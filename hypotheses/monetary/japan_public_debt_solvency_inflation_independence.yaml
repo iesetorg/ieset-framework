@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: japan_public_debt_solvency_inflation_independence
+version: 1
+status: draft
+topic: monetary
+claim: Japanese public debt crossing 150%, then 200%, then 250% of GDP 1990-2020 did not trigger a solvency or inflation crisis, contradicting household-debt-analogue framings.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT framing of Japan 1990-2020 as a large-scale falsifier of household-debt-analogue solvency claims. Human review required.
+prior_confidence: 0.65
+disclosure: Author treats Japan as a strong descriptive falsifier of naive solvency claims but resists the broader MMT inference; framing may understate demographic and saving-glut interactions.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Descriptive multi-metric pattern check: JPN debt/GDP, 10y JGB yield, CPI, BoJ holdings 1990-2020; no >300bp yield spike or >5% sustained inflation at 150/200/250% thresholds supports the claim.'
+evidence_type: associational
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - JPN
+  outcome_dim:
+  - inflation
+  - fiscal_policy
+  - monetary_policy
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  treatment_tags:
+  - japan_zirp_post_1999
+  - monetary_sovereignty
+  - japan_boj_debt_absorption
+sample:
+  countries:
+  - JPN
+  period:
+  - 1990
+  - 2020
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: jgb_yield_10y
+    source: boj:bond_yields_10y; fred:IRLTLT01JPM156N
+    transformation: level
+    notes: 10y JGB yield; FRED OECD-mirror used pending BoJ manual-drop.
+  - name: cpi_inflation
+    source: boj:CPI; fred:JPNCPIALLMINMEI
+    transformation: pct_change_yoy
+  - name: jpy_usd_exchange_rate
+    source: fred:DEXJPUS; bis:WS_EER_M
+    transformation: log_level
+  treatment:
+  - name: gross_public_debt_pct_gdp
+    source: imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: level_pct
+    notes: Tracks 150 / 200 / 250 thresholds.
+  - name: boj_jgb_holdings_pct_outstanding
+    source: boj:money_stock_m2
+    transformation: level_pct
+    notes: 'TODO: BoJ JGB holdings as share of total outstanding; manual-drop required from BoJ flow-of-funds.'
+  controls:
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_change_yoy
+  - name: current_account_pct_gdp
+    source: imf:BCA_NGDPD
+    transformation: level
+  - name: sovereign_cds_5y
+    source: academic:bloomberg_cds
+    transformation: level
+    notes: 'TODO: JPN 5y CDS via Bloomberg — manual-drop.'
+covers_claims:
+- position_id: mmt
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT claim that Japanese public debt 1990-2020 did not trigger solvency or inflation crisis, contradicting household-debt-analogue framings; direct alignment with hypothesis claim and scope.
+estimator:
+  template: descriptive
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Descriptive trajectory of Japanese gross public debt / GDP, 10y JGB yield, CPI inflation, and BoJ holdings 1990-2020. Pattern-test: no breach of
+    household-debt-style solvency triggers (yield spike, inflation spike, downgrade-driven exit of marginal investors) across 150% / 200% / 250% debt thresholds. Falsification rule and variables block remain
+    to be filled when this stub is promoted from draft.
+
+    '

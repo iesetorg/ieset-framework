@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/condition.schema.json",
+  "title": "IESET Condition Taxonomy Entry",
+  "description": "A condition in the framework's condition taxonomy specifies an institutional or economic setting and what kind of allocation mechanism empirically works best in that setting.",
+  "type": "object",
+  "required": [
+    "id",
+    "category",
+    "description",
+    "framework_position",
+    "confidence"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "conditions_favoring_markets",
+        "conditions_favoring_intervention",
+        "conditions_with_distributional_considerations",
+        "conditions_specific_institutional_models"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 30
+    },
+    "institutional_features_that_make_the_model_work": {
+      "type": "object",
+      "description": "Free-form named features explaining why the institutional model produces its observed outcomes.",
+      "additionalProperties": {"type": "string"}
+    },
+    "supporting_cases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/case"}
+    },
+    "disconfirming_cases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/case"}
+    },
+    "failed_replications": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/case"}
+    },
+    "policy_implications": {
+      "type": "string"
+    },
+    "what_the_model_is_not": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Explicit statements of what the condition does NOT claim or imply. Prevents overreading."
+    },
+    "framework_position": {
+      "type": "string",
+      "minLength": 50
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "medium_high", "high"]
+    },
+    "linked_hypotheses": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "linked_model_ids": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "sub_analyses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "observation", "framework_position"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {"type": "string"},
+          "observation": {"type": "string"},
+          "framework_position": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "case": {
+      "type": "object",
+      "required": ["id", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string"},
+        "description": {"type": "string"},
+        "citations": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: post_soviet_market_reform_life_expectancy
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Following the 1989-1992 collapse of the Soviet bloc, post-communist
+  countries that adopted market reforms rapidly (Poland, Estonia, Czech
+  Republic, Hungary, Slovenia, Slovakia, Latvia, Lithuania — the "fast
+  reformers") experienced faster recovery in life expectancy at birth
+  than countries that reformed slowly or retained state-socialist
+  economic structures (Russia, Ukraine, Belarus, Moldova, Kazakhstan —
+  the "slow reformers"). By 2019 (pre-COVID cut-off), fast reformers'
+  life expectancy had converged substantially toward Western European
+  levels; slow reformers experienced a prolonged mortality crisis (1991-
+  2003) and a partial recovery thereafter. The gap between fast and slow
+  reformer groups in 2019 should be at least 4 life-years, having been
+  essentially zero in 1989.
+
+evidence_type: causal
+
+sample:
+  countries:
+    # Fast reformers
+    - POL  # Poland
+    - EST  # Estonia
+    - CZE  # Czech Republic
+    - HUN  # Hungary
+    - SVN  # Slovenia
+    - SVK  # Slovakia
+    - LVA  # Latvia
+    - LTU  # Lithuania
+    # Slow reformers
+    - RUS  # Russia
+    - UKR  # Ukraine
+    - BLR  # Belarus
+    - MDA  # Moldova
+    - KAZ  # Kazakhstan
+    # Western European controls (already capitalist pre-1989)
+    - DEU  # Germany (including East German convergence)
+    - GBR
+    - USA
+    - FRA
+    - FIN
+    - SWE
+    - AUT
+  period: [1989, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop 2020+ (COVID mortality confound)"
+    - "include East Germany-adjusted DEU figures where available"
+
+variables:
+  outcome:
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level_years
+      notes: "WDI total life expectancy at birth, both sexes. Annual data 1989-2019."
+
+  treatment:
+    - name: fast_reformer_post_transition
+      source: "constructed: indicator = 1 for (country in fast-reformer set) AND year >= 1992. Fast reformers = POL, EST, CZE, HUN, SVN, SVK, LVA, LTU."
+      transformation: indicator
+    - name: slow_reformer_post_transition
+      source: "constructed: indicator = 1 for (country in slow-reformer set) AND year >= 1992. Slow reformers = RUS, UKR, BLR, MDA, KAZ."
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    TWFE with country + year FE. β_fast identifies the average post-1992
+    deviation in life expectancy for fast-reformer countries relative to
+    their own pre-1992 trend AND relative to the common year-level path
+    of Western controls. Similarly β_slow for slow-reformers.
+
+    Expected: β_fast > β_slow (fast reformers recovered more). Magnitude
+    prediction: fast reformers recover within ~5-10 years; slow reformers
+    show a decade+ mortality crisis, with β_slow possibly negative in
+    the initial post-treatment years.
+
+    Secondary event-study: per-year β_fast_t and β_slow_t coefficients
+    from t=-5 to t=+25 around 1992. Expect fast-reformer trajectory to
+    rise sharply post-1992; slow-reformer trajectory to DIP sharply 1992-
+    2003 then recover.
+
+falsification:
+  rule: >
+    Not supported if β_fast - β_slow <= 2 life-years at p<0.10 in the
+    aggregate TWFE, OR if fast-reformer countries' 2019 life expectancy
+    is NOT at least 4 years higher than slow-reformer average. A clean
+    pass requires (a) the between-group gap is materially wider in 2019
+    than in 1989 (at least 3 additional life-years), (b) the TWFE
+    coefficient difference is positive and significant, and (c) the
+    event-study leads (pre-1992 years) show no spurious effect.
+  test: post_soviet_reform_lifespan_recovery_diff_in_diff
+  threshold: >
+    (LE_fast_2019 - LE_slow_2019) - (LE_fast_1989 - LE_slow_1989) >= 3 years
+    AND β_fast - β_slow > 2 years at p<0.10
+
+prior_confidence: 0.92
+
+disclosure: >
+  This is one of the most-documented empirical patterns of the post-Cold-
+  War era. Peer-reviewed literature (Bloom-Kuhn-Prettner; Gerry-Mickiewicz
+  on Russian mortality; Cornia-Paniccià on transition mortality) strongly
+  supports the fast-vs-slow reformer life-expectancy divergence. Author
+  prior is extremely high; if the framework cannot detect this, something
+  is broken at the data-or-methodology level.
+
+  The framework's interest is not just "detect the pattern" but
+  decompose: fast-reformer health gains are plausibly driven by (a) higher
+  GDP growth enabling healthcare spending, (b) specific health-sector
+  institutional reforms (EBRD-guided), (c) reduced alcohol consumption
+  in some countries via excise policy, (d) EU accession effects (for
+  the 8 countries that joined EU 2004-2007). v1 tests the aggregate
+  pattern; v2 would decompose channels.
+
+scope:
+  period: [1989, 2019]
+  countries: [POL, EST, CZE, HUN, SVN, SVK, LVA, LTU, RUS, UKR, BLR, MDA, KAZ, POST_SOVIET]
+  outcome_dim: [life_expectancy_health, institutional_quality, poverty_inequality]
+  policy_family: [institutional_reform, privatisation_nationalisation]
+  treatment_tags: [post_soviet_transition_1989, shock_therapy_reforms, post_soviet_shock_therapy_1991, soviet_collapse_1991]
+
+covers_claims:
+  - position_id: austrian
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Austrian claim that rapid-reformer post-Soviet countries achieved better long-run life expectancy than state-socialist retainers is the direct fast-vs-slow-reformer divergence tested here."
+  - position_id: marxist_leninist
+    claim_index: 5
+    polarity: inverted
+    school_prediction: supported
+    confidence: high
+    notes: "Marxist-Leninist claim that 1990s market reforms caused declining life expectancy in the former Soviet states is covered (inverted) by the slow-reformer mortality-crisis arm of this hypothesis."
+
+steelman: hypotheses/steelman/post_soviet_market_reform_life_expectancy.md
+
+linked_hypotheses: []
+
+notes: >
+  Fast-reformer set based on EBRD reform-index rankings 1991-1998. Poland
+  = shock therapy 1990 (Balcerowicz Plan). Estonia = radical liberalisation
+  1992 onward. Czech = Klaus reforms 1991-1992. These are the canonical
+  fast-reformer cases.
+
+  Slow-reformer set = countries that retained large SOE sectors, maintained
+  price controls longer, had delayed privatisation, or (Belarus) explicitly
+  rejected neoliberal reform. Russia classified as slow-reformer despite
+  1992 shock therapy, because the reform was chaotic and combined with
+  fiscal collapse; mortality data supports this placement.
+
+  2020-2023 dropped due to COVID mortality confound hitting different
+  countries at different times/magnitudes.

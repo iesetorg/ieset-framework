@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: clinton_welfare_reform_labour_participation_effect
+version: 1
+status: draft
+topic: labour
+claim: Clinton's 1996 welfare reform (TANF, work requirements) increased low-skill labour-force participation and reduced caseloads without the catastrophic child-poverty outcomes critics predicted.
+notes: Stub seeded from a classical-liberal school prediction about Clinton 1996 welfare reform raising low-skill labour-force participation. Concurrent 1993 EITC expansion and the late-1990s labour boom
+  are major confounds; needs human review of identification windows.
+prior_confidence: 0.6
+disclosure: Author's market-liberal priors are sympathetic to work-requirement reform and may over-weight participation gains while under-weighting evidence of deep-poverty deterioration in the post-2001
+  cohort.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: State-staggered event study of single-mother labour-force participation (CPS) and TANF caseloads around 1996 PRWORA enactment with state/year FE; supported if 5y post-period LFPR rises >5pp vs control
+    at p<0.10 and child-poverty rate not >2pp above counterfactual.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period:
+  - 1990
+  - 2010
+  temporal_structure: panel
+  exclusion_rules:
+  - drop state-years missing CPS ASEC observations
+variables:
+  outcome:
+  - name: single_mother_labour_force_participation
+    source: fred:LNS11300002
+    transformation: level
+    notes: 'FRED CPS labour-force-participation series; women is national proxy. State-year single-mother LFPR requires bls:CPS direct — TODO add CPS state-level fetcher.
+
+      '
+  - name: tanf_caseload
+    source: derived:tanf_state_caseload
+    transformation: log
+    notes: Hand-coded HHS TANF caseload by state-year.
+  - name: child_poverty_rate
+    source: world_bank_wdi:SI.POV.NAHC
+    transformation: level
+    notes: 'Stop-gap — native source is Census SPM child poverty (US Census ACS not registered).
+
+      '
+  treatment:
+  - name: tanf_block_grant_adoption
+    source: derived:tanf_state_adoption_dates
+    transformation: indicator
+    notes: Hand-coded state TANF adoption dates 1996-1997.
+  - name: eitc_expansion
+    source: derived:eitc_max_credit
+    transformation: level
+    notes: 'EITC maximum-credit value per qualifying child; controls for concurrent 1993 EITC expansion confound.
+
+      '
+  controls:
+  - name: state_unemployment_rate
+    source: bls:LAUST010000000000003
+    transformation: level
+  - name: state_minimum_wage
+    source: fred:STTMINWGCA
+    transformation: log
+    notes: FRED state minimum wage series; CA exemplar — swap per state at wiring.
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+scope:
+  period:
+  - 1993
+  - 2010
+  countries:
+  - USA
+  outcome_dim:
+  - employment_labour
+  - welfare_state
+  - poverty_inequality
+  policy_family:
+  - welfare_architecture
+  - labour_market
+  - tax_policy
+  treatment_tags:
+  - clinton_welfare_reform_1996
+  - tanf_1996
+  - eitc_expansion_1993
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Classical liberal predicts work-requirement welfare reform raises participation without child-poverty catastrophe; Phase 4C should check that outcome windows separate TANF effect from concurrent
+    EITC expansion and late-1990s labour-market boom.
+- position_id: empirical_pragmatist
+  claim_index: 13
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Empirical pragmatist predicts outcome was labour-market-state-conditional — buoyant 1990s mattered; Phase 4C should verify pre/post comparison spans different labour-market regimes (pre-2008 boom
+    vs post-2008 recession).
+estimator:
+  template: event_study
+  clustering: state
+  fixed_effects:
+  - state
+  - year
+  notes: 'Event study around 1996 PRWORA enactment using state-year panel of single-mother labour-force participation (CPS) and TANF caseloads. State-staggered TANF block-grant adoption dates as treatment
+    timing. Pre-window 1990-1995, post-window 1996-2010.
+
+    '

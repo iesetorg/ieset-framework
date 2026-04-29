@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nordic_1990s_reform_welfare_scale_preservation
+version: 1
+status: draft
+topic: welfare_architecture
+claim: Nordic 1990s reforms (Swedish pension 1999, Norway handlingsregel 2001, Danish flexicurity) preserved
+  welfare-state scope while restoring fiscal sustainability, showing that welfare-state scale is not inherently
+  unsustainable.
+notes: Origin is auto-generated coverage-gap stub seeded from social-democratic claim that Nordic
+  1990s pension/fiscal/labour reforms preserved welfare-state scope while restoring sustainability.
+prior_confidence: 0.65
+disclosure: Author has market-liberal priors but treats the Nordic reform record as well-evidenced;
+  risk is treating "preserved scale" loosely without pre-specifying the spending/coverage thresholds.
+falsification:
+  rule: >-
+    PRIMARY (dispositive, three-leg): the hypothesis is SUPPORTED if ALL three legs hold in
+    at least 3 of 4 Nordic countries (SWE, NOR, DNK, FIN):
+    (A) WELFARE-SCALE PRESERVATION — OECD SOCX public social expenditure share of GDP,
+        peak (1985-2000) − 2005-2008 mean ≤ 3.0pp;
+    (B) FISCAL SUSTAINABILITY — IMF GGXWDG_NGDP general government gross debt,
+        2005-2008 mean ≤ 1990-1995 peak + 5.0pp (i.e. debt held or fell);
+    (C) EMPLOYMENT RECOVERY — WDI SL.UEM.TOTL.ZS unemployment rate (inverse-employment proxy),
+        1990-1995 peak − 2005-2008 mean ≥ 2.0pp.
+    REFUTED if 0 of 3 legs pass in 3+ Nordics. PARTIAL if 1-2 legs pass.
+    INFORMATIVE: per-country diagnostics + chart of debt/GDP trajectory.
+    METHOD_VALID: requires OECD SOCX, IMF GGXWDG_NGDP and WDI SL.UEM.TOTL.ZS available
+    for all four countries 1990-2008. If OECD SOCX is missing the verdict is INCONCLUSIVE
+    (data gap on the primary scale-preservation outcome) — the remaining legs cannot
+    grade the scale-preservation claim alone.
+  test: nordic_1990s_three_leg_descriptive_pre_post
+  threshold: >-
+    PRIMARY: legs (A AND B AND C) each pass in ≥3 of 4 Nordic countries (SWE/NOR/DNK/FIN),
+    with thresholds A: SOCX peak-to-2005-2008 decline ≤ 3.0pp; B: debt drift ≤ +5.0pp;
+    C: unemployment fall ≥ 2.0pp.
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic falsification rule to a
+  three-leg country-by-country pass/fail check on a pre-/post-reform descriptive design,
+  with the 1990-1995 crisis window as the pre-reform baseline and 2005-2008 as the
+  post-reform/pre-GFC window. Each leg has a defendable magnitude threshold pinned to
+  what a fair reader of the social-democratic claim would accept. Employment-rate proxy
+  uses unemployment fall (≥2pp) because WDI SL.EMP.TOTL.SP.ZS is not in the current
+  vintage; OECD SOCX (the primary scale outcome) is also not in the current vintage,
+  so v1 returns INCONCLUSIVE pending the SOCX fetcher — informative diagnostics for
+  the two available legs are emitted regardless. Re-run is automatic once the SOCX
+  fetcher lands; no spec change required.
+evidence_type: associational
+sample:
+  countries: [SWE, NOR, DNK, FIN]
+  period: [1985, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing OECD SOCX series"
+variables:
+  outcome:
+    - name: social_expenditure_share_gdp
+      source: "oecd:SOCX"
+      transformation: level
+      notes: "OECD SOCX public social expenditure as % of GDP — primary scale-preservation outcome."
+    - name: government_debt_pct_gdp
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+      notes: "IMF general government gross debt — fiscal-sustainability outcome."
+    - name: employment_rate
+      source: "world_bank_wdi:SL.EMP.TOTL.SP.ZS"
+      transformation: level
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+  treatment:
+    - name: nordic_1990s_reform_indicator
+      source: "constructed: country-specific indicators — SWE 1999 pension reform, NOR 2001 handlingsregel, DNK 1994 flexicurity. Pre/post-1990s reform test."
+      transformation: indicator
+  controls:
+    - name: old_age_dependency_ratio
+      source: "world_bank_wdi:SP.POP.DPND.OL"
+      transformation: level
+    - name: female_labour_force_participation
+      source: "world_bank_wdi:SL.TLF.CACT.FE.ZS"
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    Pre/post-1990s-reform descriptive comparison across SWE/NOR/DNK/FIN over
+    1985-2015. Multi-metric scorecard: (a) social expenditure share decline
+    <3pp from peak, (b) debt-to-GDP stabilised within 5pp of pre-reform peak,
+    (c) employment rate up >2pp. Hypothesis SUPPORTED if all three preservation
+    criteria met. Caveat: macro-cyclical recovery 1995-2007 partially explains
+    employment + debt outcomes — flagged TODO swarm-6e for sensitivity using
+    matched OECD donor pool.
+
+scope:
+  period: [1991, 2010]
+  countries: [SWE, NOR, DNK, NORDIC]
+  outcome_dim: [welfare_state, fiscal_policy, employment_labour]
+  policy_family: [welfare_architecture, fiscal_policy, labour_market, institutional_reform]
+  treatment_tags: [swedish_pension_reform_1999, norway_handlingsregel_2001, danish_flexicurity]
+
+covers_claims:
+  - position_id: social_democratic
+    claim_index: 6
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Social-democratic position predicts 1990s Nordic reforms preserved welfare-state scope while restoring fiscal sustainability; hypothesis tests the same scale-preservation-plus-sustainability proposition."
+

@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: competition_enforcement_consumer_welfare_effect
+version: 1
+status: draft
+topic: regulatory
+claim: Strict competition-policy enforcement (EU DG-Comp, Bundeskartellamt) produces higher consumer welfare
+  than laissez-faire antitrust (US post-Bork consumer-welfare-standard narrowing) in sectors prone to
+  concentration.
+notes: Origin is auto-generated coverage-gap stub seeded from ordoliberal framing of strict
+  EU/German competition enforcement as producing higher consumer welfare than US post-Bork narrowing.
+  Human review required.
+prior_confidence: 0.55
+disclosure: Author has market-liberal priors that may favour the post-Bork consumer-welfare standard,
+  cutting against the hypothesis; framing also risks treating EU vs US institutional differences as cleanly identified.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Cross-country DiD on concentration-prone sectors EU vs US 1980-2023; markup gap (EU-US) <0 with p<0.10 in concentration-prone sectors supports the strict-enforcement claim.'
+evidence_type: associational
+sample:
+  countries: [USA, DEU, FRA, GBR, ITA, ESP, NLD, BEL, AUT, SWE, POL]
+  period: [1980, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-sector-years missing OECD PMR or BIS markup series"
+variables:
+  outcome:
+    - name: industry_markup_index
+      source: "oecd_pmr:network_sectors_indicator"
+      transformation: log
+      notes: "Sectoral markup proxy via OECD PMR network-sectors indicator (lower regulation = higher competitive intensity). TODO swarm-6e: prefer De Loecker-Eeckhout markup series when registered."
+    - name: hhi_concentration_index
+      source: "oecd:industry_concentration"
+      transformation: level
+      notes: "OECD sector-level Herfindahl-Hirschman concentration index."
+    - name: consumer_price_to_marginal_cost_ratio
+      source: "oecd:value_added_decomposition"
+      transformation: level
+      notes: "OECD price-cost-margin proxy. TODO swarm-6e: confirm exact dataflow."
+  treatment:
+    - name: strict_competition_enforcement_indicator
+      source: "constructed: indicator = 1 for EU DG-Comp jurisdictions and DEU (Bundeskartellamt); 0 for USA post-1980 (post-Bork consumer-welfare-standard narrowing)."
+      transformation: indicator
+    - name: oecd_pmr_index_overall
+      source: "oecd_pmr:overall"
+      transformation: level
+      notes: "OECD Product Market Regulation overall index. Higher = more interventionist regulation."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, sector, year]
+  notes: >
+    Cross-country sectoral panel-FE 1980-2023 of markup / concentration on
+    competition-enforcement-strictness indicator and OECD PMR. Country,
+    sector, year FE; country-clustered SEs. Caveat: 'consumer welfare' is
+    multi-dimensional (price, choice, innovation) — markup proxies are the
+    closest tractable outcome.
+
+scope:
+  period: [1980, 2023]
+  countries: [EU, DEU, USA]
+  outcome_dim: [competition_concentration, regulation_compliance_cost, productivity]
+  policy_family: [competition_policy, regulation]
+  treatment_tags: [eu_dg_comp_enforcement, bundeskartellamt, us_post_bork_doctrine_1980]
+
+covers_claims:
+  - position_id: ordoliberal
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Ordoliberal position directly predicts strict EU/German antitrust yields higher consumer welfare than US post-Bork laissez-faire; claim and hypothesis are definitionally aligned on the EU-strict-vs-US-lax cross-country test."
+  - position_id: ordoliberal
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: low
+    notes: "Audit flagged FAIL — claim is US-only time-series of Reagan/Trump antitrust retreat, whereas this hypothesis is EU-vs-US cross-country; included provisionally pending Phase 4C split into a dedicated us_antitrust_retreat_concentration_effect hypothesis."
+

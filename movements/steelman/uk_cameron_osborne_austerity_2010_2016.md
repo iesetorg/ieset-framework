@@ -1,0 +1,5 @@
+# Steelman — UK Cameron–Osborne austerity
+
+1. **The austerity was counterproductively pro-cyclical.** 2010-2012 consolidation during a liquidity-trap recovery arguably extended the output gap and depressed long-run potential GDP. Blanchard-Leigh 2013 IMF working paper estimated multipliers were substantially higher than Treasury assumed. Coding this as "market-oriented fiscal discipline" credits the policy type without accounting for timing costs.
+2. **Productivity stagnation post-2008 has many candidate causes** — financial-sector contraction, Brexit uncertainty, weak business investment, low public-sector investment under austerity, misallocated capital in zombie firms on cheap credit. Attributing UK decline primarily to austerity (or primarily to anything) overstates identification.
+3. **Distributional costs were substantial.** Working-age welfare cuts + council-funding cuts compounded over the decade with material impacts on child poverty, local public-health metrics, and social infrastructure. The framework should not code economic aggregates without acknowledging distributional costs; D.1.6 is the relevant condition entry.

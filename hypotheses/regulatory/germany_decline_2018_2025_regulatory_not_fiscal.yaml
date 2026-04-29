@@ -1,0 +1,196 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: germany_decline_2018_2025_regulatory_not_fiscal
+version: 1
+status: pre_registered
+topic: regulatory
+claim: 'German industrial gross value added, manufacturing output, and real household income diverged materially from a synthetic-Germany donor- pool counterfactual over 2018-2025, and a variance decomposition
+  across candidate channels attributes the majority of the divergence to regulatory-channel factors (Environmental Policy Stringency index increase post-2017, nuclear-phase-out schedule, single-supplier
+  Russian gas dependency lock-in, industrial emission and reporting rules) rather than to fiscal-channel factors (general government consumption and tax burden were broadly stable across the Merkel late-term
+  and Scholz years, with the debt brake in effect until 2023). The hypothesis is a companion to the Energiewende electricity-price hypothesis but tests the broader claim that the observed German industrial
+  decline over this window is a regulatory/energy-policy story, not a fiscal-policy story, and a null (fiscal channel dominates) would meaningfully restructure the framework''s reading of the German case.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - DEU
+  - FRA
+  - NLD
+  - BEL
+  - ITA
+  - ESP
+  - POL
+  - CZE
+  - AUT
+  - SWE
+  - FIN
+  - USA
+  period:
+  - 2005
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing primary outcome (industrial GVA real)
+  - flag COVID years 2020-2021 and Russia-Ukraine shock years 2022-2023 for sensitivity runs with and without those windows
+  - exclude Ukraine and Russia entirely from the donor pool as active belligerents
+scope:
+  period:
+  - 2005
+  - 2025
+  countries:
+  - DEU
+  - FRA
+  - NLD
+  - BEL
+  - ITA
+  - ESP
+  - POL
+  - CZE
+  - AUT
+  - SWE
+  - FIN
+  - USA
+  outcome_dim:
+  - gdp_growth
+  - industrial_capability
+  - productivity
+  - energy
+  - regulation_compliance_cost
+  policy_family:
+  - regulation
+  - energy_policy
+  - fiscal_policy
+  treatment_tags:
+  - merkel_groko_2018
+  - energiewende
+  - nuclear_phase_out
+  - nord_stream_2
+  - eeg_surcharges
+  - debt_brake
+variables:
+  outcome:
+  - name: log_industrial_gva_real
+    source: world_bank_wdi:NV.IND.TOTL.KD
+    transformation: log
+    notes: Industrial gross value added constant local currency. Primary outcome.
+  - name: log_manufacturing_va_real
+    source: world_bank_wdi:NV.IND.MANF.CD
+    transformation: log_real
+    notes: Manufacturing-only VA. Secondary outcome. Deflated to constant prices.
+  - name: real_household_disposable_income_pc
+    source: 'constructed: OECD SDD household disposable income per capita real; WDI NY.GDP.PCAP.KD fallback. Specialist OECD fetcher pending.'
+    transformation: log
+    notes: Tertiary outcome to confirm the industrial story translates into household-level welfare.
+  treatment:
+  - name: deu_post_2018_dummy
+    source: 'constructed: indicator = 1 for DEU from 2018 onward (post-Merkel-IV-coalition formation + Energy Collection Act tightening + Nord Stream 2 construction start); 0 otherwise.'
+    transformation: indicator
+    notes: '2018 treatment date is pre-registered on three concurrent events: (a) GroKo formation and the coalition''s coal-exit and climate- policy commitments, (b) cumulative post-Fukushima nuclear schedule
+      reaching the steep phase-out cadence, (c) Nord Stream 2 under construction locking in single-supplier gas dependency. Alternative treatment dates 2011 (Fukushima Energiewende) and 2022 (war) are reported
+      as sensitivity.
+
+      '
+  decomposition_channels:
+  - name: environmental_policy_stringency_index
+    source: oecd:OECD.ENV.EPI,DSD_ENV_EPI@DF_ENV_EPI,1.0
+    transformation: level
+    notes: OECD Environmental Policy Stringency index. Primary regulatory-channel measure. Specialist OECD fetcher pending — v1 flags as data-gated.
+  - name: industrial_electricity_price_log
+    source: 'constructed: IEA industrial electricity price, band IC, USD/MWh. Specialist IEA fetcher pending.'
+    transformation: log
+    notes: Energy-policy transmission channel. Shared with german_energiewende_industrial_cost_trajectory.
+  - name: russian_gas_import_share
+    source: 'constructed: IEA/Eurostat natural gas imports from Russia / total natural gas imports. Pending fetcher.'
+    transformation: level
+    notes: Single-supplier dependency channel. DEU ran 50-55% Russia-import shares 2015-2021; policy choice rather than geological necessity.
+  - name: general_government_consumption_pct_gdp
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: Primary fiscal-channel measure; used to test the null channel.
+  - name: tax_revenue_pct_gdp
+    source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+    transformation: level
+    notes: Fiscal-channel supplementary measure.
+  - name: debt_to_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+    notes: Fiscal-stance channel. DEU debt/GDP was falling over 2012-2019 under the debt brake; any decline is not plausibly attributable to fiscal loosening.
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: working_age_population_share
+    source: world_bank_wdi:SP.POP.1564.TO.ZS
+    transformation: level
+    notes: Demographic decline is a named alternative explanation; this control is pre-registered to discipline that channel.
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: china_industrial_production_index_log
+    source: 'constructed: China NBS industrial production index; pending fetcher.'
+    transformation: log
+    notes: Chinese industrial competition is a named alternative explanation; this control absorbs a common global competitor shock.
+  - name: net_migration_rate
+    source: world_bank_wdi:SM.POP.NETM
+    transformation: level
+    notes: Migration effects are a named alternative; this control partials them out.
+intervention_channel: regulatory
+intervention_channel_justification: 'The hypothesis''s primary claim is that the German decline is regulatory-channel driven (EPS rise, nuclear phase-out, industrial emission rules, gas-supply architecture)
+  not fiscal-channel driven (broadly stable government consumption, tax burden, and debt/GDP over the window). The variance decomposition explicitly compares channels; assigning intervention_channel = regulatory
+  reflects the hypothesis being tested, not the answer assumed. A finding that the fiscal channel dominates would falsify the hypothesis and is a permitted outcome.
+
+  '
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  random_seed: 20260423
+  notes: "Primary specification: synthetic control with DEU as treated unit (treatment = 2018). Donor pool = FRA, NLD, BEL, ITA, ESP, POL, CZE, AUT, SWE, FIN, USA. Pre-treatment fit window 2005-2017. Primary\
+    \ outcome = log industrial GVA real. Placebo permutation tests. Pre-trend RMSPE reported.\nSecondary specification: variance decomposition. Regress the DEU- synthetic gap on the panel of candidate channels\
+    \ interacted with a DEU-indicator, reporting what share of the post-2018 gap each channel explains. Compare the regulatory-channel share (EPS + electricity price + Russia gas share) to the fiscal-channel\
+    \ share (gov consumption + tax revenue + debt) and to the alternative- explanation share (China competition + migration + demographics). The headline number is the ratio of regulatory-to-fiscal explained\
+    \ shares of the gap.\nTertiary specification: same synthetic control on manufacturing VA and on household disposable income per capita, to establish whether the regulatory-channel signal transmits beyond\
+    \ industrial output.\nKnown limitations: (a) The 2020-2021 COVID and 2022-2023 energy-shock windows are\n    confounders. Results reported with and without those windows.\n(b) DEU is the sole treated\
+    \ unit; external validity is narrow to\n    the German case. The hypothesis does not claim a general\n    \"regulation beats fiscal\" relationship outside Germany.\n(c) Key channel variables (EPS index,\
+    \ IEA industrial electricity\n    price, Russian gas import share) are pending fetchers; v1 is\n    data-gated and will not produce a final result until those\n    ship. The pre-registration locks the\
+    \ specification now so that\n    when data lands the analysis runs without degrees of freedom.\n(d) \"Regulatory vs fiscal\" is a binary the data can refuse; both\n    channels being jointly important\
+    \ is an allowed outcome and\n    weakens the hypothesis without falsifying it outright.\n"
+falsification:
+  rule: 'Not supported if (a) the DEU synthetic-control pre-trend fit fails (pre-treatment RMSPE on industrial GVA > 0.04 log points), OR (b) the post-2018 DEU-synthetic gap does not exceed the 90th percentile
+    of placebo gaps across the donor pool at a 5-year-cumulative horizon, OR (c) the variance decomposition assigns less than 40% of the explained gap to the regulatory channel bundle, OR (d) the fiscal
+    channel bundle explains more of the gap than the regulatory channel bundle does on the primary outcome. A null or reversed result would restructure the framework''s reading of the German case toward
+    fiscal or demographic explanations.
+
+    '
+  test: deu_synthetic_control_plus_regulatory_vs_fiscal_variance_decomposition
+  threshold: 'post-2018 DEU-synthetic gap on log industrial GVA <= -0.05 (5-yr cumulative)  AND placebo permutation p-value < 0.10  AND regulatory_channel_share_of_explained_gap >= 0.40  AND regulatory_channel_share
+    > fiscal_channel_share
+
+    '
+prior_confidence: 0.68
+disclosure: 'Author''s prior is that the German industrial decline 2018-2025 is predominantly regulatory/energy-policy driven rather than fiscal- policy driven, based on the public-debate framing around
+  EEG surcharges, nuclear phase-out, and gas-supply architecture. Prior is 0.68 rather than higher because (a) the 2022-2023 war shock is a large confound, (b) Chinese industrial competition is a genuine
+  alternative, and (c) the regulatory-vs-fiscal decomposition is sensitive to how bundles are defined — a different bundle assignment could flip the ratio. The pre-registration commits to publishing a fiscal-channel-dominant
+  finding with equal prominence if the data produces one.
+
+  The author is based outside Germany and holds no German industrial or energy-sector positions. The hypothesis''s political valence (regulatory policy caused the decline) is disclosed as aligning with
+  critiques of German green-transition design; an anti-critique finding is a permitted outcome and triggers the standard asymmetric- update rule.
+
+  '
+steelman: hypotheses/steelman/germany_decline_2018_2025_regulatory_not_fiscal.md
+linked_hypotheses:
+- german_energiewende_industrial_cost_trajectory
+- german_manufacturing_va_decline_2017_2024
+- eu_post_2021_gas_shock_industrial_output_impact
+- state_size_reduces_household_income_growth
+notes: 'This is mega-spec D.1 #3, the flagship German-decline case. It is deliberately designed so that the regulatory-vs-fiscal decomposition is the primary falsifier, rather than a "did Germany decline"
+  question (which is not in serious empirical dispute).
+
+  Data readiness: - WDI NV.IND.TOTL.KD, NV.IND.MANF.CD (ready) - WDI NE.CON.GOVT.ZS, GC.TAX.TOTL.GD.ZS (ready) - IMF GGXWDG_NGDP (ready) - WDI SP.POP.*, NE.TRD.GNFS.ZS, SM.POP.NETM (ready) - OECD EPS (pending
+  — framework data-gated) - IEA industrial electricity price (pending) - Russian gas import share (pending) - China industrial production index (pending) - OECD SDD HH disposable income (pending)
+
+  v1 pre-registers the full specification and runs partially on the ready data; the regulatory-vs-fiscal decomposition waits on EPS + IEA + gas share fetchers.
+
+  '

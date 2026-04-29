@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bukele_fdi_gdp_investment_climate_2019_2024
+version: 1
+status: candidate
+topic: growth
+claim: 'El Salvador''s FDI inflow, real-GDP growth, tourism arrivals, and business-formation rate accelerated under the Bukele era (2019-2024) relative to a Central American peer-country donor pool (Honduras,
+  Guatemala, Nicaragua, Costa Rica, Panama, Dominican Republic). The pre-registered claim is that under a synthetic-control design, Salvadoran cumulative real-GDP growth 2019Q2-2024Q4 and cumulative FDI-inflow-share-of-GDP
+  exceed the synthetic counterfactual with permutation inference at p < 0.10, and that tourism arrivals growth 2022-2024 (once post-COVID recovery paths are netted out) is faster than the peer-pool weighted
+  average. The intended mechanism is a combination of (a) the homicide-rate collapse reducing the country-risk premium and security-driven location avoidance, (b) the 2023 tech-incentive law and tax reform
+  lowering effective entry costs, and (c) the Bukele-brand publicity effect (conferences, Bitcoin-tourism, ''CECOT-tour'' narrative). The null counter-claim is that the Bukele era produced no material divergence
+  from the Central American growth path once commodity-cycle and US-demand controls are included.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - CRI
+  - PAN
+  - DOM
+  period:
+  - 2010
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Nicaragua post-2018 from donor pool due to sanctions-regime structural break
+  - exclude pandemic 2020Q2-2020Q4 from pre-treatment weighting as COVID shock
+scope:
+  period:
+  - 2010
+  - 2025
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - CRI
+  - PAN
+  - DOM
+  outcome_dim:
+  - gdp_growth
+  - capital_flows
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - tax_policy
+  - regulation
+  treatment_tags:
+  - bukele_2019
+  - salvador_homicide_collapse
+  - salvador_tech_incentive_law_2023
+  - salvador_tax_reform_2023
+variables:
+  outcome:
+  - name: real_gdp
+    source: imf:NGDP_R; world_bank_wdi:NY.GDP.MKTP.KD; sv_bcr:PIB
+    transformation: log_level_cumulative
+  - name: fdi_inflow_share_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS; unctad:World
+    transformation: level
+  - name: tourism_arrivals
+    source: world_bank_wdi:ST.INT.ARVL; sv_mitur:Estadísticas
+    transformation: log_level
+  - name: new_business_registration
+    source: world_bank_enterprise:Business; sv_cnr:Registro
+    transformation: log_level
+    notes: World Bank discontinued Doing Business; backfill via national registro comercial.
+  treatment:
+  - name: bukele_era_indicator
+    source: 'constructed: binary = 1 for SLV from 2019-06-01 onward'
+    transformation: binary
+  - name: homicide_rate_log
+    source: unodc:intentional_homicide
+    transformation: log_level
+    notes: 'Channel variable: homicide decline is the proposed mechanism for country-risk premium compression.'
+  controls:
+  - name: commodity_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: us_gdp_growth
+    source: fred:GDPC1
+    transformation: yoy_growth
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: remittance_share_gdp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: level
+  - name: wgi_rule_of_law
+    source: wgi:GOV_WGI_RL.EST
+    transformation: level
+    notes: Included as a control because a rule-of-law deterioration would normally deter FDI; the Salvadoran paradox is material-risk for the hypothesis.
+intervention_channel: bundled
+intervention_channel_justification: 'Bukele''s growth-relevant reforms span regulatory (tech-incentive law, security/crime reform), fiscal (tax reform), and institutional (rule-of-law regression) channels.
+  The bundled coding follows invariant 4 where intervention content cuts across channels.
+
+  '
+estimator:
+  template: synth_did
+  clustering: country
+  notes: 'Primary: synth_did with SLV treated from 2019Q2, Central American peers as donor pool. Secondary: Callaway-Sant''Anna DiD. Tertiary: local projections with SLV-indicator interacted with quarters-since-inauguration
+    for dynamic effect. Channel decomposition: regress the post-treatment outcome gap on homicide-rate log (as mediator) to estimate the share of the GDP/FDI effect attributable to the security channel.
+
+    '
+falsification:
+  rule: 'Not supported if any of: (a) synth_did estimated CATT on log(real_gdp) over 2019Q2-2024Q4 is not positive at p_perm < 0.10 relative to the Central American donor pool, OR (b) CATT on fdi_inflow_share_gdp
+    is not positive, OR (c) CATT on tourism_arrivals (post-2022 recovery window) is not positive, OR (d) the channel-decomposition test attributes less than 30% of the GDP gap to the homicide-rate mechanism
+    (i.e., the security-channel story fails and the observed acceleration must be explained by other factors including remittances, commodity cycle, or post-COVID base effects), OR (e) the SLV real-GDP
+    growth is statistically indistinguishable from the Central American peer-group weighted average.
+
+    '
+  test: synth_did_bundle_plus_channel_decomposition
+  threshold: 'CATT_2019Q2_2024Q4(log_real_gdp) > 0 at p_perm < 0.10 AND CATT_2019Q2_2024Q4(fdi_share_gdp) > 0 at p_perm < 0.10 AND CATT_2022_2024(tourism_arrivals) > 0 AND homicide_channel_share_of_gdp_gap
+    >= 0.30
+
+    '
+prior_confidence: 0.5
+disclosure: 'Author''s priors are divided: the security-to-growth channel is theoretically strong (Besley-Mueller 2012 Colombia evidence; Soares 2015 Latin American crime-and-growth literature), but Salvadoran
+  2019-2024 growth has been modest in absolute terms (~3% real GDP growth average) and the FDI data show mixed signals (UNCTAD reports show SLV FDI stocks rose modestly but not dramatically). Prior 0.50
+  reflects genuine uncertainty on whether the observed acceleration is large enough to register as statistically distinguishable from the peer-pool once commodity-cycle and US-demand controls are included.
+  The author''s market-liberal prior leans toward "security reform plus tax incentives drive growth" but pre-registration discipline is binding.
+
+  '
+conflict_disclosure: 'Author has no Salvadoran equity, sovereign-debt, or real-estate exposure. Disclosed divided prior; binding pre-registration.
+
+  '
+steelman: hypotheses/steelman/bukele_fdi_gdp_investment_climate_2019_2024.md
+linked_hypotheses:
+- rule_of_law_institutional_growth
+- industrial_policy_developmentalist_states_growth
+- bukele_mass_incarceration_homicide_impact_2019_2024
+notes: 'Data-gated on UNCTAD FDI inflows (annual), BCR quarterly GDP, MITUR tourism arrivals, and CNR new-business-registration series. The channel-decomposition test (security mediator) is the load-bearing
+  falsification criterion — a growth acceleration without the security-channel signal would indicate the acceleration is driven by factors the movement doctrine does not claim credit for.
+
+  '

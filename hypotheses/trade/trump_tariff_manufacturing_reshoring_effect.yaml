@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trump_tariff_manufacturing_reshoring_effect
+version: 1
+status: draft
+topic: trade
+claim: Trump tariff policy 2018-2019 did not reshore US manufacturing output to a meaningful degree, and
+  tariff incidence fell on US importers and consumers, consistent with post-Keynesian emphasis on demand-side
+  rather than price-competition factors in trade flows.
+notes: Origin is auto-generated coverage-gap stub seeded from post-Keynesian framing of Trump 2018-19
+  tariffs as failing to reshore manufacturing with incidence on US importers/consumers. Human review required.
+prior_confidence: 0.65
+disclosure: Author has market-liberal priors and considers the tariff-pass-through evidence well
+  established; framing risks treating null reshoring as evidence of demand-side trade-flow theory rather than just lag.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'DiD on US 2018-19 tariffed-good imports vs untariffed control with manufacturing-employment outcome
+    h=12..36 months; reshoring effect <2% with p<0.10 supports null-reshoring claim; price pass-through >0.8 confirms incidence.'
+evidence_type: associational
+
+scope:
+  period: [2018, 2023]
+  countries: [USA]
+  outcome_dim: [industrial_capability, trade_liberalisation, employment_labour]
+  policy_family: [trade_policy]
+  treatment_tags: [trump_tariffs_2018, trump_tariffs_2019, tariff_incidence_pass_through]
+sample:
+  countries: [USA]
+  period: [2014, 2023]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2020-2021 COVID-19 demand shock from primary spec; report sensitivity"
+variables:
+  outcome:
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: manufacturing_employment_thousands
+      source: "bls:CES3000000001"
+      transformation: log
+      notes: "BLS CES manufacturing employment, primary reshoring outcome."
+    - name: tariffed_goods_import_value_log
+      source: "us_census:trade_in_goods"
+      transformation: log
+      notes: "US Census trade-in-goods imports of HS-code-defined tariffed-goods bundle."
+    - name: import_unit_value_index
+      source: "bls:import_price_index"
+      transformation: level
+      notes: "BLS import price index — tariff pass-through outcome."
+  treatment:
+    - name: trump_tariff_2018_indicator
+      source: "constructed: indicator = 1 for tariffed-HS-code goods from 2018Q1 (Section 232 steel/aluminium) and 2018Q3 (Section 301 China); cumulative bundle through 2019."
+      transformation: indicator
+  controls:
+    - name: real_effective_exchange_rate_usd
+      source: "fred:DTWEXBGS"
+      transformation: log
+    - name: log_real_gdp
+      source: "fred:GDPC1"
+      transformation: log
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+estimator:
+  template: did_callaway_santanna
+  clustering: hs_code
+  fixed_effects: [hs_code, year]
+  notes: >
+    DiD with staggered tariff adoption (Section 232 2018Q1, Section 301 2018Q3
+    waves) using Callaway-Sant'Anna estimator. Treated unit = tariffed HS-code
+    goods; control = untariffed HS-code goods. Outcome 1 = manufacturing
+    employment / VA in tariffed-good-producing US industries (reshoring test);
+    outcome 2 = import unit value (pass-through test, Amiti-Redding-Weinstein
+    style). Caveat: 2020-2021 COVID demand shock confounds 12-36-month
+    reshoring window — primary spec ends 2019Q4; secondary extends with
+    COVID-control dummies.
+
+covers_claims:
+  - position_id: post_keynesian
+    claim_index: 13
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Post-Keynesian position predicts Trump tariffs did not reshore US manufacturing and incidence fell on importers/consumers; hypothesis tests the same reshoring-failure and pass-through claim."
+

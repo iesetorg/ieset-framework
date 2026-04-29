@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: korean_institutional_divergence_gdp_gap
+version: 1
+status: draft
+topic: growth
+claim: 'Korean division 1945-present delivers a natural experiment: matched populations, geography, pre-war institutions; post-war institutional divergence explains the roughly 20x GDP-per-capita gap.'
+notes: Seeded from an institutionalist (AJR) claim that the Korean division is a natural experiment vindicating institutions-cause-growth. Descriptive divergence test; data quality on PRK side requires
+  human review before pre-registration.
+prior_confidence: 0.75
+disclosure: 'Authorial bias risk: institutionalist framing leans on the natural-experiment trope; in reality the post-1945 paths differed in foreign aid (US for ROK, Soviet for DPRK), security alignments,
+  and 1960s policy choices, so divergence is the institutions-times-aid bundle, not pure institutions.'
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if log_gdppc(KOR, 2023) − log_gdppc(PRK, 2023) on Maddison MPD2020 is at least ln(20) ≈ 2.996 (i.e. the realised KOR/PRK ratio is at or above
+    the claim''s "~20x"). REFUTED if the same log-gap is below ln(10) ≈ 2.303 (less than half the claimed gap, per the original stub language). PARTIAL otherwise (direction correct but magnitude short).
+    INFORMATIVE (colour, non-gating): the pre-window |log-gap| at the realised baseline year (1953 if available, else latest pre-division co-observed year) should be < 0.30. Larger pre-window gaps weaken
+    the "matched starting conditions" premise of the natural-experiment framing but do not flip the verdict. METHOD_VALID: at least one common KOR/PRK observation each in MPD2020 plus a 2023 endpoint via
+    the Maddison Korea-extension; otherwise emit `inconclusive (data gap on …)`.'
+  test: korean_bilateral_gdppc_ratio_dispositive_threshold
+  threshold: 'PRIMARY: log_gap_endpoint = log_gdppc(KOR, 2023) − log_gdppc(PRK, 2023); SUPPORTED if log_gap_endpoint ≥ 2.996 (≥ 20× ratio); refuted if log_gap_endpoint < 2.303 (< 10× ratio); partial in
+    between.'
+evidence_type: descriptive
+methodology_note: 'v1 promotion (2026-04-24). Sharpened the original stub''s "p > 0.10 or <10% move" generic falsification rule into a dispositive ratio test on Maddison MPD2020 KOR/PRK GDP-per-capita:
+  SUPPORTED if endpoint ratio ≥ 20× (log-gap ≥ ln 20 ≈ 2.996, matching the claim''s "~20x"), refuted if ratio < 10× (log-gap < ln 10 ≈ 2.303, the spec''s existing falsification floor), partial in between.
+  Pre-window is 1953 if MPD2020 has a co-observation, else the latest pre-division co-observed year (in current vintage: 1943). MPD2020 has no PRK observations 1944–1989 — that data gap is documented in
+  the result card and does not gate the primary verdict because the endpoint ratio is itself dispositive. Bank of Korea''s DPRK GNI reconstruction (2020–2023) is reported as a cross-check; WDI NY.GDP.PCAP.KD
+  has no PRK observations and so cannot serve as the primary GDP series.'
+sample:
+  countries:
+  - KOR
+  - PRK
+  period:
+  - 1953
+  - 2023
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: log_gdp_pc_ppp
+    source: maddison:gdppc_ppp
+    transformation: log
+  - name: log_gdp_pc_constant
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: prk_gdp_pc_estimate
+    source: bank_of_korea:north_korea_gni_per_capita
+    transformation: log
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Bilateral KOR-PRK descriptive comparison. Single-statistic divergence test (~20x GDP-per-capita ratio by 2023). Note: a more comprehensive pattern-match version of this hypothesis exists at north_south_korea_development_divergence_1953_present
+    (multi_metric_checklist). This hypothesis retains the simpler descriptive framing.
+
+    '
+scope:
+  period:
+  - 1945
+  - 2023
+  countries:
+  - KOR
+  - PRK
+  outcome_dim:
+  - gdp_growth
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - korean_division_1945
+covers_claims:
+- position_id: institutionalism
+  claim_index: 3
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Identical-proposition: claim and hypothesis both test whether post-1945 Korean institutional divergence explains the ~20x GDP-per-capita gap (natural-experiment framing).'

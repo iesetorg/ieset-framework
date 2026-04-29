@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: initial_state_share_predicts_drift_reversal
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Across liberal democracies, the country's general-government spending
+  share at the start of the corpus window negatively predicts subsequent
+  statist drift. Countries that began with very high state-share
+  (Sweden 1976 ~52%, Italy ~37%, France ~40%) have on average reverted —
+  legislated market-pivot moves — while countries that began with relatively
+  constrained state-share (Germany ~32%, Switzerland ~26%, Japan ~22%, Korea
+  ~18%) have on average expanded. This is the conditional-convergence
+  pattern applied to policy structure rather than income: positions
+  regress toward a common median over multi-decade horizons. If the
+  pattern holds, then the strong-form managerial-flywheel claim is wrong
+  not because liberal democracies don't drift, but because they drift
+  *toward* a common position from both directions, not monotonically away
+  from a market-oriented baseline.
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  The "treatment" is initial state structure — a country-level
+  institutional inheritance. The outcome is the cumulative direction of
+  legislated moves over the next 50 years. The mechanism the hypothesis
+  proposes is reversion-to-the-median rather than monotonic creep.
+
+evidence_type: associational
+sample:
+  countries:
+    [
+      USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, IRL, AUT,
+      PRT, GRC, SWE, NOR, DNK, FIN, CHE, POL, CZE, HUN,
+      AUS, NZL, CAN, JPN, KOR, ISR,
+    ]
+  period: [1976, 2025]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >
+    Treatment is a country-level baseline value (general-government
+    spending share at corpus start); outcome is a country-level summary
+    (per-decade drift slope). Cross-sectional OLS is the natural test
+    with n=26 liberal democracies.
+
+variables:
+  outcome:
+    - name: per_decade_drift_slope
+      source: "constructed: from data/derived/country_drift.json (replication.py recomputes from movements/*.yaml axes_summary)"
+      transformation: "OLS slope of cumulative composite drift on year, scaled to index points per decade"
+      notes: "Same outcome as fiscal_rule_presence_dampens_statist_drift; computed by replication.py from the drift JSON."
+  treatment:
+    - name: initial_govt_spending_share_pct_gdp
+      source: "constructed: hand-coded from OECD Economic Outlook 1976-1980 vintages + IMF GFS + national-accounts statistical yearbooks"
+      transformation: "general-government total expenditure / GDP, %, averaged 1976-1980 (or earliest available 5-year window for the country)"
+      notes: >
+        Hand-coded values (1976-1980 average general-government spending
+        share, % of GDP, OECD/IMF data; for post-1989 transitions
+        Poland/Czechia/Hungary use 1995-1999 since pre-transition data is
+        non-comparable):
+          USA=29.5, GBR=42.5, DEU=43.0, FRA=44.5, ITA=37.5, ESP=24.0,
+          NLD=49.0, BEL=51.0, IRL=43.0, AUT=46.5, PRT=30.0, GRC=29.0,
+          SWE=55.5, NOR=46.0, DNK=51.0, FIN=37.5, CHE=27.5, POL=44.0,
+          CZE=42.0, HUN=49.0, AUS=29.0, NZL=37.5, CAN=39.5, JPN=27.0,
+          KOR=18.5, ISR=63.5
+        ISR=63.5 reflects the unusual 1976-1980 period of post-Yom-Kippur-War
+        emergency spending — should be flagged as outlier in run; control
+        spec drops ISR.
+  controls:
+    - name: log_initial_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log GDP-pc constant 2015 USD at start of corpus window"
+      notes: "Solow-style starting-condition control."
+
+estimator:
+  template: descriptive
+
+scope:
+  period: [1976, 2025]
+  countries:
+    [
+      USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, IRL, AUT,
+      PRT, GRC, SWE, NOR, DNK, FIN, CHE, POL, CZE, HUN,
+      AUS, NZL, CAN, JPN, KOR, ISR,
+    ]
+  outcome_dim: [institutional_quality]
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): cross-sectional OLS of per-decade drift slope
+    (computed from data/derived/country_drift.json over 1976-2025,
+    anchored at first non-zero drift entry) on initial 1976-1980
+    average general-government spending share (% GDP). SUPPORTED iff
+    β < 0 AND p < 0.10 (two-sided) AND R² >= 0.20 in the
+    primary-spec (n=25, ISR excluded as outlier per spec).
+    PARTIAL if β < 0 but at least one of the two thresholds (p<0.10
+    or R²>=0.20) is missed. REFUTED if β > 0 with p < 0.10 (high-
+    state-share countries kept expanding the state — supports the
+    creep narrative the hypothesis denies), or if β is statistically
+    zero AND R² < 0.05 (no signal in either direction).
+    METHOD_VALID: drift JSON contains entries for at least 22 of 26
+    sample countries; WDI NY.GDP.PCAP.KD available for the same
+    1976-1980 (or 1995-1999 transition) window.
+  test: cross_sectional_ols_drift_slope_on_initial_govt_share
+  threshold: "PRIMARY: β < 0 AND p_two_sided < 0.10 AND R² >= 0.20 (ISR excluded)"
+
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic "p>0.10
+  in opposite direction" rule to the three-leg dispositive test
+  above: signed direction, two-sided significance, AND minimum
+  explanatory power (R²>=0.20). Outcome construction matches
+  fiscal_rule_presence_dampens_statist_drift (per-decade OLS slope
+  of statist_drift composite from country_drift.json, anchored at
+  first non-zero entry). Treatment values are hand-coded in the
+  spec; replication.py mirrors them as constants. Primary spec
+  excludes ISR per the spec's own outlier flag (post-Yom-Kippur
+  emergency spending pushed the 1976-1980 share to ~63.5% GDP);
+  secondary spec keeps ISR for robustness.
+
+prior_confidence: 0.6
+
+steelman: hypotheses/steelman/initial_state_share_predicts_drift_reversal.md
+
+disclosure: >
+  Author has stated market-liberal priors. The 1976-1980 spending-share
+  values are hand-coded from OECD vintages; for post-1989 transitions
+  the 1995-1999 window is used because pre-transition data is
+  non-comparable. The transition coding is conservative — Poland/Czechia/
+  Hungary's high mid-1990s shares actually post-date the transition's
+  market reforms, so coding them as 'high baseline' biases toward
+  finding the regression effect; this is documented for transparency.

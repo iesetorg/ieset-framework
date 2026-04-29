@@ -1,0 +1,157 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: german_manufacturing_va_decline_2017_2024
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  Germany's manufacturing value-added share of GDP declined from
+  approximately 22-23% in 2017 to approximately 18-19% by 2024, a
+  historically large shift for a mature economy over seven years. This
+  hypothesis decomposes the decline into four channels: (1) energy-cost
+  differential widening (Energiewende policy-content + gas shock), (2)
+  unit-labour-cost growth outpacing productivity in German manufacturing
+  relative to competitors, (3) Chinese import penetration in
+  intermediate goods and machinery displacing German domestic content,
+  and (4) external-demand softening (slower global trade-intensive
+  growth, US IRA-induced production re-siting). The decomposition is
+  descriptive and attributes shares of the decline to each channel
+  using growth-accounting and trade-in-value-added approaches. No
+  single channel is expected to explain more than 50% of the decline.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DEU]
+  period: [2015, 2024]
+  temporal_structure: time_series
+
+scope:
+  period: [2015, 2024]
+  countries: [DEU]
+  outcome_dim: [industrial_capability, productivity, energy]
+  policy_family: [energy_policy, regulation, trade_policy]
+  treatment_tags: [energiewende_2011, gas_price_shock_2021, china_import_penetration, us_ira_2022]
+
+variables:
+  outcome:
+    - name: manufacturing_va_share_of_gdp
+      source: "world_bank_wdi:NV.IND.MANF.CD"
+      transformation: level_share
+    - name: log_manufacturing_va_real
+      source: "world_bank_wdi:NV.IND.MANF.CD"
+      transformation: log_real
+    - name: manufacturing_employment_share
+      source: "constructed: OECD STAN total hours worked in manufacturing / total employment. Fetcher pending."
+      transformation: level
+
+  decomposition_channels:
+    - name: energy_cost_channel
+      source: "constructed: Eurostat NRG_PC_205 DEU industrial electricity price gap vs trade-weighted peer index, interacted with manufacturing energy-intensity share."
+      transformation: level
+    - name: unit_labour_cost_channel
+      source: "constructed: OECD ULC manufacturing series, DEU relative to trade-weighted peer index."
+      transformation: log_ratio
+    - name: chinese_import_penetration_channel
+      source: "constructed: share of intermediate goods imports into DEU manufacturing originating from CHN (UN Comtrade HS-level, aggregated to ISIC manufacturing intermediate demand). Fetcher pending."
+      transformation: level
+    - name: external_demand_channel
+      source: "constructed: DEU export-weighted destination-country GDP growth, minus DEU GDP growth. Trade-weighted external demand proxy, BIS or OECD."
+      transformation: level
+
+  controls:
+    - name: real_effective_exchange_rate
+      source: "bis:WS_EER"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [year]
+  notes: >
+    Structural-decomposition analysis (SDA) applied to DEU-only time
+    series 2015-2024. The manufacturing-VA-share change Δ(VA/GDP) is
+    decomposed multiplicatively into the four channels using
+    input-output weights (OECD TiVA where available) and sector-level
+    growth accounting.
+
+    Primary specification: multiplicative SDA over the four channels,
+    with residual reported explicitly. Secondary specification: panel
+    FE with DEU vs peer (FRA, NLD, ITA, SWE) comparators and year FE,
+    where each channel enters as an interacted treatment.
+
+    This is a DESCRIPTIVE hypothesis — the SDA produces an accounting
+    decomposition, not causal attribution. Each channel is correlated
+    with the decline, but causal weight requires separate identification
+    (e.g., the Energiewende hypothesis provides the energy-cost channel
+    causal identification; this hypothesis consumes the magnitude).
+
+    Known limitations:
+    (1) The four channels are not mutually orthogonal — energy cost
+        feeds into ULC (electricity-intensive sectors' labour costs);
+        Chinese import penetration responds to ULC. The SDA assigns
+        shares using order-sensitive decomposition; reporting must
+        show sensitivity to decomposition order.
+    (2) TiVA data lags; final 2024 numbers won't be available until
+        ~2027. v1 uses 2015-2022 for full SDA, 2023-2024 with partial
+        data.
+    (3) Residual channel (unexplained) may be large; this is a feature
+        (shows how much is not captured by the four hypothesised
+        channels) and the writeup must not paper over it.
+
+falsification:
+  rule: >
+    Not supported if (a) the manufacturing VA share did not actually
+    decline by at least 2 percentage points of GDP between 2017 and
+    2024, OR (b) the residual channel exceeds 60% of the explained
+    variation (meaning the four hypothesised channels miss most of
+    what happened), OR (c) any single channel exceeds 60% of
+    explained decline (suggesting a monocausal story, which the
+    framework explicitly expects not to hold). Report honestly if
+    the SDA yields a story dominated by one channel — that is a
+    legitimate finding even if it contradicts the prior.
+  test: german_manufacturing_va_decline_sda
+  threshold: >
+    manufacturing_va_share_change_2017_to_2024 <= -0.02 AND
+    sum_of_four_channels explains >= 40% of change AND
+    no single channel > 60% of explained change
+
+prior_confidence: 0.80
+
+disclosure: >
+  Author prior is high that the manufacturing VA share declined
+  substantially in the window and that all four channels contributed.
+  The prior is low that any single channel dominates. If the SDA
+  reveals a monocausal story (e.g., energy costs alone explain >60%),
+  that would be a genuinely surprising finding and reportable as
+  such.
+
+  The framework disclosure: this hypothesis is the growth-topic
+  complement to the energy-topic and regulatory-topic hypotheses.
+  It is designed to report honestly on multi-channel attribution,
+  specifically to prevent politicising the result in either direction
+  ("Energiewende caused it all" or "Chinese imports caused it all").
+  The pre-registered threshold — no single channel >60% — forces
+  nuanced reporting.
+
+steelman: hypotheses/steelman/german_manufacturing_va_decline_2017_2024.md
+
+linked_hypotheses:
+  - german_energiewende_industrial_cost_trajectory
+  - eu_post_2021_gas_shock_industrial_output_impact
+  - us_eu_divergence_decomposition
+  - green_transition_cost_trajectory_electricity_prices
+
+notes: >
+  Data readiness:
+  - WDI manufacturing VA — ready
+  - OECD STAN manufacturing hours / employment — fetcher pending
+  - OECD ULC — fetcher shipped, specific series fetch needed
+  - OECD TiVA China import penetration — fetcher pending
+  - Eurostat NRG_PC_205 — Eurostat fetcher shipped, series fetch needed
+  - BIS REER — ready
+
+  v1 pre-registers; v1.1 runs full SDA when OECD STAN + TiVA ship.

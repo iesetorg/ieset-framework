@@ -1,0 +1,396 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/hypothesis.schema.json",
+  "title": "IESET Hypothesis Specification",
+  "description": "Pre-registered hypothesis with falsification criteria. Every hypothesis in hypotheses/<topic>/<id>.yaml must validate against this schema. First git commit of the file is the pre-registration timestamp for status=pre_registered hypotheses.",
+  "type": "object",
+  "required": [
+    "hypothesis_id",
+    "version",
+    "topic",
+    "claim",
+    "status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "hypothesis_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$",
+      "description": "Lowercase snake_case; matches filename stem."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1 for pre-registered spec. Increment only for post-run alternative specs; never edit v1 after first run."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "candidate", "pre_registered"],
+      "description": "Lifecycle state. draft=rough capture from corpus mining, many fields may be placeholders. candidate=human-curated but not yet pre-registered, most fields populated. pre_registered=fully specified, first git commit is the authoritative pre-registration timestamp; no further edits to v1 allowed after first run."
+    },
+    "topic": {
+      "type": "string",
+      "enum": ["monetary", "distribution", "growth", "trade", "labour", "healthcare", "welfare_architecture", "institutional_quality", "energy", "housing", "resource_rents", "fiscal", "regulatory"]
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 30,
+      "description": "One-paragraph plain-English statement of the empirical claim. No hedging weasel-words; hedging lives in prior_confidence and falsification."
+    },
+    "methodology_note": {
+      "type": "string",
+      "description": "Narrative record of why this hypothesis was respecced: what v1 did, what failed, and what v2+ changes. Required when version > 1 (human-audit signal that the respec is principled, not p-hacked)."
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": ["causal", "associational", "descriptive", "canonical_case_multi_metric"],
+      "description": "Causal claims must satisfy METHODOLOGY.md requirements (two-spec rule, natural experiment, or decomposition). Required for candidate and pre_registered. Use canonical_case_multi_metric for single-country canonical cases (Venezuela collapse, Zimbabwe hyperinflation, Great Leap Forward, etc.) where a single-estimator causal test is weaker than a pre-registered pattern-match across many independent extreme outcomes."
+    },
+    "sample": {
+      "type": "object",
+      "required": ["countries", "period", "temporal_structure"],
+      "additionalProperties": false,
+      "properties": {
+        "countries": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[A-Z]{3}$"},
+          "minItems": 1
+        },
+        "period": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1800, "maximum": 2100},
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "temporal_structure": {
+          "type": "string",
+          "enum": ["panel", "time_series", "cross_section_with_justification"]
+        },
+        "cross_section_justification": {"type": "string"},
+        "exclusion_rules": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "variables": {
+      "type": "object",
+      "required": ["outcome"],
+      "additionalProperties": false,
+      "properties": {
+        "outcome": {"type": "array", "items": {"$ref": "#/$defs/variable"}, "minItems": 1},
+        "treatment": {"type": "array", "items": {"$ref": "#/$defs/variable"}},
+        "decomposition_channels": {"type": "array", "items": {"$ref": "#/$defs/variable"}},
+        "controls": {"type": "array", "items": {"$ref": "#/$defs/variable"}},
+        "instruments": {"type": "array", "items": {"$ref": "#/$defs/variable"}}
+      }
+    },
+    "intervention_channel": {
+      "type": "string",
+      "enum": ["fiscal", "regulatory", "monetary", "institutional", "bundled"],
+      "description": "Required per invariant 4 if any variable is an intervention measure. Matches the four channels in axes.yaml plus a 'bundled' option for reforms that can't be cleanly separated."
+    },
+    "intervention_channel_justification": {"type": "string"},
+    "estimator": {
+      "type": "object",
+      "required": ["template"],
+      "additionalProperties": false,
+      "properties": {
+        "template": {
+          "type": "string",
+          "enum": ["panel_fe", "did_callaway_santanna", "did_chaisemartin", "synthetic_control", "synth_did", "cointegration_vecm", "iv_2sls", "lp_iv", "event_study", "local_projections", "panel_fe_decomposition", "multi_metric_checklist", "descriptive"]
+        },
+        "clustering": {"type": "string"},
+        "fixed_effects": {"type": "array", "items": {"type": "string"}},
+        "random_seed": {"type": "integer"},
+        "notes": {"type": "string"}
+      }
+    },
+    "falsification": {
+      "type": "object",
+      "required": ["rule", "test"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": {"type": "string", "minLength": 30},
+        "test": {"type": "string"},
+        "threshold": {}
+      }
+    },
+    "prior_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Author's subjective probability hypothesis will be supported, set before run. Required for candidate and pre_registered per invariant 6."
+    },
+    "disclosure": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Brief note on how disclosed priors might bias hypothesis choice, framing, or specification. Required for candidate and pre_registered per invariant 6."
+    },
+    "conflict_disclosure": {"type": "string"},
+    "steelman": {
+      "type": "string",
+      "pattern": "^hypotheses/steelman/.+\\.md$",
+      "description": "Path to the steelman markdown file. Required for candidate and pre_registered."
+    },
+    "scope": {
+      "$ref": "#/$defs/scope",
+      "description": "Canonical scope tags (period, countries, outcome_dim, policy_family, treatment_tags) used by scripts/validate_scope_alignment.py to gate claim→hypothesis links. Added in Phase 2 of the structural scope-alignment fix (April 2026). Authoritative for link validation; may duplicate information in sample.* and variables.outcome but the scope block is the one the validator reads."
+    },
+    "covers_claims": {
+      "type": "array",
+      "description": "Explicit reverse-index of which position claims this hypothesis covers, with AUTHORITATIVE polarity. Added Phase 3 (April 2026). When present, this is the SOURCE OF TRUTH for claim-hypothesis linkage: the scoring pipeline reads polarity from here in preference to position.claim_polarity. A reciprocity validator (scripts/validate_link_reciprocity.py) ensures every position claim with linked_hypothesis_id=this hypothesis has a matching entry here, and vice versa. Ownership inversion: positions are no longer the sole source of truth for how their claims relate to hypotheses — the hypothesis declares what it covers, so mis-linked claims surface structurally.",
+      "items": {
+        "type": "object",
+        "required": ["position_id", "claim_index", "polarity"],
+        "additionalProperties": false,
+        "properties": {
+          "position_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$",
+            "description": "The position file's position_id."
+          },
+          "claim_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Zero-based index into the position's falsifiable_specific_claims array."
+          },
+          "polarity": {
+            "type": "string",
+            "enum": ["aligned", "inverted"],
+            "description": "Authoritative polarity: 'aligned' = position's claim and this hypothesis's claim mean the same thing (a hypothesis SUPPORTED counts as support for the school); 'inverted' = position's claim is the negation (a hypothesis SUPPORTED counts as refutation of the school)."
+          },
+          "school_prediction": {
+            "type": "string",
+            "enum": ["supported", "falsified", "mixed"],
+            "description": "Optional mirror of what the school predicts for this hypothesis. Used for reciprocity checks against the position side."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"],
+            "description": "Author confidence in this coverage declaration. 'low' is a signal for Phase 4 manual re-review."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Why this claim is covered by this hypothesis. Particularly important for inverted links."
+          }
+        }
+      }
+    },
+    "linked_hypotheses": {"type": "array", "items": {"type": "string"}},
+    "linked_conditions": {"type": "array", "items": {"type": "string"}},
+    "canonical_metrics": {
+      "type": "array",
+      "minItems": 3,
+      "description": "Pre-registered multi-metric checklist for canonical-case hypotheses. Each metric is an independently-sourced extreme outcome; the hypothesis is supported/refuted based on the count of metrics that meet their thresholds. Required when evidence_type=canonical_case_multi_metric.",
+      "items": {
+        "type": "object",
+        "required": ["metric_id", "threshold", "window", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "metric_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$",
+            "description": "snake_case identifier for this metric within the hypothesis."
+          },
+          "description": {"type": "string"},
+          "threshold": {
+            "type": "string",
+            "description": "Plain-English quantitative threshold, e.g. '>40% decline' or '>15% of population'. Evaluator parses this."
+          },
+          "window": {
+            "type": "string",
+            "description": "Time window, e.g. '2013-2019' or '2014Q1-2019Q4'."
+          },
+          "source": {
+            "type": "string",
+            "description": "Canonical 'publisher_id:series_id' or composite with ';' separator."
+          },
+          "data_quality_flag": {
+            "type": "string",
+            "description": "Optional note on data reliability in the window (e.g. 'Venezuela 2014+ official data censored; use Hanke-Kwok + IMF staff estimates + shadow statistics')."
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["supports_claim", "refutes_claim"],
+            "description": "Whether meeting this threshold supports or refutes the hypothesis. Defaults to supports_claim."
+          },
+          "independence_justification": {
+            "type": "string",
+            "description": "Why this metric is epistemically independent of the others — different data source, different methodology, or different causal layer. Reduces correlated-measurement risk."
+          }
+        }
+      }
+    },
+    "multi_metric_falsification": {
+      "type": "object",
+      "description": "Count-based falsification for canonical_case_multi_metric hypotheses.",
+      "additionalProperties": false,
+      "properties": {
+        "total_metrics": {"type": "integer", "minimum": 3},
+        "support_threshold": {"type": "integer", "description": "Minimum metrics-met count to declare support."},
+        "refute_threshold": {"type": "integer", "description": "Maximum metrics-met count to declare refutation."}
+      }
+    },
+    "source_provenance": {
+      "type": "object",
+      "description": "Set by corpus mining for drafts. Points to anchor(s) in private archive. Not required; not published.",
+      "additionalProperties": false,
+      "properties": {
+        "archive_refs": {"type": "array", "items": {"type": "string"}},
+        "mined_at": {"type": "string"},
+        "mined_by_model": {"type": "string"}
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "variable": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "source": {
+          "type": "string",
+          "description": "Canonical form: 'publisher_id:series_identifier'. Composite sources (multiple publishers for different countries) use '; ' as separator, e.g. 'fred:M2SL (USA); ecb:BSI.M.U2 (EU)'. Publisher IDs must be registered in data/fetchers/publishers.yaml."
+        },
+        "transformation": {"type": "string"},
+        "notes": {"type": "string"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "description": "Canonical scope block for claim→hypothesis link gating. Period + countries + outcome_dim are REQUIRED when the scope block is present. policy_family + treatment_tags are optional but strongly recommended for named-policy claims. The validator at scripts/validate_scope_alignment.py compares claim.scope against hypothesis.scope and rejects links with zero overlap on any required axis.",
+      "required": ["period", "countries", "outcome_dim"],
+      "additionalProperties": false,
+      "properties": {
+        "period": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1800, "maximum": 2100},
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Start and end year the claim/hypothesis applies to. Inclusive on both ends."
+        },
+        "countries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([A-Z]{3}|GLOBAL|OECD|LATAM|EU|EUROZONE|ASIA_EM|AFRICA|MENA|POST_SOVIET|NORDIC|SOUTHERN_EUROPE|ANGLO)$"
+          },
+          "minItems": 1,
+          "description": "ISO3 country list, or one/more group tokens (GLOBAL, OECD, LATAM, EU, EUROZONE, ASIA_EM, AFRICA, MENA, POST_SOVIET, NORDIC, SOUTHERN_EUROPE, ANGLO). Group tokens expand during scope-alignment validation."
+        },
+        "outcome_dim": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "gdp_growth",
+              "labour_share",
+              "wage_stagnation",
+              "productivity",
+              "inflation",
+              "monetary_policy",
+              "fiscal_policy",
+              "poverty_inequality",
+              "employment_labour",
+              "welfare_state",
+              "trade_liberalisation",
+              "financial_crisis",
+              "financialisation",
+              "institutional_quality",
+              "housing",
+              "energy",
+              "industrial_capability",
+              "competition_concentration",
+              "regulation_compliance_cost",
+              "life_expectancy_health",
+              "currency_purchasing_power",
+              "capital_flows",
+              "demographics_migration",
+              "taxation"
+            ]
+          },
+          "minItems": 1,
+          "description": "Canonical outcome-family tag(s). Controlled vocabulary; extend only via schema PR."
+        },
+        "policy_family": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "fiscal_policy",
+              "monetary_policy",
+              "regulation",
+              "trade_policy",
+              "welfare_architecture",
+              "labour_market",
+              "industrial_policy",
+              "competition_policy",
+              "exchange_rate_regime",
+              "privatisation_nationalisation",
+              "energy_policy",
+              "housing_policy",
+              "tax_policy",
+              "institutional_reform",
+              "none"
+            ]
+          },
+          "description": "Broad policy channel(s) the claim/hypothesis intervenes on. Use 'none' for pure-descriptive claims with no policy channel (e.g. 'labour share fell 1980-2020')."
+        },
+        "treatment_tags": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
+          "description": "Named actors/policies/events specifically tested. Use snake_case canonical tags, e.g. reagan_tax_1981, thatcher_1979, brexit_2016, nafta_1994, tcja_2017, milei_2023, chavismo_1999, volcker_1979, abenomics_2013, agenda_2010, macron_reforms_2017. For generic cross-country panels with no named treatment, leave empty or omit."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "candidate"}}, "required": ["status"]},
+      "then": {
+        "required": [
+          "hypothesis_id", "version", "topic", "claim", "status",
+          "evidence_type", "sample", "variables", "scope",
+          "prior_confidence", "disclosure", "steelman"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "pre_registered"},
+          "evidence_type": {"const": "canonical_case_multi_metric"}
+        },
+        "required": ["status", "evidence_type"]
+      },
+      "then": {
+        "required": [
+          "hypothesis_id", "version", "topic", "claim", "status",
+          "evidence_type", "sample", "variables", "scope",
+          "canonical_metrics", "multi_metric_falsification",
+          "prior_confidence", "disclosure", "steelman"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "pre_registered"},
+          "evidence_type": {"not": {"const": "canonical_case_multi_metric"}}
+        },
+        "required": ["status", "evidence_type"]
+      },
+      "then": {
+        "required": [
+          "hypothesis_id", "version", "topic", "claim", "status",
+          "evidence_type", "sample", "variables", "scope",
+          "estimator", "falsification",
+          "prior_confidence", "disclosure", "steelman"
+        ]
+      }
+    }
+  ]
+}

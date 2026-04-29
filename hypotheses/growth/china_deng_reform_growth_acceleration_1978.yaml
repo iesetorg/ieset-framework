@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_deng_reform_growth_acceleration_1978
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  China's 1978 Deng-era reforms — Household Responsibility System in
+  agriculture, Special Economic Zones, dual-track price liberalisation,
+  Township and Village Enterprise reform, gradual opening to FDI and
+  trade — produced a structural break in per-capita GDP growth rates.
+  Pre-reform (1965-1977) annualised real GDP-per-capita growth was
+  modest; post-reform (1979-2019, pre-COVID) annualised growth
+  exceeded the pre-reform rate by at least 3 percentage points per
+  year on a sustained basis. This is one of the largest pre/post
+  growth accelerations in economic history and is a clean natural
+  experiment because the policy change is abrupt, well-dated, and
+  internal to a single country (no donor-pool identification required).
+
+evidence_type: descriptive
+
+sample:
+  countries: [CHN]
+  period: [1965, 2019]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "end pre-COVID to avoid 2020-21 distortion"
+    - "exclude 1966-1976 Cultural Revolution years from pre-reform annualised rate calculation as a robustness check"
+
+scope:
+  period: [1965, 2019]
+  countries: [CHN]
+  outcome_dim: [gdp_growth]
+  policy_family: [institutional_reform, trade_policy, privatisation_nationalisation]
+  treatment_tags: [deng_reforms_1978, household_responsibility_system, special_economic_zones, dual_track_price_liberalisation, tve_reform]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant_usd
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Pre-post annualised log-growth comparison. Primary statistic is the
+    difference between mean annualised log-growth 1979-2019 and
+    1965-1977. Visualise as a kinked trend line with a break at 1978.
+    No DiD — the identification is the structural break itself; the
+    policy change is abrupt and well-documented.
+
+falsification:
+  rule: >
+    PRIMARY (dispositive): falsified if the annualised log-growth rate
+    1979-2019 minus the annualised log-growth rate 1965-1977 is less
+    than 0.03 (3 percentage points per year). A reversed sign would
+    be decisive refutation.
+    INFORMATIVE (not gating): the robustness check excluding
+    1966-1976 (Cultural Revolution years) from the pre-reform
+    calculation should yield a similar or larger acceleration gap.
+  test: china_pre_post_1978_annualised_growth_gap
+  threshold: >
+    PRIMARY: annualised_log_growth(1979-2019) - annualised_log_growth(1965-1977) >= 0.03
+    INFORMATIVE: robustness excluding 1966-1976 yields a similar gap (>=0.025)
+    METHOD_VALID: WDI NY.GDP.PCAP.KD available for CHN across 1965-2019.
+
+prior_confidence: 0.99
+
+disclosure: >
+  Author prior is essentially 1.0. The Deng-era reform acceleration is
+  the largest policy-induced growth acceleration in recorded economic
+  history. Included for framework-validation: if this effect is not
+  detected on the primary test, something is wrong with the data
+  pipeline or estimator. Refutation would indicate a data gap, not
+  evidence against the story.
+
+linked_hypotheses:
+  - asian_convergence_vs_western_stagnation_2000_2023
+  - post_soviet_market_reform_life_expectancy
+
+notes: >
+  Canonical natural-experiment tier (HYPOTHESIS_FRAMEWORK_AUDIT.md §E6
+  case #9). Runnable today with WDI data. Primary spec deliberately
+  simple (structural-break descriptive comparison) — the magnitude of
+  the 1978 acceleration is overwhelming and does not require a DiD
+  identification strategy to be detected.
+steelman: hypotheses/steelman/china_deng_reform_growth_acceleration_1978.md

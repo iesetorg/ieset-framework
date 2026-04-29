@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiat_expansion_erodes_currency_purchasing_power_long_run
+version: 1
+status: pre_registered
+topic: monetary
+claim: 'Over 50+ year horizons since the 1971 collapse of Bretton Woods, major fiat currencies (USD, GBP, EUR legacy components, JPY, AUD) have lost substantial purchasing power against hard assets (gold,
+  broad commodity baskets, residential real estate). This is documented fact; the hypothesis re-establishes the pattern using provenanced public data.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - JPN
+  - AUS
+  period:
+  - 1971
+  - 2025
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: currency_purchasing_power_vs_gold
+    source: fred:GOLDAMGBD228NLBM; bis:WS_EER_M
+    transformation: real_index_base_1971
+  - name: currency_purchasing_power_vs_real_estate
+    source: bis:WS_LONG_PP; shiller:home_price_index
+    transformation: real_index_base_1971
+  - name: currency_purchasing_power_vs_commodity_basket
+    source: imf:primary_commodity_prices; fred:PPIACO
+    transformation: real_index_base_1971
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    notes: Included for descriptive context only; not used in falsification.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  notes: 'Descriptive long-run index construction + panel regression of log purchasing-power index on time, by country. No causal claims; objective is to establish the pattern with provenance.
+
+    '
+falsification:
+  rule: 'Not supported if any of the seven listed fiat currencies maintained or gained purchasing power against all three reference assets (gold, real estate, commodity basket) across the 1971-2025 period.
+
+    '
+  test: currency_purchasing_power_trajectory
+  threshold: End-of-period index < 100 (base 1971 = 100) against at least one of gold/RE/commodities for every currency
+prior_confidence: 0.95
+disclosure: 'High prior confidence reflects well-documented historical record; this hypothesis is closer to descriptive pattern-establishment than to contested claim-testing. Included in the framework because
+  even well-known facts deserve provenanced, replicable treatment on the public platform.
+
+  '
+conflict_disclosure: 'Author holds real estate and cryptocurrency positions. A supported result is materially consistent with the investment thesis that hard assets preserve purchasing power against fiat.
+  Disclosure is per-hypothesis per DISCLOSURE.md.
+
+  '
+steelman: hypotheses/steelman/fiat_expansion_erodes_currency_purchasing_power_long_run.md
+linked_hypotheses:
+- m2_expansion_correlates_with_asset_price_inflation
+- hyperinflation_requires_fiscal_dominance
+scope:
+  period:
+  - 1971
+  - 2025
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - JPN
+  - AUS
+  - OECD
+  outcome_dim:
+  - currency_purchasing_power
+  - inflation
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - bretton_woods_collapse_1971
+  - fiat_regime
+covers_claims:
+- position_id: austrian
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Austrian claim that fiat currencies lose purchasing power against hard assets over long horizons; direct alignment with hypothesis scope.
+notes: 'Per mega-spec D.1.5 scope decision, this hypothesis does NOT claim that a gold standard would have produced better outcomes than the post-1971 fiat regime — that claim is explicitly out of scope.
+  The descriptive pattern of purchasing-power erosion is compatible with many possible normative conclusions.
+
+  '

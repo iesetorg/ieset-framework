@@ -1,0 +1,24 @@
+# Steelman — CBAM effect on EU export competitiveness
+
+**The strongest arguments against the framework's "CBAM costs EU export competitiveness" framing:**
+
+1. **CBAM's intended function is carbon-leakage prevention and the export effect is a known design trade-off, not a failure.** EU ETS free-allocation was distorting the competitive landscape in favour of EU carbon-intensive producers; CBAM withdraws that free allocation gradually in exchange for imposing carbon costs on imports. The symmetric loss of EU-export preference in non-CBAM third markets is not a bug — it is a signal that the prior distortion existed and is being corrected. Treating this as "lost competitiveness" imports a specific pre-policy benchmark (with free allocation) as the counterfactual; an alternative benchmark (policy with neither free allocation nor CBAM, i.e., full EU ETS exposure with no import protection) would show CBAM as IMPROVING EU competitiveness versus the bare-full-ETS counterfactual.
+
+2. **The 2023-2024 reporting phase has only administrative cost; substantive price impact starts 2026.** A hypothesis timed to measure competitiveness effects of CBAM's certificate-purchase phase before that phase begins will measure mostly noise and compliance-setup overhead. Any apparent effect found in 2023Q4-2024 is likely either (a) anticipation, (b) unrelated shocks absorbed imperfectly by controls, or (c) statistical artefact. The pre-registration's low prior confidence reflects this honestly — but the headline reader will not. Framework honesty: this is a methodology pre-reg, not a substantive early verdict.
+
+3. **EU CBAM-covered subsectors face independent simultaneous shocks.** Steel faces Chinese overproduction dumping in global markets; aluminium faces European energy-price disruption that long pre-dates CBAM; fertilisers were hit by gas-price shocks; cement is heavily domestic. Attributing subsector-level export contraction to CBAM when these major independent disturbances are present requires tighter identification than the current design offers. The steelman: even a statistically significant post-2023Q4 EU export decline in these subsectors is more likely attributable to these other shocks than to CBAM.
+
+4. **Carbon-leakage is a real phenomenon CBAM aims to counter.** Before CBAM, EU producers faced EU ETS cost; non-EU producers did not. European steel and cement have been losing share to non-EU producers for years; some share-loss was carbon-leakage, not genuine comparative disadvantage. CBAM addresses that asymmetry for the import side. Measuring only the export-competitiveness downside without the import-side upside is an incomplete welfare accounting — and not what a serious CBAM assessment should lead with.
+
+5. **Some EU subsector contractions are policy-intended.** If EU cement production contracts because CBAM-plus-ETS is successfully pricing carbon into EU construction material costs and that is shifting demand toward lower-carbon substitutes, the policy is working. Framework language that treats "production contracted" as axiomatically a bad outcome is exactly the value-laden framing the pre-registration is supposed to avoid. A decarbonisation policy should reduce fossil-carbon-intensive production; that is how it decarbonises.
+
+6. **Third-country response is endogenous.** Non-EU producers may respond to CBAM by adopting their own carbon-pricing systems (UK ETS linkage, Turkey carbon market moves, India SGx considerations, China's ETS expansion). If CBAM triggers a global carbon-pricing arms race that harmonises over time, the "EU export competitiveness" effect decays as third-country carbon costs converge — which is the policy's theory-of-change. Measuring the static effect at 2024 before this dynamic plays out understates the equilibrium the policy is aiming at.
+
+**How this should shape the v1 result card when run:**
+
+- Present v1 as a methodology pre-registration with low prior confidence; flag that the substantive test runs in v2 post-2026 when CBAM bites.
+- Report both the export side (lost EU competitiveness in third markets) and the import side (imports of CBAM-covered products to EU and their carbon intensity). An export-only framing is incomplete.
+- Disaggregate by CBAM subsector explicitly. Steel, cement, aluminium, fertilisers have independent market dynamics that must not be pooled.
+- Distinguish quantity contraction from emissions contraction. If EU CBAM-subsector output falls by X% and sectoral emissions fall by more than X%, then decarbonisation is occurring — the quantity is not the welfare metric.
+- Acknowledge the leakage-prevention rationale explicitly in the report. CBAM is not a protection policy; its primary function is correcting an asymmetry in carbon cost exposure.
+- Be humble about the 2024 data window. Reviewer challenges should be welcomed; this is not a finished verdict on CBAM.

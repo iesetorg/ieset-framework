@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_market_reform_almp_complementarity_effect
+version: 1
+status: draft
+topic: labour
+claim: 'Labour-market flexibilisation reforms improve unemployment outcomes in countries with strong active-labour-market-policy (ALMP) complementarities (Denmark flexicurity post-1994, Germany Agenda 2010
+  / Hartz I-IV 2003-2005) but produce inequality increases without commensurate employment gains in countries lacking institutional ALMP infrastructure. The discriminating variable is ALMP-spending share
+  and vocational-training-system density, not labour-market-flexibility level per se.
+
+  '
+notes: 'Stub seeded from an empirical-pragmatist school prediction about ALMP-flexicurity complementarity (Denmark, Germany Hartz). Two-country panel is thin; needs human review of ALMP-spending source
+  (OECD LMP database) and the interaction-effect identification strategy.
+
+  '
+prior_confidence: 0.65
+disclosure: 'Author''s market-liberal priors are sympathetic to flexicurity claims and favour the institutional- complementarity story; could over-weight the supported finding and under-weight evidence
+  that the Danish and German cases are driven more by macro-conditions than by ALMP-flexibility interaction.
+
+  '
+falsification:
+  rule: 'The hypothesis is SUPPORTED if panel-FE interaction coefficient of (flexibility reform × ALMP-spending-share) on unemployment-duration is negative and significant at p<0.05, AND if the main effect
+    of flexibility reform alone (at low ALMP) is non-negative on inequality. REFUTED if the interaction term is zero/positive or if ALMP-spending shows no moderating effect.
+
+    '
+  test: Panel FE regression of unemployment duration on (flexibility reform x ALMP-spending-share) interaction across DNK and DEU 1994-2015; supported if interaction coefficient negative at p<0.05.
+evidence_type: associational
+sample:
+  countries:
+  - DNK
+  - DEU
+  - NLD
+  - SWE
+  - FIN
+  - NOR
+  - AUT
+  - FRA
+  - BEL
+  - GBR
+  - IRL
+  - ITA
+  - ESP
+  - PRT
+  - GRC
+  period:
+  - 1994
+  - 2015
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing OECD LMP-spending series
+variables:
+  outcome:
+  - name: unemployment_duration_share_long_term
+    source: world_bank_wdi:SL.UEM.LTRM.ZS
+    transformation: level
+    notes: WDI long-term unemployment share (>=12 months) as primary outcome. OECD ALFS series for cross-check.
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: gini_disposable_income
+    source: wid:gini_post_tax
+    transformation: level
+    notes: WID post-tax Gini — inequality outcome on the no-ALMP arm.
+  treatment:
+  - name: labour_market_flexibility_reform
+    source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+    transformation: level
+    notes: OECD Employment Protection Legislation index (overall). Lower = more flexible. Hartz-2003 and Danish-1994 reforms appear as level decreases.
+  - name: almp_spending_share_gdp
+    source: oecd:LMP_SPEND
+    transformation: level
+    notes: OECD active-labour-market-programme spending share of GDP.
+  - name: flexibility_x_almp_interaction
+    source: 'constructed: (1 - EPL_OV) * almp_spending_share_gdp; the interaction term is the discriminating coefficient.'
+    transformation: level
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Cross-country panel-FE 1994-2015 with (flexibility reform x ALMP-spending- share) interaction as discriminating coefficient on unemployment duration and Gini outcomes. Country and year FE; country-clustered
+    SEs. Sample extended beyond DNK/DEU to broader OECD-15 to gain statistical power on the interaction term — DNK and DEU remain the canonical positive cases.
+
+    '
+scope:
+  period:
+  - 1994
+  - 2015
+  countries:
+  - DNK
+  - DEU
+  outcome_dim:
+  - employment_labour
+  - poverty_inequality
+  - productivity
+  policy_family:
+  - labour_market
+  - welfare_architecture
+  treatment_tags:
+  - danish_flexicurity
+  - agenda_2010
+  - hartz_reforms_2003
+  - almp_complementarity
+covers_claims:
+- position_id: empirical_pragmatist
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Empirical-pragmatist claim that flexibility reforms work where ALMP complementarities exist. Relinked from labour_market_flexibility_unemployment_duration in Phase 4E.

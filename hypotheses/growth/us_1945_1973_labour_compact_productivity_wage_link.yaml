@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_1945_1973_labour_compact_productivity_wage_link
+version: 1
+status: draft
+topic: growth
+claim: US 1945-1973 coordinated labour-management-state compact produced broad-based real-wage growth
+  tracking productivity, demonstrating that strong labour institutions + progressive taxation are growth-compatible.
+notes: 'Stub seeded from a social-democratic school prediction about postwar US productivity-compensation
+  tracking. Spec window is 1945-1973 but the canonical FRED series (OPHNFB output per hour, COMPRNFB
+  real compensation per hour, both nonfarm business) start in 1947Q1 — effective evaluation window is
+  1947-1973. Falsification rule operates on the cumulative log wedge between productivity and
+  compensation indexed to the start of the window, plus the within-window correlation of the two
+  index series.'
+prior_confidence: 0.65
+disclosure: Author's priors lean toward institutional explanations being secondary to demand and growth-rate
+  factors, which could under-weight the role of unionisation in producing the 1945-1973 wedge dynamic.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if BOTH (a) the
+    cumulative log wedge between US labour productivity (FRED OPHNFB,
+    output per hour, nonfarm business) and real compensation per hour
+    (FRED COMPRNFB, nonfarm business), measured from window-start
+    (1947Q1) to window-end (1973Q4), is less than 10 percentage points
+    in absolute value, AND (b) the within-window Pearson correlation
+    between the two log-index series is greater than 0.85.
+    REFUTED if the absolute cumulative wedge exceeds 25 percentage
+    points OR the correlation falls below 0.5.
+    PARTIAL covers the in-between range (wedge 10-25pp or correlation
+    0.5-0.85) where productivity-compensation tracking is real but
+    weaker than the strong-form social-democratic claim.
+    METHOD_VALID: both FRED series available with at least 100 quarterly
+    observations in the 1947Q1-1973Q4 effective window. Failure of the
+    method-validity gate emits 'inconclusive (data gap)' rather than a
+    refutation.
+  test: cumulative_log_wedge_and_correlation_1947_1973
+  threshold: >-
+    PRIMARY: abs(log(productivity_index_1973Q4) - log(compensation_index_1973Q4))
+    < 0.10 AND pearson_corr(log_productivity, log_compensation) > 0.85.
+    REFUTED if abs(wedge) > 0.25 OR pearson_corr < 0.5.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic
+  falsification rule to two dispositive primary tests: cumulative log
+  wedge (productivity minus compensation, both indexed to 1947Q1) under
+  10pp at 1973Q4, AND within-window log-level Pearson correlation above
+  0.85. Spec window is 1945-1973 but FRED OPHNFB and COMPRNFB both
+  start at 1947Q1, so effective window is 1947Q1-1973Q4. Cumulative
+  wedge is the canonical EPI/Mishel productivity-pay gap statistic
+  (here in log terms so the SUPPORTED bound 10pp ≈ 10.5% level wedge).
+  Quarterly frequency is preserved (no aggregation to annual) so the
+  correlation has full sample power.
+evidence_type: descriptive
+sample:
+  countries:
+  - USA
+  period:
+  - 1945
+  - 1973
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: labour_productivity
+    source: 'fred:OPHNFB'
+    notes: 'WDI has no pre-1990 labour-productivity series; FRED OPHNFB (output per hour, nonfarm business, 1947+) is the canonical US series for the postwar period. PWT rgdpna/emp is a v2 fallback if FRED quarterly is too granular.'
+  - name: real_compensation_per_hour
+    source: 'fred:COMPRNFB'
+    notes: 'FRED COMPRNFB (real compensation per hour, nonfarm business, 1947+) is the standard EPI/Mishel productivity-compensation pair partner.'
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Single-country US time-series 1947Q1-1973Q4 of labour productivity vs real compensation per hour.
+    Reports the cumulative log wedge from window-start to window-end and the within-window Pearson correlation
+    of the two log-index series. No regression, no clustering — descriptive descriptive index comparison.
+
+    '
+scope:
+  period:
+  - 1945
+  - 1973
+  countries:
+  - USA
+  outcome_dim:
+  - productivity
+  - wage_stagnation
+  - labour_share
+  policy_family:
+  - labour_market
+  - tax_policy
+  treatment_tags:
+  - us_postwar_labour_compact
+  - collective_bargaining_institutions
+  - progressive_taxation
+covers_claims:
+- position_id: social_democratic
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Social-democratic prediction: US 1945-1973 coordinated labour-management-state compact produced
+    broad-based real-wage growth tracking productivity; direct alignment with hypothesis.'

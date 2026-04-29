@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: chile_chicago_boys_monetary_stabilisation_effect
+version: 1
+status: draft
+topic: monetary
+claim: Pinochet-era Chile's monetary stabilisation (post-1975, advised by Chicago Boys) produced lower
+  inflation and higher growth than contemporaneous Latin American countries using heterodox stabilisation.
+notes: Origin is auto-generated coverage-gap stub seeded from Chicago-monetarist claims about
+  Pinochet-era stabilisation outperforming heterodox LatAm peers. Human review required before promotion.
+prior_confidence: 0.50
+disclosure: Author has market-liberal priors that may favour the Chicago-Boys narrative; risk is
+  ignoring the political-repression dimension and selecting a flattering pre-1982 window before the debt crisis.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Synthetic control of Chile 1975-1990 vs LATAM donor pool (ARG, BRA, PER, URY, BOL, MEX);
+    cumulative inflation gap >20pp lower and GDP gap positive with placebo p<0.10 supports.'
+evidence_type: associational
+scope:
+  period: [1973, 1990]
+  countries: [CHL, LATAM]
+  outcome_dim: [inflation, gdp_growth, monetary_policy]
+  policy_family: [monetary_policy, institutional_reform, privatisation_nationalisation]
+  treatment_tags: [chile_chicago_boys_1975, pinochet_stabilisation, heterodox_stabilisation_latam]
+covers_claims:
+  - position_id: chicago_monetarism
+    claim_index: 7
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Chicago monetarist claim that Pinochet-era Chilean stabilisation outperformed contemporaneous heterodox LatAm programs; direct alignment with hypothesis claim and scope."
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Stub-level estimator pin for runnability audit. Synthetic-control of
+    Chile 1975-1990 against a donor pool of LatAm comparators (ARG, BRA, PER,
+    URY, BOL, MEX) using heterodox stabilisation. Outcomes: CPI inflation
+    and real GDP per capita. Falsification rule and variables block remain
+    to be filled when this stub is promoted from draft.
+
+sample:
+  countries: [CHL, ARG, BRA, PER, URY, BOL, MEX, COL]
+  period: [1970, 1990]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH"
+      transformation: pct_change_yoy
+    - name: real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD; maddison:gdp_per_capita_2011_intl"
+      transformation: log_level
+      notes: "Maddison Project for pre-1990 series; WDI for cross-check."
+    - name: inflation_volatility
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: rolling_3yr_stddev
+  treatment:
+    - name: chile_chicago_stabilisation_indicator
+      source: "constructed: binary = 1 for CHL from 1975 (post-El Ladrillo / Chicago Boys appointments)"
+      transformation: binary
+  controls:
+    - name: terms_of_trade
+      source: "imf_pcps:PALLFNF; world_bank_wdi:TT.PRI.MRCH.XD.WD"
+      transformation: log_diff
+    - name: pre_treatment_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: lag_avg_1970_1974
+    - name: copper_price_index
+      source: "imf_pcps:PCOPP"
+      transformation: log_diff
+      notes: "Critical for CHL given copper-export dependence."
+

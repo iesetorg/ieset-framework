@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: single_payer_cost_outcome_comparison
+version: 1
+status: draft
+topic: healthcare
+claim: Universal single-payer healthcare systems (NHS, Canadian Medicare) produce lower per-capita healthcare expenditure with equal or better life-expectancy outcomes than the US multi-payer system.
+notes: Stub seeded from a democratic-socialist school prediction comparing NHS, Canadian Medicare, and US multi-payer. Needs human review on whether life-expectancy is the right outcome (vs amenable mortality).
+prior_confidence: 0.7
+disclosure: Author's market-liberal priors recognise the well-documented US cost-outcome anomaly in OECD comparisons; this could bias toward easy validation and obscure quality-of-care heterogeneity within
+  single-payer systems (NHS waiting times, CAN access constraints).
+falsification:
+  rule: "PRIMARY (dispositive multi-metric checklist over GBR, CAN, USA, 2010-2023 mean):\n  M1 (cost): USA per-capita health expenditure exceeds the (GBR, CAN) mean by\n    more than 50% (ratio > 1.50).\
+    \ PPP-USD basis (constructed as\n    SH.XPD.CHEX.GD.ZS / 100 * NY.GDP.PCAP.PP.KD).\n  Outcome block (need >= 2 of 3):\n    M2 life-expectancy at birth: single-payer mean ties-or-exceeds USA.\n    M3\
+    \ infant-mortality per 1,000: single-payer mean ties-or-beats USA (lower better).\n    M4 under-5 mortality per 1,000: single-payer mean ties-or-beats USA (lower better).\nSUPPORTED if M1 holds AND\
+    \ outcome block passes. REFUTED if neither M1 nor the outcome block holds. PARTIAL if exactly one of {M1, outcome block} holds. INFORMATIVE: country-by-country values reported in diagnostics so within-system\
+    \ heterogeneity (NHS waiting times, CAN access constraints) is visible even when the aggregate verdict goes one way. METHOD_VALID: requires SH.XPD.CHEX.GD.ZS, NY.GDP.PCAP.PP.KD, SP.DYN.LE00.IN, SP.DYN.IMRT.IN,\
+    \ and SH.DYN.MORT vintages on disk for all three countries over the comparison window. Data gap → INCONCLUSIVE."
+  test: gbr_can_vs_usa_cost_outcome_multi_metric_2010_2023
+  threshold: 'PRIMARY: cost_ratio_USA_over_singlepayer > 1.50 AND n_outcome_metrics_favouring_singlepayer >= 2 (of 3).'
+evidence_type: associational
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - GBR
+  - CAN
+  - USA
+  outcome_dim:
+  - life_expectancy_health
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  treatment_tags:
+  - uk_nhs
+  - canadian_medicare
+  - us_multi_payer_system
+sample:
+  countries:
+  - GBR
+  - CAN
+  - USA
+  period:
+  - 1971
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: health_expenditure_per_capita_usd
+    source: world_bank_wdi:SH.XPD.CHEX.PC.CD
+    transformation: log
+    notes: WDI current health expenditure per capita, USD. Primary cost outcome.
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: amenable_mortality_per_100k
+    source: oecd:OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0
+    transformation: log
+    notes: OECD amenable-mortality rate (deaths from causes considered avoidable with timely healthcare). Refines life-expectancy as outcome.
+  treatment:
+  - name: single_payer_indicator
+    source: 'constructed: indicator = 1 for GBR (NHS) and CAN (Medicare); 0 for USA multi-payer.'
+    transformation: indicator
+  controls:
+  - name: log_gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+estimator:
+  template: multi_metric_checklist
+  notes: "Three-country comparison GBR/CAN/USA, 2010-2023 mean (the modern Medicare/NHS architectural end-state; the spec's 1971-2023 window is informational, the dispositive comparison is on the recent\
+    \ decade where all five series overlap cleanly). Metric bundle:\n  M1 cost  — USA per-capita PPP spend / single-payer mean > 1.50\n  M2 outcome — life expectancy at birth (higher better)\n  M3 outcome\
+    \ — infant mortality per 1k (lower better)\n  M4 outcome — under-5 mortality per 1k (lower better)\nVerdict map: SUPPORTED if M1 AND >=2/3 outcome metrics favour single-payer; partial if exactly one\
+    \ pillar holds; refuted otherwise. Caveat: aggregates obscure within-system heterogeneity (NHS waiting times, CAN access constraints); country-level values are surfaced in diagnostics.json.\n"
+methodology_note: v1 promotion (2026-04-24). Sharpened the original generic ">50% spend gap AND life-expectancy lower-or-equal" rule into a dispositive multi-metric checklist with three outcome metrics
+  (life expectancy, infant mortality, under-5 mortality) and a >=2/3 pass requirement. Comparison window narrowed to 2010-2023 for stable Medicare/NHS architecture and clean series overlap. Per-capita health
+  expenditure is constructed in PPP-USD as (SH.XPD.CHEX.GD.ZS / 100) * NY.GDP.PCAP.PP.KD because the spec's named SH.XPD.CHEX.PC.CD vintage is not on disk; PPP-USD is arguably preferable to current-USD
+  for cross-country cost comparison anyway. Run will re-execute drop-in with current-USD if SH.XPD.CHEX.PC.CD lands. Amenable-mortality (M5 originally proposed in spec) deferred until oecd:HEALTH_STAT@DF_AMENABLE_MORT
+  vintage lands.
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Democratic-socialist position predicts single-payer cost/outcome superiority over US multi-payer; hypothesis tests NHS and Canadian Medicare against US per-capita spend and life expectancy. Direct
+    alignment.

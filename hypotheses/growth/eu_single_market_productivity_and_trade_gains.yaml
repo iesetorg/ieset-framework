@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_single_market_productivity_and_trade_gains
+version: 1
+status: candidate
+steelman: hypotheses/steelman/eu_single_market_productivity_and_trade_gains.md
+topic: growth
+claim: EU single market 1993 produced measurable intra-EU trade, productivity, and consumer-price convergence gains consistent with the Ordoliberal view that rules-based market integration requires supranational
+  competition enforcement.
+notes: v1 promotion (2026-04-27). Sharpened the generic falsification rule into a two-period DiD on country means around the 1993 Single Market event, EU-12 vs non-EU OECD comparators, with dispositive
+  thresholds. The spec's intra-EU trade share series (eurostat:ext_lt_intratrd) is not on disk, so total trade openness from WDI substitutes as the trade-gain primary; if the intra-EU series is fetched
+  in future, a v2 should restore it as the primary. Cannot separate Single Market from EMU preparation or Eastern enlargement effects — see methodology_note.
+prior_confidence: 0.6
+disclosure: 'Authorial bias risk: pro-EU institutional priors favour finding gains; trade-creation findings can survive even when productivity gains are modest, so packaging the three outcomes together
+  risks halo effect from the strongest channel.'
+falsification:
+  rule: 'PRIMARY (dispositive): SUPPORTED if BOTH (a) the pre/post DiD on log real GDP per capita PPP around 1993 (pre = 1980-1992, post = 1994-2010), EU-12 treated vs non-EU OECD (USA, JPN, CAN, AUS, NOR,
+    CHE) controls, exceeds +2.0 log points, AND (b) the analogous DiD on trade openness (% of GDP, WDI NE.TRD.GNFS.ZS) exceeds +5.0 percentage points. REFUTED if BOTH DiDs are at or below zero (EU-12 underperformed
+    on both dimensions). PARTIAL if one primary holds and the other does not. INFORMATIVE: PWT rtfpna (TFP) DiD on the same windows, reported but not gating. METHOD_VALID: at least 10 of 12 EU-12 countries
+    and 4 of 6 non-EU OECD countries have both pre- and post-window observations of the binding trade-openness series.'
+  test: eu_single_market_1993_pre_post_did_dual_threshold
+  threshold: 'PRIMARY: did_log_gdp_pc_ppp >= 0.020 AND did_trade_openness_pp >= 5.0'
+evidence_type: associational
+sample:
+  countries:
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - GBR
+  - IRL
+  - DNK
+  - GRC
+  - PRT
+  - LUX
+  - USA
+  - JPN
+  - CAN
+  - AUS
+  - NOR
+  - CHE
+  period:
+  - 1980
+  - 2010
+  temporal_structure: panel
+  exclusion_rules:
+  - 1993 single-market activation date is the event
+variables:
+  outcome:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: tfp_index
+    source: pwt:rtfpna
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: intra_eu_trade_share
+    source: eurostat:ext_lt_intratrd
+    transformation: level
+  treatment:
+  - name: eu_member_post_1993
+    source: 'constructed: indicator = 1 for EU-12 country-years >= 1993'
+    transformation: indicator
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+estimator:
+  template: event_study
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Event study on the 1993 EU single market activation date for EU-12 with non-EU OECD comparators. Outcomes: intra-EU trade share, manufacturing productivity, consumer-price dispersion. Tests for
+    measurable post-1993 convergence consistent with rules-based market integration.
+
+    '
+scope:
+  period:
+  - 1993
+  - 2020
+  countries:
+  - EU
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  - competition_policy
+  - institutional_reform
+  treatment_tags:
+  - eu_single_market_1993
+covers_claims:
+- position_id: ordoliberal
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts EU Single Market 1993 produced intra-EU trade, productivity, and price-convergence gains, vindicating rules-based integration with supranational competition enforcement.'
+methodology_note: 'v1 promotion (2026-04-27). Sharpened the original generic falsification rule into two dispositive primary tests around the 1993 Single Market event: a +2.0 log point DiD on log GDP per
+  capita PPP (productivity proxy), and a +5.0 percentage-point DiD on WDI trade openness (substituting for the missing eurostat:ext_lt_intratrd intra-EU trade share). Two-period pre/post DiD on country
+  means is more transparent than a leads/lags event-study and adequate for a binary verdict; v2 should add a year-by-year event-study profile and the intra-EU trade share if/when fetched. Cannot separate
+  Single Market from EMU preparation (1992 Maastricht) or 1995 Eastern enlargement spillovers — these are non-identifying confounds acknowledged in the result card.'

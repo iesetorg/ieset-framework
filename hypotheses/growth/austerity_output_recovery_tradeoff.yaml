@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: austerity_output_recovery_tradeoff
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Post-2010 European fiscal consolidation intensity negatively predicts subsequent output-gap closure speed and cumulative output over the 2010-2019 window, with the effect concentrated in the Eurozone
+  periphery where the combination of sovereign spreads, no monetary- policy-at-country-level, and high initial output gaps produced a multiplier larger than the pre-crisis consensus assumed. The hypothesis
+  is consistent with the Blanchard-Leigh 2013 finding that IMF fiscal-multiplier assumptions were systematically too low in the early austerity period. The pre-registered claim is that in the Eurozone sample
+  2010-2019, countries with larger cyclically-adjusted primary-balance tightening over 2010-2013 experienced slower output- gap closure relative to the post-2008 trough, holding initial output gap and debt
+  level constant. The core-vs-periphery split is expected to show the periphery effect substantially larger than the core effect.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - AUT
+  - BEL
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - IRL
+  - ITA
+  - NLD
+  - PRT
+  - SWE
+  - CYP
+  - LUX
+  - SVN
+  - SVK
+  - EST
+  - LTU
+  - LVA
+  period:
+  - 2008
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years with banking-sector resolution programmes that produced one-off fiscal liabilities larger than 5% of GDP (distorts the CAPB measure)
+  - exclude country-years with IMF/EU/Troika programme expiry within 12 months (programme conditionality dominates the fiscal-stance measure)
+variables:
+  outcome:
+  - name: output_gap_closure_speed
+    source: imf:NGAP_NPGDP
+    transformation: annual_output_gap_narrowing_post_trough
+    notes: Defined as (output_gap_t - output_gap_trough) / (years since trough). Positive values indicate closure.
+  - name: cumulative_real_gdp_2010_to_2019
+    source: world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: cumulative_log_growth_2010_to_2019
+  - name: unemployment_cumulative
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: cumulative_mean_2010_to_2019
+  treatment:
+  - name: cyclically_adjusted_primary_balance_change
+    source: imf:WEO:GGCBP
+    transformation: change_in_capb_2010_to_2013
+    notes: 'Using IMF WEO cyclically adjusted primary balance (GGCBP), computed as the change from 2010 level to 2013 level. Positive values indicate consolidation; primary treatment variable.
+
+      '
+  - name: periphery_indicator
+    source: 'constructed: binary per country'
+    transformation: binary
+    notes: Periphery coded as {GRC, IRL, ITA, PRT, ESP, CYP, SVN, SVK}; core as the remainder of sample.
+  controls:
+  - name: initial_output_gap_2010
+    source: imf:NGAP_NPGDP
+    transformation: level_at_2010
+  - name: initial_debt_to_gdp_2010
+    source: imf:GGXWDG_NGDP
+    transformation: level_at_2010
+  - name: sovereign_spread_peak
+    source: ecb:financial_markets_yields_10yr; fred:IRLTLT01DEM156N (DE bund ref)
+    transformation: max_spread_vs_bund_2010_to_2013
+  - name: pre_crisis_current_account
+    source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+    transformation: mean_2005_to_2007
+intervention_channel: fiscal
+intervention_channel_justification: 'Fiscal consolidation is the direct fiscal-channel intervention. Monetary-policy variation within the Eurozone is absorbed by the periphery-vs-core distinction and sovereign-spread
+  control.
+
+  '
+estimator:
+  template: iv_2sls
+  clustering: country
+  notes: 'Primary specification: 2SLS using the Blanchard-Leigh 2013 forecast-error approach. The first-stage regresses actual 2010-2013 CAPB change on IMF-forecast CAPB change as of the April 2010 WEO;
+    the forecast error becomes the plausibly-exogenous instrument (countries did not systematically forecast-miss their own fiscal choices). Second stage regresses cumulative 2010-2019 output on instrumented
+    consolidation. Alternative: panel FE on 2010-2019 with CAPB_change as regressor reported as robustness. Both specs interact consolidation with the periphery indicator.
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive, downgraded to OLS — see methodology_note): cross-section OLS across the 21-country European panel of cumulative log-GDP growth 2010→2019 on Δ(general-govt net lending / GDP)
+    2010→2013 with periphery dummy and periphery×Δ-FB interaction. The hypothesis is SUPPORTED if β_core < 0 with |β_core| ≥ 0.5 pp-cumulative-growth per 1pp-of-GDP consolidation at p<0.05 AND β_periphery
+    (= β_core + δ_interaction) is more negative than β_core (periphery effect larger as predicted). REFUTED if β_core is significantly POSITIVE at p<0.05 (consolidation associated with *more* growth, contradicting
+    the austerity-damage claim and unable to be rescued by the OLS-vs-IV bias direction). INCONCLUSIVE if β_core is wrong-signed but not significant (consistent with the reverse-causality bias the IV was
+    designed to remove) OR if data gates fail. INFORMATIVE: same-sign result on the unemployment cumulative-mean outcome; controlled-OLS robustness with debt-2010 and unemp-2010 as additional regressors.
+    METHOD_VALID: ≥12 of 21 countries with treatment+outcome data; ≥6 periphery and ≥6 core countries.'
+  test: cross_section_ols_consolidation_growth_periphery_interaction
+  threshold: 'PRIMARY: beta_core < 0 AND |beta_core| >= 0.5 AND p < 0.05 AND beta_periphery < beta_core. REFUTED if beta_core > 0 at p < 0.05.'
+methodology_note: 'v1 promotion (2026-04-26). Spec originally called for IV-2SLS using Blanchard-Leigh 2013 forecast-error instrument (April-2010 IMF WEO forecast minus realised CAPB change 2010-2013).
+  The April-2010 WEO forecast vintage is not in the local data tree, and IMF GGCBP (cyclically-adjusted primary balance) is also unavailable; only the un-adjusted GGXCNL_NGDP is on disk. Per HANDOFF_TO_RUN_AGENT.md
+  allowance for missing instrument data, primary spec was downgraded to cross-section OLS using Δ-overall-fiscal-balance as a CAPB proxy. This OLS is biased toward positive β by reverse causality (countries
+  consolidate harder *because* growth has collapsed) — exactly the bias Blanchard-Leigh''s IV was designed to remove. So a wrong-sign but insignificant OLS is treated as `inconclusive` (identification gap),
+  not `refuted`. Refutation requires a significant POSITIVE β on the consolidation coefficient — only there is the IV-bias alibi exhausted. Sharpened: β_core magnitude threshold of 0.5 pp/pp + significance
+  at 5% + periphery > core in magnitude.'
+prior_confidence: 0.72
+disclosure: 'The austerity-damage literature (Blanchard-Leigh 2013, DeLong-Summers 2012, Alesina et al rebuttal 2019) is contested. Prior reflects moderate confidence in the post-2013 consensus that fiscal
+  multipliers at the ZLB and in monetary-union-periphery conditions exceed pre-crisis assumptions. Author holds priors that are genuinely mixed on this question — market-liberal on small-state grounds,
+  but persuaded by the Blanchard-Leigh forecast-error evidence on multiplier size. Pre-registration commits to publishing findings in either direction.
+
+  '
+steelman: hypotheses/steelman/austerity_output_recovery_tradeoff.md
+linked_hypotheses:
+- procyclical_fiscal_expansion_boom_bust
+- qe_asset_inflation_vs_cpi_divergence_post_2008
+notes: 'This hypothesis and procyclical_fiscal_expansion_boom_bust are in tension but not contradictory: the former argues procyclical loosening in booms is harmful; the latter argues procyclical tightening
+  in busts is also harmful. Both can simultaneously be true — the combined position is that countercyclical fiscal policy across the cycle delivers better outcomes than procyclical policy in either direction.
+  Framework should surface the tension, not collapse into partisan reading of either.
+
+  '
+scope:
+  period:
+  - 2008
+  - 2019
+  countries:
+  - AUT
+  - BEL
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - IRL
+  - ITA
+  - NLD
+  - PRT
+  - SWE
+  - CYP
+  - LUX
+  - SVN
+  - SVK
+  - EST
+  - LTU
+  - LVA
+  - EUROZONE
+  - SOUTHERN_EUROPE
+  outcome_dim:
+  - gdp_growth
+  - fiscal_policy
+  - employment_labour
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - eurozone_austerity_programmes_2010
+  - troika_adjustment_programmes
+  - blanchard_leigh_multiplier_2013
+  - reinhart_rogoff_debt_threshold
+  - cameron_osborne_austerity_2010
+  - uk_fiscal_consolidation
+covers_claims:
+- position_id: new_keynesian
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Phase 4C concern: claim is UK-specific Cameron-Osborne 2010-2016 counterfactual while hypothesis is Eurozone-periphery panel 2010-2019 with UK in sample but not focal; may need relink to UK-specific
+    austerity hypothesis or hypothesis scope broadening.'
+- position_id: post_keynesian
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Phase 4C concern: audit flagged outcome mismatch (claim coded monetary_policy, hypothesis coded employment_labour) but LLM confirmed identical proposition; outcome_dim now aligned on gdp_growth/fiscal_policy/employment_labour.'
+- position_id: social_democratic
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Direct alignment: claim asserts Eurozone periphery austerity (GRC, ESP, PRT, IRL) produced larger-than-projected output contractions, matching hypothesis'' periphery-interaction specification.'

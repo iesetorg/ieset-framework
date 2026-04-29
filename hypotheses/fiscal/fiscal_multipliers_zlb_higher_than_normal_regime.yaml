@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiscal_multipliers_zlb_higher_than_normal_regime
+version: 1
+status: draft
+topic: fiscal
+claim: Fiscal multipliers are substantially larger at the zero lower bound than in normal interest-rate
+  regimes, because crowding-out via higher rates is suppressed.
+notes: Maps the new-Keynesian school's ZLB-higher-multiplier claim to a state-dependent LP-IV across
+  OECD economies covering the 2008-2021 ZLB era plus pre-crisis normal regime. Estimator and prior set;
+  full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: Author prior leans toward the level claim (Ramey-Zubairy 2018 and Auerbach-Gorodnichenko 2012
+  do find higher multipliers under slack/ZLB) but is uncertain about how robustly the gap persists outside
+  the US — international evidence is thinner and the 'substantially' qualifier is sample-dependent.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'State-dependent LP-IV (Ramey-Zubairy) on real GDP responses to government-consumption shocks instrumented by Ramey defence-news, OECD quarterly panel 1995-2021, ZLB regime indicator at short-rate ≤0.25%; country-clustered SEs, country+year FE. Refute if ZLB cumulative multiplier at h=8 not >0.5 above normal-regime multiplier at p<0.10.'
+evidence_type: associational
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, DEU, DNK, ESP, FIN, FRA, GBR, IRL, ITA, JPN, KOR, NLD, NOR, NZL, PRT, SWE, USA]
+  period: [1995, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-quarters in a banking crisis as coded by Laeven-Valencia (treatment effect identification breaks down during crisis recapitalisation)"
+    - "drop the COVID 2020Q2 quarter from primary regressions (administrative-shutdown effects swamp fiscal-multiplier identification); retain as a separate ZLB-COVID robustness window"
+
+variables:
+  outcome:
+    - name: real_gdp_growth_quarterly
+      source: "oecd:NAQ_GDP; imf:NGDP_RPCH (quarterly where available); fred:GDPC1 (USA)"
+      transformation: pct_yoy
+      notes: "Primary outcome — used as LP target across horizons h=0..16 quarters."
+    - name: real_gdp_level
+      source: "oecd:NAQ_GDP; fred:GDPC1"
+      transformation: log_level
+      notes: "For cumulative-multiplier construction (Ramey-Zubairy approach)."
+    - name: unemployment_rate
+      source: "oecd:harmonised_unemployment; ilostat:unemployment_rate"
+      transformation: pct_labour_force
+  treatment:
+    - name: government_consumption_shock
+      source: "oecd:NAQ_government_consumption; imf:GGX_NGDP (annual fallback)"
+      transformation: pct_gdp_innovation
+      notes: "Forecast-error shock series à la Auerbach-Gorodnichenko."
+    - name: narrative_fiscal_shock
+      source: "manual: Ramey-Zubairy military news shocks; Guajardo-Leigh-Pescatori narrative consolidations"
+      transformation: pct_gdp
+      notes: "Instrument for endogenous fiscal innovations."
+    - name: zlb_regime_indicator
+      source: "constructed: indicator = 1 in country-quarters where short-rate (fred:DFF for USA, ecb:FM for EUR, boj:policy_rate for JPN, boe:bank_rate for GBR) <= 0.25%; 0 otherwise"
+      transformation: binary
+      notes: "State-dependent regime variable (Ramey-Zubairy). Interaction with shock identifies ZLB multiplier."
+  instruments:
+    - name: military_buildup_news
+      source: "manual: Ramey defence-news series, US 1939+; Owyang-Ramey-Zubairy international panel for OECD countries"
+      transformation: pct_gdp_pdv
+      notes: "Identifies exogenous component of government-consumption shocks for IV-LP."
+  controls:
+    - name: short_term_policy_rate
+      source: "fred:DFF (USA); ecb:FM (EUR); boj:policy_rate (JPN); boe:bank_rate (GBR); rba:cash_rate (AUS); statcan:overnight_rate (CAN)"
+      transformation: level_pct
+    - name: output_gap
+      source: "imf:NGAP_NPGDP; oecd:OutputGap"
+      transformation: pct_potential
+    - name: cyclically_adjusted_primary_balance
+      source: "imf:GGXCNL_NGDP; oecd:underlying_primary_balance"
+      transformation: pct_gdp
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: pct_gdp
+
+scope:
+  period: [2008, 2021]
+  countries: [USA, OECD]
+  outcome_dim: [fiscal_policy, gdp_growth, monetary_policy]
+  policy_family: [fiscal_policy, monetary_policy]
+  treatment_tags: [zero_lower_bound, arra_2009, covid_fiscal_support_2020]
+
+covers_claims:
+  - position_id: new_keynesian
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "New-Keynesian position predicts fiscal multipliers >1 at the ZLB (ARRA 2009, COVID 2020); hypothesis tests exactly that ZLB-vs-normal regime multiplier gap."
+
+estimator:
+  template: lp_iv
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    State-dependent local projections IV with regime indicator (ZLB
+    vs normal) à la Ramey-Zubairy / Auerbach-Gorodnichenko. Identified
+    fiscal shocks (narrative or forecast-error) as instruments;
+    country-quarter panel covering 2008-2021 ZLB episodes plus pre-
+    crisis normal regime.

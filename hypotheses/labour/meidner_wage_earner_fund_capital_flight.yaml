@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: meidner_wage_earner_fund_capital_flight
+version: 1
+status: draft
+topic: labour
+claim: Swedish Meidner plan / wage-earner funds 1984-1991 did not produce measurable capital flight during
+  their brief implementation, falsifying claims that citizen ownership funds trigger disinvestment.
+notes: Stub seeded from a market-socialist school prediction about Meidner-fund capital-flight null. Fund
+  was small-scale and short-lived; needs human review whether period is too short for a meaningful test.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors expected meaningful capital-flight in response to wage-earner
+  fund proposals; the small fund scale and brief implementation window mean a null finding may reflect
+  power limitations rather than absent capital-flight mechanism.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Event study on SEK exchange rate, capital-flow series, and corporate investment around 1984
+    Meidner enactment in Sweden; supported if abnormal returns within ±1 SD of pre-period (p>0.10).
+evidence_type: associational
+
+sample:
+  countries: [SWE]
+  period: [1980, 1995]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "flag 1992 Swedish currency crisis as out-of-sample confound"
+
+variables:
+  outcome:
+    - name: portfolio_capital_outflows_sweden
+      source: "imf:BFOAFA"
+      transformation: log
+      notes: >
+        IMF BoP financial account portfolio investment flows. Series ID
+        approximate; verify dataflow on wiring.
+    - name: gross_fixed_capital_formation
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+    - name: corporate_investment_share
+      source: "world_bank_wdi:NE.GDI.FPRV.ZS"
+      transformation: level
+    - name: sek_usd_exchange_rate
+      source: "world_bank_wdi:PA.NUS.FCRF"
+      transformation: log_yoy
+      notes: "WB official exchange rate; native source is Riksbank statistical database (registered)."
+    - name: sek_real_effective_exchange_rate
+      source: "bis:WS_EER"
+      transformation: log
+  treatment:
+    - name: meidner_fund_enactment
+      source: "derived:meidner_fund_dates"
+      transformation: indicator
+      notes: >
+        Hand-coded: 1984 enactment, 1991 abolition. Small fund-size
+        scale flagged in falsification disclosure.
+  controls:
+    - name: oecd_fdi_inflows_average
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+      notes: "OECD donor-pool benchmark for global capital-flow trend."
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: real_interest_rate_sweden
+      source: "world_bank_wdi:FR.INR.RINR"
+      transformation: level
+
+scope:
+  period: [1984, 1991]
+  countries: [SWE]
+  outcome_dim: [capital_flows, financialisation]
+  policy_family: [institutional_reform, tax_policy]
+  treatment_tags: [meidner_plan_sweden]
+
+covers_claims:
+  - position_id: market_socialist
+    claim_index: 4
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Market socialist predicts Meidner wage-earner funds did not trigger capital flight, falsifying disinvestment claims; Phase 4C should caveat brief 1984-1991 window and small scale — null result on capital flight may reflect limited implementation rather than counterfactual test."
+
+estimator:
+  template: event_study
+  clustering: date
+  fixed_effects: [date]
+  notes: >
+    Event study around the 1984 Meidner-fund enactment in Sweden,
+    with capital flows (BoP), corporate investment, and SEK as
+    outcomes. Tight pre/post window 1980-1991 (until 1991 fund
+    abolition). Caveat noted: small fund scale limits power.

@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: gradualist_vs_shock_therapy_transition_outcomes
+version: 1
+status: draft
+topic: growth
+claim: Deng's 1978 reforms succeeded not through pure market liberalisation but through dual-track pricing,
+  TVE experimentation, and SEZ strategic openings — a gradualist-pragmatist pattern that pure shock-therapy
+  could not reproduce in post-Soviet economies.
+notes: Seeded from a developmentalist position-claim that Deng's gradualist dual-track/TVE/SEZ pattern outperforms
+  pure shock therapy. Cross-country transition panel; human review required to address China's unique scale,
+  diaspora capital, and rural starting point.
+prior_confidence: 0.6
+disclosure: >-
+  Authorial bias risk: gradualist-vs-shock comparison is conditional on country and starting-point selection (CHN/VNM agrarian rural with diaspora capital vs RUS/POL urban industrial); attributing differences to sequencing alone risks omitting these structural priors.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Panel FE of log GDP per capita on gradualist (CHN,VNM) vs shock-therapy (RUS,POL,EST,...) dummy with
+    country and year FE 1978-2000; falsified if gradualist coefficient is not positive at p<0.10.'
+evidence_type: associational
+
+sample:
+  countries: [CHN, VNM, RUS, POL, EST, LVA, LTU, CZE, SVK, HUN, ROU, BGR, UKR, BLR, KAZ]
+  period: [1989, 2010]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: maddison_real_gdp_pc
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: gradualist_indicator
+      source: "constructed: indicator = 1 for CHN, VNM (gradualist); 0 for shock-therapy post-Soviet states"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Cross-country panel of post-1978 transition economies coded by
+    gradualist (CHN, VNM) vs shock-therapy (RUS, POL, EST, etc.) reform
+    pace. Outcome: real GDP per capita trajectory and TFP. Tests whether
+    gradualist sequencing dominates pure shock therapy on output measures.
+
+scope:
+  period: [1978, 2000]
+  countries: [CHN, POST_SOVIET]
+  outcome_dim: [gdp_growth, institutional_quality, productivity]
+  policy_family: [institutional_reform, privatisation_nationalisation, trade_policy]
+  treatment_tags: [chinese_reform_opening_1978, dual_track_pricing, tve_experimentation, sez_strategic_openings, post_soviet_shock_therapy]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 6
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether Deng's gradualist dual-track/TVE/SEZ pattern succeeded where post-Soviet shock therapy did not."
+

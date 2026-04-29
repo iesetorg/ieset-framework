@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cuba_health_outcomes_vs_latam_peers
+version: 1
+status: draft
+topic: healthcare
+claim: Cuban life expectancy and infant mortality outcomes 1960-2000 outperformed Latin American middle-income
+  peers despite sanctions, demonstrating socialist health-system superiority.
+notes: Stub seeded from a Marxist-Leninist school prediction about Cuban health-system superiority. Cuban
+  official data quality is contested; needs human review of WHO/PAHO independent estimates and embargo controls.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors are skeptical of socialist exceptionalism narratives but recognise
+  Cuban primary-care emphasis is well-documented; this could bias toward attributing outcomes to Soviet
+  subsidies rather than to the health-system architecture itself.
+falsification:
+  rule: >-
+    PRIMARY 1 (life expectancy, dispositive): Cuba's life expectancy at birth in 2000
+    minus the LATAM peer-pool mean in 2000 must be at least +1.0 year. PRIMARY 2 (infant
+    mortality, dispositive): Cuba's IMR in 2000 must be at most 50% of the LATAM peer-pool
+    mean (CUB / peer_mean <= 0.50). SUPPORTED if BOTH primaries hold AND Cuba's gap on at
+    least one metric is more favourable in 2000 than in 1960 (so Cuba "pulled away" rather
+    than just starting ahead). PARTIAL if exactly one primary holds. REFUTED if neither
+    primary holds. INFORMATIVE: Cuba's rank within the 12-country pool at 2000 on each
+    metric, plus 1991-2000 sub-period (post-Soviet-subsidy) trajectory. METHOD_VALID:
+    requires WDI coverage for at least 8 of 11 peers at the 2000 endpoint; WHO GHO
+    independent cross-check noted as unavailable for the full window (series begins ~2000).
+  test: cuba_vs_latam_peer_mean_endpoint_dual_threshold_2000
+  threshold: >-
+    PRIMARY: (le_cub_2000 - le_peer_mean_2000) >= 1.0 AND (imr_cub_2000 / imr_peer_mean_2000) <= 0.50
+    AND ((le_gap_2000 > le_gap_1960) OR (imr_ratio_2000 < imr_ratio_1960))
+evidence_type: associational
+sample:
+  countries: [CUB, MEX, BRA, ARG, CHL, COL, VEN, DOM, ECU, PER, URY, CRI]
+  period: [1960, 2000]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WHO/PAHO independent estimates"
+    - "report sensitivity using Cuban official data alongside WHO independent estimates"
+variables:
+  outcome:
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+    - name: infant_mortality_per_1000
+      source: "world_bank_wdi:SP.DYN.IMRT.IN"
+      transformation: log
+      notes: "WDI infant mortality per 1000 live births. Primary discriminating outcome."
+    - name: life_expectancy_who
+      source: "who_gho:life_expectancy_at_birth"
+      transformation: level
+      notes: "WHO GHO independent estimate as cross-check on Cuban official figures."
+  treatment:
+    - name: cuba_socialist_indicator
+      source: "constructed: indicator = 1 for CUB; 0 for income-matched LATAM peer pool."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_health_expenditure_per_capita
+      source: "world_bank_wdi:SH.XPD.CHEX.PC.CD"
+      transformation: log
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive cross-country comparison of CUB vs income-matched LATAM peers
+    1960-2000 on life expectancy and infant mortality. Plot trajectories with
+    sanctions/embargo annotations; report rank-position of CUB within peer
+    distribution at 5-year intervals. Cuban official data quality flagged as
+    measurement caveat — sensitivity using WHO independent estimates.
+    Not causal — does not separate health-system architecture from Soviet
+    subsidies channel (subsidies ended 1991 makes 1991-2000 a useful sub-period).
+
+scope:
+  period: [1960, 2000]
+  countries: [CUB, LATAM]
+  outcome_dim: [life_expectancy_health, welfare_state]
+  policy_family: [welfare_architecture, privatisation_nationalisation]
+  treatment_tags: [cuban_revolution_1959, cuba_socialist_health_system, us_cuba_embargo]
+
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic "1 SD on both metrics"
+  rule to two dispositive endpoint tests at 2000: LE gap >= +1.0y AND IMR ratio <= 0.50.
+  Added a "pulled away" gate (gap improvement on at least one metric vs 1960) so the
+  scoring does not just reward Cuba's pre-revolution starting position. Added the
+  1991-2000 post-Soviet-subsidy sub-period as informative content. Result: SUPPORTED
+  on both primaries — Cuba's 2000 IMR is 6.8/1k vs peer mean 21.1/1k (rank #1/12),
+  and 2000 LE is +3.1y above the peer mean (rank #3/12, behind CHL and CRI). Note
+  the LE-gap NARROWED from 1960's +6.0y to 2000's +3.1y (peers caught up), but IMR
+  ratio improved 0.36 → 0.32, so the "pulled away" gate is met by IMR. Honest
+  reading: Cuba's social-outcome gains are real and the IMR result is genuinely
+  exceptional, but the LE story is "started ahead, peers narrowed the gap" not
+  "Cuba pulled away on both metrics." WHO independent cross-check unavailable for
+  1960-2000 (GHO series starts ~2000), so the WDI back-fill from Cuban government
+  sources retains a 1-2y official-data uncertainty band.
+steelman: hypotheses/steelman/cuba_health_outcomes_vs_latam_peers.md
+
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Marxist-Leninist position predicts socialist health-system superiority via Cuban outcomes vs LATAM peers under sanctions; hypothesis tests Cuban life-expectancy/infant mortality divergence 1960-2000. Direct alignment."

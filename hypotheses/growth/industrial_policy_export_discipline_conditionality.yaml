@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_policy_export_discipline_conditionality
+version: 1
+status: draft
+topic: growth
+claim: Industrial policy succeeds when subsidies and cheap credit are conditional on export-discipline
+  performance (Korea, Taiwan, China) and fails when unconditional (Latin American ISI 1960s–1980s, India
+  pre-1991 licence raj).
+notes: Seeded from a developmentalist (Amsden/Wade) claim that East Asian export-discipline conditionality
+  separates successful industrial policy from ISI failure. Coding of "conditionality" is the central judgement
+  call needing human review.
+prior_confidence: 0.6
+disclosure: >-
+  Authorial bias risk: developmentalist priors favour the export-discipline/ISI dichotomy; binary coding is contestable (Latin American ISI had some export elements; Korean policy had non-export rents), and selection bias (countries that had export demand) confounds the conditionality story.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Panel FE of manufacturing TFP and real GDP growth 1960-2000 on export-discipline conditionality dummy
+    interacted with industrial-policy intensity, country and year FE; falsified if interaction not positive
+    at p<0.10.'
+evidence_type: associational
+
+sample:
+  countries: [KOR, TWN, CHN, JPN, SGP, MYS, THA, IND, IDN, PHL, ARG, BRA, MEX, CHL, PER, COL, VEN]
+  period: [1960, 2000]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+  treatment:
+    - name: export_discipline_indicator
+      source: "constructed: indicator = 1 for KOR, TWN, CHN, SGP, JPN (export-disciplined IP); 0 for ISI Latin America + IND pre-1991"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Cross-country panel coding industrial-policy regimes by conditionality
+    (export-discipline vs unconditional ISI). Outcome: manufacturing TFP
+    and real GDP growth 1960-2000. Tests whether the export-discipline
+    treatment indicator is significantly associated with higher productivity.
+
+scope:
+  period: [1960, 2000]
+  countries: [KOR, TWN, CHN, IND, LATAM, ASIA_EM]
+  outcome_dim: [industrial_capability, gdp_growth, productivity]
+  policy_family: [industrial_policy, trade_policy]
+  treatment_tags: [export_discipline_conditionality, import_substitution_industrialisation, indian_liberalisation_1991, india_licence_raj]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts industrial policy succeeds when conditional on export discipline (Korea/Taiwan/China) and fails when unconditional (Latin American ISI, India licence raj)."

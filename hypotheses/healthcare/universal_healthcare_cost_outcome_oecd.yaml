@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: universal_healthcare_cost_outcome_oecd
+version: 1
+status: draft
+topic: healthcare
+claim: Universal healthcare systems across OECD produce lower per-capita health spending than the US multi-payer system at equal or better outcome measures.
+notes: Stub seeded from a social-democratic school prediction about OECD universal vs US multi-payer performance. Needs human review of how universal-system heterogeneity is treated (single-payer vs Bismarckian).
+prior_confidence: 0.7
+disclosure: Author's market-liberal priors recognise the strong OECD cost-outcome differential against the US, biasing toward easy validation; could under-weight innovation-output and waiting-time differences
+  that complicate the welfare comparison.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Cross-country regression of per-capita health spend on outcome metrics across OECD ex-USA vs USA; supported if USA spend residual is >40% above peer regression line at 2010-2023 mean.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - CHE
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - PRT
+  - GRC
+  - CAN
+  - AUS
+  - NZL
+  - JPN
+  - KOR
+  - ISR
+  period:
+  - 1971
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing OECD health expenditure or life expectancy
+variables:
+  outcome:
+  - name: health_expenditure_per_capita_usd
+    source: world_bank_wdi:SH.XPD.CHEX.PC.CD
+    transformation: log
+  - name: health_expenditure_share_gdp
+    source: world_bank_wdi:SH.XPD.CHEX.GD.ZS
+    transformation: level
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: amenable_mortality_per_100k
+    source: oecd:OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0
+    transformation: log
+  treatment:
+  - name: universal_healthcare_indicator
+    source: 'constructed: indicator = 1 for OECD countries with universal coverage (single-payer or Bismarckian); 0 for USA pre-ACA multi-payer regime.'
+    transformation: indicator
+  - name: bismarckian_subtype_indicator
+    source: 'constructed: among universal-coverage countries, indicator = 1 for Bismarckian (DEU, AUT, CHE, FRA, BEL, NLD), 0 for Beveridgean (GBR, SWE, NOR, DNK, etc.) — separates universal-system heterogeneity.'
+    transformation: indicator
+  controls:
+  - name: log_gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: old_age_dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Cross-country panel-FE regressing log per-capita health spend on outcome metrics (life expectancy, amenable mortality) with universal/multi-payer indicator as treatment. Country and year FE; country-clustered
+    SEs. Bismarckian-subtype indicator separates universal-system heterogeneity. Caveat: ignores within-system access and waiting-time differences; innovation-output channel not measured.
+
+    '
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - OECD
+  - USA
+  outcome_dim:
+  - welfare_state
+  - life_expectancy_health
+  policy_family:
+  - welfare_architecture
+  treatment_tags:
+  - universal_healthcare
+  - us_multipayer_healthcare
+covers_claims:
+- position_id: social_democratic
+  claim_index: 9
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Social-democratic position predicts OECD universal systems dominate US multi-payer on cost and outcomes; hypothesis tests per-capita health spend vs outcome measures across OECD vs USA. Direct
+    alignment.

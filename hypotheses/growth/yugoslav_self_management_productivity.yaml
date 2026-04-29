@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: yugoslav_self_management_productivity
+version: 1
+status: draft
+topic: growth
+claim: Yugoslav worker-self-managed firms 1965-1980 achieved productivity growth comparable to southern
+  European market peers at similar development stages, demonstrating that self-management can coexist
+  with market allocation.
+notes: Stub seeded from a market-socialist school prediction about Yugoslav self-management productivity.
+  YUG is a defunct ISO code; needs human review of historical data sources (Madison, Penn World Table).
+prior_confidence: 0.40
+disclosure: Author's market-liberal priors are skeptical of self-management productivity claims, viewing
+  Yugoslav growth as commodity-export driven; could under-weight evidence of comparable productivity gains.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Compare YUG annual labour-productivity growth 1965-1980 against {ITA, ESP, GRC, PRT} mean;
+    supported if YUG growth within ±25% of southern-European peer mean over the period.
+evidence_type: descriptive
+
+sample:
+  countries: [YUG, ITA, ESP, GRC, PRT]
+  period: [1965, 1980]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_real_gdp_long_run
+      source: "maddison:gdp_ppp"
+      transformation: log
+    - name: log_gdp_pc_long_run
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: industrial_production_index
+      source: "jst:industrial_production"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: yugoslav_self_management_indicator
+      source: "constructed: indicator = 1 for YUG (worker self-management institutionalised post-1953)"
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Cross-country descriptive comparison of Yugoslav productivity-growth
+    1965-1980 against southern-European market peers (ITA, ESP, GRC, PRT)
+    at similar development stages. Tests whether self-managed firms
+    achieved comparable productivity growth.
+
+scope:
+  period: [1965, 1980]
+  countries: [YUG, SOUTHERN_EUROPE]
+  outcome_dim: [productivity]
+  policy_family: [institutional_reform, labour_market]
+  treatment_tags: [yugoslav_self_management]
+
+covers_claims:
+  - position_id: market_socialist
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts Yugoslav worker-self-managed firms 1965-1980 achieved productivity growth comparable to southern European market peers."

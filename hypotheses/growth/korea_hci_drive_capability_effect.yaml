@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: korea_hci_drive_capability_effect
+version: 1
+status: draft
+topic: growth
+claim: >
+  Park Chung-hee's 1961-1979 heavy-and-chemical-industry drive in Korea
+  (shipbuilding, steel, petrochemicals, chemicals) produced durable
+  industrial capability that generated export competitiveness by 1985,
+  outperforming import-substitution-industrialisation counterfactuals in
+  Latin America across comparable decades. The discriminating variable is
+  export-discipline conditionality: Korean subsidies required export
+  performance, while LatAm ISI subsidies did not.
+notes: >
+  Seeded from a developmentalist (Amsden/Wade) claim that Park-era HCI drive
+  built durable capability vindicated by 1985 export competitiveness. Synth-DID
+  vs LatAm ISI; human review required for donor-pool selection and capability-
+  measure choice before pre-registration.
+prior_confidence: 0.6
+disclosure: >
+  Authorial bias risk: developmentalist framing privileges the export-discipline
+  channel over alternative explanations (US security umbrella, land reform,
+  Cold War demand for Korean output, Japanese diaspora networks). Synth-DID
+  donor pool of LatAm ISI economies is sympathetic to the claim because LatAm
+  underperformance is itself disputed.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if synthetic-control estimate of Korea's
+    heavy-industry export share or revealed-comparative-advantage index
+    exceeds the LatAm ISI synthetic counterfactual by at least 50% by 1985,
+    and if export complexity (Hidalgo-Hausmann ECI) diverges by at least 0.5
+    standard deviations. REFUTED if either gap is less than half these
+    thresholds or opens in the opposite direction.
+  test: "Synth-DID with KOR treated 1973 (HCI launch) vs LatAm ISI donor pool {BRA,ARG,MEX,COL,CHL,PER}; outcome heavy-industry export share + ECI complexity 1961-1985; falsified if 1985 gap below 50% of synth at p<0.10."
+evidence_type: associational
+
+sample:
+  countries: [KOR, BRA, ARG, MEX, COL, CHL, PER, TWN, MYS]
+  period: [1961, 1990]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: economic_complexity_index
+      source: "owid:economic-complexity-index"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: korea_hci_treated
+      source: "constructed: indicator = 1 for KOR, year >= 1973 (HCI plan launched)"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    Korea treated; donor pool of LatAm ISI-era economies (BRA, ARG, MEX,
+    COL, CHL, PER) for the 1961-1985 window. Outcomes: heavy-industry
+    export share, ECI complexity, revealed-comparative-advantage. Tests
+    whether Park-era HCI subsidies-with-export-discipline produced
+    above-counterfactual capability build-up.
+
+scope:
+  period: [1961, 1985]
+  countries: [KOR, LATAM]
+  outcome_dim: [industrial_capability, gdp_growth, productivity]
+  policy_family: [industrial_policy, trade_policy]
+  treatment_tags: [park_chung_hee_reforms, korea_hci_drive_1973, export_discipline_conditionality, latam_isi_counterfactual]
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Developmentalist claim that Park-era HCI produced capability build-up is the core test. Relinked from industrial_policy_developmentalist_states_growth in Phase 4E to give the Korea-specific episode its own hypothesis."

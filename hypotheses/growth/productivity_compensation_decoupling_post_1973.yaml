@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: productivity_compensation_decoupling_post_1973
+version: 1
+status: draft
+topic: growth
+claim: US labour productivity and median compensation grew together 1945-1973 but decoupled after 1973, and the decoupling magnitude exceeds what composition-adjusted measures eliminate.
+notes: Seeded from a Marxian claim that US labour productivity and median compensation decoupled after 1973 beyond what composition-adjusted measures eliminate. Single-country descriptive; promoted to runnable
+  v1 using the BLS productivity-and-costs (PRS) program's composition-adjusted nonfarm-business series for both productivity and real hourly compensation, so the test is on the composition-adjusted measure
+  the spec calls for, not raw median wages.
+prior_confidence: 0.65
+disclosure: 'Authorial bias risk: choice of CPI-U (productivity-friendly) vs PCE (compensation-friendly) deflator materially affects whether the gap appears; total-compensation (incl. health benefits) vs
+  cash-wages also changes the magnitude. Marxian framing tends to favour the maximally-large gap measure. The replication uses BLS''s own PRS deflator for both series, so the productivity and compensation
+  indexes are deflator-consistent within the test.'
+falsification:
+  rule: 'PRIMARY (dispositive): hypothesis is SUPPORTED if the cumulative log-gap between US nonfarm-business labour productivity (BLS PRS85006092, output per hour) and real hourly compensation (BLS PRS85006112,
+    composition-adjusted) over 1973-2019 is at least +30 log-percentage-points (productivity > compensation). REFUTED if the cumulative log-gap is <= 0 (compensation kept up with productivity). PARTIAL
+    if the gap is in (0, +30) — directionally consistent with decoupling but below the EPI/Mishel "large gap" framing the Marxian claim leans on. INFORMATIVE (reported, not gating): pre-1973 baseline cumulative
+    gap (1947-1973), median weekly real-earnings gap (FRED LES1252881600Q, post-1979), and labour share change (FRED PRS85006173). METHOD_VALID: BLS PRS85006092 and PRS85006112 must both have annual coverage
+    at 1973 and 2019 endpoints. If either endpoint is missing, the verdict is `inconclusive — data gap`.'
+  test: us_nfb_productivity_compensation_log_gap_1973_2019
+  threshold: 'PRIMARY: cumulative_log_gap_ppt(productivity, compensation, 1973, 2019) >= +30 for SUPPORTED; <= 0 for REFUTED; in (0, +30) for partial.'
+methodology_note: 'v1 promotion (2026-04-27). Sharpened the original generic falsification rule into a dispositive cumulative-log-gap test on BLS''s composition-adjusted nonfarm-business productivity (PRS85006092)
+  and real hourly compensation (PRS85006112) series. Endpoints fixed at 1973 (Bretton-Woods collapse / productivity-slowdown onset) and 2019 (pre-COVID terminal year). Threshold of +30 log-ppts mirrors
+  the EPI / Mishel "large gap" framing that anchors the Marxian decoupling claim. Median-wage and labour-share gaps are reported as informative-only because (a) median weekly earnings (LES1252881600Q) only
+  starts in 1979, and (b) labour share is a level change in a different unit. Refutations are valuable: if BLS''s own composition- adjusted compensation index tracks productivity within +/- 30 ppts over
+  the post- 1973 horizon, the "exceeds composition adjustment" version of the claim fails on its own preferred measure.'
+evidence_type: descriptive
+sample:
+  countries:
+  - USA
+  period:
+  - 1947
+  - 2019
+  temporal_structure: time_series
+  exclusion_rules:
+  - End the post-break horizon at 2019 to avoid the COVID-2020 distortion.
+variables:
+  outcome:
+  - name: log_labour_productivity
+    source: bls:PRS85006092
+    transformation: log
+  - name: log_real_hourly_compensation
+    source: bls:PRS85006112
+    transformation: log
+  - name: log_median_real_weekly_earnings
+    source: fred:LES1252881600Q
+    transformation: log
+  - name: labour_share
+    source: fred:PRS85006173
+    transformation: level
+  controls: []
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Single-country US time-series cumulative-log-gap test. Annual collapse of BLS monthly/quarterly observations within each calendar year. The PRIMARY statistic is gap_ppt = 100 * (log(P_2019/P_1973)
+    - log(C_2019/C_1973)). Pre-1973 baseline gap (1947-1973) reported as informative, to confirm the claim''s "co-movement era" premise.
+
+    '
+scope:
+  period:
+  - 1947
+  - 2019
+  countries:
+  - USA
+  outcome_dim:
+  - productivity
+  - wage_stagnation
+  - labour_share
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - productivity_compensation_decoupling_1973
+  - neoliberal_turn_1980
+covers_claims:
+- position_id: marxian
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Marxian prediction: US labour productivity and median compensation grew together 1945-1973 but decoupled after 1973, exceeding composition-adjustment eliminations; direct alignment with hypothesis.'

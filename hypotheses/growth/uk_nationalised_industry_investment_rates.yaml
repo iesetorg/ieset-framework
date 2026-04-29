@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uk_nationalised_industry_investment_rates
+version: 2
+status: pre_registered
+topic: growth
+claim: UK post-war nationalised industries (coal, rail, steel, gas) through 1979 achieved capital-investment
+  rates comparable to sectoral peers in West Germany and France, falsifying the claim that public ownership
+  categorically starves investment.
+notes: 'v2 (2026-04-27) downgrades the original sector-level ambition (coal/rail/steel/gas)
+  to a country-level test. No on-disk publisher provides comparable sectoral capital-formation
+  series for GBR/DEU/FRA back to 1950. PWT csh_i (gross capital formation share of GDP at
+  current PPPs) is the only series that covers the full 1950-1979 window for all three
+  countries. The country-level test treats the UK''s economy-wide investment share as a
+  noisy proxy for the nationalised-sector investment share, on the rationale that the
+  nationalised industries were a large enough share of UK gross fixed capital formation in
+  this period to dominate the country-level signal if they were truly investment-starved.
+  See methodology_note.'
+prior_confidence: 0.4
+disclosure: Author's market-liberal priors bias toward expecting public-ownership investment crowd-out,
+  which could lead to over-weighting of decline narratives and under-weighting of high-investment 1950s-60s
+  comparators.
+steelman: hypotheses/steelman/uk_nationalised_industry_investment_rates.md
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if the absolute gap
+    |mean(UK csh_i, 1950-1979) - mean(DEU+FRA csh_i, 1950-1979)| is at most
+    5 percentage points of gross capital formation share of GDP. REFUTED
+    if the UK undershoots the DEU+FRA peer mean by more than 10pp.
+    Outcomes between -10pp and -5pp (UK below peers by 5-10pp) score as
+    weakened (directionally consistent with crowd-out but not dispositive
+    under the symmetric SUPPORTED band). Outcomes between +5pp and +10pp
+    (UK above peers by 5-10pp) score as partial.
+    METHOD_VALID: PWT csh_i has non-null annual coverage for all three
+    countries (GBR, DEU, FRA) for at least 28 of the 30 years in
+    1950-1979.
+    INFORMATIVE: per-country mean csh_i, year-by-year UK-vs-peer-mean
+    gap series, reported in diagnostics.
+  test: uk_vs_peer_country_csh_i_gap_1950_1979
+  threshold: >-
+    PRIMARY: |mean(UK csh_i 1950-1979) - mean({DEU,FRA} csh_i 1950-1979)| <= 0.05
+    SUPPORTED. UK below peers by > 0.10 REFUTED.
+methodology_note: >-
+  v2 promotion (2026-04-27). Original spec called for a sector-year FE
+  panel of coal/rail/steel/gas investment for GBR/DEU/FRA 1945-1979. No
+  publisher in the repo's vintage tree carries comparable sectoral
+  capital-formation series back to 1950 (WDI NE.GDI.TOTL.ZS only starts
+  1960 and is country-level only; OECD STAN sectoral data is not on
+  disk). PWT csh_i (gross capital formation share of GDP at current
+  PPPs) is the only on-disk series with full GBR/DEU/FRA coverage for
+  1950-1979. The v2 test substitutes a country-level investment-share
+  comparison for the original sector-level test. This is a meaningful
+  weakening of the spec — the original test would have isolated
+  publicly-owned vs privately-owned sectors directly; the v2 test only
+  asks whether the UK's economy-wide investment share tracks its
+  comparators, which conflates the nationalised-sector signal with
+  private-sector business-investment differences (e.g. German
+  Wirtschaftswunder investment was largely private). Verdict
+  thresholds are correspondingly strict (5pp SUPPORTED band, 10pp
+  REFUTED gap) rather than the original ±20% sectoral coefficient
+  band. A v3 with sector-level data (OECD STAN, BoE Three Centuries
+  data, or hand-coded Pryke 1981) would supersede this.
+evidence_type: associational
+sample:
+  countries:
+  - GBR
+  - DEU
+  - FRA
+  period:
+  - 1950
+  - 1979
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: capital_investment_rate
+    source: 'pwt:csh_i'
+    notes: 'PWT csh_i (gross capital formation share of GDP at current PPPs) is the only on-disk source covering GBR/DEU/FRA back to 1950. WDI NE.GDI.TOTL.ZS starts 1960 and lacks sector-level disaggregation. Sector-level (coal, rail, steel, gas) is the original spec ambition but no on-disk publisher provides it; v2 country-level test treats nationalised-industry investment as a country-level outcome.'
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'v2 country-level mean comparison. UK csh_i 1950-1979 vs peer
+    (DEU+FRA) mean csh_i over the same window. Implementation in
+    engine/runs/uk_nationalised_industry_investment_rates/replication.py
+    computes the gap directly rather than running a regression — with
+    only 3 countries and 30 years a panel FE adds noise without
+    additional identification.'
+scope:
+  period:
+  - 1950
+  - 1979
+  countries:
+  - GBR
+  - DEU
+  - FRA
+  outcome_dim:
+  - industrial_capability
+  - productivity
+  policy_family:
+  - privatisation_nationalisation
+  - industrial_policy
+  treatment_tags:
+  - uk_postwar_nationalisations_1945
+covers_claims:
+- position_id: market_socialist
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Identical-proposition: claim and hypothesis both test whether UK post-war nationalised industries
+    achieved capital-investment rates comparable to West German and French sectoral peers.'

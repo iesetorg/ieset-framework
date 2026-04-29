@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uk_electricity_privatisation_price_decarbonisation
+version: 1
+status: draft
+topic: energy
+claim: UK electricity-sector privatisation post-1989 increased per-MWh retail prices and did not accelerate decarbonisation relative to the public counterfactual until state-directed renewables mandates
+  post-2008.
+scope:
+  period:
+  - 1989
+  - 2017
+  countries:
+  - GBR
+  outcome_dim:
+  - energy
+  - regulation_compliance_cost
+  policy_family:
+  - privatisation_nationalisation
+  - energy_policy
+  - regulation
+  treatment_tags:
+  - uk_electricity_privatisation_1989
+  - uk_renewables_obligation_2002
+  - uk_climate_change_act_2008
+covers_claims:
+- position_id: eco_socialist
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Claim text matches hypothesis claim verbatim: UK electricity privatisation post-1989 increased retail prices and did not accelerate decarbonisation vs public counterfactual until post-2008 renewables
+    mandates. Direct alignment.'
+notes: Maps the eco-socialist school's UK-electricity-privatisation-failure claim to a 1989-2017 single- country event-study with sub-period decomposition around the 2008 Climate Change Act. Estimator and
+  prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.45
+disclosure: Author prior is skeptical that retail price increases post-1989 are cleanly attributable to privatisation rather than to gas-import dependence and Renewables Obligation costs; the decarbonisation
+  acceleration post-2008 is well-documented but the public-counterfactual is thinly identified.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: UK 1989-2017 event-study of real retail electricity price (DECC/BEIS) and grid CO2 intensity (DUKES) on privatisation 1989 and Climate Change Act 2008 events; HAC SEs with sub-period decomposition.
+    Refute if post-1989 retail price not >10% above pre-privatisation trend OR if grid-CO2 decline rate 1990-2008 not slower than 2008-2017 rate at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - GBR
+  period:
+  - 1980
+  - 2017
+  temporal_structure: time_series
+  exclusion_rules:
+  - report sub-period decomposition around 1989 privatisation and 2008 Climate Change Act
+variables:
+  outcome:
+  - name: real_retail_electricity_price_gbp_per_kwh
+    source: ons:electricity_prices
+    transformation: log
+    notes: ONS / DECC retail electricity price index, real GBP per kWh (CPI-deflated).
+  - name: grid_co2_intensity_g_per_kwh
+    source: owid:annual-co2-emissions-per-country
+    transformation: log
+    notes: 'UK electricity-sector CO2 intensity. TODO swarm-6e: cross-check with DUKES (BEIS) when fetcher lands.'
+  treatment:
+  - name: post_privatisation_indicator
+    source: 'constructed: indicator = 1 for years >= 1990 (post-1989 Electricity Act vesting).'
+    transformation: indicator
+  - name: post_climate_change_act_indicator
+    source: 'constructed: indicator = 1 for years >= 2008 (Climate Change Act enactment).'
+    transformation: indicator
+  controls:
+  - name: gas_share_of_generation
+    source: owid:share-elec-by-source
+    transformation: level
+    notes: Gas-import dependence channel — confounds price effect of privatisation.
+  - name: brent_oil_usd
+    source: imf_pcps:POILBRE
+    transformation: log
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects:
+  - year
+  notes: 'Single-country interrupted time-series 1980-2017 with two treatment breakpoints (1989 privatisation, 2008 Climate Change Act). HAC SEs. Sub-period decomposition reports retail-price gap pre/post-1989
+    and grid-CO2 decline rate 1990-2008 vs 2008-2017. Counterfactual is weakly identified — gas-import dependence partials the price channel but cannot fully separate ownership-form from policy-design effects.
+
+    '

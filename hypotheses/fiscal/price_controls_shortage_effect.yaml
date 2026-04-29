@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: price_controls_shortage_effect
+version: 1
+status: pre_registered
+topic: fiscal
+claim: 'Statutory price ceilings set below plausible market-clearing prices produce measurable shortage indicators — stockouts, queue formation, black-market emergence, quality degradation, and in monetary-
+  expansion contexts, large divergences between official and parallel- market prices. The canonical cases examined are Venezuela 2003-2023 (sustained price controls under Chavismo), Argentina under the
+  Kirchner-Fernandez governments (Precios Cuidados 2014-2023), USSR late Brezhnev / Gorbachev era (1980-1991), and the 1973-1981 US petroleum price controls (EPCA and successors). The claim is descriptive-causal:
+  where these episodes are well-documented, the shortage signature appears; the framework pre-registers the pattern and tests whether it holds in the listed cases using available quantitative indicators
+  where they exist and qualitative coding where they do not. The claim is deliberately narrower than the stronger hypotheses/regulatory/price_controls_produce_shortages_ and_quality_degradation.yaml: it
+  does not claim uniformity across all episodes, only that the pre-registered canonical cases show the signature.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - VEN
+  - ARG
+  - RUS
+  - USA
+  period:
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - restrict to episodes with documented statutory price-ceiling legislation (not just administered prices or taxes)
+  - require at least 24 months of ceiling duration for inclusion (short-term emergency controls are a different mechanism and are evaluated separately)
+variables:
+  outcome:
+  - name: official_vs_parallel_price_ratio
+    source: hanke:Troubled; ARG BCRA + blue-dollar parallel quotes (ARG); IMF historical exchange rate quotes (RUS late USSR); official crude oil price vs spot West Texas (USA 1973-1981)
+    transformation: ratio_level_or_log
+    notes: Primary outcome. Where parallel markets exist and are documented, the official/parallel ratio is the tightest shortage signature.
+  - name: stockout_incidence
+    source: 'constructed: episode-level documented stockout frequency from World Bank, IMF country reports, academic sources (Edwards 2010 for Latin America; Rockoff 1984 for US; Harrison-Mark 1985 for
+      USSR)'
+    transformation: qualitative_ordinal_coded
+  - name: cpi_divergence_official_vs_alternative
+    source: hanke:hyperinflation_table (VEN); imf:PCPI (official series); ARG alternative inflation estimates (PriceStats, Congresso estimates)
+    transformation: log_ratio_alternative_over_official
+    notes: For Venezuela and Argentina, official vs alternative inflation estimates diverge widely. Divergence is informative about price-control enforcement.
+  treatment:
+  - name: price_control_regime
+    source: 'constructed: coded per country-year from legislation chronologies'
+    transformation: binary_or_intensity_coded
+    notes: 'Episode coding: VEN Ley de Costos y Precios Justos 2011 (previously Decreto 2304 2003); ARG Precios Cuidados 2014; USSR Gosplan-administered retail prices throughout; USA Emergency Petroleum
+      Allocation Act 1973 through decontrol 1981. Each country is treated as one long episode with possible intensity variation within it.
+
+      '
+  controls:
+  - name: monetary_expansion_rate
+    source: imf:PCPIPCH (CPI inflation); world_bank_wdi:FM.LBL.BMNY.ZG (money growth where available)
+    transformation: level_pct
+    notes: Price controls frequently co-occur with monetary expansion; control attempts to separate the ceiling-specific effect from the monetary-excess effect.
+  - name: fiscal_deficit
+    source: imf:GGXCNL_NGDP
+    transformation: level_pct_of_gdp
+intervention_channel: regulatory
+intervention_channel_justification: 'Price controls are a regulatory price intervention. Where they are bundled with subsidies, rationing, or currency controls those are separately coded. Note: topic is
+  ''fiscal'' per the filename path assignment, but the intervention channel is regulatory — this is permitted because topic is an organisational tag for the scoreboard while intervention_channel carries
+  the invariant-4 channel separation.
+
+  '
+estimator:
+  template: event_study
+  clustering: country
+  notes: 'Given the small-N sample (4 countries with deep but few episodes) and the descriptive nature of the claim, a formal panel estimator is inappropriate. Event-study presentation with each country
+    as its own case: plot the shortage-signature outcomes over the episode timeline, compare to the pre-episode period and to concurrent non-treated countries where available. Quantitative hypothesis tests
+    per case rather than pooled panel coefficients.
+
+    '
+falsification:
+  rule: 'Not supported if in any one of the four canonical cases the pre-registered shortage signature is absent — specifically, if the official-vs-parallel-price ratio does not exceed 1.5 at any point
+    during the episode (where parallel market is measurable), OR if documented stockout incidence is not materially above the pre-episode baseline, OR if alternative CPI estimates are not at least 50% higher
+    than official CPI during the episode (where alternatives are available). A clean supporting result shows the signature in all 4 cases. A finding of 2 or 3 of 4 would be treated as partial support and
+    would require a v2 spec addressing why the non-supporting case differs.
+
+    '
+  test: per_case_shortage_signature_check
+  threshold: 'All 4 cases show: official_parallel_ratio > 1.5 OR stockout incidence materially above baseline OR alternative_CPI >= 1.5 * official_CPI at the peak of the episode.
+
+    '
+prior_confidence: 0.92
+disclosure: 'The price-control literature (Friedman-Stigler 1946, Rockoff 1984, Kessel-Alchian 1960, Cheung 1973 on Chinese rationing) is highly settled on the pattern. Prior is high because the canonical
+  cases are documented in detail in secondary literature. Author holds market-liberal priors aligned with the hypothesis; the pre- registration is binding and a finding that breaks the pattern in any of
+  the four cases falsifies. This hypothesis is deliberately written narrower than the parallel candidate price_controls_produce_shortages_and_quality_degradation, which makes a stronger universality claim
+  and is not pre-registered.
+
+  '
+steelman: hypotheses/steelman/price_controls_shortage_effect.md
+scope:
+  period:
+  - 1970
+  - 2023
+  countries:
+  - VEN
+  - ARG
+  - RUS
+  - USA
+  outcome_dim:
+  - inflation
+  - regulation_compliance_cost
+  - currency_purchasing_power
+  policy_family:
+  - regulation
+  - fiscal_policy
+  treatment_tags:
+  - price_controls_venezuela
+  - chavismo_1999
+  - soviet_price_controls
+  - us_petroleum_price_controls_1973_1981
+  - argentina_precios_cuidados_2014
+covers_claims:
+- position_id: austrian
+  claim_index: 12
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Austrian position reads Soviet and Chavismo price controls as producing the full calculation-debate signature (shortages, quality degradation, black markets, producer exit); hypothesis canonical
+    cases include both VEN Chavismo and USSR late Brezhnev/Gorbachev.
+- position_id: classical_liberal
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Classical-liberal position invokes Nixon 1971-1974 and Chavismo Venezuela. Phase 4C concern: hypothesis canonical US case is 1973-1981 EPCA petroleum controls, not the broader Nixon 1971 wage-price
+    freeze; candidate for claim rewrite (substitute ''1973-1981 US petroleum controls'' for ''Nixon 1971-1974'') or hypothesis augmentation to explicitly name Nixon.'
+- position_id: empirical_pragmatist
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Empirical-pragmatist position reads Nixon 1971, Venezuela 2003-2020, and Argentina 2011-2015 as a robust cross-context pattern. Phase 4C concern: POLICY_NAMED_ABSENT for the Nixon 1971 wage-price
+    freeze relative to the hypothesis''s canonical set (Chavismo, Kirchner, Gorbachev, 1973-1981 US petroleum); either extend hypothesis or relink.'
+linked_hypotheses:
+- hyperinflation_requires_fiscal_dominance
+- price_controls_produce_shortages_and_quality_degradation
+notes: 'Topic field is ''fiscal'' per the filename path; intervention_channel is regulatory. The scoreboard topic tag and the methodological channel tag are intentionally separate in this spec. Data is
+  substantially qualitative for USSR and USA 1973-1981; the event- study presentation will display quantitative series where available and acknowledge qualitative coding where not. Not a causal identification
+  exercise — the claim is that the shortage signature empirically co-occurs with the documented ceiling regime.
+
+  '

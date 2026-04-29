@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_eu_divergence_decomposition
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  The US-EU GDP per capita (PPP, constant international dollars) gap has
+  widened materially between 2000 and 2023. The gap ratio (US divided by
+  EU-27 average) grew from approximately 1.25 in 2000 to approximately
+  1.45 by 2023, a divergence of ~20 percentage points. The widening is
+  not primarily demographic (both regions age) or measurement-artefact;
+  it is associated with specific policy-content differences: US energy-
+  cost advantage post-2010 shale revolution, EU cumulative regulatory
+  burden on the digital sector (GDPR 2018, DMA 2022, AI Act 2024), US
+  capital-market depth enabling tech-sector scale that EU bank-financed
+  systems produce less of, and EU Stability and Growth Pact constraining
+  countercyclical fiscal response. This hypothesis establishes the
+  divergence as a stylised fact and attempts a first-pass decomposition.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA, DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, GBR]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing primary outcome"
+
+scope:
+  period: [2000, 2023]
+  countries: [USA, DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, GBR, EU]
+  outcome_dim: [gdp_growth, productivity, regulation_compliance_cost, energy]
+  policy_family: [regulation, energy_policy, fiscal_policy]
+  treatment_tags: [us_shale_revolution, eu_gdpr_2018, eu_dma_2022, eu_ai_act_2024, stability_growth_pact]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: gdp_growth_rate
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: yoy_log_diff
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: urbanisation
+      source: "world_bank_wdi:SP.URB.TOTL.IN.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: debt_to_gdp
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-stage:
+
+    Stage 1 (descriptive): compute log(US GDP pc PPP) − log(EU
+    population-weighted GDP pc PPP) per year. Plot trajectory 2000-2023.
+    Confirm widening magnitude and timing.
+
+    Stage 2 (decomposition): PanelOLS with US vs EU-member country FE +
+    year FE, interaction of US dummy with post-2010 (shale) indicator,
+    post-2018 (GDPR-era digital regulation) indicator, post-2021 (EU
+    energy crisis) indicator. Each interaction coefficient attributes
+    incremental divergence to the period it names.
+
+    This is explicitly a DESCRIPTIVE / DECOMPOSITION hypothesis, not a
+    causal identification. The evidence_type reflects that — we claim
+    to document a pattern and propose a decomposition, not to
+    causally identify each channel's contribution.
+
+falsification:
+  rule: >
+    Not supported if (a) the US-EU gap ratio did not widen materially
+    (less than 10 percentage points) between 2000 and 2023, OR (b) the
+    gap is flat or closing rather than widening, OR (c) the widening is
+    fully explained by demographic or measurement artefact (requires a
+    separate demographic-decomposition robustness).
+  test: us_eu_gap_trajectory_and_first_pass_decomposition
+  threshold: >
+    gap_2023 - gap_2000 >= 0.10 (log units)  AND
+    post-2010 interaction coefficient > 0  AND
+    the widening survives a demographic controls robustness
+
+prior_confidence: 0.85
+
+disclosure: >
+  The US-EU divergence is documented in ECB / European Commission
+  analyses (including the 2024 Draghi Report on EU competitiveness).
+  Author prior is high that the widening is real and that the
+  decomposition broadly aligns with the stated mechanisms (energy,
+  regulation, capital markets). Framework tests the narrower claim
+  of the widening's magnitude and first-pass decomposition.
+
+steelman: hypotheses/steelman/us_eu_divergence_decomposition.md
+
+linked_hypotheses:
+  - uk_economic_decline_multi_movement
+
+notes: >
+  EU sample includes the large members + POL (as fast-grower counter-
+  example). UK kept in but not counted as EU for aggregation (post-
+  2020 non-member).
+
+  This is v1 — descriptive + first-pass decomposition. A v2 would
+  introduce specific movement-level identification for energy costs
+  (requiring IEA industrial-electricity-price fetcher), for regulatory
+  burden (requires sector-specific metrics beyond OECD PMR), and for
+  capital-market depth (BIS credit-flow + venture-capital-activity
+  data — not all on disk yet).

@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: keynes_1930_growth_targets_actually_met
+version: 1
+status: draft
+topic: growth
+claim: Pre-1945 Keynes-era claims that growth would ease 'economic problem' within a century (Keynes 1930
+  'Possibilities for Our Grandchildren') are, by 2030, technically met in OECD per-capita output terms,
+  inviting the degrowth reframing question.
+notes: Seeded from a degrowth claim that Keynes's 1930 4-8x per-capita projection has been met, inviting a
+  reframing of the growth imperative. Long-run descriptive comparison; human review needed to choose anchor
+  year and per-capita measure.
+prior_confidence: 0.7
+disclosure: >-
+  Authorial bias risk: degrowth framing presupposes the right interpretive question is "is the economic problem solved?"; choice of OECD aggregate vs population-weighted vs median-citizen perspective changes whether the threshold has been "met.".
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if the
+    population-weighted mean ratio of real GDP per capita
+    (latest_year / 1930) across the 18-country OECD-style panel,
+    using Maddison MPD2020 (2011 PPP$), is at least 4.0x — Keynes's
+    lower bound. REFUTED if the ratio is below 2.0x (more than half
+    short of the threshold). PARTIAL if the ratio is between 2.0x
+    and 4.0x (direction correct, magnitude short). INFORMATIVE:
+    equal-weighted country mean, median, count of countries
+    individually clearing 4x, and count clearing the 8x upper bound.
+    METHOD_VALID: at least 14 of 18 panel countries observed at
+    both 1930 and the dataset's latest year (Maddison MPD2020 ends
+    2018; the missing ~12 years of trend would only raise the ratio).
+  test: keynes_1930_per_capita_ratio_pop_weighted
+  threshold: >-
+    PRIMARY: pop_weighted_mean(gdppc[latest] / gdppc[1930]) >= 4.0
+    across the OECD panel.
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic
+  falsification rule to a dispositive primary statistic: the
+  population-weighted mean of country-level (latest/1930) per-capita
+  GDP ratios across the 18-country OECD panel, using Maddison MPD2020
+  (2011 PPP$). Threshold = 4.0x (Keynes's lower bound from his 1930
+  essay 'Economic Possibilities for Our Grandchildren'). Maddison
+  ends 2018 rather than 2030; the missing ~12 years of OECD trend
+  growth (~1.5%/yr) would only raise the ratio by another ~1.2x, so
+  using 2018 is conservative against the SUPPORTED verdict. WDI
+  NY.GDP.PCAP.KD listed in the spec is not used for the primary
+  because it only starts in 1960; Maddison is the only source
+  covering 1930 for the full panel.
+evidence_type: descriptive
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, JPN, CAN, AUS, NZL, CHE]
+  period: [1930, 2023]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp_long_run
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: log_gdp_pc_constant
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Long-run descriptive comparison of OECD per-capita output 1930→2030
+    against Keynes's "Possibilities for Our Grandchildren" 4-8x projection.
+    Reports the log-ratio achieved and tests whether the technical
+    threshold has been met in OECD-output terms.
+
+scope:
+  period: [1930, 2030]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, productivity]
+  policy_family: [none]
+  treatment_tags: [keynes_1930_possibilities_for_our_grandchildren]
+
+covers_claims:
+  - position_id: degrowth
+    claim_index: 13
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts Keynes 1930 growth projections have been met in OECD per-capita output terms, inviting degrowth reframing."

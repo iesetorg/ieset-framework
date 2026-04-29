@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: post_2008_oecd_growth_emissions_path
+version: 1
+status: draft
+topic: growth
+claim: Post-2008 OECD GDP growth has slowed to roughly 1-2% trend levels while per-capita emissions remain above 1.5C-consistent paths, falsifying the 'green growth will solve it' forecasts of 2005-2010
+  IPCC scenarios.
+notes: Seeded from a degrowth claim that post-2008 OECD growth has slowed to 1-2% trend levels while per-capita emissions remain above 1.5C-consistent paths, falsifying 2005-2010 IPCC green-growth scenarios.
+  OECD panel benchmarked against 1.5C trajectories; human review needed for the benchmark-trajectory choice.
+prior_confidence: 0.6
+disclosure: 'Authorial bias risk: degrowth framing wants the green-growth scenarios to fail. The benchmark "1.5C-consistent path" varies widely across IPCC scenarios (some assume large negative-emissions
+  back-loading), so declaring a path off-track depends on which benchmark is chosen.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE of OECD real GDP growth and per-capita CO2 2008-2023 (excluding 2020) benchmarked against IPCC 1.5C SSP1-1.9 trajectory; falsified if mean OECD growth >2% and per-capita emissions on or
+    below 1.5C trajectory by 2023.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - ISR
+  - CHE
+  - POL
+  - CZE
+  - HUN
+  - PRT
+  - GRC
+  period:
+  - 2008
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020 COVID-recession year from trend calculations
+variables:
+  outcome:
+  - name: log_real_gdp
+    source: world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: log
+  - name: log_co2_emissions_per_capita
+    source: owid:co-emissions-per-capita
+    transformation: log
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  - name: log_co2_total_emissions
+    source: owid:annual-co2-emissions-per-country
+    transformation: log
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: services_share_gdp
+    source: world_bank_wdi:NV.SRV.TOTL.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'OECD-country panel of GDP growth and per-capita CO2 emissions 2008-2023 benchmarked against 1.5C-consistent emissions trajectories. Tests whether observed OECD post-2008 growth-emissions paths
+    fall short of the IPCC pathway requirements.
+
+    '
+scope:
+  period:
+  - 2008
+  - 2023
+  countries:
+  - OECD
+  outcome_dim:
+  - gdp_growth
+  - energy
+  policy_family:
+  - energy_policy
+  treatment_tags:
+  - gfc_2008
+  - paris_agreement_2015
+  - ipcc_scenarios_2005_2010
+covers_claims:
+- position_id: degrowth
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Degrowth prediction: post-2008 OECD growth has slowed to 1-2% trend while per-capita emissions remain above 1.5C pathways, falsifying 2005-2010 IPCC green-growth scenarios; direct alignment with
+    hypothesis.'

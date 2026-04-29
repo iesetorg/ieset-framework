@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: strong_union_labour_law_youth_unemployment_south_europe
+version: 1
+status: candidate
+topic: labour
+claim: 'Strong employment-protection legislation (EPL) with high union wage-setting coverage and limited at-will dismissal produces a three-order causal chain in Southern European labour markets. FIRST-ORDER:
+  insider workers receive durable job security, wage floors via collective bargaining, and statutory dismissal protections — this is a real welfare transfer to incumbent workers and an acknowledged policy
+  success on its own terms. SECOND-ORDER: an insider-outsider duality emerges in which youth, women re-entering after care periods, immigrants and long-term unemployed face exceptionally high unemployment
+  rates, temporary-contract traps, and hiring friction. THIRD- ORDER: the persistent youth/outsider disadvantage accelerates brain-drain emigration (ESP/ITA/GRC youth exodus 2011-2019), contributes to demographic-fertility
+  decline (delayed family formation through unstable early-career), and produces a productivity-scarring "lost cohort" effect on the national labour force. Cases: Spain reforma 2012 as an EPL-reduction
+  event-study, Italy Jobs Act 2015, Greece Law 4093 2012, France El Khomri 2016 and Macron 2017 ordonnances.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ESP
+  - ITA
+  - GRC
+  - FRA
+  - PRT
+  period:
+  - 1995
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 pandemic labour market shock
+scope:
+  period:
+  - 1995
+  - 2024
+  countries:
+  - ESP
+  - ITA
+  - GRC
+  - FRA
+  - PRT
+  - SOUTHERN_EUROPE
+  outcome_dim:
+  - employment_labour
+  - productivity
+  - demographics_migration
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  - regulation
+  - institutional_reform
+  treatment_tags:
+  - spain_reforma_2012
+  - italy_jobs_act_2015
+  - greece_law_4093_2012
+  - france_el_khomri_2016
+  - france_macron_ordonnances_2017
+  - portugal_codigo_trabalho_2012
+variables:
+  outcome:
+  - name: youth_unemployment_rate_15_24
+    source: eurostat:une_rt_a (youth unemployment 15-24 by country)
+    transformation: level_pct
+    notes: 'SECOND-ORDER outcome: primary measure of outsider disadvantage.'
+  - name: temporary_contract_share_age_15_29
+    source: eurostat:lfsa_etpga (temporary employment by age)
+    transformation: share
+    notes: 'SECOND-ORDER outcome: temporary-contract trap.'
+  - name: incumbent_worker_wage_index
+    source: eurostat:earn_ses (structure of earnings survey by tenure); ine:EPA; istat:RCFL; insee:DADS
+    transformation: yoy_pct_change_real
+    notes: 'FIRST-ORDER outcome: insider wage protection IS maintained — acknowledged success on its own terms for covered workers.'
+  - name: youth_outward_migration_flow
+    source: eurostat:migr_emi2 (emigration by age, citizenship)
+    transformation: log_level
+    notes: 'THIRD-ORDER outcome: brain drain emigration.'
+  - name: total_fertility_rate
+    source: eurostat:demo_find (TFR)
+    transformation: level
+    notes: 'THIRD-ORDER outcome: fertility decline via delayed family formation.'
+  - name: labour_productivity_growth
+    source: eurostat:nama_10_lp_ulc
+    transformation: yoy_pct_change
+    notes: 'THIRD-ORDER outcome: cohort-scarring productivity drag.'
+  treatment:
+  - name: epl_reform_event_indicator
+    source: 'constructed: indicators for ESP 2010+2012 reforms, ITA 2014-2015 Jobs Act, GRC 2010-2012 memorandum reforms, FRA 2016 El Khomri + 2017 Macron ordonnances, PRT 2012 Código do Trabalho revision'
+    transformation: indicator
+    notes: Reforms reduce EPL; outcome direction expected to be mirror-image of the chain when reforms occur.
+  - name: epl_index_level
+    source: oecd:EPL_indicators (strictness of employment protection legislation)
+    transformation: level
+    notes: 'Continuous treatment: higher EPL correlates with stronger chain.'
+  controls:
+  - name: gdp_growth
+    source: eurostat:nama_10_gdp
+    transformation: yoy_pct_change
+  - name: trade_union_density
+    source: oecd:trade_union_density
+    transformation: level_pct
+  - name: share_manufacturing_employment
+    source: eurostat:nama_10_a10_e
+    transformation: share
+intervention_channel: regulatory
+intervention_channel_justification: 'EPL is a regulatory intervention setting the legal conditions for hiring, firing, and wage bargaining. No direct fiscal transfer is coded; unemployment-insurance generosity
+  and active-labour-market spending enter as controls, not co-treatment.
+
+  '
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  random_seed: 20260424
+  notes: 'Primary: country-year panel with country and year FE, using the continuous OECD EPL index as the treatment and the reform events as instruments for plausibly exogenous EPL variation. Robustness:
+    Callaway-Sant''Anna staggered DiD on the reform-event indicators. Exclusion restriction: reforms were driven by Troika conditions (ESP, GRC, PRT) or domestic political cycles (ITA, FRA) rather than
+    by the outcomes of interest.
+
+    '
+falsification:
+  rule: 'Not supported if, across the five countries: (a) FIRST-ORDER incumbent-wage protection is confirmed during high-EPL windows (acknowledged success) AND (b) SECOND-ORDER youth-unemployment elasticity
+    with respect to EPL index is NOT positive and significant at p<0.05 OR temporary-contract share is NOT positively related to EPL at p<0.05 AND (c) THIRD-ORDER emigration + fertility effects are NOT
+    significantly related to youth-unemployment and temporary-contract channels in mediation analysis. The high-EPL / low-youth-unemployment regime (Nordic benchmark) is the key counter-pattern; its presence
+    in the donor region calibrates the test.
+
+    '
+  test: panel_fe_five_country_causal_chain
+  threshold: 'FIRST-ORDER incumbent wage protection supported AND youth- unemployment elasticity wrt EPL index >=0.15 at p<0.05 AND temporary-contract share elasticity wrt EPL >=0.10 at p<0.05 AND mediation:
+    at least 30% of reform-to-emigration effect routed through youth-unemployment channel
+
+    '
+prior_confidence: 0.6
+disclosure: 'Author holds market-liberal priors. The OECD consensus on EPL effects is nuanced: total employment-level effects are small, but COMPOSITION effects across age, skill and contract types are
+  substantial. The Nordic counter-pattern (high EPL without high youth unemployment) shows EPL interacts with active-labour-market policy quality. Prior is moderate rather than high because the Nordic counter-pattern
+  matters: the chain is NOT inevitable from EPL alone; it runs through insider-outsider duality plus weak active labour-market policy.
+
+  '
+steelman: hypotheses/steelman/strong_union_labour_law_youth_unemployment_south_europe.md
+linked_hypotheses:
+- labour_market_flexibility_unemployment_duration
+notes: 'Mechanism chain: incumbent-worker protection achieved (1st) -> insider-outsider labour market with youth at the margin (2nd) -> brain-drain + fertility decline + productivity drag (3rd). Nordic
+  counter-pattern is the essential robustness check.
+
+  '

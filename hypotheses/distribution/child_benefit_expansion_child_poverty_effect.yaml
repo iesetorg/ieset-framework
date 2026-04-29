@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: child_benefit_expansion_child_poverty_effect
+version: 1
+status: draft
+topic: distribution
+claim: Universal child-benefit / expanded child tax credit expansions (US ARP 2021, UK pre-2013 child benefit) reduced child poverty rates by measurable magnitudes in real time.
+notes: Maps the democratic-socialist school's child-benefit/child-poverty claim to a staggered DiD on US ARP-2021 CTC and UK pre-2013 child benefit. Estimator and prior set; full pre-registration awaits
+  steelman + human sign-off.
+prior_confidence: 0.7
+disclosure: Author prior is sympathetic to direct-cash interventions reducing child poverty in the short run (the literature is unusually clear here); the DiD spec leans on CPS / FRS poverty series whose
+  definitions differ between US and UK and may bias cross-country comparisons.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Callaway-Sant'Anna staggered DiD of child poverty headcount (SPM/HBAI) on ARP-CTC-2021 and UK pre-2013 child-benefit episodes; event-study windows ±2y. Refute if pooled ATT non-negative or sign-flipped
+    at p<0.10.
+sample:
+  countries:
+  - USA
+  - GBR
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude pandemic-confound years 2020Q2-2021Q1 from primary spec; report as robustness
+variables:
+  outcome:
+  - name: child_poverty_rate
+    source: oecd:OECD.WISE.INE,DSD_IDD@DF_CHILD_POV,1.0
+    transformation: level
+    notes: 'OECD Income Distribution Database child poverty headcount (under-18 below 50% median equivalised disposable income). TODO: cross-check against US Census SPM child poverty for the ARP-CTC robustness
+      window.
+
+      '
+  - name: child_poverty_rate_world_bank_proxy
+    source: world_bank_wdi:SI.POV.NAHC
+    transformation: level
+    notes: 'WB national-poverty headcount proxy when OECD coverage is thin.
+
+      '
+  treatment:
+  - name: child_benefit_expansion_event
+    source: derived:policy_event_dates
+    transformation: indicator
+    notes: 'Treatment timing: USA = ARP CTC enactment 2021-03; GBR = pre- 2013 universal child benefit baseline vs post-2013 means-test threshold tightening. Coded by hand in derived/.
+
+      '
+  controls:
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: median_household_income_proxy
+    source: world_bank_wdi:NY.GNP.PCAP.PP.KD
+    transformation: log
+evidence_type: associational
+scope:
+  period:
+  - 2000
+  - 2022
+  countries:
+  - USA
+  - GBR
+  outcome_dim:
+  - poverty_inequality
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  - tax_policy
+  treatment_tags:
+  - us_arp_child_tax_credit_2021
+  - uk_child_benefit_pre_2013
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Democratic-socialist claim and hypothesis claim are textually identical — US ARP 2021 + UK pre-2013 child benefit poverty-reduction effect.
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Staggered-treatment DiD across the US ARP 2021 CTC expansion and UK pre-2013 child-benefit episodes. Callaway-Sant''Anna handles cohort heterogeneity. Robustness: event-study around each policy
+    enactment date.
+
+    '

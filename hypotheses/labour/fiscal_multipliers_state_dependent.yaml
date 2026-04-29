@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiscal_multipliers_state_dependent
+version: 1
+status: draft
+topic: labour
+claim: 'Fiscal multipliers are state-dependent: large at ZLB, small near full employment; no single-number answer is policy-relevant.'
+notes: Stub seeded from an empirical-pragmatist school prediction about state-dependent fiscal multipliers (large at ZLB, small at full employment). Identification of slack regimes vs ZLB regimes is delicate;
+  needs human review of regime-dating cutoffs.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors are sympathetic to state-dependent multiplier evidence in principle but skeptical of the size of ZLB-regime multipliers cited by Auerbach-Gorodnichenko; could
+  under-weight high-multiplier-at-slack findings and over-weight crowding-out concerns in normal-regime estimates.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: State-dependent local projections (Auerbach-Gorodnichenko) on OECD panel 1971-2023 with regime indicator (ZLB or high-slack vs normal); supported if ZLB/high-slack-regime fiscal multiplier exceeds
+    normal-regime multiplier by >0.5 at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - CAN
+  - AUS
+  - JPN
+  - CHE
+  - BEL
+  - AUT
+  - IRL
+  - KOR
+  - PRT
+  period:
+  - 1971
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing CBO/IMF fiscal-stance data
+  - winsorise multiplier estimates at 1st/99th sample percentile
+variables:
+  outcome:
+  - name: real_gdp_yoy
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: industrial_production_index
+    source: oecd:OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0
+    transformation: log_yoy
+    notes: OECD KEI industrial production for cross-country panel.
+  treatment:
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: 'WB general-government final consumption share of GDP — fiscal- stance proxy. IMF GFS direct outlay shocks preferred but require manual wiring.
+
+      '
+  - name: government_spending_shock_imf
+    source: imf:G_X_G01_GDP_PT
+    transformation: yoy_change
+    notes: IMF GFS general-government expenditure share YoY change.
+  controls:
+  - name: zlb_indicator
+    source: derived:zlb_window_indicator
+    transformation: indicator
+    notes: 'Hand-coded ZLB indicator: USA 2008-2015, EUR 2014-2022, JPN 1999-2006 + 2010-2022. Conditioning state for the multiplier regime test.
+
+      '
+  - name: output_gap
+    source: imf:NGAP_NPGDP
+    transformation: level
+    notes: IMF WEO output gap — slack regime indicator.
+  - name: policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+    notes: FRED fed funds rate; per-country swap to ECB/BoE/BoJ on wiring.
+  - name: cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - fiscal_policy
+  - gdp_growth
+  - employment_labour
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  treatment_tags:
+  - zero_lower_bound
+  - fiscal_stimulus
+  - fiscal_expansion_high_unemployment
+covers_claims:
+- position_id: empirical_pragmatist
+  claim_index: 11
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Empirical pragmatist predicts fiscal multipliers vary with monetary-policy regime (large at ZLB, small at full employment); Phase 4C should verify regime-identification (ZLB window, slack measurement)
+    is consistent across OECD/GLOBAL donor pool.
+- position_id: post_keynesian
+  claim_index: 1
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Post-Keynesian claim that fiscal expansion in high-unemployment regimes produces output gains with minimal inflation cost; relinked from growth_vs_distribution_tradeoff (Phase 4C) — claim is about
+    state-dependent multipliers in slack regime.
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'State-dependent local projections (Auerbach-Gorodnichenko / Ramey- Zubairy) on OECD panel 1971-2023 with regime indicator (ZLB or high-slack vs normal). Regime-conditional IRFs report multiplier
+    state-dependence. Country and year FE; clustering by country.
+
+    '

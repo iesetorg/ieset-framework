@@ -1,0 +1,164 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_cbam_export_competitiveness_2023_onwards
+version: 1
+status: pre_registered
+topic: regulatory
+
+claim: >
+  The EU Carbon Border Adjustment Mechanism (CBAM) — reporting phase
+  from October 2023, certificate-purchase phase from 2026 — raises the
+  effective landed cost of EU-manufactured CBAM-covered products
+  (steel, aluminium, cement, fertilisers, hydrogen, electricity) in
+  extra-EU markets because (a) EU producers face the full EU ETS
+  carbon price without free-allocation offsets during the phase-out
+  and (b) EU exports to non-CBAM jurisdictions face cost disadvantages
+  from embedded-carbon-cost pass-through. This hypothesis tests whether
+  EU exports of CBAM-covered products to non-EU markets declined
+  relative to exports from non-CBAM jurisdictions (US, Turkey, India,
+  China) over 2023-2024, and whether EU domestic production in
+  CBAM-covered subsectors contracted. The hypothesis does NOT claim
+  CBAM is net-welfare-reducing — its intended function (preventing
+  carbon leakage) is outside the outcome set — only that the
+  competitiveness channel moves in the predicted direction.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, USA, TUR, IND, CHN, KOR, JPN, GBR, CAN]
+  period: [2018, 2024]
+  temporal_structure: panel
+
+scope:
+  period: [2018, 2024]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, USA, TUR, IND, CHN, KOR, JPN, GBR, CAN, EU]
+  outcome_dim: [trade_liberalisation, industrial_capability, regulation_compliance_cost, energy]
+  policy_family: [trade_policy, regulation, energy_policy]
+  treatment_tags: [eu_cbam_2023, eu_ets, carbon_border_adjustment, cbam_certificate_2026]
+
+variables:
+  outcome:
+    - name: log_cbam_covered_export_value
+      source: "constructed: UN Comtrade HS-code aggregation — iron/steel (72-73), aluminium (76), cement (2523), fertilisers (31), hydrogen (280410), electricity export value (proxy) by country-year. Fetcher pending."
+      transformation: log
+    - name: cbam_covered_export_share_of_total
+      source: "constructed: CBAM-covered export value / total goods export value by country-year (UN Comtrade)."
+      transformation: level
+    - name: log_domestic_production_cbam_subsectors
+      source: "constructed: OECD STAN — ISIC C24 (basic metals) + C23 (non-metallic minerals, covers cement) + C20 (chemicals, covers fertilisers) production index."
+      transformation: log
+
+  treatment:
+    - name: eu_post_2023q4_cbam_dummy
+      source: "constructed: indicator = 1 for EU member states from 2023Q4 (CBAM reporting phase start) onwards. Non-EU countries = control."
+      transformation: indicator
+    - name: product_is_cbam_covered_flag
+      source: "constructed: HS-code indicator = 1 if product is in CBAM scope (iron/steel, aluminium, cement, fertilisers, hydrogen, electricity). Enables triple-DiD: EU × post-2023Q4 × CBAM-product interaction vs non-CBAM products."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: eu_ets_carbon_price_eur
+      source: "constructed: EU ETS December future settlement, EUR/tCO2, annual average. Fetcher pending (ICE or EEX)."
+      transformation: log
+    - name: real_effective_exchange_rate
+      source: "bis:WS_EER"
+      transformation: level
+
+estimator:
+  template: did_chaisemartin
+  clustering: country
+  fixed_effects: [country, year, hs_product_code]
+  notes: >
+    Primary specification: triple-difference — EU vs non-EU × pre-2023Q4
+    vs post-2023Q4 × CBAM-covered vs non-CBAM-covered products, within
+    country-product-year panel. Triple-interaction coefficient identifies
+    the differential EU CBAM-product export shift. Non-CBAM EU products
+    serve as within-EU control for EU-wide shocks; non-EU countries
+    serve as cross-border control for CBAM-product common demand
+    shocks.
+
+    Secondary: synthetic control on EU aggregate CBAM-covered exports
+    using non-EU donor pool. Event-study around October 2023.
+
+    Identification relies on the timing of CBAM phase-in being
+    orthogonal to non-regulatory demand shocks — weakly true for 2023Q4
+    but confounded by gas-shock residual, Chinese overproduction
+    spillover, and Ukraine-war-related steel-trade disruption. Year FE
+    absorb common shocks; product FE absorb sector-mix differences.
+
+    Known limitations:
+    (1) CBAM certificate-purchase phase starts 2026 — the 2023-2024
+        "treatment" is the reporting phase only, which has administrative
+        cost but not direct price effect. True price-effect hypothesis
+        runs in v2 post-2026.
+    (2) Steel and fertiliser markets have independent disruption
+        (Chinese overproduction in steel; gas-price-driven fertiliser
+        capacity mothballing). Disentangling CBAM signal from these
+        is hard at v1.
+    (3) Carbon-leakage-prevention (CBAM's intended function) is NOT
+        measured in this outcome set. If EU CBAM exports fall AND
+        non-EU carbon-intensive producers lose share in EU markets,
+        CBAM may be working as designed — this hypothesis only
+        measures one side.
+
+falsification:
+  rule: >
+    Not supported if (a) the triple-interaction β is zero or positive
+    at p<0.10 (EU CBAM-covered exports did not fall differentially
+    post-2023Q4), OR (b) the effect vanishes after controlling for
+    gas price and ETS price (suggesting gas/carbon-cost pass-through
+    rather than CBAM-specific effect), OR (c) pre-trend placebo detects
+    spurious divergence before 2023Q4, OR (d) domestic CBAM-subsector
+    production shows no corresponding contraction (suggesting exports
+    re-routed to EU-internal demand rather than production-destroyed).
+    If export fall exists but is concentrated in subsectors with
+    independent shocks (e.g., only steel during Chinese dumping), the
+    attribution to CBAM is weak and should be reported as such.
+  test: cbam_export_competitiveness_triple_did
+  threshold: >
+    β_triple_interaction < -0.05 log points at p<0.10 AND
+    robust to gas + ETS price controls AND
+    pre-trend placebo |t| < 1.65
+
+prior_confidence: 0.40
+
+disclosure: >
+  Author prior is low-to-moderate. CBAM's 2023-2024 phase is reporting-
+  only; the pure administrative cost is unlikely to produce large export
+  effects. The certificate-purchase phase from 2026 is where material
+  price impact should appear, so v1 is best read as a pre-registration
+  of the methodology with a small expected effect size, and v2 runs
+  the full test post-2026.
+
+  The hypothesis is structured carefully NOT to claim CBAM is a bad
+  policy. CBAM's stated function is carbon-leakage prevention; if it
+  works as designed, it should modestly reduce the competitiveness of
+  EU exports to non-CBAM jurisdictions (because embedded EU ETS cost
+  is no longer offset) while raising the effective carbon-cost of
+  non-EU imports into the EU. Finding the first without measuring the
+  second would be a partial view. Framework disclosure: the hypothesis
+  is tuned to be honest about CBAM's intended trade-offs.
+
+steelman: hypotheses/steelman/eu_cbam_export_competitiveness_2023_onwards.md
+
+linked_hypotheses:
+  - green_transition_cost_trajectory_electricity_prices
+  - eu_regulatory_burden_productivity_drag
+  - german_manufacturing_va_decline_2017_2024
+
+notes: >
+  Data readiness:
+  - UN Comtrade HS-level bilateral trade — fetcher pending
+  - OECD STAN subsector production — fetcher pending
+  - EU ETS price series — fetcher pending (ICE or EEX)
+  - BIS REER — ready
+  - WDI — ready
+
+  This is a v1 pre-registration of methodology. The substantive test
+  runs in v2 once 2026-2027 data are available (certificate-purchase
+  phase active).

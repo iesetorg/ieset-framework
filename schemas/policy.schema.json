@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/policy.schema.json",
+  "title": "IESET Policy Specification",
+  "description": "One reform or coherent reform bundle scored on policy axes. Policy-content coding per Invariant 3 — identify what was done, not the party label. The enacted_by list points at movement_ids; axes_moved references axes.yaml ids; linked_hypotheses points at hypotheses the policy's outcome bears on.",
+  "type": "object",
+  "required": [
+    "policy_id",
+    "status",
+    "title",
+    "countries",
+    "timeframe",
+    "description"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "candidate", "canonical"],
+      "description": "draft=corpus-mined rough capture. candidate=curated. canonical=reviewed, first-class on public platform."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 6,
+      "description": "Human-readable name, e.g. 'Energiewende' or 'Hartz IV labour reform'."
+    },
+    "countries": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z]{3}$"},
+      "minItems": 1,
+      "description": "ISO 3166-1 alpha-3. Supranational policies (EU directives, etc) list the affected states."
+    },
+    "timeframe": {
+      "type": "object",
+      "required": ["start"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {"type": "integer", "minimum": 1800, "maximum": 2100},
+        "end": {
+          "oneOf": [
+            {"type": "integer", "minimum": 1800, "maximum": 2100},
+            {"type": "string", "enum": ["ongoing"]}
+          ]
+        },
+        "enacted_date": {"type": "string", "description": "YYYY-MM-DD of primary statute / regulation / executive order."}
+      }
+    },
+    "description": {
+      "type": "string",
+      "minLength": 80,
+      "description": "One-paragraph plain statement of what the policy actually did. Descriptive, not evaluative."
+    },
+    "enacted_by": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "movement_ids (per movements/*.yaml) that enacted this policy. A policy may have multiple — e.g. Obamacare was enacted under Democratic trifecta but modified under Trump."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["national", "subnational", "supranational"],
+      "description": "Default 'national' (federal/national legislation). 'subnational' for state/province/municipal-level policies — California climate acts, Quebec referenda, Berlin rent caps, NYC HSTPA, etc. 'supranational' for EU directives, treaty provisions. Optional; absence implies national."
+    },
+    "coalition_label_at_enactment": {
+      "type": "string",
+      "description": "Informational — the party/coalition label at time of enactment. Per Invariant 3 this does NOT drive scoring."
+    },
+    "axes_moved": {
+      "type": "array",
+      "minItems": 1,
+      "description": "What axes this policy moved and by how much.",
+      "items": {
+        "type": "object",
+        "required": ["axis", "direction"],
+        "additionalProperties": false,
+        "properties": {
+          "axis": {
+            "type": "string",
+            "pattern": "^(fiscal|regulatory|monetary|institutional)\\.[a-z][a-z0-9_]*[a-z0-9]$",
+            "description": "Must reference an id defined in axes.yaml. Cross-checked by validate_specs.py."
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["+", "-", "0", "mixed"],
+            "description": "Sign of movement along the axis. '+' / '-' per axes.yaml direction_semantics. '0' means explicitly-confirmed-neutral (measured, no movement). 'mixed' is for bundled reforms whose provisions move the axis in both directions."
+          },
+          "magnitude": {
+            "type": "string",
+            "enum": ["weak", "moderate", "strong"],
+            "description": "Size of movement. Optional; omit when magnitude is contested."
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Short explanation referencing the policy text or outcome measurement."
+          },
+          "intended": {
+            "type": "boolean",
+            "description": "True if the movement's stated goal included this direction on this axis. False flags unintended axis effects (e.g. Energiewende reduced supply security unintentionally)."
+          }
+        }
+      }
+    },
+    "linked_hypotheses": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "hypothesis_ids whose result this policy's outcome bears on. Human-authored."
+    },
+    "linked_hypotheses_inferred": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Top hypothesis_ids matched to this policy by axis-overlap. Derived by scripts/close_gaps.py; distinct from the human-authored linked_hypotheses."
+    },
+    "linked_conditions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "condition_ids (per hypotheses/conditional_taxonomy/*.yaml) that apply."
+    },
+    "position_predictions": {
+      "type": "array",
+      "description": "What each school of thought predicted or would predict about the outcome of this policy.",
+      "items": {
+        "type": "object",
+        "required": ["position_id", "stance"],
+        "additionalProperties": false,
+        "properties": {
+          "position_id": {"type": "string"},
+          "stance": {
+            "type": "string",
+            "enum": ["supported", "opposed", "mixed", "silent"]
+          },
+          "predicted_outcome": {"type": "string"},
+          "empirical_status": {
+            "type": "string",
+            "enum": ["untested", "supported", "falsified", "mixed"]
+          }
+        }
+      }
+    },
+    "outcome_summary": {
+      "type": "string",
+      "description": "One-paragraph plain summary of measured outcomes. Populated after linked_hypotheses have run. Empty until then."
+    },
+    "steelman": {
+      "type": "string",
+      "pattern": "^policies/steelman/.+\\.md$",
+      "description": "Strongest charitable case for the policy (or against it if the framework-level stance is critical). Path to markdown file."
+    },
+    "disclosure": {"type": "string"},
+    "source_provenance": {
+      "type": "object",
+      "description": "Set by corpus mining for drafts. Points to anchor(s) in private archive; not published.",
+      "additionalProperties": false,
+      "properties": {
+        "archive_refs": {"type": "array", "items": {"type": "string"}},
+        "mined_at": {"type": "string"},
+        "mined_by_model": {"type": "string"}
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "External citations — primary legislation, reputable analyses."
+    },
+    "notes": {"type": "string"}
+  }
+}

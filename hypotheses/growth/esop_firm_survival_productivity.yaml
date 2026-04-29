@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: esop_firm_survival_productivity
+version: 2
+status: draft
+topic: growth
+claim: ESOP (employee-stock-ownership) firms in the US post-1974 ERISA show higher survival rates and
+  comparable productivity to matched conventional firms.
+notes: 'Seeded from a market-socialist claim that ESOP firms post-1974 ERISA show higher survival and
+  comparable productivity to matched peers. Firm-level matched-sample design; selection-into-ESOP is
+  the central identification threat. DATA GAP (v2): the firm-level NCEO ESOP database and Blasi-Kruse-Freeman
+  matched-sample panels are NOT on disk. The only ownership-relevant series available is country-level
+  US labour productivity (WDI SL.GDP.PCAP.EM.KD), which is uninformative for the firm-level matched-comparison
+  the claim actually makes. v2 promotes to a runnable replication that emits an honest `inconclusive`
+  verdict on this data gap. Required fetcher: NCEO ESOP firm-year panel (formations, survival, employment),
+  with a Compustat or D&B matched non-ESOP control set; gold-standard alternative is a Census LBD ×
+  Form 5500 ESOP linkage.'
+prior_confidence: 0.55
+disclosure: 'Authorial bias risk: claim is sympathetic to employee-ownership advocacy; existing ESOP literature
+  (Blasi/Kruse/NCEO) is partly produced by employee-ownership advocates and can suffer from selection
+  bias (founders choosing ESOP for tax/succession reasons rather than productivity).'
+steelman: hypotheses/steelman/esop_firm_survival_productivity.md
+falsification:
+  rule: >-
+    PRIMARY (dispositive, gated on METHOD_VALID): the hypothesis is SUPPORTED if a firm-level
+    matched-sample panel of US ESOP vs industry/size/age-matched non-ESOP firms 1974-2023 shows
+    (a) ESOP 10-year survival rate at least 5 percentage points higher than the matched control,
+    AND (b) ESOP labour-productivity growth within +/-5% of the matched control (i.e. "comparable"
+    with no meaningful productivity penalty). REFUTED if ESOP 10-year survival is at or below the
+    matched control AND productivity gap exceeds -5%. PARTIAL if exactly one primary holds.
+    INFORMATIVE-only: country-level US GDP per person employed (WDI SL.GDP.PCAP.EM.KD) trajectory
+    is reported as background context but cannot move the verdict — ESOPs are at most ~10-15% of
+    US private-sector employment and macro labour productivity is dominated by ICT capital
+    deepening and sectoral shift, neither of which identify any ownership-form effect.
+    METHOD_VALID gate: a firm-level ESOP panel with at least 1,000 ESOP firm-years and a matched
+    non-ESOP control set drawn from the same industry/size/age strata MUST be on disk. Without
+    this panel the verdict is `inconclusive` regardless of any macro-series pattern.
+  test: firm_level_esop_vs_matched_non_esop_survival_and_productivity
+  threshold: >-
+    PRIMARY: (esop_10yr_survival - control_10yr_survival) >= 0.05 AND
+    (esop_productivity_growth - control_productivity_growth) >= -0.05.
+    METHOD_VALID: firm-level NCEO/Blasi-Kruse-Freeman or Census-LBD-Form-5500 ESOP panel on disk
+    with N_esop_firm_years >= 1000 and matched non-ESOP control set. Macro WDI series is
+    INFORMATIVE-only and never sufficient for SUPPORTED/REFUTED.
+methodology_note: >-
+  v2 respec (2026-04-27). v1 was a stub with a generic falsification rule and pointed at
+  world_bank_wdi:SL.GDP.PCAP.EM.KD (US country-level GDP per person employed) as a placeholder
+  outcome — that series cannot identify any firm-level ESOP-vs-matched-non-ESOP effect, so the
+  v1 run came back INCONCLUSIVE_DATA_PENDING from the generic panel_fe runner. v2 archives the
+  v1 artifacts to engine/runs/esop_firm_survival_productivity/ARCHIVED_v0/ and replaces them
+  with an honest hand-authored replication that (a) sharpens the falsification rule into a
+  dispositive firm-level matched-sample test gated on a METHOD_VALID data-availability check,
+  (b) demotes the WDI macro series to INFORMATIVE-only context that cannot determine the
+  verdict, and (c) emits `inconclusive — data gap` until the required NCEO/Blasi-Kruse-Freeman
+  fetcher lands. No threshold weakening: the +5pp survival and -5% productivity-floor numbers
+  come from the original v1 falsification text; the new METHOD_VALID gate is a strengthening,
+  not a relaxation. When the firm-level fetcher lands, this script needs only its data-loading
+  block updated; the verdict logic can stay as written.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period:
+  - 1974
+  - 2023
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: esop_firm_10yr_survival_rate
+    source: 'nceo:esop_firm_year_panel'
+    notes: 'PRIMARY outcome 1: 10-year survival rate of US ESOP firms vs matched non-ESOP control,
+      1974-2023. NOT ON DISK as of 2026-04-27. Required fetcher: NCEO ESOP firm-year panel
+      (formations, survival, employment) joined to a Compustat or D&B matched non-ESOP control
+      drawn from the same industry/size/age strata. Gold-standard alternative is a Census LBD ×
+      Form 5500 ESOP linkage (restricted access, requires Census RDC).'
+  - name: esop_firm_labor_productivity_growth
+    source: 'nceo:esop_firm_year_panel'
+    notes: 'PRIMARY outcome 2: labour-productivity growth of US ESOP firms vs matched non-ESOP
+      control. NOT ON DISK as of 2026-04-27. Same fetcher as outcome 1.'
+  - name: us_gdp_per_person_employed
+    source: 'world_bank_wdi:SL.GDP.PCAP.EM.KD'
+    notes: 'INFORMATIVE-only macro context. Country-level US GDP per person employed. Reported in
+      the chart as background context; does NOT enter the verdict. ESOPs are at most ~10-15% of
+      US private-sector employment and macro labour productivity is dominated by ICT capital
+      deepening and sectoral shift, neither of which identify any ownership-form effect. v2 makes
+      the demotion to INFORMATIVE-only explicit so future readers do not mistake macro pattern
+      for firm-level identification.'
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - firm
+  - year
+  clustering: firm
+  notes: 'Firm-level matched-sample panel comparing ESOP and non-ESOP firms (matched on industry,
+    size, age) post-1974 ERISA. Outcomes: 5/10/20-year survival rates and labour-productivity
+    growth. Industry-by-year fixed effects absorb sectoral shocks. Estimator is unrunnable until
+    the firm-level panel lands; the v2 replication script reflects that gap honestly rather than
+    forcing a panel_fe run on the macro series.'
+scope:
+  period:
+  - 1974
+  - 2023
+  countries:
+  - USA
+  outcome_dim:
+  - productivity
+  - employment_labour
+  policy_family:
+  - labour_market
+  - institutional_reform
+  treatment_tags:
+  - employee_ownership_plans
+  - erisa_1974
+covers_claims:
+- position_id: market_socialist
+  claim_index: 8
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts US ESOP firms post-1974 ERISA show higher survival and comparable
+    productivity to matched conventional firms.'

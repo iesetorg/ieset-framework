@@ -1,0 +1,313 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: venezuela_chavismo_canonical_case_multi_metric
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Venezuela's post-1999 socialist policy regime (Chávez 1999-2013 +
+  Maduro 2013-present, characterised by FX controls, price controls,
+  mass nationalisations, PDVSA politicisation, and 2014+ monetary
+  financing of fiscal deficits) produced a canonical institutional
+  and economic collapse that manifests as ≥7 of 10 pre-registered
+  extreme-outcome metrics, each drawn from an independent data source
+  and measuring a different causal layer. The canonical-case claim
+  is that no non-war peacetime economy in the 2000-2024 window matches
+  even 4 of these 10 thresholds simultaneously; Venezuela matches most.
+  A refutation (≤3 metrics met) would indicate the framework's
+  institutional-quality coding is overstated, or that Venezuela's
+  collapse has been substantially exaggerated in the consensus record.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [VEN]
+  period: [1999, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "no donor pool required — this is a single-country canonical-case pattern match against pre-registered extreme-outcome thresholds"
+    - "benchmark distribution (was any 2000-2024 peacetime country matching >=4 of 10 thresholds?) is computed ex post from the full WDI + UNHCR + Hanke-Krus + UNDP country-year panel; this is a sanity check on uniqueness, not part of the primary test"
+
+scope:
+  period: [1999, 2024]
+  countries: [VEN]
+  outcome_dim: [gdp_growth, currency_purchasing_power, demographics_migration, poverty_inequality, life_expectancy_health, energy]
+  policy_family: [institutional_reform, monetary_policy, privatisation_nationalisation, regulation, fiscal_policy]
+  treatment_tags: [chavismo_1999, maduro_2013, fx_controls, price_controls, pdvsa_politicisation, hyperinflation_2017]
+
+variables:
+  outcome:
+    - name: multi_metric_collapse_score
+      source: "derived: count of canonical_metrics with threshold met"
+      transformation: count
+
+canonical_metrics:
+  - metric_id: emigration_outflow_share_population
+    description: >
+      Fraction of 2013 Venezuelan population that became refugees or
+      international migrants abroad by end-2023. No Latin American
+      peer approaches this share. Only Syria and Ukraine exceed it
+      in the 2000-2024 global window.
+    threshold: ">15% of 2013 population"
+    window: "2014-2023"
+    source: "unhcr:population_origin (VEN as COO); un_desa:international_migrant_stock"
+    independence_justification: >
+      Migration outflow is observed by destination countries'
+      immigration systems and UNHCR registration, not by
+      Venezuelan state statistics. Immune to BCV/INE censoring.
+    direction: supports_claim
+
+  - metric_id: hyperinflation_cagan_threshold
+    description: >
+      Cagan (1956) defines hyperinflation as monthly inflation
+      ≥50% for ≥2 consecutive months. Venezuela entered this
+      regime November 2017 and remained there through early 2019
+      per Hanke-Krus monthly tracking.
+    threshold: ">=2 consecutive months of >50% m/m CPI"
+    window: "2013-2022"
+    source: "hanke:hyperinflation_table; imf:PCPIPCH; bcv shadow estimates"
+    data_quality_flag: >
+      BCV stopped publishing monthly CPI January 2016.
+      Hanke-Krus use the implied-purchasing-power-parity
+      methodology on parallel FX rate + observed price levels.
+      Assembly of Venezuelan opposition-controlled finance committee
+      (Asamblea Nacional OVF) publishes independent monthly CPI.
+    independence_justification: >
+      Hanke-Krus methodology is FX-rate-based, not CPI-basket-based.
+      Independent of state statistical capture.
+    direction: supports_claim
+
+  - metric_id: crude_oil_production_collapse
+    description: >
+      Venezuela's crude oil production fell from 3.1 Mb/d (1999,
+      pre-Chávez baseline) and 2.4 Mb/d (2013, Chávez→Maduro
+      transition) to ~0.4 Mb/d (2020). >80% decline versus 1999,
+      >80% versus 2013. No peer oil economy suffered anything
+      remotely comparable.
+    threshold: ">60% decline in monthly crude production"
+    window: "2013-2020"
+    source: "opec:asb_full; eia:international_energy_statistics"
+    independence_justification: >
+      Measured by independent tanker tracking (OPEC secondary
+      sources use Platts, Argus, Kpler tanker data). Not a
+      Venezuelan government reported figure.
+    direction: supports_claim
+
+  - metric_id: hdi_absolute_decline
+    description: >
+      UNDP's Human Development Index fell from 0.776 (2012) to
+      0.691 (2021) — an absolute decline of 0.085. UNDP records
+      only a handful of non-war peacetime HDI declines of this
+      magnitude since the series began (1990).
+    threshold: ">0.05 absolute HDI decline"
+    window: "2012-2022"
+    source: "undp_hdi:hdi_2025"
+    independence_justification: >
+      HDI is a composite of life expectancy, mean/expected years
+      of schooling, and GNI per capita. Life-expectancy
+      component is from WHO; schooling is from UNESCO;
+      income is partly from WDI/IMF. Multi-source composite
+      minimises dependence on any single publisher.
+    direction: supports_claim
+
+  - metric_id: extreme_poverty_rate
+    description: >
+      ENCOVI (Encuesta Nacional de Condiciones de Vida, conducted
+      by UCAB independently of Venezuelan state) reports extreme
+      poverty rising from ~23% (2014) to ~76% (2021). No Latin
+      American peer approaches this level in the same window.
+    threshold: ">70% extreme poverty rate in any year"
+    window: "2015-2022"
+    source: "manual:encovi_ucab_household_survey; encovi_ucab:household_survey"
+    data_quality_flag: >
+      Venezuelan state poverty statistics are unreliable post-2014.
+      ENCOVI is the consensus independent benchmark. Published in
+      peer-reviewed work (Vera 2018, Freitez 2020).
+    independence_justification: >
+      Survey-based, conducted by private Catholic university
+      (UCAB), not state statistics. Methodologically independent
+      of BCV/INE.
+    direction: supports_claim
+
+  - metric_id: under5_mortality_reversal
+    description: >
+      Venezuelan under-5 mortality began rising in 2012 after four
+      decades of continuous decline. Reversal of this magnitude is
+      almost never observed outside war or famine. Maternal
+      mortality also rose sharply (2016 Ministry of Health bulletin
+      documented 65% YoY rise, after which the Ministry ceased
+      publishing the series).
+    threshold: ">20% increase in under-5 mortality rate from 2012 to any year 2017-2020"
+    window: "2012-2020"
+    source: "who_gho:MDG_0000000007; world_bank_wdi:SH.DYN.MORT; pan_american_health_organization"
+    data_quality_flag: >
+      Venezuelan MoH stopped publishing after 2016. WHO and
+      PAHO estimates use survey + census-linked data.
+    independence_justification: >
+      WHO uses cross-source triangulation including household
+      surveys (not state vital registration alone). PAHO
+      regional mortality estimates are independently constructed.
+    direction: supports_claim
+
+  - metric_id: real_minimum_wage_collapse_usd
+    description: >
+      Venezuelan minimum wage measured in USD at the parallel
+      (DolarToday) exchange rate fell from ~$330/month (2013) to
+      <$5/month (2019-2022). Real purchasing power loss >98%.
+    threshold: ">90% loss of real minimum wage measured in constant USD"
+    window: "2013-2022"
+    source: "manual:ovf_bolivar_parallel_rate_series; dolartoday:archive"
+    independence_justification: >
+      Parallel exchange rate is tracked by independent private
+      operators (DolarToday, Monitor Dólar). Venezuelan decree
+      minimum wage in bolivars is state-published; the parallel
+      rate conversion is independent.
+    direction: supports_claim
+
+  - metric_id: electrical_grid_collapse
+    description: >
+      Venezuela suffered nationwide blackouts March 2019 (>5 days),
+      July 2019 (>4 days), October 2020 (>3 days). Hourly blackout
+      duration in Zulia and Táchira states exceeded 12 hours daily
+      throughout 2019-2022. Electrical grid degradation directly
+      follows from PDVSA and Corpoelec politicisation/brain drain.
+    threshold: ">=3 documented nationwide blackouts of >24 hours"
+    window: "2017-2023"
+    source: "manual:laboratorio_de_electricidad_ucv_reports; news_archive:reuters_ap_event_log"
+    independence_justification: >
+      Blackouts are directly observable physical events,
+      documented by private satellite imagery (VIIRS night-time
+      lights) and news archives. Independent of state publication.
+    direction: supports_claim
+
+  - metric_id: food_insecurity_ipc_phase
+    description: >
+      FAO / WFP Integrated Food-security Phase Classification
+      reports Venezuela has had IPC Phase 3 (Crisis) populations
+      exceeding 9 million (2019 estimate, ~30% of population) —
+      the first non-war IPC Phase 3+ classification of this
+      magnitude in the Western hemisphere in the 2000-2024 window.
+    threshold: ">20% of population in IPC Phase 3+ at any point"
+    window: "2016-2022"
+    source: "manual:fao_wfp_joint_assessment_venezuela_2019_2020; encovi_ucab:food_insecurity_module"
+    independence_justification: >
+      Multi-agency joint assessment. Uses household consumption,
+      market-access, and nutritional surveys. Independent of
+      state statistics.
+    direction: supports_claim
+
+  - metric_id: currency_par_value_collapse
+    description: >
+      The bolivar fuerte (2008 denomination) and subsequent
+      denominations (2018 soberano, 2021 digital) collectively
+      lost ≥99.999% of purchasing power against USD 2013-2023.
+      Three currency redenominations (2008: 1000→1; 2018: 100000→1;
+      2021: 1000000→1) removed 14 zeros total.
+    threshold: ">99.99% cumulative purchasing power loss vs USD"
+    window: "2013-2023"
+    source: "manual:dolartoday_archive; bcv:official_rate_time_series"
+    independence_justification: >
+      Parallel rate is market-determined. Three redenominations
+      are state-decreed events directly observable in currency
+      series — removing zeros is not a statistical construct.
+    direction: supports_claim
+
+multi_metric_falsification:
+  total_metrics: 10
+  support_threshold: 7
+  refute_threshold: 3
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Chavismo spans fiscal (deficit monetisation, state-enterprise
+  expansion, price subsidies), regulatory (FX controls, price
+  controls, expropriations), and institutional (judicial capture,
+  electoral system manipulation) channels. Bundled classification
+  reflects the mutually-reinforcing policy complex, which is what
+  the canonical-case hypothesis treats as the unit of analysis.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    For each of the 10 canonical metrics, evaluator fetches
+    the specified data source and evaluates the threshold
+    expression. Support if metrics_met >= 7, refute if
+    metrics_met <= 3, inconclusive in the 4-6 range.
+    Benchmark check: no non-war country in the 2000-2024
+    world panel should match ≥4 of these thresholds; if a
+    benchmark country does, the metric-set is not adequately
+    Venezuela-discriminating and needs revision.
+
+falsification:
+  rule: >
+    Hypothesis is SUPPORTED if ≥7 of 10 canonical metrics meet
+    their pre-registered thresholds. Hypothesis is REFUTED if ≤3
+    of 10 metrics meet their thresholds. The 4-6 metric range is
+    inconclusive. Additional falsification: if any non-war
+    country in the 2000-2024 peer panel (WDI + UNHCR + UNDP)
+    matches ≥4 of these 10 thresholds, the metric-set is not
+    Venezuela-discriminating and the hypothesis is methodologically
+    invalid regardless of Venezuela's own metric count.
+  test: multi_metric_canonical_case_pattern_match
+  threshold: "metrics_met_venezuela >= 7 AND max_metrics_met_non_war_peer <= 3"
+
+prior_confidence: 0.98
+
+disclosure: >
+  This hypothesis is a methodology-fix supersession of
+  venezuela_chavismo_framework_validation v1 (which used panel FE
+  nested DiD on GDP-per-capita-PPP and was inconclusively scored
+  because Venezuela post-2014 GDP data is materially censored by
+  the state; the dependent variable was bad). The multi-metric
+  specification replaces a single bad signal with 10 independent
+  signals drawn from heterogeneous publishers. Author's strong
+  prior (0.98) reflects that the Venezuelan collapse is one of
+  the best-documented peacetime economic disasters in modern
+  history. A refutation here would indicate either (a) the
+  metric-set is mis-calibrated, or (b) the framework has a
+  data-pipeline fault affecting multiple independent sources
+  simultaneously, which is a stronger signal than any single
+  causal test could provide.
+
+  Author's market-liberal priors are aligned with the hypothesis.
+  The pre-registered 10-metric threshold set, and the requirement
+  that the metric set not be matched by any non-war peer, binds
+  the author to a pattern-match that is not simply a re-labelling
+  of the author's priors.
+
+conflict_disclosure: >
+  Author holds no Venezuelan asset exposure and no consulting
+  relationship with parties in the Venezuela policy debate.
+
+steelman: hypotheses/steelman/venezuela_chavismo_canonical_case_multi_metric.md
+
+linked_hypotheses:
+  - venezuela_chavismo_framework_validation
+  - maduro_era_venezuelan_collapse_decomposition_2013_2023
+  - hyperinflation_requires_fiscal_dominance
+  - resource_extractor_nationalisation_reduces_output
+
+notes: >
+  Methodological rationale: single-estimator causal tests (panel FE,
+  synthetic control) are inappropriate for canonical cases where
+  (a) the outcome data is materially censored in the exact window
+  where the effect is largest (Venezuela national accounts 2014+),
+  (b) the treatment is a multi-year, multi-channel institutional
+  complex rather than a single policy event, (c) the donor pool
+  problem is severe (no Latin American peer has both comparable
+  oil dependence AND no socialist treatment AND no sanctions AND
+  no political crisis). In such cases a pre-registered multi-metric
+  pattern-match is epistemically stronger than a single biased
+  causal estimate.
+
+  Data-provenance rule: each of the 10 metrics must be evaluable
+  from a different root data source (different publisher OR
+  different methodology family). This is checked by the evaluator
+  to ensure the 10 metrics are not effectively 1 metric in
+  disguise.
+
+  Supersession note: this hypothesis supersedes
+  venezuela_chavismo_framework_validation v1 for the purpose of
+  framework-validation. The older hypothesis remains in the corpus
+  for historical provenance but is downgraded to 'candidate' in
+  any future run.

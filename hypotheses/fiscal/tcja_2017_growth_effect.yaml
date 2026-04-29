@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tcja_2017_growth_effect
+version: 1
+status: draft
+topic: fiscal
+claim: >
+  Trump's 2017 Tax Cuts and Jobs Act produced smaller investment and output
+  responses than Laffer-curve advocates projected, consistent with New Keynesian
+  estimates of corporate-tax-cut passthrough in a near-full-employment economy
+  with inelastic long-run investment supply. The discriminating test is whether
+  the investment-to-output and output-to-tax-rate elasticities sit inside the
+  canonical NK range or the supply-side range projected by TCJA proponents.
+notes: >
+  Maps the new-keynesian school's TCJA-2017 modest-response claim to a US time-series
+  with elasticity-band falsification thresholds. Estimator and prior set; full
+  pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.65
+disclosure: >
+  Author prior aligns with the NK view that TCJA delivered modest investment uplift
+  rather than supply-side growth take-off (CBO/JCT scoring + Gale-Samwick post-mortems
+  back this up); the 2020 COVID shock makes the 2018-2019 pre-COVID window the cleanest
+  cut, but two years is short for stable elasticity estimation.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if corporate investment elasticity to the
+    effective marginal tax rate falls inside the NK canonical range (≈
+    -0.1 to -0.3) rather than the supply-side range (≤ -0.5), AND if
+    cumulative real-GDP deviation from pre-TCJA trend over 2018-2019
+    (pre-COVID) is less than 1 percentage point. REFUTED if elasticity
+    exceeds -0.5 in absolute value or if cumulative GDP gain exceeds 2.5
+    percentage points over trend.
+  test: 'US time-series 2010-2019 estimating corporate investment elasticity to effective-marginal-tax-rate around 2017Q4 break + cumulative real-GDP deviation from pre-TCJA CBO baseline 2018-2019 (pre-COVID). Refute if elasticity ≤-0.5 absolute OR GDP-trend deviation >2.5pp.'
+evidence_type: associational
+sample:
+  countries: [USA]
+  period: [2010, 2019]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2020-onwards COVID-19 shock window from primary spec"
+variables:
+  outcome:
+    - name: log_real_gdp
+      source: "fred:GDPC1"
+      transformation: log
+    - name: log_real_private_nonresidential_investment
+      source: "fred:PNFI"
+      transformation: log
+    - name: corporate_investment_share_gdp
+      source: "fred:Y033RC1Q027SBEA"
+      transformation: level
+  treatment:
+    - name: tcja_post_2017q4_indicator
+      source: "constructed: indicator = 1 for quarters >= 2017Q4 (TCJA enactment Dec 2017)."
+      transformation: indicator
+    - name: effective_marginal_corporate_tax_rate
+      source: "constructed: hand-coded EMTR (Devereux-Griffith methodology) US corporate, pre-vs-post-TCJA. Treasury OTA + Tax Foundation cross-reference."
+      transformation: level
+  controls:
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+    - name: log_oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log
+estimator:
+  template: local_projections
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    US time-series local projections 2010-2019 (pre-COVID) estimating
+    corporate-investment elasticity to effective-marginal-tax-rate around
+    2017Q4 TCJA break, plus cumulative real-GDP deviation from pre-TCJA CBO
+    baseline. Newey-West HAC SEs. Caveat: 2-year pre-COVID window is short
+    for stable elasticity estimation; primary spec drops 2020+; secondary
+    spec extends through 2021 with COVID-control dummies.
+scope:
+  period: [2017, 2021]
+  countries: [USA]
+  outcome_dim: [taxation, gdp_growth, fiscal_policy]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [tcja_2017, trump_corporate_tax_cut, laffer_curve]
+covers_claims:
+  - position_id: new_keynesian
+    claim_index: 8
+    polarity: aligned
+    school_prediction: mixed
+    confidence: high
+    notes: "New Keynesian claim that TCJA 2017 produced smaller responses than Laffer advocates projected. Relinked from reagan_tax_cuts_growth_effect in Phase 4E — Reagan 1981 and TCJA 2017 are distinct episodes and need separate hypotheses."

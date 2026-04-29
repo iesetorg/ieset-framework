@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: gfc_contraction_depth_liberalised_vs_state_managed_systems
+version: 1
+status: draft
+topic: regulatory
+claim: >
+  The 2007-2009 global financial crisis produced deeper and more persistent
+  output contractions in liberalised financial systems (United States, United
+  Kingdom, Ireland, Iceland) than in more state-managed financial systems
+  (China, Vietnam), controlling for pre-crisis openness, exchange-rate regime,
+  and fiscal space. The discriminating variable is the degree of state control
+  over credit allocation and bank balance sheets heading into 2007.
+notes: Origin is auto-generated Phase-4E stub seeded from Marxist-Leninist framing of GFC
+  contraction depth as deeper in liberalised vs state-managed financial systems. Human review required.
+prior_confidence: 0.45
+disclosure: Author has market-liberal priors and considers the openness/exchange-rate/fiscal-space
+  controls likely to dominate the state-control axis; framing risks treating CHN/VNM differences as cleanly identified vs confounded by capital-account closure and fiscal stimulus scale.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if the 2007-2010 cumulative real GDP decline
+    in the liberalised-system panel exceeds that of the state-managed panel
+    by at least 3 percentage points, conditional on matching on pre-crisis
+    openness + exchange-rate regime + fiscal space. REFUTED if the gap is
+    less than 1 percentage point or reverses in sign.
+  test: 'Cross-country comparison of 2007-2010 cumulative real-GDP decline: liberalised panel (USA/GBR/IRL/ISL) vs state-managed panel (CHN/VNM); liberalised gap >=3pp deeper with p<0.10 conditional on pre-crisis controls supports.'
+evidence_type: associational
+sample:
+  countries: [USA, GBR, IRL, ISL, CHN, VNM, IND, BRA, RUS, JPN, DEU, FRA, ITA, ESP, NLD, BEL, CAN, AUS, KOR]
+  period: [2003, 2012]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing real GDP or financial-development series"
+variables:
+  outcome:
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: cumulative_gdp_decline_2007_2010
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: cumulative_window
+      notes: "Cumulative real GDP growth 2007-2010 — primary discriminating outcome."
+  treatment:
+    - name: liberalised_financial_system_indicator
+      source: "constructed: indicator = 1 for USA, GBR, IRL, ISL (liberalised financial systems pre-2007); 0 for CHN, VNM, IND (state-managed credit allocation, large state-bank share). Coding from Fraser EFW financial-freedom subindex deltas + IMF Financial Development Index."
+      transformation: indicator
+    - name: financial_freedom_index
+      source: "fraser_efw:area_3"
+      transformation: level
+      notes: "Fraser EFW area 3 (sound money + financial freedom). Continuous version of the binary indicator."
+  controls:
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: exchange_rate_regime
+      source: "ilzetzki_reinhart_rogoff:exchange_rate_regime"
+      transformation: categorical
+    - name: government_debt_pct_gdp
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+      notes: "IMF general government debt — fiscal space control."
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Cross-country panel-FE 2003-2012 of real GDP growth on liberalised-
+    vs-state-managed-financial-system indicator interacted with crisis-window
+    (post-2007Q3). Pre-crisis matching on openness + exchange-rate regime +
+    fiscal space. Country and year FE; country-clustered SEs. Caveat:
+    state-managed economies (CHN, VNM) had unrelated growth tailwinds — the
+    contraction-depth comparison conflates regime-effect with structural
+    growth differential.
+scope:
+  period: [2007, 2012]
+  countries: [USA, GBR, IRL, ISL, CHN, VNM]
+  outcome_dim: [financial_crisis, gdp_growth, financialisation]
+  policy_family: [regulation, monetary_policy, institutional_reform]
+  treatment_tags: [global_financial_crisis_2008, financial_liberalisation, china_state_managed_finance]
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Marxist-Leninist claim that GFC contraction depth was worse in liberalised systems than state-managed ones. Relinked from financial_deregulation_crisis_vulnerability in Phase 4E."

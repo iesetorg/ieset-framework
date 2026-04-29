@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: public_electricity_generator_carbon_intensity
+version: 1
+status: candidate
+methodology_note: 'v1 promotion (2026-04-24). Sharpened the original generic falsification rule to a dispositive ratio test on fossil share of electricity: public-cohort (FRA, SWE) mean fossil share / private-cohort
+  (GBR, USA, DEU, ITA, ESP, BEL, NLD) mean fossil share, averaged across 1985-1999. Operationalises the spec''s "carbon intensity 25% lower" claim as ratio <= 0.75. The spec''s preferred outcome (gCO2/kWh
+  from IEA energy balances) requires an IEA fetcher that has not shipped; OWID-Ember share-electricity-fossil-fuels is the closest publisher-on-disk proxy. The 1970-1984 sub-window of the spec is structurally
+  data-gapped (OWID-Ember begins 1985) and flagged in the verdict; testable window is 1985-1999 only. Causal attribution to public ownership remains contested per the spec''s own disclosure (resource endowments
+  + postwar industrial planning).'
+topic: energy
+claim: Publicly owned electricity generators (EDF in France pre-privatisation, Vattenfall Sweden) achieved lower-carbon generation mixes than otherwise-matched privatised counterparts in the 1970s-1990s.
+scope:
+  period:
+  - 1970
+  - 1999
+  countries:
+  - FRA
+  - SWE
+  outcome_dim:
+  - energy
+  - industrial_capability
+  policy_family:
+  - energy_policy
+  - privatisation_nationalisation
+  treatment_tags:
+  - edf_public_ownership
+  - vattenfall_public_ownership
+covers_claims:
+- position_id: eco_socialist
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Claim text matches hypothesis claim verbatim: EDF France and Vattenfall Sweden public ownership achieved lower-carbon mixes vs privatised counterparts 1970s-1990s. Direct alignment.'
+notes: Maps the eco-socialist school's public-generator-lower-carbon-mix claim to a comparative generation-mix and emissions-intensity series for FRA (EDF) and SWE (Vattenfall) vs matched privatised counterparts
+  1970-1999. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.45
+disclosure: Author prior is skeptical of the strong causal framing — EDF's nuclear-heavy mix and Vattenfall's hydro+nuclear mix were largely the products of national resource endowments and postwar industrial
+  planning, not directly attributable to public-ownership status; matched-private counterparts are scarce and selection-biased.
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if the ratio of public-cohort (FRA, SWE) mean fossil share of electricity to private-cohort (GBR, USA, DEU, ITA, ESP, BEL, NLD) mean fossil share,
+    averaged across overlap years 1985-1999, is at most 0.75 (i.e. public cohort is at least 25% lower). Ratio in (0.75, 1.00) is partial. Ratio >= 1.00 is REFUTED. INFORMATIVE: non-fossil (nuclear + renewables)
+    share gap, and OWID co2-intensity (CO2/GDP) ratio. Same direction expected. METHOD_VALID: at least 5 years of OWID-Ember coverage in 1985-1999 for both public-cohort countries AND for at least 4 of
+    7 private comparators. The 1970-1984 sub-window of the spec (15/30 years) is structurally data-gapped on OWID-Ember; verdict speaks to the testable 1985-1999 sub-window only.'
+  test: public_vs_private_fossil_share_ratio_1985_1999
+  threshold: 'PRIMARY: fossil_share_ratio_pub_over_priv <= 0.75 for SUPPORTED; in (0.75, 1.00) for partial; >= 1.00 for refuted.'
+evidence_type: associational
+sample:
+  countries:
+  - FRA
+  - SWE
+  - GBR
+  - USA
+  - DEU
+  - ITA
+  - ESP
+  - BEL
+  - NLD
+  period:
+  - 1970
+  - 1999
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing IEA generation-mix decomposition
+variables:
+  outcome:
+  - name: electricity_co2_intensity_g_per_kwh
+    source: owid:annual-co2-emissions-per-country
+    transformation: level
+    notes: 'OWID electricity-sector CO2 intensity (gCO2/kWh). TODO swarm-6e: cross-check with IEA energy-balances when iea fetcher schema lands.'
+  - name: low_carbon_generation_share
+    source: owid:share-elec-by-source
+    transformation: level
+    notes: Hydro + nuclear + non-fossil share of total electricity generation.
+  treatment:
+  - name: public_ownership_indicator
+    source: 'constructed: indicator = 1 for FRA (EDF nationalised 1946-2005) and SWE (Vattenfall public from 1909) over 1970-1999; comparator pool = privatised UK generators post-1990, US IOUs, etc.'
+    transformation: indicator
+  controls:
+  - name: hydro_resource_endowment
+    source: 'constructed: hydro generation potential as share of national electricity demand (FAO + IEA).'
+    transformation: level
+    notes: 'TODO swarm-6e: hydro-endowment as resource-not-policy control — partially derived.'
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+steelman: hypotheses/steelman/public_electricity_generator_carbon_intensity.md
+estimator:
+  template: descriptive
+  notes: 'Descriptive comparison of electricity-sector CO2 intensity for FRA (EDF) and SWE (Vattenfall) vs OECD privatised-utility average 1970-1999, with hydro/nuclear endowment shares as level control.
+    Not causal — public- ownership status conflates with national resource endowment and postwar industrial-planning legacy; matched-private comparators are scarce.
+
+    '

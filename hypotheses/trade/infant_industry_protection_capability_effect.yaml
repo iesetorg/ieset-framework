@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: infant_industry_protection_capability_effect
+version: 1
+status: draft
+topic: trade
+claim: Tariff protection for infant industries under export-discipline conditionality (Korea steel, Brazil
+  Embraer) produces capability build-up that free-trade-from-start counterfactuals would not have generated
+  in the same timeframe.
+notes: Origin is auto-generated coverage-gap stub seeded from developmentalist claim that export-discipline
+  conditioned tariff protection (KOR steel, BRA Embraer) builds capability beyond free-trade counterfactuals.
+prior_confidence: 0.55
+disclosure: Author has market-liberal priors but recognises export-discipline conditionality as a
+  meaningful filter; framing risks selecting on successful cases and ignoring failed protection episodes.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Synthetic control of POSCO (KOR steel) and Embraer (BRA aerospace) sectors vs free-trade-baseline
+    counterfactual donor pool; cumulative export-share gain >50% within 20y with p<0.10 supports.'
+evidence_type: associational
+
+scope:
+  period: [1960, 2023]
+  countries: [KOR, BRA]
+  outcome_dim: [industrial_capability, productivity, trade_liberalisation]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [korea_steel_posco, brazil_embraer, export_discipline_conditionality, infant_industry_tariff]
+sample:
+  countries: [KOR, BRA, MEX, ARG, CHL, IND, IDN, PHL, EGY, TUR, THA]
+  period: [1960, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "KOR (steel/POSCO) and BRA (aerospace/Embraer) treated; rest of pool serves as free-trade-baseline donor"
+variables:
+  outcome:
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: high_tech_export_share
+      source: "world_bank_wdi:TX.VAL.TECH.MF.ZS"
+      transformation: level
+      notes: "WDI high-technology exports as % of manufactured exports — capability-build proxy."
+    - name: manufactured_export_share
+      source: "world_bank_wdi:TX.VAL.MANF.ZS.UN"
+      transformation: level
+    - name: log_tfp_pwt
+      source: "pwt:rtfpna"
+      transformation: log
+  treatment:
+    - name: infant_industry_protection_indicator
+      source: "constructed: country-sector indicator = 1 for KOR steel from 1968 (POSCO founding) and BRA aerospace from 1969 (Embraer founding) under export-discipline tariff regime."
+      transformation: indicator
+    - name: tariff_rate_weighted
+      source: "unctad:trade_indicators"
+      transformation: level
+      notes: "UNCTAD weighted-mean tariff rate; sector-disaggregated where available."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with KOR-steel and BRA-aerospace as separate treated
+    sector-units and the developing-economy donor pool (MEX, ARG, CHL, IND,
+    IDN, PHL, EGY, TUR, THA) as free-trade-baseline counterfactual. Pre-
+    treatment fit window 1960-1968 (KOR) and 1960-1969 (BRA); post-treatment
+    20-year window. Outcomes: high-tech / manufactured export shares, TFP.
+    Caveat: two treated cases — selection-on-success risk explicit; report
+    falsification placebos across donor pool.
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 14
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Developmentalist position predicts tariff-protected-plus-export-disciplined infant industries build capability beyond free-trade counterfactuals; hypothesis tests the canonical Korea-steel and Brazil-Embraer cases."
+

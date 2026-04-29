@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: debt_brake_fiscal_discipline_without_output_cost
+version: 1
+status: draft
+topic: growth
+claim: Germany's Schuldenbremse (constitutional debt brake, 2009) produced lower debt-to-GDP trajectories
+  than comparable-economy fiscal-rule-absent peers over 2009–2019, without output loss relative to the
+  Eurozone mean.
+notes: Seeded from an Ordoliberal claim about Germany's Schuldenbremse delivering fiscal discipline without
+  an output penalty 2009-2019. Synthetic-DID design; donor pool selection is the key sensitivity that requires
+  human review.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: claim is consistent with German-establishment narrative and Ordoliberal priors; attributing post-2009 path purely to Schuldenbremse ignores ECB policy, intra-Eurozone competitiveness gaps, and German export-led demand bleed from peripheral austerity.
+falsification:
+  rule: >-
+    PRIMARY 1 (debt discipline, dispositive): Germany's Δgross-general-govt-debt-to-GDP
+    from 2008 to 2019 must be at least 10pp LOWER than the unweighted donor-pool mean
+    Δdebt-to-GDP over the same window. PRIMARY 2 (no output cost, dispositive):
+    Germany's cumulative log-real-GDP-per-capita growth 2008-2019 must be at least 90%
+    of the donor-pool unweighted mean cumulative log-growth.
+    SUPPORTED if BOTH primaries hold. partial if PRIMARY 1 holds but PRIMARY 2 fails
+    (debt discipline came at non-trivial output cost). REFUTED if PRIMARY 1 fails
+    (Schuldenbremse failed at its stated job). INFORMATIVE: pre-trend log-growth
+    2000-2008 gap |Germany - donor mean| ≤ 5pp for clean parallel-trend; if violated,
+    verdict text flags caveat. METHOD_VALID: imf:GGXWDG_NGDP and wdi:NY.GDP.PCAP.KD
+    available with at most 3 of 10 donor countries missing.
+  test: deu_vs_donor_panel_debt_and_output_2008_2019
+  threshold: >-
+    PRIMARY 1: (deu_delta_debt - donor_mean_delta_debt) ≤ -10pp.
+    PRIMARY 2: deu_log_growth / donor_mean_log_growth ≥ 0.90 (or, when donor mean ≤ 0,
+    deu - donor mean ≥ -5pp absolute).
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic falsification rule to
+  two dispositive primary tests on a before/after panel comparison: 10pp debt-gap
+  threshold and 90% cumulative output-growth ratio. Spec downgraded from synth-DID
+  (synth_did not in venv) to transparent unweighted-donor-mean comparison; pre-trend
+  diagnostic 2000-2008 included as an INFORMATIVE method-validity check. PRE=2008,
+  POST=2019 (avoids both COVID and the 2020-2022 debt-brake suspension).
+evidence_type: associational
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, AUT, FIN, IRL, PRT, GBR]
+  period: [2000, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude post-2019 (COVID + 2022 debt-brake suspension distort the trajectory)"
+
+variables:
+  outcome:
+    - name: gross_general_govt_debt_pct_gdp
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+    - name: log_real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: gen_govt_balance_pct_gdp
+      source: "imf:GGXCNL_NGDP"
+      transformation: level
+
+  treatment:
+    - name: post_schuldenbremse_indicator
+      source: "constructed: indicator = 1 for DEU, year >= 2010 (Schuldenbremse binding from 2010)"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    Synthetic difference-in-differences with Germany as the treated unit and
+    a donor pool of fiscal-rule-absent advanced economies (FRA, ITA, ESP, GBR,
+    etc.). Outcomes: debt-to-GDP path and real GDP per capita 2009-2019.
+    Tests Germany's debt path vs synthetic counterfactual without an output
+    penalty.
+
+scope:
+  period: [2009, 2019]
+  countries: [DEU, EUROZONE]
+  outcome_dim: [fiscal_policy, gdp_growth]
+  policy_family: [fiscal_policy, institutional_reform]
+  treatment_tags: [schuldenbremse_2009]
+
+covers_claims:
+  - position_id: ordoliberal
+    claim_index: 1
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether Germany's Schuldenbremse produced lower debt-to-GDP trajectories than fiscal-rule-absent peers without output loss 2009-2019."
+

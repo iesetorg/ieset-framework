@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: forward_guidance_term_structure_effect
+version: 1
+status: draft
+topic: monetary
+claim: Post-2008 mainstream-central-bank forward guidance affected the term structure of interest rates
+  beyond what pure-signal rational-expectations models would predict, consistent with NK sticky-information
+  models.
+notes: Origin is auto-generated coverage-gap stub seeded from New Keynesian sticky-information framing
+  of post-2008 forward-guidance term-structure effects. Human review required before promotion.
+prior_confidence: 0.55
+disclosure: Author finds the NK sticky-information story plausible but is open to alternative
+  explanations (signal extraction about future fundamentals); framing may overstate genuine policy power.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'High-frequency event-study around Fed/ECB/BoE/BoJ forward-guidance announcements 2008-2017,
+    30-min windows; 2y/5y yield response exceeds RE-signal benchmark with p<0.10 supports.'
+evidence_type: associational
+
+scope:
+  period: [2008, 2017]
+  countries: [USA, GBR, EUROZONE, JPN]
+  outcome_dim: [monetary_policy]
+  policy_family: [monetary_policy]
+  treatment_tags: [central_bank_forward_guidance, sticky_information, post_2008_unconventional_monetary_policy]
+
+covers_claims:
+  - position_id: new_keynesian
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "New Keynesian claim that post-2008 forward guidance affected the term structure beyond pure-signal rational-expectations predictions, consistent with NK sticky-information models."
+
+estimator:
+  template: event_study
+  clustering: announcement
+  notes: >
+    Stub-level estimator pin for runnability audit. High-frequency event-study
+    around major Fed/ECB/BoE/BoJ forward-guidance announcements 2008-2017;
+    outcome is the change in 2y/5y/10y nominal yields and OIS-implied policy
+    paths in 30-minute windows. Compares observed term-structure response
+    against pure-signal RE benchmarks. Falsification rule and variables block
+    remain to be filled when this stub is promoted from draft.
+
+sample:
+  countries: [USA, GBR, DEU, JPN]
+  period: [2008, 2017]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "DEU yields used as euro-area benchmark; ECB forward-guidance episodes pooled at currency-area level"
+
+variables:
+  outcome:
+    - name: yield_2y
+      source: "fred:DGS2; boe:bank_rate; ecb:financial_markets_yields_2yr; boj:policy_rate"
+      transformation: level_change_bps
+      notes: "DEU 2y from ECB benchmarks for euro area."
+    - name: yield_5y
+      source: "fred:DGS5; ecb:financial_markets_yields_5yr"
+      transformation: level_change_bps
+    - name: yield_10y
+      source: "fred:DGS10; ecb:financial_markets_yields_10yr"
+      transformation: level_change_bps
+  treatment:
+    - name: forward_guidance_announcement_event
+      source: "constructed: hand-coded event list — Fed FOMC (2008-12, 2011-08, 2012-08, 2013-12, 2015-09), ECB GC (2013-07, 2014-09), BoE MPC (2013-08, 2014-08), BoJ (2013-04, 2016-09)"
+      transformation: event_date
+    - name: ois_implied_policy_path_change
+      source: "fred:OIS; ecb:financial_markets_money_market_OIS"
+      transformation: level_change_bps
+      notes: "TODO: high-frequency OIS data typically requires Bloomberg/Reuters; FRED+ECB daily OIS stand-in for first pass."
+  controls:
+    - name: vix
+      source: "fred:VIXCLS"
+      transformation: level
+    - name: surprise_macro_release_indicator
+      source: "constructed: binary = 1 if FOMC/MPC/GC day coincided with NFP/CPI release"
+      transformation: binary

@@ -1,0 +1,19 @@
+# Steelman — Reduced working-time output and employment effects
+
+**The strongest argument against this hypothesis:**
+
+The standard lump-of-labour critique predicts that mandatory working-time reductions raise unit labour costs (because hourly wages do not adjust downward in proportion to the hour cut), depress hiring, and lower output and productivity at the firm level. The cited cases (French 35-hour week 2000, Iceland four-day-week trial 2015-2019) both have specific design features that mute the cost shock and therefore set a low bar for the "no catastrophe" claim:
+
+1. **France's Aubry laws bundled the 35-hour mandate with payroll-tax offsets.** The Aubry I (1998) and Aubry II (2000) laws phased the mandatory weekly limit from 39 to 35 hours but coupled it with employer payroll-tax reductions on low wages and a wage-freeze negotiation regime. Estienne and Crepon (2001), Askenazy (2013), and OECD (2002) findings indicate that the net cost shock to firms was substantially smaller than a naive hour-cost calculation suggests. A "no macro catastrophe" finding is therefore partly a finding about compensating fiscal policy and wage moderation, not about working-time reduction in isolation.
+
+2. **France's unemployment rose anyway in the early 2000s.** French unemployment rose from ~8% in 2001 to ~9.6% by 2005 and the Sarkozy 2007 reforms (including the loi TEPA exemption of overtime) effectively unwound the 35-hour cost wedge. Attribution to the 35-hour mandate is weak: the early-2000s euro-area slowdown, German Hartz reforms shifting bargaining power to German employers, and dot-com bust dynamics confound. A spec that finds "GDP gap not catastrophic" cannot exclude that the 35-hour week did reduce employment by 1-2 percentage points relative to counterfactual — which is a meaningful effect even if not "catastrophic."
+
+3. **Iceland's four-day-week trial was tiny.** The 2015-2019 trial enrolled approximately 1.3% of Iceland's workforce at peak (Reykjavík city employees and a national agency pilot). The Autonomy + ALDA report (2021) is widely cited as showing "no productivity loss," but the trial cohort is non-representative (public-sector knowledge workers) and the macro impact on Iceland's GDP would be undetectable at this scale. A finding of "no aggregate effect" is mechanically expected and is essentially zero evidence about what a binding national 32-hour mandate would do.
+
+4. **The 2008 GFC dominates the FRA post-window.** Any post-2000 trajectory for France is contaminated by the 2008-2010 recession and the 2010-2012 sovereign debt crisis. Truncating the post-window at 2007 (as this spec does) avoids the GFC but also throws away the years where the policy's lock-in effects would be most visible. A short post-window (2000-2007) is also short enough that the linear-trend extrapolation has high variance.
+
+5. **The "catastrophe" bar is low by construction.** The claim's own wording — "did not produce *catastrophic* consequences" — is asymmetric: it is hard to find macro catastrophes attributable to a single labour-market policy in a large diversified economy. A SUPPORTED verdict here is consistent with the policy having modest negative effects (1-3% GDP, 1-2pp employment) that would be policy-relevant in a normal cost-benefit assessment. The PARTIAL grey zone (-5% to -10% / -3pp to -5pp) is the methodologically honest representation.
+
+**How this steelman should shape the result card:**
+
+A SUPPORTED verdict on this hypothesis should be reported as: "the catastrophic-collapse scenario did not occur in either case, but neither case is a clean test of a binding national 32-hour mandate without compensating fiscal offsets." A REFUTED verdict (large negative gaps in either case) would be a strong finding against the degrowth claim. A PARTIAL verdict is the most likely outcome consistent with the modest-negative-effect literature on the 35-hour week.

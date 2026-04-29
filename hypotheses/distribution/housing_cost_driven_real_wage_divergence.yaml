@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: housing_cost_driven_real_wage_divergence
+version: 1
+status: pre_registered
+topic: distribution
+claim: 'Within Anglo-liberal economies (UK, US, Australia) over 1995-2020, housing-supply-restricted high-opportunity metro areas exhibit real-wage-net-of-housing-cost trajectories that diverge substantially
+  from their headline real-wage trajectories, such that the standard "real wage stagnation" story for these metros is amplified (larger stagnation) when housing costs are properly netted out, while housing-supply-elastic
+  metros show the opposite pattern — headline real-wage stagnation looks less severe after housing is netted. The specific claim is that the cross-metro divergence in housing supply elasticity (Hilber-Vermeulen
+  for UK, Saiz for US, Kendall- Tulip for Australia) is a first-order driver of cross-metro differences in welfare-relevant real wage growth, and that national aggregate real-wage series systematically
+  understate welfare losses in supply-restricted metros while overstating them in supply-elastic metros. A clean supported finding would show that the supply- elasticity coefficient on net-of-housing real
+  wage growth is statistically significant and quantitatively large (at least 20% of cross-metro variance in welfare-adjusted real wage trajectories).
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - GBR
+  - USA
+  - AUS
+  period:
+  - 1995
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - metro-level sample; drop metros with < 500k population
+  - drop metros with less than 15 years of continuous housing-price coverage
+  - winsorise metro real-wage growth rates at 1st/99th percentile within country
+scope:
+  period:
+  - 1995
+  - 2020
+  countries:
+  - GBR
+  - USA
+  - AUS
+  outcome_dim:
+  - wage_stagnation
+  - housing
+  policy_family:
+  - housing_policy
+  - regulation
+  treatment_tags:
+  - housing_supply_elasticity
+  - planning_restriction
+  - saiz_elasticity
+  - hilber_vermeulen
+  - kendall_tulip
+variables:
+  outcome:
+  - name: real_wage_net_of_housing_cost_growth
+    source: manual:constructed
+    transformation: annualised_growth
+    notes: 'Constructed outcome: headline real wage (metro-level median earnings deflated by national CPI) minus metro-level rent-plus- imputed-housing-cost growth, weighted by housing-cost share of household
+      budgets. Construction sheet committed alongside spec. Metro-level data: UK via ONS ASHE subnational + ONS/Land Registry metro rents (data-gated on ONS fetcher); US via BLS QCEW metro earnings + FHFA/Zillow
+      metro rents; AUS via ABS Labour Force metro earnings + CoreLogic metro rents (data-gated on ABS fetcher). v1 uses BLS + FHFA for US spine and OECD/BIS metro approximations for UK and AUS; v2 promotion
+      requires native ONS and ABS fetchers.
+
+      '
+  - name: headline_real_wage_growth
+    source: bls:CES0500000008
+    transformation: real_index_base_1995
+    notes: 'National headline real wage as benchmark; US spine via BLS. UK and AUS equivalents data-gated.
+
+      '
+  treatment:
+  - name: housing_supply_elasticity
+    source: manual:from_academic_sources
+    transformation: level
+    notes: 'Metro-level supply elasticity measure: Saiz (2010) for US metros, Hilber-Vermeulen (2016) for UK, Kendall-Tulip (2018) for Australia. Manual compilation into a unified cross-country metro panel;
+      coding sheet committed alongside spec. Treatment is elasticity as a continuous variable, also discretised into restricted/intermediate/elastic terciles for robustness.
+
+      '
+  decomposition_channels:
+  - name: metro_real_residential_price_growth
+    source: bis:WS_SPP
+    transformation: real_annualised_growth
+    notes: 'BIS real residential property prices at metro level where available; national prices applied to each metro as v1 fallback with metro-over-national-spread coded from published metro indices.
+
+      '
+  - name: metro_productivity_growth
+    source: manual:constructed
+    transformation: annualised_growth
+    notes: 'Metro-level output-per-worker from national-accounts regional tables. US via BEA metro GDP (data-gated on BEA fetcher); UK via ONS regional GVA; AUS via ABS state accounts. Captures the confound
+      that productivity-leading metros have both higher wage growth and higher housing prices.
+
+      '
+  controls:
+  - name: metro_population_growth
+    source: manual:constructed
+    transformation: annualised_growth
+  - name: metro_employment_share_high_skill
+    source: manual:constructed
+    transformation: level
+    notes: Compositional control for metro industry mix.
+  - name: national_real_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: real_annualised_growth
+estimator:
+  template: panel_fe
+  clustering: metro
+  fixed_effects:
+  - metro
+  - country_year
+  notes: "Panel metro x year. Primary specification:\n  net_real_wage_growth_mt = b0 + b1*supply_elasticity_m\n  + b2*productivity_growth_mt + b3*controls + alpha_m (metro FE)\n  + gamma_ct (country-year\
+    \ FE) + epsilon\nCountry-year FE absorb national-level policy and macro shocks. Metro FE absorb time-invariant metro features. Supply elasticity is time-invariant per its academic construction, so b1\
+    \ is identified via the interaction of elasticity with time trend; primary specification therefore includes supply_elasticity * time_trend as the key variable. Secondary specification: drop metro FE\
+    \ and identify via cross-metro variation in elasticity, reported as robustness. Cluster-robust SEs at metro.\n"
+falsification:
+  rule: 'Not supported if the supply-elasticity-x-time-trend coefficient on net-of-housing real wage growth is statistically insignificant at the 5 percent level on cluster-robust SEs, or if its sign is
+    opposite to predicted (supply-restricted metros showing more favourable net-of-housing wage growth than elastic metros). The hypothesis also requires that the coefficient be quantitatively meaningful:
+    supply-restricted metros (bottom tercile elasticity) should show at least 0.5 percentage points per annum lower net- of-housing real wage growth than elastic metros (top tercile) over the sample period.
+    Separately, if headline real wage growth and net-of-housing real wage growth are highly correlated across metros (correlation > 0.9), the framework''s claim that headline series systematically mis-represent
+    welfare is empirically weak.
+
+    '
+  test: supply_elasticity_coefficient_sign_significance_magnitude
+  threshold: 'supply_elasticity_time_trend_coefficient: sign_positive AND p < 0.05 net_of_housing_gap_tercile: >= 0.5_pp_per_annum correlation(headline, net_of_housing): <= 0.9
+
+    '
+prior_confidence: 0.72
+disclosure: 'Author holds strong priors toward the housing-supply-restriction reading of Anglo-liberal real-wage trajectories, and has written on UK housing supply as a first-order economic policy issue.
+  The 0.72 prior reflects this, and the falsification test is deliberately multi-pronged so the hypothesis does not pass on a significant-but- small coefficient alone. Conflict disclosure: author holds
+  UK real estate positions; per framework conflict-disclosure rules this is flagged and a supported finding must be reported with this context.
+
+  '
+conflict_disclosure: 'Author holds UK-adjacent residential real estate exposure. A supported finding is materially consistent with an investment thesis that UK housing-supply reform is high-leverage. Flagged
+  per DISCLOSURE.md. Symmetrically, the hypothesis''s falsification rule is structured to bind on multiple prongs precisely so a weakly- supportive finding cannot be framed as vindication.
+
+  '
+steelman: hypotheses/steelman/housing_cost_driven_real_wage_divergence.md
+linked_hypotheses:
+- uk_real_wage_stagnation_2008_present_decomposition
+- intergenerational_mobility_cross_country
+- labor_share_decline_causes
+notes: 'Data-gated on native fetchers for ONS subnational (UK), BEA regional (US), ABS state accounts (AU) — none currently ready. v1 uses BLS metro earnings + FHFA/Zillow US housing (via OWID mirror for
+  Zillow) + OECD regional wage approximations for UK and AUS. Substantive v2 promotion requires the three national fetchers. Supply-elasticity coding sheet will be committed to data/manual/housing_supply_elasticity.csv
+  with Saiz, Hilber-Vermeulen, Kendall-Tulip values.
+
+  '

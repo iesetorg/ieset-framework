@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mitterrand_nationalised_firm_efficiency
+version: 1
+status: draft
+topic: monetary
+claim: Mitterrand 1981-1983 nationalisations of banking and industry did not produce the predicted efficiency collapse in the nationalised firms relative to private peers during their nationalised years,
+  though macro outcomes were affected by FX pressure.
+notes: Origin is auto-generated coverage-gap stub seeded from market-socialist framing of the Mitterrand 1981-83 nationalisations as not producing the predicted firm-level efficiency collapse. Human review
+  required before promotion.
+prior_confidence: 0.45
+disclosure: Author has market-liberal priors and would expect a measurable nationalisation efficiency penalty; framing risks under-weighting the FX-pressure and U-turn macro confound that ran in parallel.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Callaway-Sant''Anna DiD on FRA firms 1978-1986: nationalised-1981/82 cohort vs matched private peers; TFP and ULC ATT |effect|<5% with p>0.10 supports null-efficiency-collapse claim.'
+evidence_type: associational
+scope:
+  period:
+  - 1981
+  - 1986
+  countries:
+  - FRA
+  outcome_dim:
+  - productivity
+  - industrial_capability
+  policy_family:
+  - privatisation_nationalisation
+  - industrial_policy
+  treatment_tags:
+  - mitterrand_nationalisations_1981
+covers_claims:
+- position_id: market_socialist
+  claim_index: 12
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Market socialist claim that Mitterrand 1981-1983 nationalised firms did not show efficiency collapse vs private peers during nationalised years; direct alignment with hypothesis claim and scope.
+estimator:
+  template: did_callaway_santanna
+  clustering: firm
+  notes: 'Stub-level estimator pin for runnability audit. Difference-in-differences (Callaway-Sant''Anna staggered) on French firms 1978-1986: nationalised-in -1981/82 firms vs matched private peers, outcomes
+    are TFP, value-added per worker, and unit labour cost. Macro FX-pressure controls included. Falsification rule and variables block remain to be filled when this stub is promoted from draft.
+
+    '
+sample:
+  countries:
+  - FRA
+  period:
+  - 1978
+  - 1986
+  temporal_structure: panel
+  exclusion_rules:
+  - panel is firm-level; FRA-only since the comparator group is private French firms
+variables:
+  outcome:
+  - name: total_factor_productivity
+    source: eu_klems:tfp_industry
+    transformation: log_level
+    notes: 'TODO: EU KLEMS earliest covers 1970+ for FRA at industry level; firm-level TFP requires INSEE BRN/SUSE — manual-drop.'
+  - name: value_added_per_worker
+    source: eu_klems:value_added_per_worker
+    transformation: log_level
+  - name: unit_labour_cost
+    source: eu_klems:unit_labour_cost; oecd:ULCEEQ01
+    transformation: log_level
+  treatment:
+  - name: nationalised_firm_indicator
+    source: 'constructed: binary = 1 for the 1981-82 nationalised firms (Saint-Gobain, Pechiney, Rhône-Poulenc, Thomson, CGE, BNP, CL, SG, Suez, Paribas, Indosuez)'
+    transformation: binary
+  - name: nationalisation_event
+    source: 'constructed: event date = 1982-02-13 (Loi de nationalisation); secondary 1981-09 (announcement)'
+    transformation: event_date
+  controls:
+  - name: industry_fixed_effects
+    source: 'constructed: 2-digit NACE industry dummies'
+    transformation: categorical
+  - name: real_franc_eer
+    source: bis:WS_EER_M
+    transformation: log_diff
+    notes: Captures the three FRA franc devaluations (1981-10, 1982-06, 1983-03) under the Mitterrand U-turn.
+  - name: macro_real_gdp_growth_fra
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_change_yoy

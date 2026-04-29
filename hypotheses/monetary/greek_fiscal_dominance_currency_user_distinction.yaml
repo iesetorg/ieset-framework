@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: greek_fiscal_dominance_currency_user_distinction
+version: 1
+status: draft
+topic: monetary
+claim: Greek fiscal crisis 2010-2015 was fundamentally a currency-user crisis (Greece issued no sovereign euro), not evidence of fiscal limits on sovereign currency-issuers.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT framing of Greece 2010-15 as a currency-user (not currency-issuer) crisis. Human review required before promotion.
+prior_confidence: 0.55
+disclosure: Author finds the currency-user/issuer distinction analytically useful but is wary of the full MMT package; framing risks treating ICELAND-style devaluation as cleanly transferable.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Event-study around May-2010, Mar-2012 PSI, and Jul-2015 capital-controls; Greek GGB spread response > non-eurozone peripheral (e.g. ISL) by >500bp at p<0.10 supports currency-user mechanism.
+evidence_type: associational
+scope:
+  period:
+  - 2010
+  - 2015
+  countries:
+  - GRC
+  - EUROZONE
+  outcome_dim:
+  - fiscal_policy
+  - financial_crisis
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  treatment_tags:
+  - eurozone_sovereign_debt_crisis_2010
+  - greek_debt_crisis
+  - euro_currency_user_constraint
+covers_claims:
+- position_id: mmt
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT claim that the Greek 2010-15 fiscal crisis was a currency-user crisis (Greece issued no sovereign euro), not evidence of fiscal limits on sovereign currency-issuers.
+estimator:
+  template: event_study
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Event-study around the May-2010 first Greek bailout / Mar-2012 PSI / Jul-2015 capital controls; outcome is GGB spread, redenomination probability,
+    and GDP contraction relative to non-eurozone peripherals. Mechanism contrasts currency-user constraint vs sovereign-currency-issuer counterfactual (e.g. ISL). Falsification rule and variables block
+    remain to be filled when this stub is promoted from draft.
+
+    '
+sample:
+  countries:
+  - GRC
+  - ISL
+  - IRL
+  - PRT
+  - ESP
+  - ITA
+  - GBR
+  period:
+  - 2007
+  - 2018
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: sovereign_yield_10y
+    source: ecb:financial_markets_yields_10yr; eurostat:irt_lt_mcby_a; fred:IRLTLT01ISM156N
+    transformation: level
+    notes: GGB 10y, ISL 10y, peripheral euro-area benchmarks; ISL via FRED IRLTLT mirror.
+  - name: real_gdp_growth
+    source: eurostat:nama_10_gdp; world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_change_yoy
+  - name: sovereign_cds_5y
+    source: academic:bloomberg_cds
+    transformation: level
+    notes: 'TODO: 5y sovereign CDS spreads via Bloomberg/Markit — manual-drop required.'
+  treatment:
+  - name: greek_crisis_event
+    source: 'constructed: events = 2010-05 (first bailout), 2012-03 (PSI), 2015-07 (capital controls / referendum)'
+    transformation: event_date
+  - name: currency_user_indicator
+    source: 'constructed: binary = 1 for euro-area members (no sovereign monetary policy), 0 for ISL/GBR'
+    transformation: binary
+  controls:
+  - name: government_debt_pct_gdp
+    source: imf:GGXWDG_NGDP; eurostat:gov_10dd_edpt1
+    transformation: level
+  - name: current_account_pct_gdp
+    source: imf:BCA_NGDPD
+    transformation: level
+  - name: ecb_policy_rate
+    source: ecb:FM:STN; bis:WS_CBPOL
+    transformation: level

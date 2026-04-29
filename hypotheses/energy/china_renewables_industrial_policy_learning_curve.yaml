@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_renewables_industrial_policy_learning_curve
+version: 1
+status: draft
+topic: energy
+claim: China's state-directed solar and wind manufacturing scale-up 2005-2020 delivered cost reductions
+  on learning curves faster than any market-led OECD programme, demonstrating planning-led industrial
+  policy's ecological potential.
+scope:
+  period: [2005, 2020]
+  countries: [CHN, OECD]
+  outcome_dim: [energy, industrial_capability, productivity]
+  policy_family: [industrial_policy, energy_policy]
+  treatment_tags: [china_solar_scaleup, china_wind_scaleup, china_renewables_industrial_policy]
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Claim text matches hypothesis claim verbatim: China state-directed renewables scale-up 2005-2020 outpacing market-led OECD on learning curves. Direct alignment."
+notes: Maps the eco-socialist school's China-renewables-learning-curve claim to a CHN vs OECD-cohort
+  comparative learning-rate analysis. Estimator and prior set; full pre-registration awaits steelman
+  + human sign-off.
+prior_confidence: 0.65
+disclosure: Author prior accepts the level fact (China dominates solar+wind manufacturing cost
+  declines) but is uncertain about the planning-vs-market causal attribution — German FIT-induced
+  demand pull was a significant fraction of total learning, and tariff policy / IP transfers
+  confound a clean planning-led story.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Compare estimated solar-PV and wind-turbine learning rates (cost decline per cumulative-doubling) between CHN and OECD cohorts 2005-2020 (BNEF/IRENA series). Refute if CHN learning rate not statistically faster than OECD median at p<0.10.'
+evidence_type: associational
+sample:
+  countries: [CHN, USA, DEU, JPN, KOR, ESP, ITA, GBR, FRA, DNK]
+  period: [2005, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing IRENA / EIA cumulative installed capacity series"
+variables:
+  outcome:
+    - name: solar_pv_module_cost_usd_per_w
+      source: "irena:solar_pv_costs"
+      transformation: log
+      notes: "IRENA renewable cost database — module $/W. Primary learning-curve outcome. TODO swarm-6e: confirm exact series id when irena fetcher schema lands."
+    - name: wind_turbine_lcoe_usd_per_mwh
+      source: "irena:wind_lcoe"
+      transformation: log
+      notes: "IRENA onshore wind LCOE. Secondary learning-curve outcome."
+  treatment:
+    - name: china_renewables_industrial_policy_indicator
+      source: "constructed: indicator = 1 for CHN from 2005 onwards (Renewable Energy Law) covering solar+wind manufacturing scale-up"
+      transformation: indicator
+    - name: cumulative_installed_capacity_log
+      source: "irena:capacity"
+      transformation: log
+      notes: "Learning-curve x-axis: cumulative MW installed (CHN vs OECD donor pool)."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+estimator:
+  template: descriptive
+  notes: >
+    Two-cohort learning-rate comparison. Estimate solar-PV and wind-turbine
+    learning rates (log cost on log cumulative capacity) separately for CHN
+    and the OECD donor pool 2005-2020 using IRENA cost-and-capacity panels.
+    Compare slope coefficients with bootstrap CIs. Descriptive — does NOT
+    identify ownership-vs-demand-pull mechanism.

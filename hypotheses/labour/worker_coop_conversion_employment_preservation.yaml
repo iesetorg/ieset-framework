@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: worker_coop_conversion_employment_preservation
+version: 1
+status: draft
+topic: labour
+claim: Worker cooperative conversions (US Main Street Employee Ownership Act 2018, Italian Marcora Law
+  1985) preserve employment in firms that would otherwise close.
+notes: Stub seeded from a market-socialist school prediction about worker-coop conversion employment
+  preservation. Self-selection into conversion is severe; needs human review of matched-comparator strategy.
+prior_confidence: 0.50
+disclosure: Author's market-liberal priors are skeptical of cooperative-conversion scalability beyond crisis
+  cases; could under-weight evidence of preserved employment in conversion firms and over-weight
+  selection-into-conversion as the principal explanation for the matched-comparison gap.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Callaway-Sant'Anna staggered DiD on Marcora and Main Street Act conversions vs matched-distress
+    closure comparators 1985-2023; supported if 5y survival rate exceeds comparator by >20pp at p<0.10.
+evidence_type: associational
+
+sample:
+  countries: [USA, ITA]
+  period: [1985, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop firms missing pre-conversion employment observations"
+    - "winsorise firm-level employment changes at 1st/99th sample percentile"
+
+variables:
+  outcome:
+    - name: firm_survival_indicator
+      source: "derived:firm_survival_panel"
+      transformation: indicator
+      notes: >
+        Hand-coded from Italian Marcora-conversion case files plus US
+        Main Street Employee Ownership Act registry. TODO surface via
+        registered Italian publisher (istat) and us_census BDS when
+        available.
+    - name: firm_employment
+      source: "derived:firm_employment_panel"
+      transformation: log
+      notes: "Hand-coded firm-level employment from same case files."
+    - name: firm_real_wage
+      source: "derived:firm_wage_panel"
+      transformation: log
+    - name: regional_cooperative_employment_share
+      source: "eurostat:nama_10r_2emhrw"
+      transformation: share
+      notes: "Stop-gap regional aggregate from Eurostat regional accounts."
+  treatment:
+    - name: coop_conversion_event
+      source: "derived:coop_conversion_dates"
+      transformation: indicator
+      notes: >
+        Treatment timing: ITA = Marcora conversion date (1985-onwards
+        rolling); USA = Main Street EOA conversion date (2018-onwards).
+  controls:
+    - name: matched_closure_pretrend
+      source: "derived:matched_closure_donors"
+      transformation: ratio
+      notes: >
+        Donor pool of similar-distress firms that closed instead of
+        converting. Matching on size, sector, region pretrends.
+    - name: gdp_per_capita_real
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+
+scope:
+  period: [1985, 2023]
+  countries: [USA, ITA]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, institutional_reform]
+  treatment_tags: [employee_ownership_plans, marcora_law_1985, main_street_employee_ownership_act_2018]
+
+covers_claims:
+  - position_id: market_socialist
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Market socialist predicts worker-coop conversions preserve employment in firms that would otherwise close; Phase 4C should verify counterfactual — matched closure comparators — since self-selected coop-conversion firms may differ systematically from closed firms on survival-relevant covariates."
+
+estimator:
+  template: did_callaway_santanna
+  clustering: firm
+  fixed_effects: [firm, year]
+  notes: >
+    Staggered DiD across worker-coop conversions (Italy Marcora-law
+    conversions, US Main Street Employee Ownership Act) using
+    matched-closure comparators (firms with similar pre-conversion
+    distress signals that closed instead of converting). Outcomes:
+    survival, employment, wages.

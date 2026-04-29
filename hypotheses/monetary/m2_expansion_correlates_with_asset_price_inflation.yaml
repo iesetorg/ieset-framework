@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: m2_expansion_correlates_with_asset_price_inflation
+version: 1
+status: pre_registered
+topic: monetary
+claim: 'Monetary base expansion (M2 growth) correlates with asset price inflation in equities and real estate with a lag, measurable via cointegration and lead-lag analysis across major developed economies
+  2008-2025. The relationship is asymmetric across asset classes and does not require a strict Austrian Business Cycle mechanism to hold.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - JPN
+  - AUS
+  - CAN
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  period:
+  - 2008
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop if missing > 20% of M2 series across period
+  - drop if asset price index series has methodology break mid-period without bridge
+variables:
+  outcome:
+  - name: equity_index_real_returns
+    source: oecd:KEI:SHCPI
+    transformation: real_yoy_pct_change_base_2015
+  - name: real_estate_price_index_real
+    source: bis:WS_LONG_PP
+    transformation: real_yoy_pct_change_base_2015
+  - name: cpi_core
+    source: oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_N_CP,1.0
+    transformation: yoy_pct_change
+  treatment:
+  - name: m2_growth_annualised
+    source: fred:M2SL (USA); ecb:BSI (EU); boe:LPMAUYM (GBR); boj:MA (JPN); rba:D3 (AUS); statcan:v41552796 (CAN)
+    transformation: yoy_pct_change
+intervention_channel: fiscal
+intervention_channel_justification: 'M2 growth is treated as the fiscal-adjacent monetary channel; regulatory interventions (e.g., macroprudential rules, Basel III) are not in scope of this hypothesis and
+  are measured separately.
+
+  '
+estimator:
+  template: cointegration_vecm
+  clustering: country
+  fixed_effects:
+  - country
+  notes: 'Johansen test for cointegration rank; VECM with country fixed effects; lead-lag analysis via cross-correlation functions reported alongside. Robustness: panel-ARDL as secondary specification.
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if BOTH asset classes (real equity total return AND real housing total return) show (a) at least 6 of 10 spec countries with a non-negative Pearson
+    correlation between M2-growth(t-1) and real-asset-return(t), AND (b) a panel mean lag-1 correlation > 0. PARTIAL if exactly one asset class clears (consistent with the spec''s "asymmetric across asset
+    classes" clause but not the symmetric reading). REFUTED if both asset classes fail both legs. INFORMATIVE: contemporaneous correlations and the sign distribution across countries are reported in diagnostics
+    for transparency. METHOD_VALID: JST Macrohistory must contain money + asset-return series for at least 8 of 10 spec countries with >=5 annual observations each in 2008-2020.'
+  test: panel_lag1_correlation_dual_asset_class
+  threshold: 'PRIMARY: For each asset class, n_countries_with_nonneg_lag1_corr >= 6 AND panel_mean_lag1_corr > 0. SUPPORTED iff both asset classes pass; PARTIAL iff exactly one passes; REFUTED iff neither
+    passes.'
+methodology_note: v1 promotion (2026-04-27). Sharpened the spec's generic two-test falsification rule (Johansen rank + lead-lag) to a panel-correlation primary because (a) annual JST data over 13 years
+  is too thin for stable Johansen ranks per country, (b) the spec's ">=6 of 10 countries with positive lag-weighted cross-correlation" threshold is directly operationalisable as the lag-1 sign-tally test
+  used here, and (c) the spec's "asymmetric across asset classes" clause is honoured by treating one-class-only success as `partial` rather than `supported`. JST vintage stops at 2020 so the 2021-2025 tail
+  of the spec period is uncovered; this is flagged as a coverage gap, not a refutation. A v2 promotion using quarterly BIS WS_SPP property prices + national M3 series can restore the cointegration design.
+prior_confidence: 0.72
+disclosure: 'Author holds market-liberal priors and has disclosed cryptocurrency and real estate positions. A supported outcome here has some favourable implication for hard-asset investment theses; this
+  is noted but does not change the pre-registered specification.
+
+  '
+conflict_disclosure: 'Author holds real-estate positions across East Asia and Latin America and cryptocurrency positions. A supported result is materially consistent with the author''s investment thesis. Per DISCLOSURE.md, this is flagged per-hypothesis.
+
+  '
+steelman: hypotheses/steelman/m2_expansion_correlates_with_asset_price_inflation.md
+linked_hypotheses:
+- fiat_expansion_erodes_currency_purchasing_power_long_run
+notes: 'Scope decision per mega-spec D.1.5: this hypothesis does NOT extend to claiming ABCT orthodoxy holds, nor that QE necessarily produces CPI inflation. The empirical claim is scoped to asset-price
+  correlation with M2 growth across major developed economies post-2008.
+
+  '
+scope:
+  period:
+  - 2008
+  - 2025
+  countries:
+  - USA
+  - GBR
+  - JPN
+  - AUS
+  - CAN
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - OECD
+  outcome_dim:
+  - monetary_policy
+  - financialisation
+  - housing
+  - inflation
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - m2_expansion
+  - qe_post_2008
+  - asset_price_lag
+  - financialisation_era
+  - minsky_financial_instability
+covers_claims:
+- position_id: austrian
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Austrian claim that monetary expansion produces asset-price inflation with a lag; hypothesis covers developed-economy panel 2008-2025 (claim period 1990-2023 partly overlaps).
+- position_id: chicago_monetarism
+  claim_index: 1
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Chicago-monetarist claim of M2-growth/asset-price lag; directly covered by the 10-country panel 2008-2025.
+- position_id: marxian
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Marxian reading of M2-asset-price correlation as financialisation of surplus; same panel covers the claim.
+- position_id: post_keynesian
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Post-Keynesian Minsky-financial-instability framing of M2-asset-price co-movement; directly covered by the developed-economy panel.

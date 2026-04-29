@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: norway_gpfg_resource_curse_avoidance
+version: 1
+status: draft
+topic: resource_rents
+claim: Norwegian GPFG sovereign wealth fund (Oljefondet, founded 1990) demonstrates that collective ownership
+  of resource rents with market-based management can avoid resource-curse outcomes.
+notes: Origin is auto-generated coverage-gap stub seeded from market-socialist framing of GPFG as
+  collective-ownership-plus-market-management resource-curse avoidance. Human review required.
+prior_confidence: 0.65
+disclosure: Author has market-liberal priors and is generally favourable toward the GPFG model;
+  framing risks attributing avoidance to fund design when pre-existing Norwegian institutional quality may dominate.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Synthetic control of Norway 1990-2023 vs hydrocarbon-dependent donor pool (RUS, VEN, SAU, NGA);
+    institutional-quality and TFP gap >0.5 SD positive with placebo p<0.10 supports avoidance claim.'
+evidence_type: associational
+
+scope:
+  period: [1990, 2023]
+  countries: [NOR]
+  outcome_dim: [institutional_quality, capital_flows]
+  policy_family: [institutional_reform, fiscal_policy]
+  treatment_tags: [norway_gpfg_1990]
+sample:
+  countries: [NOR, RUS, VEN, SAU, NGA, AGO, DZA, KAZ, AZE, ECU, GAB]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "donor pool excludes NOR for synthetic-control fit"
+    - "drop country-years missing real GDP per capita or institutional-quality series"
+variables:
+  outcome:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+      notes: "WDI real GDP per capita as primary outcome — resource-curse avoidance manifests as growth path divergence vs donor pool."
+    - name: institutional_quality_wgi
+      source: "wgi:GovernmentEffectiveness"
+      transformation: level
+      notes: "WGI government effectiveness; available 1996+. Pre-1996 backseries from V-Dem polyarchy."
+    - name: institutional_quality_vdem
+      source: "vdem:v2x_polyarchy"
+      transformation: level
+    - name: log_tfp_pwt
+      source: "pwt:rtfpna"
+      transformation: log
+  treatment:
+    - name: norway_gpfg_indicator
+      source: "constructed: indicator = 1 for NOR years >= 1990 (GPFG / Oljefondet inception). Donor pool = hydrocarbon-dependent peers (RUS, VEN, SAU, NGA, etc.)."
+      transformation: indicator
+    - name: oil_rent_share_gdp
+      source: "world_bank_wdi:NY.GDP.PETR.RT.ZS"
+      transformation: level
+      notes: "WDI oil rent % GDP — captures resource-dependence intensity."
+  controls:
+    - name: log_gdp_per_capita_initial
+      source: "maddison:rgdpnapc"
+      transformation: log
+      notes: "1990 starting condition (Solow-style)."
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-DiD with NOR as treated unit and hydrocarbon-dependent donor
+    pool (RUS, VEN, SAU, NGA, AGO, DZA, KAZ, AZE, ECU, GAB). Pre-treatment
+    fit window 1985-1989; post-treatment 1990-2023. Outcomes: log real GDP
+    per capita, institutional quality (WGI/V-Dem). Caveat: pre-existing
+    Norwegian institutional quality (1990 baseline already strong) means
+    treatment effect on institutions is likely small; growth-path
+    divergence is the cleaner test.
+
+covers_claims:
+  - position_id: market_socialist
+    claim_index: 6
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Market-socialist position predicts Norway GPFG's collective-ownership-plus-market-management design avoids resource-curse outcomes; hypothesis tests that proposition directly."
+

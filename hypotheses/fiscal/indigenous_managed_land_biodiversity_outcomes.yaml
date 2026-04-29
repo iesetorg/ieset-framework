@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: indigenous_managed_land_biodiversity_outcomes
+version: 1
+status: draft
+topic: fiscal
+claim: Indigenous-managed territories (documented across Amazon basin, Canadian First Nations, Australian
+  Indigenous Protected Areas) retain higher biodiversity and lower deforestation than state-protected
+  or privately-held land of matched biome.
+notes: Maps the eco-socialist school's indigenous-managed-land-outperforms-state-protected claim to a
+  staggered Callaway-Sant'Anna DiD on parcel-level satellite forest-cover data with biome-matched
+  controls. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: Author prior aligns with the descriptive finding (Walker et al. 2020 and Garnett et al. 2018
+  document indigenous-territory deforestation rates lower than matched control parcels in the Amazon
+  basin) but is uncertain about external validity beyond the Amazon — the Australian IPA and Canadian
+  First Nations comparisons are based on smaller and shorter samples.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if the
+    Callaway-Sant'Anna ATT on parcel-level annual forest-cover loss
+    (indigenous-managed minus biome-matched control parcels, 2000-2023,
+    pooled across BRA/PER/COL/ECU/BOL/CAN/AUS) is at most -20% in
+    relative terms (i.e. indigenous-managed parcels lose <=80% of the
+    forest-cover that matched controls lose) AND the effect does not
+    reverse sign in the Australian IPA subset. REFUTED if the pooled
+    ATT is positive OR the sign reverses in the IPA subset.
+    INFORMATIVE: country-level dispersion of the ATT (reported in
+    diagnostics) and pre-trend test on the 5-year pre-designation
+    event-time leads.
+    METHOD_VALID: parcel-level NOAA-VIIRS forest-cover (or Hansen GFC)
+    composite available with at least 5,000 parcel-years per country;
+    indigenous-territory designation dates compiled from FUNAI / DCCEEW
+    / First Nations registries for at least 80% of treated parcels.
+    Failure of METHOD_VALID emits `inconclusive (data gap on
+    <publisher>:<series>)` rather than `refuted`.
+  test: cs_did_indigenous_vs_matched_parcels_2000_2023
+  threshold: >-
+    PRIMARY: pooled CS-DiD ATT on annual forest-cover loss <= -20%
+    relative to matched controls AND Australian-IPA-subset ATT
+    same-signed as pooled.
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic
+  falsification rule to a dispositive primary: pooled CS-DiD ATT on
+  parcel-level forest-cover loss <= -20% relative to matched controls
+  AND no sign-flip in the Australian IPA subset. The 20% threshold is
+  drawn from the Walker et al. 2020 / Garnett et al. 2018 effect-size
+  range that the eco-socialist school cites.
+  Run-time data check: the dispositive outcome series
+  noaa_viirs:forest_cover (parcel-level) and the cross-check
+  faostat:forest_area are not on disk (only NOAA-VIIRS night-lights
+  and crop-production parquets exist). Replication.py emits
+  `inconclusive (data gap)` and lists the missing fetchers; no
+  fabrication, no silent series substitution. Re-run when the parcel
+  fetcher and indigenous-territory designation registry land.
+evidence_type: associational
+
+sample:
+  countries: [BRA, PER, COL, ECU, BOL, CAN, AUS]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop parcels with biome reclassification mid-sample (parcel-level biome change > 20% area is a measurement-regime break)"
+    - "drop years preceding satellite-coverage availability per parcel (NOAA-VIIRS coverage from 2012, Hansen GFC from 2000)"
+
+variables:
+  outcome:
+    - name: forest_cover_loss_pct_per_year
+      source: "noaa_viirs:forest_cover; faostat:forest_area"
+      transformation: pct_loss_yoy
+      notes: "Primary outcome. NOAA-VIIRS active-fire and forest-cover composites; FAOSTAT national-aggregate forest area as cross-check."
+    - name: protected_area_extent
+      source: "faostat:protected_area_km2; world_bank_wdi:ER.LND.PTLD.ZS"
+      transformation: pct_total_land
+    - name: deforestation_rate_amazon_basin
+      source: "noaa_viirs:active_fire_amazon (composite product covering BRA, PER, COL, ECU, BOL)"
+      transformation: hectares_lost_per_year
+      notes: "Region-specific outcome for Amazon-basin parcels."
+  treatment:
+    - name: indigenous_managed_indicator
+      source: "constructed: parcel-year indicator = 1 from official designation date of indigenous territory / IPA / First-Nations comanagement; 0 prior or for matched non-indigenous parcels"
+      transformation: binary
+      notes: "Designation dates compiled from: BRA FUNAI Terras Indígenas registry; AUS Indigenous Protected Areas registry (DCCEEW); CAN Indigenous Guardians programme; PER/COL/ECU/BOL national territorial registries (manual compilation flagged as TODO)."
+    - name: years_since_designation
+      source: "derived: parcel_year_minus_designation_year (negative for pre-treatment)"
+      transformation: integer_years
+      notes: "Used for event-time leads/lags in the Callaway-Sant'Anna staggered-DiD."
+  controls:
+    - name: parcel_slope_mean
+      source: "noaa_viirs:srtm_elevation_derived"
+      transformation: degrees
+      notes: "Time-invariant matching covariate."
+    - name: parcel_distance_to_road_km
+      source: "manual: OSM road-network distance, snapshot-2010"
+      transformation: km
+      notes: "Time-invariant matching covariate. TODO: OSM not a registered publisher; flag as a manual-drop or proxy via fallback."
+    - name: country_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: real_log
+    - name: country_agriculture_value_added
+      source: "world_bank_wdi:NV.AGR.TOTL.ZS; faostat:agricultural_value_added"
+      transformation: pct_gdp
+      notes: "Captures agricultural-frontier pressure on forested land."
+
+scope:
+  period: [1971, 2023]
+  countries: [BRA, PER, COL, ECU, BOL, CAN, AUS, LATAM]
+  outcome_dim: [institutional_quality, energy]
+  policy_family: [institutional_reform, regulation]
+  treatment_tags: [indigenous_protected_areas, amazon_indigenous_territories, first_nations_land_management]
+
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 13
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Eco-socialist position claims indigenous-managed territories outperform state-protected and private land on biodiversity/deforestation in matched biomes; hypothesis tests exactly that comparison across Amazon basin, First Nations, and IPAs."
+
+estimator:
+  template: did_callaway_santanna
+  clustering: territory
+  fixed_effects: [territory, year]
+  notes: >
+    Staggered DiD comparing indigenous-managed parcels to matched
+    state-protected and private parcels in the same biomes, using
+    designation dates as treatment timing. Outcomes: deforestation
+    rate, biodiversity index. Matching on biome, slope, accessibility
+    pre-designation.

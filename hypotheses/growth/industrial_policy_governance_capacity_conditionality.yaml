@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_policy_governance_capacity_conditionality
+version: 1
+status: draft
+topic: growth
+claim: 'Industrial policy outcomes are bimodal by governance capacity: high-capacity states (Korea, Taiwan,
+  Singapore) produce positive returns; low-capacity states produce rent-capture and white-elephants.'
+notes: Seeded from an empirical-pragmatist claim that industrial-policy returns are bimodal in state capacity.
+  Cross-country panel with capacity interaction; human review needed for governance-capacity index choice
+  and the bimodality threshold.
+prior_confidence: 0.65
+disclosure: >-
+  Authorial bias risk: governance-capacity indices (rule-of-law, bureaucratic-quality) are partly outcome-correlated (rich high-capacity states grow regardless), creating circularity; pragmatist framing packages this risk as "obvious.".
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Panel FE of manufacturing-share growth on industrial-policy intensity x governance-capacity (WGI) interaction,
+    country and year FE, 1971-2023; falsified if interaction term not positive at p<0.05 above median capacity.'
+evidence_type: associational
+
+sample:
+  countries: [KOR, TWN, SGP, JPN, CHN, MYS, THA, IDN, IND, PHL, VNM, BRA, ARG, MEX, CHL, COL, PER, EGY, NGA, KEN, GHA, ZAF, ETH, TUR]
+  period: [1971, 2019]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+
+  treatment:
+    - name: government_effectiveness
+      source: "wgi:GE.EST"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: control_of_corruption
+      source: "wgi:CC.EST"
+      transformation: level
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Cross-country panel of industrial-policy episodes interacted with a
+    governance-capacity index (state capacity, rule of law, bureaucratic
+    quality). Outcome: manufacturing-share growth and TFP. Tests for the
+    bimodal interaction term: positive returns above a capacity threshold,
+    rent-capture below.
+
+scope:
+  period: [1971, 2023]
+  countries: [KOR, TWN, SGP, GLOBAL]
+  outcome_dim: [industrial_capability, gdp_growth, institutional_quality]
+  policy_family: [industrial_policy, institutional_reform]
+  treatment_tags: [east_asian_developmental_state, industrial_policy_programs, park_chung_hee_developmental_state, epb_korea, hci_plan_korea, export_discipline_korea]
+
+covers_claims:
+  - position_id: empirical_pragmatist
+    claim_index: 4
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether industrial-policy outcomes are bimodal by governance capacity (high-capacity positive; low-capacity rent-capture)."
+  - position_id: institutionalism
+    claim_index: 4
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalist claim that Park Chung-hee 1961-1979 institutions (EPB, HCI Plan, export-discipline) drove Korean takeoff; relinked from industrial_policy_developmentalist_states_growth (Phase 4C) — governance-capacity-conditionality framing matches institutionalist reading."
+

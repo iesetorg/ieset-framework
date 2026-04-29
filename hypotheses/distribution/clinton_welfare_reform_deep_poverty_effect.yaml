@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: clinton_welfare_reform_deep_poverty_effect
+version: 1
+status: draft
+topic: distribution
+claim: Clinton welfare reform 1996 (TANF) reduced the income floor for single-parent households in recessions
+  and raised deep-poverty rates among children, consistent with democratic-socialist critique of means-tested
+  conditionality.
+notes: Maps the democratic-socialist school's PRWORA-deep-poverty critique to a US state-year event study
+  around 1996. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.55
+disclosure: Author is partially sympathetic to the welfare-reform critique on deep poverty (Edin/Shaefer
+  literature is suggestive) but cautious because EITC expansion and 1990s wage growth confound the TANF
+  effect; the event-study spec relies on state TANF adoption timing for identification.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: State-year event study (1990-2012) of single-parent deep-poverty rate (<50% FPL, CPS ASEC) on
+    TANF block-grant adoption timing; state+year FE, state-clustered SEs. Refute if post-1996 ATT non-positive
+    at p<0.10.
+sample:
+  countries:
+  - USA
+  period:
+  - 1990
+  - 2012
+  temporal_structure: panel
+  exclusion_rules:
+  - drop state-years missing CPS ASEC observations
+  - winsorise deep-poverty rates at state-1st/99th percentiles within sample
+variables:
+  outcome:
+  - name: deep_poverty_rate_single_parent_households
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level
+    notes: 'Placeholder via WB headcount-at-poverty-line series. Native source is US Census CPS ASEC deep-poverty
+      (under-50%-of-poverty- line) for single-parent households — TODO add us_census fetcher wiring or
+      BLS proxy when registered.
+
+      '
+  - name: tanf_caseload_per_eligible
+    source: fred:STTMINWGCA
+    transformation: ratio
+    notes: 'TANF caseload-to-eligible ratio. FRED hosts state-level TANF caseload; series ID approximate,
+      verify on wiring. Captures first-stage policy bite.
+
+      '
+  treatment:
+  - name: tanf_block_grant_adoption
+    source: derived:tanf_state_adoption_dates
+    transformation: indicator
+    notes: 'State-level TANF/PRWORA implementation dates (1996-1997). Hand- coded under derived/.
+
+      '
+  controls:
+  - name: state_unemployment_rate
+    source: fred:UNRATE
+    transformation: level
+    notes: 'FRED state unemployment series (LAUST*) for state panel; UNRATE is national fallback.
+
+      '
+  - name: state_minimum_wage
+    source: fred:STTMINWGCA
+    transformation: level
+    notes: 'FRED hosts state-level minimum-wage histories. Series ID is the California exemplar; per-state
+      series swapped at wiring.
+
+      '
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+evidence_type: associational
+scope:
+  period:
+  - 1996
+  - 2012
+  countries:
+  - USA
+  outcome_dim:
+  - poverty_inequality
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  treatment_tags:
+  - clinton_welfare_reform_1996
+  - tanf_1996
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Democratic-socialist claim and hypothesis claim are textually identical — Clinton/TANF 1996 deep-poverty
+    effect for single-parent households.
+estimator:
+  template: event_study
+  clustering: state
+  fixed_effects:
+  - state
+  - year
+  notes: 'Event study around the 1996 PRWORA enactment using US state-year panel of single-parent deep-poverty
+    rates (CPS ASEC). Treatment timing pinned to TANF block-grant adoption dates by state. Pre- trend
+    window 1990-1995 anchors counterfactual; post-window 1996-2012 captures recession-stress dynamics.
+
+    '

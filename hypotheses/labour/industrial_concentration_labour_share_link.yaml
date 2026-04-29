@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_concentration_labour_share_link
+version: 1
+status: draft
+topic: labour
+claim: Industrial concentration (top-4 firm share) in US manufacturing and retail sectors rose 1997-2020 alongside declining labour share, consistent with monopolisation tendency.
+notes: Stub seeded from a Marxian school prediction about rising industrial concentration co-moving with declining labour share. Intangibles-measurement and sector-mix shifts are major confounds; needs
+  human review of robustness controls.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors view rising concentration as partly reflecting superstar-firm productivity rather than rent extraction; could under-weight Marxian rent-capture interpretation
+  and over-attribute the labour-share decline to intangibles-measurement artefacts.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: US industry-year panel FE regression of labour share of value added on CR4/HHI 1997-2020 with industry/year FE and intangibles-intensity control; supported if concentration coefficient is negative
+    at p<0.10 and labour-share decline >2pp across the period.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period:
+  - 1997
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - drop industry-years missing concentration measures
+  - winsorise labour-share changes at 1st/99th sample percentile within industry
+variables:
+  outcome:
+  - name: labour_share_of_value_added
+    source: pwt:labsh
+    transformation: level
+    notes: 'Penn World Table labour share of value added — country-level spine; industry-level decomposition requires BEA GDP-by-industry (not yet registered). TODO add BEA fetcher.
+
+      '
+  - name: nonfarm_compensation_share
+    source: fred:W270RE1A156NBEA
+    transformation: level
+    notes: FRED nonfarm-business compensation share of GDP.
+  treatment:
+  - name: industry_concentration_cr4
+    source: derived:bea_compustat_industry_cr4
+    transformation: level
+    notes: 'Hand-coded CR4 (top-4 firm share) by NAICS industry from Census economic-census tabulations. TODO surface via us_census publisher when registered.
+
+      '
+  - name: industry_hhi
+    source: derived:bea_compustat_industry_hhi
+    transformation: level
+    notes: Hand-coded Herfindahl-Hirschman Index by industry.
+  - name: intangible_investment_share
+    source: oecd:OECD.SDD.TPS,DSD_PDB@DF_PDB_PT,1.0
+    transformation: level
+    notes: 'OECD productivity database intangibles intensity — robustness control for measurement-shift critique.
+
+      '
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: union_density
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TUD,1.0
+    transformation: level
+scope:
+  period:
+  - 1997
+  - 2020
+  countries:
+  - USA
+  outcome_dim:
+  - competition_concentration
+  - labour_share
+  policy_family:
+  - competition_policy
+  - labour_market
+  treatment_tags:
+  - us_post_bork_doctrine_1980
+  - monopolisation_tendency
+covers_claims:
+- position_id: marxian
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Marxian predicts rising industrial concentration co-moves with declining labour share as monopolisation captures surplus; Phase 4C should confirm the association is not driven by sector-mix or
+    intangibles-measurement changes in the post-1997 US economy.
+estimator:
+  template: panel_fe
+  clustering: industry
+  fixed_effects:
+  - industry
+  - year
+  notes: 'US industry-year panel (BEA / Compustat) regressing labour share on concentration measures (CR4, HHI) with industry and year FE. Robustness: control for intangible-investment intensity to address
+    measurement-shift critique.
+
+    '

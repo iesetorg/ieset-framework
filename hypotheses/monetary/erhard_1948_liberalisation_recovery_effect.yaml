@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: erhard_1948_liberalisation_recovery_effect
+version: 1
+status: draft
+topic: monetary
+claim: Erhard's 1948 currency reform and price-control removal produced the fastest recovery in post-war
+  Europe, demonstrating that rules-based market restoration outperforms Bretton-Woods-era rationed economies.
+notes: Origin is auto-generated coverage-gap stub seeded from ordoliberal claim about Erhard's 1948 currency
+  reform driving the Wirtschaftswunder. Human review required before promotion to candidate.
+prior_confidence: 0.6
+disclosure: Author has market-liberal prior favouring the Erhard story; risk is conflating monetary reform
+  with concurrent Marshall Plan effects, the trade-shock-of-recovery base, and political stabilisation.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Event-study around Jun-1948 Deutsche Mark introduction, h=-12..+60 months; industrial production
+    growth >25% above pre-reform trend by h=+24 with p<0.10 vs FRA/GBR/ITA control supports.
+evidence_type: associational
+scope:
+  period:
+  - 1948
+  - 1973
+  countries:
+  - DEU
+  outcome_dim:
+  - gdp_growth
+  - currency_purchasing_power
+  - inflation
+  policy_family:
+  - monetary_policy
+  - institutional_reform
+  treatment_tags:
+  - erhard_1948_currency_reform
+sample:
+  countries:
+  - DEU
+  - FRA
+  - GBR
+  - ITA
+  - BEL
+  - NLD
+  period:
+  - 1946
+  - 1958
+  temporal_structure: panel
+  exclusion_rules:
+  - Maddison annual real-GDP / per-capita series for 1946-1958 (monthly IP indices unavailable consistently
+    across comparators); event-study horizon collapses to annual
+variables:
+  outcome:
+  - name: real_gdp_per_capita
+    source: maddison:gdp_per_capita_2011_intl
+    transformation: log_level
+  - name: industrial_production_index
+    source: academic:mitchell_european_historical_statistics
+    transformation: log_level
+    notes: 'TODO: Mitchell European Historical Statistics; manual-drop required (academic publisher).'
+  - name: cpi_inflation
+    source: academic:mitchell_european_historical_statistics; jst:cpi
+    transformation: pct_change_yoy
+    notes: JST macrohistory database covers DEU/FRA/GBR/ITA back to 1870.
+  treatment:
+  - name: erhard_currency_reform_event
+    source: 'constructed: event date = 1948-06-20 (DM introduction + Leitsätzegesetz)'
+    transformation: event_date
+  - name: price_liberalisation_indicator
+    source: 'constructed: binary = 1 for DEU from 1948-06'
+    transformation: binary
+  controls:
+  - name: marshall_aid_pct_gdp
+    source: academic:marshall_plan_disbursements
+    transformation: level_pct
+    notes: 'TODO: ERP disbursements per country; usually compiled from Milward (1984) or De Long-Eichengreen.'
+covers_claims:
+- position_id: ordoliberal
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Ordoliberal claim that Erhard's 1948 currency reform produced fastest post-war European recovery;
+    direct alignment with hypothesis claim and scope.
+estimator:
+  template: event_study
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Event-study around the Jun-1948 Deutsche Mark
+    introduction and price-control removal; outcomes are industrial production index, retail sales, and
+    CPI at h = -12..+60 months. Comparator: contemporaneous rationed European economies (FRA, GBR, ITA).
+    Falsification rule and variables block remain to be filled when this stub is promoted from draft.
+
+    '

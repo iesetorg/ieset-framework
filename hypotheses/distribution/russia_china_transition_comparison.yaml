@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: russia_china_transition_comparison
+version: 1
+status: draft
+topic: distribution
+claim: Post-1991 Russian mass privatisation produced worse output and distributional outcomes than the
+  Chinese gradualist-with-retained-public-ownership path, controlling for initial conditions.
+notes: Maps the market-socialist school's Russia-vs-China transition-path claim to a documented comparative
+  case study. Estimator and prior set; full pre-registration awaits steelman + human sign-off (n=2 design,
+  descriptive only).
+prior_confidence: 0.55
+disclosure: Author prior accepts the level facts (Russia's 1990s collapse vs China's growth) but treats
+  the privatisation-mode claim as confounded with massive initial-condition differences (rural-agricultural
+  China vs urban-industrial Russia, demographic structure, scale); the n=2 case study cannot separate
+  gradualism from initial conditions.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Side-by-side comparison of RUS vs CHN trajectories (1991-2010) on real GDP per capita, headcount
+    poverty, life expectancy, and Gini. Refute if RUS outcomes are not worse than CHN on at least 3 of
+    4 dimensions over the full window.
+sample:
+  countries:
+  - RUS
+  - CHN
+  period:
+  - 1991
+  - 2010
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: 'n=2 paired-case design. The hypothesis is a side-by-side descriptive comparison
+    of two transition trajectories over a fixed window; each country is its own observation cluster. Identification
+    limits are documented; no causal claim beyond descriptive contrast.
+
+    '
+variables:
+  outcome:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: poverty_headcount_national
+    source: world_bank_wdi:SI.POV.NAHC
+    transformation: level
+  - name: gini_disposable_income
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: top_10_share
+    source: wid:wid_all
+    transformation: level
+    notes: WID top-10 income share — registered wid publisher.
+  treatment:
+  - name: privatisation_pace_indicator
+    source: derived:transition_path_classification
+    transformation: indicator
+    notes: 'Hand-coded indicator: RUS = mass voucher privatisation 1992- 1994; CHN = gradualist with retained
+      public ownership. TODO replace with EBRD transition indicator when registered.
+
+      '
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: oil_price_brent
+    source: imf_pcps:POILBRE
+    transformation: log
+    notes: 'Russia-side commodity-price confound; documents that 1990s Russian collapse coincided with
+      collapsed oil revenues.
+
+      '
+evidence_type: associational
+scope:
+  period:
+  - 1991
+  - 2010
+  countries:
+  - RUS
+  - CHN
+  outcome_dim:
+  - gdp_growth
+  - poverty_inequality
+  policy_family:
+  - privatisation_nationalisation
+  - institutional_reform
+  treatment_tags:
+  - russia_mass_privatisation_1991
+  - china_gradualist_transition
+covers_claims:
+- position_id: market_socialist
+  claim_index: 9
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Market-socialist claim and hypothesis claim are textually identical — post-1991 Russia mass privatisation
+    vs China gradualist retained-public-ownership outcome comparison.
+estimator:
+  template: descriptive
+  notes: 'Descriptive comparative case study of Russia (mass privatisation 1991-1998) versus China (gradualist
+    reform 1978-2000). Reports side-by-side outcome trajectories (poverty, inequality, growth, life expectancy)
+    with documented identification limits noted — no clean causal estimator given two-country n=2 design.
+
+    '

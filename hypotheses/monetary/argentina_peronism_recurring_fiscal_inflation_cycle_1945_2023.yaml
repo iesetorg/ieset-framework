@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023
+version: 1
+status: candidate
+topic: monetary
+claim: 'Argentina has experienced 12 distinct episodes of annual inflation exceeding 50% since 1945, each
+  preceded by a fiscal deficit exceeding 4% of GDP financed via central bank money creation. The cross-episode
+  pattern — Perón 1952, Isabelita and López Rega 1975-76, military junta 1976-83, Alfonsín 1989, Menem
+  stabilisation then 2001 default, Kirchner and CFK 2010-2015 acceleration, Macri deterioration 2018-19,
+  Fernández 2020-2023, Milei disinflation 2024 — demonstrates that Argentine monetary instability is a
+  systemic institutional phenomenon driven by weak central bank independence combined with populist fiscal
+  commitments, rather than a sequence of independent exogenous shocks. The pre-registered claim is that
+  Granger causality tests on annual Argentine data 1950-2023 show fiscal deficit (% GDP) Granger-causes
+  CPI inflation at p<0.01 with a lag structure of 1-2 years, and that this relationship holds in sub-period
+  robustness checks excluding the Convertibility period 1991-2001. Regional peers Brazil, Chile, and Uruguay
+  show no comparable fiscal-to-inflation Granger causality at p<0.05 after their respective institutional
+  reforms, establishing that the phenomenon is specific to Argentina''s institutional configuration rather
+  than a regional commodity-cycle effect.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ARG
+  - BRA
+  - CHL
+  - URY
+  - BOL
+  period:
+  - 1950
+  - 2024
+  temporal_structure: time_series
+  exclusion_rules:
+  - ARG Convertibility period 1991-2001 excluded from primary Granger test but included as structural-break
+    robustness check
+  - BOL included as secondary comparator given its own hyperinflation episode 1984-1985 and subsequent
+    Sachs stabilisation
+  - exclude 2020 pandemic year from primary estimation; include as sensitivity check
+scope:
+  period: [1950, 2024]
+  countries: [ARG, BRA, CHL, URY, BOL, LATAM]
+  outcome_dim: [inflation, currency_purchasing_power, fiscal_policy, monetary_policy]
+  policy_family: [fiscal_policy, monetary_policy, institutional_reform]
+  treatment_tags: [peron_1952, isabelita_lopez_rega_1975, alfonsin_1989, menem_convertibility_1991, kirchner_cfk_2010, macri_2018, fernandez_2020, milei_2024]
+variables:
+  outcome:
+  - name: cpi_inflation_annual
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: level
+    notes: Argentine CPI series has known quality issues 2007-2015 (INDEC manipulation); use IMF-corrected
+      series and provincial price indices for this sub-period.
+  - name: hyperinflation_episode_binary
+    source: 'hanke:hyperinflation_table; constructed: binary = 1 if annual CPI > 50%'
+    transformation: binary
+  treatment:
+  - name: fiscal_deficit_pct_gdp
+    source: imf:GGXWDG_NGDP; world_bank_wdi:GC.BAL.CASH.GD.ZS
+    transformation: level
+    notes: 'Primary causal variable. Sign convention: positive = deficit. Central bank financing share
+      coded separately.'
+  - name: central_bank_financing_binary
+    source: 'constructed: binary = 1 when BCRA adelantos transitarios > 1% GDP, sourced from BCRA annual
+      reports'
+    transformation: binary
+  controls:
+  - name: gdp_growth
+    source: imf:NGDP_RPCH; world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: pct_change
+  - name: external_debt_pct_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+  - name: current_account_pct_gdp
+    source: imf:BCA_NGDPD
+    transformation: level
+  - name: commodity_price_index
+    source: 'constructed: terms-of-trade index from IMF commodity prices weighted by ARG export basket'
+    transformation: log_diff
+  - name: central_bank_independence_index
+    source: 'constructed: Dincer-Eichengreen CBI index extended to 2023'
+    transformation: level
+intervention_channel: fiscal
+estimator:
+  template: cointegration_vecm
+  notes: 'Primary: Granger causality test (VAR lag selection by AIC, max 4 lags) of fiscal deficit → CPI
+    inflation, annual data 1950-2023 for ARG. Secondary: panel VAR for ARG, BRA, CHL, URY, BOL with country
+    fixed effects testing whether the fiscal-inflation Granger causality is specific to ARG or regional.
+    Mechanism test: event-study around the 12 >50% inflation episodes, testing whether fiscal deficit
+    > 4% GDP in t-1 or t-2 is a necessary (not merely sufficient) condition. Structural-break test: Bai-Perron
+    breakpoint test on the inflation series to identify whether episode clustering aligns with political-regime
+    transitions.
+
+    '
+falsification:
+  rule: 'The hypothesis is falsified if Granger causality of fiscal deficit → CPI inflation fails to achieve
+    p<0.01 in the primary VAR using annual 1950-2023 Argentine data, OR if fewer than 8 of the 12 >50%
+    inflation episodes are preceded by fiscal deficits exceeding 4% GDP in the prior 1-2 years, OR if
+    the same Granger causality is detected at p<0.01 in Chile or Uruguay post-1990 (which would indicate
+    a regional rather than institutional-specificity effect).
+
+    '
+  test: granger_causality_var_plus_episode_event_study
+  threshold: 'granger_p_value(fiscal_deficit → CPI_inflation, ARG 1950-2023) < 0.01 AND episode_precedence_rate(deficit
+    > 4% GDP in t-1 or t-2) >= 8/12 AND granger_p_value(fiscal → CPI, CHL post-1990) > 0.05
+
+    '
+prior_confidence: 0.8
+steelman: hypotheses/steelman/argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023.md
+linked_hypotheses:
+- hyperinflation_requires_fiscal_dominance
+- fiat_expansion_erodes_currency_purchasing_power_long_run
+- milei_shock_therapy_output_recovery_trajectory
+disclosure: Author holds the prior that Argentina's recurrent high-inflation episodes over 1945-2023 are
+  overwhelmingly driven by fiscal dominance — the inability or unwillingness to finance the Peronist transfer
+  architecture outside monetary accommodation — rather than by imported inflation shocks, oligopoly pricing,
+  or other heterodox causes. The hypothesis tests the Granger causality direction and the cointegration
+  between fiscal deficit and monetary base.

@@ -1,0 +1,171 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: spain_sanchez_economic_trajectory_2018_2023
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  Spain's headline macroeconomic trajectory under the 2018-present PSOE-led
+  governments is NOT uniformly worse than a peer euro-area donor pool, once
+  euro-area-common shocks (COVID 2020-2021, 2022 energy shock, ECB rate
+  cycle) are absorbed by year fixed effects. Specifically: (a) on GDP per
+  capita (PPP, constant) Spain tracks or slightly outperforms the euro-
+  periphery donor pool 2018-2023, with a strong 2023 recovery year; (b) on
+  the employment rate (15-64) Spain narrows its gap to the donor pool; (c)
+  on unemployment Spain remains the highest in the pool in levels but the
+  2018-2023 change is broadly comparable to peers; (d) BUT on real wages
+  net of housing costs and on house-price-to-income ratios Spain's
+  trajectory is materially weaker, particularly in the 2022-2023 energy
+  and rental-cost period. The hypothesis is deliberately nuanced: it
+  pre-registers the expectation that the "Spain is doing badly under
+  Sánchez" framing is UNSUPPORTED on headline output and employment
+  metrics, and that the defensible negative-trajectory finding is on
+  housing affordability and real wages net of housing, not on aggregate
+  growth.
+
+evidence_type: causal
+
+sample:
+  countries: [ESP, FRA, ITA, PRT, GRC, DEU, NLD, BEL, IRL]
+  period: [2005, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude IRL post-2015 from baseline (extreme FDI-routed GDP distortion); robustness reports with IRL"
+    - "drop country-years missing primary outcome"
+
+scope:
+  period: [2005, 2023]
+  countries: [ESP, FRA, ITA, PRT, GRC, DEU, NLD, BEL, IRL]
+  outcome_dim: [gdp_growth, employment_labour, housing, wage_stagnation]
+  policy_family: [fiscal_policy, housing_policy, labour_market]
+  treatment_tags: [sanchez_2018, spain_psoe_government, spain_housing_affordability]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp_constant
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: employment_rate_15_64
+      source: "eurostat:lfsi_emp_a"
+      transformation: level
+      notes: "Eurostat LFS annual employment rate age 15-64."
+    - name: unemployment_rate_harmonised
+      source: "eurostat:une_rt_a"
+      transformation: level
+    - name: real_house_price_to_income_index
+      source: "oecd:OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,1.0"
+      transformation: index_2015_base
+      notes: "OECD Analytical House Prices — price-to-income ratio; URN approximate."
+    - name: real_wage_index
+      source: "oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARN,1.0"
+      transformation: cumulative_index_2018_base
+
+  treatment:
+    - name: spain_post_2018
+      source: "constructed: indicator = 1 if country=ESP and year >= 2018; 0 otherwise. Tests whether Spanish trajectory deviates from the euro-area donor pool from the June 2018 PSOE government onward."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_gross_fixed_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: log
+    - name: euro_area_indicator
+      source: "constructed: 1 if country uses euro as of year, 0 otherwise. Absorbed by country FE but retained for interaction robustness."
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary: TWFE with country + year fixed effects. Year FE absorb
+    euro-area-common shocks (COVID, energy crisis, ECB tightening)
+    that dominate 2020-2023 and would otherwise swamp any Spain-
+    specific content signal. β_spain_post_2018 identifies the
+    Spain-specific trajectory deviation from the donor-pool time-
+    average.
+
+    Run separately for each outcome: log GDP pc PPP, employment rate,
+    unemployment rate, real house-price-to-income, real wage index,
+    and a constructed "real wage net of housing" outcome that divides
+    the real wage index by the real house-price-to-income index.
+
+    The hypothesis expects β_spain_post_2018 to be zero-or-positive on
+    GDP per capita and employment, negative on the housing and real-
+    wage-net-of-housing outcomes. Pre-registering this expected
+    differentiation is the entire methodological point: the framework
+    rejects the lazy "Sánchez = economic decline" framing and tests the
+    more defensible "Spain's aggregate trajectory is fine but housing
+    and real-purchasing-power are worse" framing.
+
+    Synthetic-control robustness for the GDP and employment outcomes.
+
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if the pre-registered pattern holds:
+    β_spain_post_2018 is non-negative on (log GDP pc, employment rate)
+    AND negative on (real house price to income, real wage net of
+    housing), all at p < 0.10. The hypothesis is REJECTED if Spain is
+    uniformly negative (i.e., also negative on headline output and
+    employment) — this would indicate the "Spain is doing badly" framing
+    is correct in the aggregate, contrary to the framework's pre-
+    registered nuanced expectation. The hypothesis is also REJECTED in
+    the opposite direction if Spain is uniformly positive (including on
+    housing and real wages) — this would indicate the critics' housing
+    concerns are not data-supported. Either uniform direction falsifies
+    the nuanced framing; only the pre-registered differentiated pattern
+    supports it.
+  test: spain_post_2018_twfe_multi_outcome
+  threshold: >
+    β_spain_post_2018 >= 0 at p < 0.10 on log_gdp_pc_ppp AND employment_rate,
+    AND β_spain_post_2018 < 0 at p < 0.10 on real_house_price_to_income AND
+    real_wage_net_of_housing.
+
+prior_confidence: 0.62
+
+disclosure: >
+  The author's honest prior is that the naive "Sánchez = economic
+  disaster" framing is wrong on aggregate output (Spain 2023 was the
+  fastest-growing large EU economy) but right on housing affordability
+  and real wages net of housing. The 0.62 prior on this differentiated
+  pattern reflects genuine uncertainty: the housing-trajectory finding
+  could also be driven by Spain's structural supply constraints (tourism,
+  short-let conversion, Airbnb concentration in Madrid/Barcelona) rather
+  than by Sánchez-era policy content per se, and the framework should
+  not over-attribute. Pre-registering the nuanced claim prevents the
+  result being either sensationalised ("Spain crashed") or white-
+  washed ("Sánchez's Spain outperformed"). The defensible finding is
+  mixed and the framework reports it as mixed.
+
+steelman: hypotheses/steelman/spain_sanchez_economic_trajectory_2018_2023.md
+
+linked_hypotheses:
+  - housing_cost_driven_real_wage_divergence
+  - eu_post_2021_gas_shock_industrial_output_impact
+
+notes: >
+  Donor-pool choice: FRA, ITA, PRT, GRC are euro-periphery/large peers
+  subject to similar euro-area shocks; DEU, NLD, BEL anchor the euro-
+  core; IRL is included as high-growth comparator but excluded from
+  baseline post-2015 due to FDI-GDP distortion. Non-euro economies
+  deliberately excluded because the monetary channel is exogenous to
+  Spain (ECB-bound) and including non-euro countries would conflate
+  monetary-regime effects with Sánchez-era policy-content effects.
+
+  The 2018 cutoff corresponds to the 1 June 2018 no-confidence vote
+  that installed the Sánchez government. The treatment indicator covers
+  the entire 2018-2023 period including COVID; year fixed effects
+  absorb the COVID + energy shocks, so the Spain-specific coefficient
+  identifies what is left after those shocks are removed.
+
+  The "solo sí es sí" law and related criminal-law content are NOT
+  tested here — see hypotheses/labour/spain_reported_sexual_assault_
+  rate_definition_controlled for the separate, independently-pre-
+  registered test of the reported-assault-rate series with the 2022
+  definitional change controlled.

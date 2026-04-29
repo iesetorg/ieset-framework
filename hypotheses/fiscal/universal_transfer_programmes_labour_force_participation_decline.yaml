@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: universal_transfer_programmes_labour_force_participation_decline
+version: 1
+status: candidate
+topic: fiscal
+claim: 'Large-scale universal or near-universal transfer programmes produce a three-order causal chain. FIRST-ORDER: poverty headcounts, food-insecurity rates, and material deprivation metrics drop materially
+  in the initial 1-3 years post-rollout. This is a real welfare gain for recipient households and an acknowledged policy success on its own terms. SECOND-ORDER: labour-force participation among working-age
+  able-bodied individuals in the bottom deciles declines relative to peer cohorts and pre-programme trends, particularly where transfer tapering and interaction with other benefits produce high effective
+  marginal tax rates; formal-sector hours worked contract. THIRD-ORDER: tax-base contraction relative to pre-programme trajectory, entrenched fiscal dependency on continued transfer expansion, and stagnation
+  of human-capital accumulation among long-tenure recipients (weaker work-history signal for future employers, lower on-the-job skill formation). Cases: Argentina Planes Trabajar / Argentina Trabaja / Potenciar
+  Trabajo; Spain Ingreso Mínimo Vital 2020; UK tax credits expansion 1999-2010 and Universal Credit; Venezuela CLAP food-box programme; US 2021 expanded Child Tax Credit.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ARG
+  - ESP
+  - GBR
+  - VEN
+  - USA
+  period:
+  - 1995
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 pandemic years as the dominant LFP shock that year was not programme-driven; retain 2022-2024 to test recovery
+scope:
+  period:
+  - 1995
+  - 2024
+  countries:
+  - ARG
+  - ESP
+  - GBR
+  - VEN
+  - USA
+  outcome_dim:
+  - employment_labour
+  - poverty_inequality
+  - fiscal_policy
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  - fiscal_policy
+  - labour_market
+  treatment_tags:
+  - argentina_planes_trabajar
+  - potenciar_trabajo_2020
+  - spain_imv_2020
+  - uk_universal_credit_2013
+  - venezuela_clap_2016
+  - us_expanded_ctc_2021
+variables:
+  outcome:
+  - name: poverty_headcount_or_material_deprivation
+    source: indec:eph_pobreza (ARG); ine:ecv_pobreza (ESP); ons:hbai (GBR); ine:cas (VEN via ENCOVI); us_census:cps_supplemental_poverty (USA)
+    transformation: level_pct
+    notes: 'FIRST-ORDER outcome: transfers do reduce poverty and material deprivation — acknowledged policy success.'
+  - name: prime_age_labour_force_participation_bottom_decile
+    source: indec:eph; ine:epa; ons:lfs; us_bls:cps
+    transformation: level_pct
+    notes: 'SECOND-ORDER outcome: LFP decline among able-bodied working-age in bottom income decile.'
+  - name: hours_worked_bottom_decile
+    source: indec:eph; ine:epa; ons:lfs; us_bls:cps
+    transformation: annual_hours_mean
+    notes: 'SECOND-ORDER outcome: intensive-margin decline.'
+  - name: effective_marginal_tax_rate_bottom_decile
+    source: oecd:taxing_wages; oecd:benefits_and_wages (EMTR by family type and income)
+    transformation: level_pct
+    notes: 'SECOND-ORDER mechanism channel: high EMTR from benefit tapering.'
+  - name: programme_expenditure_as_share_of_gdp
+    source: country budget offices; imf:WEO; mef:presupuesto (ARG)
+    transformation: pct_gdp
+    notes: 'THIRD-ORDER outcome: fiscal dependency on continued expansion.'
+  - name: long_tenure_recipient_subsequent_employment_probability
+    source: 'constructed: administrative panel data on programme exit followed by formal-sector employment; available for UC (UK HMRC + DWP), ARG Planes (SINTyS), ESP IMV (Seguridad Social)'
+    transformation: prob_employment_within_24_months
+    notes: 'THIRD-ORDER outcome: human-capital and work-history signal.'
+  treatment:
+  - name: universal_transfer_programme_event
+    source: 'constructed: ARG Planes expansion 2003-2015 + Potenciar Trabajo 2020; ESP IMV Jun-2020; GBR WTC 1999 + CTC 2003 + UC rollout 2013-2018; VEN CLAP Mar-2016; USA expanded CTC Jan-Dec 2021'
+    transformation: indicator
+  controls:
+  - name: unemployment_rate_aggregate
+    source: oecd:unemployment; eurostat:une_rt_a
+    transformation: level_pct
+  - name: demographic_composition_bottom_decile
+    source: country household survey microdata
+    transformation: share_characteristics
+  - name: active_labour_market_programme_spending
+    source: oecd:almp
+    transformation: pct_gdp
+intervention_channel: fiscal
+intervention_channel_justification: 'Transfer programmes are direct fiscal expenditures. Tapering rules produce effective marginal tax rates that interact with the regulatory EMTR schedule; both channels
+  are fiscal in origin.
+
+  '
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  random_seed: 20260424
+  notes: 'Primary: Callaway-Sant''Anna DiD on the programme-introduction events, using within-country pre-treatment cohorts as donor pool for the bottom decile. Secondary: panel FE on programme expenditure
+    as a continuous treatment across country-years. Mediation analysis: EMTR as the channel linking programme to LFP response.
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive): Across the five programme cases (ARG Planes/Argentina-Trabaja/Potenciar 2003; ESP IMV 2020; GBR UC 2013; VEN CLAP 2016; USA expanded CTC 2021), the hypothesis is SUPPORTED
+    if BOTH legs fire: (a) at least 3 of 5 cases show prime-age (25+) labour-force participation rate falling by ≥1.0pp between the 5y-mean post-rollout window and the 5y-mean pre-rollout window (excluding
+    pandemic years 2020-2021 from ESP and USA post-windows), AND (b) at least 3 of the cases with available Gini or extreme-poverty data show a first-order welfare gain (Gini ↓ or extreme-poverty ↓ in the
+    post-window). REFUTED if ≥4 of 5 cases show prime-age LFP RISING in the post-window (the chain does not fire anywhere). PARTIAL if exactly 2 of 5 cases show the LFP decline (the spec''s design-dependence
+    caveat: bad-design programmes confirm; well-designed do not). INFORMATIVE: which specific programmes break the chain (US CTC is the test the spec flagged). METHOD_VALID: at least 3 of 5 cases must have
+    prime-age LFP data in BOTH the pre and post windows (≥2 obs each).'
+  test: five_programme_pre_post_lfp_and_first_order_chain
+  threshold: 'PRIMARY: ≥3/5 cases with Δ(prime_age_LFP_5y_mean) ≤ -1.0pp post-rollout AND ≥3 cases (of those with data) with Gini or extreme-poverty improvement post-rollout'
+methodology_note: 'v1 promotion (2026-04-24). The spec''s preferred outcomes (bottom-decile LFP, hours-worked, effective marginal tax rate, programme-spend-as-pct-GDP, long-tenure recipient subsequent re-employment
+  probability) require household-microdata or OECD Benefits-and-Wages files not currently in the vintages. The promoted run substitutes ILO national prime-age (25+) LFP rate as a conservative proxy: it
+  cannot SHOW a decline that did not occur, but may UNDERESTIMATE a bottom-decile-specific decline that the upper deciles partially mask. The Callaway-Sant''Anna DiD template is replaced with a pre/post
+  5y-mean delta because no within-country donor-cohort panel is constructible from annual aggregates alone. These deviations are recorded in the result_card.md caveats. The EMTR mediation test cannot be
+  run without OECD:taxing_wages and OECD:benefits_and_wages vintage data and is left for v2.'
+prior_confidence: 0.58
+disclosure: 'Author holds market-liberal priors. The literature on transfer- programme LFP effects is highly design-dependent: unconditional cash (Alaska Permanent Fund, GiveDirectly RCTs) finds small LFP
+  effects; conditional-on-unemployment transfers (Argentina Planes Trabajar early design) find larger effects; universal child benefits find mixed effects. Prior is only moderate because the US expanded-CTC
+  2021 evidence base is leaning toward minimal LFP response in a well-designed programme. The hypothesis SPECIFICALLY tests whether bad-design programmes (high EMTR, conditioned on non-employment) produce
+  the chain; the US CTC may refute the general claim while the Argentine and Spanish programmes confirm it.
+
+  '
+steelman: hypotheses/steelman/universal_transfer_programmes_labour_force_participation_decline.md
+linked_hypotheses:
+- labour_market_flexibility_unemployment_duration
+- state_size_reduces_household_income_growth
+notes: 'Chain: poverty headcount drops (1st success acknowledged) -> bottom-decile LFP + hours decline via high EMTR (2nd) -> tax base contraction, fiscal dependency, human-capital stagnation (3rd). Design
+  matters: the hypothesis may hold for some cases and fail for others, which is the mechanism-based contribution.
+
+  '

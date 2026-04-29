@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: maoist_precondition_for_deng_reform_growth
+version: 1
+status: draft
+topic: growth
+claim: Maoist China's 1949-1976 infrastructure and literacy expansion produced the human-capital base
+  that enabled post-1978 reform growth; pre-1978 development was a precondition, not a failure.
+notes: >-
+  Seeded from a Marxist-Leninist claim that pre-1978 Maoist literacy and basic
+  health expansion built the human-capital base that enabled the post-1978
+  catch-up. Single-country descriptive trajectory; PRC pre-reform statistics
+  require human review for series quality before pre-registration.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: Marxist-Leninist framing wants Maoist development to
+  count as a precondition rather than a failure. Counterfactual to a
+  no-Mao path is unobserved, and the human-capital channel competes with
+  alternative reform-era explanations (rural-urban migration, dual-track
+  pricing, FDI inflows).
+falsification:
+  rule: >-
+    PRIMARY 1 (dispositive): CHN life expectancy at birth 1976 must be at least
+    1.30 times the CHN 1949 baseline level, i.e. a 30% rise from baseline (the
+    "≥30% above 1949" leg of the spec's prose rule).
+    PRIMARY 2 (dispositive): CHN life expectancy at birth 1976 must be at or
+    above the LMIC peer-median 1976 (peer set: IND, IDN, PAK, BRA, MEX, EGY,
+    NGA, TUR, THA, PHL, IRN). This is the "not below LMIC median" leg of the
+    spec's prose rule, applied to the most-defensible Mao-era series rather
+    than to all three indicators (literacy and primary-enrolment series have
+    near-zero CHN coverage before 1980 and cannot dispositively grade the
+    claim — they are kept as INFORMATIVE).
+    SUPPORTED iff BOTH primaries hold. REFUTED iff BOTH fail. partial if
+    exactly one holds. inconclusive if the LMIC peer panel has fewer than 6
+    countries with 1976 data, or if the CHN 1949 baseline is missing.
+    INFORMATIVE: GDP-pc level 1976 vs LMIC peer median (Maddison MPD2020),
+    primary-school gross enrolment near 1976 (WDI SE.PRM.ENRR), adult
+    literacy rate near 1976 (WDI SE.ADT.LITR.ZS).
+    METHOD_VALID: china_manual:life_expectancy_at_birth_years contains a
+    CHN 1949 datum; un_wpp:life_expectancy_at_birth (or WDI fallback) covers
+    at least 6 of the 11 LMIC peers in 1976.
+  test: chn_life_expectancy_1949_1976_vs_lmic_peer_median
+  threshold: >-
+    PRIMARY 1: le_chn_1976 / le_chn_1949 >= 1.30.
+    PRIMARY 2: le_chn_1976 >= median(le_lmic_peers_1976).
+methodology_note: >-
+  v1 promotion (2026-04-24). The original stub asked for falsification across
+  "all three indicators" (literacy, life expectancy, primary-school enrolment);
+  in practice WDI literacy and primary-enrolment series for CHN start in 1982
+  and 1980 respectively (gap of 4-6 years past the 1976 endpoint), so they
+  cannot dispositively grade pre-1976 progress. Promotion narrows the two
+  PRIMARY tests to life expectancy at birth — the indicator with continuous
+  CHN coverage 1949-1976 via china_manual (Banister 1987 / WHO_GHO compilation),
+  and continuous LMIC peer coverage via un_wpp. Literacy and enrolment are
+  retained as INFORMATIVE (non-gating) so the result card shows them when
+  available. The 30% growth threshold is taken directly from the prose rule;
+  the peer-median test uses 11 large agrarian developing-economy peers
+  (deliberately mixing Asia / LatAm / MENA so the comparison is not
+  dominated by the Asian post-war take-off pattern).
+evidence_type: descriptive
+
+sample:
+  countries: [CHN]
+  period: [1949, 1990]
+  temporal_structure: time_series
+
+variables:
+  outcome:
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+    - name: log_gdp_pc_ppp_long_run
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: primary_school_enrolment_net
+      source: "world_bank_wdi:SE.PRM.NENR"
+      transformation: level
+    - name: literacy_rate_adult
+      source: "world_bank_wdi:SE.ADT.LITR.ZS"
+      transformation: level
+    - name: under5_mortality_rate
+      source: "un_igme:U5MR"
+      transformation: level
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Single-country descriptive trajectory of Chinese pre-1978 human-capital
+    metrics: literacy rate, life expectancy, primary-school enrolment, basic
+    industrial capacity. Tests whether pre-reform indicators reached levels
+    that plausibly enabled the post-1978 productivity catch-up.
+
+scope:
+  period: [1949, 1976]
+  countries: [CHN]
+  outcome_dim: [gdp_growth, industrial_capability, institutional_quality]
+  policy_family: [industrial_policy, institutional_reform]
+  treatment_tags: [chinese_revolution_1949, maoist_development_1949_1976, gosplan_central_planning]
+
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 4
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts Maoist infrastructure and literacy expansion built the human-capital base that enabled post-1978 reform growth."

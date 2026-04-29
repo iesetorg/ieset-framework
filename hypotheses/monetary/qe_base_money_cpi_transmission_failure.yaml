@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: qe_base_money_cpi_transmission_failure
+version: 1
+status: draft
+topic: monetary
+claim: US Federal Reserve post-2008 QE expanded base money roughly 4x without triggering broad-money expansion or consumer-price inflation until 2021, contradicting the quantity-theory mechanical transmission.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT framing of post-2008 base-money expansion as decoupled from broad money and CPI until 2021, contradicting mechanical quantity theory. Human
+  review required.
+prior_confidence: 0.65
+disclosure: Author has market-liberal priors but treats the 2008-2021 base-money/CPI decoupling as well-evidenced; framing risks treating the 2021 inflation episode as fully exogenous to prior QE.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Local-projection IRFs of US CPI and M2 to monetary-base shocks 2008-2021 at h=1..36m; peak CPI response <0.5x quantity-theory prediction with p>0.10 supports transmission-failure claim.
+evidence_type: associational
+scope:
+  period:
+  - 2008
+  - 2021
+  countries:
+  - USA
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - qe_post_2008
+  - fed_balance_sheet_expansion
+covers_claims:
+- position_id: mmt
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT claim that post-2008 Fed QE expanded base money ~4x without broad-money expansion or CPI inflation until 2021, contradicting quantity-theory mechanical transmission; direct alignment with hypothesis
+    claim and scope.
+estimator:
+  template: local_projections
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Local-projection IRFs of US CPI and M2 to monetary-base shocks at h = 1..36 months over 2008-2021. Compares observed peak response against quantity-theory-
+    implied proportional pass-through. Falsification rule and variables block remain to be filled when this stub is promoted from draft.
+
+    '
+sample:
+  countries:
+  - USA
+  period:
+  - 2005
+  - 2021
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: cpi_inflation
+    source: fred:CPIAUCSL
+    transformation: pct_change_yoy
+  - name: cpi_core_inflation
+    source: fred:CPILFESL
+    transformation: pct_change_yoy
+  - name: m2_money_stock
+    source: fred:M2SL
+    transformation: log_diff
+  treatment:
+  - name: monetary_base
+    source: fred:BOGMBASE
+    transformation: log_diff
+    notes: Base contracted ~4x from ~$830bn (Aug-2008) to ~$3.4tn (Aug-2014); further expansion in 2020.
+  - name: fed_balance_sheet_total_assets
+    source: fred:WALCL
+    transformation: log_diff
+  controls:
+  - name: output_gap
+    source: imf:NGAP_NPGDP; oecd:OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0
+    transformation: level_pct
+  - name: unemployment_rate
+    source: fred:UNRATE
+    transformation: level_pct
+  - name: oil_price
+    source: imf_pcps:POILBRE
+    transformation: log_diff
+  - name: fed_funds_rate
+    source: fred:DFF
+    transformation: level

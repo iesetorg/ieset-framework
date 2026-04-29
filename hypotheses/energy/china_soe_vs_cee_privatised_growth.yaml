@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_soe_vs_cee_privatised_growth
+version: 1
+status: draft
+topic: energy
+claim: Chinese state-owned enterprises in strategic sectors (steel, energy, telecoms) post-1978 grew faster
+  than privatised peers in Eastern Europe through the 1990s-2010s, demonstrating that public ownership
+  with planning can outperform market transition.
+scope:
+  period: [1990, 2019]
+  countries: [CHN, POL, CZE, HUN, SVK, POST_SOVIET]
+  outcome_dim: [gdp_growth, industrial_capability, productivity]
+  policy_family: [privatisation_nationalisation, industrial_policy]
+  treatment_tags: [china_soe_reform_post_1978, cee_mass_privatisation]
+covers_claims:
+  - position_id: market_socialist
+    claim_index: 5
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Market-socialist claim narrows to SOE corporatisation 1990s-2000s vs CEE mass privatisation; hypothesis covers overlapping period and mechanism (public ownership + planning beats mass-privatisation transition). Slight scope mismatch: market-socialist claim emphasises retained public ownership with market competition, hypothesis emphasises strategic-sector SOE outperformance — Phase 4C may want to split or refine."
+  - position_id: marxist_leninist
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Claim text matches hypothesis claim verbatim: post-1978 Chinese SOEs in strategic sectors outgrowing privatised CEE peers 1990s-2010s. Direct alignment."
+notes: Maps the marxist-leninist + market-socialist schools' SOE-strategic-sector outperformance claim
+  to a CHN vs CEE/post-Soviet cross-country comparison. Estimator and prior set; full pre-registration
+  awaits steelman + human sign-off.
+prior_confidence: 0.4
+disclosure: Author prior is skeptical of the strict ownership-form-as-cause framing because China's
+  output growth correlates more strongly with WTO-accession trade access and rural-to-urban migration
+  than with SOE share per se; CEE growth was hammered by 1990s output collapse from a higher
+  initial-development base, biasing the comparison.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Compare 1990-2019 average annual real value-added growth in steel/energy/telecoms between Chinese SOEs and CEE post-privatisation peers (UNIDO + national statistics). Refute if CHN SOE growth not statistically faster than CEE-cohort median at p<0.10.'
+evidence_type: associational
+sample:
+  countries: [CHN, POL, CZE, HUN, SVK, RUS, UKR, ROU, BGR]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing manufacturing value-added or industrial production series"
+    - "exclude 1990-1992 hyperinflation/transition years for CEE/post-Soviet (output-collapse base distortion)"
+variables:
+  outcome:
+    - name: log_manufacturing_value_added_real
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+      notes: "WDI manufacturing VA constant USD; primary growth proxy for steel/energy/telecoms aggregate."
+    - name: industrial_value_added_share_gdp
+      source: "world_bank_wdi:NV.IND.TOTL.ZS"
+      transformation: level
+  treatment:
+    - name: china_soe_strategic_sector_indicator
+      source: "constructed: indicator = 1 for CHN; 0 for CEE/post-Soviet privatised peers (POL, CZE, HUN, SVK, RUS, UKR, ROU, BGR). Strategic-sector subset = ISIC C24 (basic metals) + D35 (electricity, gas) + J61 (telecoms) where disaggregated data permit."
+      transformation: indicator
+    - name: privatisation_intensity
+      source: "ebrd:transition_indicators"
+      transformation: level
+      notes: "EBRD transition indicators (large-scale privatisation, enterprise restructuring). CEE-only series; CHN coded as baseline 1."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Cross-country panel-FE on log manufacturing VA (and industrial share) over
+    1990-2019, with CHN-strategic-sector indicator as treatment and EBRD
+    transition / privatisation intensity as competing channel. Country and
+    year FE absorb level differences and global cycle. Caveat: CHN single
+    treated unit limits identification — output growth differential may
+    reflect WTO accession + rural-urban migration rather than ownership form.

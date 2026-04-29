@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: price_controls_produce_shortages_and_quality_degradation
+version: 1
+status: candidate
+topic: regulatory
+claim: 'Statutory price ceilings set below market-clearing prices reliably produce shortages, rationing via queue or privilege, quality degradation, and black-market arbitrage — across every documented
+  episode where enforcement is sustained. The empirical record is uniform: US wage-price controls 1971-1974 (Nixon freeze + Phase II-IV), US oil price controls 1973-1981 (gasoline lines + shortage crises),
+  Venezuela 2003-present (chronic shortage + CPI-deflated official prices diverging from parallel-market prices by orders of magnitude), Zimbabwe 2007-2008 (shop-shelf emptying), Argentina Precios Cuidados
+  2014-2023 (product disappearance), Soviet peacetime price controls (queueing equilibrium). No documented sustained binding price ceiling has produced improved allocation outcomes at policy-relevant scale.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - USA
+  - VEN
+  - ZWE
+  - ARG
+  - RUS
+  - UKR
+  - GBR
+  - FRA
+  period:
+  - 1930
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude emergency wartime controls <36 months duration (rationing-coordination case)
+  - exclude non-binding ceilings (where statutory price exceeds market price)
+  - require documented enforcement mechanism (penalties, inspections)
+variables:
+  outcome:
+  - name: price_ceiling_vs_parallel_market_ratio
+    source: 'constructed: official_price / parallel_market_price; coded per episode from academic sources'
+  - name: queue_time_or_shortage_incidence
+    source: 'constructed: episode-level documented waiting time / stockout frequency'
+    notes: 'Quantitative where available (e.g. USA gasoline 1973: avg queue 30+ min), qualitative coding otherwise.'
+  - name: cpi_divergence_official_vs_alternative
+    source: bis:WS_LONG_CPI; hanke:hyperinflation_table
+    notes: For Venezuela, Hanke's Troubled Currencies monthly series documents the 2-4 orders of magnitude divergence from official BCV CPI.
+  - name: quality_degradation_proxy
+    source: 'constructed: per-episode product-disappearance counts or consumer-survey quality decline'
+  treatment:
+  - name: binding_price_ceiling_regime
+    source: 'constructed: binary indicator per country-year with episode start/end from policy chronologies'
+    notes: Coding rules doc TBD; draws on Rockoff 1984, Hanke & Krus 2012, Edwards 2010 on Latin America.
+  controls:
+  - name: monetary_expansion_rate
+    source: imf:PCPIPCH; bis:WS_LONG_CPI
+    notes: Price controls often accompany monetary expansion; controlling isolates the ceiling-specific effect.
+  - name: wartime_dummy
+    source: 'constructed: 1 if country-year is in an acknowledged war or immediate post-war demobilisation, else 0'
+  - name: import_restriction_regime
+    source: wb:TG.VAL.TOTL.GD.ZS
+    notes: Price controls + import licences often co-occur; separate identification required.
+intervention_channel: regulatory
+intervention_channel_justification: 'Price ceilings are a regulatory price intervention. Per invariant 4 they are measured separately from fiscal transfers (which may accompany them — e.g. Nixon 1971 combined
+  wage-price freeze with dollar devaluation and import surcharge, all separately coded).
+
+  '
+estimator:
+  template: synth_did
+  clustering: episode
+  random_seed: 20260423
+  notes: 'Synthetic DiD: for each documented binding episode, construct a synthetic control from non-treated country-years matched on inflation rate, monetary expansion, and institutional quality pre-treatment.
+    Report supply-side outcome divergence post-treatment. Primary outcome is the official-vs-parallel-market price ratio (when parallel market exists) or queue/shortage incidence.
+
+    '
+falsification:
+  rule: 'Not supported if (a) synthetic-DiD effect on the primary outcome (parallel-market divergence or shortage incidence) is not positive and significant at 5% across episodes, OR (b) any single documented
+    binding episode at policy-relevant scale (>=12 months duration, >= 1M population affected) produced measurable overall welfare improvement on the joint outcome vector (allocation efficiency + availability
+    + quality + informal-market size) relative to its synthetic control.
+
+    '
+  test: synth_did_plus_counterexample_scan
+  threshold: ATT >0, p<0.05; zero counterexamples at policy-relevant scale
+prior_confidence: 0.95
+disclosure: 'Author holds market-liberal priors. This is among the most-settled conclusions in applied price theory (Friedman-Stigler 1946, Rockoff 1984, Kessel-Alchian 1960). The 0.95 prior is calibrated
+  on that literature, not on framework-side preference. Falsification is binding.
+
+  '
+steelman: hypotheses/steelman/price_controls_produce_shortages_and_quality_degradation.md
+linked_hypotheses:
+- hyperinflation_requires_fiscal_dominance
+linked_conditions:
+- growth_without_broad_participation
+notes: 'Candidate, not pre_registered. Promotion requires: (1) episode-level coding document, (2) Hanke Troubled Currencies Project mirror (for Venezuela parallel-market data — currently reconstruct_needed),
+  (3) replication benchmarks from Rockoff 1984 and Edwards 2010.
+
+  '
+scope:
+  period:
+  - 1930
+  - 2024
+  countries:
+  - USA
+  - VEN
+  - ZWE
+  - ARG
+  - RUS
+  - UKR
+  - GBR
+  - FRA
+  outcome_dim:
+  - regulation_compliance_cost
+  - inflation
+  - currency_purchasing_power
+  policy_family:
+  - regulation
+  treatment_tags:
+  - price_controls
+  - nixon_wage_price_freeze_1971
+  - us_oil_price_controls_1973
+  - venezuela_price_controls_2003
+  - zimbabwe_price_controls_2007
+  - argentina_precios_cuidados_2014
+  - soviet_peacetime_price_controls
+covers_claims:
+- position_id: marxist_leninist
+  claim_index: 1
+  polarity: aligned
+  school_prediction: falsified
+  confidence: high
+  notes: Framework predicts price controls produce shortages/quality degradation (aligned with hypothesis); ML position predicts planning can allocate without price signals, so school_prediction is falsified
+    for ML on this evidence.

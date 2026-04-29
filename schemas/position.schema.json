@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/position.schema.json",
+  "title": "IESET Position (School of Thought)",
+  "description": "An economic school or framing that produces testable claims. Kept separate from hypotheses because positions are framings, not falsifiable units. Positions are evaluated by the empirical record of their specific testable predictions, each of which links to a hypothesis_id.",
+  "type": "object",
+  "required": ["position_id", "school", "status", "steelman"],
+  "additionalProperties": false,
+  "properties": {
+    "position_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"
+    },
+    "school": {
+      "type": "string",
+      "description": "Human-readable school name, e.g., 'Austrian Business Cycle Theory', 'Post-Keynesian', 'MMT', 'Empirical Pragmatist'."
+    },
+    "short_name": {"type": "string"},
+    "status": {
+      "type": "string",
+      "enum": ["draft", "candidate", "published"],
+      "description": "draft=corpus-mined rough capture. candidate=curated, not yet published. published=live on public platform."
+    },
+    "proponents": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Representative names. Cited, not endorsed."
+    },
+    "key_texts": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "steelman": {
+      "type": "string",
+      "minLength": 100,
+      "description": "Charitable statement of the school's strongest claims, written as a proponent would phrase them."
+    },
+    "falsifiable_specific_claims": {
+      "type": "array",
+      "description": "Specific testable predictions this school makes that can be pinned to hypothesis_ids in the registry.",
+      "items": {
+        "type": "object",
+        "required": ["claim", "linked_hypothesis_id", "school_prediction", "scope"],
+        "additionalProperties": false,
+        "properties": {
+          "claim": {"type": "string"},
+          "linked_hypothesis_id": {"type": "string"},
+          "school_prediction": {
+            "type": "string",
+            "enum": ["supported", "falsified", "mixed"],
+            "description": "What the school predicts the hypothesis result will be — expressed as a verdict on the hypothesis AS PRE-REGISTERED. If the school's own narrative framing is opposite-signed to the hypothesis's pre-reg claim (see claim_polarity), this value is what the school thinks the pre-reg claim's verdict will be, not agreement with the school's own restated claim. Author convention: to avoid sign-flip mistakes, set claim_polarity explicitly and write school_prediction as the school's expected verdict on the pre-reg hypothesis."
+          },
+          "claim_polarity": {
+            "type": "string",
+            "enum": ["aligned", "inverted"],
+            "default": "aligned",
+            "description": "How the school's narrative 'claim' text relates to the linked hypothesis's pre-registered claim. 'aligned' = same direction (school's claim and hypothesis's claim mean the same thing). 'inverted' = opposite direction (school's claim is the negation of the hypothesis's claim). When inverted, the scorecard flips the verdict-to-outcome mapping so that a hypothesis SUPPORTED counts as a loss for the school (because the school's narrative claimed the opposite)."
+          },
+          "empirical_status": {
+            "type": "string",
+            "enum": ["untested", "supported", "falsified", "mixed"],
+            "description": "What the framework's run actually found. Left 'untested' until hypothesis has been run."
+          },
+          "scope": {
+            "$ref": "hypothesis.schema.json#/$defs/scope",
+            "description": "Canonical scope block for this specific claim. Must overlap with the linked hypothesis's scope block (period, countries, outcome_dim) — gated by scripts/validate_scope_alignment.py. If the claim names specific policies/actors via treatment_tags, at least one tag must appear in the linked hypothesis's treatment_tags (or the hypothesis must not declare treatment_tags, meaning it's a generic cross-country test). Added Phase 2 (April 2026)."
+          },
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "empirical_record_summary": {
+      "type": "string",
+      "description": "Running summary of how the school's specific predictions have fared in framework runs. Updated as hypotheses are run."
+    },
+    "scope_decisions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Claims the school makes that the framework has EXCLUDED from testing (see D.1.5 for worked example — framework tests some Austrian claims, not strict-ABCT claims)."
+    },
+    "linked_hypotheses": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "map": {
+      "type": "object",
+      "description": "Metadata for the positions-taxonomy map visualisation (musicmap-style). Optional — may be absent for draft positions.",
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "type": "string",
+          "enum": [
+            "market_liberal",
+            "institutional_mainstream",
+            "developmentalist",
+            "post_keynesian_heterodox",
+            "democratic_socialist_reformist",
+            "marxist_revolutionary",
+            "ecological"
+          ],
+          "description": "Super-cluster for the positions taxonomy map. Drives colour grouping."
+        },
+        "origin_year": {
+          "type": "integer",
+          "minimum": 1500,
+          "maximum": 2100,
+          "description": "Approximate intellectual origin — landmark text / school founding. Drives vertical placement on the positions map."
+        },
+        "spectrum_x": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Horizontal placement on the positions map. -1 = strongly collectivist/interventionist; +1 = strongly market-liberal. Purely positional, not normative."
+        },
+        "parent_position_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Primary intellectual ancestors within the positions taxonomy. First entry is the primary parent (solid influence arrow); subsequent are secondary."
+        },
+        "anti_link_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Positions this school emerged in explicit opposition to (musicmap-style 'anti-link' / backlash arrows)."
+        }
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

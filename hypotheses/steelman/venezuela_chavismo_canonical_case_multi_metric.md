@@ -1,0 +1,33 @@
+# Steelman — Venezuela Chavismo canonical-case multi-metric
+
+**The strongest argument that the 10-metric checklist does NOT constitute a clean framework win for the market-liberal/Austrian prior against Chavismo as a policy complex:**
+
+The multi-metric pattern-match, even if fully satisfied, is not a causal test. Each of the 10 pre-registered metrics is compatible with one or more non-Chavismo explanations, and the fact that they co-move is partly mechanical (once the Bolivar collapses, minimum-wage-USD, purchasing-power, food-insecurity, and emigration metrics are all partly driven by the same FX event). The independence requirement is weaker than the schema claims.
+
+## Specific objections
+
+1. **The oil-price crash 2014-2016 is a dominant exogenous confound.** Brent fell from ~$110 (June 2014) to <$30 (January 2016). A mono-export economy with 95% of export earnings from oil would suffer a severe terms-of-trade shock under any government. Separating "Chavismo collapse" from "oil-crash collapse" requires either (a) a counterfactual Venezuela with the same oil exposure but non-socialist policy, which does not exist, or (b) decomposition work that the multi-metric checklist does not perform. A rigorous canonical-case claim must also pattern-match against *other* oil-dependent economies that went through 2014-2016 (Russia, Saudi Arabia, Nigeria, Angola, Ecuador) and show Venezuela is an outlier even within that peer group. The current 10 metrics gesture at this ("no peer oil economy suffered anything remotely comparable") but do not include the explicit benchmark check as a hard-falsification criterion.
+
+2. **US sanctions are a real, compounding treatment from 2015, intensified sharply 2017 (EO 13808), 2019 (PDVSA SDN listing), and 2020 (secondary sanctions on traders).** The post-2017 tightening is synchronous with the worst hyperinflation months, the worst oil-production decline, and the peak emigration wave. A clean decomposition would separate 1999-2014 Chavismo-plus-oil-boom, 2014-2017 Chavismo-plus-oil-crash-no-major-sanctions, and 2017+ Chavismo-plus-full-sanctions. The multi-metric checklist lumps these, so a "support" finding is ambiguous about which policy complex is being indicted.
+
+3. **The independence requirement is partially violated in practice.** Metrics like `real_minimum_wage_collapse_usd`, `currency_par_value_collapse`, and `hyperinflation_cagan_threshold` are all downstream of the parallel-FX-rate time series. They are distinct measurements but share a common root driver (BCV balance-sheet dynamics and parallel FX). If the hypothesis is that "Chavismo caused hyperinflation", then scoring these three as independent evidence for the broader claim (Chavismo caused canonical collapse) is double- or triple-counting a single causal fact. A stricter version of the checklist would group these under one composite "monetary collapse" metric.
+
+4. **Emigration has multiple drivers.** Venezuelan emigration accelerated after the 2015 crash, but it is also driven by Colombia opening its border, regional visa liberalisation for Venezuelans (Peru, Chile temporarily, Argentina), and pre-existing Venezuelan diaspora networks that lowered the fixed cost of migration. Pattern-matching "15% of population emigrated" to "Chavismo collapse" under-accounts for the pull factors and the network effects.
+
+5. **The 1999-2013 boom period is not captured in the metric set.** Chavismo's first 14 years featured real improvements in poverty, literacy, and HDI (UNDP data). A canonical-case claim that evaluates only the 2013+ collapse period is selecting on the collapse window. A complete canonical case would either (a) define the unit of analysis as "the full Chavismo complex 1999-2024 net balance" and include the 1999-2013 gains in the metric accounting, or (b) explicitly frame the hypothesis as "Chavismo collapse 2013-2024" and restrict causal attribution accordingly. The current framing does the latter implicitly but not cleanly.
+
+6. **ENCOVI and OVF are political-opposition-aligned sources.** ENCOVI is published by UCAB (Universidad Católica Andrés Bello), a Caracas private Catholic university that has been a locus of opposition intellectual activity. The Observatorio Venezolano de Finanzas (OVF) is affiliated with the opposition-controlled National Assembly finance committee. Both produce high-quality survey and statistical work, and both are better than BCV post-2014. But "independent of state statistics" is not the same as "independent of political interest in documenting collapse". A full independence audit would cross-check against IOM, FAO-WFP, and academic-consortium sources.
+
+7. **Data-quality flags compound.** Six of the ten metrics carry explicit `data_quality_flag` notes about censored state statistics. If the evaluator's threshold logic is binary (met/not-met), marginal data — where the real value is plausibly 60-90% rather than 95% — gets coded as "met" without a confidence adjustment. A probabilistic version of the checklist would score each metric 0-1 and report the expected number of metrics met rather than a hard count.
+
+## How this should shape the result card
+
+Even granting that Venezuela will plausibly score 8-10/10 on the checklist, the result card should:
+
+- Report the checklist score alongside the benchmark check against oil-peer economies (Russia, Saudi, Nigeria, Angola, Ecuador) and pre-Chavismo Venezuela.
+- Separate the 1999-2013 boom metrics (poverty reduction, HDI gain) from the 2013-2024 collapse metrics. Show both.
+- Flag the FX-downstream metric cluster (minimum-wage-USD, currency par, hyperinflation) as one composite rather than three independent items, or weight them down accordingly.
+- Present sanctions-timing decomposition as a supplementary analysis, not just a narrative note.
+- Acknowledge that "Chavismo is a canonical institutional-quality collapse" is a defensible characterisation of the 2013-2024 tail but is compatible with "Chavismo delivered real 1999-2013 gains financed by the oil boom at the cost of building a fragile economy that could not survive the shock".
+
+The canonical-case multi-metric finding is epistemically stronger than the single synthetic-control test it supersedes, but it is still pattern-matching rather than causal identification. It should be interpreted as "the Chavismo-era Venezuelan outcome pattern-matches the framework's prediction of canonical institutional-quality collapse to an unusual degree", not as "Chavismo caused the collapse via institutional channels that would have produced the same outcome absent the oil crash and sanctions".

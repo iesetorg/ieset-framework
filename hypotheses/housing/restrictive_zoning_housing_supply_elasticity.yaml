@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: restrictive_zoning_housing_supply_elasticity
+version: 1
+status: draft
+topic: housing
+claim: UK Town and Country Planning Act 1947 and subsequent restrictive-zoning regimes produce measurable housing supply elasticity reductions and price level increases relative to more-permissive planning
+  systems.
+notes: Stub seeded from a classical-liberal school prediction about UK 1947 Town and Country Planning Act reducing housing-supply elasticity. Long-run identification is contested; needs human review of
+  comparator selection (US vs continental Europe).
+prior_confidence: 0.7
+disclosure: Author's market-liberal priors strongly endorse the supply-side restrictive-zoning critique and may over-weight evidence of constrained UK supply elasticity while under-weighting demand-side
+  and monetary contributions to UK house-price growth.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: UK regional/sub-national panel regression of housing-supply elasticity (Saiz-style) and real house prices on planning-restrictiveness index 1947-2023; supported if elasticity coefficient negative
+    at p<0.10 and UK long-run real house-price growth exceeds permissive-comparator group by >50%.
+evidence_type: associational
+estimator:
+  template: panel_fe
+  clustering: region
+  fixed_effects:
+  - region
+  - year
+  notes: 'UK regional/local-authority panel-FE 1948-2023 of real house prices and estimated supply elasticity on planning-restrictiveness index, with region and year FE; region-clustered SEs. Comparator
+    group = US permissive-zoning MSAs + continental-European planning systems. Long-run identification is contested — demand-side (mortgage credit, monetary policy) and resource (land-availability) confounds
+    are partials in the control set, but residual confounding is a flagged caveat.
+
+    '
+sample:
+  countries:
+  - GBR
+  period:
+  - 1947
+  - 2023
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_house_price_index
+    source: oecd:OECD.SDD.PIN,DSD_RHPI@DF_RHPI,1.0
+    transformation: log
+    notes: OECD real house price index, GBR series. Long-run pre-1970 backseries from BIS where OECD coverage starts later.
+  - name: housing_supply_elasticity
+    source: derived:saiz_elasticity
+    transformation: level
+    notes: 'Saiz-style elasticity at MSA / local-authority level — derived from Hilber-Vermeulen-style UK study replication. TODO swarm-6e: confirm UK-specific elasticity series when academic publisher
+      schema lands.'
+  - name: dwelling_completions_per_capita
+    source: ons:dwellings_completed
+    transformation: log
+    notes: ONS new-dwelling completions per capita as proxy for supply response.
+  treatment:
+  - name: post_1947_planning_act_indicator
+    source: 'constructed: indicator = 1 for years >= 1948 (Town and Country Planning Act enactment); 0 for pre-1948.'
+    transformation: indicator
+  - name: planning_restrictiveness_index
+    source: derived:uk_planning_restrictiveness
+    transformation: level
+    notes: Composite restrictiveness index following Hilber-Vermeulen; derived under derived/. Comparator group = US permissive-zoning MSAs and continental-European planning systems.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: real_mortgage_rate
+    source: boe:bank_rate
+    transformation: level
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+scope:
+  period:
+  - 1947
+  - 2023
+  countries:
+  - GBR
+  outcome_dim:
+  - housing
+  - regulation_compliance_cost
+  policy_family:
+  - housing_policy
+  - regulation
+  treatment_tags:
+  - uk_town_country_planning_act_1947
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 12
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Classical-liberal claim that the UK 1947 Town and Country Planning Act and subsequent restrictive-zoning regimes reduce supply elasticity and raise prices is a verbatim match to the hypothesis's
+    own claim.

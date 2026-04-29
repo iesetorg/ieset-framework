@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: gdp_wellbeing_divergence_income_threshold
+version: 1
+status: draft
+topic: growth
+claim: Wellbeing-indicator measures (life satisfaction, ISEW/GPI, HDI) diverge from GDP per capita above roughly $25-35k per capita, indicating that further growth delivers diminishing welfare returns in
+  rich economies.
+notes: Seeded from a degrowth/Easterlin-paradox claim that wellbeing measures decouple from GDP per capita above ~$25-35k. Panel FE with piecewise spline; human review needed to choose between life-satisfaction
+  and ISEW/GPI as primary outcome.
+prior_confidence: 0.55
+disclosure: 'Authorial bias risk: ISEW/GPI is constructed by degrowth-friendly accountants and embeds value judgements (defensive expenditure deductions, depletion charges); life-satisfaction-vs-income
+  literature (Stevenson-Wolfers vs Easterlin) is genuinely contested.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE regression of life-satisfaction (Gallup/WVS) on log GDP per capita with piecewise spline at ~$30k threshold, country and year FE 1971-2023; falsified if upper-segment slope not flatter
+    than lower at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - CHE
+  - KOR
+  - ISR
+  - CHN
+  - IND
+  - BRA
+  - MEX
+  - ZAF
+  - RUS
+  - TUR
+  - IDN
+  - EGY
+  - NGA
+  - KEN
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: life_satisfaction
+    source: owid:happiness-cantril-ladder
+    transformation: level
+  - name: hdi
+    source: undp_hdi:hdi
+    transformation: level
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  treatment:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: above_threshold_indicator
+    source: 'constructed: indicator = 1 if gdp_pc_ppp >= 25000 (current PPP USD)'
+    transformation: indicator
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: gini_disposable
+    source: wid:gini_disp
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Cross-country panel of life-satisfaction, ISEW/GPI, and HDI on log GDP per capita with a piecewise spline at the $25-35k threshold. Tests whether the slope of wellbeing on income flattens or inverts
+    above the threshold.
+
+    '
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags:
+  - isew_gpi_accounting
+  - easterlin_paradox
+covers_claims:
+- position_id: degrowth
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts wellbeing indicators diverge from GDP per capita above ~$25-35k threshold, consistent with diminishing welfare returns from growth in rich economies.'

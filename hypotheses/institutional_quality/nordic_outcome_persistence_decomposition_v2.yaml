@@ -1,0 +1,181 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nordic_outcome_persistence_decomposition_v2
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  The v1 decomposition (three channels: WGI gov effectiveness, WGI rule of law,
+  IMF debt/GDP) left 98% of the Nordic-vs-Southern-Europe log GDP/capita gap
+  unexplained. v2 tests whether that residual is substantially explained by
+  five additional cross-sectionally-measured channels that discriminate Nordic
+  from Southern European economies over 1996-2023: control of corruption,
+  regulatory quality, fiscal net lending (surplus vs deficit flow), current
+  account balance, and trade openness. The v2 hypothesis predicts that
+  expanding the channel set absorbs most of the v1 residual on the primary
+  outcome.
+
+evidence_type: causal
+
+sample:
+  countries: [NOR, SWE, DNK, FIN, ISL, ESP, ITA, GRC, PRT, FRA]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing outcome variable"
+    - "drop Iceland pre-1998 where WGI coverage is incomplete"
+    - "winsorise Gini at 1st/99th percentile within sample"
+
+scope:
+  period: [1996, 2023]
+  countries: [NOR, SWE, DNK, FIN, ISL, ESP, ITA, GRC, PRT, FRA, NORDIC, SOUTHERN_EUROPE]
+  outcome_dim: [gdp_growth, institutional_quality, poverty_inequality, employment_labour]
+  policy_family: [institutional_reform, fiscal_policy, welfare_architecture]
+  treatment_tags: [nordic_model, wgi_governance, fiscal_discipline]
+
+variables:
+  outcome:
+    - name: gdp_per_capita_ppp_constant
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+
+  decomposition_channels:
+    # --- v1 channels retained ---
+    - name: government_effectiveness
+      source: "wgi:GOV_WGI_GE.EST"
+      transformation: level
+
+    - name: rule_of_law
+      source: "wgi:GOV_WGI_RL.EST"
+      transformation: level
+
+    - name: debt_to_gdp_imf
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+      notes: "IMF general-government gross debt. v1 pre-reg cited WDI central-govt debt which has only ~54 non-null obs on this panel; v2 uses IMF as primary per v1 result card's documented deviation."
+
+    # --- v2 additions: five novel channels surfaced by the exploratory analysis ---
+    - name: control_of_corruption
+      source: "wgi:GOV_WGI_CC.EST"
+      transformation: level
+      notes: "Nordic-vs-SE gap ≈ +1.95 SDs over sample. Proxies the 'crony capitalism' dimension of the user critique. Same WGI endogeneity caveat as gov effectiveness applies."
+
+    - name: regulatory_quality
+      source: "wgi:GOV_WGI_RQ.EST"
+      transformation: level
+      notes: "Separates regulatory channel from governance channel. Captures the 'smart welfare + market openness' claim."
+
+    - name: fiscal_net_lending_gdp
+      source: "imf:GGXCNL_NGDP"
+      transformation: level
+      notes: "General government net lending / borrowing as % of GDP. FLOW measure of fiscal discipline, cleaner than the debt STOCK measure because it picks up behaviour rather than history. Nordic +1.17 SDs gap."
+
+    - name: current_account_gdp
+      source: "imf:BCA_NGDPD"
+      transformation: level
+      notes: "Current account balance % GDP. Nordic +1.08 SDs gap. Proxies external-savings posture (surplus) vs borrower posture (deficit)."
+
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+      notes: "Trade (% GDP). Nordic +1.22 SDs gap. Proxies market-openness dimension of Nordic model."
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+    - name: urbanisation
+      source: "world_bank_wdi:SP.URB.TOTL.IN.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [year]
+  notes: >
+    PanelOLS with time effects, cluster-robust SEs by country. Country FE
+    deliberately excluded for the same reason as v1: they would absorb the
+    time-invariant Nordic dummy, making the hypothesis untestable at the
+    cross-sectional level. Baseline: nordic_dummy + year FE. Full: nordic_dummy
+    + 8 channels + 2 controls + year FE.
+
+    Design limitation acknowledged up-front: this is a cross-sectional
+    snapshot-style decomposition like v1. It does NOT test the trajectory
+    claim (Bildt 1991, Schröder 2003, Nyrup 1994, Norway SWF 2001 → outcome
+    improvements) — that's a separate v3 hypothesis requiring within-country
+    decomposition and movement-level DiD. v2 answers the narrower question:
+    'were the v1 channels just the wrong set?' If v2 absorbs the residual, the
+    answer is yes. If v2 still leaves a large residual, the decomposition
+    framing is exhausted and the story is trajectory-shaped or unmeasurably-
+    cultural, not cross-sectional.
+
+falsification:
+  rule: >
+    Not supported if the Nordic-dummy coefficient after including the eight
+    decomposition channels (v1 three + v2 five) plus two controls and year
+    fixed effects remains greater than 30% of the baseline Nordic-dummy
+    coefficient on the primary outcome (log GDP per capita PPP). Secondary
+    thresholds: residual_share(gini) ≤ 0.50, residual_share(unemployment)
+    ≤ 0.50. All three must hold for v2 support. Additional falsifier:
+    if v2's residual_share(log_gdp_pc_ppp) is not materially lower than
+    v1's 0.98 (say, within 0.10), v2 is refuted as a specification-
+    expansion explanation — the residual survives channel expansion and
+    the story is not omitted-variable bias but rather a structural
+    limitation of cross-sectional decomposition on this sample.
+
+  test: nordic_dummy_residual_share_across_outcomes_v2
+
+  threshold: >
+    residual_share(gdp_pc_ppp)  <= 0.30  AND
+    residual_share(gini)        <= 0.50  AND
+    residual_share(unemployment) <= 0.50
+    AND residual_share(gdp_pc_ppp) materially below v1's 0.976
+    (difference ≥ 0.10)
+
+prior_confidence: 0.55
+
+disclosure: >
+  Prior has been updated downward from v1's 0.75 based on the v1 result. The
+  v1 finding that three channels absorbed only 2% of the primary-outcome gap
+  is strong evidence that either (a) many more channels matter in combination,
+  or (b) the decomposition framing itself is wrong for this question and the
+  story is trajectory-shaped. v2 tests (a) directly. A v2 refutation moves
+  confidence decisively toward (b), which would motivate v3: within-country
+  panel + movement-level DiD on specific Nordic reform episodes.
+
+  The v2 channel selection was informed by an exploratory query over all
+  on-disk country-year series (see scripts/explore_nordic_candidates.py and
+  engine/runs/nordic_outcome_persistence_decomposition/exploratory_candidates.csv)
+  ranking candidates by |Nordic-SE gap z-score| × |correlation with log GDP| ×
+  coverage. This is NOT specification mining because (i) the regression on
+  these channels has not yet been run at spec-authoring time, (ii) the
+  exploratory query did not report any regression coefficients, only univariate
+  moments, (iii) the full channel set is committed to git before the run per
+  METHODOLOGY.md invariant 1.
+
+steelman: hypotheses/steelman/nordic_outcome_persistence_decomposition_v2.md
+
+linked_hypotheses:
+  - nordic_outcome_persistence_decomposition
+  - welfare_architecture_comparative_effectiveness
+
+linked_conditions:
+  - nordic_institutional_design
+
+notes: >
+  v2 deliberately does NOT address the trajectory / movement-level critique
+  from the v1 discussion — that's a structural-model change, not a channel
+  addition. v3 will be a within-country panel with country FE + interactions
+  on movement-reform-period indicators, requiring movement YAMLs for Bildt
+  1991, Nyrup 1994, Norwegian SWF 2001, Schröder 2003-05, Mitterrand 1981,
+  Greek fiscal-dominance 2000s, Italian stagnation 1990s-2010s, etc.
+  v3 depends on movements/*.yaml content landing first.

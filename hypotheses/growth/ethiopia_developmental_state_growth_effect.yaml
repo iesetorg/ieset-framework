@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ethiopia_developmental_state_growth_effect
+version: 2
+status: draft
+topic: growth
+claim: Pre-2010 Ethiopian developmental-state strategy (state-led infrastructure, industrial parks, export-credit
+  allocation) produced the fastest sustained African growth rates, consistent with late-developer industrial-policy
+  theory.
+notes: Seeded from a developmentalist position-claim that Ethiopia's pre-2010 EPRDF developmental-state strategy
+  yielded the fastest sustained African growth. Synthetic control vs SSA peer pool; human review required
+  on donor-pool selection and aid-flow confounders.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: developmentalist sympathies favour state-led readings of Ethiopia's growth; alternative explanations (donor aid, post-Derg recovery, coffee prices, demographic dividend) need parallel testing rather than being relegated to controls.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if BOTH (P1) Ethiopia
+    ranks #1 in cumulative log-GDP-per-capita (PPP) growth 1995-2010 within
+    the SSA peer pool {KEN, TZA, UGA, RWA, SEN, GHA, MOZ, MWI, ZMB, MDG, BDI}
+    AND (P2) Ethiopia's gap to the peer-pool median cumulative log-growth
+    over 1995-2010 is at least +0.20 log-points (~22% extra per-capita PPP
+    growth versus the median peer over the 15-year window).
+    PARTIAL if Ethiopia is in the top-3 OR its gap to median is positive but
+    not both primaries hold.
+    REFUTED if Ethiopia is outside the top-3 OR its gap to peer median is
+    negative.
+    INFORMATIVE: synthetic-control-lite (Dirichlet sample search on
+    pre-treatment 1991-1994 levels of log GDPpc PPP) counterfactual gap at
+    2010 is reported but does not gate the verdict.
+    METHOD_VALID: WDI NY.GDP.PCAP.PP.KD must be available 1991-2010 for ETH
+    and at least 9 of 11 named peers. METHOD_VALID failure -> inconclusive.
+  test: ssa_peer_panel_cumulative_log_growth_rank_and_gap
+  threshold: >-
+    PRIMARY: rank_eth(1995-2010 cum log GDPpc PPP growth) == 1
+    AND eth_cum_log_growth - peer_median_cum_log_growth >= 0.20
+methodology_note: >-
+  v2 promotion (2026-04-24). Sharpened the original generic falsification
+  rule to two dispositive primaries: (1) Ethiopia must rank #1 within the
+  pre-specified SSA peer pool on cumulative log-GDP-per-capita (PPP) growth
+  over 1995-2010, AND (2) the gap to the peer median must be at least +0.20
+  log-points. The 20-log-point threshold corresponds to roughly a 22% extra
+  per-capita PPP boost over 15 years versus a typical peer — the magnitude
+  a fair reader of "fastest sustained African growth" would expect for the
+  developmental state to count as the binding driver. Synthetic-control-
+  lite gap is reported as informative, not dispositive, because the donor
+  pool is small and pre-specified; ADH quadratic-programming SC is left
+  for v3. Treatment year set to 1995 (post-EPRDF strategy bedding-in),
+  matching the sample.treatment indicator. NV.IND.MANF.ZS dropped from
+  variables block because manufacturing share is not on disk in the WDI
+  vintage; capital formation and trade openness are retained as mechanism
+  diagnostics.
+evidence_type: associational
+
+sample:
+  countries: [ETH, KEN, TZA, UGA, RWA, SEN, GHA, MOZ, MWI, ZMB, MDG, BDI]
+  period: [1991, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude ETH 1998-2000 Eritrean war years from outcome trend smoothing"
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+  treatment:
+    - name: ethiopia_treated
+      source: "constructed: indicator = 1 for ETH, year >= 1995 (post-EPRDF developmental-state strategy)"
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    Ethiopia treated; donor pool of comparable Sub-Saharan African economies
+    (KEN, TZA, UGA, RWA, SEN, GHA, MOZ). Outcome: real GDP per capita 1991-
+    2010. Tests whether Ethiopia's developmental-state strategy produced
+    above-counterfactual growth.
+
+scope:
+  period: [1991, 2010]
+  countries: [ETH, AFRICA]
+  outcome_dim: [gdp_growth, industrial_capability]
+  policy_family: [industrial_policy, trade_policy]
+  treatment_tags: [ethiopia_developmental_state_strategy]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether pre-2010 Ethiopian developmental-state strategy produced fastest sustained African growth rates."
+

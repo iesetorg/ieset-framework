@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_policy_semiconductor_chips_act_effectiveness
+version: 1
+status: draft
+topic: trade
+claim: Biden's IRA/CHIPS industrial policy will show partial success on capacity-building metrics and
+  mixed results on job creation, consistent with the conditional view that industrial policy works where
+  targeting is technically competent and governance is strong.
+notes: Origin is auto-generated coverage-gap stub seeded from developmentalist + pragmatist framings
+  of CHIPS/IRA producing partial capacity gains and mixed jobs effects. Human review required.
+prior_confidence: 0.50
+disclosure: Author has market-liberal priors that may underweight legitimate strategic-goods rationale
+  for CHIPS; framing risks selecting on still-incomplete 2025-30 evidence and confounding with cyclical demand.
+falsification:
+  rule: >-
+    PRIMARY (dispositive, evaluated 2030): the conditional claim is SUPPORTED iff
+    ALL THREE of: (a) US semiconductor manufacturing value added gains >30% over
+    a 2021 baseline (capacity-success), (b) US sector employment gains <15% over
+    the same baseline (jobs-mixed), AND (c) cumulative private capex commitments
+    triggered by CHIPS exceed $200B (leverage). REFUTED iff capacity gain <10%
+    AND capex <$100B by 2030 (no industrial-base shift). PARTIAL otherwise.
+    METHOD_VALID gate: the primary outcome series — oecd:STAN_INDUSTRY ISIC C26,
+    bls:CES3133, ilostat semiconductor employment, and a CHIPS capex tracker —
+    must be available, AND the post-treatment window must be at least 4 years
+    of observed data. If either fails, verdict is INCONCLUSIVE (data gap or
+    window too short), not refuted.
+  test: chips_ira_2030_multi_metric_pattern_check
+  threshold: >-
+    PRIMARY: capacity_VA_change_vs_2021 > 0.30 AND
+    sector_employment_change_vs_2021 < 0.15 AND
+    cumulative_private_capex_USD_bn > 200.
+    METHOD_VALID: all 4 spec-named series available AND post_treatment_years >= 4.
+evidence_type: associational
+
+scope:
+  period: [2021, 2030]
+  countries: [USA]
+  outcome_dim: [industrial_capability, productivity, employment_labour]
+  policy_family: [industrial_policy, fiscal_policy, energy_policy]
+  treatment_tags: [biden_chips_act_2022, biden_ira_2022]
+sample:
+  countries: [USA, KOR, TWN, JPN, DEU]
+  period: [2018, 2030]
+  temporal_structure: panel
+  exclusion_rules:
+    - "USA is treated unit; KOR/TWN/JPN/DEU are semiconductor-manufacturing-peer comparator pool"
+    - "report 2025-2030 window separately as projection-dependent"
+variables:
+  outcome:
+    - name: log_semiconductor_manufacturing_value_added
+      source: "oecd:STAN_INDUSTRY"
+      transformation: log
+      notes: "OECD STAN ISIC C26 (computer, electronic and optical products) value added — primary capacity outcome. TODO swarm-6e: verify exact dataflow when oecd STAN fetcher coverage extends."
+    - name: semiconductor_employment_thousands
+      source: "bls:CES3133"
+      transformation: log
+      notes: "BLS CES semiconductor and other electronic component manufacturing employment. US-only; cross-country uses ILOSTAT."
+    - name: semiconductor_employment_ilostat
+      source: "ilostat:semiconductor_employment"
+      transformation: log
+    - name: capex_announced_chips_act
+      source: "constructed: hand-coded CHIPS Act award announcements + private capex commitments (DoC database). Total $ billions cumulative."
+      transformation: level
+  treatment:
+    - name: chips_act_post_2022_indicator
+      source: "constructed: indicator = 1 for USA from 2022-08 (CHIPS and Science Act enactment); 0 for comparator pool."
+      transformation: indicator
+    - name: ira_post_2022_indicator
+      source: "constructed: indicator = 1 for USA from 2022-08 (Inflation Reduction Act); separate from CHIPS for the energy/clean-tech subsidy channel."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    Pre-registered multi-metric pattern check by 2030: (a) US semi-fab capacity
+    gain >30% over 2021 baseline = capacity-success metric; (b) aggregate
+    sector employment gain <15% = jobs-mixed metric; (c) cumulative
+    private capex commitments >$200B = leverage metric. Hypothesis SUPPORTED
+    if pattern matches all three conditional metrics. Caveat: 2030 horizon
+    means primary spec runs incomplete until then — flagged TODO swarm-6e.
+    Cyclical-demand confound (post-COVID semiconductor cycle) addressed by
+    cross-country comparison to KOR/TWN/JPN/DEU peers.
+
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic falsification rule
+  into a dispositive 2030 multi-metric pattern check (>30% capacity gain AND
+  <15% employment gain AND >$200B private capex). Added an explicit METHOD_VALID
+  gate requiring the four spec-named semiconductor-specific series AND ≥4 years
+  of post-treatment data, both of which fail today — so v1 verdict is
+  INCONCLUSIVE on stacked grounds (data gap + window too short). The script
+  audits required series, probes the best-available proxy
+  (world_bank_wdi:NV.IND.TOTL.KD), and is structured to re-run cleanly once
+  oecd:STAN_INDUSTRY (ISIC C26), bls:CES3133, ilostat sectoral employment,
+  and a CHIPS-capex tracker land. Substantively, CHIPS Act fab build-out
+  lead-times of 3-5 years mean primaries do not become informative until
+  ~2027-2028 even with perfect data — the spec's 2030 horizon already
+  acknowledges this. Re-run is appropriate post-2027 vintage.
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Developmentalist position predicts CHIPS/IRA produces measurable capacity and productivity gains; hypothesis tests the same US CHIPS/IRA capacity-building claim."
+  - position_id: empirical_pragmatist
+    claim_index: 12
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Pragmatist position predicts partial capacity success and mixed jobs outcome under competent targeting; hypothesis tests the same conditional claim on CHIPS/IRA."
+

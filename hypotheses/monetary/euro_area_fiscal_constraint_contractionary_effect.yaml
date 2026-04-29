@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: euro_area_fiscal_constraint_contractionary_effect
+version: 1
+status: draft
+topic: monetary
+claim: Euro-area Southern members (Greece, Italy, Spain) post-2010 suffered larger output contractions than fiscal-space-preserving peers because Maastricht-constrained fiscal policy combined with ECB pre-2015
+  tightness produced contractionary conditions New Keynesian models predict at the currency-union ZLB.
+notes: Origin is auto-generated coverage-gap stub seeded from New Keynesian framing of post-2010 Southern Europe contractions as predictable Maastricht+ECB ZLB outcomes. Human review required.
+prior_confidence: 0.65
+disclosure: Author largely accepts the NK view of the eurozone crisis but is sceptical of treating fiscal-rule design as solely contractionary; framing risks downplaying Southern fiscal pre-crisis fragility.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Eurozone country panel 2000-2019 with post-2010 fiscal-constraint x ZLB interaction predicting real GDP and unemployment; coefficient on interaction <0 with p<0.10 supports the hypothesis.
+evidence_type: associational
+scope:
+  period:
+  - 2010
+  - 2019
+  countries:
+  - GRC
+  - ITA
+  - ESP
+  - SOUTHERN_EUROPE
+  - EUROZONE
+  outcome_dim:
+  - fiscal_policy
+  - gdp_growth
+  - monetary_policy
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  treatment_tags:
+  - maastricht_fiscal_constraint
+  - ecb_pre_2015_tightness
+  - eurozone_sovereign_debt_crisis_2010
+  - currency_union_zlb
+covers_claims:
+- position_id: new_keynesian
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: New Keynesian claim that Maastricht-constrained fiscal + ECB tightness produced contractionary conditions in Southern Europe post-2010 as NK models predict at currency-union ZLB.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Stub-level estimator pin for runnability audit. Eurozone country panel 2000-2019 with the post-2010 fiscal-constraint × ZLB indicator interacted against output and unemployment outcomes. Country
+    and year fixed effects absorb common shocks; identification is from cross-sectional variation in fiscal-space pressure within the currency union. Falsification rule and variables block remain to be
+    filled when this stub is promoted from draft.
+
+    '
+sample:
+  countries:
+  - GRC
+  - ITA
+  - ESP
+  - PRT
+  - IRL
+  - FRA
+  - DEU
+  - NLD
+  - BEL
+  - AUT
+  - FIN
+  period:
+  - 2000
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years under formal Troika programme (GRC 2010-18, IRL 2010-13, PRT 2011-14, CYP 2013-16) for primary spec; include as robustness
+variables:
+  outcome:
+  - name: real_gdp_growth
+    source: eurostat:nama_10_gdp; world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_change_yoy
+  - name: unemployment_rate
+    source: eurostat:une_rt_a; ilostat:UE_TUNE_SEX_AGE_RT
+    transformation: level_pct
+  - name: cpi_inflation
+    source: ecb:ICP; eurostat:prc_hicp_manr
+    transformation: pct_change_yoy
+  treatment:
+  - name: maastricht_constraint_pressure
+    source: 'constructed: distance to 3% deficit / 60% debt thresholds, eurostat:gov_10dd_edpt1'
+    transformation: level
+    notes: 'Composite distance metric: max(0, deficit-3) + max(0, debt-60) scaled.'
+  - name: post_2010_indicator
+    source: 'constructed: binary = 1 from 2010-Q1 (start of sovereign-debt crisis)'
+    transformation: binary
+  - name: zlb_indicator
+    source: 'constructed: binary = 1 when ECB MRO < 0.5%'
+    transformation: binary
+  controls:
+  - name: ecb_policy_rate
+    source: ecb:FM:STN; bis:WS_CBPOL
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: external_balance_pct_gdp
+    source: imf:BCA_NGDPD; eurostat:bop_c6_q
+    transformation: level

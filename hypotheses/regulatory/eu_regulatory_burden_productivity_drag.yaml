@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_regulatory_burden_productivity_drag
+version: 1
+status: pre_registered
+topic: regulatory
+claim: 'The cumulative EU regulatory stack (GDPR 2018, MiFID II 2018, DMA 2022, DSA 2022, AI Act 2024, Taxonomy Regulation 2020, CSRD 2023, MiCA 2023, CBAM 2023, plus sector-specific accretion) has imposed
+  measurable productivity drag on EU firms relative to US counterparts in the same sectors. The drag is concentrated in scale-sensitive sectors (digital platforms, asset management, large manufacturing,
+  financial services) where fixed compliance costs are spread over smaller market size than US peers achieve. Over 2018-2023, the cumulative TFP differential between EU and US in affected sectors exceeds
+  5 percentage points. This is consistent with the Draghi Report (2024) characterisation of EU competitiveness decline.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - POL
+  - SWE
+  - IRL
+  - AUT
+  - USA
+  period:
+  - 2015
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: log_labour_productivity
+    source: 'constructed: gross value added per hour worked (OECD STAN or similar). EU-KLEMS preferred where available.'
+    transformation: log
+  - name: log_tfp_index
+    source: 'constructed: total factor productivity index (sector-level where possible; else country-level OECD productivity database)'
+    transformation: log
+  treatment:
+  - name: eu_post_2018_gdpr_dummy
+    source: 'constructed: indicator = 1 for EU member states in year 2018 onward. USA = never-treated as control.'
+    transformation: indicator
+  - name: eu_post_2022_dma_dsa_dummy
+    source: 'constructed: indicator for incremental effect post-DMA/DSA era.'
+    transformation: indicator
+  decomposition_channels:
+  - name: oecd_pmr_overall
+    source: oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2
+    transformation: level
+  - name: fraser_efw_regulation_subindex
+    source: fraser_efw:area_5_regulation
+    transformation: level
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: debt_to_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: "Two-way FE panel. β_eu_post_2018 identifies EU-member average post-GDPR productivity divergence from the US + non-EU-baseline. Because USA is the sole non-EU control + possibly GBR post-2020 (Brexit\
+    \ creates control variation), the identification is admittedly narrow.\nSensitivity: swap OECD PMR overall for regulation-subindex-only to isolate pure regulatory channel from broader PMR.\nKnown limitations:\
+    \ (1) Single control country (USA) is weak identification; adding CAN,\n    AUS, CHE as non-EU-advanced controls would strengthen.\n(2) TFP measurement is notoriously noisy and depends on KLEMS-type\n\
+    \    sectoral decomposition not uniformly available.\n(3) The 2018-2023 window overlaps with COVID + energy crisis + war\n    in Ukraine. Year FE soak up common shocks but the shocks were\n    heterogeneous\
+    \ across EU vs US.\n"
+falsification:
+  rule: 'Not supported if β_eu_post_2018 is non-negative or not statistically significant at p<0.10 on log labour productivity, OR if after controlling for energy prices + COVID exposure + fiscal-response
+    magnitude, the EU-post-2018 coefficient loses significance. The rigorous falsification would also include a placebo test (EU-post at a pre-2018 fake date should show no effect).
+
+    '
+  test: eu_post_2018_productivity_divergence_panel_fe
+  threshold: 'β_eu_post_2018 < -0.02 (log points) at p<0.10 AND robust to energy-price + COVID controls
+
+    '
+prior_confidence: 0.7
+disclosure: 'This hypothesis aligns with the Draghi Report (2024) framing and with mainstream competitiveness literature (Aghion, Philippon, Papaioannou). Author prior is high that the pattern exists; low
+  confidence that this specific cross-sectional + time-interaction design identifies it cleanly. A v2 with industry-level decomposition (EU-KLEMS by sector) would be stronger.
+
+  The framework explicitly acknowledges: "EU bureaucracy causes degrowth" as a slogan oversimplifies. The rigorous claim is "specific regulatory- compliance-cost accretion imposes measurable productivity
+  drag on scale-sensitive sectors where fixed costs are large relative to market size" — which is testable and more defensible than the slogan.
+
+  '
+steelman: hypotheses/steelman/eu_regulatory_burden_productivity_drag.md
+linked_hypotheses:
+- us_eu_divergence_decomposition
+notes: 'Data readiness: - OECD PMR (ready ✓) - WGI, Fraser EFW (registered, some data pending) - EU-KLEMS sectoral TFP — specialist fetcher needed for v1.1 - OECD STAN labour productivity — available via
+  OECD API (ready ✓)
+
+  v1 runs on country-level data on disk; v1.1 adds sectoral decomposition when EU-KLEMS fetcher ships.
+
+  '
+scope:
+  period:
+  - 2015
+  - 2023
+  countries:
+  - EU
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - POL
+  - SWE
+  - IRL
+  - AUT
+  - USA
+  outcome_dim:
+  - productivity
+  - regulation_compliance_cost
+  - competition_concentration
+  policy_family:
+  - regulation
+  treatment_tags:
+  - eu_gdpr_2018
+  - eu_mifid_ii_2018
+  - eu_dma_2022
+  - eu_dsa_2022
+  - eu_ai_act_2024
+  - eu_taxonomy_2020
+  - eu_csrd_2023
+  - eu_mica_2023
+  - eu_cbam_2023
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 14
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: Audit flagged FAIL — classical-liberal claim references REACH (pre-2015) and uses a 2000-2020 window, whereas this hypothesis starts at GDPR 2018 within a 2015-2023 window (REACH absent). Included
+    provisionally pending Phase 4C reconciliation via claim rewrite or hypothesis pre-2015 extension.

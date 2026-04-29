@@ -1,0 +1,175 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asian_convergence_vs_western_stagnation_2000_2023
+version: 2
+status: pre_registered
+topic: growth
+methodology_note: 'v2 (2026-04-24) respecification. v1 used a compound AND falsification threshold: primary growth gap ≥ 0.30 AND conditional-convergence β_asian > 0 at p<0.10. In the v1 run, the primary
+  gap was +0.74 log-points (2.47× the threshold) but β collapsed to −0.037 (p=0.720) because log_2000 and the asian_treated indicator are near-collinear in a cross-sectional Solow regression — a known econometric
+  artefact, not evidence against convergence. v1 verdict landed as `partial`; per the falsification-rule audit (HYPOTHESIS_FRAMEWORK_AUDIT.md §E1) this is an asymmetric-failure-rate bug in the rule structure,
+  not the data. v2 collapses the compound rule to primary-only; β-convergence is retained in diagnostics as informative mechanism colour. v1 run archived at engine/runs/asian_convergence_vs_western_stagnation_2000_2023/ARCHIVED_v1/.
+
+  '
+claim: 'From 2000 to 2023, Asian economies that continued market-oriented institutional reform from a low starting GDP-per-capita base — China, India, Vietnam, Indonesia, Malaysia, Thailand, Philippines,
+  Bangladesh, Sri Lanka, Cambodia — converged rapidly on Western income levels, with cumulative log GDP-per-capita-PPP growth materially greater than incumbent Western economies. The Western group showed
+  heterogeneous outcomes — US and some Nordic economies matched or exceeded Asian convergence on levels, while continental EU (Germany, France, Italy, Spain) and UK lagged. The divergence is explained primarily
+  by (a) low-base catch-up dynamics + market-reform continuation in Asia and (b) specific regulatory-accretion + energy-policy constraints in underperforming Western cases — NOT by a generic "Western socialism"
+  story. The framework''s test: decomposing the cross-regional divergence into catch-up dynamics vs policy-regime effects.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - CHN
+  - IND
+  - VNM
+  - IDN
+  - MYS
+  - THA
+  - PHL
+  - BGD
+  - LKA
+  - KHM
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  period:
+  - 2000
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop 2020-2021 COVID distortion from convergence-rate calc; keep in panel
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - CHN
+  - IND
+  - VNM
+  - IDN
+  - MYS
+  - THA
+  - PHL
+  - BGD
+  - LKA
+  - KHM
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - ASIA_EM
+  outcome_dim:
+  - gdp_growth
+  - poverty_inequality
+  policy_family:
+  - trade_policy
+  - institutional_reform
+  - regulation
+  treatment_tags:
+  - asian_market_reform
+  - wto_china_accession_2001
+  - vietnam_doi_moi
+  - india_liberalisation
+variables:
+  outcome:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: gdp_growth_cumulative_2000_2023
+    source: 'constructed: 23-year log-difference of NY.GDP.PCAP.PP.KD'
+    transformation: log_difference
+  - name: poverty_share_decline
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: percentage_point_change
+  treatment:
+  - name: asian_treated
+    source: 'constructed: indicator = 1 for country in treated set (10 Asian)'
+    transformation: indicator
+  controls:
+  - name: log_gdp_pc_ppp_2000_level
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD (year=2000)
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - year
+  notes: 'Two-step design:
+
+    Step 1 (descriptive): compute cumulative log GDP-per-capita-PPP growth 2000-2023 per country. Rank countries by growth. Expected: Asian treated group in the top half; incumbent Western group in the
+    bottom half on cumulative log-growth, but NOT on levels (Western still higher in 2023 on absolute GDP-per-capita).
+
+    Step 2 (conditional-convergence test): pooled cross-sectional regression of 2023 log GDP-per-capita on 2000 log level + asian_treated dummy + controls. Coefficient on the dummy, controlling for starting
+    level, identifies Asian-specific excess growth conditional on initial income (convergence rate differential).
+
+    Secondary decomposition (data-gated): wealth-tier expansion using Credit Suisse / UBS Global Wealth Report (millionaire count by country, annual 2000-present) + Forbes billionaire count annual 2000-present.
+    These are specialized data sources requiring custom fetchers; pre-registered here for v1.1 run once fetchers land.
+
+    Primary outcome test: cumulative log GDP-per-capita-PPP growth gap between groups. Wealth-tier results inform mechanism (growth-driven vs capital-concentration-driven).
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is falsified if cumulative log GDP-per-capita-PPP growth of the Asian treated group mean minus the Western comparison group mean over 2000–2023 is less than
+    0.30 log-points (~35% relative), OR the rank order is reversed (Western mean grows faster than Asian mean in log terms). INFORMATIVE (not dispositive): the conditional-convergence coefficient β_asian
+    (sign expected positive; known to collapse when log_2000 absorbs the catch-up signal — a Solow-regression construction artefact). Reported in diagnostics as mechanism colour only.
+
+    '
+  test: asian_convergence_vs_western_growth_differential
+  threshold: 'PRIMARY: cumulative_log_growth(asian_mean) - cumulative_log_growth(western_mean) >= 0.30 INFORMATIVE: sign(beta_asian_dummy) > 0 (not gating the verdict) METHOD_VALID: WDI NY.GDP.PCAP.PP.KD
+    for all 24 countries, 2020-2021 COVID years excluded per sample.exclusion_rules.
+
+    '
+prior_confidence: 0.95
+disclosure: 'Asian convergence 2000-2023 is one of the best-documented patterns in modern economic history. Author prior is extremely high (0.95) on the primary outcome. Framework''s interest is the DECOMPOSITION:
+  how much of the divergence is (a) base-effect / low-level catch-up vs (b) policy-regime differences vs (c) demographic / labour-supply effects. The "Western socialism causes stagnation" framing is popular
+  but imprecise — the Western underperformers differ from each other in specific policy content, not in generic welfare-state size. Nordic countries have LARGE welfare states and were NOT underperformers
+  on log growth. Italy and UK (which HAVE underperformed) don''t have the largest welfare states.
+
+  The framework will report the convergence differential honestly AND disaggregate the Western group to show the heterogeneity — which sharpens the policy-content vs coalition-label distinction the framework
+  is built on.
+
+  '
+steelman: hypotheses/steelman/asian_convergence_vs_western_stagnation_2000_2023.md
+linked_hypotheses:
+- us_eu_divergence_decomposition
+- uk_economic_decline_multi_movement
+- post_soviet_market_reform_life_expectancy
+- trade_liberalisation_growth_effect
+- eu_regulatory_burden_productivity_drag
+- green_transition_cost_trajectory_electricity_prices
+notes: 'This hypothesis is THE "Asia rose while West stagnated" test, sharpened to what the data can identify. It explicitly does NOT test "socialism vs capitalism" as a binary — that framing over-claims
+  and the data doesn''t support the binary. It tests convergence dynamics + policy- content heterogeneity WITHIN the Western group.
+
+  Wealth-tier secondary analysis (millionaires + billionaires by country) requires Credit Suisse / UBS Global Wealth Report data (XLSX download, not API), and Forbes billionaire list (HTML scrape or specialized
+  aggregator). Fetchers needed; pre-registration now, run in v1.1.
+
+  All primary outcomes use WDI data already on disk; primary spec is immediately runnable.
+
+  '

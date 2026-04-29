@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: lula_third_term_fiscal_discipline_commitment_2023_present
+version: 1
+status: pre_registered
+topic: fiscal
+claim: 'Brazil''s Novo Arcabouço Fiscal (Lei Complementar 200 of 2023) holds the federal primary-balance path and the real-spending growth rate within its statutory band (real primary spending growth 0.6-2.5%
+  per year, conditional on primary-balance target attainment) through 2026, and the cumulative 2023-2026 primary- balance outcome does not diverge from target by more than one standard deviation of the
+  historical primary-balance forecast error. The hypothesis is testable because the framework statutorily specifies a band; the test is whether the realised fiscal path falls inside or outside that band.
+  The null is not that Lula 3.0 is fiscally expansionary, but rather that the institutional framework it created is binding on the executive''s ex-ante preferences. A positive result updates toward institutional-constraint
+  effectiveness; a falsification updates toward the post-Keynesian and developmentalist reading that PT-era fiscal commitments erode under pressure.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - BRA
+  period:
+  - 2015
+  - 2027
+  temporal_structure: time_series
+  exclusion_rules:
+  - exclude 2020 and 2021 fiscal outcomes when computing historical forecast-error variance (COVID extraordinary spending disrupts the comparable baseline)
+variables:
+  outcome:
+  - name: primary_balance_pct_gdp_federal
+    source: imf:GGXCNL_NGDP (primary balance, general gov); brazil_stn:Resultado
+    transformation: annual_pct_gdp
+  - name: real_primary_spending_growth_rate
+    source: brazil_stn:Despesa; deflator from imf:PCPIPCH
+    transformation: annual_real_growth_pct
+  - name: gross_debt_gdp
+    source: imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: level
+  - name: fiscal_framework_compliance_indicator
+    source: 'constructed: 1 if both real spending growth in band AND primary-balance within target +/- 1SD of forecast error; 0 otherwise'
+    transformation: annual_binary
+  treatment:
+  - name: lula_third_term_indicator
+    source: 'constructed: indicator = 1 from 2023-01-01 onward; 0 prior'
+    transformation: binary
+  - name: marco_fiscal_regime_indicator
+    source: 'constructed: indicator = 1 from 2023-08-30 (LC 200/2023 publication) onward; 0 prior'
+    transformation: binary
+  - name: pt_prior_era_indicator
+    source: 'constructed: indicator for Rousseff era 2011-2016 as a historical comparator'
+    transformation: binary
+    notes: Included as a reference anchor in a historical comparative exercise, not as a contemporaneous control.
+  controls:
+  - name: commodity_price_index
+    source: imf:Primary; world_bank_wdi:pink_sheet
+    transformation: annual_log_change
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: annual_average
+  - name: real_gdp_growth
+    source: imf:NGDP_RPCH
+    transformation: annual_pct
+  - name: output_gap
+    source: imf:NGAP_NPGDP
+    transformation: level
+estimator:
+  template: event_study
+  clustering: year
+  notes: 'Single-unit event study around the 2023 start of Lula III and the August 2023 activation of the new fiscal framework. Primary presentation: realised primary-balance path and real-spending growth
+    vs the Lei Complementar 200 statutory band over 2023- 2026. Historical comparison: Rousseff era (2011-2015) same- window path for qualitative context. Formal statistical test uses the forecast-error
+    variance of primary-balance IMF projections (published pre-Lula 2022 for fiscal years 2023- 2026); deviations beyond ±1SD are treated as breaches.
+
+    '
+falsification:
+  rule: 'Not supported if EITHER (a) in two or more of the years 2023, 2024, 2025, 2026, real primary-spending growth falls outside the 0.6-2.5% statutory band AS MEASURED IN REALISED SPENDING (not as measured
+    in the budget ex-ante), OR (b) the cumulative 2023-2026 primary-balance outcome deviates from the cumulative pre-Lula IMF-projection baseline by more than two standard deviations of the historical (2015-2019)
+    annual primary-balance forecast error, OR (c) the Novo Arcabouço Fiscal is statutorily replaced or suspended within the 2023-2026 window (a measurable institutional-reversal event).
+
+    '
+  test: fiscal_framework_compliance_and_primary_balance_variance
+  threshold: 'years_in_band >= 3 of 4 (2023-2026 inclusive) AND |cumulative_primary_balance_deviation| <= 2 * SD(historical_forecast_error) AND fiscal_framework_statute_replaced = FALSE within window
+
+    '
+prior_confidence: 0.45
+disclosure: 'Prior is below 0.50 reflecting genuine uncertainty. The post- Keynesian reading is that fiscal commitment devices erode when the political coalition faces growth shocks; the monetarist / institutional
+  reading is that legally-specified bands can bind if the CB and market discipline reinforce them. Author''s market- liberal prior would assign higher weight to erosion risk; the 2023-2024 realised outcomes
+  show the framework holding so far, which partially offsets. Pre-registering a prior below 0.50 commits the framework to a genuine uncertainty position rather than a loaded test.
+
+  '
+conflict_disclosure: 'Author holds no Brazilian asset exposure. Institutional-quality prior is aligned with the view that binding fiscal frameworks matter; the hypothesis gives both directions of update
+  weight.
+
+  '
+steelman: hypotheses/steelman/lula_third_term_fiscal_discipline_commitment_2023_present.md
+scope:
+  period:
+  - 2015
+  - 2027
+  countries:
+  - BRA
+  outcome_dim:
+  - fiscal_policy
+  - inflation
+  - monetary_policy
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  - institutional_reform
+  treatment_tags:
+  - marco_fiscal_2023
+  - novo_arcabouco_fiscal_2023
+  - lula_third_term
+covers_claims:
+- position_id: developmentalism
+  claim_index: 16
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Developmentalist position reads Marco Fiscal (LC 200/2023) as proving structuralist fiscal space is compatible with inflation-targeting; hypothesis tests whether the statutory band binds through
+    2026.
+- position_id: post_keynesian
+  claim_index: 14
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'Post-Keynesian position credits market-yield and BCB real-rate pressure, not the statutory frame, for observed compliance; isolating the framework''s independent contribution is an identification
+    problem. Phase 4C concern: inbound claim previously ERA_MISMATCH coded to 2003-2011 Lula; scope here corrects to the 2015-2027 Lula-III window.'
+linked_hypotheses:
+- procyclical_fiscal_expansion_boom_bust
+- austerity_output_recovery_tradeoff
+notes: 'Data-gated: Brazil STN (Secretaria do Tesouro Nacional) monthly Resultado Primário and Despesa Primária series required; IMF WEO annual general-government fiscal aggregates are the automated fallback.
+  Historical forecast-error variance computed from IMF WEO vintage series (April 2022 vintage for 2023-2026 projections as pre-Lula baseline).
+
+  Pre-registration is particularly important here because the political tendency will be to re-characterise the statutory band mid-stream if realised spending exceeds it. V1 commits to the band as published
+  in LC 200/2023; any post-2023 statutory amendment widening the band is coded as a framework erosion, not as compliance.
+
+  '

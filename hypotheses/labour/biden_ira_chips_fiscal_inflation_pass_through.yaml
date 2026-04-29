@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: biden_ira_chips_fiscal_inflation_pass_through
+version: 1
+status: draft
+topic: labour
+claim: US Biden IRA + CHIPS 2022 fiscal expansion produced measurable industrial investment gains without
+  triggering persistent wage-price spiral once supply-side pandemic disruptions resolved.
+notes: Stub seeded from MMT school prediction about Biden IRA/CHIPS fiscal pass-through. Period overlaps
+  COVID supply-side shocks; needs human review on isolating fiscal-impulse vs supply-normalisation effects.
+prior_confidence: 0.50
+disclosure: Author's market-liberal priors are skeptical of MMT/large-fiscal claims and view 2021-2023 inflation
+  as primarily driven by ARP+supply shocks; could under-weight industrial-investment evidence and bias
+  toward inflation-spiral findings.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Local projections of US wage growth and core PCE on identified IRA/CHIPS fiscal shocks 2022-2025;
+    supported if industrial-investment IRF is positive and wage-price spiral coefficient near zero (p>0.10).
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [2018, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "flag pandemic-shock window 2020-Q2 to 2021-Q4 as supply-side confound"
+
+variables:
+  outcome:
+    - name: cpi_all_items
+      source: "fred:CPIAUCSL"
+      transformation: log_yoy
+      notes: "BLS CPI via FRED — headline inflation."
+    - name: cpi_core_pce
+      source: "fred:PCEPILFE"
+      transformation: log_yoy
+    - name: average_hourly_earnings
+      source: "bls:CES0500000003"
+      transformation: log_yoy
+      notes: "BLS CES total private average hourly earnings — wage side of pass-through."
+    - name: manufacturing_construction_spending
+      source: "fred:TLMFGCONS"
+      transformation: log
+      notes: >
+        FRED total manufacturing construction-spending — captures
+        IRA/CHIPS industrial-investment outcome.
+  treatment:
+    - name: ira_chips_fiscal_impulse
+      source: "derived:cbo_ira_chips_outlay_path"
+      transformation: level
+      notes: >
+        CBO-scored IRA + CHIPS outlay path; shock identification via
+        announcement-date residuals. Hand-coded under derived/.
+  controls:
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log_yoy
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: level
+    - name: import_price_index
+      source: "fred:IR"
+      transformation: log_yoy
+      notes: "FRED import-price index — supply-side normalisation control."
+
+scope:
+  period: [2022, 2025]
+  countries: [USA]
+  outcome_dim: [industrial_capability, inflation, employment_labour]
+  policy_family: [fiscal_policy, industrial_policy]
+  treatment_tags: [biden_ira_2022, chips_act_2022, covid_fiscal_response_2020]
+
+covers_claims:
+  - position_id: mmt
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "MMT predicts Biden IRA+CHIPS fiscal expansion boosts industrial investment without persistent wage-price spiral post supply-side normalisation; Phase 4C should verify wage-price spiral measurement window aligns with post-pandemic recovery."
+
+estimator:
+  template: local_projections
+  clustering: HAC
+  fixed_effects: []
+  notes: >
+    Local projections of inflation and wage-price dynamics on
+    identified IRA/CHIPS fiscal-impulse shocks (CBO-scored outlay
+    paths) using monthly US time series 2020-2025. HAC standard
+    errors. Counterfactual decomposition of supply-side normalisation.

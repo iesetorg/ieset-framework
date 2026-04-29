@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: emilia_romagna_coop_employment_resilience
+version: 1
+status: draft
+topic: labour
+claim: Cooperative-sector firms in northern Italy (Emilia-Romagna) sustained employment through the 2008-2012
+  recession at rates higher than matched private-sector firms of similar size.
+notes: Stub seeded from a market-socialist school prediction about Emilia-Romagna cooperative-sector employment
+  resilience through GFC. Distinctive industrial-district context confounds matching; needs human review
+  of donor-pool construction.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors view cooperative-resilience claims as plausibly real but heavily
+  context-bounded by the Emilia-Romagna industrial-district complementarities; could under-weight pure
+  governance-form effects and over-attribute observed gaps to regional industrial structure.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Synthetic DiD on Emilia-Romagna cooperative-sector employment 2008-2012 vs matched donor pool of
+    Italian regions controlling for sector mix; supported if employment-retention gap exceeds matched comparator
+    by >5pp at p<0.10.
+evidence_type: associational
+
+sample:
+  countries: [ITA]
+  period: [2005, 2014]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop firms missing employment observations in pre-period 2005-2007"
+    - "winsorise firm-level employment growth at 1st/99th sample percentile"
+
+variables:
+  outcome:
+    - name: regional_employment_total
+      source: "eurostat:lfst_r_lfe2emp"
+      transformation: log
+      notes: >
+        Eurostat regional employment (NUTS-2) — Emilia-Romagna code
+        ITH5. Donor pool: matched non-coop-dense Italian regions.
+    - name: regional_unemployment_rate
+      source: "eurostat:lfst_r_lfu3rt"
+      transformation: level
+    - name: cooperative_sector_employment_share
+      source: "eurostat:nama_10r_2emhrw"
+      transformation: share
+      notes: >
+        Stop-gap proxy via NACE J-K-L regional employment share. Native
+        Italian coop-sector counts come from Istat — TODO add istat
+        publisher when registered.
+  treatment:
+    - name: emilia_romagna_coop_density
+      source: "derived:italian_region_coop_share"
+      transformation: level
+      notes: >
+        Hand-coded coop-sector share of regional employment (Italian
+        Cooperative Confederations / Istat census). TODO surface
+        through registered istat publisher when wired.
+    - name: gfc_recession_window
+      source: "derived:gfc_recession_indicator"
+      transformation: indicator
+  controls:
+    - name: regional_gdp_per_capita
+      source: "eurostat:nama_10r_2gdp"
+      transformation: log
+    - name: regional_industrial_composition
+      source: "eurostat:nama_10r_3gva"
+      transformation: share
+    - name: italian_unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+
+scope:
+  period: [2008, 2012]
+  countries: [ITA]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, institutional_reform]
+  treatment_tags: [emilia_romagna_cooperative_sector, gfc_2008_recession]
+
+covers_claims:
+  - position_id: market_socialist
+    claim_index: 7
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Market socialist predicts cooperatives preserve employment through recessions vs matched private firms; Phase 4C should verify matching controls for firm size, sector, and region given Emilia-Romagna's distinctive industrial-district context."
+
+estimator:
+  template: synth_did
+  clustering: firm
+  fixed_effects: [firm, year]
+  notes: >
+    Synthetic DiD comparing Emilia-Romagna cooperative-sector
+    employment trajectory through GFC against a matched donor pool
+    of non-cooperative firms (matched on size, sector, region) using
+    Italian firm-level panel data.

@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: botswana_institutional_exceptionalism
+version: 1
+status: draft
+topic: institutional_quality
+methodology_note: >-
+  v1 promotion (2026-04-26). Sharpened the generic stub falsification rule
+  to two dispositive primary tests on Maddison real GDP per capita: classic
+  Abadie synthetic control of BWA against an SSA resource-exporter donor
+  pool with mean post-1976 log-gap ≥ +0.30 (~+35% level) AND BWA−donor mean
+  annual log-growth ≥ +2.0 pp/yr. Pre-fit window 1966-1975, post window
+  1976-2023. Placebo permutation across the donor pool emits a one-sided
+  p-value as informative robustness. V-Dem polyarchy and WGI gov-effectiveness
+  gaps reported as informative covariates. Diamond-rent decomposition (spec
+  flagged WDI NY.GDP.MINR.RT.ZS) deferred to v1.1 — series not on disk.
+claim: Botswana's divergence from Sub-Saharan African averages post-1966 is attributable primarily to
+  retained pre-colonial Tswana chieftaincy institutions plus post-independence resource-rent management,
+  rather than resource endowment alone.
+notes: Stub seeded from an institutionalist school prediction about Botswana's post-1966 divergence being
+  driven by retained Tswana chieftaincy institutions plus resource-rent management. Decomposing institutions
+  vs resource-endowment effects is delicate; needs human review of identification.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors are sympathetic to the Acemoglu-Johnson-Robinson institutional-divergence
+  story for Botswana but would also weight commodity-price luck and small-population aggregation factors;
+  could over-weight institutional-channel evidence and under-weight diamond-rent timing as a non-institutional
+  factor.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if (a) Botswana's synthetic-control mean
+    post-1976 log-gap on real GDP per capita is ≥ +0.30 log-points (~+35%
+    level outperformance) AND (b) the annual log-growth advantage over the
+    donor-pool mean over 1966-2023 is ≥ +2.0 pp/yr. REFUTED if the post
+    log-gap is ≤ +0.10 OR the growth advantage is ≤ +0.5 pp/yr.
+    INFORMATIVE (not gating): placebo permutation p-value, V-Dem polyarchy
+    gap, WGI government-effectiveness gap. Reported in diagnostics.
+    METHOD_VALID: Maddison gdppc available for BWA + ≥4 SSA donors over the
+    full 1966-2023 window; pre-fit RMSE on log-GDP not pathological (<1.0).
+  test: synthetic_control_bwa_vs_ssa_resource_exporters_1966_2023
+  threshold: >-
+    PRIMARY: SC_post_log_gap >= 0.30 AND growth_gap_pp_per_yr >= 2.0
+    INFORMATIVE: placebo p, V-Dem polyarchy gap, WGI gov-effectiveness gap
+evidence_type: associational
+sample:
+  countries: [BWA, ZMB, ZWE, NGA, AGO, COD, GAB, GHA, CIV, NAM, ZAF]
+  period: [1966, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing Maddison real GDP per capita"
+    - "donor pool excludes BWA itself for the synthetic-control fit"
+variables:
+  outcome:
+    - name: log_real_gdp_per_capita
+      source: "maddison:rgdpnapc"
+      transformation: log
+      notes: "Maddison real GDP per capita, 1966-2023. Primary outcome — divergence from SSA donor pool."
+    - name: institutional_quality_index
+      source: "vdem:v2x_polyarchy"
+      transformation: level
+      notes: "V-Dem polyarchy index as institutional-channel covariate."
+    - name: governance_indicator_composite
+      source: "wgi:GovernmentEffectiveness"
+      transformation: level
+      notes: "WGI government effectiveness; available from 1996 only."
+  treatment:
+    - name: botswana_independence_indicator
+      source: "constructed: indicator = 1 for BWA from 1966 (independence); 0 for SSA donor pool."
+      transformation: indicator
+    - name: tswana_chieftaincy_institutions
+      source: "polity5:durable"
+      transformation: level
+      notes: "Polity5 regime durability as institutional-persistence proxy."
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: diamond_export_share_gdp
+      source: "world_bank_wdi:NY.GDP.MINR.RT.ZS"
+      transformation: level
+      notes: "WDI mineral rents % GDP — captures diamond-rent timing as competing channel."
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with BWA as treated unit and SSA resource-exporter
+    donor pool. Pre-treatment fit window 1966-1975 (early independence
+    pre-diamond-boom); post-treatment 1976-2023. Primary outcome = log real
+    GDP per capita (Maddison). Placebo permutation across donor pool.
+    Secondary spec interacts treatment with institutional-quality (V-Dem)
+    and resource-rent (mineral rents % GDP) covariates to decompose
+    divergence into institutional vs resource channels. Caveat: BWA is sole
+    treated unit; small-population and commodity-price-luck channels are
+    flagged caveats not formally identified.
+
+scope:
+  period: [1966, 2023]
+  countries: [BWA, AFRICA]
+  outcome_dim: [institutional_quality, gdp_growth]
+  policy_family: [institutional_reform]
+  treatment_tags: [botswana_independence_1966, tswana_chieftaincy_institutions, botswana_resource_rent_management]
+
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalist claim that Botswana's post-1966 divergence is driven by retained Tswana chieftaincy institutions plus resource-rent management aligns directly with hypothesis claim."
+

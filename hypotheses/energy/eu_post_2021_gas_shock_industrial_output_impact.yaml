@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_post_2021_gas_shock_industrial_output_impact
+version: 1
+status: pre_registered
+topic: energy
+
+claim: >
+  The natural-gas price shock that began in late 2021 and intensified
+  after the Russian invasion of Ukraine in February 2022 produced a
+  measurable differential contraction of EU industrial output relative
+  to US, UK, and non-EU Asian comparators over 2021-2024. The EU's
+  reliance on gas-indexed wholesale electricity markets, its lower
+  domestic gas production relative to the US shale base, and its deeper
+  pipeline-gas dependence made the industrial-output pass-through of
+  the gas shock materially larger than in peer economies. Energy-
+  intensive EU subsectors (chemicals, fertilisers, basic metals, glass,
+  ceramics) contracted faster than US and non-EU counterparts between
+  2021Q4 and 2024Q4, and a portion of the reduction is persistent
+  rather than cyclical (plant mothballing, capacity re-siting abroad).
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, USA, GBR, JPN, KOR, CAN]
+  period: [2018, 2024]
+  temporal_structure: panel
+
+scope:
+  period: [2018, 2024]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, USA, GBR, JPN, KOR, CAN]
+  outcome_dim: [industrial_capability, energy]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [russia_ukraine_war_2022, gas_price_shock_2021, eu_gas_dependence, ets_carbon_price]
+
+variables:
+  outcome:
+    - name: log_industrial_production_index
+      source: "constructed: OECD industrial production index (IPI) by country, monthly, seasonally adjusted. OECD fetcher shipped but specific series fetch needed."
+      transformation: log
+    - name: log_energy_intensive_manufacturing_output
+      source: "constructed: OECD STAN VA for chemicals + basic metals + non-metallic minerals + paper (energy-intensive subset). Quarterly where available."
+      transformation: log
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.CD"
+      transformation: log_real
+
+  treatment:
+    - name: post_2021q4_gas_shock_dummy
+      source: "constructed: indicator = 1 for period from 2021Q4 onwards (start of European gas-price spike), all countries."
+      transformation: indicator
+    - name: eu_gas_exposure_interaction
+      source: "constructed: interaction of post_2021q4 dummy with country-level pre-shock gas-import share (share of primary-energy supply from imported natural gas, averaged 2018-2020). Treatment intensity continuous rather than binary."
+      transformation: level
+
+  controls:
+    - name: brent_oil_usd
+      source: "constructed: Brent crude price, log, monthly. Fetcher pending (IMF PCPS or EIA)."
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: covid_policy_response_severity
+      source: "constructed: residual from Oxford COVID stringency index carryover into 2021-2022; captures differential lockdown legacy. Fetcher pending."
+      transformation: level
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year_quarter]
+  notes: >
+    Primary specification: differences-in-differences with treatment
+    intensity = country gas-import share (continuous). β on the post-
+    2021Q4 × gas-exposure interaction identifies whether more-exposed
+    countries contracted industrial output more than less-exposed
+    countries after the shock, after year-quarter FE absorb common
+    shocks (global demand, COVID reopening residual, oil price).
+
+    Secondary specification: synthetic control for DEU (highest gas-
+    exposure large economy) using US + non-EU peers as donor pool.
+    Third specification: event-study around 2022Q1 (invasion) with
+    country gas-exposure as moderator.
+
+    Known limitations:
+    (1) 2021Q4-2022Q4 window overlaps with COVID reopening dynamics;
+        disentangling reopening-driven output swings from gas-shock
+        suppression is hard.
+    (2) EU ETS price also spiked 2021-2022 for reasons partly
+        independent of gas; this hypothesis does not separate gas-
+        channel from carbon-price-channel cost pressures.
+    (3) Industrial production indices revise substantially; final
+        vintage may differ from first-release estimates used in
+        early drafts.
+    (4) Persistence vs cyclical distinction requires post-2024 data
+        not yet available; v1 reports contemporaneous effect, v1.1
+        updates the persistence claim when 2025 data releases.
+
+falsification:
+  rule: >
+    Not supported if (a) the interaction of post-2021Q4 × gas-exposure
+    is zero or positive at p<0.10 on industrial production (should be
+    negative — more gas-exposed contracted more), OR (b) the effect
+    vanishes after controlling for oil price and COVID residual, OR
+    (c) the synthetic-control DEU post-shock gap is within the 95th
+    percentile of placebo gaps, OR (d) the energy-intensive subsector
+    disaggregation shows no stronger effect than the general
+    manufacturing aggregate (which would suggest the mechanism is not
+    energy-cost transmission). If the cyclical effect exists but
+    reverses fully by 2024, report the headline as "temporary shock"
+    rather than "structural deindustrialisation."
+  test: gas_shock_industrial_output_exposure_did
+  threshold: >
+    β_post_x_gas_exposure < -0.03 log points (industrial production)
+    at p<0.10, robust to oil-price + COVID residual controls,
+    AND energy-intensive subsector β at least 2x manufacturing aggregate
+
+prior_confidence: 0.78
+
+disclosure: >
+  The gas-shock effect on EU industrial output is well-documented in
+  ECB, IEA, and Commission reporting (see Bachmann et al. 2022 on the
+  elasticity debate; IEA 2023 World Energy Outlook). Author prior is
+  high that the differential-exposure finding exists in the data; the
+  more contested question is whether the contraction is temporary
+  (inventory + cyclical) or persistent (plant mothballing, capacity
+  re-siting). The hypothesis commits a v1 to the contemporaneous
+  effect and a v1.1 to the persistence test when 2025 data releases.
+
+  Framework disclosure: this hypothesis is a necessary companion to
+  the Energiewende hypothesis. Without isolating the gas-shock effect,
+  all of 2022-2024 EU industrial divergence risks being attributed to
+  prior policy choices, which would overstate the policy-attributable
+  share. The pre-registered specification forces the split.
+
+steelman: hypotheses/steelman/eu_post_2021_gas_shock_industrial_output_impact.md
+
+linked_hypotheses:
+  - german_energiewende_industrial_cost_trajectory
+  - green_transition_cost_trajectory_electricity_prices
+  - german_manufacturing_va_decline_2017_2024
+
+notes: >
+  Data readiness:
+  - OECD IPI monthly — fetcher shipped but specific series fetch needed
+  - Country gas-import share — constructed from IEA / Eurostat energy balances, pending
+  - Brent oil — fetcher pending (IMF PCPS or EIA)
+  - OECD STAN sectoral VA — fetcher pending
+  - Oxford COVID stringency residual — fetcher pending
+
+  Data-gated: run v1 when gas-exposure series + OECD IPI are in
+  baseline_pull.yaml.

@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: german_codetermination_competitiveness
+version: 1
+status: draft
+topic: trade
+claim: German sectoral co-determination (Mitbestimmung) and workers-on-boards has coexisted with competitive
+  export-manufacturing performance 1976-present, refuting the claim that worker voice necessarily reduces
+  firm competitiveness.
+notes: Origin is auto-generated coverage-gap stub seeded from democratic-socialist claim that German
+  Mitbestimmung coexists with strong export competitiveness. Human review required before promotion.
+prior_confidence: 0.60
+disclosure: Author has market-liberal priors but is sympathetic to evidence on German export
+  performance under codetermination; framing risks attributing outcomes to Mitbestimmung when sectoral skill-stock is the driver.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Time-series of DEU export-share, manufacturing TFP, and current-account 1976-2023 vs OECD average;
+    no >10% relative-deterioration in DEU manufacturing competitiveness with p<0.10 supports coexistence.'
+evidence_type: associational
+
+scope:
+  period: [1976, 2023]
+  countries: [DEU]
+  outcome_dim: [productivity, industrial_capability, employment_labour]
+  policy_family: [labour_market, industrial_policy]
+  treatment_tags: [mitbestimmung_1976, german_codetermination]
+sample:
+  countries: [DEU, USA, GBR, FRA, ITA, JPN, NLD, BEL, AUT, CHE, SWE]
+  period: [1976, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude DEU pre-1991 reunification years for absolute manufacturing-VA comparison; West-German subset for that segment"
+variables:
+  outcome:
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: export_share_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: log_tfp_pwt
+      source: "pwt:rtfpna"
+      transformation: log
+    - name: current_account_pct_gdp
+      source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
+      transformation: level
+  treatment:
+    - name: mitbestimmung_indicator
+      source: "constructed: indicator = 1 for DEU years >= 1976 (Mitbestimmungsgesetz extension); 0 for OECD comparator pool without similar codetermination."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Cross-country panel-FE 1976-2023 of manufacturing VA, export share, and
+    TFP with DEU-Mitbestimmung indicator as treatment. Country and year FE;
+    country-clustered SEs. Caveat: skill-stock and supply-chain channel
+    confounds — German export competitiveness is over-determined by
+    apprenticeship system, supplier-network density, and Mittelstand structure;
+    panel-FE shows coexistence (joint observation), not causal contribution
+    of codetermination.
+
+covers_claims:
+  - position_id: democratic_socialist
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Democratic-socialist position predicts German Mitbestimmung coexists with competitive export manufacturing; hypothesis tests that competitiveness coexistence directly."
+

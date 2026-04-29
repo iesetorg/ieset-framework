@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_median_wage_stagnation_1973_2000_decomposition
+version: 1
+status: pre_registered
+topic: distribution
+
+claim: >
+  The observed gap between US median real wage growth and US real GDP per
+  capita growth over 1973-2000 (commonly characterised as "wage stagnation
+  during a productivity boom") is substantially explained by a decomposable
+  set of channels rather than a single rent-extraction story: (a) growth
+  in non-wage benefits — primarily employer-paid healthcare — substituting
+  for cash wages; (b) compositional shifts in the labour force driven by
+  expanded female labour force participation lowering the median worker's
+  experience profile; (c) divergence between consumer-price and output-
+  price deflators (Feldstein measurement critique); (d) the genuine but
+  smaller residual of top-strata capture of marginal product growth
+  (Bivens-Mishel reading). The claim is that channels (a)-(c) jointly
+  absorb the majority of the raw wage-productivity gap, with a material
+  but minority residual for top-strata capture — i.e. the "stagnation"
+  is real, but its mechanism is primarily compositional and measurement-
+  driven, with a secondary but non-zero distributional component.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA]
+  period: [1973, 2000]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop years with BLS CPS methodological break flags"
+    - "exclude 1973Q4-1974Q1 from growth-rate calculations (oil-shock noise)"
+
+variables:
+  outcome:
+    - name: median_real_wage_production_nonsupervisory
+      source: "bls:CES0500000008"
+      transformation: real_index_base_1973
+      notes: >
+        BLS Current Employment Statistics average hourly earnings, production
+        and nonsupervisory workers, deflated by CPI-U-RS. Production-and-
+        nonsupervisory is the closest BLS series to a median-worker wage
+        concept over the full 1973-2000 window.
+    - name: gdp_per_capita_real
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: real_yoy_pct_change
+    - name: output_per_hour_nonfarm_business
+      source: "bls:PRS85006092"
+      transformation: real_index_base_1973
+      notes: "BLS nonfarm business productivity index — the 'productivity' side of the Bivens-Mishel gap."
+
+  decomposition_channels:
+    - name: total_compensation_vs_wages_ratio
+      source: "bls:CES0500000002"
+      transformation: ratio_compensation_to_wages
+      notes: >
+        BLS employer costs for employee compensation; ratio captures the
+        benefit-substitution channel (healthcare, pensions, paid leave).
+        Rising ratio attributes part of the wage-gap to substitution.
+    - name: female_labour_force_participation
+      source: "world_bank_wdi:SL.TLF.CACT.FE.ZS"
+      transformation: level
+      notes: >
+        Demographic-composition channel: rising female LFP over 1973-2000
+        lowered median worker experience, compressing median wage growth
+        even absent any distributional shift.
+    - name: cpi_u_vs_gdp_deflator
+      source: "bls:CUUR0000SA0"
+      transformation: ratio_to_gdp_deflator
+      notes: >
+        Feldstein measurement channel: CPI-U consistently exceeded the GDP
+        deflator 1973-2000, mechanically widening the wage-productivity
+        gap when wages are deflated by CPI and productivity by GDP deflator.
+    - name: top_1pct_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+      notes: >
+        WID-sourced top-1% share mirrored via OWID for interim use (native
+        WID fetcher pending). Captures top-strata capture residual after
+        the compositional/measurement channels are absorbed.
+
+  controls:
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Sequential decomposition: (1) compute raw wage-productivity gap as
+    cumulative log ratio of median wage index to productivity index
+    1973-2000; (2) sequentially attribute gap to each channel by
+    substituting channel-adjusted series (compensation ratio, LFP-adjusted
+    median, deflator-aligned wage); (3) report residual as the top-strata
+    capture component. Cross-check via Oaxaca-Blinder-style variance
+    decomposition on annualised growth rates with Newey-West SEs.
+    Time-series only; country FE not applicable (single country).
+    Template slot 'panel_fe_decomposition' used for the decomposition
+    mechanics; degenerates to a time-series decomposition given n=1.
+
+falsification:
+  rule: >
+    Not supported if the three compositional/measurement channels (benefits
+    substitution, female LFP, CPI-GDP deflator wedge) jointly absorb less
+    than 50 percent of the raw cumulative 1973-2000 wage-productivity gap,
+    leaving a top-strata-capture residual of more than 50 percent. That
+    pattern would weaken the "stagnation is primarily compositional" framing
+    and strengthen the pure rent-extraction reading. Symmetrically, the
+    hypothesis is also not supported if the channels absorb more than 95
+    percent of the gap with zero residual for top-strata capture — because
+    WID data clearly shows top-1% share doubling over the window, a zero
+    residual would indicate model mis-specification.
+  test: channel_attribution_share_of_cumulative_gap
+  threshold: >
+    0.50 <= compositional_and_measurement_share <= 0.85  AND
+    0.15 <= top_strata_residual <= 0.50
+
+prior_confidence: 0.65
+disclosure: >
+  Author's priors align with the framing that aggregate "stagnation"
+  narratives compress distinct mechanisms — compositional, measurement,
+  and distributional — whose separate magnitudes are the productive
+  question. The 50-85% band on compositional share is deliberately wide
+  to accommodate Feldstein-leaning and Bivens-Mishel-leaning readings;
+  both would satisfy the falsification rule, and only a zero-residual or
+  majority-residual outcome would falsify.
+
+steelman: hypotheses/steelman/us_median_wage_stagnation_1973_2000_decomposition.md
+
+scope:
+  period: [1973, 2000]
+  countries: [USA]
+  outcome_dim: [wage_stagnation, productivity, labour_share]
+  policy_family: [labour_market]
+  treatment_tags: [neoliberal_turn_1980, labour_share_decline, benefit_substitution_healthcare, female_lfp_expansion, cpi_gdp_deflator_wedge, top_strata_capture]
+
+covers_claims:
+  - position_id: marxian
+    claim_index: 3
+    polarity: inverted
+    school_prediction: supported
+    confidence: medium
+    notes: "Marxian claim attributes the 1973-2000 US wage-productivity gap to falling worker bargaining power rather than skill-biased technical change; hypothesis decomposes the gap into benefits substitution, LFP composition, deflator wedge, and top-strata residual. Inverted polarity: a clean supported hypothesis finding (compositional/measurement dominant) weakens the pure-bargaining-power reading, though the residual top-strata-capture component preserves a partial distributional channel."
+
+
+notes: >
+  Single-country time-series decomposition; BLS CES and PRS series are
+  the spine. BEA would provide cleaner compensation-vs-wages split but
+  no BEA fetcher is live; BLS CES employer-cost series is the
+  operational substitute. WID top-1% share is routed via OWID mirror
+  pending native WID fetcher — flagged for v2 re-wire.

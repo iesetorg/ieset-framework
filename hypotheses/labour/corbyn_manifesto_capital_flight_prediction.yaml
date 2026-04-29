@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: corbyn_manifesto_capital_flight_prediction
+version: 1
+status: draft
+topic: labour
+claim: Corbyn 2017-2019 Labour programme (rail/utility renationalisation, expanded NHS) did not produce
+  the capital-flight or fiscal-collapse outcomes predicted by market-liberal critics in the 2017 and 2019
+  manifestos' IFS-modelled scenarios.
+notes: Stub seeded from a democratic-socialist school prediction about Corbyn 2017/2019 manifesto market
+  reactions. Brexit-news flow concurrently dominated UK financial markets; needs human review of confound
+  isolation in tight announcement windows.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors expected meaningful market repricing on renationalisation/expanded-NHS
+  manifestos and may under-weight evidence of muted reactions while over-attributing observed sterling
+  weakness to Brexit news flow rather than fiscal-programme content.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Tight-window event study around 2017-05-16 and 2019-11-21 Labour manifesto launches on GBP, gilt
+    yields, and FTSE All-Share, controlling for Brexit news; supported if no >2sigma adverse move in primary
+    market measures at p<0.10 within 3-day window.
+evidence_type: associational
+
+sample:
+  countries: [GBR]
+  period: [2015, 2020]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "flag Brexit-referendum and Brexit-deal date windows for confound assessment"
+
+variables:
+  outcome:
+    - name: portfolio_capital_flows_uk
+      source: "imf:BFOAFA"
+      transformation: log
+      notes: >
+        IMF BoP financial account portfolio investment liabilities/
+        assets — capital-flight outcome. Series ID approximate; verify
+        dataflow on wiring.
+    - name: gbp_usd_exchange_rate
+      source: "boe:XUDLUSS"
+      transformation: log_yoy
+      notes: "BoE IADB sterling-dollar spot rate."
+    - name: gilt_yield_10y
+      source: "boe:IUDMNZC"
+      transformation: level
+      notes: "BoE 10-year gilt yield — IADB code approximate, verify on wiring."
+    - name: ftse_all_share
+      source: "owid:ftse-all-share"
+      transformation: log_yoy
+      notes: >
+        Stop-gap; native source is LSE direct or BoE financial-stability
+        indicators — TODO when registered.
+  treatment:
+    - name: corbyn_manifesto_announcement
+      source: "derived:corbyn_manifesto_dates"
+      transformation: indicator
+      notes: >
+        Manifesto-launch dates: 2017-05-16 and 2019-11-21. Hand-coded
+        under derived/.
+  controls:
+    - name: brexit_event_window_indicator
+      source: "derived:brexit_event_dates"
+      transformation: indicator
+      notes: "Confound-control for concurrent Brexit news flow."
+    - name: bank_rate
+      source: "boe:IUMABEDR"
+      transformation: level
+      notes: "BoE Bank Rate — monetary-policy control."
+    - name: vix_volatility
+      source: "fred:VIXCLS"
+      transformation: level
+
+scope:
+  period: [2017, 2019]
+  countries: [GBR]
+  outcome_dim: [capital_flows, fiscal_policy]
+  policy_family: [privatisation_nationalisation, fiscal_policy]
+  treatment_tags: [corbyn_labour_manifesto_2017, corbyn_labour_manifesto_2019, uk_rail_utility_renationalisation_proposal]
+
+covers_claims:
+  - position_id: democratic_socialist
+    claim_index: 10
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Democratic socialist claim that Corbyn 2017/2019 Labour renationalisation + NHS expansion programme did not produce predicted market-liberal capital-flight or fiscal-collapse outcomes in IFS-modelled scenarios."
+
+estimator:
+  template: event_study
+  clustering: date
+  fixed_effects: [date]
+  notes: >
+    Event study around 2017 and 2019 Labour manifesto launch dates,
+    with capital-flow series (BoP), GBP, and gilt yields as outcomes.
+    Tight-window analysis isolates announcement effects from broader
+    Brexit-era dynamics.
+

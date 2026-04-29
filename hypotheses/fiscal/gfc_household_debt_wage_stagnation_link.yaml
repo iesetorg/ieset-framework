@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: gfc_household_debt_wage_stagnation_link
+version: 1
+status: draft
+topic: fiscal
+claim: The 2007-2009 global financial crisis originated in household-debt-financed consumption sustaining aggregate demand despite stagnant real wages, a Minsky-plus-Marx pattern.
+notes: Maps the Marxian school's GFC-household-debt-Minsky-Marx claim to a cross-country panel of household debt build-up vs real wage growth in the run-up to 2008. Estimator and prior set; full pre-registration
+  awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: Author prior aligns with the descriptive level fact (Mian-Sufi documented the household-debt- consumption channel in US data; Jorda-Schularick-Taylor extended cross-country) but is uncertain
+  about the 'originated in' framing — household debt was an amplifier rather than the unique origin, with shadow-banking, securitisation, and global-imbalance roles also load-bearing.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE of real household consumption growth on household-debt-to-GDP and real median wage growth across OECD 1995-2010; country-clustered SEs, country+year FE. Refute if debt-to-GDP coefficient
+    on consumption not >0 conditional on stagnant wage growth at p<0.10 OR if 5-year debt build-up does not predict 2008-2010 GDP drawdown depth.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - IRL
+  - ITA
+  - JPN
+  - KOR
+  - NLD
+  - NOR
+  - NZL
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 1995
+  - 2010
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with household debt series breaks documented in BIS revision history
+  - exclude post-2010 from the primary regressions; pre-GFC build-up is the focus
+variables:
+  outcome:
+  - name: real_household_consumption_growth
+    source: world_bank_wdi:NE.CON.PRVT.KD.ZG; oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_HFCE,1.0
+    transformation: pct_yoy
+    notes: Primary outcome — tests whether consumption tracked debt growth rather than wage growth.
+  - name: financial_crisis_severity_2008_2010
+    source: imf:NGDP_RPCH (peak-to-trough real GDP drawdown 2008Q1-2010Q4)
+    transformation: peak_to_trough_pct
+    notes: Secondary outcome — links pre-crisis leverage build-up to crisis depth.
+  treatment:
+  - name: household_debt_to_gdp
+    source: bis:WS_TC; world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: pct_gdp_level
+    notes: Primary explanatory variable — household debt accumulation.
+  - name: household_debt_growth_5yr
+    source: bis:WS_TC
+    transformation: pp_change_5yr
+  controls:
+  - name: real_median_wage_growth
+    source: oecd:RealAverageWages; ilostat:mean_wages_real
+    transformation: pct_yoy
+    notes: Mediator under test — wage stagnation alongside debt build-up.
+  - name: real_house_price_index
+    source: bis:WS_SPP
+    transformation: real_index_2010_100
+  - name: short_term_policy_rate
+    source: fred:DFF (USA); ecb:FM (EUR); boe:bank_rate (GBR); boj:policy_rate (JPN)
+    transformation: level_pct
+  - name: financial_deregulation_index
+    source: fraser_efw:credit_market_regulation
+    transformation: level_0_to_10
+  - name: labour_share_of_income
+    source: pwt:labsh; oecd:LabourShare
+    transformation: level
+scope:
+  period:
+  - 2000
+  - 2010
+  countries:
+  - USA
+  - GBR
+  - OECD
+  outcome_dim:
+  - financial_crisis
+  - wage_stagnation
+  - financialisation
+  policy_family:
+  - regulation
+  - monetary_policy
+  treatment_tags:
+  - global_financial_crisis_2008
+  - financialisation_era
+  - labour_share_decline
+covers_claims:
+- position_id: marxian
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Marxian position reads the 2007-2009 GFC as household-debt-financed demand masking wage stagnation (Minsky+Marx pattern); hypothesis tests exactly that origin story.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Cross-country panel of household-debt-to-GDP and real median wage growth in the run-up to GFC, with country and year FE. Mian-Sufi style decomposition of consumption growth into debt-financed
+    versus wage-financed components.
+
+    '

@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: washington_consensus_vs_developmental_state_performance
+version: 1
+status: pre_registered
+topic: growth
+claim: Argentine Menem-era rapid privatisation and opening 1991–2001 produced a decade of growth followed
+  by collapse — underperforming the comparable-size Korean developmental-state path.
+notes: Stub seeded from a developmentalist school prediction comparing Argentina-Korea growth paths. The
+  matched-decade comparison is descriptive; needs human review of decade-alignment justification.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors are sympathetic to Menem's stabilisation but skeptical of the
+  developmentalist framing; this could over-attribute Argentina's collapse to convertibility-regime fragility
+  rather than to the privatisation-opening sequence per se.
+steelman: hypotheses/steelman/washington_consensus_vs_developmental_state_performance.md
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if cumulative
+    real-GDP-per-capita log-growth gap (KOR matched decade minus ARG
+    1991-2001) is at least +0.30 log-points (~+35pp cumulative
+    advantage). REFUTED if the gap is <= 0 (ARG matched or beat KOR
+    over the matched decade). PARTIAL if 0 < gap < +0.30 log-points.
+    KOR's matched decade is the 10-year window starting in the year
+    KOR's real GDP-pc (WDI NY.GDP.PCAP.KD, constant 2015 USD) was
+    closest to ARG's 1991 starting level (the "comparable starting
+    point" matched-decade reading).
+    INFORMATIVE: PPP-based growth gap (NY.GDP.PCAP.PP.KD) reported as
+    a robustness panel; supplementary diagnostic for the Park
+    Chung-hee developmental-state era 1962-1972 (NOT level-matched,
+    documented as low-base context).
+    METHOD_VALID: ARG 1991, ARG 2001, KOR match-year, KOR
+    match-year+10 must all be present in WDI; otherwise inconclusive
+    (data gap on world_bank_wdi:NY.GDP.PCAP.KD).
+  test: bilateral_matched_decade_log_growth_gap
+  threshold: >-
+    PRIMARY: log(KOR_GDPpc[match+10]/KOR_GDPpc[match])
+    - log(ARG_GDPpc[2001]/ARG_GDPpc[1991]) >= 0.30
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic
+  falsification rule to a single dispositive primary statistic: the
+  cumulative log-growth gap between Korea over its level-matched
+  decade and Argentina 1991-2001, with a +0.30 log-point (~+35pp)
+  threshold for SUPPORTED. KOR's matched decade is selected by
+  minimising |KOR GDP-pc(year) - ARG GDP-pc(1991)| over WDI; with
+  ARG 1991 ≈ $8,730 (constant 2015 USD), the level-match lands
+  around 1989-1999 (which crucially includes the 1997 Asian crisis,
+  making this a stress test that does not cherry-pick a benign KOR
+  decade). The Park-era 1962-1972 KOR window is reported as a
+  supplementary low-base diagnostic but does not gate the verdict —
+  it cannot be a like-for-like level comparator.
+evidence_type: descriptive
+sample:
+  countries:
+  - ARG
+  - KOR
+  period:
+  - 1991
+  - 2001
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: real_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+  - name: real_gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    notes: 'PPP variant for cross-country level comparison; both ARG and KOR cleanly covered 1991-2001.'
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Bilateral descriptive comparison of Menem-era Argentina (1991-2001) vs Korean developmental-state-era
+    trajectory (matched-decade). Reports cumulative growth and crisis-output-cost differential. Magnitude
+    is dispositive; not a DiD identification exercise.
+
+    '
+scope:
+  period:
+  - 1991
+  - 2001
+  countries:
+  - ARG
+  - KOR
+  outcome_dim:
+  - gdp_growth
+  - financial_crisis
+  policy_family:
+  - privatisation_nationalisation
+  - trade_policy
+  - institutional_reform
+  treatment_tags:
+  - menem_privatisation_1991
+  - argentina_2001_crisis
+  - park_chung_hee_reforms
+covers_claims:
+- position_id: developmentalism
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Developmentalist prediction: Menem-era rapid privatisation 1991-2001 produced growth then collapse,
+    underperforming the Korean developmental-state path; direct alignment with hypothesis.'

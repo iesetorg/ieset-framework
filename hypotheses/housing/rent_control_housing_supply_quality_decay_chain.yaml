@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: rent_control_housing_supply_quality_decay_chain
+version: 1
+status: candidate
+topic: housing
+claim: 'Binding rent control initiates a three-order causal chain. FIRST-ORDER: sitting tenants in covered units receive a real transfer — rents are held below market, tenure security rises. This is an
+  acknowledged policy success on its own terms for the intended beneficiaries. SECOND-ORDER: new-build permits and new rental-stock additions contract in affected markets, labour-mobility falls as tenants
+  cannot move without losing a below-market contract, and landlord investment in maintenance declines. THIRD-ORDER: housing stock quality decays, supply-demand mismatch produces queues and waiting lists
+  (Stockholm), distortion into alternative tenure (conversions to owner-occupation, Airbnb, corporate-let exemptions) erodes the rental base; mobility-penalised labour markets show productivity drag. Cases:
+  Berlin Mietendeckel 2020-2021, St Paul 2021, NYC 1947-present, Stockholm continuous queue, San Francisco 1994 expansion.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - DEU
+  - USA
+  - SWE
+  period:
+  - 1990
+  - 2024
+  temporal_structure: panel
+  cross_section_justification: 'Analysis is at city/metro level; country-code array is required by schema. Unit of analysis is city (Berlin, St Paul, NYC metro, Stockholm, San Francisco) vs donor cities
+    within same country.
+
+    '
+  exclusion_rules:
+  - exclude 2020-2021 pandemic year for non-Berlin cities; Berlin is the treated unit in that window so retention is necessary
+  - exclude country-level aggregates; only city/metro panels count
+scope:
+  period:
+  - 1990
+  - 2024
+  countries:
+  - DEU
+  - USA
+  - SWE
+  outcome_dim:
+  - housing
+  policy_family:
+  - housing_policy
+  - regulation
+  treatment_tags:
+  - berlin_mietendeckel_2020
+  - st_paul_rent_control_2021
+  - nyc_rent_stabilisation
+  - stockholm_rent_queue
+  - sf_rent_control_1994
+variables:
+  outcome:
+  - name: rent_level_for_sitting_tenants
+    source: destatis:immoscout; bls:CPI-rent; scb:hyresgaststatistik (SWE)
+    transformation: log_real_rent
+    notes: 'FIRST-ORDER outcome: rents in covered units held below market, confirming the policy works on its own terms for sitting tenants.'
+  - name: new_rental_stock_growth
+    source: destatis:baufertigstellungen (DEU); us_census:building_permits (USA); scb:nybyggnation (SWE)
+    transformation: yoy_pct_change
+    notes: 'SECOND-ORDER outcome: new supply contraction.'
+  - name: tenant_mobility_rate
+    source: 'constructed: share of renters moving in past 12 months; ons:LFS; US census ACS; SWE SCB migration register'
+    transformation: level_pct
+    notes: 'SECOND-ORDER outcome: mobility falls in controlled markets.'
+  - name: stock_quality_index
+    source: 'constructed: age of building stock + maintenance complaints where available; destatis:wohngebaeude_baujahr; us_census:ACS; SCB housing register'
+    transformation: index
+    notes: 'THIRD-ORDER outcome: quality decay.'
+  - name: airbnb_and_corporate_exemption_share
+    source: 'constructed: AirDNA Airbnb listings as share of rental stock + corporate-let exemption count; official registries where available (Berlin Zweckentfremdung; SF short-term rental registry)'
+    transformation: share
+    notes: 'THIRD-ORDER outcome: rental-base erosion via exemption routes.'
+  - name: waiting_list_length_or_queue_years
+    source: Stockholm bostadsformedlingen; NYC HPD lottery data
+    transformation: years
+    notes: 'THIRD-ORDER outcome: queue rationing.'
+  treatment:
+  - name: binding_rent_control_indicator
+    source: 'constructed: 1 in treated city-years (Berlin 2020-2021, SF 1994 expansion post-1995, St Paul 2021+, Stockholm continuous, NYC continuous rent-stabilised expansion years); 0 in donor cities'
+    transformation: indicator
+  controls:
+  - name: metro_population
+    source: destatis:bevoelkerung; us_census:population; scb:folkmangd
+    transformation: log_level
+  - name: metro_employment_growth
+    source: destatis:arbeitsmarkt; bls:LAU_metro; scb:arbetsmarknad
+    transformation: yoy_pct_change
+  - name: mortgage_rate
+    source: ecb:interest_rates (DEU); fred:MORTGAGE30US (USA); riksbank:policy_rate (SWE)
+    transformation: level_pct
+intervention_channel: regulatory
+intervention_channel_justification: 'Rent control is a regulatory price ceiling. No direct fiscal transfer is coded here; housing subsidies in controlled-rent regimes enter via city fixed effects, not as
+  co-treatment.
+
+  '
+estimator:
+  template: synthetic_control
+  clustering: city
+  fixed_effects:
+  - city
+  - year
+  random_seed: 20260424
+  notes: 'Primary: synthetic control per treated case (Berlin, SF 1994, St Paul, Stockholm-continuous as cross-section-with-donor-Nordic- cities). Secondary: Callaway-Sant''Anna staggered DiD when multiple
+    treated cases pool onto common outcome definitions. Follows Diamond-McQuade-Qian 2019 for SF and Kholodilin-Kohl 2023 for Berlin.
+
+    '
+falsification:
+  rule: 'Not supported if, across the five cases: (a) FIRST-ORDER rent-reduction for sitting tenants is confirmed at p<0.05 (acknowledged success) AND (b) NEW-BUILD and MOBILITY SECOND-ORDER divergence
+    fails to appear (<1.0pp deviation from synthetic control) in at least 3/5 cases AND (c) QUALITY/QUEUE/EXEMPTION THIRD-ORDER divergence fails to appear in at least 3/5 cases. If the first-order rent
+    suppression is confirmed but the second/third-order chain does not materialise, the causal-chain claim is refuted even though the policy mechanism works on its own terms.
+
+    '
+  test: multi_case_synthetic_control_causal_chain
+  threshold: 'FIRST-ORDER rent suppression confirmed at p<0.05 AND new-build growth divergence <=-2pp in at least 3/5 cases at p<0.10 AND quality/queue/exemption divergence appears in at least 3/5 cases
+    at p<0.10
+
+    '
+prior_confidence: 0.88
+disclosure: 'Author holds market-liberal priors. The IGM Forum economist survey shows ~93% agreement that rent control reduces housing supply and quality — this puts the prior high. The existing repo hypothesis
+  rent_control_reduces_housing_supply_and_quality sets up a binary framework-validation test; this hypothesis is distinct in staking the FALSIFICATION on the causal-chain structure (first-order acknowledged,
+  second+third-order tested) rather than on supply alone.
+
+  '
+steelman: hypotheses/steelman/rent_control_housing_supply_quality_decay_chain.md
+linked_hypotheses:
+- rent_control_reduces_housing_supply_and_quality
+notes: 'The mechanism link between orders is central: tenants gain transfer (1st), landlords under-invest and new supply dries up (2nd), and the rental base erodes structurally with quality decay and queue
+  rationing (3rd). Falsifying the chain requires null 2nd/3rd-order effects even when the 1st-order transfer is confirmed.
+
+  '

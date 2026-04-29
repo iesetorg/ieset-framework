@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labor_share_decline_causes
+version: 1
+status: pre_registered
+topic: distribution
+
+claim: >
+  The observed decline in the labour share of gross value added across
+  OECD economies over 1980-2020 (typically 4-8 percentage points) is
+  explained by a decomposable set of channels rather than a single
+  cause: (a) capital-intensity technological change with capital and
+  labour complementarity below unity (Karabarbounis-Neiman), (b)
+  globalisation and import competition lowering tradable-sector wage
+  bargaining power (Elsby-Hobijn-Sahin), (c) rising market concentration
+  enabling markup expansion (De Loecker-Eeckhout-Unger), and (d)
+  measurement artefacts from owner-occupier imputed-rent accounting and
+  self-employment income allocation (Rognlie, Gollin). The claim is that
+  channels (a)+(d) jointly absorb at least 50 percent of the observed
+  decline — i.e. a substantial fraction is either technologically-driven
+  factor-price adjustment or measurement artefact — with (b) and (c)
+  material but smaller contributors. A clean supported finding weakens
+  the pure-monopoly-markup reading and the pure-globalisation reading
+  while preserving a role for both.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, KOR, PRT]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing labour share series"
+    - "drop country-years during hyperinflation episodes per hanke classification"
+    - "winsorise labour share growth rates at 1st/99th percentile within sample"
+
+variables:
+  outcome:
+    - name: labour_share_gross_value_added
+      source: "oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE1,1.0"
+      transformation: level
+      notes: >
+        OECD Annual National Accounts table 1 compensation of employees
+        as share of gross value added at factor cost. Housing sector
+        exclusion available as robustness (Rognlie adjustment) — test
+        whether channel (d) absorbs when housing VA is stripped.
+
+  decomposition_channels:
+    - name: capital_stock_per_worker
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: log
+      notes: >
+        Gross fixed capital formation as share of GDP; proxy for capital-
+        intensity trend. Ideal series is OECD capital stock per worker
+        via STAN productivity database; v2 switch on fetcher availability.
+        Channel (a) — Karabarbounis-Neiman capital-intensity story.
+    - name: import_penetration_manufactures
+      source: "world_bank_wdi:TM.VAL.MANF.ZS.UN"
+      transformation: level
+      notes: >
+        Manufactures imports as share of merchandise imports; proxy for
+        globalisation/import-competition channel. Channel (b) — Elsby-
+        Hobijn-Sahin. Ideal measure is China-shock-style IV on low-wage
+        country imports; v2 spec adds this when trade-partner-specific
+        data is wired.
+    - name: market_concentration_pmr
+      source: "oecd:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2"
+      transformation: level
+      notes: >
+        OECD PMR market-concentration sub-index. Channel (c) — De Loecker-
+        Eeckhout. Cross-validation with firm-level markup estimates
+        deferred to v2 (requires Compustat-equivalent European data).
+    - name: housing_sector_va_share
+      source: "eurostat:nama_10_a64"
+      transformation: level
+      notes: >
+        NACE section L (real estate activities) share of gross value
+        added. Channel (d) — Rognlie housing-measurement story. When
+        housing VA is included in the labour-share denominator but
+        imputed rents are classified as capital income, labour share
+        mechanically falls as housing grows.
+    - name: self_employed_share_of_employment
+      source: "world_bank_wdi:SL.EMP.SELF.ZS"
+      transformation: level
+      notes: >
+        Gollin measurement story: self-employment income is split between
+        labour and capital returns by statistical-agency convention, and
+        shifts in self-employment share mechanically shift measured
+        labour share.
+
+  controls:
+    - name: gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: union_density
+      source: "oecd:OECD.ELS.SAE,DSD_TUD@DF_TUD,1.0"
+      transformation: level
+      notes: "Collective bargaining proxy; dataflow URN verified at wiring."
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Specification: labour_share = b0 + b1*log(K/L) + b2*import_pen
+    + b3*concentration + b4*housing_va_share + b5*self_emp_share
+    + b6*union_density + b7*log(gdp_pc) + b8*log(pop) + alpha_i + gamma_t
+    + epsilon. Driscoll-Kraay SEs clustered by country. Variance
+    decomposition (Shapley-style R-squared attribution) reports each
+    channel's share of explained variation. Robustness: re-estimate on
+    housing-stripped labour share per Rognlie; re-estimate on corporate-
+    sector-only labour share to neutralise self-employment channel.
+
+falsification:
+  rule: >
+    Not supported if channel (a) capital-intensity plus channel (d)
+    housing/self-employment measurement jointly account for less than
+    30 percent of explained variation in labour share, while channel
+    (c) concentration alone accounts for more than 40 percent. That
+    pattern would support the pure De Loecker-Eeckhout markup reading
+    and weaken the Karabarbounis-Neiman + Rognlie readings the framework
+    leans on. Symmetrically, the hypothesis is also not supported if
+    the housing-stripped labour share shows no decline at all —
+    because then the "decline" is an artefact and the whole literature
+    is misattributed; the hypothesis claims measurement is material but
+    not dispositive.
+  test: channel_variance_share_and_housing_stripped_decline
+  threshold: >
+    capital_plus_measurement_share >= 0.30  AND
+    concentration_share <= 0.40  AND
+    housing_stripped_decline >= 2_percentage_points_over_sample_period
+
+prior_confidence: 0.60
+disclosure: >
+  Author's priors weakly favour a mixed reading — capital deepening
+  and measurement jointly explain the majority, markups and globalisation
+  explain a material minority. The Rognlie measurement story is
+  intellectually important to the framework because it implies the
+  labour-share decline is less politically tractable than the markup
+  reading suggests (housing supply reform, not antitrust, is the
+  corresponding intervention). Acknowledged so the falsification test
+  binds on the housing-stripped decline condition.
+
+steelman: hypotheses/steelman/labor_share_decline_causes.md
+
+scope:
+  period: [1980, 2020]
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, KOR, PRT, OECD]
+  outcome_dim: [labour_share]
+  policy_family: [none]
+  treatment_tags: [labour_share_decline, financialisation_era, capital_intensity_technology, import_competition, market_concentration_markups, rognlie_housing_measurement]
+
+covers_claims:
+  - position_id: marxian
+    claim_index: 0
+    polarity: inverted
+    school_prediction: supported
+    confidence: medium
+    notes: "Marxian claim asserts structural labour-share decline under capitalism as capital intensity rises; hypothesis decomposes the observed OECD decline and finds the structural/capital-intensity channel is material but shared with measurement artefact — inverted polarity captures that the hypothesis's supported finding weakens (not confirms) a pure-capitalism-structural reading."
+
+
+notes: >
+  OECD SDD Annual National Accounts labour share is the spine outcome;
+  dataflow URN approximate, confirm at wiring. For countries where OECD
+  coverage is thin (KOR early 1980s, IRL early 1980s), drop to AMECO
+  backup when Eurostat fetcher scope permits. Markup estimation at
+  firm-level (Compustat / Orbis) is the gold standard for channel (c)
+  but requires data not ready on disk; v2 promotion adds this.

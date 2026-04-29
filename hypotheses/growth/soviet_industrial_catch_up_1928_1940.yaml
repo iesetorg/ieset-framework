@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: soviet_industrial_catch_up_1928_1940
+version: 1
+status: draft
+topic: growth
+claim: Soviet industrial output grew faster than Western European averages during 1928-1940 under the
+  first two Five-Year Plans, demonstrating primitive socialist accumulation's catch-up capacity.
+notes: Seeded from a Marxist-Leninist claim that 1928-40 Soviet industrial output outgrew Western European
+  averages under the first two Five-Year Plans. Cross-country descriptive comparison; 1930s output indices
+  are well-known to be reconstruction-dependent and require human review.
+prior_confidence: 0.6
+disclosure: >-
+  Authorial bias risk: Marxist-Leninist framing celebrates raw output growth and ignores the famine cost, gulag labour, and the depressed Western base (which made comparisons flattering).
+  The 1928-40 window is also exceptional because Western economies were in the Great Depression for most of it.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if the cumulative
+    log-growth differential of Maddison MPD2020 total real GDP
+    (`gdppc * pop`, 2011 PPP $) for the USSR (country_iso3 = `SUN`,
+    falling back to `RUS` if absent) over 1928 -> 1940 minus the
+    simple mean of the same statistic across the WE comparator panel
+    (GBR, DEU, FRA, ITA) is at least +0.50 log points (~+65%
+    advantage). PARTIAL if the differential is positive but below
+    +0.50. REFUTED if the differential is <= 0.
+    INFORMATIVE: differential against the WE+USA mean (a harder
+    denominator — the US was largely insulated from the WE Depression
+    timing); JST jst_r6 industrial-production index (`iy`) cumulative
+    log-growth for the WE+USA panel as context (RUS is not in JST,
+    so a strict like-for-like industrial-production comparison is a
+    documented data gap).
+    METHOD_VALID: USSR endpoints (1928 and 1940) present in Maddison
+    AND at least 3 of the 4 WE comparators have both endpoints. If
+    not, emit `inconclusive (data gap on maddison:mpd2020)`.
+  test: ussr_vs_we_mean_cum_log_growth_1928_1940
+  threshold: >-
+    PRIMARY: cum_log(USSR_GDP, 1928->1940) - mean(cum_log(WE_GDP,
+    1928->1940)) >= 0.50.
+evidence_type: descriptive
+
+methodology_note: >-
+  v1 promotion (2026-04-26). The original claim ("Soviet industrial
+  output grew faster than Western European averages 1928-40") cannot
+  be tested in the strict industrial-production sense from the
+  parquet vintages: JST jst_r6 covers 17 advanced economies and does
+  not include USSR/RUS. We therefore operationalise the claim using
+  Maddison MPD2020 total real GDP (`gdppc * pop`, 2011 PPP $), which
+  does cover SUN/RUS over 1928-40 (as the Davies-Wheatcroft /
+  Markevich-Harrison reconstruction series). The pre-registered
+  +0.50 log differential threshold is preserved verbatim from the
+  original draft falsification block. JST industrial-production for
+  the WE+USA panel is reported as informative context (Western
+  industrial production CONTRACTED 1928-40 in cum-log on JST `iy`,
+  consistent with the Great Depression). Caveats explicitly NOT
+  adjusted for in the headline: famine 1932-33, gulag forced labour,
+  consumption-side welfare collapse, and the 1940 endpoint catching
+  early-rearmament recovery in WE — these are documented in the
+  result_card and the `disclosure` field; the run scores the literal
+  output-growth claim, not the broader policy verdict.
+
+sample:
+  countries: [RUS, GBR, DEU, FRA, ITA, USA]
+  period: [1928, 1940]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_real_gdp_long_run
+      source: "maddison:gdp_ppp"
+      transformation: log
+    - name: log_gdp_pc_long_run
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: industrial_output_index_jst
+      source: "jst:industrial_production"
+      transformation: log
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison of USSR industrial-output growth rates 1928-1940
+    against Western European averages over the same period. Reports
+    cumulative log-growth differential; tests whether five-year-plan-era
+    Soviet industry grew measurably faster than peer Western Europe.
+
+scope:
+  period: [1928, 1940]
+  countries: [RUS, POST_SOVIET, EU]
+  outcome_dim: [gdp_growth, industrial_capability]
+  policy_family: [industrial_policy, privatisation_nationalisation]
+  treatment_tags: [soviet_industrialisation, gosplan_central_planning, first_five_year_plan_1928, second_five_year_plan_1933]
+
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Marxist-Leninist prediction: Soviet industrial output outgrew Western European averages 1928-1940 under the first two Five-Year Plans, demonstrating primitive socialist accumulation's catch-up capacity; direct alignment with hypothesis."
+

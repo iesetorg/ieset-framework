@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: voluntary_carbon_markets_real_abatement
+version: 1
+status: draft
+topic: energy
+claim: Post-2008 global climate finance via private carbon markets (voluntary credits, REDD+) produced
+  marginal real emissions abatement relative to stated volumes, while public-funded mandates delivered
+  measurable reductions.
+scope:
+  period: [2008, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [energy, regulation_compliance_cost]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [voluntary_carbon_markets, redd_plus, paris_agreement_2015]
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Claim text matches hypothesis claim verbatim: post-2008 voluntary carbon markets / REDD+ produced marginal real abatement relative to stated volumes, while public mandates delivered measurable reductions. Direct alignment."
+notes: Maps the eco-socialist school's voluntary-carbon-markets-marginal-abatement claim to a comparison
+  of stated-vs-realised emissions reductions for VCM/REDD+ projects vs public mandate outcomes 2008-2023.
+  Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.65
+disclosure: Author prior aligns with the descriptive finding (West et al. 2023 Science and the Guardian/
+  SourceMaterial 2023 investigation both document that >90% of Verra REDD+ credits do not deliver
+  claimed abatement) but is uncertain whether 'measurable reductions delivered by public mandates' is
+  the right counterfactual — public-mandate outcomes have their own measurement and additionality issues.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Cross-project comparison of VCM/REDD+ stated-vs-realised emissions reductions (Verra/Gold Standard registries vs satellite-verified counterfactual) 2008-2023; project-clustered SEs. Refute if median realised abatement >50% of stated volumes for VCM credits OR if public-mandate sectors (EU ETS, US RGGI) show no measurable emissions decline above price/baseline trend at p<0.10.'
+evidence_type: associational
+sample:
+  countries: [USA, GBR, BRA, IDN, COD, COL, PER, KEN, IND, CHN]
+  period: [2008, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop projects without satellite-verified counterfactual baseline"
+    - "include public-mandate sectors (EU ETS, US RGGI) as comparator panel"
+variables:
+  outcome:
+    - name: realised_abatement_share_of_stated
+      source: "constructed: project-level realised abatement / stated abatement based on West et al. 2023 Science replication and Verra/Gold Standard registry vs satellite forest-loss counterfactuals (Hansen GFC). Hand-coded under derived/."
+      transformation: ratio
+      notes: "TODO swarm-6e: confirm registry data publisher when academic fetcher schema covers Verra/Gold Standard. Currently derived."
+    - name: public_mandate_emissions_decline_rate
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log_yoy
+      notes: "EU ETS verified emissions decline rate as public-mandate comparator."
+  treatment:
+    - name: voluntary_carbon_market_indicator
+      source: "constructed: indicator = 1 for VCM/REDD+ projects; 0 for public-mandate sectors."
+      transformation: indicator
+  controls:
+    - name: forest_cover_change
+      source: "world_bank_wdi:AG.LND.FRST.ZS"
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    Cross-project comparison of realised vs stated abatement for VCM/REDD+
+    credits 2008-2023, benchmarked against public-mandate (EU ETS, US RGGI)
+    sectoral emissions trajectories. Project-level analysis where satellite
+    counterfactual exists; descriptive ratios with bootstrap CIs. Not causal —
+    mechanism is measurement gap (additionality, leakage) not estimation.

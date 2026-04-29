@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/movement.schema.json",
+  "title": "IESET Political Movement Specification",
+  "description": "A political movement or coherent governing coalition that enacted a set of policies. Movements aggregate policies and carry an axis-direction summary across them. Per Invariant 3 the scoring is policy-content, not party label. Movement and policy are separate content types because (a) one movement spans multiple policies, (b) one policy can be enacted or modified across movements, and (c) the same party label can carry opposite content in different eras.",
+  "type": "object",
+  "required": [
+    "movement_id",
+    "status",
+    "name",
+    "countries",
+    "timeframe",
+    "doctrine",
+    "policies"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "movement_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "candidate", "canonical"]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 4,
+      "description": "Human-readable name — 'Thatcherism', 'Schröder Agenda 2010', 'Bidenomics', 'Milei shock therapy'."
+    },
+    "countries": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z]{3}$"},
+      "minItems": 1
+    },
+    "timeframe": {
+      "type": "object",
+      "required": ["start"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {"type": "integer", "minimum": 1800, "maximum": 2100},
+        "enacted_date": {
+          "type": "string",
+          "description": "Optional YYYY-MM-DD of primary statute / order / treaty ratification"
+        },
+        "end": {
+          "oneOf": [
+            {"type": "integer", "minimum": 1800, "maximum": 2100},
+            {"type": "string", "enum": ["ongoing"]}
+          ]
+        }
+      }
+    },
+    "coalition": {
+      "type": "string",
+      "description": "Party or coalition label at time of movement — informational. Per Invariant 3 does not drive scoring."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["national", "subnational", "supranational"],
+      "description": "Default 'national' — federal / national government. 'subnational' for state, province, or municipal regimes that should not roll up into country-level cluster computation on the atlas. 'supranational' for EU, regional unions, etc. Optional; absence implies national."
+    },
+    "leaders": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "doctrine": {
+      "type": "string",
+      "minLength": 60,
+      "description": "One-paragraph statement of the movement's stated goals as proponents would describe them. Not evaluative."
+    },
+    "policies": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "description": "policy_ids enacted under this movement. A policy may appear under multiple movements if it spans governments."
+    },
+    "axes_summary": {
+      "type": "array",
+      "description": "Aggregated axis direction across the movement's policies. Derived from policies[].axes_moved but stated explicitly so readers can see the movement at a glance.",
+      "items": {
+        "type": "object",
+        "required": ["axis", "direction"],
+        "additionalProperties": false,
+        "properties": {
+          "axis": {
+            "type": "string",
+            "pattern": "^(fiscal|regulatory|monetary|institutional)\\.[a-z][a-z0-9_]*[a-z0-9]$"
+          },
+          "direction": {"type": "string", "enum": ["+", "-", "0", "mixed"]},
+          "magnitude": {"type": "string", "enum": ["weak", "moderate", "strong"]},
+          "rationale": {"type": "string"}
+        }
+      }
+    },
+    "outcome_hypotheses": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "hypothesis_ids whose results bear on evaluating this movement's effects."
+    },
+    "predecessor_movements": {"type": "array", "items": {"type": "string"}},
+    "successor_movements": {"type": "array", "items": {"type": "string"}},
+    "position_alignments": {
+      "type": "array",
+      "description": "Which schools of thought the movement drew from or aligned with.",
+      "items": {
+        "type": "object",
+        "required": ["position_id", "alignment"],
+        "additionalProperties": false,
+        "properties": {
+          "position_id": {"type": "string"},
+          "alignment": {"type": "string", "enum": ["aligned", "partially_aligned", "opposed"]},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "steelman": {
+      "type": "string",
+      "pattern": "^movements/steelman/.+\\.md$",
+      "description": "Charitable statement of the movement's strongest case. Required for canonical."
+    },
+    "disclosure": {"type": "string"},
+    "source_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "archive_refs": {"type": "array", "items": {"type": "string"}},
+        "mined_at": {"type": "string"},
+        "mined_by_model": {"type": "string"}
+      }
+    },
+    "references": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "canonical"}}, "required": ["status"]},
+      "then": {"required": ["movement_id", "status", "name", "countries", "timeframe", "doctrine", "policies", "steelman", "axes_summary"]}
+    }
+  ]
+}

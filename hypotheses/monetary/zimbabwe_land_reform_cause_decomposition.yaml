@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: zimbabwe_land_reform_cause_decomposition
+version: 1
+status: draft
+topic: monetary
+claim: Zimbabwean land reform 2000-2008 redistributed ownership to previously excluded populations; the
+  inflation crisis was driven by external sanctions and fiscal-military pressures, not by the redistributive
+  policy itself.
+notes: Origin is auto-generated coverage-gap stub seeded from Marxist-Leninist framing of Zimbabwe
+  2000-2008 inflation as driven by sanctions and fiscal-military pressure rather than land redistribution.
+  Human review required.
+prior_confidence: 0.30
+disclosure: Author has market-liberal priors and finds the property-rights/agricultural-collapse
+  channel highly plausible; framing risks under-weighting that channel and treating sanctions as fully exogenous to policy.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Variance-decomposition of ZWE 2000-2008 inflation across (land productivity, sanctions, fiscal-military, monetary financing) channels; sanctions+fiscal-military share >50% of variance with p<0.10 supports.'
+evidence_type: associational
+
+scope:
+  period: [2000, 2008]
+  countries: [ZWE]
+  outcome_dim: [inflation, poverty_inequality]
+  policy_family: [privatisation_nationalisation, fiscal_policy]
+  treatment_tags: [zimbabwe_fast_track_land_reform_2000, zimbabwe_sanctions_2002]
+
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 7
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Marxist-Leninist claim that Zimbabwean inflation 2000-2008 was driven by sanctions and fiscal-military pressures, not by the land redistribution itself."
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: episode
+  notes: >
+    Stub-level estimator pin for runnability audit. Decomposition of the
+    Zimbabwe 2000-2008 inflation/output collapse into channels: (i) land-
+    redistribution productivity hit, (ii) external sanctions (2002 ZIDERA,
+    EU/Commonwealth measures), (iii) fiscal-military pressures (DRC war
+    1998-2003, war-veteran payments), (iv) monetary financing. Variance-
+    accounting attributes inflation/output variance to each channel.
+    Falsification rule and variables block remain to be filled when this stub
+    is promoted from draft.
+
+sample:
+  countries: [ZWE]
+  period: [1995, 2009]
+  temporal_structure: time_series
+
+variables:
+  outcome:
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG; hanke_tc:zimbabwe_monthly_inflation"
+      transformation: pct_change_yoy
+      notes: "Hanke-Krus monthly hyperinflation series for ZWE 2007-2008 peak."
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG; imf:NGDP_RPCH"
+      transformation: pct_change_yoy
+  decomposition_channels:
+    - name: land_redistribution_productivity_channel
+      source: "constructed: agricultural-output index pre/post fast-track 2000; faostat:QC"
+      transformation: log_diff
+    - name: external_sanctions_channel
+      source: "constructed: binary = 1 from 2002-03 (ZIDERA Act); EU/Commonwealth measures coded separately"
+      transformation: binary
+    - name: fiscal_military_channel
+      source: "constructed: military spending pct GDP, DRC war 1998-2003, war-veteran payments 1997"
+      transformation: level
+      notes: "TODO: SIPRI mil-spending available; war-veteran one-off payments require academic/RBZ data."
+    - name: monetary_financing_channel
+      source: "rbz:money_supply; constructed: RBZ direct gov financing"
+      transformation: log_diff
+      notes: "TODO: RBZ monetary statistics; manual-drop required."
+  treatment:
+    - name: fast_track_land_reform_event
+      source: "constructed: event date = 2000-02 (Fast Track Land Reform Programme launch)"
+      transformation: event_date
+  controls:
+    - name: terms_of_trade
+      source: "imf_pcps:PALLFNF"
+      transformation: log_diff
+    - name: drought_indicator
+      source: "constructed: binary = 1 in major drought years (2002-2003, 2007-2008)"
+      transformation: binary

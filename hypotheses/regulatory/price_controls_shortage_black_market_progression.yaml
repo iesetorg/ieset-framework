@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: price_controls_shortage_black_market_progression
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Binding statutory price controls produce a three-order causal chain.
+  FIRST-ORDER: headline prices on the controlled basket are capped —
+  the policy works on its own terms for measured CPI components in the
+  initial window and this is an acknowledged success. SECOND-ORDER:
+  supply to official channels contracts, rationing and queueing emerge,
+  quality degrades (smaller portions, diluted products, substitutions
+  away from premium variants), scarcity arbitrage grows. THIRD-ORDER:
+  formal-economy contraction accelerates into black-market pricing,
+  regulator-corruption rents, enforcement-driven welfare losses, and
+  an aggregate welfare loss that exceeds the first-order consumer
+  gain. Cases: Venezuela Ley de Precios Justos 2014+, Argentina cepo
+  cambiario + Precios Cuidados 2014-2023, Turkey KKM FX-linked deposit
+  and 2022 food-price caps, Hungary 2022 food-fuel caps, Zimbabwe
+  2007-2008.
+
+evidence_type: causal
+
+sample:
+  countries: [VEN, ARG, TUR, HUN, ZWE]
+  period: [2000, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude years with overriding external shocks that dominate the price-control signal (e.g. Venezuela 2020 oil-collapse pandemic combined)"
+
+scope:
+  period: [2000, 2024]
+  countries: [VEN, ARG, TUR, HUN, ZWE]
+  outcome_dim: [inflation, currency_purchasing_power, regulation_compliance_cost]
+  policy_family: [regulation, monetary_policy, fiscal_policy]
+  treatment_tags: [venezuela_lpj_2014, argentina_precios_cuidados_2014, turkey_food_cap_2022, hungary_food_fuel_cap_2022, zimbabwe_2007_2008]
+
+variables:
+  outcome:
+    - name: official_cpi_controlled_basket
+      source: "ine:CPI (VEN, unreliable post-2014); indec:IPC (ARG); tuik:CPI (TUR); ksh:CPI (HUN); rbz:CPI (ZWE)"
+      transformation: yoy_pct_change
+      notes: "FIRST-ORDER outcome: statutory prices do remain below free-market level in initial window (success on own terms, with data caveats for VEN/ZWE)."
+    - name: official_black_market_price_gap
+      source: "constructed: dolartoday / blue-dollar / KitcoCN-style parallel market prices divided by official price; sourced from financial press archives + IMF AREAER + local-market price surveys"
+      transformation: ratio
+      notes: "THIRD-ORDER outcome: parallel-market premium."
+    - name: controlled_basket_official_availability
+      source: "constructed: shelf-availability surveys from local datasets (VEN Datanalisis, ARG INDEC-Canasta, TUR food-availability press surveys, HUN KSH retail sales volume by category); for ZWE use RBZ retail survey 2007-2008"
+      transformation: availability_rate
+      notes: "SECOND-ORDER outcome: shortages + stockouts."
+    - name: informal_market_share_controlled_goods
+      source: "constructed: share of controlled-category sales occurring outside tax-registered retail channels; from local household-expenditure surveys"
+      transformation: share
+      notes: "THIRD-ORDER outcome: informal-market absorption of demand."
+    - name: aggregate_welfare_loss_proxy
+      source: "constructed: Deaton-Muellbauer expenditure-survey-based deadweight-loss estimate from quantity-rationing + parallel-price premium"
+      transformation: level_real
+      notes: "THIRD-ORDER outcome: net welfare loss vs first-order consumer gain."
+
+  treatment:
+    - name: binding_price_control_event
+      source: "constructed: event indicators per country (VEN LPJ Jan-2014; ARG Precios Cuidados 2014 + cepo regimes; TUR 2022 food cap; HUN 2022 food-fuel cap; ZWE Operation Dzikwa-dzikwa 2007)"
+      transformation: indicator
+
+  controls:
+    - name: money_supply_growth
+      source: "bcv:M2 (VEN); bcra:M2 (ARG); tcmb:M2 (TUR); mnb:M2 (HUN); rbz:M2 (ZWE)"
+      transformation: yoy_pct_change
+    - name: fiscal_deficit_pct_gdp
+      source: "imf:WEO"
+      transformation: level_pct_gdp
+    - name: real_exchange_rate
+      source: "imf:IFS"
+      transformation: log_level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Statutory price caps are regulatory price ceilings. Monetary and
+  fiscal co-factors enter as controls because they often accompany
+  price-control regimes; the intervention itself is regulatory.
+
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects: [country, year]
+  random_seed: 20260424
+  notes: >
+    Panel event study with country + year FE and leads/lags around the
+    coded price-control events. Robustness: synthetic control for
+    each case against the peer-country donor pool (Latin American and
+    EM donors).
+
+falsification:
+  rule: >
+    Not supported if, across the five cases: (a) FIRST-ORDER CPI
+    suppression in the initial 6-12 month window is NOT confirmed at
+    p<0.10 (failure at first order) OR (b) BOTH second-order
+    availability contraction AND third-order parallel-market premium
+    fail to appear in at least 3/5 cases. The successful first-order
+    case with null second/third-order effects (which would refute the
+    chain) has very low prior probability given the historical record.
+  test: event_study_five_case_causal_chain
+  threshold: >
+    FIRST-ORDER CPI suppression at p<0.10 AND availability decline
+    >=5pp in at least 3/5 cases at p<0.10 AND parallel-market premium
+    >=20% emergent in at least 3/5 cases at p<0.10
+
+prior_confidence: 0.90
+disclosure: >
+  Author holds market-liberal priors. Historical record on binding
+  price controls across VEN, ARG, TUR, HUN, ZWE is overwhelming on
+  the second and third-order effects; prior is correspondingly very
+  high. Existing repo hypotheses price_controls_produce_shortages_
+  and_quality_degradation and price_controls_shortage_effect cover
+  parts of this terrain. This hypothesis is distinct in explicitly
+  staking the causal chain (first-order success acknowledged,
+  second/third-order as the falsification payload) and in using the
+  five-case panel rather than single-case designs.
+
+steelman: hypotheses/steelman/price_controls_shortage_black_market_progression.md
+
+linked_hypotheses:
+  - price_controls_produce_shortages_and_quality_degradation
+  - price_controls_shortage_effect
+
+notes: >
+  First-order CPI-suppression success is expected to be confirmed
+  (the policy does work in-window for measured baskets). Falsification
+  test is the second/third-order chain: availability contraction,
+  parallel-market premium, informalisation, and net welfare loss.

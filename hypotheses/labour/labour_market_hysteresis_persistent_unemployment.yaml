@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_market_hysteresis_persistent_unemployment
+version: 1
+status: draft
+topic: labour
+claim: 'Blanchard-Summers hysteresis: prolonged high unemployment (European NAIRU rise post-1980s, post-2008 Southern Europe) produces persistent labour-force detachment and skill decay that raises the
+  natural rate.'
+notes: Stub seeded from a New-Keynesian school prediction about Blanchard-Summers hysteresis raising the NAIRU via skill decay and labour-force detachment. NAIRU estimation methodology is itself contested;
+  needs human review of identification.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors view much of the European unemployment persistence as institutional (employment-protection, generous unemployment benefits) rather than hysteresis; could under-weight
+  skill-decay evidence and over-attribute the NAIRU rise to labour-market institutions.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Local projections of NAIRU and LFPR on prolonged-high-unemployment shocks across OECD panel 1980-2017 with country/year FE and EPL/union-density controls; supported if 5y-horizon NAIRU IRF rises
+    >0.5pp after a 2pp unemployment shock at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - GRC
+  - ITA
+  - ESP
+  - PRT
+  - IRL
+  - FRA
+  - DEU
+  - GBR
+  - USA
+  - JPN
+  - NLD
+  - BEL
+  - AUT
+  - FIN
+  - SWE
+  period:
+  - 1980
+  - 2017
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing OECD long-term-unemployment series
+variables:
+  outcome:
+  - name: nairu_estimate
+    source: imf:NAIRU
+    transformation: level
+    notes: 'IMF WEO-derived NAIRU estimates. Series ID approximate; OECD provides reference NAIRU (DSD_LMS) as alternate.
+
+      '
+  - name: long_term_unemployment_rate
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS_DURATION,1.0
+    transformation: level
+    notes: OECD share of unemployed unemployed >12 months.
+  - name: labour_force_participation_rate
+    source: world_bank_wdi:SL.TLF.CACT.ZS
+    transformation: level
+  treatment:
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+    notes: 'Treatment-side: prolonged-high-unemployment shock.'
+  - name: recession_shock_indicator
+    source: derived:recession_shock_window
+    transformation: indicator
+    notes: 'Hand-coded recession-window dummies — 2008-2013 GFC/euro-crisis as canonical hysteresis-prone window.
+
+      '
+  controls:
+  - name: epl_overall_index
+    source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+    transformation: level
+  - name: union_density
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TUD,1.0
+    transformation: level
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: real_interest_rate
+    source: world_bank_wdi:FR.INR.RINR
+    transformation: level
+scope:
+  period:
+  - 1980
+  - 2017
+  countries:
+  - EU
+  - SOUTHERN_EUROPE
+  - GRC
+  - ITA
+  - ESP
+  - PRT
+  outcome_dim:
+  - employment_labour
+  - productivity
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  - monetary_policy
+  treatment_tags:
+  - blanchard_summers_hysteresis
+  - european_nairu_rise
+  - post_2008_southern_europe
+covers_claims:
+- position_id: new_keynesian
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: New Keynesian predicts prolonged unemployment raises NAIRU via skill decay and labour-force detachment; Phase 4C should verify NAIRU estimation methodology and separate Southern-Europe-specific
+    structural factors from hysteresis mechanism.
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Local projections of NAIRU and labour-force participation on unemployment-recession shocks across OECD panel post-2008. Tests Blanchard-Summers hysteresis prediction that prolonged high unemployment
+    raises long-run NAIRU.
+
+    '

@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nordic_outcome_persistence_decomposition_v3
+version: 1
+status: pre_registered
+methodology_note: Superseded by nordic_outcome_persistence_decomposition_v2 for scoreboard reporting (2026-04-24
+  audit). v3 used a reform-vs-stagnation β-sign test with a pre-trend placebo gate and returned `refuted`;
+  the sign-test specification is less directly informative about the underlying decomposition question
+  than v2's channel accounting, and v3's pre-trend placebo may be picking up pre-1996 Nordic convergence
+  unrelated to the institutional question. Retained in the library as pre-registration proof-of-work;
+  the scoring layer should deduplicate and count v2 only.
+topic: institutional_quality
+claim: 'Countries that enacted market-oriented structural reforms with credible institutional commitment
+  (Norway handlingsregel 2001, Sweden pension- architecture reform 1999) experienced systematically better
+  post-treatment GDP-per-capita and unemployment trajectories than their own pre-treatment trends would
+  have predicted. Countries that entered the euro area without corresponding structural adjustment (Italy
+  1999, Greece 2001) experienced systematically worse post-treatment trajectories. The v3 hypothesis predicts
+  a positive within-country effect for the reform group and a negative within-country effect for the fiscal-dominance
+  group, identified off their own pre-treatment baselines via country and year fixed effects. This directly
+  addresses the v1/v2 structural limitation: cross-sectional decomposition cannot see timing, but within-country
+  DiD can.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - ISL
+  - ESP
+  - ITA
+  - GRC
+  - PRT
+  - FRA
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing outcome variable
+  - drop Iceland pre-1998 where WGI coverage is incomplete (not used as channel here but kept for v1/v2
+    comparability)
+  - exclude 2020-2021 COVID years as a sensitivity robustness spec (primary spec retains; robustness drops)
+scope:
+  period: [1996, 2023]
+  countries: [NOR, SWE, DNK, FIN, ISL, ESP, ITA, GRC, PRT, FRA, NORDIC, SOUTHERN_EUROPE]
+  outcome_dim: [gdp_growth, employment_labour, institutional_quality]
+  policy_family: [institutional_reform, fiscal_policy, monetary_policy]
+  treatment_tags: [norway_handlingsregel_2001, sweden_pension_reform_1999, italy_euro_entry_1999, greece_euro_entry_2001]
+variables:
+  outcome:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: unemployment
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  treatment:
+  - name: reform_post
+    source: 'constructed: indicator = 1 for country-years on or after the country-specific market-oriented
+      reform date; 0 otherwise. Reform dates: NOR=2001 (handlingsregel), SWE=1999 (pension NDC+funded).
+      DNK, FIN, ISL and all SE countries = never-treated on this indicator.'
+    transformation: indicator
+  - name: fiscal_dominance_post
+    source: 'constructed: indicator = 1 for country-years on or after the country-specific fiscal-dominance-onset
+      date; 0 otherwise. Dates: ITA=1999 (euro entry without structural reform), GRC=2001 (euro entry
+      + fiscal accommodation). NOR, SWE, DNK, FIN, ISL, ESP, PRT, FRA = never-treated on this indicator.'
+    transformation: indicator
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: urbanisation
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: "PanelOLS with country + year fixed effects, cluster-robust SEs by country. Specification:\n\
+    outcome_{i,t} = α_i + γ_t + β_reform * reform_post_{i,t}\n              + β_stagnation * fiscal_dominance_post_{i,t}\n\
+    \              + Xβ + ε_{i,t}\n\nCountry FE absorb all time-invariant country features (Nordic culture,\
+    \ geography, social trust, population homogeneity, pre-existing institutional quality) — the concern\
+    \ v1 and v2 could not control for. Year FE absorb global trends and common shocks (2008 GFC, 2020\
+    \ COVID, etc). β_reform identifies the average post-treatment deviation from each treated country's\
+    \ own pre-treatment trend, net of global year effects.\nThis is a staggered two-way fixed effects\
+    \ DiD. TWFE with staggered treatment has known bias under heterogeneous treatment effects (Goodman-Bacon\
+    \ 2021); v3.1 will run Callaway-Sant'Anna as robustness once that package is installed. For v3 v1,\
+    \ TWFE is the simplest identification that tests the core claim.\nSecondary specs (reported alongside\
+    \ primary): - event study with ±5 year leads and lags around each treatment date - pre-trend placebo:\
+    \ fake treatment at t-5 to test parallel trends - drop-COVID robustness (2020-2021 excluded)\n"
+falsification:
+  rule: 'Not supported if either β_reform or β_stagnation has the opposite sign from the pre-registered
+    expectation (positive for reform, negative for stagnation) at the 90% confidence level on the primary
+    outcome (log GDP per capita PPP). Also not supported if the pre-trend placebo detects spurious effects
+    — that would indicate parallel trends is violated and the identification is not clean. A clean pass
+    requires β_reform > 0 at p < 0.10, β_stagnation < 0 at p < 0.10, and the pre-trend placebo coefficient
+    at |t+<0|<1.65 (not statistically distinguishable from zero).
+
+    '
+  test: within_country_did_signs_and_pretrend_placebo
+  threshold: 'β_reform > 0 at p < 0.10  AND β_stagnation < 0 at p < 0.10  AND pre_trend_placebo_t < 1.65
+    absolute
+
+    '
+prior_confidence: 0.55
+disclosure: 'Prior held at 0.55 from v2. The within-country design addresses the user''s critique that
+  v1/v2 could not see timing. If v3 detects clear positive reform effects and negative fiscal-dominance
+  effects with clean pre-trends, that provides the first causally-identified evidence of the policy-content-over-coalition
+  mechanism the framework names as a load-bearing invariant (Refinement D.3.1).
+
+  A v3 refutation has two possible interpretations: (a) the specific treatment dates are wrong — reform
+  effects are diffuse and don''t land on a single year; (b) the reform / fiscal-dominance framing itself
+  does not hold in this sample. Both interpretations are useful. If (a), v3.1 adds event-study with leads/lags.
+  If (b), the framework updates its view of Nordic outcome mechanisms away from reform-timing-as-cause.
+
+  Prior on β_reform > 0: 0.70. Prior on β_stagnation < 0: 0.65. Joint pass prior: ~0.50 given some correlation.
+
+  '
+steelman: hypotheses/steelman/nordic_outcome_persistence_decomposition_v3.md
+linked_hypotheses:
+- nordic_outcome_persistence_decomposition
+- nordic_outcome_persistence_decomposition_v2
+linked_conditions:
+- nordic_institutional_design
+notes: 'This is the hypothesis the v1 steelman anticipated ("a v3 with within- country decomposition would
+  test a different but related claim"). The related claim is about REFORM TIMING, not average institutional
+  quality. v1 and v2 tested: "are Nordic levels of institutional quality associated with Nordic outcomes?"
+  (mostly no on v1, partly on v2). v3 tests: "did Nordic reform movements at specific dates shift subsequent
+  outcome trajectories?" (testable directly with DiD).
+
+  Treatment dates are pre-committed and documented in each movement YAML: NOR 2001, SWE 1999, ITA 1999,
+  GRC 2001. All within-sample. DNK, FIN, ISL, FRA, ESP, PRT are never-treated on both indicators; they
+  serve as the comparison group contributing year-FE identification.
+
+  The four movement YAMLs in movements/ ship together with this spec. Each carries its own steelman and
+  references.
+
+  '

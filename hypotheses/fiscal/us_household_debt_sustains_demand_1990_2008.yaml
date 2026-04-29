@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_household_debt_sustains_demand_1990_2008
+version: 1
+status: pre_registered
+topic: fiscal
+claim: Pre-2008 US household debt expansion sustained aggregate demand in the face of stagnant real median
+  wages, a pattern inconsistent with representative-agent rational-expectations models.
+notes: Maps the post-keynesian school's debt-substitutes-for-wages claim to a Mian-Sufi-style state-
+  level local projections specification 1990-2008. Estimator and prior set; full pre-registration
+  awaits steelman + human sign-off.
+prior_confidence: 0.6
+steelman: hypotheses/steelman/us_household_debt_sustains_demand_1990_2008.md
+disclosure: Author prior accepts the descriptive observation (debt growth outpaced real-wage growth
+  pre-2008) and Mian-Sufi's identification of the debt-driven consumption channel, but the stronger
+  claim that this is 'inconsistent with rational-expectations models' depends on which model is the
+  benchmark — heterogeneous-agent NK models can absorb the pattern.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if all THREE national-level
+    descriptive co-movement conditions hold for the US 1990 -> 2007 window:
+    (1) WAGE STAGNATION — log growth of real median household income
+        (FRED MEHOINUSA672N) <= 0.20 cumulative log points (~+22%);
+    (2) DEBT EXPANSION — log growth of household mortgage liabilities
+        (FRED MDOAH) exceeds log growth of real median income by >= 0.50
+        log points (debt grows materially faster than wages);
+    (3) DEMAND HELD UP — log growth of real personal consumption
+        (FRED PCE deflated by FRED PCEPI) exceeds log growth of real
+        median income by >= 0.20 log points (consumption decoupled
+        upward from median wages over the window).
+    REFUTED if BOTH (1) wage-stagnation AND (2) debt-wage-wedge fail
+    simultaneously — either alone suffices to invalidate the
+    post-Keynesian descriptive premise. PARTIAL otherwise.
+    INFORMATIVE: household debt service ratio level shift
+    (FRED HDTGPDUSQ163N), real house-price growth 1990->2006
+    (FRED USSTHPI), labour-share change (FRED PRS85006173),
+    federal-funds-rate level (FRED DFF). Reported but non-gating.
+    METHOD_VALID: all three primary FRED series available with at
+    least one observation in each anchor year (1990 and 2007).
+  test: us_national_wage_debt_consumption_co_movement_1990_2007
+  threshold: >-
+    PRIMARY (all three required for SUPPORTED):
+      log(MEHOINUSA672N_2007 / MEHOINUSA672N_1990) <= 0.20  AND
+      log(MDOAH_2007 / MDOAH_1990) - log(MEHOINUSA672N_2007 / MEHOINUSA672N_1990) >= 0.50  AND
+      log((PCE/PCEPI)_2007 / (PCE/PCEPI)_1990) - log(MEHOINUSA672N_2007 / MEHOINUSA672N_1990) >= 0.20.
+    REFUTED if conditions (1) AND (2) both fail.
+methodology_note: >-
+  v1 promotion (2026-04-27). The spec's preferred Mian-Sufi
+  state-quarter local-projections design (state+quarter FE,
+  state-clustered SEs) cannot be run on disk: the BEA state-PCE
+  panel (post-1997) and NY-Fed Consumer Credit Panel are not in
+  data/vintages/. Per HANDOFF_TO_RUN_AGENT.md (no fabrication),
+  v1 substitutes a NATIONAL-LEVEL DESCRIPTIVE CO-MOVEMENT TEST of
+  the post-Keynesian wage-stagnation / debt-substitution / sustained-
+  demand pattern in the US macro aggregates 1990-2007. If the
+  national co-movement fails, the state-panel mechanism is unlikely
+  to recover it. The state-LP design is preserved for v2 once a
+  state-panel fetcher (BEA SAPCE + NY-Fed CCP) is wired. Real
+  consumption is constructed as nominal PCE / PCEPI (PCE price
+  index) because the chained-real series PCEC96 is only available
+  on disk from 2007 onward.
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [1990, 2008]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop state-quarters with documented data breaks in NY Fed Consumer Credit Panel"
+    - "exclude 2008Q3 onwards (crisis itself is the outcome under test)"
+
+variables:
+  outcome:
+    - name: real_personal_consumption_expenditure
+      source: "fred:PCEC96"
+      transformation: pct_yoy
+      notes: "Primary outcome — aggregate consumption growth."
+    - name: real_consumption_growth_state_panel
+      source: "fred:state_personal_consumption (BEA state-level PCE, available 1997+)"
+      transformation: pct_yoy
+      notes: "State-quarterly outcome for Mian-Sufi-style cross-state identification (post-1997 only)."
+    - name: real_median_household_income
+      source: "fred:MEHOINUSA672N; us_census:saipe"
+      transformation: real_usd_yoy
+      notes: "Wage-stagnation channel under test."
+  treatment:
+    - name: household_debt_to_income
+      source: "fred:HDTGPDUSQ163N (household debt service ratio); fred:CMDEBT (consumer credit)"
+      transformation: ratio_level
+    - name: mortgage_debt_to_gdp
+      source: "fred:MDOAH (home mortgage liabilities of households)"
+      transformation: pct_gdp
+    - name: home_equity_extraction
+      source: "fred:HMLBSHNO (households mortgage liability change)"
+      transformation: pct_disposable_income
+      notes: "Mian-Sufi housing-net-worth channel."
+  controls:
+    - name: real_house_price_index
+      source: "fred:USSTHPI (Case-Shiller); shiller:home_price_index"
+      transformation: real_index_2000_100
+    - name: federal_funds_rate
+      source: "fred:DFF"
+      transformation: level_pct
+    - name: state_unemployment_rate
+      source: "fred:state_unemployment_rate (LAUS)"
+      transformation: level_pct
+    - name: labour_share_us
+      source: "fred:PRS85006173 (nonfarm business labour share); pwt:labsh"
+      transformation: level
+
+scope:
+  period: [1990, 2008]
+  countries: [USA]
+  outcome_dim: [wage_stagnation, financialisation, gdp_growth]
+  policy_family: [regulation, monetary_policy]
+  treatment_tags: [us_household_debt_expansion, wage_stagnation_era, financialisation_era]
+
+covers_claims:
+  - position_id: post_keynesian
+    claim_index: 10
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Post-Keynesian position claims pre-2008 US household debt propped up aggregate demand while real median wages stagnated, contra representative-agent models; hypothesis tests exactly that wage-debt decoupling."
+
+estimator:
+  template: local_projections
+  clustering: state
+  fixed_effects: [state, quarter]
+  notes: >
+    Local projections of consumption growth on household-debt
+    accumulation impulses across US states 1990-2008 (Mian-Sufi-style
+    leverage shock identification). State and quarter FE; clustering
+    by state.

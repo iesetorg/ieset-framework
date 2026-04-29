@@ -1,0 +1,219 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: state_size_reduces_household_income_growth
+version: 1
+status: pre_registered
+topic: fiscal
+
+claim: >
+  Across the OECD 38, over 2000-latest, larger general government final
+  consumption as a share of GDP is associated with slower growth in real
+  household disposable income per capita, controlling for demographics,
+  initial-income level, energy-price exposure, and trade openness. The
+  quantitative claim is that a 1-percentage-point higher share of general
+  government consumption in GDP is associated with roughly 0.05 to 0.20
+  percentage points lower annual growth in real household income per
+  capita, conditional on controls, with the relationship holding across
+  (a) pooled cross-section, (b) two-way fixed-effects panel, and (c)
+  synthetic-control event studies around Milei 2023 Argentina, Thatcher
+  1979 UK, Chávez 1999 Venezuela, and Balcerowicz 1990 Poland — four
+  pre-registered policy pivots spanning the state-shrinks and state-grows
+  directions. The hypothesis is an empirical test of a "state size effect
+  on household income," pre-registering the sign, magnitude, and
+  triangulation strategy so that a null or reversed finding forces a
+  corresponding update on the market-liberal prior.
+
+evidence_type: causal
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHL, COL, CRI, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, ISL, IRL, ISR, ITA, JPN, KOR, LVA, LTU, LUX, MEX, NLD, NZL, NOR, POL, PRT, SVK, SVN, ESP, SWE, CHE, TUR, GBR, USA, ARG, VEN]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing primary outcome (real household disposable income per capita)"
+    - "drop Venezuela post-2017 observations where BCV national-accounts reporting is unreliable"
+    - "drop country-years with hyperinflation (monthly CPI > 50%) per Cagan threshold"
+    - "winsorise annual real household income growth at 1st/99th percentile within sample"
+
+scope:
+  period: [2000, 2023]
+  countries: [AUS, AUT, BEL, CAN, CHL, COL, CRI, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, ISL, IRL, ISR, ITA, JPN, KOR, LVA, LTU, LUX, MEX, NLD, NZL, NOR, POL, PRT, SVK, SVN, ESP, SWE, CHE, TUR, GBR, USA, ARG, VEN, OECD]
+  outcome_dim: [gdp_growth, fiscal_policy, wage_stagnation]
+  policy_family: [fiscal_policy]
+  treatment_tags: [milei_2023, thatcher_1979, chavismo_1999, balcerowicz_1990, government_consumption_share]
+
+variables:
+  outcome:
+    - name: real_household_disposable_income_pc_growth
+      source: "constructed: OECD national accounts HH disposable income per capita real (fallback: world_bank_wdi:NY.GDP.PCAP.KD deflated). Specialist OECD SNA fetcher pending for the HH-specific series; WDI GDP-pc-constant used as v1 fallback with a known attenuation bias."
+      transformation: annual_log_change
+      notes: >
+        Primary outcome uses OECD SDD HH disposable income series when the
+        specialist fetcher lands. v1 runs on WDI NY.GDP.PCAP.KD as a
+        first-best available proxy; the specification flags the substitution
+        and re-runs automatically when the HH series ships.
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+      notes: "Secondary outcome. Tracks whether the state-size association operates on aggregate output as well as on HH income."
+
+  treatment:
+    - name: general_government_consumption_pct_gdp
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: level
+      notes: >
+        Primary IV: general government final consumption expenditure as a
+        share of GDP. A narrower state-size proxy (total government
+        spending / GDP) and a broader one (including public investment)
+        are reported as v2 robustness specs when IMF GFS and OECD SNA
+        fetchers ship.
+
+  controls:
+    - name: log_initial_gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log_initial_period_level
+      notes: "Convergence control: countries that start poorer grow faster conditional on policy."
+    - name: working_age_population_share
+      source: "world_bank_wdi:SP.POP.1564.TO.ZS"
+      transformation: level
+      notes: "Demographic control: the age structure of the economy shifts measured household income growth independent of policy."
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: energy_import_exposure
+      source: "world_bank_wdi:EG.IMP.CONS.ZS"
+      transformation: level
+      notes: "Energy import dependence proxies exposure to global energy-price shocks that compress HH income independently of state-size policy."
+    - name: debt_to_gdp
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+      notes: "Fiscal-stance control. High-debt countries may have larger state sectors for reasons unrelated to the treatment of interest."
+    - name: wgi_government_effectiveness
+      source: "wgi:GOV_WGI_GE.EST"
+      transformation: level
+      notes: "Institutional-quality control. Prevents the treatment from picking up state-capacity variation confounded with state-size variation."
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The primary IV (general government consumption / GDP) is a fiscal-channel
+  measure by construction. Regulatory-channel variation is deliberately
+  excluded and tested separately in the symmetric hypothesis
+  financial_deregulation_channel_distinct_from_fiscal_liberalisation, so
+  that state-size effects attributed here are not inadvertently capturing
+  regulatory co-movement. A v2 spec adds Fraser EFW area-1 (size of
+  government) as an alternative IV for robustness.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  random_seed: 20260423
+  notes: >
+    Triangulation across three estimators (all pre-registered):
+
+    (1) Pooled cross-section: country-average state-size vs country-average
+        HH-income growth over 2000-2019 (pre-COVID window), with the full
+        control set. Reports the raw partial correlation with
+        heteroskedasticity-robust SEs.
+
+    (2) Two-way FE panel: annual observations with country and year FE,
+        Driscoll-Kraay SEs clustered by country. Identifies the within-
+        country association after absorbing time-invariant country
+        heterogeneity and global common shocks.
+
+    (3) Synthetic-control event studies around four pre-registered policy
+        pivots: Milei 2023 Argentina (state-shrinks direction), Thatcher
+        1979 UK (state-shrinks direction), Chávez 1999 Venezuela (state-
+        grows direction), Balcerowicz 1990 Poland (state-shrinks
+        direction). Each treated unit is matched to a donor pool of
+        level-comparable non-pivot economies and the synthetic-minus-
+        treated HH-income trajectory is reported over the 10-year
+        post-pivot window. Pre-trend RMSPE reported; placebo permutation
+        p-values reported.
+
+    The three estimators probe different identifying assumptions. A clean
+    finding requires the sign and approximate magnitude to line up across
+    at least two of the three. A split result (e.g. panel FE supports,
+    synthetic control does not) is reported as a split and not resolved
+    in favour of either.
+
+    Known limitations:
+    (a) General government consumption / GDP is a coarse state-size proxy;
+        it excludes transfer payments and public investment. A v2 with
+        broader fiscal aggregates is planned.
+    (b) Reverse causality: slow-growth economies may expand the state
+        sector counter-cyclically. The two-way FE and the event-study
+        design each attack this from different angles but do not
+        eliminate it.
+    (c) Milei 2023 synthetic control has only ~2 years of post-treatment
+        data as of the 2026 vintage; that synthetic is pre-registered but
+        flagged as preliminary.
+
+falsification:
+  rule: >
+    Not supported if the estimated coefficient on general government
+    consumption / GDP (primary IV) in the two-way FE panel (primary
+    estimator) is (a) positive at any conventional significance level,
+    OR (b) negative but with p > 0.10, OR (c) negative and significant
+    but with an absolute magnitude smaller than 0.05 percentage points
+    of HH-income-growth per 1 percentage point of state size. In addition,
+    the hypothesis is weakened if the synthetic-control triangulation
+    produces opposite-signed effects in ≥ 2 of the 4 pre-registered
+    pivots — a single dissenting pivot is compatible with the hypothesis
+    (measurement error, case-specific confounders) but two or more is a
+    meaningful refutation signal.
+  test: state_size_coefficient_triangulated_across_three_estimators
+  threshold: >
+    β_gov_cons_share (panel FE, primary outcome) <= -0.0005 per 1pp (i.e. ≤ −0.05 ppt income-growth per 1pp state size) at p <= 0.10  AND
+    cross_section_coefficient sign matches panel FE sign  AND
+    synthetic_control_pivots_agreement_count >= 3 of 4  (≥ 3 pivots show sign consistent with hypothesis)
+
+prior_confidence: 0.70
+
+disclosure: >
+  Author's disclosed prior is pro-market: the framework expects smaller
+  states (on the consumption margin) to be associated with faster
+  household income growth, conditional on institutional quality. Prior
+  is 0.70 rather than higher because the cross-country literature is
+  genuinely mixed — Scandinavian large-state high-income cases and
+  Taiwan / Korea / Singapore coordination-state growth cases are real
+  and the steelman engages all five named counter-cases. The pre-
+  registration commits to publishing a null or reversed finding with
+  equal prominence per DISCLOSURE.md's asymmetric-credit-for-prior-
+  updating rule; the falsification rule above is designed so that the
+  coefficient can honestly come out flat, positive, or below magnitude
+  and trigger a public update.
+
+  Choice of four pivots (Milei, Thatcher, Chávez, Balcerowicz) is
+  pre-registered specifically so the mix includes state-shrinks and
+  state-grows directions; an all-one-direction pivot set would be a
+  selection tell.
+
+steelman: hypotheses/steelman/state_size_reduces_household_income_growth.md
+
+linked_hypotheses:
+  - nordic_outcome_persistence_decomposition
+  - venezuela_chavismo_framework_validation
+  - financial_deregulation_channel_distinct_from_fiscal_liberalisation
+  - industrial_policy_developmentalist_states_growth
+
+notes: >
+  This is mega-spec D.1 #1, the flagship state-size test. It is
+  deliberately the broadest fiscal hypothesis in the library and is
+  expected to be cited as the anchor for every narrower fiscal-channel
+  claim. The triangulation (cross-section + panel FE + four synthetic
+  controls) is heavier than strictly necessary for a single hypothesis;
+  that cost is accepted to make the finding robust enough to stand as
+  an anchor.
+
+  Data readiness:
+  - WDI NE.CON.GOVT.ZS (ready)
+  - WDI NY.GDP.PCAP.KD, NY.GDP.PCAP.PP.KD (ready)
+  - WDI SP.POP.*, NE.TRD.GNFS.ZS, EG.IMP.CONS.ZS (ready)
+  - IMF GGXWDG_NGDP (ready)
+  - WGI GE.EST (ready)
+  - OECD SDD HH disposable income (pending — falls back to WDI GDP-pc-KD
+    at v1 with an explicit attenuation-bias flag; re-runs automatically
+    on OECD SDD fetcher landing)

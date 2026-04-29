@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_dollar_issuer_solvency_record
+version: 1
+status: draft
+topic: monetary
+claim: Post-Bretton Woods US (1971-present) has never faced a solvency crisis in dollar-denominated debt,
+  consistent with currency-issuer operational-solvency claim.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT framing of post-1971 US as never
+  having faced a dollar-denominated solvency crisis, consistent with currency-issuer operational solvency.
+  Human review required.
+prior_confidence: 0.70
+disclosure: Author has market-liberal priors but treats the descriptive zero-default record as
+  factually well-established; risk is the claim being trivially descriptive rather than diagnostic of MMT's broader theory.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Descriptive count of dollar-denominated US-federal solvency events 1971-2023 (technical-default, missed-payment, IMF-distress); zero events with sovereign-CDS <100bp peak supports the issuer-solvency claim.'
+evidence_type: associational
+
+scope:
+  period: [1971, 2023]
+  countries: [USA]
+  outcome_dim: [monetary_policy, fiscal_policy]
+  policy_family: [monetary_policy, fiscal_policy]
+  treatment_tags: [fiat_currency_era, monetary_sovereignty, bretton_woods_collapse_1971]
+
+covers_claims:
+  - position_id: mmt
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "MMT claim that post-Bretton Woods US has faced no dollar-denominated solvency crisis, consistent with the currency-issuer operational-solvency argument."
+
+estimator:
+  template: descriptive
+  clustering: episode
+  notes: >
+    Stub-level estimator pin for runnability audit. Descriptive trajectory
+    of US 1971-2023: gross federal debt / GDP, 10y/30y Treasury yields,
+    sovereign CDS, and any technical-default or solvency-trigger events.
+    Pattern-test: zero dollar-denominated solvency events across the period.
+    Falsification rule and variables block remain to be filled when this stub
+    is promoted from draft.
+
+sample:
+  countries: [USA]
+  period: [1971, 2023]
+  temporal_structure: time_series
+
+variables:
+  outcome:
+    - name: us_treasury_yield_10y
+      source: "fred:DGS10"
+      transformation: level
+    - name: us_treasury_yield_30y
+      source: "fred:DGS30"
+      transformation: level
+    - name: us_sovereign_cds_5y
+      source: "academic:bloomberg_cds"
+      transformation: level
+      notes: "TODO: USA 5y CDS spreads via Bloomberg/Markit; manual-drop required. Series begins ~2003."
+    - name: dollar_denominated_default_event_count
+      source: "constructed: zero events documented for federal dollar-denominated obligations 1971-2023"
+      transformation: count
+  treatment:
+    - name: gross_federal_debt_pct_gdp
+      source: "fred:GFDEGDQ188S"
+      transformation: level
+    - name: post_bretton_woods_indicator
+      source: "constructed: binary = 1 from 1971-08-15 (Nixon shock; gold-window closure)"
+      transformation: binary
+  controls:
+    - name: cpi_inflation
+      source: "fred:CPIAUCSL"
+      transformation: pct_change_yoy
+    - name: real_gdp_growth
+      source: "fred:GDPC1"
+      transformation: pct_change_yoy
+    - name: dxy_dollar_index
+      source: "fred:DTWEXBGS"
+      transformation: log_level

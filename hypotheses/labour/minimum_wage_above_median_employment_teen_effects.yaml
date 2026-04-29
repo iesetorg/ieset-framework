@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: minimum_wage_above_median_employment_teen_effects
+version: 1
+status: candidate
+topic: labour
+claim: 'High-bite minimum wages (statutory floors that approach or exceed the local 50th percentile of the age-specific wage distribution) produce a multi-stage causal chain. FIRST-ORDER: wage floors do
+  rise for employed workers who retain their jobs — this effect is real, measurable and acknowledged. SECOND-ORDER: employment rates for teens, young immigrants, low-skill entrants, and workers in high-bite
+  sub-regions diverge negatively from synthetic controls, with hours reductions, reduced promotion-probability, and tradable-sector job reallocation away from affected regions. THIRD-ORDER: the productivity
+  ladder that moves workers from first-job wages to wages well above the minimum breaks down; informal-sector employment share rises; the share of young people neither in employment nor education (NEET)
+  increases persistently, entrenching long-run human-capital damage. Cases: Seattle 2015-2017 above-$13 hike, NYC fast-food $15 minimum 2019, California state-wide $15-to-$16 schedule, UK National Living
+  Wage 2016-2024 schedule, German Mindestlohn 2015 introduction and 2022 €12 hike.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  cross_section_justification: 'Analysis is at the sub-national unit (US state/city, UK region, German Kreis) where minimum-wage bite varies even within a single country. Country-code array is required
+    by schema; unit of analysis is the sub-national region.
+
+    '
+  exclusion_rules:
+  - exclude 2020-2021 pandemic years; employment shock dominates minimum-wage variation
+  - exclude state-years where federal US minimum-wage change dominates the state change
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - USA
+  - GBR
+  - DEU
+  outcome_dim:
+  - employment_labour
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  - regulation
+  treatment_tags:
+  - seattle_15_2015
+  - nyc_fast_food_15_2019
+  - california_15_schedule
+  - uk_nlw_2016
+  - germany_mindestlohn_2015
+  - germany_mindestlohn_12eur_2022
+variables:
+  outcome:
+  - name: teen_employment_to_population_ratio_high_bite
+    source: bls:LAU (US state teen E/P); ons:LFS (UK regional teen E/P); destatis:mikrozensus (DEU regional youth E/P)
+    transformation: level_pct
+    notes: 'Primary second-order outcome: teen E/P divergence in high-bite sub-regions vs synthetic control.'
+  - name: low_skill_immigrant_employment_rate
+    source: bls:CPS (US foreign-born by education); ons:APS (UK); destatis:mikrozensus (DEU foreign-born by education)
+    transformation: level_pct
+    notes: 'Second-order outcome: low-education immigrant employment.'
+  - name: neet_rate_15_24
+    source: oecd:NEET (15-24 not in employment, education, or training, by region)
+    transformation: level_pct
+    notes: 'Third-order outcome: persistent youth disengagement.'
+  - name: informal_sector_employment_share
+    source: 'ilo:ILOSTAT; proxies: US 1099/contractor share from BLS-CES, UK self-employment share from ONS'
+    transformation: level_pct
+    notes: 'Third-order outcome proxy: informalisation in high-bite regions.'
+  - name: wage_at_10th_percentile
+    source: bls:OEWS (US state p10 hourly wage); ons:ASHE (UK regional p10); destatis:VSE (DEU Kreis p10)
+    transformation: log_real_hourly
+    notes: 'FIRST-ORDER outcome: minimum wage does raise the p10 wage for the employed. This effect is expected to confirm, and the hypothesis acknowledges it as a success of the policy on its own terms.'
+  treatment:
+  - name: minimum_wage_bite_ratio
+    source: 'constructed: statutory minimum / median wage in same region and age-group; inputs from bls:OEWS, ons:ASHE, destatis:VSE'
+    transformation: ratio
+    notes: Kaitz-index-style bite ratio; treated units are sub-regions where bite crosses 0.50 of age-specific median.
+  controls:
+  - name: regional_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD (national-level proxy when sub-national series unavailable)
+    transformation: yoy_pct_change
+  - name: adult_unemployment_rate
+    source: bls:LAUST010000000000003; ons:LFS; destatis:arbeitsmarkt
+    transformation: level_pct
+  - name: sector_composition_share_tradable
+    source: bls:QCEW; ons:BRES; destatis:erwerbstaetige
+    transformation: share
+intervention_channel: regulatory
+intervention_channel_justification: 'Minimum-wage legislation is a regulatory price floor. No direct fiscal transfer is coded here; interactions with EITC/UC tapering enter via year fixed effects rather
+  than being modelled as co-treatment in v1.
+
+  '
+estimator:
+  template: did_callaway_santanna
+  clustering: region
+  fixed_effects:
+  - region
+  - year
+  random_seed: 20260424
+  notes: 'Staggered Callaway-Sant''Anna DiD exploiting the timing variation in high-bite minimum-wage events (Seattle 2015, NYC FF 2019, CA $15 schedule 2017-2023, UK NLW 2016-2024 sub-schedule, DEU 2015
+    intro and 2022 €12 hike). Treated units are sub-regions where post-event bite ratio exceeds 0.50 of age-specific median. Donor pool is sub-regions with bite ratio remaining below 0.35 through the treatment
+    window. Synthetic control as robustness per treated case.
+
+    '
+falsification:
+  rule: 'Not supported if, across the five labelled cases: (a) the p10 wage FIRST-ORDER effect is positive and significant (confirming the acknowledged success) AND (b) at least 3 of 5 cases show no statistically
+    meaningful teen-E/P divergence (>1.0pp below synthetic control at p<0.10) AND (c) no case shows the NEET third-order persistence. If FIRST-ORDER is confirmed but SECOND-ORDER and THIRD-ORDER effects
+    are null across the majority of cases, the causal-chain claim is refuted even though the first-order mechanism is intact. The minimum-wage-employment literature places prior at a moderate level: bite
+    ratio is the decisive moderator.
+
+    '
+  test: staggered_did_five_case_causal_chain
+  threshold: 'FIRST-ORDER (p10 wage) supported at p<0.05 AND SECOND-ORDER (teen E/P) divergence >=1.0pp in at least 3/5 cases at p<0.10 AND THIRD-ORDER (NEET or informal share) divergence >=0.5pp in at
+    least 2/5 cases at p<0.10
+
+    '
+prior_confidence: 0.62
+disclosure: 'Author holds market-liberal priors. The existing repo hypothesis minimum_wage_employment_effect_us_states sets a near-zero elasticity expectation for the full US state panel; this hypothesis
+  is distinct in focusing on HIGH-BITE events where the dosage is large and second/third-order effects are theoretically expected. Prior is only moderately high because Cengiz-Dube-Lindner-Zipperer 2019
+  find little employment effect even for sizeable US state-level hikes; the second/third-order (NEET, informalisation) evidence base is thinner and noisier.
+
+  '
+steelman: hypotheses/steelman/minimum_wage_above_median_employment_teen_effects.md
+linked_hypotheses:
+- minimum_wage_employment_effect_us_states
+- labour_market_flexibility_unemployment_duration
+notes: 'The causal chain is the payload: the hypothesis is methodologically honest about the first-order success (p10 wages rise for the employed) and stakes falsifiability on second/third-order divergence.
+  A clean first-order success with null second/third-order effects would refute the chain claim.
+
+  '

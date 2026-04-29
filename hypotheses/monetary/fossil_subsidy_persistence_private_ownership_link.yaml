@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fossil_subsidy_persistence_private_ownership_link
+version: 1
+status: draft
+topic: monetary
+claim: Fossil-fuel subsidies across OECD 1980-2020 persisted despite declared climate commitments, consistent
+  with the eco-socialist claim that private fossil-reserve ownership structurally blocks adequate public
+  action.
+notes: Origin is auto-generated coverage-gap stub seeded from eco-socialist framing of fossil-subsidy
+  persistence as a private-ownership-veto mechanism. Human review required before promotion.
+prior_confidence: 0.40
+disclosure: Author has market-liberal priors and is sceptical of the structural-veto framing; risk
+  is dismissing genuine political-economy mechanisms while over-weighting public-choice rent-seeking explanations.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Descriptive multi-metric trajectory of OECD fossil-subsidy levels (IEA/IMF) 1980-2020 vs
+    declared climate commitments; persistent non-decline post-2015 Paris with no >25% drop refutes climate alignment.'
+evidence_type: associational
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [energy, fiscal_policy]
+  policy_family: [energy_policy, fiscal_policy]
+  treatment_tags: [fossil_fuel_subsidies, paris_agreement_2015]
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Eco-socialist claim that private fossil-reserve ownership structurally blocks climate action; direct alignment with hypothesis claim and scope."
+
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Stub-level estimator pin for runnability audit. Descriptive trajectory
+    of OECD fossil-fuel subsidy levels 1980-2020 (IEA + IMF estimates),
+    against declared climate commitments (UNFCCC, Paris). Pattern-test:
+    persistence/non-decline of subsidies after 2015. Falsification rule and
+    variables block remain to be filled when this stub is promoted from draft.
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, JPN, CAN, AUS, NOR, NLD, ESP, KOR, MEX, POL, AUT, BEL]
+  period: [1980, 2020]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: fossil_fuel_subsidy_pct_gdp
+      source: "iea:fossil_fuel_subsidies; imf:imf_energy_subsidies"
+      transformation: level_pct_gdp
+      notes: "TODO: IEA fossil-fuel subsidy database starts 2007; pre-2007 use IMF energy-subsidy estimates (Coady et al.); coverage gap 1980-2007 flagged."
+    - name: fossil_fuel_subsidy_usd
+      source: "iea:fossil_fuel_subsidies"
+      transformation: log_level
+  treatment:
+    - name: paris_agreement_post_indicator
+      source: "constructed: binary = 1 from 2015-12 (COP21 / Paris Agreement)"
+      transformation: binary
+    - name: private_fossil_reserve_share
+      source: "academic:rystad_global_reserves_ownership"
+      transformation: level_pct
+      notes: "TODO: ownership share of proven reserves held by private vs state-owned entities; Rystad Energy data — manual-drop required."
+  controls:
+    - name: oil_price
+      source: "imf_pcps:POILBRE"
+      transformation: log_diff
+    - name: gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level
+    - name: government_effectiveness_wgi
+      source: "wgi:GOV_WGI_GE.EST"
+      transformation: level
+

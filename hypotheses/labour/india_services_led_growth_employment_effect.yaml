@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: india_services_led_growth_employment_effect
+version: 1
+status: draft
+topic: labour
+claim: India's post-1991 liberalisation accelerated growth but services-heavy rather than manufacturing-led,
+  leaving labour-intensive employment gains smaller than in East Asian industrial-policy peers.
+notes: Stub seeded from a developmentalist school prediction about India's services-led growth path producing
+  weaker labour-intensive employment gains than East Asian industrial-policy peers. Cross-country
+  composition effects confound interpretation; needs human review of comparator-set construction.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors view India's services-led path as a viable comparative-advantage
+  outcome rather than a labour-absorption failure; could under-weight the developmentalist case for active
+  industrial policy and over-attribute the East-Asia/India gap to demographics and unit labour costs.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Cross-country panel FE regression of manufacturing employment share on services-share-of-GDP and
+    growth composition over IND vs East Asian peers 1991-2023; supported if IND manufacturing-employment
+    gain trails East-Asia comparator group by >5pp at p<0.10.
+evidence_type: associational
+
+sample:
+  countries: [IND, KOR, TWN, CHN, MYS, THA, VNM, IDN, PHL]
+  period: [1991, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing manufacturing-employment series"
+    - "TWN coverage thin in WB; flag as data-impaired and use ILO ASEAN aggregates as fallback"
+
+variables:
+  outcome:
+    - name: manufacturing_employment_share
+      source: "world_bank_wdi:SL.IND.EMPL.ZS"
+      transformation: level
+      notes: >
+        WB manufacturing employment share of total employment — proxy
+        for labour-intensive industrial absorption.
+    - name: services_employment_share
+      source: "world_bank_wdi:SL.SRV.EMPL.ZS"
+      transformation: level
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: ilostat_employment_by_status
+      source: "ilostat:EMP_2EMP_SEX_AGE_NB"
+      transformation: level
+      notes: "ILOSTAT employment-by-status; cross-check on informal-sector share."
+  treatment:
+    - name: services_share_of_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+      notes: "Treatment — services share of value added vs manufacturing share."
+    - name: manufacturing_share_of_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  controls:
+    - name: gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: secondary_education_completion
+      source: "world_bank_wdi:SE.SEC.CUAT.UP.ZS"
+      transformation: level
+    - name: capital_formation_share
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+
+scope:
+  period: [1991, 2023]
+  countries: [IND, ASIA_EM]
+  outcome_dim: [employment_labour, gdp_growth, industrial_capability]
+  policy_family: [trade_policy, industrial_policy, labour_market]
+  treatment_tags: [indian_liberalisation_1991]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Developmentalist claim that India's post-1991 services-led growth path produced smaller labour-intensive employment gains than East Asian industrial-policy peers."
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Cross-country panel (IND vs East Asian industrial-policy peers:
+    KOR, TWN, CHN, MYS, THA, VNM) regressing labour-intensive
+    manufacturing employment on services-share-of-GDP and growth
+    composition with country and year FE.
+

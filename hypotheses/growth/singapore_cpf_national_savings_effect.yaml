@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_cpf_national_savings_effect
+version: 1
+status: draft
+topic: growth
+claim: Singapore's CPF forced-saving architecture produced higher national-savings rates and domestic capital accumulation than free-choice retirement-saving peers over 1965–2010.
+notes: Seeded from a developmentalist claim that Singapore's CPF forced-savings architecture delivered higher national savings than free-choice peers. Multi-metric pattern-match; human review required to
+  set the comparator group given Singapore's unique city-state structure.
+prior_confidence: 0.65
+disclosure: 'Authorial bias risk: developmentalist framing privileges the forced-savings channel; Singapore''s high savings rate also reflects its current-account-surplus growth model and demographic profile,
+  which are partly independent of CPF policy.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Multi-metric panel of gross savings/GDP and gross capital formation/GDP, SGP vs comparator pool 1965-2010, country and year FE; falsified if Singapore not above pool median by >5 ppts on either
+    at p<0.10.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - TWN
+  - MYS
+  - USA
+  - GBR
+  - AUS
+  - JPN
+  period:
+  - 1965
+  - 2010
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: gross_savings_pct_gdp
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: level
+  - name: gross_capital_formation_pct_gdp
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: level
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: cpf_balances_total
+    source: singapore_cpf:total_balances
+    transformation: log
+  treatment:
+  - name: cpf_treated
+    source: 'constructed: indicator = 1 for SGP, year >= 1968 (CPF expanded post-independence)'
+    transformation: indicator
+  controls:
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: 'Single-country canonical case (Singapore CPF 1965-2010). Pattern-match across national-savings rate, gross capital formation %GDP, and domestic-investment levels vs free-choice retirement-saving
+    comparator countries (matched income level). Tests forced-saving regime productivity.
+
+    '
+scope:
+  period:
+  - 1965
+  - 2010
+  countries:
+  - SGP
+  outcome_dim:
+  - welfare_state
+  - capital_flows
+  policy_family:
+  - welfare_architecture
+  treatment_tags:
+  - singapore_cpf
+covers_claims:
+- position_id: developmentalism
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Developmentalist prediction: Singapore''s CPF forced-saving architecture produced higher national-savings and domestic capital accumulation than free-choice peers; direct alignment with hypothesis.'

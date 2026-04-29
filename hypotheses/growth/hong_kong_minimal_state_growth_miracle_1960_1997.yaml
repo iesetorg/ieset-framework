@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: hong_kong_minimal_state_growth_miracle_1960_1997
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Under Financial Secretary John Cowperthwaite (1961–1971) and successors, Hong Kong pursued near-laissez-faire
+  economic policy — no capital controls, no industrial policy, minimal tariffs, low flat taxes, and light
+  labour regulation; between 1960 and 1997 Hong Kong''s GDP per capita rose from approximately $4,000
+  to $26,000 (2011 PPP), converging almost fully to UK levels and surpassing most continental European
+  economies. This convergence rate is attributable to free-market policy rather than solely to entrepôt
+  geography or East Asian culture, as evidenced by Heritage and Fraser Economic Freedom Index rankings
+  consistently placing Hong Kong first globally throughout the period.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - HKG
+  period:
+  - 1960
+  - 1997
+  temporal_structure: time_series
+  exclusion_rules:
+  - Post-handover SAR period excluded (1997+) to isolate colonial laissez-faire policy regime
+scope:
+  period: [1960, 1997]
+  countries: [HKG]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [regulation, trade_policy, tax_policy, institutional_reform]
+  treatment_tags: [cowperthwaite_laissez_faire, hong_kong_free_port, economic_freedom]
+variables:
+  outcome:
+  - name: gdp_per_capita_ppp
+    source: maddison:mpd2020
+    transformation: log_level
+  - name: gdp_per_capita_pwt
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_level
+  treatment:
+  - name: economic_freedom_score
+    source: heritage_ief:overall
+    transformation: continuous
+  controls:
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: 'The primary intervention channel is regulatory minimalism — near-zero
+  tariffs, no capital controls, flat low taxes, and light labour regulation under Cowperthwaite''s explicit
+  laissez-faire doctrine. This produced the highest economic freedom scores globally and created the conditions
+  for rapid convergence to high-income status.
+
+  '
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Time-series trajectory of HKG GDP per capita relative to OECD mean and UK specifically. Synthetic
+    control from comparable entrepôt or East Asian economies (Singapore, Taiwan, South Korea) to isolate
+    policy contribution from geography and regional manufacturing boom effects.
+
+    '
+falsification:
+  rule: 'The hypothesis is falsified if HKG GDP per capita growth rate during 1960–1997 is not statistically
+    distinguishable from a synthetic control constructed from comparable East Asian economies with more
+    state intervention, or if the convergence trajectory is fully explained by entrepôt geography alone.
+
+    '
+  test: synthetic_control_hkg_convergence
+  threshold: 'HKG GDP per capita must reach at least 80% of US level by 1997. Annual growth must average
+    at least 5% real for the 1960–1997 period. Below these thresholds would constitute weak evidence for
+    the hypothesis.
+
+    '
+prior_confidence: 0.72
+steelman: hypotheses/steelman/hong_kong_minimal_state_growth_miracle_1960_1997.md
+linked_hypotheses:
+- north_south_korea_development_divergence_1953_present
+- estonia_market_reform_post_soviet_growth_1991_2007
+notes: 'HK''s success is partly geography — deep-water port at mouth of Pearl River Delta is inherently
+  valuable regardless of policy. Singapore achieved similar results with more active state intervention
+  (HDB housing, CPF, GLCs), which suggests geography + regional manufacturing boom may be primary drivers.
+  HK also benefited from massive migration of skilled entrepreneurs fleeing mainland China. Post-1997
+  SAR governance with more intervention has remained strong through 2019, complicating pure laissez-faire
+  attribution.
+
+  '
+disclosure: Author holds the prior that Hong Kong's extended period of minimal-state economic policy (1960-1997)
+  produced one of the largest sustained growth miracles in recorded economic history, and that this is
+  meaningful evidence for the power of institutional quality + regulatory restraint even in the absence
+  of natural resources. Competing interpretations emphasising British colonial administration, Chinese
+  migration, or post-war geopolitical luck are acknowledged in the steelman.

@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: precautionary_regulation_innovation_productivity_gap_eu_us
+version: 1
+status: candidate
+topic: regulatory
+claim: 'Precautionary-principle-based regulation in the EU produces a three-order causal chain relative to the US regulatory baseline. FIRST-ORDER: environmental, privacy, consumer-safety, and pharma- safety
+  protections are codified and (largely) enforced — citizens receive measurable protection from harms targeted by each regulation (REACH substances registered; GDPR breach notifications required; AI Act
+  high-risk systems audited; EMA pharma-safety signals maintained). This is an acknowledged policy success for citizens. SECOND-ORDER: compliance costs rise, especially for small and medium firms; EU single-market
+  fragmentation persists because member states transpose differentially; product-launch timing in the EU lags the US. THIRD-ORDER: R&D investment and firm formation relocate (pharmaceutical product launches
+  in US then EU; AI and biotech unicorn formation; venture funding per capita gap); EU-US productivity and per-capita income gap widens. Cases: GDPR 2018, REACH 2007-2018, AI Act 2024, EMA vs FDA drug approval
+  timing, Digital Markets Act / Digital Services Act 2022- 2024.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - USA
+  - DEU
+  - FRA
+  - GBR
+  - IRL
+  - SWE
+  - ESP
+  - ITA
+  - NLD
+  period:
+  - 1995
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 pandemic years for firm-formation outcomes; pandemic disrupts baseline at different rates in US vs EU
+scope:
+  period:
+  - 1995
+  - 2024
+  countries:
+  - USA
+  - DEU
+  - FRA
+  - GBR
+  - IRL
+  - SWE
+  - ESP
+  - ITA
+  - NLD
+  - EU
+  outcome_dim:
+  - productivity
+  - regulation_compliance_cost
+  - industrial_capability
+  - capital_flows
+  policy_family:
+  - regulation
+  - competition_policy
+  - institutional_reform
+  treatment_tags:
+  - gdpr_2018
+  - reach_2007
+  - ai_act_2024
+  - dma_dsa_2024
+  - ema_fda_lag
+  - eu_precautionary_principle
+variables:
+  outcome:
+  - name: citizen_protection_proxy_gdpr_reach_ai_act
+    source: 'constructed: data-breach notification rate (GDPR); REACH-registered substances count; AI Act high-risk audits; EMA pharmacovigilance signals'
+    transformation: index
+    notes: 'FIRST-ORDER outcome: the regulations do deliver the protections they target — acknowledged policy success.'
+  - name: compliance_cost_index
+    source: 'constructed: compliance-cost surveys from CEPS, Bruegel, EU Regulatory Fitness reports + CRA estimates for REACH and AI Act'
+    transformation: log_real_eur_per_firm
+    notes: 'SECOND-ORDER outcome: compliance cost.'
+  - name: product_launch_timing_eu_vs_us
+    source: ema_fda_comparative:drug_approval_dates (historical FDA-EMA lag studies, Tufts CSDD); it_product:gdpr_feature_launch_gap (Apple, Google, Meta feature rollout deltas)
+    transformation: days_lag
+    notes: 'SECOND-ORDER outcome: EU launches lag US.'
+  - name: unicorn_and_high_growth_firm_count
+    source: cbinsights:unicorn_tracker; pitchbook:VC_funded_firms; crunchbase:firm_registry
+    transformation: count_per_million_population
+    notes: 'THIRD-ORDER outcome: firm scale-up gap.'
+  - name: rd_investment_per_gdp
+    source: eurostat:rd_e_gerdreg; oecd:research_and_development_statistics
+    transformation: pct_gdp
+    notes: 'THIRD-ORDER outcome: R&D intensity.'
+  - name: productivity_level_tfp
+    source: eu_klems:tfp; us_bls:multifactor_productivity
+    transformation: index_2005_100
+    notes: 'THIRD-ORDER outcome: TFP divergence.'
+  - name: venture_capital_per_capita
+    source: invest_europe:venture_capital_statistics; nvca:venture_capital_monitor (US)
+    transformation: log_real_usd_per_capita
+    notes: 'THIRD-ORDER outcome: VC market depth.'
+  treatment:
+  - name: eu_precautionary_regulation_event
+    source: 'constructed: event indicators (GDPR May-2018, REACH 2007 + registration deadlines 2010/2013/2018, AI Act adoption 2024, DMA/DSA 2023-2024); EU-vs-US indicator as the cross-sectional treatment'
+    transformation: indicator
+  controls:
+  - name: capital_market_depth
+    source: imf:FSI; world_bank:market_cap_to_gdp
+    transformation: pct_gdp
+  - name: bankruptcy_regime_stringency
+    source: world_bank:doing_business (historical); oecd:business_dynamics
+    transformation: index
+  - name: immigration_high_skill_share
+    source: oecd:international_migration_outlook
+    transformation: pct_of_labour_force
+intervention_channel: regulatory
+intervention_channel_justification: 'Precautionary-principle regulations are regulatory interventions setting compliance requirements on products and processes. No fiscal transfers are coded; industrial-policy
+  subsidies (IPCEI, IRA) enter as controls in robustness.
+
+  '
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  random_seed: 20260424
+  notes: 'Primary: Callaway-Sant''Anna DiD across the GDPR May-2018 and REACH staged-registration events, with US as untreated counterfactual. Secondary: panel FE on cumulative regulatory- stock index against
+    outcomes. The EU-vs-US comparison is the central identification; results must be reported with a capital-market-depth control that absorbs the non-regulatory contribution to the gap.
+
+    '
+falsification:
+  rule: 'Not supported if, across the outcome set: (a) FIRST-ORDER protection delivery is confirmed at p<0.05 (acknowledged success) AND (b) once capital-market-depth, bankruptcy-regime, and high-skill
+    immigration controls are included, the EU-vs-US DiD coefficient on firm-formation, R&D, VC, TFP becomes non-significant (p>0.10). If the productivity/firm-formation gap is fully absorbed by NON-regulatory
+    controls, the chain claim is refuted even though the protections (1st-order) are delivered.
+
+    '
+  test: eu_us_did_with_non_regulatory_controls_causal_chain
+  threshold: 'FIRST-ORDER citizen protection delivered AND RESIDUAL regulatory coefficient on at least 3 of 4 third-order outcomes (firm formation, R&D, VC, TFP) significant at p<0.05 AFTER controlling
+    for capital-market depth, bankruptcy regime, and immigration
+
+    '
+prior_confidence: 0.55
+disclosure: 'Author holds market-liberal priors. Existing repo hypotheses gdpr_digital_sector_firm_scale_effect, eu_chemical_reach_regulation_ firm_exit_effect, and eu_regulatory_burden_productivity_drag
+  cover components. This hypothesis is distinct in framing the full causal chain (protection delivered as 1st-order success; compliance and launch-lag as 2nd-order; R&D/firm-formation/TFP gap as 3rd-order)
+  and in requiring the test to survive non-regulatory controls (capital-market depth, bankruptcy, immigration). Prior is moderate because the non-regulatory-controls test is hard: much of the EU- US gap
+  is plausibly structural rather than regulatory.
+
+  '
+steelman: hypotheses/steelman/precautionary_regulation_innovation_productivity_gap_eu_us.md
+linked_hypotheses:
+- gdpr_digital_sector_firm_scale_effect
+- eu_chemical_reach_regulation_firm_exit_effect
+- eu_regulatory_burden_productivity_drag
+- us_eu_gdp_per_capita_divergence_policy_causes
+notes: 'Chain: protection delivered (1st) -> compliance cost + launch-lag (2nd) -> R&D, firm formation, VC, TFP gap (3rd). Falsification rests on whether residual regulatory coefficient survives non-regulatory
+  controls.
+
+  '

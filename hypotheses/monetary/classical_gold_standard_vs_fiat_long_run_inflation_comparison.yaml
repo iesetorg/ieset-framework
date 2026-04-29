@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: classical_gold_standard_vs_fiat_long_run_inflation_comparison
+version: 1
+status: draft
+topic: monetary
+claim: >
+  Pre-1914 classical-gold-standard episodes (excluding wartime suspensions)
+  show lower long-run average inflation than comparable-length fiat-regime
+  samples (post-1971) in the same or equivalent economies, even if short-run
+  price-level volatility is higher under gold. The test compares long-horizon
+  CPI geometric means across regimes, controlling for wartime suspension
+  windows.
+notes: Origin is Phase 4E coverage-gap split to give the Austrian classical-gold-standard steelman a
+  testable long-run inflation comparison vs post-1971 fiat. Human review required before promotion.
+prior_confidence: 0.55
+disclosure: Author finds the Austrian long-run-purchasing-power frame partially persuasive and may
+  under-weight short-run gold-standard volatility, deflationary episodes, and pre-1914 wartime exits.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if geometric-mean CPI growth over the
+    pre-1914 classical-gold-standard window (1870-1914 excluding wartime
+    suspensions) is at least 1.5 percentage points lower than geometric-mean
+    CPI growth over the post-1971 fiat window (1971-2020) in the same
+    countries (GBR, USA, DEU, FRA). REFUTED if fiat-window CPI is lower or
+    the gap is <0.5 percentage points.
+  test: 'Compare geometric-mean CPI growth 1870-1914 vs 1971-2020 across GBR, USA, DEU, FRA excluding
+    wartime suspensions; gold-window mean >=1.5pp lower with bootstrap-CI exclusion of zero supports.'
+evidence_type: associational
+sample:
+  countries: [GBR, USA, DEU, FRA]
+  period: [1870, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude wartime suspension windows (1914-1925, 1939-1949) per pre-registration"
+    - "drop country-years missing JST historical CPI series"
+variables:
+  outcome:
+    - name: cpi_log_yoy
+      source: "jst:cpi"
+      transformation: log_yoy
+      notes: "JST Macrohistory CPI series, primary long-run inflation outcome."
+    - name: cpi_geometric_mean_window
+      source: "jst:cpi"
+      transformation: geometric_mean_window
+      notes: "Geometric-mean CPI growth computed over pre-1914 vs post-1971 windows."
+  treatment:
+    - name: gold_standard_indicator
+      source: "ilzetzki_reinhart_rogoff:exchange_rate_regime"
+      transformation: indicator
+      notes: "Indicator = 1 for classical-gold-standard country-years (1870-1914 excluding wartime); 0 for post-1971 fiat. IRR exchange-rate-regime classification."
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "maddison:rgdpnapc"
+      transformation: log
+    - name: log_population
+      source: "maddison:pop"
+      transformation: log
+estimator:
+  template: descriptive
+  notes: >
+    Long-horizon descriptive comparison of geometric-mean CPI growth across
+    GBR/USA/DEU/FRA over (a) classical gold standard 1870-1914 excluding
+    wartime suspensions and (b) post-Bretton-Woods fiat 1971-2020. Bootstrap
+    CIs on the regime-mean differential. Caveat: short-run gold-standard
+    volatility (banking panics, deflationary episodes) is not the discriminating
+    test — long-run geometric mean is. Wartime suspensions excluded per
+    pre-registered rule.
+scope:
+  period: [1870, 2025]
+  countries: [GBR, USA, DEU, FRA, OECD]
+  outcome_dim: [inflation, currency_purchasing_power, monetary_policy]
+  policy_family: [monetary_policy, exchange_rate_regime]
+  treatment_tags: [classical_gold_standard_1870, fiat_regime_post_1971, bretton_woods_collapse_1971]
+covers_claims:
+  - position_id: austrian
+    claim_index: 13
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Austrian steelman: long-run purchasing-power stability matters more than short-run volatility. This hypothesis is the dedicated test of the classical-gold-vs-fiat long-run inflation comparison (pre-1914 vs post-1971); relinked out of fiat_expansion_erodes_currency_purchasing_power_long_run in Phase 4E."

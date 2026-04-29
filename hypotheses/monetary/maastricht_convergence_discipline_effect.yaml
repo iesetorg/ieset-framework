@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: maastricht_convergence_discipline_effect
+version: 1
+status: draft
+topic: monetary
+claim: Maastricht convergence criteria 1992 imposed fiscal discipline that produced lower inflation and
+  interest-rate convergence in pre-accession EU members, consistent with the Ordoliberal principle of
+  rules-binding monetary constitutions.
+notes: Origin is auto-generated coverage-gap stub seeded from ordoliberal framing of Maastricht as
+  rules-binding monetary constitution producing convergence. Human review required before promotion.
+prior_confidence: 0.55
+disclosure: Author has rules-friendly priors and is sympathetic to ordoliberal framing; risk is
+  attributing convergence to Maastricht when global disinflation and Bundesbank credibility-spillover may dominate.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): a difference-in-differences on the absolute CPI
+    inflation gap to the Bundesbank anchor (DEU). Treated periphery =
+    {ITA, ESP, PRT, GRC, IRL}; non-Eurozone OECD controls = {GBR, USA, JPN, CAN}.
+    Pre-Maastricht window 1985-1991, post-Maastricht convergence window
+    1996-2002. For each country, gap_closure = |post_inflation - DEU_post| -
+    |pre_inflation - DEU_pre|. PRIMARY = mean(treated gap_closure) -
+    mean(control gap_closure). SUPPORTED if PRIMARY <= -3.0pp (treated
+    converged on DEU at least 3pp more than controls). REFUTED if PRIMARY > -1.0pp
+    (no relative convergence or wrong direction). Partial range: (-3.0, -1.0]pp.
+    INFORMATIVE: per-country gap closures; absolute level of treated mean
+    inflation in 1996-2002 (close-to-DEU implies absolute-not-just-relative
+    convergence); government debt %GDP trajectories.
+    METHOD_VALID: at least 4 of 5 treated and 3 of 4 control countries have
+    WDI FP.CPI.TOTL.ZG observations in BOTH windows; if not, emit inconclusive.
+  test: maastricht_inflation_gap_did_treated_vs_controls
+  threshold: >-
+    PRIMARY: DiD <= -3.0pp for SUPPORTED. -3.0pp < DiD <= -1.0pp for partial.
+    DiD > -1.0pp for refuted. METHOD_VALID gate: >= 4 treated, >= 3 control with
+    both-window data.
+evidence_type: associational
+scope:
+  period: [1992, 2002]
+  countries: [EU, EUROZONE]
+  outcome_dim: [inflation, fiscal_policy, monetary_policy]
+  policy_family: [monetary_policy, fiscal_policy, institutional_reform]
+  treatment_tags: [maastricht_1992]
+covers_claims:
+  - position_id: ordoliberal
+    claim_index: 7
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Ordoliberal claim that Maastricht rules-based convergence produced inflation + interest-rate convergence in pre-accession members; direct alignment with hypothesis claim and scope."
+
+estimator:
+  template: event_study
+  clustering: country
+  notes: >
+    Two-window difference-in-differences on the absolute inflation gap to
+    the Bundesbank anchor (DEU). Pre window 1985-1991 (pre-Maastricht);
+    post window 1996-2002 (post-Maastricht convergence-test, ending at
+    physical euro adoption). Per-country gap closure =
+    |post_inflation - DEU_post| - |pre_inflation - DEU_pre|. Primary
+    statistic = mean(treated_closure) - mean(control_closure). 10y
+    sovereign yields are dropped from the dispositive test because vintage
+    long-run yield series for ITA/ESP/PRT/GRC across 1985-1991 are not
+    unified on disk; yields could be added to a v2 informative arm if
+    eurostat:irt_lt_mcby and equivalents are pinned.
+
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic falsification
+  rule to a dispositive DiD test on inflation convergence to the
+  Bundesbank anchor. Treated periphery = {ITA, ESP, PRT, GRC, IRL}
+  (pre-accession high-inflation states whose convergence is the empirical
+  focus of the ordoliberal claim); controls = {GBR, USA, JPN, CAN}
+  (non-Eurozone OECD comparators per spec exclusion rule). Pre window
+  1985-1991, post window 1996-2002. Yields convergence is informative-only
+  due to the data gap on unified long-run sovereign yield series.
+
+sample:
+  countries: [ITA, ESP, PRT, GRC, IRL, BEL, FRA, DEU, NLD, GBR, USA, CAN, JPN]
+  period: [1985, 2002]
+  temporal_structure: panel
+  exclusion_rules:
+    - "GBR opted out but treated as control given non-Eurozone status"
+
+variables:
+  outcome:
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG; eurostat:prc_hicp_manr; ecb:ICP"
+      transformation: pct_change_yoy
+    - name: sovereign_yield_10y
+      source: "ecb:financial_markets_yields_10yr; fred:IRLTLT01"
+      transformation: level
+    - name: inflation_dispersion_eu
+      source: "eurostat:prc_hicp_manr"
+      transformation: cross_sectional_stddev
+  treatment:
+    - name: maastricht_signature_event
+      source: "constructed: event date = 1992-02-07 (Maastricht Treaty signature); secondary = 1995-12 (Madrid summit naming euro)"
+      transformation: event_date
+    - name: pre_accession_eu_indicator
+      source: "constructed: binary = 1 for EU pre-accession members during 1992-2002"
+      transformation: binary
+  controls:
+    - name: government_debt_pct_gdp
+      source: "imf:GGXWDG_NGDP; eurostat:gov_10dd_edpt1"
+      transformation: level
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: pct_change_yoy
+    - name: pre_treatment_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: lag_avg_1985_1991
+

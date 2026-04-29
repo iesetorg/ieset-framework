@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: india_1991_liberalisation_growth_acceleration
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  India's 1991 balance-of-payments-crisis-driven liberalisation
+  programme (Manmohan Singh's package: rupee devaluation, industrial
+  delicensing, trade liberalisation, FDI opening, partial financial-
+  sector reform) produced a sustained acceleration in per-capita GDP
+  growth. Pre-reform (1965-1990) annualised real GDP-per-capita growth
+  was substantially lower than post-reform (1992-2019, pre-COVID)
+  annualised growth by at least 2 percentage points per year on a
+  sustained basis. The effect is identifiable even at the smaller
+  within-country structural-break scale.
+
+evidence_type: descriptive
+
+sample:
+  countries: [IND]
+  period: [1965, 2019]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "end pre-COVID to avoid 2020-21 distortion"
+    - "1991 itself is transition year; omit from pre and post calculations"
+
+scope:
+  period: [1965, 2019]
+  countries: [IND]
+  outcome_dim: [gdp_growth]
+  policy_family: [trade_policy, institutional_reform, exchange_rate_regime, privatisation_nationalisation]
+  treatment_tags: [india_1991_liberalisation, manmohan_singh_reforms, industrial_delicensing, rupee_devaluation_1991]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant_usd
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Pre-post annualised log-growth comparison. Primary statistic is the
+    difference between mean annualised log-growth 1992-2019 and
+    1965-1990. Visualise as a kinked trend line with a break at 1991.
+    No DiD — the 1991 package is abrupt and well-documented; this is a
+    within-country structural break.
+
+falsification:
+  rule: >
+    PRIMARY (dispositive): falsified if the annualised log-growth rate
+    1992-2019 minus the annualised log-growth rate 1965-1990 is less
+    than 0.02 (2 percentage points per year). A reversed sign would
+    be decisive refutation.
+    INFORMATIVE (not gating): the acceleration should be larger (≥0.025)
+    if the pre-window is trimmed to 1975-1990 (excluding earlier
+    commanding-heights experiments that pulled down the pre-reform
+    baseline).
+  test: india_pre_post_1991_annualised_growth_gap
+  threshold: >
+    PRIMARY: annualised_log_growth(1992-2019) - annualised_log_growth(1965-1990) >= 0.02
+    INFORMATIVE: trimmed-window robustness (1975-1990 pre vs 1992-2019 post) yields a similar or larger gap.
+    METHOD_VALID: WDI NY.GDP.PCAP.KD available for IND across 1965-2019.
+
+prior_confidence: 0.92
+
+disclosure: >
+  Author prior is high (0.92). The 1991 reform acceleration is a
+  well-documented pattern in Indian economic history; the magnitude
+  is smaller than the Chinese Deng-era acceleration but is clearly
+  present in national-accounts data. Included for framework-validation.
+
+linked_hypotheses:
+  - asian_convergence_vs_western_stagnation_2000_2023
+  - china_deng_reform_growth_acceleration_1978
+
+notes: >
+  Canonical natural-experiment tier (HYPOTHESIS_FRAMEWORK_AUDIT.md §E6
+  case #10). Runnable today with WDI data. Primary spec deliberately
+  simple (structural-break descriptive comparison) — in a framework
+  that can handle magnitudes smaller than the China 1978 case, this
+  2-pp annualised acceleration is still a first-order signal.
+steelman: hypotheses/steelman/india_1991_liberalisation_growth_acceleration.md

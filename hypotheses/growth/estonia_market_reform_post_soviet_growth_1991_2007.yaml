@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: estonia_market_reform_post_soviet_growth_1991_2007
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Estonia adopted among the most radical market-liberalisation packages of any post-Soviet state
+  — flat tax (26% universal rate, 1994), currency board (EEK pegged to DM/EUR, 1992), rapid privatisation,
+  unilateral free trade, and minimal capital controls — and by 2007 had recovered to Soviet-era GDP per
+  capita levels and substantially exceeded them, while Belarusian and Ukrainian peers had not recovered
+  comparably. Estonia''s radical shock-therapy approach combined with rule-of-law reforms and EU integration
+  produced faster and more durable recovery than gradualist alternatives applied to broadly comparable
+  post-Soviet initial conditions.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - EST
+  - LVA
+  - LTU
+  - BLR
+  - UKR
+  - RUS
+  period:
+  - 1991
+  - 2007
+  temporal_structure: panel
+  exclusion_rules:
+  - Pre-independence Soviet period excluded
+  - 2008 financial crisis and aftermath excluded to isolate reform-period effects
+scope:
+  period: [1991, 2007]
+  countries: [EST, LVA, LTU, BLR, UKR, RUS]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, tax_policy, exchange_rate_regime, privatisation_nationalisation]
+  treatment_tags: [estonia_flat_tax_1994, estonia_currency_board_1992, baltic_eu_accession, shock_therapy]
+variables:
+  outcome:
+  - name: gdp_per_capita_ppp
+    source: maddison:mpd2020
+    transformation: log_level
+  - name: gdp_growth_rate
+    source: imf:NGDP_RPCH
+    transformation: level
+  - name: gdp_per_capita_wb
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_level
+  treatment:
+  - name: reform_intensity_index
+    source: 'constructed: composite of flat tax adoption, currency board, trade openness, privatisation
+      speed'
+    transformation: continuous
+  - name: eu_accession_track
+    source: 'constructed: binary 1=EU accession candidate (EST/LVA/LTU), 0=non-candidate (BLR/UKR/RUS)'
+    transformation: binary
+  controls:
+  - name: economic_freedom
+    source: heritage_ief:overall
+    transformation: level
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+intervention_channel: institutional
+intervention_channel_justification: 'The primary channels are institutional: flat tax eliminating marginal-rate
+  distortions, currency board providing credible nominal anchor, rapid privatisation preventing entrenchment
+  of Soviet managerial class, and EU accession path providing rule-of-law credibility attracting FDI premium
+  versus non-EU peers.
+
+  '
+estimator:
+  template: did_chaisemartin
+  clustering: country
+  notes: 'DiD comparing Baltic states (treatment: radical reform + EU accession) versus CIS peers (control:
+    gradualist reform, no EU accession). Pre-treatment parallel trends assumption requires verification
+    given differential Soviet legacy (lighter heavy-industry base in Baltics). Fischer, Sahay & Vgh (1996)
+    and EBRD Transition Reports provide comparative reform-speed indices.
+
+    '
+falsification:
+  rule: 'The hypothesis is falsified if Estonia''s GDP per capita recovery speed (years to regain 1991
+    level) is not statistically faster than the CIS comparator group after controlling for EU accession
+    pull, proximity to Nordic FDI, and initial income levels.
+
+    '
+  test: did_recovery_speed_baltic_vs_cis
+  threshold: 'Estonia must recover to 1991 GDP per capita level by 2000 and exceed it by at least 20%
+    by 2007. Baltic states must outperform CIS mean by at least 15 percentage points in cumulative real
+    growth 1995–2007.
+
+    '
+prior_confidence: 0.78
+steelman: hypotheses/steelman/estonia_market_reform_post_soviet_growth_1991_2007.md
+linked_hypotheses:
+- west_east_germany_economic_system_divergence_1950_1989
+- hong_kong_minimal_state_growth_miracle_1960_1997
+notes: 'Baltic states'' strong performance partly reflects EU accession pull — the credible anchor of
+  EU membership caused rational agents to front-load investment and reform, not available as a policy
+  lever to most transition economies. Estonia''s Soviet-era legacy was lighter than Russia''s or Ukraine''s
+  (smaller heavy-industry base, shorter Soviet experience, stronger pre-WWII market institutions). The
+  flat tax claim is disputed by Keen & Simone (2004) who show revenue was largely maintained through base-broadening
+  rather than behavioural effects. Canonical comparators: gradualist_vs_shock_therapy_transition_outcomes,
+  post_soviet_market_reform_life_expectancy.
+
+  '
+disclosure: Author holds the prior that Estonia's radical shock-therapy approach to post-Soviet transition
+  produced faster and more durable recovery than the gradualist alternatives pursued by Ukraine, Belarus,
+  or Russia, and that the institutional dimension (rule of law, property rights, judicial independence)
+  was as important as the fiscal dimension (flat tax, currency board). Competing interpretations emphasising
+  Nordic-style geographic advantages or EU accession externalities are acknowledged.

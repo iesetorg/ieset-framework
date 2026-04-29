@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: el_salvador_bukele_gdp_crime_tradeoff_2019_2024
+version: 1
+status: candidate
+topic: growth
+claim: 'El Salvador''s homicide rate fell from 52 per 100,000 (2019) to 2.4 per 100,000 (2023) — a 95%
+  reduction — under Bukele''s Estado de Excepción security crackdown beginning March 2022. This security
+  improvement is associated with measurable GDP and FDI gains: El Salvador grew approximately 3.5% real
+  in 2022 and 4.0% in 2023 per IMF NGDP_RPCH, outperforming Honduras and Guatemala — the structural comparators
+  — for the first time since 2010. The pre-registered causal claim is that crime reduction via security
+  crackdown (regardless of rule-of-law costs) produced positive economic returns through three channels:
+  tourism recovery, FDI attraction in light manufacturing, and domestic consumer confidence, detectable
+  as a positive cumulative average treatment effect on the treated (CATT) in a synthetic-control design
+  with HND, GTM, NIC, and DOM as donor countries. The rule-of-law deterioration — mass imprisonment of
+  approximately 75,000 persons, habeas corpus suspension, credible reports of wrongful detention — is
+  a confounding factor coded as a separate variable and is not subsumed into the economic growth claim.
+  The hypothesis tests only the economic-returns mechanism of crime reduction, not the normative legitimacy
+  of the enforcement method.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - DOM
+  period:
+  - 2010
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - NIC excluded from primary donor pool post-2018 due to Ortega political-economic shock; retain as sensitivity
+    donor
+  - exclude 2020-2021 pandemic years from pre-treatment weighting; retain in post-treatment outcome window
+    with pandemic controls
+scope:
+  period: [2010, 2024]
+  countries: [SLV, HND, GTM, NIC, DOM]
+  outcome_dim: [gdp_growth, institutional_quality, capital_flows]
+  policy_family: [institutional_reform, regulation]
+  treatment_tags: [bukele_2019, estado_de_excepcion_2022, salvador_homicide_collapse]
+variables:
+  outcome:
+  - name: gdp_growth_real
+    source: imf:NGDP_RPCH; world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: pct_change
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log_level
+  - name: fdi_inflows_pct_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: level
+  - name: tourism_arrivals
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: log_level
+  treatment:
+  - name: estado_de_excepcion_active
+    source: 'constructed: binary = 1 for SLV from 2022-03-27 onward; 0 for all donor countries'
+    transformation: binary
+  - name: homicide_rate_per_100k
+    source: "unodc:intentional_homicide; constructed:slv_pnc_official"
+    transformation: level
+    notes: 'Mediating variable: crime reduction is the mechanism, not a direct treatment. Used in mechanism
+      test.'
+  controls:
+  - name: us_remittance_conditions
+    source: fred:LNS12000009
+    transformation: log_level
+    notes: Remittances are ~25% of SLV GDP; US Hispanic labour market is the dominant income driver.
+  - name: current_account_pct_gdp
+    source: imf:BCA_NGDPD
+    transformation: level
+  - name: rule_of_law
+    source: world_bank_wgi:GOV_WGI_RL.EST
+    transformation: level
+    notes: Expected to decline for SLV post-2022; coded as a confound to isolate crime-reduction economic
+      channel from institutional-quality channel.
+  - name: freedom_house_score
+    source: freedom_house:fiw_all_countries
+    transformation: level
+    notes: SLV democratic backsliding coded separately from economic outcomes.
+  - name: military_spending_pct_gdp
+    source: sipri:milex_share_gdp
+    transformation: level
+  - name: population_total
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log_level
+intervention_channel: institutional
+estimator:
+  template: synthetic_control
+  notes: 'Primary: synthetic control (Abadie 2010) with SLV as treated unit, treatment date 2022-03-27,
+    donor pool HND/GTM/DOM weighted on 2010-2021 GDP growth, GDP per capita, remittance share, and FDI
+    pre-trends. CATT evaluated on real GDP growth and log GDP per capita 2022-2024. Secondary: Callaway-Sant''Anna
+    DiD using annual panel. Mechanism test: two-stage regression of homicide_rate on estado_de_excepcion_active
+    (first stage), then GDP outcomes on fitted homicide reduction (second stage), to estimate the economic
+    return per unit of crime reduction. Confound separation: rule_of_law and freedom_house_score entered
+    as controls to test whether GDP gains survive institutional-quality deterioration controls.
+
+    '
+falsification:
+  rule: 'The hypothesis is falsified if the synthetic-control CATT on real GDP growth for SLV over 2022-2024
+    is not statistically positive at p_perm < 0.10 relative to the donor pool counterfactual, OR if the
+    CATT on log GDP per capita is not positive and economically meaningful (> 2% cumulative above synthetic
+    control), OR if FDI inflows show no differential increase for SLV post-2022 relative to donor countries.
+
+    '
+  test: synthetic_control_gdp_growth_plus_fdi_mechanism
+  threshold: 'CATT_2022_2024(real_gdp_growth) > 0 at p_perm < 0.10 AND CATT_2022_2024(log_gdp_per_capita)
+    > 0.02 cumulative AND FDI_inflows_SLV_2022_2024 > FDI_synthetic_control_2022_2024
+
+    '
+prior_confidence: 0.6
+steelman: hypotheses/steelman/el_salvador_bukele_gdp_crime_tradeoff_2019_2024.md
+linked_hypotheses:
+- bukele_fdi_gdp_investment_climate_2019_2024
+- bitcoin_legal_tender_remittance_adoption_2021_2024
+disclosure: Author holds the prior that Bukele's mass-incarceration policy produced a measurable drop
+  in homicide rates that improved investment climate and hence GDP, but that the institutional-quality
+  cost (weakened judicial independence, constitutional chamber removal) is real and shows up in long-run
+  rule-of-law indicators. The hypothesis tests both the short-run GDP effect and the institutional trajectory.

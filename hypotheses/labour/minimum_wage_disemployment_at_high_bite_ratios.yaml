@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: minimum_wage_disemployment_at_high_bite_ratios
+version: 1
+status: draft
+topic: labour
+claim: Minimum-wage increases above the local median-wage ratio produce disemployment effects at the low-skill margin, even if aggregate employment effects are small.
+notes: Stub seeded from a Chicago-monetarist school prediction about minimum-wage bite-ratio disemployment. Cross-country bite-ratio measurement is harmonised through OECD; needs human review on demographic-margin
+  definition.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors are sympathetic to bite-ratio-conditional disemployment claims for high-bite increases; could under-weight monopsony-channel evidence and over-weight demographic-margin
+  effects relative to aggregate-employment effects.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Stratified Callaway-Sant'Anna DiD on US state min-wage cohorts by bite-ratio terciles 1971-2023; supported if high-bite (>0.6) cohorts show low-skill disemployment >2pp larger than low-bite at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - AUS
+  - CAN
+  - JPN
+  - KOR
+  - NLD
+  - BEL
+  - ESP
+  - IRL
+  - NZL
+  - POL
+  - MEX
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing OECD bite-ratio observations
+  - winsorise low-skill employment changes at 1st/99th sample percentile
+variables:
+  outcome:
+  - name: teen_employment_to_population
+    source: fred:LNS12300012
+    transformation: level
+    notes: 'FRED 16-19 year-old employment-population ratio (US). Cross- country teen rates require ILOSTAT EAP — TODO add when wired.
+
+      '
+  - name: low_education_unemployment_rate
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS,1.0
+    transformation: level
+  - name: low_skill_employment_share
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS,1.0
+    transformation: share
+  treatment:
+  - name: minimum_to_median_wage_ratio
+    source: oecd:OECD.ELS.SAE,DSD_EARN@DF_MW_DOL_RPP,1.0
+    transformation: ratio
+    notes: 'OECD bite-ratio (minimum wage to median wage of full-time workers).
+
+      '
+  - name: state_minimum_wage
+    source: fred:STTMINWGCA
+    transformation: log
+    notes: FRED state-level minimum-wage; CA exemplar swap on wiring.
+  - name: minimum_wage_real_level
+    source: oecd:OECD.ELS.SAE,DSD_EARN@DF_MW_DOL_RPP,1.0
+    transformation: log
+    notes: OECD real minimum wage in PPP USD.
+  controls:
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: epl_overall_index
+    source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+    transformation: level
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - employment_labour
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  - regulation
+  treatment_tags:
+  - minimum_wage_bite_ratio
+  - low_skill_disemployment
+covers_claims:
+- position_id: chicago_monetarism
+  claim_index: 12
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Chicago-monetarist claim that minimum-wage increases above the local median-wage bite ratio produce low-skill disemployment even where aggregate employment effects are small.
+estimator:
+  template: did_callaway_santanna
+  clustering: state
+  fixed_effects:
+  - state
+  - year
+  notes: 'Staggered DiD across US state minimum-wage increases stratified by bite ratio (minimum/median wage). Tests whether high-bite cohorts show measurable low-skill (teen, low-education) disemployment
+    relative to low-bite cohorts.
+
+    '

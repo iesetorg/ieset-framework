@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vienna_social_housing_rent_burden_comparative
+version: 1
+status: draft
+topic: housing
+claim: Vienna's sustained social-housing programme has delivered lower rent burdens and housing-cost inflation
+  than comparable European capitals without supply collapse, a counter-example to the rent-control-supply-destruction
+  narrative.
+notes: Stub seeded from a democratic-socialist school prediction about Vienna's social-housing programme
+  delivering lower rent burdens without supply collapse. Comparator-capital selection is critical and
+  Vienna's land-bank inheritance is unusual; needs human review of matched-comparator strategy.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors view Vienna as a context-bound success premised on long-cumulated
+  municipal land banks rather than a generalisable rent-control proof; could under-weight evidence of
+  rent-burden gains and over-attribute observed lower rents to unique Viennese land-bank conditions.
+falsification:
+  rule: >-
+    PRIMARY 1 (RENT BURDEN): mean Austria housing-cost-overburden rate
+    (Eurostat ilc_mded01, hhtyp=TOTAL, incgrp=TOTAL, unit=PC) over
+    2010-2024 must trail the unweighted comparator-pool mean by at
+    least 2.0 percentage points (i.e. AT - pool <= -2.0pp).
+    PRIMARY 2 (NO HPI RUNAWAY): cumulative AT log-change in Eurostat
+    prc_hpi_a (purchase=TOTAL with DW_EXST fallback, unit=I10_A_AVG)
+    over 2010-2024 must not exceed the unweighted comparator-pool mean
+    by more than +5 percentage points. Higher AT HPI growth than peers
+    is consistent with supply tightness — the rent-control-supply-
+    destruction narrative the claim disputes.
+    Verdict logic: SUPPORTED if BOTH primaries hold, refuted if NEITHER
+    holds, partial if exactly one holds.
+    INFORMATIVE: AT mean monthly rent-CPI yoy (prc_hicp_manr coicop=CP041)
+    minus pool mean. Reported but not gating.
+    METHOD_VALID: ilc_mded01 and prc_hpi_a must each cover AT and at
+    least 6 of 10 comparator countries with at least 10 years of
+    overlapping data; otherwise emit `inconclusive`.
+  test: vienna_at_vs_european_capital_pool_dual_threshold
+  threshold: >-
+    PRIMARY 1: (AT mean overburden % - pool mean overburden %) <= -2.0pp.
+    PRIMARY 2: (AT cumulative log HPI growth - pool mean cumulative
+    log HPI growth) <= +0.05 (i.e. +5pp).
+    Both primaries 2010-2024 inclusive.
+methodology_note: >-
+  v1 promotion (2026-04-26). Sharpened the original generic
+  falsification rule to two dispositive primary tests against an
+  unweighted pool of European-capital countries (DEU, FRA, NLD, BEL,
+  DNK, SWE, IRL, ESP, ITA, CZE). The original spec asked for >5pp
+  rent-burden gap at p<0.10 in a city-level cross-section; city-level
+  rent-burden subnational data is not in vintages, so the test is
+  executed at country level using Eurostat ilc_mded01 (where the
+  spec's stated source ilc_mded01 is preserved) and the magnitude
+  threshold is rescaled to 2.0pp at country level (which is material
+  given Vienna is roughly a quarter of Austrian population). GBR
+  excluded from the pool because Eurostat coverage ends 2018-2020 due
+  to Brexit. Window 2010-2024 chosen because Eurostat prc_hpi_a starts
+  in 2010 for AT. Supply-collapse falsifier is implemented as
+  HPI-runaway (Eurostat bldg_pi_lt building-permits series is not in
+  vintages — flagged for the data backlog). When subnational
+  capital-city panels and building-permits series land, this hypothesis
+  should be respecced as v2 with the original capital-city framing.
+evidence_type: associational
+sample:
+  countries: [AUT, DEU, FRA, GBR, NLD, BEL, DNK, SWE, IRL, ESP, ITA, CZE]
+  period: [1971, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop city-years missing Eurostat HICP rents or rent-burden series"
+    - "primary unit = capital city (Vienna, Berlin, Paris, London, Amsterdam, Brussels, Copenhagen, Stockholm, Dublin, Madrid, Rome, Prague)"
+variables:
+  outcome:
+    - name: housing_cost_to_income_ratio
+      source: "eurostat:ilc_mded01"
+      transformation: level
+      notes: "Eurostat housing cost overburden / housing-cost-to-income ratio; capital-city subset where available."
+    - name: rent_hicp_index
+      source: "eurostat:prc_hicp_aind"
+      transformation: log_yoy
+      notes: "HICP actual rents for housing — primary inflation outcome."
+    - name: dwellings_completed_per_1000
+      source: "eurostat:bldg_pi_lt"
+      transformation: log
+      notes: "Eurostat building permits / completions; supply-collapse falsifier."
+  treatment:
+    - name: vienna_social_housing_indicator
+      source: "constructed: indicator = 1 for AUT (capital = Vienna with municipal social-housing dominant share); 0 for matched European-capital comparator pool."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: real_mortgage_rate
+      source: "ecb:mfi_lending_rates"
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    Cross-city descriptive comparison Vienna vs matched European-capital
+    donor pool 1971-2023. Plot rent-burden, HICP-rents, and supply-completion
+    trajectories side-by-side; report rank-position of Vienna at 5-year
+    intervals. Caveat: Vienna's pre-WWI municipal land-bank inheritance is
+    unusual — descriptive contrast cannot identify rent-control vs land-bank
+    channel. Flagged TODO swarm-6e for synthetic-control extension when
+    enough donor-city panel coverage lands.
+
+scope:
+  period: [1971, 2023]
+  countries: [AUT, EU]
+  outcome_dim: [housing, inflation]
+  policy_family: [housing_policy]
+  treatment_tags: [vienna_social_housing]
+
+covers_claims:
+  - position_id: democratic_socialist
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Democratic-socialist claim that Vienna's sustained social-housing programme yields lower rent burdens and housing-cost inflation than comparable European capitals without supply collapse is a verbatim match to the hypothesis's own claim."

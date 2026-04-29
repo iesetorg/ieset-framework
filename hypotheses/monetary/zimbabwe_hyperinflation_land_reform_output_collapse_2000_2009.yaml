@@ -1,0 +1,308 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009
+version: 1
+status: pre_registered
+topic: monetary
+
+claim: >
+  Zimbabwe's Fast Track Land Reform Programme (FTLRP, 2000-2002) combined with
+  Reserve Bank of Zimbabwe deficit monetisation produced a canonical institutional
+  and economic collapse 2000-2009 that manifests as >=7 of 10 pre-registered
+  extreme-outcome metrics, each drawn from an independent data source and
+  measuring a different causal layer (agricultural-capacity destruction, monetary
+  collapse, output contraction, human-capital flight, humanitarian stress). The
+  canonical-case claim is that no non-war peacetime sub-Saharan African economy
+  in the 2000-2009 window matches even 4 of these 10 thresholds simultaneously;
+  Zimbabwe matches most. A refutation (<=3 metrics met) would indicate that
+  Zimbabwe's collapse has been substantially overstated or that the 1980-1999
+  pre-reform trend was already trending toward collapse independent of FTLRP
+  and RBZ monetisation.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [ZWE]
+  period: [1998, 2009]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "Post-dollarisation period (2009+) treated as the recovery falsification window, not part of the collapse pattern-match"
+    - "No donor pool required; this is a single-country canonical-case pattern match against pre-registered extreme-outcome thresholds"
+    - "Benchmark distribution (was any 2000-2009 peacetime sub-Saharan African country matching >=4 of 10 thresholds?) is computed ex post from WDI + FAOSTAT + Hanke-Kwok + IMF staff panel as a sanity check on uniqueness"
+
+variables:
+  outcome:
+    - name: multi_metric_collapse_score
+      source: "derived: count of canonical_metrics with threshold met"
+      transformation: count
+
+canonical_metrics:
+  - metric_id: hyperinflation_cagan_threshold
+    description: >
+      Cagan (1956) hyperinflation threshold is ≥50% m/m for ≥2 consecutive
+      months. Zimbabwe entered this regime in March 2007 (Hanke-Kwok
+      reconstruction) and exited only via the January 2009 dollarisation.
+      Peak monthly inflation of 7.96 × 10^10 percent (mid-November 2008)
+      is the second-largest hyperinflation in recorded history, behind
+      only Hungary 1946.
+    threshold: ">=2 consecutive months of >50% m/m CPI between 2007 and 2009"
+    window: "2000-2009"
+    source: "hanke:hyperinflation_table; imf:PCPIPCH; rbz archival CPI series"
+    data_quality_flag: >
+      Central Statistical Office stopped publishing official CPI after
+      July 2008 ("no longer possible to compile"). Hanke-Kwok methodology
+      uses parallel-FX-rate + observed-price cross-check against the
+      cash-stock constraint.
+    independence_justification: >
+      Hanke-Kwok reconstruction is FX-rate-methodology-based, not
+      official-basket-based. Independent of ZIMSTAT capture.
+    direction: supports_claim
+
+  - metric_id: real_gdp_contraction_peak
+    description: >
+      World Bank / IMF reconstructions put Zimbabwean real GDP in 2008
+      at approximately 40-50% of its 2000 level. This is the largest
+      peacetime peak-to-trough GDP contraction in the 2000-2009 global
+      panel outside declared-conflict states.
+    threshold: ">35% cumulative real GDP contraction 2000-2008"
+    window: "2000-2008"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD; imf:NGDP_R; maddison:mpd2020"
+    independence_justification: >
+      Maddison reconstruction uses IMF-consistent PPP and cross-check
+      against physical-output indicators (tobacco, electricity,
+      manufacturing). Multi-source triangulation.
+    direction: supports_claim
+
+  - metric_id: tobacco_output_collapse
+    description: >
+      Flue-cured tobacco — Zimbabwe's largest commercial crop and principal
+      foreign-exchange earner — fell from 236,947 tonnes (2000) to 48,761
+      tonnes (2008), a ~80% decline. The tobacco sector was the
+      most-exposed-to-FTLRP sector because it required large commercial
+      scale, specialised knowledge, and working-capital access.
+    threshold: ">50% decline in flue-cured tobacco output from 2000 peak to any year 2003-2008"
+    window: "2000-2008"
+    source: "manual:tobacco_industry_marketing_board_zimbabwe; faostat:crops_primary"
+    independence_justification: >
+      Physical-output measurement via commodity auction volumes. Not
+      derived from national-accounts aggregates or central bank series.
+    direction: supports_claim
+
+  - metric_id: cereal_production_collapse
+    description: >
+      Maize production (the primary staple) fell from ~1.5 million tonnes
+      (1999) to ~0.5 million tonnes (2008) per FAOSTAT. Combined with
+      collapse in wheat and sorghum, Zimbabwe shifted from net food
+      exporter (pre-2000) to structural food-aid recipient.
+    threshold: ">50% decline in staple cereal production (maize + wheat + sorghum) from 1999 peak"
+    window: "2000-2008"
+    source: "faostat:QCL; wfp:food_security_monitor_zimbabwe"
+    independence_justification: >
+      FAOSTAT uses crop-cut surveys and district-level ministry-of-agriculture
+      reports; WFP uses independent field assessments for food-security
+      classification.
+    direction: supports_claim
+
+  - metric_id: emigration_skilled_labour_exodus
+    description: >
+      Estimates of Zimbabweans leaving the country 2000-2009 span 2.5 to
+      4 million people against a 2000 population of ~12.5 million
+      (20-32% of population). The outflow was skill-biased — teachers,
+      nurses, doctors, engineers, and commercial farmers disproportionately
+      departed for South Africa, UK, Botswana, and Australia.
+    threshold: ">15% of 2000 population emigrated by end-2009"
+    window: "2000-2009"
+    source: "un_desa:international_migrant_stock; iom:migration_profile_zimbabwe_2010"
+    independence_justification: >
+      Destination-country immigration statistics (SA home affairs,
+      UK ONS, Australia DIAC) measure inflow independently of Zimbabwean
+      state statistics.
+    direction: supports_claim
+
+  - metric_id: life_expectancy_reversal
+    description: >
+      Zimbabwean life expectancy at birth fell from 60.2 years (1990)
+      to 43.8 years (2003) — the steepest recorded peacetime reversal
+      in the African continent. Compounded by HIV/AIDS prevalence, the
+      collapse of public health infrastructure during 2000-2008 produced
+      maternal and child mortality reversals on top of the HIV epidemic
+      baseline.
+    threshold: ">10 year decline in life expectancy from 1990 peak to any trough year before 2009"
+    window: "1990-2008"
+    source: "world_bank_wdi:SP.DYN.LE00.IN; who_gho:life_expectancy"
+    data_quality_flag: >
+      HIV-attributable mortality is the dominant channel 1990-2003.
+      The institutional-collapse channel dominates 2003-2008 (public
+      health infrastructure degradation).
+    independence_justification: >
+      Life-expectancy estimates use demographic-health-survey (DHS)
+      data supplemented by WHO GBD modelling — independent of
+      state vital-registration statistics.
+    direction: supports_claim
+
+  - metric_id: currency_redenomination_count
+    description: >
+      Between August 2006 and February 2009, the Reserve Bank of
+      Zimbabwe executed THREE currency redenominations removing a
+      cumulative 25 zeros from the Zimbabwe dollar (2006: 3 zeros;
+      2008: 10 zeros; 2009: 12 zeros), before the currency was
+      formally abandoned via the 2009 multi-currency regime. Three
+      redenominations in three years is unmatched in the modern
+      hyperinflation record.
+    threshold: ">=2 currency redenominations within a 5-year window"
+    window: "2005-2009"
+    source: "rbz:official_redenomination_decrees; imf:article_iv_consultation_staff_reports_zwe"
+    independence_justification: >
+      Redenominations are state-decreed legal events directly observable
+      in currency legislation — not a statistical construct subject to
+      measurement dispute.
+    direction: supports_claim
+
+  - metric_id: commercial_farm_expropriation_share
+    description: >
+      Approximately 4,500 of 6,000 large-scale commercial farms (75%+ of
+      the LSCF sector) were seized or vacated under FTLRP between 2000
+      and 2003 per the Utete Commission (2003). Compensation for land
+      was explicitly not paid; compensation for improvements was nominally
+      owed but not delivered at market value.
+    threshold: ">50% of large-scale commercial farmland transferred or vacated without market-rate compensation"
+    window: "2000-2003"
+    source: "manual:utete_commission_report_2003; manual:buka_report_2002; zidera_factual_record"
+    independence_justification: >
+      Legal-status changes on individual farm titles are public record
+      in the Deeds Registry. Commission reports aggregated title-level
+      data.
+    direction: supports_claim
+
+  - metric_id: food_insecurity_wfp_caseload
+    description: >
+      World Food Programme reported 4-5 million Zimbabweans requiring
+      food assistance in 2008-2009 (~40% of remaining resident
+      population). Zimbabwe went from regional breadbasket (pre-2000)
+      to WFP's largest per-capita food-aid programme in sub-Saharan Africa
+      by 2008.
+    threshold: ">30% of resident population on WFP/NGO food assistance in any single year"
+    window: "2002-2009"
+    source: "wfp:emergency_operation_zimbabwe_annual_reports; fao:giews_country_briefs_zwe"
+    independence_justification: >
+      WFP caseload is operationally measured (ration-card registrations
+      + distribution logs) independent of Zimbabwean state statistics.
+    direction: supports_claim
+
+  - metric_id: monetary_aggregate_growth_rate
+    description: >
+      RBZ broad money (M3) expanded at triple-digit then quadruple-digit
+      year-on-year rates from 2005. The fiscal channel is direct — by
+      2007 RBZ was explicitly funding government deficits (including
+      "quasi-fiscal" purchases at below-market FX), fusing
+      monetary and fiscal policy. This satisfies the fiscal-dominance
+      precondition for hyperinflation.
+    threshold: ">1000% annualised growth of M3 (or equivalent broad-money aggregate) for >=6 consecutive months"
+    window: "2005-2008"
+    source: "rbz:monetary_policy_statements; imf:IFS_money_and_credit_zwe"
+    independence_justification: >
+      RBZ-published monetary aggregates are checked against IMF-staff
+      reconstruction and against currency-in-circulation physical counts.
+    direction: supports_claim
+
+multi_metric_falsification:
+  total_metrics: 10
+  support_threshold: 7
+  refute_threshold: 3
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Zimbabwe 2000-2009 is a bundled intervention — property-rights violation
+  (FTLRP expropriation without market compensation), fiscal collapse
+  (tax-base destruction via agricultural output collapse), monetary
+  dominance (RBZ deficit-monetisation funding governance-captured state),
+  and institutional capture (judicial, electoral). The canonical-case
+  hypothesis treats the bundle as the unit, consistent with Mugabe-era
+  governance as an institutional-quality complex.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    For each of the 10 canonical metrics, evaluator fetches the specified
+    data source and evaluates the threshold expression. Support if
+    metrics_met >= 7, refute if metrics_met <= 3, inconclusive in the
+    4-6 range. Benchmark check: no non-war sub-Saharan peer in the
+    2000-2009 window should match >=4 of these thresholds; if one does,
+    the metric-set is not adequately Zimbabwe-discriminating and needs
+    revision.
+
+falsification:
+  rule: >
+    Hypothesis is SUPPORTED if >=7 of 10 canonical metrics meet their
+    pre-registered thresholds. Hypothesis is REFUTED if <=3 of 10 metrics
+    meet their thresholds. The 4-6 metric range is inconclusive.
+    Additional falsification: if any non-war sub-Saharan peer in 2000-2009
+    (WDI + FAOSTAT panel) matches >=4 of these thresholds, the metric-set
+    is not Zimbabwe-discriminating and the hypothesis is methodologically
+    invalid regardless of Zimbabwe's own metric count.
+  test: multi_metric_canonical_case_pattern_match
+  threshold: "metrics_met_zimbabwe >= 7 AND max_metrics_met_non_war_ssa_peer <= 3"
+
+prior_confidence: 0.95
+
+disclosure: >
+  This hypothesis is a methodology-revision of the causal-inference
+  Zimbabwe collapse specification (commit 3231178) which used a
+  single-estimator event-study around FTLRP and dollarisation. The
+  multi-metric specification is epistemically stronger because Zimbabwe
+  2000-2009 is a canonical-case pattern match, not an identification
+  problem — the 2009 dollarisation event study is preserved as a
+  complementary test (it confirms the monetary channel) but not the
+  primary evidence.
+
+  Author's market-liberal priors are aligned with the hypothesis (the
+  author believes property-rights destruction plus fiscal-monetary
+  fusion caused the Zimbabwe collapse). The pre-registered 10-metric
+  threshold set, and the requirement that no non-war sub-Saharan peer
+  match >=4 metrics, binds the author to a pattern-match that is not
+  simply a re-labelling of priors.
+
+conflict_disclosure: >
+  Author holds no Zimbabwean asset exposure and no consulting
+  relationship with parties in the Zimbabwe policy debate.
+
+steelman: hypotheses/steelman/zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009.md
+
+linked_hypotheses:
+  - great_leap_forward_famine_output_collapse_1959_1961
+  - venezuela_chavismo_canonical_case_multi_metric
+  - hyperinflation_requires_fiscal_dominance
+
+scope:
+  period: [1998, 2009]
+  countries: [ZWE]
+  outcome_dim: [inflation, industrial_capability, institutional_quality]
+  policy_family: [monetary_policy, fiscal_policy, privatisation_nationalisation]
+  treatment_tags: [zimbabwe_fast_track_land_reform_2000, rbz_deficit_monetisation, zimbabwe_sanctions]
+
+covers_claims:
+  - position_id: mmt
+    claim_index: 1
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "MMT claim that Zimbabwe 2000-2008 hyperinflation followed real-supply collapse from land reform + sanctions with currency expansion downstream; direct alignment with hypothesis's bundled-intervention diagnosis."
+
+notes: >
+  Methodological rationale: a single-estimator causal test on Zimbabwe
+  2000-2009 is weak because (a) the treatment is a bundle (FTLRP +
+  RBZ monetisation + governance capture), (b) the donor pool is
+  unsatisfactory (no sub-Saharan peer has comparable pre-2000 LSCF
+  sector AND comparable political-economy shock AND comparable
+  sanctions profile), and (c) official statistics ceased publication
+  during the window of largest effect (CSO stopped CPI July 2008).
+  Pre-registered multi-metric pattern-match with explicit benchmark
+  check against sub-Saharan peers is epistemically stronger than
+  single-estimator causal claims under these conditions.
+
+  The 2009 dollarisation-recovery event is preserved as a
+  secondary falsification channel: if the hyperinflation and
+  output-collapse metrics did not reverse sharply after January
+  2009 multi-currency adoption, the monetary-channel attribution
+  would be falsified. Recovery was in fact immediate (inflation
+  fell to <10% y/y within 3 months, real GDP recovered by ~8% in
+  2010), consistent with the monetary-dominance diagnosis.

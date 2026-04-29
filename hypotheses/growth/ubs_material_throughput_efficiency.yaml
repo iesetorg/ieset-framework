@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ubs_material_throughput_efficiency
+version: 1
+status: draft
+topic: growth
+claim: Universal Basic Services provision (UK post-war, Nordic) delivers equivalent wellbeing outcomes to consumption-based equivalents at lower material-throughput levels.
+notes: Seeded from a degrowth claim that Universal Basic Services (UK postwar, Nordic) deliver equivalent wellbeing to consumption-equivalents at lower material throughput. Cross-country panel with treatment
+  indicator; human review needed for matched comparator selection.
+prior_confidence: 0.55
+disclosure: 'Authorial bias risk: degrowth framing wants UBS to dominate consumption-equivalents on every dimension; the comparators (USA-style consumption peers) include very different demographic, geographic,
+  and labour-market structures that confound the UBS-treatment indicator.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE of life expectancy and life satisfaction on UBS indicator and material-footprint per capita, country and year FE 1970-2022; falsified if UBS coefficient on wellbeing not positive at p<0.10
+    conditional on lower throughput.
+evidence_type: associational
+sample:
+  countries:
+  - GBR
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - USA
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - CHE
+  - JPN
+  - CAN
+  - AUS
+  period:
+  - 1970
+  - 2022
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: life_satisfaction
+    source: owid:happiness-cantril-ladder
+    transformation: level
+  - name: hdi
+    source: undp_hdi:hdi
+    transformation: level
+  - name: log_co2_emissions_per_capita
+    source: owid:co-emissions-per-capita
+    transformation: log
+  treatment:
+  - name: ubs_indicator
+    source: 'constructed: indicator = 1 for GBR (post-1948), SWE, NOR, DNK, FIN (Nordic universalist welfare); 0 for USA-style consumption-equivalent peers'
+    transformation: indicator
+  - name: social_expenditure_pct_gdp
+    source: oecd:SOCX_AGG
+    transformation: level
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Cross-country panel of UBS-providing economies (UK postwar, Nordic) vs consumption-equivalent matched comparators 1945-2023. Outcomes: life expectancy, life satisfaction, and material-footprint-per-capita.
+    Tests whether UBS provision delivers equivalent wellbeing at lower material throughput.
+
+    '
+scope:
+  period:
+  - 1945
+  - 2023
+  countries:
+  - GBR
+  - NORDIC
+  - SWE
+  - DNK
+  - NOR
+  - FIN
+  outcome_dim:
+  - welfare_state
+  - life_expectancy_health
+  policy_family:
+  - welfare_architecture
+  treatment_tags:
+  - uk_postwar_welfare_state_1945
+  - nhs_1948
+  - nordic_universalist_welfare
+covers_claims:
+- position_id: degrowth
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Identical-proposition: claim and hypothesis both test whether UBS provision (UK postwar, Nordic) delivers equivalent wellbeing outcomes at lower material-throughput than consumption-based equivalents.'

@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wealth_tax_capital_flight_revenue_yield_gap
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Wealth taxes produce a three-order causal chain. FIRST-ORDER: a new
+  tax instrument is legislated and administered, generating measurable
+  initial revenue — this is a genuine policy success on its own terms
+  and we acknowledge the tax does collect money from wealthy residents
+  in the first year. SECOND-ORDER: wealth-holder migration accelerates
+  (France ISF 2012 outflows, Norway 2022 emigration spike, Colombia
+  2022-2023 outflow), along with portfolio reshuffling toward exempt
+  or undervalued assets, under-reporting, and family-office
+  restructuring. THIRD-ORDER: realised revenue trajectory falls
+  systematically below legislator forecasts, pressure mounts on the
+  remaining (less-mobile) tax base, and the distributional burden
+  shifts toward non-emigrating upper-middle-class holders of
+  illiquid wealth. Cases: France ISF/IFI 1982-2017 + 2018 reform,
+  Norway 2022 wealth-tax hike, Colombia impuesto al patrimonio 2022,
+  Spain impuesto a las grandes fortunas 2022.
+
+evidence_type: causal
+
+sample:
+  countries: [FRA, NOR, COL, ESP]
+  period: [1990, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude years dominated by non-tax emigration shocks (e.g. 2015 EU migrant crisis destination-biased flows)"
+
+scope:
+  period: [1990, 2024]
+  countries: [FRA, NOR, COL, ESP]
+  outcome_dim: [taxation, capital_flows, fiscal_policy]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [france_isf_1982, france_ifi_2018, norway_wealth_tax_hike_2022, colombia_patrimonio_2022, spain_igf_2022]
+
+variables:
+  outcome:
+    - name: wealth_tax_revenue_realised_to_forecast
+      source: "minefi:recettes_fiscales (FRA); ssb:skatteinntekter (NOR); dian:estadisticas_tributarias (COL); aeat:recaudacion (ESP)"
+      transformation: ratio_realised_to_forecast
+      notes: "THIRD-ORDER outcome: yield-gap vs official projection."
+    - name: wealth_tax_revenue_level
+      source: "same as above"
+      transformation: log_real_local_currency
+      notes: "FIRST-ORDER outcome: revenue IS collected; confirmation the tax works on its own terms in year 1."
+    - name: high_net_worth_emigration_count
+      source: "henley_private_clients_millionaire_report (annual); icij:offshore_leaks_derivatives; ssb:utvandring (NOR by income decile where available); minefi:tax_residency_changes (FRA)"
+      transformation: annual_flow
+      notes: "SECOND-ORDER outcome: migration response."
+    - name: reported_taxable_wealth_base
+      source: "minefi:ISF/IFI_base (FRA); ssb:formuesskatt_base (NOR); dian:patrimonio_declarado (COL); aeat:patrimonio_declarado (ESP)"
+      transformation: log_real
+      notes: "SECOND-ORDER outcome: taxable base contraction net of valuation changes."
+    - name: asset_reshuffling_into_exempt_classes
+      source: "constructed: share of declared wealth in exempt/undervalued categories (business-asset exemption, pension wrappers, life-insurance wrappers); from tax-declaration aggregates"
+      transformation: share
+      notes: "SECOND-ORDER outcome: portfolio reshuffling."
+
+  treatment:
+    - name: wealth_tax_introduction_or_hike_event
+      source: "constructed: event indicators coded per country (FRA ISF 1982, abolition 2017/IFI 2018; NOR 2022 hike; COL 2022 introduction; ESP 2022 IGF introduction)"
+      transformation: indicator
+
+  controls:
+    - name: real_gdp_growth
+      source: "eurostat:GDP (FRA, ESP); ssb:GDP (NOR); banrep:GDP (COL)"
+      transformation: yoy_pct_change
+    - name: top_marginal_income_tax_rate
+      source: "oecd:tax_database"
+      transformation: level_pct
+    - name: capital_gains_tax_rate
+      source: "oecd:tax_database"
+      transformation: level_pct
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Wealth tax is a direct fiscal levy on net asset holdings. Classic
+  fiscal intervention.
+
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+  random_seed: 20260424
+  notes: >
+    Synthetic DiD across the four treated events with donor pool of
+    European + LatAm peer countries without wealth-tax events in the
+    same window. Robustness: Landais-Piketty-Saez bunching-style
+    estimator of wealth-holder response elasticity on FRA ISF data;
+    event-study on NOR 2022 with SSB emigration microdata.
+
+falsification:
+  rule: >
+    Not supported if, across the four cases: (a) FIRST-ORDER revenue
+    is collected at p<0.05 (acknowledged success) AND (b) forecast-
+    to-realised revenue ratio remains >=0.85 in at least 3/4 cases
+    through year-3 post-introduction AND (c) no statistically
+    detectable emigration response (HNW emigration flow not >1.5x
+    synthetic-control counterfactual at p<0.10) in at least 3/4 cases.
+    A first-order revenue success WITHOUT a yield gap and WITHOUT
+    measurable emigration response would refute the causal chain.
+  test: synth_did_four_case_causal_chain
+  threshold: >
+    FIRST-ORDER revenue supported AND yield gap >=15% below forecast
+    in at least 3/4 cases AND HNW emigration >=1.5x counterfactual
+    in at least 2/4 cases at p<0.10
+
+prior_confidence: 0.72
+disclosure: >
+  Author holds market-liberal priors. OECD 2018 review "The Role and
+  Design of Net Wealth Taxes" is cautious on yield. Prior is only
+  moderately high because wealth-tax enforcement technology has
+  improved (CRS, FATCA, DAC6) and some recent evidence (Jakobsen-
+  Jakobsen-Kleven-Zucman 2020 on Denmark) finds smaller elasticities
+  than the French ISF-era estimates. The hypothesis accepts that
+  the first-order revenue collection IS a real success and stakes
+  falsifiability on the yield-gap and emigration-response tests.
+
+steelman: hypotheses/steelman/wealth_tax_capital_flight_revenue_yield_gap.md
+
+linked_hypotheses: []
+
+notes: >
+  Mechanism link: new tax (1st) -> mobility/reshuffling response
+  (2nd) -> below-forecast yield + concentration on remaining base
+  (3rd). The yield-gap test is the cleanest quantitative falsifier.

@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: italian_stagnation_decomposition_1999_2023
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Italy''s real GDP per capita (PPP, constant international dollars) was approximately unchanged between 1999 (euro launch) and 2023 — a quarter-century of near-zero cumulative growth, with modest
+  levels of variation around a flat trend. This hypothesis decomposes Italian stagnation into four channels: (1) euro-entry real-exchange-rate lock-in (loss of devaluation as adjustment instrument combined
+  with a persistently overvalued real rate for the Italian tradeable sector), (2) regulatory and administrative stringency (OECD PMR Italy consistently high relative to peers; judicial slowness imposing
+  contract-enforcement costs), (3) demographic drag (accelerating population aging, persistent below-replacement fertility, weak prime-age labour force participation, emigration of educated young), and
+  (4) political-instability / fiscal-dominance channels (frequent government turnover, reform reversals, high-debt-stock interest burden). The decomposition is descriptive growth-accounting; no single channel
+  is expected to dominate.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - ITA
+  - DEU
+  - FRA
+  - ESP
+  - PRT
+  - GRC
+  period:
+  - 1995
+  - 2023
+  temporal_structure: panel
+scope:
+  period:
+  - 1995
+  - 2023
+  countries:
+  - ITA
+  - DEU
+  - FRA
+  - ESP
+  - PRT
+  - GRC
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - regulation_compliance_cost
+  policy_family:
+  - regulation
+  - institutional_reform
+  - exchange_rate_regime
+  treatment_tags:
+  - italy_euro_entry_1999
+  - oecd_pmr
+  - italy_demographic_drag
+variables:
+  outcome:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: gdp_growth_rate
+    source: world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: yoy_log_diff
+  - name: log_tfp_index
+    source: 'constructed: Penn World Table 10.01 TFP index or OECD productivity where available.'
+    transformation: log
+  decomposition_channels:
+  - name: euro_entry_reer_overvaluation
+    source: bis:WS_EER
+    transformation: level
+  - name: oecd_pmr_overall
+    source: oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2
+    transformation: level
+  - name: old_age_dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: prime_age_lfp_rate
+    source: 'constructed: OECD labour force participation rate 25-54, annual.'
+    transformation: level
+  - name: political_turnover_frequency
+    source: 'constructed: count of governments per decade (ITA has had among the highest rates in OECD). Manual coding from DPI or V-Dem; fetcher pending.'
+    transformation: level
+  - name: debt_to_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: urbanisation
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: "Primary specification: multiplicative growth-accounting decomposition of Italy-minus-peer-average GDP per capita growth across the four channels, over 1999-2023. Peers = DEU + FRA + ESP weighted\
+    \ average. Each channel's contribution computed as (channel_ITA - channel_peer) × channel_elasticity.\nSecondary specification: panel FE with ITA vs peers, year FE, channels as covariates. β on each\
+    \ channel × ITA dummy identifies Italy-specific loading on each channel.\nThird specification: synthetic control for Italy using peer pool, with treatment = 1999 euro entry. Compares Italy vs synthetic\
+    \ Italy on GDP per capita trajectory.\nThis is a DESCRIPTIVE hypothesis. Channel elasticities come from external literature (Lane 2006 on euro effects; Bloom et al. on management-practice productivity;\
+    \ Giavazzi-Pagano on Italian reform dynamics); identification is not attempted from scratch.\nKnown limitations: (1) Four channels are partially overlapping. PMR regulatory\n    stringency interacts\
+    \ with judicial slowness; political\n    turnover produces reform reversal that shows up as\n    regulatory stringency. Decomposition shares are order-\n    sensitive.\n(2) Demographic channel cannot\
+    \ be fully separated from economic\n    stagnation causes — young Italians emigrate partly because\n    of weak labour market, which is itself an outcome. Feedback\n    loops are real.\n(3) The 2008-2013\
+    \ eurozone crisis is a one-off shock that the\n    decomposition cannot cleanly attribute to \"euro entry\" vs\n    \"political mismanagement\" vs \"external shock.\"\n(4) 2020-2021 COVID distorts;\
+    \ year FE absorb common shocks but\n    Italy was hit disproportionately.\n"
+falsification:
+  rule: 'Not supported if (a) Italian GDP per capita in 2023 is NOT within 5% of its 1999 level (i.e., the stagnation stylised fact is falsified — unlikely given headline data), OR (b) the four channels
+    together explain < 40% of the Italy-peer gap, OR (c) a single channel explains > 60% (monocausal), OR (d) the synthetic control''s pre-1999 fit fails. If regulatory stringency alone accounts for majority
+    of gap, report honestly — even though the framework prior expects multi-causal.
+
+    '
+  test: italian_stagnation_multichannel_sda
+  threshold: 'abs(log_gdp_pc_ppp_2023 - log_gdp_pc_ppp_1999) < 0.10 (confirming stagnation) AND combined_channel_contribution >= 0.40 of Italy-peer gap AND no single channel > 0.60 of explained gap
+
+    '
+prior_confidence: 0.85
+disclosure: 'Italian stagnation from euro entry to present is a well-documented stylised fact (Draghi Report 2024, Giavazzi-Pagano decades of Italian political-economy research, Lane 2006 on euro asymmetric
+  effects). Author prior is very high that the stagnation exists and that it is multi-causal with all four channels contributing. The novelty in this hypothesis is not the finding but the structured decomposition
+  forcing no-single-channel-dominates honesty.
+
+  Framework disclosure: this hypothesis is a calibration case for the broader "EU deindustrialisation and stagnation" inquiry. Italy is the cleanest multi-decade stagnation case in a developed economy and
+  the most-studied; getting its decomposition right sets a baseline for comparing other EU stagnation cases (Greece, Portugal, pockets of France/Germany). The political-instability channel is honestly acknowledged
+  even though it cuts across partisan framings.
+
+  '
+steelman: hypotheses/steelman/italian_stagnation_decomposition_1999_2023.md
+linked_hypotheses:
+- us_eu_divergence_decomposition
+- eu_regulatory_burden_productivity_drag
+notes: 'Data readiness: - WDI GDP per capita PPP — ready - OECD PMR — ready - OECD LFP — fetcher shipped, series fetch needed - BIS REER — ready - IMF debt — ready - Penn World Table TFP — fetcher pending
+  - Political-turnover count — manual coding from DPI / V-Dem needed
+
+  v1 pre-registers; v1.1 runs full decomposition when Penn World Table TFP + political-turnover coding ship.
+
+  '

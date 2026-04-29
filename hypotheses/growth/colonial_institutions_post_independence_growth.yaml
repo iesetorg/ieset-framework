@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: colonial_institutions_post_independence_growth
+version: 1
+status: draft
+topic: growth
+claim: Pre-1945 colonial institutions explain a significant share of post-independence per-capita GDP
+  variation; former colonies with settler/inclusive institutions outperform extractive-institution former
+  colonies.
+notes: Hypothesis seeded from institutionalist position-claim text (Acemoglu-Johnson-Robinson colonial-origins
+  literature). Substantive fields filled in by automated batch; human review required before promotion to
+  candidate/pre_registered.
+prior_confidence: 0.6
+disclosure: >-
+  Authorial bias risk: the AJR/inclusive-vs-extractive coding is contested (Albouy critique on settler-mortality data; alternative geography-based stories).
+  Specification choice of binary settler/extractive classification favours the institutionalist frame over continuous geographic or human-capital channels.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Panel FE regression of log GDP per capita on settler/extractive colonial-institution dummy with region
+    and year FE, geography controls, post-1945 independence cohorts; reject if coefficient sign reverses or |t|<1.65.'
+evidence_type: associational
+
+sample:
+  countries: [USA, CAN, AUS, NZL, ARG, CHL, BRA, MEX, PER, COL, VEN, IND, PAK, BGD, NGA, KEN, GHA, ZAF, ZWE, EGY, MAR, DZA, IDN, MYS, SGP, HKG, PHL, VNM, KHM]
+  period: [1960, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020+ COVID distortion"
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: maddison_real_gdp_pc
+      source: "maddison:gdppc_ppp"
+      transformation: log
+
+  treatment:
+    - name: settler_inclusive_institutions_indicator
+      source: "constructed: AJR (2001) extractive-vs-settler binary coding by colonial power and settler-mortality threshold"
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: polity_score
+      source: "polity5:polity2"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [region, year]
+  clustering: country
+  notes: >
+    Cross-country panel of post-independence GDP per capita on a binary
+    settler-vs-extractive colonial-institution coding (Acemoglu-Johnson-
+    Robinson legacy classification), with region fixed effects and
+    geography controls. Period spans post-1945 independence cohorts.
+
+scope:
+  period: [1945, 2023]
+  countries: [GLOBAL, AFRICA, LATAM, ASIA_EM]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform]
+  treatment_tags: [colonial_institutional_legacy, settler_vs_extractive_institutions]
+
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether pre-1945 colonial institutions (settler/inclusive vs extractive) explain post-independence per-capita GDP variation."
+

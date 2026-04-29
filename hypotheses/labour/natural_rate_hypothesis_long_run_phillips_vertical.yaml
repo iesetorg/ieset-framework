@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: natural_rate_hypothesis_long_run_phillips_vertical
+version: 1
+status: draft
+topic: labour
+claim: Cross-country Phillips-curve data post-1970 shows no stable unemployment-inflation tradeoff in the long run, consistent with Friedman's natural-rate hypothesis.
+notes: Stub seeded from a Chicago-monetarist school prediction (Friedman natural-rate hypothesis). VECM/cointegration analysis is sensitive to lag and break specification; needs human review.
+prior_confidence: 0.7
+disclosure: Author's market-liberal priors strongly accept the long-run natural-rate proposition; could under-weight evidence of low-frequency Phillips relationships at horizons longer than 5y and over-weight
+  the no-cointegration finding as conclusive.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Johansen cointegration test on unemployment-inflation pair across OECD panel 1970-2023; supported if no stable cointegrating vector found at p>0.10 in 80% or more of country series.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - CAN
+  - AUS
+  - JPN
+  - CHE
+  - BEL
+  - AUT
+  - IRL
+  - KOR
+  - NZL
+  period:
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing inflation or unemployment series
+variables:
+  outcome:
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level
+    notes: WB consumer-price-inflation YoY series.
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: oecd_cpi_all_items
+    source: oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0
+    transformation: log_yoy
+    notes: OECD harmonised CPI.
+  treatment:
+  - name: ten_year_inflation_expectations
+    source: fred:T10YIE
+    transformation: level
+    notes: 'FRED 10-year breakeven inflation expectations (US); cross- country survey data requires academic publisher — flagged TODO.
+
+      '
+  - name: nairu_estimate
+    source: imf:NAIRU
+    transformation: level
+    notes: IMF WEO-derived NAIRU; OECD reference NAIRU as alternate.
+  controls:
+  - name: output_gap
+    source: imf:NGAP_NPGDP
+    transformation: level
+  - name: oil_price_brent
+    source: imf_pcps:POILBRE
+    transformation: log_yoy
+  - name: policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+    notes: FRED fed funds; per-country swap (ECB/BoE/BoJ) on wiring.
+scope:
+  period:
+  - 1970
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - employment_labour
+  - inflation
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - friedman_natural_rate_hypothesis
+  - phillips_curve_vertical_long_run
+covers_claims:
+- position_id: chicago_monetarism
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Chicago-monetarist claim that cross-country post-1970 Phillips data show no stable long-run unemployment-inflation tradeoff, consistent with Friedman's natural-rate hypothesis.
+estimator:
+  template: cointegration_vecm
+  clustering: country
+  fixed_effects: []
+  notes: 'VECM / cointegration test on long-run Phillips relationship in OECD post-1970 panel. Tests for stable cointegrating vector between unemployment and inflation; failure to cointegrate supports Friedman
+    natural-rate / vertical-long-run-Phillips view.
+
+    '

@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: german_energiewende_industrial_cost_trajectory
+version: 1
+status: pre_registered
+topic: energy
+
+claim: >
+  Germany's industrial electricity prices diverged upward from a basket of
+  comparable industrial peers (United States, France, Sweden, Norway,
+  Finland) after the 2011 Energiewende pivot and the gap widened further
+  through the 2014 nuclear-phase-out milestones and the 2022 gas crisis.
+  The price divergence is measurably associated with the decline in the
+  German manufacturing value-added share of GDP over 2011-2023, with the
+  effect concentrated in energy-intensive subsectors (chemicals, basic
+  metals, non-metallic minerals). This is the narrow empirical form of
+  the broader claim that Energiewende's policy-content choices (nuclear
+  phase-out while gas-dependence deepened, EEG surcharge on retail
+  prices, gas-indexed wholesale market) produced a concrete industrial-
+  cost penalty that peer economies avoided.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, USA, SWE, NOR, FIN, NLD, BEL, ITA, ESP]
+  period: [2005, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing primary outcome (industrial electricity price)"
+
+variables:
+  outcome:
+    - name: log_industrial_electricity_price_usd_mwh
+      source: "constructed: IEA industrial electricity price series (band IC, medium industry) + Eurostat NRG_PC_205 cross-check, USD/MWh constant 2020. Specialist IEA fetcher pending."
+      transformation: log
+    - name: log_manufacturing_value_added_real
+      source: "world_bank_wdi:NV.IND.MANF.CD"
+      transformation: log_real
+    - name: energy_intensive_subsector_output_share
+      source: "constructed: OECD STAN sectoral VA — chemicals (C20) + basic metals (C24) + non-metallic minerals (C23) + paper (C17) as share of total manufacturing VA."
+      transformation: level
+
+  treatment:
+    - name: deu_post_energiewende_dummy
+      source: "constructed: indicator = 1 for DEU from 2011 (Energiewende formal enactment after Fukushima) onwards. All other countries = 0."
+      transformation: indicator
+    - name: deu_post_nuclear_phaseout_dummy
+      source: "constructed: indicator = 1 for DEU from 2022 (final reactor closures enacted) onwards, capturing the fully-phased-out regime."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: brent_oil_usd
+      source: "constructed: reference oil price to partial out global energy-price cycle; placeholder for BIS or IMF commodity-price fetcher."
+      transformation: log
+    - name: gas_price_eu_ttf_proxy
+      source: "constructed: TTF-equivalent natural gas price (EUR/MWh) to partial out gas-shock exposure common to gas-indexed markets. Fetcher pending."
+      transformation: log
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary specification: synthetic control with DEU as treated unit
+    (treatment = 2011 Energiewende). Donor pool = FRA, USA, SWE, NOR,
+    FIN, NLD, ITA, ESP. Pre-treatment fit window 2005-2010. Primary
+    outcome = log industrial electricity price. Placebo permutation
+    tests across donor pool. Pre-trend RMSPE reported explicitly.
+
+    Secondary specification: TWFE panel with deu_post_energiewende_dummy
+    + deu_post_nuclear_phaseout_dummy, interacted with energy-intensity
+    sector shares to detect where the price transmission binds.
+
+    Second-stage: regress log manufacturing VA (and the energy-intensive
+    subsector share) on the synthetic-control-derived price gap to test
+    whether the price divergence transmits to real-sector output.
+
+    Known limitations:
+    (1) DEU is the sole treated unit — synthetic control's external
+        validity is limited to this case.
+    (2) 2022-2024 window confounded by Russia-Ukraine gas shock; report
+        results with and without that window.
+    (3) Treatment date is ambiguous — 2011 decision, 2014-2017 nuclear
+        plant closures, 2022 final phase-out. Use 2011 as primary and
+        2022 as secondary treatment; sensitivity to both.
+    (4) Gas-indexed wholesale market design is a separate channel from
+        nuclear phase-out per se; this hypothesis pools them as the
+        Energiewende policy bundle and makes no claim to separate.
+
+falsification:
+  rule: >
+    Not supported if (a) the DEU synthetic control pre-trend fit fails
+    (pre-treatment RMSPE > 0.05 log points on industrial price), OR
+    (b) the post-treatment DEU-synthetic price gap does not exceed
+    the 95th percentile of placebo gaps across donor pool, OR (c) the
+    gap fully collapses when the 2021-2024 gas-shock window is
+    excluded, OR (d) the second-stage manufacturing VA effect is
+    insignificant or signed against prediction. If the price gap is
+    real but transmits weakly to manufacturing VA, report the split —
+    divergence exists but output attribution is separate question.
+  test: energiewende_synthetic_control_price_and_output_transmission
+  threshold: >
+    post-2011 DEU-synthetic price gap >= 0.15 log points on 2015-2020
+    average (excluding war-shock years)  AND
+    placebo permutation p-value < 0.10  AND
+    β_manuf_va on price gap < -0.05 at p<0.10
+
+prior_confidence: 0.72
+
+disclosure: >
+  Author prior is that DEU industrial electricity prices have materially
+  diverged upward from comparable peers since Energiewende, consistent
+  with the Energiewende policy file (germany_energiewende_2011) and
+  with broad observation in German industrial-policy discussion. The
+  hypothesis is vulnerable to the criticism that a large share of the
+  measured divergence is attributable to the 2021-2024 gas shock — a
+  geopolitical rather than policy-content confound. The pre-registration
+  locks a sensitivity specification that drops the war window, so honest
+  reporting is forced even if the "Energiewende caused it" headline
+  narrative weakens under that split. Climate-welfare benefits of the
+  Energiewende are NOT measured in this hypothesis; the claim is narrow
+  (industrial cost trajectory), not a full welfare accounting.
+
+steelman: hypotheses/steelman/german_energiewende_industrial_cost_trajectory.md
+
+linked_hypotheses:
+  - green_transition_cost_trajectory_electricity_prices
+  - eu_post_2021_gas_shock_industrial_output_impact
+  - nuclear_phaseout_grid_reliability_cost_tradeoff
+  - german_manufacturing_va_decline_2017_2024
+
+scope:
+  period: [2005, 2024]
+  countries: [DEU, FRA, USA, SWE, NOR, FIN, NLD, BEL, ITA, ESP]
+  outcome_dim: [energy, industrial_capability, productivity]
+  policy_family: [energy_policy, industrial_policy]
+  treatment_tags: [energiewende_2000, energiewende_2011, nuclear_phaseout_2022, eu_energiewende]
+
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 1
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Eco-socialist defence of Energiewende as state-led energy-transition feasibility; relinked from us_eu_gdp_per_capita_divergence_policy_causes (Phase 4C) — Energiewende is the focal treatment of this hypothesis. Mixed prediction: hypothesis tests industrial-cost penalty, which would push against simple feasibility framing."
+
+notes: >
+  Data readiness:
+  - IEA industrial electricity price (IC band) — specialist fetcher pending
+  - Eurostat NRG_PC_205 — Eurostat fetcher shipped, specific series fetch needed
+  - OECD STAN sectoral VA — fetcher not yet shipped
+  - WDI manufacturing VA — ready
+  - TTF gas-price proxy — fetcher pending
+
+  v1 pre-registers; v1.1 runs when IEA + OECD STAN + TTF fetchers land
+  and baseline_pull.yaml is extended.

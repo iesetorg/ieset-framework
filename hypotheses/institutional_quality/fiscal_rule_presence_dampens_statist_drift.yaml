@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiscal_rule_presence_dampens_statist_drift
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Liberal democracies with binding numerical fiscal rules in place for at
+  least 10 years over the 1976–2025 window show systematically lower (less
+  positive, or more negative) statist-drift slopes than peers without such
+  rules. Mechanism: fiscal rules constrain the deficit-financed transfer
+  flywheel that public-choice theory says drives the drift; if the
+  managerial-flywheel hypothesis is correct, then constitutional / legal
+  caps on it should bite. The corpus already contains the inputs — every
+  movement coded on framework axes, every fiscal-rule introduction noted
+  in its movement YAML — so the test reduces to comparing per-decade drift
+  slopes between rule-bound and rule-free liberal democracies.
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The treatment is a fiscal-institutional anchor (Schuldenbremse-style debt
+  brake, surplus target, deficit ceiling). Effect is on the cumulative
+  fiscal + monetary moves the country legislates over decades.
+
+evidence_type: associational
+sample:
+  countries:
+    [
+      USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, IRL, AUT,
+      PRT, GRC, SWE, NOR, DNK, FIN, CHE, POL, CZE, HUN,
+      AUS, NZL, CAN, JPN, KOR, ISR,
+    ]
+  period: [1976, 2025]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >
+    The treatment is a country-level institutional feature (fiscal-rule
+    presence ≥ 10 years). The outcome is a country-level summary
+    (per-decade drift slope). Cross-sectional comparison is the natural
+    test; n=26 is small but the framework is upfront about it via
+    a one-sided Mann-Whitney U non-parametric test rather than relying on
+    parametric assumptions.
+
+variables:
+  outcome:
+    - name: per_decade_drift_slope
+      source: "constructed: from data/derived/country_drift.json (replication.py recomputes from movements/*.yaml axes_summary)"
+      transformation: "OLS slope of cumulative composite drift on year, scaled to index points per decade"
+      notes: >
+        Computed by engine/runs/liberal_democracy_managerial_flywheel_drift/
+        replication.py. Positive slope = drift toward more state; negative =
+        toward more market.
+  treatment:
+    - name: binding_fiscal_rule_10y
+      source: "constructed: hand-coded from IMF Fiscal Rules Database 2022 + EU Fiscal Rules Database 2024 + national legislation"
+      transformation: "binary: 1 if country had a binding numerical fiscal rule (debt brake, deficit ceiling, structural-balance target, debt-reduction rule) in force for at least 10 years over 1976–2025"
+      notes: >
+        Hand-coded list with citations:
+          DEU=1 (Schuldenbremse, Basic Law Art. 109/115, 2009-present)
+          CHE=1 (debt brake, 2003-present)
+          SWE=1 (1% surplus target since 1997, 2% since 2000, 0.33% since 2019)
+          NLD=1 (Zalm-norm 1994-2002, structural-balance rule since 2013)
+          FIN=1 (1.0% structural-balance ceiling, post-2013 EU Fiscal Compact)
+          AUT=1 (debt brake, BVG 2017)
+          DNK=1 (Budget Law 2012; structural deficit ≤ 0.5% GDP)
+          IRL=1 (Fiscal Responsibility Act 2012)
+          GRC=1 (Memorandum-imposed primary surplus targets 2010-2018)
+          ESP=1 (Constitutional balance amendment, Art. 135, 2011)
+          ITA=1 (Constitutional amendment Art. 81, 2012)
+          POL=1 (debt-rule constitutional ceiling 60% GDP, 1997)
+          CZE=1 (Fiscal Responsibility Act 2017)
+          HUN=1 (Stability Act, 2011)
+          KOR=0 (proposed 2020 but not enacted as of cutoff)
+          USA=0 (no binding rule; debt-ceiling acts as soft cap, repeatedly suspended)
+          GBR=0 (Charter for Budget Responsibility is non-binding; OBR advisory)
+          FRA=0 (organic-law rule under EU Fiscal Compact is technically binding but consistently breached without consequence; coded as 0 with caveat)
+          BEL=0 (EU rules only, no binding domestic rule)
+          PRT=0 (EU rules only post-Memorandum)
+          AUS=0 (Charter of Budget Honesty 1998 is non-binding)
+          NZL=0 (Public Finance Act 1989 + Fiscal Responsibility Act 1994 are reporting + transparency, non-binding)
+          CAN=0 (federal-level no binding rule; provincial vary)
+          JPN=0 (no binding numerical rule; primary-balance target consistently missed)
+          ISR=0 (deficit ceiling repeatedly raised by Knesset; coded as 0)
+          NOR=0 (handlingsregel 4% later 3% spending rule from 2001 is binding for the petroleum fund but not general budget; coded as 0 because it's a sovereign-wealth-fund withdrawal rule, not a fiscal-balance constraint)
+  controls:
+    - name: log_initial_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log of GDP-per-capita at start of corpus window for each country (1976 or earliest available)"
+      notes: "Solow-style starting-condition control."
+
+estimator:
+  template: descriptive
+
+scope:
+  period: [1976, 2025]
+  countries:
+    [
+      USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, IRL, AUT,
+      PRT, GRC, SWE, NOR, DNK, FIN, CHE, POL, CZE, HUN,
+      AUS, NZL, CAN, JPN, KOR, ISR,
+    ]
+  outcome_dim: [institutional_quality]
+
+falsification:
+  rule: >
+    SUPPORTED if the median per-decade drift slope of rule-bound countries
+    is at least 1.0 index points per decade lower than the median slope of
+    rule-free countries, AND a one-sided Mann-Whitney U test rejects the
+    null of equal distributions at p<0.10. PARTIAL if the median gap is in
+    the predicted direction but does not meet the magnitude or significance
+    threshold. REFUTED if the median slope of rule-bound countries is equal
+    to or greater than rule-free countries.
+  test: "two-sample comparison of per-decade drift slopes; non-parametric one-sided Mann-Whitney U"
+  threshold: "median(rule-bound slopes) <= median(rule-free slopes) - 1.0 AND Mann-Whitney U p<0.10 (one-sided)"
+
+prior_confidence: 0.6
+
+steelman: hypotheses/steelman/fiscal_rule_presence_dampens_statist_drift.md
+
+disclosure: >
+  Author has stated market-liberal priors. The hand-coded fiscal-rule
+  binary embeds judgement calls (especially France's organic-law rule and
+  Norway's handlingsregel — both are coded conservatively as 0 to avoid
+  inflating the rule-bound group). The replication.py prints the per-country
+  list so a reader who disagrees with the coding can re-run with their own.

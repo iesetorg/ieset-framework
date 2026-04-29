@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: reagan_tax_cuts_growth_effect
+version: 1
+status: draft
+topic: growth
+claim: Reagan's 1981–1986 marginal-tax-rate reductions produced measurable labour-supply response at the top of the distribution, with output growth exceeding the pre-reform trend.
+notes: Seeded from a classical-liberal/supply-side claim that Reagan 1981-86 marginal-rate cuts produced top-of-distribution labour-supply response and above-trend output. Event study; human review needed
+  to disentangle from Volcker disinflation and 1986 base-broadening.
+prior_confidence: 0.4
+disclosure: 'Authorial bias risk: classical-liberal/supply-side framing presupposes positive labour-supply elasticity; the modern public-finance consensus (Saez, Slemrod, Kopczuk) attributes most of the
+  apparent response to income-shifting rather than real labour-supply, so the headline elasticity is contested.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Event-study around 1981 ERTA and 1986 TRA using IRS-SOI panel, year FE, state-clustered SE; outcome top-decile labour income elasticity of taxable income; falsified if estimated ETI below 0.2 at
+    p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - CAN
+  - JPN
+  - AUS
+  period:
+  - 1970
+  - 1995
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: log_real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_real_gdp_us
+    source: fred:GDPC1
+    transformation: log
+  - name: top_1pct_income_share
+    source: wid:sptinc_p99p100
+    transformation: level
+  - name: employment_rate
+    source: fred:CIVPART
+    transformation: level
+  - name: top_marginal_income_tax_rate
+    source: wid:tax_top_rate
+    transformation: level
+  treatment:
+  - name: post_reagan_tax_cut_indicator
+    source: 'constructed: indicator = 1 for USA, year >= 1982 (ERTA effective)'
+    transformation: indicator
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level
+estimator:
+  template: event_study
+  fixed_effects:
+  - year
+  clustering: state
+  notes: 'Event study around the 1981 Reagan tax cuts and the 1986 reform using US individual-income-tax-return microdata (or aggregated state-level panel) to estimate top-of-distribution labour-supply
+    elasticity and growth response. Tests whether the post-reform output trend exceeds the pre-reform trend at conventional significance.
+
+    '
+scope:
+  period:
+  - 1981
+  - 1989
+  countries:
+  - USA
+  outcome_dim:
+  - taxation
+  - gdp_growth
+  - employment_labour
+  policy_family:
+  - tax_policy
+  - fiscal_policy
+  treatment_tags:
+  - reagan_tax_cuts_1981
+  - reagan_tax_reform_1986
+covers_claims:
+- position_id: chicago_monetarism
+  claim_index: 10
+  polarity: inverted
+  school_prediction: supported
+  confidence: medium
+  notes: Friedman endorsed the supply-side case at the margin; monetarist version is narrower than Laffer-curve caricature. Hypothesis tests Reagan-era labour-supply response.
+- position_id: classical_liberal
+  claim_index: 9
+  polarity: inverted
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts Reagan 1981-1986 marginal-rate reductions produced labour-supply response at top and output growth exceeding pre-reform trend.'

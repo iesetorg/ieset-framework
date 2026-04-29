@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bismarckian_welfare_fiscal_sustainability
+version: 1
+status: draft
+topic: fiscal
+claim: Bismarckian contributory welfare architectures (Germany, Austria, Switzerland) are more fiscally
+  sustainable than tax-financed universal architectures when demographic ageing is severe, because contribution-benefit
+  linkage constrains expansion.
+notes: Maps the ordoliberal school's Bismarckian-fiscal-sustainability claim to a multi-metric
+  comparison of contributory vs Beveridgean welfare regimes under ageing. Estimator and prior set;
+  full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.4
+disclosure: Author prior is skeptical of the strong sustainability claim — German pension
+  expenditure / GDP and implicit pension debt are not noticeably better than mid-tier Beveridgean
+  systems (e.g. UK, NL hybrid) and demographic stress in DEU since 2000 has required parametric
+  cuts; the contribution-benefit-link argument is theoretical more than observed.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if Bismarckian-mean (DEU, AUT, CHE,
+    FRA, BEL, ITA) is at least 1.5pp of GDP LOWER than Beveridgean-mean
+    (GBR, IRL, DNK, SWE, FIN, NOR, NLD, USA) for BOTH (a) public pension
+    expenditure / GDP AND (b) implicit pension debt / GDP, in the
+    2018-2023 window. REFUTED if BOTH primary fiscal metrics show
+    Bismarckian ≥ Beveridgean (gap of opposite sign or zero).
+    INFORMATIVE: net replacement rate directionally lower in Bismarckian
+    (≥5pp), total social contribution rate / wage directionally higher
+    in Bismarckian (≥3pp).
+    METHOD_VALID: at least 4 of 6 Bismarckian and 5 of 8 Beveridgean
+    countries with data on both M1 and M2.
+  test: bismarckian_vs_beveridgean_pension_fiscal_pressure_2018_2023
+  threshold: >-
+    PRIMARY: (M1) bismarckian_mean(pension_exp_pct_gdp) - beveridgean_mean
+    <= -1.5 AND (M2) bismarckian_mean(implicit_pension_debt_pct_gdp) -
+    beveridgean_mean <= -1.5, both in 2018-2023.
+methodology_note: >-
+  v1 promotion (2026-04-26). Sharpened the original generic 'opposite
+  direction at p>0.10 OR <10% move' falsification rule into a
+  dispositive two-metric primary on pension-expenditure / GDP and
+  implicit-pension-debt / GDP, with a 1.5pp-of-GDP gap threshold in
+  the claimed (Bismarckian-lower) direction over a 2018-2023 ageing
+  window. M3 (replacement rate) and M4 (contribution rate) are
+  retained from the spec as informative-only (directional) because
+  they are mechanism indicators rather than fiscal-pressure outcomes.
+  Note: the four OECD pension-system series (PensionExpenditure,
+  ImplicitPensionDebt, NetReplacementRate, SocialContributionRate)
+  are not yet in the data vintage; the v1 run therefore lands as
+  inconclusive (data gap) and re-runs automatically once those
+  fetchers ship. An informative-only auxiliary on general-government
+  debt and expenditure suggests Bismarckian states currently sit
+  ~26pp HIGHER on general-gov debt and ~6pp HIGHER on general-gov
+  expenditure than Beveridgean peers in 2018-2023, which is
+  directionally adverse to the ordoliberal claim — but those
+  aggregates conflate non-pension fiscal pressure (notably ITA's
+  pre-existing structural debt stock) and so do not decide the
+  pension-specific verdict.
+evidence_type: associational
+
+sample:
+  countries: [AUT, BEL, CHE, DEU, DNK, ESP, FIN, FRA, GBR, GRC, IRL, ITA, JPN, NLD, NOR, PRT, SWE, USA]
+  period: [1980, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude DEU pre-1991 reunification years from absolute pension-debt comparison; use West-German subset for that segment"
+    - "drop country-years missing OECD pension expenditure or social contribution-rate series"
+
+variables:
+  outcome:
+    - name: public_pension_expenditure_pct_gdp
+      source: "oecd:PensionExpenditure; eurostat:spr_exp_pens"
+      transformation: pct_gdp
+      notes: "Primary fiscal-pressure outcome."
+    - name: implicit_pension_debt_pct_gdp
+      source: "oecd:ImplicitPensionDebt; eurostat:gov_10dd_ggd (general gov debt) supplemented with OECD long-term projections"
+      transformation: pct_gdp
+      notes: "Forward-looking liability measure. Where OECD projections unavailable, use unfunded pension obligation estimates."
+    - name: replacement_rate_net
+      source: "oecd:NetReplacementRate"
+      transformation: pct_pre_retirement_earnings
+    - name: contribution_rate_total
+      source: "oecd:SocialContributionRate; eurostat:tax_aggregate_indicators"
+      transformation: pct_gross_wage
+  treatment:
+    - name: bismarckian_architecture
+      source: "constructed: indicator = 1 for DEU, AUT, CHE, FRA, BEL, ITA (contributory-Bismarckian); 0 for Beveridgean (GBR, IRL, DNK, SWE, FIN, NOR, NLD, USA)"
+      transformation: binary
+      notes: "Coding follows Esping-Andersen typology cross-walked to OECD pension-system classification."
+  controls:
+    - name: old_age_dependency_ratio
+      source: "world_bank_wdi:SP.POP.DPND.OL; un_wpp:dependency_ratio"
+      transformation: level
+    - name: real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe_per_capita"
+      transformation: log_level
+    - name: female_labour_force_participation
+      source: "world_bank_wdi:SL.TLF.CACT.FE.ZS; ilostat:lfpr_female"
+      transformation: level
+    - name: government_debt_pct_gdp
+      source: "imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS"
+      transformation: pct_gdp
+
+scope:
+  period: [1883, 2023]
+  countries: [DEU, AUT, CHE]
+  outcome_dim: [welfare_state, fiscal_policy, demographics_migration]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [bismarck_welfare_architecture]
+
+covers_claims:
+  - position_id: ordoliberal
+    claim_index: 5
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Ordoliberal position predicts Bismarckian contributory architectures are more fiscally sustainable under ageing; hypothesis tests exactly that on DEU/AUT/CHE."
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    Multi-metric checklist comparing Bismarckian (DEU, AUT, CHE)
+    versus Beveridgean welfare states across pension-system fiscal-
+    sustainability indicators (replacement rate, contribution rate,
+    implicit debt, pension expenditure / GDP). Pre-registered metric
+    bundle scored at threshold counts.

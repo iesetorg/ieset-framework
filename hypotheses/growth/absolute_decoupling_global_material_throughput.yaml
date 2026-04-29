@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: absolute_decoupling_global_material_throughput
+version: 1
+status: draft
+topic: growth
+claim: Absolute decoupling of GDP growth from material throughput has not been sustained at global scale 1970-2020; reported decoupling in advanced economies reflects offshored manufacturing and is reversed
+  under consumption-based accounting.
+notes: Maps the degrowth school's no-sustained-absolute-decoupling claim to a panel comparing production-based vs consumption-based material accounting using IRP/UNEP DMC + MF data. Estimator and prior
+  set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: 'Author prior accepts the consumption-based-accounting reframing (the offshoring critique is well-documented in IRP and Wiedmann work) but is uncertain whether ''has not been sustained globally''
+  is technically true: a few advanced economies have shown brief absolute decoupling in consumption-based accounts post-2010, though arguably too short and recent to count.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Cross-country panel FE 1970-2020 (UNEP IRP + Eora MRIO data) of real GDP growth on Domestic Material Consumption (production-based) vs Material Footprint (consumption-based); country+year FE, country-clustered
+    SEs. Refute if MF coefficient on GDP <0 (i.e. absolute consumption-based decoupling sustained) for >10y window in major OECD economies at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - JPN
+  - CAN
+  - AUS
+  - CHN
+  - IND
+  - BRA
+  - MEX
+  - IDN
+  - ZAF
+  - RUS
+  - TUR
+  - KOR
+  period:
+  - 1970
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude pre-1990 observations for non-OECD countries where material-flow accounts are reconstructed
+variables:
+  outcome:
+  - name: log_gdp_constant_usd
+    source: world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: log
+  - name: domestic_material_consumption_per_capita
+    source: owid:material-footprint-per-capita; otherwise approximate via owid:co2-emissions-per-capita as an energy-throughput proxy
+    transformation: log
+  - name: material_footprint_per_capita
+    source: owid:material-footprint-per-capita; UNEP/IRP is unregistered, OWID republishes
+    transformation: log
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: services_share_gdp
+    source: world_bank_wdi:NV.SRV.TOTL.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Cross-country panel of GDP growth vs domestic material consumption (DMC) and material footprint (MF). Tests whether the GDP-throughput coefficient flips sign or shrinks meaningfully under consumption-based
+    accounting.
+
+    '
+scope:
+  period:
+  - 1970
+  - 2020
+  countries:
+  - GLOBAL
+  - OECD
+  outcome_dim:
+  - gdp_growth
+  - energy
+  policy_family:
+  - none
+  treatment_tags:
+  - consumption_based_accounting
+  - planetary_boundaries_framework
+covers_claims:
+- position_id: degrowth
+  claim_index: 1
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Identical-proposition: claim and hypothesis both test whether absolute decoupling of GDP growth from material throughput has been sustained globally 1970-2020.'

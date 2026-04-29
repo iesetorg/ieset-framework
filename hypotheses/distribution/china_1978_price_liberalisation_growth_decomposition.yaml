@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_1978_price_liberalisation_growth_decomposition
+version: 1
+status: draft
+topic: distribution
+claim: Deng Xiaoping's 1978 reforms, by introducing price signals and household responsibility in agriculture
+  and Township-Village-Enterprise market exchange, account for the majority of Chinese poverty reduction
+  1978–2000 — not state investment.
+notes: Maps the classical-liberal school's Deng-reforms-as-poverty-driver claim to a provincial event
+  study + Shapley decomposition. Estimator and prior set; full pre-registration awaits steelman + human
+  sign-off.
+prior_confidence: 0.65
+disclosure: Author prior aligns with the market-reform-led-growth narrative for China 1978-2000; separating
+  price-liberalisation from state-investment shares is hard because both moved together and provincial
+  data quality (especially pre-1985) is uneven.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Provincial event-study (1978-2000) of poverty headcount on HRS rollout timing with province+year
+    FE; Shapley decomposition of growth into market-reform vs state-investment shares. Refute if market-reform
+    share <50% or sign-flipped at p<0.10.
+sample:
+  countries:
+  - CHN
+  period:
+  - 1978
+  - 2000
+  temporal_structure: time_series
+  exclusion_rules:
+  - drop pre-1978 years from event window; reform-onset normalised to t=0
+variables:
+  outcome:
+  - name: rural_poverty_headcount
+    source: world_bank_wdi:SI.POV.NAHC
+    transformation: level
+    notes: 'WB national poverty rate; long China backseries available from WDI. Provincial-level disaggregation
+      requires China NBS direct — flagged TODO for v2.
+
+      '
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_yoy
+  - name: agricultural_productivity_proxy
+    source: faostat:productivity
+    transformation: log
+    notes: 'FAOSTAT cereal yield + agricultural value added per worker as HRS-channel proxy. Verify exact
+      dataflow on wiring.
+
+      '
+  treatment:
+  - name: hrs_rollout_share
+    source: derived:china_hrs_rollout
+    transformation: share
+    notes: 'Household-Responsibility-System provincial rollout share 1978- 1984 (Lin 1992 series). Coded
+      by hand under derived/. TODO: replace with academic publisher when registered.
+
+      '
+  - name: tve_employment_share
+    source: derived:china_tve_share
+    transformation: share
+    notes: 'Township-Village-Enterprise employment share — proxy for non- state market exchange. Hand-coded
+      from China NBS yearbooks.
+
+      '
+  decomposition_channels:
+  - name: state_investment_share_of_gdp
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: level
+    notes: 'Gross fixed capital formation % GDP — proxy for state-investment channel competing with the
+      price-liberalisation channel.
+
+      '
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+evidence_type: associational
+scope:
+  period:
+  - 1978
+  - 2000
+  countries:
+  - CHN
+  outcome_dim:
+  - poverty_inequality
+  - gdp_growth
+  policy_family:
+  - institutional_reform
+  - trade_policy
+  treatment_tags:
+  - deng_reforms_1978
+  - china_household_responsibility_system
+  - china_tve_reform
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Classical-liberal claim and hypothesis claim are textually identical — Deng 1978 price liberalisation
+    + household responsibility + TVE as primary source of 1978-2000 poverty reduction.
+estimator:
+  template: event_study
+  clustering: province
+  fixed_effects:
+  - province
+  - year
+  notes: 'Event study around 1978 reform onset using provincial panel (Lin-Jin-Park style) with HRS rollout
+    dates as treatment timing. Decomposes poverty reduction into market-liberalisation versus state-investment
+    shares via accounting / Shapley-style decomposition over growth components.
+
+    '

@@ -1,0 +1,5 @@
+# Steelman — UK planning-restriction regime
+
+1. **The restriction reflects genuine preferences for landscape, not just political capture.** Greenbelt + local discretion were designed to prevent the urban sprawl observed in 20th-c Los Angeles, post-war Tokyo, or parts of Spain. Coding it as an unambiguous economic negative privileges aggregate GDP over revealed local preferences for low-density settlement. Welfare is not coterminous with GDP-per-hour.
+2. **Replicated findings of planning-supply-cost effects (Hilber-Vermeulen, Cheshire) are UK-specific and depend on the particular interaction of greenbelt + local discretion.** Other supply-restricted economies (Japan, parts of Germany) achieve similar outcomes through different mechanisms. The "UK planning is the cause" attribution requires a cleaner counterfactual than the academic literature has produced.
+3. **Housing-affordability problems have partial non-planning causes** — household formation, low mortgage rates compressing yields into price, buy-to-let tax treatment. Attributing the whole distortion to planning over-credits a single channel.

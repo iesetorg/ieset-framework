@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: argentina_institutional_instability_decline
+version: 1
+status: draft
+topic: growth
+claim: Argentina's post-1945 economic decline from high-income status is attributable to institutional
+  instability (Peronist-military cycles, property-rights uncertainty, central-bank subordination) more
+  than to specific policy choices.
+notes: Maps the institutionalism school's Argentina-decline-from-instability claim to a multi-metric
+  pattern-match across institutional-quality, central-bank independence, property rights, inflation
+  volatility, and per-capita GDP trajectory 1945-2023. Estimator and prior set; full pre-registration
+  awaits steelman + human sign-off.
+prior_confidence: 0.65
+disclosure: Author prior tilts toward the institutional-instability story (Acemoglu-Robinson framing
+  fits Argentina's repeated property-rights ruptures and central-bank subordination) but the
+  alternative-policy-choice explanation is hard to fully separate — the same Peronist coalitions
+  that destabilised institutions also chose chronic deficit financing and capital-controls cycles.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'ARG 1945-2023 multi-metric checklist comparing Polity/V-Dem institutional indices, WGI rule-of-law, central-bank-independence index, inflation volatility against log GDP per capita; document trajectory pattern. Refute if institutional-quality dispersion does not co-move with per-capita-GDP trajectory at the 5y level over the post-1945 sample.'
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [ARG]
+  period: [1945, 2023]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "treat 2001-2002 convertibility-collapse window as a separate event for inflation/output measurement"
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: maddison_real_gdp_pc
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: polity_score
+      source: "polity5:polity2"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: vdem_liberal_democracy
+      source: "vdem:v2x_libdem"
+      transformation: level
+
+  controls:
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Single-country canonical case (Argentina post-1945 decline). Pattern-match
+    across institutional-quality, central-bank-independence, property-rights,
+    inflation-volatility, and per-capita-GDP-trajectory metrics rather than a
+    single causal estimate. Pre-registration of the metric set will follow when
+    this stub is upgraded to candidate.
+
+scope:
+  period: [1945, 2023]
+  countries: [ARG]
+  outcome_dim: [gdp_growth, institutional_quality, inflation]
+  policy_family: [institutional_reform, monetary_policy]
+  treatment_tags: [peronism, argentina_peronist_military_cycles, argentina_central_bank_subordination]
+
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 13
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalism predicts Argentina's post-1945 decline is driven by institutional instability (Peronist-military cycles, property-rights uncertainty, central-bank subordination) rather than specific policies; direct alignment with hypothesis."
+

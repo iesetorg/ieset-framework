@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: deregulation_productivity_effect
+version: 1
+status: draft
+topic: regulatory
+claim: Deregulation episodes (US transportation 1978–1980, UK telecoms 1984, NZ Rogernomics 1984–1993)
+  show measurable TFP gains in the deregulated sectors within a decade.
+notes: Origin is auto-generated coverage-gap stub seeded from Chicago/monetarist framing of US
+  transportation 1978-80, UK telecoms 1984, and NZ Rogernomics 1984-93 as producing measurable sectoral TFP gains.
+  Human review required.
+prior_confidence: 0.65
+disclosure: Author has market-liberal priors that may overweight the deregulation-TFP literature
+  and under-weight pre-existing technology/competition trends that ran in parallel.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Event-study on deregulated-sector TFP relative to economy-wide TFP across US/UK/NZ episodes 1978-1993; sectoral TFP gain >5pp at h=10y with p<0.10 supports the deregulation-TFP claim.'
+evidence_type: associational
+sample:
+  countries: [USA, GBR, NZL, AUS, CAN, DEU, FRA, JPN, ITA, ESP, NLD, SWE]
+  period: [1970, 2010]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-sector-years missing PWT TFP series"
+variables:
+  outcome:
+    - name: log_tfp_at_constant_prices
+      source: "pwt:rtfpna"
+      transformation: log
+      notes: "PWT total-factor-productivity at constant national prices. Sectoral aggregates where available; national otherwise."
+    - name: labour_productivity_per_hour
+      source: "pwt:rgdpo"
+      transformation: log_per_hour
+      notes: "PWT real output per hour worked. Cross-check with OECD labour productivity."
+  treatment:
+    - name: deregulation_episode_indicator
+      source: "constructed: country-specific event dummies — USA transportation 1978-1980 (Airline Deregulation Act, Motor Carrier Act, Staggers Rail Act), GBR telecoms 1984 (BT privatisation), NZL Rogernomics 1984-1993."
+      transformation: indicator
+    - name: oecd_pmr_index_overall
+      source: "oecd_pmr:overall"
+      transformation: level
+      notes: "OECD PMR — captures broader deregulation intensity. Available 1998 onwards; pre-1998 episodes use event dummies."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: economic_freedom_index
+      source: "fraser_efw:summary_index"
+      transformation: level
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects: [country, sector, year]
+  notes: >
+    Event-study (±10y window) on each named deregulation episode (USA 1978-80,
+    GBR 1984, NZL 1984-93) on log TFP and labour productivity, with country,
+    sector, and year FE. Country-clustered SEs. Cross-country panel-FE
+    secondary spec uses OECD PMR for post-1998 broader-deregulation intensity.
+    Caveat: each episode has its own confounding macro story — single-episode
+    event studies are heterogeneous; pooled estimate gives consistency check.
+
+scope:
+  period: [1978, 1993]
+  countries: [USA, GBR, NZL]
+  outcome_dim: [productivity, regulation_compliance_cost, industrial_capability]
+  policy_family: [regulation, institutional_reform]
+  treatment_tags: [us_transportation_deregulation_1978, uk_telecoms_privatisation_1984, rogernomics_1984]
+
+covers_claims:
+  - position_id: chicago_monetarism
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Chicago/monetarist position directly predicts TFP gains from the three named deregulation episodes; hypothesis claim text is a verbatim match to the inbound claim."

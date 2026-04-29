@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_post_2008_gdp_vs_gpi_divergence
+version: 1
+status: draft
+topic: growth
+claim: US post-2008 recovery shows rising GDP per capita alongside stagnant or declining median-household
+  ISEW/GPI indicators, consistent with Daly's diminishing-returns-to-growth.
+notes: Stub seeded from a degrowth school prediction about post-2008 GDP-GPI divergence. ISEW/GPI measurements
+  are non-standard and not on disk; FRED real median household income (MEHOINUSA672N) is used as a weaker
+  proxy. See methodology_note.
+prior_confidence: 0.5
+disclosure: Author's market-liberal priors view GDP as the most defensible welfare proxy; this could bias
+  toward dismissing GPI-style alternatives as ideologically constructed and miss genuine median-stagnation
+  signals.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if BOTH (a) the cumulative log gap between US real
+    GDP per capita growth and US real median household income growth from 2008 to 2023
+    is at least +0.15 log-points (~+16pp, GDP/cap pulling ahead), AND (b) US real median
+    household income in 2023 is flat-or-declining versus 2008 (i.e. cumulative log change
+    of median income <= 0). REFUTED if median household income grows at the same rate as
+    or faster than GDP per capita (gap <= 0). PARTIAL if direction is right (gap > 0) but
+    either threshold misses.
+    INFORMATIVE: report the year-by-year indexed series so a reader can see the path,
+    not just the endpoints.
+    METHOD_VALID: WDI NY.GDP.PCAP.KD and FRED MEHOINUSA672N both present for 2008 and 2023.
+  test: us_2008_2023_gdp_pc_vs_real_median_income_log_gap
+  threshold: >-
+    PRIMARY: log(GDP_pc_2023 / GDP_pc_2008) - log(MEHOIN_2023 / MEHOIN_2008) >= 0.15
+    AND log(MEHOIN_2023 / MEHOIN_2008) <= 0.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic "p<0.10, 10% effect" stub
+  to a dispositive cumulative-log-gap test on US 2008-2023 endpoints. ISEW/GPI series
+  (Talberth/Kubiszewski) are non-standard and not on disk in any publisher vintage,
+  so FRED real median household income (MEHOINUSA672N, 1984+) is substituted as a
+  proxy for the "median household welfare" leg of the divergence claim. THIS IS A
+  WEAKER TEST than a true GPI comparison: real median household income excludes the
+  leisure, ecological-cost, household-labour, and inequality-correction adjustments
+  that the full GPI captures. A true GPI test would, on the degrowth school's
+  reading, show a wider gap because GPI deducts environmental and inequality costs
+  that median income ignores. So this run can refute the GDP-vs-median-income
+  framing of the claim, but cannot independently refute the broader GPI framing —
+  flagged in the result card.
+evidence_type: descriptive
+sample:
+  countries:
+  - USA
+  period:
+  - 2008
+  - 2023
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+  - name: real_median_household_income
+    source: 'fred:MEHOINUSA672N'
+    notes: 'FRED real median household income, annual 1984+. Substitute for ISEW/GPI which is non-standard and not on disk; flag in methodology_note that median income is a weaker test than full GPI.'
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Single-country US 2008-2023 endpoint comparison: cumulative log change in
+    real GDP per capita versus cumulative log change in real median household income.
+    Tests whether aggregate growth diverges from the median-household welfare proxy
+    consistent with diminishing returns to growth.
+
+    '
+scope:
+  period:
+  - 2008
+  - 2023
+  countries:
+  - USA
+  outcome_dim:
+  - gdp_growth
+  - poverty_inequality
+  - wage_stagnation
+  policy_family:
+  - none
+  treatment_tags:
+  - gfc_2008
+  - isew_gpi_accounting
+covers_claims:
+- position_id: degrowth
+  claim_index: 11
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Degrowth prediction: US post-2008 recovery shows rising GDP per capita alongside stagnant/declining
+    median-household ISEW/GPI indicators, consistent with Daly''s diminishing-returns-to-growth; direct
+    alignment with hypothesis.'

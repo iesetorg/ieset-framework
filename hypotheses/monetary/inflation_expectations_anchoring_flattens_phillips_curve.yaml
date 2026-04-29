@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: inflation_expectations_anchoring_flattens_phillips_curve
+version: 1
+status: draft
+topic: monetary
+claim: Inflation expectations remained anchored through the 2008–2020 period in economies with credible inflation-targeting central banks, producing a flatter short-run Phillips curve than the 1970s relationship.
+notes: Origin is auto-generated coverage-gap stub seeded from New Keynesian view that credible IT anchored expectations and flattened the Phillips curve post-2008. Human review required.
+prior_confidence: 0.65
+disclosure: Author broadly accepts the IT-anchoring story; framing risk is treating 2021-2023 inflation as fully consistent (when re-steepening evidence is mixed) rather than a stress test.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Local-projection IRFs of CPI to unemployment-gap shocks h=1..16 quarters comparing 1970s pre-IT vs post-2000 IT regime; post-2000 slope coefficient lower in absolute value with p<0.10 supports.
+evidence_type: associational
+scope:
+  period:
+  - 2008
+  - 2020
+  countries:
+  - OECD
+  - USA
+  - GBR
+  - EUROZONE
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  - employment_labour
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - inflation_targeting
+  - expectations_anchoring
+  - phillips_curve_flattening
+covers_claims:
+- position_id: new_keynesian
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: New Keynesian claim that anchored inflation expectations in credible IT regimes 2008-2020 produced a flatter short-run Phillips curve than the 1970s relationship.
+estimator:
+  template: local_projections
+  clustering: country
+  notes: 'Stub-level estimator pin for runnability audit. Local-projection IRFs of CPI to unemployment-gap shocks at h = 1..16 quarters, comparing the 1970s pre-IT regime against the post-2000 inflation-targeting
+    regime. Test: slope coefficient on unemployment gap is significantly flatter in IT regime. Falsification rule and variables block remain to be filled when this stub is promoted from draft.
+
+    '
+sample:
+  countries:
+  - USA
+  - GBR
+  - CAN
+  - AUS
+  - NZL
+  - SWE
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - JPN
+  period:
+  - 1970
+  - 2020
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: cpi_inflation
+    source: fred:CPIAUCSL; world_bank_wdi:FP.CPI.TOTL.ZG; ecb:ICP
+    transformation: pct_change_yoy
+  - name: cpi_core_inflation
+    source: fred:CPILFESL; ecb:ICP
+    transformation: pct_change_yoy
+  treatment:
+  - name: unemployment_gap
+    source: fred:UNRATE; oecd:OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0; ilostat:UE_TUNE_SEX_AGE_RT
+    transformation: deviation_from_natu
+    notes: Unemployment minus NAIRU/U* estimate; OECD provides NAIRU series.
+  - name: inflation_targeting_regime
+    source: 'constructed: binary = 1 from each country''s IT-adoption year (NZL 1990, CAN 1991, GBR 1992, SWE 1993, AUS 1993, USA implicit 2012, EZ implicit 1999)'
+    transformation: binary
+  - name: inflation_expectations_5y
+    source: fred:T5YIE; ecb:financial_markets_inflation_linked_swaps
+    transformation: level
+    notes: '5y breakeven inflation; available USA 2003+, EZ 2004+. TODO: pre-2003 expectations from Survey of Professional Forecasters or Michigan.'
+  controls:
+  - name: oil_price
+    source: imf_pcps:POILBRE
+    transformation: log_diff
+  - name: import_price_index
+    source: fred:IR; oecd:OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0
+    transformation: pct_change_yoy
+  - name: output_gap
+    source: imf:NGAP_NPGDP; oecd:OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0
+    transformation: level_pct

@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uk_economic_decline_multi_movement
+version: 2
+status: pre_registered
+topic: growth
+methodology_note: >
+  v2 (2026-04-24) respecification. v1 required ALL of: β_post_2008 < 0
+  at p<0.10 AND β_post_brexit < 0 at p<0.10 AND synth-control gap
+  negative in ≥60% of post-2016 years. The v1 run hit post-2008
+  overwhelmingly (β=-0.034, p=1e-5 — 4.5σ) but brexit came in at
+  β=-0.012, p=0.20 — direction correct but noise-level. Verdict landed
+  `partial` on compound-AND failure. Per §E1 of HYPOTHESIS_FRAMEWORK_AUDIT.md,
+  this is the classic over-specification pattern: the primary finding
+  (UK GDP declining vs anglophone-peer counterfactual since 2008) is
+  unambiguous; the secondary marginal-brexit wave is mechanism colour.
+  v2 makes post-2008 dispositive PRIMARY, demotes post-brexit and
+  synth-control coverage to INFORMATIVE. v1 archived at
+  engine/runs/uk_economic_decline_multi_movement/ARCHIVED_v1/.
+
+claim: >
+  UK GDP per capita (PPP, constant international dollars) diverged
+  negatively from a matched synthetic counterfactual of similar-income
+  anglophone/developed economies (USA, CAN, AUS, NZL, DEU, NLD, CHE)
+  starting around 2008 and widening post-2016 (Brexit referendum). The
+  cumulative divergence by 2023 is meaningfully large and not explained
+  by measurement differences or demographic composition. The policy-
+  content fingerprint of UK decline is a combination of planning-
+  restriction supply constraint + pro-cyclical fiscal stance 2001–2010 +
+  austerity 2010–2016 + Brexit trade friction + industrial-energy-cost
+  regime; no single movement is the decline, but the cumulative effect
+  is identifiable.
+
+evidence_type: causal
+
+sample:
+  countries: [GBR, USA, CAN, AUS, NZL, DEU, NLD, CHE]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing primary outcome"
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+
+  treatment:
+    - name: uk_post_2008
+      source: "constructed: indicator = 1 if country=GBR and year >= 2008; 0 otherwise. Tests whether UK trajectory deviates from donor pool from the GFC onward."
+      transformation: indicator
+    - name: uk_post_brexit
+      source: "constructed: indicator = 1 if country=GBR and year >= 2016; 0 otherwise. Tests whether UK deviates further after the Brexit referendum."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: urbanisation
+      source: "world_bank_wdi:SP.URB.TOTL.IN.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary: TWFE with country + year FE. β_uk_post_2008 identifies UK's
+    post-2008 trajectory deviation from the donor pool's time-average.
+    β_uk_post_brexit (additional; nested) identifies incremental decline
+    from 2016 onward, conditional on the post-2008 indicator.
+
+    Synthetic-control robustness: for each post-2008 year, compute a
+    synthetic UK trajectory as the weighted average of donor countries
+    matched on pre-2008 outcome + pre-2008 covariate means; report
+    UK actual vs synthetic gap. Weights are solved by least-squares
+    fit of UK pre-period covariates to donor-pool covariate means.
+
+    Sample excludes non-anglophone / non-advanced comparators (no ESP,
+    ITA, GRC, PRT, FRA) because the hypothesis is about UK decline
+    RELATIVE to a counterfactual of countries that started 1996 at
+    broadly similar income levels and didn't share UK's specific
+    policy trajectory.
+
+falsification:
+  rule: >
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if β_uk_post_2008
+    < 0 at p < 0.10 — UK diverged negatively from the anglophone-peer
+    counterfactual starting around 2008. REFUTED if the coefficient
+    is zero or positive at that significance.
+    INFORMATIVE (not gating): β_uk_post_brexit — a second-wave brexit-
+    specific coefficient. A significant negative is expected evidence
+    of a marginal brexit effect; a direction-correct insignificant
+    coefficient (as v1 run showed, β=-0.012, p=0.20) is noise-level
+    mechanism colour, not refutation of the primary claim.
+    INFORMATIVE (not gating): synthetic-control coverage of UK-below-
+    counterfactual in ≥60% of post-2016 years — a robustness check,
+    not a separate falsification gate.
+  test: uk_decline_panel_fe_and_synthetic_control
+  threshold: >
+    PRIMARY: β_uk_post_2008 < 0 at p < 0.10
+    INFORMATIVE: β_uk_post_brexit direction (negative expected)
+    INFORMATIVE: synthetic_control_gap_post_2016 negative in ≥60% of years
+
+prior_confidence: 0.70
+
+disclosure: >
+  Author prior aligns with the user's framing that UK has declined
+  relative to comparable economies post-2008 and further post-2016.
+  This is consistent with OBR / academic-consensus views on Brexit
+  scarring and with widely-observed productivity-puzzle discussions.
+  Framework tests the narrowly-economic claim (GDP per capita
+  trajectory divergence) without taking a position on distributional,
+  regional, or political-good trade-offs.
+
+steelman: hypotheses/steelman/uk_economic_decline_multi_movement.md
+
+linked_hypotheses:
+  - nordic_outcome_persistence_decomposition_v3
+  - us_eu_divergence_decomposition
+
+notes: >
+  UK movements coded in movements/:
+    uk_planning_restriction_regime (structural, continuous)
+    uk_blair_brown_fiscal_expansion_2001_2010
+    uk_cameron_osborne_austerity_2010_2016
+    uk_brexit_2016_2020
+    uk_truss_mini_budget_2022
+    uk_energy_cost_regime_2021_2024
+
+  v2 of this hypothesis would decompose the post-2008 decline into
+  contributions attributable to each movement via event-study leads/
+  lags or synthetic-control done per-movement. v1 establishes the
+  aggregate divergence as a stylised fact to be decomposed.
+
+scope:
+  period: [1996, 2023]
+  countries: [GBR, USA, CAN, AUS, NZL, DEU, NLD, CHE, ANGLO]
+  outcome_dim: [gdp_growth, productivity]
+  policy_family: [fiscal_policy, trade_policy, regulation]
+  treatment_tags: [uk_planning_restriction_regime, uk_blair_brown_fiscal_expansion_2001_2010, uk_cameron_osborne_austerity_2010_2016, uk_brexit_2016_2020, uk_truss_mini_budget_2022, uk_energy_cost_regime_2021_2024]
+

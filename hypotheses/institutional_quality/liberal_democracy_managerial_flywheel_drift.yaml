@@ -1,0 +1,200 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: liberal_democracy_managerial_flywheel_drift
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Liberal democracies experience monotonic positional drift toward larger,
+  more redistributive states across multi-decade horizons. The mechanism is a
+  set of asymmetric political-economy incentives — median-voter ageing tilts
+  the franchise toward transfer recipients, the managerial / regulatory class
+  expands its own scope through new rules, the fiscal flywheel of "more
+  transfers paid for by more taxes on the rich" is electorally stable, and
+  reversal episodes (Mulroney Canada 1984-1993, NZ Rogernomics 1984-1990,
+  Sweden tax-reform-of-the-century 1990-91, Greek post-2010 memoranda) are
+  rare and short-lived relative to the underlying drift. Falsifiable form:
+  the framework's composite statist-drift index (sum of pro-state-axis moves
+  minus pro-market-axis moves, weighted by magnitude) shows a positive
+  long-run slope for the median liberal democracy, and the share of liberal
+  democracies with net-positive cumulative drift over their full coverage
+  window is significantly greater than 50%.
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  The hypothesis is about the institutional dynamics of democratic political
+  economy — how franchise composition + interest-group structure interact
+  with the policy menu over time. It is not about a single fiscal or
+  regulatory intervention; it is about the joint cumulative direction of
+  many interventions over decades.
+
+evidence_type: associational
+sample:
+  countries:
+    [
+      USA,
+      GBR,
+      DEU,
+      FRA,
+      ITA,
+      ESP,
+      NLD,
+      BEL,
+      IRL,
+      AUT,
+      PRT,
+      GRC,
+      SWE,
+      NOR,
+      DNK,
+      FIN,
+      CHE,
+      POL,
+      CZE,
+      HUN,
+      AUS,
+      NZL,
+      CAN,
+      JPN,
+      KOR,
+      ISR,
+    ]
+  period: [1976, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - >
+      Drop country-years where the country was not a liberal democracy by
+      Polity 5 / V-Dem electoral-democracy index ≥ 0.7 — keeps the test
+      on the population the hypothesis is about.
+
+variables:
+  outcome:
+    - name: composite_statist_drift_final
+      source: "constructed: from data/derived/country_drift.json (computed by scripts/compute_country_drift.py from movements/*.yaml axes_summary)"
+      transformation: "country-level: final-year value of cumulative statist-drift index"
+      notes: >
+        Index = Σ (direction × magnitude) over pro-state axes minus
+        Σ (direction × magnitude) over pro-market axes, applied at each
+        movement's start year. Pro-state axes: fiscal.tax_progressivity,
+        fiscal.tax_corporate, fiscal.tax_capital, fiscal.transfer_expansion,
+        fiscal.spending_level, fiscal.sectoral_subsidy,
+        regulatory.environmental_stringency,
+        regulatory.financial_deregulation (axis name + direction is
+        labelled by lever; + means tighter regulation per axes.yaml),
+        regulatory.sectoral_licensing,
+        monetary.monetary_expansion_direction. Pro-market axes:
+        regulatory.labour_market_flexibility,
+        regulatory.product_market_competition, regulatory.trade_openness,
+        monetary.central_bank_independence. Magnitude weights: weak=1,
+        moderate=2, strong=3.
+    - name: composite_drift_slope_per_decade
+      source: "constructed: regression slope from data/derived/country_drift.json"
+      transformation: "OLS slope of cumulative drift on year, scaled to 'index points per decade'"
+      notes: >
+        Slope is the secondary outcome — it captures rate of drift, not
+        just final position, so a country that drifted hard then reversed
+        (Sweden 1990-91, NZ 1984) shows up correctly as low-slope rather
+        than just high-final.
+  treatment:
+    - name: liberal_democracy_indicator
+      source: "vdem:v2x_polyarchy"
+      transformation: ">= 0.7 over the full sample window"
+      notes: >
+        Treatment is membership in the liberal-democracy set per V-Dem
+        electoral democracy index. Used to define the sample population
+        (per exclusion_rules), not as a regressor.
+  controls:
+    - name: gdp_per_capita_log_initial
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log of 1976 (or earliest available) GDP-pc constant USD"
+      notes: "Solow-style initial-condition control — drift may correlate with starting income."
+    - name: median_age_change
+      source: "un_wpp:median_age"
+      transformation: "Δ median age 1976→latest"
+      notes: >
+        Mechanism control. The transfer-flywheel intuition predicts that
+        ageing populations drift faster (older voters tilt the franchise
+        toward pension/healthcare expansion).
+    - name: fiscal_rule_presence
+      source: "imf:fiscal_rules_dataset"
+      transformation: "binary: country had a numerical fiscal rule for >= 10 years in the window"
+      notes: >
+        Mechanism control. Countries with hard fiscal anchors (Germany
+        Schuldenbremse, Switzerland debt brake, Sweden post-1996 surplus
+        target) should show attenuated drift if rules bind.
+    - name: labour_share_change
+      source: "ilostat:labour_share_gdp"
+      transformation: "Δ labour share of GDP 1976→latest"
+      notes: >
+        Mechanism colour. Falling labour share is one channel through
+        which drift could be politically generated (compensatory transfer
+        demand).
+
+estimator:
+  template: descriptive
+
+falsification:
+  rule: >
+    SUPPORTED if (a) median liberal democracy in the sample has a final
+    composite drift > 0; AND (b) the share of liberal democracies with
+    final drift > 0 is statistically distinguishable from 50% at p<0.05
+    (one-sided binomial); AND (c) the median per-decade slope of cumulative
+    drift is positive. PARTIAL if at least one of (a) and (c) passes but
+    (b) does not reject 50% at p<0.05. REFUTED if the median final drift
+    is negative or zero and the median slope is not positive.
+  test: "constructed-index descriptive panel + one-sided binomial share test against 50% null"
+  threshold: "median final drift > 0 AND share-positive p<0.05 (one-sided) AND median slope/decade > 0"
+
+prior_confidence: 0.55
+
+scope:
+  period: [1976, 2025]
+  countries:
+    [
+      USA,
+      GBR,
+      DEU,
+      FRA,
+      ITA,
+      ESP,
+      NLD,
+      BEL,
+      IRL,
+      AUT,
+      PRT,
+      GRC,
+      SWE,
+      NOR,
+      DNK,
+      FIN,
+      CHE,
+      POL,
+      CZE,
+      HUN,
+      AUS,
+      NZL,
+      CAN,
+      JPN,
+      KOR,
+      ISR,
+    ]
+  outcome_dim: [institutional_quality]
+
+steelman: hypotheses/steelman/liberal_democracy_managerial_flywheel_drift.md
+
+disclosure: >
+  Author has stated market-liberal priors (see DISCLOSURE.md). The
+  composite statist-drift index is constructed by the framework author —
+  the choice of which axes are "pro-state" vs "pro-market" embeds the
+  author's view of what counts as state expansion. To minimise this
+  exposure, the falsification rule depends only on direction + magnitude
+  data already coded in each movement YAML (which is open to inspection
+  + correction by anyone reading the corpus), and the index weighting is
+  uniform across axes (no author-tuned hyperparameter). Anyone who
+  disagrees with the axis classification can re-derive the index with a
+  different mapping; the data substrate stays the same.
+
+# covers_claims to be added once a matching position claim is created.
+# Austrian + classical-liberal positions both predict net-positive drift in
+# liberal democracies absent constitutional constraints; that's a natural
+# linkage but the position claims don't yet exist with the right indices.

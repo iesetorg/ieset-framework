@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mittelstand_institutional_productivity_effect
+version: 1
+status: draft
+topic: growth
+claim: German Mittelstand-supporting institutional architecture (vocational training, Landesbanken patient
+  capital, co-determination) correlates with higher manufacturing productivity persistence than Anglo-Saxon
+  shareholder-primacy arrangements in capital-intensive sectors.
+notes: >-
+  Seeded from an Ordoliberal claim that German Mittelstand-supporting
+  institutions (vocational training, Landesbanken patient capital,
+  co-determination) deliver higher manufacturing-productivity persistence than
+  Anglo-Saxon shareholder-primacy arrangements. Cross-country panel; human
+  review needed for the Mittelstand-treatment indicator coding.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: Ordoliberal framing privileges the Germanic
+  institutional bundle. Mittelstand productivity persistence may reflect
+  industry composition (engineering, machinery) rather than institutional
+  architecture per se, and the Anglo comparator group masks heterogeneity
+  within the USA and GBR.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: "Panel FE of manufacturing TFP on Mittelstand indicator, advanced-economy panel 1970-2019, country and year FE; falsified if Mittelstand coefficient not positive at p<0.10 or magnitude below 5%."
+evidence_type: associational
+
+sample:
+  countries: [DEU, USA, GBR, FRA, ITA, NLD, AUT, CHE, SWE, JPN]
+  period: [1970, 2019]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+
+  treatment:
+    - name: mittelstand_indicator
+      source: "constructed: indicator = 1 for DEU, AUT, CHE (Germanic Mittelstand model); 0 for Anglo USA/GBR baseline"
+      transformation: indicator
+
+  controls:
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Cross-country panel comparing German manufacturing-productivity
+    persistence to Anglo-Saxon peers (USA, GBR) 1950-2023. Treatment
+    coding: Mittelstand-supporting institutions (vocational training
+    intensity, patient-capital share, co-determination). Outcome:
+    manufacturing TFP and survival of medium-sized firms.
+
+scope:
+  period: [1950, 2023]
+  countries: [DEU]
+  outcome_dim: [productivity, industrial_capability]
+  policy_family: [industrial_policy, institutional_reform, labour_market]
+  treatment_tags: [mittelstand_institutional_architecture, german_vocational_training, landesbanken_patient_capital]
+
+covers_claims:
+  - position_id: ordoliberal
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts German Mittelstand institutional architecture correlates with higher manufacturing productivity persistence vs Anglo-Saxon shareholder-primacy."

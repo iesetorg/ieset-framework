@@ -1,0 +1,218 @@
+# yaml-language-server: $schema=schemas/axes.schema.json
+#
+# Canonical policy-axis taxonomy. Every policy/movement references axis ids
+# from this file. Directions are policy-content semantic (+/-), not normative.
+# Per Invariant 4, fiscal and regulatory channels are tracked independently.
+
+version: 1
+
+axes:
+
+  # ---- fiscal ----
+  - id: fiscal.tax_progressivity
+    channel: fiscal
+    description: >
+      Progressivity of the personal income tax schedule, including top marginal
+      rates, bracket spread, and targeted credits (EITC-equivalents).
+    direction_semantics:
+      "+": "more progressive (higher top rates, wider spread, larger targeted credits)"
+      "-": "less progressive (flatter rates, compression, smaller credits)"
+    source_publishers: [oecd, fraser_efw, heritage_ief]
+    typical_proxies: ["OECD revenue statistics top marginal rate", "Fraser EFW area 1b"]
+
+  - id: fiscal.tax_corporate
+    channel: fiscal
+    description: >
+      Statutory and effective corporate tax rates, treatment of depreciation,
+      and international competitiveness.
+    direction_semantics:
+      "+": "higher corporate tax burden"
+      "-": "lower corporate tax burden"
+    source_publishers: [oecd, fraser_efw]
+
+  - id: fiscal.tax_capital
+    channel: fiscal
+    description: >
+      Taxation of capital income (dividends, capital gains, inheritance,
+      wealth). Distinct from corporate rate.
+    direction_semantics:
+      "+": "higher capital income tax"
+      "-": "lower capital income tax"
+    source_publishers: [oecd]
+
+  - id: fiscal.transfer_expansion
+    channel: fiscal
+    description: >
+      Size of cash and near-cash transfer programmes (unemployment benefits,
+      means-tested assistance, universal child benefits). Architecturally
+      distinct from forced-saving schemes — see condition welfare_architecture.
+    direction_semantics:
+      "+": "larger transfer footprint"
+      "-": "smaller transfer footprint"
+    source_publishers: [oecd, world_bank_wdi]
+
+  - id: fiscal.spending_level
+    channel: fiscal
+    description: >
+      General government spending as share of GDP, excluding transfers already
+      captured under fiscal.transfer_expansion to avoid double-counting.
+    direction_semantics:
+      "+": "higher spending share"
+      "-": "lower spending share"
+    source_publishers: [oecd, imf, world_bank_wdi]
+
+  - id: fiscal.sectoral_subsidy
+    channel: fiscal
+    description: >
+      Targeted industrial and sectoral subsidies (renewable energy, chip
+      manufacturing, agriculture, green hydrogen, etc).
+    direction_semantics:
+      "+": "expanded sectoral subsidies"
+      "-": "reduced sectoral subsidies"
+    source_publishers: [oecd]
+
+  # ---- regulatory ----
+  - id: regulatory.labour_market_flexibility
+    channel: regulatory
+    description: >
+      Ease of hiring/firing, collective-bargaining scope, minimum wage
+      rigidity, temporary/permanent contract regulation.
+    direction_semantics:
+      "+": "more flexible (easier hiring/firing, less rigid bargaining)"
+      "-": "less flexible (stronger employment protection)"
+    source_publishers: [oecd, fraser_efw]
+    typical_proxies: ["OECD EPL index", "Fraser EFW area 5c"]
+
+  - id: regulatory.product_market_competition
+    channel: regulatory
+    description: >
+      Product-market regulation, entry barriers, licensing burdens,
+      network-industry regulation, price controls.
+    direction_semantics:
+      "+": "more competition-friendly (lower entry barriers)"
+      "-": "more restrictive regulation, higher entry barriers"
+    source_publishers: [oecd_pmr, fraser_efw]
+    typical_proxies: ["OECD PMR aggregate", "Fraser EFW area 5b"]
+
+  - id: regulatory.environmental_stringency
+    channel: regulatory
+    description: >
+      Environmental regulation stringency — emissions caps, standards,
+      phase-out mandates, carbon pricing, renewable portfolio standards.
+    direction_semantics:
+      "+": "more stringent environmental rules"
+      "-": "less stringent environmental rules"
+    source_publishers: [oecd]
+    typical_proxies: ["OECD Environmental Policy Stringency Index"]
+
+  - id: regulatory.financial_deregulation
+    channel: regulatory
+    description: >
+      Financial-sector regulation — banking separation, capital requirements,
+      cross-border activity rules, derivatives oversight.
+    direction_semantics:
+      "+": "tighter financial regulation"
+      "-": "looser financial regulation"
+    source_publishers: [fraser_efw, heritage_ief]
+
+  - id: regulatory.immigration_openness
+    channel: regulatory
+    description: >
+      Immigration policy openness — work visas, family reunification,
+      asylum processing, border enforcement posture.
+    direction_semantics:
+      "+": "more open (easier legal immigration, broader asylum)"
+      "-": "more restrictive (lower caps, tighter enforcement)"
+    source_publishers: [vdem, oecd]
+
+  - id: regulatory.trade_openness
+    channel: regulatory
+    description: >
+      Trade policy openness — tariffs, non-tariff barriers, FTAs,
+      industrial protection.
+    direction_semantics:
+      "+": "more open trade"
+      "-": "more protectionist"
+    source_publishers: [fraser_efw, heritage_ief, world_bank_wdi]
+    typical_proxies: ["Fraser EFW area 4", "World Bank tariff rate"]
+
+  - id: regulatory.sectoral_licensing
+    channel: regulatory
+    description: >
+      Sector-specific licensing regimes, concentration / quota allocation,
+      state-controlled entry (energy, telecoms, healthcare, banking).
+    direction_semantics:
+      "+": "tighter sectoral licensing / more state gating"
+      "-": "looser licensing, more open entry"
+    source_publishers: [oecd_pmr]
+
+  - id: regulatory.energy_supply_security
+    channel: regulatory
+    description: >
+      Policy posture toward energy supply security — domestic production
+      capacity, import diversification, strategic reserves, nuclear stance,
+      fossil-fuel mix discipline.
+    direction_semantics:
+      "+": "higher supply-security posture (diversified, strategic reserves)"
+      "-": "lower supply-security posture (single-supplier dependence, early phase-outs)"
+    source_publishers: [oecd, imf]
+    notes: >
+      Often moves jointly but not identically with regulatory.environmental_stringency.
+      Germany Energiewende is the canonical case of a policy strong-positive on
+      environmental stringency and strong-negative on supply security.
+
+  # ---- monetary ----
+  - id: monetary.central_bank_independence
+    channel: monetary
+    description: >
+      De jure and de facto independence of the central bank from fiscal
+      authority. Per D.1.5 scope, one of the framework's defensible
+      monetary positions.
+    direction_semantics:
+      "+": "greater independence (legal, operational, personnel)"
+      "-": "lower independence (fiscal dominance, politicised appointments)"
+    source_publishers: [imf]
+    typical_proxies: ["CBI indices (Garriga 2016 updates)"]
+
+  - id: monetary.monetary_expansion_direction
+    channel: monetary
+    description: >
+      Direction of monetary-base expansion decisions relative to trend.
+      Separate from fiscal.transfer_expansion even when correlated.
+    direction_semantics:
+      "+": "expansionary (balance sheet, rates lower than Taylor)"
+      "-": "contractionary (balance sheet shrink, rates above Taylor)"
+    source_publishers: [fred, bis]
+
+  # ---- institutional ----
+  - id: institutional.rule_of_law
+    channel: institutional
+    description: >
+      Rule of law as institutional substrate — contract enforcement, judicial
+      independence, equal treatment before the law. Upstream of most other
+      axes.
+    direction_semantics:
+      "+": "stronger rule of law"
+      "-": "weaker rule of law"
+    source_publishers: [wgi, wjp_rol, vdem]
+
+  - id: institutional.property_rights
+    channel: institutional
+    description: >
+      Security of private property rights — formal recognition, expropriation
+      risk, titling systems.
+    direction_semantics:
+      "+": "stronger property rights"
+      "-": "weaker property rights"
+    source_publishers: [fraser_efw, heritage_ief, wgi]
+
+  - id: institutional.judicial_independence
+    channel: institutional
+    description: >
+      Independence of the judiciary from executive and legislative
+      encroachment. Specifically captures court-packing, selective
+      prosecution, judicial reshuffles.
+    direction_semantics:
+      "+": "stronger judicial independence"
+      "-": "weaker judicial independence"
+    source_publishers: [vdem, wgi, wjp_rol]

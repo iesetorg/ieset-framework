@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: r_minus_g_wealth_income_ratio_post_1980
+version: 1
+status: draft
+topic: distribution
+claim: Piketty's r > g dynamic post-1980 produced wealth-to-income ratios reaching or exceeding pre-1914
+  levels in major OECD economies, consistent with social-democratic claims about structural inequality
+  drift absent policy intervention.
+notes: Maps the social-democratic school's Piketty-r>g wealth-drift claim to a WID OECD panel.
+  Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: Author prior accepts the wealth/income ratio level fact but is more skeptical that r>g is
+  the dominant mechanism (vs housing-price asset effects and savings-rate composition); the panel-FE
+  spec is unable to separate these channels without additional decomposition.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'OECD panel FE (1980-2023, WID data) regressing wealth-to-income ratio on realised r-g gap; country+year FE, country-clustered SEs. Refute if W/Y in USA/GBR/FRA/DEU fails to reach 1910 pre-WWI levels OR coefficient on r-g sign-flipped at p<0.10.'
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, JPN, CAN, AUS, CHE, BEL, AUT, DNK, FIN, NOR, IRL]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID wealth-to-income series"
+
+variables:
+  outcome:
+    - name: wealth_to_national_income_ratio
+      source: "wid:wid_all"
+      transformation: level
+      notes: >
+        WID national wealth-to-income ratio (mnninc series); registered
+        wid publisher, post-filter for the wealth/national-income
+        fractile.
+    - name: top_1_wealth_share
+      source: "wid:wid_all"
+      transformation: level
+      notes: >
+        WID top-1 wealth share — wealth-side complement to the income
+        Gini.
+  treatment:
+    - name: realised_r_minus_g_gap
+      source: "derived:wid_r_minus_g"
+      transformation: level
+      notes: >
+        Constructed from WID after-tax capital return r vs real GDP-
+        per-capita growth g. Verifiable from registered wid + world_bank
+        sources at fetch time.
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: house_price_to_income
+      source: "bis:WS_SPP"
+      transformation: level
+
+scope:
+  period: [1980, 2023]
+  countries: [OECD, USA, GBR, FRA, DEU]
+  outcome_dim: [poverty_inequality, capital_flows]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [piketty_r_minus_g, wealth_income_ratio_drift]
+
+covers_claims:
+  - position_id: social_democratic
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Social-democratic claim and hypothesis claim are textually identical — Piketty r>g post-1980 wealth-to-income ratio drift in major OECD economies."
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Cross-country OECD panel (WID series) regressing wealth-to-income
+    ratio on the realised r-g gap with country and year FE. Sample
+    1980-2020; clustering by country.
+

@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: great_depression_over_accumulation_vs_monetary_cause
+version: 1
+status: draft
+topic: monetary
+claim: The 1929-1933 Great Depression contraction in US output was precipitated by an endogenous over-accumulation
+  crisis in the 1920s (rising capital-to-output ratio, falling profitability) rather than by Federal Reserve
+  policy errors alone.
+notes: Origin is auto-generated coverage-gap stub seeded from Marxian over-accumulation reading of the
+  Great Depression as endogenous-crisis, not pure-Fed. Human review required before promotion.
+prior_confidence: 0.35
+disclosure: Author has market-liberal priors that may dismiss the Marxian over-accumulation framing prematurely;
+  risk is failing to take seriously the 1920s capital-output and profitability deterioration evidence.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Descriptive comparison of US 1920s capital/output ratio, profit-rate estimates, and capacity utilisation
+    vs 1929 timing; pre-1929 profit-rate decline >20% supports endogenous-crisis precedence.
+evidence_type: associational
+scope:
+  period:
+  - 1929
+  - 1939
+  countries:
+  - USA
+  outcome_dim:
+  - gdp_growth
+  - financial_crisis
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - great_depression_1929
+sample:
+  countries:
+  - USA
+  period:
+  - 1920
+  - 1939
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_gdp
+    source: fred:GDPCA; jst:real_gdp
+    transformation: log_level
+  - name: industrial_production
+    source: fred:M1204AUSM363SNBR
+    transformation: log_level
+  treatment:
+  - name: capital_output_ratio
+    source: academic:duménil_lévy_us_rate_of_profit; pwt:rkna_to_rgdpna
+    transformation: level
+    notes: 'TODO: PWT 10.0 begins 1950; for 1920s use Duménil-Lévy historical series — manual-drop required.'
+  - name: rate_of_profit
+    source: academic:duménil_lévy_us_rate_of_profit
+    transformation: level
+    notes: 'TODO: long-run rate-of-profit series from Duménil-Lévy or Shaikh; manual-drop required.'
+  - name: capacity_utilisation
+    source: fred:CAPUTLB00004S
+    transformation: level_pct
+    notes: FRED capacity-utilisation series begins 1948; for 1920s historic NBER data — manual-drop required.
+  controls:
+  - name: m2_money_stock
+    source: fred:M14M
+    transformation: log_diff
+    notes: 'Compete-channel: monetary contraction during 1929-1933.'
+  - name: stock_market_index
+    source: shiller:sp_composite
+    transformation: log_level
+    notes: Robert Shiller's long-run S&P composite index.
+covers_claims:
+- position_id: marxian
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Marxian claim that 1929-1933 contraction reflects endogenous over-accumulation crisis rather
+    than pure Fed policy error; direct alignment with hypothesis claim and scope.
+estimator:
+  template: descriptive
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Descriptive trajectory of US 1920s capital-output
+    ratios, profitability (rate-of-profit estimates), and capacity utilisation against the 1929-1933 contraction
+    timing. Pattern-test contrasts the over-accumulation-crisis narrative against the monetary-shock narrative.
+    Falsification rule and variables block remain to be filled when this stub is promoted from draft.
+
+    '

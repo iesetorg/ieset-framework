@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bretton_woods_fiscal_space_growth
+version: 1
+status: draft
+topic: labour
+claim: The 1945-1973 Bretton Woods era sustained higher trend growth and lower unemployment across OECD
+  than the post-1973 floating-rate era because capital-account controls preserved fiscal space for demand
+  management.
+notes: Stub seeded from a Post-Keynesian school prediction about Bretton Woods era growth/employment via
+  capital-control-preserved fiscal space. Multiple non-Bretton-Woods structural factors (postwar catchup,
+  demographics) confound; needs human review of identification strategy.
+prior_confidence: 0.45
+disclosure: Author's market-liberal priors view post-1973 stagflation and oil shocks as the primary causes
+  of growth slowdown rather than capital-control loss; could under-weight the fiscal-space channel and
+  over-attribute the OECD growth slowdown to oil shocks and demographic headwinds.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: OECD panel FE regression of real GDP growth and unemployment rate on Bretton-Woods regime dummy
+    1945-1990 with country/year FE; supported if regime coefficient on growth >+1pp at p<0.10 and on unemployment
+    <-1pp at p<0.10.
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT]
+  period: [1945, 1990]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop years before national-accounts coverage begins (varies by country, typically 1948-1955)"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "maddison:gdppc"
+      transformation: log_yoy
+      notes: >
+        Maddison Project Database real GDP per capita — long backseries
+        covering both Bretton Woods and post-1973 eras.
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: unemployment_rate
+      source: "jst:unemp"
+      transformation: level
+      notes: "Jorda-Schularick-Taylor macro-history database — long-run unemployment series."
+  treatment:
+    - name: bretton_woods_regime_indicator
+      source: "ilzetzki_reinhart_rogoff:exchange_rate_arrangements"
+      transformation: indicator
+      notes: >
+        Ilzetzki-Reinhart-Rogoff exchange-rate-regime classification —
+        indicator for Bretton Woods peg vs floating-rate era.
+    - name: capital_account_openness_chinn_ito
+      source: "owid:capital-account-openness"
+      transformation: level
+      notes: "Chinn-Ito KAOPEN via OWID; captures capital-control intensity."
+  controls:
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: government_spending_share_of_gdp
+      source: "imf:G_X_G01_GDP_PT"
+      transformation: level
+      notes: "IMF GFS general-government expenditure share of GDP."
+
+scope:
+  period: [1945, 1982]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, employment_labour]
+  policy_family: [fiscal_policy, exchange_rate_regime]
+  treatment_tags: [bretton_woods_era, capital_account_controls, post_1973_floating_rate_era]
+
+covers_claims:
+  - position_id: post_keynesian
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Post-Keynesian prediction that Bretton Woods capital controls preserved fiscal space for demand management, sustaining higher OECD growth and lower unemployment vs post-1973 floating-rate era."
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    OECD cross-country panel comparing 1945-1973 Bretton Woods era
+    versus 1973-2000 floating-rate era on real GDP growth and
+    unemployment, with country FE. Treats regime as institutional
+    indicator; clustering by country.
+

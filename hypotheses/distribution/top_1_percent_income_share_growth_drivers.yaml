@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: top_1_percent_income_share_growth_drivers
+version: 1
+status: pre_registered
+topic: distribution
+
+claim: >
+  The growth of the top-1% pre-tax national income share across OECD
+  economies over 1980-2020 is primarily driven by two channels that are
+  consistent with marginal-product returns in skill-biased and capital-
+  deep economies — (a) specialist-wage growth concentrated in superstar-
+  firm and specialist-services sectors, and (b) capital-income growth
+  driven by asset-price appreciation relative to wage income — with
+  material but smaller contributions from (c) rent-extraction indicators
+  (finance-sector share, executive-compensation-to-worker-pay ratio) and
+  (d) sector concentration effects. The claim is that channels (a)+(b)
+  jointly account for the majority of cross-country variation in top-1%
+  share growth, with (c)+(d) material but minority contributors. A clean
+  supported finding rules out the strong Piketty-Saez "rent extraction
+  explains everything" reading while acknowledging that rent extraction
+  is real and measurable.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, NZL, KOR]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID top-1% share"
+    - "drop country-years missing finance-sector value-added share"
+    - "winsorise top-1% share growth rates at 1st/99th percentile within sample"
+
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+      notes: >
+        WID.world pre-tax national income top-1% share; routed via OWID
+        grapher mirror pending native WID fetcher. Primary outcome is
+        the level; decomposition is of level differences across countries
+        and growth rates within countries.
+
+  decomposition_channels:
+    - name: high_skill_services_va_share
+      source: "eurostat:nama_10_a64"
+      transformation: level
+      notes: >
+        Share of gross value added in professional/scientific/technical
+        activities + ICT + finance (NACE sections J+K+M). Proxy for
+        specialist-wage channel. Non-EU countries resolved via OECD STAN
+        when fetcher ships; for v1, EU coverage only and US/CAN/AUS/JPN
+        handled via OECD aggregate value-added share of business services.
+    - name: real_equity_price_index
+      source: "bis:WS_SPP"
+      transformation: real_yoy_pct_change
+      notes: >
+        BIS property/equity index as capital-appreciation proxy. Cross-
+        validated with Shiller CAPE for US time series. Captures channel
+        (b) — capital-income-driven top-share growth.
+    - name: finance_sector_va_share
+      source: "eurostat:nama_10_a64"
+      transformation: level
+      notes: >
+        NACE section K (finance + insurance) share of gross value added.
+        Rent-extraction proxy; a finance-share-fat tail is characteristic
+        of the Johnson-Kwak-Philippon rent-extraction reading.
+    - name: market_concentration_herfindahl
+      source: "oecd:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2"
+      transformation: level
+      notes: >
+        OECD PMR barrier-to-entry and market-concentration sub-indicators.
+        Channel (d) — sector concentration effect per De Loecker-Eeckhout.
+        PMR sub-index extraction is specified as concentration + market
+        power components; dataflow URN confirmed at wiring.
+
+  controls:
+    - name: gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+      notes: "Captures fiscal-incentive channel on reported top income (Saez-Slemrod-Giertz)."
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Specification: Delta(top_1pct_share) = b0 + b1*Delta(skill_services)
+    + b2*Delta(equity_index) + b3*Delta(finance_share) + b4*concentration
+    + b5*controls + alpha_i (country FE) + gamma_t (year FE) + epsilon.
+    Driscoll-Kraay SEs clustered by country. Variance decomposition
+    attributes R-squared contribution to each channel. Robustness: rerun
+    with post-tax top-1% share as alternative outcome, and with top-10%
+    share to test whether findings are specific to the very top.
+
+falsification:
+  rule: >
+    Not supported if channels (a)+(b) — skill-services value-added share
+    growth and equity-price growth — jointly account for less than 40
+    percent of within-country variation in top-1% share growth after
+    country and year fixed effects, while channels (c)+(d) — finance-
+    share and concentration — account for more than 40 percent. That
+    pattern would weaken the marginal-product reading and strengthen
+    the pure rent-extraction reading. The hypothesis is also not
+    supported if none of the four channels reaches statistical
+    significance at the 5 percent level on cluster-robust SEs, in which
+    case the cross-country variation is idiosyncratic country-specific
+    policy and the decomposition framing is not useful.
+  test: variance_decomposition_channel_contribution
+  threshold: >
+    skill_plus_capital_share >= 0.40  AND
+    skill_plus_capital_share > rent_plus_concentration_share
+
+prior_confidence: 0.55
+disclosure: >
+  Author's priors weakly favour the marginal-product-plus-capital-
+  appreciation reading over the pure rent-extraction reading, but not
+  confidently — the cross-country literature is genuinely mixed, with
+  Nordic top-1% share growth particularly hard to reconcile with a pure
+  skill-biased-technical-change story given the compressed wage
+  structure. The 0.55 prior reflects the author's view that this is
+  closer to a coin-flip than the US-centric literature suggests, and
+  the threshold is set so a relatively small majority for channels
+  (a)+(b) suffices. A finding that narrowly flips the other way would
+  update the author meaningfully.
+
+steelman: hypotheses/steelman/top_1_percent_income_share_growth_drivers.md
+
+scope:
+  period: [1980, 2020]
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, NZL, KOR, OECD]
+  outcome_dim: [poverty_inequality, labour_share]
+  policy_family: [none]
+  treatment_tags: [neoliberal_turn_1980, financialisation_era, superstar_firm_effects, capital_income_appreciation, rent_extraction]
+
+covers_claims:
+  - position_id: marxian
+    claim_index: 1
+    polarity: inverted
+    school_prediction: supported
+    confidence: low
+    notes: "Phase 4C candidate — audit flagged mismatch (hypothesis tests top-1% share drivers via skill vs capital-appreciation vs rent-extraction channels; Marxian claim frames it purely as capital-extraction vs skill-return). Inverted polarity: the hypothesis's clean supported finding would weaken, not confirm, the pure capital-extraction reading. Consider relink or new hypothesis top_1_capital_vs_skill_decomposition."
+
+
+notes: >
+  Data-gated on WID native fetcher; OWID mirror routes interim. On
+  promotion to v2, switch outcome to native WID series and add top-
+  10% and bottom-50% shares as alternative specifications. OECD STAN
+  sectoral data needed for full non-EU coverage of skill-services
+  channel; v1 uses Eurostat NACE section aggregates for EU countries
+  and OECD business-services aggregate for non-EU.

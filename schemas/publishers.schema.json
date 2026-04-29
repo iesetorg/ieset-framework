@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/publishers.schema.json",
+  "title": "IESET Publisher Registry",
+  "description": "Single source of truth for every data publisher the framework uses. Hypothesis YAMLs reference publishers by id; derive_coverage.py intersects the two to produce the coverage map. The id is the namespace for `variables[].source` strings in hypothesis specs.",
+  "type": "object",
+  "required": ["version", "publishers"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "publishers": {
+      "type": "object",
+      "description": "Map from publisher id (snake_case) to publisher record.",
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*[a-z0-9]$": {
+          "type": "object",
+          "required": ["name", "license", "credibility_tier", "status"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Human-readable publisher name."
+            },
+            "endpoint": {
+              "type": "string",
+              "description": "Base API URL or catalogue page. Empty for publishers that require per-series construction."
+            },
+            "auth_required": {
+              "type": "boolean",
+              "default": false
+            },
+            "auth_env_var": {
+              "type": "string",
+              "description": "Environment variable the fetcher reads for credentials (e.g. FRED_API_KEY)."
+            },
+            "license": {
+              "type": "string",
+              "enum": [
+                "public_domain",
+                "cc_by_4_0",
+                "ogl_uk_3_0",
+                "statcan_open",
+                "imf_terms",
+                "oecd_terms",
+                "bis_public_statistics",
+                "un_data_terms",
+                "academic_citation",
+                "mixed",
+                "unknown"
+              ]
+            },
+            "credibility_tier": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "description": "1=publisher-authoritative central bank / NSO, 2=curated aggregator, 3=academic authoritative, 4=institutional index, 5=constructed composite."
+            },
+            "status": {
+              "type": "string",
+              "enum": ["ready", "pending", "scrape_needed", "reconstruct_needed", "gap"],
+              "description": "ready=fetcher module implemented and working. pending=entry registered, fetcher not yet built. scrape_needed=no API, HTML/PDF extraction required. reconstruct_needed=compose from 2+ sources. gap=no source meets provenance requirements."
+            },
+            "fetcher_module": {
+              "type": "string",
+              "description": "Python import path of the fetcher module (e.g. 'data.fetchers.world_bank_wdi'). Required when status=ready."
+            },
+            "catalogue_url": {
+              "type": "string",
+              "description": "Publisher's series catalogue for verify: true checks."
+            },
+            "vintage_behaviour": {
+              "type": "string",
+              "enum": ["stable", "revisable", "alfred_style_vintaged", "append_only"]
+            },
+            "aliases": {
+              "type": "array",
+              "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
+              "description": "Alternate ids accepted in hypothesis source strings (e.g. 'wb' for 'world_bank_wdi'). derive_coverage.py canonicalises on read."
+            },
+            "notes": {"type": "string"}
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"status": {"const": "ready"}}, "required": ["status"]},
+              "then": {"required": ["name", "license", "credibility_tier", "status", "fetcher_module"]}
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

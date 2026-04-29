@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_cpf_institutional_complementarity
+version: 1
+status: draft
+topic: welfare_architecture
+claim: Singapore's CPF forced-saving architecture 1955-present, combined with rule-of-law and corruption-free
+  administration, produced savings and growth outcomes not replicable by transfer-based welfare states
+  without the institutional base.
+notes: Origin is auto-generated coverage-gap stub seeded from institutionalist framing of Singapore CPF
+  outcomes as conditional on rule-of-law and corruption-free administration. Human review required.
+prior_confidence: 0.55
+disclosure: Author has market-liberal+institutionalist priors that may favour the CPF model;
+  framing risks treating Singapore's institutional uniqueness as cleanly identified rather than confounded with city-state size.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Synthetic control of Singapore 1965-2023 vs city-state/small-economy donor pool with similar
+    rule-of-law indices; gross-savings and GDP-per-capita gap >0.5 SD positive with placebo p<0.10 supports.'
+evidence_type: associational
+
+scope:
+  period: [1955, 2023]
+  countries: [SGP]
+  outcome_dim: [welfare_state, institutional_quality, gdp_growth]
+  policy_family: [welfare_architecture, institutional_reform]
+  treatment_tags: [singapore_cpf, singapore_rule_of_law, forced_saving_architecture]
+sample:
+  countries: [SGP, HKG, KOR, TWN, MYS, THA, ARE, ISR, IRL, CHE]
+  period: [1965, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "SGP is treated unit; small-economy / city-state donor pool with similar rule-of-law indices"
+variables:
+  outcome:
+    - name: gross_savings_share_gdp
+      source: "world_bank_wdi:NY.GNS.ICTR.ZS"
+      transformation: level
+      notes: "WDI gross savings as % of GDP — primary CPF-channel outcome."
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: rule_of_law_index
+      source: "wgi:RuleOfLaw"
+      transformation: level
+      notes: "WGI rule of law (1996+); Fraser EFW legal-system area for pre-1996 backseries."
+    - name: corruption_control
+      source: "wgi:ControlOfCorruption"
+      transformation: level
+  treatment:
+    - name: singapore_cpf_indicator
+      source: "constructed: indicator = 1 for SGP from 1955 (CPF inception); 0 for donor pool. Rule-of-law and corruption-control covariates as moderating channel."
+      transformation: indicator
+    - name: cpf_contribution_rate_total
+      source: "singapore_cpf:contribution_rate"
+      transformation: level
+      notes: "CPF total contribution rate — captures forced-saving intensity over time."
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with SGP as treated unit and small-economy / city-state
+    donor pool (HKG, KOR, TWN, MYS, ARE, IRL, CHE). Pre-treatment fit
+    window 1965-1980; post-treatment 1981-2023. Outcomes: gross savings share
+    of GDP, log real GDP per capita. Caveat: SGP city-state size and unique
+    institutional inheritance limit donor-pool fit — flagged. The
+    institutional-complementarity claim (CPF works only with rule-of-law base)
+    is tested by interacting CPF treatment with WGI rule-of-law level.
+
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 5
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalist position predicts Singapore CPF outcomes depend on rule-of-law/administrative-quality base and are not replicable by transfer states lacking that base; hypothesis tests the institutional-complementarity conditional directly."
+

@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bukele_fiscal_trajectory_tax_cuts_imf_2019_2024
+version: 1
+status: candidate
+topic: fiscal
+claim: 'El Salvador''s fiscal trajectory under Bukele (2019-2024) shows improvement in the primary balance and stabilisation (or modest decline) in debt-to-GDP after the 2020 COVID spike, achieved via a
+  combination of: (a) the 2022-2023 bond buyback / liability-management operations, (b) the 2023 tax reform (lower rates with base-broadening and improved compliance), and (c) IMF-signalled fiscal consolidation
+  culminating in the Dec 2024 $1.4bn Extended Fund Facility. The pre-registered claim is that under a panel decomposition framework, Salvadoran primary balance improvement 2022-2024 exceeds the Central
+  American peer-group average by at least 1.5 percentage points of GDP, and that the dominant channel is spending compression + debt-service reduction via liability management, not a revenue-side tax-rise
+  (i.e., the Laffer-style lower-rate / broader-base conjecture).
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - CRI
+  - PAN
+  - DOM
+  period:
+  - 2010
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude pandemic-peak year 2020 from the pre-treatment weighting (treat separately as a COVID fiscal shock)
+  - exclude Nicaragua post-2018 from the robustness donor set due to political-economic sanctions regime
+scope:
+  period:
+  - 2010
+  - 2025
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - CRI
+  - PAN
+  - DOM
+  outcome_dim:
+  - fiscal_policy
+  - taxation
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - bukele_2019
+  - salvador_bond_buyback_2022
+  - salvador_tax_reform_2023
+  - imf_eff_2024
+variables:
+  outcome:
+  - name: primary_balance_gdp
+    source: imf:GGXONLB_NGDP (general government primary net lending/borrowing, share of GDP)
+    transformation: level
+  - name: general_government_debt_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+  - name: interest_expenditure_gdp
+    source: imf:GGXCNL_NGDP; world_bank_wdi:GC.XPN.INTP.ZS
+    transformation: level
+  treatment:
+  - name: bukele_era_indicator
+    source: 'constructed: binary = 1 for SLV from 2019-06-01 onward; 0 otherwise'
+    transformation: binary
+  - name: bond_buyback_active
+    source: 'constructed: binary = 1 for SLV from 2022-09-01 onward'
+    transformation: binary
+  - name: tax_reform_active
+    source: 'constructed: binary = 1 for SLV from 2023-10-01 onward'
+    transformation: binary
+  decomposition_channels:
+  - name: revenue_gdp
+    source: imf:GGR_NGDP
+    transformation: level
+    notes: Revenue channel — tests whether the fiscal improvement came from revenue expansion (base-broadening / compliance) vs expenditure compression.
+  - name: expenditure_gdp
+    source: imf:GGX_NGDP
+    transformation: level
+    notes: Expenditure channel.
+  - name: interest_expenditure_gdp
+    source: imf:GGXCNL_NGDP
+    transformation: level
+    notes: Debt-service channel — tests whether the buyback reduced interest burden.
+  controls:
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  - name: commodity_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+    notes: External-finance-cost control given dollarisation.
+  - name: sovereign_yield_spread
+    source: jp_morgan_embi:EMBI+; bloomberg_sov:SLV
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: 'Bond-buyback, tax-reform, and IMF-EFF conditions operate through the fiscal channel. Decomposition into revenue / expenditure / debt-service channels follows invariant
+  4 and the panel-FE-decomposition template.
+
+  '
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Primary: two-way FE panel with SLV as treated from 2019Q2, Central American peers as never-treated control; outcome is primary balance and debt/GDP. Decomposition: separately regress revenue_gdp,
+    expenditure_gdp, and interest_gdp on the Bukele-era indicator and sub-treatment binaries (buyback, tax reform) to isolate which channel explains the primary- balance change. Secondary: synth_did with
+    peer donor pool as robustness.
+
+    '
+falsification:
+  rule: 'Not supported if any of: (a) the panel-FE coefficient on the Bukele-era indicator for primary_balance_gdp is not positive and significant at 5%, OR (b) the coefficient on general_government_debt_gdp
+    is positive and significant at 5% (i.e., debt ratio rose rather than stabilised/fell), OR (c) the primary-balance improvement versus peer-group average over 2022-2024 is less than 1.5 percentage points
+    of GDP, OR (d) the decomposition shows the dominant positive channel is revenue-side with expenditure compression accounting for less than 40% of the primary-balance improvement (this would refute the
+    spending-compression/liability-management story in favour of a tax-rise story inconsistent with the stated reform content).
+
+    '
+  test: panel_fe_plus_decomposition_plus_peer_gap
+  threshold: 'panel_FE_beta(bukele_era, primary_balance) > 0 at p<0.05 AND panel_FE_beta(bukele_era, debt_gdp) < 0 at p<0.05 AND (primary_balance_SLV_2022_2024_mean - primary_balance_peers_2022_2024_mean)
+    > 1.5 percentage points GDP AND expenditure_channel_share_of_improvement >= 0.40
+
+    '
+prior_confidence: 0.55
+disclosure: 'Author''s market-liberal prior favours the Laffer-style "lower rates with base-broadening raises revenue" conjecture and the "debt-service compression via buyback improves primary balance"
+  story. Prior 0.55 reflects moderate confidence tempered by the fact that (a) SLV debt-to-GDP remains high (~75% 2024) and the debt stabilisation is modest, (b) a material portion of the 2023-2024 fiscal
+  improvement may reflect cyclical factors (remittance growth, commodity prices, post-COVID rebound) rather than reform content, and (c) the IMF EFF conditionality signals the IMF''s own view that the fiscal
+  framework remained fragile pre-2024. A null or decomposition-inconsistent result would update priors toward skepticism of the ''fiscal-tightening narrative.''
+
+  '
+conflict_disclosure: 'Author has no Salvadoran sovereign-debt exposure. Prior is disclosed and binding pre-registration commits to publishing a null result if obtained.
+
+  '
+steelman: hypotheses/steelman/bukele_fiscal_trajectory_tax_cuts_imf_2019_2024.md
+linked_hypotheses:
+- austerity_output_recovery_tradeoff
+- hyperinflation_requires_fiscal_dominance
+notes: 'Data-gated on IMF GFS series for El Salvador and peers (annual general-government fiscal aggregates) plus EMBI+ spread series for market-perception controls. The decomposition test is the load-bearing
+  falsification criterion — the literature is mixed on which channel dominates Latin American fiscal adjustments of this size.
+
+  '

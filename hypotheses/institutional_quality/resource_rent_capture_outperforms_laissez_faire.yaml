@@ -1,0 +1,209 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: resource_rent_capture_outperforms_laissez_faire
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Across resource-rich economies with meaningful extractive sectors,
+  countries that capture a high share of resource rents through
+  sovereign-wealth-fund mechanisms, royalties, resource-specific taxes,
+  or state-share equity (the "rent-capture" regime, anchored by Norway
+  and Botswana) deliver better long-run welfare outcomes — GDP per
+  capita PPP, life expectancy, gini disposable income, public-service
+  quality — than comparable resource-rich economies that run a
+  laissez-faire regime where rents are predominantly retained by
+  private extractive firms (anchored by Australia LNG, pre-SWF Alaska
+  oil, pre-reform Chilean copper). The comparison is conditional on
+  per-capita-resource-endowment and institutional-quality controls,
+  so that the hypothesis does not conflate rent-capture-policy with
+  being small-and-lucky. The quantitative claim is that a 10-percentage-
+  point higher rent-capture share is associated with at least a 5%
+  higher long-run GDP per capita PPP and non-negative effects on the
+  distribution and public-service outcomes, all controlling for the
+  per-capita-resource-endowment variable.
+
+evidence_type: associational
+
+sample:
+  countries: [NOR, BWA, AUS, CAN, CHL, PER, ZAF, NGA, AGO, DZA, MYS, IDN, KAZ, AZE, RUS, SAU, ARE, KWT, QAT, VEN, TTO, GAB, GNQ, COG, DZA, MNG, NAM]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years where resource rents / GDP < 5% (insufficient resource exposure to identify rent-capture regime)"
+    - "drop country-years missing WGI government-effectiveness data"
+    - "drop Venezuela post-2017 per BCV reliability exclusion"
+    - "drop Nigerian post-2015 data where oil-sector accounts are contested"
+    - "winsorise rent-capture share at 1st/99th percentile within sample"
+
+scope:
+  period: [1996, 2023]
+  countries: [NOR, BWA, AUS, CAN, CHL, PER, ZAF, NGA, AGO, DZA, MYS, IDN, KAZ, AZE, RUS, SAU, ARE, KWT, QAT, VEN, TTO, GAB, GNQ, COG, MNG, NAM]
+  outcome_dim: [gdp_growth, life_expectancy_health, poverty_inequality, institutional_quality]
+  policy_family: [fiscal_policy, institutional_reform, privatisation_nationalisation, tax_policy]
+  treatment_tags: [norway_swf, botswana_debswana, alaska_permanent_fund, chile_codelco_reform, resource_rent_capture]
+
+variables:
+  outcome:
+    - name: log_gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+      notes: "Primary outcome: long-run welfare anchor."
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+      notes: "Secondary outcome: non-monetary welfare measure less driven by resource-price cycle."
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+      notes: "Tertiary outcome: distributional quality. Hypothesis predicts non-worse Gini under rent-capture regime."
+
+  treatment:
+    - name: resource_rent_capture_share
+      source: "constructed: (SWF_asset_flows_from_rent + resource_royalty_revenue + resource_specific_tax_revenue + state_equity_dividend_flows) / resource_export_value. Requires assembly from IMF GFS, national SWF disclosures, and IMF Natural Resources Fiscal Database."
+      transformation: level
+      notes: >
+        Rent-capture share. Key constructed variable; coding rules to be
+        pre-registered in a companion coding.md before run. For Norway
+        the share is ~80%+ via SWF; for Botswana ~50% via Debswana
+        equity + royalty; for Australia LNG ~10-15% historically; for
+        pre-SWF Alaska and pre-CODELCO-reform Chile, <20%. Pending
+        specialist fetcher for IMF Natural Resource Fiscal Framework
+        database; v1 flags as data-gated.
+
+  controls:
+    - name: resource_rents_pct_gdp
+      source: "world_bank_wdi:NY.GDP.TOTL.RT.ZS"
+      transformation: level
+      notes: "Total natural-resource rents / GDP. Primary per-capita-resource-endowment control: equalises across rent-magnitude before testing rent-capture."
+    - name: log_resource_rents_per_capita
+      source: "constructed: (resource_rents_pct_gdp × GDP_nominal) / population"
+      transformation: log
+      notes: "Per-capita-resource-endowment, in levels. Prevents confusing 'small country with huge per-capita rent' with 'rent-capture regime'."
+    - name: wgi_government_effectiveness
+      source: "wgi:GOV_WGI_GE.EST"
+      transformation: level
+      notes: "Institutional-quality control. High-rent-capture countries may also have high state capacity; this control discriminates."
+    - name: wgi_control_of_corruption
+      source: "wgi:GOV_WGI_CC.EST"
+      transformation: level
+      notes: "Corruption control: rent-capture regimes are often implemented in higher-corruption-control settings; disentangling is the central identification challenge."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+      notes: "Population control: small-homogeneous-population moderator is a named counter-argument."
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  random_seed: 20260423
+  notes: >
+    Primary specification: two-way FE panel on log GDP per capita PPP
+    with rent-capture share as treatment, resource-rents/GDP and
+    log-resource-rents-per-capita as endowment controls, WGI GE and
+    WGI CC as institutional-quality controls, plus country and year FE.
+
+    Secondary specification: cross-section on 2010-2019 country averages
+    (pre-COVID) with the same control set, to surface the between-
+    country pattern that the panel FE suppresses.
+
+    Tertiary: anchor-case comparisons presented as paired trajectories,
+    not a regression — Norway vs Australia (oil-and-gas, sample-matched
+    per-capita endowment to within a factor), Botswana vs Angola
+    (diamonds and oil, low-income Africa), Chile CODELCO-era vs Chile
+    pre-1976 (within-country copper-rent-capture regime change), Alaska
+    Permanent Fund pre-1976 vs post-1976 (within-country oil-rent-
+    capture regime change).
+
+    Known limitations:
+    (a) The rent-capture share is a constructed variable that requires
+        expert assembly from IMF GFS + national SWF disclosures. The
+        construction rule is pre-registered; disagreements over
+        classification (is X fund a "SWF"? is Y state-equity capture or
+        private-return?) will materially move results and must be
+        handled with a sensitivity spec.
+    (b) Resource-price regime differs materially across the sample —
+        1970s-era rent-capture designs (Alaska 1976, Norway 1990) face
+        different extraction incentives than 2014+-era designs post-
+        shale-oil-price collapse. A 1976-1990 vs 1991-2013 vs 2014+
+        sub-period split is pre-registered as a robustness run.
+    (c) Country FE absorb time-invariant institutional quality; the
+        hypothesis's identification comes from within-country regime
+        changes (Chile copper, Alaska oil) + cross-country between
+        variation in the cross-section spec.
+    (d) Evidence type is associational rather than causal; the
+        rent-capture regime is chosen endogenously by institutional
+        environment. The hypothesis does not claim that imposing
+        Norway's SWF design on a Nigerian institutional substrate
+        would produce Norway's outcomes.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on rent-capture share is not
+    positive and significant at p < 0.10 on log GDP per capita PPP in
+    the two-way FE panel, after the resource-endowment and institutional-
+    quality controls are included, OR (b) the between-country cross-
+    section coefficient loses significance once per-capita-resource-
+    endowment is controlled, OR (c) laissez-faire-anchor countries
+    (Australia, pre-1976 Alaska, pre-reform Chile) match or exceed the
+    SWF-anchor countries (Norway, Botswana, post-reform Chile) on the
+    anchor-case comparison controlling for per-capita resource endowment.
+    A null or reversed result would indicate that rent-capture-policy's
+    apparent benefits are driven by the institutional environments that
+    produce rent-capture policy, not by the policy itself.
+  test: rent_capture_share_coefficient_plus_anchor_case_comparison
+  threshold: >
+    β_rent_capture_share (panel FE, log GDP pc PPP) > 0 at p < 0.10  AND
+    cross_section_coefficient > 0 after per-capita-endowment control  AND
+    anchor_case_count_favouring_rent_capture >= 3 of 4 (Norway>Australia, Botswana>Angola, Chile-post>Chile-pre, Alaska-post>Alaska-pre)
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author's prior is that rent-capture-regime outcomes exceed laissez-
+  faire-regime outcomes, anchored by the Norway and Botswana cases
+  against Venezuela and Angola counter-cases. Prior is 0.65 rather
+  than higher because the identification challenge is severe: rent-
+  capture regimes are endogenously chosen by high-institutional-
+  quality states, and the confounding with underlying state capacity
+  is tightly bound. A null finding (no effect after institutional
+  controls) is a permitted outcome and would force the framework to
+  re-code the Norway and Botswana cases as "institutional quality +
+  resource luck" rather than "rent-capture policy."
+
+  The author does not hold positions in extractive-sector or sovereign-
+  wealth-linked assets. Political valence (rent-capture is a state-
+  intervention policy position) is disclosed; a market-liberal reader
+  might prefer the laissez-faire outcome; pre-registration commits to
+  publishing either result with equal prominence.
+
+steelman: hypotheses/steelman/resource_rent_capture_outperforms_laissez_faire.md
+
+linked_hypotheses:
+  - nordic_outcome_persistence_decomposition
+  - venezuela_chavismo_framework_validation
+  - state_size_reduces_household_income_growth
+
+notes: >
+  This is mega-spec D.1 #5, the Australia LNG vs Norway SWF comparison
+  with broader panel extension. The anchor-case comparisons (Norway vs
+  Australia, Botswana vs Angola, Chile reform within-country, Alaska
+  Permanent Fund within-country) are the most identifying part of the
+  design; the panel regression is context.
+
+  Data readiness:
+  - WDI NY.GDP.PCAP.PP.KD, SP.DYN.LE00.IN, SI.POV.GINI (ready)
+  - WDI NY.GDP.TOTL.RT.ZS, ADJ.DRES.RT.ZS (ADJ series may need fetch)
+  - WDI NE.TRD.GNFS.ZS, SP.POP.TOTL (ready)
+  - WGI GE.EST, CC.EST (ready)
+  - IMF Natural Resource Fiscal Framework / GFS rent-capture assembly
+    (pending specialist fetcher; v1 data-gated for the primary IV)
+  - National SWF disclosures (Norwegian NBIM, Kuwait KIA, Chile SWF,
+    etc.) — manual assembly with pre-registered coding rules
+
+  v1 pre-registers the full specification; the primary IV construction
+  is data-gated and runs when the fetcher + coding doc ship.

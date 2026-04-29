@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bitcoin_legal_tender_remittance_adoption_2021_2024
+version: 1
+status: candidate
+topic: monetary
+claim: 'The Sep 2021 introduction of Bitcoin as legal tender plus the Chivo state-wallet launch and $30 per-adult BTC buy-in failed to produce a statistically significant change in El Salvador''s total
+  remittance volume or in the aggregate price of remittance services (World Bank remittance-cost series) relative to Central American and Caribbean peer countries. The pre- registered claim is that in a
+  synthetic-control design, SLV post-2021 remittance volume and remittance cost do not deviate from the counterfactual donor pool by more than a small magnitude, and that the share of remittances flowing
+  through BTC/Chivo rails remained below 10% in any rolling 6-month window through 2024 per BCR monthly remittance reports. This hypothesis stands against the ex-ante proponent claim (Bukele government,
+  Strike, Jack Mallers) that BTC legal tender would reduce remittance costs by replacing high-fee Western Union / MoneyGram corridors and would raise total remittance volume by enabling previously-unbanked
+  recipients.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - DOM
+  - JAM
+  - MEX
+  - ECU
+  - HTI
+  period:
+  - 2010
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Haiti post-2021 due to political-economic collapse introducing a non-comparable shock
+  - exclude pandemic-peak 2020Q2-2020Q4 from pre-treatment weighting to avoid COVID-specific outliers
+scope:
+  period:
+  - 2010
+  - 2025
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - DOM
+  - JAM
+  - MEX
+  - ECU
+  - HTI
+  - LATAM
+  outcome_dim:
+  - capital_flows
+  - currency_purchasing_power
+  - financialisation
+  policy_family:
+  - monetary_policy
+  - regulation
+  - institutional_reform
+  treatment_tags:
+  - bukele_2019
+  - bitcoin_legal_tender_2021
+  - chivo_wallet_2021
+  - bitcoin_law_repeal_2025
+variables:
+  outcome:
+  - name: remittance_inflows_usd
+    source: world_bank_wdi:BX.TRF.PWKR.CD.DT; sv_bcr:Remesas
+    transformation: log_level
+  - name: remittance_share_gdp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: level
+  - name: remittance_cost_usd_200_avg
+    source: world_bank_remittance_prices:RPW
+    transformation: level
+  - name: chivo_remittance_share
+    source: sv_bcr:Remesas
+    transformation: level
+    notes: 'Mechanistic variable: share of remittances flowing through BTC/Chivo rails. Pre-registered falsification: this share must exceed 10% in any rolling 6-month window 2022-2024 to support the ''legal-tender-drove-BTC-rails''
+      mechanism.'
+  treatment:
+  - name: bitcoin_legal_tender_active
+    source: 'constructed: binary = 1 for SLV from 2021-09-07 through 2025-01-29; 0 otherwise'
+    transformation: binary
+  - name: chivo_active
+    source: 'constructed: binary = 1 for SLV from 2021-09-07 onward'
+    transformation: binary
+  controls:
+  - name: us_employment_hispanic
+    source: fred:LNS12000009
+    transformation: log_level
+    notes: Primary remittance demand driver — US labour-market conditions for sending-household population.
+  - name: us_gdp
+    source: fred:GDPC1
+    transformation: log_level
+  - name: oil_price_brent
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+    notes: Central American remittance is modestly correlated with global oil prices via US construction-sector employment.
+  - name: recipient_country_gdp
+    source: world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: log_level
+intervention_channel: regulatory
+intervention_channel_justification: 'Bitcoin legal tender is a regulatory/monetary-architecture policy. No direct fiscal-transfer component aside from the $30 Chivo buy-in which is trivial relative to annual
+  remittance volume ($7.7bn in 2023). The regulatory-channel coding follows invariant 4.
+
+  '
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: 'Primary: synthetic control (Abadie 2010) with SLV treated 2021-09-07 onward, Central American and Caribbean donor pool weighted on 2010-2021 remittance-inflow and remittance-cost pre-trends. Secondary:
+    Callaway-Sant''Anna DiD with monthly remittance data. Mechanism test: the Chivo-share-of- remittance metric is a direct behavioural variable; if it stays < 5% throughout 2021-2024, the ex-ante proponent
+    claim is directly refuted regardless of aggregate outcome.
+
+    '
+falsification:
+  rule: 'The hypothesis is ''Bitcoin legal tender produced no material change in remittance volume or cost.'' It is falsified (i.e., rejected in favour of the proponent story) if any of: (a) synthetic-control
+    CATT on log(remittance_inflows_usd) over 2021Q4-2024Q4 is positive at p_perm < 0.05 and magnitude > 10% of pre-treatment level, OR (b) synthetic-control CATT on remittance_cost_usd_200_avg is negative
+    at p_perm < 0.05 and magnitude > 2 percentage points, OR (c) the Chivo-share- of-remittances exceeds 10% in any rolling 6-month window 2022-2024. Support requires none of (a)(b)(c) to be met.
+
+    '
+  test: synthetic_control_cost_and_volume_plus_chivo_share_mechanism
+  threshold: 'CATT_2021Q4_2024Q4(log_remittance_inflows) NOT > 0.10 at p_perm < 0.05 AND CATT_2021Q4_2024Q4(remittance_cost) NOT < -2pp at p_perm < 0.05 AND max_rolling_6m(chivo_remittance_share) < 0.10
+
+    '
+prior_confidence: 0.75
+disclosure: 'Author holds crypto-investment exposure (disclosed) and has bitcoin-libertarian sympathies, so the prior could in principle tilt toward the proponent claim. However, early empirical evidence
+  (Alvarez-Argente-Van Patten 2022 NBER 29968) has already shown Chivo adoption collapsed after initial onboarding, which updated the author''s prior toward the null. Prior 0.75 reflects high confidence
+  in the null after observing the Alvarez et al. paper, with the remaining 25% covering the possibility that post-2023 infrastructure improvements (Lightning Network maturation, corridor-specific fee competition)
+  produced delayed adoption effects.
+
+  '
+conflict_disclosure: 'Author holds disclosed Bitcoin spot and ETF exposure. The hypothesis is constructed as a clean falsification of a proponent claim that would flatter the author''s pre-existing view
+  of BTC infrastructure. Binding pre-registration commits to publishing a result that would invalidate a sympathetic narrative.
+
+  '
+steelman: hypotheses/steelman/bitcoin_legal_tender_remittance_adoption_2021_2024.md
+linked_hypotheses:
+- fiat_expansion_erodes_currency_purchasing_power_long_run
+notes: 'Data-gated on BCR remittance series (monthly since 2010, includes billetera-digital decomposition since Oct 2021) and World Bank Remittance Prices Worldwide quarterly series. Donor pool peers have
+  comparable US-corridor remittance dependency and Central American / Caribbean migration patterns. Pre- registration date for v1: first git-commit timestamp of this file supersedes prior draft.
+
+  '

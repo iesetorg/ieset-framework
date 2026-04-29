@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: argentina_default_collapse_output_effects
+version: 1
+status: draft
+topic: monetary
+claim: Argentine convertibility and subsequent collapse (Menem 1991–2001) reflects rule-based money's appeal combined with fixed-regime rigidity risk that Austrian theory predicts.
+notes: Origin is auto-generated coverage-gap stub seeded from Austrian-school claims about Menem-era convertibility and the 2001 collapse. Human review required before promotion to candidate.
+prior_confidence: 0.55
+disclosure: Author prior leans market-liberal and finds Austrian rule-based-money/fixed-regime-rigidity framing intuitive, which may bias spec choice toward an event-study around the 2001 collapse rather
+  than alternative narrative-accounting designs.
+scope:
+  period:
+  - 1991
+  - 2005
+  countries:
+  - ARG
+  outcome_dim:
+  - gdp_growth
+  - currency_purchasing_power
+  - monetary_policy
+  policy_family:
+  - exchange_rate_regime
+  - monetary_policy
+  treatment_tags:
+  - menem_convertibility_1991
+  - argentine_crisis_2001
+sample:
+  countries:
+  - ARG
+  period:
+  - 1991
+  - 2005
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG; imf:NGDP_RPCH
+    transformation: pct_change_yoy
+  - name: cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: pct_change_yoy
+  - name: peso_usd_exchange_rate
+    source: bcra:exchange_rate_official; bis:WS_EER_M
+    transformation: log_diff
+    notes: Official BCRA rate pre-2002 = 1.00 ARS/USD under convertibility; floats post-collapse.
+  - name: unemployment_rate
+    source: indec:unemployment_rate; ilostat:UE_TUNE_SEX_AGE_RT
+    transformation: level_pct
+  treatment:
+  - name: convertibility_collapse_event
+    source: 'constructed: event date = 2001-12-20 (corralito); 2002-01-06 (peso devaluation)'
+    transformation: event_date
+  - name: convertibility_regime_indicator
+    source: 'constructed: binary = 1 during 1991-04 to 2001-12 (Cavallo plan)'
+    transformation: binary
+  controls:
+  - name: terms_of_trade
+    source: imf_pcps:PALLFNF; world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log_diff
+  - name: external_debt_pct_gdp
+    source: world_bank_wdi:DT.DOD.DECT.GN.ZS
+    transformation: level
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Event-study of Argentine real GDP and CPI inflation around Dec-2001 convertibility collapse, h=-4..+8 quarters; cumulative output decline >10% versus pre-trend at h=+4 with p<0.10 supports.
+evidence_type: associational
+covers_claims:
+- position_id: austrian
+  claim_index: 5
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Austrian reading of Menem 1991-2001 convertibility as rule-based money with fixed-regime rigidity risk; direct alignment with hypothesis scope.
+- position_id: austrian
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Austrian claim that Menem currency board collapse shows rule-based money cannot substitute for fiscal discipline; direct alignment with hypothesis scope.
+estimator:
+  template: event_study
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Event-study around the Dec-2001 convertibility collapse / corralito / default; quarterly output, real exchange rate, and inflation responses at
+    h = -4..+8 quarters. Falsification rule and variables block remain to be filled when promoted from draft.
+
+    '

@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: new_deal_output_employment_counterfactual
+version: 1
+status: draft
+topic: labour
+claim: US New Deal 1933-1938 (public-works employment, Social Security, Wagner Act) raised median living
+  standards and reduced unemployment faster than the pre-1933 laissez-faire counterfactual, vindicating
+  democratic reformist economic management.
+notes: Stub seeded from a democratic-socialist school prediction about New Deal counterfactual.
+  No natural US control; needs human review of cross-country donor-pool comparability for Depression-era trajectories.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors are sympathetic to monetary-explanation accounts of US recovery
+  rather than Wagner-Act/WPA accounts; could under-weight employment-program evidence and over-weight the
+  contributions of Treasury/Fed actions in the synthetic-control comparison.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Synthetic control on US 1933-1938 employment and real wages with donor pool {CAN, GBR, FRA, CHE, AUS};
+    supported if cumulative employment gap by 1938 is positive and >5pp above synthetic counterfactual at p<0.10.
+evidence_type: associational
+
+sample:
+  countries: [USA, CAN, GBR, FRA, CHE, AUS, DEU, JPN, NLD, BEL]
+  period: [1925, 1942]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop years 1939-1945 from primary spec (WWII confound); report as robustness"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita
+      source: "maddison:gdppc"
+      transformation: log
+      notes: "Maddison Project — long backseries spanning the 1930s for all donors."
+    - name: unemployment_rate
+      source: "jst:unemp"
+      transformation: level
+      notes: "Jorda-Schularick-Taylor macro-history database — pre-WWII unemployment."
+    - name: industrial_production_index
+      source: "jst:indprod"
+      transformation: log
+    - name: real_wage_index
+      source: "jst:realwage"
+      transformation: log
+  treatment:
+    - name: new_deal_treatment_indicator
+      source: "derived:new_deal_country_year"
+      transformation: indicator
+      notes: >
+        Hand-coded — USA = 1 from 1933; donor pool = 0. Synthetic-
+        control donor weights constructed from pre-1933 outcome paths.
+  controls:
+    - name: gold_standard_indicator
+      source: "ilzetzki_reinhart_rogoff:exchange_rate_arrangements"
+      transformation: indicator
+      notes: >
+        IRR exchange-rate-regime classification — controls for
+        differential gold-standard exit timing (a major confounder
+        for 1930s recovery comparisons per Eichengreen).
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+scope:
+  period: [1933, 1938]
+  countries: [USA]
+  outcome_dim: [employment_labour, gdp_growth, welfare_state]
+  policy_family: [fiscal_policy, labour_market, welfare_architecture]
+  treatment_tags: [new_deal_1933, social_security_act_1935, wagner_act_1935, wpa_public_works]
+
+covers_claims:
+  - position_id: democratic_socialist
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Democratic socialist predicts New Deal public-works+Social Security+Wagner Act raised living standards and reduced unemployment faster than laissez-faire counterfactual; Phase 4C should specify counterfactual donor-pool (pre-1929 trend? non-NewDeal peers?) since 1933-1938 US has no natural control."
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: []
+  notes: >
+    Synthetic control on US 1933-1938 New Deal trajectory using
+    cross-country donor pool of non-New-Deal Depression-era peers
+    (CAN, GBR, FRA, CHE, AUS) on output, employment, and real wage
+    series. Counterfactual comparison addresses no-natural-control
+    critique.

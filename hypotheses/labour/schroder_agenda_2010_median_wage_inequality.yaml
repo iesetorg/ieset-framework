@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: schroder_agenda_2010_median_wage_inequality
+version: 1
+status: draft
+topic: labour
+claim: Schroder Agenda 2010 reforms reduced German unemployment but widened inequality and produced slower median-wage growth, demonstrating that not all labour-market flexibilisation is welfare-improving.
+notes: Stub seeded from social-democratic and New-Keynesian school predictions about Hartz/Agenda 2010 effects. Concurrent euro accession and German export model confound; needs human review of donor pool.
+prior_confidence: 0.6
+disclosure: Author's market-liberal priors are sympathetic to Hartz-driven employment gains but skeptical of strong inequality-attribution claims; could under-weight wage-distributional dispersion in the
+  bottom quintile and over-weight aggregate-employment performance.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Synth-DiD on German employment, Gini, and median-wage post-2003 vs OECD non-reforming donor pool; supported if employment IRF positive >+1pp AND Gini IRF positive >+0.5pp at p<0.10 each.
+evidence_type: associational
+sample:
+  countries:
+  - DEU
+  - FRA
+  - NLD
+  - AUT
+  - BEL
+  - ITA
+  - ESP
+  - GBR
+  - SWE
+  - DNK
+  - FIN
+  period:
+  - 1995
+  - 2015
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing OECD IDD inequality observations
+  - flag 2008-Q4 to 2010 GFC window for confound assessment
+variables:
+  outcome:
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: gini_disposable_income
+    source: oecd:OECD.WISE.INE,DSD_IDD@DF_IDD,1.0
+    transformation: level
+  - name: median_real_wage_index
+    source: oecd:OECD.ELS.SAE,DSD_EARN@DF_EARN_LFS,1.0
+    transformation: log
+    notes: 'OECD earnings database median wage. Native source for German ASHE-equivalent is Destatis — TODO add when registered.
+
+      '
+  - name: low_pay_incidence
+    source: oecd:OECD.ELS.SAE,DSD_EARN@DF_EARN_LFS,1.0
+    transformation: share
+    notes: OECD share of full-time workers earning <2/3 of median.
+  - name: top_10_share
+    source: wid:wid_all
+    transformation: level
+    notes: WID top-10 income share — registered wid publisher; post-filter.
+  treatment:
+  - name: hartz_iv_enactment
+    source: derived:agenda_2010_dates
+    transformation: indicator
+    notes: 'Hand-coded: Hartz I (2003), Hartz II (2003), Hartz III (2004), Hartz IV (2005-01-01). Synthetic-DiD against non-reforming OECD donor pool.
+
+      '
+  - name: minijob_share_of_employment
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS,1.0
+    transformation: share
+    notes: Treatment intensity proxy — share of marginal employment.
+  controls:
+  - name: ecb_policy_rate
+    source: ecb:FM.M.U2.EUR.4F.KR.MRR_FR.LEV
+    transformation: level
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+scope:
+  period:
+  - 1998
+  - 2010
+  countries:
+  - DEU
+  outcome_dim:
+  - employment_labour
+  - poverty_inequality
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  - welfare_architecture
+  treatment_tags:
+  - agenda_2010
+  - hartz_reforms_2003
+covers_claims:
+- position_id: social_democratic
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Social democratic predicts Agenda 2010 reduced unemployment but widened inequality and slowed median-wage growth; Phase 4C should separate Hartz-reform employment effects from concurrent euro-accession
+    wage-moderation and German export-model dynamics.
+- position_id: new_keynesian
+  claim_index: 9
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: New-Keynesian claim that Schröder Agenda 2010 reduced German structural unemployment over the subsequent decade; relinked from labour_market_flexibility_unemployment_duration (Phase 4C) — Germany-specific
+    reform test.
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Synthetic DiD comparing post-2003 German Hartz/Agenda 2010 employment, unemployment, median wage, and inequality trajectory against an OECD donor pool of non-reforming peers. Donor weights constructed
+    from pre-2003 outcome paths.
+
+    '

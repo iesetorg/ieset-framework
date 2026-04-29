@@ -1,0 +1,162 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_policy_developmentalist_states_growth
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Developmentalist East Asian states (South Korea, Taiwan, Singapore, China) pursuing active industrial policy — export-discipline, selective credit, state-directed FDI screening, targeted sector
+  promotion — achieved higher long-run real per-capita GDP growth over 1960-2019 than otherwise-comparable countries starting at similar income levels in 1960. The comparable-control set is constructed
+  from Maddison 1960 per-capita GDP neighbours plus similar initial human-capital and geographic endowment, drawn from Latin America (ARG, BRA, MEX, CHL), South Asia (IND, PAK, LKA), Southeast Asia non-developmentalist
+  (PHL, THA in the earlier period), and Africa (GHA, EGY). The hypothesis is that the developmentalist subset''s long-run growth trajectory exceeds the control group by a margin not explained by controls
+  for initial human capital, geography, and institutional quality alone.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - KOR
+  - TWN
+  - SGP
+  - CHN
+  - JPN
+  - ARG
+  - BRA
+  - MEX
+  - CHL
+  - IND
+  - PAK
+  - LKA
+  - PHL
+  - THA
+  - GHA
+  - EGY
+  - TUR
+  - MYS
+  - IDN
+  period:
+  - 1960
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Taiwan before 1960 (coverage) and China before 1978 (pre-reform non-comparable)
+  - exclude country-years in active civil war or major non-economic collapse (post-2011 Syria etc.)
+variables:
+  outcome:
+  - name: real_gdp_per_capita_ppp
+    source: maddison:real_gdp_pc; world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+    notes: Maddison Project Database for 1960-1989; WDI NY.GDP.PCAP.KD for 1990-2019 with bridge at 1990.
+  - name: manufacturing_value_added_share
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: level_pct_of_gdp
+    notes: 'Secondary outcome: manufacturing share as proxy for structural transformation.'
+  - name: export_sophistication_index
+    source: owid:economic-complexity-index
+    transformation: level_eci
+    notes: Hausmann-Hidalgo Economic Complexity Index as proxy for the sophistication channel.
+  treatment:
+  - name: developmentalist_state_category
+    source: 'constructed: binary indicator per country per epoch'
+    transformation: binary
+    notes: 'Coded 1 for KOR 1961-1997, TWN 1958-2000, SGP 1965-present, CHN 1978-present, JPN 1955-1989 (MITI era). Coded 0 for all controls. Coding sourced from Amsden 1989, Wade 1990, Chang 2002, Rodrik
+      1995. Borderline cases (MYS, THA post-1980s) coded as mixed and excluded from primary treatment identifier but retained in sample as an intermediate-robustness check.
+
+      '
+  controls:
+  - name: initial_human_capital_1960
+    source: owid:mean-years-of-schooling-long-run-1870
+    transformation: level_at_1960
+  - name: initial_gdp_per_capita_1960
+    source: maddison:real_gdp_pc
+    transformation: log_level_at_1960
+  - name: institutional_quality_pretreatment
+    source: polity5:polity2
+    transformation: level_at_treatment_start
+  - name: geographic_latitude_abs
+    source: 'constructed: abs(capital_latitude) from standard geographic table'
+    transformation: level
+  - name: primary_export_share
+    source: world_bank_wdi:TX.VAL.MRCH.R6.ZS
+    transformation: level_pct
+intervention_channel: bundled
+intervention_channel_justification: 'Industrial policy bundles fiscal (subsidised credit, tax incentives, SOE formation) and regulatory (tariffs, FDI screening, export licensing) interventions. Channel
+  assignment is bundled and justified here.
+
+  '
+estimator:
+  template: synth_did
+  clustering: country
+  random_seed: 20260423
+  notes: 'Synthetic DiD on each of the four developmentalist cases (KOR 1961, TWN 1958 or 1960, SGP 1965, CHN 1978) against a donor pool of the Latin American, South Asian, Southeast Asian non-developmentalist,
+    and African controls. Pre-treatment fit on initial GDP, human capital, geography, and institutional quality. ATT averaged across the four cases with uncertainty intervals from the Abadie- Diamond-Hainmueller
+    placebo distribution. Robustness: panel FE on the full sample with developmentalist-category dummy reported as v2 companion.
+
+    '
+falsification:
+  rule: 'Not supported if (a) the synthetic-DiD ATT on log real per-capita GDP averaged over the four developmentalist cases is not positive and outside the placebo distribution at p<0.10, OR (b) fewer
+    than 3 of 4 individual cases show a positive ATT of at least 30 log points at the 40-year post-treatment horizon (the expected magnitude is 50-150 log points based on the Maddison trajectories), OR
+    (c) the ATT attenuates by more than 50% when the comparable- initial-conditions matching is restricted to countries with Polity2 > 0 in the pre-treatment year (removing the authoritarian developmentalist
+    / democratic-control confounder).
+
+    '
+  test: synth_did_plus_individual_case_magnitudes
+  threshold: 'avg_ATT(log_gdp_pc, h=40y) > 0 at p<0.10 in placebo distribution AND 3 of 4 cases ATT >= 30 log points AND ATT_attenuation_restricted_to_polity_positive < 50%
+
+    '
+prior_confidence: 0.65
+disclosure: 'The East Asian developmentalist literature (Amsden, Wade, Chang) argues the developmentalist effect is real and large. The neoclassical counter-literature (Krueger, Lal, Bhagwati) argues these
+  economies succeeded despite industrial policy, not because of it. The prior reflects a moderate belief that the developmentalist story is partly right; author holds priors favouring market mechanisms
+  generally but updates toward the developmentalist position based on the magnitude of the East Asian trajectory. Pre-registration commits to publishing the null or reversed finding with equal prominence.
+
+  '
+steelman: hypotheses/steelman/industrial_policy_developmentalist_states_growth.md
+linked_hypotheses:
+- trade_liberalisation_growth_effect
+- rule_of_law_institutional_growth
+notes: 'This hypothesis and trade_liberalisation_growth_effect are designed to tension against each other. The developmentalist story argues selective protection + export discipline matters; the liberalisation
+  story argues openness matters. Both can hold simultaneously (selective protection for infant industry + openness elsewhere) but the v1 specs test the marginal claim of each. Results should be read jointly,
+  not as either-or.
+
+  Taiwan (TWN) data requires Maddison + IMF rather than WDI for the full span because WDI excludes Taiwan from standard tabulations.
+
+  '
+scope:
+  period:
+  - 1960
+  - 2019
+  countries:
+  - KOR
+  - TWN
+  - SGP
+  - CHN
+  - JPN
+  - ARG
+  - BRA
+  - MEX
+  - CHL
+  - IND
+  - PAK
+  - LKA
+  - PHL
+  - THA
+  - GHA
+  - EGY
+  - TUR
+  - MYS
+  - IDN
+  outcome_dim:
+  - gdp_growth
+  - industrial_capability
+  - productivity
+  policy_family:
+  - industrial_policy
+  - trade_policy
+  treatment_tags:
+  - east_asian_developmentalist_states
+  - export_discipline
+  - selective_credit
+  - state_directed_fdi_screening
+  - park_chung_hee_reforms
+  - korea_hci_drive_1973
+  - taiwan_itri_semiconductor_strategy
+  - tsmc_spinoff_1987
+  - asian_miracle_era

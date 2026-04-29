@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: lula_bolsa_familia_poverty_reduction_decomposition_2003_2010
+version: 1
+status: pre_registered
+topic: distribution
+claim: 'Brazil''s substantial 2003-2010 poverty reduction (extreme poverty headcount fell from ~10% to ~4% and Gini coefficient from ~0.58 to ~0.53 per PNAD/IPEA series) is decomposed across three channels:
+  (a) Bolsa Família cash-transfer expansion (Lei 10,836 of January 2004 consolidating prior CCTs, reaching ~13 million families by 2010), (b) real minimum-wage valorisation (real minimum wage rose over
+  50% 2003-2010, pulling up the bottom of the formal wage distribution and indexed social transfers including BPC), and (c) the 2003-2008 commodity boom (export revenue surge, formal-employment growth,
+  wage-bargaining leverage from tight labour markets). The pre-registered claim is that channels (a) and (b) — the policy channels — jointly account for at least 40% of the total observed reduction in extreme-poverty
+  headcount AND at least 30% of the Gini decline, after controlling for the commodity boom channel via an oil-exporter LatAm donor pool (Mexico, Colombia, Peru).
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - BRA
+  - MEX
+  - COL
+  - PER
+  - CHL
+  - ARG
+  period:
+  - 1995
+  - 2012
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Argentina 2001-2003 crisis years from donor-pool trend fitting to avoid the default dominating the Gini comparator
+  - exclude Mexico 2009 H1N1 extraordinary-year distortion
+scope:
+  period:
+  - 1995
+  - 2012
+  countries:
+  - BRA
+  - MEX
+  - COL
+  - PER
+  - CHL
+  - ARG
+  outcome_dim:
+  - poverty_inequality
+  - employment_labour
+  policy_family:
+  - welfare_architecture
+  - fiscal_policy
+  - labour_market
+  treatment_tags:
+  - bolsa_familia_2003
+  - lula_2003
+  - minimum_wage_valorisation
+  - lei_10836_2004
+  - commodity_boom_2003_2008
+variables:
+  outcome:
+  - name: extreme_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY (USD 2.15 2017 PPP poverty line); ipeadata:PNAD
+    transformation: annual_level_pct
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: annual_level
+  - name: bottom_40_income_share
+    source: world_bank_wdi:SI.DST.FRST.40; wid:wid_all (post-fetch filter to bottom-40 share)
+    transformation: annual_level
+  decomposition_channels:
+  - name: bolsa_familia_coverage_intensity
+    source: 'constructed: number of BF beneficiary families / total households (BRA); 0 for donor pool'
+    transformation: annual_level
+    notes: 'Channel (a): Bolsa Família scale.'
+  - name: real_minimum_wage_level
+    source: ilostat:ILMS_wages; bls-equivalent minimum-wage series per country via national statistics offices
+    transformation: annual_log_level_real
+    notes: 'Channel (b): minimum-wage valorisation.'
+  - name: commodity_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD; imf:Primary
+    transformation: annual_log_level
+    notes: 'Channel (c): commodity-boom proxy.'
+  - name: formal_employment_share
+    source: ilostat:employment_by_status (formal share); ipeadata for BRA
+    transformation: annual_level_pct
+    notes: Intermediate channel — partially captures the labour-market effect of the boom.
+  controls:
+  - name: gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: annual_pct
+  - name: urbanisation_rate
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: annual_level
+intervention_channel: fiscal
+intervention_channel_justification: 'Bolsa Família is a fiscal-channel transfer programme; minimum- wage policy is a regulatory-channel intervention with fiscal spillovers (BPC, pension floor indexation).
+  The decomposition tracks both channels but classifies the headline intervention as fiscal per the cash-transfer primary mechanism. Commodity- boom channel (c) is an exogenous control, not an intervention.
+
+  '
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Panel FE decomposition with Shapley-style variance attribution across three channels (BF, min wage, commodity boom). Primary outcome regressions: poverty headcount and Gini on channel intensities
+    with country and year FE. Donor pool (MEX, COL, PER, CHL, ARG) anchors the commodity-boom counterfactual: these LatAm peers experienced the same boom but lacked BF- scale CCT expansion and (for some)
+    minimum-wage valorisation. Shapley decomposition reports each channel''s marginal share of the explained within-Brazil variance. Robustness: synthetic control on BRA using the donor pool, with the synthetic-control
+    gap interpreted as the combined BF + minimum-wage effect.
+
+    '
+falsification:
+  rule: 'Not supported if EITHER (a) the Shapley variance share of channels (a) + (b) (BF + minimum wage) in explaining the 2003-2010 extreme-poverty headcount decline is less than 40%, OR (b) their share
+    of the Gini decline is less than 30%, OR (c) the commodity-boom channel (c) alone accounts for more than 60% of either decomposition, OR (d) the synthetic-control robustness gap on the BRA series is
+    not negative and distinguishable from the donor pool''s own Gini trajectories at 10% permutation inference. Any one condition falsifies.
+
+    '
+  test: shapley_decomposition_poverty_gini_channel_shares
+  threshold: 'variance_share(BF + minwage, poverty_headcount) >= 0.40 AND variance_share(BF + minwage, gini) >= 0.30 AND variance_share(commodity, both outcomes) <= 0.60 AND synth_control_gap on BRA negative
+    at p_perm < 0.10
+
+    '
+prior_confidence: 0.68
+disclosure: 'The Soares et al. (2010) Latin American Research Review analysis and Barros-Carvalho-Franco-Mendonça (2010) IPEA decomposition both attribute material shares of the 2003-2010 Brazilian distributional
+  improvement to BF and minimum-wage policies. A replication-consistent result supports the prior; a smaller policy share would move toward the commodity- determinism view that the boom did the heavy lifting
+  and policy was decorative. Author''s prior is that BF + minimum wage did meaningful work but the commodity boom was the dominant background condition.
+
+  '
+conflict_disclosure: 'Author holds no Brazilian asset exposure or direct involvement with Brazilian policy debates.
+
+  '
+steelman: hypotheses/steelman/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010.md
+linked_hypotheses:
+- cash_transfer_poverty_effects
+- commodity_boom_redistribution_sustainability
+- growth_vs_distribution_tradeoff
+notes: 'Data-gated: ipeadata PNAD series (BRA) via manual drop OR World Bank povcalnet / WDI for extreme-poverty headcount. Minimum-wage series from ILOSTAT plus national statistical offices as backfill.
+
+  The 2003-2010 window covers Lula''s first and second terms. A parallel hypothesis could extend through Dilma 2011-2014 to test commodity-boom-retreat effects; that is a v1.1 extension, not in scope here.
+
+  '

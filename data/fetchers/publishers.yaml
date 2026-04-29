@@ -1,0 +1,1813 @@
+version: 1
+publishers:
+  fred:
+    name: Federal Reserve Economic Data (FRED) + ALFRED
+    endpoint: https://api.stlouisfed.org/fred
+    auth_required: true
+    auth_env_var: FRED_API_KEY
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.fred
+    catalogue_url: https://fred.stlouisfed.org/categories
+    vintage_behaviour: alfred_style_vintaged
+    notes: ALFRED provides vintage-tracked releases; real-time data. Free API key registration.
+  ecb:
+    name: European Central Bank Data Portal
+    endpoint: https://data-api.ecb.europa.eu/service
+    auth_required: false
+    license: oecd_terms
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.ecb
+    catalogue_url: https://data.ecb.europa.eu/
+    vintage_behaviour: revisable
+    notes: 'SDMX 2.1 CSV API. Ships euro-area aggregate flows cleanly (BSI M3/M2 for U2, EXR bilateral rates, MIR interest rates). National- contribution keys (e.g. REF_AREA=DE for national M2 contribution)
+      require per-country resolution against the live constraint set; resolve at hypothesis-wiring time.
+
+      '
+  boe:
+    name: Bank of England Interactive Statistical Database (IADB)
+    endpoint: https://www.bankofengland.co.uk/boeapps/iadb/fromshowcolumns.asp
+    auth_required: false
+    license: ogl_uk_3_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.boe
+    catalogue_url: https://www.bankofengland.co.uk/statistics/research-datasets
+    vintage_behaviour: revisable
+    notes: 'IADB CSV endpoint. Requires browser-shaped User-Agent (Akamai check). Series codes like LPMAUYM (M4, monthly).
+
+      '
+  boj:
+    name: Bank of Japan Time Series Data Search
+    endpoint: https://www.stat-search.boj.or.jp/
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.stat-search.boj.or.jp/ssi/mtshtml/m_en.html
+    vintage_behaviour: revisable
+    notes: 'Money-statistics landing page returned 200 but shipped no direct CSV links — BoJ''s stat-search is form-driven with session state. Deferred to scrape round; JPN M2 substitute available via FRED
+      mirror (series JPNM2MB) at publisher_id=fred for interim use.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/boj/ and call data.fetchers.boj.fetch().'
+    fetcher_module: data.fetchers.boj
+  rba:
+    name: Reserve Bank of Australia Statistical Tables
+    endpoint: https://www.rba.gov.au/statistics/tables/xls
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.rba
+    catalogue_url: https://www.rba.gov.au/statistics/tables/
+    vintage_behaviour: revisable
+    notes: 'RBA serves XLSX tables cleanly via curl_cffi with Chrome TLS fingerprint; plain requests receive 403. URL pattern: /statistics/tables/xls/<code>hist.xlsx (e.g. d03hist.xlsx for D3 Monetary Aggregates).
+
+      '
+  statcan:
+    name: Statistics Canada Web Data Service
+    endpoint: https://www150.statcan.gc.ca/t1/wds/rest
+    auth_required: false
+    license: statcan_open
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.statcan
+    catalogue_url: https://www150.statcan.gc.ca/n1/en/type/data
+    vintage_behaviour: revisable
+    notes: 'WDS JSON POST API. Queried by numeric vectorId (e.g. 41552796 for Canada M2 gross). getDataFromVectorsAndLatestNPeriods endpoint.
+
+      '
+  world_bank_wdi:
+    name: World Bank World Development Indicators
+    endpoint: https://api.worldbank.org/v2
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.world_bank_wdi
+    catalogue_url: https://data.worldbank.org/indicator
+    vintage_behaviour: revisable
+    aliases:
+    - wb
+    - world_bank
+    notes: Primary cross-country panel source for controls and long-run outcomes.
+  oecd:
+    name: OECD Data API
+    endpoint: https://sdmx.oecd.org/public/rest
+    auth_required: false
+    license: oecd_terms
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.oecd
+    catalogue_url: https://data-explorer.oecd.org/
+    vintage_behaviour: revisable
+    notes: 'SDMX 2.1 API via the new Data Explorer. Client passes full dataflow identifier (''AGENCY,DATAFLOW_ID,VERSION'') as series_id, with optional SDMX key filter. Covers CPI (DSD_PRICES), KEI, IDD
+      (Gini), EPL. PMR lives at `oecd_pmr`.
+
+      '
+  imf:
+    name: International Monetary Fund (WEO — DataMapper JSON)
+    endpoint: https://www.imf.org/external/datamapper/api/v1
+    auth_required: false
+    license: imf_terms
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.imf_weo
+    aliases:
+    - imf_weo
+    catalogue_url: https://www.imf.org/external/datamapper/datasets
+    vintage_behaviour: revisable
+    notes: 'DataMapper JSON API — WEO indicators only. IFS, GFS, BOP, and Primary Commodity Prices will be added as separate fetcher methods on the same module; those datasets have their own APIs (SDMX
+      + bulk CSV). Country filter on URL path is ignored by the API; client-side post-filter used.
+
+      '
+  imf_pcps:
+    name: IMF Primary Commodity Price System
+    endpoint: https://www.imf.org/external/datamapper/api/v1
+    auth_required: false
+    license: imf_terms
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.imf_pcps
+    catalogue_url: https://www.imf.org/en/Research/commodity-prices
+    vintage_behaviour: revisable
+    notes: 'PCPS commodity prices (oil, gas, metals, agricultural) via the IMF DataMapper JSON API. Shares the WEO endpoint shape (values -> series -> region -> period). Used for resource-extraction, nationalisation,
+      and fiscal-dominance case studies. Monthly series supported where published; falls back to annual.
+
+      '
+  bis:
+    name: Bank for International Settlements Statistics
+    endpoint: https://stats.bis.org/api/v2
+    auth_required: false
+    license: bis_public_statistics
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.bis
+    catalogue_url: https://data.bis.org/
+    vintage_behaviour: revisable
+    notes: 'Stats.bis.org SDMX 2.1 v2 API with CSV output. Client passes dataflow name as series_id (WS_SPP, WS_LONG_PP, WS_EER, WS_TC). Full dataflow fetched by default; optional SDMX dot-path key narrows.
+
+      '
+  shiller:
+    name: Robert Shiller Historical Data
+    endpoint: http://www.econ.yale.edu/~shiller/data.htm
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.shiller
+    catalogue_url: http://www.econ.yale.edu/~shiller/data.htm
+    vintage_behaviour: append_only
+    notes: 'Static XLS downloads (ie_data.xls for S&P + CAPE + long rate; Fig3-1.xls for long home-price index). Requires xlrd for legacy .xls parsing.
+
+      '
+  hanke:
+    name: Hanke-Krus Hyperinflation Table
+    endpoint: https://www.cato.org/sites/cato.org/files/pubs/pdf/workingpaper-8.pdf
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.hanke
+    catalogue_url: https://www.cato.org/working-paper/world-hyperinflations
+    vintage_behaviour: stable
+    notes: 'PDF table extracted via pdfplumber from Cato Working Paper #8 (Hanke & Krus 2012). JHU-hosted original returns 403; Cato mirror ships the identical table. Parser captures 30/53 episodes with
+      fully-structured fields; 23 episodes with footnote markers / special characters are retained as raw lines in a `country_raw` column for manual cleanup (data is present; only regex refinement needed).
+      Post-2012 episodes (Venezuela 2016-2019, Lebanon 2019-2023 near-threshold) require manual supplementation documented in hypotheses/monetary/hyperinflation_fiscal_dominance_coding.md.
+
+      '
+  ilzetzki_reinhart_rogoff:
+    name: Ilzetzki-Reinhart-Rogoff Exchange Rate Regime Classification
+    endpoint: https://www.ilzetzki.com/irr-data
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.irr
+    aliases:
+    - irr
+    catalogue_url: https://www.ilzetzki.com/irr-data
+    vintage_behaviour: append_only
+    notes: 'Three xlsx files hosted on ilzetzki.com (via Wix CDN): era_classification_monthly_1940_2019, unified_market_analysis_1946_2021, anchor_currency_monthly_1946_2019. Used as control in hyperinflation_requires_fiscal_dominance.
+
+      '
+  fraser_efw:
+    name: Fraser Institute Economic Freedom of the World
+    endpoint: manual://data/manual/fraser_efw/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.fraser_efw
+    catalogue_url: https://www.fraserinstitute.org/economic-freedom/dataset
+    vintage_behaviour: append_only
+    notes: 'Manual-drop publisher. Cloudflare JS challenge blocks all automated paths (plain requests 403, curl_cffi Chrome TLS 403, Playwright plain 403+CF-redirect, Playwright+stealth loads landing but
+      dataset page exposes zero xlsx/download-action links in rendered HTML). Users download the master xlsx manually from https://www.fraserinstitute.org/economic-freedom/dataset and drop it into data/manual/fraser_efw/
+      with Fraser''s own filename convention (e.g. efotw-YYYY-master-index-data-for-researchers-iso.xlsx). The fetcher picks the latest-filename match. Annual refresh cadence means quarterly manual maintenance
+      is sustainable. Re-probe for automated path (Zenrows / playwright click-through) when convenient.
+
+      '
+  heritage_ief:
+    name: Heritage Foundation Index of Economic Freedom
+    endpoint: https://static.heritage.org/index/data
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.heritage_ief
+    catalogue_url: https://www.heritage.org/index/pages/all-country-scores-data
+    vintage_behaviour: append_only
+    notes: 'Heritage www.heritage.org main domain blocks automated access (Cloudflare). The static.heritage.org subdomain ships the data xlsx cleanly at /index/data/<year>/<year>_indexofeconomicfreedom_data.xlsx
+      even without Chrome fingerprint. Parallel axis to Fraser EFW for multi-source disagreement surfacing.
+
+      '
+  vdem:
+    name: V-Dem Varieties of Democracy
+    endpoint: https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.vdem
+    catalogue_url: https://v-dem.net/data/reference-documents/
+    vintage_behaviour: append_only
+    notes: 'Sourced from the vdeminstitute/vdemdata GitHub mirror (RData format; pyreadr dependency required). v-dem.net itself gates downloads behind a front-end flow; the R-package mirror is open and
+      stable. Covers institutional-quality axes (judicial independence, regime type, academic freedom, movement freedom, etc.) back to 1789.
+
+      '
+  wgi:
+    name: World Bank Worldwide Governance Indicators
+    endpoint: https://api.worldbank.org/v2
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.world_bank_wgi
+    aliases:
+    - world_bank_wgi
+    catalogue_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+    vintage_behaviour: append_only
+    notes: 'Accessed via World Bank v2 API with source=3. Indicator codes were migrated to the `GOV_WGI_` prefix in 2024 (e.g. GOV_WGI_GE.EST for Government Effectiveness point estimate).
+
+      '
+  eurostat:
+    name: Eurostat (EU statistical office)
+    endpoint: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.eurostat
+    catalogue_url: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes
+    vintage_behaviour: revisable
+    notes: 'JSON-stat 2.0 API. EU27 deep coverage across 200+ datasets (labor, demographics, regional, poverty, trade, R&D). Dataset codes like ''nama_10_gdp'', ''une_rt_a'' pass through as series_id.
+
+      '
+  maddison:
+    name: Maddison Project Database (GGDC)
+    endpoint: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.maddison
+    catalogue_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/
+    vintage_behaviour: append_only
+    notes: 'Bolt & van Zanden 2020. Long-run real GDP per capita from year 1 for some economies, broad coverage post-1500.
+
+      '
+  jst:
+    name: Jordà-Schularick-Taylor Macrohistory Database
+    endpoint: https://www.macrohistory.net/app/download/9834512569/JSTdatasetR6.xlsx
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.jst
+    catalogue_url: https://www.macrohistory.net/database/
+    vintage_behaviour: append_only
+    notes: '17-country macrofinancial dataset 1870-present. Release 6 (2024). GDP, inflation, rates, money aggregates, bank assets, credit, asset prices, housing. Essential for long-run monetary hypotheses.
+
+      '
+  polity5:
+    name: Polity5 (Center for Systemic Peace)
+    endpoint: https://www.systemicpeace.org/inscr/p5v2018.xls
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.polity5
+    catalogue_url: https://www.systemicpeace.org/polityproject.html
+    vintage_behaviour: append_only
+    notes: 'Regime authority scores 1800-present. Parallel axis to V-Dem for institutional-quality robustness.
+
+      '
+  freedom_house:
+    name: Freedom House — Freedom in the World
+    endpoint: https://freedomhouse.org/sites/default/files/2024-02/All_data_FIW_2013-2024.xlsx
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.freedom_house
+    catalogue_url: https://freedomhouse.org/reports/publication-archives
+    vintage_behaviour: append_only
+    notes: 'Political rights + civil liberties ratings. Mainstream-citable axis.
+
+      '
+  sipri:
+    name: SIPRI Military Expenditure Database
+    endpoint: https://www.sipri.org/sites/default/files/SIPRI-Milex-data-1948-2023.xlsx
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.sipri
+    catalogue_url: https://www.sipri.org/databases/milex
+    vintage_behaviour: append_only
+    notes: 'Military spending 1948-present, 170+ countries. Constant USD, current USD, % GDP, per-capita variants on separate sheets.
+
+      '
+  undp_hdi:
+    name: UNDP Human Development Index
+    endpoint: https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Statistical_Annex_HDI_Table.xlsx
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.undp_hdi
+    catalogue_url: https://hdr.undp.org/data-center
+    vintage_behaviour: append_only
+    notes: 'HDI composite + life expectancy + education + GNI per capita. Canonical QoL composite index.
+
+      '
+  who_gho:
+    name: WHO Global Health Observatory
+    endpoint: https://ghoapi.azureedge.net/api
+    auth_required: false
+    license: mixed
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.who_gho
+    catalogue_url: https://www.who.int/data/gho/info/gho-odata-api
+    vintage_behaviour: revisable
+    notes: 'OData API. Global health indicators (life expectancy, mortality, DALYs, health expenditure). Non-commercial license (cite + attribute).
+
+      '
+  ilostat:
+    name: ILOSTAT (International Labour Organization)
+    endpoint: https://rplumber.ilo.org/data
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.ilostat
+    catalogue_url: https://ilostat.ilo.org/data/
+    vintage_behaviour: revisable
+    notes: 'Labor indicators across 180+ countries. Broader non-OECD coverage than OECD''s own labor stats; essential for Singapore/Chile/developing- country comparators.
+
+      '
+  ucdp:
+    name: Uppsala Conflict Data Program — Georeferenced Event Dataset
+    endpoint: https://ucdp.uu.se/downloads/ged/ged241-csv.zip
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.ucdp
+    catalogue_url: https://ucdp.uu.se/downloads/
+    vintage_behaviour: append_only
+    notes: 'Conflict events 1989-present, geocoded, actor-classified. Used for state-capacity + stability axes.
+
+      '
+  bls:
+    name: US Bureau of Labor Statistics API v2
+    endpoint: https://api.bls.gov/publicAPI/v2
+    auth_required: false
+    auth_env_var: BLS_API_KEY
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.bls
+    catalogue_url: https://www.bls.gov/data/
+    vintage_behaviour: revisable
+    aliases:
+    - us_bls
+    notes: 'US Labor deep: detailed CPI, PPI, employment by industry/state, earnings, productivity. Optional free API key via BLS_API_KEY env var for higher rate limits.
+
+      '
+  transparency_cpi:
+    name: Transparency International Corruption Perceptions Index
+    endpoint: ''
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 4
+    status: ready
+    catalogue_url: https://www.transparency.org/en/cpi
+    vintage_behaviour: append_only
+    notes: 'transparencycdn.org returns 403 on direct XLSX even with full browser session. Available via OWID mirror (publisher=owid, series=ti-corruption-perception-index) for interim use.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/transparency_cpi/ and call data.fetchers.transparency_cpi.fetch().'
+    fetcher_module: data.fetchers.transparency_cpi
+  wjp_rol:
+    name: World Justice Project Rule of Law Index
+    endpoint: ''
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    catalogue_url: https://worldjusticeproject.org/rule-of-law-index/
+    vintage_behaviour: append_only
+    notes: 'WJP downloads page returns minimal-content HTML (6.5 KB) even with Playwright + stealth + 5s wait. Data links are loaded via AJAX only after user interaction. Main rule-of-law-index page renders
+      19.5 MB but contains zero xlsx refs. Likely requires simulated click-through in headless browser or manual one-shot capture. Interim: institutional.rule_of_law axis is already covered by WGI + V-Dem
+      which are ready; WJP is the 3rd source for disagreement-surfacing.
+
+      '
+    fetcher_module: data.fetchers.wjp_rol
+  owid:
+    name: Our World in Data (grapher CSV mirrors)
+    endpoint: https://ourworldindata.org/grapher
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.owid
+    catalogue_url: https://ourworldindata.org/
+    vintage_behaviour: revisable
+    notes: 'Practical bridge for publishers whose primary machine-access paths are blocked (Transparency CPI, World Happiness Report, Gallup-derived trust, some WVS aggregates). series_id is the grapher
+      slug. CC-BY-4.0 with attribution flowback to the original publisher.
+
+      '
+  oecd_pmr:
+    name: OECD Product Market Regulation Indicators
+    endpoint: https://sdmx.oecd.org/public/rest
+    auth_required: false
+    license: oecd_terms
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.oecd_pmr
+    catalogue_url: https://www.oecd.org/economy/reform/indicators-of-product-market-regulation/
+    vintage_behaviour: append_only
+    notes: 'Thin wrapper around data.fetchers.oecd scoped to the PMR dataflows (OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2). Separate namespace so PMR''s regulatory-channel data keeps its own vintage history distinct
+      from general OECD economic indicators (invariant 4, channel separation).
+
+      '
+  singapore_cpf:
+    name: Singapore Central Provident Fund Board
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.cpf.gov.sg/member/infohub/reports-and-statistics
+    vintage_behaviour: append_only
+    notes: 'Needed for welfare_architecture_comparative_effectiveness.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/singapore_cpf/ and call data.fetchers.singapore_cpf.fetch().'
+    fetcher_module: data.fetchers.singapore_cpf
+  sama:
+    name: Saudi Arabian Monetary Authority (SAMA)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.sama.gov.sa/en-US/EconomicReports
+    vintage_behaviour: revisable
+    notes: 'All direct endpoint attempts returned 404 — SAMA reshuffled URLs and the reports section requires JS navigation. Data is public but requires headless-browser scrape. Deferred to scrape round.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/sama/ and call data.fetchers.sama.fetch().'
+    fetcher_module: data.fetchers.sama
+  gastat:
+    name: Saudi General Authority for Statistics (GASTAT)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.stats.gov.sa/en
+    vintage_behaviour: revisable
+    notes: 'Landing page renders but data links are JS-injected; static scrape returns no download URLs. Deferred to scrape round.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/gastat/ and call data.fetchers.gastat.fetch().'
+    fetcher_module: data.fetchers.gastat
+  opec:
+    name: OPEC Annual Statistical Bulletin + data portal
+    endpoint: https://asb.opec.org
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.opec.org/opec_web/en/data_graphs/330.htm
+    vintage_behaviour: append_only
+    notes: 'All probed URLs (asb.opec.org/data/ASB_Data.xlsx, PDF paths, landing) returned 403. OPEC''s CDN blocks automated fetchers regardless of UA/Referer. Deferred to scrape round.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/opec/ and call data.fetchers.opec.fetch().'
+    fetcher_module: data.fetchers.opec
+  singapore_moh:
+    name: Singapore Ministry of Health + MediShield
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.moh.gov.sg/resources-statistics
+    vintage_behaviour: append_only
+    notes: 'Needed for singapore_mediShield_vs_us_outcomes_comparison.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/singapore_moh/ and call data.fetchers.singapore_moh.fetch().'
+    fetcher_module: data.fetchers.singapore_moh
+  chile_spensiones:
+    name: Superintendencia de Pensiones de Chile (AFP system)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.spensiones.cl/
+    vintage_behaviour: append_only
+    notes: 'Chilean AFP forced-saving pension data.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/chile_spensiones/ and call data.fetchers.chile_spensiones.fetch().'
+    fetcher_module: data.fetchers.chile_spensiones
+  apra:
+    name: Australian Prudential Regulation Authority (superannuation)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.apra.gov.au/superannuation-statistics
+    vintage_behaviour: append_only
+    notes: 'Australian Superannuation forced-saving data.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/apra/ and call data.fetchers.apra.fetch().'
+    fetcher_module: data.fetchers.apra
+  swiss_fso:
+    name: Swiss Federal Statistical Office
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.bfs.admin.ch/bfs/en/home.html
+    vintage_behaviour: revisable
+    notes: 'Needed for switzerland_mixed_insurance_vs_us_comparison.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/swiss_fso/ and call data.fetchers.swiss_fso.fetch().'
+    fetcher_module: data.fetchers.swiss_fso
+  swiss_obsan:
+    name: Swiss Health Observatory (OBSAN)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: ready
+    catalogue_url: https://www.obsan.admin.ch/en
+    vintage_behaviour: revisable
+    notes: 'Healthcare outcome data for Swiss mixed-insurance comparator.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/swiss_obsan/ and call data.fetchers.swiss_obsan.fetch().'
+    fetcher_module: data.fetchers.swiss_obsan
+  pwt:
+    name: Penn World Tables 10.01 (GGDC Groningen)
+    endpoint: manual://data/manual/pwt/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.pwt
+    catalogue_url: https://www.rug.nl/ggdc/productivity/pwt/
+    vintage_behaviour: append_only
+    notes: Manual-drop (GGDC xlsx URLs 404 on automated; browser-download required). 183 countries 1950-2019, productivity + capital stocks + TFP + PPP. Drop pwt1001.xlsx into data/manual/pwt/.
+  wid:
+    name: World Inequality Database (WID, Piketty-Saez-Zucman et al.)
+    endpoint: manual://data/manual/wid/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.wid
+    catalogue_url: https://wid.world/data/
+    vintage_behaviour: append_only
+    notes: Manual-drop (bulk download URLs 403/404 on automated; browser flow required). Top income + wealth shares, labor share, per-country bulk CSVs.
+  hanke_tc:
+    name: Hanke Troubled Currencies Project
+    endpoint: manual://data/manual/hanke_tc/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.hanke_tc
+    catalogue_url: https://sites.krieger.jhu.edu/iae/
+    vintage_behaviour: append_only
+    notes: 'Manual compilation required. Monthly parallel-market inflation for post-2012 hyperinflation episodes (Venezuela 2016-2019, Lebanon 2019-2023, Turkey 2021-2023 near-threshold) supplementing the
+      2012 Hanke-Krus catalogue. CSV format: country_iso3,year,month,monthly_inflation_pct,source.'
+  unhcr:
+    name: UNHCR Refugee Data Finder
+    endpoint: https://api.unhcr.org/population/v1/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.unhcr
+    catalogue_url: https://www.unhcr.org/refugee-statistics/
+    vintage_behaviour: revisable
+    notes: 'Annual refugee, asylum-seeker, IDP, and stateless population by country. Free API, no key required. Data from 1975 for global totals, 2000+ for most country-level series. Gold standard for forced
+      displacement statistics.
+
+      '
+  unodc:
+    name: UN Office on Drugs and Crime — dataUNODC
+    endpoint: https://dataunodc.un.org/sites/dataunodc.un.org/files
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.unodc
+    catalogue_url: https://dataunodc.un.org/data
+    vintage_behaviour: append_only
+    notes: 'Crime and criminal-justice statistics (intentional homicide, violent and sexual crime, corruption/bribery, prison population) from the UNODC CTS (Crime Trend Survey). Bulk XLSX downloads from
+      dataunodc.un.org; no auth required. UNODC has reshuffled URLs multiple times — if a fetch returns 404 check https://dataunodc.un.org/data for current download links and update SERIES_MAP. Canonical
+      cross-country source for the crime axis (parallels OWID mirror of the same UNODC data for disagreement surfacing).
+
+      '
+  un_desa:
+    name: UN DESA Population Division — International Migrant Stock
+    endpoint: https://www.un.org/development/desa/pd/content/international-migrant-stock
+    auth_required: false
+    license: un_data_terms
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.un_desa
+    catalogue_url: https://www.un.org/development/desa/pd/content/international-migrant-stock
+    vintage_behaviour: revisable
+    notes: 'Citation-backed seed panel for VEN+CUB origin migrant stock derived from UN DESA IMS 2020 + UNHCR R4V 2021-2023 + Pew/MPI Cuba supplement. Manual XLSX drop into data/manual/un_desa/ supported
+      but not required; seed panel emitted unconditionally so the fetcher is deterministic.
+
+      '
+  faostat:
+    name: FAOSTAT (UN FAO Statistical Database)
+    endpoint: https://faostatservices.fao.org/api/v1/en/data/FBS
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.faostat
+    catalogue_url: https://www.fao.org/faostat/en/#data
+    vintage_behaviour: revisable
+    notes: 'Food Balance Sheets (FBS) bulk JSON/CSV API. Computes import-share of domestic supply (Grand Total quantity, tonnes) per country-year as the canonical food self-sufficiency proxy. Cuba area_code=32.
+      Tested window 2010-2023.
+
+      '
+  cuba_manual:
+    name: Cuba — manual academic + regulatory data
+    endpoint: manual://data/manual/cuba/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.cuba_manual
+    catalogue_url: https://www.un.org/development/desa/pd/content/international-migrant-stock
+    vintage_behaviour: stable
+    notes: 'Hand-curated Cuba-specific series (libreta persistence, monetary regime events, MLC retail) backed by academic monographs (Mesa-Lago) and Cuban official-gazette regulations. Each series has
+      a provenance markdown file under data/manual/cuba/ documenting the citation. See data/manual/cuba/_provenance.md for the index.
+
+      '
+  bcra:
+    name: Banco Central de la República Argentina
+    endpoint: https://api.bcra.gob.ar/
+    auth_required: false
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.argentina
+    catalogue_url: https://www.bcra.gob.ar/PublicacionesEstadisticas/
+    vintage_behaviour: revisable
+    notes: 'BCRA Estadisticas Monetarias REST API v3.0 (JSON). Argentina''s central bank: monetary base, M2/M3, international reserves, FX rates, policy rates (Leliq/Pases/Tasa Politica), and BCRA-published
+      monthly inflation. SSL chain is periodically out-of-date; fetcher disables verification and suppresses the urllib3 InsecureRequestWarning. Canonical source for the hyperinflation / fiscal-dominance
+      / Peronism-cycle hypothesis family, bypassing the IMF-WEO attenuation caused by the 2007-2015 INDEC falsification period.
+
+      '
+  indec:
+    name: Instituto Nacional de Estadística y Censos (via datos.gob.ar)
+    endpoint: https://apis.datos.gob.ar/series/api/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.argentina
+    catalogue_url: https://datos.gob.ar/
+    vintage_behaviour: revisable
+    notes: 'INDEC series accessed through the Argentine open-data portal (apis.datos.gob.ar/series) which aggregates INDEC with other public agencies. INDEC CPI and GDP-deflator data 2007-2015 are considered
+      falsified (Kirchner-era intervention); tier 2 reflects that historical credibility problem. Post-2016 data (Macri-reconstructed methodology) is treated as tier 1 by most users.
+
+      '
+  bcv:
+    name: Banco Central de Venezuela
+    endpoint: https://www.bcv.org.ve/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.bcv
+    catalogue_url: https://www.bcv.org.ve/estadisticas/agregados-monetarios
+    vintage_behaviour: revisable
+    notes: Venezuelan central bank monetary aggregates. Post-2016 publications became sporadic; Hanke and DolarToday are credibility checks. Tier 3 reflects regime-era reliability concerns.
+  dolartoday:
+    name: DolarToday Parallel Bolivar Rate
+    endpoint: https://dolartoday.com/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.dolartoday
+    catalogue_url: https://dolartoday.com/
+    vintage_behaviour: append_only
+    notes: Parallel-market USD/VES rate during Venezuelan currency controls. Used as a market-based cross-check on official BCV rate during the 2013-2021 hyperinflation episode.
+  eia:
+    name: US Energy Information Administration
+    endpoint: https://api.eia.gov/v2
+    auth_required: true
+    auth_env_var: EIA_API_KEY
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.eia
+    catalogue_url: https://www.eia.gov/opendata/
+    vintage_behaviour: revisable
+    notes: US EIA Open Data API v2 (JSON). Energy production, consumption, prices, electricity, petroleum. Free API key required.
+  encovi_ucab:
+    name: ENCOVI — Encuesta Nacional de Condiciones de Vida (UCAB)
+    endpoint: manual://data/manual/encovi_ucab/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.encovi_ucab
+    catalogue_url: https://www.proyectoencovi.com/
+    vintage_behaviour: append_only
+    notes: Independent Venezuelan living-conditions survey run by UCAB (Universidad Catolica Andres Bello) as substitute for INE-Venezuela household survey suspended in 2014. Manual-drop publisher.
+  news_archive:
+    name: News Archive (curated event chronology)
+    endpoint: manual://data/manual/news_archive/
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: ready
+    fetcher_module: data.fetchers.news_archive
+    catalogue_url: ''
+    vintage_behaviour: append_only
+    notes: Hand-curated event chronology pulled from press archives (Reuters/AP/local) for case-study hypotheses. Each entry carries a per-event citation; treated as tier 4 evidence.
+  derived:
+    name: Derived in-script (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker indicating the variable is computed in-script from already-fetched inputs. Use only when the recipe is documented in the hypothesis YAML or its coding doc.
+  manual:
+    name: Manual transcription (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker indicating the variable was manually transcribed from a primary source documented per-cell. Used in case-study YAMLs.
+  fallback:
+    name: Fallback / interim placeholder (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker indicating an interim fallback while primary publisher coverage is built. Author MUST replace with a real publisher token before run.
+  proxies:
+    name: Proxy variable (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker indicating the variable is a proxy whose mapping to the latent construct is documented in the coding doc.
+  microdata:
+    name: Microdata extract (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker indicating the variable is built from a unit-record microdata extract (LIS, IPUMS, restricted-access census). Underlying source documented per hypothesis.
+  dates:
+    name: Calendar / event date (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker for treatment dates / regime-change dates that are pinned to a documented narrative source rather than a numeric series.
+  academic:
+    name: Academic citation (provenance marker)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: stable
+    notes: Not a publisher — provenance marker for variables whose values are taken directly from a published academic paper or working paper. Citation MUST appear in the hypothesis evidence block.
+  ine:
+    name: Instituto Nacional de Estadística (Spain)
+    endpoint: https://servicios.ine.es/wstempus/js/ES
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.ine
+    catalogue_url: https://www.ine.es/dyngs/INEbase/
+    vintage_behaviour: revisable
+    notes: Spanish national statistics. JSON Tempus3 API (DATOS_TABLA / DATOS_SERIE). Fetcher exposes a curated catalogue (IPC, EPA, CNTR, ECV) and accepts raw table/serie codes via function/code overrides.
+  ons:
+    name: Office for National Statistics (UK)
+    endpoint: https://www.ons.gov.uk/timeseries/
+    auth_required: false
+    license: ogl_uk_3_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.ons
+    catalogue_url: https://www.ons.gov.uk/
+    vintage_behaviour: revisable
+    notes: 'UK ONS legacy timeseries JSON endpoint (www.ons.gov.uk/timeseries/<cdid>/<dataset>/data). Each series is identified by a CDID + dataset pair (e.g. ABMI/UKEA for chained-volume GDP, D7BT/MM23
+      for CPI, MGSX/LMS for ILO unemployment). Pairs registered in data/fetchers/ons.py SUPPORTED; pass dataset=<code> kwarg to fetch additional series ad hoc. Beta API at api.beta.ons.gov.uk used only
+      for catalogue browsing.
+
+      '
+  istat:
+    name: Istituto Nazionale di Statistica (Italy)
+    endpoint: https://sdmx.istat.it/SDMXWS/rest
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: http://dati.istat.it/
+    vintage_behaviour: revisable
+    notes: Italian national statistics. SDMX 2.1 API. Fetcher TBD.
+  insee:
+    name: Institut national de la statistique (France)
+    endpoint: https://api.insee.fr/series/BDM/V1
+    auth_required: true
+    auth_env_var: INSEE_API_KEY
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.insee.fr/fr/accueil
+    vintage_behaviour: revisable
+    notes: French national statistics. BDM SDMX API; free API key. Fetcher TBD.
+  destatis:
+    name: Statistisches Bundesamt (Germany)
+    endpoint: https://www-genesis.destatis.de/genesisWS/rest
+    auth_required: false
+    auth_env_var: GENESIS_USER
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.destatis
+    catalogue_url: https://www-genesis.destatis.de/
+    aliases:
+    - destatis_germany
+    vintage_behaviour: revisable
+    notes: German national statistics (GENESIS-Online REST 2020). Defaults to GAST guest auth; set GENESIS_USER + GENESIS_PASS for higher quotas / restricted tables. Supported tables include 42153 (industrial
+      production), 61111 (CPI), 81000 (GDP), 62121 (earnings), 13231 (labour-force participation, Mikrozensus).
+  scb:
+    name: Statistics Sweden (SCB)
+    endpoint: https://api.scb.se/OV0104/v1/doris/en/ssd
+    auth_required: false
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.scb
+    catalogue_url: https://www.scb.se/en/
+    vintage_behaviour: revisable
+    notes: 'Swedish national statistics — PxWeb JSON-stat 2.0 API. POST per-table endpoint with a query body; no auth, CC0 licence. Supported aliases: cpi (PR/PR0101/PR0101A/KPItotM), gdp (NR/NR0103/NR0103A/NR0103ENS2010T01A),
+      population (BE/BE0101/BE0101A/BefolkningNy), unemployment (AM/AM0401/AM0401A/NAKUBefolkning2Ny). Bare table paths fall back to a wildcard query built from table metadata.'
+  ssb:
+    name: Statistics Norway (SSB)
+    endpoint: https://data.ssb.no/api/v0
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.ssb
+    catalogue_url: https://www.ssb.no/en
+    vintage_behaviour: revisable
+    notes: 'Norwegian national statistics — PXWeb JSON-stat 2.0 API. POST per-table endpoint (/en/table/<id>/) with a query body; no auth. NLOD 2.0 licence (treated as cc_by_4_0 in this registry). Supported
+      aliases: GDP (09190), formuesskatt_base (04476 — wealth-tax base), skatteinntekter (12404 — general-government tax revenue), utvandring (05753 — immigration/emigration by citizenship). Bare table
+      ids fall back to a wildcard query built from table metadata.'
+  riksbank:
+    name: Sveriges Riksbank (Swedish central bank)
+    endpoint: https://api.riksbank.se/swea/v1
+    auth_required: false
+    license: public_domain
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.riksbank.se/en-gb/statistics/
+    vintage_behaviour: revisable
+    notes: Swedish central bank — SWEA REST API. Policy rate, FX, monetary aggregates. Fetcher TBD.
+  ksh:
+    name: Hungarian Central Statistical Office (KSH)
+    endpoint: https://statinfo.ksh.hu/Statinfo/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.ksh.hu/?lang=en
+    vintage_behaviour: revisable
+    notes: Hungarian national statistics. Web-table downloads, programmatic access TBD.
+  mnb:
+    name: Magyar Nemzeti Bank (Hungarian central bank)
+    endpoint: https://www.mnb.hu/en/statistics
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.mnb.hu/en/statistics
+    vintage_behaviour: revisable
+    notes: Hungarian central bank. Bulk XLSX downloads on statistics page. Fetcher TBD.
+  eu_klems:
+    name: EU KLEMS Productivity Database
+    endpoint: https://euklems-intanprod-llee.luiss.it/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.eu_klems
+    catalogue_url: https://euklems-intanprod-llee.luiss.it/
+    vintage_behaviour: append_only
+    notes: 'EU KLEMS productivity & growth accounts (LUISS-hosted release). Industry-level TFP, labour, capital. Fetcher tries auto-download of the bulk zip from euklems-intanprod-llee.luiss.it; falls back
+      to manual-drop in data/manual/eu_klems/ (zip/xlsx/xls/csv accepted) if the URL changes between vintages.
+
+      '
+  aeat:
+    name: Agencia Estatal de Administracion Tributaria (Spain)
+    endpoint: https://sede.agenciatributaria.gob.es/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://sede.agenciatributaria.gob.es/AEAT/Contenidos_Comunes/La_Agencia_Tributaria/Estadisticas/
+    vintage_behaviour: revisable
+    notes: Spanish tax agency. Wealth-tax (patrimonio) and income-tax statistics. Fetcher TBD.
+  minefi:
+    name: Ministere de l'Economie et des Finances (France)
+    endpoint: https://data.economie.gouv.fr/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://data.economie.gouv.fr/
+    vintage_behaviour: revisable
+    notes: French finance ministry open-data portal. ISF/IFI tax base, recettes fiscales. Fetcher TBD.
+  bundesarchiv:
+    name: Bundesarchiv (German Federal Archives)
+    endpoint: https://www.bundesarchiv.de/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.bundesarchiv.de/EN/Navigation/Home/home.html
+    vintage_behaviour: stable
+    notes: German Federal Archives. Used as primary-source citation for historical-narrative case studies (Weimar, GDR). Manual access; not a numeric API.
+  sv_bcr:
+    name: Banco Central de Reserva (El Salvador)
+    endpoint: https://www.bcr.gob.sv/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.sv_bcr
+    catalogue_url: https://www.bcr.gob.sv/en/estadisticas-y-publicaciones
+    vintage_behaviour: revisable
+    notes: 'El Salvador central bank. Monetary, banking, FX, real-sector statistics. No public REST/SDMX API; data ships as PDF reports + Excel sheets linked from publication pages and the regulaciones/upload_files
+      file repository (URLs rotate per release vintage). Manual-drop pattern: user downloads latest workbook and places under data/manual/sv_bcr/ using the series prefix (pib_real_quarterly, inflation_cpi,
+      fdi_inflows, monetary_aggregates). El Salvador has been dollarised since 2001 so all monetary aggregates are USD-denominated.
+
+      MANUAL-DROP pattern: drop file(s) into data/manual/sv_bcr/ and call data.fetchers.sv_bcr.fetch(series_id=...).'
+  sv_cnr:
+    name: Centro Nacional de Registros (El Salvador)
+    endpoint: https://www.cnr.gob.sv/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.cnr.gob.sv/
+    vintage_behaviour: revisable
+    notes: El Salvador property and commercial registry. Used for housing/title-formalisation hypotheses. Endpoint TBD.
+  sv_pnc:
+    name: Policia Nacional Civil (El Salvador)
+    endpoint: https://www.pnc.gob.sv/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.pnc.gob.sv/portal/page/portal/informativo/estadisticas
+    vintage_behaviour: append_only
+    notes: El Salvador police homicide and crime statistics. Used in Bukele crackdown / mass-incarceration hypotheses. Fetcher TBD; cross-check against UNODC.
+  sv_mitur:
+    name: Ministerio de Turismo (El Salvador)
+    endpoint: https://www.mitur.gob.sv/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.mitur.gob.sv/estadisticas/
+    vintage_behaviour: append_only
+    notes: El Salvador tourism ministry. Visitor arrivals, tourism receipts. Fetcher TBD.
+  ipeadata:
+    name: IPEADATA (Brazil — Instituto de Pesquisa Economica Aplicada)
+    endpoint: http://www.ipeadata.gov.br/api/odata4/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.ipeadata
+    catalogue_url: http://www.ipeadata.gov.br/
+    vintage_behaviour: revisable
+    aliases:
+    - ipea
+    - brazil_ipea
+    notes: 'OData v4 JSON API. ValoresSerie(SERCODIGO=...) returns per-period rows with VALDATA + VALVALOR. Curated SUPPORTED covers IPCA inflation, monthly GDP, statutory minimum wage, PNAD Contínua unemployment,
+      and Bolsa Família coverage. Raw SERCODIGOs may be passed through directly.
+
+      '
+  brazil_stn:
+    name: Tesouro Nacional (Brazil)
+    endpoint: https://www.tesourotransparente.gov.br/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.tesourotransparente.gov.br/
+    vintage_behaviour: revisable
+    notes: Brazilian National Treasury fiscal statistics. Monthly fiscal accounts, gross/net debt. Fetcher TBD.
+  banrep:
+    name: Banco de la Republica (Colombia)
+    endpoint: https://www.banrep.gov.co/
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.banrep.gov.co/en/statistics
+    vintage_behaviour: revisable
+    notes: Colombian central bank. Monetary aggregates, FX, policy rates. Fetcher TBD.
+  dian:
+    name: Direccion de Impuestos y Aduanas Nacionales (Colombia)
+    endpoint: https://www.dian.gov.co/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.dian.gov.co/dian/cifras/Paginas/EstadisticasRecaudo.aspx
+    vintage_behaviour: revisable
+    notes: Colombian tax authority. Patrimonio (wealth tax) declared base, monthly tax collections. Fetcher TBD.
+  indec_ipc:
+    name: INDEC IPC (Argentine national CPI)
+    endpoint: https://www.indec.gob.ar/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31
+    vintage_behaviour: revisable
+    notes: INDEC consumer price index — separate token from generic indec because hyperinflation hypotheses cite the IPC series specifically. 2007-2015 vintage tier-2 (falsified). Fetcher TBD; may be served
+      via existing argentina.py.
+  pdvsa:
+    name: Petroleos de Venezuela (PDVSA)
+    endpoint: https://www.pdvsa.com/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.pdvsa.com/index.php?option=com_content&view=article&id=6537&Itemid=908&lang=es
+    vintage_behaviour: append_only
+    notes: Venezuelan state oil company. Production, exports, refining capacity. Self-reported and patchy post-2015; cross-check against OPEC and IEA. Fetcher TBD.
+  enap:
+    name: ENAP (Empresa Nacional del Petroleo, Chile)
+    endpoint: https://www.enap.cl/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.enap.cl/inversionistas
+    vintage_behaviour: append_only
+    notes: Chilean state oil company financials and operations. Fetcher TBD.
+  ypf:
+    name: YPF S.A. (Argentina)
+    endpoint: https://www.ypf.com/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://inversores.ypf.com/
+    vintage_behaviour: append_only
+    notes: Argentine state-controlled oil company financials. Used in nationalisation case studies. Fetcher TBD.
+  pemex:
+    name: Petroleos Mexicanos (PEMEX)
+    endpoint: https://www.pemex.com/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.pemex.com/ri/Paginas/default.aspx
+    vintage_behaviour: append_only
+    notes: Mexican state oil company financials and production. Fetcher TBD.
+  cepal:
+    name: CEPAL / ECLAC (UN Economic Commission for Latin America)
+    endpoint: https://statistics.cepal.org/portal/cepalstat/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://statistics.cepal.org/portal/cepalstat/
+    vintage_behaviour: revisable
+    notes: CEPAL/ECLAC statistics portal. LatAm-wide harmonised macro and social indicators. Fetcher TBD.
+  mef:
+    name: Ministerio de Economia y Finanzas (regional finance ministry)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: revisable
+    notes: Generic finance-ministry token used in multiple LatAm hypotheses (Peru, Panama, etc.). Concrete country resolution happens at hypothesis-wiring time. Endpoint TBD.
+  cbr:
+    name: Bank of Russia (Central Bank of the Russian Federation)
+    endpoint: https://www.cbr.ru/eng/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.cbr.ru/eng/statistics/
+    vintage_behaviour: revisable
+    notes: Russian central bank. Tier 3 reflects post-2022 sanctions-era reporting opacity. Fetcher TBD.
+  rosstat:
+    name: Federal State Statistics Service (Rosstat)
+    endpoint: https://rosstat.gov.ru/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://rosstat.gov.ru/
+    vintage_behaviour: revisable
+    notes: Russian national statistics. Tier 3 post-2022; cross-check against external estimates (CBR, BIS). Fetcher TBD.
+  minfin:
+    name: Ministry of Finance (Russia)
+    endpoint: https://minfin.gov.ru/en/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://minfin.gov.ru/en/statistics/
+    vintage_behaviour: revisable
+    notes: Russian Ministry of Finance fiscal statistics. Fetcher TBD.
+  rbz:
+    name: Reserve Bank of Zimbabwe
+    endpoint: https://www.rbz.co.zw/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.rbz.co.zw/en/research/statistics.html
+    vintage_behaviour: revisable
+    notes: Zimbabwean central bank. Used in 2007-2009 hyperinflation case study. Tier 3; cross-check against Hanke. Fetcher TBD.
+  havana_consulting_group:
+    name: Havana Consulting Group (Cuba remittances)
+    endpoint: https://www.thehavanaconsultinggroup.com/
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: https://www.thehavanaconsultinggroup.com/
+    vintage_behaviour: append_only
+    notes: Private consulting estimates of Cuban remittances. Used as cross-check against World Bank remittance prices. Tier 4 — single-firm estimate. Manual.
+  oficina_nacional_estadistica_cuba:
+    name: Oficina Nacional de Estadistica e Informacion (Cuba)
+    endpoint: https://www.onei.gob.cu/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.onei.gob.cu/
+    vintage_behaviour: revisable
+    notes: Cuban national statistics office. Annual statistical yearbook (AEC) PDF/XLS releases. Fetcher TBD; may overlap with cuba_manual drops.
+  minag_cuba:
+    name: Ministerio de la Agricultura (Cuba)
+    endpoint: https://www.minag.gob.cu/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.minag.gob.cu/
+    vintage_behaviour: revisable
+    notes: Cuban Ministry of Agriculture. Used for libreta-rationing and food-self-sufficiency hypotheses. Fetcher TBD.
+  capmas:
+    name: Central Agency for Public Mobilization and Statistics (Egypt)
+    endpoint: https://www.capmas.gov.eg/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.capmas.gov.eg/HomePage.aspx?lang=2
+    vintage_behaviour: revisable
+    notes: Egyptian national statistics. Fetcher TBD.
+  cbe:
+    name: Central Bank of Egypt
+    endpoint: https://www.cbe.org.eg/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.cbe.org.eg/en/economic-research/statistics
+    vintage_behaviour: revisable
+    notes: Central Bank of Egypt monetary and FX statistics. Fetcher TBD.
+  tcmb:
+    name: Central Bank of the Republic of Turkey (TCMB)
+    endpoint: https://evds2.tcmb.gov.tr/service/evds/
+    auth_required: true
+    auth_env_var: TCMB_API_KEY
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.tcmb
+    catalogue_url: https://evds2.tcmb.gov.tr/
+    vintage_behaviour: revisable
+    notes: Turkish central bank EVDS data API. Free key registration. Used in Erdogan-era policy-rate hypotheses. Graceful no-auth fallback returns placeholder frame in dev.
+  tuik:
+    name: Turkish Statistical Institute (TUIK)
+    endpoint: https://data.tuik.gov.tr/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.tuik
+    catalogue_url: https://data.tuik.gov.tr/
+    vintage_behaviour: revisable
+    notes: Turkish national statistics. CPI methodology disputes 2021-2023 — cross-check against ENAGrup independent index. HTTP-first fetch via biruni.tuik.gov.tr indicator API with manual-drop fallback
+      under data/manual/tuik/.
+  cbsl:
+    name: Central Bank of Sri Lanka
+    endpoint: https://www.cbsl.gov.lk/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.cbsl.gov.lk/en/statistics
+    vintage_behaviour: revisable
+    notes: Sri Lankan central bank. Used in 2022 default / hyperinflation-adjacent case study. Fetcher TBD.
+  dcs:
+    name: Department of Census and Statistics (Sri Lanka)
+    endpoint: http://www.statistics.gov.lk/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: http://www.statistics.gov.lk/
+    vintage_behaviour: revisable
+    notes: Sri Lankan national statistics. Fetcher TBD.
+  bog:
+    name: Bank of Ghana
+    endpoint: https://www.bog.gov.gh/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.bog.gov.gh/economic-data/
+    vintage_behaviour: revisable
+    notes: Bank of Ghana monetary statistics. Fetcher TBD.
+  bank_of_korea:
+    name: Bank of Korea
+    endpoint: https://ecos.bok.or.kr/api/
+    auth_required: true
+    auth_env_var: BOK_API_KEY
+    license: unknown
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://ecos.bok.or.kr/
+    vintage_behaviour: revisable
+    notes: Korean central bank ECOS API (free key). Monetary, FX, real-economy series. Fetcher TBD.
+  israel_cbs:
+    name: Israel Central Bureau of Statistics
+    endpoint: https://www.cbs.gov.il/
+    auth_required: false
+    license: unknown
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.cbs.gov.il/en/Pages/default.aspx
+    vintage_behaviour: revisable
+    notes: Israeli national statistics. Fetcher TBD.
+  agora:
+    name: Agora Energiewende
+    endpoint: https://www.agora-energiewende.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.agora-energiewende.org/data-tools/
+    vintage_behaviour: append_only
+    notes: German think-tank — high-frequency German + EU electricity-system tracker (Agorameter). Fetcher TBD.
+  eea:
+    name: European Environment Agency
+    endpoint: https://www.eea.europa.eu/data-and-maps
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.eea
+    catalogue_url: https://www.eea.europa.eu/en/datahub
+    vintage_behaviour: revisable
+    notes: 'EU environmental indicators. Two series wired: eu_ets_verified_emissions (data hub item 9d3fbb4f-...) and greenhouse_gas_inventory (4b8d1744-...). Bulk CSVs ship from sdi.eea.europa.eu / discomap;
+      fetcher tries an ordered candidate list and falls back to a bootstrap-stub row if all URLs are unreachable (extra.bootstrap=True flag for auditability).'
+  eex:
+    name: European Energy Exchange (EEX)
+    endpoint: https://www.eex.com/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.eex.com/en/market-data
+    vintage_behaviour: append_only
+    notes: European wholesale energy and emissions exchange. Spot and futures prices for EUA, power, gas. Subscription / market-data terms. Fetcher TBD.
+  entsoe:
+    name: ENTSO-E Transparency Platform
+    endpoint: https://web-api.tp.entsoe.eu/api
+    auth_required: true
+    auth_env_var: ENTSOE_API_KEY
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://transparency.entsoe.eu/
+    vintage_behaviour: append_only
+    notes: European electricity TSOs transparency platform. Generation, load, cross-border flows, day-ahead prices. Free API key. Fetcher TBD.
+  bnetza:
+    name: Bundesnetzagentur (German Federal Network Agency)
+    endpoint: https://www.smard.de/home/downloadcenter/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.smard.de/
+    vintage_behaviour: append_only
+    notes: German electricity market data via SMARD download centre. Fetcher TBD.
+  irena:
+    name: International Renewable Energy Agency (IRENA)
+    endpoint: https://pxweb.irena.org/api/v1/en/IRENASTAT
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.irena
+    catalogue_url: https://www.irena.org/Data
+    vintage_behaviour: append_only
+    notes: IRENA Renewable Capacity Statistics via PxWeb (PC-Axis) JSON-stat 2.0 API. Cycle suffix in table names (RECAP_<YEAR>_cycle<N>.px) bumps annually; fetcher tries the latest known cycles in order.
+      LCOE series (lcoe_solar_pv, lcoe_wind_onshore) and any PxWeb failure fall back to MANUAL-DROP under data/manual/irena/ — drop the latest Renewable Power Generation Costs or Renewable Capacity Statistics
+      XLSX/CSV there. License treated as unknown per IESET schema (IRENA terms = "free for use with attribution").
+  ema_fda_comparative:
+    name: EMA / FDA comparative regulatory dataset (constructed)
+    endpoint: ''
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: append_only
+    notes: Hand-curated comparative table of EMA vs FDA approval timelines and outcomes used in regulatory-friction hypotheses. Source files compiled per-hypothesis; no single endpoint.
+  iea:
+    name: International Energy Agency
+    endpoint: https://www.iea.org/data-and-statistics
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.iea
+    catalogue_url: https://www.iea.org/data-and-statistics/data-product
+    vintage_behaviour: revisable
+    notes: 'IEA energy statistics. Most core IEA data is paywalled; the free public datasets (Energy Prices, Fossil-Fuel Subsidies, CO2 Highlights) sit behind Cloudflare gating that blocks plain HTTP fetches.
+      MANUAL-DROP pattern: drop the IEA-published CSV/XLSX into data/manual/iea/<series_id>/ and call data.fetchers.iea.fetch(series_id). Supported series: industrial_electricity_price, fossil_subsidies_estimate,
+      co2_emissions_from_fuel_combustion.'
+  noaa_viirs:
+    name: NOAA VIIRS Nightlights
+    endpoint: https://eogdata.mines.edu/products/vnl/
+    auth_required: false
+    license: public_domain
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://eogdata.mines.edu/products/vnl/
+    vintage_behaviour: append_only
+    notes: VIIRS night-lights monthly composites (Earth Observation Group, Colorado School of Mines). Used as activity proxy in opaque-data regimes. Fetcher TBD.
+  bloomberg_sov:
+    name: Bloomberg sovereign-rates terminal extract
+    endpoint: ''
+    auth_required: true
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.bloomberg.com/professional/
+    vintage_behaviour: append_only
+    notes: Sovereign yield-curve and CDS quotes pulled from Bloomberg Terminal. Subscription only; requires manual export. Used for sovereign-debt hypotheses where FRED/ECB coverage is thin.
+  jp_morgan_embi:
+    name: JP Morgan EMBI Global Diversified
+    endpoint: ''
+    auth_required: true
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.jpmorgan.com/insights/research/index-research/embi
+    vintage_behaviour: append_only
+    notes: Emerging-market sovereign bond spread index. Subscription. Manual snapshot expected.
+  jpmorgan:
+    name: JP Morgan research / data extracts
+    endpoint: ''
+    auth_required: true
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.jpmorgan.com/insights/research
+    vintage_behaviour: append_only
+    notes: Generic JP Morgan research-note token. Manual extracts cited per-hypothesis.
+  ice:
+    name: Intercontinental Exchange (ICE)
+    endpoint: https://www.theice.com/market-data
+    auth_required: true
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.theice.com/market-data
+    vintage_behaviour: append_only
+    notes: ICE market data (energy, FX, credit). Subscription. Manual snapshots.
+  pitchbook:
+    name: PitchBook (private-market database)
+    endpoint: ''
+    auth_required: true
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://pitchbook.com/
+    vintage_behaviour: append_only
+    notes: Private-market deal and valuation database. Subscription only. Manual extracts.
+  nvca:
+    name: National Venture Capital Association (US)
+    endpoint: https://nvca.org/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://nvca.org/research/pitchbook-nvca-venture-monitor/
+    vintage_behaviour: append_only
+    notes: PitchBook-NVCA Venture Monitor PDF + XLSX. Quarterly. Fetcher TBD; manual drop expected.
+  crunchbase:
+    name: Crunchbase
+    endpoint: https://api.crunchbase.com/api/v4
+    auth_required: true
+    auth_env_var: CRUNCHBASE_API_KEY
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.crunchbase.com/
+    vintage_behaviour: revisable
+    notes: Crunchbase startup database. Subscription API. Fetcher TBD.
+  cbinsights:
+    name: CB Insights
+    endpoint: ''
+    auth_required: true
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.cbinsights.com/
+    vintage_behaviour: append_only
+    notes: CB Insights startup and venture analytics. Subscription only. Manual extracts.
+  invest_europe:
+    name: Invest Europe (formerly EVCA)
+    endpoint: https://www.investeurope.eu/
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.investeurope.eu/research/data-and-insight/
+    vintage_behaviour: append_only
+    notes: European VC/PE association statistics. Annual yearbook PDF/XLSX. Fetcher TBD.
+  epo:
+    name: European Patent Office
+    endpoint: https://ops.epo.org/
+    auth_required: true
+    auth_env_var: EPO_OPS_KEY
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.epo.org/en/searching-for-patents/data
+    vintage_behaviour: revisable
+    notes: EPO Open Patent Services API. Free key. Used in patenting/innovation hypotheses. Fetcher TBD.
+  it_product:
+    name: IT product / commercial database (placeholder)
+    endpoint: ''
+    auth_required: true
+    license: unknown
+    credibility_tier: 3
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: append_only
+    notes: Generic placeholder used in regulatory-friction hypotheses for commercial IT-product databases (e.g. App Store / Play Store snapshots). Concrete vendor TBD per hypothesis.
+  unctad:
+    name: UNCTAD (UN Conference on Trade and Development)
+    endpoint: https://unctadstat.unctad.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.unctad
+    catalogue_url: https://unctadstat.unctad.org/EN/
+    vintage_behaviour: revisable
+    notes: UNCTAD trade and FDI statistics. Bulk CSV downloads from unctadstat-api.unctad.org. SUPPORTED series_ids in the fetcher module (US.FDI, US.FDIstock, US.TradeMerchTotal, US.TradeServ, US.GVCParticipation).
+  ilo:
+    name: International Labour Organization (root)
+    endpoint: https://rplumber.ilo.org/data
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://ilostat.ilo.org/data/
+    aliases: []
+    vintage_behaviour: revisable
+    notes: ILO root-level token (not the ILOSTAT-specific endpoint). Reserved for non-ILOSTAT ILO publications (IRLEX, ILO Department reports). Fetcher TBD.
+  unu_wider:
+    name: UNU-WIDER (World Income Inequality Database / GRD)
+    endpoint: https://www.wider.unu.edu/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.wider.unu.edu/data
+    vintage_behaviour: append_only
+    notes: UNU-WIDER GRD (Government Revenue Dataset) and WIID. Fetcher TBD.
+  ebrd:
+    name: European Bank for Reconstruction and Development
+    endpoint: https://www.ebrd.com/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.ebrd.com/economic-research-and-data/data-and-statistics.html
+    vintage_behaviour: revisable
+    notes: EBRD transition indicators and country-level data. Fetcher TBD.
+  world_bank_remittance_prices:
+    name: World Bank Remittance Prices Worldwide
+    endpoint: https://remittanceprices.worldbank.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://remittanceprices.worldbank.org/sites/default/files/rpw_main_report_and_dataset/
+    vintage_behaviour: append_only
+    notes: Quarterly remittance-corridor cost survey. Bulk CSV. Fetcher TBD.
+  world_bank_enterprise:
+    name: World Bank Enterprise Surveys
+    endpoint: https://www.enterprisesurveys.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.enterprisesurveys.org/en/data
+    vintage_behaviour: append_only
+    notes: Firm-level cross-country survey on business climate, regulatory burden, finance access. Fetcher TBD.
+  human_fertility_database:
+    name: Human Fertility Database (MPIDR + VID)
+    endpoint: https://www.humanfertility.org/
+    auth_required: true
+    license: academic_citation
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.humanfertility.org/Data/Downloads
+    vintage_behaviour: append_only
+    notes: Period and cohort fertility series. Free registration required. Fetcher TBD.
+  human_mortality_database:
+    name: Human Mortality Database (UCB + MPIDR)
+    endpoint: https://www.mortality.org/
+    auth_required: true
+    license: academic_citation
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.mortality.org/Data/ZippedDataFiles
+    vintage_behaviour: append_only
+    notes: Long-run period and cohort life tables. Free registration required. Fetcher TBD.
+  gss:
+    name: General Social Survey (NORC at U Chicago)
+    endpoint: https://gss.norc.org/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://gss.norc.org/get-the-data
+    vintage_behaviour: append_only
+    notes: US General Social Survey microdata. Used in trust / social-cohesion hypotheses. Fetcher TBD.
+  icij:
+    name: International Consortium of Investigative Journalists (Offshore Leaks)
+    endpoint: https://offshoreleaks.icij.org/
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: https://offshoreleaks.icij.org/pages/database
+    vintage_behaviour: append_only
+    notes: ICIJ Offshore Leaks combined database (Panama, Paradise, Pandora). Bulk CSV. Used in capital-flight / wealth-tax-avoidance hypotheses. Fetcher TBD.
+  un_comtrade:
+    name: UN Comtrade
+    endpoint: https://comtradeapi.un.org/data/v1/get
+    auth_required: true
+    auth_env_var: UN_COMTRADE_KEY
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://comtradeplus.un.org/
+    vintage_behaviour: revisable
+    notes: UN bilateral merchandise-trade database. Free key with quota. Fetcher TBD.
+  un_igme:
+    name: UN Inter-agency Group for Child Mortality Estimation
+    endpoint: https://childmortality.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://childmortality.org/data
+    vintage_behaviour: append_only
+    notes: UN IGME child-mortality estimates. Annual XLSX. Fetcher TBD.
+  un_wpp:
+    name: UN World Population Prospects
+    endpoint: https://population.un.org/wpp/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://population.un.org/wpp/Download/Standard/CSV/
+    vintage_behaviour: revisable
+    notes: UN DESA Population Division WPP. Bulk CSV. Fetcher TBD.
+  iom:
+    name: International Organization for Migration
+    endpoint: https://www.iom.int/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://migrationdataportal.org/
+    vintage_behaviour: revisable
+    notes: IOM Migration Data Portal. Fetcher TBD.
+  onu_habitat:
+    name: UN-Habitat
+    endpoint: https://data.unhabitat.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://data.unhabitat.org/
+    vintage_behaviour: revisable
+    notes: UN-Habitat urban indicators data hub. Fetcher TBD.
+  fao:
+    name: Food and Agriculture Organization (root)
+    endpoint: https://www.fao.org/faostat/en/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.fao.org/statistics/en/
+    aliases: []
+    vintage_behaviour: revisable
+    notes: FAO root-level token (non-FAOSTAT FAO publications). FAOSTAT-specific dataflows go through faostat publisher. Fetcher TBD.
+  wfp:
+    name: World Food Programme
+    endpoint: https://dataviz.vam.wfp.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://dataviz.vam.wfp.org/
+    vintage_behaviour: append_only
+    notes: WFP food-security indicators (Hunger Map, market prices). Fetcher TBD.
+  wto:
+    name: World Trade Organization
+    endpoint: https://stats.wto.org/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://stats.wto.org/
+    vintage_behaviour: revisable
+    notes: WTO trade statistics portal. Fetcher TBD.
+  itu:
+    name: International Telecommunication Union
+    endpoint: https://www.itu.int/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
+    vintage_behaviour: revisable
+    notes: ITU ICT indicators. Fetcher TBD.
+  wipo:
+    name: World Intellectual Property Organization
+    endpoint: https://www.wipo.int/ipstats/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.wipo.int/ipstats/en/
+    vintage_behaviour: revisable
+    notes: WIPO IP statistics — patent, trademark, design filings. Fetcher TBD.
+  kipo:
+    name: Korean Intellectual Property Office
+    endpoint: https://www.kipo.go.kr/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: pending
+    catalogue_url: https://www.kipo.go.kr/en/
+    vintage_behaviour: revisable
+    notes: KIPO patent statistics. Fetcher TBD.
+  cia:
+    name: CIA World Factbook (curated extract)
+    endpoint: https://www.cia.gov/the-world-factbook/
+    auth_required: false
+    license: public_domain
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.cia.gov/the-world-factbook/
+    vintage_behaviour: revisable
+    notes: CIA World Factbook country profiles. Used as fallback for hard-to-source basic indicators. Fetcher TBD.
+  uscbp:
+    name: US Customs and Border Protection
+    endpoint: https://www.cbp.gov/
+    auth_required: false
+    license: public_domain
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.cbp.gov/newsroom/stats
+    vintage_behaviour: append_only
+    notes: US CBP encounter and apprehension statistics. Used in migration hypotheses. Fetcher TBD.
+  uscis:
+    name: US Citizenship and Immigration Services
+    endpoint: https://www.uscis.gov/
+    auth_required: false
+    license: public_domain
+    credibility_tier: 1
+    status: pending
+    catalogue_url: https://www.uscis.gov/tools/reports-and-studies/immigration-and-citizenship-data
+    vintage_behaviour: append_only
+    notes: USCIS immigration filings statistics. Fetcher TBD.
+  reuters_ap:
+    name: Reuters / Associated Press wire archive (curated)
+    endpoint: ''
+    auth_required: false
+    license: unknown
+    credibility_tier: 4
+    status: pending
+    catalogue_url: ''
+    vintage_behaviour: append_only
+    notes: Curated Reuters / AP event-chronology citations used in case-study YAMLs. No bulk feed; per-event citation only. Tier 4 narrative evidence.
+  us_census:
+    name: US Census Bureau
+    endpoint: https://api.census.gov/data
+    auth_required: false
+    auth_env_var: CENSUS_API_KEY
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.us_census
+    catalogue_url: https://www.census.gov/data/developers/data-sets.html
+    vintage_behaviour: revisable
+    notes: US Census Bureau Data API. ACS 5-year, Population Estimates, SAIPE, CPS ASEC, EITS Building Permits, International Trade. Free key recommended (CENSUS_API_KEY env var) but most endpoints work
+      without one.
+  imf_ifs:
+    name: IMF International Financial Statistics / BOP / AREAER (manual-drop)
+    endpoint: https://data.imf.org/
+    auth_required: true
+    license: imf_terms
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.imf_ifs
+    catalogue_url: https://data.imf.org/
+    vintage_behaviour: revisable
+    notes: IMF deprecated all public SDMX endpoints in 2024 in favour of Power BI Embedded at data.imf.org. There is no programmatic API. This fetcher reads bulk CSV/XLSX exports from data/manual/imf_ifs/.
+      Users sign in to data.imf.org once, export the CSV for the relevant IFS / BOP / AREAER / FSI dataset, and drop the file into the manual directory. Supports IFS series (FIDR_PA, FIGB_PA, FMA_USD),
+      BOP/IIP (BFOAFA, BFXFA), AREAER, and FSI series that are NOT in the WEO DataMapper.

@@ -1,0 +1,187 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: procyclical_fiscal_expansion_boom_bust
+version: 1
+status: pre_registered
+topic: fiscal
+claim: 'Countries that run procyclical fiscal policy during expansions — raising primary spending or cutting revenues when output is above potential — experience larger subsequent output volatility and
+  deeper recessions during the following downturn, compared to countries that run countercyclical or neutral fiscal stance in the same boom. The canonical positive cases include UK 2001-2008 (Blair-Brown
+  structural loosening at the top of the cycle), Greece 1999-2009 (pre-crisis fiscal dominance masked by euro-entry credit conditions), Argentina 2003-2011 (Kirchner commodity-boom fiscal expansion), and
+  Spain 2003-2008 (real-estate-revenue-driven primary surplus disguising structural deficit). Counter-cases include Chile (structural balance rule since 2001), Norway (fiscal guideline on oil revenue),
+  and the Nordic post-1992 fiscal frameworks. The hypothesis is that the cross-country relationship between boom-era procyclicality and subsequent output-gap volatility is positive and robust to controls.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHL
+  - CHN
+  - COL
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - IDN
+  - IND
+  - IRL
+  - ITA
+  - JPN
+  - KOR
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period:
+  - 1995
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years in a banking-crisis episode as coded by Laeven-Valencia (treatment window includes the crisis itself, which is the outcome)
+  - drop country-years with oil-revenue share > 30% of government revenue unless a sovereign-wealth / resource-rent rule is coded separately
+variables:
+  outcome:
+  - name: output_gap_volatility_subsequent
+    source: imf:NGAP_NPGDP
+    transformation: rolling_stddev_5yr_forward
+    notes: 5-year forward rolling standard deviation of the IMF output gap.
+  - name: recession_depth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: min_annual_growth_over_5yr_forward_window
+    notes: Defined as the minimum year-on-year real GDP growth observed in the 5 years following the current country-year.
+  treatment:
+  - name: boom_era_fiscal_impulse
+    source: imf:GGXCNL_NGDP
+    transformation: cyclically_adjusted_primary_balance_delta_during_positive_output_gap_years
+    notes: 'For each country-year in which the contemporaneous output gap is positive, the change in the cyclically-adjusted primary balance relative to its own country mean is computed. Negative values
+      indicate procyclical loosening in a boom; positive values indicate countercyclical discipline.
+
+      '
+  controls:
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: commodity_terms_of_trade
+    source: imf:TXG_RPCH
+    transformation: pct_change
+  - name: debt_to_gdp_initial
+    source: imf:GGXWDG_NGDP
+    transformation: level
+  - name: cbi_index
+    source: owid:central-bank-independence-cukierman
+    transformation: level_0_to_1
+    notes: Included because monetary frame interacts with fiscal frame; high CBI may discipline fiscal even absent a fiscal rule.
+intervention_channel: fiscal
+intervention_channel_justification: 'The treatment is an explicit fiscal variable (change in cyclically adjusted primary balance during a positive-output-gap period). Regulatory and monetary interventions
+  are separated as controls.
+
+  '
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Jordà local projections regressing the 5-year-forward output-gap volatility and minimum growth on the boom-era procyclical fiscal impulse, controls, and two-way FE. Standard errors clustered by
+    country. Alternative IV specification using Blanchard-Perotti narrative fiscal shocks as an instrument reported as a v2 robustness companion.
+
+    '
+falsification:
+  rule: 'Not supported if the coefficient on boom-era procyclical fiscal impulse on subsequent 5-year output-gap volatility is not positive and significant at 5% in the local projection, OR if the countries
+    pre-coded as canonical procyclical cases (ARG, GRC, ESP, GBR over the relevant boom windows) do not show larger subsequent downturns than the pre-coded countercyclical cases (CHL, NOR, SWE, DNK, FIN)
+    by at least 2 percentage points in the recession-depth outcome.
+
+    '
+  test: local_projection_plus_canonical_case_comparison
+  threshold: 'beta(procyclical_impulse → 5yr_volatility) > 0 at p<0.05 AND mean(recession_depth | procyclical canonical cases) - mean(recession_depth | countercyclical canonical cases) <= -2 percentage
+    points
+
+    '
+prior_confidence: 0.72
+disclosure: 'The cyclicality-of-fiscal-policy literature (Talvi-Vegh 2005, Alesina- Campante-Tabellini 2008, Frankel-Vegh-Vuletin 2013) has documented strong procyclical patterns in emerging markets and
+  mixed patterns in advanced economies. Prior reflects that base-rate literature. Author holds market-liberal priors that include fiscal-rule advocacy; the pre-registration commits to publishing null or
+  reversed findings with asymmetric prominence per DISCLOSURE.md.
+
+  '
+steelman: hypotheses/steelman/procyclical_fiscal_expansion_boom_bust.md
+scope:
+  period:
+  - 1995
+  - 2023
+  countries:
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHL
+  - CHN
+  - COL
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - IDN
+  - IND
+  - IRL
+  - ITA
+  - JPN
+  - KOR
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  - OECD
+  outcome_dim:
+  - fiscal_policy
+  - gdp_growth
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - blair_brown_fiscal_expansion_2001
+  - kirchner_fiscal_expansion_2003
+  - greece_pre_crisis_fiscal_dominance
+  - spain_real_estate_revenue_boom
+  - chile_structural_balance_rule_2001
+  - norway_oil_fiscal_guideline
+covers_claims:
+- position_id: austrian
+  claim_index: 8
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Austrian position claims boom-era unfunded fiscal expansions (Blair-Brown 2001-2007 UK, Kirchner 2003-2015 ARG) produce subsequent structural weakness; hypothesis includes both as pre-registered
+    canonical procyclical cases.
+linked_hypotheses:
+- austerity_output_recovery_tradeoff
+- hyperinflation_requires_fiscal_dominance
+notes: 'The canonical-case list is pre-registered here; adding or removing cases post-hoc would constitute specification search and must be logged as a v2 spec.
+
+  '

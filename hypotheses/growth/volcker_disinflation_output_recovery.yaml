@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: volcker_disinflation_output_recovery
+version: 1
+status: pre_registered
+topic: growth
+claim: Volcker's 1979–1982 disinflation produced output recovery by 1984 once inflation expectations re-anchored,
+  vindicating the monetarist claim that credible rule-based tightening imposes finite transition costs.
+notes: Stub seeded from monetarist, New-Keynesian, and empirical-pragmatist predictions about Volcker
+  disinflation output recovery. Multiple cross-school links require careful event-window specification.
+prior_confidence: 0.7
+disclosure: Author's market-liberal priors and sympathy for credible-rule monetary frameworks bias toward
+  the supported finding; could under-weight the labour-market and recession-cost channels emphasised by
+  heterodox critics.
+steelman: hypotheses/steelman/volcker_disinflation_output_recovery.md
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED iff BOTH (a) headline
+    CPI YoY inflation falls from its 1979-1980 peak to a 1983Q4 quarterly mean
+    of at most 5.0% (Volcker disinflation magnitude — a fall of >= 5pp from
+    the >=10% peak), AND (b) real GDP (GDPC1) returns to its pre-1979 trend by
+    1984Q4 (i.e. the log-gap of 1984Q4 real GDP relative to the linear log-time
+    fit estimated on 1972Q1-1979Q3 is >= -2.0%, treating "returned to trend"
+    as within 2% of the extrapolated trajectory).
+    REFUTED if EITHER (i) the inflation drop from peak to 1983Q4 is < 5pp
+    (no disinflation), OR (ii) the 1984Q4 real-GDP gap to pre-1979 trend is
+    <= -5.0% (output failed to recover, large permanent loss).
+    Otherwise PARTIAL.
+    INFORMATIVE (non-gating): the level of the effective fed funds rate at
+    the 1981 peak (treatment intensity), inflation YoY trajectory between
+    peak and 1983Q4, and trough-to-1984Q4 GDP recovery slope.
+    METHOD_VALID: requires CPIAUCSL, GDPC1, FEDFUNDS all loaded for the
+    1972Q1-1984Q4 window. If any series is missing, emit `inconclusive
+    (data gap)`.
+  test: volcker_event_study_1979Q4_disinflation_recovery_dual_threshold
+  threshold: >-
+    PRIMARY: cpi_yoy_1983Q4_mean <= 5.0% AND (peak_cpi_yoy - cpi_yoy_1983Q4_mean) >= 5.0pp
+    AND log(real_gdp_1984Q4) - trend_log_1984Q4 >= -0.020.
+    REFUTED gate: (peak_cpi_yoy - cpi_yoy_1983Q4_mean) < 5.0pp
+    OR log(real_gdp_1984Q4) - trend_log_1984Q4 <= -0.050.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period:
+  - 1979
+  - 1987
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: inflation_cpi
+    source: 'fred:CPIAUCSL'
+    notes: 'FRED CPIAUCSL (US CPI all-urban, monthly 1947+) is the standard event-study CPI series at higher resolution than WDI annual. WDI FP.CPI.TOTL.ZG is annual fallback.'
+  - name: real_gdp
+    source: 'fred:GDPC1'
+    notes: 'FRED real GDP quarterly 1947+. WDI annual is too coarse for the 1979Q4 event window the spec calls for.'
+  - name: federal_funds_rate
+    source: 'fred:FEDFUNDS'
+    notes: 'Treatment-side rate to anchor the Volcker tightening event; effective fed funds rate, monthly 1954+.'
+estimator:
+  template: event_study
+  fixed_effects:
+  - year
+  clustering: none
+  notes: 'Single-country US event study around the October 1979 Volcker tightening. Outcomes: inflation,
+    real GDP growth, output gap. Tests whether inflation re-anchored and real output recovered to trend
+    by 1984, consistent with the monetarist credibility-with-finite-cost claim.
+
+    '
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic falsification
+  rule to two dispositive primary tests: (a) the disinflation magnitude
+  test — CPI YoY in 1983Q4 must be at most 5% AND must have fallen by at
+  least 5pp from its 1979-1980 peak; (b) the output-recovery test — real
+  GDP at 1984Q4 must be within 2% of the linear log-time trend estimated
+  on the 1972Q1-1979Q3 pre-event window. SUPPORTED iff both. REFUTED if
+  either inflation fails to drop by 5pp OR 1984Q4 GDP gap to pre-event
+  trend is below -5%. Pre-trend window 1972Q1-1979Q3 chosen to span the
+  Bretton Woods collapse onwards but stop before the October-1979 Volcker
+  tightening; OPEC oil shocks are inside the pre-trend window so any
+  recovery-to-trend reading is conservative against the recovery claim
+  (the 1970s trend includes the two oil shocks' growth drag).
+scope:
+  period:
+  - 1979
+  - 1987
+  countries:
+  - USA
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  - gdp_growth
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - volcker_disinflation_1979
+  - volcker_disinflation
+  - rule_based_tightening
+  - fed_independence
+covers_claims:
+- position_id: chicago_monetarism
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Identical-proposition: claim and hypothesis both test whether Volcker''s 1979-82 disinflation
+    produced output recovery by 1984 once expectations re-anchored (monetarist finite-transition-cost
+    claim).'
+- position_id: new_keynesian
+  claim_index: 0
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: NK claim that Volcker disinflation + CB independence restored price stability without gold standard;
+    relinked from fiat_expansion_erodes_currency_purchasing_power_long_run (Phase 4C) — Volcker 1979-1987
+    USA scope matches exactly.
+- position_id: empirical_pragmatist
+  claim_index: 3
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Empirical-pragmatist claim that Volcker disinflation succeeded because of US institutional preconditions
+    (CBI, financial markets, political tolerance); relinked from central_bank_independence_inflation_discipline
+    (Phase 4C) — Volcker 1979-1987 USA scope matches. Conditional comparison with ARG/VEN cases is partial
+    cover.

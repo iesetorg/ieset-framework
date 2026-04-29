@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nationalisation_investment_productivity_decline_venezuela
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Sectoral nationalisation produces a three-order causal chain.
+  FIRST-ORDER: the state gains formal control over a strategic
+  sector — governance authority transfers, dividends can be directed
+  to fiscal objectives, and the redistributive intent can be pursued.
+  This is an acknowledged policy achievement on its own terms and
+  the hypothesis does not deny it. SECOND-ORDER: capital expenditure
+  collapses (political appointments supplant technical management,
+  procurement loses discipline, maintenance and turnaround schedules
+  slip), specialised expertise emigrates, and technology-partner
+  relationships weaken. THIRD-ORDER: sector output, productivity,
+  and tax revenue collapse by more than any redistributive gain
+  extracted, producing net fiscal and welfare loss. Cases: Venezuela
+  PDVSA from 2003 (post-tanquerazo) intensifying through 2013+;
+  Mexico Pemex 1938-present with acceleration post-2018 AMLO
+  re-prioritisation; Chile ENAP; Argentina YPF 2012 renationalisation.
+
+evidence_type: causal
+
+sample:
+  countries: [VEN, MEX, CHL, ARG]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude global oil-price shock years (2008-2009 trough, 2014-2016 collapse, 2020 pandemic) from the identification window but retain as controls"
+
+scope:
+  period: [1995, 2024]
+  countries: [VEN, MEX, CHL, ARG]
+  outcome_dim: [industrial_capability, productivity, fiscal_policy, capital_flows]
+  policy_family: [privatisation_nationalisation, industrial_policy, regulation]
+  treatment_tags: [pdvsa_purge_2003, venezuela_expropriation_wave_2007, ypf_renationalisation_2012, amlo_pemex_2018, tanquerazo_2002]
+
+variables:
+  outcome:
+    - name: sector_output_production
+      source: "opec:asb_full; pdvsa:financial_statements; pemex:production_statistics; enap:annual_report; ypf:investor_reports"
+      transformation: log_level_barrels_per_day
+      notes: "THIRD-ORDER outcome: production collapse is the headline falsifier."
+    - name: state_control_index
+      source: "constructed: share of sector assets state-owned + board political-appointment share + procurement bypass frequency; coded per case"
+      transformation: index
+      notes: "FIRST-ORDER outcome: state control IS achieved — this is acknowledged as a policy success on its own terms."
+    - name: sector_capex_to_output_ratio
+      source: "company annual reports + SEC filings (VEN PDVSA via bond prospectus filings); pemex:investment_plan; enap:memoria_anual; ypf:reports"
+      transformation: ratio
+      notes: "SECOND-ORDER outcome: capex discipline collapse."
+    - name: expertise_emigration_proxy
+      source: "constructed: petroleum-engineer and senior-technician emigration from source country to Colombian, US, Canadian, Saudi upstream firms; LinkedIn-based panel + SPE membership transfers"
+      transformation: annual_flow
+      notes: "SECOND-ORDER outcome: expertise exodus."
+    - name: sector_productivity_real_output_per_worker
+      source: "constructed: sector output / sector employment from company reports"
+      transformation: yoy_pct_change
+      notes: "THIRD-ORDER outcome: productivity collapse."
+    - name: sector_tax_dividend_contribution_to_fiscal
+      source: "minfin:fiscal_accounts (VEN, MEX, CHL, ARG)"
+      transformation: pct_of_total_revenue
+      notes: "THIRD-ORDER outcome: fiscal contribution evolution; if this falls, the redistributive objective has been defeated by the chain."
+
+  treatment:
+    - name: nationalisation_or_control_intensification_event
+      source: "constructed: event indicators per case (VEN 2003 PDVSA purge post-tanquerazo; VEN 2007 expropriation wave; MEX 2013 reform reversed / 2018 AMLO Pemex re-prioritisation; CHL ENAP historical + 2014-2022 governance shifts; ARG 2012 YPF renationalisation)"
+      transformation: indicator
+
+  controls:
+    - name: world_oil_price_brent
+      source: "eia:brent; fred:DCOILBRENTEU"
+      transformation: log_level_real_usd
+    - name: country_real_gdp_growth
+      source: "imf:WEO"
+      transformation: yoy_pct_change
+    - name: country_exchange_rate_regime
+      source: "imf:AREAER"
+      transformation: categorical
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Nationalisation combines regulatory (ownership reassignment by decree),
+  fiscal (dividend-capture), and institutional-governance changes. The
+  intervention is bundled by construction; we do not attempt to
+  decompose it in v1.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  random_seed: 20260424
+  notes: >
+    Synthetic control per treated case with donor pool of private/mixed-
+    governance oil-producing companies (Ecopetrol COL, Petrobras BRA
+    pre-Lava-Jato and post-reform, Statoil/Equinor NOR, US independents).
+    Supplement with event-study on capex and production within each
+    case. The identification leverages the fact that the nationalisation
+    shocks are not aligned with global oil-price movements.
+
+falsification:
+  rule: >
+    Not supported if, across the four cases: (a) FIRST-ORDER state-
+    control-index rise is confirmed (acknowledged success) AND (b)
+    production and capex DO NOT decline relative to synthetic control
+    at p<0.10 in at least 3/4 cases AND (c) fiscal contribution DOES
+    NOT fall in at least 2/4 cases. A first-order success with
+    stable second/third-order outputs (Statoil-like disciplined SOE
+    governance) would refute the chain claim for the Latin-American
+    cases; the cases are a bundle and the test asks whether the chain
+    holds in MOST of them.
+  test: synthetic_control_four_case_causal_chain
+  threshold: >
+    FIRST-ORDER state-control index rise supported AND production
+    decline >=-15% vs synthetic control in at least 3/4 cases at
+    p<0.10 AND capex/output ratio falls >=-20% in at least 3/4 cases
+    AND fiscal contribution falls in at least 2/4 cases
+
+prior_confidence: 0.85
+disclosure: >
+  Author holds market-liberal priors. Venezuelan PDVSA production
+  trajectory (~3.3 mb/d in 1998 to <0.7 mb/d by 2020) is the
+  dominant case; the full four-case panel exposes whether the
+  pattern holds outside VEN. Norway's Statoil/Equinor provides
+  a strong counterexample in the donor pool: disciplined SOE
+  governance can preserve output and fiscal contribution. Prior
+  is high but not extreme because the counterexample exists.
+
+steelman: hypotheses/steelman/nationalisation_investment_productivity_decline_venezuela.md
+
+linked_hypotheses:
+  - maduro_era_venezuelan_collapse_decomposition_2013_2023
+
+notes: >
+  Mechanism: formal state control achieved (1st) -> governance and
+  technical-capacity erosion (2nd) -> output + fiscal collapse
+  exceeding any redistributive gain (3rd). Norway Equinor is the
+  most important counter-case: SOE governance quality moderates
+  the chain.

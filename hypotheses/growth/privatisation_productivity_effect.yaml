@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: privatisation_productivity_effect
+version: 1
+status: draft
+topic: growth
+claim: Thatcher-era UK privatisations (BT, British Gas, BA, water utilities) produced measurable productivity
+  gains and price reductions in the privatised sectors, net of cost-shifting concerns.
+notes: >-
+  Seeded from a classical-liberal claim that Thatcher-era UK privatisations
+  (BT 1984, British Gas 1986, BA 1987, water 1989) produced measurable
+  productivity gains and price reductions in the privatised sectors net of
+  cost-shifting concerns. Stacked event-study around privatisation dates;
+  human review needed for the cost-shifting accounting.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: classical-liberal framing wants privatisation to
+  produce productivity and price wins. Some apparent gains reflect the
+  pre-privatisation labour-shedding phase under public ownership rather
+  than the privatisation itself, and water-sector regulator-set price caps
+  shifted costs to consumers via under-investment in infrastructure.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: "Stacked firm-level event-study of TFP and labour productivity around BT 1984, British Gas 1986, BA 1987, water 1989 privatisation events with firm and year FE; falsified if treated-firm productivity coefficient at h=3,5 not positive at p<0.10 or below 5%."
+evidence_type: associational
+
+sample:
+  countries: [GBR, FRA, DEU, ITA, ESP, NLD, SWE, USA, JPN]
+  period: [1975, 2000]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: log_real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+
+  treatment:
+    - name: thatcher_privatisation_indicator
+      source: "constructed: indicator = 1 for GBR years 1984-1990 (BT 1984 through water 1989)"
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: event_study
+  fixed_effects: [firm, year]
+  clustering: firm
+  notes: >
+    Stacked event-study around UK privatisation dates (BT 1984, British Gas
+    1986, BA 1987, water utilities 1989). Outcome: labour productivity, TFP,
+    and real consumer prices in privatised sectors vs comparison utilities.
+    Net of any cost-shifting via regulator-set price caps.
+
+scope:
+  period: [1979, 1990]
+  countries: [GBR]
+  outcome_dim: [productivity, competition_concentration]
+  policy_family: [privatisation_nationalisation, competition_policy]
+  treatment_tags: [thatcher_reforms_1979, uk_bt_privatisation_1984, uk_british_gas_privatisation_1986, uk_ba_privatisation_1987, uk_water_privatisation_1989]
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 5
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether Thatcher-era UK privatisations (BT, British Gas, BA, water) produced productivity gains and price reductions net of cost-shifting."
+

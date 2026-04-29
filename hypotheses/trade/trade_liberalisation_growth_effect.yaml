@@ -1,0 +1,186 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_liberalisation_growth_effect
+version: 1
+status: pre_registered
+topic: trade
+claim: 'Major trade-liberalisation events — defined as sharp, policy-driven increases in trade-to-GDP openness sustained over at least 5 years — are associated with positive subsequent per-capita GDP growth
+  over 10-year horizons, relative to matched non-liberalising controls. The headline canonical cases examined are China''s WTO accession (2001), India''s 1991 liberalisation (Manmohan Singh reforms), New
+  Zealand''s 1984-1991 Rogernomics reforms, Vietnam''s Doi Moi (1986 formally; main tariff reductions 1995-2007), and Chile''s 1974-1979 liberalisation. The associational claim is that the sign and magnitude
+  of subsequent growth differences are consistent with the Sachs-Warner and Wacziarg-Welch literatures and are not driven by selection into liberalisation alone.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - CHN
+  - IND
+  - NZL
+  - VNM
+  - CHL
+  - POL
+  - CZE
+  - HUN
+  - KOR
+  - MEX
+  - IDN
+  - MYS
+  - THA
+  - PER
+  - COL
+  - BRA
+  - ARG
+  - TUR
+  - ZAF
+  - GHA
+  - KEN
+  - NGA
+  - EGY
+  - IRN
+  - PAK
+  - BGD
+  - PHL
+  - LKA
+  - MAR
+  - TUN
+  period:
+  - 1980
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years inside an active armed-conflict episode (UCDP high-intensity code)
+  - exclude hyperinflation country-years (> 500% CPI) which dominate growth variance for reasons unrelated to trade
+variables:
+  outcome:
+  - name: real_gdp_per_capita_growth_10yr
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: cumulative_log_growth_10yr_forward
+  - name: total_factor_productivity_growth
+    source: imf:PCPI; world_bank_wdi:NY.GDP.MKTP.KD; world_bank_wdi:SL.TLF.TOTL.IN
+    transformation: solow_residual_growth_forward_10yr
+    notes: Constructed Solow residual using a fixed 0.33 capital share as a simplification; reported as secondary outcome.
+  treatment:
+  - name: trade_openness_change_event
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: event_coded_trade_reform_year
+    notes: 'Event dates coded from Wacziarg-Welch 2008 updated through 2023 where possible: CHN 2001, IND 1991, NZL 1984, VNM 1986, CHL 1974 and 1985, POL 1990, CZE 1993, HUN 1989, KOR 1988, MEX 1986 and
+      1994, IDN 1994, MYS 1988, THA 1988, PER 1991, COL 1991, BRA 1991, ARG 1991, TUR 1989, ZAF 1991 and 1995, etc. Cases without unambiguous event windows are flagged as controls.
+
+      '
+  controls:
+  - name: initial_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_level_at_event_minus_1
+    notes: Controls for convergence dynamics which are first-order over 10-year horizons.
+  - name: initial_human_capital
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: level_at_event_minus_1
+  - name: institutional_quality_pretreatment
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level_at_event_minus_1
+    notes: WGI coverage starts 1996; for pre-1996 events, Polity5 polity2 is used as a substitute.
+  - name: polity_score_pretreatment
+    source: polity5:polity2
+    transformation: level_at_event_minus_1
+  - name: conflict_dummy_pretreatment
+    source: ucdp:ged
+    transformation: active_conflict_at_event_minus_1_to_plus_2
+intervention_channel: regulatory
+intervention_channel_justification: 'Trade liberalisation is a regulatory intervention (tariff schedules, quota removal, exchange-rate unification). Fiscal interventions (tax reform) often co-occur and
+  are controlled for separately where they dominate the event (e.g. NZ 1984 bundled both).
+
+  '
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  random_seed: 20260423
+  notes: 'Callaway-Sant''Anna staggered DiD with never-liberalisers (or far-future liberalisers) as comparators, estimating ATT(g, t) for each event cohort and averaging to a single ATT over the 10-year
+    post-event horizon. Robustness: synthetic control on the four main canonical cases (CHN 2001, IND 1991, NZL 1984, VNM 1986) reported as v2 companion.
+
+    '
+falsification:
+  rule: 'Not supported if the Callaway-Sant''Anna ATT on 10-year-forward real per-capita GDP growth is not positive and significant at 5%, OR if the canonical-case synthetic-control exercise for the four
+    main events does not show a positive growth gap relative to synthetic comparators in at least 3 of 4 cases, OR if the effect disappears when institutional-quality pretrend controls are added (suggesting
+    liberalisation is a marker for broader reform rather than causal per se). Support requires all three conditions.
+
+    '
+  test: staggered_did_plus_synthetic_control_canonical_cases
+  threshold: 'ATT(10y) > 0 at p<0.05 AND 3 of 4 canonical SC cases show positive 10y growth gap AND ATT attenuation when institutional controls added < 60%
+
+    '
+prior_confidence: 0.65
+disclosure: 'The liberalisation-growth relationship has been contested since Rodrik 2006 and Rodriguez-Rodrik 2001 critiqued the Sachs-Warner methodology. The prior reflects a moderate belief — the canonical
+  cases are striking but the cross-country regression literature is known to be fragile. Author holds priors favouring open-trade regimes on political-economy grounds; pre-registration commits to the null
+  or reversed finding being published with equal prominence.
+
+  '
+steelman: hypotheses/steelman/trade_liberalisation_growth_effect.md
+linked_hypotheses:
+- rule_of_law_institutional_growth
+- industrial_policy_developmentalist_states_growth
+notes: 'The relationship between this hypothesis and industrial_policy_developmentalist_states_growth is designed to be tensioned: the developmentalist hypothesis argues selective protection + export discipline
+  drives growth; the trade-liberalisation hypothesis argues general opening drives growth. Both can be simultaneously true under different conditions (stage of development, state capacity); the framework
+  should surface that and not collapse into either as a universal claim.
+
+  '
+scope:
+  period:
+  - 1980
+  - 2023
+  countries:
+  - CHN
+  - IND
+  - NZL
+  - VNM
+  - CHL
+  - POL
+  - CZE
+  - HUN
+  - KOR
+  - MEX
+  - IDN
+  - MYS
+  - THA
+  - PER
+  - COL
+  - BRA
+  - ARG
+  - TUR
+  - ZAF
+  - GHA
+  - KEN
+  - NGA
+  - EGY
+  - IRN
+  - PAK
+  - BGD
+  - PHL
+  - LKA
+  - MAR
+  - TUN
+  outcome_dim:
+  - gdp_growth
+  - trade_liberalisation
+  - productivity
+  policy_family:
+  - trade_policy
+  - institutional_reform
+  treatment_tags:
+  - china_wto_accession_2001
+  - india_liberalisation_1991
+  - nz_rogernomics_1984
+  - vietnam_doi_moi_1986
+  - chile_liberalisation_1974
+covers_claims:
+- position_id: chicago_monetarism
+  claim_index: 9
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: Audit FAIL — claim names NAFTA/Mexico 1994 as canonical case but hypothesis canonical cases are CHN WTO 2001, IND 1991, NZL Rogernomics, VNM Doi Moi, CHL 1974. Phase 4C candidate for relink to
+    NAFTA-inclusive hypothesis.
+- position_id: classical_liberal
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: Audit FAIL — claim names EU single market 1993 and Deng 1978 as canonical cases absent from hypothesis. Phase 4C candidate for relink or split into eu_single_market_productivity_gains hypothesis.

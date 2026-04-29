@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: milei_shock_therapy_output_recovery_trajectory
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Argentine quarterly real GDP, having contracted in 2024H1 under the Milei stabilisation shock, recovers along a trajectory that by Q4 2025 closes at least 50% of the peak-to-trough output gap observed
+  during the shock''s worst quarter, and by Q4 2026 returns to or exceeds the pre-Milei (Q4 2023) real-GDP level. The trajectory is faster than the LatAm peer donor pool (Brazil, Chile, Colombia, Peru,
+  Mexico, Uruguay) weighted average for an equivalent shock absorbed without reform content. The hypothesis is consistent with the Austrian / monetarist reading that post- stabilisation recoveries are front-loaded
+  once the fiscal- dominance distortion is removed and with empirical findings on sharp-stabilisation recovery patterns (e.g., Peru 1990-1993, Bolivia 1985-1989).
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ARG
+  - BRA
+  - CHL
+  - COL
+  - MEX
+  - PER
+  - URY
+  period:
+  - 2015
+  - 2027
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-quarters during COVID extreme outliers (2020Q2, 2020Q3) from the synthetic-control pre-period weighting step to avoid pandemic-specific distortions dominating the matching
+variables:
+  outcome:
+  - name: real_gdp_quarterly
+    source: imf:NGDP_RPCH (annual, quarterly disaggregation); world_bank_wdi:NY.GDP.MKTP.KD (annual, backfill); national sources (INDEC, IBGE, INE CHL, DANE, INEGI, INEI) via owid or eurostat mirror
+    transformation: log_level_quarterly
+  - name: real_gdp_deviation_from_trend
+    source: derived from real_gdp_quarterly
+    transformation: log_deviation_from_2015_2019_linear_trend
+    notes: 'Pre-registered secondary outcome: recovery relative to pre-treatment trend rather than pre-treatment level.'
+  treatment:
+  - name: milei_era_indicator
+    source: 'constructed: binary = 1 for ARG from 2023Q4 onward; 0 otherwise'
+    transformation: binary
+  - name: quarters_since_inauguration
+    source: 'constructed: integer count of quarters since 2023Q4'
+    transformation: integer_count
+  controls:
+  - name: commodity_terms_of_trade
+    source: imf:Primary; world_bank_wdi:TT.PRI.MRCH.XD.WD (commodity terms of trade)
+    transformation: quarterly_log_change
+  - name: global_financial_conditions
+    source: fred:NFCI (Chicago Fed NFCI) or equivalent VIX-based financial-conditions proxy
+    transformation: level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: pre_treatment_output_gap
+    source: imf:NGAP_NPGDP
+    transformation: level_at_2023Q3
+estimator:
+  template: synth_did
+  clustering: country
+  notes: 'Primary specification: synthetic DiD (Arkhangelsky, Athey, Hirshberg, Imbens, Wager 2021) with ARG as treated unit and LatAm peer pool as donor set. Pre-period 2015-2023 defines the synthetic
+    counterfactual weights. Treatment effect is the cumulative and quarterly gap between observed ARG real GDP and synthetic ARG from 2023Q4 onwards.
+
+    Secondary specification: Callaway-Sant''Anna DiD treating the LatAm peer pool as never-treated control and ARG as a single treated unit at 2023Q4, with dynamic event-time coefficients through Q+12.
+    Third specification: local projections with ARG indicator interacted with quarters-since-inauguration for a robustness check.
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive, three legs — all must hold for SUPPORTED): (A) ARG annual real-GDP log-level at 2025 minus log-level at 2023 is at least -0.04 (i.e. by 2025 the contraction has not exceeded
+    ~4 log points relative to the pre-Milei baseline). (B) ARG annual real-GDP log-level at 2026 is at least the 2023 baseline (level recovery). (C) ARG cumulative log-deviation across 2024-2026 EXCEEDS
+    the unweighted mean cumulative log-deviation of the LatAm peer pool (BRA, CHL, COL, MEX, PER, URY) over the same window — the spec''s "faster than peers" claim. PARTIAL if A and B hold but not C, or
+    if B holds but A misses by less than half. REFUTED if B fails. METHOD_VALID downgrade to inconclusive when >=2/3 of 2024-2026 are IMF WEO projections rather than realised outturns AND the headline result
+    would be SUPPORTED on those projections. Translated from the spec''s quarterly wording (2025Q4, 2026Q4) to annual under the spec.notes-authorised quarterly-to-annual fallback because quarterly real-GDP
+    series for the LatAm peer pool are not on disk.'
+  test: annual_log_index_three_leg_with_peer_comparison
+  threshold: log(GDP_ARG_2025) - log(GDP_ARG_2023) >= -0.04 AND log(GDP_ARG_2026) - log(GDP_ARG_2023) >= 0.00 AND sum_y in {2024,2025,2026} log_idx_ARG_y > mean over peers in {BRA,CHL,COL,MEX,PER,URY} of
+    sum_y log_idx_peer_y
+prior_confidence: 0.58
+methodology_note: 'v1 promotion (2026-04-27). Sharpened the original four-leg falsification rule (which mixed quarterly thresholds with a synthetic-DiD permutation p-value) into a three-leg dispositive
+  test on annual log-level GDP indices: (A) 2025 floor at -4 log points vs 2023 baseline, (B) 2026 level recovery, (C) ARG cumulative 2024-2026 log-deviation must exceed the unweighted LatAm peer-pool mean.
+  Quarterly real-GDP series for the LatAm peer pool are not on disk; spec.notes explicitly authorises the annual fallback ("the panel reverts to annual GDP for pre-period weighting"). The synthetic-DiD
+  permutation p-value leg is dropped because the annual sample (one ARG observation per year, six donors) is too thin for permutation inference to be informative; the (A)+(B)+(C) test is the legitimate
+  annualised analogue. METHOD_VALID gate downgrades a SUPPORTED verdict to inconclusive when most of 2024-2026 are IMF WEO projections rather than realised outturns (today = 2026-04-27, so 2025-2026 are
+  projections; 2024 is realised).'
+disclosure: 'Prior is moderate rather than high because the recovery- trajectory claim is more contested than the inflation- stabilisation claim. Sharp-stabilisation historical record is mixed: some cases
+  (Peru 1990, Bolivia 1985) recovered fast; others (Argentina 1989-1991, Russia 1998) showed persistent scarring. Author''s market-liberal prior is aligned with the recovery hypothesis; pre-registration
+  is binding, and a slow- or-no-recovery result would update priors materially on whether shock-therapy stabilisation imposes hysteresis costs that orthodox models systematically under-predict.
+
+  '
+conflict_disclosure: 'Author does not hold Argentine equity or sovereign debt exposure. Disclosed prior aligned with the hypothesis; binding pre-registration mitigates specification-gaming risk.
+
+  '
+steelman: hypotheses/steelman/milei_shock_therapy_output_recovery_trajectory.md
+linked_hypotheses:
+- milei_reforms_reduce_argentine_inflation
+- austerity_output_recovery_tradeoff
+- hyperinflation_requires_fiscal_dominance
+notes: 'Synthetic control donor pool choice: LatAm peers with comparable institutional-quality baseline and commodity- exposure profile. Brazil included despite macro-size differences because pre-2023 trajectory
+  similarity is strong. If the quarterly GDP data for any peer country is thinner than Argentina''s own, the panel reverts to annual GDP for pre-period weighting with quarterly GDP only for post-2023Q4
+  event window.
+
+  Data-gated: national-accounts quarterly GDP for ARG and peer pool must land on disk by run date. INDEC (ARG), IBGE (BRA), INE CHL, DANE (COL), INEGI (MEX), INEI (PER), INE URY are the primary sources
+  via OWID or IMF IFS mirror.
+
+  '
+scope:
+  period:
+  - 2015
+  - 2027
+  countries:
+  - ARG
+  - BRA
+  - CHL
+  - COL
+  - MEX
+  - PER
+  - URY
+  outcome_dim:
+  - gdp_growth
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  - institutional_reform
+  treatment_tags:
+  - milei_shock_therapy_2023
+  - fiscal_dominance_removal
+  - shock_therapy_output_recovery
+covers_claims:
+- position_id: austrian
+  claim_index: 16
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Austrian prediction: post-stabilisation recovery is front-loaded once fiscal-dominance distortion is removed; direct alignment with hypothesis trajectory claim.'
+- position_id: chicago_monetarism
+  claim_index: 15
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: 'Phase 4C concern: claim anchors on Volcker template (USA 1979) as analogy while hypothesis is Argentina-only [2015, 2027] with gdp_growth focus; claim outcome foregrounds inflation re-anchoring
+    (audit FAIL). Candidate for rewrite to drop Volcker analogy or new hypothesis pairing Volcker and Milei.'

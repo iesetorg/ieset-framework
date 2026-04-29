@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_eu_gdp_per_capita_divergence_policy_causes
+version: 1
+status: candidate
+topic: growth
+claim: 'US GDP per capita (PPP, constant $) exceeds the EU15 weighted average by approximately 50% as of 2023, with the gap widening from ~20% in 2000 after converging during 1980-1995. The divergence is
+  primarily explained by policy-channel differences that are empirically separable from demographic, geographic, or capital-stock differences: (a) US product- market deregulation and competition-policy
+  activism vs EU regulatory density (OECD PMR); (b) US labour-market flexibility vs EU employment protection (OECD EPL); (c) capital-market depth and venture-financing breadth; (d) energy-cost differential
+  post-2011 driven by shale vs Energiewende/gas-import dependence; (e) tax structure favouring capital formation. The claim is that demographic + trade-openness + human-capital controls leave policy channels
+  as the binding explanation.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - FIN
+  - DNK
+  - SWE
+  - IRL
+  - PRT
+  - GRC
+  - LUX
+  period:
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude IRL post-2015 from baseline (extreme FDI-routed GDP distortion); robustness reports with IRL
+  - exclude LUX (small-economy FDI distortion) from baseline; robustness reports with LUX
+variables:
+  outcome:
+  - name: gdp_per_capita_ppp_constant
+    source: wb:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: gdp_per_capita_constant
+    source: wb:NY.GDP.PCAP.KD
+    transformation: log
+  - name: gdp_per_hour_worked_ppp
+    source: oecd:OECD.SDD.NAD.PROD,DSD_PDB@DF_PDB_LV,1.0
+    notes: OECD productivity database level indicators; URN approximate, verify at wiring.
+  decomposition_channels:
+  - name: product_market_regulation_aggregate
+    source: oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2
+    transformation: level
+    notes: OECD PMR aggregate indicator; US consistently among least regulated, EU members cluster higher.
+  - name: employment_protection_legislation_overall
+    source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+    transformation: level
+  - name: economic_freedom_index
+    source: fraser_efw:aggregate_score
+    notes: Fraser EFW (pending fetcher); Heritage IEF as cross-check.
+  - name: institutional_quality_government_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+  - name: real_residential_property_prices
+    source: bis:WS_SPP
+    notes: Housing-cost divergence distorts PPP-adjusted consumption comparisons.
+  - name: effective_corporate_tax_rate
+    source: oecd:OECD.CTP,DSD_CTS@DF_CTS_CIT,1.0
+    notes: OECD Corporate Tax Statistics; URN approximate.
+  controls:
+  - name: population_total
+    source: wb:SP.POP.TOTL
+  - name: urban_population_share
+    source: wb:SP.URB.TOTL.IN.ZS
+  - name: trade_openness_pct_gdp
+    source: wb:NE.TRD.GNFS.ZS
+  - name: human_capital_tertiary_attainment
+    source: wb:SE.TER.CUAT.BA.ZS
+intervention_channel: bundled
+intervention_channel_justification: 'The hypothesis explicitly bundles fiscal (tax structure) with regulatory (PMR, EPL) because the claim is that US-EU divergence is multi-channel. Per invariant 4, the
+  two channels are measured independently and enter the decomposition as separate regressors; the ''bundled'' label reflects that no single channel alone is claimed as sufficient.
+
+  '
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Decomposition estimates each policy-channel contribution after controlling for demographics, trade openness, and human capital. Robustness: (a) excluding IRL and LUX; (b) alternate PMR vintages;
+    (c) Fraser EFW vs Heritage IEF substitution for regulatory index.
+
+    '
+falsification:
+  rule: 'Not supported if policy channels (PMR, EPL, economic-freedom, tax, institutional quality) jointly explain less than 50% of the US-EU15 GDP-per-capita gap after demographics + trade + human-capital
+    controls, or if including IRL and LUX in the baseline reverses the sign on core policy coefficients (indicating the divergence is FDI-distortion-driven rather than policy-driven).
+
+    '
+  test: policy_channel_share_of_explained_variance
+  threshold: policy channel share >= 0.50 of explained variance; sign-stable exclusion robustness
+prior_confidence: 0.78
+disclosure: 'Author holds market-liberal priors; this hypothesis aligns directly with the author''s pre-existing view that US-EU divergence is a policy- outcome gap, not an ability-to-grow gap. The 0.78
+  prior reflects this alignment; the falsification threshold (50% of explained variance from policy channels) is designed to be binding rather than generous.
+
+  '
+conflict_disclosure: 'Author holds US equity positions that benefit from continued US growth outperformance. Flagged per DISCLOSURE.md.
+
+  '
+steelman: hypotheses/steelman/us_eu_gdp_per_capita_divergence_policy_causes.md
+scope:
+  period:
+  - 1970
+  - 2023
+  countries:
+  - USA
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - FIN
+  - DNK
+  - SWE
+  - IRL
+  - PRT
+  - GRC
+  - LUX
+  - EU
+  - EUROZONE
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - institutional_quality
+  policy_family:
+  - regulation
+  - labour_market
+  - tax_policy
+  - institutional_reform
+  treatment_tags:
+  - us_eu_policy_divergence
+  - pmr_epl_divergence
+  - us_shale_revolution_2011
+  - eu_energiewende
+  - hours_worked_preference
+  - european_leisure_preference
+  - liberalisation_episodes
+covers_claims:
+- position_id: degrowth
+  claim_index: 0
+  polarity: inverted
+  school_prediction: mixed
+  confidence: medium
+  notes: Degrowth claim asserts energy-cost divergence drives US-EU GDP gap rather than policy per se — inverted-polarity partial overlap with this hypothesis's energy-cost channel (d). Degrowthers also
+    dispute normative preference for higher-GDP US outcome given ecological footprint.
+- position_id: institutionalism
+  claim_index: 1
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Near-identical proposition: claim and hypothesis both test whether US-EU GDP gap is explained by policy+institutional differences rather than demographics.'
+- position_id: social_democratic
+  claim_index: 7
+  polarity: inverted
+  school_prediction: supported
+  confidence: medium
+  notes: 'Inverted-polarity overlap: social democratic claim attributes US-EU GDP gap to hours-worked/leisure-preference rather than productivity deficit — directly contrary to this hypothesis''s policy-channel
+    explanation, sharing same sample/scope.'
+linked_conditions:
+- growth_without_broad_participation
+- nordic_institutional_design
+notes: "Candidate, not pre_registered. Promotion requires: (1) Fraser EFW fetcher (currently scrape_needed) (2) OECD Corporate Tax Statistics dataflow URN verified (3) OECD Productivity Database dataflow\
+  \ URN verified (4) Spec decision on whether GDP-per-hour-worked or GDP-per-capita is\n    the canonical outcome (per-hour isolates productivity; per-capita\n    includes participation, hours worked, and\
+  \ demographic effects).\n"

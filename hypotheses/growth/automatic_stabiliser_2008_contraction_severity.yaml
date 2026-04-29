@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: automatic_stabiliser_2008_contraction_severity
+version: 1
+status: draft
+topic: growth
+claim: Post-2008 countries with larger automatic stabilisers (Nordics, Germany short-time work) experienced milder output and employment contractions than countries with weaker welfare-state cushions (UK,
+  southern Eurozone).
+notes: Maps the social-democratic school's automatic-stabilisers-cushion-recession claim to a cross- country panel comparing 2008-trough output/employment losses against pre-crisis stabiliser-intensity
+  index. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.65
+disclosure: Author prior aligns with the broad finding that Nordic/German stabilisers cushioned the 2008 contraction, but the Kurzarbeit story is partially distinct from automatic stabilisers (it required
+  active policy) and Eurozone-periphery contractions reflected post-2010 fiscal consolidation more than missing stabilisers; the panel-FE spec partially separates these.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: OECD panel FE 2005-2017 of 2008-trough peak-to-trough GDP and unemployment change on pre-2008 automatic-stabiliser intensity index (welfare expenditure / GDP + replacement rates + STWS coverage);
+    country+year FE, country-clustered SEs. Refute if stabiliser-intensity coefficient sign-flipped at p<0.10 OR magnitude <0.10 standard deviation.
+evidence_type: associational
+sample:
+  countries:
+  - DEU
+  - GBR
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - ESP
+  - ITA
+  - GRC
+  - PRT
+  - FRA
+  - NLD
+  - BEL
+  - AUT
+  - IRL
+  - USA
+  - JPN
+  - CAN
+  period:
+  - 2005
+  - 2017
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 from the panel as a separate COVID shock
+variables:
+  outcome:
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: employment_rate
+    source: ilostat:employment_to_population_ratio
+    transformation: level
+  treatment:
+  - name: automatic_stabiliser_intensity
+    source: oecd:SOCX_AGG
+    transformation: level
+  - name: short_time_work_coverage
+    source: oecd:STWS
+    transformation: level
+  controls:
+  - name: pre_2008_debt_to_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Cross-country panel: 2008-trough output gap and employment loss regressed on a pre-2008 automatic-stabiliser intensity index (welfare expenditure %GDP, replacement rates, short-time-work coverage).
+    Tests whether higher stabiliser intensity predicts smaller contractions, holding pre-crisis fiscal stance and openness constant.
+
+    '
+scope:
+  period:
+  - 2008
+  - 2017
+  countries:
+  - DEU
+  - GBR
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - ESP
+  - ITA
+  - GRC
+  - PRT
+  - NORDIC
+  - SOUTHERN_EUROPE
+  outcome_dim:
+  - gdp_growth
+  - employment_labour
+  - welfare_state
+  policy_family:
+  - fiscal_policy
+  - welfare_architecture
+  - labour_market
+  treatment_tags:
+  - automatic_stabilisers
+  - germany_kurzarbeit
+  - global_financial_crisis_2008
+covers_claims:
+- position_id: social_democratic
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Identical-proposition: claim and hypothesis both test whether larger automatic stabilisers produced milder 2008 output/employment contractions across Nordic/German vs UK/southern-Eurozone peers.'

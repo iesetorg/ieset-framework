@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: milei_reforms_reduce_argentine_inflation
+version: 1
+status: pre_registered
+topic: monetary
+claim: 'Argentine monthly CPI inflation declines from its late-2023 peak (around 25% month-on-month in December 2023 following the 54% peso devaluation) to below 5% month-on-month within 12 months of Milei''s
+  December 2023 inauguration, and below 3% month-on- month within 18 months. The decline is faster and deeper than in any prior Argentine stabilisation episode since the 1989-1991 Austral/Convertibility
+  period (Menem), and faster than in any of the Latin American stabilisation episodes in the IMF''s post- 1990 catalogue that did not adopt dollarisation, controlling for initial inflation level. The pre-registered
+  primary outcome is monthly CPI inflation as published by INDEC.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ARG
+  period:
+  - 2018
+  - 2027
+  temporal_structure: time_series
+  exclusion_rules:
+  - restrict to INDEC-published monthly CPI (IPC Nacional series) where disputes about official vs alternative estimates are minimal post-2016
+variables:
+  outcome:
+  - name: monthly_cpi_inflation_argentina
+    source: imf:PCPIPCH (annual); imf:IFS; indec_ipc:monthly (manual/alternative)
+    transformation: monthly_percent_change
+    notes: 'Primary outcome. Monthly CPI month-on-month percent change. Secondary annualised rate as cross-check. IMF IFS monthly CPI is the primary automated source; if unavailable on disk at run time,
+      the hypothesis is data-gated and will be materialised via INDEC manual drop.
+
+      '
+  - name: monthly_cpi_inflation_annualised
+    source: derived from monthly_cpi_inflation_argentina
+    transformation: ((1 + m/100)^12 - 1) * 100
+  treatment:
+  - name: milei_inauguration_indicator
+    source: 'constructed: indicator = 1 from 2023-12-10 onwards; 0 prior.'
+    transformation: step_indicator
+  - name: milei_months_since_inauguration
+    source: 'constructed: integer count of months since December 2023'
+    transformation: integer_count
+  controls:
+  - name: monthly_cpi_latam_peers
+    source: imf:IFS; countries BRA, CHL, COL, MEX, PER, URY
+    transformation: monthly_percent_change
+    notes: Monthly LatAm peer inflation used as control for region-wide commodity and monetary cycle effects.
+  - name: commodity_price_index
+    source: imf:Primary; world_bank_wdi pink_sheet aggregate
+    transformation: monthly_log_change
+  - name: real_effective_exchange_rate_argentina
+    source: bis:WS_EER (ARG narrow/broad); bcra official rate series
+    transformation: monthly_log_change
+intervention_channel: fiscal
+intervention_channel_justification: 'The primary Milei intervention mechanism is fiscal: elimination of BCRA financing of the Treasury (no more transfers to the Treasury) plus primary-surplus achievement
+  via spending cuts. The peso devaluation and monetary-aggregate path are consequences of the fiscal regime change rather than independent monetary interventions. This is coded as a fiscal- dominance-removal
+  intervention per D.1.5 monetary scope; regulatory-channel deregulation (DNU 70/2023) is tracked separately under milei_shock_therapy_output_recovery_trajectory.
+
+  '
+estimator:
+  template: event_study
+  clustering: month
+  notes: 'Event-study presentation around the December 2023 inauguration date. Primary test: pre-registered magnitude of monthly inflation 12 and 18 months post-event. Secondary: comparison to a peer-Latam
+    synthetic-control-style control panel using Abadie-Diamond-Hainmueller weights optimised on 2015-2023 pre-period monthly inflation dynamics. Alternative: local projection (Jordà 2005) on monthly inflation
+    with Milei-era indicator and months-since-event interaction.
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive, all three must hold for SUPPORTED): (1) median Argentine monthly CPI m/m inflation across the window [t+10, t+14] post-inauguration (Oct 2024 through Feb 2025) <= 5.0%; (2)
+    median monthly CPI m/m inflation across the window [t+16, t+20] (Apr 2025 through Aug 2025) <= 3.0%; (3) months_to_first_sub_5 (first calendar month after t=0 whose m/m INDEC print falls below 5%) <=
+    10. Verdict aggregation: 3/3 hold = SUPPORTED; 0/3 = refuted; 1-2/3 = partial. METHOD_VALID gate: INDEC IPC Nacional monthly index covers Dec 2022 through Jun 2025 (t-12 through t+18) without gaps;
+    failure emits inconclusive rather than refuted. INFORMATIVE colour: comparison to the IMF post-1990 non-dollarisation LatAm stabilisation catalogue (Brazil Real 1994, Mexico Tesobonos 1995, Peru Fujimori
+    1990, Uruguay 2002, Bolivia 1985) reported in diagnostics; colours the verdict but does not gate it.'
+  test: event_study_monthly_inflation_thresholds
+  threshold: 'PRIMARY: median(mom_pct, t in [10..14]) <= 5.0 AND median(mom_pct, t in [16..20]) <= 3.0 AND months_to_first_sub_5 <= 10'
+methodology_note: v1 promotion (2026-04-24). Replication implemented as a literal event-study around 2023-12 (Milei inauguration, t=0) using INDEC IPC Nacional monthly index (series 148.3_INIVELNAL_DICI_M_26,
+  Dec 2016 = 100), transformed to month-on-month percent change. The three pre-registered conditions in the spec's falsification.threshold are evaluated dispositively; verdict aggregates 3/3 = SUPPORTED,
+  0/3 = refuted, 1-2/3 = partial. Method-valid gate is gap-free INDEC monthly coverage from t-12 through t+18. Synthetic-control and local-projection robustness flagged in estimator.notes are deferred to
+  v2.
+prior_confidence: 0.72
+disclosure: 'Prior reflects the evident early-stabilisation signal already visible in public INDEC data through 2025-Q1, combined with uncertainty about whether the 18-month sub-3% threshold holds through
+  FX-liberalisation episodes expected 2025. Author market-liberal prior is aligned with the hypothesis; pre- registration is binding, and the specific thresholds (5% at 12 months, 3% at 18 months) commit
+  to a falsifiable test rather than a vague "inflation will decline" claim. This hypothesis is explicitly listed as entry #10 in mega-spec D.1 and is intended as a named pre-registration that the framework
+  commits to in advance of the full 18-month observation window.
+
+  '
+conflict_disclosure: 'Author does not hold Argentine assets or Argentine-currency exposure. Ideological alignment with the Austrian / monetarist reading of the stabilisation (fiscal-dominance removal as
+  root cause) is disclosed; an outcome that falsifies the hypothesis would update the author''s priors materially on whether disinflation speeds can be achieved without dollarisation in post-fiscal-dominance
+  economies.
+
+  '
+steelman: hypotheses/steelman/milei_reforms_reduce_argentine_inflation.md
+linked_hypotheses:
+- hyperinflation_requires_fiscal_dominance
+- central_bank_independence_inflation_discipline
+- milei_shock_therapy_output_recovery_trajectory
+notes: 'Data-gated: IMF IFS monthly CPI for ARG + LatAm peers must land on disk before run. If IFS coverage is delayed, the INDEC IPC series is a clean substitute via manual drop (Argentina-specific) combined
+  with peer-country monthly CPI from each central bank via OWID / IMF mirrors.
+
+  Entry #10 in mega-spec D.1 pre-registration list (monetary topic). First-commit timestamp is the authoritative pre- registration date for v1.
+
+  '
+scope:
+  period:
+  - 2018
+  - 2027
+  countries:
+  - ARG
+  - LATAM
+  outcome_dim:
+  - inflation
+  - fiscal_policy
+  - monetary_policy
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  - institutional_reform
+  treatment_tags:
+  - milei_shock_therapy_2023
+  - milei_stabilisation_2023
+  - fiscal_dominance_removal
+  - bcra_financing_removal
+  - argentine_primary_surplus
+covers_claims:
+- position_id: austrian
+  claim_index: 14
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Austrian claim that Milei fiscal-first stabilisation produces rapid disinflation without dollarisation; directly covered by the event-study spec around Dec 2023.
+- position_id: chicago_monetarism
+  claim_index: 14
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Chicago-monetarist claim that BCRA-financing removal + primary surplus produces rapid rule-based disinflation; directly covered by the event-study spec.
+- position_id: austrian
+  claim_index: 11
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Austrian claim that Milei 2023-2024 fiscal-first shock therapy produces faster inflation stabilisation than prior heterodox/price-control programmes; relinked from argentina_default_collapse_output_effects
+    (Phase 4C) — entity/era match on Milei stabilisation.

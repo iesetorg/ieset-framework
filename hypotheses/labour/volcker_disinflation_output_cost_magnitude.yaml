@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: volcker_disinflation_output_cost_magnitude
+version: 1
+status: draft
+topic: labour
+claim: Volcker disinflation 1979-1982 produced output costs (unemployment rising to 10.8%) that mainstream
+  models systematically underestimated, consistent with post-Keynesian insistence that disinflation costs
+  are real and persistent.
+notes: Stub seeded from a Post-Keynesian school prediction about Volcker disinflation output-cost magnitude.
+  Mirror of monetarist hypothesis but emphasises persistence; needs human review of model-baseline comparison.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors view Volcker output costs as a defensible price for restored
+  inflation credibility rather than a critique of the policy approach; could under-weight evidence of
+  underestimated costs and frame any positive result as confirmatory rather than challenging.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Compare realised US unemployment 1979-1982 against contemporaneous mainstream-model forecasts
+    (DRI, FRB-MIT-Penn) at the Volcker turn; supported if realised peak exceeds forecast by >2pp.
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [1976, 1985]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "report main results on 1976-1985 window; report 1970-1990 as robustness"
+
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: level
+    - name: real_gdp
+      source: "fred:GDPC1"
+      transformation: log_yoy
+    - name: industrial_production_index
+      source: "fred:INDPRO"
+      transformation: log_yoy
+    - name: real_wage_index
+      source: "bls:CES0500000003"
+      transformation: log_yoy
+      notes: "BLS CES average hourly earnings, deflated by CPI at fetch time."
+  treatment:
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+      notes: >
+        FRED fed funds rate — captures the 1979-10 Volcker policy turn.
+    - name: cpi_inflation_yoy
+      source: "fred:CPIAUCSL"
+      transformation: log_yoy
+      notes: "Disinflation outcome variable — the inflation path that the policy aimed to break."
+    - name: volcker_turn_indicator
+      source: "derived:volcker_turn_dates"
+      transformation: indicator
+      notes: "Hand-coded 1979-10 onset / 1982-08 release indicator."
+  controls:
+    - name: oil_price_wti
+      source: "fred:WTISPLC"
+      transformation: log_yoy
+    - name: dollar_index
+      source: "fred:DTWEXBGS"
+      transformation: log
+    - name: m2_money_supply
+      source: "fred:M2SL"
+      transformation: log_yoy
+
+scope:
+  period: [1979, 1982]
+  countries: [USA]
+  outcome_dim: [monetary_policy, inflation, employment_labour]
+  policy_family: [monetary_policy]
+  treatment_tags: [volcker_disinflation_1979]
+
+covers_claims:
+  - position_id: post_keynesian
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Post-Keynesian claim that Volcker 1979-82 disinflation produced output costs (unemployment to 10.8%) that mainstream models systematically underestimated, supporting real-and-persistent-disinflation-cost view."
+
+estimator:
+  template: event_study
+  clustering: HAC
+  fixed_effects: []
+  notes: >
+    Event study around the October 1979 Volcker policy turn using US
+    monthly time series. Outcomes: unemployment, real output,
+    industrial production, real wages 1976-1985. HAC standard errors;
+    counterfactual built from pre-1979 trend.
+

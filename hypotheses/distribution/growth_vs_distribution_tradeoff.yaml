@@ -1,0 +1,189 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: growth_vs_distribution_tradeoff
+version: 1
+status: pre_registered
+topic: distribution
+claim: 'Across advanced economies over 1985-2020, countries with forced-saving / architecture-based redistribution (Singapore CPF, Chilean AFP pre-2008, Australian Superannuation, Swiss mixed pension pillars)
+  achieve comparable or superior long-run growth outcomes alongside comparable distributional improvements in household net wealth distribution relative to countries relying primarily on tax-and-transfer
+  redistribution (Nordic cluster, UK, France). The specific claim is that architecture-based systems avoid the marginal-tax-rate deadweight loss while still compressing wealth inequality, because the redistribution
+  happens via mandated channelling of current income into individual accounts that collectively aggregate to household sector wealth. A clean supported finding would show architecture-countries with growth-per-capita
+  trajectories not statistically distinguishable from Nordic-cluster growth and with wealth Gini compression comparable to Nordic disposable-income Gini compression over the same period. Fiscal sustainability
+  (gross debt-to- GDP trajectory) should differ measurably, with architecture-countries carrying lower average debt burdens.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - SGP
+  - CHL
+  - AUS
+  - CHE
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - GBR
+  - FRA
+  - DEU
+  - NLD
+  - USA
+  - NZL
+  - CAN
+  period:
+  - 1985
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing household wealth distribution data
+  - 'Chile-specific: split pre-2008 AFP-only vs post-2008 solidarity-pillar periods'
+  - drop country-years during sovereign-debt crisis episodes (GRC 2010-2015 excluded to avoid euro-crisis dominance)
+variables:
+  outcome:
+  - name: gdp_per_capita_real_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: annual_pct_change
+  - name: household_wealth_gini
+    source: owid:wealth-gini-zucman
+    transformation: level
+    notes: 'WID / Credit Suisse Global Wealth Report wealth Gini; routed via OWID mirror. Coverage is thinner than disposable-income Gini; hypothesis is gated on this outcome''s availability for the forced-saving
+      country subset.
+
+      '
+  - name: gross_government_debt_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+    notes: IMF WEO general government gross debt as share of GDP.
+  treatment:
+  - name: redistribution_architecture_type
+    source: manual:classification
+    transformation: categorical
+    notes: 'Categorical treatment variable coded from policy documentation: "forced_saving_dominant" (SGP, CHL 1985-2008, AUS 1992+, CHE), "tax_transfer_dominant" (NOR, SWE, DNK, FIN, FRA, GBR, DEU, NLD),
+      "hybrid" (CHL post-2008, AUS pre-1992, USA with SS+401(k), CAN, NZL). Coding sheet committed alongside spec; manual classification flagged per framework requirement for transparent coding.
+
+      '
+  decomposition_channels:
+  - name: mandatory_savings_rate_pct_wage
+    source: manual:from_publisher_filings
+    transformation: level
+    notes: 'SGP CPF rate (pending singapore_cpf fetcher), AUS super guarantee (APRA), CHE pension pillar contribution. For tax-transfer-dominant countries, set to statutory minimum (0 for private systems,
+      or unfunded-SS-like value as footnoted). Data-gated.
+
+      '
+  - name: household_savings_rate
+    source: oecd:OECD.SDD.NAD,DSD_HHDASH@DF_HHDASH,1.0
+    transformation: level
+    notes: OECD household-savings-rate dashboard; proxy for total savings mobilisation.
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: urbanisation
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: government_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+    notes: Controls for institutional-quality confounding (SGP, CHE score high; NOR, DNK also high).
+intervention_channel: bundled
+intervention_channel_justification: 'The treatment variable (redistribution architecture) is inherently bundled — it comprises regulatory design (mandated contribution rates, account structure, investment
+  rules) and fiscal design (tax treatment of contributions, public top-up pillars). Per invariant 4 the intervention is bundled and the decomposition does not attempt to isolate the fiscal vs regulatory
+  components at v1.
+
+  '
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: "Three parallel specifications, one per outcome:\n  outcome_ct = b0 + b1*arch_type + b2*controls + alpha_c + gamma_t\n  + epsilon_ct. Treatment dummy coded on arch_type classification.\nCluster-robust\
+    \ SEs at country level. Explicitly NOT a causal estimator — evidence_type is associational because architecture adoption is a deep political-economy choice entangled with institutional quality. A causal\
+    \ reading would require either event-study on the 1992 Australian super introduction or the 1981 Chilean AFP introduction as natural experiments (v2 spec). v1 is cross-country descriptive with institutional-quality\
+    \ controls.\n"
+falsification:
+  rule: 'Not supported if the forced-saving-dominant country cluster shows either (a) statistically significant lower average growth per capita than the tax-transfer-dominant cluster by more than 0.5 percentage
+    points per annum after controls and fixed effects, or (b) statistically significant higher wealth Gini than the tax-transfer cluster by more than 5 Gini points. Either would falsify the claim that forced-saving
+    architectures deliver comparable distributional outcomes without a growth cost. Separately, the hypothesis requires that the forced-saving cluster show average gross-debt-to-GDP below the tax-transfer
+    cluster''s average by at least 10 percentage points over the sample period; if not, the fiscal-sustainability component of the claim is unsupported.
+
+    '
+  test: cluster_contrast_across_three_outcomes
+  threshold: 'abs(delta_growth) < 0.5_pp_per_annum  AND abs(delta_wealth_gini) < 5_gini_points  AND delta_debt_gdp >= 10_pp_lower_for_forced_saving
+
+    '
+prior_confidence: 0.55
+disclosure: 'Author holds strong priors toward architecture-based redistribution as an under-appreciated policy design. The 0.55 prior is deliberately modest because the cross-country evidence is mixed:
+  Chilean AFP had documented coverage problems pre-2008 reform, Singapore CPF real returns have been contested, and growth-clustering is heavily confounded with institutional quality (SGP, CHE score among
+  the world''s highest). A supported finding would be meaningful; an unsupported finding would be more meaningful still and the author commits to publishing either. Conflict-disclosure-adjacent: the author
+  has written favourably on forced-saving architectures in prior work.
+
+  '
+steelman: hypotheses/steelman/growth_vs_distribution_tradeoff.md
+scope:
+  period:
+  - 1985
+  - 2020
+  countries:
+  - SGP
+  - CHL
+  - AUS
+  - CHE
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - GBR
+  - FRA
+  - DEU
+  - NLD
+  - USA
+  - NZL
+  - CAN
+  - OECD
+  outcome_dim:
+  - gdp_growth
+  - poverty_inequality
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - forced_saving_architecture
+  - tax_and_transfer_redistribution
+  - singapore_cpf
+  - chilean_afp
+  - australian_superannuation
+  - swiss_pension_pillars
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: Phase 4C candidate — audit flagged FAIL. Democratic-socialist claim is about generic tax-and-transfer growth-neutrality; hypothesis tests architecture-based vs transfer-based comparative. Consider
+    relink to a dedicated tax-transfer-growth-neutrality hypothesis.
+- position_id: market_socialist
+  claim_index: 0
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Market-socialist claim that market-respecting redistribution outperforms pure transfers maps onto the hypothesis's architecture-vs-transfer comparative. Polarity aligned (private-ownership default
+    caveat noted in claim_notes does not flip the empirical direction).
+- position_id: social_democratic
+  claim_index: 1
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Social-democratic claim (transfer expansion without proportional growth cost) is covered by the hypothesis's tax-transfer-dominant cluster arm; the hypothesis specifically tests whether that arm
+    matches architecture-based outcomes on growth and distribution.
+linked_hypotheses:
+- welfare_architecture_comparative_effectiveness
+- nordic_outcome_persistence_decomposition
+notes: 'Data-gated on native fetchers for singapore_cpf, apra, and chile_spensiones — all currently pending in publishers.yaml. v1 relies on OWID mirrors and manual classification; v2 upgrade post- fetcher
+  brings native contribution-rate data and investment-return series. Wealth Gini coverage is the binding constraint on sample size; this is acknowledged in exclusion rules.
+
+  '

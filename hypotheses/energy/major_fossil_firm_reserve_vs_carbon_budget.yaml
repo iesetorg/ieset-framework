@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: major_fossil_firm_reserve_vs_carbon_budget
+version: 1
+status: draft
+topic: energy
+claim: Exxon, Shell, BP, Chevron 1980-2020 disclosed knowledge of climate impacts while investing in reserves
+  whose combustion would exceed the remaining 1.5C carbon budget, consistent with accumulation-ecological-limit
+  contradiction.
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL, USA, GBR, NLD]
+  outcome_dim: [energy, industrial_capability]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [fossil_fuel_major_reserves, one_point_five_c_carbon_budget, paris_agreement_2015]
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Claim text matches hypothesis claim verbatim: Exxon/Shell/BP/Chevron 1980-2020 reserves-vs-1.5C-budget divergence as accumulation-ecological-limit contradiction. Direct alignment."
+notes: Maps the eco-socialist school's fossil-major-reserves-exceed-carbon-budget claim to a descriptive
+  comparison of disclosed reserve combustion potential vs IPCC 1.5C remaining carbon budget. Estimator
+  and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.65
+disclosure: Author prior accepts the descriptive arithmetic (Carbon Tracker 2011 Unburnable Carbon and
+  IPCC AR6 reserve-vs-budget calculations both confirm major-firm reserves exceed 1.5C budget several
+  times over) but is uncertain about the 'accumulation-ecological-limit contradiction' framing — the
+  combustion attribution depends on assumed extraction realisation rates over 2020-2050.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Descriptive comparison of Exxon/Shell/BP/Chevron 1980-2020 reported reserves (10-K filings) converted to combustion-CO2 vs IPCC AR6 1.5C remaining carbon budget; firm+year-level. Refute if combined firm reserves'' combustion-CO2 not >2x the global 1.5C budget at any 5-year window OR if internal climate-knowledge documents pre-1990 are not contemporaneous with reserve expansion.'
+evidence_type: associational
+sample:
+  countries: [USA, GBR, NLD]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop firm-years missing 10-K reserve disclosure"
+    - "convert mixed oil/gas reserves to combustion-CO2 using IPCC AR6 emission factors"
+variables:
+  outcome:
+    - name: cumulative_reserve_combustion_co2_gt
+      source: "constructed: firm-level 10-K reported proved reserves (Exxon, Shell, BP, Chevron) converted to combustion-CO2 via IPCC AR6 emission factors. Hand-coded from SEC 10-K + UK Annual Reports + cross-referenced with Carbon Tracker (2011 Unburnable Carbon)."
+      transformation: level
+      notes: "Firm-year reserve volumes in GtCO2-equivalent if combusted. TODO swarm-6e: confirm Carbon Tracker / Climate Accountability Institute as canonical source — neither registered yet, so hand-coded under derived/."
+    - name: ipcc_remaining_carbon_budget_1p5c_gt
+      source: "constructed: IPCC AR6 WG1 SPM remaining 1.5C carbon budget (50% probability), updated annually."
+      transformation: level
+  treatment:
+    - name: firm_reserve_expansion_year
+      source: "constructed: firm-year indicator = 1 if reserves grew >5% YoY (10-K disclosed). Tracks contemporaneity with internal climate-knowledge documents (1980s onwards)."
+      transformation: indicator
+  controls:
+    - name: brent_oil_usd
+      source: "imf_pcps:POILBRE"
+      transformation: log
+      notes: "Reference oil price to control for reserve-revaluation effect on disclosed volumes."
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive arithmetic comparison: sum 1980-2020 disclosed reserves of
+    Exxon, Shell, BP, Chevron converted to combustion-CO2; benchmark against
+    IPCC 1.5C remaining carbon budget at 5-year intervals. Pair with timeline
+    of internal climate-knowledge documents (Exxon-Mobil internal memos
+    1977 onwards) to establish contemporaneity of disclosed knowledge and
+    reserve expansion. Not causal — descriptive arithmetic plus event timeline.

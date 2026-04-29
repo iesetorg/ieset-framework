@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: petro_reform_package_economic_trajectory_2022_present
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Colombia''s real GDP, FDI inflows, and peso exchange-rate trajectory from Petro''s August 2022 inauguration through 2026 diverge negatively from a comparable-institutional-quality Latin American
+  donor pool (Peru, Chile, Mexico) weighted to match Colombia''s pre-treatment macroeconomic profile (GDP per capita, oil export share, central-bank-independence index, WGI rule-of-law score, inflation-target
+  credibility). The hypothesis is deliberately symmetric: the pre-registered test permits a null result (no divergence), a negative result (policy-content cost), or a positive result (policy-content success).
+  Given only ~2 years of observable data at time of drafting and another ~2 years of observation anticipated before the v1 run at 2027, the prior is genuinely uncertain; the pre-registration locks the specification
+  now so the later run is not degrees-of-freedom fishing.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - COL
+  - PER
+  - CHL
+  - MEX
+  period:
+  - 2014
+  - 2027
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-quarters during the 2020Q2 and 2020Q3 COVID extreme outliers from synthetic-control weight fitting
+  - note Chile 2019-2020 social uprising and 2022-2023 Boric-era political turbulence; do not exclude but flag in robustness
+variables:
+  outcome:
+  - name: real_gdp_quarterly
+    source: imf:NGDP_RPCH (annual) + national statistics offices (DANE COL, INEI PER, INE CHL, INEGI MEX) quarterly via owid or IMF IFS mirror
+    transformation: log_level_quarterly
+  - name: fdi_net_inflows_pct_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: annual_level
+  - name: real_effective_exchange_rate
+    source: bis:WS_EER (COL, PER, CHL, MEX narrow/broad)
+    transformation: index_level_monthly
+  - name: sovereign_credit_spread
+    source: ecb:EMBI; jpmorgan:EMBI+
+    transformation: basis_points_level
+  - name: private_investment_pct_gdp
+    source: world_bank_wdi:NE.GDI.FPRV.ZS; imf:INV_NGDP (private)
+    transformation: annual_level_pct
+  treatment:
+  - name: petro_era_indicator
+    source: 'constructed: binary = 1 for COL from 2022Q3 onward; 0 otherwise'
+    transformation: binary
+  - name: quarters_since_petro_inauguration
+    source: 'constructed: integer count of quarters since 2022Q3'
+    transformation: integer_count
+  controls:
+  - name: commodity_terms_of_trade
+    source: imf:Primary; world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: quarterly_log_change
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: monthly_level
+  - name: latam_peer_average_cpi_inflation
+    source: imf:PCPIPCH
+    transformation: quarterly_annualised
+  - name: wgi_rule_of_law
+    source: wgi:GOV_WGI_RL.EST
+    transformation: annual_level
+  - name: central_bank_statutory_independence
+    source: 'constructed: CBI index (Garriga 2016 update or equivalent) — fixed across the window for donor-pool constants'
+    transformation: level_fixed
+intervention_channel: bundled
+intervention_channel_justification: 'The Petro package combines fiscal-channel (tax reform 2022, pension reform proposal 2024, labour reform), regulatory- channel (energy-transition posture, health-sector
+  reform), and institutional-channel (peace policy, security-policy pivot) changes simultaneously. Invariant 4 channel-separation is preserved by pre-registering that the aggregate outcome test is bundled
+  and that channel-specific tests would be separate v1.1 specifications.
+
+  '
+estimator:
+  template: synth_did
+  clustering: country
+  notes: 'Primary specification: synthetic DiD with COL as treated unit and PER+CHL+MEX donor pool. Pre-period 2014-2022Q2 defines the synthetic counterfactual; treatment effect is the gap between observed
+    COL and synthetic COL from 2022Q3 onwards. Donor pool is chosen on pre-treatment institutional quality (WGI + CBI index + inflation-targeting credibility) rather than geography alone.
+
+    Secondary specification: Callaway-Sant''Anna DiD with the three donors as never-treated control group.
+
+    Robustness: re-fit synthetic control excluding Chile (which had its own Boric-era political turbulence) to check whether Chile''s contemporaneous policy dynamics drive results.
+
+    '
+falsification:
+  rule: 'The pre-registered test supports the SYMMETRIC ASSESSMENT. A ''supported-negative'' outcome requires ALL of: (a) synthetic- DiD cumulative real GDP gap 2022Q3-2026Q4 < -3 log-points, (b) FDI cumulative
+    gap < -1 percentage point of GDP per year, (c) sovereign spread widening > 100 bp above synthetic counterfactual at peak. A ''supported-null'' outcome requires all three gaps within ±1 SD of permutation-inference
+    placebo distribution. A ''supported-positive'' outcome would require equal-magnitude positive deviation. The hypothesis is ''not informative'' if the permutation inference cannot distinguish any of
+    the three regimes — which at ~4-year horizon with a 3-unit donor pool is a plausible outcome.
+
+    '
+  test: synth_did_symmetric_assessment_with_donor_pool
+  threshold: 'classification one of {''supported-negative'', ''supported-null'', ''supported-positive'', ''not-informative''} per pre-registered thresholds above; reporting all three deltas AND permutation
+    p-values is required regardless of classification.
+
+    '
+prior_confidence: 0.55
+disclosure: 'Prior is deliberately near the midpoint to reflect genuine uncertainty. Early-assessment status is explicit: only 2 years of observable data at time of drafting plus another 2-3 years expected
+  before the v1 run is meaningful. The author has market-liberal priors that tilt toward expecting negative effects from rapid redistributive reform in a middle-income hydrocarbons economy; the pre-registration
+  commits to reporting the result in either direction, with the symmetric-assessment framing ensuring that a null result is publishable rather than file-drawered.
+
+  '
+conflict_disclosure: 'Author holds no Colombian asset exposure. The symmetric- assessment design is chosen specifically to mitigate ideological-prior bias: a result that falsifies the market- liberal prior
+  (i.e., Petro-era outcomes not worse than peers) updates materially and is as publishable as the opposite.
+
+  '
+steelman: hypotheses/steelman/petro_reform_package_economic_trajectory_2022_present.md
+scope:
+  period:
+  - 2014
+  - 2027
+  countries:
+  - COL
+  - PER
+  - CHL
+  - MEX
+  - LATAM
+  outcome_dim:
+  - gdp_growth
+  - capital_flows
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  - tax_policy
+  treatment_tags:
+  - petro_reforms_2022
+  - petro_reform_package_2022
+  - latam_monetary_tightening_cycle_2021_2023
+covers_claims:
+- position_id: marxian
+  claim_index: 15
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: 'Phase 4C concern: marxian claim tests tax/pension/labour reform feasibility with welfare/tax/capital_flows outcomes, while this hypothesis tests GDP/FDI/peso divergence with gdp_growth/capital_flows/fiscal_policy
+    outcomes. Candidate for relink or new hypothesis `petro_redistributive_reform_feasibility_2022_present`.'
+- position_id: post_keynesian
+  claim_index: 15
+  polarity: aligned
+  school_prediction: mixed
+  confidence: high
+  notes: 'Near-identical-proposition: post-Keynesian claim tests whether Petro-era 2022-2026 trajectory is not meaningfully worse than LatAm peer pool after controlling for monetary-tightening cycle — directly
+    aligned with this hypothesis''s symmetric-assessment design.'
+linked_hypotheses:
+- austerity_output_recovery_tradeoff
+- trade_liberalisation_growth_effect
+notes: 'Data-gated: DANE (Colombia), INEI (Peru), INE CHL, INEGI (Mexico) quarterly GDP; BIS REER for currency trajectories; JPMorgan EMBI+ spreads (may require manual drop). FDI from WDI is the automated
+  path.
+
+  Pre-registration is locked with a 2027 v1 run target. If the political turnover (2026 Colombia presidential election) produces a successor movement, the v1 endpoint captures the full Petro term. Post-run
+  v1.1 specifications can disaggregate channels (fiscal tax reform, pension reform, energy-transition, labour reform) as separate treatments.
+
+  '

@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: gfc_endogenous_minsky_leverage_mechanism
+version: 1
+status: draft
+topic: regulatory
+claim: 'The 2007-2009 financial crisis originated in endogenous leverage build-up (Minsky hedge→speculative→Ponzi financing transition) within financial sector balance sheets, not in exogenous shocks. Tested
+  by examining whether sectoral leverage and maturity-mismatch indicators rose systematically over the 2000-2007 pre-crisis window and crossed Minsky-style thresholds prior to the 2008 rupture, independent
+  of any named deregulation episode.
+
+  '
+notes: Origin is auto-generated Phase-4E stub seeded from post-Keynesian framing of GFC as endogenous-Minsky leverage build-up rather than deregulation-episode-to-crisis. Human review required to pin indicator
+  series and threshold-crossing methodology.
+prior_confidence: 0.55
+disclosure: Author has market-liberal priors but treats Minsky-indicator pre-2007 build-up as empirically well-established; risk is treating threshold-crossing as identifying causality rather than association.
+falsification:
+  rule: 'The hypothesis is SUPPORTED if at least 3 of 5 pre-registered Minsky- indicator series (broker-dealer leverage ratio, shadow-bank maturity mismatch, MBS issuance growth, household-debt-to-GDI ratio,
+    residential mortgage debt-to-income) show systematic monotonic rise over 2000-2007 and cross their pre-specified Minsky thresholds before Q1 2008. REFUTED if fewer than 2 indicators meet the threshold
+    or if the rise is non-monotonic.
+
+    '
+  test: Pre/post-crisis trajectory of 5 Minsky indicators (broker-dealer leverage, shadow-bank maturity mismatch, MBS issuance, household DTI, mortgage debt/income) over 2000-2007; >=3/5 show monotonic
+    rise crossing thresholds before Q1-2008 supports.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - IRL
+  - ISL
+  - ESP
+  - NLD
+  - DEU
+  - FRA
+  - ITA
+  period:
+  - 2000
+  - 2009
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing BIS leverage / household debt series
+variables:
+  outcome:
+  - name: broker_dealer_leverage_ratio
+    source: bis:WS_TC
+    transformation: level
+    notes: 'BIS total-credit-to-non-financial-sector / household-credit ratio as broker-dealer leverage proxy. TODO swarm-6e: Federal Reserve Z.1 for direct US broker-dealer leverage when fred fetcher coverage
+      extends.'
+  - name: household_debt_to_gdi_ratio
+    source: bis:WS_TC
+    transformation: level
+    notes: BIS credit-to-household-sector as % of GDP.
+  - name: mortgage_debt_share_gdp
+    source: fred:MORTGAGE
+    transformation: level
+    notes: FRED household mortgage debt share. US-only; cross-country uses BIS.
+  - name: real_house_price_index
+    source: oecd:OECD.SDD.PIN,DSD_RHPI@DF_RHPI,1.0
+    transformation: log
+  treatment:
+  - name: minsky_threshold_crossing_indicator
+    source: 'constructed: indicator = 1 for country-quarter when at least 3 of 5 pre-registered Minsky indicators cross their thresholds (broker-dealer leverage > 25:1, household debt-GDI > 100%, mortgage
+      growth > 10% YoY, MBS issuance > 20% YoY).'
+    transformation: indicator
+  controls:
+  - name: federal_funds_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+estimator:
+  template: descriptive
+  notes: 'Multi-indicator time-series scorecard 2000-2007 across USA + UK + IRL + ISL + ESP. For each pre-registered Minsky indicator (broker-dealer leverage, household debt-to-GDI, mortgage-growth, MBS
+    issuance, house- price-to-income), test for systematic monotonic rise and threshold- crossing pre-Q1-2008. Hypothesis supported if >=3 of 5 indicators meet monotonicity + threshold criteria. Caveat:
+    thresholds are stipulated not estimated — flagged TODO swarm-6e for sensitivity.
+
+    '
+scope:
+  period:
+  - 2000
+  - 2009
+  countries:
+  - USA
+  - GBR
+  - OECD
+  outcome_dim:
+  - financial_crisis
+  - financialisation
+  policy_family:
+  - regulation
+  treatment_tags:
+  - minsky_financial_instability
+  - gfc_2007_2009
+  - endogenous_leverage_buildup
+covers_claims:
+- position_id: post_keynesian
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Post-Keynesian claim that GFC came from endogenous Minsky leverage build-up rather than deregulation episodes. Relinked from financial_deregulation_crisis_vulnerability in Phase 4E.

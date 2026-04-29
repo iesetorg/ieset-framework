@@ -1,0 +1,74 @@
+{
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 treatment 'indigenous_managed_indicator' not loaded",
+  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+  "verdict_reason": "treatment 'indigenous_managed_indicator' not loaded",
+  "hypothesis_id": "indigenous_managed_land_biodiversity_outcomes",
+  "template": "did_callaway_santanna",
+  "claim_direction_inferred": "?",
+  "falsification_rule_text": "PRIMARY (dispositive): the hypothesis is SUPPORTED if the Callaway-Sant'Anna ATT on parcel-level annual forest-cover loss (indigenous-managed minus biome-matched control parcels, 2000-2023, pooled across BRA/PER/COL/ECU/BOL/CAN/AUS) is at most -20% in relative terms (i.e. indigenous-managed parcels lose <=80% of the forest-cover that matched controls lose) AND the effect does not reverse sign in the Australian IPA subset. REFUTED if the pooled ATT is positive OR the sign reverses in the IPA subset. INFORMATIVE: country-level dispersion of the ATT (reported in diagnostics) and pre-trend test on the 5-year pre-designation event-time leads. METHOD_VALID: parcel-level NOAA-VIIRS forest-cover (or Hansen GFC) composite available with at least 5,000 parcel-years per country; indigenous-territory designation dates compiled from FUNAI / DCCEEW / First Nations registries for at least 80% of treated parcels. Failure of METHOD_VALID emits `inconclusive (data gap on <publisher>:<series>)` rather than `refuted`.",
+  "falsification_test_text": "cs_did_indigenous_vs_matched_parcels_2000_2023",
+  "estimate": {
+    "error": "treatment 'indigenous_managed_indicator' not loaded"
+  },
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "forest_cover_loss_pct_per_year",
+        "source": "noaa_viirs:forest_cover; faostat:forest_area",
+        "publisher": "faostat",
+        "n_rows": 290
+      },
+      {
+        "role": "outcome",
+        "name": "protected_area_extent",
+        "source": "faostat:protected_area_km2; world_bank_wdi:ER.LND.PTLD.ZS",
+        "publisher": "faostat",
+        "n_rows": 290
+      },
+      {
+        "role": "controls",
+        "name": "country_gdp_per_capita",
+        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14131
+      },
+      {
+        "role": "controls",
+        "name": "country_agriculture_value_added",
+        "source": "world_bank_wdi:NV.AGR.TOTL.ZS; faostat:agricultural_value_added",
+        "publisher": "world_bank_wdi",
+        "n_rows": 11033
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "deforestation_rate_amazon_basin",
+        "source": "noaa_viirs:active_fire_amazon (composite product covering BRA, PER, COL, ECU, BOL)"
+      },
+      {
+        "role": "treatment",
+        "name": "indigenous_managed_indicator",
+        "source": "constructed: parcel-year indicator = 1 from official designation date of indigenous territory / IPA / First-Nations comanagement; 0 prior or for matched non-indigenous parcels"
+      },
+      {
+        "role": "treatment",
+        "name": "years_since_designation",
+        "source": "derived: parcel_year_minus_designation_year (negative for pre-treatment)"
+      },
+      {
+        "role": "controls",
+        "name": "parcel_slope_mean",
+        "source": "noaa_viirs:srtm_elevation_derived"
+      },
+      {
+        "role": "controls",
+        "name": "parcel_distance_to_road_km",
+        "source": "manual: OSM road-network distance, snapshot-2010"
+      }
+    ]
+  },
+  "run_utc": "2026-04-28T12:41:52+00:00",
+  "runner": "scripts/run_did_callaway_santanna.py"
+}

@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: monetary_finance_deficit_currency_collapse_chain
+version: 1
+status: candidate
+topic: monetary
+claim: 'Monetary finance of fiscal deficits (central-bank balance-sheet expansion directed at sovereign obligations in the absence of independent policy rate adjustment) produces a three-order causal chain.
+  FIRST-ORDER: the state pays ongoing expenditure without raising statutory taxes or issuing bonds to third parties — a legitimate short-run cash-flow achievement, acknowledged as working on its own terms
+  during the window before second-order effects kick in. SECOND-ORDER: headline inflation rises, real wages fall, nominal savings erode, and relative price distortions accumulate. THIRD-ORDER: spontaneous
+  dollarisation (ARG dolar blue, TUR dolarizasyon, EGY parallel dollar), black-market FX rates diverge from official, capital controls are imposed as a desperate response, and middle-class emigration accelerates.
+  Cases: Argentina Fernández 2019-2023, Turkey Erdogan 2021-2023 unorthodox monetary regime, Venezuela 2013+, Sri Lanka 2020-2022, Ghana 2022, Egypt 2022-2024.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - ARG
+  - TUR
+  - VEN
+  - LKA
+  - GHA
+  - EGY
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 as primary identification window (pandemic fiscal response dominates monetary-finance signal in many EM); retain as robustness
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - ARG
+  - TUR
+  - VEN
+  - LKA
+  - GHA
+  - EGY
+  outcome_dim:
+  - inflation
+  - currency_purchasing_power
+  - capital_flows
+  - demographics_migration
+  - monetary_policy
+  - fiscal_policy
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  - exchange_rate_regime
+  - institutional_reform
+  treatment_tags:
+  - argentina_fernandez_2019
+  - turkey_erdogan_unorthodox_2021
+  - venezuela_chavismo_monetary_finance
+  - sri_lanka_2022_crisis
+  - ghana_2022_crisis
+  - egypt_2022_crisis
+variables:
+  outcome:
+  - name: central_bank_claims_on_government
+    source: imf:IFS (central bank claims on central government); national central banks (BCRA, TCMB, BCV, CBSL, BoG, CBE)
+    transformation: log_real_local_currency
+    notes: 'FIRST-ORDER outcome: monetary finance IS delivered — the government gets cash without tax/market issuance. Acknowledged as working on its own terms in the window.'
+  - name: headline_inflation
+    source: indec:IPC (ARG); tuik:CPI (TUR); ine:CPI (VEN); dcs:CPI (LKA); gss:CPI (GHA); capmas:CPI (EGY)
+    transformation: yoy_pct_change
+    notes: 'SECOND-ORDER outcome: inflation response.'
+  - name: real_wage_index
+    source: indec:salarios; tuik:wage_index; ine:salarios (VEN, limited); dcs:wages (LKA); gss:wages (GHA); capmas:wages (EGY)
+    transformation: yoy_pct_change_real
+    notes: 'SECOND-ORDER outcome: real-wage erosion.'
+  - name: dollarisation_share_of_bank_deposits
+    source: bcra:depositos_moneda_extranjera (ARG); tcmb:doviz_mevduati (TUR); bcv:depositos (VEN, limited); cbsl:deposits (LKA); bog:deposits (GHA); cbe:deposits (EGY)
+    transformation: share
+    notes: 'THIRD-ORDER outcome: dollarisation response.'
+  - name: parallel_vs_official_fx_rate_gap
+    source: 'constructed: ARG blue-dollar from Ambito Financiero; TUR kara para; VEN dolartoday; LKA parallel rate; GHA parallel rate; EGY parallel rate; all against IMF official'
+    transformation: ratio
+    notes: 'THIRD-ORDER outcome: parallel-FX premium.'
+  - name: capital_control_stringency
+    source: 'imf:AREAER (annual); constructed: event indicator for controls imposition (ARG cepo Sep-2019, TUR KKM + capital requirements, VEN Cadivi/Sicad/Dicom, LKA 2022 import controls, GHA 2022 FX restrictions,
+      EGY 2022 import letter-of-credit controls)'
+    transformation: index
+    notes: 'THIRD-ORDER outcome: capital-control response.'
+  - name: middle_class_emigration_flow
+    source: 'constructed: country-of-origin emigration stats from destination countries (OECD IMO, Spain INE migration register, Canada IRCC) for ARG, TUR, VEN, LKA, GHA, EGY nationals'
+    transformation: log_level
+    notes: 'THIRD-ORDER outcome: emigration response.'
+  treatment:
+  - name: monetary_finance_intensity
+    source: 'constructed: central-bank claims on government as share of monetary base + direct-monetisation events (BCRA adelantos transitorios, TCMB informal gilt purchases, BCV direct transfers)'
+    transformation: share_and_event_indicator
+  controls:
+  - name: fiscal_primary_balance_pct_gdp
+    source: imf:WEO
+    transformation: level_pct_gdp
+  - name: terms_of_trade_shock
+    source: imf:WEO; unctad:commodity_price_indices
+    transformation: yoy_pct_change
+  - name: global_interest_rate_proxy
+    source: fred:DGS10 (US 10yr); ecb:euribor
+    transformation: level_pct
+intervention_channel: fiscal
+intervention_channel_justification: 'Monetary finance is a fiscal-dominance regime where nominally- monetary instruments are used to finance the deficit. The classification as "fiscal" channel (rather than
+  pure monetary) follows Sargent-Wallace unpleasant-monetarist-arithmetic framework: the intervention is fiscal in origin, executed via the central bank.
+
+  '
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  random_seed: 20260424
+  notes: 'Primary: panel event study with country and year FE around monetary-finance intensification events per country. Secondary: local-projections-IV (lp_iv) using independence-of-central-bank legislative
+    changes as instrument where available (TUR 2019- 2021 governor changes, ARG 2020 BCRA adelanto expansion).
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive, executable). For each of the six EM cases a country-specific monetary-finance intensification event year T is fixed in the script (ARG 2019, TUR 2021, VEN 2013, LKA 2020,
+    GHA 2020, EGY 2022). FIRST-ORDER (cash delivered to government) is treated as confirmed by case construction — these are documented MF episodes. SECOND-ORDER: per case, mean CPI inflation (IMF PCPIPCH)
+    over T+1..T+3 must be >= 2.0x the T-5..T-1 mean. THIRD-ORDER: per case, the LCU/PPP$ private conversion factor (WDI PA.NUS.PRVT.PP) at T+3 must be at least +30% above its T-1 value (cumulative depreciation).
+    Chain is SUPPORTED if SECOND-ORDER passes in >=5/6 cases AND THIRD-ORDER passes in >=4/6 cases. Chain is REFUTED if neither gate is met. Partial otherwise. INFORMATIVE: per-case inflation multiple,
+    depreciation %, and spec context series (gov debt/GDP, primary balance/GDP) are reported but do not gate the verdict. METHOD_VALID: at least 4/6 cases must have non-missing IMF PCPIPCH coverage in both
+    pre and post windows. If >=3/6 cases have an inflation data gap, the verdict is inconclusive rather than refuted.'
+  test: event_study_six_case_em_monetary_finance_chain
+  threshold: 'PRIMARY: post/pre inflation mean >= 2.0 in >=5/6 cases AND cumulative LCU/PPP$ depreciation >= +30% in >=4/6 cases.'
+methodology_note: 'v1 promotion (2026-04-27). Sharpened the original rule into two dispositive case-level gates against the IMF PCPIPCH inflation series and the WDI PA.NUS.PRVT.PP currency conversion factor.
+  Asymmetric thresholds (5/6 inflation, 4/6 currency) reflect the framework''s expectation that price-level transmission is near- mechanical while currency response can be muted under capital controls or
+  managed float regimes. Real-wage erosion and dollarisation/parallel-FX/capital-controls/emigration outcomes named in spec.variables are not separately tested in v1: the bcra/tcmb/cbsl/bog/cbe deposit
+  and parallel-rate vintages and the destination-country migration vintages are not on disk. PA.NUS.PRVT.PP is used as a single 3rd-order proxy that captures the official-rate component of currency depreciation
+  across all six cases uniformly; spec''s parallel-FX premium is the cleaner test where data lands.'
+prior_confidence: 0.88
+disclosure: 'Author holds market-liberal priors and follows Sargent-Wallace, fiscal-theory-of-the-price-level, and standard EM-crisis literatures. Existing repo hypotheses hyperinflation_requires_ fiscal_dominance
+  and milei_reforms_reduce_argentine_inflation cover parts of this terrain. This hypothesis is distinct in staking the full six-country causal chain (monetary finance achieved -> inflation + real wage ->
+  dollarisation + capital controls + emigration) rather than the single-country analyses. Prior is high because the historical record across these six cases is overwhelming; the chain holds tightly.
+
+  '
+steelman: hypotheses/steelman/monetary_finance_deficit_currency_collapse_chain.md
+linked_hypotheses:
+- hyperinflation_requires_fiscal_dominance
+- milei_reforms_reduce_argentine_inflation
+- fiat_expansion_erodes_currency_purchasing_power_long_run
+- central_bank_independence_inflation_discipline
+notes: 'Chain: monetary finance delivered to gov (1st) -> inflation + real wage decline (2nd) -> dollarisation + parallel FX + capital controls + emigration (3rd). Scoped to EMs with weak central-bank independence;
+  DM QE cases (USA, JPN) are acknowledged separately and do not participate in the test.
+
+  '

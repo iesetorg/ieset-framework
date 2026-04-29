@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: abenomics_monetary_fiscal_coordination_effect
+version: 1
+status: draft
+topic: monetary
+claim: Abenomics' combined monetary-fiscal expansion lifted Japanese inflation and output partially but
+  failed to durably escape the deflation equilibrium, consistent with NK models of near-permanent ZLB
+  traps.
+notes: Stub seeded from a New-Keynesian school prediction about Abenomics partial-success/ZLB-trap. Distinguishing
+  partial lift from durable escape is delicate; needs human review of long-run inflation-expectations
+  metric.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors view Japan as a structural-supply-side stagnation case rather
+  than a pure ZLB-trap case; could over-attribute Abenomics' partial success to demographic and TFP headwinds
+  and under-weight the genuine monetary-fiscal coordination contribution.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Event study around April 2013 BoJ QQE on Japanese CPI, output, and 10y inflation expectations;
+    supported if CPI rises but expectations fail to anchor at 2% target by 2019 at p<0.10.
+evidence_type: associational
+scope:
+  period:
+  - 2012
+  - 2020
+  countries:
+  - JPN
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  - fiscal_policy
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  treatment_tags:
+  - abenomics_2012
+  - boj_qqe
+  - zero_lower_bound
+  - deflation_trap
+sample:
+  countries:
+  - JPN
+  period:
+  - 2008
+  - 2020
+  temporal_structure: time_series
+  exclusion_rules:
+  - exclude 2011 Tohoku-earthquake quarters (2011Q1-Q2) from primary estimation; include as sensitivity
+    check
+variables:
+  outcome:
+  - name: cpi_inflation_yoy
+    source: boj:CPI; fred:JPNCPIALLMINMEI
+    transformation: pct_change_yoy
+    notes: Headline CPI yoy. Boj series via manual-drop fallback; FRED mirror used pre-fetch.
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG; imf:NGDP_RPCH
+    transformation: pct_change_yoy
+  - name: inflation_expectations_breakeven
+    source: boj:inflation_expectations_household_survey
+    transformation: level_pct
+    notes: 'TODO: BoJ Opinion Survey on the General Public''s Views and Behavior; manual-drop required.'
+  treatment:
+  - name: abenomics_regime_indicator
+    source: 'constructed: binary = 1 from 2013-04 (BoJ QQE launch under Kuroda)'
+    transformation: binary
+  - name: boj_balance_sheet_pct_gdp
+    source: boj:money_stock_m2; fred:JPNASSETS
+    transformation: level_pct_gdp
+    notes: BoJ total assets / nominal GDP; tracks the QQE expansion intensity.
+  controls:
+  - name: usd_jpy_exchange_rate
+    source: fred:DEXJPUS
+    transformation: log_diff
+  - name: oil_price_brent
+    source: imf_pcps:POILBRE
+    transformation: log_diff
+    notes: Imported-inflation control.
+covers_claims:
+- position_id: new_keynesian
+  claim_index: 10
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'NK claim about Abenomics partially lifting inflation/output but failing to exit ZLB; Phase 4C
+    concern: hypothesis lacks sample.countries list — needs JPN and 2012-2020 explicitly added to resolve
+    GEO_UNVERIFIABLE flag.'
+estimator:
+  template: event_study
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Treatment is the Abenomics regime change (Apr-2013
+    BoJ QQE + fiscal package); event-study around the announcement/implementation window for inflation,
+    output, and inflation-expectations responses. Falsification rule and variables block remain to be
+    filled when this stub is promoted from draft.
+
+    '

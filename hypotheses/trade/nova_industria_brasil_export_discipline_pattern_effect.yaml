@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nova_industria_brasil_export_discipline_pattern_effect
+version: 1
+status: draft
+topic: trade
+claim: >
+  Lula third-term's Nova Indústria Brasil 2024 industrial-policy package,
+  conditioned on export performance and technology-diffusion metrics,
+  produces measurable sectoral capability gains (semiconductors, green
+  hydrogen, health-industrial complex) by 2030 — replicating the East Asian
+  export-discipline conditionality pattern rather than the earlier Latin
+  American import-substitution-industrialisation pattern.
+notes: Origin is Phase 4E coverage-gap split to give the Brazil 2024 Nova Indústria episode its own
+  hypothesis distinct from US CHIPS/IRA. Forward-looking claim with 2030 test window.
+prior_confidence: 0.40
+disclosure: Author has market-liberal priors that may underweight the Lula-third-term institutional
+  capacity for credibly enforcing export-discipline conditionality vs the import-substitution failure pattern.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if at least 3 of 5 pre-registered capability
+    indicators (sectoral export share, patent stock, FDI inward in target
+    sectors, domestic value-added share, employment in target sectors)
+    show gains exceeding pre-2023 trend by at least 1 standard deviation by
+    2030, conditional on export-performance metrics being enforced. REFUTED
+    if fewer than 2 indicators meet the threshold or if non-enforcement
+    reduces the effect to zero.
+  test: 'Multi-metric pattern check by 2030 across 5 capability indicators (sector export share, patent
+    stock, FDI, domestic VA, employment); >=3 above pre-2023 trend by >=1 SD with export discipline enforced supports.'
+evidence_type: associational
+scope:
+  period: [2024, 2030]
+  countries: [BRA]
+  outcome_dim: [industrial_capability, productivity]
+  policy_family: [industrial_policy, energy_policy, trade_policy]
+  treatment_tags: [nova_industria_brasil_2024, export_discipline_conditionality, import_substitution_industrialisation, lula_third_term]
+sample:
+  countries: [BRA, MEX, ARG, CHL, COL, KOR]
+  period: [2018, 2030]
+  temporal_structure: panel
+  exclusion_rules:
+    - "BRA is treated unit; MEX/ARG/CHL/COL/KOR donor pool"
+    - "primary spec runs incomplete until 2030 — flagged TODO swarm-6e"
+variables:
+  outcome:
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: high_tech_export_share
+      source: "world_bank_wdi:TX.VAL.TECH.MF.ZS"
+      transformation: level
+    - name: patent_stock_log
+      source: "wipo:patent_applications"
+      transformation: log
+      notes: "WIPO patent applications by origin. Cross-check with EPO."
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: employment_target_sectors
+      source: "ipeadata:emprego_industria"
+      transformation: log
+      notes: "IPEADATA Brazilian employment in target industrial sectors."
+  treatment:
+    - name: nova_industria_post_2024_indicator
+      source: "constructed: indicator = 1 for BRA from 2024 (Nova Indústria Brasil enactment); 0 for comparator pool."
+      transformation: indicator
+    - name: export_discipline_enforcement_dummy
+      source: "constructed: indicator = 1 for BRA target sectors with credible export-performance conditionality enforcement; 0 for non-enforced sectors. Hand-coded from BNDES + Brazil Stn announcements."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    Pre-registered multi-metric pattern check across 5 capability indicators
+    (sectoral export share, patent stock, FDI in target sectors, domestic VA
+    share, employment in target sectors) by 2030. Hypothesis SUPPORTED if
+    >=3 of 5 indicators show >=1 SD gain over pre-2023 trend, conditional
+    on export-discipline enforcement. Caveat: forward-looking claim with
+    2030 horizon — primary spec runs incomplete until then. Comparison to
+    KOR replicates East Asian benchmark; comparison to MEX/ARG/CHL/COL
+    benchmarks against ISI baseline.
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 15
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Developmentalist claim that Nova Indústria Brasil 2024 replicates East Asian export-discipline pattern. Relinked from industrial_policy_semiconductor_chips_act_effectiveness in Phase 4E."

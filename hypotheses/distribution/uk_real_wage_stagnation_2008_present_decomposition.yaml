@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uk_real_wage_stagnation_2008_present_decomposition
+version: 1
+status: candidate
+topic: distribution
+claim: 'Median UK real wage growth since 2008 has been materially below the pre-2008 trend (approximately flat real median wages vs a 2% annualised pre-crisis path), producing a ~15–20 percentage-point
+  shortfall by 2023. The gap is decomposable into empirically separable channels: (a) housing- cost inflation mis-attributed as real-wage compression when CPI excludes owner-occupier housing costs; (b)
+  productivity collapse post-GFC that deepened after Brexit; (c) sectoral shift toward lower-wage services as finance stabilised; (d) labour-supply expansion through migration and female participation flattening
+  individual wage growth while raising household income; (e) measurement artefacts (CPI vs RPI vs CPIH choice). The claim is that these channels jointly explain most of the gap and that no residual "pure
+  wage capture" effect is needed once they are attributed — i.e. the stagnation is an institutional-failure story, not a market-failure story per the refinements'' D.1.6 framing.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - GBR
+  - USA
+  - DEU
+  - FRA
+  - NLD
+  period:
+  - 1995
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-year if missing > 25% of housing-price series
+scope:
+  period:
+  - 1995
+  - 2023
+  countries:
+  - GBR
+  - USA
+  - DEU
+  - FRA
+  - NLD
+  outcome_dim:
+  - wage_stagnation
+  - productivity
+  - housing
+  policy_family:
+  - regulation
+  - housing_policy
+  - labour_market
+  treatment_tags:
+  - uk_post_gfc_stagnation
+  - brexit_2016
+  - planning_restriction
+  - cpih_vs_cpi
+variables:
+  outcome:
+  - name: median_real_wage_index
+    source: owid:self-reported-trust-attitudes
+    transformation: real_index_base_2007
+    notes: 'Primary source would be ONS ASHE median gross weekly earnings, deflated by CPIH. ONS direct is not yet a ready publisher; for candidate-status this placeholder routes through OWID mirrors. On
+      promotion to pre_registered, wire to a real ONS fetcher.
+
+      '
+  - name: gdp_per_capita_real
+    source: wb:NY.GDP.PCAP.KD
+    transformation: real_yoy_pct_change
+  - name: gdp_per_hour_worked
+    source: oecd:OECD.SDD.NAD.PROD,DSD_PDB@DF_PDB_GR,1.0
+    transformation: real_yoy_pct_change
+    notes: OECD PDB productivity database; dataflow URN approximate, verify at wiring.
+  decomposition_channels:
+  - name: real_residential_property_prices
+    source: bis:WS_SPP
+    transformation: real_yoy_pct_change
+  - name: cpi_all_items_vs_cpih
+    source: oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0
+    notes: Bridge between CPI (excludes OOH) and CPIH (includes) isolates housing-channel attribution.
+  - name: labour_market_flexibility_index
+    source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+    notes: OECD Employment Protection Legislation overall index — UK labour market is among the most flexible in OECD.
+  - name: migration_share_of_population
+    source: wb:SM.POP.TOTL.ZS
+    transformation: ratio
+  - name: sectoral_composition_finance_share
+    source: eurostat:nama_10_a64
+    notes: Finance+insurance sector share of gross value added.
+  controls:
+  - name: population
+    source: wb:SP.POP.TOTL
+  - name: unemployment_rate
+    source: wb:SL.UEM.TOTL.ZS
+  - name: trade_openness
+    source: wb:NE.TRD.GNFS.ZS
+intervention_channel: regulatory
+intervention_channel_justification: 'The framework''s hypothesis is that the UK shortfall is driven primarily by regulatory-channel failures (planning restriction, product-market concentration, energy policy)
+  rather than fiscal-channel. This is per the refinements'' D.1.6 policy_implications — "specific institutional failures causing capture of gains".
+
+  '
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Decomposition: regress median-real-wage growth gap on each channel sequentially and jointly; report residual share. Robust to method per the refinements'' insistence on honest residual reporting.
+
+    '
+falsification:
+  rule: 'Not supported if the listed channels (housing, productivity, sectoral composition, labour supply, measurement) jointly explain less than 60% of the UK-to-comparator-trend wage-gap. A large unexplained
+    residual would indicate a genuine rent-extraction / capture story inconsistent with the framework''s institutional-failure diagnostic.
+
+    '
+  test: residual_share_of_uk_trend_gap
+  threshold: residual < 40% of uk_to_counterfactual_trend_gap
+prior_confidence: 0.7
+disclosure: 'Author holds market-liberal priors and has flagged UK housing policy + regulatory density as likely explanatory mechanisms in prior writing. Prior aligns with the hypothesis''s framing; this
+  is acknowledged so the falsification test (residual < 40%) is the binding check.
+
+  '
+conflict_disclosure: 'Author holds UK-adjacent real estate positions. A supported result is materially consistent with the author''s investment thesis that housing- supply reform would be the single highest-leverage
+  UK economic intervention. Flagged per DISCLOSURE.md.
+
+  '
+steelman: hypotheses/steelman/uk_real_wage_stagnation_2008_present_decomposition.md
+linked_conditions:
+- growth_without_broad_participation
+notes: 'Candidate, not pre_registered. On promotion, resolve the ONS median- wage source (requires ONS fetcher or verified OWID mirror) and confirm the OECD PDB productivity dataflow URN.
+
+  '

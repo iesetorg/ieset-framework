@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurozone_austerity_distributional_incidence
+version: 2
+status: candidate
+topic: fiscal
+claim: Post-2008 eurozone austerity disproportionately affected households in the bottom income quintile; distributional cost was not necessary for fiscal consolidation, given alternative tax-side options.
+notes: Maps the democratic-socialist school's eurozone-austerity-bottom-quintile claim to a periphery-vs-core endpoint comparison on harmonised EU-SILC distributional measures. Promoted v1→v2 (2026-04-24)
+  — original spec called for local projections on Alesina-Favero-Giavazzi narrative shocks; those shock series and ilc_di01 mean-income-by-quintile are not in vintages, so the dispositive test is reduced
+  to a periphery-vs-core 2008→2014 endpoint comparison on Gini (ilc_di12) and at-risk-of-poverty (ilc_peps01n). The bottom-quintile-incidence claim mechanically implies both rise more in periphery than
+  in core; treatment is confirmed informally via primary-balance change.
+prior_confidence: 0.65
+disclosure: Author prior accepts the level fact (eurozone periphery austerity hit bottom quintile harder than top — well-established in IMF Fiscal Monitor and Ball-Furceri-Loungani 2013) but the 'not necessary'
+  counterfactual depends on assumed elasticity of tax-side measures, which is contested.
+steelman: hypotheses/steelman/eurozone_austerity_distributional_incidence.md
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if BOTH (a) the eurozone-periphery (GRC, ESP, PRT, IRL, ITA) mean within-country change in the Gini coefficient of equivalised disposable income
+    (eurostat:ilc_di12) from 2008 to 2014 exceeds the same change in the eurozone-core (AUT, BEL, DEU, FRA, FIN, NLD) by at least +1.0 Gini points, AND (b) the periphery mean within-country change in the
+    at-risk-of-poverty rate (eurostat:ilc_peps01n) from 2008 to 2014 exceeds the same change in the core by at least +2.0 percentage points. REFUTED if BOTH gaps are in the OPPOSITE direction (i.e. core
+    deteriorated more) by more than half the threshold. Otherwise PARTIAL. INFORMATIVE: treatment confirmation — periphery 2008→2014 change in primary balance / GDP (imf:GGXCNL_NGDP) must exceed core change
+    by at least +1.5pp, otherwise the periphery-core comparison cannot be treated as a treatment-vs-control contrast. METHOD_VALID: at least 4 of 5 periphery and 4 of 6 core countries have 2008 and 2014
+    observations on each Eurostat series; otherwise emit `inconclusive (coverage)`.'
+  test: eurozone_periphery_vs_core_gini_and_arop_endpoint_comparison_2008_to_2014
+  threshold: 'PRIMARY: (Δ_periphery_gini − Δ_core_gini) ≥ +1.0pp AND (Δ_periphery_arop − Δ_core_arop) ≥ +2.0pp.'
+methodology_note: 'v2 promotion (2026-04-24). Sharpened the original generic falsification rule. The pre-registered local-projections estimator on Alesina-Favero- Giavazzi narrative shocks cannot run as
+  written: (i) AFG/Guajardo-Leigh- Pescatori narrative shocks are not in vintages (no publisher), (ii) eurostat:ilc_di01 (mean equivalised disposable income by quintile) is not in vintages — only ilc_di12
+  (Gini) and ilc_peps01n (at-risk-of-poverty) are available. The bottom-quintile incidence claim mechanically implies rising Gini AND rising at-risk-of-poverty in austerity-hit countries relative to a core
+  control, so the test reduces to a periphery-vs-core endpoint comparison on those two distributional summary measures with treatment confirmed informally by the primary-balance change. This preserves the
+  spirit of the test (distributional incidence on the bottom quintile) while staying on data on disk. A v3 promotion with the AFG narrative panel and ilc_di01 quintile incomes would be the proper LP-IRF
+  replication.'
+evidence_type: associational
+sample:
+  countries:
+  - AUT
+  - BEL
+  - DEU
+  - ESP
+  - FIN
+  - FRA
+  - GRC
+  - IRL
+  - ITA
+  - NLD
+  - PRT
+  period:
+  - 2005
+  - 2017
+  temporal_structure: panel
+  exclusion_rules:
+  - drop pre-2005 country-years (limited harmonised EU-SILC distributional series)
+  - drop GRC 2015 from primary regressions (capital controls + bank-holiday distort the income-distribution measurement)
+variables:
+  outcome:
+  - name: bottom_quintile_disposable_income
+    source: eurostat:ilc_di01 (mean equivalised disposable income by quintile, EU-SILC)
+    transformation: real_eur_yoy
+    notes: Primary distributional outcome — first-quintile real income trajectory.
+  - name: at_risk_of_poverty_rate
+    source: eurostat:ilc_li02 (at-risk-of-poverty rate by household type)
+    transformation: pct_population
+  - name: in_work_poverty_rate
+    source: eurostat:ilc_iw01 (in-work at-risk-of-poverty rate)
+    transformation: pct_employed
+  - name: gini_disposable_income
+    source: eurostat:ilc_di12 (Gini coefficient of equivalised disposable income); wid:gini_disp
+    transformation: level
+  - name: social_protection_expenditure_pct_gdp
+    source: eurostat:spr_exp_sum (total social protection expenditure)
+    transformation: pct_gdp
+  treatment:
+  - name: austerity_shock_narrative
+    source: 'manual: Alesina-Favero-Giavazzi narrative austerity shocks (consolidation events, share of GDP); imf:GGXONLB_NGDP'
+    transformation: pct_gdp_consolidation
+    notes: Identified narrative fiscal-consolidation shocks, primary treatment.
+  - name: cyclically_adjusted_primary_balance_change
+    source: imf:GGXCNL_NGDP; oecd:underlying_primary_balance
+    transformation: pp_change_yoy
+  - name: tax_vs_spending_consolidation_share
+    source: 'manual: Guajardo-Leigh-Pescatori IMF Working Paper 11/158 categorisation; oecd:tax_revenue; oecd:gov_expenditure'
+    transformation: tax_share_of_consolidation_pct
+    notes: Decomposition variable — tests whether spending-side cuts had larger distributional incidence than tax-side measures.
+  controls:
+  - name: real_gdp_growth
+    source: imf:NGDP_RPCH; eurostat:nama_10_gdp
+    transformation: pct_yoy
+  - name: unemployment_rate
+    source: eurostat:une_rt_a; ilostat:unemployment_rate
+    transformation: pct_labour_force
+  - name: ecb_policy_rate
+    source: ecb:FM (deposit facility rate)
+    transformation: level_pct
+  - name: nominal_effective_exchange_rate
+    source: bis:WS_EER_M
+    transformation: index_2010_100
+scope:
+  period:
+  - 2008
+  - 2017
+  countries:
+  - EUROZONE
+  - SOUTHERN_EUROPE
+  outcome_dim:
+  - poverty_inequality
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - eurozone_austerity_post_2008
+  - eurozone_sovereign_debt_crisis_2010
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 11
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Democratic-socialist position claims post-2008 austerity hit the bottom quintile disproportionately and alternative tax-side consolidation was available; hypothesis tests exactly that distributional
+    incidence.
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Local projections of distributional outcomes (bottom-quintile income, in-work poverty, social-spending shares) on identified austerity shocks (Alesina-Favero-Giavazzi narrative; Guajardo- Leigh-Pescatori)
+    across Eurozone periphery. Country-clustered SE.
+
+    '

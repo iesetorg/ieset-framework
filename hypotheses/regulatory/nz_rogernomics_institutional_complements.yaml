@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nz_rogernomics_institutional_complements
+version: 1
+status: draft
+topic: regulatory
+claim: New Zealand post-1984 Rogernomics reforms delivered growth improvement only in conjunction with
+  later institutional reforms (Reserve Bank Act 1989, Fiscal Responsibility Act 1994), not from deregulation
+  alone.
+notes: Origin is auto-generated coverage-gap stub seeded from institutionalist framing of NZ Rogernomics
+  growth as conditional on RBA-1989 + FRA-1994 institutional complements. Human review required.
+prior_confidence: 0.55
+disclosure: Author has institutionalist+market-liberal priors that may overweight the institutional
+  complementarity story; framing risks treating subsequent reform packages as causally separable from initial deregulation.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Event-study comparing NZ TFP and GDP-growth pre/post 1989 RBA Act and 1994 FRA vs OECD donor pool;
+    growth gap >1pp emerges only post-1994 with p<0.10 supports institutional-complementarity claim.'
+evidence_type: associational
+
+scope:
+  period: [1984, 2000]
+  countries: [NZL]
+  outcome_dim: [gdp_growth, institutional_quality, productivity]
+  policy_family: [institutional_reform, regulation, monetary_policy, fiscal_policy]
+  treatment_tags: [rogernomics_1984, nz_reserve_bank_act_1989, nz_fiscal_responsibility_act_1994]
+sample:
+  countries: [NZL, AUS, USA, GBR, CAN]
+  period: [1980, 2000]
+  temporal_structure: panel
+  exclusion_rules:
+    - "NZL is treated unit; AUS/USA/GBR/CAN form donor counterfactual pool"
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_tfp_pwt
+      source: "pwt:rtfpna"
+      transformation: log
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+  treatment:
+    - name: rogernomics_indicator
+      source: "constructed: indicator = 1 for NZL years >= 1984 (Lange Labour government deregulation)."
+      transformation: indicator
+    - name: rba_act_indicator
+      source: "constructed: indicator = 1 for NZL years >= 1989 (Reserve Bank of New Zealand Act inflation-targeting framework)."
+      transformation: indicator
+    - name: fra_act_indicator
+      source: "constructed: indicator = 1 for NZL years >= 1994 (Fiscal Responsibility Act)."
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    NZ-only event study 1984-2000 around three sequential treatment dates
+    (1984 Rogernomics, 1989 RBA Act, 1994 FRA). Compare TFP and real GDP
+    growth trajectories vs OECD donor-pool counterfactual (mean of AUS, USA,
+    GBR, CAN as control). Sub-period decomposition: 1984-1988 (deregulation
+    only), 1989-1993 (deregulation + RBA), 1994-2000 (full institutional
+    stack). Caveat: small-N single-country, sequential-treatment overlap
+    limits clean attribution.
+
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 14
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalist claim is a verbatim match to hypothesis claim text: NZ growth improvement required the institutional-complements stack (RBA 1989 + FRA 1994) not deregulation alone."
+

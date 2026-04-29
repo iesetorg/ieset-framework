@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: argentina_fx_obligation_inflation_mechanism
+version: 1
+status: draft
+topic: monetary
+claim: Argentinian chronic inflation reflects foreign-currency obligations (dollar-denominated debt, dollarised expectations) and repeated fiscal dominance in a non-sovereign currency, not a generic 'money
+  printing' failure.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT framing of Argentine inflation as FX-obligation and fiscal-dominance driven, not generic money-printing. Human review required before promotion.
+prior_confidence: 0.55
+disclosure: Author leans toward MMT's currency-issuer/user distinction here while remaining sceptical of the broader MMT policy package; framing risks under-weighting domestic-monetary-policy explanations.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: VECM cointegration of Argentine CPI, peso-USD rate, and USD-debt share 1971-2023 with structural breaks (1991, 2001, 2018); FX-debt loading on long-run inflation positive at p<0.10 supports.
+evidence_type: associational
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - ARG
+  outcome_dim:
+  - inflation
+  - currency_purchasing_power
+  - capital_flows
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  - exchange_rate_regime
+  treatment_tags:
+  - argentina_fx_dollarisation
+  - argentina_fiscal_dominance
+  - fiscal_dominance
+sample:
+  countries:
+  - ARG
+  period:
+  - 1971
+  - 2023
+  temporal_structure: time_series
+  exclusion_rules:
+  - include INDEC-manipulation period 2007-2015 only with IMF-corrected CPI
+  - treat 1991-2001 Convertibility period as a structural-break regime
+variables:
+  outcome:
+  - name: cpi_inflation_annual
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: pct_change_yoy
+    notes: INDEC official CPI 2007-2015 known to be manipulated; use IMF-corrected series for that window.
+  - name: peso_usd_exchange_rate
+    source: bcra:exchange_rate_official; bis:WS_EER_M
+    transformation: log_diff
+  treatment:
+  - name: usd_denominated_debt_share
+    source: world_bank_wdi:DT.DOD.DECT.GN.ZS; bcra:public_debt_currency_breakdown
+    transformation: level_pct
+    notes: External + dollar-linked domestic debt as share of total public debt.
+  - name: fiscal_deficit_pct_gdp
+    source: imf:GGXCNL_NGDP; world_bank_wdi:GC.BAL.CASH.GD.ZS
+    transformation: level
+  - name: bcra_monetisation_indicator
+    source: 'constructed: binary = 1 when BCRA adelantos transitorios > 1% GDP'
+    transformation: binary
+    notes: BCRA annual reports; manual-drop required for adelantos series.
+  controls:
+  - name: terms_of_trade
+    source: imf_pcps:PALLFNF
+    transformation: log_diff
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_change_yoy
+covers_claims:
+- position_id: mmt
+  claim_index: 9
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT claim that Argentine chronic inflation reflects foreign-currency obligations and fiscal dominance in a non-sovereign currency, not generic money-printing.
+estimator:
+  template: cointegration_vecm
+  clustering: episode
+  notes: 'Stub-level estimator pin for runnability audit. Long-run cointegration between Argentine CPI inflation, peso-USD exchange rate, and the share of USD-denominated obligations / fiscal-deficit monetisation,
+    1971-2023. VECM with structural breaks at major regime shifts (Convertibility 1991, 2001 default, 2018 IMF stand-by). Falsification rule and variables block remain to be filled when this stub is promoted
+    from draft.
+
+    '

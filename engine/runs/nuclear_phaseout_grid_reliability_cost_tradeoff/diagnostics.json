@@ -1,0 +1,73 @@
+{
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'log_industrial_electricity_price_usd_mwh' not loaded",
+  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+  "verdict_reason": "outcome 'log_industrial_electricity_price_usd_mwh' not loaded",
+  "hypothesis_id": "nuclear_phaseout_grid_reliability_cost_tradeoff",
+  "template": "did_callaway_santanna",
+  "claim_direction_inferred": "+",
+  "falsification_rule_text": "PRIMARY (dispositive, requires data not yet on disk): the hypothesis is SUPPORTED if (i) mean log industrial electricity price 2010-2024 in the phase-out cohort (DEU, BEL, CHE) exceeds the retain cohort (FRA, FIN, SWE, USA, GBR) by at least 0.08 log-points (~8.3%) AND (ii) wholesale day-ahead volatility CoV is higher in phase-out cohort by at least 20% AND (iii) the effect survives a drop-2021-2024 sensitivity that excludes the gas shock. REFUTED if any one of (i)-(iii) flips sign with confident methodology. Method-validity failure (data gap, FRA 2022 availability shock not handled, pre-trend RMSPE > 0.5\u00d7post-RMSPE in synth control) yields INCONCLUSIVE not refuted.\nSURROGATE (testable today on OWID-Ember data): mean change in fossil share of electricity 2005\u21922024 in phase-out cohort minus retain cohort. The hypothesis predicts a positive gap (phase-out countries leaned harder on fossils for back-up). Surrogate- supports threshold = +5pp gap. Surrogate is informative-only \u2014 it does NOT settle the cost or volatility primaries.",
+  "falsification_test_text": "nuclear_phaseout_cost_reliability_did",
+  "estimate": {
+    "error": "outcome 'log_industrial_electricity_price_usd_mwh' not loaded"
+  },
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "controls",
+        "name": "log_population",
+        "source": "world_bank_wdi:SP.POP.TOTL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 17000
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "log_industrial_electricity_price_usd_mwh",
+        "source": "constructed: IEA industrial electricity price (band IC, medium industry) + Eurostat NRG_PC_205 cross-check, USD/MWh constant 2020. Specialist IEA fetcher pending."
+      },
+      {
+        "role": "outcome",
+        "name": "wholesale_price_volatility",
+        "source": "constructed: annual coefficient of variation of day-ahead wholesale electricity prices (EPEX, Nord Pool, ENTSO-E transparency platform). Fetcher pending."
+      },
+      {
+        "role": "outcome",
+        "name": "fossil_backup_capacity_factor",
+        "source": "constructed: ENTSO-E + EIA annual capacity factor of fossil-fired (gas + coal) plants, as proxy for back-up reliance. Fetcher pending."
+      },
+      {
+        "role": "outcome",
+        "name": "loss_of_load_expectation_hours",
+        "source": "constructed: ENTSO-E MAF / NERC equivalent reserve-adequacy indicator; interpolation required across non-harmonised reporting. Fetcher pending and difficult."
+      },
+      {
+        "role": "treatment",
+        "name": "nuclear_phaseout_legislated_dummy",
+        "source": "constructed: indicator = 1 in years after a country legislated a binding nuclear phase-out. DEU 2011+, BEL 2003+ (law), CHE 2017+ (referendum). USA, FRA, FIN, SWE, KOR, JPN = 0 (nuclear-retaining, though JPN has post-Fukushima effective pause \u2014 excluded for cleanness or coded as 'partial' in sensitivity)."
+      },
+      {
+        "role": "treatment",
+        "name": "nuclear_capacity_share_change",
+        "source": "constructed: year-over-year change in nuclear share of electricity generation, BP Statistical Review / IEA electricity statistics. Continuous treatment intensity."
+      },
+      {
+        "role": "controls",
+        "name": "gas_price_eu_ttf_proxy",
+        "source": "constructed: TTF-equivalent natural gas price (EUR/MWh) to partial out gas-shock exposure common to gas-indexed markets. Fetcher pending."
+      },
+      {
+        "role": "controls",
+        "name": "renewable_capacity_share",
+        "source": "constructed: IEA / IRENA wind + solar share of installed capacity. Fetcher pending."
+      },
+      {
+        "role": "controls",
+        "name": "interconnection_capacity_per_capita",
+        "source": "constructed: ENTSO-E interconnection NTC / population. Fetcher pending."
+      }
+    ]
+  },
+  "run_utc": "2026-04-28T12:41:51+00:00",
+  "runner": "scripts/run_did_callaway_santanna.py"
+}

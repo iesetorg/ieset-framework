@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nz_rogernomics_productivity_effect
+version: 1
+status: draft
+topic: growth
+claim: NZ Rogernomics 1984–1993 liberalisation (tariff removal, SOE corporatisation, financial-market
+  liberalisation) produced productivity acceleration and real-income gains over 1990s–2000s relative to
+  pre-reform trend.
+notes: >-
+  Seeded from a classical-liberal claim that Lange-Douglas Rogernomics
+  liberalisation 1984-1993 (tariff removal, SOE corporatisation, financial-
+  market liberalisation) produced productivity acceleration and real-income
+  gains. Synth-DID against advanced-economy donor pool; human review needed
+  because NZ's productivity record is contested.
+prior_confidence: 0.4
+disclosure: >-
+  Authorial bias risk: classical-liberal framing privileges the
+  liberalisation channel; NZ's measured productivity acceleration is
+  modest at best (NZ remains below the OECD productivity frontier two
+  decades after reform), so the headline claim of "productivity
+  acceleration" is generous to the prior.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: "Synth-DID with NZL treated 1984 vs donor pool {AUS,IRL,FIN,DNK,SWE,NOR,GBR,CAN}; outcome real GDP per capita and TFP 1970-2005; falsified if synth gap not positive at p<0.10 by 1995 or magnitude below 5%."
+evidence_type: associational
+
+sample:
+  countries: [NZL, AUS, IRL, FIN, DNK, SWE, NOR, GBR, CAN]
+  period: [1970, 2005]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+  treatment:
+    - name: rogernomics_treated
+      source: "constructed: indicator = 1 for NZL, year >= 1984 (Lange-Douglas reforms)"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    NZ treated post-1984; donor pool of comparable advanced economies
+    (AUS, IRL, FIN, DNK, SWE) for the 1984-2005 window. Outcomes: TFP
+    growth, real GDP per capita, real-income gains. Tests whether
+    Rogernomics liberalisation produced above-counterfactual productivity.
+
+scope:
+  period: [1984, 2005]
+  countries: [NZL]
+  outcome_dim: [productivity, gdp_growth, trade_liberalisation]
+  policy_family: [trade_policy, privatisation_nationalisation, institutional_reform]
+  treatment_tags: [nz_rogernomics_1984]
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 6
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts NZ Rogernomics 1984-1993 liberalisation produced productivity acceleration and real-income gains over 1990s-2000s."

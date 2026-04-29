@@ -1,0 +1,196 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: central_bank_independence_inflation_discipline
+version: 1
+status: pre_registered
+topic: monetary
+claim: 'Across countries 1990-2023, higher de jure and de facto central-bank independence predicts lower mean CPI inflation and lower inflation volatility, conditional on a basic set of controls (exchange-rate
+  regime, trade openness, fiscal balance, initial inflation level). The relationship is expected to be strongest in the tails: countries with very low CBI exhibit episodic double-digit inflation; countries
+  with very high CBI cluster tightly around 2% targets. The claim is associational at the country-year panel level and does not by itself establish that legal reform causes inflation discipline, only that
+  the two co-vary as the Rogoff 1985 / Cukierman 1992 / Garriga 2016 literature suggests.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - ARG
+  - AUS
+  - BRA
+  - CAN
+  - CHL
+  - CHN
+  - COL
+  - DEU
+  - ESP
+  - FRA
+  - GBR
+  - IDN
+  - IND
+  - ITA
+  - JPN
+  - KOR
+  - MEX
+  - NOR
+  - NZL
+  - PER
+  - PHL
+  - POL
+  - RUS
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - VEN
+  - ZAF
+  period:
+  - 1990
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years in an active hyperinflation episode (> 500% annual CPI) since those are dominated by fiscal dominance and addressed separately
+  - drop years of formal dollarisation or currency board (CBI index becomes undefined)
+variables:
+  outcome:
+  - name: mean_cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level_pct_yoy
+  - name: inflation_volatility
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: rolling_5yr_stddev
+  treatment:
+  - name: cbi_garriga_index
+    source: owid:central-bank-independence-cukierman
+    transformation: level_0_to_1
+    notes: Garriga 2016 CBI index, OWID mirror. Composite of CEO selection, objectives, policy formulation, lending limits.
+  - name: wgi_government_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+    notes: Included as a secondary de-facto-institutional-capacity proxy so the CBI coefficient is identified off the non-overlapping part of the CBI construct.
+  controls:
+  - name: exchange_rate_regime
+    source: ilzetzki_reinhart_rogoff:era_classification_monthly_1940_2019
+    transformation: categorical_coarse
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: fiscal_balance_to_gdp
+    source: imf:GGXCNL_NGDP
+    transformation: level
+  - name: initial_inflation_1990
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level_at_1990
+    notes: Controls for mean reversion from 1980s-1990s stabilisation episodes.
+intervention_channel: regulatory
+intervention_channel_justification: 'CBI is a legal-institutional (regulatory) characteristic of the monetary authority, not a fiscal flow. Treated as a regulatory-channel variable per invariant 4.
+
+  '
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Two-way FE panel with standard errors clustered by country. Primary specification uses within-country variation in CBI arising from statutory reforms (Cukierman-Webb-Neyapti 1992 codes reforms
+    by effective year). Cross-sectional spec with country means added as robustness; different answer patterns are diagnostic.
+
+    '
+falsification:
+  rule: 'Not supported if either (a) the coefficient on the Garriga CBI index on mean inflation is not negative and significant at 5% in the two-way FE panel, OR (b) the coefficient on inflation volatility
+    is not negative at 5%, OR (c) the cross-sectional country-mean spec shows no negative relationship at 5%. Support requires both outcomes and both temporal slices to move in the predicted direction;
+    one-out-of-three would be treated as weak/mixed evidence, not as support.
+
+    '
+  test: panel_and_cross_section_both_negative
+  threshold: panel_FE coefficient < 0 at p<0.05 for BOTH outcomes; cross-sectional coefficient < 0 at p<0.05 for mean inflation
+prior_confidence: 0.78
+disclosure: 'The CBI-inflation empirical relationship is one of the more robust findings in applied monetary economics (Cukierman 1992, Alesina-Summers 1993, Garriga-Rodriguez 2020 meta-analysis). Prior
+  reflects that literature, not framework preference. Falsification is binding — recent critiques (Mishkin, Binder) argue the relationship weakens post-1990 and in advanced economies only, and the spec
+  is designed to catch that if it holds in our sample.
+
+  '
+steelman: hypotheses/steelman/central_bank_independence_inflation_discipline.md
+linked_hypotheses:
+- hyperinflation_requires_fiscal_dominance
+- fiat_expansion_erodes_currency_purchasing_power_long_run
+notes: 'Garriga CBI index coverage extends to 2014; post-2014 values require either extrapolation (treat as last-observation-carried-forward with reform-event updates from central-bank websites) or restriction
+  of the outcome window. v1 restricts the treatment lag to pre-2015 reforms and evaluates outcomes on the 1995-2023 outcome window with the CBI value at the start of each 5-year block.
+
+  '
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - ARG
+  - AUS
+  - BRA
+  - CAN
+  - CHL
+  - CHN
+  - COL
+  - DEU
+  - ESP
+  - FRA
+  - GBR
+  - IDN
+  - IND
+  - ITA
+  - JPN
+  - KOR
+  - MEX
+  - NOR
+  - NZL
+  - PER
+  - PHL
+  - POL
+  - RUS
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - VEN
+  - ZAF
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  - institutional_quality
+  policy_family:
+  - monetary_policy
+  - institutional_reform
+  treatment_tags:
+  - central_bank_independence
+  - bundesbank_independence_1957
+  - boe_independence_1997
+  - rbnz_independence_1989
+covers_claims:
+- position_id: austrian
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Austrian claim that CBI-maintaining countries experience fewer hyperinflation episodes; hypothesis tests CBI-inflation panel relationship 1990-2023.
+- position_id: chicago_monetarism
+  claim_index: 3
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Chicago-monetarist claim that statutory CBI (Bundesbank, post-1997 BoE, post-1989 RBNZ) produces lower average inflation; directly covered by the CBI panel spec.
+- position_id: empirical_pragmatist
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Empirical-pragmatist reading that CBI produces lower inflation across institutional contexts; directly covered by the global CBI panel spec.
+- position_id: institutionalism
+  claim_index: 8
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: 'Phase 4C candidate: claim scope OECD post-1980 vs hypothesis cross-country panel 1990-2023; partially overlapping era.'
+- position_id: ordoliberal
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: low
+  notes: 'Phase 4C candidate: Bundesbank 1957-1998 specific claim; hypothesis panel starts 1990, so pre-1990 Bundesbank dominance only partially covered.'

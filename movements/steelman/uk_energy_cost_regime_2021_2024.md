@@ -1,0 +1,5 @@
+# Steelman — UK industrial energy cost regime
+
+1. **The 2022 price spike was mostly exogenous (Russia gas crisis).** Attributing post-2022 industrial energy costs to UK policy specifically requires separating UK-specific regime features from the common European gas-supply shock. UK network charges + gas-indexed wholesale market made the UK worse-positioned to absorb the shock, but they didn't cause the shock.
+2. **Environmental stringency is a political good with genuine support.** Net-zero commitments reflect a democratic mandate the economic-only framing doesn't capture. D.1.6 is the relevant condition entry; GDP-per-capita trajectory is one metric among several.
+3. **The wholesale market design is fixable** — marginal-price gas-indexation is a known-solvable problem (zonal pricing, contracts-for-difference structural reform). If UK implements such reforms, the "energy cost regime" movement coding would need to be updated. It's a flow not a stock; current-era coding shouldn't project indefinitely.

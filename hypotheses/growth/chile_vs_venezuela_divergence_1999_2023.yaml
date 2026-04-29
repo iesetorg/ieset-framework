@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: chile_vs_venezuela_divergence_1999_2023
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  Chile and Venezuela began the 1999-2023 window at broadly comparable
+  GDP per capita (PPP, constant international dollars). Over the
+  subsequent 24 years Chile continued its institutional-market policy
+  trajectory (fiscal rule, central-bank independence, export-diversified
+  commodity model, secure property rights, trade openness) while
+  Venezuela ran the Chavismo programme (FX controls, price controls,
+  PDVSA politicisation, large-scale nationalisations, monetary-fiscal
+  fusion). By 2023 the log GDP-per-capita-PPP gap between Chile and
+  Venezuela exceeds 1.2 log-points (~230% relative). The bilateral
+  comparison is one of the cleanest natural experiments in Latin
+  American development economics because both economies are
+  commodity-dependent, Spanish-colonial-legacy Latin American states
+  that diverged on policy content, not on initial conditions.
+
+evidence_type: descriptive
+
+sample:
+  countries: [CHL, VEN]
+  period: [1999, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop 2020-2021 COVID window from endpoint calculation; report separately"
+
+scope:
+  period: [1999, 2023]
+  countries: [CHL, VEN]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, privatisation_nationalisation, exchange_rate_regime, monetary_policy]
+  treatment_tags: [chavismo_1999, chile_fiscal_rule, pdvsa_politicisation, fx_controls_venezuela]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Bilateral cumulative log-growth comparison. Primary statistic is the
+    2023 log-gap vs 1999. The framework's interest is a clean, pre-
+    registered natural experiment — not a DiD identification exercise.
+    Magnitude is dispositive; the story is in per-capita-PPP levels.
+
+falsification:
+  rule: >
+    PRIMARY (dispositive): falsified if log_gdp_pc_ppp(CHL, 2023) -
+    log_gdp_pc_ppp(VEN, 2023) < 1.20 (i.e. Chile less than ~230%
+    richer per capita PPP than Venezuela by 2023), OR if the cumulative
+    log-growth gap 1999→2023 (Chile minus Venezuela) is less than 0.60
+    log-points. A sign reversal would be decisive refutation.
+    INFORMATIVE (not gating): pre-1999 log-gap should be small
+    (|gap_1999| < 0.30) to validate the "began comparable" framing. If
+    the pre-window gap is already large, the post-window divergence
+    is less attributable to policy.
+  test: chile_venezuela_bilateral_cumulative_gap
+  threshold: >
+    PRIMARY: log_gdp_pc_ppp(CHL, 2023) - log_gdp_pc_ppp(VEN, 2023) >= 1.20
+    PRIMARY: cumulative_log_growth(CHL, 1999-2023) - cumulative_log_growth(VEN, 1999-2023) >= 0.60
+    INFORMATIVE: |log_gdp_pc_ppp(CHL, 1999) - log_gdp_pc_ppp(VEN, 1999)| < 0.30
+    METHOD_VALID: WDI NY.GDP.PCAP.PP.KD available for both countries across full window.
+
+prior_confidence: 0.97
+
+disclosure: >
+  Author prior is extremely high (0.97). Chile-vs-Venezuela divergence
+  1999-2023 is a canonical teaching case in Latin American development
+  economics. This hypothesis is included for framework-validation
+  purposes alongside venezuela_chavismo_framework_validation: if the
+  framework cannot detect this bilateral divergence on a clean
+  pre-registered test, the econometric substrate is miscalibrated.
+  Refutation here would indicate data or method failure, not evidence
+  against the canonical story.
+
+linked_hypotheses:
+  - venezuela_chavismo_framework_validation
+  - chile_post_1990_institutional_premium
+
+notes: >
+  This is part of the canonical natural-experiment tier
+  (HYPOTHESIS_FRAMEWORK_AUDIT.md §E6 case #6). Runnable today with
+  World Bank WDI data already on disk; primary spec is deliberately
+  simple (bilateral descriptive comparison) to isolate the magnitude
+  of the policy-content divergence from any methodological concerns.
+steelman: hypotheses/steelman/chile_vs_venezuela_divergence_1999_2023.md

@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_green_deal_vs_ets_emissions_mechanism
+version: 1
+status: draft
+topic: energy
+claim: EU Green Deal 2020-present production-side regulation produced faster sectoral emissions reductions
+  than previous EU-ETS price-mechanism-only approaches.
+scope:
+  period: [2005, 2023]
+  countries: [EU]
+  outcome_dim: [energy, regulation_compliance_cost, industrial_capability]
+  policy_family: [regulation, energy_policy, industrial_policy]
+  treatment_tags: [eu_green_deal_2020, cap_and_trade_eu_ets, paris_agreement_2015]
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Claim text matches hypothesis claim verbatim: EU Green Deal production-side regulation outperforming EU ETS price-mechanism on sectoral emissions reductions. Direct alignment."
+notes: Maps the eco-socialist school's Green-Deal-beats-ETS claim to a pre-vs-post-2020 sectoral
+  emissions trajectory comparison. Estimator and prior set; full pre-registration awaits steelman +
+  human sign-off.
+prior_confidence: 0.4
+disclosure: Author prior is skeptical that 2020-2023 sectoral emissions declines can be cleanly
+  attributed to Green Deal regulation versus the contemporaneous EU ETS Phase-4 price tightening,
+  REPowerEU energy-crisis response, and pandemic/Ukraine-war demand shocks. The 3-year window since
+  Green Deal launch is also short for sector-level identification.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Sectoral emissions DiD comparing EU-ETS-only sectors (pre-2020) to Green-Deal-regulated sectors (post-2020) over EEA inventory data 2005-2023; sector+year FE, sector-clustered SEs. Refute if Green-Deal-sector post-2020 emissions decline rate not >1.5x ETS-only pre-2020 decline rate at p<0.10 OR if effect disappears net of REPowerEU/Phase-4 ETS price tightening.'
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, HRV, CYP, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, IRL, ITA, LVA, LTU, LUX, MLT, NLD, POL, PRT, ROU, SVK, SVN, ESP, SWE]
+  period: [2005, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-sector-years missing EEA verified emissions"
+    - "report sensitivity excluding 2020-2021 pandemic-distorted years"
+variables:
+  outcome:
+    - name: log_sectoral_co2_emissions
+      source: "eea:greenhouse_gas_inventory"
+      transformation: log
+      notes: "EEA territorial GHG inventory by IPCC sector (1.A.1 energy, 1.A.2 industry, 1.A.3 transport, etc.)."
+    - name: ets_verified_emissions_sector
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log
+  treatment:
+    - name: green_deal_post_2020_indicator
+      source: "constructed: indicator = 1 for years >= 2020 in Green-Deal-regulated sectors (CBAM-listed industries, transport, buildings); 0 otherwise."
+      transformation: indicator
+    - name: ets_phase4_price_tightening
+      source: "constructed: indicator = 1 for years >= 2021 (Phase-4 launch and post-MSR price >= EUR 50/t threshold)."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: event_study
+  clustering: sector
+  fixed_effects: [country, sector, year]
+  notes: >
+    Sectoral DiD / event study comparing pre-vs-post-2020 emissions decline
+    rates in Green-Deal-regulated sectors versus ETS-only sectors. Country,
+    sector, and year FE; sector-clustered SEs. Secondary spec partials out
+    Phase-4 ETS price tightening to separate Green-Deal regulation channel
+    from contemporaneous price-mechanism strengthening. 3-year post window
+    is short — flagged as identification limit.

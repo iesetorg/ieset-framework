@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mitterrand_nationalisations_productivity_effect
+version: 1
+status: draft
+topic: growth
+claim: Mitterrand's 1981–1983 French nationalisations reduced productivity and required the 1983 'tournant
+  de la rigueur' reversal, vindicating the classical-liberal diagnosis that political ownership distorts
+  resource allocation.
+notes: >-
+  Seeded from a classical-liberal claim that Mitterrand's 1981-1983
+  nationalisations reduced productivity and required the 1983 'tournant de la
+  rigueur' reversal. Firm-level event study around the nationalisation and
+  reversal; human review needed for the comparison-firm matching.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: classical-liberal framing wants nationalisation to
+  damage productivity. The 1981-1983 macro shock includes simultaneous
+  fiscal expansion, Franc devaluations, and EMS exit pressure — separating
+  ownership effects from macro effects requires careful firm-level matching
+  that this hypothesis only sketches.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: "Firm-level event study of TFP and labour productivity around 1981 nationalisations and 1983 reversal, firm and year FE 1975-1995; falsified if treated-firm productivity not declining at h=1,2 post-nationalisation and recovering post-1983 at p<0.10."
+evidence_type: associational
+
+sample:
+  countries: [FRA, DEU, GBR, ITA, NLD, BEL, ESP]
+  period: [1975, 1995]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+
+  treatment:
+    - name: mitterrand_nationalisation_indicator
+      source: "constructed: indicator = 1 for FRA years 1981-1983 (nationalisations active before tournant)"
+      transformation: indicator
+
+  controls:
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+
+estimator:
+  template: event_study
+  fixed_effects: [firm, year]
+  clustering: firm
+  notes: >
+    French firm-level event study around the 1981 nationalisations and the
+    1983 'tournant de la rigueur' reversal. Outcome: TFP and labour
+    productivity in nationalised vs comparison firms (industry-matched).
+    Tests whether productivity contracted under state ownership and
+    recovered after reversal.
+
+scope:
+  period: [1981, 1995]
+  countries: [FRA]
+  outcome_dim: [productivity, gdp_growth]
+  policy_family: [privatisation_nationalisation, fiscal_policy]
+  treatment_tags: [mitterrand_nationalisations_1981, tournant_de_la_rigueur_1983]
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 8
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Identical-proposition: claim and hypothesis both test whether Mitterrand's 1981-83 nationalisations reduced productivity and required the 1983 rigueur reversal."
+

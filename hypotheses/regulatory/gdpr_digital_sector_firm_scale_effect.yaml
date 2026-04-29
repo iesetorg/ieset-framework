@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: gdpr_digital_sector_firm_scale_effect
+version: 1
+status: pre_registered
+topic: regulatory
+claim: 'The cumulative EU digital-sector regulatory stack — GDPR (2018), Digital Markets Act (2022), Digital Services Act (2022), AI Act (2024) — has imposed a measurable fixed-compliance-cost burden that
+  falls disproportionately on scale of EU-headquartered digital firms relative to US counterparts. Over 2018-2024, EU-headquartered digital firms show lower revenue-per-firm, lower VC-funding-per-firm,
+  lower mean-employee count, and a lower rate of scale-up (defined as growth from <100 to >500 employees) than comparable-stage US firms. The effect is hypothesised to operate through the fixed-cost channel
+  (compliance cost is lumpy and amortised over revenue base; smaller market means thinner spreading). The hypothesis does NOT claim the regulations produce net welfare loss (GDPR''s consumer-privacy externality
+  is explicitly outside the outcome set) — only that firm-scale is differentially smaller on the measured dimensions.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - POL
+  - SWE
+  - IRL
+  - AUT
+  - DNK
+  - FIN
+  - USA
+  - GBR
+  - CAN
+  period:
+  - 2014
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with <50 digital-sector firms observed in source data
+scope:
+  period:
+  - 2014
+  - 2024
+  countries:
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - POL
+  - SWE
+  - IRL
+  - AUT
+  - DNK
+  - FIN
+  - USA
+  - GBR
+  - CAN
+  - EU
+  outcome_dim:
+  - productivity
+  - regulation_compliance_cost
+  - industrial_capability
+  - capital_flows
+  - competition_concentration
+  policy_family:
+  - regulation
+  - competition_policy
+  treatment_tags:
+  - gdpr_2018
+  - dma_2022
+  - dsa_2022
+  - ai_act_2024
+variables:
+  outcome:
+  - name: log_mean_digital_firm_revenue
+    source: 'constructed: Crunchbase / PitchBook firm-level digital-sector revenue, aggregated to country-year mean (log). Firm-level data-gated fetcher pending.'
+    transformation: log
+  - name: log_vc_funding_per_active_firm
+    source: 'constructed: total VC dollars invested in digital-sector firms per country-year / number of active digital firms. Crunchbase fetcher pending.'
+    transformation: log
+  - name: scaleup_rate
+    source: 'constructed: fraction of digital firms that transitioned from <100 to >500 employees within the country-year window. Crunchbase / PitchBook.'
+    transformation: level
+  - name: digital_sector_employment_share
+    source: 'constructed: share of total employment in ISIC J (information and communication). OECD STAN or ILO where available.'
+    transformation: level
+  treatment:
+  - name: eu_post_2018_gdpr_dummy
+    source: 'constructed: indicator = 1 for EU member states in year 2018 onwards. USA, CAN, GBR (post-2020) = control.'
+    transformation: indicator
+  - name: eu_post_2022_dma_dsa_dummy
+    source: 'constructed: indicator for EU member states in 2022 onwards, incremental cumulative burden.'
+    transformation: indicator
+  - name: eu_post_2024_ai_act_dummy
+    source: 'constructed: indicator for EU member states in 2024 onwards; 2024 effect will be shallow given recency.'
+    transformation: indicator
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: oecd_pmr_digital_subindex
+    source: oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2
+    transformation: level
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: capital_market_depth_proxy
+    source: 'constructed: domestic VC dollars raised as share of GDP (Invest Europe + NVCA). Fetcher pending.'
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: "Two-way FE panel with USA, CAN, and post-2020 GBR as non-EU control. β_eu_post_2018 identifies the EU-member post-GDPR average shift on the four outcome measures.\nSecondary: event-study around\
+    \ GDPR enforcement date (May 2018), DMA entry into application (2023), and AI Act enforcement phases. Separate coefficient per episode; cumulative burden tested as sum.\nIdentification is associational\
+    \ rather than causal: multiple treatments coincide with other large shocks (COVID, gas-price shock, US Big Tech concentration continuing), and the pure regulation-compliance channel cannot be cleanly\
+    \ separated from co-occurring forces. Placebo at pre-2018 fake dates tested.\nKnown limitations: (1) Crunchbase / PitchBook firm-level data has uneven country\n    coverage; EU coverage weaker than\
+    \ US. Measurement bias could\n    under- or overstate effects in unknown directions.\n(2) Capital-market depth is a confound with known importance —\n    EU VC markets are thinner independently of regulation.\n\
+    \    Controlling for VC raised as share of GDP partly addresses,\n    but collinearity with treatment is real.\n(3) Big Tech concentration in the US is partly a tax and\n    antitrust story independent\
+    \ of EU regulation. The comparison\n    is not \"EU-regulated vs counterfactual EU-unregulated\" but\n    \"EU-regulated vs US-different-bundle.\"\n"
+falsification:
+  rule: 'Not supported if (a) β_eu_post_2018 is non-negative or not statistically significant at p<0.10 on at least two of the four outcome measures, OR (b) the effect vanishes after controlling for capital-market
+    depth and VC-raised-as-share-of-GDP, OR (c) placebo at pre-2018 fake date shows a similar-magnitude "effect" (indicating pre-existing trend rather than GDPR), OR (d) the scale-up rate difference is
+    driven by US superstar firms rather than EU-firm scale-up deficit (decomposable via medians vs means). Report honestly if the scale-gap exists but cannot be attributed to regulation specifically — this
+    is a real and legitimate null.
+
+    '
+  test: eu_digital_regulation_firm_scale_did
+  threshold: 'β_eu_post_2018 < -0.05 log points on log VC funding per firm AND β_eu_post_2018 < -0.02 on scaleup_rate (at p<0.10) AND placebo pre-2018 |t| < 1.65 AND effects survive capital-market-depth
+    control
+
+    '
+prior_confidence: 0.55
+disclosure: 'Author prior is moderate — there are plausible mechanisms (fixed compliance costs, legal-uncertainty deterrence of VC investment, lock-in of incumbents with scale to absorb compliance) but
+  the identification is genuinely difficult. EU VC market thinness pre-dates GDPR by decades and may be doing most of the work; if it is, the "regulation caused small firms" story is wrong and the true
+  story is "capital-market structure produces small firms." The pre-registration commits to honest reporting of that finding.
+
+  The framework also acknowledges a real welfare benefit of GDPR — consumer privacy externality — that this outcome set does NOT measure. A hypothesis finding "GDPR reduced firm scale" is fully compatible
+  with a parallel finding that GDPR produced net welfare gains through privacy protection. The hypothesis tests one side of the ledger only.
+
+  '
+steelman: hypotheses/steelman/gdpr_digital_sector_firm_scale_effect.md
+linked_hypotheses:
+- eu_regulatory_burden_productivity_drag
+- us_eu_divergence_decomposition
+notes: "Data readiness: - Crunchbase / PitchBook firm-level — commercial, data-gated, fetcher\n  pending and possibly requires partnership\n- OECD PMR digital subindex — ready - OECD STAN ICT sector VA\
+  \ — fetcher pending - Invest Europe + NVCA VC totals — fetcher pending - WDI, IMF — ready\nThis hypothesis is data-gated on firm-level commercial sources. A weaker v1 using only sector-aggregate outcomes\
+  \ (ICT VA, ICT employment, aggregate VC inflows) is runnable now; v1.1 with firm-level outcomes when commercial data access lands.\n"

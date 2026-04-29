@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: pinochet_chile_rapid_liberalisation_growth_collapse
+version: 1
+status: draft
+topic: growth
+claim: >
+  Pinochet-era Chile's rapid liberalisation programme (1973-1982) produced
+  an initial growth collapse culminating in the 1975 recession and the 1982
+  banking-and-debt crisis, with sustained recovery only after selective
+  state re-engagement (copper-sector re-nationalisation, Banco del Estado
+  expansion, pension-system guarantee backstopping). The pure-Chicago
+  prescription underperformed East Asian developmentalist peers over
+  1973-1990 on growth, volatility, and financial-stability metrics.
+notes: >-
+  Seeded from a developmentalist claim that Pinochet-era Chile's pure-Chicago
+  liberalisation 1973-1982 produced an initial growth collapse and the 1982
+  banking crisis, with sustained recovery only after selective state
+  re-engagement. Synth-DID against East Asian developmentalist peers; human
+  review needed for the East Asian donor pool selection.
+prior_confidence: 0.55
+disclosure: >-
+  Authorial bias risk: developmentalist framing privileges the
+  state-re-engagement channel and treats post-1985 recovery as vindicating
+  developmentalism rather than the underlying liberalisation. The 1982
+  crisis is over-determined (copper price collapse, exchange-rate peg,
+  external debt), so attributing the collapse to liberalisation alone
+  overstates the policy channel.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if synthetic-control estimate of Chile's
+    cumulative real GDP per capita growth 1973-1990 underperforms an East
+    Asian donor pool by at least 20% AND the 1982 banking-crisis output cost
+    exceeds 10% of GDP (consistent with pure-Chicago prescription
+    underperforming). REFUTED if Chile outperforms or the crisis cost is
+    below 5% of GDP.
+  test: "Synth-DID with CHL treated 1973 vs East Asian donor pool {KOR,TWN,SGP,MYS,THA,IDN}; outcome cumulative real GDP per capita 1973-1990 and 1982 banking-crisis output cost; falsified if synth gap below 20% or crisis cost below 5% of GDP."
+evidence_type: associational
+
+sample:
+  countries: [CHL, KOR, TWN, SGP, MYS, THA, IDN]
+  period: [1965, 1995]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: pinochet_chicago_treated
+      source: "constructed: indicator = 1 for CHL, years 1973-1990 (Pinochet/Chicago Boys window)"
+      transformation: indicator
+
+  controls:
+    - name: copper_price_index
+      source: "imf_pcps:PCOPP"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    Chile treated 1973-1990; East Asian donor pool (KOR, TWN, SGP, MYS).
+    Outcomes: cumulative real GDP per capita, output volatility, banking-
+    crisis output cost. Tests whether pure-Chicago liberalisation
+    underperformed selective developmentalist comparators.
+
+scope:
+  period: [1973, 1990]
+  countries: [CHL]
+  outcome_dim: [gdp_growth, financial_crisis, institutional_quality]
+  policy_family: [trade_policy, privatisation_nationalisation, institutional_reform, regulation]
+  treatment_tags: [pinochet_chicago_boys_reforms, chile_1982_crisis, chile_copper_re_nationalisation]
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Developmentalist claim that pure-Chicago Chile underperformed East Asian developmentalist peers 1973-1990. Relinked from washington_consensus_vs_developmental_state_performance in Phase 4E."

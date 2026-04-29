@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: capital_mobility_worker_bargaining_power
+version: 1
+status: draft
+topic: distribution
+claim: Increased capital mobility after 1980 (capital account liberalisation across OECD) is correlated with declining worker bargaining power, measured via union density and strike frequency.
+notes: Maps the marxian school's capital-mobility/labour-bargaining claim to a testable spec on OECD panel data. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.55
+disclosure: Author prior tilts toward the claim's framing (post-1980 capital-mobility weakened labour bargaining); the panel-FE spec is chosen to reduce confound risk from coincident demographic and technology
+  shifts but cannot fully separate them.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE regression of union density and strike frequency on Chinn-Ito capital-account-openness across OECD-30 over 1980-2020; country+year FE, country-clustered SEs. Refute if Chinn-Ito coefficient
+    has opposite sign at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - CAN
+  - AUS
+  - JPN
+  - CHE
+  - BEL
+  - AUT
+  - IRL
+  - KOR
+  - PRT
+  period:
+  - 1980
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with missing union-density series
+  - winsorise capital-mobility index changes at 1st/99th percentile
+variables:
+  outcome:
+  - name: union_density
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TUD,1.0
+    transformation: level
+    notes: 'OECD trade-union density (members as share of wage/salary earners). ICTWSS provides a longer-run alternative — TODO swap when ICTWSS fetcher is registered.
+
+      '
+  - name: collective_bargaining_coverage
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_CBC,1.0
+    transformation: level
+    notes: 'OECD collective-bargaining coverage rate; complements union- density as worker-power proxy.
+
+      '
+  treatment:
+  - name: capital_account_openness_chinn_ito
+    source: owid:capital-account-openness
+    transformation: level
+    notes: 'Chinn-Ito KAOPEN index mirrored by OWID. TODO: replace with direct Chinn-Ito feed when a registered fetcher exists.
+
+      '
+  - name: financial_openness_assets_plus_liabilities_to_gdp
+    source: imf:BFXFA
+    transformation: log
+    notes: 'IMF IFS external financial assets+liabilities to GDP — Lane- Milesi-Ferretti style de-facto openness. Series ID approximate; verify dataflow on wiring.
+
+      '
+  controls:
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - OECD
+  outcome_dim:
+  - labour_share
+  - employment_labour
+  policy_family:
+  - labour_market
+  - regulation
+  treatment_tags:
+  - capital_account_liberalisation_1980
+  - neoliberal_turn_1980
+  - financialisation_era
+covers_claims:
+- position_id: marxian
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Marxian position claim is textually identical to hypothesis claim — direct capital-mobility / worker-bargaining-power link over post-1980 OECD.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Cross-country OECD panel (post-1980 capital-account liberalisation cohort) regressing union density / strike frequency on capital-mobility indices (Chinn-Ito, Quinn) with country and year FE;
+    clustering by country to handle within-country serial correlation.
+
+    '

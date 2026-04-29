@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: canada_gdp_per_capita_stagnation_post_2015
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  Canadian GDP per capita (PPP, constant international dollars) diverged
+  negatively from a donor pool of resource-plus-advanced-anglophone-plus-
+  small-open-developed economies (USA, AUS, NZL, GBR, NOR, CHE) starting
+  around 2015, such that the Canadian per-capita trajectory 2015-2023 is
+  materially below a country-and-year-fixed-effect counterfactual matched
+  on pre-2015 level and covariates. The claim is narrowly about per-capita
+  output trajectory; it does not assert that aggregate GDP fell (it did
+  not) nor that Canadian headline growth was bad in every year. It asserts
+  that per-capita productivity growth under the 2015-present policy mix
+  was slow enough, and population growth fast enough, that the per-capita
+  level has stagnated relative to the donor pool — consistent with the
+  productivity-gap warning issued by Bank of Canada Senior Deputy Governor
+  Rogers in March 2024 ("it's an emergency").
+
+evidence_type: causal
+
+sample:
+  countries: [CAN, USA, AUS, NZL, GBR, NOR, CHE]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing primary outcome"
+    - "robustness: drop NOR when oil-price episodes dominate (pre-tested cut 2014-2016)"
+
+scope:
+  period: [2000, 2023]
+  countries: [CAN, USA, AUS, NZL, GBR, NOR, CHE]
+  outcome_dim: [gdp_growth, productivity]
+  policy_family: [regulation, fiscal_policy, institutional_reform]
+  treatment_tags: [trudeau_2015, canada_productivity_gap, canada_population_growth]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp_constant
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+      notes: >
+        PPP-adjusted constant international dollars is the correct scale
+        for this claim. Nominal-USD GDP per capita confounds with CAD
+        depreciation 2014-2016 and 2022 and would overstate Canadian
+        decline for currency-market reasons that are not policy-content.
+    - name: log_gdp_pc_constant_lcu
+      source: "world_bank_wdi:NY.GDP.PCAP.KN"
+      transformation: log
+      notes: "Secondary: real GDP per capita in constant local-currency units to cross-check the PPP series."
+
+  treatment:
+    - name: canada_post_2015
+      source: "constructed: indicator = 1 if country=CAN and year >= 2015; 0 otherwise. Tests whether Canadian per-capita trajectory deviates from the donor pool's time-average from the start of the Trudeau government (November 2015; year-resolution treatment coded from 2016 in robustness)."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_gross_fixed_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: log
+    - name: terms_of_trade_index
+      source: "world_bank_wdi:TT.PRI.MRCH.XD.WD"
+      transformation: level
+      notes: "Essential for Canada, NOR, AUS: commodity-terms-of-trade shocks are a first-order confound 2014-2016 and 2022."
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary: TWFE with country + year fixed effects. β on the
+    canada_post_2015 indicator identifies the Canadian per-capita
+    trajectory deviation from the donor pool's time-average under
+    fixed-effects adjustment, with clustered standard errors.
+
+    Secondary: synthetic-control robustness. For each post-2015 year,
+    compute synthetic Canada as the weighted average of donor countries
+    matched on 2000-2014 outcome + pre-2015 covariate means. Report
+    Canada-actual minus Canada-synthetic gap.
+
+    Treatment-date robustness: re-run with 2016 cutoff (first full year
+    under the Trudeau government) and report both coefficients.
+
+    Population-growth decomposition: Canadian population grew ~15%
+    2015-2023, substantially faster than the donor pool average. A
+    mechanical accounting decomposition reports the share of the
+    per-capita gap attributable to faster denominator growth vs
+    slower numerator (real GDP) growth. This is descriptive, not
+    causal, but is essential for interpretation: a large portion of
+    Canadian per-capita stagnation reflects rapid immigration-driven
+    population growth absorbing output, not an absolute contraction
+    of the productive base.
+
+falsification:
+  rule: >
+    Not supported if β on canada_post_2015 is non-negative (>= 0) at
+    p < 0.10 in the TWFE specification OR if the synthetic-control gap
+    for Canada is non-negative for a majority of post-2015 years. If
+    the TWFE β is negative and significant but the population-growth
+    decomposition attributes more than 100% of the per-capita gap to
+    denominator growth (i.e., real-GDP numerator growth is at or above
+    donor-pool average), the headline claim is recorded as supported
+    on per-capita stagnation but NOT supported on productivity-
+    stagnation, and the result card must state this disaggregation
+    explicitly.
+  test: canada_post_2015_twfe_and_synthetic_control
+  threshold: >
+    β_canada_post_2015 < 0 at p < 0.10  AND  synthetic-control gap
+    post_2015 negative in ≥60% of years. Population-growth decomposition
+    reported alongside as interpretation guard.
+
+prior_confidence: 0.72
+
+disclosure: >
+  Author holds the prior that Canadian per-capita output trajectory
+  under the 2015-present policy mix has stagnated relative to peer
+  resource-plus-anglophone economies. This aligns with the Bank of
+  Canada's own public warnings (Rogers, March 2024) and with RBC /
+  TD / Scotiabank research on the productivity gap with the US. The
+  0.72 prior reflects this alignment. The falsification rule is
+  designed to bind: either the fixed-effects coefficient must be
+  negative and significant OR the synthetic-control gap must be
+  majority-negative post-2015. The population-growth decomposition is
+  included specifically to prevent the hypothesis from being "cheaply
+  confirmed" by fast immigration absorbing output — if that mechanism
+  explains the entire per-capita gap, the result card must say so.
+
+conflict_disclosure: >
+  Author holds no Canadian equity positions. Framework author is not
+  Canadian. Disclosure maintained per DISCLOSURE.md.
+
+steelman: hypotheses/steelman/canada_gdp_per_capita_stagnation_post_2015.md
+
+linked_hypotheses:
+  - canada_real_disposable_income_post_2015
+  - us_eu_gdp_per_capita_divergence_policy_causes
+  - uk_economic_decline_multi_movement
+
+notes: >
+  Why this donor pool: USA, AUS, NZL are anglophone-federal-parliamentary
+  economies with comparable legal/financial institutions; NOR and CHE are
+  small-open-advanced peers with different resource/financial mixes; GBR
+  anchors the anglophone group. The pool is NOT the full OECD — deliberately
+  excluded are EU members whose 2015-2023 trajectories are dominated by
+  euro-area + energy-crisis shocks Canada did not face.
+
+  The 2015 cutoff corresponds to the November 2015 Liberal election
+  victory; the treatment can be interpreted as the Trudeau-era policy
+  mix but should not be read as attributing causality to a single
+  identifiable policy. Per METHODOLOGY.md this is a whole-movement
+  effect estimate, not a policy-specific effect estimate.

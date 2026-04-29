@@ -1,0 +1,372 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: soviet_union_central_planning_gdp_collapse_1989_1991
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  The Soviet central-planning system, having already exhibited
+  TFP stagnation 1970-1989, underwent a canonical institutional
+  and economic collapse 1989-1998 as plan-enforcement was
+  withdrawn without functioning market institutions in place.
+  The collapse manifests as ≥7 of 10 pre-registered extreme-
+  outcome metrics drawn from independent data sources and
+  measuring distinct causal layers (real output, industrial
+  production, hyperinflation, male mortality, demographic
+  collapse, inequality surge, emigration, currency regime
+  failure, poverty headcount, reform-depth-conditioned recovery).
+  The canonical-case claim is that no non-war peacetime
+  transition in the 1989-1998 global panel matches even 4 of
+  these 10 thresholds simultaneously except the FSU bloc itself.
+  A refutation (≤3 metrics met) would indicate that the post-
+  Soviet collapse has been overstated by Western reconstructions,
+  or that the political-shock explanation (Gorbachev / Yeltsin
+  choices) dominates the institutional-exhaustion explanation in
+  a way that rules out the canonical-case framing.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [RUS]
+  period: [1989, 1998]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "primary window is 1989-1998 for the FSU collapse pattern; metrics that measure pre-1989 stagnation (e.g. TFP growth 1970-1989) are scored against the pre-collapse window"
+    - "no donor pool required — this is a single-country canonical-case pattern match against pre-registered extreme-outcome thresholds"
+    - "benchmark distribution (was any 1989-1998 non-war country matching >=4 of 10 thresholds?) is computed ex post from WDI + Maddison + IMF + UN DESA global panel, with FSU bloc countries treated as a single cluster not multiple independent observations"
+    - "Russia is the primary case; other FSU republics (UKR, BLR, GEO, Central Asian -stans) are reported separately as a natural stratification test on reform-depth-conditioned recovery"
+
+scope:
+  period: [1989, 1998]
+  countries: [RUS, POST_SOVIET]
+  outcome_dim: [gdp_growth, life_expectancy_health, currency_purchasing_power, demographics_migration, poverty_inequality]
+  policy_family: [institutional_reform, privatisation_nationalisation, monetary_policy]
+  treatment_tags: [ussr_dissolution_1991, soviet_central_planning_collapse, ruble_redenomination_1998, russian_default_1998, shock_therapy]
+
+variables:
+  outcome:
+    - name: multi_metric_collapse_score
+      source: "derived: count of canonical_metrics with threshold met"
+      transformation: count
+
+canonical_metrics:
+  - metric_id: gdp_contraction_peak_to_trough
+    description: >
+      Russian real GDP contracted approximately 40% peak-to-trough
+      1989-1998 per Maddison and World Bank reconstructions. This
+      is the largest peacetime peak-to-trough contraction in the
+      1989-1998 global panel outside declared-conflict states.
+    threshold: ">30% cumulative real GDP contraction 1989-1998"
+    window: "1989-1998"
+    source: "maddison:mpd2020; world_bank_wdi:NY.GDP.MKTP.KD; imf:NGDP_R"
+    independence_justification: >
+      Maddison uses cross-checks against physical-output
+      indicators (steel, electricity, crude oil); multi-source
+      triangulation not dependent on Rosstat alone.
+    direction: supports_claim
+
+  - metric_id: industrial_output_collapse
+    description: >
+      Russian industrial production index fell by roughly 50%
+      from 1990 peak to 1998 trough per Rosstat and CIS
+      statistical committee reconstructions. Heavy industry
+      contracted more than light industry; the military-
+      industrial complex collapsed most severely as defence
+      orders dried up.
+    threshold: ">40% decline in industrial production index 1990-1998"
+    window: "1990-1998"
+    source: "rosstat:industrial_production_index; imf:IFS_industrial_production; world_bank_wdi:NV.IND.TOTL.KD"
+    independence_justification: >
+      Industrial output measured via physical-quantity indices
+      (tonnes, kWh, units produced) separate from GDP accounts.
+    direction: supports_claim
+
+  - metric_id: life_expectancy_male_collapse
+    description: >
+      Russian male life expectancy at birth fell from
+      approximately 64.8 years (1987) to approximately 57.4 years
+      (1994) — a decline exceeding 7 years over 7 calendar years.
+      No non-war peacetime economy in the modern demographic
+      record exhibits male LE collapse of comparable magnitude.
+      Driven by alcohol mortality, cardiovascular disease surge,
+      violent death, and suicide in the transitional-male cohort.
+    threshold: ">5 year decline in male life expectancy at birth between 1987 and any trough year before 2000"
+    window: "1987-1999"
+    source: "who_gho:life_expectancy; human_mortality_database:RUS; rosstat:demographic_yearbook"
+    independence_justification: >
+      Human Mortality Database uses academic reconstruction from
+      vital-registration primary data with quality checks; WHO
+      GHO uses independent UN-agency compilation.
+    direction: supports_claim
+
+  - metric_id: hyperinflation_1992_1995
+    description: >
+      Russian CPI rose approximately 2500% in 1992 following price
+      liberalisation, sustained 300-900% annualised inflation
+      through 1993-1995. Triple-digit-plus inflation for 3+
+      consecutive years is a canonical monetary-regime failure.
+    threshold: ">=2 consecutive calendar years of >500% annualised CPI inflation 1992-1995"
+    window: "1992-1995"
+    source: "imf:PCPIPCH; rosstat:CPI_time_series; world_bank_wdi:FP.CPI.TOTL.ZG"
+    independence_justification: >
+      IMF Article IV consultation reconstructions cross-check
+      Rosstat; parallel-FX-rate observations provide further
+      independent check.
+    direction: supports_claim
+
+  - metric_id: gini_inequality_surge
+    description: >
+      USSR Gini coefficient was approximately 0.27 in 1988 per
+      academic reconstructions of household income surveys; by
+      1998 the Russian Gini had risen to approximately 0.48-0.49
+      per World Bank and Rosstat Household Budget Survey. A Gini
+      increase of 0.20+ over a decade is not matched in any non-
+      war peacetime economy in the WDI inequality panel.
+    threshold: ">0.15 Gini increase between 1988 and 1998"
+    window: "1988-1998"
+    source: "world_bank_wdi:SI.POV.GINI; unu_wider:wiid; academic:milanovic_soviet_inequality"
+    independence_justification: >
+      UNU-WIDER WIID is an academic compilation cross-checked
+      against national household budget surveys; Milanovic
+      reconstructions use Soviet-era HBS micro-data.
+    direction: supports_claim
+
+  - metric_id: fertility_collapse_tfr
+    description: >
+      Russian total fertility rate fell from approximately 2.0
+      (1987) to approximately 1.17 (1999) — a decline exceeding
+      0.8 children per woman over 12 years. Fertility collapse of
+      this speed and depth outside war is extremely rare; combined
+      with the male-LE collapse it produced outright natural
+      population decline.
+    threshold: ">0.5 decline in TFR between 1987 and any trough year before 2001"
+    window: "1987-2000"
+    source: "world_bank_wdi:SP.DYN.TFRT.IN; human_fertility_database:RUS; rosstat:demographic_yearbook"
+    independence_justification: >
+      Human Fertility Database uses academic reconstruction from
+      vital-registration primary data; WDI uses WHO/UNPD
+      composites; two independent demographic compilations.
+    direction: supports_claim
+
+  - metric_id: poverty_headcount_surge
+    description: >
+      World Bank Russia poverty headcount (at moderate poverty
+      line, approximately $5.50/day 2011 PPP) rose from <5% in
+      1988 (Soviet-era HBS reconstruction) to approximately 30%+
+      by 1998. Poverty-headcount increase of 20+ percentage points
+      over a decade is extreme for any non-war economy.
+    threshold: ">20 percentage point increase in poverty headcount (moderate line) 1988-1998"
+    window: "1988-1998"
+    source: "world_bank_wdi:SI.POV.UMIC; world_bank:ecapov; academic:milanovic_transition_poverty"
+    data_quality_flag: >
+      Soviet-era poverty measurement is reconstructed from HBS
+      micro-data since no official poverty line existed; consensus
+      academic reconstruction places 1988 poverty headcount
+      between 2% and 6%.
+    independence_justification: >
+      World Bank ECAPOV uses harmonised HBS micro-data; Milanovic
+      and Cornia-Paniccia academic reconstructions provide
+      independent cross-check.
+    direction: supports_claim
+
+  - metric_id: emigration_fsu_diaspora
+    description: >
+      Approximately 2+ million people emigrated from the FSU
+      1989-1996 to Germany (Aussiedler + Jewish quota), Israel
+      (~1M under the Law of Return), the US, and Canada. This
+      represents roughly 1.5% of FSU population in a 7-year
+      window. Destination-country arrival statistics confirm the
+      magnitude independently of FSU emigration records.
+    threshold: ">1 million recorded emigrants from FSU territory to OECD destinations 1989-1996"
+    window: "1989-1996"
+    source: "un_desa:international_migrant_stock; oecd:sopemi; israel_cbs:immigration_statistics; destatis_germany:aussiedler_statistics"
+    independence_justification: >
+      Destination-country immigration systems (German BAMF,
+      Israeli CBS, US DHS) record arrivals independently of
+      Russian/FSU state statistics.
+    direction: supports_claim
+
+  - metric_id: currency_regime_failure_ruble
+    description: >
+      The Soviet ruble was redenominated in 1991 (confiscatory
+      Pavlov reform) and the Russian ruble was redenominated
+      again 1 January 1998 at 1000:1. Combined with the August
+      1998 default and devaluation, Russia experienced three
+      distinct currency-regime failures within a decade — the
+      1991 Pavlov confiscation, the 1998 redenomination, and the
+      August 1998 sovereign default + ruble devaluation.
+    threshold: ">=2 major currency-regime events (confiscatory reform, redenomination, or sovereign default + devaluation >30%) within a 10-year window"
+    window: "1989-1998"
+    source: "cbr:official_decrees; imf:article_iv_consultation_rus; academic:aslund_building_capitalism"
+    independence_justification: >
+      Currency-regime events are state-decreed legal facts
+      directly observable in official gazette publication; not a
+      statistical construct subject to measurement dispute.
+    direction: supports_claim
+
+  - metric_id: reform_depth_conditioned_recovery
+    description: >
+      FSU republics that undertook deeper market reforms recovered
+      faster: by 2000 Estonia and Latvia had regained 1989 GDP
+      per capita levels, Poland (non-FSU but same bloc) exceeded
+      1989 GDP by ~25%. Belarus, Ukraine, and Central Asian
+      republics that reformed less deeply remained below 60% of
+      1989 GDP per capita in 2000. This cross-sectional
+      stratification supports institutional-quality attribution
+      rather than political-shock-only attribution.
+    threshold: ">20 percentage point gap in 2000-GDP-pc-relative-to-1989 between deep-reform (EST, LVA, POL, CZE) and shallow-reform (BLR, UKR, UZB, TKM) FSU/CEE republics"
+    window: "1989-2000"
+    source: "maddison:mpd2020; world_bank_wdi:NY.GDP.PCAP.KD; ebrd:transition_report_indicators"
+    data_quality_flag: >
+      EBRD transition indicators provide a reform-depth scoring
+      that allows the stratification to be pre-specified rather
+      than reverse-engineered from recovery outcomes.
+    independence_justification: >
+      EBRD transition-indicator scoring is constructed ex ante
+      from policy reform observations (price liberalisation, SOE
+      privatisation, banking reform), independent of the GDP
+      recovery outcome being tested.
+    direction: supports_claim
+
+multi_metric_falsification:
+  total_metrics: 10
+  support_threshold: 7
+  refute_threshold: 3
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The Soviet-system collapse 1989-1998 is a bundled institutional
+  failure spanning monetary (ruble overhang, price liberalisation
+  hyperinflation, 1998 default), fiscal (tax-base collapse,
+  federal-regional fiscal war), regulatory (overnight property-
+  rights ambiguity as SOEs were voucher-privatised without
+  functioning courts), and political (plan-enforcement withdrawal
+  under Gorbachev without market-institution substitution). The
+  canonical-case hypothesis treats the bundle as the unit of
+  analysis. The reform-depth-conditioned-recovery metric
+  specifically addresses the political-shock-vs-institutional-
+  exhaustion debate raised in the steelman.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    For each of the 10 canonical metrics, evaluator fetches the
+    specified data source and evaluates the threshold expression.
+    Support if metrics_met >= 7, refute if metrics_met <= 3,
+    inconclusive in the 4-6 range. Benchmark check: no non-war
+    peer in the 1989-1998 global panel should match >=4 of these
+    thresholds outside the FSU/CEE bloc; if a non-transitional
+    country does, the metric-set is not transition-discriminating
+    and needs revision. FSU-bloc countries are treated as a
+    single cluster for benchmark purposes since they share the
+    treatment (Soviet-system collapse), not as independent
+    observations.
+
+falsification:
+  rule: >
+    Hypothesis is SUPPORTED if >=7 of 10 canonical metrics meet
+    their pre-registered thresholds. Hypothesis is REFUTED if <=3
+    of 10 metrics meet their thresholds. The 4-6 metric range is
+    inconclusive. Additional falsification: if any non-war non-
+    FSU/CEE country in 1989-1998 (WDI + Maddison + UN DESA panel)
+    matches >=4 of these thresholds, the metric-set is not
+    transition-discriminating and the hypothesis is
+    methodologically invalid regardless of Russia's own metric
+    count. Secondary falsification: if deep-reform FSU/CEE
+    republics did NOT outperform shallow-reform republics on the
+    reform-depth-conditioned-recovery metric, the institutional-
+    quality attribution is weakened.
+  test: multi_metric_canonical_case_pattern_match
+  threshold: "metrics_met_russia >= 7 AND max_metrics_met_non_war_non_transition_peer <= 3"
+
+prior_confidence: 0.92
+
+disclosure: >
+  This hypothesis is a methodology revision of
+  soviet_union_central_planning_gdp_collapse_1989_1991 v1 (which
+  used panel regression + synthetic control on log GDP per capita
+  1950-1995). The multi-metric specification is epistemically
+  stronger because (a) Soviet-era national accounts 1950-1989
+  rely on Western CIA/PlanEcon reconstructions contested by
+  Harrison/Rosefielde revisionists, and (b) the 1989-1998
+  transition is a bundled institutional event, not a clean
+  treatment-timing natural experiment. The 10-metric specification
+  draws on heterogeneous publishers — demographic (HMD, HFD),
+  industrial-output (Rosstat IPI), fiscal (IMF Article IV),
+  destination-country immigration (German BAMF, Israeli CBS),
+  and EBRD reform-depth scoring — to triangulate the pattern.
+
+  Prior confidence is 0.92 (higher than Cuba 0.88, lower than
+  Venezuela 0.98) because the USSR collapse is extensively
+  documented with independent destination-country and demographic
+  corroboration, but the steelman's political-shock-dominance
+  argument is non-trivial and the Harrison-Rosefielde measurement-
+  revision debate is genuine. The reform-depth-conditioned-
+  recovery metric is specifically included to address whether
+  the collapse was endogenous to the planning model or merely a
+  consequence of Gorbachev-Yeltsin political choices — the
+  stratification test distinguishes these hypotheses.
+
+  Author's market-liberal priors are aligned with the hypothesis
+  (the author believes central planning systematically
+  underperforms market allocation in TFP growth and that the
+  1989-1998 collapse reflects institutional exhaustion interacting
+  with reform-sequencing choices). The pre-registered 10-metric
+  threshold set, the requirement that non-transition peers not
+  match >=4 metrics, and the explicit reform-depth stratification
+  bind the author to a pattern-match that is not simply a re-
+  labelling of priors.
+
+conflict_disclosure: >
+  Author holds no Russian or FSU asset exposure and no consulting
+  relationship with parties in the post-Soviet transition policy
+  debate.
+
+steelman: hypotheses/steelman/soviet_union_central_planning_gdp_collapse_1989_1991.md
+
+linked_hypotheses:
+  - west_east_germany_economic_system_divergence_1950_1989
+  - north_south_korea_development_divergence_1953_present
+  - cuba_socialist_economy_stagnation_1960_2023
+  - venezuela_chavismo_canonical_case_multi_metric
+  - zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009
+
+notes: >
+  Methodological rationale: single-estimator causal tests are
+  weak for the USSR collapse because (a) Soviet-era national
+  accounts are reconstructions with known bias in either
+  direction (CIA overstated Soviet output in some dimensions and
+  understated in others; Harrison/Rosefielde revisionists argue
+  the bias direction differs again), (b) the treatment is a
+  multi-year, multi-channel institutional transition, (c) the
+  donor-pool problem is severe (no non-transition comparator is
+  structurally similar to USSR 1989). Pre-registered multi-metric
+  pattern-match with explicit benchmark check and reform-depth
+  stratification is epistemically stronger under these conditions.
+
+  Framing decision: the hypothesis_id references "1989-1991" but
+  the canonical-case metric window extends to 1998 because the
+  collapse trough is 1998, not 1991. The 1989-1991 dates mark
+  the terminal political events (plan-enforcement withdrawal,
+  USSR dissolution); the 1992-1998 window is where the economic
+  collapse metrics are strongest. Version 1 is preserved with
+  its hypothesis_id for provenance; a v2 id-rename is deferred.
+
+  Reform-depth stratification (metric 10) is the methodological
+  innovation that addresses the steelman's strongest objection
+  (China/Vietnam maintained planning and did not collapse;
+  therefore enforcement not planning is the binding variable).
+  The within-FSU-CEE cross-section allows a natural test: if
+  plan-enforcement-withdrawal were the only mechanism, all FSU
+  republics should have collapsed similarly; they did not.
+  Deep-reform republics recovered while shallow-reform republics
+  stagnated, supporting the institutional-quality reading over
+  the political-shock-only reading.
+
+  Flagged metric uncertainty: the Soviet-era (pre-1989) poverty
+  headcount and Gini baselines rely on academic HBS
+  reconstructions (Milanovic, Atkinson-Micklewright); the 1988
+  Gini of 0.27 is a conservative consensus point-estimate with
+  uncertainty interval 0.24-0.30. The threshold (>0.15 Gini
+  increase) is calibrated to be robust across this uncertainty
+  interval.

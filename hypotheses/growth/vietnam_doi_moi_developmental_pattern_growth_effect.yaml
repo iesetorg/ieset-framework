@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vietnam_doi_moi_developmental_pattern_growth_effect
+version: 1
+status: draft
+topic: growth
+claim: Vietnam's Doi Moi 1986 reforms and subsequent export-oriented strategy replicated the East Asian
+  developmental-state pattern and produced three decades of above-peer-region growth.
+notes: Stub seeded from a developmentalist school prediction about Vietnam's post-1986 trajectory.
+  Pre-Doi-Moi macro data is sparse; needs human review of donor-pool comparability with regional peers.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors interpret Vietnam's success as primarily about market opening, not
+  about state-led pattern replication; this could under-weight industrial-policy evidence in the synth-DiD outputs.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if the cumulative log-GDP-per-capita
+    gap (Vietnam minus equal-weighted SE-Asian donor-pool counterfactual)
+    by 2010 exceeds +0.25 log-points (~+28% in levels), where the donor
+    pool is {PHL, IDN, KHM, LAO, BGD, MMR} and the index is anchored at
+    the first year all panel members have WDI NY.GDP.PCAP.PP.KD coverage
+    (typically 1990, since WDI VNM PPP coverage begins then). REFUTED if
+    the gap is <= 0 (Vietnam at or below equal-weight donor mean). PARTIAL
+    if 0 < gap < +0.25.
+    INFORMATIVE: post-2000 mean gaps in (i) manufacturing-value-added/GDP
+    share (NV.IND.MANF.ZS) and (ii) exports/GDP share (NE.EXP.GNFS.ZS) vs
+    the same donor pool; PWT rtfpna log-change vs donors over common years.
+    METHOD_VALID: at least 3 of the 6 donors must have WDI GDP-pc-PPP data
+    at the base year, and at least 10 overlapping VNM/donor-pool years
+    base-to-2010, else the verdict is `inconclusive (method_valid)`.
+  test: vietnam_doi_moi_log_gap_2010_vs_se_asia_donor_pool
+  threshold: >-
+    PRIMARY: log_gap(VNM, donor_mean, year=2010) >= +0.25.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic rule (which
+  asked for "+25% over synthetic counterfactual at p<0.10") to a
+  dispositive log-space test: log-gap >= +0.25 (≈ +28% in levels) by 2010
+  vs an equal-weighted SE-Asian donor pool. Equal-weighting (rather than
+  full synth-DiD weight optimisation) is conservative for SUPPORTED
+  because it includes KHM/LAO/MMR which had their own catch-up booms
+  post-1990 — a true synth would likely down-weight these and INCREASE
+  the Vietnam gap. WDI NY.GDP.PCAP.PP.KD coverage for Vietnam begins
+  1990, so the script anchors the index at the first overlapping year
+  rather than 1986; pre-Doi-Moi WDI PPP data is not available. THA/MYS
+  are excluded from the donor pool (East Asian Tigers / NIE peers, not
+  comparable LDCs at 1986 income) but kept as informative reference.
+evidence_type: associational
+
+sample:
+  countries: [VNM, PHL, IDN, KHM, LAO, BGD, MMR, THA, MYS]
+  period: [1986, 2019]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: doi_moi_treated
+      source: "constructed: indicator = 1 for VNM, year >= 1986 (Doi Moi reforms)"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    Vietnam treated post-1986; donor pool of comparable Southeast Asian
+    economies (PHL, IDN, MMR, KHM, LAO, BGD) with similar 1986 income.
+    Outcome: real GDP per capita and manufacturing-export share. Tests
+    whether Doi Moi reforms produced above-counterfactual growth.
+
+scope:
+  period: [1986, 2023]
+  countries: [VNM, ASIA_EM]
+  outcome_dim: [gdp_growth, industrial_capability, trade_liberalisation]
+  policy_family: [industrial_policy, trade_policy, institutional_reform]
+  treatment_tags: [vietnam_doi_moi_1986, asian_miracle_era]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 13
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts Vietnam's Doi Moi 1986 reforms replicated East Asian developmental-state export pattern and delivered three decades of above-peer growth."

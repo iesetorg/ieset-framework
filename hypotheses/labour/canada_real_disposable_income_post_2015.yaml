@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: canada_real_disposable_income_post_2015
+version: 1
+status: pre_registered
+topic: labour
+
+claim: >
+  Canadian real household disposable income per capita has stagnated or
+  grown more slowly than in comparable resource-plus-anglophone-plus-small-
+  open-developed economies (USA, AUS, NZL, GBR, NOR, CHE) over 2015-2023,
+  once adjusted for CPI and household size. The claim is narrowly about
+  the household-sector purchasing-power trajectory — not aggregate output
+  and not pre-tax labour earnings in isolation — because the relevant
+  welfare metric for a household under the 2015-present Canadian policy
+  mix is after-tax-and-transfer real income per capita. The hypothesis
+  additionally tests whether, once housing costs are netted out (real
+  disposable income net of shelter expenditure), the Canadian trajectory
+  is worse than the headline series suggests, since Canadian house prices
+  and rents rose substantially faster than the donor-pool average over
+  the sample window.
+
+evidence_type: causal
+
+sample:
+  countries: [CAN, USA, AUS, NZL, GBR, NOR, CHE]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing primary or proxy outcome"
+    - "NZL and NOR may be dropped in robustness if OECD Household Dashboard coverage is incomplete at wiring time"
+
+scope:
+  period: [2000, 2023]
+  countries: [CAN, USA, AUS, NZL, GBR, NOR, CHE]
+  outcome_dim: [wage_stagnation, employment_labour, housing]
+  policy_family: [fiscal_policy, welfare_architecture, housing_policy]
+  treatment_tags: [canada_trudeau_2015, ccb_enhancement, cpp_enhancement, canada_housing_cost_surge]
+
+variables:
+  outcome:
+    - name: real_household_net_disposable_income_per_capita
+      source: "oecd:OECD.SDD.NAD,DSD_NASEC_T14@DF_T14,1.0"
+      transformation: log
+      notes: >
+        Primary outcome. OECD National Accounts Section 2 / Household
+        Dashboard variant. URN approximate; the exact dataflow identifier
+        must be confirmed against the live OECD data API at hypothesis-
+        wiring time. Flagged v1.1 fetcher requirement — the Canadian
+        series is additionally available from Statistics Canada CANSIM
+        36-10-0112-01 (Household economic accounts, per capita) and the
+        two series should be cross-walked for Canada-specific robustness.
+    - name: gni_per_capita_ppp_constant
+      source: "world_bank_wdi:NY.GNP.PCAP.PP.KD"
+      transformation: log
+      notes: >
+        Proxy outcome. Where the ideal OECD household-disposable-income
+        series is unavailable for a donor country-year, GNI per capita
+        (PPP constant) is used as the fallback. GNI captures cross-border
+        income flows that GDP does not, and is a closer proxy for
+        household purchasing power than GDP per capita, though it still
+        does not net taxes and transfers.
+    - name: real_wage_growth_cumulative
+      source: "oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARN,1.0"
+      transformation: cumulative_index_2015_base
+      notes: "Secondary: cumulative real-wage index 2015=100, to separate wage-growth from transfer-and-tax effects."
+
+  treatment:
+    - name: canada_post_2015
+      source: "constructed: indicator = 1 if country=CAN and year >= 2015; 0 otherwise."
+      transformation: indicator
+
+  decomposition_channels:
+    - name: real_house_price_index
+      source: "bis:WS_SPP_RPP"
+      transformation: cumulative_index_2015_base
+      notes: "BIS residential property price database — real house prices. Canadian RPP rose substantially faster than donor-pool average 2015-2022."
+    - name: household_debt_to_disposable_income
+      source: "oecd:OECD.SDD.NAD,DSD_NASEC_T7HH@DF_T7HH,1.0"
+      transformation: level
+    - name: net_transfers_share_of_household_income
+      source: "oecd:OECD.SDD.NAD,DSD_NASEC_T14@DF_T14,1.0 (net current transfers received component)"
+      transformation: level
+      notes: "Decomposition channel: Canadian CCB + CPP enhancement + COVID transfers raise the transfer share, which may partially offset pre-tax wage weakness."
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: cpi_inflation_annual
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: terms_of_trade_index
+      source: "world_bank_wdi:TT.PRI.MRCH.XD.WD"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary: TWFE on log real household disposable income per capita
+    with country and year fixed effects. β_canada_post_2015 identifies
+    the Canadian household-income trajectory deviation from the donor
+    pool's time-average.
+
+    Two-spec rule (per METHODOLOGY.md): the primary spec uses OECD
+    household disposable income; the secondary spec uses WDI GNI per
+    capita (PPP, constant) as proxy, with identical fixed effects and
+    treatment indicator. Both specifications reported. A finding
+    supported under BOTH passes the two-spec rule; supported under
+    only one is reported as tentative.
+
+    Housing-netted specification: construct "real household disposable
+    income net of shelter" = household disposable income per capita
+    minus a fitted shelter-expenditure estimate (BIS RPP × shelter-
+    weight from OECD household accounts). Re-estimate the TWFE on this
+    netted series. Expected direction: Canadian gap widens once shelter
+    is netted out, because housing cost growth absorbed a larger share
+    of nominal income in Canada than in the donor pool.
+
+    Data-gate: this hypothesis is flagged as v1.1 fetcher requirement.
+    The OECD Household Dashboard dataflow URNs must be verified before
+    first run; the Statistics Canada cross-walk must be implemented for
+    Canada-specific robustness. Until the primary series is available,
+    runs will use GNI-per-capita proxy only and explicitly label findings
+    as proxy-based.
+
+falsification:
+  rule: >
+    Not supported if β_canada_post_2015 is non-negative (>= 0) at p < 0.10
+    in both (a) the OECD household-disposable-income primary spec and
+    (b) the WDI GNI-per-capita proxy spec. Supported-tentative if
+    negative and significant in only one of the two specs. Supported if
+    negative and significant in both, with the housing-netted
+    specification reported as secondary evidence on real purchasing-
+    power. If the transfer-share decomposition channel shows that
+    transfer-share increases in Canada fully offset pre-tax wage
+    weakness (i.e., disposable income after transfers tracks the donor
+    pool even while pre-tax wages do not), the result card must
+    report this explicitly: Canadian redistribution absorbed the
+    market-income shock, and the "household-income stagnation" framing
+    is inaccurate even if the "market-income stagnation" framing is
+    accurate.
+  test: canada_post_2015_household_income_twfe_two_spec
+  threshold: >
+    β_canada_post_2015 < 0 at p < 0.10 in OECD primary spec  AND
+    β_canada_post_2015 < 0 at p < 0.10 in WDI GNI proxy spec.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author holds the prior that Canadian household real purchasing power
+  trajectory under the 2015-present policy mix is weaker than the peer
+  trajectory, primarily through the housing-cost channel and the slower
+  real-wage channel, rather than through headline GDP decline. The
+  confidence is lower (0.65 vs 0.72 for the GDP hypothesis) because
+  the transfer-expansion channel genuinely cuts the other way: CCB,
+  CPP enhancement, COVID transfers, $10/day childcare all raise
+  household disposable income and may offset market-income weakness
+  in the data. The hypothesis is structured to REPORT that offset
+  honestly if the data shows it, rather than to claim stagnation
+  where there is none.
+
+conflict_disclosure: >
+  Author holds no Canadian real-estate or household-debt instrument
+  positions. No conflict on this specific series.
+
+steelman: hypotheses/steelman/canada_real_disposable_income_post_2015.md
+
+linked_hypotheses:
+  - canada_gdp_per_capita_stagnation_post_2015
+  - housing_cost_driven_real_wage_divergence
+
+notes: >
+  v1.1 dependency: OECD Household Dashboard dataflow URN verification
+  and Statistics Canada CANSIM cross-walk. Primary run before v1.1
+  must use WDI GNI-per-capita proxy only and be labelled accordingly.
+
+  The "v1.1 fetcher requirement" marker preserves the pre-registration
+  integrity: the claim, sample, treatment, estimator, and falsification
+  rule are fixed now; only the data source wiring becomes more precise
+  between v1 and v1.1. This is consistent with the pre-registration
+  discipline under METHODOLOGY.md.

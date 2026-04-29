@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: great_depression_fiscal_counterfactual
+version: 1
+status: draft
+topic: fiscal
+claim: The 1929-1933 US Great Depression contraction would have been substantially shallower with active fiscal expansion rather than the actual deflationary fiscal stance through 1932.
+notes: Maps the post-Keynesian school's Great-Depression fiscal-counterfactual claim to local projections of fiscal impulses across the Eichengreen gold-standard cross-country panel 1925-1939. Estimator
+  and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.55
+disclosure: Author prior accepts the directional claim (counterfactual fiscal expansion would have shortened the contraction) but is skeptical of 'substantially' as a quantitative threshold — Eichengreen-Sachs
+  and Romer 1992 both find moderate effects, and the counterfactual is heavily dependent on assumed multiplier size and gold-standard exit timing.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Local projections of real GDP growth on identified fiscal impulses (JST primary balance shocks) across 18-country panel 1925-1939, conditioning on gold-standard regime; country-clustered SEs, country+year
+    FE. Refute if cumulative h=4 multiplier on output not >0.5 OR if counterfactual Hoover-era expansion path does not raise 1933 GDP by ≥10% at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - NZL
+  - SWE
+  - USA
+  period:
+  - 1925
+  - 1939
+  temporal_structure: panel
+  exclusion_rules:
+  - drop DEU after 1933 (Nazi rearmament fiscal regime is a structural break, not a Keynesian counterfactual)
+  - drop ESP 1936-1939 (civil war)
+  - drop country-years missing the JST or Maddison real-GDP series
+variables:
+  outcome:
+  - name: real_gdp_growth
+    source: jst:rgdp_pc_real; maddison:rgdp_per_capita
+    transformation: pct_yoy
+    notes: Primary outcome. Counterfactual IRF applied to USA 1929-1933 path.
+  - name: unemployment_rate
+    source: jst:unemployment_rate; bls:historical_unemployment_us
+    transformation: pct_labour_force
+  - name: industrial_production_index
+    source: jst:ip_index; fred:M1204AUSM363NNBR (US historical IP)
+    transformation: index_1929_100
+  treatment:
+  - name: primary_fiscal_balance_pct_gdp
+    source: jst:gov_revenue_pct_gdp
+    transformation: pct_gdp
+    notes: Identified fiscal-stance variable. Negative = expansionary.
+  - name: real_government_expenditure_growth
+    source: jst:gov_expenditure_real
+    transformation: pct_yoy
+  controls:
+  - name: short_term_policy_rate
+    source: jst:stir; fred:M13002USM156NNBR (US discount rate historical)
+    transformation: level_pct
+  - name: gold_standard_indicator
+    source: ilzetzki_reinhart_rogoff:exchange_rate_regime
+    transformation: binary
+    notes: Eichengreen cohort identifier — gold-standard adherence is a key confounder for fiscal-policy effectiveness.
+  - name: bank_failures
+    source: jst:banking_crisis_indicator
+    transformation: binary_country_year
+  - name: terms_of_trade
+    source: jst:tot
+    transformation: index
+scope:
+  period:
+  - 1929
+  - 1933
+  countries:
+  - USA
+  outcome_dim:
+  - gdp_growth
+  - fiscal_policy
+  - employment_labour
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - great_depression_1929
+  - hoover_deflationary_fiscal_stance
+covers_claims:
+- position_id: post_keynesian
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Post-Keynesian position holds that active fiscal expansion would have materially shortened the 1929-1933 contraction; hypothesis is the counterfactual test of the Hoover deflationary stance.
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Local projections of output and employment on identified fiscal impulses across cross-country Great Depression panel (Eichengreen gold-standard cohort). Counterfactual built from estimated IRFs
+    applied to a hypothetical Hoover-era fiscal expansion path.
+
+    '

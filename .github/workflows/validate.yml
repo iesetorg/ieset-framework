@@ -1,0 +1,68 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  schema-validation:
+    name: spec library + cross-references + pre-registration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # pre-registration check needs git timestamps
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: install python deps
+        run: pip install pyyaml jsonschema
+
+      - name: validate hypothesis, condition, position, and publisher specs
+        run: python scripts/validate_specs.py
+
+      - name: check pre-registration invariant
+        run: python scripts/check_preregistration.py
+
+      - name: derive coverage map and enforce pre_registered gaps
+        run: python scripts/derive_coverage.py --strict
+
+  pytest:
+    name: python test suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: install python deps
+        run: pip install pytest pyyaml
+
+      - name: run pytest
+        run: python -m pytest tests/ -v
+
+  web-build:
+    name: web platform build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: install web deps
+        working-directory: web
+        run: npm ci
+
+      - name: typecheck + build
+        working-directory: web
+        run: npm run build

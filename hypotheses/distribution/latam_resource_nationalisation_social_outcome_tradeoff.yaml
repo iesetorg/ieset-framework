@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: latam_resource_nationalisation_social_outcome_tradeoff
+version: 1
+status: draft
+topic: distribution
+claim: Venezuela, Bolivia, Ecuador resource-nationalisation programmes 2000-2015 financed measurable social-outcome
+  gains (poverty reduction, literacy) despite extractive-output costs, a Pareto-dominance structure depending
+  on normative weighting.
+notes: Maps the eco-socialist school's resource-nationalisation/social-outcomes claim to a LatAm panel
+  vs synthetic donor pool. Estimator and prior set; full pre-registration awaits steelman + human
+  sign-off.
+prior_confidence: 0.45
+disclosure: Author prior is skeptical that pre-2014 commodity supercycle gains would have repeated
+  absent the Chavez/Morales/Correa nationalisations; the 2014 oil price collapse confounds late-period
+  attribution and makes the Pareto framing sensitive to end-window choice.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Panel FE on VEN+BOL+ECU vs LatAm donor pool (2000-2015) of poverty headcount and oil/gas output growth on nationalisation intensity; country+year FE, country-clustered SEs. Refute if poverty coefficient sign-flipped at p<0.10 OR output cost exceeds social-gain in PPP welfare units.'
+evidence_type: associational
+
+sample:
+  countries: [VEN, BOL, ECU, PER, COL, CHL, BRA, MEX, ARG]
+  period: [2000, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop VEN 2014+ official statistics; flag as data-quality-impaired window"
+    - "winsorise commodity-price-shock years at 1st/99th percentile"
+
+variables:
+  outcome:
+    - name: poverty_headcount_national
+      source: "world_bank_wdi:SI.POV.NAHC"
+      transformation: level
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+    - name: literacy_rate_adult
+      source: "world_bank_wdi:SE.ADT.LITR.ZS"
+      transformation: level
+    - name: life_expectancy
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+    - name: oil_production_index
+      source: "imf_pcps:Oil"
+      transformation: log
+      notes: >
+        IMF PCPS oil production volume index — captures the
+        extractive-output cost side of the tradeoff.
+  treatment:
+    - name: nationalisation_event
+      source: "derived:latam_nationalisation_dates"
+      transformation: indicator
+      notes: >
+        Treatment dummies: VEN 1999/2007 oil/PDVSA; BOL 2006 hydrocarbon
+        nationalisation; ECU 2007 hydrocarbon contract reform. Hand-
+        coded.
+    - name: state_share_of_extractive_value_added
+      source: "derived:latam_state_extractive_share"
+      transformation: share
+      notes: >
+        Hand-coded share of extractive-sector revenue captured by the
+        state. TODO: replace with cepal or unctad publisher series when
+        registered.
+  controls:
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: terms_of_trade
+      source: "world_bank_wdi:TT.PRI.MRCH.XD.WD"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+scope:
+  period: [2000, 2015]
+  countries: [VEN, BOL, ECU, LATAM]
+  outcome_dim: [poverty_inequality, welfare_state, industrial_capability]
+  policy_family: [privatisation_nationalisation, welfare_architecture, fiscal_policy]
+  treatment_tags: [chavismo_1999, bolivia_morales_nationalisation_2006, ecuador_correa_nationalisation_2007]
+
+covers_claims:
+  - position_id: eco_socialist
+    claim_index: 10
+    polarity: aligned
+    school_prediction: mixed
+    confidence: high
+    notes: "Eco-socialist claim and hypothesis claim are textually identical — Venezuela/Bolivia/Ecuador 2000-2015 nationalisation-financed social-outcome gains vs extractive-output costs."
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    LatAm panel (treated: VEN, BOL, ECU; donor pool: PER, COL, CHL,
+    BRA, MEX) regressing social-outcome and extractive-output indices
+    on resource-nationalisation intensity with country and year FE.
+    Robustness: synthetic-control gap on each treated country.
+

@@ -1,0 +1,345 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: north_south_korea_development_divergence_1953_present
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  From a comparable (arguably DPRK-favoured) 1953 armistice starting point —
+  same ethnicity, language, pre-colonial institutional inheritance, and a
+  Japanese colonial industrial capital stock disproportionately located in
+  the North — the Republic of Korea's market economy with state-directed
+  industrial policy and export discipline, versus the Democratic People's
+  Republic of Korea's autarkic central planning under Juche, produced by
+  2023 a canonical divergence that pattern-matches >=7 of 10 pre-registered
+  extreme-outcome metrics, each drawn from a different publisher or
+  methodology family. The canonical-case claim is that no other peacetime
+  country pair separated for a comparable duration from a comparable
+  starting point has produced a divergence of this magnitude across this
+  many independent outcome channels. A refutation (<=3 metrics met) would
+  indicate either that the consensus DPRK-ROK gap is materially
+  overstated, or that the framework's institutional-quality coding of
+  market-vs-planned autarky is overstated.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [KOR, PRK]
+  period: [1953, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "Korean War years (1950-1953) excluded from the comparison window"
+    - "DPRK official statistics treated as non-authoritative; reconstructions from Bank of Korea, CIA Factbook, Maddison, UN, WHO, defector surveys, and satellite remote-sensing are used instead"
+    - "No donor pool required — this is a single canonical-pair pattern match against pre-registered extreme-outcome thresholds"
+    - "Benchmark distribution (has any other peacetime country-pair separated >=60 years from comparable 1953 starting conditions matched >=4 of 10 thresholds?) is computed ex post as a sanity check on uniqueness"
+
+scope:
+  period: [1953, 2023]
+  countries: [KOR, PRK]
+  outcome_dim: [gdp_growth, life_expectancy_health, institutional_quality, industrial_capability]
+  policy_family: [institutional_reform, industrial_policy, trade_policy]
+  treatment_tags: [korea_armistice_1953, juche_autarky, rok_developmental_state, dprk_central_planning]
+
+variables:
+  outcome:
+    - name: multi_metric_divergence_score
+      source: "derived: count of canonical_metrics with threshold met"
+      transformation: count
+
+canonical_metrics:
+  - metric_id: gdp_per_capita_ppp_ratio_2023
+    description: >
+      ROK/DPRK GDP per capita (PPP) ratio by 2023. Bank of Korea publishes
+      an annual DPRK GDP reconstruction; Maddison and CIA Factbook publish
+      independent reconstructions. Consensus ratio >20x; ROK ~$50k PPP
+      vs DPRK ~$1.5-2k PPP range.
+    threshold: ">15x ROK/DPRK GDP per capita PPP ratio in 2023"
+    window: "2020-2023"
+    source: "maddison:mpd2020; bank_of_korea:dprk_gdp_reconstruction; cia:world_factbook_dprk"
+    data_quality_flag: >
+      DPRK national accounts are not published by DPRK authorities. BoK
+      reconstruction uses physical-output and trade-mirror methods.
+      Maddison uses cross-referenced estimates.
+    independence_justification: >
+      Three publishers with different methodologies (BoK physical-output
+      reconstruction, Maddison historical PPP series, CIA Factbook).
+      Multi-source triangulation insulates against any single reconstruction bias.
+    direction: supports_claim
+
+  - metric_id: life_expectancy_gap_years
+    description: >
+      Life expectancy at birth gap between ROK (~83.5 years, 2023) and
+      DPRK (~72-73 years per UN WPP). Gap of roughly 10-11 years is the
+      largest among any contiguous ethnically-identical country pair.
+    threshold: ">8 year ROK-minus-DPRK life expectancy gap"
+    window: "2020-2023"
+    source: "un_wpp:life_expectancy_at_birth; who_gho:life_expectancy"
+    independence_justification: >
+      UN WPP uses cross-referenced demographic reconstruction (including
+      DPRK 2008 census + WHO cause-of-death modelling), methodologically
+      independent of GDP/income measurement.
+    direction: supports_claim
+
+  - metric_id: height_gap_centimetres
+    description: >
+      Adult male stature gap is a biological integrator of childhood
+      nutrition. Pak (2004) and Schwekendiek (2009) find DPRK adult male
+      stature 3-8cm below ROK counterparts based on defector-sample
+      anthropometric studies and pre-1945 northern vs southern baselines.
+    threshold: ">3cm adult male height gap (ROK > DPRK)"
+    window: "2000-2020"
+    source: "pak_2004:dprk_heights; schwekendiek_2009:anthropometric_reconstruction"
+    data_quality_flag: >
+      Defector samples are non-random (disproportionately from NE border
+      regions and younger cohorts). Stature gap is robust to
+      sample-selection corrections per academic literature.
+    independence_justification: >
+      Anthropometric outcome is measured via direct physical examination,
+      methodologically independent of national-accounts, vital statistics,
+      or state data.
+    direction: supports_claim
+
+  - metric_id: internet_penetration_gap
+    description: >
+      ROK internet penetration >96% (2023, ITU); DPRK has a domestic
+      intranet (Kwangmyong) but internet access is restricted to an
+      estimated <0.1% of the population (elite + designated researchers).
+    threshold: ">90 percentage-point ROK-minus-DPRK internet penetration gap"
+    window: "2018-2023"
+    source: "itu:internet_penetration_rate; freedom_house:freedom_on_the_net"
+    independence_justification: >
+      ITU penetration estimates are derived from telecoms-operator
+      subscription returns (ROK) and qualitative access-regime
+      reconstruction (DPRK). Communications-infrastructure channel is
+      independent of income and biological outcomes.
+    direction: supports_claim
+
+  - metric_id: electricity_consumption_per_capita_ratio
+    description: >
+      ROK per-capita electricity consumption >10,000 kWh (2022, IEA) vs
+      DPRK <500 kWh (CIA Factbook + satellite night-lights inference).
+      Physical energy is difficult for a state to misreport because
+      primary-energy consumption leaves thermodynamic + satellite signatures.
+    threshold: ">15x ROK/DPRK electricity consumption per capita ratio"
+    window: "2018-2023"
+    source: "iea:electricity_consumption_per_capita; cia:world_factbook_dprk; noaa_viirs:night_lights"
+    independence_justification: >
+      IEA reconstruction triangulates generation capacity, fuel imports,
+      and satellite night-lights. Physical-energy methodology is
+      independent of national-accounts reconstruction.
+    direction: supports_claim
+
+  - metric_id: famine_episode_count
+    description: >
+      DPRK "Arduous March" famine 1994-1998 is documented to have killed
+      600k-3m (Goodkind-West; Spoorenberg-Schwekendiek). Chronic food
+      insecurity has persisted through the 2020s (WFP/FAO). ROK has had
+      zero peacetime famines post-1953.
+    threshold: "DPRK has >=1 documented peacetime famine event 1953-2023; ROK has 0"
+    window: "1953-2023"
+    source: "manual:goodkind_west_dprk_famine_mortality; manual:spoorenberg_schwekendiek_dprk_demography; wfp:dprk_food_security_assessments"
+    independence_justification: >
+      Famine reconstruction uses independent demographic methods
+      (cohort-survival, fertility deficit, refugee-testimony), not
+      income or anthropometric metrics alone.
+    direction: supports_claim
+
+  - metric_id: fortune_global_firm_count
+    description: >
+      ROK has multiple Fortune Global 500 firms (Samsung Electronics,
+      Hyundai Motor, LG, SK Hynix, POSCO, Kia, Korea Electric Power,
+      Hanwha). DPRK has zero firms on any global revenue ranking.
+    threshold: "ROK has >=5 Fortune Global 500 firms AND DPRK has 0"
+    window: "2020-2023"
+    source: "fortune:global_500_annual"
+    independence_justification: >
+      Fortune Global 500 ranking is compiled from audited revenue
+      reports, independent of macro-income, demographic, or physical-output
+      measurement. Captures the market/industrial-structure layer.
+    direction: supports_claim
+
+  - metric_id: manufacturing_export_share_world
+    description: >
+      ROK ~3% of world manufactured exports (2023, UN Comtrade / WTO);
+      DPRK <0.01%. Ratio >>100x. ROK is a top-10 world exporter; DPRK
+      formal exports are sanctions-constrained but even pre-2016 levels
+      were negligible on the world scale.
+    threshold: ">100x ROK/DPRK manufacturing export share of world"
+    window: "2018-2023"
+    source: "wto:world_trade_statistical_review; un_comtrade:hs_two_digit"
+    independence_justification: >
+      Trade statistics are measured at destination-country customs and
+      mirror-reported; methodologically independent of origin-country
+      state capture.
+    direction: supports_claim
+
+  - metric_id: emigration_refugee_asymmetry
+    description: >
+      >33,000 North Korean defectors have been admitted to ROK 1998-2023
+      (Ministry of Unification). ROK has been net-immigration destination
+      for decades, with migrant stock >2.5m (2023). DPRK is a net-emigration
+      sender even under tight exit controls.
+    threshold: "Directional asymmetry: DPRK net-emigration + ROK net-immigration sustained >=20 years"
+    window: "2000-2023"
+    source: "manual:rok_ministry_of_unification_defector_registry; un_desa:international_migrant_stock"
+    independence_justification: >
+      Defector admissions are measured by ROK immigration authorities;
+      international migrant stock is measured by UN DESA via
+      destination-country statistics. Revealed-preference channel is
+      independent of all income, health, or trade metrics.
+    direction: supports_claim
+
+  - metric_id: patent_filings_ratio
+    description: >
+      ROK is consistently top-4 in world patent filings (WIPO; KIPO
+      annual ~200-250k applications). DPRK has negligible international
+      patent activity (<100/year). Ratio well above 1000x.
+    threshold: ">1000x ROK/DPRK annual patent filings ratio"
+    window: "2015-2023"
+    source: "wipo:ip_statistics_data_center; kipo:annual_report"
+    independence_justification: >
+      Patent statistics capture R&D and innovation-output layer,
+      independent of all income, demographic, and trade outcome metrics.
+    direction: supports_claim
+
+  - metric_id: nightlights_gdp_proxy
+    description: >
+      The DMZ border night-lights image is one of the most widely
+      reproduced satellite photographs in economics. ROK per-unit-area
+      night-lights intensity is >100x DPRK. Henderson-Storeygard-Weil
+      (2012) and subsequent literature have validated night-lights as
+      a GDP proxy robust to state statistics capture.
+    threshold: "ROK/DPRK nightlights radiance per unit area >100x"
+    window: "2015-2023"
+    source: "noaa_viirs:annual_composites; manual:henderson_storeygard_weil_2012_nightlights_gdp"
+    independence_justification: >
+      Remote-sensing methodology is wholly independent of any statistical
+      agency. Validates the GDP-ratio metric via a fully orthogonal
+      measurement stack.
+    direction: supports_claim
+
+  - metric_id: infant_mortality_gap
+    description: >
+      ROK infant mortality ~2.4 per 1000 live births (2023, UN IGME);
+      DPRK ~14 per 1000 (UN IGME reconstruction). Ratio ~6x.
+    threshold: ">5x DPRK/ROK infant mortality ratio"
+    window: "2018-2023"
+    source: "un_igme:infant_mortality_rate; who_gho:infant_mortality"
+    independence_justification: >
+      UN IGME combines demographic and health surveys + vital registration
+      + multilateral cross-check. Demographic-health measurement is
+      independent of income, trade, and innovation metrics.
+    direction: supports_claim
+
+multi_metric_falsification:
+  total_metrics: 10
+  support_threshold: 7
+  refute_threshold: 3
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Institutional-system divergence — market-with-industrial-policy vs
+  autarkic central planning — imposed by post-WWII US/Soviet occupation
+  zones and the 1953 armistice. The bundle spans institutional
+  (property rights, rule of law), regulatory (price system, FX regime,
+  openness to trade and ideas), and fiscal (budget-constraint hardness)
+  channels. The canonical-case hypothesis treats this bundle as the
+  unit of analysis because the DPRK Juche complex is not decomposable
+  into separable policy levers for counterfactual purposes.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    For each of the 10 canonical metrics, the evaluator fetches the
+    specified data source(s) and evaluates the threshold expression.
+    Because 10 metrics are selected from 12 candidates documented in
+    the claim, the specific 10 scored here are the ones pre-registered
+    in this file. Support if metrics_met >= 7, refute if metrics_met
+    <= 3, inconclusive in the 4-6 range. Benchmark check: no other
+    contiguous ethnically-identical country pair separated >=60 years
+    from comparable 1953 starting conditions should match >=4 of
+    these thresholds (the FRG/GDR pair is the only credible peer
+    and is the subject of its own canonical-case hypothesis).
+
+falsification:
+  rule: >
+    Hypothesis is SUPPORTED if >=7 of 10 canonical metrics meet their
+    pre-registered thresholds. Hypothesis is REFUTED if <=3 of 10
+    metrics meet their thresholds. The 4-6 range is inconclusive.
+    Additional falsification: if the FRG/GDR 1989 canonical-case
+    companion hypothesis is REFUTED by its own 10-metric checklist
+    while DPRK/ROK is SUPPORTED, the author must publish a note
+    explaining why the framework coding generalises across the two
+    classic system-divergence cases.
+  test: multi_metric_canonical_case_pattern_match
+  threshold: "metrics_met_korea_pair >= 7"
+
+prior_confidence: 0.97
+
+disclosure: >
+  This hypothesis is a methodology-fix supersession of
+  north_south_korea_development_divergence_1953_present v1 (which
+  treated the comparison as a descriptive two-country panel with a
+  single GDP-ratio and life-expectancy-gap threshold). The
+  multi-metric specification replaces two signals with ten drawn from
+  heterogeneous publishers and methodology families (national accounts,
+  demographic surveys, anthropometric studies, trade customs,
+  remote-sensing, patent registries, revealed-preference migration,
+  famine demography). The author's strong prior (0.97) reflects that
+  the Korea comparison is one of the most-documented natural
+  experiments in modern economic history; a refutation here would
+  signal either (a) the metric-set is mis-calibrated, or (b) a
+  simultaneous data-pipeline fault across orthogonal publishers, which
+  is a stronger falsification signal than any single estimator could
+  produce.
+
+  Author holds market-liberal priors aligned with the hypothesis. The
+  pre-registered 10-metric threshold set, the requirement that at
+  least 7 be met simultaneously, and the cross-case consistency
+  requirement with the FRG/GDR companion hypothesis bind the author
+  to a pattern-match that is not reducible to a re-statement of
+  priors. The steelman (developmental-state + sanctions-confound
+  argument) is preserved separately and remains relevant for
+  interpreting attribution to "market vs planned" versus "open vs
+  autarkic" — a decomposition the canonical-case pattern-match does
+  not attempt to resolve.
+
+conflict_disclosure: >
+  Author holds no direct ROK or DPRK asset exposure and no consulting
+  relationship with parties in the Korea policy debate.
+
+steelman: hypotheses/steelman/north_south_korea_development_divergence_1953_present.md
+
+linked_hypotheses:
+  - west_east_germany_economic_system_divergence_1950_1989
+  - hong_kong_minimal_state_growth_miracle_1960_1997
+  - venezuela_chavismo_canonical_case_multi_metric
+  - zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009
+
+notes: >
+  Methodological rationale: a single-estimator causal test on the
+  Korea pair is weak because (a) the comparator DPRK is a single
+  data-censored entity with no donor pool, (b) the treatment bundle
+  (autarkic central planning + sanctions + Juche ideology) is not
+  separable into policy levers with independent counterfactuals, and
+  (c) the cross-country ratio outcome is identifiable from many
+  orthogonal measurement stacks (national accounts, demographics,
+  anthropometry, trade customs, remote-sensing, patent registries),
+  making a pre-registered 10-metric pattern-match epistemically
+  stronger than any single panel/DiD/synthetic-control estimate.
+
+  The steelman (Chang / Amsden developmental-state critique,
+  sanctions confound, planning-vs-autarky conflation) is NOT
+  addressed by the multi-metric test — it concerns attribution
+  across sub-channels within the bundled treatment. The canonical-case
+  hypothesis only claims that the bundle produced the observed
+  divergence; it does not claim that any single sub-channel (e.g.
+  "markets alone") is necessary or sufficient. Attribution within
+  the bundle is the subject of separate, narrower hypotheses
+  (e.g. developmental-state HCI-drive effect, sanctions-loss
+  counterfactual for DPRK post-1990).
+
+  Supersession note: this hypothesis supersedes the v1 descriptive
+  specification for framework-validation purposes. The older
+  specification remains in the corpus for provenance but should be
+  downgraded to 'candidate' in future runs.

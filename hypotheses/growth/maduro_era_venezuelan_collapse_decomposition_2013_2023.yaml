@@ -1,0 +1,162 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: maduro_era_venezuelan_collapse_decomposition_2013_2023
+version: 1
+status: pre_registered
+topic: growth
+claim: 'The cumulative Venezuelan real-GDP contraction over the 2013- 2023 Maduro era (>70% peak-to-trough from the 2013 peak) is decomposed into four channels: (a) the exogenous 2014-2016 oil price shock,
+  (b) the 2013-2019 monetary-fiscal-fusion channel culminating in the 2017-2019 Cagan-threshold hyperinflation, (c) the post-2015 US sanctions escalation (SDN 2017, PDVSA designation January 2019, secondary
+  sanctions on tanker operators 2019-2020), and (d) post-2017 political destabilisation (2017 constitutional crisis, 2019 Guaidó parallel-government episode, 2024 election dispute). The pre-registered claim
+  is that channels (b) and (d) — the domestic monetary-fiscal-fusion and political-destabilisation channels — together account for a larger share of the cumulative loss than channels (a) + (c) — the exogenous
+  oil-shock and sanctions channels — combined. A falsification would indicate the collapse is more exogenously driven than the framework''s institutional-policy coding implies.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - VEN
+  - COL
+  - ECU
+  - MEX
+  - PER
+  - BOL
+  - BRA
+  period:
+  - 2005
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Bolivia post-2019 when MAS expulsion reshaped the policy regime
+  - flag Ecuador 2007-2017 Correa era as donor-pool member with policy caveats; retain but robustness-check by excluding
+variables:
+  outcome:
+  - name: real_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log_level_annual
+  - name: real_gdp_level
+    source: world_bank_wdi:NY.GDP.MKTP.KD; maddison:mpd2020
+    transformation: log_level_annual
+  - name: cumulative_venezuela_contraction_2013_peak_to_year
+    source: derived
+    transformation: log(GDP_VEN_t) - log(GDP_VEN_2013)
+  treatment:
+  - name: maduro_era_indicator
+    source: 'constructed: = 1 for VEN from 2013 onward; 0 otherwise'
+    transformation: binary
+  - name: venezuela_oil_shock_exposure
+    source: 'constructed: (oil_price_change) * (oil_export_share_venezuela)'
+    transformation: interaction
+    notes: 'Channel (a): exogenous oil-price-shock channel via Venezuelan pre-shock oil export share. IMF Primary Commodity Prices Brent × VEN oil export share ~95%.'
+  - name: monetary_fiscal_fusion_intensity
+    source: 'constructed: 1 once BCV direct financing of PDVSA reaches a threshold OR monthly inflation first breaches 20% m/m, whichever earlier; scaled by intensity post-threshold'
+    transformation: graded_indicator
+    notes: 'Channel (b): post-2013 monetary-fiscal-fusion channel; coded episode-by-episode from hanke hyperinflation_table and BCV balance-sheet data where available.'
+  - name: sanctions_regime_intensity
+    source: 'constructed: stepwise intensity — 0 pre-2015, 1 post-SDN-individuals 2017, 2 post-PDVSA-SDN Jan 2019, 3 post-secondary-sanctions Aug 2019'
+    transformation: ordinal
+    notes: 'Channel (c): escalating US sanctions regime.'
+  - name: political_destabilisation_intensity
+    source: 'constructed: composite of (i) UCDP event counts for Venezuela, (ii) V-Dem electoral-integrity index inverse, (iii) WGI political stability inverse'
+    transformation: composite_index_rescaled_0_1
+    notes: 'Channel (d): domestic political-destabilisation channel.'
+  controls:
+  - name: commodity_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log_level
+  - name: oil_export_share_pre_shock
+    source: world_bank_wdi:TX.VAL.FUEL.ZS.UN (fuel exports % merch)
+    transformation: average_2010_2013
+    notes: Used to match donor pool on oil-dependence profile.
+  - name: wgi_rule_of_law
+    source: wgi:GOV_WGI_RL.EST
+    transformation: annual_level
+intervention_channel: bundled
+intervention_channel_justification: 'Intentional multi-channel decomposition. Fiscal-channel (b) and regulatory/institutional-channels (d) are the domestic policy content; (a) and (c) are exogenous shocks.
+  Invariant-4 separation is preserved by the explicit four-channel specification, with bundled classification for the intervention-as-a-whole.
+
+  '
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Panel FE decomposition with four treatment intensities entered linearly (plus interaction terms for monetary_fiscal_fusion × sanctions). The estimator returns share-of-variance-explained estimates
+    for each channel under Shapley-style decomposition (Fields 2003; Shorrocks 2013), reporting each channel''s marginal contribution to the observed VEN-vs-donor-pool log-GDP-pc gap. Robustness: synthetic-control
+    weighting on donor pool fitted to VEN pre-2013 dynamics; channel-specific counterfactuals holding one channel at donor-pool mean while allowing others to vary. Permutation inference on donor pool for
+    significance.
+
+    '
+falsification:
+  rule: 'Not supported if EITHER (a) the combined variance share of channels (b) + (d) is less than 40% of the total explained variance in the VEN-donor-pool gap, OR (b) the oil-shock channel (a) alone
+    accounts for more than 50% of the explained variance (which would indicate the collapse is predominantly exogenous, not policy-driven), OR (c) the sanctions channel (c) alone accounts for more than
+    40% of the explained variance (which would indicate the post-2015 sanctions escalation is the dominant force and the framework''s institutional-quality coding is overstated).
+
+    '
+  test: shapley_decomposition_channel_variance_shares
+  threshold: 'variance_share(b + d) > 0.40 AND variance_share(a) < 0.50 AND variance_share(c) < 0.40
+
+    '
+prior_confidence: 0.7
+disclosure: 'Prior reflects the mainstream Latin American economics consensus (Kronick 2019, Rodriguez 2024, Hanke-Krus) that the Venezuelan collapse is multi-causal but with substantial domestic-policy
+  weight. Rodriguez (2024) specifically argues for a larger sanctions share than the consensus allows; this hypothesis''s falsification rule lets that argument prevail if the decomposition supports it,
+  which is the intended symmetry. Author''s market-liberal prior is aligned with the hypothesis; the Rodriguez sanctions-share argument is the within-field contested alternative that the test permits to
+  win.
+
+  '
+conflict_disclosure: 'Author holds no Venezuelan asset exposure and no consulting relationship with parties in the sanctions-policy debate.
+
+  '
+steelman: hypotheses/steelman/maduro_era_venezuelan_collapse_decomposition_2013_2023.md
+linked_hypotheses:
+- venezuela_chavismo_framework_validation
+- hyperinflation_requires_fiscal_dominance
+- resource_extractor_nationalisation_reduces_output
+notes: 'Data-gated: VEN post-2013 national-accounts data are partial (BCV publication gaps 2015-2019, partial resumption 2020+). IMF estimates, Hanke-Krus inflation series, and opposition- calibrated estimates
+  (Observatorio Venezolano de Finanzas) are all used with provenance-tracked. Pre-registration is binding; missing-data imputation rules are pre-specified in the v1 spec and cannot be post-hoc adjusted.
+
+  This is the Maduro-era-specific decomposition. The broader venezuela_chavismo_framework_validation hypothesis tests the 1999-2020 aggregate gap; this hypothesis tests the 2013-2023 sub-period with explicit
+  channel decomposition.
+
+  '
+scope:
+  period:
+  - 2013
+  - 2023
+  countries:
+  - VEN
+  - COL
+  - ECU
+  - MEX
+  - PER
+  - BOL
+  - BRA
+  outcome_dim:
+  - gdp_growth
+  - institutional_quality
+  - inflation
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  - institutional_reform
+  - trade_policy
+  treatment_tags:
+  - maduro_succession_2013
+  - venezuela_hyperinflation_2017
+  - us_sanctions_venezuela_2017
+  - us_sanctions_pdvsa_2019
+covers_claims:
+- position_id: austrian
+  claim_index: 15
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Austrian prediction: Maduro-era >70% collapse is predominantly driven by domestic monetary-fiscal fusion and political-destabilisation channels rather than oil shock or sanctions alone; directly
+    aligned with hypothesis decomposition (b)+(d) > (a)+(c).'
+- position_id: marxian
+  claim_index: 14
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Marxian prediction partially aligns with Rodriguez (2024) sanctions-share argument; pre-registered decomposition allows this alternative to prevail if the data support it (the competing within-field
+    hypothesis).

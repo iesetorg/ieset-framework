@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: currency_monetisation_consumer_price_effect
+version: 1
+status: draft
+topic: monetary
+claim: Currency monetisation does not mechanically produce proportional consumer-price inflation in high-slack regimes; the US 2008-2019 and Japan 1995-2020 experience demonstrates the decoupling.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT/post-Keynesian claims about base-CPI decoupling at the ZLB in USA 2008-2019 and JPN 1995-2020. Human review required before promotion.
+prior_confidence: 0.65
+disclosure: Author considers the QE-era base-CPI decoupling strongly evidenced; framing may under-weight 2021-2023 inflation episode evidence that slack/post-ZLB conditions matter for the result.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Local-projections IRFs of CPI to monetary base shocks h=1..36 months for USA 2008-2019 and JPN 1995-2020; pass-through coefficient <0.2 with p<0.10 across both supports decoupling claim.
+evidence_type: associational
+scope:
+  period:
+  - 1995
+  - 2020
+  countries:
+  - USA
+  - JPN
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - qe_post_2008
+  - japan_zirp_post_1999
+  - high_slack_regime
+sample:
+  countries:
+  - USA
+  - JPN
+  period:
+  - 1995
+  - 2020
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: cpi_inflation
+    source: fred:CPIAUCSL; boj:CPI
+    transformation: pct_change_yoy
+  - name: cpi_core
+    source: fred:CPILFESL; boj:CPI
+    transformation: pct_change_yoy
+  treatment:
+  - name: monetary_base_shock
+    source: fred:BOGMBASE; boj:money_stock_m2
+    transformation: log_diff
+    notes: Year-on-year change in monetary base; for JPN BoJ M2 used pending BoJ-base manual-drop.
+  - name: cb_balance_sheet_pct_gdp
+    source: fred:WALCL; fred:JPNASSETS
+    transformation: level_pct_gdp
+  controls:
+  - name: output_gap
+    source: imf:NGAP_NPGDP; oecd:OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0
+    transformation: level_pct
+  - name: unemployment_rate
+    source: fred:UNRATE; ilostat:UE_TUNE_SEX_AGE_RT
+    transformation: level_pct
+  - name: oil_price
+    source: imf_pcps:POILBRE
+    transformation: log_diff
+covers_claims:
+- position_id: mmt
+  claim_index: 12
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT claim that currency monetisation in high-slack regimes does not produce proportional CPI inflation; US 2008-2019 and Japan 1995-2020 provide the decoupling evidence.
+estimator:
+  template: local_projections
+  clustering: country
+  notes: 'Stub-level estimator pin for runnability audit. Local-projections IRFs of CPI to monetary base / central-bank balance-sheet shocks at horizons h = 1..36 months for USA 2008-2019 and JPN 1995-2020.
+    Slack interaction via output gap. Falsification rule and variables block remain to be filled when this stub is promoted from draft.
+
+    '

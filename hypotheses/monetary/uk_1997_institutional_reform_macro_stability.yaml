@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uk_1997_institutional_reform_macro_stability
+version: 1
+status: draft
+topic: monetary
+claim: UK post-1979 institutional reform (Bank of England independence 1997, competition-authority strengthening,
+  privatisation regulatory frameworks) contributed to 1992-2007 macro stability more than the policy content
+  alone.
+notes: Origin is auto-generated coverage-gap stub seeded from institutionalist framing of UK
+  post-1979 reforms (BoE independence 1997, competition authority, privatisation frameworks) as
+  contributing to 1992-2007 macro stability beyond policy content. Human review required.
+prior_confidence: 0.55
+disclosure: Author has market-liberal+institutionalist priors that may favour the institutional
+  channel; risk is over-attributing 1992-2007 stability to UK reforms vs the global Great Moderation trend.
+
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Event-study around 1997-05-06 BoE independence on GBR vs G7 panel 1979-2007; 5y inflation-volatility decline >25% relative to G7 with p<0.10 supports the institutional-channel claim.'
+evidence_type: associational
+scope:
+  period: [1979, 2007]
+  countries: [GBR]
+  outcome_dim: [inflation, monetary_policy, competition_concentration]
+  policy_family: [institutional_reform, monetary_policy, competition_policy, privatisation_nationalisation]
+  treatment_tags: [boe_independence_1997, uk_privatisation, uk_competition_authority_strengthening]
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalist claim that UK post-1979 institutional reform (BoE independence, competition authority, privatisation frameworks) produced 1992-2007 macro stability beyond policy content; direct alignment with hypothesis claim and scope."
+
+estimator:
+  template: event_study
+  clustering: episode
+  notes: >
+    Stub-level estimator pin for runnability audit. Event-study around the
+    May-1997 BoE operational-independence announcement (and secondary
+    institutional events: 1998 Competition Act, 1979-1990 privatisation
+    waves). Outcomes are CPI inflation, 10y gilt yields, and inflation
+    expectations relative to G7 peers. Falsification rule and variables
+    block remain to be filled when this stub is promoted from draft.
+
+sample:
+  countries: [GBR, USA, DEU, FRA, ITA, CAN, JPN]
+  period: [1979, 2007]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: cpi_inflation
+      source: "ons:CDKO; world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: pct_change_yoy
+    - name: cpi_inflation_volatility
+      source: "ons:CDKO; world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: rolling_5yr_stddev
+    - name: gilt_yield_10y
+      source: "boe:bank_rate; fred:IRLTLT01GBM156N"
+      transformation: level
+      notes: "BoE IADB historical 10y gilt; FRED OECD-mirror used pending BoE manual-drop."
+    - name: real_gdp_volatility
+      source: "ons:ABMI; world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: rolling_5yr_stddev
+  treatment:
+    - name: boe_independence_event
+      source: "constructed: event date = 1997-05-06 (Brown grants BoE operational independence)"
+      transformation: event_date
+    - name: gbr_institutional_reform_indicator
+      source: "constructed: binary = 1 for GBR from 1997-05; secondary 1998 Competition Act, 1980s privatisation waves"
+      transformation: binary
+  controls:
+    - name: oil_price
+      source: "imf_pcps:POILBRE"
+      transformation: log_diff
+    - name: g7_inflation_average
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: g7_simple_mean
+      notes: "Captures global disinflation trend independent of UK reform."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+

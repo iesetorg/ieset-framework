@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: qe_zlb_effectiveness_term_premia
+version: 1
+status: draft
+topic: monetary
+claim: Fed QE programmes 2008–2014 lowered long-end yields and corporate spreads, raising asset prices
+  and stimulating investment through portfolio-rebalancing and signalling channels even at the zero lower
+  bound.
+notes: Origin is auto-generated coverage-gap stub seeded from New Keynesian framing of QE1/2/3 as
+  effective via portfolio rebalancing and signalling. Human review required before promotion.
+prior_confidence: 0.60
+disclosure: Author finds the high-frequency event-study evidence persuasive on yield response but
+  is sceptical of strong real-economy effect size; framing may overstate output transmission.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): take six FOMC QE-related announcement dates
+    (2008-11-25 QE1 launch, 2009-03-18 QE1 expansion, 2010-11-03 QE2,
+    2011-09-21 Operation Twist, 2012-09-13 QE3, 2013-12-18 QE3 taper).
+    For the FIVE easing announcements, compute the 1-trading-day change
+    in the 10-year Treasury yield (FRED:DGS10) using prior-trading-day
+    close to next-trading-day close. The hypothesis is SUPPORTED if the
+    cumulative 1-day yield change across the five easing announcements
+    is at most -25 bp AND the per-event mean is at most -5 bp. REFUTED
+    if cumulative > 0 bp OR zero of five easing events show a yield
+    decline. PARTIAL if direction is correct but magnitude misses the
+    cumulative threshold.
+    INFORMATIVE (does not gate): 30y yield (DGS30) cumulative change,
+    HY OAS (BAMLH0A0HYM2) cumulative change, BAA cumulative change,
+    and the 5-day window as a robustness alternative. The taper
+    announcement is graded separately and should RAISE 10y yields
+    under the same channel.
+    METHOD_VALID: at least 4 of 5 easing announcements have a tradable
+    DGS10 observation within the +/- 2 trading-day window; all six dates
+    fall inside the on-disk DGS10 vintage range.
+  test: fed_qe_announcement_event_study_dgs10_1d_window
+  threshold: >-
+    PRIMARY (both required): cumul_1d_dgs10_bp <= -25 AND
+    avg_1d_dgs10_bp <= -5 across the five easing announcements.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic falsification
+  rule to a dispositive event-study primary on FRED daily DGS10 with two
+  threshold tests (cumulative and per-event-mean 1-day change). Switched
+  from the literature's 30-min intraday window (Gagnon-Raskin-Remache-Sack
+  2011, Krishnamurthy-Vissing-Jorgensen 2011) to a publicly-replicable
+  daily close-to-close window because FRED publishes daily not intraday.
+  Thresholds (-25 bp cumulative, -5 bp mean) are sized for the daily
+  window: the literature's intraday-summed effect on the 10y is ~-91 bp
+  for QE1+QE2 alone, so a -25 bp daily-window cumulative across all five
+  easing events is a defensible support threshold that does not
+  pre-bake the conclusion. AAA series not on disk (only BAA available),
+  so we report BAA level changes as a noisier credit-channel proxy
+  rather than the BAA-AAA spread the spec originally asked for. HY OAS
+  (BAMLH0A0HYM2) on-disk vintage starts 2023-04 so the QE-era HY data
+  is currently a secondary data gap; primary uses DGS10 only.
+evidence_type: associational
+
+scope:
+  period: [2008, 2014]
+  countries: [USA]
+  outcome_dim: [monetary_policy, financialisation]
+  policy_family: [monetary_policy]
+  treatment_tags: [fed_qe_2008_2014, zero_lower_bound, portfolio_rebalancing]
+
+covers_claims:
+  - position_id: new_keynesian
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "New Keynesian claim that Fed QE 2008-2014 lowered long-end yields and spreads via portfolio-rebalancing and signalling channels at the ZLB."
+
+estimator:
+  template: event_study
+  clustering: announcement
+  notes: >
+    Stub-level estimator pin for runnability audit. High-frequency event
+    study around Fed QE1/QE2/QE3 announcement dates 2008-2014; outcomes are
+    10y/30y Treasury yields and corporate-spread (BAA-AAA, IG-OAS) changes
+    in 30-minute and 1-day windows. Falsification rule and variables block
+    remain to be filled when this stub is promoted from draft.
+
+sample:
+  countries: [USA]
+  period: [2008, 2014]
+  temporal_structure: time_series
+
+variables:
+  outcome:
+    - name: treasury_yield_10y
+      source: "fred:DGS10"
+      transformation: level_change_bps
+    - name: treasury_yield_30y
+      source: "fred:DGS30"
+      transformation: level_change_bps
+    - name: baa_aaa_corporate_spread
+      source: "fred:BAA; fred:AAA"
+      transformation: spread_bps
+    - name: high_yield_oas
+      source: "fred:BAMLH0A0HYM2"
+      transformation: level_change_bps
+      notes: "ICE BofA US High Yield Index OAS."
+  treatment:
+    - name: qe_announcement_event
+      source: "constructed: event dates = 2008-11-25 (QE1 launch), 2009-03-18 (QE1 expansion), 2010-11-03 (QE2), 2011-09-21 (Operation Twist), 2012-09-13 (QE3), 2013-12-18 (QE3 taper)"
+      transformation: event_date
+    - name: fed_balance_sheet_total_assets
+      source: "fred:WALCL"
+      transformation: log_diff
+  controls:
+    - name: vix
+      source: "fred:VIXCLS"
+      transformation: level
+    - name: sp500
+      source: "fred:SP500"
+      transformation: log_diff
+    - name: fed_funds_rate
+      source: "fred:DFF"
+      transformation: level

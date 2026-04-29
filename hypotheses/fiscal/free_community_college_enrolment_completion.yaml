@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: free_community_college_enrolment_completion
+version: 1
+status: draft
+topic: fiscal
+claim: US free-community-college state experiments (Tennessee Promise 2015, Oregon 2016) raised enrolment
+  and completion rates among low-income students without measurable fiscal crowd-out.
+notes: Maps the democratic-socialist school's TN-Promise/OR-Promise enrolment-without-crowdout claim to a
+  staggered Callaway-Sant'Anna DiD using non-Promise states as control. Estimator and prior set; full
+  pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.55
+disclosure: Author prior accepts the enrolment-rise level fact (Carruthers-Fox 2016 and Page-Iriondo-
+  Riccards 2019 do show TN Promise raised community-college entry) but is skeptical that 'no measurable
+  fiscal crowd-out' has been firmly established — the longer-run state higher-ed appropriations response
+  is still unsettled and depends on offset assumptions.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Callaway-Sant''Anna staggered DiD on community-college enrolment rate and associate-degree completion across US states 2010-2023, treating TN 2015 and OR 2016 cohorts; state-clustered SEs, state+year FE, COVID 2020-2021 dropped. Refute if average treatment effect on the treated (ATT) not >5% above non-Promise control trajectory at p<0.10 OR if state higher-ed appropriations show offsetting decline.'
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 from primary enrolment outcome regressions (COVID-19 disruption confounds the staggered-DiD identification); retain as a separate robustness window"
+    - "drop states adopting copy-cat free-community-college programmes during the post-period (e.g. RI 2017, NY Excelsior 2017) from the donor pool"
+
+variables:
+  outcome:
+    - name: community_college_enrolment_rate
+      source: "us_census:acs_school_enrollment; bls:education_attainment"
+      transformation: enrolment_per_18_24_population
+      notes: "TODO: IPEDS state-level enrolment is the canonical source but IPEDS is not currently a registered publisher; us_census ACS school-enrollment microdata + BLS attainment used as substitute. Flag for publisher registration."
+    - name: associate_degree_completion_rate
+      source: "us_census:acs_education_attainment"
+      transformation: completion_per_cohort
+    - name: low_income_enrolment_rate
+      source: "us_census:acs_school_enrollment (filtered to bottom-quintile family income)"
+      transformation: enrolment_pct_low_income_18_24
+      notes: "Distributional outcome — tests the no-crowd-out claim's distributional channel."
+    - name: state_higher_ed_appropriations_per_fte
+      source: "fred:state_govt_higher_ed_expenditure_per_capita"
+      transformation: real_usd_2020
+      notes: "Crowd-out check — does Promise spending substitute for or supplement existing higher-ed appropriations?"
+  treatment:
+    - name: tennessee_promise_2015
+      source: "constructed: indicator = 1 for TN from 2015-08-01 (first cohort) onward; 0 prior or for non-Promise states"
+      transformation: binary
+    - name: oregon_promise_2016
+      source: "constructed: indicator = 1 for OR from 2016-08-01 onward; 0 prior"
+      transformation: binary
+    - name: any_promise_program
+      source: "constructed: state-cohort indicator combining TN 2015 and OR 2016 cohorts for staggered-DiD pooling"
+      transformation: binary
+  controls:
+    - name: state_unemployment_rate
+      source: "fred:state_unemployment_rate (LAUS)"
+      transformation: level_pct
+    - name: state_real_gdp_per_capita
+      source: "fred:state_gdp_per_capita; us_census:saipe"
+      transformation: real_usd_log
+    - name: state_population_18_24
+      source: "us_census:annual_state_population_estimates"
+      transformation: log_level
+    - name: pell_grant_eligibility_share
+      source: "fred:pell_grant_recipients (state aggregates)"
+      transformation: share_of_undergrad
+
+scope:
+  period: [2015, 2023]
+  countries: [USA]
+  outcome_dim: [welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [tennessee_promise_2015, oregon_promise_2016]
+
+covers_claims:
+  - position_id: democratic_socialist
+    claim_index: 7
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Democratic-socialist position claims Tennessee Promise 2015 and Oregon 2016 free-community-college raised enrolment/completion without crowd-out; hypothesis tests exactly those two state experiments."
+
+estimator:
+  template: did_callaway_santanna
+  clustering: state
+  fixed_effects: [state, year]
+  notes: >
+    Staggered DiD across Tennessee Promise (2015) and Oregon Promise
+    (2016) using non-Promise states as control. Callaway-Sant'Anna
+    handles two-cohort structure. IPEDS enrolment/completion
+    outcomes; pre-trend window 2010-2014.

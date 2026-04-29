@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: immigration_crime_rate_vs_native_controlled
+version: 1
+status: pre_registered
+topic: labour
+
+claim: >
+  Per-capita crime rates (measured by police-recorded offences per 100k
+  population, by offence type) among foreign-born residents in developed
+  destination countries are NOT systematically higher than among native-born
+  residents once age, gender, and socioeconomic status are controlled. This
+  aggregate pattern is the robust finding of the criminology meta-literature
+  (Light-Miller 2018; Bell-Fasani-Machin 2013; Fasani-Mastrobuoni-Owens-Pinotti
+  2019). Within the aggregate, there IS measurable variation by specific
+  origin group, duration of residence, and legal status — but these
+  differences are best explained by (a) selection effects in the migration
+  channel (e.g., asylum cohorts have different age/gender distributions than
+  native population, producing age-composition-driven offending differentials
+  before any ethnicity effect), (b) labour-market integration policy,
+  (c) neighbourhood concentration and policing intensity, NOT by ethnicity
+  as a causal variable.
+
+evidence_type: causal
+
+sample:
+  countries: [USA, GBR, DEU, NLD, SWE, NOR, DNK, ITA]
+  period: [2000, 2023]
+  temporal_structure: panel
+
+scope:
+  period: [2000, 2023]
+  countries: [USA, GBR, DEU, NLD, SWE, NOR, DNK, ITA]
+  outcome_dim: [demographics_migration, institutional_quality]
+  policy_family: [regulation, institutional_reform]
+  treatment_tags: [immigration_crime_decomposition, foreign_born_native_comparison]
+
+variables:
+  outcome:
+    - name: crime_rate_per_capita_by_nativity_and_offence
+      source: "constructed: police-recorded offence rates per 100k by nativity (foreign-born vs native-born) and offence type (violent / property / drug / public order). Destination-country admin data — SCB Sweden, BKA Germany, ONS England-Wales, FBI UCR US (with caveats), CBS Netherlands."
+      transformation: level_per_100k
+
+  decomposition_channels:
+    - name: age_composition
+      source: "constructed: % of group aged 15-34 (primary offending age band); WDI + destination-country admin data"
+      transformation: level
+    - name: gender_composition
+      source: "constructed: % male in group"
+      transformation: level
+    - name: socioeconomic_status_proxy
+      source: "constructed: median income / unemployment rate / education attainment for the group; destination-country admin data"
+      transformation: level
+    - name: years_since_arrival
+      source: "constructed: average duration of residence"
+      transformation: level
+    - name: legal_status_mix
+      source: "constructed: % of group on work-visa / family / asylum / undocumented"
+      transformation: categorical
+
+  controls:
+    - name: neighbourhood_concentration
+      source: "constructed: residential segregation index for group (Dissimilarity Index)"
+      transformation: level
+    - name: policing_intensity
+      source: "constructed: police officers per 100k × local enforcement priority indicators"
+      transformation: level
+
+estimator:
+  template: panel_fe_decomposition
+  fixed_effects: [destination_country, year]
+  clustering: destination_country
+  notes: >
+    Log-odds decomposition: for each country-year, compute crime rate ratio
+    between foreign-born and native-born. Regress log-ratio on the 5
+    channels + 2 controls + FE. The KEY test: after controlling for
+    age-composition + SES + gender, does the group-level crime-rate
+    differential converge toward zero or native-born baseline?
+
+    Robustness specs:
+    - Disaggregate by offence type (violent vs property vs drug) — findings
+      often vary; violent-crime ratios are typically NOT higher for
+      foreign-born once controls applied, but property-crime ratios can
+      be elevated for specific low-SES subgroups.
+    - Second-generation separate analysis — convergence to native rates
+      is the expected finding; where it doesn't happen (specific cases
+      in some Nordic countries for some origin groups), the framework
+      needs to examine destination-country integration + policing
+      mechanisms rather than ethnicity.
+    - Arrest rates vs conviction rates vs self-report victimisation —
+      police-recorded rates are contaminated by differential reporting
+      + arrest rates; the NCVS / Dutch Veiligheidsmonitor self-report
+      data often show different patterns than admin.
+
+falsification:
+  rule: >
+    Not supported if, after controls for age-sex-SES + policing, the log-
+    rate ratio between foreign-born and native-born is positive and
+    statistically significant at p<0.05 for violent offences specifically
+    (the highest-salience offence type) in a majority of sample countries
+    AND the gap does NOT close materially between first- and second-
+    generation. Either finding would indicate that channel decomposition
+    is incomplete and ethnicity-or-unmeasured-selection effects remain
+    material. A clean pass: age-sex-SES-controlled violent-crime log-
+    ratio within ±0.10 of zero in most countries, and 2nd-generation
+    convergence measurable.
+  test: crime_rate_channels_decomposition_by_offence_and_generation
+  threshold: >
+    After age-sex-SES controls: |log_rate_ratio(violent)| < 0.10 in ≥60% of
+    sample countries  AND 2nd-generation log-ratio materially closer to 0
+    than 1st-generation log-ratio
+
+prior_confidence: 0.80
+
+disclosure: >
+  Framework position follows the criminology meta-literature consensus:
+  immigrant status per se does not predict higher crime rates after
+  standard demographic + SES controls. Variation exists by origin,
+  duration, legal status — and that variation is best explained by
+  selection + destination-country integration policy, NOT by ethnicity.
+
+  The framework explicitly REJECTS two popular but empirically weak
+  framings:
+  (1) "Immigrants commit more crime" — empirically false as unqualified
+      claim; Light-Miller meta-analysis on US data finds lower crime
+      rates among foreign-born.
+  (2) "Specific ethnic groups have higher innate propensity to crime" —
+      empirically weak; what looks like ethnicity-effect in raw data
+      almost always collapses under age-sex-SES controls, with residual
+      explained by integration policy failures (housing, labour market
+      access, criminal-justice system interaction patterns).
+
+  The ACTIONABLE policy question: which destination-country policy design
+  minimises both aggregate offending AND group-level differentials?
+  (Answer from the literature: labour-market integration speed is a
+  large moderator. Nordic data shows cohorts with fast labour-market
+  entry post-arrival produce crime-rate convergence within a generation.)
+
+steelman: hypotheses/steelman/immigration_crime_rate_vs_native_controlled.md
+
+linked_hypotheses:
+  - immigration_net_fiscal_contribution_by_origin_skill_duration
+  - second_generation_education_outcomes_by_origin
+
+notes: >
+  This is a politically charged topic handled with framework rigour: strong
+  demographic + SES controls, disaggregation by offence type, explicit
+  comparison of 1st vs 2nd generation to test convergence, and a steelman
+  that engages the strongest counter-arguments rather than the weakest.
+
+  The pre-registration format prevents selective reporting: if the data
+  shows an unexpected elevation in a specific offence type that does not
+  converge, the framework MUST report it honestly per DISCLOSURE.md,
+  while also reporting the destination-country-policy interaction that
+  best explains the result.
+
+  Data access: US FBI UCR is coarse; NCVS and state-level data more
+  useful. UK Crime Survey England-Wales provides victimisation data.
+  Sweden BRÅ (crime council) publishes detailed breakdowns. Germany BKA
+  and Bundesrepublik statistics are partly legally restricted on ethnicity
+  reporting — Dutch CBS and Norwegian SSB have more permissive breakdowns.

@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_wto_accession_productivity_growth_effect
+version: 1
+status: draft
+topic: growth
+claim: China's post-WTO 2001 accession produced export-sector productivity gains that spilled over to
+  domestic value chains, vindicating export-oriented industrial policy combined with selective liberalisation.
+notes: Maps the developmentalism school's WTO-accession-with-export-spillover claim to a Chinese
+  industry-level event study around 2001. Estimator and prior set; full pre-registration awaits
+  steelman + human sign-off.
+prior_confidence: 0.7
+disclosure: Author prior accepts the level fact (Chinese export-sector productivity gains post-2001
+  are well-established in Brandt-Van-Biesebroeck-Zhang and Khandelwal-Schott-Wei) but the framing as
+  'vindicating export-oriented industrial policy' attributes a portion to selective liberalisation
+  that the data does not cleanly separate from straight WTO-tariff and MFN-status effects.
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH must hold for SUPPORTED):
+      (1) CHN PWT-rtfpna mean log-growth in the post-WTO window 2002-2019
+          must exceed the pre-WTO window 1990-2000 by at least
+          +0.50pp/yr.
+      (2) CHN merchandise-export share of GDP at current PPPs (PWT csh_x,
+          converted to percent) must rise by at least +8 percentage
+          points from the 1990-2000 mean to the pre-GFC ramp 2002-2007
+          mean.
+    Both held = SUPPORTED. Exactly one held (with the other directionally
+    correct but missing magnitude) = partial. Both missed AND at least
+    one with the wrong sign = refuted.
+    INFORMATIVE (does NOT gate the verdict):
+      CHN TFP-growth acceleration net of an EM-peer panel mean
+      (IND, BRA, MEX, IDN, MYS, THA, TUR, ZAF) >= +0.30pp/yr — flags
+      the global-2000s-TFP-cycle alternative explanation when this fails.
+    METHOD_VALID:
+      pwt:rtfpna and pwt:csh_x must be available with non-empty pre and
+      post windows for CHN. Original spec called for industry-level CIP
+      data (industry+year FE, industry-clustered SEs); CIP industry panel
+      is not on disk in this build, so the country-level structural-break
+      proxy substitutes — see methodology_note.
+  test: chn_post_2001_tfp_break_with_export_share_break_and_em_peer_difference
+  threshold: >-
+    PRIMARY 1: mean(rtfpna_log_growth, 2002-2019) - mean(rtfpna_log_growth,
+    1990-2000) >= 0.005.
+    PRIMARY 2: mean(csh_x*100, 2002-2007) - mean(csh_x*100, 1990-2000)
+    >= 8.0.
+    INFORMATIVE: PRIMARY 1 numerator minus the same difference computed
+    on the 8-country EM peer panel mean >= 0.003.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic "p<0.10 in the
+  claimed direction" rule to two dispositive primary tests on the on-disk
+  PWT 10.01 vintage (rtfpna for TFP, csh_x for the export share) plus an
+  informative peer-difference test. The original spec called for a CIP
+  industry-level event study with tariff-cut intensity as treatment; the
+  CIP industry panel is not on disk in this build, so we substitute a
+  country-level structural-break design. Pre window 1990-2000 captures
+  the post-Tiananmen reform consolidation but pre-WTO; post window
+  2002-2019 ends pre-COVID. Export-share post window restricted to the
+  pre-GFC ramp 2002-2007 because every published WTO-trade-creation
+  estimate locates the peak there; the post-2008 retrenchment is
+  well-documented and is a separate causal regime. The +0.5pp/yr TFP
+  threshold is intentionally moderate (Brandt-Van-Biesebroeck-Zhang
+  industry estimates imply 1-2pp at the aggregate); the +8pp export-share
+  threshold matches the rough pre/post WTO trade-share gap in the
+  developmentalism narrative. WDI NE.EXP.GNFS.KD has only 1 non-null
+  CHN observation in the on-disk vintage so could not be used.
+evidence_type: associational
+
+sample:
+  countries: [CHN]
+  period: [1990, 2019]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2020+ COVID years"
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+  treatment:
+    - name: post_wto_accession_indicator
+      source: "constructed: indicator = 1 for years >= 2002 (post-WTO entry)"
+      transformation: indicator
+
+  controls:
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: event_study
+  fixed_effects: [industry, year]
+  clustering: industry
+  notes: >
+    Event study around the 2001 WTO-accession date using Chinese industry-
+    level productivity data. Tests for differential post-accession TFP
+    growth in industries with higher pre-2001 export-orientation potential
+    or higher tariff-cut exposure (treatment intensity).
+
+scope:
+  period: [2001, 2023]
+  countries: [CHN]
+  outcome_dim: [productivity, trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [china_wto_accession_2001]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 7
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts China's post-WTO 2001 accession produced export-sector productivity spillovers, vindicating export-oriented industrial policy."

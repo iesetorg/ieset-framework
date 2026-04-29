@@ -1,0 +1,238 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cuba_special_period_degrowth_basic_needs
+version: 3
+status: draft
+topic: growth
+claim: >
+  Cuban post-1991 Special Period forced degrowth (real GDP per capita
+  contracted ~35% over 1989-1993 after the Soviet bloc collapse cut
+  off concessional sugar/oil terms) demonstrated that basic-needs
+  provision (life expectancy, infant mortality, primary-school
+  enrolment) can be maintained — or improved — during rapid
+  material-throughput reduction when institutions are aligned around
+  free universal health and education.
+notes: >
+  v3 (2026-04-27) — indicator-set integrity correction. v2 graded
+  SUPPORTED on three "basic-needs" indicators (LE / IMR / school
+  enrolment) while explicitly noting in caveats that caloric supply
+  per capita dropped ~30 % during the 1989-1993 trough (Garfield &
+  Santana 1997; FAO Food Balance Sheets) and that the 1994 balsero
+  emigration crisis revealed mass dissatisfaction. That was indicator
+  gaming: the canonical basic-needs literature (Streeten 1981, Sen,
+  UNDP HDI extensions) treats food security as a primary basic need,
+  arguably THE primary one. SUPPORTED on a favourable subset while
+  the canonical-primary indicator collapsed is not an honest
+  affirmation of "basic needs preserved". v3 requires the canonical
+  basic-needs basket (food security + health + education + emigration
+  as revealed preference) and emits inconclusive on data gap rather
+  than SUPPORTED on the favourable subset. v0/v1/v2 all archived.
+methodology_note: >
+  v3 (2026-04-27) — indicator-set integrity correction.
+
+  CANONICAL BASIC-NEEDS SET (per Streeten 1981, Sen, UNDP HDI
+  extensions): food security (caloric supply per capita), health
+  (life expectancy + infant mortality), education (school enrolment),
+  emigration / revealed preference (% of population emigrated). The
+  v3 spec requires all four canonical dimensions to be testable for
+  the verdict to be SUPPORTED. Omission of any canonical dimension
+  triggers METHOD_VALID failure → inconclusive (not SUPPORTED on the
+  favourable subset).
+
+  PRIMARY (dispositive — all four must hold for SUPPORTED):
+    P1. Cuban real GDP per capita contracted ≥ 25 % peak-to-trough.
+    P2. Daily caloric supply per capita (FAO FBS): max single-year
+        decline from 1989 baseline ≤ 15 %, AND value at 2000 ≥ 95 %
+        of 1989 baseline. (Garfield & Santana 1997 documents a
+        ~30 % drop from ~2,900 kcal/cap/day in 1989 to ~1,800 in
+        1993; the 15 % threshold is the dispositive bar a fair-reader
+        defender of the "basic needs preserved" claim would accept.)
+    P3. Life expectancy + infant mortality + primary-school enrolment
+        all stayed within ±10 % of the 1989 baseline (the v2 test).
+    P4. Cuban net emigration share over 1989-2000 < 5 % of 1989
+        population. (Cuba had ~10.6m in 1989; the 1994 balsero
+        crisis alone produced ~35k attempts in August; cumulative
+        Mariel-to-2000 net emigration is the relevant test of
+        revealed welfare preference.)
+
+  REFUTED if P1 holds but ANY canonical basic-need (P2, P3, or P4)
+  failed by the documented threshold.
+
+  PARTIAL if exactly one basic-need failed by < 1.5x its threshold.
+
+  METHOD_VALID gate: all four canonical-basket inputs must be on
+  disk. The current vintages are missing FAO daily caloric supply
+  per capita for CUB 1989-2000 (the on-disk faostat:food_balance_sheets
+  pre-computed slug only covers 2010+) AND lack a clean Cuban
+  emigration-share annual time-series for the trough window
+  (cuba_manual:emigration_share_pct only carries decade-stamped
+  values 1990, 2000, 2010, 2015, 2020). Until those fetchers land,
+  the verdict is `inconclusive — data gap on canonical basic-needs
+  indicators (FAO daily caloric supply, annual emigration share for
+  1989-2000)`.
+
+  v2 archived at ARCHIVED_v2/. v0 archived at ARCHIVED_v0/.
+  Authorial bias risk: degrowth-friendly framing treats Cuba as a
+  success of "decoupling welfare from GDP"; selection of
+  Cuba-favourable indicators (life expectancy, infant mortality) over
+  migration outflows (Mariel/balsero), revealed-preference welfare
+  measures, or food-availability metrics could bias the multi-metric
+  pattern-match. The v2 spec deliberately keeps the four indicators
+  the original claim makes — to test the claim on its own terms — but
+  the steelman flags the omitted basic-needs dimensions (food, safety
+  nets, emigration as revealed preference) and the Soviet-subsidy
+  baseline confound.
+falsification:
+  rule: >
+    PRIMARY (dispositive): SUPPORTED requires all four CANONICAL
+    BASIC-NEEDS conditions: (P1) Cuban real GDP per capita
+    contracted ≥ 25 % peak-to-trough (1989 peak vs 1991-1995 trough);
+    (P2) FAO daily caloric supply per capita: max single-year
+    decline from 1989 baseline ≤ 15 % AND value at 2000 ≥ 95 % of
+    1989 baseline; (P3) all three v2 indicators (life expectancy,
+    infant mortality, primary enrolment) stayed within ±10 % of
+    1989 baseline; (P4) Cuban cumulative net emigration 1989-2000
+    < 5 % of 1989 population. REFUTED if P1 holds but ANY of P2/P3/P4
+    failed by the documented threshold. PARTIAL if exactly one of
+    P2/P3/P4 failed by < 1.5× its threshold.
+    INFORMATIVE: per-indicator trajectory, recovery by 2000,
+    qualitative documented evidence on caloric collapse and balsero
+    crisis (reported in result_card even when method-invalid).
+    METHOD_VALID: all four canonical inputs must be on disk: WDI
+    SP.DYN.LE00.IN + SP.DYN.IMRT.IN + SE.PRM.ENRR + NY.GDP.PCAP.KD
+    AND faostat:food_balance_sheets daily caloric supply per capita
+    1989-2000 AND a Cuban annual emigration-share series 1989-2000.
+    The current on-disk vintages have the WDI legs but NOT the FAO
+    caloric-supply 1989-2000 leg (faostat slug only covers 2010+)
+    NOR an annual emigration series. Verdict therefore inconclusive,
+    not SUPPORTED on the favourable subset.
+  test: cuba_special_period_canonical_basic_needs_quad_test
+  threshold: >-
+    PRIMARY: gdp_pc_peak_to_trough_decline >= 0.25 AND
+    max_kcal_decline_pct <= 0.15 AND kcal_2000_ratio_to_1989 >= 0.95 AND
+    max_le_decline_pct <= 0.10 AND max_imr_rise_pct <= 0.10 AND
+    max_enrol_decline_pct <= 0.10 AND
+    cumulative_net_emigration_share_1989_2000 < 0.05
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - CUB
+  period:
+  - 1989
+  - 2000
+  temporal_structure: time_series
+  exclusion_rules:
+  - "No comparator donor pool: this is a single-country trajectory test against pre-registered direction-and-magnitude thresholds, not a synthetic-control identification."
+variables:
+  outcome:
+  - name: gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+  - name: infant_mortality_rate
+    source: world_bank_wdi:SP.DYN.IMRT.IN
+  - name: school_enrolment_primary
+    source: world_bank_wdi:SE.PRM.ENRR
+  - name: caloric_supply_per_capita_per_day
+    source: 'faostat:food_balance_sheets'
+    notes: 'Required canonical basic-need (Streeten 1981, Sen, UNDP HDI extensions). Cuban 1989-2000 caloric supply not on disk in current FAO vintage (pre-computed slug only covers 2010+). METHOD_VALID gate fires inconclusive until fetcher adds the FAO FBS daily caloric supply series for the 1989-2000 trough window.'
+  - name: net_emigration_share
+    source: 'cuba_manual:emigration_share_pct'
+    notes: 'Required canonical revealed-preference welfare metric. On-disk series carries decade-stamp values (1990, 2000, 2010, 2015, 2020); annual coverage 1989-2000 needed for the dispositive test. METHOD_VALID gate flags the gap.'
+canonical_metrics:
+- metric_id: gdp_pc_peak_to_trough_contraction
+  description: >
+    Real GDP per capita peak-to-trough decline 1989-1995. The
+    Special Period claim premises a contraction of roughly 35%; the
+    dispositive threshold here is 25% (a fair-reader minimum for
+    "forced degrowth").
+  threshold: ">=25% real GDP per capita decline from 1989 peak to 1991-1995 trough"
+  window: "1989-1995"
+  source: "world_bank_wdi:NY.GDP.PCAP.KD"
+  direction: supports_claim
+  independence_justification: >
+    Macroeconomic aggregate, distinct in measurement methodology
+    from the demographic / education metrics below.
+- metric_id: life_expectancy_preserved
+  description: >
+    Cuban period life expectancy at birth did not fall by more than
+    10% (i.e. by more than ~7.4 years from a 1989 baseline of 73.69)
+    at any point in 1990-2000. The basic-needs claim requires that
+    life expectancy was preserved through the contraction.
+  threshold: "max(LE_1989 - LE_t for t in 1990..2000) / LE_1989 <= 0.10"
+  window: "1990-2000"
+  source: "world_bank_wdi:SP.DYN.LE00.IN"
+  direction: supports_claim
+  independence_justification: >
+    Period life expectancy is a functional of age-specific mortality
+    schedule, methodologically distinct from infant-mortality count
+    and from enrolment statistics.
+- metric_id: infant_mortality_preserved
+  description: >
+    Cuban infant mortality rate did not rise by more than 10% from
+    its 1989 baseline (11.4 per 1,000 live births) at any point in
+    1990-2000. Strong test of basic-needs preservation in the
+    most-vulnerable cohort during macro contraction.
+  threshold: "max(IMR_t / IMR_1989 for t in 1990..2000) <= 1.10"
+  window: "1990-2000"
+  source: "world_bank_wdi:SP.DYN.IMRT.IN"
+  direction: supports_claim
+  independence_justification: >
+    Infant-mortality rate is reported via separate vital-registration
+    pipeline from period life expectancy and is the most-cited
+    Cuban basic-needs success indicator.
+- metric_id: primary_school_enrolment_preserved
+  description: >
+    Cuban gross primary-school enrolment ratio did not fall by more
+    than 10% from its 1989 baseline at any point in 1990-2000.
+    Education access is the third leg of the basic-needs claim.
+  threshold: "min(ENROL_t / ENROL_1989 for t in 1990..2000) >= 0.90"
+  window: "1990-2000"
+  source: "world_bank_wdi:SE.PRM.ENRR"
+  direction: supports_claim
+  independence_justification: >
+    Education access is institutionally distinct from the health
+    system; gross enrolment ratios from administrative reporting are
+    a different data pipeline from vital registration.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 4
+  refute_threshold: 2
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Single-country canonical case. Pattern-match across GDP
+    contraction magnitude and three basic-needs metrics across the
+    1989-2000 Special Period to test whether basic-needs provision
+    was preserved through forced degrowth. The hand-authored
+    replication.py implements the dual-threshold falsification rule
+    directly (per the post_2008_oecd_growth_emissions_path
+    canonical-example pattern); the multi_metric_checklist template
+    declaration above is for framework metadata consistency.
+steelman: hypotheses/steelman/cuba_special_period_degrowth_basic_needs.md
+scope:
+  period:
+  - 1989
+  - 2000
+  countries:
+  - CUB
+  outcome_dim:
+  - gdp_growth
+  - life_expectancy_health
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  treatment_tags:
+  - cuba_special_period_1991
+  - soviet_collapse_1991
+covers_claims:
+- position_id: degrowth
+  claim_index: 5
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: >
+    Degrowth prediction is mixed: Cuban Special Period forced
+    contraction preserved basic-needs provision, supporting
+    degrowth's decoupling-of-welfare-from-GDP claim; direct
+    alignment with hypothesis.

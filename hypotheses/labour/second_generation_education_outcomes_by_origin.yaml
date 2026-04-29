@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: second_generation_education_outcomes_by_origin
+version: 1
+status: pre_registered
+topic: labour
+
+claim: >
+  Second-generation immigrant children (born in destination country to
+  foreign-born parents) show education outcomes (PISA scores, tertiary
+  attainment, NEET rates) that converge toward native-born peers when
+  controlled for parental socioeconomic status, parental years-since-
+  arrival, and destination-country language of instruction. The rate of
+  convergence varies by origin group but is best explained by origin-
+  country educational attainment norms + destination-country school-
+  quality equality + whether parents' credentials were recognised, NOT
+  by ethnicity as a biological variable. OECD PISA data across ~40
+  countries supports this: SES-adjusted performance gaps between
+  immigrant-background and native students are narrow or zero in
+  countries with high school-quality equality (CAN, FIN), wider in
+  countries with greater school-quality inequality (DEU under old
+  tracking, USA urban-suburban).
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, CAN, DEU, NLD, FRA, SWE, NOR, DNK, AUS, CHE, ITA, ESP]
+  period: [2003, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - "PISA cycles: 2003, 2006, 2009, 2012, 2015, 2018, 2022 (7 waves)"
+
+scope:
+  period: [2003, 2022]
+  countries: [USA, GBR, CAN, DEU, NLD, FRA, SWE, NOR, DNK, AUS, CHE, ITA, ESP]
+  outcome_dim: [demographics_migration, productivity, employment_labour]
+  policy_family: [welfare_architecture, regulation, institutional_reform]
+  treatment_tags: [pisa_immigrant_decomposition, second_generation_convergence, school_quality_equality]
+
+variables:
+  outcome:
+    - name: pisa_score_math
+      source: "constructed: OECD PISA microdata, by student immigrant background + origin region"
+      transformation: level_standardised
+    - name: pisa_score_reading
+      source: "constructed: OECD PISA microdata"
+      transformation: level_standardised
+    - name: pisa_score_science
+      source: "constructed: OECD PISA microdata"
+      transformation: level_standardised
+
+  decomposition_channels:
+    - name: parental_ses_escs
+      source: "constructed: OECD PISA ESCS (Economic Social Cultural Status) index"
+      transformation: level
+    - name: language_of_instruction_is_home_language
+      source: "constructed: PISA home-language indicator"
+      transformation: indicator
+    - name: parental_education_level
+      source: "constructed: PISA HISEI + parental-education ISCED"
+      transformation: level
+    - name: origin_region_education_norms
+      source: "constructed: origin-region (country group) average PISA-equivalent scores where available; Barro-Lee education attainment years where not"
+      transformation: level
+    - name: years_since_parental_arrival
+      source: "constructed: PISA immigration-generation variable (1st-generation student vs 2nd-generation vs native) + arrival-year where collected"
+      transformation: level
+
+  controls:
+    - name: school_quality_equality_destination
+      source: "constructed: destination-country PISA between-school variance / within-school variance ratio"
+      transformation: level
+    - name: destination_country_fe
+      source: "constructed: country dummies"
+      transformation: categorical
+
+estimator:
+  template: panel_fe_decomposition
+  fixed_effects: [destination_country, year]
+  clustering: destination_country
+  notes: >
+    Student-level regression (pooled across PISA waves) with destination-
+    country FE + year FE. Outcome is individual student PISA score;
+    covariates are student-level (immigrant generation, home language,
+    parental SES, parental education) + destination-country × origin-
+    region interactions.
+
+    Key test: after controlling for parental SES + language + parental
+    education, does the immigrant-background dummy coefficient attenuate
+    toward zero? Strong attenuation supports the channel-decomposition
+    framing. Residual differences by origin-region should be explainable
+    by origin-region educational norms + duration; if they aren't, the
+    framework reports the finding honestly and flags possible destination-
+    country school-system-quality-equality as the residual moderator.
+
+    Sensitivity spec: interact immigrant-background with destination-
+    country school-quality-equality index. Prediction: countries with
+    higher between-school variance show larger residual gaps; countries
+    with more equal school quality (CAN, FIN) show smaller gaps.
+
+falsification:
+  rule: >
+    Not supported if, after controls for parental SES + language + parental
+    education, the immigrant-background PISA-score gap remains larger than
+    0.3 standard deviations in a majority of sample countries AND the
+    2nd-generation gap is NOT materially smaller than the 1st-generation
+    gap. Additionally, if origin-region residuals exceed the parental-SES
+    coefficient magnitude, unmeasured origin factors (not channel-
+    captured) dominate the explanation, weakening the channel-
+    decomposition story.
+  test: pisa_gap_attenuation_and_generational_convergence
+  threshold: >
+    Post-control immigrant-background gap < 0.30 SD in ≥60% of sample AND
+    |2nd-generation gap| < |1st-generation gap| in ≥80% of sample
+
+prior_confidence: 0.80
+
+disclosure: >
+  Author prior aligns with OECD PISA secretariat's own framing of these
+  findings. The immigrant-native gap exists in raw data but narrows
+  substantially under socioeconomic + language controls, and is much
+  smaller in countries with equitable school systems.
+
+  The framework rejects two common weak framings:
+  (1) "Immigrant-background kids do worse in school" — true in raw data
+      but misleading without SES controls; the operative question is
+      WHY (SES transmission? school inequality? language acquisition?)
+      and the answer is actionable in the WHY, not in the raw gap.
+  (2) "Ethnicity causes educational outcome differences" — empirically
+      weak; within-ethnicity variation by parental SES is much larger
+      than between-ethnicity variation at constant SES. The "ethnicity"
+      story in educational outcomes is almost entirely an SES +
+      school-quality-equality story in empirical decomposition.
+
+  Policy implications: (a) school-quality-equality increases reduce
+  group-level educational gaps more than any direct "ethnic" intervention
+  does; (b) language support in early arrival years has measurable
+  returns; (c) parental-credential-recognition reforms indirectly
+  help second-generation via parental SES pathway.
+
+steelman: hypotheses/steelman/second_generation_education_outcomes_by_origin.md
+
+linked_hypotheses:
+  - immigration_net_fiscal_contribution_by_origin_skill_duration
+  - immigration_crime_rate_vs_native_controlled
+
+notes: >
+  PISA microdata is accessible via OECD data portal (public-use files
+  with anonymisation). New fetcher needed or use OECD Data API. Data-
+  gated for v1.1 run; pre-registration now.
+
+  The framework's treatment of this politically-charged topic is
+  designed to be neither sentimentally pro-immigration nor hostile:
+  just empirically disciplined, with strong steelman engagement of
+  objections, and actionable conclusions pointed at destination-country
+  POLICY rather than at immigrant-group characteristics.

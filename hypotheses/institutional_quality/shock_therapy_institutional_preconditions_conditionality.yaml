@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: shock_therapy_institutional_preconditions_conditionality
+version: 1
+status: draft
+topic: institutional_quality
+claim: Rogernomics (NZ) and Pinochet-era Chile produced positive macro outcomes because reforms were combined
+  with strengthened institutions; same reforms without institutional strengthening (Russia 1990s) produced
+  catastrophic outcomes.
+notes: Stub seeded from an empirical-pragmatist school prediction that shock-therapy outcomes are conditional
+  on institutional strengthening (NZ + Chile positive, Russia negative). Three-country comparison is small-N;
+  needs human review of supplementary case-set and outcome-window selection.
+prior_confidence: 0.70
+disclosure: Author's market-liberal priors strongly endorse institutions-matter framings of post-1990
+  transition divergence and may over-weight institutional-quality channels while under-weighting initial
+  conditions and energy-rent shocks unique to Russia.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: Three-country panel comparison of real GDP, inflation, and V-Dem institutional-quality trajectories
+    1973-1999 around shock-therapy onset dates (NZL 1984, CHL 1975, RUS 1992); supported if NZL+CHL outperform
+    RUS counterfactual by >5pp on growth at p<0.10 with institutional-quality difference explaining outcome
+    gap.
+evidence_type: associational
+estimator:
+  template: descriptive
+  notes: >
+    Three-country small-N comparison NZL/CHL/RUS 1973-1999 around respective
+    shock-therapy onset dates. Plot real GDP, inflation, and V-Dem trajectories
+    against onset-year (event-time t=0 normalisation). Score on multi-metric
+    checklist of (a) growth recovery 5y after onset, (b) inflation
+    stabilisation, (c) institutional-quality delta. Caveat: small-N (3
+    countries) means descriptive only — flagged TODO swarm-6e for synthetic-
+    control extension to broader transition-economy donor pool. RUS oil-rent
+    shock channel is partialled via Brent control but not fully separated.
+
+sample:
+  countries: [NZL, CHL, RUS]
+  period: [1973, 1999]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+      notes: "WDI real GDP per capita growth, annual %."
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: institutional_quality_vdem
+      source: "vdem:v2x_libdem"
+      transformation: level
+      notes: "V-Dem liberal democracy index."
+    - name: governance_indicator_composite
+      source: "wgi:RuleOfLaw"
+      transformation: level
+      notes: "WGI rule of law; available from 1996 only — used for late-period sub-window."
+  treatment:
+    - name: shock_therapy_onset_indicator
+      source: "constructed: country-specific onset year indicators (NZL 1984 Rogernomics, CHL 1975 Pinochet-Chicago, RUS 1992 Yeltsin shock therapy). Joint event study around onset dates."
+      transformation: indicator
+    - name: institutional_strengthening_dummy
+      source: "constructed: indicator = 1 for NZL and CHL (institutional reforms accompanied liberalisation); 0 for RUS (institutional decay 1992-1999). Hand-coded from V-Dem + WGI deltas around onset."
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log
+      notes: "RUS specific — oil-rent shock channel must be partialled."
+
+scope:
+  period: [1973, 1999]
+  countries: [NZL, CHL, RUS]
+  outcome_dim: [gdp_growth, institutional_quality, inflation]
+  policy_family: [institutional_reform, privatisation_nationalisation, monetary_policy]
+  treatment_tags: [rogernomics_1984, pinochet_chicago_reforms_1975, russia_shock_therapy_1992]
+
+covers_claims:
+  - position_id: empirical_pragmatist
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Empirical-pragmatist claim that shock-therapy outcomes are conditional on institutional strengthening (NZ + Chile positive, Russia negative) maps one-to-one onto this three-country conditionality hypothesis."
+

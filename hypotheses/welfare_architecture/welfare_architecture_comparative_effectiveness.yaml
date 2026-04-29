@@ -1,0 +1,180 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_architecture_comparative_effectiveness
+version: 1
+status: pre_registered
+topic: welfare_architecture
+claim: 'Forced-saving welfare architectures (Singapore CPF since 1955, Chile AFP since 1981, Australia Superannuation Guarantee since 1992) and universal-transfer architectures (Nordic model, UK NHS) produce
+  different profiles on two dimensions: (a) retirement-income adequacy for the median retiree, and (b) long-run fiscal sustainability as measured by projected net liabilities of the pension / welfare state
+  over 30+ year horizons. The hypothesis is that forced-saving systems deliver comparable or better adequacy for the median saver with materially lower sovereign fiscal liability, while universal-transfer
+  systems deliver higher redistributive effect (lower elderly poverty rates) at the cost of larger sovereign liability exposure. Both architectures face political-economy pressure to under-save or over-
+  promise; the empirical test compares realised outcomes rather than ideal types.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - SGP
+  - CHL
+  - AUS
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - ISL
+  - GBR
+  - NLD
+  - DEU
+  - FRA
+  - USA
+  - CAN
+  - NZL
+  - CHE
+  period:
+  - 1990
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years where pension reform is in transition with phase-in rules that make accrued vs projected values non-comparable (e.g., SWE 1998-2002 reform transition period)
+variables:
+  outcome:
+  - name: retirement_income_replacement_rate_median
+    source: oecd:OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0
+    transformation: level_pct_of_pre_retirement_earnings
+    notes: OECD Pensions at a Glance gross replacement rate for median earner.
+  - name: elderly_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD (poverty_rate, 66+ age group)
+    transformation: level_pct
+  - name: sovereign_pension_net_liability_projection
+    source: imf:GGXWDG_NGDP; oecd:pension_spending_projections
+    transformation: level_pct_of_gdp_2050_projection
+    notes: 'Constructed as (implicit pension debt) + (projected pay-as-you-go deficit through 2050) / GDP. For forced-saving systems, implicit pension debt is near zero since the liability sits on the individual
+      account. For PAYG systems, implicit debt is large and drawn from IMF-Eurostat-OECD fiscal gap literature.
+
+      '
+  treatment:
+  - name: welfare_architecture_category
+    source: 'constructed: categorical per country per epoch'
+    transformation: categorical
+    notes: 'Categories: forced-saving-dominant (SGP, CHL, AUS from 1992), universal-transfer-dominant (NOR, SWE, DNK, FIN, GBR post-1948 for NHS at minimum), mixed (CHE with three-pillar; DEU with Bismarck-plus-Riester;
+      NLD with three-pillar; USA with Social Security + 401(k)), and liberal-residual (USA if 401(k) coded as non-forced). Assignment rules documented in notes field of the coding spreadsheet.
+
+      '
+  controls:
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: female_labour_force_participation
+    source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: 'Welfare architecture is intrinsically a bundled intervention: fiscal (transfers, tax base) + regulatory (mandatory contributions, vehicle design). Per invariant 4 the
+  channel assignment is bundled and justified here.
+
+  '
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Panel FE on the three outcomes with architecture category as a set of dummy variables (forced_saving, universal_transfer; mixed is reference). Controls for per-capita income, dependency ratio,
+    female LFP. Primary specification. Secondary: between-country cross-sectional regression of outcomes on architecture category using country-mean values, to capture the level differences that within-country
+    FE absorb. Both specifications reported.
+
+    '
+falsification:
+  rule: 'Not supported if on pooled data (a) forced-saving systems do not show comparable-or-better median replacement rates than universal- transfer systems (gap < -10pp against forced-saving), OR (b)
+    forced- saving systems do not show materially lower sovereign pension liability projections (gap < 15pp of GDP against universal-transfer), OR (c) universal-transfer systems do not show lower elderly
+    poverty (gap > +3pp against universal-transfer). Support requires ALL three outcomes to fall in the predicted direction, consistent with the hypothesis that the architectures differ along these dimensions
+    rather than being equivalent.
+
+    '
+  test: three_outcome_joint_direction_test
+  threshold: 'median_replacement_rate(forced) - median_replacement_rate(universal) > -10pp AND sovereign_liability(universal) - sovereign_liability(forced) > 15pp of GDP AND elderly_poverty(forced) - elderly_poverty(universal)
+    > 3pp
+
+    '
+prior_confidence: 0.6
+disclosure: 'Author holds market-liberal priors that favour forced-saving systems for fiscal-sustainability reasons. The hypothesis is deliberately structured to allow the universal-transfer side to win
+  on redistributive-effect dimensions; the pre-registered prediction is that each architecture has its own strengths, not that one dominates. The falsification rule tests whether the architectures differ
+  in the predicted pattern; a finding of "no difference" across all three outcomes would be the most common non-support result and would be published as such.
+
+  '
+steelman: hypotheses/steelman/welfare_architecture_comparative_effectiveness.md
+linked_hypotheses:
+- nordic_outcome_persistence_decomposition
+linked_conditions:
+- nordic_institutional_design
+notes: 'Data-gated. Primary publishers: oecd, world_bank_wdi, imf. Secondary (forced-saving country-specific): singapore_cpf (pending), chile_ spensiones (pending), apra (pending). Until those land, forced-saving
+  measures rely on OECD Pensions at a Glance harmonised tabulations. The hypothesis is pre-registered now to lock the comparison logic; first-run execution waits on publisher readiness.
+
+  '
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - SGP
+  - CHL
+  - AUS
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - ISL
+  - GBR
+  - NLD
+  - DEU
+  - FRA
+  - USA
+  - CAN
+  - NZL
+  - CHE
+  - NORDIC
+  outcome_dim:
+  - welfare_state
+  - poverty_inequality
+  - fiscal_policy
+  policy_family:
+  - welfare_architecture
+  - tax_policy
+  - institutional_reform
+  treatment_tags:
+  - singapore_cpf
+  - chile_afp_1981
+  - australia_super_guarantee_1992
+  - nordic_model
+  - uk_nhs
+  - bismarck_welfare_architecture
+  - swiss_contributory
+covers_claims:
+- position_id: empirical_pragmatist
+  claim_index: 1
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pragmatist position predicts Nordic mixed model performs well in high-institutional-quality settings; hypothesis's universal-transfer arm (NOR/SWE/DNK/FIN/ISL) measures the same Nordic outcomes.
+- position_id: empirical_pragmatist
+  claim_index: 8
+  polarity: aligned
+  school_prediction: mixed
+  confidence: low
+  notes: 'Phase 4C candidate: OUTCOME_MISMATCH — claim tests architecture-times-state-capacity interaction while hypothesis tests forced-saving-vs-universal adequacy/sustainability. Retained pending new
+    welfare_architecture_state_capacity_interaction_effect hypothesis.'
+- position_id: developmentalism
+  claim_index: 0
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Developmentalist claim that forced-saving (SGP CPF, CHL AFP) outperforms universal-transfer architectures; relinked from nordic_outcome_persistence_decomposition (Phase 4C) — direct match to this
+    hypothesis's forced-saving-vs-universal comparative.
+- position_id: ordoliberal
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Ordoliberal claim that market-respecting state mechanisms (Bismarckian sickness funds, Norway SWF, Singapore CPF) outperform market-replacing alternatives; relinked from nordic_outcome_persistence_decomposition
+    (Phase 4C) — Bismarck + Singapore CPF treatment_tags match this hypothesis.

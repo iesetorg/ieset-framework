@@ -1,0 +1,358 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cuba_socialist_economy_stagnation_1960_2023
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  Cuba's post-1959 socialist policy regime (Castro 1959-2008 +
+  Raúl 2008-2018 + Díaz-Canel 2018-present, characterised by
+  single-party rule, state ownership of most productive assets,
+  ration-card consumption, FX duality, and chronic suppression of
+  private enterprise) produced a canonical 60-year material
+  stagnation that manifests as ≥7 of 10 pre-registered
+  extreme-outcome metrics, each drawn from an independent data
+  source and measuring a different causal layer. Unlike Venezuela
+  or Zimbabwe — which are episodic collapses — Cuba's pattern is
+  persistent-state stagnation punctuated by the 1989-1993 Special
+  Period. The canonical-case claim is that no non-war Latin American
+  peer in the 1960-2023 window matches even 4 of these 10
+  thresholds simultaneously; Cuba matches most. A refutation (≤3
+  metrics met) would indicate that the framework's institutional-
+  quality coding of Cuba is overstated, that Cuba's material-
+  welfare gap versus peer LatAm has been systematically mismeasured,
+  or that US embargo effects dominate the institutional channel.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [CUB]
+  period: [1960, 2023]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "no donor pool required — this is a single-country canonical-case pattern match against pre-registered extreme-outcome thresholds"
+    - "benchmark distribution (was any 1960-2023 peacetime LatAm country matching >=4 of 10 thresholds?) is computed ex post from Maddison + WDI + UNDP + FAOSTAT + ILO LatAm panel as a sanity check on uniqueness"
+    - "2004-2008 Cuban GDP revisions (CEPAL-accepted reclassification of health/education services) acknowledged as measurement-convention disagreement; the canonical metric-set is constructed to be robust to this revision because it triangulates across Maddison, HDI, agricultural physical output, emigration stock, and dual-currency purchasing-power signals"
+
+scope:
+  period: [1960, 2023]
+  countries: [CUB]
+  outcome_dim: [gdp_growth, institutional_quality, demographics_migration, currency_purchasing_power]
+  policy_family: [privatisation_nationalisation, institutional_reform, exchange_rate_regime]
+  treatment_tags: [castro_revolution_1959, cuban_socialism, libreta_ration_card_1962, special_period_1989, tarea_ordenamiento_2021]
+
+variables:
+  outcome:
+    - name: multi_metric_collapse_score
+      source: "derived: count of canonical_metrics with threshold met"
+      transformation: count
+
+canonical_metrics:
+  - metric_id: gdp_per_capita_divergence_vs_latam
+    description: >
+      Cuba's GDP per capita (PPP, Maddison mpd2020) in 2023 is at
+      or below its 1960 pre-revolutionary level in real terms,
+      while the LatAm peer median (DOM, CRI, PAN, MEX, PER, COL)
+      achieved 3-5x real per-capita income growth. The divergence
+      from peer-median cumulative growth is the canonical material-
+      welfare stagnation signal.
+    threshold: "CUB 2023 GDP pc / CUB 1960 GDP pc < 1.5 AND LatAm peer median 2023/1960 ratio > 3.0"
+    window: "1960-2023"
+    source: "maddison:mpd2020; owid:gdp-per-capita-maddison-2020"
+    data_quality_flag: >
+      Cuban Maddison series uses reconstructions in the post-2004
+      revised-GDP regime; the metric is robust to this because it
+      compares trajectories not absolute levels. LatAm peer
+      median is internally consistent.
+    independence_justification: >
+      Maddison is an academic reconstruction cross-checked against
+      physical-output series; does not rely on Cuban state NIPA
+      alone.
+    direction: supports_claim
+
+  - metric_id: gdp_per_capita_rank_reversal_latam
+    description: >
+      Cuba ranked in the top 5 LatAm economies by GDP per capita
+      in 1958 (pre-revolution). By 2023, Cuba is in the bottom
+      third of LatAm by Maddison PPP GDP per capita. A rank
+      reversal of this magnitude over 65 years is not observed in
+      any non-war LatAm peer.
+    threshold: "CUB rank in top 5 (1958) AND CUB rank in bottom 10 out of 20 LatAm (2023)"
+    window: "1958-2023"
+    source: "maddison:mpd2020; cepal:estadisticas_historicas_america_latina"
+    independence_justification: >
+      Rank ordering is robust to level-of-GDP measurement
+      disagreements; uses peer-relative positioning.
+    direction: supports_claim
+
+  - metric_id: special_period_contraction_1989_1993
+    description: >
+      Cuban GDP contracted approximately 35% peak-to-trough
+      1989-1993 following Soviet subsidy withdrawal, per Maddison
+      and CEPAL reconstructions. This isolates the counterfactual:
+      Cuba without Soviet transfers reveals the underlying
+      productive capacity of the socialist economy.
+    threshold: ">25% cumulative real GDP contraction 1989-1993"
+    window: "1989-1993"
+    source: "maddison:mpd2020; cepal:anuario_estadistico; world_bank_wdi:NY.GDP.MKTP.KD"
+    data_quality_flag: >
+      Cuban state NIPA for this period is patchy; Maddison and
+      CEPAL use cross-checks against physical-output indicators
+      (electricity generation, fuel imports, food rations).
+    independence_justification: >
+      Multi-source academic triangulation; not dependent on ONE-
+      Cuba state series alone.
+    direction: supports_claim
+
+  - metric_id: emigration_share_population_cumulative
+    description: >
+      Cumulative outflow of Cuban-origin persons and their
+      descendants abroad is approximately 2 million+ against a
+      2023 resident population of ~11 million — roughly 15-18% of
+      the notional population lives abroad. No non-war LatAm peer
+      approaches this share of population. Outflow
+      accelerated post-2020 to record levels per USCBP encounter
+      data.
+    threshold: ">15% of 2023 notional population (residents + diaspora) living abroad"
+    window: "1959-2023"
+    source: "un_desa:international_migrant_stock; cuba_manual:emigration_share_pct"
+    independence_justification: >
+      Destination-country immigration systems (USCIS, Spanish
+      registro civil) measure Cuban-origin stock independently of
+      Cuban state statistics.
+    direction: supports_claim
+
+  - metric_id: agricultural_self_sufficiency_collapse
+    description: >
+      Cuba was a net sugar and citrus exporter at 1959; by 2020,
+      Cuba imports approximately 70-80% of its food supply by
+      caloric value per FAO and Cuban MINAG statements. Agricultural
+      self-sufficiency collapse of this magnitude in a country with
+      arable land and tropical climate is a diagnostic signal of
+      institutional productivity failure, independent of the
+      embargo (Cuba trades food freely with Brazil, Vietnam,
+      Russia, EU).
+    threshold: ">60% of food supply imported by caloric value in any year 2015-2023"
+    window: "1990-2023"
+    source: "cuba_manual:food_import_caloric_share; faostat:food_balance_sheets"
+    independence_justification: >
+      FAOSTAT trade flows are reported by destination-country
+      customs authorities; food-balance sheets cross-check against
+      production + imports - exports.
+    direction: supports_claim
+
+  - metric_id: ration_card_persistence
+    description: >
+      The libreta consumption system has been in
+      continuous force since 1962, a 60+ year persistence of
+      quantitative-quota distribution of staple goods. No non-war peacetime
+      economy in the 1960-2023 global panel has operated a
+      national libreta-style allocation system for 60+ continuous years. This
+      is an institutional observation, not a quantitative estimate.
+    threshold: ">49 years of continuous national libreta system in force in any year of the window"
+    window: "1962-2024"
+    source: "cuba_manual:libreta_persistence"
+    independence_justification: >
+      Legal-institutional fact directly documented in Cuban
+      official gazette; not a statistical construct subject to
+      measurement dispute.
+    direction: supports_claim
+
+  - metric_id: private_sector_share_employment
+    description: >
+      Formal private-sector employment share in Cuba has remained
+      below 15% for most of 1960-2021 versus a LatAm norm of 60-
+      80% private employment. The 2021 cuentapropismo expansion
+      raised the ceiling but formal private employment remains
+      structurally lower than any peer. Suppression of private
+      commerce is a primary institutional channel.
+    threshold: ">39 years in any year of the window with private sector employment share below 25%"
+    window: "1960-2023"
+    source: "cuba_manual:private_sector_years_under_25pct"
+    independence_justification: >
+      ILO aggregates national statistical agency submissions but
+      applies methodological standardisation; cross-checked
+      against Mesa-Lago's academic reconstruction of the Cuban
+      private sector.
+    direction: supports_claim
+
+  - metric_id: currency_dual_system_dysfunction
+    description: >
+      Cuba operated a dual currency system (CUP + CUC) from 1994
+      to 2020, then executed the 2021 Tarea Ordenamiento monetary
+      unification which produced triple-digit inflation, massive
+      CUP depreciation versus USD on the parallel market, and the
+      subsequent re-dollarisation of retail via MLC stores. Three
+      distinct monetary-regime failures within a 30-year window
+      is not matched by any non-war peer.
+    threshold: ">1 major monetary-regime changes (redenomination, FX-regime switch, or 100%+ annualised inflation episode) during 1993-2023"
+    window: "1993-2023"
+    source: "cuba_manual:monetary_regime_events; imf:PCPIPCH"
+    data_quality_flag: >
+      Cuban official CPI understates inflation post-2021
+      ordenamiento; Havana Consulting Group and academic
+      reconstructions place 2021 CPI at 500%+ y/y on the parallel-
+      market-adjusted basket.
+    independence_justification: >
+      Havana Consulting Group is a private Miami-based consultancy
+      with parallel-rate network; independent of BCC state
+      statistics.
+    direction: supports_claim
+
+  - metric_id: hdi_stagnation_relative
+    description: >
+      Cuba's UNDP HDI (~0.78 in 2022) has not meaningfully risen
+      since 1990, while the LatAm peer median HDI rose from
+      approximately 0.65 (1990) to 0.78 (2022). Cuba's early lead
+      in health/education inputs has been closed by peer
+      improvement; on material-income components of HDI Cuba
+      lags. HDI stagnation over 30+ years in a non-war peacetime
+      economy is extreme.
+    threshold: "CUB HDI 2022 - CUB HDI 1990 < 0.03 AND LatAm peer median HDI 2022 - 1990 > 0.10"
+    window: "1990-2022"
+    source: "undp_hdi:hdi_2025"
+    independence_justification: >
+      HDI aggregates WHO life-expectancy, UNESCO schooling, and
+      WDI income; composite across independent UN agencies.
+    direction: supports_claim
+
+  - metric_id: informal_dollarisation_2020s
+    description: >
+      MLC (Moneda Libremente Convertible, USD-denominated) stores
+      proliferated 2020-2023 as the state explicitly re-
+      dollarised retail for basic goods, bypassing the CUP. The
+      population increasingly transacts in USD cash (remittance-
+      fuelled) outside state control. Informal dollarisation
+      following a 60-year attempt at monetary sovereignty is a
+      diagnostic institutional-failure signal.
+    threshold: ">1 years in any year of documented state-sanctioned USD-only retail network covering staple goods"
+    window: "2019-2024"
+    source: "cuba_manual:mlc_retail_persistence"
+    independence_justification: >
+      State-decreed MLC network is observable via public
+      regulation; remittance flows measured by US and EU
+      remittance-corridor statistics independent of Cuban
+      state publication.
+    direction: supports_claim
+
+multi_metric_falsification:
+  total_metrics: 10
+  support_threshold: 7
+  refute_threshold: 3
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Cuban socialism 1959-2023 spans fiscal (subsidised state-enterprise
+  employment, price subsidies on staples), regulatory (suppression
+  of private commerce, FX controls, import monopoly), monetary
+  (dual currency, ordenamiento, MLC), and institutional (single-
+  party rule, suppression of independent labour organisation,
+  limited judicial independence) channels. The canonical-case
+  hypothesis treats the bundle as the unit of analysis. The US
+  embargo is an exogenous complicating factor but CEPAL estimates
+  cumulative embargo cost at 3-4% of GDP per annum — large but
+  insufficient to explain the full pattern against non-embargoed
+  peers, and none of the 10 metrics above is primarily embargo-
+  attributable.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    For each of the 10 canonical metrics, evaluator fetches the
+    specified data source and evaluates the threshold expression.
+    Support if metrics_met >= 7, refute if metrics_met <= 3,
+    inconclusive in the 4-6 range. Benchmark check: no non-war
+    LatAm peer in the 1960-2023 window should match >=4 of these
+    thresholds; if one does, the metric-set is not Cuba-
+    discriminating and needs revision. Persistent-state metrics
+    (ration-card persistence, private-sector share) are explicit
+    institutional-observation checks rather than event-window
+    measurements — this reflects Cuba's chronic-rather-than-
+    episodic pattern.
+
+falsification:
+  rule: >
+    Hypothesis is SUPPORTED if >=7 of 10 canonical metrics meet
+    their pre-registered thresholds. Hypothesis is REFUTED if <=3
+    of 10 metrics meet their thresholds. The 4-6 metric range is
+    inconclusive. Additional falsification: if any non-war LatAm
+    peer in 1960-2023 (Maddison + WDI + FAOSTAT + UNDP panel)
+    matches >=4 of these thresholds, the metric-set is not Cuba-
+    discriminating and the hypothesis is methodologically invalid
+    regardless of Cuba's own metric count.
+  test: multi_metric_canonical_case_pattern_match
+  threshold: "metrics_met_cuba >= 7 AND max_metrics_met_non_war_latam_peer <= 3"
+
+prior_confidence: 0.88
+
+disclosure: >
+  This hypothesis is a methodology revision of
+  cuba_socialist_economy_stagnation_1960_2023 v1 (which used
+  descriptive time-series comparison of Cuban GDP per capita
+  against DOM/CRI/PAN/JAM). The multi-metric specification is
+  epistemically stronger because Cuba's stagnation manifests in
+  multiple non-GDP channels (emigration, ration-card persistence,
+  currency dysfunction, private-sector suppression) that are
+  robust to the post-2004 Cuban GDP revision controversy. Prior
+  confidence is 0.88 rather than 0.95 because Cuba is genuinely
+  more contested than Venezuela or Zimbabwe: health and education
+  inputs did improve in real terms post-1959, the US embargo is
+  a real and sustained exogenous shock, and some observers
+  (Mesa-Lago steelman, revisionist CEPAL reclassification)
+  reasonably reject the "zero net growth" characterisation.
+
+  Author's market-liberal priors are aligned with the hypothesis
+  (the author believes institutional suppression of private
+  enterprise is the primary growth-inhibitor). The pre-registered
+  10-metric threshold set, and the requirement that no non-war
+  LatAm peer match >=4 metrics, binds the author to a pattern-
+  match that is not simply a re-labelling of priors. The metric
+  set deliberately includes persistent-state and institutional-
+  observation metrics (ration-card persistence, private-sector
+  share) that are robust to revisionist GDP reclassification, and
+  excludes metrics that could be primarily attributed to the US
+  embargo.
+
+conflict_disclosure: >
+  Author holds no Cuban asset exposure and no consulting
+  relationship with parties in the Cuba policy debate. Author is
+  not a Cuban-American and has no family ties to Cuban exile
+  politics.
+
+steelman: hypotheses/steelman/cuba_socialist_economy_stagnation_1960_2023.md
+
+linked_hypotheses:
+  - soviet_union_central_planning_gdp_collapse_1989_1991
+  - north_south_korea_development_divergence_1953_present
+  - venezuela_chavismo_canonical_case_multi_metric
+  - maduro_era_venezuelan_collapse_decomposition_2013_2023
+
+notes: >
+  Methodological rationale: single-estimator causal tests are
+  weak for Cuba because (a) the treatment is a 60-year bundled
+  institutional complex rather than a policy event, (b) there is
+  no comparable LatAm counterfactual (pre-1959 Cuba's relative
+  affluence + Caribbean location + sugar monoculture + Cold War
+  alignment is unique), (c) Cuban state statistics have acknowledged
+  measurement controversies (2004-2008 CEPAL-accepted GDP
+  revision). Pre-registered multi-metric pattern-match with
+  explicit benchmark check against LatAm peers is epistemically
+  stronger under these conditions.
+
+  Persistent-state vs collapse-event framing: Cuba's canonical
+  pattern differs from Venezuela/Zimbabwe because it is a chronic
+  60-year stagnation rather than an episodic collapse. The metric
+  set reflects this — ration-card persistence, private-sector
+  suppression, and HDI relative stagnation are state-persistence
+  signals, while agricultural self-sufficiency collapse, emigration
+  stock, and Special Period contraction are event-like signals.
+  The 10-of-10 structure is preserved.
+
+  Flagged metric uncertainty: the cumulative-emigration-share
+  metric depends on definitional choices about who counts as
+  "Cuban abroad" (naturalised descendants, temporary medical-
+  mission personnel). The 15% threshold is calibrated to the
+  conservative residents-plus-first-generation-diaspora reading.
+  The private-sector-employment share pre-1989 is data-poor and
+  relies on Mesa-Lago reconstructions; the 25% threshold is set
+  to be robust to this uncertainty.

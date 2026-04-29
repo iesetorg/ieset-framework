@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: phillips_curve_flattening_post_1990
+version: 1
+status: draft
+topic: labour
+claim: The Phillips curve flattened post-1990 in OECD economies, reflecting endogenous expectation formation and labour-market regime change rather than pure NAIRU drift.
+notes: Stub seeded from a Post-Keynesian school prediction about Phillips-curve flattening in OECD post-1990. Rolling-window slope estimation is sensitive to break specification; needs human review.
+prior_confidence: 0.65
+disclosure: Author's market-liberal priors view post-1990 flattening as primarily evidence of credible inflation-targeting anchoring expectations rather than as evidence of regime change in labour markets;
+  could under-weight the labour-market-channel claim and over-weight the monetary-credibility explanation.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Compare rolling-window Phillips slope OECD panel pre- and post-1990 with country/year FE and expectations control; supported if post-1990 slope is <0.5 of pre-1990 magnitude at p<0.05.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - CAN
+  - AUS
+  - JPN
+  - CHE
+  - BEL
+  - AUT
+  - IRL
+  - KOR
+  - NZL
+  period:
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing CPI or unemployment series
+  - winsorise inflation observations at 1st/99th sample percentile (excludes 1970s shocks)
+variables:
+  outcome:
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level
+  - name: core_inflation
+    source: oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0
+    transformation: log_yoy
+    notes: OECD core CPI excluding food/energy.
+  treatment:
+  - name: unemployment_gap
+    source: imf:NGAP_NPGDP
+    transformation: level
+    notes: 'Output-gap proxy for unemployment-gap (NAIRU subtracted). OECD reference NAIRU subtraction at wiring.
+
+      '
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: post_1990_window
+    source: derived:post_1990_indicator
+    transformation: indicator
+    notes: Window indicator for the regime-change interaction term.
+  controls:
+  - name: ten_year_inflation_expectations
+    source: fred:T10YIE
+    transformation: level
+    notes: US breakeven; per-country swap to ECB SPF or BoE expectations on wiring.
+  - name: oil_price_brent
+    source: imf_pcps:POILBRE
+    transformation: log_yoy
+  - name: import_price_index
+    source: oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0
+    transformation: log_yoy
+  - name: union_density
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TUD,1.0
+    transformation: level
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - OECD
+  outcome_dim:
+  - inflation
+  - employment_labour
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  - labour_market
+  treatment_tags:
+  - phillips_curve_flattening
+  - post_1990_labour_market_regime_change
+covers_claims:
+- position_id: post_keynesian
+  claim_index: 12
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Post-Keynesian claim that post-1990 OECD Phillips curve flattening reflects endogenous expectation formation and labour-market regime change rather than pure NAIRU drift.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'OECD panel estimating rolling-window Phillips slope (inflation on unemployment gap) pre- and post-1990 with country and year FE. Tests whether observed flattening is robust to NAIRU-drift and
+    expectations controls.
+
+    '

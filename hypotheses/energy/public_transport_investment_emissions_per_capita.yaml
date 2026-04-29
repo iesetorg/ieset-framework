@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: public_transport_investment_emissions_per_capita
+version: 1
+status: draft
+topic: energy
+claim: Post-1945 US and Western European public investment in rail/transit produced lower per-capita emissions than the post-1980 privatised-deregulated transport regime.
+scope:
+  period:
+  - 1945
+  - 2020
+  countries:
+  - USA
+  - EU
+  - GBR
+  - FRA
+  - DEU
+  outcome_dim:
+  - energy
+  - industrial_capability
+  policy_family:
+  - energy_policy
+  - privatisation_nationalisation
+  - industrial_policy
+  treatment_tags:
+  - postwar_public_transit_investment
+  - transport_privatisation_1980s
+covers_claims:
+- position_id: eco_socialist
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: 'Claim text matches hypothesis claim verbatim: post-1945 US/Western European public rail-transit investment produced lower per-capita emissions than post-1980 privatised-deregulated regime. Direct
+    alignment.'
+notes: Maps the eco-socialist school's postwar-public-transit-vs-privatised claim to a long-run pre/post comparison of transport-sector emissions per capita across USA and Western Europe. Estimator and
+  prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.4
+disclosure: Author prior is skeptical of the strong attribution — postwar US transport-emissions trajectory was dominated by interstate-highway buildout, suburbanisation, and oil-price shocks rather than
+  'public investment regime'; Western European transport emissions per capita were lower than US throughout the period regardless of pre/post-1980 ownership shifts.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Pre/post-1980 comparison of transport-sector CO2 per capita (IEA, IRENA) for USA, GBR, FRA, DEU 1945-2020 conditional on transport-mode-share controls; country-clustered SEs, country+year FE. Refute
+    if pre-1980 public-investment regime not associated with at least 15% lower transport CO2 per capita than post-1980 regime once oil-price/fuel-cost effects netted out at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - SWE
+  - DNK
+  period:
+  - 1970
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing IEA transport-sector emissions decomposition
+variables:
+  outcome:
+  - name: transport_co2_per_capita_t
+    source: owid:annual-co2-emissions-per-country
+    transformation: level
+    notes: OWID transport-sector CO2 per capita; cross-check with IEA when iea fetcher lands.
+  - name: passenger_rail_share_passenger_km
+    source: world_bank_wdi:IS.RRS.PASG.KM
+    transformation: level
+    notes: WDI passenger rail-km as share of total motorised passenger-km (where available).
+  treatment:
+  - name: post_1980_privatisation_indicator
+    source: 'constructed: indicator = 1 for years >= 1980 in countries that pursued transport-sector privatisation/deregulation (USA airlines 1978, GBR rail 1993, EU liberalisation packages 1990s); 0 for
+      postwar public-investment regime years.'
+    transformation: indicator
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_population_density
+    source: world_bank_wdi:EN.POP.DNST
+    transformation: log
+  - name: oil_price_brent
+    source: imf_pcps:POILBRE
+    transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Cross-country panel-FE comparing pre/post-1980 transport CO2 per capita with post-1980 privatisation indicator as treatment, controlling for oil price, population density, and GDP per capita.
+    Country and year FE. Caveat: regime indicator is coarse — postwar US emissions trajectory dominated by interstate-highway buildout and suburbanisation, not "public investment" per se; identification
+    is weak by design.
+
+    '

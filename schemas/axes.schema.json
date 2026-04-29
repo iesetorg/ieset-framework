@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/axes.schema.json",
+  "title": "IESET Policy Axes Taxonomy",
+  "description": "Canonical list of policy axes. Policies are scored per-axis; movements summarise across axes. Every `axis` string in a policy/movement YAML must reference an id defined here. Axes are grouped by channel per Invariant 4 (fiscal vs regulatory separation).",
+  "type": "object",
+  "required": ["version", "axes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "axes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "channel", "description", "direction_semantics"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(fiscal|regulatory|monetary|institutional)\\.[a-z][a-z0-9_]*[a-z0-9]$",
+            "description": "Dotted id: <channel>.<axis_name>"
+          },
+          "channel": {
+            "type": "string",
+            "enum": ["fiscal", "regulatory", "monetary", "institutional"]
+          },
+          "description": {"type": "string", "minLength": 30},
+          "direction_semantics": {
+            "type": "object",
+            "required": ["+", "-"],
+            "additionalProperties": false,
+            "properties": {
+              "+": {"type": "string", "description": "What moving in the + direction means (policy-content, not normative)."},
+              "-": {"type": "string", "description": "What moving in the - direction means."}
+            }
+          },
+          "source_publishers": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Publisher ids (per publishers.yaml) that carry axis-level panel data. Informs which fetchers the data agent needs ready for axis-level charts."
+          },
+          "typical_proxies": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Series or indices commonly used to measure this axis, e.g. 'Fraser EFW area 1b' or 'OECD PMR aggregate'."
+          },
+          "notes": {"type": "string"}
+        }
+      }
+    }
+  }
+}

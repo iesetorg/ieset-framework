@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: australia_super_guarantee_saving_effect
+version: 1
+status: draft
+topic: fiscal
+claim: Australian superannuation guarantee 1992 produced broad-based retirement-savings expansion without the crowd-out or private-saving collapse predicted by some critics.
+notes: Maps the social-democratic school's Australian-superannuation-no-crowdout claim to a synthetic control vs OECD donor pool. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.5
+disclosure: Author prior is genuinely uncertain — the literature shows partial offset (Connolly & Kohler estimate ~30% private-saving offset); whether that constitutes 'crowd-out as critics predicted' depends
+  on the strength of the steelman counterfactual. Synthetic-control donor choice is consequential.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Synthetic control of AUS national saving rate 1992-2023 vs OECD donor pool, with retirement-asset accumulation as secondary outcome (RBA/ABS data). Refute if private-saving offset >70% of mandated
+    contribution OR aggregate saving falls below synthetic counterfactual at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - NZL
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 1980
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop AUS pre-1992 from treated period; donor-pool OECD economies retain full series for synthetic-control construction
+  - drop country-years missing household saving rate or pension-asset accumulation series
+variables:
+  outcome:
+  - name: household_saving_rate
+    source: oecd:HSR; rba:e2 (Australian household saving)
+    transformation: pct_disposable_income
+    notes: Primary outcome. Measures whether forced-saving via super crowded out voluntary saving.
+  - name: pension_asset_stock_pct_gdp
+    source: oecd:PensionAssets; apra:superannuation_statistics
+    transformation: pct_gdp
+    notes: Secondary outcome — total retirement assets / GDP, measures broad-based saving expansion.
+  - name: gross_national_saving_rate
+    source: imf:NGSD_NGDP; world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: pct_gdp
+  treatment:
+  - name: super_guarantee_treatment
+    source: 'constructed: indicator = 1 for AUS from 1992-07-01 onward; 0 prior or for donor-pool countries'
+    transformation: binary
+  - name: super_guarantee_rate
+    source: 'apra:sg_contribution_rate (statutory rate trajectory: 3% 1992 → 9% 2002 → 11% 2023)'
+    transformation: level_pct
+    notes: Continuous-treatment variant for dose-response check.
+  controls:
+  - name: real_gdp_growth
+    source: imf:NGDP_RPCH; world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_yoy
+  - name: real_interest_rate
+    source: world_bank_wdi:FR.INR.RINR; oecd:LongTermInterestRates
+    transformation: level
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: house_price_index
+    source: bis:WS_SPP
+    transformation: real_index_2010_100
+scope:
+  period:
+  - 1992
+  - 2023
+  countries:
+  - AUS
+  outcome_dim:
+  - welfare_state
+  - capital_flows
+  policy_family:
+  - welfare_architecture
+  - fiscal_policy
+  treatment_tags:
+  - australia_super_guarantee_1992
+covers_claims:
+- position_id: social_democratic
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Social-democratic position predicts Australian superannuation expanded retirement savings without crowd-out; hypothesis tests exactly that claim on the 1992 guarantee.
+estimator:
+  template: descriptive
+  notes: 'Descriptive analysis of pre-/post-1992 Australian household saving rates (RBA / ABS national accounts) versus a synthetic OECD donor pool to assess crowd-out. Forced-saving designs are typically
+    descriptive given identification challenges in n=1 country institutional reform.
+
+    '

@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: liberalisation_episodes_growth_trajectory
+version: 1
+status: draft
+topic: growth
+claim: 'Across cross-country liberalisation episodes since 1971 (trade opening, product-market deregulation, state-owned-enterprise divestiture, financial account liberalisation), output growth follows
+  the reform rather than preceding it — i.e. the observed growth pickup is policy-caused and not driven by reverse causation where successful economies reform because they can afford to. Tested via event-study
+  across liberalisation-episode panel with pre-trend checks.
+
+  '
+notes: 'Seeded from a classical-liberal claim that growth follows liberalisation rather than precedes it. Stacked event study; episode catalogue (inclusion criteria for what counts as a liberalisation episode)
+  is the central judgement call requiring human review before pre-registration.
+
+  '
+prior_confidence: 0.55
+disclosure: 'Authorial bias risk: classical-liberal framing of the question; episode catalogues (Sachs-Warner, Wacziarg-Welch) have been criticised for selection bias and for coding crisis-induced reform
+  as exogenous when it is endogenous to economic distress.
+
+  '
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if event-study coefficients on real GDP-per-capita log-growth (excess over the country sample-mean baseline) are each at least +0.5pp/yr AND statistically
+    positive at p<0.10 (country-block bootstrap) at horizons h=3, h=5, AND h=10, AND the pre-trend coefficients at h=-3 and h=-5 are NOT significantly positive (i.e. either p>=0.10 against the zero null
+    or magnitude < +0.5pp). REFUTED if any post-reform coefficient at h=3,5,10 fails the magnitude OR the significance test, OR if either pre-trend at h=-3,-5 is significantly positive (the reverse-causation
+    indicator). INFORMATIVE: per-horizon coefficients, SEs, and number of cells in diagnostics.json. METHOD_VALID: at least 30 EFW-jump episodes detected across the 41-country sample.'
+  test: liberalisation_episode_event_study_dual_threshold
+  threshold: 'PRIMARY: coef[h] >= +0.005 AND p[h] < 0.10 for h in {3,5,10}; AND not (coef[h] >= +0.005 AND p[h] < 0.10) for h in {-3,-5}.'
+methodology_note: 'v1 promotion (2026-04-24). Sharpened the original generic falsification rule: defined liberalisation episodes as the year of each country''s largest 5-year jump in Fraser EFW aggregate
+  score, conditional on that jump being >= +0.5 points (one episode per country; the EFW panel is 5-year-spaced 1970-2000 and annual after, so 5 yr is the natural unit, and one-episode-per-country avoids
+  stacked-event-study double-counting of the same multi-decade reform wave). Sharpened thresholds to a magnitude band (+0.5pp/yr post, symmetric pre-trend cutoff) and a country-block bootstrap (1000 reps)
+  to clusters SEs by country. Method validity gated at >= 30 episodes; below that, verdict is `inconclusive` rather than refuted.'
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - CHL
+  - MEX
+  - ARG
+  - BRA
+  - IND
+  - IDN
+  - TUR
+  - POL
+  - HUN
+  - CZE
+  - EST
+  - ZAF
+  - PHL
+  - MYS
+  - THA
+  - VNM
+  - CHN
+  - EGY
+  - MAR
+  - KEN
+  - GHA
+  - NGA
+  period:
+  - 1971
+  - 2019
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  treatment:
+  - name: liberalisation_episode_indicator
+    source: fraser_efw:aggregate_score
+    transformation: indicator
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  controls:
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+  - name: gross_capital_formation_pct_gdp
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: level
+estimator:
+  template: event_study
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Stacked event-study across liberalisation-episode panel since 1971. Outcome: real GDP per capita growth at horizons h ∈ {-5,-3,0,3,5,10}. Pre-trend tests at h=-5,-3 distinguish policy causation
+    from reverse causation. Episodes coded from Sachs-Warner trade-openness, IMF capital-account, and product-market deregulation indicators.
+
+    '
+scope:
+  period:
+  - 1971
+  - 2023
+  countries:
+  - GLOBAL
+  - OECD
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  policy_family:
+  - institutional_reform
+  - trade_policy
+  - regulation
+  - privatisation_nationalisation
+  treatment_tags:
+  - liberalisation_episodes
+  - trade_liberalisation_episodes
+  - product_market_deregulation
+  - soe_divestiture
+  - capital_account_liberalisation
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Classical-liberal claim that growth follows liberalisation rather than precedes it is the core test of this hypothesis. Relinked from us_eu_gdp_per_capita_divergence_policy_causes in Phase 4E.

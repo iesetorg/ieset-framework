@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: unfunded_fiscal_expansion_above_zlb_bond_market_response
+version: 1
+status: pre_registered
+topic: monetary
+claim: Truss 2022 mini-budget shows that unfunded fiscal expansion above the ZLB triggers sharp bond-market
+  and currency responses through expected-inflation and risk-premium channels.
+notes: Origin is auto-generated coverage-gap stub seeded from New Keynesian framing of the Truss
+  2022 mini-budget as a sharp bond-market and FX response to unfunded fiscal expansion above the ZLB.
+  Human review required.
+prior_confidence: 0.70
+disclosure: Author finds the September 2022 high-frequency event evidence persuasive; risk is
+  treating LDI-cascade dynamics as cleanly identified vs an institutional/regulatory channel from pension funds.
+steelman: hypotheses/steelman/unfunded_fiscal_expansion_above_zlb_bond_market_response.md
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if the GBP/USD spot
+    trough close in the 2022-09-23..2022-09-28 sub-window (announcement →
+    BoE LDI emergency-purchase intervention) is at least 3.0% (log-decline)
+    below the 2022-09-22 pre-announcement close. PARTIAL if the trough
+    decline is in (1.5%, 3.0%). REFUTED if the trough decline is below
+    1.5% or in the wrong direction.
+    Why the trough rather than t+5d close: the spec's literal t..t+5d
+    window is contaminated by the 28-Sep BoE LDI gilt-purchase
+    intervention, which mechanically reverses the FX move inside the
+    window and converts the unfunded-fiscal signal into a "BoE put"
+    signal. Using the trough close anchored to the pre-announcement
+    close isolates the uncontaminated repricing window.
+    INFORMATIVE (not dispositive on verdict): close-to-close t..t+5d
+    GBP/USD move; t..t+10d, t..t+15d (to Hunt U-turn) FX moves; US 10y
+    treasury yield move; VIX move; BoE Bank Rate / SONIA moves.
+    METHOD_VALID: fred:DEXUSUK on disk for the event window; pre-anchor
+    close 2022-09-22 observable. The 30y gilt yield half of the original
+    spec is documented as a data-gap (fred:IRLTLT01GBM156N and a BoE
+    long-gilt series both absent from the current vintage tree); the
+    yield-channel claim therefore remains untested rather than refuted.
+  test: truss_mini_budget_2022_fx_trough_event_study
+  threshold: >-
+    PRIMARY: GBP/USD trough log-decline (2022-09-23..2022-09-28 vs
+    2022-09-22 close) >= 0.030 → SUPPORTED. Between 0.015 and 0.030 →
+    PARTIAL. Below 0.015 or wrong-direction → REFUTED.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic falsification
+  rule to a single dispositive primary statistic on the FX channel: the
+  GBP/USD trough close inside the announcement → BoE-intervention sub-window
+  (2022-09-23..2022-09-28) vs the 2022-09-22 pre-announcement close. The
+  spec's literal t..t+5d window is reported informationally but not used
+  for the verdict because the 28-Sep BoE LDI gilt-purchase intervention
+  is inside it and reverses most of the move. Yield-channel half of the
+  spec (30y gilt yield rise >50bp) is documented as a data-gap pending a
+  fetcher pass for fred:IRLTLT01GBM156N and a BoE long-gilt series; not
+  treated as missing falsifying evidence.
+evidence_type: associational
+
+scope:
+  period: [2022, 2023]
+  countries: [GBR]
+  outcome_dim: [fiscal_policy, inflation, currency_purchasing_power]
+  policy_family: [fiscal_policy, monetary_policy]
+  treatment_tags: [truss_mini_budget_2022, uk_gilt_market_stress, unfunded_fiscal_expansion]
+
+covers_claims:
+  - position_id: new_keynesian
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "New Keynesian claim that unfunded fiscal expansion above the ZLB (Truss 2022) triggers sharp bond-market and currency responses via expected-inflation and risk-premium channels."
+
+estimator:
+  template: event_study
+  clustering: announcement
+  notes: >
+    Stub-level estimator pin for runnability audit. High-frequency event-
+    study around the 23-Sep-2022 Truss/Kwarteng mini-budget; outcomes are
+    GBP/USD, 10y gilt yield, and 30y gilt yield in intraday windows
+    (announcement-day and t+5d). Comparator: bracketed UK policy events with
+    fully-funded packages. Falsification rule and variables block remain to
+    be filled when this stub is promoted from draft.
+
+sample:
+  countries: [GBR]
+  period: [2022, 2023]
+  temporal_structure: time_series
+
+variables:
+  outcome:
+    - name: gilt_yield_10y
+      source: "boe:bank_rate; fred:IRLTLT01GBM156N"
+      transformation: level_change_bps
+    - name: gilt_yield_30y
+      source: "boe:bank_rate"
+      transformation: level_change_bps
+      notes: "30y gilt; the dramatic September 2022 LDI-driven move concentrated at long end."
+    - name: gbp_usd_exchange_rate
+      source: "fred:DEXUSUK"
+      transformation: log_diff
+    - name: uk_inflation_breakeven_5y
+      source: "boe:bank_rate"
+      transformation: level_change_bps
+      notes: "TODO: UK 5y RPI-linked breakeven; usually computed from gilt-linker spreads — manual-drop."
+  treatment:
+    - name: truss_mini_budget_event
+      source: "constructed: event date = 2022-09-23 (Kwarteng growth plan); reversal = 2022-10-14 (Hunt restoration); resignation = 2022-10-20"
+      transformation: event_date
+    - name: unfunded_fiscal_expansion_indicator
+      source: "constructed: binary = 1 from 2022-09-23 to 2022-10-17 (announcement to U-turn)"
+      transformation: binary
+  controls:
+    - name: us_treasury_10y_yield
+      source: "fred:DGS10"
+      transformation: level_change_bps
+      notes: "Captures global rate environment; isolates UK-specific component."
+    - name: boe_policy_rate
+      source: "boe:bank_rate"
+      transformation: level
+    - name: vix
+      source: "fred:VIXCLS"
+      transformation: level

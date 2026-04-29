@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: union_density_inequality_growth_oecd
+version: 1
+status: draft
+topic: distribution
+claim: Post-1980 OECD countries with higher union density and collective-bargaining coverage maintained lower inequality growth without measurable cumulative growth penalty.
+notes: Maps the social-democratic school's union-density-without-growth-cost claim to an OECD panel using ICTWSS + WID. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.55
+disclosure: Author prior accepts the inequality-suppression effect of bargaining institutions but is agnostic on the no-growth-cost claim — the literature is contested and identification depends on the
+  chosen institutional index (ICTWSS vs OECD-EWAS) and whether one allows a non-linear effect.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: OECD panel FE (1980-2023) of Δ-Gini and 5y cumulative real GDP growth on ICTWSS union density and bargaining coverage; country+year FE, country-clustered SEs. Refute if Gini coefficient sign-flipped
+    at p<0.10 OR growth coefficient negative at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - CAN
+  - AUS
+  - JPN
+  - CHE
+  - BEL
+  - AUT
+  - IRL
+  - KOR
+  - PRT
+  - NZL
+  - GRC
+  period:
+  - 1980
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing union-density series
+  - winsorise inequality-growth rates at 1st/99th sample percentile
+variables:
+  outcome:
+  - name: gini_disposable_income_change
+    source: oecd:OECD.WISE.INE,DSD_IDD@DF_IDD,1.0
+    transformation: level_change
+    notes: 'OECD IDD Gini of equivalised disposable income. Outcome is the within-country growth rate.
+
+      '
+  - name: top_1_share
+    source: wid:wid_all
+    transformation: level
+    notes: 'WID top-1 income share via registered wid publisher; post- filter for top_1 fractile.
+
+      '
+  - name: cumulative_real_gdp_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: cumulative
+    notes: Tests the alleged growth-cost of high union density.
+  treatment:
+  - name: union_density
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TUD,1.0
+    transformation: level
+    notes: 'OECD trade-union density. ICTWSS provides the longer-run series — TODO swap when ICTWSS publisher is registered.
+
+      '
+  - name: collective_bargaining_coverage
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_CBC,1.0
+    transformation: level
+  controls:
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: top_marginal_income_tax_rate
+    source: owid:top-marginal-income-tax-rate
+    transformation: level
+scope:
+  period:
+  - 1980
+  - 2023
+  countries:
+  - OECD
+  outcome_dim:
+  - poverty_inequality
+  - gdp_growth
+  - labour_share
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - collective_bargaining_institutions
+  - union_density
+covers_claims:
+- position_id: social_democratic
+  claim_index: 3
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Social-democratic claim and hypothesis claim are textually identical — post-1980 OECD union density / collective bargaining vs inequality growth and cumulative growth cost.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'OECD panel (1980-2023) regressing inequality growth (Gini, top-1% share) and cumulative real GDP growth on union density and collective-bargaining coverage with country and year FE. ICTWSS series
+    for institutions; WID/OECD-IDD for outcomes. Clustering by country.
+
+    '

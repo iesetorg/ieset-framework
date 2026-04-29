@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: milei_shock_therapy_poverty_and_real_wage_effect
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Milei shock therapy in Argentina from December 2023 produces poverty-rate
+  increase and real-wage decline in its first two years (2024-2025) of
+  magnitude consistent with the Marxist-Leninist critique of neoliberal
+  restoration — distinct from the inflation-stabilisation and output-recovery
+  questions handled by separate hypotheses.
+notes: >
+  Maps the marxist-leninist school's distributional critique of Milei shock therapy (poverty +
+  real-wage in 2024-2025) to a single-country interrupted time series. Estimator and prior set;
+  full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: >
+  Author prior expects measurable short-run distributional pain from any genuine shock-therapy
+  stabilisation, but is uncertain whether 2024-25 poverty/real-wage paths exceed the
+  counterfactual under continued populist money-printing — INDEC measurement breaks under Milei
+  add another layer of identification noise.
+falsification:
+  rule: >
+    The hypothesis is SUPPORTED if Argentina's INDEC headline poverty rate
+    exceeds the pre-Milei December 2023 baseline by at least 5 percentage
+    points at any point during 2024-2025, AND if real private-formal-sector
+    wages fall at least 10% below the December 2023 level over the same
+    window. REFUTED if poverty rate trends flat or below baseline and real
+    wages decline less than 3%.
+  test: 'Argentina interrupted time-series (2020Q1-2025Q4) of INDEC EPH poverty headcount and IPC-deflated private-formal real wage on Milei-2023Q4 break; Newey-West SE. Refute if poverty <+5pp peak and real wage drop <3% across 2024-2025.'
+sample:
+  countries: [ARG]
+  period: [2023, 2027]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: poverty_headcount_rate_indec_eph
+      source: "indec:eph_pobreza"
+      transformation: level
+      notes: "INDEC EPH semestral headline poverty headcount rate, primary outcome. Cross-check WDI SI.POV.NAHC for benchmark."
+    - name: real_wage_index_private_formal
+      source: "indec:ripte"
+      transformation: log
+      notes: "INDEC RIPTE private-formal-sector wage deflated by IPC; secondary outcome."
+  treatment:
+    - name: milei_shock_therapy_break
+      source: "constructed: indicator = 1 for ARG from 2023-12 (Milei inauguration)."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: "indec_ipc:ipc_general"
+      transformation: yoy
+evidence_type: associational
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Single-country interrupted time-series for ARG with Milei-2023Q4 break
+    as treatment. Newey-West HAC SEs. Outcomes: INDEC EPH headline poverty
+    rate and IPC-deflated private-formal real-wage index. Pre-window
+    2020Q1-2023Q3, post-window 2024Q1-2025Q4 (extending where data become
+    available). Caveat: INDEC measurement-break concerns under Milei add
+    identification noise — flagged TODO swarm-6e for sensitivity using
+    UCA-IIE alternative poverty series when registered.
+scope:
+  period: [2023, 2027]
+  countries: [ARG]
+  outcome_dim: [poverty_inequality, wage_stagnation]
+  policy_family: [fiscal_policy, monetary_policy, institutional_reform]
+  treatment_tags: [milei_shock_therapy_2023]
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Marxist-Leninist critique of Milei shock therapy focuses on poverty and real-wage effects. Relinked from milei_shock_therapy_output_recovery_trajectory in Phase 4E — poverty/wage is a distinct outcome from the output-recovery question."

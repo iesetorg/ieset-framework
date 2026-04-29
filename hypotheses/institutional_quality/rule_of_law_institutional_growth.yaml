@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: rule_of_law_institutional_growth
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  Across countries 1996-2023, higher WGI Rule of Law (RL) scores
+  predict higher subsequent real per-capita GDP growth, conditional
+  on standard controls (initial income, investment share, trade
+  openness, demographic composition). The relationship is consistent
+  with the Acemoglu-Robinson institutional-growth hypothesis: property
+  rights, contract enforcement, and impartial adjudication raise the
+  expected return on productive investment and lower the cost of
+  transactions, producing a compounding growth advantage that is not
+  reducible to geography, culture, or initial income. The pre-
+  registered claim is that within-country increases in RL over 5-year
+  blocks positively predict next-block growth, and that cross-
+  sectional rule-of-law level correlates positively with country-mean
+  growth, with effect size consistent with the Kaufmann-Kraay 2002
+  and Acemoglu-Johnson-Robinson 2001 ranges.
+
+evidence_type: associational
+
+sample:
+  countries: [ALB, ARG, AUS, AUT, BEL, BGD, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, ETH, FIN, FRA, GBR, GHA, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KAZ, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PAK, PER, PHL, POL, PRT, ROU, RUS, SGP, SVK, SVN, SWE, THA, TUR, UKR, USA, VNM, ZAF]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years inside active civil-war episodes (UCDP high-intensity codes)"
+    - "drop hyperinflation country-years (> 500% annual CPI) where growth is dominated by monetary collapse and not institutional conditions"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth_5yr_forward
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: cumulative_log_growth_5yr_forward
+    - name: gross_fixed_capital_formation_growth
+      source: "world_bank_wdi:NE.GDI.FTOT.KD.ZG"
+      transformation: 5yr_forward_mean
+      notes: "Secondary outcome; investment channel through which institutional effect is hypothesised to operate."
+  treatment:
+    - name: wgi_rule_of_law
+      source: "wgi:GOV_WGI_RL.EST"
+      transformation: level
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_block_start
+    - name: investment_share_of_gdp_initial
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level_at_block_start
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: dependency_ratio
+      source: "world_bank_wdi:SP.POP.DPND"
+      transformation: level
+    - name: secondary_school_enrolment
+      source: "world_bank_wdi:SE.SEC.ENRR"
+      transformation: level
+    - name: wgi_government_effectiveness
+      source: "wgi:GOV_WGI_GE.EST"
+      transformation: level
+      notes: "Included so the RL coefficient is identified off the non-overlapping component. WGI subcomponents are highly collinear; the decomposition is imperfect."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Rule-of-law quality is a regulatory/institutional variable. No
+  fiscal intervention is coded here. The channel assignment follows
+  invariant 4 for institutional-quality variables.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with standard errors clustered by country. Primary
+    identification from within-country variation in RL over 5-year
+    blocks. Robustness: cross-sectional regression of country-mean
+    growth 1996-2023 on country-mean RL, reported separately. IV
+    robustness using Acemoglu-Johnson-Robinson 2001 settler-mortality
+    instrument is noted as out of scope for v1 because the instrument's
+    validity is contested (Albouy 2012) and the v1 spec sticks to
+    panel-FE identification.
+
+falsification:
+  rule: >
+    Not supported if either (a) the two-way FE panel coefficient on
+    WGI RL is not positive and significant at 5% on 5-year-forward
+    per-capita GDP growth, OR (b) the cross-sectional country-mean
+    coefficient is not positive at 5%, OR (c) the coefficient
+    collapses by more than 70% when WGI Government Effectiveness is
+    added as a co-regressor (suggesting WGI RL is identifying off a
+    general institutional quality factor rather than rule of law
+    specifically). Support requires at least 2 of 3 conditions to be
+    met; 3 of 3 is strong support.
+  test: panel_plus_cross_section_plus_ge_robustness
+  threshold: >
+    At least 2 of 3 conditions:
+    panel_FE_beta(RL) > 0 at p<0.05 AND
+    cross_section_beta(RL_mean) > 0 at p<0.05 AND
+    RL_coefficient_attenuation_when_GE_added < 70%
+
+prior_confidence: 0.75
+disclosure: >
+  The rule-of-law-growth literature (Acemoglu-Johnson-Robinson 2001,
+  Rodrik-Subramanian-Trebbi 2004, Kaufmann-Kraay 2002) is substantial
+  and broadly supports the positive relationship. Glaeser-La Porta-
+  Lopez-de-Silanes-Shleifer 2004 offered the strongest critique,
+  arguing human capital drives institutions rather than vice versa,
+  and that the institutions-growth causal claim is fragile. The prior
+  reflects moderate confidence in the associational claim with lower
+  confidence in causal identification. Author holds priors favouring
+  institutional explanations for growth; pre-registration commits to
+  publishing null findings prominently.
+
+scope:
+  period: [1996, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform]
+  treatment_tags: [wgi_rule_of_law, wgi_government_effectiveness, trade_liberalisation_episodes]
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Classical-liberal claim that property-rights / rule-of-law indices predict per-capita income levels and growth rates in cross-country panels is the core regression tested by this hypothesis."
+  - position_id: empirical_pragmatist
+    claim_index: 2
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Empirical-pragmatist claim that policy effectiveness is conditional on institutional quality is adjacent — this hypothesis tests the direct RL->growth channel rather than the trade-liberalisation interaction, so cover is partial."
+
+steelman: hypotheses/steelman/rule_of_law_institutional_growth.md
+
+linked_hypotheses:
+  - nordic_outcome_persistence_decomposition
+  - trade_liberalisation_growth_effect
+  - industrial_policy_developmentalist_states_growth
+
+notes: >
+  This hypothesis deliberately restricts to the associational claim.
+  The causal version (institutions cause growth rather than co-vary
+  with it) requires stronger identification than WGI panel variation
+  provides; the steelman addresses this and a v2 would use natural-
+  experiment variation (colonial settler mortality, legal-origin
+  heritage) to separate institutions-causes-growth from growth-
+  causes-institutions.

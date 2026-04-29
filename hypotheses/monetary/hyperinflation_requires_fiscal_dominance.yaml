@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: hyperinflation_requires_fiscal_dominance
+version: 1
+status: pre_registered
+topic: monetary
+claim: 'Every documented hyperinflation episode since 1900 (Weimar Germany, post-WW2 Hungary, Yugoslavia 1990s, Zimbabwe 2000s, Venezuela 2010s-2020s, among others) was preceded by fiscal dominance — a
+  state of affairs where monetary policy is subordinated to financing government deficits that cannot be financed by taxation or market-rate borrowing. Monetary mismanagement alone, absent fiscal dominance,
+  has not produced hyperinflation in the historical record.
+
+  '
+evidence_type: descriptive
+sample:
+  countries:
+  - DEU
+  - HUN
+  - YUG
+  - ZWE
+  - VEN
+  - BRA
+  - ARG
+  - BOL
+  - PER
+  - NIC
+  - UKR
+  - BLR
+  - TUR
+  - LBN
+  period:
+  - 1900
+  - 2025
+  temporal_structure: time_series
+  exclusion_rules:
+  - include only country-episodes meeting Cagan's hyperinflation threshold (monthly inflation >= 50%)
+variables:
+  outcome:
+  - name: monthly_inflation_rate
+    source: hanke:hyperinflation_table
+    transformation: raw_monthly_percent
+  treatment:
+  - name: fiscal_dominance_indicator
+    source: 'constructed: (central_bank_direct_gov_financing > 0) AND (tax_revenue < 50% of gov_expenditure) AND (external_market_access = impaired)'
+    notes: 'Constructed per-episode from central bank balance sheet data, fiscal accounts, and sovereign debt market access. Coding rules in hypotheses/monetary/hyperinflation_fiscal_dominance_coding.md
+      (TBD).
+
+      '
+  controls:
+  - name: currency_regime
+    source: ilzetzki_reinhart_rogoff:era_classification_monthly_1940_2019
+    notes: Fixed vs floating regimes enter as context.
+estimator:
+  template: panel_fe
+  clustering: episode
+  notes: 'Descriptive episode-level coding + qualitative reasoning. Panel treatment is cross-episode: does the fiscal-dominance indicator equal 1 for every Cagan-threshold episode?
+
+    '
+falsification:
+  rule: 'Not supported if any documented hyperinflation episode (monthly inflation >= 50% per Cagan) occurred WITHOUT fiscal dominance being present in the preceding 24 months, as determined by the coding
+    rule. A single counter-example falsifies the claim.
+
+    '
+  test: hyperinflation_episode_fiscal_dominance_coverage
+  threshold: 100% of qualifying episodes must exhibit fiscal dominance in the 24 months preceding Cagan threshold breach
+prior_confidence: 0.9
+disclosure: 'High prior confidence reflects the well-documented historical record (see Hanke-Krus catalogue, Reinhart-Rogoff, Bernholz). The hypothesis is included on the public platform because the political-economy
+  implication — that central bank independence and fiscal discipline are the preconditions for price stability — is contested even where the historical record itself is not. Per DISCLOSURE.md, the author''s
+  institutional-quality prior aligns with this claim, which is flagged.
+
+  '
+steelman: hypotheses/steelman/hyperinflation_requires_fiscal_dominance.md
+linked_hypotheses:
+- fiat_expansion_erodes_currency_purchasing_power_long_run
+scope:
+  period:
+  - 1900
+  - 2025
+  countries:
+  - GLOBAL
+  - DEU
+  - HUN
+  - YUG
+  - ZWE
+  - VEN
+  - BRA
+  - ARG
+  - BOL
+  - PER
+  - NIC
+  - UKR
+  - BLR
+  - TUR
+  - LBN
+  outcome_dim:
+  - inflation
+  - fiscal_policy
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  treatment_tags:
+  - fiscal_dominance
+  - hyperinflation_episodes
+  - zimbabwe_land_reform_2000
+  - zimbabwe_hyperinflation_2008
+  - zimbabwe_hyperinflation
+covers_claims:
+- position_id: austrian
+  claim_index: 1
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Austrian claim that hyperinflation requires fiscal dominance as root cause; direct alignment with hypothesis claim and GLOBAL scope.
+- position_id: austrian
+  claim_index: 9
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Austrian claim that Zimbabwe 2000-2008 land-reform-plus-monetisation exemplifies fiscal dominance pathway; aligned with hypothesis's Zimbabwe episode.
+- position_id: chicago_monetarism
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Chicago monetarist claim that hyperinflations always involve fiscal dominance; direct alignment with hypothesis claim.
+- position_id: chicago_monetarism
+  claim_index: 13
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Chicago monetarist claim that Zimbabwe 2000-2008 followed Friedman-Schwartz fiscal-dominance pattern; aligned with hypothesis's Zimbabwe episode.
+- position_id: marxian
+  claim_index: 11
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Marxian claim that Zimbabwe 2000-2008 originated in fiscal-military crisis following land reform rather than purely monetary expansion; aligned with the fiscal-dominance diagnosis though frames
+    causality differently.
+- position_id: mmt
+  claim_index: 0
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT accepts fiscal-dominance necessary condition but disputes that monetary growth alone is sufficient; aligned on necessary condition with hypothesis claim.
+notes: 'Per mega-spec D.1.5 scope decision, this hypothesis is part of the framework''s "defensible monetary scope" and explicitly does NOT extend to claims about fractional reserve banking being inherently
+  unstable or to a gold-standard endorsement. The claim is narrowly about hyperinflation''s necessary fiscal precondition.
+
+  '

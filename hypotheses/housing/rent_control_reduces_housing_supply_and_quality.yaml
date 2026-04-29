@@ -1,0 +1,154 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: rent_control_reduces_housing_supply_and_quality
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  Binding rent control (price ceilings below market clearing with
+  enforcement teeth) reduces aggregate housing supply in affected markets,
+  reduces the quality of existing rent-controlled stock through reduced
+  maintenance incentives, and produces distributional effects favouring
+  long-tenure incumbents over mobile workers and new household formation.
+  These effects are well-identified in the literature and represent a
+  framework-validation opportunity: consensus among economists is ~93%
+  that rent control reduces housing availability and quality
+  (IGM Forum survey). If the framework cannot reproduce this on natural-
+  experiment data (Berlin Mietendeckel 2020-2021, San Francisco 1994
+  expansion, Stockholm persistent control), it is broken.
+
+evidence_type: causal
+
+sample:
+  # Sample specification is CONDITIONAL on data availability; this hypothesis
+  # is pre-registered for running once city-level housing data fetchers ship.
+  # Candidate treated regions + donor pools below.
+  countries: [DEU, USA, SWE]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "analysis operates at city/metro level, not country level; specific sample pinned in v1.1 when data lands"
+
+variables:
+  outcome:
+    - name: rent_growth_rate
+      source: "constructed: city-level rent index — fetcher pending. Candidates: BIS residential property prices by city (WS_SPP has city-level rows for some markets), Eurostat housing prices by Funktionsbereich, US BLS CPI rent subcomponents at MSA level."
+      transformation: yoy_pct_change
+    - name: housing_stock_growth
+      source: "constructed: building-permits or housing-completions at treated-city level — fetcher pending."
+      transformation: yoy_pct_change
+    - name: housing_quality_proxy
+      source: "constructed: maintenance complaints / code violations / age of unit mix — fetcher pending; likely requires city-administrative data not yet in the repo."
+      transformation: level
+
+  treatment:
+    - name: rent_control_bind
+      source: "constructed: indicator = 1 in treated city-years (Berlin 2020-2021 Mietendeckel, SF 1994 expansion post-1995, Stockholm continuous). Precise coding in v1.1 when case data is assembled."
+      transformation: indicator
+
+  controls:
+    - name: metro_population
+      source: "pending"
+      transformation: log
+    - name: metro_gdp_per_capita
+      source: "pending"
+      transformation: level
+
+estimator:
+  template: did_callaway_santanna
+  clustering: metro
+  fixed_effects: [metro, year]
+  notes: >
+    Staggered DiD with metro + year FE. Primary outcomes: rent growth,
+    housing stock growth, quality proxies. Synthetic control per treated
+    case as robustness (Diamond-McQuade-Qian 2019 methodology for SF;
+    Kholodilin-Kohl 2023 for Berlin).
+
+    DATA STATE: this hypothesis is pre-registered ahead of data
+    availability. The fetchers for city-level rent and permit data
+    are not yet shipped. Hypothesis will run in v1.1 once fetchers
+    (likely specialist BLS CPI rent subindex + Eurostat subnational
+    housing) are implemented. Pre-registration now locks the spec so
+    the subsequent run cannot be re-fitted to findings.
+
+falsification:
+  rule: >
+    Not supported if ANY of:
+    (a) Berlin Mietendeckel 2020-2021 did not reduce Berlin rental stock
+        growth or new-rental listings relative to other German cities;
+    (b) San Francisco 1994 expansion did not reduce housing supply
+        growth in affected units relative to synthetic control (Diamond-
+        McQuade-Qian replication);
+    (c) Stockholm continuous control market does not show longer queues
+        + higher informal transfer prices than non-controlled Stockholm
+        non-regulated segment.
+    A clean failure on all three cases would be extraordinary and would
+    overturn current economic consensus; it has very low prior
+    probability (<0.05).
+  test: rent_control_multi_case_replication
+  threshold: >
+    All three cases show expected-direction effect at p<0.10 OR
+    pooled meta-analytic coefficient is negative at p<0.05
+
+prior_confidence: 0.93
+
+disclosure: >
+  Framework validation case per user request. If the model cannot
+  reproduce the ~93%-economist-consensus finding that rent control
+  reduces housing supply, the framework is broken. Author prior is
+  correspondingly extreme.
+
+  Pre-registered ahead of data because (a) the spec is simple and
+  agnostic to specific fetcher details and (b) locking the spec now
+  prevents any future data-dependent re-specification.
+
+steelman: hypotheses/steelman/rent_control_reduces_housing_supply_and_quality.md
+
+linked_hypotheses: []
+
+notes: >
+  Core literature for v1.1 when running:
+    Diamond, McQuade, Qian (2019) 'The Effects of Rent Control
+      Expansion on Tenants, Landlords, and Inequality' AER 109(9).
+    Sims (2007) 'Out of control: what can we learn from the end of
+      Massachusetts rent control?' J Urb Econ 61.
+    Autor, Palmer, Pathak (2014) 'Housing market spillovers' J Pol Econ.
+    Kholodilin, Kohl (2023) 'Rent control: a review of the evidence'
+      J Housing Econ.
+    IGM Forum Chicago Booth survey 'Rent Control' (2012).
+
+  Data fetchers needed:
+    - BLS CPI rent subcomponents by MSA (expand existing data.fetchers.bls)
+    - Eurostat housing statistics (already-shipped fetcher, needs new series)
+    - City-level administrative data for supply / quality proxies
+      (likely requires specialist fetcher per-case)
+
+  This is the first HOUSING-topic hypothesis in the repo. Needs new
+  topic_dir hypotheses/housing/ (already implicit via topic enum).
+
+scope:
+  period: [2000, 2023]
+  countries: [DEU, USA, SWE]
+  outcome_dim: [housing, regulation_compliance_cost]
+  policy_family: [housing_policy, regulation]
+  treatment_tags: [berlin_mietendeckel_2020, sf_rent_control_1994, stockholm_rent_control, rent_control, price_controls, second_generation_rent_stabilisation]
+
+covers_claims:
+  - position_id: chicago_monetarism
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Chicago-monetarist claim cites Friedman 'Roofs or Ceilings?' (1946) applied to SF/Berlin/Stockholm; hypothesis tests the same three natural experiments on supply/quality outcomes. Audit flagged claim period [1946, 2023] mismatch with hypothesis [2000, 2023] — covered here but Phase 4C may relink or rescope."
+  - position_id: classical_liberal
+    claim_index: 1
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Classical-liberal prediction that rent control produces shortages and misallocation aligns directly with hypothesis's expected negative supply and quality effects in Berlin, SF, and Stockholm."
+  - position_id: democratic_socialist
+    claim_index: 1
+    polarity: aligned
+    school_prediction: falsified
+    confidence: medium
+    notes: "Democratic-socialist defence of well-designed second-generation rent stabilisation is the contra-position; hypothesis predicts supply effects dominate across the three cases, which would falsify the claim."

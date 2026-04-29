@@ -1,0 +1,388 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: great_leap_forward_famine_output_collapse_1959_1961
+version: 1
+status: pre_registered
+topic: growth
+
+claim: >
+  Mao Zedong's Great Leap Forward (1958-1962), characterised by forced
+  collectivisation into People's Communes, Lysenkoist rejection of
+  scientific agronomy, diversion of rural labour to backyard steel
+  production, and cadre-competition-driven inflation of reported
+  harvests, produced a canonical institutional-economic collapse that
+  manifests as >=7 of 10 pre-registered extreme-outcome metrics, each
+  drawn from an independent data source or methodology family and
+  measuring a different causal layer (demographic mortality, agricultural
+  output, macroeconomic contraction, institutional coverage, human
+  capital). The canonical-case claim is that no non-war peacetime
+  economy in the 20th-century panel matches even 4 of these 10
+  thresholds simultaneously; China 1958-1962 matches most. A refutation
+  (<=3 metrics met) would indicate that the consensus demographic and
+  output reconstructions (Banister 1987, Ashton et al. 1984, Peng 1987,
+  Yang Jisheng 2008) are substantially overstated, or that the
+  institutional-quality coding of the GLF is misplaced.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [CHN]
+  period: [1958, 1965]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "Pre-GLF baseline uses 1952-1957 People's Republic reconstruction average (post-land-reform, pre-commune)"
+    - "Post-GLF readjustment period 1963-1965 (Liu Shaoqi / Deng Xiaoping Seven Thousand Cadres Conference era) used as recovery-falsification window, not part of the collapse pattern-match"
+    - "No donor pool required; this is a single-country canonical-case pattern match against pre-registered extreme-outcome thresholds"
+    - "Benchmark distribution (was any 20th-century non-war peacetime country matching >=4 of 10 thresholds?) computed ex post from the Maddison + UN WPP + FAOSTAT world panel as a sanity check on uniqueness"
+
+scope:
+  period: [1958, 1965]
+  countries: [CHN]
+  outcome_dim: [gdp_growth, life_expectancy_health, institutional_quality, demographics_migration]
+  policy_family: [privatisation_nationalisation, institutional_reform, industrial_policy]
+  treatment_tags: [great_leap_forward_1958, peoples_communes_1958, mao_collectivisation, backyard_steel_campaign, lysenkoism]
+
+variables:
+  outcome:
+    - name: multi_metric_collapse_score
+      source: "derived: count of canonical_metrics with threshold met"
+      transformation: count
+
+canonical_metrics:
+  - metric_id: excess_mortality_1958_1962
+    description: >
+      Excess deaths in China 1958-1962 relative to a counterfactual
+      1957 mortality baseline. Consensus academic reconstructions span
+      15-45 million: Ashton et al. (1984) ~30M, Banister (1987) ~30M,
+      Peng Xizhe (1987) ~23M (lower bound), Yang Jisheng (2008) ~36M,
+      Dikotter (2010) ~45M (upper bound). No other 20th-century
+      peacetime event approaches this magnitude.
+    threshold: ">15 million excess deaths over 1958-1962"
+    window: "1958-1962"
+    source: "china_manual:great_leap_excess_mortality_millions; manual:banister_1987_chinas_changing_population; manual:ashton_hill_piazza_zeitz_1984_pdr; manual:peng_xizhe_1987_pdr; manual:yang_jisheng_2008_tombstone"
+    data_quality_flag: >
+      Chinese official vital registration 1958-1962 is materially
+      censored — cadres suppressed death reports to avoid punishment.
+      Consensus reconstructions use 1953, 1964, and 1982 census cohort
+      back-projection (Coale-Banister methodology) rather than
+      contemporaneous reporting.
+    independence_justification: >
+      Demographic reconstruction from census-cohort back-projection is
+      methodologically distinct from any contemporaneous administrative
+      series. Multiple independent demographers (Banister at US Census
+      Bureau, Ashton at ANU, Peng at Fudan) converged on overlapping
+      estimates using different back-projection specifications.
+    direction: supports_claim
+
+  - metric_id: grain_output_collapse
+    description: >
+      Chinese grain output fell from ~200 million tonnes (1958 official
+      peak, itself likely inflated) to ~143-144 million tonnes (1960)
+      per the post-1978 revised NBS series, a nominal >25% decline.
+      Using Peng's reconstructed series the true 1958 peak was closer
+      to 200Mt and the 1960 trough to 144Mt; using Ashton et al. the
+      decline is ~28%.
+    threshold: ">20% decline in national grain output from 1958 peak to 1960 trough"
+    window: "1958-1961"
+    source: "china_manual:grain_output_million_tonnes; manual:nbs_china_statistical_yearbook_1983_revised_grain_series; faostat:QCL (CHN, primary cereals, post-1961 coverage); manual:perkins_1969_agricultural_development_china"
+    data_quality_flag: >
+      Contemporaneous 1958-1960 grain output reports were severely
+      inflated by cadre competition (Kung & Chen 2011). The 1983 NBS
+      revision and Perkins' independent reconstruction are the
+      consensus-accepted series for this window. FAOSTAT coverage
+      begins 1961.
+    independence_justification: >
+      Physical-output measurement (tonnes of grain) is conceptually
+      independent of mortality, demographic, and monetary series.
+      Cross-checked across three independent reconstructions (NBS
+      revised, Perkins, Chinese Academy of Agricultural Sciences).
+    direction: supports_claim
+
+  - metric_id: gdp_per_capita_contraction
+    description: >
+      Maddison Project Database reconstruction of Chinese real GDP per
+      capita shows a peak-to-trough decline of ~15-25% between 1958
+      and 1961 (depending on vintage). This is the largest peacetime
+      peak-to-trough per-capita contraction in the 20th-century Chinese
+      series and one of the largest in the global Maddison panel
+      outside declared conflict.
+    threshold: ">15% cumulative real GDP per capita contraction from 1958 peak to 1961 trough"
+    window: "1958-1962"
+    source: "maddison:mpd2020 (CHN); manual:perkins_yusuf_1984_rural_development_china"
+    data_quality_flag: >
+      Chinese national accounts 1958-1962 are reconstructed ex post;
+      contemporaneous material product balance series are materially
+      unreliable. Maddison uses sectoral physical-output
+      reconstructions.
+    independence_justification: >
+      Macroeconomic aggregate constructed from sectoral physical-output
+      indicators (grain, steel, electricity, textiles) aggregated via
+      Paasche/Laspeyres price weights. Methodologically distinct from
+      vital-registration and survey-based metrics.
+    direction: supports_claim
+
+  - metric_id: commune_coverage_rate
+    description: >
+      By end-1958, >99% of Chinese rural households had been enrolled
+      into People's Communes (typically 4,000-5,000 households each),
+      with simultaneous abolition of private plots, mess-hall collective
+      dining, and militia-style labour mobilisation. The speed and
+      totality of this institutional restructuring is unmatched in the
+      20th-century non-war record.
+    threshold: ">90% of rural households enrolled in People's Communes within 18 months of August 1958 Beidaihe Conference"
+    window: "1958-1959"
+    source: "china_manual:commune_coverage_pct_rural_households; manual:ccp_central_committee_beidaihe_resolution_august_1958; manual:chan_madsen_unger_1984_chen_village; manual:macfarquhar_1983_origins_cultural_revolution_vol2"
+    independence_justification: >
+      Institutional-coverage variable measured by administrative decree
+      and local-history case studies, not by output, mortality, or
+      price statistics. Directly documents the treatment bundle rather
+      than its outcomes.
+    direction: supports_claim
+
+  - metric_id: crude_birth_rate_collapse
+    description: >
+      Chinese crude birth rate fell from ~34 per 1,000 (1957) to ~18
+      per 1,000 (1961) per Banister (1987) reconstruction — a >45%
+      decline. Amenorrhea from severe malnutrition and delayed/foregone
+      marriages are the demographic mechanisms. Post-1962 rebound above
+      trend confirms the famine-amenorrhea interpretation.
+    threshold: ">25% decline in crude birth rate from 1957 baseline to 1961 trough"
+    window: "1957-1962"
+    source: "china_manual:crude_birth_rate_per_1000; manual:banister_1987_chinas_changing_population; un_wpp:crude_birth_rate (CHN); manual:coale_1981_population_trends_china"
+    independence_justification: >
+      Fertility measurement is demographically distinct from mortality
+      — amenorrhea mechanism operates via maternal body fat and HPA
+      axis independently of excess-death pathways. Cross-validated by
+      1982 census cohort reconstruction of 1958-1962 birth cohorts.
+    direction: supports_claim
+
+  - metric_id: life_expectancy_collapse
+    description: >
+      Banister (1987) estimates Chinese life expectancy at birth fell
+      from ~50 years (1957) to ~24-29 years (1960), a >20-year
+      one-year-lived-experience decline. This is the largest peacetime
+      life-expectancy collapse in the 20th-century demographic record
+      excluding conflict zones.
+    threshold: ">15 year decline in period life expectancy at birth from 1957 baseline to 1960 trough"
+    window: "1957-1962"
+    source: "china_manual:life_expectancy_at_birth_years; manual:banister_1987_chinas_changing_population; manual:coale_1984_rapid_population_change; who_gho:WHOSIS_000001"
+    data_quality_flag: >
+      Period life expectancy in famine years is mechanically sensitive
+      to infant and early-child mortality spikes; Banister's estimates
+      use age-specific death rates reconstructed from 1953-1964 census
+      linkage rather than contemporaneous registration.
+    independence_justification: >
+      Period life expectancy is a functional of the entire age-specific
+      mortality schedule, not just excess deaths; it captures the
+      distribution of deaths across age cohorts. Demographically
+      distinct from aggregate excess-death count.
+    direction: supports_claim
+
+  - metric_id: provincial_famine_severity_dispersion
+    description: >
+      Provincial excess-mortality reconstructions (Peng 1987, Yang 2008,
+      Cao Shuji 2005) show Anhui, Sichuan, Guizhou, Gansu, Qinghai,
+      and Henan each suffered excess mortality exceeding 10-15% of
+      1957 provincial population. The geographic concentration in
+      Maoist-faction provinces (Kung & Chen 2011) is the signature
+      of the institutional-political mechanism.
+    threshold: ">=3 provinces with excess mortality exceeding 10% of 1957 provincial population"
+    window: "1958-1962"
+    source: "china_manual:provincial_excess_mortality_pct_1957_pop; manual:cao_shuji_2005_da_jihuang; manual:peng_xizhe_1987_pdr; manual:yang_jisheng_2008_tombstone; manual:kung_chen_2011_aer"
+    data_quality_flag: >
+      Provincial-level figures are reconstructed from 1982 census data
+      back-projected using provincial survival ratios; some provinces
+      (Anhui, Sichuan) have stronger local-gazetteer corroboration
+      than others.
+    independence_justification: >
+      Sub-national dispersion metric is distinct from national
+      aggregates — tests whether the shock was concentrated (consistent
+      with institutional/political-economy mechanism) versus diffuse
+      (consistent with nationwide weather shock). Kung & Chen provide
+      the key falsification-relevant variation.
+    direction: supports_claim
+
+  - metric_id: net_grain_export_during_famine
+    description: >
+      China continued to export grain (principally to the USSR as debt
+      repayment and to client states as aid) through 1959-1960 despite
+      domestic famine. Net grain exports in 1959 were ~4.15 million
+      tonnes and in 1960 ~2.72 million tonnes per customs archives.
+      This is the decisive empirical fact distinguishing informational
+      failure (cadres over-reported harvests, Beijing planned exports
+      on false figures) from resource-constraint famine.
+    threshold: ">1 million tonnes net grain exports in at least one of 1959 or 1960"
+    window: "1959-1961"
+    source: "china_manual:net_grain_exports_million_tonnes; manual:prc_customs_annual_trade_statistics_archive; manual:riskin_1987_chinas_political_economy; manual:li_wenhua_2005_grain_trade_during_great_leap"
+    independence_justification: >
+      Foreign-trade customs series are distinct from domestic output,
+      mortality, and demographic series. Cross-validated against USSR
+      foreign-trade archives (Soviet imports from China) and Albania /
+      North Korea grain-aid records.
+    direction: supports_claim
+
+  - metric_id: backyard_steel_campaign_capital_waste
+    description: >
+      The 1958-1959 backyard steel campaign mobilised ~90 million
+      labourers to produce ~11 million tonnes of nominal steel of which
+      a large share (contemporary estimates 30-60%, Bachman 1991) was
+      unusable pig-iron scrap. The campaign simultaneously diverted
+      agricultural labour at harvest 1958 and destroyed cooking pots /
+      metal tools melted down as raw feedstock. Combined capital-waste
+      estimates range 2-5% of 1958 GDP.
+    threshold: ">25% of reported backyard-steel output classified as unusable, or >50 million labour-days diverted from 1958 autumn harvest"
+    window: "1958-1959"
+    source: "china_manual:backyard_steel_unusable_pct; manual:bachman_1991_bureaucracy_economy_leadership_china; manual:macfarquhar_1983_origins_cultural_revolution_vol2; manual:lardy_1987_cambridge_history_china_vol14"
+    independence_justification: >
+      Industrial-campaign metric (steel tonnage, labour-days) distinct
+      from agricultural output and demographic series. Documents the
+      labour-diversion mechanism as a direct causal channel.
+    direction: supports_claim
+
+  - metric_id: post_readjustment_recovery_speed
+    description: >
+      Following the January 1962 Seven Thousand Cadres Conference and
+      the Liu Shaoqi / Deng Xiaoping / Chen Yun readjustment (return of
+      private plots, partial commune de-escalation, grain-import
+      authorisation), Chinese grain output recovered to the 1957
+      pre-GLF level by 1965 and crude birth rate rebounded above trend
+      by 1963. This rapid reversal following policy change is the
+      classic canonical-case signature that the collapse was
+      institutional rather than structural.
+    threshold: "Grain output recovers to >=1957 level within 5 years of the January 1962 readjustment; crude birth rate rebounds above 1957 level within 3 years"
+    window: "1962-1967"
+    source: "manual:nbs_china_statistical_yearbook_1983_revised_grain_series; un_wpp:crude_birth_rate (CHN); maddison:mpd2020 (CHN); manual:macfarquhar_1997_origins_cultural_revolution_vol3"
+    independence_justification: >
+      Recovery metric is structurally a mirror-image test — a
+      collapse caused by institutional policy should reverse when
+      the policy reverses, whereas a collapse caused by a structural
+      shock (weather, resource depletion) would not. This is the
+      canonical-case falsification check for the institutional
+      attribution.
+    direction: supports_claim
+
+multi_metric_falsification:
+  total_metrics: 10
+  support_threshold: 7
+  refute_threshold: 3
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The Great Leap Forward is a bundled intervention — agricultural
+  collectivisation (People's Communes), ideological Lysenkoism in
+  agronomy (close-planting, deep-ploughing), industrial mobilisation
+  (backyard steel), and political-incentive restructuring (cadre
+  competition for Maoist favour producing inflated harvest reports).
+  The canonical-case hypothesis treats the bundle as the unit of
+  analysis; the January 1962 readjustment (recovery metric) is
+  equivalent to reversing the bundle, which is why rapid recovery
+  is diagnostic of the institutional attribution.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    For each of the 10 canonical metrics, evaluator fetches the
+    specified source (primary literature reconstructions for the
+    Chinese state-statistics-censored window) and evaluates the
+    threshold. Support if metrics_met >= 7, refute if metrics_met
+    <= 3, inconclusive in the 4-6 range. Benchmark check: no non-war
+    peacetime country in the 20th-century Maddison + UN WPP + FAOSTAT
+    panel should match >=4 of these thresholds; if one does (candidates
+    to check: Soviet famine 1932-1933, North Korean famine 1994-1998,
+    Cambodian famine 1975-1979 — all plausibly non-peer-set-valid
+    because each is itself a canonical institutional-collapse case),
+    the metric-set needs revision to ensure the GLF discrimination is
+    against ordinary peacetime economies, not against other canonical
+    disasters.
+
+falsification:
+  rule: >
+    Hypothesis is SUPPORTED if >=7 of 10 canonical metrics meet their
+    pre-registered thresholds. Hypothesis is REFUTED if <=3 of 10
+    metrics meet their thresholds. The 4-6 metric range is inconclusive.
+    Additional falsification: if any non-war, non-canonical-collapse
+    peacetime country in the 20th-century panel matches >=4 of these
+    10 thresholds, the metric-set is not GLF-discriminating and the
+    hypothesis is methodologically invalid regardless of the China
+    metric count. The January 1962 readjustment recovery (metric 10)
+    is itself a built-in falsification — if grain output and fertility
+    did not rapidly recover after the policy reversal, the institutional
+    attribution (versus structural / weather) would be falsified.
+  test: multi_metric_canonical_case_pattern_match
+  threshold: "metrics_met_china_1958_1962 >= 7 AND max_metrics_met_non_war_non_canonical_peer <= 3"
+
+prior_confidence: 0.97
+
+disclosure: >
+  This hypothesis is a methodology-fix supersession of the original
+  causal-inference GLF specification (v1 causal, event-study template)
+  which was epistemically weak because (a) Chinese official statistics
+  for the 1958-1962 window are materially censored — grain reports
+  inflated by cadre competition, death reports suppressed to avoid
+  punishment — so a single-estimator dependent variable is unreliable,
+  (b) there is no valid donor pool (no peer country had comparable
+  pre-1958 institutional structure AND no comparable bundled
+  intervention AND no comparable political-economy shock), and (c)
+  the treatment is a multi-year bundled institutional complex, not
+  a single policy event. The multi-metric specification replaces a
+  single biased signal with 10 independent signals drawn from
+  heterogeneous publishers and methodology families.
+
+  Author's market-liberal priors are aligned with the hypothesis
+  (the author believes forced collectivisation plus informational
+  failure in central planning caused the GLF famine, not weather or
+  Soviet debt). The pre-registered 10-metric threshold set, the
+  requirement that no non-war non-canonical peer match >=4 metrics,
+  and the explicit institutional-reversal falsification (metric 10)
+  bind the author to a pattern-match that is not simply a relabelling
+  of priors. A refutation here would indicate either (a) the
+  Banister/Ashton/Peng/Yang consensus reconstructions are substantially
+  overstated, which would overturn a large body of academic
+  demography, or (b) the framework has a systematic fault across
+  multiple independent primary-literature sources, which is a
+  stronger diagnostic than any single causal test could provide.
+
+conflict_disclosure: >
+  Author holds no Chinese onshore asset exposure and no consulting
+  relationship with parties in the PRC historiography debate.
+
+steelman: hypotheses/steelman/great_leap_forward_famine_output_collapse_1959_1961.md
+
+linked_hypotheses:
+  - zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009
+  - venezuela_chavismo_canonical_case_multi_metric
+  - north_south_korea_development_divergence_1953_present
+
+notes: >
+  Methodological rationale: single-estimator causal tests (panel FE,
+  synthetic control, event study) are inappropriate for the GLF because
+  (a) outcome data is materially censored in the exact window where
+  the effect is largest (1958-1962 Chinese state statistics are
+  consensus-unreliable), (b) the treatment is a multi-year bundled
+  institutional complex (collectivisation + Lysenkoism + backyard
+  steel + cadre-pressure informational failure), (c) the donor-pool
+  problem is severe (no peer country has comparable pre-1958 land-reform
+  baseline AND no comparable treatment bundle AND no comparable
+  political-economy shock). In these conditions a pre-registered
+  multi-metric pattern-match is epistemically stronger than a single
+  biased causal estimate.
+
+  Data-provenance rule: each of the 10 metrics must be evaluable from
+  a different root data source (different publisher OR different
+  methodology family — e.g. Banister cohort back-projection vs Peng
+  provincial reconstruction vs NBS revised physical-output series vs
+  customs archives vs Maddison sectoral aggregate). This is checked
+  by the evaluator to ensure the 10 metrics are not effectively one
+  metric in disguise.
+
+  Note on provincial-mortality correlation: the Kung & Chen (2011)
+  AER finding that provincial mortality correlates with cadre
+  political pressure (proximity to Maoist faction strongholds) and
+  with collectivisation intensity, net of rainfall anomalies, is
+  preserved in the corpus as a complementary causal test. It is not
+  the primary evidence here because the primary claim of the
+  canonical-case hypothesis is the pattern-match against extreme
+  outcomes, which is logically prior to attribution of the mechanism.
+
+  Supersession note: this version 1 fully supersedes any prior
+  draft/candidate causal specification of the GLF collapse for
+  framework-validation purposes.

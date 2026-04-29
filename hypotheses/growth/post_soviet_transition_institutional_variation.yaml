@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: post_soviet_transition_institutional_variation
+version: 1
+status: draft
+topic: growth
+claim: Post-1991 post-Soviet transition outcomes vary sharply with pre-1991 and transition-era institutional
+  quality; Estonia/Poland (high inclusive-institution build-out) outperformed Russia/Ukraine (partial
+  extraction persistence).
+notes: >-
+  Seeded from an institutionalist claim that post-1991 transition outcomes
+  vary sharply with pre-1991 and transition-era institutional quality, with
+  Estonia/Poland (high inclusive-institution build-out) outperforming
+  Russia/Ukraine. Cross-country panel of post-Soviet transition cohort;
+  human review needed for the institutional-quality scoring choice.
+prior_confidence: 0.65
+disclosure: >-
+  Authorial bias risk: institutionalist framing privileges the inclusive-
+  institution channel and treats institutional quality as exogenous when
+  it is partly endogenous to the same EU-accession orientation that drove
+  reform speed. Pre-1991 cultural and geographic ties to the West confound
+  institutional-quality measures.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: "Panel FE of post-Soviet log GDP per capita on WGI rule-of-law and control-of-corruption, country and year FE 1991-2019; falsified if institutional-quality coefficient not positive at p<0.10 or below 5%."
+evidence_type: associational
+
+sample:
+  countries: [EST, LVA, LTU, POL, CZE, SVK, HUN, ROU, BGR, RUS, UKR, BLR, MDA, KAZ, KGZ, TJK, UZB, GEO, ARM, AZE]
+  period: [1991, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020+ to avoid COVID and post-2022 Russia/Ukraine war distortion"
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: maddison_real_gdp_pc
+      source: "maddison:gdppc_ppp"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: control_of_corruption
+      source: "wgi:CC.EST"
+      transformation: level
+    - name: polity_score
+      source: "polity5:polity2"
+      transformation: level
+    - name: vdem_liberal_democracy
+      source: "vdem:v2x_libdem"
+      transformation: level
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Post-Soviet country panel 1991-2023 of real GDP per capita on
+    transition-era institutional-quality scores (EBRD transition indicators,
+    World Governance Indicators rule-of-law, Polity IV democracy). Tests
+    whether institutional-quality differences explain the cross-country
+    spread in transition-cohort outcomes.
+
+scope:
+  period: [1991, 2023]
+  countries: [EST, POL, RUS, UKR, POST_SOVIET]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, privatisation_nationalisation]
+  treatment_tags: [soviet_collapse_1991, post_soviet_transition]
+
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 6
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Direct alignment: claim asserts post-Soviet transition outcomes vary with institutional quality, Estonia/Poland outperforming Russia/Ukraine."

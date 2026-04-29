@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nordic_outcome_persistence_decomposition
+version: 1
+status: pre_registered
+methodology_note: Superseded by nordic_outcome_persistence_decomposition_v2 for scoreboard reporting (2026-04-24
+  audit). v1 used a three-channel decomposition (WGI gov effectiveness + rule of law + IMF debt/GDP) and
+  returned `weakened` on a 0.30 residual-share threshold; v2 broadened to eight channels and produced
+  `partially supported`. v1 is retained in the library as pre-registration proof-of-work; the scoring
+  layer should deduplicate and count v2 only.
+topic: institutional_quality
+claim: 'Nordic persistent outcome advantages (GDP per capita, Gini disposable income, unemployment) over
+  comparable high-welfare Southern European economies over 1996-2023 are substantially explained by a
+  decomposable set of institutional, market-economy, and fiscal-discipline features — specifically government
+  effectiveness, rule of law, and debt-to-GDP ratio — rather than by welfare architecture or Nordic-specific
+  cultural factors alone. Country-specific residuals after channel controls and country fixed effects
+  should account for a minority of the raw Nordic-vs-Southern-Europe outcome gap.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - ISL
+  - ESP
+  - ITA
+  - GRC
+  - PRT
+  - FRA
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing outcome variable
+  - drop Iceland pre-1998 where WGI coverage is incomplete
+  - winsorise Gini at 1st/99th percentile within sample
+variables:
+  outcome:
+  - name: gdp_per_capita_ppp_constant
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: gini_disposable_income
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+    notes: WDI coverage has gaps; Eurostat gini fallback will be added as v2 robustness spec when eurostat
+      fetcher ships.
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  decomposition_channels:
+  - name: government_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+    notes: WGI GE point estimate, z-scored across the full WGI sample in the fetcher.
+  - name: rule_of_law
+    source: wgi:GOV_WGI_RL.EST
+    transformation: level
+  - name: debt_to_gdp
+    source: world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: level
+    notes: Central government debt. IMF GGXWDG_NGDP used as alternative specification in a v2 robustness
+      run.
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: urbanisation
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Specification: outcome = b0 + b1*GovEff + b2*RuleOfLaw + b3*DebtGDP + b4*log(pop) + b5*urbanisation
+    + alpha_i (country FE) + gamma_t (year FE) + epsilon. Driscoll-Kraay SEs clustered by country to handle
+    cross- sectional dependence. Decomposition step: re-estimate on Nordic-vs- Southern-Europe dummy panel
+    without channels vs with channels; report how much of the raw Nordic-indicator coefficient the channels
+    absorb.
+
+    Known channel omissions for v1: OECD EPL (labour market flexibility) and WVS/V-Dem social trust measures
+    are not yet fetcher-ready. These are acknowledged in the falsification rule — a large residual in
+    v1 is compatible with either the hypothesis being weak OR the missing channels being important. A
+    v2 spec adds these once the fetchers ship and reports whether the residual collapses.
+
+    Norway''s SWF mechanism is absorbed into the Norway country fixed effect rather than modelled as a
+    channel variable; the hypothesis does not claim the SWF''s contribution is separable from Norway''s
+    country-specific time-invariant features at v1.
+
+    '
+scope:
+  period: [1996, 2023]
+  countries: [NOR, SWE, DNK, FIN, ISL, ESP, ITA, GRC, PRT, FRA, NORDIC, SOUTHERN_EUROPE]
+  outcome_dim: [institutional_quality, gdp_growth, welfare_state, poverty_inequality]
+  policy_family: [institutional_reform, welfare_architecture, fiscal_policy]
+  treatment_tags: [nordic_model, nordic_welfare_architecture, government_effectiveness_channel, rule_of_law_channel, debt_to_gdp_channel, nordic_welfare_model, universal_welfare_architecture]
+
+covers_claims:
+  - position_id: empirical_pragmatist
+    claim_index: 0
+    polarity: aligned
+    school_prediction: supported
+    confidence: low
+    notes: "Abstract meta-claim about separability of intervention-vs-market conditions is not tightly matched to the Nordic-specific decomposition; retained as weak cover pending a dedicated institutional-conditionality meta-hypothesis."
+  - position_id: institutionalism
+    claim_index: 0
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Core institutionalist prediction — Nordic outcomes decompose primarily into institutional-quality channels — is exactly what this hypothesis tests."
+  - position_id: new_keynesian
+    claim_index: 1
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "New Keynesian claim that Nordic welfare plus counter-cyclical fiscal stabilisation can deliver strong growth is within the hypothesis sample; decomposition will quantify how much of the residual is welfare+fiscal-rule coded."
+  - position_id: social_democratic
+    claim_index: 0
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Social-democratic claim that welfare is co-necessary with institutions is the direct counter-framing the hypothesis adjudicates via channel decomposition."
+
+falsification:
+  rule: 'Not supported if the Nordic-dummy coefficient after including the three decomposition channels
+    (government effectiveness, rule of law, debt/GDP) plus country and year fixed effects remains greater
+    than 30 percent of the raw Nordic-dummy coefficient (pre-channel) across all three outcome specifications.
+    A large residual would indicate Nordic-specific factors beyond the measured channels are doing most
+    of the explanatory work, and the hypothesis — that decomposable institutional features explain the
+    gap — would be weakened. A clean finding requires channels to absorb at least 70 percent of the raw
+    gap on the primary outcome (log GDP per capita PPP) and at least 50 percent on the other two.
+
+    '
+  test: nordic_dummy_residual_share_across_outcomes
+  threshold: 'residual_share(gdp_pc_ppp)  <= 0.30  AND residual_share(gini)        <= 0.50  AND residual_share(unemployment)
+    <= 0.50
+
+    '
+prior_confidence: 0.75
+disclosure: 'The author''s disclosed priors align with the hypothesis — market-liberal framing expects
+  institutional features to explain Nordic outcomes more than welfare-architecture magic. The pre-registration
+  commits to publishing the result even if the residual exceeds the threshold, in which case the framework''s
+  market-liberal reading of Nordic outcomes is weakened and the update is surfaced prominently per the
+  framework- level asymmetric-credit-for-prior-updating rule in DISCLOSURE.md.
+
+  '
+steelman: hypotheses/steelman/nordic_outcome_persistence_decomposition.md
+linked_hypotheses:
+- welfare_architecture_comparative_effectiveness
+linked_conditions:
+- nordic_institutional_design
+notes: 'First-run readiness: all cited publishers (world_bank_wdi, wgi) are status: ready in data/fetchers/publishers.yaml.
+  All cited series are in data/vintages/ as of the Apr-2026 baseline bootstrap pull (WDI NY.GDP.PCAP.PP.KD,
+  SI.POV.GINI, SL.UEM.TOTL.ZS, GC.DOD.TOTL.GD.ZS, SP.POP.TOTL, SP.URB.TOTL.IN.ZS; WGI GE.EST, RL.EST).
+  This is the first hypothesis in the library whose variables are fully data-on- disk, making it the natural
+  first-run candidate.
+
+  The spec references D.2.9 Extended Nordic Model Analysis in the condition taxonomy; that entry''s institutional_features
+  list is the source of the channels specified here. v2 will add labour market flexibility and social
+  trust as channels when OECD EPL and WVS/V-Dem fetchers ship.
+
+  '

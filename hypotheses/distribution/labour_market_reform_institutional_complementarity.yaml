@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_market_reform_institutional_complementarity
+version: 1
+status: draft
+topic: distribution
+claim: Germany's Agenda 2010 labour-market reforms worked within the Ordoliberal framework precisely because they preserved collective-bargaining institutions and vocational-training architecture; the same
+  reforms imposed on UK-style labour markets produced larger inequality increases.
+notes: Maps the ordoliberal school's institutional-complementarity claim (Hartz reforms preserved bargaining + training, UK-style deregulation did not) to a DEU vs GBR panel. Estimator and prior set; full
+  pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: Author prior is sympathetic to the varieties-of-capitalism complementarity argument; the two-country panel is statistically thin and an interaction effect with institutional indices (e.g. CME/LME
+  index) does heavy identification work, so falsification thresholds matter.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE on DEU+GBR (1998-2015) regressing Gini on labour-reform intensity interacted with collective-bargaining-coverage; country+year FE, country-clustered SEs. Refute if interaction term sign-flipped
+    at p<0.10 or |effect|<10% of pre-period Gini.
+sample:
+  countries:
+  - DEU
+  - GBR
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - DNK
+  - FIN
+  - AUT
+  - BEL
+  - IRL
+  - USA
+  - CAN
+  - AUS
+  period:
+  - 1998
+  - 2015
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing OECD EPL index
+  - winsorise inequality changes at 1st/99th sample percentile
+variables:
+  outcome:
+  - name: gini_disposable_income
+    source: oecd:OECD.WISE.INE,DSD_IDD@DF_IDD,1.0
+    transformation: level
+    notes: 'OECD IDD Gini of equivalised disposable income.
+
+      '
+  - name: top_10_share
+    source: wid:wid_all
+    transformation: level
+    notes: 'WID top-10 income share — registered via wid publisher; post- filter for top_10 fractile after fetch.
+
+      '
+  - name: long_term_unemployment_rate
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS_DURATION,1.0
+    transformation: level
+  treatment:
+  - name: epl_overall_index
+    source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+    transformation: level
+    notes: 'OECD Employment Protection Legislation overall index — captures labour-market reform intensity.
+
+      '
+  - name: collective_bargaining_coverage
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_CBC,1.0
+    transformation: level
+    notes: 'Pre-existing institutional architecture; interaction term with EPL change is the key complementarity test.
+
+      '
+  - name: union_density
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TUD,1.0
+    transformation: level
+  controls:
+  - name: gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: labour_share
+    source: pwt:labsh
+    transformation: level
+evidence_type: associational
+scope:
+  period:
+  - 1998
+  - 2015
+  countries:
+  - DEU
+  - GBR
+  outcome_dim:
+  - poverty_inequality
+  - employment_labour
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  - welfare_architecture
+  treatment_tags:
+  - hartz_reforms_2003
+  - agenda_2010
+  - uk_labour_market_deregulation
+covers_claims:
+- position_id: ordoliberal
+  claim_index: 6
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Ordoliberal claim and hypothesis claim are textually identical — Hartz/Agenda 2010 effectiveness contingent on preserved collective-bargaining and vocational-training architecture versus UK-style
+    deregulated markets.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Cross-country OECD panel testing interaction between labour-market reform intensity and pre-existing collective-bargaining / vocational-training institutions on inequality outcomes. Country and
+    year FE; clustering by country.
+
+    '

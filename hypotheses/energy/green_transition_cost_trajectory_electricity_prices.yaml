@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: green_transition_cost_trajectory_electricity_prices
+version: 1
+status: pre_registered
+topic: energy
+
+claim: >
+  Countries with aggressive green-transition regulatory stringency layered on
+  top of gas-indexed wholesale electricity markets and premature phase-out
+  of firm-dispatchable generation (Germany, UK, Belgium, Netherlands) have
+  experienced materially higher industrial electricity prices 2015-2023 than
+  comparable economies with more measured transition paths (France's nuclear
+  retention, Nordic hydro, USA's shale-gas-backed grid). The price gap is
+  measurably associated with manufacturing-sector output divergence, with
+  energy-intensive sectors (chemicals, metals, cement) relocating or
+  contracting in high-price destinations. This operationalises the user's
+  "green policy degrowth numbers" framing at the sector level rather than
+  as a political slogan.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, GBR, BEL, NLD, ITA, ESP, SWE, NOR, USA, JPN, KOR]
+  period: [2005, 2023]
+  temporal_structure: panel
+
+scope:
+  period: [2005, 2023]
+  countries: [DEU, FRA, GBR, BEL, NLD, ITA, ESP, SWE, NOR, USA, JPN, KOR]
+  outcome_dim: [energy, industrial_capability, regulation_compliance_cost]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [energiewende_2011, uk_climate_change_act_2008, nuclear_phaseout, gas_indexed_wholesale]
+
+variables:
+  outcome:
+    - name: log_industrial_electricity_price
+      source: "constructed: IEA industrial electricity price series + Eurostat NRG_PC_205 (industrial electricity prices), USD/MWh constant 2020. Fetcher pending for IEA."
+      transformation: log
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.CD"
+      transformation: log_real
+    - name: energy_intensive_sector_output_share
+      source: "constructed: share of manufacturing value added from chemicals + metals + cement + paper (OECD STAN)"
+      transformation: level
+
+  treatment:
+    - name: aggressive_green_transition_dummy
+      source: "constructed: indicator = 1 for country-years with (a) legislated nuclear/coal phase-out AND (b) gas-indexed wholesale market AND (c) renewable-share target >30% by 2030. DEU (from 2011), GBR (from 2008 Climate Change Act binding), BEL, NLD qualify; FRA does not (retained nuclear); USA does not (grid more gas/renewables mix no firm phase-out); SWE/NOR do not (hydro baseload). Treatment date per country."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: urbanisation
+      source: "world_bank_wdi:SP.URB.TOTL.IN.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Staggered TWFE. β_aggressive_green identifies the average post-treatment
+    divergence on industrial electricity prices. Second-stage regression of
+    log manufacturing VA on log industrial electricity price (instrumented
+    by the aggressive_green dummy) tests whether the price channel
+    transmits to output.
+
+    Known limitations:
+    (1) Two-way FE with staggered treatment has Goodman-Bacon bias risks;
+        Callaway-Sant'Anna robustness spec in v1.1.
+    (2) Treatment-date coding is subjective (when did DEU's Energiewende
+        "take effect" — 2011 formal decision, 2014 nuclear phase-out
+        milestone, 2022 gas crisis?). The hypothesis uses 2011 as primary
+        DEU treatment date, flags sensitivity.
+    (3) COVID + Russia-Ukraine war are confounds 2020-2023; drop those
+        years as sensitivity.
+
+    Identification is clean only to the extent that the aggressive-
+    treatment countries and the non-treated comparators share enough
+    pre-treatment trend similarity. Pre-trend placebo is required.
+
+falsification:
+  rule: >
+    Not supported if (a) β_aggressive_green on log industrial electricity
+    price is zero or negative at p<0.10 (should be positive: treatment
+    raises prices), OR (b) the second-stage manufacturing VA effect is
+    zero, OR (c) the pre-trend placebo detects spurious effects. Sensitivity
+    drops 2020-2023 (war + COVID) — if the effect relies on those years,
+    report honestly that the attribution is confounded by exogenous
+    shocks rather than persistent policy-content effect.
+  test: aggressive_green_transition_price_and_output_transmission
+  threshold: >
+    β_electricity_price > 0.10 log-points at p<0.10  AND
+    β_manuf_va < -0.02 at p<0.10 via electricity price channel  AND
+    pre-trend placebo |t| < 1.65  AND
+    sensitivity drop-2020-2023 does not flip signs
+
+prior_confidence: 0.75
+
+disclosure: >
+  Framework position: green transition has real climate benefits that this
+  hypothesis's narrow productivity framing does NOT measure. The empirical
+  question operationalised here is narrow: does the SPECIFIC combination of
+  "stringency + gas indexation + firm-capacity phase-out" produce
+  disproportionate industrial-price divergence compared to more measured
+  transition designs? This is the testable claim.
+
+  The author's prior matches the user's framing that aggressive green
+  stringency with poor grid-design complements produced larger industrial-
+  cost divergence than comparable-ambition transitions in jurisdictions
+  with better grid-design complements. This is a NUANCED claim — pro-
+  transition where complements are good, critical where they are not —
+  not a slogan-level "green = degrowth."
+
+  The distinction from "green policy = degrowth" as slogan is important:
+  Swedish and Norwegian grids have aggressive renewable penetration + low
+  industrial electricity prices + no industrial-sector decline. The
+  difference is hydro baseload + nuclear retention + grid-interconnection
+  investments + wholesale market design. Policy, not ideology, determines
+  the outcome.
+
+steelman: hypotheses/steelman/green_transition_cost_trajectory_electricity_prices.md
+
+linked_hypotheses:
+  - eu_regulatory_burden_productivity_drag
+  - us_eu_divergence_decomposition
+
+linked_conditions: []
+
+notes: >
+  Data readiness:
+  - IEA industrial electricity price series — specialist fetcher needed
+  - Eurostat NRG_PC_205 — Eurostat fetcher already shipped ✓ but specific
+    series needs fetch
+  - WDI manufacturing VA — ready ✓
+  - OECD STAN — not yet fetcher-ready
+
+  v1 pre-registers; v1.1 runs when IEA + Eurostat energy-price series
+  are added to baseline_pull.yaml and bootstrap.

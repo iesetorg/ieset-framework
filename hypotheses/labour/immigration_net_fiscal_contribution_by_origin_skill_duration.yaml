@@ -1,0 +1,151 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: immigration_net_fiscal_contribution_by_origin_skill_duration
+version: 1
+status: pre_registered
+topic: labour
+
+claim: >
+  The net fiscal contribution of immigrants (taxes paid minus public services
+  + transfers received, measured in lifetime NPV terms) varies systematically
+  by (a) origin-country institutional quality, (b) skill level at arrival,
+  (c) age at arrival, (d) duration of residence, and (e) legal status
+  (working-age visa / family reunification / asylum). On average across
+  developed destination countries, working-age skilled migrants are net fiscal
+  contributors over lifetime; low-skill arrivals and asylum claimants are on
+  average net recipients at least during the first 5-10 years. These
+  differences are empirically identified and not reducible to ethnicity as
+  a biological variable — ethnicity correlates with outcomes only because it
+  correlates with origin institutions + selection + duration.
+
+evidence_type: causal
+
+sample:
+  countries: [GBR, USA, DEU, NLD, SWE, NOR, DNK, CAN, AUS]
+  period: [2000, 2023]
+  temporal_structure: panel
+
+scope:
+  period: [2000, 2023]
+  countries: [GBR, USA, DEU, NLD, SWE, NOR, DNK, CAN, AUS]
+  outcome_dim: [demographics_migration, fiscal_policy, employment_labour]
+  policy_family: [fiscal_policy, welfare_architecture, regulation]
+  treatment_tags: [immigration_fiscal_decomposition, dustmann_frattini, points_based_visa]
+
+variables:
+  outcome:
+    - name: net_fiscal_contribution_per_migrant
+      source: "constructed: taxes + payroll contributions − benefits − public-service cost per migrant per year. Methodology follows Dustmann-Frattini (2014) UK; OECD International Migration Outlook 2013 + updates; National Academies US 2017."
+      transformation: level_constant_2020_usd
+
+  decomposition_channels:
+    - name: origin_country_institutional_quality
+      source: "wgi:GOV_WGI_GE.EST (origin country, not destination)"
+      transformation: level
+      notes: "Origin-country WGI Government Effectiveness as proxy for institutional bundle migrants self-select from; strongly correlates with skills + education + language at arrival."
+    - name: skill_bucket_at_arrival
+      source: "constructed: categorical from destination-country administrative data (where available) or census microdata: low-skill / semi-skill / skilled / professional"
+      transformation: categorical
+    - name: age_at_arrival
+      source: "constructed: destination-country admin data"
+      transformation: level
+    - name: years_since_arrival
+      source: "constructed: destination-country admin data"
+      transformation: level
+    - name: legal_status_category
+      source: "constructed: categorical — points-based work visa / family reunification / asylum / undocumented"
+      transformation: categorical
+
+  controls:
+    - name: destination_country_fe
+      source: "constructed: country dummies"
+      transformation: categorical
+
+estimator:
+  template: panel_fe_decomposition
+  fixed_effects: [destination_country, year]
+  clustering: destination_country
+  notes: >
+    Two-stage decomposition:
+
+    Stage 1: regress per-migrant net fiscal contribution on the 5 channels
+    above + destination country FE + year FE. Test whether coefficients
+    have predicted signs (origin WGI ↑ → contribution ↑; skilled ↑ →
+    contribution ↑; age-at-arrival working-age → contribution ↑;
+    years-since-arrival ↑ → contribution ↑ with convergence to native;
+    asylum initially negative, converges with time).
+
+    Stage 2: after controlling for the 5 channels, compute residual
+    variation attributable to origin-country dummies. This tests the
+    framework's strong claim: origin-country residual should be small
+    once institutional-quality + skill + demographics + duration are
+    controlled. If origin-country residuals remain large, ethnicity-
+    like effects would be identified — but the honest read is such
+    residuals would reflect further unmeasured selection + destination-
+    country reception effects (discrimination, integration policy),
+    not biology.
+
+    Data requirement: destination-country administrative fiscal + migration
+    microdata. Not all 9 countries have open access — UK (HMRC+DWP
+    linked), Germany (SOEP), Netherlands (CBS), Sweden (SCB), Norway
+    (Statistics Norway), Denmark (Statistics Denmark) publish partial
+    data; US relies on NASEM 2017 cohort imputations; AUS + CAN
+    published government fiscal models.
+
+falsification:
+  rule: >
+    Not supported if the channel coefficients do NOT have predicted signs
+    at p<0.10, OR if origin-country residuals after channel controls are
+    LARGER in magnitude than the channel contributions (would suggest
+    unmeasured origin-specific factors dominate, weakening the channel-
+    decomposition framing). Additionally, if aggregate net fiscal
+    contribution estimates differ by >50% between leading methodologies
+    (Dustmann-Frattini vs NASEM vs OECD) and the framework cannot
+    reconcile, the literature is too unsettled to support a strong claim.
+  test: immigration_fiscal_channels_decomposition_and_residual_magnitude
+  threshold: >
+    All 5 channel coefficients with predicted signs at p<0.10  AND
+    mean|origin-country residual| < mean|channel contribution|  AND
+    leading-methodology estimates within ±50% of each other
+
+prior_confidence: 0.75
+
+disclosure: >
+  This hypothesis treats a politically-charged topic with the same rigour
+  applied to monetary or welfare questions. Author prior follows the OECD
+  / Dustmann-Frattini mainstream empirical position: migration fiscal
+  effects are heterogeneous and explainable by the listed channels, NOT
+  primarily driven by ethnicity as a standalone factor.
+
+  The framework explicitly rejects two popular but empirically weak
+  framings:
+  (1) "Immigration is net fiscal burden regardless of type" — empirically
+      false for working-age skilled migrants from high-institutional-
+      quality origins, who are uniformly net contributors in published
+      studies.
+  (2) "Ethnicity independently causes outcome differences" — empirically
+      conflated with origin-country institutions, SES selection at
+      departure, and duration of residence. The variance "ethnicity"
+      appears to explain collapses when those confounds are controlled.
+
+  Framework position: policy debate should be about WHICH migrants
+  (skill, age, legal channel) and WITH WHAT integration policy — not
+  about ethnicity as a proxy. This framing produces actionable
+  recommendations (e.g. points-based skill weighting, age-at-arrival
+  cutoffs, language training as fiscal-return-raising intervention)
+  rather than unactionable ethnic claims.
+
+steelman: hypotheses/steelman/immigration_net_fiscal_contribution_by_origin_skill_duration.md
+
+linked_hypotheses:
+  - immigration_crime_rate_vs_native_controlled
+  - second_generation_education_outcomes_by_origin
+
+notes: >
+  Data readiness: partial. UK HMRC-DWP-ONS linked datasets require special
+  access. German SOEP public. US NASEM 2017 is a one-shot report; updates
+  pending. Netherlands CBS publishes StatLine tables.
+
+  v1 pre-registers the decomposition structure; v1.1 runs on whichever
+  destination countries have current accessible data, likely UK + NLD +
+  DEU first. This is the standard pre-register-before-data pattern per
+  invariant 1.

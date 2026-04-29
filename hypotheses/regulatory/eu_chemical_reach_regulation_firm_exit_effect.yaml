@@ -1,0 +1,177 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_chemical_reach_regulation_firm_exit_effect
+version: 1
+status: pre_registered
+topic: regulatory
+
+claim: >
+  The EU Registration, Evaluation, Authorisation and Restriction of
+  Chemicals regulation (REACH, entered into force 2007 with phased
+  registration deadlines 2010, 2013, 2018) imposed substantial
+  fixed-cost registration requirements on chemical substances
+  manufactured or imported above threshold tonnages. This hypothesis
+  tests whether REACH's phased registration deadlines — particularly
+  the 2018 final deadline for low-tonnage substances — are associated
+  with a measurable differential in chemical-sector firm exits,
+  substance discontinuations, and SME-share erosion in the EU
+  relative to non-EU comparators (USA, CHN, JPN, KOR). The hypothesis
+  recognises explicitly that REACH's intended function — consumer and
+  worker protection from chemical hazards — is a welfare benefit
+  outside the outcome set, and that EU chemicals firms (BASF, Bayer,
+  Solvay, Evonik, DSM) have historically been world-leading despite
+  regulatory stringency. The empirical test is whether the specific
+  SME-share and substance-diversity margins show regulatory-induced
+  exit, not whether the sector as a whole is damaged.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, USA, JPN, KOR, CHN]
+  period: [2000, 2023]
+  temporal_structure: panel
+
+scope:
+  period: [2000, 2023]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, USA, JPN, KOR, CHN, EU]
+  outcome_dim: [industrial_capability, regulation_compliance_cost, competition_concentration]
+  policy_family: [regulation, industrial_policy]
+  treatment_tags: [reach_2007, reach_2010_deadline, reach_2018_deadline, eu_chemicals_regulation]
+
+variables:
+  outcome:
+    - name: log_chemical_sector_firm_count
+      source: "constructed: Eurostat SBS chemicals sector (ISIC C20) firm count by country-year. Fetcher pending."
+      transformation: log
+    - name: chemical_sme_share
+      source: "constructed: share of chemical-sector firms with <250 employees (Eurostat SBS). Fetcher pending."
+      transformation: level
+    - name: log_registered_substance_count_eu
+      source: "constructed: ECHA REACH dossier count by registration deadline, available post-2008. Direct ECHA API or bulk download; fetcher pending."
+      transformation: log
+    - name: log_chemical_sector_va
+      source: "constructed: OECD STAN ISIC C20 value added. Fetcher pending."
+      transformation: log_real
+
+  treatment:
+    - name: eu_post_2018_reach_final_deadline_dummy
+      source: "constructed: indicator = 1 for EU member states in 2018Q2 onwards (final REACH registration deadline 31 May 2018 for 1-100 t/yr substances, which covers most small-volume producers). USA, JPN, KOR, CHN = control."
+      transformation: indicator
+    - name: eu_post_2010_reach_first_deadline_dummy
+      source: "constructed: indicator = 1 for EU member states in 2010Q4 onwards (first registration deadline November 2010 for >1000 t/yr substances, hitting large producers first)."
+      transformation: indicator
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: eu_ets_carbon_price_eur
+      source: "constructed: EU ETS December future settlement, EUR/tCO2. Fetcher pending."
+      transformation: log
+    - name: industrial_electricity_price
+      source: "constructed: Eurostat NRG_PC_205 industrial electricity price, to partial out energy-cost channel."
+      transformation: log
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary specification: Callaway-Sant'Anna staggered DiD with two
+    treatment dates — 2010Q4 (first-deadline, hits large-tonnage) and
+    2018Q2 (final deadline, hits small-tonnage / SMEs). EU = treated,
+    USA + JPN + KOR + CHN = control. Treatment effect heterogeneity
+    across deadlines is tested explicitly.
+
+    Secondary: event-study with 1-year event windows around each
+    deadline. SME share outcome should respond more to 2018 deadline
+    than to 2010 deadline (small-tonnage producers disproportionately
+    SME).
+
+    Third: synthetic control on EU-aggregate chemical-sector firm
+    count, with USA + JPN + KOR as donor pool.
+
+    Known limitations:
+    (1) ECHA dossier data are EU-only by construction (they are EU
+        registrations); substance-count trajectories in non-EU peers
+        must be constructed differently (Chemical Abstracts Service
+        or TSCA active list for USA) and are imperfectly comparable.
+    (2) 2020-2022 COVID + gas shock confound the 2018 treatment
+        window's post-trend. Split pre-COVID vs COVID-onwards as
+        sensitivity.
+    (3) Historical market structure: EU chemicals sector is
+        concentrated among large incumbents (BASF, Bayer, Solvay);
+        SME-share metric is inherently small and fluctuations are
+        noisy.
+    (4) Firm exit could be misattributed to REACH when actual driver
+        is energy-cost (post-2021) or Chinese competition (post-2008).
+        The controls for industrial electricity price and EU ETS
+        partly address but not fully.
+
+falsification:
+  rule: >
+    Not supported if (a) β_eu_post_2018 on chemical SME share is zero
+    or positive at p<0.10, OR (b) β is significant but disappears
+    after controlling for industrial electricity price (suggesting
+    energy-cost channel rather than REACH-specific), OR (c) the
+    2010 deadline shows similar or larger effect than 2018 deadline
+    (inconsistent with the SME-concentrated mechanism), OR (d) the
+    synthetic control placebo test fails. Important null case to
+    report honestly: EU chemicals sector may be resilient to REACH
+    at aggregate level (consistent with BASF, Bayer's continued
+    world-leading status) even if specific SME margin is affected.
+  test: reach_2018_deadline_sme_exit_did
+  threshold: >
+    β_eu_post_2018 on chemical_sme_share < -0.01 at p<0.10 AND
+    β_eu_post_2018 on log_chemical_sector_firm_count < -0.02 at p<0.10 AND
+    differential vs 2010 deadline is consistent with SME-concentrated mechanism
+
+prior_confidence: 0.45
+
+disclosure: >
+  Author prior is moderate-to-low. The "REACH killed EU chemicals"
+  slogan is defensible in some subsectors (specialty chemicals, rare-
+  use substances where registration costs exceed revenue) and NOT
+  defensible at the sector aggregate (EU chemicals majors remain
+  world-competitive). The pre-registration is designed to identify
+  where the claim holds (SME margin + substance-diversity) and where
+  it fails (large-producer VA).
+
+  REACH has identifiable welfare benefits — worker and consumer
+  protection from chemical hazards — that are OUTSIDE this outcome
+  set. A finding of "REACH caused SME exit" says nothing about
+  whether REACH is a good policy net of those benefits. Framework
+  disclosure: this hypothesis is the careful regulatory-cost
+  counter-example — a case where the naive "EU regulation kills
+  industry" narrative is empirically weak at the aggregate, and the
+  refined claim is about specific margins.
+
+  The differentiation from the EU digital-regulation hypotheses is
+  substantive: EU chemicals has world-leading firms; EU digital
+  broadly does not. This cross-case variation is informative about
+  when regulatory stacks are compatible vs incompatible with
+  scale firms.
+
+steelman: hypotheses/steelman/eu_chemical_reach_regulation_firm_exit_effect.md
+
+linked_hypotheses:
+  - eu_regulatory_burden_productivity_drag
+  - gdpr_digital_sector_firm_scale_effect
+
+notes: >
+  Data readiness:
+  - Eurostat SBS chemicals sector — Eurostat fetcher shipped, series
+    fetch needed
+  - ECHA REACH registration dossier counts — public API, fetcher pending
+  - OECD STAN ISIC C20 — fetcher pending
+  - Non-EU substance-count proxies (USA TSCA active list, JPN CSCL,
+    KOR K-REACH) — fetcher pending, non-trivial harmonisation
+  - WDI — ready
+
+  v1 pre-registers; v1.1 runs when ECHA + Eurostat SBS + non-EU
+  substance-count series ship.

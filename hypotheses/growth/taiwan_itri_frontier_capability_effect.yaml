@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: taiwan_itri_frontier_capability_effect
+version: 1
+status: draft
+topic: growth
+claim: >
+  Taiwan's ITRI-led semiconductor strategy (ITRI founding 1973, UMC spinoff
+  1980, TSMC spinoff 1987, continued state-industry co-investment through
+  the 1990s-2000s) produced a frontier-capability industry that market-led
+  alternatives in comparable-income economies did not generate over the
+  same 40-year window. Tested against donor pool of Asian and Latin American
+  economies with similar 1970s per-capita GDP and absent coordinated state
+  technology strategy.
+notes: >
+  Seeded from a developmentalist claim that Taiwan's ITRI-led semiconductor
+  strategy produced a frontier-capability industry no comparable-income peer
+  generated. Synth-DID with comparable-income donor pool; human review needed
+  for foundry market-share threshold and process-node leadership measure.
+prior_confidence: 0.7
+disclosure: >
+  Authorial bias risk: developmentalist framing privileges the ITRI-coordination
+  channel; Taiwan's semiconductor success also reflects Cold War US technology
+  transfer to Taiwan, the diaspora-engineer return wave, and TSMC's pure-play
+  foundry business model — none of which are reducible to "ITRI strategy."
+falsification:
+  rule: >-
+    PRIMARY 1 (capability proxy): SUPPORTED if Taiwan's cumulative log-change
+    in PWT TFP (rtfpna), 1973 -> 2019, exceeds the donor-pool mean by at least
+    +0.20 log-points (~22% extra TFP) AND Taiwan ranks #1 or #2 in the
+    9-country sample. REFUTED if Taiwan's TFP gain is below the donor-pool
+    mean. PARTIAL otherwise.
+    PRIMARY 2 (output proxy): SUPPORTED if Taiwan's cumulative log-change in
+    real GDP per capita (PWT rgdpe / pop), 1973 -> 2019, exceeds the
+    donor-pool mean by at least +0.50 log-points (~65% extra income) AND
+    Taiwan ranks #1 in the 9-country sample. REFUTED if Taiwan's gain is
+    below the pool mean. PARTIAL otherwise.
+    Joint verdict: SUPPORTED only if BOTH primaries pass. REFUTED only if
+    BOTH primaries refute. PARTIAL otherwise.
+    INFORMATIVE: also report the gap to a 'market-led-only' subpool
+    excluding KOR (which is itself a developmentalist case).
+    METHOD_VALID: PWT 10.x covers TWN and at least 6 of 8 donors over the
+    1973-2019 window. If donor coverage falls below this gate, emit
+    inconclusive.
+  test: "twn_vs_donor_pool_cumlog_gap_pwt_1973_to_2019"
+  threshold: >-
+    PRIMARY 1: tfp_gap_vs_pool >= +0.20 log-pts AND tfp_rank_twn <= 2.
+    PRIMARY 2: gdppc_gap_vs_pool >= +0.50 log-pts AND gdppc_rank_twn == 1.
+methodology_note: >-
+  v1 promotion (2026-04-27). The original spec named foundry market-share,
+  semiconductor patent-stock, and the OWID Atlas Economic Complexity Index
+  as outcomes, but none are present on disk in a Taiwan-inclusive form
+  (WIPO ip_statistics_data_center has no TWN rows; OWID economic-complexity-
+  index file is not present; WDI excludes Taiwan entirely). Pivoted to
+  PWT 10.x productivity indicators (rtfpna, rgdpe, pop), the only on-disk
+  series with full TWN + donor-pool coverage 1973-2019. TFP is the closest
+  available proxy for 'frontier capability'; real GDP per capita is the
+  closest proxy for whether the frontier industry's productivity gains
+  flowed to the wider economy. Replaced the under-identified synth_did
+  estimator (1 treated unit, 9-country pool, ~17 yr pre-period) with a
+  direct cumulative-log-gap test. KOR retained in headline pool because
+  the spec's countries list includes it; market-led subpool diagnostic
+  reported separately so a reader can see the gap with KOR removed.
+evidence_type: associational
+
+sample:
+  countries: [TWN, KOR, PHL, MYS, BRA, MEX, ARG, THA, IDN]
+  period: [1970, 2019]
+  temporal_structure: panel
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: high_tech_exports_pct
+      source: "world_bank_wdi:TX.VAL.TECH.MF.ZS"
+      transformation: level
+    - name: economic_complexity_index
+      source: "owid:economic-complexity-index"
+      transformation: level
+    - name: patent_applications_resident
+      source: "wipo:patent_applications_resident"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+  treatment:
+    - name: taiwan_itri_treated
+      source: "constructed: indicator = 1 for TWN, year >= 1973 (ITRI founded)"
+      transformation: indicator
+
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: synth_did
+  clustering: none
+  notes: >
+    Taiwan treated 1973-2023; donor pool of comparable-1970s-income economies
+    without coordinated state technology strategy (PHL, MYS, BRA, MEX, ARG).
+    Outcomes: global foundry market share, semiconductor patent stock, and
+    process-node-leadership indicators. Tests whether ITRI strategy
+    produced above-counterfactual capability buildup.
+
+scope:
+  period: [1973, 2023]
+  countries: [TWN]
+  outcome_dim: [industrial_capability, productivity]
+  policy_family: [industrial_policy]
+  treatment_tags: [taiwan_itri_semiconductor_strategy, tsmc_spinoff_1987, asian_miracle_era, itri_founding_1973]
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 4
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: "Developmentalist claim that ITRI-led semiconductor strategy produced a frontier-capability industry. Relinked from industrial_policy_developmentalist_states_growth in Phase 4E."

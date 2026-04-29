@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: top_marginal_rate_growth_tradeoff
+version: 1
+status: draft
+topic: growth
+claim: Progressive income-tax marginal rates (up to roughly 70% top rate) have been compatible with strong growth in post-war US 1945-1980 and Nordics, falsifying extreme-Laffer-curve positions.
+notes: Seeded from a social-democratic claim that high (~70%) marginal income-tax rates have coexisted with strong post-war growth in the US and Nordics, falsifying extreme-Laffer positions. Cross-country
+  panel; human review needed because rate levels endogenous to growth performance.
+prior_confidence: 0.65
+disclosure: 'Authorial bias risk: social-democratic framing welcomes the headline correlation; "extreme Laffer" is a strawman that few serious economists hold, so falsifying it is a low bar. The interesting
+  margin (whether current rates are above or below revenue-maximising) is not directly tested.'
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Panel FE of real GDP per capita growth on top-marginal-tax-rate level, advanced-economy panel 1945-1980, country and year FE; falsified if coefficient is significantly negative at p<0.05 or |coefficient|>0.5.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - JPN
+  - CAN
+  - AUS
+  period:
+  - 1945
+  - 1980
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: log_gdp_pc_long_run
+    source: maddison:gdppc_ppp
+    transformation: log
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  - name: tfp_index
+    source: pwt:rtfpna
+    transformation: level
+  treatment:
+  - name: top_marginal_income_tax_rate
+    source: wid:tax_top_rate; OWID has owid:top-income-tax as fallback
+    transformation: level
+  controls:
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: gross_capital_formation_pct_gdp
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'Cross-country panel of US and Nordic economies 1945-1980 of real GDP per capita growth on top-marginal-tax-rate level. Tests whether high-rate periods (>=70% top rate) coexisted with strong growth,
+    contradicting extreme-Laffer-curve predictions.
+
+    '
+scope:
+  period:
+  - 1945
+  - 1980
+  countries:
+  - USA
+  - NOR
+  - SWE
+  - DNK
+  - FIN
+  - NORDIC
+  outcome_dim:
+  - taxation
+  - gdp_growth
+  policy_family:
+  - tax_policy
+  - fiscal_policy
+  treatment_tags:
+  - progressive_taxation
+  - top_marginal_rate
+  - laffer_curve_debate
+covers_claims:
+- position_id: social_democratic
+  claim_index: 8
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts high marginal rates (up to ~70%) have been compatible with strong growth in post-war US and Nordics, falsifying extreme Laffer positions.'

@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: japan_stagnation_wellbeing_outcomes
+version: 2
+status: draft
+topic: growth
+claim: Japanese stagnation 1990-2020 (mean GDP growth under 1%) coincided with stable or improving wellbeing
+  indicators (life expectancy, life satisfaction), refuting the claim that zero-growth necessarily degrades
+  human outcomes.
+notes: Seeded from a degrowth claim that Japanese 1990-2020 stagnation coexisted with stable/improving
+  wellbeing. Single-country pattern-match; human review needed to address selection of "wellbeing" indicators
+  that mask hours-worked, suicide rates, and demographic decline.
+prior_confidence: 0.55
+disclosure: 'Authorial bias risk: degrowth-friendly framing leans on life expectancy (which globally improved)
+  and ignores fertility collapse, hikikomori, and rising suicide cohorts; "stable wellbeing" is heavily
+  a function of indicator basket choice.'
+methodology_note: >-
+  v2 (2026-04-27) — indicator-integrity correction. v1 (run as wave-6
+  inconclusive due to format bug; the wave-6 fixed v1 SUPPORTED on
+  3 of 3 chosen indicators) tested only LE + unemployment + Gini
+  while explicitly noting in disclosure that the test ignored
+  hours-worked, suicide rates, and fertility collapse. That's
+  indicator gaming. The canonical wellbeing literature (OECD Better
+  Life Index, World Happiness Report, UNDP HDI extensions) defines
+  wellbeing as a multi-dimensional basket including: subjective life
+  satisfaction (Cantril ladder), suicide rate (negative
+  externality of mental health), fertility (forward-looking welfare
+  preference), time poverty (hours worked), social connection,
+  environmental quality, plus the v1 economic-side metrics. v2
+  requires the canonical wellbeing basket. JPN data on disk:
+  fertility (WDI SP.DYN.TFRT.IN, fell 1.54→1.36 over 1990-2020,
+  ~12% degradation), suicide (WHO SDGSUICIDE, peaked ~24/100k
+  1998-2003, recovered by 2020 but still elevated relative to 1990),
+  hours worked (PWT avh, fell sharply — improved dimension), LE
+  (WDI, improved 6.1y), unemployment (WDI, ~unchanged), Gini (WDI,
+  worsened ~25→33). Cantril ladder NOT on disk (Gallup World Poll
+  not landed). Honest verdict requires all available canonical
+  indicators tested, not just the v1 favourable subset.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED iff (a) JPN mean GDP/cap growth
+    1990-2020 (ex 2020 COVID) < 1.5 % AND (b) at most 1 of 6 canonical
+    wellbeing indicators degraded by more than the per-indicator
+    threshold over 1990-2020:
+      W1. life_expectancy: relative-to-OECD-median delta >= -2 yrs
+      W2. suicide_rate: max-window value <= 1989 baseline + 5/100k
+      W3. fertility_rate: 2020 / 1990 >= 0.90 (i.e. <10 % decline)
+      W4. hours_worked_per_employed: 2020 / 1990 <= 1.05 (i.e. didn't rise >5 %)
+      W5. unemployment_rate: relative-to-OECD-median delta <= +2 pp
+      W6. gini_index: |2018 - 1990| <= 5 pp
+    REFUTED iff stagnation premise fails (mean growth >= 1.5 %) OR
+    >= 3 canonical indicators degraded.
+    PARTIAL iff stagnation holds and exactly 2 canonical indicators
+    degraded.
+    INFORMATIVE: Cantril ladder / life satisfaction (NOT on disk;
+    fetcher backlog item — when landed, becomes W7 and would gate
+    SUPPORTED).
+    METHOD_VALID: requires WDI LE + SP.DYN.TFRT.IN + SL.UEM.TOTL.ZS +
+    SI.POV.GINI + WHO SDGSUICIDE + PWT avh, all with JPN coverage
+    1990-2020. If any indicator missing, downgrade to inconclusive
+    on that dimension; if >= 3 of 6 canonical inputs missing, full
+    inconclusive.
+  test: japan_stagnation_canonical_wellbeing_basket_1990_2020
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - JPN
+  period:
+  - 1990
+  - 2020
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+  - name: gini_index
+    source: world_bank_wdi:SI.POV.GINI
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: 'Single-country canonical case (Japan 1990-2020). Pattern-match across GDP growth, life expectancy,
+    life satisfaction, unemployment, infant mortality, and Gini to test whether a near-zero-growth trajectory
+    coincided with maintained or improved wellbeing outcomes.
+
+    '
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - JPN
+  outcome_dim:
+  - gdp_growth
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags:
+  - japan_lost_decades_1990
+  - japan_asset_bubble_collapse_1990
+covers_claims:
+- position_id: degrowth
+  claim_index: 8
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Degrowth prediction: Japanese stagnation 1990-2020 with stable/improving wellbeing indicators
+    refutes the zero-growth-degrades-outcomes claim; direct alignment with hypothesis.'

@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_decoupling_consumption_based_accounting
+version: 1
+status: draft
+topic: growth
+claim: US GDP growth 1980-2020 did not absolutely decouple from territorial CO2 emissions once offshored
+  manufacturing emissions are attributed; 'decoupling' claim dissolves under consumption-based accounting.
+notes: Stub seeded from an eco-socialist prediction about offshoring-corrected emissions. Promoted v1
+  on 2026-04-27. The consumption-based CO2 series (Global Carbon Project / Eora MRIO) is NOT yet on
+  disk — fetcher needs to be built before a dispositive verdict is possible. Run currently emits
+  inconclusive (data gap) with territorial-only descriptive numbers as informative.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors are sympathetic to decoupling narratives but skeptical of accounting
+  manipulations; this could bias toward null findings and over-weight the persistence of relative decoupling.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if cumulative US real GDP growth 1980-2020
+    (NY.GDP.MKTP.KD ratio 2020/1980 - 1) exceeds +50% AND the absolute change in US consumption-based
+    CO2 (level 2020 vs level 1980) is a decline of less than 5% (i.e. consumption-based emissions
+    are roughly flat or higher while GDP more than 1.5x — the 'decoupling claim dissolves' regime).
+    REFUTED if consumption-based CO2 declined by at least 25% over 1980-2020 (sustained absolute
+    decoupling visible even on the offshoring-corrected series).
+    PARTIAL otherwise.
+    INFORMATIVE (not gating): cumulative change in territorial CO2 per capita and the implied
+    territorial-vs-consumption gap, reported in diagnostics.
+    METHOD_VALID: requires both world_bank_wdi:NY.GDP.MKTP.KD and a US 1980-2020 consumption-based
+    CO2 series (owid:consumption_co2 or equivalent GCP/Eora MRIO vintage) on disk. If the
+    consumption-based series is missing, the run emits 'inconclusive (data gap on
+    owid:consumption_co2)' and reports the territorial-only descriptive numbers as informative.
+  test: us_gdp_vs_consumption_based_co2_1980_2020
+  threshold: >-
+    PRIMARY: gdp_ratio_2020_1980 > 1.50 AND consumption_co2_change_pct > -0.05  -> SUPPORTED.
+    consumption_co2_change_pct <= -0.25  -> REFUTED.
+methodology_note: >-
+  v1 promotion (2026-04-27). Sharpened the original generic falsification rule to a two-tier
+  dispositive primary on the spec's own quantitative anchor (>50% GDP growth + <5% consumption-based
+  CO2 decline = SUPPORTED). Added an explicit REFUTED ceiling at >=25% consumption-based decline
+  so a clean offshoring-corrected decoupling result can dispositively refute the claim. The
+  consumption-based CO2 series (owid:consumption_co2 / Global Carbon Project / Eora MRIO) is NOT
+  on disk in this vintage — the run script detects this and emits 'inconclusive (data gap)' with
+  territorial-only descriptive numbers as informative. The script is ready to produce a real
+  verdict the moment the consumption-based fetcher lands; no spec change required at that point.
+evidence_type: descriptive
+sample:
+  countries:
+  - USA
+  period:
+  - 1980
+  - 2020
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_gdp
+    source: world_bank_wdi:NY.GDP.MKTP.KD
+  - name: territorial_co2
+    source: 'owid:co2_per_capita'
+    notes: 'OWID territorial CO2 emissions; on-disk via owid fetcher.'
+  - name: consumption_based_co2
+    source: 'owid:consumption_co2'
+    notes: 'OWID consumption-based CO2 (Eora-MRIO derived); the offshoring-corrected series the spec needs.'
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'Single-country US 1980-2020 time-series comparison of GDP growth against territorial CO2 emissions
+    and against consumption-based (offshoring-corrected) emissions. Tests whether the decoupling claim
+    persists once offshored manufacturing emissions are attributed to the consuming economy.
+
+    '
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - USA
+  outcome_dim:
+  - gdp_growth
+  - energy
+  - trade_liberalisation
+  policy_family:
+  - none
+  treatment_tags:
+  - consumption_based_emissions_accounting
+  - offshoring_manufacturing
+covers_claims:
+- position_id: eco_socialist
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts US GDP 1980-2020 did not absolutely decouple from CO2 emissions
+    once offshored manufacturing is attributed via consumption-based accounting.'

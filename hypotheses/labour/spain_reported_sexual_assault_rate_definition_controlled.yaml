@@ -1,0 +1,269 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: spain_reported_sexual_assault_rate_definition_controlled
+version: 1
+status: pre_registered
+topic: labour
+
+claim: >
+  The Spanish police-recorded sexual-offence rate per 100,000 population
+  cannot be interpreted directly across the 7 October 2022 entry into
+  force of Ley Orgánica 10/2022 ("Ley de garantía integral de la libertad
+  sexual", colloquially "solo sí es sí"), because that statute redefined
+  the boundaries of the sexual-offence category: it replaced the prior
+  distinction between "abuso sexual" (without violence/intimidation) and
+  "agresión sexual" (with violence/intimidation) with a single
+  consent-based "agresión sexual" offence category, broadened what
+  conduct is prosecutable, and reorganised statistical reporting
+  categories used by INE and the Sistema Estadístico de Criminalidad of
+  the Ministerio del Interior. The hypothesis operationalises two
+  separable empirical questions. (Q1, descriptive-plus-comparative): on
+  the 2015-2021 sample window — entirely pre-reform — does the Spanish
+  reported sexual-offence rate trajectory deviate from a European
+  comparator pool (FRA, ITA, PRT, DEU, SWE, NLD, BEL) after absorbing
+  common-Europe reporting-culture shocks? (Q2, within-country
+  definitional-shift): when the 7 October 2022 law takes effect, what
+  is the level-shift in the Spanish reported-offence series, how much
+  of it is attributable to the definitional reclassification, and how
+  much residual (if any) is attributable to change in underlying
+  reporting propensity or underlying offending? Neither question permits
+  a raw pre-vs-post comparison of the Spanish series in levels, because
+  the measurement instrument changed.
+
+evidence_type: causal
+
+sample:
+  countries: [ESP, FRA, ITA, PRT, DEU, SWE, NLD, BEL]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "Q1 primary window: 2015-2021 inclusive (entirely pre-reform in Spain)"
+    - "Q2 within-country window: 2018-2023 inclusive (Spain only; event-study around 2022-10-07 effective date)"
+    - "drop country-years where Eurostat crim_off_cat has missing or footnoted-as-incomparable sexual-offence cell"
+    - "DEU reporting change 2017 (StGB §177 reform) flagged as donor-pool confound; DEU excluded in Q1 robustness"
+
+scope:
+  period: [2010, 2023]
+  countries: [ESP, FRA, ITA, PRT, DEU, SWE, NLD, BEL]
+  outcome_dim: [institutional_quality]
+  policy_family: [regulation, institutional_reform]
+  treatment_tags: [spain_lo_10_2022, solo_si_es_si, sexual_offence_definitional_reform]
+
+variables:
+  outcome:
+    - name: reported_sexual_offence_rate_per_100k
+      source: "eurostat:crim_off_cat"
+      transformation: rate_per_100k
+      notes: >
+        Eurostat Police-recorded offences database — sexual-violence
+        aggregate (includes rape and sexual assault categories per
+        Eurostat's harmonised classification). Raw per-100k series
+        used as outcome; definitional discontinuity handled in the
+        estimator (Q2) rather than by adjusting the outcome series
+        ex-ante. For Spain specifically, the Ministerio del Interior
+        Sistema Estadístico de Criminalidad series and INE Estadística
+        de condenados series are both fetched as cross-checks; the
+        three series are reported alongside one another with explicit
+        definitional notes.
+    - name: spain_ministerio_interior_agresion_sexual_rate
+      source: "manual: Ministerio del Interior — Sistema Estadístico de Criminalidad, Balances Trimestrales / Anales. Not currently in an API fetcher; manual-drop under data/manual/spain_mi/."
+      transformation: rate_per_100k
+      notes: "Cross-check series with explicit pre-2022 / post-2022 category labels preserved."
+    - name: spain_ine_condenados_sexual_rate
+      source: "manual: INE Estadística de Condenados"
+      transformation: rate_per_100k
+      notes: "Convictions-based — different selection than police-recorded. Used as a secondary triangulation; not a primary outcome."
+
+  treatment:
+    - name: spain_post_2022_10_07
+      source: "constructed: indicator = 1 if country=ESP and year >= 2023 (or month >= 2022-10 for monthly specification); 0 otherwise. Effective date of LO 10/2022 is 7 October 2022; year-resolution treatment is coded from 2023 with 2022 treated as a transition year in robustness."
+      transformation: indicator
+
+  decomposition_channels:
+    - name: reporting_propensity_proxy
+      source: "constructed: European victimisation-survey series on reporting rate to police, where available (FRA-CVS, ITA-ISTAT delitti, ESP-ENVS 2019). Sparse; enters as a level covariate where country-year coverage permits."
+      transformation: level
+    - name: media_attention_proxy
+      source: "constructed: Google Trends index for country-language terms 'agresión sexual' / 'violación' / equivalents; annual average. Proxy for reporting-climate effects (MeToo waves 2017-2018, La Manada verdict 2018-2019, public reaction to LO 10/2022)."
+      transformation: level
+    - name: migration_composition_share
+      source: "world_bank_wdi:SM.POP.TOTL.ZS"
+      transformation: level
+      notes: "Migrant stock as % of population. Included because cross-country comparisons of reported sex-offence rates can be confounded by compositional shifts; Spain's migration composition changed materially 2015-2023. Included with explicit caveat that this variable is a compositional control, not a causal claim about any subgroup."
+
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: urbanisation
+      source: "world_bank_wdi:SP.URB.TOTL.IN.ZS"
+      transformation: level
+    - name: share_population_age_15_34
+      source: "world_bank_wdi:SP.POP.1564.TO.ZS"
+      transformation: level
+      notes: "Approximated via 15-64 share at WDI resolution; UN WPP age-band data substituted where available."
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Q1 (pre-reform 2015-2021, panel): TWFE with country and year fixed
+    effects. Outcome: log reported sexual-offence rate per 100k. β on a
+    Spain indicator identifies the Spanish deviation from the comparator
+    pool's time-average. Reporting-propensity and media-attention
+    proxies enter as covariates. The test: is Spain's pre-reform
+    2015-2021 trajectory distinguishable from the European reporting-
+    culture trend, or does it track the pool?
+
+    Q2 (within-Spain event study, 2018-2023): interrupted time series
+    around the 7 October 2022 effective date of LO 10/2022. Monthly
+    Ministerio del Interior series preferred; annual Eurostat series
+    used where monthly is unavailable. Specification: log(rate) = α +
+    β·post_2022_10_07 + γ·t (trend) + δ·t·post (trend break) + month/
+    year FE + ε. β and δ estimate the level shift and trend-break at
+    the reform date.
+
+    The level-shift β in Q2 has TWO empirical interpretations that must
+    be reported separately rather than conflated:
+      (i) DEFINITIONAL component: the portion of the level-shift
+          attributable to offences previously categorised as "abuso
+          sexual" (or other categories) being reclassified into the
+          post-reform "agresión sexual" category. This is estimated by
+          summing the pre-reform abuso + agresión cells and comparing
+          to the post-reform consolidated cell — a same-definition
+          comparison that removes the reclassification mechanically.
+      (ii) RESIDUAL component: the portion remaining after the
+          definitional reclassification is removed. This residual is
+          itself a composite of (a) change in underlying offending
+          rate, (b) change in victim reporting propensity induced by
+          the law's public-communication campaign and surrounding
+          media environment, and (c) change in police
+          classification/recording practices under the new statute.
+          The framework CANNOT separate (a)/(b)/(c) from aggregate
+          police-recorded data alone; this limitation is pre-
+          registered and the result card must state it.
+
+    Robustness: (R1) drop DEU from Q1 pool due to 2017 StGB §177 reform
+    creating a similar definitional discontinuity in the German series;
+    (R2) use convictions-based INE series for Spain as triangulation;
+    (R3) report Eurostat's own footnote flags for the Spanish cell and
+    honour Eurostat's data-comparability notes explicitly.
+
+falsification:
+  rule: >
+    The hypothesis has two parts. Q1 is SUPPORTED if, on the pre-reform
+    2015-2021 window with reporting-propensity and media-attention
+    controls, the Spain indicator is within ±0.10 log points of zero
+    at p > 0.10 (i.e., Spain is NOT distinguishable from the European
+    reporting-trend) — this would corroborate the interpretation that
+    Spain's pre-reform trajectory tracked the European reporting-
+    culture trend rather than representing a Spanish-specific offending
+    surge. Q1 is NOT SUPPORTED if the Spain indicator is significantly
+    positive (Spain deviates upward from Europe pre-reform), in which
+    case the framework reports that Spain's pre-reform trajectory WAS
+    distinct from Europe and the critics' pre-reform-rising-trend
+    framing is data-supported.
+
+    Q2 is SUPPORTED if the level-shift β at 2022-10-07 is positive AND
+    the definitional-component decomposition attributes the majority
+    (>50%) of β to reclassification — corroborating the interpretation
+    that the post-2022 reported-rate spike is primarily a measurement-
+    regime change rather than an underlying offending surge. Q2 is NOT
+    SUPPORTED if the residual component is positive and large
+    (>50% of β), in which case the framework reports that even after
+    definitional adjustment there is a substantial residual component
+    which it cannot further decompose from aggregate data and which
+    requires dedicated victimisation-survey evidence (Encuesta
+    Nacional de Violencia contra la Mujer waves pre- and post-reform)
+    to interpret.
+
+    Either outcome is an honest finding. The hypothesis is designed to
+    be falsifiable in both directions and is pre-registered specifically
+    to prevent selective reporting of whichever direction aligns with
+    the commentator's priors.
+  test: spain_sexual_offence_rate_two_part_Q1_panel_Q2_event_study
+  threshold: >
+    Q1 SUPPORTED if |β_spain_pre_reform| < 0.10 and p > 0.10.
+    Q2 SUPPORTED if level-shift β > 0 and definitional component
+    accounts for > 50% of β.
+
+prior_confidence: 0.62
+
+disclosure: >
+  The author's prior is that the post-2022 reported-rate spike in Spain
+  is largely attributable to the definitional reclassification plus the
+  reporting-climate effect of the law's public-communication campaign,
+  rather than to an underlying surge in offending. This prior is based
+  on (i) the mechanical fact of the aggression/abuse merger, which
+  redraws category boundaries without any change in underlying
+  behaviour, (ii) the well-documented reporting-rate effects of high-
+  profile legal reforms elsewhere (German 2017 §177 reform, Swedish
+  2018 consent-law reform), and (iii) the framework's general prior
+  that legal-definitional changes should be handled as measurement-
+  regime changes rather than as outcome changes.
+
+  The framework REJECTS three specific popular framings as empirically
+  weak:
+  (1) "Reported assault rate went up therefore Spain is more unsafe" —
+      weak because the instrument changed; direct pre/post comparison
+      of police-recorded rates across 2022-10-07 is not scientifically
+      legitimate.
+  (2) "The reported-rate rise is 100% definitional, nothing else is
+      going on" — also weak because reporting-propensity shifts
+      around high-profile legal reforms are well-documented and the
+      residual component cannot be assumed to be zero without
+      decomposition.
+  (3) "Migration composition explains the rise" — weak because
+      compositional shifts in Spain 2015-2023 are not large enough to
+      mechanically produce the observed level-shift, and because this
+      framing typically substitutes for the definitional-change
+      mechanism (which is the dominant factor per proposition 1)
+      rather than adding explanatory power on top of it. The migration-
+      composition channel is retained as a control so the decomposition
+      is honest; the framework does not use it to advance a claim
+      beyond what a formal decomposition will support.
+
+  The author's prior is explicitly labelled, the falsification rule is
+  designed to be binding in both directions, and the steelman engages
+  the full range of counter-framings that a lawyer, a feminist
+  criminologist, and a demographer would each bring.
+
+conflict_disclosure: >
+  Author is not Spanish and holds no professional, financial, or
+  advocacy relationship to the parties to the LO 10/2022 debate.
+  Framework author's only relationship to the topic is pre-registration
+  of the measurement framework.
+
+steelman: hypotheses/steelman/spain_reported_sexual_assault_rate_definition_controlled.md
+
+linked_hypotheses:
+  - immigration_crime_rate_vs_native_controlled
+  - spain_sanchez_economic_trajectory_2018_2023
+
+notes: >
+  This hypothesis is the framework's response to a politically-charged
+  topic where raw descriptive statistics are routinely deployed
+  without the instrumental-discontinuity controls they require. The
+  framework's value-add is not to take sides on the LO 10/2022 debate
+  — which is a legal and political debate the framework has no
+  special standing on — but to enforce the measurement discipline
+  that the reform created a definitional discontinuity in the
+  reported-rate series and that any claim about trajectory across
+  2022-10-07 must decompose definitional from residual components
+  before it can be interpreted.
+
+  Data access limits: Eurostat crim_off_cat has harmonisation caveats
+  Spain-specific; Ministerio del Interior series requires manual-drop
+  fetching as of v1; INE Estadística de Condenados requires separate
+  access. Victimisation-survey triangulation (ENVS 2019, pre-reform)
+  is available but only one wave within the sample; a post-reform
+  ENVS wave is essential for the strongest version of Q2 and is
+  called out as a v2 requirement.
+
+  This hypothesis MUST NOT be read as advancing a normative claim
+  about LO 10/2022. It advances only the measurement claim that the
+  reported-rate series cannot be interpreted raw across the reform
+  date.

@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: australia_2008_fiscal_stimulus_output_effect
+version: 1
+status: draft
+topic: monetary
+claim: Australian fiscal expansion during 2008-2009 GFC response prevented recession entry, consistent
+  with MMT claim that currency-issuer fiscal space in high-unemployment regimes produces output gains
+  with minimal inflation cost.
+notes: Origin is auto-generated coverage-gap stub seeded from MMT/Keynesian framing of Australia's 2008
+  cash-handout package as a successful currency-issuer fiscal response. Human review required.
+prior_confidence: 0.55
+disclosure: Author considers AUS 2008 a strong textbook case of countercyclical fiscal policy but is sceptical
+  of generalising it to MMT-scale claims; the claim could conflate stimulus with terms-of-trade tailwind.
+falsification:
+  rule: >-
+    PRIMARY (dispositive): the hypothesis is SUPPORTED if the AUS-vs-donor-pool
+    DiD on log real GDP per capita over 2007-2010 is at least +2.0pp, where the
+    donor pool is the spec sample (CAN, GBR, NZL, DEU, FRA, ITA, JPN, KOR, CHE,
+    NOR, SWE, NLD) excluding USA (ARRA was the only sample peer with a
+    comparable >2%-of-GDP cash-handout package). REFUTED if the DiD is
+    non-positive (AUS did not outperform). PARTIAL if the DiD is positive but
+    below +2.0pp.
+    INFORMATIVE: AUS-vs-donor change in unemployment rate (negative = AUS
+    labour-market outperformance) and CPI inflation differential (small =
+    MMT minimal-inflation-cost claim) over 2007-2010, reported as DiDs.
+    METHOD_VALID: at least 8 of the 13 donor countries with usable GDP-per-capita
+    data at both 2007 and 2010, otherwise inconclusive (data gap). Pre-trend
+    2003-2007 DiD must be smaller in magnitude than the 2007-2010 DiD,
+    otherwise verdict is downgraded to weakened (parallel-trends violation).
+  test: did_aus_vs_oecd_donor_mean_log_gdp_pc_2007_2010
+  threshold: >-
+    PRIMARY: did_log_gdp_pc(AUS, 2007, 2010) - mean_donor_pool_dlog >= 0.020
+    AND |pre_trend_did_2003_2007| < |primary_did_2007_2010|.
+evidence_type: associational
+scope:
+  period:
+  - 2007
+  - 2010
+  countries:
+  - AUS
+  outcome_dim:
+  - gdp_growth
+  - employment_labour
+  - inflation
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - australia_gfc_stimulus_2008
+  - gfc_2008
+sample:
+  countries:
+  - AUS
+  - CAN
+  - GBR
+  - USA
+  - NZL
+  - DEU
+  - FRA
+  - ITA
+  - JPN
+  - KOR
+  - CHE
+  - NOR
+  - SWE
+  - NLD
+  period:
+  - 2000
+  - 2012
+  temporal_structure: panel
+  exclusion_rules:
+  - donor pool excludes any economy with comparable >2% GDP cash-handout fiscal package in 2008-2009
+variables:
+  outcome:
+  - name: real_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD; imf:NGDPRPC
+    transformation: log_level
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS; ilostat:UE_TUNE_SEX_AGE_RT
+    transformation: level_pct
+  - name: cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: pct_change_yoy
+  treatment:
+  - name: aus_fiscal_stimulus_indicator
+    source: 'constructed: binary = 1 for AUS from 2008-10 (Rudd Economic Security Strategy + Nation Building)'
+    transformation: binary
+  - name: discretionary_fiscal_impulse_pct_gdp
+    source: imf:GGXCNL_NGDP
+    transformation: level
+    notes: IMF cyclically-adjusted primary-balance change as fiscal-impulse proxy.
+  controls:
+  - name: pre_treatment_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: lag_avg_2000_2007
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: china_demand_proxy
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: chn_filter
+    notes: Captures AUS commodity-export exposure; only relevant control given mining boom.
+covers_claims:
+- position_id: mmt
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT claim that Australian currency-issuer fiscal space during GFC prevented recession entry with
+    minimal inflation cost; direct alignment with hypothesis claim and scope.
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: 'Spec calls for synthetic-control counterfactual for Australia 2008-2010
+    vs a donor pool of advanced economies that did not deploy a comparable cash-handout
+    fiscal package. Outcome: real GDP per capita; secondary outcomes: unemployment,
+    CPI inflation. The runnable replication downgrades to an unweighted peer-mean
+    DiD (no synth library available locally) — see methodology_note.
+
+    '
+methodology_note: >-
+  v1 promotion (2026-04-24). Sharpened the original generic falsification rule
+  to a dispositive +2.0pp DiD threshold on AUS-vs-donor-mean log GDP per capita
+  2007-2010, with a 2003-2007 pre-trend parallel-trends gate that downgrades to
+  `weakened` if violated. The synthetic-control template was downgraded to an
+  unweighted peer-mean DiD because no synth library is installed in the local
+  venv; per HANDOFF_TO_RUN_AGENT.md downgrade allowance, this is documented in
+  the script's docstring. The donor pool excludes USA on the spec's
+  exclusion_rule (ARRA at ~5.5% of GDP is the only sample peer with a
+  comparable >2%-of-GDP cash-handout package); robustness with USA reincluded
+  is reported. Secondary outcomes (unemployment, CPI inflation) are informative
+  not dispositive.

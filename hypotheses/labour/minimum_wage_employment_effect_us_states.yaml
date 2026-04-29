@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: minimum_wage_employment_effect_us_states
+version: 1
+status: pre_registered
+topic: labour
+claim: 'US state-level minimum-wage increases over 1990-2024 produce small, statistically uncertain effects on teen and low-wage employment when compared to contiguous counties or neighbouring states that
+  did not raise their minimum. The Card-Krueger 1994 / Dube-Lester-Reich 2010 research design is the baseline: the hypothesis predicts that the estimated employment elasticity with respect to the minimum
+  wage falls in the range [-0.15, +0.05] with the 95% confidence interval straddling zero, consistent with the post-1990 border-discontinuity literature but inconsistent with Neumark-Wascher-style nationwide
+  panel findings of elasticities < -0.2. Pre-registered direction of effect: minimum-wage elasticity is close to zero and typically not significantly negative at the 5% level on the primary outcome.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - USA
+  period:
+  - 1990
+  - 2024
+  temporal_structure: panel
+  cross_section_justification: US states panel; country-code array is singleton USA with state as unit of analysis in the estimator. State codes enumerated in the estimator notes.
+  exclusion_rules:
+  - exclude state-years during federal minimum-wage hikes (1991, 1996-1997, 2007-2009) where the treatment is ambiguous across states without own-state hikes
+  - exclude 2020 due to pandemic employment shock dwarfing the minimum-wage variation
+variables:
+  outcome:
+  - name: teen_employment_to_population_ratio
+    source: bls:LNS12300012 (national teen); bls:LAU (state-level teen employment-population ratio)
+    transformation: level_pct
+    notes: Primary outcome. BLS state-level teen E/P derived from CPS state tabulations; coverage from 1990 monthly.
+  - name: low_wage_sector_employment
+    source: bls:CES (accommodation + food services state-level employment)
+    transformation: log_level
+    notes: Secondary outcome following Dube-Lester-Reich 2010.
+  - name: unemployment_duration_teen
+    source: bls:LNS12000000
+    transformation: median_weeks_unemployed
+    notes: Tertiary outcome; relevant if employment levels respond slowly but duration does.
+  treatment:
+  - name: state_minimum_wage_log_level
+    source: bls:state_minimum_wage_history (USDOL)
+    transformation: log_nominal_state_minimum_wage
+    notes: State statutory minimum; Federal floor when state is below. When binding local (city) minima differ meaningfully (Seattle, NYC, DC), robustness spec uses county-level minima from Vaghul-Zipperer
+      2016.
+  controls:
+  - name: state_gdp_growth
+    source: bls:QCEW; fred:NYNGSP (per-state nominal GSP — exemplar; replicate per state)
+    transformation: yoy_pct_change
+  - name: state_unemployment_rate_adult
+    source: bls:LAU_state_unemployment
+    transformation: level_pct
+intervention_channel: regulatory
+intervention_channel_justification: 'Minimum-wage legislation is a regulatory price-floor intervention. No fiscal transfers are coded here; the EITC expansions (1993, 2009) are controlled for via year fixed
+  effects but not modelled as co-treatment in v1.
+
+  '
+estimator:
+  template: did_callaway_santanna
+  clustering: state
+  random_seed: 20260423
+  notes: 'Primary: Callaway-Sant''Anna staggered DiD exploiting state-level minimum-wage changes 1990-2024 against never-/late-changing states. Secondary: Dube-Lester-Reich contiguous-county-pair design
+    using QCEW accommodation-and-food-services county employment around state-border discontinuities. The border-pair design is the cleaner identification but has narrower outcome coverage.
+
+    '
+falsification:
+  rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if the Callaway-Sant''Anna staggered-DiD elasticity of teen employment-to-population with respect to the log state minimum wage over the 1990-2024
+    US-state panel falls in [-0.15, +0.05] AND the 95% CI crosses zero. REFUTED if the elasticity is significantly below -0.15 at the 5% level (Neumark-Wascher direction) OR significantly above +0.10 at
+    the 5% level (positive-employment direction; the claim is "close to zero," not "positive"). SECONDARY (also dispositive): the Dube-Lester-Reich contiguous-county-pair elasticity on QCEW NAICS-722 (accommodation/food
+    services) county employment must fall in [-0.20, +0.05]. INFORMATIVE: leave-one-state-out sign stability of the CS-ATT coefficient; pre-trend test on the 4 years preceding each state''s first minimum-wage
+    hike. METHOD_VALID: state-level BLS LAU teen E/P available for at least 40 of 50 states with >= 20 years of coverage; USDOL state minimum-wage history available with at least one state-level binding
+    change in at least 30 states; QCEW NAICS-722 county-level employment available for the border- pair specification.'
+  test: staggered_did_plus_border_pair_both_in_range
+  threshold: 'PRIMARY: CS_ATT_elasticity in [-0.15, +0.05] AND 95% CI crosses zero AND CS_ATT not significantly < -0.15 AND not significantly > +0.10. SECONDARY: border_pair_elasticity in [-0.20, +0.05].'
+methodology_note: 'v1 promotion (2026-04-24). Sharpened the original generic falsification rule into a two-tier dispositive band: PRIMARY band [-0.15, +0.05] on the Callaway-Sant''Anna staggered-DiD elasticity
+  of teen E/P w.r.t. the log state minimum wage (the post-1990 Card-Krueger / Dube-Lester-Reich consensus), with explicit refute bands at < -0.15 (Neumark-Wascher) and > +0.10 (positive-effect). SECONDARY
+  band [-0.20, +0.05] on the Dube-Lester-Reich contiguous- county-pair elasticity for QCEW NAICS-722 employment. The 2020 COVID year and federal-floor-binding state-years are dropped per sample.exclusion_rules.
+  The replication is data-gated on v1: the on-disk BLS vintages contain only national-level series (LNS*/CES05*/CUUR*); state-level LAU teen E/P, SMS state CES, ENU county QCEW, the USDOL state minimum-wage
+  history, and the Vaghul-Zipperer 2016 county-minimum dataset are pending fetcher / manual-drop work. Until those land the run emits inconclusive with `data_gap: true` rather than fabricating estimates.'
+prior_confidence: 0.68
+disclosure: 'The minimum-wage-employment literature is contested. Prior reflects the post-2010 Dube-Lester-Reich / Cengiz-Dube-Lindner-Zipperer 2019 consensus that state-level elasticities are small; Neumark-Wascher
+  2017 literature survey reaches a more negative conclusion and the range of credible elasticities in the literature spans roughly [-0.3, 0.1]. The hypothesis is pre-registered at the optimistic end of
+  that range; a finding outside the predicted window falsifies it.
+
+  '
+steelman: hypotheses/steelman/minimum_wage_employment_effect_us_states.md
+linked_hypotheses:
+- labour_market_flexibility_unemployment_duration
+notes: 'Data-gated but BLS state-level series are mostly ready. CPS microdata requires IPUMS download; automated via ipums-cps package when added to fetchers. Vaghul-Zipperer county-level minimum-wage dataset
+  is a manual drop in data/manual/ for the border-pair robustness spec.
+
+  '
+scope:
+  period:
+  - 1990
+  - 2024
+  countries:
+  - USA
+  outcome_dim:
+  - employment_labour
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - us_state_minimum_wage_increases_2004_2020
+  - card_krueger_1994
+  - dube_lester_reich_2010
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 4
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Democratic socialist predicts state minimum-wage rises produced near-zero employment effects contra standard competitive-market model; Phase 4C should verify 2004-2020 sub-window within the broader
+    1990-2024 hypothesis panel and check border-pair vs staggered-DiD identification agreement.

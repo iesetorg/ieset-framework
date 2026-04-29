@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiscal_rule_departure_credibility_loss_effect
+version: 1
+status: draft
+topic: fiscal
+claim: 'Post-2010 Southern-European departures from euro fiscal rules (Greece 2001–2009) produced the specific pattern Ordoliberal theory predicts: credibility loss, borrowing-cost spikes, and forced stabilisation
+  on worse terms than voluntary rule-compliance would have produced.'
+notes: Maps the ordoliberal school's eurozone-fiscal-rule-departure-credibility claim to a sovereign-yield event study around documented Greek and periphery EDP escalations 2009-2012. Estimator and prior
+  set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.55
+disclosure: Author prior partially aligns — the Greek 2009 deficit revision did produce credibility loss and yield spikes — but the 'forced stabilisation on worse terms than rule-compliance' counterfactual
+  attributes too much to the Stability Pact's prior bite, given that ECB OMT (not rule compliance) ultimately stabilised spreads.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Event study of 10y sovereign-yield-vs-Bund spreads (ecb:IRS) around documented EDP-escalation and SGP-breach dates in eurozone periphery 2001-2019; country-clustered SEs, country+date FE, OMT window
+    dropped. Refute if cumulative spread response at h=20 trading days not >50bp at p<0.10 OR if Greece 2009-Q4 revision shows no break.
+evidence_type: associational
+sample:
+  countries:
+  - AUT
+  - BEL
+  - DEU
+  - ESP
+  - FIN
+  - FRA
+  - GRC
+  - IRL
+  - ITA
+  - NLD
+  - PRT
+  period:
+  - 2001
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - drop pre-1999 country-years (predates eurozone fiscal-rule regime)
+  - drop country-quarters during ECB OMT activation window (2012-09 to 2013-03) when sovereign-spread dynamics were dominated by ECB backstop announcements rather than fiscal-rule news
+variables:
+  outcome:
+  - name: sovereign_yield_spread_vs_bund
+    source: ecb:IRS (10y sovereign yields); fred:IRLTLT01DEM156N (Bund 10y)
+    transformation: bp_spread_over_bund
+    notes: Primary outcome — credibility-loss proxy. Daily/monthly available.
+  - name: sovereign_cds_5y
+    source: bis:WS_DEBT_SEC2
+    transformation: bp_level
+    notes: 'TODO: BIS does not directly publish sovereign CDS; if unavailable, drop and rely on yield spreads.'
+  - name: gross_debt_pct_gdp
+    source: imf:GGXWDG_NGDP; eurostat:gov_10dd_ggd
+    transformation: pct_gdp
+  - name: primary_balance_pct_gdp
+    source: imf:GGXONLB_NGDP; eurostat:gov_10dd_edpt1
+    transformation: pct_gdp
+  treatment:
+  - name: fiscal_rule_departure_event
+    source: 'constructed: indicator = 1 in country-quarter of documented Excessive-Deficit-Procedure escalation, formal SGP breach declaration, or major budget revision (e.g. Greece 2009-Q4 retrospective
+      deficit revision); 0 otherwise'
+    transformation: binary
+  - name: edp_active_indicator
+    source: constructed from eurostat:gov_proc_edp (EDP open/closed status)
+    transformation: binary
+    notes: Time-varying; flags whether the country is in an open Excessive Deficit Procedure.
+  controls:
+  - name: real_gdp_growth
+    source: imf:NGDP_RPCH; eurostat:nama_10_gdp
+    transformation: pct_yoy
+  - name: ecb_policy_rate
+    source: ecb:FM (deposit facility rate)
+    transformation: level
+  - name: vix
+    source: fred:VIXCLS
+    transformation: level
+    notes: Risk-off control during the 2010-2012 crisis window.
+  - name: current_account_pct_gdp
+    source: imf:BCA_NGDPD; eurostat:bop_c6_q
+    transformation: pct_gdp
+scope:
+  period:
+  - 2001
+  - 2019
+  countries:
+  - GRC
+  - ITA
+  - ESP
+  - PRT
+  - SOUTHERN_EUROPE
+  outcome_dim:
+  - fiscal_policy
+  - financial_crisis
+  policy_family:
+  - fiscal_policy
+  - institutional_reform
+  treatment_tags:
+  - greece_fiscal_rule_departure
+  - eurozone_sovereign_debt_crisis_2010
+covers_claims:
+- position_id: ordoliberal
+  claim_index: 8
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Ordoliberal position predicts Southern-European fiscal rule departures produced credibility loss and yield spikes; hypothesis tests the specific Greece 2001-2009 case and contagion pattern.
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects:
+  - country
+  - date
+  notes: 'Event study around documented fiscal-rule departure dates in Greece (2009 budget revisions) and Eurozone periphery, with sovereign-yield spreads as primary outcome. Daily/monthly sovereign-bond
+    panel across the 2010 crisis window.
+
+    '

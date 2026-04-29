@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: resource_extractor_nationalisation_reduces_output
+version: 1
+status: candidate
+topic: resource_rents
+
+claim: >
+  Nationalisation of producing oil, gas, and mining enterprises without
+  preservation of operational autonomy reduces extractor output within 3–5
+  years of nationalisation and underperforms the counterfactual trajectory
+  for at least a decade. Documented cases: Venezuela PDVSA 2003-2007
+  (purge of technical staff, subsequent 50%+ output collapse through 2020),
+  Argentina YPF 2012 (expropriation from Repsol, subsequent capex retreat),
+  Bolivia YPFB 2006 (gas output stagnation vs regional trend), Mexico Pemex
+  (post-1938 long decline in extraction efficiency), UK 1970s coal + steel
+  nationalisations (productivity decline), Iran post-1979. The contrast
+  case the framework preserves is market-respecting state ownership
+  (Norway Statoil/Equinor, Saudi Aramco pre-2019, Gulf NOCs with technocratic
+  autonomy) — where state ownership with commercial operational rules does
+  NOT reduce output. The discriminating variable is preservation of
+  technocratic autonomy + commercial incentive structure, not ownership
+  per se.
+
+evidence_type: causal
+
+sample:
+  countries: [VEN, ARG, BOL, MEX, IRN, GBR, NOR, SAU, BRA]
+  period: [1950, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "episode-level: require identifiable nationalisation date and 5+ years of post-treatment data"
+    - "exclude joint-venture renegotiations where foreign operator retained operational control (not nationalisation)"
+
+variables:
+  outcome:
+    - name: primary_commodity_output_volume
+      source: "imf:primary_commodity_prices"
+      notes: "IMF PCPS covers prices; volumes need BP Statistical Review (pending fetcher) or OPEC ASB (pending scrape) at promotion."
+    - name: capex_per_barrel_or_tonne
+      source: "constructed: extractor capex / output; requires per-company annual reports for Repsol, PDVSA, YPF, Equinor"
+    - name: export_revenue_share_of_gdp
+      source: "wb:TX.VAL.MRCH.CD.WT"
+    - name: productivity_output_per_worker
+      source: "constructed: extractor headcount / physical output; per-episode"
+
+  treatment:
+    - name: nationalisation_with_autonomy_loss
+      source: "constructed: binary = 1 where state assumed operational control AND documented technocratic-autonomy reduction (staff purge, political appointment of technical managers, revenue diversion to general budget)"
+      notes: "Distinguishes from Norway-model state ownership which preserves autonomy. Coding doc TBD."
+
+  controls:
+    - name: commodity_price_level
+      source: "imf:primary_commodity_prices"
+    - name: global_demand_proxy
+      source: "wb:NY.GDP.MKTP.KD"
+    - name: institutional_quality
+      source: "wgi:GOV_WGI_GE.EST"
+    - name: prior_output_trend
+      source: "constructed: pre-treatment 5-year volume trend per episode"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Nationalisation is a regulatory change in ownership + operational
+  control structure, not a fiscal transfer. Where state enterprises
+  also divert revenue to fiscal spending (Venezuela under Chávez),
+  the fiscal leakage is coded as a separate treatment channel
+  per invariant 4.
+
+estimator:
+  template: synthetic_control
+  clustering: episode
+  random_seed: 20260423
+  notes: >
+    Synthetic control: for each autonomy-loss-nationalisation event,
+    construct a synthetic comparator from non-treated producing states
+    matched on pre-treatment output trajectory, commodity mix, and
+    institutional quality. Primary outcome is post-treatment output
+    trajectory divergence over 5-10 year windows. Norway (1972 Statoil
+    formation with autonomy preservation) serves as an explicit
+    placebo — the framework predicts Norway's trajectory does NOT
+    diverge negatively from its synthetic control.
+
+falsification:
+  rule: >
+    Not supported if (a) the synthetic-control ATT on output volume is
+    not negative and significant at 5% across autonomy-loss episodes,
+    OR (b) Norway's post-1972 placebo shows negative divergence
+    comparable to autonomy-loss cases (which would indicate the
+    discriminating variable is ownership not autonomy), OR (c) any
+    single autonomy-loss-nationalisation produced sustained output
+    outperformance of 20%+ over 10 years vs synthetic control.
+  test: synth_control_att_with_placebo_check
+  threshold: "ATT negative, p<0.05; Norway placebo ATT insignificant; zero positive counterexamples"
+
+prior_confidence: 0.85
+disclosure: >
+  Author holds market-liberal priors. The 0.85 prior is slightly below
+  the rent-control and price-control priors (0.92, 0.95) because the
+  claim is genuinely nuanced — state ownership CAN work (Norway,
+  Aramco) and the framework takes that seriously. The discriminating
+  variable is technocratic autonomy, not ownership. Falsification via
+  the Norway placebo is a binding test of the framework's own
+  nuance-claim.
+
+steelman: hypotheses/steelman/resource_extractor_nationalisation_reduces_output.md
+
+linked_conditions:
+  - nordic_institutional_design  # Norway SWF is the explicit success case
+
+notes: >
+  Candidate, not pre_registered. Promotion requires: (1) BP Statistical
+  Review fetcher or OPEC ASB fetcher for extractor output volumes
+  (both currently pending/scrape_needed), (2) per-company capex
+  extraction from annual reports (Repsol, PDVSA, YPF, Equinor), (3)
+  episode coding document distinguishing autonomy-loss nationalisation
+  from autonomy-preserving state ownership.
+
+scope:
+  period: [1950, 2024]
+  countries: [VEN, ARG, BOL, MEX, IRN, GBR, NOR, SAU, BRA]
+  outcome_dim: [industrial_capability, productivity, energy]
+  policy_family: [privatisation_nationalisation, industrial_policy]
+  treatment_tags: [resource_extractor_nationalisation, autonomy_loss, autonomy_preserved, resource_extractor_nationalisation_autonomy_preserved]
+
+covers_claims:
+  - position_id: developmentalism
+    claim_index: 1
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Developmentalist position expects mixed results because technocratic state ownership can work; hypothesis tests the autonomy-loss boundary the developmentalist caveat names."
+  - position_id: eco_socialist
+    claim_index: 0
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Eco-socialist position accepts output decline when reduction is the policy goal; hypothesis measures the output-decline channel the position contingently endorses."
+  - position_id: market_socialist
+    claim_index: 1
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: "Market-socialist position predicts autonomy-preserved state ownership is output-neutral; hypothesis uses Norway/Aramco as the autonomy-preservation placebo that discriminates ownership from autonomy."
+  - position_id: marxist_leninist
+    claim_index: 0
+    polarity: aligned
+    school_prediction: falsified
+    confidence: medium
+    notes: "Marxist-Leninist position predicts planned state ownership raises output; hypothesis's autonomy-loss cases (Venezuela PDVSA, Argentina YPF, Bolivia YPFB) test and refute that prediction."
+

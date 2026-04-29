@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: federal_minimum_wage_employment_meta
+version: 1
+status: draft
+topic: labour
+claim: US Sanders 2016/2020 $15 federal minimum wage proposal, in meta-analyses of state-level evidence, would not produce the 1.3m-job loss CBO low-end estimate; effect is closer to zero.
+notes: Stub seeded from a democratic-socialist school prediction about Sanders $15 federal floor employment meta-analysis. Out-of-sample extrapolation from sub-federal increases is fragile at high bite
+  ratios; needs human review of how state evidence maps to federal scenario.
+prior_confidence: 0.4
+disclosure: Author's market-liberal priors expect more disemployment at federal-floor bite ratios that exceed historical state range, especially in low-wage southern labour markets; could under-weight evidence
+  of zero/positive aggregate effect in meta-analyses and over-weight CBO's adverse low-end.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Callaway-Sant'Anna staggered DiD on US state minimum-wage increases 1990-2022 with QCEW state-quarter employment and state/year FE; supported if pooled employment elasticity falls within [-0.05,
+    +0.05] interval at p<0.10, contradicting CBO low-end magnitude.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop state-quarters missing QCEW employment counts
+  - winsorise minimum-wage shock magnitudes at 1st/99th sample percentile
+variables:
+  outcome:
+  - name: state_total_employment_qcew
+    source: bls:CES0500000003
+    transformation: log
+    notes: 'BLS Current Employment Statistics state-level employment series. Native QCEW state-quarter series requires bls:QCEW endpoint — TODO when registered.
+
+      '
+  - name: low_wage_sector_employment
+    source: bls:OEUM000000000000000001
+    transformation: log
+    notes: BLS OEWS occupational employment in low-wage industries (NAICS 72, 44-45).
+  - name: low_wage_employment_share
+    source: bls:OEUM000000000000000001
+    transformation: share
+  treatment:
+  - name: state_minimum_wage
+    source: fred:STTMINWGCA
+    transformation: log
+    notes: 'FRED state-level minimum-wage histories. Series ID is the California exemplar — swap per state at wiring.
+
+      '
+  - name: federal_minimum_wage
+    source: fred:FEDMINNFRWG
+    transformation: log
+  - name: minimum_to_median_wage_ratio
+    source: oecd:OECD.ELS.SAE,DSD_EARN@DF_MW_DOL_RPP,1.0
+    transformation: ratio
+    notes: OECD minimum-wage-to-median-wage bite ratio.
+  controls:
+  - name: state_unemployment_rate
+    source: bls:LAUST010000000000003
+    transformation: level
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_state_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+scope:
+  period:
+  - 2016
+  - 2020
+  countries:
+  - USA
+  outcome_dim:
+  - employment_labour
+  - wage_stagnation
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - sanders_15_federal_minimum_wage_proposal_2016
+  - sanders_15_federal_minimum_wage_proposal_2020
+  - cbo_minimum_wage_estimate_2019
+covers_claims:
+- position_id: democratic_socialist
+  claim_index: 12
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Democratic socialist claim that meta-analyses of state-level minimum-wage evidence imply Sanders' $15 federal floor would produce employment effects closer to zero than CBO's 1.3m-job low-end estimate.
+estimator:
+  template: did_callaway_santanna
+  clustering: state
+  fixed_effects:
+  - state
+  - year
+  notes: 'Staggered DiD across US state minimum-wage increases using QCEW state-quarter employment counts. Callaway-Sant''Anna handles cohort heterogeneity; meta-style aggregation across treatment cohorts
+    produces effective elasticity for federal-floor scenario.
+
+    '

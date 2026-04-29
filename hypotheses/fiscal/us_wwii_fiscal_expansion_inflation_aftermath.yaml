@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_wwii_fiscal_expansion_inflation_aftermath
+version: 1
+status: draft
+topic: fiscal
+claim: US WWII fiscal expansion 1941-1945 (debt reaching 106% of GDP) did not produce sustained inflation once price controls were lifted and real capacity returned, consistent with MMT's real-constraint
+  view.
+notes: Maps the MMT school's WWII-debt-no-sustained-inflation claim to a 1941-1951 US local-projections decomposition separating price-control suppression from real-constraint dynamics. Estimator and prior
+  set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.4
+disclosure: Author is skeptical of the strong MMT framing because the 1946-1948 post-control inflation spike (~14% annualised) was substantial — calling it 'not sustained' depends on the window choice;
+  Reconversion 1947-1951 was facilitated by demand-suppression demobilisation and Fed-Treasury accord rather than by the absence of an underlying inflation overhang.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: US monthly LP (h=0..36m) 1941-1951 of CPI inflation on fiscal-impulse shocks with WWII price-control regime indicator; HAC SEs. Refute if post-1946-control-removal inflation persists >24m above
+    pre-war baseline (Romer counterfactual >5pp) at p<0.10.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period:
+  - 1939
+  - 1955
+  temporal_structure: time_series
+  exclusion_rules:
+  - 'treat the 1946 OPA price-control unwinding as a known structural break, not an exclusion: the period between de-control and 1948 inflation peak is the focal test window'
+  - drop 1942Q1-1945Q3 from primary inflation regressions when modelling latent inflationary pressure (price controls censor measurement); retain for sensitivity
+variables:
+  outcome:
+  - name: cpi_inflation_yoy
+    source: fred:CPIAUCNS (US CPI, all items, 1913+)
+    transformation: pct_yoy
+    notes: Primary outcome. Tests whether high-debt fiscal expansion produced sustained post-control inflation.
+  - name: cpi_inflation_5yr_avg_post_war
+    source: fred:CPIAUCNS
+    transformation: avg_yoy_1946_1951
+    notes: Sustained-inflation test — does inflation persist beyond the immediate de-control surge?
+  - name: gdp_deflator
+    source: fred:GDPDEF (US GDP implicit price deflator, quarterly from 1947); jst:cpi
+    transformation: pct_yoy
+  treatment:
+  - name: federal_debt_pct_gdp
+    source: fred:GFDEGDQ188S (federal debt to GDP); jst:debtgdp
+    transformation: pct_gdp
+    notes: Reaches 106% of GDP at 1946 peak.
+  - name: federal_primary_balance_pct_gdp
+    source: fred:FYFSGDA188S (federal surplus/deficit, % GDP)
+    transformation: pct_gdp
+  - name: real_government_expenditure_growth
+    source: fred:FGEXPND (federal government current expenditure)
+    transformation: pct_yoy_real_deflated_by_cpi
+  - name: opa_price_controls_active
+    source: 'constructed: indicator = 1 from 1942-01-30 (Emergency Price Control Act) to 1946-11-09 (OPA termination); 0 otherwise'
+    transformation: binary
+  controls:
+  - name: fed_discount_rate
+    source: fred:M13002USM156NNBR (NY Fed discount rate historical)
+    transformation: level_pct
+  - name: real_gdp_growth
+    source: fred:GDPC1; jst:rgdp_pc_real
+    transformation: pct_yoy
+  - name: unemployment_rate
+    source: fred:UNRATE (post-1948); bls:historical_unemployment_us
+    transformation: pct_labour_force
+  - name: industrial_capacity_utilisation
+    source: 'fred:CAPUTLG2211S (post-1967 only); manual: WWII NBER capacity-utilisation series for war-period coverage'
+    transformation: pct_capacity
+    notes: 'TODO: pre-1967 capacity-utilisation must be hand-compiled from NBER archival data; flag as a fallback.'
+scope:
+  period:
+  - 1941
+  - 1951
+  countries:
+  - USA
+  outcome_dim:
+  - inflation
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - us_wwii_fiscal_expansion
+  - wwii_price_controls
+covers_claims:
+- position_id: mmt
+  claim_index: 2
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: MMT position reads WWII fiscal expansion (debt to 106% of GDP) as consistent with the real-constraint view because post-control inflation did not persist; hypothesis tests exactly the 1941-1951
+    US inflation aftermath.
+estimator:
+  template: local_projections
+  clustering: HAC
+  fixed_effects: []
+  notes: 'Local projections of inflation on WWII-era fiscal-impulse shocks using US monthly/quarterly time series 1941-1951. HAC standard errors. Counterfactual decomposition separates price-control suppression
+    from underlying real-constraint dynamics.
+
+    '

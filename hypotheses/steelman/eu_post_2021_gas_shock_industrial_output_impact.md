@@ -1,0 +1,24 @@
+# Steelman — EU post-2021 gas shock industrial output impact
+
+**The strongest arguments against the framework's "gas-shock contracted EU industry differentially" framing:**
+
+1. **The contraction is largely cyclical inventory and demand response, not persistent deindustrialisation.** Energy-intensive EU producers drew down inventories and idled marginal plants in 2022-2023, but most capacity remained in place and can be restarted when relative prices normalise. Bachmann et al. (2022) argued that an acute gas curtailment would have a modest and reversible output cost; the observed contraction is broadly consistent with that view. Treating the 2022-2024 dip as "structural deindustrialisation" overreads what may be a normal cyclical response to an exogenous price spike. By late 2024 some subsectors (refining, ammonia) had already partially recovered — the persistence claim is data-fragile.
+
+2. **The shock is exogenous to EU policy choices.** Russia's invasion and pipeline-supply weaponisation are geopolitical events imposed on Europe from outside. A hypothesis that characterises the resulting industrial contraction as an EU-policy outcome blurs the attribution: Europe's share of global energy-intensive output was declining gradually before 2022 for secular reasons (Chinese scale, US shale advantage, demographic drag); the 2022 spike is a one-off stress event rather than evidence about EU policy design per se. The steelman is that "EU industry contracted more than US under a Russian gas cut" mostly tells us about pipeline geography, not regulation or green policy.
+
+3. **Intra-EU heterogeneity challenges the "EU as a whole contracted" narrative.** Germany and Italy showed the largest gas-exposure-driven hits; Ireland, Netherlands (Groningen supply notwithstanding), and Scandinavia fared markedly better. Spain and Portugal benefited from low-gas-intensity electricity mixes and the Iberian gas-price decoupling mechanism. If the EU-wide average masks large country-level heterogeneity that maps to country-specific gas-supply infrastructure (pipeline dependence, LNG terminal capacity, interconnection) rather than common-EU policy, then the interpretation is less about EU policy and more about country-level infrastructure.
+
+4. **US comparator outperformance is overdetermined.** US shale gas gave domestic gas prices roughly one-fifth of European TTF at peak; energy-intensive US manufacturing benefited from a price gap that is about geology and pipeline geography, not about EU over-regulation or bad policy. Holding up the US as a clean comparator implies EU could have replicated something similar, which is counterfactually implausible — the EU has no comparable domestic shale base, and building one would have collided with prior policy commitments and public acceptance.
+
+5. **Measurement challenges in industrial production indices are substantial.** Real output is computed with base-year quantity weights that become outdated; heavy substitution (e.g., ammonia → imported ammonia) during the shock period means the IPI may understate or overstate real value added depending on accounting convention. National statistical offices revise these series heavily, and cross-country comparability during a turbulent window is weaker than usual. The steelman: a significant share of the measured "contraction" may be a measurement artefact rather than a real economic loss.
+
+6. **The climate-welfare dimension is unmeasured.** Lower EU gas consumption in 2022-2024 produced real emissions reductions relative to counterfactual; acceleration of renewables deployment also sped up through the shock (gas as expensive made renewables relatively cheaper on the margin). The hypothesis measures only the industrial-output cost and not these offsetting benefits.
+
+**How this should shape the v1 result card when run:**
+
+- Report the contemporaneous (2022-2023) effect separately from the persistence question (2024+); flag that persistence is data-limited at v1 and commit to updating at v1.1 when 2025 data releases.
+- Decompose by country (pipeline exposure, LNG capacity, grid-mix) rather than pooling "EU." The country heterogeneity is substantive evidence.
+- Compare energy-intensive subsectors to broader manufacturing; if the effect is concentrated in energy-intensive subsectors as predicted, the mechanism is credible. If it is diffuse, something else is driving the aggregate.
+- Separate the gas-channel from the EU-ETS carbon-price channel. Both spiked together; the hypothesis should not attribute both to "gas shock."
+- Treat the US comparator with caution. The shale-driven cost gap is structural and not reproducible through EU policy; comparison should inform magnitude but not be read as a normative benchmark.
+- Acknowledge climate-benefit offsets as out-of-frame, not zero.

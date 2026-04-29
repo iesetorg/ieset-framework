@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: occupational_licensing_productivity_drag
+version: 1
+status: draft
+topic: distribution
+claim: Excessive occupational-licensing scope (US state-level variation) reduces inter-state labour mobility and sector productivity relative to light-licensing alternatives.
+notes: Maps the classical-liberal school's licensing-as-mobility-tax claim to a US state-year panel. Estimator and prior set; full pre-registration awaits steelman + human sign-off.
+prior_confidence: 0.6
+disclosure: Author prior aligns with the Kleiner-Krueger view that licensing scope reduces mobility and rents up wages without commensurate quality gains; the panel-FE spec absorbs time-invariant state
+  heterogeneity but cannot fully separate licensing scope from broader regulatory environment.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: US state-year panel FE (1980-2023) of inter-state migration rate and sector TFP on licensing-scope index (Kleiner-Krueger / Carpenter-Knepper); state+year FE, state-clustered SEs. Refute if coefficient
+    sign-flipped at p<0.10.
+sample:
+  countries:
+  - USA
+  period:
+  - 1980
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop state-years missing CPS state-of-residence/state-of-birth migration data
+variables:
+  outcome:
+  - name: state_labour_productivity_per_hour
+    source: bls:CES0500000003
+    transformation: log_yoy
+    notes: 'BLS Current Employment Statistics average hourly earnings as productivity proxy by state-of-work. TODO: replace with BLS productivity-by-state series when fetcher exposes it.
+
+      '
+  - name: inter_state_migration_rate
+    source: world_bank_wdi:SM.POP.TOTL
+    transformation: ratio
+    notes: 'Stop-gap proxy via WB international-migrant stocks. Native source is US Census ACS state-to-state mobility — TODO add us_census fetcher wiring.
+
+      '
+  - name: state_employment_in_licensed_occupations
+    source: bls:OEUM000000000000000001
+    transformation: share
+    notes: 'BLS OEWS occupational employment series; hand-mapped to Carpenter-Knepper licensed-occupation set.
+
+      '
+  treatment:
+  - name: occupational_licensing_scope_index
+    source: derived:carpenter_knepper_licensing_index
+    transformation: level
+    notes: 'Hand-coded Kleiner-Krueger / Carpenter-Knepper state licensing breadth and burden index. TODO: surface via academic publisher when registered.
+
+      '
+  controls:
+  - name: state_unemployment_rate
+    source: bls:LAUST010000000000003
+    transformation: level
+  - name: state_minimum_wage
+    source: fred:STTMINWGCA
+    transformation: log
+  - name: log_state_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+evidence_type: associational
+scope:
+  period:
+  - 1980
+  - 2023
+  countries:
+  - USA
+  outcome_dim:
+  - productivity
+  - employment_labour
+  - regulation_compliance_cost
+  policy_family:
+  - labour_market
+  - regulation
+  treatment_tags:
+  - us_state_occupational_licensing
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 11
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: Classical-liberal claim and hypothesis claim are textually identical — US state-level occupational licensing scope vs inter-state mobility and sector productivity.
+estimator:
+  template: panel_fe
+  clustering: state
+  fixed_effects:
+  - state
+  - year
+  notes: 'US state-year panel regressing inter-state mobility and sector productivity on occupational-licensing scope (Kleiner-Krueger series; Carpenter-Knepper updates). State and year FE; clustering by
+    state.
+
+    '

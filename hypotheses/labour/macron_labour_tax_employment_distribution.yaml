@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: macron_labour_tax_employment_distribution
+version: 1
+status: draft
+topic: labour
+claim: Macron 2017-2019 labour-tax reforms produced measurable employment gains but had distributional costs; welfare-state-adjustment outcome is mixed and depends on transfer-side offsets.
+notes: Stub seeded from social-democratic, empirical-pragmatist, and New-Keynesian school predictions about Macron 2017-2019 reforms. Window is short and pre-COVID; needs human review of yellow-vest distributional
+  channel.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors are sympathetic to Macron's flexibilisation/tax reforms but recognise mixed distributional evidence; could under-weight wealth-tax-abolition transfer effects on
+  inequality and over-weight employment gains during a strong euro-area cycle.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
+    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
+  test: Event study around 2017 ordonnances and 2018 tax reforms on French regional employment and Gini; supported if employment IRF is positive >+0.5pp and Gini IRF is positive >+0.5pp at p<0.10 each.
+evidence_type: associational
+sample:
+  countries:
+  - FRA
+  period:
+  - 2014
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - flag pandemic window 2020-Q2 to 2021-Q4 as confound
+variables:
+  outcome:
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: employment_rate
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS,1.0
+    transformation: level
+  - name: gini_disposable_income
+    source: oecd:OECD.WISE.INE,DSD_IDD@DF_IDD,1.0
+    transformation: level
+  - name: top_1_share
+    source: wid:wid_all
+    transformation: level
+    notes: WID top-1 income share — registered wid publisher; post-filter.
+  - name: poverty_rate_at_60_median
+    source: eurostat:ILC
+    transformation: level
+  treatment:
+  - name: macron_ordonnances_event
+    source: derived:macron_reform_dates
+    transformation: indicator
+    notes: 'Treatment timing: 2017-09 ordonnances; 2018 ISF/wealth-tax reform; 2019 unemployment-insurance reform. Hand-coded.
+
+      '
+  - name: french_corporate_tax_rate
+    source: oecd:OECD.CTP.TPS,DSD_TAX@DF_TAX_WAGES_COMP,2.1
+    transformation: level
+    notes: OECD corporate tax-rate series; tax-side bite.
+  controls:
+  - name: euro_area_unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+    notes: Donor-pool baseline — Eurozone aggregate as counterfactual trend.
+  - name: ecb_policy_rate
+    source: ecb:FM.M.U2.EUR.4F.KR.MRR_FR.LEV
+    transformation: level
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+scope:
+  period:
+  - 2017
+  - 2019
+  countries:
+  - FRA
+  outcome_dim:
+  - employment_labour
+  - poverty_inequality
+  policy_family:
+  - labour_market
+  - tax_policy
+  treatment_tags:
+  - macron_labour_reforms_2017
+  - macron_tax_reforms_2018
+covers_claims:
+- position_id: social_democratic
+  claim_index: 11
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: Social-democratic claim that Macron 2017-19 labour-tax reforms delivered employment gains with distributional costs and transfer-side-offset-conditional welfare outcomes.
+- position_id: empirical_pragmatist
+  claim_index: 14
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pragmatist claim that Macron 2017-19 reforms gained from French state capacity; relinked from labour_market_flexibility_unemployment_duration (Phase 4C) — France-specific reform test.
+- position_id: new_keynesian
+  claim_index: 7
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: New-Keynesian claim that Macron 2017-19 ordonnances reduced French unemployment duration without offsetting wage compression; relinked from labour_market_flexibility_unemployment_duration (Phase
+    4C).
+estimator:
+  template: event_study
+  clustering: region
+  fixed_effects:
+  - region
+  - quarter
+  notes: 'Event study around 2017 ordonnances and 2018 tax-reform enactment dates using French regional/sectoral panel. Outcomes: employment, unemployment duration, wage distribution, poverty rate. Pre-window
+    2014-2016, post-window 2017-2019.
+
+    '

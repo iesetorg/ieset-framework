@@ -1,0 +1,9 @@
+# Steelman: El Salvador Bukele GDP-Crime Tradeoff 2019-2024
+
+The strongest counter-argument runs on three levels: attribution, mechanism, and durability.
+
+On attribution: El Salvador's homicide decline began in 2016, three years before Bukele took office, and accelerated during 2019-2021 before the Estado de Excepción was declared in March 2022. Gang truces, migration of MS-13 and Barrio 18 leadership abroad, and demographic thinning of the prime-crime-age male cohort all contributed to the pre-Excepción decline. A synthetic control design with 2019 as the treatment date — matching the start of Bukele's term rather than the Estado de Excepción — would need to disentangle which intervention caused the final collapse of the homicide rate.
+
+On mechanism: El Salvador's remittances are approximately 25% of GDP, driven entirely by the US Hispanic labour market. US GDP growth 2022-2024 was unexpectedly strong, boosting remittance inflows and domestic consumption. A synthetic control donor pool of Honduras and Guatemala also benefited from this same US growth tailwind, but if the synthetic weights underweight the remittance channel for SLV — which is more remittance-dependent than most donors — the CATT will spuriously attribute US-driven consumption to the crime reduction. The mechanism test must explicitly net out the remittance channel.
+
+On durability: the GDP gains are consistent with a temporary security dividend that may not be sustained if mass imprisonment produces gang reorganisation at a more diffuse level, if wrongful detentions generate social discontent, or if the fiscal cost of maintaining 75,000+ prisoners (~1% of population) crowds out productive public investment over a 5-10 year horizon. The hypothesis tests 2022-2024 only; this window is too short to evaluate whether the crime-growth link is durable.

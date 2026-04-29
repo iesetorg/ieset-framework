@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_market_flexibility_unemployment_duration
+version: 1
+status: pre_registered
+topic: labour
+claim: 'Countries with stricter employment protection legislation — measured by the OECD EPL indicator (or comparable alternatives where OECD EPL is missing) — experience longer average unemployment duration,
+  holding other controls constant. The hypothesis is consistent with the Mortensen-Pissarides search-and-matching framework: higher firing costs reduce both firing and hiring flows, lengthening the time
+  unemployed workers spend searching for jobs. The effect on the unemployment LEVEL is theoretically ambiguous (lower inflows offsetting longer durations) and is NOT part of the pre-registered claim; only
+  the duration effect is. Expected effect is sign-definite (positive correlation between EPL strictness and duration) with magnitude consistent with the Nickell 1997, Blanchard-Wolfers 2000, and OECD Employment
+  Outlook (2020+) ranges.
+
+  '
+evidence_type: associational
+sample:
+  countries:
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  - AUS
+  period:
+  - 1985
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with active systemic banking-crisis unemployment shocks (Laeven-Valencia coding); crisis-driven displacement dominates duration for reasons unrelated to EPL
+  - drop country-years where OECD EPL series has a methodology break without bridge (EPL v1 to v2 transition ~2008 requires bridge)
+variables:
+  outcome:
+  - name: long_term_unemployment_share
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS_INCIDENCE_UNEMP,1.0
+    transformation: share_unemployed_12_months_or_more
+    notes: Primary outcome. Share of unemployed who have been unemployed for 12+ months.
+  - name: median_unemployment_duration
+    source: oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS_DURATION,1.0
+    transformation: level_months
+    notes: Secondary outcome; alternative measurement of the same duration concept.
+  - name: unemployment_to_employment_transition_rate
+    source: ilostat:EMP_2EMP_SEX_AGE_NB; oecd:OECD.ELS.EMP,DSD_LMS@DF_LMS,1.0
+    transformation: monthly_transition_rate_12mo_average
+    notes: 'Tertiary outcome: direct measure of the matching-function flow rate.'
+  treatment:
+  - name: oecd_epl_strictness
+    source: oecd:DSD_EPL@DF_EPL
+    transformation: level_index_0_to_6
+    notes: 'OECD EPL v2 regular-contracts indicator primary; v1-v2 bridge series used where v2 unavailable for early years. Fetcher status: pending as of hypothesis pre-registration; data-gated.'
+  controls:
+  - name: unemployment_benefit_replacement_rate
+    source: oecd:OECD.ELS.SAE,DSD_UBR@DF_UBR,1.0
+    transformation: level_pct
+    notes: Generosity of unemployment insurance also affects duration; controlling separates the EPL-specific effect from the UI-generosity effect.
+  - name: active_labour_market_spending
+    source: oecd:OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0
+    transformation: pct_of_gdp
+  - name: unionisation_rate
+    source: oecd:OECD.ELS.SAE,DSD_TU@DF_TU,1.0; ilostat:union_density
+    transformation: level_pct
+  - name: output_gap
+    source: imf:NGAP_NPGDP
+    transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: 'EPL is a regulatory intervention governing the firm-worker contractual relationship. Fiscal flows (unemployment benefits, ALMP spending) are controls, not treatment.
+
+  '
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: 'Two-way FE panel, standard errors clustered by country. Primary identification from within-country EPL changes over time (many OECD countries undertook EPL reforms — DEU 2003 Hartz, ESP 2012,
+    ITA 2014 Jobs Act, FRA 2017 — providing useful within-country variation). Robustness: Blanchard-Wolfers 2000 style interaction of EPL with macro shock (output gap), since the theoretical prediction
+    is EPL matters more when shocks are larger.
+
+    '
+falsification:
+  rule: 'Not supported if (a) the two-way FE panel coefficient on OECD EPL on long-term-unemployment share is not positive and significant at 5%, OR (b) the coefficient on median unemployment duration is
+    not positive at 5%, OR (c) the coefficient loses significance when unemployment-benefit replacement rate is added as a control (suggesting the finding is confounded with UI generosity rather than identifying
+    the EPL-specific effect). Support requires both outcomes to show the predicted sign AND for the EPL coefficient to remain significant after the UI generosity robustness control.
+
+    '
+  test: two_outcome_direction_plus_ui_robustness
+  threshold: 'panel_FE_beta(EPL) on long_term_share > 0 at p<0.05 AND panel_FE_beta(EPL) on median_duration > 0 at p<0.05 AND EPL coefficient remains significant at p<0.10 after UI generosity control
+
+    '
+prior_confidence: 0.7
+disclosure: 'The EPL-duration literature has a large base: Nickell 1997, Blanchard- Wolfers 2000, IMF/OECD institutional-reform literature through the 2010s generally supported a positive association. Post-2015
+  literature (Bassanini-Duval, OECD Employment Outlook series) has qualified the magnitude and argued heterogeneity by worker type matters. Author holds market-liberal priors that favour the hypothesis''s
+  direction; pre-registration commits to publishing the null with asymmetric prominence per DISCLOSURE.md.
+
+  '
+scope:
+  period:
+  - 1985
+  - 2023
+  countries:
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  - AUS
+  - OECD
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+  - regulation
+  treatment_tags:
+  - oecd_epl_indicator
+  - employment_protection_legislation
+  - danish_flexicurity
+  - agenda_2010
+  - hartz_reforms_2003
+steelman: hypotheses/steelman/labour_market_flexibility_unemployment_duration.md
+linked_hypotheses:
+- minimum_wage_employment_effect_us_states
+- nordic_outcome_persistence_decomposition
+notes: 'Data-gated on OECD EPL fetcher. Publisher oecd is status: ready but the EPL dataflow (OECD.ELS.EMP,DSD_EPL@DF_EPL) has not been confirmed via the standard fetcher path; v1 pre-registration commits
+  the spec, first-run execution waits on EPL dataflow validation. Alternative specification using Fraser EFW labour-market-flexibility subcomponent (regulation of hiring and firing) as a secondary treatment
+  is a v2 companion.
+
+  '

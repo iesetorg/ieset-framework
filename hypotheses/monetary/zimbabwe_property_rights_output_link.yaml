@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: zimbabwe_property_rights_output_link
+version: 1
+status: draft
+topic: monetary
+claim: Zimbabwean property-rights deterioration post-2000 (commercial-farm expropriation without compensation)
+  precedes hyperinflation and output collapse; institutional mechanism is necessary, not merely monetary.
+notes: Origin is auto-generated coverage-gap stub seeded from institutionalist framing of Zimbabwe
+  hyperinflation as property-rights-deterioration mechanism, not pure-monetary. Human review required.
+prior_confidence: 0.65
+disclosure: Author has institutionalist+market-liberal priors that may overweight the property-rights
+  channel and underweight monetary-financing-of-fiscal-deficit explanations operating in parallel.
+falsification:
+  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
+    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
+    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
+    the variables and estimator blocks when this stub is promoted from draft.
+  test: 'Multi-metric checklist on ZWE 2000-2009: property-rights-index decline >1 SD precedes hyperinflation onset (Cagan threshold 50%) by >12 months with p<0.10 supports the institutional-channel claim.'
+evidence_type: associational
+scope:
+  period: [2000, 2009]
+  countries: [ZWE]
+  outcome_dim: [inflation, institutional_quality, gdp_growth]
+  policy_family: [institutional_reform, privatisation_nationalisation]
+  treatment_tags: [zimbabwe_land_expropriation_2000, zimbabwe_hyperinflation]
+covers_claims:
+  - position_id: institutionalism
+    claim_index: 10
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Institutionalist claim that Zimbabwe post-2000 property-rights deterioration precedes hyperinflation and output collapse — institutional mechanism necessary not merely monetary; direct alignment with hypothesis claim and scope."
+
+estimator:
+  template: multi_metric_checklist
+  clustering: episode
+  notes: >
+    Stub-level estimator pin for runnability audit. Canonical-case multi-
+    metric checklist for Zimbabwe 2000-2009: (i) commercial-farm expropriation
+    timing (Fast Track 2000), (ii) institutional-quality indices (property
+    rights, rule of law), (iii) hyperinflation onset (Cagan threshold),
+    (iv) real-output collapse, (v) monetary aggregates. Pattern-test:
+    institutional-deterioration metrics deteriorate before monetary collapse.
+    Falsification rule, canonical_metrics array, and variables block remain
+    to be filled when this stub is promoted from draft.
+
+sample:
+  countries: [ZWE]
+  period: [1995, 2009]
+  temporal_structure: time_series
+
+variables:
+  outcome:
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG; hanke_tc:zimbabwe_monthly_inflation"
+      transformation: pct_change_yoy
+      notes: "Hanke-Krus daily/monthly inflation peaks ~89.7 sextillion% Nov-2008."
+    - name: real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD; maddison:gdp_per_capita_2011_intl"
+      transformation: log_level
+    - name: hyperinflation_onset_indicator
+      source: "constructed: binary = 1 from month annual CPI > 50% (Cagan threshold); ZWE breaches in 2007"
+      transformation: binary
+  treatment:
+    - name: fast_track_land_reform_event
+      source: "constructed: event date = 2000-02 (FTLRP launch); commercial-farm expropriation 2000-2002"
+      transformation: event_date
+    - name: property_rights_index
+      source: "fraser_efw:legal_system_property_rights; heritage_ief:property_rights"
+      transformation: level
+    - name: rule_of_law_wgi
+      source: "wgi:RL.EST"
+      transformation: level
+  controls:
+    - name: m2_money_supply
+      source: "rbz:money_supply"
+      transformation: log_diff
+      notes: "TODO: RBZ M2 series; manual-drop required."
+    - name: terms_of_trade
+      source: "imf_pcps:PALLFNF"
+      transformation: log_diff
+    - name: drought_indicator
+      source: "constructed: binary = 1 in major drought years (2002-2003, 2007-2008)"
+      transformation: binary
+

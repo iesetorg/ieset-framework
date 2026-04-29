@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bukele_mass_incarceration_homicide_impact_2019_2024
+version: 1
+status: candidate
+topic: institutional_quality
+claim: 'El Salvador''s ~98% homicide-rate decline from 103/100k (2015) to 2.4/100k (2023) — with the sharpest decline occurring after the Mar 2022 régimen de excepción and the Jan 2023 CECOT opening — is
+  causally attributable in material part to the Bukele-era mass-incarceration regime (régimen de excepción + Plan Control Territorial + CECOT). The pre-registered claim is that under a synthetic-control
+  design using Central American and Andean peer countries (HND, GTM, NIC, HND, CRI, DOM, COL, ECU, VEN) as donor pool, SLV''s post-treatment homicide-rate gap versus its synthetic counterfactual is negative
+  and large (> 50% of observed decline) with permutation inference p-value < 0.05. The hypothesis must also address the pre-existing gang-truce confound (2012-2014 FMLN-era truce + alleged 2019-2022 undisclosed
+  Bukele-administration truce per El Faro reporting) and the demographic factor (mara-age-cohort shrinking). An alternative channel (negotiated truce) must be tested via leaked-message-dated structural-break
+  analysis around the Mar 26-30 2022 massacre that triggered the régimen.
+
+  '
+evidence_type: causal
+sample:
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - CRI
+  - DOM
+  - COL
+  - ECU
+  - VEN
+  - MEX
+  - JAM
+  period:
+  - 2005
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Venezuela post-2017 from donor pool weighting due to data-quality collapse under the Maduro-era crisis
+  - exclude country-years with armed-conflict codings above UCDP intensity-1 threshold (internal armed conflict)
+scope:
+  period:
+  - 2005
+  - 2025
+  countries:
+  - SLV
+  - HND
+  - GTM
+  - NIC
+  - CRI
+  - DOM
+  - COL
+  - ECU
+  - VEN
+  - MEX
+  - JAM
+  - LATAM
+  outcome_dim:
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - regulation
+  treatment_tags:
+  - bukele_2019
+  - regimen_de_excepcion_2022
+  - plan_control_territorial
+  - cecot_opening_2023
+variables:
+  outcome:
+  - name: homicide_rate_per_100k
+    source: unodc:intentional_homicide; world_bank_wdi:VC.IHR.PSRC.P5 (backfill via WDI mirror)
+    transformation: level
+  - name: extortion_complaints_rate
+    source: sv_pnc:PNC; honduras_pn; guatemala_pn
+    transformation: level
+    notes: 'Secondary outcome: extortion is the primary mara economic activity; complaints-rate decline is a harder-to-fake channel than homicide (bodies must be recorded; extortion dark figure is large
+      but secular).'
+  treatment:
+  - name: regimen_de_excepcion_active
+    source: 'constructed: binary = 1 for SLV from 2022-03-27 onward; 0 otherwise'
+    transformation: binary
+  - name: detention_rate_per_100k
+    source: constructed from Ministerio de Justicia y Seguridad Pública + Cristosal detention tallies
+    transformation: cumulative_level
+  controls:
+  - name: male_15_29_population_share
+    source: world_bank_wdi:SP.POP.1564.MA.ZS (proxy); un_desa:WPP
+    transformation: level
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: remittance_share_gdp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: level
+  - name: gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_level
+intervention_channel: regulatory
+intervention_channel_justification: 'Mass-incarceration policy operates through the regulatory (criminal-justice / security-regulation) channel. Fiscal spending expansion is secondary.
+
+  '
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: 'Primary: synthetic control (Abadie 2010) with SLV treated 2022-03-27 onward, pre-period 2005-2021 for donor weighting. Secondary: synth_did for matched pre-trend plus parallel- trends-free estimation.
+    Robustness: Callaway-Sant''Anna DiD with Central American peers as never-treated; placebo-in- space tests applying treatment to each donor unit; placebo-in- time assigning treatment at 2019-06-01 (Bukele
+    inauguration) to test whether the homicide decline precedes the régimen.
+
+    '
+falsification:
+  rule: 'Not supported if any of: (a) synthetic-control estimated treatment effect on homicide rate 2022-2024 is not negative and statistically distinguishable from donor-permutation distribution at p <
+    0.05, OR (b) the post-2022 gap is smaller than 50% of the observed pre-to-post decline (i.e., the counterfactual donor pool also experienced substantial homicide decline), OR (c) a placebo-in-time test
+    assigning treatment at 2019-06-01 produces a similarly large gap (indicating the decline predates régimen and is attributable to Plan Control Territorial / alleged undisclosed truce rather than mass
+    incarceration), OR (d) the extortion- complaints secondary outcome shows no decline (indicating crime was not substantively reduced, only homicides, implying a body-disposal or reporting-manipulation
+    confound).
+
+    '
+  test: synthetic_control_plus_placebo_in_time_plus_extortion_secondary
+  threshold: 'CATT_2022_2024(homicides) < 0 at p_perm < 0.05 AND |CATT_2022_2024(homicides)| > 0.5 * observed_decline_2015_2023 AND placebo_in_time_CATT_2019_2021 < 0.5 * CATT_2022_2024 AND CATT_2022_2024(extortion_complaints)
+    < 0 at p_perm < 0.10
+
+    '
+prior_confidence: 0.62
+disclosure: 'Author''s market-liberal prior is genuinely divided: security- content reforms are coded as pro-property-rights but the rule-of-law channel is coded strongly negative, and the author''s prior
+  toward "hard-security shocks do reduce violent crime via incapacitation" (Durlauf-Nagin 2011, Canada/USA mass-incarceration literature) is counter-balanced by skepticism of government-supplied administrative
+  detention statistics and the El Faro-documented truce-negotiation evidence. Prior 0.62 reflects moderate confidence that some causal share is attributable, with substantial uncertainty on the fraction
+  and on whether the extortion-complaints secondary outcome will corroborate. A null or weak result would update priors toward the truce-negotiation explanation.
+
+  '
+conflict_disclosure: 'Author has no Salvadoran financial exposure. Prior is disclosed and binding pre-registration commits to publishing null result if obtained.
+
+  '
+steelman: hypotheses/steelman/bukele_mass_incarceration_homicide_impact_2019_2024.md
+linked_hypotheses:
+- rule_of_law_institutional_growth
+notes: 'Data-gated: UNODC and national-police homicide series for the donor pool must be current through 2024. Cristosal detention dataset (monthly series of régimen-de-excepción detentions) is the primary
+  administrative-detention metric. Extortion- complaints data thinner but essential for the body-disposal confound test. Placebo-in-time design at 2019-06-01 is critical for separating Plan Control Territorial
+  effect from régimen effect.
+
+  '
