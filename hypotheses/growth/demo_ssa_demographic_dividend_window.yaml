@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_ssa_demographic_dividend_window
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Sub-Saharan Africa's demographic-dividend window (defined as the period of rising working-
+  age share following fertility transition) opened for most countries 2000-2020 and is
+  projected to extend through 2050. The hypothesis predicts (a) measurable working-age share
+  rises in SSA panel 2000-2023, (b) per-capita growth response per pp working-age-share
+  increase is positive but smaller than the East Asian benchmark, conditional on
+  institutional quality. Below a governance-effectiveness threshold, the dividend fails to
+  translate to per-capita growth.
+evidence_type: associational
+sample:
+  countries: [NGA, KEN, ETH, GHA, TZA, UGA, SEN, CIV, ZAF, RWA, ZMB, MOZ, CMR, AGO, BFA, MLI, BEN, NER, MWI, MDG]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [AFRICA]
+  outcome_dim: [gdp_growth, demographics_migration]
+  policy_family: [none]
+  treatment_tags: [demographic_dividend, sub_saharan_africa]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+  controls:
+    - name: government_effectiveness
+      source: wgi:GOV_WGI_GE.EST
+      transformation: level
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: secondary_completion_rate
+      source: world_bank_wdi:SE.SEC.CMPT.LO.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE with interaction between working-age share and government-effectiveness tertile
+    to test institutional moderation.
+falsification:
+  rule: >-
+    SUPPORTED if (a) working-age-share coefficient is positive and significant for the
+    high-governance tertile, (b) interaction term between working-age share and governance
+    tertile is significant at p<0.10, AND (c) low-governance tertile coefficient is
+    indistinguishable from zero. REFUTED if the dividend operates uniformly regardless of
+    governance OR fails to operate at any governance level.
+  test: panel_fe_ssa_dividend_with_governance_interaction
+  threshold: "coef_wap_high_gov > 0 AND interaction_p < 0.10 AND coef_wap_low_gov_p > 0.10"
+prior_confidence: 0.55
+disclosure: >-
+  Author's priors expect institutional moderation; risk of governance-quality measurement
+  conflating with development level.
+steelman: hypotheses/steelman/demo_ssa_demographic_dividend_window.md

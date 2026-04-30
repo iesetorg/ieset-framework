@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_nigeria_fuel_subsidy_removal_2023
+version: 1
+status: candidate
+topic: fiscal
+claim: >-
+  Nigeria's May 2023 elimination of the petrol subsidy under President Tinubu produced a
+  fiscally favourable but socially costly trajectory: federally-retained revenue rose, the
+  primary fiscal balance improved relative to the 2018-2022 baseline, but headline CPI
+  inflation accelerated and household real-consumption proxies weakened in the 12-24 months
+  post-removal. The pre-registered claim is that, in a synthetic-control design with a Sub-
+  Saharan African oil-exporter donor pool (Angola, Algeria, Gabon, Republic of Congo,
+  Equatorial Guinea), Nigeria's primary fiscal balance share of GDP improves by at least 1.5
+  percentage points 2023-2025 vs synthetic counterfactual AND CPI inflation rises by at least
+  6 percentage points more than the synthetic counterfactual. The null counter-claim is that
+  Nigeria's fiscal improvement is statistically indistinguishable from the donor-pool path
+  once oil-price terms-of-trade and naira devaluation are netted out — i.e. the subsidy reform
+  did not deliver fiscal repair distinct from windfall mechanics.
+evidence_type: causal
+sample:
+  countries:
+  - NGA
+  - AGO
+  - DZA
+  - GAB
+  - COG
+  - GNQ
+  period:
+  - 2010
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude pandemic 2020Q2-2020Q4 from pre-treatment weighting
+  - flag Algeria 2019-2020 Hirak political turbulence; retain but robustness-check
+scope:
+  period:
+  - 2010
+  - 2025
+  countries:
+  - NGA
+  - AGO
+  - DZA
+  - GAB
+  - COG
+  - GNQ
+  outcome_dim:
+  - fiscal_policy
+  - inflation
+  - currency_purchasing_power
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - tinubu_fuel_subsidy_removal_2023
+  - nigeria_naira_float_2023
+variables:
+  outcome:
+  - name: primary_fiscal_balance_share_gdp
+    source: imf:GGXONLB_NGDP; world_bank_wdi:GC.BAL.CASH.GD.ZS
+    transformation: level
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: real_household_consumption_pc
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: log_level
+  - name: fuel_pump_price
+    source: world_bank_wdi:EP.PMP.SGAS.CD; owid:fuel_prices
+    transformation: log_level
+  treatment:
+  - name: subsidy_removal_indicator
+    source: 'constructed: binary = 1 for NGA from 2023-06-01 onward'
+    transformation: binary
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU; imf:POILBRE
+    transformation: log_level
+  - name: usd_exchange_rate_official
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >-
+  The petrol subsidy was an off-budget federal subsidy borne primarily through NNPC
+  under-recoveries; its elimination is a fiscal-channel intervention with downstream
+  monetary effects through the FX market when paired with the simultaneous naira float.
+  Channel-separation note: the naira float is a parallel monetary/exchange-rate-regime
+  shock that runs alongside the fiscal shock; the spec retains a bundled-fiscal coding
+  but reports a robustness specification controlling for the float separately.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with NGA treated from 2023Q3 and oil-exporter SSA + MENA donor
+    pool. Secondary: Callaway-Sant'Anna DiD. Tertiary: local projections with
+    quarters-since-removal interaction. Robustness includes excluding Angola (its own
+    2023 fiscal adjustment) and excluding 2024Q1 naira-redenomination noise.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) synth_did CATT on primary_fiscal_balance over 2023Q3-
+    2025Q4 is less than +1.5 percentage points of GDP at p_perm < 0.10, OR (b) the
+    inflation acceleration relative to synthetic counterfactual is less than +6
+    percentage points cumulative, OR (c) both the fiscal and inflation effects are
+    inside the placebo distribution (indicating the reform did not produce a
+    detectable break).
+  test: synth_did_dual_outcome_with_permutation
+  threshold: >-
+    CATT_2023Q3_2025Q4(primary_fiscal_balance_share_gdp) > 1.5 ppts at p_perm < 0.10
+    AND CATT(cpi_yoy) > 6 ppts cumulative at p_perm < 0.10
+prior_confidence: 0.6
+disclosure: >-
+  Author's market-liberal prior expects the reform to produce fiscal improvement and
+  short-run inflation cost (textbook subsidy-removal pattern). The 0.60 prior reflects
+  moderate confidence the fiscal effect is large enough to clear the 1.5-ppt threshold,
+  tempered by uncertainty about how much of the headline fiscal gain is FX accounting
+  vs real revenue (NNPC remittance practices changed simultaneously). The naira-float
+  confound is the main reason the prior is not higher.
+conflict_disclosure: Author has no Nigerian asset exposure or consulting relationship.
+steelman: hypotheses/steelman/africa_nigeria_fuel_subsidy_removal_2023.md
+notes: >-
+  Data-gated on IMF GFS quarterly fiscal series for Nigeria (often lagged) and CBN
+  inflation data. The June-2023 naira float is a confound; the spec controls for it
+  rather than excluding it because the political package was bundled. Run target after
+  IMF Article IV 2025 update releases full-year 2024 fiscal data.

@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_canada_points_system_immigration
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Canada's points-based immigration system (introduced 1967, enhanced 2002 IRPA) selects on
+  human capital and produces a foreign-born workforce with above-average tertiary
+  attainment. The hypothesis tests whether Canada's foreign-born tertiary-attainment share
+  exceeds the OECD destination median by at least 10 percentage points 2000-2023, and
+  whether Canadian per-capita output growth contains a measurable high-skill-immigration
+  contribution above non-points-system comparators.
+evidence_type: associational
+sample:
+  countries: [CAN, USA, GBR, AUS, NZL, DEU, FRA, NLD, SWE, CHE, BEL, AUT, IRL]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [CAN]
+  outcome_dim: [demographics_migration, employment_labour, gdp_growth]
+  policy_family: [labour_market, institutional_reform]
+  treatment_tags: [canada_points_system, irpa_2002, high_skill_migration]
+variables:
+  outcome:
+    - name: foreign_born_tertiary_share
+      source: oecd:OECD.ELS.IMM,DSD_DIOC@DF_DIOC,1.0
+      transformation: level
+      notes: OECD DIOC tertiary-attainment share among foreign-born; series resolved at wiring.
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: points_system_indicator
+      source: "constructed: indicator = 1 for CAN; CAN = points-system reference; comparators = 0 unless they introduced equivalent points systems."
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: total_migrant_share
+      source: un_desa:international_migrant_stock
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if Canada's foreign-born tertiary-attainment share exceeds the OECD destination
+    median (excl AUS, NZL) by at least 10 pp on average 2000-2023, AND points-system country
+    fixed-effect coefficient on foreign-born tertiary share is positive and significant at
+    p<0.05. REFUTED if Canadian premium is < 5 pp or coefficient is insignificant.
+  test: panel_fe_canada_points_system_skill_premium
+  threshold: "canada_tertiary_premium >= 10.0 AND coef_points_system > 0 AND p < 0.05"
+prior_confidence: 0.7
+disclosure: >-
+  Canada-Australia-NZL all use points systems and should cluster as a group; testing the
+  effect requires careful comparator selection. Risk of selection-on-the-dependent-variable.
+steelman: hypotheses/steelman/demo_canada_points_system_immigration.md

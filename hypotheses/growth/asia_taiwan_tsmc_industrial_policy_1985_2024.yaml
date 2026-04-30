@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asia_taiwan_tsmc_industrial_policy_1985_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Taiwan's semiconductor industrial policy — anchored by ITRI's 1980s
+  technology incubation, the 1987 spin-off of TSMC under government
+  ownership, the Hsinchu Science Park ecosystem, and sustained
+  R&D-intensity targeting through 2024 — produced one of the largest
+  industrial-policy successes in modern economic history. Taiwan's
+  manufacturing value-added share of GDP remains above 30% through 2023
+  (vs OECD typical 12-18%); R&D / GDP exceeds 3.5% by 2022 (top-5
+  globally); high-tech exports / total manufacturing exports exceed
+  60% by 2022 (top-tier globally); and TFP index growth 1985-2019
+  exceeds OECD median by at least +0.5pp/yr.
+
+evidence_type: canonical_case_multi_metric
+
+notes: >-
+  Multi-metric pattern-match for canonical industrial-policy success.
+  Six pre-registered metrics across distinct measurement channels.
+  Taiwan-specific not-replicable case; pattern-match is the appropriate
+  estimator family.
+
+prior_confidence: 0.92
+
+disclosure: >-
+  Author market-liberal priors are sceptical of industrial policy
+  in general but credit Taiwan as a documented exception. Bias risk:
+  motivated framing as a "narrow exception" understating the broader
+  industrial-policy lessons. Mitigation: pre-registered six-metric
+  pattern-match commits to extreme-outcome thresholds before run.
+
+steelman: hypotheses/steelman/asia_taiwan_tsmc_industrial_policy_1985_2024.md
+
+falsification:
+  rule: >-
+    Multi-metric checklist. SUPPORTED if >=4 of 6 metrics meet
+    thresholds; REFUTED if <=2 do.
+  test: taiwan_tsmc_industrial_policy_canonical_six_metric
+  threshold: ">=4/6 supports; <=2/6 refutes"
+
+canonical_metrics:
+  - metric_id: manufacturing_va_share_persistent
+    description: Taiwan manufacturing value-added share of GDP through 2023.
+    threshold: "manufacturing VA / GDP >= 30% in 2023"
+    window: "2018-2023"
+    source: "world_bank_wdi:NV.IND.MANF.ZS"
+    independence_justification: National accounts; sectoral share is independent of TFP and R&D measurements.
+  - metric_id: rd_intensity_top_tier
+    description: Taiwan R&D / GDP rises into top-5 globally by 2022.
+    threshold: "R&D / GDP >= 3.5% in 2022"
+    window: "2020-2022"
+    source: "world_bank_wdi:GB.XPD.RSDV.GD.ZS"
+    independence_justification: Innovation-input metric independent of trade or sectoral-share measurement.
+  - metric_id: high_tech_exports_share
+    description: High-tech exports as percent of manufactured exports.
+    threshold: ">=60% high-tech share of manufactured exports in 2022"
+    window: "2018-2022"
+    source: "world_bank_wdi:TX.VAL.TECH.MF.ZS"
+    independence_justification: Trade-statistics channel measured at customs; orthogonal to R&D and TFP.
+  - metric_id: gdp_pc_convergence_to_high_income
+    description: Taiwan reaches high-income status (>=$30k constant USD GDP-pc).
+    threshold: "GDP-pc constant USD >= $30,000 in 2023"
+    window: "2020-2023"
+    source: "world_bank_wdi:NY.GDP.PCAP.KD"
+    independence_justification: National-income measure; orthogonal to industrial-policy direct measures.
+  - metric_id: tfp_growth_above_oecd
+    description: Taiwan TFP index 1985-2019 grows at OECD-leading pace.
+    threshold: "PWT rtfpna log-growth differential TWN minus OECD median >= 0.005/yr over 1985-2019"
+    window: "1985-2019"
+    source: "pwt:rtfpna"
+    independence_justification: Productivity-residual measure independent of sectoral and trade outcomes.
+  - metric_id: tsmc_global_share_dominance
+    description: Taiwan's share of world foundry semiconductor capacity by 2023.
+    threshold: "Taiwan foundry share >= 60% world by 2023 (TSMC alone >50%)"
+    window: "2020-2023"
+    source: "owid:semiconductor_industry"
+    independence_justification: Industry-share measurement at firm/wafer level, independent of national-accounts.
+
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 4
+  refute_threshold: 2
+
+intervention_channel: bundled
+intervention_channel_justification: >-
+  ITRI / TSMC / Hsinchu Science Park is a coordinated bundle of fiscal
+  (R&D subsidies), regulatory (technology-park designation), institutional
+  (state-owned spin-off model), and industrial-policy targeting.
+
+sample:
+  countries: [TWN]
+  period: [1985, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "OECD-comparator metrics use OECD median as benchmark, not full panel test"
+
+scope:
+  period: [1985, 2024]
+  countries: [TWN]
+  outcome_dim: [productivity, industrial_capability, gdp_growth]
+  policy_family: [industrial_policy, trade_policy]
+  treatment_tags: [taiwan_itri, tsmc_1987_spinoff, hsinchu_science_park, taiwan_semiconductor_policy]
+
+variables:
+  outcome:
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: rd_pct_gdp
+      source: "world_bank_wdi:GB.XPD.RSDV.GD.ZS"
+      transformation: level
+    - name: high_tech_exports_pct
+      source: "world_bank_wdi:TX.VAL.TECH.MF.ZS"
+      transformation: level
+    - name: log_gdp_pc_constant_usd
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >-
+    Six pre-registered metrics across measurement families.
+
+linked_hypotheses:
+  - taiwan_itri_frontier_capability_effect
+  - china_extra_made_in_china_2025_outcomes
+  - chips_act_2022_semiconductor_capacity_2024_2027

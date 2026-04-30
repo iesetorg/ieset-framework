@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_australia_2009_top_rate_response
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The Australian Rudd-Swan 2008-2010 top-rate adjustments (Medicare-levy
+  surcharge changes + temporary flood levy 2011 + ongoing top-bracket
+  threshold movements) plus the 2014-2017 Abbott temporary deficit-levy
+  produced top-1 pretax income share dynamics with an absolute elasticity
+  to the headline top rate below 0.5, consistent with the Australian
+  imputation-credit franking system reducing the income-shifting margin
+  for high-earner business owners. The discriminating test is the headline-
+  rate elasticity vs an OECD-imputation-system-comparator pool.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 4. Australian dividend-imputation
+  system is uniquely identifying for income-shifting elasticity.
+prior_confidence: 0.55
+disclosure: >
+  Author prior weakly accepts that imputation systems compress the income-
+  shifting margin and so reduce headline-rate ETI; evidence from Australia
+  is suggestive but not definitive.
+falsification:
+  rule: >
+    SUPPORTED if Australian absolute top-1 share elasticity to top rate
+    over 2005-2020 is below 0.5 AND below the OECD-comparator median at
+    p<0.10. REFUTED if elasticity exceeds 0.7 in absolute value or
+    exceeds OECD median at p<0.10.
+  test: >
+    Australia time-series + OECD comparator panel local-projections of
+    top-1 share on top-rate change.
+evidence_type: associational
+sample:
+  countries: [AUS, NZL, CAN, GBR, USA, JPN, FRA, DEU]
+  period: [1995, 2020]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Local-projections of top-1 share on top-rate change with country FE.
+    Driscoll-Kraay SEs.
+intervention_channel: fiscal
+scope:
+  period: [2005, 2020]
+  countries: [AUS]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [australia_top_rate_dynamics, imputation_credit_system, deficit_levy_2014]

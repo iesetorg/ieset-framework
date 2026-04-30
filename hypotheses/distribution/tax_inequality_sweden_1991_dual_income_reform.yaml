@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_sweden_1991_dual_income_reform
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The Swedish 1991 "tax reform of the century" — flat 30 percent rate on
+  capital income, top labour-income marginal rate cut from 80 to 50 percent,
+  + base broadening — produced a sharp rise in measured top-1 pre-tax income
+  share between 1991 and 1995 driven primarily by the dual-rate income-
+  shifting incentive (capital-income reclassification of high-earner
+  business income), with smaller persistent labour-supply response. The
+  discriminating test is the income-form composition shift among top earners.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 3. Dual-income-tax design is
+  uniquely identifying for income-shifting vs labour-supply elasticity.
+prior_confidence: 0.7
+disclosure: >
+  Author prior aligns with Pirttila-Selin and Alstadsaeter-Jacob
+  reading that dual-income shifting drove much of Nordic top-share rise.
+falsification:
+  rule: >
+    SUPPORTED if Swedish top-1 pretax share rises by at least 2 percentage
+    points 1991-1995 AND the capital-income share of top-1 income rises
+    by at least 5 percentage points over the same window. REFUTED if
+    top-1 share fails to rise by 1 percentage point or capital-income
+    composition shift is below 2 percentage points at p<0.10.
+  test: >
+    Sweden time-series + Nordic-comparator panel structural-break analysis
+    around 1991Q1, with composition decomposition of top-decile income.
+evidence_type: associational
+sample:
+  countries: [SWE, NOR, DNK, FIN]
+  period: [1985, 2000]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: swe_1991_dual_reform_post
+      source: "constructed: indicator = 1 for SWE, year >= 1991"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna DiD with SWE treated 1991 against Nordic-ex-SWE
+    control. Robustness with synthetic_control.
+intervention_channel: fiscal
+scope:
+  period: [1991, 2000]
+  countries: [SWE]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [sweden_1991_tax_reform, dual_income_tax, base_broadening, income_shifting]

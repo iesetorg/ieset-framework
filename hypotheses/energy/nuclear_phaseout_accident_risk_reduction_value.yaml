@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nuclear_phaseout_accident_risk_reduction_value
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The post-Fukushima nuclear phase-outs in Germany (2011-2023),
+  Belgium (legislated 2003, accelerated 2025) and Switzerland
+  (Energy Strategy 2050, 2017) produced an expected-loss reduction
+  -- probability of severe accident multiplied by actuarial cost
+  per accident (NEA 2018; Sovacool et al. 2016) -- whose monetised
+  value is comparable to or larger than the wholesale-electricity
+  price gap relative to nuclear-retaining peers (FRA, FIN, SWE,
+  CZE, USA) over 2011-2024. Accident-risk reduction is a real,
+  monetisable benefit that the standard cost-only framing of
+  phase-out treats as zero.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DEU, BEL, CHE, FRA, FIN, SWE, CZE, USA]
+  period: [2011, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing IEA wholesale electricity price OR pre-phaseout reactor operating capacity"
+
+variables:
+  outcome:
+    - name: cumulative_avoided_reactor_years_gw_yr
+      source: "iea:nuclear_capacity_factor; irena:capacity"
+      transformation: cumulative_decommissioned_capacity_x_years
+      notes: "Cumulative reactor-GW-years removed from operation in DEU/BEL/CHE post-phaseout decisions."
+    - name: expected_accident_loss_avoided_usd_bn
+      source: "derived: avoided_reactor_yrs_gw_yr * P(severe_accident | reactor_yr) * E[loss_per_accident_usd]"
+      transformation: present_value_2020_usd
+      notes: "Probability and loss parameters from NEA 2018 actuarial review (P central = 5e-5 / reactor-yr) and Sovacool et al. 2016 (E[loss] central = USD 200bn / severe accident; range USD 50bn-USD 1tn)."
+    - name: cumulative_wholesale_electricity_price_gap_usd_bn
+      source: "iea:wholesale_electricity_price; eex:de_baseload"
+      transformation: deu_belux_che_minus_nuclear_peer_mean_x_consumption
+    - name: net_ledger_usd_bn
+      source: "derived: expected_accident_loss_avoided_usd_bn - cumulative_wholesale_electricity_price_gap_usd_bn"
+      transformation: level
+  treatment:
+    - name: post_phaseout_decision_indicator
+      source: "constructed: 1 for DEU 2011+, BEL 2003+ (full phaseout decision), CHE 2017+; 0 otherwise"
+      transformation: indicator
+  controls:
+    - name: log_total_electricity_consumption
+      source: "iea:electricity_balance"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gas_price_eu_ttf_proxy
+      source: "imf_pcps:PNG_USD"
+      transformation: log
+      notes: "Partials out gas-shock common cause of post-2021 wholesale price moves."
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Two-flow accounting comparison in constant 2020 USD over
+    2011-2024. Flow A: expected-accident-loss avoided = cumulative
+    decommissioned reactor-GW-years x P(severe accident per reactor-
+    year) x E[loss per severe accident]. P central = 5e-5 from NEA
+    2018 (Fukushima + Chernobyl + TMI fleet experience); sensitivity
+    P low = 1e-5 (PRA-based pre-Fukushima estimates), P high = 2e-4
+    (post-Fukushima updated PRA). E[loss] central = USD 200bn per
+    Sovacool et al. 2016; sensitivity USD 50bn-USD 1tn band.
+    Flow B: wholesale electricity price gap = (DEU/BEL/CHE wholesale
+    price minus mean of FRA/FIN/SWE/CZE/USA) x phaseout-country
+    consumption, summed annually. Net = A - B at central, low, and
+    high parameter sets.
+
+    Decommissioning costs and long-run waste-stewardship costs
+    (which would shift in favour of phaseout) are NOT included in
+    this primary spec; reported as INFORMATIVE adjustments only.
+
+falsification:
+  rule: >
+    SUPPORTED iff cumulative_net_ledger_usd_bn (central P, central
+    E[loss]) > 0 over 2011-2024 AND remains > 0 at the conservative
+    low-P, low-E[loss] parameter set. REFUTED if net ledger is
+    negative at the central parameterisation. PARTIAL if positive
+    at central but flips negative at low-low. METHOD_VALID: IEA
+    wholesale price + IEA nuclear capacity time-series both on disk
+    for DEU/BEL/CHE + at least 3 nuclear-retaining peers for the
+    full window; if either missing for the treated unit, downgrade
+    to inconclusive.
+  test: nuclear_phaseout_expected_loss_vs_wholesale_premium
+  threshold: >-
+    PRIMARY: cumulative_net_ledger_usd_bn (2011-2024, central
+    parameters) > 0 AND cumulative_net_ledger_usd_bn (low P,
+    low E[loss]) > 0
+
+prior_confidence: 0.55
+
+disclosure: >-
+  Eco-socialist / risk-sceptic framing: the result depends heavily
+  on the chosen accident-probability parameter and the loss
+  magnitude, both of which are contested. Pre-Fukushima PRA
+  estimates of P were ~1e-7 / reactor-year; post-Fukushima fleet
+  experience (3 severe accidents in ~16,000 reactor-years) gives
+  ~2e-4. The spec pre-registers a sensitivity band that spans this
+  range, so an honestly-reported result will show the verdict
+  depending on the parameter set. A second framing risk: the spec
+  treats wholesale price gap as the only cost-side leg, which
+  understates the gas-dependence and capacity-firming costs that
+  followed phaseout in DEU specifically. Decommissioning and
+  waste-stewardship costs (which the eco-socialist case would
+  argue cut the OTHER way -- they are real costs of nuclear
+  retention that phaseout reduces in present value) are kept in
+  INFORMATIVE not PRIMARY because their actuarial parameters are
+  even more contested than accident probabilities.
+
+steelman: hypotheses/steelman/nuclear_phaseout_accident_risk_reduction_value.md
+
+scope:
+  period: [2011, 2024]
+  countries: [DEU, BEL, CHE, FRA, FIN, SWE, CZE, USA]
+  outcome_dim: [energy, regulation_compliance_cost]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [german_nuclear_phaseout_2011, belgium_nuclear_phaseout_2003, swiss_energy_strategy_2050_2017, fukushima_2011]
+
+linked_hypotheses:
+  - nuclear_phaseout_energy_cost_industry_exit
+  - nuclear_phaseout_grid_reliability_cost_tradeoff
+
+notes: >
+  Counter-spec to nuclear_phaseout_energy_cost_industry_exit. That
+  hypothesis tests the cost-side; this one tests the avoided-risk
+  side and the joint ledger. NEA + Sovacool actuarial parameters
+  are stable academic citations; the IEA wholesale price series is
+  a specialist fetcher (status: pending in this repo per prior
+  notes); EEX baseload is a registered publisher with a partial
+  fetcher. Falsification gates inconclusive on the IEA fetcher gap.

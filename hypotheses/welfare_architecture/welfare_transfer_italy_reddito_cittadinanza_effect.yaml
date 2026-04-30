@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_italy_reddito_cittadinanza_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Italy's Reddito di Cittadinanza (RdC, March 2019) reduced absolute-poverty headcount among low-income
+  Italian households by at least 15% within three years (2019-2022) but produced no measurable improvement
+  in employment-rate among working-age beneficiaries, identified off the synthetic-control gap with EU
+  peers (ESP, GRC, PRT) lacking comparable means-tested guaranteed-minimum-income programmes pre-2020.
+evidence_type: causal
+prior_confidence: 0.55
+disclosure: |
+  Author has market-liberal priors that distrust unconditional cash-transfer effects on employment but
+  acknowledge their direct poverty effect. Hypothesis is structured to allow poverty effect to succeed
+  while employment effect fails — the paired test reduces cherry-picking risk.
+sample:
+  countries: [ITA, ESP, GRC, PRT, FRA]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-Q2 to 2021-Q1 COVID lockdown quarters from primary spec
+  - exclude ESP from donor pool post-2020 (IMV launch contaminates control)
+variables:
+  outcome:
+  - name: absolute_poverty_rate
+    source: eurostat:ilc_li02
+    transformation: level_pct
+    notes: Eurostat at-risk-of-poverty rate (60% median).
+  - name: employment_rate_low_education
+    source: eurostat:lfsa_ergaedn
+    transformation: level_pct
+  treatment:
+  - name: rdc_indicator
+    source: eurostat:ilc_li02
+    transformation: indicator
+    notes: ITA = 1 from 2019-Q1; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: eurostat:une_rt_a
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  RdC is a fiscal-channel cash-transfer programme with regulatory means-test rules.
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic control on ITA poverty and employment series 2010-2023 with GRC, PRT, FRA donor pool
+    (ESP excluded post-2020). Pre-treatment fit 2010-2018. Two-outcome paired test.
+falsification:
+  rule: |
+    Refuted on the poverty arm if the synthetic-control gap on absolute-poverty rate at three-year
+    horizon is below 15% reduction, OR placebo p > 0.10. Refuted on the employment arm if the gap on
+    low-education employment rate at three-year horizon exceeds plus-1pp, OR placebo p < 0.10.
+    Hypothesis is jointly supported only if poverty arm passes AND employment arm passes (i.e., no
+    detectable employment effect).
+  test: synthetic_control_3yr_paired_poverty_employment
+  threshold: poverty_gap_relative <= -15pct AND placebo_p_poverty < 0.10 AND abs(employment_gap) <= 1pp
+scope:
+  period: [2019, 2023]
+  countries: [ITA, ESP, GRC, PRT, FRA]
+  outcome_dim: [poverty_inequality, employment_labour, welfare_state]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [italy_rdc_2019, conte_government_2018, m5s_lega_coalition]
+steelman: hypotheses/steelman/welfare_transfer_italy_reddito_cittadinanza_effect.md

@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_russia_1998_default_canonical
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The August 1998 Russian crisis — domestic-currency sovereign default, ruble
+  devaluation of >= 60% against USD, real-GDP contraction of >= 5%, banking-system
+  collapse with widespread bank failures, and IMF programme entry — is the canonical
+  EM sovereign-and-banking-twin-default case of the late 1990s. The hypothesis is
+  that Russia 1998 meets the canonical multi-metric checklist on at least 4 of 5
+  metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [RUS]
+  period: [1994, 2003]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: ruble_depreciation_1998
+    description: Ruble against USD peak-to-trough nominal depreciation
+    threshold: ">= 60% depreciation"
+    window: "1998-1999"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal.
+  - metric_id: real_gdp_decline
+    description: Russia real GDP decline 1998-1999 vs 1997
+    threshold: ">= 5% peak-to-trough decline"
+    window: "1997-1999"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD; pwt:rgdpna"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: sovereign_default_event
+    description: Sovereign default on GKO domestic debt August 1998
+    threshold: "yes/no — yes counts as breach"
+    window: "1998"
+    source: "imf:RUS_DEFAULT_1998"
+    direction: supports_claim
+    independence_justification: Default event coded.
+  - metric_id: systemic_banking_crisis_coded
+    description: Laeven-Valencia banking-crisis coding 1998
+    threshold: "coded yes"
+    window: "1998-1999"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: cpi_inflation_spike
+    description: Russia CPI inflation rise vs 1997 baseline
+    threshold: ">= 50 pp YoY peak rise"
+    window: "1998-1999"
+    source: "world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH"
+    direction: supports_claim
+    independence_justification: Price-level outcome.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: peak_yoy
+prior_confidence: 0.96
+disclosure: >
+  Russia 1998 is well-documented; multi-metric pattern overdetermined.
+steelman: hypotheses/steelman/banking_crisis_russia_1998_default_canonical.md
+scope:
+  period: [1994, 2003]
+  countries: [RUS]
+  outcome_dim: [financial_crisis, currency_purchasing_power, fiscal_policy, inflation]
+  policy_family: [regulation, exchange_rate_regime, fiscal_policy]
+  treatment_tags: [russia_1998, gko_default_1998, ruble_devaluation_1998, post_soviet_transition_crisis]

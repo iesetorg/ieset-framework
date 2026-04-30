@@ -1,0 +1,179 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: energy_crisis_2022_european_industrial_relocation
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The 2022 European gas-price shock plus heterogeneous national policy
+  responses (German Doppelwumms ~€200bn relief package, Spanish-Portuguese
+  Iberian gas-price-cap mechanism, Italian energy-aid bridges, French EDF
+  nationalisation + nuclear price cap) produced a divergent industrial-
+  relocation pattern within Europe and across the Atlantic over 2022-2025.
+  Energy-intensive manufacturing share (chemicals, basic metals, fertiliser,
+  glass, ceramics) fell more in DEU, ITA, and POL than in ESP, FRA, and
+  USA; the lost share is partly structural (plant mothballing, capacity re-
+  siting to Gulf Coast USA / Middle East / China) rather than cyclical.
+  The intra-EU heterogeneity is large enough that the pooled-EU narrative
+  obscures the policy-design lesson: countries that intervened on
+  wholesale price formation (Iberian cap, French nuclear renationalisation)
+  preserved more energy-intensive capacity than countries that intervened
+  only on retail bills (Germany).
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, GBR, USA, SAU, ARE, CHN]
+  period: [2018, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing OECD STAN sectoral VA or Eurostat sbs_na_ind_r2 panels"
+
+scope:
+  period: [2018, 2025]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, AUT, GBR, USA, SAU, ARE, CHN]
+  outcome_dim: [industrial_capability, energy, productivity]
+  policy_family: [energy_policy, industrial_policy, regulation]
+  treatment_tags: [russia_ukraine_war_2022, gas_price_shock_2021, iberian_gas_cap_2022, doppelwumms_2022, eu_energy_emergency_response]
+
+variables:
+  outcome:
+    - name: log_energy_intensive_manufacturing_va
+      source: "constructed: OECD STAN VA — chemicals (C20) + basic metals (C24) + non-metallic minerals (C23) + paper (C17) + fertiliser. Cross-check Eurostat sbs_na_ind_r2 sectoral turnover."
+      transformation: log
+    - name: log_industrial_production_index
+      source: "oecd:STSIND4_PRODMAN"
+      transformation: log
+      notes: "OECD industrial production index, monthly, seasonally adjusted, manufacturing aggregate."
+    - name: log_chemical_industry_output
+      source: "eurostat:sts_inpr_m"
+      transformation: log
+      notes: "Eurostat short-term statistics — chemicals subsector (NACE C20) production index."
+    - name: log_steel_production
+      source: "constructed: World Steel Association monthly crude-steel production by country. Manual-drop pending under data/manual/derived/."
+      transformation: log
+    - name: log_ammonia_fertiliser_production
+      source: "constructed: Fertilizers Europe / IFA monthly ammonia + nitrogen-fertiliser output by country. Manual-drop pending."
+      transformation: log
+    - name: log_us_gulf_coast_petrochemical_capacity
+      source: "constructed: ACC (American Chemistry Council) + EIA Gulf-Coast petrochemical capacity tracker. Cross-check eia: methanol / ethylene production. Manual-drop pending."
+      transformation: log
+
+  treatment:
+    - name: post_2021q4_gas_shock_dummy
+      source: "constructed: indicator = 1 from 2021Q4 onwards (gas-price spike start)."
+      transformation: indicator
+    - name: country_gas_price_intervention_intensity
+      source: "constructed: ordinal index of national wholesale-price interventions (0 = retail-only relief; 1 = retail + selective-industry rebate; 2 = wholesale-price cap or renationalisation). DEU/POL = 1, ESP/PRT = 2, FRA = 2 (EDF), ITA/NLD = 1, USA = 0."
+      transformation: level
+
+  controls:
+    - name: log_gas_price_ttf
+      source: "constructed: Dutch TTF natural gas spot/forward, EUR/MWh, monthly. Cross-check fred:DHHNGSP (Henry Hub for USA). Manual-drop or eex fetcher when shipped."
+      transformation: log
+    - name: log_brent_oil
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: eu_ets_price
+      source: "eea:eu_ets_verified_emissions"
+      transformation: level
+      notes: "EU ETS allowance price for ETS-exposed countries — partial-out the carbon-cost channel from the gas-cost channel."
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Treatment bundles an exogenous geopolitical price shock with heterogeneous
+  national fiscal-relief packages and wholesale-market interventions
+  (Iberian cap, EDF nationalisation, German Doppelwumms). Pure-fiscal vs
+  pure-regulatory decomposition not feasible at country level; the test
+  is whether the price-intervention intensity moderates the shock effect.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year_quarter]
+  notes: >
+    Primary specification: differences-in-differences with country-level
+    treatment intensity = wholesale-intervention ordinal score interacted
+    with the post-2021Q4 dummy. Outcome: log energy-intensive manufacturing
+    VA + log chemical / steel / ammonia output. Test: does higher-
+    intervention country show smaller post-2021Q4 contraction than lower-
+    intervention country, after partialling out gas-price and oil-price?
+
+    Second-stage: regress US Gulf-Coast petrochemical capacity additions
+    on EU energy-intensive output decline to test the cross-Atlantic
+    relocation channel — whether share lost in EU correlates with share
+    gained in US Gulf Coast / SAU / ARE.
+
+    Synthetic control for DEU and ITA on energy-intensive manufacturing
+    VA using donor pool of FRA, ESP, USA, KOR, JPN.
+
+    Known limitations:
+    (1) Wholesale-intervention ordinal score is author-coded; sensitivity
+        to alternative codings (binary, continuous-spend per GDP) reported.
+    (2) Iberian cap was reformed and partially withdrawn 2023; treatment
+        is time-varying.
+    (3) Cyclical inventory destocking 2022-2023 is a confound for any
+        2024 reading; report 2024-2025 as the structural-persistence test.
+    (4) Capacity re-siting decisions take 3-5 years; 2022-2025 window
+        captures announcements + early plant mothballing but not full
+        relocation.
+
+falsification:
+  rule: >
+    Not supported if (a) the post-2021Q4 × intervention-intensity
+    interaction is zero or wrong-signed at p<0.10 (high-intervention
+    countries should have smaller contraction), OR (b) intra-EU energy-
+    intensive output gap (DEU+ITA vs FRA+ESP) does not widen by ≥5pp by
+    2024 relative to pre-shock baseline, OR (c) US Gulf Coast petrochemical
+    capacity additions do not exceed pre-2022 trend, OR (d) the
+    contraction reverses fully in 2024-2025 (cyclical not structural). If
+    only the contemporaneous (2022-2023) effect is real and 2024-2025
+    shows recovery, classify as "cyclical shock without persistent
+    relocation."
+  test: european_relocation_did_panel
+  threshold: >
+    β_post×intervention positive on energy-intensive VA at p<0.10 AND
+    DEU+ITA energy-intensive VA gap to FRA+ESP widens ≥ 5pp 2021-2024 AND
+    US Gulf Coast petrochemical capacity exceeds 2018-2021 trend by ≥10%
+    AND no full reversal by 2024-2025
+
+prior_confidence: 0.62
+
+disclosure: >
+  Author prior is high that intra-EU heterogeneity is real and large —
+  Iberia + France preserved energy-intensive capacity better than Germany
+  + Italy + Poland. The cross-Atlantic relocation channel (US Gulf Coast
+  gain) is supported by ACC reporting and Dow / BASF announcements but
+  the magnitude is contested. Author is sceptical of pooled-EU framings
+  that obscure the policy-design lesson; the hypothesis is structured to
+  surface heterogeneity. Climate-policy implications (lower EU emissions
+  via deindustrialisation is a perverse climate "win") are out-of-frame
+  for this hypothesis.
+
+steelman: hypotheses/steelman/energy_crisis_2022_european_industrial_relocation.md
+
+linked_hypotheses:
+  - eu_post_2021_gas_shock_industrial_output_impact
+  - german_energiewende_industrial_cost_trajectory
+  - eu_gas_storage_winter_2022_2023_demand_destruction_vs_substitution
+  - german_manufacturing_va_decline_2017_2024
+
+notes: >
+  Data readiness:
+  - OECD STAN sectoral VA: fetcher pending
+  - OECD industrial production: ready
+  - Eurostat sbs_na_ind_r2 / sts_inpr_m: ready
+  - World Steel Association steel: manual-drop pending
+  - Fertilizers Europe / IFA ammonia: manual-drop pending
+  - ACC / EIA Gulf Coast petrochemical: manual-drop pending
+  - TTF gas price: fetcher pending (eex) or manual-drop
+  - EU ETS price: partial via eea fetcher
+  - WDI / IMF PCPS: ready
+
+  Run when OECD STAN + steel/ammonia manual drops + TTF series populate baseline.

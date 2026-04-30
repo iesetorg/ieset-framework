@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: qe_financialisation_minsky_channel_2008_2021
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  Post-2008 quantitative easing operated principally through a
+  Minsky-style financialisation channel — collateral-revaluation,
+  portfolio-rebalancing into long-duration risk assets, and a
+  yield-driven compression of risk premia — rather than through the
+  textbook quantity-theoretic broad-money or expectations channels.
+  Empirical signature: between 2008 and 2021, cumulative real total
+  returns on the broad asset basket (equities + investment-grade
+  corporate bonds + residential property) in the USA, GBR, JPN, and
+  Eurozone Big-4 exceeded cumulative real wage growth by at least
+  20 log-points in five of seven economies, household financial-asset
+  Gini rose by at least 2 points across LIS micro-data in the same
+  countries, and the financial-corporate sector profit share rose at
+  least 1.5 percentage points relative to non-financial-corporate sector
+  profit share. The pattern is consistent with PK-Minsky framing of
+  financialisation as the operative QE channel and inconsistent with
+  pure portfolio-balance or expectations-anchoring framings.
+notes: >-
+  Sister to the existing qe_asset_inflation_vs_cpi_divergence_post_2008
+  spec. Where that hypothesis tests the asset-vs-CPI gap as a
+  pattern-match against quantity-theoretic prediction, this hypothesis
+  tests the joint Minsky pattern: asset-inflation, financial-sector
+  profit share, and household financial-asset distribution all moving
+  consistently with the financialisation reading. Targets the gap that
+  the existing asset-vs-CPI spec leaves: financial-sector incidence
+  and household-distributional outcomes.
+prior_confidence: 0.65
+disclosure: >-
+  Author has market-liberal priors and is not natively PK-aligned, but
+  the empirical financialisation pattern is robustly documented across
+  the LIS, BIS, and FSB datasets. Specification risk: the
+  joint-pattern test combines three independent gates and may pass on
+  some but not all; the hypothesis specifies a count-rule (at least
+  two of three gates met) to avoid all-or-nothing rejection.
+falsification:
+  rule: >-
+    The hypothesis is falsified if fewer than two of three Minsky-pattern
+    gates are met across the 2008-2021 panel: (a) cumulative real asset
+    basket return minus cumulative real wage growth ≥ 20 log-points in
+    ≥5 of 7 country economies (USA, GBR, JPN, DEU, FRA, ITA, ESP), (b)
+    household financial-asset Gini increase ≥ 2 points in ≥5 of 7
+    economies per LIS comparable waves, and (c) financial-vs-non-financial
+    corporate profit-share gap widens by ≥ 1.5 percentage points in
+    ≥5 of 7 economies. The hypothesis is REFUTED if zero of three gates
+    are met.
+  test: minsky_channel_three_gate_panel_2008_2021
+  threshold: at least 2 of 3 gates met (each gate requires ≥5 of 7 country pass)
+evidence_type: associational
+sample:
+  countries: [USA, GBR, JPN, DEU, FRA, ITA, ESP]
+  period: [2008, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing both BIS asset-price and Eurostat/national wage data
+    - LIS micro-data wave coverage uneven; report nearest-available wave for Gini comparison
+variables:
+  outcome:
+    - name: cumulative_real_asset_basket_return
+      source: bis:WS_SPP; bis:WS_LONG_PP; shiller:ie_data
+      transformation: real_cumulative_index_base_2008
+      notes: Equal-weighted basket of equities (BIS share-price + Shiller for USA), residential property (BIS WS_LONG_PP), and IG corporate bonds (FRED Bofa USC0 + Eurostat).
+    - name: cumulative_real_wage_growth
+      source: oecd:real_average_wage; ilostat:real_wage_index; eurostat:earn_nt_net
+      transformation: real_cumulative_index_base_2008
+    - name: household_financial_asset_gini
+      source: lis:household_finance (manual); ecb:HFCS; oecd:WEALTH
+      transformation: gini_index
+      notes: "TODO: LIS manual-drop required. HFCS available 2010, 2014, 2017, 2021 waves for Eurozone."
+    - name: financial_corporate_profit_share
+      source: oecd:financial_corp_balance_sheet; eurostat:nasq_10_nf_tr; bea:national_accounts
+      transformation: pct_corporate_gva
+      notes: Financial-sector share of total corporate gross value added.
+    - name: nonfinancial_corporate_profit_share
+      source: oecd:nonfinancial_corp_balance_sheet
+      transformation: pct_corporate_gva
+  treatment:
+    - name: central_bank_balance_sheet_pct_gdp
+      source: fred:WALCL; fred:GDP; ecb:ILM; boe:BalanceSheet; boj:monetary_base; fred:JPNASSETS
+      transformation: ratio_to_nominal_gdp
+      notes: QE intensity. Defined as 'QE-active country-year' when balance sheet > 15% of GDP.
+    - name: long_term_yield_compression
+      source: fred:DGS10 (USA); ecb:irs_10y (EUR); boe:gilt_10y; boj:bond_yields_10y
+      transformation: bp_change_from_2007
+      notes: Term-premium compression as the proximate Minsky-channel driver.
+  controls:
+    - name: short_rate
+      source: fred:DFF (USA); ecb:FM (EUR); boe:bank_rate (GBR); boj:policy_rate (JPN)
+      transformation: level_pct
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: pct_change_yoy
+    - name: unemployment_rate
+      source: ilostat:unemployment_rate
+      transformation: pct_labour_force
+intervention_channel: monetary
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >-
+    Three-gate count rule on the 2008-2021 panel. Primary gates evaluated
+    cumulatively over the window. Secondary regression: panel FE of
+    each gate's outcome (asset-wage gap, financial-asset Gini change,
+    financial-vs-nonfinancial profit-share gap) on QE-intensity
+    indicator, with country and year fixed effects. Standard errors
+    clustered by country.
+scope:
+  period: [2008, 2021]
+  countries: [USA, GBR, JPN, DEU, FRA, ITA, ESP, EUROZONE, OECD]
+  outcome_dim: [financialisation, monetary_policy, poverty_inequality, wage_stagnation, currency_purchasing_power]
+  policy_family: [monetary_policy]
+  treatment_tags: [qe_post_2008, post_2008_qe, financialisation_era, minsky_moment_2008, low_for_long_rates, household_balance_sheet]
+covers_claims:
+  - position_id: post_keynesian
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: PK-Minsky financialisation reading of QE; directly tested via the three-gate joint pattern.
+  - position_id: marxian
+    claim_index: 10
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: Marxian reading of QE as wealth-transfer to asset-holding classes; covered through asset-vs-wage gap and financial-corporate profit-share gates.
+  - position_id: mmt
+    claim_index: 8
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: MMT shares the financialisation diagnosis but emphasises the policy-design rather than the inevitability; aligned but PK is the closer school.
+steelman: hypotheses/steelman/qe_financialisation_minsky_channel_2008_2021.md
+linked_hypotheses:
+  - qe_asset_inflation_vs_cpi_divergence_post_2008
+  - qe_base_money_cpi_transmission_failure
+  - interest_rate_hike_distributional_upward_redistribution

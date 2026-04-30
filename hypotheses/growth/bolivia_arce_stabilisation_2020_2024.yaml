@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bolivia_arce_stabilisation_2020_2024
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  Bolivia's 2020-2024 Arce administration inherited a depleted-FX-reserve,
+  declining-gas-export economy and attempted to defend the boliviano-USD
+  peg through capital controls, fuel subsidies, and quasi-fiscal central-
+  bank intervention. The pre-registered claim is that this stabilisation
+  attempt failed on its own terms by 2023-2024: parallel exchange-rate
+  premium widened above 30% by mid-2024, FX reserves at the central bank
+  fell below 3 months of imports, fuel-import shortages produced
+  measurable inflation pass-through, and net real-GDP growth turned
+  negative on a per-capita basis. The mechanism is that defending an
+  overvalued peg without underlying export earnings is fiscally and
+  monetarily unsustainable, and the cost falls on import-dependent
+  consumption.
+
+evidence_type: causal
+
+sample:
+  countries: [BOL]
+  period: [2014, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude COVID 2020Q2-2020Q4 from cumulative-growth comparison; report separately"
+
+scope:
+  period: [2014, 2024]
+  countries: [BOL]
+  outcome_dim: [gdp_growth, currency_purchasing_power, inflation, fiscal_policy]
+  policy_family: [monetary_policy, exchange_rate_regime, fiscal_policy]
+  treatment_tags: [bolivia_capital_controls_2023, bolivia_fx_crisis_2023]
+
+variables:
+  outcome:
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: fx_reserves_months_imports
+      source: imf:FI_RES_TOTL_MO
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: current_account_share_gdp
+      source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+      transformation: level
+    - name: hydrocarbon_rents_share_gdp
+      source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+      transformation: level
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  Defence of the boliviano-USD peg via capital controls, FX rationing,
+  and quasi-fiscal CB intervention is a monetary-channel intervention
+  with fiscal spillovers.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Primary: descriptive trajectory of FX reserves, current account,
+    inflation, and per-capita GDP showing the 2022-2024 stabilisation
+    attempt's outcomes. Secondary: pre-post comparison of inflation
+    and reserves around the 2023 capital-controls policy package.
+
+falsification:
+  rule: >
+    Not supported if FX reserves remained above 6 months of imports
+    through 2024, OR cpi_inflation_yoy remained below 5% through 2024,
+    OR per-capita real GDP growth 2022-2024 averaged above 1.5%
+    annualised. Any of these three would indicate the stabilisation
+    held; combined failure across all three is the claim.
+  test: descriptive_macro_pressure_metrics
+  threshold: >
+    fx_reserves_months_imports(BOL, 2024) < 6
+    AND cpi_inflation_yoy(BOL, 2024) > 5
+    AND avg_real_gdp_pc_growth(BOL, 2022-2024) < 1.5
+
+prior_confidence: 0.78
+
+disclosure: >
+  Author macro-policy prior is that overvalued pegs without export
+  earnings end in disorderly adjustment. Bolivia 2020-2024 is a textbook
+  case. Risk: 2024 endpoint may not yet show full crisis if data lag is
+  large; spec accepts that and conditions on observed data only.
+
+steelman: hypotheses/steelman/bolivia_arce_stabilisation_2020_2024.md
+
+linked_hypotheses:
+  - bolivia_morales_resource_nationalism_2006_2019
+
+notes: >
+  Single-country time-series spec (descriptive). The Bolivia-specific
+  case is the test; donor-pool synth_did is impractical for a peg-defence
+  episode without a clean counterfactual in the region.

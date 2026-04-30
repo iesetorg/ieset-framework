@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_hong_kong_cash_payout_2020
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Hong Kong's HKD 10,000 universal cash payout to permanent residents (announced February 2020,
+  disbursed June-July 2020, total cost approximately HKD 71B) functioned as a near-universal-basic-
+  income natural experiment with 7M+ recipients in a high-administrative-capacity environment, providing
+  a clean test of universal-cash macro-stimulus effects on household consumption and a comparison case
+  for less-targeted relief. Multiplier at the household level (consumption increase per HKD 1 transferred
+  in the subsequent two quarters) is hypothesised to fall in the 0.4-0.6 range, consistent with the MPC
+  literature for transitory income shocks in high-savings households.
+evidence_type: descriptive
+prior_confidence: 0.6
+disclosure: |
+  Author has market-liberal priors that view universal-cash stimulus as fiscally inefficient relative
+  to targeted transfers but useful as a clean natural experiment for measuring the household-level
+  marginal-propensity-to-consume parameter. Hypothesis is descriptive of the multiplier rather than
+  evaluative of the policy choice.
+sample:
+  countries: [HKG]
+  period: [2018, 2022]
+  temporal_structure: time_series
+  exclusion_rules:
+  - exclude COVID-protest-violence interaction in 2020-Q1 from primary measurement window
+variables:
+  outcome:
+  - name: household_consumption_per_capita
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: log
+  - name: household_savings_rate
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: level
+  treatment:
+  - name: cash_payout_event
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: indicator
+    notes: HKG = 1 from 2020-Q3 disbursement quarter.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: covid_stringency_index
+    source: oecd:DSD_HEALTH@DF_HEALTH_STAT
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Cash payout is a fiscal-channel universal transfer.
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects: [year_quarter]
+  notes: |
+    Local-projections IRF for household-consumption response to the cash-payout event in HKG with
+    COVID-stringency control. Multiplier estimated at 1, 2, and 4 quarter horizons.
+falsification:
+  rule: |
+    Refuted if the household-consumption multiplier estimated via local-projections at 2-quarter horizon
+    is below 0.4, OR exceeds 0.6, OR if the savings-rate response is not negative (i.e., consumption
+    increase is not financed by the transfer rather than by saving-decline-from-other-sources).
+  test: local_projections_2qtr_household_consumption_multiplier
+  threshold: 0.4 <= multiplier_2qtr <= 0.6 AND delta_savings_rate < 0
+scope:
+  period: [2020, 2022]
+  countries: [HKG]
+  outcome_dim: [welfare_state, employment_labour]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [hong_kong_cash_payout_2020, covid_response_2020, hkma_carrie_lam_administration]
+steelman: hypotheses/steelman/welfare_transfer_hong_kong_cash_payout_2020.md

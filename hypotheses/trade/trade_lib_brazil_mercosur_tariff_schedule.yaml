@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_brazil_mercosur_tariff_schedule
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Brazil's tariff schedule under Mercosur Common External Tariff
+  (CET) commitments has been historically high relative to other
+  middle-income economies and has not declined materially over
+  1995-2020 — Brazil weighted applied tariffs hovered around
+  10-12% throughout the period vs OECD median ~3% and emerging
+  Asia median ~6-7%. The descriptive claim is that Mercosur acted
+  as a tariff-floor mechanism that prevented unilateral
+  liberalisation rather than as a stepping-stone to deeper
+  integration.
+
+evidence_type: descriptive
+
+sample:
+  countries: [BRA, ARG, MEX, CHL, COL, IDN, IND, MYS, PHL, THA]
+  period: [1995, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with missing tariff data"
+
+scope:
+  period: [1995, 2020]
+  countries: [BRA]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [brazil_mercosur_cet, common_external_tariff, latin_american_protection]
+
+variables:
+  outcome:
+    - name: weighted_applied_tariff
+      source: "world_bank_wdi:TM.TAX.MRCH.WM.AR.ZS"
+      transformation: level
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Tariff schedule is a regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. Reports weighted applied tariff
+    trajectories for Brazil vs comparator emerging-market
+    economies over 1995-2020. Tests whether Brazil's tariff
+    differential persists.
+
+falsification:
+  rule: >
+    SUPPORTED if mean Brazil weighted applied tariff 2010-2020
+    minus mean comparator (Asian-EM mean) tariff 2010-2020
+    exceeds +3 pp AND Brazil tariff change 1995-2020 is small
+    (|change| < 5 pp). REFUTED if Brazil-comparator gap is small
+    or Brazil tariff dropped substantially.
+  test: descriptive_brazil_vs_em_tariff_persistence
+  threshold: >
+    PRIMARY: BRA-comparator tariff differential 2010-2020 >= +3 pp AND
+    BRA tariff change 1995-2020 |< 5 pp|.
+
+prior_confidence: 0.8
+
+disclosure: >
+  Prior high (0.8). The Brazilian tariff persistence is well
+  documented in Latin American trade literature (Bouzas 2017;
+  Markwald 2008). Heterodox developmentalist readers will defend
+  the persistence as legitimate import-substitution-and-industrial-
+  policy retention; the spec records the fact without normative
+  framing.
+
+linked_hypotheses:
+  - trade_lib_mercosur_1991_intra_bloc_trade
+
+steelman: hypotheses/steelman/trade_lib_brazil_mercosur_tariff_schedule.md

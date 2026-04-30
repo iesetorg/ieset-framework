@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: guatemala_remittance_dependence_2000_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Guatemala's 2000-2024 macro trajectory shows the migration-and-
+  remittance development pattern: remittance inflows rose from below
+  3% of GDP (2000) to above 20% (2024), and the macro economy is
+  increasingly stabilised by household-level migrant transfers rather
+  than productive-investment-driven growth. The pre-registered claim
+  is (a) remittance share of GDP rose by at least 15 percentage
+  points 2000-2024, AND (b) consumption share of GDP rose more than
+  investment share over the same window, AND (c) the correlation
+  between Guatemalan real-GDP growth and US-economy real-GDP growth
+  exceeds 0.5 on annual data 2000-2024 (because remittance flows
+  are pro-cyclical with US labour markets). The mechanism is that
+  migration-and-remittance becomes a quasi-permanent external income
+  channel that smooths consumption but does not necessarily produce
+  domestic productivity convergence.
+
+evidence_type: associational
+
+sample:
+  countries: [GTM, HND, SLV, NIC, MEX, DOM, JAM]
+  period: [2000, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude NIC post-2018 sanctions regime"
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [2000, 2024]
+  countries: [GTM, HND, SLV, NIC, MEX, DOM, JAM]
+  outcome_dim: [demographics_migration, gdp_growth, capital_flows, employment_labour]
+  policy_family: [trade_policy, none]
+  treatment_tags: [guatemala_migration_corridor]
+
+variables:
+  outcome:
+    - name: remittance_share_gdp
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: level
+    - name: consumption_share_gdp
+      source: world_bank_wdi:NE.CON.TOTL.ZS
+      transformation: level
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: emigration_stock_share_population
+      source: world_bank_wdi:SM.POP.TOTL.ZS
+      transformation: level
+  controls:
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: us_unemployment_rate
+      source: fred:UNRATE
+      transformation: level
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of consumption-share and remittance-share on
+    country and year FE plus GTM-indicator interaction. Secondary:
+    correlation matrix of GTM real-GDP growth with US real-GDP
+    growth.
+
+falsification:
+  rule: >
+    Not supported if (a) remittance_share_gdp(GTM) rose by less than
+    15 pp 2000-2024, OR (b) consumption-share growth did not exceed
+    investment-share growth, OR (c) corr(real_gdp_growth(GTM),
+    real_gdp_growth(USA), 2000-2024) is below 0.40.
+  test: panel_fe_plus_correlation_threshold
+  threshold: >
+    remittance_share_gdp(GTM, 2024) - remittance_share_gdp(GTM, 2000) >= 15
+    AND delta_consumption_share(GTM, 2000-2024) >= delta_capital_formation_share(GTM, 2000-2024)
+    AND corr(real_gdp_growth(GTM), real_gdp_growth(USA), 2000-2024) >= 0.40
+
+prior_confidence: 0.8
+
+disclosure: >
+  Author macro prior is that the remittance-development equilibrium
+  is real but incomplete: smooths consumption, partially substitutes
+  for missing domestic financial intermediation, but does not
+  necessarily produce productive-investment convergence.
+
+steelman: hypotheses/steelman/guatemala_remittance_dependence_2000_2024.md
+
+linked_hypotheses:
+  - bukele_fdi_gdp_investment_climate_2019_2024
+
+notes: >
+  Tests the migration-driven small-economy macro pattern.

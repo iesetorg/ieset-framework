@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_peru_2008_msme_regime
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Peru's 2008 MYPE (micro/small-enterprise) special labour
+  regime extension (Legislative Decree 1086: reduced labour
+  obligations, simplified social-security access for small
+  firms) raised the formal-employment share among MYPE
+  workers by at least 4 pp by 2013 relative to a synthetic
+  control of Latin-American peers, without producing a
+  measurable wage decline at the median.
+notes: >
+  Treatment dated 2008-Q3 (DL 1086 enactment). Peru is the
+  canonical small-firm-formalisation case in Latin America.
+  Country-level identification is weak because the MYPE
+  regime is sector-conditional; the spec acknowledges this
+  as a robustness concern.
+prior_confidence: 0.5
+disclosure: >-
+  Author is genuinely uncertain — MYPE regimes elsewhere
+  (Brazil Simples Nacional, Mexico INFONAVIT) have produced
+  mixed results, with formalisation gains often concentrated
+  in re-classification rather than new employment.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Peruvian MYPE formal-
+    employment share > +4.0 pp by 2013 AND median real wage
+    gap is not statistically more negative than -1.0 pp at
+    p<0.10. REFUTED if formal-employment gap < +1.0 pp OR
+    median wage falls > -2.0 pp (wage-suppression channel
+    dominant). PARTIAL otherwise.
+  test: >
+    Synth-DiD on Peruvian MYPE formal-employment share and
+    median real wage 2008-2013 vs LATAM donor pool, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [PER, COL, MEX, BRA, CHL, URY, ECU]
+  period: [2000, 2015]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+    - name: median_real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+  treatment:
+    - name: peru_dl_1086_2008
+      source: "constructed: indicator for 2008-Q3 DL 1086 MYPE-regime extension"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2008, 2013]
+  countries: [PER]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [peru_mype_dl_1086_2008]
+steelman: hypotheses/steelman/labour_reform_peru_2008_msme_regime.md

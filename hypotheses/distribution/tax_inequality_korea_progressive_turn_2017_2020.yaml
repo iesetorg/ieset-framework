@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_korea_progressive_turn_2017_2020
+version: 1
+status: draft
+topic: distribution
+claim: >
+  South Korea's Moon-era progressive turn 2017-2020 (top marginal rate
+  raised from 40 to 42 then 45 percent, corporate top rate raised from
+  22 to 25 percent, capital-gains broadening) produced a measurable
+  decline in the Korean top-1 pretax income share by at least 0.5
+  percentage points over 2017-2022 vs East-Asia synthetic control,
+  consistent with the public-finance literature where rate increases
+  in evasion-constrained but enforcement-intensifying environments
+  produce real distributional effects. The discriminating test is the
+  synth-control gap on top-1 share.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 5.
+prior_confidence: 0.55
+disclosure: >
+  Author prior weakly accepts that Moon-era progressivity produced a
+  detectable but small reduction in top-1 share; uncertain about
+  separating tax effect from concurrent labour-market shifts.
+falsification:
+  rule: >
+    SUPPORTED if Korean top-1 share is at least 0.5 percentage points
+    below East-Asia synthetic control at the 2022 horizon at p<0.10.
+    REFUTED if no detectable gap or positive gap at five-year horizon.
+  test: >
+    Synthetic-control with East-Asia donor pool (JPN, TWN, HKG, SGP),
+    treated KOR 2017.
+evidence_type: associational
+sample:
+  countries: [KOR, JPN, TWN, HKG, SGP]
+  period: [2005, 2023]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: kor_moon_progressive_turn_post_2017
+      source: "constructed: indicator = 1 for KOR, year >= 2017"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with East-Asia donor pool. Treated KOR 2017.
+intervention_channel: fiscal
+scope:
+  period: [2017, 2023]
+  countries: [KOR]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [moon_progressive_turn, korea_top_rate_2017, east_asia_distribution]

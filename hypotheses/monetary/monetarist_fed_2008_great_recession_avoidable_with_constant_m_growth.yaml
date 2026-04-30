@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: monetarist_fed_2008_great_recession_avoidable_with_constant_m_growth
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  In Q3 2008 through Q2 2009 the Federal Reserve allowed broad-money
+  M2 growth to slow sharply (annualised QoQ growth fell from ~7% in
+  early 2008 to near zero by late 2008, with M2 outright contracting
+  for several months in late 2008). Had the Fed instead maintained M2
+  growth at its 1985-2007 mean of ~6% per year through the 2008
+  financial shock, the trough of US real-GDP would have been shallower
+  by at least 1.5 percentage points and the unemployment-rate peak
+  lower by at least 1.0 percentage point. The hypothesis tests
+  Friedman's (2009 Wall Street Journal) and Anna Schwartz's (2008-09
+  interviews) public claim that the Great Recession was largely a
+  recurrence of the 1929-1933 monetary policy error: a passive Fed
+  permitting broad money to contract during a banking-system shock.
+
+evidence_type: causal
+
+sample:
+  countries: [USA]
+  period: [1985, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "use 1985-2007 as the regime-comparable training sample for counterfactual M2 growth path; the post-2008 regime change in IOR/QE policy is what is being tested"
+
+scope:
+  period: [2007, 2014]
+  countries: [USA]
+  outcome_dim: [monetary_policy, gdp_growth, employment_labour, financial_crisis]
+  policy_family: [monetary_policy]
+  treatment_tags: [fed_2008_response, friedman_2009_critique, great_recession_monetary_error, lehman_2008]
+
+variables:
+  outcome:
+    - name: real_gdp_quarterly
+      source: "fred:GDPC1"
+      transformation: log_diff_qoq_annualised
+      notes: "Real GDP quarterly log-difference annualised."
+    - name: unemployment_rate_monthly
+      source: "fred:UNRATE"
+      transformation: level
+    - name: industrial_production_monthly
+      source: "fred:INDPRO"
+      transformation: log_diff_yoy
+  treatment:
+    - name: m2_growth_actual
+      source: "fred:M2SL"
+      transformation: log_diff_qoq_annualised
+      notes: "Actual quarterly annualised broad-money growth."
+    - name: m2_growth_counterfactual_constant_6pct
+      source: "derived:m2_growth_counterfactual_constant_6pct"
+      transformation: synthetic_path_constant_6pct_from_2008Q3
+      notes: "Counterfactual: M2 grows at constant 6% (1985-2007 mean) from 2008Q3 onward, irrespective of the financial-stress shock. Used in synthetic-control / structural-VAR counterfactual."
+    - name: m2_growth_gap
+      source: "derived:m2_actual_minus_counterfactual"
+      transformation: difference
+      notes: "Gap between actual M2 growth and counterfactual constant-6% path. The hypothesis predicts this gap mediates the recession depth."
+  controls:
+    - name: ted_spread
+      source: "fred:TEDRATE"
+      transformation: level
+      notes: "Banking-system stress proxy; controls for financial-shock exogeneity to monetary stance."
+    - name: oil_price_change
+      source: "fred:WTISPLC"
+      transformation: log_diff_yoy
+    - name: housing_starts
+      source: "fred:HOUST"
+      transformation: log_diff_yoy
+      notes: "Housing-stock-overhang control; tests whether real-side housing collapse explains the GDP path independent of M2."
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  Counterfactual is purely a monetary-policy stance variable (rate of
+  broad-money expansion). No fiscal counterfactual is being computed.
+
+estimator:
+  template: synthetic_control
+  notes: >
+    Primary spec: structural-VAR with M2 growth, real GDP growth,
+    unemployment, TED spread, oil prices, housing starts; identification
+    via Cholesky with M2 ordered last among policy variables (so that
+    M2 responds to financial-stress shock first, allowing a measure of
+    exogenous M2 stance shifts within the SVAR). Counterfactual: re-run
+    the SVAR with M2 growth fixed at 6% from 2008Q3 onward, holding
+    other shocks at their realised values. Difference between
+    counterfactual GDP/unemployment paths and actual paths is the
+    estimated cost of the M2 contraction. Robustness: synth-DiD using
+    other advanced-economy quarterly GDP series as donor pool to build
+    a synthetic US.
+
+falsification:
+  rule: >
+    Not supported if the SVAR-implied counterfactual GDP path under
+    constant-6% M2 growth differs from the actual path by less than
+    1.5pp (cumulative real-GDP gap) at the 2009Q2 trough, OR if the
+    counterfactual unemployment peak differs by less than 1.0pp from
+    the actual 2009-2010 peak, OR if the SVAR M2-shock impulse response
+    on real GDP is not statistically positive at h=4 quarters and
+    h=8 quarters at 90% confidence bands. A real-side / financial-friction
+    reading wins cleanly if the M2-shock impulse response on GDP is
+    insignificant at h>=4 — i.e. the Fed could not have prevented the
+    recession by holding M2 growth steady because the contraction was
+    driven by housing-collapse and balance-sheet repair, not money supply.
+  test: svar_counterfactual_constant_m2_growth_gdp_unemployment_gap
+  threshold: >
+    counterfactual_gdp_gap_2009Q2_trough >= 1.5pp at 90% bands
+    AND counterfactual_unemployment_peak_gap >= 1.0pp at 90% bands
+    AND SVAR M2-shock impulse on real GDP positive at h=4 and h=8 at 90% bands
+    AND result robust to inclusion of housing_starts as additional shock variable
+
+prior_confidence: 0.55
+
+disclosure: >-
+  The Friedman-Schwartz "Fed could have prevented this" reading of
+  2008-09 is monetarist canon and was Friedman's last public position
+  (Wall Street Journal 2009-01-30). Heterodox / financial-frictions
+  readers (Bernanke-Gertler-Gilchrist, Mian-Sufi household-debt
+  overhang, Reinhart-Rogoff balance-sheet recession) argue the
+  recession depth was determined by household-balance-sheet damage
+  and broken intermediation, not by money supply, and that Fed
+  expansion of base money would have been insufficient — and in fact
+  was attempted via QE without preventing the trough. Author's
+  market-liberal priors lean toward accepting Friedman's diagnosis but
+  the prior_confidence is set at 0.55 to reflect that this is the
+  contested-counterfactual case where the empirical literature is
+  closer to a coin-flip than monetarists usually concede. The
+  causal-claim status (rather than associational) is intentional
+  because Friedman's claim IS a counterfactual; an associational
+  framing would dodge the actual question.
+
+steelman: hypotheses/steelman/monetarist_fed_2008_great_recession_avoidable_with_constant_m_growth.md
+
+linked_hypotheses:
+  - friedman_schwartz_great_depression_monetary_cause
+  - monetarist_velocity_stability_breaks_post_2008
+  - friedman_inflation_always_monetary_long_run_panel
+
+notes: >
+  Hetzel (2012) "The Great Recession: Market Failure or Policy Failure?"
+  develops the monetarist counterfactual at book length. Sumner's
+  market-monetarist NGDP-targeting critique is closely adjacent. The
+  prior_confidence reflects that the 2008-09 case is far weaker for
+  monetarism than the 1929-1933 case: in 2008 the Fed expanded base
+  money by 100% within 6 months, and M2 growth slowed not because of
+  Fed inaction but because of massive bank-credit contraction. Whether
+  more aggressive M2 targeting (e.g. via Treasury asset purchases that
+  directly increased deposits) would have closed the gap is an open
+  empirical question.

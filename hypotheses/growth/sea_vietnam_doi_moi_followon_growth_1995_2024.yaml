@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sea_vietnam_doi_moi_followon_growth_1995_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Vietnam's post-1995 trajectory — building on the 1986 Doi Moi reforms
+  through US trade-normalisation 1995, ASEAN accession 1995, BTA with
+  the US 2001, WTO accession 2007, EVFTA 2020, and a deliberate FDI
+  manufacturing-attraction strategy — produced sustained convergence to
+  middle-income levels, with real GDP-per-capita (PPP) growth averaging
+  at least 4.5 percentage points per year above the SE-Asian peer panel
+  mean (PHL, IDN, KHM, LAO, BGD, MMR) over 1995-2019. The cumulative
+  log-gap by 2019 vs the peer panel exceeds +0.6 log points (~+82% in
+  levels).
+
+evidence_type: associational
+
+notes: >-
+  Complement to vietnam_doi_moi_developmental_pattern_growth_effect
+  (1986 onset). This hypothesis tests the SUSTAINED follow-on growth
+  through 2024 with multiple integration steps treated as a sustained
+  institutional+trade reform regime.
+
+prior_confidence: 0.85
+
+disclosure: >-
+  Author market-liberal priors interpret Vietnam's success as primarily
+  about market opening and FDI attraction. Bias risk is under-weighting
+  industrial-policy targeting (electronics export zones, foreign-firm
+  preferences). Mitigation: peer-pool comparison absorbs common SE-Asia
+  trend; magnitude threshold is large enough that any sub-channel
+  attribution does not move the verdict.
+
+steelman: hypotheses/steelman/sea_vietnam_doi_moi_followon_growth_1995_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if cumulative log-GDP-pc-PPP gap
+    (VNM minus equal-weighted peer-pool mean of PHL, IDN, KHM, LAO,
+    BGD, MMR) from 1995 to 2019 is at least +0.6 log-points. REFUTED
+    if the gap is at most +0.2 log-points (or negative).
+  test: vietnam_post_1995_log_gap_vs_se_asia_peer_pool_2019
+  threshold: >-
+    PRIMARY: log_gdp_pc_ppp(VNM, 2019) - log_gdp_pc_ppp(VNM, 1995) - [log_gdp_pc_ppp(peers, 2019) - log_gdp_pc_ppp(peers, 1995)] >= 0.6.
+    METHOD_VALID: WDI NY.GDP.PCAP.PP.KD available for VNM and >=4 of 6 peers across 1995-2019.
+
+sample:
+  countries: [VNM, PHL, IDN, KHM, LAO, BGD, MMR]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "primary window 1995-2019 to avoid 2020-2021 COVID distortion"
+
+scope:
+  period: [1995, 2024]
+  countries: [VNM]
+  outcome_dim: [gdp_growth, trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, institutional_reform, industrial_policy]
+  treatment_tags: [vietnam_post_1995_integration, vietnam_us_bta_2001, vietnam_wto_2007, evfta_2020]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+  treatment:
+    - name: post_1995_integration_indicator
+      source: "constructed: indicator = 1 for VNM, year >= 1995"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Equal-weighted peer-pool baseline; informative full synth-DiD with
+    weight optimisation. Outcome: log GDP-pc PPP. Donor pool excludes
+    THA, MYS as too-developed peers but includes them as informative
+    reference.
+
+linked_hypotheses:
+  - vietnam_doi_moi_developmental_pattern_growth_effect
+  - sea_indonesia_jokowi_infrastructure_2014_2024

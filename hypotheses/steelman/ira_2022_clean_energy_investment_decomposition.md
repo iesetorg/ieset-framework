@@ -1,0 +1,24 @@
+# Steelman — IRA 2022 clean-energy investment decomposition
+
+**The strongest arguments against the framework's "IRA produced a measurable industrial step-change" framing:**
+
+1. **Announced capex is a misleading outcome — many plants will never operate.** A large share of the post-IRA "manufacturing reshoring" headline is announcements (battery factories, EV plants, solar module lines), not operating plants. Permitting delays, supply-chain bottlenecks, NIMBY litigation, labour shortages, and project cancellations have already reduced realised capex below announcement totals. By 2024Q4 a meaningful fraction of high-profile announcements were postponed or cancelled. Treating announcement counts as "industrial response" overstates what the IRA actually produced; the realised-capex channel may be 50-70% of headline by 2026.
+
+2. **Deployment acceleration is overdetermined by global cost declines, not IRA.** US utility-scale solar additions accelerated in 2023-2024 — but so did deployments globally, in markets without IRA-equivalent policy. The marginal cost of a utility-scale solar project fell ~20% over 2022-2024 due to Chinese module oversupply, independent of the US production tax credit. Disentangling "IRA caused acceleration" from "global cost declines + interest-rate normalisation caused acceleration in markets like the US" is hard; the synthetic-USA donor pool (which faces similar global cost trends without IRA) is the right comparator and the gap may be smaller than headline numbers suggest.
+
+3. **Fiscal cost is the most-reliable, most-overshooting channel — but the wrong success metric.** CBO reestimated IRA's 10-year cost upward by 2-3x the original $369bn within 18 months of enactment, primarily because production tax credits (45X) and EV credits (30D) are uncapped and demand-elastic. This means the deficit channel "succeeded" on the fiscal-cost dimension only because the other channels (deployment, capex) responded — but the fiscal-effectiveness ratio (dollars per ton of CO2 abated, dollars per MW deployed, dollars per manufacturing job) is plausibly worse than baseline IEA / IRENA learning-curve extrapolation would have produced via cheaper alternatives (carbon price + R&D + permitting reform).
+
+4. **Made-in-America requirements may have raised costs more than they delivered jobs.** The 45X domestic-content requirement and 30D EV-credit foreign-entity-of-concern provisions appear to have driven incremental US battery + solar manufacturing capex. But these provisions also increased component costs by 15-30% relative to imports, transferring some IRA outlay into producer margins rather than incremental capacity. The job-creation channel may be modest in absolute terms (50-150k direct jobs) when measured against the $400-800bn 10-year cost, an implicit subsidy of $1-3M per job — high by industrial-policy standards.
+
+5. **Trump administration repeal risk + state-level resistance leave the policy unstable.** Post-January 2025 IRA implementation has been partially modified by Treasury guidance restrictions and Republican-state opposition; the EV consumer credit was particularly contested. A hypothesis that windows 2022-2026 risks measuring a partial-implementation regime where pre-2025 announcements proceed but post-2025 incremental investment slows. The "step-change" framing assumes statutory stability that has not held.
+
+6. **The counterfactual is industrial policy elsewhere, not no industrial policy.** EU CRMA + Net-Zero Industry Act, Japan GX (¥150tn), Korea K-Chips, and Chinese 14th Five-Year Plan clean-energy targets all responded to or pre-dated IRA; global clean-manufacturing capex would have risen 2022-2026 even without IRA, just with more in EU / Asia. Attributing global clean-manufacturing capex shifts to IRA overstates US-specific causal effect; a meaningful share is "diversion" from EU / Asia rather than "creation" of new global capacity.
+
+**How this should shape the v1 result card when run:**
+
+- Report announced vs realised capex separately. Realised is the binding measure; announced is forward-looking signalling.
+- Decompose deployment effect against synthetic-USA + against global cost-decline trend. The "IRA-attributable share" of the deployment acceleration is plausibly 20-50%, not 100%.
+- Report fiscal cost per MW deployed and per manufacturing job, not just absolute outlay. The ratio is the policy-effectiveness measure.
+- Acknowledge that 2025+ statutory uncertainty leaves the v1 estimate fragile; flag for v1.1 update.
+- Treat "diversion vs creation" decomposition explicitly. If IRA primarily relocated investment from EU / Asia, global climate effect is small even if US industrial response is real.
+- Climate-welfare benefits are out-of-frame for this hypothesis but should be acknowledged as a separate measurement question.

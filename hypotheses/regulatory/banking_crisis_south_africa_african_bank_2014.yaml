@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_south_africa_african_bank_2014
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  South Africa's August 2014 African Bank Limited curatorship — SARB-led resolution
+  of an unsecured-consumer-credit lender, retail-deposit guarantee, good-bank / bad-bank
+  split, no propagation to systemic banks (Standard Bank, FirstRand, Absa, Nedbank) —
+  is a canonical case of a contained-resolution single-institution failure in an
+  emerging market with an effective supervisory framework. The hypothesis is that
+  South Africa 2014 meets a deliberately-narrow checklist on at least 3 of 4 metrics
+  WITHOUT producing a Laeven-Valencia coded systemic crisis or material macro impact.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [ZAF]
+  period: [2010, 2018]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: african_bank_curatorship_2014
+    description: African Bank Limited placed in curatorship August 2014
+    threshold: "yes/no — yes counts as breach"
+    window: "2014"
+    source: "imf:ZAF_AFRICAN_BANK_2014"
+    direction: supports_claim
+    independence_justification: Resolution event.
+  - metric_id: good_bank_bad_bank_split
+    description: Good-bank ("African Bank Holdings") / bad-bank split executed 2014-2016
+    threshold: "yes/no — yes counts as breach"
+    window: "2014-2016"
+    source: "imf:ZAF_GBBB_2014"
+    direction: supports_claim
+    independence_justification: Resolution-mechanism event.
+  - metric_id: laeven_valencia_no_systemic_coding
+    description: Laeven-Valencia did NOT code South Africa as systemic-banking-crisis
+    threshold: "coded NO — supports the contained-resolution framing"
+    window: "2014-2018"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding as negative control.
+  - metric_id: real_gdp_undisturbed
+    description: South Africa real GDP growth not materially disturbed in 2014-2015
+    threshold: "annual growth >= 1% in each of 2014 and 2015"
+    window: "2014-2015"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+    direction: supports_claim
+    independence_justification: Activity measure as negative control.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: annual_yoy
+    - name: bank_npl_ratio
+      source: "world_bank_wdi:FB.AST.NPER.ZS"
+      transformation: peak_level
+prior_confidence: 0.92
+disclosure: >
+  African Bank 2014 is a textbook "single-institution failure with effective resolution"
+  case in an EM context.
+steelman: hypotheses/steelman/banking_crisis_south_africa_african_bank_2014.md
+scope:
+  period: [2010, 2018]
+  countries: [ZAF]
+  outcome_dim: [financial_crisis, financialisation, regulation_compliance_cost]
+  policy_family: [regulation]
+  treatment_tags: [south_africa_2014, african_bank_curatorship, good_bank_bad_bank_split]

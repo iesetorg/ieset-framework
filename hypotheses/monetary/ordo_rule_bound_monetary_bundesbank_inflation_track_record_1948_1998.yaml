@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ordo_rule_bound_monetary_bundesbank_inflation_track_record_1948_1998
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  Across 1948-1998, the Deutsche Bundesbank — operating under a
+  statutorily independent, price-stability-prioritised mandate
+  (Bundesbankgesetz 1957) — delivered lower mean and lower-variance
+  CPI inflation than the median OECD central bank operating under
+  more discretionary mandates. The Freiburg / ordoliberal claim is
+  that rule-bound, mandate-bound monetary policy outperforms
+  discretionary policy on the inflation-stabilisation dimension; the
+  test is a descriptive cross-country comparison of inflation level
+  and volatility, with Germany ranked against an OECD comparator
+  panel of pre-Maastricht advanced economies.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DEU, USA, GBR, FRA, ITA, JPN, CAN, AUS, NLD, BEL, AUT, CHE, SWE, NOR, DNK, FIN]
+  period: [1948, 1998]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude post-1998 (ECB era invalidates Bundesbank-as-monetary-authority assumption)"
+    - "drop country-years with hyperinflation episodes (>500% annual CPI) where regime is not characterised by ordinary monetary discretion"
+
+variables:
+  outcome:
+    - name: cpi_inflation_annual
+      source: "imf:PCPIPCH"
+      transformation: level
+    - name: cpi_inflation_volatility_5yr
+      source: "imf:PCPIPCH"
+      transformation: rolling_5yr_stdev
+    - name: cpi_index_oecd
+      source: "oecd:cpi_all_items"
+      transformation: yoy_pct_change
+      notes: "Cross-source robustness; OECD series for advanced economies starts later than IMF for some countries."
+  treatment:
+    - name: bundesbank_indicator
+      source: "constructed: indicator = 1 for DEU, 0 otherwise"
+      transformation: indicator
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  Central-bank mandate design is a monetary intervention. Spec
+  tests whether the Bundesbank's statutory rule-bound regime
+  delivered better inflation outcomes than discretionary peers.
+  Channel monetary per invariant 4.
+
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Country-mean inflation level and country-mean rolling-5yr
+    inflation volatility computed across 1948-1998. Germany ranked
+    against the OECD comparator panel. Primary statistic: rank of
+    DEU on (a) mean inflation, (b) inflation volatility. No
+    causal-identification design — this is a track-record claim
+    of the form "rule-bound CB outperforms discretionary CBs on
+    its own stated objective."
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) DEU ranks in the top quartile (lowest
+    inflation) of the comparator panel on mean annual CPI inflation
+    1948-1998, AND (b) DEU ranks in the top quartile (lowest
+    volatility) on 5yr-rolling inflation-volatility mean. PARTIAL
+    if DEU ranks in top half on both. REFUTED if DEU ranks below
+    median on either dimension. INFORMATIVE: the gap between DEU
+    and panel median should widen during high-inflation global
+    episodes (1973-1982).
+  test: bundesbank_inflation_rank_oecd_panel_1948_1998
+  threshold: >
+    PRIMARY: rank(DEU, mean_inflation, ascending) <= ceil(N/4) AND
+    rank(DEU, mean_inflation_volatility, ascending) <= ceil(N/4).
+    PARTIAL: both ranks <= ceil(N/2).
+    INFORMATIVE: |DEU - panel_median| larger in 1973-1982 sub-window than overall.
+
+prior_confidence: 0.78
+
+disclosure: >-
+  Author prior is high (0.78) — the Bundesbank's low-inflation
+  reputation 1948-1998 is well documented and forms the empirical
+  basis on which the ECB inherited its mandate design. Authorial
+  framing risk: a descriptive rank comparison cannot distinguish
+  "rule-bound mandate causes low inflation" from "post-war German
+  political economy made low inflation a near-consensus social
+  preference and the central bank's mandate is downstream of that."
+  Heterodox readers (post-Keynesian, MMT, structuralist) will note
+  that Germany's external surplus and undervalued DM contributed
+  to the low-inflation outcome independent of mandate design;
+  others (Hetzel, Goodhart) will argue the Bundesbank's record
+  is partly mythology — its monetary-targeting regime missed its
+  own M3 targets in roughly half of years 1975-1998. The descriptive
+  rank-test is intentionally minimal and survives those critiques
+  on the narrow track-record dimension only.
+
+scope:
+  period: [1948, 1998]
+  countries: [DEU, OECD]
+  outcome_dim: [inflation, monetary_policy]
+  policy_family: [monetary_policy, institutional_reform]
+  treatment_tags: [bundesbank_independence, bundesbankgesetz_1957, ordoliberal_monetary_rule, mandate_bound_central_bank]
+
+steelman: hypotheses/steelman/ordo_rule_bound_monetary_bundesbank_inflation_track_record_1948_1998.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+
+notes: >
+  This is a descriptive track-record hypothesis, not a causal
+  identification. The companion spec
+  freiburg_strong_state_independent_central_bank_synergy_panel
+  carries the cross-country panel test of CBI x rule-of-law
+  interactions. v2 could substitute Bade-Parkin or Cukierman CBI
+  indices once a publisher registers them at series-level.

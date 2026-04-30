@@ -33,7 +33,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_panel_fe import (
-    has_committed_verdict,
+    is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, build_panel, infer_claim_direction, filter_sample,
 )
 from run_event_study import find_event_year
@@ -156,6 +156,22 @@ def run_one(hid: str, force: bool = False) -> str:
     if not found:
         return f"  ✗ {hid}: spec not found"
     _, spec = found
+    # Integrity gate: refuse to grade against a stub falsification rule.
+    # The auto-grader's verdicts are only meaningful against a dispositive
+    # pre-registered threshold; running against the generic boilerplate
+    # ("…when this stub is promoted from draft") would attach a fake-clean
+    # verdict to a non-promoted spec. See post-mortem (commit bba6f644).
+    if is_stub_falsification_rule(spec):
+        verdict = "INCONCLUSIVE_DATA_PENDING"
+        reason = (
+            "falsification rule not sharpened — auto-grader refuses to "
+            "grade against the generic stub boilerplate. Promote the spec "
+            "(replace falsification.rule with a dispositive threshold AND "
+            "document the sharpening in methodology_note) before running."
+        )
+        write_outputs(hid, spec, {"variables_loaded": [], "variables_missing": []}, {"error": reason}, {}, verdict, reason, None)
+        return f"  ⚠ {hid}: {verdict} (stub rule, refused to grade)"
+
     panel, status = build_panel(spec)
     var_blocks = spec.get("variables") or {}
     outcome_items = var_blocks.get("outcome") or []

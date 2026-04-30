@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_brazil_2017_trabalhista_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Brazil's November 2017 Reforma Trabalhista (Law 13,467/2017:
+  intermittent-contract creation, collective-bargaining
+  prevalence over statute, judicial-fee imposition on labour
+  claims) raised the Brazilian formal-employment rate by at
+  least 1 pp by 2019 relative to a synthetic control of Latin-
+  American peers, but did not reduce informal-sector share.
+notes: >
+  Treatment dated 2017-Q4 enactment, effective 2017-11-11.
+  Sample window stops 2019 to exclude the COVID shock. Brazil
+  is the largest Latin-American flexibilisation episode of the
+  decade and remains contested. The informal-sector outcome
+  is the steelman discipline: a reform that raised formal
+  employment by reclassifying existing informal work has
+  weaker welfare implications than one that genuinely
+  expanded labour demand.
+prior_confidence: 0.5
+disclosure: >-
+  Author is genuinely uncertain about Brazil 2017 — the prior
+  is set at 0.5 because the available 2018-2019 evidence is
+  mixed and the COVID shock cuts off the post-period. Donor
+  pool weights are very fragile given Latin-American
+  heterogeneity 2017-2019.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Brazilian formal-employment
+    rate > +1.0 pp by 2019 AND informal-sector share gap is
+    not statistically more positive than zero at p<0.10.
+    REFUTED if formal-employment gap is wrong-signed at p<0.10
+    OR informal-sector gap rises significantly (formalisation
+    failure). PARTIAL if formal employment rises and informal
+    employment also rises (both expanding — net employment
+    expansion claim only).
+  test: >
+    Synth-DiD on Brazilian formal-employment rate and informal
+    share 2017-2019 vs Latin-American donor pool, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [BRA, MEX, ARG, CHL, COL, PER, URY]
+  period: [2010, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2015-2016 Brazilian recession window for asymmetric exposure
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+  treatment:
+    - name: brazil_trabalhista_2017
+      source: "constructed: indicator for 2017-11-11 Reforma Trabalhista enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2017, 2019]
+  countries: [BRA]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [brazil_trabalhista_2017]
+steelman: hypotheses/steelman/labour_reform_brazil_2017_trabalhista_employment.md

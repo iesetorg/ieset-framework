@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_japan_ageing_deflation_link
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Japan's prolonged deflationary period 1995-2015 is causally linked to its rapid demographic
+  ageing through reduced aggregate demand from older cohorts and depressed wage growth.
+  The hypothesis predicts (a) a strong negative cointegrating relationship between old-age
+  dependency ratio and headline CPI inflation in Japan over 1990-2023, and (b) Japan's
+  inflation-ageing relationship is significantly steeper than the OECD median.
+evidence_type: associational
+sample:
+  countries: [JPN, DEU, ITA, KOR, FRA, USA, GBR, ESP, NLD, SWE, FIN, AUT]
+  period: [1990, 2023]
+  temporal_structure: time_series
+  cross_section_justification: >-
+    Single-country VECM for Japan with cross-country comparator coefficients; the panel
+    serves as benchmark for Japan's idiosyncratic relationship.
+scope:
+  period: [1990, 2023]
+  countries: [JPN]
+  outcome_dim: [inflation, demographics_migration]
+  policy_family: [monetary_policy]
+  treatment_tags: [japan_ageing, deflation_persistence]
+variables:
+  outcome:
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+  treatment:
+    - name: old_age_dependency_ratio
+      source: world_bank_wdi:SP.POP.DPND.OL
+      transformation: level
+  controls:
+    - name: m2_growth
+      source: fred:JPNM2MB
+      transformation: yoy_log_diff
+    - name: output_gap_proxy
+      source: imf:WEO.NGAP_NPGDP
+      transformation: level
+estimator:
+  template: cointegration_vecm
+  notes: >
+    Johansen VECM on (CPI, OADR, M2 growth) for Japan 1990-2023; report long-run
+    cointegrating coefficient on OADR. Compare to identical specification fit on each
+    OECD comparator for the cross-country benchmark.
+falsification:
+  rule: >-
+    SUPPORTED if (a) cointegration is detected at 5% trace-test level for Japan, (b)
+    long-run coefficient on OADR is negative on CPI with t-stat > 2, AND (c) Japan's
+    OADR-on-CPI coefficient is in the bottom-quartile (most-negative) of the comparator
+    panel. REFUTED if no cointegration, wrong-signed long-run coefficient, or Japan is
+    indistinguishable from comparator median.
+  test: japan_vecm_oadr_cpi_long_run_with_panel_benchmark
+  threshold: "trace_test_p < 0.05 AND coef_oadr_long_run < 0 AND t_stat < -2 AND japan_quartile_rank <= 1"
+prior_confidence: 0.55
+disclosure: >-
+  The "ageing causes deflation" thesis is contested (Goodhart-Pradhan argue the opposite for
+  the global future). Author's priors give roughly even odds; the test is genuinely
+  informative.
+steelman: hypotheses/steelman/demo_japan_ageing_deflation_link.md

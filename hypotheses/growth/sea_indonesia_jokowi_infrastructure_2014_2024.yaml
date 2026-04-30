@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sea_indonesia_jokowi_infrastructure_2014_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Indonesia's Jokowi-era infrastructure push 2014-2024 — covering the
+  toll-road expansion, MRT/LRT urban transit, port and airport upgrades,
+  electrification programme, and 2024 Nusantara new-capital build —
+  produced a measurable rise in gross fixed capital formation share of
+  GDP and a logistics-cost reduction visible in the World Bank Logistics
+  Performance Index. By 2023, Indonesia's GFCF share rises by at least
+  +2 percentage points above the 2010-2013 mean, and real GDP-pc growth
+  through 2014-2019 (pre-COVID) averages at least 0.5pp/yr above the
+  ASEAN-5 peer mean (PHL, MYS, THA, VNM).
+
+evidence_type: associational
+
+notes: >-
+  Tests whether the Jokowi infrastructure push translates into
+  observable macro outcomes. GFCF share is the input-side test;
+  pre-COVID growth differential is the output-side test.
+
+prior_confidence: 0.62
+
+disclosure: >-
+  Author tilts neutral — infrastructure-led growth in EMs has mixed
+  track record. Bias risk: attributing 2014-2019 growth to Jokowi
+  specifically when commodity-cycle factors also matter for Indonesia.
+  Mitigation: peer-panel mean absorbs ASEAN common cycle.
+
+steelman: hypotheses/steelman/sea_indonesia_jokowi_infrastructure_2014_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH must hold): (1) GFCF / GDP for IDN
+    averages at least +2pp above the 2010-2013 mean over 2017-2023;
+    AND (2) real GDP-pc growth differential IDN minus ASEAN-5 peer
+    mean (PHL, MYS, THA, VNM) averaged 2014-2019 is at least +0.5pp/yr.
+    REFUTED if EITHER condition fails (no input-side push OR no
+    output-side acceleration).
+  test: indonesia_jokowi_infrastructure_capex_and_growth_differential
+  threshold: >-
+    PRIMARY 1: gfcf_pct_gdp(IDN, 2017-2023 mean) - gfcf_pct_gdp(IDN, 2010-2013 mean) >= 2.
+    PRIMARY 2: gdp_pc_growth(IDN, 2014-2019 mean) - gdp_pc_growth(ASEAN5, 2014-2019 mean) >= 0.005.
+    METHOD_VALID: WDI NE.GDI.FTOT.ZS and NY.GDP.PCAP.KD.ZG for IDN and ASEAN-5 peers through 2023.
+
+sample:
+  countries: [IDN, PHL, MYS, THA, VNM]
+  period: [2008, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "growth-differential window restricted to 2014-2019 to avoid COVID 2020-2022"
+
+scope:
+  period: [2014, 2024]
+  countries: [IDN]
+  outcome_dim: [gdp_growth, productivity]
+  policy_family: [fiscal_policy, industrial_policy]
+  treatment_tags: [indonesia_jokowi_era, indonesia_infrastructure_push, nusantara_capital_2024]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: gross_fixed_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+  treatment:
+    - name: post_jokowi_indicator
+      source: "constructed: indicator = 1 for IDN, year >= 2014"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way fixed effects panel. ASEAN-5 peer pool. Test 1 is
+    country-level pre-post on GFCF share; Test 2 is panel-DiD on
+    growth rate.
+
+linked_hypotheses:
+  - sea_vietnam_doi_moi_followon_growth_1995_2024

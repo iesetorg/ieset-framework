@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_canada_2016_top_rate_increase
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 2016 Trudeau federal top marginal income tax bracket (33 percent on
+  income above CAD 200,000, raising combined federal-provincial top rate
+  to 53.5 percent in Ontario) produced a measurable but transitory
+  forestalling spike in reported top-1 pretax income share in 2015 with
+  partial reversion by 2018, consistent with a Canadian ETI estimate in
+  the 0.4-0.7 range as documented by Milligan-Smart. The discriminating
+  test is the 2015 forestalling magnitude and the 2018 reversion.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 4.
+prior_confidence: 0.65
+disclosure: >
+  Author prior aligns with the Milligan-Smart ETI estimates for Canada;
+  forestalling effects are well-documented for the 2016 episode.
+falsification:
+  rule: >
+    SUPPORTED if Canadian top-1 share shows 2015 forestalling spike of at
+    least 0.5 percentage points AND post-2017 share is within 0.5pp of
+    the 2010-2014 baseline at p<0.10. REFUTED if forestalling spike is
+    below 0.2 pp or post-2017 share is more than 1.0 pp below baseline.
+  test: >
+    Canada time-series + provincial cross-section structural break at
+    2016Q1 with 2015 forestalling dummy.
+evidence_type: associational
+sample:
+  countries: [CAN]
+  period: [2005, 2020]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: forestalling_2015_indicator
+      source: "constructed: indicator = 1 for year == 2015"
+      transformation: indicator
+    - name: trudeau_top_rate_post_2016
+      source: "constructed: indicator = 1 for year >= 2016"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: equity_index_real_yoy
+      source: "fred:SP500"
+      transformation: real_yoy_pct_change
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Event study with break at 2016Q1 and 2015 forestalling dummy. HAC SEs.
+intervention_channel: fiscal
+scope:
+  period: [2016, 2020]
+  countries: [CAN]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [trudeau_top_rate_2016, canada_eti, forestalling_2015]

@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_ireland_2008_property_bust
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The 2008-2013 Irish banking crisis was a property-credit-bust event in which the
+  Anglo Irish Bank, Allied Irish Banks, and Bank of Ireland balance-sheet expansion
+  during 2003-2007 produced a real-house-price peak-to-trough decline of >= 50%, a
+  bank-rescue fiscal cost of >= 25% of GDP, an unemployment rate rise of >= 9 pp,
+  and a Troika programme entry. The hypothesis is that the canonical multi-metric
+  signature for Ireland is met across at least 4 of 5 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [IRL]
+  period: [2002, 2016]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_house_price_decline
+    description: Ireland real residential property price index peak-to-trough
+    threshold: ">= 50% decline"
+    window: "2007-2013"
+    source: "bis:WS_SPP"
+    direction: supports_claim
+    independence_justification: Property-price index, independent of bank-balance-sheet data.
+  - metric_id: real_gdp_contraction
+    description: Ireland real GDP peak-to-trough decline
+    threshold: ">= 7% decline"
+    window: "2007-2010"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: unemployment_rate_rise
+    description: Ireland unemployment rate rise vs 2006-2007 baseline
+    threshold: ">= 9 pp rise"
+    window: "2008-2013"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; eurostat:une_rt_a"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+  - metric_id: government_debt_run_up
+    description: General government gross debt rise from pre-crisis to peak
+    threshold: ">= 70 pp of GDP rise"
+    window: "2007-2013"
+    source: "imf:GGXWDG_NGDP; eurostat:gov_10dd_edpt1"
+    direction: supports_claim
+    independence_justification: Fiscal aggregate.
+  - metric_id: troika_programme_entered
+    description: EU-IMF-ECB Troika programme entered November 2010
+    threshold: "yes/no — yes counts as breach"
+    window: "2010-2013"
+    source: "imf:EFF_IRL_2010"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_house_price_index
+      source: "bis:WS_SPP"
+      transformation: peak_to_trough
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+prior_confidence: 0.95
+disclosure: >
+  Ireland 2008 is one of the canonical "property-credit-bubble + bank-rescue" episodes
+  of the GFC. Author has market-liberal priors but treats this as overdetermined.
+steelman: hypotheses/steelman/banking_crisis_ireland_2008_property_bust.md
+scope:
+  period: [2002, 2016]
+  countries: [IRL]
+  outcome_dim: [financial_crisis, financialisation, housing, employment_labour]
+  policy_family: [regulation, fiscal_policy]
+  treatment_tags: [ireland_2008, anglo_irish_bank, troika_programme_2010, celtic_tiger_bust]

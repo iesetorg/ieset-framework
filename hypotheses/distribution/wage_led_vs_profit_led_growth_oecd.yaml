@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wage_led_vs_profit_led_growth_oecd
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  Following Bhaduri-Marglin (1990) and the Stockhammer-Onaran post-Keynesian
+  empirical tradition, advanced economies are heterogeneously classified
+  as "wage-led" or "profit-led" depending on whether a rise in the wage
+  share raises or lowers aggregate demand. The hypothesis tests, in an
+  OECD post-1980 panel, whether the cross-country distribution of
+  estimated demand-regime classifications is a mix rather than uniformly
+  profit-led, with at least one-third of countries supporting a wage-led
+  classification (positive consumption response to wage-share rise that
+  exceeds the negative investment-and-net-export response). A market-
+  liberal reading would predict that all economies are profit-led under
+  open-economy / capital-mobility conditions; the post-Keynesian reading
+  predicts substantial heterogeneity, with large closed economies (US,
+  EU as bloc, Japan) more wage-led and small open economies (Netherlands,
+  Sweden, Korea) more profit-led.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, BEL, AUT, KOR]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing labour-share or final-demand component series
+    - drop countries with insufficient time-series length for country-specific estimation (< 25 annual observations)
+variables:
+  outcome:
+    - name: aggregate_demand_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: yoy
+      notes: >
+        Real GDP growth, decomposed via national-accounts identity into
+        consumption, investment, government, and net-export contributions.
+        Each component regressed separately on labour-share dynamics.
+    - name: private_consumption_share_gdp
+      source: world_bank_wdi:NE.CON.PRVT.ZS
+      transformation: level
+      notes: Consumption channel of demand response.
+    - name: gross_fixed_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.FTOT.ZS
+      transformation: level
+      notes: Investment channel of demand response.
+    - name: net_exports_share_gdp
+      source: world_bank_wdi:NE.RSB.GNFS.ZS
+      transformation: level
+      notes: Net-export channel of demand response.
+  treatment:
+    - name: labour_share_gross_value_added
+      source: oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE1,1.0
+      transformation: level
+      notes: >
+        OECD compensation-of-employees share of gross value added at
+        factor cost. Bhaduri-Marglin treatment variable. Dataflow URN
+        approximate; verify at wiring.
+  controls:
+    - name: real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: short_term_interest_rate
+      source: oecd:OECD.SDD.STES,DSD_KEI@DF_KEI,4.0
+      transformation: level
+    - name: real_effective_exchange_rate
+      source: bis:WS_EER
+      transformation: level
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Country-by-country single-equation regressions (a la Stockhammer-Onaran)
+    of consumption, investment, and net-exports on labour-share, with
+    standard controls. The country-level wage-led-vs-profit-led
+    classification is the SIGN of the sum-of-component-coefficients on
+    the labour-share variable. Aggregate panel-FE specification reports
+    the average effect; the heterogeneity test counts the fraction of
+    countries where the country-specific sum is positive (wage-led).
+falsification:
+  rule: >
+    Not supported if (a) the cross-country distribution of demand-regime
+    classifications is uniformly profit-led (sum-of-component-
+    coefficients on labour-share is negative for all countries at
+    p < 0.10), OR (b) the wage-led classification is supported in
+    fewer than one-third of sample countries (i.e. heterogeneity is
+    too thin to ground a meaningfully heterogeneous regime), OR (c)
+    the country classifications are unstable across the 1980-2000
+    vs 2000-2020 sub-samples (i.e. the regime is contingent on the
+    sample period rather than a stable structural feature).
+  test: country_specific_sum_of_demand_component_labour_share_coefficients
+  threshold: >
+    sum-of-component-coefficients > 0 in >= 33% of sample countries AND
+    classification is stable across two halves of the sample period AND
+    average panel-FE coefficient is statistically distinct from zero
+prior_confidence: 0.55
+disclosure: >
+  Author framing draws on the Bhaduri-Marglin / Stockhammer-Onaran
+  post-Keynesian / Kaleckian demand-regime tradition. A market-liberal
+  reader would object that under open-economy capital-mobility conditions
+  the "demand regime" is an analytical artefact of the closed-economy
+  closure rule (Kaleckian models close the economy too tightly), that
+  the aggregate-demand growth response to labour-share dynamics is
+  mostly noise within a country (very small estimated coefficients with
+  wide confidence intervals in published Stockhammer-Onaran results),
+  and that the Bhaduri-Marglin classification has poor out-of-sample
+  predictive power for actual policy outcomes. Authorial framing risk
+  acknowledged; the heterogeneity-and-stability falsification rule
+  imposes a high bar.
+steelman: hypotheses/steelman/wage_led_vs_profit_led_growth_oecd.md
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [labour_share, gdp_growth]
+  policy_family: [none]
+  treatment_tags:
+    - bhaduri_marglin
+    - wage_led_demand_regime
+    - kaleckian_closure
+notes: >
+  Candidate, not pre_registered. On promotion, confirm OECD ANA labour-
+  share dataflow URN, document the country-by-country estimation
+  protocol (lag structure, sample-stability tests), and pre-register
+  the country list and the heterogeneity threshold in advance of
+  the run.

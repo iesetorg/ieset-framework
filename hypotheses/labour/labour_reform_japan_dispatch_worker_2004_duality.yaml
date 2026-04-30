@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_japan_dispatch_worker_2004_duality
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Japan's 2004 Worker Dispatch Law amendment (manufacturing-
+  sector liberalisation effective 2004-Q1, period extension
+  to 3 years) raised the Japanese non-regular-worker share by
+  at least 4 pp by 2008 relative to a synthetic control of
+  high-income peers, but did not raise aggregate employment
+  rate above donor pool baseline.
+notes: >
+  Treatment dated 2004-Q1 (manufacturing dispatch ban lifted).
+  Japanese case is structurally important because dispatch-
+  worker liberalisation is widely credited with the post-2008
+  Japan-specific labour-market vulnerability that surfaced
+  in the GFC. The hypothesis is symmetric on the aggregate-
+  employment margin.
+prior_confidence: 0.6
+disclosure: >-
+  Author treats Japan as a clean test of "flexibilisation
+  expanded duality without expanding aggregate employment"
+  — a finding that would weight against deregulation as
+  pro-employment policy. Counter-prior: Japanese aggregate
+  employment is constrained by demographics, so an aggregate-
+  employment null is not informative.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Japanese non-regular-worker
+    share > +4 pp by 2008 AND aggregate-employment-rate gap
+    is statistically indistinguishable from zero. REFUTED if
+    duality gap < +2 pp OR aggregate employment gap is
+    significantly positive at p<0.10 (employment-bonus story
+    dominates duality story).
+  test: >
+    Synth-DiD on Japanese non-regular-worker share and
+    employment rate 2004-2008 vs high-income donor pool,
+    placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [JPN, KOR, TWN, USA, GBR, DEU, FRA, ITA]
+  period: [1995, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: non_regular_worker_share
+      source: oecd:DSD_LFS@DF_LFS_TEMP
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: japan_dispatch_2004_amendment
+      source: "constructed: indicator for 2004-Q1 manufacturing dispatch liberalisation"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2004, 2008]
+  countries: [JPN]
+  outcome_dim: [employment_labour, poverty_inequality]
+  policy_family: [labour_market]
+  treatment_tags: [japan_dispatch_worker_2004]
+steelman: hypotheses/steelman/labour_reform_japan_dispatch_worker_2004_duality.md

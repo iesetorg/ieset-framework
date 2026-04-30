@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_colombia_us_fta_2012
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The Colombia-United States Trade Promotion Agreement, effective
+  2012-05-15, did not produce a measurable trade-openness or
+  manufacturing-export acceleration for Colombia over the 2012-2019
+  pre-COVID window. Pre-existing ATPDEA preferential access (1991-
+  2012) had already provided substantial duty-free access to the US
+  market for most Colombian exports; formalisation under the FTA
+  largely codified existing flows.
+
+evidence_type: descriptive
+
+sample:
+  countries: [COL, PER, ECU, CHL, MEX]
+  period: [2002, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019)"
+
+scope:
+  period: [2002, 2019]
+  countries: [COL]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [colombia_us_fta_2012, atpdea_predecessor, colombia_trade_promotion_agreement]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Bilateral FTA — regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. Colombia 2012-2019 vs Andean comparator
+    (Peru, which had its own US-FTA from 2009) and broader Latin
+    American mean.
+
+falsification:
+  rule: >
+    SUPPORTED (null) if Colombia trade-openness change 2012-2019
+    is within +/- 3 pp of comparator change. REFUTED if Colombia
+    outperforms by more than 5 pp.
+  test: descriptive_colombia_us_fta_2012_null
+  threshold: >
+    PRIMARY: |delta_openness(COL) - delta_openness(comparator_mean)| <= 3 pp.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderate-high (0.7) on the null. The ATPDEA-predecessor
+  point makes most of the claim. Heterodox readers will note that
+  the FTA had distributional effects on Colombian agriculture
+  (US-subsidised commodity imports) that are not captured by
+  aggregate trade-openness.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_colombia_us_fta_2012.md

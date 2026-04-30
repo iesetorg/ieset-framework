@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_trump_china_tariffs_2018_2024
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The Trump administration's Section-301 China tariffs (2018-2019,
+  cumulating to >USD 350bn of imports under tariff by end 2019),
+  largely retained by the Biden administration through 2024,
+  reduced US-China bilateral trade-openness while raising US trade
+  with bilateral substitutes (Vietnam, Mexico, Taiwan). The
+  aggregate US trade-to-GDP ratio is hypothesised to be roughly
+  unchanged; the bilateral composition shifted measurably.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA, CHN, VNM, MEX, TWN, IND]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity"
+
+scope:
+  period: [2010, 2024]
+  countries: [USA]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [trump_section_301_china_tariffs, biden_tariff_continuation, china_decoupling]
+
+variables:
+  outcome:
+    - name: us_trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: us_imports_pct_gdp
+      source: "world_bank_wdi:NE.IMP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: trump_section301_indicator
+      source: "constructed: indicator = 1 for USA from 2018-07 (initial Section 301 wave)"
+      transformation: indicator
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Tariffs are a regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive structural-break test. Reports US aggregate
+    trade-openness 2010-2017 vs 2019-2024 means; reports
+    bilateral US-China share of US imports as composition test.
+    Cannot identify causal effect on aggregate trade ratios at
+    macro level — the test is whether the aggregate is
+    approximately invariant while composition shifts.
+
+falsification:
+  rule: >
+    SUPPORTED if (a) US aggregate trade-openness 2019-2024 mean
+    is within +/- 2 pp of 2010-2017 mean (rough invariance), AND
+    (b) US merchandise-imports-share-of-GDP shows similar
+    invariance. The composition-shift mechanism is documented
+    qualitatively in the disclosure note. REFUTED if aggregate
+    trade-openness fell substantially (>3 pp), which would suggest
+    tariffs were trade-destroying at the aggregate level.
+  test: descriptive_us_aggregate_trade_invariance_under_section301
+  threshold: >
+    PRIMARY: |delta_aggregate_trade_openness_USA(2010-17 vs 2019-24)| <= 2 pp.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Prior moderate-high (0.65). The bilateral substitution pattern
+  (China share of US imports falling, Vietnam/Mexico/India shares
+  rising) is well documented (Freund-Mulabdic-Ruta 2023; Alfaro-
+  Chor 2023). The aggregate-invariance prediction is the more
+  testable component on WDI data. Heterodox post-Keynesian readers
+  will note that the tariff incidence fell on US importers and
+  consumers (Amiti-Redding-Weinstein 2019; Fajgelbaum-Goldberg-
+  Kennedy-Khandelwal 2020) — that price-pass-through channel is
+  covered by the existing trump_tariff_manufacturing_reshoring
+  hypothesis.
+
+linked_hypotheses:
+  - trump_tariff_manufacturing_reshoring_effect
+  - trade_lib_us_china_phase_one_2020
+
+steelman: hypotheses/steelman/trade_lib_trump_china_tariffs_2018_2024.md

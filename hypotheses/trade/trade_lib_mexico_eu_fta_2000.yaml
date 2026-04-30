@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_mexico_eu_fta_2000
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The Mexico-EU Free Trade Agreement, effective 2000-07-01, raised
+  Mexican bilateral exports to the EU and broader trade-openness
+  modestly over the 2000-2007 pre-China-shock window. The expected
+  effect is small relative to NAFTA but detectable.
+
+evidence_type: descriptive
+
+sample:
+  countries: [MEX, BRA, ARG, CHL, COL]
+  period: [1990, 2007]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-2008 to avoid GFC and China-shock confounding"
+    - "drop ARG 2001-2003 currency-crisis years"
+
+scope:
+  period: [1990, 2007]
+  countries: [MEX]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [mexico_eu_fta_2000, mexico_diversification_from_us]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  FTA — regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. Mexican trade-openness 1995-1999
+    pre-treatment mean vs 2003-2007 post-treatment mean, vs Latin
+    American comparator change over same windows.
+
+falsification:
+  rule: >
+    SUPPORTED if Mexico trade-openness change 1995-1999 to
+    2003-2007 exceeds comparator change by >=2 pp. PARTIAL if
+    smaller. REFUTED if negative.
+  test: descriptive_mexico_eu_fta_2000_diversification
+  threshold: >
+    PRIMARY: (delta_openness(MEX) - delta_openness(comparator_mean)) >= +2 pp.
+
+prior_confidence: 0.5
+
+disclosure: >
+  Prior coin-flip (0.5). Mexican trade is dominated by NAFTA-driven
+  US flows; the EU-bilateral effect is small relative to that
+  baseline. Heterodox readers will note that Mexican export
+  diversification from US dependence has been a long-running
+  policy aspiration with limited measurable success.
+
+linked_hypotheses:
+  - trade_lib_nafta_1994_mexico_manufacturing_employment
+
+steelman: hypotheses/steelman/trade_lib_mexico_eu_fta_2000.md

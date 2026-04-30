@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_south_africa_property_tax_burden
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Post-apartheid South African tax structure (top marginal income rate
+  raised to 45 percent in 2017, capital-gains inclusion ratio raised
+  2012 + 2016, recurring property-tax effective burden via municipal
+  rates) produced a measurable reduction in the South African top-1
+  pretax income share over 1995-2024 vs SADC synthetic comparator pool,
+  with the recurring property-tax channel contributing more than the
+  marginal-income-rate channel to the distributional effect. The
+  discriminating test is the channel decomposition.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 6. The wealth-tax debate is
+  active in South Africa; this hypothesis tests the alternative claim
+  that recurring property-tax already does substantial distributional
+  work.
+prior_confidence: 0.5
+disclosure: >
+  Author prior is uncertain whether South African tax progressivity
+  effectively reduces top concentration given high baseline inequality
+  and pervasive informal-sector boundary effects.
+falsification:
+  rule: >
+    SUPPORTED if South African top-1 share falls by at least 1.0
+    percentage point 1995-2024 vs SADC synth control AND property-tax
+    channel decomposition exceeds marginal-income-rate channel at
+    p<0.10. REFUTED if no detectable gap or property-tax channel is
+    less than half the marginal-rate channel at p<0.10.
+  test: >
+    Synthetic-control with SADC donor pool (NAM, BWA, ZWE, MOZ, ZMB),
+    treated ZAF 1995, plus channel-decomposition panel-FE.
+evidence_type: associational
+sample:
+  countries: [ZAF, NAM, BWA, ZMB, MOZ]
+  period: [1995, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+  treatment:
+    - name: zaf_post_apartheid_tax_regime
+      source: "constructed: indicator = 1 for ZAF, year >= 1995"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with SADC donor pool. Channel-decomposition via
+    panel_fe_decomposition robustness.
+intervention_channel: fiscal
+scope:
+  period: [1995, 2024]
+  countries: [ZAF]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [post_apartheid_tax, sa_property_tax, sadc_distribution]

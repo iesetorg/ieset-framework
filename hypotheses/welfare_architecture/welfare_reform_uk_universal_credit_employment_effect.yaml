@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_reform_uk_universal_credit_employment_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  The UK Universal Credit rollout (2013-2017, replacing six legacy means-tested benefits with a single
+  taper) raised employment-rate among legacy-benefit claimants by 3 to 5 percentage points within 24
+  months of area rollout, identified off geographic-staggered Pathfinder/full-service rollout timing
+  2013-2018, controlling for area unemployment and the post-Brexit-vote labour-market shock.
+evidence_type: causal
+prior_confidence: 0.55
+disclosure: |
+  Author has market-liberal priors that favour single-taper benefit consolidation on labour-supply grounds.
+  UC rollout is contaminated by simultaneous benefit cuts (two-child limit, benefit cap) which the spec
+  attempts to control for via cohort/timing variation but cannot fully separate.
+sample:
+  countries: [GBR]
+  period: [2010, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop Northern Ireland LADs (separate administration)
+  - exclude COVID-emergency-uplift months 2020-04 to 2021-09 from primary spec
+variables:
+  outcome:
+  - name: employment_rate_working_age
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: level_pct
+    notes: OECD harmonised employment-to-population, 16-64.
+  - name: benefit_caseload_legacy_to_uc_share
+    source: eurostat:lfsa_argan
+    transformation: ratio
+    notes: Eurostat LFS active-by-status; UK-DWP UC stat-summary preferred at wiring.
+  treatment:
+  - name: uc_full_service_rollout
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: indicator
+    notes: Local-authority-level UC full-service go-live dates 2013-2018; placeholder source pending DWP wiring.
+  controls:
+  - name: lad_unemployment_rate
+    source: eurostat:lfst_r_lfu3rt
+    transformation: level
+  - name: real_wage_index
+    source: oecd:DSD_LFS_BS@DF_EARN
+    transformation: log
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+intervention_channel: bundled
+intervention_channel_justification: |
+  UC bundles regulatory taper-rate change with fiscal benefit-level changes; channel is bundled per invariant 4.
+estimator:
+  template: event_study
+  clustering: local_authority
+  fixed_effects: [local_authority, year_quarter]
+  notes: |
+    Event study around LAD-level UC full-service go-live 2013-2018. Pre-trend window 24 months,
+    post-window 36 months. Cohort heterogeneity reported by Pathfinder/full-service stage.
+falsification:
+  rule: |
+    Refuted if employment-rate ATT among legacy claimants is below +3pp at 24-month post-rollout horizon,
+    OR if the 95% CI excludes +3pp, OR if the post-rollout coefficient is non-monotonic and dominated
+    by the COVID-uplift period.
+  test: event_study_att_24mo_employment_rate_legacy_claimants
+  threshold: ATT >= +3pp at 24mo horizon AND lower 95% CI bound > 0
+scope:
+  period: [2013, 2022]
+  countries: [GBR]
+  outcome_dim: [employment_labour, welfare_state, poverty_inequality]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [uk_universal_credit_2013, cameron_reforms_2010, welfare_reform_act_2012]
+steelman: hypotheses/steelman/welfare_reform_uk_universal_credit_employment_effect.md
+notes: UK Pathfinder rollout 2013, full-service expansion 2015-2018, managed migration 2019-2024.

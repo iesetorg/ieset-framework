@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_argentina_auh_2009_child_poverty_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Argentina's Asignación Universal por Hijo (AUH, October 2009 by decreto) reduced child-poverty
+  headcount by at least 8 percentage points within four years (2009-2013), separating the cash-transfer
+  channel from the contemporaneous commodity-boom channel via a synthetic-control of LatAm peers (BRA,
+  COL, PER, URY) with comparable boom exposure but no AUH-scale CCT expansion in the same window.
+evidence_type: causal
+prior_confidence: 0.7
+disclosure: |
+  Author is sceptical of Argentine official statistics 2007-2015 (INDEC manipulation episode) and the
+  hypothesis explicitly uses CEPAL/IDB-harmonised series rather than INDEC headline poverty for
+  identification; the falsification rule depends on the harmonised series choice.
+sample:
+  countries: [ARG, BRA, COL, PER, URY, CHL]
+  period: [2000, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2001-2003 Argentine crisis years from pre-treatment fit
+  - use CEPAL/IDB-harmonised poverty series (NOT INDEC headline 2007-2015) for ARG
+variables:
+  outcome:
+  - name: child_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+    notes: WDI poverty headcount as proxy; CEPAL CEPALSTAT child-poverty harmonised series preferred at wiring.
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  treatment:
+  - name: auh_indicator
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: indicator
+    notes: ARG = 1 from 2009-Q4; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: terms_of_trade_commodity
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+  - name: formal_employment_share
+    source: ilostat:ILMS_employment_status
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  AUH is a fiscal-channel cash-transfer for families with informally-employed or unemployed parents.
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic control on ARG child-poverty series 2000-2015 with BRA, COL, PER, URY donor pool.
+    Pre-treatment fit 2003-2008. Robustness: Gini-coefficient parallel synth check.
+falsification:
+  rule: |
+    Refuted if the synthetic-control gap on child-poverty headcount at 4-year horizon is below
+    minus-8pp (i.e., reduction less than 8pp), OR if placebo permutation p-value exceeds 0.10,
+    OR if Gini parallel synth-control gap is positive (inequality rises).
+  test: synthetic_control_4yr_gap_child_poverty
+  threshold: gap <= -8pp at 4yr horizon AND placebo_p < 0.10 AND gini_gap < 0
+scope:
+  period: [2009, 2015]
+  countries: [ARG, BRA, COL, PER, URY, CHL]
+  outcome_dim: [poverty_inequality, welfare_state]
+  policy_family: [welfare_architecture]
+  treatment_tags: [argentina_auh_2009, cristina_kirchner_government, decreto_1602_2009]
+steelman: hypotheses/steelman/welfare_transfer_argentina_auh_2009_child_poverty_effect.md

@@ -1,0 +1,179 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_ets_price_2022_2026_carbon_signal_strength
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  EU Emissions Trading System (ETS) allowance prices traded in a sustained
+  €70-100/tCO2 range from late 2021 through 2024 (with a peak at €105 in
+  February 2023), a step-change above the €5-30 range that prevailed
+  through Phase I-III (2005-2020). At this price level, classical
+  carbon-pricing theory predicts an acceleration of fuel-switching from
+  coal to gas in power, marginal abatement investment in industry, and
+  measurable extra emissions reductions beyond the pre-2021 trajectory.
+  The hypothesis tests whether ETS-covered-sector emissions in 2022-2024
+  declined faster than the pre-2021 trend after netting out the 2022 gas
+  shock (which forced coal substitution against the ETS signal in some
+  countries) and the 2023-2024 industrial-output contraction (which
+  reduced emissions for non-pricing reasons). The acceleration test:
+  ETS-sector emissions intensity (tCO2 per unit of activity) declined
+  faster 2021-2024 than 2010-2020 trend.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, CZE, SWE, FIN, AUT, IRL]
+  period: [2010, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing EEA EU ETS verified-emissions registry data"
+
+scope:
+  period: [2010, 2026]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, CZE, SWE, FIN, AUT, IRL]
+  outcome_dim: [energy, regulation_compliance_cost, industrial_capability]
+  policy_family: [energy_policy, regulation, fiscal_policy]
+  treatment_tags: [eu_ets_phase4, eu_fit_for_55_2021, mssr_2018, ets2_2024, eu_carbon_pricing_step_change]
+
+variables:
+  outcome:
+    - name: log_eu_ets_verified_emissions
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log
+      notes: "EEA EU ETS verified-emissions registry — total covered emissions by member state, annual."
+    - name: log_eu_ets_emissions_intensity_industry
+      source: "constructed: ETS verified emissions in industrial subsectors (steel, cement, chemicals, refining) ÷ subsector value added (Eurostat sbs_na_ind_r2 or OECD STAN). Decomposes scale from intensity."
+      transformation: log
+    - name: log_eu_ets_emissions_intensity_power
+      source: "constructed: ETS verified emissions in power sector ÷ generation (TWh, ENTSO-E). Captures coal-to-gas-to-renewables intensity shift."
+      transformation: log
+    - name: log_eu_coal_generation_share
+      source: "constructed: ENTSO-E aggregated thermal generation by fuel — coal/lignite share of total generation. entsoe fetcher pending; Eurostat nrg_cb_em fallback."
+      transformation: log
+    - name: log_eu_industry_abatement_capex
+      source: "constructed: BloombergNEF / IEA decarbonisation tracker — EU heavy-industry decarbonisation announcements (hydrogen, electrification, CCS). Manual-drop pending under data/manual/derived/."
+      transformation: log
+
+  treatment:
+    - name: log_eu_ets_allowance_price_eur
+      source: "constructed: EEX EUA spot price index, monthly average. eex fetcher pending; manual-drop fallback under data/manual/derived/."
+      transformation: log
+    - name: post_2021_step_change_dummy
+      source: "constructed: indicator = 1 from 2021-Q1 onwards (when ETS price first sustained above €40 + Fit-for-55 announcement)."
+      transformation: indicator
+
+  controls:
+    - name: log_natural_gas_ttf
+      source: "constructed: TTF EUR/MWh, monthly. eex fetcher pending or manual-drop."
+      transformation: log
+    - name: log_brent_oil
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: log_real_gdp_eu
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: log_industrial_production_index_eu
+      source: "oecd:STSIND4_PRODMAN"
+      transformation: log
+    - name: heating_degree_days_eu
+      source: "eurostat:nrg_chdd_m"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  EU ETS is a regulatory cap-and-trade carbon-price instrument. Treatment
+  is the price-level step-change driven by Market Stability Reserve
+  reforms (2018), Phase 4 cap tightening, and Fit-for-55 expansion (2021).
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary specification: panel regression of log emissions intensity
+    (industry + power separately) on log ETS price + controls (TTF,
+    oil, IPI, HDD), with country + year FE. Identification: ETS-price
+    variation post-2021 step-change. Test: β on log_ETS_price < 0 at
+    p<0.10 on emissions intensity, after partialling out gas-shock
+    + industrial-output channels.
+
+    Secondary: pre-2021 vs post-2021 trend-break test on emissions
+    intensity. Did the slope flatten further (faster declines) after
+    the price step-change? Decompose into power vs industry — power-
+    sector intensity drop is dominated by coal-to-gas-to-renewables
+    fuel-switching; industry drop requires actual abatement-capex
+    response, which is slower.
+
+    Tertiary: industry abatement-capex announcements regression on
+    ETS price — does the price signal predict announced decarbonisation
+    investment cumulating with a 2-3 year lag?
+
+    Known limitations:
+    (1) 2022-2023 ETS-covered emissions fell partly because of gas-shock
+        induced industrial-output contraction (energy-intensive plant
+        idling). Separating "less output → less emissions" from "same
+        output but more abatement" requires output-normalised intensity
+        metric, which is the primary outcome here. But the intensity
+        metric is noisy at country-sector level.
+    (2) Phase 4 (2021-2030) tightened cap + linear reduction factor +
+        MSR holds back excess allowances; price is endogenous to all
+        three. Treatment is bundled.
+    (3) ETS2 (separate system for buildings + road transport) launches
+        2027; v1 scope ends 2026 to keep ETS1 isolated.
+    (4) Free allocation phase-out for CBAM-covered sectors begins 2026,
+        introducing time-varying effective price faced by EU producers.
+
+falsification:
+  rule: >
+    Not supported if (a) β_log_ETS_price on emissions intensity is zero
+    or wrong-signed at p<0.10 after gas-shock + IPI controls, OR
+    (b) post-2021 emissions-intensity trend-break is not faster than
+    pre-2021 trend at p<0.10, OR (c) industry abatement capex
+    announcements show no positive elasticity to ETS price (capex
+    responds with multi-year lag, but no response by 2024 would refute
+    the investment-channel mechanism), OR (d) the headline emissions
+    decline is fully explained by gas-shock + output contraction
+    (suggesting the ETS price signal is doing nothing on top).
+  test: ets_price_signal_emissions_intensity_panel
+  threshold: >
+    β_log_ETS_price < -0.10 at p<0.10 on power emissions intensity AND
+    β_log_ETS_price < -0.05 at p<0.10 on industry emissions intensity AND
+    Post-2021 intensity decline > 1.5x pre-2010-2020 trend AND
+    Industry abatement-capex elasticity to ETS price > 0 at p<0.10.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author prior is mixed: the power-sector intensity response (coal-to-gas-
+  to-renewables) is well-documented and strong; the industry-sector
+  intensity response is contested and slower. CBAM-covered sectors received
+  free allocation through 2025, blunting the effective ETS-price signal
+  faced by EU producers in those sectors. Author predicts a "supported with
+  caveats" verdict: power-sector signal real and strong; industry signal
+  weaker, with abatement-capex announcements as the leading indicator that
+  may not yet show in 2022-2024 emissions data. Climate-policy relevance
+  (does ETS work?) is the obvious downstream question; the hypothesis
+  tests the price-signal-strength leg only, not the cap-tightening leg.
+
+steelman: hypotheses/steelman/eu_ets_price_2022_2026_carbon_signal_strength.md
+
+linked_hypotheses:
+  - eu_ets_emissions_reduction_vs_1p5c_pathway
+  - eu_ets_absolute_decoupling_emissions_gdp
+  - cbam_2026_implementation_carbon_leakage_test
+  - eu_green_deal_vs_ets_emissions_mechanism
+
+notes: >
+  Data readiness:
+  - EEA EU ETS verified emissions: ready (eea fetcher)
+  - Eurostat sbs_na_ind_r2 + nrg_chdd_m: ready
+  - OECD industrial production: ready
+  - WDI / IMF PCPS: ready
+  - ENTSO-E generation mix: entsoe fetcher pending; Eurostat nrg_cb_em fallback
+  - EEX EUA spot price: eex fetcher pending or manual-drop under data/manual/derived/
+  - TTF gas: eex fetcher pending or manual-drop
+  - BNEF / IEA decarbonisation announcements tracker: manual-drop pending
+
+  Run when EEX (EUA + TTF) manual-drop is populated; emissions intensity test
+  can run on existing eea + Eurostat + WDI as v0.5.

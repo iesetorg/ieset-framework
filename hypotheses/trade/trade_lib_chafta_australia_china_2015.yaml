@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_chafta_australia_china_2015
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The China-Australia Free Trade Agreement (ChAFTA), effective
+  2015-12-20, raised Australian merchandise-exports-to-GDP and
+  resource-export intensity over the 2016-2019 pre-COVID window
+  relative to a synthetic-control donor pool of resource-exporting
+  economies. The post-2020 China-Australia trade-tension period
+  (informal sanctions on Australian wine, barley, coal) is treated
+  as a separate post-2020 sensitivity check.
+
+evidence_type: causal
+
+sample:
+  countries: [AUS, NZL, CAN, CHL, NOR, BRA, ZAF, RUS, IDN, MYS]
+  period: [2005, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID and pre-China-trade-tensions (2019)"
+    - "drop RUS post-2014 (sanctions)"
+
+scope:
+  period: [2005, 2019]
+  countries: [AUS]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [chafta_2015, australia_china_fta, resource_export_dependence]
+
+variables:
+  outcome:
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: chafta_indicator
+      source: "constructed: indicator = 1 for AUS from 2016-01-01"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  ChAFTA is a regulatory / trade-policy intervention.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for Australia against a resource-
+    exporter donor pool. Pre-treatment 2005-2015; post-treatment
+    2016-2019.
+
+falsification:
+  rule: >
+    SUPPORTED if SC gap on merchandise-exports-share is positive
+    by 2018. PARTIAL if positive but small (<2 pp). REFUTED if
+    gap is negative.
+  test: synthetic_control_australia_chafta_2015
+  threshold: >
+    PRIMARY: SC_gap(merchandise_exports_share, 2018) > 0.
+
+prior_confidence: 0.5
+
+disclosure: >
+  Prior coin-flip (0.5). Australian export performance is
+  dominated by iron-ore and coal price cycles; FTA-attributable
+  variation is small. The 2014-2016 commodity-price collapse
+  contaminates the pre-treatment fitting window. Heterodox
+  readers will note that the post-2020 trade-tensions episode
+  illustrates the political-risk side of bilateral concentration.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_chafta_australia_china_2015.md

@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_spain_imv_poverty_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Spain's Ingreso Mínimo Vital (IMV, June 2020 emergency-launched during COVID) reached fewer than half
+  of intended-eligible households within 24 months due to take-up frictions, producing a measured
+  reduction in extreme-poverty headcount of less than 3 percentage points by 2022 — well below the
+  pre-launch government estimate of 7-10pp — and providing a natural test of unconditional-floor design
+  in a high-frictions administrative environment.
+evidence_type: associational
+prior_confidence: 0.7
+disclosure: |
+  Author has market-liberal priors that view poorly-designed national means-tested programmes as
+  delivering substantially less than headline coverage targets. AIReF and Banco de España monitoring
+  reports document low take-up; the prior favours the under-delivery interpretation.
+sample:
+  countries: [ESP, ITA, PRT, GRC]
+  period: [2015, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-Q2 lockdown quarter from outcome smoothing
+variables:
+  outcome:
+  - name: extreme_poverty_rate
+    source: eurostat:ilc_mddd11
+    transformation: level_pct
+    notes: Eurostat severe material deprivation rate.
+  - name: imv_take_up_rate_eligibles
+    source: eurostat:ilc_li02
+    transformation: ratio
+    notes: Eurostat headline poverty series; AIReF take-up series at wiring.
+  treatment:
+  - name: imv_indicator
+    source: eurostat:ilc_mddd11
+    transformation: indicator
+    notes: ESP = 1 from 2020-Q3; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: eurostat:une_rt_a
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  IMV is a fiscal-channel guaranteed-minimum-income transfer.
+estimator:
+  template: descriptive
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Descriptive comparison of ESP take-up trajectory and post-IMV poverty path against southern-EU peers.
+    No causal claim beyond the take-up failure — the under-delivery is a design-and-administration outcome.
+falsification:
+  rule: |
+    Refuted if IMV take-up (recipients / eligible households) exceeds 60% by end-2022, OR if the
+    extreme-poverty-rate gap with donor pool exceeds minus-3pp at 24-month horizon (i.e., poverty
+    reduction LARGER than 3pp would refute the under-delivery framing).
+  test: descriptive_take_up_and_poverty_gap_24mo
+  threshold: take_up_2022 < 0.60 AND poverty_gap >= -3pp
+scope:
+  period: [2020, 2023]
+  countries: [ESP, ITA, PRT, GRC]
+  outcome_dim: [poverty_inequality, welfare_state]
+  policy_family: [welfare_architecture]
+  treatment_tags: [spain_imv_2020, sanchez_coalition_2020, covid_response_2020]
+steelman: hypotheses/steelman/welfare_transfer_spain_imv_poverty_effect.md

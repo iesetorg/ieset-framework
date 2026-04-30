@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_korea_eitc_2009_labour_supply_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  South Korea's Earned Income Tax Credit (EITC, introduced 2009 with subsequent expansions 2012, 2015,
+  2019) raised labour-force-participation among low-income married women by 2 to 4 percentage points
+  within five years of each expansion threshold change, identified off discontinuity in eligibility-cliff
+  income brackets across years using a regression-discontinuity-in-time framework consistent with US EITC
+  literature (Eissa-Liebman 1996; Hoynes-Patel 2018).
+evidence_type: causal
+prior_confidence: 0.6
+disclosure: |
+  Author has market-liberal priors that favour in-work transfers as labour-supply enhancing for
+  secondary-earner cohorts. KOR EITC is small relative to US EITC but expansion thresholds give
+  identification; concern is that the expansion-coincident minimum-wage hikes (2018, 2019) confound the
+  income-bracket discontinuity.
+sample:
+  countries: [KOR]
+  period: [2005, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 COVID years from primary spec
+variables:
+  outcome:
+  - name: female_lfp_low_income_married
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: level_pct
+    notes: OECD female-LFP harmonised; Korean Statistics KOSIS preferred at wiring.
+  - name: hours_worked_low_income_women
+    source: oecd:DSD_LFS_BS@DF_HRS
+    transformation: level
+  treatment:
+  - name: eitc_eligibility_indicator
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: indicator
+    notes: Indicator = 1 for households below EITC eligibility-bracket cap, varies by year per expansion.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: minimum_wage_relative_median
+    source: oecd:DSD_EARNINGS@DF_MIN_REL_MED
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  EITC is a fiscal-channel refundable tax credit on labour income.
+estimator:
+  template: event_study
+  clustering: household
+  fixed_effects: [household, year]
+  notes: |
+    Event study around 2009 introduction and 2012, 2015, 2019 expansion thresholds. RD-in-time
+    framework using bracket-cap discontinuities. Robustness: comparison-cohort with secondary-earner
+    households just above eligibility threshold.
+falsification:
+  rule: |
+    Refuted if the post-expansion ATT on female-LFP among eligible low-income married women is below
+    +2pp at five-year horizon, OR if the 95% CI excludes +2pp, OR if a placebo eligibility-cap
+    discontinuity in non-expansion years also produces comparable ATT.
+  test: event_study_5yr_lfp_eligible_low_income_married_women
+  threshold: ATT >= +2pp at 5yr horizon AND lower 95% CI bound > 0
+scope:
+  period: [2009, 2022]
+  countries: [KOR]
+  outcome_dim: [employment_labour, welfare_state, taxation]
+  policy_family: [welfare_architecture, tax_policy, labour_market]
+  treatment_tags: [korea_eitc_2009, korea_eitc_expansion_2019, lee_myung_bak_government, moon_jae_in_government]
+steelman: hypotheses/steelman/welfare_transfer_korea_eitc_2009_labour_supply_effect.md

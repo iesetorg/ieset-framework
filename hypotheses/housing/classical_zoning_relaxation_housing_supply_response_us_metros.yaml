@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: classical_zoning_relaxation_housing_supply_response_us_metros
+version: 1
+status: candidate
+topic: housing
+
+claim: >
+  Across a small set of identifiable zoning-reform events
+  (Minneapolis 2040 plan effective 2020 abolishing single-family
+  zoning city-wide; Houston's persistent absence of formal zoning;
+  Tokyo's national land-use system; Auckland Unitary Plan 2016
+  upzoning), the post-reform housing-completion rate and rental-
+  price growth rate diverge from comparator metros without
+  equivalent reform: completions accelerate and rental-price growth
+  decelerates relative to a synthetic-control donor pool of
+  comparable metros. The Smithian / Friedman supply-side claim is
+  that local land-use restriction is the binding constraint on
+  housing supply in high-demand metros, and that relaxation
+  produces measurable supply response within 5 years.
+
+evidence_type: causal
+
+sample:
+  countries: [USA, NZL, JPN]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID-period 2020-2022 from primary analysis (shocks dominate); restrict to 2015-2019 + 2023-2024 windows for clean pre/post"
+    - "Tokyo case treated as descriptive comparison only — no clean policy-change event to anchor a DiD"
+
+variables:
+  outcome:
+    - name: housing_completions_per_1000_population
+      source: "fred:permits_authorized_residential"
+      transformation: scaled_per_1000_pop
+      notes: "Building-permit-authorised series substituted where completions not directly available; permits-to-completions lag accounted for in window choice."
+    - name: rental_price_index
+      source: "bls:cpi_rent_primary_residence"
+      transformation: yoy_pct_change
+    - name: rental_price_index_auckland
+      source: "ons:auckland_rent_index"
+      transformation: yoy_pct_change
+      notes: "ONS used as a placeholder publisher for Stats NZ-equivalent rental data; spec acknowledges Auckland series may need v2 substitution if a NZ stats publisher is added to publishers.yaml."
+  treatment:
+    - name: zoning_reform_event
+      source: "constructed: indicator = 1 in event year and after for Minneapolis (2020), Auckland (2016); 0 for comparator donor pool metros"
+      transformation: indicator
+  controls:
+    - name: metro_population_growth
+      source: "fred:metro_population"
+      transformation: yoy_pct_change
+    - name: metro_real_pc_income
+      source: "fred:metro_personal_income_per_capita"
+      transformation: log_real_yoy
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Zoning reform is a regulatory land-use intervention. Channel
+  regulatory per invariant 4.
+
+estimator:
+  template: synthetic_control
+  clustering: metro
+  notes: >
+    Synthetic control for each treated metro (Minneapolis, Auckland)
+    against a donor pool of comparable metros without equivalent
+    reform. Houston is treated as a descriptive permanent-no-zoning
+    benchmark; Tokyo similarly. Pre-treatment fit is the binding
+    constraint — Auckland is a small donor pool problem; spec is
+    honest that a v2 should add NZ-domestic donor metros once a
+    registered NZ publisher is available.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) the synthetic-control estimate of
+    cumulative housing completions/permits in the 5-year post-
+    reform window for Minneapolis and Auckland combined exceeds
+    the synthetic-counterfactual by at least 15%, AND (b) the
+    rental-price-growth gap (treated minus synthetic) is
+    negative (slower growth in treated) by at least 1pp/year mean
+    over the post-window. PARTIAL if (a) holds but (b) does not
+    — supply responded but rents kept rising due to demand
+    pressure exceeding supply response. REFUTED if (a) is
+    insignificant or wrong-signed. INFORMATIVE: Houston's long-
+    run completions-per-population series should sit visibly
+    above a synthetic counterfactual built from comparable
+    Sun-Belt metros.
+  test: minneapolis_auckland_synth_supply_response
+  threshold: >
+    PRIMARY: cumulative_completions_treated - cumulative_completions_synthetic >= +15%
+    AND mean_annual_rental_growth_treated - mean_annual_rental_growth_synthetic <= -1.0pp.
+    INFORMATIVE: Houston long-run completions/pop > synthetic counterfactual.
+
+prior_confidence: 0.62
+
+disclosure: >-
+  Author prior is moderate (0.62). The supply-elasticity-and-
+  zoning literature (Glaeser-Gyourko, Hsieh-Moretti) is supportive
+  of the directional claim, but the post-reform 5-year window for
+  Minneapolis is partly contaminated by COVID. Authorial framing
+  risk: by selecting Minneapolis and Auckland as the canonical
+  successful-reform cases, the spec may suffer from selection-on-
+  outcomes — these reforms are well-known partly because they
+  produced visible supply responses. Heterodox readers (urban-
+  political-economy, post-Keynesian, anti-displacement) will note
+  that supply response in Minneapolis was modest in absolute terms
+  and concentrated in already-gentrifying neighbourhoods, that
+  Auckland's rental-price moderation may reflect general NZ housing
+  cooling rather than the Unitary Plan, and that Tokyo's
+  consistently-low rental growth reflects national-level demographic
+  decline plus permissive land-use, not a clean policy lever
+  available elsewhere. The synthetic-control design is sensitive
+  to donor-pool choice; the spec should be re-run with multiple
+  donor pools at v2.
+
+scope:
+  period: [2010, 2024]
+  countries: [USA, NZL, JPN]
+  outcome_dim: [housing, regulation_compliance_cost]
+  policy_family: [housing_policy, regulation]
+  treatment_tags: [minneapolis_2040_plan, auckland_unitary_plan, houston_no_zoning, tokyo_land_use, classical_liberal_supply_side]
+
+steelman: hypotheses/steelman/classical_zoning_relaxation_housing_supply_response_us_metros.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+
+notes: >
+  Smith's "Wealth of Nations" Book I treatment of urban land
+  rents and Friedman's broader anti-zoning instinct are the
+  philosophical backdrop. The empirical literature (Glaeser-
+  Gyourko, Hsieh-Moretti, Greenaway-McGrevy-Phillips on Auckland)
+  carries the modern test. v2 should add Tokyo time-series with a
+  registered Japanese publisher and substitute a NZ-domestic
+  rental publisher for the placeholder.

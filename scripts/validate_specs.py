@@ -101,6 +101,68 @@ def cross_ref_axes(valid_axis_ids: set[str]) -> list[str]:
     return errors
 
 
+_STUB_RULE_MARKER = "when this stub is promoted from draft"
+
+
+def integrity_check_falsification_rules() -> list[str]:
+    """Fail when a hypothesis carries the stub-promotion boilerplate falsification
+    rule AND a real verdict has been emitted in diagnostics.json. That combination
+    means the auto-grader scored against a generic 'p<0.10 + correct sign' rule
+    rather than against a dispositive pre-registered threshold a fair reader of
+    the claim would defend — the integrity-failure mode that hit the pre-launch
+    audit (post-mortem in commit bba6f644).
+
+    Three legitimate states are still allowed:
+      (1) Stub rule + no run yet: the spec is a draft. Fine.
+      (2) Stub rule + run with verdict starting 'inconclusive_data_pending' or
+          'blocked' — the runner declined to grade. Fine.
+      (3) Sharpened rule + run with verdict — the canonical good state. Fine.
+      (4) Stub rule field + methodology_note documenting the dispositive
+          sharpening — acceptable upgrade-path state. Fine.
+
+    The forbidden state is: stub rule + a verdict-bearing run + no methodology
+    note explaining the sharpening. That's what this check catches.
+    """
+    import json
+    errors: list[str] = []
+    hyp_dir = ROOT / "hypotheses"
+    if not hyp_dir.is_dir():
+        return errors
+    for yml in hyp_dir.rglob("*.yaml"):
+        if yml.name.startswith("_") or "steelman" in yml.parts:
+            continue
+        doc = load_yaml(yml) or {}
+        rule = ((doc.get("falsification") or {}).get("rule") or "").lower()
+        if _STUB_RULE_MARKER not in rule:
+            continue
+        hid = doc.get("hypothesis_id")
+        if not hid:
+            continue
+        mn = (doc.get("methodology_note") or "").lower()
+        if any(k in mn for k in ("dispositive", "sharpened", "primary (dispositive")):
+            continue
+        diag = ROOT / "engine" / "runs" / hid / "diagnostics.json"
+        if not diag.exists():
+            continue
+        try:
+            d = json.loads(diag.read_text())
+        except Exception:
+            continue
+        verdict = (d.get("verdict") or "").strip().lower()
+        if not verdict:
+            continue
+        if verdict.startswith(("inconclusive_data_pending", "blocked", "error", "no verdict")):
+            continue
+        rel = yml.relative_to(ROOT)
+        errors.append(
+            f"{rel}: hypothesis_id '{hid}' has STUB falsification rule "
+            f"('…when this stub is promoted from draft') but diagnostics.json "
+            f"carries a verdict ({verdict[:60]}…). Either sharpen the YAML rule, "
+            f"document the sharpening in methodology_note, or remove the run."
+        )
+    return errors
+
+
 def cross_ref_policies(known_policy_ids: set[str]) -> tuple[list[str], list[str]]:
     """Every policy_id referenced by a canonical movement.policies must exist.
     Candidate/draft movements can forward-reference policy_ids not yet materialised
@@ -199,6 +261,10 @@ def main() -> int:
         errors.extend(cross_ref_axes(axis_ids))
     policy_errors, policy_warnings = cross_ref_policies(known_policy_ids)
     errors.extend(policy_errors)
+
+    # Integrity gate: stub falsification rule + real verdict is forbidden.
+    # See integrity_check_falsification_rules() for the rationale + exit states.
+    errors.extend(integrity_check_falsification_rules())
 
     if policy_warnings:
         print(f"WARN ({len(policy_warnings)} unresolved policy forward-references):")

@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nordstream_sabotage_2022_european_energy_security_pivot
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The September 2022 sabotage of the Nord Stream 1 and 2 pipelines
+  formalised a structural pivot in European gas supply: the share of EU
+  gas imports from Russia (pipeline + LNG combined) fell from ~40% in
+  2021 to <15% by 2024, US LNG exports to the EU rose from ~22 bcm/yr
+  pre-shock to ~50-70 bcm/yr 2023-2024, Norwegian pipeline gas became
+  the largest single EU supplier (>30% of imports), and EU LNG
+  regasification capacity expanded materially (FSRU additions in DEU
+  Wilhelmshaven + Brunsbüttel + Stade, NLD Eemshaven, ITA Piombino, FRA
+  Le Havre). This hypothesis is descriptive: it inventories the supply-
+  side pivot as a verified pattern across customs-data, pipeline-flow,
+  and LNG-cargo trackers, with no causal counterfactual.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, AUT, FIN, USA, NOR, QAT, RUS, GBR]
+  period: [2018, 2025]
+  temporal_structure: time_series
+
+scope:
+  period: [2018, 2025]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, AUT, FIN, USA, NOR, QAT, RUS, GBR]
+  outcome_dim: [energy, capital_flows, trade_liberalisation]
+  policy_family: [energy_policy, trade_policy, none]
+  treatment_tags: [nordstream_sabotage_2022, russia_pipeline_cutoff_2022, eu_lng_pivot_2022, repower_eu_2022]
+
+variables:
+  outcome:
+    - name: russia_share_eu_gas_imports
+      source: "constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard."
+      transformation: level
+    - name: log_us_lng_exports_to_eu_bcm
+      source: "constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/."
+      transformation: log
+    - name: log_norway_pipeline_exports_to_eu_bcm
+      source: "constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending."
+      transformation: log
+    - name: eu_lng_regasification_capacity_bcm_yr
+      source: "constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending."
+      transformation: level
+    - name: eu_gas_storage_filling_pct
+      source: "constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending."
+      transformation: level
+    - name: log_ttf_gas_price
+      source: "constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop."
+      transformation: log
+
+  treatment:
+    - name: post_sept_2022_dummy
+      source: "constructed: indicator = 1 from 2022-10 onwards (Nord Stream sabotage September 2022, formal end of Russian pipeline supply except for limited Turkstream + Yamal-Europe transit)."
+      transformation: indicator
+    - name: post_repower_eu_dummy
+      source: "constructed: indicator = 1 from 2022-05 (REPowerEU plan announcement) — secondary treatment marking policy framework rather than physical event."
+      transformation: indicator
+
+  controls:
+    - name: log_global_lng_demand
+      source: "constructed: GIIGNL annual LNG trade report — global LNG imports. Manual-drop pending."
+      transformation: log
+    - name: log_henry_hub_gas
+      source: "fred:DHHNGSP"
+      transformation: log
+    - name: heating_degree_days_eu
+      source: "eurostat:nrg_chdd_m"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Treatment combines a physical sabotage event (Sept 2022), a regulatory
+  framework (REPowerEU May 2022), and emergency-mode infrastructure
+  procurement (FSRU charters by national governments). Pure-regulatory or
+  pure-fiscal decomposition not feasible.
+
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive inventory: time-series plots of supplier-country shares,
+    LNG flows, pipeline flows, regasification capacity, storage levels,
+    and price by month from 2018 to 2025. Document supplier-share shifts
+    and capacity additions; do NOT estimate causal effect.
+
+    Quantitative checks:
+    (a) Russia share pre/post: Compare 2018-2021 monthly mean to 2023-2024
+        monthly mean.
+    (b) US LNG cargo count and bcm by EU destination 2021 vs 2024.
+    (c) Norwegian pipeline output vs nameplate capacity 2018-2024.
+    (d) Regas capacity additions 2022-2024 by country and operational date.
+    (e) Storage filling profile each summer/winter; resilience improvement.
+
+    Known limitations:
+    (1) "Russia share" hides residual pipeline flows via TurkStream (still
+        active to HUN, AUT, ITA via Bulgaria-Serbia) and small Yamal
+        transit; aggregate share ≠ zero, just much reduced.
+    (2) US LNG growth is partly demand-pull (EU buyers) and partly supply-
+        push (US export terminal completions Calcasieu Pass, Plaquemines,
+        Corpus Christi T3); causally separating the two is not the point
+        of this descriptive hypothesis.
+    (3) FSRU charters are typically 5-10 year leases; some are bridging
+        rather than permanent. Future rebalancing possible.
+
+falsification:
+  rule: >
+    Descriptive — falsified by counter-fact, not statistical inference.
+    Falsified if (a) Russia share of EU gas imports in 2024 is > 30%
+    (would refute the "pivot" claim), OR (b) US LNG to EU 2024 < 30 bcm
+    (would refute the LNG-replacement claim), OR (c) Norwegian pipeline
+    exports did NOT rise above 2018-2021 mean (would refute the
+    Norwegian-substitute claim), OR (d) net new regasification capacity
+    < 20 bcm/yr added 2022-2024 (would refute the infrastructure-
+    response claim). Hypothesis declared "supported" if 4 of 4 verified;
+    "partial" if 3 of 4; "refuted" if ≤ 2 of 4.
+  test: nordstream_pivot_inventory
+  threshold: >
+    All four pivot legs verified at thresholds: Russia share < 20% 2024,
+    US LNG > 50 bcm 2023+2024 average, Norway > 110 bcm/yr 2023-2024,
+    new regas capacity ≥ 30 bcm/yr added 2022-2024.
+
+prior_confidence: 0.85
+
+disclosure: >
+  This is a descriptive inventory with a high-confidence prior because
+  the supplier-share shift is in published Eurostat / Bruegel / EIA data
+  and is widely documented. The hypothesis exists in the corpus mainly to
+  pin a verified factual record that other (causal) hypotheses can build
+  on. No author bias on causal mechanism is being tested. The Nord
+  Stream sabotage attribution (state actor identity) is OUT OF SCOPE —
+  this hypothesis tests the post-event supply pattern, not whodunnit.
+
+steelman: hypotheses/steelman/nordstream_sabotage_2022_european_energy_security_pivot.md
+
+linked_hypotheses:
+  - eu_post_2021_gas_shock_industrial_output_impact
+  - eu_gas_storage_winter_2022_2023_demand_destruction_vs_substitution
+  - energy_crisis_2022_european_industrial_relocation
+  - german_energiewende_industrial_cost_trajectory
+
+notes: >
+  Data readiness:
+  - Eurostat nrg_te_gas + nrg_chdd_m: ready
+  - FRED Henry Hub: ready
+  - EIA LNG export by destination: requires eia fetcher (ready) + monthly series fetch
+  - Kpler / ICIS / Bruegel LNG cargoes: manual-drop pending under data/manual/derived/
+  - Gassco / Norway petroleum directorate: manual-drop pending
+  - GIE ALSI regas capacity + AGSI+ storage: manual-drop pending
+  - GIIGNL global LNG: manual-drop pending
+  - TTF spot: eex fetcher pending or manual-drop
+
+  Run when LNG cargo + regas-capacity manual-drops are populated.

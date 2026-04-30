@@ -5,6 +5,7 @@ import {
   loadAxes,
   loadHypothesisSchoolPredictions,
   loadRunArtifacts,
+  isHypothesisPubliclyVisible,
 } from "@/lib/content";
 import { loadHypothesisAxisIndex } from "@/lib/matching";
 import { verdictTone, verdictShort } from "@/lib/verdict";
@@ -80,19 +81,20 @@ export default async function HypothesesIndex() {
     loadHypothesisAxisIndex(),
     loadHypothesisSchoolPredictions(),
   ]);
-  const withRuns = await Promise.all(
+  const allRuns = await Promise.all(
     all.map(async (h) => ({
       h,
       run: await loadRunArtifacts(h.hypothesis_id),
     }))
   );
 
-  // Hypothesis count summary — distinguish actual verdicts from runs in flight.
-  // A run directory exists for any hypothesis whose pipeline has been kicked
-  // off, but only the ones with a `verdict` field in diagnostics.json have a
-  // real result to show. The rest are still pre-registered awaiting data or
-  // a complete estimator pass.
-  const verdictCount = withRuns.filter((r) => r.run.verdict).length;
+  // Public visibility gate — hide stub-graded hypotheses (auto-graded against
+  // the generic falsification boilerplate without a real replication.py + a
+  // sharpened dispositive rule). Those pages still exist if drilled into by
+  // direct link, but they don't surface in the public index. See
+  // isHypothesisPubliclyVisible() in @/lib/content for the criteria.
+  const withRuns = allRuns.filter((r) => isHypothesisPubliclyVisible(r.h, r.run));
+  const verdictCount = withRuns.length;
 
   // Sort: hypotheses with a verdict first (by tone — supported ranks above
   // partial above refuted), pre-registered/pending last. Stable sort preserves

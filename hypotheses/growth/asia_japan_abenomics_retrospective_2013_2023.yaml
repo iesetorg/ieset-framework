@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asia_japan_abenomics_retrospective_2013_2023
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Japan's Abenomics programme (2012-12 onward, with three "arrows":
+  aggressive monetary easing under Kuroda BOJ, flexible fiscal policy,
+  growth-strategy structural reforms) produced a measurable inflation-
+  expectations break and a labour-market tightening through 2019, but
+  did NOT produce a sustained acceleration in real GDP-pc growth
+  relative to the Japan 2002-2012 trend. Real GDP-pc growth differential
+  Japan 2013-2019 vs 2002-2012 is at most +0.3pp/yr (no major
+  acceleration), while CPI inflation differential is at least +0.7pp/yr
+  (inflation regime shift) AND unemployment rate falls by at least
+  -1.5pp peak-to-trough.
+
+evidence_type: descriptive
+
+notes: >-
+  Mixed-prediction structure typical of Abenomics retrospectives:
+  monetary regime change worked (inflation, labour market) but the
+  "third arrow" structural reform did not deliver real-growth
+  acceleration. Three primary tests, all from Japan time series.
+
+prior_confidence: 0.78
+
+disclosure: >-
+  Author tilts toward the mixed-success reading. Bias risk: the
+  inflation-regime test depends on the choice of pre-window (2002-2012
+  includes deflationary episodes that may bias the differential up).
+  Mitigation: also report 2007-2012 sub-window as informative.
+
+steelman: hypotheses/steelman/asia_japan_abenomics_retrospective_2013_2023.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, mixed-pattern): SUPPORTED if (a) real GDP-pc
+    growth differential JPN 2013-2019 minus 2002-2012 is at most
+    +0.003 (no major acceleration); AND (b) CPI inflation differential
+    JPN 2013-2019 vs 2002-2012 is at least +0.007 (regime change);
+    AND (c) JPN unemployment rate falls by at least 1.5pp peak-to-trough
+    over 2012-2019. REFUTED if (a) shows >+1pp/yr growth acceleration
+    (full-success) OR if both (b) and (c) fail (full-failure).
+  test: japan_abenomics_inflation_labour_yes_growth_no_2013_2023
+  threshold: >-
+    PRIMARY: gdp_pc_growth(JPN, 2013-2019) - gdp_pc_growth(JPN, 2002-2012) <= 0.003 AND
+    cpi_inflation(JPN, 2013-2019) - cpi_inflation(JPN, 2002-2012) >= 0.007 AND
+    unemployment_drop(JPN, 2012-2019) >= 1.5.
+    METHOD_VALID: WDI NY.GDP.PCAP.KD.ZG, FP.CPI.TOTL.ZG, SL.UEM.TOTL.ZS for JPN through 2019.
+
+sample:
+  countries: [JPN]
+  period: [2002, 2023]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "primary post-window 2013-2019 to avoid COVID 2020-2022 distortion"
+    - "2008-2009 GFC included in pre-window; secondary check excludes 2008-2009"
+
+scope:
+  period: [2013, 2023]
+  countries: [JPN]
+  outcome_dim: [gdp_growth, monetary_policy, employment_labour, inflation]
+  policy_family: [monetary_policy, fiscal_policy, institutional_reform]
+  treatment_tags: [abenomics_2012, kuroda_boj_qqe, three_arrows_2013, japan_inflation_regime_shift]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+  treatment:
+    - name: post_abenomics_indicator
+      source: "constructed: indicator = 1 for JPN, year >= 2013"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Pre-post structural break on three outcome series. No donor pool;
+    within-Japan structural-break design.
+
+linked_hypotheses:
+  - abenomics_monetary_policy_demand_effect
+  - abenomics_monetary_fiscal_coordination_effect
+  - japan_stagnation_wellbeing_outcomes
+  - demo_japan_ageing_deflation_link

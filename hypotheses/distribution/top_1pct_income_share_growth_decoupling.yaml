@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: top_1pct_income_share_growth_decoupling
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  In the cross-country panel of advanced economies post-1980, the top-1
+  percent share of total pre-tax national income exhibits a structural
+  break upward in countries that adopted the Anglo-American liberalisation
+  package (US, UK, Canada, Australia, New Zealand) and a flat-or-mildly-
+  rising trajectory in coordinated-market economies (Germany, France,
+  Sweden, Denmark, Netherlands), even though both groups experienced
+  comparable real GDP per capita growth. The Marxian / heterodox reading
+  is that aggregate growth is not the binding constraint on top-share
+  dynamics — institutional and policy choice is. The hypothesis tests
+  this by jointly regressing top-1 share growth on the standard control
+  set and a "liberalisation cluster" indicator, predicting that top-1
+  share rose at least 5 percentage points more in the Anglo cluster
+  than in the coordinated cluster 1980-2020.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, IRL, DEU, FRA, SWE, DNK, NOR, NLD, FIN, BEL, AUT, ITA, ESP, PRT, JPN, CHE]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing WID top-1 share
+    - drop years where WID source-fiscal-data revision discontinuities are flagged in WID metadata
+variables:
+  outcome:
+    - name: top_1_share_pretax_income
+      source: owid:top-1-share-of-total-income
+      transformation: level
+      notes: >
+        OWID mirror of the WID top-1 pre-tax national income share.
+        Pre-tax preferred over post-tax for testing the institutional
+        labour-vs-capital bargain rather than the redistribution layer.
+    - name: top_10_share_pretax_income
+      source: owid:income-share-top-10
+      transformation: level
+      notes: Robustness; a similar pattern in top-10 strengthens the structural reading.
+  treatment:
+    - name: anglo_cluster_indicator
+      source: dates:anglo_liberalisation_cluster
+      transformation: indicator
+      notes: >
+        Constructed dummy: 1 for USA/GBR/CAN/AUS/NZL/IRL post-1980,
+        0 otherwise. Operationalises the Marxian / institutionalist
+        reading that the Reagan-Thatcher liberalisation package is a
+        joint policy treatment, not a set of independent reforms.
+    - name: top_marginal_income_tax_rate
+      source: owid:top-marginal-income-tax-rate
+      transformation: level
+      notes: >
+        Cross-validates that the cluster effect is not just the tax
+        cut. If the cluster coefficient survives conditioning on the
+        marginal rate, the institutional-bundle reading is supported.
+  controls:
+    - name: real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: union_density
+      source: oecd:OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0
+      transformation: level
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+    - name: financial_sector_va_share
+      source: oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE3,1.0
+      transformation: level
+      notes: >
+        OECD Annual National Accounts financial-sector value-added
+        share. Conditions on the financialisation channel which
+        plausibly raises top shares independently of the cluster.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE regression of top-1 pre-tax share on Anglo-cluster
+    indicator (interacted with post-1980 dummy), top marginal rate,
+    real GDP per capita, union density, financial-sector share, and
+    standard controls. Country and year FE, country-clustered SEs.
+    Robustness: Callaway-Sant'Anna staggered-treatment DiD with
+    cluster onset year-staggered (USA 1980, UK 1979, NZL 1984, AUS
+    1983, CAN 1984).
+falsification:
+  rule: >
+    Not supported if the Anglo-cluster post-1980 differential coefficient
+    is statistically zero or negative (p > 0.10), OR if the differential
+    disappears once conditioning on top marginal income tax rates and
+    union density (i.e. the "cluster" effect collapses into observable
+    policy parameters and is not a residual institutional-package effect).
+    Symmetric falsification: if the top-1 share rose in the coordinated
+    cluster by within 1 percentage point of the Anglo cluster's rise,
+    the institutional-divergence claim is undercut.
+  test: panel_fe_anglo_cluster_post_1980_differential_with_policy_conditioning
+  threshold: >
+    coef(anglo_post_1980) >= +5 percentage-points 1980-2020 cumulative AND
+    coefficient survives top_marginal_rate + union_density conditioning AND
+    p < 0.10
+prior_confidence: 0.65
+disclosure: >
+  Author framing draws on the Piketty-Saez-Atkinson tradition (top-share
+  literature) and on the varieties-of-capitalism reading that treats
+  Reagan-Thatcher as a joint institutional package. A market-liberal
+  reader would object that the Anglo cluster also out-performed in
+  growth and innovation per capita, that the top-1 share rise is partly
+  a measurement-shift (S-corp pass-through reclassification post-1986 in
+  the US) rather than a real distribution change, and that conditioning
+  on union density and the marginal tax rate is bad-control because
+  those are themselves part of the "cluster". Authorial framing risk
+  acknowledged; the policy-conditioning test in the falsification rule
+  is the binding check.
+steelman: hypotheses/steelman/top_1pct_income_share_growth_decoupling.md
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [poverty_inequality, gdp_growth]
+  policy_family: [tax_policy, labour_market, regulation]
+  treatment_tags:
+    - reagan_thatcher_cluster
+    - top_share_rise
+    - liberalisation_package
+notes: >
+  Candidate, not pre_registered. On promotion, secure a registered WID
+  fetcher rather than the OWID mirror, document the cluster-onset dates,
+  and pin the OECD financial-sector dataflow URN.

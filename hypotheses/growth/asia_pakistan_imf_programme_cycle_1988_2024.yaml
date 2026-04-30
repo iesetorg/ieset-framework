@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asia_pakistan_imf_programme_cycle_1988_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Pakistan's recurring IMF-programme cycle 1988-2024 — at least 23
+  IMF arrangements over 36 years, including major SBA/EFF/RCF
+  programmes 1988, 1993, 1995, 2008, 2013, 2019, 2023 — reflects a
+  pattern of stabilisation-without-reform: short-run BoP support
+  followed by fiscal slippage and renewed crisis. Pakistan's per-capita
+  GDP-PPP growth differential vs SAARC peer mean (BGD, IND, NPL, LKA)
+  averages at most +0.0pp/yr over 1990-2019 (Pakistan at or below
+  peers despite repeated IMF support); and inflation volatility
+  exceeds peer mean by a large margin.
+
+evidence_type: associational
+
+notes: >-
+  Tests the political-economy claim that frequent IMF programmes
+  without follow-through reform produce a chronic-stabilisation
+  pattern rather than convergence. SAARC peer pool is benchmarking;
+  Pakistan-specific cycle is the unit of analysis.
+
+prior_confidence: 0.80
+
+disclosure: >-
+  Author market-liberal priors are critical of Pakistan's macroeconomic
+  management. Bias risk: under-weighting security/external-shock
+  contributions to fiscal slippage. Mitigation: peer-pool comparison
+  absorbs SAARC common shocks; magnitude threshold is moderate.
+
+steelman: hypotheses/steelman/asia_pakistan_imf_programme_cycle_1988_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if PAK real GDP-pc-PPP growth
+    minus SAARC peer mean (BGD, IND, NPL, LKA) over 1990-2019 averages
+    at most +0.0pp/yr (PAK at or below peers). REFUTED if PAK
+    differential exceeds +1.0pp/yr (PAK clearly outperforming peers
+    despite IMF cycle).
+    INFORMATIVE (not gating): inflation volatility (CV of CPI inflation)
+    higher in PAK than SAARC peers.
+  test: pakistan_imf_cycle_no_growth_premium_vs_saarc_peers
+  threshold: >-
+    PRIMARY: gdp_pc_growth(PAK, 1990-2019 mean) - gdp_pc_growth(SAARC_peers, 1990-2019 mean) <= 0.
+    REFUTING: same diff > 0.01.
+    METHOD_VALID: WDI NY.GDP.PCAP.KD.ZG for PAK and SAARC peers across 1990-2019.
+
+sample:
+  countries: [PAK, BGD, IND, NPL, LKA]
+  period: [1988, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "primary window 1990-2019 to avoid COVID 2020-2022 distortion"
+
+scope:
+  period: [1988, 2024]
+  countries: [PAK]
+  outcome_dim: [gdp_growth, inflation, monetary_policy]
+  policy_family: [fiscal_policy, monetary_policy, exchange_rate_regime]
+  treatment_tags: [pakistan_imf_programmes, imf_sba_eff_pakistan, pakistan_fiscal_cycle]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: government_debt_pct_gdp
+      source: "imf:general_government_gross_debt_pct_gdp"
+      transformation: level
+  treatment:
+    - name: pakistan_indicator
+      source: "constructed: indicator = 1 for PAK"
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way fixed effects panel; SAARC peer pool. Pakistan-specific
+    pattern test is country-vs-peer differential.
+
+linked_hypotheses:
+  - asia_bangladesh_apparel_growth_1985_2024
+  - asia_sri_lanka_default_2022_imf_2023

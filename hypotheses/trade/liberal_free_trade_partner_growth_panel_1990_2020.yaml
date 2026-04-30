@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: liberal_free_trade_partner_growth_panel_1990_2020
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Across countries 1990-2020, accession to a substantive free-trade
+  agreement (FTA) — defined as a WTO-notified preferential-trade
+  agreement going beyond MFN with measurable bilateral tariff
+  reductions — is followed by higher trade openness and higher
+  per-capita real GDP growth in the post-accession 5-year window than
+  in the matched pre-accession 5-year window. The Ricardian /
+  Smithian claim is that voluntary trade liberalisation between
+  partners produces measurable growth gains via specialisation,
+  scale, and cheaper imported inputs; the test is a panel of
+  FTA-accession events using country-year fixed effects to absorb
+  global trends and country idiosyncrasies.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop FTA accession events that occur within 3 years of a separate major reform package (avoid bundled-treatment confound)"
+    - "drop country-years inside active currency or banking crisis (IMF systemic banking-crisis dating)"
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp_5yr_post
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: 5yr_post_accession_mean
+    - name: real_gdp_pc_growth_5yr_post
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: cumulative_log_growth_5yr_post
+  treatment:
+    - name: fta_accession_indicator
+      source: "constructed: indicator = 1 in accession year and 5yr post-window for each country-FTA event identified from WTO RTA-IS database (publicly listed accession dates)"
+      transformation: indicator
+  controls:
+    - name: initial_log_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_pre_accession
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: wgi_rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: pre_accession_trend_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: cumulative_log_growth_5yr_pre
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  An FTA is a regulatory / trade-policy intervention that lowers
+  bilateral tariff and non-tariff barriers. Channel regulatory per
+  invariant 4 (trade-policy is a regulatory subcategory).
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Staggered DiD using Callaway-Sant'Anna estimator on the FTA-
+    accession events. Pre-accession trend growth is included as a
+    control to attenuate the parallel-trends violation that
+    typically plagues FTA-event studies. Robustness: drop EU-
+    accession events (which are bundled with substantial
+    institutional reforms and may inflate the estimate).
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) the average treatment effect on the
+    treated for FTA accession on 5yr-post real-GDP-per-capita
+    cumulative log-growth is positive and significant at p<0.05,
+    AND (b) the corresponding ATT on 5yr-post trade-openness is
+    positive and significant at p<0.05 (mechanism check). PARTIAL
+    if (b) holds but (a) is insignificant — accession increased
+    trade but didn't measurably move growth, the weak Ricardian
+    win. REFUTED if (a) is wrong-signed at p<0.05.
+    INFORMATIVE: drop EU-accession events; the coefficient should
+    survive at >50% of full-sample magnitude.
+  test: cs_did_fta_accession_growth_and_openness
+  threshold: >
+    PRIMARY: cs_did_ATT(growth_5yr_post) > 0 at p<0.05 AND
+    cs_did_ATT(openness_5yr_post) > 0 at p<0.05.
+    INFORMATIVE: ex-EU coefficient retained at >=0.5 × full-sample magnitude.
+
+prior_confidence: 0.65
+
+disclosure: >-
+  Author prior is moderate (0.65). The trade-and-growth literature
+  is contentious: Frankel-Romer 1999 supports the claim, Rodriguez-
+  Rodrik 2001 critiques the identification, Feyrer 2009 attempts
+  IV approaches that revive the positive effect. Authorial framing
+  risk: FTAs vary enormously in depth (deep-integration agreements
+  like EU vs shallow tariff-cuts like many Latin American RTAs);
+  treating them as a binary indicator collapses heterogeneity that
+  matters. Heterodox readers (structuralist, Latin-American
+  developmentalist, dependency-theorist) will note that NAFTA's
+  effect on Mexican growth was modest at best, that Africa's many
+  RTAs have not produced growth take-offs, and that the headline
+  positive effect is driven by EU enlargement and a handful of
+  East-Asian episodes. Dropping EU accessions in the INFORMATIVE
+  check is the heterodox reader's clean win path.
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, gdp_growth]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [fta_accession, wto_rta, ricardian_specialisation, classical_liberal_free_trade]
+
+steelman: hypotheses/steelman/liberal_free_trade_partner_growth_panel_1990_2020.md
+
+linked_hypotheses:
+  - eu_single_market_productivity_and_trade_gains
+  - china_wto_accession_productivity_growth_effect
+
+notes: >
+  The Ricardian-Smithian claim is one of the most contested
+  propositions in empirical economics. The spec deliberately uses
+  Callaway-Sant'Anna to handle the staggered-treatment problem
+  that plagues earlier two-way-FE FTA studies (Goodman-Bacon
+  decomposition shows TWFE in this setting is biased). v2 could
+  use deep-integration coverage indices once a registered
+  publisher provides them.

@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_india_gst_2017_distributional
+version: 1
+status: draft
+topic: distribution
+claim: >
+  India's 2017 GST implementation (replacing fragmented state VAT/excise
+  with unified GST with five rate slabs 0/5/12/18/28 percent) produced a
+  short-run regressive distributional bite — measurable rise in disposable-
+  income Gini over 2017-2019 — followed by partial reversal as input-tax-
+  credit pass-through stabilised by 2021. The discriminating test is the
+  trajectory of disposable-income Gini before and after the 2017Q3
+  implementation against a South-Asia synthetic control.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 6. GST distributional debate is
+  unresolved in the Indian literature.
+prior_confidence: 0.5
+disclosure: >
+  Author prior is genuinely uncertain — GST may be progressive on
+  formalisation grounds but regressive on incidence grounds.
+falsification:
+  rule: >
+    SUPPORTED if Indian disposable Gini rises by at least 0.5 Gini-points
+    2017-2019 vs South-Asia synth control AND partial reversal (Gini
+    return to within 0.3pp of 2017 baseline) by 2021 at p<0.10. REFUTED
+    if no detectable rise or rise persists beyond 2021 at p<0.10.
+  test: >
+    Synthetic-control with South-Asia donor pool (BGD, LKA, NPL, PAK),
+    treated IND 2017.
+evidence_type: associational
+sample:
+  countries: [IND, BGD, LKA, NPL, PAK]
+  period: [2010, 2023]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: ind_gst_post_2017
+      source: "constructed: indicator = 1 for IND, year >= 2017"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with South-Asia donor pool. Treated IND 2017Q3.
+intervention_channel: fiscal
+scope:
+  period: [2017, 2023]
+  countries: [IND]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [india_gst_2017, vat_unification, formalisation_distributional]

@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  Between 2002 and 2007 the US effective Federal Funds Rate ran on
+  average more than 200 basis points below the rate prescribed by a
+  standard Taylor rule (1.5 inflation-gap, 0.5 output-gap weights, 2%
+  natural rate). The 2008 housing bust and MBS write-downs constitute
+  a canonical case of malinvestment in the inter-temporal capital
+  structure: residential investment as a share of GDP rose 1.5 SD
+  above its 1990-2001 mean, household mortgage debt rose by more than
+  40 percentage points of GDP, and the post-bust write-down of
+  housing-sector capital exceeded $4 trillion. The Austrian
+  interpretation — Greenspan-era loose money distorted the relative
+  price of long-duration capital goods — is consistent with the
+  multi-metric pattern of pre-bust extremes and post-bust collapse.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [USA]
+  period: [1990, 2012]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "include 2008-2012 as the post-bust observation window for collapse metrics"
+
+scope:
+  period: [1990, 2012]
+  countries: [USA]
+  outcome_dim: [monetary_policy, financial_crisis, housing]
+  policy_family: [monetary_policy, regulation]
+  treatment_tags: [greenspan_low_rates_2002_2004, taylor_rule_deviation, abct_capital_misallocation, gfc_2008]
+
+variables:
+  outcome:
+    - name: residential_investment_share_gdp
+      source: "fred:PRFIC1"
+      transformation: level
+      notes: "Real private residential fixed investment as share of GDP."
+    - name: household_mortgage_debt_to_gdp
+      source: "fred:HMLBSHNO"
+      transformation: level
+    - name: case_shiller_home_price_index
+      source: "shiller:us_home_price_real"
+      transformation: log
+  treatment:
+    - name: fed_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+    - name: taylor_rule_deviation
+      source: "constructed: FEDFUNDS minus standard Taylor rule (1.5 pi-gap, 0.5 y-gap, 2% r*, 2% pi*)"
+      transformation: level
+      notes: "Constructed series; primary specification uses CPI inflation and CBO output gap."
+  controls:
+    - name: cpi_inflation
+      source: "fred:CPIAUCSL"
+      transformation: yoy
+    - name: cbo_output_gap
+      source: "fred:GDPC1"
+      transformation: pct_dev_potential
+    - name: long_term_yield_10y
+      source: "fred:DGS10"
+      transformation: level
+
+intervention_channel: monetary
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    Pre-registered multi-metric pattern test: was the 2002-2007 window
+    a canonical malinvestment episode? Each metric is independently
+    sourced and would have to fail to justify rejecting the canonical
+    case framing. Mainstream/Keynesian readers would attribute the
+    bust to global savings-glut + financial-regulation gaps, not to
+    Fed deviation from Taylor; the multi-metric checklist does not
+    adjudicate between Austrian and savings-glut narratives, only
+    whether the canonical pattern holds in the data.
+
+canonical_metrics:
+  - metric_id: taylor_rule_average_deviation_2002_2007
+    description: "Average deviation of FEDFUNDS below standard Taylor rule across 2002-2007."
+    threshold: ">= 150 bps below Taylor rule average"
+    window: "2002-2007"
+    source: "fred:FEDFUNDS; fred:CPIAUCSL; fred:GDPC1"
+    direction: supports_claim
+    independence_justification: "Constructed monetary-stance metric — independent of housing-side metrics."
+  - metric_id: residential_investment_share_peak_excess
+    description: "Peak residential investment share of GDP relative to 1990-2001 mean, in standard deviations."
+    threshold: ">= 1.0 SD above 1990-2001 mean at peak"
+    window: "2003-2006"
+    source: "fred:PRFIC1"
+    direction: supports_claim
+    independence_justification: "Real-side housing metric — captures distortion in capital-structure composition."
+  - metric_id: mortgage_debt_to_gdp_rise
+    description: "Increase in household mortgage debt to GDP over 2001-2007."
+    threshold: ">= 25 percentage points increase"
+    window: "2001-2007"
+    source: "fred:HMLBSHNO"
+    direction: supports_claim
+    independence_justification: "Household-leverage metric — independent of price index."
+  - metric_id: case_shiller_real_price_rise
+    description: "Cumulative real home-price growth, 2000Q1 to 2006Q2 peak."
+    threshold: ">= 60% cumulative real growth"
+    window: "2000Q1-2006Q2"
+    source: "shiller:us_home_price_real"
+    direction: supports_claim
+    independence_justification: "Asset-price metric — different layer than leverage or quantity."
+  - metric_id: post_bust_home_price_drawdown
+    description: "Peak-to-trough real home-price drawdown 2006-2012."
+    threshold: ">= 25% peak-to-trough decline"
+    window: "2006Q2-2012Q1"
+    source: "shiller:us_home_price_real"
+    direction: supports_claim
+    independence_justification: "Liquidation/correction metric — Austrian prediction is that the post-bust drawdown should be roughly proportional to the pre-bust over-extension."
+
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+
+falsification:
+  rule: >
+    Hypothesis is supported if at least 4 of 5 canonical metrics meet
+    their thresholds; refuted if fewer than 3 do. The "canonical" framing
+    requires the pattern to be unambiguous in the data, not borderline.
+  test: malinvestment_canonical_pattern_count
+  threshold: >
+    metrics_met >= 4 of 5 → supported
+    metrics_met <= 2 of 5 → refuted
+
+prior_confidence: 0.75
+
+disclosure: >-
+  Author prior is high (0.75) because the Taylor-deviation calculation
+  and housing-bust magnitudes are well-documented (Taylor 2007 "Housing
+  and Monetary Policy" makes this case explicitly). Heterodox readers
+  will object that (a) the Taylor rule is itself a contested benchmark,
+  (b) the global savings glut (Bernanke 2005) provides an alternative
+  causal account that does not require Fed culpability, and (c)
+  attributing the 2008 crisis to monetary policy rather than to
+  financial-regulation gaps and originate-to-distribute incentives is
+  a politically-loaded choice. The multi-metric test sidesteps causal
+  identification — it asks only whether the pattern Austrians point
+  to is in the data.
+
+steelman: hypotheses/steelman/abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007.md
+
+linked_hypotheses:
+  - abct_credit_boom_predicts_capital_misallocation_oecd
+  - austrian_monetary_expansion_asset_bubble_not_cpi_panel
+
+notes: >
+  Canonical Austrian case from Taylor (2007), Schwartz (2009), White
+  (2009 "How Did We Get into This Mess?"). The hypothesis tests pattern,
+  not mechanism — a Bernankean savings-glut account would also predict
+  several of these metrics, so a "supported" verdict here does not
+  uniquely confirm ABCT.

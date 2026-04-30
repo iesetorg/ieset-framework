@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_universal_childcare_quebec_germany_korea
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Universal-childcare expansions in three jurisdictions — Quebec 1997 (CAD 5/day universal subsidised
+  childcare), Germany 2013 (legal-entitlement to under-3 childcare via U3 Ausbau), Korea 2013 (universal
+  free childcare for ages 0-5) — produced cross-jurisdiction-replicable maternal-LFP increases of at
+  least 4 percentage points within five years of universal-rollout, identified off rest-of-Canada,
+  rest-of-Germany (eastern-states pre-treatment baseline), and synthetic-control donor pools, providing
+  triangulation evidence for a generalisable maternal-LFP effect of universal childcare.
+evidence_type: causal
+prior_confidence: 0.7
+disclosure: |
+  Author has market-liberal priors that view universal-childcare-design effects on maternal LFP as
+  well-evidenced (Baker-Gruber-Milligan 2008 on Quebec; Bauernschuster-Schlotter 2015 on Germany).
+  Hypothesis tests cross-jurisdiction replication rather than single-case effect.
+sample:
+  countries: [CAN, DEU, KOR]
+  period: [1990, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Quebec 1995-1996 referendum-period from primary identification window
+variables:
+  outcome:
+  - name: maternal_labour_force_participation_under_5
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: level_pct
+  - name: childcare_enrolment_under_3
+    source: oecd:DSD_FAMILY@DF_FAMILY
+    transformation: level_pct
+    notes: OECD family database under-3 enrolment; placeholder pending wiring.
+  treatment:
+  - name: universal_childcare_indicator
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: indicator
+    notes: Quebec = 1 from 1997-Q3; Germany = 1 from 2013-Q3; Korea = 1 from 2013-Q3.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: female_education_years
+    source: undp_hdi:female_mean_years_schooling
+    transformation: level
+  - name: total_fertility_rate
+    source: world_bank_wdi:SP.DYN.TFRT.IN
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: |
+  Universal-childcare expansion bundles fiscal subsidy with regulatory entitlement-rule and
+  institutional service-provision; channel is bundled.
+estimator:
+  template: synth_did
+  clustering: jurisdiction
+  fixed_effects: [jurisdiction, year]
+  notes: |
+    Synth-DiD on each jurisdiction with rest-of-Canada (for Quebec), rest-of-Germany (for federal-
+    universal Germany 2013), and OECD-Asia donor pool (for Korea). Three cases evaluated separately;
+    cross-jurisdiction replication assessed by joint-pattern-test on the three ATTs.
+falsification:
+  rule: |
+    Refuted if any individual jurisdiction ATT on maternal-LFP at 5-year horizon is below +4pp, OR
+    if the joint-pattern test (all three jurisdictions show consistent positive effects within
+    confidence bounds) fails at the 10% level. Cross-jurisdiction replication requires all three.
+  test: synth_did_5yr_maternal_lfp_three_jurisdiction_replication
+  threshold: each_jurisdiction_att >= +4pp AND joint_pattern_test_p < 0.10
+scope:
+  period: [1997, 2022]
+  countries: [CAN, DEU, KOR]
+  outcome_dim: [employment_labour, welfare_state, demographics_migration]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [quebec_universal_childcare_1997, germany_u3_ausbau_2013, korea_free_childcare_2013]
+steelman: hypotheses/steelman/welfare_transfer_universal_childcare_quebec_germany_korea.md

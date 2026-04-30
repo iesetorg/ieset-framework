@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sea_singapore_fta_cascade_post_2014
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Singapore's post-2014 FTA expansion — covering CECA upgrade with India
+  (in-force 2005, modernised post-2014), CPTPP 2018, RCEP 2022 — sustained
+  the export-share-of-GDP and trade-openness ratios at the world's highest
+  levels, with exports of goods and services / GDP averaging at least
+  170% over 2015-2019 (vs 100-130% for global peers like NLD, BEL, IRL),
+  and Singapore's real GDP-pc growth maintaining at least +0.3pp/yr
+  differential vs the high-income East Asian peer panel (KOR, JPN, HKG)
+  over 2014-2019.
+
+evidence_type: associational
+
+notes: >-
+  Tests Singapore's hyper-open trade model continuation post-2014.
+  Trade openness threshold of 170% is calibrated to detect maintenance
+  of frontier-trader status; growth differential vs Korea/Japan/HK
+  benchmarks against high-income East Asian comparators.
+
+prior_confidence: 0.70
+
+disclosure: >-
+  Author market-liberal priors are sympathetic to the FTA-cascade trade-
+  openness story. Bias risk: attributing trade openness to FTAs when
+  Singapore's geography (entrepôt port) and historical trade-zone
+  status are the dominant drivers. Mitigation: focus on maintenance,
+  not change — the test is whether the model holds, not whether FTAs
+  caused it.
+
+steelman: hypotheses/steelman/sea_singapore_fta_cascade_post_2014.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH for SUPPORTED): (1) Singapore's
+    exports/GDP averages at least 170% over 2015-2019; AND (2)
+    SGP real GDP-pc growth minus high-income East Asian peer mean
+    (KOR, JPN, HKG) over 2014-2019 is at least +0.003. REFUTED if
+    EITHER fails.
+  test: singapore_post_2014_trade_openness_growth_premium
+  threshold: >-
+    PRIMARY 1: exports_pct_gdp(SGP, 2015-2019 mean) >= 170.
+    PRIMARY 2: gdp_pc_growth(SGP, 2014-2019 mean) - gdp_pc_growth([KOR,JPN,HKG], 2014-2019 mean) >= 0.003.
+    METHOD_VALID: WDI NE.EXP.GNFS.ZS and NY.GDP.PCAP.KD.ZG for SGP and high-income East Asia peers across 2014-2019.
+
+sample:
+  countries: [SGP, KOR, JPN, HKG]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "primary window 2014-2019 to avoid COVID distortion 2020-2022"
+
+scope:
+  period: [2014, 2024]
+  countries: [SGP]
+  outcome_dim: [gdp_growth, trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [singapore_fta_cascade, ceca_india_2014, cptpp_2018, rcep_2022]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: trade_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+  treatment:
+    - name: post_2014_fta_cascade_indicator
+      source: "constructed: indicator = 1 for SGP, year >= 2014"
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way fixed effects panel with high-income East Asia peer pool.
+
+linked_hypotheses:
+  - singapore_cpf_national_savings_effect
+  - singapore_temasek_public_ownership_efficiency

@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_pension_mexico_universal_2023_fiscal_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Mexico's 2023 Pensión Universal expansion (DOF January 2023, raising the universal-noncontributory
+  pension to all adults 65+ at twice the previous level under AMLO's constitutional amendment) raised
+  social-spending share of GDP by at least 1 percentage point of GDP within two fiscal years, with no
+  offsetting domestic-revenue measure, generating a measurable structural-fiscal-balance deterioration
+  visible in IMF Article IV monitoring and BdM stability reports.
+evidence_type: descriptive
+prior_confidence: 0.75
+disclosure: |
+  Author has market-liberal priors that view universal-noncontributory pensions absent revenue offset
+  as fiscally unsustainable. Hypothesis is descriptive — tests whether the headline cost increase
+  materialises as the pre-launch IMF projection suggested, not whether the pension serves its
+  redistributive purpose.
+sample:
+  countries: [MEX]
+  period: [2018, 2026]
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: social_spending_share_gdp
+    source: imf:GGXG_NGDP
+    transformation: level
+  - name: structural_fiscal_balance_share_gdp
+    source: imf:GGSB_NPGDP
+    transformation: level
+  - name: elderly_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level_pct
+  controls:
+  - name: oil_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Pensión Universal expansion is a fiscal-channel transfer scaling.
+estimator:
+  template: descriptive
+  clustering: country
+  fixed_effects: [year]
+  notes: |
+    Descriptive time-series for MEX with pre-launch IMF Article IV projection as counterfactual.
+    Compare 2023-2025 actual social-spending and fiscal-balance trajectory against 2022 IMF baseline.
+falsification:
+  rule: |
+    Refuted if MEX social-spending-share-of-GDP rises by less than 1pp 2022-2025, OR if structural-
+    fiscal-balance does not deteriorate by at least 0.7pp of GDP over the same window, OR if elderly-
+    poverty rate falls by more than 5pp (i.e., a large redistributive success would warrant
+    reconsidering the fiscal-cost framing as the dominant outcome).
+  test: descriptive_fiscal_trajectory_vs_imf_2022_projection
+  threshold: delta_social_spending >= +1pp AND delta_structural_balance <= -0.7pp AND delta_elderly_poverty > -5pp
+scope:
+  period: [2023, 2026]
+  countries: [MEX]
+  outcome_dim: [welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [mexico_pension_universal_2023, amlo_constitutional_amendment, sheinbaum_continuation]
+steelman: hypotheses/steelman/welfare_pension_mexico_universal_2023_fiscal_effect.md

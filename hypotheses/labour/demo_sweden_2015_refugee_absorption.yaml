@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_sweden_2015_refugee_absorption
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Sweden absorbed approximately 163,000 asylum applicants in 2015 (~1.6% of population in
+  one year). The hypothesis tests (a) whether the inflow produced a persistent foreign-born
+  employment gap exceeding the OECD destination median, (b) whether fiscal-burden indicators
+  (per-capita social-protection spending) showed a measurable post-2015 increase, and
+  (c) whether labour-market integration outcomes 2015-2023 were below the Swedish pre-2015
+  refugee-cohort baseline.
+evidence_type: descriptive
+sample:
+  countries: [SWE, NOR, DNK, FIN, NLD, DEU, AUT, BEL]
+  period: [2010, 2023]
+  temporal_structure: time_series
+scope:
+  period: [2010, 2023]
+  countries: [SWE]
+  outcome_dim: [demographics_migration, employment_labour, welfare_state]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [sweden_2015_refugee_absorption, asylum_inflow]
+variables:
+  outcome:
+    - name: foreign_native_employment_gap
+      source: eurostat:lfsa_ergan
+      transformation: difference
+    - name: social_protection_per_capita
+      source: eurostat:spr_exp_sum
+      transformation: log
+  treatment:
+    - name: refugee_inflow_event_indicator
+      source: "constructed: indicator pulses 2015-2016 for SWE"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+estimator:
+  template: event_study
+  notes: >
+    Event-study around 2015-2016 for SWE, comparator panel of Nordic + DEU/NLD/AUT/BEL;
+    pre-period 2010-2014, event 2015-2016, post-period 2017-2023.
+falsification:
+  rule: >-
+    SUPPORTED if SWE foreign-native employment gap widens by at least 3pp post-2015
+    relative to comparator panel, AND per-capita social-protection spending shows a
+    structural break > 5% above pre-2015 trend. REFUTED if employment gap does not widen
+    or social-protection break < 2%.
+  test: event_study_sweden_2015_absorption
+  threshold: "employment_gap_widening >= 3.0 AND social_protection_break >= 0.05"
+prior_confidence: 0.6
+disclosure: >-
+  Topic is politically charged in Sweden; risk of confirmation bias toward the "absorption
+  was costly" framing. Counterweight: refugees are not points-selected, so a measurable
+  short-run gap is consistent with literature without implying long-run failure.
+steelman: hypotheses/steelman/demo_sweden_2015_refugee_absorption.md

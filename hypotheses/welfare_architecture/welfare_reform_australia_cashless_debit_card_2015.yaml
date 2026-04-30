@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_reform_australia_cashless_debit_card_2015
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Australia's Cashless Debit Card trial (2016-2022, restricting 80% of welfare payments to non-cash
+  spending in trial regions Ceduna, East Kimberley, Goldfields, Bundaberg/Hervey Bay) did not produce
+  measurable reductions in alcohol-related hospitalisation, gambling spend, or domestic-violence
+  reporting relative to a synthetic-control of comparable remote/rural regions, supporting the
+  empirical critique that paternalistic conditionality on welfare delivery has limited demonstrable
+  outcome effects against its stated objectives.
+evidence_type: causal
+prior_confidence: 0.65
+disclosure: |
+  Author has market-liberal priors that distrust paternalistic conditionality on welfare design.
+  Hypothesis is consistent with University of Adelaide / ANU evaluation findings and was the basis
+  for the Albanese government's 2022 abolition of the trial. Identification depends on synthetic-control
+  quality given small trial-region sample.
+sample:
+  countries: [AUS]
+  period: [2010, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID-affected 2020-Q2 to 2021-Q2 from primary spec
+variables:
+  outcome:
+  - name: alcohol_hospitalisation_rate_per_1000
+    source: who_gho:GHO/SA_0000001688
+    transformation: level
+  - name: domestic_violence_reports_per_1000
+    source: world_bank_wdi:VC.IHR.PSRC.P5
+    transformation: level
+    notes: WDI homicide-rate series as proxy; AIHW DV-reports preferred at wiring.
+  treatment:
+  - name: cdc_trial_region_indicator
+    source: who_gho:GHO/SA_0000001688
+    transformation: indicator
+    notes: Trial regions = 1 from rollout date 2016-2022; comparator regions = 0.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: indigenous_population_share
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: ratio
+intervention_channel: regulatory
+intervention_channel_justification: |
+  CDC restricts the form of welfare-payment delivery (regulatory channel on transfer mechanism) without
+  changing benefit levels.
+estimator:
+  template: synth_did
+  clustering: region
+  fixed_effects: [region, year_quarter]
+  notes: |
+    Synthetic-DiD on trial-region outcomes 2010-2022 with comparable remote/rural Australian-region
+    donor pool. Pre-treatment fit 2010-2015. Heterogeneity across the four trial sites reported.
+falsification:
+  rule: |
+    Refuted if the synth-DiD ATT on alcohol-related hospitalisation is below minus-10% at 4-year horizon
+    (i.e., a sizable reduction would refute the no-effect framing), OR if domestic-violence reports
+    fall by more than 10%, OR if both effects show statistically significant reductions at p < 0.10.
+  test: synth_did_4yr_alcohol_hospitalisation_dv_reports
+  threshold: alcohol_att > -10pct AND dv_att > -10pct AND p_value > 0.10
+scope:
+  period: [2016, 2022]
+  countries: [AUS]
+  outcome_dim: [welfare_state, life_expectancy_health]
+  policy_family: [welfare_architecture, regulation]
+  treatment_tags: [australia_cashless_debit_card_2015, coalition_government_abbott_turnbull_morrison, indigenous_advancement_strategy]
+steelman: hypotheses/steelman/welfare_reform_australia_cashless_debit_card_2015.md

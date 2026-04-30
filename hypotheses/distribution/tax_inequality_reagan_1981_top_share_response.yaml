@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_reagan_1981_top_share_response
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 1981 Economic Recovery Tax Act (ERTA) cutting the US top marginal income
+  tax rate from 70 to 50 percent produced a measurable rise in the top-1
+  percent pre-tax national income share within five years, consistent with the
+  Saez-Slemrod-Giertz elasticity-of-taxable-income literature where most of
+  the apparent response is income-shifting and reporting-form changes rather
+  than real labour-supply expansion. The discriminating test is the magnitude
+  of the top-1 share level shift between 1981 and 1986 against the OECD
+  contemporaneous control trajectory.
+notes: >
+  Tax-inequality candidate from swarm-S6 batch 1. Distinct from the existing
+  growth/reagan_tax_cuts_growth_effect spec (which targets output) and from
+  TCJA/2017. Outcome here is distributional, not growth.
+prior_confidence: 0.7
+disclosure: >
+  Author prior accepts that the top-1 share rose post-1981, but is agnostic on
+  whether the mechanism is real elasticity or reporting/income-shifting; the
+  ETI literature post-Goolsbee/Saez generally attributes most of the post-1981
+  bump to shifting between corporate and personal forms.
+falsification:
+  rule: >
+    SUPPORTED if the US top-1 pre-tax share rises by at least 2 percentage
+    points 1981-1986 AND the difference-in-differences against the OECD
+    sample mean is positive at p<0.10. REFUTED if the US top-1 share fails
+    to rise by 1 percentage point over the window or if the DiD coefficient
+    is negative at p<0.10.
+  test: >
+    OECD panel DiD around 1981-1986, US treated, OECD others control.
+    Outcome top-1 pre-tax share. Country + year FE, country-clustered SEs.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, CAN, JPN, AUS, NLD, SWE, NOR, DNK, FIN]
+  period: [1975, 1990]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID top-1 share"
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: erta_1981_us_post
+      source: "constructed: indicator = 1 for USA, year >= 1982"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna DiD with US treated 1982 onward against OECD control
+    pool. Outcome top-1 pre-tax share. Robustness with synth_did and event
+    study around 1981 break.
+intervention_channel: fiscal
+scope:
+  period: [1981, 1990]
+  countries: [USA, OECD]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [reagan_tax_cuts_1981, erta_1981, top_marginal_rate_cut]

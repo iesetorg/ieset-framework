@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financial_boe_independence_1997_macroprudential_2013
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  The Bank of England's operational independence (May 1997, instrument-independence
+  on monetary policy) and its post-GFC macroprudential remit (Financial Policy
+  Committee created April 2013 under the Bank of England Act 2013) are associated
+  with (a) lower realised UK CPI-inflation volatility 1997-2008 vs 1985-1997, (b)
+  flatter UK credit-cycle amplitude 2014-2022 vs 2000-2007, and (c) lower exchange-
+  rate-passthrough volatility post-1997 vs pre-1997. The hypothesis is tested as a
+  pre/post comparison on three pre-registered metrics; supports if 2 of 3 metrics
+  show statistically significant improvement.
+evidence_type: associational
+sample:
+  countries: [GBR]
+  period: [1985, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: cpi_inflation_volatility
+      source: "boe:CPI_UK; world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: rolling_std_yoy_5y
+    - name: household_credit_growth_volatility
+      source: "boe:LPMAUYM; bis:WS_TC"
+      transformation: rolling_std_yoy_5y
+    - name: gbp_eer_passthrough_to_cpi
+      source: "boe:XUDLBK67; bis:WS_EER"
+      transformation: regression_coef_xr_to_cpi
+  treatment:
+    - name: boe_independence_1997
+      source: "constructed: 1997-05-06 Bank of England operational-independence date"
+      transformation: event_date
+    - name: fpc_macroprudential_2013
+      source: "constructed: 2013-04-01 Financial Policy Committee statutory creation"
+      transformation: event_date
+  controls:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: yoy_pct
+    - name: bank_of_england_policy_rate
+      source: "boe:IUDBEDR; fred:BOERUKM"
+      transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >
+  Operational independence and macroprudential remit are institutional / regulatory
+  reforms that change the policy-decision architecture without directly choosing a
+  policy instrument level.
+estimator:
+  template: descriptive
+  notes: >
+    Pre/post comparison on three metrics: CPI volatility (5y rolling std) 1985-1996
+    vs 1998-2008; credit-cycle amplitude (5y rolling std of credit-growth) 2000-2007
+    vs 2014-2022; and ER-passthrough coefficient pre-1997 vs post-1997. Robustness:
+    rolling-window estimation; structural-break tests at 1997 and 2013.
+falsification:
+  rule: >
+    SUPPORTED if 2 of 3 metrics show post-period values lower than pre-period values
+    by at least 25% in magnitude, with t-test p < 0.10. PARTIAL if 1 of 3 meets
+    criterion. REFUTED if 0 of 3 meets criterion or any metric shows post-period
+    values higher by >= 25%.
+  test: pre_post_comparison_three_metrics
+  threshold: ">=2 of 3 metrics with post < pre by 25% at p<0.10"
+prior_confidence: 0.7
+disclosure: >
+  BoE-independence-and-macropru track record is contested. Author market-liberal
+  prior treats institutional independence as a stabilising reform but acknowledges
+  the post-2008 financial-stability remit blurs the boundary between monetary and
+  prudential policy.
+steelman: hypotheses/steelman/financial_boe_independence_1997_macroprudential_2013.md
+scope:
+  period: [1985, 2024]
+  countries: [GBR]
+  outcome_dim: [monetary_policy, financial_crisis, institutional_quality]
+  policy_family: [monetary_policy, regulation, institutional_reform]
+  treatment_tags: [boe_independence_1997, fpc_macroprudential_2013, bank_of_england_act_1998_2013]

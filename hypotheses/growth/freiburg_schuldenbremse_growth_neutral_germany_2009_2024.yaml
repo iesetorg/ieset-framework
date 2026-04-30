@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: freiburg_schuldenbremse_growth_neutral_germany_2009_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Germany's Schuldenbremse (constitutional debt brake adopted 2009 and
+  binding on the federation from 2016) did not produce a sustained
+  growth or investment collapse over 2010-2019 (pre-COVID) at the
+  single-country time-series level. Specifically, average annualised
+  real GDP-per-capita growth and gross fixed capital formation share
+  of GDP in the 2010-2019 binding-rule window are not materially below
+  the 2000-2008 pre-rule baseline, contrary to the strong-Keynesian
+  prediction that constitutional fiscal restriction in a large open
+  economy produces a sustained recessionary drag. This is a within-
+  country descriptive test framed as a counter-prediction to the
+  "austerity = recession" reading at the German national-accounts
+  scale.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DEU]
+  period: [2000, 2019]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2009 (peak GFC contraction; not representative of either pre or post regime)"
+    - "exclude post-2019 (COVID + 2020-2022 debt-brake suspension distort the trajectory)"
+
+variables:
+  outcome:
+    - name: log_real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: gross_fixed_capital_formation_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+    - name: gen_govt_balance_pct_gdp
+      source: "imf:GGXCNL_NGDP"
+      transformation: level
+  treatment:
+    - name: post_schuldenbremse_indicator
+      source: "constructed: indicator = 1 for 2010-2019, 0 for 2000-2008"
+      transformation: indicator
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Schuldenbremse is a constitutional fiscal rule restricting structural
+  deficits. The intervention channel is fiscal per invariant 4. Spec
+  tests whether this fiscal-rule regime shift produced a measurable
+  growth or investment penalty at the single-country level.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Pre-vs-post-rule mean comparison on annualised log-growth and
+    investment share. No DiD; this is a within-country single-series
+    test. Companion hypothesis debt_brake_fiscal_discipline_without_output_cost
+    runs the cross-country donor-pool design. This spec is the
+    minimal single-country counter-prediction test.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) annualised log-real-GDP-per-capita growth
+    2010-2019 minus 2000-2008 is not less than -0.005 (i.e. post-rule
+    growth is not more than 0.5pp/year below pre-rule growth), AND
+    (b) mean gross fixed capital formation share 2010-2019 minus
+    2000-2008 is not less than -2pp. REFUTED if either gap exceeds
+    those magnitudes adversely (a sustained growth or investment
+    collapse). INFORMATIVE: the cyclically-adjusted general-government
+    balance should improve (less negative) in the post-rule window
+    by at least 1pp of GDP — confirming the rule actually bound.
+  test: deu_pre_post_schuldenbremse_growth_and_investment_gap
+  threshold: >
+    PRIMARY 1: annualised_log_growth(2010-2019) - annualised_log_growth(2000-2008) >= -0.005
+    PRIMARY 2: mean(GFCF_share, 2010-2019) - mean(GFCF_share, 2000-2008) >= -2.0pp
+    INFORMATIVE: mean(gen_govt_balance, 2010-2019) - mean(gen_govt_balance, 2000-2008) >= +1.0pp.
+
+prior_confidence: 0.65
+
+disclosure: >-
+  Author prior moderate (0.65). The German national-accounts series
+  show roughly flat-to-rising per-capita growth and stable investment
+  share across the 2010-2019 window, consistent with the spec's
+  prediction. Heterodox readers (post-Keynesian, MMT, Stiglitz)
+  will object that (i) the absence of a German recession reflects
+  ECB unconventional monetary policy and intra-Eurozone competitiveness
+  bleed (Germany ran the surplus, periphery ran the deficit), not
+  the debt brake's neutrality; (ii) suppressed German public
+  investment in infrastructure, defence, and digital is a hidden
+  cost the GDP series misses. Authorial framing risk: by testing
+  only top-line growth and investment-share, the spec cannot
+  distinguish "no penalty" from "penalty masked by ECB stimulus and
+  external demand." That distinction is left to the cross-country
+  donor-pool spec; this spec is the minimal within-country
+  counter-prediction.
+
+scope:
+  period: [2010, 2019]
+  countries: [DEU]
+  outcome_dim: [gdp_growth, fiscal_policy]
+  policy_family: [fiscal_policy, institutional_reform]
+  treatment_tags: [schuldenbremse_2009, ordoliberal_fiscal_rule, freiburg_school]
+
+steelman: hypotheses/steelman/freiburg_schuldenbremse_growth_neutral_germany_2009_2024.md
+
+linked_hypotheses:
+  - debt_brake_fiscal_discipline_without_output_cost
+  - austerity_output_recovery_tradeoff
+
+notes: >
+  Companion to the existing debt_brake_fiscal_discipline_without_output_cost
+  cross-country spec. This Freiburg-framed version is single-country
+  and intentionally narrow: it tests whether the strong-Keynesian
+  prediction (constitutional fiscal restriction in a large open
+  economy produces sustained recessionary drag) survives within
+  Germany's own national accounts. Negative result on either primary
+  would be a meaningful update against the ordoliberal claim. v2
+  could decompose by federal vs Land government once a registered
+  series provides Land-level fiscal balances.

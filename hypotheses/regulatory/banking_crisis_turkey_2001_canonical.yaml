@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_turkey_2001_canonical
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Turkey's February 2001 banking crisis — exchange-rate-based stabilisation collapse,
+  TRL devaluation of >= 50% against USD, real-GDP contraction of >= 5%, large IMF
+  programme, and Banking Regulation and Supervision Agency takeover of failed banks —
+  is a canonical case of an EM exchange-rate-anchor disinflation programme failing
+  through the banking-system channel. The hypothesis is that Turkey 2001 meets the
+  canonical multi-metric checklist on at least 4 of 5 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [TUR]
+  period: [1998, 2005]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: lira_depreciation_2001
+    description: Turkish lira against USD peak-to-trough nominal depreciation
+    threshold: ">= 50% depreciation"
+    window: "2001"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal.
+  - metric_id: real_gdp_decline_2001
+    description: Turkey real GDP decline 2001 vs 2000
+    threshold: ">= 5% decline"
+    window: "2000-2002"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: imf_programme
+    description: IMF Stand-By Arrangement augmented in 2001
+    threshold: "yes/no — yes counts as breach"
+    window: "2001-2002"
+    source: "imf:SBA_TUR_2001"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: systemic_banking_crisis_coded
+    description: Laeven-Valencia banking-crisis coding 2000-2001
+    threshold: "coded yes"
+    window: "2000-2002"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: cpi_inflation_persistence
+    description: Turkey CPI inflation YoY peak post-crisis
+    threshold: ">= 60% YoY peak"
+    window: "2001-2002"
+    source: "world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH"
+    direction: supports_claim
+    independence_justification: Price-level outcome.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: peak_yoy
+prior_confidence: 0.92
+disclosure: >
+  Turkey 2001 is the standard example of a failed exchange-rate-based stabilisation;
+  pattern overdetermined.
+steelman: hypotheses/steelman/banking_crisis_turkey_2001_canonical.md
+scope:
+  period: [1998, 2005]
+  countries: [TUR]
+  outcome_dim: [financial_crisis, currency_purchasing_power, inflation]
+  policy_family: [regulation, exchange_rate_regime, monetary_policy]
+  treatment_tags: [turkey_2001, exchange_rate_stabilisation_failure, brsa_takeovers_2001]

@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: india_extra_aadhaar_upi_productivity
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  India's digital public infrastructure stack — Aadhaar (universal
+  biometric ID, 2009-2016 build-out), UPI (Unified Payments Interface
+  launched 2016), and the JAM trinity (Jan Dhan accounts + Aadhaar +
+  Mobile) — produced productivity gains visible in formal-sector
+  employment, financial-inclusion measures, and government-to-person
+  transfer leakage reduction. By 2022, account-ownership (% age 15+)
+  for IND rises to >75% from <40% in 2011, an increase exceeding the
+  EM peer panel mean (BRA, IDN, MEX, NGA, PHL, ZAF) gain by at least
+  +20 percentage points over the same window.
+
+evidence_type: associational
+
+notes: >-
+  Tests financial-inclusion channel as an observable productivity proxy.
+  Account-ownership (Findex) and digital-payment usage are the cleanest
+  observable outputs of the digital-infrastructure programme. Productivity
+  attribution is harder; the financial-inclusion test is the conservative
+  primary, with TFP-growth differential reported as informative.
+
+prior_confidence: 0.72
+
+disclosure: >-
+  Author market-liberal priors are sympathetic to digital-infrastructure
+  productivity claims. Bias risk: attributing financial-inclusion gains
+  to Aadhaar/UPI when smartphone penetration alone explains much of the
+  EM trend. Mitigation: peer-panel differential test absorbs the
+  smartphone-penetration baseline.
+
+steelman: hypotheses/steelman/india_extra_aadhaar_upi_productivity.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if account-ownership pct (age 15+,
+    Findex via WDI FX.OWN.TOTL.ZS) for IND rises by at least +35
+    percentage points 2011 to 2021, AND IND increase exceeds the EM
+    peer panel mean (BRA, IDN, MEX, NGA, PHL, ZAF) increase by at
+    least +20pp. REFUTED if IND increase is below +20pp absolute OR
+    below the peer panel mean increase.
+  test: india_jam_findex_account_ownership_differential_2011_2021
+  threshold: >-
+    PRIMARY: findex_account(IND, 2021) - findex_account(IND, 2011) >= 35 AND
+    differential vs peer-panel-mean >= 20.
+    METHOD_VALID: WDI FX.OWN.TOTL.ZS available for IND and peer pool 2011-2021.
+
+sample:
+  countries: [IND, BRA, IDN, MEX, NGA, PHL, ZAF]
+  period: [2011, 2021]
+  temporal_structure: panel
+
+scope:
+  period: [2014, 2024]
+  countries: [IND]
+  outcome_dim: [productivity, financialisation]
+  policy_family: [regulation, institutional_reform]
+  treatment_tags: [india_aadhaar, india_upi_2016, jam_trinity, digital_public_infrastructure]
+
+variables:
+  outcome:
+    - name: account_ownership_age15_pct
+      source: "world_bank_wdi:FX.OWN.TOTL.ZS"
+      transformation: level
+    - name: digital_payment_made_pct
+      source: "world_bank_wdi:FX.OWN.TOTL.PL.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+  treatment:
+    - name: post_jam_buildout_indicator
+      source: "constructed: indicator = 1 for IND, year >= 2014"
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Difference-in-differences on financial-inclusion measure with EM
+    peer pool. Findex waves: 2011, 2014, 2017, 2021.
+
+intervention_channel: institutional
+intervention_channel_justification: >-
+  Aadhaar / UPI / JAM bundle is institutional infrastructure (state
+  ID, payment rails, account universalisation) rather than a fiscal
+  or monetary intervention.
+
+linked_hypotheses:
+  - india_extra_demonetisation_2016_economic_effect
+  - india_extra_modi_era_growth_2014_2024

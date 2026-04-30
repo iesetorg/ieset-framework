@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_japan_consumption_tax_hikes
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Japan's three consumption-tax hikes (1997 3->5, 2014 5->8, 2019 8->10
+  percent) raised the disposable-income Gini coefficient by at least
+  0.3 Gini-points cumulatively relative to G7-ex-JPN comparator
+  synthetic control, with the regressivity bite partially offset by
+  simultaneous tax-rebate / cash-transfer programmes. The discriminating
+  test is the cumulative disposable-Gini gap vs synth control over
+  1996-2020.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 4.
+prior_confidence: 0.55
+disclosure: >
+  Author prior weakly accepts cumulative regressivity but is uncertain
+  whether the magnitude exceeds the offset from rebate programmes.
+falsification:
+  rule: >
+    SUPPORTED if Japanese disposable Gini cumulative deviation from G7-
+    ex-JPN synthetic over 1996-2020 exceeds +0.3 Gini-points at p<0.10.
+    REFUTED if cumulative deviation is below +0.1 Gini-point or negative
+    at p<0.10.
+  test: >
+    Synthetic-control with G7-ex-JPN donor pool, treated JPN 1997.
+evidence_type: associational
+sample:
+  countries: [JPN, USA, GBR, FRA, DEU, ITA, CAN]
+  period: [1990, 2022]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: jpn_consumption_tax_hike_1997
+      source: "constructed: indicator = 1 for JPN, year >= 1997"
+      transformation: indicator
+    - name: jpn_consumption_tax_hike_2014
+      source: "constructed: indicator = 1 for JPN, year >= 2014"
+      transformation: indicator
+    - name: jpn_consumption_tax_hike_2019
+      source: "constructed: indicator = 1 for JPN, year >= 2019"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with G7-ex-JPN donor pool. Multi-treatment
+    extension via Callaway-Sant'Anna staggered DiD as robustness.
+intervention_channel: fiscal
+scope:
+  period: [1997, 2020]
+  countries: [JPN]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [japan_consumption_tax_1997, japan_vat_2014_2019, regressive_consumption_tax]

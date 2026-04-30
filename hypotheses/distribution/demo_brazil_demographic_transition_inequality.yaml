@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_brazil_demographic_transition_inequality
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Brazil's demographic transition 1980-2023 (TFR fall from ~4.0 to ~1.6) coincides with
+  inequality decline post-2000 (Gini from ~0.60 to ~0.53). The hypothesis tests whether
+  working-age-share rise contributed to inequality decline via labour-market tightening at
+  the bottom of the wage distribution. The mechanism predicts a negative association between
+  working-age share and Gini, partially mediated by minimum-wage real-value gains.
+evidence_type: associational
+sample:
+  countries: [BRA]
+  period: [1980, 2023]
+  temporal_structure: time_series
+scope:
+  period: [1980, 2023]
+  countries: [BRA]
+  outcome_dim: [poverty_inequality, demographics_migration]
+  policy_family: [labour_market]
+  treatment_tags: [brazil_demographic_transition, latin_inequality_decline]
+variables:
+  outcome:
+    - name: gini_disposable_income
+      source: world_bank_wdi:SI.POV.GINI
+      transformation: level
+  treatment:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+  decomposition_channels:
+    - name: real_minimum_wage
+      source: ilostat:MIN_2WAP_NOC_RT
+      transformation: log
+    - name: lfp_total
+      source: world_bank_wdi:SL.TLF.CACT.ZS
+      transformation: level
+  controls:
+    - name: labour_productivity
+      source: pwt:rgdpo_per_emp
+      transformation: log
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+estimator:
+  template: panel_fe_decomposition
+  notes: >
+    Brazil time series, decomposition of Gini change into demographic, minimum-wage, and
+    productivity channels; report fraction of post-2000 Gini decline attributable to
+    demographic vs minimum-wage policy contributions.
+falsification:
+  rule: >-
+    SUPPORTED if working-age-share coefficient is negative on Gini at p<0.10 and demographic
+    channel accounts for at least 15% of post-2000 Gini decline. REFUTED if working-age
+    share is wrong-signed, insignificant, or attributable share < 5%.
+  test: time_series_brazil_demographic_inequality_decomp
+  threshold: "coef_wap < 0 AND p < 0.10 AND demographic_share_of_gini_decline >= 0.15"
+prior_confidence: 0.45
+disclosure: >-
+  Brazilian inequality decline is overdetermined (Bolsa Familia, real minimum-wage gains,
+  commodity boom, education expansion). Demographic share is likely small; this spec
+  documents whether it shows up at all.
+steelman: hypotheses/steelman/demo_brazil_demographic_transition_inequality.md

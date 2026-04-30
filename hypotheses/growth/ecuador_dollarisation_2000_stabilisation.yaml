@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ecuador_dollarisation_2000_stabilisation
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  Ecuador's January 2000 unilateral dollarisation (in the wake of the
+  1998-1999 banking and currency crisis) produced a permanent break
+  in the inflation series and a measurable stabilisation of macro
+  outcomes relative to a Latin American non-dollarised peer pool over
+  the subsequent two decades. The pre-registered claim is (a) cpi
+  inflation fell from above 90% (2000) to single digits by 2003 and
+  remained below 5% mean annualised through 2019, AND (b) cumulative
+  log GDP per capita 2000-2019 exceeds the LATAM 25th percentile.
+  The mechanism is the imported nominal anchor: the central bank
+  cannot finance fiscal deficits via inflation tax once domestic
+  currency is abandoned. The hypothesis tests dollarisation as a
+  successful nominal-anchor stabilisation rather than as a
+  growth-enhancing structural reform.
+
+evidence_type: causal
+
+sample:
+  countries: [ECU, PER, COL, BOL, BRA, ARG, MEX]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1995, 2024]
+  countries: [ECU, PER, COL, BOL, BRA, ARG, MEX]
+  outcome_dim: [inflation, gdp_growth, currency_purchasing_power]
+  policy_family: [monetary_policy, exchange_rate_regime]
+  treatment_tags: [ecuador_dollarisation_2000]
+
+variables:
+  outcome:
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: fiscal_balance_share_gdp
+      source: imf:GGXCNL_NGDP
+      transformation: level
+  treatment:
+    - name: dollarisation_indicator
+      source: "constructed: binary = 1 for ECU from 2000-01 onward"
+      transformation: binary
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  Dollarisation is a pure exchange-rate-regime / monetary intervention
+  imposing an external nominal anchor.
+
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with ECU treated from 2000, LATAM non-dollarised
+    peers as donor pool. Secondary: event study around January 2000
+    on inflation and exchange-rate pass-through.
+
+falsification:
+  rule: >
+    Not supported if (a) mean cpi_inflation_yoy(ECU, 2003-2019) > 5%,
+    OR (b) cumulative log_gdp_pc 2000-2019 (ECU) is below the LATAM
+    25th percentile, OR (c) the inflation break around January 2000
+    is not statistically distinguishable from zero in the event-study
+    spec.
+  test: synth_did_plus_event_study_inflation_break
+  threshold: >
+    mean_cpi_inflation_yoy(ECU, 2003-2019) <= 5
+    AND cumulative_log_gdp_pc(ECU, 2000-2019) >= LATAM_25th_percentile
+    AND event_study_inflation_break(ECU, 2000-01) significant at p < 0.05
+
+prior_confidence: 0.72
+
+disclosure: >
+  Author macro prior is that imported nominal anchors stabilise
+  inflation but do not necessarily improve growth. Pre-registered
+  separation of inflation success from growth success.
+
+steelman: hypotheses/steelman/ecuador_dollarisation_2000_stabilisation.md
+
+linked_hypotheses:
+  - ecuador_correa_default_2008
+
+notes: >
+  Tests dollarisation as nominal-anchor success without claiming
+  growth effects.

@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_italy_spain_demographic_stagnation
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Italy and Spain 1995-2023 exhibit a coupled demographic-growth stagnation: sustained
+  sub-replacement fertility (TFR ~1.2-1.4) since the 1980s feeds into post-2008 working-age
+  contraction, which decomposes as a substantial share of the post-2008 per-capita growth
+  shortfall vs the EU-15 median. The hypothesis predicts working-age-share decline accounts
+  for at least 25% of Italy's and Spain's per-capita growth gap to the EU-15 median over
+  2008-2023.
+evidence_type: associational
+sample:
+  countries: [ITA, ESP, FRA, DEU, NLD, BEL, AUT, IRL, FIN, DNK, SWE, GRC, PRT]
+  period: [1995, 2023]
+  temporal_structure: panel
+scope:
+  period: [1995, 2023]
+  countries: [ITA, ESP]
+  outcome_dim: [gdp_growth, demographics_migration]
+  policy_family: [none]
+  treatment_tags: [italy_stagnation, spain_stagnation, southern_europe_demographics]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  decomposition_channels:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+    - name: net_migration_rate
+      source: world_bank_wdi:SM.POP.NETM
+      transformation: level
+  controls:
+    - name: gross_fixed_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE decomposition of per-capita growth on working-age share, fertility, migration,
+    and controls; report fraction of ITA/ESP per-capita-growth gap to EU-15 median
+    attributable to working-age share contribution.
+falsification:
+  rule: >-
+    SUPPORTED if working-age-share contribution accounts for >= 25% of ITA growth gap and
+    >= 25% of ESP growth gap to EU-15 median 2008-2023. REFUTED if working-age contribution
+    < 10% in either country.
+  test: panel_fe_decomp_southern_europe_demographics
+  threshold: "wap_share_of_growth_gap_ITA >= 0.25 AND wap_share_of_growth_gap_ESP >= 0.25"
+prior_confidence: 0.65
+disclosure: >-
+  ITA/ESP stagnation is overdetermined (financial-sector legacy, productivity, governance);
+  separating demographic contribution from these is hard. Risk of overstating demographic
+  channel.
+steelman: hypotheses/steelman/demo_italy_spain_demographic_stagnation.md

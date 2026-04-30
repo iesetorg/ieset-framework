@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: lucas_critique_pre_post_volcker_phillips_curve_shift
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  The estimated reduced-form parameters of the US Phillips curve (slope
+  on unemployment-NAIRU gap; coefficient on lagged inflation) shifted
+  significantly between the pre-Volcker (1960Q1-1979Q3) and post-Volcker
+  (1985Q1-2019Q4) regimes. The pre-registered prediction is that the
+  Phillips slope flattened in absolute magnitude (from above 0.4 to
+  below 0.2) AND the lagged-inflation coefficient fell (from above 0.85
+  to below 0.6). The hypothesis is the empirical embodiment of Lucas's
+  (1976) critique: when monetary regime shifts, agents re-optimise
+  expectation formation, and the reduced-form Phillips parameters that
+  appear stable within a regime are not stable across regimes.
+
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [1960, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop transition window 1979Q4-1984Q4 from primary sub-sample comparison"
+    - "drop 2020Q1-2021Q4 COVID window from primary; report effect including/excluding"
+
+scope:
+  period: [1960, 2024]
+  countries: [USA]
+  outcome_dim: [inflation, employment_labour, monetary_policy]
+  policy_family: [monetary_policy]
+  treatment_tags: [lucas_critique_1976, volcker_disinflation_1979, regime_dependent_phillips, expectations_reanchoring]
+
+variables:
+  outcome:
+    - name: cpi_inflation_quarterly
+      source: "fred:CPIAUCSL"
+      transformation: log_diff_qoq_annualised
+    - name: phillips_slope_estimate
+      source: "derived:phillips_slope_rolling_window"
+      transformation: rolling_60q_ols_coefficient
+      notes: "Rolling 60-quarter OLS estimate of the slope on unemployment-NAIRU gap in a Phillips regression with controls for inflation expectations and lagged inflation."
+  treatment:
+    - name: post_volcker_regime_indicator
+      source: "derived:volcker_regime_break_1985Q1"
+      transformation: indicator
+    - name: unemployment_minus_nairu_gap
+      source: "fred:UNRATE; fred:NROU"
+      transformation: difference
+    - name: lagged_cpi_inflation
+      source: "fred:CPIAUCSL"
+      transformation: lag_4q_log_diff_yoy
+  controls:
+    - name: oil_price_change
+      source: "fred:WTISPLC"
+      transformation: log_diff_qoq
+    - name: import_price_change
+      source: "fred:IR"
+      transformation: log_diff_qoq
+    - name: ten_year_inflation_expectations
+      source: "fred:T10YIE"
+      transformation: level
+      notes: "Available post-2003 (TIPS); used for late-period robustness."
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  The treatment (regime change) is purely monetary: Volcker's 1979
+  disinflation announcement and 1981-82 implementation are a credibility-
+  driven shift in monetary stance.
+
+estimator:
+  template: panel_fe
+  fixed_effects: []
+  clustering: newey_west_4_lags
+  notes: >
+    Two pre-registered tests. Test 1: estimate Phillips equations
+    separately on 1960Q1-1979Q3 and 1985Q1-2019Q4 sub-samples with
+    identical specifications (lagged inflation, unemployment gap,
+    oil shocks, import shocks); compare slope and lagged-inflation
+    coefficients with bootstrap CIs and Wald test of equality. Test 2:
+    Bai-Perron multiple-break test on rolling 60Q Phillips slope estimate
+    1960-2024. Pre-registered prediction: at least one structural break
+    detected in the 1979-1984 window. Robustness: Cogley-Sargent (2005)
+    Bayesian time-varying-parameter VAR replication.
+
+falsification:
+  rule: >
+    Not supported if (a) the pre-Volcker Phillips slope is below 0.3
+    in absolute magnitude, OR (b) the post-Volcker slope is above
+    0.25 in absolute magnitude, OR (c) the Wald test of equality of
+    slopes does not reject at p<0.05, OR (d) the Bai-Perron break
+    test fails to detect a break in 1979-1984. A neo-Keynesian
+    "stable Phillips curve" reading wins cleanly if Wald test fails
+    to reject equality across regimes. A pure-supply-shock reading
+    wins if including richer oil and import controls eliminates the
+    coefficient differences.
+  test: subsample_phillips_estimation_with_break_test
+  threshold: >
+    pre_volcker_slope >= 0.4 in absolute magnitude
+    AND post_volcker_slope <= 0.2 in absolute magnitude
+    AND Wald test of slope equality rejects at p<0.05
+    AND Bai-Perron break detected in [1979Q4, 1984Q4]
+    AND lagged-inflation coefficient: pre-Volcker >= 0.85, post-Volcker <= 0.6
+
+prior_confidence: 0.7
+
+disclosure: >-
+  The Lucas critique is one of the most influential propositions in
+  macro and is explicitly Chicago / new-classical canon. Heterodox /
+  post-Keynesian readers grant the descriptive Phillips-curve shift
+  but interpret it differently: institutional changes (decline of
+  COLAs, decline of indexed wage contracts, decline of union density)
+  drove the post-1985 flattening, and Volcker credibility / expectations
+  re-anchoring is correlation rather than causation. Author's market-
+  liberal priors lean toward the Lucas reading; the falsification rule
+  on (c) (Wald-test rejection) and (d) (Bai-Perron break in 1979-1984)
+  is structured so an institutional-change reading can register a
+  partial victory if the break is detected later (1990s rather than
+  early 1980s) or if the flattening is gradual rather than discontinuous.
+
+steelman: hypotheses/steelman/lucas_critique_pre_post_volcker_phillips_curve_shift.md
+
+linked_hypotheses:
+  - lucas_expectations_anchoring_post_volcker_us_inflation_persistence
+  - friedman_natural_rate_long_run_phillips_vertical_us
+  - phillips_curve_flattening_post_1990
+  - volcker_disinflation_output_cost_magnitude
+
+notes: >
+  Lucas (1976 Carnegie-Rochester) is the foundational reference; Cogley-
+  Sargent (2005), Stock-Watson (2007), Ball-Mazumder (2011) on Phillips
+  curve flattening are the primary modern empirics. The hypothesis is
+  conceptually adjacent to lucas_expectations_anchoring_post_volcker but
+  tests a different parameter (Phillips slope and lagged-inflation
+  coefficient, vs AR persistence in inflation). Both should move
+  together if the canonical Lucas-Volcker story is correct.

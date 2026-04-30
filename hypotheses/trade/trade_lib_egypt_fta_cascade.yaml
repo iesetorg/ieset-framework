@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_egypt_fta_cascade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Egypt's FTA cascade (EU Association Agreement 2004, Agadir
+  Agreement 2007, COMESA Free Trade Area 1998 with full
+  implementation 2009, US Qualifying Industrial Zones 2004 enabling
+  duty-free apparel exports to the US under Israeli content rules)
+  raised Egyptian trade-openness modestly over 2000-2010 before the
+  2011 revolution and subsequent macroeconomic instability eroded
+  the gains. The descriptive claim is a positive 2000-2010
+  trajectory with stagnation or reversal post-2011.
+
+evidence_type: descriptive
+
+sample:
+  countries: [EGY, MAR, TUN, JOR, TUR]
+  period: [1995, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report sensitivity for EGY 2011-2014 (revolutionary period instability)"
+
+scope:
+  period: [1995, 2019]
+  countries: [EGY]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [egypt_eu_association_2004, egypt_qualifying_industrial_zones, agadir_agreement, comesa_egypt]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  FTA cascade — regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. Reports EGY trade-openness pre-FTA
+    cascade (1995-1999), peak (2007-2010), and post-revolution
+    (2015-2019) means.
+
+falsification:
+  rule: >
+    SUPPORTED if (a) EGY trade-openness rose by >=5 pp from 1995-
+    1999 mean to 2007-2010 mean, AND (b) 2015-2019 mean is below
+    or close to the 2007-2010 peak (showing post-revolution
+    stagnation/reversal). REFUTED if the 2007-2010 peak did not
+    materialise.
+  test: descriptive_egypt_fta_cascade_pre_post_revolution
+  threshold: >
+    PRIMARY: openness_change(1995-99 -> 2007-10) >= +5 pp AND
+    openness(2015-19) <= openness(2007-10) + 2 pp.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderate-high (0.7). The Egyptian QIZ-driven apparel
+  export boom is documented (Hoekman-Sekkat 2009). The
+  post-2011 reversal is well-known. Heterodox readers will note
+  that Egypt's macro instability (currency-peg shocks 2003, 2016,
+  2022, IMF programmes) contributes more to trade-share variation
+  than FTA effects, and that the FTAs were oversold politically.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+  - trade_lib_morocco_eu_us_ftas
+
+steelman: hypotheses/steelman/trade_lib_egypt_fta_cascade.md

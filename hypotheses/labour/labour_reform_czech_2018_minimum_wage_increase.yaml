@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_czech_2018_minimum_wage_increase
+version: 1
+status: candidate
+topic: labour
+claim: >
+  The Czech Republic's 2017-2019 staged minimum-wage rises
+  (CZK 11,000/month 2017, 12,200 in 2018, 13,350 in 2019:
+  approximately +21% nominal cumulative) did not produce a
+  measurable employment-rate decline relative to a synthetic
+  control of Visegrad peers, while raising bottom-decile real
+  wages by at least 12% by 2020.
+notes: >
+  Treatment is the cumulative 2017-2019 stage rises. Czech
+  case is informative because the labour market was
+  exceptionally tight (unemployment <3%), so disemployment
+  predictions face an unusually weak slack channel. Donor
+  pool of Visegrad peers absorbs common labour-market
+  tightness.
+prior_confidence: 0.6
+disclosure: >-
+  Author is sympathetic to modest minimum-wage rises being
+  employment-neutral in tight labour markets. The Czech case
+  is a strong test because the floor was rising into a
+  binding range relative to the median while unemployment
+  was at historic lows.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Czech employment-rate is
+    not statistically more negative than -0.5 pp at p<0.10
+    AND bottom-decile real-wage gap > +12% by 2020. REFUTED
+    if employment-rate gap < -1.5 pp at p<0.10.
+  test: >
+    Synth-DiD on Czech employment rate and bottom-decile
+    real wage 2017-2020 vs Visegrad donor pool, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [CZE, POL, HUN, SVK, ROU, SVN, AUT]
+  period: [2010, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2020-2021 COVID window
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: bottom_decile_real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: czech_minimum_wage_2017_2019
+      source: "constructed: cumulative indicator 2017-Q1 / 2018-Q1 / 2019-Q1 stage rises"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2017, 2020]
+  countries: [CZE]
+  outcome_dim: [employment_labour, wage_stagnation]
+  policy_family: [labour_market]
+  treatment_tags: [czech_minimum_wage_2018]
+steelman: hypotheses/steelman/labour_reform_czech_2018_minimum_wage_increase.md

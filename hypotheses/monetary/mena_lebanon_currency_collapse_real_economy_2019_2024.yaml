@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_lebanon_currency_collapse_real_economy_2019_2024
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  Lebanon's October-2019-onwards economic collapse (banking-sector freeze, BdL multi-rate
+  regime, lira hyperinflation, GDP contraction, dollarisation reversal) produced one of
+  the largest real-economy contractions of the 21st century, with World Bank estimating
+  GDP shrinking ~58% peak-to-trough. The pre-registered claim is that, treating Lebanon
+  as a single canonical-case multi-metric instance, at least 5 of 6 pre-registered extreme
+  thresholds are met: (a) cumulative real-GDP-pc decline >40% from 2018 peak, (b) lira
+  cumulative depreciation >95% in unofficial market, (c) CPI inflation >100% YoY at peak,
+  (d) banking-sector total assets in real terms decline >70%, (e) emigration outflow >10%
+  of pre-crisis population, (f) electricity supply hours per day fall below 4. The null
+  counter-claim is that the cumulative effect is large but not at the canonical-extreme
+  thresholds (e.g. emigration figure depends on unverified estimates).
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - LBN
+  period:
+  - 2010
+  - 2024
+  temporal_structure: time_series
+scope:
+  period:
+  - 2010
+  - 2024
+  countries:
+  - LBN
+  outcome_dim:
+  - gdp_growth
+  - inflation
+  - currency_purchasing_power
+  - financial_crisis
+  - demographics_migration
+  - energy
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  - exchange_rate_regime
+  treatment_tags:
+  - lebanon_october_2019_collapse
+  - lebanon_bdl_multirate_regime
+canonical_metrics:
+- metric_id: real_gdp_pc_decline
+  description: Cumulative real GDP per capita decline from 2018 peak.
+  threshold: '>40% decline'
+  window: 2018-2023
+  source: world_bank_wdi:NY.GDP.PCAP.KD; imf:NGDPRPC
+  direction: supports_claim
+  independence_justification: National-accounts series, IMF/WB.
+- metric_id: lira_unofficial_depreciation
+  description: Lebanese lira unofficial-market depreciation vs USD from 2019Q3.
+  threshold: '>95% depreciation'
+  window: 2019Q3-2023Q4
+  source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+  data_quality_flag: BdL maintains multiple official rates; the unofficial parallel rate is the binding measure. Use lirarate.org or BdL Sayrafa as proxies; document source.
+  direction: supports_claim
+  independence_justification: FX-market data, distinct from national-accounts and price data.
+- metric_id: cpi_inflation_peak
+  description: Peak year-over-year CPI inflation.
+  threshold: '>100% YoY at peak'
+  window: 2020-2023
+  source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+  direction: supports_claim
+  independence_justification: Price-survey data, methodologically independent of FX market.
+- metric_id: banking_sector_real_assets
+  description: Banking-sector total assets in real (FX-adjusted) terms.
+  threshold: '>70% decline'
+  window: 2019Q3-2023Q4
+  source: imf:FOSAOA_USD; world_bank_wdi:FS.AST.DOMS.GD.ZS
+  data_quality_flag: BdL reporting reliability degraded post-2019; use IMF Article IV staff estimates.
+  direction: supports_claim
+  independence_justification: Banking-sector balance-sheet data, independent of FX or CPI.
+- metric_id: emigration_outflow_share
+  description: Net emigration as share of pre-crisis (2018) population.
+  threshold: '>10% of population'
+  window: 2019-2024
+  source: world_bank_wdi:SM.POP.NETM; undp_hdi:Migration
+  data_quality_flag: Lebanese emigration estimates vary widely; use UN-DESA migration stock data and World Bank net-migration as triangulation.
+  direction: supports_claim
+  independence_justification: Demographic data, independent of all monetary/financial channels.
+- metric_id: electricity_supply_hours
+  description: Average daily grid-electricity supply hours.
+  threshold: '<4 hours per day'
+  window: 2021-2023
+  source: world_bank_wdi:EG.ELC.ACCS.ZS; owid:electricity-access
+  data_quality_flag: World Bank EG.ELC reflects access not duration; use IMF Article IV / EDL annual reports for hours-per-day measurement.
+  direction: supports_claim
+  independence_justification: Energy-sector physical-infrastructure measurement, fully independent of monetary channels.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 5
+  refute_threshold: 2
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; imf:NGDPRPC
+    transformation: log_level
+prior_confidence: 0.7
+disclosure: >-
+  Author's prior is strongly that the Lebanon collapse meets canonical-extreme
+  thresholds. The case is designed as orthogonal to the existing
+  banking_crisis_lebanon_2019_2024_collapse hypothesis (which tests financial-sector
+  specific outcomes); this hypothesis tests the broader real-economy multi-metric
+  pattern. Prior 0.70 reflects high confidence on at least 5 of 6 thresholds being
+  met, with the emigration metric being the most uncertain due to measurement.
+conflict_disclosure: No Lebanese asset exposure or affiliations.
+steelman: hypotheses/steelman/mena_lebanon_currency_collapse_real_economy_2019_2024.md
+linked_hypotheses:
+- banking_crisis_lebanon_2019_2024_collapse
+notes: >-
+  Designed as multi-metric canonical-case rather than synthetic control because no
+  comparable peer can match Lebanon's pre-2019 banking-anchored fixed-rate macro
+  regime. The 5-of-6 threshold permits one metric to fall short while still
+  classifying as supported.

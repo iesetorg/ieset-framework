@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: working_time_reduction_employment_neutral_oecd
+version: 1
+status: candidate
+topic: labour
+
+claim: >
+  Across OECD economies 1980-2022, country-year reductions in
+  average annual hours worked per employed person are NOT
+  proportionally associated with declines in the
+  employment-to-population ratio. The implied employment
+  elasticity with respect to hours is small (|epsilon| < 0.5),
+  refuting the lump-of-labour-fallacy critique that
+  shorter-hours policy must shed jobs proportionally.
+
+evidence_type: associational
+
+sample:
+  countries: [FRA, DEU, NLD, BEL, AUT, SWE, NOR, DNK, FIN, ISL, GBR, IRL, ITA, ESP, PRT, GRC, CHE, USA, CAN, JPN, KOR, AUS, NZL]
+  period: [1980, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing PWT avh OR ILOSTAT employment-to-population ratio"
+    - "drop 2008-2010 GFC trough years for sensitivity (reported with and without)"
+    - "drop 2020-2021 COVID years"
+
+variables:
+  outcome:
+    - name: log_employment_to_population_ratio
+      source: "ilostat:employment_to_population_ratio"
+      transformation: log
+    - name: log_unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: log
+    - name: log_real_gdp_per_employed
+      source: "pwt:rgdpo; pwt:emp"
+      transformation: log_ratio
+      notes: "Productivity cross-check -- if hours fell and output/employed rose, the policy compensated through productivity, not employment."
+  treatment:
+    - name: log_avg_annual_hours_worked
+      source: "pwt:avh"
+      transformation: log
+      notes: "Primary treatment variable. Country-year variation in hours worked per employed person."
+    - name: french_35_hour_indicator
+      source: "constructed: 1 for FRA 2000+ (Aubry laws). Used in the named-policy event-study spec."
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel regression of
+    log(employment_to_population_ratio) on log(avg_annual_hours)
+    with country and year fixed effects, clustered on country.
+    The estimated coefficient is the within-country elasticity of
+    employment to hours; the lump-of-labour prediction is
+    coefficient = -1 (each hour cut translates to a proportional
+    employment decline only if the wage bill is fully redistributed
+    across new hires). The hypothesis predicts |coefficient| < 0.5.
+    Sensitivity specifications: (i) drop GFC + COVID windows, (ii)
+    add OECD lagged GDP-growth as control, (iii) FRA-only
+    event-study around 2000 35-hour week, (iv) Iceland 2015-2019
+    4-day-week trial.
+
+falsification:
+  rule: >
+    SUPPORTED iff the estimated within-country elasticity of
+    log(emp/pop) on log(hours) is in (-0.5, +0.5) at p<0.10 in the
+    primary specification AND the FRA event-study around 2000
+    shows no negative deviation in employment trajectory worse than
+    -2% at 5-year horizon. REFUTED if the elasticity is < -0.7
+    (close to lump-of-labour prediction of -1) at p<0.10 OR if the
+    FRA event-study shows a negative employment deviation > 5% at
+    5-year horizon. PARTIAL between these. METHOD_VALID requires
+    PWT avh + ILOSTAT employment-to-population on disk for >= 18
+    of 23 panel countries 1990-2022.
+  test: oecd_panel_employment_elasticity_to_hours_1980_2022
+  threshold: >-
+    PRIMARY: |beta_log_hours_on_log_emp_pop_ratio| < 0.5 at p<0.10
+    AND FRA 35-hour event-study employment deviation worse than -2%
+    at 5y NOT realised.
+
+prior_confidence: 0.65
+
+disclosure: >-
+  Degrowth authorial framing: the spec is oriented to find a small
+  elasticity by including OECD-wide variation that washes out
+  France's contested 2000-2002 unemployment behaviour, and by
+  using employment-to-population (which moves with participation)
+  rather than employment levels. A market-liberal critique would
+  note: (i) the lump-of-labour prediction is more cleanly tested on
+  named-policy events (FRA 2000, ISL 2015-2019, KOR 2018 cap), not
+  generic country-year hours variation which is dominated by
+  composition effects (rise of part-time work, services-share
+  growth, women's labour-force entry); (ii) the |0.5| threshold is
+  permissive -- "employment-neutral" in the strong claim should be
+  |beta| < 0.1 rather than 0.5. The pre-registered FRA event-study
+  arm partly addresses (i) by isolating the named treatment. The
+  permissive threshold is acknowledged framing risk.
+
+steelman: hypotheses/steelman/working_time_reduction_employment_neutral_oecd.md
+
+scope:
+  period: [1980, 2022]
+  countries: [OECD]
+  outcome_dim: [employment_labour, productivity]
+  policy_family: [labour_market]
+  treatment_tags: [french_35_hour_week_2000, iceland_four_day_week_trial_2015, korea_52_hour_cap_2018]
+
+linked_hypotheses:
+  - reduced_working_time_output_employment
+
+notes: >
+  Distinct from reduced_working_time_output_employment which tests
+  only FRA 2000 + ISL 2015 event-studies on a 13-country panel.
+  This spec generalises to a 23-country OECD panel-FE elasticity
+  estimate (different identification: within-country variation
+  rather than two named treatments) and adds employment-to-
+  population as primary outcome. PWT avh + ILOSTAT emp/pop are
+  registered publishers; PWT avh coverage is good for OECD
+  1980-2019, with 2020-2022 patchy.

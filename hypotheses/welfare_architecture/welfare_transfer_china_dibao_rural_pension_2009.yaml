@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_china_dibao_rural_pension_2009
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  China's combined social-protection expansion — urban dibao (1999, expanded 2003) plus rural dibao
+  (2007 universalisation) plus rural-pension scheme NRPS (2009 launch reaching 459M+ enrollees by 2013) —
+  reduced rural extreme-poverty headcount by at least 5 percentage points within five years (2009-2014)
+  net of growth-channel effects, identified off province-staggered NRPS rollout 2009-2012 and
+  province-level dibao-spending intensity in panel-FE design.
+evidence_type: causal
+prior_confidence: 0.55
+disclosure: |
+  Author has scepticism of CHN official poverty statistics and uses multiple data sources for
+  triangulation. Hypothesis is structured to identify the social-protection channel net of broader
+  growth-channel poverty reduction; identification depends on NRPS rollout timing variation across
+  provinces.
+sample:
+  countries: [CHN]
+  period: [2000, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Tibet and Xinjiang from primary spec given non-standard administration
+  - exclude Sichuan-2008-Q2 earthquake-recovery quarter from panel
+variables:
+  outcome:
+  - name: rural_extreme_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+  - name: rural_consumption_per_capita
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: log
+  treatment:
+  - name: nrps_rollout_indicator
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: indicator
+    notes: Province-staggered NRPS launch 2009-2012; placeholder pending NBS provincial-MIS wiring.
+  - name: dibao_spending_per_rural_household
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: log
+    notes: Provincial dibao spending intensity 2003-2018; placeholder pending MoCA dibao-stat wiring.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: rural_to_urban_migration_share
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Dibao and NRPS are fiscal-channel transfer programmes; primary classification is fiscal.
+estimator:
+  template: did_callaway_santanna
+  clustering: province
+  fixed_effects: [province, year]
+  notes: |
+    Callaway-Sant'Anna staggered DiD across CHN provinces using NRPS rollout timing 2009-2012.
+    Pre-trend window 5 years, post-window 5 years. Decomposition by dibao-intensity coefficient.
+falsification:
+  rule: |
+    Refuted if the post-NRPS-rollout ATT on rural extreme-poverty at 5-year horizon is below minus-5pp,
+    OR if dibao-intensity coefficient is non-negative on poverty, OR if Wald test of joint significance
+    has p > 0.10.
+  test: did_cs_5yr_combined_dibao_nrps_rural_poverty
+  threshold: combined_att <= -5pp at 5yr AND dibao_coef < 0 AND wald_p < 0.10
+scope:
+  period: [2009, 2018]
+  countries: [CHN]
+  outcome_dim: [poverty_inequality, welfare_state]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [china_dibao_rural_2007, china_nrps_2009, hu_jintao_government, harmonious_society_program]
+steelman: hypotheses/steelman/welfare_transfer_china_dibao_rural_pension_2009.md

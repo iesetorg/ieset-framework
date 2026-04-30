@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_iceland_2008_canonical_multimetric
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The 2008 Icelandic banking collapse (failure of Glitnir, Landsbanki, and Kaupthing
+  in October 2008) is a canonical case of a small-open-economy systemic banking crisis
+  driven by external-funded balance-sheet expansion exceeding any plausible lender-of-
+  last-resort capacity. The hypothesis is that the Iceland 2008 episode meets the
+  canonical-case checklist with extreme metric values: at least 5 of 6 pre-registered
+  metrics (bank-assets-to-GDP, ISK depreciation, real-GDP contraction, unemployment
+  rise, IMF programme entry, sovereign-yield spike) hit thresholds well above the
+  cross-country GFC norm.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [ISL]
+  period: [2003, 2015]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: bank_assets_to_gdp_peak
+    description: Iceland's three big banks' consolidated assets relative to GDP at 2007 peak
+    threshold: ">= 700% of GDP"
+    window: "2007-2008"
+    source: "world_bank_wdi:FB.AST.NPER.ZS; world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    direction: supports_claim
+    independence_justification: Bank-assets aggregate independent of crisis-onset coding.
+  - metric_id: krona_depreciation_2008_2009
+    description: ISK against EUR / USD trough vs 2007 average
+    threshold: ">= 50% nominal depreciation peak-to-trough"
+    window: "2007-2009"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal independent of bank-balance-sheet data.
+  - metric_id: real_gdp_peak_to_trough
+    description: Iceland real GDP peak-to-trough decline
+    threshold: ">= 8% peak-to-trough decline"
+    window: "2007-2011"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Real activity, independent measurement.
+  - metric_id: unemployment_rate_rise
+    description: Iceland unemployment rate rise from pre-crisis baseline to peak
+    threshold: ">= 5 pp rise from 2007 baseline"
+    window: "2008-2011"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; oecd:DSD_LFS@DF_LFS"
+    direction: supports_claim
+    independence_justification: Labour-market outcome.
+  - metric_id: imf_stand_by_arrangement_entered
+    description: IMF Stand-By Arrangement formally entered
+    threshold: "yes/no — yes counts as breach"
+    window: "2008-2010"
+    source: "imf:SBA_ICL_2008"
+    direction: supports_claim
+    independence_justification: IMF programme metadata.
+  - metric_id: sovereign_yield_spike_or_cds
+    description: Iceland sovereign 5y yield rise or CDS spike vs Bund
+    threshold: ">= 500 bp at peak"
+    window: "2008-2009"
+    source: "imf:GG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS"
+    direction: supports_claim
+    independence_justification: Sovereign credit signal, independent.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 5
+  refute_threshold: 2
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: peak_above_baseline
+prior_confidence: 0.97
+disclosure: >
+  Iceland 2008 is among the most extreme banking-crisis events on record (assets/GDP
+  ~700%). Hypothesis is mechanically near-certain to be supported; value lies in
+  pre-committing to specific thresholds.
+steelman: hypotheses/steelman/banking_crisis_iceland_2008_canonical_multimetric.md
+scope:
+  period: [2003, 2015]
+  countries: [ISL]
+  outcome_dim: [financial_crisis, financialisation, currency_purchasing_power, employment_labour]
+  policy_family: [regulation, exchange_rate_regime, monetary_policy]
+  treatment_tags: [iceland_2008, glitnir_landsbanki_kaupthing, small_open_economy_collapse]

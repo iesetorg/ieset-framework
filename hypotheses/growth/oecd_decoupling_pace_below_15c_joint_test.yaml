@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_decoupling_pace_below_15c_joint_test
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  OECD economies 2010-2023 have absolutely decoupled territorial
+  CO2 emissions from real GDP -- emissions fell while GDP rose --
+  AND the pace of that decoupling falls short of the rate
+  consistent with a 1.5C-aligned linear pathway (50% reduction
+  2019-2030, ~7%/year). The joint claim holds the absolute-
+  decoupling fact (which refutes growth-requires-emissions
+  necessity) AND the insufficient-pace finding (which refutes
+  optimistic green-growth sufficiency). Both legs must hold; the
+  spec is structured to refuse a one-leg-only verdict.
+
+evidence_type: descriptive
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHL, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, ISL, IRL, ITA, JPN, KOR, LVA, LTU, LUX, MEX, NLD, NZL, NOR, POL, PRT, SVK, SVN, ESP, SWE, CHE, TUR, GBR, USA]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing OWID territorial CO2 OR WDI real GDP"
+
+variables:
+  outcome:
+    - name: log_co2_per_capita
+      source: "owid:co-emissions-per-capita"
+      transformation: log
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: log_consumption_co2_per_capita
+      source: "owid:consumption-co2-per-capita"
+      transformation: log
+      notes: "Consumption-based cross-check on the absolute-decoupling leg."
+    - name: pace_gap_vs_15c_pct
+      source: "derived: (observed_co2_2023 / observed_co2_2019) - benchmark_15c_2023"
+      transformation: percentage_points
+      notes: "Benchmark = linear path from 1.0 in 2019 to 0.5 in 2030; benchmark_15c_2023 = 0.818."
+  treatment:
+    - name: post_paris_indicator
+      source: "constructed: 1 for years >= 2016 (Paris Agreement entry into force)"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: log_oil_price
+      source: "imf_pcps:POILAPSP"
+      transformation: log
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Joint two-leg test on the OECD-35 panel 2010-2023. Leg A
+    (absolute-decoupling fact, holds the eco-socialist /
+    PK-degrowth claim against simple green-growth sceptics):
+    population-weighted mean territorial CO2 per capita 2023 vs
+    2010 declines AND population-weighted mean real GDP per
+    capita 2023 vs 2010 rises. Leg B (insufficient-pace fact,
+    holds against optimistic green-growth advocates): mean
+    pace_gap_vs_15c is positive (i.e. observed 2023 emissions are
+    above the 1.5C-consistent linear benchmark for 2023). Country-
+    level dispersion reported (which countries are on/below pace,
+    which are not). Consumption-based cross-check is reported as
+    diagnostic; if territorial decoupled but consumption-based did
+    not, the absolute-decoupling leg is annotated PARTIAL.
+
+falsification:
+  rule: >
+    SUPPORTED iff BOTH (a) pooled OECD territorial CO2/cap 2023 /
+    2010 < 1.0 AND pooled OECD real GDP/cap 2023 / 2010 > 1.05
+    (absolute decoupling fact), AND (b) mean pace_gap_vs_15c
+    across OECD-35 in 2023 > 0.05 (>= 5 percentage points above
+    the 1.5C benchmark; pace insufficient).
+    REFUTED if (a) fails (no decoupling) OR (b) fails by more than
+    5 pp (i.e. pace_gap < -0.05; pace actually faster than
+    benchmark).
+    PARTIAL if exactly one leg holds.
+    INFORMATIVE: country-level dispersion, consumption-based cross-
+    check, sub-period decomposition.
+    METHOD_VALID: at least 28 of 35 OECD countries have both
+    endpoints on territorial CO2pc and real GDPpc; OWID
+    consumption-CO2 panel covers >= 25 OECD countries.
+  test: oecd_joint_decoupling_fact_and_pace_gap_2010_2023
+  threshold: >-
+    PRIMARY: pooled co2pc_2023 / co2pc_2010 < 1.0 AND
+    pooled gdppc_2023 / gdppc_2010 > 1.05 AND
+    mean pace_gap_vs_15c_2023 > 0.05.
+
+prior_confidence: 0.7
+
+disclosure: >-
+  Degrowth authorial framing risk: the joint test is structured to
+  hold both empirical legs the degrowth case wants (decoupling is
+  real but insufficient). A green-growth optimist would set the
+  benchmark differently -- using IPCC SSP1-1.9 fast-mitigation
+  pathway as the comparator rather than the linear 50%-by-2030
+  glide path -- and reach different verdicts on leg B. The
+  benchmark choice (linear path to 50% by 2030) is the spec's
+  contestable choice; sensitivity at SSP1-1.9 (steeper) and
+  SSP2-2.6 (gentler) reported as INFORMATIVE. Holding both legs
+  jointly is the methodological commitment the spec makes -- it
+  refuses to cherry-pick either fact in isolation. A market-liberal
+  critique would note that the spec uses territorial CO2 and the
+  consumption-based cross-check is diagnostic-only -- if the
+  "absolute decoupling" disappears under consumption-based
+  accounting, the supported verdict becomes PARTIAL.
+
+steelman: hypotheses/steelman/oecd_decoupling_pace_below_15c_joint_test.md
+
+scope:
+  period: [2010, 2023]
+  countries: [OECD]
+  outcome_dim: [energy, gdp_growth]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [paris_agreement_2015]
+
+linked_hypotheses:
+  - eu_green_deal_decoupling_pace_vs_target
+  - eu_ets_absolute_decoupling_emissions_gdp
+  - absolute_decoupling_global_material_throughput
+  - post_2008_oecd_growth_emissions_path
+
+notes: >
+  Distinct from eu_green_deal_decoupling_pace_vs_target which is
+  an EU-16 panel 2019-2023 around the Green Deal as named
+  treatment. This spec covers the broader OECD-35 panel 2010-2023
+  with no named policy treatment, joint-testing the
+  decoupling-fact and pace-shortfall on the same observation.
+  WDI + OWID inputs are on disk for OECD; consumption-CO2 OWID
+  panel coverage for non-EU OECD members (KOR, JPN, CAN, AUS,
+  USA, MEX, CHL, TUR) needs confirmation -- spec gates inconclusive
+  on the consumption-side leg if missing.

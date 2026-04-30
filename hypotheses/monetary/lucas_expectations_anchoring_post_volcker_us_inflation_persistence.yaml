@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: lucas_expectations_anchoring_post_volcker_us_inflation_persistence
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  US CPI inflation was highly persistent (first-order autocorrelation
+  at quarterly frequency above 0.85, sum of AR coefficients above 0.95)
+  during 1960-1979, and substantially less persistent (first-order
+  autocorrelation below 0.6, sum of AR coefficients below 0.8) during
+  1985-2019. The decline reflects expectations anchoring under the
+  post-1979 Volcker regime: when the central bank is credibly
+  committed to a stable inflation target, inflation shocks no longer
+  feed forward into wage-price-setting expectations, and the AR-1
+  decay of inflation toward target accelerates. The hypothesis is the
+  Lucas (1973, 1976) prediction that reduced-form inflation dynamics
+  shift when monetary regime shifts.
+
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [1960, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop transition window 1979Q4-1984Q4 (Volcker regime change in progress) from both sub-samples; report transition window separately"
+    - "drop 2020Q2-2021Q2 COVID-policy window from primary estimation; report effect with and without"
+
+scope:
+  period: [1960, 2024]
+  countries: [USA]
+  outcome_dim: [inflation, monetary_policy]
+  policy_family: [monetary_policy]
+  treatment_tags: [volcker_disinflation_1979, lucas_critique, expectations_anchoring]
+
+variables:
+  outcome:
+    - name: cpi_inflation_quarterly
+      source: "fred:CPIAUCSL"
+      transformation: log_diff_qoq_annualised
+      notes: "Headline CPI quarterly log-difference annualised. Core PCE robustness in secondary spec."
+    - name: core_pce_inflation_quarterly
+      source: "fred:PCEPILFE"
+      transformation: log_diff_qoq_annualised
+      notes: "Core PCE excluding food and energy; Fed's preferred persistence series."
+    - name: ar1_persistence_rolling_40q
+      source: "fred:CPIAUCSL"
+      transformation: rolling_ar1_coefficient_40q
+      notes: "Rolling 40-quarter AR(1) coefficient on quarterly inflation as a continuous persistence measure."
+  treatment:
+    - name: post_volcker_regime_indicator
+      source: "derived:volcker_regime_break_1985Q1"
+      transformation: indicator
+      notes: "Indicator equal to 1 from 1985Q1 onwards (post-transition Volcker regime). Pre-registered break date."
+    - name: ten_year_inflation_expectations
+      source: "fred:T10YIE"
+      transformation: level
+      notes: "10-year breakeven inflation expectations. Available only post-2003 (TIPS market); used to anchor the post-2003 sub-period."
+  controls:
+    - name: oil_price_change
+      source: "fred:WTISPLC"
+      transformation: log_diff_qoq
+      notes: "WTI oil price change; supply-shock control so persistence shift is not just absence of 1970s oil shocks."
+    - name: output_gap
+      source: "fred:GDPC1"
+      transformation: cbo_gap_filter
+      notes: "Output gap from CBO potential-output series."
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  The treatment is a monetary-regime indicator (post-Volcker
+  inflation-targeting credibility); no fiscal channel.
+
+estimator:
+  template: panel_fe
+  fixed_effects: []
+  clustering: newey_west_4_lags
+  notes: >
+    Primary spec: AR(p) regression of quarterly inflation on its own
+    lags within each sub-sample (1960Q1-1979Q3 and 1985Q1-2019Q4),
+    with sum-of-AR-coefficients (rho) reported per sub-sample. Bai-Perron
+    structural-break test on inflation persistence is a robustness
+    check; pre-registered prediction is one break in 1979-1984. Local
+    projections of inflation response to a one-SD oil shock are reported
+    pre and post Volcker; impulse response should decay faster post-1985.
+
+falsification:
+  rule: >
+    Not supported if (a) the sum-of-AR-coefficients in 1960-1979 is
+    below 0.85, or (b) the sum in 1985-2019 is above 0.85, or (c)
+    the difference between the two sums is below 0.15, or (d) the
+    Bai-Perron break test fails to detect a break in 1979-1984. A
+    Keynesian / cost-push reading wins cleanly if the persistence
+    drop is fully explained by the absence of 1970s-style oil shocks
+    in the post-1985 sample (i.e. the persistence difference disappears
+    once oil shocks are controlled for at quarterly frequency).
+  test: ar_persistence_pre_post_volcker
+  threshold: >
+    sum_of_AR_coeffs(1960-1979) >= 0.85
+    AND sum_of_AR_coeffs(1985-2019) <= 0.80
+    AND difference >= 0.15 with bootstrap p<0.05
+    AND Bai-Perron break detected in [1979Q4, 1984Q4]
+    AND oil-shock-controlled persistence difference still >= 0.10
+
+prior_confidence: 0.72
+
+disclosure: >-
+  The expectations-anchoring story is Chicago / new-classical canon
+  (Lucas 1973, Sargent 1982 ends-of-four-big-inflations, Goodfriend-King
+  2005 incredible Volcker disinflation). Heterodox readers argue (i)
+  the persistence decline is mechanical — inflation simply fell to a
+  lower mean and any series reverts faster around a stable mean; (ii)
+  the absence of 1970s oil shocks does most of the work and Volcker
+  credibility does little; (iii) the post-2021 inflation surge and slow
+  decline shows expectations were not in fact anchored. Author's
+  market-liberal priors lean toward accepting Volcker credibility as
+  the operative mechanism; the spec deliberately structures (c) and
+  (e) so a cost-push critic with quarterly oil controls has a clean
+  refutation path.
+
+steelman: hypotheses/steelman/lucas_expectations_anchoring_post_volcker_us_inflation_persistence.md
+
+linked_hypotheses:
+  - lucas_critique_pre_post_volcker_phillips_curve_shift
+  - friedman_natural_rate_long_run_phillips_vertical_us
+  - volcker_disinflation_output_cost_magnitude
+
+notes: >
+  Stock-Watson (2007) "Why has US inflation become harder to forecast?"
+  is the canonical reduced-form documentation of the persistence decline.
+  Cogley-Sargent (2005) re-derive the result in a Bayesian time-varying-
+  parameter framework. The Lucas-1976 critique is cited as the structural
+  rationale for why pre-1979 reduced-form inflation dynamics should not
+  be expected to survive the Volcker regime change.

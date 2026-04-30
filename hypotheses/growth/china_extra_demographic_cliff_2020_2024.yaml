@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_extra_demographic_cliff_2020_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  China's demographic transition — driven by the legacy of the one-child
+  policy (1980-2015), low post-relaxation fertility despite three-child
+  policy (2021), and the realisation of the working-age-population peak
+  around 2014-2015 — is now empirically visible in macro outcomes
+  2020-2024. The working-age population (15-64) declined in level for
+  the first time, total population peaked and turned negative around
+  2022, and the old-age dependency ratio rose by at least 4 percentage
+  points 2015-2024. This demographic cliff exerts a measurable drag on
+  GDP-per-worker growth that is identifiable as a structural break.
+
+evidence_type: descriptive
+
+notes: >-
+  Tests realisation of the demographic-dividend-reversal mechanism. The
+  one-child-policy long-run-growth hypothesis (demo_china_one_child_long_run_growth)
+  was a forward-looking projection; this hypothesis tests the realised
+  2020-2024 outcome. UN WPP and WDI population age-structure series
+  triangulated.
+
+prior_confidence: 0.85
+
+disclosure: >-
+  Author has high confidence the demographic cliff is observable.
+  Bias risk: attributing growth slowdown 2021-2024 to demographics
+  when property and zero-COVID also contributed. Mitigation: test
+  measures population structure directly, not growth attribution.
+
+steelman: hypotheses/steelman/china_extra_demographic_cliff_2020_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if (a) total population CHN peaks
+    in 2021 or 2022 and is lower in 2024 than peak; AND (b) old-age
+    dependency ratio rises by at least 4pp 2015 to 2024. REFUTED if
+    population is still rising in 2024 (i.e. peak not yet realised) OR
+    old-age dependency rises by less than 2pp.
+  test: china_demographic_cliff_realised_2020_2024
+  threshold: >-
+    PRIMARY: pop_total(CHN, 2024) < pop_total(CHN, 2021_or_2022) AND
+    old_age_dep_ratio(CHN, 2024) - old_age_dep_ratio(CHN, 2015) >= 4.
+    METHOD_VALID: WDI SP.POP.TOTL and SP.POP.65UP.TO.ZS available for CHN through 2024.
+
+sample:
+  countries: [CHN]
+  period: [2000, 2024]
+  temporal_structure: time_series
+
+scope:
+  period: [2015, 2024]
+  countries: [CHN]
+  outcome_dim: [gdp_growth]
+  policy_family: [none]
+  treatment_tags: [china_demographic_cliff, one_child_policy_legacy, china_population_peak_2022]
+
+variables:
+  outcome:
+    - name: total_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: level
+    - name: working_age_population_pct
+      source: "world_bank_wdi:SP.POP.1564.TO.ZS"
+      transformation: level
+    - name: old_age_dependency_ratio
+      source: "world_bank_wdi:SP.POP.DPND.OL"
+      transformation: level
+    - name: total_fertility_rate
+      source: "world_bank_wdi:SP.DYN.TFRT.IN"
+      transformation: level
+  treatment:
+    - name: post_2015_indicator
+      source: "constructed: indicator = 1 for years >= 2015 (working-age-pop peak)"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Pre-post level test on population structure. No causal identification —
+    demographic outcomes are pre-determined by 30+ year lagged fertility
+    decisions, so this is a realisation-vs-projection check.
+
+linked_hypotheses:
+  - demo_china_one_child_long_run_growth
+  - china_extra_property_bubble_bust_2020_2024
+  - demo_japan_ageing_deflation_link

@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_spain_top_rate_dynamics
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Spanish top marginal income tax rate dynamics — Zapatero 2007 cut to 43
+  percent, Rajoy 2012 hike to 52 percent, Sanchez 2021 hike to 47 percent
+  + IGF (solidarity wealth tax) 2022 — produce top-1 pre-tax income share
+  responses that are smaller in absolute magnitude than the OECD median,
+  consistent with a labour-market with relatively compressed top-decile
+  wage structure (high public-sector and family-firm capture of top
+  income). The discriminating test is the elasticity of top-1 share to
+  the top-rate change vs OECD median.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 3.
+prior_confidence: 0.55
+disclosure: >
+  Author prior weakly accepts that Spanish top-1 share is rate-inelastic
+  relative to OECD median given labour-market structure.
+falsification:
+  rule: >
+    SUPPORTED if absolute elasticity of Spanish top-1 share to top
+    marginal rate over 2005-2024 is below 0.4 AND below the OECD median
+    elasticity at p<0.10. REFUTED if elasticity exceeds 0.6 in absolute
+    value or exceeds OECD median at p<0.10.
+  test: >
+    Spain time-series + OECD comparator panel local-projections of top-1
+    share on top marginal rate change with three break events.
+evidence_type: associational
+sample:
+  countries: [ESP, FRA, DEU, ITA, GBR, USA, CAN, AUS, JPN, NLD, SWE, NOR, DNK, FIN]
+  period: [1995, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Local-projections of top-1 share on top-rate change, ESP vs OECD
+    pool. Driscoll-Kraay SEs.
+intervention_channel: fiscal
+scope:
+  period: [2005, 2024]
+  countries: [ESP]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [zapatero_rajoy_sanchez, spain_irpf_dynamics, solidarity_wealth_tax_2022]

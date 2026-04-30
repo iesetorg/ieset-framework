@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: energiewende_avoided_emissions_value_outweighs_industrial_cost
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  Germany's 2010-2024 Energiewende-driven reduction in territorial CO2
+  emissions, valued at a central social-cost-of-carbon (SCC) of
+  USD 185/tCO2 (Rennert et al. 2022), produces an avoided-damage flow
+  whose cumulative present value exceeds the cumulative industrial-
+  electricity-cost differential between Germany and a peer basket
+  (FRA, USA, SWE, NLD, BEL, ITA, ESP) over the same window. The joint
+  ledger reverses the headline industrial-cost narrative once
+  carbon damages are internalised at standard SCC values.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DEU, FRA, USA, SWE, NLD, BEL, ITA, ESP]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing EEA territorial inventory or Eurostat industrial electricity price"
+
+variables:
+  outcome:
+    - name: cumulative_avoided_co2_mt_vs_2010_baseline
+      source: "eea:greenhouse_gas_inventory"
+      transformation: cumulative_delta_vs_baseline
+      notes: "DEU territorial CO2 minus 2010 baseline, cumulated annually."
+    - name: cumulative_avoided_damage_value_usd_bn
+      source: "derived: avoided_co2_mt * SCC(185 USD/tCO2, 2020 USD); SCC central from Rennert et al. 2022 Nature."
+      transformation: present_value_2020_usd
+    - name: cumulative_industrial_electricity_cost_premium_usd_bn
+      source: "eurostat:nrg_pc_205; iea:industrial_electricity_price"
+      transformation: deu_minus_peer_mean_x_industrial_electricity_consumption
+      notes: "DEU minus peer-basket mean industrial electricity price (USD/MWh) multiplied by DEU annual industrial electricity consumption (Eurostat nrg_bal_c)."
+    - name: net_ledger_usd_bn
+      source: "derived: cumulative_avoided_damage_value_usd_bn - cumulative_industrial_electricity_cost_premium_usd_bn"
+      transformation: level
+  treatment:
+    - name: post_2010_energiewende_window
+      source: "constructed: indicator = 1 for DEU 2010 onwards"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: industrial_electricity_consumption_twh
+      source: "eurostat:nrg_bal_c"
+      transformation: level
+      notes: "Used as multiplier on the price differential to monetise the cost-side ledger."
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Joint-ledger accounting comparison. Two flows are computed in
+    constant 2020 USD: (i) cumulative avoided-CO2 damage value =
+    cumulative avoided emissions vs 2010 baseline x SCC central,
+    sensitivity at SCC = 51 USD/tCO2 (US IWG 2016 central) and
+    SCC = 380 USD/tCO2 (Rennert high). (ii) cumulative industrial-
+    electricity-cost premium = DEU minus peer-basket mean industrial
+    price x DEU industrial consumption, summed annually. Net ledger
+    is (i) - (ii). Pre-trend baseline window 2005-2010 reported for
+    sensitivity. Not a causal identification of Energiewende — it is
+    a what-does-the-monetised-ledger-say accounting frame that
+    counterposes the existing industrial-cost spec on the same
+    treatment.
+
+falsification:
+  rule: >
+    SUPPORTED iff cumulative_net_ledger_usd_bn > 0 over 2010-2024 at
+    SCC central (USD 185/tCO2) AND remains positive at SCC = 51
+    USD/tCO2 (the conservative US IWG 2016 figure). REFUTED if the
+    net ledger is negative at SCC central. PARTIAL if positive at
+    central SCC but flips negative at SCC = 51. METHOD_VALID requires
+    EEA inventory + Eurostat industrial price + Eurostat industrial
+    consumption all on disk for DEU + at least 5 peer-basket
+    countries 2010-2024; if industrial price series missing for >2
+    peers, downgrade to inconclusive.
+  test: energiewende_joint_ledger_avoided_damage_vs_industrial_premium
+  threshold: >-
+    PRIMARY: cumulative_net_ledger_usd_bn (2010-2024, central SCC) > 0
+    AND cumulative_net_ledger_usd_bn (2010-2024, low SCC = 51 USD/tCO2) > 0
+
+prior_confidence: 0.7
+
+disclosure: >-
+  Eco-socialist authorial framing risk: the result is highly
+  sensitive to the SCC value chosen (a standard-Stern-discount-rate
+  reading gives SCC > 200 USD/tCO2; a Nordhaus DICE-2017 reading
+  gives SCC ~50 USD/tCO2). The spec pre-registers two SCC values to
+  make the sensitivity transparent. A second framing risk: the cost
+  side excludes consumer retail electricity (which is dominated by
+  the EEG surcharge, a transfer not a deadweight cost), and excludes
+  the 2022-2024 gas-shock window as a separate confound — both
+  choices favour the supported verdict and are flagged. Industrial
+  output displacement to non-decarbonising jurisdictions
+  (carbon-leakage) is NOT measured in this hypothesis; if leakage is
+  large the avoided-emissions side is overstated.
+
+steelman: hypotheses/steelman/energiewende_avoided_emissions_value_outweighs_industrial_cost.md
+
+scope:
+  period: [2010, 2024]
+  countries: [DEU, FRA, USA, SWE, NLD, BEL, ITA, ESP]
+  outcome_dim: [energy, industrial_capability]
+  policy_family: [energy_policy, industrial_policy]
+  treatment_tags: [energiewende_2011, eu_energiewende, agenda_2010]
+
+linked_hypotheses:
+  - german_energiewende_industrial_cost_trajectory
+  - nuclear_phaseout_energy_cost_industry_exit
+  - eu_ets_emissions_reduction_vs_1p5c_pathway
+
+notes: >
+  Counter-spec to german_energiewende_industrial_cost_trajectory.
+  That hypothesis pre-registers the industrial-cost penalty side of
+  the ledger; this one pre-registers the avoided-damage side and the
+  net. Run-time data check: EEA inventory and Eurostat industrial
+  electricity price are on disk for DEU + most peers; SCC values are
+  hard-coded constants per the cited sources. Industrial electricity
+  consumption (eurostat:nrg_bal_c) needs a confirmation pull.

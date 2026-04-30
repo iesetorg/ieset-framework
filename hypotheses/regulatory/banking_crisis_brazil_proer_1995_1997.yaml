@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_brazil_proer_1995_1997
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Brazil's PROER (Programme to Stimulate the Restructuring and Strengthening of the
+  National Financial System) of 1995-1997 — interventions in Banco Nacional, Banco
+  Económico, Banco Bamerindus, central-bank liquidity facilities, and pre-emptive
+  bank cleanup — is a canonical case of pre-emptive bank-balance-sheet cleanup in
+  the wake of macro stabilisation (Plano Real 1994). The hypothesis is that PROER
+  1995-1997 meets a multi-metric checklist on at least 3 of 4 metrics, with the
+  defining feature being preventive resolution prior to a Laeven-Valencia-coded
+  systemic event.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [BRA]
+  period: [1992, 2000]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: proer_facility_creation_1995
+    description: PROER facility created November 1995 by Provisional Measure 1182
+    threshold: "yes/no — yes counts as breach"
+    window: "1995"
+    source: "imf:BRA_PROER_1995"
+    direction: supports_claim
+    independence_justification: Resolution-policy event.
+  - metric_id: bank_interventions_1995_1997
+    description: Banco Nacional, Banco Económico, Banco Bamerindus interventions
+    threshold: "all three interventions executed by 1997"
+    window: "1995-1997"
+    source: "imf:BRA_BANK_INTERVENTIONS_1995_1997"
+    direction: supports_claim
+    independence_justification: Resolution events.
+  - metric_id: laeven_valencia_systemic_banking_crisis
+    description: Laeven-Valencia coded Brazil 1994-1996
+    threshold: "coded yes (recognising PROER episode counts as systemic in LV)"
+    window: "1994-1996"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: real_gdp_growth_undisturbed
+    description: Brazil real GDP growth not disturbed below 2% in 1995-1997
+    threshold: "annual growth >= 2% in each year (negative-control: PROER pre-empted macro spillover)"
+    window: "1995-1997"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+    direction: supports_claim
+    independence_justification: Activity measure as negative control.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: annual_yoy
+    - name: bank_credit_to_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: level
+prior_confidence: 0.85
+disclosure: >
+  PROER is widely cited as a successful pre-emptive cleanup case (Maia 1999, Carvalho 2014).
+steelman: hypotheses/steelman/banking_crisis_brazil_proer_1995_1997.md
+scope:
+  period: [1992, 2000]
+  countries: [BRA]
+  outcome_dim: [financial_crisis, financialisation, regulation_compliance_cost]
+  policy_family: [regulation, monetary_policy]
+  treatment_tags: [brazil_proer_1995_1997, banco_nacional_intervention, plano_real_legacy_1994]

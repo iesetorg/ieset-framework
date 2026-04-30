@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_indonesia_omnibus_2020_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Indonesia's 2020 Omnibus Law on Job Creation (UU Cipta Kerja:
+  fixed-term-contract liberalisation, severance reduction,
+  outsourcing expansion, minimum-wage formula recalibration)
+  raised the Indonesian formal-employment share by at least
+  2 pp by 2024 relative to a synthetic control of ASEAN
+  peers, partially offsetting the COVID labour-market shock.
+notes: >
+  Treatment dated 2020-Q4 (Omnibus enactment November 2020;
+  challenged at Constitutional Court 2021; revised
+  Perppu/Law 6/2023). COVID coincides with treatment
+  beginning; the donor pool absorbs the common shock.
+prior_confidence: 0.5
+disclosure: >-
+  Author treats this as genuinely uncertain — the Omnibus
+  was widely opposed by Indonesian unions and challenged
+  at the Constitutional Court, and the COVID overlap makes
+  identification difficult. Donor pool weights are sensitive
+  to inclusion of Vietnam (own 2019 reform) and Philippines.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Indonesian formal-employment
+    share > +2.0 pp by 2024 AND informal-share gap is not
+    statistically more positive than +1.0 pp at p<0.10.
+    REFUTED if formal-employment gap < +0.5 pp OR informal-
+    share gap > +2.0 pp (informalisation backfire).
+  test: >
+    Synth-DiD on Indonesian formal-employment share 2020-2024
+    vs ASEAN donor pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [IDN, MYS, THA, PHL, VNM, KHM, IND]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2020-2021 COVID window for asymmetric exposure
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: indonesia_omnibus_2020
+      source: "constructed: indicator for 2020-Q4 UU Cipta Kerja enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2020, 2024]
+  countries: [IDN]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [indonesia_omnibus_2020]
+steelman: hypotheses/steelman/labour_reform_indonesia_omnibus_2020_employment.md

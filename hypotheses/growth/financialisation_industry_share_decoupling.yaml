@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financialisation_industry_share_decoupling
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Across advanced economies post-1970, the finance-and-insurance sector's
+  share of gross value added rose materially while the manufacturing
+  sector's share fell, and the two trajectories are not jointly accounted
+  for by a balanced services-sector reweighting. The Marxian / Magdoff-
+  Sweezy reading interprets this as a structural over-accumulation
+  symptom: with declining productive-investment opportunities, surplus
+  is increasingly absorbed by the financial sector. The hypothesis tests
+  whether finance-share rise and manufacturing-share fall are
+  approximately one-for-one in advanced-economy panel, controlling for
+  GDP per capita, and whether the rise in finance share is associated
+  with a fall in aggregate fixed-capital-formation share of GDP — the
+  symptom that distinguishes the over-accumulation reading from a
+  benign structural-shift reading.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, KOR, PRT]
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing finance-sector or manufacturing-sector value-added series
+    - drop years where SIC-NACE-NAICS reclassification breaks the panel
+variables:
+  outcome:
+    - name: finance_insurance_va_share_gdp
+      source: oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE3,1.0
+      transformation: level
+      notes: >
+        OECD Annual National Accounts NACE section K (financial and
+        insurance activities) gross value added share of GDP. Dataflow
+        URN approximate; verify at wiring.
+    - name: manufacturing_va_share_gdp
+      source: world_bank_wdi:NV.IND.MANF.ZS
+      transformation: level
+      notes: WDI manufacturing value added as share of GDP.
+    - name: gross_fixed_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.FTOT.ZS
+      transformation: level
+      notes: >
+        Tests the over-accumulation prediction: is the rise in finance
+        share associated with a FALL in aggregate fixed investment?
+        A pure structural-shift reading would predict no link.
+  treatment:
+    - name: post_1980_indicator
+      source: dates:financialisation_era_post_1980
+      transformation: indicator
+      notes: >
+        Theory-pre-registered structural break at 1980, marking the
+        post-Bretton-Woods / Volcker-shock onset of the
+        financialisation era as conventionally dated.
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: services_total_va_share
+      source: world_bank_wdi:NV.SRV.TOTL.ZS
+      transformation: level
+      notes: >
+        Conditions on aggregate services share so the test isolates
+        finance-vs-manufacturing dynamics from the broader
+        services-sector rise (Baumol effects).
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE regression of (finance share + manufacturing share) joint
+    dynamics on the post-1980 indicator and standard controls. Test of
+    interest: coefficient of finance share rise on manufacturing share
+    fall, conditioning on aggregate services-sector share. A second
+    specification regresses gross-fixed-capital-formation share on
+    finance share to test the over-accumulation prediction. Country
+    and year FE; country-clustered SEs.
+falsification:
+  rule: >
+    Not supported if (a) the finance-share-rise / manufacturing-share-
+    fall correlation in country FE specification is statistically zero
+    or attenuated to less than 0.5 (i.e. the two are not jointly
+    moving), OR (b) the gross-fixed-capital-formation share is flat
+    or rising, not falling, alongside the finance-share rise (which
+    would refute the over-accumulation prediction and support a
+    benign structural-shift reading), OR (c) the finance-share rise
+    is fully accounted for by the broader services-share rise (no
+    finance-specific deviation from Baumol-style sectoral reweighting).
+  test: panel_fe_finance_manufacturing_substitution_with_investment_falsifier
+  threshold: >
+    coef(finance_share -> manufacturing_share) <= -0.5 at p < 0.10 AND
+    coef(finance_share -> gross_fixed_capital_formation_share) <= -0.3 at p < 0.10 AND
+    finance-share rise survives services-share conditioning
+prior_confidence: 0.55
+disclosure: >
+  Author framing draws on the Magdoff-Sweezy financialisation /
+  over-accumulation literature and on the Krippner empirical
+  financialisation tradition. A market-liberal reader would object
+  that the rising finance share reflects deepening financial-services
+  intermediation that supports productivity (capital allocated more
+  efficiently across borders, risk-sharing, household consumption-
+  smoothing), that the manufacturing-share fall is a Balassa-Samuelson
+  / Baumol structural inevitability of advanced economies, and that
+  the falling fixed-capital-formation share reflects rising intangibles
+  investment which national accounts under-measured pre-2013. Authorial
+  framing risk acknowledged; the falsification rule has three
+  independent ways to fail.
+steelman: hypotheses/steelman/financialisation_industry_share_decoupling.md
+scope:
+  period: [1970, 2020]
+  countries: [OECD]
+  outcome_dim: [financialisation, industrial_capability, gdp_growth]
+  policy_family: [none]
+  treatment_tags:
+    - financialisation_era
+    - manufacturing_decline
+    - over_accumulation_symptom
+notes: >
+  Candidate, not pre_registered. On promotion, confirm OECD ANA
+  finance-sector dataflow URN, secure a fetcher for intangibles
+  capitalisation series (BEA / Eurostat) to address the under-measured-
+  intangibles objection, and tighten the over-accumulation falsifier
+  threshold.

@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_japan_1990_lost_decade
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Japan's 1990-2003 banking-and-asset-bubble bust — Nikkei index decline of >= 60%
+  peak-to-trough, real residential property price decline of >= 40%, persistent
+  bank-NPL accumulation that required government recapitalisation in 1998 and 2003,
+  and a "lost decade" of GDP growth averaging <= 1% — is a canonical case of a
+  delayed-resolution banking crisis. The hypothesis is that Japan 1990-2003 meets the
+  canonical multi-metric checklist on at least 4 of 5 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [JPN]
+  period: [1985, 2005]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: equity_index_decline
+    description: Nikkei (or broad equity proxy) peak-to-trough decline
+    threshold: ">= 60% peak-to-trough decline (Dec-1989 to Apr-2003)"
+    window: "1989-2003"
+    source: "fred:NIKKEI225; jst:eq_tr"
+    direction: supports_claim
+    independence_justification: Equity-market signal.
+  - metric_id: real_house_price_decline
+    description: Japan real residential property price peak-to-trough decline
+    threshold: ">= 40% decline"
+    window: "1990-2005"
+    source: "bis:WS_SPP; jst:hpnom"
+    direction: supports_claim
+    independence_justification: Property-price index.
+  - metric_id: real_gdp_growth_lost_decade
+    description: Real GDP growth average over 1992-2002
+    threshold: "<= 1% average annual growth"
+    window: "1992-2002"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: laeven_valencia_systemic_banking_crisis
+    description: Laeven-Valencia banking-crisis coding
+    threshold: "coded yes in 1997-2001 (Laeven-Valencia codes Japan 1997-2001)"
+    window: "1997-2001"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: bank_npl_ratio_peak
+    description: Japanese bank non-performing-loan ratio peak
+    threshold: ">= 8% of gross loans"
+    window: "1998-2003"
+    source: "world_bank_wdi:FB.AST.NPER.ZS"
+    direction: supports_claim
+    independence_justification: Bank-asset-quality measure.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: average_yoy
+    - name: real_house_price_index
+      source: "bis:WS_SPP"
+      transformation: peak_to_trough
+prior_confidence: 0.94
+disclosure: >
+  Japan 1990-2003 is one of the most-studied delayed-resolution banking crises;
+  multi-metric pattern well-documented.
+steelman: hypotheses/steelman/banking_crisis_japan_1990_lost_decade.md
+scope:
+  period: [1985, 2005]
+  countries: [JPN]
+  outcome_dim: [financial_crisis, financialisation, housing, gdp_growth]
+  policy_family: [regulation, monetary_policy]
+  treatment_tags: [japan_1990_bubble_bust, lost_decade, japan_1998_bank_recap, japan_2003_resona]

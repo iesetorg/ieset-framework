@@ -1,47 +1,26 @@
-# Cuba Special Period resilience claim — v3 honesty correction
+# Result card — cuba_special_period_resilience
 
-**Verdict:** inconclusive — v3 spec requires canonical health basket (LE+IMR+nutrition status) AND UNSHOCKED market-economy comparator pool (CRI/PAN/MEX/ECU/COL/DOM). v2 graded SUPPORTED on LE/IMR alone vs SHOCKED pool — both gaming. Documented optic neuropathy epidemic 1991-1995 (~50,000 cases, B-vitamin deficiency) would gate SUPPORTED if formally tested. Missing canonical inputs: nutrition_status_indicator. Unshocked pool LE coverage: 6/6; IMR coverage: 6/6.
+**Verdict:** PARTIAL — shape=panel_summary, |Δ_log|=0.0801, ratio=1.08; claim direction ambiguous
 
-## Two integrity gaps in the v2 SUPPORTED verdict
+## Pre-registration
+- **Claim:** Cuban post-1991 Special Period shows that socialist planning can maintain health and education outputs under severe external shock better than market economies of similar GDP per capita.
+- **Falsification rule:** PRIMARY (dispositive — all four conditions must hold for SUPPORTED): (P1) Cuba's LE change 1991-2000 >= the UNSHOCKED market-economy pool mean {CRI, PAN, MEX, ECU, COL, DOM (no shock)}; (P2) Cuba's IMR % reduction 1991-2000 >= the unshocked pool mean; (P3) Cuban nutrition status during 1991-1995 trough did not show documented epidemic-scale degradation (B-vitamin deficiency / optic neuropathy proxy, anaemia prevalence, undernourishment prevalence); (P4) Cuban primary completion + literacy 1991-2000 within ±5 pp of unshocked pool mean. REFUTED if Cuba underperforms the unshocked pool on EITHER LE or IMR by more than 1 year / 5 pp respectively, OR the documented optic-neuropathy epidemic (50,000+ cases 1991-1995) is included in the test as a SUPPORTED-disqualifying nutrition-health failure. PARTIAL if one of the four conditions fails by less than 50% of its threshold. INFORMATIVE: original v2 pool comparison (Caribbean + post-Soviet shocked) reported as colour; emigration share trajectory; food-import dependence. METHOD_VALID: requires (a) WDI LE+IMR coverage for CUB + at least 4 of 6 unshocked comparators 1991-2000; (b) at least one nutrition-status indicator on disk for CUB 1991-2000 (FAO undernourishment prevalence PA.NUS.PCAP, WHO anaemia prevalence WSH_WATER_BASIC, or a hand-curated Cuban optic-neuropathy epidemic time series); (c) WDI primary completion (SE.PRM.CMPT.ZS) and adult literacy (SE.ADT.LITR.ZS) for CUB + comparators. If any leg of (a)/(b)/(c) is missing, verdict is inconclusive (data gap), not SUPPORTED on the available subset.
+- **Falsification test:** cuba_vs_unshocked_market_pool_canonical_health_education_1991_2000
 
-**(1) Indicator gaming.** v2 tested only LE + IMR (+ informative primary enrolment) and called this 'health and education preserved'. The documented Cuban optic-neuropathy epidemic 1991-1995 (~50,000 cases of bilateral optic + sensory neuropathy attributable to B-vitamin deficiency from caloric collapse — Roman 1994; Hedges et al. 1997 NEJM; Cuba MOH/WHO 1995) is documented epidemic-scale nutrition-driven health degradation during the test window.
+## Comparison
+- **shape:** panel_summary
+- **treatment_country:** CUB
+- **treatment_value:** 76.95769999999999
+- **donor_pool_median:** 71.03264999999999
+- **ratio:** 1.083413050195931
+- **log_diff:** 0.08011628976255203
+- **n_donor_countries:** 8
+- **end_year_window:** [1995, 2000]
 
-**(2) Comparator-pool gaming.** v2's pool was {JAM, DOM, HTI, NIC, UKR, MDA, ARM, GEO}. The post-Soviet legs (UKR/MDA/ARM/GEO) were ALSO undergoing severe shocks (30-60% GDP contractions, hyperinflation, civil conflict). HTI was a failed state. Using shocked / failed-state comparators sets a low bar.
+## Variables resolved
+- `world_bank_wdi:SP.DYN.LE00.IN` → life_expectancy_at_birth (outcome, publisher=world_bank_wdi, n=16996)
+- `world_bank_wdi:SP.DYN.IMRT.IN` → infant_mortality_rate (outcome, publisher=world_bank_wdi, n=13405)
+- `world_bank_wdi:SE.PRM.ENRR` → school_enrollment_primary (outcome, publisher=world_bank_wdi, n=9461)
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → gdp_per_capita_ppp (outcome, publisher=world_bank_wdi, n=8360)
 
-The honest counterfactual for 'socialism resilient under shock vs markets' is similar-income market economies NOT undergoing shock — i.e. {CRI, PAN, MEX, ECU, COL, DOM} 1991-2000.
-
-## v3 canonical basket coverage
-
-| Dimension | Source | Status |
-|---|---|---|
-| Cuba + pool LE | WDI SP.DYN.LE00.IN | ✓ |
-| Cuba + pool IMR | WDI SP.DYN.IMRT.IN | ✓ |
-| Nutrition status (epidemic gating) | cuba_manual / WDI SN.ITK.DEFC.ZS | ✗ (gap) |
-| Education completion / literacy | WDI | ✓ |
-| Unshocked pool LE | CRI/PAN/MEX/ECU/COL/DOM | 6/6 |
-| Unshocked pool IMR | CRI/PAN/MEX/ECU/COL/DOM | 6/6 |
-
-## INFORMATIVE Cuba vs unshocked-pool numbers (NOT a verdict)
-
-- Cuba LE 1991→2000: 73.757→75.922 (delta 2.164999999999992)
-- Unshocked pool LE mean delta: 2.2966666666666646
-- Cuba minus unshocked pool LE: -0.1316666666666726
-- Cuba IMR pct reduction: 0.3398058252427185
-- Unshocked pool IMR mean pct reduction: 0.26521421795806244
-- Cuba minus unshocked pool IMR: 0.07459160728465608
-
-## Documented evidence (un-tested, would gate SUPPORTED if formally graded)
-
-- 1991-1995 optic neuropathy epidemic ~50,000 cases (B-vitamin deficiency)
-- Caloric supply collapse ~30% 1989-1993
-- 1994 balsero crisis (~35,000 attempts in August)
-
-## Fetcher backlog
-
-- cuba_manual annual optic-neuropathy case counts
-- WDI undernourishment prevalence for CUB + unshocked pool
-- WDI primary completion + adult literacy 1991-2000
-
-## Archives
-
-v0 at ARCHIVED_v0/. v2 (SUPPORTED on shocked-pool LE/IMR) at ARCHIVED_v2/.
+_Generated by `scripts/run_descriptive.py` at 2026-04-29T21:54:23+00:00_

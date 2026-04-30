@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_schroeder_agenda_2010_long_run_inequality
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Germany's Schröder Agenda 2010 reforms (2003-2005, complementary
+  to Hartz IV) durably widened the German bottom-quintile-to-
+  median wage ratio: by 2015 the ratio gap relative to a
+  synthetic control of euro-area peers was at least -3 pp
+  below the donor pool, with the gap not reverting after
+  partial 2015 minimum-wage introduction.
+notes: >
+  Companion to labour_reform_hartz_iv_germany_2003_employment_effect.
+  This spec tests the long-run distributional cost of the
+  reforms specifically, with a 2015 horizon to capture
+  whether the German national minimum-wage introduction
+  reversed the wage-floor compression.
+prior_confidence: 0.65
+disclosure: >-
+  Author treats the long-run distributional cost as the most
+  robust heterodox finding on Agenda 2010 — separable from the
+  contested employment claim. The 2015 minimum-wage horizon is
+  the natural test of whether the wage-floor compression was
+  durable.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on German bottom-quintile-to-
+    median wage ratio < -3.0 pp by 2015 AND the gap does not
+    statistically narrow after 2015-Q1 minimum-wage introduction.
+    REFUTED if gap is shallower than -1.0 pp OR if the gap
+    closes substantially post-2015 (showing the effect was
+    a flow not a stock).
+  test: >
+    Synth-DiD on German P10/P50 wage ratio 2003-2018 vs
+    euro-area donor pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [DEU, FRA, NLD, BEL, AUT, ITA, FIN, IRL]
+  period: [1995, 2018]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: p10_p50_wage_ratio
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: level
+    - name: low_pay_incidence
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: level
+    - name: gini_gross_earnings
+      source: oecd:DSD_IDD@DF_IDD
+      transformation: level
+  treatment:
+    - name: agenda_2010_enactment
+      source: "constructed: indicator for 2003-Q1 Hartz I onwards"
+      transformation: indicator
+    - name: german_minimum_wage_2015
+      source: "constructed: indicator for 2015-Q1 minimum-wage introduction"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2003, 2018]
+  countries: [DEU]
+  outcome_dim: [poverty_inequality, wage_stagnation]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [agenda_2010, hartz_reforms_2003]
+steelman: hypotheses/steelman/labour_reform_schroeder_agenda_2010_long_run_inequality.md

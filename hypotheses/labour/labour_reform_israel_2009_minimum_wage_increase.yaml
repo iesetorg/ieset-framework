@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_israel_2009_minimum_wage_increase
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Israel's 2008-2011 staged minimum-wage increase (from NIS
+  3,710 to NIS 4,100 monthly, with subsequent 2011 increase
+  to NIS 4,300) did not produce a statistically distinguishable
+  employment-rate decline relative to a synthetic control of
+  high-income OECD peers, while raising the bottom-quintile
+  real wage by at least 5%.
+notes: >
+  Treatment is the 2008 Tripartite Agreement implementation.
+  Israel is a useful test case because the minimum-wage rise
+  was bundled with negotiated implementation rather than
+  imposed unilaterally — closer to a Nordic-style social-
+  partner outcome.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to modest minimum-wage rises being
+  employment-neutral and may under-weight the Israeli context's
+  specific labour-market segmentation (Arab-Israeli, ultra-
+  Orthodox sub-populations) where minimum-wage bite differs.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Israeli employment rate is
+    not statistically more negative than -0.5 pp at p<0.10 AND
+    bottom-quintile real-wage gap > +5% by 2013. REFUTED if
+    employment gap < -1.5 pp at p<0.10 (disemployment confirmed)
+    OR bottom-quintile wage gap < +2% (non-compliance).
+  test: >
+    Synth-DiD on Israeli employment rate and bottom-quintile
+    real wage 2008-2013 vs OECD donor pool, placebo permutation
+    at p<0.10.
+evidence_type: associational
+sample:
+  countries: [ISR, GBR, USA, IRL, NLD, DEU, AUS, KOR]
+  period: [2000, 2015]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: bottom_quintile_real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: israel_minimum_wage_2008
+      source: "constructed: indicator for 2008-Q3 Tripartite Agreement implementation"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: real_effective_exchange_rate
+      source: bis:reer_broad_ils
+      transformation: log
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2008, 2013]
+  countries: [ISR]
+  outcome_dim: [employment_labour, wage_stagnation]
+  policy_family: [labour_market]
+  treatment_tags: [israel_minimum_wage_2008]
+steelman: hypotheses/steelman/labour_reform_israel_2009_minimum_wage_increase.md

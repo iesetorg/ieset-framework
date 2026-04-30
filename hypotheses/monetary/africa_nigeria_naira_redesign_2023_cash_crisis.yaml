@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_nigeria_naira_redesign_2023_cash_crisis
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  The CBN's October 2022 - February 2023 naira-redesign demonetisation programme (recall
+  of 200/500/1000 notes, replacement with new design, partial deadline rollback by Supreme
+  Court) caused a measurable but transitory contraction in cash-intensive informal-sector
+  activity, a temporary spike in payment-system volume on NIBSS rails, and a documented
+  shock to first-quarter 2023 retail and consumption indicators. The pre-registered claim
+  is that, in an event-study design around the November-2022 announcement and February-
+  2023 deadline, the contemporaneous month and the following two months show (a) NIBSS
+  electronic-payment volume rises at least 50% above 2022 trend, (b) Nigerian PMI
+  retail/services prints fall at least 5 index points below the prior 12-month average,
+  and (c) the effect substantially dissipates by Q3 2023. The null counter-claim is that
+  the naira-redesign was a small noise event whose macroeconomic footprint is
+  indistinguishable from the parallel May-2023 fuel-subsidy shock.
+evidence_type: causal
+sample:
+  countries:
+  - NGA
+  period:
+  - 2018
+  - 2024
+  temporal_structure: time_series
+  exclusion_rules:
+  - flag the May-2023 fuel-subsidy removal as a parallel shock; isolate via
+    sub-period decomposition
+scope:
+  period:
+  - 2018
+  - 2024
+  countries:
+  - NGA
+  outcome_dim:
+  - currency_purchasing_power
+  - financialisation
+  - employment_labour
+  policy_family:
+  - monetary_policy
+  - regulation
+  treatment_tags:
+  - nigeria_naira_redesign_2022
+  - nigeria_demonetisation_2023
+variables:
+  outcome:
+  - name: currency_in_circulation_share_m2
+    source: imf:FMA_USD; world_bank_wdi:FM.LBL.MQMY.CN
+    transformation: level
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: real_gdp_quarterly
+    source: world_bank_wdi:NY.GDP.MKTP.KD; imf:NGDP_R
+    transformation: log_level
+  - name: m2_money_supply
+    source: world_bank_wdi:FM.LBL.BMNY.CN; imf:FMA_USD
+    transformation: log_level
+  treatment:
+  - name: redesign_announcement_event
+    source: 'constructed: dummy in months 2022-10 and 2023-01 to 2023-04'
+    transformation: event_dummy
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: usd_exchange_rate
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+intervention_channel: monetary
+intervention_channel_justification: >-
+  The naira redesign is a CBN-led monetary-channel intervention with retail/payments-
+  system effects. Coded monetary per axes.yaml.
+estimator:
+  template: event_study
+  clustering: country
+  notes: >-
+    Event study with t=0 at 2022-10 announcement and 2023-02 original deadline. ARIMA
+    benchmark for pre-event trend on each outcome. Robustness uses DiD against Ghana
+    monthly data as imperfect control; primary specification is single-country event
+    study because no clean cross-country comparator exists for a demonetisation episode
+    of this scale at this time.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) currency-in-circulation does not fall by at least 30%
+    from October 2022 to February 2023, OR (b) Q1 2023 real GDP print is not at least
+    1.5 ppts below the prior 4-quarter trend, OR (c) the impact does not dissipate by
+    Q4 2023 (effect persists into 2024 — would suggest the demonetisation had a more
+    persistent effect than the textbook one-quarter-shock framing predicts).
+  test: event_study_dual_outcome_with_persistence_check
+  threshold: >-
+    currency_in_circulation_2023_02 / currency_in_circulation_2022_09 <= 0.70 AND
+    Q1_2023_real_gdp_yoy - prior_4q_trend <= -1.5 ppts AND Q4_2023 outcome within
+    1 SD of pre-event mean
+prior_confidence: 0.6
+disclosure: >-
+  Author's prior is moderately that the demonetisation had a real, transitory effect.
+  Currency-in-circulation data clearly show the effect; the GDP impact is harder to
+  isolate from confounds. Prior 0.60 reflects directional confidence with moderate
+  uncertainty on threshold magnitudes.
+conflict_disclosure: No Nigerian asset exposure.
+steelman: hypotheses/steelman/africa_nigeria_naira_redesign_2023_cash_crisis.md
+linked_hypotheses:
+- africa_nigeria_fuel_subsidy_removal_2023
+notes: >-
+  Data-gated on CBN monthly money-supply data and NBS quarterly GDP. The Supreme Court
+  rollback (early March 2023) created an unusual treatment-reversal episode; the spec
+  treats the announcement as the event of interest rather than the original deadline.

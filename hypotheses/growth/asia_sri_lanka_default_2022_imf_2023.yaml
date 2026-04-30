@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asia_sri_lanka_default_2022_imf_2023
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Sri Lanka's April 2022 sovereign default — preceded by FX-reserve
+  depletion, Rajapaksa-era tax cuts (2019), unfunded fertilizer-import
+  ban (2021), and tourism collapse (2020-2021) — produced a measurable
+  growth contraction with real GDP falling at least 7% in 2022, 33%+
+  CPI inflation peak in 2022, and the March 2023 IMF EFF arrangement
+  produced a partial 2023 stabilisation visible in inflation
+  deceleration to under 10% by year-end and FX-reserve recovery to
+  at least 3 months of imports by end-2023.
+
+evidence_type: descriptive
+
+notes: >-
+  Tests both the crisis (2022) and post-IMF stabilisation (2023)
+  phases. Sharp idiosyncratic shock; Sri Lanka time series with
+  pre-shock baseline.
+
+prior_confidence: 0.85
+
+disclosure: >-
+  Author market-liberal priors interpret the default as overdetermined
+  by fiscal mismanagement plus organic-farming mandate. Bias risk:
+  attributing stabilisation to IMF when natural cyclical recovery
+  also operates. Mitigation: dispositive thresholds on inflation
+  AND reserves (both must hold).
+
+steelman: hypotheses/steelman/asia_sri_lanka_default_2022_imf_2023.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH for SUPPORTED): (1) Sri Lanka real GDP
+    contraction 2022 is at least -7%; AND (2) CPI inflation 2023
+    end-of-year falls below 10% YoY (vs >70% peak 2022). REFUTED if
+    EITHER fails (no major contraction OR no stabilisation).
+  test: sri_lanka_2022_default_2023_imf_stabilisation
+  threshold: >-
+    PRIMARY 1: gdp_growth(LKA, 2022) <= -0.07.
+    PRIMARY 2: cpi_inflation(LKA, 2023-12) < 10.
+    METHOD_VALID: WDI NY.GDP.MKTP.KD.ZG and FP.CPI.TOTL.ZG for LKA through 2023; IMF inflation series for end-2023 quarterly.
+
+sample:
+  countries: [LKA]
+  period: [2015, 2024]
+  temporal_structure: time_series
+
+scope:
+  period: [2022, 2024]
+  countries: [LKA]
+  outcome_dim: [gdp_growth, inflation, financial_crisis, currency_purchasing_power]
+  policy_family: [fiscal_policy, monetary_policy, exchange_rate_regime]
+  treatment_tags: [sri_lanka_default_2022, lka_imf_eff_2023, rajapaksa_tax_cuts_2019, organic_fertilizer_ban_2021]
+
+variables:
+  outcome:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: government_debt_pct_gdp
+      source: "imf:general_government_gross_debt_pct_gdp"
+      transformation: level
+  treatment:
+    - name: post_default_indicator
+      source: "constructed: indicator = 1 for year >= 2022"
+      transformation: indicator
+    - name: imf_eff_2023_indicator
+      source: "constructed: indicator = 1 for year >= 2023"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Within-Sri-Lanka structural-break test on growth and inflation.
+    Default-and-stabilisation pattern.
+
+linked_hypotheses:
+  - asia_pakistan_imf_programme_cycle_1988_2024

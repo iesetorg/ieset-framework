@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: monetary_finance_zlb_no_inflation
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  Across the 2008-2014 ZLB era and the 2020-2021 pandemic-response window,
+  large-scale de-facto monetary finance of fiscal expansion in the US,
+  Japan, and the Eurozone did not produce headline-CPI inflation
+  consistent with naive quantity-theoretic monetisation predictions:
+  cumulative central-bank balance-sheet expansion exceeded 15% of GDP
+  while CPI YoY remained below 3% in each economy across both windows.
+  Functional-finance / MMT prediction at slack regimes — that
+  monetary-fiscal coordination at the ZLB transmits to output and
+  employment with negligible inflation pass-through — is supported,
+  while the textbook hyperinflation-from-money-printing prediction is
+  refuted at the slack-regime margin.
+notes: >-
+  Standard mainstream framing of the 2008-2014 and 2020-2021 episodes
+  treats the absence of CPI inflation as a money-multiplier collapse
+  story; the MMT/functional-finance framing reads it as confirmation
+  that monetary finance is non-inflationary at slack. This hypothesis
+  registers the latter prediction explicitly. Excludes 2022-2024
+  inflation episode from primary test as supply-side-driven (energy,
+  food, supply chain) per the BIS, Fed, ECB staff decompositions; the
+  hypothesis is not silent on 2022 but assigns it to the cost-push
+  channel registered in inflation_cost_push_distributional_conflict_eurozone_2021_2024.
+prior_confidence: 0.65
+disclosure: >-
+  Author has market-liberal priors and is sceptical of the strong
+  generalisation that monetary finance is always non-inflationary at
+  slack — the slack-regime qualifier is doing meaningful work and the
+  2022-2024 episode complicates the post-2020 portion of the test.
+  Specification choice: separating the 2008-2014 window from the
+  2020-2021 window allows the result to be partially supported on the
+  cleaner ZLB regime even if the COVID window is contested.
+falsification:
+  rule: >-
+    The hypothesis is falsified if any of the following hold: (a) CPI
+    YoY exceeds 3% in any 6-month rolling window during 2008-2014 in
+    USA or Japan or the Eurozone, (b) CPI YoY exceeds 3% in any
+    6-month window during 2020-2021 in any of the three economies, or
+    (c) Granger causality from central-bank balance sheet to CPI
+    rejects null at p<0.01 with positive coefficient at h=12-24 months
+    on the joint 2008-2021 sample after controlling for output gap and
+    oil prices.
+  test: balance_sheet_to_cpi_pass_through_slack_regime
+  threshold: max(cpi_yoy_6m, USA/JPN/EUR, 2008-2014 union 2020-2021) < 3% AND granger_p(balance_sheet → CPI, h=12-24) > 0.01
+evidence_type: associational
+sample:
+  countries: [USA, JPN, DEU, FRA, ITA, ESP, NLD]
+  period: [2008, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - 2022-2024 supply-shock period excluded from primary CPI gate; reported as separate context
+    - drop country-quarters where short-rate above 0.50% (slack-regime restriction)
+variables:
+  outcome:
+    - name: cpi_inflation_yoy
+      source: fred:CPIAUCSL (USA); fred:JPNCPIALLMINMEI (JPN); ecb:ICP.M.U2.N.000000.4.ANR (EUR aggregate); eurostat:HICP (per-country)
+      transformation: pct_change_yoy
+    - name: core_cpi_inflation_yoy
+      source: fred:CPILFESL (USA); boj:core_cpi (JPN); ecb:ICP_core (EUR)
+      transformation: pct_change_yoy
+    - name: inflation_expectations_5y5y_forward
+      source: fred:T5YIFR (USA); ecb:5Y5Y_inflation_swap (EUR)
+      transformation: level_pct
+      notes: Tests whether expectations remained anchored, separate from realised CPI.
+  treatment:
+    - name: central_bank_balance_sheet_pct_gdp
+      source: fred:WALCL; fred:GDP (USA); boj:monetary_base; fred:JPNNGDP (JPN); ecb:ILM; ecb:NGDP (EUR)
+      transformation: ratio_to_nominal_gdp
+      notes: Crosses 15% in 2009 (US) / 2013 (Japan) / 2015 (ECB); peaks above 35% in all three by 2021.
+    - name: consolidated_government_deficit_pct_gdp
+      source: imf:GGXCNL_NGDP; oecd:underlying_primary_balance
+      transformation: pct_gdp
+      notes: Joint fiscal-monetary stance — monetary finance defined as deficit financing where central-bank purchases of sovereign debt absorb >50% of net issuance in the fiscal year.
+    - name: monetary_finance_indicator
+      source: "constructed: binary = 1 in country-fiscal-years where central-bank net JGB/Treasury/sovereign purchases > 50% of net government debt issuance; coded from BoJ flow-of-funds, Fed SOMA holdings, ECB asset purchase reports"
+      transformation: binary
+  controls:
+    - name: short_rate
+      source: fred:DFF (USA); ecb:FM (EUR); boj:policy_rate (JPN)
+      transformation: level
+    - name: output_gap
+      source: imf:NGAP_NPGDP
+      transformation: level
+    - name: oil_price
+      source: imf_pcps:POILBRE
+      transformation: log_diff
+    - name: unemployment_rate
+      source: fred:UNRATE (USA); ilostat:unemployment_rate; eurostat:lfsa_urgan
+      transformation: pct_labour_force
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >-
+    Jordà local projections of CPI response to central-bank balance-sheet
+    expansion shocks, restricted to slack regimes (short-rate ≤ 0.50%
+    AND unemployment > NAIRU + 0.5pp). Horizon 1-24 months. Primary
+    falsification: peak CPI response not significantly positive at
+    p<0.01 at any horizon. Robustness: parametric VAR with monetary-finance
+    indicator as alternative treatment.
+scope:
+  period: [2008, 2021]
+  countries: [USA, JPN, EUROZONE, OECD]
+  outcome_dim: [inflation, monetary_policy, fiscal_policy, currency_purchasing_power]
+  policy_family: [monetary_policy, fiscal_policy]
+  treatment_tags: [zero_lower_bound, qe_post_2008, abenomics_2013, covid_fiscal_support_2020, monetary_fiscal_coordination, helicopter_money]
+covers_claims:
+  - position_id: mmt
+    claim_index: 5
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: Functional-finance prediction that monetary finance at slack is non-inflationary; directly tested via the slack-regime LP and the panel CPI gate.
+  - position_id: post_keynesian
+    claim_index: 5
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: PK endogenous-money reading that base-money expansion does not mechanically transmit to broad money or CPI; covered through the LP impulse-response test.
+steelman: hypotheses/steelman/monetary_finance_zlb_no_inflation.md
+linked_hypotheses:
+  - qe_base_money_cpi_transmission_failure
+  - qe_asset_inflation_vs_cpi_divergence_post_2008
+  - japan_sargent_wallace_refutation_1990_2024
+  - inflation_cost_push_distributional_conflict_eurozone_2021_2024

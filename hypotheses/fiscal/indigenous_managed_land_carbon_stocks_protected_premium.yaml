@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: indigenous_managed_land_carbon_stocks_protected_premium
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Indigenous-managed parcels in the Amazon basin (BRA, PER, COL,
+  ECU, BOL), Canadian First-Nations comanagement areas, and
+  Australian Indigenous Protected Areas retain at least 20% more
+  above-ground biomass per hectare than biome-matched state-
+  protected and private parcels over 2003-2023, after controlling
+  for slope, accessibility, and pre-treatment biome composition.
+  This is the carbon-stocks corollary of the lower-deforestation
+  finding, and it monetises into a positive avoided-emissions
+  ledger when valued at standard SCC.
+
+evidence_type: associational
+
+sample:
+  countries: [BRA, PER, COL, ECU, BOL, CAN, AUS]
+  period: [2003, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop parcels with pre-2003 designation date (no pre-treatment trajectory)"
+    - "drop parcels with biome reclassification mid-sample"
+
+variables:
+  outcome:
+    - name: above_ground_biomass_t_per_ha
+      source: "noaa_viirs:forest_cover; faostat:forest_area"
+      transformation: level
+      notes: "Primary outcome. Composite NOAA VIIRS-derived above-ground biomass and FAO national-aggregate forest carbon density as cross-check. Best-available proxy where ESA CCI Biomass parcel-level series is not on disk."
+    - name: cumulative_biomass_loss_pct
+      source: "noaa_viirs:forest_cover"
+      transformation: pct_loss_vs_2003
+    - name: avoided_emissions_value_usd_per_ha
+      source: "derived: biomass_premium_t_per_ha * 0.5 (biomass-to-carbon factor) * 3.67 (CO2/C molecular) * SCC_185_usd_per_tco2"
+      transformation: present_value_2020_usd
+  treatment:
+    - name: indigenous_managed_indicator
+      source: "constructed: parcel-year indicator = 1 from official designation date"
+      transformation: binary
+      notes: "Designation dates from FUNAI Terras Indigenas, AUS DCCEEW IPA registry, CAN Indigenous Guardians programme, national territorial registries for PER/COL/ECU/BOL (manual compilation flagged as TODO)."
+  controls:
+    - name: parcel_slope_mean
+      source: "noaa_viirs:srtm_elevation_derived"
+      transformation: degrees
+    - name: parcel_distance_to_road_km
+      source: "manual:osm_road_distance_2010"
+      transformation: km
+      notes: "OSM not a registered publisher; flagged as manual-drop fetcher. TODO: register OSM as a publisher OR derive proxy from a registered source."
+    - name: country_agriculture_value_added
+      source: "world_bank_wdi:NV.AGR.TOTL.ZS"
+      transformation: pct_gdp
+    - name: country_log_real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+
+estimator:
+  template: did_callaway_santanna
+  clustering: territory
+  fixed_effects: [territory, year]
+  notes: >
+    Staggered DiD on parcel-level above-ground biomass, comparing
+    indigenous-managed to biome-matched state-protected and private
+    parcels using designation dates as treatment timing. Matching on
+    biome class, slope, accessibility pre-designation. Outcome is
+    biomass density (level), not deforestation rate -- this is the
+    carbon-stocks corollary spec, complementary to
+    indigenous_managed_land_biodiversity_outcomes. Pre-treatment
+    event-time leads on 5-year window reported for parallel-trends
+    diagnostic. Country-level dispersion of the ATT reported.
+
+falsification:
+  rule: >
+    SUPPORTED iff pooled CS-DiD ATT on above-ground biomass density
+    (indigenous-managed minus matched controls, 2003-2023) >= +20%
+    in relative terms AND the Australian-IPA subset ATT does not
+    reverse sign relative to the pooled estimate. REFUTED if pooled
+    ATT < +5% OR sign-flip in IPA subset. PARTIAL between +5% and
+    +20%. METHOD_VALID requires parcel-level biomass series with at
+    least 5,000 parcel-years per country and designation-date
+    registry for at least 80% of treated parcels; failure emits
+    inconclusive (data gap on noaa_viirs:above_ground_biomass).
+  test: cs_did_indigenous_vs_matched_parcels_biomass_2003_2023
+  threshold: >-
+    PRIMARY: pooled CS-DiD ATT on biomass density >= +20% relative
+    to matched controls AND Australian-IPA subset ATT same-signed
+    as pooled.
+
+prior_confidence: 0.6
+
+disclosure: >-
+  Eco-socialist authorial framing: the hypothesis stacks two
+  contested choices in favour of a supported verdict -- (i) using
+  NOAA VIIRS-derived biomass as the primary outcome where ESA CCI
+  Biomass would be the gold-standard but is not on disk in this
+  repo, and (ii) using the +20% threshold drawn from Walker et al.
+  2020 / Garnett et al. 2018 which are themselves the eco-socialist
+  literature's own effect-size estimates. The Australian IPA subset
+  is the cleanest external-validity check and is gated explicitly
+  in the falsification rule. A market-liberal critique would note
+  that indigenous-managed parcels are non-randomly allocated to
+  remote, low-pressure terrain; the matching strategy on slope and
+  road-distance partials this but cannot eliminate it. Carbon-stock
+  monetisation depends on the SCC value chosen (185 USD/tCO2
+  central) -- sensitivity at SCC = 51 reported.
+
+steelman: hypotheses/steelman/indigenous_managed_land_carbon_stocks_protected_premium.md
+
+scope:
+  period: [2003, 2023]
+  countries: [BRA, PER, COL, ECU, BOL, CAN, AUS, LATAM]
+  outcome_dim: [institutional_quality, energy]
+  policy_family: [institutional_reform, regulation]
+  treatment_tags: [indigenous_protected_areas, amazon_indigenous_territories, first_nations_land_management]
+
+linked_hypotheses:
+  - indigenous_managed_land_biodiversity_outcomes
+
+notes: >
+  Companion spec to indigenous_managed_land_biodiversity_outcomes.
+  That hypothesis tests deforestation rate (flow); this one tests
+  biomass density (stock) and the avoided-emissions monetisation.
+  Outcome series (parcel-level biomass) is not on disk in current
+  vintage; spec gates inconclusive on that gap. OSM road distance
+  is not a registered publisher and is flagged TODO -- either
+  register OSM or substitute a registered-source proxy.

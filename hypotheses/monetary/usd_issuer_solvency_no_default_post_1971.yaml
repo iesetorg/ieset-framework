@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: usd_issuer_solvency_no_default_post_1971
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  The United States has not experienced a default, missed coupon, missed
+  principal, or IMF-program distress event on dollar-denominated federal
+  obligations across the entire post-Bretton-Woods fiat era 1971-2024,
+  including periods when gross federal debt exceeded 100% of GDP
+  (2013-2024) and when net interest crossed pre-1990 thresholds
+  (2022-2024). The descriptive zero-event record across more than five
+  decades and at debt levels above textbook "fiscal limit" warnings is a
+  necessary-but-not-sufficient empirical condition for the MMT
+  currency-issuer operational-solvency claim, and a strong refutation of
+  the household-budget-analogue framing that animates standard
+  fiscal-cliff rhetoric.
+notes: >-
+  MMT-framed sister to the existing us_dollar_issuer_solvency_record
+  draft. Where the existing draft treats the zero-default record as
+  trivially descriptive, this candidate spec frames it as the
+  pre-registered empirical surface of a falsifiable MMT prediction:
+  that a sovereign currency-issuer faces no operational solvency
+  constraint on debt denominated in its own currency, distinct from
+  any inflation or political-economy constraint. Counters Reinhart-Rogoff
+  90%-cliff rhetoric and standard "unsustainable trajectory" framings
+  applied to advanced sovereign issuers.
+prior_confidence: 0.75
+disclosure: >-
+  Author holds market-liberal priors and is not native to the MMT school.
+  The descriptive record itself is non-controversial; framing risk is
+  that "operational solvency" is sometimes used to imply a stronger
+  claim about inflation neutrality, which this hypothesis explicitly
+  does not test. Linked to monetary_finance_zlb_no_inflation and
+  japan_sargent_wallace_refutation_1990_2024 for the joint MMT picture.
+falsification:
+  rule: >-
+    The hypothesis is falsified if any of the following are recorded
+    in the 1971-08-15 through 2024-12-31 window: (a) a missed coupon
+    or principal payment on any dollar-denominated US Treasury
+    obligation, (b) an IMF program or formal external bailout request
+    by the US government, (c) a sovereign-CDS 5y peak above 100bp on
+    dollar-denominated US debt, or (d) a Treasury auction failure
+    requiring direct Federal Reserve primary-market purchase to clear.
+    A single qualifying event falsifies the descriptive claim.
+  test: usd_default_event_count_post_bretton_woods
+  threshold: zero qualifying events 1971-08-15 to 2024-12-31
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [1971, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - debt-ceiling brinkmanship episodes (2011, 2013, 2023) excluded from default-event count when no coupon was actually missed; documented as separate political-rupture events
+variables:
+  outcome:
+    - name: dollar_denominated_default_event_count
+      source: "constructed: zero events documented for federal dollar-denominated obligations 1971-08-15 to 2024-12-31; manually coded from Moody's-S&P-Fitch sovereign-default tables"
+      transformation: count
+      notes: Primary outcome — count of qualifying default/distress events.
+    - name: us_sovereign_cds_5y
+      source: academic:bloomberg_cds
+      transformation: level_bp
+      notes: "TODO: USA 5y CDS spreads via Bloomberg/Markit; manual-drop required. Series begins ~2003. Used for falsification gate (d)."
+    - name: treasury_auction_bid_to_cover_ratio
+      source: "fred:auction_results; manual: TreasuryDirect auction tables"
+      transformation: ratio
+      notes: Auction-clearing health indicator; sustained below 1.5 would warrant scrutiny.
+  treatment:
+    - name: gross_federal_debt_pct_gdp
+      source: fred:GFDEGDQ188S
+      transformation: level_pct
+      notes: Crosses 100% in 2013Q1; reaches ~120% post-COVID. Tests whether qualifying events occur AT high debt levels.
+    - name: net_interest_pct_gdp
+      source: fred:A091RC1Q027SBEA; fred:GDP
+      transformation: ratio
+      notes: Net interest / GDP; rose above 3% in 2024. Tests whether interest burden alone triggers distress events.
+    - name: post_bretton_woods_indicator
+      source: "constructed: binary = 1 from 1971-08-15 (Nixon shock; gold-window closure)"
+      transformation: binary
+  controls:
+    - name: cpi_inflation
+      source: fred:CPIAUCSL
+      transformation: pct_change_yoy
+      notes: Distinguishes operational-solvency events from inflation episodes. The hypothesis is silent on inflation.
+    - name: dxy_dollar_index
+      source: fred:DTWEXBGS
+      transformation: log_level
+estimator:
+  template: descriptive
+  clustering: episode
+  notes: >-
+    Descriptive event-count tabulation across 1971-2024. Pattern test:
+    zero qualifying default-or-distress events at any debt-to-GDP
+    threshold reached in the sample. No inferential model required —
+    the claim is a count claim. Robustness: cross-check
+    against Hanke sovereign-default registry, Reinhart-Rogoff
+    "this-time-is-different" episode list, and IMF Article IV documents.
+scope:
+  period: [1971, 2024]
+  countries: [USA]
+  outcome_dim: [monetary_policy, fiscal_policy, currency_purchasing_power]
+  policy_family: [monetary_policy, fiscal_policy]
+  treatment_tags: [fiat_currency_era, monetary_sovereignty, bretton_woods_collapse_1971, post_2008_qe, post_covid_fiscal_expansion]
+covers_claims:
+  - position_id: mmt
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: Direct test of the MMT currency-issuer operational-solvency claim across the full post-1971 fiat era; aligned with the hypothesis claim and USA scope.
+steelman: hypotheses/steelman/usd_issuer_solvency_no_default_post_1971.md
+linked_hypotheses:
+  - us_dollar_issuer_solvency_record
+  - japan_sargent_wallace_refutation_1990_2024
+  - monetary_finance_zlb_no_inflation

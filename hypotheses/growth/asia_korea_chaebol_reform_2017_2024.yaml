@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asia_korea_chaebol_reform_2017_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  South Korea's chaebol-reform attempts under Moon Jae-in (2017-2022,
+  fair-trade enforcement, 2018 commercial-act amendments, minimum wage
+  hikes) and Yoon Suk-yeol (2022-present, partial rollback) did NOT
+  produce a measurable de-concentration of the Korean economy. Top-30
+  chaebol value-added share of GDP and broader economic-concentration
+  proxies (industry-level value-added concentration) do NOT decline
+  meaningfully through 2023, and Korea's WGI Regulatory Quality and
+  Control of Corruption percentile rank does not rise by more than
+  +5 percentile points 2016 to 2022.
+
+evidence_type: descriptive
+
+notes: >-
+  Tests effort-vs-outcome on a structural reform agenda. Direct chaebol
+  share data is hard to standardise, so the test relies on broader
+  proxies: WGI governance quality, ratio of top-firm market cap / GDP
+  (informative), and industry concentration via WDI manufacturing-share.
+  Hypothesis predicts the reform attempts did NOT meaningfully shift
+  these.
+
+prior_confidence: 0.72
+
+disclosure: >-
+  Author market-liberal priors are sceptical that politically-motivated
+  chaebol reform delivers structural change without judicial willingness
+  to break up groups. Bias risk: cherry-picking metrics that won't move.
+  Mitigation: WGI governance percentile is the most-defensible direct
+  test of regulatory-quality improvement.
+
+steelman: hypotheses/steelman/asia_korea_chaebol_reform_2017_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if WGI Regulatory Quality
+    percentile rank for KOR rises by AT MOST +5 percentile points
+    from 2016 to 2022 (no meaningful regulatory-quality improvement).
+    REFUTED if KOR WGI Regulatory Quality rises by more than +10
+    percentile points (clear reform success).
+    INFORMATIVE (not gating): WGI Control of Corruption percentile
+    same-window change.
+  test: korea_chaebol_reform_no_wgi_improvement_2016_2022
+  threshold: >-
+    PRIMARY: wgi_regulatory_quality_pct(KOR, 2022) - wgi_regulatory_quality_pct(KOR, 2016) <= 5.
+    REFUTING: same diff > 10.
+    METHOD_VALID: WGI Regulatory Quality available for KOR 2016, 2022.
+
+sample:
+  countries: [KOR]
+  period: [2010, 2024]
+  temporal_structure: time_series
+
+scope:
+  period: [2017, 2024]
+  countries: [KOR]
+  outcome_dim: [institutional_quality, competition_concentration]
+  policy_family: [competition_policy, institutional_reform, labour_market]
+  treatment_tags: [korea_chaebol_reform, moon_jae_in_reforms_2017, yoon_2022, korea_minimum_wage_hike_2018]
+
+variables:
+  outcome:
+    - name: wgi_regulatory_quality
+      source: "world_bank_wgi:RQ.PER.RNK"
+      transformation: level
+    - name: wgi_control_of_corruption
+      source: "world_bank_wgi:CC.PER.RNK"
+      transformation: level
+    - name: wgi_government_effectiveness
+      source: "world_bank_wgi:GE.PER.RNK"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+  treatment:
+    - name: post_2017_reform_indicator
+      source: "constructed: indicator = 1 for KOR, year >= 2017"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Within-Korea pre-post on WGI percentile ranks. The hypothesis is
+    a non-acceleration claim, so the threshold direction is reversed
+    relative to typical reform-success tests.
+
+linked_hypotheses:
+  - korea_hci_drive_capability_effect
+  - korean_institutional_divergence_gdp_gap

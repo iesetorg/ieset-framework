@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_life_expectancy_lfp_panel
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Cross-country panel evidence 1990-2023: gains in life expectancy at age 60 are associated
+  with rising labour force participation rates among the 55-64 and 65+ age brackets,
+  controlling for statutory pension age. The effect is hypothesised to be roughly 1 additional
+  year of life expectancy at 60 mapping to a 1-2 percentage-point rise in 55-64 LFP within
+  10 years, holding pension reforms constant.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, KOR, CAN, AUS, NLD, SWE, NOR, DNK, FIN, CHE, BEL, AUT, IRL, NZL, GRC, PRT, POL, HUN, CZE, SVK, ISR, EST, LVA, LTU]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, life_expectancy_health, demographics_migration]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [life_expectancy_gains, older_worker_lfp]
+variables:
+  outcome:
+    - name: lfp_55_64
+      source: ilostat:EAP_2WAP_SEX_AGE_RT
+      transformation: level
+      notes: ILOSTAT 55-64 labour force participation rate; series ID confirmed at wiring.
+    - name: lfp_65_plus
+      source: world_bank_wdi:SL.TLF.ACTI.65UP.ZS
+      transformation: level
+  treatment:
+    - name: life_expectancy_at_60
+      source: who_gho:LIFE_0000000035
+      transformation: level
+      notes: WHO GHO life-expectancy-at-60 indicator (placeholder series ID).
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: statutory_pension_age
+      source: oecd:OECD.ELS.SAE,DSD_PAG_LM@DF_PAG_LM,1.0
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if coefficient on life expectancy at 60 (lagged 10 years) on 55-64 LFP is
+    positive at p<0.05, magnitude between 0.5 and 3 pp per year of life-expectancy gain.
+    REFUTED if coefficient insignificant or magnitude outside that window, OR if controlling
+    for pension age fully absorbs the effect (suggesting no health-channel residual).
+  test: panel_fe_le60_to_lfp5564_with_pension_control
+  threshold: "0.5 <= coef_le60 <= 3.0 AND p < 0.05"
+prior_confidence: 0.6
+disclosure: >-
+  Priors expect a meaningful association but suspect it is largely policy-driven rather than
+  health-driven; pension-reform absorption is the live falsification risk.
+steelman: hypotheses/steelman/demo_life_expectancy_lfp_panel.md

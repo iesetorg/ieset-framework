@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ordo_competition_law_enforcement_growth_premium_oecd
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across OECD economies 1998-2022, jurisdictions with stricter rule-bound
+  competition-law enforcement (proxied by OECD Product Market Regulation
+  state-control / barriers-to-entry sub-indices and EFW area-5 regulation
+  scores) exhibit higher subsequent multifactor and labour productivity
+  growth than jurisdictions with weaker enforcement, conditional on
+  initial income, openness, and rule-of-law level. The Eucken
+  "Wettbewerbsordnung" prediction is that rule-bound competition policy
+  raises long-run productivity by preventing entrenchment of incumbent
+  rents, and the effect is identifiable in cross-country PMR variation
+  even after stripping common rule-of-law variation.
+
+evidence_type: associational
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1998, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years inside active currency-board collapse or sovereign debt restructuring (GRC 2010-2014) where productivity is dominated by demand collapse not regulatory regime"
+
+variables:
+  outcome:
+    - name: labour_productivity_growth_5yr_forward
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: cumulative_log_growth_5yr_forward
+    - name: tfp_growth_pwt
+      source: "pwt:rtfpna"
+      transformation: log_diff_5yr_forward
+  treatment:
+    - name: oecd_pmr_overall
+      source: "oecd_pmr:overall"
+      transformation: level
+      notes: "Lower PMR = less restrictive product-market regulation = stronger competition-policy regime in OECD coding."
+    - name: efw_regulation_area5
+      source: "fraser_efw:area_5_regulation"
+      transformation: level
+  controls:
+    - name: initial_log_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_block_start
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: wgi_rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  PMR and EFW area-5 are regulatory measures of competition-policy
+  intensity. No fiscal or monetary intervention coded. Channel follows
+  invariant 4 for product-market regulation variables.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way fixed-effects panel with standard errors clustered by
+    country. Identification from within-country PMR variation across
+    OECD vintages (1998, 2003, 2008, 2013, 2018). Robustness: drop
+    rule-of-law control and observe coefficient stability — Eucken's
+    claim is that competition-rule enforcement is a distinct channel
+    from generalised RL.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) the panel-FE coefficient on lower PMR
+    (i.e. stronger competition policy) is positive on 5-year-forward
+    labour-productivity growth at p<0.05, AND (b) the coefficient
+    survives inclusion of WGI Rule of Law as a co-regressor with at
+    least 50% of the bivariate magnitude retained. REFUTED if the
+    PMR coefficient is wrong-signed at p<0.05 or collapses to <20%
+    of the bivariate magnitude when RL is added (suggests competition
+    rule is a proxy for generalised institutional quality).
+    INFORMATIVE: EFW area-5 regression replicates direction.
+  test: oecd_pmr_panel_fe_productivity_with_rl_attenuation
+  threshold: >
+    PRIMARY: panel_FE_beta(PMR_inverted) > 0 at p<0.05 AND
+    coefficient retained at >=50% when wgi:RL.EST included.
+    INFORMATIVE: fraser_efw:area_5 coefficient same sign at p<0.10.
+
+prior_confidence: 0.62
+
+disclosure: >-
+  Author prior is moderate (0.62). The PMR-productivity literature
+  (Nicoletti-Scarpetta 2003, Bourles et al 2013) broadly supports a
+  positive link, but coefficient magnitudes are sensitive to which
+  PMR vintage and which control set is used. Heterodox readers
+  (post-Keynesian, evolutionary) will note that PMR conflates
+  competition-policy enforcement with consumer-protection
+  deregulation and labour-market flexibility — the index is not a
+  pure measure of cartel-prevention. Authorial framing risk: by
+  reading PMR as a Eucken proxy, the spec credits any productivity
+  premium to competition-rule enforcement when the index also picks
+  up labour and entry deregulation that ordoliberals would not
+  endorse. The RL-attenuation gate is the heterodox reader's clean
+  win condition.
+
+scope:
+  period: [1998, 2022]
+  countries: [OECD]
+  outcome_dim: [productivity, competition_concentration, regulation_compliance_cost]
+  policy_family: [institutional_reform, competition_policy]
+  treatment_tags: [oecd_pmr, fraser_efw_regulation, eucken_wettbewerbsordnung, ordoliberal_competition_law]
+
+steelman: hypotheses/steelman/ordo_competition_law_enforcement_growth_premium_oecd.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+  - deregulation_productivity_effect
+
+notes: >
+  Eucken's 1952 "Grundsätze der Wirtschaftspolitik" specified the
+  Wettbewerbsordnung — a constitutionally rule-bound competition order
+  — as the backbone of a productive market economy. PMR and EFW area-5
+  are the closest registered proxies. Spec explicitly tests whether
+  the productivity signal is identified off competition-rule
+  enforcement specifically, separate from generalised rule-of-law
+  variation, by gating on RL-attenuation. v2 would substitute a direct
+  DG-COMP merger-block-intensity series if a publisher registers it.

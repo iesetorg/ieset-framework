@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_thatcher_1988_top_rate_cut
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Nigel Lawson's 1988 budget cut the UK top marginal income tax rate from
+  60 to 40 percent, producing a discrete jump in the UK top-1 pre-tax
+  national income share within three years that exceeds the contemporaneous
+  G7-ex-UK trajectory. The UK case is a clean event because the 1988 reform
+  was not paired with substantial base-broadening, so the residual after
+  controlling for the City of London financial deregulation effect should
+  isolate a top-rate-cut-on-distribution effect.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 1. Identification challenge is
+  separating Big Bang 1986 financial deregulation (already underway) from
+  the 1988 rate cut.
+prior_confidence: 0.65
+disclosure: >
+  Author prior accepts UK top-share rose post-1988 but is uncertain whether
+  the mechanism is the rate cut versus financial-sector compensation
+  expansion driven by Big Bang.
+falsification:
+  rule: >
+    SUPPORTED if UK top-1 pretax share rises by at least 1.5 percentage
+    points 1988-1992 AND DiD coefficient against G6 control pool is positive
+    at p<0.10 after controlling for finance-sector value-added share.
+    REFUTED if UK top-1 share fails to rise by 0.75 percentage points over
+    the window or DiD coefficient is negative at p<0.10.
+  test: >
+    Synthetic-control with G6 donor pool, treated UK 1988. Outcome top-1
+    pretax share. Auxiliary panel-FE with finance-sector VA-share as
+    confounder control.
+evidence_type: associational
+sample:
+  countries: [GBR, USA, FRA, DEU, ITA, CAN, JPN]
+  period: [1980, 1995]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID UK top-share"
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: lawson_1988_uk_post
+      source: "constructed: indicator = 1 for GBR, year >= 1988"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: finance_va_share
+      source: "eurostat:nama_10_a64"
+      transformation: level
+      notes: "NACE K finance share; UK coverage via Eurostat aggregate."
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with G6 donor pool. Treated UK 1988. Placebo-in-time
+    1985 and 1991 to check sensitivity. Robustness with synth_did.
+intervention_channel: fiscal
+scope:
+  period: [1988, 1995]
+  countries: [GBR]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [thatcher_lawson_1988, top_marginal_rate_cut, uk_big_bang_confound]

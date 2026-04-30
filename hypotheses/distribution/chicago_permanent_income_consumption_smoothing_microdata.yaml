@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: chicago_permanent_income_consumption_smoothing_microdata
+version: 1
+status: candidate
+topic: distribution
+
+claim: >
+  Across US household-panel microdata 1980-2019, the marginal
+  propensity to consume out of income shocks identified as permanent
+  (lasting >5 years; e.g. job-displacement, persistent earnings change,
+  permanent transfer programme enrolment) substantially exceeds the
+  marginal propensity to consume out of identified-transitory income
+  shocks (one-off rebates, lottery wins, predictable one-time tax
+  refunds, severance windfalls). The pre-registered prediction is
+  MPC(permanent) >= 0.7 and MPC(transitory) <= 0.3, with the gap
+  preserved across income-tercile sub-samples but largest in the top
+  two terciles. The hypothesis is the Friedman (1957) Permanent
+  Income Hypothesis test on micro-data with explicit shock
+  decomposition.
+
+evidence_type: causal
+
+sample:
+  countries: [USA]
+  period: [1980, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop households with assets below $1000 (liquidity-constrained sub-sample tested separately)"
+    - "drop years where shock identification is ambiguous (e.g. mixed permanent-transitory tax changes)"
+
+scope:
+  period: [1980, 2019]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, employment_labour, financialisation]
+  policy_family: [tax_policy, welfare_architecture]
+  treatment_tags: [friedman_pih_1957, permanent_income_hypothesis, mpc_decomposition, tax_rebate_2001, tax_rebate_2008]
+
+variables:
+  outcome:
+    - name: nondurable_consumption_change
+      source: "academic:psid_cex_consumption_microdata"
+      transformation: log_diff
+      notes: "Annual log-difference of nondurable consumption from PSID and CEX microdata."
+    - name: total_consumption_change_inc_durables
+      source: "academic:psid_cex_consumption_microdata"
+      transformation: log_diff
+  treatment:
+    - name: identified_permanent_income_shock
+      source: "academic:job_displacement_kaplan_violante_panel"
+      transformation: dollar_pv_2020
+      notes: "Permanent income shock identified via job-displacement events (mass-layoff matching), persistent earnings changes (Kaplan-Violante 2014 method), or programme enrolment (DI, SSI). Present-value dollar magnitude in 2020 USD."
+    - name: identified_transitory_income_shock
+      source: "academic:tax_rebate_natural_experiments"
+      transformation: dollar_pv_2020
+      notes: "Transitory shock from 2001 and 2008 tax rebates (Parker-Souleles-Johnson-McClelland), one-off severance, lottery winnings (Imbens-Rubin-Sacerdote), one-time stimulus."
+  controls:
+    - name: household_age_head
+      source: "academic:psid_cex_consumption_microdata"
+      transformation: integer_years
+    - name: household_size
+      source: "academic:psid_cex_consumption_microdata"
+      transformation: integer
+    - name: household_pre_shock_assets
+      source: "academic:psid_cex_consumption_microdata"
+      transformation: log_real_2020
+      notes: "Liquid + illiquid assets pre-shock; tested as moderator (Kaplan-Violante 'wealthy hand-to-mouth')."
+    - name: state_unemployment_rate
+      source: "bls:LAUST010000000000003"
+      transformation: level
+    - name: gdp_per_capita_real
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Tax-rebate experiments are fiscal interventions; the test is on
+  household consumption response to the fiscal transfer.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [household, year]
+  clustering: household
+  notes: >
+    Two-stage decomposition: (i) classify each income-change observation
+    as permanent or transitory using Kaplan-Violante 2014 micro-shock
+    decomposition + the natural-experiment events; (ii) regress
+    consumption changes on permanent and transitory shock dollars
+    separately, with household and year FE. Heterogeneity by pre-shock
+    assets (Kaplan-Violante wealthy-hand-to-mouth test) reported as
+    secondary spec. The Parker-Souleles-Johnson-McClelland 2001 and
+    2008 rebate quasi-experiments provide pre-registered transitory-
+    shock identification.
+
+falsification:
+  rule: >
+    Not supported if (a) MPC(permanent) is below 0.5, OR (b) MPC(transitory)
+    exceeds 0.45 in the unconstrained sub-sample (assets above $1000),
+    OR (c) the gap MPC(permanent) - MPC(transitory) is below 0.25 with
+    bootstrap CI including zero. A behavioural / hand-to-mouth reading
+    wins cleanly if MPC(transitory) >= 0.45 in the unconstrained
+    sub-sample. A liquidity-constrained reading wins partially if MPC
+    differences disappear in the bottom-tercile sub-sample (which the
+    PIH does not require).
+  test: kv_decomposition_mpc_permanent_vs_transitory_with_natural_experiments
+  threshold: >
+    MPC_permanent_unconstrained >= 0.7 with CI excluding 0.5
+    AND MPC_transitory_unconstrained <= 0.3 with CI excluding 0.45
+    AND gap >= 0.25 at p<0.05
+    AND result robust across CEX and PSID consumption measures separately
+
+prior_confidence: 0.6
+
+disclosure: >-
+  Friedman's PIH is foundational Chicago micro and one of the most-
+  empirically-tested propositions in macro / micro labour. The
+  classical PIH's strict form (MPC_transitory near zero) is widely
+  refuted in the natural-experiment literature (Parker-Souleles
+  finds MPC ~ 0.25-0.35 on 2001/2008 rebates for non-durables, higher
+  including durables); the Kaplan-Violante "wealthy hand-to-mouth"
+  finding shows substantial MPC_transitory even among ostensibly
+  unconstrained households. Author's prior leans toward a moderated
+  PIH — permanent shocks dominate consumption changes but transitory
+  shocks are not zero — and the threshold (gap >= 0.25, not gap = 1)
+  reflects this. A behavioural / Carroll buffer-stock reading is
+  given a clean win if MPC_transitory exceeds 0.45 unconditionally.
+
+steelman: hypotheses/steelman/chicago_permanent_income_consumption_smoothing_microdata.md
+
+linked_hypotheses:
+  - friedman_negative_income_tax_labour_supply_smaller_than_predicted
+
+notes: >
+  Friedman 1957 (A Theory of the Consumption Function), Kaplan-Violante
+  2014 (Econometrica wealthy hand-to-mouth), Parker-Souleles-Johnson-
+  McClelland 2013 AEJ on 2008 rebate, Imbens-Rubin-Sacerdote 2001 AER
+  on lottery winners are the canonical references. The hypothesis as
+  framed is a moderated PIH; the strict-PIH reading (MPC_transitory = 0)
+  is already known to be falsified.

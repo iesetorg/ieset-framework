@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_japan_cptpp_2018_trade_effect
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Japan's CPTPP entry (2018-12-30) plus the EU-Japan Economic
+  Partnership Agreement (effective 2019-02-01) jointly produced a
+  modest measurable trade-openness expansion for Japan over the
+  2019-2024 window relative to a synthetic-control donor pool of
+  large advanced economies. Effects are expected to be small given
+  Japan's already-extensive bilateral coverage and structurally
+  low trade-openness (~30% of GDP) relative to other advanced
+  economies.
+
+evidence_type: causal
+
+sample:
+  countries: [JPN, USA, KOR, AUS, CAN, GBR, DEU, FRA, ITA]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity"
+    - "drop USA from primary spec (TPP withdrawal contaminates the comparator role)"
+
+scope:
+  period: [2010, 2024]
+  countries: [JPN]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [japan_cptpp_2018, japan_eu_epa_2019, japan_mega_fta_pivot]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: japan_mega_fta_indicator
+      source: "constructed: indicator = 1 for JPN from 2019-01-01 (CPTPP/EPA bundle)"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  CPTPP and EU-Japan EPA — regulatory / trade-policy interventions.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for Japan vs advanced-economy
+    donor pool. Pre-treatment 2010-2018; post-treatment 2019-2024.
+
+falsification:
+  rule: >
+    SUPPORTED if SC gap on trade-openness is positive at point
+    estimate by 2024. PARTIAL if positive but small. REFUTED if
+    negative.
+  test: synthetic_control_japan_megafta_2019
+  threshold: >
+    PRIMARY: SC_gap(trade_openness, 2024) > 0 (point estimate).
+
+prior_confidence: 0.55
+
+disclosure: >
+  Prior just above coin-flip (0.55). Japanese trade openness has
+  been structurally low for decades despite multiple FTA waves.
+  The mega-FTA pivot is a deliberate diversification move that may
+  show up in bilateral composition rather than aggregate openness.
+
+linked_hypotheses:
+  - trade_lib_cptpp_2018_pacific_rim_trade
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_japan_cptpp_2018_trade_effect.md

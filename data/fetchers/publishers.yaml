@@ -558,6 +558,25 @@ publishers:
 
       MANUAL-DROP pattern: drop file(s) into data/manual/swiss_fso/ and call data.fetchers.swiss_fso.fetch().'
     fetcher_module: data.fetchers.swiss_fso
+  bak_swiss:
+    name: BAK Economics + KOF Swiss Economic Institute
+    endpoint: manual://data/manual/bak_swiss/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    catalogue_url: https://kof.ethz.ch/en/forecasts-and-indicators/indicators.html
+    vintage_behaviour: append_only
+    notes: 'Swiss-cantonal economic indicators (per-capita GDP, employment shares,
+      regulation intensity) sourced from BAK Economics regional forecasts and KOF
+      (ETH Zurich) Globalisation Index + cantonal regulation index. BAK is a paid-research
+      firm so cantonal series ship as XLSX previews behind a press / media-room flow;
+      KOF series are free but the kof.ethz.ch download URLs rotate per release. Both
+      handled as MANUAL-DROP: drop file(s) into data/manual/bak_swiss/<series_id>/ and
+      call data.fetchers.bak_swiss.fetch(series_id). Schema target: country_iso3=CHE,
+      region_code (CH-XX ISO-3166-2), year, value. Cross-reference with swiss_fso
+      for canton GDP/demographics underlay.'
+    fetcher_module: data.fetchers.bak_swiss
   swiss_obsan:
     name: Swiss Health Observatory (OBSAN)
     endpoint: ''
@@ -593,6 +612,21 @@ publishers:
     catalogue_url: https://wid.world/data/
     vintage_behaviour: append_only
     notes: Manual-drop (bulk download URLs 403/404 on automated; browser flow required). Top income + wealth shares, labor share, per-country bulk CSVs.
+  chinn_ito:
+    name: Chinn-Ito KAOPEN
+    endpoint: https://web.pdx.edu/~ito/kaopen_2023.dta
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.chinn_ito
+    catalogue_url: https://web.pdx.edu/~ito/Chinn-Ito_website.htm
+    vintage_behaviour: append_only
+    aliases:
+    - kaopen
+    notes: 'De jure capital-account-openness index built from four IMF AREAER binary indicators (multiple FX, current-acct restrictions, capital-acct restrictions, surrender of export proceeds). 2023 release covers 1970-2023, ~180 economies. Stata .dta format. Falls back to manual drop at data/manual/chinn_ito/ if the PDX host is unavailable. Mirrored by OWID as `owid:capital-account-openness` — this entry is the canonical upstream.
+
+      '
   hanke_tc:
     name: Hanke Troubled Currencies Project
     endpoint: manual://data/manual/hanke_tc/
@@ -1798,6 +1832,19 @@ publishers:
     vintage_behaviour: revisable
     notes: US Census Bureau Data API. ACS 5-year, Population Estimates, SAIPE, CPS ASEC, EITS Building Permits, International Trade. Free key recommended (CENSUS_API_KEY env var) but most endpoints work
       without one.
+  nber_historical:
+    name: NBER Historical Macrohistory Database
+    endpoint: https://data.nber.org/databases/macrohistory/contents/
+    auth_required: false
+    license: public_domain
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.nber_historical
+    catalogue_url: https://www.nber.org/research/data/nber-macrohistory-database
+    vintage_behaviour: append_only
+    notes: 'Pre-1929 US macro (industrial production, unemployment, money stock, pig-iron, freight carloadings) compiled by NBER from US public-domain statistical sources. Strategy: prefer FRED mirror
+      (M*NNBR series IDs) for series available there; fall back to direct CSV downloads from data.nber.org/databases/macrohistory/rectdata/ for series with no mirror. Series IDs are namespaced
+      nber_us_* to avoid collision with FRED bare IDs. Requires FRED_API_KEY for mirrored series.'
   imf_ifs:
     name: IMF International Financial Statistics / BOP / AREAER (manual-drop)
     endpoint: https://data.imf.org/
@@ -1811,3 +1858,36 @@ publishers:
     notes: IMF deprecated all public SDMX endpoints in 2024 in favour of Power BI Embedded at data.imf.org. There is no programmatic API. This fetcher reads bulk CSV/XLSX exports from data/manual/imf_ifs/.
       Users sign in to data.imf.org once, export the CSV for the relevant IFS / BOP / AREAER / FSI dataset, and drop the file into the manual directory. Supports IFS series (FIDR_PA, FIGB_PA, FMA_USD),
       BOP/IIP (BFOAFA, BFXFA), AREAER, and FSI series that are NOT in the WEO DataMapper.
+  mercatus:
+    name: Mercatus QuantGov RegData
+    endpoint: https://www.quantgov.org/regdata-us
+    auth_required: false
+    license: unknown
+    credibility_tier: 3
+    status: ready
+    fetcher_module: data.fetchers.mercatus
+    catalogue_url: https://www.quantgov.org/regdata-us
+    vintage_behaviour: append_only
+    notes: 'Mercatus Center / QuantGov RegData — US federal regulatory restrictiveness via binding-language word counts in the CFR plus Federal Register annual page counts. QuantGov does not advertise stable
+      direct CSV URLs, so the fetcher probes a candidate list (versioned static URL, WP-uploads URL, GitHub mirror) and falls back to manual drop in data/manual/mercatus/<series_id>.csv if all candidates 404.
+      Open-data terms in practice but mapped to ''unknown'' since the schema enum lacks open_data. Re-confirm canonical URLs against the QuantGov landing page on annual refresh.
+
+      '
+  kleiner_krueger:
+    name: Kleiner & Krueger / Hamilton Project occupational-licensing replication
+    endpoint: https://www.hamiltonproject.org/papers/reforming_occupational_licensing_policies/
+    auth_required: false
+    license: academic_citation
+    credibility_tier: 3
+    aliases:
+    - kk_licensing
+    status: ready
+    fetcher_module: data.fetchers.kleiner_krueger
+    catalogue_url: https://www.hamiltonproject.org/papers/reforming_occupational_licensing_policies/
+    vintage_behaviour: stable
+    notes: 'Static academic replication tables from Morris Kleiner + Alan Krueger (BLS / NBER 2006-2013) and the Hamilton Project / Brookings 2015 update. Single-shot CSV download with manual-drop fallback
+      under data/manual/kleiner_krueger/<series_id>.csv since Brookings has re-pathed the report PDF twice since 2015. Headline series: state-year licensing share of workforce (~50 states x 1983-2015), wage
+      premium for licensed vs unlicensed within occupations, historical 1950-2008 occupation-licensing growth, and the 2015 single-year cross-section. Cite Kleiner-Krueger (2010, 2013) and Kleiner (2015,
+      Hamilton Project).
+
+      '

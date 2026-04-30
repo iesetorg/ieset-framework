@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_working_age_share_per_capita_growth
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  The "demographic dividend" hypothesis: across countries 1960-2023, increases in the
+  working-age population share (15-64) are associated with elevated real GDP per capita
+  growth, with a 1-percentage-point rise in working-age share predicting roughly
+  0.3-0.5 percentage-point higher annualised per-capita growth, after controlling for
+  capital deepening, education, and institutions. Effect is symmetric: countries past the
+  working-age peak should experience a corresponding drag.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, KOR, CHN, IND, IDN, BRA, MEX, ARG, CHL, ZAF, NGA, KEN, EGY, TUR, THA, MYS, PHL, VNM, BGD, PAK, IRN, POL, HUN, CZE, ROU, RUS, UKR, CAN, AUS, NZL]
+  period: [1960, 2023]
+  temporal_structure: panel
+scope:
+  period: [1960, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, demographics_migration]
+  policy_family: [none]
+  treatment_tags: [demographic_dividend, working_age_share]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+  controls:
+    - name: log_gdp_per_capita_initial
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: secondary_completion_rate
+      source: world_bank_wdi:SE.SEC.CMPT.LO.ZS
+      transformation: level
+    - name: government_effectiveness
+      source: wgi:GOV_WGI_GE.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if coefficient on working-age share is positive at p<0.05 with magnitude
+    between 0.2 and 0.8 percentage points of growth per percentage-point increase, AND
+    holds out-of-sample in the post-2000 sub-panel. REFUTED if coefficient insignificant,
+    wrong-signed, or post-2000 sub-panel shows no relationship.
+  test: panel_fe_dividend_with_subsample_robustness
+  threshold: "coef_wap > 0.2 AND coef_wap < 0.8 AND p < 0.05 AND post2000_subsample_significant"
+prior_confidence: 0.75
+disclosure: >-
+  Priors strongly aligned with the demographic-dividend literature; risk of confirmation bias.
+  Bloom-Williamson/Asia-tigers experience may not generalise globally; institutional
+  conditioning could absorb the headline effect.
+steelman: hypotheses/steelman/demo_working_age_share_per_capita_growth.md

@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_remittance_corridor_dependency
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  In countries with major migrant-corridor remittance dependency (Philippines, Bangladesh,
+  Honduras, Nepal, where remittances exceed 6% of GDP for sustained periods), remittances
+  smooth household consumption but are associated with reduced domestic labour-force
+  participation (Dutch-disease-via-labour) and elevated reservation wages. The hypothesis
+  predicts a negative panel association between remittance share of GDP and male prime-age
+  LFP across the corridor sample 2000-2023.
+evidence_type: associational
+sample:
+  countries: [PHL, BGD, HND, NPL, GTM, SLV, MEX, IND, PAK, LKA, MAR, EGY, JAM]
+  period: [2000, 2023]
+  temporal_structure: panel
+scope:
+  period: [2000, 2023]
+  countries: [PHL, BGD, HND, NPL]
+  outcome_dim: [demographics_migration, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [remittance_dependency, migrant_corridors]
+variables:
+  outcome:
+    - name: lfp_male_25_54
+      source: ilostat:EAP_2WAP_SEX_AGE_RT
+      transformation: level
+  treatment:
+    - name: remittance_share_gdp
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: level
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if remittance-share-of-GDP coefficient on male prime-age LFP is negative at
+    p<0.05 with magnitude at least 0.2pp LFP per pp of remittance share. REFUTED if
+    coefficient insignificant, wrong-signed, or magnitude < 0.1pp.
+  test: panel_fe_remittance_male_lfp
+  threshold: "coef_remittance < -0.2 AND p < 0.05"
+prior_confidence: 0.55
+disclosure: >-
+  Reverse causation (low LFP → migration → remittances) is a binding identification problem;
+  cross-sectional fixed effects help but do not solve. v2 should use IV (oil-price for Gulf
+  corridors).
+steelman: hypotheses/steelman/demo_remittance_corridor_dependency.md

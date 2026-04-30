@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: caribbean_climate_resilience_panel_1990_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Across Caribbean small-island economies 1990-2024, climate-related
+  shocks (named hurricanes, tropical-storm landfalls, sea-level
+  encroachment events) imposed measurable cumulative real-GDP-per-
+  capita losses correlated with storm frequency and intensity, and
+  insurance-market and disaster-financing arrangements (CCRIF SPC,
+  contingent-credit lines) reduced — but did not eliminate — the
+  growth penalty. The pre-registered claim is (a) panel-FE
+  estimation of log_gdp_pc on country and year FE shows a
+  significant negative coefficient on a storm-intensity index, AND
+  (b) post-2007 (CCRIF establishment) the magnitude of the storm
+  coefficient is smaller than pre-2007 in countries that joined,
+  AND (c) the CARICOM-region cumulative growth gap relative to LATAM
+  median is at least partly explained by the storm-intensity differential.
+
+evidence_type: causal
+
+sample:
+  countries: [JAM, BRB, BHS, DOM, TTO, HTI, GRD, LCA, KNA, ATG, VCT, DMA]
+  period: [1990, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1990, 2024]
+  countries: [JAM, BRB, BHS, DOM, TTO, HTI, GRD, LCA, KNA, ATG, VCT, DMA]
+  outcome_dim: [gdp_growth, fiscal_policy, capital_flows]
+  policy_family: [fiscal_policy, energy_policy, regulation]
+  treatment_tags: [ccrif_2007]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: gross_general_govt_debt_share_gdp
+      source: imf:GGXWDG_NGDP
+      transformation: level
+    - name: tourism_arrivals
+      source: world_bank_wdi:ST.INT.ARVL
+      transformation: log_level
+  treatment:
+    - name: storm_intensity_index
+      source: "constructed: from EM-DAT/IBTrACS proxy mapped to country-year"
+      transformation: level
+      notes: External climate proxy required; spec acknowledges data-gating.
+    - name: ccrif_membership_indicator
+      source: "constructed: binary by country and post-2007 year"
+      transformation: binary
+  controls:
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Climate exposure (regulatory/risk-pooling), fiscal (disaster
+  finance), and infrastructure (energy/coastal) are bundled.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe with country and year FE plus storm-intensity
+    coefficient. Secondary: CCRIF DiD comparing pre/post-2007
+    membership. Tertiary: variance decomposition of cumulative growth
+    gap into storm intensity and other channels.
+
+falsification:
+  rule: >
+    Not supported if (a) panel_fe coefficient on storm-intensity is
+    not negative and significant at p < 0.10, OR (b) CCRIF
+    DiD-attenuation coefficient is not negative (i.e. CCRIF membership
+    does not partly offset the storm coefficient), OR (c) the
+    storm-intensity-attributable share of the Caribbean-LATAM growth
+    gap is below 10%.
+  test: panel_fe_plus_ccrif_did_plus_decomposition
+  threshold: >
+    storm_intensity_coefficient < 0 at p < 0.10
+    AND ccrif_did_attenuation < 0
+    AND storm_attributable_share_of_growth_gap >= 0.10
+
+prior_confidence: 0.7
+
+disclosure: >
+  Author prior favours climate-vulnerability-imposing-real-cost story.
+  Risk: storm-intensity index is constructed from external sources
+  that the framework discipline does not yet fully gate; spec is
+  data-gated and may be deferred until the index is publisher-clean.
+
+steelman: hypotheses/steelman/caribbean_climate_resilience_panel_1990_2024.md
+
+linked_hypotheses:
+  - jamaica_imf_debt_restructuring_2010_2024
+  - dominican_tourism_freezone_model_1980_2024
+
+notes: >
+  Cross-country Caribbean panel; storm-intensity index requires
+  external-source mapping with clear data-quality flags.

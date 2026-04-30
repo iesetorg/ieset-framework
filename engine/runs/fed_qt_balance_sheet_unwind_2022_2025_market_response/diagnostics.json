@@ -1,0 +1,95 @@
+{
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient pre/post obs (pre=2, post=4)",
+  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+  "verdict_reason": "insufficient pre/post obs (pre=2, post=4)",
+  "hypothesis_id": "fed_qt_balance_sheet_unwind_2022_2025_market_response",
+  "template": "event_study",
+  "claim_direction_inferred": "-",
+  "event_year": 2022,
+  "threshold_extracted": {},
+  "falsification_rule_text": "Daily event study around six QT-related Fed communications: 2022-05-04 (May FOMC QT plan), 2022-06-01 (QT begins), 2022-09-01 (cap doubles), 2024-05-01 (QT taper announced), 2024-06-01 (taper begins), 2025-01 (further taper or end announcement). For each event, compute 1-day and 5-day changes in 10y term premium (NY Fed ACM model) and 30y mortgage spread to 10y Treasury. SUPPORTED if (a) cumulative 1-day term-premium change across all six events is positive AND in [+10bp, +40bp] AND (b) per-dollar effect (cumulative bp / cumulative balance-sheet movement in $T) is in [3bp/$T, 12bp/$T], materially smaller than QE-era estimate (~25bp/$T per Bauer-Rudebusch 2014). REFUTED if cumulative term-premium change <=0 (no QT effect) OR per-dollar effect >20bp/$T (symmetric, contradicts asymmetry prediction).",
+  "falsification_test_text": "fed_qt_2022_2025_event_study_term_premium_mortgage_spread",
+  "comparison": {
+    "error": "insufficient pre/post obs (pre=2, post=4)"
+  },
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "treasury_yield_10y",
+        "source": "fred:DGS10",
+        "publisher": "fred",
+        "n_rows": 65
+      },
+      {
+        "role": "outcome",
+        "name": "treasury_yield_30y",
+        "source": "fred:DGS30",
+        "publisher": "fred",
+        "n_rows": 50
+      },
+      {
+        "role": "outcome",
+        "name": "mortgage_treasury_spread",
+        "source": "fred:MORTGAGE30US; fred:DGS10",
+        "publisher": "fred",
+        "n_rows": 65
+      },
+      {
+        "role": "treatment",
+        "name": "fed_balance_sheet_walcl",
+        "source": "fred:WALCL",
+        "publisher": "fred",
+        "n_rows": 25
+      },
+      {
+        "role": "controls",
+        "name": "vix",
+        "source": "fred:VIXCLS",
+        "publisher": "fred",
+        "n_rows": 37
+      },
+      {
+        "role": "controls",
+        "name": "cpi_yoy",
+        "source": "fred:CPIAUCSL",
+        "publisher": "fred",
+        "n_rows": 80
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "ny_fed_acm_term_premium_10y",
+        "source": "fred:THREEFYTP10"
+      },
+      {
+        "role": "outcome",
+        "name": "mortgage_30y_rate",
+        "source": "fred:MORTGAGE30US"
+      },
+      {
+        "role": "outcome",
+        "name": "mbs_oas_spread",
+        "source": "fred:BAMLC0A0CMTRIV"
+      },
+      {
+        "role": "treatment",
+        "name": "qt_announcement_event",
+        "source": "constructed: 6 events 2022-05-04, 2022-06-01, 2022-09-01, 2024-05-01, 2024-06-01, 2025-01-XX"
+      },
+      {
+        "role": "treatment",
+        "name": "fed_funds_target",
+        "source": "fred:DFEDTARU"
+      },
+      {
+        "role": "controls",
+        "name": "treasury_issuance_pace",
+        "source": "fred:MTSDS133FMS"
+      }
+    ]
+  },
+  "run_utc": "2026-04-30T08:43:17+00:00",
+  "runner": "scripts/run_event_study.py"
+}

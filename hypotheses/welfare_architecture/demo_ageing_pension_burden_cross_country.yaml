@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_ageing_pension_burden_cross_country
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: >-
+  Across OECD countries 1990-2023, the rise in the old-age dependency ratio is associated with
+  a proportional increase in public pension expenditure as a share of GDP and crowding-out of
+  productive public investment, particularly where pay-as-you-go pension architecture
+  predominates. The hypothesis predicts a positive elasticity of pension spending to old-age
+  dependency exceeding 0.7, and a negative association between rising pension shares and
+  public capital investment.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, KOR, CAN, AUS, NLD, SWE, NOR, DNK, FIN, CHE, BEL, AUT, IRL, NZL, GRC, PRT, POL, HUN, CZE, SVK, SVN, EST, LVA, LTU]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [fiscal_policy, welfare_state, demographics_migration]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [ageing, pension_burden, paygo_systems]
+variables:
+  outcome:
+    - name: public_pension_expenditure_share_gdp
+      source: oecd:OECD.ELS.SAE,DSD_SOCX_AGG@DF_SOCX_AGG,1.0
+      transformation: level
+      notes: OECD SOCX aggregate pension expenditure share of GDP.
+    - name: public_investment_share_gdp
+      source: imf:WEO.NGDP_RPCH
+      transformation: level
+      notes: IMF WEO/IFS general government gross fixed capital formation share of GDP; resolved at wiring.
+  treatment:
+    - name: old_age_dependency_ratio
+      source: world_bank_wdi:SP.POP.DPND.OL
+      transformation: level
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: government_effectiveness
+      source: wgi:GOV_WGI_GE.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if elasticity of pension share to old-age dependency >= 0.7 with p<0.05, AND
+    public investment share negatively associated with pension share at p<0.10. REFUTED if
+    elasticity below 0.4 or wrong-signed, OR no crowd-out detectable in either direction.
+  test: panel_fe_pension_dependency_elasticity_with_crowdout
+  threshold: "elasticity_pension_to_oadr >= 0.7 AND coef_pension_on_invest < 0 AND p < 0.10"
+prior_confidence: 0.65
+disclosure: >-
+  Priors expect the headline elasticity result but are less confident on the crowding-out
+  channel given debt-financed accommodation. Reverse causation (countries with growth
+  troubles ageing harder via emigration) is a concern.
+steelman: hypotheses/steelman/demo_ageing_pension_burden_cross_country.md
+notes: SOCX OECD path data-gated; IMF GFCF series resolved at wiring.

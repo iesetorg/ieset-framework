@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: latam_remittance_dependency_2020_2025_dollarisation_pull
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Across six Latin American economies with high US-source remittance dependency (MEX, GTM, HND,
+  SLV, NIC, DOM), the post-COVID expansion of US-to-LatAm remittance flows (2020-2024) combined
+  with the 2022-2023 Federal-Reserve hiking cycle produced measurable dollarisation pressure:
+  rising USD share of resident deposits, rising USD-denominated household savings, and (where
+  measurable) rising USD-denominated retail circulation. The pre-registered claim is that across
+  these six countries, the growth in remittances-as-share-of-GDP between 2019 and 2024 is
+  positively associated with the change in resident-deposit USD share over the same window
+  (cross-country regression coefficient > 0.15 with p < 0.10), AND that the US-Fed-rate-hike
+  pass-through to local deposit rates is incomplete in non-dollarised economies (real-rate
+  gap widened > 100 bp at peak), creating an additional dollarisation incentive.
+notes: >
+  Six-country cross-section + time-series panel design. SLV is dollarised (2001) so serves as
+  the dollarisation-saturated control; the other five vary in dollarisation pressure. Remittance-
+  share-of-GDP is the largest cross-country variation: SLV/HND/GTM at 20-30%, DOM at ~9%, MEX
+  at ~4%, NIC at 27%. Post-COVID remittance expansion was disproportionate (Mexican remittances
+  grew from $36bn in 2019 to $63bn in 2023 — 75% increase). The hypothesis tests whether this
+  flow expansion mechanically raised dollarisation pressure in the recipient economies.
+prior_confidence: 0.55
+disclosure: >
+  Author has theoretical priors that high remittance dependency mechanically pulls toward
+  dollarisation, but the empirical literature is mixed: Levy-Yeyati (2006) finds dollarisation
+  is sticky and primarily driven by inflation history rather than capital-flow pressure;
+  Chamon-Hausmann (2005) find dollarisation can be high even in countries without large
+  USD inflows (driven by credibility deficits). The 0.55 reflects this theoretical-empirical
+  tension; pre-registration locks the cross-country threshold.
+evidence_type: associational
+sample:
+  countries: [MEX, GTM, HND, SLV, NIC, DOM]
+  period: [2017, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude SLV from main regression (dollarisation saturated since 2001); report separately"
+    - "Nicaragua post-2018 sanctions affect remittance-channel dynamics; flag in robustness"
+scope:
+  period: [2017, 2025]
+  countries: [MEX, GTM, HND, SLV, NIC, DOM]
+  outcome_dim: [currency_purchasing_power, capital_flows, monetary_policy]
+  policy_family: [monetary_policy, exchange_rate_regime]
+  treatment_tags: [latam_remittance_expansion_2020_2024, latam_monetary_tightening_cycle_2021_2023, us_fed_hiking_cycle_2022_2023]
+variables:
+  outcome:
+    - name: resident_deposit_usd_share
+      source: imf:DCFD_USD_DC; world_bank_wdi:FB.AST.NPER.ZS
+      transformation: pct_total_deposits
+      notes: >
+        IMF Financial Soundness Indicators (FSI) coverage of deposit-currency-composition is
+        partial across LatAm; supplemented with central-bank-published series where available
+        (banrep COL, sv_bcr SLV).
+    - name: real_local_currency_deposit_rate
+      source: imf:FIDR; world_bank_wdi:FR.INR.DPST
+      transformation: real_rate_yoy
+    - name: real_effective_exchange_rate
+      source: bis:WS_EER
+      transformation: index_level_monthly
+  treatment:
+    - name: remittance_share_of_gdp_change
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: change_2019_to_2024
+    - name: us_fed_rate_pass_through_gap
+      source: "derived: (us_policy_rate - local_deposit_rate) - (us_2017_avg - local_2017_avg)"
+      transformation: change_in_rate_gap
+  controls:
+    - name: cpi_inflation
+      source: imf:PCPIPCH
+      transformation: yoy_pct
+    - name: pre_treatment_dollarisation_level
+      source: imf:DCFD_USD_DC
+      transformation: pre_2020_avg
+    - name: oil_price
+      source: fred:DCOILBRENTEU; imf_pcps:POILBRE
+      transformation: log_level
+    - name: us_recession_indicator
+      source: fred:USREC
+      transformation: binary
+intervention_channel: monetary
+intervention_channel_justification: >
+  Cross-country dollarisation pressure is a monetary-channel outcome (currency-substitution
+  dynamics within national monetary systems). Coded as "monetary" per axes.yaml.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary: country-year panel fixed-effects regression of change in resident-deposit USD
+    share on change in remittance-share-of-GDP, with country and year fixed effects, clustered
+    SE at country level. Secondary: cross-section regression of 2024-vs-2019 change in
+    USD-deposit share on 2024-vs-2019 change in remittance share, single observation per
+    country (5 non-dollarised countries). Tertiary: time-series correlation of monthly
+    remittance-flow series with monthly USD-deposit-share for the country with cleanest data
+    (DOM or HND).
+falsification:
+  rule: >
+    Refuted if panel-FE coefficient on remittance-share-change is less than 0.15 with
+    p > 0.10 (i.e., dollarisation pressure does NOT track remittance dependency
+    cross-sectionally), OR if the cross-section regression's coefficient is negative or
+    insignificant. Mixed if panel coefficient is positive but small (0.05-0.15). Supported
+    if panel coefficient > 0.15 at p < 0.10 AND cross-section regression points the same
+    way.
+  test: panel_fe_remittance_dollarisation_pressure
+  threshold: "panel_FE_coefficient_remittance_share >= 0.15 at p < 0.10 AND cross_section_coefficient > 0"
+prior_confidence: 0.55
+disclosure: >
+  Pre-registered with limited (n=5 non-dollarised LatAm) cross-section power. The panel-FE
+  specification leverages within-country time-series variation to gain power; the cross-section
+  is a weaker secondary test. A null on this hypothesis would update author priors toward
+  the Chamon-Hausmann credibility-channel interpretation of dollarisation.
+steelman: hypotheses/steelman/latam_remittance_dependency_2020_2025_dollarisation_pull.md
+linked_hypotheses:
+  - bukele_fdi_gdp_investment_climate_2019_2024
+  - milei_dollarisation_inflation_collapse_2024_2026

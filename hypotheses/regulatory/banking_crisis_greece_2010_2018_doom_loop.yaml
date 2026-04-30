@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_greece_2010_2018_doom_loop
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Greece 2010-2018 exhibits the canonical sovereign-banking doom-loop: sovereign-debt
+  distress propagated through bank holdings of Greek government bonds, requiring three
+  successive IMF/EU programmes (2010, 2012, 2015), a sovereign restructuring in 2012
+  (PSI), and bank recapitalisations that depressed real GDP cumulatively by >= 25%
+  peak-to-trough. The hypothesis is that the canonical multi-metric signature for
+  Greece is met across at least 5 of 6 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [GRC]
+  period: [2007, 2019]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_gdp_peak_to_trough
+    description: Greece real GDP peak-to-trough cumulative decline
+    threshold: ">= 25% decline"
+    window: "2008-2016"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: unemployment_peak
+    description: Greece unemployment rate peak vs 2008 baseline
+    threshold: ">= 19 pp rise (peak >= 27%)"
+    window: "2010-2016"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; eurostat:une_rt_a"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+  - metric_id: government_debt_peak
+    description: Greece general government gross debt peak
+    threshold: ">= 175% of GDP"
+    window: "2011-2018"
+    source: "imf:GGXWDG_NGDP; eurostat:gov_10dd_edpt1"
+    direction: supports_claim
+    independence_justification: Fiscal aggregate.
+  - metric_id: psi_sovereign_restructuring_2012
+    description: Greek PSI sovereign-debt restructuring March 2012
+    threshold: "yes/no — yes counts as breach"
+    window: "2012"
+    source: "imf:EFF_GRC_2012"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: capital_controls_imposed_2015
+    description: Capital controls imposed June 2015 with bank holiday
+    threshold: "yes/no — yes counts as breach"
+    window: "2015-2019"
+    source: "imf:GRC_CFM_2015"
+    direction: supports_claim
+    independence_justification: Programme/CFM metadata.
+  - metric_id: bank_npl_ratio_peak
+    description: Greek bank non-performing loan ratio peak
+    threshold: ">= 40% of gross loans"
+    window: "2014-2018"
+    source: "world_bank_wdi:FB.AST.NPER.ZS"
+    direction: supports_claim
+    independence_justification: Bank-asset-quality measure.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 5
+  refute_threshold: 2
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: peak_above_baseline
+prior_confidence: 0.96
+disclosure: >
+  Greece's 2010-2018 trajectory is among the most-documented sovereign-banking crises
+  in modern macro and the multi-metric signature is overdetermined. Pre-registration
+  commits to specific thresholds.
+steelman: hypotheses/steelman/banking_crisis_greece_2010_2018_doom_loop.md
+scope:
+  period: [2007, 2019]
+  countries: [GRC]
+  outcome_dim: [financial_crisis, financialisation, fiscal_policy, employment_labour]
+  policy_family: [regulation, fiscal_policy, monetary_policy]
+  treatment_tags: [greece_2010_2018, sovereign_banking_doom_loop, psi_2012, syriza_capital_controls_2015]

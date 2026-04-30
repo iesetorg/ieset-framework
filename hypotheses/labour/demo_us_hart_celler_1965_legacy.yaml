@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_us_hart_celler_1965_legacy
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  The 1965 US Hart-Celler immigration reform replaced national-origin quotas with a
+  family-reunification + skill-based system, producing a multi-decade shift in the
+  composition and scale of US migrant inflows. The hypothesis tests whether the post-1965
+  immigrant cohort delivered measurable contributions to (a) US working-age population
+  growth above the trajectory implied by pre-1965 rules, and (b) labour-force participation
+  rates and per-capita output, controlling for natural population growth.
+evidence_type: associational
+sample:
+  countries: [USA]
+  period: [1950, 2023]
+  temporal_structure: time_series
+scope:
+  period: [1950, 2023]
+  countries: [USA]
+  outcome_dim: [demographics_migration, employment_labour, gdp_growth]
+  policy_family: [labour_market, institutional_reform]
+  treatment_tags: [hart_celler_1965, us_immigration_policy]
+variables:
+  outcome:
+    - name: foreign_born_population_share
+      source: un_desa:international_migrant_stock
+      transformation: level
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: hart_celler_indicator
+      source: "constructed: indicator = 1 for years >= 1968 (effective date of 1965 reform)"
+      transformation: indicator
+  controls:
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+estimator:
+  template: event_study
+  notes: >
+    Event-study design around 1965/1968 with single-treated-unit (US); use long pre-period
+    1950-1965 as baseline. Report break-test on foreign-born share trajectory.
+falsification:
+  rule: >-
+    SUPPORTED if the foreign-born share trajectory shows a structural break at 1965/1968
+    with post-break slope exceeding pre-break slope by at least 0.05 pp/yr, AND the
+    cumulative contribution to US working-age share by 2020 exceeds 3 percentage points
+    versus a no-Hart-Celler counterfactual. REFUTED if no detectable break or cumulative
+    working-age contribution < 1pp.
+  test: event_study_hart_celler_break_with_counterfactual_simulation
+  threshold: "break_test_p < 0.05 AND cumulative_wap_contribution_2020 >= 3.0"
+prior_confidence: 0.75
+disclosure: >-
+  Hart-Celler's transformative effect on US demography is well-documented; risk is conflating
+  the policy effect with concurrent fertility-decline-driven demand for replacement labour.
+steelman: hypotheses/steelman/demo_us_hart_celler_1965_legacy.md

@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: solar_lcoe_2010_2024_learning_curve_continuation
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The photovoltaic (PV) learning curve — log cost of utility-scale solar
+  modules and levelised cost of electricity (LCOE) declining linearly in
+  log cumulative installed capacity at a learning rate of approximately
+  20-25% per doubling — continued through the 2020-2024 period despite
+  (a) the COVID supply-chain shock 2020-2022, (b) the 2022 polysilicon
+  + freight-rate spike, (c) the 2022-2023 inflation shock that reversed
+  cost declines in many other capital-equipment classes, (d) US + EU
+  trade defences against Chinese modules. Specifically, global utility-
+  scale solar module prices ($/W) and LCOE ($/MWh) by 2024 were lower
+  than 2019 levels in real terms despite the macro inflation shock, and
+  the implied 2010-2024 learning rate is statistically indistinguishable
+  from the 2010-2019 learning rate. This is a sharp test against the
+  alternative hypothesis that the PV learning curve flattened post-2020
+  due to commoditisation + supply-chain pressures.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN, USA, DEU, IND, JPN, KOR, ESP, ITA, AUS, BRA, GBR, FRA]
+  period: [2010, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "global learning curve fitted on world spot prices; country list represents the dominant capacity-installer set used to verify cumulative-installed-capacity series"
+
+scope:
+  period: [2010, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [energy, productivity, industrial_capability]
+  policy_family: [industrial_policy, energy_policy, none]
+  treatment_tags: [solar_pv_learning_curve, china_solar_industrial_policy, ira_2022_solar_credits, eu_solar_anti_dumping]
+
+variables:
+  outcome:
+    - name: log_solar_pv_module_price_usd_per_w
+      source: "irena:solar_pv_costs"
+      transformation: log
+      notes: "IRENA renewable cost database — utility-scale module $/W, real 2023 USD."
+    - name: log_solar_pv_lcoe_usd_per_mwh
+      source: "irena:lcoe_solar_pv"
+      transformation: log
+    - name: log_polysilicon_spot_price_usd_per_kg
+      source: "constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/."
+      transformation: log
+    - name: log_solar_module_efficiency_pct
+      source: "constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending."
+      transformation: log
+
+  treatment:
+    - name: log_cumulative_installed_solar_capacity_gw
+      source: "irena:capacity"
+      transformation: log
+      notes: "Learning-curve x-axis: log cumulative GW solar installed globally."
+    - name: post_2020_inflation_shock_dummy
+      source: "constructed: indicator = 1 from 2020-Q1 onwards (COVID supply-chain shock + subsequent commodity + freight inflation)."
+      transformation: indicator
+
+  controls:
+    - name: log_brent_oil
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: log_industrial_metals_index
+      source: "imf_pcps:PMETA"
+      transformation: log
+    - name: log_us_cpi
+      source: "fred:CPIAUCSL"
+      transformation: log
+      notes: "US CPI deflator — convert nominal IRENA $/W to real $/W."
+
+estimator:
+  template: panel_fe
+  clustering: year
+  fixed_effects: []
+  notes: >
+    Primary specification: log(cost) = α + β × log(cumulative capacity) + ε,
+    estimated separately for two windows: 2010-2019 (pre-shock) and 2010-
+    2024 (full sample). Test: H0 β_full = β_pre, against H1 the coefficient
+    has flattened (|β_full| < |β_pre|).
+
+    Secondary: structural-break test (Chow / Quandt-Andrews) for break-
+    point in log-cost on log-cumulative-capacity series 2020-2022. If
+    no break detected, learning curve continued through inflation shock.
+
+    Tertiary: residual analysis — plot residuals from 2010-2019 fitted
+    learning curve against 2020-2024 actuals. Inflation-shock spike
+    2022 visible as positive residual; subsequent reversion below
+    fitted line by 2024 indicates the trajectory caught up.
+
+    Decomposition: separate module $/W (technology-cost) from BOS
+    (balance-of-system) $/W (installation cost). The learning rate is
+    historically faster on module than BOS; if the 2020-2024 module-
+    learning continued but BOS flattened, the LCOE result is mixed.
+
+    Known limitations:
+    (1) IRENA cost data is annual; finer-resolution test using BloombergNEF
+        monthly module spot would be sharper.
+    (2) Trade-defended markets (US post-2018 Section 201 tariffs, EU 2013-
+        2018 anti-dumping) had higher domestic prices than world spot;
+        the global learning curve mixes these regimes.
+    (3) Capacity factor improvements (bifacial modules, tracker uptake)
+        are part of LCOE decline that is not module-cost-curve.
+    (4) Currency effects: USD-denominated cost vs CNY-denominated
+        production cost; some 2022-2024 USD price stability reflects
+        CNY weakness rather than CNY-cost decline.
+
+falsification:
+  rule: >
+    Not supported if (a) β_full < 0.7 × β_pre (learning rate flattened
+    by more than 30%), OR (b) Chow-test for break in 2020-2022 rejects
+    no-break at p<0.10 with break that is a slowdown, OR (c) module $/W
+    in 2024 exceeds 2019 real $/W (no progress despite cumulative
+    capacity tripling), OR (d) the BOS-cost component shows zero or
+    positive learning rate (BOS-cost learning has historically been
+    weaker; if it has flatlined entirely, LCOE story is more fragile).
+  test: solar_learning_curve_2010_2024
+  threshold: >
+    β_full ≥ 0.85 × β_pre (≤15% flattening tolerated) AND
+    No structural break at p<0.10 AND
+    2024 module $/W < 2019 module $/W in real 2023 USD AND
+    BOS-cost learning rate > 0 over 2010-2024.
+
+prior_confidence: 0.78
+
+disclosure: >
+  Author prior is high that the PV module learning curve continued: by
+  2024 utility-scale module prices had fallen to $0.10-0.15/W (down
+  from $0.20-0.25/W in 2019, despite the 2022 spike to $0.27-0.30/W
+  during the polysilicon-shortage). The BOS-cost story is less clean —
+  installation labour + permitting + interconnection costs in OECD
+  markets have flattened or risen. Author predicts a "supported with
+  caveats" verdict: module-cost learning continued, BOS may have
+  flatlined. Climate-policy implication (continued learning means
+  decarbonisation cost-of-abatement keeps falling) is OUT OF SCOPE for
+  this hypothesis but is the obvious downstream relevance.
+
+steelman: hypotheses/steelman/solar_lcoe_2010_2024_learning_curve_continuation.md
+
+linked_hypotheses:
+  - china_renewables_industrial_policy_learning_curve
+  - china_renewables_global_learning_curve_spillover
+  - ira_2022_clean_energy_investment_decomposition
+  - green_industrial_policy_global_chip_race_2022_2026
+
+notes: >
+  Data readiness:
+  - IRENA cost + capacity panels: ready
+  - IMF PCPS (oil, metals): ready
+  - FRED CPI: ready
+  - BloombergNEF polysilicon + module spot: manual-drop pending under data/manual/derived/
+  - ITRPV efficiency: manual-drop pending
+
+  Run when BNEF polysilicon manual-drop is populated; v1 can run on IRENA
+  alone for the headline learning-rate test.

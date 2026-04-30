@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financial_fed_reverse_repo_facility_usage_2021_2024
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  The Federal Reserve's overnight reverse-repurchase-agreement facility (ON RRP) saw
+  usage rise from sub-USD 100bn in early 2021 to a peak above USD 2.4 trillion in
+  December 2022, then decline to below USD 500bn by mid-2024 as Treasury bill issuance
+  absorbed money-market-fund cash. The hypothesis is descriptive: ON RRP usage at
+  peak was >= USD 2.0 trillion, and the post-peak decline through 2024 was >= USD 1.5
+  trillion, both observable directly in FRED:RRPONTSYD.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2020, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: on_rrp_usage_daily
+      source: "fred:RRPONTSYD"
+      transformation: level_usd_billion
+    - name: tbill_outstanding
+      source: "fred:MTSDS133FMS; fred:TREAST"
+      transformation: level_usd_billion
+  treatment:
+    - name: ont_rrp_facility_active
+      source: "fred:RRPONTSYAWARD"
+      transformation: level
+  controls:
+    - name: fed_balance_sheet_size
+      source: "fred:WALCL"
+      transformation: level_usd_billion
+    - name: fed_funds_rate
+      source: "fred:DFF"
+      transformation: level_basis_points
+intervention_channel: monetary
+intervention_channel_justification: >
+  ON RRP is a monetary-policy implementation tool.
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive time series of ON RRP usage 2020-2024 with peak and post-peak decline.
+    Cross-reference with T-bill outstanding to show the absorption channel.
+falsification:
+  rule: >
+    SUPPORTED if peak ON RRP usage (FRED:RRPONTSYD daily) >= USD 2,000bn at any
+    observation 2021-2023 AND if post-peak decline through 2024Q3 >= USD 1,500bn.
+    PARTIAL if one of the two conditions met.
+    REFUTED if peak < USD 1,500bn OR if post-peak decline < USD 1,000bn through 2024Q3.
+  test: descriptive_rrp_peak_and_decline
+  threshold: "peak_RRPONTSYD >= 2000 AND decline_from_peak_to_2024Q3 >= 1500 (USD bn)"
+prior_confidence: 0.97
+disclosure: >
+  ON RRP usage data is published daily on FRED; peak and decline are observable facts.
+  Author market-liberal prior treats ON RRP usage as informative about post-COVID
+  liquidity conditions and Treasury issuance composition.
+steelman: hypotheses/steelman/financial_fed_reverse_repo_facility_usage_2021_2024.md
+scope:
+  period: [2020, 2024]
+  countries: [USA]
+  outcome_dim: [monetary_policy, financialisation]
+  policy_family: [monetary_policy]
+  treatment_tags: [fed_on_rrp, fed_balance_sheet_2021_2024, mmf_cash_management, tbill_supply_dynamics]

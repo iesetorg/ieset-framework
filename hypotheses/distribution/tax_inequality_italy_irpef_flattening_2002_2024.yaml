@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_italy_irpef_flattening_2002_2024
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Italian IRPEF flattening (Berlusconi 2003 bracket reduction from five to
+  three brackets, Renzi 2014 EUR 80 monthly bonus, Meloni 2024 three-bracket
+  structure) over 2002-2024 produced a measurable rise in the top-10 pretax
+  income share but a flat-to-declining top-1 share, consistent with the view
+  that bracket-flattening compresses upper-middle-class progressivity rather
+  than substantially benefitting the very top in a high-evasion-rate
+  jurisdiction. The discriminating test is the divergence between top-1 and
+  top-10 share trajectories over the period.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 3. The Italian pattern is well-
+  known but rarely formalised as a hypothesis; high evasion rates limit
+  the headline-rate elasticity at the very top.
+prior_confidence: 0.55
+disclosure: >
+  Author prior is genuinely uncertain — Italian top-1 share is partly an
+  evasion-corrected SOLE/IRES-side phenomenon and may not respond to
+  IRPEF rate structure.
+falsification:
+  rule: >
+    SUPPORTED if Italian top-10 share rises by at least 2 percentage points
+    2002-2024 AND top-1 share rises by less than 1 percentage point over
+    the same window. REFUTED if both move in the same direction by more
+    than 1 percentage point or top-1 outpaces top-10 at p<0.10.
+  test: >
+    Italy descriptive time-series plus Eurozone-comparator panel of top-1
+    vs top-10 trajectories with bracket-count change events as breaks.
+evidence_type: associational
+sample:
+  countries: [ITA, FRA, DEU, ESP, NLD, BEL, AUT, FIN, IRL, PRT]
+  period: [1995, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: ita_2003_bracket_flattening
+      source: "constructed: indicator = 1 for ITA, year >= 2003"
+      transformation: indicator
+    - name: ita_2024_bracket_flattening
+      source: "constructed: indicator = 1 for ITA, year >= 2024"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel-FE with Eurozone comparator pool. Outcome top-10 minus top-1
+    share gap. Robustness with event_study around 2003 and 2024 breaks.
+intervention_channel: fiscal
+scope:
+  period: [2002, 2024]
+  countries: [ITA]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [italy_irpef_flattening, berlusconi_2003, meloni_2024_brackets, evasion_constrained_eti]

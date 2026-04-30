@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_brazil_tax_base_evolution
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Brazilian tax-base evolution 1995-2024 — Real Plan stabilisation 1994 +
+  CPMF transactions tax 1997-2007 + Lula CCT funding 2003-2010 + Dilma
+  fiscal expansion + Bolsonaro tax simplification proposals + Lula 2024
+  consumption-tax reform — produced disposable-income Gini reduction of
+  at least 3 Gini-points over 1995-2024 driven primarily by transfer-side
+  expansion rather than tax-progressivity. The discriminating test
+  decomposes pretax vs disposable Gini change attribution to tax vs
+  transfer side.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 5.
+prior_confidence: 0.65
+disclosure: >
+  Author prior accepts that Brazilian Gini fell substantially over 1995-
+  2014 then plateaued; Bolsa Familia and BPC drive most of the reduction.
+falsification:
+  rule: >
+    SUPPORTED if Brazilian disposable-Gini falls by at least 3 Gini-
+    points 1995-2024 AND decomposition attributes more than 60 percent
+    of the fall to transfer-side at p<0.10. REFUTED if disposable-Gini
+    falls less than 1.5 Gini-points or transfer attribution is below
+    40 percent.
+  test: >
+    Brazil descriptive panel-FE decomposition of pretax-vs-disposable
+    Gini change.
+evidence_type: descriptive
+sample:
+  countries: [BRA]
+  period: [1995, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+    - name: poverty_headcount_ratio_3p65
+      source: "world_bank_wdi:SI.POV.LMIC"
+      transformation: level
+  decomposition_channels:
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+    - name: government_consumption_share_gdp
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: panel_fe_decomposition
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Decomposition of pretax-disposable Gini gap attribution to tax vs
+    transfer side. Robustness using Lustig-CEQ-style fiscal-incidence
+    decomposition.
+intervention_channel: fiscal
+scope:
+  period: [1995, 2024]
+  countries: [BRA]
+  outcome_dim: [poverty_inequality, taxation, welfare_state]
+  policy_family: [tax_policy, welfare_architecture]
+  treatment_tags: [real_plan_1994, lula_2003, brazil_2024_consumption_reform, fiscal_incidence_decomposition]

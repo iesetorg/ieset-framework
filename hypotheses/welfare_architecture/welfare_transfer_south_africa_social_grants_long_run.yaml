@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_south_africa_social_grants_long_run
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  South Africa's social-grants system (Old Age Pension extension 1998, Child Support Grant 1998-2012
+  expansion to age 18, Disability and Foster Care Grants, Social Relief of Distress 2020-2024) reaching
+  18+ million recipients — roughly 30% of population — has produced sustained reductions in extreme-
+  poverty headcount of 6 to 10 percentage points relative to a synthetic-control of upper-middle-income
+  Sub-Saharan and LatAm peers without comparable grant-coverage scale, while exerting fiscal-pressure
+  costs visible in National Treasury MTBPS structural-balance projections.
+evidence_type: associational
+prior_confidence: 0.65
+disclosure: |
+  Author views ZAF social-grants system as a high-coverage, high-cost natural experiment that has
+  outperformed expectations on poverty reduction while creating structural-fiscal pressure. Hypothesis
+  is associational long-run; identification depends on synthetic-control quality given ZAF's unique
+  apartheid-legacy structural features.
+sample:
+  countries: [ZAF, BWA, NAM, BRA, MEX, COL]
+  period: [1998, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 COVID SRD-emergency-grant period from headline grant-count series
+  - flag NAM as small-comparator with potential weight instability
+variables:
+  outcome:
+  - name: extreme_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  - name: social_spending_share_gdp
+    source: imf:GGXG_NGDP
+    transformation: level
+  treatment:
+  - name: social_grant_coverage_share_population
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level
+    notes: ZAF SASSA grant-recipient share of total population; placeholder pending SASSA wiring.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: ilostat:ILMS_unemployment
+    transformation: level
+  - name: hiv_prevalence_rate
+    source: who_gho:GHO/HIV_0000000001
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Social-grants system is a fiscal-channel transfer programme; expansion phases are fiscal scale changes.
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic-DiD on ZAF poverty/Gini outcomes 1998-2024 with BWA, NAM, BRA, MEX, COL donor pool.
+    Pre-treatment fit 1995-1998. Multi-stage rollout (1998 OAP, 2012 CSG-18, 2020 SRD) as event-time
+    cohorts.
+falsification:
+  rule: |
+    Refuted if the synth-DiD ATT on extreme-poverty headcount at 10-year horizon is below minus-6pp
+    (i.e., reduction less than 6pp), OR if Gini gap is positive (inequality fails to improve), OR if
+    placebo permutation p-value exceeds 0.10.
+  test: synth_did_10yr_extreme_poverty_gini_gaps
+  threshold: poverty_att <= -6pp AND gini_att < 0 AND placebo_p < 0.10
+scope:
+  period: [1998, 2024]
+  countries: [ZAF, BWA, NAM, BRA, MEX, COL]
+  outcome_dim: [poverty_inequality, welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [south_africa_social_grants_1998, csg_2012_expansion, srd_grant_2020, anc_government_continuity]
+steelman: hypotheses/steelman/welfare_transfer_south_africa_social_grants_long_run.md

@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_brazil_1999_real_devaluation
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Brazil's January 1999 abandonment of the crawling peg and devaluation of the real
+  by >= 35% against USD, combined with the IMF programme negotiated in late 1998 and
+  the legacy of the PROER bank-restructuring programme of 1995-1997, constitutes a
+  canonical EM exchange-rate-anchor-failure case in which banking-system stress was
+  managed without a Laeven-Valencia-coded systemic banking crisis. The hypothesis is
+  that Brazil 1998-1999 meets the canonical multi-metric currency-crisis signature on
+  at least 3 of 4 metrics, but does not satisfy the systemic-banking-crisis threshold.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [BRA]
+  period: [1995, 2003]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_depreciation_1999
+    description: Brazilian real against USD peak-to-trough nominal depreciation
+    threshold: ">= 35% depreciation"
+    window: "1998-1999"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal.
+  - metric_id: imf_programme_1998
+    description: IMF programme negotiated late 1998 (USD 41bn package)
+    threshold: "yes/no — yes counts as breach"
+    window: "1998-2000"
+    source: "imf:SBA_BRA_1998"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: real_gdp_growth_disturbance
+    description: Brazil real GDP growth dip vs trend
+    threshold: ">= 2 pp slowdown vs 1995-1997 average"
+    window: "1998-1999"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: cpi_inflation_pickup
+    description: Brazil CPI inflation pickup vs pre-devaluation
+    threshold: ">= 5 pp YoY rise from 1998 to 2000"
+    window: "1998-2000"
+    source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+    direction: supports_claim
+    independence_justification: Price-level outcome.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: yoy
+    - name: nominal_xr_usd
+      source: "imf:ENDA_XDC_USD_RATE"
+      transformation: peak_to_trough
+prior_confidence: 0.85
+disclosure: >
+  Brazil 1999 is the "canonical near-miss" — a currency crisis with managed banking
+  outcomes thanks to the PROER cleanup of 1995-1997. Author market-liberal prior treats
+  PROER as a successful pre-emptive bank-restructuring programme.
+steelman: hypotheses/steelman/banking_crisis_brazil_1999_real_devaluation.md
+scope:
+  period: [1995, 2003]
+  countries: [BRA]
+  outcome_dim: [financial_crisis, currency_purchasing_power, capital_flows]
+  policy_family: [regulation, exchange_rate_regime]
+  treatment_tags: [brazil_1999, real_devaluation_1999, proer_legacy, currency_only_not_banking_crisis]

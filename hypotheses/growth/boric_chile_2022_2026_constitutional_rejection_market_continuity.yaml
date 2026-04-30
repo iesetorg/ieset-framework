@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: boric_chile_2022_2026_constitutional_rejection_market_continuity
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Chile rejected two proposed constitutions during the Boric administration: the 2022
+  left-leaning convencion text (rejected 62% in September 2022) and the 2023 right-leaning
+  consejo text (rejected 55% in December 2023). The pre-registered claim is that the
+  net effect of voter rejection of both constitutional alternatives is preservation of the
+  1980 framework AND continuity of macro-stability indicators (CPI inflation in target band
+  by 2025-2026, fiscal-rule compliance, central-bank-independence intact, peso-USD
+  trajectory not deviating from synthetic counterfactual). The hypothesis isolates the
+  institutional-stability channel: a successful rejection of constitutional change preserved
+  pre-existing market-economy framework and the macro outcomes track that institutional
+  continuity rather than the Boric-administration left-shift signal.
+notes: >
+  Chile's 2022-2023 double-rejection is unusual: a left-administration-led constitutional
+  process rejected by voters in both directions, leaving the 1980 (Pinochet-era) framework
+  in place. The hypothesis tests whether macro stability tracks the institutional outcome
+  (continuity) rather than the political signal (left-administration). Comparison to Petro
+  (Colombia, where left-administration policies are partially implemented) and Lula 3 (Brazil,
+  where left-administration is implementing industrial policy and tax reform) is the implicit
+  contrast: Chile's voter-blocked left-shift may produce more stable outcomes than the
+  Colombian or Brazilian comparators.
+prior_confidence: 0.65
+disclosure: >
+  Author has market-liberal priors that lean toward "institutional-stability dominates
+  political-rhetoric signals". The 0.65 reflects that lean tempered by Chile-specific
+  factors: the 2019 social uprising signal that the underlying 1980 framework has weakened
+  social legitimacy, and that the 2025 Chilean presidential election could produce a further
+  political shock not captured in the 2022-2023 rejection-window observation.
+evidence_type: causal
+sample:
+  countries: [CHL, COL, BRA, PER, MEX]
+  period: [2014, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020Q2-2020Q4 from baseline"
+    - "exclude Chile 2019Q4-2020Q1 social-uprising window from pre-treatment matching"
+scope:
+  period: [2014, 2026]
+  countries: [CHL, COL, BRA, PER, MEX]
+  outcome_dim: [gdp_growth, inflation, fiscal_policy, capital_flows, institutional_quality]
+  policy_family: [institutional_reform, monetary_policy, fiscal_policy]
+  treatment_tags: [chile_constitutional_rejection_2022, chile_constitutional_rejection_2023, boric_2022, latam_left_administrations_2022_2026]
+variables:
+  outcome:
+    - name: cpi_inflation
+      source: imf:PCPIPCH; world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: yoy_pct
+    - name: real_gdp_quarterly
+      source: imf:NGDP_R; world_bank_wdi:NY.GDP.MKTP.KD
+      transformation: log_level_quarterly
+    - name: fiscal_balance_pct_gdp
+      source: imf:GGXCNL_NGDP
+      transformation: annual_pct_gdp
+    - name: real_effective_exchange_rate
+      source: bis:WS_EER
+      transformation: index_level_monthly
+    - name: sovereign_credit_spread
+      source: jp_morgan_embi:CHL
+      transformation: basis_points
+  treatment:
+    - name: chile_constitutional_rejection_indicator
+      source: "constructed: binary = 1 for CHL from 2022-09-04 onward (post-first-rejection)"
+      transformation: binary
+    - name: post_second_rejection_indicator
+      source: "constructed: binary = 1 for CHL from 2023-12-17 onward"
+      transformation: binary
+  controls:
+    - name: commodity_terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD; imf_pcps:Primary
+      transformation: log_change
+      notes: "Chile copper-export exposure is the dominant external driver"
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: wgi_rule_of_law
+      source: wgi:GOV_WGI_RL.EST
+      transformation: level
+    - name: vdem_electoral_democracy
+      source: vdem:v2x_polyarchy
+      transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >
+  Voter rejection of constitutional change is an institutional-channel non-event: the
+  treatment is the preservation of the existing institutional framework rather than the
+  imposition of a new one. Coded as "institutional" per axes.yaml.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with CHL as treated unit and COL+BRA+PER+MEX as donor pool, matched on
+    pre-2022 macroeconomic profile. Pre-period 2014Q1-2022Q2 defines synthetic; post-period
+    2022Q3-2026Q4 measures treatment effect. The "treatment" is the rejection of
+    constitutional change, measured against the counterfactual of a successful constitutional
+    transition. Secondary: event-study around the September 2022 and December 2023 plebiscite
+    dates.
+falsification:
+  rule: >
+    Supported if CHL shows non-negative CATT versus the synthetic counterfactual on at least
+    3 of 5 outcomes (CPI inflation, real GDP, fiscal balance, REER, EMBI spread) over
+    2022Q3-2026Q4 with permutation p > 0.20 (i.e., not significantly worse than peers).
+    Refuted if CHL shows negative CATT on at least 3 of 5 at p_perm < 0.10 (i.e., constitutional
+    uncertainty + Boric administration produced macro-deterioration relative to peers).
+    Mixed otherwise. Note the direction-asymmetric thresholds: the hypothesis is one of
+    macro-stability preservation, so "no worse than peers" is the support condition.
+  test: synth_did_constitutional_continuity_5_outcome_count
+  threshold: "non_negative_CATT_count >= 3 of 5 outcomes at p_perm > 0.20"
+prior_confidence: 0.65
+disclosure: >
+  Pre-registered before 2025 Chilean presidential election outcome is known. The 2025-2026
+  political dynamics could materially change the test: a market-liberal successor to Boric
+  would cement the institutional-continuity story; a further-left shift could complicate it.
+steelman: hypotheses/steelman/boric_chile_2022_2026_constitutional_rejection_market_continuity.md
+linked_hypotheses:
+  - chile_post_1990_institutional_premium
+  - petro_reform_package_economic_trajectory_2022_present

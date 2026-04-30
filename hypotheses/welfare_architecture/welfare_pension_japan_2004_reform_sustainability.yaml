@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_pension_japan_2004_reform_sustainability
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Japan's 2004 basic-pension reform (introducing macroeconomic-slide indexation, raising employee
+  contributions in stages to 18.3% by 2017, raising age of full-eligibility to 65) materially extended
+  fiscal sustainability of the pension system through the 2010s without producing the projected step-down
+  in elderly-poverty rate, illustrating a sustainability-versus-adequacy tradeoff that motivated
+  subsequent 2012 and 2020 supplementary-benefit additions.
+evidence_type: descriptive
+prior_confidence: 0.7
+disclosure: |
+  Author has market-liberal priors that view automatic-stabiliser pension indexation as a sustainability-
+  improving design. Hypothesis is descriptive — claims that the reform achieved its sustainability target
+  while elderly poverty did not improve, illustrating an expected adequacy-sustainability tradeoff.
+sample:
+  countries: [JPN]
+  period: [1995, 2022]
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: pension_system_balance_per_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+    notes: IMF general government debt as proxy; OECD pension-fund flow data preferred at wiring.
+  - name: elderly_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level_pct
+    notes: OECD elderly poverty 66+ at 50% median.
+  - name: pension_replacement_rate_median
+    source: oecd:DSD_PENSIONS@DF_PENSIONS_REPL_RATE
+    transformation: level_pct
+  controls:
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+intervention_channel: institutional
+intervention_channel_justification: |
+  The 2004 reform restructures the pension institution itself (indexation rule, contribution schedule,
+  eligibility age); intervention channel is institutional with fiscal-spillover.
+estimator:
+  template: descriptive
+  clustering: country
+  fixed_effects: [year]
+  notes: |
+    Descriptive time-series for JPN with structural-break test at 2004. Compare actual pension-balance
+    trajectory and elderly-poverty path against pre-reform projections published in 2003 by MHLW.
+falsification:
+  rule: |
+    Refuted if elderly-poverty rate falls more than 3pp by 2018, OR if pension-replacement rate
+    rises after 2004, OR if pension-system balance fails to improve relative to pre-reform projection
+    by at least 2% of GDP by 2015.
+  test: descriptive_structural_break_pension_outcomes_2004
+  threshold: delta_elderly_poverty <= -3pp NOT met AND delta_replacement_rate <= 0 AND delta_balance_vs_projection >= +2pct of GDP
+scope:
+  period: [2004, 2022]
+  countries: [JPN]
+  outcome_dim: [welfare_state, fiscal_policy, demographics_migration]
+  policy_family: [welfare_architecture, fiscal_policy, institutional_reform]
+  treatment_tags: [japan_basic_pension_reform_2004, koizumi_reforms_2001, macroeconomic_slide_indexation]
+steelman: hypotheses/steelman/welfare_pension_japan_2004_reform_sustainability.md

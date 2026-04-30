@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: haiti_governance_collapse_economic_effect_2010_2024
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Haiti's 2010-2024 governance trajectory — the failed post-earthquake
+  reconstruction (2010-2015), Martelly-era PetroCaribe-fund mismanagement
+  (2011-2016), Moïse assassination (July 2021), gang takeover of Port-
+  au-Prince (2022-2024), and effective state collapse — produced a
+  catastrophic economic collapse measurable in real-GDP-per-capita
+  decline, life-expectancy stagnation, and emigration acceleration. The
+  pre-registered claim is (a) cumulative log GDP per capita 2010-2024
+  (HTI) is negative (an absolute decline), AND (b) the WGI Government
+  Effectiveness score declined by at least 0.5 standard deviations
+  2010-2023, AND (c) emigration stock as a share of population rose by
+  at least 5 percentage points across the window. The mechanism is
+  that state-capacity collapse compounds: each year of weak governance
+  raises the cost of the next year's recovery, producing a
+  self-reinforcing decline.
+
+evidence_type: descriptive
+
+sample:
+  countries: [HTI]
+  period: [2005, 2024]
+  temporal_structure: time_series
+  exclusion_rules: []
+
+scope:
+  period: [2005, 2024]
+  countries: [HTI]
+  outcome_dim: [institutional_quality, gdp_growth, demographics_migration, life_expectancy_health]
+  policy_family: [institutional_reform, none]
+  treatment_tags: [haiti_earthquake_2010, haiti_petrocaribe_misuse, haiti_moise_2021, haiti_gang_takeover_2022]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: wgi_government_effectiveness
+      source: world_bank_wgi:GOV_WGI_GE.EST
+      transformation: level
+    - name: wgi_political_stability
+      source: world_bank_wgi:GOV_WGI_PV.EST
+      transformation: level
+    - name: life_expectancy_birth
+      source: world_bank_wdi:SP.DYN.LE00.IN
+      transformation: level
+    - name: emigration_stock_share_population
+      source: world_bank_wdi:SM.POP.TOTL.ZS
+      transformation: level
+  controls:
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: us_remittance_corridor_proxy
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: level
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Hypothesis is institutional-collapse-as-treatment.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Single-country descriptive trajectory with annotation of named
+    governance events. WGI series measure the institutional collapse
+    channel; macro series measure the consequence.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc 2010-2024 (HTI) is
+    not negative, OR (b) WGI Government Effectiveness change
+    2010-2023 is greater than -0.5 standard deviations, OR (c)
+    emigration stock share rose by less than 5 percentage points.
+  test: descriptive_trajectory_thresholds
+  threshold: >
+    cumulative_log_gdp_pc(HTI, 2010-2024) < 0
+    AND wgi_government_effectiveness(HTI, 2023) - wgi_government_effectiveness(HTI, 2010) <= -0.5
+    AND emigration_stock_share(HTI, 2024) - emigration_stock_share(HTI, 2010) >= 5
+
+prior_confidence: 0.92
+
+disclosure: >
+  Author prior is very high that Haiti's governance collapse produced
+  catastrophic economic outcomes. Spec is descriptive because
+  identification of "the policy" is meaningless when the entire state
+  function failed; the claim is about magnitudes.
+
+steelman: hypotheses/steelman/haiti_governance_collapse_economic_effect_2010_2024.md
+
+linked_hypotheses: []
+
+notes: >
+  Tests state-capacity collapse as the binding constraint on
+  development outcomes.

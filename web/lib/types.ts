@@ -60,6 +60,7 @@ export interface Hypothesis {
   linked_hypotheses?: string[];
   linked_conditions?: string[];
   notes?: string;
+  methodology_note?: string;
 
   // Phase 2 (April 2026): scope block for claim→hypothesis link gating.
   scope?: {

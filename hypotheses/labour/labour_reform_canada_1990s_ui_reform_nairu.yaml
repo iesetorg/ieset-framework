@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_canada_1990s_ui_reform_nairu
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Canada's 1990-1996 unemployment-insurance reforms (1990 Bill
+  C-21 entrance-requirement tightening, 1996 EI Act with
+  hours-based eligibility and intensity rule) lowered the
+  Canadian NAIRU by at least 1.5 pp by 2000 relative to a
+  synthetic control of OECD peers, with the largest gains in
+  high-frequent-claimant regions (Atlantic provinces).
+notes: >
+  Treatment dated 1990-Q4 then intensified 1996-Q3. The 1990s
+  Canadian NAIRU debate (Fortin, Setterfield) makes Canada a
+  testbed case for whether UI reform shifts the structural
+  unemployment rate. Region-heterogeneity spec captures the
+  Atlantic-Canada concentration of frequent-claimant behaviour.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to UI-tightening reducing structural
+  unemployment but recognises Canada's 1990s recovery is bound
+  up with NAFTA, BoC monetary tightening, and US business cycle.
+  Donor pool weights are sensitive to USA inclusion (where US
+  cycle is the natural counterfactual for Canada).
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Canadian NAIRU < -1.5 pp by
+    2000 (estimated as Hodrick-Prescott-trended unemployment
+    rate as proxy) AND the gap is concentrated in Atlantic
+    provinces. REFUTED if NAIRU gap is insignificant OR
+    distributed evenly across provinces (no region-heterogeneity
+    consistent with frequent-claimant story).
+  test: >
+    Synth-DiD on Canadian unemployment rate (HP-trended) 1990-
+    2000 vs OECD donor pool with US-cycle control, plus province-
+    level event study; placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [CAN, USA, GBR, AUS, FRA, DEU, NLD]
+  period: [1985, 2002]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: nairu_imf_estimate
+      source: imf:NAIRU
+      transformation: level
+    - name: long_term_unemployment_share
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: level
+  treatment:
+    - name: canada_ui_ei_reform
+      source: "constructed: indicator for 1990-Q4 (Bill C-21) then 1996-Q3 (EI Act) intensification"
+      transformation: indicator
+  controls:
+    - name: us_unemployment_rate
+      source: fred:UNRATE
+      transformation: level
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1990, 2000]
+  countries: [CAN]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [canada_ui_ei_reform_1996]
+steelman: hypotheses/steelman/labour_reform_canada_1990s_ui_reform_nairu.md

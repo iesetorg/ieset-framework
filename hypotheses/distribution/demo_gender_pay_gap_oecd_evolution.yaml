@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_gender_pay_gap_oecd_evolution
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Across OECD countries 1990-2023, the median gender pay gap has narrowed but the rate of
+  narrowing has slowed since 2010, with the residual gap concentrated in (a) parenthood
+  penalties, (b) occupational segregation, and (c) hours-of-work differences. The hypothesis
+  documents the OECD median pay-gap trajectory, tests whether the post-2010 slowdown is
+  statistically significant against the 1990-2010 trend, and reports cross-country
+  variation.
+evidence_type: descriptive
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, KOR, CAN, AUS, NLD, SWE, NOR, DNK, FIN, CHE, BEL, AUT, IRL, NZL, GRC, PRT, POL, HUN, CZE]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [poverty_inequality, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [gender_pay_gap, occupational_segregation]
+variables:
+  outcome:
+    - name: median_gender_pay_gap
+      source: oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_GENDER_WAGE_GAP,1.0
+      transformation: level
+      notes: OECD median gender wage gap (full-time employees).
+  controls:
+    - name: female_lfp
+      source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+      transformation: level
+    - name: tertiary_attainment_female
+      source: world_bank_wdi:SE.TER.CUAT.BA.FE.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE; report year-fixed-effect trajectory and test for slope change at 2010
+    (Chow-style test or interaction with post-2010 indicator).
+falsification:
+  rule: >-
+    SUPPORTED if (a) OECD-median gender pay gap declines by at least 5pp 1990-2023, AND
+    (b) post-2010 trend slope (in pp/year) is significantly less negative than pre-2010
+    slope at p<0.10. REFUTED if median gap reduces by < 2pp or post-2010 slowdown is
+    indistinguishable from continued trend.
+  test: panel_fe_pay_gap_with_slope_change_test
+  threshold: "pay_gap_reduction >= 5.0 AND post2010_slope_change_p < 0.10"
+prior_confidence: 0.7
+disclosure: >-
+  Pay-gap measurement is methodologically contested (raw vs adjusted, full-time vs all
+  workers); specification choice can move the trajectory. OECD's standardised measure is
+  used here as the most-comparable.
+steelman: hypotheses/steelman/demo_gender_pay_gap_oecd_evolution.md

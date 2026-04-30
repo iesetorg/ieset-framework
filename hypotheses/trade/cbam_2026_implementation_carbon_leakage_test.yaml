@@ -1,0 +1,185 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cbam_2026_implementation_carbon_leakage_test
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The EU Carbon Border Adjustment Mechanism (CBAM) entered its definitive
+  phase on 1 January 2026 (after a 2023-2025 transitional reporting-only
+  phase), imposing financial liability on EU importers of cement, iron and
+  steel, aluminium, fertilisers, electricity, and hydrogen embedding non-EU
+  carbon costs. The carbon-leakage hypothesis (high-emission imports flow
+  to non-EU producers because of EU ETS price differential) predicts that
+  prior to CBAM (2018-2023), high-carbon-intensity imports had grown
+  faster than low-carbon-intensity imports of the same products, and that
+  CBAM phase-in (2026 onwards) reverses or attenuates this pattern. This
+  hypothesis tests both legs: (a) the pre-CBAM leakage signature in cross-
+  border carbon-intensity-weighted trade flows, and (b) the early post-
+  CBAM-2026 flow re-routing measurable in 2026-2027 customs data.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, CHN, TUR, IND, KOR, USA, RUS, UKR, MAR, EGY]
+  period: [2018, 2027]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-product cells missing UN Comtrade or EU TARIC import data"
+
+scope:
+  period: [2018, 2027]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, SWE, CHN, TUR, IND, KOR, USA, RUS, UKR, MAR, EGY]
+  outcome_dim: [trade_liberalisation, energy, industrial_capability, regulation_compliance_cost]
+  policy_family: [trade_policy, energy_policy, regulation]
+  treatment_tags: [cbam_2023, cbam_2026, eu_ets_carbon_pricing, eu_carbon_leakage_response]
+
+variables:
+  outcome:
+    - name: log_eu_imports_cbam_products_value
+      source: "un_comtrade:HS72_HS76_HS25_HS31"
+      transformation: log
+      notes: "UN Comtrade EU imports of CBAM-covered HS chapters: 72 (iron+steel), 76 (aluminium), 25 (cement clinker subset), 31 (fertilisers). Hydrogen + electricity tracked separately via EU TARIC where Comtrade lacks granularity."
+    - name: log_eu_imports_cbam_products_volume_tonnes
+      source: "un_comtrade:HS72_HS76_HS25_HS31_volume"
+      transformation: log
+    - name: cbam_carbon_intensity_weighted_imports
+      source: "constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) × tonnes imported. Manual-drop pending under data/manual/derived/."
+      transformation: level
+    - name: log_extra_eu_imports_share_of_consumption
+      source: "constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade)."
+      transformation: log
+    - name: log_third_country_exports_to_non_eu_destinations
+      source: "un_comtrade:HS72_HS76_HS25_HS31"
+      transformation: log
+      notes: "Trade-deflection test: do CBAM-product exporters (CHN, TUR, IND) redirect flows to non-EU destinations after CBAM phase-in?"
+
+  treatment:
+    - name: cbam_transitional_dummy
+      source: "constructed: indicator = 1 from 2023-10 (transitional reporting phase begin) onwards; 0 otherwise."
+      transformation: indicator
+    - name: cbam_definitive_dummy
+      source: "constructed: indicator = 1 from 2026-01 (definitive phase, financial liability) onwards; 0 otherwise."
+      transformation: indicator
+    - name: cbam_carbon_intensity_gap_eu
+      source: "constructed: (exporter-country CO2/tonne for product) − (EU CO2/tonne benchmark for product). Higher gap = higher CBAM cost burden. Continuous treatment intensity."
+      transformation: level
+
+  controls:
+    - name: log_eu_ets_price
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log
+    - name: log_real_gdp_eu
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: log_brent_oil
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: log_natural_gas_ttf
+      source: "constructed: TTF spot, monthly. eex fetcher pending or manual-drop."
+      transformation: log
+    - name: exporter_country_real_exchange_rate_eur
+      source: "constructed: bilateral REER vs EUR for major CBAM exporters (CHN, TUR, IND, KOR, RUS). bis or imf source."
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  CBAM is a regulatory border-adjustment mechanism: it requires EU importers
+  to surrender CBAM certificates priced against EU ETS allowance price,
+  pricing embedded carbon in imports. Pure trade-policy + carbon-pricing
+  regulatory instrument; no fiscal-transfer component.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country_product
+  fixed_effects: [country_product, year_quarter]
+  notes: >
+    Primary specification: differences-in-differences with treatment =
+    CBAM-covered products × post-2023-10 (transitional) and × post-2026-01
+    (definitive). Continuous treatment intensity = exporter-EU carbon-
+    intensity gap. Outcome: log EU imports value + carbon-intensity-
+    weighted imports. Control: similar-but-non-CBAM HS lines
+    (e.g. semi-finished metal manufactures outside CBAM scope).
+
+    Pre-CBAM leakage test (2018-2023): regress carbon-intensity-weighted
+    EU imports on EU ETS price; positive elasticity = leakage signature.
+
+    Post-CBAM test (2026-2027): event study around 2026-01, with carbon-
+    intensity gap as moderator. Higher-gap exporters should see larger
+    EU-import contraction.
+
+    Trade-deflection test: parallel regression on third-country exports
+    to non-EU destinations; positive shift = re-routing (carbon
+    relocates rather than reduces).
+
+    Known limitations:
+    (1) 2026-2027 outcome window is short — full identification of
+        post-definitive-phase response needs 2027-2028 data; v1 reports
+        early reading, v1.1 updates.
+    (2) Carbon-intensity data quality during transitional phase is mixed;
+        many exporters used default values rather than actual emissions
+        data, limiting the gap-treatment-intensity precision.
+    (3) Substitution within HS chapters (low-carbon-intensity producers
+        gain EU market share at expense of high-intensity producers) is
+        a within-product reallocation that matters for climate but is
+        sometimes mislabelled "leakage."
+    (4) CBAM-covered products are 6 chapters (initial scope); the broader
+        anti-leakage claim covers products outside scope (chemicals,
+        plastics, glass) where leakage may continue unmeasured.
+
+falsification:
+  rule: >
+    Pre-CBAM leakage leg not supported if (a) EU ETS price elasticity of
+    carbon-intensity-weighted imports is zero or wrong-signed at p<0.10,
+    OR (b) CBAM-product imports did not grow faster from high-intensity
+    sources than low-intensity sources 2018-2023. Post-CBAM leg not
+    supported if (c) the post-2026 × carbon-intensity-gap interaction is
+    zero on EU imports, OR (d) trade-deflection (third-country to non-EU)
+    is zero (suggesting volume just stops rather than reroutes — not
+    leakage but demand destruction). Mixed verdict permitted: pre-leakage
+    signature without post-CBAM reversal would suggest CBAM is
+    inadequately calibrated.
+  test: cbam_carbon_leakage_pre_post_did
+  threshold: >
+    Pre-CBAM: ETS-price elasticity of high-vs-low-intensity import share
+    > 0.10 at p<0.10 AND
+    Post-CBAM 2026: post × carbon-gap β on EU imports < -0.10 at p<0.10 AND
+    Trade-deflection: third-country to non-EU exports rise ≥ 5% in 2026
+    relative to 2024-2025 baseline for high-gap exporters.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author prior is mixed: there is reasonable evidence in 2018-2023 EU
+  trade data that CBAM-covered imports grew faster from high-carbon-
+  intensity sources (CHN, TUR, RUS, IND) than from low-intensity sources
+  (KOR, JPN, SWE), but the elasticity is small. Author is sceptical of
+  whether CBAM 2026 phase-in will produce a sharp re-routing in 2026-2027
+  because (a) free-allocation phase-out for EU producers runs through
+  2034, (b) carbon-content verification is weak, (c) major exporters
+  (CHN, TUR) have signalled domestic carbon-pricing alignment to avoid
+  CBAM cost. The hypothesis tests the strong form of the claim and is
+  likely to come out as "partial support" rather than a clean win for
+  either side. Climate-effectiveness-of-CBAM (does it reduce global
+  emissions?) is out-of-frame; this hypothesis tests trade-flow
+  redirection only.
+
+steelman: hypotheses/steelman/cbam_2026_implementation_carbon_leakage_test.md
+
+linked_hypotheses:
+  - eu_cbam_export_competitiveness_2023_onwards
+  - eu_ets_price_2022_2026_carbon_signal_strength
+  - eu_ets_absolute_decoupling_emissions_gdp
+  - energy_crisis_2022_european_industrial_relocation
+
+notes: >
+  Data readiness:
+  - UN Comtrade: ready (un_comtrade fetcher)
+  - Eurostat prom_dsx production + sts_inpr_m: ready
+  - IEA / OECD embedded-carbon-trade tables: manual-drop pending
+  - CBAM transitional declarations: manual-drop pending under data/manual/derived/
+  - EU ETS price: eea ready
+  - WDI / IMF PCPS / TTF: as elsewhere
+
+  Run when CBAM declaration manual-drop is populated and 2026Q1-Q2 customs
+  data ships (typically 90-day lag).

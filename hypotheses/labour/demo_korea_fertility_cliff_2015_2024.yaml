@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_korea_fertility_cliff_2015_2024
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  South Korea experienced a "fertility cliff" 2015-2024 (TFR falling from ~1.24 to <0.8),
+  globally unprecedented in peacetime. The hypothesis predicts (a) Korea's TFR decline
+  exceeds 3 standard deviations relative to OECD-comparator decadal changes, (b) the
+  decline is concentrated in metropolitan/Seoul cohorts, and (c) early signals of working-
+  age contraction are visible in 2020-2024 labour-market participation among 25-34 year
+  olds.
+evidence_type: descriptive
+sample:
+  countries: [KOR, JPN, ITA, ESP, GRC, PRT, DEU, SGP, TWN, HKG]
+  period: [2000, 2024]
+  temporal_structure: time_series
+scope:
+  period: [2000, 2024]
+  countries: [KOR]
+  outcome_dim: [demographics_migration, employment_labour]
+  policy_family: [none]
+  treatment_tags: [korea_fertility_cliff, sub_replacement_fertility]
+variables:
+  outcome:
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+    - name: birth_rate_crude
+      source: world_bank_wdi:SP.DYN.CBRT.IN
+      transformation: level
+    - name: lfp_25_34_female
+      source: ilostat:EAP_2WAP_SEX_AGE_RT
+      transformation: level
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+estimator:
+  template: descriptive
+  notes: >
+    Time-series description of Korea TFR vs comparator panel; report decadal changes and
+    z-scores against OECD comparator distribution. No causal claim; this is a
+    pattern-recognition spec to anchor downstream causal hypotheses.
+falsification:
+  rule: >-
+    SUPPORTED if Korea's TFR change 2015-2024 is at least 3 SD below comparator-panel mean
+    decadal change AND TFR end-point < 0.85. REFUTED if Korea is within 2 SD of comparators
+    or TFR did not fall below 0.9.
+  test: korea_tfr_zscore_against_comparator_panel
+  threshold: "korea_tfr_zscore <= -3.0 AND korea_tfr_2024 < 0.85"
+prior_confidence: 0.85
+disclosure: >-
+  Korea's TFR collapse is well-documented; the test is essentially confirmatory. Value
+  comes from establishing the magnitude precisely for downstream specs.
+steelman: hypotheses/steelman/demo_korea_fertility_cliff_2015_2024.md

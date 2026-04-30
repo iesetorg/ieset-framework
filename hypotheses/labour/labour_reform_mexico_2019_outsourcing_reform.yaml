@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_mexico_2019_outsourcing_reform
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Mexico's 2019 labour reform (recognition of authentic
+  collective-bargaining, pre-USMCA labour-side-letter
+  compliance) and the 2021 outsourcing prohibition increased
+  the formal-employment share by at least 2 pp by 2023
+  relative to a synthetic control of Latin-American peers,
+  with the largest gains concentrated in manufacturing-export
+  states.
+notes: >
+  Two-stage treatment: 2019-Q2 (constitutional reform on
+  collective-bargaining) and 2021-Q2 (outsourcing prohibition
+  effective). 2020-2021 COVID window flagged. Mexico is
+  important because the reform is bundled with USMCA enforcement.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to formalisation reforms but recognises
+  Mexico 2019-2023 macro is dominated by USMCA/nearshoring
+  effects that are extremely hard to disentangle from the
+  labour-reform channel. Donor pool is small.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Mexican formal-employment
+    share > +2.0 pp by 2023 AND the gap is concentrated in
+    manufacturing-export states. REFUTED if formal-employment
+    gap is < +0.5 pp OR if state-level distribution is
+    inconsistent with manufacturing concentration.
+  test: >
+    Synth-DiD on Mexican formal-employment share 2019-2023 vs
+    LATAM donor pool, plus state-level event study; placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [MEX, COL, CHL, PER, BRA, ARG, URY]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2020-2021 COVID window
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: mexico_2019_2021_reform
+      source: "constructed: indicator for 2019-Q2 collective-bargaining reform + 2021-Q2 outsourcing ban"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2019, 2023]
+  countries: [MEX]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [mexico_labour_reform_2019, mexico_outsourcing_ban_2021]
+steelman: hypotheses/steelman/labour_reform_mexico_2019_outsourcing_reform.md

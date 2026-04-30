@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_ets_absolute_decoupling_emissions_gdp
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  Across the EU-27 panel 2005-2023, territorial CO2 emissions
+  declined in absolute terms while real GDP rose -- a
+  pattern-consistent absolute-decoupling regime. The decoupling
+  fact directly refutes the position that growth in advanced
+  capitalist economies necessarily increases territorial
+  emissions, and it survives the consumption-based-emissions
+  cross-check at a smaller magnitude.
+
+evidence_type: descriptive
+
+sample:
+  countries: [AUT, BEL, BGR, HRV, CYP, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, IRL, ITA, LVA, LTU, LUX, MLT, NLD, POL, PRT, ROU, SVK, SVN, ESP, SWE]
+  period: [2005, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing EEA territorial inventory or WDI real GDP"
+
+variables:
+  outcome:
+    - name: log_territorial_co2_emissions
+      source: "eea:greenhouse_gas_inventory"
+      transformation: log
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: consumption_based_co2_per_capita
+      source: "owid:consumption-co2-per-capita"
+      transformation: log
+      notes: "Consumption-based cross-check to test the offshoring critique."
+    - name: ets_sector_verified_emissions
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log
+  treatment:
+    - name: post_ets_phase3_indicator
+      source: "constructed: 1 from 2013 (Phase 3 cap-tightening + auctioning); secondary post-MSR indicator from 2019"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: log_oil_price
+      source: "imf_pcps:POILAPSP"
+      transformation: log
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Two-leg descriptive test on the EU-27 panel 2005-2023. Leg A:
+    pooled (population-weighted) territorial CO2 in 2023 vs 2005,
+    log change. Leg B: pooled real GDP in 2023 vs 2005, log change.
+    Absolute decoupling holds iff leg A is negative AND leg B is
+    positive. Country-level dispersion reported in diagnostics
+    (which countries decoupled, by how much, on which leg).
+    Consumption-based emissions cross-check repeats Leg A on the
+    OWID consumption-CO2 series; if territorial decoupled but
+    consumption-based did not, the decoupling is partly offshoring
+    and the verdict is annotated PARTIAL.
+
+falsification:
+  rule: >
+    SUPPORTED iff (a) pooled-EU territorial CO2 2023 / 2005 <= 0.85
+    (i.e. >= 15% absolute decline), AND (b) pooled-EU real GDP 2023
+    / 2005 >= 1.10 (>= 10% growth), AND (c) consumption-based CO2
+    per capita 2023 / 2005 <= 1.0 (no consumption-side increase).
+    REFUTED if either (a) or (b) fails. PARTIAL if (a) and (b) hold
+    but (c) fails (consumption-based emissions rose -- territorial
+    decoupling is offshoring artefact). METHOD_VALID: at least 22
+    of 27 EU member states have both 2005 and 2023 observations on
+    EEA inventory + WDI real GDP; OWID consumption-based panel
+    covers >=20 EU countries.
+  test: eu_27_absolute_decoupling_co2_gdp_2005_2023
+  threshold: >-
+    PRIMARY: pooled co2_2023/co2_2005 <= 0.85 AND
+    gdp_2023/gdp_2005 >= 1.10 AND
+    consumption_co2_pc_2023 / consumption_co2_pc_2005 <= 1.0
+
+prior_confidence: 0.75
+
+disclosure: >-
+  Eco-socialist authorial framing risk: the spec is structured
+  around the EU's strongest decoupling case (2005-2023 with the
+  ETS as policy companion); the supported verdict on territorial
+  emissions is well-documented (Eurostat, EEA both report this).
+  The contested layer is the consumption-based cross-check: if
+  consumption-based EU emissions rose (or fell less than territorial)
+  the decoupling is partly offshoring to non-EU producers, which is
+  the post-Keynesian / degrowth offshoring critique. The PARTIAL
+  arm is gated on this exact split; supported requires
+  consumption-side to NOT have risen. The hypothesis does not
+  address pace-vs-1.5C-pathway (that's
+  eu_green_deal_decoupling_pace_vs_target's job); it tests only the
+  absolute-decoupling fact at the unconstrained magnitude. The
+  framing inverts the existing eu_ets_emissions_reduction_vs_1p5c_pathway
+  spec which scores the EU as a market-mechanism failure on pace --
+  this spec scores the same evidence as a refutation of the
+  emissions-require-growth claim.
+
+steelman: hypotheses/steelman/eu_ets_absolute_decoupling_emissions_gdp.md
+
+scope:
+  period: [2005, 2023]
+  countries: [EU, EUROZONE]
+  outcome_dim: [energy, gdp_growth]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [cap_and_trade_eu_ets, eu_ets_phase3_2013, eu_ets_msr_2019]
+
+linked_hypotheses:
+  - eu_ets_emissions_reduction_vs_1p5c_pathway
+  - eu_green_deal_decoupling_pace_vs_target
+  - absolute_decoupling_global_material_throughput
+
+notes: >
+  Counter-spec to eu_ets_emissions_reduction_vs_1p5c_pathway,
+  testing the same EU-27 trajectory but on a different falsification
+  axis (absolute-decoupling fact) rather than pace-vs-target.
+  Distinct from eu_green_deal_decoupling_pace_vs_target which
+  tests the 2019-2023 Green Deal sub-window. EEA inventory + WDI
+  GDP are on disk; OWID consumption-based CO2 panel availability
+  for the full 27-country panel needs confirmation -- spec gates
+  inconclusive on the consumption-side leg.

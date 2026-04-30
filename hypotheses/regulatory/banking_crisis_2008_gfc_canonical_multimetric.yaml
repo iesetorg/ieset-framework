@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_2008_gfc_canonical_multimetric
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The 2007-2009 Global Financial Crisis was a systemic banking-and-credit rupture in
+  the advanced-economy core (USA, UK, Ireland, Iceland, Spain, the Eurozone periphery)
+  with the canonical multi-metric pattern of large credit-to-GDP run-up followed by
+  sharp output contraction, persistent unemployment, large fiscal-deficit blowout, and
+  long real-house-price retracement. The hypothesis is that the GFC meets the
+  canonical-case multi-metric checklist for a systemic banking crisis: at least 5 of
+  the 7 pre-registered metrics breach their thresholds in 2007-2014.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [USA, GBR, IRL, ISL, ESP, GRC, PRT, ITA, CYP]
+  period: [2000, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - report metrics country-by-country; aggregate verdict requires 5 of 7 metrics breached in at least 5 of 9 countries
+canonical_metrics:
+  - metric_id: peak_to_trough_real_gdp_decline
+    description: Peak-to-trough real GDP decline 2007Q4-2010 (or country-specific trough)
+    threshold: "decline >= 4% in at least 5 of 9 countries"
+    window: "2007-2014"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: WDI annual real GDP is independent of crisis-coding.
+  - metric_id: unemployment_rate_peak_above_baseline
+    description: Peak unemployment rate vs 2005-2007 baseline
+    threshold: "rise >= 5 pp in at least 5 of 9 countries"
+    window: "2008-2014"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+    direction: supports_claim
+    independence_justification: Labour-market outcome is causally downstream from but methodologically independent of bank-balance-sheet signals.
+  - metric_id: real_house_price_peak_to_trough
+    description: BIS real residential property price index, peak-to-trough
+    threshold: "decline >= 25% in at least 4 of 9 countries"
+    window: "2007-2015"
+    source: "bis:WS_SPP"
+    direction: supports_claim
+    independence_justification: Property prices are not part of Laeven-Valencia coding.
+  - metric_id: gross_government_debt_run_up
+    description: General government gross debt run-up 2007-2014
+    threshold: "rise >= 25 pp of GDP in at least 5 of 9 countries"
+    window: "2007-2014"
+    source: "imf:GGXWDG_NGDP"
+    direction: supports_claim
+    independence_justification: Fiscal aggregate independent of bank-credit data.
+  - metric_id: current_account_swing
+    description: Current-account-balance swing peak-deficit to trough-surplus
+    threshold: "swing >= 5 pp of GDP in at least 4 of 9 countries"
+    window: "2007-2014"
+    source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
+    direction: supports_claim
+    independence_justification: External-balance signal independent of domestic banking coding.
+  - metric_id: bank_credit_to_gdp_decline
+    description: Bank credit to private sector decline from peak
+    threshold: "decline >= 15 pp in at least 4 of 9 countries"
+    window: "2008-2016"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    direction: supports_claim
+    independence_justification: Domestic-bank-balance-sheet aggregate.
+  - metric_id: laeven_valencia_systemic_banking_crisis
+    description: Laeven-Valencia systemic banking crisis coded in country-year window
+    threshold: "coded in at least 7 of 9 countries"
+    window: "2007-2012"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding (Laeven-Valencia 2020).
+multi_metric_falsification:
+  total_metrics: 7
+  support_threshold: 5
+  refute_threshold: 2
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: peak_above_baseline
+    - name: real_house_price_index
+      source: "bis:WS_SPP"
+      transformation: peak_to_trough
+prior_confidence: 0.92
+disclosure: >
+  GFC is the most-studied banking crisis in modern macro and the multi-metric pattern
+  is well-documented. Hypothesis is mechanically high-probability given coding choices;
+  pre-registration is included to commit to exact thresholds and prevent post-hoc
+  metric trimming.
+steelman: hypotheses/steelman/banking_crisis_2008_gfc_canonical_multimetric.md
+scope:
+  period: [2000, 2018]
+  countries: [USA, GBR, IRL, ISL, ESP, GRC, PRT, ITA, CYP, EUROZONE]
+  outcome_dim: [financial_crisis, financialisation, gdp_growth, employment_labour, housing]
+  policy_family: [regulation, monetary_policy, fiscal_policy]
+  treatment_tags: [gfc_2008_2009, eurozone_periphery_crisis, anglo_saxon_banking_crisis]

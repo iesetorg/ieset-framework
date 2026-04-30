@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_rwanda_post_genocide_growth_model_1995_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Rwanda's post-1995 reconstruction trajectory under the RPF/Kagame government produced
+  a multi-decade growth premium versus Sub-Saharan African peers, accompanied by sharp
+  improvements in life expectancy, child mortality, and electrification, and a
+  comparatively idiosyncratic civil-liberties regression captured in V-Dem and Freedom
+  House. The pre-registered claim is that, in a synthetic-control design with SSA peers
+  (Burundi, Uganda, Tanzania, Kenya, Ethiopia, Mozambique), Rwanda's cumulative real-
+  GDP-pc growth 1995-2024 exceeds the synthetic counterfactual by at least 50% AND under-
+  five mortality declines by at least 30 deaths per 1000 more than counterfactual.
+  The null counter-claim is that Rwanda's gains, while large in absolute terms, are
+  consistent with post-conflict catch-up dynamics generally and not a regime-specific
+  premium attributable to RPF developmental governance.
+evidence_type: causal
+sample:
+  countries:
+  - RWA
+  - BDI
+  - UGA
+  - TZA
+  - KEN
+  - ETH
+  - MOZ
+  period:
+  - 1990
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 1990-1994 Rwanda genocide window from pre-treatment fitting
+  - flag Burundi 1993-2005 civil war; retain but robustness-check
+scope:
+  period:
+  - 1990
+  - 2024
+  countries:
+  - RWA
+  - BDI
+  - UGA
+  - TZA
+  - KEN
+  - ETH
+  - MOZ
+  outcome_dim:
+  - gdp_growth
+  - life_expectancy_health
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - industrial_policy
+  treatment_tags:
+  - rwanda_rpf_1994
+  - rwanda_vision_2020
+  - rwanda_vision_2050
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe; maddison:mpd2020
+    transformation: log_level
+  - name: under_five_mortality
+    source: world_bank_wdi:SH.DYN.MORT; who_gho:CME_MRY5
+    transformation: level
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN; who_gho:WHOSIS_000001
+    transformation: level
+  - name: electricity_access_share
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: level
+  - name: vdem_civil_liberties
+    source: vdem:v2x_civlib
+    transformation: level
+  treatment:
+  - name: rpf_governance_indicator
+    source: 'constructed: 1 for RWA from 1995 onward'
+    transformation: binary
+  controls:
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: oda_share_gni
+    source: world_bank_wdi:DT.ODA.ODAT.GN.ZS
+    transformation: level
+  - name: agricultural_va_share
+    source: world_bank_wdi:NV.AGR.TOTL.ZS
+    transformation: level
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+intervention_channel: institutional
+intervention_channel_justification: >-
+  The RPF-led post-1994 reconstruction is best characterised as an institutional-channel
+  intervention: state-capacity rebuild, anti-corruption enforcement, results-based public
+  administration (Imihigo), land reform, and a developmental-state industrial policy
+  bundle. Coded institutional per axes.yaml.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with RWA treated from 1995 and SSA peer donor pool. Secondary:
+    Callaway-Sant'Anna DiD using never-treated peers. Tertiary: dual-outcome reporting on
+    GDP and child mortality. Robustness drops Burundi (parallel-conflict confound) and
+    drops Ethiopia (developmental-state co-treatment).
+falsification:
+  rule: >-
+    Not supported if EITHER (a) cumulative log-GDP-pc gap 1995-2024 vs synthetic
+    counterfactual is less than +0.40 (40% premium) at p_perm < 0.10, OR (b) under-five
+    mortality decline gap is less than 30 per 1000 by 2024, OR (c) the civil-liberties
+    score (V-Dem v2x_civlib) does NOT show a regression of at least 0.10 below the SSA
+    donor-pool average over 2010-2024 (i.e. the authoritarian-developmentalism
+    characterisation fails empirically — important counter-test).
+  test: synth_did_dual_economic_with_authoritarianism_validation
+  threshold: >-
+    cumulative_log_gdp_pc_gap >= 0.40 at p_perm < 0.10 AND mortality_gap >= 30 per 1000
+    AND vdem_civlib_2010_2024_gap <= -0.10
+prior_confidence: 0.7
+disclosure: >-
+  Author's prior is that Rwanda's growth premium is real and large. The civil-liberties
+  regression is also well-documented. Prior 0.70 reflects strong confidence on the
+  economic outcomes and the authoritarian-trade-off characterisation. The main
+  uncertainty is whether the synthetic-control donor pool can construct a plausible
+  Rwanda counterfactual given the genocide-baseline shock makes pre-treatment matching
+  fragile. Author's market-liberal prior would expect autocratic developmentalism to
+  underperform liberal-democratic peers; the empirical Rwanda case is in tension with
+  that prior, which is part of what makes it a strong test.
+conflict_disclosure: No Rwandan asset exposure or affiliations.
+steelman: hypotheses/steelman/africa_rwanda_post_genocide_growth_model_1995_2024.md
+notes: >-
+  Data-gated on NISR (Rwanda) plus WDI/Maddison long-run series. The civil-liberties
+  counter-test is deliberately included so the hypothesis cannot be a simple "Rwanda
+  good" finding — the spec requires the authoritarian-side cost to also register.

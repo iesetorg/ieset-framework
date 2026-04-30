@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_india_modi_tariff_reversals_2014_2024
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  India under the Modi government (2014-) has reversed elements of
+  the 1991-2007 tariff-liberalisation trajectory: weighted applied
+  tariffs rose from ~13% in 2014 to ~18% by 2022 (according to WTO
+  and WDI tariff measures), with Production-Linked Incentive
+  schemes adding non-tariff protection. The claim is that India's
+  trade-openness ratio has stagnated or fallen relative to a
+  synthetic-control donor pool of comparable emerging economies
+  over 2014-2023.
+
+evidence_type: descriptive
+
+sample:
+  countries: [IND, IDN, BRA, ZAF, MEX, TUR, VNM, BGD, PAK, EGY]
+  period: [2005, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity"
+    - "drop TUR post-2018 (currency-crisis dynamics)"
+
+scope:
+  period: [2005, 2023]
+  countries: [IND]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [india_modi_tariff_increases, production_linked_incentives, india_protectionist_turn_2014]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_imports_pct_gdp
+      source: "world_bank_wdi:NE.IMP.GNFS.ZS"
+      transformation: level
+    - name: weighted_applied_tariff
+      source: "world_bank_wdi:TM.TAX.MRCH.WM.AR.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Tariff increases and PLI schemes are regulatory / trade-policy
+  and industrial-policy interventions.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. India's trade-openness 2014-2023 vs
+    matched emerging-market comparators. Reports the
+    weighted-tariff trajectory as a direct treatment-intensity
+    measure.
+
+falsification:
+  rule: >
+    SUPPORTED if (a) WDI weighted applied tariff for India rises
+    by >=3 pp from 2014 to 2022, AND (b) trade-openness change
+    2014-2019 (pre-COVID) underperforms the comparator-mean
+    change. PARTIAL if (a) holds but (b) does not. REFUTED if
+    (a) does not hold (i.e. tariffs did not rise).
+  test: descriptive_india_2014_2023_tariff_and_openness
+  threshold: >
+    PRIMARY: tariff_change(2014->2022) >= +3 pp AND
+    openness_change(2014->2019, IND) < openness_change(2014->2019, comparator_mean).
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderate-high (0.7). The Indian protectionist turn under
+  Modi is a documented pattern but the magnitude is contested:
+  some analysts (Panagariya 2022) view it as a modest reversal,
+  others (Rodrik 2023) as a more substantial structural shift.
+  Heterodox developmentalist readers will support the PLI / tariff
+  approach as legitimate industrial policy and reject the spec's
+  framing as "reversal."
+
+linked_hypotheses:
+  - trade_lib_india_1991_tariff_cut_export_response
+  - india_1991_liberalisation_growth_acceleration
+
+steelman: hypotheses/steelman/trade_lib_india_modi_tariff_reversals_2014_2024.md

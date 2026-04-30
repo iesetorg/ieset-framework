@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_argentina_2001_corralito_canonical
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Argentina's 2001-2002 crisis — convertibility regime collapse, December 2001 corralito
+  freeze on bank deposits, January 2002 currency-board abandonment, sovereign default,
+  pesification of bank balance sheets, and real-GDP contraction of >= 10% peak-to-trough
+  — is the canonical case of a hard-peg / currency-board collapse compounded by
+  banking-system suspension. The hypothesis is that Argentina 2001-2002 meets the
+  canonical multi-metric checklist on at least 5 of 6 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [ARG]
+  period: [1998, 2006]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: peso_depreciation_2002
+    description: Argentine peso against USD peak-to-trough nominal depreciation post-convertibility
+    threshold: ">= 65% depreciation"
+    window: "2001-2002"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal.
+  - metric_id: real_gdp_decline
+    description: Argentina real GDP peak-to-trough decline
+    threshold: ">= 10% decline"
+    window: "1998-2002"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD; pwt:rgdpna"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: sovereign_default_event
+    description: Sovereign default declared December 2001 (~ USD 100bn)
+    threshold: "yes/no — yes counts as breach"
+    window: "2001-2002"
+    source: "imf:ARG_DEFAULT_2001"
+    direction: supports_claim
+    independence_justification: Default event.
+  - metric_id: corralito_deposit_freeze
+    description: Corralito deposit-withdrawal restriction imposed Dec-2001
+    threshold: "yes/no — yes counts as breach"
+    window: "2001-2002"
+    source: "imf:ARG_CFM_CORRALITO_2001"
+    direction: supports_claim
+    independence_justification: Resolution-policy event.
+  - metric_id: unemployment_peak
+    description: Argentina unemployment rate peak vs 2000 baseline
+    threshold: ">= 5 pp rise"
+    window: "2001-2003"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+  - metric_id: cpi_inflation_spike
+    description: Argentina CPI inflation rise vs pre-crisis
+    threshold: ">= 20 pp peak YoY rise"
+    window: "2001-2003"
+    source: "world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH"
+    direction: supports_claim
+    independence_justification: Price-level outcome.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 5
+  refute_threshold: 2
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: nominal_xr_usd
+      source: "imf:ENDA_XDC_USD_RATE"
+      transformation: peak_to_trough
+prior_confidence: 0.97
+disclosure: >
+  Argentina 2001-2002 is one of the most-studied EM hard-peg-collapse crises; metric
+  pattern overdetermined.
+steelman: hypotheses/steelman/banking_crisis_argentina_2001_corralito_canonical.md
+scope:
+  period: [1998, 2006]
+  countries: [ARG]
+  outcome_dim: [financial_crisis, currency_purchasing_power, fiscal_policy, employment_labour]
+  policy_family: [regulation, exchange_rate_regime, fiscal_policy]
+  treatment_tags: [argentina_2001_2002, corralito, convertibility_collapse_2002, currency_board_failure]

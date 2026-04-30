@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_us_china_phase_one_2020
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The US-China Phase One Trade Agreement (signed 2020-01-15)
+  committed China to USD 200bn of additional US imports over 2020-
+  2021. This commitment was not met: actual purchases reached only
+  ~58% of target according to PIIE tracking through 2021. The
+  descriptive test is whether US-China bilateral merchandise trade
+  shows the agreement's anticipated step-up against pre-agreement
+  trend.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA, CHN]
+  period: [2015, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity (the agreement's first year overlapped with COVID demand collapse)"
+
+scope:
+  period: [2015, 2024]
+  countries: [USA, CHN]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [us_china_phase_one_2020, managed_trade_purchase_commitment, trade_war_partial_resolution]
+
+variables:
+  outcome:
+    - name: us_merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Phase One agreement is a regulatory / trade-policy intervention
+  (managed-trade purchase commitments).
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive evaluation. Aggregate WDI data cannot isolate the
+    US-China bilateral; the spec records the aggregate trajectory
+    and discloses the qualitative finding from the bilateral
+    tracking literature.
+
+falsification:
+  rule: >
+    SUPPORTED (null on commitment fulfilment) if US merchandise-
+    exports-to-GDP did not show a step-up materially exceeding the
+    2015-2019 pre-agreement trend over 2020-2021. REFUTED if
+    aggregate exports rose markedly above trend in 2020-2021
+    (which would be inconsistent with the documented under-
+    fulfilment).
+  test: descriptive_us_exports_phase_one_step_up
+  threshold: >
+    PRIMARY: US exports/GDP 2020-2021 mean does not exceed 2015-2019
+    linear trend extrapolation by more than +1 pp.
+
+prior_confidence: 0.85
+
+disclosure: >
+  Prior high (0.85) on the null. The Phase One under-fulfilment
+  is documented in the bilateral-tracking literature (PIIE Bown
+  2022; CRS 2023). Heterodox readers will note that the
+  agreement's structural commitments on intellectual property,
+  market access, and forced technology transfer were qualitatively
+  more substantive than the headline-purchase commitments and may
+  have produced effects not captured in trade-share data.
+
+linked_hypotheses:
+  - trade_lib_trump_china_tariffs_2018_2024
+
+steelman: hypotheses/steelman/trade_lib_us_china_phase_one_2020.md

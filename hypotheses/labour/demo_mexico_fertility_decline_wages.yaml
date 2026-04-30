@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_mexico_fertility_decline_wages
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Mexico's fertility decline (TFR 6.7 in 1970 to ~1.8 in 2023) is associated with a working-
+  age share rise that should have translated into rising real wages 1995-2023, partially
+  offset by US migration outflows. The hypothesis predicts a positive panel-FE association
+  between Mexican working-age share and real-wage growth, conditional on net migration to
+  the US.
+evidence_type: associational
+sample:
+  countries: [MEX]
+  period: [1990, 2023]
+  temporal_structure: time_series
+scope:
+  period: [1990, 2023]
+  countries: [MEX]
+  outcome_dim: [wage_stagnation, demographics_migration]
+  policy_family: [labour_market]
+  treatment_tags: [mexico_fertility_transition, mexico_us_migration]
+variables:
+  outcome:
+    - name: real_wage_index
+      source: ilostat:EAR_4MTH_SEX_RT
+      transformation: log
+  treatment:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+  controls:
+    - name: net_migration_rate
+      source: world_bank_wdi:SM.POP.NETM
+      transformation: level
+    - name: labour_productivity
+      source: pwt:rgdpo_per_emp
+      transformation: log
+estimator:
+  template: panel_fe
+  notes: >
+    Mexico-only time series; panel_fe slot used for regression mechanics. Newey-West HAC
+    SEs (lag 4). Single-country test; benchmark sensitivity to comparator LATAM specs.
+falsification:
+  rule: >-
+    SUPPORTED if working-age share has positive coefficient on real-wage growth at p<0.10
+    in Mexico time series, controlling for productivity and net migration. REFUTED if
+    coefficient insignificant, wrong-signed, or absorbed by productivity control.
+  test: time_series_mexico_dividend_wages
+  threshold: "coef_wap > 0 AND p < 0.10"
+prior_confidence: 0.5
+disclosure: >-
+  Mexico real-wage data quality is uneven; ILO series may have breaks. Single-country
+  inference is fragile; consider this informative rather than dispositive.
+steelman: hypotheses/steelman/demo_mexico_fertility_decline_wages.md

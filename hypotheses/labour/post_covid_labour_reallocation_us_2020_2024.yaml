@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: post_covid_labour_reallocation_us_2020_2024
+version: 1
+status: candidate
+topic: labour
+claim: The US COVID labour-market shock 2020-2024 produced a sharp asymmetric reallocation — leisure/hospitality
+  and brick-and-mortar retail collapsed in 2020 then over-recovered nominal wages relative to trend,
+  while professional/information sectors saw remote-work entrenchment with persistently elevated
+  WFH share and lower CBD office utilisation through 2024.
+notes: 2020s natural experiment — pandemic shock + structural WFH adoption. Multi-metric to capture
+  asymmetric sectoral pattern; single-coefficient test would mask the reallocation story.
+prior_confidence: 0.72
+disclosure: Author's market-liberal priors over-weight the structural-reallocation reading and
+  may under-weight cyclical demand explanations (fiscal-stimulus-driven goods boom, services
+  rebound mechanically tracking reopening). Sectoral wage over-recovery in low-pay services could
+  be a transitory tight-labour-market artefact rather than a durable reallocation.
+steelman: hypotheses/steelman/post_covid_labour_reallocation_us_2020_2024.md
+evidence_type: canonical_case_multi_metric
+falsification:
+  rule: >-
+    Multi-metric checklist on US 2020Q1-2024Q4 sectoral data. The hypothesis
+    is SUPPORTED if at least 4 of 5 metrics meet their thresholds; REFUTED if
+    2 or fewer meet; PARTIAL otherwise. Each metric below is independently
+    sourced (BLS CES, BLS CPS, FRED) and probes a different layer
+    (employment level, wage growth, hours, WFH share, sector-specific JOLTS
+    quits).
+  test: us_post_covid_sectoral_reallocation_2020_2024_multi_metric
+  threshold: >-
+    SUPPORTED if >=4/5 metrics meet thresholds; REFUTED if <=2/5.
+canonical_metrics:
+  - metric_id: leisure_hospitality_employment_collapse_2020
+    description: Peak-to-trough employment decline in leisure/hospitality 2020Q1-2020Q2.
+    threshold: ">35% decline peak-to-trough"
+    window: "2020-02 to 2020-04"
+    source: "fred:USLAH"
+    independence_justification: BLS CES establishment-survey series; distinct from CPS household survey.
+  - metric_id: leisure_hospitality_wage_overrecovery_2024
+    description: Nominal average hourly earnings growth in leisure/hospitality 2019-2024 vs aggregate private wage growth.
+    threshold: ">5pp cumulative excess over aggregate private AHE 2019-12 to 2024-12"
+    window: "2019-12 to 2024-12"
+    source: "fred:CES7000000003; fred:CES0500000003"
+    independence_justification: BLS sector-level AHE; tests asymmetric tight-labour pricing.
+  - metric_id: information_sector_employment_recovery
+    description: Information-sector employment recovery vs pre-pandemic trend by 2024.
+    threshold: "by 2024-12 employment >= 2019-12 level (full recovery or above)"
+    window: "2019-12 to 2024-12"
+    source: "fred:USINFO"
+    independence_justification: BLS CES information sector; remote-work-friendly contrast.
+  - metric_id: wfh_share_persistence_2024
+    description: Share of employed working primarily from home (BLS American Time Use Survey / SWAA).
+    threshold: ">25% of full-time employees still hybrid or fully remote in 2024"
+    window: "2024 annual"
+    source: "bls:american_time_use_survey_telework"
+    independence_justification: ATUS household-survey complement to CES establishment data.
+  - metric_id: retail_brick_mortar_employment_shortfall
+    description: General-merchandise + department-store employment vs 2019 baseline by 2024.
+    threshold: "by 2024-12 employment <= 95% of 2019-12 level"
+    window: "2019-12 to 2024-12"
+    source: "fred:CES4245200001"
+    independence_justification: Specific sub-sector probing brick-mortar reallocation independent of headline retail.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+scope:
+  period: [2020, 2024]
+  countries: [USA]
+  outcome_dim: [employment_labour, wage_stagnation, productivity]
+  policy_family: [labour_market]
+  treatment_tags: [covid_shock_2020, post_covid_reallocation, wfh_adoption]
+sample:
+  countries: [USA]
+  period: [2019, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "include 2020Q2 trough but flag as PHA-defined recession; primary inference uses 2024 endpoint"
+variables:
+  outcome:
+    - name: leisure_hospitality_employment
+      source: "fred:USLAH"
+      transformation: level
+    - name: information_sector_employment
+      source: "fred:USINFO"
+      transformation: level
+    - name: leisure_hospitality_ahe
+      source: "fred:CES7000000003"
+      transformation: pct_change_yoy
+    - name: aggregate_private_ahe
+      source: "fred:CES0500000003"
+      transformation: pct_change_yoy
+    - name: total_nonfarm_payrolls
+      source: "fred:PAYEMS"
+      transformation: level
+  treatment:
+    - name: covid_recession_indicator
+      source: "constructed: NBER recession 2020-02 to 2020-04, post-recession 2020-05+"
+      transformation: indicator
+  controls:
+    - name: cpi_headline
+      source: "fred:CPIAUCSL"
+      transformation: pct_change_yoy
+    - name: real_pce
+      source: "fred:PCEC96"
+      transformation: log
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Asymmetric-reallocation pattern requires multi-metric design rather than single
+    coefficient. Each metric independently sourced and probes a different layer of
+    the post-COVID adjustment.

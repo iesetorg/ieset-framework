@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_singapore_high_skill_migration_policy
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Singapore's tiered Employment Pass / S Pass / Work Permit migration regime selects strongly
+  on skill and produces one of the world's highest foreign-born population shares (~38% by
+  2020) without comparable native employment displacement. The hypothesis tests whether
+  Singapore's per-capita output growth 1990-2023 contains a measurable foreign-skill
+  contribution above non-Singapore Asian comparators (HKG, KOR, JPN, TWN).
+evidence_type: associational
+sample:
+  countries: [SGP, HKG, KOR, JPN, TWN, MYS]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [SGP]
+  outcome_dim: [demographics_migration, gdp_growth, productivity]
+  policy_family: [labour_market]
+  treatment_tags: [singapore_employment_pass, tiered_skill_migration]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+    - name: foreign_born_share_population
+      source: un_desa:international_migrant_stock
+      transformation: level
+  treatment:
+    - name: tiered_pass_regime_indicator
+      source: "constructed: indicator = 1 for SGP; 0 for comparators"
+      transformation: indicator
+  controls:
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if SGP foreign-born share is at least 20pp above the comparator panel mean
+    AND SGP per-capita growth exceeds comparator mean by at least 1pp annualised over
+    1990-2023, with the migration channel accounting for at least 25% of the per-capita
+    growth gap in decomposition. REFUTED if foreign-born premium < 10pp or migration
+    channel < 10% of growth gap.
+  test: panel_fe_singapore_skill_migration_premium
+  threshold: "sgp_foreign_premium >= 20.0 AND growth_gap >= 1.0 AND migration_share >= 0.25"
+prior_confidence: 0.7
+disclosure: >-
+  Singapore's growth is overdetermined (industrial policy, savings, openness, governance);
+  isolating the migration contribution is hard. Risk of attributing growth to any one
+  channel.
+steelman: hypotheses/steelman/demo_singapore_high_skill_migration_policy.md

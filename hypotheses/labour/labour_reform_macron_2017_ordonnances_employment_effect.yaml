@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_macron_2017_ordonnances_employment_effect
+version: 1
+status: candidate
+topic: labour
+claim: >
+  The 2017 Macron ordonnances (CDI flexibilisation, dismissal-cost
+  ceilings, branch-vs-firm bargaining inversion) raised the French
+  private-sector employment-to-population ratio by at least 1.0 pp
+  over the 2017-2019 pre-COVID window relative to a synthetic
+  control of non-reforming euro-area peers, with no offsetting
+  rise in headline poverty rate at 60% of median income.
+notes: >
+  Treatment is dated 2017-Q4 (signing of the five ordonnances).
+  Sample window pre-COVID to isolate the Macron effect from the
+  pandemic shock; 2020-2022 reserved for robustness. The pairing
+  of an employment outcome with a poverty outcome is the
+  steelman-driven design — heterodox readers can win cleanly if
+  employment moves but poverty also rises.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to flexibilisation reforms generating
+  measurable employment gains and may under-weight the wage-
+  compression and gig-economy substitution channels that critics
+  emphasise. Donor-pool weights are sensitive to inclusion of
+  Spain and Italy whose 2017-2019 employment dynamics are
+  contaminated by their own labour-market reforms.
+falsification:
+  rule: >
+    SUPPORTED if synthetic-control gap on employment-to-population
+    > +1.0 pp at 2019 horizon AND headline poverty rate at 60%
+    median is not statistically distinguishable from donor pool
+    at p<0.10. REFUTED if employment gap is wrong-signed at p<0.10
+    OR poverty rate worsens by >+1.0 pp vs donor pool. PARTIAL
+    if employment gap is +1.0 pp but poverty also rises by
+    +0.5 to +1.0 pp.
+  test: >
+    Synth-DiD on French employment-to-population trajectory and
+    headline poverty rate 2017-2019 against euro-area donor pool;
+    placebo-permutation inference at p<0.10.
+evidence_type: associational
+sample:
+  countries: [FRA, DEU, NLD, BEL, AUT, FIN, IRL, PRT]
+  period: [2010, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop ESP and ITA from donor pool when their own 2014 labour reforms remain bedded in
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: poverty_rate_at_60_median
+      source: eurostat:ilc_li02
+      transformation: level
+    - name: long_term_unemployment_share
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: level
+  treatment:
+    - name: macron_ordonnances_event
+      source: "constructed: indicator for 2017-Q4 ordonnances enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2017, 2019]
+  countries: [FRA]
+  outcome_dim: [employment_labour, poverty_inequality]
+  policy_family: [labour_market]
+  treatment_tags: [macron_labour_reforms_2017]
+steelman: hypotheses/steelman/labour_reform_macron_2017_ordonnances_employment_effect.md

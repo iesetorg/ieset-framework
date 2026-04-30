@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: austrian_monetary_expansion_asset_bubble_not_cpi_panel
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  In a panel of advanced economies 1987-2007, base-money expansion and
+  broad money growth correlate positively with asset-price indices
+  (equity, real estate) but only weakly with headline CPI inflation.
+  This dissociation — money flowing into asset markets rather than
+  goods-market prices — is the empirical pattern Austrians (Rothbard,
+  Salerno, Shostak) call "asset-price inflation" and use to argue
+  that CPI-targeting central banks systematically miss the welfare-
+  relevant inflation. The pre-registered claim is that the panel-FE
+  coefficient on broad-money growth in an asset-price-index regression
+  is at least 3x the coefficient in a parallel CPI regression over
+  the same window.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, JPN, CAN, AUS, NLD, ITA, ESP, SWE, CHE]
+  period: [1987, 2007]
+  temporal_structure: panel
+  exclusion_rules:
+    - "primary window ends in 2007 to avoid the post-GFC zero-lower-bound regime"
+    - "post-2008 sub-sample reported as robustness; coefficient relationships expected to differ"
+
+scope:
+  period: [1987, 2007]
+  countries: [OECD]
+  outcome_dim: [inflation, monetary_policy, housing, financial_crisis]
+  policy_family: [monetary_policy]
+  treatment_tags: [great_moderation, asset_price_inflation, base_money_expansion]
+
+variables:
+  outcome:
+    - name: real_home_price_index
+      source: "bis:WS_LONG_PP"
+      transformation: log_diff
+      notes: "BIS long-run residential property price index, real, log-difference."
+    - name: real_equity_price_index
+      source: "shiller:us_home_price_real; oecd:share_price_index"
+      transformation: log_diff
+      notes: "Equity index — Shiller for US, OECD share-price index for other countries."
+    - name: cpi_inflation_yoy
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+  treatment:
+    - name: broad_money_growth_yoy
+      source: "fred:M2SL; ecb:BSI.M.U2.Y.V.M30.X.1.U2.2300.Z01.E; boe:LPMVWYR"
+      transformation: yoy
+      notes: "Composite: FRED M2 for USA, ECB M3 for euro area, BoE M4 for UK, OECD MEI broad money for others."
+    - name: base_money_growth_yoy
+      source: "fred:BOGMBASE"
+      transformation: yoy
+      notes: "Monetary base growth; primarily USA series, others where available."
+  controls:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: short_term_rate
+      source: "bis:WS_CBPOL"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+intervention_channel: monetary
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two parallel panel-FE regressions: (1) real asset-price index growth
+    on broad-money growth and controls; (2) CPI inflation on broad-money
+    growth and the same controls. Test compares the two coefficients
+    via Wald test. Mainstream/monetarist priors expect a CPI-link;
+    finding it absent (or weaker than the asset-link) supports the
+    Austrian "asset inflation" framing. Heterodox null is that the
+    money-asset correlation is an artefact of credit-driven asset
+    accumulation, not a money-disequilibrium phenomenon.
+
+falsification:
+  rule: >
+    Hypothesis is falsified if the coefficient on broad-money growth
+    in the asset-price regression is not at least 3x the coefficient
+    in the CPI regression at p<0.05, OR if the asset-price coefficient
+    is itself not positive and significant.
+  test: panel_fe_money_asset_vs_money_cpi_coefficient_ratio
+  threshold: >
+    coefficient(money_growth → asset_price_growth) / coefficient(money_growth → cpi_inflation) >= 3.0
+    AND coefficient(money_growth → asset_price_growth) > 0 at p<0.05
+
+prior_confidence: 0.6
+
+disclosure: >-
+  The Austrian framing here (Salerno, Shostak, Rothbard) is heterodox
+  within the monetary-economics mainstream, which generally treats
+  asset-price inflation as a financial-stability question separate from
+  CPI-based monetary policy. Author prior 0.60 reflects that the
+  empirical dissociation in the Great Moderation period is well-
+  documented (Borio-Lowe 2002 BIS, Adalid-Detken 2007 ECB) but the
+  Austrian reading — that this represents a systematic central-bank
+  failure rather than a finance-stability tradeoff — is contested.
+  Risk: the author's prior favours the Austrian reading; the panel
+  test deliberately uses a coefficient-ratio threshold rather than
+  a single-sign test to make falsification cleaner.
+
+steelman: hypotheses/steelman/austrian_monetary_expansion_asset_bubble_not_cpi_panel.md
+
+linked_hypotheses:
+  - abct_credit_boom_predicts_capital_misallocation_oecd
+  - abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007
+
+notes: >
+  Salerno (1987 "True Money Supply"), Rothbard (1963 America's Great
+  Depression), Shostak (2002 "Defining Inflation"). The hypothesis
+  reframes the standard CPI-targeting consensus as a measurement
+  failure: the welfare-relevant inflation is the one the metric
+  fails to see.

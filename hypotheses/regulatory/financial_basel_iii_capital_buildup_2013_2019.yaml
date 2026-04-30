@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financial_basel_iii_capital_buildup_2013_2019
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The 2013-2019 phase-in of Basel III capital, leverage, and liquidity standards
+  produced a measurable rise in bank-equity-to-assets ratios across G-SIB and
+  domestic-systemic banks in BIS-reporting jurisdictions, with median CET1 capital
+  ratios rising from <= 9% pre-2013 to >= 13% by 2019. The hypothesis is that across
+  the panel of G20 advanced economies, post-2013 bank capital ratios are systematically
+  higher than 2007-2012 averages by at least 3 pp, after controlling for the GFC
+  recapitalisation pulse.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, AUS, CAN, CHE, NLD, SWE, BEL]
+  period: [2007, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years inside ongoing crisis windows where capital ratios reflect rescue injections rather than prudential build-up
+variables:
+  outcome:
+    - name: bank_regulatory_capital_to_rwa
+      source: "world_bank_wdi:FB.BNK.CAPA.ZS"
+      transformation: level_pct_rwa
+      notes: WDI bank regulatory capital to risk-weighted assets aggregate.
+    - name: bank_capital_to_assets_ratio
+      source: "world_bank_wdi:FB.BNK.CAPA.ZS; bis:WS_BANK_CAP"
+      transformation: level
+  treatment:
+    - name: basel_iii_phase_in
+      source: "constructed: indicator phased-in 2013-2019 per BIS implementation timeline"
+      transformation: event_phase
+  controls:
+    - name: gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: yoy_pct
+    - name: bank_npl_ratio
+      source: "world_bank_wdi:FB.AST.NPER.ZS"
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Basel III is a regulatory-channel intervention by definition.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country]
+  random_seed: 20260428
+  notes: >
+    Country-FE panel comparison of pre-2013 (2007-2012) and post-2013 (2013-2019) bank
+    capital ratios. Robustness: synthetic-DiD against non-Basel-III adopters
+    (limited but includes some EMs).
+falsification:
+  rule: >
+    SUPPORTED if median post-2013 capital-to-RWA ratio across the 13-country panel is
+    >= 3 pp above 2007-2012 average with p < 0.05 in country-FE panel regression.
+    PARTIAL if rise in [1.5, 3) pp. REFUTED if rise < 1.5 pp.
+  test: panel_fe_pre_post_basel_iii
+  threshold: "median_post_2013 - median_2007_2012 >= 3 pp"
+prior_confidence: 0.88
+disclosure: >
+  Basel III's effect on bank capital is well-documented (BCBS monitoring reports);
+  hypothesis is straightforward and high-prior. Risk: WDI bank-capital aggregate
+  has measurement noise and country-coverage gaps.
+steelman: hypotheses/steelman/financial_basel_iii_capital_buildup_2013_2019.md
+scope:
+  period: [2007, 2022]
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, AUS, CAN, CHE, NLD, SWE, BEL, OECD]
+  outcome_dim: [financial_crisis, financialisation, regulation_compliance_cost]
+  policy_family: [regulation]
+  treatment_tags: [basel_iii_2013_2019, cet1_buildup, lcr_implementation, gsib_capital_surcharge]

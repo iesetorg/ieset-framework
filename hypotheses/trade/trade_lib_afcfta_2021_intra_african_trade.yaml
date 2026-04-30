@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_afcfta_2021_intra_african_trade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The African Continental Free Trade Area (AfCFTA), with trading
+  formally commencing 2021-01-01, has not yet produced a measurable
+  acceleration in aggregate African trade-openness ratios over the
+  2021-2024 window relative to a synthetic-control donor pool of
+  non-AfCFTA emerging-market regions, because of slow tariff-
+  schedule ratification, COVID-19 trade disruption, and weak
+  cross-border infrastructure. The descriptive prediction is a
+  null or modestly-negative effect through 2024 with implementation
+  effects expected to materialise in the 2025-2030 window.
+
+evidence_type: descriptive
+
+sample:
+  countries: [DZA, AGO, BWA, BFA, BDI, CMR, CAF, TCD, COM, COG, CIV, COD, DJI, EGY, GNQ, ERI, SWZ, ETH, GAB, GMB, GHA, GIN, GNB, KEN, LSO, LBR, LBY, MDG, MWI, MLI, MRT, MUS, MAR, MOZ, NAM, NER, NGA, RWA, SEN, SLE, SOM, ZAF, SSD, SDN, TZA, TGO, TUN, UGA, ZMB, ZWE]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years inside active armed conflict (UCDP high-intensity)"
+    - "report COVID-2020-2021 sensitivity separately"
+
+scope:
+  period: [2010, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [afcfta_2021, african_continental_free_trade, intra_african_trade]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: afcfta_indicator
+      source: "constructed: indicator = 1 for AfCFTA-ratifying states from 2021-01-01"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  AfCFTA is a regulatory / trade-policy intervention. Channel
+  regulatory per invariant 4.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive pre/post mean comparison. Too early in the
+    implementation timeline for credible DiD identification.
+    Reports the change in mean trade-openness 2021-2024 minus
+    2017-2019 (pre-COVID baseline) for African vs non-African
+    middle-income economies.
+
+falsification:
+  rule: >
+    SUPPORTED if the change in trade-openness for AfCFTA states
+    2021-2024 minus 2017-2019 baseline is not greater than +2 pp
+    relative to the matched non-African comparator change. The
+    null prediction is the default; the framework records the
+    magnitude as a baseline against which a follow-on 2025-2030
+    spec will measure deepening.
+  test: descriptive_pre_post_afcfta_trade_openness
+  threshold: >
+    PRIMARY: African-minus-comparator change in trade-openness <= +2 pp.
+    METHOD_VALID: WDI NE.TRD.GNFS.ZS available for >=80% of African states 2017-2024.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderate-high (0.7). Implementation has been slow:
+  ratification incomplete by 2024, tariff schedules under
+  negotiation, infrastructure (cross-border roads, ports,
+  customs digitisation) remains a binding constraint. Heterodox
+  pan-African readers will note that even a measurable 2021-2024
+  effect would understate the longer-term integration potential
+  given the regulatory and infrastructure investments still in
+  flight.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_afcfta_2021_intra_african_trade.md

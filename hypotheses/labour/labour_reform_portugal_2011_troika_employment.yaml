@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_portugal_2011_troika_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Portugal's 2011-2014 troika-era labour reforms (Memorandum of
+  Understanding measures: severance reduction, working-time
+  flexibility, collective-bargaining suspension) lowered the
+  Portuguese unemployment rate by at least 1.5 pp by 2017
+  relative to a synthetic control of euro-area peripheral peers,
+  but did not durably raise the labour-share of national income.
+notes: >
+  Treatment dated 2011-Q3 (start of MoU implementation). Portugal
+  is a clean case because the reforms were imposed conditionally
+  by the troika — a quasi-exogenous timing relative to domestic
+  political-economic dynamics.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to crisis-era flexibilisation but
+  recognises Portugal's recovery is also driven by the post-2014
+  ECB-QE tailwind and tourism boom. The labour-share outcome is
+  the heterodox-friendly check on whether crisis-era reforms had
+  permanent distributional consequences.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on unemployment rate < -1.5 pp by
+    2017 AND labour-share gap is not statistically more negative
+    than -2.0 pp at p<0.10. REFUTED if unemployment gap is
+    insignificant OR labour-share gap < -2.0 pp (showing the
+    reform's main effect was a permanent factor-share shift).
+  test: >
+    Synth-DiD on Portuguese unemployment rate and labour share
+    2011-2017 vs peripheral donor pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [PRT, ESP, ITA, GRC, IRL, FRA, BEL]
+  period: [2005, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2011-2014 troika-program-implementation window for treatment intensity
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: labour_share_of_gdp
+      source: pwt:labsh
+      transformation: level
+  treatment:
+    - name: troika_mou_implementation
+      source: "constructed: indicator for 2011-Q3 onwards MoU labour measures"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2011, 2017]
+  countries: [PRT]
+  outcome_dim: [employment_labour, labour_share]
+  policy_family: [labour_market]
+  treatment_tags: [portugal_troika_2011]
+steelman: hypotheses/steelman/labour_reform_portugal_2011_troika_employment.md

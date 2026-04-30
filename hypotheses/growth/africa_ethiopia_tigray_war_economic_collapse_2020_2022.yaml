@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_ethiopia_tigray_war_economic_collapse_2020_2022
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  The November 2020 - November 2022 Ethiopia-Tigray war produced a sharp economic
+  contraction in Ethiopia visible in real GDP growth deceleration, FX-reserve depletion,
+  birr depreciation, sovereign-spread widening, and humanitarian-aid-distortion of the
+  external accounts. The pre-registered claim is that, in a synthetic-control design with
+  East African / SSA developmental peers (Kenya, Tanzania, Rwanda, Uganda, Mozambique),
+  Ethiopia's cumulative real-GDP growth 2020-2023 falls at least 5 log-points below the
+  synthetic counterfactual AND the birr-USD official rate depreciates by at least 50%
+  more than counterfactual over the war window. The null counter-claim is that, given
+  Ethiopia's pre-war growth trajectory was already decelerating and the COVID confound
+  is severe, the war effect is not statistically separable from the parallel shocks.
+evidence_type: causal
+sample:
+  countries:
+  - ETH
+  - KEN
+  - TZA
+  - RWA
+  - UGA
+  - MOZ
+  period:
+  - 2010
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag COVID 2020Q2-2020Q4; treat as common shock to all donor units
+  - exclude Mozambique 2017+ Cabo Delgado conflict windows from donor weighting
+scope:
+  period:
+  - 2010
+  - 2024
+  countries:
+  - ETH
+  - KEN
+  - TZA
+  - RWA
+  - UGA
+  - MOZ
+  outcome_dim:
+  - gdp_growth
+  - currency_purchasing_power
+  - capital_flows
+  - institutional_quality
+  policy_family:
+  - none
+  treatment_tags:
+  - ethiopia_tigray_war_2020
+  - ethiopia_pretoria_agreement_2022
+variables:
+  outcome:
+  - name: real_gdp
+    source: world_bank_wdi:NY.GDP.MKTP.KD; imf:NGDP_R; pwt:rgdpe
+    transformation: log_level
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_level
+  - name: birr_usd_official
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+  - name: fx_reserves_usd
+    source: world_bank_wdi:FI.RES.TOTL.CD; imf:RAFA_USD
+    transformation: log_level
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  treatment:
+  - name: tigray_war_indicator
+    source: 'constructed: 1 for ETH from 2020-11 through 2022-11'
+    transformation: binary
+  - name: conflict_intensity
+    source: owid:battle_deaths; world_bank_wdi:VC.BTL.DETH
+    transformation: log_level
+    notes: UCDP-coded battle deaths as conflict-intensity proxy.
+  controls:
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: official_dev_assistance_received
+    source: world_bank_wdi:DT.ODA.ODAT.GN.ZS
+    transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >-
+  The Tigray war is a state-led institutional rupture (federal government vs TPLF
+  regional government). Treated as an institutional/political shock; coded
+  institutional with conflict-intensity as the graded treatment.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with ETH treated 2020-Q4 through 2022-Q4 and SSA donor pool.
+    Secondary: panel FE with conflict-intensity interacted with year dummies. Robustness
+    runs the test ending at 2022Q4 (war end) and extending through 2023 (post-war
+    recovery). Permutation inference on 5-unit donor pool.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) cumulative real-GDP gap 2020Q4-2023Q4 versus synthetic
+    counterfactual is less than -5 log-points at p_perm < 0.10, OR (b) the birr
+    depreciation gap is less than 50%, OR (c) the conflict-intensity coefficient on
+    GDP loses statistical significance in the panel-FE specification (indicating war
+    intensity is not the mediator).
+  test: synth_did_dual_outcome_with_intensity_panel
+  threshold: >-
+    cumulative_log_gdp_gap_2020Q4_2023Q4 <= -0.05 at p_perm < 0.10 AND
+    log_birr_gap_peak <= -0.50 (more depreciation than counterfactual) AND
+    conflict_intensity_panel_coef on log_gdp significant at p < 0.05
+prior_confidence: 0.65
+disclosure: >-
+  Author's prior is that the Tigray war produced a real and large economic shock
+  (visible in IMF Article IV downward revisions, S&P sovereign downgrades, NBE FX-
+  rationing). The 0.65 prior reflects strong confidence on the directional sign and
+  moderate confidence on clearing the 5-log-point threshold. Sample-size limitations
+  (5 donor pool units) and COVID-confound are the main reasons the prior is not higher.
+conflict_disclosure: No Ethiopian asset exposure or consulting relationship.
+steelman: hypotheses/steelman/africa_ethiopia_tigray_war_economic_collapse_2020_2022.md
+linked_hypotheses:
+- ethiopia_developmental_state_growth_effect
+- africa_ethiopia_gerd_economic_effect_2011_2024
+notes: >-
+  Data-gated on NBE quarterly indicators (partial 2020-2022 disclosure due to war).
+  IMF Article IV staff estimates are the most reliable continuous series. The Pretoria
+  Agreement (November 2022) ends the active war; post-war recovery measurement is a
+  separate research question deferred to a later hypothesis.

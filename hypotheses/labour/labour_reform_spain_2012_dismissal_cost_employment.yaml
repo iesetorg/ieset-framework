@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_spain_2012_dismissal_cost_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Spain's February 2012 labour reform (Real Decreto-Ley 3/2012:
+  dismissal-cost reduction from 45 to 33 days/year, decentralised
+  collective bargaining, "objective causes" expansion) shortened
+  the duration of the post-2011 unemployment surge by accelerating
+  hiring rates 2014-2017 by at least 1.5 pp relative to a synthetic
+  control of euro-area peripheral peers, without producing a
+  permanent reduction in real wages relative to donors.
+notes: >
+  Treatment dated 2012-Q1. Spain's case is unusually contested
+  because the reform was followed by a sharp rise in unemployment
+  through 2013 before reversing — making a naive pre-post test
+  flat-out misleading. The synthetic-DiD design with a peer donor
+  pool absorbs the common austerity shock and isolates the relative
+  labour-flow gain.
+prior_confidence: 0.6
+disclosure: >-
+  Author is sympathetic to dismissal-cost reform but acknowledges
+  Spain's reform was bundled with severe fiscal consolidation, so
+  the treatment is genuinely intertwined with austerity. Real-wage
+  channel is included specifically because heterodox readers
+  argue the reform's main effect was wage-share compression.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on hiring rate > +1.5 pp by 2017
+    AND real-wage-index gap is not statistically more negative
+    than -2.0 pp at p<0.10. REFUTED if hiring-rate gap is
+    insignificant OR real-wage gap < -2.0 pp at p<0.10 (wage
+    suppression channel dominant). PARTIAL if both conditions
+    are met but with shrinking magnitude.
+  test: >
+    Synth-DiD on Spanish hiring rate and real-wage index
+    2012-2017 vs euro-area peripheral donor pool with placebo
+    permutation inference at p<0.10.
+evidence_type: associational
+sample:
+  countries: [ESP, ITA, PRT, GRC, IRL, FRA, DEU]
+  period: [2005, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2010-2013 sovereign-debt-crisis window
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: hiring_rate_quarterly
+      source: eurostat:lfsi_emp_q
+      transformation: level
+    - name: real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+  treatment:
+    - name: spain_2012_reform
+      source: "constructed: indicator for 2012-Q1 RDL 3/2012 enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: government_consumption_share
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2012, 2017]
+  countries: [ESP]
+  outcome_dim: [employment_labour, wage_stagnation]
+  policy_family: [labour_market]
+  treatment_tags: [spain_labour_reform_2012]
+steelman: hypotheses/steelman/labour_reform_spain_2012_dismissal_cost_employment.md

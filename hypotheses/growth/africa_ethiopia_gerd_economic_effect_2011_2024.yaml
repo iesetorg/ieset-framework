@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_ethiopia_gerd_economic_effect_2011_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Ethiopia's Grand Ethiopian Renaissance Dam (construction 2011-2024, partial commissioning
+  from 2022) was projected to raise generation capacity by ~5 GW and shift the country's
+  electricity-supply frontier outward. The pre-registered claim is that, despite the
+  contemporaneous Tigray war shock (covered in a separate hypothesis), Ethiopia's per
+  capita electricity consumption rose at least 40% from 2011-2024 and electrification
+  share of population rose by at least 25 percentage points, both at rates exceeding the
+  Sub-Saharan African low-income peer average (Tanzania, Uganda, Kenya, Rwanda, Sudan,
+  Mozambique). The null counter-claim is that, given GERD construction delays, Tigray war
+  disruption, and persistent transmission-network bottlenecks, the GERD's actual delivered
+  effect on consumption and electrification is statistically indistinguishable from the
+  SSA-peer trajectory.
+evidence_type: causal
+sample:
+  countries:
+  - ETH
+  - TZA
+  - UGA
+  - KEN
+  - RWA
+  - SDN
+  - MOZ
+  period:
+  - 2005
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag Sudan post-2019 transitional government and 2023+ civil war; retain but robustness-check
+  - flag Ethiopia 2020-2022 Tigray war windows
+scope:
+  period:
+  - 2005
+  - 2024
+  countries:
+  - ETH
+  - TZA
+  - UGA
+  - KEN
+  - RWA
+  - SDN
+  - MOZ
+  outcome_dim:
+  - energy
+  - gdp_growth
+  - industrial_capability
+  policy_family:
+  - energy_policy
+  - industrial_policy
+  treatment_tags:
+  - ethiopia_gerd_2011
+  - ethiopia_gerd_commissioning_2022
+variables:
+  outcome:
+  - name: electricity_consumption_pc
+    source: world_bank_wdi:EG.USE.ELEC.KH.PC; owid:electricity_consumption_per_capita
+    transformation: log_level
+  - name: electricity_access_share
+    source: world_bank_wdi:EG.ELC.ACCS.ZS; owid:share-of-population-with-access-to-electricity
+    transformation: level
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: manufacturing_share_gdp
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: level
+  treatment:
+  - name: gerd_construction_indicator
+    source: 'constructed: 1 for ETH from 2011 onward (construction); intensity scaled by reported MW commissioned'
+    transformation: graded_indicator
+  controls:
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: rainfall_anomaly
+    source: owid:rainfall; world_bank_wdi:AG.LND.PRCP.MM
+    transformation: anomaly
+    notes: Hydropower output is rainfall-dependent; East African rainfall variability is a confound.
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >-
+  GERD is a state-led infrastructure investment financed primarily through domestic
+  bonds and diaspora contributions. The intervention is a public-investment / industrial-
+  policy action with energy-policy content. Coded institutional per the long-horizon
+  state-capacity framing.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with ETH treated from 2011 and SSA peer donor pool. Secondary:
+    panel FE with construction-intensity (cumulative MW reported) interacted with year.
+    Robustness excludes Sudan (Nile-basin co-treated and 2023 war shock) and runs ETH
+    pre/post-Tigray-war split.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) Ethiopian per-capita electricity consumption growth
+    2011-2024 is less than 40% AND less than the SSA donor-pool average, OR (b)
+    electrification access rises by less than 25 percentage points 2011-2024, OR (c)
+    the synth-DiD CATT on log(electricity_consumption_pc) is statistically
+    indistinguishable from zero (p_perm > 0.10), indicating GERD's projected supply
+    effect did not materialise in measured consumption due to delays and transmission
+    bottlenecks.
+  test: synth_did_with_dual_threshold
+  threshold: >-
+    log(electricity_consumption_pc_2024 / electricity_consumption_pc_2011) > 0.336
+    AND access_2024 - access_2011 >= 25 ppts AND CATT positive at p_perm < 0.10
+prior_confidence: 0.55
+disclosure: >-
+  Author's prior is mildly favourable to the supply-effect story but heavily tempered by
+  three confounding factors: GERD commissioning was repeatedly delayed; the Tigray war
+  destroyed transmission infrastructure in northern Ethiopia; and Ethiopia's
+  electrification gains pre-date GERD (universal access programme launched 2011). The
+  null hypothesis — that GERD's effect is hard to distinguish from the broader Ethiopian
+  electrification programme — is plausible. Prior 0.55 reflects this genuine uncertainty.
+conflict_disclosure: No Ethiopian or Nile-basin equity exposure.
+steelman: hypotheses/steelman/africa_ethiopia_gerd_economic_effect_2011_2024.md
+linked_hypotheses:
+- ethiopia_developmental_state_growth_effect
+- africa_ethiopia_tigray_war_economic_collapse_2020_2022
+notes: >-
+  Data-gated on EEU (Ethiopian Electric Utility) reports — partial coverage. Hydropower
+  output is rainfall-dependent; control includes rainfall anomaly. The Tigray war
+  hypothesis covers the 2020-2022 collapse period; this hypothesis tests the long-run
+  GERD effect through the war window.

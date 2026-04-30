@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: india_extra_modi_era_growth_2014_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  India's Modi-era growth 2014-2024 — covering GST implementation 2017,
+  IBC bankruptcy reform 2016, infrastructure capex push, PLI manufacturing
+  schemes 2020-2024 — produced a per-capita GDP growth rate that is
+  comparable to but not materially above the 2004-2013 UPA-era pre-COVID
+  trend. The differential vs the EM peer panel (BRA, IDN, MEX, TUR, ZAF,
+  PHL) is at most +0.5 percentage points per year on real GDP-pc growth
+  averaged over the full 2014-2024 window (including COVID years).
+
+evidence_type: associational
+
+notes: >-
+  Distinguishes "Modi-era growth was good" (likely true vs DM peers) from
+  "Modi-era growth was a structural break above prior Indian trend"
+  (likely false). Tests against the immediate predecessor decade and an
+  EM peer panel.
+
+prior_confidence: 0.62
+
+disclosure: >-
+  Author tilts toward seeing the Modi era as continuation rather than
+  acceleration relative to UPA-era trend. Bias risk: under-weighting
+  the 2014-2019 sub-window (which was strong) by including 2020-2022
+  COVID drag in the post mean. Mitigation: also report 2014-2019
+  sub-window as informative.
+
+steelman: hypotheses/steelman/india_extra_modi_era_growth_2014_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if mean real GDP-pc growth IND
+    2014-2024 minus mean 2004-2013 is at most +0.5pp/yr (no major
+    acceleration). REFUTED if the differential exceeds +1.5pp/yr
+    (clear acceleration claim vindicated).
+    INFORMATIVE (not gating): 2014-2019 sub-window mean growth vs
+    2004-2013 mean growth (excludes COVID drag).
+  test: india_modi_era_growth_vs_upa_era_continuation
+  threshold: >-
+    PRIMARY: gdp_pc_growth(IND, 2014-2024) - gdp_pc_growth(IND, 2004-2013) <= 0.005.
+    REFUTING: same diff > 0.015.
+    METHOD_VALID: WDI NY.GDP.PCAP.KD.ZG available for IND through 2024.
+
+sample:
+  countries: [IND, BRA, IDN, MEX, TUR, ZAF, PHL]
+  period: [2004, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "include COVID years 2020-2022 in primary; report 2014-2019 sub-window as informative"
+
+scope:
+  period: [2014, 2024]
+  countries: [IND]
+  outcome_dim: [gdp_growth, productivity]
+  policy_family: [fiscal_policy, regulation, industrial_policy]
+  treatment_tags: [india_modi_era, gst_2017, ibc_2016, india_pli_schemes]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+  treatment:
+    - name: post_modi_indicator
+      source: "constructed: indicator = 1 for IND, year >= 2014"
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way FE panel with EM peer pool. Test 1: country-level pre-post
+    on India 2004-2013 vs 2014-2024. Test 2: panel DiD with peer pool.
+
+linked_hypotheses:
+  - india_1991_liberalisation_growth_acceleration
+  - india_extra_demonetisation_2016_economic_effect
+  - india_extra_aadhaar_upi_productivity
+  - demo_india_demographic_transition_realised

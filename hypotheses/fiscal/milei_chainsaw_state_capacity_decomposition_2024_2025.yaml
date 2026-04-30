@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: milei_chainsaw_state_capacity_decomposition_2024_2025
+version: 1
+status: candidate
+topic: fiscal
+claim: >
+  Milei's "motosierra" (chainsaw) programme combines public-sector employment cuts, ministry
+  consolidation (from 18 to 9 ministries), and elimination of energy/transport subsidies. The
+  pre-registered claim is that the state-shrinkage produces a measurable contraction in
+  general-government expenditure as a share of GDP (>5 pp decline 2023→2025) AND that GDP
+  recovery occurs by 2025Q4 (i.e., the state-shrinkage does not produce a permanent output
+  decline). The competing prediction is that aggressive state contraction produces a Greek-style
+  permanent-output-loss outcome (output recovery to 2023 level fails by 2026Q4). The hypothesis
+  decomposes the fiscal correction into spending-side vs revenue-side channels to test whether
+  the correction is genuinely structural (spending cuts) or transitory (inflation-tax revenue +
+  asset-sale one-offs).
+notes: >
+  This complements milei_dollarisation_inflation_collapse_2024_2026 but tests a distinct
+  outcome family: state-capacity decomposition rather than nominal-stabilisation success. The
+  fiscal-correction channel decomposition is the load-bearing test — a correction achieved
+  primarily via inflation-eroding nominal liabilities is different from one achieved via
+  real-spending cuts. Comparison to historical austerity episodes (Greece 2010-2015, Ireland
+  2010-2013, Latvia 2009-2010) provides context for the spending-cut-to-output-cost ratio.
+prior_confidence: 0.55
+disclosure: >
+  Author has market-liberal priors that lean toward "lean-state delivers growth" but the Greek
+  austerity literature (Blanchard-Leigh 2013 fiscal-multiplier underestimate) is a binding
+  prior-correction. The 0.55 reflects genuine uncertainty over whether Argentina's specific
+  combination of extreme prior fiscal bloat (~45% of GDP general-government expenditure),
+  high inflation, and dollar-denominated balance-sheet exposure produces a different multiplier
+  than the eurozone-periphery case studies.
+evidence_type: causal
+sample:
+  countries: [ARG, GRC, IRL, LVA, ESP, PRT]
+  period: [2008, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020Q2-2020Q4 from austerity-window comparisons"
+    - "Latvia 2009-2010 included as canonical-internal-devaluation comparator; Greece 2010-2015 as external-austerity comparator"
+scope:
+  period: [2008, 2026]
+  countries: [ARG, GRC, IRL, LVA, ESP, PRT]
+  outcome_dim: [fiscal_policy, gdp_growth, employment_labour, taxation]
+  policy_family: [fiscal_policy, institutional_reform, labour_market]
+  treatment_tags: [milei_2023, argentina_chainsaw_plan_2024, greek_austerity_2010, irish_austerity_2010]
+variables:
+  outcome:
+    - name: general_government_expenditure_pct_gdp
+      source: imf:GGX_NGDP; world_bank_wdi:GC.XPN.TOTL.GD.ZS
+      transformation: annual_pct_gdp
+    - name: public_sector_employment_share
+      source: ilostat:public_sector_employment; indec:eph_publico
+      transformation: pct_of_total_employment
+    - name: real_gdp_quarterly
+      source: imf:NGDP_R; indec:emae
+      transformation: log_level_quarterly
+    - name: subsidies_pct_gdp
+      source: imf:GGXCNL_NGDP; indec:subsidios_economicos
+      transformation: annual_pct_gdp
+  treatment:
+    - name: milei_chainsaw_indicator
+      source: "constructed: binary = 1 for ARG from 2023-12-10 onward"
+      transformation: binary
+  controls:
+    - name: commodity_terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD; imf_pcps:Primary
+      transformation: log_change
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: pre_treatment_govt_size
+      source: world_bank_wdi:GC.XPN.TOTL.GD.ZS
+      transformation: pre_treatment_average
+  decomposition_channels:
+    - name: spending_cut_share_of_correction
+      source: "derived: real spending cuts / (real spending cuts + revenue gain + inflation erosion of nominal liabilities)"
+      transformation: ratio
+      notes: >
+        Decomposes the 2024-2025 fiscal-balance improvement into (a) real spending cuts,
+        (b) revenue-base expansion, (c) inflation-tax erosion of nominal pension/wage indexation.
+        Loadbearing for distinguishing structural from transitory correction.
+    - name: subsidy_elimination_share_of_correction
+      source: "derived: change in subsidies_pct_gdp / total fiscal-balance improvement"
+      transformation: ratio
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The chainsaw programme is fundamentally a fiscal-channel intervention (spending cuts +
+  subsidy elimination + ministry consolidation). Monetary effects (BCRA balance-sheet) are
+  treated separately in milei_dollarisation_inflation_collapse_2024_2026.
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Primary: synthetic control with ARG as treated unit and Greece/Ireland/Latvia/Spain/Portugal
+    as donor pool, matched on pre-treatment government-expenditure share and inflation level.
+    Secondary: panel_fe with austerity-window indicator. Tertiary: channel decomposition
+    regressing fiscal-correction outcome on real-spending-cut share, subsidy-elimination share,
+    and inflation-tax share to test which channel dominates.
+falsification:
+  rule: >
+    Refuted if any of: (a) general-government-expenditure share does not fall by at least 5 pp
+    of GDP from 2023 to 2025, OR (b) real GDP at 2025Q4 remains below 2023Q3 level (permanent
+    output loss), OR (c) the channel decomposition shows that less than 40% of the fiscal
+    correction is real-spending cuts (i.e., the correction is dominated by inflation-tax or
+    one-off asset-sale revenues), OR (d) the synthetic-DiD CATT on real GDP through 2025 is
+    significantly negative versus the austerity-comparator donor pool at the Greek 2010-2015
+    output-cost depth (peak-to-trough decline > 8%).
+  test: synthetic_control_plus_fiscal_channel_decomposition
+  threshold: "spending_share_decline >= 5pp AND real_gdp_2025Q4 >= real_gdp_2023Q3 AND real_spending_cut_share >= 0.40"
+prior_confidence: 0.55
+disclosure: >
+  Author's market-liberal prior leans positive on lean-state outcomes; the Greek 2010-2015
+  fiscal-multiplier evidence binds toward expecting deeper output cost than the simple
+  Friedman-Schumpeter narrative predicts. The 2-spec design (this + the inflation-collapse
+  hypothesis) prevents any single positive outcome from being read as confirmation of the
+  whole package.
+steelman: hypotheses/steelman/milei_chainsaw_state_capacity_decomposition_2024_2025.md
+linked_hypotheses:
+  - milei_dollarisation_inflation_collapse_2024_2026
+  - austerity_output_recovery_tradeoff

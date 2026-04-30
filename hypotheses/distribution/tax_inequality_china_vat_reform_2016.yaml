@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_china_vat_reform_2016
+version: 1
+status: draft
+topic: distribution
+claim: >
+  China's 2016 VAT reform (replacing the business tax on services with VAT,
+  unifying VAT across goods and services with 17/13/11/6 percent rate
+  slabs subsequently consolidated to 13/9/6 in 2019) produced no
+  detectable change in the Chinese disposable-income Gini coefficient
+  vs East-Asia synthetic control over 2016-2020, with the formalisation
+  benefits offsetting the consumption-tax incidence regressivity. The
+  discriminating test is the synth-control gap on disposable-Gini.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 6. Tests the formalisation-
+  vs-incidence hypothesis for VAT distributional effects.
+prior_confidence: 0.55
+disclosure: >
+  Author prior weakly accepts that formalisation benefits offset
+  incidence regressivity in the Chinese case given large informal-services
+  sector pre-2016.
+falsification:
+  rule: >
+    SUPPORTED if Chinese disposable Gini moves less than 0.5 Gini-points
+    in either direction 2016-2020 vs East-Asia synth control at p<0.10.
+    REFUTED if Gini moves more than 1.0 Gini-points in either direction
+    at p<0.10.
+  test: >
+    Synthetic-control with East-Asia donor pool (KOR, JPN, TWN, SGP, MYS,
+    THA, VNM), treated CHN 2016Q2.
+evidence_type: associational
+sample:
+  countries: [CHN, KOR, JPN, MYS, THA, VNM, IDN]
+  period: [2005, 2022]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: chn_vat_unification_post_2016
+      source: "constructed: indicator = 1 for CHN, year >= 2016"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with East-Asia donor pool. Treated CHN 2016Q2.
+intervention_channel: fiscal
+scope:
+  period: [2016, 2022]
+  countries: [CHN]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [china_vat_reform_2016, business_tax_to_vat, china_formalisation]

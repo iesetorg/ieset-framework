@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_russia_2001_flat_tax_13pct
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 2001 Russian Putin-Kasyanov 13 percent flat income tax (replacing a
+  three-bracket schedule with top rate 30 percent) produced a measurable
+  rise in reported tax compliance and a discrete jump in the Russian
+  top-1 pretax income share over 2001-2005, with most of the apparent
+  share rise attributable to compliance/reporting gain rather than real
+  redistribution. The discriminating test is the magnitude of measured
+  compliance gain (Gorodnichenko-Martinez-Vazquez-Sabirianova-Peter
+  Engel-curve evidence) vs the top-share level shift.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 6. Russian flat-tax episode is
+  often cited supportively in flat-tax advocacy literature; this
+  hypothesis disambiguates the compliance-vs-real-redistribution channels.
+prior_confidence: 0.7
+disclosure: >
+  Author prior accepts the Gorodnichenko reading that most of the post-
+  2001 reported-income shift is compliance, not real labour-supply.
+falsification:
+  rule: >
+    SUPPORTED if Russian top-1 share rises by at least 1.5 percentage
+    points 2001-2005 AND independent compliance proxies (consumption-
+    income gap from Engel curves) tighten by at least 5 percentage
+    points over the window at p<0.10. REFUTED if top-share rise is
+    below 0.75 pp or compliance proxies fail to tighten at p<0.10.
+  test: >
+    Russia time-series structural-break + post-Soviet comparator panel
+    around 2001Q1.
+evidence_type: associational
+sample:
+  countries: [RUS, UKR, BLR, KAZ, GEO, ARM]
+  period: [1995, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+  treatment:
+    - name: rus_flat_tax_post_2001
+      source: "constructed: indicator = 1 for RUS, year >= 2001"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: oil_price_real
+      source: "imf_pcps:POILBRE"
+      transformation: real_yoy_pct_change
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna DiD with RUS treated 2001 against post-Soviet
+    comparator pool. Robustness with synthetic_control.
+intervention_channel: fiscal
+scope:
+  period: [2001, 2010]
+  countries: [RUS]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [russia_flat_tax_2001, putin_kasyanov, compliance_vs_real_response]

@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: dominican_tourism_freezone_model_1980_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  The Dominican Republic's 1980-2024 development path combined an
+  early free-zone regime (Law 4315 of 1955; expanded under Balaguer
+  and especially under the 1990s textile boom), a sustained tourism-
+  buildout (Punta Cana, Bávaro, Puerto Plata), and a Mirex-led
+  remittance-receiving migrant infrastructure to deliver
+  cumulative log GDP-per-capita growth in the top quartile of the
+  Caribbean and top half of Latin America. The pre-registered claim
+  is (a) cumulative log_gdp_pc_constant growth 1980-2019 (DOM)
+  exceeds the Caribbean median by at least 0.30 log-points AND
+  exceeds the LATAM median, AND (b) tourism-arrivals growth produces
+  a measurable services-sector employment expansion, AND (c) the
+  growth is non-resource-rent: hydrocarbon-rents share of GDP
+  remains below 1% across the window.
+
+evidence_type: associational
+
+sample:
+  countries: [DOM, JAM, TTO, BRB, BHS, HTI, CRI, PAN, GTM]
+  period: [1980, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1980, 2024]
+  countries: [DOM, JAM, TTO, BRB, BHS, HTI, CRI, PAN, GTM]
+  outcome_dim: [gdp_growth, employment_labour, capital_flows]
+  policy_family: [trade_policy, tax_policy, regulation, industrial_policy]
+  treatment_tags: [dominican_freezone_law_4315, dominican_tourism_buildout]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: tourism_arrivals
+      source: world_bank_wdi:ST.INT.ARVL
+      transformation: log_level
+    - name: tourism_receipts_share_exports
+      source: world_bank_wdi:ST.INT.RCPT.XP.ZS
+      transformation: level
+    - name: services_value_added_share_gdp
+      source: world_bank_wdi:NV.SRV.TOTL.ZS
+      transformation: level
+    - name: fdi_inflow_share_gdp
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+    - name: remittance_share_gdp
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: level
+  controls:
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Free-zone (regulatory + tax), tourism (regulatory + infrastructure),
+  and remittance (institutional facilitation) channels are bundled.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of log_gdp_pc on country and year FE plus
+    DOM-indicator interaction. Secondary: descriptive ranking among
+    Caribbean and LATAM. Tertiary: services-sector share trajectory.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc 1980-2019 (DOM) is
+    not above Caribbean median AND LATAM median, OR (b) services
+    value-added share of GDP does not rise at least 5 percentage
+    points across the window, OR (c) tourism receipts share of
+    exports does not exceed 25% by 2019.
+  test: panel_fe_plus_descriptive_thresholds
+  threshold: >
+    cumulative_log_gdp_pc(DOM, 1980-2019) - max(Caribbean_median, LATAM_median) >= 0.30
+    AND delta_services_share_gdp(DOM, 1980-2019) >= 5
+    AND tourism_receipts_share_exports(DOM, 2019) >= 25
+
+prior_confidence: 0.7
+
+disclosure: >
+  Author market-liberal prior favours the tourism-and-free-zone
+  small-economy model. Risk: services-sector growth may reflect
+  measurement composition rather than productivity gain.
+
+steelman: hypotheses/steelman/dominican_tourism_freezone_model_1980_2024.md
+
+linked_hypotheses:
+  - jamaica_imf_debt_restructuring_2010_2024
+
+notes: >
+  Tests the small-Caribbean-economy export-of-services model.

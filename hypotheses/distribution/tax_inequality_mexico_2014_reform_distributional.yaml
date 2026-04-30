@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_mexico_2014_reform_distributional
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The Pena Nieto 2014 Mexican tax reform (top marginal income tax rate
+  raised from 30 to 35 percent, capital-gains taxation introduced at 10
+  percent, dividend tax 10 percent) produced a measurable but small
+  reduction in the Mexican top-1 pretax income share over 2014-2018 vs
+  LATAM synthetic control, with the effect attenuated by Mexico's high
+  informal-sector share which limits the formal-tax-base distributional
+  margin. The discriminating test is the synth-control gap on top-1
+  share against the LATAM comparator pool.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 5.
+prior_confidence: 0.45
+disclosure: >
+  Author prior is genuinely uncertain — Mexican formal-sector tax base
+  is narrow enough that headline-rate distributional effects may be
+  swamped by informality dynamics.
+falsification:
+  rule: >
+    SUPPORTED if Mexican top-1 pretax share falls by at least 0.4
+    percentage points 2014-2018 vs LATAM synth at p<0.10. REFUTED if no
+    detectable gap or positive gap at four-year horizon.
+  test: >
+    Synthetic-control with LATAM donor pool, treated MEX 2014.
+evidence_type: associational
+sample:
+  countries: [MEX, BRA, ARG, COL, PER, CHL, URY]
+  period: [2005, 2020]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: mex_2014_tax_reform_post
+      source: "constructed: indicator = 1 for MEX, year >= 2014"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: oil_price_real
+      source: "imf_pcps:POILBRE"
+      transformation: real_yoy_pct_change
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with LATAM donor pool. Treated MEX 2014.
+intervention_channel: fiscal
+scope:
+  period: [2014, 2020]
+  countries: [MEX]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [pena_nieto_tax_reform_2014, mexico_top_rate, latam_distribution]

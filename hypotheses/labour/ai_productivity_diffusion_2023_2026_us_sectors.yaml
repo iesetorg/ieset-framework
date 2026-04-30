@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ai_productivity_diffusion_2023_2026_us_sectors
+version: 1
+status: candidate
+topic: labour
+claim: Generative-AI tool adoption following ChatGPT's November 2022 release will produce a measurable
+  but modest sector-level labour-productivity divergence by 2026 — high-AI-exposure white-collar
+  sectors (information, professional services, finance) running 1-3pp/year above low-exposure
+  sectors (construction, accommodation, transportation), consistent with Brynjolfsson's
+  productivity-J-curve at an early-diffusion stage.
+notes: Tests the "great divergence" prediction at a stage where it should just begin to register
+  in BLS sector productivity. By design conservative — a 1-3pp differential is small enough that
+  null (no divergence yet) remains a plausible reading consistent with the J-curve being still
+  in its complementary-investments phase.
+prior_confidence: 0.50
+disclosure: Author is bullish on long-run AI productivity but explicitly priors a slow diffusion
+  curve; could under-weight measurement lag. Conversely, may over-weight 2024-2025 LLM adoption
+  surveys if those surveys conflate experimentation with productive use. Sector productivity in
+  knowledge work is partly imputed and could spuriously rise as input costs of writing/analysis
+  fall regardless of true output gains.
+steelman: hypotheses/steelman/ai_productivity_diffusion_2023_2026_us_sectors.md
+evidence_type: associational
+falsification:
+  rule: >-
+    BLS sector-level labour-productivity (output per hour) US 2019-2026.
+    Define AI-exposure tier from Eloundou-Manning-Mishkin (2023) GPT
+    occupational-exposure scores aggregated to NAICS 2-digit. Compare
+    cumulative productivity-growth divergence high-exposure vs
+    low-exposure sectors 2022-Q4 to 2026-Q4 against pre-period
+    (2015-Q1 to 2019-Q4) divergence. SUPPORTED if cumulative
+    high-minus-low excess productivity growth is in [+3pp, +12pp] over
+    the four-year post-period and exceeds the pre-period divergence by
+    at least 2pp. REFUTED if cumulative divergence < +1pp OR is smaller
+    than pre-period divergence (i.e. AI tracks pre-existing trend).
+    PARTIAL if direction correct but magnitude in [+1pp, +3pp].
+  test: us_sector_productivity_ai_exposure_divergence_2022_2026
+  threshold: >-
+    SUPPORTED: cumul high-minus-low productivity growth 2022-2026 in [+3pp, +12pp]
+    AND exceeds 2015-2019 pre-trend divergence by >=2pp.
+    REFUTED: cumul <+1pp OR < pre-trend divergence.
+methodology_note: >-
+  v1 candidate (2026-04-28). Endpoint runs partially into the future
+  (2026-Q4 BLS productivity not yet released as of 2026-04). Initial
+  evaluation uses 2026-Q1/Q2 data with full evaluation deferred to
+  2027-Q2 once 2026-Q4 productivity data publishes. Pre-period
+  divergence baseline locks in 2015-2019 to avoid post-period
+  contamination.
+scope:
+  period: [2022, 2026]
+  countries: [USA]
+  outcome_dim: [productivity, employment_labour]
+  policy_family: [none]
+  treatment_tags: [generative_ai_diffusion, chatgpt_2022_release, ai_productivity_jcurve]
+sample:
+  countries: [USA]
+  period: [2015, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "agriculture (NAICS 11) excluded — different productivity measurement"
+    - "government (NAICS 92) excluded — non-market output"
+variables:
+  outcome:
+    - name: sector_labour_productivity
+      source: "bls:productivity_major_sector_industry"
+      transformation: log
+      notes: BLS major-industry productivity (output per hour, NAICS 2-3 digit).
+    - name: real_output_per_hour
+      source: "fred:OPHNFB; fred:OPHPBS"
+      transformation: log
+  treatment:
+    - name: ai_exposure_tier
+      source: "constructed: Eloundou-Manning-Mishkin 2023 GPT-exposure aggregated to NAICS 2-digit; high (>=50%), medium (20-50%), low (<20%)"
+      transformation: categorical
+    - name: post_chatgpt_indicator
+      source: "constructed: 1 from 2022-12 onwards"
+      transformation: indicator
+    - name: ai_adoption_share
+      source: "us_census:Business_Trends_and_Outlook_Survey_AI_Use"
+      transformation: level_pct
+      notes: Census BTOS AI-use module begins 2023; sector level.
+  controls:
+    - name: ict_capital_intensity
+      source: "bls:ict_capital_services"
+      transformation: log
+    - name: pre_period_productivity_trend
+      source: "derived: 2015-2019 sector productivity-growth mean"
+      transformation: level
+    - name: covid_recovery_phase
+      source: "constructed: 2020-Q2 to 2022-Q4 indicator"
+      transformation: indicator
+estimator:
+  template: panel_fe_decomposition
+  clustering: sector
+  fixed_effects: [sector, quarter]
+  notes: >
+    Difference-in-differences-style decomposition: high-AI-exposure sector
+    productivity growth post-2022Q4 vs pre-2019Q4, against low-AI-exposure
+    sector trajectory as control. Threshold sized for a moderate-effect
+    Brynjolfsson J-curve early-stage prediction (1-3pp/yr); strong rejection
+    requires either no divergence or pre-existing trend dominance.

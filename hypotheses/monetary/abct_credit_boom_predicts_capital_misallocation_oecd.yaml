@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: abct_credit_boom_predicts_capital_misallocation_oecd
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  In an OECD panel 1980-2023, the 5-year cumulative growth of private
+  credit to non-financial corporations (BIS WS_CREDIT) is positively
+  associated with the subsequent (t+1 to t+5) volatility of non-residential
+  fixed investment and with downward revisions to ex-ante TFP growth
+  forecasts. Countries experiencing the largest credit booms exhibit
+  the largest post-bust capital-stock reallocation episodes,
+  consistent with the Mises-Hayek prediction that artificially-low
+  interest rates produce a structural distortion in the inter-temporal
+  capital structure that must be liquidated when monetary conditions
+  normalise.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, JPN, CAN, AUS, NZL, CHE, PRT, GRC, KOR]
+  period: [1980, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with credit-to-GDP < 30% (insufficient financial development for ABCT mechanism to bind)"
+    - "drop 2020-2021 COVID window from primary estimation; report separately"
+
+scope:
+  period: [1980, 2023]
+  countries: [OECD]
+  outcome_dim: [productivity, financial_crisis, monetary_policy]
+  policy_family: [monetary_policy, regulation]
+  treatment_tags: [private_credit_boom, abct_capital_misallocation]
+
+variables:
+  outcome:
+    - name: nonresidential_investment_volatility_5y
+      source: "world_bank_wdi:NE.GDI.FPRV.ZS"
+      transformation: rolling_std_5y
+      notes: "5-year rolling standard deviation of private fixed investment as share of GDP."
+    - name: tfp_growth_5y_forward
+      source: "pwt:rtfpna"
+      transformation: log_diff_5y
+      notes: "Forward 5-year log-difference of TFP at constant national prices."
+  treatment:
+    - name: private_credit_growth_5y
+      source: "bis:WS_CREDIT"
+      transformation: log_diff_5y
+      notes: "Cumulative 5-year log-difference of credit to private non-financial sector. BIS total credit statistics."
+    - name: credit_to_gdp_gap
+      source: "bis:WS_CREDIT_GAP"
+      transformation: level
+      notes: "BIS credit-to-GDP gap (deviation from one-sided HP-filtered trend)."
+  controls:
+    - name: real_policy_rate
+      source: "bis:WS_CBPOL"
+      transformation: level
+      notes: "Real central-bank policy rate (deflated by CPI)."
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: government_consumption_share
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: level
+
+intervention_channel: monetary
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE regression of investment volatility (and ex-post TFP shortfall)
+    on lagged 5-year credit growth and credit-to-GDP gap. Heterodox/Keynesian
+    null is that credit-driven investment is welfare-improving and the
+    volatility/TFP link should be small or absent. Local-projections variant
+    traces investment-volatility response over h=1..10 years to a one-SD
+    credit-growth shock as robustness.
+
+falsification:
+  rule: >
+    The hypothesis is falsified if the panel-FE coefficient on lagged
+    5-year credit growth is not positive and significant at p<0.05 for
+    EITHER outcome (investment volatility OR forward TFP shortfall),
+    OR if the magnitude of the volatility response is below 0.20 SD
+    per 1-SD credit shock. A clean refutation also requires that the
+    sign be stable across pre-2008 and post-2008 sub-samples.
+  test: panel_fe_credit_growth_to_investment_volatility_and_tfp
+  threshold: >
+    coefficient(credit_growth_5y → investment_volatility_5y) > 0 at p<0.05
+    AND coefficient(credit_growth_5y → tfp_growth_5y_forward) < 0 at p<0.05
+    AND volatility_response >= 0.20 SD per 1-SD credit shock
+    AND sign stable in both 1980-2007 and 2010-2023 sub-samples
+
+prior_confidence: 0.65
+
+disclosure: >-
+  The framing — credit booms cause capital misallocation rather than welcome
+  investment — is canonically Austrian (Mises 1912, Hayek 1931, Garrison
+  2001). Heterodox readers (post-Keynesian, MMT) view private-credit growth
+  as endogenous accommodation of profitable investment opportunities and
+  reject the malinvestment claim; New-Keynesian readers grant a credit-cycle
+  link but attribute it to financial frictions, not to inter-temporal
+  misallocation per se. Author prior is moderately positive on the BIS
+  credit-gap → crisis correlation (which is well-documented in BIS working
+  papers) but the TFP-shortfall channel is more contested.
+
+steelman: hypotheses/steelman/abct_credit_boom_predicts_capital_misallocation_oecd.md
+
+linked_hypotheses:
+  - abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007
+  - austrian_monetary_expansion_asset_bubble_not_cpi_panel
+
+notes: >
+  Mises (1912 Theory of Money and Credit), Hayek (1931 Prices and
+  Production), Rothbard (1963 America's Great Depression) form the
+  canonical ABCT lineage. Modern empirical adjacents: Borio-Drehmann
+  BIS work on credit gaps, Mian-Sufi on household-debt overhang.
+  Author's bias risk: predisposed to read 2008 GFC as a malinvestment
+  story; the panel design forces the claim to generalise across many
+  episodes rather than being fit to the US housing case.

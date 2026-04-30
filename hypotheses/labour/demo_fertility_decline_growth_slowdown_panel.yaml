@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_fertility_decline_growth_slowdown_panel
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Across countries 1980-2023, sustained declines in the total fertility rate below 2.1 are
+  followed within 20-30 years by significant slowdowns in real GDP per capita growth, mediated
+  by working-age population share. The mechanism predicts a panel association between TFR
+  measured at year t and the per-capita growth rate observed at t+20 to t+30, controlling
+  for initial income, capital deepening, and human-capital stock. The effect is hypothesised
+  to operate primarily through the demographic-dividend reversal channel rather than
+  innovation-decay or savings-glut channels.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, KOR, CAN, AUS, NLD, SWE, NOR, DNK, FIN, CHE, BEL, AUT, IRL, NZL, GRC, PRT, POL, HUN, CZE, MEX, BRA, ARG, CHL, TUR, THA, MYS, IDN, PHL, IND, CHN, ZAF, EGY, NGA, KEN, GHA]
+  period: [1980, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years with major war or sovereign collapse (UCDP-coded high-intensity conflict)
+    - drop transition-economy outliers 1990-1995
+scope:
+  period: [1980, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, demographics_migration]
+  policy_family: [none]
+  treatment_tags: [fertility_decline, demographic_dividend_reversal]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+      notes: Lagged 20-30 years to align fertility cohorts with working-age entry.
+  decomposition_channels:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+    - name: dependency_ratio_total
+      source: world_bank_wdi:SP.POP.DPND
+      transformation: level
+  controls:
+    - name: log_initial_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+    - name: capital_per_worker
+      source: pwt:rkna_per_emp
+      transformation: log
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel of 5-year-averaged growth on lagged TFR (20-25-year lag) plus
+    decomposition into working-age-share contribution. Newey-West HAC SEs alternative.
+falsification:
+  rule: >-
+    SUPPORTED if coefficient on TFR(t-25) on per-capita growth is negative and significant at
+    p<0.05 with a magnitude such that a 1-child decline in TFR predicts at least 0.5pp lower
+    annualised growth 25 years later, AND the working-age-share channel accounts for at least
+    40 percent of the implied effect via mediation decomposition. REFUTED if coefficient is
+    insignificant or wrong-signed, or if working-age-share channel <15% of effect.
+  test: panel_fe_lagged_tfr_growth_with_mediation
+  threshold: "coef_tfr_lag25 < 0 AND p_value < 0.05 AND mediation_share_wap >= 0.40"
+prior_confidence: 0.7
+disclosure: >-
+  Author's market-liberal priors expect the mechanism to operate but are uncertain about
+  whether the working-age-share channel dominates innovation-stagnation effects. Selection
+  on which countries achieved sub-replacement fertility is correlated with prior development
+  level, biasing toward finding negative association independent of demographic dividend.
+steelman: hypotheses/steelman/demo_fertility_decline_growth_slowdown_panel.md
+notes: Routes through WDI; PWT capital-per-worker control is data-gated on rkna availability.

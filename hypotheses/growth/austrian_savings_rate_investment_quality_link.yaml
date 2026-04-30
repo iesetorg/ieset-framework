@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: austrian_savings_rate_investment_quality_link
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  In a long-run cross-country panel 1960-2019, economies with
+  persistently high gross domestic savings rates (Germany, Japan,
+  Switzerland, Korea, Taiwan, Singapore) generate more TFP growth per
+  unit of investment than economies whose investment is predominantly
+  financed by foreign credit inflows or domestic credit expansion. The
+  Austrian-Hayekian prediction is that genuine savings represent
+  forgone present consumption and therefore signal authentic
+  inter-temporal preferences, while credit-financed investment is
+  prone to malinvestment because the underlying inter-temporal price
+  signal (the loan rate) is distorted. The pre-registered claim is
+  that the cross-country elasticity of TFP growth with respect to
+  savings-financed investment exceeds the elasticity with respect to
+  credit-financed investment by a factor of at least 1.5.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, JPN, CAN, AUS, NZL, CHE, KOR, SGP, TWN, PRT, GRC]
+  period: [1960, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop 2008-2010 GFC window from primary estimation; report separately"
+    - "exclude oil-state savings rates inflated by resource rents (not in sample) "
+
+scope:
+  period: [1960, 2019]
+  countries: [OECD, ASIA_EM]
+  outcome_dim: [productivity, gdp_growth, capital_flows]
+  policy_family: [monetary_policy, regulation, institutional_reform]
+  treatment_tags: [savings_rate, investment_quality, credit_financed_investment]
+
+variables:
+  outcome:
+    - name: tfp_growth_5y
+      source: "pwt:rtfpna"
+      transformation: log_diff_5y
+      notes: "5-year log-difference of TFP at constant national prices."
+    - name: capital_productivity_5y
+      source: "pwt:rkna; pwt:rgdpna"
+      transformation: ratio_log_diff_5y
+      notes: "5-year change in real-output-to-capital-stock ratio."
+  treatment:
+    - name: gross_domestic_savings_pct_gdp
+      source: "world_bank_wdi:NY.GDS.TOTL.ZS"
+      transformation: level
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: private_credit_pct_gdp
+      source: "bis:WS_CREDIT"
+      transformation: level
+    - name: current_account_pct_gdp
+      source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
+      transformation: level
+      notes: "Used to decompose savings vs foreign-financed investment."
+  controls:
+    - name: log_gdp_pc_ppp_initial
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+      notes: "Initial-period log GDP per capita to control for convergence."
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+
+intervention_channel: institutional
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel-FE regression of 5-year-forward TFP growth on
+    savings-financed investment (proxied by gross capital formation
+    minus current-account deficit) and credit-financed investment
+    (proxied by private-credit growth), plus controls. Wald test on
+    the ratio of the two coefficients. Mainstream growth-economics null
+    treats the source of investment finance as irrelevant — the
+    Modigliani-Miller-style assumption is that capital is fungible. A
+    significant differential coefficient supports the Austrian view.
+
+falsification:
+  rule: >
+    The hypothesis is falsified if the elasticity-ratio of TFP growth
+    to savings-financed vs credit-financed investment is below 1.5,
+    OR if the savings-financed-investment coefficient is not
+    significantly positive at p<0.05.
+  test: panel_fe_savings_vs_credit_investment_quality_ratio
+  threshold: >
+    elasticity(savings_financed_inv → tfp_growth) / elasticity(credit_financed_inv → tfp_growth) >= 1.5
+    AND savings_financed_inv coefficient significant at p<0.05
+
+prior_confidence: 0.55
+
+disclosure: >-
+  This is among the more contested Austrian/Hayekian empirical claims —
+  mainstream growth theory (Solow, neoclassical aggregator) treats
+  savings vs credit as fungible and rejects the "investment quality"
+  framing. Author prior 0.55 reflects genuine uncertainty: high-savings
+  East Asian economies clearly outperformed credit-driven Anglo
+  economies on growth, but disentangling savings-quality from policy
+  bundle (industrial policy, exchange-rate management, demographics)
+  is hard. Bias risk: the author finds the Hayekian framing
+  intuitively appealing and may have specified a coefficient-ratio
+  test rather than a stricter mechanism test.
+
+steelman: hypotheses/steelman/austrian_savings_rate_investment_quality_link.md
+
+linked_hypotheses:
+  - abct_credit_boom_predicts_capital_misallocation_oecd
+  - austrian_monetary_expansion_asset_bubble_not_cpi_panel
+
+notes: >
+  Hayek (1931 Prices and Production), Mises (1949 Human Action ch.18-20)
+  on the role of genuine savings in coordinating the inter-temporal
+  capital structure. Modern adjacents: Lucas (1990) "Why doesn't
+  capital flow from rich to poor countries?" — the puzzle the Austrians
+  would say is dissolved once you recognise that not all "investment"
+  is alike.

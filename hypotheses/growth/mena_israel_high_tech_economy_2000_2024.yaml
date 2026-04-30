@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_israel_high_tech_economy_2000_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Israel's 2000-2024 transformation into a high-tech-export-led economy ("Start-Up
+  Nation") produced a sustained labour-productivity acceleration, services-export
+  composition shift, and high-skilled-employment expansion exceeding OECD peers without
+  comparable defence-tech / venture-capital ecosystems. The pre-registered claim is that,
+  in a synthetic-control design with small-open-economy OECD peers (Ireland, Denmark,
+  Finland, New Zealand, Singapore is-non-OECD-but-comparable), Israel's cumulative
+  labour-productivity (real GDP per hour worked) growth 2000-2024 exceeds the synthetic
+  counterfactual by at least 25 log-points AND ICT services export share rises by at
+  least 10 percentage points more than counterfactual. The null counter-claim is that
+  Israel's headline outperformance is driven primarily by Russian/Soviet-Jewish-immigrant
+  human-capital absorption (1989-1995 cohort) rather than continuing 2000-2024 policy
+  content.
+evidence_type: causal
+sample:
+  countries:
+  - ISR
+  - IRL
+  - DNK
+  - FIN
+  - NZL
+  - SGP
+  period:
+  - 1995
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID 2020Q2-2020Q4 from fitting
+  - flag Ireland 2015 GDP-revision (FDI-distortion) windows; retain but robustness-check
+scope:
+  period:
+  - 1995
+  - 2024
+  countries:
+  - ISR
+  - IRL
+  - DNK
+  - FIN
+  - NZL
+  - SGP
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - industrial_capability
+  - trade_liberalisation
+  policy_family:
+  - industrial_policy
+  - trade_policy
+  - regulation
+  treatment_tags:
+  - israel_chief_scientist_oicis_2000s
+  - israel_yozma_vc_program
+  - israel_8200_tech_pipeline
+variables:
+  outcome:
+  - name: real_gdp_per_hour
+    source: oecd:gdp_per_hour; pwt:rgdpe; pwt:avh
+    transformation: log_level
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: ict_services_export_share
+    source: world_bank_wdi:BX.GSR.CCIS.ZS; oecd:trade_in_services
+    transformation: level
+  - name: high_tech_employment_share
+    source: oecd:employment_high_tech; ilostat:EAR_INEE_SEX_AGE_OCU_NB
+    transformation: level
+  treatment:
+  - name: high_tech_pivot_indicator
+    source: 'constructed: 1 for ISR from 2000 onward'
+    transformation: binary
+  controls:
+  - name: tertiary_enrolment_share
+    source: world_bank_wdi:SE.TER.ENRR; oecd:education
+    transformation: level
+  - name: rd_share_gdp
+    source: world_bank_wdi:GB.XPD.RSDV.GD.ZS; oecd:rd_expenditure
+    transformation: level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: us_nasdaq_index
+    source: fred:NASDAQCOM
+    transformation: log_level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  The Israeli model bundles industrial-policy (Office of Chief Scientist / Israel
+  Innovation Authority grants, Yozma VC programme), regulatory-channel (favourable IP
+  regime, defence-tech commercialisation pathways), trade-policy (US FTA, EU
+  association agreement), and institutional-channel (military 8200/Talpiot tech-talent
+  pipeline). Bundled per invariant 4.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with ISR treated from 2000 and small-open-economy OECD donor
+    pool. Robustness drops Ireland (FDI-distortion confound on services exports) and
+    drops Singapore (different geographical/institutional regime). Cumulative-growth
+    contour reported at 2005, 2010, 2015, 2020, 2024 to show trajectory shape.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) labour-productivity (real GDP per hour) cumulative gap
+    2000-2024 vs synthetic counterfactual is less than +25 log-points at p_perm <
+    0.10, OR (b) ICT services export share gap is less than +10 ppts, OR (c) the
+    cumulative gap controlling for 1995-2000 Russian-Jewish-immigrant-cohort human-
+    capital effect (proxied by post-1989 net-migration share) is reduced by more than
+    50% — i.e. the immigration channel dominates and the policy-content channel is
+    not separable.
+  test: synth_did_with_immigration_attribution_check
+  threshold: >-
+    cumulative_log_productivity_gap_2000_2024 >= 0.25 at p_perm < 0.10 AND
+    ict_services_export_share_gap >= 10 ppts AND
+    immigration_adjusted_residual_gap >= 0.50 * raw_gap
+prior_confidence: 0.65
+disclosure: >-
+  Author's prior is high on Israeli labour-productivity outperformance vs OECD peers.
+  The specific magnitudes are uncertain; the immigration-channel attribution is the
+  most genuinely contestable element. Prior 0.65 reflects strong directional
+  confidence with moderate uncertainty on threshold magnitudes and the immigration-
+  vs-policy attribution problem.
+conflict_disclosure: Author has VC industry exposure to Israeli portfolio companies in indirect form (LP holdings); no direct equity in Israeli public companies. Prior may be biased toward the Start-Up Nation thesis; pre-registration discipline is binding.
+steelman: hypotheses/steelman/mena_israel_high_tech_economy_2000_2024.md
+linked_hypotheses:
+- demo_israel_soviet_absorption_1989_1994
+notes: >-
+  Designed to be orthogonal to demo_israel_soviet_absorption_1989_1994 (which tests
+  the 1989-1994 immigration absorption); this hypothesis tests the post-2000 high-
+  tech-led growth model. The post-October-7-2023 war effect on the high-tech sector
+  is too recent to be fully reflected in 2024 data; v1.1 spec will revisit.

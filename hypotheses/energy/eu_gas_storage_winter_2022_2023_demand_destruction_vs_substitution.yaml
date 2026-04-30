@@ -1,0 +1,190 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_gas_storage_winter_2022_2023_demand_destruction_vs_substitution
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The EU's headline ~15% reduction in natural-gas demand over the August
+  2022 - March 2023 emergency window (vs the 2017-2021 average) was
+  achieved through a measurable mix of (a) industrial demand destruction
+  (rationing, plant mothballing, output cuts), (b) household + commercial
+  conservation (thermostat reductions, voluntary cuts), (c) electricity-
+  sector fuel-switching (coal restart, nuclear extension where available),
+  and (d) unusually warm winter weather. The decomposition is a
+  contested claim because the policy-feasibility implications differ
+  sharply across channels: weather-driven savings tell us little about
+  policy capacity; industrial demand destruction is mostly capacity loss
+  (output cost), not adjustment; conservation may be sustainable; coal
+  switching is a climate-perverse temporary regression. This hypothesis
+  pre-registers a quantitative decomposition.
+
+evidence_type: causal
+
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, AUT, CZE, SVK, HUN, ROU, BGR]
+  period: [2017, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-months missing Eurostat nrg_cb_gasm or ENTSOG gas-flow data"
+
+scope:
+  period: [2017, 2024]
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, POL, AUT, CZE, SVK, HUN, ROU, BGR]
+  outcome_dim: [energy, industrial_capability]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [eu_gas_emergency_2022, eu_save_gas_winter_regulation, gas_price_shock_2021, russia_pipeline_cutoff_2022]
+
+variables:
+  outcome:
+    - name: log_total_gas_consumption
+      source: "eurostat:nrg_cb_gasm"
+      transformation: log
+      notes: "Eurostat monthly gas-balance consumption — total. Decomposed into industry / power / households + commercial via Eurostat sectoral split."
+    - name: log_industrial_gas_consumption
+      source: "eurostat:nrg_cb_gasm"
+      transformation: log
+      notes: "Industrial-sector subseries from monthly gas balance."
+    - name: log_residential_commercial_gas_consumption
+      source: "eurostat:nrg_cb_gasm"
+      transformation: log
+    - name: log_power_sector_gas_consumption
+      source: "eurostat:nrg_cb_gasm"
+      transformation: log
+    - name: heating_degree_days
+      source: "eurostat:nrg_chdd_m"
+      transformation: level
+      notes: "Eurostat heating-degree-days monthly per country — weather control."
+    - name: log_coal_generation
+      source: "constructed: ENTSO-E aggregated thermal generation by fuel — coal/lignite. entsoe fetcher pending; Eurostat nrg_cb_em as fallback."
+      transformation: log
+    - name: log_industrial_production_index
+      source: "oecd:STSIND4_PRODMAN"
+      transformation: log
+      notes: "Channel-(a) industrial-demand-destruction proxy: gas use down + IPI down ⇒ destruction; gas use down + IPI flat ⇒ efficiency / substitution."
+
+  treatment:
+    - name: post_aug_2022_gas_emergency_dummy
+      source: "constructed: indicator = 1 from August 2022 (EU 15% gas-demand reduction regulation effective) through March 2023; 0 otherwise. Secondary: 1 through March 2024 for second-winter test."
+      transformation: indicator
+
+  decomposition_channels:
+    - name: weather_attributable_savings_share
+      source: "constructed: counterfactual gas consumption holding HDD at 2017-2021 monthly mean; difference = weather component."
+      transformation: level
+    - name: industrial_destruction_share
+      source: "constructed: industrial gas use change net of industrial-output-weighted change (proxy: IPI or sectoral VA). Residual after output-adjusted gas decline = efficiency/destruction component split."
+      transformation: level
+    - name: power_fuel_switching_share
+      source: "constructed: change in power-sector gas use vs. counterfactual at constant power-mix; residual after coal/nuclear/renewables substitution accounting."
+      transformation: level
+    - name: residential_conservation_share
+      source: "constructed: change in residential gas use after weather-normalisation (HDD-adjusted)."
+      transformation: level
+
+  controls:
+    - name: log_ttf_gas_price
+      source: "constructed: Dutch TTF spot, monthly. eex fetcher or manual-drop pending."
+      transformation: log
+    - name: log_eu_ets_price
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log
+    - name: gas_storage_filling_level
+      source: "constructed: AGSI+ EU gas-storage filling level by country, monthly. Manual-drop pending."
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Treatment is EU Council Regulation 2022/1369 (15% voluntary gas-demand
+  reduction August 2022 - March 2023, extended through 2024) — a regulatory
+  coordination instrument with informational + targeting force, not a
+  direct fiscal subsidy. National-level implementation varied (some
+  industrial-rationing protocols, some retail-pricing nudges, some
+  building-temperature mandates).
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, month_of_year]
+  notes: >
+    Primary specification: weather-normalise consumption (regress on HDD
+    at country-month level), then decompose residual gas-demand change
+    Aug 2022 - Mar 2023 (and the second winter Aug 2023 - Mar 2024) into
+    industrial / power / residential channels. Power-sector decomposition
+    uses ENTSO-E generation mix to identify coal-substitution share.
+    Industrial-destruction decomposition: gas use change minus output-
+    elasticity-implied change (calibrated from 2017-2021 panel) =
+    structural cut.
+
+    Cross-country: estimate channel shares per country, test whether
+    higher-gas-exposure countries (DEU, ITA, NLD) show larger industrial
+    destruction shares than lower-exposure countries (FRA, ESP).
+
+    Second-winter test (Aug 2023 - Mar 2024) distinguishes weather (the
+    2022-2023 winter was warm; 2023-2024 also mild) from other channels.
+    If the second-winter cut is similar in size and channel mix, weather
+    is doing less than headline; if it shrinks substantially, weather
+    was a large share.
+
+    Known limitations:
+    (1) Weather normalisation is sensitive to HDD specification (linear
+        vs threshold-based); report sensitivity.
+    (2) Industrial-destruction vs efficiency split requires output data
+        (IPI / sectoral VA) on the same monthly panel; OECD STAN does
+        not ship monthly. Use proxy IPI for monthly, validate against
+        annual STAN.
+    (3) Hidden-flow problem: gas imports into EU may have been embedded
+        in non-gas imports (ammonia, hot-rolled steel, aluminium); the
+        true demand-destruction figure is overstated by the volume of
+        imported energy-intensive intermediates.
+    (4) AGSI+ storage data has lag and revisions for some smaller member
+        states.
+
+falsification:
+  rule: >
+    Not supported if (a) the channel decomposition cannot bound any
+    channel's share away from zero with 80% confidence (decomposition
+    underidentified), OR (b) weather attribution exceeds 60% of the total
+    cut (would imply the policy + behavioural response was minor), OR (c)
+    industrial-destruction share is statistically zero (would refute the
+    capacity-loss interpretation), OR (d) the second-winter cut is
+    entirely weather-explained with no remaining policy/behavioural
+    component (would suggest first-winter response was not durable).
+  test: gas_demand_decomposition_panel
+  threshold: >
+    All four channels each contribute ≥ 5pp to the headline 15% cut at
+    EU aggregate AND industrial-destruction share is statistically > 0
+    at p<0.10 AND second-winter cut retains > 5pp of non-weather component.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author prior is that the 15% headline cut decomposes roughly: weather
+  20-30%, industrial-destruction 30-40% (most of which is capacity loss
+  rather than efficiency), power-fuel-switching 15-25% (mostly to coal
+  short-term), residential conservation 15-20%. The contested numbers
+  are weather (Bruegel and IEA differ; Bruegel attributes more to weather)
+  and industrial-destruction-vs-efficiency (industry argues most was
+  mothballing; greens argue most was efficiency). The hypothesis is
+  structured to surface the disagreement rather than impose author prior.
+  Climate-policy implications (coal-substitution as a temporary regression
+  is a perverse climate outcome) noted but not measured.
+
+steelman: hypotheses/steelman/eu_gas_storage_winter_2022_2023_demand_destruction_vs_substitution.md
+
+linked_hypotheses:
+  - eu_post_2021_gas_shock_industrial_output_impact
+  - energy_crisis_2022_european_industrial_relocation
+  - nordstream_sabotage_2022_european_energy_security_pivot
+  - german_energiewende_industrial_cost_trajectory
+
+notes: >
+  Data readiness:
+  - Eurostat nrg_cb_gasm + nrg_chdd_m: ready
+  - OECD industrial production: ready
+  - ENTSO-E generation mix: entsoe fetcher pending; Eurostat nrg_cb_em as fallback
+  - TTF gas price: eex fetcher pending or manual-drop
+  - EU ETS price: eea ready
+  - AGSI+ storage levels: manual-drop pending under data/manual/derived/
+
+  Run when ENTSO-E fetcher + TTF + AGSI+ manual-drops complete.

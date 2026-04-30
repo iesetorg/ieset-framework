@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: truss_2022_currency_user_ldi_collateral_mechanism
+version: 1
+status: candidate
+topic: fiscal
+claim: >-
+  The September 2022 UK gilt-market dysfunction had its operative
+  amplification mechanism in the foreign-currency-collateral exposure of
+  the Liability-Driven Investment (LDI) leveraged-derivative chain in
+  the UK pension system, not in a "fiscal limit" reached by the
+  sovereign issuer. Specifically, the 30y gilt yield spiked because
+  forced LDI collateral calls on USD/EUR-denominated swap counterparties
+  triggered a self-reinforcing fire-sale; UK pension funds were
+  effectively foreign-currency users at the margin even though the UK
+  sovereign was a currency issuer. The pattern was resolved by the BoE
+  intervening as issuer-of-last-resort within four trading days, with
+  full reversal of the gilt-yield spike, and the institutional reform
+  that followed (LDI collateral standards) was a financial-stability
+  measure rather than fiscal credibility restoration. This contrasts
+  the MMT/PK currency-user-vs-issuer mechanism with the mainstream
+  reading of Truss as a fiscal-credibility event.
+notes: >-
+  Companion to the existing uk_truss_mini_budget_currency_sovereign_mechanism
+  spec; that spec frames the question generally as institutional-rupture
+  vs hard-fiscal-limit, while this candidate spec is more specific:
+  the operative channel was the LDI collateral fire-sale, and the
+  pension funds were the marginal currency-user. Tests the BIS / BoE
+  Financial Stability Report decomposition. The standard mainstream
+  read locates the mechanism in fiscal-credibility loss; this read
+  locates it in institutional design and FX-collateral exposure of
+  pension intermediaries.
+prior_confidence: 0.60
+disclosure: >-
+  Author has market-liberal priors and is sceptical of the strongest
+  MMT generalisation that all fiscal-credibility episodes are
+  reducible to institutional-rupture. The Truss episode is the cleanest
+  case because the BoE intervention reversed yields fully within days
+  and the LDI mechanism is documented in BoE FSR; the broader
+  inference does not extend automatically. Specification risk:
+  attributing the spike to LDI collateral specifically requires
+  high-frequency data the BoE has only released in aggregate.
+falsification:
+  rule: >-
+    The hypothesis is falsified if any of the following hold for the
+    September 2022 gilt-crisis window: (a) the 30y gilt yield does NOT
+    fall by at least 100 basis points within 5 trading days of the
+    BoE 28 September gilt-purchase facility announcement, (b) the BoE
+    Financial Stability Report and TPR LDI investigation do NOT
+    identify forced collateral calls on FX-denominated derivative
+    positions as the proximate amplification mechanism, OR (c) GBP
+    spot does NOT recover to within 3% of pre-mini-budget level by
+    end-October 2022 absent further fiscal news. Falsification
+    requires (a) AND ((b) OR (c)) — primary gate is the BoE intervention
+    yield reversal.
+  test: ldi_collateral_fire_sale_event_study_2022
+  threshold: 30y_gilt_yield reversal >= 100bp within 5 trading days of 2022-09-28 AND (BoE/TPR identifies LDI collateral channel OR GBP recovers to within 3% of pre-event level by 2022-10-31)
+evidence_type: associational
+sample:
+  countries: [GBR]
+  period: [2022, 2023]
+  temporal_structure: time_series
+  exclusion_rules:
+    - exclude US-CPI release dates within event windows when global yields moved on US data not UK fiscal news
+    - treat the BoE 28 Sept 2022 gilt-purchase announcement as a separate event from the 23 Sept mini-budget
+    - high-frequency intra-day data preferred where available; daily fallback
+variables:
+  outcome:
+    - name: gilt_yield_30y
+      source: boe:IUDLG7N
+      transformation: bp_level
+      notes: Primary high-frequency outcome; spike on 23-27 Sept, reversal post 28 Sept.
+    - name: gilt_yield_10y
+      source: boe:IUDMNZC
+      transformation: bp_level
+    - name: gilt_implied_volatility
+      source: boe:gilt_volatility (manual); ice:UK_gilt_options
+      transformation: level
+      notes: "TODO: ICE gilt-options data manual-drop required."
+    - name: gbp_usd_spot
+      source: fred:DEXUSUK; boe:XUDLUSS
+      transformation: log_level
+    - name: gbp_eur_spot
+      source: ecb:EXR.D.GBP.EUR; boe:XUDLERS
+      transformation: log_level
+    - name: ldi_collateral_call_volume
+      source: "manual: BoE Financial Stability Report Dec 2022 + TPR LDI investigation tables"
+      transformation: gbp_billion
+      notes: "TODO: aggregated daily-collateral-call series only available from BoE FSR commentary; high-frequency series not publicly published. Mechanism evidence relies on BoE/TPR documentation."
+  treatment:
+    - name: mini_budget_announcement
+      source: "constructed: indicator = 1 on 2022-09-23; 0 otherwise"
+      transformation: event_dummy
+    - name: boe_gilt_intervention_announcement
+      source: "constructed: indicator = 1 on 2022-09-28 (BoE temporary gilt-purchase facility); 0 otherwise"
+      transformation: event_dummy
+    - name: boe_gilt_intervention_unwind
+      source: "constructed: indicator = 1 on 2022-10-14 (extension end); 0 otherwise"
+      transformation: event_dummy
+    - name: truss_resignation
+      source: "constructed: indicator = 1 on 2022-10-20; 0 otherwise"
+      transformation: event_dummy
+  controls:
+    - name: us_10y_yield
+      source: fred:DGS10
+      transformation: bp_level
+    - name: bund_10y_yield
+      source: ecb:IRS.M.DE; fred:IRLTLT01DEM156N
+      transformation: bp_level
+    - name: vix
+      source: fred:VIXCLS
+      transformation: level
+    - name: boe_bank_rate
+      source: boe:IUDBEDR
+      transformation: level_pct
+intervention_channel: monetary
+estimator:
+  template: event_study
+  clustering: date
+  fixed_effects: [date]
+  notes: >-
+    High-frequency event study around the September 2022 gilt-crisis
+    window. Primary identification: yield-reversal magnitude in 5
+    trading days post 28 September. Secondary: cross-walk against
+    BoE FSR and TPR LDI commentary documenting forced-collateral-call
+    mechanism. Robustness: GBP spot vs DXY-comparable basket to
+    distinguish Truss-specific from global-rate channel.
+scope:
+  period: [2022, 2023]
+  countries: [GBR]
+  outcome_dim: [fiscal_policy, financial_crisis, monetary_policy, currency_purchasing_power]
+  policy_family: [fiscal_policy, monetary_policy, regulation]
+  treatment_tags: [uk_truss_mini_budget_2022, boe_gilt_intervention_2022, ldi_pension_crisis_2022, currency_user_vs_issuer_distinction]
+covers_claims:
+  - position_id: mmt
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: MMT reading that Truss-2022 was an institutional-rupture / currency-user-collateral event rather than a fiscal-limit event; directly tested via the LDI mechanism gate and the BoE-intervention-reverses-yields gate.
+  - position_id: post_keynesian
+    claim_index: 9
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: PK financial-stability reading of LDI as an endogenous-instability mechanism; covered through the LDI-collateral channel test.
+steelman: hypotheses/steelman/truss_2022_currency_user_ldi_collateral_mechanism.md
+linked_hypotheses:
+  - uk_truss_mini_budget_currency_sovereign_mechanism
+  - currency_user_vs_issuer_hyperinflation_classification

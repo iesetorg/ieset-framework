@@ -1,0 +1,154 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ordo_anti_cartel_post_war_germany_economic_miracle
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Post-war West Germany's Wirtschaftswunder (1948-1965) reflects the
+  combined effect of (a) Erhard's June-1948 currency reform plus
+  immediate price-control liberalisation and (b) the 1957 Gesetz
+  gegen Wettbewerbsbeschränkungen (GWB) anti-cartel law. The
+  ordoliberal claim is that the competition-policy contribution is
+  identifiable as a distinct channel from the currency-reform
+  contribution: real GDP-per-capita growth in the post-GWB sub-window
+  (1958-1965) remained at or above the pre-GWB sub-window
+  (1949-1957) despite the convergence-catch-up effect having largely
+  exhausted by 1957, indicating that competition-rule enforcement
+  preserved productivity growth past the point at which simple
+  reconstruction effects predicted deceleration.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [DEU]
+  period: [1949, 1965]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "1948 itself is currency-reform year; pre-window starts 1949"
+    - "post-1965 excluded — German growth converges with European average; signal vs noise weakens"
+
+variables:
+  outcome:
+    - name: real_gdp_pc_maddison
+      source: "maddison:mpd2020"
+      transformation: log_level
+    - name: real_gdp_pc_pwt
+      source: "pwt:rgdpna"
+      transformation: log_level
+    - name: industrial_production_growth
+      source: "world_bank_wdi:NV.IND.TOTL.KD.ZG"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The 1948 reform package combined currency reform (monetary),
+  price-control abolition (regulatory), and the 1957 GWB
+  (regulatory). The intervention is bundled per invariant 4 because
+  the spec explicitly tries to decompose the regulatory-competition
+  contribution from the currency-reform contribution but the
+  underlying intervention is a multi-channel reform sequence.
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case multi-metric checklist with five independently-
+    sourced extreme outcomes spanning 1949-1965. The hypothesis is
+    supported / partial / refuted based on metrics-met count.
+
+canonical_metrics:
+  - metric_id: per_capita_growth_acceleration_1949_1957
+    description: "Maddison real GDP per capita 1949-1957 average annualised growth >=6%/yr (currency-reform + reconstruction window)."
+    threshold: ">=6.0%/yr"
+    window: "1949-1957"
+    source: "maddison:mpd2020"
+    direction: supports_claim
+    independence_justification: "Maddison series is independently sourced from PWT; reconstruction-driven growth is the canonical pre-GWB benchmark."
+  - metric_id: per_capita_growth_post_gwb_persistence_1958_1965
+    description: "Maddison real GDP per capita 1958-1965 average annualised growth >=4%/yr — sustained materially above OECD median despite reconstruction-catch-up exhaustion by 1957."
+    threshold: ">=4.0%/yr"
+    window: "1958-1965"
+    source: "maddison:mpd2020"
+    direction: supports_claim
+    independence_justification: "Different sub-window; the post-GWB persistence is the ordoliberal claim's distinctive prediction beyond simple reconstruction."
+  - metric_id: industrial_production_growth_1958_1965
+    description: "WDI industrial value added growth post-GWB sub-window averages >=5%/yr."
+    threshold: ">=5.0%/yr"
+    window: "1958-1965"
+    source: "world_bank_wdi:NV.IND.TOTL.KD.ZG"
+    direction: supports_claim
+    independence_justification: "Industrial-sector growth is a different national-accounts aggregate from per-capita GDP; sectoral test is an independent layer."
+  - metric_id: pwt_rgdpna_concordance
+    description: "PWT rgdpna log-growth 1949-1965 cumulative >=80 log-points (Maddison cross-source check)."
+    threshold: ">=0.80 log-pts cumulative"
+    window: "1949-1965"
+    source: "pwt:rgdpna"
+    direction: supports_claim
+    independence_justification: "PWT is methodologically independent of Maddison; concordance reduces single-source risk."
+  - metric_id: pre_gwb_to_post_gwb_growth_ratio
+    description: "Average annualised growth 1958-1965 is at least 50% of average 1949-1957 growth (i.e. growth does not collapse to <half its reconstruction-window pace)."
+    threshold: ">=0.50 ratio"
+    window: "1949-1965"
+    source: "maddison:mpd2020"
+    direction: supports_claim
+    independence_justification: "Within-series ratio test isolates the post-GWB-persistence claim from the absolute-level claim."
+
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+
+falsification:
+  rule: >
+    SUPPORTED if at least 4 of 5 canonical metrics meet their
+    pre-registered thresholds. PARTIAL if 3 of 5 met. REFUTED if
+    2 or fewer met. The decisive metric for the ordoliberal-vs-
+    reconstruction-only reading is metric 5 (pre-to-post GWB ratio):
+    if growth 1958-1965 is less than half of 1949-1957 growth, the
+    pure-reconstruction reading wins and the GWB-channel claim
+    cannot be sustained at the national-accounts level.
+  test: deu_wirtschaftswunder_5metric_ordo_panel
+  threshold: ">=4 of 5 metrics meet their thresholds; metric 5 (ratio>=0.5) is the GWB-channel decisive test."
+
+prior_confidence: 0.70
+
+disclosure: >-
+  Author prior is moderate-to-high (0.70). The Wirtschaftswunder
+  growth magnitudes are well documented in Maddison and PWT. The
+  authorial framing risk is large: the spec credits the GWB
+  competition law with sustaining post-1957 growth, but the same
+  window includes the EEC Treaty (1958), the Common Market trade
+  effect, the demographic-labour-supply effect of expellee
+  integration, and the Marshall-Plan capital deepening. A pure
+  reconstruction + Common Market reading explains most of the
+  observed pattern without invoking the GWB. The decomposition this
+  spec offers is the within-country pre-vs-post-GWB ratio (metric 5);
+  even that is contaminated by the 1958 EEC Treaty entering the same
+  sub-window. Heterodox readers will note that the "ordoliberal
+  miracle" narrative was constructed largely retrospectively by
+  Erhard's allies and that contemporary German economic-policy
+  practice was more dirigiste than the Freiburg-school frame admits.
+
+scope:
+  period: [1949, 1965]
+  countries: [DEU]
+  outcome_dim: [gdp_growth, productivity, competition_concentration]
+  policy_family: [institutional_reform, competition_policy, exchange_rate_regime]
+  treatment_tags: [erhard_currency_reform_1948, gwb_1957, ordoliberal_competition_law, wirtschaftswunder]
+
+steelman: hypotheses/steelman/ordo_anti_cartel_post_war_germany_economic_miracle.md
+
+linked_hypotheses:
+  - ordo_competition_law_enforcement_growth_premium_oecd
+  - rule_of_law_institutional_growth
+
+notes: >
+  Multi-metric checklist canonical-case design is the appropriate
+  evidence type — single-country, single-window, with multiple
+  independent national-accounts outcomes. The decisive-metric
+  framing on metric 5 lets the heterodox "pure reconstruction"
+  reading win cleanly if the post-GWB growth window collapses to
+  less than half the reconstruction pace. v2 could add sectoral
+  concentration measures from a registered competition-statistics
+  publisher if one is added.

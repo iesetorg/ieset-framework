@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_tcja_2017_decile_incidence
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The Tax Cuts and Jobs Act 2017 produced after-tax income gains that were
+  monotonically increasing in pre-tax income decile through 2019, with the
+  top decile capturing more than 35 percent of cumulative after-tax income
+  gain over 2018-2019 — orthogonal to the existing TCJA growth-effect spec
+  which targets aggregate output. The discriminating test is the share of
+  the after-tax-income-gain pie captured by deciles 9-10 vs deciles 1-5,
+  using JCT/CBO distributional tables and CEX/SCF microdata.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 2. Orthogonal angle to existing
+  fiscal/tcja_2017_growth_effect.yaml — tests incidence by decile rather
+  than aggregate output.
+prior_confidence: 0.75
+disclosure: >
+  Author prior accepts the JCT/CBO/TPC distributional-table consensus that
+  TCJA gains were top-skewed; risk is that the static distributional
+  scoring overstates the decile gradient relative to dynamic incidence.
+falsification:
+  rule: >
+    SUPPORTED if top-decile share of cumulative after-tax-income gain over
+    2018-2019 exceeds 35 percent AND the gradient (decile 10 minus decile
+    1 percentage-point change in after-tax income) exceeds 1.5 percentage
+    points at p<0.10. REFUTED if top-decile share is below 25 percent or
+    the gradient is below 0.5 percentage points at p<0.10.
+  test: >
+    US descriptive panel of after-tax income change by decile 2017-2019
+    using TPC/JCT distributional tables, cross-validated with CEX-SCF
+    microdata.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2015, 2020]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2020+ COVID window from primary spec"
+variables:
+  outcome:
+    - name: top_decile_after_tax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+  treatment:
+    - name: tcja_2018_post_indicator
+      source: "constructed: indicator = 1 for year >= 2018"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp
+      source: "fred:GDPC1"
+      transformation: log
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive comparison of top-decile vs bottom-decile after-tax income
+    change pre vs post 2018. Cross-validated against TPC/JCT distributional
+    tables. Robustness with event_study around 2018Q1 break.
+intervention_channel: fiscal
+scope:
+  period: [2017, 2020]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [tcja_2017, decile_incidence, distributional_scoring]

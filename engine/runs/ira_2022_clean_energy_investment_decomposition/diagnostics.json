@@ -1,0 +1,85 @@
+{
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'log_us_cumulative_clean_energy_tax_credit_outlay_usd' not loaded; missing: ['constructed: US Treasury / OMB outlay tabulations cross-checked against CBO 2022/2023/2024 reestimates. fred:FYONET (deficit baseline) + Treasury Green Book line items. Manual-drop pending.', 'irena:capacity', 'constructed: BEA NIPA private fixed investment in clean-energy manufacturing + DOE LPO loan-guarantee tracker + BloombergNEF announced-capex tracker. Manual-drop under data/manual/derived/. Cross-checks: fred:PNFI (private nonresidential fixed investment) and fred:IPN331S (manufacturing IP).', 'bls:CES1021100001', 'constructed: BloombergNEF / IEA Energy Technology Perspectives \u2014 share of global clean-energy manufacturing capex by location (USA, EU, CHN). Manual-drop under data/manual/iea/.']",
+  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+  "verdict_reason": "outcome 'log_us_cumulative_clean_energy_tax_credit_outlay_usd' not loaded; missing: ['constructed: US Treasury / OMB outlay tabulations cross-checked against CBO 2022/2023/2024 reestimates. fred:FYONET (deficit baseline) + Treasury Green Book line items. Manual-drop pending.', 'irena:capacity', 'constructed: BEA NIPA private fixed investment in clean-energy manufacturing + DOE LPO loan-guarantee tracker + BloombergNEF announced-capex tracker. Manual-drop under data/manual/derived/. Cross-checks: fred:PNFI (private nonresidential fixed investment) and fred:IPN331S (manufacturing IP).', 'bls:CES1021100001', 'constructed: BloombergNEF / IEA Energy Technology Perspectives \u2014 share of global clean-energy manufacturing capex by location (USA, EU, CHN). Manual-drop under data/manual/iea/.']",
+  "hypothesis_id": "ira_2022_clean_energy_investment_decomposition",
+  "template": "panel_fe_decomposition",
+  "claim_direction_inferred": "?",
+  "falsification_rule_text": "Not supported if (a) the USA \u00d7 post-2022 effect on clean-energy MW added is within the 95% CI of the pre-IRA trend extrapolation (no deployment acceleration), OR (b) US share of global clean-manufacturing capex does not rise above its 2018-2021 mean by at least 5 percentage points by end-2025, OR (c) clean-energy employment is flat or declines relative to total manufacturing employment, OR (d) total tax-credit outlays fall below the original CBO 10-year estimate (suggesting take-up failure). If only the fiscal-cost channel materialises (deficit rises) without deployment / capex / jobs response, classify as \"fiscal cost without industrial response.\"\n",
+  "falsification_test_text": "ira_decomposition_panel",
+  "estimate": {
+    "error": "outcome 'log_us_cumulative_clean_energy_tax_credit_outlay_usd' not loaded; missing: ['constructed: US Treasury / OMB outlay tabulations cross-checked against CBO 2022/2023/2024 reestimates. fred:FYONET (deficit baseline) + Treasury Green Book line items. Manual-drop pending.', 'irena:capacity', 'constructed: BEA NIPA private fixed investment in clean-energy manufacturing + DOE LPO loan-guarantee tracker + BloombergNEF announced-capex tracker. Manual-drop under data/manual/derived/. Cross-checks: fred:PNFI (private nonresidential fixed investment) and fred:IPN331S (manufacturing IP).', 'bls:CES1021100001', 'constructed: BloombergNEF / IEA Energy Technology Perspectives \u2014 share of global clean-energy manufacturing capex by location (USA, EU, CHN). Manual-drop under data/manual/iea/.']"
+  },
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "us_federal_deficit_share_gdp",
+        "source": "fred:GFDEGDQ188S",
+        "publisher": "fred",
+        "n_rows": 60
+      },
+      {
+        "role": "controls",
+        "name": "log_real_gdp",
+        "source": "world_bank_wdi:NY.GDP.MKTP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14131
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "log_us_cumulative_clean_energy_tax_credit_outlay_usd",
+        "source": "constructed: US Treasury / OMB outlay tabulations cross-checked against CBO 2022/2023/2024 reestimates. fred:FYONET (deficit baseline) + Treasury Green Book line items. Manual-drop pending."
+      },
+      {
+        "role": "outcome",
+        "name": "us_utility_scale_clean_energy_mw_added",
+        "source": "irena:capacity"
+      },
+      {
+        "role": "outcome",
+        "name": "log_us_clean_manufacturing_announced_capex_usd",
+        "source": "constructed: BEA NIPA private fixed investment in clean-energy manufacturing + DOE LPO loan-guarantee tracker + BloombergNEF announced-capex tracker. Manual-drop under data/manual/derived/. Cross-checks: fred:PNFI (private nonresidential fixed investment) and fred:IPN331S (manufacturing IP)."
+      },
+      {
+        "role": "outcome",
+        "name": "us_clean_energy_employment",
+        "source": "bls:CES1021100001"
+      },
+      {
+        "role": "outcome",
+        "name": "comparator_clean_manufacturing_capex_share_global",
+        "source": "constructed: BloombergNEF / IEA Energy Technology Perspectives \u2014 share of global clean-energy manufacturing capex by location (USA, EU, CHN). Manual-drop under data/manual/iea/."
+      },
+      {
+        "role": "treatment",
+        "name": "us_post_ira_dummy",
+        "source": "constructed: indicator = 1 for USA from 2022-08 (IRA enactment) onwards; 0 otherwise."
+      },
+      {
+        "role": "treatment",
+        "name": "us_post_ira_eligible_subsector_interaction",
+        "source": "constructed: interaction of post-IRA dummy with subsector eligibility (battery / EV / solar / wind eligible = 1; non-eligible manufacturing = 0). Identifies whether eligible subsectors accelerate relative to non-eligible."
+      },
+      {
+        "role": "controls",
+        "name": "real_interest_rate",
+        "source": "fred:DFII10"
+      },
+      {
+        "role": "controls",
+        "name": "brent_oil_log",
+        "source": "imf_pcps:POILBRE"
+      },
+      {
+        "role": "controls",
+        "name": "china_clean_manufacturing_capex_share",
+        "source": "constructed: same BloombergNEF / IEA tracker, China share. Used to control for global clean-energy capex cycle independent of IRA."
+      }
+    ]
+  },
+  "run_utc": "2026-04-30T08:43:10+00:00",
+  "runner": "scripts/run_panel_fe.py"
+}

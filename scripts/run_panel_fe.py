@@ -245,6 +245,27 @@ def load_spec(hid: str) -> tuple[Path, dict] | None:
     return None
 
 
+_STUB_RULE_MARKER = "when this stub is promoted from draft"
+
+
+def is_stub_falsification_rule(spec: dict) -> bool:
+    """True iff the spec's falsification.rule is still the generic stub-promotion
+    boilerplate AND the methodology_note doesn't document the dispositive
+    sharpening. Runners use this to refuse to grade — they emit
+    `inconclusive — falsification rule not sharpened` instead, so auto-grader
+    output never gets attached to a non-promoted spec.
+
+    See post-mortem in commit bba6f644 for the failure mode this prevents.
+    """
+    rule = ((spec.get("falsification") or {}).get("rule") or "").lower()
+    if _STUB_RULE_MARKER not in rule:
+        return False
+    mn = (spec.get("methodology_note") or "").lower()
+    if any(k in mn for k in ("dispositive", "sharpened", "primary (dispositive")):
+        return False
+    return True
+
+
 def list_panel_fe_specs() -> list[str]:
     derived = ROOT / "engine" / "runnability.derived.yaml"
     with derived.open() as f:
@@ -623,6 +644,22 @@ def run_one(hid: str, verbose: bool = True, force: bool = False) -> str:
     if found is None:
         return f"  ✗ {hid}: spec not found"
     _, spec = found
+    # Integrity gate: refuse to grade against a stub falsification rule.
+    # The auto-grader's verdicts are only meaningful against a dispositive
+    # pre-registered threshold; running against the generic boilerplate
+    # ("…when this stub is promoted from draft") would attach a fake-clean
+    # verdict to a non-promoted spec. See post-mortem (commit bba6f644).
+    if is_stub_falsification_rule(spec):
+        verdict = "INCONCLUSIVE_DATA_PENDING"
+        reason = (
+            "falsification rule not sharpened — auto-grader refuses to "
+            "grade against the generic stub boilerplate. Promote the spec "
+            "(replace falsification.rule with a dispositive threshold AND "
+            "document the sharpening in methodology_note) before running."
+        )
+        write_outputs(hid, spec, {"variables_loaded": [], "variables_missing": []}, {"error": reason}, {}, verdict, reason, None)
+        return f"  ⚠ {hid}: {verdict} (stub rule, refused to grade)"
+
     panel, status = build_panel(spec)
 
     var_blocks = spec.get("variables") or {}

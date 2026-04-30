@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_reform_prwora_single_mother_employment
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: 'PRWORA 1996 (TANF block-grant + work requirements) raised single-mother labour-force participation
+  by at least 5 percentage points relative to single-childless-women within five years of state TANF
+  adoption, holding constant EITC expansion and the late-1990s tight labour market. The orthogonal angle
+  to the existing deep-poverty critique: PRWORA''s primary stated goal — moving single mothers from welfare
+  to work — is testable as an employment effect that can succeed even if the deep-poverty critique also
+  binds.'
+evidence_type: causal
+prior_confidence: 0.7
+disclosure: 'Author has market-liberal priors that favour activation-based welfare reform on labour-supply
+  grounds. The hypothesis is paired with the existing deep-poverty critique so both effects are tested
+  jointly rather than cherry-picking one. State-staggered TANF adoption identifies the work-requirement
+  channel net of EITC, which expanded contemporaneously and confounds national-level comparisons.
+
+  '
+sample:
+  countries:
+  - USA
+  period:
+  - 1990
+  - 2005
+  temporal_structure: panel
+  exclusion_rules:
+  - drop state-years missing CPS labour-force tabulations
+  - exclude AK and HI from primary spec given non-comparable labour markets
+variables:
+  outcome:
+  - name: single_mother_labour_force_participation_rate
+    source: bls:LNS11300000; world_bank_wdi:SL.TLF.CACT.FE.ZS
+    transformation: level_pct
+    notes: BLS CPS state-level female LFP by family-status; WDI female-LFP series as cross-validation.
+  - name: single_childless_women_lfp_rate
+    source: bls:LNS11300000
+    transformation: level_pct
+    notes: Comparison group; difference-in-differences denominator.
+  treatment:
+  - name: tanf_state_adoption
+    source: fred:STTMINWGCA
+    transformation: indicator
+    notes: State-staggered TANF adoption dates 1996-1997. FRED state-level series identifier placeholder
+      pending wiring against derived/tanf_state_adoption_dates.
+  controls:
+  - name: state_unemployment_rate
+    source: fred:UNRATE
+    transformation: level
+  - name: state_eitc_supplement_indicator
+    source: fred:STTMINWGCA
+    transformation: indicator
+    notes: State-level EITC supplements 1990-2005; FRED placeholder pending state-series wiring.
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+intervention_channel: regulatory
+intervention_channel_justification: 'PRWORA''s work-requirement and time-limit rules are regulatory-channel
+  conditions on transfer eligibility; the fiscal block grant is secondary mechanism.
+
+  '
+estimator:
+  template: did_callaway_santanna
+  clustering: state
+  fixed_effects:
+  - state
+  - year
+  notes: 'Callaway-Sant''Anna staggered DiD with single-childless-women as comparator group. Pre-trend
+  window 1990-1995, treatment cohorts by state TANF effective date 1996-1997, post-window 1996-2005.
+  Heterogeneity reported by adoption cohort.
+
+    '
+falsification:
+  rule: Refuted if the post-1996 ATT on single-mother LFP relative to single-childless-women comparator
+    is below +5pp at five-year horizon, OR if the 95% CI excludes +5pp, OR if a Goodman-Bacon decomposition
+    shows the average treatment effect is dominated by negative-weight 2x2 contrasts.
+  test: callaway_santanna_att_5yr_horizon_singlemother_lfp_diff
+  threshold: ATT >= +5pp at 5yr horizon AND lower 95% CI bound > 0
+scope:
+  period:
+  - 1996
+  - 2005
+  countries:
+  - USA
+  outcome_dim:
+  - employment_labour
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  - labour_market
+  treatment_tags:
+  - prwora_1996
+  - tanf_1996
+  - clinton_welfare_reform_1996
+steelman: hypotheses/steelman/welfare_reform_prwora_single_mother_employment.md
+linked_hypotheses:
+- clinton_welfare_reform_deep_poverty_effect
+- clinton_welfare_reform_labour_participation_effect
+notes: Orthogonal angle to clinton_welfare_reform_deep_poverty_effect — that hypothesis tests deep-poverty
+  worsening; this one tests employment-elevation, which can hold simultaneously with the poverty critique.

@@ -1,0 +1,88 @@
+{
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'log_eu_imports_cbam_products_value' not loaded",
+  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+  "verdict_reason": "outcome 'log_eu_imports_cbam_products_value' not loaded",
+  "hypothesis_id": "cbam_2026_implementation_carbon_leakage_test",
+  "template": "did_callaway_santanna",
+  "claim_direction_inferred": "?",
+  "falsification_rule_text": "Pre-CBAM leakage leg not supported if (a) EU ETS price elasticity of carbon-intensity-weighted imports is zero or wrong-signed at p<0.10, OR (b) CBAM-product imports did not grow faster from high-intensity sources than low-intensity sources 2018-2023. Post-CBAM leg not supported if (c) the post-2026 \u00d7 carbon-intensity-gap interaction is zero on EU imports, OR (d) trade-deflection (third-country to non-EU) is zero (suggesting volume just stops rather than reroutes \u2014 not leakage but demand destruction). Mixed verdict permitted: pre-leakage signature without post-CBAM reversal would suggest CBAM is inadequately calibrated.\n",
+  "falsification_test_text": "cbam_carbon_leakage_pre_post_did",
+  "estimate": {
+    "error": "outcome 'log_eu_imports_cbam_products_value' not loaded"
+  },
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "controls",
+        "name": "log_real_gdp_eu",
+        "source": "world_bank_wdi:NY.GDP.MKTP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14131
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "log_eu_imports_cbam_products_value",
+        "source": "un_comtrade:HS72_HS76_HS25_HS31"
+      },
+      {
+        "role": "outcome",
+        "name": "log_eu_imports_cbam_products_volume_tonnes",
+        "source": "un_comtrade:HS72_HS76_HS25_HS31_volume"
+      },
+      {
+        "role": "outcome",
+        "name": "cbam_carbon_intensity_weighted_imports",
+        "source": "constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) \u00d7 tonnes imported. Manual-drop pending under data/manual/derived/."
+      },
+      {
+        "role": "outcome",
+        "name": "log_extra_eu_imports_share_of_consumption",
+        "source": "constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade)."
+      },
+      {
+        "role": "outcome",
+        "name": "log_third_country_exports_to_non_eu_destinations",
+        "source": "un_comtrade:HS72_HS76_HS25_HS31"
+      },
+      {
+        "role": "treatment",
+        "name": "cbam_transitional_dummy",
+        "source": "constructed: indicator = 1 from 2023-10 (transitional reporting phase begin) onwards; 0 otherwise."
+      },
+      {
+        "role": "treatment",
+        "name": "cbam_definitive_dummy",
+        "source": "constructed: indicator = 1 from 2026-01 (definitive phase, financial liability) onwards; 0 otherwise."
+      },
+      {
+        "role": "treatment",
+        "name": "cbam_carbon_intensity_gap_eu",
+        "source": "constructed: (exporter-country CO2/tonne for product) \u2212 (EU CO2/tonne benchmark for product). Higher gap = higher CBAM cost burden. Continuous treatment intensity."
+      },
+      {
+        "role": "controls",
+        "name": "log_eu_ets_price",
+        "source": "eea:eu_ets_verified_emissions"
+      },
+      {
+        "role": "controls",
+        "name": "log_brent_oil",
+        "source": "imf_pcps:POILBRE"
+      },
+      {
+        "role": "controls",
+        "name": "log_natural_gas_ttf",
+        "source": "constructed: TTF spot, monthly. eex fetcher pending or manual-drop."
+      },
+      {
+        "role": "controls",
+        "name": "exporter_country_real_exchange_rate_eur",
+        "source": "constructed: bilateral REER vs EUR for major CBAM exporters (CHN, TUR, IND, KOR, RUS). bis or imf source."
+      }
+    ]
+  },
+  "run_utc": "2026-04-30T08:43:19+00:00",
+  "runner": "scripts/run_did_callaway_santanna.py"
+}

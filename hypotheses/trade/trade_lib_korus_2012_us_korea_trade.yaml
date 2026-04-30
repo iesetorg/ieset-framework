@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_korus_2012_us_korea_trade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The Korea-US Free Trade Agreement (KORUS), effective 2012-03-15,
+  raised bilateral US-Korea merchandise trade volumes and Korean
+  manufacturing-export share to GDP relative to a synthetic-control
+  donor pool of comparable East Asian and OECD economies over the
+  2012-2019 pre-COVID window. The renegotiation in 2018 (KORUS 2.0)
+  is treated as part of the post-treatment window.
+
+evidence_type: causal
+
+sample:
+  countries: [KOR, JPN, TWN, SGP, MYS, THA, AUS, NZL, MEX, CAN]
+  period: [2002, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019)"
+    - "report 2018 KORUS-renegotiation sensitivity"
+
+scope:
+  period: [2002, 2019]
+  countries: [KOR]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [korus_2012, korea_us_fta, korus_renegotiation_2018]
+
+variables:
+  outcome:
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: korus_indicator
+      source: "constructed: indicator = 1 for KOR from 2012-03-15"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  KORUS is a regulatory / trade-policy intervention.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for Korea against an East-Asian /
+    OECD donor pool. Pre-treatment fitting 2002-2011; post-
+    treatment evaluation 2012-2019. Placebo permutation across
+    donor pool.
+
+falsification:
+  rule: >
+    SUPPORTED if SC gap on trade-openness exceeds +5 percentage
+    points by 2018 with placebo p-value < 0.20. PARTIAL if SC gap
+    is positive but smaller. REFUTED if the SC gap is negative.
+  test: synthetic_control_korea_korus_2012
+  threshold: >
+    PRIMARY: SC_gap(trade_openness, 2018) >= 5 pp AND placebo p < 0.20.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Prior just above coin-flip (0.55). Korea is heavily integrated
+  with both China and the US; the marginal effect of the KORUS
+  bilateral on top of pre-existing trade relationships is
+  empirically uncertain. Heterodox developmentalist readers will
+  note that Korea's manufacturing-export model is driven by
+  industrial policy and capital-investment dynamics that swamp
+  most bilateral FTA effects.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_korus_2012_us_korea_trade.md

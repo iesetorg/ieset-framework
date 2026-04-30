@@ -4,6 +4,7 @@ import {
   loadAllHypotheses,
   loadRunArtifacts,
   scoreAllPositions,
+  isHypothesisPubliclyVisible,
 } from "@/lib/content";
 import { verdictTone, verdictShort } from "@/lib/verdict";
 import { Badge } from "@/components/badges/Badge";
@@ -18,12 +19,12 @@ export default async function HomePage() {
     all.map(async (h) => ({ h, run: await loadRunArtifacts(h.hypothesis_id) }))
   );
 
-  // Featured = hypotheses that have a real verdict in diagnostics.json. A run
-  // directory may exist before the estimator finishes (no verdict yet); those
-  // belong in the pre-registered tier so we don't render result cards with
-  // missing copy.
-  const withResults = runs.filter((r) => r.run.verdict);
-  const preRegOnly = runs.filter((r) => !r.run.verdict);
+  // Featured = hypotheses that pass the publicly-visible gate (real
+  // replication, real verdict, sharpened falsification rule). The other
+  // runs stay in the repo as drafts but don't surface here — see
+  // isHypothesisPubliclyVisible() for the full criteria.
+  const withResults = runs.filter((r) => isHypothesisPubliclyVisible(r.h, r.run));
+  const preRegOnly = runs.filter((r) => !isHypothesisPubliclyVisible(r.h, r.run));
 
   // Curated featured-six. Picked deliberately to (a) feature recent runs from
   // the wave-4-through-integrity-sweep era, (b) headline a clean Austrian-school
@@ -63,9 +64,11 @@ export default async function HomePage() {
         <p className="mb-6 max-w-[720px] text-[18px] leading-[1.55] text-muted">
           {schoolsCount} schools. {totalPredictions.toLocaleString()} predictions.
           Each one written into git <em>before</em> any data is touched, then scored
-          against the actual record. {withResults.length} hypotheses have results
-          so far; {preRegOnly.length} wait pre-registered. Every result ships with
-          the strongest argument against it.
+          against the actual record. {withResults.length} hypotheses are
+          publicly graded — sharpened falsification rule, real replication,
+          dispositive verdict. {preRegOnly.length} more are in draft, awaiting
+          rule-sharpening or data, and don&apos;t surface here until they pass
+          that integrity bar.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link

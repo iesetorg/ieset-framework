@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_cptpp_2018_pacific_rim_trade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The Comprehensive and Progressive Agreement for Trans-Pacific
+  Partnership (CPTPP), effective 2018-12-30 for the first six
+  ratifying members (AUS, CAN, JPN, MEX, NZL, SGP), produced
+  modest measurable trade-creation effects among CPTPP members
+  in the 2019-2024 window. Because the agreement was truncated
+  by US withdrawal (2017) and the COVID-19 trade disruption
+  dominated the early implementation window, the effect is
+  expected to be small and difficult to identify cleanly.
+
+evidence_type: associational
+
+sample:
+  countries: [AUS, CAN, JPN, MEX, NZL, SGP, BRN, CHL, MYS, PER, VNM, USA, KOR, IDN, THA, COL, GBR]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity separately"
+    - "drop USA from primary control panel (initial signatory; political-economy outlier)"
+
+scope:
+  period: [2010, 2024]
+  countries: [AUS, CAN, JPN, MEX, NZL, SGP]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [cptpp_2018, tpp_us_withdrawal_2017, pacific_rim_fta]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: cptpp_indicator
+      source: "constructed: indicator = 1 for first-six ratifying members from 2019-01-01; staggered for later ratifiers"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  CPTPP is a regulatory / trade-policy intervention. Channel
+  regulatory per invariant 4.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna staggered DiD with 2019 cohort. Donor pool
+    = Pacific-Rim non-CPTPP economies (USA, KOR, IDN, THA, COL).
+    Pre-trends 2010-2018. Effect size expected to be small;
+    confidence intervals will likely span zero. Reports the point
+    estimate and CI honestly.
+
+falsification:
+  rule: >
+    SUPPORTED if cs_did_ATT on trade-openness over h=3y is
+    positive at the point estimate, regardless of significance.
+    PARTIAL if positive but CI contains zero. REFUTED if the
+    point estimate is negative.
+  test: cs_did_cptpp_2018_trade_openness
+  threshold: >
+    PRIMARY: cs_did_ATT(trade_openness, h=3y) > 0 (point estimate).
+    METHOD_VALID: WDI NE.TRD.GNFS.ZS available for all units 2010-2024.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Prior just above coin-flip (0.55). The literature was optimistic
+  pre-US-withdrawal (Petri-Plummer 2016 estimates); after the
+  truncation, the agreement covers a smaller share of global GDP
+  and the deep-integration provisions matter less without US
+  market access. Heterodox readers will note that the deeper
+  provisions on intellectual property, investor-state dispute
+  settlement, and labour standards were watered down post-US-
+  withdrawal, further reducing the deep-integration content.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_cptpp_2018_pacific_rim_trade.md

@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_japan_refusal_immigration_counterfactual
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Japan's de facto policy of refusing large-scale immigration through the 1990s-2010s, in
+  combination with its rapid ageing, produced a working-age population contraction larger
+  than any major OECD comparator. The hypothesis estimates a counterfactual: under
+  comparator-OECD-average net migration rates, what would Japan's working-age share and
+  per-capita growth have been? The hypothesis predicts the realised gap is substantial:
+  realised working-age share is at least 4pp below the migration-equalised counterfactual
+  by 2020.
+evidence_type: descriptive
+sample:
+  countries: [JPN, DEU, ITA, KOR, USA, GBR, FRA, NLD, SWE, ESP]
+  period: [1990, 2023]
+  temporal_structure: time_series
+scope:
+  period: [1990, 2023]
+  countries: [JPN]
+  outcome_dim: [demographics_migration, gdp_growth]
+  policy_family: [labour_market, institutional_reform]
+  treatment_tags: [japan_immigration_refusal, demographic_choice]
+variables:
+  outcome:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: net_migration_rate
+      source: world_bank_wdi:SM.POP.NETM
+      transformation: level
+  controls:
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    Counterfactual simulation: replace Japan's net-migration-rate with the comparator-OECD
+    average and propagate through population dynamics; report gap between realised and
+    counterfactual working-age share by 2020 and implied per-capita growth.
+falsification:
+  rule: >-
+    SUPPORTED if realised JPN working-age share is at least 4pp below the
+    migration-equalised counterfactual by 2020, AND implied per-capita growth gap is at
+    least 0.3pp annualised over 1990-2023. REFUTED if working-age gap < 2pp or growth
+    gap insignificant.
+  test: descriptive_japan_migration_counterfactual
+  threshold: "wap_gap_2020 >= 4.0 AND implied_growth_gap >= 0.3"
+prior_confidence: 0.7
+disclosure: >-
+  Counterfactual simulation is mechanical and depends on assumed migration rate; sensitivity
+  to comparator choice is the binding methodological risk.
+steelman: hypotheses/steelman/demo_japan_refusal_immigration_counterfactual.md

@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_germany_gastarbeiter_long_run
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Germany's Gastarbeiter programme (1955-1973) and subsequent family-reunification waves
+  produced a long-run Turkish-origin and Southern-European-origin foreign-born population
+  that, despite official rhetoric of temporary stay, became permanent. The hypothesis tests
+  whether the second-generation Gastarbeiter-origin population shows persistent labour-market
+  gaps relative to native-born Germans, controlling for education, and whether the
+  Gastarbeiter cohort's long-run contribution to working-age share averaged at least 1pp
+  over 1980-2023.
+evidence_type: descriptive
+sample:
+  countries: [DEU]
+  period: [1955, 2023]
+  temporal_structure: time_series
+scope:
+  period: [1955, 2023]
+  countries: [DEU]
+  outcome_dim: [demographics_migration, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [gastarbeiter_1955_1973, second_generation_integration]
+variables:
+  outcome:
+    - name: foreign_born_share_population
+      source: un_desa:international_migrant_stock
+      transformation: level
+    - name: foreign_native_employment_gap
+      source: eurostat:lfsa_ergan
+      transformation: difference
+  treatment:
+    - name: gastarbeiter_phase_indicator
+      source: "constructed: 1 = 1955-1973 (active recruitment); 2 = 1974-1990 (family reunification); 3 = 1990-2023 (post-reunification)."
+      transformation: indicator
+  controls:
+    - name: tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    DEU time-series description; report foreign-born share trajectory by phase, and
+    second-generation employment gap (where available; Eurostat LFS post-2005 only).
+falsification:
+  rule: >-
+    SUPPORTED if DEU foreign-born share rises by at least 5pp 1955-2000 AND
+    second-generation employment gap (post-2005, where measurable) is < 5pp AND working-
+    age share contribution from migrant cohort exceeds 1pp on average 1980-2023. REFUTED
+    if foreign-born share rise < 3pp or working-age contribution is below 0.5pp.
+  test: descriptive_germany_gastarbeiter_long_run_pattern
+  threshold: "foreign_born_share_rise >= 5.0 AND working_age_contribution >= 1.0"
+prior_confidence: 0.75
+disclosure: >-
+  Gastarbeiter trajectory is well-documented; this is largely a confirmatory descriptive spec.
+  Second-generation gap data is incomplete pre-2005.
+steelman: hypotheses/steelman/demo_germany_gastarbeiter_long_run.md

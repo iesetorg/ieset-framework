@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_bangladesh_apparel_eu_eba_2008
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Bangladesh's preferential duty-free, quota-free access to EU
+  markets under the Everything-But-Arms (EBA) scheme — strengthened
+  by Multi-Fibre Arrangement phase-out completion in 2005 and
+  EBA-rules-of-origin simplification effective 2011 — produced a
+  structural acceleration in Bangladesh apparel exports and
+  manufacturing-share-of-GDP over the 2005-2019 window. The test
+  is a within-country structural break plus comparator descriptive
+  test against Pakistan, which had similar pre-2005 apparel-export
+  potential but did not enjoy equivalent EU preferential access.
+
+evidence_type: descriptive
+
+sample:
+  countries: [BGD, PAK, LKA, KHM, VNM]
+  period: [1995, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019)"
+
+scope:
+  period: [1995, 2019]
+  countries: [BGD]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy]
+  treatment_tags: [bangladesh_eba_apparel, mfa_phaseout_2005, eu_preferential_access]
+
+variables:
+  outcome:
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: manufacturing_share_of_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  EBA preferential access plus MFA phase-out is a regulatory /
+  trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison BGD vs PAK over 1995-2019. Reports
+    manufacturing-share-of-GDP and merchandise-exports-share
+    trajectories. No DiD because EBA access is a single-country
+    treatment with limited donor pool.
+
+falsification:
+  rule: >
+    SUPPORTED if BGD manufacturing-share-of-GDP rose by >=4 pp
+    from 2000-2004 mean to 2015-2019 mean AND PAK comparator did
+    not show a similar magnitude increase. PARTIAL if BGD increase
+    is smaller. REFUTED if PAK matched or exceeded BGD.
+  test: descriptive_bgd_vs_pak_apparel_export_share
+  threshold: >
+    PRIMARY: BGD manufacturing-share change >= +4 pp AND
+    BGD-minus-PAK change >= +2 pp.
+
+prior_confidence: 0.85
+
+disclosure: >
+  Prior high (0.85). The Bangladesh apparel-export takeoff is a
+  textbook case in development-economics literature
+  (Mostafa-Klepper 2018; Heath-Mobarak 2015). Heterodox readers
+  note severe labour conditions (Rana Plaza 2013) as a welfare
+  caveat that the export-share metric does not capture.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_bangladesh_apparel_eu_eba_2008.md

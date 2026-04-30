@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_china_wto_2001_manufacturing_export_surge
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  China's WTO accession (2001-12-11) triggered a structural
+  acceleration in Chinese merchandise-export intensity and
+  manufacturing value-added relative to a synthetic-control donor
+  pool of large emerging economies that did not accede to the WTO
+  on the same date. The post-2001 export boom is one of the most
+  consequential trade-liberalisation episodes in recorded economic
+  history; this spec tests whether it is detectable as a
+  pre/post structural break in WDI national-accounts and
+  trade-share data, not whether the boom raised aggregate growth
+  (already covered by china_deng_reform_growth_acceleration_1978).
+
+evidence_type: causal
+
+sample:
+  countries: [CHN, IND, IDN, BRA, MEX, RUS, TUR, ZAF, THA, MYS, PHL, VNM]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019) to avoid 2020-21 distortion"
+    - "drop country-years inside currency or banking crisis (RUS 1998, TUR 2001, IDN 1997-98)"
+
+scope:
+  period: [1990, 2019]
+  countries: [CHN]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [china_wto_accession_2001, mfn_status_normalisation, tariff_binding]
+
+variables:
+  outcome:
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: wto_accession_indicator
+      source: "constructed: indicator = 1 for CHN from 2002 onward; 0 elsewhere"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  WTO accession is a regulatory intervention (binding tariff
+  reductions, MFN normalisation, services commitments). Channel
+  regulatory per invariant 4.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for China against a donor pool of
+    large emerging economies. Pre-treatment fitting window
+    1990-2001; post-treatment evaluation 2002-2019. Placebo
+    permutation across donor pool. Robustness: drop the 2008-2009
+    GFC years from the post-window.
+
+falsification:
+  rule: >
+    SUPPORTED if SC gap on merchandise-exports-share-of-GDP exceeds
+    +10 percentage points by 2007 AND SC gap on log manufacturing
+    value-added exceeds +0.30 (≈35% level gap) by 2010. PARTIAL if
+    only one holds. REFUTED if China under-performs the synthetic
+    on both metrics — would indicate a serious data or
+    identification failure given the strength of the consensus
+    historical pattern.
+  test: synthetic_control_china_vs_em_donor_pool
+  threshold: >
+    PRIMARY: SC_gap(merchandise_exports_share, 2007) >= 10 pp AND
+    SC_gap(log_manufacturing_va, 2010) >= 0.30.
+    METHOD_VALID: WDI series available 1990-2019 for all donor pool members.
+
+prior_confidence: 0.95
+
+disclosure: >
+  Author prior very high (0.95). The post-2001 Chinese export
+  surge is a textbook trade-liberalisation episode and any
+  framework that fails to detect it is broken. Included primarily
+  as a framework-validation spec. Heterodox critics
+  (developmentalist tradition, Wade, Chang) will note that the
+  surge was enabled by prior industrial-policy capability
+  accumulation and a managed exchange rate — WTO accession alone
+  on a country with weaker pre-existing capability would not
+  have produced a similar surge. The candidate spec does not test
+  that mechanism distinction.
+
+linked_hypotheses:
+  - china_deng_reform_growth_acceleration_1978
+  - trade_liberalisation_growth_effect
+
+steelman: hypotheses/steelman/trade_lib_china_wto_2001_manufacturing_export_surge.md
+
+notes: >
+  Framework-validation tier. If the synthetic-control estimator
+  fails to detect this episode, something is wrong with the data
+  pipeline or estimator implementation.

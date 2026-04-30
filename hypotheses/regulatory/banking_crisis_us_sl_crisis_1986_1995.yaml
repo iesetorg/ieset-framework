@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_us_sl_crisis_1986_1995
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The US Savings & Loan crisis of 1986-1995 — closure or assistance of >= 1,000 thrifts,
+  Resolution Trust Corporation creation in 1989, FDIC bank failures peaking in 1988-1992,
+  estimated taxpayer cost in the USD 100-200bn range, and a Laeven-Valencia coded
+  systemic banking crisis 1988 — was a US-domestic banking crisis with limited GDP
+  impact. The hypothesis is that S&L 1986-1995 meets a multi-metric checklist on at
+  least 4 of 5 metrics tuned to the institution-level rather than macro-aggregate
+  signature.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [USA]
+  period: [1980, 1998]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: bank_failures_count_peak
+    description: Annual FDIC bank + thrift failure count peak
+    threshold: ">= 200 institutions failed in a single year between 1988 and 1992"
+    window: "1986-1995"
+    source: "fred:BKFTTLA01USA661N; fred:USNUM"
+    direction: supports_claim
+    independence_justification: Institution-count failure measure, distinct from macro-aggregate signals.
+  - metric_id: laeven_valencia_systemic_banking_crisis
+    description: Laeven-Valencia banking-crisis coding 1988-1991 USA
+    threshold: "coded yes"
+    window: "1988-1991"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: real_house_price_regional_decline
+    description: Real residential property price decline in oil-belt and northeast regional sub-indices
+    threshold: ">= 15% peak-to-trough in BIS US RPPI"
+    window: "1989-1995"
+    source: "bis:WS_SPP; fred:USSTHPI"
+    direction: supports_claim
+    independence_justification: Property-price index.
+  - metric_id: rtc_creation_1989
+    description: Resolution Trust Corporation creation under FIRREA Aug-1989
+    threshold: "yes/no — yes counts as breach"
+    window: "1989"
+    source: "fred:RTC_FIRREA_1989"
+    direction: supports_claim
+    independence_justification: Resolution-policy event.
+  - metric_id: real_gdp_minor_disturbance
+    description: Real GDP growth dip 1990-1991 vs 1980s average
+    threshold: ">= 1 pp slowdown vs prior 5y average"
+    window: "1990-1991"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG; fred:GDPC1"
+    direction: supports_claim
+    independence_justification: Activity measure, deliberately small threshold reflecting limited macro impact.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: bank_failures_count
+      source: "fred:BKFTTLA01USA661N"
+      transformation: peak_level
+    - name: real_gdp_growth
+      source: "fred:GDPC1"
+      transformation: yoy_pct
+prior_confidence: 0.93
+disclosure: >
+  US S&L crisis is well-documented (Litan, White 1991, FDIC History). Pattern overdetermined.
+steelman: hypotheses/steelman/banking_crisis_us_sl_crisis_1986_1995.md
+scope:
+  period: [1980, 1998]
+  countries: [USA]
+  outcome_dim: [financial_crisis, financialisation, regulation_compliance_cost]
+  policy_family: [regulation, fiscal_policy]
+  treatment_tags: [us_sl_crisis_1986_1995, rtc_1989, firrea_1989, didmca_legacy]

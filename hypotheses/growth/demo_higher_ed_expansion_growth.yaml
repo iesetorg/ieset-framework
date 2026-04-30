@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_higher_ed_expansion_growth
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Korea, Taiwan, and Ireland's rapid higher-education expansion (tertiary attainment rising
+  from <15% to >50% of working-age cohorts within roughly 30 years) is associated with
+  measurable acceleration in per-capita output growth in these countries, particularly
+  pronounced in the high-tech-export-share component. The hypothesis tests whether these
+  three countries experienced higher-than-comparator per-capita growth conditional on
+  capital deepening, attributable to the human-capital channel.
+evidence_type: associational
+sample:
+  countries: [KOR, TWN, IRL, JPN, ESP, PRT, GRC, ITA, FIN, ISR]
+  period: [1980, 2023]
+  temporal_structure: panel
+scope:
+  period: [1980, 2023]
+  countries: [KOR, IRL]
+  outcome_dim: [gdp_growth, productivity, employment_labour]
+  policy_family: [institutional_reform, labour_market]
+  treatment_tags: [higher_education_expansion, human_capital_growth]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+    - name: total_factor_productivity
+      source: pwt:rtfpna
+      transformation: log
+  treatment:
+    - name: tertiary_attainment_share
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+  controls:
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: gdp_per_capita_initial
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if tertiary-attainment-share coefficient on per-capita growth is positive at
+    p<0.05, magnitude implying a 10pp tertiary-share rise predicts at least 0.5pp annualised
+    per-capita growth, AND KOR/IRL country fixed effects are positive vs comparator-mean.
+    REFUTED if coefficient insignificant, magnitude < 0.2pp per 10pp share rise, or
+    KOR/IRL FE not above comparator mean.
+  test: panel_fe_tertiary_growth_with_country_fe
+  threshold: "coef_tertiary > 0.05 AND p < 0.05 AND korea_irl_fe > comparator_mean_fe"
+prior_confidence: 0.7
+disclosure: >-
+  Selection effects (countries that expand higher ed are also pursuing other growth-friendly
+  reforms) make causal inference hard; the panel FE only partially addresses this.
+steelman: hypotheses/steelman/demo_higher_ed_expansion_growth.md

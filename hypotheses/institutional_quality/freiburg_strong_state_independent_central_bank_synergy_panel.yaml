@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: freiburg_strong_state_independent_central_bank_synergy_panel
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across countries 1996-2022, the joint condition of high rule-of-law
+  (WGI RL) and high de-jure central-bank independence (proxied by
+  Fraser-EFW area-3 sound-money sub-component plus institutional rules)
+  predicts simultaneously lower mean inflation AND lower output
+  volatility than either single condition alone. The Freiburg "strong
+  state plus independent central bank" doctrine is that the two
+  pillars are interactive: a rule-bound state needs a rule-bound
+  monetary authority, and the combined regime is more than the sum of
+  its parts. The test is a panel interaction term on the WGI-RL x
+  EFW-area-3 product against twin outcomes (CPI inflation,
+  GDP-growth volatility).
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, COL, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KAZ, KOR, LTU, LVA, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, ROU, RUS, SGP, SVK, SVN, SWE, THA, TUR, USA, ZAF]
+  period: [1996, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop hyperinflation country-years (>500% annual CPI)"
+    - "drop country-years inside active currency-board collapse where the CB-independence proxy is mechanically degraded"
+
+variables:
+  outcome:
+    - name: cpi_inflation_annual
+      source: "imf:PCPIPCH"
+      transformation: level
+    - name: gdp_growth_volatility_5yr
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: rolling_5yr_stdev
+  treatment:
+    - name: wgi_rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: efw_sound_money_area3
+      source: "fraser_efw:area_3_sound_money"
+      transformation: level
+    - name: rl_x_sound_money_interaction
+      source: "constructed: wgi:RL.EST × fraser_efw:area_3_sound_money"
+      transformation: product_term
+  controls:
+    - name: initial_log_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_block_start
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: gen_govt_debt_pct_gdp
+      source: "imf:GGXWDG_NGDP"
+      transformation: level
+    - name: vdem_liberal_democracy
+      source: "vdem:v2x_libdem"
+      transformation: level
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Both treatment variables (WGI RL, EFW area-3) are institutional-
+  quality measures. The interaction tests an institutional-design
+  claim. Channel institutional per invariant 4.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way fixed-effects panel with the interaction term as the
+    object of interest. Standard errors clustered by country.
+    Identification from within-country variation in either pillar.
+    Robustness: drop the interaction and run main effects only;
+    Freiburg synergy claim requires interaction-term significance
+    above and beyond main effects.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) the interaction-term coefficient
+    (RL × sound-money) is negative and significant at p<0.05 on
+    inflation, AND (b) the same interaction-term coefficient is
+    negative and significant at p<0.10 on output volatility (twin-
+    outcome dual condition). PARTIAL if the interaction is
+    significant on inflation but not on volatility. REFUTED if the
+    interaction is wrong-signed or insignificant on inflation.
+    INFORMATIVE: main-effect-only specification's R² compared to
+    interaction specification — if the interaction adds <2pp to R²
+    on either outcome, the synergy claim is empirically marginal
+    even if statistically significant.
+  test: panel_fe_rl_x_sound_money_dual_outcome
+  threshold: >
+    PRIMARY: beta(RL × area3) < 0 at p<0.05 on inflation AND
+    beta(RL × area3) < 0 at p<0.10 on growth volatility.
+    INFORMATIVE: R² gain from interaction term >= 0.02 on each outcome.
+
+prior_confidence: 0.60
+
+disclosure: >-
+  Author prior is moderate (0.60) — the rule-of-law-and-CBI joint
+  literature is supportive but interaction effects in two-way FE
+  panels are notoriously fragile. Authorial framing risk: by
+  combining WGI RL and EFW area-3 as proxies for "Freiburg two
+  pillars," the spec inherits the problems of both indices (WGI
+  contamination by economic outcomes, EFW area-3 conflating
+  inflation level with monetary regime). Heterodox readers will
+  argue the interaction-term coefficient is mechanical: countries
+  that score high on both indices are simply rich, post-Bretton-
+  Woods, OECD-aligned states with stable institutions, and the
+  inflation and volatility outcomes are reflections of that joint
+  condition rather than synergy of two separable institutional
+  pillars. The R²-gain INFORMATIVE check is the heterodox reader's
+  clean win path: a "synergy" that adds <2pp explanatory power
+  beyond main effects is empirically negligible regardless of
+  statistical significance.
+
+scope:
+  period: [1996, 2022]
+  countries: [GLOBAL]
+  outcome_dim: [inflation, monetary_policy, institutional_quality]
+  policy_family: [monetary_policy, institutional_reform]
+  treatment_tags: [wgi_rule_of_law, efw_sound_money, freiburg_two_pillars, ordoliberal_strong_state]
+
+steelman: hypotheses/steelman/freiburg_strong_state_independent_central_bank_synergy_panel.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+  - ordo_rule_bound_monetary_bundesbank_inflation_track_record_1948_1998
+
+notes: >
+  The "strong state plus independent central bank" formulation is
+  Eucken's; Müller-Armack's "social market economy" carries the
+  political-economy framing. The interaction test is the cleanest
+  available expression of the synergy claim against published WGI
+  + EFW data. v2 could substitute Bade-Parkin or Cukierman CBI
+  indices once registered, which would tighten the institutional-
+  CBI proxy.

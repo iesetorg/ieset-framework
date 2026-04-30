@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fed_2022_rate_cycle_inflation_response_lag
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  The 2022-2024 US disinflation episode is partially but not predominantly
+  attributable to the Fed's 525bp rate-hike cycle 2022-03 to 2023-07;
+  supply-chain normalisation, energy-price reversion, and fiscal-impulse
+  fade explain at least as much of CPI's decline from 9.1% (2022-06) to
+  ~3% (2024-12). Decomposition is roughly one-third Fed, two-thirds non-Fed,
+  with monetary effect concentrated in goods and shelter (lagged) rather
+  than headline.
+notes: Quantitative decomposition rather than binary test. Romer-Romer narrative-IV style with
+  Bernanke-Blanchard 2023 supply/demand decomposition as benchmark.
+prior_confidence: 0.55
+disclosure: Author's market-liberal priors give Fed somewhat more credit than this 1/3 number
+  suggests; counter-tilt to keep the prior honest. The hypothesis SUPPORTED reading is the
+  Bernanke-Blanchard "mostly supply" framing; the REFUTED reading is the orthodox monetarist
+  "mostly Fed" framing — both have credible advocates and the truth is contested.
+steelman: hypotheses/steelman/fed_2022_rate_cycle_inflation_response_lag.md
+evidence_type: causal
+falsification:
+  rule: >-
+    Decomposition of US headline CPI YoY decline 2022-06 (peak 9.06%) to
+    2024-12 (~2.9%) — total ~6.1pp disinflation — into (a) Fed-driven
+    component via shadow-rate/proxy-FFR shock with Romer-Romer narrative
+    benchmark, (b) supply-shock component via NY Fed Global Supply Chain
+    Pressure Index reversion, (c) energy-price component via Brent
+    contribution to headline CPI, (d) fiscal-impulse component via CBO
+    fiscal-impulse measure. SUPPORTED if Fed-attributable share is in
+    [25%, 50%] of the 6.1pp disinflation. REFUTED if Fed share <15%
+    (no monetary contribution) or >75% (orthodox-only framing).
+    PARTIAL otherwise.
+  test: us_disinflation_2022_2024_decomposition
+  threshold: >-
+    SUPPORTED: Fed-attributable share in [25%, 50%].
+    REFUTED: Fed share <15% OR >75%.
+scope:
+  period: [2021, 2025]
+  countries: [USA]
+  outcome_dim: [inflation, monetary_policy]
+  policy_family: [monetary_policy]
+  treatment_tags: [fed_2022_rate_cycle, post_covid_inflation_episode, fed_disinflation_2022_2024]
+sample:
+  countries: [USA]
+  period: [2019, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2020Q2 from primary; include as sensitivity"
+variables:
+  outcome:
+    - name: cpi_headline_yoy
+      source: "fred:CPIAUCSL"
+      transformation: pct_change_yoy
+    - name: cpi_core_yoy
+      source: "fred:CPILFESL"
+      transformation: pct_change_yoy
+    - name: pce_core_yoy
+      source: "fred:PCEPILFE"
+      transformation: pct_change_yoy
+    - name: shelter_cpi_yoy
+      source: "fred:CUSR0000SAH1"
+      transformation: pct_change_yoy
+    - name: goods_ex_food_energy_cpi
+      source: "fred:CUSR0000SACL1E"
+      transformation: pct_change_yoy
+  treatment:
+    - name: fed_funds_target
+      source: "fred:DFEDTARU"
+      transformation: level
+    - name: shadow_rate_wu_xia
+      source: "fred:WUXIASHADOWRATE"
+      transformation: level
+      notes: Wu-Xia shadow rate as proxy-FFR including unconventional policy.
+    - name: fed_balance_sheet_walcl
+      source: "fred:WALCL"
+      transformation: log_diff
+  decomposition_channels:
+    - name: ny_fed_global_supply_chain_pressure
+      source: "fred:GSCPI"
+      transformation: level
+      notes: NY Fed GSCPI; supply-shock proxy.
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log_diff
+    - name: cbo_fiscal_impulse
+      source: "fred:FYFSGDA188S"
+      transformation: pct_gdp
+      notes: CBO/FRED federal-deficit-as-share-of-GDP; fiscal-impulse proxy.
+    - name: nominal_wage_growth_atlanta_fed
+      source: "fred:FRBATLWGT12MMUMHWGO"
+      transformation: level
+  controls:
+    - name: usd_broad_index
+      source: "fred:DTWEXBGS"
+      transformation: log_diff
+    - name: vix
+      source: "fred:VIXCLS"
+      transformation: level
+estimator:
+  template: lp_iv
+  clustering: none
+  notes: >
+    Local-projection IV with Romer-Romer narrative monetary-policy shock
+    as instrument for proxy-FFR shock. Decompose 6.1pp CPI disinflation
+    into Fed-attributable, supply-shock-attributable (GSCPI normalisation),
+    energy-attributable (Brent reversion), and fiscal-fade components.
+    Bernanke-Blanchard 2023 NK model used as benchmark structural
+    decomposition for cross-validation.

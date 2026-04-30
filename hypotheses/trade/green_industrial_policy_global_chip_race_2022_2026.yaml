@@ -1,0 +1,187 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: green_industrial_policy_global_chip_race_2022_2026
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The 2022-2026 wave of major-economy industrial-policy programmes — US
+  IRA + CHIPS, EU Critical Raw Materials Act + Net-Zero Industry Act, EU
+  Chips Act, Japan Green Transformation (GX, ¥150tn / ~$1tn announced),
+  Korea K-Chips + Korean New Deal 2.0, China 14th Five-Year Plan +
+  Made-in-China-2025-2.0 with semiconductors and clean energy as
+  national-security frontier — represents the largest coordinated wave of
+  industrial-policy spending in the post-1970s OECD record. The
+  comparative-effectiveness question (which programmes delivered MW
+  deployed / fab construction / clean-manufacturing capex per dollar
+  spent) is testable. The hypothesis predicts that programmes which
+  combine a clear technology target, a price-signal complement (carbon
+  pricing or feed-in tariff), and an export-discipline mechanism (China
+  WTO-era model) outperform pure-subsidy programmes (US IRA leans
+  subsidy-heavy with weak export discipline; EU NZIA mixes subsidy with
+  weak target-clarity). Net global clean-energy + semiconductor capacity
+  rose materially but with substantial geographic redistribution rather
+  than aggregate creation.
+
+evidence_type: causal
+
+sample:
+  countries: [USA, DEU, FRA, JPN, KOR, CHN, GBR, ITA, ESP, NLD, AUS, CAN, IND, SGP]
+  period: [2018, 2027]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-program cells missing announced or realised disbursement data"
+
+scope:
+  period: [2018, 2027]
+  countries: [USA, DEU, FRA, JPN, KOR, CHN, GBR, ITA, ESP, NLD, AUS, CAN, IND, SGP]
+  outcome_dim: [industrial_capability, energy, productivity, fiscal_policy, trade_liberalisation]
+  policy_family: [industrial_policy, fiscal_policy, energy_policy, trade_policy]
+  treatment_tags: [ira_2022, chips_act_2022, eu_crma_2024, eu_nzia_2024, eu_chips_act_2023, japan_gx_2023, korea_k_chips_2023, china_14th_five_year_plan, global_industrial_policy_2022_2026]
+
+variables:
+  outcome:
+    - name: log_program_announced_disbursement_usd
+      source: "constructed: cross-country comparative tabulation: US Treasury / Commerce CHIPS PO / DOE LPO; EU Commission CRMA / NZIA tracker; METI GX bond + execution; Korean MOTIE / KIIT; China NDRC + national IC fund disbursements. Manual-drop pending under data/manual/derived/."
+      transformation: log
+    - name: log_program_realised_disbursement_usd
+      source: "constructed: same sources but realised flow (obligated / paid) rather than announced. Manual-drop pending."
+      transformation: log
+    - name: log_country_clean_energy_mw_added
+      source: "irena:capacity"
+      transformation: log
+    - name: log_country_semiconductor_capacity_kwspm
+      source: "constructed: SEMI World Fab Forecast country-level. Manual-drop pending."
+      transformation: log
+    - name: log_country_clean_manufacturing_capex_usd
+      source: "constructed: BloombergNEF / IEA Energy Technology Perspectives — country-level clean-manufacturing capex. Manual-drop pending."
+      transformation: log
+    - name: spend_per_mw_clean_energy_usd
+      source: "constructed: realised disbursement / MW added. Effectiveness ratio."
+      transformation: log
+    - name: spend_per_kwspm_semiconductor_usd
+      source: "constructed: realised disbursement / kWspm capacity added. Effectiveness ratio."
+      transformation: log
+
+  treatment:
+    - name: program_design_score
+      source: "constructed: ordinal score per country-program on three dimensions: (a) target clarity (single-technology vs portfolio); (b) price-signal complement (carbon price level, FIT design); (c) export discipline (Korean / Chinese model = high; US IRA = low). 0-9 ordinal scale, hand-coded with documented rubric."
+      transformation: level
+    - name: post_2022_dummy
+      source: "constructed: indicator = 1 from country-specific program enactment date onwards. US: 2022-08; EU CHIPS: 2023-09; EU CRMA: 2024-04; EU NZIA: 2024-06; JPN GX: 2023-02; KOR K-Chips: 2023-03; CHN: continuous."
+      transformation: indicator
+
+  controls:
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: real_interest_rate_country
+      source: "constructed: imf:IFS_PMP / fred for USA / boe / boj / ecb. Composite."
+      transformation: level
+    - name: pre_2022_industrial_policy_baseline_spend_share_gdp
+      source: "constructed: oecd or country-specific tabulation of industrial-policy spending pre-2022, normalised by GDP. Used to net out pre-existing trajectory."
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The hypothesis explicitly studies bundled industrial-policy programmes
+  combining fiscal subsidy + regulatory + sometimes monetary (state-
+  directed credit) channels. The decomposition test asks which bundle
+  designs work, not which channel works in isolation.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary specification: country-year panel. Outcome: log clean-energy
+    MW added, log semiconductor capacity, log clean-manufacturing capex.
+    Treatment: program_design_score (continuous, 0-9) interacted with
+    post-2022 dummy. Test: does higher design-score predict more output
+    per dollar?
+
+    Effectiveness ratios: log spend / output. Compare ratios across
+    countries, ranked.
+
+    Decomposition asks: of the major programmes (US IRA, US CHIPS, EU
+    CHIPS, EU CRMA, EU NZIA, JPN GX, KOR K-Chips, CHN composite), how
+    do they rank on (a) MW deployed per $bn, (b) fab capacity per $bn,
+    (c) clean-manufacturing capex per $bn?
+
+    Net-global vs redistribution test: aggregate global clean-energy
+    capacity additions 2022-2026 vs counterfactual extrapolation of
+    2018-2021 trend; share attributable to incremental capacity vs
+    geographic redistribution from one country to another.
+
+    Known limitations:
+    (1) Program-design scoring is author-coded and contested; sensitivity
+        to alternative codings reported.
+    (2) Realised disbursement data lags announcements by 1-3 years;
+        2022-2024 data is mostly announcement, 2025-2027 will start
+        showing realised. v1 reports announced + early realised; v1.1
+        updates with full realised by 2027.
+    (3) Export-discipline channel is hard to measure cross-country in a
+        comparable way; using qualitative score rather than continuous
+        elasticity.
+    (4) Counterfactual is "no major industrial policy 2022-2026" which
+        is implausible; better counterfactual is 2018-2021 trend
+        extrapolation (used here).
+
+falsification:
+  rule: >
+    Not supported if (a) program_design_score has zero or negative
+    effect on effectiveness ratios at p<0.10, OR (b) the rank-order of
+    programmes by effectiveness does not match author-predicted rank
+    (Korea K-Chips + China composite outperform US IRA + EU NZIA), OR
+    (c) global clean-energy / semiconductor capacity addition exceeds
+    pre-2022 trend by less than 10% (would refute the "step-change"
+    framing — programs would just be redistribution), OR (d) the
+    country-level effectiveness measure is dominated by GDP / pre-existing
+    industrial base rather than program-design (no policy lesson).
+  test: global_industrial_policy_design_panel
+  threshold: >
+    program_design_score β > 0 at p<0.10 on effectiveness ratios AND
+    Korea + China rank in top 3 of 8 by spend-per-MW + spend-per-kWspm AND
+    global clean-energy capacity 2022-2026 > 1.20x pre-2022 trend
+    extrapolation AND program-design-score retains predictive power
+    after netting GDP and pre-2022 baseline.
+
+prior_confidence: 0.50
+
+disclosure: >
+  Author prior is genuinely uncertain on the comparative-effectiveness
+  question. Author is market-liberal sceptic of pure-subsidy industrial
+  policy and predicts US IRA + EU NZIA underperform Korea + China on
+  spend-per-output ratios, but the empirical evidence is contested and
+  data quality on disbursement is poor for non-OECD. The "global net
+  vs redistribution" test is the cleanest empirical separator: if 2022-
+  2026 global clean-energy + semiconductor capacity additions broadly
+  match 2018-2021 trend extrapolation, the entire industrial-policy
+  wave is plausibly net-zero in capacity terms (just redistribution).
+  If they exceed substantially, programs collectively expanded global
+  capacity. Author leans toward the "mostly redistribution" reading
+  but is open to falsification. This hypothesis is intentionally
+  comparative; individual-program decompositions are in the spec-
+  specific hypotheses (ira_2022_*, chips_act_2022_*).
+
+steelman: hypotheses/steelman/green_industrial_policy_global_chip_race_2022_2026.md
+
+linked_hypotheses:
+  - ira_2022_clean_energy_investment_decomposition
+  - chips_act_2022_semiconductor_capacity_2024_2027
+  - china_renewables_industrial_policy_learning_curve
+  - industrial_policy_export_discipline_conditionality
+  - solar_lcoe_2010_2024_learning_curve_continuation
+
+notes: >
+  Data readiness:
+  - IRENA capacity panel: ready
+  - WDI: ready
+  - SEMI / BloombergNEF / IEA: manual-drop pending
+  - Country-level program disbursement tabulation: manual-drop pending — single biggest data dependency
+  - Program design rubric: author-coded YAML to be added under hypotheses/derived/
+
+  Run when program-disbursement manual-drops + design-rubric YAML are populated.
+  This is the umbrella hypothesis; individual-program decompositions live
+  in ira_2022_clean_energy_investment_decomposition and
+  chips_act_2022_semiconductor_capacity_2024_2027.

@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: guyana_suriname_oil_discovery_2015_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Guyana's 2015 Liza-1 discovery (and subsequent Stabroek-block
+  developments through 2024) and Suriname's 2020 Block-58 discoveries
+  produced one of the most extreme oil-and-gas-windfall growth events
+  on record. The pre-registered claim is (a) Guyana's cumulative log
+  real-GDP per capita 2015-2024 exceeds 1.0 log-points (i.e. >170%
+  cumulative), AND (b) the gap between Guyana and a synthetic peer
+  pool of small frontier-resource economies is statistically
+  distinguishable, AND (c) the Suriname discovery effect is
+  measurable but smaller, with cumulative real-GDP-pc growth
+  2020-2024 in the top quartile of small-economy growth. The
+  mechanism is the offshore-oil resource-windfall.
+
+evidence_type: descriptive
+
+sample:
+  countries: [GUY, SUR, TTO, BHS, BRB, JAM, ECU, COL]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint comparison"
+
+scope:
+  period: [2010, 2024]
+  countries: [GUY, SUR, TTO, BHS, BRB, JAM, ECU, COL]
+  outcome_dim: [gdp_growth, capital_flows, fiscal_policy]
+  policy_family: [energy_policy, fiscal_policy]
+  treatment_tags: [guyana_liza_2015, suriname_block58_2020]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: hydrocarbon_rents_share_gdp
+      source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+      transformation: level
+    - name: fdi_inflow_share_gdp
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+    - name: current_account_share_gdp
+      source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+      transformation: level
+  treatment:
+    - name: guyana_oil_indicator
+      source: "constructed: binary = 1 for GUY from 2019 (first oil) onward"
+      transformation: binary
+    - name: suriname_oil_indicator
+      source: "constructed: binary = 1 for SUR from 2020 onward"
+      transformation: binary
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Discovery and contractual-regime decisions (production-sharing
+  contracts, royalty terms) are regulatory; macro outcomes follow.
+
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Primary: descriptive cumulative-log-GDP-pc trajectory for GUY and
+    SUR vs peer pool. Secondary: synth_did with frontier-resource
+    peer donor pool.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc 2015-2024 (GUY) does
+    not exceed 1.0 log-points, OR (b) hydrocarbon rents share of GDP
+    (GUY, 2024) is not at least 30 percentage points above peer pool,
+    OR (c) Suriname cumulative log_gdp_pc 2020-2024 is below the
+    LATAM median.
+  test: descriptive_cumulative_growth_thresholds
+  threshold: >
+    cumulative_log_gdp_pc(GUY, 2015-2024) >= 1.0
+    AND hydrocarbon_rents_share_gdp(GUY, 2024) - peer_pool_median(2024) >= 30
+    AND cumulative_log_gdp_pc(SUR, 2020-2024) >= LATAM_median
+
+prior_confidence: 0.93
+
+disclosure: >
+  Author prior is very high — Guyana's GDP growth 2020-2024 is
+  publicly reported as the fastest globally. Spec is included for
+  framework-validation purposes alongside other natural-experiment
+  cases.
+
+steelman: hypotheses/steelman/guyana_suriname_oil_discovery_2015_2024.md
+
+linked_hypotheses:
+  - trinidad_tobago_oil_dependence_2008_2024
+
+notes: >
+  Tests the offshore-oil-windfall growth case as a clean
+  natural-experiment for resource-curse / blessing dynamics.

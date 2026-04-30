@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_israel_soviet_absorption_1989_1994
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Israel absorbed approximately 900,000 Soviet Jewish immigrants 1989-1994 (~20% of the
+  pre-immigration population). The hypothesis tests whether the high-skill composition
+  (engineers, scientists, doctors) of the inflow is associated with measurable productivity
+  gains and tech-sector employment growth in Israel 1990-2010, supporting the canonical
+  view that Israel's tech-cluster emergence was substantially Soviet-immigrant-enabled.
+evidence_type: descriptive
+sample:
+  countries: [ISR]
+  period: [1985, 2010]
+  temporal_structure: time_series
+scope:
+  period: [1985, 2010]
+  countries: [ISR]
+  outcome_dim: [demographics_migration, productivity, gdp_growth]
+  policy_family: [labour_market]
+  treatment_tags: [israel_soviet_absorption_1989, high_skill_inflow]
+variables:
+  outcome:
+    - name: real_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log
+    - name: foreign_born_share_population
+      source: un_desa:international_migrant_stock
+      transformation: level
+    - name: total_factor_productivity
+      source: pwt:rtfpna
+      transformation: log
+  treatment:
+    - name: soviet_inflow_indicator
+      source: "constructed: indicator pulses 1989-1994 for ISR"
+      transformation: indicator
+  controls:
+    - name: tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+estimator:
+  template: event_study
+  notes: >
+    Event-study around 1989-1994 with Israel as the single treated unit; report break in
+    foreign-born share, TFP, and per-capita output. Counterfactual based on linear
+    extrapolation of 1985-1988 trend.
+falsification:
+  rule: >-
+    SUPPORTED if foreign-born share rises by at least 15pp 1989-1994 AND post-1994 TFP
+    growth exceeds pre-1989 trend by at least 0.5pp annualised through 2005. REFUTED if
+    foreign-born share rise < 10pp OR TFP gain insignificant against pre-trend.
+  test: event_study_israel_soviet_absorption
+  threshold: "foreign_born_share_rise >= 15.0 AND tfp_growth_premium >= 0.5"
+prior_confidence: 0.7
+disclosure: >-
+  Israeli tech narrative is well-documented; risk of overweighting the Soviet-cohort
+  contribution and underweighting US-Israel tech-investment ties.
+steelman: hypotheses/steelman/demo_israel_soviet_absorption_1989_1994.md

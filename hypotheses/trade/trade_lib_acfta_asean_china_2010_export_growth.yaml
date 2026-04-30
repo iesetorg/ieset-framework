@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_acfta_asean_china_2010_export_growth
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The ASEAN-China Free Trade Area (ACFTA), with the goods agreement
+  effective 2010-01-01 for the original ASEAN-6, raised ASEAN-6
+  merchandise-export intensity over the 2010-2019 window relative
+  to non-ASEAN comparator economies. The bilateral-tariff-removal
+  claim is that ACFTA's elimination of most tariffs on ASEAN-6
+  exports to China shifted regional supply-chain participation
+  toward Chinese final-assembly demand.
+
+evidence_type: causal
+
+sample:
+  countries: [BRN, IDN, MYS, PHL, SGP, THA, VNM, IND, PAK, BGD, LKA, MEX, BRA, CHL, PER]
+  period: [2000, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019)"
+    - "drop country-years inside currency/banking crises"
+
+scope:
+  period: [2000, 2019]
+  countries: [BRN, IDN, MYS, PHL, SGP, THA, VNM]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy]
+  treatment_tags: [acfta_2010, asean_china_fta, supply_chain_integration]
+
+variables:
+  outcome:
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+  treatment:
+    - name: acfta_2010_indicator
+      source: "constructed: indicator = 1 for original ASEAN-6 from 2010-01-01; VNM, MMR, KHM, LAO from 2015-01-01"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  ACFTA is a regulatory / trade-policy intervention. Channel
+  regulatory per invariant 4.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna staggered DiD with 2010 ASEAN-6 cohort and
+    2015 CLMV cohort. Donor pool = non-ACFTA emerging Asian and
+    Latin American economies. Robustness: drop SGP (financial-
+    centre outlier inflates trade ratios).
+
+falsification:
+  rule: >
+    SUPPORTED if Callaway-Sant'Anna ATT on merchandise-exports
+    over h=5y is positive and significant at p<0.10. PARTIAL if
+    ATT is positive but insignificant. REFUTED if ATT is negative
+    at p<0.10.
+  test: cs_did_acfta_2010_export_intensity
+  threshold: >
+    PRIMARY: cs_did_ATT(merchandise_exports, h=5y) > 0 at p<0.10.
+    INFORMATIVE: ex-SGP coefficient retained at >=0.6 × full.
+
+prior_confidence: 0.6
+
+disclosure: >
+  Prior moderate (0.6). The literature finds heterogeneous effects:
+  Vietnam and Indonesia gained substantially; the Philippines and
+  Singapore less so. Heterodox dependency-theory readers will note
+  that the supply-chain-integration story made ASEAN exporters
+  more dependent on Chinese final-demand cycles, exposing them to
+  the post-2018 US-China trade-war fallout — a tail risk that the
+  static gain estimate does not capture.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_acfta_asean_china_2010_export_growth.md

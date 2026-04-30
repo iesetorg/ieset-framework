@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_eastern_europe_outmigration_wages
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Post-1990 (and especially post-EU-accession 2004/2007) outmigration from Eastern Europe
+  (POL, ROU, BGR, LTU, LVA, EST, HUN, SVK) has produced upward pressure on real wages at
+  origin via labour-supply contraction. The hypothesis predicts a positive association
+  between cumulative net out-migrant share and real-wage growth at origin over 2004-2023,
+  conditional on productivity growth.
+evidence_type: associational
+sample:
+  countries: [POL, ROU, BGR, LTU, LVA, EST, HUN, SVK, CZE, HRV, SVN]
+  period: [1990, 2023]
+  temporal_structure: panel
+scope:
+  period: [1990, 2023]
+  countries: [POST_SOVIET]
+  outcome_dim: [wage_stagnation, demographics_migration]
+  policy_family: [labour_market]
+  treatment_tags: [eu_eastern_enlargement_2004, post_communist_outmigration]
+variables:
+  outcome:
+    - name: real_wage_index
+      source: ilostat:EAR_4MTH_SEX_RT
+      transformation: log
+    - name: real_compensation_per_employee
+      source: eurostat:nama_10_a10
+      transformation: log
+  treatment:
+    - name: net_migration_rate
+      source: world_bank_wdi:SM.POP.NETM
+      transformation: level
+    - name: cumulative_outmigrant_share
+      source: un_desa:international_migrant_stock
+      transformation: level
+      notes: Computed as (origin-born stock abroad) / (origin total population).
+  controls:
+    - name: labour_productivity
+      source: pwt:rgdpo_per_emp
+      transformation: log
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if cumulative outmigrant share has positive coefficient on real-wage growth
+    at p<0.05 controlling for labour productivity, with magnitude >= 0.2pp wage growth per
+    pp of cumulative outmigrant share. REFUTED if coefficient insignificant, wrong-signed,
+    or absorbed by productivity control.
+  test: panel_fe_outmigration_origin_wages
+  threshold: "coef_outmigrant_share > 0.2 AND p < 0.05"
+prior_confidence: 0.7
+disclosure: >-
+  Mechanism is well-documented in Polish-plumber-style narratives; risk is that productivity
+  and migration co-trend, making clean attribution hard.
+steelman: hypotheses/steelman/demo_eastern_europe_outmigration_wages.md

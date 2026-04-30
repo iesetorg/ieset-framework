@@ -69,6 +69,48 @@ export function verdictTone(v: string | undefined): VerdictTone {
   return "muted";
 }
 
+// ---------------------------------------------------------------------------
+// Falsification-rule sharpening detector.
+//
+// Many specs in the library still carry the generic stub-promotion boilerplate
+// in their falsification.rule field. The auto-grader will happily emit
+// "supported / refuted / partial" against that boilerplate, but the verdict is
+// against a generic "p<0.10 + correct sign" rule, NOT against a dispositive
+// pre-registered threshold a fair reader of the claim would defend.
+//
+// We detect that text and downgrade those verdicts to amber regardless of what
+// the diagnostics.json says. Same gating logic the canonical-basket gate uses
+// for social-outcome claims, applied to falsification-rule quality.
+//
+// The full boilerplate string (all variants seen) keys off the unique tail
+// phrase "when this stub is promoted from draft" — that text never appears in
+// any sharpened spec.
+const STUB_RULE_MARKER = "when this stub is promoted from draft";
+
+export function isStubFalsificationRule(rule: string | undefined): boolean {
+  if (!rule) return false;
+  return rule.toLowerCase().includes(STUB_RULE_MARKER);
+}
+
+/**
+ * Like verdictTone() but downgrades to amber when the falsification rule is
+ * still the stub boilerplate. Pass the spec's falsification.rule alongside
+ * the verdict string. If the rule is sharpened, this is identical to
+ * verdictTone(verdict). If the rule is boilerplate, green and red both
+ * collapse to amber so the reader doesn't see clean SUPPORTED / refuted on
+ * an unsharpened spec.
+ */
+export function verdictToneRespectingRule(
+  verdict: string | undefined,
+  falsificationRule: string | undefined
+): VerdictTone {
+  const baseTone = verdictTone(verdict);
+  if (!isStubFalsificationRule(falsificationRule)) return baseTone;
+  // Boilerplate rule: collapse decisive tones to amber.
+  if (baseTone === "green" || baseTone === "red") return "amber";
+  return baseTone;
+}
+
 export function verdictShort(v: string | undefined): VerdictShort {
   if (!v) return "run pending";
   const vl = v.toLowerCase().trim();

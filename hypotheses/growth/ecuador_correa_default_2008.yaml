@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ecuador_correa_default_2008
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Ecuador's December 2008 strategic default on $3.2bn of Global 2012 and
+  Global 2030 bonds (declared "illegitimate" by the Correa-appointed
+  audit commission) produced a measurable medium-run sovereign-borrowing-
+  cost penalty without delivering a fiscal-space dividend large enough
+  to offset that penalty. The pre-registered claim is (a) Ecuador's
+  EMBI+ spread relative to LATAM peers widened by at least 200bp on a
+  five-year average post-default basis (2009-2014), AND (b) the
+  cumulative fiscal saving from the haircut (about 2-3% of one year's
+  GDP, written down to single-digit-cents-on-the-dollar in the 2009
+  buyback) is small relative to the cumulative borrowing-cost penalty
+  on subsequent issuances. The mechanism is reputational: a
+  willingness-to-pay default raises the long-run cost of capital more
+  than it saves on the original principal.
+
+evidence_type: causal
+
+sample:
+  countries: [ECU, PER, COL, BRA, MEX]
+  period: [2003, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-cost calculation"
+
+scope:
+  period: [2003, 2024]
+  countries: [ECU, PER, COL, BRA, MEX]
+  outcome_dim: [capital_flows, fiscal_policy]
+  policy_family: [fiscal_policy, institutional_reform]
+  treatment_tags: [ecuador_default_2008, correa_2007]
+
+variables:
+  outcome:
+    - name: total_external_debt_share_gni
+      source: world_bank_wdi:DT.DOD.DECT.GN.ZS
+      transformation: level
+    - name: interest_payments_share_revenue
+      source: world_bank_wdi:GC.XPN.INTP.RV.ZS
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: default_indicator
+      source: "constructed: binary = 1 for ECU from 2008-12 onward"
+      transformation: binary
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: us_high_yield_spread
+      source: fred:BAMLH0A0HYM2
+      transformation: level
+      notes: Global EM risk-appetite control.
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Strategic default is a fiscal-policy + institutional-credibility
+  intervention.
+
+estimator:
+  template: event_study
+  clustering: country
+  notes: >
+    Primary: event study around December 2008 default declaration with
+    country fixed effects. Secondary: synth_did on
+    interest_payments_share_revenue with peer pool.
+
+falsification:
+  rule: >
+    Not supported if (a) the post-default Ecuadorian
+    interest_payments_share_revenue 2009-2019 mean is not measurably
+    higher than the matched-peer mean by at least 1 percentage point,
+    OR (b) the post-default capital-formation share of GDP does not
+    show a sustained reduction relative to pre-trend.
+  test: event_study_plus_capital_formation_check
+  threshold: >
+    mean(interest_payments_share_revenue, ECU, 2009-2019) - mean(matched_peer_pool, 2009-2019) >= 1.0
+    AND post_2008_capital_formation_share(ECU) < pre_2008_trend - 1.0
+
+prior_confidence: 0.6
+
+disclosure: >
+  Author market-liberal prior is that strategic defaults raise long-run
+  borrowing costs more than they save. Risk: the 2009-2014 oil tailwind
+  may mask any borrowing-cost penalty by inflating apparent fiscal
+  capacity.
+
+steelman: hypotheses/steelman/ecuador_correa_default_2008.md
+
+linked_hypotheses:
+  - ecuador_dollarisation_2000_stabilisation
+  - argentina_institutional_instability_decline
+
+notes: >
+  Tests strategic default's reputational cost in a specific natural-
+  experiment window.

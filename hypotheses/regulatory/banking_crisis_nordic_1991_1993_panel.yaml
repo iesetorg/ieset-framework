@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_nordic_1991_1993_panel
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The 1988-1993 Nordic banking crises (Norway 1988-1991, Sweden 1991-1992, Finland
+  1991-1993) are a canonical post-deregulation credit-boom-bust panel. Following the
+  mid-1980s liberalisation of credit and capital markets, all three countries
+  experienced bank-credit-to-GDP run-up of >= 25 pp, real-house-price decline of
+  >= 25%, real-GDP contraction of >= 5%, large bank rescues / nationalisations, and
+  Laeven-Valencia banking-crisis coding. The hypothesis is that the canonical
+  multi-metric pattern is met across at least 3 of 3 countries on at least 4 of 5
+  metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [NOR, SWE, FIN]
+  period: [1985, 1998]
+  temporal_structure: panel
+canonical_metrics:
+  - metric_id: bank_credit_to_gdp_run_up
+    description: Bank credit to private sector run-up before crisis
+    threshold: ">= 25 pp of GDP rise pre-crisis in all three countries"
+    window: "1985-1990"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS; jst:tloans"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate, pre-crisis indicator.
+  - metric_id: real_house_price_decline
+    description: Real residential property price peak-to-trough decline
+    threshold: ">= 25% decline in at least 2 of 3 countries"
+    window: "1989-1995"
+    source: "bis:WS_SPP; jst:hpnom"
+    direction: supports_claim
+    independence_justification: Property-price index.
+  - metric_id: real_gdp_contraction
+    description: Real GDP peak-to-trough decline
+    threshold: ">= 5% decline in at least 2 of 3 countries"
+    window: "1989-1994"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD; jst:rgdpmad"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: laeven_valencia_systemic_banking_crisis
+    description: Laeven-Valencia banking-crisis coding
+    threshold: "coded yes in all 3 countries"
+    window: "1988-1993"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: unemployment_rate_rise
+    description: Unemployment rate rise vs pre-crisis baseline
+    threshold: ">= 6 pp rise in at least 2 of 3 countries"
+    window: "1990-1995"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; oecd:DSD_LFS@DF_LFS"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: real_house_price_index
+      source: "bis:WS_SPP"
+      transformation: peak_to_trough
+prior_confidence: 0.94
+disclosure: >
+  Nordic crises 1988-1993 are well-documented in Honkapohja-Englund and Drees-Pazarbasioglu;
+  multi-metric pattern overdetermined. Author market-liberal prior treats this as a clean
+  illustration of post-deregulation transitional vulnerability.
+steelman: hypotheses/steelman/banking_crisis_nordic_1991_1993_panel.md
+scope:
+  period: [1985, 1998]
+  countries: [NOR, SWE, FIN, NORDIC]
+  outcome_dim: [financial_crisis, financialisation, housing, employment_labour]
+  policy_family: [regulation, monetary_policy]
+  treatment_tags: [nordic_banking_crises_1991, sweden_1991_bank_resolution, finland_1991_recession, norway_1988_1991]

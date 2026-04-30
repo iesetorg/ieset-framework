@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nuclear_revival_2023_2026_western_construction_starts
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The 2022-2026 window saw rhetorical and policy-stated revival of Western
+  large-scale nuclear power: France committed to EPR2 fleet (6 + 8 reactors
+  by 2050) under loi accélération du nucléaire 2023; UK confirmed Sizewell
+  C investment FID 2024 + Small Modular Reactor (SMR) competitive selection
+  2024-2025; US Vogtle Unit 4 commercial start July 2024 + several SMR /
+  advanced-reactor licensing applications; Japan re-pivoted to nuclear
+  restart + lifetime extension (2023 GX framework permits >60-year
+  operation); Sweden, Finland, Netherlands, Belgium reversed phase-out
+  policies. The hypothesis tests whether this rhetorical revival
+  translated into measurable concrete-pour construction starts and FIDs
+  with full financing on 1+ Generation-III/III+ Western reactor by end-
+  2026, distinct from continued construction of pre-2022 commitments
+  (Hinkley Point C, Olkiluoto-3 finished 2023). A weaker interpretation:
+  rhetorical revival without construction starts is policy theatre, not
+  industrial revival.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA, FRA, GBR, JPN, SWE, FIN, NLD, BEL, KOR, CAN, POL]
+  period: [2018, 2027]
+  temporal_structure: time_series
+
+scope:
+  period: [2018, 2027]
+  countries: [USA, FRA, GBR, JPN, SWE, FIN, NLD, BEL, KOR, CAN, POL]
+  outcome_dim: [energy, industrial_capability, fiscal_policy]
+  policy_family: [energy_policy, industrial_policy, institutional_reform]
+  treatment_tags: [nuclear_revival_2022, france_epr2_2023, sizewell_c_fid_2024, japan_gx_nuclear_2023, smr_first_of_kind_2025]
+
+variables:
+  outcome:
+    - name: count_western_large_reactor_construction_starts_post_2022
+      source: "constructed: IAEA PRIS (Power Reactor Information System) construction-start records, filtered to OECD + UK + KOR + JPN, ≥1000 MWe Generation-III/III+. Manual-drop pending under data/manual/derived/."
+      transformation: level
+    - name: count_smr_first_of_a_kind_construction_starts
+      source: "constructed: IAEA PRIS + ARIS (Advanced Reactor Information System) for SMR designs (NuScale, BWRX-300, X-energy Xe-100, Rolls-Royce SMR, etc.), construction-start records 2022-2026. Manual-drop pending."
+      transformation: level
+    - name: count_reactor_lifetime_extensions
+      source: "constructed: IAEA PRIS lifetime-extension licensing decisions (US NRC subsequent license renewal SLR; French ASN/IRSN visite décennale; Japan NRA 60+ extension). Manual-drop pending."
+      transformation: level
+    - name: log_total_announced_nuclear_capex_usd
+      source: "constructed: country-program announced + FID-confirmed capex: France EPR2 cost estimates (RTE / EDF + Cour des Comptes), UK Sizewell C strike-price + RAB-finance details, Vogtle 3+4 final cost, etc. Manual-drop pending."
+      transformation: log
+    - name: vogtle_4_levelised_cost_usd_per_mwh
+      source: "constructed: Georgia Power / Southern Company project costs / 60-year lifetime / capacity factor. Cross-check fred:CES2023700001 (US power gen employment). Manual-drop pending."
+      transformation: level
+    - name: phase_out_reversal_policy_count
+      source: "constructed: count of formal phase-out reversals 2022-2026 (Sweden 2023 abandons phase-out target; Belgium 2023 lifetime extension; Netherlands 2024 new-build commitment; Italy 2024 lifting ban; Switzerland 2024 lifting ban). Manual-drop pending."
+      transformation: level
+
+  treatment:
+    - name: post_2022_nuclear_revival_dummy
+      source: "constructed: indicator = 1 from 2022-08 onwards (post-energy-crisis policy framing window)."
+      transformation: indicator
+
+  controls:
+    - name: log_eu_ets_price
+      source: "eea:eu_ets_verified_emissions"
+      transformation: log
+    - name: log_natural_gas_ttf
+      source: "constructed: TTF EUR/MWh, monthly. eex fetcher pending."
+      transformation: log
+    - name: nuclear_share_existing_generation
+      source: "constructed: IEA / IRENA share of nuclear in country generation mix, 2021. Pre-existing reliance moderates revival probability."
+      transformation: level
+    - name: post_fukushima_residual_phaseout_status
+      source: "constructed: indicator = 1 if country had a formal phase-out policy at 2021 baseline (DEU, BEL, ITA, ESP, CHE, TWN). Used to identify which countries had the most policy-distance to revival."
+      transformation: indicator
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Nuclear revival combines fiscal (state guarantees, RAB financing,
+  ITC-style PTC for advanced reactors), regulatory (licensing reform,
+  phase-out reversal, lifetime extension), and institutional (state-
+  owned developer reorganisation — EDF nationalisation, Westinghouse
+  ownership) channels. Pure-channel decomposition not feasible.
+
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive inventory: count construction starts + FIDs + lifetime
+    extensions + phase-out reversals 2022-2026 by country, compared to
+    2010-2021 baseline. Cross-check IAEA PRIS records.
+
+    Key tests:
+    (a) Western large-reactor construction starts 2022-2026: count
+        ≥ 2 = supported (excludes pre-2022 commitments still in
+        construction).
+    (b) SMR first-of-a-kind construction starts: count ≥ 1 = supported
+        (NuScale Carbon-Free Power Project was cancelled Nov 2023, so
+        the bar is whether any SMR actually breaks ground in West).
+    (c) Phase-out reversals: count ≥ 3 of (BEL, NLD, SWE, ITA, ESP, CHE)
+        formally reversing.
+    (d) Lifetime extensions: count ≥ 5 reactors approved for 60+ year
+        operation in OECD 2022-2026.
+    (e) Vogtle-4 levelised cost: report unconditionally; if it is below
+        $130/MWh the project's economics are tractable, if above $180/MWh
+        the comparative-effectiveness picture is poor.
+
+    Known limitations:
+    (1) SMR landscape is in flux; cancellations (NuScale CFPP Nov 2023)
+        outweigh starts in 2023-2024.
+    (2) "Construction start" definition (concrete pour vs site
+        preparation) varies; use IAEA PRIS first-concrete-for-base-mat.
+    (3) Vogtle-4 is the FIRST Western large reactor to start commercial
+        ops post-2018 (Olkiluoto-3 in 2023 in Europe was the prior
+        case); both finished 5-10 years late and 2-3x over budget.
+        Whether this represents end-of-bad-streak or warning-of-future
+        cost is contested.
+    (4) Asian nuclear (CHN, KOR) is excluded by scope definition (this
+        is "Western" revival); CHN nuclear is on a different
+        institutional trajectory.
+
+falsification:
+  rule: >
+    Descriptive — falsified by counter-fact. Falsified if 2022-2026 sees
+    ZERO new Western large-reactor construction starts (other than pre-
+    2022 commitments) AND ZERO SMR first-of-a-kind construction starts
+    AND fewer than 3 phase-out reversals AND fewer than 5 lifetime
+    extensions. Each metric counted independently. Verdict tiers:
+    "supported" = 4 of 5 metrics hit thresholds; "partial" = 3 of 5;
+    "refuted (revival is rhetoric)" = ≤ 2 of 5.
+  test: nuclear_revival_inventory
+  threshold: >
+    Western large-reactor construction starts ≥ 2 (Hinkley C-2 / Sizewell
+    C / EPR2 site work counts if FID + concrete by 2026) AND
+    SMR FOAK construction starts ≥ 1 AND
+    Phase-out reversals ≥ 3 AND
+    Lifetime extensions ≥ 5 AND
+    Vogtle-4 LCOE < $180/MWh
+
+prior_confidence: 0.45
+
+disclosure: >
+  Author prior is sceptical: rhetorical revival is large but construction-
+  start-on-the-ground evidence is thinner. By April 2026: France EPR2
+  has financing-structure debate ongoing, Sizewell C FID 2024 but main
+  works start 2025-2026, Vogtle-4 commercial 2024 (genuine win), SMR
+  cancellations (NuScale CFPP) have outweighed starts (BWRX-300 Darlington
+  is the closest to FOAK). Author predicts the v1 result will be "partial":
+  3-4 of 5 metrics hit, with the SMR-FOAK leg weakest. Climate-effectiveness
+  of nuclear vs renewables on cost-of-CO2-abated is OUT OF SCOPE; this
+  hypothesis tests whether revival-rhetoric matched concrete-pour reality.
+
+steelman: hypotheses/steelman/nuclear_revival_2023_2026_western_construction_starts.md
+
+linked_hypotheses:
+  - nuclear_phaseout_grid_reliability_cost_tradeoff
+  - nuclear_phaseout_energy_cost_industry_exit
+  - german_energiewende_industrial_cost_trajectory
+  - eu_ets_price_2022_2026_carbon_signal_strength
+
+notes: >
+  Data readiness:
+  - IAEA PRIS / ARIS: manual-drop pending under data/manual/derived/
+    (PRIS data is publicly downloadable from iaea.org but not via API)
+  - EU ETS price: eea ready
+  - TTF gas: eex fetcher pending or manual-drop
+  - Country phase-out policy timeline: hand-curated, manual-drop pending
+  - Vogtle-4 cost: Georgia Power filings, manual-drop
+
+  Run when IAEA PRIS / ARIS manual-drop is populated through end-2025.

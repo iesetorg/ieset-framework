@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_singapore_china_2009_bilateral_fta
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The Singapore-China FTA, effective 2009-01-01, produced negligible
+  measurable trade-creation effects on Singapore aggregate trade
+  ratios because Singapore's trade was already extremely liberalised
+  under unilateral free-port policy and pre-existing ASEAN-China
+  integration. The null-prediction is that Singapore's trade-
+  openness trajectory should not show a structural break at 2009.
+
+evidence_type: descriptive
+
+sample:
+  countries: [SGP, HKG, MYS, THA, KOR, JPN]
+  period: [1995, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019)"
+
+scope:
+  period: [1995, 2019]
+  countries: [SGP]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [singapore_china_fta_2009, free_port_unilateral_liberalisation]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: sg_chn_fta_indicator
+      source: "constructed: indicator = 1 for SGP from 2009-01-01"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Bilateral FTA — regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive structural-break test. Pre/post-2009 mean trade-
+    openness comparison for Singapore vs Hong Kong (the natural
+    comparator: similar free-port, similar pre-existing
+    liberalisation, no equivalent bilateral with China).
+
+falsification:
+  rule: >
+    SUPPORTED (null) if the SGP-vs-HKG difference in trade-openness
+    change from 2004-2008 to 2009-2013 is within +/- 5 pp. REFUTED
+    (rejecting the null) if SGP shows a >5 pp positive gap relative
+    to HKG.
+  test: descriptive_sgp_vs_hkg_2009_fta_break
+  threshold: >
+    PRIMARY: |delta_openness(SGP) - delta_openness(HKG)| <= 5 pp.
+
+prior_confidence: 0.75
+
+disclosure: >
+  Prior moderate-high (0.75) on the null. Singapore's trade was
+  already at extreme openness levels (>300% of GDP) before 2009;
+  any bilateral FTA marginal effect is statistically tiny.
+  Heterodox readers will note that the FTA may have had effects on
+  service-trade composition or specific bilateral flows that
+  aggregate openness ratios cannot detect.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_singapore_china_2009_bilateral_fta.md

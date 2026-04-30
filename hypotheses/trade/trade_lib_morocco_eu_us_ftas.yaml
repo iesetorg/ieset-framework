@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_morocco_eu_us_ftas
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Morocco's FTA cascade (EU Association Agreement 2000, Agadir
+  Agreement 2007, US FTA 2006, Turkey 2006) raised Moroccan trade-
+  openness and manufacturing-export share over the 2000-2019
+  window relative to North African comparators. The expected
+  effect is modest but detectable in within-country and comparator
+  descriptive comparisons.
+
+evidence_type: descriptive
+
+sample:
+  countries: [MAR, TUN, EGY, DZA, JOR]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop DZA from primary spec (oil-export dominance distorts trade ratios)"
+    - "exclude EGY 2011-2014 (revolutionary-period instability)"
+
+scope:
+  period: [1990, 2019]
+  countries: [MAR]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy]
+  treatment_tags: [morocco_eu_association_2000, morocco_us_fta_2006, agadir_agreement, mena_fta_cascade]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  FTA cascade — regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. Morocco trade-openness and manufacturing
+    value-added trajectories vs MENA comparators (TUN, EGY, JOR).
+
+falsification:
+  rule: >
+    SUPPORTED if Morocco trade-openness change 1995-1999 mean to
+    2015-2019 mean exceeds comparator-mean change by >=5 pp.
+    PARTIAL if smaller. REFUTED if Morocco underperforms.
+  test: descriptive_morocco_fta_cascade_trade_openness
+  threshold: >
+    PRIMARY: (delta_openness(MAR) - delta_openness(MENA_comparator_mean)) >= +5 pp.
+
+prior_confidence: 0.6
+
+disclosure: >
+  Prior moderate (0.6). Morocco's automotive and aerospace export
+  growth from 2010 (Renault Tangier 2012, Boeing-Stelia) is the
+  textbook positive case; the question is whether it is FTA-
+  attributable or driven by industrial-policy investment incentives.
+  Heterodox readers will emphasise the industrial-policy channel.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_morocco_eu_us_ftas.md

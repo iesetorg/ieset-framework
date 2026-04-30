@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_eu_2007_2013_enlargement_balkans
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The EU's 2007 (BGR, ROU) and 2013 (HRV) enlargements produced a
+  smaller per-capita-income convergence acceleration than the 2004
+  enlargement, because (a) accession occurred into the financial-
+  crisis and post-crisis austerity environment rather than the
+  pre-crisis growth boom, and (b) baseline institutional quality
+  was lower at the accession date. The test is staggered DiD
+  comparing 2007 and 2013 cohorts to a non-acceding Balkans donor
+  pool.
+
+evidence_type: causal
+
+sample:
+  countries: [BGR, ROU, HRV, BIH, MKD, MNE, SRB, ALB, TUR]
+  period: [1995, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop pre-2002 ALB years (severe data quality concerns)"
+    - "drop SRB pre-2003 (post-conflict transition years)"
+
+scope:
+  period: [1995, 2019]
+  countries: [BGR, ROU, HRV]
+  outcome_dim: [gdp_growth, trade_liberalisation]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [eu_enlargement_2007, eu_enlargement_2013, balkans_accession]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant_usd
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+  treatment:
+    - name: eu_2007_2013_indicator
+      source: "constructed: indicator = 1 for BGR, ROU from 2007-01-01; HRV from 2013-07-01"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: wgi_control_of_corruption
+      source: "world_bank_wgi:CC.EST"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  EU accession bundles trade-policy and institutional reform.
+  Bundled per invariant 4.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna staggered DiD with 2007 and 2013 cohorts.
+    Compare ATT magnitude against the 2004 cohort spec
+    (trade_lib_eu_eastern_enlargement_2004_growth_convergence)
+    in a follow-on cross-spec analysis.
+
+falsification:
+  rule: >
+    SUPPORTED if 2007/2013 cohort ATT on log GDP per capita over
+    h=5y is positive but smaller than the 2004-cohort ATT (formal
+    test: <0.7× the 2004-cohort ATT). PARTIAL if positive and
+    similar magnitude. REFUTED if the ATT is negative.
+  test: cs_did_eu_2007_2013_growth_smaller_than_2004
+  threshold: >
+    PRIMARY: ATT(log_gdp_pc, h=5y) > 0 AND ATT(2007/2013) < 0.7 × ATT(2004).
+    METHOD_VALID: WDI NY.GDP.PCAP.KD available for all units 1995-2019.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderately high (0.7). The smaller-magnitude prediction
+  follows from the GFC and austerity environment that the 2007/2013
+  cohorts entered. Heterodox critics will note that BGR and ROU
+  experienced substantial post-2007 emigration (working-age
+  population leaving for Western Europe) which mechanically raises
+  per-capita GDP without raising welfare; that channel is not
+  controlled here.
+
+linked_hypotheses:
+  - trade_lib_eu_eastern_enlargement_2004_growth_convergence
+
+steelman: hypotheses/steelman/trade_lib_eu_2007_2013_enlargement_balkans.md

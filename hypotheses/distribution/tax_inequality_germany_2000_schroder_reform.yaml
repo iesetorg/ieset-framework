@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_germany_2000_schroder_reform
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 2000 Schroder corporate + personal tax reform package (top personal
+  rate cut from 53 to 42 percent staged 2000-2005, corporate rate cut
+  from 40 to 25 percent, capital-gains exemption on inter-corporate
+  shareholdings) is associated with a 1.0 to 1.5 percentage point rise
+  in the German top-1 pre-tax income share over 2000-2008 vs Eurozone
+  synthetic control, but no measurable rise in aggregate output growth
+  beyond Eurozone trend. The test pairs distributional response vs
+  growth response.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 3. Distinct from any growth-
+  effect spec; outcome here is distributional.
+prior_confidence: 0.6
+disclosure: >
+  Author prior weakly favours that the Schroder package raised top share
+  modestly through both labour-supply and corporate-shareholding-
+  liquidation channels.
+falsification:
+  rule: >
+    SUPPORTED if German top-1 pretax share rises by at least 1 percentage
+    point vs Eurozone synthetic over 2000-2008 at p<0.10. REFUTED if no
+    detectable gap or negative gap at the eight-year horizon.
+  test: >
+    Synthetic-control with Eurozone donor pool, treated DEU 2001.
+evidence_type: associational
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, AUT, FIN, IRL]
+  period: [1990, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: schroder_2001_deu_post
+      source: "constructed: indicator = 1 for DEU, year >= 2001"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with Eurozone donor pool. Robustness with synth_did.
+intervention_channel: fiscal
+scope:
+  period: [2000, 2010]
+  countries: [DEU]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [schroder_tax_reform_2000, agenda_2010, corporate_tax_cut]

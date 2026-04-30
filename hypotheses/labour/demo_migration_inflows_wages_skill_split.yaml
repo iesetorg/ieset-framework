@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_migration_inflows_wages_skill_split
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Across high-income destination countries 1995-2023, migration inflows have heterogeneous
+  wage effects by skill: high-skill (tertiary-educated) inflows are associated with neutral
+  or positive wage effects on natives, while low-skill inflows produce small negative wage
+  effects on the bottom decile of native earners but no aggregate native-wage decline. The
+  hypothesis predicts the high-skill / low-skill differential exceeds 1 percentage point in
+  decadal real-wage growth at the destination level.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, CAN, AUS, NLD, SWE, NOR, DNK, CHE, BEL, AUT, IRL, NZL]
+  period: [1995, 2023]
+  temporal_structure: panel
+scope:
+  period: [1995, 2023]
+  countries: [OECD]
+  outcome_dim: [wage_stagnation, employment_labour, demographics_migration]
+  policy_family: [labour_market]
+  treatment_tags: [migration_inflows, skill_composition, native_wages]
+variables:
+  outcome:
+    - name: real_median_wage
+      source: oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARNINGS,1.0
+      transformation: log
+    - name: real_wage_bottom_decile
+      source: oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARNINGS,1.0
+      transformation: log
+  treatment:
+    - name: migrant_share_population
+      source: un_desa:international_migrant_stock
+      transformation: level
+    - name: high_skill_migrant_share
+      source: oecd:OECD.ELS.IMM,DSD_DIOC@DF_DIOC,1.0
+      transformation: level
+      notes: OECD DIOC-style high-skill (tertiary-attainment) migrant share among foreign-born.
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if (a) high-skill migrant share has positive or non-negative coefficient on
+    median real wage, (b) low-skill migrant share has negative coefficient on bottom-decile
+    real wage with magnitude < 1pp per pp of share, (c) high-skill / low-skill differential
+    on median wage > 1pp / decade. REFUTED if low-skill inflows produce large negative
+    aggregate effects (>2pp per decade) or high-skill effects are negative.
+  test: panel_fe_skill_split_wage_response
+  threshold: "coef_high_skill >= 0 AND coef_low_skill_bottom_decile > -1.0 AND differential > 1.0"
+prior_confidence: 0.6
+disclosure: >-
+  Author's priors align with the Borjas-vs-Card debate having a consensus mid-point of small
+  effects with skill-split heterogeneity. Endogeneity (migrants choose booming destinations)
+  is the binding methodological risk; v2 should add Bartik-style instruments.
+steelman: hypotheses/steelman/demo_migration_inflows_wages_skill_split.md

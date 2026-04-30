@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_nz_employment_contracts_act_1991
+version: 1
+status: candidate
+topic: labour
+claim: >
+  New Zealand's 1991 Employment Contracts Act (abolition of
+  national awards, individual contracts default, voluntary
+  unionism) lowered the New Zealand unemployment rate by at
+  least 2 pp by 1996 relative to a synthetic control of Anglo
+  peer economies, with the largest gains in low-skill
+  employment, but did not raise productivity growth above
+  donor-pool baseline.
+notes: >
+  Treatment dated 1991-Q2 (ECA enactment). NZ is the canonical
+  "deepest deregulation" case in the Anglo set and has been
+  studied extensively. Donor pool is AUS, GBR, IRL, USA, CAN.
+  The productivity-channel test is the steelman discipline:
+  if NZ deregulation produced employment growth without
+  productivity, the welfare verdict is mixed.
+prior_confidence: 0.6
+disclosure: >-
+  Author is sympathetic to ECA-style deregulation generating
+  employment gains but recognises that the 1980s Lange-Douglas
+  reforms (preceding ECA) and broader Rogernomics package may
+  be doing some of the work attributed here to the ECA.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on NZ unemployment rate <
+    -2.0 pp by 1996 AND productivity-growth gap is not
+    statistically distinguishable from zero. REFUTED if
+    unemployment gap is wrong-signed at p<0.10. PARTIAL if
+    unemployment gap meets threshold and productivity gap
+    is also significantly positive (productivity-bonus
+    interpretation).
+  test: >
+    Synth-DiD on NZ unemployment rate 1991-1996 vs Anglo
+    donor pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [NZL, AUS, GBR, IRL, USA, CAN]
+  period: [1985, 2000]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: labour_productivity_per_hour
+      source: pwt:rgdpo
+      transformation: log
+  treatment:
+    - name: eca_enactment_1991
+      source: "constructed: indicator for 1991-Q2 ECA enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1991, 1996]
+  countries: [NZL]
+  outcome_dim: [employment_labour, productivity]
+  policy_family: [labour_market]
+  treatment_tags: [nz_employment_contracts_act_1991]
+steelman: hypotheses/steelman/labour_reform_nz_employment_contracts_act_1991.md

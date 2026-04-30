@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_us_eitc_cumulative_1975_2020
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Cumulative US EITC expansions 1975-2020 (1975 introduction, 1986 TRA expansion, 1990/1993 OBRA
+  expansions, 2009 ARRA expansion, 2017 TCJA marginal changes) produced a long-run reduction in
+  single-mother poverty rate of at least 6 percentage points and an increase in single-mother labour-
+  force participation of at least 4 percentage points relative to a counterfactual without the
+  cumulative expansions, identified off state-EITC-supplement variation in panel-FE design and the
+  major-expansion event-windows.
+evidence_type: causal
+prior_confidence: 0.75
+disclosure: |
+  Author views EITC as the most-studied US welfare-architecture innovation with extensive causal
+  literature (Eissa-Liebman 1996; Hoynes-Patel 2018; Bastian-Michelmore 2018). The hypothesis is
+  designed to test the cumulative effect over the full 1975-2020 horizon, distinguishing it from
+  expansion-specific event studies that dominate the literature.
+sample:
+  countries: [USA]
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude state-years missing CPS ASEC tabulation
+variables:
+  outcome:
+  - name: single_mother_poverty_rate
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+    notes: WDI proxy; CPS ASEC single-mother-poverty preferred at wiring.
+  - name: single_mother_labour_force_participation
+    source: bls:LNS11300000
+    transformation: level_pct
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  treatment:
+  - name: federal_eitc_intensity
+    source: fred:STTMINWGCA
+    transformation: log
+    notes: Federal EITC max-credit-real time-series; FRED placeholder pending IRS-SOI wiring.
+  - name: state_eitc_supplement_indicator
+    source: fred:STTMINWGCA
+    transformation: indicator
+    notes: State EITC supplements 1986-2020; FRED placeholder pending state-series wiring.
+  controls:
+  - name: state_minimum_wage
+    source: fred:STTMINWGCA
+    transformation: level
+  - name: state_unemployment_rate
+    source: fred:UNRATE
+    transformation: level
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+intervention_channel: fiscal
+intervention_channel_justification: |
+  EITC is a fiscal-channel refundable tax credit on labour income.
+estimator:
+  template: panel_fe
+  clustering: state
+  fixed_effects: [state, year]
+  notes: |
+    Panel FE on US states 1970-2020 with federal-EITC-intensity time-series and state-EITC-supplement
+    indicators. Cumulative effect identified as the integral of marginal-credit changes against single-
+    mother outcomes.
+falsification:
+  rule: |
+    Refuted if the cumulative ATT on single-mother poverty rate over 1975-2020 is below minus-6pp,
+    OR if cumulative ATT on single-mother LFP is below +4pp, OR if state-EITC-supplement coefficient
+    is non-negative on LFP.
+  test: panel_fe_cumulative_45yr_eitc_single_mother_outcomes
+  threshold: cumulative_poverty_att <= -6pp AND cumulative_lfp_att >= +4pp AND state_supplement_lfp_coef > 0
+scope:
+  period: [1975, 2020]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, employment_labour, welfare_state, taxation]
+  policy_family: [welfare_architecture, tax_policy, labour_market]
+  treatment_tags: [us_eitc_1975, eitc_1986_obra, eitc_1993_obra, eitc_2009_arra]
+steelman: hypotheses/steelman/welfare_transfer_us_eitc_cumulative_1975_2020.md
+linked_hypotheses:
+- welfare_reform_prwora_single_mother_employment
+- clinton_welfare_reform_labour_participation_effect

@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_australia_workchoices_1996_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Australia's 1996 Workplace Relations Act and subsequent 2005
+  WorkChoices amendments (enterprise-bargaining shift, AWA
+  individual contracts, Fair Pay Commission replacing arbitrated
+  awards) accelerated Australian employment-rate growth between
+  1996 and 2007 by at least 1.5 pp relative to a synthetic
+  control of OECD peers, with the largest gains in private-
+  sector employment.
+notes: >
+  Treatment dated 1996-Q4 (Workplace Relations Act enactment).
+  WorkChoices 2005 is treated as a treatment intensification.
+  The 2007 Rudd-government partial repeal provides an
+  endogenous robustness window for testing whether the gain
+  is durable or implementation-conditional.
+prior_confidence: 0.6
+disclosure: >-
+  Author is sympathetic to enterprise-bargaining flexibilisation
+  but recognises Australia's 1996-2007 macro environment was
+  dominated by the China commodity boom — a major confound that
+  the donor pool may not fully absorb.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Australian employment rate
+    > +1.5 pp by 2007 AND the gap is robust to a commodity-
+    price control (terms-of-trade index). REFUTED if employment
+    gap < +0.5 pp OR collapses to insignificance once terms
+    of trade is partialled out (commodity-channel-dominant
+    interpretation).
+  test: >
+    Synth-DiD on Australian employment rate 1996-2007 vs OECD
+    donor pool with terms-of-trade control, placebo permutation
+    at p<0.10.
+evidence_type: associational
+sample:
+  countries: [AUS, NZL, CAN, GBR, USA, IRL, DNK, NLD]
+  period: [1985, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: workplace_relations_act_1996
+      source: "constructed: indicator for 1996-Q4 enactment, intensified 2005-Q4 with WorkChoices"
+      transformation: indicator
+  controls:
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1996, 2007]
+  countries: [AUS]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [australia_workplace_relations_1996, australia_workchoices_2005]
+steelman: hypotheses/steelman/labour_reform_australia_workchoices_1996_employment.md

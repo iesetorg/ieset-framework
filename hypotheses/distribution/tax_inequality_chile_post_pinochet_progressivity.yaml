@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_chile_post_pinochet_progressivity
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Chilean post-Pinochet tax progressivity reforms — Concertación-era
+  Aylwin-Frei marginal-rate increases 1990-1995, Bachelet 2014 reform
+  raising corporate rate from 20 to 27 percent + DTA tightening, Boric
+  2022-2024 reform attempts — produced gradual reductions in the Chilean
+  top-1 pretax income share by at least 1.5 percentage points over
+  1990-2024 vs Latin-American synthetic comparator pool, with most of
+  the level shift concentrated in 1990-2000 rather than the recent
+  reform attempts. The discriminating test is the Chilean trajectory vs
+  LATAM synth.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 5.
+prior_confidence: 0.55
+disclosure: >
+  Author prior accepts that Chilean inequality fell post-Pinochet but is
+  agnostic on whether tax progressivity vs minimum-wage / labour-market
+  formalisation was the dominant channel.
+falsification:
+  rule: >
+    SUPPORTED if Chilean top-1 share falls by at least 1.5 percentage
+    points 1990-2024 vs LATAM synth control at p<0.10. REFUTED if no
+    detectable gap or rise in top-1 share over the period at p<0.10.
+  test: >
+    Synthetic-control with LATAM donor pool (BRA, MEX, ARG, COL, PER, URY),
+    treated CHL 1991.
+evidence_type: associational
+sample:
+  countries: [CHL, BRA, MEX, ARG, COL, PER, URY]
+  period: [1985, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+  treatment:
+    - name: chl_concertacion_post_1990
+      source: "constructed: indicator = 1 for CHL, year >= 1991"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: copper_price_real
+      source: "imf_pcps:PCOPP"
+      transformation: real_yoy_pct_change
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with LATAM donor pool. Multi-step treatment
+    handled via staggered DiD robustness.
+intervention_channel: fiscal
+scope:
+  period: [1990, 2024]
+  countries: [CHL]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [chile_concertacion, bachelet_2014_reform, post_pinochet_progressivity]

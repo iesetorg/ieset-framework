@@ -1,0 +1,163 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  US business-dynamism measures — the firm-formation rate (new
+  establishments per 1000 working-age population), the job-
+  reallocation rate, and the share of employment in firms aged 0-5
+  — declined materially over 1980-2020. Across US states, the
+  magnitude of the dynamism decline is positively associated with
+  the cumulative growth of state-level occupational-licensing
+  prevalence, federal-regulation cost burden allocated to the state,
+  and industry-concentration indices. The Kirznerian-Austrian
+  prediction is that entrepreneurship is a discovery process whose
+  rate of operation depends on the openness of entry, and that
+  rising regulatory and concentration barriers progressively
+  suppress it. Pre-registered claim is that across 4 of 5 canonical
+  metrics (firm formation rate, share of young-firm employment,
+  job reallocation rate, occupational-licensing prevalence,
+  industry concentration), the post-1980 trajectory shows
+  statistically and economically significant deterioration.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [USA]
+  period: [1980, 2020]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop the 2008-2010 GFC window from primary trajectory; report separately"
+
+scope:
+  period: [1980, 2020]
+  countries: [USA]
+  outcome_dim: [productivity, employment_labour, competition_concentration, regulation_compliance_cost]
+  policy_family: [regulation, competition_policy, labour_market]
+  treatment_tags: [business_dynamism_decline, kirznerian_entrepreneurship, occupational_licensing_growth, industry_concentration_rise]
+
+variables:
+  outcome:
+    - name: firm_formation_rate
+      source: "bls:business_dynamics_statistics_firm_births"
+      transformation: level
+      notes: "BLS BDS new-firm formation rate per 1000 working-age population."
+    - name: young_firm_employment_share
+      source: "bls:business_dynamics_statistics_young_firm_employment"
+      transformation: level
+      notes: "Share of employment in firms aged 0-5 years."
+    - name: job_reallocation_rate
+      source: "bls:business_dynamics_statistics_job_reallocation"
+      transformation: level
+      notes: "Sum of job-creation rate and job-destruction rate."
+  treatment:
+    - name: occupational_licensing_prevalence
+      source: "academic:kleiner_krueger_occupational_licensing"
+      transformation: level
+      notes: "Share of US workforce requiring an occupational licence; Kleiner-Krueger and follow-on series."
+    - name: industry_concentration_top4
+      source: "us_census:economic_census_concentration_ratios"
+      transformation: level
+      notes: "Top-4 firm share of industry revenue, US Census Economic Census."
+    - name: federal_regulation_cumulative_pages
+      source: "academic:mercatus_regdata_federal_register"
+      transformation: level
+      notes: "Cumulative pages of federal regulation; Mercatus RegData / federal register."
+
+intervention_channel: regulatory
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    Multi-metric trajectory test: 5 metrics, hypothesis supported if
+    >=4 show economically and statistically significant deterioration
+    over 1980-2020. Heterodox / progressive null is that some
+    dynamism decline reflects beneficial maturation (less Schumpeterian
+    churn = more accumulated firm-specific human capital), and that
+    the regulation-dynamism correlation is reverse-causal (high-tech
+    economies need more regulation than low-tech economies).
+
+canonical_metrics:
+  - metric_id: firm_formation_rate_decline
+    description: "Firm formation rate (new establishments per 1000 working-age population) declines >= 25% from 1980 baseline to 2018 (pre-COVID)."
+    threshold: ">= 25% decline 1980-2018"
+    window: "1980-2018"
+    source: "bls:business_dynamics_statistics_firm_births"
+    direction: supports_claim
+    independence_justification: "Firm-entry metric — primary Kirznerian-discovery proxy."
+  - metric_id: young_firm_employment_share_decline
+    description: "Share of employment in firms aged 0-5 declines >= 30% over 1980-2018."
+    threshold: ">= 30% decline 1980-2018"
+    window: "1980-2018"
+    source: "bls:business_dynamics_statistics_young_firm_employment"
+    direction: supports_claim
+    independence_justification: "Stock measure (employment in young firms), independent of formation flow."
+  - metric_id: job_reallocation_rate_decline
+    description: "Job reallocation rate declines >= 20% over 1980-2018."
+    threshold: ">= 20% decline 1980-2018"
+    window: "1980-2018"
+    source: "bls:business_dynamics_statistics_job_reallocation"
+    direction: supports_claim
+    independence_justification: "Labour-market churn metric — independent of firm-counts."
+  - metric_id: occupational_licensing_growth
+    description: "Share of US workforce requiring occupational licensing rises from <10% in 1970 to >20% by 2010."
+    threshold: ">= 2x growth in licensed-share 1970-2010"
+    window: "1970-2010"
+    source: "academic:kleiner_krueger_occupational_licensing"
+    direction: supports_claim
+    independence_justification: "Regulation-prevalence metric — independent of dynamism outcomes."
+  - metric_id: industry_concentration_rise
+    description: "US industry top-4 concentration rises across the majority of NAICS sectors 1980-2017."
+    threshold: ">= 60% of NAICS sectors show top-4 share rising 1980-2017"
+    window: "1980-2017"
+    source: "us_census:economic_census_concentration_ratios"
+    direction: supports_claim
+    independence_justification: "Concentration metric — independent of regulation and dynamism flows."
+
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+
+falsification:
+  rule: >
+    Hypothesis is supported if >=4 of 5 metrics meet thresholds. A
+    refuted verdict requires that 3+ metrics fail their thresholds —
+    e.g. firm-formation rate did not meaningfully decline, OR
+    occupational licensing did not grow as claimed, OR concentration
+    did not rise across most sectors.
+  test: business_dynamism_decline_canonical_pattern_count
+  threshold: >
+    metrics_met >= 4 of 5 → supported
+    metrics_met <= 2 of 5 → refuted
+
+prior_confidence: 0.75
+
+disclosure: >-
+  Author prior is high (0.75) because the headline business-dynamism
+  decline is one of the most-replicated findings in modern US
+  industrial-organisation research (Decker-Haltiwanger-Jarmin-Miranda
+  papers, the Hathaway-Litan "Declining Business Dynamism" sequence).
+  The contested move is the Austrian causal interpretation — that
+  the decline is regulation- and concentration-driven rather than
+  reflecting a maturing economy or a Schumpeterian winner-takes-most
+  natural progression. Bias risk: the multi-metric checklist
+  conflates the dynamism descriptive pattern (well-documented) with
+  the regulation/concentration causal mechanism (contested);
+  "supported" should be read as the descriptive pattern, with the
+  causal claim left to follow-on hypotheses.
+
+steelman: hypotheses/steelman/austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020.md
+
+linked_hypotheses:
+  - hayek_regulatory_uncertainty_investment_chilling
+  - austrian_rent_seeking_concentration_olson_growth_drag
+
+notes: >
+  Kirzner (1973 Competition and Entrepreneurship; 1997 "Entrepreneurial
+  Discovery and the Competitive Market Process"). Modern empirical
+  adjacents: Decker-Haltiwanger-Jarmin-Miranda BDS analyses,
+  Kleiner-Krueger on occupational licensing, Furman-Orszag on
+  rising industry rents.

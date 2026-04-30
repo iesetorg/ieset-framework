@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_italy_2016_2017_mps
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Italy's 2016-2017 banking-distress episode — Banca Monte dei Paschi di Siena
+  precautionary recapitalisation in July 2017, Veneto-banks resolution in June 2017,
+  and a peak system-wide non-performing-loan ratio above 17% — represents a
+  protracted-NPL-overhang post-GFC banking distress case that did NOT meet the
+  canonical full-systemic-banking-crisis threshold but DID require multiple state-aid
+  resolution events. The hypothesis is that Italy 2016-2017 meets a deliberately-
+  weaker multi-metric checklist on at least 3 of 4 metrics, while explicitly NOT
+  meeting the full Laeven-Valencia systemic-crisis threshold.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [ITA]
+  period: [2010, 2020]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: bank_npl_ratio_peak
+    description: Italian bank-system non-performing-loan ratio peak
+    threshold: ">= 16% gross NPL ratio"
+    window: "2014-2017"
+    source: "world_bank_wdi:FB.AST.NPER.ZS; ecb:CBD2"
+    direction: supports_claim
+    independence_justification: Bank-asset-quality measure.
+  - metric_id: mps_precautionary_recap
+    description: MPS precautionary recapitalisation under BRRD-state-aid framework July 2017
+    threshold: "yes/no — yes counts as breach"
+    window: "2017"
+    source: "ecb:MPS_PRECAUTIONARY_RECAP_2017"
+    direction: supports_claim
+    independence_justification: Resolution event.
+  - metric_id: veneto_banks_resolution
+    description: Banca Popolare di Vicenza + Veneto Banca resolution June 2017
+    threshold: "yes/no — yes counts as breach"
+    window: "2017"
+    source: "ecb:VENETO_BANKS_RESOLUTION_2017"
+    direction: supports_claim
+    independence_justification: Resolution event.
+  - metric_id: bank_credit_to_gdp_decline
+    description: Bank credit to private sector decline from peak
+    threshold: ">= 15 pp of GDP decline"
+    window: "2011-2018"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS; bis:WS_TC"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: bank_npl_ratio
+      source: "world_bank_wdi:FB.AST.NPER.ZS"
+      transformation: peak_level
+    - name: bank_credit_to_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: peak_to_trough
+prior_confidence: 0.85
+disclosure: >
+  Italy 2016-2017 is the textbook "BRRD-era state-aid bank resolution" case. Author
+  market-liberal prior treats Italian NPL overhang as a delayed-cleanup outcome
+  similar in structure (slower) to Japan 1998-2003.
+steelman: hypotheses/steelman/banking_crisis_italy_2016_2017_mps.md
+scope:
+  period: [2010, 2020]
+  countries: [ITA]
+  outcome_dim: [financial_crisis, financialisation]
+  policy_family: [regulation, fiscal_policy]
+  treatment_tags: [italy_2016_2017, monte_dei_paschi_recap_2017, veneto_banks_2017, brrd_state_aid_compromise]

@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_uk_thatcher_union_law_1980s
+version: 1
+status: candidate
+topic: labour
+claim: >
+  The UK 1980-1988 Thatcher Employment Acts (1980, 1982, 1984,
+  1988 — picketing restrictions, secondary-action ban, ballot
+  requirements, closed-shop restrictions) reduced UK strike
+  days lost per 1000 employees by at least 80% between 1980
+  and 1990 relative to a synthetic control of European peers,
+  and lowered the union-wage premium without producing a
+  measurable employment-rate gain.
+notes: >
+  Treatment is a sequence of four Employment Acts plus the 1985
+  Trade Union Act. Treated as a cumulative bundle. UK is the
+  canonical Anglo deunionisation case. The employment-channel
+  test is symmetric: the spec lets a heterodox reader argue
+  that the reforms suppressed union wages without expanding
+  employment.
+prior_confidence: 0.65
+disclosure: >-
+  Author's market-liberal priors are sympathetic to union-law
+  tightening reducing strike activity but is genuinely
+  uncertain whether deunionisation expanded UK employment
+  margins or simply redistributed bargaining-rent from labour
+  to capital.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on UK strike-days lost per 1000
+    employees < -80% by 1990 AND union-wage-premium gap shows
+    a statistically significant negative coefficient at p<0.10.
+    REFUTED if strike-days gap < -50% (insufficient bite)
+    OR if union-wage-premium gap is wrong-signed at p<0.10.
+    PARTIAL if both met but employment-rate gap is also
+    significantly positive (employment-bonus) — that pattern
+    would shift the welfare interpretation.
+  test: >
+    Synth-DiD on UK strike-days, union-wage premium, and
+    employment rate 1980-1990 vs European donor pool, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [GBR, FRA, DEU, ITA, ESP, NLD, BEL, IRL]
+  period: [1975, 1995]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: strike_days_lost_per_1000_employees
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: log
+    - name: union_density
+      source: oecd:DSD_LFS@DF_LFS_UNION
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+  treatment:
+    - name: thatcher_employment_acts_1980_1988
+      source: "constructed: cumulative indicator across 1980, 1982, 1984, 1988 Employment Acts"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1980, 1990]
+  countries: [GBR]
+  outcome_dim: [employment_labour, labour_share]
+  policy_family: [labour_market]
+  treatment_tags: [uk_union_law_reform_1980s, thatcher_reforms_1979]
+steelman: hypotheses/steelman/labour_reform_uk_thatcher_union_law_1980s.md

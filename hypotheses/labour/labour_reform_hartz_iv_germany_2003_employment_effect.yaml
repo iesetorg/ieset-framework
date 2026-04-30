@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_hartz_iv_germany_2003_employment_effect
+version: 1
+status: candidate
+topic: labour
+claim: >
+  The 2003-2005 Hartz I-IV reforms in Germany lowered the German
+  unemployment rate by at least 2 percentage points relative to a
+  synthetic control of non-reforming euro-area peers over the
+  five-year post-period (2005-2010), with the effect concentrated
+  in long-term unemployment exit rates rather than short-duration
+  flows.
+notes: >
+  Standard Schroeder-Agenda-2010 employment claim. The synthetic
+  control donor pool draws on euro-area peers that did not undertake
+  comparable activation/benefit-tightening reforms in the same
+  window. The treatment is dated to 2003-Q1 (Hartz I/II enactment)
+  with the deepest bite arriving 2005-Q1 (Hartz IV merger of
+  unemployment and social assistance). 2008-2010 GFC window flagged
+  as a confound — donor pool absorbs the common shock but
+  asymmetric labour-market exposure remains.
+prior_confidence: 0.65
+disclosure: >-
+  Author's market-liberal priors are sympathetic to activation/
+  benefit-tightening reforms generating employment gains; could
+  over-weight aggregate-employment performance and under-weight
+  the bottom-quintile wage compression that the same reforms
+  arguably produced. The synthetic-control donor weights are
+  sensitive to the inclusion of southern-European peers whose
+  pre-2003 unemployment trajectories differ from Germany's; spec
+  reports both inclusive and Northern-only donor pools.
+falsification:
+  rule: >
+    SUPPORTED if synthetic-control gap on German unemployment
+    rate exceeds -2.0 pp at the 2010 horizon AND the long-term-
+    unemployment-exit-rate channel coefficient is positive at
+    p<0.10. REFUTED if the gap is wrong-signed at p<0.10 or if
+    the long-term exit rate shows no statistically distinguishable
+    movement. PARTIAL if only the headline gap holds with no
+    mechanism evidence.
+  test: >
+    Synth-DiD on German unemployment-rate trajectory 2005-2010
+    against euro-area donor pool with placebo permutation
+    inference; supported if treatment-vs-donor gap < -2.0 pp at
+    p<0.10 by 2010.
+evidence_type: associational
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, AUT, BEL, FIN, PRT, GRC]
+  period: [1995, 2012]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2008-Q4 to 2010-Q4 GFC window for asymmetric-exposure robustness
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: long_term_unemployment_share
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: level
+      notes: OECD share of unemployed >12 months — long-duration channel.
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+  treatment:
+    - name: hartz_iv_enactment
+      source: "constructed: indicator for Hartz I-IV enactment (2003-Q1 through 2005-Q1)"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic DiD with euro-area donor pool. Pre-period 1995-2002
+    used to construct donor weights from outcome-path matching.
+    Placebo permutation on every donor unit for inference.
+scope:
+  period: [2003, 2010]
+  countries: [DEU]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [hartz_reforms_2003, agenda_2010]
+steelman: hypotheses/steelman/labour_reform_hartz_iv_germany_2003_employment_effect.md

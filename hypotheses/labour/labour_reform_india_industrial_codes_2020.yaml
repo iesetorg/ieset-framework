@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_india_industrial_codes_2020
+version: 1
+status: candidate
+topic: labour
+claim: >
+  India's 2019-2020 consolidation of 29 labour laws into 4
+  Codes (Wage Code 2019, Industrial Relations Code 2020,
+  OSH Code 2020, Social Security Code 2020) — implementation
+  pending in many states — raised India's manufacturing
+  formal-employment share by at least 1 pp by 2024 in early-
+  notifying states relative to late-notifying states, exploiting
+  the staggered state-level rollout for identification.
+notes: >
+  Treatment timing varies by state because labour falls under
+  Concurrent List requiring state-level rule notification. As
+  of 2024 about 25 states had pre-published rules; full
+  national implementation has not occurred. Identification
+  uses early-vs-late state staggering.
+prior_confidence: 0.45
+disclosure: >-
+  Author's prior is below 0.5 because (a) most early-notifying
+  states are BJP-aligned and may differ structurally on growth
+  trajectories from late-notifying states, (b) implementation
+  has been patchy. The dispositive identification requires
+  cleaner data than is yet available.
+falsification:
+  rule: >
+    SUPPORTED if early-notifying-state vs late-notifying-state
+    DiD on manufacturing formal-employment share shows >+1.0 pp
+    gap at p<0.10 by 2024, robust to a state political-control
+    control. REFUTED if gap < +0.3 pp OR collapses with
+    political-control adjustment. PARTIAL if gap is significant
+    but small in magnitude.
+  test: >
+    Callaway-Sant'Anna staggered DiD on Indian state panel of
+    manufacturing formal-employment share, 2019-2024, with
+    state and year FE plus state political-control covariate.
+evidence_type: associational
+sample:
+  countries: [IND]
+  period: [2015, 2024]
+  temporal_structure: panel
+  cross_section_justification: "Within-India state panel; cross-state staggered notification of labour-Code rules provides the identification."
+  exclusion_rules:
+    - flag 2020-2021 COVID window for asymmetric state exposure
+variables:
+  outcome:
+    - name: manufacturing_formal_employment_share
+      source: world_bank_wdi:SL.IND.EMPL.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: india_state_code_notification
+      source: "constructed: state-year indicator for labour-Code rules pre-publication date"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: state_political_control
+      source: "constructed: state-year indicator for ruling party (BJP / INC / regional)"
+      transformation: indicator
+estimator:
+  template: did_callaway_santanna
+  clustering: state
+  fixed_effects: [state, year]
+scope:
+  period: [2019, 2024]
+  countries: [IND]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [india_labour_codes_2020]
+steelman: hypotheses/steelman/labour_reform_india_industrial_codes_2020.md

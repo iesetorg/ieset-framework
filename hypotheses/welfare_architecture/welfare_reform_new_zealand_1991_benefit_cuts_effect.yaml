@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_reform_new_zealand_1991_benefit_cuts_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  New Zealand's 1991 'Mother of All Budgets' benefit cuts (8-25% reductions to unemployment, sickness,
+  domestic-purposes, and youth benefits, with stricter eligibility) produced a step-change rise in child
+  poverty (under-65%-median) of at least 6 percentage points within 5 years, identified off the
+  synthetic-control gap with Australia and other small Anglo economies, providing empirical weight to
+  the democratic-socialist critique of front-loaded welfare retrenchment in commodity-exposed economies.
+evidence_type: causal
+prior_confidence: 0.7
+disclosure: |
+  Author has market-liberal priors but documented NZ child-poverty literature (Perry MSD reports;
+  Boston-Chapple 2014) shows large step-changes around 1991 that align with the democratic-socialist
+  critique. Hypothesis is structured to test the magnitude of the step-change against synthetic-control,
+  not to relitigate the broader Ruth Richardson reform package which was bundled with labour-market and
+  privatisation reforms.
+sample:
+  countries: [NZL, AUS, IRL, GBR, CAN]
+  period: [1985, 2000]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 1987 stockmarket-crash year from pre-treatment fit weighting
+variables:
+  outcome:
+  - name: child_poverty_rate_under_65_median
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level_pct
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  treatment:
+  - name: nz_1991_cuts_indicator
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: indicator
+    notes: NZL = 1 from 1991-Q3; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: oecd:DSD_LFS_BS@DF_UNE_RATE
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+intervention_channel: fiscal
+intervention_channel_justification: |
+  The 1991 benefit cuts are a fiscal-channel reduction in transfer levels with regulatory eligibility
+  tightening; primary classification is fiscal.
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic control on NZL child-poverty series 1985-2000 with AUS, IRL, GBR, CAN donor pool.
+    Pre-treatment fit 1985-1990. Robustness: Gini-coefficient parallel synth check.
+falsification:
+  rule: |
+    Refuted if the synthetic-control gap on child-poverty rate at 5-year horizon is below +6pp,
+    OR if placebo permutation p-value exceeds 0.10, OR if Gini parallel synth-control gap is below +0.02.
+  test: synthetic_control_5yr_gap_child_poverty
+  threshold: gap >= +6pp at 5yr horizon AND placebo_p < 0.10 AND gini_gap >= +0.02
+scope:
+  period: [1991, 2000]
+  countries: [NZL, AUS, IRL, GBR, CAN]
+  outcome_dim: [poverty_inequality, welfare_state]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [new_zealand_1991_cuts, ruth_richardson_budget, national_government_bolger]
+steelman: hypotheses/steelman/welfare_reform_new_zealand_1991_benefit_cuts_effect.md

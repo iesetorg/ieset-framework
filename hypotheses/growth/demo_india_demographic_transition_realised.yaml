@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_india_demographic_transition_realised
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  India's demographic transition 1990-2050 was projected (UN-DESA 1990s/2000s) to deliver a
+  large dividend to per-capita growth. The hypothesis tests whether realised per-capita
+  growth 1990-2023 has tracked the Bloom-Williamson predicted dividend or has fallen short.
+  Specifically, the hypothesis predicts realised per-capita growth attributable to working-
+  age share gains is below the predicted dividend by at least 30 percent, suggesting India
+  has under-utilised the window relative to East-Asian comparators.
+evidence_type: descriptive
+sample:
+  countries: [IND, CHN, IDN, VNM, BGD, PAK, PHL, THA]
+  period: [1990, 2023]
+  temporal_structure: time_series
+scope:
+  period: [1990, 2023]
+  countries: [IND]
+  outcome_dim: [gdp_growth, demographics_migration]
+  policy_family: [none]
+  treatment_tags: [india_demographic_transition, dividend_underutilisation]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+  controls:
+    - name: lfp_total
+      source: ilostat:EAP_2WAP_SEX_AGE_RT
+      transformation: level
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+estimator:
+  template: descriptive
+  notes: >
+    Decompose India's per-capita growth into working-age-share component vs per-worker
+    productivity growth; benchmark working-age-share contribution against comparator
+    Asian-tiger trajectories. Report counterfactual per-capita growth had India matched
+    Asian-tiger working-age-to-employment translation.
+falsification:
+  rule: >-
+    SUPPORTED if India's realised per-capita growth attributable to working-age channel is
+    at least 30% below the comparator Asian-tiger benchmark for similar working-age share
+    rises. REFUTED if India tracks within 20% of the Asian-tiger benchmark or exceeds it.
+  test: descriptive_india_dividend_vs_asia_benchmark
+  threshold: "india_dividend_underperformance >= 0.30"
+prior_confidence: 0.6
+disclosure: >-
+  Indian female LFP is unusually low and falling, which mechanically caps working-age
+  translation to employment; risk of mistaking LFP-specific issue for general
+  dividend-underuse.
+steelman: hypotheses/steelman/demo_india_demographic_transition_realised.md

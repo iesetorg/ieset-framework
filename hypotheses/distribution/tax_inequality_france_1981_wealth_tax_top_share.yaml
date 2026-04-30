@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_france_1981_wealth_tax_top_share
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 1981 Mitterrand wealth tax (Impot sur les Grandes Fortunes, suspended
+  1986, reinstated 1988 as ISF) produced a measurable but modest reduction
+  in the French top-1 wealth share over 1981-1985 relative to the synthetic
+  control of comparable continental European economies, with capital-flight
+  attrition smaller than the Macron-era political narrative implied. The
+  discriminating test is the synth-control gap on top-1 wealth share at
+  five-year horizon.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 2. Tests the canonical "wealth
+  tax causes capital flight" narrative against the early French case
+  pre-CRS-era.
+prior_confidence: 0.5
+disclosure: >
+  Author prior is genuinely uncertain — pre-CRS enforcement era plus
+  Mitterrand nationalisation confound make this case hard. Skeptical of
+  both the "huge effect" and "no effect" framings.
+falsification:
+  rule: >
+    SUPPORTED if French top-1 wealth share falls by at least 1 percentage
+    point relative to synthetic-control trajectory over 1981-1985 AND the
+    pre-treatment fit RMSPE is below post-treatment by a factor of 2.
+    REFUTED if no detectable gap (within 0.3pp) at five-year horizon or
+    pre/post RMSPE ratio fails the placebo test.
+  test: >
+    Synthetic control with continental European donor pool (DEU, ITA,
+    BEL, NLD, AUT, CHE), treated FRA 1982. Outcome top-1 wealth share.
+evidence_type: associational
+sample:
+  countries: [FRA, DEU, ITA, BEL, NLD, AUT, CHE]
+  period: [1975, 1990]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID top wealth share"
+variables:
+  outcome:
+    - name: top_1pct_wealth_share
+      source: "owid:top-1-share-of-total-wealth"
+      transformation: level
+    - name: top_10pct_wealth_share
+      source: "owid:top-10-share-of-total-wealth"
+      transformation: level
+  treatment:
+    - name: igf_1982_fra_post
+      source: "constructed: indicator = 1 for FRA, year >= 1982"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with continental EU donor pool. Treated FRA 1982.
+    Placebo-in-time at 1979 + placebo-in-space across donor pool.
+intervention_channel: fiscal
+scope:
+  period: [1981, 1990]
+  countries: [FRA]
+  outcome_dim: [poverty_inequality, taxation, capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [mitterrand_wealth_tax_1982, igf_1982, french_isf_predecessor]

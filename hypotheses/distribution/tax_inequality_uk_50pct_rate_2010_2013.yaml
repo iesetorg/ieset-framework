@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_uk_50pct_rate_2010_2013
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The UK's temporary 50 percent additional rate on income above GBP 150,000
+  (introduced April 2010, reduced to 45 percent April 2013) produced a
+  large transitory dip in reported top-1 pretax income share via 2009-2010
+  realisation forestalling, with limited persistent effect once the
+  realisation pull-back unwinds. The HMRC 2012 elasticity-of-taxable-income
+  evaluation estimated central ETI of 0.48; the discriminating test is
+  whether reported top-1 share returns to trend by 2014 within HMRC's ETI
+  band.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 4. Tests HMRC 2012 official ETI
+  estimate against post-2014 reversion data.
+prior_confidence: 0.6
+disclosure: >
+  Author prior accepts that the 2010-2013 episode was substantially
+  forestalling-driven; the HMRC 2012 ETI estimate is consistent with
+  most independent reviews.
+falsification:
+  rule: >
+    SUPPORTED if UK top-1 pretax share shows a clear 2009-2010 forestalling
+    spike of at least 1 percentage point AND post-2014 reversion to within
+    0.5 percentage points of the 2007-2008 baseline at p<0.10. REFUTED if
+    forestalling spike is below 0.3 pp or post-2014 share remains more
+    than 1pp below baseline at p<0.10.
+  test: >
+    UK time-series with explicit forestalling-window dummy 2009-2010 and
+    structural breaks at 2010-Apr and 2013-Apr.
+evidence_type: associational
+sample:
+  countries: [GBR]
+  period: [2000, 2018]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: top_0p1pct_pretax_income_share
+      source: "owid:top-0-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: forestalling_window_2009_2010
+      source: "constructed: indicator = 1 for fiscal-years 2009/10"
+      transformation: indicator
+    - name: rate_50pct_window_2010_2013
+      source: "constructed: indicator = 1 for fiscal-years 2010/11 to 2012/13"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Event study with two breaks 2010-Apr and 2013-Apr plus 2009-2010
+    forestalling dummy. HAC SEs.
+intervention_channel: fiscal
+scope:
+  period: [2010, 2018]
+  countries: [GBR]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [uk_50pct_rate_2010, brown_darling_top_rate, hmrc_eti_2012]

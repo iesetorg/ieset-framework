@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_uae_diversification_economic_complexity_1990_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  The UAE's 1990-2024 diversification trajectory — Dubai's services / logistics / finance
+  / tourism build-out, Abu Dhabi's hydrocarbon-anchored sovereign-wealth model, free-zone
+  proliferation (DIFC, ADGM, JAFZA) — produced the most successful Gulf transition from
+  hydrocarbon-rent dependency, visible in non-oil-GDP share, services-export composition,
+  and tourism / aviation hub metrics. The pre-registered claim is that, in a synthetic-
+  control design with GCC peers (Saudi Arabia, Kuwait, Qatar, Oman, Bahrain), UAE's
+  cumulative log-GDP-pc growth 1990-2024 exceeds the synthetic counterfactual by at
+  least 30 log-points AND non-oil exports as share of total exports rises by at least
+  20 percentage points more than counterfactual. The null counter-claim is that UAE's
+  outperformance is driven by Dubai's port-and-aviation geographical advantage rather
+  than replicable policy content, and the GCC-peer benchmark cannot adequately capture
+  the geographical premium.
+evidence_type: causal
+sample:
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 1985
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag Qatar 2017-2021 GCC blockade
+  - exclude COVID 2020Q2-2020Q4 from fitting
+scope:
+  period:
+  - 1985
+  - 2024
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - gdp_growth
+  - trade_liberalisation
+  - industrial_capability
+  - capital_flows
+  policy_family:
+  - trade_policy
+  - regulation
+  - industrial_policy
+  treatment_tags:
+  - uae_freezone_proliferation
+  - dubai_services_pivot_1990s
+  - uae_diversification_2000s
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: services_export_share
+    source: world_bank_wdi:TX.VAL.SERV.CD.WT
+    transformation: level
+  - name: non_oil_exports_share
+    source: world_bank_wdi:TX.VAL.MMTL.ZS.UN
+    transformation: level
+    notes: Computed as 1 - fuel exports share of merchandise.
+  - name: fdi_inflow_share_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS; unctad:World
+    transformation: level
+  treatment:
+  - name: uae_diversification_indicator
+    source: 'constructed: 1 for ARE from 1990 onward'
+    transformation: binary
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: pre_treatment_oil_share_gdp
+    source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+    transformation: average_1985_1989
+intervention_channel: bundled
+intervention_channel_justification: >-
+  UAE diversification bundles regulatory-channel (free-zone proliferation, foreign-
+  ownership rules), trade-policy (port and aviation hub strategy, low-tariff regime),
+  industrial-policy (Emirates airline, Dubai Ports World, sovereign-wealth-fund
+  strategic investments), and institutional (commercial-court reforms via DIFC/ADGM
+  common-law jurisdictions) channels.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with ARE treated from 1990 and GCC peer donor pool. Secondary:
+    Callaway-Sant'Anna DiD. Robustness drops Qatar (idiosyncratic blockade-era
+    confound). Geography-adjusted specification regresses out distance-to-major-
+    shipping-lanes coefficient.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) cumulative log-GDP-pc growth gap 1990-2024 is less than
+    +30 log-points at p_perm < 0.10, OR (b) non-oil-exports share gap is less than +20
+    ppts, OR (c) the geography-adjusted specification reduces the cumulative gap by
+    more than 60% (i.e. the geographical-hub channel dominates and the policy-content
+    channel cannot be cleanly identified).
+  test: synth_did_with_geography_robustness
+  threshold: >-
+    cumulative_log_gdp_pc_gap >= 0.30 at p_perm < 0.10 AND non_oil_exports_share_gap >=
+    20 ppts AND geography_adjusted_residual_gap >= 0.40 * raw_gap
+prior_confidence: 0.65
+disclosure: >-
+  Author's prior is fairly high on UAE outperformance vs GCC peers; the absolute
+  magnitudes are large in raw data. Prior 0.65 reflects this confidence, tempered by
+  the geography-vs-policy attribution problem the steelman raises and by data-quality
+  issues for UAE pre-2005 (unified federal accounts only stabilised in mid-2000s).
+conflict_disclosure: No UAE asset exposure or affiliations.
+steelman: hypotheses/steelman/mena_uae_diversification_economic_complexity_1990_2024.md
+notes: >-
+  Data-gated on FCSA / SCAD long-run series (recent reconstruction), WDI / IMF Article
+  IV. The pre-1990 UAE federal accounts are partially reconstructed; long-run
+  comparison is most reliable from 1995 onward.

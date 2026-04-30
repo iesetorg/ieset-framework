@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: hayek_decentralised_governance_swiss_cantonal_growth
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Across 26 Swiss cantons 1990-2023, cantons with persistently lower
+  effective corporate tax rates, looser regulatory burden, and higher
+  Fraser-style sub-national economic-freedom ranks exhibit higher
+  per-capita GDP growth, higher private business formation rates,
+  and higher net inward migration of high-earning workers than
+  cantons with persistently tighter regulation and higher tax rates.
+  This is the Hayekian prediction in microcosm: decentralised
+  jurisdictional competition produces a discovery process that
+  selects efficient policy bundles. Switzerland's 26-canton
+  experiment with substantial fiscal and regulatory autonomy is the
+  cleanest available test inside a single-currency, single-language-
+  family, single-rule-of-law institutional environment.
+
+evidence_type: associational
+
+sample:
+  countries: [CHE]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop the COVID 2020-2021 window from the migration outcome (border closures distort)"
+    - "Geneva and Zurich excluded from primary high-vs-low-tax comparison and reported separately (international-finance hub effects)"
+
+scope:
+  period: [1990, 2023]
+  countries: [CHE]
+  outcome_dim: [gdp_growth, institutional_quality, demographics_migration]
+  policy_family: [tax_policy, regulation, institutional_reform]
+  treatment_tags: [swiss_cantonal_autonomy, jurisdictional_competition, hayekian_discovery_process]
+
+variables:
+  outcome:
+    - name: cantonal_gdp_per_capita_growth_5y
+      source: "swiss_fso:gdp_cantonal"
+      transformation: log_diff_5y
+    - name: cantonal_business_formation_rate
+      source: "swiss_fso:business_demography"
+      transformation: level
+      notes: "New enterprise registrations per 1000 working-age population."
+    - name: net_high_earner_migration
+      source: "swiss_fso:tax_migration_register"
+      transformation: level
+      notes: "Net cross-cantonal migration of taxpayers in the top income decile."
+  treatment:
+    - name: cantonal_effective_corporate_tax_rate
+      source: "swiss_fso:fiscal_statistics_cantonal"
+      transformation: level
+    - name: cantonal_regulatory_burden_index
+      source: "academic:swiss_cantonal_regulation_index"
+      transformation: level
+      notes: "BAK Economics or KOF cantonal-regulation indices."
+    - name: cantonal_top_income_tax_rate
+      source: "swiss_fso:fiscal_statistics_cantonal"
+      transformation: level
+  controls:
+    - name: cantonal_population_density
+      source: "swiss_fso:population_statistics"
+      transformation: log
+    - name: cantonal_industry_composition
+      source: "swiss_fso:gdp_cantonal_by_sector"
+      transformation: shares
+    - name: language_region_fixed_effect
+      source: "constructed: German / French / Italian / Romansh region indicator"
+      transformation: categorical
+
+intervention_channel: bundled
+
+intervention_channel_justification: >
+  Cantonal autonomy bundles tax, regulatory, and institutional choices.
+  The pre-registered design tests the bundle against outcomes; sub-
+  channel decomposition (which margin matters most) is left to a
+  follow-on hypothesis.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [canton, year]
+  clustering: canton
+  notes: >
+    Canton-year panel, two-way FE, clustered by canton. Three parallel
+    regressions on the three outcomes. Heterogeneity: report the
+    French-speaking vs German-speaking sub-samples separately because
+    institutional culture varies. Heterodox / social-democratic null
+    is that low-tax cantons are simply attracting tax-avoidance
+    activity rather than productive investment, so the GDP-growth
+    correlation reflects accounting relocation not real growth. The
+    business-formation outcome is the cleanest discriminator because
+    accounting relocation does not require new firms to be founded.
+
+falsification:
+  rule: >
+    The hypothesis is falsified if at least 2 of the 3 outcomes do
+    not show the predicted sign at p<0.05, OR if the business-formation
+    outcome (the discriminator from accounting-relocation) is not
+    significantly positive at p<0.05.
+  test: panel_fe_cantonal_freedom_three_outcome_test
+  threshold: >
+    sign(low_tax → gdp_pc_growth) > 0 at p<0.05
+    AND sign(low_regulatory_burden → business_formation) > 0 at p<0.05
+    AND sign(low_tax → net_high_earner_migration) > 0 at p<0.05
+    REQUIRED: at least 2 of 3, INCLUDING the business_formation channel
+
+prior_confidence: 0.65
+
+disclosure: >-
+  Author prior 0.65 — the Swiss cantonal pattern (Zug attracting
+  corporate HQs, Schwyz attracting wealthy individuals, Vaud-Geneva
+  competing on hub status) is well-documented in EU-tax-competition
+  literature. The Hayekian reading is contested by social-democratic
+  critics who frame it as tax-base erosion harming high-tax cantons
+  rather than discovery process producing efficient bundles. Bias
+  risk: author finds the jurisdictional-competition framing
+  intellectually attractive; the test deliberately requires the
+  business-formation channel (which does not allow accounting
+  relocation) to take the discovery interpretation seriously.
+
+steelman: hypotheses/steelman/hayek_decentralised_governance_swiss_cantonal_growth.md
+
+linked_hypotheses:
+  - hayek_regulatory_uncertainty_investment_chilling
+
+notes: >
+  Hayek (1939 "The Economic Conditions of Interstate Federalism"; 1948
+  "Individualism and Economic Order"). Modern adjacents: Tiebout
+  (1956), Bewley critique. Swiss cantonal autonomy is closer to a
+  natural experiment than US-state competition because the cantonal
+  policy space is genuinely autonomous on tax, regulation, and
+  spending in ways US states are not.

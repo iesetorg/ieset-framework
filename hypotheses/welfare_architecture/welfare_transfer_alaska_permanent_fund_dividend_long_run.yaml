@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_alaska_permanent_fund_dividend_long_run
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Alaska's Permanent Fund Dividend (PFD, established 1982 paying annual dividends to all Alaska
+  residents from oil-revenue-funded sovereign wealth) — averaging USD 1100-2000 per resident-year over
+  1982-2024 — has produced a measurable and persistent reduction in extreme-poverty rate of at least
+  3 percentage points relative to a synthetic-control of comparable resource-rich US states (Wyoming,
+  North Dakota, Texas, Louisiana) without affecting state-level employment-rate, providing the longest-
+  running natural-experiment evidence for non-trivial unconditional-cash-floor effects in a US-state
+  high-income institutional environment.
+evidence_type: causal
+prior_confidence: 0.6
+disclosure: |
+  Author has market-liberal priors that view PFD as a successful sovereign-wealth-fund design with
+  documented modest effects on poverty. Hypothesis tests both poverty arm (expected support) and
+  employment arm (expected null) jointly.
+sample:
+  countries: [USA]
+  period: [1980, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude AK, WY pre-statehood-style anomalous years 1980-1981 from pre-treatment fit
+variables:
+  outcome:
+  - name: extreme_poverty_rate_state
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+    notes: WDI proxy; US Census ACS state-level poverty preferred at wiring.
+  - name: employment_rate_working_age
+    source: bls:LNS11300000
+    transformation: level_pct
+  - name: in_migration_rate
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+    notes: Migration as channel through which PFD-induced settlement might mute the effect.
+  treatment:
+  - name: pfd_indicator
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: indicator
+    notes: AK = 1 from 1982; 0 for donor pool of resource-rich US states.
+  controls:
+  - name: oil_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+intervention_channel: fiscal
+intervention_channel_justification: |
+  PFD is a fiscal-channel sovereign-wealth-distribution transfer.
+estimator:
+  template: synth_did
+  clustering: state
+  fixed_effects: [state, year]
+  notes: |
+    Synthetic-DiD on AK with WY, ND, TX, LA donor pool 1980-2023. Pre-treatment fit 1980-1981.
+    Long-run trajectory 1982-2023 with post-period heterogeneity by oil-cycle phases.
+falsification:
+  rule: |
+    Refuted on the poverty arm if the synth-DiD ATT on extreme-poverty rate at 20-year horizon is
+    below minus-3pp (i.e., reduction less than 3pp), OR placebo p > 0.10. Refuted on the employment
+    arm if the employment-rate ATT exceeds plus or minus 1pp at 20-year horizon (i.e., a non-null
+    employment effect would refute the joint pattern).
+  test: synth_did_20yr_paired_poverty_employment
+  threshold: poverty_att <= -3pp AND abs(employment_att) <= 1pp AND placebo_p < 0.10
+scope:
+  period: [1982, 2023]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, welfare_state, employment_labour]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [alaska_permanent_fund_dividend_1982, hammond_governor_administration, sovereign_wealth_fund]
+steelman: hypotheses/steelman/welfare_transfer_alaska_permanent_fund_dividend_long_run.md

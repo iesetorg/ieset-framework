@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fed_qt_balance_sheet_unwind_2022_2025_market_response
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  Fed quantitative tightening (QT) 2022-06 to 2025 — running off Treasury and
+  MBS holdings at peak ~$95B/month (slowed to ~$60B in 2024-Q2) — produced
+  small but detectable upward pressure on term premia and mortgage spreads,
+  consistent with the QE channel operating in reverse but at materially
+  weaker magnitude per dollar of balance-sheet change. Asymmetric: QT effects
+  are roughly half the size of QE effects per equivalent balance-sheet
+  movement, supporting the "stock-not-flow" channel and suggesting market
+  segmentation matters less in unwind than in accumulation.
+notes: >-
+  Reverse-QE test on the 2022-2025 unwind. Asymmetry prediction (QT < QE
+  in absolute size) is the central testable claim distinct from "QT works
+  same as QE backwards". Tests Bauer-Rudebusch, Krishnamurthy-Vissing-Jorgensen
+  reverse-channel implications.
+prior_confidence: 0.65
+disclosure: >-
+  Author finds the asymmetry prediction (QT effect ~half of QE effect per
+  dollar) plausible based on portfolio-rebalancing theory but the empirical
+  evidence is thin and the 2022-2025 sample is contaminated by simultaneous
+  rate-hike effects, regional-bank stress 2023-Q1, and Treasury issuance
+  shifts. Risk is over-cleanly attributing observed term-premium movements
+  to QT vs other simultaneous shocks.
+steelman: hypotheses/steelman/fed_qt_balance_sheet_unwind_2022_2025_market_response.md
+evidence_type: associational
+falsification:
+  rule: >-
+    Daily event study around six QT-related Fed communications: 2022-05-04
+    (May FOMC QT plan), 2022-06-01 (QT begins), 2022-09-01 (cap doubles),
+    2024-05-01 (QT taper announced), 2024-06-01 (taper begins), 2025-01
+    (further taper or end announcement). For each event, compute 1-day
+    and 5-day changes in 10y term premium (NY Fed ACM model) and 30y
+    mortgage spread to 10y Treasury. SUPPORTED if (a) cumulative
+    1-day term-premium change across all six events is positive AND
+    in [+10bp, +40bp] AND (b) per-dollar effect (cumulative bp /
+    cumulative balance-sheet movement in $T) is in [3bp/$T, 12bp/$T],
+    materially smaller than QE-era estimate (~25bp/$T per Bauer-Rudebusch
+    2014). REFUTED if cumulative term-premium change <=0 (no QT effect)
+    OR per-dollar effect >20bp/$T (symmetric, contradicts asymmetry
+    prediction).
+  test: fed_qt_2022_2025_event_study_term_premium_mortgage_spread
+  threshold: >-
+    SUPPORTED: cumul 1-day TP change in [+10bp, +40bp] AND per-$T effect
+    in [3, 12] bp/$T.
+    REFUTED: cumul TP <= 0 OR per-$T effect > 20bp/$T.
+scope:
+  period: [2022, 2025]
+  countries: [USA]
+  outcome_dim: [monetary_policy, financialisation, housing]
+  policy_family: [monetary_policy]
+  treatment_tags: [fed_qt_2022_2025, balance_sheet_unwind, reverse_qe_channel, mortgage_spread_response]
+sample:
+  countries: [USA]
+  period: [2020, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2023-03-09 to 2023-03-31 SVB/regional-bank crisis window from primary; sensitivity check"
+variables:
+  outcome:
+    - name: treasury_yield_10y
+      source: "fred:DGS10"
+      transformation: level
+    - name: treasury_yield_30y
+      source: "fred:DGS30"
+      transformation: level
+    - name: ny_fed_acm_term_premium_10y
+      source: "fred:THREEFYTP10"
+      transformation: level
+    - name: mortgage_30y_rate
+      source: "fred:MORTGAGE30US"
+      transformation: level
+    - name: mortgage_treasury_spread
+      source: "fred:MORTGAGE30US; fred:DGS10"
+      transformation: spread_bps
+    - name: mbs_oas_spread
+      source: "fred:BAMLC0A0CMTRIV"
+      transformation: level
+  treatment:
+    - name: fed_balance_sheet_walcl
+      source: "fred:WALCL"
+      transformation: log_diff
+    - name: qt_announcement_event
+      source: "constructed: 6 events 2022-05-04, 2022-06-01, 2022-09-01, 2024-05-01, 2024-06-01, 2025-01-XX"
+      transformation: event_date
+    - name: fed_funds_target
+      source: "fred:DFEDTARU"
+      transformation: level
+  controls:
+    - name: treasury_issuance_pace
+      source: "fred:MTSDS133FMS"
+      transformation: log_diff
+    - name: vix
+      source: "fred:VIXCLS"
+      transformation: level
+    - name: cpi_yoy
+      source: "fred:CPIAUCSL"
+      transformation: pct_change_yoy
+estimator:
+  template: event_study
+  clustering: announcement
+  notes: >-
+    Daily event study, mirroring qe_zlb_effectiveness_term_premia.yaml
+    structure on the unwind side. Per-dollar effect normalisation enables
+    direct comparison to QE-era literature estimates. Asymmetry test is
+    the distinctive contribution beyond binary direction-of-effect.

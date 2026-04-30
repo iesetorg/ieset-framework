@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_france_2017_isf_to_ifi_abolition
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Macron's 2017 reform replacing the French ISF (Impot de Solidarite sur
+  la Fortune) with the IFI (real-estate-only wealth tax) and the introduction
+  of the 30 percent flat tax (PFU) on capital income produced a measurable
+  rise in the French top-1 pre-tax income share over 2018-2022 relative to
+  Eurozone synthetic control, but a smaller-than-projected fall in HNW
+  emigration once concurrent CRS enforcement is accounted for. The
+  discriminating test pairs top-share rise vs HNW outbound migration vs
+  synthetic-control trajectory.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 2. Tests the "ISF abolition
+  caused exodus reversal" narrative against the broader CRS-enforcement
+  confound.
+prior_confidence: 0.55
+disclosure: >
+  Author prior accepts the top-1 share rose post-2018 in France but is
+  skeptical that the Macron reform alone caused a substantial migration
+  reversal beyond what CRS-era enforcement would have produced.
+falsification:
+  rule: >
+    SUPPORTED if French top-1 pretax share rises by at least 0.75
+    percentage points 2017-2022 vs synthetic-control trajectory at p<0.10.
+    REFUTED if no detectable gap (within 0.3pp) or the gap is negative
+    at five-year horizon.
+  test: >
+    Synthetic-control with Eurozone donor pool, treated FRA 2018.
+evidence_type: associational
+sample:
+  countries: [FRA, DEU, ITA, ESP, NLD, BEL, AUT, PRT, FIN]
+  period: [2010, 2023]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: top_1pct_wealth_share
+      source: "owid:top-1-share-of-total-wealth"
+      transformation: level
+  treatment:
+    - name: isf_to_ifi_2018_fra_post
+      source: "constructed: indicator = 1 for FRA, year >= 2018"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with Eurozone donor pool. Treated FRA 2018. Placebo-
+    in-time at 2014. Robustness with synth_did.
+intervention_channel: fiscal
+scope:
+  period: [2017, 2023]
+  countries: [FRA]
+  outcome_dim: [poverty_inequality, taxation, capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [macron_isf_abolition_2018, ifi_pfu_2018, wealth_tax_reform]

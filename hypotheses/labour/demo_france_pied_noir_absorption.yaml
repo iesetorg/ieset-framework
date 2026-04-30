@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_france_pied_noir_absorption
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  France absorbed approximately 800,000-1,000,000 pied-noir repatriates from Algeria in
+  1962-1963, equivalent to roughly 2% of the French population. The hypothesis tests
+  whether the rapid inflow caused (a) measurable labour-market disruption in destination
+  regions over 1962-1970, and (b) whether absorption was relatively rapid (within 10 years)
+  by per-capita-output and employment-rate metrics, supporting the Hunt (1992) finding of
+  fast convergence.
+evidence_type: descriptive
+sample:
+  countries: [FRA]
+  period: [1955, 1980]
+  temporal_structure: time_series
+scope:
+  period: [1955, 1980]
+  countries: [FRA]
+  outcome_dim: [demographics_migration, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [pied_noir_1962, mass_absorption_event]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: maddison:mpd2020
+      transformation: yoy_log_diff
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+      notes: WDI series starts 1991; pre-1991 unemployment routed via OECD historical or manual-drop.
+  treatment:
+    - name: pied_noir_event_indicator
+      source: "constructed: indicator pulses 1962-1963; population-share inflow ~2%."
+      transformation: indicator
+  controls:
+    - name: real_gdp_growth_total
+      source: maddison:mpd2020
+      transformation: yoy_log_diff
+estimator:
+  template: event_study
+  notes: >
+    Single-country event-study around 1962-1963; report deviation from pre-event trajectory
+    in GDP-per-capita growth and unemployment. Pre-period 1955-1961, event 1962-1963,
+    post-period 1964-1972.
+falsification:
+  rule: >-
+    SUPPORTED if French per-capita growth and unemployment trajectories show no significant
+    deviation from pre-event trend within 10 years (Hunt 1992 pattern), with deviation
+    confidence band including zero. REFUTED if a sustained negative deviation in per-capita
+    growth or sustained unemployment-rise persists past 1972.
+  test: event_study_pied_noir_absorption_1962
+  threshold: "deviation_10yr_p > 0.05 AND no_persistent_unemployment_rise"
+prior_confidence: 0.65
+disclosure: >-
+  Hunt (1992) establishes the rapid-absorption finding for the regional labour market;
+  national-level test may not detect what was a regional shock. Acknowledged underpowered
+  for high-confidence inference.
+steelman: hypotheses/steelman/demo_france_pied_noir_absorption.md

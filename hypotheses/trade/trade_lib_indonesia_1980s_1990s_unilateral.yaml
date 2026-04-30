@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_indonesia_1980s_1990s_unilateral
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Indonesia's 1985-1995 unilateral trade-liberalisation reforms
+  (tariff reductions, customs reform under the Inpres 4 1985
+  package, removal of import licensing) raised manufacturing
+  exports and trade-openness ratios over the 1985-1996 window
+  before the 1997 Asian Financial Crisis interrupted the
+  trajectory. The descriptive claim is a structural break with
+  trade-share rising substantially over the pre-AFC decade.
+
+evidence_type: descriptive
+
+sample:
+  countries: [IDN, MYS, THA, PHL]
+  period: [1975, 2000]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop 1997-1999 AFC years from primary spec; report sensitivity"
+
+scope:
+  period: [1975, 2000]
+  countries: [IDN]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy]
+  treatment_tags: [indonesia_inpres_1985, indonesia_unilateral_liberalisation, manufacturing_export_promotion]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Tariff and import-licensing reform — regulatory / trade-policy
+  intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive structural-break test. Pre-1985 (1975-1984) vs
+    post-1985 pre-AFC (1986-1996) trade-openness comparison for
+    Indonesia. Comparison with Southeast Asian peers as
+    auxiliary descriptive context.
+
+falsification:
+  rule: >
+    SUPPORTED if mean trade-openness 1986-1996 minus mean trade-
+    openness 1975-1984 exceeds +10 pp. REFUTED if less than +5 pp.
+  test: indonesia_pre_post_1985_trade_openness_break
+  threshold: >
+    PRIMARY: openness_change(1986-1996 vs 1975-1984) >= +10 pp.
+
+prior_confidence: 0.78
+
+disclosure: >
+  Prior moderate-high (0.78). The Indonesian 1980s opening is
+  documented (Hill 2000; Aswicahyono-Hill 2014). Heterodox readers
+  note the AFC reversal and the role of state-owned enterprises
+  and rent-seeking under the Suharto regime that the trade-share
+  metric does not capture.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_indonesia_1980s_1990s_unilateral.md

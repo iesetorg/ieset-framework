@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_nz_2010_gst_rate_swap
+version: 1
+status: draft
+topic: distribution
+claim: >
+  New Zealand's 2010 tax swap (GST rate raised from 12.5 to 15 percent,
+  paired with personal income tax rate cuts including the top rate from
+  38 to 33 percent) produced a measurable rise in the New Zealand top-1
+  pretax income share over 2010-2014 vs Anglo-comparator synthetic
+  control, with smaller but detectable rise in the disposable-income
+  Gini coefficient driven by the GST regressivity. The discriminating
+  test pairs top-1 share rise vs disposable Gini rise.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 4.
+prior_confidence: 0.6
+disclosure: >
+  Author prior accepts that the Key 2010 swap was top-progressive on
+  income side and bottom-regressive on consumption side; net distributional
+  effect was top-favoured.
+falsification:
+  rule: >
+    SUPPORTED if NZ top-1 share rises by at least 0.75 percentage points
+    over 2010-2014 vs Anglo synthetic control AND disposable-income Gini
+    rises by at least 0.5 Gini-points at p<0.10. REFUTED if no detectable
+    movement on either margin at the four-year horizon.
+  test: >
+    Synthetic-control with Anglo donor pool (AUS, CAN, GBR, IRL, USA),
+    treated NZL 2010.
+evidence_type: associational
+sample:
+  countries: [NZL, AUS, CAN, GBR, IRL, USA]
+  period: [2000, 2018]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+  treatment:
+    - name: nz_2010_gst_swap_post
+      source: "constructed: indicator = 1 for NZL, year >= 2010"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with Anglo donor pool. Treated NZL 2010. Placebo-
+    in-time 2005.
+intervention_channel: fiscal
+scope:
+  period: [2010, 2018]
+  countries: [NZL]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [key_2010_tax_swap, gst_regressive, top_rate_cut_anglo]

@@ -49,6 +49,61 @@ export async function loadHypothesis(id: string): Promise<Hypothesis | null> {
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// Public-visibility gate.
+//
+// The repo carries 270+ hypothesis YAMLs but only a subset are READY to show
+// publicly. The rest are stubs without a real replication.py, or auto-graded
+// against the generic falsification boilerplate ("…when this stub is promoted
+// from draft"). Showing those in the homepage / scoreboard / hypothesis index
+// would hand readers fake-clean SUPPORTED/refuted verdicts that aren't pinned
+// to a dispositive pre-registered threshold.
+//
+// A hypothesis is publicly visible iff:
+//   1. A run directory exists with a real replication.py (not just an
+//      auto-generated diagnostics stub).
+//   2. diagnostics.json has a verdict that doesn't start with stub / pending /
+//      blocked / error markers.
+//   3. The falsification rule is sharpened — either the rule field itself is
+//      not the boilerplate, OR the methodology_note explains the dispositive
+//      sharpening and the replication.py encodes it.
+//
+// Hidden hypotheses still have their YAML on disk and can be drilled into by
+// link, but they don't appear in indexes / scoreboards / featured lists. This
+// is the "fix or hide" call from the integrity audit.
+import { existsSync as _existsSync } from "node:fs";
+const _STUB_RULE_MARKER = "when this stub is promoted from draft";
+
+export function isHypothesisPubliclyVisible(
+  h: Hypothesis,
+  run: { exists?: boolean; verdict?: string }
+): boolean {
+  if (!run.exists) return false;
+  const v = (run.verdict ?? "").toLowerCase().trim();
+  if (!v) return false;
+  if (
+    v.startsWith("inconclusive_data_pending") ||
+    v.startsWith("blocked") ||
+    v.startsWith("error") ||
+    v.startsWith("no verdict")
+  )
+    return false;
+  // Must have a replication.py — pure auto-grader stubs don't count.
+  const replPath = join(REPO_ROOT, "engine", "runs", h.hypothesis_id, "replication.py");
+  if (!_existsSync(replPath)) return false;
+
+  // Falsification rule sharpened?
+  const rule = h.falsification?.rule ?? "";
+  const ruleSharpened = !rule.toLowerCase().includes(_STUB_RULE_MARKER);
+  if (ruleSharpened) return true;
+
+  // Stub rule but methodology_note explains the sharpening:
+  const mn = (h.notes ?? "").toLowerCase() + " " + ((h as unknown as { methodology_note?: string }).methodology_note ?? "").toLowerCase();
+  if (mn.includes("dispositive") || mn.includes("sharpened") || mn.includes("primary (dispositive")) return true;
+
+  return false;
+}
+
 // Memoize at module scope. Static export hits this from many pages.
 let _allHypothesesCache: Promise<Hypothesis[]> | null = null;
 
@@ -478,13 +533,22 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       partial = 0,
       untested = 0;
 
+    const hypById = new Map(hypotheses.map((h) => [h.hypothesis_id, h] as const));
     for (let idx = 0; idx < claims.length; idx++) {
       const c = claims[idx];
       const exists = hypIds.has(c.linked_hypothesis_id);
       let verdict: string | undefined;
       if (exists) {
         const run = await loadRunArtifacts(c.linked_hypothesis_id);
-        verdict = run.verdict;
+        const linkedHyp = hypById.get(c.linked_hypothesis_id);
+        // Public-visibility gate: only count verdicts from hypotheses that
+        // pass the integrity bar (sharpened rule + real replication + real
+        // verdict). Verdicts auto-graded against the generic falsification
+        // boilerplate are excluded from school net-scores — they're not
+        // dispositive enough to update a position's standing.
+        if (linkedHyp && isHypothesisPubliclyVisible(linkedHyp, run)) {
+          verdict = run.verdict;
+        }
       }
       // Phase 3: hypothesis-side coverage takes precedence. If the linked
       // hypothesis has declared a covers_claims entry for this specific

@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_australia_high_skill_migration
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Australia's skill-stream-dominant immigration policy (skill stream ~60-70% of permanent
+  migration since 1996) is associated with above-comparator gains in foreign-born tertiary
+  share and labour-force-participation contribution. The hypothesis predicts Australia's
+  foreign-born employment-rate is at parity with native employment-rate (within 2pp), in
+  contrast to many European destinations where the foreign-born employment gap exceeds 5pp.
+evidence_type: associational
+sample:
+  countries: [AUS, NZL, CAN, USA, GBR, DEU, FRA, NLD, SWE, NOR, DNK, BEL, AUT, CHE, IRL]
+  period: [1996, 2023]
+  temporal_structure: panel
+scope:
+  period: [1996, 2023]
+  countries: [AUS]
+  outcome_dim: [demographics_migration, employment_labour]
+  policy_family: [labour_market, institutional_reform]
+  treatment_tags: [australia_skill_stream_1996, high_skill_migration]
+variables:
+  outcome:
+    - name: foreign_born_native_employment_gap
+      source: oecd:OECD.ELS.IMM,DSD_DIOC@DF_DIOC,1.0
+      transformation: difference
+      notes: OECD International Migration Outlook foreign-born minus native employment rate.
+  treatment:
+    - name: skill_stream_share
+      source: "constructed: AUS skill-stream share of permanent migration from DHA (Department of Home Affairs) annual program reports."
+      transformation: level
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: total_migrant_share
+      source: un_desa:international_migrant_stock
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if Australia's foreign-born/native employment-rate gap is < 2pp on average
+    2000-2023, AND the cross-country panel shows skill-stream-share negatively correlated
+    with the gap at p<0.05. REFUTED if Australian gap > 4pp or skill-stream coefficient
+    insignificant/wrong-signed.
+  test: panel_fe_australia_skill_stream_employment_parity
+  threshold: "abs(aus_employment_gap) < 2.0 AND coef_skill_stream < 0 AND p < 0.05"
+prior_confidence: 0.7
+disclosure: >-
+  Skill-stream-share data may have measurement gaps; manual-drop construction is permissible
+  for AUS-only series. Risk: AUS labour-market strength independent of migration policy
+  drives the result.
+steelman: hypotheses/steelman/demo_australia_high_skill_migration.md

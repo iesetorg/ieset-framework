@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jamaica_imf_debt_restructuring_2010_2024
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Jamaica's 2010-2024 fiscal-consolidation programme (under successive
+  IMF SBA, EFF, and PLL programmes; combined with two domestic-debt
+  restructurings — JDX 2010 and NDX 2013) succeeded in reducing public
+  debt as a share of GDP from above 140% (2012) to below 75% (2024)
+  while sustaining positive cumulative real-GDP growth and avoiding
+  hyperinflation. The pre-registered claim is (a) gross general-
+  government debt share of GDP fell by at least 50 percentage points
+  2012-2024, AND (b) cumulative log GDP per capita 2013-2019
+  (post-JDX/NDX, pre-COVID) is positive, AND (c) cpi inflation
+  remained below 10% mean annualised across 2013-2019. The mechanism
+  is a multi-cycle bondholder restructuring combined with primary-
+  surplus discipline (>7% of GDP for several years), supported by an
+  IMF-anchored political consensus. This is the canonical Caribbean
+  case of orthodox debt sustainability.
+
+evidence_type: descriptive
+
+sample:
+  countries: [JAM, BRB, BHS, DOM, TTO]
+  period: [2005, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [2005, 2024]
+  countries: [JAM, BRB, BHS, DOM, TTO]
+  outcome_dim: [fiscal_policy, gdp_growth, inflation]
+  policy_family: [fiscal_policy, monetary_policy, institutional_reform]
+  treatment_tags: [jamaica_jdx_2010, jamaica_ndx_2013, jamaica_imf_eff_2013, jamaica_imf_pll_2016]
+
+variables:
+  outcome:
+    - name: gross_general_govt_debt_share_gdp
+      source: imf:GGXWDG_NGDP
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: primary_balance_share_gdp
+      source: imf:GGXONLB_NGDP
+      transformation: level
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+  controls:
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Primary: descriptive trajectory of debt, growth, and inflation
+    series 2005-2024 with annotation of JDX (2010), NDX (2013), and
+    IMF-programme transitions. Secondary: comparison to peer Caribbean
+    average debt trajectory.
+
+falsification:
+  rule: >
+    Not supported if (a) gross_general_govt_debt_share_gdp(JAM, 2024) is
+    not at least 50 percentage points below the 2012 peak, OR (b)
+    cumulative log_gdp_pc 2013-2019 (JAM) is negative, OR (c) mean
+    cpi_inflation_yoy(JAM, 2013-2019) > 10.
+  test: descriptive_trajectory_thresholds
+  threshold: >
+    gross_general_govt_debt_share_gdp(JAM, 2012) - gross_general_govt_debt_share_gdp(JAM, 2024) >= 50
+    AND cumulative_log_gdp_pc(JAM, 2013-2019) > 0
+    AND mean_cpi_inflation_yoy(JAM, 2013-2019) <= 10
+
+prior_confidence: 0.85
+
+disclosure: >
+  Author macro prior is that orthodox primary-surplus + IMF-anchored
+  programmes work when politically sustainable. Jamaica is the textbook
+  Caribbean case. Risk: 2024 endpoint may show debt re-acceleration
+  due to climate-event spending; spec accepts the observed data.
+
+steelman: hypotheses/steelman/jamaica_imf_debt_restructuring_2010_2024.md
+
+linked_hypotheses:
+  - dominican_tourism_freezone_model_1980_2024
+
+notes: >
+  Single-country descriptive spec; Jamaica's debt-restructuring
+  trajectory is dispositive on its own.

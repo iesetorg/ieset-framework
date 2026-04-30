@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_chile_bilateral_fta_cascade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Chile's bilateral-FTA cascade (Canada 1997, Mexico 1999, EU 2003,
+  Korea 2004, US 2004, China 2006, Japan 2007) is associated with
+  Chile's trade-openness-to-GDP rising from approximately 50% in
+  1990 to over 70% by 2019 — among the largest sustained increases
+  in Latin America. The descriptive claim is a within-country
+  trajectory comparison plus a Latin American comparator
+  descriptive test.
+
+evidence_type: descriptive
+
+sample:
+  countries: [CHL, ARG, BRA, COL, PER, MEX]
+  period: [1985, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-COVID (2019)"
+
+scope:
+  period: [1985, 2019]
+  countries: [CHL]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [chile_bilateral_fta_cascade, chile_open_regionalism, chile_unilateral_liberalisation]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: weighted_applied_tariff
+      source: "world_bank_wdi:TM.TAX.MRCH.WM.AR.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  FTA cascade is a regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive trajectory comparison. Reports Chilean trade-
+    openness 1985-2019 vs Latin American comparator mean.
+
+falsification:
+  rule: >
+    SUPPORTED if Chile trade-openness 2010-2019 mean exceeds 1985-
+    1994 mean by >=15 pp AND Chile-comparator differential
+    increased by >=10 pp over the same window. REFUTED if the
+    differential did not increase.
+  test: descriptive_chile_fta_cascade_trade_openness
+  threshold: >
+    PRIMARY: openness_change(CHL, 1985-1994 -> 2010-2019) >= +15 pp AND
+    (CHL - comparator) differential change >= +10 pp.
+
+prior_confidence: 0.85
+
+disclosure: >
+  Prior high (0.85). Chile is the canonical Latin American open-
+  regionalism case (Edwards 1999; Schmukler-Zoido 2018). Heterodox
+  readers will note that Chile's commodity-export concentration
+  (copper) makes the trade-openness ratio mechanically high and
+  that domestic deindustrialisation is a welfare cost the metric
+  does not capture.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_chile_bilateral_fta_cascade.md

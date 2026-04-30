@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: latam_extra_inflation_targeting_diff_in_diff_1999_2024
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  Across Latin American economies 1999-2024, the staggered adoption
+  of formal inflation-targeting central-bank regimes (Brazil 1999,
+  Chile 1999, Colombia 1999, Mexico 2001, Peru 2002, Guatemala 2005,
+  Uruguay 2007, Paraguay 2011, Dominican Republic 2012, Costa Rica
+  2018) reduced average inflation and inflation volatility relative
+  to a non-adopting comparison group, without an associated growth
+  penalty. The pre-registered claim is (a) Callaway-Sant'Anna staggered
+  DiD on cpi_inflation_yoy shows a negative average treatment effect
+  at p < 0.10, AND (b) inflation volatility (5-year rolling SD)
+  declines post-adoption, AND (c) cumulative log GDP-pc growth
+  post-adoption is not below the non-adopter comparison.
+
+evidence_type: causal
+
+sample:
+  countries: [ARG, BOL, BRA, CHL, COL, CRI, DOM, ECU, GTM, HND, JAM, MEX, NIC, PAN, PER, PRY, SLV, TTO, URY, VEN]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude VEN post-1999 (Chavismo regime change is a confound)"
+    - "exclude ECU (dollarised, monetary policy regime is different)"
+    - "exclude SLV (dollarised, monetary policy regime is different)"
+    - "exclude PAN (dollarised, monetary policy regime is different)"
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1995, 2024]
+  countries: [LATAM]
+  outcome_dim: [inflation, monetary_policy, gdp_growth]
+  policy_family: [monetary_policy, institutional_reform]
+  treatment_tags: [latam_inflation_targeting_adoption, brazil_it_1999, chile_it_1999, colombia_it_1999, mexico_it_2001, peru_it_2002]
+
+variables:
+  outcome:
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: inflation_volatility
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: rolling_5yr_sd
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+  treatment:
+    - name: inflation_targeting_indicator
+      source: "constructed: country-year binary by adoption date (BRA/CHL/COL 1999, MEX 2001, PER 2002, GTM 2005, URY 2007, PRY 2011, DOM 2012, CRI 2018)"
+      transformation: binary
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: wgi_government_effectiveness
+      source: world_bank_wgi:GOV_WGI_GE.EST
+      transformation: level
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  Inflation targeting is the canonical monetary-policy regime
+  intervention with central-bank-independence and operational-target
+  components.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  notes: >
+    Primary: Callaway-Sant'Anna staggered DiD on cpi_inflation_yoy
+    with multiple adoption dates 1999-2018. Secondary: pre/post
+    inflation-volatility comparison. Tertiary: cumulative GDP-pc
+    growth comparison post-adoption.
+
+falsification:
+  rule: >
+    Not supported if (a) DiD ATT on cpi_inflation_yoy is not
+    negative at p < 0.10, OR (b) within-country inflation volatility
+    (5-yr rolling SD) does not decline post-adoption, OR (c)
+    cumulative log_gdp_pc growth post-adoption is materially below
+    the non-adopter comparison (a more-than-trivial growth penalty).
+  test: callaway_santanna_did_plus_volatility_plus_growth_check
+  threshold: >
+    DiD_ATT(cpi_inflation_yoy) < 0 at p < 0.10
+    AND within_country_SD_inflation_post < within_country_SD_inflation_pre
+    AND cumulative_log_gdp_pc_post(adopters) - cumulative_log_gdp_pc_post(non_adopters) >= -0.05
+
+prior_confidence: 0.75
+
+disclosure: >
+  Author macro prior favours inflation-targeting regimes;
+  pre-registered growth-penalty falsification disciplines the
+  claim that there is no real-side cost.
+
+steelman: hypotheses/steelman/latam_extra_inflation_targeting_diff_in_diff_1999_2024.md
+
+linked_hypotheses:
+  - peru_post_fujimori_growth_2001_2019
+  - latam_extra_fiscal_rule_adoption_panel_1999_2024
+
+notes: >
+  Canonical staggered-DiD design covering the LATAM-wide adoption
+  of inflation-targeting frameworks 1999-2018.

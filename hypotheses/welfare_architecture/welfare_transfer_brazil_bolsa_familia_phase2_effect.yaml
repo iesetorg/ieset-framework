@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_brazil_bolsa_familia_phase2_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Brazil's Bolsa Família phase-2 (post-2010 expansion under Dilma 2011-2015 with Brasil Sem Miséria
+  add-on, then Bolsonaro-era restructuring 2019-2021, then Lula-era Auxílio Brasil to BFP rebrand 2023)
+  produced diminishing marginal poverty-reduction returns relative to the 2003-2010 phase, with the
+  post-2014 commodity-bust eroding the wage-floor channel that complemented BFP transfers in phase-1,
+  illustrating cash-transfer-program-decoupling from labour-market complement.
+evidence_type: associational
+prior_confidence: 0.6
+disclosure: |
+  Author has market-liberal priors that view CCT effectiveness as conditional on labour-market
+  complement rather than autonomous. Hypothesis is associational and decomposition-style; identifies
+  the diminishing-return pattern but does not claim a clean causal counterfactual for phase-2.
+sample:
+  countries: [BRA, MEX, COL, PER, ARG]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 COVID emergency-aid years from primary spec
+variables:
+  outcome:
+  - name: extreme_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  - name: bottom_40_income_share
+    source: world_bank_wdi:SI.DST.FRST.40
+    transformation: level
+  treatment:
+  - name: bfp_phase2_intensity
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level
+    notes: BFP coverage and per-family transfer intensity 2010-2023; placeholder pending IPEA wiring.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: real_minimum_wage_index
+    source: ilostat:ILMS_wages
+    transformation: log
+  - name: terms_of_trade_commodity
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+intervention_channel: fiscal
+intervention_channel_justification: |
+  BFP phase-2 is a fiscal-channel CCT continuation; intensity changes are fiscal scale adjustments.
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Panel FE decomposition of poverty-and-Gini variance across BFP intensity, real-minimum-wage, and
+    terms-of-trade channels for BRA versus LatAm peers 2010-2023. Phase-2 effect identified as the
+    BFP-channel coefficient relative to phase-1 (lula_bolsa_familia_poverty_reduction_decomposition_2003_2010).
+falsification:
+  rule: |
+    Refuted if the BFP-channel marginal effect on extreme-poverty in 2010-2019 phase-2 exceeds 70% of
+    the corresponding phase-1 (2003-2010) marginal effect, OR if the Gini reduction attributable to
+    BFP in phase-2 is at least equal to phase-1, indicating no diminishing-returns pattern.
+  test: panel_fe_decomp_phase2_vs_phase1_marginal_effect
+  threshold: bfp_phase2_marginal_effect / bfp_phase1_marginal_effect <= 0.70 for poverty AND <= 0.70 for gini
+scope:
+  period: [2010, 2023]
+  countries: [BRA, MEX, COL, PER, ARG]
+  outcome_dim: [poverty_inequality, welfare_state]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [bolsa_familia_phase2, dilma_brasil_sem_miseria_2011, auxilio_brasil_2021, bfp_rebrand_2023]
+steelman: hypotheses/steelman/welfare_transfer_brazil_bolsa_familia_phase2_effect.md
+linked_hypotheses:
+- lula_bolsa_familia_poverty_reduction_decomposition_2003_2010

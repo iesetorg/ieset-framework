@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_extra_zero_covid_exit_recovery_2023
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  China's December-2022 abrupt reopening from dynamic-zero-COVID produced
+  a partial-and-fading recovery in 2023 rather than a sharp pent-up-demand
+  rebound. By 2023H2, retail-sales YoY growth, manufacturing PMI, and
+  youth unemployment all reverted toward weakness; full-year 2023 real
+  GDP growth missed the IMF April-2023 5.5%+ consensus forecast by at
+  least 0.5 percentage points net of the official print, and the 2024
+  carry-over growth rate stayed below the pre-COVID 2017-2019 trend.
+
+evidence_type: descriptive
+
+notes: >-
+  Orthogonal to china_zero_covid_2022_2023 (which focused on the
+  2022 contraction phase). This hypothesis tests the 2023 recovery
+  trajectory specifically: is the post-reopening rebound durable and
+  V-shaped, or partial and fading? Cross-checks via PMI, retail, and
+  trade insulate against single-series capture.
+
+prior_confidence: 0.72
+
+disclosure: >-
+  Author tilts toward the partial-and-fading reading. Bias risk is
+  attributing 2023 softness to zero-COVID exit when property + LGFV +
+  demographics also contributed. Mitigation: examines independent
+  series whose comovement implies common-shock structure.
+
+steelman: hypotheses/steelman/china_extra_zero_covid_exit_recovery_2023.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if (a) 2023 full-year real GDP
+    growth is below the 2017-2019 mean by at least 0.5pp; AND (b) 2024
+    real GDP growth does NOT recover to within 0.5pp of the 2017-2019
+    mean. REFUTED if 2023 growth exceeds the 2017-2019 mean (V-shape
+    confirmed) AND 2024 sustains or accelerates above pre-COVID trend.
+  test: china_zero_covid_exit_2023_recovery_trajectory
+  threshold: >-
+    PRIMARY: gdp_growth(2023) <= gdp_growth_mean(2017-2019) - 0.005 AND
+    gdp_growth(2024) <= gdp_growth_mean(2017-2019) - 0.005.
+    METHOD_VALID: WDI NY.GDP.MKTP.KD.ZG available for CHN through 2024.
+
+sample:
+  countries: [CHN]
+  period: [2017, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "2020-2022 COVID/zero-COVID years excluded from comparison baselines"
+
+scope:
+  period: [2022, 2024]
+  countries: [CHN]
+  outcome_dim: [gdp_growth]
+  policy_family: [regulation]
+  treatment_tags: [china_zero_covid_reopening_2022_12, post_pandemic_recovery]
+
+variables:
+  outcome:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: household_consumption_growth
+      source: "world_bank_wdi:NE.CON.PRVT.KD.ZG"
+      transformation: pct_change_yoy
+    - name: exports_growth
+      source: "world_bank_wdi:NE.EXP.GNFS.KD.ZG"
+      transformation: level
+  treatment:
+    - name: post_reopening_indicator
+      source: "constructed: indicator = 1 for years >= 2023"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Pre-post comparison: 2017-2019 baseline vs 2023, 2024 outcomes.
+    Tests recovery trajectory against pre-COVID trend rather than zero-COVID
+    nadir. V-shape would show 2023 above-trend, fading would show
+    2023 below trend with no 2024 recovery.
+
+linked_hypotheses:
+  - china_zero_covid_2022_2023_demand_collapse_recovery
+  - china_extra_property_bubble_bust_2020_2024

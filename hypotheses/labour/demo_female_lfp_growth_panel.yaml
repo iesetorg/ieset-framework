@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_female_lfp_growth_panel
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Across countries 1980-2023, increases in female labour-force participation are positively
+  associated with per-capita output growth, with substantial heterogeneity by income level
+  and institutional context. The hypothesis predicts a positive coefficient on female LFP
+  in panel FE estimation, with magnitude implying that closing the female-male LFP gap by
+  10pp is associated with roughly 0.3-0.6pp higher annualised per-capita growth.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, JPN, KOR, CAN, AUS, NLD, SWE, NOR, DNK, FIN, CHE, BEL, AUT, IRL, NZL, IND, IDN, BRA, MEX, ARG, CHL, ZAF, NGA, EGY, TUR, THA, MYS, PHL, BGD, PAK, POL, HUN, CZE]
+  period: [1980, 2023]
+  temporal_structure: panel
+scope:
+  period: [1980, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [female_lfp, gender_employment_gap]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: female_lfp
+      source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+      transformation: level
+    - name: female_male_lfp_gap
+      source: "constructed: SL.TLF.CACT.MA.ZS - SL.TLF.CACT.FE.ZS"
+      transformation: level
+  controls:
+    - name: gdp_per_capita_initial
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+    - name: tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+falsification:
+  rule: >-
+    SUPPORTED if female LFP coefficient on per-capita growth is positive at p<0.05, with
+    magnitude between 0.02 and 0.06 (i.e. 0.3-0.6pp growth per 10pp LFP increase), AND
+    holds in both high-income and middle-income subsamples. REFUTED if coefficient
+    insignificant, wrong-signed, or absent in middle-income subsample.
+  test: panel_fe_female_lfp_growth_with_subsample
+  threshold: "0.02 <= coef_female_lfp <= 0.06 AND p < 0.05 AND middle_income_subsample_significant"
+prior_confidence: 0.7
+disclosure: >-
+  Reverse causation (growth pulls women into LFP) is the binding identification issue;
+  panel FE only partially addresses. Goldin U-shaped LFP-development pattern adds non-
+  linearity that linear specification ignores.
+steelman: hypotheses/steelman/demo_female_lfp_growth_panel.md

@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: petro_reform_package_capital_flight_response_2022_2026
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Colombia's policy package under Petro (2022-2026) — tax reform raising marginal rates on
+  high incomes and dividends, energy-transition policies signalling oil/coal sector contraction,
+  pension reform proposal, and labour reform — produces measurable capital-flight indicators
+  beyond the synthetic counterfactual: peso real depreciation, sovereign credit-spread widening,
+  resident-deposit dollarisation, and net portfolio outflows. The pre-registered claim is that
+  across at least 3 of 4 capital-flight indicators, Colombia diverges negatively from a Latin
+  American institutional-quality-matched donor pool (Peru, Chile, Mexico) by 2026Q4.
+notes: >
+  Companion to petro_reform_package_economic_trajectory_2022_present which tests the GDP/FDI
+  channel. This hypothesis isolates the capital-account-and-FX channel specifically because
+  capital-flight responses to redistributive-reform announcements are theoretically expected
+  to lead real-economy effects by 6-18 months. Multi-metric design: any single capital-flight
+  indicator can be noisy (e.g., spreads driven by US Fed cycle, peso driven by oil price), so
+  the test requires divergence in at least 3 of 4 channels to support the capital-flight claim.
+prior_confidence: 0.60
+disclosure: >
+  Author has market-liberal priors that lean toward expecting redistributive-reform announcements
+  in middle-income hydrocarbon economies to produce capital-flight signals. The 0.60 reflects
+  that lean tempered by the actual 2022-2024 outcome (peso has depreciated but not catastrophically,
+  EMBI spread widened then partially compressed). Pre-registration locks the multi-metric
+  threshold before 2025-2026 data is fully observable.
+evidence_type: causal
+sample:
+  countries: [COL, PER, CHL, MEX, BRA]
+  period: [2014, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020Q2-2020Q4 from synthetic-control weight fitting"
+    - "Brazil included as alternate donor (matched on commodity-export profile); de-weight in main spec since Lula3 is contemporaneously left-shifting"
+scope:
+  period: [2014, 2026]
+  countries: [COL, PER, CHL, MEX, BRA]
+  outcome_dim: [capital_flows, monetary_policy, currency_purchasing_power, financial_crisis]
+  policy_family: [tax_policy, fiscal_policy, energy_policy, labour_market]
+  treatment_tags: [petro_reforms_2022, petro_tax_reform_2022, petro_energy_transition_2022, petro_pension_reform_2024]
+variables:
+  outcome:
+    - name: real_effective_exchange_rate
+      source: bis:WS_EER
+      transformation: index_level_monthly
+    - name: sovereign_credit_spread
+      source: jp_morgan_embi:COL
+      transformation: basis_points
+    - name: net_portfolio_flows_pct_gdp
+      source: imf:BFPA_BP6_USD; world_bank_wdi:BX.PEF.TOTL.CD.WD
+      transformation: pct_gdp_quarterly
+    - name: resident_deposit_dollarisation
+      source: banrep:deposits_fx_share
+      transformation: pct_total_deposits
+  treatment:
+    - name: petro_era_indicator
+      source: "constructed: binary = 1 for COL from 2022Q3 onward"
+      transformation: binary
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU; imf_pcps:POILBRE
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: emerging_market_risk_index
+      source: fred:STLFSI4
+      transformation: level
+    - name: latam_peer_average_inflation
+      source: imf:PCPIPCH
+      transformation: quarterly_annualised
+    - name: wgi_rule_of_law
+      source: wgi:GOV_WGI_RL.EST
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  Petro reform package combines tax (fiscal channel), energy-transition (regulatory channel),
+  pension (fiscal channel), labour (regulatory channel). Capital-flight responses are the joint
+  outcome and cannot be cleanly attributed to a single channel.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did per outcome variable with COL treated from 2022Q3, PER+CHL+MEX donor
+    pool. Secondary: event-study around tax-reform announcement (2022-09), energy-transition
+    speech (2022-11), pension-reform proposal (2024-Q1) for short-window capital-flight signals.
+    Tertiary: count of how many of 4 outcomes show negative CATT at p_perm < 0.10.
+falsification:
+  rule: >
+    Refuted if fewer than 3 of 4 capital-flight indicators (REER, EMBI spread, portfolio flows,
+    deposit dollarisation) show negative CATT at p_perm < 0.10 over 2022Q3-2026Q4 versus the
+    synthetic counterfactual. Strongly supported if all 4 do. The single-channel-supported case
+    is mixed; channels noted in the result card.
+  test: synth_did_multi_channel_capital_flight_count
+  threshold: "channels_with_negative_CATT_at_p10 >= 3 of 4"
+prior_confidence: 0.60
+disclosure: >
+  Pre-registered before 2025-2026 data fully observable. The multi-channel framing prevents
+  cherry-picking the "most-flighty" indicator post-hoc.
+steelman: hypotheses/steelman/petro_reform_package_capital_flight_response_2022_2026.md
+linked_hypotheses:
+  - petro_reform_package_economic_trajectory_2022_present

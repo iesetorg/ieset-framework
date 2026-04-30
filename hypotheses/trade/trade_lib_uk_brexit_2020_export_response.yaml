@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_uk_brexit_2020_export_response
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The UK's exit from the EU single market (effective 2021-01-01
+  end of transition) reduced UK trade-openness and merchandise
+  exports relative to a synthetic-control donor pool of European
+  comparator economies. The post-2021 window is contaminated by
+  COVID-19 and Russia-Ukraine war shocks, but the UK-specific
+  underperformance pattern is hypothesised to be detectable
+  against the synthetic counterfactual.
+
+evidence_type: causal
+
+sample:
+  countries: [GBR, DEU, FRA, ITA, ESP, NLD, BEL, IRL, SWE, DNK, NOR, CHE]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity separately"
+    - "drop CHE-specific shocks (e.g. SNB EUR floor 2015) sensitivity"
+
+scope:
+  period: [2010, 2024]
+  countries: [GBR]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [uk_brexit_2020, eu_single_market_exit, brexit_trade_friction]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: brexit_indicator
+      source: "constructed: indicator = 1 for GBR from 2021-01-01 (end of transition)"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Brexit is a regulatory / trade-policy intervention.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for the UK against European-
+    comparator donor pool. Pre-treatment 2010-2019 (avoiding
+    Brexit-vote anticipation effect from 2016 in a robustness
+    check). Post-treatment 2021-2024.
+
+falsification:
+  rule: >
+    SUPPORTED if SC gap on trade-openness for GBR by 2024 is
+    negative by >=5 pp. PARTIAL if negative but smaller.
+    REFUTED if positive.
+  test: synthetic_control_uk_brexit_2021
+  threshold: >
+    PRIMARY: SC_gap(trade_openness, 2024) <= -5 pp.
+    INFORMATIVE: ex-2016-2019 robustness retains negative sign.
+
+prior_confidence: 0.75
+
+disclosure: >
+  Prior moderate-high (0.75). The CER, OBR, and academic literature
+  estimate Brexit-induced UK trade losses in the 5-15% range
+  by 2024. Heterodox readers will note that the UK signed bilateral
+  rollover agreements covering most prior EU-third-country trade
+  and that some UK service-sector exports (financial services,
+  legal) have proved resilient. The aggregate trade-openness
+  metric captures the goods-trade frictions disproportionately.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_uk_brexit_2020_export_response.md

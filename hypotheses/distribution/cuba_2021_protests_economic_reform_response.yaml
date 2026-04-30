@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cuba_2021_protests_economic_reform_response
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  Following the July 2021 protests (largest mass demonstrations in Cuba since 1959), the
+  Cuban government enacted incremental economic reforms: legalisation of small/medium private
+  enterprises (MIPYME, August 2021), partial dual-currency unification (Tarea Ordenamiento
+  followed through), expansion of MLC (USD-denominated) retail circuits, and adjustment of
+  official FX rates. The descriptive pre-registered claim is that across four metrics —
+  registered MIPYMEs, real-wage purchasing power, food-import share of supply, and net
+  emigration outflow — the post-2021 Cuban trajectory shows (a) a measurable expansion of
+  the private-sector formal segment, (b) continued real-wage erosion despite reforms, (c)
+  rising food-import dependency, and (d) the largest emigration outflow in Cuban history
+  (>500k departures cumulative 2022-2024). The hypothesis tests whether reforms partially
+  responded to social demands without restoring real living standards.
+notes: >
+  Pure descriptive multi-metric design: Cuba's data environment makes causal identification
+  infeasible, but the magnitudes of post-2021 changes are large enough that descriptive
+  pattern-matching is informative. ENCOVI-equivalent surveys are absent for Cuba; substitute
+  sources include cuba_manual hand-curated series, FAOSTAT food-balance sheets, USCBP
+  border-encounter data for emigration measurement, and oficina_nacional_estadistica_cuba
+  (ONEI) for MIPYME registrations.
+prior_confidence: 0.75
+disclosure: >
+  Author has high prior on the pattern: the 2022-2024 Cuban emigration outflow is well
+  documented in USCBP border-encounter data (>425k Cuban encounters cumulative through
+  2023, exceeding all prior Mariel + Balsero waves combined). The reforms-without-recovery
+  narrative is the consensus view across academic and journalistic sources (Mesa-Lago,
+  Vidal Alejandro, Cuba Study Group). The 0.75 prior reflects that confidence; the
+  multi-metric design ensures the pattern-match is documented across independent measurement
+  channels rather than relying on any single source.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [CUB]
+  period: [2018, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "ONEI tier 3; cross-check MIPYME registrations against MEP gazette announcements"
+    - "FAOSTAT 2024+ Cuba data lags 12-18 months; final-year estimates may need revision"
+scope:
+  period: [2018, 2025]
+  countries: [CUB]
+  outcome_dim: [poverty_inequality, demographics_migration, currency_purchasing_power, employment_labour]
+  policy_family: [institutional_reform, exchange_rate_regime, regulation]
+  treatment_tags: [cuba_july_2021_protests, cuba_mipyme_legalisation_2021, cuba_tarea_ordenamiento_2021, cuba_mlc_expansion_2020]
+variables:
+  outcome:
+    - name: registered_mipymes
+      source: cuba_manual:mipyme_registrations; oficina_nacional_estadistica_cuba:aec_actividades
+      transformation: log_level_cumulative
+    - name: real_wage_index
+      source: cuba_manual:salario_real; oficina_nacional_estadistica_cuba:salario_medio
+      transformation: log_level
+    - name: food_import_share
+      source: faostat:fbs_import_share; minag_cuba:dependencia_alimentaria
+      transformation: pct_of_supply
+    - name: cumulative_emigration_outflow
+      source: uscbp:cuban_encounters; un_desa:cuban_migrant_stock; iom:cuban_outflows
+      transformation: cumulative_count
+canonical_metrics:
+  - metric_id: mipyme_formal_sector_expansion
+    description: "MIPYMEs registered cumulatively exceed 9,000 by end-2024 (zero pre-Aug-2021 baseline)."
+    threshold: "registered_MIPYMEs > 9,000 cumulative by 2024-12-31"
+    window: "2021-08 to 2024-12"
+    source: "cuba_manual:mipyme_registrations"
+    direction: supports_claim
+    independence_justification: "Administrative count of new legal entity formations; independent of price/wage/migration measurement."
+  - metric_id: real_wage_erosion_persistent
+    description: "Real wages by 2024 remain below 60% of 2019 baseline despite Tarea Ordenamiento nominal-wage increases."
+    threshold: "real_wage_index_2024 / real_wage_index_2019 < 0.60"
+    window: "2019 to 2024"
+    source: "cuba_manual:salario_real"
+    direction: supports_claim
+    independence_justification: "Cuban-wage-deflated-by-CPI series, distinct from emigration and food-import channels."
+  - metric_id: food_import_dependency_rising
+    description: "Food-import share of domestic supply rises by at least 5 pp from 2019-2020 baseline through 2023-2024."
+    threshold: "(food_import_share_2023_2024 average) - (food_import_share_2019_2020 average) > 0.05"
+    window: "2019-2024"
+    source: "faostat:fbs_import_share"
+    direction: supports_claim
+    independence_justification: "External-trade-balance-sheet measurement, independent of internal-economy proxies."
+  - metric_id: emigration_outflow_unprecedented
+    description: "Cumulative Cuban emigration 2022-2024 (USCBP encounters + Mexico/third-country routes) exceeds 600,000 — larger than Mariel 1980 (~125k) plus Balsero 1994 (~35k) combined."
+    threshold: "cumulative_emigration_2022_2024 > 600,000"
+    window: "2022-01 to 2024-12"
+    source: "uscbp:cuban_encounters; un_desa:cuban_migrant_stock"
+    direction: supports_claim
+    independence_justification: "Border-crossing administrative data, independent of internal Cuban statistics."
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+falsification:
+  rule: >
+    Supported (descriptive pattern of "reforms-without-recovery") if at least 3 of 4 metrics
+    meet thresholds. Refuted if only 1 or 0 metrics meet thresholds (would imply the
+    post-2021 reforms either fully restored living standards or failed to expand even the
+    formal-private-sector channel).
+  test: multi_metric_descriptive_canonical_pattern
+  threshold: "metrics_met >= 3 of 4"
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Single-country descriptive case; no estimator. Pattern-matching across 4 independent
+    measurement channels substitutes for causal identification, which is infeasible given
+    Cuba's data environment.
+prior_confidence: 0.75
+disclosure: >
+  Pre-registered for completeness; author's prior is high enough that this is partly a
+  framework-validation case (if the framework cannot detect the post-2021 Cuban reform-
+  without-recovery pattern across 4 independent channels, the data substrate is mis-
+  configured). Refutation would indicate measurement failure, not an alternative empirical
+  reality.
+steelman: hypotheses/steelman/cuba_2021_protests_economic_reform_response.md
+linked_hypotheses: []

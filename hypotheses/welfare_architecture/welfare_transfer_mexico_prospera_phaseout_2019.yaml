@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_mexico_prospera_phaseout_2019
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Mexico's 2019 phase-out of Prospera (formerly Oportunidades / Progresa, the canonical CCT programme
+  studied since 1997) and replacement with un-conditional cash-transfer schemes under AMLO produced
+  a measurable rise in extreme-poverty headcount and a deterioration in school-attendance among
+  poor children of at least 3 percentage points within three years (2019-2022), identified off the
+  synthetic-control gap with LatAm peers (BRA, COL, PER) maintaining CCT continuity.
+evidence_type: causal
+prior_confidence: 0.65
+disclosure: |
+  Author has market-liberal priors and views CCT conditionality as evidence-supported. The Progresa
+  RCT literature (Schultz 2004, Behrman-Hoddinott 2005) provides the strongest experimental case for
+  CCT effects; the AMLO phase-out provides a natural rollback test of that evidence in panel form.
+sample:
+  countries: [MEX, BRA, COL, PER, ECU]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-2021 COVID extreme-emergency-aid years from primary spec
+  - extend post-window robustness check to include COVID for emergency-channel decomposition
+variables:
+  outcome:
+  - name: extreme_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+  - name: school_attendance_secondary_low_income
+    source: world_bank_wdi:SE.SEC.NENR
+    transformation: level_pct
+    notes: WDI net secondary enrolment rate; CONEVAL household-survey series preferred at wiring.
+  treatment:
+  - name: prospera_phaseout_indicator
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: indicator
+    notes: MEX = 1 from 2019-Q1; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: remittance_inflow_per_gdp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: level
+  - name: oil_terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+intervention_channel: bundled
+intervention_channel_justification: |
+  Phase-out bundles fiscal cuts to CCT with regulatory removal of conditionality; channel is bundled.
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic control on MEX extreme-poverty and school-attendance series 2010-2023 with BRA, COL,
+    PER, ECU donor pool. Pre-treatment fit 2010-2018. Two-outcome paired test.
+falsification:
+  rule: |
+    Refuted if the synthetic-control gap on extreme-poverty headcount at 3-year horizon is below
+    +3pp, OR if the school-attendance gap is above minus-3pp (i.e., attendance does not deteriorate),
+    OR if placebo permutation p > 0.10 on either outcome.
+  test: synthetic_control_3yr_paired_poverty_school_attendance
+  threshold: poverty_gap >= +3pp AND school_gap <= -3pp AND placebo_p < 0.10 on each
+scope:
+  period: [2019, 2023]
+  countries: [MEX, BRA, COL, PER, ECU]
+  outcome_dim: [poverty_inequality, welfare_state, employment_labour]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [mexico_prospera_phaseout_2019, amlo_government, becas_welfare_restructuring]
+steelman: hypotheses/steelman/welfare_transfer_mexico_prospera_phaseout_2019.md

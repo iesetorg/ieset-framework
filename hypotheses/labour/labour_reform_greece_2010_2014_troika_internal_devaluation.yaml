@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_greece_2010_2014_troika_internal_devaluation
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Greece's 2010-2014 troika-program labour reforms (minimum-wage
+  cut 22% / 32% youth, collective-bargaining decentralisation,
+  dismissal-cost reduction) effected a permanent real-wage
+  decline of at least 15% relative to a synthetic control of
+  euro-area peers, but produced no statistically distinguishable
+  improvement in unit-labour-cost-adjusted employment by 2017.
+notes: >
+  Treatment dated 2010-Q2 onwards through successive MoU
+  packages. Greek case is the canonical "internal devaluation
+  failed" study — labour shed price but not quantity. The
+  paired ULC and employment outcomes are the steelman
+  discipline.
+prior_confidence: 0.65
+disclosure: >-
+  Author is sceptical of austerity-plus-flexibilisation in a
+  fixed-exchange-rate regime and may over-weight the Greek
+  failure narrative. Counter-priors include the view that the
+  reforms were too late, too partial, and not the binding
+  constraint — capital-controls and banking-system collapse
+  dominated.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on real-wage index < -15.0 pp
+    by 2017 AND employment-rate gap is not statistically
+    distinguishable from zero at p<0.10. REFUTED if the wage
+    gap is shallower than -10 pp OR if the employment gap is
+    significantly positive at p<0.10. PARTIAL if the wage
+    gap is met but employment also rises significantly.
+  test: >
+    Synth-DiD on Greek real-wage index, employment rate, and
+    ULC 2010-2017 vs euro-area donor pool, placebo permutation
+    at p<0.10.
+evidence_type: associational
+sample:
+  countries: [GRC, PRT, ESP, ITA, IRL, FRA, DEU]
+  period: [2005, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2015-Q1 capital-controls window
+variables:
+  outcome:
+    - name: real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unit_labour_cost
+      source: oecd:DSD_PDB@DF_PDB_ULC
+      transformation: log
+  treatment:
+    - name: greece_troika_labour_measures
+      source: "constructed: indicator for 2010-Q2 onwards Greek MoU labour measures"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2010, 2017]
+  countries: [GRC]
+  outcome_dim: [employment_labour, wage_stagnation, labour_share]
+  policy_family: [labour_market]
+  treatment_tags: [greece_troika_2010]
+steelman: hypotheses/steelman/labour_reform_greece_2010_2014_troika_internal_devaluation.md

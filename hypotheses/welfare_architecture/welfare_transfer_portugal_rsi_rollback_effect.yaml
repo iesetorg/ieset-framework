@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_portugal_rsi_rollback_effect
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Portugal's 2010-2012 austerity-era rollback of the Rendimento Social de Inserção (RSI) — eligibility
+  restrictions, value freezes, and stricter conditionality under the Troika programme — raised severe
+  material deprivation among working-age households by at least 3 percentage points within 4 years,
+  identified off the synthetic-control gap with Greece-excluded southern-EU donor pool, demonstrating
+  that residualisation of guaranteed-minimum-income programmes during fiscal consolidation has measurable
+  poverty cost.
+evidence_type: causal
+prior_confidence: 0.6
+disclosure: |
+  Author is sceptical of automatic equating of austerity with welfare-cost claims but RSI rollback was
+  unusually steep (caseload halved 2010-2014). Synthetic control depends on post-2010 donor-pool peers
+  experiencing comparable cycles without comparable RSI-style cuts; ESP is included because Spain did
+  not roll back its regional rentas mínimas as aggressively in 2010-2014.
+sample:
+  countries: [PRT, ESP, ITA, FRA]
+  period: [2005, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude GRC from donor pool (covariant Troika rollback)
+  - exclude 2020-2021 from extension robustness (COVID)
+variables:
+  outcome:
+  - name: severe_material_deprivation_rate
+    source: eurostat:ilc_mddd11
+    transformation: level_pct
+  - name: rsi_caseload_per_population
+    source: eurostat:ilc_li02
+    transformation: ratio
+    notes: Placeholder — INE Portugal series at wiring.
+  treatment:
+  - name: rsi_rollback_indicator
+    source: eurostat:ilc_mddd11
+    transformation: indicator
+    notes: PRT = 1 from 2010-Q3; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: eurostat:une_rt_a
+    transformation: level
+  - name: structural_fiscal_balance
+    source: imf:GGSB_NPGDP
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  RSI rollback is a fiscal-channel transfer cut combined with regulatory eligibility restriction;
+  primary classification is fiscal.
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic control on PRT severe-material-deprivation series 2005-2018 with ESP, ITA, FRA donor pool.
+    Pre-treatment fit 2005-2009. Heterogeneity by household composition reported.
+falsification:
+  rule: |
+    Refuted if the synthetic-control gap on severe-material-deprivation rate at 4-year horizon is below
+    +3pp, OR if placebo permutation p-value exceeds 0.10, OR if Spain's parallel rentas-mínimas trajectory
+    shows comparable deprivation rise at the same horizon (suggesting common austerity rather than
+    RSI-specific effect).
+  test: synthetic_control_4yr_gap_severe_deprivation
+  threshold: gap >= +3pp at 4yr horizon AND placebo_p < 0.10
+scope:
+  period: [2010, 2018]
+  countries: [PRT, ESP, ITA, FRA]
+  outcome_dim: [poverty_inequality, welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [portugal_rsi_rollback_2010, troika_program_2011, socrates_government, passos_coelho_government]
+steelman: hypotheses/steelman/welfare_transfer_portugal_rsi_rollback_effect.md

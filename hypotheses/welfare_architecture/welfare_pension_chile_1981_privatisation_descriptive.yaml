@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_pension_chile_1981_privatisation_descriptive
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Chile's 1981 pension privatisation (replacing PAYG with mandatory individual AFP accounts under
+  Decreto Ley 3500) delivered domestic-savings-rate persistence near 20% of GDP through 1985-2010 and
+  capital-deepening above LatAm peers, but produced median replacement rates below 40% by 2010-2020 due
+  to coverage gaps among informal workers, motivating the 2008 solidarity-pillar addition (Pilar
+  Solidario) and the ongoing 2019-2024 reform debate. The descriptive claim documents both the
+  forced-saving mechanism's success on macro-savings and its insufficient delivery on individual
+  adequacy.
+evidence_type: descriptive
+prior_confidence: 0.75
+disclosure: |
+  Author has market-liberal priors that view forced-saving architecture as fiscally superior to PAYG.
+  Hypothesis is structured descriptively to surface both the macro-savings success and the adequacy
+  shortfall, avoiding a single-direction framing that the dual-outcome evidence does not support.
+sample:
+  countries: [CHL, ARG, MEX, PER, BRA, COL, URY]
+  period: [1970, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 1973-1980 Pinochet-era pre-reform structural-adjustment period from outcome trajectory comparisons
+variables:
+  outcome:
+  - name: gross_savings_share_gdp
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: level
+  - name: pension_replacement_rate_median
+    source: oecd:DSD_PENSIONS@DF_PENSIONS_REPL_RATE
+    transformation: level_pct
+  - name: elderly_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level_pct
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: informal_employment_share
+    source: world_bank_wdi:SL.ISV.IFRM.ZS
+    transformation: level
+intervention_channel: institutional
+intervention_channel_justification: |
+  AFP privatisation restructures the pension institution itself; institutional channel with fiscal
+  spillovers via implicit-debt absorption.
+estimator:
+  template: descriptive
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Descriptive panel comparing CHL macro-savings and pension-adequacy trajectories with LatAm peers
+    1970-2022. Structural break test at 1981 for savings; replacement-rate level comparison post-2000
+    when OECD harmonised data are available. No causal counterfactual is constructed.
+falsification:
+  rule: |
+    Refuted on the savings arm if CHL gross savings 1985-2010 average is below 18% of GDP. Refuted on
+    the adequacy arm if median replacement rate 2010-2020 average exceeds 50%. The dual-outcome
+    descriptive claim requires both observed gaps.
+  test: descriptive_dual_outcome_threshold_check
+  threshold: chl_savings_85_10_avg >= 18pct AND chl_replacement_rate_10_20_avg <= 50pct
+scope:
+  period: [1981, 2022]
+  countries: [CHL, ARG, MEX, PER, BRA, COL, URY]
+  outcome_dim: [welfare_state, fiscal_policy, capital_flows]
+  policy_family: [welfare_architecture, privatisation_nationalisation, institutional_reform]
+  treatment_tags: [chile_afp_1981, pinochet_reforms, decreto_ley_3500, pilar_solidario_2008]
+steelman: hypotheses/steelman/welfare_pension_chile_1981_privatisation_descriptive.md

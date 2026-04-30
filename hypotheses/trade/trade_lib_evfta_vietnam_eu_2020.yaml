@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_evfta_vietnam_eu_2020
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The EU-Vietnam Free Trade Agreement (EVFTA), effective 2020-08-01,
+  raised Vietnamese merchandise-exports-to-GDP and manufacturing
+  value-added relative to a synthetic-control donor pool of
+  South-East Asian comparator economies in the 2020-2024 window.
+  Even controlling for COVID-19 supply-chain reshuffling that
+  benefited Vietnam disproportionately, the EVFTA bilateral effect
+  should be detectable.
+
+evidence_type: causal
+
+sample:
+  countries: [VNM, IDN, THA, PHL, MYS, BGD, KHM, LAO]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "report COVID-2020-2021 sensitivity separately"
+
+scope:
+  period: [2010, 2024]
+  countries: [VNM]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy]
+  treatment_tags: [evfta_2020, vietnam_eu_fta, manufacturing_export_growth]
+
+variables:
+  outcome:
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: evfta_indicator
+      source: "constructed: indicator = 1 for VNM from 2020-08-01"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  EVFTA is a regulatory / trade-policy intervention.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for Vietnam against a SE-Asian
+    donor pool. Pre-treatment 2010-2019; post-treatment 2020-2024.
+    Sensitivity check: drop 2020-2021 from post-window to test
+    whether the gap is COVID-supply-chain-reshuffling-driven.
+
+falsification:
+  rule: >
+    SUPPORTED if SC gap on log manufacturing value-added is
+    positive in 2024 AND the gap survives dropping 2020-2021 from
+    post-window. PARTIAL if positive but driven primarily by
+    2020-2021. REFUTED if negative.
+  test: synthetic_control_vietnam_evfta_2020
+  threshold: >
+    PRIMARY: SC_gap(log_manufacturing_va, 2024) > 0 in both full
+    and ex-COVID-2020-21 specifications.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Prior moderate (0.65). Vietnam's manufacturing-export trajectory
+  was strong before the EVFTA, driven by the China-supply-chain-
+  diversification trend that accelerated under the 2018 US-China
+  trade war. Distinguishing the EVFTA bilateral effect from the
+  broader China-substitution trend is the central identification
+  challenge.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+steelman: hypotheses/steelman/trade_lib_evfta_vietnam_eu_2020.md

@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_china_2015_2020_panel
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  China's 2015 stock-market crash and the 2020-2024 property-sector deleveraging
+  episode (Evergrande default August 2021, Country Garden distress August 2023, the
+  "three red lines" macroprudential framework introduced 2020) constitute a sustained
+  financial-stress episode characterised by extreme equity volatility 2015-2016, real
+  residential property price decline >= 10% in tier-2/3 cities 2021-2024, and
+  developer-bond defaults exceeding RMB 1 trillion cumulative. The hypothesis is that
+  China 2015-2024 meets a multi-metric financial-stress checklist on at least 3 of 4
+  metrics WITHOUT producing a Laeven-Valencia-coded systemic banking crisis.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [CHN]
+  period: [2013, 2024]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: shanghai_stock_index_2015_decline
+    description: Shanghai Composite Index peak-to-trough decline mid-2015
+    threshold: ">= 40% peak-to-trough decline June-2015 to Feb-2016"
+    window: "2015-2016"
+    source: "fred:CHNSCITRD; fred:SHCOMP"
+    direction: supports_claim
+    independence_justification: Equity-market signal, distinct from property/bank channels.
+  - metric_id: real_house_price_decline_tier_2_3
+    description: BIS China RPPI or proxy peak-to-trough decline
+    threshold: ">= 8% nominal decline in BIS WS_SPP"
+    window: "2021-2024"
+    source: "bis:WS_SPP"
+    direction: supports_claim
+    independence_justification: Property-price index.
+  - metric_id: bank_credit_to_gdp_extreme_run_up
+    description: Bank credit to private non-financial sector pre-2017 run-up
+    threshold: ">= 70 pp of GDP rise from 2008 to 2017 peak"
+    window: "2008-2017"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS; bis:WS_TC"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate.
+  - metric_id: laeven_valencia_no_systemic_coding
+    description: Laeven-Valencia did NOT code China as systemic-banking-crisis 2015-2024 (negative control)
+    threshold: "coded NO — supports the 'managed under capital controls' framing"
+    window: "2015-2024"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding used as negative-control on systemic-vs-managed distinction.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_house_price_index
+      source: "bis:WS_SPP"
+      transformation: peak_to_trough
+    - name: bank_credit_to_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: change_2008_2017
+prior_confidence: 0.78
+disclosure: >
+  China data quality and Laeven-Valencia coverage of post-2015 China are both contested.
+  Author market-liberal prior treats the pre-2017 credit run-up as a record-breaking
+  case but is uncertain whether managed deleveraging will generate a Laeven-Valencia
+  coded crisis or a Japan-1990s slow-burn.
+steelman: hypotheses/steelman/banking_crisis_china_2015_2020_panel.md
+scope:
+  period: [2013, 2024]
+  countries: [CHN]
+  outcome_dim: [financial_crisis, financialisation, housing, capital_flows]
+  policy_family: [regulation, monetary_policy]
+  treatment_tags: [china_2015_stock_crash, evergrande_2021, three_red_lines, china_property_deleverage_2020_2024]

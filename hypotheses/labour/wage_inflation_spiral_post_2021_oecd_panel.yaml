@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wage_inflation_spiral_post_2021_oecd_panel
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  In the 2021-2024 OECD inflation episode, wage growth lagged price inflation
+  rather than led it — average across OECD economies, real wages fell 2-4%
+  cumulative 2021-2023 before recovering — refuting the wage-price-spiral
+  framing and supporting the "profit-led-then-supply-shock-driven"
+  decomposition (Bivens, Weber, Stiglitz) for the early phase, with wage
+  catch-up only emerging 2023-2024 once inflation peaked.
+notes: >-
+  Wage-price spiral test on OECD panel. Granger / VAR identification on
+  whether wage YoY leads or lags CPI YoY. Strong null prediction
+  (no spiral) is the SUPPORTED reading.
+prior_confidence: 0.70
+disclosure: >-
+  Author's priors lean against the wage-price-spiral framing for this
+  episode (it didn't fit the contemporaneous data anywhere in OECD); could
+  under-weight late-cycle wage catch-up dynamics that, by 2024-2025, may
+  start to look spiral-like in tight labour markets (Australia, UK, US).
+  Profit-led-inflation framing has its own measurement issues — markup
+  estimates depend heavily on capital-cost imputation.
+steelman: hypotheses/steelman/wage_inflation_spiral_post_2021_oecd_panel.md
+evidence_type: associational
+falsification:
+  rule: >-
+    OECD-country panel 2019-2024 quarterly. Run bivariate VAR(4) on log
+    nominal wage and log CPI per country, then aggregate. Test Granger
+    direction: does wage growth Granger-cause CPI inflation, or vice
+    versa? Compute cumulative real-wage change 2021-Q1 to 2023-Q4.
+    SUPPORTED if (a) median country shows CPI Granger-causes wage at
+    p<0.10 while wage does NOT Granger-cause CPI, AND (b) median
+    cumulative real-wage change 2021-Q1 to 2023-Q4 is between -2% and
+    -5%. REFUTED if median wage Granger-causes CPI at p<0.10 OR
+    cumulative real wages rose during the inflation peak (positive
+    median real-wage growth 2021-Q1 to 2022-Q4).
+  test: oecd_wage_cpi_var_granger_2021_2024
+  threshold: >-
+    SUPPORTED: CPI->wage Granger p<0.10 in median country AND wage->CPI
+    p>0.10 AND median cumul real wage 2021-Q1 to 2023-Q4 in [-5%, -2%].
+scope:
+  period: [2021, 2024]
+  countries: [OECD, USA, GBR, DEU, FRA, ITA, ESP, NLD, JPN, AUS, CAN, KOR, EU, EUROZONE]
+  outcome_dim: [inflation, wage_stagnation, employment_labour]
+  policy_family: [labour_market, monetary_policy]
+  treatment_tags: [post_covid_inflation_episode, wage_price_spiral_test, profit_led_inflation]
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, JPN, AUS, CAN, KOR, BEL, AUT, FIN, IRL, PRT, SWE, DNK]
+  period: [2018, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-quarters with missing wage series"
+    - "exclude 2020Q2 from primary VAR; sensitivity check including"
+variables:
+  outcome:
+    - name: nominal_wage_growth
+      source: "oecd:OECD.SDD.TPS,DSD_EARNINGS@DF_AVE_HRLY,1.0"
+      transformation: pct_change_yoy
+      notes: OECD average hourly earnings, business sector.
+    - name: cpi_headline_yoy
+      source: "oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0"
+      transformation: pct_change_yoy
+    - name: real_wage_index
+      source: "oecd:OECD.SDD.TPS,DSD_EARNINGS@DF_AVE_HRLY,1.0; oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0"
+      transformation: real_wage_index
+    - name: ulc_unit_labour_cost
+      source: "oecd:OECD.SDD.STA,DSD_PDB@DF_PDB_ULC,1.0"
+      transformation: pct_change_yoy
+  treatment:
+    - name: covid_recovery_indicator
+      source: "constructed: 1 from 2021-Q1 onward"
+      transformation: indicator
+  controls:
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log_diff
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+    - name: ny_fed_global_supply_chain_pressure
+      source: "fred:GSCPI"
+      transformation: level
+estimator:
+  template: local_projections
+  clustering: country
+  fixed_effects: [country, quarter]
+  notes: >-
+    Bivariate VAR(4) per country on log wage and log CPI; Granger-causality
+    test extracted per country and aggregated to median. Real-wage cumulative
+    test as second leg. Pre-registered SUPPORTED outcome (CPI leads wage,
+    real wages fell) is the Bivens/Weber profit-led decomposition; REFUTED
+    is the orthodox-spiral reading.

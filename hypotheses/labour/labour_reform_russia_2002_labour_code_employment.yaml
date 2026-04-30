@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_russia_2002_labour_code_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Russia's 2002 Labour Code (replacing the 1971 KZoT:
+  fixed-term contract liberalisation, severance recalibration,
+  collective-bargaining recodification) did not produce a
+  measurable formal-employment-share gain by 2007 relative to
+  a synthetic control of post-Soviet peers; the headline
+  Russian labour-market improvement 2002-2007 is dominated
+  by the oil-price-driven domestic-demand expansion.
+notes: >
+  Treatment dated 2002-Q1 (effective 2002-02-01). Russia is
+  the canonical post-Soviet labour-code modernisation case.
+  The hypothesis is null-leaning by design — the steelman
+  reading is that Russia's recovery is overwhelmingly
+  commodity-driven and the Code is endogenous to broader
+  Putin-era institutional changes.
+prior_confidence: 0.6
+disclosure: >-
+  Author treats this as a null-test: a finding that the Code
+  did move formal employment beyond the donor-pool baseline
+  would be informative against the strong commodity-channel
+  reading. Donor pool of post-Soviet peers is small.
+falsification:
+  rule: >
+    SUPPORTED (heterodox-favourable null) if synth-DiD gap on
+    Russian formal-employment share is statistically
+    indistinguishable from zero at p<0.10 by 2007. REFUTED
+    (pro-reform claim wins) if formal-employment gap > +1.5 pp
+    at p<0.10. PARTIAL if a small positive gap appears that
+    collapses with oil-price control.
+  test: >
+    Synth-DiD on Russian formal-employment share 2002-2007
+    vs post-Soviet donor pool with oil-price control,
+    placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [RUS, UKR, BLR, KAZ, POL, HUN, CZE, ROU]
+  period: [1995, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+  treatment:
+    - name: russia_labour_code_2002
+      source: "constructed: indicator for 2002-02 Code effective date"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2002, 2007]
+  countries: [RUS]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [russia_labour_code_2002]
+steelman: hypotheses/steelman/labour_reform_russia_2002_labour_code_employment.md

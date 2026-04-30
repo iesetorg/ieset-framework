@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_pension_singapore_cpf_2013_2024_reforms
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Singapore's CPF reform sequence 2013-2024 — MediShield Life 2015, CPF Life 2013-2024 evolution,
+  Silver Support Scheme 2016, Workfare Income Supplement increases, Lease Buyback Scheme expansion,
+  Retirement Sum increases — preserved the CPF forced-saving architecture's macro-savings rate while
+  materially reducing elderly-poverty rate from 41% (2014 OECD harmonised) to under 20% by 2024 through
+  targeted top-up mechanisms, demonstrating that CPF-style architecture is upgradeable on adequacy
+  without abandoning the forced-saving foundation.
+evidence_type: descriptive
+prior_confidence: 0.7
+disclosure: |
+  Author has market-liberal priors that view CPF as a successful forced-saving architecture with
+  documented adequacy gaps that the 2013-2024 reforms address through targeted top-ups rather than
+  architectural replacement. Hypothesis is descriptive-comparative.
+sample:
+  countries: [SGP]
+  period: [2010, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: elderly_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level_pct
+  - name: gross_savings_share_gdp
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: level
+  - name: pension_replacement_rate_median
+    source: oecd:DSD_PENSIONS@DF_PENSIONS_REPL_RATE
+    transformation: level_pct
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+intervention_channel: institutional
+intervention_channel_justification: |
+  CPF reforms are institutional-channel modifications to the forced-saving mechanism with fiscal-
+  spillover effects via SSS top-ups.
+estimator:
+  template: descriptive
+  clustering: country
+  fixed_effects: [year]
+  notes: |
+    Descriptive time-series for SGP with structural-break tests at 2013, 2015, 2016, and 2020 reform
+    inflection points. Compare elderly-poverty trajectory against the OECD-harmonised 2014 baseline.
+falsification:
+  rule: |
+    Refuted if SGP elderly-poverty rate fails to fall by at least 15pp 2014-2024, OR if gross-savings
+    share of GDP falls below 30% (i.e., the forced-saving architecture is meaningfully eroded), OR
+    if median replacement rate fails to rise by at least 5pp.
+  test: descriptive_dual_outcome_elderly_poverty_savings_2014_2024
+  threshold: delta_elderly_poverty <= -15pp AND savings_2024 >= 30pct AND delta_replacement_rate >= +5pp
+scope:
+  period: [2013, 2024]
+  countries: [SGP]
+  outcome_dim: [welfare_state, poverty_inequality, fiscal_policy]
+  policy_family: [welfare_architecture, institutional_reform]
+  treatment_tags: [singapore_cpf_2013_reforms, medishield_life_2015, silver_support_scheme_2016, cpf_life_evolution]
+steelman: hypotheses/steelman/welfare_pension_singapore_cpf_2013_2024_reforms.md
+linked_hypotheses:
+- singapore_cpf_institutional_complementarity
+- welfare_architecture_comparative_effectiveness

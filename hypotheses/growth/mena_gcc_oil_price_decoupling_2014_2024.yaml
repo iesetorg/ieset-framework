@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_gcc_oil_price_decoupling_2014_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  GCC economies' GDP growth volatility correlation with oil-price changes diminished
+  measurably from the 2014-2016 oil-price collapse onwards, reflecting the cumulative
+  effect of fiscal-buffer institutionalisation (sovereign-wealth funds, NDC frameworks),
+  VAT introduction (UAE/SAU/BHR 2018, OMN/QAT 2022), and progress on non-oil-sector
+  expansion. The pre-registered claim is that, in a panel-FE specification with GCC
+  countries 2000-2024, the correlation between annual oil-price log-changes and annual
+  real-GDP log-changes falls by at least 50% in the 2014-2024 sub-period vs the 2000-
+  2013 sub-period. The null counter-claim is that GCC economic cycles remain dominated
+  by oil-price cycles and the apparent decoupling is a statistical artefact of the
+  2020 COVID outlier.
+evidence_type: causal
+sample:
+  countries:
+  - SAU
+  - ARE
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID 2020Q2-2020Q4 from primary specification; report with-COVID as robustness
+  - flag Qatar 2017-2021 GCC blockade as parallel shock
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - SAU
+  - ARE
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - gdp_growth
+  - fiscal_policy
+  - taxation
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  - industrial_policy
+  treatment_tags:
+  - gcc_post_2014_oil_collapse
+  - gcc_vat_introduction
+  - gcc_swf_buffer_institutionalisation
+variables:
+  outcome:
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG; imf:NGDP_RPCH; pwt:rgdpe
+    transformation: yoy_growth
+  - name: non_oil_gdp_growth
+    source: imf:NGDP_NonOil_RPCH
+    transformation: yoy_growth
+    notes: Imputed from IMF Article IV oil/non-oil decompositions where available.
+  - name: fiscal_balance_share_gdp
+    source: imf:GGXONLB_NGDP; world_bank_wdi:GC.BAL.CASH.GD.ZS
+    transformation: level
+  treatment:
+  - name: post_2014_indicator
+    source: 'constructed: 1 from 2014 onward'
+    transformation: binary
+  - name: oil_price_change
+    source: fred:DCOILBRENTEU; imf:POILBRE
+    transformation: yoy_log_change
+  - name: oil_price_x_post_2014
+    source: 'constructed: oil_price_change × post_2014_indicator'
+    transformation: interaction
+    notes: 'Test variable: interaction coefficient measures whether oil-price sensitivity declined post-2014.'
+  controls:
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: vat_introduction_indicator
+    source: 'constructed: country-specific dummy from VAT-introduction year'
+    transformation: binary
+  - name: pre_treatment_swf_size_share_gdp
+    source: 'constructed: SWF AUM / GDP, GCC SWF list (PIF, ADIA, KIA, QIA)'
+    transformation: average_2010_2013
+intervention_channel: fiscal
+intervention_channel_justification: >-
+  The decoupling treatment is fiscal-channel: SWF-buffer institutionalisation, VAT
+  introduction, expenditure rationalisation. Coded fiscal per axes.yaml.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: >-
+    Panel FE with country and year fixed effects. Primary test is the
+    oil_price_change × post_2014 interaction coefficient. Sub-period coefficient ratio
+    test: estimate oil-sensitivity beta separately on 2000-2013 and 2014-2024 panels;
+    test ratio < 0.5. Robustness drops Qatar (blockade-confound) and re-runs.
+falsification:
+  rule: >-
+    Not supported if the sub-period oil-sensitivity ratio (2014-2024 beta / 2000-2013
+    beta) on real-GDP-growth is greater than 0.50 (i.e. less than 50% reduction in
+    sensitivity), OR if the oil_price_change × post_2014 interaction coefficient is
+    not significantly negative at p < 0.05. Robustness check: if including 2020 COVID
+    flips the result direction, the decoupling claim is fragile and should be
+    described as suggestive rather than confirmed.
+  test: panel_fe_sub_period_beta_ratio_test
+  threshold: >-
+    beta_2014_2024 / beta_2000_2013 < 0.50 AND interaction_coef significant negative
+    at p < 0.05 AND result robust to COVID inclusion/exclusion
+prior_confidence: 0.55
+disclosure: >-
+  Author's prior is mildly that decoupling is real but the magnitude is contested.
+  IMF Article IVs document GCC fiscal buffers improving but oil-price sensitivity
+  remains substantial. Prior 0.55 reflects this — the directional sign is likely
+  correct but the 50% reduction threshold is genuinely uncertain. The COVID-2020
+  outlier is large enough to flip results; robust specifications are essential.
+conflict_disclosure: No GCC asset exposure.
+steelman: hypotheses/steelman/mena_gcc_oil_price_decoupling_2014_2024.md
+linked_hypotheses:
+- mena_saudi_vision_2030_diversification_2016_2024
+- mena_uae_diversification_economic_complexity_1990_2024
+notes: >-
+  Designed as a panel-FE complement to the country-specific Saudi/UAE hypotheses.
+  Tests the broader regional decoupling claim that motivated the country-level
+  reform programmes.

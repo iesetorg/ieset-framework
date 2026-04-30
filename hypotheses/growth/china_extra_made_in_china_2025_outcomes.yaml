@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_extra_made_in_china_2025_outcomes
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  China's "Made in China 2025" industrial-policy programme (announced May
+  2015, targeting 10 priority sectors with subsidies, state-directed
+  investment, and indigenous-innovation procurement) produced measurable
+  capability gains in manufacturing value-added share, high-tech export
+  share, and R&D intensity from 2015 to 2024 — but did not break the
+  global manufacturing-value-added share growth trend already in place
+  pre-2015. The differential vs an EM peer panel (BRA, MEX, IDN, IND,
+  TUR, ZAF) on R&D intensity (gross domestic R&D / GDP) is at least
+  +0.8 percentage points by 2022, while manufacturing value-added share
+  growth is NOT differentially faster post-2015 than pre-2015.
+
+evidence_type: associational
+
+notes: >-
+  Tests both "capability gain" and "trend break" channels. The R&D test
+  measures input-side commitment; manufacturing share tests whether
+  the industrial-policy push produced an output-side share gain beyond
+  pre-existing trend. Mixed prediction: capability YES, trend break NO.
+
+prior_confidence: 0.65
+
+disclosure: >-
+  Author market-liberal priors are sceptical of state-directed industrial
+  policy producing trend breaks, but credit input-side capability gains
+  as plausible. Bias risk is under-weighting frontier-sector wins
+  (semiconductor equipment, EVs, batteries) that don't show in
+  aggregate manufacturing share. Mitigation: high-tech exports panel.
+
+steelman: hypotheses/steelman/china_extra_made_in_china_2025_outcomes.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH must hold for SUPPORTED): (1) R&D / GDP
+    differential CHN vs EM peer panel mean (BRA, MEX, IDN, IND, TUR, ZAF)
+    increases by at least +0.8pp from 2014 to 2022. (2) Manufacturing
+    value-added share of GDP for CHN does NOT show a positive trend break
+    post-2015 vs pre-2015 (the test is for capability without share gain).
+    REFUTED if R&D differential FAILS to grow OR if manufacturing share
+    DOES show a positive trend break (which would make the policy a
+    full success and refute the partial-vindication framing).
+  test: china_mic2025_capability_input_without_share_break
+  threshold: >-
+    PRIMARY 1: rd_pct_gdp(CHN, 2022) - rd_pct_gdp(CHN, 2014) - [rd_pct_gdp(peers, 2022) - rd_pct_gdp(peers, 2014)] >= 0.8.
+    PRIMARY 2: trend_break_test(manuf_va_pct_gdp, CHN, 2015) NOT positive significant.
+    METHOD_VALID: WDI GB.XPD.RSDV.GD.ZS and NV.IND.MANF.ZS available for CHN and peer panel through 2022.
+
+sample:
+  countries: [CHN, BRA, MEX, IDN, IND, TUR, ZAF]
+  period: [2005, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "Latest available year used (typically 2022 for R&D series)"
+
+scope:
+  period: [2015, 2024]
+  countries: [CHN]
+  outcome_dim: [productivity, industrial_capability]
+  policy_family: [industrial_policy]
+  treatment_tags: [made_in_china_2025, china_industrial_policy_2015, indigenous_innovation_drive]
+
+variables:
+  outcome:
+    - name: rd_pct_gdp
+      source: "world_bank_wdi:GB.XPD.RSDV.GD.ZS"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: high_tech_exports_pct
+      source: "world_bank_wdi:TX.VAL.TECH.MF.ZS"
+      transformation: level
+  treatment:
+    - name: post_mic2025_indicator
+      source: "constructed: indicator = 1 for CHN, year >= 2015"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way fixed effects panel. Test 1: differences-in-differences on R&D
+    share, CHN as treated post-2015 vs EM peer panel. Test 2: country-level
+    structural-break test on manufacturing-share trend, CHN only.
+
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  MIC2025 is a coordinated regulatory + procurement + subsidy package
+  with industrial-policy framing; the bundle is regulatory-led with
+  fiscal subsidy support.
+
+linked_hypotheses:
+  - china_wto_accession_productivity_growth_effect
+  - china_extra_lgfv_debt_evolution_2015_2024
+  - taiwan_extra_tsmc_industrial_policy_success_1985_2024

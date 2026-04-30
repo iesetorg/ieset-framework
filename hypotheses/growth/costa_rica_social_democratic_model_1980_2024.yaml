@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: costa_rica_social_democratic_model_1980_2024
+version: 1
+status: candidate
+topic: welfare_architecture
+
+claim: >
+  Costa Rica's 1980-2024 development path — universal-health system
+  (CCSS, established 1941, expanded), abolition of military 1948,
+  large public-education investment, FDI promotion via free-zone
+  regime (CINDE 1982, Intel 1996, medical-devices cluster 2000+), and
+  central-bank-led inflation targeting since 2018 — produced a
+  measurable life-expectancy and human-development premium relative to
+  Central American peers while sustaining mid-quartile cumulative
+  growth. The pre-registered claim is (a) life expectancy at birth
+  (CRI) exceeds Central American median by at least 4 years across
+  the window, AND (b) Human Development Index (CRI) ranks above the
+  Central American 75th percentile across all available years, AND
+  (c) cumulative log_gdp_pc_constant growth 1980-2019 exceeds
+  Central American median.
+
+evidence_type: associational
+
+sample:
+  countries: [CRI, PAN, GTM, HND, NIC, SLV, DOM]
+  period: [1980, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from life-expectancy endpoint comparison"
+    - "exclude NIC post-2018 sanctions regime from donor pool"
+
+scope:
+  period: [1980, 2024]
+  countries: [CRI, PAN, GTM, HND, NIC, SLV, DOM]
+  outcome_dim: [life_expectancy_health, gdp_growth, welfare_state]
+  policy_family: [welfare_architecture, fiscal_policy, institutional_reform]
+  treatment_tags: [costa_rica_ccss, costa_rica_military_abolition_1948]
+
+variables:
+  outcome:
+    - name: life_expectancy_birth
+      source: world_bank_wdi:SP.DYN.LE00.IN
+      transformation: level
+    - name: hdi
+      source: undp_hdi:HDI
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: health_expenditure_share_gdp
+      source: world_bank_wdi:SH.XPD.CHEX.GD.ZS
+      transformation: level
+    - name: education_expenditure_share_gdp
+      source: world_bank_wdi:SE.XPD.TOTL.GD.ZS
+      transformation: level
+  controls:
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: remittance_share_gdp
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Welfare-architecture (CCSS), institutional (military abolition,
+  fiscal sustainability), and regulatory (FDI free-zone regime)
+  channels are bundled.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of life-expectancy and log_gdp_pc on country and
+    year FE plus CRI-indicator interaction. Secondary: descriptive
+    HDI ranking by year.
+
+falsification:
+  rule: >
+    Not supported if (a) mean life_expectancy_birth gap (CRI minus
+    Central American median, 1980-2019) is below 4 years, OR (b)
+    HDI ranks below the 75th percentile for any year with available
+    data, OR (c) cumulative log_gdp_pc_constant growth 1980-2019
+    is below Central American median.
+  test: panel_fe_plus_hdi_ranking
+  threshold: >
+    mean[life_expectancy_birth(CRI) - life_expectancy_birth(C.A._median), 1980-2019] >= 4.0
+    AND hdi_rank(CRI, year) >= C.A._75th_percentile for all years with data
+    AND cumulative_log_gdp_pc(CRI, 1980-2019) >= C.A._median
+
+prior_confidence: 0.78
+
+disclosure: >
+  Author market-liberal prior favours the FDI-cluster channel of the
+  CRI story; centre-left readings emphasise the CCSS/welfare channel.
+  Pre-registered multi-channel test acknowledges both could be
+  contributing.
+
+steelman: hypotheses/steelman/costa_rica_social_democratic_model_1980_2024.md
+
+linked_hypotheses:
+  - costa_rica_high_wellbeing_low_throughput_path
+
+notes: >
+  Tests the CRI model on multiple human-development metrics.

@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_us_arpa_expanded_ctc_2021
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  The American Rescue Plan Act (March 2021) expansion of the Child Tax Credit to USD 3000-3600 per
+  child with full refundability and monthly disbursement (July-December 2021) produced a measurable
+  and immediate decline in monthly child-poverty rate of at least 4 percentage points (Center on
+  Poverty and Social Policy at Columbia time-series), with the credit's December 2021 expiration
+  producing a corresponding immediate reversal — providing high-frequency event-window evidence on
+  near-instantaneous cash-transfer-to-poverty mechanics. Labour-supply effect on parental employment
+  is hypothesised to be small (less than 1pp absolute change) at the 6-month horizon.
+evidence_type: causal
+prior_confidence: 0.7
+disclosure: |
+  Author views the ARPA-CTC expansion as a cleanly-identified high-frequency cash-transfer test with
+  strong evidence in the Columbia poverty-monthly series. Hypothesis tests poverty effect (expected
+  large positive) and labour-supply effect (expected null) jointly to constrain the policy-debate
+  framing.
+sample:
+  countries: [USA]
+  period: [2019, 2023]
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: monthly_child_poverty_rate
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+    notes: WDI proxy; CPSP Columbia monthly poverty preferred at wiring.
+  - name: parental_labour_force_participation
+    source: bls:LNS11300000
+    transformation: level_pct
+  treatment:
+  - name: ctc_expansion_indicator
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: indicator
+    notes: USA = 1 from 2021-07; 0 thereafter from 2022-01.
+  controls:
+  - name: state_unemployment_rate
+    source: fred:UNRATE
+    transformation: level
+  - name: pandemic_relief_indicator
+    source: fred:UNRATE
+    transformation: indicator
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Expanded CTC is a fiscal-channel refundable cash-transfer.
+estimator:
+  template: event_study
+  clustering: state
+  fixed_effects: [state, month]
+  notes: |
+    Event study around 2021-07 expansion onset and 2022-01 expiration. Two events identified
+    separately. Pre-trend 12 months, post-window 6 months each event.
+falsification:
+  rule: |
+    Refuted if the post-onset child-poverty ATT is below minus-4pp at 3-month horizon, OR if the
+    post-expiration ATT does not show a corresponding rise of at least 3pp, OR if the parental-LFP
+    ATT exceeds plus or minus 1pp at 6-month horizon.
+  test: event_study_paired_onset_expiration_poverty_lfp
+  threshold: onset_3mo_poverty_att <= -4pp AND expiration_3mo_poverty_att >= +3pp AND abs(parental_lfp_att) <= 1pp
+scope:
+  period: [2021, 2023]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, welfare_state, employment_labour]
+  policy_family: [welfare_architecture, tax_policy, fiscal_policy]
+  treatment_tags: [arpa_2021, biden_administration, ctc_expansion_2021, ctc_expiration_2022]
+steelman: hypotheses/steelman/welfare_transfer_us_arpa_expanded_ctc_2021.md

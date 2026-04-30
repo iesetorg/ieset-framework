@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_stockton_seed_guaranteed_income_2019
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  The Stockton SEED guaranteed-income trial (Feb 2019 - Jan 2021, 125 randomised treated recipients
+  receiving USD 500/month for 24 months in low-income Stockton CA neighbourhoods) produced a measurable
+  full-time-employment-rate increase of approximately 12 percentage points in the treated group versus
+  control, as reported in the West-Castro 2021 evaluation, providing US-context RCT evidence that
+  unconditional-cash floors can complement rather than substitute for labour-market participation among
+  working-age low-income recipients.
+evidence_type: causal
+prior_confidence: 0.55
+disclosure: |
+  Author has market-liberal priors that distrust headline UBI labour-supply claims but the Stockton
+  RCT's 12pp employment-rate effect is strong and replicable from the published microdata. Hypothesis
+  tests whether the effect survives extended robustness checks; small-sample concerns (n=125) are
+  flagged.
+sample:
+  countries: [USA]
+  period: [2018, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID-19-impacted months 2020-04 to 2020-12 from primary spec
+variables:
+  outcome:
+  - name: full_time_employment_rate
+    source: bls:LNS11300000
+    transformation: level_pct
+    notes: BLS national LFP series as proxy; SEED RCT microdata preferred at wiring.
+  - name: self_reported_anxiety_score
+    source: oecd:DSD_HEALTH@DF_HEALTH_STAT
+    transformation: level
+  treatment:
+  - name: seed_treatment_indicator
+    source: bls:LNS11300000
+    transformation: indicator
+    notes: Treatment = 1 for 125 randomised recipients; 0 for matched control.
+  controls:
+  - name: pre_program_employment_history
+    source: bls:LNS11300000
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  SEED is a fiscal-channel unconditional-transfer trial.
+estimator:
+  template: panel_fe
+  clustering: individual
+  fixed_effects: [individual, year_quarter]
+  notes: |
+    Panel FE on the SEED experimental sample with COVID-period exclusion robustness check. Primary
+    outcome full-time-employment rate at month 12 and month 24.
+falsification:
+  rule: |
+    Refuted if the ATT on full-time-employment rate at month 12 is below +5pp, OR exceeds +20pp
+    (implausibly large), OR if the published 12pp result fails to replicate when COVID months are
+    excluded, OR if the 95% CI excludes +5pp.
+  test: panel_fe_seed_employment_att_12mo_24mo
+  threshold: 5pp <= employment_att <= 20pp at 12mo AND lower 95% CI > 0pp
+scope:
+  period: [2019, 2022]
+  countries: [USA]
+  outcome_dim: [employment_labour, welfare_state, life_expectancy_health]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [stockton_seed_2019, mayors_for_a_guaranteed_income, michael_tubbs_administration]
+steelman: hypotheses/steelman/welfare_transfer_stockton_seed_guaranteed_income_2019.md

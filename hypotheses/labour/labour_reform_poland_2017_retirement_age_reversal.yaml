@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_poland_2017_retirement_age_reversal
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Poland's 2017 retirement-age reversal (PiS-government rollback
+  of the 2012 Tusk-government age increase: women's age 60 from
+  67, men's age 65 from 67) reduced the 55-64 employment-rate
+  by at least 3 pp by 2020 relative to a synthetic control of
+  Visegrad-Central-European peers, and increased the early
+  pension take-up rate substantially.
+notes: >
+  Treatment dated 2017-Q4 (effective 2017-10-01). Poland is
+  the canonical case of an explicit retirement-age reversal in
+  the EU and a clean test of the labour-supply channel. Donor
+  pool excludes other CEE countries that ran their own
+  retirement-age changes in the window.
+prior_confidence: 0.7
+disclosure: >-
+  Author has a higher prior because retirement-age reversals
+  have well-established labour-supply effects in the
+  Gruber-Wise OECD literature. The dispositive question is
+  the magnitude not the direction.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Polish 55-64 employment rate
+    < -3.0 pp by 2020 AND early pension take-up rises by >
+    +5 pp relative to donor pool. REFUTED if employment-rate
+    gap is < -1.0 pp OR if the gap is concentrated in non-
+    pension-eligible age groups (suggesting non-pension
+    confound).
+  test: >
+    Synth-DiD on Polish 55-64 employment rate 2017-2020 vs
+    Visegrad-CEE donor pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [POL, CZE, SVK, HUN, ROU, BGR, SVN, EST]
+  period: [2010, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2020-2021 COVID window for asymmetric exposure
+variables:
+  outcome:
+    - name: employment_rate_55_64
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: level
+    - name: early_pension_take_up_rate
+      source: eurostat:demo_pjan
+      transformation: level
+    - name: labour_force_participation_55_64
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: level
+  treatment:
+    - name: poland_retirement_age_reversal
+      source: "constructed: indicator for 2017-10 retirement-age rollback effective date"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2017, 2020]
+  countries: [POL]
+  outcome_dim: [employment_labour, demographics_migration]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [poland_retirement_reversal_2017]
+steelman: hypotheses/steelman/labour_reform_poland_2017_retirement_age_reversal.md

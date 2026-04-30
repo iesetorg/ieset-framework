@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_turkey_akp_two_phase_economic_arc_2003_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Turkey's AKP-era 2003-2024 trajectory shows two distinct phases: 2003-2013
+  orthodox-anchor convergence (post-2001-banking-crisis IMF programme, EU-accession
+  reform momentum, CBRT inflation targeting establishment, real GDP-pc growth
+  outperforming EM peers) followed by 2014-2024 unorthodox-economics regression
+  (anti-interest-rate doctrine, central-bank-independence erosion, recurring lira
+  crises, inflation re-acceleration). The pre-registered claim is that, in a synthetic-
+  control design with EM peers (Mexico, Brazil, South Africa, Indonesia, Poland), the
+  phase decomposition shows positive Turkey-vs-counterfactual cumulative log-GDP-pc
+  gap over 2003-2013 (>+10 log-points, p_perm < 0.10) AND negative or zero gap over
+  2014-2024 (<= 0 log-points). The null counter-claim is that the apparent two-phase
+  pattern is artefact of EM-cycle timing and Turkey's growth path is not statistically
+  separable from EM peers' cycle.
+evidence_type: causal
+sample:
+  countries:
+  - TUR
+  - MEX
+  - BRA
+  - ZAF
+  - IDN
+  - POL
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag Brazil 2014-2016 recession; retain
+  - exclude COVID 2020Q2-2020Q4 from fitting
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - TUR
+  - MEX
+  - BRA
+  - ZAF
+  - IDN
+  - POL
+  outcome_dim:
+  - gdp_growth
+  - inflation
+  - currency_purchasing_power
+  - monetary_policy
+  policy_family:
+  - monetary_policy
+  - fiscal_policy
+  - institutional_reform
+  treatment_tags:
+  - turkey_akp_2002
+  - turkey_imf_program_2002
+  - erdogan_anti_interest_doctrine_2014
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: lira_usd_rate
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+  - name: cbrt_policy_rate
+    source: imf:FPOLM_PA; world_bank_wdi:FR.INR.RINR
+    transformation: level
+  treatment:
+  - name: akp_governance_indicator
+    source: 'constructed: 1 for TUR from 2003 onward'
+    transformation: binary
+  - name: phase_indicator
+    source: 'constructed: 1 (2003-2013 orthodox phase) vs 2 (2014-2024 unorthodox phase)'
+    transformation: ordinal
+    notes: Phase break at 2014 reflects the documented shift in monetary-policy doctrine and CBRT independence erosion.
+  controls:
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: emerging_market_vix
+    source: fred:VIXCLS
+    transformation: level
+  - name: wgi_govt_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  The 2003-2013 phase bundles institutional-reform (EU-accession-track judicial and
+  banking-supervision reform), monetary (CBRT inflation targeting, central-bank
+  independence), and fiscal (post-IMF-programme consolidation) channels. The 2014-2024
+  phase is dominated by monetary-channel (anti-interest doctrine, FX-protected deposits)
+  and institutional regression. Bundled coding per invariant 4.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with TUR treated from 2003 and EM peer donor pool. Phase
+    decomposition reports separate 2003-2013 and 2014-2024 cumulative gaps. Robustness
+    drops Brazil (2014-2016 recession parallel) and runs the test with Poland-only
+    counterfactual (closest EU-accession-track peer). The post-2018 currency crises
+    are episodic; cumulative-loss measure averages over crisis and recovery quarters.
+falsification:
+  rule: >-
+    Not supported if the phase-asymmetry pattern is NOT confirmed: specifically (a)
+    early-phase 2003-2013 cumulative log-GDP-pc gap < +10 log-points at p_perm < 0.10,
+    OR (b) late-phase 2014-2024 cumulative log-GDP-pc gap > 0 (no regression visible),
+    OR (c) the inflation-vs-counterfactual pattern fails to reverse between phases
+    (e.g., inflation gap stays positive in both phases). The "two-phase" framing
+    requires both phase coefficients to point as predicted with the directional break.
+  test: synth_did_phase_decomposition_with_inflation_validation
+  threshold: >-
+    early_phase_gdp_gap >= 0.10 at p_perm < 0.10 AND late_phase_gdp_gap <= 0 AND
+    early_phase_inflation_gap < 0 (disinflation outperformance) AND
+    late_phase_inflation_gap > 0 (inflation underperformance)
+prior_confidence: 0.7
+disclosure: >-
+  Author's prior is high on the two-phase asymmetry pattern. The 2014 doctrine break
+  is well-documented (Erdoğan's anti-interest-rate stance, sequential CBRT governor
+  dismissals 2019-2021, FX-protected deposit scheme 2021). Prior 0.70 reflects
+  strong directional confidence. The main uncertainty is whether the phase break at
+  2014 vs 2018 (Inan IV referendum + post-coup-attempt institutional consolidation)
+  is the correct dividing line; the spec uses 2014 as the doctrine-statement date.
+conflict_disclosure: No Turkish equity exposure.
+steelman: hypotheses/steelman/mena_turkey_akp_two_phase_economic_arc_2003_2024.md
+linked_hypotheses:
+- turkey_fx_erdogan_unorthodox_inflation_response_2021_2024
+- banking_crisis_turkey_2001_canonical
+notes: >-
+  Designed to be orthogonal to existing turkey_fx_erdogan hypothesis (which tests
+  the 2021-2024 unorthodox response specifically); this hypothesis tests the
+  longer 2003-2024 arc with phase decomposition. Data-gated on TÜİK and CBRT
+  long-run series.

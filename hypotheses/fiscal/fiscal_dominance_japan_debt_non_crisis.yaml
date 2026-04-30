@@ -1,0 +1,158 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiscal_dominance_japan_debt_non_crisis
+version: 1
+status: candidate
+topic: fiscal
+claim: >
+  Japan post-1990 has run gross public-debt-to-GDP ratios from ~70%
+  rising to ~250%, the highest sustained level in the OECD record,
+  WITHOUT triggering inflation, currency collapse, sovereign-spread
+  blowout, or fiscal-dominance-induced loss of monetary control. This
+  case is a counter-example to the Sargent-Wallace 1981 "unpleasant
+  monetarist arithmetic" prediction that high debt-to-GDP under
+  monetary independence forces eventual monetisation and inflation.
+  The post-Keynesian / MMT reading is that for a sovereign currency
+  issuer with deep domestic savings absorption, the debt-stock
+  constraint is a political-economy constraint about real-resource
+  allocation, not a market-discipline constraint about solvency. The
+  hypothesis tests whether Japan's debt path 1990-2024 violates the
+  Sargent-Wallace prediction at standard significance, and whether
+  inflation, JGB yields, and JPY trade-weighted index remained within
+  non-crisis bands across the period.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [JPN]
+  period: [1990, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - none (full Japan post-1990 sample is the test)
+canonical_metrics:
+  - metric_id: debt_to_gdp_threshold_breach
+    description: >
+      Japan general-government gross debt as percent of GDP exceeds
+      the Sargent-Wallace-style "unsustainable" threshold (commonly
+      argued ~90% in Reinhart-Rogoff or ~150% in conservative IMF
+      framings) without triggering crisis.
+    threshold: ">150% sustained 2010-2024"
+    window: "2010-2024"
+    source: "imf:WEO_GGXWDG_NGDP"
+    direction: supports_claim
+    independence_justification: >
+      The debt-to-GDP level is the structural premise of the
+      hypothesis; metric establishes it. Independent of the
+      crisis-symptom metrics below.
+  - metric_id: cpi_inflation_below_persistent_threshold
+    description: >
+      Japan CPI inflation never exceeds the IMF's "elevated inflation"
+      4% threshold for more than two consecutive years across the
+      sample period.
+    threshold: "<4% persistent across 1990-2024 (max ~3% transient post-COVID)"
+    window: "1990-2024"
+    source: "fred:JPNCPIALLMINMEI"
+    direction: supports_claim
+    independence_justification: >
+      Inflation is the Sargent-Wallace mechanism's predicted symptom;
+      its absence falsifies the prediction. Independent of FX and
+      yield metrics.
+  - metric_id: jgb_10y_yield_below_crisis_band
+    description: >
+      Japan 10-year government-bond yield never breaches a
+      "crisis-spread" threshold (e.g. 5%) across the sample.
+    threshold: "<5% across 1990-2024 (max ~1.5% in early 1990s, peaked ~1.7% in 2025)"
+    window: "1990-2024"
+    source: "oecd:OECD.SDD.STES,DSD_KEI@DF_KEI,4.0"
+    direction: supports_claim
+    independence_justification: >
+      Sovereign-spread blowout is the Sargent-Wallace market-discipline
+      mechanism; its absence directly tests the prediction. Independent
+      of FX and inflation metrics.
+  - metric_id: jpy_trade_weighted_index_no_collapse
+    description: >
+      Japanese yen trade-weighted real-effective-exchange-rate index
+      remains within a non-crisis band (no >50% real depreciation
+      in any 12-month window) across the sample.
+    threshold: "no >50% REER decline in any 12-month window 1990-2024"
+    window: "1990-2024"
+    source: "bis:WS_EER"
+    direction: supports_claim
+    independence_justification: >
+      Currency collapse is the alternative Sargent-Wallace symptom
+      when debt is foreign-denominated; for Japan (yen-denominated)
+      currency stability is still a relevant non-crisis test.
+      Independent of the inflation and yield metrics.
+  - metric_id: monetary_policy_independence_preserved
+    description: >
+      Bank of Japan retains operational independence and ability to
+      conduct unconventional monetary policy (QE, YCC) without being
+      forced into direct deficit monetisation by fiscal authority.
+      Coding by qualitative cross-reference to BoJ governance and
+      MoF coordination record.
+    threshold: "BoJ retains operational policy autonomy across 1990-2024 per qualitative coding"
+    window: "1990-2024"
+    source: "boj:policy_governance_record;academic:bof_independence_index"
+    direction: supports_claim
+    data_quality_flag: >
+      Qualitative coding required; BoJ-MoF coordination during YCC
+      raises a legitimate question about ex-ante "independence" but
+      the test is whether monetary policy was forced to monetise
+      deficits unwillingly, not whether coordination occurred.
+    independence_justification: >
+      Sargent-Wallace's mechanism is loss of monetary-policy autonomy
+      at high debt; the independence metric tests the mechanism
+      directly rather than just its symptoms.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+variables:
+  outcome:
+    - name: gross_general_government_debt_gdp
+      source: imf:WEO_GGXWDG_NGDP
+      transformation: level
+    - name: cpi_inflation_yoy
+      source: fred:JPNCPIALLMINMEI
+      transformation: yoy
+    - name: jgb_10y_yield
+      source: oecd:OECD.SDD.STES,DSD_KEI@DF_KEI,4.0
+      transformation: level
+    - name: jpy_real_effective_exchange_rate
+      source: bis:WS_EER
+      transformation: level
+prior_confidence: 0.7
+disclosure: >
+  Author framing draws on the post-Keynesian / functional-finance / MMT
+  reading of currency-issuer fiscal space, and on the Werner / Koo
+  empirical Japan literature. A market-liberal reader would object that
+  Japan is a special case (deep domestic savings absorbing JGBs at
+  near-zero yields, demographic-and-cultural ZIRP-stability), that the
+  Sargent-Wallace prediction does not say crisis is GUARANTEED at any
+  particular debt level but that the unconditional path is unsustainable,
+  and that 35 years of Japan low-inflation accommodation is not an
+  infinity — the debt-stock could still impose real costs (crowding-
+  out of public investment, capacity constraints on response to future
+  crises) that aggregate to the same prediction over a longer horizon.
+  Authorial framing risk acknowledged; the multi-metric checklist
+  defines "non-crisis" rigorously across four independent symptom
+  channels, so partial failures along one channel do not produce a
+  full-support reading.
+steelman: hypotheses/steelman/fiscal_dominance_japan_debt_non_crisis.md
+linked_hypotheses:
+  - hyperinflation_requires_fiscal_dominance
+  - japan_public_debt_solvency_inflation_independence
+scope:
+  period: [1990, 2024]
+  countries: [JPN]
+  outcome_dim: [fiscal_policy, monetary_policy, inflation, currency_purchasing_power]
+  policy_family: [fiscal_policy, monetary_policy]
+  treatment_tags:
+    - japan_high_debt
+    - sargent_wallace_counter_example
+    - fiscal_dominance
+notes: >
+  Candidate, not pre_registered. On promotion, secure a registered
+  fetcher for BoJ governance / monetary independence index, and
+  pin the qualitative coding rule for the monetary-independence
+  metric (which is the weakest leg of the multi-metric design).
+  Note overlap with japan_public_debt_solvency_inflation_independence
+  hypothesis; this spec is the post-Keynesian-framed version testing
+  the Sargent-Wallace prediction directly.

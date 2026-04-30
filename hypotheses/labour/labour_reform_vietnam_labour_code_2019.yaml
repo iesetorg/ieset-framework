@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_vietnam_labour_code_2019
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Vietnam's 2019 Labour Code revision (Law 45/2019/QH14:
+  retirement-age increase, multiple-trade-union recognition,
+  working-time provisions, dispute-resolution reform)
+  effective 2021-Q1 raised the Vietnamese formal-employment
+  share by at least 1.5 pp by 2024 relative to a synthetic
+  control of ASEAN peers, with the largest gains in foreign-
+  invested manufacturing.
+notes: >
+  Treatment dated 2021-Q1 (effective date). Vietnam's 2019
+  Labour Code is unusual because it includes ILO-conformity
+  changes (multiple-union recognition) alongside flexibilisation
+  components. COVID overlap is a concern.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to ILO-conformity reforms producing
+  formalisation gains in FDI-intensive manufacturing but
+  acknowledges the Vietnamese export boom 2020-2024 makes
+  donor-pool comparison fragile.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Vietnamese formal-employment
+    share > +1.5 pp by 2024 AND the gain is concentrated in
+    foreign-invested manufacturing sectors. REFUTED if formal-
+    employment gap < +0.5 pp OR uniformly distributed across
+    sectors (no FDI-channel concentration).
+  test: >
+    Synth-DiD on Vietnamese formal-employment share 2021-2024
+    vs ASEAN donor pool with FDI-share control, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [VNM, IDN, THA, MYS, PHL, KHM]
+  period: [2010, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+    - name: manufacturing_employment_share
+      source: world_bank_wdi:SL.IND.EMPL.ZS
+      transformation: level
+  treatment:
+    - name: vietnam_labour_code_2019
+      source: "constructed: indicator for 2021-Q1 Law 45/2019 effective date"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: fdi_inflow_share
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2021, 2024]
+  countries: [VNM]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [vietnam_labour_code_2019]
+steelman: hypotheses/steelman/labour_reform_vietnam_labour_code_2019.md

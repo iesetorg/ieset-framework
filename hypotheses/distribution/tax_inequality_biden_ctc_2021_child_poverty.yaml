@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_biden_ctc_2021_child_poverty
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 2021 expansion of the US Child Tax Credit under the American Rescue
+  Plan (full refundability + monthly payments + raised maximum) reduced
+  the official + Supplemental Poverty Measure child poverty rate by at
+  least 3 percentage points within the six-month payment window (July-
+  December 2021), with a sharp reversion after expiration in 2022Q1. The
+  discriminating test is the symmetric pre/expansion/post pattern in SPM
+  child-poverty rates.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 2. Pairs with IRA tax provisions
+  separately.
+prior_confidence: 0.8
+disclosure: >
+  Author prior accepts the Census Bureau SPM finding that child poverty
+  fell sharply during the expansion window. Risk: the SPM measure is
+  partly mechanical given that CTC payments enter the SPM calculation
+  directly; the test is closer to descriptive accounting than causal.
+falsification:
+  rule: >
+    SUPPORTED if SPM child-poverty rate falls by at least 3 percentage
+    points 2020-2021 AND rises by at least 2 percentage points 2021-2022
+    after expiration. REFUTED if either move is below 1.5 percentage
+    points at p<0.10.
+  test: >
+    US descriptive time-series 2018-2023 SPM and OPM child-poverty rates
+    around 2021Q3-2021Q4 expansion window with explicit expiration break
+    at 2022Q1.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2018, 2023]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: child_poverty_rate
+      source: "world_bank_wdi:SI.POV.NAHC"
+      transformation: level
+    - name: poverty_headcount_ratio_national
+      source: "world_bank_wdi:SI.POV.NAHC"
+      transformation: level
+  treatment:
+    - name: ctc_expansion_window_2021h2
+      source: "constructed: indicator = 1 for 2021Q3-2021Q4"
+      transformation: indicator
+    - name: post_ctc_expiration_2022_indicator
+      source: "constructed: indicator = 1 for year >= 2022"
+      transformation: indicator
+  controls:
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: level
+    - name: cpi_inflation
+      source: "fred:CPIAUCSL"
+      transformation: yoy_pct_change
+    - name: log_real_gdp
+      source: "fred:GDPC1"
+      transformation: log
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Event study with two breaks at 2021Q3 (expansion) and 2022Q1 (expiration).
+    HAC SEs. Robustness using descriptive comparison of OPM vs SPM child-
+    poverty over the window.
+intervention_channel: fiscal
+scope:
+  period: [2021, 2023]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, welfare_state, taxation]
+  policy_family: [tax_policy, welfare_architecture]
+  treatment_tags: [ctc_expansion_2021, american_rescue_plan, child_poverty]

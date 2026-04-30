@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: paraguay_long_stable_growth_2003_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Paraguay 2003-2024 quietly delivered cumulative log real-GDP per
+  capita growth in the top half of Latin America, with low inflation
+  (mean below 5% annualised), stable fiscal balance, and durable
+  currency, despite minimal headline reform attention. The
+  pre-registered claim is that Paraguay's combination of (a) low
+  effective tax rates and a tax-haven-adjacent regime, (b) abundant
+  hydroelectricity from Itaipú and Yacyretá producing the
+  cheapest-in-LATAM industrial electricity, (c) soybean and beef
+  export specialisation, and (d) Mercosur trade integration produced
+  a structurally stable growth path. The mechanism is a low-friction
+  small-economy model. Primary statistics: log_gdp_pc_constant
+  cumulative growth 2003-2024 (PRY) exceeds the LATAM median by at
+  least 0.10 log-points, AND mean cpi_inflation_yoy is below 5%, AND
+  the within-country standard deviation of real-GDP growth (a
+  volatility metric) does not exceed the regional median.
+
+evidence_type: associational
+
+sample:
+  countries: [PRY, BOL, URY, ECU, PER, ARG, BRA, COL]
+  period: [2003, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [2003, 2024]
+  countries: [PRY, BOL, URY, ECU, PER, ARG, BRA, COL]
+  outcome_dim: [gdp_growth, inflation, fiscal_policy, energy]
+  policy_family: [tax_policy, energy_policy, trade_policy]
+  treatment_tags: [paraguay_itaipu, paraguay_mercosur]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: fiscal_balance_share_gdp
+      source: imf:GGXCNL_NGDP
+      transformation: level
+    - name: real_gdp_growth_volatility
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: rolling_5yr_sd
+  controls:
+    - name: soybean_price
+      source: fred:PSOYBUSDM
+      transformation: log_level
+    - name: beef_price
+      source: fred:PBEEFUSDM
+      transformation: log_level
+    - name: brazil_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+      notes: Paraguay's largest export market; spillover control.
+    - name: argentina_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of log_gdp_pc on country and year FE plus
+    Paraguay-indicator interaction. Secondary: descriptive ranking
+    of cumulative log GDP-pc growth and macro-volatility metrics.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc 2003-2024 (PRY minus
+    LATAM median) is < 0.10, OR (b) mean cpi_inflation_yoy
+    (PRY, 2003-2024) >= 5%, OR (c) within-PRY 5-year-rolling SD of
+    real-GDP growth exceeds the LATAM median.
+  test: panel_fe_plus_volatility_metric
+  threshold: >
+    cumulative_log_gdp_pc(PRY, 2003-2024) - cumulative_log_gdp_pc(LATAM_median, 2003-2024) >= 0.10
+    AND mean_cpi_inflation_yoy(PRY, 2003-2024) < 5
+    AND within_PRY_SD_gdp_growth(2003-2024) <= median_LATAM_within_SD_gdp_growth(2003-2024)
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author market-liberal prior favours the small-economy low-friction
+  model. Paraguay is genuinely under-studied; risk is that the
+  apparent stability is a function of small-base statistical
+  characteristics rather than policy structure.
+
+steelman: hypotheses/steelman/paraguay_long_stable_growth_2003_2024.md
+
+linked_hypotheses:
+  - chile_post_1990_institutional_premium
+
+notes: >
+  Under-studied case; spec deliberately includes a volatility-metric
+  to test the "stable" framing rather than only the "growth" framing.

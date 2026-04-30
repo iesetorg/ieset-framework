@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_eu_eastern_enlargement_2004_growth_convergence
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The 2004 EU eastern enlargement (CZE, EST, HUN, LVA, LTU, POL,
+  SVK, SVN; plus CYP, MLT) produced an income-convergence
+  acceleration relative to non-acceding Eastern European and
+  CIS comparators. The Krugman-style claim is that single-market
+  access plus Schengen labour mobility plus the regulatory acquis
+  drives faster catch-up of GDP-per-capita to the EU-15 mean.
+  The test is staggered DiD against a donor pool of non-EU
+  Eastern European economies (BIH, MKD, MNE, SRB, TUR, UKR, MDA,
+  BLR), evaluated over the 2004-2019 window.
+
+evidence_type: causal
+
+sample:
+  countries: [CZE, EST, HUN, LVA, LTU, POL, SVK, SVN, BIH, MKD, MNE, SRB, TUR, UKR, MDA, BLR, ROU, BGR, HRV]
+  period: [1995, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop UKR 2014-2019 (Crimea/Donbas conflict invalidates comparator status)"
+    - "drop BLR post-2020 (excluded by sample end-date 2019 anyway)"
+    - "exclude pre-1995 Yugoslav-wars years where data are unreliable"
+
+scope:
+  period: [1995, 2019]
+  countries: [CZE, EST, HUN, LVA, LTU, POL, SVK, SVN]
+  outcome_dim: [gdp_growth, trade_liberalisation]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [eu_enlargement_2004, single_market_accession, schengen_labour_mobility, acquis_communautaire]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant_usd
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+  treatment:
+    - name: eu_2004_enlargement_indicator
+      source: "constructed: indicator = 1 for CZE, EST, HUN, LVA, LTU, POL, SVK, SVN from 2004-05-01 onward; 0 elsewhere"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: wgi_rule_of_law
+      source: "world_bank_wgi:RL.EST"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  EU accession bundles trade-policy (single-market goods/services
+  access), institutional reform (acquis adoption), labour-market
+  liberalisation (free movement), and structural funds (fiscal).
+  Bundled per invariant 4.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Callaway-Sant'Anna staggered DiD with 2004 cohort. Donor pool
+    = non-acceding Eastern European/Balkan states. Pre-trends
+    examined 1995-2003. Robustness: drop UKR entirely (volatile
+    comparator); test 2007 cohort (BGR, ROU) and 2013 cohort
+    (HRV) as separate panel waves in companion specs.
+
+falsification:
+  rule: >
+    SUPPORTED if Callaway-Sant'Anna ATT on log GDP per capita over
+    the 5-year and 10-year post-accession horizons is positive and
+    significant at p<0.05, AND ATT on trade-openness is positive
+    and significant. PARTIAL if openness rises but growth gap is
+    insignificant — common-market access raised trade but did not
+    measurably accelerate convergence. REFUTED if the ATT on log
+    GDP-per-capita is negative or wrong-signed at p<0.05.
+  test: cs_did_eu_2004_enlargement_growth_and_openness
+  threshold: >
+    PRIMARY: cs_did_ATT(log_gdp_pc, h=10y) > 0 at p<0.05 AND
+    cs_did_ATT(trade_openness, h=10y) > 0 at p<0.05.
+    INFORMATIVE: ex-UKR robustness retains coefficient at >=0.7 × full.
+
+prior_confidence: 0.78
+
+disclosure: >
+  Author prior is moderately high (0.78). The convergence pattern
+  is well documented (Crespo-Cuaresma et al. 2014; Campos-Coricelli-
+  Moretti 2019). The cleanest critique is that the donor pool is
+  weak — non-acceding Balkan states had different histories
+  (Yugoslav-wars legacy, weaker pre-1995 institutions), so any
+  positive ATT could overstate the EU effect. Heterodox
+  developmentalist critics will note that the convergence was
+  uneven (peripheral regions in acceding states often lost
+  relative ground) and that the post-GFC austerity wave from 2010
+  partially reversed the gains for some members (HUN, ROU on some
+  measures). Restricting evaluation to 2004-2019 captures the
+  full window including the post-GFC reversal.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+  - trade_lib_eu_2007_2013_enlargement_balkans
+
+steelman: hypotheses/steelman/trade_lib_eu_eastern_enlargement_2004_growth_convergence.md

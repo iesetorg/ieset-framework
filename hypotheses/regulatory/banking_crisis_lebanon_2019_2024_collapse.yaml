@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_lebanon_2019_2024_collapse
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Lebanon's 2019-2024 banking collapse — informal capital controls, multi-tier
+  exchange rates, sovereign default on Eurobonds in March 2020, and a real-GDP
+  cumulative decline of >= 35% — constitutes a canonical case of a peg-plus-Ponzi-
+  banking-system unwind in a small, dollarised, post-civil-war economy. The hypothesis
+  is that Lebanon 2019-2024 meets the canonical multi-metric checklist on at least 5
+  of 6 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [LBN]
+  period: [2015, 2024]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_gdp_cumulative_decline
+    description: Lebanon real GDP cumulative peak-to-trough decline
+    threshold: ">= 35% decline"
+    window: "2018-2023"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD; imf:NGDPRPCH"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: cpi_inflation_spike
+    description: Lebanon CPI inflation YoY peak
+    threshold: ">= 100% YoY peak"
+    window: "2020-2023"
+    source: "world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH"
+    direction: supports_claim
+    independence_justification: Price-level outcome.
+  - metric_id: pound_depreciation
+    description: Lebanese pound parallel-market depreciation against USD
+    threshold: ">= 90% nominal depreciation peak-to-trough"
+    window: "2019-2023"
+    source: "imf:ENDA_XDC_USD_RATE"
+    direction: supports_claim
+    independence_justification: External-rate signal (parallel-market rate where official rate diverges).
+  - metric_id: sovereign_default_event
+    description: Sovereign default on Eurobonds March 2020
+    threshold: "yes/no — yes counts as breach"
+    window: "2020"
+    source: "imf:LBN_DEFAULT_2020"
+    direction: supports_claim
+    independence_justification: Default event.
+  - metric_id: informal_capital_controls
+    description: Informal capital and deposit-withdrawal controls imposed October 2019
+    threshold: "yes/no — yes counts as breach"
+    window: "2019-2024"
+    source: "imf:LBN_CFM_2019"
+    direction: supports_claim
+    independence_justification: Resolution-policy event.
+  - metric_id: bank_credit_to_gdp_decline
+    description: Bank credit to private sector decline from peak
+    threshold: ">= 50 pp of GDP decline"
+    window: "2019-2023"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 5
+  refute_threshold: 2
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: peak_yoy
+prior_confidence: 0.97
+disclosure: >
+  Lebanon's 2019-2024 collapse is one of the three or four most severe banking
+  crises since 1980 by World Bank's own characterisation. Pattern overdetermined.
+  Coding choices on parallel-market vs official-rate are pre-committed.
+steelman: hypotheses/steelman/banking_crisis_lebanon_2019_2024_collapse.md
+scope:
+  period: [2015, 2024]
+  countries: [LBN]
+  outcome_dim: [financial_crisis, currency_purchasing_power, fiscal_policy, financialisation]
+  policy_family: [regulation, exchange_rate_regime, fiscal_policy]
+  treatment_tags: [lebanon_2019_2024, ponzi_banking_system, eurobond_default_2020, multi_tier_xr]

@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_reform_germany_hartz_iv_unemployment_consolidation
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  The Hartz IV reform (Jan 2005, consolidating Arbeitslosenhilfe and Sozialhilfe into a single means-tested
+  benefit with stricter activation rules) cut Germany's long-term-unemployment rate by at least 30%
+  within seven years (2005-2012) relative to a synthetic-control of EU peers (FRA, BEL, NLD, AUT, ITA),
+  with the activation channel decomposed from the wage-floor channel by tracking the simultaneous Hartz
+  I-III placement-service reforms.
+evidence_type: causal
+prior_confidence: 0.65
+disclosure: |
+  Author has market-liberal priors that favour activation-channel reforms; the Krause-Uhlig 2012 and
+  Krebs-Scheffel 2013 literature reports large effects on long-term unemployment. Identification depends
+  on synthetic-control fit; the 2005 timing aligns with the global cycle upturn which donor-pool peers
+  also experienced.
+sample:
+  countries: [DEU, FRA, BEL, NLD, AUT, ITA]
+  period: [1995, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2008-2009 GFC years from pre-treatment fit
+variables:
+  outcome:
+  - name: long_term_unemployment_rate
+    source: oecd:DSD_LFS_BS@DF_LTUE
+    transformation: level_pct
+  - name: employment_rate_age_55_64
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: level_pct
+  treatment:
+  - name: hartz_iv_indicator
+    source: oecd:DSD_LFS_BS@DF_LTUE
+    transformation: indicator
+    notes: DEU = 1 from 2005-Q1; 0 for donor pool.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: union_density
+    source: oecd:DSD_TUD@DF_TUD
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: |
+  Hartz IV bundles regulatory activation rules with fiscal benefit consolidation; channel is bundled.
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Synthetic control on DEU long-term-unemployment series 1995-2015 with FRA, BEL, NLD, AUT, ITA donor
+    pool. Pre-treatment fit 1995-2004 (excluding GFC). Hartz I-III timing 2003 tested as placebo
+    ahead-of-Hartz-IV check.
+falsification:
+  rule: |
+    Refuted if the synthetic-control gap on long-term-unemployment at seven-year horizon is below 30%
+    reduction, OR if placebo permutation p-value exceeds 0.10, OR if the Hartz-I-III pre-window placebo
+    also shows a negative gap of comparable magnitude (suggesting common-trend rather than treatment effect).
+  test: synthetic_control_7yr_gap_long_term_unemployment
+  threshold: gap_relative <= -30% at 7yr horizon AND placebo_p < 0.10 AND placebo_pre_window_gap > -10%
+scope:
+  period: [2005, 2015]
+  countries: [DEU, FRA, BEL, NLD, AUT, ITA]
+  outcome_dim: [employment_labour, welfare_state]
+  policy_family: [welfare_architecture, labour_market, institutional_reform]
+  treatment_tags: [agenda_2010, hartz_iv_2005, schroder_reforms]
+steelman: hypotheses/steelman/welfare_reform_germany_hartz_iv_unemployment_consolidation.md

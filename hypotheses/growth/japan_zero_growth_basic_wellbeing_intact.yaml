@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: japan_zero_growth_basic_wellbeing_intact
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Japan's 1990-2020 near-zero per-capita GDP growth regime
+  (mean GDP/capita growth < 1%) coincided with a meaningful
+  improvement in life expectancy at birth (+5 years), a sharp
+  decline in average annual hours worked per employed person
+  (~-15%), and a stable Cantril life-satisfaction trajectory at
+  OECD-median levels. The pattern refutes the proposition that
+  per-capita GDP growth is a binding constraint on retaining or
+  improving baseline-wellbeing outcomes in advanced economies.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [JPN]
+  period: [1990, 2020]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop 2020 COVID year for the GDP-growth premise check (canonical-case spec uses pre-2020 mean)"
+
+variables:
+  outcome:
+    - name: gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+    - name: avg_annual_hours_worked_per_employed
+      source: "pwt:avh"
+      transformation: level
+    - name: cantril_life_satisfaction
+      source: "owid:happiness-cantril-ladder"
+      transformation: level
+      notes: "Gallup World Poll Cantril ladder via OWID. Coverage starts 2006, so the 1990 baseline is unavailable for this metric. Spec uses 2008-2020 trajectory and tests stability against OECD median."
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+  treatment:
+    - name: japan_lost_decades_window
+      source: "constructed: indicator = 1 for JPN 1990-2020"
+      transformation: indicator
+
+canonical_metrics:
+  - metric_id: jpn_zero_growth_premise
+    description: >
+      Japanese mean per-capita real GDP growth, 1990-2019 (excluding
+      2020 COVID year), is below 1.5% to qualify as a near-zero
+      growth regime that the claim asserts.
+    threshold: "mean(NY.GDP.PCAP.KD.ZG, 1990-2019) < 1.5%"
+    window: "1990-2019"
+    source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+    direction: supports_claim
+    independence_justification: >
+      Macro-aggregate independent in measurement methodology from the
+      health, hours, and satisfaction outcomes below.
+  - metric_id: jpn_life_expectancy_gain
+    description: >
+      Japanese life expectancy at birth rose by at least 4 years
+      from 1990 baseline (78.83) to 2019 (84.36) -- a substantial
+      gain in the basic-wellbeing measure most cited in the
+      stagnation-vs-wellbeing degrowth literature.
+    threshold: "LE_2019 - LE_1990 >= 4 years"
+    window: "1990-2019"
+    source: "world_bank_wdi:SP.DYN.LE00.IN"
+    direction: supports_claim
+    independence_justification: >
+      Vital-registration outcome independent from labour-market and
+      survey-based satisfaction metrics.
+  - metric_id: jpn_hours_worked_decline
+    description: >
+      Japanese average annual hours worked per employed person fell
+      by at least 10% from 1990 to 2019 -- a direct measure of
+      time-poverty alleviation that the degrowth literature treats
+      as a positive welfare dimension.
+    threshold: "avh_2019 / avh_1990 <= 0.90"
+    window: "1990-2019"
+    source: "pwt:avh"
+    direction: supports_claim
+    independence_justification: >
+      PWT labour-input series, methodologically distinct from health
+      and satisfaction outcomes.
+  - metric_id: jpn_life_satisfaction_stable_oecd_median
+    description: >
+      Japanese Cantril life-satisfaction over the available 2008-2020
+      window stays within 1 point of the OECD median in every year.
+      Tests the "growth-stagnation does not collapse subjective
+      wellbeing" claim on the canonical satisfaction measure.
+    threshold: "max(|cantril_jpn_t - cantril_oecd_median_t|) <= 1.0 over 2008-2020"
+    window: "2008-2020"
+    source: "owid:happiness-cantril-ladder"
+    direction: supports_claim
+    independence_justification: >
+      Subjective survey instrument distinct from objective metrics
+      above. Coverage begins 2006 (Gallup World Poll launch), so
+      cannot test 1990-2020 endpoint -- the metric is honest about
+      its window.
+
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 4
+  refute_threshold: 2
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Single-country canonical case, four-leg pattern-match.
+    Distinct from the existing japan_stagnation_wellbeing_outcomes
+    spec which tests a six-leg canonical wellbeing basket including
+    suicide and fertility (degraded dimensions); this spec tests
+    only the four legs the eco-socialist / degrowth literature
+    centres -- LE, hours, satisfaction, employment -- and asserts
+    that on those four the verdict is supported, while remaining
+    silent on the additional dimensions covered in the companion
+    spec. The two specs are designed to score the same Japan
+    canonical case on different fairly-defined indicator baskets.
+
+falsification:
+  rule: >
+    SUPPORTED iff all four canonical metrics are met (premise +
+    LE gain + hours decline + satisfaction stable). REFUTED if
+    fewer than 2 are met OR if the GDP-growth premise fails (mean
+    >= 1.5% would mean Japan is not a near-zero-growth case in the
+    relevant window). PARTIAL if 2 or 3 are met. METHOD_VALID:
+    requires WDI LE + WDI growth + PWT avh on disk for JPN
+    1990-2020; if PWT avh missing, downgrade to inconclusive on
+    hours-worked metric. Cantril window is honest about its
+    2008-2020 coverage.
+  test: japan_zero_growth_basic_wellbeing_quad_check_1990_2020
+  threshold: >-
+    PRIMARY: 4-of-4 canonical metrics met.
+
+prior_confidence: 0.6
+
+disclosure: >-
+  Degrowth authorial framing: the four-leg basket selects exactly
+  the indicators where Japan looks best (life expectancy, hours
+  worked, satisfaction) and excludes fertility (TFR fell ~12%,
+  documented in the v2 of japan_stagnation_wellbeing_outcomes),
+  suicide (peaked >24/100k in late 1990s), and inequality (Gini
+  worsened ~25 to ~33). The exclusion is intentional and is the
+  specification's contestable choice -- this spec is the
+  degrowth-favourable basket; the companion spec is the broader
+  basket. Reading the two specs together is the honest scoreboard.
+  This disclosure does not change the falsification rule but
+  prevents a "we scored 4-of-4 on Japan" claim from being read as
+  the full wellbeing picture.
+
+steelman: hypotheses/steelman/japan_zero_growth_basic_wellbeing_intact.md
+
+scope:
+  period: [1990, 2020]
+  countries: [JPN]
+  outcome_dim: [gdp_growth, life_expectancy_health, employment_labour]
+  policy_family: [none]
+  treatment_tags: [japan_lost_decades_1990, japan_asset_bubble_collapse_1990]
+
+linked_hypotheses:
+  - japan_stagnation_wellbeing_outcomes
+  - costa_rica_high_wellbeing_low_throughput_path
+
+notes: >
+  Companion to japan_stagnation_wellbeing_outcomes (v2). That spec
+  uses a 6-indicator canonical wellbeing basket including suicide
+  and fertility (degraded dims); this spec uses the 4-indicator
+  degrowth-favourable basket. The two together form the full
+  scoreboard. WDI + PWT inputs are on disk per repo notes.
+  Cantril ladder via OWID coverage gap 1990-2007 is acknowledged.

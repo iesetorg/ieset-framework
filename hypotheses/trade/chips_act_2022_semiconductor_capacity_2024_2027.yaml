@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: chips_act_2022_semiconductor_capacity_2024_2027
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  The 2022 US CHIPS and Science Act (~$52bn manufacturing subsidy + 25% ITC)
+  produced a measurable acceleration in announced and realised US
+  semiconductor fab construction starts and capacity additions over 2023-
+  2027, narrowing the US share-of-global advanced-logic capacity gap
+  relative to Taiwan + South Korea, but the realised capacity addition by
+  2027 falls materially short of both the headline announcements (Intel
+  Ohio, TSMC Arizona, Samsung Texas, Micron New York) and the pre-CHIPS
+  US share-recovery rhetoric. Asian competitor capex (TSMC Taiwan, Samsung
+  Korea, SMIC China) continued at or above pre-CHIPS rates over the same
+  window, so the US share of global advanced-node (≤7nm) wafer capacity
+  rises modestly rather than dramatically.
+
+evidence_type: causal
+
+sample:
+  countries: [USA, TWN, KOR, JPN, CHN, DEU, IRL, ISR]
+  period: [2018, 2027]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing SEMI / TechInsights wafer-capacity panel data"
+
+scope:
+  period: [2018, 2027]
+  countries: [USA, TWN, KOR, JPN, CHN, DEU, IRL, ISR]
+  outcome_dim: [industrial_capability, productivity, fiscal_policy]
+  policy_family: [industrial_policy, fiscal_policy, trade_policy]
+  treatment_tags: [chips_act_2022, us_semiconductor_industrial_policy, biden_industrial_policy, advanced_node_reshoring]
+
+variables:
+  outcome:
+    - name: log_us_semiconductor_fab_construction_value_added
+      source: "fred:TLPRVCONS"
+      transformation: log
+      notes: "FRED total private construction spending — manufacturing component, with semiconductor subseries when available (TLMFGCONS or specific NAICS 3344 split). BEA NIPA private fixed investment in computing/electronics equipment as cross-check (fred:Y033RC1Q027SBEA)."
+    - name: log_us_advanced_node_wafer_capacity_kwspm
+      source: "constructed: SEMI World Fab Forecast / TechInsights advanced-node (≤7nm logic) capacity by location (kWspm = thousand wafers per month). Manual-drop pending under data/manual/derived/."
+      transformation: log
+    - name: us_share_global_logic_capacity
+      source: "constructed: SEMI / Boston Consulting Group + SIA (Semiconductor Industry Association) annual capacity-share report. Manual-drop pending."
+      transformation: level
+    - name: log_taiwan_korea_china_semiconductor_capex
+      source: "constructed: TSMC + Samsung + SK Hynix + SMIC reported annual capex (company filings). Cross-check against Korea industrial-production semiconductor index (oecd or kosis source)."
+      transformation: log
+    - name: us_chips_act_obligated_outlay_usd
+      source: "constructed: Department of Commerce / CHIPS Program Office obligation tracker. Manual-drop pending."
+      transformation: log
+
+  treatment:
+    - name: us_post_chips_dummy
+      source: "constructed: indicator = 1 for USA from 2022-08 (CHIPS Act enactment) onwards; 0 otherwise."
+      transformation: indicator
+    - name: us_chips_eligible_advanced_node_interaction
+      source: "constructed: interaction of post-CHIPS dummy with advanced-node (≤7nm logic) eligibility. Identifies whether the subsidy is binding on the targeted leading-edge segment vs trailing-edge."
+      transformation: indicator
+
+  controls:
+    - name: log_global_semiconductor_demand
+      source: "constructed: WSTS (World Semiconductor Trade Statistics) global billings. Manual-drop pending."
+      transformation: log
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: real_interest_rate
+      source: "fred:DFII10"
+      transformation: level
+    - name: us_export_control_intensity_china
+      source: "constructed: BIS export-control rule count (October 2022, October 2023, December 2024 expansions) — count of HS6 / ECCN line items restricted. Cross-check against fred:IRPRTS003M086NEST commodity export indices. Manual-drop pending."
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  CHIPS bundles direct subsidy (~$39bn manufacturing grants), 25% investment tax credit
+  (fiscal), and BIS export controls on advanced-node equipment to China (regulatory).
+  Pure-fiscal vs regulatory decomposition impossible without the export-control complement.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary specification: differences-in-differences with treatment =
+    USA post-2022, control = TWN, KOR, JPN, CHN, DEU. Outcome: log
+    semiconductor-construction value, log advanced-node capacity, US
+    share of global logic capacity. Test whether the US × post-2022
+    coefficient is significantly positive after country + year FE.
+
+    Secondary specification: synthetic control for USA on semiconductor
+    construction spending using donor pool of non-treated peers; the
+    counterfactual USA carries forward pre-CHIPS construction trend.
+
+    Decomposition asks: of (a) construction starts, (b) realised capacity,
+    (c) global share, (d) outlay disbursement, which exceeded their pre-
+    CHIPS trend by ≥1 sigma by 2027? Realised capacity is the binding
+    measure; announcements + obligated funds are leading.
+
+    Known limitations:
+    (1) 2024-2027 outcomes still partially forecast; v1 reports through
+        latest available year, v1.1 updates as fab construction completes
+        (Intel Ohio delayed to 2027-2028; TSMC AZ Phase 1 ramping 2025).
+    (2) Asian competitor capex is endogenous — TSMC + Samsung accelerated
+        domestic capex partly in response to US export-control pressure
+        rather than independent of it.
+    (3) Advanced-node (≤7nm) is the policy-target segment; trailing-edge
+        capacity (28nm+) trends differently and a wide-aperture "all
+        semiconductor" outcome would dilute the policy signal.
+    (4) BIS October 2022 / 2023 export controls are a confounder bundled
+        with the subsidy — separating subsidy-induced reshoring from
+        export-control-induced reshoring is hard.
+
+falsification:
+  rule: >
+    Not supported if (a) the US × post-2022 effect on semiconductor
+    construction is not statistically positive at p<0.10 after country +
+    year FE, OR (b) US share of global advanced-node logic capacity does
+    not rise by at least 5 percentage points by end-2027, OR (c) realised
+    capacity addition by 2027 is less than 30% of announced 2022-2024
+    capacity-addition headlines, OR (d) Asian competitor capex fell
+    materially below pre-CHIPS trend (refuting the "narrowing the gap"
+    framing — it would imply the US gain is a relocation of capex rather
+    than expansion of the policy-target). If only construction-start
+    activity rises but realised capacity by 2027 is well short of
+    announcements, classify as "announcement bubble."
+  test: chips_act_capacity_did_panel
+  threshold: >
+    US × post-2022 β on log construction > 0.20 at p<0.10 AND US
+    advanced-node share rises ≥ 5pp by 2027 AND realised capacity ≥
+    50% of announcement headline AND TSMC + Samsung capex remained
+    flat-to-positive (no withdrawal). ≥3 of 4 hit = supported; 2 = mixed.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author prior is that CHIPS produced a real but more-modest-than-headline
+  effect: construction spending rose strongly (FRED manufacturing-construction
+  series tripled 2022-2024), but realised advanced-node capacity will lag
+  announcements by 2-4 years and be ~50-70% of headline by 2027 (Intel Ohio
+  delays + Samsung Texas push-out + workforce shortages). Asian competitor
+  capex did not meaningfully decelerate. Author is sceptical of advanced-
+  manufacturing industrial policy as a generic reshoring strategy and
+  expects the US-share gain to be modest (3-7pp) rather than dramatic
+  (>10pp). Test forces honest reporting of which leg of the policy claim
+  held. National-security framing of CHIPS is out-of-scope; this hypothesis
+  measures industrial-policy effectiveness narrowly.
+
+steelman: hypotheses/steelman/chips_act_2022_semiconductor_capacity_2024_2027.md
+
+linked_hypotheses:
+  - ira_2022_clean_energy_investment_decomposition
+  - green_industrial_policy_global_chip_race_2022_2026
+  - industrial_policy_semiconductor_chips_act_effectiveness
+
+notes: >
+  Data readiness:
+  - FRED construction series: ready
+  - WDI GDP + FRED interest: ready
+  - SEMI World Fab Forecast / TechInsights / SIA capacity panels: manual-drop pending under data/manual/derived/
+  - WSTS billings: manual-drop pending
+  - CHIPS Program Office obligation tracker: manual-drop pending
+  - Asian competitor capex (TSMC, Samsung, SK Hynix, SMIC filings): manual-drop pending
+
+  Adjacent existing hypothesis (industrial_policy_semiconductor_chips_act_effectiveness)
+  takes a different angle (broader effectiveness framing); this spec narrows to the
+  realised-capacity vs announced-capacity decomposition with a fixed 2027 endpoint.

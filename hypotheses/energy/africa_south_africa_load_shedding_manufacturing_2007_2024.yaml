@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_south_africa_load_shedding_manufacturing_2007_2024
+version: 1
+status: candidate
+topic: energy
+claim: >-
+  South Africa's persistent electricity-supply crisis (Eskom load-shedding episodes 2007,
+  2014-2015, 2018-2024) caused a measurable and cumulative manufacturing-sector contraction
+  and total-factor-productivity drag, with effects intensifying in the post-2018 phase as
+  load-shedding hours per year escalated to record levels. The pre-registered claim is
+  that, in a synthetic-control design with upper-middle-income emerging-market peers
+  (Brazil, Mexico, Turkey, Malaysia, Thailand, Indonesia), South Africa's manufacturing
+  share of GDP declines by at least 4 percentage points more than the synthetic
+  counterfactual 2007-2024 AND real-GDP-pc cumulative growth falls at least 15 log-points
+  below counterfactual. The null counter-claim is that South Africa's manufacturing decline
+  is part of a broader Brazil/Latin-American-style premature deindustrialisation pattern
+  and the load-shedding signal cannot be cleanly separated from commodity-cycle and
+  competition-from-China effects.
+evidence_type: causal
+sample:
+  countries:
+  - ZAF
+  - BRA
+  - MEX
+  - TUR
+  - MYS
+  - THA
+  - IDN
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID 2020Q2-2020Q4 from pre/post fitting
+  - flag Turkey 2018-2024 FX crisis as parallel shock; retain but robustness-check
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - ZAF
+  - BRA
+  - MEX
+  - TUR
+  - MYS
+  - THA
+  - IDN
+  outcome_dim:
+  - industrial_capability
+  - gdp_growth
+  - energy
+  - productivity
+  policy_family:
+  - energy_policy
+  - industrial_policy
+  treatment_tags:
+  - south_africa_eskom_crisis
+  - south_africa_loadshedding_post_2018
+variables:
+  outcome:
+  - name: manufacturing_share_gdp
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: level
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: industrial_va
+    source: world_bank_wdi:NV.IND.TOTL.KD
+    transformation: log_level
+  - name: total_factor_productivity_index
+    source: pwt:rtfpna
+    transformation: level
+  treatment:
+  - name: load_shedding_indicator
+    source: 'constructed: 1 for ZAF from 2007 onward (treatment); intensified post-2018'
+    transformation: graded_indicator
+  - name: load_shedding_hours_year
+    source: 'constructed: scraped CSIR / Eskom annual loadshedding hours; 0 for non-treated countries'
+    transformation: log_level
+    notes: 'Treatment intensity proxy: hours of stage-2+ loadshedding per year.'
+  controls:
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: china_imports_share
+    source: world_bank_wdi:TM.VAL.MRCH.WL.CD
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: pwt_capital_stock
+    source: pwt:rnna
+    transformation: log_level
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  The treatment is a regulatory/SOE-governance failure: Eskom's monopoly position,
+  delayed Medupi/Kusile commissioning, deferred maintenance, and policy reluctance to
+  liberalise IPP entry until late 2021. Coded regulatory per axes.yaml.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with ZAF treated from 2007 and EM-UMI peer donor pool. Secondary:
+    panel FE with loadshedding-hours intensity treatment (continuous). Tertiary: event
+    study around the 2018 intensification break. Robustness drops Turkey (parallel-FX-
+    crisis confound) and adds an interaction with the China-import-share control.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) the manufacturing-share gap vs synthetic counterfactual
+    over 2007-2024 is less than -4 percentage points at p_perm < 0.10, OR (b) the real-
+    GDP-pc cumulative growth gap is less than -15 log-points, OR (c) the loadshedding-
+    hours coefficient on log(industrial_va) in the panel-FE specification is not
+    significantly negative at p < 0.05 (indicating intensity does not predict damage).
+  test: synth_did_with_intensity_panel_validation
+  threshold: >-
+    manufacturing_share_gap_2024 - manufacturing_share_gap_2007 <= -4 ppts AND
+    cumulative_log_gdp_pc_gap_2007_2024 <= -0.15 AND
+    intensity_panel_coef_negative at p < 0.05
+prior_confidence: 0.65
+disclosure: >-
+  Author's prior is strongly that load-shedding is a material drag on South African
+  manufacturing — the case is well-documented in CSIR analyses, Reserve Bank reviews,
+  and SARB MPC statements. Prior 0.65 reflects high confidence on directional sign and
+  moderate confidence on clearing the magnitude thresholds. The premature-
+  deindustrialisation null is genuinely competitive: Brazil's manufacturing share fell
+  similarly without an electricity crisis, suggesting the China-trade-shock channel is
+  large.
+conflict_disclosure: No South African equity or Eskom-related exposure.
+steelman: hypotheses/steelman/africa_south_africa_load_shedding_manufacturing_2007_2024.md
+linked_hypotheses:
+- premature_deindustrialisation_emerging_markets
+notes: >-
+  Data-gated on Stats SA quarterly manufacturing series, CSIR loadshedding-hours dataset
+  (publicly released annually), and PWT TFP series. The 2018-2024 intensification phase
+  is the cleanest window for the test; pre-2014 loadshedding was episodic.

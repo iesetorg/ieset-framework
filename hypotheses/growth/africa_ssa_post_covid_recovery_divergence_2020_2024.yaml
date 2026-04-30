@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_ssa_post_covid_recovery_divergence_2020_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Sub-Saharan African economies' post-2020 COVID recovery trajectories diverged
+  systematically along three dimensions: oil/commodity exporters (Nigeria, Angola, Gabon)
+  underperformed on inflation; fiscally-constrained economies in debt distress (Ghana,
+  Zambia, Ethiopia, Kenya) underperformed on growth; and tourism-dependent or fiscally-
+  cushioned economies (Mauritius, Botswana, Senegal, Côte d'Ivoire) recovered faster.
+  The pre-registered claim is that, in a panel-FE specification with country and year
+  fixed effects across 30+ SSA countries, pre-COVID public-debt-share-of-GDP and
+  commodity-export-share-of-GDP jointly explain at least 35% of the cross-country
+  variation in cumulative 2020-2024 real-GDP-pc growth. The null counter-claim is that
+  SSA recovery patterns are dominated by country-specific shocks (conflicts, political
+  transitions) and the structural pre-COVID variables explain less than 20% of the
+  variation.
+evidence_type: associational
+sample:
+  countries:
+  - NGA
+  - AGO
+  - GAB
+  - GHA
+  - ZMB
+  - ETH
+  - KEN
+  - SEN
+  - CIV
+  - MUS
+  - BWA
+  - TZA
+  - UGA
+  - RWA
+  - MOZ
+  - CMR
+  - CPV
+  - BEN
+  - TGO
+  - BFA
+  - MLI
+  - NER
+  - TCD
+  - ZAF
+  - NAM
+  - ZWE
+  - MWI
+  - MDG
+  - SLE
+  - LBR
+  period:
+  - 2015
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag countries with active conflict 2020-2024 (Tigray, Sudan, Mali coups, Burkina coups, Niger coup) for robustness
+scope:
+  period:
+  - 2015
+  - 2024
+  countries:
+  - AFRICA
+  outcome_dim:
+  - gdp_growth
+  - fiscal_policy
+  - inflation
+  policy_family:
+  - none
+  treatment_tags:
+  - covid_19_2020
+  - ssa_post_covid_recovery
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: gross_public_debt_share_gdp
+    source: imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: level
+  treatment:
+  - name: pre_covid_debt_share
+    source: world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: average_2018_2019
+    notes: 'Cross-sectional explanatory variable: pre-shock fiscal space.'
+  - name: pre_covid_commodity_export_share
+    source: world_bank_wdi:TX.VAL.MMTL.ZS.UN; world_bank_wdi:TX.VAL.FUEL.ZS.UN
+    transformation: average_2018_2019
+    notes: 'Cross-sectional explanatory variable: commodity-export concentration.'
+  - name: pre_covid_tourism_share_gdp
+    source: world_bank_wdi:ST.INT.RCPT.XP.ZS
+    transformation: average_2018_2019
+  controls:
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: vdem_political_stability
+    source: vdem:v2x_polyarchy
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  This is a descriptive/associational hypothesis about cross-country recovery
+  divergence. The "intervention" is COVID itself plus heterogeneous country-level
+  pre-existing conditions. Bundled coding reflects the multi-channel nature of the
+  shock and response.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: >-
+    Panel FE with country and year fixed effects, plus interaction of post-2020 dummy
+    with pre-COVID structural variables (debt, commodity export share, tourism share).
+    Variance-decomposition test reports the share of cross-country recovery variation
+    explained by the structural variables. Robustness drops conflict-affected
+    countries and re-estimates. R-squared and adjusted-R-squared with-and-without the
+    treatment terms gives the variance-explained share.
+falsification:
+  rule: >-
+    Not supported if (pre-COVID debt + commodity export share) interacted with the post-
+    2020 dummy explain less than 35% of the cross-country variation in cumulative real-
+    GDP-pc growth 2020-2024 (i.e. delta-R-squared from adding the interactions is less
+    than 0.35), OR if the coefficient on the debt × post-2020 interaction is not
+    significantly negative on growth at p < 0.05.
+  test: panel_fe_variance_decomposition_with_interaction
+  threshold: >-
+    delta_R_squared_from_structural_interactions >= 0.35 AND coef(pre_covid_debt ×
+    post_2020) on log_gdp_pc < 0 at p < 0.05
+prior_confidence: 0.55
+disclosure: >-
+  Prior is near 0.50 because recovery divergence is empirically real but the 35%
+  variance-explained threshold is genuinely uncertain — country-specific shocks
+  (Tigray war, Sahel coups, Sudan war 2023, Lebanon spillovers) may dominate the
+  structural channels. The pre-registered threshold is set deliberately ambitious to
+  produce a clean falsification regardless of direction.
+conflict_disclosure: No SSA-region asset exposure.
+steelman: hypotheses/steelman/africa_ssa_post_covid_recovery_divergence_2020_2024.md
+notes: >-
+  Designed as the broad SSA-region descriptive hypothesis to complement the country-
+  specific specs. Data-gated on WDI and IMF Article IV through 2024 vintage.

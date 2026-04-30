@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bolivia_morales_resource_nationalism_2006_2019
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Bolivia's 2006-2019 Morales-MAS era (May 2006 hydrocarbons
+  nationalisation, renegotiated gas-export contracts with Brazil and
+  Argentina, expansion of cash-transfer programmes Bono Juancito Pinto
+  and Renta Dignidad, fixed-currency-peg-style stabilisation, large
+  social investment) produced a measurable poverty-reduction and
+  growth record relative to a Latin American resource-dependent peer
+  pool. The pre-registered claim is (a) cumulative log real-GDP per
+  capita 2006-2019 is at or above the LATAM median, AND (b) extreme-
+  poverty headcount falls by at least 15 percentage points 2005-2019,
+  AND (c) public-investment share of GDP rises at least 4 percentage
+  points relative to peer median. The mechanism is that resource-rent
+  capture combined with currency stability and fiscal-discipline
+  features produced a rare macroeconomically stable redistribution.
+
+evidence_type: causal
+
+sample:
+  countries: [BOL, ECU, PER, COL, BRA, ARG, PRY, VEN]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude VEN post-1999 from donor pool (Chavismo regime change contaminates as outlier on policy bundle)"
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1995, 2024]
+  countries: [BOL, ECU, PER, COL, BRA, ARG, PRY, VEN]
+  outcome_dim: [gdp_growth, poverty_inequality, fiscal_policy, capital_flows]
+  policy_family: [privatisation_nationalisation, fiscal_policy, welfare_architecture, exchange_rate_regime]
+  treatment_tags: [bolivia_hydrocarbon_nationalisation_2006, morales_2006, bolivia_renta_dignidad_2008]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: extreme_poverty_headcount
+      source: world_bank_wdi:SI.POV.DDAY
+      transformation: level
+    - name: gini_index
+      source: world_bank_wdi:SI.POV.GINI
+      transformation: level
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: morales_era_indicator
+      source: "constructed: binary = 1 for BOL from 2006 onward"
+      transformation: binary
+    - name: hydrocarbon_rents_share_gdp
+      source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+      transformation: level
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: natural_gas_price
+      source: fred:PNGASEUUSDM
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Resource-nationalism programme combines fiscal (rent capture),
+  regulatory (contract renegotiation), and welfare (cash transfers)
+  channels.
+
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with BOL treated from 2006, peer pool of
+    resource-dependent LATAM economies. Secondary: pre-post on
+    poverty-headcount with terms-of-trade decomposition. Tertiary:
+    decomposition of GDP gain into hydrocarbon-rent share vs
+    non-hydrocarbon GDP.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc 2006-2019 (BOL minus
+    synth) is < 0, OR (b) extreme_poverty_headcount fall is less
+    than 15 percentage points, OR (c) the non-hydrocarbon real-GDP
+    component does not grow faster than the LATAM median (so the
+    apparent gains are entirely terms-of-trade-driven).
+  test: synth_did_plus_poverty_plus_non_hydrocarbon_decomposition
+  threshold: >
+    cumulative_log_gdp_pc(BOL, 2006-2019) - cumulative_log_gdp_pc(synth, 2006-2019) >= 0
+    AND extreme_poverty_headcount(BOL, 2005) - extreme_poverty_headcount(BOL, 2019) >= 15
+    AND non_hydrocarbon_log_gdp_growth(BOL, 2006-2019) - non_hydrocarbon_log_gdp_growth(LATAM_median) >= 0
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author market-liberal prior is sceptical of resource-nationalism cases
+  but Bolivia 2006-2019 is the unusually well-managed instance:
+  fiscal accumulation in stabilisation funds, credible currency peg,
+  no hyperinflation. Pre-registered non-hydrocarbon-decomposition
+  guards against attributing commodity-price gains to policy.
+
+steelman: hypotheses/steelman/bolivia_morales_resource_nationalism_2006_2019.md
+
+linked_hypotheses:
+  - chile_vs_venezuela_divergence_1999_2023
+
+notes: >
+  WDI poverty data for Bolivia is intermittent; spec uses available
+  poverty-survey years and accepts gaps in the level series.

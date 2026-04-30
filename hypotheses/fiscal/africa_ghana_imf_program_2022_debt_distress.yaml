@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_ghana_imf_program_2022_debt_distress
+version: 1
+status: candidate
+topic: fiscal
+claim: >-
+  Ghana's December 2022 IMF Extended Credit Facility programme, paired with the December
+  2022 domestic-debt-exchange (DDEP) and 2023 external-debt restructuring, produced a
+  measurable but partial macro-stabilisation: cedi depreciation slowed, inflation
+  decelerated from a peak above 50% YoY, and primary fiscal balance moved toward surplus.
+  The pre-registered claim is that, in a synthetic-control design with a Sub-Saharan
+  African low-income IMF-programme donor pool (Zambia, Kenya, Senegal, Côte d'Ivoire,
+  Cameroon), Ghana's CPI inflation declines by at least 25 percentage points from peak
+  to 2025Q4 AND the primary fiscal balance improves by at least 4 percentage points of
+  GDP relative to the synthetic counterfactual. The null counter-claim is that Ghana's
+  stabilisation is statistically indistinguishable from the SSA-IMF-programme donor-pool
+  path once global commodity-price and DSSI conditions are netted out.
+evidence_type: causal
+sample:
+  countries:
+  - GHA
+  - ZMB
+  - KEN
+  - SEN
+  - CIV
+  - CMR
+  period:
+  - 2014
+  - 2026
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID 2020Q2-2020Q4 from pre-treatment fitting
+  - flag Zambia 2020 default + 2024 restructuring; retain but robustness-check
+scope:
+  period:
+  - 2014
+  - 2026
+  countries:
+  - GHA
+  - ZMB
+  - KEN
+  - SEN
+  - CIV
+  - CMR
+  outcome_dim:
+  - fiscal_policy
+  - inflation
+  - currency_purchasing_power
+  - capital_flows
+  policy_family:
+  - fiscal_policy
+  - monetary_policy
+  treatment_tags:
+  - ghana_imf_ecf_2022
+  - ghana_ddep_2022
+  - ghana_external_restructuring_2023
+variables:
+  outcome:
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: primary_fiscal_balance_share_gdp
+    source: imf:GGXONLB_NGDP; world_bank_wdi:GC.BAL.CASH.GD.ZS
+    transformation: level
+  - name: gross_public_debt_share_gdp
+    source: imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: level
+  - name: cedi_usd_rate
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+  treatment:
+  - name: ecf_program_indicator
+    source: 'constructed: 1 for GHA from 2022Q4 onward'
+    transformation: binary
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: cocoa_price
+    source: fred:PCOCOUSDM; imf:PCOCO
+    transformation: log_level
+  - name: gold_price
+    source: fred:GOLDAMGBD228NLBM
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  The Ghana 2022-2023 programme bundles fiscal (DDEP haircut, expenditure cuts), monetary
+  (BoG tightening), and institutional (IMF conditionality on procurement and SOE reform)
+  channels simultaneously. Bundled coding per invariant 4. Channel-specific specifications
+  are deferred to v1.1.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with GHA treated from 2022Q4 and SSA IMF-programme donor pool.
+    Secondary: Callaway-Sant'Anna DiD with never-treated SSA peers. Robustness drops
+    Zambia (parallel default trajectory) and re-runs with 4-unit donor pool. Inflation
+    decline test uses peak-to-trough comparison; primary balance test uses pre/post
+    average levels.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) Ghana's CPI inflation decline from 2022 peak to 2025Q4
+    is less than 25 ppts (i.e. inflation remains stuck above 25%), OR (b) the synth-DiD
+    CATT on primary fiscal balance over 2023Q1-2025Q4 is less than +4 ppts of GDP at
+    p_perm < 0.10, OR (c) the cedi-USD rate continues to depreciate at more than 15% per
+    annum through 2025 (indicating the FX stabilisation channel failed).
+  test: synth_did_with_inflation_disinflation_threshold
+  threshold: >-
+    inflation_peak_2022 - inflation_2025Q4 >= 25 ppts AND
+    CATT_2023Q1_2025Q4(primary_balance) >= 4 ppts at p_perm < 0.10 AND
+    cedi_depreciation_2024_2025_annualised <= 0.15
+prior_confidence: 0.6
+disclosure: >-
+  Author's prior leans toward "IMF programmes deliver headline disinflation but only
+  partial fiscal repair in low-income SSA". The 0.60 prior reflects high confidence on
+  the inflation channel (all SSA IMF programmes 2014-2024 delivered disinflation) and
+  moderate confidence on the primary-balance threshold (4 ppts is a stretch). The DDEP
+  haircut was material (~30% NPV loss) but compliance with expenditure-side
+  conditionality has been mixed across Ghanaian programmes historically.
+conflict_disclosure: Author holds no Ghanaian sovereign-debt or equity exposure.
+steelman: hypotheses/steelman/africa_ghana_imf_program_2022_debt_distress.md
+linked_hypotheses:
+- imf_program_currency_stabilisation_panel
+- austerity_output_recovery_tradeoff
+notes: >-
+  Data-gated on BoG monthly inflation, MoF quarterly fiscal data, and IMF Article IV
+  reports. The DDEP design is unique in SSA history (domestic-debt restructuring without
+  external default at the time); the synthetic-control donor pool cannot match this
+  exactly, which is a recognised limitation of the design.

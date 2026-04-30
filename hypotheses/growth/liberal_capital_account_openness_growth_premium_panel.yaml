@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: liberal_capital_account_openness_growth_premium_panel
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Across countries 1990-2020, higher capital-account openness
+  (proxied by EFW area-4 freedom-to-trade-internationally sub-
+  components covering capital controls, plus IMF AREAER-derived
+  binary capital-control intensity where available) predicts higher
+  subsequent 10-year real per-capita GDP growth, conditional on
+  initial income, rule-of-law level, trade openness, and financial-
+  development depth. The Smith-Mill-Friedman classical-liberal claim
+  is that free movement of capital allocates global savings to
+  highest-return investment opportunities, raising productive
+  capacity in capital-importing countries and disciplining
+  capital-exporting governments. The test acknowledges that the
+  effect is contested in panel data and is conditional on
+  institutional-quality threshold.
+
+evidence_type: associational
+
+sample:
+  countries: [ALB, ARG, AUS, AUT, BEL, BGD, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KAZ, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NLD, NOR, NZL, PAK, PER, PHL, POL, PRT, ROU, RUS, SGP, SVK, SVN, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-decades containing major banking crises (avoid the post-crisis growth collapse contaminating the openness coefficient)"
+    - "drop hyperinflation country-years"
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth_10yr_forward
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: cumulative_log_growth_10yr_forward
+  treatment:
+    - name: efw_freedom_to_trade_area4
+      source: "fraser_efw:area_4_freedom_to_trade"
+      transformation: level
+      notes: "EFW area-4 includes capital-control indicators; preferred proxy for KAOPEN where EFW coverage is broader than Chinn-Ito's registered availability."
+    - name: heritage_investment_freedom
+      source: "heritage_ief:investment_freedom"
+      transformation: level
+  controls:
+    - name: initial_log_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_block_start
+    - name: wgi_rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: domestic_credit_to_private_sector_pct_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: level
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Capital-account regulation (controls vs openness) is a regulatory
+  intervention. EFW area-4 and Heritage Investment Freedom code
+  capital-account regulation alongside related foreign-exchange
+  rules. Channel regulatory per invariant 4.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way fixed-effects panel using non-overlapping decade blocks.
+    Standard errors clustered by country. Identification from
+    within-country variation in capital-account openness over
+    decades. The conditional-on-institutions interaction is the
+    Kose-Prasad-Rogoff-Wei refinement of the simple positive claim;
+    spec includes a robustness specification adding RL × openness
+    interaction.
+
+falsification:
+  rule: >
+    SUPPORTED if the panel-FE coefficient on EFW area-4 freedom-
+    to-trade is positive and significant at p<0.05 on 10-year-
+    forward per-capita growth, AND the coefficient sign is
+    preserved when restricted to the high-rule-of-law sub-sample
+    (WGI RL above sample median). PARTIAL if the high-RL coefficient
+    is positive but full-sample is insignificant — Kose-Prasad-
+    Rogoff-Wei threshold-effect reading wins. REFUTED if both are
+    insignificant or wrong-signed at p<0.05. INFORMATIVE: when
+    Heritage IEF investment-freedom is substituted as the openness
+    proxy, the coefficient sign should be preserved.
+  test: panel_fe_capital_openness_growth_with_rl_interaction
+  threshold: >
+    PRIMARY: panel_FE_beta(area_4) > 0 at p<0.05 in full sample,
+    AND coefficient positive in high-RL sub-sample.
+    PARTIAL: high-RL coefficient positive at p<0.05 but full-sample insignificant.
+    INFORMATIVE: heritage_ief:investment_freedom coefficient same sign at p<0.10.
+
+prior_confidence: 0.55
+
+disclosure: >-
+  Author prior is moderate-low (0.55). The capital-account-openness-
+  and-growth literature is among the most contested in empirical
+  macro. Rodrik 1998, Kose-Prasad-Rogoff-Wei 2009, and Quinn-Schindler-
+  Toyoda 2011 all find conditional or fragile relationships at best.
+  The full-sample positive effect is unstable; the threshold-effect
+  reading (positive only above an institutional-quality threshold) is
+  the more defensible classical-liberal claim. Authorial framing risk:
+  by setting up the test with an institutional-conditional INFORMATIVE
+  check, the spec partly hedges the claim — heterodox readers will
+  argue this is gerrymandering toward a refined-Friedman claim that
+  the original Smith-Mill formulation didn't make. Heterodox readers
+  (post-Keynesian, structuralist, Stiglitz, Rodrik) will note that
+  the 1997 Asian crisis, 2008 GFC, and several Latin American sudden-
+  stops are the key counter-evidence: capital-account openness
+  contributed to crisis vulnerability. The spec excludes major
+  banking-crisis decades to focus on the steady-state growth
+  channel; that exclusion is itself contestable.
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, capital_flows]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [capital_account_openness, kaopen_chinn_ito, smith_mill_capital_freedom, classical_liberal_capital_mobility]
+
+steelman: hypotheses/steelman/liberal_capital_account_openness_growth_premium_panel.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+notes: >
+  Smith's "Wealth of Nations" Book IV chapter on the corn-trade and
+  later discussions, Mill's Principles Book V, and Friedman's
+  free-capital-flow advocacy all point at the same claim. Modern
+  empirical literature is more cautious; the spec reflects that.
+  v2 should incorporate Chinn-Ito KAOPEN directly once a publisher
+  registers it; current spec uses EFW area-4 and Heritage IEF as
+  registered substitutes.

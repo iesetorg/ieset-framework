@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_cyprus_2013_bailin
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The March 2013 Cyprus banking crisis, in which uninsured depositors at Bank of
+  Cyprus and Laiki Bank were converted to equity / written down ("bail-in"), produced
+  a real GDP peak-to-trough decline of >= 8%, a bank-credit-to-GDP decline of >= 100
+  pp, an unemployment-rate rise of >= 10 pp, and required an EUR 10bn ESM programme.
+  The hypothesis is that the canonical multi-metric signature for Cyprus is met
+  across at least 4 of 5 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [CYP]
+  period: [2007, 2018]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_gdp_decline
+    description: Cyprus real GDP peak-to-trough cumulative decline
+    threshold: ">= 8% decline"
+    window: "2011-2015"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: unemployment_rise
+    description: Cyprus unemployment rate rise vs 2008 baseline
+    threshold: ">= 10 pp rise"
+    window: "2009-2015"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; eurostat:une_rt_a"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+  - metric_id: bank_credit_to_gdp_decline
+    description: Bank credit to private sector decline from peak
+    threshold: ">= 100 pp of GDP decline"
+    window: "2012-2018"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate.
+  - metric_id: esm_programme_2013
+    description: ESM EUR 10bn programme entered March 2013
+    threshold: "yes/no — yes counts as breach"
+    window: "2013-2016"
+    source: "imf:ESM_CYP_2013"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: depositor_bailin_imposed
+    description: Bail-in imposed on uninsured depositors at BoC and Laiki
+    threshold: "yes/no — yes counts as breach"
+    window: "2013"
+    source: "imf:CYP_BAILIN_2013"
+    direction: supports_claim
+    independence_justification: Resolution-policy event.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: bank_credit_to_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: peak_to_trough
+prior_confidence: 0.94
+disclosure: >
+  Cyprus 2013 is well-documented; canonical-case framing overdetermined.
+  Bail-in is a uniquely-identifying event (first eurozone use).
+steelman: hypotheses/steelman/banking_crisis_cyprus_2013_bailin.md
+scope:
+  period: [2007, 2018]
+  countries: [CYP]
+  outcome_dim: [financial_crisis, financialisation, employment_labour]
+  policy_family: [regulation, fiscal_policy]
+  treatment_tags: [cyprus_2013, depositor_bailin, esm_programme_2013, bank_of_cyprus_laiki]

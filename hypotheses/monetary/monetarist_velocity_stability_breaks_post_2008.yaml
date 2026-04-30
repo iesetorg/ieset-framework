@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: monetarist_velocity_stability_breaks_post_2008
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  US M2 velocity (nominal-GDP / M2) was stable in the strong
+  Friedman-Schwartz sense (low-frequency variation only, no trend
+  break) from 1960 through 2007. Beginning in 2008 the series
+  exhibits a structural break: a step-decline of roughly 30% by
+  2014 and a further decline through 2020, accompanied by loss of
+  the prior cyclical regularity. The same break appears in the
+  Eurozone, UK and Japan in their own M2/GDP velocity series.
+  This hypothesis is descriptive: it pre-registers exactly when and
+  where the break occurs, so that subsequent monetarist-style
+  predictions of the form "M2-growth implies inflation" can be
+  conditioned on a known velocity-regime indicator rather than
+  applied as if velocity were still stable.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, JPN, CAN, AUS, CHE, SWE, NOR]
+  period: [1960, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop quarters with reunification-induced M2 series breaks (DEU 1990-1991)"
+
+scope:
+  period: [1960, 2024]
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, JPN, CAN, AUS, CHE, SWE, NOR, OECD]
+  outcome_dim: [monetary_policy, inflation, financialisation]
+  policy_family: [monetary_policy]
+  treatment_tags: [m2_velocity_break_2008, friedman_velocity_stability, qe_balance_sheet_expansion]
+
+variables:
+  outcome:
+    - name: m2_velocity_quarterly
+      source: "fred:M2V (USA); ecb:BSI.Q.U2 (EU); boe:LPMAUYM (GBR); boj:M2 (JPN)"
+      transformation: ratio_nominalgdp_to_m2
+      notes: "Nominal-GDP / M2 quarterly. National sources for headline series; FRED M2V used for US headline."
+    - name: m2_velocity_long_run_trend
+      source: "fred:M2V"
+      transformation: hp_filter_lambda_1600
+      notes: "HP-filtered trend with quarterly lambda 1600 to separate trend-break from cyclical variation."
+    - name: m2_velocity_volatility
+      source: "fred:M2V"
+      transformation: rolling_5yr_stddev
+  treatment:
+    - name: post_2008_break_indicator
+      source: "derived:break_indicator_2008Q3"
+      transformation: indicator
+      notes: "Indicator equal to 1 from 2008Q3 (Lehman) onwards; primary structural-break date pre-registered."
+    - name: m2_growth_rate_yoy
+      source: "fred:M2SL (USA); world_bank_wdi:FM.LBL.BMNY.ZG (rest)"
+      transformation: log_diff_yoy
+  controls:
+    - name: nominal_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.CN"
+      transformation: log_diff_yoy
+    - name: short_term_interest_rate
+      source: "fred:FEDFUNDS (USA); ecb:FM.M.U2 (EU); boe:IUDSOIA (GBR); boj:JPNDISCOUNT (JPN)"
+      transformation: level
+      notes: "Velocity is mechanically related to interest-rate level (money-demand elasticity); included so that the break is not just a low-rates artefact."
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  This is a descriptive series-level claim about a monetary aggregate;
+  no intervention is being tested.
+
+estimator:
+  template: descriptive
+  notes: >
+    Primary test: Bai-Perron 1998 multiple-structural-break test on
+    log M2 velocity 1960Q1-2024Q4, allowing up to 3 breaks. Pre-registered
+    prediction: at least one break is detected within +/- 4 quarters of
+    2008Q3 in the US series and within +/- 8 quarters in EU/UK/JP.
+    Secondary test: Chow test at 2008Q3 against pre-2008 trend with
+    p<0.01 cutoff. Tertiary: visual diagnostic chart panel showing the
+    HP-filtered trend, the rolling 5y stddev, and the regime-conditional
+    M2-growth-to-CPI relationship pre and post 2008.
+
+falsification:
+  rule: >
+    Not supported if the Bai-Perron test detects no break in 2005-2012
+    in the US series, or if the magnitude of the post-break velocity
+    decline is below 15%, or if the break is detected only in the US
+    and not in at least 2 of (EU, UK, JP). A Keynesian / endogenous-money
+    reading wins cleanly if the pre-2008 series fails the stability test
+    too — i.e. velocity was never stable in the Friedman-Schwartz sense
+    and the post-2008 'break' is just continuation of pre-existing drift.
+  test: bai_perron_break_test_m2_velocity_1960_2024
+  threshold: >
+    Bai-Perron break date in [2007Q1, 2010Q4] for USA at 5% supF cutoff
+    AND post-break level decline >= 15% within 6 years
+    AND analogous break detected in at least 2 of {EU, UK, JP} within +/- 8 quarters
+    AND pre-2008 sub-series passes Bai-Perron no-break null at 5%
+
+prior_confidence: 0.78
+
+disclosure: >-
+  The framing — Friedman's QTM gets velocity stability wrong post-2008,
+  but the regime change is itself a coherent monetarist story (Cagan's
+  velocity-as-money-demand-function, a regime shift in the demand for
+  zero-rate liquidity once IOR was introduced and rates hit ZLB) — is
+  monetarist self-criticism. Heterodox readers (post-Keynesian) treat
+  the post-2008 break as direct refutation of the QTM and read the
+  pre-2008 stability as coincidental. Author's market-liberal priors
+  are sympathetic to the "regime shift, not refutation" reading; this
+  spec deliberately flags the pre-2008 stability test as a precondition
+  so that a Keynesian victory is structurally available if the pre-2008
+  series is itself unstable.
+
+steelman: hypotheses/steelman/monetarist_velocity_stability_breaks_post_2008.md
+
+linked_hypotheses:
+  - friedman_inflation_always_monetary_long_run_panel
+  - m2_expansion_correlates_with_asset_price_inflation
+  - friedman_schwartz_great_depression_monetary_cause
+
+notes: >
+  Lucas (1988) "Money Demand in the United States" and Anderson-Bordo-Duca
+  (2017) "Money and Velocity During Financial Crises" are the relevant
+  references. The 2008 break is widely acknowledged in central-bank
+  research; the contested question is whether it constitutes a refutation
+  of QTM or a regime-shift consistent with money-demand-function
+  monetarism. This spec answers only the descriptive question (does
+  the break exist, when, how large) and leaves the interpretive question
+  to the linked hypotheses on M2-CPI decoupling.

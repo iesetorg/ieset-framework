@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_korea_imf_1998_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  South Korea's 1998 IMF-program labour reforms (lifetime-
+  employment relaxation, dispatch-worker law, layoff-rule
+  liberalisation) restructured the Korean labour market: by
+  2003 non-regular-worker share rose by at least 8 pp relative
+  to a synthetic control of East-Asian peers, and aggregate
+  employment-rate recovered to pre-crisis level, but the
+  regular-worker share fell durably.
+notes: >
+  Treatment dated 1998-Q1 (Tripartite Commission agreement and
+  February 1998 amendment to Labour Standards Act enabling
+  managerial dismissals). Korea is the canonical Asian-crisis
+  flexibilisation case. Donor pool of East-Asian peers attempts
+  to absorb the common Asian-crisis shock.
+prior_confidence: 0.65
+disclosure: >-
+  Author is sympathetic to crisis-driven flexibilisation but
+  recognises Korea's outcome is widely viewed as ambiguous —
+  the dual labour market that emerged is now criticised as
+  a long-run inequality driver. The duality-channel test is
+  the focal disagreement.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Korean non-regular-worker
+    share > +8 pp by 2003 AND aggregate employment-rate gap
+    returns to within 1 pp of donor pool by 2002. REFUTED if
+    duality channel is < +4 pp OR aggregate employment fails
+    to recover to within 2 pp of donor pool by 2002.
+  test: >
+    Synth-DiD on Korean non-regular-worker share and employment
+    rate 1998-2003 vs East-Asian donor pool, placebo permutation
+    at p<0.10.
+evidence_type: associational
+sample:
+  countries: [KOR, JPN, TWN, SGP, MYS, THA, HKG]
+  period: [1990, 2008]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 1997-Q4 to 1998-Q4 Asian crisis intensity window
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: non_regular_worker_share
+      source: oecd:DSD_LFS@DF_LFS_TEMP
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: korea_1998_labour_reform
+      source: "constructed: indicator for 1998-Q1 LSA amendment + Tripartite Commission agreement"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: real_effective_exchange_rate
+      source: bis:reer_broad_krw
+      transformation: log
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1998, 2003]
+  countries: [KOR]
+  outcome_dim: [employment_labour, poverty_inequality]
+  policy_family: [labour_market]
+  treatment_tags: [korea_imf_1998_reform]
+steelman: hypotheses/steelman/labour_reform_korea_imf_1998_employment.md

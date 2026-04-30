@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: peru_fujimori_shock_therapy_1990_2000
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Peru's 1990-1995 Fujimori shock-therapy package (price liberalisation,
+  fiscal stabilisation under the August 1990 "Fujishock", Brady-style
+  external debt restructuring 1996-1997, large-scale privatisation of
+  SOEs, central-bank independence under the 1993 constitution, and trade
+  liberalisation) produced a structural break in inflation and real-GDP
+  per capita relative to Peru's 1985-1990 hyperinflation trajectory and
+  relative to a Latin American peer pool that did not adopt comparable
+  packages on the same timeline. The pre-registered claim is (a) inflation
+  collapsed from >7000% (1990) to single digits by 1999, and (b)
+  cumulative log real-GDP per capita 1990-2000 exceeds the Latin American
+  median by at least 0.10 log-points. The mechanism is a fiscal+monetary
+  regime change that broke the inflation-tax equilibrium and restored
+  property-rights credibility for private investment.
+
+evidence_type: causal
+
+sample:
+  countries: [PER, ARG, BRA, CHL, COL, ECU, MEX, URY, BOL, VEN]
+  period: [1985, 2005]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude VEN post-1999 from donor pool (Chavismo regime change contaminates)"
+    - "exclude ARG 2002 sovereign default endpoint window from cumulative-growth comparison"
+
+scope:
+  period: [1985, 2005]
+  countries: [PER, ARG, BRA, CHL, COL, ECU, MEX, URY, BOL, VEN]
+  outcome_dim: [gdp_growth, inflation, institutional_quality]
+  policy_family: [fiscal_policy, monetary_policy, privatisation_nationalisation, institutional_reform, trade_policy]
+  treatment_tags: [fujimori_shock_1990, peru_brady_1996, peru_constitution_1993]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: log_gdp_pc_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: gross_capital_formation_share_gdp
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: fujimori_shock_indicator
+      source: "constructed: binary = 1 for PER from 1990 onward"
+      transformation: binary
+  controls:
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: copper_price
+      source: fred:PCOPPUSDM
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: wgi_government_effectiveness
+      source: world_bank_wgi:GOV_WGI_GE.EST
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Fujishock spans fiscal (subsidy elimination, tax reform), monetary
+  (central-bank independence, currency reform), regulatory
+  (privatisation, deregulation), and institutional (1993 constitution)
+  channels. Bundled coding follows invariant 4.
+
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with PER treated from 1990, Latin American peers
+    as donor pool. Secondary: event-study on log GDP-pc relative to
+    1989 baseline. Tertiary: cointegration between credibility proxy
+    (inflation level) and investment share to test whether the regime
+    change had a credible-commitment signature.
+
+falsification:
+  rule: >
+    Not supported if any of (a) inflation does not break below 20% by
+    1995 and below 10% by 1999 (hyperinflation reversal channel), OR
+    (b) cumulative log_gdp_pc_constant 1990-2000 (Peru minus
+    synthetic peer) is < 0.10, OR (c) gross_capital_formation share
+    of GDP does not rise at least 4 percentage points 1990-2000
+    relative to peer median.
+  test: synth_did_plus_inflation_break_plus_investment_share
+  threshold: >
+    cumulative_log_gdp_pc(PER, 1990-2000) - cumulative_log_gdp_pc(synth, 1990-2000) >= 0.10
+    AND cpi_inflation_yoy(PER, 1999) < 10
+    AND delta_capital_formation_share(PER, 1990-2000) - delta_capital_formation_share(peer_median, 1990-2000) >= 4
+
+prior_confidence: 0.78
+
+disclosure: >
+  Author market-liberal prior favours regime-change-stabilisation cases
+  succeeding. Peru 1990-2000 is a textbook stabilisation case with
+  large effect size; risk is that the 1990-1992 starting point depresses
+  any baseline so much that gains look mechanical rather than
+  policy-content-driven. Pre-registered investment-share criterion
+  guards against confounding rebound with policy effect.
+
+steelman: hypotheses/steelman/peru_fujimori_shock_therapy_1990_2000.md
+
+linked_hypotheses:
+  - chile_post_1990_institutional_premium
+  - argentina_institutional_instability_decline
+
+notes: >
+  Data already on disk via WDI/WGI/FRED. Excludes the political-rights
+  cost of the 1992 autogolpe; spec is narrowly economic. Channel-
+  decomposition extension could test whether the property-rights
+  channel (privatisation revenue 1991-2000) explains the investment-
+  share rise.

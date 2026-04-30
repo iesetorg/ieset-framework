@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_mauritius_export_zone_model_1980_2024
+version: 1
+status: candidate
+topic: trade
+claim: >-
+  Mauritius's 1970-launched Export Processing Zone, sequenced upper-middle-income transition
+  through textiles → tourism → financial services, and post-2000 services-export
+  diversification produced a sustained convergence pattern that distinguishes it from SSA
+  peers. The pre-registered claim is that, in a synthetic-control design with island /
+  small-economy / SSA-peer donor pool (Madagascar, Seychelles, Cabo Verde, Kenya, Tunisia),
+  Mauritius's cumulative real-GDP-pc growth 1980-2024 exceeds the synthetic counterfactual
+  by at least 80 log-points AND services-export share of total exports rises by at least
+  30 percentage points more than counterfactual. The null counter-claim is that Mauritius's
+  performance is geography- and small-economy-specific (offshore-financial-centre rents)
+  rather than EPZ-replicable industrial policy.
+evidence_type: causal
+sample:
+  countries:
+  - MUS
+  - MDG
+  - SYC
+  - CPV
+  - KEN
+  - TUN
+  period:
+  - 1975
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag Madagascar 2009 political crisis; retain but robustness-check
+  - flag Tunisia 2011 Arab Spring; retain but robustness-check
+scope:
+  period:
+  - 1975
+  - 2024
+  countries:
+  - MUS
+  - MDG
+  - SYC
+  - CPV
+  - KEN
+  - TUN
+  outcome_dim:
+  - gdp_growth
+  - trade_liberalisation
+  - industrial_capability
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  - regulation
+  treatment_tags:
+  - mauritius_epz_1970
+  - mauritius_offshore_financial_centre
+  - mauritius_textile_phase_out_2005
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe; maddison:mpd2020
+    transformation: log_level
+  - name: services_export_share
+    source: world_bank_wdi:TX.VAL.SERV.CD.WT
+    transformation: level
+  - name: manufacturing_share_gdp
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: level
+  - name: fdi_inflow_share_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS; unctad:World
+    transformation: level
+  treatment:
+  - name: epz_indicator
+    source: 'constructed: 1 for MUS from 1980 onward'
+    transformation: binary
+  controls:
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: wgi_govt_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  The Mauritian model bundles trade-policy (EPZ/AGOA/MFA), industrial-policy (sector
+  sequencing), regulatory-channel (offshore financial-centre framework, double-tax
+  treaties), and institutional (sustained electoral democracy). Bundled coding per
+  invariant 4.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with MUS treated from 1980. Secondary: panel FE with sequenced
+    treatment dummies (EPZ 1970-2005, AGOA 2000+, services-export pivot 2005+).
+    Tertiary: cumulative log-GDP-pc gap reporting at 1990, 2000, 2010, 2024 to show the
+    growth-trajectory shape.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) cumulative log-GDP-pc gap 1980-2024 vs synthetic
+    counterfactual is less than +0.80 at p_perm < 0.10, OR (b) services-export share
+    gap is less than +30 ppts, OR (c) the Madagascar / Cabo Verde donor units (which
+    received similar AGOA/preferential trade access) close most of the trajectory gap
+    by 2024 — indicating preferential trade access rather than the Mauritian policy
+    bundle is the load-bearing channel.
+  test: synth_did_with_donor_substitution_check
+  threshold: >-
+    cumulative_log_gdp_pc_gap >= 0.80 at p_perm < 0.10 AND services_export_share_gap >=
+    30 ppts AND Madagascar_CPV_residual_gap_2024 >= 0.30 (i.e. preferential-trade-access
+    peers don't fully close the gap)
+prior_confidence: 0.7
+disclosure: >-
+  Author's prior is strongly that Mauritius is a genuine outlier in SSA growth. Prior
+  0.70 reflects high confidence on the directional sign and magnitude. The
+  preferential-trade-access null is a real test: Madagascar received MFA quota access
+  too but did not converge — suggesting MFA alone is insufficient. Mauritius's
+  institutional inheritance (post-1968 electoral democracy, multi-ethnic accommodation)
+  is a confound the spec cannot fully isolate.
+conflict_disclosure: No Mauritian asset exposure.
+steelman: hypotheses/steelman/africa_mauritius_export_zone_model_1980_2024.md
+notes: >-
+  Data-gated on Statistics Mauritius long-run series, Maddison historical data,
+  WDI/PWT modern series. The hypothesis is structured to allow the "preferential
+  trade access drives the gap" alternative to win if the donor-substitution residual
+  closes.

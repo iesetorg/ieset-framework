@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_extra_lgfv_debt_evolution_2015_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  China's local-government-financing-vehicle (LGFV) debt expansion
+  2015-2024 — driven by post-2015 credit easing, infrastructure
+  stimulus to offset property weakness, and 2020-2022 COVID fiscal
+  response — produced a structural rise in non-financial-corporate
+  debt-to-GDP and a generalised public-sector debt-to-GDP increase
+  that is observable in BIS credit aggregates and IMF general-government
+  debt series. By 2024, China's non-financial-corporate-debt/GDP
+  exceeds the 2015 level by at least 30 percentage points and IMF
+  general-government debt/GDP rises by at least 25 percentage points
+  over the same window.
+
+evidence_type: descriptive
+
+notes: >-
+  LGFVs sit between corporate and government balance sheets — BIS
+  classifies most as non-financial corporates while IMF augmented-debt
+  reconstruction reclassifies them as government. Test uses BOTH series
+  to capture the bundle. No donor pool needed; this is a within-China
+  structural-rise test.
+
+prior_confidence: 0.80
+
+disclosure: >-
+  Author market-liberal priors interpret LGFV debt buildup as a hidden
+  fiscal liability that will eventually surface as either growth drag or
+  inflation. Bias risk: framing the rise as unsustainable when it may be
+  manageable given Chinese government balance-sheet capacity. Mitigation:
+  test is purely descriptive on debt levels, no sustainability claim.
+
+steelman: hypotheses/steelman/china_extra_lgfv_debt_evolution_2015_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if BOTH (a) BIS non-financial
+    corporate debt/GDP for CHN rises by at least 30pp from 2015 to 2024;
+    AND (b) IMF general-government gross debt/GDP for CHN rises by at
+    least 25pp from 2015 to 2024. REFUTED if either falls or rises by
+    less than 50% of the threshold.
+  test: china_lgfv_debt_aggregates_structural_rise_2015_2024
+  threshold: >-
+    PRIMARY: bis_corp_debt_gdp(CHN, 2024) - bis_corp_debt_gdp(CHN, 2015) >= 30 AND
+    imf_gg_debt_gdp(CHN, 2024) - imf_gg_debt_gdp(CHN, 2015) >= 25.
+    METHOD_VALID: BIS total credit to non-financial corporates and IMF WEO general-government debt available for CHN through 2024.
+
+sample:
+  countries: [CHN]
+  period: [2010, 2024]
+  temporal_structure: time_series
+
+scope:
+  period: [2015, 2024]
+  countries: [CHN]
+  outcome_dim: [gdp_growth]
+  policy_family: [fiscal_policy, monetary_policy]
+  treatment_tags: [china_lgfv_debt, china_infrastructure_stimulus_2015, china_credit_easing_2015_2024]
+
+variables:
+  outcome:
+    - name: nonfinancial_corp_debt_pct_gdp
+      source: "bis:total_credit_nonfinancial_corporates_to_gdp"
+      transformation: level
+    - name: general_govt_debt_pct_gdp
+      source: "imf:general_government_gross_debt_pct_gdp"
+      transformation: level
+    - name: total_credit_pct_gdp
+      source: "bis:total_credit_to_private_nonfinancial_sector"
+      transformation: level
+  treatment:
+    - name: post_2015_lgfv_buildout_indicator
+      source: "constructed: indicator = 1 for years >= 2015"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Pre-post level comparison on debt aggregates. No causal identification
+    needed — this is a within-country structural-rise descriptive test.
+    Cross-source between BIS (corporate) and IMF (government) captures
+    the LGFV reclassification ambiguity.
+
+linked_hypotheses:
+  - china_extra_property_bubble_bust_2020_2024
+  - china_extra_made_in_china_2025_outcomes

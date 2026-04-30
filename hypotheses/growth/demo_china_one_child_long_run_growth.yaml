@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_china_one_child_long_run_growth
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  The Chinese one-child policy (1980-2015) produced a measurable long-run drag on per-capita
+  growth in the post-2010 period via accelerated working-age decline and a higher dependency
+  ratio than counterfactual fertility paths would predict. Compared to a synthetic control
+  built from comparable middle-income East/South Asian countries, China should show a
+  significantly steeper decline in working-age share post-2015 and lower per-capita growth
+  decomposable to the demographic channel.
+evidence_type: causal
+sample:
+  countries: [CHN, IND, IDN, VNM, PHL, THA, MYS, BGD, PAK, KOR]
+  period: [1970, 2023]
+  temporal_structure: time_series
+  cross_section_justification: >-
+    Single-treated-unit synthetic control: China is the treated unit; the donor pool is
+    middle-income Asian comparators that did not pursue coercive fertility policy.
+scope:
+  period: [1970, 2023]
+  countries: [CHN]
+  outcome_dim: [gdp_growth, demographics_migration]
+  policy_family: [institutional_reform]
+  treatment_tags: [china_one_child_1980, demographic_dividend_reversal]
+variables:
+  outcome:
+    - name: real_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log
+    - name: working_age_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+  treatment:
+    - name: one_child_policy_indicator
+      source: "constructed: indicator = 1 for CHN years 1980-2015"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_initial
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: total_fertility_rate
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: level
+estimator:
+  template: synthetic_control
+  notes: >
+    Synthetic-control estimator (Abadie-Diamond-Hainmueller); pre-treatment fit window
+    1960-1979; treatment 1980-2015; post-treatment outcome window 2015-2023 for working-age
+    share and growth decomposition.
+falsification:
+  rule: >-
+    SUPPORTED if China's working-age share post-2015 is at least 3 percentage points below
+    the synthetic counterfactual AND the implied per-capita growth gap exceeds 0.4
+    percentage points annualised over 2015-2023, with placebo-test rank in bottom 10% of
+    donor-pool placebo runs. REFUTED if working-age gap is smaller than 1pp or per-capita
+    growth gap is wrong-signed/insignificant in placebo terms.
+  test: synth_control_china_demographic_growth_gap
+  threshold: "wap_gap >= 3.0 AND growth_gap >= 0.4 AND placebo_rank <= 0.10"
+prior_confidence: 0.7
+disclosure: >-
+  Author's priors expect a meaningful dividend-reversal effect attributable to OCP, but
+  separating OCP from the broader fertility-transition trajectory China would have followed
+  voluntarily is hard; donor-pool selection is the binding methodological choice.
+steelman: hypotheses/steelman/demo_china_one_child_long_run_growth.md

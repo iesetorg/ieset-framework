@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_italy_jobs_act_2014_employment_effect
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Italy's 2014-2015 Jobs Act (Article 18 dismissal-cost reform,
+  contratto a tutele crescenti, NASpI unemployment insurance
+  rationalisation) raised the Italian employment rate by at
+  least 0.8 pp by end-2018 relative to a synthetic control of
+  southern-European peers, with the largest gains on permanent
+  rather than fixed-term contracts.
+notes: >
+  Treatment dated 2015-Q1 (decreto attuativo). The contract-type
+  composition test is a deliberate steelman-led design: Italian
+  critics argued the Jobs Act would shift labour into precarious
+  contracts; the spec asks the data to adjudicate. Donor pool
+  is the southern-European peer set whose 2014-2018 macro
+  trajectories share Italy's banking-crisis legacy.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to dismissal-cost reform improving aggregate
+  employment but acknowledges Italy's long-stagnant productivity
+  and demographic decline make the counterfactual highly uncertain.
+  Synthetic-control donor weights are sensitive to whether Spain
+  and Portugal (which ran their own 2011-2012 reforms) are included.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on employment rate > +0.8 pp at
+    2018 horizon AND permanent-contract-share-of-employment shows
+    a statistically significant positive coefficient at p<0.10.
+    REFUTED if employment gap is wrong-signed or insignificant,
+    OR if the contract-composition shift is toward fixed-term
+    rather than permanent contracts.
+  test: >
+    Synth-DiD on Italian employment rate 2015-2018 vs southern-
+    European donor pool; placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [ITA, ESP, PRT, GRC, FRA, DEU, AUT]
+  period: [2008, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2011-2013 sovereign-debt-crisis window for asymmetric exposure
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: permanent_contract_share
+      source: eurostat:lfsa_etpga
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: jobs_act_enactment
+      source: "constructed: indicator for 2015-Q1 Jobs Act decreto attuativo"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2014, 2018]
+  countries: [ITA]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [italy_jobs_act_2014]
+steelman: hypotheses/steelman/labour_reform_italy_jobs_act_2014_employment_effect.md

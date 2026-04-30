@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: austrian_rent_seeking_concentration_olson_growth_drag
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  In a cross-country panel of OECD and middle-income democracies
+  1960-2019, the age of stable democratic institutions (years since
+  last constitutional rupture) is positively associated with the
+  density of distributional coalitions (proxied by union density,
+  professional-licensing prevalence, and OECD PMR entry-barrier
+  scores) and negatively associated with TFP growth, after
+  controlling for initial GDP per capita and human-capital level.
+  This is the Mancur Olson "rise and decline of nations" hypothesis,
+  which is a classical-liberal / Austrian-adjacent framing that long-
+  stable polities accumulate rent-seeking coalitions that
+  progressively choke the price-discovery and resource-reallocation
+  processes that drive growth. The pre-registered claim is that
+  countries in the top quartile of institutional age show TFP growth
+  rates at least 0.5 percentage points lower than countries in the
+  bottom quartile of institutional age, controlling for convergence.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, HUN, CZE, CHL, MEX, ZAF, IND, IDN, PHL, BRA, ARG, URY]
+  period: [1960, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years in the first 5 years post-democratisation (transition period not coded as 'stable')"
+    - "drop the 2008-2010 GFC and 2020-2021 COVID windows from primary estimation"
+
+scope:
+  period: [1960, 2019]
+  countries: [OECD]
+  outcome_dim: [productivity, gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, regulation, labour_market]
+  treatment_tags: [olson_distributional_coalitions, rent_seeking_drag, institutional_age]
+
+variables:
+  outcome:
+    - name: tfp_growth_5y
+      source: "pwt:rtfpna"
+      transformation: log_diff_5y
+    - name: gdp_per_capita_growth_5y
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: rolling_mean_5y
+  treatment:
+    - name: years_since_last_democratic_rupture
+      source: "vdem:v2x_polyarchy; constructed: years since last polity-IV regime change"
+      transformation: level
+    - name: union_density
+      source: "ilostat:union_density_rate"
+      transformation: level
+    - name: oecd_pmr_entry_barriers
+      source: "oecd_pmr:barriers_to_entry"
+      transformation: level
+  controls:
+    - name: log_gdp_pc_ppp_initial
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: gov_consumption_share
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+
+intervention_channel: institutional
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE plus a quartile-comparison robustness. Two-way FE
+    absorbs much of the institutional-age cross-country variation,
+    so the primary identification is the within-country evolution of
+    union density and entry barriers. Heterodox / progressive null
+    is that distributional coalitions (unions, professional
+    licensing) deliver welfare-improving floors and that the
+    productivity-drag claim cherry-picks one outcome (TFP) while
+    ignoring inequality reduction and labour-market security.
+
+falsification:
+  rule: >
+    The hypothesis is falsified if the quartile-difference in TFP
+    growth between top and bottom institutional-age quartiles is
+    less than 0.5 pp, OR if the panel-FE coefficient on union
+    density / entry-barrier score on TFP growth is not significantly
+    negative at p<0.05.
+  test: panel_fe_olson_quartile_test_plus_within_country_coalitions
+  threshold: >
+    tfp_growth(top_quartile_age) - tfp_growth(bottom_quartile_age) <= -0.5 pp
+    AND coefficient(union_density → tfp_growth) < 0 OR coefficient(entry_barriers → tfp_growth) < 0 at p<0.05
+
+prior_confidence: 0.55
+
+disclosure: >-
+  Olson's hypothesis is one of the most-cited and most-contested in
+  political economy. The empirical record is genuinely mixed —
+  long-stable democracies (Switzerland, Sweden, Netherlands)
+  outperform many younger democracies on TFP, while older
+  democracies (US, UK) show some of the patterns Olson predicted.
+  Author prior 0.55 reflects this. Bias risk: author finds the
+  classical-liberal rent-seeking diagnosis intellectually compelling
+  but recognises that the "distributional coalition" measurement
+  is contested (union density is not the same thing as rent-
+  seeking; some unions deliver real productivity gains via
+  wage compression and skill investment).
+
+steelman: hypotheses/steelman/austrian_rent_seeking_concentration_olson_growth_drag.md
+
+linked_hypotheses:
+  - hayek_regulatory_uncertainty_investment_chilling
+  - austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020
+
+notes: >
+  Olson (1982 The Rise and Decline of Nations); classical-liberal
+  / public-choice tradition (Buchanan, Tullock, Tollison). Closer to
+  Tullock-public-choice than to canonical Mises/Hayek but the
+  framework places it in the Austrian-adjacent cluster as a market-
+  liberal critique of long-stable institutional accumulations.

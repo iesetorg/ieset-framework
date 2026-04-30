@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: turkey_fx_erdogan_unorthodox_inflation_response_2021_2024
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  Erdogan's "unorthodox" doctrine 2021-2023 — repeated TCMB rate cuts during
+  accelerating inflation under his Islamist-finance theory that high rates
+  cause inflation — produced a textbook monetary-policy failure: lira
+  collapse, inflation-expectations de-anchoring, and CPI peaking above 85%
+  YoY before the post-election 2023 reversal under Erkan/Karahan brought
+  rates from 8.5% to 50% and slowly re-anchored expectations.
+notes: Canonical-case multi-metric on an explicit policy doctrine that mainstream macro predicts
+  will fail. Provides a clean test against the heterodox claim that high rates can be inflationary
+  via cost-channel transmission in production-cost-pass-through-heavy economies.
+prior_confidence: 0.85
+disclosure: >-
+  Author's market-liberal priors strongly favour the orthodox reading. The
+  unorthodox cost-channel argument has minor theoretical support (Gibson
+  paradox, Reinhart-Rogoff fiscal dominance regimes) but Turkey 2021-2023
+  was so far off-shore that the case is near-canonical for orthodox
+  failure. Risk is that the prior is too high — could fail to update if
+  some metrics come in ambiguous.
+steelman: hypotheses/steelman/turkey_fx_erdogan_unorthodox_inflation_response_2021_2024.md
+evidence_type: canonical_case_multi_metric
+falsification:
+  rule: >-
+    Multi-metric checklist on Turkey 2021-09 (when Sahap Kavcioglu began aggressive
+    cuts) to 2024-12. SUPPORTED if >=4 of 5 metrics meet thresholds; REFUTED if
+    <=2 do. Each metric independently sourced (TCMB, TUIK, FRED, OECD)
+    capturing different layers of the textbook FX-monetary-failure pattern.
+  test: turkey_unorthodox_doctrine_2021_2024_multi_metric
+  threshold: ">=4/5 supports; <=2/5 refutes"
+canonical_metrics:
+  - metric_id: lira_dollar_depreciation_2021_2023
+    description: TRY/USD depreciation peak from 2021-09 (start of cuts) to 2023-06 (post-election trough).
+    threshold: ">60% depreciation in TRY/USD over the window"
+    window: "2021-09 to 2023-06"
+    source: "fred:DEXTUUS"
+    independence_justification: FX rate is a market-determined cross-check on monetary stance, distinct from CPI measurement.
+  - metric_id: cpi_inflation_peak_2022
+    description: TUIK CPI YoY peak during the unorthodox-doctrine window.
+    threshold: ">75% YoY peak"
+    window: "2022-01 to 2023-12"
+    source: "tuik:cpi_yoy_headline"
+    independence_justification: TUIK official CPI; independent of FX market; ENAG shadow estimates much higher (160%+) suggest TUIK if anything understates.
+  - metric_id: tcmb_policy_rate_minus_cpi_real_rate_trough
+    description: Real ex-post policy rate (1-week repo minus YoY CPI) trough during cuts.
+    threshold: "<-50pp at trough"
+    window: "2022-09 to 2023-06"
+    source: "tcmb:one_week_repo; tuik:cpi_yoy_headline"
+    independence_justification: Constructed from two independent sources; tests the "unorthodox cuts during inflation" definition directly.
+  - metric_id: post_reversal_disinflation_2024
+    description: CPI YoY decline 2023-10 (post-tightening cycle start under Erkan) to 2024-12.
+    threshold: ">25pp decline in CPI YoY peak-to-2024-12"
+    window: "2023-10 to 2024-12"
+    source: "tuik:cpi_yoy_headline"
+    independence_justification: Tests the orthodox prediction that rate hikes eventually disinflate, providing the symmetric comparison.
+  - metric_id: fx_reserves_decline_swaps
+    description: TCMB net international reserves (excluding swaps) trough during defence of crawling peg / KKM scheme.
+    threshold: "net reserves ex-swaps below -50bn USD at trough"
+    window: "2021-09 to 2023-06"
+    source: "tcmb:international_reserves_net_ex_swaps"
+    independence_justification: Stock-flow consistency — reserves measure the cost of defending an unsustainable rate, independent of CPI/FX flows.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+scope:
+  period: [2021, 2024]
+  countries: [TUR]
+  outcome_dim: [inflation, monetary_policy, currency_purchasing_power]
+  policy_family: [monetary_policy, exchange_rate_regime]
+  treatment_tags: [erdogan_unorthodox_doctrine, tcmb_rate_cuts_2021_2023, lira_crisis_2021_2023, post_election_reversal_2023]
+sample:
+  countries: [TUR]
+  period: [2018, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "include 2018 currency crisis as pre-period reference; primary test window 2021-09 onward"
+variables:
+  outcome:
+    - name: cpi_inflation_yoy
+      source: "tuik:cpi_yoy_headline"
+      transformation: pct_change_yoy
+    - name: try_usd_exchange_rate
+      source: "fred:DEXTUUS"
+      transformation: log
+    - name: tcmb_policy_rate
+      source: "tcmb:one_week_repo"
+      transformation: level
+    - name: tcmb_net_reserves_ex_swaps
+      source: "tcmb:international_reserves_net_ex_swaps"
+      transformation: level
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG; imf:NGDP_RPCH"
+      transformation: pct_change_yoy
+  treatment:
+    - name: erdogan_unorthodox_regime
+      source: "constructed: 1 from 2021-09-23 (first Kavcioglu cut) to 2023-06-21 (Erkan first hike)"
+      transformation: indicator
+    - name: post_reversal_indicator
+      source: "constructed: 1 from 2023-06-22 onward"
+      transformation: indicator
+  controls:
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log_diff
+    - name: em_currencies_index
+      source: "fred:DTWEXEMEGS"
+      transformation: log
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case multi-metric — single-country natural experiment on
+    explicit policy doctrine. Pattern-match across FX, CPI, real rate,
+    post-reversal disinflation, and reserves rather than single
+    coefficient. Pre-registered metric thresholds sized to require
+    extreme orthodox-failure pattern.

@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: household_debt_minsky_cycle_2008
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Post-Keynesian / Minsky reading: across advanced economies in the
+  decade preceding the 2008 GFC, the rise in household credit-to-GDP
+  was the leading indicator of subsequent banking-sector distress. The
+  hypothesis tests, in a panel of OECD countries 1995-2010, whether
+  the change in household credit-to-GDP over a five-year window predicts
+  Laeven-Valencia-classified banking-crisis onset 2007-2010, with a
+  predictive coefficient material in magnitude and surviving conditioning
+  on standard macro controls. A market-liberal "subprime-as-policy-
+  failure" reading attributes the same pattern to a US-specific
+  Community Reinvestment Act / GSE channel; the cross-country panel
+  test discriminates by showing the relationship holds across countries
+  with very different mortgage policy regimes.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, IRL, ESP, NLD, DNK, FRA, DEU, ITA, PRT, BEL, AUT, SWE, NOR, FIN, CAN, AUS, JPN, CHE, NZL, GRC]
+  period: [1995, 2010]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing BIS household-credit series
+    - drop country-years post-2010 (out of sample for the 2008 crisis test)
+variables:
+  outcome:
+    - name: banking_crisis_indicator
+      source: imf:laeven_valencia_banking_crises
+      transformation: indicator
+      notes: >
+        Laeven-Valencia 2018 banking-crises database; binary indicator
+        for 2007-2010 onset year per their classification. Distributed
+        through IMF working paper appendix; verify fetcher mapping at
+        wiring.
+  treatment:
+    - name: household_credit_gdp_5y_change
+      source: bis:WS_TC
+      transformation: diff_5y
+      notes: >
+        BIS total credit to households as percent of GDP, five-year
+        change ending in pre-crisis year. Schularick-Taylor / Mian-
+        Sufi-style household-leverage indicator.
+    - name: household_credit_gdp_level
+      source: bis:WS_TC
+      transformation: level
+      notes: Level robustness; the change is the predictive variable.
+  controls:
+    - name: real_house_price_5y_change
+      source: bis:WS_SPP
+      transformation: diff_5y
+      notes: >
+        Conditions on the simultaneous house-price boom; the test
+        of interest is whether household-credit growth still
+        predicts crisis once house-price dynamics are conditioned on.
+    - name: current_account_balance_gdp
+      source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+      transformation: level
+    - name: real_gdp_growth_5y_avg
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: avg_5y
+    - name: short_term_interest_rate
+      source: oecd:OECD.SDD.STES,DSD_KEI@DF_KEI,4.0
+      transformation: level
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country]
+  notes: >
+    Panel logit / linear-probability regression of 2007-2010
+    banking-crisis-onset indicator on lagged household-credit-GDP
+    five-year change, conditioning on real house-price change and
+    macro controls. Country FE only (year FE would absorb the crisis-
+    onset year). Robustness: Schularick-Taylor JST long-run banking
+    crisis sample for cross-validation, and ROC-curve report of
+    AUC for credit-change vs alternatives as crisis predictor.
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on household-credit-GDP
+    five-year change is statistically zero or negative as a crisis
+    predictor (p > 0.10), OR (b) the predictive power disappears
+    after conditioning on real house-price change (i.e. household
+    credit predicts only because it is collinear with the housing
+    boom and adds no independent information), OR (c) the AUC of
+    household-credit change as a crisis predictor is below 0.65 in
+    the OECD pre-2008 panel, indicating it is not a useful
+    predictor relative to alternatives like current-account deficit.
+  test: panel_logit_household_credit_change_2007_2010_crisis_with_house_price_conditioning
+  threshold: >
+    coef(household_credit_change) > 0 at p < 0.10 AND
+    coefficient survives real-house-price conditioning AND
+    AUC of household-credit change >= 0.65
+prior_confidence: 0.7
+disclosure: >
+  Author framing draws on the Minsky financial-instability hypothesis
+  and on the Schularick-Taylor / Mian-Sufi empirical credit-cycles
+  literature. A market-liberal reader would object that the
+  household-credit boom is endogenous to the housing-supply restriction
+  + monetary policy combination, and that the predictive content is
+  largely subsumed by house-price change once it is conditioned on; the
+  Minsky framing imputes an endogenous-fragility narrative to what is
+  better described as a contingent policy-and-housing-supply outcome.
+  Authorial framing risk is moderate — this is a relatively well-
+  established empirical pattern — but the conditioning-on-house-price
+  test is the binding falsifier.
+steelman: hypotheses/steelman/household_debt_minsky_cycle_2008.md
+scope:
+  period: [1995, 2010]
+  countries: [OECD]
+  outcome_dim: [financial_crisis, financialisation]
+  policy_family: [monetary_policy]
+  treatment_tags:
+    - household_debt
+    - minsky_cycle
+    - gfc_2008
+notes: >
+  Candidate, not pre_registered. On promotion, secure a registered
+  fetcher for Laeven-Valencia banking-crises (IMF WP) and JST cross-
+  validation; confirm BIS WS_TC dataflow URN; pin the ROC-curve AUC
+  threshold using a held-out sub-sample.

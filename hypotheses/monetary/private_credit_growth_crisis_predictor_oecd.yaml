@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: private_credit_growth_crisis_predictor_oecd
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Following Schularick-Taylor 2012 and Jorda-Schularick-Taylor, the
+  five-year change in private credit-to-GDP is a leading indicator of
+  subsequent financial-sector distress in the OECD post-1980 panel.
+  The post-Keynesian / Minsky reading interprets this as evidence of
+  endogenous credit-cycle dynamics not captured in real-business-cycle
+  or fundamentals-based crisis models. The hypothesis tests, in an
+  OECD post-1980 panel, whether the BIS five-year private-credit
+  change predicts subsequent financial-sector distress (proxied by
+  WDI bank non-performing loan ratio FS.AST.PRVT.GD.ZS distress
+  threshold or Laeven-Valencia onset), with predictive AUC at least
+  0.7 and the coefficient surviving conditioning on the standard
+  fundamentals control set.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, KOR, PRT, NZL, GRC, ISL]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing BIS WS_CREDIT private-credit series
+    - drop country-years where banking-system structure is undergoing major reclassification (e.g. East-West German reunification 1990-1995)
+variables:
+  outcome:
+    - name: financial_distress_indicator
+      source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+      transformation: distress_threshold
+      notes: >
+        WDI domestic credit to private sector by banks; constructed
+        distress indicator triggers when (a) the series falls more
+        than 10 percent year-over-year (credit contraction signal),
+        (b) Laeven-Valencia banking-crisis onset is coded for that
+        country-year, or (c) sovereign-credit spreads exceed crisis
+        thresholds. Multi-source distress indicator.
+    - name: laeven_valencia_banking_crisis_indicator
+      source: imf:laeven_valencia_banking_crises
+      transformation: indicator
+      notes: Cross-validation; verify fetcher mapping at wiring.
+  treatment:
+    - name: private_credit_gdp_5y_change
+      source: bis:WS_CREDIT
+      transformation: diff_5y
+      notes: >
+        BIS total credit to private non-financial sector as percent
+        of GDP, five-year change ending in pre-crisis year.
+        Schularick-Taylor headline indicator.
+    - name: private_credit_gdp_level
+      source: bis:WS_CREDIT
+      transformation: level
+      notes: Level robustness.
+  controls:
+    - name: real_gdp_growth_5y_avg
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: avg_5y
+    - name: current_account_balance_gdp
+      source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+      transformation: level
+    - name: short_term_interest_rate
+      source: oecd:OECD.SDD.STES,DSD_KEI@DF_KEI,4.0
+      transformation: level
+    - name: real_house_price_5y_change
+      source: bis:WS_SPP
+      transformation: diff_5y
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country]
+  notes: >
+    Panel logit / linear-probability regression of distress indicator
+    on lagged five-year private-credit-GDP change with macro controls.
+    Country FE only. Cross-validated against the Schularick-Taylor /
+    JST long-run sample. Report ROC-curve AUC for credit-change
+    against alternatives; out-of-sample predictive evaluation by
+    holding out 2008-2010 from training.
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on private-credit-GDP five-
+    year change is statistically zero or negative as a distress
+    predictor (p > 0.10), OR (b) AUC of credit-change as predictor
+    is below 0.65 (Schularick-Taylor JST baseline implies AUC ~0.70-
+    0.75 in their sample), OR (c) the predictive power is fully
+    subsumed by current-account-balance change (an open-economy
+    fundamentals-based reading would predict CA dynamics dominate
+    credit dynamics as a crisis predictor).
+  test: panel_logit_credit_change_distress_predictor_with_auc_threshold
+  threshold: >
+    coef(private_credit_change) > 0 at p < 0.10 AND
+    AUC of credit-change >= 0.65 AND
+    incremental AUC over CA-deficit alone >= 0.05
+prior_confidence: 0.7
+disclosure: >
+  Author framing draws on the post-Keynesian / Minsky empirical-credit-
+  cycles literature (Schularick-Taylor, Jorda-Schularick-Taylor, Mian-
+  Sufi). A market-liberal reader would object that the predictive
+  coefficient is largely an open-economy capital-flow phenomenon (CA
+  deficit -> capital inflow -> credit boom -> sudden-stop crisis)
+  better attributed to macroprudential policy choices than to
+  autonomous Minsky dynamics, and that the Schularick-Taylor result
+  is largely driven by a small number of post-1980 banking crises
+  (1991 Nordic, 1997 Asian, 2008 GFC) that are themselves
+  institutionally heterogeneous. Authorial framing risk acknowledged;
+  the AUC and incremental-AUC-over-CA test is the binding falsifier.
+steelman: hypotheses/steelman/private_credit_growth_crisis_predictor_oecd.md
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [financial_crisis, financialisation, monetary_policy]
+  policy_family: [monetary_policy]
+  treatment_tags:
+    - private_credit_boom
+    - schularick_taylor
+    - minsky_cycle
+notes: >
+  Candidate, not pre_registered. On promotion, confirm BIS WS_CREDIT
+  dataflow URN, secure registered fetcher for Laeven-Valencia
+  banking-crises database, and pin the AUC threshold using
+  Schularick-Taylor JST benchmark.

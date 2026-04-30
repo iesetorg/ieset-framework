@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uruguay_frente_amplio_social_investment_2005_2020
+version: 1
+status: candidate
+topic: welfare_architecture
+
+claim: >
+  Uruguay's 2005-2020 Frente Amplio era (Vázquez I, Mujica, Vázquez II)
+  expanded the welfare state (Plan de Equidad 2008, Asignaciones
+  Familiares expansion, FONASA universal-health integration 2008,
+  Sistema Nacional Integrado de Cuidados 2015), legalised cannabis 2013,
+  and ran a centre-left fiscal-and-redistributive programme without
+  abandoning macroeconomic orthodoxy. The pre-registered claim is that
+  Uruguay achieved a measurable poverty-reduction and inequality-
+  compression record while maintaining single-digit inflation and
+  positive cumulative growth, distinguishing it from Latin American
+  populist redistribution programmes that ran into macro instability.
+  Primary statistics: extreme-poverty headcount falls by at least
+  10 percentage points 2005-2019, gini index falls by at least 4 points,
+  cumulative log GDP-pc growth 2005-2019 is at LATAM median or above,
+  AND mean cpi_inflation_yoy stays below 10%.
+
+evidence_type: associational
+
+sample:
+  countries: [URY, ARG, BRA, CHL, PRY, BOL, PER]
+  period: [1998, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1998, 2024]
+  countries: [URY, ARG, BRA, CHL, PRY, BOL, PER]
+  outcome_dim: [poverty_inequality, gdp_growth, welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy, tax_policy]
+  treatment_tags: [uruguay_frente_amplio_2005, uruguay_fonasa_2008, uruguay_plan_equidad_2008]
+
+variables:
+  outcome:
+    - name: extreme_poverty_headcount
+      source: world_bank_wdi:SI.POV.DDAY
+      transformation: level
+    - name: gini_index
+      source: world_bank_wdi:SI.POV.GINI
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: government_expenditure_share_gdp
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: level
+    - name: health_expenditure_share_gdp
+      source: world_bank_wdi:SH.XPD.CHEX.GD.ZS
+      transformation: level
+  controls:
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: soybean_price
+      source: fred:PSOYBUSDM
+      transformation: log_level
+    - name: brazil_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: argentina_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  Frente Amplio programme spans welfare (FONASA, transfers), fiscal
+  (tax reform 2007), and institutional (cuidados system) channels.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of poverty/gini/log_gdp on country and year FE
+    plus URY-indicator interaction. Secondary: descriptive trajectory
+    showing levels.
+
+falsification:
+  rule: >
+    Not supported if (a) extreme_poverty_headcount fall is less than
+    10 percentage points 2005-2019, OR (b) gini index fall is less
+    than 4 points, OR (c) mean cpi_inflation_yoy 2005-2019 exceeds
+    10%, OR (d) cumulative log_gdp_pc growth (URY, 2005-2019) is
+    below the LATAM 25th percentile.
+  test: panel_fe_plus_descriptive_thresholds
+  threshold: >
+    extreme_poverty_headcount(URY, 2005) - extreme_poverty_headcount(URY, 2019) >= 10
+    AND gini_index(URY, 2005) - gini_index(URY, 2019) >= 4
+    AND mean_cpi_inflation_yoy(URY, 2005-2019) <= 10
+    AND cumulative_log_gdp_pc(URY, 2005-2019) >= LATAM_25th_percentile
+
+prior_confidence: 0.7
+
+disclosure: >
+  Author has market-liberal prior but acknowledges Uruguay is the
+  most-cited centre-left case where redistribution coexisted with
+  macro orthodoxy. Risk of confirmation: cherry-picking 2005-2019
+  excludes the post-2019 fiscal pressure. Spec includes COVID window
+  exclusion explicitly to address that risk.
+
+steelman: hypotheses/steelman/uruguay_frente_amplio_social_investment_2005_2020.md
+
+linked_hypotheses:
+  - chile_post_1990_institutional_premium
+
+notes: >
+  Tests whether welfare-state expansion within a credible macro frame
+  is compatible with growth.

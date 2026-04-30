@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_kenya_hsnp_2015_consumption_smoothing
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Kenya's Hunger Safety Net Programme (HSNP, scaled-up from 2013 pilot to full-arm coverage in four
+  northern arid-land counties 2015, with shock-responsive scale-up triggered by NDMA drought-monitor
+  thresholds 2017 and 2022) demonstrably smoothed consumption among recipient households during drought
+  episodes by at least 15 percentage points relative to non-recipient households in eligibility-cliff
+  comparison areas, providing causal evidence that mobile-money-delivered shock-responsive transfers
+  outperform conventional emergency-aid in ASAL contexts.
+evidence_type: causal
+prior_confidence: 0.7
+disclosure: |
+  Author views shock-responsive social-protection design as well-supported by the Oxford Policy
+  Management evaluations of HSNP. Hypothesis is structured to test the consumption-smoothing claim
+  rather than the broader poverty-reduction or institutional-development claims, narrowing scope to
+  the most empirically-tractable dimension.
+sample:
+  countries: [KEN]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 2020-Q2 COVID emergency-aid scale-up period from primary identification window
+variables:
+  outcome:
+  - name: household_consumption_per_capita
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: log
+    notes: WDI proxy; KIHBS micro-household-survey series preferred at wiring.
+  - name: severe_food_insecurity_rate
+    source: who_gho:GHO/NCD_BMI
+    transformation: level_pct
+    notes: WHO indicator placeholder; FAO/IPC food-insecurity classification preferred at wiring.
+  treatment:
+  - name: hsnp_recipient_indicator
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: indicator
+    notes: County-level recipient/non-recipient indicator with eligibility-cliff geography.
+  controls:
+  - name: rainfall_anomaly
+    source: world_bank_wdi:AG.LND.PRCP.MM
+    transformation: level
+  - name: ndma_drought_indicator
+    source: world_bank_wdi:AG.LND.PRCP.MM
+    transformation: indicator
+intervention_channel: fiscal
+intervention_channel_justification: |
+  HSNP is a fiscal-channel cash-transfer; the shock-responsive trigger mechanism is an institutional
+  innovation but the transfer itself is fiscal.
+estimator:
+  template: did_callaway_santanna
+  clustering: county
+  fixed_effects: [county, year_quarter]
+  notes: |
+    Callaway-Sant'Anna staggered DiD using HSNP scale-up cohorts and shock-responsive-trigger event
+    times 2017 and 2022. Pre-trend window 12 months, post-window 18 months around each shock-trigger.
+falsification:
+  rule: |
+    Refuted if the post-shock-trigger ATT on consumption (treated relative to control households) is
+    below +15pp at 6-month post-trigger horizon, OR if the 95% CI excludes +15pp, OR if the
+    food-insecurity ATT shows no improvement.
+  test: did_cs_shock_trigger_consumption_smoothing
+  threshold: consumption_att >= +15pp at 6mo horizon AND food_insecurity_att <= -5pp
+scope:
+  period: [2015, 2024]
+  countries: [KEN]
+  outcome_dim: [poverty_inequality, welfare_state, life_expectancy_health]
+  policy_family: [welfare_architecture]
+  treatment_tags: [kenya_hsnp_2013, kenya_hsnp_scale_up_2015, ndma_drought_trigger, shock_responsive_social_protection]
+steelman: hypotheses/steelman/welfare_transfer_kenya_hsnp_2015_consumption_smoothing.md

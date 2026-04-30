@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_bush_2003_dividend_capgains_cut
+version: 1
+status: draft
+topic: distribution
+claim: >
+  The 2003 Jobs and Growth Tax Relief Reconciliation Act (JGTRRA), which
+  cut US qualified-dividend and long-term-capital-gains rates to 15 percent,
+  shifted the composition of top-1 pre-tax income toward dividend and
+  capital-gains realisations between 2003 and 2007, raising the top-1 share
+  by 1.5 to 3 percentage points relative to the pre-2003 trend. The
+  discriminating test is the dividend-share component of top-decile income
+  pre vs post 2003 against the wage-share component.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 1. Decomposition exploits SCF
+  + WID income-form composition.
+prior_confidence: 0.7
+disclosure: >
+  Author prior accepts that the dividend-rate cut shifted compensation form
+  toward dividends at the top; the composition shift is well-documented in
+  Yagan (2015) AER.
+falsification:
+  rule: >
+    SUPPORTED if dividend share of top-decile income rises by at least 2
+    percentage points 2002-2007 AND the difference between top-1 share
+    growth and bottom-90 share growth widens by at least 1pp at p<0.10.
+    REFUTED if dividend-share shift is below 1 percentage point or the
+    top-vs-bottom growth gap fails to widen at p<0.10.
+  test: >
+    US time-series decomposition of top-decile income by form (wages vs
+    dividends vs capital gains) around the 2003 break, with placebo on
+    2001 EGTRRA.
+evidence_type: associational
+sample:
+  countries: [USA]
+  period: [1995, 2010]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude 2008Q4-2009Q4 financial-crisis window from primary spec"
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: jgtrra_2003_post_indicator
+      source: "constructed: indicator = 1 for year >= 2003"
+      transformation: indicator
+    - name: dividend_tax_rate_top_qualified
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+      notes: "OWID top-rate proxy; secondary cross-check via Tax Policy Center series."
+  controls:
+    - name: log_real_gdp
+      source: "fred:GDPC1"
+      transformation: log
+    - name: federal_funds_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+    - name: equity_index_real_yoy
+      source: "fred:SP500"
+      transformation: real_yoy_pct_change
+estimator:
+  template: event_study
+  clustering: year
+  fixed_effects: [year]
+  notes: >
+    Event study around 2003Q2 break (JGTRRA effective). Placebo on 2001Q3
+    EGTRRA. Robustness with local_projections.
+intervention_channel: fiscal
+scope:
+  period: [2003, 2010]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, taxation, financialisation]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [jgtrra_2003, bush_dividend_cut, capital_gains_2003]

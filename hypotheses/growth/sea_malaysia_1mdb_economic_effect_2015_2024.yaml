@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sea_malaysia_1mdb_economic_effect_2015_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Malaysia's 1MDB scandal — public-fund misappropriation 2009-2015,
+  international scandal exposure 2015-2018, Najib conviction 2020 —
+  produced measurable institutional-quality damage observable in
+  Worldwide Governance Indicators (WGI) Control of Corruption and
+  Government Effectiveness scores, and an associated under-performance
+  in real GDP-pc growth vs ASEAN-5 peer mean over 2015-2019. WGI Control
+  of Corruption percentile rank for MYS declines by at least 5 percentile
+  points 2014 to 2018, and real GDP-pc growth differential MYS minus
+  ASEAN-5 peer mean (IDN, PHL, THA, VNM) over 2015-2019 averages at
+  least -0.5pp/yr.
+
+evidence_type: associational
+
+notes: >-
+  Tests institutional-quality damage via WGI and growth under-performance
+  via panel-FE. The 2018 GE14 election (PH coalition victory unseating
+  BN/Najib) is the political response to the scandal; the 2020 Najib
+  guilty verdict is the legal capstone.
+
+prior_confidence: 0.65
+
+disclosure: >-
+  Author market-liberal priors interpret 1MDB as a clear institutional
+  shock. Bias risk: oil-price decline 2014-2016 also hit Malaysia
+  (~20% of fiscal revenue from oil); attributing growth softness to
+  governance vs commodity-cycle is the key confound. Mitigation:
+  ASEAN-5 peer pool absorbs commodity exposure imperfectly; informative
+  WGI test isolates the institutional channel.
+
+steelman: hypotheses/steelman/sea_malaysia_1mdb_economic_effect_2015_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH for SUPPORTED): (1) WGI Control of
+    Corruption percentile rank for MYS falls by at least 5 percentile
+    points from 2014 to 2018; AND (2) MYS real GDP-pc growth minus
+    ASEAN-5 peer mean (IDN, PHL, THA, VNM) over 2015-2019 averages
+    at most -0.005 (MYS at least 0.5pp/yr below peers). REFUTED if
+    EITHER fails.
+  test: malaysia_1mdb_wgi_decline_growth_underperformance_2015_2019
+  threshold: >-
+    PRIMARY 1: wgi_control_of_corruption_pct(MYS, 2018) - wgi_control_of_corruption_pct(MYS, 2014) <= -5.
+    PRIMARY 2: gdp_pc_growth(MYS, 2015-2019 mean) - gdp_pc_growth(ASEAN5, 2015-2019 mean) <= -0.005.
+    METHOD_VALID: WGI Control of Corruption available for MYS 2014, 2018; WDI NY.GDP.PCAP.KD.ZG for MYS and ASEAN-5 across 2015-2019.
+
+sample:
+  countries: [MYS, IDN, PHL, THA, VNM]
+  period: [2008, 2024]
+  temporal_structure: panel
+
+scope:
+  period: [2015, 2024]
+  countries: [MYS]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform]
+  treatment_tags: [malaysia_1mdb_scandal, najib_conviction_2020, wgi_governance_shock]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: wgi_control_of_corruption
+      source: "world_bank_wgi:CC.PER.RNK"
+      transformation: level
+    - name: wgi_government_effectiveness
+      source: "world_bank_wgi:GE.PER.RNK"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+  treatment:
+    - name: post_1mdb_exposure_indicator
+      source: "constructed: indicator = 1 for MYS, year >= 2015"
+      transformation: indicator
+  controls:
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way fixed effects panel with ASEAN-5 peer pool. WGI test
+    is country-level pre-post; growth test is panel DiD.
+
+linked_hypotheses:
+  - sea_thailand_2014_coup_tourism_shock

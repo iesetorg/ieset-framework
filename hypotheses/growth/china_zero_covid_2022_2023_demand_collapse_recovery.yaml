@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_zero_covid_2022_2023_demand_collapse_recovery
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  China's dynamic-zero-COVID policy 2020-2022, peaking with the Shanghai
+  April-2022 lockdown and Beijing/Wuhan late-2022 closures, produced
+  sharper-than-counterfactual demand contraction — retail-sales YoY turning
+  negative, manufacturing PMI sub-50, and youth unemployment spiking — and
+  the December-2022 abrupt reopening produced an incomplete and short-lived
+  recovery rather than the V-shaped rebound expected from pent-up demand
+  and excess household savings.
+notes: 2020s natural experiment of an extreme NPI regime, then a sharp policy reversal.
+  Pattern-match on demand-side metrics; growth-side outcome.
+prior_confidence: 0.70
+disclosure: >-
+  Author tilts toward the demand-collapse-and-incomplete-recovery reading.
+  Bias risk is under-attributing the post-reopening softness to the
+  unfolding property-sector debt unwind (Evergrande/Country Garden), which
+  would have produced demand weakness regardless of COVID. Chinese official
+  statistics in 2022-2023 may be smoothed; cross-checking against satellite,
+  electricity, and trade data is essential.
+steelman: hypotheses/steelman/china_zero_covid_2022_2023_demand_collapse_recovery.md
+evidence_type: canonical_case_multi_metric
+falsification:
+  rule: >-
+    Multi-metric checklist on China 2022Q1-2023Q4. SUPPORTED if >=4 of 6
+    metrics meet thresholds; REFUTED if <=2 do. Each metric independently
+    sourced (NBS retail-sales, Caixin/NBS PMI, NBS labour-force survey,
+    customs trade data, OWID stringency) and probes a different layer
+    of the lockdown demand-shock and reopening response.
+  test: china_zero_covid_demand_collapse_2022_2023_multi_metric
+  threshold: ">=4/6 supports; <=2/6 refutes"
+canonical_metrics:
+  - metric_id: shanghai_lockdown_industrial_production_drop_2022q2
+    description: Industrial production YoY in Shanghai region 2022-04 (lockdown month).
+    threshold: ">25% MoM decline in Shanghai industrial production 2022-04 vs 2022-03"
+    window: "2022-04"
+    source: "world_bank_wdi:NV.IND.TOTL.KD.ZG; owid:industrial_production_china"
+    independence_justification: Sub-national industrial production; distinct from national PMI/retail.
+  - metric_id: retail_sales_negative_2022
+    description: National retail-sales YoY trough during 2022 lockdown waves.
+    threshold: "retail-sales YoY <=-7% at 2022 trough"
+    window: "2022-03 to 2022-12"
+    source: "world_bank_wdi:NE.CON.PRVT.KD.ZG"
+
+    independence_justification: Consumption-side; complement to production indicators.
+  - metric_id: manufacturing_pmi_sub50_persistent
+    description: Caixin/official manufacturing PMI months below 50 during 2022.
+    threshold: ">=6 months of 2022 with manufacturing PMI <50"
+    window: "2022-01 to 2022-12"
+    source: "owid:china_manufacturing_pmi"
+    independence_justification: Survey-based forward-looking indicator; orthogonal to ex-post production data.
+  - metric_id: youth_unemployment_spike_2023
+    description: Urban youth (16-24) unemployment rate peak before NBS suspended publication in 2023-08.
+    threshold: ">=20% peak"
+    window: "2022-01 to 2023-07"
+    source: "ilostat:UNE_2EAP_SEX_AGE_RT_NB"
+    independence_justification: Labour-market metric independent of GDP/retail; NBS suspension itself is a meta-signal.
+  - metric_id: incomplete_v_recovery_2023
+    description: Real GDP YoY 2023H2 vs counterfactual extrapolation of 2017-2019 trend.
+    threshold: "actual 2023 full-year real GDP growth <5.5% (vs IMF 2019 pre-COVID forecast ~6.0%)"
+    window: "2023-01 to 2023-12"
+    source: "imf:NGDP_RPCH"
+    independence_justification: Aggregate growth measure tests recovery completeness, distinct from monthly indicators.
+  - metric_id: stringency_index_extreme_2022
+    description: Oxford COVID government-response stringency index for China 2022 average.
+    threshold: ">=70 mean stringency 2022 (vs OECD ~30)"
+    window: "2022-01 to 2022-12"
+    source: "owid:government_response_stringency_index"
+    independence_justification: Treatment-intensity measure; defines the regime independent of outcomes.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 4
+  refute_threshold: 2
+scope:
+  period: [2020, 2024]
+  countries: [CHN]
+  outcome_dim: [gdp_growth, employment_labour, productivity]
+  policy_family: [regulation, none]
+  treatment_tags: [china_zero_covid_2020_2022, shanghai_lockdown_2022, china_reopening_2022_12, dynamic_zero_covid_doctrine]
+sample:
+  countries: [CHN]
+  period: [2018, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "2020Q1 initial Wuhan-shock excluded from primary; primary window 2022-01 to 2023-12"
+    - "official Chinese statistics 2022-2023 flagged for smoothing risk; cross-check with satellite/electricity/trade"
+variables:
+  outcome:
+    - name: real_gdp_growth_yoy
+      source: "imf:NGDP_RPCH; world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: pct_change_yoy
+    - name: retail_sales_growth
+      source: "world_bank_wdi:NE.CON.PRVT.KD.ZG"
+      transformation: pct_change_yoy
+    - name: manufacturing_pmi
+      source: "owid:china_manufacturing_pmi"
+      transformation: level
+    - name: youth_unemployment_rate
+      source: "ilostat:UNE_2EAP_SEX_AGE_RT_NB"
+      transformation: level
+    - name: industrial_production
+      source: "owid:industrial_production_china"
+      transformation: pct_change_yoy
+  treatment:
+    - name: zero_covid_stringency
+      source: "owid:government_response_stringency_index"
+      transformation: level
+    - name: shanghai_lockdown_indicator
+      source: "constructed: 1 from 2022-03-28 to 2022-06-01"
+      transformation: indicator
+    - name: reopening_indicator
+      source: "constructed: 1 from 2022-12-07 (10-point reopening) onward"
+      transformation: indicator
+  controls:
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log_diff
+    - name: global_manufacturing_pmi
+      source: "owid:global_manufacturing_pmi"
+      transformation: level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Single-country canonical case (China zero-COVID 2020-2022 and abrupt
+    2022-12 reversal). Pattern-match across stringency, retail, PMI, youth
+    unemployment, and post-reopening growth. NBS data-quality concerns
+    addressed by cross-source independence (OWID, ILOSTAT, IMF, WDI).

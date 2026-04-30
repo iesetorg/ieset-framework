@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_chile_2001_lagos_temporal
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Chile's 2001 Lagos-government labour reform (Law 19,759:
+  collective-bargaining strengthening, dismissal-cost
+  recalibration, working-time provisions) raised the share of
+  workers under collective-bargaining coverage by at least
+  3 pp by 2006 relative to a synthetic control of Latin-
+  American peers, without producing a statistically
+  distinguishable employment-rate decline.
+notes: >
+  Treatment dated 2001-Q4 (Law 19,759 enactment). Chile is
+  the canonical "social-democratic recalibration of a Pinochet-
+  era flexibilisation" case. The hypothesis tests whether
+  partial re-strengthening of labour protections compresses
+  employment — a heterodox prediction the spec lets win.
+prior_confidence: 0.55
+disclosure: >-
+  Author treats this as a near-symmetric test: the prior is
+  set close to 0.5 and the spec lets either side win cleanly.
+  Donor pool weights are sensitive to inclusion of Brazil
+  whose 2001-2006 trajectory is dominated by Lula-government
+  policy.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Chilean collective-bargaining
+    coverage > +3.0 pp by 2006 AND employment-rate gap is not
+    statistically more negative than -0.5 pp at p<0.10.
+    REFUTED if employment-rate gap < -1.0 pp at p<0.10
+    (employment-margin cost dominates) OR if collective-
+    bargaining-coverage gap is < +1.0 pp.
+  test: >
+    Synth-DiD on Chilean collective-bargaining coverage and
+    employment rate 2001-2006 vs LATAM donor pool, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [CHL, MEX, BRA, COL, PER, URY, ARG]
+  period: [1995, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: collective_bargaining_coverage
+      source: oecd:DSD_LFS@DF_LFS_UNION
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: chile_law_19759_2001
+      source: "constructed: indicator for 2001-Q4 Law 19,759 enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2001, 2006]
+  countries: [CHL]
+  outcome_dim: [employment_labour, labour_share]
+  policy_family: [labour_market]
+  treatment_tags: [chile_lagos_labour_2001]
+steelman: hypotheses/steelman/labour_reform_chile_2001_lagos_temporal.md

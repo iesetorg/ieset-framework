@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: latam_extra_fiscal_rule_adoption_panel_1999_2024
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Across Latin American economies 1999-2024, countries that adopted
+  numerical fiscal rules (Chile 2001, Brazil LRF 1999, Colombia 2011,
+  Mexico Pemex-and-budget 2006, Peru 1999, Uruguay 2006) showed
+  measurably better fiscal-balance dispersion and lower public-debt
+  growth than non-adopters, conditional on commodity-cycle exposure.
+  The pre-registered claim is (a) panel-FE estimation of public-debt
+  share of GDP on a fiscal-rule indicator shows a negative coefficient
+  at p < 0.10, AND (b) the within-country standard deviation of
+  fiscal-balance-share-of-GDP is reduced post-adoption, AND (c)
+  cumulative growth post-adoption is not lower than the non-adopter
+  comparison panel (i.e. fiscal rules do not impose a growth penalty
+  in this window).
+
+evidence_type: causal
+
+sample:
+  countries: [ARG, BOL, BRA, CHL, COL, CRI, DOM, ECU, GTM, HND, JAM, MEX, PAN, PER, PRY, SLV, TTO, URY]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1995, 2024]
+  countries: [LATAM]
+  outcome_dim: [fiscal_policy, gdp_growth, institutional_quality]
+  policy_family: [fiscal_policy, institutional_reform]
+  treatment_tags: [chile_fiscal_rule_2001, brazil_lrf_1999, colombia_fiscal_rule_2011, peru_fiscal_rule_1999, uruguay_fiscal_rule_2006]
+
+variables:
+  outcome:
+    - name: gross_general_govt_debt_share_gdp
+      source: imf:GGXWDG_NGDP
+      transformation: level
+    - name: fiscal_balance_share_gdp
+      source: imf:GGXCNL_NGDP
+      transformation: level
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+  treatment:
+    - name: fiscal_rule_indicator
+      source: "constructed: country-year binary, 1 from adoption-year onward (Chile 2001, Brazil 1999, Colombia 2011, Peru 1999, Uruguay 2006)"
+      transformation: binary
+  controls:
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: wgi_government_effectiveness
+      source: world_bank_wgi:GOV_WGI_GE.EST
+      transformation: level
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Numerical fiscal rule is the canonical fiscal-channel intervention.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  notes: >
+    Primary: Callaway-Sant'Anna staggered DiD with multiple
+    treatment-adoption dates. Secondary: panel_fe with fiscal-rule
+    indicator. Tertiary: within-country fiscal-balance dispersion
+    pre/post adoption.
+
+falsification:
+  rule: >
+    Not supported if (a) fiscal-rule indicator coefficient on
+    public-debt share is not negative at p < 0.10, OR (b) within-
+    country fiscal-balance dispersion does not decline post-adoption,
+    OR (c) cumulative log_gdp_pc growth post-adoption is below the
+    non-adopter median (i.e. rules cost growth).
+  test: callaway_santanna_did_plus_dispersion_test
+  threshold: >
+    fiscal_rule_coefficient on debt_share < 0 at p < 0.10
+    AND within_country_SD_fiscal_balance_post < within_country_SD_fiscal_balance_pre
+    AND cumulative_log_gdp_pc_post_adoption(adopter_median) >= cumulative_log_gdp_pc_post_adoption(non_adopter_median)
+
+prior_confidence: 0.7
+
+disclosure: >
+  Author market-liberal prior favours fiscal rules where
+  institutionally credible. Spec includes growth-penalty test
+  explicitly.
+
+steelman: hypotheses/steelman/latam_extra_fiscal_rule_adoption_panel_1999_2024.md
+
+linked_hypotheses:
+  - peru_post_fujimori_growth_2001_2019
+  - chile_post_1990_institutional_premium
+
+notes: >
+  Staggered-DiD design with explicit treatment timing.

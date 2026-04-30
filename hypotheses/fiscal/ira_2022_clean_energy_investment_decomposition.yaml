@@ -1,0 +1,168 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ira_2022_clean_energy_investment_decomposition
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  The Inflation Reduction Act (IRA, signed August 2022) produced a measurable
+  step-change in US clean-energy investment, manufacturing reshoring, and
+  fiscal cost over 2022-2026 relative to a pre-IRA trajectory and to non-US
+  comparators (EU, China, Japan, Korea). Specifically, cumulative tax-credit
+  outlays exceeded the original CBO estimate of ~$369bn (10-year), utility-
+  scale clean-energy MW deployed accelerated above the 2018-2021 trend,
+  announced battery + EV + solar manufacturing capex relocated to the US at
+  a rate that materially raised the US share of new global clean-energy
+  manufacturing investment, and clean-energy-related job postings rose. The
+  decomposition tests which of these channels (deployment, manufacturing,
+  jobs, fiscal cost) materialised at the magnitudes claimed by Treasury and
+  by the IRA's defenders, and which fell short.
+
+evidence_type: causal
+
+sample:
+  countries: [USA, DEU, FRA, GBR, JPN, KOR, CHN, CAN, AUS, NLD, ESP, ITA]
+  period: [2015, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing IRENA capacity or BEA/Eurostat manufacturing-capex panels"
+
+scope:
+  period: [2015, 2026]
+  countries: [USA, DEU, FRA, GBR, JPN, KOR, CHN, CAN, AUS, NLD, ESP, ITA]
+  outcome_dim: [energy, industrial_capability, fiscal_policy, employment_labour]
+  policy_family: [industrial_policy, fiscal_policy, energy_policy]
+  treatment_tags: [ira_2022, biden_industrial_policy, clean_energy_tax_credits, us_reshoring]
+
+variables:
+  outcome:
+    - name: log_us_cumulative_clean_energy_tax_credit_outlay_usd
+      source: "constructed: US Treasury / OMB outlay tabulations cross-checked against CBO 2022/2023/2024 reestimates. fred:FYONET (deficit baseline) + Treasury Green Book line items. Manual-drop pending."
+      transformation: log
+    - name: us_utility_scale_clean_energy_mw_added
+      source: "irena:capacity"
+      transformation: level
+      notes: "IRENA renewable-capacity panel — annual MW added (solar PV + onshore + offshore wind + battery) for USA. Compared to 2018-2021 trend."
+    - name: log_us_clean_manufacturing_announced_capex_usd
+      source: "constructed: BEA NIPA private fixed investment in clean-energy manufacturing + DOE LPO loan-guarantee tracker + BloombergNEF announced-capex tracker. Manual-drop under data/manual/derived/. Cross-checks: fred:PNFI (private nonresidential fixed investment) and fred:IPN331S (manufacturing IP)."
+      transformation: log
+    - name: us_clean_energy_employment
+      source: "bls:CES1021100001"
+      transformation: log
+      notes: "BLS CES employment in solar / wind / battery / EV manufacturing subsectors. Substitute series via E2 Clean Jobs America manual-drop if BLS subseries are missing."
+    - name: us_federal_deficit_share_gdp
+      source: "fred:GFDEGDQ188S"
+      transformation: level
+    - name: comparator_clean_manufacturing_capex_share_global
+      source: "constructed: BloombergNEF / IEA Energy Technology Perspectives — share of global clean-energy manufacturing capex by location (USA, EU, CHN). Manual-drop under data/manual/iea/."
+      transformation: level
+
+  treatment:
+    - name: us_post_ira_dummy
+      source: "constructed: indicator = 1 for USA from 2022-08 (IRA enactment) onwards; 0 otherwise."
+      transformation: indicator
+    - name: us_post_ira_eligible_subsector_interaction
+      source: "constructed: interaction of post-IRA dummy with subsector eligibility (battery / EV / solar / wind eligible = 1; non-eligible manufacturing = 0). Identifies whether eligible subsectors accelerate relative to non-eligible."
+      transformation: indicator
+
+  controls:
+    - name: log_real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: log
+    - name: real_interest_rate
+      source: "fred:DFII10"
+      transformation: level
+    - name: brent_oil_log
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: china_clean_manufacturing_capex_share
+      source: "constructed: same BloombergNEF / IEA tracker, China share. Used to control for global clean-energy capex cycle independent of IRA."
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  IRA bundles supply-side production tax credits (45X), investment tax credits (48E),
+  consumer demand-side credits (30D EV), and direct DOE loan/grant programmes — fiscal
+  + industrial-policy mix. Decomposition into pure-fiscal vs pure-regulatory not clean.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Primary specification: country-year panel with USA × post-2022 interaction
+    on each outcome (deployment, manufacturing capex, jobs, fiscal cost,
+    global-share). Compare effect sizes against pre-IRA trend extrapolation
+    (2018-2021 fitted line) and against synthetic-USA (donor pool: DEU,
+    GBR, JPN, KOR, AUS).
+
+    Decomposition asks: of the six outcomes, how many show a >1-sigma
+    acceleration above pre-IRA trend in 2023-2026? Which fall short of the
+    Treasury / Goldman / Credit Suisse 2022-2023 projections?
+
+    Known limitations:
+    (1) IRA tax-credit costs are uncapped; "actual cost" is a moving estimate
+        with CBO reestimates rising substantially through 2024.
+    (2) Announced capex ≠ realised capex; manufacturing-reshoring claims
+        depend on plant operations, not announcement counts.
+    (3) Trump administration post-Jan-2025 actions may modify or partially
+        repeal IRA — v1 windows 2022-2026, v1.1 updates if statutory
+        landscape changes.
+    (4) Counterfactual is hard: 2022-2024 also saw EU CRMA, Japan GX, Korea
+        IRA-equivalent — global clean-energy capex would have risen anyway.
+
+falsification:
+  rule: >
+    Not supported if (a) the USA × post-2022 effect on clean-energy MW
+    added is within the 95% CI of the pre-IRA trend extrapolation (no
+    deployment acceleration), OR (b) US share of global clean-manufacturing
+    capex does not rise above its 2018-2021 mean by at least 5 percentage
+    points by end-2025, OR (c) clean-energy employment is flat or declines
+    relative to total manufacturing employment, OR (d) total tax-credit
+    outlays fall below the original CBO 10-year estimate (suggesting
+    take-up failure). If only the fiscal-cost channel materialises (deficit
+    rises) without deployment / capex / jobs response, classify as "fiscal
+    cost without industrial response."
+  test: ira_decomposition_panel
+  threshold: >
+    USA × post-2022 coefficient on clean-energy MW > 1.5x pre-IRA trend
+    AND USA share of global clean-manufacturing capex rises ≥ 5pp by 2025
+    AND clean-energy employment growth > total manufacturing employment growth
+    AND realised tax-credit outlays within ±50% of original CBO estimate
+    (≥3 of 4 outcomes hit thresholds for support; 2 = mixed; ≤1 = refuted)
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author prior is that IRA produced a measurable but uneven step-change:
+  deployment and manufacturing-announcement channels appear strong in
+  2023-2024 reporting; the fiscal-cost-overrun channel is also strong
+  (CBO reestimated upward). The job-creation and realised-capex channels
+  are softer; many announced plants face delays, NIMBY blocks, or
+  cancellation. Author is market-liberal sceptic of industrial-policy
+  effectiveness; the decomposition is structured so the four channels
+  can disagree, forcing honest reporting of which parts of the IRA
+  story held and which did not. Climate-welfare and avoided-warming
+  benefits are not measured here. The Trump-administration repeal risk
+  post-Jan-2025 is a policy-stability rather than empirical concern.
+
+steelman: hypotheses/steelman/ira_2022_clean_energy_investment_decomposition.md
+
+linked_hypotheses:
+  - chips_act_2022_semiconductor_capacity_2024_2027
+  - green_industrial_policy_global_chip_race_2022_2026
+  - solar_lcoe_2010_2024_learning_curve_continuation
+  - nuclear_revival_2023_2026_western_construction_starts
+
+notes: >
+  Data readiness:
+  - IRENA capacity panel: ready (data.fetchers.irena)
+  - BLS CES: ready (data.fetchers.bls)
+  - FRED deficit + interest: ready
+  - WDI GDP: ready
+  - IMF PCPS oil: ready
+  - BEA / DOE manufacturing-capex tracker: manual-drop pending under data/manual/derived/
+  - BloombergNEF / IEA share-of-global tracker: manual-drop pending under data/manual/iea/
+  - Treasury IRA outlay tabulation: manual-drop pending; cross-check against CBO score
+
+  Run when manual-drop manufacturing-capex tracker + Treasury outlay table are populated.

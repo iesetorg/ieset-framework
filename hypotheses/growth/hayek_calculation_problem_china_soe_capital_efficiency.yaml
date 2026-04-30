@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: hayek_calculation_problem_china_soe_capital_efficiency
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  In post-1992 China, sectors and provinces with persistently high
+  state-owned-enterprise (SOE) shares of fixed-asset investment
+  exhibit lower TFP growth and higher incremental capital-output
+  ratios (ICOR — capital used per unit of additional output) than
+  sectors and provinces dominated by private firms, after controlling
+  for sector composition, urbanisation, and human capital. The
+  Mises-Hayek calculation-problem prediction is that SOEs lack the
+  decentralised price-and-profit signals required to allocate capital
+  efficiently and therefore systematically over-consume capital
+  relative to private firms. Pre-registered claim is that the SOE
+  share of investment is positively associated with provincial ICOR
+  and negatively associated with provincial TFP growth at p<0.05 in
+  a province-year panel 1992-2019.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN]
+  period: [1992, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "primary panel is province-year (31 provinces); supplementary sectoral panel as robustness"
+    - "drop 2008-2010 stimulus window from primary estimation; report separately as a stimulus-bundle robustness check"
+
+scope:
+  period: [1992, 2019]
+  countries: [CHN]
+  outcome_dim: [productivity, gdp_growth, institutional_quality]
+  policy_family: [privatisation_nationalisation, institutional_reform]
+  treatment_tags: [china_soe_dominance, deng_reform_continuation, calculation_problem_microcosm]
+
+variables:
+  outcome:
+    - name: provincial_tfp_growth_5y
+      source: "academic:china_provincial_tfp_estimates"
+      transformation: log_diff_5y
+      notes: "Provincial TFP estimates per Brandt-Van Biesebroeck-Zhang or Wu-Storesletten reconstructions; will require sourcing the academic dataset."
+    - name: provincial_icor_5y
+      source: "constructed: provincial fixed_capital_formation / Δ provincial GDP, rolling 5y"
+      transformation: level
+      notes: "Incremental capital-output ratio; constructed from National Bureau of Statistics China data."
+  treatment:
+    - name: soe_share_fixed_asset_investment
+      source: "academic:china_provincial_soe_investment_share"
+      transformation: level
+      notes: "Provincial share of fixed-asset investment by SOEs vs private/foreign-invested. Will be sourced from China Statistical Yearbook (manual) until a registered publisher exists."
+  controls:
+    - name: provincial_urbanisation_rate
+      source: "academic:china_provincial_panel"
+      transformation: level
+    - name: provincial_education_attainment
+      source: "academic:china_provincial_panel"
+      transformation: level
+    - name: provincial_export_share_gdp
+      source: "academic:china_provincial_panel"
+      transformation: level
+
+intervention_channel: institutional
+
+estimator:
+  template: panel_fe
+  fixed_effects: [province, year]
+  clustering: province
+  notes: >
+    Province-year panel with two-way FE, clustering by province.
+    Outcome: provincial TFP growth and provincial ICOR. Treatment:
+    SOE share of investment. The Hayekian prediction is that the SOE
+    share negatively predicts TFP growth and positively predicts
+    ICOR. Heterodox/developmental-state readers (Lin Justin Yifu, Ang)
+    argue that SOEs deliver coordination externalities (infrastructure,
+    upstream supply chains) that PWT/provincial TFP measures
+    underweight, and that SOE-heavy regions also tend to be heavy-
+    industry regions where measurement issues are largest.
+
+falsification:
+  rule: >
+    The hypothesis is falsified if the panel-FE coefficient on SOE
+    share is not significantly negative for TFP growth (p<0.05), OR
+    not significantly positive for ICOR (p<0.05), OR if the magnitude
+    of either is below 0.10 SD per 1-SD shift in SOE share.
+  test: panel_fe_provincial_soe_share_tfp_icor
+  threshold: >
+    coefficient(soe_share → tfp_growth, province-year FE) < 0 at p<0.05
+    AND coefficient(soe_share → icor, province-year FE) > 0 at p<0.05
+    AND magnitudes >= 0.10 SD per 1-SD SOE-share shift
+
+prior_confidence: 0.65
+
+disclosure: >-
+  The Hayekian framing — that SOEs are inherently inefficient because
+  they lack price-driven calculation — is contested by China-watchers
+  who emphasise that SOEs deliver targeted industrial-policy outcomes
+  (Huawei, BYD, CRRC, COMAC are not "calculation failures"). Author
+  prior 0.65 reflects that the broad cross-sectional pattern (SOE-
+  heavy provinces have higher capital intensity per unit of output)
+  is well-documented in academic China-watcher literature, but the
+  "calculation" interpretation is one reading among several. Bias
+  risk: author predisposed to read SOE inefficiency as Hayekian; an
+  identification-focused study would need exogenous variation in SOE
+  share that the panel design lacks.
+
+steelman: hypotheses/steelman/hayek_calculation_problem_china_soe_capital_efficiency.md
+
+linked_hypotheses:
+  - china_deng_reform_growth_acceleration_1978
+  - industrial_policy_developmentalist_states_growth
+
+notes: >
+  Mises (1920 "Economic Calculation in the Socialist Commonwealth"),
+  Hayek (1945 "The Use of Knowledge in Society"). Modern China-
+  specific empirics: Brandt-Van Biesebroeck-Zhang on factor
+  reallocation, Hsieh-Klenow on misallocation. TODO: provincial
+  TFP and SOE-share data are currently sourced from academic
+  reconstructions; if the framework registers a CSY (China Statistical
+  Yearbook) publisher these would graduate to a primary publisher
+  citation.

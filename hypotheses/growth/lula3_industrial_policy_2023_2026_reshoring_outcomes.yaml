@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: lula3_industrial_policy_2023_2026_reshoring_outcomes
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Brazil's Nova Indústria Brasil (NIB) 2024 industrial-policy plan targets six "missions"
+  (sustainable agribusiness, health complex, infrastructure, digital transformation, defence/
+  bioeconomy, decarbonisation) with R$300bn of subsidised credit + procurement preferences. The
+  pre-registered claim is that targeted-mission sectors show measurably faster value-added growth
+  (>2 pp annualised) than non-targeted control sectors over 2024-2026, AND that this within-Brazil
+  sectoral divergence does not appear in Brazil's pre-NIB 2018-2022 baseline. The competing
+  prediction is that the NIB outlay produces no detectable within-country sectoral divergence
+  once commodity-cycle and macro controls are applied — i.e., classical industrial-policy-
+  ineffectiveness in middle-income context.
+notes: >
+  Within-country difference-in-differences across sectors is the cleanest identification
+  strategy because it controls for all Brazil-wide macro shocks. Sector-level value-added is
+  available from IPEADATA and IBGE quarterly. Treatment is the binary indicator of "NIB-targeted
+  sector" mapped from CNAE 2.0 sector codes to the NIB mission definitions. The middle-income
+  context makes this distinct from the Korean/Taiwanese industrial-policy literature (which
+  operated in low-income / catch-up settings); the Lula 3 NIB is closer to the post-2008
+  developmentalist-revival literature (Rodrik, Mazzucato).
+prior_confidence: 0.40
+disclosure: >
+  Author has market-liberal priors leaning toward industrial-policy ineffectiveness in
+  middle-income settings, but Aiginger-Rodrik 2020 review noted heterogeneity. The 0.40
+  reflects that lean tempered by the explicit "missions" design which is closer to
+  Mazzucato-style mission-orientation than the older picking-winners-by-sector approach.
+  Brazil specifically has a long history of state-led industrial policy (BNDES) with
+  mixed-to-poor measured outcomes; pre-registration locks the test before 2025-2026 NIB
+  outcomes can be selectively interpreted.
+evidence_type: causal
+sample:
+  countries: [BRA]
+  period: [2018, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020Q2-2021Q2 from sectoral baseline"
+    - "exclude Bolsonaro-era 2019-2022 outlier sectors (oil concession changes, Eletrobras privatisation) from baseline matching"
+scope:
+  period: [2018, 2026]
+  countries: [BRA]
+  outcome_dim: [gdp_growth, industrial_capability, productivity]
+  policy_family: [industrial_policy, fiscal_policy, regulation]
+  treatment_tags: [lula3_nib_2024, brazil_industrial_policy_2024, bndes_credit_expansion_2024]
+variables:
+  outcome:
+    - name: sectoral_value_added_log
+      source: ipeadata:pim_pf_setor; ipeadata:pib_setorial_trimestral
+      transformation: log_level_quarterly
+    - name: sectoral_employment
+      source: ipeadata:caged_setor; ilostat:employment_by_sector
+      transformation: log_level_quarterly
+    - name: sectoral_investment_share
+      source: ipeadata:fbcf_setorial
+      transformation: pct_of_sectoral_va
+  treatment:
+    - name: nib_targeted_sector_indicator
+      source: "constructed: binary = 1 for CNAE codes mapped to NIB missions; 0 for other manufacturing/services sectors"
+      transformation: binary
+    - name: nib_implementation_period
+      source: "constructed: binary = 1 from 2024-Q1 onward"
+      transformation: binary
+  controls:
+    - name: commodity_terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD; imf_pcps:Primary
+      transformation: log_change
+    - name: brazil_policy_rate
+      source: ipeadata:selic_anualizada
+      transformation: level
+    - name: brazil_real_exchange_rate
+      source: bis:WS_EER
+      transformation: level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  NIB combines subsidised credit (BNDES on-lending), procurement preferences, and fiscal
+  expenditure on R&D/infrastructure. All three are fiscal-channel interventions per axes.yaml.
+  Coded as "fiscal" rather than bundled because the regulatory and institutional channels are
+  intentionally minimal in NIB design.
+estimator:
+  template: did_callaway_santanna
+  clustering: country
+  notes: >
+    Primary: Callaway-Sant'Anna DiD with NIB-targeted sectors as treated, non-targeted manufacturing
+    + services sectors as control, all within Brazil. Pre-period 2018-2023 vs post-period
+    2024-2026. Secondary: event-study around 2024-Q1 NIB launch with sector × time interaction.
+    Tertiary: synthetic-control across countries with Brazil as treated and other middle-income
+    LatAm (Mexico, Argentina, Colombia, Chile) as donor pool, on the manufacturing-VA outcome.
+falsification:
+  rule: >
+    Refuted if Callaway-Sant'Anna ATT on log_sectoral_value_added for NIB-targeted vs control
+    sectors over 2024-2026 is less than 2 pp annualised at p < 0.10 clustered at sector level,
+    OR if the same divergence appears in placebo windows pre-2024 (suggesting selection on
+    pre-trends). Strongly refuted if ATT is negative or zero. Supported if ATT >= 2 pp
+    annualised AND placebo-window ATT < 0.5 pp. Mixed if 1-2 pp annualised.
+  test: callaway_santanna_did_within_country_sector
+  threshold: "ATT >= 2 pp annualised log_VA growth AND placebo_pre_ATT < 0.5 pp"
+prior_confidence: 0.40
+disclosure: >
+  Pre-registered to lock the threshold before NIB outcomes are observable. Author's prior is
+  on the skeptical side; a "supported" verdict would update meaningfully toward developmentalist-
+  industrial-policy-revival positions in middle-income contexts.
+steelman: hypotheses/steelman/lula3_industrial_policy_2023_2026_reshoring_outcomes.md
+linked_hypotheses:
+  - industrial_policy_developmentalist_states_growth

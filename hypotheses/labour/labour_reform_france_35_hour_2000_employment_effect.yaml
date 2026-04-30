@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_france_35_hour_2000_employment_effect
+version: 1
+status: candidate
+topic: labour
+claim: >
+  France's 1998-2002 35-hour week law (Aubry I 1998, Aubry II
+  2000) did not produce the predicted +700,000 net jobs claimed
+  by proponents; the synthetic-DiD gap on French employment
+  rate 2000-2005 vs euro-area peers is below +1.0 pp and
+  statistically indistinguishable from zero, while real wage
+  growth slowed measurably.
+notes: >
+  Treatment dated 2000-Q1 (firms over 20 employees mandate).
+  This is a heterodox-leaning hypothesis structured to favour
+  the social-democratic claim if the data support it: it sets
+  a dispositive threshold rather than the strong null. The
+  spec is therefore symmetric — heterodox readers can win
+  cleanly by hitting +1.0pp.
+prior_confidence: 0.6
+disclosure: >-
+  Author's market-liberal priors are sceptical of work-sharing
+  as net employment policy and may under-weight the offsetting
+  hiring-subsidy components of the Aubry laws (FNE-allègements,
+  RTT-cotisation). Spec deliberately uses a dispositive rather
+  than a strong-null falsification rule to avoid baking in the
+  prior.
+falsification:
+  rule: >
+    SUPPORTED (work-sharing-effective claim) if synth-DiD gap
+    on French employment rate > +1.0 pp by 2005 at p<0.10 AND
+    real-wage growth gap is not statistically more negative
+    than -1.0 pp. REFUTED if employment gap is < +0.5 pp OR
+    wrong-signed at p<0.10. PARTIAL if employment gap meets
+    threshold but real wage growth falls by more than 1pp
+    relative to donor pool.
+  test: >
+    Synth-DiD on French employment rate and real-wage growth
+    2000-2005 vs euro-area donor pool, placebo permutation
+    inference at p<0.10.
+evidence_type: associational
+sample:
+  countries: [FRA, DEU, ITA, ESP, NLD, BEL, AUT, GBR]
+  period: [1990, 2007]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: average_annual_hours_worked
+      source: pwt:avh
+      transformation: level
+    - name: real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+  treatment:
+    - name: aubry_35_hour_enactment
+      source: "constructed: indicator for 2000-Q1 Aubry II enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1998, 2005]
+  countries: [FRA]
+  outcome_dim: [employment_labour, wage_stagnation]
+  policy_family: [labour_market]
+  treatment_tags: [france_35_hour_law_2000]
+steelman: hypotheses/steelman/labour_reform_france_35_hour_2000_employment_effect.md

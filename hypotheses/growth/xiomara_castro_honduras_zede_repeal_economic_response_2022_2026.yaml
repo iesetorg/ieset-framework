@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: xiomara_castro_honduras_zede_repeal_economic_response_2022_2026
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Honduras under Xiomara Castro repealed the ZEDE (Zonas de Empleo y Desarrollo Económico —
+  charter-city / special-economic-zone) framework in April 2022, immediately after taking
+  office. The pre-registered claim tests two competing predictions: the libertarian-Próspera
+  prediction that ZEDE-repeal triggers FDI collapse and arbitration-driven sovereign-credit
+  cost increases (Próspera ICSID claim filed 2022, ~$11bn); and the heterodox prediction that
+  ZEDE-repeal has minimal aggregate-FDI effect because the ZEDE FDI base was small (<0.5% of
+  national FDI flows). The pre-registered test asks whether Honduras's FDI-share-of-GDP and
+  sovereign-credit spread over 2022Q2-2026Q4 diverge negatively from a Central American peer
+  pool (GTM, NIC excluded, CRI, PAN, DOM) by magnitudes inconsistent with the heterodox
+  prediction.
+notes: >
+  Symmetric-assessment test. The libertarian prediction (FDI collapse > 1pp/yr; spread
+  widening > 75bp persistent) and the heterodox prediction (no detectable divergence) are
+  both pre-registered with explicit thresholds. The hypothesis is one of policy-content
+  measurement: whether the ZEDE repeal produced the catastrophic-investment-climate signal
+  the Próspera-defenders forecast, or the no-effect signal the GoH defended.
+prior_confidence: 0.40
+disclosure: >
+  Author has libertarian-leaning priors that are sympathetic to charter-city / SEZ frameworks
+  on theoretical grounds. The 0.40 reflects that lean tempered by the specific empirical
+  observation that ZEDE FDI flows were small in absolute terms and that the headline
+  Honduran FDI base is dominated by maquila + remittance-driven banking, not SEZ-specific
+  investment. Pre-registration locks the test to prevent post-hoc rationalisation in either
+  direction.
+evidence_type: causal
+sample:
+  countries: [HND, GTM, CRI, PAN, DOM, SLV]
+  period: [2015, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude Nicaragua post-2018 (sanctions confound)"
+    - "exclude COVID 2020Q2-2020Q4 from synthetic-control weight fitting"
+scope:
+  period: [2015, 2026]
+  countries: [HND, GTM, CRI, PAN, DOM, SLV]
+  outcome_dim: [capital_flows, gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, privatisation_nationalisation, regulation]
+  treatment_tags: [xiomara_castro_2022, honduras_zede_repeal_2022, honduras_prospera_icsid_claim_2022]
+variables:
+  outcome:
+    - name: fdi_inflow_share_gdp
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS; unctad:World
+      transformation: level
+    - name: sovereign_credit_spread
+      source: jp_morgan_embi:HND
+      transformation: basis_points
+    - name: real_gdp_quarterly
+      source: imf:NGDP_R; world_bank_wdi:NY.GDP.MKTP.KD
+      transformation: log_level_quarterly
+    - name: gross_fixed_capital_formation_share
+      source: world_bank_wdi:NE.GDI.FTOT.ZS
+      transformation: pct_of_gdp
+  treatment:
+    - name: zede_repeal_indicator
+      source: "constructed: binary = 1 for HND from 2022-04-21 onward"
+      transformation: binary
+  controls:
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+    - name: remittance_share_gdp
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: level
+      notes: "Honduras remittance share is 25%+ of GDP; dominant FDI alternative funding"
+    - name: commodity_terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: log_change
+    - name: wgi_rule_of_law
+      source: wgi:GOV_WGI_RL.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  ZEDE repeal is a regulatory-channel intervention (removal of a regulatory regime applied
+  to specific zones). Coded as "regulatory" per axes.yaml. Institutional-channel implications
+  (treaty/ICSID claim) are downstream consequences, not the intervention.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with HND treated from 2022Q2 and Central American peer pool. Secondary:
+    event-study around April 2022 ZEDE-repeal vote and the Próspera ICSID claim filing
+    (December 2022). Tertiary: symmetric-assessment classification per pre-registered
+    thresholds.
+falsification:
+  rule: >
+    Symmetric-assessment classification:
+    LIBERTARIAN-PREDICTION-SUPPORTED: synth_did CATT on fdi_inflow_share_gdp over 2022Q2-
+    2026Q4 < -1.0 pp annualised at p_perm < 0.10 AND CATT on sovereign credit spread > +75bp
+    persistent at p_perm < 0.10.
+    HETERODOX-PREDICTION-SUPPORTED: both CATTs are within ±1 SD of permutation-inference
+    placebo distribution (no detectable divergence).
+    MIXED: one channel supports libertarian prediction, the other does not.
+    NOT-INFORMATIVE: permutation inference cannot distinguish at the 4-year horizon with
+    a ~5-unit donor pool.
+  test: synth_did_symmetric_zede_repeal_assessment
+  threshold: "classification one of {libertarian_supported, heterodox_supported, mixed, not_informative}"
+prior_confidence: 0.40
+disclosure: >
+  Pre-registered before 2025-2026 outcomes are fully observable. The symmetric-assessment
+  framing is chosen specifically to prevent libertarian-priors from biasing interpretation:
+  a "heterodox supported" verdict updates the prior meaningfully and is as publishable as
+  the opposite.
+steelman: hypotheses/steelman/xiomara_castro_honduras_zede_repeal_economic_response_2022_2026.md
+linked_hypotheses:
+  - bukele_fdi_gdp_investment_climate_2019_2024

@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_argentina_mercosur_industrial_effect
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Argentina's manufacturing sector did not benefit durably from
+  Mercosur (1991 onward) — manufacturing share of GDP fell over
+  1995-2019 from approximately 18% to 14%, a trajectory broadly
+  consistent with non-Mercosur Latin American comparators
+  (suggesting global deindustrialisation, not Mercosur-induced
+  gain). The claim is that Mercosur did not produce a measurable
+  industrial-deepening effect for Argentina relative to Latin
+  American non-bloc comparators.
+
+evidence_type: descriptive
+
+sample:
+  countries: [ARG, BRA, CHL, COL, PER, ECU, BOL, MEX]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop ARG 2001-2003 currency-crisis years from primary spec; report sensitivity"
+
+scope:
+  period: [1990, 2019]
+  countries: [ARG]
+  outcome_dim: [industrial_capability, trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [argentina_mercosur_1991, latin_american_deindustrialisation, mercosur_industrial_effect]
+
+variables:
+  outcome:
+    - name: manufacturing_share_of_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Mercosur is a regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive comparison. Argentina manufacturing-share-of-GDP
+    trajectory vs Latin American non-Mercosur comparators
+    (CHL, COL, PER, MEX). Tests whether Argentina's
+    deindustrialisation pace differs from non-Mercosur peers.
+
+falsification:
+  rule: >
+    SUPPORTED if Argentina manufacturing-share change 1995-2019 is
+    within +/- 2 pp of comparator-mean change (no measurable
+    Mercosur effect). PARTIAL if Argentina performs better than
+    comparators by more than 2 pp. REFUTED if Argentina performs
+    worse by more than 2 pp.
+  test: descriptive_arg_mfg_share_vs_latam_comparators
+  threshold: >
+    PRIMARY: |delta_mfg_share(ARG) - delta_mfg_share(comparator_mean)| < 2 pp.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderate-high (0.7). Argentine deindustrialisation is
+  documented (CIPPEC, Schorr 2020). Heterodox structuralist
+  readers will note that Argentine industrial decline is part of
+  a longer macro-instability trajectory that predates Mercosur and
+  cannot be cleanly attributed to it.
+
+linked_hypotheses:
+  - trade_lib_mercosur_1991_intra_bloc_trade
+
+steelman: hypotheses/steelman/trade_lib_argentina_mercosur_industrial_effect.md

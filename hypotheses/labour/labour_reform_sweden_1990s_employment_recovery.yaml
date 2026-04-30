@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_sweden_1990s_employment_recovery
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Sweden's 1990s labour-market reforms (1991 unemployment-insurance
+  partial reform, 1994 Lindbeck-Commission-driven activation
+  changes, 1995 EU accession liberalisation) accelerated post-
+  crisis employment-rate recovery between 1995 and 2002 by at
+  least 2 pp relative to a synthetic control of Nordic and
+  northern-European peers, conditional on the 1992 currency-peg
+  collapse and SEK depreciation channel.
+notes: >
+  Sweden 1990s is the canonical "social-democratic adjustment
+  done well" case and is treated here as one. The donor pool
+  is restricted to peers that did not undertake comparable
+  activation reforms in the same window. Currency-channel
+  control is critical because the November-1992 SEK float
+  contributed independently to recovery.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to activation-style reform combined
+  with currency adjustment as effective recession-exit policy
+  and may over-weight the labour-reform component versus the
+  currency-depreciation component. Donor pool is small and
+  inference is correspondingly fragile.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Swedish employment rate >
+    +2.0 pp by 2002 AND the SEK-effective-exchange-rate-
+    controlled coefficient remains positive at p<0.10. REFUTED
+    if employment gap is wrong-signed at p<0.10 OR if the
+    coefficient collapses once currency channel is partialled
+    out (SEK-channel-dominant interpretation).
+  test: >
+    Synth-DiD on Swedish employment rate 1995-2002 vs Nordic
+    plus DEU/NLD donor pool with SEK effective-exchange-rate
+    control, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [SWE, NOR, FIN, DNK, DEU, NLD, AUT]
+  period: [1985, 2005]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 1992-Q4 SEK float as currency-channel breakpoint
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: long_term_unemployment_share
+      source: oecd:DSD_LFS@DF_LFS_INDIC
+      transformation: level
+  treatment:
+    - name: swedish_1990s_reforms
+      source: "constructed: indicator for 1991-1995 reform package"
+      transformation: indicator
+  controls:
+    - name: sek_real_effective_exchange_rate
+      source: bis:reer_broad_sek
+      transformation: log
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [1991, 2002]
+  countries: [SWE]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [sweden_1990s_reforms]
+steelman: hypotheses/steelman/labour_reform_sweden_1990s_employment_recovery.md

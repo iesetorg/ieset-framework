@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trinidad_tobago_oil_dependence_2008_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Trinidad and Tobago's 2008-2024 macro trajectory shows the classic
+  hydrocarbon-dependent small-economy pattern: real GDP, fiscal
+  balance, and current account move with global oil and gas prices,
+  with limited non-hydrocarbon-economy diversification despite repeated
+  policy efforts. The pre-registered claim is (a) the cumulative log
+  GDP per capita 2008-2024 (TTO) is below the Caribbean median, AND
+  (b) cumulative real-GDP growth co-moves strongly with the
+  Brent-Henry-Hub composite price (correlation > 0.6 on annual data
+  2008-2024), AND (c) Heritage Stabilisation Fund withdrawals between
+  2014 and 2020 indicate the fiscal cushion was used reactively. The
+  mechanism is the Dutch-disease and price-cycle vulnerability of a
+  small open hydrocarbon-export economy.
+
+evidence_type: associational
+
+sample:
+  countries: [TTO, JAM, BRB, BHS, DOM]
+  period: [2008, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [2008, 2024]
+  countries: [TTO, JAM, BRB, BHS, DOM]
+  outcome_dim: [gdp_growth, fiscal_policy, capital_flows, currency_purchasing_power]
+  policy_family: [fiscal_policy, energy_policy, exchange_rate_regime]
+  treatment_tags: [trinidad_oil_price_collapse_2014]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: hydrocarbon_rents_share_gdp
+      source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+      transformation: level
+    - name: gas_rents_share_gdp
+      source: world_bank_wdi:NY.GDP.NGAS.RT.ZS
+      transformation: level
+    - name: current_account_share_gdp
+      source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+      transformation: level
+    - name: fiscal_balance_share_gdp
+      source: imf:GGXCNL_NGDP
+      transformation: level
+  controls:
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+    - name: natural_gas_price
+      source: fred:DHHNGSP
+      transformation: log_level
+    - name: us_gdp_growth
+      source: fred:GDPC1
+      transformation: yoy_growth
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of log_gdp_pc on country and year FE plus
+    TTO-indicator interacted with the Brent-HH composite price.
+    Secondary: descriptive trajectory of fiscal-balance and current-
+    account around the 2014-2016 oil-price collapse.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc 2008-2024 (TTO) is
+    above Caribbean median, OR (b) annual correlation of TTO real-GDP
+    growth with Brent-HH composite is below 0.40, OR (c) the
+    TTO-indicator-times-oil-price interaction in panel_fe is not
+    significant at p < 0.10.
+  test: panel_fe_with_oil_interaction_plus_correlation
+  threshold: >
+    cumulative_log_gdp_pc(TTO, 2008-2024) <= Caribbean_median
+    AND corr(real_gdp_growth(TTO), brent_hh_composite, 2008-2024) >= 0.40
+    AND panel_fe interaction TTO_dummy x oil_price significant at p < 0.10
+
+prior_confidence: 0.78
+
+disclosure: >
+  Author macro prior is that hydrocarbon-dependent small economies
+  show price-cycle dominance unless they pre-commit to sovereign-
+  fund discipline. TTO Heritage Fund discipline weakened post-2014.
+
+steelman: hypotheses/steelman/trinidad_tobago_oil_dependence_2008_2024.md
+
+linked_hypotheses:
+  - bolivia_morales_resource_nationalism_2006_2019
+
+notes: >
+  Tests the resource-curse cycle in a Caribbean hydrocarbon exporter.

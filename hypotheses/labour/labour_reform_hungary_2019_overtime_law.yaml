@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_hungary_2019_overtime_law
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Hungary's 2018 "slave law" overtime amendment (Act CXVI/2018:
+  raising annual overtime cap from 250 to 400 hours, allowing
+  3-year reference periods) effective 2019-Q1 raised the
+  Hungarian average annual hours worked by at least 1.5%
+  relative to a synthetic control of Visegrad peers, but did
+  not produce a measurable expansion in employment-rate or
+  output growth.
+notes: >
+  Treatment dated 2019-Q1. The "slave law" is unusual for
+  raising labour intensity rather than headcount margin. The
+  hypothesis lets a heterodox reader argue the reform was
+  redistributive (transferring leisure to employer use) without
+  productivity payoff.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to working-time flexibility raising
+  labour input but recognises Hungary's 2019-2020 manufacturing
+  capacity utilisation was already high (auto-supply chain),
+  so additional intensive-margin scope may not have been
+  binding for many firms.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Hungarian average annual
+    hours worked > +1.5% by 2020 AND employment-rate gap is
+    not significantly positive at p<0.10. REFUTED if hours
+    gap < +0.5% OR employment-rate gap also rises significantly
+    (joint expansion claim, undermining the steelman intensive-
+    margin-only reading).
+  test: >
+    Synth-DiD on Hungarian average annual hours worked,
+    employment rate, and output 2019-2020 vs Visegrad donor
+    pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [HUN, POL, CZE, SVK, ROU, SVN, AUT]
+  period: [2010, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2020-2021 COVID window
+variables:
+  outcome:
+    - name: average_annual_hours_worked
+      source: pwt:avh
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+  treatment:
+    - name: hungary_overtime_law_2019
+      source: "constructed: indicator for 2019-Q1 Act CXVI/2018 effective date"
+      transformation: indicator
+  controls:
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: ecb_policy_rate
+      source: imf:IFS_FPOLM_PA
+      transformation: level
+    - name: capacity_utilisation_proxy
+      source: eurostat:bs_cscb_q
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2019, 2021]
+  countries: [HUN]
+  outcome_dim: [employment_labour, productivity]
+  policy_family: [labour_market]
+  treatment_tags: [hungary_overtime_law_2019]
+steelman: hypotheses/steelman/labour_reform_hungary_2019_overtime_law.md

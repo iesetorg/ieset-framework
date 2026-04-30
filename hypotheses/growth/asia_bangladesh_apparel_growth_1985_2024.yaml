@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: asia_bangladesh_apparel_growth_1985_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Bangladesh's apparel-export-led growth model 1985-2024 — anchored by
+  the 1985 establishment of the EPZ regime, the MFA-quota dynamics
+  pre-2005, the EU Everything But Arms preferences from 2008, and a
+  sustained labour-cost advantage — produced cumulative real GDP-pc-PPP
+  growth that converges toward the SAARC peer mean (IND, PAK, NPL) and
+  a manufacturing value-added share rise of at least +5 percentage
+  points 1985 to 2019. Real GDP-pc-PPP growth differential BGD vs PAK
+  averages at least +1.0pp/yr over 2000-2019.
+
+evidence_type: associational
+
+notes: >-
+  Bangladesh-Pakistan parallel test is the cleanest natural-experiment
+  framing — partition in 1971, similar 1971-1985 baselines, divergent
+  apparel-led trajectories. Augmented with manufacturing-share test
+  to capture the structural shift.
+
+prior_confidence: 0.82
+
+disclosure: >-
+  Author market-liberal priors interpret Bangladesh as a standout
+  success case for export-led LDC development. Bias risk: under-weighting
+  remittances (~6% GDP) which also contribute alongside apparel.
+  Mitigation: manufacturing-share test isolates apparel-driven
+  structural change.
+
+steelman: hypotheses/steelman/asia_bangladesh_apparel_growth_1985_2024.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH for SUPPORTED): (1) BGD manufacturing
+    value-added share rises by at least +5pp from 1985 to 2019; AND
+    (2) BGD real GDP-pc-PPP growth minus PAK 2000-2019 mean is at
+    least +0.01 (BGD at least 1pp/yr above PAK). REFUTED if EITHER
+    fails.
+  test: bangladesh_apparel_manufacturing_share_pakistan_growth_diff
+  threshold: >-
+    PRIMARY 1: manuf_va_pct_gdp(BGD, 2019) - manuf_va_pct_gdp(BGD, 1985) >= 5.
+    PRIMARY 2: gdp_pc_growth(BGD, 2000-2019 mean) - gdp_pc_growth(PAK, 2000-2019 mean) >= 0.01.
+    METHOD_VALID: WDI NV.IND.MANF.ZS for BGD across 1985-2019; NY.GDP.PCAP.KD.ZG for BGD and PAK 2000-2019.
+
+sample:
+  countries: [BGD, PAK, IND, NPL, LKA]
+  period: [1985, 2024]
+  temporal_structure: panel
+
+scope:
+  period: [1985, 2024]
+  countries: [BGD]
+  outcome_dim: [gdp_growth, industrial_capability, trade_liberalisation]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [bangladesh_apparel_export, bangladesh_epz_1985, eu_eba_preferences_2008, mfa_quota_dynamics]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: manufacturing_value_added_pct_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: post_1985_epz_indicator
+      source: "constructed: indicator = 1 for BGD, year >= 1985"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: gross_capital_formation_pct_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way fixed effects with SAARC peer pool. Bangladesh-Pakistan
+    bilateral comparison is the cleanest sub-test (similar 1971
+    starting point).
+
+intervention_channel: bundled
+intervention_channel_justification: >-
+  EPZ + trade-preference access + labour-cost advantage is a bundle
+  spanning regulatory (EPZ regime), trade-policy (EBA), and
+  institutional (export discipline) channels.
+
+linked_hypotheses:
+  - trade_lib_bangladesh_apparel_eu_eba_2008
+  - asia_pakistan_imf_programme_cycle_1988_2024

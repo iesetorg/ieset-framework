@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: costa_rica_high_wellbeing_low_throughput_path
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Costa Rica's 1950-2023 development trajectory reaches
+  US-comparable life expectancy at birth (within 1.5 years of US
+  LE in 2010-2020) at roughly one-fifth the per-capita CO2
+  emissions and a UNDP HDI score within 0.05 of the US level by
+  2020. The pattern shows that high-wellbeing trajectories at low
+  material-throughput are feasible for at least one Latin American
+  middle-income country, refuting strong claims that high
+  wellbeing requires high-throughput consumption.
+
+evidence_type: descriptive
+
+sample:
+  countries: [CRI, USA]
+  period: [1950, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop pre-1960 years for CO2 per capita (OWID coverage starts 1960 for CRI)"
+
+variables:
+  outcome:
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+    - name: co2_per_capita
+      source: "owid:co-emissions-per-capita"
+      transformation: level
+    - name: undp_hdi_composite
+      source: "undp_hdi:hdi_composite"
+      transformation: level
+    - name: gdp_per_capita_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: who_healthy_life_expectancy
+      source: "who_gho:WHOSIS_000002"
+      transformation: level
+      notes: "WHO HALE cross-check on the LE outcome. Coverage from 2000."
+  treatment:
+    - name: costa_rica_post_1948_indicator
+      source: "constructed: indicator = 1 for CRI 1948 onwards (army abolition 1948, universal healthcare consolidation 1941, universal primary education long-standing)"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Bilateral CRI vs USA descriptive trajectory comparison
+    1950-2023. Three-leg test on the 2010-2020 mean: (i) LE ratio
+    CRI/USA >= 0.98, (ii) CO2/cap ratio CRI/USA <= 0.25, (iii) HDI
+    ratio CRI/USA >= 0.93. Distinct from the existing
+    costa_rica_wellbeing_throughput_efficiency spec
+    (topic=healthcare) which tests two legs (LE + CO2); this spec
+    adds the HDI composite as a third independent wellbeing
+    measure. Not causal -- institutional history is specific and
+    unscalable; the bilateral comparison is offered as proof-of-
+    concept for the feasibility claim, not as a transferable
+    causal mechanism.
+
+falsification:
+  rule: >
+    SUPPORTED iff (a) mean(LE_CRI / LE_USA, 2010-2020) >= 0.98 AND
+    (b) mean(CO2pc_CRI / CO2pc_USA, 2010-2020) <= 0.25 AND
+    (c) HDI_CRI_2020 / HDI_USA_2020 >= 0.93.
+    REFUTED if (a) fails OR (b) > 0.45 OR (c) < 0.85.
+    PARTIAL between SUPPORTED and REFUTED bounds.
+    METHOD_VALID requires WDI LE + OWID CO2pc + UNDP HDI on disk
+    for CRI and USA across 2010-2020; if any missing, downgrade
+    on that leg.
+  test: costa_rica_three_leg_high_wellbeing_low_throughput_2010_2020
+  threshold: >-
+    PRIMARY: LE-ratio >= 0.98 AND CO2pc-ratio <= 0.25 AND
+    HDI-ratio >= 0.93.
+
+prior_confidence: 0.6
+
+disclosure: >-
+  Degrowth authorial framing: the spec selects Costa Rica as the
+  most-favourable Latin American case and compares against the
+  US -- the highest-throughput peer. Both choices favour the
+  supported verdict. A market-liberal critique would note that
+  (i) Costa Rica's institutional history (army abolition 1948,
+  long democratic continuity) is a sui-generis condition the
+  feasibility claim cannot generalise from; (ii) tourism revenues
+  underwrite parts of the development model and have their own
+  carbon footprint not captured in territorial CO2; (iii) the LE
+  / HDI gains rest partly on global health-technology diffusion
+  that improved most LMICs over the same window. The
+  proof-of-concept claim is preserved against (i)-(iii) -- the
+  spec only asserts that Costa Rica achieves the trajectory, not
+  that other countries can replicate it. Substituting CO2/cap
+  for the unavailable UNEP IRP material-footprint series is
+  conservative for the claim direction (CO2 ratio is lower than
+  material-footprint ratio).
+
+steelman: hypotheses/steelman/costa_rica_high_wellbeing_low_throughput_path.md
+
+scope:
+  period: [1950, 2023]
+  countries: [CRI, USA]
+  outcome_dim: [life_expectancy_health, gdp_growth, energy]
+  policy_family: [welfare_architecture, energy_policy]
+  treatment_tags: [costa_rica_1948_army_abolition, costa_rica_universal_healthcare_1941]
+
+linked_hypotheses:
+  - costa_rica_wellbeing_throughput_efficiency
+  - japan_zero_growth_basic_wellbeing_intact
+  - material_footprint_cap_feasibility
+
+notes: >
+  Distinct from costa_rica_wellbeing_throughput_efficiency
+  (healthcare topic, two-leg test). This spec adds the UNDP HDI
+  composite as a third independent wellbeing dimension and
+  reframes the case as a growth-topic feasibility argument
+  rather than a healthcare-topic outcomes argument. UNEP IRP
+  material-footprint per capita is the canonical degrowth
+  throughput measure; not on disk in repo's OWID vintage. CO2/cap
+  used as proxy with conservative-direction substitution.

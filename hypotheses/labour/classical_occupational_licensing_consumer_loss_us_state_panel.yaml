@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: classical_occupational_licensing_consumer_loss_us_state_panel
+version: 1
+status: candidate
+topic: labour
+
+claim: >
+  Across US states 2000-2022, higher occupational-licensing intensity
+  in licensed service sectors (proxied by share of state workforce
+  requiring a state-issued license, derived from BLS Current
+  Population Survey supplements) is associated with higher consumer
+  prices in the affected service sectors and lower employment in
+  those sectors, conditional on state per-capita income, demographic
+  composition, and rural/urban share. The Friedman 1962 / Kleiner-
+  Krueger claim is that occupational-licensing operates as a barrier
+  to entry that protects incumbent rents at consumer expense; the
+  test is a panel of US states with state-and-year fixed effects on
+  service-sector CPI sub-components.
+
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [2000, 2022]
+  temporal_structure: panel
+  cross_section_justification: "Within-USA state-panel design; ISO3 country list of [USA] reflects single-country test where the panel dimension is sub-national states, not international cross-section."
+  exclusion_rules:
+    - "exclude state-years inside post-2020 disaster-declaration / pandemic-emergency licensing waivers (2020-2022 partial; flag and check robustness)"
+
+variables:
+  outcome:
+    - name: services_cpi_state_level
+      source: "bls:cpi_services_subindex"
+      transformation: yoy_pct_change
+      notes: "BLS CPI services sub-index; spec uses regional CUUR series where state-level not available, with state-to-region mapping documented."
+    - name: licensed_sector_employment_share
+      source: "bls:ces_state_employment"
+      transformation: share_of_total_state_employment
+  treatment:
+    - name: licensing_intensity_state
+      source: "bls:cps_licensing_supplement"
+      transformation: share_of_workforce_requiring_state_license
+      notes: "Derived from CPS occupational-licensing supplements (2015 onward) and Kleiner-Krueger 2013 historical baseline series; the spec acknowledges measurement is more reliable post-2015."
+  controls:
+    - name: state_real_pc_income
+      source: "fred:state_personal_income_per_capita"
+      transformation: log_real
+    - name: state_unemployment_rate
+      source: "fred:state_unemployment_rate"
+      transformation: level
+    - name: state_population_density
+      source: "fred:state_population"
+      transformation: log_per_sqkm
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Occupational licensing is a regulatory entry barrier. Channel
+  regulatory per invariant 4.
+
+estimator:
+  template: panel_fe
+  clustering: state
+  fixed_effects: [state, year]
+  notes: >
+    Two-way FE panel with state and year fixed effects, standard
+    errors clustered by state. Identification from within-state
+    variation in licensing intensity over 2000-2022. Pre-2015
+    licensing intensity is measured with substantial error;
+    robustness check restricts to 2015-2022. Spec acknowledges
+    the licensing-intensity measure is noisier than the outcome
+    measures.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) panel-FE coefficient on licensing
+    intensity is positive and significant at p<0.05 on services
+    CPI growth, AND (b) the coefficient on licensed-sector
+    employment share is negative and significant at p<0.10
+    (mechanism check). PARTIAL if only (a) holds. REFUTED if (a)
+    is wrong-signed at p<0.05 or insignificant. INFORMATIVE: the
+    coefficient should be larger when restricted to 2015-2022
+    (better-measured licensing data); if it shrinks substantially
+    in that window, the headline result is partly an artefact of
+    the noisy historical series.
+  test: state_panel_fe_licensing_on_cpi_and_employment
+  threshold: >
+    PRIMARY: panel_FE_beta(licensing_intensity, services_CPI) > 0 at p<0.05 AND
+    panel_FE_beta(licensing_intensity, licensed_sector_employment) < 0 at p<0.10.
+    INFORMATIVE: 2015-2022 sub-sample coefficient retains >=70% of full-sample magnitude.
+
+prior_confidence: 0.60
+
+disclosure: >-
+  Author prior is moderate (0.60). The Kleiner-Krueger 2013 and
+  Kleiner 2006 evidence on licensing wage premiums is robust; the
+  consumer-price evidence is thinner (small literatures on
+  cosmetology, dentistry, opticians). Authorial framing risk: the
+  spec frames the test as Friedman's barrier-to-entry claim, but
+  the quality-improvement counter-argument (licensing screens out
+  low-quality providers and the consumer welfare effect is
+  ambiguous) is genuine and not fully testable in this design.
+  Heterodox readers (institutionalist, public-health) will note
+  that the consumer-price-rise channel can coexist with consumer-
+  welfare improvement if the quality of licensed services rises,
+  which the spec cannot measure. Spec is honest that this is a
+  partial test of the Friedman claim, not a verdict on optimal
+  licensing policy.
+
+scope:
+  period: [2000, 2022]
+  countries: [USA]
+  outcome_dim: [employment_labour, regulation_compliance_cost, productivity]
+  policy_family: [labour_market, regulation]
+  treatment_tags: [occupational_licensing, friedman_barrier_to_entry, kleiner_krueger, classical_liberal_entry_freedom]
+
+steelman: hypotheses/steelman/classical_occupational_licensing_consumer_loss_us_state_panel.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+
+notes: >
+  Friedman's "Capitalism and Freedom" 1962 chapter on occupational
+  licensure is the canonical statement. Kleiner-Krueger 2013 is
+  the modern empirical update. v2 should use a regression-
+  discontinuity design on state-level licensing-reform episodes
+  (Arizona Universal Recognition Act 2019, etc.) once event dates
+  are reliably codified.

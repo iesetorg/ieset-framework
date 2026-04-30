@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_botswana_diamond_dependency_post_2014
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Botswana's celebrated 1966-2010 institutional-exceptionalism case showed signs of
+  diminishing returns post-2014 as natural-diamond demand softened (lab-grown competition,
+  shifting consumer preferences, Indian polishing-industry restructuring) and economic
+  diversification efforts produced limited results. The pre-registered claim is that, in
+  a synthetic-control design with mineral-exporting upper-middle-income peers (Namibia,
+  Chile, Zambia, Ghana), Botswana's real-GDP-pc growth 2014-2024 falls at least 8 log-
+  points below the synthetic counterfactual AND non-mining manufacturing share of GDP
+  fails to rise by at least 2 percentage points (i.e. the diversification narrative does
+  not register in the data). The null counter-claim is that Botswana's institutional
+  premium continues to deliver outperformance and the apparent slowdown is within normal
+  commodity-cycle variation.
+evidence_type: causal
+sample:
+  countries:
+  - BWA
+  - NAM
+  - CHL
+  - ZMB
+  - GHA
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude COVID 2020Q2-2020Q4 from fitting
+  - flag Zambia 2020 default; retain but robustness-check
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - BWA
+  - NAM
+  - CHL
+  - ZMB
+  - GHA
+  outcome_dim:
+  - gdp_growth
+  - industrial_capability
+  - capital_flows
+  policy_family:
+  - industrial_policy
+  - institutional_reform
+  treatment_tags:
+  - botswana_diamond_demand_decline_post_2014
+  - botswana_diversification_strategy_post_2014
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: manufacturing_share_gdp
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: level
+  - name: mineral_rents_share_gdp
+    source: world_bank_wdi:NY.GDP.MINR.RT.ZS
+    transformation: level
+  - name: services_export_share
+    source: world_bank_wdi:TX.VAL.SERV.CD.WT
+    transformation: level
+  treatment:
+  - name: post_2014_diamond_demand_indicator
+    source: 'constructed: 1 for BWA from 2014 onward'
+    transformation: binary
+  - name: rough_diamond_price_index
+    source: 'constructed: De Beers / Rapaport composite; supplemented by world_bank_wdi commodity prices'
+    transformation: log_level
+    notes: 'Channel intensity: rough-diamond price index as treatment-intensity proxy.'
+  controls:
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: copper_price
+    source: fred:PCOPPUSDM; imf:PCOPP
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: wgi_govt_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  The treatment is the post-2014 diamond-demand softening interacting with Botswana's
+  diversification-policy bundle (regulatory, fiscal, industrial-policy attempts under
+  ERTP, EDD strategy). Bundled coding per invariant 4.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with BWA treated from 2014 and mineral-exporter peer donor pool.
+    Secondary: panel FE with diamond-price index as treatment intensity. Robustness drops
+    Chile (different mineral regime, diversified industrial base) and runs the test with
+    Namibia-only counterfactual (closest geographic and structural peer).
+falsification:
+  rule: >-
+    Not supported if EITHER (a) Botswana's cumulative log-GDP-pc growth gap 2014-2024
+    vs synthetic counterfactual is greater than -8 log-points (i.e. less than the
+    threshold underperformance), OR (b) manufacturing share of GDP rises by more than
+    2 ppts 2014-2024 (i.e. diversification IS materialising), OR (c) the diamond-price
+    intensity coefficient is not significantly positive on log_gdp_pc (i.e. the
+    diamond-channel mechanism is not the proximate cause).
+  test: synth_did_with_diversification_test
+  threshold: >-
+    cumulative_log_gdp_pc_gap_2014_2024 <= -0.08 AND
+    manufacturing_share_2024 - manufacturing_share_2014 <= 2 ppts AND
+    diamond_price_panel_coef on log_gdp_pc significant at p < 0.10
+prior_confidence: 0.55
+disclosure: >-
+  Author's prior is mildly that post-2014 has been weaker for Botswana than the
+  pre-2014 institutional-exceptionalism narrative implies. Prior 0.55 reflects this
+  qualitative impression tempered by uncertainty: the COVID confound was severe for
+  Botswana (tourism collapse), Botswana's WGI scores remain best-in-Africa, and IMF
+  Article IV reports have generally been positive. The diversification-failure
+  prediction is the load-bearing test: if manufacturing has actually grown, the
+  hypothesis is falsified even if growth is slow.
+conflict_disclosure: No Botswana or De Beers exposure.
+steelman: hypotheses/steelman/africa_botswana_diamond_dependency_post_2014.md
+linked_hypotheses:
+- botswana_institutional_exceptionalism
+notes: >-
+  Designed to be orthogonal to the existing botswana_institutional_exceptionalism
+  hypothesis (which tests the long-run 1966-2010 success). This hypothesis tests
+  whether the institutional-quality premium has weakened in the diamond-demand-softening
+  era.

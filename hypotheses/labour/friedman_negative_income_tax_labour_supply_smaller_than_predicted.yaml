@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: friedman_negative_income_tax_labour_supply_smaller_than_predicted
+version: 1
+status: candidate
+topic: labour
+
+claim: >
+  The labour-supply dis-employment elasticity of negative-income-tax
+  (NIT) and earned-income-tax-credit (EITC) -style cash-transfer
+  programmes is materially smaller than the canonical mid-1970s NIT-
+  experiment headline estimates suggested. Across the four US NIT
+  experiments (New Jersey, Rural NIT, Seattle-Denver SIME-DIME, Gary)
+  the male-head-of-household labour-supply reduction averaged 5-8%,
+  not the 20%+ that conservative critics warned about; and the post-
+  1986 EITC expansion produced positive (not negative) labour-supply
+  effects on single mothers in the +5 to +10 percentage-point range.
+  The hypothesis is the Chicago / Friedman 1962 prediction that a
+  well-designed cash transfer integrated with the tax system reduces
+  marginal effective tax rates on work and produces smaller dis-
+  employment than means-tested categorical welfare.
+
+evidence_type: causal
+
+sample:
+  countries: [USA]
+  period: [1968, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop NIT-experiment families with attrition >50% within 12 months of randomisation"
+    - "drop CPS observations missing wage / hours / earnings"
+
+scope:
+  period: [1968, 2020]
+  countries: [USA]
+  outcome_dim: [employment_labour, welfare_state, poverty_inequality, taxation]
+  policy_family: [welfare_architecture, tax_policy, labour_market]
+  treatment_tags: [friedman_nit_1962, sime_dime_experiment, eitc_1986_expansion, eitc_1993_expansion, prwora_1996]
+
+variables:
+  outcome:
+    - name: weekly_labour_hours_male_head
+      source: "academic:nit_experiments_microdata"
+      transformation: level_hours_per_week
+      notes: "NIT-experiment microdata (NJ, Rural, SIME-DIME, Gary). Treatment-control difference in male-head weekly hours."
+    - name: labour_force_participation_single_mothers
+      source: "fred:LNS11300002"
+      transformation: level_pp
+      notes: "FRED women's LFPR; CPS state-level single-mother LFPR for EITC quasi-experimental analysis."
+    - name: annual_earnings_low_skill
+      source: "bls:CPS_ASEC_microdata"
+      transformation: log_real_2020
+      notes: "CPS ASEC annual earnings; sample restricted to bottom-tercile education-by-age cells."
+  treatment:
+    - name: nit_experimental_assignment
+      source: "academic:nit_experiments_microdata"
+      transformation: indicator_treatment_assignment
+      notes: "Random assignment to NIT treatment (varied guarantee level x marginal rate). Treatment intensity vector also captured."
+    - name: eitc_max_credit_real
+      source: "derived:eitc_max_credit_real"
+      transformation: log_usd_2020
+      notes: "EITC maximum credit indexed to 2020 USD; expansions in 1986, 1990, 1993 are key events."
+    - name: federal_minimum_wage_real
+      source: "fred:STTMINWGCA"
+      transformation: log_real_2020
+      notes: "Real federal minimum wage; controls for concurrent wage-floor changes."
+  controls:
+    - name: state_unemployment_rate
+      source: "bls:LAUST010000000000003"
+      transformation: level
+    - name: state_gdp_per_capita
+      source: "fred:GDPPC_state_panel"
+      transformation: log
+    - name: prwora_implementation
+      source: "derived:tanf_state_adoption_dates"
+      transformation: indicator
+      notes: "Concurrent welfare-reform confound for the post-1996 EITC analysis."
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  NIT and EITC bundle a fiscal transfer (cash) with a regulatory
+  integration of welfare and tax (no separate categorical means-test).
+  The labour-supply effect tested combines the two channels.
+
+estimator:
+  template: did_callaway_santanna
+  fixed_effects: [individual, year, state]
+  clustering: state
+  notes: >
+    Two-strategy design: (A) NIT experiment treatment-control comparisons
+    using SIME-DIME / NJ microdata with intent-to-treat hours estimates;
+    (B) Eissa-Liebman 1996 / Meyer-Rosenbaum 2001 style DiD on EITC
+    expansions using CPS ASEC and the kink-and-kink-jumps in marginal
+    EITC schedules as quasi-experimental variation. Effects pooled
+    across both strategies for the headline test. Callaway-Sant'Anna
+    DiD on EITC expansions to handle staggered state-level supplements.
+
+falsification:
+  rule: >
+    Not supported if (a) the NIT-experiment male-head hours reduction
+    exceeds 15% (the rough threshold separating Friedman's "manageable"
+    prediction from the conservative-critic prediction), OR (b) the
+    EITC-induced single-mother LFPR effect is negative or below +3pp
+    at p<0.05, OR (c) the bundled labour-supply elasticity to the
+    after-tax wage exceeds 0.5 in the bottom-tercile education sample.
+    A welfare-trap critique of NIT/EITC wins cleanly if the male-head
+    hours reduction exceeds 20% AND the EITC LFPR effect on single
+    mothers is below +3pp.
+  test: nit_experiment_hours_and_eitc_did_lfpr
+  threshold: >
+    NIT_male_head_hours_reduction <= 15% across all four experiments
+    AND EITC_single_mother_lfpr_effect >= +5pp at p<0.05
+    AND bundled_labour_supply_elasticity <= 0.4
+    AND post-PRWORA confound robustness: result holds when 1996-2000 dropped from EITC sample
+
+prior_confidence: 0.7
+
+disclosure: >-
+  This is the Chicago "well-designed cash transfer beats categorical
+  welfare" prediction, which contradicts both the conservative welfare-
+  trap critique (predicts large dis-employment) and the progressive
+  universalism critique (predicts EITC is a wage subsidy that supports
+  low-wage employers more than workers). Author's market-liberal
+  priors lean strongly toward the Friedman framing: cash transfers
+  with low marginal effective rates produce smaller dis-employment
+  than categorical means-testing. The literature is consistent with
+  this — Eissa-Liebman, Meyer-Rosenbaum, Hoynes-Patel — but the
+  conservative reading remains politically influential despite the
+  empirical evidence. Falsification rule is structured so the
+  conservative-critic reading wins cleanly on (a) AND (b) failure;
+  the progressive critique that EITC is a wage subsidy is not directly
+  testable in this spec and is flagged as out-of-scope.
+
+steelman: hypotheses/steelman/friedman_negative_income_tax_labour_supply_smaller_than_predicted.md
+
+linked_hypotheses:
+  - clinton_welfare_reform_labour_participation_effect
+  - clinton_welfare_reform_deep_poverty_effect
+
+notes: >
+  Hum-Simpson (1993) meta of NIT experiments, Eissa-Liebman (1996 QJE)
+  on EITC and single-mother labour supply, Meyer-Rosenbaum (2001 QJE)
+  on EITC and welfare reform, Hoynes-Patel (2018) on long-run EITC
+  effects are the canonical references. The 1968-1980 NIT experiments
+  remain the only large-N RCTs on cash-transfer labour-supply effects
+  in advanced economies until the 2010s UBI experiments (Finland,
+  Stockton CA), which are too recent for inclusion in this spec.

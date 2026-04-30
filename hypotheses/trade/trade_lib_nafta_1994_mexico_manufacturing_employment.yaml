@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_nafta_1994_mexico_manufacturing_employment
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  NAFTA (effective 1994-01-01) raised Mexican manufacturing
+  value-added and merchandise-export intensity over the 1994-2007
+  pre-China-shock window relative to a synthetic-control pool of
+  Latin American non-NAFTA economies. The Heckscher-Ohlin /
+  Krugman-style claim is that bilateral preferential access to the
+  US market combined with rules-of-origin-driven supply-chain
+  integration shifted Mexico's tradeable-sector composition toward
+  manufacturing exports faster than its non-NAFTA peers. Wage and
+  aggregate-employment effects are documented to be small and
+  heterogeneous; the cleaner first-order signal is on
+  manufacturing-sector value-added share and goods-export intensity.
+
+evidence_type: causal
+
+sample:
+  countries: [MEX, ARG, BRA, CHL, COL, CRI, DOM, ECU, GTM, HND, PER, SLV, URY]
+  period: [1985, 2007]
+  temporal_structure: panel
+  exclusion_rules:
+    - "end pre-2008 to avoid GFC and China-WTO-shock confounding"
+    - "drop country-years inside currency-crisis episodes (Tequila 1994-95 retained as part of treatment window for MEX; Argentina 2001-2002 dropped from donor pool)"
+
+scope:
+  period: [1985, 2007]
+  countries: [MEX]
+  outcome_dim: [trade_liberalisation, industrial_capability, employment_labour]
+  policy_family: [trade_policy]
+  treatment_tags: [nafta_1994, mexico_us_canada_fta, rules_of_origin, manufacturing_export_promotion]
+
+variables:
+  outcome:
+    - name: log_manufacturing_value_added
+      source: "world_bank_wdi:NV.IND.MANF.KD"
+      transformation: log
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:TX.VAL.MRCH.CD.WT"
+      transformation: share_of_gdp
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: nafta_indicator
+      source: "constructed: indicator = 1 for MEX from 1994 onward; 0 elsewhere"
+      transformation: indicator
+  controls:
+    - name: log_gdp_pc_pretreatment
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_treatment_minus_1
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: real_effective_exchange_rate
+      source: "imf:REER"
+      transformation: log
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  NAFTA is a regulatory intervention (tariff schedules, rules-of-origin,
+  investor-state dispute settlement). Channel regulatory per invariant 4.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Synthetic-control estimator for Mexico against a Latin American
+    donor pool of non-NAFTA middle-income economies. Pre-treatment
+    fitting window 1985-1993; post-treatment evaluation 1994-2007.
+    Placebo permutation test across the donor pool reports
+    p-values. Robustness: drop the 1994-1995 Tequila-crisis years
+    from the post-window to ensure the synthetic gap is not
+    devaluation-driven.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) the SC gap on log manufacturing
+    value-added is positive and persistent (>=5% gap by 2000) AND
+    (b) the SC gap on merchandise-exports-share-of-GDP is positive
+    and persistent (>=3 percentage points by 2000). PARTIAL if (b)
+    holds but (a) does not — exports rose but production did not
+    deepen, consistent with maquila-shell critique. REFUTED if
+    Mexico under-performs the synthetic control on both metrics.
+  test: synthetic_control_mexico_vs_latam_donor_pool
+  threshold: >
+    PRIMARY: SC_gap(log_manufacturing_va, 2000) >= 0.05 AND
+    SC_gap(merchandise_exports_share, 2000) >= 0.03.
+    INFORMATIVE: placebo permutation p-value < 0.10.
+
+prior_confidence: 0.62
+
+disclosure: >
+  Author prior moderate (0.62). The empirical literature on NAFTA
+  is genuinely mixed: Hanson 2007 documents wage convergence in
+  northern Mexico; Caliendo-Parro 2015 estimates modest aggregate
+  welfare gains; structuralist critics (Weisbrot et al. 2014) note
+  Mexican per-capita growth has been sluggish and that any
+  manufacturing gains were swamped by the post-2001 China shock.
+  Restricting the evaluation window to pre-2008 isolates the
+  cleaner Mexican-export-share signal from the China-shock
+  confound. Heterodox readers will note that the agricultural side
+  (corn imports displacing peasant maize farmers) is excluded from
+  this spec — that channel is material and is best handled in a
+  separate spec on rural employment and migration.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+  - trade_liberalisation_growth_effect
+
+steelman: hypotheses/steelman/trade_lib_nafta_1994_mexico_manufacturing_employment.md
+
+notes: >
+  Pre-2008 evaluation window is deliberate — the post-2001 China
+  WTO-accession shock is the single largest confound for any NAFTA
+  evaluation, and treating it as part of the NAFTA effect would
+  conflate two separate trade shocks.

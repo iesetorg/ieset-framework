@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
@@ -23,6 +24,12 @@ export default function RootLayout({
         <Topbar />
         {children}
         <Footer />
+        {/* Cloudflare Web Analytics — first-party, cookie-less, GDPR-friendly. */}
+        <Script
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "ac7593aeb84a443c889566add26504cd"}'
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

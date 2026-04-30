@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_egypt_floatation_episodes_2016_2024
+version: 1
+status: candidate
+topic: monetary
+claim: >-
+  Egypt's three sequential currency-regime devaluations (November 2016, March 2022, March
+  2024) each followed a recurring pattern: an FX-shortage crisis, an IMF-anchored
+  devaluation step, a brief inflation surge, and a partial reserve rebuild. The pre-
+  registered claim is that, in an event-study design pooling the three episodes, the
+  six-month post-event window shows (a) FX reserves rise by at least 20% from the pre-
+  event trough, (b) parallel-vs-official rate gap narrows by at least 50%, and (c) CPI
+  inflation accelerates by at least 8 percentage points YoY at peak, with the inflation
+  effect dissipating within 18 months. The null counter-claim is that the three episodes
+  do not share a common dynamic — the response is regime-specific (e.g. the 2024 episode
+  was rescued by the UAE Ras El Hekma deal rather than by floatation per se), and the
+  pooled event study cannot reject heterogeneity.
+evidence_type: causal
+sample:
+  countries:
+  - EGY
+  period:
+  - 2014
+  - 2025
+  temporal_structure: time_series
+  exclusion_rules:
+  - exclude COVID 2020Q2-2020Q4 baseline windows
+  - flag 2024 episode as Ras-El-Hekma-augmented; report with and without UAE FDI windfall
+scope:
+  period:
+  - 2014
+  - 2025
+  countries:
+  - EGY
+  outcome_dim:
+  - currency_purchasing_power
+  - inflation
+  - capital_flows
+  policy_family:
+  - monetary_policy
+  - exchange_rate_regime
+  treatment_tags:
+  - egypt_devaluation_2016
+  - egypt_devaluation_2022
+  - egypt_devaluation_2024
+variables:
+  outcome:
+  - name: official_usd_rate
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: fx_reserves_usd
+    source: world_bank_wdi:FI.RES.TOTL.CD; imf:RAFA_USD
+    transformation: log_level
+  - name: current_account_share_gdp
+    source: world_bank_wdi:BN.CAB.XOKA.GD.ZS; imf:BCA_NGDPD
+    transformation: level
+  treatment:
+  - name: devaluation_event_indicator
+    source: 'constructed: 1 in months {2016-11, 2022-03, 2024-03}, 0 otherwise'
+    transformation: event_dummy
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: emerging_market_vix
+    source: fred:VIXCLS
+    transformation: level
+  - name: tourism_arrivals
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: log_level
+intervention_channel: monetary
+intervention_channel_justification: >-
+  The intervention is a discrete exchange-rate-regime adjustment (managed peg → step
+  devaluation → managed-float). All three episodes are CBE-led monetary actions
+  conditional on IMF programme anchoring. Channel coding is monetary per axes.yaml.
+estimator:
+  template: event_study
+  clustering: country
+  notes: >-
+    Pooled event study with t=0 at each devaluation month, ±24-month window. Outcomes
+    indexed to t=-1. Inverse-variance weighting across the three episodes. Robustness
+    drops 2024 (UAE-deal-augmented) and re-runs as two-event pool. Secondary local-
+    projections specification with horizon-specific impulse responses.
+falsification:
+  rule: >-
+    Not supported if any of (a) average reserves at t+6 are not at least 20% above the
+    pre-event trough, OR (b) the parallel-vs-official rate gap does not narrow by at
+    least 50% on average across the three episodes by t+6, OR (c) the inflation peak is
+    less than 8 ppts above the pre-event trend, OR (d) the three episodes are statistically
+    heterogeneous at p < 0.05 (Wald test of equal coefficients), indicating the pooled
+    pattern is not a single shared dynamic.
+  test: pooled_event_study_with_homogeneity_test
+  threshold: >-
+    pooled_reserves_t6 / reserves_t-1 >= 1.20 AND parallel_gap_t6 <= 0.50 *
+    parallel_gap_t-1 AND inflation_peak - inflation_pre >= 8 ppts AND
+    homogeneity_chi2_p > 0.05
+prior_confidence: 0.55
+disclosure: >-
+  Prior is near 0.50 because the three-episode pattern is real but each episode had
+  episode-specific drivers (2016 was IMF-anchored cold-turkey; 2022 was war-shock
+  driven; 2024 was UAE-deal driven). The homogeneity test is the load-bearing
+  falsification — if the episodes are heterogeneous, the "Egypt has a recurring
+  floatation pattern" framing is over-stylised. Author's prior is mildly that the
+  pattern holds in expectation but each episode looks different on close inspection.
+conflict_disclosure: Author has no Egyptian asset exposure.
+steelman: hypotheses/steelman/mena_egypt_floatation_episodes_2016_2024.md
+linked_hypotheses:
+- imf_program_currency_stabilisation_panel
+notes: >-
+  Data-gated on CBE FX reserve releases (monthly) and CAPMAS CPI (monthly). The 2024
+  Ras El Hekma deal ($35bn UAE FDI) is a confound that the spec flags but cannot
+  cleanly remove. The hypothesis is most informative if 2016 and 2022 episodes share
+  a pattern that 2024 does not — consistent with the "external rescue regime" story
+  being qualitatively different from a market-led floatation.

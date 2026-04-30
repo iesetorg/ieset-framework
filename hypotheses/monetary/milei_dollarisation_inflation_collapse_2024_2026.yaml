@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: milei_dollarisation_inflation_collapse_2024_2026
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Argentina under Milei (December 2023 inauguration) executed a fiscal-surplus + monetary-contraction
+  + de-facto-dollarisation programme that collapsed monthly CPI inflation from ~25% (Dec 2023)
+  toward sub-3% by 2025-2026, eliminated the primary fiscal deficit within a single fiscal year,
+  and compressed the parallel-market peso-USD gap (blue-dolar / official) from over 100% to
+  near zero. The pre-registered claim is that across four monetary/fiscal metrics — monthly
+  inflation, primary fiscal balance, peso-USD parallel-market gap, and BCRA real monetary base —
+  the Milei programme produces extreme outcomes that diverge from prior Argentine stabilisation
+  attempts (Convertibilidad 1991, Macri 2015-2019) and from Latin American disinflation
+  comparators. The headline test is whether the inflation collapse holds without a recession of
+  comparable magnitude to the disinflation gain (output decline less than 4% peak-to-trough).
+notes: >
+  Multi-metric canonical-case design. Argentina's 2023-2026 stabilisation is a once-in-a-generation
+  natural experiment combining a fiscal-shock-therapy package, central-bank-balance-sheet sterilisation,
+  and incremental dollarisation steps (cepo relaxation, USD legal-tender expansion, BCRA reserve
+  recomposition). The hypothesis treats it as a multi-metric pattern-match rather than a single
+  estimator because the pre-period (2007-2023 INDEC falsification, 2018-2023 cepo regime) makes
+  conventional panel/synth-control identification noisy. Output-trajectory and poverty-rate
+  metrics are included to surface the social cost of the disinflation, not just the disinflation
+  itself.
+prior_confidence: 0.65
+disclosure: >
+  Author has market-liberal priors and an a-priori sympathetic read on the Milei stabilisation
+  package. The 0.65 prior reflects high confidence that *inflation falls sharply* (the 2024 H1
+  data already show this) but genuine uncertainty over (a) whether the fiscal surplus is
+  sustainable past 2025 mid-terms, (b) whether the parallel-FX gap stays compressed once cepo
+  is fully lifted, and (c) whether output recovery materialises by 2026. The multi-metric
+  framing is chosen to allow a "supported on inflation, refuted on output" mixed verdict rather
+  than collapsing the case into a single number.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [ARG]
+  period: [2020, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "INDEC pre-2016 series treated as falsified; use BCRA + private-consultancy parallel series for 2007-2015 historical context only"
+scope:
+  period: [2020, 2026]
+  countries: [ARG]
+  outcome_dim: [inflation, fiscal_policy, monetary_policy, currency_purchasing_power, gdp_growth, poverty_inequality]
+  policy_family: [fiscal_policy, monetary_policy, exchange_rate_regime, institutional_reform]
+  treatment_tags: [milei_2023, argentina_dollarisation_2024, argentina_chainsaw_plan_2024, cepo_relaxation_2024]
+variables:
+  outcome:
+    - name: monthly_cpi_inflation
+      source: bcra:inflation_monthly; indec:ipc_monthly
+      transformation: monthly_pct_change
+    - name: primary_fiscal_balance_pct_gdp
+      source: imf:GGXCNL_NGDP; indec:resultado_primario
+      transformation: annual_pct_gdp
+    - name: parallel_fx_gap
+      source: bcra:fx_official; dolartoday:blue_rate
+      transformation: ratio_minus_one
+      notes: >
+        Computed as (parallel_rate / official_rate) - 1. Pre-cepo-lift this captures the blue-dolar
+        gap; post-lift this should approach zero if dollarisation is effective.
+    - name: real_gdp_index
+      source: imf:NGDP_R; indec:emae
+      transformation: log_level
+    - name: poverty_rate_official
+      source: indec:eph_pobreza; world_bank_wdi:SI.POV.DDAY
+      transformation: level
+  treatment:
+    - name: milei_era_indicator
+      source: "constructed: binary = 1 for ARG from 2023-12-10 onward"
+      transformation: binary
+canonical_metrics:
+  - metric_id: monthly_inflation_collapse
+    description: "Monthly CPI inflation falls below 3% by 2025-12 and stays below 4% for 6+ consecutive months."
+    threshold: "monthly inflation < 3% by Dec 2025; sustained < 4% for 6+ months"
+    window: "2024-01 to 2026-06"
+    source: "bcra:inflation_monthly; indec:ipc_monthly"
+    direction: supports_claim
+    independence_justification: "Direct outcome variable; independent of fiscal balance and FX gap measurement."
+  - metric_id: primary_fiscal_surplus_achieved
+    description: "Argentina runs a primary fiscal surplus in 2024 and 2025 (first time since 2010 outside crisis-induced surpluses)."
+    threshold: "primary balance > 0% of GDP in 2024 AND 2025"
+    window: "2024-2025 fiscal years"
+    source: "imf:GGXCNL_NGDP; indec:resultado_primario"
+    direction: supports_claim
+    independence_justification: "Fiscal data sourced from Treasury accounts; independent of monetary and FX measurement."
+  - metric_id: parallel_fx_gap_compression
+    description: "Blue-dolar / official-rate gap compresses from > 100% (2023-12) to < 20% by 2025-12."
+    threshold: "parallel_fx_gap < 0.20 by Dec 2025"
+    window: "2023-12 to 2026-06"
+    source: "bcra:fx_official; dolartoday:blue_rate"
+    direction: supports_claim
+    independence_justification: "Market-based price discovery; independent of official CPI and fiscal accounts."
+  - metric_id: output_recession_bounded
+    description: "Real GDP peak-to-trough decline during stabilisation does not exceed 4% (i.e., the disinflation is not paid for with a deeper-than-Tequila-1995-style recession)."
+    threshold: "max peak_to_trough log_real_gdp decline < 0.04"
+    window: "2023Q4 to 2026Q4"
+    source: "imf:NGDP_R; indec:emae"
+    direction: supports_claim
+    independence_justification: "Real-activity measure; independent of nominal price/FX channels."
+  - metric_id: poverty_rate_recovery
+    description: "Poverty rate (INDEC EPH) returns to or below the 2023-S2 level (~42%) by 2026-S1, after the disinflation-shock spike to ~52% in 2024-S1."
+    threshold: "INDEC poverty headcount < 42% by 2026-S1"
+    window: "2023-S2 to 2026-S1"
+    source: "indec:eph_pobreza"
+    direction: supports_claim
+    independence_justification: "Household-survey-based; independent of macro aggregates."
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+falsification:
+  rule: >
+    Supported if 4 of 5 canonical metrics meet thresholds. Refuted if 2 or fewer metrics meet
+    thresholds. Mixed verdict otherwise. The headline single-shot version: refuted if monthly
+    inflation does NOT fall below 5% by end-2025, OR if real GDP peak-to-trough decline exceeds
+    6% (i.e., the disinflation costs more output than the Tequila-style stabilisation benchmark).
+  test: multi_metric_canonical_milei_stabilisation
+  threshold: "metrics_met >= 4 of 5"
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Single-country canonical case; no comparator panel. The 5-metric checklist substitutes for
+    a single causal estimator. Comparison to historical Argentine stabilisations (Convertibilidad,
+    Macri) is descriptive context, not gating.
+disclosure: >
+  Pre-registered to lock the threshold before 2025-2026 data is fully observable. The
+  multi-metric framing is chosen explicitly to prevent post-hoc cherry-picking of "the metric
+  that worked".
+steelman: hypotheses/steelman/milei_dollarisation_inflation_collapse_2024_2026.md
+linked_hypotheses:
+  - argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023
+  - hyperinflation_requires_fiscal_dominance

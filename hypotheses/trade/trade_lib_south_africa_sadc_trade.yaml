@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_lib_south_africa_sadc_trade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  South Africa's SADC trade-protocol implementation (effective 2000,
+  asymmetric tariff phase-down completed 2008 for the SADC
+  developing-country members and 2012 for South Africa) raised
+  bilateral intra-SADC trade for ZAF but did not produce a measurable
+  acceleration in aggregate ZAF trade-openness over 2000-2019.
+  The descriptive claim is that SADC produced bilateral
+  composition shifts in regional trade share without moving the
+  aggregate trade-share-of-GDP needle.
+
+evidence_type: descriptive
+
+sample:
+  countries: [ZAF, BWA, NAM, SWZ, LSO, MOZ, ZMB, ZWE, MUS, TZA]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop ZWE 2003-2010 hyperinflation period"
+    - "end pre-COVID (2019)"
+
+scope:
+  period: [1990, 2019]
+  countries: [ZAF]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [south_africa_sadc_protocol_2000, sadc_asymmetric_liberalisation, regional_african_integration]
+
+variables:
+  outcome:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: merchandise_exports_pct_gdp
+      source: "world_bank_wdi:NE.EXP.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  SADC trade protocol — regulatory / trade-policy intervention.
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Descriptive structural-break test. Reports ZAF trade-openness
+    1995-1999 mean vs 2010-2019 mean. Tests whether SADC
+    implementation produced an aggregate trade-share break.
+
+falsification:
+  rule: >
+    SUPPORTED (modest effect) if ZAF trade-openness change 1995-
+    1999 to 2010-2019 is in the [+5, +20] pp range. SUPPORTED
+    (null) if change is within +/- 5 pp. REFUTED if change exceeds
+    +20 pp (which would suggest something beyond SADC, likely
+    commodity prices, drove the change).
+  test: descriptive_zaf_sadc_trade_openness_break
+  threshold: >
+    PRIMARY: openness_change(ZAF, 1995-99 -> 2010-19) in [-5, +20] pp.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior moderate-high (0.7). The South African SADC integration
+  is an under-studied regional case. Heterodox pan-African readers
+  will note that SADC's asymmetric phase-down was deliberately
+  designed to protect smaller members and that trade-openness
+  metrics may understate welfare gains from regional supply-chain
+  integration.
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+  - trade_lib_afcfta_2021_intra_african_trade
+
+steelman: hypotheses/steelman/trade_lib_south_africa_sadc_trade.md

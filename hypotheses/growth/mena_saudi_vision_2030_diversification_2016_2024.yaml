@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_saudi_vision_2030_diversification_2016_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Saudi Arabia's 2016-launched Vision 2030 strategy under MBS targeted non-oil GDP share
+  growth, female labour-force participation, tourism inflows, and PIF-led mega-project
+  investment. The pre-registered claim is that, in a synthetic-control design with GCC /
+  Gulf-oil-exporter peers (UAE, Kuwait, Qatar, Oman, Bahrain), Saudi Arabia's non-oil GDP
+  share rises by at least 5 percentage points more than the synthetic counterfactual
+  2016-2024 AND female labour-force participation rises by at least 12 percentage points
+  more than counterfactual. The null counter-claim is that Saudi Vision 2030 economic
+  outcomes track the broader GCC diversification trend without significant divergence,
+  and the headline structural change is dominated by external oil-price effects rather
+  than Saudi-specific policy content.
+evidence_type: causal
+sample:
+  countries:
+  - SAU
+  - ARE
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 2008
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag Qatar 2017-2021 GCC blockade as parallel shock
+  - exclude COVID 2020Q2-2020Q4 from pre-treatment fitting
+scope:
+  period:
+  - 2008
+  - 2024
+  countries:
+  - SAU
+  - ARE
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - gdp_growth
+  - employment_labour
+  - industrial_capability
+  policy_family:
+  - industrial_policy
+  - institutional_reform
+  - regulation
+  treatment_tags:
+  - saudi_vision_2030_2016
+  - mbs_consolidation_2017
+  - saudi_pif_giga_projects
+variables:
+  outcome:
+  - name: non_oil_gdp_share
+    source: imf:NGDP_NonOil_NGDP; world_bank_wdi:NY.GDP.MKTP.KD
+    transformation: level
+    notes: 'Constructed from IMF Article IV non-oil and oil GDP series.'
+  - name: female_lfp_15plus
+    source: world_bank_wdi:SL.TLF.CACT.FE.ZS; ilostat:EAP_2WAP_SEX_AGE_RT
+    transformation: level
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: tourism_arrivals
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: log_level
+  treatment:
+  - name: vision_2030_indicator
+    source: 'constructed: 1 for SAU from 2016-04 onward'
+    transformation: binary
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: wgi_govt_effectiveness
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >-
+  Vision 2030 bundles fiscal (VAT 2018, expenditure rationalisation), regulatory (entertainment
+  liberalisation, women driving 2018, tourism visa 2019), institutional (anti-corruption
+  consolidation 2017, judicial reforms), and industrial-policy (PIF giga-projects, NEOM,
+  Red Sea Project, Diriyah) channels. Bundled coding per invariant 4.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with SAU treated from 2016Q2 and GCC peer donor pool. Secondary:
+    Callaway-Sant'Anna DiD. Robustness drops Qatar (blockade-confound 2017-2021) and
+    runs with 4-unit donor pool. The non-oil GDP share is the primary outcome; female
+    LFP is the social-reform secondary; tourism is tertiary.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) the synth-DiD CATT on non-oil-GDP-share over 2016Q2-
+    2024Q4 is less than +5 ppts at p_perm < 0.10, OR (b) the female LFP gap is less
+    than +12 ppts, OR (c) the cumulative log-GDP-pc growth gap is statistically
+    indistinguishable from zero (suggesting non-oil structural change occurred but
+    headline economic performance did not improve relative to GCC peers).
+  test: synth_did_dual_outcome_with_growth_validation
+  threshold: >-
+    CATT_2016_2024(non_oil_gdp_share) >= 5 ppts at p_perm < 0.10 AND
+    CATT_2016_2024(female_lfp) >= 12 ppts at p_perm < 0.10
+prior_confidence: 0.6
+disclosure: >-
+  Author's prior is moderate-positive on Vision 2030 directional outcomes. Female LFP
+  has clearly risen (from ~17% to ~36% on official data), which makes the secondary
+  test relatively achievable. The non-oil GDP share rise is harder to disentangle from
+  oil-price-cycle effects (when oil prices fall, non-oil share rises mechanically as
+  oil GDP shrinks). Prior 0.60 reflects this.
+conflict_disclosure: Author has no Saudi or GCC asset exposure or consulting relationship.
+steelman: hypotheses/steelman/mena_saudi_vision_2030_diversification_2016_2024.md
+notes: >-
+  Data-gated on GASTAT (Saudi national stats), IMF Article IV non-oil GDP decomposition,
+  and ILOSTAT/WDI labour-force series. The 2017 anti-corruption Ritz-Carlton episode and
+  subsequent state-capital-allocation regime is a confound that the WGI control partly
+  captures.

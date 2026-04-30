@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_share_decline_capital_mobility_panel
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  Across an OECD post-1980 panel, the rise in cross-border capital-account
+  openness is the dominant treatment channel reducing the labour share of
+  gross value added, with a magnitude that exceeds the contributions of
+  technology, trade, or measurement adjustments. A one-standard-deviation
+  rise in capital-account openness is associated with at least a 2
+  percentage-point fall in the labour share over a five-year horizon,
+  conditional on union density and the standard control set; the effect
+  survives instrumenting openness with global financial-liberalisation
+  waves.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, NOR, DNK, FIN, CAN, AUS, JPN, CHE, BEL, AUT, IRL, KOR, PRT, NZL, GRC]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing labour-share series
+    - drop country-years during hyperinflation episodes per hanke classification
+    - winsorise labour-share growth rates at 1st/99th sample percentile
+variables:
+  outcome:
+    - name: labour_share_gross_value_added
+      source: oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE1,1.0
+      transformation: level
+      notes: >
+        OECD Annual National Accounts compensation of employees as share
+        of gross value added at factor cost. Robustness: housing-stripped
+        version per Rognlie.
+  treatment:
+    - name: capital_account_openness
+      source: owid:capital-account-openness
+      transformation: level
+      notes: >
+        OWID mirror of the Chinn-Ito KAOPEN index of de jure capital-
+        account openness. Higher = more open. Marxian framing reads
+        rising KAOPEN as the structural condition under which capital's
+        outside option dominates wage bargaining.
+    - name: union_density
+      source: oecd:OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0
+      transformation: level
+      notes: >
+        OECD trade-union density. Marxian and post-Keynesian readings
+        treat union density as the conditioning variable that determines
+        how much of capital-mobility's bargaining-power effect translates
+        into a labour-share fall.
+  controls:
+    - name: gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+    - name: capital_stock_per_worker_proxy
+      source: pwt:rkna
+      transformation: log
+      notes: PWT real capital stock; conditions on the Karabarbounis-Neiman capital-deepening channel.
+    - name: import_penetration_manufactures
+      source: world_bank_wdi:TM.VAL.MANF.ZS.UN
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    OECD panel (1980-2020) regressing labour share on capital-account
+    openness and union density with country and year FE; Driscoll-Kraay
+    SEs clustered by country. Five-year forward differences as robustness.
+    A v2 IV specification instruments KAOPEN with the global mean-of-
+    other-countries openness wave (a la Rajan-Zingales).
+falsification:
+  rule: >
+    Not supported if the coefficient on capital-account openness is
+    positive or smaller in absolute value than 1 percentage point per
+    one-standard-deviation rise (p < 0.10), or if the union-density
+    interaction is the wrong sign — i.e. high-union countries show
+    bigger labour-share falls under openness than low-union countries.
+    A symmetric falsification: the coefficient on capital-deepening
+    (log K/L) is materially larger than the openness coefficient,
+    which would re-vindicate the technology-is-dominant reading.
+  test: panel_fe_coefficient_on_capital_account_openness_with_union_density_interaction
+  threshold: >
+    coef(capital_account_openness) <= -0.4 percentage-points per unit KAOPEN
+    AND |coef(KAOPEN)| > |coef(log K/L)|  AND  p(KAOPEN) < 0.10
+prior_confidence: 0.6
+disclosure: >
+  Author framing draws on the Marxian "capital mobility = structurally
+  raised exit option for capital" reading (Sweezy, Harvey, Brenner) and
+  on the empirical capital-mobility-and-bargaining-power literature. A
+  market-liberal reader would object that capital-account openness is
+  endogenous to good institutions, that its correlation with labour-
+  share decline reflects technology and globalisation channels openness
+  is merely contemporaneous with, and that the union-density interaction
+  is mis-identified because high-union countries also have stronger
+  product-market regulation. Authorial framing risk is high; the
+  falsification rule is set so the technology-channel reading is a
+  legitimate way for this hypothesis to fail.
+steelman: hypotheses/steelman/labour_share_decline_capital_mobility_panel.md
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [labour_share]
+  policy_family: [none]
+  treatment_tags:
+    - capital_account_liberalisation
+    - financialisation_era
+    - capital_mobility
+notes: >
+  Candidate, not pre_registered. On promotion, tighten threshold language
+  with point estimates and pin the OECD union-density dataflow URN.

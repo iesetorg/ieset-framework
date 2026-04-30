@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: profit_rate_secular_decline_us_1948_2023
+version: 1
+status: candidate
+topic: growth
+claim: >
+  In the US 1948-2023, the Marxian-defined real profit rate (corporate
+  net operating surplus divided by the replacement-cost net stock of
+  fixed capital, deflated) exhibits a secular declining trend with a
+  structural break post-1973, consistent with the Dumenil-Levy and
+  Shaikh long-wave readings. The post-1973 trend coefficient is
+  negative and statistically distinguishable from the pre-1973 trend
+  at conventional significance, and the level after 2000 has not
+  recovered to the 1948-1973 average.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [1948, 2023]
+  temporal_structure: time_series
+  exclusion_rules:
+    - drop years with major BEA national-account-revision discontinuities (flagged in BEA release notes); use chained vintage where overlap exists
+variables:
+  outcome:
+    - name: corporate_profit_rate_marxian
+      source: fred:CNCF
+      transformation: ratio_to_capital_stock
+      notes: >
+        Constructed: corporate net cash flow (FRED CNCF) divided by
+        non-residential fixed-asset net stock at replacement cost
+        (FRED K1NTOTL1ES000). Deflated by GDP deflator. Marxian
+        construction follows Dumenil-Levy and Shaikh; not the
+        accounting profit margin, which has its own dynamics.
+    - name: net_operating_surplus_share_gdp
+      source: fred:A446RC1Q027SBEA
+      transformation: level
+      notes: >
+        BEA aggregate corporate operating-surplus share of GDP, used
+        as a robustness measure for the numerator. Not identical to
+        the Marxian profit rate but informative on numerator dynamics.
+  treatment:
+    - name: post_1973_indicator
+      source: dates:structural_break_1973
+      transformation: indicator
+      notes: >
+        Constructed structural-break dummy at 1973 (gold-standard
+        collapse + first oil shock + productivity slowdown onset).
+        Date breakpoint is theory-pre-registered, not data-mined.
+  controls:
+    - name: capital_stock_replacement_cost
+      source: fred:K1NTOTL1ES000
+      transformation: log
+    - name: gdp_deflator
+      source: fred:GDPDEF
+      transformation: yoy
+    - name: capacity_utilisation_manufacturing
+      source: fred:MCUMFN
+      transformation: level
+      notes: Conditions on cyclical utilisation; secular trend should survive.
+estimator:
+  template: descriptive
+  notes: >
+    Time-series descriptive: plot the Marxian profit rate 1948-2023;
+    estimate a Bai-Perron structural-break test allowing one break
+    in mean and slope; report the pre-1973 and post-1973 trend
+    coefficients and their difference. Robustness: alternative
+    deflators, alternative numerator (after-tax vs pre-tax), and
+    alternative capital-stock vintages.
+falsification:
+  rule: >
+    Not supported if (a) the post-1973 trend coefficient is positive
+    or zero, OR (b) the post-1973 mean profit rate is statistically
+    indistinguishable from or higher than the 1948-1973 mean, OR
+    (c) the secular decline disappears once capacity utilisation is
+    conditioned on (i.e. the "decline" is purely cyclical underuse).
+    Any of those three findings refutes the secular-decline reading
+    and supports a stationary or recovered profit-rate reading more
+    consistent with neoclassical capital-allocation theory.
+  test: pre_post_1973_trend_coefficient_and_mean_difference
+  threshold: >
+    coef(trend | post_1973) < 0 at p < 0.10  AND
+    mean(rate | 2000-2023) < mean(rate | 1948-1973)  AND
+    decline survives conditioning on capacity utilisation
+prior_confidence: 0.6
+disclosure: >
+  Author framing draws on the Marxian falling-rate-of-profit tradition
+  (Dumenil-Levy, Shaikh, Brenner) and treats the post-1973 break as
+  a long-wave structural feature of mature US capitalism. A market-
+  liberal reader would object that the "Marxian profit rate" mixes
+  apples and oranges (replacement-cost capital stock has its own
+  measurement uncertainty), that the 1948-1973 baseline is a unique
+  golden-age that no theory predicts as stationary, and that the
+  post-2010 recovery in corporate profit margins (FRED CP) shows
+  the rate is not in secular decline at all once you use a defensible
+  numerator. Authorial framing risk acknowledged; the falsification
+  rule allows three independent ways to fail, including the cyclical
+  reading.
+steelman: hypotheses/steelman/profit_rate_secular_decline_us_1948_2023.md
+scope:
+  period: [1948, 2023]
+  countries: [USA]
+  outcome_dim: [labour_share, gdp_growth, financialisation]
+  policy_family: [none]
+  treatment_tags:
+    - secular_profit_rate_trend
+    - golden_age_post_1948
+    - post_1973_break
+notes: >
+  Candidate, not pre_registered. On promotion, pin BEA fixed-asset
+  vintage and confirm FRED K1NTOTL1ES000 series identifier; resolve
+  numerator construction (gross operating surplus vs net cash flow)
+  and document the deflator choice.

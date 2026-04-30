@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: hayek_regulatory_uncertainty_investment_chilling
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  In an OECD panel 2000-2023, increases in OECD Product Market
+  Regulation (PMR) stringency and increases in regulatory uncertainty
+  (proxied by year-to-year changes in the OECD PMR sub-indices) are
+  negatively associated with private non-residential investment as a
+  share of GDP, with effects concentrated in capital-intensive
+  long-duration sectors. The Hayekian prediction is that regulatory
+  unpredictability — not just regulatory level — chills investment by
+  raising the option value of waiting and degrading the relative-
+  price information firms use to allocate capital. Pre-registered
+  claim is that the post-2008 regulatory acceleration (post-GFC
+  financial regulation, post-2012 environmental tightening, GDPR-era
+  data regulation) coincides with a structurally lower investment
+  share than the 2000-2007 baseline, controlling for output-gap and
+  cost-of-capital channels.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, JPN, CAN, AUS, NZL, CHE, PRT, GRC, KOR]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop 2008-2010 GFC window from primary estimation; include in robustness"
+    - "drop 2020-2021 COVID window from primary estimation"
+
+scope:
+  period: [2000, 2023]
+  countries: [OECD]
+  outcome_dim: [productivity, gdp_growth, regulation_compliance_cost]
+  policy_family: [regulation, institutional_reform]
+  treatment_tags: [post_gfc_regulation, regulatory_uncertainty, hayekian_chilling_effect]
+
+variables:
+  outcome:
+    - name: nonresidential_private_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FPRV.ZS"
+      transformation: level
+    - name: investment_share_gdp_5y_change
+      source: "world_bank_wdi:NE.GDI.FPRV.ZS"
+      transformation: diff_5y
+  treatment:
+    - name: oecd_pmr_overall_score
+      source: "oecd_pmr:overall_score"
+      transformation: level
+      notes: "OECD Product Market Regulation index, headline score."
+    - name: oecd_pmr_yoy_change
+      source: "oecd_pmr:overall_score"
+      transformation: yoy
+      notes: "Year-on-year change in PMR; proxies regulatory-uncertainty / churn."
+    - name: regulatory_quality_wgi
+      source: "wgi:RQ.EST"
+      transformation: level
+      notes: "World Governance Indicators regulatory-quality estimate."
+  controls:
+    - name: real_long_term_yield
+      source: "bis:WS_LTRT"
+      transformation: level
+    - name: output_gap
+      source: "oecd:output_gap_eo"
+      transformation: level
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+
+intervention_channel: regulatory
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way panel FE on OECD private non-residential investment share.
+    Two treatment variables (level and yoy change in PMR) tested
+    separately and jointly. Robustness: use Baker-Bloom-Davis economic-
+    policy uncertainty (EPU) where available as alternative measure of
+    regulatory uncertainty. Heterodox / progressive null is that
+    regulation is endogenous to investment booms (busy regulators =
+    busy economy) so the negative association is reverse-causality.
+
+falsification:
+  rule: >
+    The hypothesis is falsified if the panel-FE coefficient on PMR
+    yoy change is not significantly negative for investment share
+    (p<0.05), OR if the coefficient on PMR level is positive (which
+    would suggest more-regulated economies invest more, the opposite
+    Hayekian prediction).
+  test: panel_fe_pmr_change_to_investment_share
+  threshold: >
+    coefficient(pmr_yoy_change → investment_share, country-year FE) < 0 at p<0.05
+    AND coefficient(pmr_level → investment_share) <= 0
+    AND magnitude >= 0.10 SD per 1-SD shift in PMR change
+
+prior_confidence: 0.55
+
+disclosure: >-
+  This is a contested mid-prior hypothesis. Mainstream / progressive
+  economists argue that regulatory tightening post-2008 was a
+  necessary response to financial-stability and climate externalities
+  and that any short-run investment chilling is a feature, not a bug
+  (Pigouvian internalisation of social cost). Author prior 0.55
+  reflects genuine uncertainty: the OECD investment-share decline
+  post-2008 is real, but disentangling it from secular-stagnation,
+  demographics, and the China-shock channels is hard. Bias risk:
+  author predisposed to read the post-2008 regulatory wave as
+  growth-suppressing; the panel test forces the claim to generalise
+  beyond a single window.
+
+steelman: hypotheses/steelman/hayek_regulatory_uncertainty_investment_chilling.md
+
+linked_hypotheses:
+  - hayek_decentralised_governance_swiss_cantonal_growth
+  - austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020
+
+notes: >
+  Hayek (1944 The Road to Serfdom, ch.6 on planning vs rule of law;
+  1960 Constitution of Liberty on the rule of law as a generality
+  constraint). Modern empirical adjacents: Bloom-Bond-Van Reenen on
+  uncertainty and investment, Davis-Baker policy-uncertainty
+  literature.

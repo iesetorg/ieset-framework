@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_spain_2012_cajas_restructuring
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Spain's 2012 banking-sector restructuring of the cajas (regional savings banks),
+  including the FROB recapitalisation, the creation of SAREB (the bad-bank vehicle),
+  and the EUR 100bn ESM bank-recapitalisation programme, occurred in response to a
+  multi-year buildup of property-credit exposure that produced a peak-to-trough real
+  house-price decline of >= 35%, an unemployment rate rise to >= 25%, and a
+  government-debt run-up of >= 50 pp of GDP. Canonical multi-metric checklist:
+  at least 4 of 5 metrics breach.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [ESP]
+  period: [2002, 2016]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_house_price_decline
+    description: Spain real residential property price index peak-to-trough
+    threshold: ">= 35% decline"
+    window: "2007-2014"
+    source: "bis:WS_SPP"
+    direction: supports_claim
+    independence_justification: Property-price index.
+  - metric_id: unemployment_peak
+    description: Spain unemployment rate peak vs 2007 baseline
+    threshold: ">= 17 pp rise (peak >= 25%)"
+    window: "2008-2013"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; eurostat:une_rt_a"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+  - metric_id: government_debt_rise
+    description: Spain general government gross debt rise from pre-crisis to peak
+    threshold: ">= 50 pp of GDP rise"
+    window: "2007-2014"
+    source: "imf:GGXWDG_NGDP; eurostat:gov_10dd_edpt1"
+    direction: supports_claim
+    independence_justification: Fiscal aggregate.
+  - metric_id: bank_credit_to_gdp_decline
+    description: Bank credit to private sector decline from peak
+    threshold: ">= 30 pp of GDP decline"
+    window: "2010-2017"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate.
+  - metric_id: esm_bank_recap_programme
+    description: ESM bank-recapitalisation programme drawn 2012-2013
+    threshold: "yes/no — drawn programme counts as breach"
+    window: "2012-2014"
+    source: "imf:ESM_ESP_2012"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_house_price_index
+      source: "bis:WS_SPP"
+      transformation: peak_to_trough
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: peak_above_baseline
+prior_confidence: 0.93
+disclosure: >
+  Spain 2008-2014 is well-documented; canonical-case framing is overdetermined.
+  Author market-liberal prior treats Spanish property-credit boom as similar in
+  mechanism to Irish/Icelandic cases.
+steelman: hypotheses/steelman/banking_crisis_spain_2012_cajas_restructuring.md
+scope:
+  period: [2002, 2016]
+  countries: [ESP]
+  outcome_dim: [financial_crisis, financialisation, housing, employment_labour]
+  policy_family: [regulation, fiscal_policy]
+  treatment_tags: [spain_2012, cajas_restructuring, sareb_bad_bank, esm_bank_recap]

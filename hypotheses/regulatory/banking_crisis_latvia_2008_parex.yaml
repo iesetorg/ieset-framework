@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_latvia_2008_parex
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Latvia's 2008-2010 banking crisis — Parex Banka nationalisation in November 2008,
+  EUR-peg defence, EUR 7.5bn IMF / EU programme, real-GDP cumulative decline of
+  >= 20% peak-to-trough, and unemployment-rate rise of >= 13 pp — is a canonical
+  small-open-economy hard-peg-defence + banking-rescue case from the GFC era. The
+  hypothesis is that Latvia 2008-2010 meets the canonical multi-metric checklist on
+  at least 4 of 5 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [LVA]
+  period: [2003, 2014]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_gdp_decline
+    description: Latvia real GDP peak-to-trough decline
+    threshold: ">= 20% decline"
+    window: "2008-2010"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD; eurostat:nama_10_gdp"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: unemployment_rise
+    description: Latvia unemployment rate rise vs 2007 baseline
+    threshold: ">= 13 pp rise"
+    window: "2008-2010"
+    source: "world_bank_wdi:SL.UEM.TOTL.ZS; eurostat:une_rt_a"
+    direction: supports_claim
+    independence_justification: Labour outcome.
+  - metric_id: imf_eu_programme
+    description: IMF SBA + EU BoP loan + Nordic bilateral support late 2008
+    threshold: "yes/no — yes counts as breach"
+    window: "2008-2011"
+    source: "imf:SBA_LVA_2008"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: parex_nationalisation
+    description: Parex Banka nationalisation November 2008
+    threshold: "yes/no — yes counts as breach"
+    window: "2008"
+    source: "imf:LVA_PAREX_2008"
+    direction: supports_claim
+    independence_justification: Resolution event.
+  - metric_id: bank_credit_to_gdp_decline
+    description: Bank credit to private sector decline from peak
+    threshold: ">= 30 pp of GDP decline"
+    window: "2009-2014"
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    direction: supports_claim
+    independence_justification: Bank-balance-sheet aggregate.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: peak_above_baseline
+prior_confidence: 0.94
+disclosure: >
+  Latvia 2008-2010 is one of the textbook "internal devaluation under hard peg" cases
+  of the GFC; well-documented.
+steelman: hypotheses/steelman/banking_crisis_latvia_2008_parex.md
+scope:
+  period: [2003, 2014]
+  countries: [LVA]
+  outcome_dim: [financial_crisis, employment_labour, financialisation]
+  policy_family: [regulation, exchange_rate_regime, fiscal_policy]
+  treatment_tags: [latvia_2008, parex_bailout, internal_devaluation, baltic_hard_peg_defence]

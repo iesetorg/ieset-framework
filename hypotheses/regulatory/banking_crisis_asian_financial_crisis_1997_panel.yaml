@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_asian_financial_crisis_1997_panel
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  The 1997-1998 Asian Financial Crisis affected a tightly-clustered group of east-Asian
+  economies (Thailand, Indonesia, Korea, Malaysia, Philippines) through a common pattern
+  of currency-peg collapse, foreign-currency-denominated bank-and-corporate balance-sheet
+  distress, large IMF programmes, and sharp output contractions. The hypothesis is that
+  across the five-country panel, a multi-metric checklist of currency depreciation,
+  real-GDP contraction, banking-crisis coding, IMF programme entry, and current-account
+  reversal is met in at least 4 of 5 countries on at least 4 of 5 metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [THA, IDN, KOR, MYS, PHL]
+  period: [1995, 2002]
+  temporal_structure: panel
+canonical_metrics:
+  - metric_id: nominal_currency_depreciation_peak
+    description: Local currency depreciation against USD peak-to-trough 1997-1998
+    threshold: ">= 30% nominal depreciation in at least 4 of 5 countries"
+    window: "1997-1998"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal.
+  - metric_id: real_gdp_decline_1998
+    description: Real GDP decline 1998 vs 1997 peak
+    threshold: ">= 5% peak-to-trough in at least 4 of 5 countries"
+    window: "1997-1999"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: laeven_valencia_systemic_banking_crisis
+    description: Laeven-Valencia banking-crisis coding 1997-1998
+    threshold: "coded in at least 4 of 5 countries"
+    window: "1997-2001"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: imf_programme_entered
+    description: IMF programme (SBA / EFF) entered
+    threshold: "yes in at least 4 of 5 countries (THA, IDN, KOR, PHL definite; MYS opted out — 4 of 5 expected)"
+    window: "1997-1999"
+    source: "imf:SBA_PROGRAMMES_1997_1998"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: current_account_reversal
+    description: Current-account-balance reversal from deficit to surplus
+    threshold: ">= 8 pp of GDP swing in at least 4 of 5 countries"
+    window: "1996-1999"
+    source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
+    direction: supports_claim
+    independence_justification: External-balance signal.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: nominal_xr_usd
+      source: "imf:ENDA_XDC_USD_RATE"
+      transformation: peak_to_trough
+prior_confidence: 0.95
+disclosure: >
+  Asian Financial Crisis 1997-1998 is among the most-studied EM crises and the multi-
+  metric pattern is overdetermined. Author market-liberal prior treats the crisis as
+  a canonical capital-account-mismanagement-plus-private-balance-sheet-mismatch event.
+steelman: hypotheses/steelman/banking_crisis_asian_financial_crisis_1997_panel.md
+scope:
+  period: [1995, 2002]
+  countries: [THA, IDN, KOR, MYS, PHL, ASIA_EM]
+  outcome_dim: [financial_crisis, financialisation, capital_flows, currency_purchasing_power]
+  policy_family: [regulation, exchange_rate_regime, monetary_policy]
+  treatment_tags: [asian_financial_crisis_1997, twin_currency_banking_crisis, imf_programmes_1997]

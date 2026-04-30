@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sea_thailand_2014_coup_tourism_shock
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  Thailand's 2014 military coup and ensuing junta + 2017 constitutional
+  reset under-performed peer ASEAN economies on per-capita GDP growth
+  through 2019, and Thailand's heavy tourism-dependence (international
+  tourism receipts ~12-18% of GDP pre-COVID) produced a sharper-than-peer
+  contraction in 2020 and slower recovery through 2023. Real GDP-pc
+  growth differential Thailand minus ASEAN-5 peer mean over 2014-2019
+  is at least -1.0pp/yr (Thailand below peers), and Thailand's 2020
+  GDP contraction is at least 3pp deeper than the ASEAN-5 mean.
+
+evidence_type: associational
+
+notes: >-
+  Tests two channels: (1) institutional/political under-performance
+  post-coup and (2) tourism-dependence amplifying the COVID shock.
+  Thailand was the only ASEAN-5 economy in the bottom half of 2014-2019
+  growth rankings and had the deepest 2020 contraction.
+
+prior_confidence: 0.78
+
+disclosure: >-
+  Author market-liberal priors interpret the coup as a negative
+  institutional-quality shock. Bias risk: attributing slow growth
+  to politics when demographics and middle-income-trap dynamics also
+  matter. Mitigation: tourism-shock test is independent of political
+  channel.
+
+steelman: hypotheses/steelman/sea_thailand_2014_coup_tourism_shock.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive, BOTH for SUPPORTED): (1) real GDP-pc growth
+    differential THA minus ASEAN-5 peer mean (IDN, MYS, PHL, VNM)
+    over 2014-2019 is at most -0.01 (THA at least 1pp/yr below peers);
+    AND (2) THA 2020 real GDP growth minus ASEAN-5 mean 2020 growth
+    is at most -0.03. REFUTED if EITHER differential is positive.
+  test: thailand_post_coup_underperformance_tourism_shock_2020
+  threshold: >-
+    PRIMARY 1: gdp_pc_growth(THA, 2014-2019) - gdp_pc_growth(ASEAN5, 2014-2019) <= -0.01.
+    PRIMARY 2: gdp_growth(THA, 2020) - gdp_growth(ASEAN5, 2020) <= -0.03.
+    METHOD_VALID: WDI NY.GDP.PCAP.KD.ZG and NY.GDP.MKTP.KD.ZG for THA and ASEAN-5 through 2020.
+
+sample:
+  countries: [THA, IDN, MYS, PHL, VNM]
+  period: [2008, 2023]
+  temporal_structure: panel
+
+scope:
+  period: [2014, 2023]
+  countries: [THA]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, none]
+  treatment_tags: [thailand_2014_coup, thailand_junta, thailand_tourism_dependence, covid_tourism_shock_2020]
+
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: services_value_added_pct_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+    - name: international_tourism_receipts_pct_exports
+      source: "world_bank_wdi:ST.INT.RCPT.XP.ZS"
+      transformation: level
+  treatment:
+    - name: post_2014_coup_indicator
+      source: "constructed: indicator = 1 for THA, year >= 2014"
+      transformation: indicator
+    - name: covid_2020_indicator
+      source: "constructed: indicator = 1 for year == 2020"
+      transformation: indicator
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Two-way FE panel. Two pre-registered tests on differentials. WGI
+    institutional-quality channel could be added in a follow-on spec
+    but is not gating here.
+
+linked_hypotheses:
+  - sea_indonesia_jokowi_infrastructure_2014_2024
+  - sea_vietnam_doi_moi_followon_growth_1995_2024

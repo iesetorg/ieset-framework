@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: classical_property_rights_security_fdi_premium_panel
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across countries 2000-2022, higher WGI Political Stability (PV.EST)
+  and Rule of Law (RL.EST) jointly predict higher subsequent FDI
+  inflows as a share of GDP, conditional on initial income, market
+  size, openness, and natural-resource rents. The Smithian /
+  classical-liberal claim is that secure property rights and
+  predictable adjudication are the binding constraints on the
+  marginal foreign-investor decision to commit irreversible capital;
+  the test is a panel-FE regression of 5-year-forward mean FDI
+  inflows on a composite property-rights-security index built from
+  WGI PV and RL.
+
+evidence_type: associational
+
+sample:
+  countries: [ALB, ARG, AUS, AUT, BEL, BGD, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, ETH, FIN, FRA, GBR, GHA, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KAZ, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PAK, PER, PHL, POL, PRT, ROU, RUS, SGP, SVK, SVN, SWE, THA, TUR, UKR, USA, VNM, ZAF]
+  period: [2000, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active high-intensity civil conflict (UCDP coding)"
+    - "drop country-years with FDI inflow >25% of GDP — these are typically tax-haven flow-through effects, not real productive investment"
+
+variables:
+  outcome:
+    - name: fdi_net_inflows_pct_gdp_5yr_forward
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: 5yr_forward_mean
+  treatment:
+    - name: wgi_political_stability
+      source: "wgi:PV.EST"
+      transformation: level
+    - name: wgi_rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: property_rights_security_composite
+      source: "constructed: 0.5 × wgi:PV.EST + 0.5 × wgi:RL.EST"
+      transformation: composite
+  controls:
+    - name: initial_log_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level_at_block_start
+    - name: log_population_market_size
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log_level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: natural_resource_rents
+      source: "world_bank_wdi:NY.GDP.TOTL.RT.ZS"
+      transformation: level
+    - name: corp_tax_rate
+      source: "world_bank_wdi:IC.TAX.TOTL.CP.ZS"
+      transformation: level
+      notes: "Total tax-and-contribution rate proxy; substitute for marginal CIT rate which is not in WDI."
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  WGI PV and RL are institutional-quality measures. Spec tests
+  whether secure property rights (institutional) explain FDI
+  inflows. Channel institutional per invariant 4.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way fixed-effects panel with standard errors clustered by
+    country. Identification from within-country variation in WGI
+    PV/RL. Robustness: replicate with each WGI subcomponent
+    separately and with the composite. v2 could exploit Polity5
+    or V-Dem regime-transition events as instruments.
+
+falsification:
+  rule: >
+    SUPPORTED if both (a) panel-FE coefficient on the composite
+    property-rights-security index is positive and significant at
+    p<0.05 on 5-year-forward FDI/GDP, AND (b) the bivariate cross-
+    sectional country-mean regression also yields a positive
+    coefficient at p<0.05. PARTIAL if only one of the two holds.
+    REFUTED if both are insignificant or the panel-FE coefficient
+    is wrong-signed at p<0.05. INFORMATIVE: the coefficient should
+    be larger (in magnitude) for low-resource-rent countries —
+    extractive-resource-rich countries' FDI is partly insensitive
+    to property-rights variation because rent capture dominates.
+  test: panel_fe_composite_pv_rl_on_fdi_with_cross_section_robustness
+  threshold: >
+    PRIMARY: panel_FE_beta(composite) > 0 at p<0.05 AND
+    cross_section_beta(composite_mean) > 0 at p<0.05.
+    INFORMATIVE: |coefficient| larger in resource-rents-below-median sub-sample.
+
+prior_confidence: 0.70
+
+disclosure: >-
+  Author prior is moderate-to-high (0.70). The institutions-FDI
+  literature (Wei 2000, Daude-Stein 2007, Bénassy-Quéré et al 2007)
+  broadly supports the claim. Authorial framing risk: WDI's FDI
+  net-inflow series lumps together greenfield productive
+  investment, M&A, tax-haven flow-through, and intra-firm financial
+  transactions. A "FDI premium" measured this way mixes quality
+  with quantity. Heterodox readers (developmentalist, post-
+  Keynesian) will note that countries can attract substantial FDI
+  through tax incentives, cheap labour, and resource access without
+  any property-rights premium — Singapore and China both attracted
+  large FDI under regimes the index codes very differently.
+  Heterodox alternative reading: FDI is driven by market access
+  and labour-cost gradients, with property-rights as a secondary
+  filter. The cross-sectional + panel-FE dual gate gives that
+  reading a clean win path if either fails.
+
+scope:
+  period: [2000, 2022]
+  countries: [GLOBAL]
+  outcome_dim: [capital_flows, institutional_quality]
+  policy_family: [institutional_reform]
+  treatment_tags: [wgi_political_stability, wgi_rule_of_law, smithian_property_rights, classical_liberal_secure_property]
+
+steelman: hypotheses/steelman/classical_property_rights_security_fdi_premium_panel.md
+
+linked_hypotheses:
+  - rule_of_law_institutional_growth
+  - bukele_fdi_gdp_investment_climate_2019_2024
+
+notes: >
+  Smith's "Wealth of Nations" Book V argued that the security of
+  property is the pre-condition for accumulation. Modern formal
+  expression: AJR institutional growth literature, North-Weingast
+  contract-enforcement-and-investment line. The composite PV+RL
+  index is the registered-publisher proxy for the broader concept.

@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: peru_post_fujimori_growth_2001_2019
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Peru's 2001-2019 growth window — under five different administrations
+  (Toledo, García II, Humala, PPK, Vizcarra) that all preserved the
+  1993 macroeconomic constitution (inflation-targeting central bank,
+  fiscal-responsibility framework, open trade and capital account) —
+  delivered cumulative real-GDP-per-capita growth in the top quartile
+  of Latin America despite high political turnover. The pre-registered
+  claim is that institutional persistence (constraint on the executive
+  to deviate from the macro framework) is the binding factor: log GDP-pc
+  growth 2001-2019 exceeds the LATAM median by at least 0.20 log-points,
+  AND the dispersion of macro outcomes (inflation, fiscal balance) under
+  five administrations is lower than the within-administration
+  dispersion of typical Latin American countries on a 5-year basis.
+  The mechanism is that pre-committed institutions (central-bank
+  independence, fiscal rule, open trade) outperform discretionary
+  populist swings even when populist political pressure is high.
+
+evidence_type: causal
+
+sample:
+  countries: [PER, ARG, BRA, COL, ECU, MEX, BOL, URY, CHL, PRY]
+  period: [2001, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [2001, 2024]
+  countries: [PER, ARG, BRA, COL, ECU, MEX, BOL, URY, CHL, PRY]
+  outcome_dim: [gdp_growth, inflation, institutional_quality, fiscal_policy]
+  policy_family: [monetary_policy, fiscal_policy, institutional_reform, trade_policy]
+  treatment_tags: [peru_inflation_targeting_2002, peru_fiscal_rule_1999]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: cpi_inflation_yoy
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: fiscal_balance_share_gdp
+      source: imf:GGXCNL_NGDP
+      transformation: level
+    - name: wgi_government_effectiveness
+      source: world_bank_wgi:GOV_WGI_GE.EST
+      transformation: level
+  controls:
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: copper_price
+      source: fred:PCOPPUSDM
+      transformation: log_level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Hypothesis tests durability of pre-committed institutions
+  (central-bank independence, fiscal rule, open trade) across
+  multiple administrations. Channel is institutional commitment.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of log_gdp_pc on country and year FE plus
+    Peru-indicator interacted with year. Secondary: variance-decomposition
+    showing within-Peru macro dispersion across five administrations
+    is below the LATAM median within-country dispersion. Tertiary:
+    descriptive ranking of cumulative log GDP-pc growth 2001-2019
+    among the donor pool.
+
+falsification:
+  rule: >
+    Not supported if (a) cumulative log_gdp_pc_constant 2001-2019
+    (Peru minus LATAM median) is < 0.20, OR (b) within-Peru
+    standard deviation of fiscal_balance_share_gdp 2001-2019 is
+    not below the median LATAM within-country SD, OR (c)
+    cpi_inflation_yoy in Peru 2001-2019 exceeds an annual mean
+    of 4% (target ceiling).
+  test: panel_fe_plus_macro_dispersion_test
+  threshold: >
+    cumulative_log_gdp_pc(PER, 2001-2019) - cumulative_log_gdp_pc(LATAM_median, 2001-2019) >= 0.20
+    AND mean_cpi_inflation_yoy(PER, 2001-2019) <= 4.0
+    AND within_PER_SD_fiscal_balance(2001-2019) <= median_LATAM_within_SD_fiscal_balance(2001-2019)
+
+prior_confidence: 0.72
+
+disclosure: >
+  Author market-liberal prior favours institutional-persistence stories.
+  Risk is that Peru's commodity-export profile is doing the heavy
+  lifting and the institutional thesis is over-claimed. Fiscal-balance
+  dispersion test is included specifically to discipline against the
+  "lucky-commodity" alternative.
+
+steelman: hypotheses/steelman/peru_post_fujimori_growth_2001_2019.md
+
+linked_hypotheses:
+  - peru_fujimori_shock_therapy_1990_2000
+  - chile_post_1990_institutional_premium
+
+notes: >
+  Tests whether macro-framework persistence under non-aligned political
+  administrations produces a measurable growth premium.

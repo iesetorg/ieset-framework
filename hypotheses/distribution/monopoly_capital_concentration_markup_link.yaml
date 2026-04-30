@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: monopoly_capital_concentration_markup_link
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  Across US industries 1980-2020, rising concentration (top-4 / top-8
+  firm shares of industry sales) is associated with a parallel rise in
+  aggregate non-financial corporate markups, and the cross-industry
+  relationship is positive and material in magnitude. A
+  Baran-Sweezy-style monopoly-capital reading predicts that industries
+  with the largest concentration increases display the largest markup
+  increases, and that the aggregate markup share of GDP rises in lockstep
+  with concentration. A market-liberal "rising-superstar-firms-from-
+  technology" reading predicts the same correlation but attributes it
+  to productivity dispersion rather than market power; the test here
+  uses an industry FE specification to discriminate.
+evidence_type: associational
+sample:
+  countries: [USA]
+  period: [1980, 2020]
+  temporal_structure: time_series
+  exclusion_rules:
+    - drop industries where Census Bureau concentration disclosure thresholds censor the top-4 share
+    - drop years where SIC-to-NAICS reclassification breaks the panel; use NAICS-only post-1997
+variables:
+  outcome:
+    - name: aggregate_corporate_markup_share
+      source: fred:A446RC1Q027SBEA
+      transformation: level
+      notes: >
+        BEA non-financial corporate net operating surplus share of
+        GDP at factor cost as proxy for the aggregate markup. Imperfect
+        proxy — De Loecker-Eeckhout firm-level markup estimates are
+        the gold standard but not available as a registered-publisher
+        series. Robustness: corporate profits before tax / GDP (FRED CP).
+    - name: corporate_profits_before_tax
+      source: fred:CP
+      transformation: level
+      notes: Robustness numerator for aggregate markup proxy.
+  treatment:
+    - name: aggregate_industry_concentration_index
+      source: us_census:concentration_ratio_top4_top8
+      transformation: level
+      notes: >
+        US Census Bureau Economic Census top-4 and top-8 concentration
+        ratios. Coverage is decennial pre-1997, quinquennial after.
+        For annual specification, interpolate linearly between Census
+        years and report sensitivity to interpolation.
+    - name: top_1pct_firm_share_of_corporate_sales
+      source: oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE1,1.0
+      transformation: level
+      notes: >
+        OECD MultiProd database firm-level sales-concentration measure
+        as cross-validation of the Census ratio. Dataflow URN approximate;
+        verify at wiring.
+  controls:
+    - name: capital_stock_per_worker
+      source: pwt:rkna
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: log_real_gdp
+      source: fred:GDPC1
+      transformation: log
+    - name: union_density_us
+      source: oecd:OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: year
+  fixed_effects: [industry, year]
+  notes: >
+    Industry-by-year panel (where industry-level Census data permit)
+    of markup proxy on concentration with industry and year fixed
+    effects. Aggregate-time-series back-up specification regresses
+    aggregate markup on aggregate concentration with HAC SEs.
+    Robustness: instrument concentration with industry-specific China
+    shock exposure (a la Autor-Dorn-Hanson) to address the
+    superstar-firm endogeneity.
+falsification:
+  rule: >
+    Not supported if the industry-FE coefficient on concentration is
+    statistically zero or negative (p > 0.10 OR sign-flipped), OR if
+    the aggregate markup-vs-concentration time-series correlation
+    breaks once controlling for productivity dispersion (Andrews-
+    Criscuolo-Gal-style frontier-vs-laggard gap), which would
+    re-vindicate the superstar-firm-from-technology reading. A
+    symmetric falsification: if concentration rises but markup share
+    is flat or falling in the post-2015 sub-sample, the
+    monopoly-capital reading is undercut on its strongest claimed
+    period.
+  test: industry_fe_concentration_markup_coefficient_with_productivity_dispersion_control
+  threshold: >
+    coef(concentration) > 0 at p < 0.10 AND
+    aggregate markup share rises >= 3 percentage-points 1980-2020 AND
+    coefficient survives productivity-dispersion control
+prior_confidence: 0.55
+disclosure: >
+  Author framing draws on the Marxian monopoly-capital tradition (Baran-
+  Sweezy, Foster, Phillips Sawyer) and on the De Loecker-Eeckhout markup
+  literature read as confirming a structural-power story. A market-
+  liberal reader would object that the rising-markup finding is a
+  measurement artefact (intangibles capitalised inconsistently across
+  the sample, fixed-cost industries with rising digital scale producing
+  higher Lerner indices for non-power reasons), and that the
+  industry-level concentration-markup correlation is consistent with
+  superstar-firm productivity dispersion that is unambiguously good
+  for consumer welfare. Authorial framing risk acknowledged; the
+  productivity-dispersion control in the falsification rule is the
+  binding test.
+steelman: hypotheses/steelman/monopoly_capital_concentration_markup_link.md
+scope:
+  period: [1980, 2020]
+  countries: [USA]
+  outcome_dim: [labour_share, competition_concentration, financialisation]
+  policy_family: [competition_policy]
+  treatment_tags:
+    - market_concentration
+    - monopoly_capital
+    - markup_rise
+notes: >
+  Candidate, not pre_registered. On promotion, secure a registered
+  fetcher for De Loecker-Eeckhout firm-level markups (Compustat-based)
+  and confirm OECD MultiProd dataflow URN; the aggregate-only test is
+  weaker than an industry-panel test.

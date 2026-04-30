@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_south_africa_2018_national_minimum_wage
+version: 1
+status: candidate
+topic: labour
+claim: >
+  South Africa's 2018 National Minimum Wage Act (R20/hour
+  effective 2019-Q1) did not produce a measurable employment-
+  rate decline relative to a synthetic control of upper-middle-
+  income peers despite its high minimum-wage-to-median ratio
+  (~62%), but raised real wages at the bottom decile by at
+  least 8% by 2022.
+notes: >
+  Treatment dated 2019-Q1 (effective date). South Africa's
+  NMW is one of the highest minimum-to-median ratios in the
+  world and is therefore a clean test of the high-bite-ratio
+  disemployment claim. COVID overlap is a major concern;
+  donor pool absorbs common shock.
+prior_confidence: 0.5
+disclosure: >-
+  Author is genuinely uncertain — the Cengiz et al. 2019 USA
+  literature suggests modest minimum-wage rises don't reduce
+  employment, but South Africa's bite ratio is extreme. The
+  hypothesis is structured to give either side a clean win.
+falsification:
+  rule: >
+    SUPPORTED (modest minimum-wage view) if synth-DiD gap on
+    South African employment rate is not statistically more
+    negative than -1.0 pp at p<0.10 AND bottom-decile real-
+    wage gap > +8.0% by 2022. REFUTED if employment gap <
+    -2.0 pp at p<0.10 (high-bite disemployment confirmed) OR
+    if bottom-decile wage gap < +3.0% (binding-but-evaded
+    enforcement failure).
+  test: >
+    Synth-DiD on South African employment rate and bottom-
+    decile real wage 2019-2022 vs upper-middle-income donor
+    pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [ZAF, BRA, MEX, COL, TUR, ARG, MYS, THA]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2020-2021 COVID window
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: bottom_decile_real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: south_africa_nmw_2019
+      source: "constructed: indicator for 2019-Q1 NMW effective date"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2019, 2022]
+  countries: [ZAF]
+  outcome_dim: [employment_labour, wage_stagnation]
+  policy_family: [labour_market]
+  treatment_tags: [south_africa_nmw_2018]
+steelman: hypotheses/steelman/labour_reform_south_africa_2018_national_minimum_wage.md

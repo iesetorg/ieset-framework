@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: demo_uk_post_2004_eu_migration
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  The UK's decision not to apply transitional restrictions on A8 (2004) accession-state
+  migration produced a large inflow (~1.5 million by 2014), particularly Polish-origin. The
+  hypothesis tests (a) the magnitude of the working-age population contribution from A8
+  migration, and (b) whether wage effects in low-wage sectors detectable in pre-Brexit
+  UK panel data are small (consistent with Wadsworth-Dustmann findings) or substantial.
+evidence_type: associational
+sample:
+  countries: [GBR]
+  period: [1995, 2020]
+  temporal_structure: time_series
+scope:
+  period: [1995, 2020]
+  countries: [GBR]
+  outcome_dim: [demographics_migration, wage_stagnation, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [eu_a8_accession_2004, free_movement, brexit_pretreatment]
+variables:
+  outcome:
+    - name: real_wage_low_decile
+      source: oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARNINGS,1.0
+      transformation: log
+    - name: foreign_born_share_population
+      source: un_desa:international_migrant_stock
+      transformation: level
+  treatment:
+    - name: a8_accession_indicator
+      source: "constructed: indicator = 1 for years >= 2004"
+      transformation: indicator
+  controls:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+estimator:
+  template: event_study
+  notes: >
+    Single-country event study; pre-event 1995-2003, event 2004-2007 (transitional period),
+    post-event 2007-2020. Report break in foreign-born trajectory and bottom-decile wage
+    trajectory; benchmark wage break against pre-trend.
+falsification:
+  rule: >-
+    SUPPORTED if foreign-born share trajectory shows structural break at 2004 with
+    post-break slope at least 2x pre-break slope, AND bottom-decile real wage growth shows
+    small (< 0.5pp/yr negative) deviation from pre-trend over 2004-2014. REFUTED if no
+    foreign-born break OR if low-wage growth deviation exceeds 1.5pp/yr negative.
+  test: event_study_uk_a8_2004_with_low_wage_response
+  threshold: "fb_break_test_p < 0.05 AND fb_post_slope_ratio >= 2.0 AND low_wage_deviation > -1.5"
+prior_confidence: 0.65
+disclosure: >-
+  Topic is politically charged; author's priors align with the Wadsworth-Dustmann small-effect
+  reading. Risk of confirmation bias in framing.
+steelman: hypotheses/steelman/demo_uk_post_2004_eu_migration.md

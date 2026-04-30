@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: banking_crisis_mexico_tequila_1994_canonical
+version: 1
+status: candidate
+topic: regulatory
+claim: >
+  Mexico's December-1994 Tequila Crisis — peso devaluation against the USD by >= 50%,
+  IMF / US Treasury rescue package, real-GDP contraction of >= 6% in 1995, and a
+  Laeven-Valencia-coded systemic banking crisis 1994-1996 — is the canonical
+  EM-currency-and-banking-twin-crisis case of the early 1990s. The hypothesis is that
+  Mexico 1994-1996 meets the canonical multi-metric checklist on at least 4 of 5
+  metrics.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [MEX]
+  period: [1990, 2000]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: peso_depreciation_1994_1995
+    description: Mexican peso peak-to-trough nominal depreciation against USD
+    threshold: ">= 50% depreciation"
+    window: "1994-1995"
+    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    direction: supports_claim
+    independence_justification: External-rate signal.
+  - metric_id: real_gdp_decline_1995
+    description: Mexico real GDP decline 1995 vs 1994
+    threshold: ">= 6% decline"
+    window: "1994-1996"
+    source: "world_bank_wdi:NY.GDP.MKTP.KD"
+    direction: supports_claim
+    independence_justification: Activity measure.
+  - metric_id: imf_us_treasury_programme
+    description: IMF SBA + US Treasury ESF support in 1995
+    threshold: "yes/no — yes counts as breach"
+    window: "1995"
+    source: "imf:SBA_MEX_1995"
+    direction: supports_claim
+    independence_justification: Programme metadata.
+  - metric_id: systemic_banking_crisis_coded
+    description: Laeven-Valencia banking-crisis coding 1994-1996
+    threshold: "coded yes"
+    window: "1994-1996"
+    source: "owid:systemic-banking-crises"
+    direction: supports_claim
+    independence_justification: Independent expert coding.
+  - metric_id: current_account_reversal
+    description: Mexico current-account-balance swing
+    threshold: ">= 5 pp of GDP swing 1994-1996"
+    window: "1993-1996"
+    source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
+    direction: supports_claim
+    independence_justification: External-balance signal.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1
+variables:
+  outcome:
+    - name: real_gdp
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: peak_to_trough
+    - name: nominal_xr_usd
+      source: "imf:ENDA_XDC_USD_RATE"
+      transformation: peak_to_trough
+prior_confidence: 0.96
+disclosure: >
+  Tequila Crisis is one of the most-studied EM twin crises; metric pattern overdetermined.
+steelman: hypotheses/steelman/banking_crisis_mexico_tequila_1994_canonical.md
+scope:
+  period: [1990, 2000]
+  countries: [MEX]
+  outcome_dim: [financial_crisis, financialisation, currency_purchasing_power, capital_flows]
+  policy_family: [regulation, exchange_rate_regime, monetary_policy]
+  treatment_tags: [mexico_tequila_1994, peso_devaluation_1994, twin_crisis_em, imf_us_treasury_rescue_1995]

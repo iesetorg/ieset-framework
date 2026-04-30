@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: africa_kenya_mpesa_digital_payments_formalisation_2007_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Kenya's 2007 launch of M-Pesa and subsequent build-out of mobile-money rails (2007-2024)
+  produced a measurable acceleration in financial inclusion, household consumption
+  smoothing, and informal-to-formal transition relative to Sub-Saharan African peers without
+  comparable mobile-money penetration. The pre-registered claim is that, in a synthetic-
+  control design with a SSA peer donor pool (Uganda, Tanzania, Rwanda, Ethiopia, Nigeria,
+  Ghana, Senegal), Kenya's account-ownership share of adults rises by at least 30
+  percentage points more than the synthetic counterfactual by 2021 (Findex round) AND
+  domestic credit to private sector share of GDP rises by at least 6 percentage points
+  more than counterfactual by 2024. The null counter-claim is that Kenya's financial-
+  inclusion gain is the SSA-region pattern (mobile-money diffused widely) and not a
+  Kenya-specific premium attributable to first-mover advantage.
+evidence_type: causal
+sample:
+  countries:
+  - KEN
+  - UGA
+  - TZA
+  - RWA
+  - ETH
+  - NGA
+  - GHA
+  - SEN
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - flag Ethiopia closed-mobile-money regime pre-2021; retain as counterfactual donor
+  - exclude post-conflict windows in Uganda 2007 and Rwanda baseline period normalisation
+scope:
+  period:
+  - 2000
+  - 2024
+  countries:
+  - KEN
+  - UGA
+  - TZA
+  - RWA
+  - ETH
+  - NGA
+  - GHA
+  - SEN
+  outcome_dim:
+  - gdp_growth
+  - financialisation
+  - poverty_inequality
+  policy_family:
+  - regulation
+  - institutional_reform
+  treatment_tags:
+  - kenya_mpesa_2007
+  - kenya_mobile_money_regulation
+variables:
+  outcome:
+  - name: account_ownership_adult_share
+    source: world_bank_wdi:FX.OWN.TOTL.ZS
+    transformation: level
+    notes: World Bank Findex rounds 2011/2014/2017/2021 anchor; intercensal smoothing.
+  - name: domestic_credit_private_share_gdp
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: level
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe
+    transformation: log_level
+  - name: poverty_headcount_215_2017ppp
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level
+  treatment:
+  - name: mpesa_launch_indicator
+    source: 'constructed: 1 for KEN from 2007 onward'
+    transformation: binary
+  - name: mobile_money_accounts_per_1000_adults
+    source: world_bank_wdi:FB.CBK.BRWR.P3
+    transformation: log_level
+    notes: 'Channel intensity variable: mobile-money penetration as the treatment-intensity proxy.'
+  controls:
+  - name: real_gdp_pc_2000_baseline
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: average_2000_2006
+  - name: urbanisation_share
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+  - name: secondary_education_enrolment
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: level
+  - name: mobile_subscriptions_per_100
+    source: world_bank_wdi:IT.CEL.SETS.P2
+    transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  M-Pesa's launch was enabled by the Central Bank of Kenya's permissive regulatory
+  stance allowing a non-bank (Safaricom) to offer e-money. The intervention is a
+  regulatory-channel innovation. Subsequent legal formalisation (NPS Act 2011) is the
+  same channel.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with KEN treated from 2007 and SSA donor pool. Secondary:
+    Callaway-Sant'Anna DiD. Tertiary: panel FE with mobile-money-penetration as
+    intensity treatment. Robustness excludes Ethiopia (closed-regime confound) and
+    excludes Uganda/Tanzania (early M-Pesa-Tanzania rollout 2008 contaminates control).
+falsification:
+  rule: >-
+    Not supported if EITHER (a) the synth-DiD gap on account_ownership_adult_share by
+    2021 Findex round is less than 30 ppts at p_perm < 0.10, OR (b) the gap on
+    domestic_credit_private_share_gdp by 2024 is less than 6 ppts, OR (c) the gap on
+    real_gdp_pc cumulative growth 2007-2024 is statistically indistinguishable from the
+    SSA donor pool (p_perm > 0.20), indicating M-Pesa drove financial inclusion but did
+    not raise the level of GDP.
+  test: synth_did_dual_outcome_with_growth_secondary
+  threshold: >-
+    CATT_2021(account_ownership) >= 30 ppts AND CATT_2024(credit_private_share_gdp) >=
+    6 ppts AND p_perm < 0.10 on both
+prior_confidence: 0.7
+disclosure: >-
+  The financial-inclusion premium is the strongest part of the claim — Findex data
+  consistently show Kenya 30+ ppts above SSA peers on account ownership. The credit-
+  to-GDP premium is weaker; mobile-money is mostly transactional rather than
+  intermediated credit. Author's prior is high on (a) and moderate on (b); the GDP-
+  growth secondary is genuinely uncertain because base effects favour low-starting
+  donors (Rwanda, Ethiopia) which converged rapidly 2007-2024 from lower starting
+  points.
+conflict_disclosure: Author holds no Safaricom equity or East African asset exposure.
+steelman: hypotheses/steelman/africa_kenya_mpesa_digital_payments_formalisation_2007_2024.md
+notes: >-
+  Findex is quadrennial; the synth-DiD effectively has 4 post-treatment data points on
+  account ownership (2011, 2014, 2017, 2021). Power is limited; the spec uses a 30-
+  ppt gap threshold deliberately large to compensate. Tanzania's M-Pesa 2008 rollout
+  is the main contamination risk — Tanzania is in the donor pool but actively treated
+  too; robustness drops it.

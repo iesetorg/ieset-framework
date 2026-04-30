@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_indonesia_pkh_blt_2007_2022
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Indonesia's PKH (Program Keluarga Harapan, conditional cash transfer launched 2007 with phased
+  expansion to 10M+ households by 2018) and BLT/BLSM unconditional energy-subsidy compensation
+  transfers (2005, 2008, 2013, 2014, 2022) produced complementary poverty effects, with PKH delivering
+  long-horizon human-capital channel and BLT delivering short-horizon consumption-smoothing channel,
+  identified off staggered PKH rollout cohorts and BLT one-shot event-windows in the panel of
+  Indonesian provinces 2005-2022.
+evidence_type: causal
+prior_confidence: 0.65
+disclosure: |
+  Author views PKH as well-evidenced (TNP2K and World Bank impact evaluations) and BLT as a more
+  mixed instrument primarily justified as fuel-subsidy-removal compensation. Hypothesis is structured
+  to test the complementary-channels claim.
+sample:
+  countries: [IDN]
+  period: [2003, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Aceh tsunami-recovery years 2005-2007 from primary spec
+  - exclude 2020-2021 COVID emergency-aid period from primary identification
+variables:
+  outcome:
+  - name: extreme_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level_pct
+  - name: school_enrolment_secondary
+    source: world_bank_wdi:SE.SEC.NENR
+    transformation: level_pct
+  - name: child_underweight_rate
+    source: who_gho:GHO/NCD_BMI
+    transformation: level_pct
+  treatment:
+  - name: pkh_coverage_rate
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level
+    notes: Province-year PKH beneficiary share of poor households; placeholder pending TNP2K wiring.
+  - name: blt_event_indicator
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: indicator
+    notes: BLT/BLSM event indicator for 2005, 2008, 2013, 2014, 2022 launches.
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: oil_price_index
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: log
+  - name: rural_population_share
+    source: world_bank_wdi:SP.RUR.TOTL.ZS
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  PKH is fiscal-channel CCT; BLT is fiscal-channel UCT. Both are fiscal classification.
+estimator:
+  template: did_callaway_santanna
+  clustering: province
+  fixed_effects: [province, year]
+  notes: |
+    Callaway-Sant'Anna staggered DiD on Indonesian provinces using PKH rollout cohorts (2007-2018) and
+    BLT event-windows. Two-channel decomposition via separate intensity coefficients.
+falsification:
+  rule: |
+    Refuted if combined ATT on extreme-poverty at 5-year horizon is below minus-3pp, OR PKH-channel
+    coefficient is non-negative on school-enrolment, OR BLT event-window ATT on consumption is below
+    +5pp at 6-month horizon.
+  test: did_cs_5yr_pkh_3yr_blt_combined_channels
+  threshold: pkh_5yr_att <= -3pp on poverty AND pkh_school_coef > 0 AND blt_6mo_consumption_att >= +5pp
+scope:
+  period: [2007, 2022]
+  countries: [IDN]
+  outcome_dim: [poverty_inequality, welfare_state, life_expectancy_health]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [indonesia_pkh_2007, indonesia_blt_2005, indonesia_blt_2022, sby_government, jokowi_government]
+steelman: hypotheses/steelman/welfare_transfer_indonesia_pkh_blt_2007_2022.md

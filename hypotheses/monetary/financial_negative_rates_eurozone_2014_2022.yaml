@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financial_negative_rates_eurozone_2014_2022
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  The ECB's June-2014 introduction of a negative deposit-facility rate (initially -0.10%,
+  cut to -0.50% by September-2019) and the parallel Swiss / Danish / Swedish / Japanese
+  negative-rate experiments lowered short-end money-market rates and core sovereign-bond
+  yields below zero, but did NOT cause an aggregate decline in eurozone bank deposits or
+  measurable deposit-flight from the banking sector. The hypothesis is that the Eonia /
+  ESTR rate followed the deposit-facility rate downward to within 10 bp through the
+  negative-rate window, while aggregate eurozone household deposits continued to grow
+  at a rate within 2 pp of the pre-2014 trend.
+evidence_type: descriptive
+sample:
+  countries: [DEU, FRA, ITA, ESP, NLD, BEL, AUT, IRL, PRT, FIN, GRC, CHE, DNK, SWE, JPN]
+  period: [2010, 2022]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: eonia_estr_short_end_rate
+      source: "ecb:EON; ecb:ESTR"
+      transformation: level_basis_points
+    - name: ten_year_sovereign_yield_core
+      source: "ecb:IRS; fred:IRLTLT01DEM156N"
+      transformation: level_basis_points
+    - name: eurozone_household_deposits_growth
+      source: "ecb:BSI"
+      transformation: yoy_pct
+  treatment:
+    - name: ecb_dfr_negative
+      source: "ecb:DFR"
+      transformation: level_basis_points
+      notes: ECB deposit-facility rate, monthly.
+  controls:
+    - name: cpi_inflation_eurozone
+      source: "ecb:ICP; eurostat:prc_hicp_manr"
+      transformation: yoy_pct
+    - name: real_gdp_growth_eurozone
+      source: "eurostat:nama_10_gdp"
+      transformation: yoy_pct
+intervention_channel: monetary
+intervention_channel_justification: >
+  Negative deposit-facility rate is a monetary-policy intervention.
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive time-series + simple panel: track Eonia/ESTR, 10y Bund/OAT yields, and
+    aggregate eurozone deposits before, during, and after the negative-rate window.
+    No causal claim against counterfactual; descriptive test of the "negative rates
+    pass through to short end and core sovereigns without breaking the deposit base"
+    proposition.
+falsification:
+  rule: >
+    SUPPORTED if (i) Eonia/ESTR tracked DFR within 10 bp on average through 2014-2022,
+    (ii) at least one of {DE 2y, NL 2y, FR 2y, FI 2y} sovereign yield went below zero
+    for at least 24 cumulative months, AND (iii) aggregate eurozone household deposits
+    grew within 2 pp/year of the 2010-2013 trend during 2014-2022.
+    PARTIAL if 2 of 3 conditions hold.
+    REFUTED if any of (i) or (iii) fails by a large margin (e.g. deposit run-down > 5%
+    annualised) or if no core sovereign yield went negative.
+  test: descriptive_passthrough_and_deposit_stability
+  threshold: "Eonia/ESTR-DFR spread <= 10 bp avg AND core 2y < 0 for >= 24 months AND deposit growth within 2 pp of trend"
+prior_confidence: 0.92
+disclosure: >
+  ECB / BIS literature documents the passthrough and deposit-stability findings.
+  Author market-liberal prior is sceptical of negative rates as policy choice but
+  accepts the empirical proposition that they did not break aggregate deposit
+  behaviour.
+steelman: hypotheses/steelman/financial_negative_rates_eurozone_2014_2022.md
+scope:
+  period: [2010, 2022]
+  countries: [DEU, FRA, ITA, ESP, NLD, CHE, DNK, SWE, JPN, EUROZONE]
+  outcome_dim: [monetary_policy, financialisation, financial_crisis]
+  policy_family: [monetary_policy]
+  treatment_tags: [ecb_negative_rates_2014_2022, dfr_negative, snb_negative_rates, jpn_nirp_2016]

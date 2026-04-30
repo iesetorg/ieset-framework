@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financial_fed_dot_plot_realised_path_2012_2024
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Comparing the FOMC's Summary of Economic Projections (SEP) median federal-funds-rate
+  forecast from 2012 onwards (the "dot plot") against the realised effective-fed-funds
+  path, the median dot at horizons of 2-3 years systematically over-predicted the
+  realised rate during the 2012-2019 window (median dot consistently above the path
+  ultimately realised) and under-predicted it during the 2021-2023 inflation surge.
+  The hypothesis is that the absolute difference between t+2y SEP-median dot and the
+  realised effective-fed-funds rate at t+2y is, on average, >= 100 bp across SEP
+  releases 2012Q1 through 2022Q4.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2012, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: sep_median_dot_t_plus_2y
+      source: "fred:FEDFUNDS_SEP_PROJ; fred:DFEDTAR; fred:DFEDTARU"
+      transformation: median_projection_basis_points
+      notes: SEP median fed-funds projection at t+2y horizon; FRED hosts SEP-released projections.
+    - name: realised_effective_fed_funds_at_t_plus_2y
+      source: "fred:DFF; fred:FEDFUNDS"
+      transformation: level_basis_points
+  treatment:
+    - name: fomc_meeting_release_date
+      source: "fred:FOMC_RELEASES"
+      transformation: event_date
+  controls:
+    - name: cpi_inflation
+      source: "fred:CPIAUCSL"
+      transformation: yoy_pct
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: level
+intervention_channel: monetary
+intervention_channel_justification: >
+  SEP / dot-plot is a monetary-policy communication artefact, used to test forward-
+  guidance accuracy.
+estimator:
+  template: descriptive
+  notes: >
+    Descriptive: for each SEP release t, compute |SEP_median_t+2y - realised_FFR_t+2y|.
+    Average across all SEP releases 2012Q1 to 2022Q4. Also report the signed mean to
+    show systematic bias direction.
+falsification:
+  rule: >
+    SUPPORTED if mean absolute difference of SEP-median t+2y projection vs realised
+    effective fed-funds rate at t+2y is >= 100 bp across SEP releases 2012Q1 through
+    2022Q4 (the 2-year-ahead window means we use SEP through 2022Q4 to have a 2024Q4
+    realised endpoint).
+    PARTIAL if mean absolute difference in [50, 100) bp.
+    REFUTED if mean absolute difference < 50 bp.
+    METHOD_VALID requires at least 36 of 44 quarterly SEPs in the window having usable
+    median dots and matched realised FFR at t+2y.
+  test: dot_plot_vs_realised_descriptive
+  threshold: "mean |SEP_dot_t+2y - realised_DFF_t+2y| >= 100 bp"
+prior_confidence: 0.85
+disclosure: >
+  Fed's own internal-review documents (Powell 2024 Brookings, Dotsey-Goodman) acknowledge
+  the dot-plot's poor 2-year forecast accuracy. Author market-liberal prior is sceptical
+  of forward-guidance value.
+steelman: hypotheses/steelman/financial_fed_dot_plot_realised_path_2012_2024.md
+scope:
+  period: [2012, 2024]
+  countries: [USA]
+  outcome_dim: [monetary_policy]
+  policy_family: [monetary_policy]
+  treatment_tags: [fed_dot_plot_2012, sep_forward_guidance, fomc_communication]

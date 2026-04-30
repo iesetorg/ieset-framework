@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_colombia_2002_uribe_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Colombia's 2002 Uribe-government labour reform (Law 789:
+  working-day extension, overtime/holiday-premium reduction,
+  dismissal-cost cuts) reduced the Colombian unemployment
+  rate by at least 2 pp by 2007 relative to a synthetic
+  control of Latin-American peers, with formal-sector
+  employment gaining and informality not worsening.
+notes: >
+  Treatment dated 2002-Q4 (Law 789 enactment). Colombia 2002-
+  2007 is widely cited as a flexibilisation success but the
+  donor-pool comparison is critical because the period
+  coincides with the security-improvement-driven economic
+  recovery under Uribe.
+prior_confidence: 0.55
+disclosure: >-
+  Author is sympathetic to dismissal-cost reform but
+  recognises the Colombian recovery is dominated by the
+  security improvement (FARC weakening), commodity-price
+  rise, and US-Colombia FTA negotiations — confounds the
+  donor pool may not absorb. Informal-sector outcome is
+  the steelman discipline.
+falsification:
+  rule: >
+    SUPPORTED if synth-DiD gap on Colombian unemployment rate
+    < -2.0 pp by 2007 AND informal-sector share gap is not
+    statistically more positive than +1.0 pp at p<0.10.
+    REFUTED if unemployment gap is wrong-signed at p<0.10 OR
+    informal-sector share rises > +2.0 pp (formalisation
+    failure). PARTIAL if unemployment gap meets threshold but
+    informal share also rises significantly.
+  test: >
+    Synth-DiD on Colombian unemployment rate and informal-
+    sector share 2002-2007 vs LATAM donor pool, placebo
+    permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [COL, PER, MEX, BRA, CHL, URY, ARG]
+  period: [1995, 2010]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: informal_employment_share
+      source: world_bank_wdi:SL.ISV.IFRM.ZS
+      transformation: level
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+  treatment:
+    - name: colombia_law_789_2002
+      source: "constructed: indicator for 2002-Q4 Law 789 enactment"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2002, 2007]
+  countries: [COL]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [colombia_uribe_law_789_2002]
+steelman: hypotheses/steelman/labour_reform_colombia_2002_uribe_employment.md

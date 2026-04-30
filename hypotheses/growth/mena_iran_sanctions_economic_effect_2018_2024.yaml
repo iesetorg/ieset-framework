@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mena_iran_sanctions_economic_effect_2018_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  The May 2018 US withdrawal from the JCPOA and subsequent maximum-pressure sanctions
+  regime (re-imposition 2018-2019, oil-buyer-waiver elimination 2019, expanded financial
+  sanctions 2020-2024) caused a measurable Iranian economic contraction visible in real
+  GDP, oil exports, FX market dislocation, and household real-consumption proxies. The
+  pre-registered claim is that, in a synthetic-control design with oil-exporting EM peers
+  with comparable pre-2018 structural profile (Russia, Venezuela pre-2017, Iraq, Algeria,
+  Nigeria, Kazakhstan), Iran's cumulative log-real-GDP-pc growth 2018-2024 falls at least
+  20 log-points below the synthetic counterfactual AND oil-export volume falls at least
+  50% from pre-sanction baseline. The null counter-claim is that Iran's pre-2018
+  economic trajectory was already deteriorating due to domestic-policy and demographic
+  pressures, and the post-2018 contraction is statistically indistinguishable from the
+  pre-existing trend extrapolated forward.
+evidence_type: causal
+sample:
+  countries:
+  - IRN
+  - RUS
+  - VEN
+  - IRQ
+  - DZA
+  - NGA
+  - KAZ
+  period:
+  - 2010
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude Venezuela post-2017 (parallel sanctions episode); use 2010-2016 for fitting only
+  - flag Russia post-2022 sanctions as parallel treatment; retain pre-2022 weights only
+  - exclude COVID 2020Q2-2020Q4 from fitting
+scope:
+  period:
+  - 2010
+  - 2024
+  countries:
+  - IRN
+  - RUS
+  - VEN
+  - IRQ
+  - DZA
+  - NGA
+  - KAZ
+  outcome_dim:
+  - gdp_growth
+  - trade_liberalisation
+  - currency_purchasing_power
+  - inflation
+  policy_family:
+  - trade_policy
+  - monetary_policy
+  treatment_tags:
+  - us_sanctions_iran_2018
+  - jcpoa_withdrawal_2018
+  - iran_oil_waivers_eliminated_2019
+variables:
+  outcome:
+  - name: real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe; imf:NGDPRPC
+    transformation: log_level
+  - name: oil_export_volume
+    source: imf:Iran_oil_exports; world_bank_wdi:TX.VAL.FUEL.ZS.UN
+    transformation: log_level
+    notes: Iranian oil-export volume is partially observed via shipping-trace and IEA estimates.
+  - name: cpi_inflation_yoy
+    source: world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH
+    transformation: yoy
+  - name: rial_usd_unofficial_rate
+    source: world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE
+    transformation: log_level
+    notes: 'Iranian rial has multiple rates; unofficial / NIMA-rate is the relevant economic-effect proxy.'
+  treatment:
+  - name: maximum_pressure_indicator
+    source: 'constructed: 1 for IRN from 2018-05 onward'
+    transformation: binary
+  - name: sanctions_intensity
+    source: 'constructed: ordinal 0 (pre-2018) → 1 (2018 re-imposition) → 2 (2019 oil-waiver elimination) → 3 (2020-2024 expanded financial sanctions)'
+    transformation: ordinal
+  controls:
+  - name: brent_oil_price
+    source: fred:DCOILBRENTEU
+    transformation: log_level
+  - name: us_policy_rate
+    source: fred:FEDFUNDS
+    transformation: level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: level
+  - name: vdem_political_stability
+    source: vdem:v2x_polyarchy
+    transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >-
+  US sanctions are an external institutional/political shock that operates through
+  trade and financial channels. Coded institutional reflecting the geopolitical-policy
+  origin; the fiscal/monetary effects are downstream.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >-
+    Primary: synth_did with IRN treated from 2018Q2 and oil-exporter peer donor pool.
+    Secondary: Callaway-Sant'Anna DiD with non-sanctioned oil exporters as control.
+    Robustness drops Russia post-2022 and uses Venezuela pre-2017 only (separate
+    sanctions episode). The sanctions-intensity ordinal supports a dose-response panel
+    specification as tertiary test.
+falsification:
+  rule: >-
+    Not supported if EITHER (a) cumulative log-GDP-pc gap 2018-2024 is greater than
+    -20 log-points (i.e. less contraction than threshold) at p_perm < 0.10, OR (b) oil
+    export volume decline from 2017 baseline is less than 50%, OR (c) the sanctions-
+    intensity panel coefficient is not negative on log_gdp_pc at p < 0.05 (no dose-
+    response), OR (d) Iran's pre-2018 trajectory extrapolated forward fits the post-
+    2018 path better than the synthetic counterfactual (indicating pre-existing trend
+    decline rather than sanctions causation).
+  test: synth_did_with_dose_response_and_pretrend_validation
+  threshold: >-
+    cumulative_log_gdp_pc_gap_2018_2024 <= -0.20 at p_perm < 0.10 AND
+    oil_export_volume_decline >= 0.50 from 2017 baseline AND
+    intensity_panel_coef significant negative at p < 0.05 AND
+    synthetic_counterfactual_RMSE < pretrend_extrapolation_RMSE
+prior_confidence: 0.65
+disclosure: >-
+  Author's prior is high that the maximum-pressure sanctions imposed real economic
+  costs on Iran. Pre-2018 Iranian economy was indeed weak (post-Rouhani initial
+  recovery 2014-2017 plateaued by 2017), so the pre-trend extrapolation null is a
+  real test. The Maduro-Venezuela hypothesis covers a similar question with different
+  dynamics. Prior 0.65 reflects directional confidence with moderate uncertainty on
+  magnitudes given Iranian data-quality limitations.
+conflict_disclosure: No Iranian or sanctioned-trade exposure.
+steelman: hypotheses/steelman/mena_iran_sanctions_economic_effect_2018_2024.md
+linked_hypotheses:
+- maduro_era_venezuelan_collapse_decomposition_2013_2023
+notes: >-
+  Data-gated on Iranian SCI / CBI series (variable quality, occasionally suspended)
+  and IMF Article IV staff estimates. Oil-export volume relies on
+  shipping-trace and IEA estimates because Iranian official trade data
+  understate sanctions-evasion flows. The hypothesis is structured to permit the
+  pre-trend-extrapolation alternative to win.

@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_argentina_macri_milei_simplification
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Argentine tax-cut episodes — Macri 2017 simplification (export-tax cuts,
+  income-tax floor adjustments, asset-revaluation amnesty) and Milei 2024
+  cuts (PAIS-tax simplification, top-rate adjustments, dollarisation-
+  preparation framework) — produced upward shifts in the Argentine top-1
+  pretax income share over their respective post-treatment windows vs
+  LATAM synthetic control, but with the headline-rate effect attenuated
+  by 100+ percent inflation regimes that mechanically inflate measured
+  capital-income realisations. The discriminating test pairs nominal vs
+  real (CPI-deflated) top-1 share movements.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 5. Argentine inflation regime
+  is uniquely identifying for the nominal-vs-real top-share confound.
+prior_confidence: 0.45
+disclosure: >
+  Author prior is highly uncertain — Argentine inflation makes raw top-
+  share data nearly uninterpretable without explicit nominal-vs-real
+  decomposition.
+falsification:
+  rule: >
+    SUPPORTED if real (CPI-deflated) Argentine top-1 share rises by at
+    least 0.5 percentage points over each post-treatment window vs LATAM
+    synth at p<0.10. REFUTED if no detectable gap or rise less than 0.2
+    percentage points over either window.
+  test: >
+    Synthetic-control with LATAM donor pool, treated ARG 2017 and
+    separately 2024. Robustness using inflation-regime controls.
+evidence_type: associational
+sample:
+  countries: [ARG, BRA, MEX, COL, PER, CHL, URY]
+  period: [2010, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - "flag 2018-2019 currency-crisis window for separate handling"
+variables:
+  outcome:
+    - name: top_1pct_pretax_income_share
+      source: "owid:top-1-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: arg_macri_post_2016
+      source: "constructed: indicator = 1 for ARG, year >= 2016"
+      transformation: indicator
+    - name: arg_milei_post_2024
+      source: "constructed: indicator = 1 for ARG, year >= 2024"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with LATAM donor pool. Multi-treatment with
+    inflation-regime controls.
+intervention_channel: fiscal
+scope:
+  period: [2016, 2025]
+  countries: [ARG]
+  outcome_dim: [poverty_inequality, taxation, currency_purchasing_power]
+  policy_family: [tax_policy]
+  treatment_tags: [macri_2017_simplification, milei_2024_tax_cuts, argentina_high_inflation_regime]

@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: latam_extra_capital_account_openness_panel_1990_2024
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Across Latin American economies 1990-2024, the cross-country
+  gradient of capital-account openness (Chinn-Ito-style index proxied
+  by Foreign-direct-investment-share-of-GDP plus
+  external-debt-stock-share-of-GNI as available signals) correlates
+  positively with cumulative real-GDP-per-capita growth and negatively
+  with macro volatility, but conditionally on institutional quality
+  (WGI). The pre-registered claim is (a) panel-FE estimation of
+  log_gdp_pc on FDI-openness shows a positive coefficient at p < 0.10,
+  AND (b) the interaction with WGI Government Effectiveness is
+  positive (i.e. capital-account openness pays off more in higher-
+  capacity states), AND (c) macro-volatility (rolling SD of real-GDP
+  growth) is not increased by openness conditionally on institutions.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, BOL, BRA, CHL, COL, CRI, DOM, ECU, GTM, HND, JAM, MEX, NIC, PAN, PER, PRY, SLV, TTO, URY, VEN]
+  period: [1990, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude VEN post-1999 (Chavismo regime change contaminates capital-flow dynamics)"
+    - "exclude 2020-2021 COVID window from cumulative-growth endpoint"
+
+scope:
+  period: [1990, 2024]
+  countries: [LATAM]
+  outcome_dim: [gdp_growth, capital_flows, financialisation, institutional_quality]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [latam_capital_account_liberalisation]
+
+variables:
+  outcome:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: real_gdp_growth_volatility
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: rolling_5yr_sd
+  treatment:
+    - name: fdi_inflow_share_gdp
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+    - name: external_debt_stock_share_gni
+      source: world_bank_wdi:DT.DOD.DECT.GN.ZS
+      transformation: level
+    - name: portfolio_equity_inflow_share_gdp
+      source: world_bank_wdi:BX.PEF.TOTL.CD.WD
+      transformation: log_level
+  controls:
+    - name: wgi_government_effectiveness
+      source: world_bank_wgi:GOV_WGI_GE.EST
+      transformation: level
+    - name: terms_of_trade
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: us_policy_rate
+      source: fred:FEDFUNDS
+      transformation: level
+    - name: oil_price
+      source: fred:DCOILBRENTEU
+      transformation: log_level
+
+estimator:
+  template: panel_fe
+  clustering: country
+  notes: >
+    Primary: panel_fe of log_gdp_pc on country and year FE plus
+    capital-flow openness controls plus interaction with WGI. Secondary:
+    panel_fe of macro-volatility on the same set.
+
+falsification:
+  rule: >
+    Not supported if (a) FDI-openness coefficient on log_gdp_pc is
+    not positive at p < 0.10, OR (b) the openness × WGI interaction
+    is not positive, OR (c) openness × WGI interaction on macro
+    volatility is not negative (i.e. openness conditional on good
+    institutions does not stabilise growth).
+  test: panel_fe_with_wgi_interaction
+  threshold: >
+    fdi_openness coefficient > 0 at p < 0.10
+    AND (fdi_openness × wgi_government_effectiveness) coefficient > 0
+    AND (fdi_openness × wgi_government_effectiveness) on growth_volatility coefficient < 0
+
+prior_confidence: 0.6
+
+disclosure: >
+  Author market-liberal prior favours capital-account openness when
+  institutions are credible. Spec is conditional on WGI to discipline
+  the prior; unconditional openness-growth claims are too contested.
+
+steelman: hypotheses/steelman/latam_extra_capital_account_openness_panel_1990_2024.md
+
+linked_hypotheses:
+  - latam_extra_inflation_targeting_diff_in_diff_1999_2024
+
+notes: >
+  Cross-country LATAM panel; openness measure approximates Chinn-Ito
+  via WDI series.

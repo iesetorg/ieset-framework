@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_greece_troika_tax_hikes_2010_2018
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Greek Memorandum-era tax hikes 2010-2018 (top marginal income rate raised
+  to 45 percent, VAT hikes to 24 percent standard, ENFIA recurring property
+  tax 2014, solidarity surcharge 2011-2019) raised the disposable-income
+  Gini coefficient by at least 1.5 Gini-points relative to Eurozone-
+  comparator synthetic control over the period, with the regressivity
+  driven by VAT and property-tax incidence rather than income-tax
+  progressivity. The discriminating test is the disposable-income Gini gap
+  vs synth control.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 3. Tests the canonical austerity-
+  era regressivity claim against synth control.
+prior_confidence: 0.65
+disclosure: >
+  Author prior accepts that Greek tax-package was regressive at the margin
+  even though the headline top rate rose; VAT and property-tax incidence
+  exceeded the labour-tax progressivity gain.
+falsification:
+  rule: >
+    SUPPORTED if Greek disposable-income Gini rises by at least 1.5 Gini-
+    points vs Eurozone synthetic control over 2010-2018 at p<0.10. REFUTED
+    if no detectable gap or negative gap at the eight-year horizon.
+  test: >
+    Synthetic-control with Eurozone donor pool, treated GRC 2010.
+evidence_type: associational
+sample:
+  countries: [GRC, ESP, ITA, PRT, IRL, FRA, BEL, NLD, DEU]
+  period: [2000, 2020]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: gini_disposable_income
+      source: "world_bank_wdi:SI.POV.GINI"
+      transformation: level
+    - name: top_10pct_pretax_income_share
+      source: "owid:top-10-share-of-total-income"
+      transformation: level
+  treatment:
+    - name: troika_grc_post_2010
+      source: "constructed: indicator = 1 for GRC, year >= 2010"
+      transformation: indicator
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with Eurozone donor pool. Treated GRC 2010. Placebo-
+    in-time at 2005.
+intervention_channel: fiscal
+scope:
+  period: [2010, 2018]
+  countries: [GRC]
+  outcome_dim: [poverty_inequality, taxation, fiscal_policy]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [troika_memorandum, greek_austerity, vat_hike_regressive, enfia_property_tax]

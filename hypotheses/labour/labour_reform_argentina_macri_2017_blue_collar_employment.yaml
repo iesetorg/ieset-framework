@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_reform_argentina_macri_2017_blue_collar_employment
+version: 1
+status: candidate
+topic: labour
+claim: >
+  Argentina's 2017 Macri-government labour-reform package
+  (Vaca Muerta sector-specific reform, broader labour-cost
+  reduction proposal partially blocked) failed to deliver a
+  measurable formal-employment gain by 2019: synthetic-DiD
+  gap on formal-employment share is statistically
+  indistinguishable from zero against a Latin-American donor
+  pool, falsifying the strong-pro-employment claim.
+notes: >
+  Treatment dated 2017-Q4 (Vaca Muerta hydrocarbons reform
+  enacted; broader package introduced but stalled in Congress).
+  Sample window stops 2019 to exclude COVID. The hypothesis
+  is structured to favour the heterodox null — Macri-era
+  reforms are widely viewed as not having produced labour-
+  market gains under the simultaneous IMF-program austerity.
+prior_confidence: 0.65
+disclosure: >-
+  Author's prior leans toward the null on Macri-era labour
+  reform because the 2018-2019 macro environment (peso crisis,
+  IMF program, recession) makes any positive labour-market
+  signal extremely difficult. Counter-prior: the broader
+  labour-reform package was partially blocked, so what was
+  actually treated is narrower than the rhetorical agenda.
+falsification:
+  rule: >
+    SUPPORTED (null/heterodox-favourable) if synth-DiD gap on
+    Argentine formal-employment share is statistically
+    indistinguishable from zero at p<0.10 by 2019. REFUTED
+    if a positive formal-employment gap > +1.0 pp emerges at
+    p<0.10 (pro-reform claim wins). PARTIAL if formal-
+    employment gap is positive but < +0.5 pp.
+  test: >
+    Synth-DiD on Argentine formal-employment share 2017-2019
+    vs LATAM donor pool, placebo permutation at p<0.10.
+evidence_type: associational
+sample:
+  countries: [ARG, BRA, CHL, MEX, PER, URY, COL]
+  period: [2010, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - flag 2018-Q2 to 2019-Q4 peso-crisis window for asymmetric exposure
+variables:
+  outcome:
+    - name: formal_employment_share
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: real_wage_index
+      source: oecd:DSD_EARN@DF_EARN_LFS
+      transformation: log
+  treatment:
+    - name: argentina_macri_2017_reform
+      source: "constructed: indicator for 2017-Q4 Vaca Muerta + partial labour package"
+      transformation: indicator
+  controls:
+    - name: gdp_per_capita_real
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: terms_of_trade_index
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: level
+    - name: real_effective_exchange_rate
+      source: bis:reer_broad_ars
+      transformation: log
+estimator:
+  template: synth_did
+  clustering: country
+  fixed_effects: [country, year]
+scope:
+  period: [2017, 2019]
+  countries: [ARG]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [argentina_macri_labour_2017]
+steelman: hypotheses/steelman/labour_reform_argentina_macri_2017_blue_collar_employment.md

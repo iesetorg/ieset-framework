@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: india_extra_demonetisation_2016_economic_effect
+version: 1
+status: candidate
+topic: growth
+
+claim: >-
+  India's November 2016 demonetisation (sudden withdrawal of 86% of
+  currency in circulation by value, INR500 and INR1000 notes) produced
+  a measurable short-run output contraction visible in quarterly real
+  GDP growth and a persistent negative effect on the cash-intensive
+  informal-sector through 2017-2018, with no offsetting medium-run
+  benefit on tax-revenue / GDP or formalisation indicators by 2019.
+  Real GDP growth in the four quarters following demonetisation
+  (2016Q4-2017Q3) is at least 1 percentage point per year below the
+  pre-shock 2015Q1-2016Q3 trend.
+
+evidence_type: descriptive
+
+notes: >-
+  Single-country structural break with a tightly-defined treatment
+  date (2016-11-08). Annualised data primary; the WDI annual series
+  smooths the shock so the test is on growth-rate level for fiscal
+  years 2016-17, 2017-18 (Indian fiscal-year basis). Tax-revenue
+  channel is informative.
+
+prior_confidence: 0.70
+
+disclosure: >-
+  Author tilts toward the no-net-benefit reading. Bias risk: under-weighting
+  formalisation gains that took multiple years to manifest (UPI adoption
+  surge post-2016 plausibly causally linked). Mitigation: medium-run
+  formalisation channel handled separately in Aadhaar/UPI hypothesis.
+
+steelman: hypotheses/steelman/india_extra_demonetisation_2016_economic_effect.md
+
+falsification:
+  rule: >-
+    PRIMARY (dispositive): SUPPORTED if real GDP growth in fiscal year
+    2016-17 (which contains the demonetisation shock) is at least 0.5pp
+    below the 2014-15 / 2015-16 mean AND fiscal year 2017-18 growth
+    is at least 0.3pp below that same mean. REFUTED if either fiscal
+    year's growth EXCEEDS the pre-period mean.
+    INFORMATIVE (not gating): tax-revenue / GDP for IND should NOT
+    rise by more than 1pp from 2015 to 2019 (no fiscal payoff).
+  test: india_demonetisation_2016_growth_dip_no_payoff
+  threshold: >-
+    PRIMARY: gdp_growth(IND, 2016-17) <= mean(gdp_growth, 2014-15, 2015-16) - 0.005 AND
+    gdp_growth(IND, 2017-18) <= mean(gdp_growth, 2014-15, 2015-16) - 0.003.
+    METHOD_VALID: WDI NY.GDP.MKTP.KD.ZG and GC.TAX.TOTL.GD.ZS available for IND through 2019.
+
+sample:
+  countries: [IND]
+  period: [2010, 2019]
+  temporal_structure: time_series
+
+scope:
+  period: [2016, 2019]
+  countries: [IND]
+  outcome_dim: [gdp_growth, employment_labour]
+  policy_family: [monetary_policy, regulation]
+  treatment_tags: [india_demonetisation_2016, currency_withdrawal_shock]
+
+variables:
+  outcome:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: level
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: level
+    - name: tax_revenue_pct_gdp
+      source: "world_bank_wdi:GC.TAX.TOTL.GD.ZS"
+      transformation: level
+    - name: household_consumption_growth
+      source: "world_bank_wdi:NE.CON.PRVT.KD.ZG"
+      transformation: level
+  treatment:
+    - name: post_demonetisation_indicator
+      source: "constructed: indicator = 1 for IND, year >= 2016 (Nov 2016 shock)"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >-
+    Pre-post structural break around 2016-11-08. Annual series smooths
+    the within-year shock; primary test is on FY2016-17 and FY2017-18
+    growth rates vs the FY2014-15 / FY2015-16 mean.
+
+linked_hypotheses:
+  - india_extra_aadhaar_upi_productivity
+  - india_extra_modi_era_growth_2014_2024

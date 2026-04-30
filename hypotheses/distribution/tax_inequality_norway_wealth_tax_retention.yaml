@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_norway_wealth_tax_retention
+version: 1
+status: draft
+topic: distribution
+claim: >
+  Norway's continued retention of an annual wealth tax (formuesskatt)
+  through 2024 — at rates of 0.85-1.1 percent on net wealth above NOK
+  1.7M — is associated with a top-1 wealth share trajectory that lies
+  below the Nordic-ex-Norway synthetic counterfactual by at least 1
+  percentage point over 2010-2024, without a large register-based HNW
+  emigration response prior to the 2022 rate increase. The discriminating
+  test is the synth-control gap on top-1 wealth share against the
+  register-based emigration count.
+notes: >
+  Tax-inequality candidate, swarm-S6 batch 2. Pairs with the French case
+  for cross-country wealth-tax retention vs abolition contrast.
+prior_confidence: 0.55
+disclosure: >
+  Author prior weakly favours that wealth-tax retention compresses top
+  wealth share modestly with manageable migration response, but is
+  cautious about the 2022 rate hike + concurrent capital-gains reform
+  confound.
+falsification:
+  rule: >
+    SUPPORTED if Norway top-1 wealth share is at least 1 percentage point
+    below Nordic-ex-NOR synthetic at the 2024 horizon AND register-based
+    HNW outbound migration prior to 2022 averages below 0.5 percent of
+    HNW stock per year. REFUTED if no detectable gap or migration rate
+    above 1 percent per year.
+  test: >
+    Synthetic-control with Nordic-ex-NOR donor pool (SWE, DNK, FIN, ISL).
+evidence_type: associational
+sample:
+  countries: [NOR, SWE, DNK, FIN, ISL]
+  period: [2000, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "treat 2022 rate hike as separate sub-event with confound dummy"
+variables:
+  outcome:
+    - name: top_1pct_wealth_share
+      source: "owid:top-1-share-of-total-wealth"
+      transformation: level
+    - name: top_10pct_wealth_share
+      source: "owid:top-10-share-of-total-wealth"
+      transformation: level
+  treatment:
+    - name: norway_wealth_tax_retention
+      source: "constructed: indicator = 1 for NOR, year >= 2000 (continuous regime)"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: top_marginal_income_tax_rate
+      source: "owid:top-marginal-income-tax-rate"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+estimator:
+  template: synthetic_control
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Synthetic-control with Nordic-ex-NOR donor pool. Robustness with
+    panel_fe across the Nordic block with NOR-specific indicator.
+intervention_channel: fiscal
+scope:
+  period: [2000, 2024]
+  countries: [NOR]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [norway_formuesskatt, wealth_tax_retention, nordic_distribution]

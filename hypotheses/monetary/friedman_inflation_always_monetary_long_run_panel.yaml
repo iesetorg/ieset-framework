@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: friedman_inflation_always_monetary_long_run_panel
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  Across a global cross-country panel 1960-2023, the 10-year average
+  rate of broad-money (M2 or equivalent national broad-money aggregate)
+  growth is positively and strongly associated with the contemporaneous
+  10-year average rate of CPI inflation, with a slope close to unity
+  net of trend real-output growth. Country-level long-run averages
+  cluster on a 45-degree (money-growth minus output-growth = inflation)
+  line. The claim is Friedman's (1963) "inflation is always and
+  everywhere a monetary phenomenon" recast as a long-horizon panel
+  regularity rather than a high-frequency causal claim.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, JPN, CAN, AUS, NZL, CHE, SWE, NOR, DNK, FIN, IRL, AUT, BEL, PRT, GRC, KOR, MEX, BRA, ARG, CHL, COL, PER, IND, IDN, THA, PHL, ZAF, TUR, ISR]
+  period: [1960, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-decades inside an active hyperinflation episode (Cagan threshold) since long-run averages are dominated by single-month spikes"
+    - "drop country-decades with formal dollarisation or currency-board where the country has no autonomous M2 series"
+    - "drop country-decades with fewer than 60 monthly M2 observations to keep the long-run average meaningful"
+
+scope:
+  period: [1960, 2023]
+  countries: [GLOBAL, OECD, LATAM, ASIA_EM]
+  outcome_dim: [inflation, monetary_policy, currency_purchasing_power]
+  policy_family: [monetary_policy]
+  treatment_tags: [friedman_qtm, broad_money_growth_long_run]
+
+variables:
+  outcome:
+    - name: cpi_inflation_10yr_avg
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: rolling_10yr_mean
+      notes: "10-year rolling mean of annual CPI inflation. Trimmed at the 99th percentile within each decade to dampen single-year spikes."
+  treatment:
+    - name: broad_money_growth_10yr_avg
+      source: "fred:M2SL (USA); ecb:BSI.M.U2 (EU); boe:LPMAUYM (GBR); boj:M2 (JPN); world_bank_wdi:FM.LBL.BMNY.ZG (rest)"
+      transformation: rolling_10yr_mean_log_diff
+      notes: "10-year mean of annual broad-money growth. National aggregates preferred; WDI broad-money-growth indicator FM.LBL.BMNY.ZG used as fallback."
+    - name: trend_real_gdp_growth_10yr_avg
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: rolling_10yr_mean
+      notes: "10-year mean of real GDP growth, used as the QTM 'output-velocity' offset on the right-hand side."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: exchange_rate_regime
+      source: "ilzetzki_reinhart_rogoff:era_classification_monthly_1940_2019"
+      transformation: categorical_coarse
+      notes: "Pegs and currency boards constrain domestic M2 formation; included so the slope is identified off countries with monetary autonomy."
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  Broad-money growth is the canonical monetary-channel variable;
+  no fiscal or regulatory channel is being tested here.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, decade]
+  clustering: country
+  notes: >
+    Primary spec: between-country regression of 10y inflation average on
+    10y broad-money growth average minus 10y trend real-output growth.
+    Secondary spec: panel-FE with country and decade effects to absorb
+    common shocks; the long-run-monetary-phenomenon claim is about
+    cross-country variation in averages, so the FE coefficient is
+    diagnostic but not the headline. Local-projection variant traces
+    cumulative inflation response to a one-SD broad-money-growth shock
+    over h=1..10 years.
+
+falsification:
+  rule: >
+    Not supported if (a) the cross-country between-regression slope on
+    (broad-money-growth minus trend-output-growth) is below 0.6 or above
+    1.4, or (b) the slope is statistically indistinguishable from zero
+    at p<0.05, or (c) country fixed effects in the panel-FE spec absorb
+    the entire money-growth coefficient (i.e. no within-country
+    relationship between decade-averaged money growth and inflation).
+    A Keynesian / cost-push reading wins cleanly if the slope is below
+    0.3 with R-squared below 0.2 in the cross-country regression.
+  test: long_run_money_growth_inflation_panel_slope
+  threshold: >
+    cross-country slope on (M_growth - g_growth) in [0.6, 1.4]
+    AND p<0.05 against zero
+    AND R^2 in cross-country between-regression > 0.4
+    AND within-country coefficient remains positive at p<0.10 after country and decade FE
+
+prior_confidence: 0.7
+
+disclosure: >-
+  The "inflation-always-monetary" framing is Chicago-monetarist canon
+  (Friedman 1963 Monetary History; Lucas 1980 cross-country chart).
+  Heterodox / post-Keynesian readers argue (i) the long-run regularity
+  is mechanical because broad money is endogenous to nominal demand,
+  so the regression has reverse causality baked in; (ii) the slope is
+  driven by high-inflation outliers (1970s-1980s LATAM) and collapses
+  on advanced-economy post-1990 data; (iii) post-2008 QE produced
+  large M2 growth without proportional CPI inflation, so the proposition
+  is regime-dependent. Author's market-liberal priors lean toward
+  accepting the long-run QTM regularity; the falsification rule is
+  designed to make a flat or sub-0.6 slope a clean refutation rather
+  than a hedge.
+
+steelman: hypotheses/steelman/friedman_inflation_always_monetary_long_run_panel.md
+
+linked_hypotheses:
+  - hyperinflation_requires_fiscal_dominance
+  - central_bank_independence_inflation_discipline
+  - monetarist_velocity_stability_breaks_post_2008
+
+notes: >
+  De Grauwe-Polan (2005) and Teles-Uhlig (2016) report long-run slopes
+  near unity on cross-country averages but flatter slopes within
+  advanced economies post-1990. Spec is structured so that result
+  pattern (cross-section unity, within-advanced-economy flattening)
+  registers as supported with regime-dependence, not as falsified.

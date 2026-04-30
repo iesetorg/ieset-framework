@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: austrian_v_recovery_us_1920_no_fiscal_stim_canonical
+version: 1
+status: candidate
+topic: monetary
+
+claim: >
+  The 1920-1921 US depression — a sharp post-WW1 contraction featuring
+  industrial production collapse on the order of 30% and unemployment
+  rising above 10% — was followed by a rapid V-shaped recovery within
+  approximately 18 months, despite the Harding administration cutting
+  federal spending by roughly half over 1920-1922 and the Federal
+  Reserve raising rather than lowering policy rates through much of
+  1920. The Austrian/laissez-faire reading (Rothbard, Grant, Woods) is
+  that this is the canonical case of a recession allowed to clear via
+  liquidation of malinvestment without either fiscal stimulus or
+  monetary accommodation, demonstrating that recovery can proceed
+  rapidly without the Hoover/FDR-style intervention paradigm. Pre-
+  registered claim is that across at least 4 of 5 canonical metrics
+  (GDP, industrial production, unemployment, federal-spending change,
+  policy-rate stance) the 1920-1921 episode meets the "rapid recovery
+  without stimulus" pattern.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [USA]
+  period: [1918, 1925]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "data quality: pre-1929 federal statistics are reconstructed (NBER, Romer); flag in the run"
+
+scope:
+  period: [1918, 1925]
+  countries: [USA]
+  outcome_dim: [gdp_growth, employment_labour, fiscal_policy, monetary_policy]
+  policy_family: [fiscal_policy, monetary_policy]
+  treatment_tags: [harding_recession_1920, laissez_faire_recovery, no_fiscal_stimulus_canonical, fed_tight_money_1920]
+
+variables:
+  outcome:
+    - name: real_gdp_index
+      source: "maddison:gdp_per_capita_2011usd"
+      transformation: log
+      notes: "Maddison Project historical GDP estimate."
+    - name: industrial_production_index
+      source: "fred:INDPRO"
+      transformation: log
+      notes: "FRED industrial production historical series; pre-1929 is NBER-reconstructed."
+    - name: unemployment_rate
+      source: "academic:lebergott_1957_unemployment_series"
+      transformation: level
+      notes: "Lebergott 1957 historical unemployment estimates; published in academic literature."
+  treatment:
+    - name: federal_outlays_share_gdp
+      source: "fred:FYONGDA188S"
+      transformation: level
+      notes: "Historical federal outlays as share of GDP."
+    - name: fed_discount_rate
+      source: "fred:M13009USM156NNBR"
+      transformation: level
+      notes: "NBER historical Federal Reserve discount rate series."
+
+intervention_channel: bundled
+
+intervention_channel_justification: >
+  The hypothesis tests a counterfactual ABSENCE of intervention — both
+  fiscal contraction and monetary tightness coincided. "Bundled" reflects
+  that the canonical reading attributes recovery to the joint absence of
+  Keynesian-style intervention rather than isolating one channel.
+
+estimator:
+  template: multi_metric_checklist
+  notes: >
+    Pre-registered checklist of canonical Austrian-claim metrics for
+    the 1920-1921 episode. The hypothesis is an existence claim ("a
+    rapid V-shaped recovery without stimulus did happen in this
+    canonical case"), not a causal generalisation. Heterodox/Keynesian
+    objections (de Long, Krugman) argue (a) the recovery was not as
+    rapid as Austrian retellings claim, (b) underlying conditions
+    differed enormously from 1929 or 2008, (c) the Fed cut rates from
+    7% to 4% over 1921-1922 — i.e. did substantially loosen — and (d)
+    1920-1921 was a postwar reconversion shock, not a credit-boom
+    bust. The multi-metric checklist tests pattern, not causal
+    generalisability.
+
+canonical_metrics:
+  - metric_id: real_gdp_recovery_18mo
+    description: "Real GDP returns to or exceeds 1919 peak within 18 months of 1921 trough."
+    threshold: "real_gdp(1923) >= real_gdp(1919)"
+    window: "1919-1923"
+    source: "maddison:gdp_per_capita_2011usd"
+    direction: supports_claim
+    independence_justification: "Output-side metric; independent of labour-market metrics."
+  - metric_id: industrial_production_v_recovery
+    description: "Industrial production peak-to-trough decline >= 25%; recovery to peak within 24 months."
+    threshold: ">= 25% drop AND recovery to pre-recession peak within 24 months"
+    window: "1920-1923"
+    source: "fred:INDPRO"
+    direction: supports_claim
+    independence_justification: "Real-sector metric; different from unemployment or GDP."
+  - metric_id: unemployment_peak_and_recovery
+    description: "Unemployment rises >= 10% then falls below 5% within 24 months of peak."
+    threshold: "peak unemployment >= 10% AND unemployment(1923) <= 5%"
+    window: "1920-1923"
+    source: "academic:lebergott_1957_unemployment_series"
+    direction: supports_claim
+    independence_justification: "Labour-market metric — direct measure of recovery completeness."
+  - metric_id: federal_spending_cut_during_recession
+    description: "Federal outlays as share of GDP fell >= 30% during 1920-1922 (no fiscal stimulus)."
+    threshold: "federal_outlays_share_gdp(1922) <= 0.7 * federal_outlays_share_gdp(1920)"
+    window: "1920-1922"
+    source: "fred:FYONGDA188S"
+    direction: supports_claim
+    independence_justification: "Fiscal-stance metric; independent of real outcomes."
+  - metric_id: fed_did_not_loosen_during_contraction_1920
+    description: "Fed discount rate rose or held steady through the 1920 contraction (no monetary stimulus during contraction)."
+    threshold: "fed_discount_rate average 1920 >= fed_discount_rate average 1919"
+    window: "1919-1920"
+    source: "fred:M13009USM156NNBR"
+    direction: supports_claim
+    independence_justification: "Monetary-stance metric; checks the Austrian narrative that the Fed did not act in classic Keynesian-stimulus pattern at the contraction."
+    data_quality_flag: "Note: Fed cut discount rates in 1921-1922 (post-trough). This metric is deliberately scoped to 1919-1920 to test the 'no stimulus during contraction' claim, which is the contested Austrian assertion."
+
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+
+falsification:
+  rule: >
+    Hypothesis is supported if at least 4 of 5 canonical metrics meet
+    their thresholds; refuted if 2 or fewer meet thresholds. A clean
+    refutation would show e.g. either GDP did not recover within 18mo,
+    OR federal spending did not fall, OR the Fed did materially loosen
+    during the contraction itself.
+  test: rapid_recovery_without_stimulus_pattern_count
+  threshold: >
+    metrics_met >= 4 of 5 → supported
+    metrics_met <= 2 of 5 → refuted
+
+prior_confidence: 0.7
+
+disclosure: >-
+  Author prior 0.70 — the 1920-1921 case has been documented as
+  a counter-example to Keynesian recession-management orthodoxy by
+  Rothbard, Powell, Grant, and Woods. Heterodox readers (Krugman, de
+  Long, Romer) argue the case is over-claimed: postwar reconversion
+  is not generalisable to credit-bust dynamics, the Fed did
+  eventually loosen, and the recovery's "rapidity" depends on which
+  dating convention is used. The multi-metric test isolates pattern
+  from generalisability — even if the 1920 case is sui generis, the
+  pattern (drop, no stimulus, recover) either holds in the data or
+  it does not.
+
+steelman: hypotheses/steelman/austrian_v_recovery_us_1920_no_fiscal_stim_canonical.md
+
+linked_hypotheses:
+  - abct_credit_boom_predicts_capital_misallocation_oecd
+  - austerity_output_recovery_tradeoff
+
+notes: >
+  Rothbard (1963 America's Great Depression, ch.10), Grant (2014 The
+  Forgotten Depression), Woods (2009 Meltdown). Mainstream rejoinder:
+  Romer 1988, de Long-Eichengreen historical macro, Krugman columns.
+  This is one of the most-cited Austrian canonical cases; the framework
+  treats it as "pattern in the data, not generalisable lesson."

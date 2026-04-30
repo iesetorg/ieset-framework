@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: high_income_material_footprint_unchanged_post_2000
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  High-income-country per-capita material footprint (UNEP
+  International Resource Panel "raw material equivalents"
+  consumption-based metric) has not declined materially over
+  2000-2022 -- mean change across the high-income panel is within
+  +/-10% of 2000 levels -- despite a documented decline in
+  territorial CO2 emissions over the same window. The
+  consumption-based material-throughput stagnation refutes
+  green-growth claims of broad-based decoupling and supports the
+  PK-degrowth offshoring critique that headline emissions
+  decoupling reflects production relocation rather than
+  throughput reduction.
+
+evidence_type: descriptive
+
+sample:
+  countries: [USA, GBR, DEU, FRA, JPN, ITA, CAN, AUS, KOR, ESP, NLD, BEL, AUT, CHE, NOR, SWE, DNK, FIN, IRL, NZL]
+  period: [2000, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing UNEP IRP material-footprint OR OWID consumption-based CO2"
+
+variables:
+  outcome:
+    - name: material_footprint_per_capita_t
+      source: "owid:material-footprint-per-capita"
+      transformation: level
+      notes: "OWID slug sources from UNEP IRP raw-material-equivalents accounting; not on disk in current OWID vintage. TODO: register UNEP IRP as a publisher OR extend OWID fetcher. Spec gates inconclusive on this leg until landed."
+    - name: log_consumption_based_co2_per_capita
+      source: "owid:consumption-co2-per-capita"
+      transformation: log
+    - name: log_territorial_co2_per_capita
+      source: "owid:co-emissions-per-capita"
+      transformation: log
+      notes: "Comparator leg -- territorial declined; the question is whether MF declined."
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+  treatment:
+    - name: post_2000_window
+      source: "constructed: 1 for years >= 2000"
+      transformation: indicator
+  controls:
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: level
+
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Two-leg descriptive test on the high-income panel 2000-2022.
+    Leg A (material-footprint stagnation): population-weighted
+    mean MF/cap 2022 / 2000 within 0.90-1.10 (not materially
+    declined). Leg B (territorial-vs-consumption divergence):
+    population-weighted mean territorial CO2/cap 2022 / 2000 < 1.0
+    AND consumption-based CO2/cap 2022 / 2000 declines by less
+    than territorial-side declines (offshoring signature).
+    Country-level dispersion reported. Also reports MF/GDP
+    intensity (which has declined in some HIC countries) -- the
+    distinction between intensity-decoupling and absolute-MF
+    decoupling is the spec's headline finding.
+
+falsification:
+  rule: >
+    SUPPORTED iff (a) pooled HIC mean MF/cap 2022 / 2000 in
+    [0.90, 1.10] (i.e. < 10% decline AND < 10% rise -- the
+    "unchanged" claim), AND (b) territorial-minus-consumption
+    decoupling gap > 5 percentage points (offshoring signature
+    visible). REFUTED if MF/cap pooled mean fell by > 15%
+    (decoupling claim defensible) OR rose by > 15% (footprint
+    expanded, not "stable"). PARTIAL between bounds. METHOD_VALID
+    requires UNEP IRP / OWID material-footprint panel for >=15 of
+    20 HIC sample countries 2000-2022; if MF series unavailable,
+    full inconclusive on the primary leg.
+  test: hic_material_footprint_stagnation_2000_2022
+  threshold: >-
+    PRIMARY: 0.90 <= mean(MF_pc_2022 / MF_pc_2000) <= 1.10 AND
+    territorial-minus-consumption decoupling gap > 5 pp.
+
+prior_confidence: 0.6
+
+disclosure: >-
+  PK-degrowth authorial framing: the offshoring critique is
+  load-bearing for the spec, and the "stagnation" verdict is
+  defined permissively (within +/-10%) so that even a small
+  decline counts as supporting evidence. A market-liberal critique
+  would (i) prefer a stricter test like "did MF/cap fall less than
+  GDP/cap rose" (an intensity-decoupling test), where some HIC
+  countries do show modest absolute decoupling; (ii) note that the
+  UNEP IRP MFA accounting is itself contested -- input-output
+  attribution of mining and biomass extraction to consuming
+  countries depends on table-construction choices (multi-region
+  Eora vs EXIOBASE vs OECD ICIO give different MF numbers); and
+  (iii) note that the offshoring channel is partly real
+  (manufacturing relocation to CHN, IND, MEX) and partly
+  composition shift in HIC economies (services share rose). The
+  spec does not separate these channels and is honest about that
+  in this disclosure.
+
+steelman: hypotheses/steelman/high_income_material_footprint_unchanged_post_2000.md
+
+scope:
+  period: [2000, 2022]
+  countries: [OECD, ANGLO]
+  outcome_dim: [energy, gdp_growth]
+  policy_family: [none]
+  treatment_tags: []
+
+linked_hypotheses:
+  - absolute_decoupling_global_material_throughput
+  - eu_ets_absolute_decoupling_emissions_gdp
+  - oecd_decoupling_pace_below_15c_joint_test
+  - material_footprint_cap_feasibility
+
+notes: >
+  PK-degrowth offshoring critique against the headline-decoupling
+  claim. UNEP IRP material-footprint per capita is the canonical
+  consumption-based throughput metric (Wiedmann et al. 2015;
+  Hickel & Kallis 2020). Series is not on disk in current OWID
+  vintage of this repo (per material_footprint_cap_feasibility
+  notes). Spec hard-gates inconclusive on the MF leg until UNEP
+  IRP fetcher lands or OWID slug coverage extends.
+
+  TODO genuinely unregistered data sources flagged here:
+  - UNEP IRP material-footprint accounting (NOT a registered
+    publisher in publishers.yaml). owid:material-footprint-per-capita
+    slug exists but is not on disk in current vintage. Either
+    register UNEP IRP directly OR extend the OWID fetcher to pull
+    the material-footprint slug.

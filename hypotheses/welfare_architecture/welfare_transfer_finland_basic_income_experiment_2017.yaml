@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_transfer_finland_basic_income_experiment_2017
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Finland's 2017-2018 Basic Income Experiment (2000 randomised unemployed-benefit recipients receiving
+  EUR 560/month unconditional cash for 24 months versus matched-control unemployed-benefit recipients)
+  produced a small positive employment effect — ATT of less than 6 days additional employment in year 2
+  — and a measurable improvement in self-reported wellbeing and trust-in-government, providing the
+  cleanest RCT evidence available for unconditional-basic-income labour-supply effects in a high-welfare-
+  state institutional context.
+evidence_type: causal
+prior_confidence: 0.75
+disclosure: |
+  Author views the Finnish RCT as the strongest available evidence on UBI labour-supply effects; the
+  small positive employment finding has been published (Kangas-Jauhiainen-Ylikanno-Hagan-Hellsten 2020)
+  and the prior aligns with that literature.
+sample:
+  countries: [FIN]
+  period: [2015, 2020]
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: days_employed_year_2
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: level
+  - name: self_reported_wellbeing_score
+    source: oecd:DSD_HEALTH@DF_HEALTH_STAT
+    transformation: level
+    notes: OECD better-life-index proxy; Kela RCT survey series preferred at wiring.
+  treatment:
+  - name: ubi_treatment_indicator
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: indicator
+    notes: Random assignment 2000 treated / 173000 control unemployed-benefit-recipient pool.
+  controls:
+  - name: pre_experiment_employment_history
+    source: oecd:DSD_LFS_BS@DF_EMP_RATE
+    transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Basic-income experiment is a fiscal-channel unconditional-transfer mechanism.
+estimator:
+  template: panel_fe
+  clustering: individual
+  fixed_effects: [individual, year_quarter]
+  notes: |
+    Panel FE on the experimental sample with individual and time FE. Primary outcome employment days
+    in year 2; secondary outcomes wellbeing and trust scores. Matches Kangas et al. published spec.
+falsification:
+  rule: |
+    Refuted on the labour-supply arm if the ATT on year-2 employment days is below +1 day (no detectable
+    effect) OR exceeds +12 days (large positive effect). Refuted on the wellbeing arm if the wellbeing
+    ATT is non-positive at p < 0.10. The hypothesis describes the joint pattern of small-positive
+    employment + clear wellbeing improvement.
+  test: panel_fe_year2_employment_wellbeing_paired
+  threshold: 1 <= employment_days_att <= 12 AND wellbeing_att > 0 at p < 0.10
+scope:
+  period: [2017, 2020]
+  countries: [FIN]
+  outcome_dim: [employment_labour, welfare_state, life_expectancy_health]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [finland_basic_income_experiment_2017, sipila_government, kela_rct_2017_2018]
+steelman: hypotheses/steelman/welfare_transfer_finland_basic_income_experiment_2017.md

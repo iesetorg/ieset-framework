@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_reform_sweden_1990s_consolidation_outcome
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  Sweden's 1990s welfare-state consolidation (replacement-rate cuts to sickness/unemployment insurance
+  1991-1996, 1998 pension reform to NDC, child-allowance flatten 1996-2006) preserved poverty/inequality
+  outcomes (Gini and bottom-40 income share) within plus-or-minus 5% of pre-crisis levels while restoring
+  fiscal sustainability (debt/GDP back below 50% by 2008), supporting the scale-preserving consolidation
+  interpretation rather than retreat from the universal-transfer model.
+evidence_type: associational
+prior_confidence: 0.6
+disclosure: |
+  Author has institutionalist priors that view Nordic 1990s reforms as competence-driven recalibration
+  rather than retreat. Hypothesis is descriptive-comparative; causal identification of individual reform
+  components is not attempted.
+sample:
+  countries: [SWE, NOR, DNK, FIN, NLD, DEU]
+  period: [1985, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude SWE 1991-1993 banking-crisis trough years from outcome trajectory comparisons
+variables:
+  outcome:
+  - name: gini_coefficient
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  - name: bottom_40_income_share
+    source: world_bank_wdi:SI.DST.FRST.40
+    transformation: level
+  - name: general_govt_debt_to_gdp
+    source: imf:GGXWDG_NGDP
+    transformation: level
+  - name: elderly_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level
+  controls:
+  - name: gdp_per_capita_real
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+intervention_channel: bundled
+intervention_channel_justification: |
+  Multi-component reform package with fiscal, regulatory, and institutional elements; channel is bundled.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: |
+    Panel FE comparison of SWE outcome trajectories with Nordic and continental-European peers.
+    SWE-specific deviation tested as country-year interaction with post-1996 indicator.
+falsification:
+  rule: |
+    Refuted if SWE Gini in 2008-2015 deviates by more than 5% from pre-crisis level, OR if bottom-40
+    share falls more than 5%, OR if elderly poverty rises more than 3pp, OR if debt/GDP fails to fall
+    below 50% by 2008.
+  test: multi_outcome_band_check_post_consolidation_period
+  threshold: abs(delta_gini) <= 5pct AND abs(delta_bottom40_share) <= 5pct AND delta_elderly_poverty <= +3pp AND debt_gdp_2008 < 50pct
+scope:
+  period: [1991, 2015]
+  countries: [SWE, NOR, DNK, FIN, NLD, DEU]
+  outcome_dim: [welfare_state, fiscal_policy, poverty_inequality]
+  policy_family: [welfare_architecture, fiscal_policy, institutional_reform]
+  treatment_tags: [sweden_1990s_reforms, nordic_model, ndc_pension_1998]
+steelman: hypotheses/steelman/welfare_reform_sweden_1990s_consolidation_outcome.md

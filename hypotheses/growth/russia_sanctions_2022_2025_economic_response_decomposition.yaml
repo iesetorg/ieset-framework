@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: russia_sanctions_2022_2025_economic_response_decomposition
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Western sanctions on Russia 2022-2025 produced material but bounded economic
+  damage — GDP contraction shallower than Western forecasters predicted in
+  March 2022 — because oil-revenue rerouting (China + India + Turkey absorption
+  of seaborne crude under the G7 price cap) and import-substitution from EAEU
+  partners blunted the trade-shock impact, while the ruble stabilised after
+  initial collapse via capital controls and a current-account surplus. The
+  effective sanctions impact was real but smaller than the "isolation" rhetoric
+  suggested, with binding effects concentrated in technology imports and
+  long-run capital deepening.
+notes: >-
+  Multi-metric decomposition of a major 2020s natural experiment in
+  large-economy sanctions. Tests the gap between predicted and realised
+  damage; pattern-match across GDP, ruble, oil-revenue, trade-rerouting.
+prior_confidence: 0.70
+disclosure: >-
+  Author's market-liberal priors expect sanctions to underperform
+  rhetorical claims due to substitution margins (third-party absorption,
+  parallel financial channels). Risk is over-attributing the milder
+  outcome to sanctions design weakness when much of the gap could be
+  explained by Russia's pre-2022 macro buffers (low debt, FX reserves
+  before freeze, oil-revenue cushion) that ran out 2024-2025.
+steelman: hypotheses/steelman/russia_sanctions_2022_2025_economic_response_decomposition.md
+evidence_type: canonical_case_multi_metric
+falsification:
+  rule: >-
+    Multi-metric checklist on Russia 2022-Q1 to 2025-Q1. SUPPORTED if
+    >=4 of 6 metrics meet thresholds; REFUTED if <=2 do. Each metric
+    independently sourced (Rosstat shadow estimates / IMF / CBR / customs
+    data / Yale CELI tracker / FRED) capturing different channels:
+    GDP shortfall vs forecast, oil-revenue rerouting, ruble path, trade
+    re-routing, technology-import collapse, fiscal-buffer drawdown.
+  test: russia_sanctions_2022_2025_multi_metric
+  threshold: ">=4/6 supports; <=2/6 refutes"
+canonical_metrics:
+  - metric_id: gdp_shortfall_vs_march2022_forecast
+    description: Cumulative real GDP gap 2022-2024 vs IMF March 2022 forecast (which projected -8.5% 2022, -2.3% 2023).
+    threshold: "actual cumulative 2022-2024 GDP within +/- 4pp of MARCH-2022 IMF projection (i.e., damage materialised meaningfully but bounded)"
+    window: "2022-01 to 2024-12"
+    source: "imf:NGDP_RPCH"
+    independence_justification: Aggregate growth metric tests the central "milder-than-predicted" claim against published forecast.
+  - metric_id: oil_revenue_rerouting_china_india_share
+    description: Combined share of Russian seaborne crude exports going to China + India by 2024 vs 2021 baseline.
+    threshold: ">=70% of seaborne crude exports to CHN+IND by 2024 (vs ~30% in 2021)"
+    window: "2022-01 to 2024-12"
+    source: "owid:russian_oil_exports_destination"
+    independence_justification: Trade-flow metric independent of GDP measurement; tests rerouting-not-cessation channel.
+  - metric_id: ruble_stabilisation_post_initial_collapse
+    description: RUB/USD by 2024-Q4 vs 2022-03 trough (peak depreciation).
+    threshold: "RUB/USD by 2024-Q4 within 30% of 2021 baseline (i.e., partial recovery from 2022-03 trough but not full retracement)"
+    window: "2021-12 to 2024-12"
+    source: "fred:DEXRUUS"
+    independence_justification: FX rate is market-determined; capital-controls + current-account dynamics combine here.
+  - metric_id: technology_import_collapse
+    description: Russian semiconductor + machine-tool imports from G7 countries 2024 vs 2021 baseline.
+    threshold: ">=50% decline in tech-imports from G7 by 2024 vs 2021"
+    window: "2022-01 to 2024-12"
+    source: "world_bank_wdi:NE.IMP.GNFS.KD"
+    independence_justification: Tests the binding-channel claim (technology) where sanctions worked even where macro effects were small.
+  - metric_id: fiscal_buffer_nwf_drawdown
+    description: National Wealth Fund (liquid assets) drawdown 2022-Q1 to 2024-Q4.
+    threshold: ">40% decline in liquid NWF assets over the window"
+    window: "2022-01 to 2024-12"
+    source: "cbr:nwf_liquid_assets"
+    independence_justification: Stock-flow consistency on fiscal buffer running out — orthogonal to GDP/FX flows.
+  - metric_id: third_country_intermediation_turkey_uae
+    description: Russia trade with Turkey + UAE + Kazakhstan combined growth 2022-2024 vs 2021.
+    threshold: ">=50% cumulative trade increase with TUR+ARE+KAZ combined 2022-2024 vs 2021 baseline"
+    window: "2022-01 to 2024-12"
+    source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+    independence_justification: Third-country-intermediation channel; distinct from CHN/IND oil rerouting.
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 4
+  refute_threshold: 2
+scope:
+  period: [2022, 2025]
+  countries: [RUS]
+  outcome_dim: [gdp_growth, trade_liberalisation, capital_flows, currency_purchasing_power]
+  policy_family: [trade_policy, monetary_policy, exchange_rate_regime]
+  treatment_tags: [russia_sanctions_2022, g7_oil_price_cap_2022, swift_disconnect_2022, fx_reserve_freeze_2022, technology_export_controls_2022]
+sample:
+  countries: [RUS]
+  period: [2018, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "primary window 2022-Q1 onward; pre-period 2018-2021 baseline"
+    - "Rosstat data flagged for selection bias post-2022; cross-check with IMF, OECD, CBR independent sources"
+variables:
+  outcome:
+    - name: real_gdp_growth_yoy
+      source: "imf:NGDP_RPCH; world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: pct_change_yoy
+    - name: rub_usd_exchange_rate
+      source: "fred:DEXRUUS"
+      transformation: log
+    - name: cpi_inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: pct_change_yoy
+    - name: cbr_policy_rate
+      source: "cbr:key_rate"
+      transformation: level
+    - name: trade_partner_shares
+      source: "world_bank_wdi:TX.VAL.MRCH.HI.ZS"
+      transformation: level_pct
+  treatment:
+    - name: g7_sanctions_indicator
+      source: "constructed: 1 from 2022-02-24 onward; oil price cap from 2022-12-05"
+      transformation: indicator
+    - name: oil_export_destination_china_india
+      source: "owid:russian_oil_exports_destination"
+      transformation: level_pct
+  controls:
+    - name: oil_price_brent
+      source: "imf_pcps:POILBRE"
+      transformation: log
+    - name: oil_price_urals_discount
+      source: "owid:urals_brent_spread"
+      transformation: level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >-
+    Single-country canonical case. Cross-source measurement essential
+    given Rosstat reporting concerns post-2022. Multi-metric design
+    captures channel decomposition (GDP, trade rerouting, FX, tech,
+    fiscal buffer, third-country intermediation) rather than single
+    coefficient.
