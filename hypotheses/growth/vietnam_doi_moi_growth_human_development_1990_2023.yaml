@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vietnam_doi_moi_growth_human_development_1990_2023
+version: 1
+status: pre_registered
+topic: growth
+claim: >
+  Vietnam's post-Doi Moi development path from 1990 to 2023 combined rapid
+  real income growth, human-development gains, trade integration, and a
+  labour-market shift toward services. The narrow test is whether Vietnam
+  clears at least three of four independent outcome thresholds: average real
+  GDP per-capita growth of at least 4% per year, at least a 60% decline in
+  under-5 mortality, trade openness above 150% of GDP, and services employment
+  reaching at least 35% of total employment.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries: [VNM]
+  period: [1990, 2023]
+  temporal_structure: time_series
+canonical_metrics:
+  - metric_id: real_gdp_pc_growth_fast
+    description: Vietnam average annual real GDP per-capita growth
+    threshold: "average annual growth >= 4%"
+    window: "1990-2023"
+    source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+    direction: supports_claim
+    independence_justification: Income-growth outcome measured separately from health and sectoral composition.
+  - metric_id: under5_mortality_decline
+    description: Vietnam under-5 mortality rate decline
+    threshold: ">= 60% decline"
+    window: "1990-2023"
+    source: "world_bank_wdi:SH.DYN.MORT"
+    direction: supports_claim
+    independence_justification: Health outcome independent of GDP accounting.
+  - metric_id: trade_openness_high
+    description: Trade as a share of GDP reached high integration levels
+    threshold: ">= 150% during 2022"
+    window: "2022"
+    source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+    direction: supports_claim
+    independence_justification: External integration channel measured from national accounts trade flows.
+  - metric_id: services_employment_shift
+    description: Services share of total employment reached a large minority of employment
+    threshold: ">= 35% during 2023"
+    window: "2023"
+    source: "world_bank_wdi:SL.SRV.EMPL.ZS"
+    direction: supports_claim
+    independence_justification: Labour-market composition outcome independent of trade and health metrics.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case checklist over WDI series already in the vintage store.
+falsification:
+  rule: >
+    Evaluate each canonical metric against its pre-registered WDI source,
+    window, and threshold. The hypothesis is SUPPORTED if at least 3 of 4
+    metrics are MET, REFUTED if at most 1 metric is MET after all available
+    data are evaluated, and otherwise INCONCLUSIVE.
+  test: multi_metric_checklist_development_path
+  threshold: "MET >= 3 of 4; REFUTE when confirmed MET <= 1 with no pending path to support"
+variables:
+  outcome:
+    - name: real_gdp_pc_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: annual_mean
+    - name: under5_mortality
+      source: "world_bank_wdi:SH.DYN.MORT"
+      transformation: peak_to_trough_decline
+    - name: trade_share_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: services_employment_share
+      source: "world_bank_wdi:SL.SRV.EMPL.ZS"
+      transformation: level
+prior_confidence: 0.84
+disclosure: >
+  Author prior expects Vietnam to clear the checklist; the test is deliberately
+  outcome-level and does not attribute causality among trade reform, state
+  capacity, demographics, or global supply-chain relocation.
+steelman: hypotheses/steelman/vietnam_doi_moi_growth_human_development_1990_2023.md
+scope:
+  period: [1990, 2023]
+  countries: [VNM]
+  outcome_dim: [gdp_growth, life_expectancy_health, trade_liberalisation, employment_labour]
+  policy_family: [trade_policy, industrial_policy, institutional_reform]
+  treatment_tags: [vietnam_doi_moi, vietnam_export_integration, structural_transformation]
