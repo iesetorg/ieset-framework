@@ -1,14 +1,14 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome or no treatment variable in spec",
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient observations after listwise deletion (0)",
   "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome or no treatment variable in spec",
+  "verdict_reason": "insufficient observations after listwise deletion (0)",
   "hypothesis_id": "post_covid_inflation_episode_supply_vs_demand_decomposition",
   "template": "panel_fe_decomposition",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "Run Bernanke-Blanchard 2023 structural decomposition on 7 OECD economies (USA, GBR, DEU, FRA, ITA, ESP, CAN) for 2021-Q1 to 2024-Q4 inflation episode. Decompose cumulative CPI deviation from 2% target into (a) supply-shock channel (energy + supply-chain + COVID labour constraints), (b) demand-shock channel (fiscal-impulse + monetary accommodation), (c) wage-markup channel, (d) inflation-expectations channel. SUPPORTED if cross-country median supply-share is in [50%, 70%] AND demand-share is in [30%, 50%], with US specifically showing demand-share >=40%. REFUTED if median supply-share <30% (pure-monetarist case) OR median supply-share >85% (pure-supply-shock case).",
   "falsification_test_text": "oecd_post_covid_inflation_decomposition_2021_2024",
   "estimate": {
-    "error": "no outcome or no treatment variable in spec"
+    "error": "insufficient observations after listwise deletion (0)"
   },
   "data_status": {
     "variables_loaded": [
@@ -27,26 +27,73 @@
         "n_rows": 70
       },
       {
+        "role": "outcome",
+        "name": "ppi_yoy",
+        "source": "fred:PPIACO",
+        "publisher": "fred",
+        "n_rows": 114
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "ny_fed_global_supply_chain_pressure",
+        "source": "fred:T5YIFR",
+        "publisher": "fred",
+        "n_rows": 24
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "oil_price_brent",
+        "source": "imf_pcps:POILBRE",
+        "publisher": "imf_pcps",
+        "n_rows": 37
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "natural_gas_ttf_europe",
+        "source": "imf_pcps:PNGASEU",
+        "publisher": "imf_pcps",
+        "n_rows": 37
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "cbo_fiscal_impulse",
+        "source": "fred:FYFSGDA188S",
+        "publisher": "fred",
+        "n_rows": 97
+      },
+      {
         "role": "controls",
         "name": "usd_broad_index",
         "source": "fred:DTWEXBGS",
         "publisher": "fred",
-        "n_rows": 21
-      }
-    ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "ppi_yoy",
-        "source": "fred:PPIACO"
+        "n_rows": 140
       },
       {
         "role": "controls",
         "name": "long_term_inflation_expectations_5y5y",
-        "source": "fred:T5YIFR"
+        "source": "fred:T5YIFR",
+        "publisher": "fred",
+        "n_rows": 168
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "decomposition_channels",
+        "name": "shadow_fed_funds_rate",
+        "source": "fred:WUXIASHADOWRATE"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "ecb_policy_rate",
+        "source": "ecb:FM.B.U2.EUR.4F.KR.MRR_FR.LEV"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "covid_labour_supply_shock",
+        "source": "constructed: peak-to-recovery LFPR gap by country"
       }
     ]
   },
-  "run_utc": "2026-04-30T08:43:13+00:00",
+  "run_utc": "2026-05-01T08:59:49+00:00",
   "runner": "scripts/run_panel_fe.py"
 }

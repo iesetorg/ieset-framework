@@ -2,11 +2,11 @@
 
 **Verdict:** inconclusive (data gaps)
 
-**Reason:** 0 metrics met, 5 pending; 4 more need resolution
+**Reason:** 1 metrics met, 4 pending; 3 more need resolution
 
 Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 0 MET · 0 NOT_MET · 2 PENDING_DATA · 3 PENDING_EVAL
+**Counts:** 1 MET · 0 NOT_MET · 3 PENDING_DATA · 1 PENDING_EVAL
 
 **Primary country:** USA
 
@@ -15,10 +15,10 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
 | 1 | real_gdp_recovery_18mo | PENDING_DATA |  | `real_gdp(1923) >= real_gdp(1919)` | No usable vintage for: maddison:gdp_per_capita_2011usd |
-| 2 | industrial_production_v_recovery | PENDING_EVAL |  | `>= 25% drop AND recovery to pre-recession peak within 24 months` | Non-tidy (needs custom parser): fred:INDPRO |
+| 2 | industrial_production_v_recovery | MET | 34.1 (1921) [peak_to_trough_pct_decline] | `>= 25% drop AND recovery to pre-recession peak within 24 months` |  |
 | 3 | unemployment_peak_and_recovery | PENDING_DATA |  | `peak unemployment >= 10% AND unemployment(1923) <= 5%` | No usable vintage for: academic:lebergott_1957_unemployment_series |
-| 4 | federal_spending_cut_during_recession | PENDING_EVAL |  | `federal_outlays_share_gdp(1922) <= 0.7 * federal_outlays_share_gdp(1920)` | Non-tidy (needs custom parser): fred:FYONGDA188S |
-| 5 | fed_did_not_loosen_during_contraction_1920 | PENDING_EVAL |  | `fed_discount_rate average 1920 >= fed_discount_rate average 1919` | Non-tidy (needs custom parser): fred:M13009USM156NNBR |
+| 4 | federal_spending_cut_during_recession | PENDING_DATA |  | `federal_outlays_share_gdp(1922) <= 0.7 * federal_outlays_share_gdp(1920)` | No USA observations in window 1920-1922 |
+| 5 | fed_did_not_loosen_during_contraction_1920 | PENDING_EVAL | 29.5 (1919) [peak_to_trough_pct_decline] | `fed_discount_rate average 1920 >= fed_discount_rate average 1919` | threshold expression unparseable by regex |
 
 ## Claim
 
@@ -26,7 +26,7 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 2 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 3 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+Verdict is **inconclusive (data gaps)** — 3 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 1 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

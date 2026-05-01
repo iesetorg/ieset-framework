@@ -20,8 +20,8 @@ statistical sources; NBER itself releases the database without restriction).
 from __future__ import annotations
 
 import io
-from dataclasses import replace
 from datetime import datetime
+import re
 from typing import Any
 
 import pandas as pd
@@ -35,6 +35,7 @@ LICENSE = "public_domain"
 METHODOLOGY_URL = "https://www.nber.org/research/data/nber-macrohistory-database"
 NBER_CONTENTS = "https://data.nber.org/databases/macrohistory/contents/"
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh) Safari/605.1.15"}
+FRED_PUBLIC_CSV = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 
 
 # id -> spec dict.
@@ -68,10 +69,9 @@ SUPPORTED: dict[str, dict[str, Any]] = {
         "frequency": "monthly",
     },
     "nber_us_freight_carloadings_1918_1947": {
-        # No stable FRED mirror; use NBER direct CSV.
-        "nber_csv": "https://data.nber.org/databases/macrohistory/rectdata/03/m03048a.dat",
-        "description": "US revenue freight carloadings, NBER, 1918-1947",
-        "units": "thousands of cars",
+        "fred_id": "M03002USM544NNBR",
+        "description": "US freight cars loaded, NBER, 1918-1973",
+        "units": "thousands of cars per week",
         "frequency": "monthly",
     },
 }
@@ -79,6 +79,9 @@ SUPPORTED: dict[str, dict[str, Any]] = {
 
 class NberError(RuntimeError):
     pass
+
+
+_NUMBER_RE = re.compile(r"[-+]?\d+(?:\.\d+)?")
 
 
 def supported_series() -> list[str]:
@@ -92,7 +95,12 @@ def _fetch_via_fred(series_id: str, fred_id: str, vintage_utc: datetime | None) 
     cache) but additionally write a copy under ``vintages/nber_historical/``
     keyed by the NBER-namespaced series_id so manifests are coherent.
     """
-    fr = fred_fetcher.fetch(fred_id, vintage_utc=vintage_utc)
+    try:
+        fr = fred_fetcher.fetch(fred_id, vintage_utc=vintage_utc)
+    except fred_fetcher.FredError as e:
+        if "FRED_API_KEY not set" not in str(e) or vintage_utc is not None:
+            raise
+        return _fetch_via_fred_public_csv(series_id, fred_id)
 
     # Re-emit a vintage under the nber_historical publisher. Use the same
     # frame loaded back from FRED's parquet so SHA matches.
@@ -134,6 +142,50 @@ def _fetch_via_fred(series_id: str, fred_id: str, vintage_utc: datetime | None) 
     )
 
 
+def _fetch_via_fred_public_csv(series_id: str, fred_id: str) -> FetchResult:
+    """Fallback for public, current-vintage pulls when no FRED API key is set."""
+    fetch_ts = utc_now()
+    r = requests.get(FRED_PUBLIC_CSV, params={"id": fred_id}, headers=UA, timeout=60)
+    r.raise_for_status()
+
+    df = pd.read_csv(io.StringIO(r.text))
+    if list(df.columns[:2]) != ["DATE", fred_id]:
+        raise NberError(f"Unexpected public FRED CSV schema for {fred_id}: {list(df.columns)}")
+    df = df.rename(columns={"DATE": "date", fred_id: "value"})
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    df = df.dropna(subset=["date", "value"]).sort_values("date").reset_index(drop=True)
+    df.insert(0, "country_iso3", "USA")
+    df["year"] = df["date"].dt.year.astype("Int64")
+
+    path_out, sha = write_vintage(
+        publisher=PUBLISHER,
+        series_id=series_id,
+        frame=df,
+        fetch_utc=fetch_ts,
+    )
+
+    return FetchResult(
+        publisher=PUBLISHER,
+        series_id=series_id,
+        source_url=f"{FRED_PUBLIC_CSV}?id={fred_id}",
+        methodology_url=METHODOLOGY_URL,
+        license=LICENSE,
+        fetch_utc=fetch_ts,
+        rows=len(df),
+        frequency="monthly",
+        units="series units as reported by FRED public CSV mirror",
+        currency=None,
+        start_date=df["date"].min().date().isoformat() if len(df) else None,
+        end_date=df["date"].max().date().isoformat() if len(df) else None,
+        sha256=sha,
+        parquet_path=path_out,
+        extra={
+            "fred_mirror_id": fred_id,
+            "transport": "fred_public_csv",
+        },
+    )
+
 def _fetch_nber_direct(series_id: str, url: str, spec: dict[str, Any]) -> FetchResult:
     """Pull a raw NBER macrohistory rectdata file (.dat or .csv).
 
@@ -148,33 +200,53 @@ def _fetch_nber_direct(series_id: str, url: str, spec: dict[str, Any]) -> FetchR
     r.raise_for_status()
     text = r.text
 
+    freq = spec.get("frequency", "unknown")
+    tokens = _NUMBER_RE.findall(text)
     rows: list[dict[str, Any]] = []
-    for raw in text.splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        parts = line.split()
-        if len(parts) < 2:
-            continue
-        try:
-            t = float(parts[0])
-            v = float(parts[1])
-        except ValueError:
-            continue
-        year = int(t)
-        frac = t - year
-        # NBER monthly fraction: .000=Jan, .083=Feb, ..., .917=Dec
-        month = min(12, max(1, int(round(frac * 12)) + 1)) if frac > 0 else 1
-        rows.append({
-            "country_iso3": "USA",
-            "year": year,
-            "month": month,
-            "date_fraction": t,
-            "value": v,
-        })
+
+    if freq in {"monthly", "quarterly"} and len(tokens) % 3 == 0:
+        subperiods = [int(float(tok)) for tok in tokens[1::3]]
+        expected_max = 12 if freq == "monthly" else 4
+        if subperiods and all(1 <= sp <= expected_max for sp in subperiods):
+            for i in range(0, len(tokens), 3):
+                year = int(float(tokens[i]))
+                subperiod = int(float(tokens[i + 1]))
+                value = float(tokens[i + 2])
+                month = subperiod if freq == "monthly" else (subperiod - 1) * 3 + 1
+                rows.append({
+                    "country_iso3": "USA",
+                    "year": year,
+                    "month": month,
+                    "subperiod": subperiod,
+                    "value": value,
+                })
+
+    if not rows and len(tokens) % 2 == 0:
+        for i in range(0, len(tokens), 2):
+            t = float(tokens[i])
+            value = float(tokens[i + 1])
+            year = int(t)
+            frac = t - year
+            if freq == "monthly":
+                month = min(12, max(1, int(round(frac * 12)) + 1)) if frac > 0 else 1
+            elif freq == "quarterly":
+                quarter = min(4, max(1, int(round(frac * 4)) + 1)) if frac > 0 else 1
+                month = (quarter - 1) * 3 + 1
+            else:
+                month = 1
+            rows.append({
+                "country_iso3": "USA",
+                "year": year,
+                "month": month,
+                "date_fraction": t,
+                "value": value,
+            })
 
     if not rows:
-        raise NberError(f"NBER rectdata at {url} parsed zero observations")
+        raise NberError(
+            f"NBER rectdata at {url} parsed zero observations "
+            f"(frequency={freq}, tokens={len(tokens)})"
+        )
 
     df = pd.DataFrame(rows)
     df["date"] = pd.to_datetime(

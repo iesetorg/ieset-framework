@@ -95,6 +95,12 @@ SUPPORTED: dict[str, dict[str, Any]] = {
     },
 }
 
+SERIES_ALIASES = {
+    "capacity": "installed_capacity_renewable",
+    "solar_pv_costs": "lcoe_solar_pv",
+    "wind_lcoe": "lcoe_wind_onshore",
+}
+
 
 class IrenaError(RuntimeError):
     pass
@@ -316,6 +322,7 @@ def fetch(
     *,
     vintage_utc: datetime | None = None,
 ) -> FetchResult:
+    series_id = SERIES_ALIASES.get(series_id, series_id)
     if series_id not in SUPPORTED:
         raise IrenaError(
             f"unsupported IRENA series_id {series_id!r}; "

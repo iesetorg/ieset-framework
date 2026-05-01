@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cuba_health_outcomes_vs_advanced_market_peers
+version: 1
+status: candidate
+topic: healthcare
+claim: If Cuba's socialist health-system superiority story really travels beyond a friendly regional pool, Cuba should remain at least mid-pack against a small advanced-market subgroup of non-socialist health performers by 2000; if it ranks near the bottom even after adjusting expectations for lower income, the universal version of the Marxist-Leninist claim is overstated.
+notes: >-
+  This is the intentionally mean companion to both the LATAM peer spec and the
+  broader non-LatAm market-pool spec. It isolates a rich-country subgroup that is
+  often invoked as evidence that good health systems do not require socialism:
+  Spain, Portugal, Greece, Israel, Japan, and South Korea. The question is not
+  whether Cuba matches Japan on income or technology, but whether it remains in the
+  competitive upper half on the two flagship health metrics or instead falls toward
+  the bottom once the pool contains only advanced-market health performers.
+prior_confidence: 0.22
+disclosure: >-
+  This spec is explicitly harsher than the broad non-LatAm pool and therefore risks
+  becoming a rhetorical stress test rather than a neutral first-pass comparator.
+  That is acceptable only because it is framed as a companion, not a silent rewrite
+  of the easier Cuba tests, and because the thresholds are simple ex-ante rank gates
+  rather than tuned to the observed data.
+falsification:
+  rule: >-
+    PRIMARY 1 (life expectancy rank, dispositive): within the fixed 7-country
+    subgroup {CUB, ESP, PRT, GRC, ISR, JPN, KOR}, Cuba's life expectancy at birth
+    in 2000 must rank in the upper half of the pool (rank <= 4 of 7, rank 1 = best).
+    PRIMARY 2 (infant mortality rank, dispositive): Cuba's infant mortality rate in
+    2000 must also rank in the upper half of the same pool (rank <= 4 of 7, lower =
+    better). PRIMARY 3 (health-vs-income overperformance): Cuba's mean health rank
+    across {life expectancy, infant mortality} in 2000 must beat its GDP-per-capita
+    rank by at least 1 place. SUPPORTED if all three primaries hold. PARTIAL if
+    exactly two hold. REFUTED if zero or one holds. INFORMATIVE: report 1960 ranks
+    and 1991-2000 post-Soviet-subsidy trajectory. METHOD_VALID: requires coverage for
+    Cuba plus all 6 non-Cuban comparators at the 2000 endpoint for life expectancy,
+    infant mortality, and income-rank context.
+  test: cuba_advanced_market_subgroup_rank_2000
+  threshold: >-
+    PRIMARY: LE_rank_CUB_2000 <= 4 of 7 AND IMR_rank_CUB_2000 <= 4 of 7
+    AND income_rank_CUB_2000 - mean(LE_rank_CUB_2000, IMR_rank_CUB_2000) >= 1
+evidence_type: associational
+sample:
+  countries: [CUB, ESP, PRT, GRC, ISR, JPN, KOR]
+  period: [1960, 2000]
+  temporal_structure: panel
+  exclusion_rules:
+    - "subgroup fixed ex ante to advanced-market health performers outside Latin America"
+    - "exclude poorer developing comparators so Cuba cannot clear the bar simply by outranking lower-income states"
+    - "report Soviet-subsidy caveat explicitly because the subgroup test is even less causal than the broad pool"
+variables:
+  outcome:
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+      notes: "WDI life expectancy at birth, total years."
+    - name: infant_mortality_per_1000
+      source: "world_bank_wdi:SP.DYN.IMRT.IN"
+      transformation: level
+      notes: "WDI infant mortality per 1,000 live births; lower is better."
+  treatment:
+    - name: cuba_socialist_indicator
+      source: "constructed: indicator = 1 for CUB; 0 for the advanced-market comparator subgroup."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita_maddison
+      source: "owid:gdp-per-capita-maddison-2020"
+      transformation: log
+      notes: "Income-rank context only. WDI PPP-per-capita endpoint is missing for Cuba in current vintages."
+estimator:
+  template: descriptive
+  notes: >-
+    Descriptive rich-comparator subgroup test. This is not a causal socialism-vs-
+    capitalism design; it is a credibility stress test of the stronger rhetorical
+    claim that Cuba's health outcomes remained competitive even against high-
+    performing market economies. The signal is rank position, not a structural
+    estimate.
+linked_hypotheses:
+  - cuba_health_outcomes_vs_latam_peers
+  - cuba_health_outcomes_vs_non_latam_market_peers
+  - cuba_special_period_resilience
+scope:
+  period: [1960, 2000]
+  countries: [CUB, ESP, PRT, GRC, ISR, JPN, KOR]
+  outcome_dim: [life_expectancy_health, welfare_state]
+  policy_family: [welfare_architecture, privatisation_nationalisation]
+  treatment_tags: [cuban_revolution_1959, cuba_socialist_health_system, us_cuba_embargo]
+steelman: hypotheses/steelman/cuba_health_outcomes_vs_advanced_market_peers.md

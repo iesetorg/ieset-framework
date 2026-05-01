@@ -48,7 +48,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_panel_fe import (
     is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, load_variable, transform, parse_source,
-    infer_claim_direction, build_panel,
+    infer_claim_direction, build_panel, first_loaded_var,
+    filter_sample,
+    should_persist_preflight_inconclusive, bump_bulk_run_count,
+    print_bulk_run_summary,
 )
 
 
@@ -343,7 +346,11 @@ def list_descriptive_specs() -> list[str]:
     ]
 
 
-def run_one(hid: str, force: bool = False) -> str:
+def run_one(
+    hid: str,
+    force: bool = False,
+    persist_preflight_inconclusive: bool = True,
+) -> str:
     if not force and has_committed_verdict(hid):
         return f"  · {hid}: skipped (committed verdict already on disk)"
     found = load_spec(hid)
@@ -363,8 +370,23 @@ def run_one(hid: str, force: bool = False) -> str:
             "(replace falsification.rule with a dispositive threshold AND "
             "document the sharpening in methodology_note) before running."
         )
-        write_outputs(hid, spec, {"variables_loaded": [], "variables_missing": []}, {"error": reason}, {}, verdict, reason)
-        return f"  ⚠ {hid}: {verdict} (stub rule, refused to grade)"
+        persisted = should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        )
+        if persisted:
+            write_outputs(
+                hid,
+                spec,
+                {"variables_loaded": [], "variables_missing": []},
+                {"error": reason},
+                {},
+                verdict,
+                reason,
+            )
+        suffix = " (stub rule, refused to grade)"
+        if not persisted:
+            suffix += " [artifact skipped]"
+        return f"  ⚠ {hid}: {verdict}{suffix}"
 
     panel, status = build_panel(spec)
     var_blocks = spec.get("variables") or {}
@@ -372,15 +394,22 @@ def run_one(hid: str, force: bool = False) -> str:
     if not outcome_items:
         verdict = "INCONCLUSIVE_DATA_PENDING"
         reason = "no outcome variable in spec"
-        write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason)
+        if should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        ):
+            write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason)
         return f"  ⚠ {hid}: {verdict}"
-    outcome_name = outcome_items[0]["name"]
-    if outcome_name not in panel.columns:
+    panel_filt = filter_sample(panel, spec)
+    outcome_name = first_loaded_var(outcome_items, panel_filt)
+    if outcome_name is None:
         verdict = "INCONCLUSIVE_DATA_PENDING"
         missing = [v["source"] for v in status["variables_missing"]
                    if v["role"] == "outcome"]
-        reason = f"outcome '{outcome_name}' not loaded; missing: {missing}"
-        write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason)
+        reason = f"no outcome variable loaded; missing: {missing}"
+        if should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        ):
+            write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason)
         return f"  ⚠ {hid}: {verdict}"
 
     sample = spec.get("sample") or {}
@@ -393,21 +422,37 @@ def run_one(hid: str, force: bool = False) -> str:
         (spec.get("falsification") or {}).get("test", "")
     )
     if len(countries) == 2:
-        comp = bilateral_comparison(panel, outcome_name, countries, period)
+        comp = bilateral_comparison(panel_filt, outcome_name, countries, period)
     elif len(countries) == 1:
         cut = find_cut_year(spec)
         if cut is None:
             cut = (period[0] + period[1]) // 2 if len(period) == 2 and all(period) else None
         if cut is None:
-            comp = {"error": "couldn't infer pre/post cut year"}
+            verdict = "INCONCLUSIVE_DATA_PENDING"
+            reason = "couldn't infer pre/post cut year"
+            if should_persist_preflight_inconclusive(
+                reason, persist_preflight_inconclusive
+            ):
+                write_outputs(
+                    hid, spec, status, {"error": reason}, {}, verdict, reason
+                )
+            return f"  ⚠ {hid}: {verdict}"
         else:
-            comp = pre_post_comparison(panel, outcome_name, countries[0], cut, period)
+            comp = pre_post_comparison(panel_filt, outcome_name, countries[0], cut, period)
     else:
         if not countries:
-            comp = {"error": "no countries in sample"}
+            verdict = "INCONCLUSIVE_DATA_PENDING"
+            reason = "no countries in sample"
+            if should_persist_preflight_inconclusive(
+                reason, persist_preflight_inconclusive
+            ):
+                write_outputs(
+                    hid, spec, status, {"error": reason}, {}, verdict, reason
+                )
+            return f"  ⚠ {hid}: {verdict}"
         else:
             # First country = treatment; rest = donor pool.
-            comp = panel_summary(panel, outcome_name, countries[0],
+            comp = panel_summary(panel_filt, outcome_name, countries[0],
                                  countries[1:], period)
 
     claim_dir = infer_claim_direction(spec)
@@ -425,20 +470,43 @@ def main() -> int:
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--force", action="store_true",
                         help="Overwrite existing committed verdicts.")
+    parser.add_argument(
+        "--write-preflight-inconclusive",
+        action="store_true",
+        help="Persist obvious preflight INCONCLUSIVE artifacts during bulk runs.",
+    )
     args = parser.parse_args()
+    persist_preflight = args.write_preflight_inconclusive or not args.all
     if args.all:
         ids = list_descriptive_specs()
+        counts: dict[str, int] = {}
         print(f"Running {len(ids)} descriptive specs…")
         for hid in ids:
             try:
-                print(run_one(hid, force=args.force))
+                msg = (
+                    run_one(
+                        hid,
+                        force=args.force,
+                        persist_preflight_inconclusive=persist_preflight,
+                    )
+                )
+                print(msg)
+                bump_bulk_run_count(counts, msg)
             except Exception as exc:
                 print(f"  ✗ {hid}: runner crashed — {exc}")
+                counts["crashed"] = counts.get("crashed", 0) + 1
                 traceback.print_exc()
+        print_bulk_run_summary("descriptive", counts)
         return 0
     if not args.hypothesis_id:
         parser.error("Pass <hypothesis_id> or --all.")
-    print(run_one(args.hypothesis_id, force=args.force))
+    print(
+        run_one(
+            args.hypothesis_id,
+            force=args.force,
+            persist_preflight_inconclusive=persist_preflight,
+        )
+    )
     return 0
 
 

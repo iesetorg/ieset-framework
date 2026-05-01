@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cuba_health_outcomes_vs_non_latam_market_peers
+version: 1
+status: candidate
+topic: healthcare
+claim: Cuba's life expectancy and infant mortality outcomes by 2000 were strong enough to rank competitively not just against Latin American peers, but against a broad ex-ante fixed pool of non-Latin-American market economies; if Cuba fails that harder comparison, the "socialist health-system superiority" story is more regional than universal.
+notes: >-
+  Harder companion to `cuba_health_outcomes_vs_latam_peers`. The LATAM-only pool
+  is informative but friendly: Cuba started ahead regionally and some of the best
+  non-socialist health performers (Southern Europe, East Asia) sit outside that
+  frame. This spec widens the test to a broad non-LatAm market-economy pool and
+  asks where Cuba actually ranks, both in raw health outcomes and relative to its
+  income rank. The question is not "did Cuba beat Japan or Spain on every metric,"
+  but whether Cuba's health ranking materially outran what its income position
+  within a broad market comparator pool would predict.
+prior_confidence: 0.4
+disclosure: >-
+  Author's market-liberal priors are skeptical of socialist-exceptionalism claims
+  and may overweight the significance of advanced-market comparators such as Spain,
+  Portugal, Japan, and Korea. That bias cuts against easy validation. The companion
+  spec is intentionally harder than the LATAM pool and therefore risks becoming a
+  "raise the bar until the claim fails" exercise unless the thresholds are pinned
+  ex ante and interpreted carefully.
+falsification:
+  rule: >-
+    PRIMARY 1 (life expectancy rank, dispositive): within the fixed 21-country
+    pool {CUB, ESP, PRT, GRC, TUR, ISR, JPN, KOR, THA, MYS, IDN, PHL, IND, LKA,
+    PAK, BGD, MAR, TUN, DZA, EGY, JOR}, Cuba's life expectancy at birth in 2000
+    must rank in the top third of the pool (rank <= 7 of 21, rank 1 = best).
+    PRIMARY 2 (infant mortality rank, dispositive): Cuba's infant mortality rate
+    in 2000 must rank in the top quartile of the same pool (rank <= 5 of 21,
+    lower = better). PRIMARY 3 (health-vs-income overperformance): Cuba's mean
+    health rank across {life expectancy, infant mortality} in 2000 must beat its
+    GDP-per-capita rank by at least 5 places. SUPPORTED if all three primaries
+    hold. PARTIAL if exactly two hold. REFUTED if zero or one holds. INFORMATIVE:
+    report 1960 ranks, 1991-2000 post-Soviet-subsidy sub-period trajectory, and
+    separate Cuba's standing versus the advanced-market subgroup {ESP, PRT, GRC,
+    ISR, JPN, KOR}. METHOD_VALID: requires coverage for Cuba plus at least 18
+    of the 20 non-Cuban comparators at the 2000 endpoint for life expectancy,
+    infant mortality, and income-rank context.
+  test: cuba_non_latam_market_pool_rank_and_income_gap_2000
+  threshold: >-
+    PRIMARY: LE_rank_CUB_2000 <= 7 of 21 AND IMR_rank_CUB_2000 <= 5 of 21
+    AND income_rank_CUB_2000 - mean(LE_rank_CUB_2000, IMR_rank_CUB_2000) >= 5
+evidence_type: associational
+sample:
+  countries: [CUB, ESP, PRT, GRC, TUR, ISR, JPN, KOR, THA, MYS, IDN, PHL, IND, LKA, PAK, BGD, MAR, TUN, DZA, EGY, JOR]
+  period: [1960, 2000]
+  temporal_structure: panel
+  exclusion_rules:
+    - "pool fixed ex ante to non-LatAm market economies spanning Southern Europe, East/Southeast Asia, South Asia, and MENA"
+    - "exclude socialist / party-state comparators (e.g. CHN, VNM, PRK) because the test is explicitly Cuba vs market-economy comparators"
+    - "report WHO/PAHO independent cross-check where available, but WDI is the main long-window source because WHO independent series do not cover the full 1960-2000 span"
+variables:
+  outcome:
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: level
+      notes: "WDI life expectancy at birth, total years."
+    - name: infant_mortality_per_1000
+      source: "world_bank_wdi:SP.DYN.IMRT.IN"
+      transformation: level
+      notes: "WDI infant mortality per 1,000 live births; lower is better."
+    - name: life_expectancy_who
+      source: "who_gho:life_expectancy_at_birth"
+      transformation: level
+      notes: "Independent WHO cross-check where endpoint overlap exists."
+  treatment:
+    - name: cuba_socialist_indicator
+      source: "constructed: indicator = 1 for CUB; 0 for the non-LatAm market comparator pool."
+      transformation: indicator
+  controls:
+    - name: log_gdp_per_capita_maddison
+      source: "owid:gdp-per-capita-maddison-2020"
+      transformation: log
+      notes: "Income-rank context only. Chosen because WDI PPP-per-capita does not carry a usable Cuba 2000 endpoint in current vintages."
+    - name: log_health_expenditure_per_capita
+      source: "world_bank_wdi:SH.XPD.CHEX.PC.CD"
+      transformation: log
+      notes: "Informative only; not part of the dispositive rank test."
+estimator:
+  template: descriptive
+  notes: >-
+    Descriptive rank-table comparison of Cuba against a broad non-LatAm market
+    comparator pool, 1960-2000. Primary statistics are 2000 endpoint ranks on
+    life expectancy, infant mortality, and GDP per capita. The key diagnostic
+    is whether Cuba's health rank materially outruns its income rank inside a pool
+    that includes both developing and advanced market economies. Not causal and not
+    a clean socialism-vs-capitalism estimator: Soviet subsidy, baseline advantage,
+    sanctions, and official-data quality remain confounds. The point is to stress-
+    test how far the Cuban health result travels outside a friendlier regional pool.
+linked_hypotheses:
+  - cuba_health_outcomes_vs_latam_peers
+  - cuba_health_outcomes_vs_advanced_market_peers
+  - cuba_special_period_resilience
+  - cuba_socialist_economy_stagnation_1960_2023
+scope:
+  period: [1960, 2000]
+  countries: [CUB, ESP, PRT, GRC, TUR, ISR, JPN, KOR, THA, MYS, IDN, PHL, IND, LKA, PAK, BGD, MAR, TUN, DZA, EGY, JOR]
+  outcome_dim: [life_expectancy_health, welfare_state]
+  policy_family: [welfare_architecture, privatisation_nationalisation]
+  treatment_tags: [cuban_revolution_1959, cuba_socialist_health_system, us_cuba_embargo]
+steelman: hypotheses/steelman/cuba_health_outcomes_vs_non_latam_market_peers.md
+covers_claims:
+  - position_id: marxist_leninist
+    claim_index: 3
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: "Harder companion to the older LATAM-only Cuba health claim link. Broadens the pool ex ante and directly tests whether Cuba's health rank outruns its income rank outside Latin America."

@@ -17,7 +17,7 @@ Pre-registered rule: SUPPORT if >= 4 of 6 metrics met; REFUTE if <= 2 met (impos
 | 1 | gdp_shortfall_vs_march2022_forecast | PENDING_EVAL |  | `actual cumulative 2022-2024 GDP within +/- 4pp of MARCH-2022 IMF projection (i.e., damage materialised meaningfully but bounded)` | cross-country gap/ratio requires dedicated cross-country evaluator; data present |
 | 2 | oil_revenue_rerouting_china_india_share | PENDING_DATA |  | `>=70% of seaborne crude exports to CHN+IND by 2024 (vs ~30% in 2021)` | No usable vintage for: owid:russian_oil_exports_destination |
 | 3 | ruble_stabilisation_post_initial_collapse | PENDING_DATA |  | `RUB/USD by 2024-Q4 within 30% of 2021 baseline (i.e., partial recovery from 2022-03 trough but not full retracement)` | No usable vintage for: fred:DEXRUUS |
-| 4 | technology_import_collapse | PENDING_DATA |  | `>=50% decline in tech-imports from G7 by 2024 vs 2021` | No usable vintage for: world_bank_wdi:NE.IMP.GNFS.KD |
+| 4 | technology_import_collapse | PENDING_DATA |  | `>=50% decline in tech-imports from G7 by 2024 vs 2021` | No RUS observations in loaded vintages |
 | 5 | fiscal_buffer_nwf_drawdown | PENDING_DATA |  | `>40% decline in liquid NWF assets over the window` | No usable vintage for: cbr:nwf_liquid_assets |
 | 6 | third_country_intermediation_turkey_uae | NOT_MET | 0 (2022) [pct_increase_from_baseline] | `>=50% cumulative trade increase with TUR+ARE+KAZ combined 2022-2024 vs 2021 baseline` |  |
 

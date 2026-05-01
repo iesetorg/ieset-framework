@@ -1,13 +1,67 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient obs (14); LP needs >=50",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "insufficient obs (14); LP needs >=50",
+  "verdict": "PARTIAL \u2014 cumulative_effect=+0.06989, h=5, p_h=0.504 (above \u03b1=0.10)",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "cumulative_effect=+0.06989, h=5, p_h=0.504 (above \u03b1=0.10)",
   "hypothesis_id": "monetary_finance_zlb_no_inflation",
   "template": "local_projections",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "The hypothesis is falsified if any of the following hold: (a) CPI YoY exceeds 3% in any 6-month rolling window during 2008-2014 in USA or Japan or the Eurozone, (b) CPI YoY exceeds 3% in any 6-month window during 2020-2021 in any of the three economies, or (c) Granger causality from central-bank balance sheet to CPI rejects null at p<0.01 with positive coefficient at h=12-24 months on the joint 2008-2021 sample after controlling for output gap and oil prices.",
   "estimate": {
-    "error": "insufficient obs (14); LP needs >=50"
+    "shape": "local_projections",
+    "horizons": [
+      {
+        "horizon": 0,
+        "coefficient": 0.21202542969437632,
+        "std_error": 0.39225991665498083,
+        "p_value": 0.5888365394956334,
+        "n_obs": 84
+      },
+      {
+        "horizon": 1,
+        "coefficient": 0.31782165038926036,
+        "std_error": 0.3810549543799451,
+        "p_value": 0.40424871914664995,
+        "n_obs": 78
+      },
+      {
+        "horizon": 2,
+        "coefficient": 0.09018639237568887,
+        "std_error": 0.4063288046718611,
+        "p_value": 0.8243495225781838,
+        "n_obs": 72
+      },
+      {
+        "horizon": 3,
+        "coefficient": 0.29410697166935823,
+        "std_error": 0.4580339600389447,
+        "p_value": 0.520803484828861,
+        "n_obs": 66
+      },
+      {
+        "horizon": 4,
+        "coefficient": -0.35222049786757,
+        "std_error": 0.8374448436209199,
+        "p_value": 0.674054871223199,
+        "n_obs": 60
+      },
+      {
+        "horizon": 5,
+        "coefficient": -0.49203468716898113,
+        "std_error": 0.7363843182129532,
+        "p_value": 0.504020942277793,
+        "n_obs": 54
+      }
+    ],
+    "cumulative_coefficient": 0.06988525909213261,
+    "horizon_h_coefficient": -0.49203468716898113,
+    "horizon_h_std_error": 0.7363843182129532,
+    "horizon_h_p_value": 0.504020942277793,
+    "max_horizon": 5,
+    "n_countries": 6,
+    "method": "Jord\u00e0 local projections (TWFE, country-clustered)",
+    "dropped_controls_due_to_overlap": [
+      "short_rate"
+    ]
   },
   "data_status": {
     "variables_loaded": [
@@ -15,22 +69,8 @@
         "role": "outcome",
         "name": "cpi_inflation_yoy",
         "source": "fred:CPIAUCSL (USA); fred:JPNCPIALLMINMEI (JPN); ecb:ICP.M.U2.N.000000.4.ANR (EUR aggregate); eurostat:HICP (per-country)",
-        "publisher": "fred",
-        "n_rows": 80
-      },
-      {
-        "role": "outcome",
-        "name": "core_cpi_inflation_yoy",
-        "source": "fred:CPILFESL (USA); boj:core_cpi (JPN); ecb:ICP_core (EUR)",
-        "publisher": "fred",
-        "n_rows": 70
-      },
-      {
-        "role": "treatment",
-        "name": "central_bank_balance_sheet_pct_gdp",
-        "source": "fred:WALCL; fred:GDP (USA); boj:monetary_base; fred:JPNNGDP (JPN); ecb:ILM; ecb:NGDP (EUR)",
-        "publisher": "fred",
-        "n_rows": 25
+        "publisher": "ecb+eurostat",
+        "n_rows": 1229
       },
       {
         "role": "treatment",
@@ -43,22 +83,25 @@
         "role": "controls",
         "name": "short_rate",
         "source": "fred:DFF (USA); ecb:FM (EUR); boj:policy_rate (JPN)",
-        "publisher": "fred",
-        "n_rows": 73
-      },
-      {
-        "role": "controls",
-        "name": "unemployment_rate",
-        "source": "fred:UNRATE (USA); ilostat:unemployment_rate; eurostat:lfsa_urgan",
-        "publisher": "fred",
-        "n_rows": 79
+        "publisher": "ecb",
+        "n_rows": 33
       }
     ],
     "variables_missing": [
       {
         "role": "outcome",
+        "name": "core_cpi_inflation_yoy",
+        "source": "fred:CPILFESL (USA); boj:core_cpi (JPN); ecb:ICP_core (EUR)"
+      },
+      {
+        "role": "outcome",
         "name": "inflation_expectations_5y5y_forward",
         "source": "fred:T5YIFR (USA); ecb:5Y5Y_inflation_swap (EUR)"
+      },
+      {
+        "role": "treatment",
+        "name": "central_bank_balance_sheet_pct_gdp",
+        "source": "fred:WALCL; fred:GDP (USA); boj:monetary_base; fred:JPNNGDP (JPN); ecb:ILM; ecb:NGDP (EUR)"
       },
       {
         "role": "treatment",
@@ -74,9 +117,14 @@
         "role": "controls",
         "name": "oil_price",
         "source": "imf_pcps:POILBRE"
+      },
+      {
+        "role": "controls",
+        "name": "unemployment_rate",
+        "source": "fred:UNRATE (USA); ilostat:unemployment_rate; eurostat:lfsa_urgan"
       }
     ]
   },
-  "run_utc": "2026-04-29T21:54:30+00:00",
+  "run_utc": "2026-04-30T10:51:42+00:00",
   "runner": "scripts/run_local_projections.py"
 }

@@ -16,7 +16,7 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 |---|---|:---:|---:|---|---|
 | 1 | per_capita_growth_acceleration_1949_1957 | MET | 97.8 (1957) [pct_increase_from_baseline] | `>=6.0%/yr` |  |
 | 2 | per_capita_growth_post_gwb_persistence_1958_1965 | MET | 36.3 (1965) [pct_increase_from_baseline] | `>=4.0%/yr` |  |
-| 3 | industrial_production_growth_1958_1965 | PENDING_DATA |  | `>=5.0%/yr` | No usable vintage for: world_bank_wdi:NV.IND.TOTL.KD.ZG |
+| 3 | industrial_production_growth_1958_1965 | PENDING_DATA |  | `>=5.0%/yr` | No DEU observations in window 1958-1965 |
 | 4 | pwt_rgdpna_concordance | MET | 180 (1965) [pct_increase_from_baseline] | `>=0.80 log-pts cumulative` |  |
 | 5 | pre_gwb_to_post_gwb_growth_ratio | MET | 64.3 (1949) [peak_to_trough_pct_decline] | `>=0.50 ratio` |  |
 

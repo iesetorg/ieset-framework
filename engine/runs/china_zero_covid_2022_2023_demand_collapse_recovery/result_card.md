@@ -2,11 +2,11 @@
 
 **Verdict:** inconclusive (data gaps)
 
-**Reason:** 0 metrics met, 6 pending; 4 more need resolution
+**Reason:** 0 metrics met, 5 pending; 4 more need resolution
 
 Pre-registered rule: SUPPORT if >= 4 of 6 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 0 MET · 0 NOT_MET · 4 PENDING_DATA · 2 PENDING_EVAL
+**Counts:** 0 MET · 1 NOT_MET · 3 PENDING_DATA · 2 PENDING_EVAL
 
 **Primary country:** CHN
 
@@ -14,7 +14,7 @@ Pre-registered rule: SUPPORT if >= 4 of 6 metrics met; REFUTE if <= 2 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | shanghai_lockdown_industrial_production_drop_2022q2 | PENDING_DATA |  | `>25% MoM decline in Shanghai industrial production 2022-04 vs 2022-03` | No usable vintage for: world_bank_wdi:NV.IND.TOTL.KD.ZG, owid:industrial_production_china |
+| 1 | shanghai_lockdown_industrial_production_drop_2022q2 | NOT_MET | 0 (2022) [peak_to_trough_pct_decline] | `>25% MoM decline in Shanghai industrial production 2022-04 vs 2022-03` |  |
 | 2 | retail_sales_negative_2022 | PENDING_EVAL | 1.49 (2022) [max_in_window] | `retail-sales YoY <=-7% at 2022 trough` | threshold expression unparseable by regex |
 | 3 | manufacturing_pmi_sub50_persistent | PENDING_DATA |  | `>=6 months of 2022 with manufacturing PMI <50` | No usable vintage for: owid:china_manufacturing_pmi |
 | 4 | youth_unemployment_spike_2023 | PENDING_DATA |  | `>=20% peak` | No usable vintage for: ilostat:UNE_2EAP_SEX_AGE_RT_NB |
@@ -27,7 +27,7 @@ Pre-registered rule: SUPPORT if >= 4 of 6 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 4 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 2 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+Verdict is **inconclusive (data gaps)** — 3 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 2 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

@@ -1,24 +1,74 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'russia_share_eu_gas_imports' not loaded; missing: ['constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.', 'constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/.', 'constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending.', 'constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.', 'constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending.', 'constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop.']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "outcome 'russia_share_eu_gas_imports' not loaded; missing: ['constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.', 'constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/.', 'constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending.', 'constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.', 'constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending.', 'constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop.']",
+  "verdict": "PARTIAL \u2014 shape=panel_summary, sign matches but magnitude below threshold; |\u0394_log|=0; threshold 40.0%, observed 0.0%",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "shape=panel_summary, sign matches but magnitude below threshold; |\u0394_log|=0; threshold 40.0%, observed 0.0%",
   "hypothesis_id": "nordstream_sabotage_2022_european_energy_security_pivot",
   "template": "descriptive",
   "claim_direction_inferred": "+",
-  "threshold_extracted": {},
+  "threshold_extracted": {
+    "percent": 40.0
+  },
   "falsification_rule_text": "Descriptive \u2014 falsified by counter-fact, not statistical inference. Falsified if (a) Russia share of EU gas imports in 2024 is > 30% (would refute the \"pivot\" claim), OR (b) US LNG to EU 2024 < 30 bcm (would refute the LNG-replacement claim), OR (c) Norwegian pipeline exports did NOT rise above 2018-2021 mean (would refute the Norwegian-substitute claim), OR (d) net new regasification capacity < 20 bcm/yr added 2022-2024 (would refute the infrastructure- response claim). Hypothesis declared \"supported\" if 4 of 4 verified; \"partial\" if 3 of 4; \"refuted\" if \u2264 2 of 4.\n",
   "falsification_test_text": "nordstream_pivot_inventory",
   "comparison": {
-    "error": "outcome 'russia_share_eu_gas_imports' not loaded; missing: ['constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.', 'constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/.', 'constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending.', 'constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.', 'constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending.', 'constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop.']"
+    "shape": "panel_summary",
+    "treatment_country": "DEU",
+    "treatment_value": 0.0,
+    "donor_pool_median": 0.0,
+    "ratio": null,
+    "log_diff": null,
+    "n_donor_countries": 13,
+    "end_year_window": [
+      2020,
+      2025
+    ]
   },
   "data_status": {
-    "variables_loaded": [],
-    "variables_missing": [
+    "variables_loaded": [
       {
         "role": "outcome",
         "name": "russia_share_eu_gas_imports",
-        "source": "constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard."
+        "source": "constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.",
+        "publisher": "constructed",
+        "n_rows": 112
       },
+      {
+        "role": "outcome",
+        "name": "eu_lng_regasification_capacity_bcm_yr",
+        "source": "constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "treatment",
+        "name": "post_sept_2022_dummy",
+        "source": "constructed: indicator = 1 from 2022-10 onwards (Nord Stream sabotage September 2022, formal end of Russian pipeline supply except for limited Turkstream + Yamal-Europe transit).",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "treatment",
+        "name": "post_repower_eu_dummy",
+        "source": "constructed: indicator = 1 from 2022-05 (REPowerEU plan announcement) \u2014 secondary treatment marking policy framework rather than physical event.",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "controls",
+        "name": "log_henry_hub_gas",
+        "source": "fred:DHHNGSP",
+        "publisher": "fred",
+        "n_rows": 30
+      },
+      {
+        "role": "controls",
+        "name": "heating_degree_days_eu",
+        "source": "eurostat:nrg_chdd_m",
+        "publisher": "eurostat",
+        "n_rows": 1426
+      }
+    ],
+    "variables_missing": [
       {
         "role": "outcome",
         "name": "log_us_lng_exports_to_eu_bcm",
@@ -31,11 +81,6 @@
       },
       {
         "role": "outcome",
-        "name": "eu_lng_regasification_capacity_bcm_yr",
-        "source": "constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending."
-      },
-      {
-        "role": "outcome",
         "name": "eu_gas_storage_filling_pct",
         "source": "constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending."
       },
@@ -45,32 +90,12 @@
         "source": "constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop."
       },
       {
-        "role": "treatment",
-        "name": "post_sept_2022_dummy",
-        "source": "constructed: indicator = 1 from 2022-10 onwards (Nord Stream sabotage September 2022, formal end of Russian pipeline supply except for limited Turkstream + Yamal-Europe transit)."
-      },
-      {
-        "role": "treatment",
-        "name": "post_repower_eu_dummy",
-        "source": "constructed: indicator = 1 from 2022-05 (REPowerEU plan announcement) \u2014 secondary treatment marking policy framework rather than physical event."
-      },
-      {
         "role": "controls",
         "name": "log_global_lng_demand",
         "source": "constructed: GIIGNL annual LNG trade report \u2014 global LNG imports. Manual-drop pending."
-      },
-      {
-        "role": "controls",
-        "name": "log_henry_hub_gas",
-        "source": "fred:DHHNGSP"
-      },
-      {
-        "role": "controls",
-        "name": "heating_degree_days_eu",
-        "source": "eurostat:nrg_chdd_m"
       }
     ]
   },
-  "run_utc": "2026-04-30T08:43:15+00:00",
+  "run_utc": "2026-04-30T13:38:24+00:00",
   "runner": "scripts/run_descriptive.py"
 }

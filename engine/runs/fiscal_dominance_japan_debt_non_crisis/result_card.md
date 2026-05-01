@@ -2,11 +2,11 @@
 
 **Verdict:** inconclusive (data gaps)
 
-**Reason:** 0 metrics met, 5 pending; 4 more need resolution
+**Reason:** 3 metrics met, 2 pending; 1 more need resolution
 
 Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 0 MET · 0 NOT_MET · 4 PENDING_DATA · 1 PENDING_EVAL
+**Counts:** 3 MET · 0 NOT_MET · 2 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** JPN
 
@@ -14,10 +14,10 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | debt_to_gdp_threshold_breach | PENDING_DATA |  | `>150% sustained 2010-2024` | No usable vintage for: imf:WEO_GGXWDG_NGDP |
-| 2 | cpi_inflation_below_persistent_threshold | PENDING_DATA |  | `<4% persistent across 1990-2024 (max ~3% transient post-COVID)` | No usable vintage for: fred:JPNCPIALLMINMEI |
+| 1 | debt_to_gdp_threshold_breach | MET | 179 (2010) [min_level_in_window] | `>150% sustained 2010-2024` | min_level_in_window = 178.600; threshold >150 |
+| 2 | cpi_inflation_below_persistent_threshold | MET | 3.27 (1991) [max_yoy_pct_change_in_window] | `<4% persistent across 1990-2024 (max ~3% transient post-COVID)` | max_yoy_pct_change_in_window = 3.273; threshold <4 |
 | 3 | jgb_10y_yield_below_crisis_band | PENDING_DATA |  | `<5% across 1990-2024 (max ~1.5% in early 1990s, peaked ~1.7% in 2025)` | No usable vintage for: oecd:OECD.SDD.STES,DSD_KEI@DF_KEI,4.0 |
-| 4 | jpy_trade_weighted_index_no_collapse | PENDING_EVAL |  | `no >50% REER decline in any 12-month window 1990-2024` | Non-tidy (needs custom parser): bis:WS_EER |
+| 4 | jpy_trade_weighted_index_no_collapse | MET | 41.7 (1990) [peak_to_trough_pct_decline] | `no >50% REER decline in any 12-month window 1990-2024` |  |
 | 5 | monetary_policy_independence_preserved | PENDING_DATA |  | `BoJ retains operational policy autonomy across 1990-2024 per qualitative coding` | No usable vintage for: boj:policy_governance_record, academic:bof_independence_index |
 
 ## Claim
@@ -26,7 +26,7 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 4 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 1 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+Verdict is **inconclusive (data gaps)** — 2 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

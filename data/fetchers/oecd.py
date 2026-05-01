@@ -21,6 +21,8 @@ License: OECD standard permissions (attribution).
 from __future__ import annotations
 
 import io
+import re
+import xml.etree.ElementTree as ET
 from datetime import datetime
 
 import pandas as pd
@@ -42,26 +44,136 @@ _DSD_AGENCY: dict[str, str] = {
     "DSD_TAX_CIT": "OECD.CTP.TPS", "DSD_HEALTH_STAT": "OECD.ELS.HD",
     "DSD_PMR": "OECD.ECO.GCRD", "DSD_MIG": "OECD.ELS.IMD",
     "DSD_DASHBOARD": "OECD.CFE.RDG",
+    # Inferred from existing full-URN citations already used in the repo.
+    "DSD_LFS": "OECD.SDD.TPS", "DSD_LFS_BS": "OECD.SDD.TPS",
+    "DSD_EARNINGS": "OECD.SDD.TPS",
+    "DSD_NAMAIN1": "OECD.SDD.NAD", "DSD_NAAG": "OECD.SDD.NAD",
 }
 
 _OECD_SHORTCUTS: dict[str, str] = {
     "EPL_OV": "OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0",
+    "EPL_indicators": "OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0",
     "MWUSD": "OECD.ELS.SAE,DSD_EARN@DF_MW_DOL_RPP,1.0",
     "OUTGAP": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
+    "OutputGap": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
     "DSD_KEI": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
     "DSD_TAX": "OECD.CTP.TPS,DSD_TAX@DF_TAX_WAGES_COMP,2.1",
     "CPI:core": "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_N_CP,1.0",
     "CPI": "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",
+    "DSD_PRICES": "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",
+    "DSD_PRICES@DF_PRICES_N_CP": "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_N_CP,1.0",
+    "DSD_TU@DF_TUD": "OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0",
+    "DSD_TU@DF_CBC": "OECD.ELS.SAE,DSD_TUD_CBC@DF_CBC,1.0",
+    "DSD_TU@DF_TU": "OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0",
+    "TUD": "OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0",
+    "trade_union_density": "OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0",
+    "HEALTH_STAT@DF_AMENABLE_MORT": "OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0",
+    "HOUSE_PRICES": "OECD.SDD.PIN,DSD_RHPI@DF_RHPI,1.0",
+    "DSD_IDD": "OECD.WISE.INE,DSD_IDD@DF_IDD,1.0",
+    "DSD_IDD@DF_IDD": "OECD.WISE.INE,DSD_IDD@DF_IDD,1.0",
+    "DSD_IDD@DF_CHILD_POV": "OECD.WISE.INE,DSD_IDD@DF_CHILD_POV,1.0",
+    "POVERTY": "OECD.WISE.INE,DSD_IDD@DF_IDD,1.0",
+    "DSD_EARN": "OECD.ELS.SAE,DSD_EARN@DF_EARN_LFS,1.0",
+    "DSD_EARNINGS": "OECD.SDD.TPS,DSD_EARNINGS@DF_EARNINGS,1.0",
+    "NEET": "OECD.ELS.EMP,DSD_LFS@DF_NEET,1.0",
+    "DSD_PDB": "OECD.SDD.TPS,DSD_PDB@DF_PDB_PT,1.0",
+    "DSD_PENSIONS@DF_PENSIONS_REPL_RATE": "OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0",
+    "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_AGG,1.0",
+    "DSD_SOCX@DF_SOCX_ALMP": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0",
+    "FDI_statistics": "OECD.DAF.INV,DSD_FDI@DF_FDI_FLOWS,1.0",
+    "HFCE": "OECD.SDD.NAD,DSD_NAMAIN1@DF_HFCE,1.0",
+    "Gov_Exp": "OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0",
+    "GovExp": "OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0",
+    "GGEXP": "OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0",
+    "STAN": "OECD.SDD.TPS,DSD_STAN@DF_STAN,1.0",
+    "STAN_VA": "OECD.SDD.TPS,DSD_STAN@DF_STAN,1.0",
 }
+
+_OECD_DATAFLOW_CACHE: list[dict[str, str | None]] | None = None
+
+
+def _normalise_token(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+
+
+def _load_dataflows() -> list[dict[str, str | None]]:
+    global _OECD_DATAFLOW_CACHE
+    if _OECD_DATAFLOW_CACHE is not None:
+        return _OECD_DATAFLOW_CACHE
+    try:
+        r = requests.get(
+            "https://sdmx.oecd.org/public/rest/dataflow/all/all/latest",
+            timeout=30,
+            headers={"User-Agent": "Mozilla/5.0 IESET"},
+        )
+        r.raise_for_status()
+        ns = {
+            "s": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure",
+            "c": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common",
+        }
+        root = ET.fromstring(r.text)
+        flows: list[dict[str, str | None]] = []
+        for df in root.findall(".//s:Dataflow", ns):
+            names = df.findall(".//c:Name", ns)
+            name = next(
+                (
+                    n.text
+                    for n in names
+                    if n.attrib.get("{http://www.w3.org/XML/1998/namespace}lang") == "en"
+                ),
+                names[0].text if names else "",
+            )
+            flows.append(
+                {
+                    "agencyID": df.attrib.get("agencyID"),
+                    "id": df.attrib.get("id"),
+                    "version": df.attrib.get("version") or "1.0",
+                    "name": name,
+                }
+            )
+        _OECD_DATAFLOW_CACHE = flows
+    except Exception:
+        _OECD_DATAFLOW_CACHE = []
+    return _OECD_DATAFLOW_CACHE
+
+
+def _resolve_by_catalogue(series_id: str) -> str | None:
+    tokens = re.findall(r"(?:DSD|DF)_[A-Z0-9_]+", series_id.upper())
+    if not tokens:
+        return None
+    norm_tokens = [_normalise_token(t) for t in tokens]
+    best: tuple[int, dict[str, str | None]] | None = None
+    for flow in _load_dataflows():
+        haystack = _normalise_token(
+            " ".join(str(flow.get(k) or "") for k in ("agencyID", "id", "name"))
+        )
+        score = sum(1 for token in norm_tokens if token and token in haystack)
+        if score and (best is None or score > best[0]):
+            best = (score, flow)
+    if best is None:
+        return None
+    flow = best[1]
+    agency = flow.get("agencyID")
+    flow_id = flow.get("id")
+    version = flow.get("version") or "1.0"
+    if not agency or not flow_id:
+        return None
+    return f"{agency},{flow_id},{version}"
 
 
 def _resolve_dataflow(series_id: str) -> str:
     """Convert partial OECD URN to full one. Already-full URNs pass through."""
     sid = series_id.strip()
-    if sid.startswith("OECD.") and "," in sid:
-        return sid
+    shortcut = _OECD_SHORTCUTS.get(sid) or _OECD_SHORTCUTS.get(sid.upper())
+    if shortcut:
+        return shortcut
     if sid in _OECD_SHORTCUTS:
         return _OECD_SHORTCUTS[sid]
+    resolved = _resolve_by_catalogue(sid)
+    if resolved:
+        return resolved
+    if sid.startswith("OECD.") and "," in sid:
+        return sid
     head = sid.split("@", 1)[0]
     if head in _DSD_AGENCY:
         agency = _DSD_AGENCY[head]
@@ -103,11 +215,15 @@ def fetch(
         params["endPeriod"] = end_period
     resolved = _resolve_dataflow(series_id)
     url = f"{OECD_BASE}/{resolved}/{key or 'all'}"
+    # Older successful repo pulls used OECD's explicit `format=csvfilewithlabels`
+    # URL shape; keep that transport contract instead of relying on content
+    # negotiation, which has recently started returning 403s for some calls.
+    params["format"] = "csvfilewithlabels"
     r = requests.get(
         url,
         params=params,
         timeout=120,
-        headers={"Accept": "application/vnd.sdmx.data+csv;version=1.0"},
+        headers={"User-Agent": "Mozilla/5.0 IESET"},
     )
     if r.status_code == 404:
         raise OecdError(f"OECD 404 for {series_id} (resolved='{resolved}') key='{key}' — check dataflow id")

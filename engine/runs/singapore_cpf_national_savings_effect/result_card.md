@@ -1,8 +1,8 @@
 # Result card — singapore_cpf_national_savings_effect
 
-**Verdict:** refuted
+**Verdict:** INCONCLUSIVE_DATA_PENDING
 
-**Reason:** 0 metrics failed and 0 pending; cannot reach 7
+**Reason:** no canonical metrics available to evaluate
 
 Pre-registered rule: SUPPORT if >= 7 of 0 metrics met; REFUTE if <= 3 met (impossible to hit support).
 
@@ -21,7 +21,7 @@ Pre-registered rule: SUPPORT if >= 7 of 0 metrics met; REFUTE if <= 3 met (impos
 
 ## Interpretation
 
-The canonical-case pattern match is not satisfied: only 0 of 0 metrics met their thresholds, below the support threshold of 7. Note that for canonical-case hypotheses, a refutation can indicate either that the hypothesis is genuinely weak, that the metric set is mis-calibrated (too strict), or that the data substrate has systematic gaps. Review the PENDING_DATA / PENDING_EVAL metrics before accepting the refutation.
+Verdict is **INCONCLUSIVE_DATA_PENDING** — 0 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

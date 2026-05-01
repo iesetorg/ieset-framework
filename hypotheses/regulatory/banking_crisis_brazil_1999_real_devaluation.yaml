@@ -1,7 +1,13 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: banking_crisis_brazil_1999_real_devaluation
 version: 1
-status: candidate
+status: pre_registered
+methodology_note: >
+  v1 promotion (2026-04-30). The candidate spec already pinned the
+  canonical_metrics list, metric thresholds, data windows, and
+  multi_metric_falsification counts. This promotion adds only the
+  checklist estimator/falsification wrapper and leaves all metric
+  thresholds unchanged before the post-commit rerun.
 topic: regulatory
 claim: >
   Brazil's January 1999 abandonment of the crawling peg and devaluation of the real
@@ -21,7 +27,7 @@ canonical_metrics:
     description: Brazilian real against USD peak-to-trough nominal depreciation
     threshold: ">= 35% depreciation"
     window: "1998-1999"
-    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    source: "world_bank_wdi:PA.NUS.FCRF; bis:WS_EER"
     direction: supports_claim
     independence_justification: External-rate signal.
   - metric_id: imf_programme_1998
@@ -49,13 +55,35 @@ multi_metric_falsification:
   total_metrics: 4
   support_threshold: 3
   refute_threshold: 1
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case checklist evaluator reads canonical_metrics and
+    multi_metric_falsification; no regression model is estimated.
+    Each metric is scored against its pre-registered source, window,
+    and threshold before applying the count rule below.
+
+falsification:
+  rule: >
+    Evaluate every canonical_metrics row against its pre-registered
+    source, window, and threshold. The hypothesis is SUPPORTED if at
+    least 3 of 4 metrics are MET. It is REFUTED if even
+    counting all pending metrics as favorable cannot reach 3
+    MET metrics and the confirmed failures cross the pre-registered
+    refutation guardrail. Otherwise the verdict is INCONCLUSIVE until
+    pending data or pending evaluation metrics are resolved.
+  test: multi_metric_checklist_canonical_banking_crisis
+  threshold: "MET >= 3 of 4; REFUTE when MET + PENDING_DATA + PENDING_EVAL < 3; refutation guardrail=1"
+
 variables:
   outcome:
     - name: real_gdp
       source: "world_bank_wdi:NY.GDP.MKTP.KD"
       transformation: yoy
     - name: nominal_xr_usd
-      source: "imf:ENDA_XDC_USD_RATE"
+      source: "world_bank_wdi:PA.NUS.FCRF"
       transformation: peak_to_trough
 prior_confidence: 0.85
 disclosure: >

@@ -1,7 +1,13 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: banking_crisis_2008_gfc_canonical_multimetric
 version: 1
-status: candidate
+status: pre_registered
+methodology_note: >
+  v1 promotion (2026-04-30). The candidate spec already pinned the
+  canonical_metrics list, metric thresholds, data windows, and
+  multi_metric_falsification counts. This promotion adds only the
+  checklist estimator/falsification wrapper and leaves all metric
+  thresholds unchanged before the post-commit rerun.
 topic: regulatory
 claim: >
   The 2007-2009 Global Financial Crisis was a systemic banking-and-credit rupture in
@@ -72,6 +78,28 @@ multi_metric_falsification:
   total_metrics: 7
   support_threshold: 5
   refute_threshold: 2
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case checklist evaluator reads canonical_metrics and
+    multi_metric_falsification; no regression model is estimated.
+    Each metric is scored against its pre-registered source, window,
+    and threshold before applying the count rule below.
+
+falsification:
+  rule: >
+    Evaluate every canonical_metrics row against its pre-registered
+    source, window, and threshold. The hypothesis is SUPPORTED if at
+    least 5 of 7 metrics are MET. It is REFUTED if even
+    counting all pending metrics as favorable cannot reach 5
+    MET metrics and the confirmed failures cross the pre-registered
+    refutation guardrail. Otherwise the verdict is INCONCLUSIVE until
+    pending data or pending evaluation metrics are resolved.
+  test: multi_metric_checklist_canonical_banking_crisis
+  threshold: "MET >= 5 of 7; REFUTE when MET + PENDING_DATA + PENDING_EVAL < 5; refutation guardrail=2"
+
 variables:
   outcome:
     - name: real_gdp

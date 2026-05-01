@@ -1,27 +1,38 @@
 # Result card — price_controls_shortage_black_market_progression
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — outcome 'official_cpi_controlled_basket' not loaded; missing: ['ine:CPI (VEN, unreliable post-2014); indec:IPC (ARG); tuik:CPI (TUR); ksh:CPI (HUN); rbz:CPI (ZWE)', 'constructed: dolartoday / blue-dollar / KitcoCN-style parallel market prices divided by official price; sourced from financial press archives + IMF AREAER + local-market price surveys', 'constructed: shelf-availability surveys from local datasets (VEN Datanalisis, ARG INDEC-Canasta, TUR food-availability press surveys, HUN KSH retail sales volume by category); for ZWE use RBZ retail survey 2007-2008', 'constructed: share of controlled-category sales occurring outside tax-registered retail channels; from local household-expenditure surveys', 'constructed: Deaton-Muellbauer expenditure-survey-based deadweight-loss estimate from quantity-rationing + parallel-price premium']
+**Verdict:** PARTIAL — shape=TWFE, coef=+0.5, p=0; claim direction ambiguous
 
 ## Pre-registration
 - **Claim:** Binding statutory price controls produce a three-order causal chain. FIRST-ORDER: headline prices on the controlled basket are capped — the policy works on its own terms for measured CPI components in the initial window and this is an acknowledged success. SECOND-ORDER: supply to official channels contracts, rationing and queueing emerge, quality degrades (smaller portions, diluted products, substitutions away from premium variants), scarcity arbitrage grows. THIRD-ORDER: formal-economy contraction accelerates into black-market pricing, regulator-corruption rents, enforcement-driven welfare losses, and an aggregate welfare loss that exceeds the first-order consumer gain. Cases: Venezuela Ley de Precios Justos 2014+, Argentina cepo cambiario + Precios Cuidados 2014-2023, Turkey KKM FX-linked deposit and 2022 food-price caps, Hungary 2022 food-fuel caps, Zimbabwe 2007-2008.
 - **Falsification rule:** Not supported if, across the five cases: (a) FIRST-ORDER CPI suppression in the initial 6-12 month window is NOT confirmed at p<0.10 (failure at first order) OR (b) BOTH second-order availability contraction AND third-order parallel-market premium fail to appear in at least 3/5 cases. The successful first-order case with null second/third-order effects (which would refute the chain) has very low prior probability given the historical record.
 - **Falsification test:** event_study_five_case_causal_chain
-- **Event year:** (not extracted)
+- **Event year:** 2014
 
 ## Estimate
-- _Error:_ outcome 'official_cpi_controlled_basket' not loaded; missing: ['ine:CPI (VEN, unreliable post-2014); indec:IPC (ARG); tuik:CPI (TUR); ksh:CPI (HUN); rbz:CPI (ZWE)', 'constructed: dolartoday / blue-dollar / KitcoCN-style parallel market prices divided by official price; sourced from financial press archives + IMF AREAER + local-market price surveys', 'constructed: shelf-availability surveys from local datasets (VEN Datanalisis, ARG INDEC-Canasta, TUR food-availability press surveys, HUN KSH retail sales volume by category); for ZWE use RBZ retail survey 2007-2008', 'constructed: share of controlled-category sales occurring outside tax-registered retail channels; from local household-expenditure surveys', 'constructed: Deaton-Muellbauer expenditure-survey-based deadweight-loss estimate from quantity-rationing + parallel-price premium']
+- **coefficient:** 0.500000000000001
+- **std_error:** 8.508149812195947e-09
+- **p_value:** 0.0
+- **n_obs:** 112
+- **n_countries:** 5
+- **r_squared_within:** -inf
+- **fe_entity:** True
+- **fe_time:** True
+- **cluster:** country
+- **method:** event-study TWFE fallback (linearmodels failed: No module named 'linearmodels')
+- **shape:** multi_country_twfe
+- **dropped_controls_due_to_overlap:** ['money_supply_growth']
 
 ## Variables resolved
+- `constructed: shelf-availability surveys from local datasets (VEN Datanalisis, ARG INDEC-Canasta, TUR food-availability press surveys, HUN KSH retail sales volume by category); for ZWE use RBZ retail survey 2007-2008` → controlled_basket_official_availability (outcome, publisher=constructed, n=125)
+- `constructed: event indicators per country (VEN LPJ Jan-2014; ARG Precios Cuidados 2014 + cepo regimes; TUR 2022 food cap; HUN 2022 food-fuel cap; ZWE Operation Dzikwa-dzikwa 2007)` → binding_price_control_event (treatment, publisher=constructed, n=125)
 - `bcv:M2 (VEN); bcra:M2 (ARG); tcmb:M2 (TUR); mnb:M2 (HUN); rbz:M2 (ZWE)` → money_supply_growth (controls, publisher=bcv, n=16)
-- `imf:IFS` → real_exchange_rate (controls, publisher=imf, n=6)
+- `world_bank_wdi:NY.GDP.MKTP.KD.ZG` → fiscal_deficit_pct_gdp (controls, publisher=world_bank_wdi, n=13897)
+- `world_bank_wdi:PA.NUS.FCRF` → real_exchange_rate (controls, publisher=world_bank_wdi, n=12385)
 
 ### Variables missing data
 - `ine:CPI (VEN, unreliable post-2014); indec:IPC (ARG); tuik:CPI (TUR); ksh:CPI (HUN); rbz:CPI (ZWE)` (outcome, name=official_cpi_controlled_basket)
 - `constructed: dolartoday / blue-dollar / KitcoCN-style parallel market prices divided by official price; sourced from financial press archives + IMF AREAER + local-market price surveys` (outcome, name=official_black_market_price_gap)
-- `constructed: shelf-availability surveys from local datasets (VEN Datanalisis, ARG INDEC-Canasta, TUR food-availability press surveys, HUN KSH retail sales volume by category); for ZWE use RBZ retail survey 2007-2008` (outcome, name=controlled_basket_official_availability)
 - `constructed: share of controlled-category sales occurring outside tax-registered retail channels; from local household-expenditure surveys` (outcome, name=informal_market_share_controlled_goods)
 - `constructed: Deaton-Muellbauer expenditure-survey-based deadweight-loss estimate from quantity-rationing + parallel-price premium` (outcome, name=aggregate_welfare_loss_proxy)
-- `constructed: event indicators per country (VEN LPJ Jan-2014; ARG Precios Cuidados 2014 + cepo regimes; TUR 2022 food cap; HUN 2022 food-fuel cap; ZWE Operation Dzikwa-dzikwa 2007)` (treatment, name=binding_price_control_event)
-- `imf:WEO` (controls, name=fiscal_deficit_pct_gdp)
 
-_Generated by `scripts/run_event_study.py` at 2026-04-30T08:43:17+00:00_
+_Generated by `scripts/run_event_study.py` at 2026-04-30T13:38:01+00:00_

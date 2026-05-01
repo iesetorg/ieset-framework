@@ -1,17 +1,32 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'sector_labour_productivity' not loaded; missing: ['bls:productivity_major_sector_industry', 'fred:OPHNFB; fred:OPHPBS']",
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient observations after listwise deletion (11)",
   "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "outcome 'sector_labour_productivity' not loaded; missing: ['bls:productivity_major_sector_industry', 'fred:OPHNFB; fred:OPHPBS']",
+  "verdict_reason": "insufficient observations after listwise deletion (11)",
   "hypothesis_id": "ai_productivity_diffusion_2023_2026_us_sectors",
   "template": "panel_fe_decomposition",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "BLS sector-level labour-productivity (output per hour) US 2019-2026. Define AI-exposure tier from Eloundou-Manning-Mishkin (2023) GPT occupational-exposure scores aggregated to NAICS 2-digit. Compare cumulative productivity-growth divergence high-exposure vs low-exposure sectors 2022-Q4 to 2026-Q4 against pre-period (2015-Q1 to 2019-Q4) divergence. SUPPORTED if cumulative high-minus-low excess productivity growth is in [+3pp, +12pp] over the four-year post-period and exceeds the pre-period divergence by at least 2pp. REFUTED if cumulative divergence < +1pp OR is smaller than pre-period divergence (i.e. AI tracks pre-existing trend). PARTIAL if direction correct but magnitude in [+1pp, +3pp].",
   "falsification_test_text": "us_sector_productivity_ai_exposure_divergence_2022_2026",
   "estimate": {
-    "error": "outcome 'sector_labour_productivity' not loaded; missing: ['bls:productivity_major_sector_industry', 'fred:OPHNFB; fred:OPHPBS']"
+    "error": "insufficient observations after listwise deletion (11)"
   },
   "data_status": {
-    "variables_loaded": [],
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "real_output_per_hour",
+        "source": "fred:OPHNFB; fred:OPHPBS",
+        "publisher": "fred",
+        "n_rows": 79
+      },
+      {
+        "role": "treatment",
+        "name": "post_chatgpt_indicator",
+        "source": "constructed: 1 from 2022-12 onwards",
+        "publisher": "constructed",
+        "n_rows": 12
+      }
+    ],
     "variables_missing": [
       {
         "role": "outcome",
@@ -19,19 +34,9 @@
         "source": "bls:productivity_major_sector_industry"
       },
       {
-        "role": "outcome",
-        "name": "real_output_per_hour",
-        "source": "fred:OPHNFB; fred:OPHPBS"
-      },
-      {
         "role": "treatment",
         "name": "ai_exposure_tier",
         "source": "constructed: Eloundou-Manning-Mishkin 2023 GPT-exposure aggregated to NAICS 2-digit; high (>=50%), medium (20-50%), low (<20%)"
-      },
-      {
-        "role": "treatment",
-        "name": "post_chatgpt_indicator",
-        "source": "constructed: 1 from 2022-12 onwards"
       },
       {
         "role": "treatment",
@@ -55,6 +60,6 @@
       }
     ]
   },
-  "run_utc": "2026-04-30T08:43:10+00:00",
+  "run_utc": "2026-04-30T14:08:57+00:00",
   "runner": "scripts/run_panel_fe.py"
 }

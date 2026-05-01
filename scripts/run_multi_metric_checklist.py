@@ -42,6 +42,14 @@ import pandas as pd
 import pyarrow.parquet as pq
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from run_panel_fe import (
+    is_stub_falsification_rule,
+    latest_vintage as shared_latest_vintage,
+    normalise_panel as panel_fe_normalise_panel,
+    resolve_source_target,
+)
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 VINTAGES_DIR = REPO_ROOT / "data" / "vintages"
 RUNS_DIR = REPO_ROOT / "engine" / "runs"
@@ -72,11 +80,7 @@ def find_hypothesis(hid: str) -> Path:
 
 def latest_vintage(publisher: str, series: str) -> Optional[Path]:
     """Return newest parquet vintage for publisher:series, else None."""
-    d = VINTAGES_DIR / publisher
-    if not d.exists():
-        return None
-    files = sorted(d.glob(f"{series}@*.parquet"), key=lambda p: p.stat().st_mtime)
-    return files[-1] if files else None
+    return shared_latest_vintage(publisher, series)
 
 
 def parse_source(src: str) -> list[tuple[str, str]]:
@@ -159,12 +163,21 @@ PUBLISHER_TIDY_ADAPTERS: dict = {
     "unhcr": _tidy_unhcr,
 }
 
+FRED_SINGLE_COUNTRY_SERIES = {
+    # FRED hosts several non-US market indexes without a country column.
+    # The shared panel normalizer defaults country-less FRED series to USA, so
+    # pin the country for those globally quoted but country-specific tickers.
+    "JPNCPIALLMINMEI": "JPN",
+    "NIKKEI225": "JPN",
+}
+
 
 def load_panel_series(publisher: str, series: str) -> Optional[pd.DataFrame]:
     """Load a vintage as a tidy panel: country, year, value.
 
     Returns None if no vintage present. Returns empty df if vintage is malformed.
     """
+    publisher, series = resolve_source_target(publisher, series)
     path = latest_vintage(publisher, series)
     if path is None:
         return None
@@ -174,12 +187,28 @@ def load_panel_series(publisher: str, series: str) -> Optional[pd.DataFrame]:
         print(f"  WARN: failed to read {path.name}: {e}", file=sys.stderr)
         return pd.DataFrame(columns=["country", "year", "value"])
 
+    if publisher == "fred" and series.upper() in FRED_SINGLE_COUNTRY_SERIES:
+        lower_cols = {c.lower() for c in t.columns}
+        if not lower_cols.intersection({"country", "country_iso3", "iso3", "geo_code", "ref_area", "region"}):
+            t = t.copy()
+            t["country_iso3"] = FRED_SINGLE_COUNTRY_SERIES[series.upper()]
+
     adapter = PUBLISHER_TIDY_ADAPTERS.get(publisher, _tidy_default)
     out = adapter(t, series)
     if out is None or out.empty:
         # Try default fallback if publisher-specific adapter returned nothing
         if adapter is not _tidy_default:
             out = _tidy_default(t, series)
+    if out is None or out.empty:
+        # Reuse the broader panel normalizer from the panel-FE runner. It knows
+        # about single-country FRED/BLS-style files, SDMX-ish period columns,
+        # and several publisher aliases that the checklist runner historically
+        # treated as non-tidy.
+        panel = panel_fe_normalise_panel(t, publisher)
+        if panel is not None and not panel.empty:
+            out = panel.rename(columns={"country_iso3": "country"})[
+                ["country", "year", "value"]
+            ]
     if out is None or out.empty:
         return pd.DataFrame(columns=["country", "year", "value"])
     out = out.copy()
@@ -334,6 +363,22 @@ _RANK_BOTTOM_RE = re.compile(
 # >=2 ... in a 30-year window
 _EVENT_COUNT_RE = re.compile(
     rf"^{_OP_RE}\s*(\d+)\s+(.+?)\s+in\s+a\s+(\d+)-year\s+window",
+    re.IGNORECASE,
+)
+_MEAN_FUNC_RE = re.compile(
+    rf"^\s*mean\s*\(\s*[^,]+,\s*{_YEAR}\s*-\s*{_YEAR}\s*\)\s*{_OP_RE}\s*{_NUM_RE}\s*%?.*$",
+    re.IGNORECASE,
+)
+_NAMED_YEAR_DIFF_RE = re.compile(
+    rf"^\s*[A-Za-z0-9_.-]+_{_YEAR}\s*-\s*[A-Za-z0-9_.-]+_{_YEAR}\s*{_OP_RE}\s*{_NUM_RE}\s*.*$",
+    re.IGNORECASE,
+)
+_NAMED_YEAR_RATIO_RE = re.compile(
+    rf"^\s*[A-Za-z0-9_.-]+_{_YEAR}\s*/\s*[A-Za-z0-9_.-]+_{_YEAR}\s*{_OP_RE}\s*{_NUM_RE}\s*.*$",
+    re.IGNORECASE,
+)
+_MAX_ABS_COUNTRY_PEER_MEDIAN_RE = re.compile(
+    rf"^\s*max\s*\(\s*\|\s*([A-Za-z]+)_([a-z]+)_t\s*-\s*([A-Za-z]+)_([a-z]+)_median_t\s*\|\s*\)\s*{_OP_RE}\s*{_NUM_RE}.*$",
     re.IGNORECASE,
 )
 
@@ -503,6 +548,86 @@ def _evaluate_clause(clause: str, country: str, panel_df: pd.DataFrame,
     verdict: True/False/None (None means clause not recognised or data missing).
     """
     s = clause.strip()
+
+    # --- Functional mean: mean(series, 1990-2019) < 1.5%
+    m = _MEAN_FUNC_RE.match(s)
+    if m:
+        y0, y1 = int(m.group(1)), int(m.group(2))
+        op, num = m.group(3), float(m.group(4))
+        sub = panel_df[panel_df["country"] == country].dropna(subset=["value"])
+        sub = sub[(sub["year"] >= y0) & (sub["year"] <= y1)]
+        if sub.empty:
+            return None, f"mean-clause: no {country} data {y0}-{y1}"
+        observed = float(sub["value"].mean())
+        return _compare(op, observed, num), (
+            f"{country} mean {y0}-{y1} = {observed:.3f}; threshold {op}{num:g}"
+        )
+
+    # --- Named-year difference: LE_2019 - LE_1990 >= 4 years
+    m = _NAMED_YEAR_DIFF_RE.match(s)
+    if m:
+        y1, y2 = int(m.group(1)), int(m.group(2))
+        op, num = m.group(3), float(m.group(4))
+        v1 = _value_at_year(panel_df, country, y1)
+        v2 = _value_at_year(panel_df, country, y2)
+        if v1 is None or v2 is None:
+            return None, f"named-year diff: missing {country} data {y1}/{y2}"
+        diff = v1[0] - v2[0]
+        return _compare(op, diff, num), (
+            f"{country} {y1}-{y2} diff = {diff:.3f} (used {v1[1]}, {v2[1]}); "
+            f"threshold {op}{num:g}"
+        )
+
+    # --- Named-year ratio: avh_2019 / avh_1990 <= 0.90
+    m = _NAMED_YEAR_RATIO_RE.match(s)
+    if m:
+        y1, y2 = int(m.group(1)), int(m.group(2))
+        op, num = m.group(3), float(m.group(4))
+        v1 = _value_at_year(panel_df, country, y1)
+        v2 = _value_at_year(panel_df, country, y2)
+        if v1 is None or v2 is None or v2[0] == 0:
+            return None, f"named-year ratio: missing {country} data {y1}/{y2}"
+        ratio = v1[0] / v2[0]
+        return _compare(op, ratio, num), (
+            f"{country} {y1}/{y2} ratio = {ratio:.3f} (used {v1[1]}, {v2[1]}); "
+            f"threshold {op}{num:g}"
+        )
+
+    # --- Max absolute country-vs-peer-median gap:
+    # max(|cantril_jpn_t - cantril_oecd_median_t|) <= 1.0 over 2008-2020
+    m = _MAX_ABS_COUNTRY_PEER_MEDIAN_RE.match(s)
+    if m:
+        country_token = m.group(2).upper()
+        peer_token = m.group(4).upper()
+        op, num = m.group(5), float(m.group(6))
+        target = _canon_iso3(country_token)
+        if target not in _KNOWN_ISO3 and len(target) != 3:
+            target = country
+        peers = PEER_SETS.get(peer_token)
+        if peers is None:
+            return None, f"unknown peer set {peer_token!r}"
+        y0, y1 = window if window else (
+            int(panel_df["year"].min()), int(panel_df["year"].max())
+        )
+        sub = panel_df[panel_df["year"].between(y0, y1)].dropna(subset=["value"])
+        target_df = sub[sub["country"] == target][["year", "value"]].rename(
+            columns={"value": "target_value"}
+        )
+        peer_df = sub[sub["country"].isin(peers)]
+        if target_df.empty or peer_df.empty:
+            return None, f"peer-median gap: no {target}/{peer_token} data {y0}-{y1}"
+        med = peer_df.groupby("year")["value"].median().rename("peer_median")
+        joined = target_df.merge(med, left_on="year", right_index=True, how="inner")
+        if joined.empty:
+            return None, f"peer-median gap: no common {target}/{peer_token} years {y0}-{y1}"
+        joined["abs_gap"] = (joined["target_value"] - joined["peer_median"]).abs()
+        idx = joined["abs_gap"].idxmax()
+        observed = float(joined.loc[idx, "abs_gap"])
+        year_used = int(joined.loc[idx, "year"])
+        return _compare(op, observed, num), (
+            f"max |{target} - {peer_token} median| = {observed:.3f} "
+            f"in {year_used}; threshold {op}{num:g}"
+        )
 
     # --- Same-country ratio: CUB 2023 GDP pc / CUB 1960 GDP pc < 1.5
     m = _RATIO_SAME_COUNTRY_RE.match(s)
@@ -986,6 +1111,108 @@ def parse_window(win: str) -> Optional[tuple[int, int]]:
     return None
 
 
+def parse_date_window(win: str) -> Optional[tuple[pd.Timestamp, pd.Timestamp]]:
+    """Parse date/month windows such as '2023-03 to 2023-05'."""
+    if not win:
+        return None
+    found = re.findall(r"\d{4}(?:-\d{2}(?:-\d{2})?)?", win)
+    if not found:
+        return None
+
+    def _start(s: str) -> pd.Timestamp:
+        return pd.to_datetime(s if len(s) > 4 else f"{s}-01-01")
+
+    def _end(s: str) -> pd.Timestamp:
+        if len(s) == 4:
+            return pd.to_datetime(f"{s}-12-31")
+        if len(s) == 7:
+            return pd.to_datetime(s + "-01") + pd.offsets.MonthEnd(0)
+        return pd.to_datetime(s)
+
+    if len(found) == 1:
+        return _start(found[0]), _end(found[0])
+    return _start(found[0]), _end(found[1])
+
+
+def _rolling_outflow_from_raw_vintages(
+    paths: list[Path],
+    threshold: str,
+    window: str,
+) -> Optional[dict]:
+    """Evaluate clauses like '>= USD 200bn outflow over 8 weeks'."""
+    tl = threshold.lower()
+    m = re.search(
+        r"(>=|>|<=|<|=)\s*(?:usd\s*)?(-?\d+(?:\.\d+)?)\s*bn\s+outflow\s+over\s+(\d+)\s+weeks",
+        tl,
+    )
+    if not m:
+        return None
+    date_window = parse_date_window(window)
+    if date_window is None:
+        return {
+            "met": None,
+            "observed_value": None,
+            "observed_year": None,
+            "stat_name": "rolling_outflow_bn",
+            "note": "date window unparseable for rolling outflow threshold",
+        }
+
+    frames = []
+    for path in paths:
+        try:
+            raw = pq.read_table(path).to_pandas()
+        except Exception:
+            continue
+        if "date" not in raw.columns or "value" not in raw.columns:
+            continue
+        f = raw[["date", "value"]].copy()
+        f["date"] = pd.to_datetime(f["date"], errors="coerce")
+        f["value"] = pd.to_numeric(f["value"], errors="coerce")
+        frames.append(f.dropna(subset=["date", "value"]))
+    if not frames:
+        return {
+            "met": None,
+            "observed_value": None,
+            "observed_year": None,
+            "stat_name": "rolling_outflow_bn",
+            "note": "raw date/value vintage unavailable for rolling outflow threshold",
+        }
+
+    data = pd.concat(frames, ignore_index=True).sort_values("date")
+    start, end = date_window
+    data = data[(data["date"] >= start) & (data["date"] <= end)].copy()
+    if data.empty:
+        return {
+            "met": None,
+            "observed_value": None,
+            "observed_year": None,
+            "stat_name": "rolling_outflow_bn",
+            "note": f"no observations in date window {window}",
+        }
+    weeks = int(m.group(3))
+    rows = weeks + 1
+    if len(data) < rows:
+        return {
+            "met": None,
+            "observed_value": None,
+            "observed_year": None,
+            "stat_name": "rolling_outflow_bn",
+            "note": f"only {len(data)} observations in {window}; need {rows} for {weeks}-week outflow",
+        }
+    data["outflow"] = data["value"].shift(weeks) - data["value"]
+    best = data.dropna(subset=["outflow"]).sort_values("outflow", ascending=False).iloc[0]
+    observed = float(best["outflow"])
+    cutoff = float(m.group(2))
+    op = m.group(1)
+    return {
+        "met": _compare(op, observed, cutoff),
+        "observed_value": observed,
+        "observed_year": int(best["date"].year),
+        "stat_name": f"max_{weeks}w_outflow_bn",
+        "note": f"max {weeks}-week outflow {observed:.3f}bn in {window}; threshold {op} {cutoff:g}bn",
+    }
+
+
 @dataclass
 class MetricResult:
     metric_id: str
@@ -1011,6 +1238,9 @@ LEVEL_RATE_KEYWORDS = ("rate in any year", "at any point", "threshold in any yea
 def _apply_numeric_threshold(observed: float, threshold_text: str) -> Optional[bool]:
     """Given a numeric observed value and a threshold string like '>60%' or '>=7',
     return True/False if parseable, None if threshold not recognisable."""
+    m_no = re.search(r"\bno\s*>\s*(-?\d+(?:\.\d+)?)", threshold_text.strip(), re.IGNORECASE)
+    if m_no:
+        return observed <= float(m_no.group(1))
     m = re.match(r"\s*(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)", threshold_text.strip())
     if not m:
         return None
@@ -1022,6 +1252,42 @@ def _apply_numeric_threshold(observed: float, threshold_text: str) -> Optional[b
     if op == "=":
         return abs(observed - num) < 1e-9
     return None
+
+
+def _annual_growth_series(
+    df: pd.DataFrame,
+    country: str,
+    years: list[int],
+) -> tuple[dict[int, float], str] | None:
+    """Return annual growth rates for requested years.
+
+    Some sources are already annual growth-rate series (small percentage
+    values), while FRED macro levels need a year-over-year percent change.
+    """
+    full = df[df["country"] == country].dropna(subset=["value"]).copy()
+    if full.empty:
+        return None
+    annual = full.groupby("year")["value"].mean().sort_index()
+    if annual.empty:
+        return None
+    requested = [y for y in years if y in annual.index]
+    if not requested:
+        return None
+    sample = annual.loc[requested].abs()
+    use_pct_change = bool((sample > 100).any())
+    out: dict[int, float] = {}
+    for year in years:
+        if year not in annual.index:
+            return None
+        if use_pct_change:
+            prev = year - 1
+            if prev not in annual.index or annual.loc[prev] == 0:
+                return None
+            out[year] = float((annual.loc[year] / annual.loc[prev] - 1.0) * 100.0)
+        else:
+            out[year] = float(annual.loc[year])
+    stat = "annual_yoy_pct_growth" if use_pct_change else "annual_growth_rate_value"
+    return out, stat
 
 
 def evaluate_metric(metric: dict, country: str) -> MetricResult:
@@ -1112,6 +1378,32 @@ def evaluate_metric(metric: dict, country: str) -> MetricResult:
             notes=ev_note or "complex threshold partially evaluable",
         )
 
+    rolling_outflow = _rolling_outflow_from_raw_vintages(
+        [Path(p) for p in vintage_files],
+        threshold,
+        window,
+    )
+    if rolling_outflow is not None:
+        if rolling_outflow["met"] is None:
+            return MetricResult(
+                mid, "PENDING_EVAL", threshold, window, src, direction,
+                observed_value=rolling_outflow["observed_value"],
+                observed_stat_name=rolling_outflow["stat_name"],
+                observed_year=rolling_outflow["observed_year"],
+                vintage_files=vintage_files, vintage_sha256=vintage_shas,
+                notes=rolling_outflow["note"],
+            )
+        return MetricResult(
+            mid, "MET" if rolling_outflow["met"] else "NOT_MET",
+            threshold, window, src, direction,
+            observed_value=rolling_outflow["observed_value"],
+            observed_stat_name=rolling_outflow["stat_name"],
+            observed_year=rolling_outflow["observed_year"],
+            vintage_files=vintage_files,
+            vintage_sha256=vintage_shas,
+            notes=rolling_outflow["note"],
+        )
+
     sub = df[df["country"] == country].dropna(subset=["value"]).copy()
     if sub.empty:
         return MetricResult(mid, "PENDING_DATA", threshold, window, src, direction,
@@ -1119,8 +1411,74 @@ def evaluate_metric(metric: dict, country: str) -> MetricResult:
                             notes=f"No {country} observations in loaded vintages")
 
     win = parse_window(window)
+    tl = threshold.lower()
+    dl = (metric.get("description") or "").lower()
+    combo = tl + " " + dl
+
     if win:
         sub = sub[(sub["year"] >= win[0]) & (sub["year"] <= win[1])]
+
+    # Count-thresholds across the loaded country panel, e.g.
+    # "yes in at least 4 of 5 countries" or
+    # ">= 30% nominal depreciation in at least 4 of 5 countries".
+    # These need all loaded countries, not just the hypothesis's first country.
+    m_country_count = re.search(r"\bin\s+at\s+least\s+(\d+)\s+of\s+(\d+)\s+countries\b", tl)
+    if m_country_count and win:
+        required = int(m_country_count.group(1))
+        universe = df.dropna(subset=["value"]).copy()
+        universe = universe[(universe["year"] >= win[0]) & (universe["year"] <= win[1])]
+        if universe.empty:
+            return MetricResult(mid, "PENDING_DATA", threshold, window, src, direction,
+                                vintage_files=vintage_files, vintage_sha256=vintage_shas,
+                                notes=f"No panel observations in window {window}")
+        numeric_m = re.search(r"(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)", threshold.strip())
+        per_country: dict[str, float] = {}
+        for code, g in universe.groupby("country"):
+            vals = g.sort_values("year")["value"].dropna()
+            if vals.empty:
+                continue
+            if re.search(r"\byes\b", tl) or re.search(r"\bcoded\b", tl):
+                per_country[code] = float(vals.max())
+            elif "pp" in tl or "percentage point" in tl or "swing" in tl:
+                per_country[code] = float(vals.max() - vals.min())
+            elif any(k in combo for k in DECLINE_KEYWORDS):
+                peak = float(vals.max())
+                trough = float(vals.min())
+                per_country[code] = ((peak - trough) / peak * 100.0) if peak else 0.0
+            else:
+                baseline = float(vals.iloc[0])
+                peak = float(vals.max())
+                per_country[code] = ((peak - baseline) / abs(baseline) * 100.0) if baseline else 0.0
+        if not per_country:
+            return MetricResult(mid, "PENDING_DATA", threshold, window, src, direction,
+                                vintage_files=vintage_files, vintage_sha256=vintage_shas,
+                                notes=f"No country-level values in window {window}")
+        if re.search(r"\byes\b", tl) or re.search(r"\bcoded\b", tl):
+            passed = [c for c, v in per_country.items() if v > 0]
+            note_threshold = "event indicator > 0"
+        elif numeric_m:
+            op = numeric_m.group(1)
+            num = float(numeric_m.group(2))
+            passed = [c for c, v in per_country.items() if _compare(op, v, num)]
+            note_threshold = f"{op}{num:g}"
+        else:
+            return MetricResult(mid, "PENDING_EVAL", threshold, window, src, direction,
+                                vintage_files=vintage_files, vintage_sha256=vintage_shas,
+                                notes="count threshold recognised but numeric cutoff unparseable",
+                                observed_value=float(max(per_country.values())),
+                                observed_stat_name="max_loaded_value")
+        count = len(passed)
+        met = count >= required
+        return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                            observed_value=float(count),
+                            observed_stat_name="countries_meeting_threshold",
+                            vintage_files=vintage_files,
+                            vintage_sha256=vintage_shas,
+                            notes=(
+                                f"{count} countries meet {note_threshold} in {window}; "
+                                f"required >= {required}; countries={','.join(sorted(passed))}"
+                            ))
+
     if sub.empty:
         return MetricResult(mid, "PENDING_DATA", threshold, window, src, direction,
                             vintage_files=vintage_files, vintage_sha256=vintage_shas,
@@ -1128,10 +1486,103 @@ def evaluate_metric(metric: dict, country: str) -> MetricResult:
 
     sub = sub.sort_values("year").reset_index(drop=True)
 
+    annual_growth_match = re.search(
+        r"\baverage\s+annual\s+growth\s*(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)",
+        tl,
+    )
+    if annual_growth_match is None:
+        annual_growth_match = re.search(
+            r"\s*(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)%?\s+average\s+annual\s+growth\b",
+            tl,
+        )
+    if annual_growth_match and win:
+        years = list(range(win[0], win[1] + 1))
+        growth = _annual_growth_series(df, country, years)
+        if growth is not None:
+            values, stat_name = growth
+            observed_value = float(pd.Series(list(values.values())).mean())
+            met = _compare(annual_growth_match.group(1), observed_value, float(annual_growth_match.group(2)))
+            return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                                observed_value=observed_value,
+                                observed_stat_name=f"average_{stat_name}",
+                                observed_year=win[1],
+                                vintage_files=vintage_files,
+                                vintage_sha256=vintage_shas,
+                                notes=(
+                                    f"average annual growth {win[0]}-{win[1]} = "
+                                    f"{observed_value:.3f}; threshold "
+                                    f"{annual_growth_match.group(1)}{float(annual_growth_match.group(2)):g}"
+                                ))
+
+    annual_each_match = re.search(
+        r"\bannual\s+growth\s*(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)%?\s+in\s+each(?:\s+of)?\s+(.+)$",
+        tl,
+    )
+    annual_single_match = re.search(
+        r"\bannual\s+growth\s*(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)%?\s+in\s+(\d{4})\b",
+        tl,
+    )
+    if annual_each_match or annual_single_match:
+        if annual_each_match:
+            op = annual_each_match.group(1)
+            num = float(annual_each_match.group(2))
+            years = [int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", annual_each_match.group(3))]
+            if not years and win:
+                years = list(range(win[0], win[1] + 1))
+        else:
+            op = annual_single_match.group(1)
+            num = float(annual_single_match.group(2))
+            years = [int(annual_single_match.group(3))]
+        growth = _annual_growth_series(df, country, years)
+        if growth is not None:
+            values, stat_name = growth
+            met = all(_compare(op, v, num) for v in values.values())
+            observed_value = float(min(values.values()) if op in (">", ">=") else max(values.values()))
+            return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                                observed_value=observed_value,
+                                observed_stat_name=stat_name,
+                                observed_year=max(years),
+                                vintage_files=vintage_files,
+                                vintage_sha256=vintage_shas,
+                                notes=(
+                                    "annual growth values: "
+                                    + ", ".join(f"{y}={values[y]:.3f}" for y in sorted(values))
+                                    + f"; threshold each {op}{num:g}"
+                                ))
+
+    level_band_match = re.search(r"(>=|>|<=|<|=)\s*(-?\d+(?:\.\d+)?)", tl)
+    if level_band_match and any(k in tl for k in ("sustained", "across", "persistent")):
+        op = level_band_match.group(1)
+        num = float(level_band_match.group(2))
+        values = sub[["year", "value"]].dropna().sort_values("year").copy()
+        if not values.empty:
+            stat_values = values["value"]
+            stat_suffix = "level"
+            if "inflation" in combo and stat_values.abs().median() > 20:
+                stat_values = stat_values.pct_change() * 100.0
+                values = values.assign(value=stat_values).dropna(subset=["value"])
+                stat_values = values["value"]
+                stat_suffix = "yoy_pct_change"
+            if not values.empty:
+                if op in (">", ">="):
+                    idx = values["value"].idxmin()
+                    observed_value = float(values.loc[idx, "value"])
+                    observed_stat_name = f"min_{stat_suffix}_in_window"
+                else:
+                    idx = values["value"].idxmax()
+                    observed_value = float(values.loc[idx, "value"])
+                    observed_stat_name = f"max_{stat_suffix}_in_window"
+                observed_year = int(values.loc[idx, "year"])
+                met = _compare(op, observed_value, num)
+                return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                                    observed_value=observed_value,
+                                    observed_stat_name=observed_stat_name,
+                                    observed_year=observed_year,
+                                    vintage_files=vintage_files,
+                                    vintage_sha256=vintage_shas,
+                                    notes=f"{observed_stat_name} = {observed_value:.3f}; threshold {op}{num:g}")
+
     # ---------- Classifier: pick summary statistic ----------
-    tl = threshold.lower()
-    dl = (metric.get("description") or "").lower()
-    combo = tl + " " + dl
 
     observed_value = None
     observed_stat_name = None
@@ -1157,10 +1608,17 @@ def evaluate_metric(metric: dict, country: str) -> MetricResult:
             observed_stat_name = "peak_to_trough_pct_decline"
             observed_year = int(sub.loc[sub["value"].idxmin(), "year"]) if not sub.empty else None
 
-    # Case B: 'gap' or 'ratio' between countries — need cross-country comparison
-    # Use word-boundary matching so 'emigration' (which contains 'ratio' as a
-    # substring) does NOT trigger this branch.
-    elif _has_word(combo, "gap") or _has_word(combo, "ratio") or _has_word(combo, "difference"):
+    # Case B: cross-country gap/ratio — need a dedicated comparison.
+    # A metric like "bank NPL ratio peak" is just a level series, not a
+    # cross-country ratio. Only reserve the branch for text that signals
+    # comparison across countries/peers.
+    elif (
+        (_has_word(combo, "gap") or _has_word(combo, "difference"))
+        and any(k in combo for k in ("peer", " vs ", "versus", "between", "/"))
+    ) or (
+        _has_word(combo, "ratio")
+        and any(k in combo for k in ("peer", " vs ", "versus", "between", "/"))
+    ):
         return MetricResult(mid, "PENDING_EVAL", threshold, window, src, direction,
                             vintage_files=vintage_files, vintage_sha256=vintage_shas,
                             notes="cross-country gap/ratio requires dedicated cross-country evaluator; data present")
@@ -1182,8 +1640,79 @@ def evaluate_metric(metric: dict, country: str) -> MetricResult:
         observed_stat_name = "pct_increase_from_baseline"
         observed_year = int(sub.loc[sub["value"].idxmax(), "year"])
 
-    # Case E: count ('>=3 blackouts', '>=2 redenominations') — need external source
-    elif any(k in tl for k in ("count", "number", "documented")) or re.search(r">=\s*\d+", tl):
+    # Case E0: binary coded yes/no indicators. Used for crisis/event coding
+    # panels where value is 1 in coded event years and 0 otherwise.
+    elif re.search(r"\bcoded\s+yes\b", tl):
+        observed_value = float(sub["value"].max())
+        observed_stat_name = "coded_yes_indicator_max"
+        observed_year = int(sub.loc[sub["value"].idxmax(), "year"])
+        met = observed_value > 0
+        return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                            observed_value=observed_value,
+                            observed_stat_name=observed_stat_name,
+                            observed_year=observed_year,
+                            vintage_files=vintage_files,
+                            vintage_sha256=vintage_shas,
+                            notes="coded YES evaluated from binary event indicator")
+
+    elif re.search(r"\bcoded\s+no\b", tl):
+        observed_value = float(sub["value"].max())
+        observed_stat_name = "coded_no_indicator_max"
+        observed_year = int(sub.loc[sub["value"].idxmax(), "year"])
+        met = observed_value == 0
+        return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                            observed_value=observed_value,
+                            observed_stat_name=observed_stat_name,
+                            observed_year=observed_year,
+                            vintage_files=vintage_files,
+                            vintage_sha256=vintage_shas,
+                            notes="coded NO evaluated from binary event indicator")
+
+    elif re.search(r"\bcoded\s+in\s+at\s+least\s+\d+\s+of\s+\d+\s+countries\b", tl):
+        m = re.search(r"\bcoded\s+in\s+at\s+least\s+(\d+)\s+of\s+(\d+)\s+countries\b", tl)
+        required = int(m.group(1)) if m else 0
+        universe = df.dropna(subset=["value"]).copy()
+        if win:
+            universe = universe[(universe["year"] >= win[0]) & (universe["year"] <= win[1])]
+        coded = int((universe.groupby("country")["value"].max() > 0).sum())
+        met = coded >= required
+        return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                            observed_value=float(coded),
+                            observed_stat_name="countries_with_coded_event",
+                            vintage_files=vintage_files,
+                            vintage_sha256=vintage_shas,
+                            notes=f"{coded} countries coded with event; threshold >= {required}")
+
+    elif "yes/no" in tl:
+        observed_value = float(sub["value"].max())
+        observed_stat_name = "yes_no_indicator_max"
+        observed_year = int(sub.loc[sub["value"].idxmax(), "year"])
+        met = observed_value > 0
+        return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                            observed_value=observed_value,
+                            observed_stat_name=observed_stat_name,
+                            observed_year=observed_year,
+                            vintage_files=vintage_files,
+                            vintage_sha256=vintage_shas,
+                            notes="yes/no event evaluated from binary event indicator")
+
+    elif re.search(r"\ball\s+three\b", tl):
+        observed_value = float(sub["value"].max())
+        observed_stat_name = "event_count_indicator_max"
+        observed_year = int(sub.loc[sub["value"].idxmax(), "year"])
+        met = observed_value >= 3
+        return MetricResult(mid, "MET" if met else "NOT_MET", threshold, window, src, direction,
+                            observed_value=observed_value,
+                            observed_stat_name=observed_stat_name,
+                            observed_year=observed_year,
+                            vintage_files=vintage_files,
+                            vintage_sha256=vintage_shas,
+                            notes="all-three event threshold evaluated from coded count")
+
+    # Case E: count/event thresholds need an event log. Do not classify every
+    # numeric ">= N%" threshold as count-based; those can be evaluated against
+    # the observed summary statistic below.
+    elif any(k in tl for k in ("count", "number", "documented", "coded yes", "yes/no")):
         # If the data is a time-series, we can't auto-count discrete events
         return MetricResult(mid, "PENDING_EVAL", threshold, window, src, direction,
                             vintage_files=vintage_files, vintage_sha256=vintage_shas,
@@ -1245,6 +1774,23 @@ def compute_verdict(results: list[MetricResult], support_threshold: int, refute_
             pending_eval += 1
 
     total = len(results)
+    if total == 0:
+        return {
+            "verdict": "INCONCLUSIVE_DATA_PENDING",
+            "reason": "no canonical metrics available to evaluate",
+            "counts": {
+                "total": 0,
+                "met": 0,
+                "not_met": 0,
+                "pending_data": 0,
+                "pending_eval": 0,
+                "optimistic_met_ceiling": 0,
+            },
+            "thresholds": {
+                "support_threshold": support_threshold,
+                "refute_threshold": refute_threshold,
+            },
+        }
     # Optimistic ceiling: if every pending resolved in favour of the hypothesis
     optimistic_met = met + pending_data + pending_eval
     # Pessimistic floor: currently MET only
@@ -1305,6 +1851,45 @@ def run_hypothesis(hid: str) -> dict:
             f"{hid} has evidence_type={spec.get('evidence_type')!r}; "
             f"this runner only handles canonical_case_multi_metric"
         )
+
+    if is_stub_falsification_rule(spec):
+        agg = {
+            "verdict": "INCONCLUSIVE_DATA_PENDING",
+            "reason": "falsification rule not sharpened — runner refuses to grade against generic stub boilerplate",
+            "counts": {
+                "total": 0,
+                "met": 0,
+                "not_met": 0,
+                "pending_data": 0,
+                "pending_eval": 0,
+                "optimistic_met_ceiling": 0,
+            },
+            "thresholds": {"support_threshold": 0, "refute_threshold": 0},
+        }
+        diag = {
+            "hypothesis_id": hid,
+            "evidence_type": "canonical_case_multi_metric",
+            "run_utc": pd.Timestamp.now(tz="UTC").isoformat(),
+            "country": primary_country(spec),
+            "verdict": agg["verdict"],
+            "reason": agg["reason"],
+            "counts": agg["counts"],
+            "thresholds": agg["thresholds"],
+            "metrics": [],
+        }
+        out_dir = RUNS_DIR / hid
+        out_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame([]).to_parquet(out_dir / "metric_results.parquet", index=False)
+        (out_dir / "diagnostics.json").write_text(json.dumps(diag, indent=2, default=str) + "\n")
+        (out_dir / "manifest.yaml").write_text(yaml.safe_dump({
+            "hypothesis_id": hid,
+            "run_utc": pd.Timestamp.now(tz="UTC").isoformat(),
+            "evidence_type": "canonical_case_multi_metric",
+            "vintages": [],
+        }, sort_keys=False))
+        lines = _build_result_card(hid, spec, [], agg, primary_country(spec))
+        (out_dir / "result_card.md").write_text("\n".join(lines) + "\n")
+        return diag
 
     country = primary_country(spec)
     mmf = spec.get("multi_metric_falsification", {})

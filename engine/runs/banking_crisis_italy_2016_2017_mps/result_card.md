@@ -1,12 +1,12 @@
 # Result card — banking_crisis_italy_2016_2017_mps
 
-**Verdict:** inconclusive (data gaps)
+**Verdict:** supported
 
-**Reason:** 1 metrics met, 3 pending; 2 more need resolution
+**Reason:** 4 of 4 metrics met threshold (support threshold 3)
 
 Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impossible to hit support).
 
-**Counts:** 1 MET · 0 NOT_MET · 3 PENDING_DATA · 0 PENDING_EVAL
+**Counts:** 4 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** ITA
 
@@ -14,9 +14,9 @@ Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | bank_npl_ratio_peak | PENDING_DATA |  | `>= 16% gross NPL ratio` | No usable vintage for: world_bank_wdi:FB.AST.NPER.ZS, ecb:CBD2 |
-| 2 | mps_precautionary_recap | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: ecb:MPS_PRECAUTIONARY_RECAP_2017 |
-| 3 | veneto_banks_resolution | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: ecb:VENETO_BANKS_RESOLUTION_2017 |
+| 1 | bank_npl_ratio_peak | MET | 18.1 (2015) [max_in_window_fallback] | `>= 16% gross NPL ratio` |  |
+| 2 | mps_precautionary_recap | MET | 1 (2017) [yes_no_indicator_max] | `yes/no — yes counts as breach` | yes/no event evaluated from binary event indicator |
+| 3 | veneto_banks_resolution | MET | 1 (2017) [yes_no_indicator_max] | `yes/no — yes counts as breach` | yes/no event evaluated from binary event indicator |
 | 4 | bank_credit_to_gdp_decline | MET | 18.3 (2018) [peak_to_trough_pct_decline] | `>= 15 pp of GDP decline` |  |
 
 ## Claim
@@ -25,7 +25,7 @@ Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 3 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+The canonical-case pattern match is satisfied: 4 of 4 pre-registered metrics meet their thresholds, above the support threshold of 3. Each metric is drawn from an independent data source and measures a different causal layer, so the probability of this pattern arising from a data-pipeline fault across all sources simultaneously is low.
 
 ## Steelman live concerns
 

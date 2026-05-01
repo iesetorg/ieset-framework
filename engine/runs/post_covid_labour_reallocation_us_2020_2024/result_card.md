@@ -2,11 +2,11 @@
 
 **Verdict:** inconclusive (data gaps)
 
-**Reason:** 0 metrics met, 5 pending; 4 more need resolution
+**Reason:** 1 metrics met, 3 pending; 3 more need resolution
 
 Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 0 MET · 0 NOT_MET · 5 PENDING_DATA · 0 PENDING_EVAL
+**Counts:** 1 MET · 1 NOT_MET · 1 PENDING_DATA · 2 PENDING_EVAL
 
 **Primary country:** USA
 
@@ -14,11 +14,11 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | leisure_hospitality_employment_collapse_2020 | PENDING_DATA |  | `>35% decline peak-to-trough` | No usable vintage for: fred:USLAH |
-| 2 | leisure_hospitality_wage_overrecovery_2024 | PENDING_DATA |  | `>5pp cumulative excess over aggregate private AHE 2019-12 to 2024-12` | No usable vintage for: fred:CES7000000003, fred:CES0500000003 |
-| 3 | information_sector_employment_recovery | PENDING_DATA |  | `by 2024-12 employment >= 2019-12 level (full recovery or above)` | No usable vintage for: fred:USINFO |
+| 1 | leisure_hospitality_employment_collapse_2020 | NOT_MET | 0 (2020) [peak_to_trough_pct_decline] | `>35% decline peak-to-trough` |  |
+| 2 | leisure_hospitality_wage_overrecovery_2024 | MET | 112 (2024) [pct_increase_from_baseline] | `>5pp cumulative excess over aggregate private AHE 2019-12 to 2024-12` |  |
+| 3 | information_sector_employment_recovery | PENDING_EVAL | 3.06e+03 (2022) [max_in_window_fallback] | `by 2024-12 employment >= 2019-12 level (full recovery or above)` | threshold expression unparseable by regex |
 | 4 | wfh_share_persistence_2024 | PENDING_DATA |  | `>25% of full-time employees still hybrid or fully remote in 2024` | No usable vintage for: bls:american_time_use_survey_telework |
-| 5 | retail_brick_mortar_employment_shortfall | PENDING_DATA |  | `by 2024-12 employment <= 95% of 2019-12 level` | No usable vintage for: fred:CES4245200001 |
+| 5 | retail_brick_mortar_employment_shortfall | PENDING_EVAL | 3.24e+03 (2024) [max_in_window_fallback] | `by 2024-12 employment <= 95% of 2019-12 level` | threshold expression unparseable by regex |
 
 ## Claim
 
@@ -26,7 +26,7 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 5 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+Verdict is **inconclusive (data gaps)** — 1 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 2 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

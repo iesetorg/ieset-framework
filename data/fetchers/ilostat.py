@@ -29,6 +29,13 @@ class IlostatError(RuntimeError):
     pass
 
 
+_ILO_ALIASES: dict[str, str] = {
+    "unemployment_rate": "UNE_2EAP_SEX_AGE_RT_A",
+    "EAP_2WAP_SEX_AGE_RT": "EAP_2WAP_SEX_AGE_RT_A",
+    "EAR_4MTH_SEX_RT": "EAR_EHRA_SEX_NB_A",
+}
+
+
 def fetch(
     series_id: str,
     *,
@@ -41,6 +48,7 @@ def fetch(
     ref_area: ISO3 country (or comma-separated list), or None for all.
     time_from / time_to: YYYY bounds."""
     fetch_ts = utc_now()
+    series_id = _ILO_ALIASES.get(series_id, series_id)
     params: dict[str, str] = {"id": series_id, "format": ".csv"}
     if ref_area:
         params["ref_area"] = ref_area

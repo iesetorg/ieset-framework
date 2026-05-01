@@ -1,12 +1,12 @@
 # Result card — japan_zero_growth_basic_wellbeing_intact
 
-**Verdict:** inconclusive (data gaps)
+**Verdict:** refuted
 
-**Reason:** 0 metrics met, 4 pending; 4 more need resolution
+**Reason:** 1 metrics failed and 0 pending; cannot reach 4
 
 Pre-registered rule: SUPPORT if >= 4 of 4 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 0 MET · 0 NOT_MET · 0 PENDING_DATA · 4 PENDING_EVAL
+**Counts:** 3 MET · 1 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** JPN
 
@@ -14,10 +14,10 @@ Pre-registered rule: SUPPORT if >= 4 of 4 metrics met; REFUTE if <= 2 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | jpn_zero_growth_premise | PENDING_EVAL | 0 (1990) [pct_increase_from_baseline] | `mean(NY.GDP.PCAP.KD.ZG, 1990-2019) < 1.5%` | threshold expression unparseable by regex |
-| 2 | jpn_life_expectancy_gain | PENDING_EVAL | 7 (2019) [pct_increase_from_baseline] | `LE_2019 - LE_1990 >= 4 years` | threshold expression unparseable by regex |
-| 3 | jpn_hours_worked_decline | PENDING_EVAL | 0 (1990) [pct_increase_from_baseline] | `avh_2019 / avh_1990 <= 0.90` | threshold expression unparseable by regex |
-| 4 | jpn_life_satisfaction_stable_oecd_median | PENDING_EVAL |  | `max(|cantril_jpn_t - cantril_oecd_median_t|) <= 1.0 over 2008-2020` | Non-tidy (needs custom parser): owid:happiness-cantril-ladder |
+| 1 | jpn_zero_growth_premise | MET |  | `mean(NY.GDP.PCAP.KD.ZG, 1990-2019) < 1.5%` | JPN mean 1990-2019 = 0.961; threshold <1.5 |
+| 2 | jpn_life_expectancy_gain | MET |  | `LE_2019 - LE_1990 >= 4 years` | JPN 2019-1990 diff = 5.519 (used 2019, 1990); threshold >=4 |
+| 3 | jpn_hours_worked_decline | MET |  | `avh_2019 / avh_1990 <= 0.90` | JPN 2019/1990 ratio = 0.834 (used 2019, 1990); threshold <=0.9 |
+| 4 | jpn_life_satisfaction_stable_oecd_median | NOT_MET |  | `max(|cantril_jpn_t - cantril_oecd_median_t|) <= 1.0 over 2008-2020` | max |JPN - OECD median| = 1.016 in 2019; threshold <=1 |
 
 ## Claim
 
@@ -25,7 +25,7 @@ Pre-registered rule: SUPPORT if >= 4 of 4 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 0 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 4 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+The canonical-case pattern match is not satisfied: only 3 of 4 metrics met their thresholds, below the support threshold of 4. Note that for canonical-case hypotheses, a refutation can indicate either that the hypothesis is genuinely weak, that the metric set is mis-calibrated (too strict), or that the data substrate has systematic gaps. Review the PENDING_DATA / PENDING_EVAL metrics before accepting the refutation.
 
 ## Steelman live concerns
 

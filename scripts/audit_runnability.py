@@ -88,9 +88,24 @@ def load_yaml(path: Path) -> dict | None:
         return None
 
 
+# Reverse aliases: stored_series_id -> {requested_series_id, ...}
+# Used when a fetcher resolves an alias at runtime but stores under the canonical name.
+_SERIES_REVERSE_ALIASES: dict[str, dict[str, set[str]]] = {
+    "ilostat": {
+        "EAP_2WAP_SEX_AGE_RT_A": {"EAP_2WAP_SEX_AGE_RT"},
+        "EAR_EHRA_SEX_NB_A": {"EAR_4MTH_SEX_RT"},
+        "UNE_2EAP_SEX_AGE_RT_A": {"unemployment_rate"},
+    },
+    "ecb": {
+        "ICP__M.U2.N.000000.4.ANR": {"ICP.M.U2.N.000000.4.ANR"},
+        "FM__D.U2.EUR.4F.KR.MRR_RT.LEV": {"FM", "FM:STN", "FM.M.U2.EUR.4F.KR.MRR_FR.LEV"},
+    },
+}
+
+
 def list_publishers_with_data() -> dict[str, set[str]]:
     """Return {publisher_id: {series_id, ...}} for every publisher with at least
-    one parquet file on disk."""
+    one parquet file on disk. Includes aliases from publishers.yaml."""
     result: dict[str, set[str]] = {}
     if not VINTAGE_ROOT.exists():
         return result
@@ -105,6 +120,25 @@ def list_publishers_with_data() -> dict[str, set[str]]:
                 series.add(stem.split("@", 1)[0])
         if series:
             result[pub_dir.name] = series
+    # Resolve aliases from publishers.yaml
+    publishers_yaml = Path(__file__).resolve().parents[1] / "data" / "fetchers" / "publishers.yaml"
+    if publishers_yaml.exists():
+        try:
+            with publishers_yaml.open() as f:
+                pubs = yaml.safe_load(f)
+            for pub_id, info in (pubs.get("publishers") or {}).items():
+                if pub_id in result:
+                    for alias in info.get("aliases", []):
+                        if alias not in result:
+                            result[alias] = result[pub_id]
+        except Exception:
+            pass
+    # Apply reverse aliases (stored name -> requested name)
+    for pub_id, rev_map in _SERIES_REVERSE_ALIASES.items():
+        if pub_id in result:
+            for stored_sid, requested_sids in rev_map.items():
+                if stored_sid in result[pub_id]:
+                    result[pub_id].update(requested_sids)
     return result
 
 
@@ -282,24 +316,29 @@ def write_report(records: list[dict[str, Any]]) -> None:
             flag_counts[f] += 1
 
     # Top blocking publishers: how many hypotheses would unlock if this
-    # publisher were added. Only counts hypotheses that have a supported
-    # template AND no other blocking publisher than this one (i.e. adding
-    # the fetcher actually unlocks the hypothesis). For reporting we show
-    # both unconditional (any-hypothesis-mentioning-it) and unlock-count.
+    # publisher were added. Count NEEDS_DATA specs even when they already
+    # have an engine/runs/ directory; a prior inconclusive run is still a
+    # real coverage blocker, not evidence that the spec is runnable.
     mentions = Counter()
     unlock_counts = Counter()
+    missing_series_mentions = Counter()
+    missing_series_publishers = Counter()
     for r in records:
         if "LEGACY_SCHEMA" in r["flags"]:
             continue
         if r["estimator_template"] not in SUPPORTED_TEMPLATES:
             continue
-        if "READY" in r["flags"] or "HAS_RUN" in r["flags"]:
+        if "NEEDS_DATA" not in r["flags"]:
             continue
         miss = r["missing_publishers"]
         for p in miss:
             mentions[p] += 1
         if len(miss) == 1:
             unlock_counts[miss[0]] += 1
+        for series in r["missing_series"]:
+            missing_series_mentions[series] += 1
+            pub = series.split(":", 1)[0] if ":" in series else "(unknown)"
+            missing_series_publishers[pub] += 1
 
     # READY but not run.
     ready_not_run = [r for r in records
@@ -346,6 +385,22 @@ def write_report(records: list[dict[str, Any]]) -> None:
     for p in combined[:30]:
         lines.append(f"| {p} | {unlock_counts.get(p, 0)} | {mentions.get(p, 0)} |")
     lines.append("")
+
+    if missing_series_mentions:
+        lines.append("## Top Missing Series\n")
+        lines.append("Series-level gaps where the publisher exists locally but the requested series "
+                     "is not present in the local vintages. These can often be unlocked with "
+                     "small alias additions, targeted fetches, or spec source rewrites.\n")
+        lines.append("| Publisher | missing-series mentions |")
+        lines.append("|-----------|------------------------:|")
+        for pub, count in missing_series_publishers.most_common(30):
+            lines.append(f"| {pub} | {count} |")
+        lines.append("")
+        lines.append("| Series | mentions |")
+        lines.append("|--------|---------:|")
+        for series, count in missing_series_mentions.most_common(40):
+            lines.append(f"| `{series}` | {count} |")
+        lines.append("")
 
     lines.append("## READY-but-not-run candidates\n")
     lines.append(f"_{len(ready_not_run)} hypotheses are READY (template + data on disk) and have no engine/runs/ directory._\n")

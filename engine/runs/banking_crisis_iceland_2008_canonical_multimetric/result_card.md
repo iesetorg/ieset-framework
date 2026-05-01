@@ -1,12 +1,12 @@
 # Result card — banking_crisis_iceland_2008_canonical_multimetric
 
-**Verdict:** inconclusive (data gaps)
+**Verdict:** refuted
 
-**Reason:** 2 metrics met, 3 pending; 3 more need resolution
+**Reason:** 2 metrics failed and 0 pending; cannot reach 5
 
 Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 2 MET · 1 NOT_MET · 2 PENDING_DATA · 1 PENDING_EVAL
+**Counts:** 4 MET · 2 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** ISL
 
@@ -14,11 +14,11 @@ Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | bank_assets_to_gdp_peak | PENDING_EVAL | 243 [max_loaded_value] | `>= 700% of GDP` | count-based threshold requires event log; data not sufficient to auto-count |
-| 2 | krona_depreciation_2008_2009 | PENDING_DATA |  | `>= 50% nominal depreciation peak-to-trough` | No usable vintage for: imf:ENDA_XDC_USD_RATE; Non-tidy (needs custom parser): bis:WS_EER |
+| 1 | bank_assets_to_gdp_peak | NOT_MET | 243 (2007) [max_in_window_fallback] | `>= 700% of GDP` |  |
+| 2 | krona_depreciation_2008_2009 | MET | 169 (2007) [max_in_window_fallback] | `>= 50% nominal depreciation peak-to-trough` |  |
 | 3 | real_gdp_peak_to_trough | MET | 10.4 (2010) [peak_to_trough_pct_decline] | `>= 8% peak-to-trough decline` |  |
-| 4 | unemployment_rate_rise | MET | 157 (2010) [pct_increase_from_baseline] | `>= 5 pp rise from 2007 baseline` |  |
-| 5 | imf_stand_by_arrangement_entered | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: imf:SBA_ICL_2008 |
+| 4 | unemployment_rate_rise | MET | 1.64e+03 (2008) [pct_increase_from_baseline] | `>= 5 pp rise from 2007 baseline` |  |
+| 5 | imf_stand_by_arrangement_entered | MET | 1 (2008) [yes_no_indicator_max] | `yes/no — yes counts as breach` | yes/no event evaluated from binary event indicator |
 | 6 | sovereign_yield_spike_or_cds | NOT_MET | 12.9 (2009) [pct_increase_from_baseline] | `>= 500 bp at peak` |  |
 
 ## Claim
@@ -27,7 +27,7 @@ Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 2 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 1 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+The canonical-case pattern match is not satisfied: only 4 of 6 metrics met their thresholds, below the support threshold of 5. Note that for canonical-case hypotheses, a refutation can indicate either that the hypothesis is genuinely weak, that the metric set is mis-calibrated (too strict), or that the data substrate has systematic gaps. Review the PENDING_DATA / PENDING_EVAL metrics before accepting the refutation.
 
 ## Steelman live concerns
 

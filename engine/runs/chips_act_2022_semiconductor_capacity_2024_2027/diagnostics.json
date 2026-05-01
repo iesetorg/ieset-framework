@@ -1,31 +1,54 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'log_us_semiconductor_fab_construction_value_added' not loaded",
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient obs after listwise deletion (9)",
   "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "outcome 'log_us_semiconductor_fab_construction_value_added' not loaded",
+  "verdict_reason": "insufficient obs after listwise deletion (9)",
   "hypothesis_id": "chips_act_2022_semiconductor_capacity_2024_2027",
   "template": "did_callaway_santanna",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "Not supported if (a) the US \u00d7 post-2022 effect on semiconductor construction is not statistically positive at p<0.10 after country + year FE, OR (b) US share of global advanced-node logic capacity does not rise by at least 5 percentage points by end-2027, OR (c) realised capacity addition by 2027 is less than 30% of announced 2022-2024 capacity-addition headlines, OR (d) Asian competitor capex fell materially below pre-CHIPS trend (refuting the \"narrowing the gap\" framing \u2014 it would imply the US gain is a relocation of capex rather than expansion of the policy-target). If only construction-start activity rises but realised capacity by 2027 is well short of announcements, classify as \"announcement bubble.\"\n",
   "falsification_test_text": "chips_act_capacity_did_panel",
   "estimate": {
-    "error": "outcome 'log_us_semiconductor_fab_construction_value_added' not loaded"
+    "error": "insufficient obs after listwise deletion (9)"
   },
   "data_status": {
     "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "log_us_semiconductor_fab_construction_value_added",
+        "source": "fred:TLPRVCONS",
+        "publisher": "fred",
+        "n_rows": 34
+      },
+      {
+        "role": "outcome",
+        "name": "log_taiwan_korea_china_semiconductor_capex",
+        "source": "constructed: TSMC + Samsung + SK Hynix + SMIC reported annual capex (company filings). Cross-check against Korea industrial-production semiconductor index (oecd or kosis source).",
+        "publisher": "constructed",
+        "n_rows": 80
+      },
+      {
+        "role": "treatment",
+        "name": "us_post_chips_dummy",
+        "source": "constructed: indicator = 1 for USA from 2022-08 (CHIPS Act enactment) onwards; 0 otherwise.",
+        "publisher": "constructed",
+        "n_rows": 80
+      },
       {
         "role": "controls",
         "name": "log_real_gdp",
         "source": "world_bank_wdi:NY.GDP.MKTP.KD",
         "publisher": "world_bank_wdi",
-        "n_rows": 14131
+        "n_rows": 14066
+      },
+      {
+        "role": "controls",
+        "name": "real_interest_rate",
+        "source": "fred:DFII10",
+        "publisher": "fred",
+        "n_rows": 192
       }
     ],
     "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "log_us_semiconductor_fab_construction_value_added",
-        "source": "fred:TLPRVCONS"
-      },
       {
         "role": "outcome",
         "name": "log_us_advanced_node_wafer_capacity_kwspm",
@@ -38,18 +61,8 @@
       },
       {
         "role": "outcome",
-        "name": "log_taiwan_korea_china_semiconductor_capex",
-        "source": "constructed: TSMC + Samsung + SK Hynix + SMIC reported annual capex (company filings). Cross-check against Korea industrial-production semiconductor index (oecd or kosis source)."
-      },
-      {
-        "role": "outcome",
         "name": "us_chips_act_obligated_outlay_usd",
         "source": "constructed: Department of Commerce / CHIPS Program Office obligation tracker. Manual-drop pending."
-      },
-      {
-        "role": "treatment",
-        "name": "us_post_chips_dummy",
-        "source": "constructed: indicator = 1 for USA from 2022-08 (CHIPS Act enactment) onwards; 0 otherwise."
       },
       {
         "role": "treatment",
@@ -63,16 +76,11 @@
       },
       {
         "role": "controls",
-        "name": "real_interest_rate",
-        "source": "fred:DFII10"
-      },
-      {
-        "role": "controls",
         "name": "us_export_control_intensity_china",
         "source": "constructed: BIS export-control rule count (October 2022, October 2023, December 2024 expansions) \u2014 count of HS6 / ECCN line items restricted. Cross-check against fred:IRPRTS003M086NEST commodity export indices. Manual-drop pending."
       }
     ]
   },
-  "run_utc": "2026-04-30T08:43:19+00:00",
+  "run_utc": "2026-05-01T08:59:30+00:00",
   "runner": "scripts/run_did_callaway_santanna.py"
 }

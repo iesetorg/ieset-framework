@@ -2,11 +2,11 @@
 
 **Verdict:** inconclusive (data gaps)
 
-**Reason:** 0 metrics met, 3 pending; 3 more need resolution
+**Reason:** 2 metrics met, 1 pending; 1 more need resolution
 
 Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impossible to hit support).
 
-**Counts:** 0 MET · 1 NOT_MET · 2 PENDING_DATA · 1 PENDING_EVAL
+**Counts:** 2 MET · 1 NOT_MET · 1 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** CHN
 
@@ -15,9 +15,9 @@ Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impos
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
 | 1 | shanghai_stock_index_2015_decline | PENDING_DATA |  | `>= 40% peak-to-trough decline June-2015 to Feb-2016` | No usable vintage for: fred:CHNSCITRD, fred:SHCOMP |
-| 2 | real_house_price_decline_tier_2_3 | PENDING_EVAL |  | `>= 8% nominal decline in BIS WS_SPP` | Non-tidy (needs custom parser): bis:WS_SPP |
+| 2 | real_house_price_decline_tier_2_3 | MET | 20.7 (2024) [peak_to_trough_pct_decline] | `>= 8% nominal decline in BIS WS_SPP` |  |
 | 3 | bank_credit_to_gdp_extreme_run_up | NOT_MET | 52.6 (2016) [pct_increase_from_baseline] | `>= 70 pp of GDP rise from 2008 to 2017 peak` |  |
-| 4 | laeven_valencia_no_systemic_coding | PENDING_DATA |  | `coded NO — supports the 'managed under capital controls' framing` | No usable vintage for: owid:systemic-banking-crises |
+| 4 | laeven_valencia_no_systemic_coding | MET | 0 (2015) [coded_no_indicator_max] | `coded NO — supports the 'managed under capital controls' framing` | coded NO evaluated from binary event indicator |
 
 ## Claim
 
@@ -25,7 +25,7 @@ Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 2 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 1 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+Verdict is **inconclusive (data gaps)** — 1 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

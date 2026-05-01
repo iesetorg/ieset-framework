@@ -2,11 +2,11 @@
 
 **Verdict:** inconclusive (data gaps)
 
-**Reason:** 0 metrics met, 5 pending; 5 more need resolution
+**Reason:** 2 metrics met, 3 pending; 3 more need resolution
 
 Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impossible to hit support).
 
-**Counts:** 0 MET · 1 NOT_MET · 4 PENDING_DATA · 1 PENDING_EVAL
+**Counts:** 2 MET · 1 NOT_MET · 3 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** LBN
 
@@ -15,8 +15,8 @@ Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impos
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
 | 1 | real_gdp_cumulative_decline | NOT_MET | 32.9 (2023) [peak_to_trough_pct_decline] | `>= 35% decline` |  |
-| 2 | cpi_inflation_spike | PENDING_EVAL | 221 [max_loaded_value] | `>= 100% YoY peak` | count-based threshold requires event log; data not sufficient to auto-count |
-| 3 | pound_depreciation | PENDING_DATA |  | `>= 90% nominal depreciation peak-to-trough` | No usable vintage for: imf:ENDA_XDC_USD_RATE |
+| 2 | cpi_inflation_spike | MET | 221 (2023) [max_in_window_fallback] | `>= 100% YoY peak` |  |
+| 3 | pound_depreciation | MET | 1.39e+04 (2023) [max_in_window_fallback] | `>= 90% nominal depreciation peak-to-trough` |  |
 | 4 | sovereign_default_event | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: imf:LBN_DEFAULT_2020 |
 | 5 | informal_capital_controls | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: imf:LBN_CFM_2019 |
 | 6 | bank_credit_to_gdp_decline | PENDING_DATA |  | `>= 50 pp of GDP decline` | No LBN observations in window 2019-2023 |
@@ -27,7 +27,7 @@ Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 4 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 1 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+Verdict is **inconclusive (data gaps)** — 3 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
 
 ## Steelman live concerns
 

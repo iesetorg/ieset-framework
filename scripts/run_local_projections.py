@@ -26,6 +26,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_panel_fe import (
     is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, build_panel, infer_claim_direction, filter_sample,
+    first_loaded_var, construct_treatment_from_text,
+    should_persist_preflight_inconclusive,
+    bump_bulk_run_count, print_bulk_run_summary, fit_fe_ols_fallback,
+    prune_controls_for_overlap,
 )
 
 
@@ -43,14 +47,19 @@ def fit_lp(panel: pd.DataFrame, spec: dict, outcome: str, treatment: str) -> dic
     var_blocks = spec.get("variables") or {}
     control_names = [c["name"] for c in (var_blocks.get("controls") or [])
                      if c.get("name") and c["name"] in panel.columns]
-    sub = panel[["country_iso3", "year", outcome, treatment] + control_names].dropna()
+    sub, usable_controls, dropped_controls = prune_controls_for_overlap(
+        panel,
+        [outcome, treatment],
+        control_names,
+        min_obs=50,
+    )
     if len(sub) < 50:
         return {"error": f"insufficient obs ({len(sub)}); LP needs >=50"}
 
     # For each horizon h, build y_{t+h} and regress on treatment_t
     coefficients = []
     try:
-        from linearmodels.panel import PanelOLS
+        rhs = [treatment] + usable_controls
         for h in HORIZONS:
             sub_h = sub.copy()
             sub_h[f"y_h{h}"] = sub_h.groupby("country_iso3")[outcome].shift(-h)
@@ -58,9 +67,9 @@ def fit_lp(panel: pd.DataFrame, spec: dict, outcome: str, treatment: str) -> dic
             if len(sub_h) < 30:
                 coefficients.append({"horizon": h, "error": f"insufficient at h={h}"})
                 continue
-            sub_idx = sub_h.set_index(["country_iso3", "year"])
-            rhs = [treatment] + control_names
             try:
+                from linearmodels.panel import PanelOLS
+                sub_idx = sub_h.set_index(["country_iso3", "year"])
                 mod = PanelOLS(sub_idx[f"y_h{h}"], sub_idx[rhs],
                                entity_effects=True, time_effects=True,
                                drop_absorbed=True)
@@ -73,7 +82,26 @@ def fit_lp(panel: pd.DataFrame, spec: dict, outcome: str, treatment: str) -> dic
                     "n_obs": int(res.nobs),
                 })
             except Exception as exc:
-                coefficients.append({"horizon": h, "error": str(exc)})
+                fallback = fit_fe_ols_fallback(
+                    sub_h.reset_index(drop=True),
+                    f"y_h{h}",
+                    rhs,
+                    treatment,
+                    entity=True,
+                    time=True,
+                    cluster_spec="country",
+                    method_label=f"LP fallback h={h} (linearmodels failed: {exc})",
+                )
+                if "error" in fallback:
+                    coefficients.append({"horizon": h, "error": str(exc)})
+                else:
+                    coefficients.append({
+                        "horizon": h,
+                        "coefficient": fallback["coefficient"],
+                        "std_error": fallback["std_error"],
+                        "p_value": fallback["p_value"],
+                        "n_obs": fallback["n_obs"],
+                    })
         # Cumulative effect = sum of coefficients across horizons
         valid = [c for c in coefficients if "coefficient" in c]
         if not valid:
@@ -91,12 +119,13 @@ def fit_lp(panel: pd.DataFrame, spec: dict, outcome: str, treatment: str) -> dic
             "max_horizon": last["horizon"],
             "n_countries": int(sub["country_iso3"].nunique()),
             "method": "Jordà local projections (TWFE, country-clustered)",
+            "dropped_controls_due_to_overlap": dropped_controls,
         }
     except Exception as exc:
         return {"error": f"LP failed: {exc}"}
 
 
-def verdict(est: dict, claim_dir: str) -> tuple[str, str]:
+def compute_verdict(est: dict, claim_dir: str) -> tuple[str, str]:
     if "error" in est:
         return "INCONCLUSIVE_DATA_PENDING", est["error"]
     cumul = est["cumulative_coefficient"]
@@ -164,7 +193,11 @@ def write_outputs(hid: str, spec: dict, status: dict, est: dict,
     (out_dir / "result_card.md").write_text("\n".join(md))
 
 
-def run_one(hid: str, force: bool = False) -> str:
+def run_one(
+    hid: str,
+    force: bool = False,
+    persist_preflight_inconclusive: bool = True,
+) -> str:
     if not force and has_committed_verdict(hid):
         return f"  · {hid}: skipped (committed verdict already on disk)"
     found = load_spec(hid)
@@ -184,8 +217,22 @@ def run_one(hid: str, force: bool = False) -> str:
             "(replace falsification.rule with a dispositive threshold AND "
             "document the sharpening in methodology_note) before running."
         )
-        write_outputs(hid, spec, {"variables_loaded": [], "variables_missing": []}, {"error": reason}, {}, verdict, reason, None)
-        return f"  ⚠ {hid}: {verdict} (stub rule, refused to grade)"
+        persisted = should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        )
+        if persisted:
+            write_outputs(
+                hid,
+                spec,
+                {"variables_loaded": [], "variables_missing": []},
+                {"error": reason},
+                verdict,
+                reason,
+            )
+        suffix = " (stub rule, refused to grade)"
+        if not persisted:
+            suffix += " [artifact skipped]"
+        return f"  ⚠ {hid}: {verdict}{suffix}"
 
     panel, status = build_panel(spec)
     var_blocks = spec.get("variables") or {}
@@ -193,18 +240,27 @@ def run_one(hid: str, force: bool = False) -> str:
     treatment_items = var_blocks.get("treatment") or []
     if not outcome_items or not treatment_items:
         v, r = "INCONCLUSIVE_DATA_PENDING", "no outcome or no treatment variable"
-        write_outputs(hid, spec, status, {"error": r}, v, r)
-        return f"  ⚠ {hid}: {v}"
-    o, t = outcome_items[0]["name"], treatment_items[0]["name"]
-    if o not in panel.columns or t not in panel.columns:
-        missing = [x for x in (o, t) if x not in panel.columns]
-        v, r = "INCONCLUSIVE_DATA_PENDING", f"variables not loaded: {missing}"
-        write_outputs(hid, spec, status, {"error": r}, v, r)
+        if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
+            write_outputs(hid, spec, status, {"error": r}, v, r)
         return f"  ⚠ {hid}: {v}"
     panel_filt = filter_sample(panel, spec)
+    o = first_loaded_var(outcome_items, panel_filt)
+    t = first_loaded_var(treatment_items, panel_filt)
+    if t is None:
+        built = construct_treatment_from_text(spec, panel_filt)
+        if built is not None:
+            panel_filt, t = built
+    if o is None or t is None:
+        missing = []
+        if o is None: missing += [item.get("source") for item in outcome_items]
+        if t is None: missing += [item.get("source") for item in treatment_items]
+        v, r = "INCONCLUSIVE_DATA_PENDING", f"variables not loaded: {missing}"
+        if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
+            write_outputs(hid, spec, status, {"error": r}, v, r)
+        return f"  ⚠ {hid}: {v}"
     est = fit_lp(panel_filt, spec, o, t)
     cd = infer_claim_direction(spec)
-    v, r = verdict(est, cd)
+    v, r = compute_verdict(est, cd)
     write_outputs(hid, spec, status, est, v, r)
     icon = {"SUPPORTED": "✓", "REFUTED": "✗", "PARTIAL": "·",
             "INCONCLUSIVE_DATA_PENDING": "⚠"}.get(v, " ")
@@ -217,19 +273,43 @@ def main() -> int:
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--force", action="store_true",
                     help="Overwrite existing committed verdicts.")
+    ap.add_argument(
+        "--write-preflight-inconclusive",
+        action="store_true",
+        help="Persist obvious preflight INCONCLUSIVE artifacts during bulk runs.",
+    )
     args = ap.parse_args()
+    persist_preflight = args.write_preflight_inconclusive or not args.all
     if args.all:
         ids = list_specs()
+        counts: dict[str, int] = {}
         print(f"Running {len(ids)} local_projections specs…")
         for hid in ids:
-            try: print(run_one(hid, force=args.force))
+            try:
+                msg = (
+                    run_one(
+                        hid,
+                        force=args.force,
+                        persist_preflight_inconclusive=persist_preflight,
+                    )
+                )
+                print(msg)
+                bump_bulk_run_count(counts, msg)
             except Exception as e:
                 print(f"  ✗ {hid}: crashed — {e}")
+                counts["crashed"] = counts.get("crashed", 0) + 1
                 traceback.print_exc()
+        print_bulk_run_summary("local_projections", counts)
         return 0
     if not args.hypothesis_id:
         ap.error("Pass <hid> or --all")
-    print(run_one(args.hypothesis_id, force=args.force))
+    print(
+        run_one(
+            args.hypothesis_id,
+            force=args.force,
+            persist_preflight_inconclusive=persist_preflight,
+        )
+    )
     return 0
 
 

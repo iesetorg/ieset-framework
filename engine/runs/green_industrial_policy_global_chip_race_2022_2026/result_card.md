@@ -1,6 +1,6 @@
 # Result card — green_industrial_policy_global_chip_race_2022_2026
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — outcome 'log_program_announced_disbursement_usd' not loaded; missing: ['constructed: cross-country comparative tabulation: US Treasury / Commerce CHIPS PO / DOE LPO; EU Commission CRMA / NZIA tracker; METI GX bond + execution; Korean MOTIE / KIIT; China NDRC + national IC fund disbursements. Manual-drop pending under data/manual/derived/.', 'constructed: same sources but realised flow (obligated / paid) rather than announced. Manual-drop pending.', 'irena:capacity', 'constructed: SEMI World Fab Forecast country-level. Manual-drop pending.', 'constructed: BloombergNEF / IEA Energy Technology Perspectives — country-level clean-manufacturing capex. Manual-drop pending.', 'constructed: realised disbursement / MW added. Effectiveness ratio.', 'constructed: realised disbursement / kWspm capacity added. Effectiveness ratio.']
+**Verdict:** INCONCLUSIVE_DATA_PENDING — insufficient observations after listwise deletion (20)
 
 ## Pre-registration
 - **Claim:** The 2022-2026 wave of major-economy industrial-policy programmes — US IRA + CHIPS, EU Critical Raw Materials Act + Net-Zero Industry Act, EU Chips Act, Japan Green Transformation (GX, ¥150tn / ~$1tn announced), Korea K-Chips + Korean New Deal 2.0, China 14th Five-Year Plan + Made-in-China-2025-2.0 with semiconductors and clean energy as national-security frontier — represents the largest coordinated wave of industrial-policy spending in the post-1970s OECD record. The comparative-effectiveness question (which programmes delivered MW deployed / fab construction / clean-manufacturing capex per dollar spent) is testable. The hypothesis predicts that programmes which combine a clear technology target, a price-signal complement (carbon pricing or feed-in tariff), and an export-discipline mechanism (China WTO-era model) outperform pure-subsidy programmes (US IRA leans subsidy-heavy with weak export discipline; EU NZIA mixes subsidy with weak target-clarity). Net global clean-energy + semiconductor capacity rose materially but with substantial geographic redistribution rather than aggregate creation.
@@ -8,22 +8,22 @@
 - **Falsification test:** global_industrial_policy_design_panel
 
 ## Estimate
-- _Error:_ outcome 'log_program_announced_disbursement_usd' not loaded; missing: ['constructed: cross-country comparative tabulation: US Treasury / Commerce CHIPS PO / DOE LPO; EU Commission CRMA / NZIA tracker; METI GX bond + execution; Korean MOTIE / KIIT; China NDRC + national IC fund disbursements. Manual-drop pending under data/manual/derived/.', 'constructed: same sources but realised flow (obligated / paid) rather than announced. Manual-drop pending.', 'irena:capacity', 'constructed: SEMI World Fab Forecast country-level. Manual-drop pending.', 'constructed: BloombergNEF / IEA Energy Technology Perspectives — country-level clean-manufacturing capex. Manual-drop pending.', 'constructed: realised disbursement / MW added. Effectiveness ratio.', 'constructed: realised disbursement / kWspm capacity added. Effectiveness ratio.']
+- _Error:_ insufficient observations after listwise deletion (20)
 
 ## Variables resolved
-- `world_bank_wdi:NY.GDP.MKTP.KD` → log_real_gdp (controls, publisher=world_bank_wdi, n=14131)
+- `constructed: cross-country comparative tabulation: US Treasury / Commerce CHIPS PO / DOE LPO; EU Commission CRMA / NZIA tracker; METI GX bond + execution; Korean MOTIE / KIIT; China NDRC + national IC fund disbursements. Manual-drop pending under data/manual/derived/.` → log_program_announced_disbursement_usd (outcome, publisher=constructed, n=140)
+- `constructed: ordinal score per country-program on three dimensions: (a) target clarity (single-technology vs portfolio); (b) price-signal complement (carbon price level, FIT design); (c) export discipline (Korean / Chinese model = high; US IRA = low). 0-9 ordinal scale, hand-coded with documented rubric.` → program_design_score (treatment, publisher=constructed, n=140)
+- `constructed: indicator = 1 from country-specific program enactment date onwards. US: 2022-08; EU CHIPS: 2023-09; EU CRMA: 2024-04; EU NZIA: 2024-06; JPN GX: 2023-02; KOR K-Chips: 2023-03; CHN: continuous.` → post_2022_dummy (treatment, publisher=constructed, n=140)
+- `world_bank_wdi:NY.GDP.MKTP.KD` → log_real_gdp (controls, publisher=world_bank_wdi, n=14066)
+- `constructed: imf:IFS_PMP / fred for USA / boe / boj / ecb. Composite.` → real_interest_rate_country (controls, publisher=constructed, n=140)
 
 ### Variables missing data
-- `constructed: cross-country comparative tabulation: US Treasury / Commerce CHIPS PO / DOE LPO; EU Commission CRMA / NZIA tracker; METI GX bond + execution; Korean MOTIE / KIIT; China NDRC + national IC fund disbursements. Manual-drop pending under data/manual/derived/.` (outcome, name=log_program_announced_disbursement_usd) — vintage not on disk
 - `constructed: same sources but realised flow (obligated / paid) rather than announced. Manual-drop pending.` (outcome, name=log_program_realised_disbursement_usd) — vintage not on disk
 - `irena:capacity` (outcome, name=log_country_clean_energy_mw_added) — vintage not on disk
 - `constructed: SEMI World Fab Forecast country-level. Manual-drop pending.` (outcome, name=log_country_semiconductor_capacity_kwspm) — vintage not on disk
 - `constructed: BloombergNEF / IEA Energy Technology Perspectives — country-level clean-manufacturing capex. Manual-drop pending.` (outcome, name=log_country_clean_manufacturing_capex_usd) — vintage not on disk
 - `constructed: realised disbursement / MW added. Effectiveness ratio.` (outcome, name=spend_per_mw_clean_energy_usd) — vintage not on disk
 - `constructed: realised disbursement / kWspm capacity added. Effectiveness ratio.` (outcome, name=spend_per_kwspm_semiconductor_usd) — vintage not on disk
-- `constructed: ordinal score per country-program on three dimensions: (a) target clarity (single-technology vs portfolio); (b) price-signal complement (carbon price level, FIT design); (c) export discipline (Korean / Chinese model = high; US IRA = low). 0-9 ordinal scale, hand-coded with documented rubric.` (treatment, name=program_design_score) — vintage not on disk
-- `constructed: indicator = 1 from country-specific program enactment date onwards. US: 2022-08; EU CHIPS: 2023-09; EU CRMA: 2024-04; EU NZIA: 2024-06; JPN GX: 2023-02; KOR K-Chips: 2023-03; CHN: continuous.` (treatment, name=post_2022_dummy) — vintage not on disk
-- `constructed: imf:IFS_PMP / fred for USA / boe / boj / ecb. Composite.` (controls, name=real_interest_rate_country) — vintage not on disk
 - `constructed: oecd or country-specific tabulation of industrial-policy spending pre-2022, normalised by GDP. Used to net out pre-existing trajectory.` (controls, name=pre_2022_industrial_policy_baseline_spend_share_gdp) — vintage not on disk
 
-_Generated by `scripts/run_panel_fe.py` at 2026-04-30T08:43:15+00:00_
+_Generated by `scripts/run_panel_fe.py` at 2026-04-30T14:08:57+00:00_

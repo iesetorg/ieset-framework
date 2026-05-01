@@ -47,6 +47,8 @@ def main() -> int:
     if args.countries is not None:
         if args.publisher in ("imf", "imf_weo"):
             kwargs["countries"] = [c.strip() for c in args.countries.replace("/", ",").split(",") if c.strip()]
+        elif args.publisher == "wid":
+            kwargs["country_filter"] = [c.strip() for c in args.countries.replace("/", ",").split(",") if c.strip()]
         else:
             kwargs["countries"] = args.countries
     if args.key is not None:

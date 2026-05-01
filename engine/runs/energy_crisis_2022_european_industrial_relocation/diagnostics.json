@@ -1,30 +1,74 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'log_energy_intensive_manufacturing_va' not loaded",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "outcome 'log_energy_intensive_manufacturing_va' not loaded",
+  "verdict": "PARTIAL \u2014 ATT=-0.03733, p=0.0419, N=94, treated_countries=14; claim direction ambiguous",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "ATT=-0.03733, p=0.0419, N=94, treated_countries=14; claim direction ambiguous",
   "hypothesis_id": "energy_crisis_2022_european_industrial_relocation",
   "template": "did_callaway_santanna",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "Not supported if (a) the post-2021Q4 \u00d7 intervention-intensity interaction is zero or wrong-signed at p<0.10 (high-intervention countries should have smaller contraction), OR (b) intra-EU energy- intensive output gap (DEU+ITA vs FRA+ESP) does not widen by \u22655pp by 2024 relative to pre-shock baseline, OR (c) US Gulf Coast petrochemical capacity additions do not exceed pre-2022 trend, OR (d) the contraction reverses fully in 2024-2025 (cyclical not structural). If only the contemporaneous (2022-2023) effect is real and 2024-2025 shows recovery, classify as \"cyclical shock without persistent relocation.\"\n",
   "falsification_test_text": "european_relocation_did_panel",
   "estimate": {
-    "error": "outcome 'log_energy_intensive_manufacturing_va' not loaded"
+    "coefficient": -0.037328073269316725,
+    "std_error": 0.01834804629090426,
+    "p_value": 0.04190684619029211,
+    "n_obs": 94,
+    "n_countries": 14,
+    "r_squared_within": 0.9857296543900552,
+    "fe_entity": true,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "Callaway-Sant'Anna TWFE fallback (linearmodels failed: No module named 'linearmodels')",
+    "n_treated_countries": 14,
+    "cohort_years": [
+      2021
+    ],
+    "dropped_controls_due_to_overlap": [
+      "log_gas_price_ttf"
+    ]
   },
   "data_status": {
     "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "log_chemical_industry_output",
+        "source": "world_bank_wdi:NV.IND.MANF.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 9698
+      },
+      {
+        "role": "treatment",
+        "name": "post_2021q4_gas_shock_dummy",
+        "source": "constructed: indicator = 1 from 2021Q4 onwards (gas-price spike start).",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "treatment",
+        "name": "country_gas_price_intervention_intensity",
+        "source": "constructed: ordinal index of national wholesale-price interventions (0 = retail-only relief; 1 = retail + selective-industry rebate; 2 = wholesale-price cap or renationalisation). DEU/POL = 1, ESP/PRT = 2, FRA = 2 (EDF), ITA/NLD = 1, USA = 0.",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "controls",
+        "name": "log_gas_price_ttf",
+        "source": "constructed: Dutch TTF natural gas spot/forward, EUR/MWh, monthly. Cross-check fred:DHHNGSP (Henry Hub for USA). Manual-drop or eex fetcher when shipped.",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
       {
         "role": "controls",
         "name": "log_real_gdp",
         "source": "world_bank_wdi:NY.GDP.MKTP.KD",
         "publisher": "world_bank_wdi",
-        "n_rows": 14131
+        "n_rows": 14066
       },
       {
         "role": "controls",
         "name": "trade_openness",
         "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
         "publisher": "world_bank_wdi",
-        "n_rows": 10779
+        "n_rows": 10714
       }
     ],
     "variables_missing": [
@@ -37,11 +81,6 @@
         "role": "outcome",
         "name": "log_industrial_production_index",
         "source": "oecd:STSIND4_PRODMAN"
-      },
-      {
-        "role": "outcome",
-        "name": "log_chemical_industry_output",
-        "source": "eurostat:sts_inpr_m"
       },
       {
         "role": "outcome",
@@ -59,21 +98,6 @@
         "source": "constructed: ACC (American Chemistry Council) + EIA Gulf-Coast petrochemical capacity tracker. Cross-check eia: methanol / ethylene production. Manual-drop pending."
       },
       {
-        "role": "treatment",
-        "name": "post_2021q4_gas_shock_dummy",
-        "source": "constructed: indicator = 1 from 2021Q4 onwards (gas-price spike start)."
-      },
-      {
-        "role": "treatment",
-        "name": "country_gas_price_intervention_intensity",
-        "source": "constructed: ordinal index of national wholesale-price interventions (0 = retail-only relief; 1 = retail + selective-industry rebate; 2 = wholesale-price cap or renationalisation). DEU/POL = 1, ESP/PRT = 2, FRA = 2 (EDF), ITA/NLD = 1, USA = 0."
-      },
-      {
-        "role": "controls",
-        "name": "log_gas_price_ttf",
-        "source": "constructed: Dutch TTF natural gas spot/forward, EUR/MWh, monthly. Cross-check fred:DHHNGSP (Henry Hub for USA). Manual-drop or eex fetcher when shipped."
-      },
-      {
         "role": "controls",
         "name": "log_brent_oil",
         "source": "imf_pcps:POILBRE"
@@ -85,6 +109,6 @@
       }
     ]
   },
-  "run_utc": "2026-04-30T08:43:18+00:00",
+  "run_utc": "2026-04-30T14:01:37+00:00",
   "runner": "scripts/run_did_callaway_santanna.py"
 }

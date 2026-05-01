@@ -1,13 +1,65 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 variables not loaded: ['nominal_wage_growth', 'covid_recovery_indicator']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "variables not loaded: ['nominal_wage_growth', 'covid_recovery_indicator']",
+  "verdict": "PARTIAL \u2014 cumulative_effect=+11.75, h=5, p_h=0.126 (above \u03b1=0.10)",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "cumulative_effect=+11.75, h=5, p_h=0.126 (above \u03b1=0.10)",
   "hypothesis_id": "wage_inflation_spiral_post_2021_oecd_panel",
   "template": "local_projections",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "OECD-country panel 2019-2024 quarterly. Run bivariate VAR(4) on log nominal wage and log CPI per country, then aggregate. Test Granger direction: does wage growth Granger-cause CPI inflation, or vice versa? Compute cumulative real-wage change 2021-Q1 to 2023-Q4. SUPPORTED if (a) median country shows CPI Granger-causes wage at p<0.10 while wage does NOT Granger-cause CPI, AND (b) median cumulative real-wage change 2021-Q1 to 2023-Q4 is between -2% and -5%. REFUTED if median wage Granger-causes CPI at p<0.10 OR cumulative real wages rose during the inflation peak (positive median real-wage growth 2021-Q1 to 2022-Q4).",
   "estimate": {
-    "error": "variables not loaded: ['nominal_wage_growth', 'covid_recovery_indicator']"
+    "shape": "local_projections",
+    "horizons": [
+      {
+        "horizon": 0,
+        "coefficient": 1.2173837641267322,
+        "std_error": 0.19570217644602772,
+        "p_value": 4.952765649433905e-10,
+        "n_obs": 123
+      },
+      {
+        "horizon": 1,
+        "coefficient": 3.643355838439141,
+        "std_error": 0.23238255066305216,
+        "p_value": 2.129839291059114e-55,
+        "n_obs": 105
+      },
+      {
+        "horizon": 2,
+        "coefficient": 3.915813101941011,
+        "std_error": 0.2376643133037466,
+        "p_value": 5.436678419988343e-61,
+        "n_obs": 87
+      },
+      {
+        "horizon": 3,
+        "coefficient": 2.970809491731144,
+        "std_error": 0.26033909490523166,
+        "p_value": 3.67167820329627e-30,
+        "n_obs": 69
+      },
+      {
+        "horizon": 4,
+        "coefficient": 6.566960612530524e-14,
+        "std_error": 1.6268804086962384e-15,
+        "p_value": 0.0,
+        "n_obs": 51
+      },
+      {
+        "horizon": 5,
+        "coefficient": 1.239062736675817e-12,
+        "std_error": 8.088092628340124e-13,
+        "p_value": 0.1255325198875475,
+        "n_obs": 34
+      }
+    ],
+    "cumulative_coefficient": 11.747362196239333,
+    "horizon_h_coefficient": 1.239062736675817e-12,
+    "horizon_h_std_error": 8.088092628340124e-13,
+    "horizon_h_p_value": 0.1255325198875475,
+    "max_horizon": 5,
+    "n_countries": 18,
+    "method": "Jord\u00e0 local projections (TWFE, country-clustered)",
+    "dropped_controls_due_to_overlap": []
   },
   "data_status": {
     "variables_loaded": [
@@ -16,21 +68,42 @@
         "name": "cpi_headline_yoy",
         "source": "oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",
         "publisher": "oecd",
-        "n_rows": 1367
+        "n_rows": 2908
       },
       {
         "role": "outcome",
         "name": "real_wage_index",
         "source": "oecd:OECD.SDD.TPS,DSD_EARNINGS@DF_AVE_HRLY,1.0; oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",
         "publisher": "oecd",
-        "n_rows": 1367
+        "n_rows": 2908
+      },
+      {
+        "role": "treatment",
+        "name": "covid_recovery_indicator",
+        "source": "constructed: 1 from 2021-Q1 onward",
+        "publisher": "constructed",
+        "n_rows": 126
+      },
+      {
+        "role": "controls",
+        "name": "oil_price_brent",
+        "source": "imf_pcps:POILBRE",
+        "publisher": "imf_pcps",
+        "n_rows": 648
       },
       {
         "role": "controls",
         "name": "unemployment_rate",
         "source": "world_bank_wdi:SL.UEM.TOTL.ZS",
         "publisher": "world_bank_wdi",
-        "n_rows": 8106
+        "n_rows": 8071
+      },
+      {
+        "role": "controls",
+        "name": "ny_fed_global_supply_chain_pressure",
+        "source": "fred:T5YIFR",
+        "publisher": "fred",
+        "n_rows": 432
       }
     ],
     "variables_missing": [
@@ -43,24 +116,9 @@
         "role": "outcome",
         "name": "ulc_unit_labour_cost",
         "source": "oecd:OECD.SDD.STA,DSD_PDB@DF_PDB_ULC,1.0"
-      },
-      {
-        "role": "treatment",
-        "name": "covid_recovery_indicator",
-        "source": "constructed: 1 from 2021-Q1 onward"
-      },
-      {
-        "role": "controls",
-        "name": "oil_price_brent",
-        "source": "imf_pcps:POILBRE"
-      },
-      {
-        "role": "controls",
-        "name": "ny_fed_global_supply_chain_pressure",
-        "source": "fred:GSCPI"
       }
     ]
   },
-  "run_utc": "2026-04-30T08:43:21+00:00",
+  "run_utc": "2026-05-01T07:16:52+00:00",
   "runner": "scripts/run_local_projections.py"
 }

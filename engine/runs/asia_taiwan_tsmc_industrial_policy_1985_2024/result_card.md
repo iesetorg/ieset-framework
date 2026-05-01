@@ -15,10 +15,10 @@ Pre-registered rule: SUPPORT if >= 4 of 6 metrics met; REFUTE if <= 2 met (impos
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
 | 1 | manufacturing_va_share_persistent | PENDING_DATA |  | `manufacturing VA / GDP >= 30% in 2023` | No TWN observations in loaded vintages |
-| 2 | rd_intensity_top_tier | PENDING_DATA |  | `R&D / GDP >= 3.5% in 2022` | No usable vintage for: world_bank_wdi:GB.XPD.RSDV.GD.ZS |
+| 2 | rd_intensity_top_tier | PENDING_DATA |  | `R&D / GDP >= 3.5% in 2022` | No TWN observations in loaded vintages |
 | 3 | high_tech_exports_share | PENDING_DATA |  | `>=60% high-tech share of manufactured exports in 2022` | No TWN observations in loaded vintages |
 | 4 | gdp_pc_convergence_to_high_income | PENDING_DATA |  | `GDP-pc constant USD >= $30,000 in 2023` | No TWN observations in loaded vintages |
-| 5 | tfp_growth_above_oecd | PENDING_EVAL |  | `PWT rtfpna log-growth differential TWN minus OECD median >= 0.005/yr over 1985-2019` | Non-tidy (needs custom parser): pwt:rtfpna |
+| 5 | tfp_growth_above_oecd | PENDING_EVAL | 95.3 (2019) [pct_increase_from_baseline] | `PWT rtfpna log-growth differential TWN minus OECD median >= 0.005/yr over 1985-2019` | threshold expression unparseable by regex |
 | 6 | tsmc_global_share_dominance | PENDING_DATA |  | `Taiwan foundry share >= 60% world by 2023 (TSMC alone >50%)` | No usable vintage for: owid:semiconductor_industry |
 
 ## Claim

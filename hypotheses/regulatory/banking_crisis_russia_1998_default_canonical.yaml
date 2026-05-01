@@ -1,7 +1,13 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: banking_crisis_russia_1998_default_canonical
 version: 1
-status: candidate
+status: pre_registered
+methodology_note: >
+  v1 promotion (2026-04-30). The candidate spec already pinned the
+  canonical_metrics list, metric thresholds, data windows, and
+  multi_metric_falsification counts. This promotion adds only the
+  checklist estimator/falsification wrapper and leaves all metric
+  thresholds unchanged before the post-commit rerun.
 topic: regulatory
 claim: >
   The August 1998 Russian crisis — domestic-currency sovereign default, ruble
@@ -20,7 +26,7 @@ canonical_metrics:
     description: Ruble against USD peak-to-trough nominal depreciation
     threshold: ">= 60% depreciation"
     window: "1998-1999"
-    source: "imf:ENDA_XDC_USD_RATE; bis:WS_EER"
+    source: "world_bank_wdi:PA.NUS.FCRF; bis:WS_EER"
     direction: supports_claim
     independence_justification: External-rate signal.
   - metric_id: real_gdp_decline
@@ -55,6 +61,28 @@ multi_metric_falsification:
   total_metrics: 5
   support_threshold: 4
   refute_threshold: 1
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case checklist evaluator reads canonical_metrics and
+    multi_metric_falsification; no regression model is estimated.
+    Each metric is scored against its pre-registered source, window,
+    and threshold before applying the count rule below.
+
+falsification:
+  rule: >
+    Evaluate every canonical_metrics row against its pre-registered
+    source, window, and threshold. The hypothesis is SUPPORTED if at
+    least 4 of 5 metrics are MET. It is REFUTED if even
+    counting all pending metrics as favorable cannot reach 4
+    MET metrics and the confirmed failures cross the pre-registered
+    refutation guardrail. Otherwise the verdict is INCONCLUSIVE until
+    pending data or pending evaluation metrics are resolved.
+  test: multi_metric_checklist_canonical_banking_crisis
+  threshold: "MET >= 4 of 5; REFUTE when MET + PENDING_DATA + PENDING_EVAL < 4; refutation guardrail=1"
+
 variables:
   outcome:
     - name: real_gdp

@@ -1,35 +1,25 @@
-"""IMF Primary Commodity Price System (PCPS) fetcher via the IMF DataMapper API.
+"""IMF Primary Commodity Price System (PCPS) fetcher.
 
-Endpoint: https://www.imf.org/external/datamapper/api/v1
-Auth: none.
-License: IMF standard permissions (attribution; citation required).
+Source page:
+    https://www.imf.org/en/research/commodity-prices
 
-PCPS ships commodity prices (oil, gas, metals, agricultural) through the same
-DataMapper API shape as WEO:
-    {"values": {"<series>": {"<region>": {"<period>": <number>, ...}}}}
+The public IMF commodity-prices portal links a monthly Excel workbook:
+    https://www.imf.org/-/media/files/research/commodityprices/monthly/external-data.xls
 
-For PCPS the outer region key is typically "W00" (world) since commodity prices
-are global. Periods may be annual ("2020") or monthly ("2020M01") depending on
-the series. This fetcher tolerates both the nested shape (region -> period ->
-value) observed in WEO and a flat shape (period -> value) in case the PCPS
-endpoint omits the region layer.
+The workbook contains a single "External" sheet with:
+    row 0 -> indicator code
+    row 1 -> indicator description
+    row 2 -> unit / data type
+    row 3 -> frequency
+    row 4+ -> period + values
 
-Key indicators (verified against the IMF PCPS series catalogue):
-    POILAPSP   Average petroleum spot price (Brent/WTI/Dubai avg, USD/bbl)
-    POILBRE    Brent crude oil (USD/bbl)
-    POILWTI    WTI crude oil (USD/bbl)
-    PNGASEU    Natural gas, Europe (USD/mmbtu)
-    PNGASUS    Natural gas, US (USD/mmbtu)
-    PGOLD      Gold (USD/troy oz)
-    PCOPP      Copper (USD/mt)
-    PALUM      Aluminum (USD/mt)
-    PWHEAMT    Wheat (USD/mt)
-    PCORN      Corn (USD/mt)
-    PSOYB      Soybeans (USD/mt)
-    PCOFFOTM   Coffee, Other Mild Arabicas (USD/lb)
+Some legacy hypotheses refer to informal aliases rather than workbook codes
+(`Primary`, `Oil`, `PNG_USD`). We preserve those aliases here so existing specs
+become fetchable without an immediate rewrite.
 """
 from __future__ import annotations
 
+import io
 from datetime import datetime
 from typing import Any
 
@@ -38,19 +28,29 @@ import requests
 
 from ._base import FetchResult, utc_now, write_vintage
 
-IMF_BASE = "https://www.imf.org/external/datamapper/api/v1"
+WORKBOOK_URL = "https://www.imf.org/-/media/files/research/commodityprices/monthly/external-data.xls"
+SOURCE_PAGE_URL = "https://www.imf.org/en/research/commodity-prices"
+TECHNICAL_DOC_URL = "https://www.imf.org/-/media/files/research/commodityprices/monthly/pcps-technical-documentation.pdf"
 METHODOLOGY = "https://www.imf.org/en/Research/commodity-prices"
 LICENSE = "IMF standard permissions (attribution required)"
+SHEET_NAME = "External"
+
+SERIES_ALIASES = {
+    # Legacy spec shorthands.
+    "PRIMARY": "PALLFNF",
+    "OIL": "POILAPSP",
+    "PNG_USD": "PNGASEU",
+}
 
 
 class ImfPcpsError(RuntimeError):
     pass
 
 
-def _get(path: str) -> Any:
-    r = requests.get(f"{IMF_BASE}/{path}", timeout=60)
+def _get_workbook() -> pd.DataFrame:
+    r = requests.get(WORKBOOK_URL, timeout=120)
     r.raise_for_status()
-    return r.json()
+    return pd.read_excel(io.BytesIO(r.content), sheet_name=SHEET_NAME, header=None)
 
 
 def _infer_frequency(periods: pd.Series) -> str:
@@ -62,78 +62,88 @@ def _infer_frequency(periods: pd.Series) -> str:
     return "annual"
 
 
+def _canonical_series_id(series_id: str) -> str:
+    raw = str(series_id or "").strip()
+    upper = raw.upper()
+    if not upper:
+        raise ImfPcpsError("Missing PCPS series_id")
+    return SERIES_ALIASES.get(upper, upper)
+
+
+def _resolve_column(sheet: pd.DataFrame, series_id: str) -> tuple[int, str, str, str]:
+    codes = sheet.iloc[0].astype(str).str.strip()
+    descriptions = sheet.iloc[1].astype(str).str.strip()
+    units = sheet.iloc[2].astype(str).str.strip()
+    frequencies = sheet.iloc[3].astype(str).str.strip()
+
+    matches = [idx for idx, code in enumerate(codes) if code.upper() == series_id]
+    if not matches:
+        available = sorted({code for code in codes if code and code != "nan"})
+        raise ImfPcpsError(
+            f"IMF PCPS series {series_id} not found in workbook. "
+            f"Available examples: {', '.join(available[:20])}"
+        )
+
+    # Some codes appear twice: once as an empty index column and once as the
+    # usable USD-priced series. Prefer the column with more non-null data rows.
+    best_idx = max(matches, key=lambda idx: int(sheet.iloc[4:, idx].notna().sum()))
+    return best_idx, descriptions.iloc[best_idx], units.iloc[best_idx], frequencies.iloc[best_idx]
+
+
 def fetch(
     series_id: str,
     *,
     vintage_utc: datetime | None = None,
 ) -> FetchResult:
-    """Fetch a PCPS commodity series.
-
-    PCPS prices are global (not country-specific); the DataMapper response may
-    key values under a region code (e.g. "W00") or drop the region layer
-    entirely. We flatten either shape to a ``(region, period, value)`` frame.
-    """
+    """Fetch a PCPS commodity series from the IMF workbook."""
     fetch_ts = utc_now()
-    payload = _get(series_id)
-    values = (payload.get("values") or {}).get(series_id)
-    if not values:
-        raise ImfPcpsError(f"IMF PCPS returned no values for {series_id}")
+    canonical = _canonical_series_id(series_id)
+    sheet = _get_workbook()
+    col_idx, description, unit, frequency_label = _resolve_column(sheet, canonical)
 
-    records: list[dict] = []
-    for outer_key, inner in values.items():
-        if isinstance(inner, dict):
-            # nested: region -> period -> value (WEO-style shape)
-            for period, val in inner.items():
-                records.append({
-                    "region": outer_key,
-                    "period": str(period),
-                    "value": pd.to_numeric(val, errors="coerce"),
-                })
-        else:
-            # flat: period -> value (no region layer)
-            records.append({
-                "region": "W00",
-                "period": str(outer_key),
-                "value": pd.to_numeric(inner, errors="coerce"),
-            })
-
-    df = pd.DataFrame(records).sort_values(["region", "period"]).reset_index(drop=True)
+    period_col = sheet.iloc[4:, 0].astype(str).str.strip()
+    value_col = pd.to_numeric(sheet.iloc[4:, col_idx], errors="coerce")
+    df = pd.DataFrame({
+        "region": "W00",
+        "period": period_col,
+        "value": value_col,
+    })
+    df = df[df["period"].notna() & (df["period"] != "") & (df["period"] != "nan")]
+    df = df.dropna(subset=["value"]).reset_index(drop=True)
+    if df.empty:
+        raise ImfPcpsError(f"IMF PCPS workbook contains no usable observations for {canonical}")
 
     path_out, sha = write_vintage(
         publisher="imf_pcps",
-        series_id=series_id,
+        series_id=canonical,
         frame=df,
         fetch_utc=fetch_ts,
     )
-
-    # Indicator metadata — same endpoint as WEO indicators namespace
-    desc: dict[str, Any] = {}
-    try:
-        indicator_meta = _get(f"indicators/{series_id}")
-        desc = (indicator_meta.get("indicators") or {}).get(series_id) or {}
-    except requests.HTTPError:
-        pass
-
-    frequency = _infer_frequency(df["period"]) if len(df) else "annual"
+    frequency = str(frequency_label).lower() if frequency_label and frequency_label != "nan" else _infer_frequency(df["period"])
+    unit_text = str(unit).strip()
+    currency = "USD" if "usd" in unit_text.lower() or "us$" in description.lower() else None
 
     return FetchResult(
         publisher="imf_pcps",
-        series_id=series_id,
-        source_url=f"{IMF_BASE}/{series_id}",
-        methodology_url=METHODOLOGY,
+        series_id=canonical,
+        source_url=WORKBOOK_URL,
+        methodology_url=TECHNICAL_DOC_URL,
         license=LICENSE,
         fetch_utc=fetch_ts,
         rows=len(df),
         frequency=frequency,
-        units=desc.get("unit") or "per indicator definition",
-        currency="USD",
+        units=unit_text or "per indicator definition",
+        currency=currency,
         start_date=str(df["period"].min()) if len(df) else None,
         end_date=str(df["period"].max()) if len(df) else None,
         sha256=sha,
         parquet_path=path_out,
         extra={
-            "indicator_label": desc.get("label"),
-            "dataset": desc.get("dataset") or "PCPS",
+            "indicator_label": description or canonical,
+            "dataset": "PCPS",
+            "requested_series_id": series_id,
+            "resolved_series_id": canonical,
+            "source_page_url": SOURCE_PAGE_URL,
             "vintage_utc": vintage_utc.isoformat() if vintage_utc else None,
         },
     )

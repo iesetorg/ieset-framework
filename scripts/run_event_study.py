@@ -54,6 +54,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_panel_fe import (
     is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, build_panel, infer_claim_direction, filter_sample,
+    first_loaded_var, construct_treatment_from_text,
+    should_persist_preflight_inconclusive,
+    bump_bulk_run_count, print_bulk_run_summary, fit_fe_ols_fallback,
+    prune_controls_for_overlap,
 )
 from run_descriptive import extract_threshold
 
@@ -156,64 +160,6 @@ def fit_its(panel: pd.DataFrame, outcome: str, country: str,
 # ---------------------------------------------------------------------------
 
 
-def construct_treatment_from_text(spec: dict,
-                                  panel: pd.DataFrame) -> tuple[pd.DataFrame, str] | None:
-    """Build a post-event binary treatment column from a `constructed:` source.
-
-    Handles strings like:
-        'constructed: event date = 1997-05-06 (Brown grants BoE independence)'
-        'constructed: binary = 1 for GBR from 1997-05'
-        'constructed: post-1971 fiat regime'
-
-    Returns the panel (with a new column) and the column name, or None if
-    no constructable pattern was found.
-    """
-    var_blocks = spec.get("variables") or {}
-    treatment_items = var_blocks.get("treatment") or []
-    if not treatment_items:
-        return None
-    first = treatment_items[0]
-    source = (first.get("source") or "")
-    name = first.get("name") or "constructed_treatment"
-    if not source.lower().lstrip().startswith("constructed:"):
-        return None
-
-    # Parse the year. Try date pattern first (1997-05-06), then bare year.
-    text = source.lower()
-    year = None
-    m = re.search(r"\b(19\d{2}|20\d{2})\b", text)
-    if m:
-        year = int(m.group(1))
-    if year is None:
-        return None
-
-    # Parse the target ISO3 country.
-    # 1. 'binary = 1 for GBR from 1997-05' on this treatment item
-    # 2. fall through any OTHER treatment item's source for the same pattern
-    # 3. fall through the sample's first country (event-study convention:
-    #    treated unit listed first)
-    iso3 = None
-    sources_to_scan = [source] + [
-        (t.get("source") or "") for t in treatment_items[1:]
-    ]
-    for src in sources_to_scan:
-        cm = re.search(r"\bfor\s+([A-Z]{3})\b", src)
-        if cm:
-            iso3 = cm.group(1)
-            break
-    if iso3 is None:
-        sample = (spec.get("sample") or {})
-        countries = sample.get("countries") or []
-        if countries:
-            iso3 = countries[0]
-
-    df = panel.copy()
-    if iso3 is not None:
-        df[name] = ((df["country_iso3"] == iso3) & (df["year"] >= year)).astype(int)
-    else:
-        df[name] = (df["year"] >= year).astype(int)
-    return df, name
-
 
 def fit_twfe_event(panel: pd.DataFrame, spec: dict, outcome: str,
                    treatment: str | None) -> dict:
@@ -231,15 +177,20 @@ def fit_twfe_event(panel: pd.DataFrame, spec: dict, outcome: str,
                              if c.get("name") and c["name"] in panel.columns]
         else:
             return {"error": "no treatment variable resolved"}
-    needed = [outcome, treatment] + control_names
-    sub = panel[["country_iso3", "year"] + needed].dropna()
+    sub, usable_controls, dropped_controls = prune_controls_for_overlap(
+        panel,
+        [outcome, treatment],
+        control_names,
+        min_obs=30,
+    )
     if len(sub) < 30:
         return {"error": f"insufficient obs ({len(sub)})"}
+    sub_plain = sub.copy()
 
     try:
         from linearmodels.panel import PanelOLS
         sub = sub.set_index(["country_iso3", "year"])
-        rhs = [treatment] + control_names
+        rhs = [treatment] + usable_controls
         mod = PanelOLS(sub[outcome], sub[rhs], entity_effects=True,
                        time_effects=True, drop_absorbed=True)
         res = mod.fit(cov_type="clustered", cluster_entity=True)
@@ -252,9 +203,22 @@ def fit_twfe_event(panel: pd.DataFrame, spec: dict, outcome: str,
             "n_countries": int(sub.index.get_level_values(0).nunique()),
             "r_squared_within": float(res.rsquared_within or 0),
             "method": "linearmodels.PanelOLS (TWFE, country-clustered)",
+            "dropped_controls_due_to_overlap": dropped_controls,
         }
     except Exception as exc:
-        return {"error": f"twfe failed: {exc}"}
+        fallback = fit_fe_ols_fallback(
+            sub_plain,
+            outcome,
+            [treatment] + usable_controls,
+            treatment,
+            entity=True,
+            time=True,
+            cluster_spec="country",
+            method_label=f"event-study TWFE fallback (linearmodels failed: {exc})",
+        ) | {"shape": "multi_country_twfe"}
+        if "error" not in fallback:
+            fallback["dropped_controls_due_to_overlap"] = dropped_controls
+        return fallback
 
 
 # ---------------------------------------------------------------------------
@@ -386,7 +350,11 @@ def list_event_study_specs() -> list[str]:
             if h["estimator_template"] == "event_study"]
 
 
-def run_one(hid: str, force: bool = False) -> str:
+def run_one(
+    hid: str,
+    force: bool = False,
+    persist_preflight_inconclusive: bool = True,
+) -> str:
     if not force and has_committed_verdict(hid):
         return f"  · {hid}: skipped (committed verdict already on disk)"
     found = load_spec(hid)
@@ -406,8 +374,24 @@ def run_one(hid: str, force: bool = False) -> str:
             "(replace falsification.rule with a dispositive threshold AND "
             "document the sharpening in methodology_note) before running."
         )
-        write_outputs(hid, spec, {"variables_loaded": [], "variables_missing": []}, {"error": reason}, {}, verdict, reason, None)
-        return f"  ⚠ {hid}: {verdict} (stub rule, refused to grade)"
+        persisted = should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        )
+        if persisted:
+            write_outputs(
+                hid,
+                spec,
+                {"variables_loaded": [], "variables_missing": []},
+                {"error": reason},
+                {},
+                verdict,
+                reason,
+                None,
+            )
+        suffix = " (stub rule, refused to grade)"
+        if not persisted:
+            suffix += " [artifact skipped]"
+        return f"  ⚠ {hid}: {verdict}{suffix}"
 
     panel, status = build_panel(spec)
     var_blocks = spec.get("variables") or {}
@@ -415,19 +399,26 @@ def run_one(hid: str, force: bool = False) -> str:
     if not outcome_items:
         verdict = "INCONCLUSIVE_DATA_PENDING"
         reason = "no outcome variable in spec"
-        write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason, None)
+        if should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        ):
+            write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason, None)
         return f"  ⚠ {hid}: {verdict}"
-    outcome_name = outcome_items[0]["name"]
-    outcome_kind = (outcome_items[0].get("transformation") or "level").lower()
-    outcome_is_log = "log" in outcome_kind
-
-    if outcome_name not in panel.columns:
+    panel_filt = filter_sample(panel, spec)
+    outcome_name = first_loaded_var(outcome_items, panel_filt)
+    if outcome_name is None:
         verdict = "INCONCLUSIVE_DATA_PENDING"
         missing = [v["source"] for v in status["variables_missing"]
                    if v["role"] == "outcome"]
-        reason = f"outcome '{outcome_name}' not loaded; missing: {missing}"
-        write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason, None)
+        reason = f"no outcome variable loaded; missing: {missing}"
+        if should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        ):
+            write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason, None)
         return f"  ⚠ {hid}: {verdict}"
+    outcome_item = next((item for item in outcome_items if item.get("name") == outcome_name), {})
+    outcome_kind = (outcome_item.get("transformation") or "level").lower()
+    outcome_is_log = "log" in outcome_kind
 
     event_year = find_event_year(spec)
     threshold = extract_threshold(
@@ -438,16 +429,22 @@ def run_one(hid: str, force: bool = False) -> str:
     sample = spec.get("sample") or {}
     countries = sample.get("countries") or []
     period = sample.get("period") or [None, None]
-    panel_filt = filter_sample(panel, spec)
-
     if len(countries) == 1:
         if event_year is None:
-            comp = {"error": "couldn't infer event_year"}
+            reason = "couldn't infer event_year"
+            verdict = "INCONCLUSIVE_DATA_PENDING"
+            if should_persist_preflight_inconclusive(
+                reason, persist_preflight_inconclusive
+            ):
+                write_outputs(
+                    hid, spec, status, {"error": reason}, {}, verdict, reason, None
+                )
+            return f"  ⚠ {hid}: {verdict}"
         else:
             comp = fit_its(panel_filt, outcome_name, countries[0], event_year, period)
     else:
         treatment_items = var_blocks.get("treatment") or []
-        treatment = treatment_items[0]["name"] if treatment_items else None
+        treatment = first_loaded_var(treatment_items, panel_filt)
         comp = fit_twfe_event(panel_filt, spec, outcome_name, treatment)
 
     claim_dir = infer_claim_direction(spec)
@@ -465,20 +462,43 @@ def main() -> int:
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--force", action="store_true",
                         help="Overwrite existing committed verdicts.")
+    parser.add_argument(
+        "--write-preflight-inconclusive",
+        action="store_true",
+        help="Persist obvious preflight INCONCLUSIVE artifacts during bulk runs.",
+    )
     args = parser.parse_args()
+    persist_preflight = args.write_preflight_inconclusive or not args.all
     if args.all:
         ids = list_event_study_specs()
+        counts: dict[str, int] = {}
         print(f"Running {len(ids)} event_study specs…")
         for hid in ids:
             try:
-                print(run_one(hid, force=args.force))
+                msg = (
+                    run_one(
+                        hid,
+                        force=args.force,
+                        persist_preflight_inconclusive=persist_preflight,
+                    )
+                )
+                print(msg)
+                bump_bulk_run_count(counts, msg)
             except Exception as exc:
                 print(f"  ✗ {hid}: runner crashed — {exc}")
+                counts["crashed"] = counts.get("crashed", 0) + 1
                 traceback.print_exc()
+        print_bulk_run_summary("event_study", counts)
         return 0
     if not args.hypothesis_id:
         parser.error("Pass <hypothesis_id> or --all.")
-    print(run_one(args.hypothesis_id, force=args.force))
+    print(
+        run_one(
+            args.hypothesis_id,
+            force=args.force,
+            persist_preflight_inconclusive=persist_preflight,
+        )
+    )
     return 0
 
 

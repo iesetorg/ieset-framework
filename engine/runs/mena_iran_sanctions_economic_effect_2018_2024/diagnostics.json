@@ -1,0 +1,96 @@
+{
+  "verdict": "PARTIAL \u2014 mean_gap=+772.4, |gap|/pre_sd=4.3, p_perm=0.857 (gap below 0.5\u00d7pre_sd or placebo p\u22650.10)",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "mean_gap=+772.4, |gap|/pre_sd=4.3, p_perm=0.857 (gap below 0.5\u00d7pre_sd or placebo p\u22650.10)",
+  "hypothesis_id": "mena_iran_sanctions_economic_effect_2018_2024",
+  "template": "synth_did",
+  "claim_direction_inferred": "+",
+  "falsification_rule_text": "Not supported if EITHER (a) cumulative log-GDP-pc gap 2018-2024 is greater than -20 log-points (i.e. less contraction than threshold) at p_perm < 0.10, OR (b) oil export volume decline from 2017 baseline is less than 50%, OR (c) the sanctions- intensity panel coefficient is not negative on log_gdp_pc at p < 0.05 (no dose- response), OR (d) Iran's pre-2018 trajectory extrapolated forward fits the post- 2018 path better than the synthetic counterfactual (indicating pre-existing trend decline rather than sanctions causation).",
+  "estimate": {
+    "shape": "synth_did",
+    "treated_country": "IRN",
+    "event_year": 2018,
+    "n_donors": 6,
+    "donor_weights": {
+      "RUS": 0.0,
+      "VEN": 0.0041,
+      "IRQ": 0.0,
+      "DZA": 0.9959,
+      "NGA": 0.0,
+      "KAZ": 0.0
+    },
+    "pre_rmse": 586.8229698409368,
+    "pre_period_sd": 181.04156804445728,
+    "mean_post_gap": 772.4152390741693,
+    "end_period_gap": 1082.0873251611347,
+    "post_period_years": [
+      2018,
+      2024
+    ],
+    "placebo_p_value": 0.8571428571428571,
+    "n_placebos": 6,
+    "method": "synthetic-control via NNLS, permutation inference"
+  },
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "real_gdp_pc",
+        "source": "world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe; imf:NGDPRPC",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14131
+      },
+      {
+        "role": "outcome",
+        "name": "cpi_inflation_yoy",
+        "source": "world_bank_wdi:FP.CPI.TOTL.ZG; imf:PCPIPCH",
+        "publisher": "world_bank_wdi",
+        "n_rows": 9066
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "oil_export_volume",
+        "source": "imf:Iran_oil_exports; world_bank_wdi:TX.VAL.FUEL.ZS.UN"
+      },
+      {
+        "role": "outcome",
+        "name": "rial_usd_unofficial_rate",
+        "source": "world_bank_wdi:PA.NUS.FCRF; imf:ENDA_XDC_USD_RATE"
+      },
+      {
+        "role": "treatment",
+        "name": "maximum_pressure_indicator",
+        "source": "constructed: 1 for IRN from 2018-05 onward"
+      },
+      {
+        "role": "treatment",
+        "name": "sanctions_intensity",
+        "source": "constructed: ordinal 0 (pre-2018) \u2192 1 (2018 re-imposition) \u2192 2 (2019 oil-waiver elimination) \u2192 3 (2020-2024 expanded financial sanctions)"
+      },
+      {
+        "role": "controls",
+        "name": "brent_oil_price",
+        "source": "fred:DCOILBRENTEU"
+      },
+      {
+        "role": "controls",
+        "name": "us_policy_rate",
+        "source": "fred:FEDFUNDS"
+      },
+      {
+        "role": "controls",
+        "name": "terms_of_trade",
+        "source": "world_bank_wdi:TT.PRI.MRCH.XD.WD"
+      },
+      {
+        "role": "controls",
+        "name": "vdem_political_stability",
+        "source": "vdem:v2x_polyarchy"
+      }
+    ]
+  },
+  "run_utc": "2026-04-30T10:15:31+00:00",
+  "runner": "scripts/run_synth_did.py"
+}

@@ -1,6 +1,6 @@
 # Result card — nordstream_sabotage_2022_european_energy_security_pivot
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — outcome 'russia_share_eu_gas_imports' not loaded; missing: ['constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.', 'constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/.', 'constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending.', 'constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.', 'constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending.', 'constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop.']
+**Verdict:** PARTIAL — shape=panel_summary, sign matches but magnitude below threshold; |Δ_log|=0; threshold 40.0%, observed 0.0%
 
 ## Pre-registration
 - **Claim:** The September 2022 sabotage of the Nord Stream 1 and 2 pipelines formalised a structural pivot in European gas supply: the share of EU gas imports from Russia (pipeline + LNG combined) fell from ~40% in 2021 to <15% by 2024, US LNG exports to the EU rose from ~22 bcm/yr pre-shock to ~50-70 bcm/yr 2023-2024, Norwegian pipeline gas became the largest single EU supplier (>30% of imports), and EU LNG regasification capacity expanded materially (FSRU additions in DEU Wilhelmshaven + Brunsbüttel + Stade, NLD Eemshaven, ITA Piombino, FRA Le Havre). This hypothesis is descriptive: it inventories the supply- side pivot as a verified pattern across customs-data, pipeline-flow, and LNG-cargo trackers, with no causal counterfactual.
@@ -8,21 +8,30 @@
 - **Falsification test:** nordstream_pivot_inventory
 
 ## Comparison
-- _Error:_ outcome 'russia_share_eu_gas_imports' not loaded; missing: ['constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.', 'constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/.', 'constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending.', 'constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.', 'constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending.', 'constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop.']
+- **shape:** panel_summary
+- **treatment_country:** DEU
+- **treatment_value:** 0.0
+- **donor_pool_median:** 0.0
+- **ratio:** None
+- **log_diff:** None
+- **n_donor_countries:** 13
+- **end_year_window:** [2020, 2025]
+
+## Extracted threshold: {'percent': 40.0}
 
 ## Variables resolved
+- `constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.` → russia_share_eu_gas_imports (outcome, publisher=constructed, n=112)
+- `constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.` → eu_lng_regasification_capacity_bcm_yr (outcome, publisher=constructed, n=112)
+- `constructed: indicator = 1 from 2022-10 onwards (Nord Stream sabotage September 2022, formal end of Russian pipeline supply except for limited Turkstream + Yamal-Europe transit).` → post_sept_2022_dummy (treatment, publisher=constructed, n=112)
+- `constructed: indicator = 1 from 2022-05 (REPowerEU plan announcement) — secondary treatment marking policy framework rather than physical event.` → post_repower_eu_dummy (treatment, publisher=constructed, n=112)
+- `fred:DHHNGSP` → log_henry_hub_gas (controls, publisher=fred, n=30)
+- `eurostat:nrg_chdd_m` → heating_degree_days_eu (controls, publisher=eurostat, n=1426)
 
 ### Variables missing data
-- `constructed: Eurostat nrg_te_gas EU extra-EU imports by partner; Russian share = (RUS LNG + RUS pipeline) / total. Cross-check Bruegel EU gas dashboard.` (outcome, name=russia_share_eu_gas_imports)
 - `constructed: EIA monthly LNG exports by destination + EU LNG cargo arrivals (Kpler / ICIS / Bruegel). Manual-drop pending under data/manual/derived/.` (outcome, name=log_us_lng_exports_to_eu_bcm)
 - `constructed: Gassco / Norway petroleum directorate monthly pipeline exports by terminal. Manual-drop pending.` (outcome, name=log_norway_pipeline_exports_to_eu_bcm)
-- `constructed: GIE (Gas Infrastructure Europe) ALSI regasification capacity by terminal; new FSRU additions DEU/NLD/ITA/FRA 2022-2024. Manual-drop pending.` (outcome, name=eu_lng_regasification_capacity_bcm_yr)
 - `constructed: AGSI+ EU gas storage filling level, country-month. Manual-drop pending.` (outcome, name=eu_gas_storage_filling_pct)
 - `constructed: Dutch TTF spot, monthly average. eex fetcher pending or manual-drop.` (outcome, name=log_ttf_gas_price)
-- `constructed: indicator = 1 from 2022-10 onwards (Nord Stream sabotage September 2022, formal end of Russian pipeline supply except for limited Turkstream + Yamal-Europe transit).` (treatment, name=post_sept_2022_dummy)
-- `constructed: indicator = 1 from 2022-05 (REPowerEU plan announcement) — secondary treatment marking policy framework rather than physical event.` (treatment, name=post_repower_eu_dummy)
 - `constructed: GIIGNL annual LNG trade report — global LNG imports. Manual-drop pending.` (controls, name=log_global_lng_demand)
-- `fred:DHHNGSP` (controls, name=log_henry_hub_gas)
-- `eurostat:nrg_chdd_m` (controls, name=heating_degree_days_eu)
 
-_Generated by `scripts/run_descriptive.py` at 2026-04-30T08:43:15+00:00_
+_Generated by `scripts/run_descriptive.py` at 2026-04-30T13:38:24+00:00_

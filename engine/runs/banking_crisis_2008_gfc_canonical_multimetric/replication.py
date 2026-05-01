@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""Replication script for banking_crisis_2008_gfc_canonical_multimetric."""
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+CMD = [
+    str(ROOT / "venv/bin/python"),
+    str(ROOT / "scripts/run_multi_metric_checklist.py"),
+    "banking_crisis_2008_gfc_canonical_multimetric",
+    "--force",
+]
+
+if __name__ == "__main__":
+    raise SystemExit(subprocess.run(CMD, cwd=ROOT).returncode)

@@ -25,6 +25,18 @@ from ._base import FetchResult, utc_now, write_vintage
 
 BASE = "https://ourworldindata.org/grapher"
 LICENSE = "cc_by_4_0"
+SERIES_ALIASES = {
+    "top-marginal-income-tax-rate": "top-income-tax-rates-piketty",
+    "top-1-share-of-total-income": "income-share-top-1-before-tax-wid",
+    "top-10-share-of-total-income": "income-share-top-10-before-tax-wid",
+    "top-1-share-of-total-wealth": "wealth-share-richest-1-percent",
+    "top-10-share-of-total-wealth": "wealth-share-richest-10-percent",
+    "top-0-1-share-of-total-income": "income-share-top-0-1-before-tax-wid",
+    "co-emissions-per-capita": "co2-emissions-per-capita",
+    "consumption-co2-per-capita": "consumption-co2",
+    "annual-co2-emissions-per-country": "annual-co2-emissions",
+    "economic-complexity-index": "economic-complexity-index-eci",
+}
 
 
 class OwidError(RuntimeError):
@@ -34,7 +46,8 @@ class OwidError(RuntimeError):
 def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult:
     """series_id is the grapher slug."""
     fetch_ts = utc_now()
-    url = f"{BASE}/{series_id}.csv"
+    resolved = SERIES_ALIASES.get(series_id, series_id)
+    url = f"{BASE}/{resolved}.csv"
     r = requests.get(url, timeout=60, headers={"User-Agent": "Mozilla/5.0 IESET"})
     r.raise_for_status()
     if "csv" not in (r.headers.get("content-type") or "").lower():
@@ -57,7 +70,7 @@ def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult
         publisher="owid",
         series_id=series_id,
         source_url=url,
-        methodology_url=f"https://ourworldindata.org/grapher/{series_id}",
+        methodology_url=f"https://ourworldindata.org/grapher/{resolved}",
         license=LICENSE,
         fetch_utc=fetch_ts,
         rows=len(df),
@@ -69,6 +82,7 @@ def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult
         sha256=sha,
         parquet_path=path_out,
         extra={
+            "resolved_series_id": resolved,
             "n_columns": len(df.columns),
             "columns": list(df.columns),
             "vintage_utc": vintage_utc.isoformat() if vintage_utc else None,

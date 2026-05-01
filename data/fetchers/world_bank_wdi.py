@@ -29,6 +29,7 @@ class WorldBankError(RuntimeError):
 
 def _iter_pages(indicator: str, countries: str) -> Iterable[dict]:
     page = 1
+    saw_rows = False
     while True:
         # Cross-country pulls on large indicators routinely take >60s; retry
         # transient timeouts with backoff rather than failing the series.
@@ -46,7 +47,16 @@ def _iter_pages(indicator: str, countries: str) -> Iterable[dict]:
                 continue
         else:
             raise WorldBankError(f"WDI timed out 3x fetching {indicator} page={page}: {last_exc}")
-        r.raise_for_status()
+        try:
+            r.raise_for_status()
+        except requests.HTTPError:
+            # Some WDI indicators occasionally advertise one page too many and
+            # then return HTTP 400 on the terminal overrun page. If we've
+            # already consumed earlier pages successfully, treat that late 400
+            # as end-of-series rather than failing the whole fetch.
+            if saw_rows and page > 1 and r.status_code == 400:
+                return
+            raise
         payload = r.json()
         if not isinstance(payload, list) or len(payload) < 2:
             # Single-element payload is always an error object from the WB API.
@@ -56,6 +66,7 @@ def _iter_pages(indicator: str, countries: str) -> Iterable[dict]:
         if rows is None:
             return
         for row in rows:
+            saw_rows = True
             yield row
         if page >= int(meta.get("pages", 1)):
             return

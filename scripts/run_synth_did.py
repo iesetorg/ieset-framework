@@ -31,6 +31,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_panel_fe import (
     is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, build_panel, infer_claim_direction, filter_sample,
+    first_loaded_var, should_persist_preflight_inconclusive,
+    bump_bulk_run_count, print_bulk_run_summary,
 )
 from run_event_study import find_event_year
 
@@ -59,7 +61,10 @@ def fit_synthetic(panel: pd.DataFrame, outcome: str, treated: str,
     if treated not in wide.columns:
         return {"error": f"{treated} not in panel"}
     pre_treated = pre[treated].dropna()
-    pre_donors_full = pre[donors].dropna(how="all", axis=1)
+    available_donors = [d for d in donors if d in pre.columns]
+    if len(available_donors) < 2:
+        return {"error": f"insufficient donor coverage (available donors={available_donors})"}
+    pre_donors_full = pre[available_donors].dropna(how="all", axis=1)
     pre_donors = pre_donors_full.dropna(axis=1)  # Donors with full pre-period coverage
     common_years = pre_treated.index.intersection(pre_donors.index)
     if len(common_years) < 4 or pre_donors.shape[1] < 2:
@@ -112,8 +117,10 @@ def fit_synthetic(panel: pd.DataFrame, outcome: str, treated: str,
                 w_d = w_d / w_d.sum() if w_d.sum() > 0 else np.ones(len(other_donors)) / len(other_donors)
             except Exception:
                 w_d = np.ones(len(other_donors)) / len(other_donors)
+            if d not in post_donors.columns:
+                continue
             X_post_d = post_donors[other_donors].loc[common_post].values
-            Y_post_d = pre_donors[d].loc[common_post].values if d in pre_donors.columns else None
+            Y_post_d = post_donors[d].loc[common_post].values
             if Y_post_d is None or len(Y_post_d) == 0 or np.any(np.isnan(Y_post_d)):
                 continue
             placebo_gap = float(np.mean(Y_post_d - X_post_d @ w_d))
@@ -141,7 +148,7 @@ def fit_synthetic(panel: pd.DataFrame, outcome: str, treated: str,
     }
 
 
-def verdict(est: dict, claim_dir: str) -> tuple[str, str]:
+def compute_verdict(est: dict, claim_dir: str) -> tuple[str, str]:
     if "error" in est:
         return "INCONCLUSIVE_DATA_PENDING", est["error"]
     gap = est["mean_post_gap"]
@@ -204,7 +211,11 @@ def write_outputs(hid: str, spec: dict, status: dict, est: dict,
     (out_dir / "result_card.md").write_text("\n".join(md))
 
 
-def run_one(hid: str, force: bool = False) -> str:
+def run_one(
+    hid: str,
+    force: bool = False,
+    persist_preflight_inconclusive: bool = True,
+) -> str:
     if not force and has_committed_verdict(hid):
         return f"  · {hid}: skipped (committed verdict already on disk)"
     found = load_spec(hid)
@@ -224,26 +235,44 @@ def run_one(hid: str, force: bool = False) -> str:
             "(replace falsification.rule with a dispositive threshold AND "
             "document the sharpening in methodology_note) before running."
         )
-        write_outputs(hid, spec, {"variables_loaded": [], "variables_missing": []}, {"error": reason}, {}, verdict, reason, None)
-        return f"  ⚠ {hid}: {verdict} (stub rule, refused to grade)"
+        persisted = should_persist_preflight_inconclusive(
+            reason, persist_preflight_inconclusive
+        )
+        if persisted:
+            write_outputs(
+                hid,
+                spec,
+                {"variables_loaded": [], "variables_missing": []},
+                {"error": reason},
+                verdict,
+                reason,
+            )
+        suffix = " (stub rule, refused to grade)"
+        if not persisted:
+            suffix += " [artifact skipped]"
+        return f"  ⚠ {hid}: {verdict}{suffix}"
 
     panel, status = build_panel(spec)
     var_blocks = spec.get("variables") or {}
     outcome_items = var_blocks.get("outcome") or []
     if not outcome_items:
         v, r = "INCONCLUSIVE_DATA_PENDING", "no outcome variable"
-        write_outputs(hid, spec, status, {"error": r}, v, r)
+        if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
+            write_outputs(hid, spec, status, {"error": r}, v, r)
         return f"  ⚠ {hid}: {v}"
-    o = outcome_items[0]["name"]
-    if o not in panel.columns:
-        v, r = "INCONCLUSIVE_DATA_PENDING", f"outcome '{o}' not loaded"
-        write_outputs(hid, spec, status, {"error": r}, v, r)
+    panel_filt = filter_sample(panel, spec)
+    o = first_loaded_var(outcome_items, panel_filt)
+    if o is None:
+        v, r = "INCONCLUSIVE_DATA_PENDING", "no outcome variable loaded"
+        if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
+            write_outputs(hid, spec, status, {"error": r}, v, r)
         return f"  ⚠ {hid}: {v}"
     sample = spec.get("sample") or {}
     countries = sample.get("countries") or []
     if len(countries) < 3:
         v, r = "INCONCLUSIVE_DATA_PENDING", f"need >= 3 countries (1 treated + 2 donors), got {len(countries)}"
-        write_outputs(hid, spec, status, {"error": r}, v, r)
+        if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
+            write_outputs(hid, spec, status, {"error": r}, v, r)
         return f"  ⚠ {hid}: {v}"
     event_year = find_event_year(spec)
     if event_year is None:
@@ -252,13 +281,13 @@ def run_one(hid: str, force: bool = False) -> str:
             event_year = (period[0] + period[1]) // 2
         else:
             v, r = "INCONCLUSIVE_DATA_PENDING", "couldn't infer event_year"
-            write_outputs(hid, spec, status, {"error": r}, v, r)
+            if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
+                write_outputs(hid, spec, status, {"error": r}, v, r)
             return f"  ⚠ {hid}: {v}"
-    panel_filt = filter_sample(panel, spec)
     treated, *donors = countries
     est = fit_synthetic(panel_filt, o, treated, donors, event_year)
     cd = infer_claim_direction(spec)
-    v, r = verdict(est, cd)
+    v, r = compute_verdict(est, cd)
     write_outputs(hid, spec, status, est, v, r)
     icon = {"SUPPORTED": "✓", "REFUTED": "✗", "PARTIAL": "·",
             "INCONCLUSIVE_DATA_PENDING": "⚠"}.get(v, " ")
@@ -271,19 +300,43 @@ def main() -> int:
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--force", action="store_true",
                     help="Overwrite existing committed verdicts.")
+    ap.add_argument(
+        "--write-preflight-inconclusive",
+        action="store_true",
+        help="Persist obvious preflight INCONCLUSIVE artifacts during bulk runs.",
+    )
     args = ap.parse_args()
+    persist_preflight = args.write_preflight_inconclusive or not args.all
     if args.all:
         ids = list_specs()
+        counts: dict[str, int] = {}
         print(f"Running {len(ids)} synth_did/synthetic_control specs…")
         for hid in ids:
-            try: print(run_one(hid, force=args.force))
+            try:
+                msg = (
+                    run_one(
+                        hid,
+                        force=args.force,
+                        persist_preflight_inconclusive=persist_preflight,
+                    )
+                )
+                print(msg)
+                bump_bulk_run_count(counts, msg)
             except Exception as e:
                 print(f"  ✗ {hid}: crashed — {e}")
+                counts["crashed"] = counts.get("crashed", 0) + 1
                 traceback.print_exc()
+        print_bulk_run_summary("synth_did", counts)
         return 0
     if not args.hypothesis_id:
         ap.error("Pass <hid> or --all")
-    print(run_one(args.hypothesis_id, force=args.force))
+    print(
+        run_one(
+            args.hypothesis_id,
+            force=args.force,
+            persist_preflight_inconclusive=persist_preflight,
+        )
+    )
     return 0
 
 

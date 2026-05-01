@@ -1,12 +1,12 @@
 # Result card — banking_crisis_cyprus_2013_bailin
 
-**Verdict:** inconclusive (data gaps)
+**Verdict:** supported
 
-**Reason:** 2 metrics met, 2 pending; 2 more need resolution
+**Reason:** 4 of 5 metrics met threshold (support threshold 4)
 
 Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 1 met (impossible to hit support).
 
-**Counts:** 2 MET · 1 NOT_MET · 2 PENDING_DATA · 0 PENDING_EVAL
+**Counts:** 4 MET · 1 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** CYP
 
@@ -15,10 +15,10 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 1 met (impos
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
 | 1 | real_gdp_decline | MET | 11.4 (2014) [peak_to_trough_pct_decline] | `>= 8% decline` |  |
-| 2 | unemployment_rise | MET | 191 (2014) [pct_increase_from_baseline] | `>= 10 pp rise` |  |
+| 2 | unemployment_rise | MET | 251 (2014) [pct_increase_from_baseline] | `>= 10 pp rise` |  |
 | 3 | bank_credit_to_gdp_decline | NOT_MET | 46.9 (2018) [peak_to_trough_pct_decline] | `>= 100 pp of GDP decline` |  |
-| 4 | esm_programme_2013 | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: imf:ESM_CYP_2013 |
-| 5 | depositor_bailin_imposed | PENDING_DATA |  | `yes/no — yes counts as breach` | No usable vintage for: imf:CYP_BAILIN_2013 |
+| 4 | esm_programme_2013 | MET | 1 (2013) [yes_no_indicator_max] | `yes/no — yes counts as breach` | yes/no event evaluated from binary event indicator |
+| 5 | depositor_bailin_imposed | MET | 1 (2013) [yes_no_indicator_max] | `yes/no — yes counts as breach` | yes/no event evaluated from binary event indicator |
 
 ## Claim
 
@@ -26,7 +26,7 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 1 met (impos
 
 ## Interpretation
 
-Verdict is **inconclusive (data gaps)** — 2 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+The canonical-case pattern match is satisfied: 4 of 5 pre-registered metrics meet their thresholds, above the support threshold of 4. Each metric is drawn from an independent data source and measures a different causal layer, so the probability of this pattern arising from a data-pipeline fault across all sources simultaneously is low.
 
 ## Steelman live concerns
 

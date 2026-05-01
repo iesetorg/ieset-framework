@@ -14,10 +14,10 @@ Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 2 met (impos
 
 | # | Metric | Status | Observed | Threshold | Notes |
 |---|---|:---:|---:|---|---|
-| 1 | monthly_inflation_collapse | PENDING_DATA |  | `monthly inflation < 3% by Dec 2025; sustained < 4% for 6+ months` | No usable vintage for: bcra:inflation_monthly, indec:ipc_monthly |
+| 1 | monthly_inflation_collapse | PENDING_DATA |  | `monthly inflation < 3% by Dec 2025; sustained < 4% for 6+ months` | No usable vintage for: indec:ipc_monthly; Non-tidy (needs custom parser): bcra:inflation_monthly |
 | 2 | primary_fiscal_surplus_achieved | PENDING_EVAL | 0.5 (2024) [max_in_window_fallback] | `primary balance > 0% of GDP in 2024 AND 2025` | threshold expression unparseable by regex |
-| 3 | parallel_fx_gap_compression | PENDING_DATA |  | `parallel_fx_gap < 0.20 by Dec 2025` | No usable vintage for: bcra:fx_official, dolartoday:blue_rate |
-| 4 | output_recession_bounded | PENDING_DATA |  | `max peak_to_trough log_real_gdp decline < 0.04` | No usable vintage for: imf:NGDP_R, indec:emae |
+| 3 | parallel_fx_gap_compression | PENDING_DATA |  | `parallel_fx_gap < 0.20 by Dec 2025` | No usable vintage for: dolartoday:blue_rate; Non-tidy (needs custom parser): bcra:fx_official |
+| 4 | output_recession_bounded | PENDING_DATA |  | `max peak_to_trough log_real_gdp decline < 0.04` | No usable vintage for: indec:emae |
 | 5 | poverty_rate_recovery | PENDING_DATA |  | `INDEC poverty headcount < 42% by 2026-S1` | No usable vintage for: indec:eph_pobreza |
 
 ## Claim

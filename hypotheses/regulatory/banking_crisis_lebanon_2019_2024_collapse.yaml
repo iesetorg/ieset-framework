@@ -1,7 +1,13 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: banking_crisis_lebanon_2019_2024_collapse
 version: 1
-status: candidate
+status: pre_registered
+methodology_note: >
+  v1 promotion (2026-04-30). The candidate spec already pinned the
+  canonical_metrics list, metric thresholds, data windows, and
+  multi_metric_falsification counts. This promotion adds only the
+  checklist estimator/falsification wrapper and leaves all metric
+  thresholds unchanged before the post-commit rerun.
 topic: regulatory
 claim: >
   Lebanon's 2019-2024 banking collapse — informal capital controls, multi-tier
@@ -34,7 +40,7 @@ canonical_metrics:
     description: Lebanese pound parallel-market depreciation against USD
     threshold: ">= 90% nominal depreciation peak-to-trough"
     window: "2019-2023"
-    source: "imf:ENDA_XDC_USD_RATE"
+    source: "world_bank_wdi:PA.NUS.FCRF"
     direction: supports_claim
     independence_justification: External-rate signal (parallel-market rate where official rate diverges).
   - metric_id: sovereign_default_event
@@ -62,6 +68,28 @@ multi_metric_falsification:
   total_metrics: 6
   support_threshold: 5
   refute_threshold: 2
+
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: >
+    Canonical-case checklist evaluator reads canonical_metrics and
+    multi_metric_falsification; no regression model is estimated.
+    Each metric is scored against its pre-registered source, window,
+    and threshold before applying the count rule below.
+
+falsification:
+  rule: >
+    Evaluate every canonical_metrics row against its pre-registered
+    source, window, and threshold. The hypothesis is SUPPORTED if at
+    least 5 of 6 metrics are MET. It is REFUTED if even
+    counting all pending metrics as favorable cannot reach 5
+    MET metrics and the confirmed failures cross the pre-registered
+    refutation guardrail. Otherwise the verdict is INCONCLUSIVE until
+    pending data or pending evaluation metrics are resolved.
+  test: multi_metric_checklist_canonical_banking_crisis
+  threshold: "MET >= 5 of 6; REFUTE when MET + PENDING_DATA + PENDING_EVAL < 5; refutation guardrail=2"
+
 variables:
   outcome:
     - name: real_gdp

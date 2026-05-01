@@ -34,9 +34,9 @@ BASE = "https://data-api.ecb.europa.eu/service"
 LICENSE = "oecd_terms"
 
 _ECB_SHORTCUTS: dict[str, tuple[str, str]] = {
-    "FM": ("FM", "M.U2.EUR.4F.KR.MRR_FR.LEV"),
-    "FM:STN": ("FM", "M.U2.EUR.4F.KR.MRR_FR.LEV"),
-    "FM.M.U2.EUR.4F.KR.MRR_FR.LEV": ("FM", "M.U2.EUR.4F.KR.MRR_FR.LEV"),
+    "FM": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
+    "FM:STN": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
+    "FM.M.U2.EUR.4F.KR.MRR_FR.LEV": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
     "financial_markets_money_market_OIS": ("FM", "M.U2.EUR.4F.MM.EONIA_.HSTA"),
     "euribor": ("FM", "M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA"),
     "financial_markets_yields_2yr": ("FM", "M.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y"),
