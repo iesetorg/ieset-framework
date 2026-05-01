@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: yield_curve_inversion_unemployment_us_1976_2026
+version: 1
+status: pre_registered
+topic: monetary
+claim: >
+  US 10-year minus 2-year Treasury yield-curve inversions are followed by
+  meaningful labour-market weakening in most completed post-1976 episodes.
+  The pre-registered test treats a completed inversion episode as a monthly
+  average 10y-2y spread below zero for at least two consecutive months, with
+  new episodes allowed after at least three non-inverted months. The claim is
+  supported if at least 70% of completed episodes are followed by a rise in
+  the unemployment rate of at least 0.75 percentage points within 24 months
+  of episode start, and the median 24-month unemployment increase is at least
+  1.0 percentage point.
+evidence_type: associational
+sample:
+  countries: [USA]
+  period: [1976, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "episodes starting fewer than 24 months before the latest unemployment observation are treated as censored and excluded from the completed-episode count"
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: "max increase within 24 months of inversion start"
+  treatment:
+    - name: ten_year_two_year_spread
+      source: "fred:DGS10; fred:DGS2"
+      transformation: "monthly mean DGS10 minus monthly mean DGS2"
+estimator:
+  template: event_study
+  clustering: none
+  notes: >
+    Custom replication script detects completed inversion episodes from daily
+    FRED yields aggregated to monthly means, then evaluates unemployment-rate
+    increases within the next 24 months.
+falsification:
+  rule: >
+    SUPPORTED if at least 70% of completed inversion episodes have a 24-month
+    unemployment-rate increase >= 0.75 percentage points and the median
+    increase is >= 1.0 percentage point. REFUTED if fewer than 50% pass or
+    the median increase is < 0.5 percentage points. Otherwise PARTIAL.
+  test: completed_inversion_episode_unemployment_followthrough
+  threshold: "pass_rate >= 0.70 AND median_unemployment_increase_pp >= 1.0"
+prior_confidence: 0.74
+disclosure: >
+  Author prior expects inversions to predict labour-market weakness, but this
+  is an associational timing test rather than a structural monetary-policy
+  causal identification.
+steelman: hypotheses/steelman/yield_curve_inversion_unemployment_us_1976_2026.md
+scope:
+  period: [1976, 2026]
+  countries: [USA]
+  outcome_dim: [monetary_policy, employment_labour]
+  policy_family: [monetary_policy]
+  treatment_tags: [yield_curve_inversion, unemployment_followthrough]

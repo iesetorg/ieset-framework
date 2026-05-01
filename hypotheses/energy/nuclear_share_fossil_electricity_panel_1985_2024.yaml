@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nuclear_share_fossil_electricity_panel_1985_2024
+version: 1
+status: pre_registered
+topic: energy
+claim: >
+  In countries where nuclear power's share of electricity generation rose
+  materially after 1985, fossil-fuel electricity share usually fell. The
+  pre-registered descriptive-panel test selects countries with at least a
+  5 percentage-point increase in nuclear electricity share between their
+  first and last available observations in 1985-2024, then asks whether at
+  least 75% of those countries experienced a fossil-fuel electricity-share
+  decline of at least 5 percentage points and whether the median fossil-share
+  change was at most -10 percentage points.
+evidence_type: descriptive
+sample:
+  countries: [ARE, BGR, BLR, CZE, PAK, ROU, RUS, SVK, UKR]
+  period: [1985, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: fossil_electricity_share
+      source: "owid:share-electricity-fossil-fuels"
+      transformation: "endpoint percentage-point change"
+  treatment:
+    - name: nuclear_electricity_share
+      source: "owid:share-electricity-nuclear"
+      transformation: "endpoint percentage-point change"
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Custom replication script joins OWID nuclear and fossil electricity-share
+    panels by country-year, selects countries with nuclear-share increases of
+    at least 5 percentage points, and evaluates the corresponding fossil-share
+    endpoint changes.
+falsification:
+  rule: >
+    SUPPORTED if at least 75% of countries with nuclear-share increases >= 5pp
+    have fossil-share declines <= -5pp and the median fossil-share change is
+    <= -10pp. REFUTED if fewer than 50% have fossil-share declines <= -5pp or
+    the median fossil-share change is non-negative. Otherwise PARTIAL.
+  test: nuclear_share_increase_fossil_share_endpoint_change
+  threshold: "pass_rate >= 0.75 AND median_fossil_share_change_pp <= -10"
+prior_confidence: 0.8
+disclosure: >
+  Author prior expects nuclear buildout to displace fossil generation in many
+  systems. This descriptive endpoint test does not isolate demand growth,
+  hydro variation, gas-price shocks, or policy packages that co-move with
+  nuclear construction.
+steelman: hypotheses/steelman/nuclear_share_fossil_electricity_panel_1985_2024.md
+scope:
+  period: [1985, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [energy]
+  policy_family: [energy_policy]
+  treatment_tags: [nuclear_electricity, fossil_electricity_displacement]
