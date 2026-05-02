@@ -3,74 +3,129 @@ hypothesis_id: thailand_middle_income_plateau_state_coordination
 version: 1
 status: candidate
 topic: growth
-claim: Thailand middle-income plateau is associated with weaker competition and lower institutional quality despite earlier export-led development.
-evidence_type: causal
+claim: >-
+  Thailand's middle-income plateau (post-1997 and especially post-2005) is associated
+  with weaker product-market competition, lower institutional quality, and fragmented
+  state coordination capacity relative to East Asian peers that sustained convergence.
+  Despite successful early export-led development, Thailand's total factor productivity
+  growth and GDP per capita convergence slowed because of entrenched oligopolistic
+  structures, inconsistent infrastructure investment, and regulatory capture, after
+  controlling for initial income, human capital, trade openness, and foreign direct
+  investment inflows.
+evidence_type: associational
 sample:
   countries:
-    - THA
-  period: [1980, 2024]
-  temporal_structure: time_series
+  - THA
+  - KOR
+  - TWN
+  - MYS
+  - VNM
+  - IDN
+  - PHL
+  - CHL
+  - MEX
+  - TUR
+  period:
+  - 1980
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude 1997-1998 Asian financial crisis years from baseline trend if treating as exogenous
+  - exclude years of major political instability (2006, 2014 coups) as robustness checks
+  - require at least 10 years of continuous data for each country
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - THA
+  - KOR
+  - TWN
+  - MYS
+  - VNM
+  - IDN
+  - PHL
+  - CHL
+  - MEX
+  - TUR
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - institutional_quality
+  - competition_concentration
+  policy_family:
+  - institutional_reform
+  - competition_policy
+  - industrial_policy
+  treatment_tags:
+  - thailand_export_led_growth_1980s
+  - thailand_political_instability_2006_2014
+  - thailand_infrastructure_fragmentation
 variables:
   outcome:
-    - name: real_gdp_per_capita_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: level
-    - name: tfp_growth
-      source: pwt:rtfpna
-      transformation: annual_log_diff
-    - name: manufacturing_share
-      source: world_bank_wdi:NV.IND.MANF.ZS
-      transformation: level
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: gdp_per_capita_convergence_gap
+    source: pwt:rgdpe
+    transformation: constructed_gap_to_usa
+    notes: Log-gap to US real GDP per capita.
   treatment:
-    - name: competition_policy_index
-      source: oecd_pmr:pmr
-      transformation: level
-      notes: OECD PMR or Fraser EFW regulation sub-index as proxy for domestic competition.
-    - name: institutional_quality
-      source: wgi:RL.EST
-      transformation: level
-    - name: export_led_dummy
-      source: constructed:binary_indicator
-      transformation: binary
-      notes: Coded 1 for 1980-1997 export-led boom period.
+  - name: product_market_competition
+    source: oecd_pmr:pmr
+    transformation: level
+    notes: OECD product market regulation index as inverse competition proxy.
+  - name: institutional_quality
+    source: wgi:GE.EST
+    transformation: level
+    notes: WGI government effectiveness as proxy for state coordination capacity.
+  - name: regulatory_capture_proxy
+    source: constructed:concentration_of_political_connections_in_top_firms
+    transformation: level
+    notes: Proxy for oligopolistic capture based on listed-firm political connections.
   controls:
-    - name: political_instability_index
-      source: vdem:v2x_polyarchy
-      transformation: level
-    - name: trade_openness
-      source: world_bank_wdi:NE.TRD.GNFS.ZS
-      transformation: level
-    - name: commodity_prices
-      source: world_bank_wdi:NETWD
-      transformation: level
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: fdi_inflows_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: level
+  - name: infrastructure_quality
+    source: constructed:wef_gci_infrastructure_score
+    transformation: level
+    notes: Infrastructure quality index as control for physical capital coordination.
 estimator:
-  template: event_study
-  fixed_effects: [year]
-  clustering: none
-  notes: Event-study of Thai growth around the 1997 crisis and subsequent plateau. Tests whether weak competition and institutions predict the slowdown.
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Panel fixed-effects with interaction between competition and institutional quality.
 falsification:
-  rule: The hypothesis is refuted if Thailand post-1997 growth did not slow significantly, or if competition and institutional quality significantly improved during the plateau period.
-  test: event_study_thailand_plateau
+  rule: >-
+    The hypothesis is falsified if Thailand's TFP growth post-2005 is statistically
+    indistinguishable from Vietnam's or South Korea's at comparable income levels,
+    or if product-market competition and institutional quality do not carry positive
+    and significant (p < 0.10) coefficients on TFP growth in the full panel.
+  test: panel_fe_thailand_plateau_competition_institutions_1980_2020
   threshold:
-    post_1997_slowdown: true
-    competition_institutions_weak: true
-prior_confidence: 0.6
-disclosure: Author acknowledges that Thailand has experienced repeated political crises and coups that confound economic policy attribution.
+    supported: competition and institutional_quality coefficients > 0 at p < 0.10; THA post-2005 TFP < KOR/VNM
+    refuted: competition or institutional_quality coefficient <= 0 at p < 0.10; THA post-2005 TFP >= KOR/VNM
+prior_confidence: 0.60
+disclosure: >-
+  Author priors accept that Thailand's export sector remains competitive but believe
+  that domestic oligopoly and political instability have constrained economy-wide
+  productivity. The test is designed to separate export-sector performance from
+  aggregate TFP dynamics.
 steelman: hypotheses/steelman/thailand_middle_income_plateau_state_coordination.md
-scope:
-  period: [1980, 2024]
-  countries:
-    - THA
-  outcome_dim:
-    - gdp_growth
-    - institutional_quality
-    - competition_concentration
-  policy_family:
-    - competition_policy
-    - institutional_reform
-    - trade_policy
-  treatment_tags:
-    - thailand_export_led_growth
-    - thailand_1997_crisis
-    - thailand_political_instability
-notes: OECD PMR data for Thailand is sparse; Fraser EFW used as alternative. Political instability requires coding from events catalogues.
+notes: >-
+  Thailand's plateau is confounded by the 1997 crisis balance-sheet effects and
+  recurring political uncertainty. Fixed effects partial out country-invariant shocks
+  but not within-country political cycles.

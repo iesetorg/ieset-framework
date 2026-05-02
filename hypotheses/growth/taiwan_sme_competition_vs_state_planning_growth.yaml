@@ -3,75 +3,113 @@ hypothesis_id: taiwan_sme_competition_vs_state_planning_growth
 version: 1
 status: candidate
 topic: growth
-claim: Taiwan's long-run productivity performance is better predicted by SME competition and export-market discipline than by direct state planning intensity.
-evidence_type: causal
+claim: >-
+  Taiwan's long-run total factor productivity performance is better predicted by
+  small-and-medium-enterprise (SME) density, export-market discipline, and product-market
+  competition intensity than by direct state planning or state-owned-enterprise (SOE)
+  share. Relative to comparator economies with heavier state direction (South Korea's
+  chaebol era, Malaysia's national champions), Taiwan's SME-led, export-oriented
+  structure is associated with higher TFP growth and lower resource misallocation
+  over 1960-2020, after controlling for initial income, human capital, and trade openness.
+evidence_type: associational
 sample:
   countries:
-    - TWN
-  period: [1960, 2024]
-  temporal_structure: time_series
+  - TWN
+  - KOR
+  - JPN
+  - SGP
+  - MYS
+  - THA
+  period:
+  - 1960
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude years of major internal conflict or martial law transition periods if data quality is compromised
+  - require at least 15 years of continuous data for each country
+scope:
+  period:
+  - 1960
+  - 2020
+  countries:
+  - TWN
+  - KOR
+  - JPN
+  - SGP
+  - MYS
+  - THA
+  outcome_dim:
+  - productivity
+  - competition_concentration
+  - trade_liberalisation
+  policy_family:
+  - industrial_policy
+  - competition_policy
+  treatment_tags:
+  - taiwan_sme_ecosystem
+  - taiwan_hsinchu_science_park_1980
+  - korea_chaebol_concentration
 variables:
   outcome:
-    - name: labour_productivity_growth
-      source: oecd_stan:gdp_per_hour_worked
-      transformation: annual_log_diff
-      notes: OECD STAN for Taiwan via alternative compilation; national accounts as fallback.
-    - name: tfp_growth
-      source: pwt:rtfpna
-      transformation: annual_log_diff
-    - name: real_gdp_per_capita_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: level
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: labour_productivity_growth
+    source: oecd_stan:manufacturing_tfp
+    transformation: log_diff_5y
+    notes: Manufacturing labour productivity growth from OECD STAN or constructed from UNIDO.
   treatment:
-    - name: sme_share_of_employment
-      source: constructed:nsb_sme_survey
-      transformation: level
-      notes: SME employment share from Taiwan National Statistics Bureau or academic compilations.
-    - name: state_planning_intensity
-      source: constructed:composite_index
-      transformation: level
-      notes: Composite of state-directed investment share, SOE output share, and planning-board budget authority.
-    - name: export_ratio
-      source: world_bank_wdi:NE.TRD.GNFS.ZS
-      transformation: level
+  - name: sme_share_of_employment
+    source: constructed:ilo_sme_employment_share
+    transformation: level
+    notes: SME employment share as proxy for competitive market structure.
+  - name: state_planning_intensity
+    source: constructed:soe_share_plus_directed_credit_intensity
+    transformation: level
+    notes: Composite of SOE output share and directed credit intensity.
+  - name: export_market_discipline
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: Trade openness as proxy for export-market discipline.
   controls:
-    - name: r_d_intensity
-      source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
-      transformation: level
-    - name: human_capital
-      source: owid:mean-years-of-schooling-long-run-1870
-      transformation: level
-    - name: fdi_inflows
-      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
-      transformation: level
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: institutional_quality
+    source: wgi:GE.EST
+    transformation: level
+  - name: fdi_inflows_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: level
 estimator:
   template: panel_fe
-  fixed_effects: [year]
-  clustering: none
-  notes: Time-series regression of productivity growth on SME competition, export discipline, and state planning intensity. Uses rolling windows to test which factor predicts subsequent productivity growth.
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Panel fixed-effects with interaction between SME share and export openness.
 falsification:
-  rule: The hypothesis is refuted if state planning intensity has a larger and significant positive coefficient than SME competition or export ratio in predicting Taiwan's productivity growth 1960-2024, or if SME competition does not significantly predict productivity growth.
-  test: time_series_taiwan_productivity_drivers
+  rule: >-
+    The hypothesis is falsified if state planning intensity carries a positive and
+    significant (p < 0.10) coefficient on TFP growth that is larger than the SME-share
+    coefficient, or if the SME-share coefficient is not positive and significant in
+    a panel that includes Taiwan and comparators.
+  test: panel_fe_sme_vs_state_planning_1960_2020
   threshold:
-    sme_coef: ">0 and p<0.10"
-    state_planning_coef: "<=0 or p>=0.10"
-prior_confidence: 0.55
-disclosure: Author acknowledges that Taiwan's state planning was less intensive than Korea's and that SME data quality varies over time; the comparison may be stacked in favour of the SME hypothesis.
+    supported: sme_share coefficient > 0 at p < 0.10 and larger than state_planning coefficient
+    refuted: state_planning coefficient > sme_share coefficient at p < 0.10
+prior_confidence: 0.60
+disclosure: >-
+  Author priors favour competitive market explanations for Taiwan's success but acknowledge
+  that state technology institutes (ITRI) and Hsinchu Science Park played coordinating
+  roles. The test is framed to isolate the relative contribution of SME competition versus
+  state planning, not to deny all state involvement.
 steelman: hypotheses/steelman/taiwan_sme_competition_vs_state_planning_growth.md
-scope:
-  period: [1960, 2024]
-  countries:
-    - TWN
-  outcome_dim:
-    - productivity
-    - competition_concentration
-    - trade_liberalisation
-  policy_family:
-    - industrial_policy
-    - competition_policy
-    - trade_policy
-  treatment_tags:
-    - taiwan_sme_ecosystem
-    - taiwan_export_discipline
-    - taiwan_industrial_planning
-notes: Taiwan SME employment share requires compilation from national statistics; some years interpolated. State planning intensity is a constructed index requiring academic source calibration.
+notes: >-
+  Taiwan's SME structure is partly an artefact of mainland refugee entrepreneurship
+  and US aid conditions, not purely a policy choice. Reverse causality (high productivity
+  enabling SME entry) is a concern addressed partially through lagged treatment variables.

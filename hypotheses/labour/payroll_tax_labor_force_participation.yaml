@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: payroll_tax_labor_force_participation
+version: 1
+status: candidate
+topic: labour
+claim: Higher tax burden proxies predict lower labour-force participation over long windows.
+methodology_note: Promoted from the 200-item long-horizon market/QOL backlog as a local-data first-pass
+  screen.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - CAN
+  - AUS
+  - NZL
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - JPN
+  - KOR
+  - CHN
+  - IND
+  - BRA
+  - MEX
+  - CHL
+  - ARG
+  - TUR
+  - ZAF
+  - POL
+  - EST
+  - VNM
+  - THA
+  - MYS
+  - IDN
+  - COL
+  - PER
+  - PHL
+  - EGY
+  - MAR
+  - KEN
+  - NGA
+  - BGD
+  - PAK
+  - LKA
+  period: &id001
+  - 1990
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with missing primary outcome or treatment proxy
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - employment_labour
+  - taxation
+  policy_family:
+  - tax_policy
+  - labour_market
+  treatment_tags:
+  - payroll_tax
+  - labour_force_participation
+variables:
+  outcome:
+  - name: qol_or_prosperity_outcome
+    source: world_bank_wdi:SL.TLF.CACT.ZS
+    transformation: level_or_growth_proxy
+  treatment:
+  - name: market_or_intervention_proxy
+    source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+    transformation: level
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Local-data first-pass TWFE screen; upgrade to exact outcome/treatment datasets before scoreboard
+    promotion.
+falsification:
+  rule: SUPPORTED if the treatment coefficient has the predicted sign at p<0.10. REFUTED if the opposite
+    sign is significant at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_payroll_tax_labor_force_participation
+  threshold: p<0.10 with pre-registered sign
+prior_confidence: 0.55
+disclosure: These are proxy-first QOL screens. They are intended to identify promising evidence, not to
+  settle causal claims without robustness checks.
+steelman: hypotheses/steelman/payroll_tax_labor_force_participation.md

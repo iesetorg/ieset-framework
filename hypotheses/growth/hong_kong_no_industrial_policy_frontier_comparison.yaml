@@ -3,84 +3,116 @@ hypothesis_id: hong_kong_no_industrial_policy_frontier_comparison
 version: 1
 status: candidate
 topic: growth
-claim: Hong Kong long-run income convergence without classic industrial policy matches or exceeds developmentalist Asian comparators after controlling for initial income.
-evidence_type: causal
+claim: >-
+  Hong Kong's long-run income convergence to the productivity frontier without classic
+  industrial policy (sectoral targeting, directed credit, national champions, or SOE
+  promotion) matches or exceeds that of developmentalist East Asian comparators after
+  controlling for initial income, human capital, and trade openness. Between 1960 and
+  2020, Hong Kong's GDP per capita growth and total factor productivity performance
+  are statistically indistinguishable from or superior to South Korea's, Taiwan's, and
+  Singapore's, despite the absence of state-led sectoral coordination, suggesting that
+  market institutions and trade openness can substitute for industrial policy in achieving
+  frontier convergence.
+evidence_type: associational
 sample:
   countries:
-    - HKG
-    - KOR
-    - TWN
-    - SGP
-    - JPN
-    - MYS
-    - THA
-    - PHL
-    - IDN
-  period: [1960, 2024]
+  - HKG
+  - KOR
+  - TWN
+  - JPN
+  - SGP
+  - MYS
+  - THA
+  period:
+  - 1960
+  - 2020
   temporal_structure: panel
+  exclusion_rules:
+  - exclude post-1997 handover period if testing colonial laissez-faire specifically
+  - exclude years of major social unrest if treating as structural break
+  - require at least 20 years of continuous data for each economy
+scope:
+  period:
+  - 1960
+  - 2020
+  countries:
+  - HKG
+  - KOR
+  - TWN
+  - JPN
+  - SGP
+  - MYS
+  - THA
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  - institutional_reform
+  - none
+  treatment_tags:
+  - hong_kong_free_port
+  - hong_kong_no_industrial_policy
+  - cowperthwaite_laissez_faire
 variables:
   outcome:
-    - name: real_gdp_per_capita
-      source: world_bank_wdi:NY.GDP.PCAP.KD
-      transformation: log
-    - name: real_gdp_per_capita_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: level
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: gdp_per_capita_convergence_gap
+    source: pwt:rgdpe
+    transformation: constructed_gap_to_usa
+    notes: Log-gap to US real GDP per capita as convergence measure.
   treatment:
-    - name: hong_kong_dummy
-      source: constructed:binary_indicator
-      transformation: binary
-      notes: Coded 1 for Hong Kong throughout the period.
-    - name: developmentalist_dummy
-      source: constructed:binary_indicator
-      transformation: binary
-      notes: Coded 1 for KOR, TWN, SGP, JPN (MITI era), MYS, THA during their developmentalist periods.
+  - name: industrial_policy_intensity
+    source: constructed:soe_share_plus_sectoral_subsidy_index
+    transformation: level
+    notes: Composite index of SOE share, sectoral subsidies, and directed credit intensity.
+  - name: economic_freedom_score
+    source: fraser_efw:summary_index
+    transformation: level
+    notes: Fraser Institute Economic Freedom of the World summary index.
   controls:
-    - name: log_initial_gdp_pc
-      source: maddison:real_gdp_pc
-      transformation: log
-    - name: trade_openness
-      source: world_bank_wdi:NE.TRD.GNFS.ZS
-      transformation: level
-    - name: institutional_quality
-      source: wgi:RL.EST
-      transformation: level
-    - name: human_capital
-      source: owid:mean-years-of-schooling-long-run-1870
-      transformation: level
+  - name: log_initial_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_lagged_5y
+    notes: Lagged log GDP per capita to control for convergence effects.
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: institutional_quality
+    source: wgi:RL.EST
+    transformation: level
 estimator:
   template: panel_fe
-  fixed_effects: [country, year]
+  fixed_effects:
+  - country
+  - year
   clustering: country
-  notes: Panel FE comparing Hong Kong growth trajectory to developmentalist Asian comparators, controlling for initial income and institutions. Synthetic control for Hong Kong as a robustness check.
+  notes: Panel fixed-effects with interaction between low industrial-policy intensity and high economic freedom.
 falsification:
-  rule: The hypothesis is refuted if Hong Kong real GDP-per-capita growth is significantly lower than the developmentalist comparator average after controlling for initial income, or if the Hong Kong coefficient is negative and significant at p<0.10.
-  test: panel_fe_hk_vs_developmentalist
+  rule: >-
+    The hypothesis is falsified if Hong Kong's TFP growth or GDP per capita convergence
+    is significantly lower (p < 0.10) than that of South Korea, Taiwan, or Singapore
+    after controlling for initial income and human capital, or if industrial policy
+    intensity carries a positive and significant coefficient that exceeds the economic
+    freedom coefficient in the full panel.
+  test: panel_fe_hk_vs_developmentalist_comparators_1960_2020
   threshold:
-    hk_coef: ">=0 or p>=0.10"
+    supported: HKG TFP/convergence coefficient >= KOR/TWN/SGP at p < 0.10; industrial_policy coefficient <= 0
+    refuted: HKG coefficient < KOR/TWN/SGP at p < 0.10; industrial_policy coefficient > 0 at p < 0.10
 prior_confidence: 0.55
-disclosure: Author acknowledges that Hong Kong pre-1997 benefited from British institutional heritage and refugee human capital, which are hard to separate from policy effects.
+disclosure: >-
+  Author priors are sympathetic to laissez-faire explanations but acknowledge that Hong
+  Kong's entrepôt geography and British legal inheritance are strong confounders. The
+  test cannot fully separate policy from geography.
 steelman: hypotheses/steelman/hong_kong_no_industrial_policy_frontier_comparison.md
-scope:
-  period: [1960, 2024]
-  countries:
-    - HKG
-    - KOR
-    - TWN
-    - SGP
-    - JPN
-    - MYS
-    - THA
-    - PHL
-    - IDN
-  outcome_dim:
-    - gdp_growth
-    - institutional_quality
-  policy_family:
-    - trade_policy
-    - institutional_reform
-    - industrial_policy
-  treatment_tags:
-    - hong_kong_laissez_faire
-    - hong_kong_rule_of_law
-notes: Hong Kong data requires Maddison or IMF rather than WDI for some periods due to political status coding. Initial income matching uses Maddison real GDP per capita.
+notes: >-
+  Hong Kong's industrial policy intensity is near zero by construction, so the test
+  relies on cross-country comparison rather than within-country variation. Synthetic
+  control methods using entrepôt economies may improve causal identification.

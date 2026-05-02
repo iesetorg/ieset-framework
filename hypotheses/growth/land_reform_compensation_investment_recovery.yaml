@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: land_reform_compensation_investment_recovery
+version: 1
+status: candidate
+topic: growth
+claim: Market-compatible land reforms with compensation show stronger post-reform agricultural investment
+  and productivity recovery than expropriatory reforms.
+methodology_note: Promoted from the sectoral first-wave backlog on 2026-05-02 using locally cached proxy
+  variables; exact sector datasets can replace proxies in later revisions.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - CAN
+  - AUS
+  - NZL
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - JPN
+  - KOR
+  - CHN
+  - IND
+  - BRA
+  - MEX
+  - CHL
+  - ARG
+  - TUR
+  - ZAF
+  - POL
+  - EST
+  - VNM
+  - THA
+  - MYS
+  - IDN
+  period: &id001
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with missing primary outcome or treatment proxy
+variables:
+  outcome:
+  - name: primary_sectoral_outcome
+    source: world_bank_wdi:NV.AGR.TOTL.ZS
+    transformation: level_or_growth_proxy
+  treatment:
+  - name: policy_or_institution_proxy
+    source: 'constructed: 1 for CHL from 1974 onward; ZAF from 1994 onward; ZWE from 2000 onward'
+    transformation: indicator_or_level
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Proxy-first TWFE screen; upgrade to bespoke replication when exact sector datasets are fetched.
+falsification:
+  rule: SUPPORTED if the treatment coefficient has the predicted sign at p<0.10. REFUTED if the opposite
+    sign is significant at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_land_reform_compensation_investment_recovery
+  threshold: p<0.10 with pre-registered sign
+prior_confidence: 0.55
+disclosure: 'Proxy-first promotion risk: the local variable may capture broad institutional or sector
+  conditions rather than the exact legal treatment. Treat first-pass verdicts as triage until exact datasets
+  are fetched.'
+steelman: hypotheses/steelman/land_reform_compensation_investment_recovery.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - privatisation_nationalisation
+  treatment_tags:
+  - compensated_land_reform
+  - expropriation

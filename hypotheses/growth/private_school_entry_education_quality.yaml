@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: private_school_entry_education_quality
+version: 1
+status: candidate
+topic: growth
+claim: Higher regulatory quality and lower entry-barrier proxies predict stronger education participation
+  outcomes.
+methodology_note: Promoted from the third long-horizon market/QOL candidate wave as a local-data first-pass
+  screen.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - CAN
+  - AUS
+  - NZL
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - JPN
+  - KOR
+  - CHN
+  - IND
+  - BRA
+  - MEX
+  - CHL
+  - ARG
+  - TUR
+  - ZAF
+  - POL
+  - EST
+  - VNM
+  - THA
+  - MYS
+  - IDN
+  - COL
+  - PER
+  - PHL
+  - EGY
+  - MAR
+  - KEN
+  - NGA
+  - BGD
+  - PAK
+  - LKA
+  period: &id001
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with missing primary outcome or treatment proxy
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  - regulation_compliance_cost
+  policy_family:
+  - regulation
+  - competition_policy
+  treatment_tags:
+  - private_school_entry
+  - education_quality
+variables:
+  outcome:
+  - name: qol_or_prosperity_outcome
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: level_or_growth_proxy
+  treatment:
+  - name: market_or_intervention_proxy
+    source: wgi:RQ.EST
+    transformation: level
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Local-data first-pass TWFE screen; upgrade to exact treatment/outcome datasets before scoreboard
+    promotion.
+falsification:
+  rule: SUPPORTED if the treatment coefficient has the pre-registered sign at p<0.10. REFUTED if the opposite
+    sign is significant at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_private_school_entry_education_quality
+  threshold:
+    p_value: p<0.10
+    expected_sign: +
+prior_confidence: 0.55
+disclosure: These are proxy-first QOL screens. They are intended to identify promising evidence, not to
+  settle causal claims without robustness checks.
+steelman: hypotheses/steelman/private_school_entry_education_quality.md

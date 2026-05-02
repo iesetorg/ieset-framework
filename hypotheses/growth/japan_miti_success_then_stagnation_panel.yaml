@@ -3,76 +3,117 @@ hypothesis_id: japan_miti_success_then_stagnation_panel
 version: 1
 status: candidate
 topic: growth
-claim: Japan MITI-era catch-up is positive, but post-1990 stagnation is associated with protected sectors, zombie lending, and weak domestic competition.
-evidence_type: causal
+claim: >-
+  Japan's Ministry of International Trade and Industry (MITI) era (1960-1985) produced
+  positive catch-up productivity growth through technology licensing coordination and
+  scale economies, but Japan's post-1990 stagnation is associated with protected domestic
+  sectors, zombie lending to inefficient incumbents, and weak product-market competition.
+  The post-1990 TFP growth slowdown is larger than can be explained by demographics or
+  macroeconomic deflation alone, after controlling for initial income, human capital,
+  and global demand conditions. The claim applies to Japan 1960-2020 with cross-country
+  comparator benchmarking.
+evidence_type: associational
 sample:
   countries:
-    - JPN
-  period: [1955, 2024]
-  temporal_structure: time_series
+  - JPN
+  - KOR
+  - TWN
+  - DEU
+  - USA
+  - GBR
+  period:
+  - 1960
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude World War II reconstruction period (pre-1960)
+  - exclude 2011 Tohoku earthquake year from trend estimates if treating as outlier
+  - require at least 10 years of data in each sub-period
+scope:
+  period:
+  - 1960
+  - 2020
+  countries:
+  - JPN
+  - KOR
+  - TWN
+  - DEU
+  - USA
+  - GBR
+  outcome_dim:
+  - productivity
+  - competition_concentration
+  - institutional_quality
+  policy_family:
+  - industrial_policy
+  - competition_policy
+  - regulation
+  treatment_tags:
+  - japan_miti_era_1960_1985
+  - japan_post_1990_stagnation
+  - japan_zombie_lending_1990s
 variables:
   outcome:
-    - name: real_gdp_per_capita_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: level
-    - name: tfp_growth
-      source: pwt:rtfpna
-      transformation: annual_log_diff
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: manufacturing_tfp_growth
+    source: oecd_stan:manufacturing_tfp
+    transformation: log_diff_5y
+    notes: Manufacturing TFP growth from OECD STAN.
   treatment:
-    - name: miti_era_dummy
-      source: constructed:binary_indicator
-      transformation: binary
-      notes: Coded 1 for 1955-1989 MITI-led industrial policy period.
-    - name: post_1990_stagnation_dummy
-      source: constructed:binary_indicator
-      transformation: binary
-      notes: Coded 1 from 1990 onward.
-    - name: zombie_lending_share
-      source: constructed:caballero_hoshi_kashyap
-      transformation: level
-      notes: Zombie-firm share of lending from Caballero-Hoshi-Kashyap methodology or similar.
-    - name: domestic_protection_index
-      source: oecd_pmr:pmr
-      transformation: level
-      notes: OECD PMR as proxy for domestic protection and competition barriers.
+  - name: miti_era_indicator
+    source: constructed:japan_miti_active_1960_1985
+    transformation: indicator
+    notes: Indicator for the high-growth MITI-coordination period.
+  - name: post_1990_protection_indicator
+    source: oecd_pmr:barriers_to_entry
+    transformation: level
+    notes: OECD PMR barriers-to-entry index as proxy for domestic protection.
+  - name: zombie_lending_share
+    source: constructed:boj_fsr_zombie_firm_proxy
+    transformation: level
+    notes: Proxy for share of lending directed to low-profit incumbent firms.
   controls:
-    - name: r_d_intensity
-      source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
-      transformation: level
-    - name: terms_of_trade
-      source: world_bank_wdi:NE.TRD.GNFS.ZS
-      transformation: level
-    - name: global_demand
-      source: imf_weo:world_gdp_growth
-      transformation: level
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: old_age_dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+    notes: Demographic control for ageing effects on productivity.
 estimator:
-  template: event_study
-  fixed_effects: [year]
-  clustering: none
-  notes: Event-study and structural-break analysis of Japanese growth around 1990. Tests whether post-1990 stagnation is associated with rising zombie lending and protected sectors.
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Panel fixed-effects with structural-break dummies for Japan sub-periods.
 falsification:
-  rule: The hypothesis is refuted if post-1990 Japan shows no slowdown in TFP growth or GDP-per-capita growth relative to the MITI era, or if zombie lending and domestic protection do not significantly predict the stagnation.
-  test: event_study_japan_miti_vs_stagnation
+  rule: >-
+    The hypothesis is falsified if Japan's post-1990 TFP growth is statistically
+    indistinguishable from Germany's or the USA's after controlling for demographics
+    and macro shocks, or if the MITI-era coefficient is negative and significant
+    (p < 0.10) in the panel.
+  test: panel_fe_japan_miti_vs_stagnation_1960_2020
   threshold:
-    post_1990_slowdown: true
-    zombie_protection_predicts: true
-prior_confidence: 0.6
-disclosure: Author acknowledges that Japan stagnation has multiple competing explanations (demographics, monetary policy, asset bubble) and that isolating the protection-zombie channel is difficult.
+    supported: post_1990 JPN TFP coefficient < 0 at p < 0.10 relative to DEU/USA; miti_era coefficient >= 0
+    refuted: post_1990 JPN TFP coefficient >= 0 or miti_era coefficient < 0 at p < 0.10
+prior_confidence: 0.65
+disclosure: >-
+  Author priors accept the developmentalist narrative for Japan's catch-up but are
+  sceptical that MITI-era tools remained appropriate at the frontier. The test is designed
+  to separate catch-up success from frontier-policy failure.
 steelman: hypotheses/steelman/japan_miti_success_then_stagnation_panel.md
-scope:
-  period: [1955, 2024]
-  countries:
-    - JPN
-  outcome_dim:
-    - gdp_growth
-    - productivity
-    - competition_concentration
-  policy_family:
-    - industrial_policy
-    - competition_policy
-    - regulation
-  treatment_tags:
-    - japan_miti_era
-    - japan_lost_decade
-    - japan_zombie_lending
-notes: Zombie lending data requires academic reconstruction (Caballero-Hoshi-Kashyap 2008). OECD PMR for Japan begins 1998.
+notes: >-
+  Japan's post-1990 experience is confounded by the asset-price bubble burst, balance-sheet
+  repair, and demographic headwinds. The claim isolates the policy-channel contribution
+  by comparing with Germany, which faced similar demographics but different competition
+  policy.

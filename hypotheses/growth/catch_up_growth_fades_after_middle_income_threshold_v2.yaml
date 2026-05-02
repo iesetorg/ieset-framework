@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: catch_up_growth_fades_after_middle_income_threshold_v2
+version: 1
+status: candidate
+topic: growth
+claim: >
+  In Maddison long-run country panels, catch-up growth is materially faster
+  below roughly 40 percent of US GDP per capita than above that threshold, but
+  the post-threshold premium is small enough that the developmentalist catch-up
+  advantage fades over longer 10-year windows.
+methodology_note: >
+  Robustness v2 for `catch_up_growth_fades_after_middle_income_threshold`.
+  This version switches the income source to Maddison and uses 10-year-forward
+  annualised growth rather than the v1 PWT/WDI five-year window.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, DEU, FRA, ITA, ESP, NLD, SWE, JPN, KOR, CHN, IND, BRA, MEX, CHL, TUR, ZAF, POL, EST]
+  period: [1960, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - require Maddison GDP-per-capita coverage sufficient for 10-year windows
+  - exclude oil microstates and war-collapse years in robustness checks
+variables:
+  outcome:
+  - name: ten_year_forward_gdp_pc_growth
+    source: maddison:rgdpnapc
+    transformation: ten_year_forward_annualised_log_growth
+  treatment:
+  - name: below_40pct_us_frontier
+    source: maddison:rgdpnapc
+    transformation: indicator_country_gdp_pc_below_40pct_us
+  controls:
+  - name: income_share_of_us_frontier
+    source: maddison:rgdpnapc
+    transformation: ratio_to_us_gdp_pc
+estimator:
+  template: descriptive
+  clustering: country
+  notes: >
+    Bespoke Maddison robustness check in
+    `engine/runs/catch_up_growth_fades_after_middle_income_threshold_v2/replication.py`.
+falsification:
+  rule: >
+    SUPPORTED if countries below 40 percent of US GDP per capita grow at least
+    1.0 percentage point per year faster over forward 10-year windows than
+    countries at or above the threshold, with p<0.10. REFUTED if the
+    below-threshold premium is zero or negative. Otherwise PARTIAL.
+  test: maddison_10yr_frontier_threshold_panel
+  threshold:
+    income_threshold_us_share: 0.40
+    min_growth_effect_pp: 1.0
+    p_max: 0.10
+prior_confidence: 0.55
+disclosure: >
+  The robustness test is designed to be harder on the original claim: longer
+  windows and Maddison coverage reduce sensitivity to short bursts of
+  catch-up. It can therefore downgrade a v1 signal without invalidating the
+  broader hypothesis.
+steelman: hypotheses/steelman/catch_up_growth_fades_after_middle_income_threshold_v2.md
+scope:
+  period: [1960, 2018]
+  countries: [GLOBAL, ASIA_EM, LATAM, POST_SOVIET]
+  outcome_dim: [gdp_growth, productivity, institutional_quality]
+  policy_family: [industrial_policy, institutional_reform, regulation]
+  treatment_tags: [developmentalist_catch_up, middle_income_threshold, market_institutions, maddison_v2]
+
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 97
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: ordoliberal
+  claim_index: 85
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: institutionalism
+  claim_index: 91
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: empirical_pragmatist
+  claim_index: 93
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: austrian
+  claim_index: 87
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: chicago_monetarism
+  claim_index: 88
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: developmentalism
+  claim_index: 122
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: new_keynesian
+  claim_index: 86
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'
+- position_id: social_democratic
+  claim_index: 94
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: 'Phase 4E recovery mapping for the 2026-05-02 recovered verdict wave; position claim restates this pre-registered hypothesis as a school prediction.'

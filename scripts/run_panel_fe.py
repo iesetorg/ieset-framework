@@ -1568,6 +1568,16 @@ def infer_claim_direction(spec: dict) -> str:
     if explicit in ("minus", "negative", "decrease", "refuted"):
         return "-"
 
+    threshold = (spec.get("falsification") or {}).get("threshold")
+    if isinstance(threshold, dict):
+        expected_sign = threshold.get("expected_sign")
+        if expected_sign in ("+", "-", "?"):
+            return expected_sign
+        if expected_sign in ("plus", "positive", "increase", "supported"):
+            return "+"
+        if expected_sign in ("minus", "negative", "decrease", "refuted"):
+            return "-"
+
     import re as _re
 
     # 1. Slug-suffix shortcut. Many hypothesis_ids encode direction.

@@ -3,71 +3,104 @@ hypothesis_id: china_post_wto_market_opening_vs_subsidy_tfp
 version: 1
 status: candidate
 topic: growth
-claim: China strongest TFP acceleration occurs after WTO-linked market opening, while later subsidy-heavy state direction is associated with weaker TFP growth.
-evidence_type: causal
+claim: >-
+  China's strongest total factor productivity acceleration occurred during the
+  WTO-accession period (2001-2008) linked to tariff reduction, foreign competition,
+  and regulatory harmonisation, while the subsequent subsidy-heavy state-direction
+  phase (post-2008, intensifying post-2015) is associated with weaker TFP growth and
+  rising capital misallocation. The structural break in TFP growth around 2008-2010
+  is larger than can be explained by demographics, capital deepening, or the global
+  financial crisis alone, after controlling for human capital, urbanisation, and
+  infrastructure investment.
+evidence_type: associational
 sample:
   countries:
-    - CHN
-  period: [1978, 2024]
+  - CHN
+  period:
+  - 1990
+  - 2020
   temporal_structure: time_series
+  exclusion_rules:
+  - exclude 1989 political shock year as outlier
+  - exclude 2020 COVID-19 year from trend estimates
+  - require at least 8 years of data in each sub-period
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - CHN
+  outcome_dim:
+  - productivity
+  - trade_liberalisation
+  - industrial_capability
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  treatment_tags:
+  - china_wto_accession_2001
+  - china_made_in_china_2025
+  - china_state_subsidy_expansion_post_2008
 variables:
   outcome:
-    - name: tfp_growth
-      source: pwt:rtfpna
-      transformation: annual_log_diff
-    - name: real_gdp_per_capita_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: level
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: capital_misallocation_index
+    source: constructed:dispersion_of_mrpk_across_firms
+    transformation: level
+    notes: Dispersion of marginal revenue product of capital across firms as misallocation proxy.
   treatment:
-    - name: wto_accession_dummy
-      source: constructed:binary_indicator
-      transformation: binary
-      notes: Coded 1 from 2001 onward (WTO accession year).
-    - name: subsidy_intensity
-      source: constructed:subsidy_to_gdp
-      transformation: level
-      notes: Industrial subsidies as share of GDP from national statistics and academic estimates.
-    - name: state_ownership_share
-      source: constructed:soe_share
-      transformation: level
-      notes: SOE share of industrial output or assets from NBS and academic sources.
+  - name: post_wto_indicator
+    source: constructed:china_wto_2001_2008
+    transformation: indicator
+    notes: Indicator for the WTO accession liberalisation window.
+  - name: post_2008_subsidy_intensity
+    source: constructed:subsidies_to_industrial_enterprises_to_gdp
+    transformation: level
+    notes: Industrial subsidy intensity proxy from enterprise survey and fiscal data.
+  - name: tariff_rate
+    source: world_bank_wdi:TM.TAX.MRCH.WM.AR.ZS
+    transformation: level
+    notes: Weighted mean applied tariff rate.
   controls:
-    - name: r_d_intensity
-      source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
-      transformation: level
-    - name: human_capital
-      source: owid:mean-years-of-schooling-long-run-1870
-      transformation: level
-    - name: urbanisation_rate
-      source: world_bank_wdi:SP.URB.TOTL.IN.ZS
-      transformation: level
+  - name: capital_deepening
+    source: pwt:ck
+    transformation: log_diff_5y
+    notes: Capital stock per worker growth from Penn World Table.
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: urbanisation_rate
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+  - name: infrastructure_investment_share
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: level
+    notes: Fixed capital formation share as control for investment-driven growth.
 estimator:
   template: event_study
-  fixed_effects: [year]
   clustering: none
-  notes: Event-study of Chinese TFP growth around 2001 WTO accession and subsequent subsidy expansion. Tests whether TFP accelerated post-WTO and decelerated post-subsidy surge.
+  notes: Time-series event-study around WTO accession (2001) and stimulus shift (2008).
 falsification:
-  rule: The hypothesis is refuted if TFP growth did not accelerate significantly after 2001, or if TFP growth did not decelerate significantly after the subsidy-heavy period (post-2010), or if the post-WTO TFP gain is smaller than the pre-WTO reform gain.
-  test: event_study_china_wto_vs_subsidy
+  rule: >-
+    The hypothesis is falsified if China's TFP growth in the post-2008 period is
+    statistically higher than in the 2001-2008 WTO period after controlling for
+    capital deepening and demographics, or if the post_2008_subsidy_intensity
+    coefficient is positive and significant (p < 0.10) in explaining TFP growth.
+  test: event_study_china_wto_vs_subsidy_tfp_1990_2020
   threshold:
-    post_wto_tfp_higher: true
-    post_subsidy_tfp_lower: true
-prior_confidence: 0.55
-disclosure: Author acknowledges that Chinese TFP measurement is contested and that PWT data may understate or overstate true TFP due to capital mismeasurement.
+    supported: post_wto TFP > post_2008 TFP at p < 0.10; subsidy_intensity coefficient < 0
+    refuted: post_2008 TFP >= post_wto TFP at p < 0.10; subsidy_intensity coefficient > 0
+prior_confidence: 0.65
+disclosure: >-
+  Author priors accept that WTO-era market opening raised Chinese productivity but
+  are sceptical that post-2008 state direction improved allocation. The test is designed
+  to compare the two regimes within a single country, reducing cross-country confounding.
 steelman: hypotheses/steelman/china_post_wto_market_opening_vs_subsidy_tfp.md
-scope:
-  period: [1978, 2024]
-  countries:
-    - CHN
-  outcome_dim:
-    - productivity
-    - gdp_growth
-  policy_family:
-    - trade_policy
-    - industrial_policy
-    - institutional_reform
-  treatment_tags:
-    - china_wto_accession_2001
-    - china_made_in_china_2025
-    - china_soe_reform
-notes: Subsidy data for China is partial and politically sensitive; academic estimates (e.g., OECD 2019) used where official data is unavailable. PWT TFP for China has known measurement issues.
+notes: >-
+  China's data quality is contested, especially for TFP and subsidies. The test uses
+  PWT TFP (standardised across countries) and supplements with firm-level misallocation
+  proxies where available. The 2008 global financial crisis is a confounder partially
+  addressed by comparing pre- and post-crisis windows.

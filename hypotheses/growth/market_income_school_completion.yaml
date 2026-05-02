@@ -1,0 +1,102 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_income_school_completion
+version: 1
+status: candidate
+topic: growth
+claim: Market-led income growth predicts higher school completion over 20-year windows.
+methodology_note: Promoted from the 200-item long-horizon market/QOL backlog as a local-data first-pass
+  screen.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - CAN
+  - AUS
+  - NZL
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - JPN
+  - KOR
+  - CHN
+  - IND
+  - BRA
+  - MEX
+  - CHL
+  - ARG
+  - TUR
+  - ZAF
+  - POL
+  - EST
+  - VNM
+  - THA
+  - MYS
+  - IDN
+  - COL
+  - PER
+  - PHL
+  - EGY
+  - MAR
+  - KEN
+  - NGA
+  - BGD
+  - PAK
+  - LKA
+  period: &id001
+  - 1990
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years with missing primary outcome or treatment proxy
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  - gdp_growth
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - income_growth
+  - school_completion
+variables:
+  outcome:
+  - name: qol_or_prosperity_outcome
+    source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+    transformation: level_or_growth_proxy
+  treatment:
+  - name: market_or_intervention_proxy
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: level
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Local-data first-pass TWFE screen; upgrade to exact outcome/treatment datasets before scoreboard
+    promotion.
+falsification:
+  rule: SUPPORTED if the treatment coefficient has the predicted sign at p<0.10. REFUTED if the opposite
+    sign is significant at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_income_school_completion
+  threshold: p<0.10 with pre-registered sign
+prior_confidence: 0.55
+disclosure: These are proxy-first QOL screens. They are intended to identify promising evidence, not to
+  settle causal claims without robustness checks.
+steelman: hypotheses/steelman/market_income_school_completion.md
