@@ -1105,7 +1105,7 @@ def requests_interaction_without_constructed_term(spec: dict) -> bool:
     asks_for_interaction = (
         "interaction" in text
         or "interacted" in text
-        or re.search(r"\b[a-z0-9_]+\s*(?:x|×)\s*[a-z0-9_]+\b", text) is not None
+        or re.search(r"\b[a-z0-9_]+(?:\s+(?:x|×)\s+|\s*\*\s*)[a-z0-9_]+\b", text) is not None
     )
     if not asks_for_interaction:
         return False
@@ -1123,7 +1123,7 @@ def requests_interaction_without_constructed_term(spec: dict) -> bool:
         if (
             "interaction" in item_text
             or "interacted" in item_text
-            or re.search(r"\b[a-z0-9_]+\s*(?:x|×|\*)\s*[a-z0-9_]+\b", item_text)
+            or re.search(r"\b[a-z0-9_]+(?:\s+(?:x|×)\s+|\s*\*\s*)[a-z0-9_]+\b", item_text)
         ):
             return False
     return True
