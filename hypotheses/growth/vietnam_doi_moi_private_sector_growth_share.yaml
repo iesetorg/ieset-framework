@@ -3,78 +3,76 @@ hypothesis_id: vietnam_doi_moi_private_sector_growth_share
 version: 1
 status: candidate
 topic: growth
-claim: Vietnam's post-Doi Moi growth from 1990 to 2023 is more strongly associated with private-sector entry, enterprise reform, and trade openness than with state-owned enterprise expansion, as measured by sectoral value-added and employment shares.
+claim: Vietnam post-Doi Moi growth is more strongly associated with private-sector entry and trade openness than with SOE expansion.
 evidence_type: causal
 sample:
   countries:
-  - VNM
-  period:
-  - 1990
-  - 2023
+    - VNM
+  period: [1986, 2024]
   temporal_structure: time_series
 variables:
   outcome:
-  - name: real_gdp_per_capita_growth
-    source: world_bank_wdi:NY.GDP.PCAP.KD
-    transformation: annual_log_growth
-  - name: tfp_growth
-    source: pwt:rtfpna
-    transformation: annual_growth
-    notes: PWT TFP; cross-check with ADB and IMF estimates.
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: tfp_growth
+      source: pwt:rtfpna
+      transformation: annual_log_diff
+    - name: private_sector_share
+      source: constructed:private_enterprise_share
+      transformation: level
+      notes: Private enterprise share of output or employment from GSO and academic sources.
   treatment:
-  - name: private_sector_share
-    source: constructed:gso_vietnam
-    transformation: level
-    notes: "Share of private and household enterprises in total employment or industrial output, from Vietnam GSO and Enterprise Census. Data dependency: may need World Bank Enterprise Surveys as proxy for early years."
-  - name: soe_share
-    source: constructed:gso_vietnam
-    transformation: level
-    notes: Share of state-owned enterprises in total employment or industrial output.
-  - name: trade_openness
-    source: world_bank_wdi:NE.TRD.GNFS.ZS
-    transformation: level
+    - name: private_sector_entry_rate
+      source: constructed:business_registration
+      transformation: level
+      notes: New business registrations or private firm creation from national statistics.
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: soe_share
+      source: constructed:soe_output_share
+      transformation: level
+      notes: SOE share of output or employment from GSO and World Bank enterprise surveys.
   controls:
-  - name: gross_capital_formation_share
-    source: world_bank_wdi:NE.GDI.FTOT.ZS
-    transformation: level
-  - name: fdi_inflows_share
-    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
-    transformation: level
-  - name: secondary_enrolment
-    source: world_bank_wdi:SE.SEC.ENRR
-    transformation: level
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: fdi_inflows
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
 estimator:
-  template: panel_fe_decomposition
+  template: panel_fe
+  fixed_effects: [year]
   clustering: none
-  notes: >
-    Time-series decomposition of Vietnam's GDP growth into private-sector,
-    SOE, FDI, and capital-deepening contributions using a growth-accounting
-    framework. Private-sector share entered as a time-varying treatment.
-    Robustness: Granger-causality test (does private-sector share growth
-    precede TFP acceleration?).
+  notes: Time-series regression of Vietnam growth on private-sector entry, trade openness, and SOE share. Tests relative contribution of private entry versus SOE expansion.
 falsification:
-  rule: SUPPORTED if the private-sector share coefficient is positive and significant (p<=0.10) while the SOE share coefficient is negative or insignificant in a decomposition regression, AND private-sector share Granger-causes TFP growth. REFUTED if the SOE share coefficient is positive and significant and private-sector share is not. Otherwise PARTIAL.
-  test: vietnam_growth_decomposition_private_vs_soe
+  rule: The hypothesis is refuted if SOE share has a larger and significant positive coefficient than private-sector entry or trade openness in predicting Vietnam growth 1986-2024, or if private-sector entry does not significantly predict growth.
+  test: time_series_vietnam_growth_drivers
   threshold:
-    private_coef_sign: positive
-    soe_coef_sign: negative_or_zero
-    p_max: 0.10
-prior_confidence: 0.65
-disclosure: The prior is informed by standard transition-economics narratives but recognises that SOEs in Vietnam include strategic sectors (energy, telecoms) where productivity measurement is noisy.
+    private_entry_coef: ">0 and p<0.10"
+    trade_openness_coef: ">0 and p<0.10"
+    soe_share_coef: "<=0 or p>=0.10"
+prior_confidence: 0.6
+disclosure: Author acknowledges that Vietnamese private-sector data quality is limited and that SOEs continue to play a large role in key sectors.
 steelman: hypotheses/steelman/vietnam_doi_moi_private_sector_growth_share.md
 scope:
-  period:
-  - 1990
-  - 2023
+  period: [1986, 2024]
   countries:
-  - VNM
+    - VNM
   outcome_dim:
-  - gdp_growth
-  - productivity
-  - industrial_capability
+    - gdp_growth
+    - productivity
+    - competition_concentration
   policy_family:
-  - institutional_reform
-  - privatisation_nationalisation
-  - trade_policy
+    - institutional_reform
+    - trade_policy
+    - privatisation_nationalisation
   treatment_tags:
-  - vietnam_doi_moi_1986
+    - vietnam_doi_moi_1986
+    - vietnam_private_sector_entry
+    - vietnam_soe_reform
+notes: Vietnamese enterprise data requires compilation from GSO, World Bank enterprise surveys, and academic sources. Private-sector definition varies over time.

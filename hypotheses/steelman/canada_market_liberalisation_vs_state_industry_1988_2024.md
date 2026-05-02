@@ -1,23 +1,27 @@
-# Steelman: Canada Market Liberalisation vs State Industry 1988-2024
+# Steelman — Canada market liberalisation vs state industry 1988–2024
 
-## Strongest version of the claim
-Canada's economic performance since the FTA (1988) and NAFTA (1994) was primarily driven by deeper integration with the US market, regulatory harmonisation, and economies of scale in manufacturing and resources. National industrial-policy programmes (Technology Partnerships Canada, Strategic Innovation Fund, aerospace and auto sector supports) had at best marginal effects on aggregate productivity and growth, and at worst created rent-seeking and political capture. The counterfactual of a more closed, industrially planned Canada would have produced slower growth and less diversification.
+## 1. Strongest version of the claim
 
-## Key evidence the claim would need
-1. GDP and productivity data showing Canada tracking or exceeding comparable commodity exporters (Australia, Norway) post-1988.
-2. Trade-flow data demonstrating increased US-Canada integration and cross-border supply chains.
-3. Industrial-policy spending data showing weak correlation with productivity growth in targeted sectors.
-4. Sectoral studies of aerospace (Bombardier) and automotive sectors showing subsidy dependence without self-sustaining competitiveness.
+The Canada–US Free Trade Agreement and NAFTA integrated Canada into a continental supply chain, forced efficiency in previously sheltered sectors (especially autos and steel), and attracted foreign direct investment. National industrial-policy initiatives — from the Strategic Innovation Fund to repeated Bombardier bailouts — have a poor track record of picking winners and sustaining productivity growth.
 
-## Best counterarguments
-- Canada's proximity to the US and shared language/culture make FTA/NAFTA effects non-replicable for most countries; this is geography, not policy.
-- Industrial policy in aerospace and automotive preserved high-wage manufacturing jobs that pure market openness would have offshored to Mexico or the US South.
-- Canada's post-2000 productivity growth was mediocre by OECD standards, suggesting neither trade nor industrial policy was particularly effective.
-- The 2018-2019 US tariffs on Canadian steel and aluminium revealed vulnerability of trade-dependent models.
-- Provincial variation (Quebec's industrial policy vs Alberta's resource dependence) confounds national-level aggregates.
+## 2. Key evidence the claim would need
 
-## Boundary conditions
-Applies to resource-rich economies adjacent to large markets. Generalises poorly to remote economies or those without a natural hegemonic trade partner.
+- A positive and significant panel-FE or synthetic-control gap for Canada post-1988 on GDP-pc growth, labour productivity, and trade openness.
+- Evidence that cross-border investment and trade intensity rose after 1988 and that these correlate with the growth differential.
+- Evidence that federal industrial-policy spending or state-aid proxies do not positively predict the growth gap.
 
-## Relation to existing hypotheses
-Links to australia_hawke_keating_reform_long_run and us_eu_divergence_decomposition. Tensions with hypotheses attributing Canadian stability to social-democratic institutions (universal healthcare, progressive taxation) rather than market openness.
+## 3. Best counterarguments
+
+1. **Canada’s growth has been mediocre.** By OECD standards, Canada’s post-1988 GDP-pc growth and productivity performance were unremarkable. The “prosperity” claim is weak if the counterfactual is not a protected Canada but a Canada that pursued a different industrial strategy.
+2. **Provincial industrial policies are substantial and successful.** Quebec’s hydroelectric development, Alberta’s oil-sector stewardship, and Ontario’s auto-industry support all delivered large, sustained returns. The hypothesis focuses on federal policy and may miss the most effective state direction.
+3. **Manufacturing job losses in Ontario.** FTA/NAFTA produced a well-documented hollowing-out of manufacturing employment in Ontario, particularly in autos and textiles. If the hypothesis measures only aggregate GDP, it masks significant distributional costs.
+4. **Commodity prices dominate business cycles.** Canadian macro stability and growth are driven more by oil, mineral, and agricultural prices than by trade policy. The terms-of-trade cycle explains much of the post-1988 variance.
+5. **US monetary policy spillovers.** Because Canada is a small open economy with a floating exchange rate and deep financial integration, US Federal Reserve policy dominates Canadian macro conditions. Domestic trade policy may be a second-order driver.
+
+## 4. Boundary conditions
+
+The claim applies most strongly to resource-rich economies adjacent to a large market. Trade-policy effects are conditional on commodity cycles and US demand, limiting external validity.
+
+## 5. Relation to existing hypotheses
+
+This hypothesis complements NAFTA-related growth hypotheses and the broader trade-openness literature. It contrasts with claims that credit Canadian provincial or federal industrial policy with sustaining key sectors (autos, aerospace, energy).

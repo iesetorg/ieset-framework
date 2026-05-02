@@ -3,13 +3,19 @@ hypothesis_id: sweden_1990s_market_reform_recovery
 version: 1
 status: candidate
 topic: growth
+
 claim: >
-  Sweden's post-1992 crisis market reforms (pension privatisation, tax reform,
-  expenditure ceilings, product-market deregulation, and central-bank independence)
-  predict stronger real GDP growth and productivity growth during 1995-2024 than
-  its pre-crisis state-expansion model (1970-1990) would have produced, relative
-  to Nordic and continental European peers.
+  Sweden’s post-1992 crisis market reforms — fiscal consolidation, inflation-
+  targeting adoption, tax and pension overhauls, and product-market
+  deregulation — predict stronger real GDP-per-capita growth during 1995–2024
+  than its pre-crisis state-expansion model (1975–1990). The test is whether
+  Sweden’s post-1995 growth trajectory lies above a synthetic counterfactual
+  built from Nordic and continental European peers, and whether a panel
+  treatment coefficient for the post-reform period is positive and
+  significant.
+
 evidence_type: causal
+
 sample:
   countries:
     - SWE
@@ -17,91 +23,112 @@ sample:
     - NOR
     - FIN
     - NLD
-    - AUT
-    - DEU
-    - CHE
     - BEL
-  period: [1990, 2024]
+    - AUT
+    - CHE
+    - DEU
+    - FRA
+    - GBR
+  period: [1975, 2024]
   temporal_structure: panel
   exclusion_rules:
-    - Exclude 2020-2022 COVID years from primary trend
-    - Exclude 1991-1993 crisis years as transitional outliers
+    - "exclude COVID 2020-2021 from fitting"
+
 scope:
-  period: [1990, 2024]
+  period: [1975, 2024]
   countries:
     - SWE
     - DNK
     - NOR
     - FIN
     - NLD
-    - AUT
-    - DEU
-    - CHE
     - BEL
-  outcome_dim: [gdp_growth, productivity, institutional_quality]
-  policy_family: [fiscal_policy, institutional_reform, regulation]
-  treatment_tags: [sweden_1990s_crisis_reforms, sweden_expenditure_ceiling, sweden_pension_reform_1998]
+    - AUT
+    - CHE
+    - DEU
+    - FRA
+    - GBR
+  outcome_dim:
+    - gdp_growth
+    - institutional_quality
+    - employment_labour
+  policy_family:
+    - fiscal_policy
+    - institutional_reform
+    - regulation
+  treatment_tags:
+    - sweden_1990s_crisis_reform
+    - sweden_inflation_targeting_1993
+    - sweden_pension_reform_1998
+
 variables:
   outcome:
-    - name: real_gdp_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: annual_pct
-    - name: labour_productivity_growth
-      source: oecd_stan:gdp_per_hour_worked
-      transformation: annual_pct
-    - name: public_sector_expenditure_share
-      source: world_bank_wdi:GC.XPN.TOTL.GD.ZS
-      transformation: level_pct
+    - name: real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level
+    - name: labour_productivity
+      source: "world_bank_wdi:SL.GDP.PCAP.EM.KD"
+      transformation: level
+    - name: unemployment_rate
+      source: "world_bank_wdi:SL.UEM.TOTL.ZS"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
   treatment:
-    - name: post_1992_reform_dummy
-      source: constructed:binary
+    - name: sweden_post_1995
+      source: "constructed: 1 for SWE from 1995 onward"
       transformation: binary
-      notes: 1 for SWE from 1995 onward, 0 for pre-reform period and peers.
-    - name: reform_intensity_index
-      source: constructed:composite_pension_tax_deregulation_expenditure_ceiling
-      transformation: continuous_index
   controls:
-    - name: initial_income
-      source: maddison:mpd2020
-      transformation: log_level_at_1990
-    - name: financial_crisis_exposure
-      source: constructed:bank_crisis_dummy_1990s
+    - name: initial_gdp_pc_1975
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: level_at_1975
+    - name: human_capital
+      source: "pwt:hc"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: wgi_govt_effectiveness
+      source: "wgi:GE.EST"
+      transformation: level
+    - name: eu_membership_dummy
+      source: "constructed: 1 from 1995 for SWE, FIN, AUT; 1973 for DNK, GBR, IRL"
       transformation: binary
-    - name: eu_membership
-      source: constructed:binary
-      transformation: binary
-      notes: SWE joined EU 1995; NOR did not.
+
 intervention_channel: bundled
 intervention_channel_justification: >
-  Swedish reforms bundled fiscal (expenditure ceilings, pension privatisation),
-  tax, and regulatory (product-market deregulation, central-bank independence)
-  interventions.
+  The reform bundle spans fiscal consolidation, inflation targeting
+  (monetary/institutional), tax and pension overhauls (fiscal), and product-
+  market deregulation (regulatory). Bundled coding per invariant 4.
+
 estimator:
   template: event_study
   clustering: country
   notes: >
-    Event-study around 1992-1995 reform breakpoint with Nordic and continental peers
-    as controls. Panel FE with post-reform dummy as robustness.
+    Primary: event-study with SWE treated from 1995, estimating dynamic
+    treatment effects relative to pre-reform trend. Secondary: synthetic
+    control for SWE using Nordic and continental peers.
+
 falsification:
   rule: >
-    Falsified if Sweden's post-1995 real GDP growth and productivity growth do not
-    exceed the pre-1990 trend or the synthetic-control peer-group mean by at least
-    5 percentage points cumulative over 1995-2024 after controlling for EU membership
-    and financial-crisis exposure.
-  test: event_study_post_1992_reform
-  threshold:
-    cumulative_growth_premium_pct: 5
-    significance: p_lt_0.10
-    productivity_premium_required: yes
-prior_confidence: 0.62
+    Refuted if the post-1995 event-study coefficients for SWE are negative and
+    significant at p<0.05 for at least two consecutive years, or if the
+    cumulative log GDP-pc gap vs synthetic counterfactual is negative over
+    1995–2024.
+  test: event_study_sweden_reform
+  threshold: >
+    post_1995_coef > 0 AND p < 0.10 for majority of years; synthetic_gap > 0.
+
+prior_confidence: 0.65
+
 disclosure: >
-  Author holds moderate priors that Swedish post-crisis reforms improved fiscal
-  sustainability and growth, but acknowledges the Nordic welfare model remained
-  largely intact and may be the true source of resilience.
+  Author’s priors lean moderately market-liberal and view Sweden’s post-1992
+  reforms as a successful correction. Bias risk: underweighting the role of
+  global IT boom and Ericsson spillovers. Mitigation: include Nordic peers
+  that also experienced the IT boom.
+
 steelman: hypotheses/steelman/sweden_1990s_market_reform_recovery.md
+
 linked_hypotheses:
-  - nordic_outcome_persistence_decomposition
-  - fiscal_rule_presence_dampens_statist_drift
-notes: >
-  OECD STAN productivity from 1995. Pre-1995 from national accounts or PWT.
-  Expenditure ceiling data from Swedish Ministry of Finance.
+  - market_reform_duration_growth_persistence

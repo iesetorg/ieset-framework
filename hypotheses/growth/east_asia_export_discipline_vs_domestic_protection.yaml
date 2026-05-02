@@ -3,93 +3,95 @@ hypothesis_id: east_asia_export_discipline_vs_domestic_protection
 version: 1
 status: candidate
 topic: growth
-claim: East Asian economies that combined export orientation with competitive domestic markets achieved stronger long-run productivity growth than those that combined export promotion with protected domestic sectors, over 1970-2020.
-evidence_type: associational
+claim: East Asian success cases outperform because export discipline forced market tests, while protected domestic industrial policy predicts weaker long-run productivity.
+evidence_type: causal
 sample:
   countries:
-  - KOR
-  - TWN
-  - JPN
-  - HKG
-  - SGP
-  - MYS
-  - THA
-  - IDN
-  - PHL
-  - VNM
-  - CHN
-  period:
-  - 1970
-  - 2020
+    - KOR
+    - TWN
+    - SGP
+    - HKG
+    - JPN
+    - MYS
+    - THA
+    - IDN
+    - PHL
+    - VNM
+    - CHN
+  period: [1960, 2024]
   temporal_structure: panel
-  exclusion_rules:
-  - exclude country-years with active internal armed conflict
 variables:
   outcome:
-  - name: tfp_growth
-    source: pwt:rtfpna
-    transformation: annual_growth
-  - name: labour_productivity_growth
-    source: pwt:rgdpo
-    transformation: annual_growth_per_worker
+    - name: tfp_growth
+      source: pwt:rtfpna
+      transformation: annual_log_diff
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: export_sophistication
+      source: owid:economic-complexity-index
+      transformation: level
   treatment:
-  - name: export_orientation_x_domestic_competition
-    source: constructed:interaction_term
-    transformation: level
-    notes: Interaction of export-to-GDP ratio (world_bank_wdi:NE.TRD.GNFS.ZS) and an inverse measure of domestic protection (1 - average tariff, or 1 - SOE share, or Fraser EFW trade freedom index). Higher values mean more export discipline AND more domestic competition.
-  - name: export_orientation_x_domestic_protection
-    source: constructed:interaction_term
-    transformation: level
-    notes: Interaction of export-to-GDP ratio and domestic protection (tariff or SOE share). Tests whether export promotion with protection is weaker.
+    - name: export_discipline_index
+      source: constructed:composite_index
+      transformation: level
+      notes: Composite of export growth, export-to-GDP ratio, and export-market diversification.
+    - name: domestic_protection_index
+      source: oecd_pmr:pmr
+      transformation: level
+      notes: OECD PMR or constructed tariff-and-non-tariff barrier index; higher = more protected.
   controls:
-  - name: log_gdp_per_capita
-    source: world_bank_wdi:NY.GDP.PCAP.KD
-    transformation: log
-  - name: human_capital
-    source: world_bank_wdi:SE.SEC.ENRR
-    transformation: level
-  - name: institutional_quality
-    source: wgi:GOV_WTI_GE.EST
-    transformation: level
-  - name: fdi_inflows_share
-    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
-    transformation: level
+    - name: log_initial_gdp_pc
+      source: maddison:real_gdp_pc
+      transformation: log
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+    - name: fdi_inflows
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
 estimator:
   template: panel_fe
+  fixed_effects: [country, year]
   clustering: country
-  fixed_effects:
-  - country
-  - year
-  notes: >
-    PanelOLS with country and year FE. The key test is the difference in
-    coefficients between export×competition and export×protection interactions.
-    Robustness: use OECD PMR instead of tariffs for high-income subsample;
-    use World Bank WITS tariff data for emerging-market subsample.
+  notes: Panel FE of productivity growth on export discipline and domestic protection indices across East Asian economies. Tests whether export discipline is associated with stronger TFP while domestic protection is associated with weaker TFP.
 falsification:
-  rule: SUPPORTED if the export×competition interaction is positive and significant (p<=0.05) and the coefficient on export×protection is significantly smaller (p<=0.10 for the difference). REFUTED if export×protection is larger or if both are insignificant. Otherwise PARTIAL.
-  test: panel_fe_export_discipline_interaction
+  rule: The hypothesis is refuted if domestic protection has a positive and significant coefficient on TFP growth, or if export discipline does not have a positive and significant coefficient, or if the interaction between export discipline and domestic protection is positive.
+  test: panel_fe_export_discipline_domestic_protection
   threshold:
-    interaction_diff_sign: positive
-    p_max: 0.05
-    min_countries: 8
-    min_observations: 200
+    export_discipline_coef: ">0 and p<0.10"
+    domestic_protection_coef: "<0 and p<0.10"
 prior_confidence: 0.6
-disclosure: The prior is informed by the Amsden/Wade developmental-state literature but treats export discipline as a market test rather than a state-planning success.
+disclosure: Author acknowledges that export discipline and domestic protection are often bundled in the same policy package (e.g., Korea import substitution plus export push), making clean identification difficult.
 steelman: hypotheses/steelman/east_asia_export_discipline_vs_domestic_protection.md
 scope:
-  period:
-  - 1970
-  - 2020
+  period: [1960, 2024]
   countries:
-  - ASIA_EM
+    - KOR
+    - TWN
+    - SGP
+    - HKG
+    - JPN
+    - MYS
+    - THA
+    - IDN
+    - PHL
+    - VNM
+    - CHN
   outcome_dim:
-  - productivity
-  - trade_liberalisation
-  - industrial_capability
+    - productivity
+    - gdp_growth
+    - trade_liberalisation
+    - competition_concentration
   policy_family:
-  - trade_policy
-  - industrial_policy
-  - competition_policy
+    - trade_policy
+    - industrial_policy
+    - competition_policy
   treatment_tags:
-  - export_discipline
-  - domestic_protection
+    - east_asian_export_discipline
+    - east_asian_domestic_protection
+    - export_oriented_industrialisation
+notes: Export discipline index requires hand-construction from trade data. Domestic protection indices are sparse for non-OECD Asian economies before 1995; interpolation and alternative sources used.

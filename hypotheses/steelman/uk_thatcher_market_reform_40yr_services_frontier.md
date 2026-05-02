@@ -1,23 +1,27 @@
-# Steelman: UK Thatcher Market Reform 40-Year Services Frontier
+# Steelman — UK Thatcher market reform 40-year services frontier
 
-## Strongest version of the claim
-The UK's post-1979 market reforms—particularly privatisation, financial deregulation (Big Bang 1986), and labour-market flexibilisation—created a dynamic services sector centred on London that outperformed continental European peers in business-services output, employment growth, and ICT adoption. The corporatist regimes (Germany, France, Italy) with stronger sectoral bargaining and industrial planning produced stronger manufacturing productivity but weaker services-sector dynamism. Over 1980-2020, the UK's services productivity growth exceeded the continental mean, though this came at the cost of greater inequality and financial instability.
+## 1. Strongest version of the claim
 
-## Key evidence the claim would need
-1. Services-sector productivity and employment data showing UK outperformance versus DEU, FRA, ITA over 1980-2020.
-2. Financial and business-services output data demonstrating London's agglomeration effects.
-3. ICT adoption and digital-services metrics showing UK firms ahead of continental peers.
-4. Labour-market flexibility indicators (OECD EPL) correlating with services employment growth.
+UK reforms broke union power, introduced competition into previously sheltered sectors (telecoms, energy, transport), and created a flexible labour market that allowed services to expand rapidly. Continental corporatism protected incumbents, stifled entry, and channelled resources into declining manufacturing sectors, producing a services-productivity gap that widened over four decades.
 
-## Best counterarguments
-- The UK's services "productivity" is inflated by financial-sector rents and regulatory arbitrage (eurodollar markets, tax haven structures) rather than genuine efficiency.
-- Germany's manufacturing-export model produced higher median wages and lower inequality; UK services growth was top-heavy and regionally concentrated in London/South East.
-- The 2008 financial crisis demonstrated that UK-style financial deregulation created systemic fragility, questioning whether the pre-crisis services premium was sustainable.
-- North Sea oil revenue (1980-1985) and sterling volatility confound the reform narrative.
-- UK aggregate productivity growth 2010-2020 was the worst in the G7, suggesting the Thatcher-era model exhausted its gains.
+## 2. Key evidence the claim would need
 
-## Boundary conditions
-Applies to large economies with global financial centres and English-language advantages. Generalises poorly to manufacturing-specialised economies or coordinated-market systems with strong vocational training.
+- A positive and significant panel-FE or synthetic-control gap for UK services employment share, services value-added share, and aggregate labour productivity post-1979.
+- Evidence that privatised sectors (telecoms, energy, airlines) saw faster productivity growth than their continental peers.
+- Robustness to excluding the North Sea oil boom (1979–1986) and the financial-sector boom (1986–2008).
 
-## Relation to existing hypotheses
-Links to uk_economic_decline_multi_movement. Tensions with industrial_policy_developmentalist_states_growth and with hypotheses attributing UK performance to financialisation rather than genuine productivity.
+## 3. Best counterarguments
+
+1. **Financialisation, not services dynamism.** Much of UK services growth was concentrated in finance (Big Bang 1986). The 2008 crisis revealed this as fragile, and post-crisis non-financial services productivity has been mediocre.
+2. **Germany and France maintained higher manufacturing productivity.** The corporatist regimes outperformed the UK in high-value manufacturing and export surpluses. A narrow focus on services share misses the broader productivity picture.
+3. **Inequality and regional divergence rose sharply.** Market reforms generated large wage and wealth inequalities and widened the gap between London/South-East and the rest of the UK. If the hypothesis measures only aggregate productivity, it ignores distributional costs.
+4. **Germany also reformed.** The Hartz reforms (2003–2005) were a deep labour-market liberalisation within a corporatist framework. Labelling Germany as a static corporatist comparator is anachronistic after 2003.
+5. **North Sea oil and global finance are confounds.** UK growth in the 1980s was boosted by oil revenues; growth in the 1990s–2000s was boosted by financial sector globalisation. Both are exogenous to domestic regulatory reform.
+
+## 4. Boundary conditions
+
+The claim is most relevant for large, already-developed economies with a strong pre-existing services base. It may not generalise to manufacturing-led economies or to countries without a global financial centre.
+
+## 5. Relation to existing hypotheses
+
+This hypothesis complements `market_reform_duration_growth_persistence` and the broader market-liberalisation cluster. It is in tension with coordinated-market-economy hypotheses that credit corporatist institutions (works councils, sectoral bargaining) with sustaining manufacturing productivity and wage restraint.

@@ -1,30 +1,24 @@
 # Steelman — Vietnam Doi Moi Private Sector Growth Share
 
 ## Strongest version of the claim
-
-Vietnam's post-Doi Moi growth acceleration (1986–2020) is primarily attributable to private-sector enterprise entry, de-collectivisation, and trade openness rather than to SOE expansion or state-directed investment. The 1986 reforms and the 1990 Private Enterprise Law unleashed household businesses, domestic private firms, and foreign-invested enterprises that absorbed labour from agriculture, raised allocative efficiency, and drove export growth. Periods of SOE recentralisation or expansion (late 2000s stimulus) coincided with slower TFP growth and rising misallocation, suggesting that the private sector was the marginal driver of productivity gains.
+Vietnam post-Doi Moi growth (1986-present) was driven primarily by private-sector entry, foreign trade integration, and agricultural decollectivisation rather than by state-owned enterprise expansion. The private sector provided the employment absorption, export dynamism, and productivity growth that powered convergence, while SOEs remained a drag on resource allocation despite periodic reform announcements.
 
 ## Key evidence the claim would need
-
-1. **Time-series and panel evidence** showing private-sector share positively and significantly associated with TFP and GDP per capita growth, while SOE share is negatively or insignificantly associated.
-2. **Firm-level data** from Vietnam Enterprise Surveys showing higher productivity growth, job creation, and export propensity among private firms compared to SOEs, after controlling for sector and size.
-3. **Historical episode analysis** comparing growth accelerations (post-1986, post-2000 WTO accession talks, post-2007 WTO entry) with private-sector expansion phases, and slowdowns with SOE consolidation.
-4. **Cross-country benchmarking** against Laos, Cambodia, and the Philippines, which had different private-sector trajectories but comparable initial conditions.
+1. Time-series evidence that private-sector entry rates and trade openness have larger positive coefficients than SOE share in predicting GDP growth and TFP growth.
+2. Sectoral evidence that private-dominated sectors (textiles, footwear, seafood, electronics assembly) outgrew and outperformed SOE-dominated sectors (coal, steel, telecoms, banking).
+3. Evidence that SOE reform episodes (equitisation, corporatisation) did not produce sustained productivity improvements compared to private-firm benchmarks.
 
 ## Best counterarguments
-
-1. **SOEs provided stability and infrastructure**. State-owned utilities, banks, and telecoms created the conditions for private-sector growth; the private sector is a complement, not a substitute.
-2. **Reform sequencing, not sectoral composition**. Doi Moi succeeded because reforms were gradual and politically stable, not because the private sector was intrinsically superior.
-3. **Data quality**. Vietnam's official statistics undercount informal and household enterprises while overstating SOE output; measured private-sector share may be biased.
-4. **Reverse causality**. Growth itself enabled private-sector entry by raising savings and demand; the causal arrow may run from aggregate growth to firm composition.
-5. **Viettel and other successful SOEs**. Some Vietnamese SOEs are globally competitive, undermining the claim that SOE share uniformly predicts weaker performance.
+- **SOEs as stabilisers:** Vietnamese SOEs provided employment and social services during transition; their economic inefficiency may have been a necessary price for political stability.
+- **State-mediated integration:** Vietnam trade integration was state-negotiated (WTO accession 2007, bilateral trade agreements); private firms benefited from state-built infrastructure and diplomatic relationships.
+- **Party-state control:** Many nominally private Vietnamese firms have party-cell oversight and state-linked ownership; the private-public boundary is blurrier than the hypothesis assumes.
+- **China spillover:** Vietnam growth accelerated after 2000 partly due to supply-chain relocation from China; this is an external shock rather than a domestic private-sector story.
+- **Data quality:** Vietnamese statistics on private firms are known to underreport; the true private-sector contribution may be overstated if informal activity is misclassified.
 
 ## Boundary conditions
-
-- Most defensible for **manufacturing, services, and agriculture** where private entry was explicitly liberalised.
-- Less defensible for **natural monopolies and strategic sectors** (defence, energy, banking) where SOE dominance persists for plausible reasons.
-- The claim concerns average marginal associations, not every individual firm or sector.
+- Claim applies most clearly to the post-2000 period when private-sector entry accelerated; the 1986-1995 period was more ambiguous.
+- SOEs retain monopoly positions in utilities, finance, and natural resources where private entry is restricted by law.
+- The claim does not require that SOEs had no role, only that private-sector entry and trade openness were the stronger growth drivers.
 
 ## Relation to existing hypotheses
-
-Aligns with `vietnam_doi_moi_developmental_pattern_growth_effect` and `vietnam_doi_moi_growth_human_development_1990_2023` by focusing on the private-sector mechanism. Tensions with `sea_vietnam_doi_moi_followon_growth_1995_2024` if the latter credits state coordination for growth continuity. Complements `east_asia_export_discipline_vs_domestic_protection` by treating Vietnam's private exporters as the disciplined sector.
+Aligns with `liberalisation_episodes_growth_trajectory` and `high_income_escape_market_openness_1950_2024`. Tensions with `industrial_policy_developmentalist_states_growth` and `vietnam_doi_moi_developmental_pattern_growth_effect` if the latter attributes success to state-led developmentalism.

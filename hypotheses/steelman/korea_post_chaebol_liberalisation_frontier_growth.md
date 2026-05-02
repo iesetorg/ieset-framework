@@ -1,22 +1,30 @@
-# Steelman: Korea Post-Chaebol Liberalisation Frontier Growth
+# Steelman — Korea Post-Chaebol Liberalisation and Frontier Growth
 
 ## Strongest version of the claim
-South Korea's post-1997 corporate governance and financial reforms—chaebol restructuring, foreign ownership liberalisation, and banking clean-ups—raised TFP growth and reduced resource misallocation more than the earlier HCI drive. The strongest version predicts that the post-1997 reform coefficient exceeds the HCI-era coefficient in a structural-break regression.
+
+South Korea's post-1997 corporate governance and financial liberalisation reforms—chaebol debt restructuring, foreign ownership liberalisation, bankruptcy-code enforcement, and banking clean-ups—were the primary drivers of its sustained frontier convergence after the Asian financial crisis. While the Heavy and Chemical Industry (HCI) drive (1973–1996) accelerated capital deepening and industrial diversification, it also entrenched chaebol concentration and moral hazard. The 1997 crisis forced a switch from state-directed credit to market-based discipline, which improved allocative efficiency, R&D productivity, and TFP growth in the 2000s and 2010s. The claim does not deny HCI's catch-up contribution but argues that liberalisation explained a larger share of post-crisis frontier convergence.
 
 ## Key evidence the claim would need
-- A larger and more significant positive coefficient on post-1997 reforms than on HCI-era indicators in Korea's TFP regression.
-- Evidence that chaebol concentration declined and that the decline is correlated with TFP acceleration.
-- Cross-country benchmarking showing Korea's post-1997 TFP performance exceeded that of countries that did not undertake comparable reforms (e.g., Malaysia).
+
+1. **Time-series structural break** in Korean TFP growth around 1997–1998, with post-reform TFP exceeding HCI-era TFP after controlling for global demand and capital deepening.
+2. **Firm-level microdata** showing declining resource misallocation (dispersion of MRPK) post-1998, especially in chaebol-affiliated firms.
+3. **Cross-country benchmarking** against Taiwan and Japan, which had different corporate-governance trajectories but similar initial income levels.
+4. **Sectoral decomposition** showing productivity gains concentrated in sectors opened to foreign competition and restructuring after 1997.
 
 ## Best counterarguments
-- The HCI drive built the industrial capabilities that made post-1997 reform possible; attributing success to reform alone is ahistorical.
-- The 1997 crisis was a massive negative shock; recovery dynamics may exaggerate the reform effect.
-- Chaebol still dominate Korea's economy; the claim of significant restructuring may be overstated.
+
+1. **HCI built the capabilities that reform unlocked**. Without the HCI-era industrial base, post-1997 liberalisation would have produced fire-sale asset transfers rather than productivity gains.
+2. **The 1997 crisis was exogenous**. Reforms were crisis-driven, not planned; attributing success to reform design rather than crisis severity is speculative.
+3. **Demographics and education**. Korea's workforce human capital continued rising post-1997, confounding the liberalisation effect.
+4. **Chaebol resilience**. The top chaebol retained dominance post-reform; if liberalisation were decisive, we would expect greater churn in the firm-size distribution.
+5. **Global tech cycle**. The 2000s semiconductor and smartphone booms drove Korean growth independently of domestic reform.
 
 ## Boundary conditions
-- The claim applies to a country that had already achieved industrial depth before reform.
-- It does not imply that early industrial policy was useless, only that its marginal contribution declined relative to market-liberal reforms.
+
+- Most defensible for **manufacturing and technology sectors** with clear export markets.
+- Less defensible for **services and construction**, where reform effects were weaker.
+- The comparison between HCI and post-reform phases depends on TFP measurement assumptions; capital-deepening adjustments matter.
 
 ## Relation to existing hypotheses
-- Complements `japan_miti_success_then_stagnation_panel` and `east_asia_export_discipline_vs_domestic_protection`.
-- Tensions with `industrial_policy_developmentalist_states_growth` by downgrading the long-run contribution of HCI.
+
+Aligns with `developmental_state_to_market_transition_success` by treating Korea as the canonical transition case. Tensions with `industrial_policy_high_governance_success`, which credits HCI-era targeting for building capabilities, and with `korea_hci_drive_capability_effect`, which attributes catch-up primarily to state-led sectoral promotion.
