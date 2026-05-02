@@ -1,0 +1,165 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_order_trade_openness_gdp_pc_growth_panel
+version: 1
+status: pre_registered
+topic: trade
+claim: Across a pre-registered panel of OECD and major emerging-market economies from 1996 to 2023, higher trade
+  openness predict faster real GDP per capita growth after country and year fixed effects and basic macro controls.
+  This tests the competition, specialization, and market-size channels without using the Heritage latest-year cross-section
+  as the treatment.
+methodology_note: Second-stage market-order pre-registration generated from a prior candidate-screen queue. The
+  Heritage screen is used only for triage; this spec is registered before estimation and uses time-varying WGI,
+  Fraser EFW, or WDI panel measures rather than Heritage latest-year scores.
+evidence_type: associational
+sample:
+  countries:
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - EGY
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KEN
+  - KOR
+  - LTU
+  - LVA
+  - MAR
+  - MEX
+  - MYS
+  - NGA
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - PHL
+  - POL
+  - PRT
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - URY
+  - USA
+  - ZAF
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat this as associational evidence unless a later event-study or DiD design is registered
+scope:
+  period:
+  - 1996
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  policy_family:
+  - trade_policy
+  - competition_policy
+  treatment_tags:
+  - trade_openness
+  - market_access
+  - competition
+variables:
+  outcome:
+  - name: gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+    notes: annual real GDP per capita growth
+  treatment:
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: trade openness
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control to reduce short-run development-level bias.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: Fiscal-demand control; omitted when fiscal size is the treatment.
+intervention_channel: institutional
+intervention_channel_justification: The treatment operationalizes trade openness as a time-varying policy or institutional
+  channel, not a contemporaneous outcome cherry-pick.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Primary test is two-way fixed effects with country-clustered standard errors. The first public verdict
+    should not be treated as causal; it is the registered panel hurdle before any scoreboard interpretation.
+falsification:
+  rule: SUPPORTED if the coefficient on trade_openness is positively signed at p<0.10 with at least 30 usable observations
+    after listwise deletion. REFUTED if the coefficient is significantly opposite-signed at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_order_trade_openness_gdp_pc_growth_panel
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.57
+disclosure: The author is actively testing market-liberal and Austrian/ordoliberal claims, so favorable selection
+  risk is real. This spec counters that risk by recording the claim, sample, variables, direction, and position
+  links before the run; null or contrary results count.
+steelman: hypotheses/steelman/market_order_trade_openness_gdp_pc_growth_panel.md
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 131
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order prereg wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: ordoliberal
+  claim_index: 119
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order prereg wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: empirical_pragmatist
+  claim_index: 116
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order prereg wave; position claim and hypothesis
+    claim were linked before estimation.
+notes: Do not promote from the earlier Heritage screen directly. This v1 panel spec is the registered second-stage
+  test.
