@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bhutan_growth_health_services_shift_1990_2023
+version: 1
+status: pre_registered
+topic: growth
+claim: Bhutan's 1990-2023 development trajectory combined sustained real income growth, large
+  child-mortality reductions, rising life expectancy, and a services-employment shift. The
+  narrow test is whether Bhutan clears at least three of four independent outcome thresholds
+  over the period, using WDI vintages already present in the pipeline.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - BTN
+  period:
+  - 1990
+  - 2023
+  temporal_structure: time_series
+canonical_metrics:
+- metric_id: real_gdp_pc_growth_sustained
+  description: Bhutan average annual real GDP per-capita growth
+  threshold: average annual growth >= 4.0%
+  window: 1990-2023
+  source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+  direction: supports_claim
+  independence_justification: Income-growth series separate from health and employment composition.
+- metric_id: under5_mortality_decline_large
+  description: Bhutan under-5 mortality rate decline
+  threshold: '>= 80% decline'
+  window: 1990-2023
+  source: world_bank_wdi:SH.DYN.MORT
+  direction: supports_claim
+  independence_justification: Health outcome independently collected from GDP/employment statistics.
+- metric_id: life_expectancy_gain_large
+  description: Bhutan life expectancy increased substantially from the 1990 baseline
+  threshold: '>= 25% increase'
+  window: 1990-2023
+  source: world_bank_wdi:SP.DYN.LE00.IN
+  direction: supports_claim
+  independence_justification: Population health stock measure distinct from under-5 mortality
+    rate.
+- metric_id: services_employment_share_high
+  description: Bhutan services employment reached a substantial share before COVID
+  threshold: '>= 30% during 2019'
+  window: '2019'
+  source: world_bank_wdi:SL.SRV.EMPL.ZS
+  direction: supports_claim
+  independence_justification: Labour-market composition measured independently of health and
+    growth outcomes.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Canonical-case checklist over WDI income, health, and employment-composition series.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 metrics meet their thresholds, REFUTED if at most 1 metric
+    is met after all available data are evaluated, and otherwise INCONCLUSIVE.
+  test: multi_metric_checklist_development_and_services_shift
+  threshold: MET >= 3 of 4; REFUTE when confirmed MET <= 1 with no pending path to support
+variables:
+  outcome:
+  - name: real_gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: annual_mean
+  - name: under5_mortality
+    source: world_bank_wdi:SH.DYN.MORT
+    transformation: peak_to_trough_decline
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: pct_change
+  - name: services_employment_share
+    source: world_bank_wdi:SL.SRV.EMPL.ZS
+    transformation: level
+prior_confidence: 0.78
+disclosure: Author prior expects Bhutan to clear the health and growth thresholds. The checklist
+  is descriptive and does not identify which policy package, sectoral driver, or external
+  condition caused the pattern.
+steelman: hypotheses/steelman/bhutan_growth_health_services_shift_1990_2023.md
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - BTN
+  outcome_dim:
+  - gdp_growth
+  - life_expectancy_health
+  - employment_labour
+  policy_family:
+  - industrial_policy
+  - labour_market
+  - institutional_reform
+  treatment_tags:
+  - bhutan_development
+  - services_shift
+  - health_transition
