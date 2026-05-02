@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_market_to_disposable_gini_compression_panel
+version: 1
+status: candidate
+topic: distribution
+claim: Across OECD country-years, disposable-income Gini is materially lower than
+  market-income Gini after taxes and transfers.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period: &id001
+  - 1975
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-periods missing the predeclared treatment or outcome
+  - retain common shocks and absorb them with year effects where the estimator is
+    a panel FE
+variables:
+  outcome:
+  - name: gini_compression
+    source: local pinned vintage panel
+    transformation: Supported if mean market-minus-disposable Gini compression is
+      >= 0.08 and at least 90 percent of country-years are positive, with at least
+      300 observations and 25 countries.
+  treatment:
+  - name: redistribution_system
+    source: local pinned vintage panel
+    transformation: as predeclared in threshold
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: ''
+  notes: Generated Worker C first-tranche local-data panel verdict.
+falsification:
+  rule: Supported if mean market-minus-disposable Gini compression is >= 0.08 and
+    at least 90 percent of country-years are positive, with at least 300 observations
+    and 25 countries.
+  test: oecd_market_to_disposable_gini_compression_panel
+  threshold:
+    mean_min: 0.08
+    share_min: 0.9
+    min_observations: 300
+    min_countries: 25
+prior_confidence: 0.9
+disclosure: This is a compact first-tranche screen. It predeclares magnitude and coverage
+  gates before reading the emitted verdict, but it is not a causal natural experiment.
+steelman: hypotheses/steelman/oecd_market_to_disposable_gini_compression_panel.md
+scope:
+  period: *id001
+  countries:
+  - OECD
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - oecd
+  - market
+  - to
+  - disposable
+  - gini
+notes: Runnable via engine/runs/oecd_market_to_disposable_gini_compression_panel/replication.py.
+  Uses only pinned local BIS/OECD/WGI/WDI vintages.

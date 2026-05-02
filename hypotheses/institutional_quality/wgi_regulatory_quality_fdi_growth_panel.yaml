@@ -1,0 +1,147 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wgi_regulatory_quality_fdi_growth_panel
+version: 1
+status: candidate
+topic: institutional_quality
+claim: Across country-years, higher WGI Regulatory Quality predicts higher average
+  FDI net inflows as a share of GDP over the next three years after fixed effects
+  and macro controls.
+evidence_type: associational
+sample:
+  countries:
+  - ALB
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BGD
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KAZ
+  - KEN
+  - KOR
+  - LTU
+  - LVA
+  - MAR
+  - MEX
+  - MYS
+  - NLD
+  - NOR
+  - NZL
+  - PAK
+  - PER
+  - PHL
+  - POL
+  - PRT
+  - ROU
+  - RUS
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - UKR
+  - USA
+  - VNM
+  - ZAF
+  period: &id001
+  - 1996
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-periods missing the predeclared treatment or outcome
+  - retain common shocks and absorb them with year effects where the estimator is
+    a panel FE
+variables:
+  outcome:
+  - name: fwd_fdi_gdp_3y_avg
+    source: local pinned vintage panel
+    transformation: Supported if beta(regulatory_quality) >= 0.25 pp of GDP with p
+      <= 0.10, and the top-minus-bottom RQ-tercile raw mean difference is >= 1.0 pp
+      of GDP, with at least 800 observations and 40 countries.
+  treatment:
+  - name: regulatory_quality
+    source: local pinned vintage panel
+    transformation: as predeclared in threshold
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Generated Worker C first-tranche local-data panel verdict.
+falsification:
+  rule: Supported if beta(regulatory_quality) >= 0.25 pp of GDP with p <= 0.10, and
+    the top-minus-bottom RQ-tercile raw mean difference is >= 1.0 pp of GDP, with
+    at least 800 observations and 40 countries.
+  test: wgi_regulatory_quality_fdi_growth_panel
+  threshold:
+    coef_min: 0.25
+    p_max: 0.1
+    raw_min: 1.0
+    min_observations: 800
+    min_countries: 40
+prior_confidence: 0.57
+disclosure: This is a compact first-tranche screen. It predeclares magnitude and coverage
+  gates before reading the emitted verdict, but it is not a causal natural experiment.
+steelman: hypotheses/steelman/wgi_regulatory_quality_fdi_growth_panel.md
+scope:
+  period: *id001
+  countries:
+  - ALB
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BGD
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  outcome_dim:
+  - institutional_quality
+  - capital_flows
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - wgi
+  - regulatory
+  - quality
+  - fdi
+  - growth
+notes: Runnable via engine/runs/wgi_regulatory_quality_fdi_growth_panel/replication.py.
+  Uses only pinned local BIS/OECD/WGI/WDI vintages.

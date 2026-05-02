@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+CMD = [str(ROOT / "venv/bin/python"), str(ROOT / "scripts/generate_bis_oecd_wgi_wave.py"), "oecd_market_to_disposable_gini_compression_panel"]
+
+if __name__ == "__main__":
+    raise SystemExit(subprocess.run(CMD, cwd=ROOT).returncode)

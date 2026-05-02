@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_remittance_gdp_pc_resilience_2009_2021
+version: 1
+status: pre_registered
+topic: growth
+claim: High-remittance economies should more often than not avoid negative average real GDP-per-capita
+  growth across the global shock years 2009, 2020, and 2021.
+evidence_type: descriptive
+sample:
+  countries:
+  - ALB
+  - ARM
+  - BIH
+  - BMU
+  - COM
+  - CPV
+  - DOM
+  - GEO
+  - GMB
+  - GTM
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - JOR
+  - KGZ
+  - KIR
+  - LBN
+  - LBR
+  - LSO
+  - MDA
+  - MHL
+  - MNE
+  - NIC
+  - NPL
+  - PHL
+  - PSE
+  - PYF
+  - SEN
+  - SLV
+  - TJK
+  - TON
+  - TUV
+  - UZB
+  - WSM
+  - XKX
+  - ZWE
+  period:
+  - 2000
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: real_gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: mean across 2009, 2020, 2021
+  treatment:
+  - name: remittances_pct_gdp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: country selected if 2000-2023 mean >= 8% of GDP
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Custom endpoint/mean panel replication using local WDI/OWID vintages and fixed country-selection
+    thresholds.
+falsification:
+  rule: SUPPORTED if n>=25, at least 50% of high-remittance economies have non-negative average
+    GDP-per-capita growth in shock years, and the median is >=0%. REFUTED if fewer than 40%
+    pass or the median is below -2%. Otherwise PARTIAL.
+  test: wdi_remittance_gdp_pc_resilience_2009_2021
+  threshold: n >= 25 AND pass_rate >= 0.50 AND median_avg_gdp_pc_growth_shock_years >= 0
+prior_confidence: 0.53
+disclosure: The prior is modest because remittances stabilize households more directly than
+  aggregate GDP, especially when tourism, construction, or conflict dominate the cycle.
+steelman: hypotheses/steelman/wdi_remittance_gdp_pc_resilience_2009_2021.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - ALB
+  - ARM
+  - BIH
+  - BMU
+  - COM
+  - CPV
+  - DOM
+  - GEO
+  - GMB
+  - GTM
+  - GUY
+  - HND
+  - HTI
+  - JAM
+  - JOR
+  - KGZ
+  - KIR
+  - LBN
+  - LBR
+  - LSO
+  - MDA
+  - MHL
+  - MNE
+  - NIC
+  - NPL
+  - PHL
+  - PSE
+  - PYF
+  - SEN
+  - SLV
+  - TJK
+  - TON
+  - TUV
+  - UZB
+  - WSM
+  - XKX
+  - ZWE
+  outcome_dim:
+  - gdp_growth
+  - demographics_migration
+  policy_family:
+  - none
+  treatment_tags:
+  - remittances
+  - macro_resilience

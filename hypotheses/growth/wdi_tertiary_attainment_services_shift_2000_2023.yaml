@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_tertiary_attainment_services_shift_2000_2023
+version: 1
+status: pre_registered
+topic: growth
+claim: Countries with large tertiary-attainment gains from 2000 to 2023 should usually show
+  a visible shift of employment toward services.
+evidence_type: descriptive
+sample:
+  countries:
+  - ALB
+  - AUS
+  - BOL
+  - CAN
+  - CRI
+  - CZE
+  - IRL
+  - IRN
+  - KOR
+  - LTU
+  - MKD
+  - MLT
+  - MNG
+  - MUS
+  - PRT
+  - PSE
+  - SAU
+  - SGP
+  - SRB
+  - SWE
+  - USA
+  - VEN
+  period:
+  - 2000
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: services_employment_share
+    source: world_bank_wdi:SL.SRV.EMPL.ZS
+    transformation: endpoint percentage-point change
+  treatment:
+  - name: tertiary_attainment_gain
+    source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+    transformation: country selected if endpoint gain >= 10pp
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Custom endpoint/mean panel replication using local WDI/OWID vintages and fixed country-selection
+    thresholds.
+falsification:
+  rule: SUPPORTED if n>=15, at least 70% of large-tertiary-gain countries increase services
+    employment share by >=5pp, and the median gain is >=7pp. REFUTED if fewer than 50% pass
+    or the median gain is <2pp. Otherwise PARTIAL.
+  test: wdi_tertiary_attainment_services_shift_2000_2023
+  threshold: n >= 15 AND pass_rate >= 0.70 AND median_services_employment_gain_pp >= 7
+prior_confidence: 0.75
+disclosure: The prior expects skill upgrading to pair with services expansion, but services
+  shares also rise mechanically when agriculture shrinks or manufacturing weakens.
+steelman: hypotheses/steelman/wdi_tertiary_attainment_services_shift_2000_2023.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - ALB
+  - AUS
+  - BOL
+  - CAN
+  - CRI
+  - CZE
+  - IRL
+  - IRN
+  - KOR
+  - LTU
+  - MKD
+  - MLT
+  - MNG
+  - MUS
+  - PRT
+  - PSE
+  - SAU
+  - SGP
+  - SRB
+  - SWE
+  - USA
+  - VEN
+  outcome_dim:
+  - employment_labour
+  - productivity
+  policy_family:
+  - labour_market
+  - none
+  treatment_tags:
+  - tertiary_attainment
+  - services_shift

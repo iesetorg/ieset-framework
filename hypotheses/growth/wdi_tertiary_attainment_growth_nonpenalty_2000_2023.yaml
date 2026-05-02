@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_tertiary_attainment_growth_nonpenalty_2000_2023
+version: 1
+status: pre_registered
+topic: growth
+claim: Large tertiary-attainment gains from 2000 to 2023 should generally be compatible with
+  positive average real GDP-per-capita growth.
+evidence_type: descriptive
+sample:
+  countries:
+  - ALB
+  - AUS
+  - BOL
+  - CAN
+  - CRI
+  - CZE
+  - IRL
+  - IRN
+  - KOR
+  - LTU
+  - MKD
+  - MLT
+  - MNG
+  - MUS
+  - PRT
+  - PSE
+  - SAU
+  - SGP
+  - SRB
+  - SWE
+  - USA
+  - VEN
+  period:
+  - 2000
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: real_gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: 2000-2023 annual mean
+  treatment:
+  - name: tertiary_attainment_gain
+    source: world_bank_wdi:SE.TER.CUAT.BA.ZS
+    transformation: country selected if endpoint gain >= 10pp
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Custom endpoint/mean panel replication using local WDI/OWID vintages and fixed country-selection
+    thresholds.
+falsification:
+  rule: SUPPORTED if n>=15, at least 65% of large-tertiary-gain countries average >=1% real
+    GDP-per-capita growth, and the median is >=1%. REFUTED if fewer than 45% pass or the median
+    is <0%. Otherwise PARTIAL.
+  test: wdi_tertiary_attainment_growth_nonpenalty_2000_2023
+  threshold: n >= 15 AND pass_rate >= 0.65 AND median_avg_real_gdp_pc_growth >= 1
+prior_confidence: 0.66
+disclosure: The prior expects human-capital expansion to be growth-compatible, but the sample
+  includes mature economies, oil exporters, and crisis-hit states.
+steelman: hypotheses/steelman/wdi_tertiary_attainment_growth_nonpenalty_2000_2023.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - ALB
+  - AUS
+  - BOL
+  - CAN
+  - CRI
+  - CZE
+  - IRL
+  - IRN
+  - KOR
+  - LTU
+  - MKD
+  - MLT
+  - MNG
+  - MUS
+  - PRT
+  - PSE
+  - SAU
+  - SGP
+  - SRB
+  - SWE
+  - USA
+  - VEN
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  policy_family:
+  - labour_market
+  - none
+  treatment_tags:
+  - tertiary_attainment
+  - growth_nonpenalty

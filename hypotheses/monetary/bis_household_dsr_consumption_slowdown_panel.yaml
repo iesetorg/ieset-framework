@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_household_dsr_consumption_slowdown_panel
+version: 1
+status: candidate
+topic: monetary
+claim: In BIS/WDI country panels, high household debt-service stress is followed by
+  weaker private-consumption growth over the next two years.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - ITA
+  - JPN
+  - KOR
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period: &id001
+  - 1999
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-periods missing the predeclared treatment or outcome
+  - retain common shocks and absorb them with year effects where the estimator is
+    a panel FE
+variables:
+  outcome:
+  - name: fwd_consumption_growth_2y_avg
+    source: local pinned vintage panel
+    transformation: High DSR is BIS household DSR >= 12 percent and >= country p75;
+      outcome is the average WDI real private-consumption growth rate in years t+1
+      and t+2.
+  treatment:
+  - name: high_household_dsr
+    source: local pinned vintage panel
+    transformation: as predeclared in threshold
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Generated Worker C first-tranche local-data panel verdict.
+falsification:
+  rule: High DSR is BIS household DSR >= 12 percent and >= country p75; outcome is
+    the average WDI real private-consumption growth rate in years t+1 and t+2.
+  test: bis_household_dsr_consumption_slowdown_panel
+  threshold:
+    coef_max: -1.0
+    p_max: 0.05
+    mean_diff_max: -1.0
+    min_countries: 15
+    min_observations: 400
+prior_confidence: 0.6
+disclosure: This is a compact first-tranche screen. It predeclares magnitude and coverage
+  gates before reading the emitted verdict, but it is not a causal natural experiment.
+steelman: hypotheses/steelman/bis_household_dsr_consumption_slowdown_panel.md
+scope:
+  period: *id001
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - ITA
+  - JPN
+  - KOR
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  outcome_dim:
+  - monetary_policy
+  - financialisation
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - bis
+  - household
+  - dsr
+  - consumption
+  - slowdown
+notes: Runnable via engine/runs/bis_household_dsr_consumption_slowdown_panel/replication.py.
+  Uses only pinned local BIS/OECD/WGI/WDI vintages.

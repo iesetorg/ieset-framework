@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_policy_rate_credit_gap_compression_panel
+version: 1
+status: candidate
+topic: monetary
+claim: In BIS panels, policy-rate tightening episodes are followed by compression
+  in the BIS credit-to-GDP gap over the next eight quarters.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FRA
+  - GBR
+  - GRC
+  - HKG
+  - HUN
+  - IDN
+  - IND
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - MEX
+  - MYS
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - RUS
+  - SAU
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period: &id001
+  - 1958
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-periods missing the predeclared treatment or outcome
+  - retain common shocks and absorb them with year effects where the estimator is
+    a panel FE
+variables:
+  outcome:
+  - name: fwd_credit_gap_change_8q
+    source: local pinned vintage panel
+    transformation: Policy tightening is a >= 2 pp rise in BIS central-bank policy
+      rates over four quarters; outcome is credit-gap change from t to t+8 quarters.
+  treatment:
+  - name: policy_tightening_2pp
+    source: local pinned vintage panel
+    transformation: as predeclared in threshold
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Generated Worker C first-tranche local-data panel verdict.
+falsification:
+  rule: Policy tightening is a >= 2 pp rise in BIS central-bank policy rates over
+    four quarters; outcome is credit-gap change from t to t+8 quarters.
+  test: bis_policy_rate_credit_gap_compression_panel
+  threshold:
+    coef_max: -1.5
+    p_max: 0.05
+    mean_diff_max: -1.5
+    min_countries: 20
+    min_observations: 700
+prior_confidence: 0.58
+disclosure: This is a compact first-tranche screen. It predeclares magnitude and coverage
+  gates before reading the emitted verdict, but it is not a causal natural experiment.
+steelman: hypotheses/steelman/bis_policy_rate_credit_gap_compression_panel.md
+scope:
+  period: *id001
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FRA
+  - GBR
+  - GRC
+  - HKG
+  - HUN
+  - IDN
+  - IND
+  outcome_dim:
+  - monetary_policy
+  - financialisation
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - bis
+  - policy
+  - rate
+  - credit
+  - gap
+notes: Runnable via engine/runs/bis_policy_rate_credit_gap_compression_panel/replication.py.
+  Uses only pinned local BIS/OECD/WGI/WDI vintages.
