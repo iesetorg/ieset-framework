@@ -1,0 +1,147 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ireland_market_opening_fdi_frontier_1987_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Ireland’s long-run convergence from a middle-income to a high-income economy
+  during 1987–2024 is better predicted by trade openness, tax competitiveness,
+  and FDI entry than by classic industrial planning. In a synthetic-
+  difference-in-differences design with EU periphery and small open economy
+  comparators, Ireland’s cumulative log GDP-pc growth after 1987 exceeds the
+  synthetic counterfactual, and the gap is positively correlated with FDI
+  inflows and corporate tax competitiveness, while state-aid and industrial-
+  planning intensity do not show a comparable association.
+
+evidence_type: causal
+
+sample:
+  countries:
+    - IRL
+    - GRC
+    - PRT
+    - ESP
+    - ITA
+    - BEL
+    - NLD
+    - DNK
+    - FIN
+    - SWE
+    - AUT
+    - CHE
+    - NZL
+    - ISL
+    - LUX
+  period: [1987, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020-2021 from fitting"
+    - "flag GDP distortions from 2015 BEPS-driven asset relocations"
+
+scope:
+  period: [1987, 2024]
+  countries:
+    - IRL
+    - GRC
+    - PRT
+    - ESP
+    - ITA
+    - BEL
+    - NLD
+    - DNK
+    - FIN
+    - SWE
+    - AUT
+    - CHE
+    - NZL
+    - ISL
+    - LUX
+  outcome_dim:
+    - gdp_growth
+    - trade_liberalisation
+    - institutional_quality
+  policy_family:
+    - trade_policy
+    - institutional_reform
+    - industrial_policy
+  treatment_tags:
+    - ireland_celtic_tiger_1987
+    - ireland_corporate_tax_competitiveness
+    - ireland_fdi_policy_1987
+
+variables:
+  outcome:
+    - name: real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level
+    - name: labour_productivity
+      source: "world_bank_wdi:SL.GDP.PCAP.EM.KD"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  treatment:
+    - name: ireland_post_1987
+      source: "constructed: 1 for IRL from 1987 onward"
+      transformation: binary
+  controls:
+    - name: initial_gdp_pc_1987
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: level_at_1987
+    - name: eu_membership_dummy
+      source: "constructed: 1 from 1973 for IRL, 1986 for PRT/ESP, etc."
+      transformation: binary
+    - name: human_capital
+      source: "pwt:hc"
+      transformation: level
+    - name: wgi_govt_effectiveness
+      source: "wgi:GE.EST"
+      transformation: level
+    - name: us_policy_rate
+      source: "fred:FEDFUNDS"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The treatment spans trade openness, tax competitiveness (fiscal), and FDI
+  entry (regulatory/industrial). Bundled coding per invariant 4.
+
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with IRL treated from 1987, donor pool of EU periphery
+    and small open economies. Secondary: panel FE with IRL × post-1987
+    interaction, controlling for EU membership.
+
+falsification:
+  rule: >
+    Refuted if Ireland’s cumulative log GDP-pc growth gap versus synthetic
+    counterfactual over 1987-2024 is not positive and significant at p<0.10,
+    or if the panel-FE coefficient on IRL × post-1987 is negative and
+    significant at p<0.05. Also refuted if FDI inflows do not positively
+    predict the gap.
+  test: synth_did_ireland_convergence
+  threshold: >
+    cumulative_log_gdp_pc_gap_1987_2024 > 0 AND p < 0.10; panel_fe_coef > 0
+    AND p < 0.10.
+
+prior_confidence: 0.75
+
+disclosure: >
+  Author’s priors view Ireland as a clear market-openness success, but
+  acknowledge that GDP measurement is distorted by multinational profit-
+  shifting. Bias risk: over-interpreting headline GDP. Mitigation: also
+  examine labour productivity and GNI* where available.
+
+steelman: hypotheses/steelman/ireland_market_opening_fdi_frontier_1987_2024.md
+
+linked_hypotheses:
+  - liberal_capital_account_openness_growth_premium_panel

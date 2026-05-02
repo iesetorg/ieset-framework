@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: middle_class_asset_building_market_depth
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Middle-class wealth accumulation (median household net worth growth, homeownership rates,
+  and financial-asset participation) is stronger in countries with deeper capital markets
+  (stock-market capitalisation to GDP, private credit to GDP) and more secure property
+  rights (WGI rule of law, Heritage property-rights score) than in peers at similar income
+  levels with shallow financial systems or weak tenure security, over 1990-2020.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - ISR
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years with banking crises (Laeven-Valencia crisis list)
+  - exclude observations where wealth-distribution microdata are imputed rather than surveyed
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - OECD
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  outcome_dim:
+  - poverty_inequality
+  - financialisation
+  - institutional_quality
+  policy_family:
+  - regulation
+  - institutional_reform
+  treatment_tags: []
+variables:
+  outcome:
+  - name: median_household_net_worth_growth
+    source: constructed:credit_suisse_global_wealth_databook_median
+    transformation: log_diff
+    notes: Credit Suisse Global Wealth Databook median wealth per adult; cross-country comparable.
+  - name: homeownership_rate
+    source: oecd:OECD.HOU.POL
+    transformation: level
+    notes: OECD homeownership rate where available; Eurostat and national surveys elsewhere.
+  - name: financial_asset_participation
+    source: constructed:oecd_wealth_distribution; eurostat:lfso
+    transformation: level
+    notes: Share of households holding positive financial assets.
+  treatment:
+  - name: stock_market_capitalisation_gdp
+    source: world_bank_wdi:CM.MKT.LCAP.GD.ZS
+    transformation: log
+  - name: private_credit_gdp
+    source: world_bank_wdi:GFDD.DI.14
+    transformation: log
+  - name: property_rights_security
+    source: heritage_efw:property_rights
+    transformation: level
+  controls:
+  - name: log_gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: inflation_rate
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level
+  - name: old_age_dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: social_transfer_gdp
+    source: world_bank_wdi:GC.XPN.TRFT.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if deeper capital markets or stronger property rights are
+    negatively and significantly (p < 0.10) associated with median wealth growth or
+    homeownership, or if the association is positive but not significant after controlling
+    for initial income and demographics.
+  test: panel_fe_middle_class_assets_market_depth_1990_2020
+  threshold:
+    supported: capital-market and property-rights coefficients > 0 at p < 0.10
+    refuted: coefficients < 0 at p < 0.10
+prior_confidence: 0.60
+disclosure: >-
+  Author priors expect market depth to facilitate asset accumulation but acknowledge that
+  shallow markets may be correlated with stronger informal-family safety nets that also
+  build wealth. Financial-crisis episodes may confound the capital-market coefficient.
+steelman: hypotheses/steelman/middle_class_asset_building_market_depth.md

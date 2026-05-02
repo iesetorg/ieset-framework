@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: resource_developmentalism_rent_seeking_trap
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Resource-funded developmentalist states produce early public-investment gains
+  but weaker long-run economic diversification and lower TFP growth than market-open
+  resource peers over 30-year windows in a broad panel of resource-rich economies
+  during 1970-2020.
+evidence_type: causal
+sample:
+  countries:
+    - ZAF
+    - NGA
+    - EGY
+    - ETH
+    - KEN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - ZMB
+    - MAR
+    - TUN
+    - DZA
+    - LBY
+    - SDN
+    - AGO
+    - COD
+    - GAB
+    - CMR
+    - CIV
+    - SEN
+    - MLI
+    - BFA
+    - NER
+    - TCD
+    - ARG
+    - BRA
+    - CHL
+    - MEX
+    - URY
+    - COL
+    - PER
+    - VEN
+    - ECU
+    - BOL
+    - PRY
+    - CRI
+    - DOM
+    - GTM
+    - HND
+    - SLV
+    - NIC
+    - PAN
+    - JAM
+    - TTO
+    - TUR
+    - IRN
+    - IRQ
+    - JOR
+    - LBN
+    - SYR
+    - YEM
+    - SAU
+    - ARE
+    - KWT
+    - QAT
+    - BHR
+    - OMN
+    - IND
+    - IDN
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - KHM
+    - LAO
+    - MMR
+    - CHN
+    - KOR
+    - TWN
+    - PAK
+    - LKA
+    - NPL
+    - MNG
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude countries with no significant resource rents (<5% of GDP)
+    - Exclude post-conflict reconstruction periods
+scope:
+  period: [1970, 2020]
+  countries:
+    - AFRICA
+    - LATAM
+    - MENA
+    - ASIA_EM
+  outcome_dim: [gdp_growth, productivity, trade_liberalisation]
+  policy_family: [industrial_policy, fiscal_policy]
+  treatment_tags: [resource_developmentalism, rent_seeking, dutch_disease]
+variables:
+  outcome:
+    - name: export_diversification_index
+      source: constructed:theil_index_or_hirschman_herfindahl_of_exports
+      transformation: level
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+    - name: manufacturing_va_share
+      source: world_bank_wdi:NV.IND.MANF.ZS
+      transformation: level_pct
+  treatment:
+    - name: resource_developmentalism
+      source: constructed:binary_coded_from_policy_description
+      transformation: binary
+      notes: Coded 1 for states using resource rents to fund active industrial policy and state-led diversification (e.g., Venezuela, Algeria, Nigeria, Angola).
+    - name: resource_rents
+      source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      transformation: level_pct
+  controls:
+    - name: resource_rents
+      source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      transformation: level_pct
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Resource developmentalism operates through fiscal channel by using resource
+  rents to fund state-directed investment and subsidies.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE comparing resource-funded developmentalist states with market-open
+    resource peers. Robustness via synthetic control and propensity-score matching.
+falsification:
+  rule: >
+    Falsified if resource-funded developmentalist states do not show statistically
+    weaker export diversification and TFP growth than market-open resource peers
+    over 30-year windows after controlling for resource rents, initial income,
+    and institutional quality.
+  test: panel_fe_resource_developmentalism_vs_market_open
+  threshold:
+    diversification_coefficient: negative_p_lt_0.10
+    tfp_coefficient: negative_p_lt_0.10
+    window_years: 30
+prior_confidence: 0.55
+disclosure: >
+  Author holds priors that resource rents encourage rent-seeking and state
+  capture when channelled through developmentalist industrial policy, but
+  acknowledges Norway's counterexample of successful resource management.
+steelman: hypotheses/steelman/resource_developmentalism_rent_seeking_trap.md
+linked_hypotheses:
+  - industrial_policy_corruption_interaction
+  - state_credit_allocation_zombie_firm_persistence
+notes: >
+  Export diversification indices from UNCTAD, IMF, or constructed from UN Comtrade.
+  Resource developmentalism coding requires manual policy classification.

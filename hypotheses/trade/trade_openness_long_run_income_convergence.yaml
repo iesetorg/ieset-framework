@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_openness_long_run_income_convergence
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Across a broad panel of countries 1960-2019, higher trade openness predicts
+  faster long-run convergence of real GDP per capita toward the global frontier
+  (the United States) than industrial-policy intensity does. Convergence is
+  measured by β-convergence — the coefficient on initial log GDP per capita
+  becomes less negative (or more positive in a conditional-convergence
+  specification) when interacted with trade openness — and by σ-convergence,
+  the declining cross-sectional standard deviation of log GDP per capita over
+  20-year windows. The hypothesis tests the Smithian-Ricardian claim that
+  openness is a more reliable convergence engine than dirigiste industrial
+  targeting.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, VNM, ZAF]
+  period: [1960, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during major wars or civil conflicts (UCDP/PRIO > 1000 battle deaths)"
+    - "drop observations with trade openness > 250% of GDP (entrepôt outliers: SGP, HKG unless robustness checked)"
+    - "drop post-communist transition years 1989-1994 for Eastern European economies to avoid regime-break confound"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita
+      source: "pwt:rgdpo"
+      transformation: log_per_capita
+      notes: "Penn World Table real GDP output-side (rgdpo) divided by population."
+    - name: convergence_speed_beta
+      source: "constructed: 20-year rolling regression of log GDP pc growth on initial log GDP pc"
+      transformation: rolling_window_estimate
+      notes: "Derived outcome: speed of β-convergence within 20-year windows."
+  treatment:
+    - name: trade_openness_pct_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+      notes: "Exports plus imports of goods and services as % of GDP."
+    - name: industrial_policy_intensity_index
+      source: "constructed: composite of state ownership share, directed credit, and sectoral subsidy intensity (CRDF/ITC + Fraser EFW subcomponents)"
+      transformation: z_score_composite
+      notes: "Pending dedicated fetcher. v1 uses Fraser EFW Area 5 (Credit Market Regulations) and Area 4 (Government Enterprises and Investment) as proxy."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "pwt:rgdpo"
+      transformation: log_initial_5yr_window
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+      notes: "WGI Rule of Law estimate; available from 1996 onward. Pre-1996 values backfilled using extrapolation flagged in notes."
+    - name: population_growth
+      source: "world_bank_wdi:SP.POP.GROW"
+      transformation: level
+    - name: investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+  decomposition_channels:
+    - name: import_penetration_ratio
+      source: "world_bank_wits:import_value"
+      transformation: ratio_to_gdp
+      notes: "Channel test: does openness work through import competition and input variety?"
+    - name: export_diversification_index
+      source: "un_comtrade:export_product_diversity"
+      transformation: theil_index
+      notes: "Channel test: does openness work through export diversification?"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Trade openness is a regulatory/trade-policy intervention (tariff and non-tariff
+  barrier reduction). Industrial policy intensity is a bundled fiscal-regulatory
+  intervention (subsidies, state ownership, directed credit). The test compares
+  two regulatory channels.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way fixed-effects panel with Driscoll-Kraay standard errors. Primary
+    specification: growth of log GDP pc = β0 + β1*initial_log_gdp + β2*openness
+    + β3*(initial_log_gdp × openness) + controls + country FE + year FE. The
+    interaction term β3 is the convergence test: if β3 > 0, openness accelerates
+    convergence. A parallel specification replaces openness with industrial-policy
+    intensity. Robustness: 20-year non-overlapping windows to avoid serial
+    correlation; entrepôt outliers dropped or downweighted.
+
+falsification:
+  rule: >
+    SUPPORTED if the interaction coefficient β3 (initial_log_gdp × openness) is
+    positive and significant at p<0.10, while the corresponding interaction
+    for industrial-policy intensity is either negative, insignificant, or
+    materially smaller in magnitude. PARTIAL if both interactions are positive
+    and significant but openness has the larger coefficient. REFUTED if the
+    openness interaction is negative and significant at p<0.10, or if the
+    industrial-policy interaction is positive and significantly larger.
+  test: panel_fe_convergence_interaction_trade_vs_industrial_policy
+  threshold: >
+    β3_trade_openness > 0 at p<=0.10  AND
+    |β3_trade_openness| > |β3_industrial_policy|  AND
+    σ-convergence (20yr window SD of log GDP pc) declines more in high-openness decades than in high-industrial-policy decades.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is broadly sympathetic to trade-led growth arguments but acknowledges
+  the Rodrik critique and the East Asian developmental-state counter-examples
+  (Taiwan, Korea). Prior is deliberately moderate (0.55) because the
+  convergence literature is mixed and because industrial-policy intensity is
+  poorly measured in cross-country data, creating attenuation bias that may
+  favour the null for the industrial-policy side. Framing risk: openness may
+  proxy for broader institutional quality, and the interaction may pick up
+  globalisation-era common shocks rather than a structural convergence
+  mechanism.
+
+steelman: hypotheses/steelman/trade_openness_long_run_income_convergence.md
+
+scope:
+  period: [1960, 2019]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [trade_openness, industrial_policy, convergence]
+
+linked_hypotheses:
+  - liberal_free_trade_partner_growth_panel_1990_2020
+  - infant_industry_protection_capability_effect
+
+notes: >
+  Data readiness:
+  - PWT rgdpo, hc (ready)
+  - WDI NE.TRD.GNFS.ZS, NE.GDI.TOTL.ZS, SP.POP.GROW (ready)
+  - WGI RL.EST (ready from 1996; pre-1996 backfill flagged)
+  - Industrial policy intensity composite (pending — Fraser EFW used as v1 proxy)
+  - UN Comtrade / World Bank WITS export diversity (ready)

@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: price_signal_distortion_capital_misallocation
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across a broad panel of developing and emerging-market economies
+  1980-2020, price controls and directed input subsidies predict
+  higher capital misallocation — measured by the dispersion of the
+  marginal product of capital across firms or sectors — and lower
+  long-run total-factor-productivity growth. The pre-registered
+  claim is that a one-standard-deviation increase in a composite
+  price-distortion index is associated with at least a 5%
+  increase in the standard deviation of log-MPK and at least a
+  0.2-percentage-point reduction in annual TFP growth, after
+  controlling for initial income, financial development, and
+  state-capacity proxies.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN, IND, IDN, BRA, MEX, ARG, COL, THA, MYS, PHL, VNM, EGY, TUR, ZAF, RUS, POL, CZE, HUN, CHL, PER, UKR, KAZ, MAR, NGA, KEN, BGD, PAK, LKA]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years in the immediate post-socialist transition window (1990-1994 for ex-communist countries) where price liberalisation is ongoing"
+    - "drop observations where firm-level MPK dispersion cannot be computed due to missing industrial census data"
+
+scope:
+  period: [1980, 2020]
+  countries: [ASIA_EM, LATAM, AFRICA, POST_SOVIET]
+  outcome_dim: [productivity, gdp_growth, regulation_compliance_cost]
+  policy_family: [regulation, industrial_policy, fiscal_policy]
+  treatment_tags: [price_controls, input_subsidies, capital_misallocation, directed_credit]
+
+variables:
+  outcome:
+    - name: capital_misallocation_sd_log_mpk
+      source: "constructed: std_dev_log_mpk_from_industrial_census"
+      transformation: "level"
+      notes: "Standard deviation of log marginal product of capital across firms or 2-digit sectors. Constructed from WB Enterprise Surveys, national industrial censuses, or OECD STAN where available."
+    - name: tfp_growth_10yr
+      source: "pwt:rtfpna"
+      transformation: "log_diff_10yr"
+    - name: sectoral_labour_productivity_dispersion
+      source: "constructed: cv_log_va_per_worker"
+      transformation: "level"
+      notes: "Coefficient of variation of value-added per worker across sectors as alternative misallocation proxy."
+  treatment:
+    - name: price_distortion_index
+      source: "constructed: 0.5×price_controls + 0.3×input_subsidies + 0.2×directed_credit_share"
+      transformation: "level"
+      notes: "Composite index. Price-control prevalence from Fraser EFW price controls sub-component; input subsidies from OECD agricultural support estimates and national energy-subsidy data; directed credit from IMF financial-repression indices."
+    - name: fraser_price_controls_subindex
+      source: "fraser_efw:price_controls"
+      transformation: "level"
+      notes: "Fraser EFW price-controls sub-index (0-10, lower = more controls)."
+    - name: fuel_subsidy_share_gdp
+      source: "world_bank_wdi:NY.GDP.MINR.RT.ZS"
+      transformation: "level"
+      notes: "Proxy for input-subsidy intensity; IMF fuel-subsidy database preferred when available."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: private_credit_share_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+      notes: "Financial development proxy."
+    - name: government_effectiveness
+      source: "wgi:GE.EST"
+      transformation: "level"
+      notes: "State-capacity proxy."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Price controls and directed input subsidies are direct regulatory
+  and fiscal interventions that distort relative prices. The
+  hypothesis tests whether these distortions predict capital
+  misallocation and productivity stagnation.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with 10-year forward-differenced TFP and contemporaneous
+    misallocation measures on lagged price-distortion index.
+    Robustness: cross-sectional long-difference using transition-
+    economy price-liberalisation episodes (China 1978-1992, Vietnam
+    Doi Moi, ex-USSR 1991-1995) as natural-experiment validation.
+    Alternative misallocation measure: Hsieh-Klenow dispersion.
+
+falsification:
+  rule: >
+    Not supported if (a) the panel-FE coefficient on price-distortion
+    index is not positive and significant at p<0.05 on MPK dispersion,
+    OR (b) the coefficient is not negative and significant at p<0.05
+    on TFP growth, OR (c) the implied effect of a one-SD increase in
+    price distortion on MPK dispersion is below 2.5%. A
+    developmentalist / infant-industry reading wins if price
+    controls are negatively associated with MPK dispersion
+    (suggesting that controls correct market failures and improve
+    allocation) or positively associated with TFP growth.
+  test: panel_fe_price_distortion_on_misallocation_and_tfp
+  threshold: >
+    panel_FE_beta(price_distortion → sd_log_mpk) > 0 at p<0.05
+    AND panel_FE_beta(price_distortion → tfp_growth_10yr) < 0 at p<0.05
+    AND implied_effect_per_1sd_price_distortion_on_mpk_dispersion >= 2.5%
+
+prior_confidence: 0.65
+
+disclosure: >
+  The price-distortion and misallocation literature (Hsieh-Klenow
+  2009, Restuccia-Rogerson 2017) strongly supports the claim for
+  developing countries. Author's prior 0.65 is moderately high but
+  not extreme because some price controls (e.g. agricultural
+  input subsidies in Green Revolution contexts) have documented
+  positive productivity effects. Bias risk: author may over-
+  generalise from the Hsieh-Klenow India/Mexico results and under-
+  weight successful targeted-subsidy episodes (e.g. Korean
+  directed credit in the 1970s-80s).
+
+steelman: hypotheses/steelman/price_signal_distortion_capital_misallocation.md
+
+linked_hypotheses:
+  - incumbent_subsidy_market_share_persistence
+  - bankruptcy_law_efficiency_capital_reallocation
+
+notes: >
+  MPK dispersion data is scarce and patchy. Primary source is WB
+  Enterprise Surveys (cross-sectional, not panel). Sectoral
+  productivity dispersion from UNIDO INDSTAT is a lower-quality
+  alternative. This is the main data dependency flagged for this
+  hypothesis.

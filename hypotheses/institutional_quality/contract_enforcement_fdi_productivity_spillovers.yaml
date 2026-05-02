@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: contract_enforcement_fdi_productivity_spillovers
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across emerging-market and developing economies 1990-2020,
+  stronger contract enforcement — measured by years to resolve a
+  commercial dispute, contract-enforcement index, and legal-origin
+  dummies — predicts whether foreign-direct-investment inflows
+  produce productivity spillovers to domestic firms rather than
+  enclave effects. The pre-registered claim is that the
+  correlation between FDI inflows and subsequent domestic-firm TFP
+  growth is positive and significant at p<0.05 only in countries
+  with above-median contract enforcement, and is insignificant or
+  negative in countries with below-median enforcement.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN, IND, IDN, BRA, MEX, ARG, COL, THA, MYS, PHL, VNM, EGY, TUR, ZAF, RUS, POL, CZE, HUN, CHL, PER, UKR, KAZ, MAR, NGA, KEN, BGD, PAK, LKA, ROU, BGR, HRV, SRB, EST, LVA, LTU, SVN, SVK]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with FDI inflows exceeding 25% of GDP (tax-haven or financial-flow-through)"
+    - "drop observations with missing Doing Business contract-enforcement data and no backfill"
+
+scope:
+  period: [1990, 2020]
+  countries: [ASIA_EM, LATAM, AFRICA, POST_SOVIET]
+  outcome_dim: [productivity, capital_flows, institutional_quality]
+  policy_family: [institutional_reform, trade_policy]
+  treatment_tags: [contract_enforcement, fdi_spillovers, legal_origins, enclave_effect]
+
+variables:
+  outcome:
+    - name: domestic_firm_tfp_growth
+      source: "constructed: tfp_growth_domestic_firms_from_enterprise_surveys"
+      transformation: "level"
+      notes: "TFP growth of domestic firms (excluding foreign-owned) from WB Enterprise Surveys or national industrial census microdata."
+    - name: aggregate_tfp_growth
+      source: "pwt:rtfpna"
+      transformation: "log_diff_5yr"
+    - name: fdi_spillover_proxy
+      source: "constructed: correlation_fdi_inflows_and_domestic_productivity_growth"
+      transformation: "rolling_5yr_correlation"
+      notes: "5-year rolling correlation between FDI/GDP and domestic-firm productivity growth as spillover proxy."
+  treatment:
+    - name: contract_enforcement_index
+      source: "world_bank_wdi:IC.LGL.DURS"
+      transformation: "composite"
+      notes: "Composite: inverse of years to resolve commercial dispute (Doing Business) plus contract-enforcement quality index. Higher = better enforcement."
+    - name: years_to_enforce_contract
+      source: "world_bank_wdi:IC.LGL.DURS"
+      transformation: "level"
+    - name: legal_origin_common_law
+      source: "constructed: la_porta_legal_origin_dummy"
+      transformation: "indicator"
+      notes: "La Porta et al. legal-origin dummy; common-law origin as institutional proxy for contract enforcement."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: financial_development
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+    - name: infrastructure_quality
+      source: "wgi:GE.EST"
+      transformation: "level"
+      notes: "WGI government effectiveness as proxy for broader state capacity."
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Contract enforcement is a legal-institutional feature. FDI
+  spillovers depend on the institutional environment that governs
+  supplier relationships, technology licensing, and labour
+  mobility.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with interaction: FDI inflows × contract enforcement.
+    Primary test: sign and significance of interaction on domestic-
+    firm TFP growth. Sub-sample analysis: above-median vs below-
+    median contract enforcement. Robustness: use legal-origin
+    dummies instead of Doing Business enforcement measure; IV
+    using colonial-legal-origin as instrument for contract
+    enforcement.
+
+falsification:
+  rule: >
+    Not supported if (a) the interaction coefficient is not
+    positive and significant at p<0.05, OR (b) the marginal effect
+    of FDI on domestic TFP is positive and significant even in
+    below-median contract-enforcement countries (no threshold), OR
+    (c) the result is driven entirely by common-law countries
+    (legal-origin confound rather than enforcement per se). An
+    "FDI always helps" reading wins if (b) holds; a "institutions
+    don't matter for FDI" reading wins if the interaction is
+    insignificant and FDI main effect dominates.
+  test: panel_fe_fdi_contract_enforcement_interaction_on_domestic_tfp
+  threshold: >
+    panel_FE_beta(FDI × contract_enforcement) > 0 at p<0.05
+    AND marginal_effect_FDI_at_below_median_enforcement NOT > 0 at p<0.10
+    AND result robust to excluding_common_law_countries at p<0.10
+
+prior_confidence: 0.60
+
+disclosure: >
+  The FDI-spillover literature (Blomström-Kokko 1998, Javorcik
+  2004, Harrison-Rodríguez-Clare 2011) finds mixed results:
+  spillovers are positive in some countries and sectors, zero or
+  negative in others. The institutional-conditioning hypothesis
+  (better institutions → positive spillovers) is plausible but not
+  definitively established. Author's priors lean toward the
+  institutional-complementarity view. Prior 0.60 reflects
+  moderate confidence. Bias risk: author may over-weight the
+  legal-origin literature (La Porta et al.) and under-weight the
+  "enclave FDI in extractive sectors is insensitive to contract
+  enforcement" critique.
+
+steelman: hypotheses/steelman/contract_enforcement_fdi_productivity_spillovers.md
+
+linked_hypotheses:
+  - property_rights_long_run_income_frontier
+  - classical_property_rights_security_fdi_premium_panel
+
+notes: >
+  Domestic-firm TFP from WB Enterprise Surveys is cross-sectional
+  with limited panel dimension. Aggregate TFP from PWT is a lower-
+  quality substitute. Doing Business contract-enforcement data
+  starts in 2003; earlier years rely on backfilled legal-origin
+  proxies.

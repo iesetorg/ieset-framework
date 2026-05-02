@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: corruption_state_allocation_growth_interaction
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across a broad panel of economies 1980-2020, state allocation of
+  resources — measured by government consumption share, state-
+  enterprise share of output, and public-investment share — has
+  negative long-run effects on total-factor-productivity growth
+  when corruption is high (WGI Control of Corruption below
+  median), but neutral or positive effects when corruption is low
+  (above median). The pre-registered claim is that the
+  interaction term between state-allocation intensity and
+  corruption is negative and significant at p<0.05, and that the
+  marginal effect of state allocation is negative and significant
+  in the high-corruption sub-sample but not significantly
+  negative in the low-corruption sub-sample.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA, ROU, BGR, HRV, SRB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with missing WGI control-of-corruption (no interpolation beyond 3 years)"
+    - "drop observations where state-enterprise data is unavailable and government consumption is the sole proxy"
+
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, gdp_growth, institutional_quality]
+  policy_family: [fiscal_policy, institutional_reform, privatisation_nationalisation]
+  treatment_tags: [corruption, state_allocation, public_investment, soe_share]
+
+variables:
+  outcome:
+    - name: tfp_growth_10yr
+      source: "pwt:rtfpna"
+      transformation: "log_diff_10yr"
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+    - name: investment_efficiency
+      source: "constructed: gdp_growth_per_unit_of_investment"
+      transformation: "level"
+      notes: "Incremental capital-output ratio (ICOR) inverse: GDP growth divided by gross fixed capital formation % GDP."
+  treatment:
+    - name: state_allocation_intensity
+      source: "constructed: 0.4×gov_consumption_gdp + 0.3×soe_output_share + 0.3×public_investment_gdp"
+      transformation: "level"
+      notes: "Composite state-allocation intensity. SOE output share from OECD and national sources; government consumption and public investment from WDI and IMF WEO."
+    - name: government_consumption_share
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "level"
+    - name: control_of_corruption
+      source: "wgi:CC.EST"
+      transformation: "level"
+      notes: "WGI Control of Corruption estimate, standardised -2.5 to +2.5. Higher = less corruption."
+    - name: high_corruption_dummy
+      source: "constructed: indicator = 1 if wgi:CC.EST < median"
+      transformation: "indicator"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: financial_development
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  State allocation is a fiscal intervention; corruption is an
+  institutional feature. The interaction tests whether the
+  effectiveness of fiscal allocation depends on institutional
+  quality.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with interaction: state_allocation × corruption.
+    Primary test: sign and significance of interaction. Sub-
+    sample analysis: high-corruption vs low-corruption countries.
+    Robustness: use Fraser EFW government-size instead of
+    constructed state-allocation index; use V-Dem corruption
+    index instead of WGI; exclude oil exporters (where state
+    allocation is rent-driven, not policy-driven).
+
+falsification:
+  rule: >
+    Not supported if (a) the interaction coefficient is not
+    negative and significant at p<0.05, OR (b) the marginal effect
+    of state allocation is negative and significant even in the
+    low-corruption sub-sample (no conditioning), OR (c) the
+    marginal effect is positive and significant in the high-
+    corruption sub-sample (reverse of predicted). A "state
+    allocation is always bad" reading wins if (b) holds; a
+    "corruption doesn't matter" reading wins if the interaction
+    is insignificant and the main effect of state allocation
+    dominates.
+  test: panel_fe_state_allocation_corruption_interaction_on_tfp
+  threshold: >
+    panel_FE_beta(state_allocation × corruption) < 0 at p<0.05
+    AND marginal_effect_state_allocation_at_high_corruption < 0 at p<0.05
+    AND marginal_effect_state_allocation_at_low_corruption NOT < 0 at p<0.10
+
+prior_confidence: 0.60
+
+disclosure: >
+  The state-allocation literature is deeply polarised: public-
+  choice / market-liberal critics (Buchanan, Tullock, De Soto)
+  argue state allocation is inefficient regardless of corruption,
+  while developmentalists (Amsden, Wade, Mazzucato) argue it can
+  be highly effective when state capacity is strong. The
+  interaction hypothesis is a middle-ground position. Author's
+  priors lean toward the institutional-conditioning view. Prior
+  0.60 reflects moderate confidence. Bias risk: author may over-
+  weight the "good governance enables good industrial policy"
+  narrative and under-weight cases where corrupt state allocation
+  accidentally produced growth (e.g. Suharto's Indonesia, where
+  patronage networks coincided with rapid industrialisation).
+
+steelman: hypotheses/steelman/corruption_state_allocation_growth_interaction.md
+
+linked_hypotheses:
+  - property_rights_long_run_income_frontier
+  - rule_of_law_market_reform_complementarity
+
+notes: >
+  SOE output-share data is patchy outside OECD and major emerging
+  markets. Government consumption and public investment from WDI
+  are more complete but conflate allocation with other functions.
+  The composite index is flagged as a measurement limitation.

@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: developmental_state_to_market_transition_success
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  The strongest long-run economic performers among countries that achieved middle-income
+  status are those that used developmentalist tools (state-directed credit, sectoral
+  targeting, export subsidies, infrastructure investment) for catch-up growth, then
+  transitioned toward market competition, fiscal discipline, and rule-bound institutions
+  before reaching frontier convergence. Countries that maintained state-direction into
+  the high-income frontier stall in productivity growth and TFP convergence. The claim
+  applies to a panel of catch-up economies 1960-2020.
+evidence_type: associational
+sample:
+  countries:
+  - KOR
+  - TWN
+  - JPN
+  - SGP
+  - CHN
+  - VNM
+  - MYS
+  - IDN
+  - THA
+  - CHL
+  - MEX
+  - BRA
+  - COL
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - EST
+  - LVA
+  - LTU
+  - ROU
+  - BGR
+  - HRV
+  - TUR
+  - ZAF
+  - IND
+  period:
+  - 1960
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude countries that never reached lower-middle-income status
+  - exclude oil-exporting dominant economies where resource rents, not developmentalism, drove catch-up
+  - require at least 20 years of post-transition data for transition episodes
+scope:
+  period:
+  - 1960
+  - 2020
+  countries:
+  - KOR
+  - TWN
+  - JPN
+  - SGP
+  - CHN
+  - VNM
+  - MYS
+  - IDN
+  - THA
+  - CHL
+  - MEX
+  - BRA
+  - COL
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - EST
+  - LVA
+  - LTU
+  - ROU
+  - BGR
+  - HRV
+  - TUR
+  - ZAF
+  - IND
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - institutional_quality
+  - industrial_capability
+  policy_family:
+  - industrial_policy
+  - institutional_reform
+  treatment_tags:
+  - korea_developmental_state_transition
+  - taiwan_transition_to_democracy_and_markets
+  - chile_pinochet_to_concertacion_transition
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+  - name: gdp_per_capita_convergence_gap
+    source: pwt:rgdpe
+    transformation: constructed_gap_to_usa
+    notes: Log-gap to US real GDP per capita as convergence measure.
+  - name: manufacturing_tfp_growth
+    source: oecd_stan:manufacturing_tfp
+    transformation: log_diff_5y
+  treatment:
+  - name: developmental_state_phase
+    source: constructed:state_directed_credit_plus_sectoral_targeting_indicator
+    transformation: indicator
+    notes: Indicator for years with active developmental-state policies.
+  - name: market_transition_phase
+    source: constructed:efw_improvement_plus_fiscal_discipline_indicator
+    transformation: indicator
+    notes: Indicator for years after credible transition to market competition and fiscal rules.
+  - name: frontier_proximity
+    source: pwt:rgdpe
+    transformation: ratio_to_usa
+    notes: Ratio of real GDP per capita to US level.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: institutional_quality
+    source: wgi:GE.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if countries that maintained developmental-state policies
+    into the high-income phase show TFP growth indistinguishable from or superior to
+    transitioners in a panel with country and year fixed effects, or if the transition
+    indicator is negatively and significantly associated with TFP growth.
+  test: panel_fe_developmental_state_transition_1960_2020
+  threshold:
+    supported: market_transition coefficient > 0 at p < 0.10 for high-income subsample (GDPpc >50% US)
+    refuted: developmental_state coefficient > market_transition coefficient at p < 0.10 in high-income subsample
+prior_confidence: 0.60
+disclosure: >-
+  Author priors accept the sequence hypothesis (developmentalism then markets) but
+  acknowledge that successful transitioners may have had pre-existing institutional
+  advantages that enabled both phases. The test cannot fully separate sequence effects
+  from fixed-country characteristics.
+steelman: hypotheses/steelman/developmental_state_to_market_transition_success.md

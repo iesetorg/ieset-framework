@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: capital_account_openness_institutional_threshold
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Capital account openness supports long-run real GDP per capita growth only
+  above institutional-quality thresholds; below them it raises the frequency
+  and severity of financial crises without delivering offsetting growth gains,
+  in a broad-country panel 1970-2020. The directional claim is that the
+  marginal effect of capital-account liberalisation on long-run prosperity is
+  positive and significant only when rule-of-law and government-effectiveness
+  scores exceed median levels, and is negative or insignificant below those
+  thresholds.
+
+evidence_type: causal
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop observations during sovereign default episodes (Reinhart-Rogoff)"
+    - "drop city-states and microstates (population < 500,000)"
+    - "drop country-years with missing capital-account data for more than 3 consecutive years"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+    - name: crisis_indicator
+      source: "constructed: banking crisis + currency crisis + sovereign debt crisis (Laeven-Valencia + Reinhart-Rogoff)"
+      transformation: indicator
+      notes: "Composite crisis indicator. Any year with at least one active crisis = 1."
+  treatment:
+    - name: capital_account_openness_index
+      source: "chinn_ito:kaopen"
+      transformation: level
+      notes: "Chinn-Ito capital account openness index (KAOPEN). Higher = more open."
+    - name: institutional_quality_index
+      source: "wgi:composite_rl_ge"
+      transformation: level
+      notes: "Average of WGI Rule of Law and Government Effectiveness. Threshold variable."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+      notes: "Controls for macroeconomic instability that may co-drive capital controls and growth."
+    - name: financial_depth
+      source: "world_bank_wdi:GFDD.DI.14"
+      transformation: level
+      notes: "Private credit to GDP ratio. Controls for financial development."
+    - name: commodity_export_share
+      source: "world_bank_wdi:TX.VAL.MRCH.HI.ZS"
+      transformation: inverted_share
+      notes: "Share of manufactured exports in merchandise exports, inverted to proxy commodity dependence."
+  decomposition_channels:
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+      notes: "Channel: long-term FDI inflows (stable) vs portfolio / debt flows (volatile)."
+    - name: portfolio_inflows_pct_gdp
+      source: "imf_bop:portfolio_inflows"
+      transformation: level
+      notes: "Channel: portfolio and short-term debt inflows (crisis-prone)."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Capital account openness is a regulatory (trade/financial-policy)
+  intervention that governs cross-border capital flows. Institutional quality
+  is an institutional channel that conditions the regulatory effect.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with explicit interaction: growth = β0 + β1*KAOPEN +
+    β2*institutional_quality + β3*(KAOPEN × institutional_quality) + controls
+    + FE. Subsample analysis: split sample at median institutional quality
+    and estimate separate KAOPEN coefficients. Secondary: local projections
+    tracing dynamic response of growth and crisis probability to capital-
+    account liberalisation shocks, interacted with institutional quality.
+    Crisis outcome estimated via linear probability model with country and
+    year FE.
+
+falsification:
+  rule: >
+    SUPPORTED if β3 (KAOPEN × institutional_quality) is positive and
+    significant at p<0.10, AND the KAOPEN coefficient in the below-median
+    institutional-quality subsample is negative or insignificant while the
+    above-median subsample coefficient is positive and significant. PARTIAL
+    if β3 is positive and significant but the below-median coefficient is
+    also positive (institutions matter but openness helps everywhere).
+    REFUTED if β3 is negative and significant, or if KAOPEN is insignificant
+    in both subsamples. INFORMATIVE: the crisis-probability model should show
+    KAOPEN raising crisis risk in the below-median subsample.
+  test: panel_fe_capital_account_institutions_interaction_growth_and_crisis
+  threshold: >
+    β_interaction > 0 at p<=0.10  AND
+    β_kaopen_below_median <= 0 or p>=0.10  AND
+    β_kaopen_above_median > 0 at p<=0.10  AND
+    crisis_probability_kaopen_below_median > 0 at p<=0.10.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author is moderately confident (0.65) in the institutions-threshold story.
+  The Kose-Prasad-Terrones-Tong (2009) finding that financial openness has
+  no growth effect on average but raises TFP growth in developed economies
+  is the empirical anchor. However, endogeneity is severe: countries
+  liberalise capital accounts when they are already growing or when they
+  have IMF pressure. The Chinn-Ito index is also coarse and slow-moving.
+  Framing risk: the hypothesis could be read as endorsing capital controls
+  for developing countries; the spec is agnostic on the normative question
+  and tests only the conditional empirical association.
+
+steelman: hypotheses/steelman/capital_account_openness_institutional_threshold.md
+
+scope:
+  period: [1970, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, financial_crisis, institutional_quality]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [capital_account_liberalisation, institutional_quality, financial_crisis]
+
+linked_hypotheses:
+  - fiscal_dominance_japan_debt_non_crisis
+  - gfc_balance_sheet_recession_post_2008_household_dual_mandate
+
+notes: >
+  Data readiness:
+  - Chinn-Ito KAOPEN (ready, public data)
+  - WGI RL.EST, GE.EST (ready from 1996)
+  - WDI GDP pc, trade openness, inflation, private credit (ready)
+  - Laeven-Valencia banking crisis, Reinhart-Rogoff sovereign default (ready)
+  - IMF BOP portfolio flows (ready)

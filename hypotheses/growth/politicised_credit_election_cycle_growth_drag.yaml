@@ -1,0 +1,180 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: politicised_credit_election_cycle_growth_drag
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Politicised development-bank lending that increases around election cycles
+  predicts weaker subsequent total-factor-productivity growth and higher
+  non-performing loan ratios in a broad panel of emerging and developing economies
+  during 1990-2020.
+evidence_type: causal
+sample:
+  countries:
+    - ARG
+    - BRA
+    - CHL
+    - MEX
+    - URY
+    - COL
+    - PER
+    - VEN
+    - ECU
+    - BOL
+    - PRY
+    - CRI
+    - DOM
+    - GTM
+    - HND
+    - SLV
+    - NIC
+    - PAN
+    - JAM
+    - TTO
+    - IND
+    - IDN
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - KHM
+    - LAO
+    - MMR
+    - CHN
+    - KOR
+    - TWN
+    - PAK
+    - LKA
+    - NPL
+    - MNG
+    - ZAF
+    - NGA
+    - EGY
+    - ETH
+    - KEN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - ZMB
+    - MAR
+    - TUN
+    - DZA
+    - LBY
+    - SDN
+    - AGO
+    - COD
+    - GAB
+    - CMR
+    - CIV
+    - SEN
+    - MLI
+    - BFA
+    - NER
+    - TCD
+    - TUR
+    - IRN
+    - IRQ
+    - JOR
+    - LBN
+    - SYR
+    - YEM
+    - SAU
+    - ARE
+    - KWT
+    - QAT
+    - BHR
+    - OMN
+    - RUS
+    - UKR
+    - BLR
+    - KAZ
+    - UZB
+    - KGZ
+    - TJK
+    - TKM
+    - AZE
+    - ARM
+    - GEO
+    - MDA
+    - LTU
+    - LVA
+    - EST
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude years with non-competitive elections (Polity2 < 5)
+    - Exclude banking-crisis years as exogenous NPL shocks
+scope:
+  period: [1990, 2020]
+  countries:
+    - LATAM
+    - ASIA_EM
+    - AFRICA
+    - MENA
+    - POST_SOVIET
+  outcome_dim: [productivity, institutional_quality, gdp_growth]
+  policy_family: [industrial_policy, fiscal_policy]
+  treatment_tags: [politicised_credit, election_cycle_lending, development_banks]
+variables:
+  outcome:
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+    - name: nonperforming_loan_ratio
+      source: world_bank_wdi:GFDD.DM.04
+      transformation: level_pct
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: annual_pct
+  treatment:
+    - name: election_cycle_credit_surge
+      source: constructed:dev_bank_lending_in_election_year_minus_off_year
+      transformation: level_pct_gdp
+      notes: Deviation of development-bank lending in election years from trend.
+    - name: election_year_dummy
+      source: constructed:binary
+      transformation: binary
+  controls:
+    - name: private_credit_growth
+      source: world_bank_wdi:GFDD.DM.02
+      transformation: annual_pct
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: commodity_price_index
+      source: constructed:terms_of_trade_index
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Politicised credit operates through fiscal/financial channel by substituting
+  politically motivated lending for market-based credit allocation.
+estimator:
+  template: event_study
+  clustering: country
+  notes: >
+    Event-study around election years with development-bank lending surges.
+    Panel FE with election-year interaction as robustness.
+falsification:
+  rule: >
+    Falsified if election-year development-bank lending surges do not show a
+    statistically significant negative association with subsequent TFP growth
+    and a positive association with NPL ratios after controlling for private
+    credit growth and institutional quality.
+  test: event_study_election_credit_on_tfp_and_npls
+  threshold:
+    tfp_coefficient: negative_p_lt_0.10
+    npl_coefficient: positive_p_lt_0.10
+    lag_years: 1_to_3
+prior_confidence: 0.65
+disclosure: >
+  Author holds priors that political interference in development banking reduces
+  allocative efficiency, informed by BNDES, CDB, and Indian state-bank literature.
+steelman: hypotheses/steelman/politicised_credit_election_cycle_growth_drag.md
+linked_hypotheses:
+  - state_credit_allocation_zombie_firm_persistence
+  - industrial_policy_corruption_interaction
+notes: >
+  Development-bank lending data from national sources, OECD DBS, or World Bank
+  FinDev gateway. Election dates from NELDA, V-Dem, or national electoral commissions.

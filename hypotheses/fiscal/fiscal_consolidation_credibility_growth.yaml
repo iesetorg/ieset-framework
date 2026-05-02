@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fiscal_consolidation_credibility_growth
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Credible fiscal consolidation episodes — defined as sustained primary
+  balance improvement of at least 2% of GDP over 3 years, not reversed
+  within 5 years, and accompanied by declining debt-to-GDP trajectories —
+  predict stronger subsequent 10-year real GDP per capita growth and
+  private investment than repeated discretionary fiscal stimulus in mature
+  economies, in an OECD panel 1980-2020. The directional claim is that
+  credible consolidators experience cumulative growth 5-15% above matched
+  non-consolidating peers over the post-consolidation decade, while
+  stimulus-reliant economies show no significant gain or a relative loss.
+
+evidence_type: causal
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISR, ITA, JPN, KOR, LTU, LVA, LUX, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA, GBR]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop consolidation episodes that coincide with IMF programs or banking crises within 2 years (crisis-driven consolidation)"
+    - "drop observations during war or civil conflict"
+    - "drop country-years with missing primary balance data for more than 2 consecutive years"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+    - name: private_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+      notes: "Gross fixed capital formation; public component subtracted where available."
+    - name: long_term_interest_rate
+      source: "imf_weo:long_term_interest_rate"
+      transformation: level
+      notes: "Tertiary outcome: do consolidations reduce sovereign risk premia?"
+  treatment:
+    - name: credible_consolidation_indicator
+      source: "constructed: indicator = 1 during and 10 years after credible consolidation episode"
+      transformation: indicator
+      notes: "Credible consolidation defined as primary balance improvement >=2pp GDP over 3 years, not reversed within 5 years, with debt/GDP declining. Episodes identified from IMF FAD, OECD Economic Outlook, and Alesina-Ardagna historical dataset."
+    - name: repeated_stimulus_indicator
+      source: "constructed: indicator = 1 for countries with >3 discretionary fiscal expansions (>1.5pp cyclically-adjusted primary balance deterioration) in 15-year window"
+      transformation: indicator
+      notes: "Stimulus-reliant economies identified from cyclically-adjusted primary balance series."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: initial_debt_to_gdp
+      source: "imf_weo:GGXWDG_NGDP"
+      transformation: pre_episode_level
+    - name: unemployment_rate
+      source: "ilo:unemployment_rate"
+      transformation: pre_episode_mean
+      notes: "Controls for initial cyclical position."
+  decomposition_channels:
+    - name: sovereign_bond_yield_spread
+      source: "constructed: 10yr government bond yield minus German bund (EU) or US Treasury (non-EU)"
+      transformation: level
+      notes: "Channel: credibility reduces risk premia."
+    - name: business_confidence_index
+      source: "oecd_bci:business_confidence"
+      transformation: level
+      notes: "Channel: credible consolidation raises business confidence. Pending OECD BCI fetcher."
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Fiscal consolidation and discretionary stimulus are both fiscal-channel
+  interventions. The test compares two fiscal-policy strategies for mature
+  economies.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Primary: synthetic control for each credible consolidation episode,
+    matching on pre-consolidation GDP per capita, debt, investment,
+    institutional quality, and unemployment over a 10-year donor window.
+    Donor pool: mature OECD economies that did not consolidate in the same
+    period. Secondary: Callaway-Sant'Anna staggered DiD with never-treated
+    and not-yet-treated controls. Tertiary: local projections tracing
+    dynamic response to consolidation initiation.
+
+falsification:
+  rule: >
+    SUPPORTED if the average synthetic-control gap for real GDP per capita
+    growth is positive and significant (permutation p<0.10) over the 10-year
+    post-consolidation window, AND the private-investment gap is also
+    positive and significant. PARTIAL if growth gap is positive but
+    investment gap is not (consumption-driven expansion). REFUTED if the
+    growth gap is negative and significant at p<0.10. INFORMATIVE:
+    excluding the 2010-2015 European austerity episodes should not
+    eliminate the result; if it does, the finding is a post-GFC Eurozone
+    story rather than a general consolidation effect.
+  test: synthetic_control_credible_consolidation_vs_stimulus_growth_10yr
+  threshold: >
+    Synthetic-control ATT (GDP pc growth, 10yr) > 0 at permutation p<=0.10  AND
+    Synthetic-control ATT (private investment, 10yr) > 0 at permutation p<=0.10  AND
+    Ex-Eurozone-austerity robustness retains sign of both ATTs.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The expansionary-austerity
+  literature (Alesina-Ardagna) is highly contested (IMF 2010 critique,
+  Guajardo et al. 2014 narrative approach). Prior is not higher because
+  consolidation episodes are endogenous (governments consolidate when
+  markets force them to), and because the 2010-2015 Eurozone experience
+  is a prominent counter-example where consolidation was followed by
+  stagnation. Framing risk: the hypothesis may be read as endorsing
+  austerity over stimulus; the spec tests only the credible-consolidation
+  vs stimulus-reliance comparison and does not claim that all austerity
+  is expansionary.
+
+steelman: hypotheses/steelman/fiscal_consolidation_credibility_growth.md
+
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, fiscal_policy, productivity]
+  policy_family: [fiscal_policy]
+  treatment_tags: [fiscal_consolidation, austerity, fiscal_stimulus, credibility]
+
+linked_hypotheses:
+  - debt_overhang_private_investment_30yr
+  - eurozone_austerity_distributional_incidence
+  - fiscal_multipliers_zlb_higher_than_normal_regime
+
+notes: >
+  Data readiness:
+  - IMF FAD / OECD Economic Outlook primary balance (ready)
+  - Alesina-Ardagna consolidation dataset (ready)
+  - WDI GDP pc, private investment (ready)
+  - IMF WEO debt, long-term interest rate (ready)
+  - WGI RL.EST (ready)
+  - ILO unemployment (ready)
+  - Sovereign bond yields (ready)
+  - OECD BCI business confidence (pending)

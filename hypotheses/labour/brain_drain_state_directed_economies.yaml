@@ -1,0 +1,151 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: brain_drain_state_directed_economies
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Skilled emigration rates (tertiary-educated migrants as a share of the tertiary-educated
+  domestic population) are higher from countries with weaker market opportunity (lower EFW
+  business freedom, higher entry barriers, weaker property rights) than from peers at similar
+  income levels with stronger market institutions, even when public investment in education
+  and research is high. The claim applies to middle-income and emerging economies 1990-2020.
+evidence_type: associational
+sample:
+  countries:
+  - ZAF
+  - BRA
+  - ARG
+  - URY
+  - COL
+  - PER
+  - CHL
+  - MEX
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  - VNM
+  - RUS
+  - UKR
+  - BLR
+  - KAZ
+  - AZE
+  - ARM
+  - GEO
+  - MDV
+  - TUN
+  - EGY
+  - MAR
+  - DZA
+  - JOR
+  - LBN
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude countries with active civil conflict (UCDP >1000 battle deaths)
+  - exclude micro-states with tertiary-educated population <50,000
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - ZAF
+  - BRA
+  - ARG
+  - URY
+  - COL
+  - PER
+  - CHL
+  - MEX
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  - VNM
+  - RUS
+  - UKR
+  - BLR
+  - KAZ
+  - AZE
+  - ARM
+  - GEO
+  - MDV
+  - TUN
+  - EGY
+  - MAR
+  - DZA
+  - JOR
+  - LBN
+  outcome_dim:
+  - demographics_migration
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - labour_market
+  treatment_tags: []
+variables:
+  outcome:
+  - name: skilled_emigration_rate
+    source: constructed:docquiermarfouk_skilled_emigration; world_bank_wdi:SM.EMI.TERT.ZS
+    transformation: level
+    notes: Tertiary-educated emigrants / tertiary-educated resident population.
+  treatment:
+  - name: business_freedom_index
+    source: fraser_efw:5a_business_regulations
+    transformation: level
+    notes: Fraser EFW business-regulations area score; higher = freer.
+  - name: entry_barrier_index
+    source: oecd_pmr:barriers_to_entry
+    transformation: level
+    notes: OECD PMR barriers to entry where available; otherwise constructed from Doing Business data.
+  - name: property_rights_protection
+    source: heritage_efw:property_rights
+    transformation: level
+    notes: Heritage Foundation property-rights score.
+  controls:
+  - name: log_gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: public_education_spending_gdp
+    source: world_bank_wdi:SE.XPD.TOTL.GD.ZS
+    transformation: level
+  - name: research_spending_gdp
+    source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
+    transformation: level
+  - name: common_language_index
+    source: constructed:melitz_language_proximity
+    transformation: level
+  - name: conflict_proximity
+    source: ucdp:ged
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if the coefficient on market-opportunity proxies (business
+    freedom, entry barriers, property rights) is positive and significant (p < 0.10) for
+    skilled emigration — i.e., more market freedom predicts more brain drain — after
+    controlling for income and public R&D spending.
+  test: panel_fe_skilled_emigration_market_opportunity_1990_2020
+  threshold:
+    supported: business_freedom coefficient < 0 at p < 0.10 and |coefficient| > 0.5 percentage points per 1-point index change
+    refuted: business_freedom coefficient > 0 at p < 0.10
+prior_confidence: 0.60
+disclosure: >-
+  Author priors expect market opportunity to retain skilled workers but acknowledge that
+  high public R&D spending in state-directed economies (e.g., China, Russia) may create
+  domestic opportunities that offset weak business freedom. The test may under-weight
+  non-monetary motivations (patriotism, family ties) that also affect emigration.
+steelman: hypotheses/steelman/brain_drain_state_directed_economies.md

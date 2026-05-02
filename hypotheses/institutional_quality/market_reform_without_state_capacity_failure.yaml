@@ -1,0 +1,164 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_reform_without_state_capacity_failure
+version: 1
+status: candidate
+topic: institutional_quality
+claim: >-
+  Market-oriented reforms (trade liberalisation, privatisation, price decontrol) implemented
+  in countries with weak state capacity (low WGI government effectiveness, low tax revenue
+  as % of GDP, weak contract enforcement) fail to produce sustained long-run prosperity
+  compared to similar reforms in high-capacity settings. The claim is a boundary test:
+  it protects against naive laissez-faire claims by requiring minimum state capacity as a
+  precondition for market-reform success, over 1980-2020.
+evidence_type: associational
+sample:
+  countries:
+  - BRA
+  - MEX
+  - ARG
+  - CHL
+  - PER
+  - COL
+  - VEN
+  - BOL
+  - ECU
+  - RUS
+  - UKR
+  - BLR
+  - KAZ
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - ROU
+  - BGR
+  - ALB
+  - ZAF
+  - NGA
+  - KEN
+  - TZA
+  - GHA
+  - ETH
+  - IDN
+  - PHL
+  - VNM
+  - IND
+  - CHN
+  - THA
+  - MYS
+  - TUR
+  - EGY
+  - MAR
+  - DZA
+  - TUN
+  period:
+  - 1980
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude episodes coinciding with major armed conflict (UCDP >1000 battle deaths)
+  - exclude micro-states with population <2 million
+  - require at least 10 years of post-reform data for inclusion
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - BRA
+  - MEX
+  - ARG
+  - CHL
+  - PER
+  - COL
+  - VEN
+  - BOL
+  - ECU
+  - RUS
+  - UKR
+  - BLR
+  - KAZ
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - ROU
+  - BGR
+  - ALB
+  - ZAF
+  - NGA
+  - KEN
+  - TZA
+  - GHA
+  - ETH
+  - IDN
+  - PHL
+  - VNM
+  - IND
+  - CHN
+  - THA
+  - MYS
+  - TUR
+  - EGY
+  - MAR
+  - DZA
+  - TUN
+  outcome_dim:
+  - gdp_growth
+  - institutional_quality
+  - poverty_inequality
+  policy_family:
+  - institutional_reform
+  - trade_policy
+  treatment_tags: []
+variables:
+  outcome:
+  - name: real_gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+  treatment:
+  - name: market_reform_episode
+    source: constructed:wacziarg_welch_trade_liberalisation; fraser_efw:summary_index
+    transformation: indicator
+    notes: Trade liberalisation or major EFW improvement episode.
+  - name: state_capacity_index
+    source: constructed:wgi_gov_effectiveness_plus_tax_revenue
+    transformation: level
+    notes: Composite of WGI government effectiveness and tax revenue % GDP.
+  controls:
+  - name: log_gdp_per_capita_initial
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: political_stability
+    source: wgi:PV.EST
+    transformation: level
+  - name: natural_resource_rents
+    source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if market reforms in low-capacity countries show positive
+    and significant (p < 0.10) coefficients on GDP or TFP growth that are indistinguishable
+    from reforms in high-capacity countries in an interaction specification. The claim
+    requires a significant positive interaction between reform and state capacity.
+  test: panel_fe_market_reform_state_capacity_interaction_1980_2020
+  threshold:
+    supported: reform_x_state_capacity interaction > 0 at p < 0.10
+    refuted: reform coefficient positive and significant with no interaction effect
+prior_confidence: 0.70
+disclosure: >-
+  Author priors accept that state capacity is a complement to market reform, but acknowledge
+  that some low-capacity reformers (e.g., Vietnam, Rwanda) have shown strong growth. The
+  test may under-weight gradual reform paths that build capacity and markets simultaneously.
+steelman: hypotheses/steelman/market_reform_without_state_capacity_failure.md

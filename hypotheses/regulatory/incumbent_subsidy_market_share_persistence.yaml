@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: incumbent_subsidy_market_share_persistence
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across OECD and emerging-market economies 1995-2020, subsidies to
+  incumbent firms — measured by state aid, bailouts, and directed
+  credit guarantees as a share of GDP — predict persistent market
+  concentration (rising top-4 firm revenue share) and weaker
+  subsequent total-factor-productivity growth. The pre-registered
+  claim is that a one-percentage-point increase in incumbent-subsidy
+  share of GDP is associated with at least a 0.5-percentage-point
+  increase in top-4 concentration over the subsequent decade and at
+  least a 0.15-percentage-point reduction in annual TFP growth,
+  after controlling for initial concentration, sectoral composition,
+  and country fixed effects.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN]
+  period: [1995, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with systemic banking crises where subsidies are crisis-response rather than industrial policy (Laeven-Valencia coding)"
+    - "drop country-years where state-aid data is not disaggregated between incumbents and new entrants"
+
+scope:
+  period: [1995, 2020]
+  countries: [OECD, ASIA_EM, LATAM]
+  outcome_dim: [competition_concentration, productivity, gdp_growth]
+  policy_family: [industrial_policy, competition_policy, regulation]
+  treatment_tags: [state_aid, incumbent_subsidy, bailouts, market_concentration]
+
+variables:
+  outcome:
+    - name: top_4_concentration_change_10yr
+      source: "oecd_stan:concentration_ratio_top4"
+      transformation: "level_diff_10yr"
+      notes: "Change in top-4 firm revenue share over 10 years. OECD STAN or national statistical institute series."
+    - name: tfp_growth_10yr
+      source: "pwt:rtfpna"
+      transformation: "log_diff_10yr"
+    - name: markups_index
+      source: "constructed: de_loeker_eeckhout_markups_proxy"
+      transformation: "level"
+      notes: "Proxy for economy-wide markups from De Loecker-Eeckhout methodology where available."
+  treatment:
+    - name: incumbent_subsidy_share_gdp
+      source: "constructed: state_aid + bailouts + directed_credit_guarantees_to_incumbents"
+      transformation: "level"
+      notes: "Sum of state aid to incumbent firms, bailouts, and directed credit guarantees. EU State Aid Scoreboard for EU members; national sources for others."
+    - name: state_aid_share_gdp
+      source: "oecd:competition_state_aid"
+      transformation: "level"
+      notes: "OECD state aid as % GDP where available."
+  controls:
+    - name: initial_top4_concentration
+      source: "oecd_stan:concentration_ratio_top4"
+      transformation: "lagged_level"
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: product_market_regulation
+      source: "oecd_pmr:pmr_composite"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  State aid and directed credit to incumbents are regulatory and
+  fiscal interventions that distort competition. The hypothesis
+  tests whether these incumbent-protection policies predict
+  concentration and productivity stagnation.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with 10-year forward-differenced outcomes on lagged
+    incumbent-subsidy share. Country FE absorb persistent
+    cross-country differences in industrial policy philosophy.
+    Identification from within-country changes in subsidy intensity
+    (e.g. EU state-aid waves, Korean chaebol support, Chinese SOE
+    subsidies). Robustness: exclude China (largest subsidy outlier);
+    use only EU sub-sample with Scoreboard data; IV using EU
+    membership x sectoral-regulation timing.
+
+falsification:
+  rule: >
+    Not supported if (a) the panel-FE coefficient on incumbent
+    subsidy is not positive and significant at p<0.05 on
+    concentration change, OR (b) the coefficient on incumbent
+    subsidy is not negative and significant at p<0.05 on TFP
+    growth, OR (c) the implied 1-pp subsidy effect on top-4
+    concentration is below 0.25 pp. A developmentalist reading
+    wins if subsidies to incumbents are positively associated with
+    TFP growth (suggesting learning-by-doing and scale economies
+    dominate rent-seeking) or if the concentration effect is
+    negative (subsidies enable entry against foreign incumbents).
+  test: panel_fe_incumbent_subsidy_on_concentration_and_tfp
+  threshold: >
+    panel_FE_beta(subsidy → top4_concentration_change_10yr) > 0 at p<0.05
+    AND panel_FE_beta(subsidy → tfp_growth_10yr) < 0 at p<0.05
+    AND implied_effect_1pp_subsidy_on_concentration >= 0.25 pp
+
+prior_confidence: 0.55
+
+disclosure: >
+  The incumbent-subsidy literature is ideologically polarised:
+  market-liberal critics (Tullock, Cowen) emphasise rent-seeking
+  and zombification, while developmentalists (Amsden, Wade) argue
+  that subsidies to incumbents enable scale economies and
+  technology transfer. Author's priors lean toward the rent-
+  seeking interpretation but prior 0.55 reflects the genuine
+  empirical uncertainty. Bias risk: author may over-weight EU
+  state-aid episodes (where aid is often transparent and
+  documented) and under-weight East Asian cases where subsidy
+  data is opaque but growth effects may be positive.
+
+steelman: hypotheses/steelman/incumbent_subsidy_market_share_persistence.md
+
+linked_hypotheses:
+  - startup_density_frontier_prosperity
+  - price_signal_distortion_capital_misallocation
+
+notes: >
+  State-aid data is best for EU members (EU Scoreboard). For non-
+  EU countries, incumbent subsidies are proxied by SOE subsidies,
+  bailout programmes, and directed credit from national sources.
+  Coverage gaps flagged in diagnostics.

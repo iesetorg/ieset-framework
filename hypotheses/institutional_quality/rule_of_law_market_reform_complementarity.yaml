@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: rule_of_law_market_reform_complementarity
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across a broad panel of economies 1980-2020, market reforms
+  (privatisation, trade liberalisation, and price decontrol)
+  produce durable gains in real GDP per capita growth only when
+  rule-of-law scores exceed a minimum threshold (WGI Rule of Law
+  > -0.5, approximately the 40th percentile of the global
+  distribution). Below this threshold, market reforms show
+  insignificant or negative associations with growth. The pre-
+  registered claim is that the interaction term between market-
+  reform intensity and rule-of-law score is positive and
+  significant at p<0.05, while the marginal effect of market reform
+  at rule-of-law below -0.5 is not significantly positive.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA, ROU, BGR, HRV, SRB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years in the first 3 years of transition from central planning (institutional flux)"
+    - "drop observations where WGI Rule of Law is missing (no backfill beyond 5-year interpolation)"
+
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality, trade_liberalisation]
+  policy_family: [institutional_reform, privatisation_nationalisation, trade_policy]
+  treatment_tags: [market_reform, rule_of_law, shock_therapy, privatisation, trade_liberalisation]
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+    - name: tfp_growth_5yr
+      source: "pwt:rtfpna"
+      transformation: "log_diff_5yr"
+  treatment:
+    - name: market_reform_intensity_index
+      source: "constructed: 0.4×fraser_efw:privatisation + 0.3×fraser_efw:trade_openness + 0.3×fraser_efw:price_controls"
+      transformation: "level"
+      notes: "Composite market-reform intensity from Fraser EFW sub-components. Higher = more market-oriented."
+    - name: rule_of_law_wgi
+      source: "wgi:RL.EST"
+      transformation: "level"
+      notes: "WGI Rule of Law estimate, standardised approximately -2.5 to +2.5."
+    - name: rule_of_law_above_threshold
+      source: "constructed: indicator = 1 if wgi:RL.EST > -0.5"
+      transformation: "indicator"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: government_consumption_share
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "level"
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Market reforms are bundled regulatory, trade, and privatisation
+  interventions. Rule of law is an institutional precondition.
+  The interaction tests institutional-channel complementarity.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with interaction term: market_reform × rule_of_law.
+    Primary test: significance and sign of interaction coefficient.
+    Secondary: sub-sample analysis (rule-of-law above vs below
+    threshold). Robustness: use Fraser EFW composite instead of
+    constructed reform index; use V-Dem polyarchy instead of WGI
+    RL as threshold measure; event-study around large reform
+    episodes (post-Soviet transition, China's 1978, India's 1991)
+    with rule-of-law pre-condition as moderator.
+
+falsification:
+  rule: >
+    Not supported if (a) the interaction coefficient is not
+    positive and significant at p<0.05, OR (b) the marginal effect
+    of market reform is positive and significant even when rule-of-
+    law is below -0.5 (no threshold effect), OR (c) the
+    interaction becomes insignificant when post-Soviet transition
+    countries are dropped (indicating the result is driven by one
+    historical episode). A "market reform works everywhere"
+    reading wins if (b) holds; a "institutions don't matter"
+    reading wins if both main effect and interaction are
+    insignificant.
+  test: panel_fe_market_reform_rule_of_law_interaction
+  threshold: >
+    panel_FE_beta(market_reform × rule_of_law) > 0 at p<0.05
+    AND marginal_effect_reform_at_RL_minus_0.5 NOT > 0 at p<0.10
+    AND result robust to excluding POST_SOVIET at p<0.10
+
+prior_confidence: 0.65
+
+disclosure: >
+  The institutions-first vs policy-first debate (Rodrik vs. AJR)
+  is one of the most important in development economics. The
+  complementarity hypothesis is a moderate position: market
+  reforms work, but only above an institutional floor. Author's
+  priors lean toward this moderate view. Prior 0.65 reflects
+  moderate confidence based on the post-Soviet experience (shock
+  therapy failures in low-RL countries vs successes in high-RL
+  countries like Poland and Slovenia) but acknowledges that China
+  1978-1992 is a partial outlier (low formal RL but strong party-
+  state enforcement). Bias risk: author may over-weight the
+  post-Soviet transition and under-weight China's unique
+  institutional model.
+
+steelman: hypotheses/steelman/rule_of_law_market_reform_complementarity.md
+
+linked_hypotheses:
+  - property_rights_long_run_income_frontier
+  - shock_therapy_institutional_preconditions_conditionality
+
+notes: >
+  Fraser EFW sub-components provide the longest-run market-reform
+  series. WGI Rule of Law begins in 1996; earlier years use
+  backfilled Polity5 and V-Dem proxies with flagged uncertainty.
+  The post-Soviet transition episode (1990-2000) provides the
+  cleanest natural experiment but also the strongest leverage;
+  robustness to its exclusion is essential.

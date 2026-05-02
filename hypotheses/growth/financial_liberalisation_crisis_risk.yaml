@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: financial_liberalisation_crisis_risk
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Financial liberalisation (capital-account opening, domestic interest-rate deregulation,
+  removal of credit controls) without prudential regulation (strong supervision, capital
+  adequacy, macro-prudential buffers) raises the probability and severity of banking and
+  currency crises, which can erase long-run market-reform gains in GDP per capita. The
+  claim applies to middle-income emerging markets 1975-2020 and challenges the assumption
+  that financial opening is unconditionally welfare-improving.
+evidence_type: associational
+sample:
+  countries:
+  - MEX
+  - ARG
+  - BRA
+  - CHL
+  - COL
+  - PER
+  - URY
+  - VEN
+  - BOL
+  - ECU
+  - THA
+  - MYS
+  - IDN
+  - PHL
+  - VNM
+  - KOR
+  - TWN
+  - IND
+  - PAK
+  - LKA
+  - TUR
+  - ZAF
+  - EGY
+  - MAR
+  - TUN
+  - RUS
+  - UKR
+  - KAZ
+  - POL
+  - HUN
+  - CZE
+  - ROU
+  - BGR
+  - HRV
+  period:
+  - 1975
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years already in crisis (Laeven-Valencia crisis list)
+  - exclude offshore financial centres where liberalisation is structurally different
+scope:
+  period:
+  - 1975
+  - 2020
+  countries:
+  - MEX
+  - ARG
+  - BRA
+  - CHL
+  - COL
+  - PER
+  - URY
+  - VEN
+  - BOL
+  - ECU
+  - THA
+  - MYS
+  - IDN
+  - PHL
+  - VNM
+  - KOR
+  - TWN
+  - IND
+  - PAK
+  - LKA
+  - TUR
+  - ZAF
+  - EGY
+  - MAR
+  - TUN
+  - RUS
+  - UKR
+  - KAZ
+  - POL
+  - HUN
+  - CZE
+  - ROU
+  - BGR
+  - HRV
+  outcome_dim:
+  - financial_crisis
+  - gdp_growth
+  - capital_flows
+  policy_family:
+  - regulation
+  - institutional_reform
+  treatment_tags: []
+variables:
+  outcome:
+  - name: banking_crisis_indicator
+    source: constructed:laeven_valencia_crisis_database
+    transformation: indicator
+  - name: currency_crisis_indicator
+    source: constructed:laeven_valencia_crisis_database
+    transformation: indicator
+  - name: crisis_output_loss
+    source: constructed:peak_to_trough_gdp_loss_crisis_years
+    transformation: level
+    notes: Cumulative GDP loss relative to pre-crisis trend.
+  treatment:
+  - name: financial_liberalisation_index
+    source: constructed:abiad_detragiache_quint_financial_reform_index
+    transformation: level
+    notes: Abiad-Detragiache financial reform index; higher = more liberalised.
+  - name: prudential_regulation_index
+    source: constructed:basel_compliance_plus_macroprudential_score
+    transformation: level
+    notes: Composite of capital-adequacy compliance and macro-prudential policy intensity.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: credit_gdp_ratio
+    source: world_bank_wdi:GFDD.DI.14
+    transformation: log
+  - name: current_account_balance_gdp
+    source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+    transformation: level
+  - name: exchange_rate_regime
+    source: constructed:Ilzetzki_Reinhart_Rogoff_fine
+    transformation: categorical
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if financial liberalisation without prudential regulation
+    does not significantly raise crisis probability in a panel logit or linear probability
+    model, or if the liberalisation-crisis link disappears after controlling for credit
+    growth and current-account deficits.
+  test: panel_fe_financial_liberalisation_crisis_risk_1975_2020
+  threshold:
+    supported: liberalisation_x_weak_prudential interaction > 0 at p < 0.10 for crisis probability
+    refuted: liberalisation coefficient not significant for crisis probability
+prior_confidence: 0.70
+disclosure: >-
+  Author priors accept the financial-liberalisation crisis link from the Kaminsky-Reinhart
+  literature but acknowledge that prudential regulation is endogenous: countries that
+  liberalise often also strengthen supervision. The test attempts to separate the two
+  channels.
+steelman: hypotheses/steelman/financial_liberalisation_crisis_risk.md

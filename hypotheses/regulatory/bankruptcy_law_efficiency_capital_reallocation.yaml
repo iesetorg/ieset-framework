@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bankruptcy_law_efficiency_capital_reallocation
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across countries 1990-2020, faster insolvency and bankruptcy
+  resolution — measured by years to resolve, recovery rate, and
+  strength of insolvency framework index — predicts stronger post-
+  shock productivity recovery than discretionary rescue policy
+  (bailouts, forbearance, and evergreening). The pre-registered
+  claim is that countries in the top tercile of bankruptcy
+  efficiency show at least 1.5 percentage points higher TFP growth
+  in the five years following a financial shock than countries in
+  the bottom tercile, after controlling for shock severity and
+  initial income.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years without a defined financial shock (recession or banking stress) in the prior 2 years"
+    - "drop observations where Doing Business insolvency data is interpolated"
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, gdp_growth, institutional_quality]
+  policy_family: [regulation, institutional_reform, competition_policy]
+  treatment_tags: [bankruptcy_reform, insolvency_efficiency, bailouts, capital_reallocation]
+
+variables:
+  outcome:
+    - name: tfp_growth_5yr_post_shock
+      source: "pwt:rtfpna"
+      transformation: "log_diff_5yr"
+      notes: "TFP growth in the 5 years following a financial shock."
+    - name: labour_productivity_growth_5yr_post_shock
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff_5yr"
+    - name: capital_reallocation_rate
+      source: "constructed: std_dev_log_mpk"
+      transformation: "level"
+      notes: "Cross-firm dispersion of marginal product of capital (MPK) as inverse proxy for reallocation efficiency; lower dispersion = better reallocation."
+  treatment:
+    - name: bankruptcy_efficiency_index
+      source: "world_bank_wdi:IC.REC.COST"
+      transformation: "composite"
+      notes: "Composite of (1) years to resolve insolvency (Doing Business), (2) recovery rate (cents on dollar), and (3) strength of insolvency framework index. Higher = more efficient."
+    - name: years_to_resolve_insolvency
+      source: "world_bank_wdi:IC.REC.DURS"
+      transformation: "level"
+    - name: recovery_rate
+      source: "world_bank_wdi:IC.REC.COST"
+      transformation: "level"
+      notes: "Cents on the dollar recovered by secured creditors through insolvency."
+  controls:
+    - name: shock_severity_gdp_drop
+      source: "world_bank_wdi:NY.GDP.MKTP.KD"
+      transformation: "peak_to_trough_pct"
+      notes: "Peak-to-trough real GDP decline in the shock episode."
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: bailout_share_gdp
+      source: "constructed: fiscal_cost_banking_crisis"
+      transformation: "level"
+      notes: "Fiscal cost of banking crisis (Laeven-Valencia database) as % GDP."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Bankruptcy and insolvency frameworks are legal-institutional
+  features. Rescue policy is a bundled fiscal-regulatory
+  intervention. The test compares institutional reallocation
+  mechanisms against discretionary rescue.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE on post-shock windows only (country-years with a
+    defined shock in t-2 to t). Interaction: bankruptcy efficiency
+    × shock severity. Robustness: event-study around bankruptcy
+    reforms (e.g. UK 2002 Enterprise Act, Germany 1999 Insolvency
+    Code, India 2016 IBC). Placebo: test on non-shock years.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on bankruptcy efficiency
+    is not positive and significant at p<0.05 on post-shock TFP
+    growth, OR (b) the top-tercile vs bottom-tercile post-shock
+    TFP growth gap is below 0.75 pp/year, OR (c) the interaction
+    with bailout intensity is positive and significant (indicating
+    that bailouts complement rather than substitute for efficient
+    bankruptcy). A "too-big-to-fail" / bailout-necessity reading
+    wins if bailout intensity is positively associated with
+    recovery and bankruptcy efficiency is insignificant.
+  test: panel_fe_bankruptcy_efficiency_on_post_shock_recovery
+  threshold: >
+    panel_FE_beta(bankruptcy_efficiency → tfp_growth_5yr_post_shock) > 0 at p<0.05
+    AND top_tercile_mean_gap >= 0.75 pp/yr
+    AND interaction_beta(bankruptcy_efficiency × bailout) <= 0 or insignificant
+
+prior_confidence: 0.60
+
+disclosure: >
+  The bankruptcy-recovery literature (Djankov et al. 2008,
+  Rodano et al. 2016) supports a positive association between
+  insolvency efficiency and recovery, but the comparison with
+  bailouts is confounded by political economy (bailouts go to
+  countries with worse initial institutions). Author's market-
+  liberal priors lean toward the clean-bankruptcy mechanism but
+  prior 0.60 reflects the endogeneity of bailout assignment. Bias
+  risk: author may under-weight the systemic-risk argument for
+  bailouts (Lehman Brothers counterfactual) and over-weight the
+  Austrian liquidationist reading.
+
+steelman: hypotheses/steelman/bankruptcy_law_efficiency_capital_reallocation.md
+
+linked_hypotheses:
+  - incumbent_subsidy_market_share_persistence
+  - price_signal_distortion_capital_misallocation
+
+notes: >
+  Doing Business insolvency indicators are available from 2003
+  onward; earlier years are backfilled using academic series
+  (Djankov et al.). Laeven-Valencia banking-crisis dates define
+  the shock episodes. Post-shock windows use 5-year horizons to
+  capture medium-run reallocation.

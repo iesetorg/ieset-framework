@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sectoral_competition_services_productivity
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Among high-income economies 1990-2020, services-sector competition
+  — measured by low barriers to entry, low incumbent-protection
+  scores, and high churn in retail, transport, communications, and
+  professional services — predicts long-run prosperity (real GDP
+  per capita growth and labour-productivity growth) better than
+  manufacturing-specific industrial policy spending. The pre-
+  registered claim is that, in a horse-race regression, the
+  coefficient on services-sector competition is larger in absolute
+  t-statistic than the coefficient on manufacturing industrial-
+  policy spending, and that countries in the top tercile of
+  services competition show at least 0.3 percentage points higher
+  annual labour-productivity growth than countries in the bottom
+  tercile.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, SVN, SVK, LVA, LTU, CHL, MEX]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with systemic banking crises"
+    - "drop observations where OECD PMR services-sector data is unavailable"
+
+scope:
+  period: [1990, 2020]
+  countries: [OECD]
+  outcome_dim: [productivity, gdp_growth, competition_concentration]
+  policy_family: [competition_policy, industrial_policy, regulation]
+  treatment_tags: [services_competition, manufacturing_industrial_policy, sectoral_productivity]
+
+variables:
+  outcome:
+    - name: labour_productivity_growth
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff"
+      notes: "Annual log-difference of real GDP per worker."
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+    - name: services_sector_productivity_growth
+      source: "oecd_stan:va_per_hour_services"
+      transformation: "log_diff"
+      notes: "Value added per hour worked in services, OECD STAN."
+  treatment:
+    - name: services_sector_competition_index
+      source: "oecd_pmr:pmr_services"
+      transformation: "level"
+      notes: "OECD PMR services-sector regulation sub-index (lower = more competition). Inverted so higher = more competition."
+    - name: manufacturing_industrial_policy_spending
+      source: "constructed: state_aid_manufacturing + subsidies + directed_credit_manufacturing"
+      transformation: "level"
+      notes: "Manufacturing-specific industrial-policy spending as % GDP. EU State Aid Scoreboard for sectoral breakdown; national sources otherwise."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: rd_spending_share_gdp
+      source: "world_bank_wdi:GB.XPD.RSDV.GD.ZS"
+      transformation: "level"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: product_market_regulation_overall
+      source: "oecd_pmr:pmr_composite"
+      transformation: "level"
+    - name: manufacturing_share_gdp
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Services-sector competition is determined by sector-specific
+  regulation (licensing, entry barriers, price controls, shop-
+  opening hours, professional restrictions). Manufacturing
+  industrial policy is fiscal/regulatory. Both channels are
+  regulatory/fiscal interventions tested against prosperity.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE horse-race: services competition and manufacturing
+    industrial policy entered simultaneously. Primary test is
+    absolute t-statistic comparison. Tercile comparison as
+    robustness. Robustness: exclude US; use only EU-15 sub-sample;
+    use PMR retail-trade and professional-services sub-components
+    separately.
+
+falsification:
+  rule: >
+    Not supported if (a) the services-competition coefficient is
+    not positive and significant at p<0.05 on productivity growth,
+    OR (b) in the horse-race the manufacturing-industrial-policy
+    coefficient has a larger absolute t-statistic than services
+    competition, OR (c) the top-tercile vs bottom-tercile
+    productivity growth gap is below 0.15 pp/year. A
+    manufacturing-first / industrial-policy reading wins cleanly
+    if manufacturing policy outperforms services competition in
+    the horse-race.
+  test: panel_fe_horserace_services_competition_vs_manufacturing_policy
+  threshold: >
+    panel_FE_beta(services_competition → productivity_growth) > 0 at p<0.05
+    AND |t_stat(services_competition)| > |t_stat(manufacturing_policy)| in horse-race
+    AND top_tercile_mean_gap >= 0.30 pp/yr
+
+prior_confidence: 0.55
+
+disclosure: >
+  The services-competition literature (Bourlès et al. 2013,
+  Andrews & Cingano 2014) finds significant productivity effects
+  from services deregulation in EU countries. However, the
+  comparison with manufacturing industrial policy is rarely tested
+  directly. Author's market-liberal priors lean toward the
+  services-competition channel but prior 0.55 reflects uncertainty
+  about whether the horse-race specification is fair (manufacturing
+  policy may have longer lags). Bias risk: author may under-weight
+  the externalities of manufacturing (spillovers to services) and
+  over-weight the within-sector services effect.
+
+steelman: hypotheses/steelman/sectoral_competition_services_productivity.md
+
+linked_hypotheses:
+  - product_market_regulation_tfp_30yr_panel
+  - startup_density_frontier_prosperity
+
+notes: >
+  OECD PMR services-sector index has best coverage for OECD
+  members. Manufacturing industrial-policy spending by sector is
+  available from EU State Aid Scoreboard for EU members; other
+  countries rely on national sources or aggregate subsidy proxies.

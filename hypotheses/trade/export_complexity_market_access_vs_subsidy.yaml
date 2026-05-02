@@ -1,0 +1,136 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: export_complexity_market_access_vs_subsidy
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  In a panel of middle-income countries 1990-2020, export complexity
+  (Hausmann-Hidalgo Economic Complexity Index) rises more following reforms
+  that improve foreign market access and reduce domestic entry barriers than
+  following expansions of subsidy-only industrial policy. The claim is
+  directional: a one-standard-deviation improvement in market-access and
+  competition conditions predicts a larger ECI gain over the subsequent decade
+  than a one-standard-deviation increase in subsidy intensity, controlling for
+  initial complexity, income, and human capital.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, BGD, BGR, BRA, CHL, CHN, COL, CRI, CZE, DOM, ECU, EGY, EST, GRC, GTM, HND, HUN, IDN, IND, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, PAK, PAN, PER, PHL, POL, PRT, ROU, RUS, SLV, SVK, SVN, THA, TUR, TWN, UKR, URY, VNM, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with ECI based on fewer than 10 million USD in total exports (noisy measurement)"
+    - "drop observations during hyperinflation (>50% monthly CPI)"
+    - "drop transition years 1989-1994 for post-communist economies"
+
+variables:
+  outcome:
+    - name: economic_complexity_index
+      source: "constructed: Atlas of Economic Complexity (Harvard CID)"
+      transformation: level
+      notes: "Hausmann-Hidalgo ECI. Data dependency: Harvard CID Atlas; canonical source string used pending direct fetcher."
+    - name: export_diversification_theil
+      source: "un_comtrade:export_product_concentration"
+      transformation: theil_index
+      notes: "Secondary outcome: export diversification measured by Theil index."
+  treatment:
+    - name: market_access_and_competition_index
+      source: "constructed: composite of foreign market access (tariff faced abroad, FTA depth) and domestic entry barriers (OECD PMR, WBG Doing Business)"
+      transformation: z_score_composite
+      notes: "Pending dedicated fetcher. v1 uses World Bank WITS tariff faced + OECD PMR entry barriers as proxy."
+    - name: subsidy_industrial_policy_index
+      source: "constructed: state aid / GDP, directed credit, and sectoral subsidy intensity (CRDF/ITC + Fraser EFW Area 4)"
+      transformation: z_score_composite
+      notes: "Pending dedicated fetcher. v1 uses Fraser EFW Area 4 (Government Enterprises and Investment) as proxy."
+  controls:
+    - name: initial_eci
+      source: "constructed: Atlas of Economic Complexity"
+      transformation: 5yr_lagged_level
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: exchange_rate_volatility
+      source: "imf_weo:exchange_rate_volatility"
+      transformation: 5yr_sd
+      notes: "Controls for macro instability that may distort complexity measurement."
+  decomposition_channels:
+    - name: high_tech_export_share
+      source: "world_bank_wits:high_tech_exports"
+      transformation: pct_total_exports
+    - name: number_of_export_products
+      source: "un_comtrade:unique_hs6_products"
+      transformation: count
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Market-access reform is a trade-policy (regulatory) intervention. Subsidy-only
+  industrial policy is a fiscal-regulatory bundled intervention. The test
+  compares two channels for raising export complexity.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with decade-long differences (1990-2000, 2000-2010,
+    2010-2020) to reduce noise and capture medium-run structural change.
+    Primary specification: ΔECI = β1*Δmarket_access + β2*Δsubsidy_index +
+    controls + FE. Mechanism decomposition via high-tech export share and
+    product-count channels. Robustness: exclude China (dominates ECI
+    dynamics) and check if result holds.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (market access) is positive and significant at p<0.05
+    while β2 (subsidy) is insignificant or negative, AND |β1| > |β2|.
+    PARTIAL if both are positive and significant but β1 > β2. REFUTED if
+    β1 is negative and significant or if β2 is positive and significantly
+    larger than β1. INFORMATIVE: excluding China should not flip the sign
+    of β1; if it does, the result is a China-driven artefact.
+  test: panel_fe_decomposition_eci_market_access_vs_subsidy
+  threshold: >
+    β_market_access > 0 at p<=0.05  AND
+    |β_market_access| > |β_subsidy|  AND
+    Ex-China robustness retains sign of β_market_access.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The export-complexity literature
+  strongly associates complexity with growth, but the policy determinants
+  of complexity are less well identified. Framing risk: market-access reform
+  is easier to measure cross-country than subsidy intensity, which may
+  create asymmetric measurement error favouring the market-access side.
+  Developmentalist readers will note that Korea's complexity rise was
+  heavily state-directed, and that China's ECI surge combined subsidies
+  (SOE credit, export VAT rebates) with WTO accession. The specification
+  cannot cleanly separate the two in China.
+
+steelman: hypotheses/steelman/export_complexity_market_access_vs_subsidy.md
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability, trade_liberalisation]
+  policy_family: [trade_policy, industrial_policy, competition_policy]
+  treatment_tags: [export_complexity, market_access, subsidy_industrial_policy]
+
+linked_hypotheses:
+  - infant_industry_protection_capability_effect
+  - trade_lib_china_wto_2001_manufacturing_export_surge
+
+notes: >
+  Data readiness:
+  - Harvard CID Atlas ECI (pending direct fetcher; canonical source used)
+  - UN Comtrade export diversity / product counts (ready)
+  - World Bank WITS high-tech exports, tariff data (ready)
+  - OECD PMR entry barriers (ready)
+  - PWT hc, WDI GDP pc, FDI inflows (ready)

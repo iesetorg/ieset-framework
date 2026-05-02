@@ -1,0 +1,158 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: natural_monopoly_private_failure
+version: 1
+status: candidate
+topic: institutional_quality
+claim: >-
+  Privatisation of natural monopolies (electricity transmission, water distribution, rail
+  infrastructure, fixed-line telecommunications) without strong independent regulation
+  fails to improve long-run consumer welfare compared to well-governed public ownership
+  or regulated private provision. Consumer welfare is measured by real prices, service
+  quality indices, access expansion, and consumer surplus estimates, over 1985-2020 in
+  middle- and high-income countries.
+evidence_type: associational
+sample:
+  countries:
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - USA
+  - CHL
+  - ARG
+  - BRA
+  - MEX
+  - COL
+  - PER
+  - ZAF
+  - POL
+  - HUN
+  - CZE
+  - ROU
+  - BGR
+  period:
+  - 1985
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude privatisation episodes where the sale was primarily to insiders or politically connected buyers
+  - exclude observations within 3 years of privatisation to allow for transition adjustment
+scope:
+  period:
+  - 1985
+  - 2020
+  countries:
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - USA
+  - CHL
+  - ARG
+  - BRA
+  - MEX
+  - COL
+  - PER
+  - ZAF
+  - POL
+  - HUN
+  - CZE
+  - ROU
+  - BGR
+  outcome_dim:
+  - regulation_compliance_cost
+  - energy
+  - poverty_inequality
+  - institutional_quality
+  policy_family:
+  - privatisation_nationalisation
+  - regulation
+  treatment_tags: []
+variables:
+  outcome:
+  - name: real_consumer_price_index
+    source: constructed:sectoral_price_deflators; oecd:energy_prices
+    transformation: log
+    notes: Real consumer prices for electricity, water, rail, or telecom services.
+  - name: service_quality_index
+    source: "constructed: outage_minutes_leakage_rate_rail_punctuality"
+    transformation: level
+  - name: access_coverage_rate
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: level
+    notes: Electricity access, water access, or telecom penetration as relevant.
+  treatment:
+  - name: privatisation_indicator
+    source: constructed:privatisation_event_database
+    transformation: indicator
+    notes: Indicator for post-privatisation years in natural-monopoly sectors.
+  - name: regulatory_independence_index
+    source: constructed:oecd_regulatory_governance_index
+    transformation: level
+    notes: Proxy for strength of independent sectoral regulator.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: fuel_price_index
+    source: world_bank_wdi:commodity_prices
+    transformation: log
+  - name: population_density
+    source: world_bank_wdi:EN.POP.DNST
+    transformation: log
+  - name: public_ownership_baseline_quality
+    source: constructed:pre_privatisation_performance
+    transformation: level
+    notes: Pre-privatisation price and quality levels to control for baseline.
+estimator:
+  template: event_study
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if privatisation without strong regulation shows positive
+    and significant (p < 0.10) consumer-welfare improvements (lower real prices, higher
+    quality, expanded access) comparable to or better than regulated privatisation or
+    public ownership.
+  test: event_study_natural_monopoly_privatisation_1985_2020
+  threshold:
+    supported: unregulated privatisation shows price increase >10% or quality decline vs public benchmark at p < 0.10
+    refuted: unregulated privatisation shows price decrease >5% and quality improvement at p < 0.10
+prior_confidence: 0.60
+disclosure: >-
+  Author priors are sceptical of unregulated natural-monopoly privatisation but acknowledge
+  that regulated privatisation (e.g., UK water, Chile telecom) has sometimes succeeded. The
+  test isolates the regulation channel, not privatisation per se.
+steelman: hypotheses/steelman/natural_monopoly_private_failure.md

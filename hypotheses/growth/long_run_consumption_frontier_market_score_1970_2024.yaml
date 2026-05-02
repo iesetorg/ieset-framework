@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: long_run_consumption_frontier_market_score_1970_2024
+version: 1
+status: candidate
+topic: growth
+claim: Countries with higher sustained market-institution scores from 1970 to 2024 experienced stronger convergence in real household consumption per capita toward the US frontier than countries with weaker market scores.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, JPN, CAN, AUS, SWE, NLD, CHE, KOR, SGP, IRL, ESP, ITA, NZL, NOR, DNK, FIN, PRT, GRC, POL, EST, CHL, MEX, BRA, ARG, TUR, ZAF, IND, CHN, IDN, MYS, THA, VNM]
+  period: [1970, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - require consumption per capita observations in at least three decades
+  - winsorize crisis-year outliers in robustness checks
+variables:
+  outcome:
+  - name: real_consumption_pc_convergence
+    source: pwt:ccon; world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: ratio to US real consumption per capita and ten-year growth
+  treatment:
+  - name: sustained_market_score
+    source: fraser_efw:summary_index
+    transformation: rolling ten-year average
+  controls:
+  - name: initial_consumption_pc
+    source: pwt:ccon_pop
+    transformation: log baseline level
+  - name: terms_of_trade
+    source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+    transformation: annual change
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: Consumption frontier convergence test using ten-year windows to reduce business-cycle noise.
+falsification:
+  rule: SUPPORTED if sustained_market_score positively predicts consumption convergence with p<=0.05 and at least a 2 percentage point ten-year convergence effect per standard deviation. REFUTED if the effect is negative with p<=0.05 and comparable magnitude. Otherwise PARTIAL.
+  test: consumption_frontier_market_score_panel
+  threshold:
+    p_max: 0.05
+    min_ten_year_convergence_pp: 2
+    min_countries: 25
+prior_confidence: 0.61
+disclosure: The claim focuses on household welfare rather than GDP alone, but consumption data are noisier and may vary across accounting systems.
+steelman: hypotheses/steelman/long_run_consumption_frontier_market_score_1970_2024.md
+scope:
+  period: [1970, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, currency_purchasing_power, institutional_quality]
+  policy_family: [institutional_reform, regulation, trade_policy]
+  treatment_tags: [market_score, consumption_convergence, frontier_prosperity]
+

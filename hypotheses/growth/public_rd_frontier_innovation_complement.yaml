@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: public_rd_frontier_innovation_complement
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Public R&D spending (government and higher-education R&D) complements private-market
+  innovation at the technology frontier, raising private patenting, total factor
+  productivity, and venture-capital activity in sectors with high spillover potential
+  (defence, health, general-purpose technologies). The complementarity is stronger in
+  high-income countries 1990-2020 where private R&D is already substantial, and weaker
+  or absent in catch-up economies where imitation dominates invention.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - JPN
+  - KOR
+  - CAN
+  - AUS
+  - ISR
+  - EST
+  - CZE
+  - SVN
+  - SGP
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years where public R&D is >80% of total R&D (indicates underdeveloped private sector, not complementarity)
+  - require at least 10 years of consecutive R&D data
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - JPN
+  - KOR
+  - CAN
+  - AUS
+  - ISR
+  - EST
+  - CZE
+  - SVN
+  - SGP
+  outcome_dim:
+  - productivity
+  - industrial_capability
+  - gdp_growth
+  policy_family:
+  - fiscal_policy
+  - industrial_policy
+  treatment_tags: []
+variables:
+  outcome:
+  - name: private_patents_per_capita
+    source: wipo:patent_applications_residents
+    transformation: log
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+  - name: venture_capital_gdp
+    source: "constructed: PitchBook; oecd: venture_capital_investments"
+    transformation: log
+    notes: Venture capital investment as % of GDP; PitchBook or OECD Entrepreneurship at a Glance.
+  treatment:
+  - name: public_rd_gdp
+    source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
+    transformation: level
+    notes: Government plus higher-education R&D expenditure as % of GDP.
+  - name: private_rd_gdp
+    source: "oecd: main_science_technology_indicators; world_bank_wdi"
+    transformation: level
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: ip_protection_index
+    source: "constructed: park_patent_rights_index"
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if public R&D has a negative and significant (p < 0.10)
+    coefficient on private innovation outcomes, or if the public-private interaction term
+    is negative and significant in a frontier-country panel.
+  test: panel_fe_public_rd_private_innovation_complement_1990_2020
+  threshold:
+    supported: public_rd coefficient > 0 at p < 0.10 OR public_x_private interaction > 0 at p < 0.10
+    refuted: public_rd coefficient < 0 at p < 0.10
+prior_confidence: 0.55
+disclosure: >-
+  Author priors are sympathetic to public R&D complementarity but acknowledge that
+  crowding-out is possible if public labs compete with private firms for talent and
+  funding. The frontier-country sample excludes catch-up contexts where public R&D may
+  substitute for weak private capacity.
+steelman: hypotheses/steelman/public_rd_frontier_innovation_complement.md

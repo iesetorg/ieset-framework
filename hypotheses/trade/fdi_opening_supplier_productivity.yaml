@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fdi_opening_supplier_productivity
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  FDI openness predicts domestic supplier total factor productivity growth when
+  paired with pro-competition domestic policy, but not when domestic markets
+  are reserved for protected national champions, in a panel of emerging
+  economies 1990-2020. The directional claim is that the interaction between
+  FDI restrictiveness (lower = more open) and domestic competition policy
+  (lower barriers = more competition) is positive and significant for supplier
+  TFP growth, while FDI openness alone shows no significant effect.
+
+evidence_type: causal
+
+sample:
+  countries: [ARG, BGD, BGR, BRA, CHL, CHN, COL, CZE, DOM, ECU, EGY, EST, HUN, IDN, IND, JOR, KOR, LTU, LVA, MAR, MEX, MYS, PAK, PER, PHL, POL, PRT, ROU, RUS, SVK, SVN, THA, TUR, TWN, UKR, VNM, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during capital-control surges (>10pp increase in restrictiveness within 2 years)"
+    - "drop observations with missing supplier TFP proxy for more than 3 consecutive years"
+    - "drop transition years 1989-1994 for post-communist economies"
+
+variables:
+  outcome:
+    - name: domestic_supplier_tfp_growth
+      source: "constructed: sectoral TFP from OECD STAN or Penn World Table sectoral data"
+      transformation: annual_log_change
+      notes: "Supplier TFP proxied by manufacturing-sector TFP growth when firm-level data unavailable. Pending dedicated sectoral-TFP fetcher."
+    - name: manufacturing_value_added_growth
+      source: "world_bank_wdi:NV.IND.MANF.KD.ZG"
+      transformation: annual_growth
+      notes: "Secondary outcome: manufacturing value-added growth."
+  treatment:
+    - name: fdi_restrictiveness_index
+      source: "oecd_fdi_reg:fdi_regulatory_restrictiveness_index"
+      transformation: inverted_scale
+      notes: "OECD FDI Regulatory Restrictiveness Index, inverted so higher = more open. Available for OECD and selected non-OECD economies."
+    - name: domestic_competition_policy_index
+      source: "oecd_pmr:overall_pmr"
+      transformation: inverted_scale
+      notes: "OECD PMR overall product-market regulation, inverted so higher = more competitive."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: infrastructure_quality
+      source: "wgi:GE.EST"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+      notes: "Controls for general trade openness separate from FDI policy."
+  decomposition_channels:
+    - name: backward_linkage_index
+      source: "constructed: domestic-input share in foreign-affiliate output from OECD TiVA or WB ICIO"
+      transformation: level
+      notes: "Channel test: do supplier productivity gains operate through stronger backward linkages? Pending TiVA fetcher."
+    - name: technology_transfer_proxy
+      source: "wipo:patent_applications_non_resident"
+      transformation: per_capita
+      notes: "Channel test: non-resident patent applications as proxy for technology transfer from foreign affiliates."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  FDI policy and domestic competition policy are both regulatory interventions.
+  The test identifies a complementarity between two regulatory channels.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with explicit interaction term: supplier TFP growth =
+    β0 + β1*FDI_openness + β2*competition_policy + β3*(FDI_openness ×
+    competition_policy) + controls + FE. The interaction β3 is the parameter
+    of interest. Robustness: (1) subsample analysis splitting countries above
+    and below median competition policy; (2) IV approach using bilateral
+    investment treaty (BIT) ratification as instrument for FDI openness;
+    (3) sector-level panel if OECD STAN sectoral TFP is available.
+
+falsification:
+  rule: >
+    SUPPORTED if β3 (FDI openness × competition policy) is positive and
+    significant at p<0.10, AND β1 (FDI openness alone) is insignificant.
+    PARTIAL if β3 is positive and significant but β1 is also positive and
+    significant (FDI works regardless of competition). REFUTED if β3 is
+    negative and significant, or if both β1 and β3 are insignificant.
+    INFORMATIVE: BIT-instrumented 2SLS should produce the same sign as OLS;
+    opposite sign suggests OLS endogeneity bias.
+  test: panel_fe_fdi_competition_interaction_supplier_tfp
+  threshold: >
+    β_interaction > 0 at p<=0.10  AND
+    β_fdi_openness_main effect p >= 0.10  AND
+    IV robustness retains sign of β_interaction.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The FDI-productivity literature is
+  large and mixed: some studies find strong positive spillovers (Javorcik
+  2004 on Lithuania), others find none or negative spillovers when domestic
+  firms are crowded out. The competition-policy interaction is theoretically
+  appealing but empirically fragile because competition policy is poorly
+  measured and correlated with general institutional quality. Framing risk:
+  the hypothesis may be read as saying "FDI is always good if competition
+  exists"; the spec explicitly tests for the interaction and requires the
+  main effect of FDI to be insignificant, which would falsify that blanket
+  claim.
+
+steelman: hypotheses/steelman/fdi_opening_supplier_productivity.md
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, competition_concentration, trade_liberalisation]
+  policy_family: [trade_policy, competition_policy]
+  treatment_tags: [fdi_openness, competition_policy, supplier_productivity]
+
+linked_hypotheses:
+  - trade_lib_china_wto_2001_manufacturing_export_surge
+  - industrial_policy_semiconductor_chips_act_effectiveness
+
+notes: >
+  Data readiness:
+  - OECD FDI Regulatory Restrictiveness Index (ready for subset)
+  - OECD PMR overall (ready for subset)
+  - PWT hc, WDI GDP pc, trade openness (ready)
+  - WGI GE.EST, RL.EST (ready)
+  - OECD STAN / TiVA sectoral data (pending)
+  - WIPO patent data (ready)

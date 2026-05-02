@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: housing_supply_flexibility_real_wage
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Real disposable wage growth for median earners is higher in metropolitan areas and
+  countries with more flexible housing supply (lower regulatory barriers to new construction,
+  higher land-use elasticity) than in otherwise-similar peers with restrictive zoning,
+  even when headline GDP growth is comparable. The mechanism is that flexible housing
+  supply prevents rent extraction by incumbent owners, preserving purchasing power of
+  wages over housing consumption.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - CHL
+  - MEX
+  - ZAF
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude city-years with population <500,000
+  - exclude observations during national housing-market collapse (e.g., Spain 2008-2014) from primary estimation; report separately
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - OECD
+  - CHL
+  - MEX
+  - ZAF
+  outcome_dim:
+  - housing
+  - poverty_inequality
+  - employment_labour
+  policy_family:
+  - regulation
+  - housing_policy
+  treatment_tags: []
+variables:
+  outcome:
+  - name: real_median_disposable_wage
+    source: oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARNINGS,1.0
+    transformation: log
+    notes: OECD real median disposable earnings or ILO real wage indices where OECD unavailable.
+  - name: real_wage_purchasing_power
+    source: constructed:median_wage_deflated_by_cpi_and_rent_index
+    transformation: log
+    notes: Median wage deflated by CPI-adjusted rent index to capture housing-cost-adjusted purchasing power.
+  treatment:
+  - name: housing_supply_elasticity
+    source: constructed:saiiz_housing_supply_elasticity; saiz_2010
+    transformation: level
+    notes: Saiz (2010) housing-supply elasticity estimates for US metros; cross-walked to OECD PMR and Demographia for non-US.
+  - name: regulatory_barriers_index
+    source: oecd_pmr:barriers_to_entry
+    transformation: level
+    notes: OECD PMR barriers-to-entry score as proxy for construction-entry barriers.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: level
+  - name: mortgage_credit_gdp
+    source: imf_weo:household_debt
+    transformation: level
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if the coefficient on housing-supply elasticity is negative
+    and significant (p < 0.10) in a panel FE regression of real median wage growth, or if
+    the coefficient is positive but not significant after controlling for GDP growth and
+    unemployment. The claim requires that housing flexibility adds explanatory power beyond
+    aggregate growth.
+  test: panel_fe_housing_supply_flexibility_real_wage_1990_2020
+  threshold:
+    supported: coefficient on housing_supply_elasticity > 0 at p < 0.10 and R-squared gain > 0.02 vs GDP-only model
+    refuted: coefficient < 0 at p < 0.10
+prior_confidence: 0.60
+disclosure: >-
+  Author priors are sympathetic to the YIMBY/agglomeration-economies literature but
+  acknowledge that housing-supply elasticity measurement is noisy outside the US, and that
+  endogenous sorting of high-productivity workers into elastic-supply cities may confound
+  the wage coefficient.
+steelman: hypotheses/steelman/housing_supply_flexibility_real_wage.md

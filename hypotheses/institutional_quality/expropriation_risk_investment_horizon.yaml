@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: expropriation_risk_investment_horizon
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across emerging-market and developing economies 1990-2020, higher
+  expropriation risk — measured by ICRG expropriation risk index,
+  Heritage investment-freedom score, and political-risk ratings —
+  predicts shorter investment horizons (higher share of short-term
+  investment, lower share of structures and machinery) and lower
+  capital intensity in tradable sectors. The pre-registered claim
+  is that a one-standard-deviation increase in expropriation risk
+  is associated with at least a 3-percentage-point reduction in
+  the structures-and-machinery share of investment and at least a
+  5-percentage-point reduction in the capital-labour ratio in
+  manufacturing, after controlling for initial income, financial
+  development, and country fixed effects.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN, IND, IDN, BRA, MEX, ARG, COL, THA, MYS, PHL, VNM, EGY, TUR, ZAF, RUS, POL, CZE, HUN, CHL, PER, UKR, KAZ, MAR, NGA, KEN, BGD, PAK, LKA, ROU, BGR, HRV, SRB, EST, LVA, LTU, SVN, SVK]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active armed conflict (UCDP intensity-1+)"
+    - "drop observations where ICRG data is missing and Heritage backfill unavailable"
+
+scope:
+  period: [1990, 2020]
+  countries: [ASIA_EM, LATAM, AFRICA, POST_SOVIET]
+  outcome_dim: [capital_flows, institutional_quality, industrial_capability]
+  policy_family: [institutional_reform, trade_policy]
+  treatment_tags: [expropriation_risk, investment_horizon, capital_intensity, political_risk]
+
+variables:
+  outcome:
+    - name: structures_machinery_share_investment
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "derived_share"
+      notes: "Share of gross fixed capital formation in structures and machinery (vs inventories and intangibles). Derived from national accounts data."
+    - name: capital_labour_ratio_manufacturing
+      source: "unido:capital_per_worker_manufacturing"
+      transformation: "log"
+      notes: "UNIDO capital per worker in manufacturing sector."
+    - name: fdi_short_term_share
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: "derived"
+      notes: "Proxy for short-horizon investment: portfolio + short-term debt flows as share of total investment."
+  treatment:
+    - name: expropriation_risk_index
+      source: "constructed: 0.5×icrg:expropriation_risk + 0.3×heritage_efw:investment_freedom + 0.2×fraser_efw:capital_controls"
+      transformation: "level"
+      notes: "Composite expropriation-risk index. Higher = more risk. ICRG expropriation risk (0-12, lower = more risk) inverted for consistency."
+    - name: icrg_expropriation_risk
+      source: "icrg:expropriation_risk"
+      transformation: "level"
+    - name: heritage_investment_freedom
+      source: "heritage_efw:investment_freedom"
+      transformation: "level"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: private_credit_share_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: natural_resource_rents
+      source: "world_bank_wdi:NY.GDP.TOTL.RT.ZS"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Expropriation risk is an institutional feature that shapes
+  investor time horizons and capital-commitment decisions. The
+  hypothesis tests whether this institutional risk channel
+  predicts capital-structure choices.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with investment-horizon and capital-intensity outcomes
+    on expropriation-risk index. Country FE absorb persistent
+    cross-country differences. Identification from within-country
+    changes in political risk (e.g. Venezuela pre/post Chávez,
+    Zimbabwe pre/post land reform, Russia pre/post Yukos). Event-
+    study around expropriation episodes as robustness. Instrument:
+    commodity-price volatility × resource dependence as exogenous
+    shock to expropriation risk.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on expropriation risk is
+    not negative and significant at p<0.05 on structures-machinery
+    share, OR (b) the coefficient is not negative and significant
+    at p<0.05 on capital-labour ratio, OR (c) the implied effect
+    of a one-SD increase in risk on structures-machinery share is
+    below 1.5 percentage points. A "risk doesn't matter"
+    reading wins if both coefficients are insignificant; a
+    "reverse causation" reading wins if the coefficient is
+    positive (richer countries invest more in structures and also
+    have lower risk, but within-country changes flip the sign).
+  test: panel_fe_expropriation_risk_on_investment_horizon_and_capital_intensity
+  threshold: >
+    panel_FE_beta(expropriation_risk → structures_machinery_share) < 0 at p<0.05
+    AND panel_FE_beta(expropriation_risk → capital_labour_ratio) < 0 at p<0.05
+    AND implied_effect_per_1sd_risk_on_structures_share >= 1.5 pp
+
+prior_confidence: 0.60
+
+disclosure: >
+  The expropriation-risk and investment literature (Henisz 2000,
+  Li 2009, Julio-Yook 2012) broadly supports the claim, but
+  causal identification is challenging: expropriation risk is
+  correlated with general institutional decay and may respond to
+  investment levels rather than cause them. Author's market-
+  liberal priors lean toward the property-rights-security
+  channel. Prior 0.60 reflects moderate confidence. Bias risk:
+  author may over-weight the resource-curse / expropriation
+  narrative and under-weight successful state-participation models
+  (e.g. Chile's Codelco, Botswana's Debswana) where de facto
+  expropriation risk is low despite high state involvement.
+
+steelman: hypotheses/steelman/expropriation_risk_investment_horizon.md
+
+linked_hypotheses:
+  - property_rights_long_run_income_frontier
+  - contract_enforcement_fdi_productivity_spillovers
+
+notes: >
+  ICRG expropriation risk has limited coverage (approx. 140
+  countries) and begins in 1984. Heritage investment freedom
+  provides broader coverage from 1995. UNIDO capital-per-worker
+  data is patchy; manufacturing capital-intensity from national
+  accounts is a lower-quality substitute.

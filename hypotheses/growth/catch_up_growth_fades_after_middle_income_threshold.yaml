@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: catch_up_growth_fades_after_middle_income_threshold
+version: 1
+status: candidate
+topic: growth
+claim: Developmentalist catch-up growth premiums are strongest before countries reach roughly 40 percent of US GDP per capita, but the premium fades or reverses after that middle-income threshold unless market competition and rule-bound institutions strengthen.
+evidence_type: associational
+sample:
+  countries: [KOR, TWN, CHN, MYS, THA, VNM, IDN, IND, BRA, MEX, CHL, ARG, TUR, POL, EST, IRL, PRT, ESP, GRC, ZAF, SGP, JPN, HKG]
+  period: [1960, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - require GDP per capita series sufficient to identify threshold-crossing windows
+  - exclude oil microstates and war-collapse years in robustness checks
+variables:
+  outcome:
+  - name: five_year_gdp_pc_growth
+    source: pwt:rgdpo_pop; world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: rolling five-year annualized growth
+  treatment:
+  - name: developmentalist_policy_intensity
+    source: movement_position_alignments:developmentalism; vdem:state_ownership; world_bank:industrial_policy_proxy
+    transformation: coded developmentalist alignment and state-allocation proxy
+  - name: market_institution_strength
+    source: fraser_efw:summary_index; wgi:rule_of_law
+    transformation: standardized score
+  controls:
+  - name: income_threshold
+    source: pwt:rgdpo_pop
+    transformation: country GDP per capita as share of US GDP per capita
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: Interaction model between developmentalist intensity and below/above 40 percent US income threshold.
+falsification:
+  rule: SUPPORTED if developmentalist intensity is positive below 40 percent of US income but statistically weaker, zero, or negative above that threshold, and market-institution strength is positive above the threshold. REFUTED if developmentalist intensity remains equally positive above the threshold while market institutions add no positive signal. Otherwise PARTIAL.
+  test: catch_up_threshold_interaction_panel
+  threshold:
+    income_threshold_us_share: 0.40
+    p_max: 0.05
+    min_growth_effect_pp: 0.5
+prior_confidence: 0.58
+disclosure: The prior expects state-led catch-up to be real but less durable near the frontier; the specification should not erase East Asian success cases.
+steelman: hypotheses/steelman/catch_up_growth_fades_after_middle_income_threshold.md
+scope:
+  period: [1960, 2024]
+  countries: [GLOBAL, ASIA_EM, LATAM, POST_SOVIET]
+  outcome_dim: [gdp_growth, productivity, institutional_quality]
+  policy_family: [industrial_policy, institutional_reform, regulation]
+  treatment_tags: [developmentalist_catch_up, middle_income_threshold, market_institutions]
+

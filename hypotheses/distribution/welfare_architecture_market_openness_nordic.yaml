@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_architecture_market_openness_nordic
+version: 1
+status: candidate
+topic: distribution
+claim: Nordic prosperity relative to peer high-income economies is better explained by the combination of generous welfare states with high trade openness, flexible labour markets, and strong competition policy than by welfare-state size alone, over the 1990-2023 period.
+evidence_type: associational
+sample:
+  countries:
+  - DNK
+  - FIN
+  - ISL
+  - NOR
+  - SWE
+  - DEU
+  - FRA
+  - GBR
+  - NLD
+  - BEL
+  - AUT
+  - CHE
+  - USA
+  - CAN
+  - AUS
+  - IRL
+  period:
+  - 1990
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: real_gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: annual_log_growth
+  - name: labour_productivity_growth
+    source: oecd_stan:gdp_per_hour_worked
+    transformation: annual_growth
+    notes: OECD STAN labour productivity per hour worked where available; PWT rgdpo/emp otherwise.
+  treatment:
+  - name: social_spending_share
+    source: oecd:socx
+    transformation: level
+    notes: OECD Social Expenditure Database, public social spending as % of GDP.
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: employment_protection_legislation
+    source: oecd:eprc_v1
+    transformation: level
+    notes: OECD EPL strictness of employment protection, overall version 1.
+  - name: product_market_regulation
+    source: oecd_pmr:overall
+    transformation: level
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: tertiary_education
+    source: world_bank_wdi:SE.TER.ENRR
+    transformation: level
+  - name: institutional_quality
+    source: wgi:GOV_WGI_GE.EST
+    transformation: level
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: PanelOLS with country and year FE. The specification interacts social_spending_share with trade_openness and with (1-EPL) and (1-PMR) to test whether welfare-state effects are amplified by market openness and flexibility. Decomposition reports marginal effects at high vs low openness/flexibility.
+falsification:
+  rule: SUPPORTED if the interaction term between social spending and trade openness is positive and significant (p<=0.05), and the marginal effect of social spending on growth is significantly larger at above-median openness than at below-median openness. REFUTED if the interaction is negative and significant with p<=0.05. Otherwise PARTIAL.
+  test: panel_fe_interaction_welfare_openness
+  threshold:
+    interaction_sign: positive
+    p_max: 0.05
+    min_countries: 15
+    min_observations: 250
+prior_confidence: 0.6
+disclosure: The prior is shaped by the familiar Nordic-model literature but pre-registration commits to reporting null or negative interaction effects with equal prominence.
+steelman: hypotheses/steelman/welfare_architecture_market_openness_nordic.md
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - NORDIC
+  - EU
+  - ANGLO
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  - trade_policy
+  - labour_market
+  treatment_tags:
+  - nordic_model
+  - welfare_openness_interaction

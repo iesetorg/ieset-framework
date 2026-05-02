@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: czech_slovak_market_transition_comparison
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  The long-run prosperity gap between the Czech Republic and Slovakia since
+  their 1993 dissolution is better explained by divergence in market
+  institutions and FDI openness than by state-led industrial strategy. In a
+  panel of post-communist transition economies, the Czech Republic’s higher
+  post-1993 GDP per capita and total factor productivity are positively
+  associated with a larger gap in market-institution quality and FDI inflows,
+  while government consumption (a proxy for state footprint) does not show a
+  comparable or larger positive association with the gap.
+
+evidence_type: causal
+
+sample:
+  countries:
+    - CZE
+    - SVK
+    - POL
+    - HUN
+    - SVN
+    - HRV
+    - BGR
+    - ROU
+    - EST
+    - LVA
+    - LTU
+  period: [1993, 2024]
+  temporal_structure: panel
+
+scope:
+  period: [1993, 2024]
+  countries:
+    - CZE
+    - SVK
+    - POL
+    - HUN
+    - SVN
+    - HRV
+    - BGR
+    - ROU
+    - EST
+    - LVA
+    - LTU
+  outcome_dim:
+    - gdp_growth
+    - productivity
+    - institutional_quality
+  policy_family:
+    - institutional_reform
+    - competition_policy
+    - industrial_policy
+  treatment_tags:
+    - czech_slovak_dissolution_1993
+    - czech_fdi_openness
+    - slovak_state_industrial_strategy
+
+variables:
+  outcome:
+    - name: real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: manufacturing_va_share
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+  decomposition_channels:
+    - name: market_institutions_index
+      source: "fraser_efw:summary_index"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: govt_consumption_pct_gdp
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: level
+      notes: "Coarse proxy for state footprint; not a direct industrial-strategy measure."
+  controls:
+    - name: initial_gdp_pc_1993
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: level_at_1993
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: eu_membership_dummy
+      source: "constructed: 1 from 2004 for EU accession countries"
+      transformation: binary
+    - name: human_capital
+      source: "pwt:hc"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The claim compares market-institution and FDI channels against state
+  industrial strategy. Decomposition channels span regulatory, trade, and
+  fiscal footprints. Bundled coding per invariant 4.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Decomposition panel FE with country and year fixed effects. The Czech-
+    Slovak gap is decomposed into contributions from market institutions, FDI,
+    and government consumption. Two-spec rule: also run a long-difference
+    cross-section (1993 vs 2024) regression of log GDP-pc growth on changes in
+    the same three factors.
+
+falsification:
+  rule: >
+    Refuted if the combined coefficient magnitude of market institutions and
+    FDI on log GDP-pc is not larger than the coefficient on government
+    consumption, or if the market-institutions coefficient is negative and
+    significant at p<0.05.
+  test: panel_fe_decomposition_cze_svk
+  threshold: >
+    (|beta_market_institutions| + |beta_fdi|) > |beta_govt_consumption| AND
+    beta_market_institutions > 0 at p < 0.10.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author expects market institutions to dominate but acknowledges Czech pre-
+  dissolution industrial base and geographic proximity to Germany as confounds
+  not fully captured by the panel.
+
+steelman: hypotheses/steelman/czech_slovak_market_transition_comparison.md
+
+linked_hypotheses:
+  - poland_market_transition_30yr_growth
+  - estonia_market_reform_30yr_income_convergence

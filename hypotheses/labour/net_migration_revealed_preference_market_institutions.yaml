@@ -1,0 +1,154 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: net_migration_revealed_preference_market_institutions
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Net migration flows per 1,000 population across countries 1990-2020 are positively
+  associated with stronger market institutions (higher Economic Freedom of the World
+  composite, lower OECD PMR product-market regulation, and stronger rule of law),
+  after controlling for per-capita income level, common language networks, and
+  proximity to armed conflict. The claim is that revealed preference in migration
+  patterns favors institutional environments with secure property rights and open
+  markets over state-directed alternatives at comparable income levels.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - ISR
+  - EST
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - CHL
+  - MEX
+  - ZAF
+  - IND
+  - IDN
+  - PHL
+  - BRA
+  - ARG
+  - URY
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - CHN
+  - VNM
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years with active civil war (UCDP/PRIO battle-deaths >1000)
+  - exclude micro-states with population <1 million
+  - winsorise net migration rate at 1st/99th percentile
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - OECD
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - ARG
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - CHN
+  - VNM
+  - IND
+  - IDN
+  - PHL
+  outcome_dim:
+  - demographics_migration
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - none
+  treatment_tags: []
+variables:
+  outcome:
+  - name: net_migration_rate_per_1000
+    source: world_bank_wdi:SM.POP.NETM
+    transformation: level
+    notes: Net migration per 1,000 population; WDI estimates derived from UN DESA.
+  treatment:
+  - name: economic_freedom_composite
+    source: fraser_efw:summary_index
+    transformation: level
+    notes: Fraser Institute EFW overall summary index (0-10), higher = more market freedom.
+  - name: product_market_regulation
+    source: oecd_pmr:overall_pmr
+    transformation: level
+    notes: OECD PMR overall product-market regulation score; lower = less regulation.
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+  controls:
+  - name: log_gdp_per_capita_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: common_language_migration_index
+    source: constructed:migration_language_proxies_melitz_houde
+    transformation: level
+    notes: Language proximity index as proxy for migration-network pull.
+  - name: conflict_proximity_score
+    source: ucdp:ged; constructed
+    transformation: level
+    notes: Inverse distance-weighted conflict deaths in neighboring countries.
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if the pooled coefficient on market-institution proxies
+    (EFW, PMR, or rule of law) is negative and statistically significant (p < 0.10) in a
+    country- and year-fixed-effects panel with country-clustered standard errors, or if
+    the coefficient is positive but smaller than one standard error after controlling for
+    income, language, and conflict.
+  test: panel_fe_net_migration_on_market_institutions_1990_2020
+  threshold:
+    supported: coefficient on EFW > 0 at p < 0.10 and magnitude > 1.0 migrants per 1,000 per 1-point EFW increase
+    refuted: coefficient on EFW < 0 at p < 0.10
+prior_confidence: 0.65
+disclosure: >-
+  Author priors expect market-institution quality to be a positive predictor of net
+  migration, but acknowledge that income differentials and existing diaspora networks
+  likely dominate institutional quality in raw flows. The test is deliberately
+  conditional on income and language controls.
+steelman: hypotheses/steelman/net_migration_revealed_preference_market_institutions.md

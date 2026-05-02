@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: consumer_choice_variety_trade_market_reform
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Consumer product variety and price-adjusted welfare improve more after episodes of trade
+  liberalisation and competition-policy reform than after state industrial-policy episodes
+  of comparable duration and scale, in a panel of middle- and high-income countries
+  1980-2020. Variety is measured by import-product-line counts and domestic SKU availability
+  indices; welfare is measured by real consumption deflated by quality-adjusted price indices.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - ISR
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - ARG
+  - URY
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  - VNM
+  period:
+  - 1980
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude episodes with concurrent currency or banking crises
+  - require at least 5 years of pre-reform and 5 years of post-reform data for episode identification
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - OECD
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - ARG
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  - VNM
+  outcome_dim:
+  - trade_liberalisation
+  - competition_concentration
+  - poverty_inequality
+  policy_family:
+  - trade_policy
+  - competition_policy
+  - industrial_policy
+  treatment_tags: []
+variables:
+  outcome:
+  - name: import_product_variety_count
+    source: un_comtrade:product_lines; world_bank_wits:product_concentration
+    transformation: log
+    notes: Number of distinct HS6 product lines in imports as proxy for consumer variety.
+  - name: real_quality_adjusted_consumption
+    source: pwt:rconna
+    transformation: log
+    notes: PWT real consumption per capita as welfare proxy; quality adjustment is partial.
+  treatment:
+  - name: trade_liberalisation_episode
+    source: constructed:wacziarg_welch_trade_liberalisation_dates
+    transformation: indicator
+    notes: Wacziarg-Welch (2008) trade-liberalisation episode dates.
+  - name: competition_reform_episode
+    source: oecd_pmr:overall_pmr
+    transformation: change_score
+    notes: Large decline in OECD PMR overall score (>1 standard deviation) within 5-year window.
+  - name: industrial_policy_intensity
+    source: constructed:state_ownership_share_and_sectoral_targeting
+    transformation: level
+    notes: Proxy from SOE share of value added and sectoral subsidy intensity where available.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: services_share_gdp
+    source: world_bank_wdi:NV.SRV.TOTL.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if the post-reform coefficient on trade/competition episodes
+    is negative and significant (p < 0.10) for variety or welfare, or if industrial-policy
+    episodes show a significantly larger positive coefficient than trade/competition episodes
+    in a head-to-head panel specification.
+  test: panel_fe_consumer_variety_reform_episodes_1980_2020
+  threshold:
+    supported: trade/competition coefficient > 0 at p < 0.10 AND larger than industrial-policy coefficient
+    refuted: trade/competition coefficient < 0 at p < 0.10
+prior_confidence: 0.55
+disclosure: >-
+  Author priors favor market-reform channels but acknowledge that industrial policy in East
+  Asia expanded export variety through targeted sectoral promotion. The variety measure may
+  conflate intermediate and final goods, overstating consumer welfare.
+steelman: hypotheses/steelman/consumer_choice_variety_trade_market_reform.md

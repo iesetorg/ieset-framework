@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: constitutional_fiscal_rules_growth_stability
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across advanced and emerging-market economies 1980-2020,
+  constitutional or statutory fiscal rules — debt brakes,
+  deficit ceilings, and expenditure-growth limits — predict more
+  durable prosperity (lower growth volatility and stronger long-
+  run income growth) than discretionary state-investment surges.
+  The pre-registered claim is that countries with binding fiscal
+  rules in place for at least 10 years show at least 0.8
+  percentage points lower standard deviation of GDP growth and
+  at least 0.3 percentage points higher mean growth over 1980-
+  2020 than matched peers without such rules, after controlling
+  for initial income, resource dependence, and financial
+  development.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA, ROU, BGR, HRV, SRB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with systemic banking crises (fiscal rules may be suspended)"
+    - "drop observations where fiscal-rule bindingness is ambiguous (coded conservatively as non-binding)"
+
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality, fiscal_policy]
+  policy_family: [fiscal_policy, institutional_reform]
+  treatment_tags: [fiscal_rules, debt_brake, deficit_ceiling, discretionary_investment, growth_volatility]
+
+variables:
+  outcome:
+    - name: gdp_growth_volatility
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "rolling_sd_10yr"
+      notes: "Standard deviation of annual real GDP growth over 10-year rolling windows."
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+    - name: long_run_prosperity_index
+      source: "constructed: mean_growth_minus_volatility"
+      transformation: "level"
+      notes: "Composite prosperity index: mean growth minus a penalty for volatility."
+  treatment:
+    - name: binding_fiscal_rule_dummy
+      source: "constructed: imf_fiscal_rules_database + national_legislation"
+      transformation: "indicator"
+      notes: "Indicator = 1 if country has a constitutional or statutory numerical fiscal rule (debt brake, deficit ceiling, structural-balance target, expenditure-growth limit) in force for at least 10 years over the sample window. Hand-coded from IMF Fiscal Rules Database 2022, EU Fiscal Rules Database, and national legislation."
+    - name: discretionary_state_investment_surge
+      source: "constructed: public_investment_above_trend_plus_3sd"
+      transformation: "indicator"
+      notes: "Indicator for discretionary state-investment surges: public investment > 1.5 standard deviations above country-specific trend for at least 3 consecutive years."
+    - name: public_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "level"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: natural_resource_rents
+      source: "world_bank_wdi:NY.GDP.TOTL.RT.ZS"
+      transformation: "level"
+    - name: financial_development
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Fiscal rules are institutional constraints on discretionary
+  fiscal policy. State-investment surges are fiscal
+  interventions. The hypothesis compares institutional-channel
+  durability against discretionary-fiscal-channel volatility.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE comparing rule-bound vs non-rule-bound country-years
+    on growth volatility and mean growth. Matching estimator as
+    robustness: propensity-score matching on initial income,
+    resource dependence, and financial development. Event-study
+    around fiscal-rule adoptions (e.g. Germany Schuldenbremse
+    2009, Switzerland debt brake 2003, Sweden surplus target 1997)
+    with synthetic control. Robustness: exclude EU countries
+    (where rules may be EU-imposed rather than domestically
+    chosen); exclude commodity exporters.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on binding fiscal rule is
+    not negative and significant at p<0.05 on growth volatility,
+    OR (b) the mean growth difference between rule-bound and non-
+    rule-bound countries is below 0.15 pp/year, OR (c) the
+    discretionary-investment-surge coefficient is positive and
+    significant on long-run prosperity (suggesting discretion
+    outperforms rules). A Keynesian / counter-cyclical-fiscal
+    reading wins if (c) holds or if fiscal rules are associated
+    with lower growth (austerity drag).
+  test: panel_fe_fiscal_rules_vs_discretionary_investment_on_prosperity
+  threshold: >
+    panel_FE_beta(binding_fiscal_rule → growth_volatility) < 0 at p<0.05
+    AND mean_growth_rule_bound − mean_growth_no_rule >= 0.30 pp/yr
+    AND discretionary_surge_coefficient NOT > prosperity_index at p<0.10
+
+prior_confidence: 0.55
+
+disclosure: >
+  The fiscal-rules literature (Kopits-Symansky 1998, IMF FAD 2019,
+  Heinemann et al. 2018) finds that rules reduce deficits and
+  debt but evidence on growth effects is mixed: some rules
+  coincide with austerity and low growth (Eurozone post-2010),
+  while others coincide with stability and investment (Switzerland,
+  Nordics). Author's market-liberal priors lean toward the rules-
+  as-commitment-devices view but prior 0.55 reflects the genuine
+  empirical ambiguity. Bias risk: author may under-weight the
+  "fiscal rules as pro-cyclical straitjackets" critique
+  (especially for Eurozone periphery) and over-weight the
+  Swiss/German success stories.
+
+steelman: hypotheses/steelman/constitutional_fiscal_rules_growth_stability.md
+
+linked_hypotheses:
+  - fiscal_rule_presence_dampens_statist_drift
+  - rule_of_law_market_reform_complementarity
+
+notes: >
+  IMF Fiscal Rules Database 2022 is the primary source for rule
+  identification. EU Fiscal Rules Database provides detail for
+  European members. National legislation verification is required
+  for bindingness coding. Discretionary-investment-surge
+  identification uses IMF WEO and WDI public-investment series.

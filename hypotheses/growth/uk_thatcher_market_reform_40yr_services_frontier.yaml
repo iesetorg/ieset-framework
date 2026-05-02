@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uk_thatcher_market_reform_40yr_services_frontier
+version: 1
+status: candidate
+topic: growth
+claim: >
+  UK market reforms from 1979-1990 (privatisation, labour-market deregulation,
+  financial liberalisation, and tax simplification) predict stronger long-run
+  services-sector productivity and employment growth during 1980-2020 than
+  comparable European corporatist regimes (France, Germany, Italy) with stronger
+  labour-market coordination, industrial planning, and sectoral bargaining.
+evidence_type: causal
+sample:
+  countries:
+    - GBR
+    - DEU
+    - FRA
+    - ITA
+    - ESP
+    - NLD
+    - BEL
+    - AUT
+    - SWE
+    - DNK
+    - CHE
+    - NOR
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude 2008-2012 financial crisis as exogenous shock to UK financial services
+    - Exclude North Sea oil revenue years (1980-1985) as exogenous commodity windfall
+scope:
+  period: [1980, 2020]
+  countries:
+    - GBR
+    - DEU
+    - FRA
+    - ITA
+    - ESP
+    - NLD
+    - BEL
+    - AUT
+    - SWE
+    - DNK
+    - CHE
+    - NOR
+  outcome_dim: [productivity, employment_labour, competition_concentration]
+  policy_family: [competition_policy, institutional_reform, regulation, privatisation_nationalisation]
+  treatment_tags: [thatcher_reforms_1979_1990, uk_privatisation_wave, uk_financial_big_bang_1986]
+variables:
+  outcome:
+    - name: services_sector_productivity
+      source: oecd_stan:services_va_per_hour
+      transformation: level_index
+      notes: OECD STAN services sector value added per hour worked.
+    - name: services_employment_share
+      source: ilo:employee_services_share
+      transformation: level_pct
+    - name: business_services_output
+      source: oecd_stan:financial_and_business_services_va
+      transformation: log_level
+  treatment:
+    - name: market_reform_intensity
+      source: constructed:composite_privatisation_deregulation_tax_reform
+      transformation: continuous_index
+      notes: Composite of privatisation receipts/GDP, OECD EPL strictness, top marginal tax rate.
+    - name: post_1979_reform_dummy
+      source: constructed:binary
+      transformation: binary
+      notes: 1 for GBR from 1980 onward, 0 for corporatist peers.
+  controls:
+    - name: initial_services_share
+      source: world_bank_wdi:NV.SRV.TOTL.ZS
+      transformation: level_at_1980
+    - name: financial_sector_size
+      source: constructed:bank_assets_to_gdp
+      transformation: level
+    - name: oil_and_gas_revenue
+      source: constructed:north_sea_oil_revenue_share
+      transformation: level
+      notes: UK-only control for North Sea windfall.
+intervention_channel: bundled
+intervention_channel_justification: >
+  Thatcher reforms bundled privatisation, labour-market deregulation, financial
+  liberalisation, and tax reform; channels are interdependent and treated as bundled.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE with services-sector decomposition. Synthetic control using UK as treated
+    and continental European corporatist regimes as donors, pre-treatment fit on 1975-1979.
+falsification:
+  rule: >
+    Falsified if UK services-sector productivity growth 1980-2020 does not exceed the
+    synthetic-control or FE-comparator mean by at least 8 percentage points cumulative,
+    or if the premium is fully explained by financial-sector size and North Sea oil
+    revenue rather than reform intensity.
+  test: panel_fe_plus_synthetic_control
+  threshold:
+    services_productivity_premium_pct: 8
+    significance: p_lt_0.10
+    oil_and_finance_explanation: partial_r_squared_lt_0.30
+prior_confidence: 0.52
+disclosure: >
+  Author is uncertain about UK services productivity claims; financial-sector
+  deregulation likely helped London but may have harmed aggregate stability.
+  Prior reflects scepticism of strong Thatcher-growth narratives.
+steelman: hypotheses/steelman/uk_thatcher_market_reform_40yr_services_frontier.md
+linked_hypotheses:
+  - uk_economic_decline_multi_movement
+  - industrial_policy_developmentalist_states_growth
+notes: >
+  OECD STAN services productivity data available from 1995 for most countries.
+  Pre-1995 interpolation from national accounts or EU KLEMS where available.

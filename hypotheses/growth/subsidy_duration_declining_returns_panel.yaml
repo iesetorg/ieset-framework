@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: subsidy_duration_declining_returns_panel
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Industrial subsidies have positive early output effects but declining or negative
+  productivity effects when maintained beyond 10 years in a broad panel of advanced
+  and emerging economies during 1970-2020.
+evidence_type: causal
+sample:
+  countries:
+    - USA
+    - DEU
+    - FRA
+    - GBR
+    - JPN
+    - AUS
+    - CAN
+    - ITA
+    - ESP
+    - NLD
+    - CHE
+    - SWE
+    - NOR
+    - DNK
+    - FIN
+    - AUT
+    - BEL
+    - KOR
+    - TWN
+    - CHN
+    - BRA
+    - IND
+    - MEX
+    - ZAF
+    - IDN
+    - THA
+    - MYS
+    - POL
+    - CZE
+    - GRC
+    - PRT
+    - NZL
+    - IRL
+    - ISR
+    - SGP
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude wartime or post-conflict reconstruction periods
+    - Exclude temporary crisis-response subsidies (2008-2009, 2020) as temporary emergency measures
+scope:
+  period: [1970, 2020]
+  countries:
+    - OECD
+    - KOR
+    - TWN
+    - CHN
+    - BRA
+    - IND
+    - MEX
+    - ZAF
+    - IDN
+    - THA
+    - MYS
+  outcome_dim: [gdp_growth, productivity, industrial_capability]
+  policy_family: [industrial_policy, fiscal_policy]
+  treatment_tags: [industrial_subsidies, subsidy_duration, declining_returns]
+variables:
+  outcome:
+    - name: output_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: annual_pct
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+    - name: sectoral_va_growth
+      source: oecd_stan:value_added_by_sector
+      transformation: annual_pct
+  treatment:
+    - name: subsidy_duration
+      source: constructed:years_since_subsidy_programme_inception
+      transformation: continuous
+      notes: Duration of continuous subsidy programme in years.
+    - name: subsidy_intensity
+      source: constructed:subsidies_pct_gdp_or_sector_va
+      transformation: level_pct
+  controls:
+    - name: initial_income
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: sectoral_composition
+      source: world_bank_wdi:NV.IND.MANF.ZS
+      transformation: level_pct
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Subsidies operate through fiscal channel by transferring public resources to
+  targeted firms or sectors.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE with quadratic term in subsidy duration to test for declining returns.
+    Robustness via event-study around subsidy programme starts and ends.
+falsification:
+  rule: >
+    Falsified if the coefficient on subsidy duration-squared in a TFP growth
+    regression is not negative and statistically significant, or if subsidies
+    maintained beyond 10 years show no productivity decline relative to unsubsidised
+    sectors.
+  test: panel_fe_quadratic_subsidy_duration
+  threshold:
+    duration_squared_coefficient: negative_p_lt_0.10
+    ten_year_tfp_premium: negative_or_zero
+prior_confidence: 0.55
+disclosure: >
+  Author holds priors that subsidy effectiveness declines with duration due to
+  rent-seeking and political capture, but acknowledges East Asian cases where
+  long-duration subsidies coincided with export discipline and upgrading.
+steelman: hypotheses/steelman/subsidy_duration_declining_returns_panel.md
+linked_hypotheses:
+  - industrial_policy_developmentalist_states_growth
+  - industrial_policy_without_exit_discipline_failure
+notes: >
+  Subsidy data from OECD STI, WTO notifications, national budget documents, and
+  Klier and Linn (2010) auto-sector databases. Duration coding requires manual
+  programme tracing.

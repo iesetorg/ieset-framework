@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: frontier_tfp_market_liberal_panel_1970_2024
+version: 1
+status: candidate
+topic: growth
+claim: Among high-income and near-frontier economies from 1970 to 2024, lower product-market regulation, stronger competition, and stronger property rights predict higher long-run TFP growth than state ownership or targeted industrial-policy intensity.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, JPN, CAN, AUS, SWE, NLD, CHE, KOR, SGP, IRL, ESP, ITA, NZL, NOR, DNK, FIN, PRT, GRC, POL, EST, CHL]
+  period: [1970, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - require at least 15 annual TFP observations
+  - run OECD-only robustness where PMR coverage is available
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna; oecd:mfp
+    transformation: annual and ten-year rolling TFP growth
+  treatment:
+  - name: market_liberal_score
+    source: fraser_efw:regulation_property_rights_trade; oecd:product_market_regulation
+    transformation: standardized low-regulation/high-property-rights index
+  - name: state_ownership_intensity
+    source: oecd:state_control_pmr; vdem:state_ownership_proxy
+    transformation: standardized state-control proxy
+  controls:
+  - name: initial_income
+    source: pwt:rgdpo_pop
+    transformation: log GDP per capita
+  - name: human_capital
+    source: pwt:hc
+    transformation: human capital index
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: Baseline panel FE with decade-average robustness to reduce cyclical noise.
+falsification:
+  rule: SUPPORTED if market_liberal_score positively predicts TFP growth with p<=0.05 and at least 0.20pp annual effect per standard deviation, while state_ownership_intensity is zero or negative. REFUTED if market_liberal_score is negative with p<=0.05 or state ownership dominates positively. Otherwise PARTIAL.
+  test: frontier_tfp_market_liberal_panel
+  threshold:
+    min_countries: 18
+    min_observations: 250
+    p_max: 0.05
+    min_effect_pp: 0.20
+prior_confidence: 0.6
+disclosure: This directly tests a market-liberal frontier prosperity claim and may be sensitive to measurement of state ownership and product-market regulation.
+steelman: hypotheses/steelman/frontier_tfp_market_liberal_panel_1970_2024.md
+scope:
+  period: [1970, 2024]
+  countries: [OECD]
+  outcome_dim: [productivity, institutional_quality, competition_concentration]
+  policy_family: [regulation, competition_policy, privatisation_nationalisation]
+  treatment_tags: [product_market_regulation, property_rights, tfp_growth]
+

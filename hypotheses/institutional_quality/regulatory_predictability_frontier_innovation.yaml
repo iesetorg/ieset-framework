@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: regulatory_predictability_frontier_innovation
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Among high-income frontier economies 1990-2020, regulatory
+  predictability — measured by low regulatory-policy volatility,
+  stable tax codes, and low frequency of major rule changes —
+  predicts innovation outcomes (patent quality, R&D productivity,
+  and frontier TFP growth) better than direct public R&D subsidies
+  as a share of GDP. The pre-registered claim is that, in a horse-
+  race regression, the coefficient on regulatory predictability is
+  larger in absolute t-statistic than the coefficient on public R&D
+  subsidies, and that countries in the top tercile of regulatory
+  predictability show at least 0.25 percentage points higher annual
+  TFP growth and 10% more forward citations per patent than
+  countries in the bottom tercile.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, SVN, SVK, LVA, LTU]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with major regulatory overhauls that are themselves innovation policy (e.g. EU GDPR 2018 treated as separate event, not noise)"
+    - "drop observations where public R&D data is imputed"
+
+scope:
+  period: [1990, 2020]
+  countries: [OECD]
+  outcome_dim: [productivity, industrial_capability, institutional_quality]
+  policy_family: [regulation, fiscal_policy, industrial_policy]
+  treatment_tags: [regulatory_predictability, public_rd_subsidies, innovation_policy, patent_quality]
+
+variables:
+  outcome:
+    - name: tfp_growth
+      source: "pwt:rtfpna"
+      transformation: "log_diff"
+      notes: "Annual TFP growth from Penn World Table."
+    - name: patent_forward_citations_per_patent
+      source: "wipo:patent_citations"
+      transformation: "level"
+      notes: "Forward citations per patent family, 5-year window."
+    - name: rd_productivity
+      source: "constructed: patents_per_million_rd_dollars"
+      transformation: "level"
+      notes: "Patent output per million PPP dollars of R&D spending."
+  treatment:
+    - name: regulatory_predictability_index
+      source: "constructed: 0.4×fraser_efw:regulatory_stability + 0.3×oecd_gov_regulatory_management + 0.3×tax_code_stability"
+      transformation: "level"
+      notes: "Composite predictability index. Fraser EFW regulatory stability sub-component; OECD Regulatory Policy and Governance indicators; tax-code stability from KPMG / IBFD annual surveys. Higher = more predictable."
+    - name: public_rd_subsidies_share_gdp
+      source: "world_bank_wdi:GB.XPD.RSDV.GD.ZS"
+      transformation: "level"
+      notes: "Public R&D spending % GDP. Note: WDI series mixes public and private; OECD Main Science and Technology Indicators preferred for OECD members."
+    - name: fraser_regulatory_stability
+      source: "fraser_efw:regulatory_stability"
+      transformation: "level"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: private_rd_share_gdp
+      source: "oecd:msti_private_rd"
+      transformation: "level"
+      notes: "Private R&D % GDP from OECD MSTI."
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: product_market_regulation
+      source: "oecd_pmr:pmr_composite"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Regulatory predictability is an institutional feature that
+  reduces option-value uncertainty for long-horizon R&D
+  investments. Public R&D subsidies are fiscal interventions.
+  The horse-race compares institutional vs fiscal channels for
+  frontier innovation.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE horse-race: regulatory predictability and public R&D
+    subsidies entered simultaneously. Primary test: absolute t-
+    statistic comparison. Tercile comparison as robustness.
+    Robustness: exclude US; use only EU-15 sub-sample; use OECD
+    MSTI public R&D measure instead of WDI; alternative
+    predictability measure from V-Dem policy predictability.
+
+falsification:
+  rule: >
+    Not supported if (a) the regulatory-predictability coefficient
+    is not positive and significant at p<0.05 on TFP growth or
+    patent citations, OR (b) in the horse-race the public-R&D
+    coefficient has a larger absolute t-statistic than regulatory
+    predictability, OR (c) the top-tercile vs bottom-tercile TFP
+    growth gap is below 0.15 pp/year. A "public R&D drives
+    innovation" reading wins cleanly if (b) holds.
+  test: panel_fe_horserace_regulatory_predictability_vs_public_rd
+  threshold: >
+    panel_FE_beta(predictability → tfp_growth) > 0 at p<0.05
+    AND |t_stat(predictability)| > |t_stat(public_rd_subsidies)| in horse-race
+    AND top_tercile_mean_tfp_gap >= 0.25 pp/yr
+
+prior_confidence: 0.55
+
+disclosure: >
+  The innovation-policy literature (Mazzucato 2013, Rodrik 2004,
+  Aghion et al. 2015) strongly advocates public R&D subsidies and
+  mission-oriented policy. The regulatory-predictability channel
+  is less studied but consistent with classical uncertainty-cost
+  theory (Knight, Keynes). Author's market-liberal priors lean
+  toward predictability but prior 0.55 reflects the genuine
+  empirical success of public R&D in pharmaceuticals, semiconductors,
+  and clean energy. Bias risk: author may under-weight the
+  positive externalities of public R&D and over-weight the
+  uncertainty-reduction channel.
+
+steelman: hypotheses/steelman/regulatory_predictability_frontier_innovation.md
+
+linked_hypotheses:
+  - competition_policy_enforcement_innovation
+  - sectoral_competition_services_productivity
+
+notes: >
+  Regulatory predictability is poorly measured compared to R&D
+  spending. Fraser EFW provides the longest series but is
+  opinion-survey-based. OECD regulatory-management indicators are
+  objective but start later and have patchy coverage. This is
+  the primary measurement limitation.

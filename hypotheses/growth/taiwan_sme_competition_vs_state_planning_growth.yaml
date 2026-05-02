@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: taiwan_sme_competition_vs_state_planning_growth
+version: 1
+status: candidate
+topic: growth
+claim: Taiwan's long-run productivity performance is better predicted by SME competition and export-market discipline than by direct state planning intensity.
+evidence_type: causal
+sample:
+  countries:
+    - TWN
+  period: [1960, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: labour_productivity_growth
+      source: oecd_stan:gdp_per_hour_worked
+      transformation: annual_log_diff
+      notes: OECD STAN for Taiwan via alternative compilation; national accounts as fallback.
+    - name: tfp_growth
+      source: pwt:rtfpna
+      transformation: annual_log_diff
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+  treatment:
+    - name: sme_share_of_employment
+      source: constructed:nsb_sme_survey
+      transformation: level
+      notes: SME employment share from Taiwan National Statistics Bureau or academic compilations.
+    - name: state_planning_intensity
+      source: constructed:composite_index
+      transformation: level
+      notes: Composite of state-directed investment share, SOE output share, and planning-board budget authority.
+    - name: export_ratio
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+  controls:
+    - name: r_d_intensity
+      source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
+      transformation: level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+    - name: fdi_inflows
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [year]
+  clustering: none
+  notes: Time-series regression of productivity growth on SME competition, export discipline, and state planning intensity. Uses rolling windows to test which factor predicts subsequent productivity growth.
+falsification:
+  rule: The hypothesis is refuted if state planning intensity has a larger and significant positive coefficient than SME competition or export ratio in predicting Taiwan's productivity growth 1960-2024, or if SME competition does not significantly predict productivity growth.
+  test: time_series_taiwan_productivity_drivers
+  threshold:
+    sme_coef: ">0 and p<0.10"
+    state_planning_coef: "<=0 or p>=0.10"
+prior_confidence: 0.55
+disclosure: Author acknowledges that Taiwan's state planning was less intensive than Korea's and that SME data quality varies over time; the comparison may be stacked in favour of the SME hypothesis.
+steelman: hypotheses/steelman/taiwan_sme_competition_vs_state_planning_growth.md
+scope:
+  period: [1960, 2024]
+  countries:
+    - TWN
+  outcome_dim:
+    - productivity
+    - competition_concentration
+    - trade_liberalisation
+  policy_family:
+    - industrial_policy
+    - competition_policy
+    - trade_policy
+  treatment_tags:
+    - taiwan_sme_ecosystem
+    - taiwan_export_discipline
+    - taiwan_industrial_planning
+notes: Taiwan SME employment share requires compilation from national statistics; some years interpolated. State planning intensity is a constructed index requiring academic source calibration.

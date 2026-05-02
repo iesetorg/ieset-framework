@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: national_champions_long_run_productivity_drag
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Sectors dominated by national-champion firms show lower 20-year total-factor-
+  productivity growth than comparable competitive sectors after the initial scale-up
+  phase, in a broad panel of OECD and emerging-market economies during 1980-2020.
+evidence_type: associational
+sample:
+  countries:
+    - USA
+    - DEU
+    - FRA
+    - GBR
+    - JPN
+    - KOR
+    - CHN
+    - BRA
+    - IND
+    - ZAF
+    - MEX
+    - TUR
+    - IDN
+    - AUS
+    - CAN
+    - ITA
+    - ESP
+    - NLD
+    - CHE
+    - SWE
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude sectors with natural monopoly or network-utility characteristics
+    - Exclude crisis years (2008-2009, 2020) as exogenous shocks
+scope:
+  period: [1980, 2020]
+  countries:
+    - OECD
+    - KOR
+    - JPN
+    - CHN
+    - BRA
+    - IND
+    - ZAF
+    - MEX
+    - TUR
+    - IDN
+  outcome_dim: [productivity, competition_concentration]
+  policy_family: [industrial_policy, competition_policy]
+  treatment_tags: [national_champion_policy, state_aid_concentration]
+variables:
+  outcome:
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+    - name: labour_productivity_growth
+      source: oecd_stan:gdp_per_hour_worked
+      transformation: annual_pct
+  treatment:
+    - name: national_champion_concentration
+      source: constructed:top_3_firm_revenue_share_by_sector
+      transformation: level_pct
+      notes: Sector-level CR3 revenue share; high values indicate national-champion dominance.
+    - name: state_aid_intensity
+      source: constructed:oecd_sti_or_national_state_aid_database
+      transformation: level_pct_gdp
+  controls:
+    - name: sector_size
+      source: constructed:sector_va_share
+      transformation: level_pct
+    - name: r_and_d_spending
+      source: oecd_stan:business_rd_expenditure
+      transformation: level_pct_va
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  National champion policies operate through regulatory and competition-policy
+  channels by shielding dominant firms from competitive pressure.
+estimator:
+  template: panel_fe
+  clustering: country_sector
+  fixed_effects: [country, sector, year]
+  notes: >
+    Sector-country panel FE with country, sector, and year fixed effects.
+    Cluster at country-sector level. Robustness via IV using EU state-aid
+    court rulings as instrument.
+falsification:
+  rule: >
+    Falsified if sectors with national-champion concentration (top-3 revenue share
+    above 60%) do not show statistically lower TFP growth than competitive sectors
+    (top-3 share below 40%) over 20-year windows after controlling for R&D,
+    sector size, and trade openness.
+  test: panel_fe_champion_concentration_on_tfp
+  threshold:
+    tfp_growth_difference_pct: -2
+    significance: p_lt_0.10
+    window_years: 20
+prior_confidence: 0.55
+disclosure: >
+  Author holds moderate priors that competition matters for productivity but
+  acknowledges national-champion arguments about scale, R&D spillovers, and
+  global market power.
+steelman: hypotheses/steelman/national_champions_long_run_productivity_drag.md
+linked_hypotheses:
+  - industrial_policy_developmentalist_states_growth
+  - state_owned_enterprise_share_growth_plateau
+notes: >
+  Sector-level concentration data from OECD STAN, Orbis, or national competition
+  authorities. PWT TFP available at country level; sector-level TFP requires
+  EU KLEMS or OECD STAN.

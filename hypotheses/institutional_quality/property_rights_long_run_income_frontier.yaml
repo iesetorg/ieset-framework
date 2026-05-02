@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: property_rights_long_run_income_frontier
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across a broad panel of economies 1960-2020, property-rights
+  protection — measured by WGI Rule of Law, Fraser EFW legal-system
+  and property-rights sub-index, and Heritage property-rights
+  scores — predicts 40-year real income per capita growth more
+  strongly than state investment share of GDP. The pre-registered
+  claim is that, in a horse-race regression, the coefficient on
+  property-rights protection is larger in absolute t-statistic than
+  the coefficient on state investment share, and that countries in
+  the top tercile of property-rights protection show at least 0.5
+  percentage points higher annual growth than countries in the
+  bottom tercile, after controlling for initial income, education,
+  and geography.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA]
+  period: [1960, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active high-intensity civil conflict (UCDP intensity-2+)"
+    - "drop transition-economy years 1989-1994 for ex-communist countries where property-rights institutions were in flux"
+
+scope:
+  period: [1960, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality, productivity]
+  policy_family: [institutional_reform, fiscal_policy]
+  treatment_tags: [property_rights, rule_of_law, state_investment, smithian_growth]
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth_40yr
+      source: "maddison:rgdpnapc"
+      transformation: "log_diff_40yr"
+      notes: "Maddison real GDP per capita, 40-year log-difference. Primary long-horizon outcome."
+    - name: real_gdp_per_capita_growth_10yr
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+      notes: "Annual growth for panel specification."
+  treatment:
+    - name: property_rights_protection_index
+      source: "constructed: 0.4×wgi:RL.EST + 0.3×fraser_efw:legal_system_property_rights + 0.3×heritage_efw:property_rights"
+      transformation: "level"
+      notes: "Composite property-rights protection index. WGI Rule of Law available from 1996; backfilled using Polity5 and V-Dem where needed. Fraser and Heritage provide longer series."
+    - name: state_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "level"
+      notes: "Gross fixed capital formation % GDP as proxy for state + private investment; state component proxied by public-sector share where available."
+    - name: public_investment_share_gdp
+      source: "imf_weo:ggxwdn_ngdp"
+      transformation: "level"
+      notes: "Public investment % GDP from IMF WEO where available."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: years_schooling_average
+      source: "barro_lee:years_schooling"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: tropical_landlocked_dummies
+      source: "constructed: geography_dummies"
+      transformation: "indicator"
+      notes: "Sachs-Warner style geography controls."
+    - name: life_expectancy_at_birth
+      source: "world_bank_wdi:SP.DYN.LE00.IN"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Property-rights protection is a foundational institutional
+  feature. State investment is a fiscal intervention. The
+  horse-race compares institutional vs fiscal channels for long-
+  run income growth.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, decade]
+  clustering: country
+  notes: >
+    Panel FE with non-overlapping 10-year blocks to capture long-
+    run effects and reduce noise. Primary test: horse-race of
+    property-rights index vs state investment share. Cross-
+    sectional robustness: 40-year long-difference (1960-2000 vs
+    2000-2020) using Maddison data. Robustness: exclude
+    sub-Saharan Africa (where institutions are weakest and geography
+    confounds strongest); exclude China (state-investment outlier).
+
+falsification:
+  rule: >
+    Not supported if (a) the property-rights coefficient is not
+    positive and significant at p<0.05 on GDP growth, OR (b) in the
+    horse-race the state-investment-share coefficient has a larger
+    absolute t-statistic than property rights, OR (c) the top-
+    tercile vs bottom-tercile 40-year mean growth gap is below 0.3
+    pp/year. A state-led-development reading wins cleanly if state
+    investment outperforms property rights in the horse-race.
+  test: panel_fe_horserace_property_rights_vs_state_investment
+  threshold: >
+    panel_FE_beta(property_rights → gdp_growth) > 0 at p<0.05
+    AND |t_stat(property_rights)| > |t_stat(state_investment_share)| in horse-race
+    AND top_tercile_mean_gap_40yr >= 0.50 pp/yr
+
+prior_confidence: 0.60
+
+disclosure: >
+  The institutions-growth literature (Acemoglu-Johnson-Robinson,
+  North-Thomas, Hall-Jones) strongly supports property-rights
+  protection, but the horse-race with state investment is rarely
+  tested on equal footing. Author's market-liberal priors lean
+  toward the institutional channel but prior 0.60 reflects the
+  genuine success of state-investment-led catch-up in East Asia.
+  Bias risk: author may under-weight the complementarity between
+  secure property rights and active state investment (the
+  "developmental state with rule of law" model) and frame them as
+  substitutes.
+
+steelman: hypotheses/steelman/property_rights_long_run_income_frontier.md
+
+linked_hypotheses:
+  - classical_property_rights_security_fdi_premium_panel
+  - rule_of_law_institutional_growth
+
+notes: >
+  Maddison data provides the longest-run income series but ends
+  in 2018 and has uneven coverage. PWT and WDI provide more
+  complete panels but shorter horizons. The 40-year test relies
+  primarily on Maddison with WDI/PWT backfill.

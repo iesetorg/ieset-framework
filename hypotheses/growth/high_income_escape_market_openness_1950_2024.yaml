@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: high_income_escape_market_openness_1950_2024
+version: 1
+status: candidate
+topic: growth
+claim: Countries escaping middle income into high income are more likely to combine export openness with domestic market competition than export promotion with persistent domestic protection.
+evidence_type: associational
+sample:
+  countries:
+    - KOR
+    - TWN
+    - SGP
+    - HKG
+    - CHL
+    - MYS
+    - THA
+    - POL
+    - HUN
+    - CZE
+    - EST
+    - SVN
+    - GRC
+    - PRT
+    - ESP
+    - IRL
+    - ISR
+    - MEX
+    - BRA
+    - ARG
+    - TUR
+    - ZAF
+    - COL
+    - PER
+    - VNM
+    - CHN
+    - IND
+    - IDN
+    - PHL
+  period: [1950, 2024]
+  temporal_structure: panel
+variables:
+  outcome:
+    - name: high_income_escape_dummy
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: indicator_crossing_threshold
+      notes: Dummy = 1 in year when country first crosses World Bank high-income threshold (constant 2015 USD, ~$13,845 in 2023) and remains above for 5+ years.
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+  treatment:
+    - name: export_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: domestic_market_competition
+      source: oecd_pmr:pmr
+      transformation: level
+      notes: Lower PMR = more competition; for non-OECD countries, Fraser EFW regulation sub-index used as proxy.
+    - name: tariff_protection_avg
+      source: world_bank_wits:tariff_average
+      transformation: level
+  controls:
+    - name: log_initial_gdp_pc
+      source: maddison:real_gdp_pc
+      transformation: log
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+    - name: manufacturing_value_added_share
+      source: world_bank_wdi:NV.IND.MANF.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: Panel FE or conditional logit for escaping middle income, with interaction between export openness and domestic competition. Tests whether the combination outperforms export promotion with domestic protection.
+falsification:
+  rule: The hypothesis is refuted if the interaction between export openness and low domestic protection (or high competition) is not positive and significant at p<0.10 in predicting high-income escape, or if export promotion combined with high domestic protection performs equally well.
+  test: panel_fe_interaction_openness_competition
+  threshold:
+    interaction_coef: ">0 and p<0.10"
+prior_confidence: 0.6
+disclosure: Author acknowledges that the World Bank income threshold is a moving target and that escapees are a selected sample; the test may be biased toward observed success cases.
+steelman: hypotheses/steelman/high_income_escape_market_openness_1950_2024.md
+scope:
+  period: [1950, 2024]
+  countries:
+    - KOR
+    - TWN
+    - SGP
+    - HKG
+    - CHL
+    - MYS
+    - THA
+    - POL
+    - HUN
+    - CZE
+    - EST
+    - SVN
+    - GRC
+    - PRT
+    - ESP
+    - IRL
+    - ISR
+    - MEX
+    - BRA
+    - ARG
+    - TUR
+    - ZAF
+    - COL
+    - PER
+    - VNM
+    - CHN
+    - IND
+    - IDN
+    - PHL
+  outcome_dim:
+    - gdp_growth
+    - trade_liberalisation
+    - competition_concentration
+  policy_family:
+    - trade_policy
+    - competition_policy
+    - industrial_policy
+notes: WITS tariff data has gaps for many countries before 1990; interpolation and UN Comtrade alternative used. OECD PMR coverage limited before 1998 for emerging economies.

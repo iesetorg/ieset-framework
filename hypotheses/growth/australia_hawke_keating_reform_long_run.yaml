@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: australia_hawke_keating_reform_long_run
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Australia's long expansion and income growth after the Hawke-Keating reforms
+  (1983-1996: tariff cuts, financial deregulation, floating exchange rate,
+  compulsory superannuation, and competition policy) are better predicted by
+  market liberalisation than by sector-specific state direction or natural
+  resource rents alone.
+evidence_type: causal
+sample:
+  countries:
+    - AUS
+    - NZL
+    - CAN
+    - GBR
+    - USA
+    - NOR
+    - CHL
+    - ZAF
+    - BRA
+  period: [1983, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude 2008-2009 commodity super-cycle peak as exogenous terms-of-trade shock
+    - Exclude 2020-2022 COVID years from primary trend estimates
+scope:
+  period: [1983, 2023]
+  countries:
+    - AUS
+    - NZL
+    - CAN
+    - GBR
+    - USA
+    - NOR
+    - CHL
+    - ZAF
+    - BRA
+  outcome_dim: [gdp_growth, productivity, institutional_quality]
+  policy_family: [trade_policy, institutional_reform, regulation, fiscal_policy]
+  treatment_tags: [australia_hawke_keating_reforms, australia_tariff_cuts, australia_competition_policy_1993]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: annual_pct
+    - name: labour_productivity_growth
+      source: oecd_stan:gdp_per_hour_worked
+      transformation: annual_pct
+    - name: export_sophistication
+      source: owid:economic-complexity-index
+      transformation: level
+  treatment:
+    - name: reform_intensity_index
+      source: constructed:composite_tariff_financial_deregulation_competition_superannuation
+      transformation: continuous_index
+    - name: post_1983_reform_dummy
+      source: constructed:binary
+      transformation: binary
+  controls:
+    - name: terms_of_trade
+      source: world_bank_wdi:NE.TRD.XQ
+      transformation: level
+    - name: commodity_export_share
+      source: world_bank_wdi:TX.VAL.MRCH.HI.ZS
+      transformation: level
+    - name: net_migration_rate
+      source: world_bank_wdi:SM.POP.NETM
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  Hawke-Keating reforms bundled trade, financial, competition, and pension policy;
+  channels are interdependent and treated as bundled.
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE decomposing growth into reform channels versus commodity and migration
+    channels. Synthetic control for AUS against commodity-exporter donor pool
+    (CAN, NOR, CHL, ZAF, BRA) as robustness.
+falsification:
+  rule: >
+    Falsified if Australia's post-1983 GDP per capita growth and productivity growth
+    are explained by terms-of-trade improvements and commodity export volumes alone,
+    with the reform-intensity index showing no significant marginal effect in a
+    decomposition regression.
+  test: panel_fe_decomposition_reform_vs_commodities
+  threshold:
+    reform_intensity_significance: p_lt_0.10
+    commodity_terms_of_trade_alone_r_squared: lt_0.25
+prior_confidence: 0.60
+disclosure: >
+  Author holds priors that Australian reforms mattered but expects commodity
+  terms of trade to explain a large share of variance. Prior informed by Australian
+  Treasury and RBA literature on the terms-of-trade cycle.
+steelman: hypotheses/steelman/australia_hawke_keating_reform_long_run.md
+linked_hypotheses:
+  - new_zealand_reform_long_run_productivity_recheck
+  - canada_market_liberalisation_vs_state_industry_1988_2024
+notes: >
+  OECD STAN productivity from 1990. Pre-1990 from national accounts or PWT.
+  Terms of trade data from ABS and World Bank.

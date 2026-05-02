@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_state_market_flexibility_complement
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Large welfare states sustain long-run real GDP per capita growth when
+  paired with market flexibility (low product- and labour-market barriers),
+  trade openness, and fiscal discipline (debt-to-GDP below 90%), but not
+  when paired with rigid product and labour markets, in an OECD and rich-
+  country panel 1980-2020. The directional claim is that the interaction
+  between welfare-state size (social transfers + public consumption as % of
+  GDP) and a composite flexibility-openness-discipline index is positive and
+  significant for growth, while welfare-state size alone shows no effect or
+  a negative effect.
+
+evidence_type: associational
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISR, ITA, JPN, KOR, LTU, LVA, LUX, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA, GBR]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during systemic banking crisis (Laeven-Valencia)"
+    - "drop observations with sovereign debt crisis (Reinhart-Rogoff)"
+    - "drop transition years 1989-1994 for post-communist economies"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+    - name: real_household_disposable_income_growth
+      source: "constructed: OECD SNA household disposable income per capita real growth"
+      transformation: annual_log_change
+      notes: "Pending OECD SNA fetcher; v1 uses WDI GDP pc growth as fallback with explicit flag."
+  treatment:
+    - name: welfare_state_size
+      source: "oecd_social_expenditure:public_social_expenditure"
+      transformation: pct_gdp
+      notes: "OECD Social Expenditure Database public social spending as % of GDP."
+    - name: market_flexibility_openness_discipline_index
+      source: "constructed: composite of OECD PMR (inverted), OECD EPL (inverted), trade openness (WDI), and debt-to-GDP (IMF, inverted above 90%)"
+      transformation: z_score_composite
+      notes: "Composite complementarity index. Higher = more flexible, open, and disciplined."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: age_dependency_ratio
+      source: "world_bank_wdi:SP.POP.DPND"
+      transformation: level
+      notes: "Controls for demographic pressure on welfare spending and growth."
+  decomposition_channels:
+    - name: employment_rate
+      source: "oecd_lfs:employment_rate_15_64"
+      transformation: level
+      notes: "Channel: does the welfare-flexibility combination raise employment?"
+    - name: labour_productivity_growth
+      source: "pwt:rgdpo"
+      transformation: annual_log_change_per_worker
+      notes: "Channel: productivity rather than employment-driven growth."
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Welfare-state size is a fiscal-channel intervention (transfers and public
+  consumption). Market flexibility, openness, and fiscal discipline are
+  regulatory and fiscal complementary conditions.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with interaction: growth = β0 + β1*welfare_size +
+    β2*flexibility_index + β3*(welfare_size × flexibility_index) + controls
+    + FE. Subsample analysis at terciles of flexibility index. Robustness:
+    (1) use Fraser EFW overall index instead of constructed composite;
+    (2) exclude Nordic countries; (3) use 5-year non-overlapping averages;
+    (4) separate product-market and labour-market flexibility interactions.
+
+falsification:
+  rule: >
+    SUPPORTED if β3 (welfare × flexibility) is positive and significant at
+    p<0.10, AND the marginal welfare effect is negative or insignificant in
+    the bottom tercile of flexibility and positive or insignificant in the
+    top tercile. PARTIAL if β3 is positive and significant but β1 is also
+    positive (welfare helps regardless, just more with flexibility).
+    REFUTED if β3 is negative and significant. INFORMATIVE: the result
+    should survive excluding the Nordic countries; if not, it is a Nordic-
+    specific story.
+  test: panel_fe_welfare_flexibility_interaction_growth_oecd
+  threshold: >
+    β_interaction > 0 at p<=0.10  AND
+    Marginal welfare effect <= 0 or p>=0.10 in bottom tercile  AND
+    Marginal welfare effect >= 0 or p>=0.10 in top tercile  AND
+    Ex-Nordic robustness retains sign of β_interaction.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author is moderately confident (0.60). The "flexicurity" literature
+  (e.g., Denmark's combination of generous benefits and low EPL) provides
+  the theoretical anchor, but cross-country tests are scarce and
+  endogeneity is severe (flexible countries may choose smaller or more
+  efficient welfare states). Prior is not higher because Southern European
+  cases (high welfare, rigid markets, slow growth) and Anglo cases (low
+  welfare, flexible markets, moderate growth) both fit the interaction
+  story, but the causal mechanism is unclear. Framing risk: the hypothesis
+  may be read as endorsing the Nordic model for all countries; the spec
+  tests only the complementarity and does not claim universality.
+
+steelman: hypotheses/steelman/welfare_state_market_flexibility_complement.md
+
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, welfare_state, employment_labour, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy, labour_market, trade_policy]
+  treatment_tags: [welfare_state, market_flexibility, trade_openness, fiscal_discipline]
+
+linked_hypotheses:
+  - welfare_architecture_market_openness_nordic
+  - tax_burden_frontier_growth_non_linear
+  - state_size_reduces_household_income_growth
+
+notes: >
+  Data readiness:
+  - OECD Social Expenditure public spending (ready)
+  - OECD PMR, EPL (ready)
+  - WDI trade openness, GDP pc, investment, dependency ratio (ready)
+  - PWT hc (ready)
+  - WGI RL.EST (ready)
+  - IMF GGXWDG_NGDP debt (ready)
+  - OECD LFS employment rate (ready)
+  - Fraser EFW overall (ready)

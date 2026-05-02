@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: decentralized_property_rights_agricultural_productivity
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across developing and transition economies 1980-2020, secure
+  private or household land-use rights predict stronger
+  agricultural productivity growth — measured by cereal yields,
+  agricultural value added per worker, and total-factor
+  productivity in agriculture — than collective or state-allocation
+  systems over long windows. The pre-registered claim is that
+  countries with above-median land-rights security show at least
+  0.8 percentage points higher annual agricultural productivity
+  growth and at least 10% higher cereal yields after 20 years than
+  countries with below-median security, after controlling for
+  rainfall, fertiliser use, and initial agricultural productivity.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN, IND, IDN, BRA, MEX, ARG, COL, THA, MYS, PHL, VNM, EGY, TUR, ZAF, RUS, POL, CZE, HUN, CHL, PER, UKR, KAZ, MAR, NGA, KEN, BGD, PAK, LKA, ROU, BGR, HRV, SRB, EST, LVA, LTU, SVN, SVK, ETH, TZA, UGA, GHA, CIV, SEN, MOZ, ZMB, ZWE, BWA, NAM, MWI, RWA, BDI]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years in the immediate post-collectivisation or post-land-reform transition window (first 5 years after reform)"
+    - "drop observations with missing FAO agricultural data and no national-backfill"
+
+scope:
+  period: [1980, 2020]
+  countries: [ASIA_EM, LATAM, AFRICA, POST_SOVIET]
+  outcome_dim: [productivity, gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, privatisation_nationalisation]
+  treatment_tags: [land_tenure, property_rights, agricultural_productivity, household_responsibility]
+
+variables:
+  outcome:
+    - name: agricultural_productivity_growth
+      source: "fao:cereal_yield"
+      transformation: "log_diff"
+      notes: "FAOSTAT cereal yield (tonnes per hectare) annual log-growth as primary outcome."
+    - name: agricultural_va_per_worker
+      source: "world_bank_wdi:EA.PRD.AGRI.KD"
+      transformation: "log_diff"
+      notes: "Agriculture value added per worker (constant 2015 USD) from WDI."
+    - name: agricultural_tfp_index
+      source: "constructed: fao_output_index_div_by_input_index"
+      transformation: "level"
+      notes: "TFP index constructed from FAO output and input indices where available."
+  treatment:
+    - name: land_rights_security_index
+      source: "constructed: 0.5×fao_land_tenure_security + 0.3×prindex:property_rights_index + 0.2×vdem:land_rights_equality"
+      transformation: "level"
+      notes: "Composite land-rights security index. FAO land tenure indicators; PRIndex property-rights module; V-Dem land-rights equality. Higher = more secure private/household rights."
+    - name: collective_allocation_dummy
+      source: "constructed: indicator = 1 if dominant land regime is collective or state farm"
+      transformation: "indicator"
+      notes: "Dummy for collective/state allocation systems vs private/household tenure."
+    - name: fao_land_tenure_security
+      source: "fao:land_tenure_indicators"
+      transformation: "level"
+  controls:
+    - name: rainfall_deviation
+      source: "world_bank_wdi:AG.LND.FRST.ZS"
+      transformation: "level"
+      notes: "Rainfall deviation from long-run mean (GPCC or CHIRPS data) as climate control."
+    - name: fertiliser_use_per_hectare
+      source: "fao:fertiliser_nutrients_per_ha"
+      transformation: "log"
+    - name: log_initial_agricultural_productivity
+      source: "fao:cereal_yield"
+      transformation: "log"
+    - name: rural_population_share
+      source: "world_bank_wdi:SP.RUR.TOTL.ZS"
+      transformation: "level"
+    - name: road_density
+      source: "world_bank_wdi:IS.ROD.DNST.K2"
+      transformation: "log"
+      notes: "Road density as infrastructure control."
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Land tenure and property-rights allocation are foundational
+  institutional features. The hypothesis tests whether
+  decentralised/household tenure outperforms collective/state
+  allocation in agricultural productivity.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with agricultural-productivity outcomes on land-rights
+    security. Country FE absorb persistent differences in agro-
+    ecological conditions. Identification from within-country land
+    reforms (e.g. China HRS 1978-1984, Vietnam Doi Moi 1986,
+    Ethiopia 1995 land certification, Rwanda 2000s land titling).
+    Event-study around reform episodes as robustness. IV:
+    colonial-legal-origin interacted with time as instrument for
+    land-rights evolution.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on land-rights security is
+    not positive and significant at p<0.05 on agricultural
+    productivity growth, OR (b) the above-median vs below-median
+    mean productivity growth gap is below 0.4 pp/year, OR (c) the
+    collective-allocation dummy is positively associated with
+    productivity growth (suggesting scale economies dominate
+    incentive effects). A collectivist reading wins if (c) holds.
+  test: panel_fe_land_rights_on_agricultural_productivity
+  threshold: >
+    panel_FE_beta(land_rights_security → ag_productivity_growth) > 0 at p<0.05
+    AND above_median_mean_gap >= 0.80 pp/yr
+    AND collective_dummy_coefficient <= 0 or insignificant
+
+prior_confidence: 0.65
+
+disclosure: >
+  The land-tenure and agricultural-productivity literature (De
+  Janvry et al. 2001, Feder-Nishio 1998, Banerjee-Gertler 2002)
+  broadly supports the private-tenure productivity advantage, but
+  with important exceptions: collective systems in Israel
+  (kibbutzim) and some Chinese villages showed high productivity
+  under certain conditions. Author's market-liberal priors lean
+  toward the decentralised-property-rights channel. Prior 0.65
+  reflects moderate confidence. Bias risk: author may over-
+  generalise from the China HRS experience and under-weight the
+  "collective action enables irrigation and mechanisation"
+  argument.
+
+steelman: hypotheses/steelman/decentralized_property_rights_agricultural_productivity.md
+
+linked_hypotheses:
+  - property_rights_long_run_income_frontier
+  - china_1978_price_liberalisation_growth_decomposition
+
+notes: >
+  FAO land tenure indicators are patchy and often ordinal.
+  PRIndex property-rights module has limited country coverage.
+  The composite index will have substantial missing data; this
+  is flagged as the primary data dependency.

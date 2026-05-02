@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: services_trade_liberalisation_frontier_growth
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Services trade liberalisation predicts stronger total factor productivity
+  growth in high-income frontier economies after 1990 than goods-sector
+  industrial policy does. The directional claim is that a one-standard-
+  deviation reduction in services trade restrictiveness (OECD STRI or
+  equivalent) predicts larger TFP growth gains in the subsequent decade
+  than a one-standard-deviation increase in goods-sector subsidy or
+  tariff-protection intensity, in an OECD and high-income panel 1990-2020.
+
+evidence_type: associational
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISR, ITA, JPN, KOR, LTU, LVA, LUX, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA, GBR]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during systemic banking crisis (Laeven-Valencia)"
+    - "drop observations with missing services restrictiveness data for more than 2 consecutive years"
+    - "drop transition years 1989-1994 for Eastern European accession economies"
+
+variables:
+  outcome:
+    - name: total_factor_productivity_growth
+      source: "oecd_stan:tfp_growth"
+      transformation: annual_log_change
+      notes: "OECD STAN TFP growth. Pending dedicated fetcher; v1 uses PWT rtfpna as fallback with explicit flag."
+    - name: services_sector_tfp_growth
+      source: "constructed: EU KLEMS or OECD STAN sectoral TFP for services"
+      transformation: annual_log_change
+      notes: "Sectoral TFP growth in services (ISIC G-N). Pending sectoral fetcher."
+  treatment:
+    - name: services_trade_restrictiveness_index
+      source: "oecd_stri:overall_stri"
+      transformation: inverted_scale
+      notes: "OECD Services Trade Restrictiveness Index, inverted so higher = more liberal. Available from 2014; backcasting using PMR and regulatory data flagged."
+    - name: goods_sector_industrial_policy_intensity
+      source: "constructed: goods-sector subsidy intensity + tariff dispersion (CRDF/ITC + WITS)"
+      transformation: z_score_composite
+      notes: "Pending dedicated fetcher. v1 uses OECD PMR state-control subcomponent + average applied tariff as proxy."
+  controls:
+    - name: initial_log_tfp
+      source: "pwt:rtfpna"
+      transformation: log
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: digital_infrastructure_index
+      source: "constructed: broadband penetration + mobile subscriptions (ITU)"
+      transformation: z_score_composite
+      notes: "Controls for digital readiness that may co-determine services productivity."
+    - name: regulatory_quality
+      source: "wgi:RQ.EST"
+      transformation: level
+  decomposition_channels:
+    - name: services_export_share
+      source: "world_bank_wdi:BX.GSR.CMCP.ZS"
+      transformation: pct_total_exports
+      notes: "Channel: services exports as share of total service exports."
+    - name: fdi_services_inflows
+      source: "oecd_fdi:fdi_services_inward"
+      transformation: pct_gdp
+      notes: "Channel: FDI inflows into services sectors. Pending dedicated fetcher."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Services trade liberalisation is a regulatory (trade-policy) intervention
+  that governs market access, nationality requirements, and regulatory
+  harmonisation in services. Goods-sector industrial policy is a bundled
+  fiscal-regulatory intervention.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with decade differences (1990-2000, 2000-2010,
+    2010-2020) to reduce noise. Primary specification: ΔTFP = β1*Δservices
+    liberalisation + β2*Δgoods industrial policy + controls + FE. Robustness:
+    (1) exclude US to check for US-driven results; (2) use PWT TFP instead
+    of OECD STAN; (3) restrict to EU member states to exploit within-EU
+    regulatory variation.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (services liberalisation) is positive and significant
+    at p<0.10 while β2 (goods industrial policy) is insignificant or negative,
+    AND |β1| > |β2|. PARTIAL if both are positive and significant but
+    β1 > β2. REFUTED if β1 is negative and significant or if β2 is
+    positive and significantly larger than β1. INFORMATIVE: the result
+    should survive excluding the United States; if not, it is a US deregulation
+    story rather than a general services-liberalisation effect.
+  test: panel_fe_services_vs_goods_industrial_policy_tfp_frontier
+  threshold: >
+    β_services_lib > 0 at p<=0.10  AND
+    |β_services_lib| > |β_goods_ip|  AND
+    Ex-US robustness retains sign of β_services_lib.
+
+prior_confidence: 0.50
+
+disclosure: >
+  Author is exactly at 0.50 (agnostic). The services-trade literature is
+  thinner than the goods-trade literature, and the OECD STRI has limited
+  time-series coverage. Services liberalisation is often bundled with
+  digital regulation, competition policy, and privatisation, making
+  identification difficult. Framing risk: the hypothesis could be read as
+  saying "industrial policy is dead in rich countries"; the spec tests only
+  a relative TFP prediction and does not claim that goods-sector policy has
+  zero effect.
+
+steelman: hypotheses/steelman/services_trade_liberalisation_frontier_growth.md
+
+scope:
+  period: [1990, 2020]
+  countries: [OECD]
+  outcome_dim: [productivity, trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [services_trade_liberalisation, goods_industrial_policy, frontier_productivity]
+
+linked_hypotheses:
+  - trade_lib_eu_2007_2013_enlargement_balkans
+  - industrial_policy_semiconductor_chips_act_effectiveness
+
+notes: >
+  Data readiness:
+  - OECD STRI (available from 2014; backcasting flagged)
+  - OECD STAN TFP (pending; PWT rtfpna used as fallback)
+  - EU KLEMS sectoral TFP (pending)
+  - PWT hc, WDI GDP pc (ready)
+  - WGI RQ.EST (ready)
+  - ITU digital infrastructure data (ready)

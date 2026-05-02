@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: frontier_real_wage_growth_market_competition_1980_2024
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Across OECD and high-income economies 1980-2024, real wage growth at the
+  productivity frontier is stronger in countries with more competitive product
+  markets and lower barriers to firm entry. The pre-registered claim is that a
+  one-standard-deviation improvement in product-market competition is associated
+  with at least 0.4 percentage points higher annual real wage growth and at
+  least 0.3 percentage points higher labour-productivity growth, after
+  controlling for initial income, trade openness, union density, and
+  sectoral composition.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, COL, SVN, SVK, LVA, LTU]
+  period: [1980, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with systemic banking crises where wage-setting is disrupted"
+    - "drop observations where OECD PMR or Fraser EFW competition data are unavailable"
+
+scope:
+  period: [1980, 2024]
+  countries: [OECD]
+  outcome_dim: [wage_stagnation, productivity, competition_concentration]
+  policy_family: [competition_policy, institutional_reform, regulation]
+  treatment_tags: [product_market_competition, barriers_to_entry, real_wage_growth, oecd_pmr]
+
+variables:
+  outcome:
+    - name: real_wage_growth
+      source: "oecd:avwage_growth_real"
+      transformation: "level"
+      notes: "OECD average annual wages deflated by CPI or GDP deflator; real wage growth % year-on-year."
+    - name: labour_productivity_growth
+      source: "oecd:gdp_per_hour_worked_growth"
+      transformation: "level"
+      notes: "GDP per hour worked, annual growth rate."
+    - name: median_real_wage_growth
+      source: "ilo:median_wages_real_growth"
+      transformation: "level"
+      notes: "ILO median real wage growth where available; supplement with national statistical institute data."
+  treatment:
+    - name: product_market_competition_index
+      source: "constructed: 0.6×oecd_pmr:overall_pmr + 0.4×fraser_efw:regulation_business"
+      transformation: "level"
+      notes: "Composite competition index. OECD PMR overall indicator (lower = more competitive); Fraser EFW business-regulation sub-index (higher = more competitive). Standardised and inverted so higher = more competitive."
+    - name: barriers_to_entry_index
+      source: "oecd_pmr:barriers_to_entry"
+      transformation: "level"
+      notes: "OECD PMR barriers-to-entry sub-indicator (lower = fewer barriers)."
+    - name: fraser_efw_competition
+      source: "fraser_efw:competition_policy"
+      transformation: "level"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: union_density
+      source: "oecd:union_density"
+      transformation: "level"
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: "level"
+    - name: real_interest_rate
+      source: "world_bank_wdi:FR.INR.RINR"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Product-market competition and barriers to entry are regulatory features.
+  The hypothesis tests whether deregulation-driven competition translates
+  into stronger real wage growth at the frontier.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with real-wage and labour-productivity growth outcomes on
+    product-market competition index. Identification from within-country
+    variation in PMR reforms (e.g. UK 1980s deregulation, EU Services
+    Directive implementation, Japan 1990s deregulation). Robustness:
+    exclude small open economies where trade competition dominates;
+    control for minimum-wage policy changes; use only PMR-available
+    countries.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on product-market competition is
+    not positive and significant at p<0.05 on real wage growth, OR (b) the
+    coefficient is not positive and significant at p<0.05 on labour-
+    productivity growth, OR (c) the implied effect of a one-SD competition
+    improvement on real wage growth is below 0.20 pp/year. A "monopsony-
+    power / rent-sharing" reading wins if coefficients are negative
+    (suggesting more competition hurts worker bargaining power).
+  test: panel_fe_product_market_competition_on_real_wage_growth
+  threshold: >
+    panel_FE_beta(competition → real_wage_growth) > 0 at p<0.05
+    AND panel_FE_beta(competition → labour_productivity_growth) > 0 at p<0.05
+    AND implied_effect_per_1sd_competition_on_wages >= 0.40 pp/yr
+
+prior_confidence: 0.58
+
+disclosure: >
+  The competition-wage-growth link is theoretically ambiguous: more
+  competition can raise productivity and wages via efficiency, but can
+  also reduce worker rent-sharing and union bargaining power (Dobbelaere
+  2004, Blanchard-Giavazzi 2003). The existing literature (Bouis-Duval
+  2016 OECD, Aghion et al. 2005) finds broadly positive effects on
+  productivity but mixed effects on wages. Author's market-liberal priors
+  lean toward the efficiency channel. Prior 0.58 reflects moderate
+  confidence. Bias risk: author may under-weight the rent-sharing
+  destruction channel and over-weight the productivity-pass-through
+  channel.
+
+steelman: hypotheses/steelman/frontier_real_wage_growth_market_competition_1980_2024.md
+
+linked_hypotheses:
+  - catch_up_capital_deepening_not_tfp
+  - austrian_rent_seeking_concentration_olson_growth_drag
+
+notes: >
+  OECD PMR indicators are available from 1998 onward with some back-casting.
+  Fraser EFW business-regulation sub-index extends to 1980. The composite
+  will have uneven coverage in the 1980s; this is flagged as a measurement
+  limitation.

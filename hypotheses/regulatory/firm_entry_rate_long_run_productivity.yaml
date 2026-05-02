@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: firm_entry_rate_long_run_productivity
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across an unbalanced panel of OECD and emerging-market economies
+  1980-2020, higher firm-entry rates (new business registrations per
+  1000 working-age population) predict stronger subsequent 20-year
+  total-factor-productivity growth, after controlling for initial GDP
+  per capita, human capital, and capital-deepening rates. The
+  Schumpeterian-Kirznerian claim is that entry is the primary engine
+  of creative destruction and productivity catch-up; the test
+  distinguishes the entry channel from incumbent-scale and
+  state-investment channels.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active high-intensity civil conflict (UCDP intensity-2+)"
+    - "drop country-years where firm-registration data is imputed rather than administrative"
+
+scope:
+  period: [1980, 2020]
+  countries: [OECD, ASIA_EM, LATAM]
+  outcome_dim: [productivity, gdp_growth, competition_concentration]
+  policy_family: [competition_policy, regulation, industrial_policy]
+  treatment_tags: [firm_entry_rate, business_dynamism, creative_destruction]
+
+variables:
+  outcome:
+    - name: tfp_growth_20yr_forward
+      source: "pwt:rtfpna"
+      transformation: "log_diff_20yr"
+      notes: "Penn World Table TFP level, 20-year forward log-difference."
+    - name: labour_productivity_growth_20yr
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff_20yr"
+      notes: "Real GDP per worker, 20-year forward log-difference."
+  treatment:
+    - name: firm_entry_rate
+      source: "world_bank_wdi:IC.BUS.NREG"
+      transformation: "per_1000_working_age"
+      notes: "New business registrations per 1000 people ages 15-64. WDI series; backfill via OECD where available."
+    - name: business_density
+      source: "world_bank_wdi:IC.BUS.DENS"
+      transformation: "level"
+      notes: "Registered businesses per 1000 working-age people."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: capital_deepening_rate
+      source: "pwt:rnna"
+      transformation: "log_diff_20yr"
+      notes: "Capital stock per worker growth as Solow control."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: government_size
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Firm-entry rates are shaped by product-market regulation, entry
+  barriers, and licensing regimes — all regulatory-channel
+  interventions. The test asks whether cross-country variation in
+  this regulatory outcome predicts long-run productivity.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way fixed-effects panel with 20-year forward-differenced
+    outcomes on lagged entry-rate levels. Country+year FE absorb
+    much cross-sectional variation; identification relies on
+    within-country changes in entry regimes over long horizons.
+    Robustness: 10-year non-overlapping windows; cross-sectional
+    long-difference (1980-2000 vs 2000-2020) as placebo.
+
+falsification:
+  rule: >
+    Not supported if the panel-FE coefficient on firm-entry rate is
+    not positive and significant at p<0.05 on 20-year-forward TFP
+    growth, OR if the cross-sectional bivariate correlation between
+    mean entry rate and mean TFP growth is negative. A
+    developmentalist alternative wins if state-investment share
+    outperforms entry rate in a horse-race regression (both entered
+    simultaneously and state-investment coefficient is larger and
+    more significant).
+  test: panel_fe_entry_rate_on_tfp_growth_with_state_investment_horserace
+  threshold: >
+    panel_FE_beta(entry_rate → tfp_growth_20yr) > 0 at p<0.05
+    AND cross_section_beta(entry_rate_mean → tfp_growth_mean) > 0 at p<0.10
+    AND in horse-race, |t-stat(entry_rate)| >= |t-stat(state_investment_share)|
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author's market-liberal priors are sympathetic to the
+  Schumpeterian entry-growth nexus, but the empirical literature is
+  mixed: Haltiwanger et al. document strong entry-contribution to
+  US productivity growth, while cross-country panels (Bartelsman-
+  Scarpetta) find institution-quality and human-capital effects
+  often dominate entry margins. Prior 0.60 reflects moderate
+  confidence that the entry channel is positive but not necessarily
+  the dominant growth driver. Bias risk: author may under-weight
+  state-capacity and industrial-policy channels that complement
+  rather than substitute for entry.
+
+steelman: hypotheses/steelman/firm_entry_rate_long_run_productivity.md
+
+linked_hypotheses:
+  - austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020
+  - business_dynamism_frontier_income_growth
+
+notes: >
+  Data dependency: WDI new-business-registration series has uneven
+  coverage pre-2000; OECD Entrepreneurship at a Glance provides
+  backfill for OECD members. Emerging-market coverage relies on
+  Doing Business historical series (now discontinued by World Bank
+  but archived).

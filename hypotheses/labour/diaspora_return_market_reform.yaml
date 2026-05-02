@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: diaspora_return_market_reform
+version: 1
+status: candidate
+topic: labour
+claim: >-
+  Diaspora return rates (returning emigrants as a share of the stock of emigrants abroad)
+  rise after credible market and property-rights reforms in origin countries, controlling
+  for income growth and political stability. The claim applies to reform episodes in
+  middle-income and emerging economies 1990-2020 where reform credibility is proxied by
+  sustained EFW improvement and WGI rule-of-law upgrades over at least 5 consecutive years.
+evidence_type: causal
+sample:
+  countries:
+  - CHL
+  - MEX
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - EST
+  - LVA
+  - LTU
+  - SVN
+  - KOR
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - VNM
+  - ZAF
+  - BRA
+  - COL
+  - PER
+  - ROU
+  - BGR
+  - HRV
+  - SRB
+  - MKD
+  - ALB
+  - GEO
+  - ARM
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude reform episodes coinciding with EU accession to isolate market-reform effect from free-migration effect
+  - require at least 3 years of pre-reform diaspora-return data
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - CHL
+  - MEX
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - EST
+  - LVA
+  - LTU
+  - SVN
+  - KOR
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - VNM
+  - ZAF
+  - BRA
+  - COL
+  - PER
+  - ROU
+  - BGR
+  - HRV
+  - SRB
+  - MKD
+  - ALB
+  - GEO
+  - ARM
+  outcome_dim:
+  - demographics_migration
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  treatment_tags: []
+variables:
+  outcome:
+  - name: diaspora_return_rate
+    source: constructed:return_migration_oecd_dac; world_bank_wdi:SM.INM.TOTL
+    transformation: level
+    notes: Returning migrants / stock of emigrants abroad; proxy from OECD DAC migration and UN DESA return data.
+  treatment:
+  - name: market_reform_episode
+    source: constructed:efw_improvement_5y_window
+    transformation: indicator
+    notes: Indicator = 1 during and after 5 consecutive years of EFW improvement >0.3 points.
+  - name: property_rights_upgrade
+    source: wgi:RL.EST
+    transformation: change_score
+    notes: WGI rule-of-law estimate increase >0.2 points sustained 5+ years.
+  controls:
+  - name: real_gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+  - name: political_stability
+    source: wgi:PV.EST
+    transformation: level
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: emigration_stock
+    source: world_bank_wdi:SM.POP.TOTL
+    transformation: log
+    notes: Stock of emigrants abroad as denominator scaling factor.
+estimator:
+  template: event_study
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if the post-reform diaspora-return coefficient is negative
+    and significant (p < 0.10) in an event-study or staggered-DiD design, or if the
+    coefficient is not distinguishable from zero despite 10+ years of post-reform data.
+  test: event_study_diaspora_return_market_reform_1990_2020
+  threshold:
+    supported: post-reform return rate increase > 2 percentage points at p < 0.10
+    refuted: post-reform coefficient < 0 at p < 0.10
+prior_confidence: 0.55
+disclosure: >-
+  Author priors expect institutional credibility to attract return migrants but acknowledge
+  that EU accession and other free-mobility shocks confound many reform episodes. The test
+  deliberately excludes EU-accession episodes to isolate non-mobility reform effects.
+steelman: hypotheses/steelman/diaspora_return_market_reform.md

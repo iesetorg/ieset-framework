@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: infrastructure_gap_state_investment_high_return
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  State-led infrastructure investment (transport, energy, water, telecommunications) has
+  high economic returns in countries below basic access thresholds (paved-road density
+  <20 km per 100 km2, electricity access <80%, clean water access <90%), confirming
+  developmentalist catch-up logic. Returns are measured by subsequent GDP growth, firm
+  productivity, and agricultural yield improvements in connected regions, over 1990-2020.
+  The claim is adversarial: it validates a core developmentalist argument under specific
+  boundary conditions.
+evidence_type: associational
+sample:
+  countries:
+  - BGD
+  - IND
+  - IDN
+  - PHL
+  - VNM
+  - KEN
+  - TZA
+  - UGA
+  - ETH
+  - RWA
+  - GHA
+  - NGA
+  - EGY
+  - MAR
+  - TUN
+  - DZA
+  - PAK
+  - LKA
+  - NPL
+  - KHM
+  - LAO
+  - MMR
+  - BOL
+  - PRY
+  - PER
+  - ECU
+  - GTM
+  - HND
+  - NIC
+  - SLV
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude large-scale infrastructure projects with documented corruption cost overruns >50%
+  - exclude observations where infrastructure spending is primarily military or prestige projects
+  - require at least 5 years of post-project data for impact assessment
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - BGD
+  - IND
+  - IDN
+  - PHL
+  - VNM
+  - KEN
+  - TZA
+  - UGA
+  - ETH
+  - RWA
+  - GHA
+  - NGA
+  - EGY
+  - MAR
+  - TUN
+  - DZA
+  - PAK
+  - LKA
+  - NPL
+  - KHM
+  - LAO
+  - MMR
+  - BOL
+  - PRY
+  - PER
+  - ECU
+  - GTM
+  - HND
+  - NIC
+  - SLV
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - energy
+  - industrial_capability
+  policy_family:
+  - fiscal_policy
+  - industrial_policy
+  treatment_tags: []
+variables:
+  outcome:
+  - name: real_gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+  - name: agricultural_productivity_growth
+    source: world_bank_wdi:EA.PRD.AGRI.KD
+    transformation: level
+  - name: firm_productivity_growth
+    source: constructed:world_bank_enterprise_surveys_tfp
+    transformation: level
+    notes: TFP estimates from World Bank Enterprise Surveys where available.
+  treatment:
+  - name: infrastructure_access_gap
+    source: constructed:road_density_electricity_water_composite
+    transformation: level
+    notes: "Composite gap index: low road density, electricity access, and clean water access."
+  - name: public_infrastructure_investment_gdp
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: level
+    notes: Government fixed capital formation as proxy for public infrastructure investment.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: political_stability
+    source: wgi:PV.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if public infrastructure investment has a negative and
+    significant (p < 0.10) association with GDP or productivity growth in below-threshold
+    countries, or if the coefficient is not distinguishable from zero after controlling for
+    governance and initial income.
+  test: panel_fe_infrastructure_investment_below_threshold_1990_2020
+  threshold:
+    supported: infrastructure_investment coefficient > 0 at p < 0.10 in below-threshold subsample
+    refuted: coefficient < 0 at p < 0.10 in below-threshold subsample
+prior_confidence: 0.60
+disclosure: >-
+  Author priors accept high infrastructure returns at low access levels but are concerned
+  about corruption, white-elephant projects, and misallocation that may drive returns to
+  zero or negative in practice. The exclusion rule for corruption overruns is designed to
+  address this.
+steelman: hypotheses/steelman/infrastructure_gap_state_investment_high_return.md

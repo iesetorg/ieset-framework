@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: product_market_regulation_tfp_30yr_panel
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across OECD countries 1975-2020, lower product-market regulation
+  (PMR) predicts higher long-run total-factor-productivity growth,
+  after controlling for education attainment, capital deepening, and
+  initial income per capita. The pre-registered claim is that a
+  one-standard-deviation reduction in the OECD PMR composite index
+  is associated with at least 0.3 percentage points higher annual
+  TFP growth over the subsequent decade, in a panel with country and
+  year fixed effects.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, CZE, HUN, POL, EST, SVN, SVK, LVA, LTU, CHL, MEX, TUR, COL, ISR]
+  period: [1975, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop transition-economy years before EU accession structural reforms for CEE countries (use 1995 onward for CZE, HUN, POL, EST, SVN, SVK, LVA, LTU)"
+    - "drop country-years with major banking crises (Laeven-Valencia coding)"
+
+scope:
+  period: [1975, 2020]
+  countries: [OECD]
+  outcome_dim: [productivity, gdp_growth, regulation_compliance_cost]
+  policy_family: [regulation, competition_policy, institutional_reform]
+  treatment_tags: [oecd_pmr, product_market_regulation, deregulation_wave]
+
+variables:
+  outcome:
+    - name: tfp_growth_10yr
+      source: "pwt:rtfpna"
+      transformation: "log_diff_10yr"
+      notes: "Penn World Table TFP level, 10-year forward log-difference."
+    - name: labour_productivity_growth_10yr
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff_10yr"
+  treatment:
+    - name: oecd_pmr_composite_index
+      source: "oecd_pmr:pmr_composite"
+      transformation: "level"
+      notes: "OECD Product Market Regulation composite index (0-6 scale, lower = less regulation)."
+    - name: oecd_pmr_barriers_to_entry
+      source: "oecd_pmr:barriers_to_entry"
+      transformation: "level"
+      notes: "PMR sub-component: barriers to entry (state control + barriers to entrepreneurship + barriers to trade and investment)."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: years_schooling_average
+      source: "barro_lee:years_schooling"
+      transformation: "level"
+      notes: "Barro-Lee average years of schooling; UNESCO Institute for Statistics backfill where needed."
+    - name: capital_deepening_rate
+      source: "pwt:rnna"
+      transformation: "log_diff_10yr"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: employment_protection_legislation
+      source: "oecd_pmr:epl_composite"
+      transformation: "level"
+      notes: "EPL included to separate product-market from labour-market regulation effects."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  The OECD PMR index is the canonical measure of product-market
+  regulation. The hypothesis tests whether regulatory liberalisation
+  predicts productivity growth, holding constant education and
+  capital accumulation.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with 10-year forward-differenced TFP on lagged PMR
+    levels. Country and year FE absorb most cross-sectional
+    variation; identification relies on within-country PMR reforms
+    (e.g. UK 1980s, EU Single Market 1990s, Germany 2000s
+    Hartz-adjacent product-market reforms). Robustness: use PMR
+    sub-components separately; IV using EU-membership-induced
+    reform pressure as instrument.
+
+falsification:
+  rule: >
+    Not supported if (a) the panel-FE coefficient on PMR composite
+    is not negative and significant at p<0.05 (higher PMR = lower
+    TFP growth), OR (b) a one-SD PMR reduction corresponds to less
+    than 0.15 pp higher annual TFP growth, OR (c) the coefficient
+    becomes insignificant when EPL is omitted (indicating labour-
+    market regulation is the true driver, not product-market
+    regulation). A coordinated-market-economy / Varieties-of-
+    Capitalism reading wins if PMR is insignificant but EPL or
+    vocational-training variables are significant.
+  test: panel_fe_pmr_on_tfp_growth_with_epl_robustness
+  threshold: >
+    panel_FE_beta(PMR_composite → tfp_growth_10yr) < 0 at p<0.05
+    AND implied_annual_effect_per_1sd_PMR_reduction >= 0.15 pp
+    AND coefficient remains negative at p<0.10 when EPL included
+
+prior_confidence: 0.60
+
+disclosure: >
+  The PMR-TFP literature (Conway et al. OECD 2006, Bourlès et al.
+  2013, Andrews & Cingano 2014) broadly supports a negative
+  association, but causal identification is weak: PMR reforms
+  often coincide with broader structural-adjustment packages, and
+  TFP measurement error is large. Author's market-liberal priors
+  lean toward the deregulation-growth nexus but prior 0.60 reflects
+  measurement and endogeneity concerns. Bias risk: author may
+  under-weight the VoC argument that regulated coordination
+  (Germany, Nordics) achieves high TFP via long-term relational
+  contracting rather than low PMR.
+
+steelman: hypotheses/steelman/product_market_regulation_tfp_30yr_panel.md
+
+linked_hypotheses:
+  - firm_entry_rate_long_run_productivity
+  - competition_policy_enforcement_innovation
+
+notes: >
+  OECD PMR series has vintages 1998, 2003, 2008, 2013, 2018; the
+  panel is constructed using interpolated values between vintages
+  (piecewise-constant or linear interpolation). This is a known
+  measurement-limitation flagged in diagnostics.

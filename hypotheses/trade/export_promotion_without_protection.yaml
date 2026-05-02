@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: export_promotion_without_protection
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Export promotion combined with domestic competition policy outperforms
+  export promotion combined with domestic protection (entry barriers,
+  state aid to incumbents, preferential procurement) in raising real
+  export growth and manufacturing TFP, in a broad-country panel 1990-2020.
+  The directional claim is that the interaction between export-promotion
+  intensity and competition-policy stringency is positive for export growth
+  and TFP, while the interaction between export promotion and protection
+  intensity is insignificant or negative.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, BGD, BGR, BRA, CHL, CHN, COL, CZE, DOM, ECU, EGY, EST, HUN, IDN, IND, JOR, KOR, LTU, LVA, MAR, MEX, MYS, PAK, PER, PHL, POL, PRT, ROU, RUS, SVK, SVN, THA, TUR, TWN, UKR, VNM, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during major currency crisis (monthly depreciation > 30%)"
+    - "drop observations with export growth based on fewer than 5 HS2 products (noisy measurement)"
+    - "drop transition years 1989-1994 for post-communist economies"
+
+variables:
+  outcome:
+    - name: real_export_growth
+      source: "world_bank_wdi:NE.EXP.GNFS.KD.ZG"
+      transformation: annual_log_change
+      notes: "Real exports of goods and services growth."
+    - name: manufacturing_tfp_growth
+      source: "constructed: UNIDO INDSTAT or OECD STAN sectoral TFP"
+      transformation: annual_log_change
+      notes: "Manufacturing-sector TFP growth. Pending dedicated fetcher; v1 uses PWT aggregate TFP as fallback with explicit flag."
+  treatment:
+    - name: export_promotion_intensity
+      source: "constructed: export promotion agency budget / GDP + export financing / GDP + number of trade missions (ITC / World Bank TPR)"
+      transformation: z_score_composite
+      notes: "Pending dedicated fetcher. v1 uses ITC Trade Facilitation indicators + existence of export promotion agency as proxy."
+    - name: domestic_protection_index
+      source: "oecd_pmr:barriers_to_trade_and_investment"
+      transformation: level
+      notes: "OECD PMR barriers-to-trade-and-investment subcomponent. Higher = more protection."
+    - name: domestic_competition_index
+      source: "oecd_pmr:overall_pmr"
+      transformation: inverted_scale
+      notes: "OECD PMR overall, inverted so higher = more competition."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: real_effective_exchange_rate
+      source: "imf_weo:reer"
+      transformation: log_change
+      notes: "Controls for competitiveness shocks independent of trade policy."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: infrastructure_quality
+      source: "wgi:GE.EST"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Export promotion is a trade-policy (regulatory+fiscal) intervention.
+  Domestic protection and competition policy are regulatory interventions.
+  The test compares two bundled policy packages.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with two interaction terms: outcome = β0 + β1*export
+    promotion × competition + β2*export promotion × protection + β3*export
+    promotion + β4*competition + β5*protection + controls + FE. The
+    comparison of interest is β1 versus β2. Mechanism decomposition via
+    export diversification and manufacturing TFP channels. Robustness:
+    (1) exclude China and Korea (dominant export-promotion cases); (2)
+    use 5-year non-overlapping averages; (3) IV for export promotion
+    using shift-share based on world demand growth by sector.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (export promotion × competition) is positive and
+    significant at p<0.10 while β2 (export promotion × protection) is
+    insignificant or negative. PARTIAL if both are positive but β1 > β2.
+    REFUTED if β2 is positive and significantly larger than β1, or if
+    both are insignificant. INFORMATIVE: excluding China and Korea should
+    not eliminate β1; if it does, the result is driven by two East Asian
+    developmental states.
+  test: panel_fe_export_promotion_competition_vs_protection_interaction
+  threshold: >
+    β_export_x_competition > 0 at p<=0.10  AND
+    β_export_x_protection p >= 0.10 or coefficient <= 0  AND
+    Ex-China-Korea robustness retains sign of β_export_x_competition.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The export-promotion literature
+  (e.g., Lederman et al. 2010) finds positive effects on average, but
+  identification is weak and heterogeneity is large. The competition-
+  versus-protection interaction is theoretically compelling but empirically
+  demanding because the three variables are correlated and poorly measured.
+  Framing risk: the hypothesis may be read as saying "all export promotion
+  should be laissez-faire"; the spec tests only a relative productivity
+  prediction and does not claim that protectionist export promotion never
+  works.
+
+steelman: hypotheses/steelman/export_promotion_without_protection.md
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, trade_liberalisation, competition_concentration]
+  policy_family: [trade_policy, industrial_policy, competition_policy]
+  treatment_tags: [export_promotion, domestic_competition, domestic_protection]
+
+linked_hypotheses:
+  - infant_industry_protection_capability_effect
+  - trade_lib_china_wto_2001_manufacturing_export_surge
+  - africa_mauritius_export_zone_model_1980_2024
+
+notes: >
+  Data readiness:
+  - ITC Trade Facilitation / export promotion indicators (pending)
+  - OECD PMR barriers to trade and investment, overall PMR (ready for subset)
+  - WDI real export growth, trade openness, GDP pc (ready)
+  - IMF WEO REER (ready)
+  - PWT hc, WGI GE.EST (ready)
+  - UNIDO INDSTAT / OECD STAN manufacturing TFP (pending)

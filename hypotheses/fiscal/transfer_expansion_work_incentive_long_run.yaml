@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: transfer_expansion_work_incentive_long_run
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Large expansions of means-tested or categorical transfers without work-
+  incentives or activation requirements predict lower prime-age labour-force
+  participation rates over 15-20-year windows relative to expansions that
+  incorporate negative-income-tax or earned-income-tax-credit designs, in
+  an OECD and rich-country panel 1980-2020. The directional claim is that
+  a 5-percentage-point increase in transfer spending as a share of GDP,
+  when accompanied by weak work incentives, predicts a 1-3 percentage point
+  decline in prime-age (25-54) labour-force participation over the
+  subsequent two decades, while an equivalent expansion with strong work
+  incentives predicts no significant decline or a smaller decline.
+
+evidence_type: associational
+
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISR, ITA, JPN, KOR, LTU, LVA, LUX, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA, GBR]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop observations with transfer spending > 35% of GDP (likely measurement error or special social-insurance accounting)"
+    - "drop transition years 1989-1994 for post-communist economies"
+
+variables:
+  outcome:
+    - name: prime_age_labour_force_participation_rate
+      source: "oecd_lfs:lfpr_25_54"
+      transformation: level
+      notes: "OECD Labour Force Statistics prime-age (25-54) labour-force participation rate."
+    - name: employment_to_population_ratio_15_64
+      source: "ilo:emp_15_64"
+      transformation: level
+      notes: "ILOSTAT employment-to-population ratio 15-64 as secondary outcome."
+  treatment:
+    - name: transfer_expansion_without_work_incentives
+      source: "constructed: social transfers excluding EITC/NIT equivalents / GDP, interacted with benefit-replacement-rate proxy"
+      transformation: level
+      notes: "OECD Social Expenditure social transfers minus active labour-market programmes and in-work benefits, as % of GDP."
+    - name: transfer_expansion_with_work_incentives
+      source: "constructed: EITC/NIT-equivalent spending + ALMP spending / GDP"
+      transformation: level
+      notes: "Spending on in-work benefits and active labour-market programmes as % of GDP. Pending dedicated fetcher; v1 uses OECD SOCX categories as proxy."
+  controls:
+    - name: initial_labour_force_participation
+      source: "oecd_lfs:lfpr_25_54"
+      transformation: 5yr_lagged_level
+    - name: female_education_rate
+      source: "world_bank_wdi:SE.TER.CUAT.BA.FE.ZS"
+      transformation: level
+      notes: "Controls for rising female education and labour-force attachment independent of transfer policy."
+    - name: elderly_dependency_ratio
+      source: "world_bank_wdi:SP.POP.DPND.OL"
+      transformation: level
+    - name: minimum_wage_relative_to_median
+      source: "oecd_epl:minimum_wage_relative_median"
+      transformation: level
+      notes: "Controls for labour-market institutions that may confound transfer effects."
+    - name: union_density
+      source: "oecd_employment:union_density"
+      transformation: level
+  decomposition_channels:
+    - name: long_term_unemployment_rate
+      source: "oecd_lfs:long_term_unemployment_rate"
+      transformation: level
+      notes: "Channel: do transfers without incentives raise long-term unemployment?"
+    - name: inactivity_rate
+      source: "oecd_lfs:inactivity_rate_25_54"
+      transformation: level
+      notes: "Channel: do transfers raise inactivity rather than unemployment?"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Transfer expansions and work-incentive designs are both fiscal-channel
+  interventions (social spending and tax-credit design). The test compares
+  two welfare-architecture approaches.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with 10-year differences to capture medium-run
+    behavioural responses: ΔLFPR = β0 + β1*Δtransfers_no_incentives +
+    β2*Δtransfers_with_incentives + controls + FE. Robustness: (1) use
+    5-year non-overlapping averages; (2) subsample by gender (male vs
+    female prime-age participation); (3) IV for transfer expansions using
+    political-turnover instruments (left-government tenure as predictor
+    of transfer expansion).
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (transfers without incentives) is negative and
+    significant at p<0.10 while β2 (transfers with incentives) is
+    insignificant or less negative. PARTIAL if both are negative but
+    |β1| > |β2|. REFUTED if β2 is negative and significantly larger
+    than β1 (work incentives backfire) or if both are positive.
+    INFORMATIVE: the male prime-age subsample should show the same
+    pattern as the full sample; if only females drive the result,
+    the mechanism is family-structure rather than work-incentive design.
+  test: panel_fe_transfer_design_labour_force_participation_20yr
+  threshold: >
+    β_transfers_no_incentives < 0 at p<=0.10  AND
+    β_transfers_with_incentives >= 0 or p>=0.10  AND
+    |β_transfers_no_incentives| > |β_transfers_with_incentives|  AND
+    Male subsample retains pattern.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author is moderately confident (0.60). The work-incentive literature
+  (e.g., EITC evaluations in the US, UK tax-credit reforms) finds positive
+  employment effects, but cross-country panel evidence is thinner.
+  Prior is not higher because: (a) macro labour-force participation is
+  driven by demographics, culture, and female education as much as by
+  transfer design; (b) the distinction between "with incentives" and
+  "without incentives" is coded from OECD SOCX categories that may
+  misclassify hybrid programmes. Framing risk: the hypothesis may be
+  read as endorsing workfare over welfare; the spec tests only the
+  participation prediction and does not claim that work incentives
+  always improve welfare.
+
+steelman: hypotheses/steelman/transfer_expansion_work_incentive_long_run.md
+
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy, tax_policy]
+  treatment_tags: [transfer_expansion, work_incentives, eitc, labour_force_participation]
+
+linked_hypotheses:
+  - welfare_state_market_flexibility_complement
+  - welfare_architecture_market_openness_nordic
+  - universal_transfer_programmes_labour_force_participation_decline
+
+notes: >
+  Data readiness:
+  - OECD LFS prime-age LFPR, long-term unemployment, inactivity (ready)
+  - OECD SOCX social transfers, in-work benefits, ALMP (ready)
+  - ILOSTAT employment-to-population (ready)
+  - WDI female education, elderly dependency (ready)
+  - OECD EPL minimum wage, union density (ready)

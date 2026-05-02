@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: estonia_market_reform_30yr_income_convergence
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Estonia’s radical market reforms after independence in 1991 — including a
+  currency board, flat tax, rapid privatisation, and full trade liberalisation
+  — generated a cumulative GDP-per-capita convergence gain of at least 15
+  log-points by 2024 relative to a synthetic counterfactual constructed from
+  gradual post-Soviet reform comparators (Latvia, Lithuania, Russia, Ukraine,
+  Belarus, Kazakhstan). The null is that Estonia’s convergence path is
+  indistinguishable from the synthetic control.
+
+evidence_type: causal
+
+sample:
+  countries:
+    - EST
+    - LVA
+    - LTU
+    - RUS
+    - UKR
+    - BLR
+    - KAZ
+    - POL
+    - CZE
+    - SVK
+    - HUN
+    - SVN
+    - HRV
+    - BGR
+    - ROU
+  period: [1991, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020 from fitting"
+    - "flag Russia-Ukraine war 2022-2024 in donor pool"
+
+scope:
+  period: [1991, 2024]
+  countries:
+    - EST
+    - LVA
+    - LTU
+    - RUS
+    - UKR
+    - BLR
+    - KAZ
+    - POL
+    - CZE
+    - SVK
+    - HUN
+    - SVN
+    - HRV
+    - BGR
+    - ROU
+  outcome_dim:
+    - gdp_growth
+    - institutional_quality
+    - trade_liberalisation
+  policy_family:
+    - institutional_reform
+    - privatisation_nationalisation
+    - trade_policy
+  treatment_tags:
+    - estonia_market_reform_1991
+    - estonia_currency_board_1992
+
+variables:
+  outcome:
+    - name: real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD; pwt:rgdpe_per_capita"
+      transformation: log_level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+  treatment:
+    - name: estonia_post_1991
+      source: "constructed: 1 for EST from 1991 onward"
+      transformation: binary
+  controls:
+    - name: initial_gdp_pc_1991
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: level_at_1991
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: wgi_govt_effectiveness
+      source: "wgi:GE.EST"
+      transformation: level
+    - name: human_capital
+      source: "pwt:hc"
+      transformation: level
+    - name: eu_membership_dummy
+      source: "constructed: 1 from 2004 for EU accession countries"
+      transformation: binary
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The reform bundle spans currency-board (monetary/institutional), flat tax
+  (fiscal), privatisation (industrial), and trade liberalisation (trade).
+  Bundled coding per invariant 4.
+
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Primary: synth_did with EST treated from 1991, donor pool of post-communist
+    peers. Secondary: panel FE with country and year fixed effects,
+    estonia_dummy × post_1991 as treatment, controlling for EU accession.
+
+falsification:
+  rule: >
+    Refuted if Estonia’s cumulative log GDP-per-capita growth gap versus
+    synthetic counterfactual over 1991-2024 is not positive and significant at
+    p<0.10, or if the panel-FE coefficient on Estonia × post-1991 is negative
+    and significant at p<0.05.
+  test: synth_did_estonia_convergence
+  threshold: >
+    cumulative_log_gdp_pc_gap_1991_2024 > 0.15 AND p < 0.10 for synth_did;
+    panel_fe_coef > 0 AND p < 0.10.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author's priors lean market-liberal; Estonia is frequently cited as a
+  transition success. Risk of motivated reasoning in donor-pool selection and
+  treatment timing. Mitigation: donor pool pre-registered to include all
+  post-Soviet and CEE peers with available data; both synth_did and panel FE
+  required to align.
+
+steelman: hypotheses/steelman/estonia_market_reform_30yr_income_convergence.md
+
+linked_hypotheses:
+  - post_soviet_transition_institutional_variation

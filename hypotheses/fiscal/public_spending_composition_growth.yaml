@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: public_spending_composition_growth
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Public investment in basic infrastructure (transport, energy, water,
+  sanitation) has strong catch-up returns to real GDP per capita growth in
+  developing and emerging economies, while persistent public transfers and
+  subsidies have weaker or insignificant long-run growth effects, in a
+  broad-country panel 1980-2020. The directional claim is that a 1-percentage-
+  point increase in public-investment share of GDP predicts a 0.1-0.3
+  percentage point increase in annual growth, while an equivalent increase
+  in transfers/subsidies share predicts no significant growth effect or a
+  negative effect, controlling for initial income, institutions, and debt.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during hyperinflation (>50% monthly CPI)"
+    - "drop observations with public investment > 25% of GDP (likely measurement error or oil-fund capitalisation)"
+    - "drop country-years with missing public-investment data for more than 3 consecutive years"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+    - name: total_factor_productivity_growth
+      source: "pwt:rtfpna"
+      transformation: annual_log_change
+      notes: "Secondary outcome to test whether infrastructure raises TFP or just capital accumulation."
+  treatment:
+    - name: public_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+      notes: "Gross fixed capital formation by general government as % of GDP. WDI series; IMF GFS fallback flagged."
+    - name: transfers_and_subsidies_share_gdp
+      source: "imf_gfs:transfers_and_subsidies"
+      transformation: level
+      notes: "IMF Government Finance Statistics transfers and subsidies as % of GDP. Pending dedicated fetcher; v1 uses OECD SNA or WDI general-government expenditure minus investment minus consumption as fallback."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: debt_to_gdp
+      source: "imf_weo:GGXWDG_NGDP"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: population_growth
+      source: "world_bank_wdi:SP.POP.GROW"
+      transformation: level
+  decomposition_channels:
+    - name: infrastructure_quality_index
+      source: "wef_gci:infrastructure_quality"
+      transformation: level
+      notes: "Channel: does public investment translate into perceived infrastructure quality? Pending WEF fetcher."
+    - name: private_investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+      notes: "Channel: crowding-in vs crowding-out of private investment."
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Public investment and transfers/subsidies are both fiscal-channel
+  interventions. The test compares the growth returns to two different
+  compositions of public spending.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with decomposition: growth = β0 + β1*public_investment
+    + β2*transfers_subsidies + controls + FE. Mechanism decomposition via
+    infrastructure quality and private investment channels. Robustness:
+    (1) 5-year non-overlapping averages to capture medium-run effects;
+    (2) subsample by income level (catch-up vs frontier); (3) IV for public
+    investment using lagged public investment and electoral-cycle timing
+    (political budget cycles). Separate catch-up and frontier specifications
+    pre-registered.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (public investment) is positive and significant at
+    p<0.10 while β2 (transfers/subsidies) is insignificant or negative.
+    PARTIAL if both are positive but β1 > β2. REFUTED if β2 is positive
+    and significantly larger than β1, or if both are insignificant.
+    INFORMATIVE: the public-investment coefficient should be larger and
+    more significant in the catch-up subsample than in the frontier
+    subsample; if the opposite holds, the result is a frontier-specific
+    anomaly.
+  test: panel_fe_decomposition_public_investment_vs_transfers_growth
+  threshold: >
+    β_public_investment > 0 at p<=0.10  AND
+    β_transfers_subsidies p >= 0.10 or coefficient <= 0  AND
+    Catch-up subsample β_public_investment >= frontier subsample β_public_investment.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author is moderately confident (0.65). The public-investment literature
+  (e.g., Calderón & Servén 2014) finds positive growth effects, but
+  identification is weak and returns vary enormously by project quality
+  and institutional context. The transfers-versus-investment comparison
+  is theoretically clean but empirically demanding because the two
+  spending categories are correlated with political economy and social
+  insurance needs. Framing risk: the hypothesis may be read as endorsing
+  austerity for social transfers; the spec tests only growth effects and
+  does not claim that transfers have no welfare value.
+
+steelman: hypotheses/steelman/public_spending_composition_growth.md
+
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, fiscal_policy]
+  policy_family: [fiscal_policy]
+  treatment_tags: [public_investment, transfers, subsidies, infrastructure]
+
+linked_hypotheses:
+  - state_size_reduces_household_income_growth
+  - debt_overhang_private_investment_30yr
+  - government_consumption_share_tfp
+
+notes: >
+  Data readiness:
+  - WDI public fixed capital formation, total investment, GDP pc (ready)
+  - IMF GFS transfers and subsidies (pending; constructed fallback flagged)
+  - WGI RL.EST (ready)
+  - IMF WEO debt (ready)
+  - PWT rtfpna (ready)
+  - WEF GCI infrastructure quality (pending)

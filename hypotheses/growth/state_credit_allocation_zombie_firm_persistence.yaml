@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: state_credit_allocation_zombie_firm_persistence
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Persistent state-directed credit allocation predicts higher zombie-firm shares
+  and lower total-factor-productivity growth over 15-30 year windows in a broad
+  panel of advanced and emerging economies.
+evidence_type: associational
+sample:
+  countries:
+    - USA
+    - DEU
+    - FRA
+    - GBR
+    - JPN
+    - KOR
+    - CHN
+    - BRA
+    - IND
+    - ZAF
+    - MEX
+    - TUR
+    - IDN
+    - NGA
+    - EGY
+    - ARG
+    - CHL
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - PAK
+    - ETH
+    - KEN
+    - RUS
+    - POL
+    - AUS
+    - CAN
+    - ITA
+    - ESP
+    - NLD
+    - CHE
+    - SWE
+    - NOR
+    - DNK
+    - FIN
+    - AUT
+    - BEL
+    - ISR
+    - SAU
+    - ARE
+    - COL
+    - PER
+    - UKR
+    - ROU
+    - HUN
+    - CZE
+    - GRC
+    - PRT
+    - NZL
+    - SGP
+    - HKG
+    - TWN
+    - KAZ
+    - UZB
+    - MAR
+    - TUN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - BOL
+    - PRY
+    - URY
+    - CRI
+    - DOM
+    - JAM
+    - LKA
+    - NPL
+    - KHM
+    - LAO
+    - MMR
+    - MNG
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude hyperinflation episodes (>100% annual inflation) that distort credit allocation
+    - Exclude active banking-crisis years as exogenous credit disruption
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, competition_concentration, institutional_quality]
+  policy_family: [industrial_policy, fiscal_policy]
+  treatment_tags: [state_directed_credit, zombie_firm_persistence, development_bank_lending]
+variables:
+  outcome:
+    - name: zombie_firm_share
+      source: constructed:share_of_firms_with_interest_coverage_lt_1_for_3_years
+      transformation: level_pct
+      notes: Standard Caballero-Hoshi-Kashyap definition using Orbis/Amadeus or national firm-level data.
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+  treatment:
+    - name: state_credit_share
+      source: constructed:state_owned_bank_credit_to_private_sector_pct_gdp
+      transformation: level_pct
+      notes: Credit extended by state-owned banks or development banks as share of total private credit.
+  controls:
+    - name: private_credit_depth
+      source: world_bank_wdi:GFDD.DI.14
+      transformation: level_pct_gdp
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: annual_pct
+intervention_channel: fiscal
+intervention_channel_justification: >
+  State-directed credit operates through fiscal/financial channel by substituting
+  state allocation for market-based credit rationing.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Country-year panel FE with country and year fixed effects. Robustness via
+    system GMM to address persistence in zombie shares and endogeneity of credit allocation.
+falsification:
+  rule: >
+    Falsified if state credit share does not show a statistically significant
+    positive association with zombie-firm share and a negative association with
+    TFP growth over 15-30 year windows after controlling for private credit depth,
+    institutional quality, and GDP growth.
+  test: panel_fe_state_credit_on_zombies_and_tfp
+  threshold:
+    zombie_share_coefficient: positive_p_lt_0.10
+    tfp_growth_coefficient: negative_p_lt_0.10
+    window_min_years: 15
+prior_confidence: 0.60
+disclosure: >
+  Author holds priors that market-based credit allocation outperforms state
+  direction, informed by Japan's lost decade and China's SOE lending literature.
+  Acknowledges developmental-state counterarguments about capital-market failures.
+steelman: hypotheses/steelman/state_credit_allocation_zombie_firm_persistence.md
+linked_hypotheses:
+  - state_owned_enterprise_share_growth_plateau
+  - industrial_policy_without_exit_discipline_failure
+notes: >
+  Zombie-firm data requires Orbis/Amadeus or national business registries.
+  State credit share from World Bank GFDD, CBRC, or national central banks.

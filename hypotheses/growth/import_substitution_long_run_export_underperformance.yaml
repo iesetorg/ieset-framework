@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: import_substitution_long_run_export_underperformance
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Import-substitution industrialisation episodes underperform export-oriented
+  openness episodes in 25-year GDP-per-capita and labour-productivity windows
+  across a broad panel of developing economies during 1960-2020.
+evidence_type: causal
+sample:
+  countries:
+    - ARG
+    - BRA
+    - CHL
+    - MEX
+    - URY
+    - COL
+    - PER
+    - VEN
+    - ECU
+    - BOL
+    - PRY
+    - CRI
+    - DOM
+    - GTM
+    - HND
+    - SLV
+    - NIC
+    - PAN
+    - JAM
+    - TTO
+    - ZAF
+    - NGA
+    - EGY
+    - ETH
+    - KEN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - ZMB
+    - MAR
+    - TUN
+    - DZA
+    - LBY
+    - SDN
+    - IND
+    - IDN
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - KHM
+    - LAO
+    - MMR
+    - CHN
+    - KOR
+    - TWN
+    - TUR
+    - IRN
+    - IRQ
+    - JOR
+    - LBN
+    - SYR
+    - YEM
+    - SAU
+    - ARE
+    - KWT
+    - QAT
+    - BHR
+    - OMN
+    - PAK
+  period: [1960, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude oil-exporting monocultures where industrial policy was never attempted
+    - Exclude socialist planned economies with non-market pricing
+scope:
+  period: [1960, 2020]
+  countries:
+    - LATAM
+    - AFRICA
+    - ASIA_EM
+    - MENA
+  outcome_dim: [gdp_growth, productivity, trade_liberalisation]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [import_substitution_industrialisation, export_oriented_growth]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: annual_pct
+    - name: labour_productivity_growth
+      source: pwt:rgdpo_emp
+      transformation: annual_pct
+    - name: export_growth
+      source: world_bank_wits:export_value_constant_usd
+      transformation: annual_pct
+  treatment:
+    - name: import_substitution_episode
+      source: constructed:binary_from_trade_policy_coding
+      transformation: binary
+      notes: Coded 1 for countries/years under explicit ISI strategy; 0 for export-oriented or neutral regimes. Coding from Sachs-Warner, Wacziarg-Welch, or national histories.
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+  controls:
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  ISI operates through trade-policy channel by restricting imports and protecting
+  domestic industry.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE with country and year fixed effects. Robustness via synthetic control
+    using ISI-adopters as treated and export-oriented peers as donors.
+falsification:
+  rule: >
+    Falsified if import-substitution episodes show statistically higher or equal
+    25-year cumulative GDP per capita growth and labour-productivity growth compared
+    to export-oriented episodes after controlling for initial income, human capital,
+    and institutional quality.
+  test: panel_fe_isi_vs_export_orientation
+  threshold:
+    gdp_growth_premium_for_isi: negative_or_zero_p_lt_0.10
+    productivity_growth_premium_for_isi: negative_or_zero_p_lt_0.10
+    window_years: 25
+prior_confidence: 0.58
+disclosure: >
+  Author holds priors favouring trade openness but acknowledges that ISI built
+  industrial capacity in some cases (Brazil, India) that later supported export
+  diversification.
+steelman: hypotheses/steelman/import_substitution_long_run_export_underperformance.md
+linked_hypotheses:
+  - industrial_policy_developmentalist_states_growth
+  - washington_consensus_vs_developmental_state_performance
+notes: >
+  ISI episode coding requires historical policy classification; Sachs-Warner and
+  Wacziarg-Welch provide panel openness indicators but not explicit ISI dummies.
+  Manual coding needed for key cases.

@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: government_consumption_share_tfp
+version: 1
+status: candidate
+topic: fiscal
+claim: Higher government-consumption shares predict weaker TFP growth after controlling for public investment, education, and health spending, across a broad panel of advanced and emerging economies from 1970 to 2020.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - JPN
+  - ITA
+  - ESP
+  - NLD
+  - SWE
+  - CAN
+  - AUS
+  - CHE
+  - BEL
+  - AUT
+  - DNK
+  - NOR
+  - FIN
+  - IRL
+  - PRT
+  - GRC
+  - KOR
+  - MEX
+  - BRA
+  - ARG
+  - CHL
+  - TUR
+  - ZAF
+  - POL
+  - CZE
+  - HUN
+  - ISR
+  - NZL
+  period:
+  - 1970
+  - 2020
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: annual_log_growth
+    notes: Penn World Table TFP at constant national prices.
+  treatment:
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: General government final consumption expenditure as % of GDP.
+  controls:
+  - name: public_investment_share
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: level
+    notes: Gross fixed capital formation % of GDP, proxy for public investment.
+  - name: secondary_enrolment
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: level
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: initial_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log_level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: PanelOLS with country and year fixed effects, cluster-robust SEs by country. Government consumption share is entered in levels and lagged by one year to reduce simultaneity.
+falsification:
+  rule: SUPPORTED if the coefficient on government_consumption_share is negative with p<=0.05 and the absolute magnitude exceeds 0.03 percentage points of annual TFP growth per one-percentage-point increase in the consumption share. REFUTED if the coefficient is positive with p<=0.05 and magnitude >=0.03pp. Otherwise PARTIAL.
+  test: panel_fe_gov_consumption_tfp
+  threshold:
+    coef_max: -0.03
+    p_max: 0.05
+    min_countries: 25
+    min_observations: 400
+prior_confidence: 0.55
+disclosure: The prior expects a small negative association but recognises that government consumption includes productive services (administration, justice) as well as less productive items, and that decomposition is noisy.
+steelman: hypotheses/steelman/government_consumption_share_tfp.md
+scope:
+  period:
+  - 1970
+  - 2020
+  countries:
+  - OECD
+  - ASIA_EM
+  - LATAM
+  outcome_dim:
+  - productivity
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - government_consumption

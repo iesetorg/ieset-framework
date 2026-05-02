@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: startup_density_frontier_prosperity
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Among high-income economies 2000-2020, startup density (new high-
+  growth firms per 1000 working-age population) predicts frontier
+  prosperity — measured by real GDP per capita growth and
+  productivity growth — more strongly than industrial-policy
+  spending as a share of GDP. The pre-registered claim is that, in
+  a horse-race regression, the coefficient on startup density is
+  larger in absolute t-statistic than the coefficient on industrial-
+  policy spending, and that countries in the top quartile of startup
+  density show at least 0.35 percentage points higher annual
+  productivity growth than countries in the bottom quartile.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST]
+  period: [2000, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with banking crises (Laeven-Valencia coding)"
+    - "drop observations where venture-capital or startup data is imputed"
+
+scope:
+  period: [2000, 2020]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, productivity, competition_concentration]
+  policy_family: [industrial_policy, competition_policy, regulation]
+  treatment_tags: [startup_density, venture_capital, industrial_policy_spending]
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+    - name: labour_productivity_growth
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff"
+      notes: "Annual log-difference of real GDP per worker."
+  treatment:
+    - name: startup_density
+      source: "oecd:entrepreneurship_at_a_glance_high_growth_firms"
+      transformation: "per_1000_working_age"
+      notes: "OECD high-growth firm density (gazelles) or business-density proxy from WDI where OECD unavailable."
+    - name: venture_capital_invested_pct_gdp
+      source: "oecd:venture_capital_invested"
+      transformation: "per_gdp"
+      notes: "OECD venture-capital invested as share of GDP."
+    - name: industrial_policy_spending_share_gdp
+      source: "constructed: state_aid + subsidies + directed_credit_guarantees"
+      transformation: "level"
+      notes: "Industrial-policy spending proxy: sum of state aid (EU Scoreboard), production subsidies, and directed credit programmes as % GDP."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: rd_spending_share_gdp
+      source: "world_bank_wdi:GB.XPD.RSDV.GD.ZS"
+      transformation: "level"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: product_market_regulation
+      source: "oecd_pmr:pmr_composite"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Startup density is shaped by regulatory entry barriers, labour-
+  market flexibility, bankruptcy regimes, and tax treatment of
+  equity finance. Industrial policy is typically fiscal or
+  regulatory. The horse-race compares two regulatory/fiscal
+  channels for frontier prosperity.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE horse-race: both startup density and industrial-policy
+    spending entered simultaneously. Primary test is on absolute
+    t-statistic comparison. Quartile comparison as robustness.
+    Robustness: drop US (high startup density outlier); use only
+    European sub-sample; alternative industrial-policy measure
+    from Criscuolo et al. OECD state-aid database.
+
+falsification:
+  rule: >
+    Not supported if (a) the startup-density coefficient is not
+    positive and significant at p<0.05, OR (b) in the horse-race
+    the industrial-policy-spending coefficient has a larger absolute
+    t-statistic than startup density, OR (c) the top-quartile vs
+    bottom-quartile productivity growth gap is below 0.20 pp/year.
+    A developmentalist / industrial-policy reading wins cleanly if
+    (b) holds — i.e. state-directed spending outperforms private
+    startup formation in predicting prosperity.
+  test: panel_fe_horserace_startup_density_vs_industrial_policy
+  threshold: >
+    panel_FE_beta(startup_density → productivity_growth) > 0 at p<0.05
+    AND |t_stat(startup_density)| > |t_stat(industrial_policy_spending)| in horse-race
+    AND top_quartile_mean_gap >= 0.35 pp/yr
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author's market-liberal priors lean toward startup-driven growth,
+  but the empirical evidence is mixed: Israel and Korea combine
+  high startup density with significant industrial policy; Germany
+  and Japan have lower startup density but strong incumbent
+  productivity. Prior 0.55 reflects this ambiguity. Bias risk:
+  author may under-weight the "startup density as symptom not
+  cause" critique (high startup density may reflect weak incumbent
+  regulation and abundant VC, not independent growth causation).
+
+steelman: hypotheses/steelman/startup_density_frontier_prosperity.md
+
+linked_hypotheses:
+  - firm_entry_rate_long_run_productivity
+  - incumbent_subsidy_market_share_persistence
+
+notes: >
+  OECD Entrepreneurship at a Glance and the Criscuolo-OECD
+  high-growth firm database are preferred sources. Venture-capital
+  data from OECD Entrepreneurship Finance database. Industrial-
+  policy spending is the weakest-measured variable; EU State Aid
+  Scoreboard provides the best coverage for European countries.

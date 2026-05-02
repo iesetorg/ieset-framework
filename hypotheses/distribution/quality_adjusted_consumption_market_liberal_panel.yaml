@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: quality_adjusted_consumption_market_liberal_panel
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Quality-adjusted real household consumption per capita grew faster in market-liberal
+  economies than in state-directed peers over 30-year windows from 1960-2020, after
+  controlling for initial income level, human capital, and demographic structure. Quality
+  adjustment is proxied by the expansion of product variety and falling relative prices of
+  durables and services attributable to trade and entry liberalisation.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - ARG
+  - URY
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  - VNM
+  period:
+  - 1960
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years during major hyperinflation episodes (annual CPI > 100%)
+  - exclude observations where household-consumption data are imputed rather than surveyed
+  - require at least 20 consecutive years per country for inclusion
+scope:
+  period:
+  - 1960
+  - 2020
+  countries:
+  - OECD
+  - CHL
+  - MEX
+  - ZAF
+  - BRA
+  - ARG
+  - COL
+  - PER
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - IDN
+  - IND
+  - CHN
+  - VNM
+  outcome_dim:
+  - poverty_inequality
+  - gdp_growth
+  policy_family:
+  - competition_policy
+  - trade_policy
+  treatment_tags: []
+variables:
+  outcome:
+  - name: real_household_consumption_per_capita
+    source: pwt:rconna
+    transformation: log
+    notes: PWT real consumption at constant national prices per capita.
+  - name: consumption_variety_index
+    source: constructed:unctad_trade_variety; un_comtrade:product_lines
+    transformation: log
+    notes: Number of distinct HS product categories in household consumption imports as proxy for variety.
+  treatment:
+  - name: economic_freedom_index
+    source: fraser_efw:summary_index
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  controls:
+  - name: log_gdp_per_capita_initial
+    source: pwt:rgdpe
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: old_age_dependency_ratio
+    source: world_bank_wdi:SP.POP.DPND.OL
+    transformation: level
+  - name: urbanisation_rate
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if the coefficient on market-liberal proxies (EFW or trade
+    openness) in a 30-year rolling panel is negative and significant (p < 0.10) for quality-
+    adjusted consumption growth, or if the coefficient is not distinguishable from zero
+    after controlling for initial income and human capital.
+  test: panel_fe_quality_adjusted_consumption_growth_1960_2020
+  threshold:
+    supported: coefficient on EFW > 0 at p < 0.10 across majority of 30-year windows
+    refuted: coefficient on EFW < 0 at p < 0.10 across majority of windows
+prior_confidence: 0.55
+disclosure: >-
+  Author priors are sympathetic to market-liberal growth arguments but acknowledge that
+  quality-adjustment proxies (variety counts) are imperfect and that state-directed economies
+  (e.g., Korea, Taiwan) showed strong consumption growth during catch-up phases. The test
+  may under-weight public-goods contributions to consumption quality.
+steelman: hypotheses/steelman/quality_adjusted_consumption_market_liberal_panel.md

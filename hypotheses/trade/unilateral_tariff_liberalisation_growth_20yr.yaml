@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: unilateral_tariff_liberalisation_growth_20yr
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Countries that undertake unilateral tariff liberalisation — defined as an
+  autonomous, non-FTA-driven reduction in the applied weighted-mean tariff of
+  at least 5 percentage points sustained for at least 5 consecutive years —
+  experience stronger subsequent 20-year growth in real GDP per worker and real
+  private consumption per capita than matched protectionist peers, in a global
+  panel 1970-2020. The test compares treated liberalisers against synthetic
+  controls and against a matched donor pool of economies with similar pre-reform
+  income levels, tariffs, and growth trajectories.
+
+evidence_type: causal
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop episodes where tariff cuts occur within 3 years of a banking crisis, IMF program, or major civil conflict"
+    - "drop episodes where tariff cuts are reversed within 5 years (not sustained liberalisation)"
+    - "drop microstates and city-states (population < 500,000)"
+
+variables:
+  outcome:
+    - name: real_gdp_per_worker_growth_20yr
+      source: "pwt:rgdpo"
+      transformation: cumulative_log_growth_per_worker_20yr
+      notes: "Real GDP output-side divided by number of persons engaged, cumulative log growth over 20-year post-reform window."
+    - name: real_private_consumption_per_capita_growth_20yr
+      source: "world_bank_wdi:NE.CON.PRVT.ZS"
+      transformation: cumulative_log_growth_per_capita_20yr
+      notes: "Household and NPISH final consumption expenditure, real per capita, cumulative log growth. Fallback to PWT consumption-side when available."
+  treatment:
+    - name: unilateral_tariff_cut_indicator
+      source: "constructed: indicator = 1 for 5yr post-reform window and 15yr follow-up after sustained tariff cut"
+      transformation: indicator
+      notes: "Reform episodes identified from World Bank WITS applied weighted-mean tariff series. Threshold: ≥5pp sustained cut for ≥5 years, not driven by FTA accession."
+    - name: applied_weighted_mean_tariff
+      source: "world_bank_wits:weighted_mean_applied_tariff"
+      transformation: level
+  controls:
+    - name: initial_log_gdp_per_worker
+      source: "pwt:rgdpo"
+      transformation: log_pre_reform_level
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: pre_reform_mean
+      notes: "WGI Rule of Law, 5-year pre-reform mean."
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: pre_reform_mean
+    - name: terms_of_trade_index
+      source: "world_bank_wdi:NE.TRM.TRAD.XD.WD"
+      transformation: level
+      notes: "Terms of trade adjustment; controls for commodity-price windfalls that may co-occur with liberalisation."
+    - name: population_growth
+      source: "world_bank_wdi:SP.POP.GROW"
+      transformation: level
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Unilateral tariff liberalisation is a trade-policy (regulatory) intervention
+  that reduces the price of imported goods and inputs, alters domestic
+  competitive pressure, and changes effective rates of protection across sectors.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Primary: synthetic control for each identified liberalisation episode,
+    matching on pre-reform GDP per worker, investment share, institutional
+    quality, and population growth over a 10-year donor window. Donor pool:
+    all non-reforming countries in same income decile and region. Secondary:
+    Callaway-Sant'Anna staggered DiD across all episodes, with robustness to
+    never-treated and not-yet-treated controls. Tertiary: local projections
+    (Jordà method) to trace dynamic response without imposing functional form.
+
+falsification:
+  rule: >
+    SUPPORTED if the average synthetic-control gap for treated countries is
+    positive and statistically distinguishable from zero (permutation p<0.10)
+    for real GDP per worker growth over the 20-year post-reform window, AND
+    the same holds for private consumption per capita. PARTIAL if the GDP per
+    worker effect is positive and significant but consumption is insignificant
+    (growth without welfare gains). REFUTED if the synthetic-control gap is
+    negative and significant at p<0.10 for either outcome. INFORMATIVE:
+    exclusion of commodity-exporter liberalisations should not eliminate the
+    result — if it does, the effect is a terms-of-trade story, not a trade-policy
+    story.
+  test: synthetic_control_unilateral_tariff_liberalisation_20yr_growth
+  threshold: >
+    Synthetic-control ATT (GDP per worker, 20yr) > 0 at permutation p<=0.10  AND
+    Synthetic-control ATT (consumption per capita, 20yr) > 0 at permutation p<=0.10  AND
+    Ex-commodity-exporter robustness retains >=50% of baseline ATT magnitude.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author is moderately confident (0.60) that unilateral liberalisation produces
+  long-run growth gains, but acknowledges serious identification challenges:
+  tariff cuts are rarely exogenous (they often follow crises or IMF programs),
+  and the donor pool for synthetic control may be contaminated by spillovers.
+  Prior is not higher because of well-known cases (e.g., Mexico post-NAFTA,
+  Argentina 1990s) where liberalisation was followed by disappointing growth.
+  Framing risk: the hypothesis could be read as a blanket endorsement of
+  Washington-Consensus trade policy; the spec deliberately includes consumption
+  per capita as a welfare check and requires robustness to commodity-exporter
+  exclusion to avoid conflating trade policy with resource rents.
+
+steelman: hypotheses/steelman/unilateral_tariff_liberalisation_growth_20yr.md
+
+scope:
+  period: [1970, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [unilateral_tariff_liberalisation, washington_consensus]
+
+linked_hypotheses:
+  - trade_lib_india_1991_tariff_cut_export_response
+  - trade_lib_indonesia_1980s_1990s_unilateral
+  - infant_industry_protection_capability_effect
+
+notes: >
+  Data readiness:
+  - World Bank WITS applied weighted-mean tariff (ready)
+  - PWT rgdpo, persons engaged (ready)
+  - WDI NE.CON.PRVT.ZS, NE.GDI.TOTL.ZS, SP.POP.GROW, NE.TRM.TRAD.XD.WD (ready)
+  - WGI RL.EST (ready from 1996)
+  - FTA dating from WTO RTA-IS (ready, used to exclude FTA-driven cuts)

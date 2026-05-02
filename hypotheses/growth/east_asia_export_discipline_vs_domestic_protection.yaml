@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: east_asia_export_discipline_vs_domestic_protection
+version: 1
+status: candidate
+topic: growth
+claim: East Asian economies that combined export orientation with competitive domestic markets achieved stronger long-run productivity growth than those that combined export promotion with protected domestic sectors, over 1970-2020.
+evidence_type: associational
+sample:
+  countries:
+  - KOR
+  - TWN
+  - JPN
+  - HKG
+  - SGP
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  - VNM
+  - CHN
+  period:
+  - 1970
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years with active internal armed conflict
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: annual_growth
+  - name: labour_productivity_growth
+    source: pwt:rgdpo
+    transformation: annual_growth_per_worker
+  treatment:
+  - name: export_orientation_x_domestic_competition
+    source: constructed:interaction_term
+    transformation: level
+    notes: Interaction of export-to-GDP ratio (world_bank_wdi:NE.TRD.GNFS.ZS) and an inverse measure of domestic protection (1 - average tariff, or 1 - SOE share, or Fraser EFW trade freedom index). Higher values mean more export discipline AND more domestic competition.
+  - name: export_orientation_x_domestic_protection
+    source: constructed:interaction_term
+    transformation: level
+    notes: Interaction of export-to-GDP ratio and domestic protection (tariff or SOE share). Tests whether export promotion with protection is weaker.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: level
+  - name: institutional_quality
+    source: wgi:GOV_WTI_GE.EST
+    transformation: level
+  - name: fdi_inflows_share
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: >
+    PanelOLS with country and year FE. The key test is the difference in
+    coefficients between export×competition and export×protection interactions.
+    Robustness: use OECD PMR instead of tariffs for high-income subsample;
+    use World Bank WITS tariff data for emerging-market subsample.
+falsification:
+  rule: SUPPORTED if the export×competition interaction is positive and significant (p<=0.05) and the coefficient on export×protection is significantly smaller (p<=0.10 for the difference). REFUTED if export×protection is larger or if both are insignificant. Otherwise PARTIAL.
+  test: panel_fe_export_discipline_interaction
+  threshold:
+    interaction_diff_sign: positive
+    p_max: 0.05
+    min_countries: 8
+    min_observations: 200
+prior_confidence: 0.6
+disclosure: The prior is informed by the Amsden/Wade developmental-state literature but treats export discipline as a market test rather than a state-planning success.
+steelman: hypotheses/steelman/east_asia_export_discipline_vs_domestic_protection.md
+scope:
+  period:
+  - 1970
+  - 2020
+  countries:
+  - ASIA_EM
+  outcome_dim:
+  - productivity
+  - trade_liberalisation
+  - industrial_capability
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  - competition_policy
+  treatment_tags:
+  - export_discipline
+  - domestic_protection

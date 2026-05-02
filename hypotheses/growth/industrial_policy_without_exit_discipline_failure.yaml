@@ -1,0 +1,165 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_policy_without_exit_discipline_failure
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Industrial policy episodes without clear exit rules or export-discipline
+  conditions generate weaker long-run GDP-per-capita and productivity outcomes
+  than episodes with hard performance conditions, in a broad panel of economies
+  during 1970-2020.
+evidence_type: causal
+sample:
+  countries:
+    - USA
+    - DEU
+    - FRA
+    - GBR
+    - JPN
+    - KOR
+    - CHN
+    - BRA
+    - IND
+    - ZAF
+    - MEX
+    - TUR
+    - IDN
+    - NGA
+    - EGY
+    - ARG
+    - CHL
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - PAK
+    - ETH
+    - KEN
+    - RUS
+    - POL
+    - AUS
+    - CAN
+    - ITA
+    - ESP
+    - NLD
+    - CHE
+    - SWE
+    - NOR
+    - DNK
+    - FIN
+    - AUT
+    - BEL
+    - ISR
+    - SAU
+    - ARE
+    - COL
+    - PER
+    - UKR
+    - ROU
+    - HUN
+    - CZE
+    - GRC
+    - PRT
+    - NZL
+    - SGP
+    - HKG
+    - TWN
+    - KAZ
+    - UZB
+    - MAR
+    - TUN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - BOL
+    - PRY
+    - URY
+    - CRI
+    - DOM
+    - JAM
+    - LKA
+    - NPL
+    - KHM
+    - LAO
+    - MMR
+    - MNG
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude wartime mobilisation or post-conflict reconstruction programmes
+    - Exclude temporary crisis-response industrial programmes (<3 years)
+scope:
+  period: [1970, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, industrial_capability]
+  policy_family: [industrial_policy, institutional_reform]
+  treatment_tags: [industrial_policy_exit_discipline, export_discipline_conditionality]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: annual_pct
+    - name: labour_productivity_growth
+      source: pwt:rgdpo_emp
+      transformation: annual_pct
+    - name: export_competitiveness_index
+      source: owid:economic-complexity-index
+      transformation: level
+  treatment:
+    - name: industrial_policy_without_exit_discipline
+      source: constructed:binary_coded_from_historical_programme_descriptions
+      transformation: binary
+      notes: Coded 1 for programmes without sunset clauses, performance benchmarks, or export requirements.
+    - name: industrial_policy_with_exit_discipline
+      source: constructed:binary
+      transformation: binary
+      notes: Coded 1 for programmes with explicit performance conditions, sunset clauses, or export requirements.
+  controls:
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: governance_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >
+  Exit discipline and export conditions operate through institutional channels
+  by hardening budget constraints and aligning firm incentives with productivity
+  growth rather than rent extraction.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE comparing industrial-policy episodes with and without exit discipline.
+    Robustness via matching on initial income, governance, and sector.
+falsification:
+  rule: >
+    Falsified if industrial-policy episodes without exit discipline do not show
+    statistically weaker long-run GDP per capita growth and productivity growth
+    than episodes with exit discipline after controlling for initial income,
+    governance, and human capital.
+  test: panel_fe_exit_discipline_comparison
+  threshold:
+    gdp_growth_difference_pct: -3
+    significance: p_lt_0.10
+    productivity_difference_required: yes
+prior_confidence: 0.62
+disclosure: >
+  Author holds priors that institutional design (exit rules, performance conditions)
+  matters more than policy intent, informed by East Asian developmental-state
+  literature and European state-aid evaluation.
+steelman: hypotheses/steelman/industrial_policy_without_exit_discipline_failure.md
+linked_hypotheses:
+  - industrial_policy_developmentalist_states_growth
+  - industrial_policy_governance_capacity_conditionality
+  - subsidy_duration_declining_returns_panel
+notes: >
+  Industrial-policy episode coding requires manual historical classification.
+  Key sources: Amsden (1989), Wade (1990), Chang (2002), World Bank PPI database,
+  OECD STI industrial policy database.

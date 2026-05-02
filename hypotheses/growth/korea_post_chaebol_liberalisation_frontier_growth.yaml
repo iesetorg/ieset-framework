@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: korea_post_chaebol_liberalisation_frontier_growth
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  South Korea's post-1997 corporate governance and financial liberalisation reforms
+  explain a larger share of post-crisis frontier productivity convergence than the
+  earlier heavy-and-chemical-industry (HCI) drive. After 1997, chaebol restructuring,
+  foreign ownership liberalisation, and banking-sector clean-ups raised total factor
+  productivity growth and reduced resource misallocation relative to the HCI era
+  (1973-1996), even after controlling for initial income, human capital, and global
+  trade conditions. The claim applies to South Korea 1970-2020 in a time-series
+  structural-break framework with cross-country comparator benchmarking.
+evidence_type: associational
+sample:
+  countries:
+  - KOR
+  - TWN
+  - JPN
+  - MYS
+  - THA
+  - CHL
+  - MEX
+  period:
+  - 1970
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude years of major war or severe political instability (KOR 1950-1953)
+  - require at least 10 years of post-1997 data for post-reform phase estimates
+  - exclude commodity-driven boom years when benchmarking against commodity exporters
+scope:
+  period:
+  - 1970
+  - 2020
+  countries:
+  - KOR
+  - TWN
+  - JPN
+  - MYS
+  - THA
+  - CHL
+  - MEX
+  outcome_dim:
+  - productivity
+  - gdp_growth
+  - institutional_quality
+  policy_family:
+  - industrial_policy
+  - institutional_reform
+  - competition_policy
+  treatment_tags:
+  - korea_chaebol_reform_1997
+  - korea_heavy_chemical_industry_1973
+  - korea_financial_liberalisation_1998
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: gdp_per_capita_convergence_gap
+    source: pwt:rgdpe
+    transformation: constructed_gap_to_usa
+    notes: Log-gap to US real GDP per capita as convergence measure.
+  treatment:
+  - name: hci_era_indicator
+    source: constructed:korea_hci_drive_1973_1996
+    transformation: indicator
+    notes: Indicator for years under the Heavy and Chemical Industry drive.
+  - name: post_1997_reform_indicator
+    source: constructed:korea_post_crisis_reform_1998_2020
+    transformation: indicator
+    notes: Indicator for years after the 1997-1998 financial crisis reforms.
+  - name: chaebol_concentration_index
+    source: constructed:top_5_chaebol_assets_to_gdp
+    transformation: level
+    notes: Proxy for corporate governance liberalisation via reduced chaebol dominance.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: institutional_quality
+    source: wgi:GE.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Panel fixed-effects with a structural-break interaction for Korea post-1997.
+falsification:
+  rule: >-
+    The hypothesis is falsified if the post-1997 reform indicator does not carry a
+    positive and statistically significant (p < 0.10) coefficient on TFP growth or
+    convergence-gap reduction in South Korea relative to the HCI-era indicator, or if
+    the HCI-era coefficient is larger and more significant than the post-1997 coefficient.
+  test: panel_fe_structural_break_korea_1970_2020
+  threshold:
+    supported: post_1997 coefficient > hci_era coefficient at p < 0.10 for KOR
+    refuted: hci_era coefficient > post_1997 coefficient at p < 0.10 for KOR
+prior_confidence: 0.55
+disclosure: >-
+  Author priors are sympathetic to market-liberal reforms but acknowledge that the HCI
+  drive built industrial capability that enabled later reform success. The test is designed
+  to bound the relative contribution of each phase, not to deny either.
+steelman: hypotheses/steelman/korea_post_chaebol_liberalisation_frontier_growth.md
+notes: >-
+  The 1997 crisis was exogenous in timing to some extent (Asian financial contagion),
+  providing a plausible break point, but reform intensity was endogenous to domestic
+  politics. Comparator countries help difference out regional trends.

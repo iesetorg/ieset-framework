@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: japan_miti_success_then_stagnation_panel
+version: 1
+status: candidate
+topic: growth
+claim: Japan MITI-era catch-up is positive, but post-1990 stagnation is associated with protected sectors, zombie lending, and weak domestic competition.
+evidence_type: causal
+sample:
+  countries:
+    - JPN
+  period: [1955, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: tfp_growth
+      source: pwt:rtfpna
+      transformation: annual_log_diff
+  treatment:
+    - name: miti_era_dummy
+      source: constructed:binary_indicator
+      transformation: binary
+      notes: Coded 1 for 1955-1989 MITI-led industrial policy period.
+    - name: post_1990_stagnation_dummy
+      source: constructed:binary_indicator
+      transformation: binary
+      notes: Coded 1 from 1990 onward.
+    - name: zombie_lending_share
+      source: constructed:caballero_hoshi_kashyap
+      transformation: level
+      notes: Zombie-firm share of lending from Caballero-Hoshi-Kashyap methodology or similar.
+    - name: domestic_protection_index
+      source: oecd_pmr:pmr
+      transformation: level
+      notes: OECD PMR as proxy for domestic protection and competition barriers.
+  controls:
+    - name: r_d_intensity
+      source: world_bank_wdi:GB.XPD.RSDV.GD.ZS
+      transformation: level
+    - name: terms_of_trade
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: global_demand
+      source: imf_weo:world_gdp_growth
+      transformation: level
+estimator:
+  template: event_study
+  fixed_effects: [year]
+  clustering: none
+  notes: Event-study and structural-break analysis of Japanese growth around 1990. Tests whether post-1990 stagnation is associated with rising zombie lending and protected sectors.
+falsification:
+  rule: The hypothesis is refuted if post-1990 Japan shows no slowdown in TFP growth or GDP-per-capita growth relative to the MITI era, or if zombie lending and domestic protection do not significantly predict the stagnation.
+  test: event_study_japan_miti_vs_stagnation
+  threshold:
+    post_1990_slowdown: true
+    zombie_protection_predicts: true
+prior_confidence: 0.6
+disclosure: Author acknowledges that Japan stagnation has multiple competing explanations (demographics, monetary policy, asset bubble) and that isolating the protection-zombie channel is difficult.
+steelman: hypotheses/steelman/japan_miti_success_then_stagnation_panel.md
+scope:
+  period: [1955, 2024]
+  countries:
+    - JPN
+  outcome_dim:
+    - gdp_growth
+    - productivity
+    - competition_concentration
+  policy_family:
+    - industrial_policy
+    - competition_policy
+    - regulation
+  treatment_tags:
+    - japan_miti_era
+    - japan_lost_decade
+    - japan_zombie_lending
+notes: Zombie lending data requires academic reconstruction (Caballero-Hoshi-Kashyap 2008). OECD PMR for Japan begins 1998.

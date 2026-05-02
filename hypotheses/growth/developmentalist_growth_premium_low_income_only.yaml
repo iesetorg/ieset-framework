@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: developmentalist_growth_premium_low_income_only
+version: 1
+status: candidate
+topic: growth
+claim: Developmentalist policy packages show positive growth effects mainly in low-income catch-up windows, while the same packages show weaker or null effects in upper-middle-income and high-income windows unless market competition improves.
+evidence_type: associational
+sample:
+  countries: [KOR, TWN, CHN, VNM, MYS, THA, IDN, IND, ETH, RWA, BGD, BRA, MEX, ARG, CHL, TUR, ZAF, POL, EST, IRL, ESP, PRT, GRC]
+  period: [1960, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - split observations into low-income, middle-income, and frontier windows using relative GDP per capita
+  - exclude active civil-war years in robustness checks
+variables:
+  outcome:
+  - name: five_year_gdp_pc_growth
+    source: pwt:rgdpo_pop; world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: rolling five-year annualized growth
+  treatment:
+  - name: developmentalist_alignment
+    source: movements:position_alignments_developmentalism; policy_axes:industrial_policy
+    transformation: country-year coded alignment/intensity proxy
+  - name: market_competition_score
+    source: fraser_efw:regulation; oecd:pmr
+    transformation: standardized competition score
+  controls:
+  - name: relative_income_bin
+    source: pwt:rgdpo_pop
+    transformation: country GDP per capita as share of US level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: Tests developmentalist treatment interactions by income-stage bins.
+falsification:
+  rule: SUPPORTED if developmentalist_alignment is positive in low-income windows but significantly smaller or null in higher-income windows, while market_competition_score is positive in higher-income windows. REFUTED if developmentalist_alignment is equally positive across all income stages and market competition is not positive. Otherwise PARTIAL.
+  test: developmentalist_growth_by_income_stage
+  threshold:
+    low_income_us_share_max: 0.25
+    middle_income_us_share_max: 0.60
+    p_max: 0.05
+prior_confidence: 0.59
+disclosure: This is deliberately adversarial to the recent developmentalism scoreboard boost and asks whether those wins are mostly catch-up-window wins.
+steelman: hypotheses/steelman/developmentalist_growth_premium_low_income_only.md
+scope:
+  period: [1960, 2024]
+  countries: [GLOBAL, ASIA_EM, AFRICA, LATAM, POST_SOVIET]
+  outcome_dim: [gdp_growth, productivity, industrial_capability]
+  policy_family: [industrial_policy, competition_policy, institutional_reform]
+  treatment_tags: [developmentalist_alignment, income_stage_split, market_competition]
+

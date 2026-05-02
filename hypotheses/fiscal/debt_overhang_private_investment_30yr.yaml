@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: debt_overhang_private_investment_30yr
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  High public-debt overhang — defined as general government gross debt
+  exceeding 90% of GDP for at least 5 consecutive years — predicts lower
+  private gross fixed capital formation and slower real GDP per capita
+  growth over subsequent 30-year windows, in a broad-country panel
+  1970-2020. The directional claim is that debt-overhang episodes are
+  followed by cumulative private-investment shortfalls of 10-25% relative
+  to matched non-overhang peers, and by annual growth shortfalls of
+  0.3-0.7 percentage points, controlling for initial income, institutions,
+  and crisis history.
+
+evidence_type: causal
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during war or civil conflict (UCDP/PRIO > 1000 battle deaths)"
+    - "drop observations with debt > 250% of GDP (likely data error or special accounting)"
+    - "drop country-years with missing private investment data for more than 3 consecutive years"
+
+variables:
+  outcome:
+    - name: private_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: level
+      notes: "Gross fixed capital formation as % of GDP. Public plus private; public component subtracted where available."
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+    - name: cumulative_private_investment_30yr
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: cumulative_30yr_sum
+      notes: "Cumulative private investment over 30-year post-overhang window, constructed by subtracting public investment where available."
+  treatment:
+    - name: debt_overhang_indicator
+      source: "constructed: indicator = 1 when general government gross debt > 90% of GDP for >=5 consecutive years"
+      transformation: indicator
+      notes: "Debt overhang episodes identified from IMF WEO and Reinhart-Rogoff historical public debt database."
+    - name: debt_to_gdp
+      source: "imf_weo:GGXWDG_NGDP"
+      transformation: level
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: banking_crisis_history
+      source: "constructed: indicator = 1 if country experienced systemic banking crisis in prior 10 years"
+      transformation: indicator
+      notes: "Controls for crisis legacy that may drive both debt accumulation and investment weakness."
+  decomposition_channels:
+    - name: long_term_interest_rate
+      source: "imf_weo:long_term_interest_rate"
+      transformation: level
+      notes: "Channel: debt overhang may raise risk premia and crowd out private borrowing."
+    - name: sovereign_credit_rating
+      source: "constructed: Moody's/Fitch/S&P sovereign rating converted to numeric scale"
+      transformation: level
+      notes: "Channel: debt overhang may reduce sovereign rating and raise external financing costs."
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Public debt accumulation is a fiscal-channel intervention. The hypothesis
+  tests the long-run consequences of sustained high debt, which operates
+  through fiscal expectations (future taxation, crowding out) and financial
+  channels (risk premia, sovereign risk).
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Primary: synthetic control for each debt-overhang episode, matching on
+    pre-overhang GDP per capita, investment share, institutional quality,
+    and debt trajectory over a 10-year donor window. Donor pool: countries
+    that never experienced debt overhang or that experienced it at a
+    different time. Secondary: local projections (Jordà method) tracing
+    dynamic response of private investment and growth to debt-overhang
+    initiation, with robustness to post-crisis episodes. Tertiary:
+    Callaway-Sant'Anna staggered DiD with never-treated controls.
+
+falsification:
+  rule: >
+    SUPPORTED if the average synthetic-control gap for private investment
+    is negative and significant (permutation p<0.10) over the 30-year post-
+    overhang window, AND the corresponding GDP-per-capita growth gap is
+    also negative and significant. PARTIAL if the investment gap is
+    negative and significant but the growth gap is not (debt crowds out
+    investment without affecting aggregate growth, perhaps due to offsetting
+    public spending). REFUTED if either gap is positive and significant
+    at p<0.10. INFORMATIVE: Japan (1990s-present) is a prominent overhang
+    case with low investment but also unique demographics; excluding Japan
+    should not eliminate the result.
+  test: synthetic_control_debt_overhang_private_investment_and_growth_30yr
+  threshold: >
+    Synthetic-control ATT (private investment, 30yr) < 0 at permutation p<=0.10  AND
+    Synthetic-control ATT (GDP pc growth, 30yr) < 0 at permutation p<=0.10  AND
+    Ex-Japan robustness retains sign of both ATTs.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Author is moderately confident (0.65). The Reinhart-Rogoff 90% threshold
+  is controversial (Herndon-Ash-Pollin 2014 identified spreadsheet errors),
+  but the broader debt-overhang literature (Krugman 1988, Sachs 1989)
+  provides theoretical support. Prior is not higher because Japan's
+  decades-long high-debt low-investment episode is confounded by
+  demographics and deflation, and because several high-debt episodes
+  (post-WWII US/UK) were followed by strong growth. Framing risk: the
+  hypothesis may be read as endorsing aggressive austerity; the spec tests
+  only the long-run association and does not prescribe policy.
+
+steelman: hypotheses/steelman/debt_overhang_private_investment_30yr.md
+
+scope:
+  period: [1970, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, fiscal_policy, productivity]
+  policy_family: [fiscal_policy]
+  treatment_tags: [public_debt, debt_overhang, crowding_out]
+
+linked_hypotheses:
+  - fiscal_dominance_japan_debt_non_crisis
+  - fiscal_consolidation_credibility_growth
+  - state_size_reduces_household_income_growth
+
+notes: >
+  Data readiness:
+  - IMF WEO general government gross debt (ready)
+  - Reinhart-Rogoff historical debt (ready)
+  - WDI private investment, GDP pc (ready)
+  - WGI RL.EST (ready)
+  - IMF WEO long-term interest rate (ready for subset)
+  - Sovereign credit ratings (pending; constructed from public sources)

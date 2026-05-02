@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: free_market_shock_therapy_social_cost
+version: 1
+status: candidate
+topic: institutional_quality
+claim: >-
+  Rapid market liberalisation (price decontrol, mass privatisation, trade opening) under
+  weak institutions produces large short-run welfare losses—rising mortality, falling
+  life expectancy, rising inequality, and collapsing output—that may persist for at least
+  a decade, compared to gradual reformers or non-reformers at similar initial income levels.
+  The claim challenges naive laissez-faire by documenting the social cost of reform speed
+  when institutional scaffolding is absent, over 1989-2010.
+evidence_type: causal
+sample:
+  countries:
+  - RUS
+  - UKR
+  - BLR
+  - KAZ
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - EST
+  - LVA
+  - LTU
+  - ROU
+  - BGR
+  - HRV
+  - SRB
+  - MKD
+  - ALB
+  - BIH
+  - MDA
+  - ARM
+  - GEO
+  - AZE
+  - KGZ
+  - TJK
+  - UZB
+  - TKM
+  - MNG
+  - CHN
+  - VNM
+  period:
+  - 1989
+  - 2010
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude years of active civil war (Balkans 1991-1995, Caucasus 1990s)
+  - exclude China and Vietnam from primary "shock therapy" pool; use as gradual-reform comparators
+scope:
+  period:
+  - 1989
+  - 2010
+  countries:
+  - RUS
+  - UKR
+  - BLR
+  - KAZ
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - EST
+  - LVA
+  - LTU
+  - ROU
+  - BGR
+  - HRV
+  - SRB
+  - MKD
+  - ALB
+  - BIH
+  - MDA
+  - ARM
+  - GEO
+  - AZE
+  - KGZ
+  - TJK
+  - UZB
+  - TKM
+  - MNG
+  - CHN
+  - VNM
+  outcome_dim:
+  - gdp_growth
+  - poverty_inequality
+  - life_expectancy_health
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  - trade_policy
+  treatment_tags:
+  - post_soviet_transition_1991
+  - shock_therapy_episodes
+variables:
+  outcome:
+  - name: life_expectancy_at_birth
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: gini_index
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  - name: poverty_headcount_2_15
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: level
+  - name: real_gdp_per_capita
+    source: maddison:rgdpnapc
+    transformation: log
+  treatment:
+  - name: shock_therapy_episode
+    source: constructed:rapid_price_decontrol_plus_mass_privatisation
+    transformation: indicator
+    notes: Indicator for countries implementing rapid price liberalisation and mass privatisation within 3 years of transition start.
+  - name: reform_speed_index
+    source: constructed:efw_change_first_5y
+    transformation: level
+    notes: Magnitude of EFW improvement in first 5 years of transition as proxy for reform speed.
+  controls:
+  - name: initial_life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+  - name: initial_gdp_per_capita
+    source: maddison:rgdpnapc
+    transformation: log
+  - name: soviet_industrial_structure_index
+    source: constructed:heavy_industry_share_1989
+    transformation: level
+  - name: ethnic_fractionalisation
+    source: constructed:alestina_fractionalisation
+    transformation: level
+estimator:
+  template: synthetic_control
+  notes: Synthetic control or staggered DiD with gradual reformers (China, Vietnam) and non-reformers as donor pool.
+falsification:
+  rule: >-
+    The hypothesis is falsified if shock-therapy countries show life-expectancy and GDP
+    trajectories indistinguishable from or superior to gradual reformers in a synthetic-
+    control or event-study design, or if welfare losses are fully reversed within 5 years.
+  test: synthetic_control_shock_therapy_vs_gradual_1989_2010
+  threshold:
+    supported: shock_therapy countries show life-expectancy decline >2 years and GDP gap >15% vs synthetic at year 10
+    refuted: no significant gap vs synthetic at year 10
+prior_confidence: 0.65
+disclosure: >-
+  Author priors expect shock therapy to impose social costs but acknowledge that gradual
+  reform may have preserved inefficiencies and corruption. The test does not claim gradual
+  reform is optimal, only that rapid reform without institutions is costly.
+steelman: hypotheses/steelman/free_market_shock_therapy_social_cost.md

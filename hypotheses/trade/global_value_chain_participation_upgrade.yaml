@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: global_value_chain_participation_upgrade
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Global value chain (GVC) participation predicts real GDP per capita income
+  upgrading when firms can enter and exit freely, but not when rents are
+  reserved for protected incumbents, in a panel of developing and emerging
+  economies 1990-2020. The directional claim is that the interaction between
+  GVC participation (backward plus forward linkage intensity) and domestic
+  entry freedom is positive and significant for income growth, while GVC
+  participation alone shows no significant or weaker effect.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, BGD, BGR, BRA, CHL, CHN, COL, CZE, DOM, ECU, EGY, EST, HUN, IDN, IND, JOR, KOR, LTU, LVA, MAR, MEX, MYS, PAK, PER, PHL, POL, PRT, ROU, RUS, SVK, SVN, THA, TUR, TWN, UKR, VNM, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with GVC participation based on export value < 1 billion USD (noisy measurement)"
+    - "drop observations during systemic banking crisis (Laeven-Valencia)"
+    - "drop transition years 1989-1994 for post-communist economies"
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: annual_log_change
+    - name: real_wage_manufacturing_growth
+      source: "ilo:earnings_manufacturing_real"
+      transformation: annual_log_change
+      notes: "ILOSTAT real manufacturing earnings. Pending dedicated fetcher; WDI fallback flagged."
+  treatment:
+    - name: gvc_participation_index
+      source: "oecd_tiva:gvc_participation"
+      transformation: level
+      notes: "OECD TiVA GVC participation rate (backward + forward linkages as % of gross exports). Pending direct fetcher; v1 uses UNCTAD-Eora GVC data as fallback with flag."
+    - name: domestic_entry_freedom_index
+      source: "oecd_pmr:barriers_to_entry"
+      transformation: inverted_scale
+      notes: "OECD PMR barriers-to-entry subcomponent, inverted so higher = freer entry."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: rule_of_law
+      source: "wgi:RL.EST"
+      transformation: level
+  decomposition_channels:
+    - name: backward_linkage_intensity
+      source: "oecd_tiva:backward_linkages"
+      transformation: pct_gross_exports
+      notes: "Foreign value added in exports. Channel: imported input quality and variety."
+    - name: forward_linkage_intensity
+      source: "oecd_tiva:forward_linkages"
+      transformation: pct_gross_exports
+      notes: "Domestic value added in third-country exports. Channel: intermediate-goods upgrading."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  GVC participation is a trade-policy outcome (tariff and non-tariff barrier
+  reductions enable cross-border production fragmentation). Entry freedom is a
+  competition-policy (regulatory) intervention. The test identifies a
+  complementarity between trade integration and domestic market structure.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with interaction: growth = β0 + β1*GVC_participation +
+    β2*entry_freedom + β3*(GVC × entry_freedom) + controls + FE. Subsample
+    analysis at terciles of entry freedom. Robustness: (1) instrument GVC
+    participation using bilateral-distance-weighted world GVC growth
+    (Bartik-style shift-share); (2) exclude China; (3) use 5-year non-
+    overlapping averages to reduce serial correlation.
+
+falsification:
+  rule: >
+    SUPPORTED if β3 (GVC × entry_freedom) is positive and significant at
+    p<0.10, AND the GVC coefficient in the bottom tercile of entry freedom
+    is insignificant or negative while the top tercile coefficient is
+    positive and significant. PARTIAL if β3 is positive and significant
+    but β1 is also positive (GVC helps regardless, just more with entry).
+    REFUTED if β3 is negative and significant. INFORMATIVE: Bartik-IV
+    robustness should retain the sign of β3.
+  test: panel_fe_gvc_entry_freedom_interaction_income_upgrade
+  threshold: >
+    β_interaction > 0 at p<=0.10  AND
+    β_gvc_bottom_tercile p >= 0.10 or coefficient < 0  AND
+    β_gvc_top_tercile > 0 at p<=0.10  AND
+    IV robustness retains sign of β_interaction.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The GVC-income-upgrade literature
+  (e.g., Kummritz et al. 2017) finds positive associations, but causality
+  is disputed: GVC participation is endogenous to income and industrial
+  structure. The entry-freedom interaction is theoretically appealing but
+  empirically fragile because entry barriers are correlated with general
+  institutional quality. Framing risk: the hypothesis may be read as
+  endorsing unconditional GVC integration; the spec explicitly requires
+  the interaction and tests for null effects under protected incumbency.
+
+steelman: hypotheses/steelman/global_value_chain_participation_upgrade.md
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, trade_liberalisation, competition_concentration]
+  policy_family: [trade_policy, competition_policy]
+  treatment_tags: [gvc_participation, entry_barriers, income_upgrading]
+
+linked_hypotheses:
+  - trade_lib_china_wto_2001_manufacturing_export_surge
+  - export_complexity_market_access_vs_subsidy
+
+notes: >
+  Data readiness:
+  - OECD TiVA GVC participation (pending direct fetcher; UNCTAD-Eora fallback)
+  - OECD PMR barriers to entry (ready for subset)
+  - WDI GDP pc, trade openness, FDI inflows (ready)
+  - PWT hc, WGI RL.EST (ready)
+  - ILOSTAT manufacturing wages (pending; WDI fallback flagged)

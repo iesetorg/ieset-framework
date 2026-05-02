@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: poverty_exit_durable_jobs_vs_transfer
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  Durable exit from extreme poverty (sustained above-poverty-line household consumption
+  for at least 5 consecutive years) is more strongly associated with private formal-sector
+  job creation than with the expansion of cash transfers or social-assistance programmes
+  alone, over 15-25 year windows in low- and middle-income countries 1995-2020. The claim
+  is conditional on controlling for initial poverty depth, human capital, and agricultural
+  productivity growth.
+evidence_type: associational
+sample:
+  countries:
+  - BRA
+  - MEX
+  - COL
+  - PER
+  - CHL
+  - ZAF
+  - IDN
+  - PHL
+  - VNM
+  - IND
+  - CHN
+  - BGD
+  - ETH
+  - KEN
+  - TZA
+  - UGA
+  - RWA
+  - GHA
+  - NGA
+  - EGY
+  - MAR
+  - TUN
+  - DZA
+  - TUR
+  - THA
+  - MYS
+  period:
+  - 1995
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years with major conflict (UCDP >1000 battle deaths)
+  - exclude observations where poverty data are interpolated across more than 3 years
+scope:
+  period:
+  - 1995
+  - 2020
+  countries:
+  - BRA
+  - MEX
+  - COL
+  - PER
+  - CHL
+  - ZAF
+  - IDN
+  - PHL
+  - VNM
+  - IND
+  - CHN
+  - BGD
+  - ETH
+  - KEN
+  - TZA
+  - UGA
+  - RWA
+  - GHA
+  - NGA
+  - EGY
+  - MAR
+  - TUN
+  - DZA
+  - TUR
+  - THA
+  - MYS
+  outcome_dim:
+  - poverty_inequality
+  - employment_labour
+  policy_family:
+  - welfare_architecture
+  - labour_market
+  treatment_tags: []
+variables:
+  outcome:
+  - name: poverty_exit_rate_5y
+    source: constructed:povcalnet_world_bank; world_bank_wdi:SI.POV.DDAY
+    transformation: level
+    notes: Share of population below $2.15/day that exits and stays above the line for 5+ years.
+  - name: sustained_consumption_growth_bottom_quartile
+    source: constructed:lsms_household_survey_panels
+    transformation: log_diff
+    notes: Real consumption growth of bottom quartile from harmonised household surveys where available.
+  treatment:
+  - name: formal_private_jobs_growth
+    source: ilostat:EMP_SEX_ECO_ECO_NB_A; world_bank_wdi:SL.EMP.TOTL.SP.ZS
+    transformation: level
+    notes: Growth in formal private-sector employment as % of working-age population.
+  - name: social_assistance_coverage
+    source: constructed:aspire_world_bank; world_bank_wdi:per_si_allsi.cov_pop_tot
+    transformation: level
+    notes: Share of population covered by any social-assistance programme.
+  - name: cash_transfer_gdp
+    source: constructed:aspire_world_bank
+    transformation: level
+    notes: Cash and near-cash transfers as % of GDP.
+  controls:
+  - name: initial_poverty_headcount
+    source: world_bank_wdi:SI.POV.DDAY
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: agricultural_productivity_growth
+    source: world_bank_wdi:EA.PRD.AGRI.KD
+    transformation: level
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if cash-transfer expansion has a positive and significant
+    (p < 0.10) association with durable poverty exit larger in magnitude than formal job
+    creation, or if formal job creation is negatively and significantly associated with
+    poverty exit.
+  test: panel_fe_poverty_exit_jobs_vs_transfers_1995_2020
+  threshold:
+    supported: formal_jobs coefficient > 0 at p < 0.10 AND larger than cash_transfer coefficient
+    refuted: formal_jobs coefficient < 0 at p < 0.10
+prior_confidence: 0.55
+disclosure: >-
+  Author priors expect productive employment to dominate transfer dependency for durable
+  poverty exit but acknowledge that well-targeted transfers (e.g., Bolsa Familia, Mexico
+  Progresa) have shown strong short-run poverty-reduction effects. The 5-year durability
+  filter is designed to separate temporary from sustained exit.
+steelman: hypotheses/steelman/poverty_exit_durable_jobs_vs_transfer.md

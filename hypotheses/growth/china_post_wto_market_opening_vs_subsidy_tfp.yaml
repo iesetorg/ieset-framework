@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: china_post_wto_market_opening_vs_subsidy_tfp
+version: 1
+status: candidate
+topic: growth
+claim: China's strongest total-factor-productivity acceleration occurred in the decade following WTO accession and associated market opening (2001-2011), while the subsequent shift toward subsidy-heavy state direction after 2012 is associated with weaker TFP growth.
+evidence_type: causal
+sample:
+  countries:
+  - CHN
+  period:
+  - 1990
+  - 2023
+  temporal_structure: time_series
+  exclusion_rules:
+  - exclude 2020-2022 COVID years as a robustness check
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: annual_growth
+    notes: PWT TFP at constant national prices; cross-check with Conference Board TFP and constructed Solow residual.
+  - name: labour_productivity_growth
+    source: pwt:rgdpo
+    transformation: annual_growth_per_worker
+  treatment:
+  - name: post_wto_period
+    source: constructed:wto_accession_2001
+    transformation: indicator
+    notes: Indicator = 1 for 2001-2011, the window of rapid tariff reduction, FDI liberalisation, and SOE restructuring.
+  - name: post_2012_state_direction
+    source: constructed:policy_shift_2012
+    transformation: indicator
+    notes: Indicator = 1 for 2012-2019, capturing the shift toward Made in China 2025, subsidy-heavy industrial policy, and SOE consolidation.
+  controls:
+  - name: fixed_capital_formation_share
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: level
+  - name: secondary_enrolment
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: level
+  - name: urbanisation
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: level
+  - name: working_age_share
+    source: world_bank_wdi:SP.POP.DPND
+    transformation: inverse_level
+estimator:
+  template: event_study
+  clustering: none
+  notes: >
+    Event-study / interrupted time-series design on Chinese TFP growth with
+    breaks at 2001 (WTO) and 2012 (state-direction shift). Primary spec:
+    segmented regression with pre/post trend differences. Robustness:
+    synthetic-control using comparator emerging-market panel (VNM, IDN, BGD, PHL, IND)
+    to construct a counterfactual China trajectory absent WTO accession.
+    Secondary: Chow test for structural break in 2012.
+falsification:
+  rule: SUPPORTED if average annual TFP growth in 2001-2011 exceeds the 1990-2000 trend by at least 1.0 percentage point, AND average TFP growth in 2012-2019 falls below the 2001-2011 level by at least 0.5 percentage points, with both differences significant at p<=0.10 in a segmented regression. REFUTED if both periods show no significant break from trend. Otherwise PARTIAL.
+  test: interrupted_time_series_china_tfp_breaks
+  threshold:
+    wto_lift_min: 1.0
+    post_2012_drop_min: 0.5
+    p_max: 0.10
+prior_confidence: 0.6
+disclosure: The prior is informed by the broad literature on China’s WTO accession but recognises that confounding factors (demographics, real-estate cycles, global demand) make attribution to policy shifts alone difficult.
+steelman: hypotheses/steelman/china_post_wto_market_opening_vs_subsidy_tfp.md
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - CHN
+  outcome_dim:
+  - productivity
+  - trade_liberalisation
+  - industrial_capability
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  treatment_tags:
+  - china_wto_accession_2001
+  - china_made_in_china_2025

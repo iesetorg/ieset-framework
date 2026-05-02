@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tariff_protection_duration_growth_drag
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  Longer durations of sustained tariff protection predict weaker subsequent
+  export competitiveness (lower real export growth and slower export-
+  complexity upgrading) and lower real household consumption per capita
+  growth, in a broad-country panel 1970-2020. The directional claim is that
+  each additional decade of protection, measured by applied weighted-mean
+  tariffs above 15%, is associated with roughly 0.2-0.5 percentage points
+  lower annual export growth and 0.1-0.3 percentage points lower consumption
+  growth in the following decade, controlling for initial income,
+  institutions, and terms of trade.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [1970, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during major wars or civil conflict (UCDP/PRIO > 1000 battle deaths)"
+    - "drop observations with trade openness > 250% of GDP (entrepôt outliers)"
+    - "drop commodity-boom years (terms-of-trade improvement > 20% in single year) to avoid conflating protection with commodity windfalls"
+
+variables:
+  outcome:
+    - name: real_export_growth
+      source: "world_bank_wdi:NE.EXP.GNFS.KD.ZG"
+      transformation: annual_log_change
+    - name: export_complexity_index_change
+      source: "constructed: Atlas of Economic Complexity ECI 5-year change"
+      transformation: 5yr_change
+      notes: "Change in Hausmann-Hidalgo ECI over 5-year windows."
+    - name: real_household_consumption_per_capita_growth
+      source: "world_bank_wdi:NE.CON.PRVT.ZS"
+      transformation: annual_log_change_per_capita
+      notes: "Private consumption per capita real growth. WDI series; PWT fallback flagged."
+  treatment:
+    - name: protection_duration_decades
+      source: "constructed: cumulative years with applied weighted-mean tariff > 15%"
+      transformation: level
+      notes: "Duration measure from World Bank WITS applied tariff data. Threshold 15% is pre-registered."
+    - name: applied_weighted_mean_tariff
+      source: "world_bank_wits:weighted_mean_applied_tariff"
+      transformation: level
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: terms_of_trade_index
+      source: "world_bank_wdi:NE.TRM.TRAD.XD.WD"
+      transformation: level
+    - name: investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+    - name: population_growth
+      source: "world_bank_wdi:SP.POP.GROW"
+      transformation: level
+  decomposition_channels:
+    - name: import_penetration_ratio
+      source: "world_bank_wits:import_value"
+      transformation: ratio_to_gdp
+      notes: "Channel: protection reduces import competition, insulating inefficiency."
+    - name: export_product_diversification
+      source: "un_comtrade:unique_hs6_products"
+      transformation: count
+      notes: "Channel: protection narrows export base and slows complexity upgrading."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Tariff protection is a trade-policy (regulatory) intervention that raises
+  domestic prices of importables, alters effective rates of protection, and
+  changes incentives for export orientation versus import substitution.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with 10-year non-overlapping windows (1970-1980,
+    1980-1990, etc.) to capture medium-run structural effects. Primary
+    specification: outcome = β0 + β1*protection_duration + β2*current_tariff
+    + controls + FE. Robustness: (1) use tariff level instead of duration
+    as alternative treatment; (2) subsample analysis by income level
+    (frontier vs catch-up); (3) local projections tracing dynamic response
+    of exports and consumption to protection spells.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (protection duration) is negative and significant at
+    p<0.10 for both real export growth and consumption per capita growth.
+    PARTIAL if negative and significant for exports but not for consumption
+    (competitiveness loss without household welfare drag). REFUTED if β1 is
+    positive and significant at p<0.10 for either outcome. INFORMATIVE:
+    the coefficient should be more negative for high-income (frontier)
+    countries than for low-income catch-up economies; if the opposite holds,
+    the result is a development-stage artefact.
+  test: panel_fe_protection_duration_export_and_consumption_growth
+  threshold: >
+    β_protection_duration < 0 at p<=0.10 for real export growth  AND
+    β_protection_duration < 0 at p<=0.10 for consumption pc growth  AND
+    Frontier subsample coefficient <= catch-up subsample coefficient.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author is moderately confident (0.60) that sustained protection erodes
+  competitiveness and consumer welfare. The protection-and-growth literature
+  (e.g., Sachs-Warner 1995, Rodriguez-Rodrik 2001 critique) is contentious:
+  the cross-country correlation is robustly negative, but causality is
+  disputed. Prior is not higher because some protected economies (South
+  Korea 1960s-1980s, Taiwan) achieved rapid export growth, and because
+  temporary protection may have infant-industry benefits that the duration
+  measure captures as costs. Framing risk: the hypothesis may be read as
+  endorsing immediate zero-tariff policies; the spec tests only the
+  duration-growth association and does not claim that all tariffs are
+  harmful.
+
+steelman: hypotheses/steelman/tariff_protection_duration_growth_drag.md
+
+scope:
+  period: [1970, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, trade_liberalisation, productivity, poverty_inequality]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [tariff_protection, duration, export_competitiveness, consumer_welfare]
+
+linked_hypotheses:
+  - infant_industry_protection_capability_effect
+  - unilateral_tariff_liberalisation_growth_20yr
+  - trade_openness_long_run_income_convergence
+
+notes: >
+  Data readiness:
+  - World Bank WITS applied weighted-mean tariff (ready)
+  - WDI real export growth, consumption, GDP pc, investment, population (ready)
+  - WGI RL.EST (ready)
+  - UN Comtrade product diversity (ready)
+  - Harvard CID ECI (pending direct fetcher)

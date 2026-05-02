@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: protected_infant_industries_fail_to_mature
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Infant-industry protection that persists longer than 15 years predicts lower
+  export competitiveness and weaker productivity growth than time-limited
+  protection in a broad panel of developing economies during 1960-2020.
+evidence_type: causal
+sample:
+  countries:
+    - ARG
+    - BRA
+    - CHL
+    - MEX
+    - URY
+    - COL
+    - PER
+    - VEN
+    - ECU
+    - BOL
+    - PRY
+    - CRI
+    - DOM
+    - GTM
+    - HND
+    - SLV
+    - NIC
+    - PAN
+    - JAM
+    - TTO
+    - ZAF
+    - NGA
+    - EGY
+    - ETH
+    - KEN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - ZMB
+    - MAR
+    - TUN
+    - DZA
+    - LBY
+    - SDN
+    - IND
+    - IDN
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - KHM
+    - LAO
+    - MMR
+    - CHN
+    - KOR
+    - TWN
+    - TUR
+    - IRN
+    - IRQ
+    - JOR
+    - LBN
+    - SYR
+    - YEM
+    - SAU
+    - ARE
+    - KWT
+    - QAT
+    - BHR
+    - OMN
+    - PAK
+  period: [1960, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude sectors with documented national-security rationales for permanent protection
+    - Exclude sectors where protection was reversed within 3 years as insufficient trial
+scope:
+  period: [1960, 2020]
+  countries:
+    - LATAM
+    - ASIA_EM
+    - AFRICA
+    - MENA
+  outcome_dim: [productivity, trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [infant_industry_protection, protection_duration, export_competitiveness]
+variables:
+  outcome:
+    - name: export_competitiveness_index
+      source: constructed:revealed_comparative_advantage_and_export_market_share
+      transformation: level
+    - name: labour_productivity_growth
+      source: pwt:rgdpo_emp
+      transformation: annual_pct
+    - name: sectoral_export_share
+      source: un_comtrade:export_value_by_sector
+      transformation: level_pct
+  treatment:
+    - name: infant_industry_protection_duration
+      source: constructed:years_since_protection_imposition
+      transformation: continuous
+      notes: Duration of infant-industry tariff or non-tariff protection in years.
+    - name: protection_duration_gt_15
+      source: constructed:binary
+      transformation: binary
+      notes: 1 if protection lasted longer than 15 years, 0 otherwise.
+  controls:
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+    - name: market_size
+      source: world_bank_wdi:NY.GDP.MKTP.CD
+      transformation: log_level
+intervention_channel: bundled
+intervention_channel_justification: >
+  Infant-industry protection operates through trade-policy channel by restricting
+  imports and sheltering domestic producers from foreign competition.
+estimator:
+  template: panel_fe
+  clustering: country_sector
+  fixed_effects: [country, sector, year]
+  notes: >
+    Country-sector panel FE with fixed effects and robustness via matching on
+    initial sectoral productivity and country income level.
+falsification:
+  rule: >
+    Falsified if infant-industry protection lasting longer than 15 years does not
+    show statistically lower export competitiveness and productivity growth than
+    time-limited protection (3-10 years) after controlling for initial income,
+    human capital, and market size.
+  test: panel_fe_protection_duration_on_competitiveness
+  threshold:
+    export_competitiveness_coefficient: negative_p_lt_0.10
+    productivity_coefficient: negative_p_lt_0.10
+    duration_threshold_years: 15
+prior_confidence: 0.58
+disclosure: >
+  Author holds priors that time-limited protection can work but persistent
+  protection becomes capture, informed by Latin American ISI and African
+  manufacturing literature.
+steelman: hypotheses/steelman/protected_infant_industries_fail_to_mature.md
+linked_hypotheses:
+  - import_substitution_long_run_export_underperformance
+  - industrial_policy_without_exit_discipline_failure
+notes: >
+  Protection duration data from TRAINS, WTO notifications, and national tariff
+  schedules. Sectoral export data from UN Comtrade and UNCTAD.

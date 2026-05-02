@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: chile_market_reform_long_horizon_with_democracy
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Chile's long-run income convergence toward OECD levels is stronger after the
+  combination of market reforms (1975-1990: trade liberalisation, privatisation,
+  pension privatisation, central-bank independence) plus democratic institutional
+  repair (1990-present: judicial strengthening, anti-corruption, social-pact
+  restoration) than under earlier state-led import substitution (1940-1973),
+  relative to Latin American peers.
+evidence_type: causal
+sample:
+  countries:
+    - CHL
+    - ARG
+    - BRA
+    - MEX
+    - URY
+    - COL
+    - PER
+    - ECU
+    - BOL
+    - PRY
+    - CRI
+    - VEN
+  period: [1960, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude Venezuela post-2014 due to collapse distorting regional means
+    - Exclude 2020-2022 COVID years from primary trend estimates
+scope:
+  period: [1960, 2024]
+  countries:
+    - CHL
+    - ARG
+    - BRA
+    - MEX
+    - URY
+    - COL
+    - PER
+    - ECU
+    - BOL
+    - PRY
+    - CRI
+    - VEN
+  outcome_dim: [gdp_growth, institutional_quality, productivity]
+  policy_family: [trade_policy, institutional_reform, privatisation_nationalisation]
+  treatment_tags: [chile_pinochet_reforms_1975_1990, chile_concertacion_democracy_1990, chicago_boys_reforms]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_convergence
+      source: maddison:mpd2020
+      transformation: log_gap_to_oecd_mean
+    - name: institutional_quality
+      source: wgi:RL.EST
+      transformation: level
+    - name: labour_productivity_growth
+      source: oecd_stan:gdp_per_hour_worked
+      transformation: annual_pct
+      notes: OECD STAN for CHL, MEX, COL; PWT for others.
+  treatment:
+    - name: market_reform_plus_democracy
+      source: constructed:composite_reform_intensity_times_democracy_score
+      transformation: continuous_index
+      notes: Interaction of EBRD-style reform intensity and Polity2/V-Dem liberal democracy score.
+    - name: post_1990_democratic_repair_dummy
+      source: constructed:binary
+      transformation: binary
+  controls:
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level_at_1960
+    - name: copper_price_cycle
+      source: world_bank_wits:copper_real_price_index
+      transformation: level
+    - name: education_attainment
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  Chile's trajectory combines market reform (trade, privatisation, pensions) and
+  democratic institutional repair (judicial independence, anti-corruption, social
+  pacts); these channels are bundled and tested jointly.
+estimator:
+  template: synth_did
+  clustering: country
+  notes: >
+    Synthetic DiD for Chile against Latin American donor pool, pre-treatment fit
+    on 1960-1974 outcomes and institutional predictors. Panel FE with interaction
+    term as robustness.
+falsification:
+  rule: >
+    Falsified if Chile's post-1990 GDP per capita convergence toward the OECD mean
+    is not statistically faster than its pre-1973 ISI trajectory or the synthetic-control
+    Latin American peer mean by at least 15 log points over 1990-2024 after controlling
+    for copper prices and initial income.
+  test: synth_did_chile_convergence
+  threshold:
+    convergence_premium_log_points: 15
+    significance: p_lt_0.10
+    democracy_interaction_positive: yes
+prior_confidence: 0.65
+disclosure: >
+  Author acknowledges the ethical difficulty of evaluating Pinochet-era reforms
+  independently of human-rights abuses. Prior is that institutional repair post-1990
+  was essential for sustaining market-reform gains.
+steelman: hypotheses/steelman/chile_market_reform_long_horizon_with_democracy.md
+linked_hypotheses:
+  - chile_post_1990_institutional_premium
+  - chile_vs_venezuela_divergence_1999_2023
+  - pinochet_chile_rapid_liberalisation_growth_collapse
+notes: >
+  Maddison provides 1960-2024 GDP data. WGI institutional quality from 1996;
+  pre-1996 requires interpolation or V-Dem back-extension. OECD STAN for Chile
+  from 1996.

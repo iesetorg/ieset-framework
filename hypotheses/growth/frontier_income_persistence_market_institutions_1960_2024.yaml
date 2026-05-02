@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: frontier_income_persistence_market_institutions_1960_2024
+version: 1
+status: candidate
+topic: growth
+claim: Countries with stronger market-institution scores around 1960 were more likely to remain in, or converge into, the high-income frontier by 2024 than countries with weaker property rights and heavier state-directed allocation, after controlling for initial GDP per capita.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, JPN, CAN, AUS, SWE, NLD, CHE, SGP, KOR, CHL, POL, EST, IRL, ESP, ITA, NZL, NOR, DNK, FIN, PRT, GRC, TUR, ZAF, MEX, BRA, ARG, IND, CHN, IDN, MYS, THA, VNM]
+  period: [1960, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - require at least 25 years of GDP-per-capita observations
+  - use earliest available market-institution score if 1960 is missing, but no later than 1975
+variables:
+  outcome:
+  - name: frontier_status_or_convergence
+    source: pwt:rgdpo; world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: indicator for >=70 percent of US GDP per capita by 2024, plus continuous convergence ratio
+  treatment:
+  - name: baseline_market_institution_score
+    source: fraser_efw:summary_index; vdem:private_property_and_rule_of_law; wgi:rule_of_law
+    transformation: standardized average of earliest available property-rights, sound-money, trade, and regulation scores
+  controls:
+  - name: initial_gdp_pc
+    source: pwt:rgdpo_pop
+    transformation: log level at baseline
+  - name: education_baseline
+    source: barro_lee:average_years_schooling
+    transformation: baseline adult schooling
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [region, decade]
+  notes: Long-horizon panel and endpoint logistic/linear probability checks for frontier persistence.
+falsification:
+  rule: SUPPORTED if baseline market-institution score positively predicts 2024 frontier status or convergence with p<=0.05 and a one standard deviation score gain predicts at least a 10 percentage point higher frontier probability. REFUTED if the relationship is negative with p<=0.05 and magnitude at least 10 points. Otherwise PARTIAL.
+  test: long_horizon_frontier_status_market_institutions
+  threshold:
+    min_countries: 25
+    p_max: 0.05
+    min_probability_effect_pp: 10
+prior_confidence: 0.62
+disclosure: This specification is chosen to test a market-liberal long-horizon claim, but it explicitly controls for initial income and leaves room for developmentalist catch-up successes.
+steelman: hypotheses/steelman/frontier_income_persistence_market_institutions_1960_2024.md
+scope:
+  period: [1960, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform, regulation, trade_policy]
+  treatment_tags: [market_institutions, property_rights, frontier_convergence]
+

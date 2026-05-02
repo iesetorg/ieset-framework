@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: judicial_independence_growth_persistence
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across a broad panel of economies 1980-2020, stronger judicial
+  independence — measured by V-Dem judicial-constraints-on-the-
+  executive index, Fraser EFW integrity of the legal system, and
+  the Cingranelli-Richards physical-integrity-rights index —
+  predicts lower investment volatility and stronger long-run GDP
+  per capita growth following major reform episodes. The pre-
+  registered claim is that countries in the top tercile of judicial
+  independence show at least 1.0 percentage point lower standard
+  deviation of investment/GDP and at least 0.4 percentage points
+  higher annual growth in the 10 years post-reform than countries
+  in the bottom tercile, after controlling for reform type and
+  initial income.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA, ROU, BGR, HRV, SRB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years in the first 2 years post-reform (implementation lag)"
+    - "drop observations where V-Dem judicial independence data is missing and no Fraser backfill exists"
+
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality, productivity]
+  policy_family: [institutional_reform, fiscal_policy]
+  treatment_tags: [judicial_independence, reform_episodes, investment_volatility, growth_persistence]
+
+variables:
+  outcome:
+    - name: investment_gdp_volatility
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "rolling_sd_10yr"
+      notes: "Standard deviation of gross fixed capital formation % GDP over 10-year rolling windows."
+    - name: real_gdp_per_capita_growth_post_reform
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "mean_post_reform_10yr"
+      notes: "Mean annual GDP growth in the 10 years following a major reform episode."
+    - name: tfp_growth_post_reform
+      source: "pwt:rtfpna"
+      transformation: "log_diff_post_reform_10yr"
+  treatment:
+    - name: judicial_independence_index
+      source: "constructed: 0.5×vdem:v2x_jucon + 0.3×fraser_efw:legal_integrity + 0.2×vdem:v2xcl_rol"
+      transformation: "level"
+      notes: "Composite judicial-independence index. V-Dem v2x_jucon (judicial constraints on executive) primary; Fraser legal-integrity and V-Dem rule-of-law as secondary."
+    - name: vdem_judicial_constraints
+      source: "vdem:v2x_jucon"
+      transformation: "level"
+    - name: major_reform_episode
+      source: "constructed: reform_episodes_from_fraser_efw_changes"
+      transformation: "indicator"
+      notes: "Indicator for major reform episodes: top quartile 5-year change in Fraser EFW composite or known structural reforms (e.g. India 1991, China 1978, post-Soviet transitions)."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: government_consumption_share
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "level"
+    - name: political_stability
+      source: "wgi:PV.EST"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Judicial independence is a core institutional feature that
+  governs the credibility and durability of policy reforms. The
+  hypothesis tests whether this institutional channel moderates
+  post-reform growth trajectories.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE on reform-episode sub-sample with interaction:
+    reform_episode × judicial_independence. Tercile comparison
+    as robustness. Event-study around identified reform episodes
+    with judicial independence as moderator. Robustness: exclude
+    post-Soviet transitions; exclude China; use only Fraser EFW
+    legal-integrity measure.
+
+falsification:
+  rule: >
+    Not supported if (a) the interaction coefficient is not
+    positive and significant at p<0.05 on post-reform growth, OR
+    (b) the top-tercile vs bottom-tercile investment-volatility
+    gap is below 0.5 pp of GDP standard deviation, OR (c) the
+    marginal effect of reform is positive and significant even at
+    low judicial independence (no complementarity). An
+    "institutions don't matter for reform success" reading wins if
+    (c) holds.
+  test: panel_fe_reform_judicial_independence_interaction
+  threshold: >
+    panel_FE_beta(reform × judicial_independence) > 0 at p<0.05
+    AND top_tercile_investment_volatility_gap >= 0.50 pp_of_gdp_sd
+    AND marginal_effect_reform_at_low_judicial_independence NOT > 0 at p<0.10
+
+prior_confidence: 0.55
+
+disclosure: >
+  The judicial-independence and growth literature (Feld-Kirchgässner
+  2001, Voigt 2009) supports a positive association, but causal
+  identification is weak: judicial independence is correlated with
+  many other good institutions. Author's market-liberal priors
+  lean toward the rule-of-law channel but prior 0.55 reflects the
+  difficulty of separating judicial independence from broader
+  institutional quality. Bias risk: author may conflate judicial
+  independence with general democracy and under-weight the
+  "authoritarian growth with independent commercial courts"
+  possibility (e.g. Singapore, Dubai).
+
+steelman: hypotheses/steelman/judicial_independence_growth_persistence.md
+
+linked_hypotheses:
+  - rule_of_law_market_reform_complementarity
+  - property_rights_long_run_income_frontier
+
+notes: >
+  V-Dem judicial-constraints data begins in 1900 but coverage is
+  sparse pre-1980. Fraser EFW legal-integrity begins in 1970.
+  Reform episodes are identified from large Fraser EFW changes
+  and verified against known historical episodes.

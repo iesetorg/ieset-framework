@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_simplicity_entrepreneurship_panel
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Simpler tax systems — measured by fewer tax payments per year, lower time
+  spent on tax compliance, and fewer separate taxes — predict higher
+  entrepreneurship rates (new business registrations per 1,000 working-age
+  adults) and stronger small-firm employment growth over 20-year windows,
+  in a broad-country panel 2000-2020. The directional claim is that a one-
+  standard-deviation improvement in tax simplicity predicts a 5-15% increase
+  in new business registrations and a 0.5-1.5 percentage point increase in
+  small-firm ( < 50 employees) employment share growth, controlling for
+  overall tax burden, institutional quality, and financial development.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [2000, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop observations with tax payments > 100 per year (likely measurement error)"
+    - "drop country-years with missing Doing Business tax data for more than 2 consecutive years"
+
+variables:
+  outcome:
+    - name: new_business_registrations_per_1000_working_age
+      source: "world_bank_wdi:IC.BUS.NREG"
+      transformation: per_1000_working_age
+      notes: "New business registrations per 1,000 people ages 15-64."
+    - name: small_firm_employment_share_growth
+      source: "ilo:employment_by_firm_size"
+      transformation: annual_change_in_share
+      notes: "Employment in firms with <50 employees as share of total employment, annual change. Pending ILO fetcher; v1 uses constructed proxy from enterprise surveys."
+  treatment:
+    - name: tax_simplicity_index
+      source: "world_bank_db:tax_payments_and_time"
+      transformation: z_score_composite
+      notes: "World Bank Doing Business tax payments per year, time to comply (hours per year), and number of distinct taxes, combined into z-score index. Inverted so higher = simpler."
+    - name: total_tax_rate
+      source: "world_bank_db:total_tax_rate"
+      transformation: level
+      notes: "Controls for overall tax burden separate from simplicity."
+  controls:
+    - name: initial_log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: financial_depth
+      source: "world_bank_wdi:GFDD.DI.14"
+      transformation: level
+    - name: regulatory_quality
+      source: "wgi:RQ.EST"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+  decomposition_channels:
+    - name: informal_economy_share
+      source: "imf_weo:informal_economy_estimate"
+      transformation: level
+      notes: "Channel: simpler taxes may reduce informality and bring firms into formal registration."
+    - name: self_employment_rate
+      source: "ilo:self_employment_rate"
+      transformation: level
+      notes: "Channel: simpler taxes may shift workers from self-employment to formal entrepreneurship."
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Tax-system design is a fiscal-channel (tax-policy) intervention. The test
+  isolates the simplicity/compliance-cost dimension from the tax-burden
+  dimension.
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with 5-year non-overlapping averages to capture
+    medium-run adjustment: entrepreneurship = β0 + β1*tax_simplicity +
+    β2*total_tax_rate + controls + FE. Robustness: (1) exclude small
+    island economies and city-states where tax simplicity may reflect
+    lack of tax base rather than policy design; (2) use PwC Paying Taxes
+    data instead of Doing Business; (3) subsample by income level
+    (frontier vs catch-up); (4) use 20-year cumulative outcomes rather
+    than 5-year averages.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (tax simplicity) is positive and significant at p<0.10
+    for both new business registrations and small-firm employment growth,
+    while β2 (total tax rate) is negative or insignificant. PARTIAL if
+    β1 is positive and significant for registrations but not for small-
+    firm employment (entry without expansion). REFUTED if β1 is negative
+    and significant at p<0.10. INFORMATIVE: the result should survive
+    excluding Georgia and Estonia (dominant tax-simplification cases);
+    if not, it is a two-country story.
+  test: panel_fe_tax_simplicity_entrepreneurship_20yr
+  threshold: >
+    β_tax_simplicity (registrations) > 0 at p<=0.10  AND
+    β_tax_simplicity (small-firm employment) > 0 at p<=0.10  AND
+    Ex-Georgia-Estonia robustness retains sign of β_tax_simplicity.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The tax-compliance-cost literature
+  (e.g., Djankov et al. 2010) finds strong cross-country correlations,
+  but identification is weak because tax simplicity is correlated with
+  general regulatory quality and state capacity. Prior is not higher
+  because: (a) entrepreneurship may respond to opportunity and culture
+  more than to tax forms; (b) some complex tax systems (Germany, Japan)
+  sustain high entrepreneurship through other compensating institutions.
+  Framing risk: the hypothesis may be read as endorsing flat taxes for
+  all countries; the spec tests only the simplicity-entrepreneurship link
+  and does not claim that flat taxes are optimal.
+
+steelman: hypotheses/steelman/tax_simplicity_entrepreneurship_panel.md
+
+scope:
+  period: [2000, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [employment_labour, taxation, productivity]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [tax_simplicity, entrepreneurship, compliance_cost]
+
+linked_hypotheses:
+  - tax_burden_frontier_growth_non_linear
+  - government_consumption_share_tfp
+
+notes: >
+  Data readiness:
+  - World Bank Doing Business tax payments, time, total tax rate (ready)
+  - WDI new business registrations, GDP pc, financial depth, trade openness (ready)
+  - WGI RL.EST, RQ.EST (ready)
+  - PwC Paying Taxes data (pending)
+  - ILO employment by firm size, self-employment (pending)
+  - IMF informal economy estimates (ready for subset)

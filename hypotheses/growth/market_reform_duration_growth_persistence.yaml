@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_reform_duration_growth_persistence
+version: 1
+status: candidate
+topic: growth
+claim: Market-oriented reform episodes that persist for at least twenty years produce more durable GDP-per-capita and productivity gains than short reform bursts or state-led industrial-policy episodes without sustained market competition.
+evidence_type: associational
+sample:
+  countries: [EST, POL, CZE, SVK, SVN, IRL, CHL, NZL, AUS, SWE, GBR, CAN, KOR, TWN, SGP, MYS, THA, MEX, BRA, ARG, TUR, IND, CHN, VNM]
+  period: [1980, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - require identifiable reform start dates and at least 15 post-reform years
+  - separate crisis stabilization from structural market reform in robustness checks
+variables:
+  outcome:
+  - name: durable_growth
+    source: pwt:rgdpo_pop,rtfpna; world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: ten-year and twenty-year post-reform growth
+  treatment:
+  - name: market_reform_duration
+    source: fraser_efw:summary_index; movements:market_liberal_alignment
+    transformation: years with sustained high or improving market score after reform
+  - name: state_industrial_policy_episode
+    source: movements:developmentalism_alignment; policy_axes:industrial_policy
+    transformation: episode indicator and duration
+estimator:
+  template: event_study
+  clustering: country
+  notes: Matched long-window event study comparing sustained market reform, short reform bursts, and developmentalist episodes.
+falsification:
+  rule: SUPPORTED if sustained market_reform_duration predicts stronger 20-year GDP-per-capita or TFP gains than short reforms or state-led episodes with p<=0.05. REFUTED if state-led episodes outperform sustained market reform over the 20-year horizon. Otherwise PARTIAL.
+  test: market_reform_duration_long_window_event_study
+  threshold:
+    min_post_years: 15
+    preferred_post_years: 20
+    p_max: 0.05
+prior_confidence: 0.6
+disclosure: Reform episodes are endogenous to crisis and politics; matched controls and pre-trend checks are required before strong claims.
+steelman: hypotheses/steelman/market_reform_duration_growth_persistence.md
+scope:
+  period: [1980, 2024]
+  countries: [GLOBAL, OECD, POST_SOVIET, ASIA_EM, LATAM]
+  outcome_dim: [gdp_growth, productivity, institutional_quality]
+  policy_family: [institutional_reform, regulation, privatisation_nationalisation, competition_policy]
+  treatment_tags: [market_reform_duration, structural_reform, industrial_policy_episode]
+

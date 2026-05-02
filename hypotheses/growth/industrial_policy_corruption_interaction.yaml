@@ -1,0 +1,163 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: industrial_policy_corruption_interaction
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Industrial policy effectiveness depends on governance quality; in low-rule-of-law
+  country samples, state allocation predicts higher corruption and lower long-run
+  GDP growth than in high-rule-of-law samples, in a broad panel of economies
+  during 1990-2020.
+evidence_type: causal
+sample:
+  countries:
+    - USA
+    - DEU
+    - FRA
+    - GBR
+    - JPN
+    - KOR
+    - CHN
+    - BRA
+    - IND
+    - ZAF
+    - MEX
+    - TUR
+    - IDN
+    - NGA
+    - EGY
+    - ARG
+    - CHL
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - PAK
+    - ETH
+    - KEN
+    - RUS
+    - POL
+    - AUS
+    - CAN
+    - ITA
+    - ESP
+    - NLD
+    - CHE
+    - SWE
+    - NOR
+    - DNK
+    - FIN
+    - AUT
+    - BEL
+    - ISR
+    - SAU
+    - ARE
+    - COL
+    - PER
+    - UKR
+    - ROU
+    - HUN
+    - CZE
+    - GRC
+    - PRT
+    - NZL
+    - SGP
+    - HKG
+    - TWN
+    - KAZ
+    - UZB
+    - MAR
+    - TUN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - BOL
+    - PRY
+    - URY
+    - CRI
+    - DOM
+    - JAM
+    - LKA
+    - NPL
+    - KHM
+    - LAO
+    - MMR
+    - MNG
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude failed states with Polity2 < -5 or WGI rule-of-law below -2 as ungovernable
+    - Exclude years of major armed conflict
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality, productivity]
+  policy_family: [industrial_policy, institutional_reform]
+  treatment_tags: [industrial_policy_governance, corruption, state_capacity]
+variables:
+  outcome:
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: annual_pct
+    - name: corruption_index
+      source: vdem:v2x_corr
+      transformation: level
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+  treatment:
+    - name: industrial_policy_intensity
+      source: constructed:subsidies_and_state_aid_pct_gdp
+      transformation: level_pct
+    - name: low_rule_of_law_dummy
+      source: constructed:binary_wgi_rl_est_below_median
+      transformation: binary
+  controls:
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+    - name: resource_rents
+      source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      transformation: level_pct
+intervention_channel: institutional
+intervention_channel_justification: >
+  Industrial policy operates through institutional channel, and its effectiveness
+  is conditional on the quality of those institutions.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE with interaction term between industrial policy intensity and
+    rule-of-law dummy. Robustness via subsample analysis (high vs low WGI) and
+    IV using legal origin as instrument for institutional quality.
+falsification:
+  rule: >
+    Falsified if the interaction coefficient between industrial policy intensity
+    and low rule of law is not negative and statistically significant for GDP
+    growth and corruption outcomes, or if industrial policy shows positive effects
+    in low-rule-of-law samples comparable to high-rule-of-law samples.
+  test: panel_fe_interaction_ip_x_rule_of_law
+  threshold:
+    interaction_coefficient_gdp: negative_p_lt_0.10
+    interaction_coefficient_corruption: positive_p_lt_0.10
+    high_rl_positive_effect_required: yes
+prior_confidence: 0.68
+disclosure: >
+  Author holds strong priors that governance quality is the binding constraint
+  on industrial policy effectiveness, informed by Rodrik, North, and Acemoglu
+  literatures.
+steelman: hypotheses/steelman/industrial_policy_corruption_interaction.md
+linked_hypotheses:
+  - industrial_policy_governance_capacity_conditionality
+  - state_credit_allocation_zombie_firm_persistence
+  - resource_developmentalism_rent_seeking_trap
+notes: >
+  V-Dem corruption index available from 1900-2024. WGI rule of law from 1996.
+  Industrial policy intensity from OECD STI, WTO notifications, and national
+  budget documents.

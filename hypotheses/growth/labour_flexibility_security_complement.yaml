@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: labour_flexibility_security_complement
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Labour-market flexibility (ease of hiring and firing, low EPL, decentralised wage
+  bargaining) improves long-run employment rates, productivity growth, and GDP per capita
+  only when paired with complementary adjustment institutions: active labour-market policy
+  (retraining, job search assistance), relocation support, or income-smoothing mechanisms
+  (unemployment insurance, portable benefits). Flexibility without security produces
+  transient employment gains but no durable prosperity advantage over rigid but secure
+  regimes, in OECD and middle-income panels 1980-2020.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - CHL
+  - MEX
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - EST
+  - LVA
+  - LTU
+  - ISR
+  period:
+  - 1980
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years with unemployment >25% (crisis periods dominate structural relationships)
+  - exclude transition recession years 1990-1994 for post-communist entrants
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - CHL
+  - MEX
+  - POL
+  - HUN
+  - CZE
+  - SVK
+  - SVN
+  - EST
+  - LVA
+  - LTU
+  - ISR
+  outcome_dim:
+  - employment_labour
+  - productivity
+  - gdp_growth
+  policy_family:
+  - labour_market
+  - welfare_architecture
+  treatment_tags: []
+variables:
+  outcome:
+  - name: employment_rate_15_64
+    source: oecd:OECD.ELS.SAE
+    transformation: level
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+  - name: real_gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+  treatment:
+  - name: employment_protection_legislation_index
+    source: oecd:OECD.ELS.EPL
+    transformation: level
+    notes: OECD EPL overall strictness; lower = more flexible.
+  - name: active_labour_market_policy_spending
+    source: oecd:OECD.ELS.SAE
+    transformation: level
+    notes: ALMP spending as % of GDP.
+  - name: unemployment_insurance_replacement_rate
+    source: oecd:OECD.ELS.SAE
+    transformation: level
+    notes: Net UI replacement rate for average worker.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: union_density
+    source: ilostat:union_density_rate
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if labour-market flexibility alone (low EPL) has a positive
+    and significant (p < 0.10) association with employment and productivity growth without
+    interaction with ALMP or UI, or if the flexibility-security interaction is negative
+    and significant.
+  test: panel_fe_flexibility_security_complement_1980_2020
+  threshold:
+    supported: flexibility_x_security interaction > 0 at p < 0.10 for employment and productivity
+    refuted: flexibility coefficient > 0 and significant with no interaction effect
+prior_confidence: 0.60
+disclosure: >-
+  Author priors accept the flexicurity logic but are concerned that ALMP and UI are
+  endogenous to labour-market structure, making causal identification difficult. The
+  interaction specification is a best-effort associational test.
+steelman: hypotheses/steelman/labour_flexibility_security_complement.md

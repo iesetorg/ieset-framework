@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: catch_up_capital_deepening_not_tfp
+version: 1
+status: candidate
+topic: growth
+claim: Developmentalist catch-up episodes generate more of their early growth through capital deepening and labor reallocation than through sustained TFP growth, which helps explain why the growth premium fades near the frontier.
+evidence_type: associational
+sample:
+  countries: [KOR, TWN, CHN, VNM, MYS, THA, IDN, IND, ETH, RWA, BGD, BRA, MEX, CHL, TUR, POL, EST, IRL, JPN, SGP]
+  period: [1960, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+  - require PWT capital stock, labor, and TFP coverage
+  - separate first 15 years after developmentalist episode from later years
+variables:
+  outcome:
+  - name: growth_decomposition_shares
+    source: pwt:rgdpo,ck,emp,hc,rtfpna
+    transformation: growth accounting shares from capital deepening, labor/human capital, and TFP
+  treatment:
+  - name: developmentalist_episode
+    source: movements:developmentalism_alignment; policy_axes:industrial_policy
+    transformation: country-year episode indicator
+  controls:
+  - name: initial_income
+    source: pwt:rgdpo_pop
+    transformation: log baseline GDP per capita
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, decade]
+  notes: Growth accounting decomposition comparing early and later windows of developmentalist episodes.
+falsification:
+  rule: SUPPORTED if capital deepening and labor/human-capital channels explain at least 60 percent of early developmentalist growth while TFP contribution falls in later windows. REFUTED if TFP explains most early growth and remains high after income convergence. Otherwise PARTIAL.
+  test: developmentalist_growth_accounting_decomposition
+  threshold:
+    capital_labor_share_min: 0.60
+    early_window_years: 15
+prior_confidence: 0.56
+disclosure: The hypothesis tests a market-liberal interpretation of developmentalist success, but strong TFP results would support the developmentalist case.
+steelman: hypotheses/steelman/catch_up_capital_deepening_not_tfp.md
+scope:
+  period: [1960, 2024]
+  countries: [GLOBAL, ASIA_EM, AFRICA, LATAM]
+  outcome_dim: [gdp_growth, productivity, industrial_capability]
+  policy_family: [industrial_policy, institutional_reform]
+  treatment_tags: [growth_accounting, capital_deepening, developmentalist_catch_up]
+

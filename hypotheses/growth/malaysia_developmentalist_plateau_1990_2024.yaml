@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: malaysia_developmentalist_plateau_1990_2024
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Malaysia's post-1990 growth plateau is associated with protected national-champion
+  industrial policy (Proton, GLC preference, sectoral reservation) and ethnic-allocation
+  constraints (Bumiputera equity requirements, preferential procurement) that reduced
+  product-market competition and resource allocation efficiency after successful early
+  catch-up (1970-1990). Total factor productivity growth and GDP per capita convergence
+  slowed relative to comparator economies that liberalised more aggressively after
+  reaching middle-income status, after controlling for commodity price cycles, human
+  capital, and trade openness.
+evidence_type: associational
+sample:
+  countries:
+  - MYS
+  - KOR
+  - TWN
+  - THA
+  - IDN
+  - CHL
+  - TUR
+  - POL
+  period:
+  - 1970
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude pre-1970 colonial period
+  - exclude 1997-1998 Asian financial crisis years from trend estimates if treating as exogenous shock
+  - require at least 15 years of data in each sub-period
+scope:
+  period:
+  - 1970
+  - 2024
+  countries:
+  - MYS
+  - KOR
+  - TWN
+  - THA
+  - IDN
+  - CHL
+  - TUR
+  - POL
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  - competition_concentration
+  policy_family:
+  - industrial_policy
+  - regulation
+  - institutional_reform
+  treatment_tags:
+  - malaysia_proton_national_champion
+  - malaysia_bumiputera_policy
+  - malaysia_glc_preference
+variables:
+  outcome:
+  - name: tfp_growth
+    source: pwt:rtfpna
+    transformation: log_diff_5y
+    notes: Total factor productivity growth from Penn World Table.
+  - name: gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+    notes: Annual GDP per capita growth from World Bank WDI.
+  treatment:
+  - name: national_champion_protection_index
+    source: constructed:glc_share_plus_sectoral_reservation_index
+    transformation: level
+    notes: Proxy for national-champion policy intensity via GLC share and sectoral reservations.
+  - name: ethnic_allocation_constraint_index
+    source: constructed:bumiputera_equity_procurement_proxy
+    transformation: level
+    notes: Proxy for Bumiputera policy constraints on market entry and ownership.
+  - name: product_market_competition
+    source: oecd_pmr:pmr
+    transformation: level
+    notes: OECD product market regulation index as inverse competition proxy.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: commodity_export_share
+    source: world_bank_wdi:TX.VAL.MMTL.ZS.WT
+    transformation: level
+    notes: Commodity export share to control for commodity price cycles.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Panel fixed-effects with structural break for Malaysia post-1990.
+falsification:
+  rule: >-
+    The hypothesis is falsified if Malaysia's post-1990 TFP growth is statistically
+    indistinguishable from or higher than South Korea's or Taiwan's post-1990 performance
+    after controlling for initial income and commodity dependence, or if the national-champion
+    protection index does not carry a negative and significant (p < 0.10) coefficient
+    on TFP growth in the panel.
+  test: panel_fe_malaysia_plateau_1970_2024
+  threshold:
+    supported: national_champion coefficient < 0 at p < 0.10; MYS post-1990 TFP < KOR/TWN post-1990 TFP
+    refuted: national_champion coefficient >= 0 at p < 0.10; MYS post-1990 TFP >= KOR/TWN
+prior_confidence: 0.60
+disclosure: >-
+  Author priors are sceptical of national-champion policies and ethnic-preference
+  constraints but acknowledge that Malaysia's early industrial policy did raise
+  manufacturing share and human capital. The test isolates the post-1990 plateau.
+steelman: hypotheses/steelman/malaysia_developmentalist_plateau_1990_2024.md
+notes: >-
+  Malaysia's plateau is partly attributable to the middle-income trap common to
+  resource-rich economies. The inclusion of Chile and Turkey helps separate
+  resource-dependence from policy-specific effects.

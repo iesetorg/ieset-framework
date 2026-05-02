@@ -1,0 +1,157 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: state_owned_enterprise_share_growth_plateau
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Higher state-owned enterprise shares predict slower long-run labour-productivity
+  growth once basic infrastructure, literacy, and initial income gaps are controlled
+  in a broad panel of advanced and emerging economies during 1980-2020.
+evidence_type: associational
+sample:
+  countries:
+    - USA
+    - DEU
+    - FRA
+    - GBR
+    - JPN
+    - KOR
+    - CHN
+    - BRA
+    - IND
+    - ZAF
+    - MEX
+    - TUR
+    - IDN
+    - NGA
+    - EGY
+    - ARG
+    - CHL
+    - THA
+    - MYS
+    - PHL
+    - VNM
+    - BGD
+    - PAK
+    - ETH
+    - KEN
+    - RUS
+    - POL
+    - AUS
+    - CAN
+    - ITA
+    - ESP
+    - NLD
+    - CHE
+    - SWE
+    - NOR
+    - DNK
+    - FIN
+    - AUT
+    - BEL
+    - ISR
+    - SAU
+    - ARE
+    - COL
+    - PER
+    - UKR
+    - ROU
+    - HUN
+    - CZE
+    - GRC
+    - PRT
+    - NZL
+    - SGP
+    - HKG
+    - TWN
+    - KAZ
+    - UZB
+    - MAR
+    - TUN
+    - GHA
+    - TZA
+    - UGA
+    - ZWE
+    - BOL
+    - PRY
+    - URY
+    - CRI
+    - DOM
+    - JAM
+    - LKA
+    - NPL
+    - KHM
+    - LAO
+    - MMR
+    - MNG
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude socialist planned economies with non-market pricing pre-1990
+    - Exclude natural-resource NOCs in petrostates where SOE share is mechanically high
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, institutional_quality]
+  policy_family: [privatisation_nationalisation, industrial_policy]
+  treatment_tags: [state_owned_enterprises, soe_productivity_drag]
+variables:
+  outcome:
+    - name: labour_productivity_growth
+      source: pwt:rgdpo_emp
+      transformation: annual_pct
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_pct
+  treatment:
+    - name: soe_share
+      source: constructed:soe_employment_or_va_share
+      transformation: level_pct
+      notes: SOE share of total employment or value added from Kowalski et al. (2013) or national sources.
+  controls:
+    - name: infrastructure_index
+      source: world_bank_wdi:IT.NET.BBND.P2
+      transformation: level
+      notes: Broadband density as proxy for infrastructure; robustness with road density or electricity access.
+    - name: literacy_rate
+      source: world_bank_wdi:SE.ADT.LITR.ZS
+      transformation: level_pct
+    - name: initial_gdp_per_capita
+      source: maddison:mpd2020
+      transformation: log_level
+    - name: natural_resource_rents
+      source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      transformation: level_pct
+intervention_channel: institutional
+intervention_channel_justification: >
+  SOE dominance operates through institutional channel by weakening competitive
+  pressure, softening budget constraints, and politicising management appointments.
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE with country and year fixed effects. Robustness via IV using
+    privatisation waves (mass privatisation programmes, IPO waves) as instrument.
+falsification:
+  rule: >
+    Falsified if higher SOE shares do not show a statistically significant negative
+    association with labour-productivity growth after controlling for infrastructure,
+    literacy, initial income, and natural resources.
+  test: panel_fe_soe_share_on_productivity
+  threshold:
+    soe_coefficient: negative_p_lt_0.10
+    magnitude: coefficient_lt_minus_0.02
+prior_confidence: 0.50
+disclosure: >
+  Author holds weak priors on this claim due to mixed evidence (Singapore Temasek,
+  Norwegian Statoil, French EDF). Expects the coefficient to be negative but small
+  and sensitive to specification.
+steelman: hypotheses/steelman/state_owned_enterprise_share_growth_plateau.md
+linked_hypotheses:
+  - state_credit_allocation_zombie_firm_persistence
+  - national_champions_long_run_productivity_drag
+  - singapore_temasek_public_ownership_efficiency
+notes: >
+  SOE share data from OECD SOE database, Kowalski et al. (2013), or national
+  statistical offices. Coverage is sparse for low-income countries pre-2000.

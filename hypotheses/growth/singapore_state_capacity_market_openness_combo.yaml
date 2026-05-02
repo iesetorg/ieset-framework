@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_state_capacity_market_openness_combo
+version: 1
+status: candidate
+topic: growth
+claim: Singapore long-run prosperity is better predicted by extreme trade openness, rule of law, and competitive services than by state ownership alone.
+evidence_type: causal
+sample:
+  countries:
+    - SGP
+  period: [1965, 2024]
+  temporal_structure: time_series
+variables:
+  outcome:
+    - name: real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: tfp_growth
+      source: pwt:rtfpna
+      transformation: annual_log_diff
+    - name: service_sector_productivity
+      source: constructed:sectoral_tfp
+      transformation: level
+      notes: Service-sector TFP or value-added per worker from national accounts.
+  treatment:
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: rule_of_law_index
+      source: wgi:RL.EST
+      transformation: level
+    - name: state_ownership_share
+      source: constructed:soe_share_gdp
+      transformation: level
+      notes: SOE share of GDP or employment from national statistics and Temasek reports.
+  controls:
+    - name: global_trade_volume
+      source: world_bank_wits:total_trade
+      transformation: log
+    - name: fdi_inflows
+      source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+      transformation: level
+    - name: human_capital
+      source: owid:mean-years-of-schooling-long-run-1870
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [year]
+  clustering: none
+  notes: Time-series regression of Singapore growth on trade openness, rule of law, and state ownership. Tests relative contribution of market openness versus state ownership.
+falsification:
+  rule: The hypothesis is refuted if state ownership has a larger and significant positive coefficient than trade openness or rule of law in predicting Singapore growth 1965-2024, or if trade openness and rule of law do not significantly predict growth.
+  test: time_series_singapore_growth_drivers
+  threshold:
+    openness_coef: ">0 and p<0.10"
+    rule_of_law_coef: ">0 and p<0.10"
+    state_ownership_coef: "<=0 or p>=0.10"
+prior_confidence: 0.55
+disclosure: Author acknowledges that Singapore is a city-state with unique geographic and strategic advantages; results may not generalise to larger economies.
+steelman: hypotheses/steelman/singapore_state_capacity_market_openness_combo.md
+scope:
+  period: [1965, 2024]
+  countries:
+    - SGP
+  outcome_dim:
+    - gdp_growth
+    - productivity
+    - institutional_quality
+  policy_family:
+    - trade_policy
+    - institutional_reform
+    - privatisation_nationalisation
+  treatment_tags:
+    - singapore_temasek
+    - singapore_trade_openness
+    - singapore_rule_of_law
+notes: SOE share data for Singapore requires Temasek annual reports and national statistics compilation. WGI rule of law begins 1996.

@@ -1,0 +1,163 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_openness_inequality_backlash_risk
+version: 1
+status: candidate
+topic: growth
+claim: >-
+  Market openness (trade and capital-account liberalisation) without complementary
+  adjustment institutions (active labour-market policy, regional transfers, wage insurance,
+  retraining) raises inequality or regional divergence enough to trigger policy reversal
+  (tariff increases, capital controls, populist economic platforms) within 10-15 years.
+  The claim applies to middle- and high-income countries 1980-2020 and challenges the
+  assumption that openness is self-sustaining regardless of distributional consequences.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - MEX
+  - CHL
+  - BRA
+  - ARG
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - ZAF
+  - POL
+  - HUN
+  - CZE
+  period:
+  - 1980
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude country-years under IMF structural-adjustment programmes to separate openness from conditionality
+  - exclude micro-states where single-sector shocks dominate
+scope:
+  period:
+  - 1980
+  - 2020
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - MEX
+  - CHL
+  - BRA
+  - ARG
+  - TUR
+  - THA
+  - MYS
+  - PHL
+  - ZAF
+  - POL
+  - HUN
+  - CZE
+  outcome_dim:
+  - poverty_inequality
+  - trade_liberalisation
+  - institutional_quality
+  policy_family:
+  - trade_policy
+  - welfare_architecture
+  treatment_tags: []
+variables:
+  outcome:
+  - name: policy_reversal_indicator
+    source: constructed:fraser_efw_trade_decline; wacziarg_welch_reversal_dates
+    transformation: indicator
+    notes: Indicator for years following trade-liberalisation reversal or major tariff increase.
+  - name: top_1_income_share
+    source: constructed:wid_world_top_1_percent
+    transformation: level
+    notes: World Wealth and Income Database top 1% pre-tax national income share.
+  - name: regional_wage_divergence
+    source: constructed:oecd_regional_wage_data
+    transformation: coefficient_of_variation
+    notes: Coefficient of variation of regional wages within country.
+  treatment:
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: capital_account_openness
+    source: chinn_ito_kaopen; constructed
+    transformation: level
+  - name: adjustment_institutions_index
+    source: constructed:oecd_almp_spending_plus_unemployment_insurance_coverage
+    transformation: level
+    notes: Composite of active labour-market policy spending and UI coverage.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: manufacturing_share_gdp
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: level
+  - name: union_density
+    source: ilostat:union_density_rate
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if trade openness is positively and significantly associated
+    with policy stability (no reversal) even without adjustment institutions, or if the
+    interaction between openness and adjustment institutions is not significant for
+    preventing reversal.
+  test: panel_fe_openness_inequality_reversal_1980_2020
+  threshold:
+    supported: openness_without_adjustment coefficient > 0 at p < 0.10 for reversal probability
+    refuted: openness coefficient not significant for reversal regardless of adjustment institutions
+prior_confidence: 0.55
+disclosure: >-
+  Author priors expect distributional conflict to undermine openness but acknowledge that
+  identity politics and non-economic factors also drive policy reversal. The test isolates
+  the economic channel but cannot fully separate it from cultural or political confounds.
+steelman: hypotheses/steelman/market_openness_inequality_backlash_risk.md

@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: business_dynamism_frontier_income_growth
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Among high-income frontier economies 1980-2020, countries with
+  higher business dynamism — measured by firm-entry rates, job-
+  reallocation rates, and low incumbent-employment share — maintain
+  stronger real income growth per capita than countries with low
+  churn and high incumbent protection. The pre-registered claim is
+  that the top quartile of dynamism shows at least 0.4 percentage
+  points higher annual real income growth than the bottom quartile,
+  after controlling for initial income, education, and sectoral
+  composition.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with banking-crisis codings (Laeven-Valencia) to avoid crisis-driven churn"
+    - "drop observations where dynamism data is imputed rather than directly observed"
+
+scope:
+  period: [1980, 2020]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, productivity, competition_concentration]
+  policy_family: [competition_policy, regulation, labour_market]
+  treatment_tags: [business_dynamism, incumbent_protection, job_reallocation]
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+    - name: real_gni_per_capita_growth
+      source: "world_bank_wdi:NY.GNP.PCAP.KD.ZG"
+      transformation: "level"
+  treatment:
+    - name: business_dynamism_composite
+      source: "constructed: 0.4×firm_entry_rate + 0.4×job_reallocation_rate + 0.2×(1−incumbent_employment_share)"
+      transformation: "level"
+      notes: "Composite index. Firm entry from WDI IC.BUS.NREG; job reallocation from OECD DynEmp / BDS analogues; incumbent share from OECD STAN."
+    - name: job_reallocation_rate
+      source: "oecd_stan:job_reallocation_rate"
+      transformation: "level"
+      notes: "OECD STAN / DynEmp job reallocation rate where available."
+    - name: firm_entry_rate
+      source: "world_bank_wdi:IC.BUS.NREG"
+      transformation: "per_1000_working_age"
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: tertiary_enrollment_rate
+      source: "world_bank_wdi:SE.TER.ENRR"
+      transformation: "level"
+    - name: services_share_gdp
+      source: "world_bank_wdi:NV.SRV.TOTL.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: union_density
+      source: "ilo:union_density_rate"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Business dynamism is regulated by product-market entry barriers,
+  labour-market flexibility rules, and bankruptcy/insolvency
+  regimes. The hypothesis tests whether regulatory outcomes that
+  preserve churn predict income growth at the frontier.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with quartile comparison robustness. Primary spec:
+    regress real income growth on dynamism composite with country
+    and year FE. Secondary: quartile-difference test (top vs bottom
+    quartile of dynamism) on mean growth over 1980-2020.
+    Robustness: drop US to avoid US-dominance; use only European
+    sub-sample; alternative dynamism construction from OECD
+    Entrepreneurship at a Glance.
+
+falsification:
+  rule: >
+    Not supported if (a) the panel-FE coefficient on the dynamism
+    composite is not positive and significant at p<0.05, OR (b) the
+    top-quartile vs bottom-quartile mean growth gap is below 0.3
+    pp/year, OR (c) the coefficient becomes insignificant or wrong-
+    signed when US observations are dropped (indicating US-driven
+    result). A developmentalist / incumbent-protection reading wins
+    if high-churn countries show higher volatility but not higher
+    mean growth.
+  test: panel_fe_dynamism_composite_on_income_growth_with_quartile_robustness
+  threshold: >
+    panel_FE_beta(dynamism_composite) > 0 at p<0.05
+    AND top_quartile_mean_growth − bottom_quartile_mean_growth >= 0.4 pp/yr
+    AND result robust to US exclusion at p<0.10
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author's priors lean toward the dynamism-growth link but the
+  empirical record is genuinely contested: the US shows both high
+  dynamism (until recently) and high income growth, while Nordic
+  countries show moderate dynamism but strong growth, and Southern
+  Europe shows low dynamism and weak growth — yet Japan shows low
+  churn and moderate growth. The pattern is suggestive but not
+  overwhelming. Prior 0.55 reflects this ambiguity. Bias risk:
+  author may over-weight the US experience and under-weight the
+  Nordic "regulated but competitive" model where growth is driven
+  by incumbents investing in human capital rather than churn.
+
+steelman: hypotheses/steelman/business_dynamism_frontier_income_growth.md
+
+linked_hypotheses:
+  - firm_entry_rate_long_run_productivity
+  - austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020
+
+notes: >
+  OECD DynEmp and BDS analogues are the preferred sources for job
+  reallocation; where unavailable, Doing Business entry-density
+  proxies are used with flagged coverage gaps.

@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: life_satisfaction_income_market_institutions
+version: 1
+status: candidate
+topic: distribution
+claim: >-
+  In high-income countries 1990-2020, gains in life satisfaction (subjective well-being)
+  are more strongly associated with real income growth, employment opportunity, and
+  institutional trust than with the intensity of state economic planning or public-sector
+  employment share. The claim is bounded to countries already above the World Bank high-
+  income threshold, separating catch-up wellbeing gains from frontier dynamics.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - ISR
+  - EST
+  - CZE
+  - SVK
+  - SVN
+  - POL
+  - HUN
+  - LVA
+  - LTU
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - exclude transition recession years 1990-1994 for post-Soviet entrants
+  - require at least 3 waves of subjective-wellbeing data per country
+scope:
+  period:
+  - 1990
+  - 2020
+  countries:
+  - OECD
+  outcome_dim:
+  - life_expectancy_health
+  - institutional_quality
+  - poverty_inequality
+  policy_family:
+  - institutional_reform
+  - welfare_architecture
+  treatment_tags: []
+variables:
+  outcome:
+  - name: life_satisfaction_index
+    source: world_bank_wdi:SWB.LS
+    transformation: level
+    notes: Cantril ladder or comparable life-satisfaction measure from Gallup World Poll / World Happiness Report.
+  - name: happiness_index
+    source: constructed:world_happiness_report_ladder
+    transformation: level
+  treatment:
+  - name: real_gdp_per_capita_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+  - name: employment_rate
+    source: oecd:OECD.ELS.SAE
+    transformation: level
+    notes: Employment-to-population ratio or prime-age employment rate.
+  - name: institutional_trust_index
+    source: vdem:v2x_corr
+    transformation: level
+    notes: V-Dem corruption / public-sector confidence index as trust proxy.
+  - name: state_planning_intensity
+    source: constructed:government_consumption_plus_soe_share
+    transformation: level
+    notes: Government consumption share of GDP plus SOE value-added share where available.
+  controls:
+  - name: log_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: unemployment_rate
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: level
+  - name: gini_index
+    source: world_bank_wdi:SI.POV.GINI
+    transformation: level
+  - name: social_expenditure_gdp
+    source: oecd:OECD.SOCX
+    transformation: level
+    notes: OECD social expenditure as % of GDP.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: >-
+    The hypothesis is falsified if state-planning intensity has a positive and significant
+    (p < 0.10) association with life-satisfaction gains larger than that of income growth or
+    employment opportunity in a high-income panel, or if market-institution proxies are
+    negatively and significantly associated with well-being.
+  test: panel_fe_life_satisfaction_drivers_high_income_1990_2020
+  threshold:
+    supported: income/employment/trust coefficients positive and significant; state-planning coefficient not larger and not significant
+    refuted: state-planning coefficient > income coefficient at p < 0.10
+prior_confidence: 0.50
+disclosure: >-
+  Author priors expect income and employment to matter for well-being but are uncertain
+  about the relative weight of institutional trust versus social expenditure. The
+  state-planning proxy is crude and may miss active-labour-market policies that improve
+  well-being through security rather than planning intensity.
+steelman: hypotheses/steelman/life_satisfaction_income_market_institutions.md

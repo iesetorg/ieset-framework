@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wto_accession_productivity_spillover_panel
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  WTO accession predicts total factor productivity (TFP) growth spillovers
+  through increased import competition and expanded export market access,
+  especially in episodes where domestic entry barriers also fall, in a panel
+  of accession and non-accession countries 1995-2020. The directional claim
+  is that accession countries experience faster TFP growth in the 10-year
+  post-accession window than matched non-accession peers, with the effect
+  magnified when domestic product-market regulation (entry barriers) declines
+  concurrently.
+
+evidence_type: causal
+
+sample:
+  countries: [ALB, CHN, COL, ECU, GEO, KHM, LAO, MMR, NPL, OMN, RUS, SAU, TON, UKR, VNM, VUT, YEM, ZAF, ARG, BRA, IND, IDN, MEX, PHL, THA, TUR, EGY, MAR, KOR, CHL, POL, HUN, CZE, SVK, SVN, EST, LVA, LTU, BGR, ROU, HRV]
+  period: [1995, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop accession events that coincide with EU accession within 3 years (bundled treatment)"
+    - "drop country-years during systemic banking crisis per Laeven-Valencia"
+    - "drop observations with missing TFP data for more than 3 consecutive years"
+
+variables:
+  outcome:
+    - name: total_factor_productivity_growth
+      source: "pwt:rtfpna"
+      transformation: annual_log_change
+      notes: "Penn World Table TFP at constant national prices (rtfpna)."
+    - name: labour_productivity_growth
+      source: "pwt:rgdpo"
+      transformation: annual_log_change_per_worker
+      notes: "Real GDP per worker as secondary outcome."
+  treatment:
+    - name: wto_accession_indicator
+      source: "constructed: indicator = 1 in accession year and 10-year post-accession window"
+      transformation: indicator
+      notes: "Accession dates from WTO official records."
+    - name: domestic_entry_barrier_reduction
+      source: "oecd_pmr:ETCR"
+      transformation: change_from_pre_accession
+      notes: "OECD PMR entry-barrier subcomponent; change from 5-year pre-accession mean. Available for subset of countries; missing values flagged."
+  controls:
+    - name: initial_log_tfp
+      source: "pwt:rtfpna"
+      transformation: log_pre_accession_level
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+    - name: human_capital
+      source: "pwt:hc"
+      transformation: level
+    - name: infrastructure_quality
+      source: "wgi:GE.EST"
+      transformation: level
+      notes: "WGI Government Effectiveness used as proxy for infrastructure and public-goods quality."
+    - name: fdi_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+  decomposition_channels:
+    - name: import_penetration_ratio
+      source: "world_bank_wits:import_value"
+      transformation: ratio_to_gdp
+      notes: "Competition channel: import penetration post-accession."
+    - name: export_market_access_index
+      source: "constructed: weighted foreign tariff faced by exporter"
+      transformation: level
+      notes: "Market-access channel: decline in tariffs faced abroad."
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  WTO accession is a regulatory/trade-policy intervention that binds tariff
+  schedules and reduces non-tariff barriers. Domestic entry-barrier reduction
+  is a competition-policy (regulatory) complement.
+
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Event-study design with dynamic treatment effects estimated year-by-year
+    from t-5 to t+10 relative to WTO accession. Parallel trends assessed via
+    pre-trend coefficients. Primary estimator: Callaway-Sant'Anna staggered DiD
+    with not-yet-treated and never-treated controls. Secondary: synthetic DiD
+    (Arkhangelsky et al.) for robustness to heterogeneous treatment effects.
+    Interaction with domestic entry-barrier reduction estimated via subsample
+    split and via explicit interaction term.
+
+falsification:
+  rule: >
+    SUPPORTED if the ATT on TFP growth over the 10-year post-accession window
+    is positive and significant at p<0.10, AND the effect is larger (by at
+    least 50% in point estimate) for the subsample where domestic entry
+    barriers also fell. PARTIAL if the main ATT is positive and significant
+    but the interaction with entry-barrier reduction is insignificant (market
+    access alone drives the effect). REFUTED if the ATT is negative and
+    significant at p<0.10. INFORMATIVE: pre-trend coefficients t-5 to t-1
+    should be jointly insignificant; significant pre-trends invalidate the
+    parallel-trends assumption.
+  test: cs_did_wto_accession_tfp_spillover_with_entry_barrier_interaction
+  threshold: >
+    ATT (TFP growth, 10yr post) > 0 at p<=0.10  AND
+    ATT_entry_barrier_fall >= 1.5 × ATT_entry_barrier_stable  AND
+    Pre-trend F-test p >= 0.10.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author is moderately confident (0.60) that WTO accession raises TFP through
+  competition and market-access channels. The China WTO accession (2001) is
+  the dominant episode in the sample and may drive the average effect; the
+  spec includes an ex-China robustness check. Prior is not higher because
+  several accession countries (e.g., Russia 2012, Saudi Arabia 2005) had
+  limited TFP accelerations post-accession, and because WTO commitments are
+  often shallow or poorly enforced. Framing risk: the hypothesis may be read
+  as endorsing the WTO as an institution; the spec is agnostic on WTO
+  institutional design and tests only the accession-event productivity effect.
+
+steelman: hypotheses/steelman/wto_accession_productivity_spillover_panel.md
+
+scope:
+  period: [1995, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, trade_liberalisation, competition_concentration]
+  policy_family: [trade_policy, competition_policy, institutional_reform]
+  treatment_tags: [wto_accession, market_access, import_competition]
+
+linked_hypotheses:
+  - trade_lib_china_wto_2001_manufacturing_export_surge
+  - liberal_free_trade_partner_growth_panel_1990_2020
+
+notes: >
+  Data readiness:
+  - PWT rtfpna, rgdpo, hc (ready)
+  - WDI GDP pc, FDI inflows (ready)
+  - WGI GE.EST (ready from 1996)
+  - World Bank WITS import data (ready)
+  - OECD PMR ETCR (ready for subset)
+  - WTO accession dates (ready, public record)

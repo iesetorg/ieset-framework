@@ -1,0 +1,136 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: licensing_burden_income_mobility
+version: 1
+status: candidate
+topic: regulatory
+
+claim: >
+  Across US states and a cross-country panel of OECD and middle-
+  income economies 1980-2020, higher occupational and business
+  licensing burdens predict weaker entrepreneurship rates and lower
+  intergenerational income mobility over long horizons. The pre-
+  registered claim is that a one-standard-deviation increase in
+  licensing burden is associated with at least a 3-percentage-point
+  reduction in the share of children born to bottom-quintile parents
+  who reach the top quintile, and with at least a 10% reduction in
+  the firm-formation rate, after controlling for education, racial
+  composition, and manufacturing share.
+
+evidence_type: associational
+
+sample:
+  countries: [USA]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop state-years with major military-base closures or resource-boom shocks that swamp local entrepreneurship"
+    - "drop state-years where licensing data is interpolated across more than 5 years"
+
+scope:
+  period: [1980, 2020]
+  countries: [USA]
+  outcome_dim: [poverty_inequality, employment_labour, competition_concentration]
+  policy_family: [regulation, labour_market]
+  treatment_tags: [occupational_licensing, business_regulation, intergenerational_mobility]
+
+variables:
+  outcome:
+    - name: intergenerational_income_mobility
+      source: "academic:chetty_hendren_kline_saez_igmb"
+      transformation: "level"
+      notes: "Chetty-Hendren-Kline-Saez absolute upward mobility measure (fraction of children reaching top quintile from bottom quintile). Commuting-zone level aggregated to state means."
+    - name: firm_formation_rate
+      source: "bls:business_dynamics_statistics_firm_births"
+      transformation: "per_1000_working_age"
+      notes: "BLS BDS new-firm formation rate per 1000 working-age population, state-level."
+    - name: self_employment_share
+      source: "bls:cps_self_employment"
+      transformation: "level"
+      notes: "CPS self-employment share by state."
+  treatment:
+    - name: occupational_licensing_burden_index
+      source: "academic:kleiner_krueger_occupational_licensing_state_panel"
+      transformation: "level"
+      notes: "Share of workforce covered by occupational licensing requirements, by state and year. Kleiner-Krueger series plus Institute for Justice State Licensing Burden index."
+    - name: business_regulatory_burden
+      source: "fraser_efw:regulation"
+      transformation: "level"
+      notes: "Fraser EFW regulatory burden sub-index at state level (where available) or national proxy."
+  controls:
+    - name: college_attainment_share
+      source: "census:acs_bachelor_degree"
+      transformation: "level"
+    - name: black_population_share
+      source: "census:decennial_race"
+      transformation: "level"
+    - name: manufacturing_employment_share
+      source: "bls:qcew_manufacturing"
+      transformation: "level"
+    - name: median_household_income
+      source: "census:acs_median_household_income"
+      transformation: "log"
+    - name: income_inequality_gini
+      source: "census:acs_gini"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Occupational and business licensing are direct regulatory
+  interventions that raise entry barriers. The hypothesis tests
+  whether this regulatory burden reduces mobility and
+  entrepreneurship.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [state, year]
+  clustering: state
+  notes: >
+    US state-year panel with state and year FE. Identification
+    from within-state changes in licensing prevalence (e.g.
+    Arizona 2010s reform waves, California's steady expansion).
+    Robustness: cross-sectional long-difference (1980 vs 2020);
+    instrument using national occupational-licensing trend
+    interacted with state baseline industry composition (Bartik-
+    style). Secondary: international cross-country regression
+    using OECD PMR entry-barrier sub-index as licensing proxy.
+
+falsification:
+  rule: >
+    Not supported if (a) the panel-FE coefficient on licensing
+    burden is not negative and significant at p<0.05 on either
+    mobility or firm formation, OR (b) the implied effect of a
+    one-SD licensing increase on absolute upward mobility is less
+    than 1.5 percentage points, OR (c) the coefficient flips to
+    positive when state time trends are included (suggesting
+    reverse causation: richer states regulate more). A
+    public-interest / consumer-protection reading wins if licensing
+    is positively associated with income or health outcomes.
+  test: panel_fe_licensing_burden_on_mobility_and_entrepreneurship
+  threshold: >
+    panel_FE_beta(licensing → absolute_upward_mobility) < 0 at p<0.05
+    AND |effect_per_1sd_licensing_increase| >= 1.5 pp on mobility
+    AND panel_FE_beta(licensing → firm_formation_rate) < 0 at p<0.05
+
+prior_confidence: 0.60
+
+disclosure: >
+  The licensing literature (Kleiner 2006, 2015; Johnson & Kleiner
+  2017) finds substantial mobility and wage effects, but causal
+  identification is contested: licensing may expand in response to
+  incumbent-union pressure or consumer-demand for quality assurance.
+  Author's market-liberal priors lean toward the entry-barrier
+  interpretation but prior 0.60 reflects endogeneity concerns. Bias
+  risk: author may under-weight the quality-assurance channel
+  (licensed professions have lower accident rates and higher
+  consumer satisfaction) and over-weight the rent-seeking channel.
+
+steelman: hypotheses/steelman/licensing_burden_income_mobility.md
+
+linked_hypotheses:
+  - austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020
+
+notes: >
+  Chetty et al. mobility data is available at commuting-zone level
+  (1980-2012 birth cohorts). State-level aggregation is
+  straightforward but loses precision. The cross-country extension
+  is flagged as a secondary spec due to data availability.

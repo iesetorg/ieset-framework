@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: policy_uncertainty_private_investment
+version: 1
+status: candidate
+topic: institutional_quality
+
+claim: >
+  Across a broad panel of economies 1990-2020, higher policy
+  uncertainty — measured by economic-policy-uncertainty (EPU)
+  indices, election-frequency volatility, and regulatory-turnover
+  rates — predicts lower private-investment shares of GDP and
+  slower long-run total-factor-productivity growth in the years
+  following state-led reform shifts. The pre-registered claim is
+  that a one-standard-deviation increase in policy uncertainty is
+  associated with at least a 1.5-percentage-point reduction in
+  private investment as a share of GDP and at least a 0.2-
+  percentage-point reduction in annual TFP growth over the
+  subsequent 5 years, after controlling for initial income,
+  financial conditions, and country fixed effects.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA, ROU, BGR, HRV, SRB]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with systemic banking crises where uncertainty is crisis-driven rather than policy-driven"
+    - "drop observations where EPU index is unavailable and no national-proxy exists"
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, institutional_quality]
+  policy_family: [institutional_reform, fiscal_policy, regulation]
+  treatment_tags: [policy_uncertainty, epu_index, private_investment, reform_shifts]
+
+variables:
+  outcome:
+    - name: private_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "derived"
+      notes: "Gross fixed capital formation % GDP minus public-investment share (IMF WEO) as proxy for private investment."
+    - name: tfp_growth_5yr
+      source: "pwt:rtfpna"
+      transformation: "log_diff_5yr"
+    - name: business_investment_share_gdp
+      source: "oecd:national_accounts_business_investment"
+      transformation: "level"
+      notes: "OECD business-investment share where available."
+  treatment:
+    - name: policy_uncertainty_index
+      source: "constructed: 0.5×epu:national_index + 0.3×election_frequency_volatility + 0.2×regulatory_turnover_rate"
+      transformation: "level"
+      notes: "Composite policy-uncertainty index. EPU indices from Baker-Bloom-Davis where available (approx. 30 countries); election-frequency volatility from national electoral calendars; regulatory-turnover rate from OECD and Fraser EFW."
+    - name: epu_index
+      source: "academic:baker_bloom_davis_epu"
+      transformation: "level"
+      notes: "Baker-Bloom-Davis Economic Policy Uncertainty index. Available for major economies."
+    - name: state_led_reform_shift_indicator
+      source: "constructed: indicator = 1 for large_state_intervention_episodes"
+      transformation: "indicator"
+      notes: "Indicator for major state-led reform shifts: nationalisations, large privatisations, trade-policy reversals, tax overhauls."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: real_interest_rate
+      source: "world_bank_wdi:FR.INR.RINR"
+      transformation: "level"
+    - name: credit_to_private_sector
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: government_consumption_share
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Policy uncertainty is an institutional feature that raises the
+  option value of waiting for irreversible investments. State-
+  led reform shifts are bundled regulatory/fiscal/institutional
+  interventions. The hypothesis tests whether uncertainty
+  surrounding these shifts dampens private investment and
+  productivity.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Panel FE with 5-year forward-differenced outcomes on policy-
+    uncertainty index. Interaction: uncertainty × reform-shift
+    indicator. Event-study around major reform shifts (e.g.
+    Argentina 2001 corralito, India 1991, Brazil 1990 Collor
+    plan) with uncertainty as moderator. Robustness: use only
+    EPU-available countries; exclude election years; control for
+    stock-market volatility as alternative uncertainty proxy.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on policy uncertainty is
+    not negative and significant at p<0.05 on private investment,
+    OR (b) the coefficient is not negative and significant at
+    p<0.05 on TFP growth, OR (c) the implied effect of a one-SD
+    uncertainty increase on private investment is below 0.75 pp
+    of GDP. A "uncertainty is good for investment" reading wins
+    if coefficients are positive (some theories predict that
+    uncertainty raises the option value of investing in flexible
+    technologies).
+  test: panel_fe_policy_uncertainty_on_private_investment_and_tfp
+  threshold: >
+    panel_FE_beta(uncertainty → private_investment_share) < 0 at p<0.05
+    AND panel_FE_beta(uncertainty → tfp_growth_5yr) < 0 at p<0.05
+    AND implied_effect_per_1sd_uncertainty_on_investment >= 0.75 pp_of_gdp
+
+prior_confidence: 0.60
+
+disclosure: >
+  The policy-uncertainty literature (Baker-Bloom-Davis 2016,
+  Julio-Yook 2012, Gulen-Ion 2016) strongly supports a negative
+  investment-uncertainty link for developed countries. Emerging-
+  market evidence is thinner and confounded by coincident crises.
+  Author's market-liberal priors lean toward the uncertainty-
+  chilling channel. Prior 0.60 reflects moderate confidence. Bias
+  risk: author may conflate policy uncertainty with general
+  macroeconomic volatility and under-weight the "state-led reform
+  reduces long-run uncertainty" argument (reforms that are
+  successfully completed may lower uncertainty even if the transition
+  raises it).
+
+steelman: hypotheses/steelman/policy_uncertainty_private_investment.md
+
+linked_hypotheses:
+  - rule_of_law_market_reform_complementarity
+  - judicial_independence_growth_persistence
+
+notes: >
+  EPU indices are available for ~30 major economies. For the
+  remaining countries, the composite relies on electoral-calendar
+  volatility and regulatory-turnover proxies, which are lower
+  quality. This is flagged as a measurement limitation.

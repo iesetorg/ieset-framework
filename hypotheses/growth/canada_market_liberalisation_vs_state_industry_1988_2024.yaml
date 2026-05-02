@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: canada_market_liberalisation_vs_state_industry_1988_2024
+version: 1
+status: candidate
+topic: growth
+claim: >
+  Canada's long-run prosperity and productivity growth after FTA/NAFTA (1988-2024)
+  are more associated with market openness, trade integration, and regulatory
+  harmonisation than with national industrial-policy initiatives such as Technology
+  Partnerships Canada, Strategic Innovation Fund, or sectoral strategies.
+evidence_type: causal
+sample:
+  countries:
+    - CAN
+    - AUS
+    - GBR
+    - USA
+    - DEU
+    - FRA
+    - JPN
+    - KOR
+    - NZL
+    - CHE
+  period: [1988, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude 2008-2009 financial crisis as exogenous shock
+    - Exclude 2020-2022 COVID years from primary trend estimates
+scope:
+  period: [1988, 2024]
+  countries:
+    - CAN
+    - AUS
+    - GBR
+    - USA
+    - DEU
+    - FRA
+    - JPN
+    - KOR
+    - NZL
+    - CHE
+  outcome_dim: [gdp_growth, productivity, trade_liberalisation]
+  policy_family: [trade_policy, industrial_policy, institutional_reform]
+  treatment_tags: [nafta_1994, canada_us_fta_1988, canada_industrial_policy]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: annual_pct
+    - name: labour_productivity_growth
+      source: oecd_stan:gdp_per_hour_worked
+      transformation: annual_pct
+    - name: export_diversification_index
+      source: owid:economic-complexity-index
+      transformation: level
+  treatment:
+    - name: trade_openness_index
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: industrial_policy_spending
+      source: constructed:government_business_enterprise_support_pct_gdp
+      transformation: level_pct
+      notes: Composite of direct subsidies, tax expenditures, and loan guarantees.
+  controls:
+    - name: commodity_price_index
+      source: constructed:terms_of_trade_index_canada
+      transformation: level
+      notes: Canada's terms of trade heavily influenced by oil, minerals, and lumber.
+    - name: us_growth_spillover
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+      notes: US real GDP growth as proxy for demand spillover.
+    - name: exchange_rate_volatility
+      source: imf_weo:exchange_rate_volatility_cad_usd
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  Trade policy (FTA/NAFTA) and industrial policy operate through distinct channels
+  but are tested jointly; the bundled justification reflects their simultaneous
+  presence in Canadian policy.
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Panel FE decomposing growth into trade-openness and industrial-policy channels.
+    Synthetic control for CAN against commodity-exporter donor pool (AUS, NOR, NZL)
+    as robustness.
+falsification:
+  rule: >
+    Falsified if Canada's post-1988 GDP per capita growth and productivity growth
+    are explained by industrial-policy spending and commodity prices alone, with
+    trade openness showing no significant marginal effect in a decomposition regression.
+  test: panel_fe_decomposition_trade_vs_industrial_policy
+  threshold:
+    trade_openness_significance: p_lt_0.10
+    industrial_policy_alone_r_squared: lt_0.15
+prior_confidence: 0.58
+disclosure: >
+  Author holds moderate priors that Canadian trade integration mattered more than
+  industrial policy, but acknowledges the US proximity effect as a major confound
+  not available to other OECD peers.
+steelman: hypotheses/steelman/canada_market_liberalisation_vs_state_industry_1988_2024.md
+linked_hypotheses:
+  - australia_hawke_keating_reform_long_run
+  - us_eu_divergence_decomposition
+notes: >
+  OECD STAN productivity from 1995. Government business enterprise support data
+  from Statistics Canada and OECD STI.

@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: pension_forced_saving_capital_deepening
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  Forced-saving pension systems (mandatory defined-contribution or provident
+  funds with significant asset accumulation) raise capital deepening
+  (capital per worker) and support catch-up real GDP per worker growth in
+  developing and emerging economies, but do not guarantee frontier total
+  factor productivity growth, in a broad-country panel 1980-2020. The
+  directional claim is that a 10-percentage-point increase in pension-fund
+  assets under management as a share of GDP predicts a 5-15% increase in
+  capital per worker over the following decade, with the effect on TFP
+  growth insignificant or smaller than the capital-deepening effect.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during hyperinflation (>50% monthly CPI)"
+    - "drop observations with pension assets > 150% of GDP (likely measurement error or sovereign wealth fund misclassification)"
+    - "drop country-years with missing pension-fund data for more than 3 consecutive years"
+
+variables:
+  outcome:
+    - name: capital_per_worker_growth
+      source: "pwt:rnna"
+      transformation: annual_log_change_per_worker
+      notes: "Penn World Table real capital stock (rnna) divided by persons engaged."
+    - name: total_factor_productivity_growth
+      source: "pwt:rtfpna"
+      transformation: annual_log_change
+      notes: "Secondary outcome to test whether forced saving raises TFP or just capital accumulation."
+    - name: real_gdp_per_worker_growth
+      source: "pwt:rgdpo"
+      transformation: annual_log_change_per_worker
+      notes: "Tertiary outcome: labour productivity growth."
+  treatment:
+    - name: pension_fund_assets_pct_gdp
+      source: "oecd_pension_statistics:pension_fund_assets"
+      transformation: level
+      notes: "OECD Pension Statistics pension fund assets as % of GDP. Available for OECD and selected partners."
+    - name: forced_saving_mandatory_contribution_rate
+      source: "ilo:social_security_contribution_rate"
+      transformation: level
+      notes: "ILO Social Security Database mandatory contribution rate. Pending dedicated fetcher."
+  controls:
+    - name: initial_log_gdp_per_worker
+      source: "pwt:rgdpo"
+      transformation: log
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: level
+    - name: financial_depth
+      source: "world_bank_wdi:GFDD.DI.14"
+      transformation: level
+      notes: "Private credit to GDP. Controls for general financial development."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: population_growth
+      source: "world_bank_wdi:SP.POP.GROW"
+      transformation: level
+    - name: old_age_dependency_ratio
+      source: "world_bank_wdi:SP.POP.65UP.TO.ZS"
+      transformation: level
+      notes: "Controls for demographic pressure that may simultaneously raise pension assets and reduce productivity growth."
+  decomposition_channels:
+    - name: domestic_investment_share
+      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
+      transformation: level
+      notes: "Channel: do pension assets translate into higher domestic investment?"
+    - name: stock_market_capitalisation
+      source: "world_bank_wdi:GFDD.DM.02"
+      transformation: pct_gdp
+      notes: "Channel: do pension assets deepen equity markets?"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Mandatory pension contributions are a fiscal-channel intervention (forced
+  saving) that alters national savings, capital-market depth, and
+  intergenerational transfers. The test distinguishes capital-deepening
+  effects from TFP effects.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way FE panel with decomposition: capital per worker growth = β0 +
+    β1*pension_assets + controls + FE. TFP growth regressed separately.
+    Mechanism decomposition via domestic investment and stock-market
+    capitalisation channels. Robustness: (1) IV for pension assets using
+    year-of-pension-reform indicators (major DC reforms: Chile 1981,
+    Australia 1992, etc.); (2) subsample by income level (catch-up vs
+    frontier); (3) exclude Singapore and Chile (dominant forced-saving
+    cases).
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (pension assets) is positive and significant at p<0.10
+    for capital-per-worker growth, AND is insignificant or materially
+    smaller for TFP growth. PARTIAL if positive and significant for both
+    but the capital-deepening coefficient is at least twice the TFP
+    coefficient. REFUTED if β1 is negative and significant for capital
+    per worker, or if β1 is positive and significant for TFP growth with
+    no capital-deepening effect (suggesting a spurious correlation).
+    INFORMATIVE: the result should survive excluding Singapore and Chile;
+    if not, it is a two-country story.
+  test: panel_fe_decomposition_pension_assets_capital_deepening_vs_tfp
+  threshold: >
+    β_pension_assets (capital per worker) > 0 at p<=0.10  AND
+    β_pension_assets (TFP) p >= 0.10 or |β_tfp| < 0.5 × |β_capital|  AND
+    Ex-Singapore-Chile robustness retains sign of β_pension_assets for capital.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author is moderately confident (0.55). The pension-capital-deepening
+  literature (e.g., Holzmann 1997 on Chile, Impavido 2003 on OECD) finds
+  positive effects on savings and asset accumulation, but the TFP link is
+  tenuous. Prior is not higher because pension funds may invest abroad
+  (capital flight), may be captured by political mandates (directed
+  investment), or may simply displace private savings one-for-one
+  (Ricardian equivalence). Framing risk: the hypothesis may be read as
+  endorsing mandatory privatised pensions for all countries; the spec
+  tests only the capital-deepening prediction and notes the TFP boundary.
+
+steelman: hypotheses/steelman/pension_forced_saving_capital_deepening.md
+
+scope:
+  period: [1980, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, fiscal_policy]
+  policy_family: [fiscal_policy, welfare_architecture]
+  treatment_tags: [pension_reform, forced_saving, capital_deepening]
+
+linked_hypotheses:
+  - australia_super_guarantee_saving_effect
+  - welfare_state_market_flexibility_complement
+
+notes: >
+  Data readiness:
+  - OECD Pension Statistics fund assets (ready)
+  - ILO Social Security contribution rates (pending)
+  - PWT rnna, rtfpna, rgdpo, persons engaged (ready)
+  - WDI financial depth, trade openness, population, old-age dependency (ready)
+  - WGI RL.EST (ready)

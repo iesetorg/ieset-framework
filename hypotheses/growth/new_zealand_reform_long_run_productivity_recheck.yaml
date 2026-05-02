@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: new_zealand_reform_long_run_productivity_recheck
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  New Zealand’s 1984–1993 liberalisation (deregulation, tariff cuts,
+  privatisation, inflation targeting, and fiscal consolidation) improved
+  long-run macroeconomic stability and tradables-sector productivity over
+  1984–2024 relative to a synthetic counterfactual of OECD small open
+  economies, but aggregate economy-wide labour productivity and TFP did not
+  improve enough to support strong market-optimism claims. The hypothesis
+  predicts a positive and significant gap in inflation volatility reduction
+  and trade openness, but a non-positive or modest gap in aggregate labour
+  productivity and TFP.
+
+evidence_type: causal
+
+sample:
+  countries:
+    - NZL
+    - AUS
+    - CAN
+    - GBR
+    - IRL
+    - DNK
+    - NOR
+    - SWE
+    - FIN
+    - NLD
+    - BEL
+    - AUT
+    - CHE
+  period: [1984, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "exclude COVID 2020-2021 from fitting"
+
+scope:
+  period: [1984, 2024]
+  countries:
+    - NZL
+    - AUS
+    - CAN
+    - GBR
+    - IRL
+    - DNK
+    - NOR
+    - SWE
+    - FIN
+    - NLD
+    - BEL
+    - AUT
+    - CHE
+  outcome_dim:
+    - productivity
+    - gdp_growth
+    - institutional_quality
+    - trade_liberalisation
+  policy_family:
+    - institutional_reform
+    - competition_policy
+    - trade_policy
+    - regulation
+  treatment_tags:
+    - new_zealand_rogernomics_1984
+    - new_zealand_ruthanasia_1991
+
+variables:
+  outcome:
+    - name: real_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log_level
+    - name: labour_productivity
+      source: "world_bank_wdi:SL.GDP.PCAP.EM.KD"
+      transformation: level
+    - name: tfp_index
+      source: "pwt:rtfpna"
+      transformation: level
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+    - name: manufacturing_va_share
+      source: "world_bank_wdi:NV.IND.MANF.ZS"
+      transformation: level
+    - name: inflation
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: level
+  treatment:
+    - name: nz_post_1984
+      source: "constructed: 1 for NZL from 1984 onward"
+      transformation: binary
+  controls:
+    - name: initial_gdp_pc_1984
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: level_at_1984
+    - name: human_capital
+      source: "pwt:hc"
+      transformation: level
+    - name: wgi_govt_effectiveness
+      source: "wgi:GE.EST"
+      transformation: level
+    - name: terms_of_trade
+      source: "world_bank_wdi:TT.PRI.MRCH.XD.WD"
+      transformation: level
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  The reform bundle spans deregulation (regulatory), tariff cuts (trade),
+  privatisation (industrial), inflation targeting (monetary), and fiscal
+  consolidation (fiscal). Bundled coding per invariant 4.
+
+estimator:
+  template: synthetic_control
+  clustering: country
+  notes: >
+    Primary: synthetic control for NZL treated from 1984, donor pool of OECD
+    small open economies. Secondary: panel FE with NZL × post-1984
+    interaction.
+
+falsification:
+  rule: >
+    Refuted if (a) NZL's post-reform cumulative log GDP-pc gap vs synthetic
+    counterfactual is positive and significant at p<0.10 for aggregate
+    productivity, which would contradict the skeptical limb of the claim, OR
+    (b) the gap in trade openness and inflation volatility is negative and
+    significant, contradicting the supportive limb.
+  test: synthetic_control_nz_reform
+  threshold: >
+    cumulative_log_gdp_pc_gap <= 0.05 OR not significant at p<0.10 for
+    aggregate productivity (supporting skepticism) AND trade_openness_gap > 0
+    at p<0.10 (supporting tradables gain). If aggregate productivity gap >
+    0.10 and p<0.10, the skeptical limb is refuted.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author holds mixed priors: sympathetic to market reforms but skeptical that
+  NZ’s aggregate productivity performance justifies strong claims. Bias risk:
+  motivated to find modest aggregate effects. Mitigation: pre-registered dual-
+  limb falsification (tradables vs aggregate) forces acceptance of either
+  result.
+
+steelman: hypotheses/steelman/new_zealand_reform_long_run_productivity_recheck.md
+
+linked_hypotheses:
+  - australia_hawke_keating_reform_long_run

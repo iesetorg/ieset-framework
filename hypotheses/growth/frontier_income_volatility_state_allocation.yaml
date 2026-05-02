@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: frontier_income_volatility_state_allocation
+version: 1
+status: candidate
+topic: growth
+
+claim: >
+  Across middle-income and catch-up economies 1980-2020, high state-directed
+  allocation — measured by state-enterprise share of output, directed-credit
+  intensity, and public-investment-driven growth — is associated with larger
+  boom-bust cycles after middle-income status is reached, even when early
+  catch-up growth is strong. The pre-registered claim is that countries in
+  the top tercile of state-allocation intensity show at least 1.5 percentage
+  points higher standard deviation of GDP growth and at least twice the
+  crisis frequency in the post-middle-income window than bottom-tercile
+  peers, after controlling for resource dependence, financial development,
+  and initial income.
+
+evidence_type: associational
+
+sample:
+  countries: [CHN, IND, IDN, BRA, MEX, ARG, COL, THA, MYS, PHL, VNM, EGY, TUR, ZAF, RUS, POL, CZE, HUN, CHL, PER, UKR, KAZ, ROU, BGR, HRV, SRB, EST, LVA, LTU, SVN, SVK, MAR, NGA, KEN, BGD, PAK, LKA, BOL, ECU, URY, PRY, CRI, PAN, DOM, GTM, HND, NIC, JOR, TUN, DZA, IRN, AZE, ARM, GEO, MDA, MNG, BLR, BIH, MKD, MNE, ALB]
+  period: [1980, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with systemic banking crises in the first 3 years after middle-income threshold crossing"
+    - "drop observations where state-enterprise or directed-credit data are unavailable and no proxy exists"
+
+scope:
+  period: [1980, 2020]
+  countries: [ASIA_EM, LATAM, AFRICA, POST_SOVIET, MENA]
+  outcome_dim: [gdp_growth, financial_crisis, institutional_quality]
+  policy_family: [industrial_policy, institutional_reform, fiscal_policy]
+  treatment_tags: [state_directed_allocation, directed_credit, state_enterprise, boom_bust, middle_income_trap]
+
+variables:
+  outcome:
+    - name: gdp_growth_volatility
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "rolling_sd_10yr"
+      notes: "Standard deviation of annual real GDP growth over 10-year rolling windows."
+    - name: crisis_frequency
+      source: "constructed: laeven_valencia_crisis_dummy_sum_10yr"
+      transformation: "level"
+      notes: "Count of systemic banking or currency crises in 10-year window (Laeven-Valencia database)."
+    - name: output_loss_post_boom
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "peak_to_trough_gdp_loss"
+      notes: "GDP growth peak-to-trough loss during bust episodes."
+  treatment:
+    - name: state_allocation_intensity_index
+      source: "constructed: 0.4×world_bank_wdi:SE.PRV.TOTL.FE.ZS_inverse + 0.3×directed_credit_gdp + 0.3×public_investment_above_trend"
+      transformation: "level"
+      notes: "Composite state-allocation index. Inverse of private-sector employment share (proxy for state-enterprise dominance); directed credit from national development banks or central-bank windows as % GDP; public investment > 1SD above country trend. Higher = more state-directed."
+    - name: state_enterprise_output_share
+      source: "constructed: fraser_efw:government_enterprises + national_sources"
+      transformation: "level"
+      notes: "State-enterprise output share from Fraser EFW government-enterprise sub-index and national statistical sources."
+    - name: directed_credit_share_gdp
+      source: "constructed: imf_wed:development_bank_credit + national_central_bank_data"
+      transformation: "level"
+      notes: "Directed credit from state-owned development banks and policy-lending windows as share of GDP."
+  controls:
+    - name: log_initial_gdp_pc
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: natural_resource_rents
+      source: "world_bank_wdi:NY.GDP.TOTL.RT.ZS"
+      transformation: "level"
+    - name: financial_development
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: institutional_quality_index
+      source: "wgi:rq"
+      transformation: "level"
+      notes: "WGI Regulatory Quality as proxy for general institutional capability."
+
+intervention_channel: bundled
+intervention_channel_justification: >
+  State-directed allocation is a bundled intervention spanning fiscal
+  (public investment surges), regulatory (directed credit, entry barriers),
+  and institutional (state-enterprise dominance) channels. The hypothesis
+  tests the aggregate boom-bust consequences of this bundle.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, decade]
+  clustering: country
+  notes: >
+    Panel FE with growth-volatility and crisis-frequency outcomes on state-
+    allocation intensity. Identification from within-country variation in
+    state-allocation episodes (e.g. Brazil BNDES surge 2007-2014, Malaysia
+    GLC expansion, China post-2008 stimulus, Russia state-enterprise
+    consolidation). Event-study around middle-income threshold crossing.
+    Robustness: exclude commodity exporters; control for exchange-rate
+    regime; use only private-sector-employment-share countries.
+
+falsification:
+  rule: >
+    Not supported if (a) the coefficient on state-allocation intensity is
+    not positive and significant at p<0.05 on growth volatility, OR (b) the
+    top-tercile vs bottom-tercile crisis-frequency ratio is below 1.3, OR
+    (c) state-allocation intensity is negatively associated with volatility
+    (suggesting state direction stabilises growth). A "developmentalist
+    stabilisation" reading wins if (c) holds.
+  test: panel_fe_state_allocation_on_growth_volatility_and_crisis_frequency
+  threshold: >
+    panel_FE_beta(state_allocation → growth_volatility) > 0 at p<0.05
+    AND top_tercile_crisis_freq / bottom_tercile_crisis_freq >= 1.50
+    AND state_allocation_coefficient_on_volatility >= 0.5 pp_sd
+
+prior_confidence: 0.55
+
+disclosure: >
+  The state-allocation-volatility link is confounded by commodity
+  dependence and financial-development level. Many high-state-allocation
+  economies are also resource-dependent (Russia, Venezuela, Nigeria), and
+  resource rents drive volatility independently of allocation mode.
+  Author's market-liberal priors lean toward the "state direction
+  generates misallocation and boom-bust" channel. Prior 0.55 reflects
+  moderate confidence given the confounding. Bias risk: author may
+  conflate state allocation with resource-dependence and under-weight
+  successful state-directed stabilisation episodes (e.g. Korea 1960s-70s,
+  Taiwan industrial policy).
+
+steelman: hypotheses/steelman/frontier_income_volatility_state_allocation.md
+
+linked_hypotheses:
+  - catch_up_capital_deepening_not_tfp
+  - resource_rent_capture_outperforms_laissez_faire
+  - corruption_state_allocation_growth_interaction
+
+notes: >
+  State-enterprise employment share from WDI is patchy for non-OECD
+  countries. Directed-credit data rely on IMF WEO and national central-bank
+  sources with inconsistent coverage. The composite index will have
+  substantial missing data; this is flagged as the primary measurement
+  limitation.
