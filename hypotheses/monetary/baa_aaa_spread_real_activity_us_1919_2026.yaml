@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: baa_aaa_spread_real_activity_us_1919_2026
+version: 1
+status: candidate
+topic: monetary
+claim: Spikes in the US Baa-Aaa corporate bond spread are followed by deteriorating real activity, visible as rising unemployment and falling industrial production within twelve months.
+notes: Long FRED history allows a stress-window test rather than relying on the short high-yield OAS vintage available on disk.
+prior_confidence: 0.68
+disclosure: Credit-spread priors are pro-cyclical by construction; the test requires forward deterioration after discrete spread spikes, but causality is not claimed.
+steelman: hypotheses/steelman/baa_aaa_spread_real_activity_us_1919_2026.md
+evidence_type: associational
+falsification:
+  rule: Identify non-overlapping months where the Baa-Aaa spread is at least 1.0 percentage point above its trailing 24-month median. A completed episode supports the claim if unemployment rises at least +0.50pp OR industrial production falls at least 3% within the following 12 months. SUPPORTED if at least 65% of completed episodes pass and the median unemployment change is positive. REFUTED if fewer than 45% pass or median unemployment change is <= 0 and median industrial-production change is >= 0. PARTIAL otherwise.
+  test: fred_baa_aaa_spread_real_activity_12m
+  threshold: "SUPPORTED: pass rate >= 65% and median unemployment change > 0pp; REFUTED: pass rate < 45% or both median unemployment change <= 0 and median IP change >= 0."
+scope:
+  period: [1919, 2026]
+  countries: [USA]
+  outcome_dim: [employment_labour, industrial_capability, financial_crisis]
+  policy_family: [monetary_policy]
+  treatment_tags: [credit_spread_spike, baa_aaa_spread, real_activity]
+sample:
+  countries: [USA]
+  period: [1919, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "episodes before 1948 lack unemployment coverage but still require industrial-production follow-through"
+    - "exclude episodes without 12 forward months of outcome data"
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: "fred:UNRATE"
+      transformation: max 12-month forward level minus episode-month level
+    - name: industrial_production
+      source: "fred:INDPRO"
+      transformation: minimum 12-month forward log change from episode month
+  treatment:
+    - name: baa_aaa_credit_spread
+      source: "fred:BAA; fred:AAA"
+      transformation: Baa seasoned corporate yield minus Aaa seasoned corporate yield
+estimator:
+  template: event_study
+  clustering: none
+  notes: Monthly event-window checklist over long-run FRED spread and real-activity series.

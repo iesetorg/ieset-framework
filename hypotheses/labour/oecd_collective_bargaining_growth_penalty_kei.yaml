@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_collective_bargaining_growth_penalty_kei
+version: 1
+status: pre_registered
+topic: labour
+claim: In OECD annual data from 1990 to 2022, broader collective-bargaining coverage is not associated
+  with a material penalty to real GDP-volume growth.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DNK
+  - EST
+  - FIN
+  - FRA
+  - DEU
+  - GRC
+  - HUN
+  - ISL
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LVA
+  - LTU
+  - LUX
+  - MEX
+  - NLD
+  - NZL
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - ESP
+  - SWE
+  - CHE
+  - TUR
+  - GBR
+  - USA
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the OECD treatment, outcome, or control series
+  - collapse duplicate OECD cells to country-year means after predeclared code filters
+  - retain COVID years because year fixed effects absorb common shocks
+variables:
+  outcome:
+  - name: gdp_volume_growth
+    source: oecd:OECD.ECO.MAD_DSD_KEI_DF_KEI_1.0
+    transformation: level
+  treatment:
+  - name: bargaining_coverage
+    source: oecd:OECD.ELS.SAE_DSD_TUD_CBC_DF_CBC_1.0
+    transformation: level
+  controls:
+  - name: unemployment_rate
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: OLS with country and year fixed effects, clustered by country. This is an associational institutional
+    panel, not a causal natural experiment.
+falsification:
+  rule: SUPPORTED iff beta_bargaining_coverage >= -0.02 GDP-growth points per 1 pp coverage OR p>=0.10.
+    REFUTED iff beta_bargaining_coverage <= -0.02 with p<0.10. PARTIAL otherwise if method-valid.
+  test: oecd_collective_bargaining_growth_penalty_kei_twfe_1990_2022
+  threshold:
+    support: SUPPORTED iff beta_bargaining_coverage >= -0.02 GDP-growth points per 1 pp coverage OR p>=0.10.
+    refute: REFUTED iff beta_bargaining_coverage <= -0.02 with p<0.10. PARTIAL otherwise if method-valid.
+    alpha: 0.1
+prior_confidence: 0.52
+disclosure: 'The claim is intentionally vulnerable: it takes the no-growth-cost version of the bargaining
+  argument seriously and lets the KEI growth series falsify it.'
+steelman: hypotheses/steelman/oecd_collective_bargaining_growth_penalty_kei.md
+scope:
+  period:
+  - 1990
+  - 2022
+  countries:
+  - OECD
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - collective_bargaining_institutions
+  - union_density
+notes: Generated as Worker D OECD labour/distribution wave using only pinned OECD vintages already on
+  disk.

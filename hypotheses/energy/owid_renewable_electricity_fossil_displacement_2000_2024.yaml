@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: owid_renewable_electricity_fossil_displacement_2000_2024
+version: 1
+status: pre_registered
+topic: energy
+claim: 'Among countries where renewable electricity share rose by at least 15 percentage points
+  between 2000 and 2024, fossil-fuel electricity share usually fell materially: at least 70%
+  should show a fossil-share decline of at least 10 percentage points, and the median fossil-share
+  change should be at most -15 percentage points.'
+evidence_type: descriptive
+sample:
+  countries: &id001
+  - ABW
+  - AFG
+  - AUS
+  - BEL
+  - BGR
+  - BLZ
+  - CAF
+  - CHL
+  - CHN
+  - COK
+  - CPV
+  - CYP
+  - DEU
+  - DJI
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - GBR
+  - GIN
+  - GLP
+  - GRC
+  - GRL
+  - GTM
+  - HRV
+  - HUN
+  - IRL
+  - ITA
+  - JOR
+  - KEN
+  - KHM
+  - KIR
+  - LBN
+  - LBR
+  - LTU
+  - LUX
+  - MAC
+  - MAR
+  - MKD
+  - MLT
+  - MRT
+  - MTQ
+  - NIC
+  - NLD
+  - NRU
+  - POL
+  - PRT
+  - PSE
+  - ROU
+  - SDN
+  - SEN
+  - SLE
+  - SLV
+  - SOM
+  - SYC
+  - TUR
+  - VEN
+  - VUT
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: fossil_electricity_share
+    source: owid:share-electricity-fossil-fuels
+    transformation: endpoint percentage-point change
+  treatment:
+  - name: renewable_electricity_share
+    source: owid:share-electricity-renewables
+    transformation: countries selected if endpoint increase >= 15pp
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Custom OWID endpoint-panel replication using local vintages on disk. Countries are
+    selected by the predeclared treatment-threshold rule, then graded against endpoint change
+    thresholds.
+falsification:
+  rule: SUPPORTED if at least 70% of selected countries have fossil-electricity-share declines
+    of at least 10pp and the median fossil-share change is <= -15pp. REFUTED if fewer than
+    50% pass or the median decline is less than 5pp. Otherwise PARTIAL.
+  test: renewable_electricity_growth_fossil_share_endpoint_change
+  threshold: n >= 20 AND pass_rate >= 0.70 AND median_fossil_change_pp <= -15
+prior_confidence: 0.82
+disclosure: The prior expects a strong accounting substitution pattern because electricity
+  shares sum to 100, but hydro variability, nuclear retirements, imports, and demand growth
+  can weaken causal interpretation.
+steelman: hypotheses/steelman/owid_renewable_electricity_fossil_displacement_2000_2024.md
+scope:
+  period:
+  - 2000
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - energy
+  policy_family:
+  - energy_policy
+  treatment_tags:
+  - renewable_electricity
+  - fossil_electricity_displacement

@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: owid_electric_renewables_total_energy_followthrough_2000_2023
+version: 1
+status: pre_registered
+topic: energy
+claim: 'Countries with very large renewable-electricity gains should also show visible economy-wide
+  energy transition: among countries where renewable electricity share rose by at least 20
+  percentage points from 2000 to 2023, at least 80% should increase renewables'' share of
+  total energy by at least 5 percentage points, and the median total-energy renewable-share
+  gain should be at least 8 percentage points.'
+evidence_type: descriptive
+sample:
+  countries: &id001
+  - AUS
+  - BEL
+  - CYP
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ITA
+  - LTU
+  - LUX
+  - NLD
+  - POL
+  - PRT
+  - ROU
+  period:
+  - 2000
+  - 2023
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: renewable_share_total_energy
+    source: owid:renewable-share-energy
+    transformation: endpoint percentage-point change
+  treatment:
+  - name: renewable_electricity_share
+    source: owid:share-electricity-renewables
+    transformation: countries selected if endpoint increase >= 20pp
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Custom OWID endpoint-panel replication using local vintages on disk. Countries are
+    selected by the predeclared treatment-threshold rule, then graded against endpoint change
+    thresholds.
+falsification:
+  rule: SUPPORTED if at least 80% of selected countries have total-energy renewable-share
+    gains >= 5pp and the median total-energy gain is >= 8pp. REFUTED if fewer than 60% pass
+    or the median total-energy gain is below 3pp. Otherwise PARTIAL.
+  test: electric_renewables_total_energy_endpoint_followthrough
+  threshold: n >= 15 AND pass_rate >= 0.80 AND median_total_renewable_energy_change_pp >=
+    8
+prior_confidence: 0.7
+disclosure: The prior expects electricity transition leaders to show broader renewable energy
+  gains, but electricity is only one slice of final energy and transport/heat can lag badly.
+steelman: hypotheses/steelman/owid_electric_renewables_total_energy_followthrough_2000_2023.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries: *id001
+  outcome_dim:
+  - energy
+  policy_family:
+  - energy_policy
+  treatment_tags:
+  - renewable_electricity
+  - total_energy_transition

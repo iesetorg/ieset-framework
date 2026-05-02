@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fred_productivity_compensation_gap_us_1973_2025
+version: 1
+status: candidate
+topic: labour
+claim: Since 1973, US nonfarm-business labour productivity has cumulatively outpaced real hourly compensation by a large margin, indicating a persistent productivity-compensation divergence.
+notes: FRED-only variant of the productivity-compensation decoupling question using OPHNFB and COMPRNFB vintages already on disk, with 2019 as the pre-COVID dispositive endpoint and 2025 reported as informative.
+prior_confidence: 0.66
+disclosure: The result depends on using the FRED/BLS nonfarm-business real compensation index rather than median cash wages; this is a conservative test relative to larger median-worker divergence claims.
+steelman: hypotheses/steelman/fred_productivity_compensation_gap_us_1973_2025.md
+evidence_type: descriptive
+falsification:
+  rule: SUPPORTED if the cumulative log gap between nonfarm-business output per hour (OPHNFB) and real hourly compensation (COMPRNFB) from 1973 to 2019 is at least +20 log percentage points. REFUTED if the 1973-2019 gap is <= 0. PARTIAL if the gap is positive but below +20. The 1973-2025 gap is reported as informative only because the COVID/reopening productivity cycle distorts the terminal years.
+  test: fred_nfb_productivity_compensation_log_gap_1973_2019
+  threshold: "SUPPORTED: 1973-2019 productivity-minus-compensation cumulative log gap >= +20 log-ppts; REFUTED: <= 0; PARTIAL: (0, +20)."
+scope:
+  period: [1973, 2025]
+  countries: [USA]
+  outcome_dim: [productivity, wage_stagnation, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [productivity_compensation_decoupling, real_hourly_compensation, nonfarm_business]
+sample:
+  countries: [USA]
+  period: [1973, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "primary endpoint is 2019 to avoid COVID and reopening distortions"
+variables:
+  outcome:
+    - name: nonfarm_business_output_per_hour
+      source: "fred:OPHNFB"
+      transformation: annual mean, log cumulative growth
+    - name: nonfarm_business_real_hourly_compensation
+      source: "fred:COMPRNFB"
+      transformation: annual mean, log cumulative growth
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Annualized cumulative log-gap test using quarterly FRED productivity and compensation indexes.

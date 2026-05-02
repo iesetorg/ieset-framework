@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_youth_wage_gap_youth_employment
+version: 1
+status: pre_registered
+topic: labour
+claim: In OECD country-years from 1990 to 2022, a wider youth-to-prime-age wage gap is associated with
+  lower youth employment, even after controlling for the aggregate unemployment rate.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DNK
+  - EST
+  - FIN
+  - FRA
+  - DEU
+  - GRC
+  - HUN
+  - ISL
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LVA
+  - LTU
+  - LUX
+  - MEX
+  - NLD
+  - NZL
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - ESP
+  - SWE
+  - CHE
+  - TUR
+  - GBR
+  - USA
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the OECD treatment, outcome, or control series
+  - collapse duplicate OECD cells to country-year means after predeclared code filters
+  - retain COVID years because year fixed effects absorb common shocks
+variables:
+  outcome:
+  - name: youth_employment_ratio
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: level
+  treatment:
+  - name: youth_prime_wage_gap
+    source: oecd:OECD.ELS.SAE_DSD_EARNINGS_DF_EARNINGS_1.0
+    transformation: level
+  controls:
+  - name: unemployment_rate
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: OLS with country and year fixed effects, clustered by country. This is an associational institutional
+    panel, not a causal natural experiment.
+falsification:
+  rule: SUPPORTED iff beta_youth_prime_wage_gap <= -0.20 youth-employment-ratio points per 1 pp wage gap
+    with p<0.10. REFUTED iff beta_youth_prime_wage_gap >= 0 with p<0.10. PARTIAL otherwise if method-valid.
+  test: oecd_youth_wage_gap_youth_employment_twfe_1990_2022
+  threshold:
+    support: SUPPORTED iff beta_youth_prime_wage_gap <= -0.20 youth-employment-ratio points per 1 pp wage
+      gap with p<0.10.
+    refute: REFUTED iff beta_youth_prime_wage_gap >= 0 with p<0.10. PARTIAL otherwise if method-valid.
+    alpha: 0.1
+prior_confidence: 0.5
+disclosure: The measure is a wage-gap outcome, not a clean policy instrument. This makes the test descriptive
+  and vulnerable to reverse causality from weak youth labour markets.
+steelman: hypotheses/steelman/oecd_youth_wage_gap_youth_employment.md
+scope:
+  period:
+  - 1990
+  - 2022
+  countries:
+  - OECD
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - earnings_dispersion
+notes: Generated as Worker D OECD labour/distribution wave using only pinned OECD vintages already on
+  disk.

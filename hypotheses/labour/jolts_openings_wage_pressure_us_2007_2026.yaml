@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jolts_openings_wage_pressure_us_2007_2026
+version: 1
+status: candidate
+topic: labour
+claim: Elevated US JOLTS job openings are a leading indicator of broad private-sector wage growth; when job openings accelerate, average hourly earnings growth follows within six months.
+notes: FRED-runnable labour-market tightness test using JOLTS job openings rather than quits because the on-disk BLS quits vintage is too short for a serious event-window test.
+prior_confidence: 0.62
+disclosure: Tight-labour-market priors make this hypothesis tempting; the predeclared test uses only aggregate openings and wages, so compositional shifts and sector mix could produce false positives.
+steelman: hypotheses/steelman/jolts_openings_wage_pressure_us_2007_2026.md
+evidence_type: associational
+falsification:
+  rule: SUPPORTED if monthly YoY log growth in JOLTS job openings predicts private average hourly earnings YoY six months later with Pearson r >= 0.45, and months in the top quartile of openings growth show median six-month-ahead wage-growth acceleration of at least +0.25 percentage points. REFUTED if r <= 0.15 or median acceleration <= 0. PARTIAL otherwise. Exclude March 2020 through December 2021 from the primary correlation because pandemic labour-market measurement and reopening distort the signal.
+  test: fred_jolts_openings_lead_private_ahe_yoy_6m
+  threshold: "SUPPORTED: lead correlation >= 0.45 and top-quartile median wage-growth acceleration >= +0.25pp; REFUTED: correlation <= 0.15 or acceleration <= 0."
+scope:
+  period: [2007, 2026]
+  countries: [USA]
+  outcome_dim: [wage_stagnation, employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [jolts_openings, labour_market_tightness, wage_pressure]
+sample:
+  countries: [USA]
+  period: [2007, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "primary excludes 2020-03 through 2021-12 pandemic reopening window"
+variables:
+  outcome:
+    - name: private_average_hourly_earnings_yoy
+      source: "fred:CES0500000003"
+      transformation: 100 * log difference from 12 months earlier
+  treatment:
+    - name: jolts_job_openings_yoy
+      source: "fred:JTSJOL"
+      transformation: 100 * log difference from 12 months earlier
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Monthly lead-lag event-window diagnostic; openings YoY at t is compared with wage YoY at t+6, and wage acceleration is wage_yoy(t+6) minus wage_yoy(t).

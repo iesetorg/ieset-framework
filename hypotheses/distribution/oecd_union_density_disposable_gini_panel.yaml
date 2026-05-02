@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_union_density_disposable_gini_panel
+version: 1
+status: pre_registered
+topic: distribution
+claim: In OECD country-years from 1990 to 2022, higher trade-union density is associated with lower disposable-income
+  Gini after country and year fixed effects and unemployment controls.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DNK
+  - EST
+  - FIN
+  - FRA
+  - DEU
+  - GRC
+  - HUN
+  - ISL
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LVA
+  - LTU
+  - LUX
+  - MEX
+  - NLD
+  - NZL
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - ESP
+  - SWE
+  - CHE
+  - TUR
+  - GBR
+  - USA
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the OECD treatment, outcome, or control series
+  - collapse duplicate OECD cells to country-year means after predeclared code filters
+  - retain COVID years because year fixed effects absorb common shocks
+variables:
+  outcome:
+  - name: gini_disp
+    source: oecd:OECD.WISE.INE_DSD_IDD_DF_IDD_1.0
+    transformation: level
+  treatment:
+  - name: union_density
+    source: oecd:OECD.ELS.SAE_DSD_TUD_CBC_DF_TUD_1.0
+    transformation: level
+  controls:
+  - name: unemployment_rate
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: OLS with country and year fixed effects, clustered by country. This is an associational institutional
+    panel, not a causal natural experiment.
+falsification:
+  rule: SUPPORTED iff beta_union_density <= -0.0005 Gini points per 1 pp union density with p<0.10. REFUTED
+    iff beta_union_density >= +0.0005 with p<0.10. PARTIAL otherwise if method-valid.
+  test: oecd_union_density_disposable_gini_panel_twfe_1990_2022
+  threshold:
+    support: SUPPORTED iff beta_union_density <= -0.0005 Gini points per 1 pp union density with p<0.10.
+    refute: REFUTED iff beta_union_density >= +0.0005 with p<0.10. PARTIAL otherwise if method-valid.
+    alpha: 0.1
+prior_confidence: 0.62
+disclosure: I expected the sign to be negative from bargaining-power theory, but the within-country FE
+  design is deliberately hard on slow-moving institutions.
+steelman: hypotheses/steelman/oecd_union_density_disposable_gini_panel.md
+scope:
+  period:
+  - 1990
+  - 2022
+  countries:
+  - OECD
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - collective_bargaining_institutions
+  - union_density
+notes: Generated as Worker D OECD labour/distribution wave using only pinned OECD vintages already on
+  disk.

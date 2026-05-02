@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_collective_bargaining_unemployment_nonpenalty
+version: 1
+status: pre_registered
+topic: labour
+claim: In OECD country-years from 1990 to 2022, broader collective-bargaining coverage does not impose
+  a material unemployment penalty.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DNK
+  - EST
+  - FIN
+  - FRA
+  - DEU
+  - GRC
+  - HUN
+  - ISL
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LVA
+  - LTU
+  - LUX
+  - MEX
+  - NLD
+  - NZL
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - ESP
+  - SWE
+  - CHE
+  - TUR
+  - GBR
+  - USA
+  period:
+  - 1990
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the OECD treatment, outcome, or control series
+  - collapse duplicate OECD cells to country-year means after predeclared code filters
+  - retain COVID years because year fixed effects absorb common shocks
+variables:
+  outcome:
+  - name: unemployment_rate
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: level
+  treatment:
+  - name: bargaining_coverage
+    source: oecd:OECD.ELS.SAE_DSD_TUD_CBC_DF_CBC_1.0
+    transformation: level
+  controls: []
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects:
+  - country
+  - year
+  notes: OLS with country and year fixed effects, clustered by country. This is an associational institutional
+    panel, not a causal natural experiment.
+falsification:
+  rule: SUPPORTED iff the 90% upper confidence bound for beta_bargaining_coverage is <= +0.10 unemployment-rate
+    points per 1 pp coverage. REFUTED iff beta_bargaining_coverage >= +0.10 with p<0.10. PARTIAL otherwise
+    if method-valid.
+  test: oecd_collective_bargaining_unemployment_nonpenalty_twfe_1990_2022
+  threshold:
+    support: SUPPORTED iff the 90% upper confidence bound for beta_bargaining_coverage is <= +0.10 unemployment-rate
+      points per 1 pp coverage.
+    refute: REFUTED iff beta_bargaining_coverage >= +0.10 with p<0.10. PARTIAL otherwise if method-valid.
+    alpha: 0.1
+prior_confidence: 0.58
+disclosure: This is framed as a non-inferiority test rather than proof of job creation. That favors the
+  modest social-democratic claim that bargaining coverage is not mechanically unemployment-raising.
+steelman: hypotheses/steelman/oecd_collective_bargaining_unemployment_nonpenalty.md
+scope:
+  period:
+  - 1990
+  - 2022
+  countries:
+  - OECD
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - collective_bargaining_institutions
+  - union_density
+notes: Generated as Worker D OECD labour/distribution wave using only pinned OECD vintages already on
+  disk.

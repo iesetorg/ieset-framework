@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_credit_gap_house_price_reversal_panel
+version: 1
+status: candidate
+topic: housing
+claim: >
+  In BIS country-quarter panels, an elevated credit-to-GDP gap predicts a
+  subsequent real residential property-price reversal. A credit boom should
+  leave housing markets fragile enough that, after country fixed effects and
+  common calendar-year shocks, high-gap quarters are followed by materially
+  weaker three-year real house-price growth.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, ESP, IRL, DNK, SWE, NOR, KOR, JPN, FRA, DEU, ITA, NLD, BEL, CHE, NZL, PRT, GRC]
+  period: [1970, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-quarters missing BIS WS_CREDIT_GAP CG_DTYPE=C
+    - drop country-quarters missing BIS WS_SPP real residential property-price index
+    - require 12-quarter forward real house-price observations
+variables:
+  outcome:
+    - name: fwd_real_house_price_growth_12q
+      source: bis:WS_SPP
+      transformation: 100 * log(real_index_t+12 / real_index_t)
+  treatment:
+    - name: high_credit_gap
+      source: bis:WS_CREDIT_GAP
+      transformation: indicator(CG_DTYPE=C >= 10 percentage points)
+  controls:
+    - name: credit_gap
+      source: bis:WS_CREDIT_GAP
+      transformation: level, CG_DTYPE=C
+    - name: lag_real_house_price_growth_8q
+      source: bis:WS_SPP
+      transformation: 100 * log(real_index_t / real_index_t-8)
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Country-quarter panel. Threshold is deliberately high and known before
+    execution: credit gap >= 10 percentage points. The outcome is forward,
+    so the contemporaneous high-gap marker cannot mechanically include the
+    reversal window.
+falsification:
+  rule: >
+    Falsified if high BIS credit-gap quarters do not predict materially weaker
+    subsequent real house-price growth after fixed effects, or if the raw
+    high-gap contrast is not economically negative.
+  test: bis_credit_gap_house_price_reversal_panel
+  threshold: >
+    Supported only if coefficient(high_credit_gap) <= -3.0 percentage points
+    with cluster-robust p <= 0.05, raw high-minus-normal mean outcome <= -3.0
+    percentage points, at least 600 observations, and at least 20 countries.
+    Partial if exactly one of the regression or raw contrast gates clears.
+prior_confidence: 0.58
+disclosure: >
+  This is a predictive BIS panel screen, not a causal identification design.
+  The strongest skeptical interpretation is that credit gaps proxy for mixed
+  corporate leverage, banking structure, and policy-cycle conditions rather
+  than housing-specific excess.
+steelman: hypotheses/steelman/bis_credit_gap_house_price_reversal_panel.md
+scope:
+  period: [1970, 2025]
+  countries: [OECD]
+  outcome_dim: [housing, financialisation]
+  policy_family: [monetary_policy, regulation, housing_policy]
+  treatment_tags:
+    - credit_gap
+    - residential_property_prices
+    - balance_sheet_cycle
+notes: >
+  Runnable via engine/runs/bis_credit_gap_house_price_reversal_panel/replication.py.
+  Uses only pinned BIS vintages already on disk.

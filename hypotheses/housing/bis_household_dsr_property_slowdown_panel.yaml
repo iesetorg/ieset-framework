@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_household_dsr_property_slowdown_panel
+version: 1
+status: candidate
+topic: housing
+claim: >
+  Household debt-service stress predicts slower real house-price appreciation.
+  If household cash-flow pressure is a binding fragility channel, BIS household
+  DSR stress quarters should be followed by weaker two-year real residential
+  property-price growth.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, ESP, DNK, SWE, NOR, KOR, FRA, DEU, ITA, NLD, BEL, CHE, PRT, MEX]
+  period: [1999, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-quarters missing household DSR
+    - drop country-quarters missing real residential property-price index
+    - require 8-quarter forward property-price observations
+variables:
+  outcome:
+    - name: fwd_real_house_price_growth_8q
+      source: bis:WS_SPP
+      transformation: 100 * log(real_index_t+8 / real_index_t)
+  treatment:
+    - name: high_household_dsr
+      source: bis:WS_DSR
+      transformation: indicator(DSR_BORROWERS=H >= 12 percent and >= country p75)
+  controls:
+    - name: household_dsr
+      source: bis:WS_DSR
+      transformation: level
+    - name: lag_real_house_price_growth_8q
+      source: bis:WS_SPP
+      transformation: 100 * log(real_index_t / real_index_t-8)
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+falsification:
+  rule: >
+    Falsified if high household DSR stress does not predict slower subsequent
+    real residential property-price growth after fixed effects, or if the raw
+    stress contrast is not economically negative.
+  test: bis_household_dsr_property_slowdown_panel
+  threshold: >
+    Supported only if coefficient(high_household_dsr) <= -2.0 percentage
+    points with cluster-robust p <= 0.05, raw high-minus-normal mean outcome
+    <= -2.0 percentage points, at least 400 observations, and at least 15
+    countries. Partial if exactly one of the regression or raw contrast gates
+    clears.
+prior_confidence: 0.6
+disclosure: >
+  Household DSR stress can be a symptom of interest-rate tightening, income
+  weakness, or household leverage. This spec measures predictive signal for
+  forward real property prices, not a fully causal DSR channel.
+steelman: hypotheses/steelman/bis_household_dsr_property_slowdown_panel.md
+scope:
+  period: [1999, 2025]
+  countries: [OECD]
+  outcome_dim: [housing, financialisation]
+  policy_family: [monetary_policy, regulation, housing_policy]
+  treatment_tags:
+    - debt_service_ratio
+    - residential_property_prices
+    - household_stress
+notes: >
+  Runnable via engine/runs/bis_household_dsr_property_slowdown_panel/replication.py.
+  Uses only pinned BIS vintages already on disk.

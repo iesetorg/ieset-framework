@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mortgage_rate_shock_housing_starts_us_1971_2026
+version: 1
+status: candidate
+topic: labour
+claim: Large US mortgage-rate increases are followed by materially weaker housing starts within one year, consistent with interest-rate-sensitive residential construction labour demand.
+notes: Placed under labour because the mechanism is residential construction activity and labour demand; the treatment is monetary/credit-market transmission through mortgage rates.
+prior_confidence: 0.72
+disclosure: The rate-sensitive housing view is conventional, so the threshold deliberately requires a large starts decline after discrete mortgage-rate shocks rather than any negative correlation.
+steelman: hypotheses/steelman/mortgage_rate_shock_housing_starts_us_1971_2026.md
+evidence_type: associational
+falsification:
+  rule: Identify non-overlapping monthly episodes where the 30-year fixed mortgage rate rises at least +150bp over the previous 12 months. For each completed episode, compare housing starts 12 months later with the episode month. SUPPORTED if at least 60% of completed episodes have starts down at least 15% and the median 12-month starts change is <= -15%. REFUTED if fewer than 40% pass or the median starts change is positive. PARTIAL otherwise.
+  test: fred_mortgage_rate_shock_housing_starts_12m
+  threshold: "SUPPORTED: pass rate >= 60% and median 12m starts change <= -15%; REFUTED: pass rate < 40% or median starts change > 0%."
+scope:
+  period: [1971, 2026]
+  countries: [USA]
+  outcome_dim: [housing, employment_labour]
+  policy_family: [monetary_policy, labour_market]
+  treatment_tags: [mortgage_rate_shock, housing_starts, residential_construction]
+sample:
+  countries: [USA]
+  period: [1971, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "exclude rate-shock months without a full 12-month forward housing-starts observation"
+variables:
+  outcome:
+    - name: housing_starts
+      source: "fred:HOUST"
+      transformation: 12-month log change after shock
+  treatment:
+    - name: thirty_year_mortgage_rate
+      source: "fred:MORTGAGE30US"
+      transformation: monthly average; 12-month change in basis points
+estimator:
+  template: event_study
+  clustering: none
+  notes: Non-overlapping shock windows with 12-month forward change in seasonally adjusted annualized housing starts.

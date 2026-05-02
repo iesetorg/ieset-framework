@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_reer_appreciation_reversal_panel
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Large real effective exchange-rate appreciations mean-revert. In the BIS
+  real broad EER panel, a 15 percent or larger three-year REER appreciation
+  should predict subsequent two-year real depreciation or at least materially
+  weaker REER growth.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, JPN, KOR, FRA, DEU, ITA, ESP, NLD, BEL, CHE, SWE, NOR, DNK, MEX, BRA, CHL, ZAF, TUR]
+  period: [1994, 2026]
+  temporal_structure: panel
+  exclusion_rules:
+    - keep monthly real broad EER rows only
+    - aggregate monthly values to quarterly means
+    - require 12-quarter lag and 8-quarter forward observations
+variables:
+  outcome:
+    - name: fwd_reer_growth_8q
+      source: bis:WS_EER
+      transformation: 100 * log(real_broad_reer_t+8 / real_broad_reer_t)
+  treatment:
+    - name: large_reer_appreciation
+      source: bis:WS_EER
+      transformation: indicator(12-quarter log REER growth >= 15 percent)
+  controls:
+    - name: reer_appreciation_12q
+      source: bis:WS_EER
+      transformation: 100 * log(real_broad_reer_t / real_broad_reer_t-12)
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+falsification:
+  rule: >
+    Falsified if large three-year REER appreciations do not predict weaker
+    subsequent two-year REER growth after fixed effects, or if the raw
+    appreciation contrast is not economically negative.
+  test: bis_reer_appreciation_reversal_panel
+  threshold: >
+    Supported only if coefficient(large_reer_appreciation) <= -2.0 percentage
+    points with cluster-robust p <= 0.05, raw high-minus-normal mean outcome
+    <= -2.0 percentage points, at least 1200 observations, and at least 25
+    countries. Partial if exactly one of the regression or raw contrast gates
+    clears.
+prior_confidence: 0.66
+disclosure: >
+  REER appreciations can reflect equilibrium productivity, terms-of-trade, or
+  safe-haven shocks. The verdict is a short-horizon mean-reversion screen, not
+  proof of currency misalignment.
+steelman: hypotheses/steelman/bis_reer_appreciation_reversal_panel.md
+scope:
+  period: [1994, 2026]
+  countries: [GLOBAL]
+  outcome_dim: [currency_purchasing_power, capital_flows, monetary_policy]
+  policy_family: [monetary_policy, exchange_rate_regime]
+  treatment_tags:
+    - real_exchange_rate
+    - mean_reversion
+    - competitiveness
+notes: >
+  Runnable via engine/runs/bis_reer_appreciation_reversal_panel/replication.py.
+  Uses only pinned BIS vintages already on disk.

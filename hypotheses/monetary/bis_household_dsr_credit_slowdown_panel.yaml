@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_household_dsr_credit_slowdown_panel
+version: 1
+status: candidate
+topic: monetary
+claim: >
+  Household debt-service stress predicts subsequent private-credit slowdown.
+  In BIS panels, quarters where household DSR is both absolutely high and high
+  relative to that country's own history should be followed by weaker broad
+  private-credit-to-GDP growth over the next two years.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, ESP, DNK, SWE, NOR, KOR, FRA, DEU, ITA, NLD, BEL, CHE, PRT, MEX]
+  period: [1999, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-quarters missing household DSR
+    - drop country-quarters missing broad private credit/GDP CG_DTYPE=B
+    - require 8-quarter forward credit/GDP observations
+variables:
+  outcome:
+    - name: fwd_credit_growth_8q
+      source: bis:WS_CREDIT_GAP
+      transformation: CG_DTYPE=B at t+8 minus CG_DTYPE=B at t
+  treatment:
+    - name: high_household_dsr
+      source: bis:WS_DSR
+      transformation: indicator(DSR_BORROWERS=H >= 12 percent and >= country p75)
+  controls:
+    - name: household_dsr
+      source: bis:WS_DSR
+      transformation: level
+    - name: lag_credit_growth_8q
+      source: bis:WS_CREDIT_GAP
+      transformation: CG_DTYPE=B at t minus CG_DTYPE=B at t-8
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+falsification:
+  rule: >
+    Falsified if high household DSR stress does not predict slower subsequent
+    broad private-credit/GDP growth after fixed effects, or if the raw stress
+    contrast is not economically negative.
+  test: bis_household_dsr_credit_slowdown_panel
+  threshold: >
+    Supported only if coefficient(high_household_dsr) <= -2.0 percentage
+    points with cluster-robust p <= 0.05, raw high-minus-normal mean outcome
+    <= -2.0 percentage points, at least 500 observations, and at least 15
+    countries. Partial if exactly one of the regression or raw contrast gates
+    clears.
+prior_confidence: 0.62
+disclosure: >
+  Household DSR can rise because rates rise, income falls, or debt stocks rise;
+  the panel verdict should be read as predictive content for aggregate credit,
+  not as a clean structural decomposition of household cash-flow stress.
+steelman: hypotheses/steelman/bis_household_dsr_credit_slowdown_panel.md
+scope:
+  period: [1999, 2025]
+  countries: [OECD]
+  outcome_dim: [monetary_policy, financialisation]
+  policy_family: [monetary_policy, regulation]
+  treatment_tags:
+    - debt_service_ratio
+    - household_stress
+    - credit_slowdown
+notes: >
+  Runnable via engine/runs/bis_household_dsr_credit_slowdown_panel/replication.py.
+  Uses only pinned BIS vintages already on disk.
