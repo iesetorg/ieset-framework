@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mortgage_market_liberalisation_homeownership_panel
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  In a broad-country panel 1990-2020, mortgage-market liberalisation episodes
+  (abolition of interest-rate caps, reduction of down-payment requirements,
+  privatisation of state mortgage banks, and introduction of securitisation)
+  predict higher homeownership rates, higher residential investment as a share
+  of GDP, and lower housing-rent-to-income ratios, controlling for income
+  growth, demographic structure, and urbanisation. The directional claim is
+  that mortgage liberalisation is associated with at least a 3 percentage-point
+  increase in the homeownership rate and a 0.5 percentage-point increase in
+  residential investment/GDP within 5 years.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU, BGR, ROU, HRV, BRA, ARG, URY, CRI, DOM, ECU, GTM, HND, NIC, PAN, SLV, BOL, PRY, JOR, KWT, SAU, ARE, QAT, BHR, OMN, DZA, TUN, MAR, GHA, ETH, TZA, UGA, BWA, ZMB, ZWE, MOZ, EGY, NGA, KEN, BGD, PAK, VNM, THA, MYS, IDN, PHL, IND, CHN, RUS, UKR, KAZ, UZB, AZE, ARM, GEO, KGZ, MNG]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during banking crises (Laeven-Valencia systemic crisis indicator = 1)"
+    - "drop observations where homeownership rate exceeds 95% or is below 20% (measurement error)"
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [housing, capital_flows, financialisation]
+  policy_family: [regulation, privatisation_nationalisation, housing_policy]
+  treatment_tags: [mortgage_liberalisation, homeownership, financial_deregulation, housing_supply]
+
+variables:
+  outcome:
+    - name: homeownership_rate
+      source: "constructed: indicator = 1 for homeownership rate by country-year"
+      transformation: "level"
+      notes: "Homeownership rate %. Constructed from UN-Habitat, Eurostat, and national census data. v1 uses available WDI/UN cross-country estimates with explicit flag."
+    - name: residential_investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "level"
+      notes: "Gross fixed capital formation % GDP as proxy for residential investment."
+  treatment:
+    - name: mortgage_liberalisation_indicator
+      source: "constructed: indicator = 1 for USA from 1980; GBR from 1986; ESP from 1992; IRL from 1986; NLD from 1995; AUS from 1992; NZL from 1992; CHL from 1997; MEX from 1993; POL from 1995; HUN from 1995; CZE from 1995; EST from 1994; LVA from 1998; LTU from 1997; KOR from 1997; IND from 1991; CHN from 1998"
+      transformation: "indicator"
+      notes: "Mortgage liberalisation adoption dummy based on documented deregulation episodes. Covers major interest-rate and down-payment liberalisation waves."
+    - name: private_credit_depth
+      source: "world_bank_wdi:GFDD.DI.14"
+      transformation: "level"
+      notes: "Private credit to GDP %. Continuous proxy for financial development."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: urban_population_share
+      source: "world_bank_wdi:SP.URB.TOTL.IN.ZS"
+      transformation: "level"
+    - name: working_age_population_share
+      source: "world_bank_wdi:SP.POP.1564.TO.ZS"
+      transformation: "level"
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: "level"
+    - name: real_interest_rate
+      source: "world_bank_wdi:FR.INR.RINR"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Mortgage-market liberalisation is a regulatory-channel (financial-regulation)
+  intervention that relaxes credit constraints on housing demand.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with staggered adoption: homeownership = β0 + β1*mortgage
+    liberalisation + controls + FE. Robustness: (1) exclude USA and UK
+    (dominant liberalisation cases); (2) use synthetic control for each
+    adopter; (3) control for house-price growth to separate credit access
+    from asset-price effects; (4) subsample by initial financial depth;
+    (5) use 5-year forward averages to capture medium-run housing-stock
+    adjustment.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (mortgage liberalisation) is positive and significant at
+    p<0.10 for both homeownership and residential investment. PARTIAL if
+    positive and significant for homeownership but not investment (demand
+    reallocation without supply response). REFUTED if β1 is negative and
+    significant at p<0.10. INFORMATIVE: excluding USA and UK should not
+    eliminate the positive sign; if it does, the result is driven by Anglo-
+    Saxon cases.
+  test: panel_fe_mortgage_liberalisation_homeownership
+  threshold: >
+    β_mortgage_lib (homeownership) > 0 at p<=0.10  AND
+    β_mortgage_lib (residential investment) > 0 at p<=0.10  AND
+    Ex-USA-UK robustness retains positive sign.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author has market-liberal priors that may overweight the credit-access
+  mechanism. Prior is 0.55 because: (a) mortgage liberalisation often
+  produces house-price bubbles that reduce affordability for non-owners;
+  (b) homeownership gains may reflect debt-fuelled demand rather than
+   sustainable wealth accumulation. Framing risk: the hypothesis may be read
+   as endorsing pre-2008-style mortgage deregulation; the spec tests only
+   the average association and does not claim that all mortgage liberalisation
+   is welfare-improving.
+
+steelman: hypotheses/steelman/mortgage_market_liberalisation_homeownership_panel.md
+
+linked_hypotheses:
+  - housing_supply_freedom_affordability
+  - property_rights_mortgage_depth_home_access
+  - construction_competition_housing_cost

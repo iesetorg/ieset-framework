@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_product_market_deregulation_tfp_panel
+version: 1
+status: pre_registered
+topic: regulatory
+
+claim: >
+  In OECD and accession-country panels 1998-2019, reductions in the OECD PMR
+  overall product-market-regulation index predict higher subsequent TFP growth.
+  The directional claim is that a one-standard-deviation reduction in PMR
+  predicts at least 0.2 percentage points higher annual TFP growth over the
+  following 5-year window, controlling for initial TFP level, R&D intensity,
+  and human capital.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU]
+  period: [1998, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop observations with missing PMR or TFP data for more than 2 consecutive years"
+
+scope:
+  period: [1998, 2019]
+  countries: [OECD]
+  outcome_dim: [productivity, regulation_compliance_cost, competition_concentration]
+  policy_family: [regulation, competition_policy]
+  treatment_tags: [deregulation, product_market_regulation, tfp_growth, oecd_pmr]
+
+variables:
+  outcome:
+    - name: tfp_growth_annual
+      source: "pwt:rtfpna"
+      transformation: "log_diff_annual"
+      notes: "PWT TFP at constant national prices, annual log-difference. Primary outcome."
+    - name: labour_productivity_growth
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff_annual"
+      notes: "Real output per worker, annual log-difference. Secondary outcome."
+  treatment:
+    - name: oecd_pmr_overall_index
+      source: "oecd_pmr:PMR@DF_PMR_1.2"
+      transformation: "level"
+      notes: "OECD PMR overall index. Lower = less regulation. Inverted in regression so positive coefficient = growth from deregulation."
+    - name: oecd_pmr_barriers_to_entry
+      source: "oecd_pmr:PMR@DF_PMR_1.2"
+      transformation: "level"
+      notes: "Barriers to entry sub-component, where available."
+  controls:
+    - name: log_initial_tfp
+      source: "pwt:rtfpna"
+      transformation: "log"
+    - name: rd_expenditure_gdp
+      source: "oecd:DSD_PDB@DF_PDB_PT"
+      transformation: "level"
+      notes: "R&D expenditure % GDP. Pending OECD fetcher resolution; v1 uses WDI GB.XPD.RSDV.GD.ZS as fallback."
+    - name: human_capital_index
+      source: "pwt:hc"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Product-market regulation is a regulatory-channel intervention. The test
+  isolates the association between deregulation intensity and productivity
+  growth within the OECD regulatory-reform wave.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with 5-year forward growth windows to reduce
+    reverse-causality: TFP_growth(t+1 to t+5) = β0 + β1*PMR(t) + controls + FE.
+    Robustness: (1) use 1-year lags instead of 5-year windows; (2) exclude
+    the 2008-2009 crisis period; (3) use PMR sub-components (barriers to
+    entry, state control, barriers to trade) separately; (4) subsample by
+    initial income level.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (PMR, inverted) is positive and significant at p<0.05
+    for both TFP growth and labour productivity growth. PARTIAL if positive
+    and significant for TFP but not labour productivity. REFUTED if β1 is
+    negative and significant at p<0.05. INFORMATIVE: the result should survive
+    excluding the UK and New Zealand (dominant deregulation cases); if not,
+    it is a two-country story.
+  test: panel_fe_pmr_deregulation_tfp_oecd
+  threshold: >
+    β_PMR_inverted (TFP growth) > 0 at p<=0.05  AND
+    β_PMR_inverted (labour productivity) > 0 at p<=0.05  AND
+    Ex-UK-NZ robustness retains positive sign.
+
+prior_confidence: 0.60
+
+disclosure: >
+  Author has market-liberal priors that may overweight the deregulation-TFP
+  link from the OECD literature (Bourlès et al., Nicoletti-Scarpetta). Prior
+  is 0.60 because: (a) PMR reductions often coincide with technology adoption
+  waves that independently raise TFP; (b) the PMR index is coarse and may
+  miss enforcement variation. Framing risk: the hypothesis may be read as
+  endorsing zero regulation; the spec tests only the marginal association
+  across observed PMR variation.
+
+steelman: hypotheses/steelman/oecd_product_market_deregulation_tfp_panel.md
+
+linked_hypotheses:
+  - deregulation_productivity_effect
+  - competition_policy_enforcement_innovation
+  - frontier_tfp_market_liberal_panel_1970_2024

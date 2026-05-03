@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: flat_tax_reform_growth_panel
+version: 1
+status: pre_registered
+topic: fiscal
+
+claim: >
+  Countries that adopted a flat personal-income-tax regime between 1994 and
+  2012 experienced faster real GDP per capita growth in the decade following
+  reform than matched non-reforming peers, controlling for initial income,
+  institutional quality, and trade openness. The directional claim is that
+  flat-tax adoption is associated with at least 0.5 percentage points higher
+  annual real GDP per capita growth over the post-reform decade.
+
+evidence_type: associational
+
+sample:
+  countries: [EST, LVA, LTU, RUS, SRB, ROU, UKR, BGR, ALB, CZE, SVK, MKD, MNE, HUN, GEO, KAZ, KGZ, MNG]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active high-intensity civil conflict (UCDP intensity-2+)"
+    - "drop transition-economy years 1989-1994 for ex-communist countries where tax administration was in flux"
+    - "drop observations where real GDP pc growth exceeds 25% annually (data error or war recovery)"
+
+scope:
+  period: [1990, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, taxation, institutional_quality]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [flat_tax, tax_reform, supply_side, entrepreneurship]
+
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+      notes: "Annual real GDP per capita growth %. Primary outcome."
+    - name: real_gdp_per_capita_level
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+      notes: "Log real GDP per capita for convergence control."
+  treatment:
+    - name: flat_tax_adopter_indicator
+      source: "constructed: indicator = 1 for EST from 1994; LVA from 1997; LTU from 1994; RUS from 2001; SRB from 2003; ROU from 2005; UKR from 2004; BGR from 2008; ALB from 2008; CZE from 2008; SVK from 2004; MKD from 2007; MNE from 2007; HUN from 2012; GEO from 2005; KAZ from 2007; KGZ from 2006; MNG from 2007"
+      transformation: "indicator"
+      notes: "Flat-tax adoption dummy based on documented reform dates."
+    - name: years_since_flat_tax
+      source: "constructed: indicator = 1 for EST from 1994; LVA from 1997; LTU from 1994; RUS from 2001; SRB from 2003; ROU from 2005; UKR from 2004; BGR from 2008; ALB from 2008; CZE from 2008; SVK from 2004; MKD from 2007; MNE from 2007; HUN from 2012; GEO from 2005; KAZ from 2007; KGZ from 2006; MNG from 2007"
+      transformation: "years_since"
+      notes: "Linear trend since reform to capture dynamic adjustment."
+  controls:
+    - name: log_initial_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: "level"
+    - name: investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "level"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Flat-tax reform is a fiscal-channel (tax-policy) intervention that reduces
+  marginal rates, simplifies compliance, and broadens the base.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with staggered adoption: growth = β0 + β1*flat_tax +
+    β2*years_since + controls + FE. Robustness: (1) exclude Russia and Estonia
+    (dominant early adopters); (2) use synthetic control for each adopter vs
+    matched non-adopters; (3) subsample by OECD vs non-OECD; (4) use Fraser
+    EFW tax-burden sub-index as continuous alternative treatment.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (flat-tax indicator) is positive and significant at p<0.10
+    and the post-reform decade mean growth gap vs synthetic counterfactual is
+    at least 0.3 pp/year. PARTIAL if positive and significant in FE but not in
+    synthetic-control estimates. REFUTED if β1 is negative and significant at
+    p<0.10. INFORMATIVE: excluding Russia and Estonia should not eliminate the
+    positive sign; if it does, the result is driven by two dominant cases.
+  test: panel_fe_flat_tax_growth_staggered_adoption
+  threshold: >
+    β_flat_tax (GDP pc growth) > 0 at p<=0.10  AND
+    Synthetic-control post-reform gap >= 0.30 pp/yr  AND
+    Ex-Russia-Estonia robustness retains positive sign.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author has market-liberal priors that may overweight supply-side growth
+  effects of marginal-rate reductions. Prior is 0.55 because: (a) flat-tax
+  adopters are mostly transition economies where growth accelerations may
+  reflect convergence or EU accession rather than tax reform; (b) the revenue
+  losses from flat taxes can force spending cuts that themselves affect growth.
+  Framing risk: the hypothesis may be read as endorsing flat taxes for all
+  countries; the spec tests only the average growth association in the observed
+  reform episodes.
+
+steelman: hypotheses/steelman/flat_tax_reform_growth_panel.md
+
+linked_hypotheses:
+  - tax_inequality_estonia_1994_flat_tax_dividend_reform
+  - tax_inequality_russia_2001_flat_tax_13pct
+  - tax_simplicity_entrepreneurship_panel

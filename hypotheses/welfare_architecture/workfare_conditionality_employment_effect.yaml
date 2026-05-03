@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: workfare_conditionality_employment_effect
+version: 1
+status: pre_registered
+topic: welfare_architecture
+
+claim: >
+  In a broad-country panel 1990-2020, the introduction of workfare or activity-
+  conditional welfare programmes (requiring job search, training, or community
+  work in exchange for benefits) predicts higher employment-to-population ratios
+  and lower long-run unemployment relative to unconditional transfer regimes,
+  controlling for cyclical conditions and institutional quality. The directional
+  claim is that workfare adoption is associated with at least a 1.5 percentage-
+  point increase in the employment-to-population ratio within 5 years of
+  implementation.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU, BGR, ROU, HRV, NLD, AUS, NZL, CAN, IRL]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop transition-economy years 1989-1994 where programme administration was in flux"
+
+scope:
+  period: [1990, 2020]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [workfare, conditionality, welfare_reform, active_labour_market_policy]
+
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: "ilostat:EMP_2EMP_SEX_AGE_RT_A"
+      transformation: "level"
+      notes: "ILO employment-to-population ratio, ages 15-64 where available. Primary outcome."
+    - name: long_term_unemployment_rate
+      source: "ilostat:UNE_2EAP_SEX_AGE_RT_A"
+      transformation: "level"
+      notes: "ILO unemployment rate as proxy for long-term unemployment. Secondary outcome."
+  treatment:
+    - name: workfare_programme_indicator
+      source: "constructed: indicator = 1 for USA from 1996; GBR from 1996; DEU from 2005; NLD from 2004; AUS from 1998; NZL from 1998; CAN from 1996; DNK from 1994; SWE from 2007; NOR from 2007; FIN from 2006"
+      transformation: "indicator"
+      notes: "Workfare or strong conditionality adoption dummy. Covers PRWORA (USA), JSA reforms (UK), Hartz IV (DEU), Re-integratie (NL), Mutual Obligation (AUS), welfare reforms (NZL, CAN)."
+    - name: years_since_workfare
+      source: "constructed: indicator = 1 for USA from 1996; GBR from 1996; DEU from 2005; NLD from 2004; AUS from 1998; NZL from 1998; CAN from 1996; DNK from 1994; SWE from 2007; NOR from 2007; FIN from 2006"
+      transformation: "years_since"
+      notes: "Linear trend since reform to capture dynamic adjustment."
+  controls:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "level"
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: working_age_population_share
+      source: "world_bank_wdi:SP.POP.1564.TO.ZS"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: social_expenditure_gdp
+      source: "world_bank_wdi:GC.XPN.TOTL.GD.ZS"
+      transformation: "level"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Workfare conditionality is a fiscal-channel (transfer-policy design)
+  intervention that changes the eligibility rules for welfare receipt.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with staggered adoption: employment = β0 + β1*workfare +
+    β2*years_since + controls + FE. Robustness: (1) exclude USA and UK
+    (dominant early adopters); (2) use synthetic control for each adopter vs
+    matched non-adopters; (3) subsample by initial unemployment level; (4)
+    control for ALMP spending intensity to separate conditionality from spending.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (workfare) is positive and significant at p<0.10 for
+    employment-to-population and negative for unemployment. PARTIAL if
+    positive and significant for employment but not unemployment (participation
+    gain without unemployment reduction). REFUTED if β1 is negative and
+    significant at p<0.10. INFORMATIVE: excluding USA and UK should not
+    eliminate the positive sign; if it does, the result is driven by Anglo-
+    Saxon cases.
+  test: panel_fe_workfare_conditionality_employment
+  threshold: >
+    β_workfare (employment/pop) > 0 at p<=0.10  AND
+    β_workfare (unemployment) < 0 at p<=0.10  AND
+    Ex-USA-UK robustness retains positive sign.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author has market-liberal priors that may overweight the work-discipline
+  effect of conditionality. Prior is 0.55 because: (a) workfare programmes
+  often shift workers into low-quality, unstable jobs rather than sustainable
+  employment; (b) the observed correlation may reflect macroeconomic booms
+  coinciding with reform timing. Framing risk: the hypothesis may be read as
+  endorsing punitive welfare regimes; the spec tests only the average
+  employment association and does not claim that conditionality is optimal
+  for all social protection systems.
+
+steelman: hypotheses/steelman/workfare_conditionality_employment_effect.md
+
+linked_hypotheses:
+  - welfare_reform_prwora_single_mother_employment
+  - welfare_reform_germany_hartz_iv_unemployment_consolidation
+  - welfare_reform_new_zealand_1991_benefit_cuts_effect

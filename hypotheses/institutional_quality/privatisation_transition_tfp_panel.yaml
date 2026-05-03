@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: privatisation_transition_tfp_panel
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  In post-communist transition-economy panels 1990-2015, countries that
+  implemented rapid mass-privatisation programmes (voucher privatisation,
+  direct sales to insiders, and rapid SOE liquidation) experienced faster
+  TFP growth recovery in the decade following reform than countries that
+  pursued gradual or partial state-retention strategies, controlling for
+  initial income, EU accession candidacy, and institutional quality. The
+  directional claim is that mass-privatisation adoption is associated with
+  at least 0.5 percentage points higher annual TFP growth over the post-
+  reform decade.
+
+evidence_type: associational
+
+sample:
+  countries: [EST, LVA, LTU, POL, CZE, SVK, HUN, SVN, HRV, BGR, ROU, ALB, BIH, MKD, MNE, SRB, UKR, BLR, RUS, KAZ, UZB, AZE, ARM, GEO, KGZ, TJK, TKM, MNG, MDA]
+  period: [1990, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active high-intensity civil conflict (UCDP intensity-2+)"
+    - "drop observations where TFP growth exceeds 25% annually (data error or base effect)"
+
+scope:
+  period: [1990, 2015]
+  countries: [GLOBAL]
+  outcome_dim: [productivity, institutional_quality]
+  policy_family: [privatisation_nationalisation, institutional_reform]
+  treatment_tags: [mass_privatisation, transition_economies, soe_reform, tfp_growth]
+
+variables:
+  outcome:
+    - name: tfp_growth_annual
+      source: "pwt:rtfpna"
+      transformation: "log_diff_annual"
+      notes: "PWT TFP at constant national prices, annual log-difference. Primary outcome."
+    - name: labour_productivity_growth
+      source: "pwt:rgdpo_per_emp"
+      transformation: "log_diff_annual"
+      notes: "Real output per worker, annual log-difference. Secondary outcome."
+  treatment:
+    - name: mass_privatisation_indicator
+      source: "constructed: indicator = 1 for EST from 1993; LVA from 1994; LTU from 1995; CZE from 1992; SVK from 1992; POL from 1994; HUN from 1995; RUS from 1992; UKR from 1994; KAZ from 1993; GEO from 1994; ARM from 1994; ALB from 1995"
+      transformation: "indicator"
+      notes: "Mass-privatisation dummy based on documented voucher/sale programmes. Gradual reformers (BLR, UZB, TKM, MNG) remain 0."
+    - name: eu_accession_candidate
+      source: "constructed: indicator = 1 for POL from 1994; CZE from 1996; SVK from 1995; HUN from 1994; SVN from 1996; EST from 1995; LVA from 1995; LTU from 1995; BGR from 1995; ROU from 1995; HRV from 1996"
+      transformation: "indicator"
+      notes: "EU accession candidacy dummy to control for institutional anchor effect."
+  controls:
+    - name: log_initial_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: "level"
+    - name: investment_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  Mass privatisation is an institutional-channel intervention that reassigns
+  property rights from the state to private owners, changing incentives for
+  efficiency and innovation.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with staggered adoption: TFP_growth = β0 + β1*mass_priv +
+    β2*EU_candidate + controls + FE. Robustness: (1) exclude Russia (dominant
+    mass-privatisation case); (2) use synthetic control for each privatiser vs
+    matched gradualist; (3) control for war/conflict exposure; (4) separate
+    voucher privatisation from direct sales; (5) use 5-year non-overlapping
+    averages to reduce noise.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (mass privatisation) is positive and significant at p<0.10
+    for TFP growth and larger than the EU-candidacy coefficient. PARTIAL if
+    positive and significant but smaller than EU candidacy (institutional
+    anchor dominates ownership reform). REFUTED if β1 is negative and
+    significant at p<0.10. INFORMATIVE: excluding Russia should not eliminate
+    the positive sign; if it does, the result is driven by one dominant case.
+  test: panel_fe_mass_privatisation_tfp_transition
+  threshold: >
+    β_mass_priv (TFP growth) > 0 at p<=0.10  AND
+    β_mass_priv > β_EU_candidate  AND
+    Ex-Russia robustness retains positive sign.
+
+prior_confidence: 0.50
+
+disclosure: >
+  Author is neutral (0.50). The transition-economy literature (e.g. Djankov-
+  Murrell meta-analysis) finds mixed results: privatisation to outsiders
+   raises productivity but insider privatisation often does not. Prior is not
+   higher because: (a) mass privatisation often produced fragmented ownership
+   and weak corporate governance; (b) EU accession candidacy confounds the
+   ownership effect with institutional convergence. Framing risk: the
+   hypothesis may be read as endorsing shock-therapy privatisation; the spec
+   tests only the average TFP association and does not claim that speed is
+   optimal for all countries.
+
+steelman: hypotheses/steelman/privatisation_transition_tfp_panel.md
+
+linked_hypotheses:
+  - china_soe_vs_cee_privatised_growth
+  - gradualist_vs_shock_therapy_transition_outcomes
+  - post_soviet_transition_institutional_variation

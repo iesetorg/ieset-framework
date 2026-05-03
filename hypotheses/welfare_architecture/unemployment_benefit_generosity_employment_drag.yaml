@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: unemployment_benefit_generosity_employment_drag
+version: 1
+status: pre_registered
+topic: welfare_architecture
+
+claim: >
+  In a broad-country panel 1990-2019, higher unemployment-benefit generosity
+  (proxied by public social expenditure on unemployment programmes as a share
+  of GDP and by the OECD net replacement rate where available) predicts lower
+  employment-to-population ratios and higher structural unemployment,
+  controlling for cyclical conditions, institutional quality, and demographic
+  structure. The directional claim is that a 5 percentage-point increase in
+  net replacement rate is associated with at least a 1 percentage-point
+  decrease in the employment-to-population ratio.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU, BGR, ROU, HRV, GRC]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop observations with unemployment benefit expenditure > 5% of GDP (likely measurement error or crisis spike)"
+
+scope:
+  period: [1990, 2019]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [unemployment_benefits, replacement_rate, work_incentives, moral_hazard]
+
+variables:
+  outcome:
+    - name: employment_to_population_ratio
+      source: "ilostat:EMP_2EMP_SEX_AGE_NB"
+      transformation: "level"
+      notes: "ILO employment-to-population ratio. Primary outcome."
+    - name: unemployment_rate
+      source: "ilostat:UNE_2EAP_SEX_AGE_RT_A"
+      transformation: "level"
+      notes: "ILO unemployment rate. Secondary outcome."
+  treatment:
+    - name: unemployment_benefit_expenditure_gdp
+      source: "oecd:DSD_SOCX@DF_SOCX_AGG"
+      transformation: "level"
+      notes: "OECD social expenditure on unemployment programmes % GDP. Pending precise sub-component fetcher; v1 uses aggregate social expenditure as proxy with explicit flag."
+    - name: social_expenditure_gdp
+      source: "world_bank_wdi:GC.XPN.TOTL.GD.ZS"
+      transformation: "level"
+      notes: "Fallback: general government expenditure % GDP as proxy for benefit generosity in non-OECD sample."
+  controls:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "level"
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: working_age_population_share
+      source: "world_bank_wdi:SP.POP.1564.TO.ZS"
+      transformation: "level"
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Unemployment benefits are a fiscal-channel (transfer-policy) intervention.
+  The test isolates the work-incentive effect of benefit generosity from the
+  macro-stabilisation effect.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel: employment = β0 + β1*benefit_generosity + controls + FE.
+    Robustness: (1) exclude Nordic countries (dominant high-benefit cases);
+    (2) use 5-year non-overlapping averages to capture structural rather than
+    cyclical unemployment; (3) instrument benefit generosity with left-party
+    government seat share (political-economy instrument); (4) subsample by
+    EPL strictness (generosity may matter less when firing is already costly).
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (benefit generosity) is negative and significant at p<0.10
+    for both employment-to-population and unemployment rate. PARTIAL if
+    negative and significant for unemployment but not employment (search-
+    duration effect without exit reduction). REFUTED if β1 is positive and
+    significant at p<0.10. INFORMATIVE: excluding Nordic countries should not
+    eliminate the negative sign; if it does, the result is driven by the
+    Nordic model.
+  test: panel_fe_unemployment_benefit_employment_drag
+  threshold: >
+    β_benefit (employment/pop) < 0 at p<=0.10  AND
+    β_benefit (unemployment) > 0 at p<=0.10  AND
+    Ex-Nordic robustness retains sign.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author has market-liberal priors that may overweight the moral-hazard
+  mechanism. Prior is 0.55 because: (a) generous benefits may improve job
+  match quality and reduce poverty traps; (b) the observed correlation may
+  reflect that high-unemployment countries expand benefits as a response,
+  not a cause. Framing risk: the hypothesis may be read as endorsing zero
+  unemployment benefits; the spec tests only the marginal association across
+  observed generosity levels.
+
+steelman: hypotheses/steelman/unemployment_benefit_generosity_employment_drag.md
+
+linked_hypotheses:
+  - welfare_reform_prwora_single_mother_employment
+  - welfare_reform_germany_hartz_iv_unemployment_consolidation
+  - transfer_expansion_work_incentive_long_run
