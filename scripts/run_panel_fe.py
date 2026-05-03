@@ -799,6 +799,20 @@ def construct_variable_from_text(
                 country = normalise_country_code(raw_country)
                 if country:
                     apply_assignment({country}, int(raw_year))
+            continue
+
+        # Handle "post-YYYY year" / "post YYYY" patterns (e.g. "binary by country and post-2007 year")
+        post_year_match = re.search(r"post[-\s]*(\d{4})(?:\s+year)?", segment, flags=re.I)
+        if post_year_match:
+            targets = _expand_constructed_country_targets(segment, sample_countries)
+            # Filter to actual ISO3 codes present in sample
+            valid_targets = {t for t in targets if t in sample_countries}
+            if valid_targets:
+                apply_assignment(valid_targets, int(post_year_match.group(1)))
+            else:
+                # No specific countries found — apply to all sample countries
+                apply_assignment(set(sample_countries), int(post_year_match.group(1)))
+            continue
 
         m = re.search(r"^(.*?)\s+years?\s*>=\s*(\d{4})", segment, flags=re.I)
         if m:
@@ -1551,7 +1565,7 @@ _ID_SUFFIX_DIR = {
 }
 
 
-def infer_claim_direction(spec: dict) -> str:
+def infer_claim_direction(spec: dict, outcome_name: str | None = None) -> str:
     """Return '+' / '-' / '?' for the first-sentence prediction direction.
 
     Strategy:
@@ -1579,6 +1593,39 @@ def infer_claim_direction(spec: dict) -> str:
             return "-"
 
     import re as _re
+
+    # Free-form legacy rules often say the decisive sign directly, even when
+    # they predate machine-readable threshold.expected_sign. Prefer that text
+    # before claim-sentence heuristics.
+    rule = ((spec.get("falsification") or {}).get("rule") or "").lower()
+    supported_clause = ""
+    if "supported if" in rule:
+        supported_clause = rule.split("supported if", 1)[1]
+        supported_clause = re.split(
+            r"\b(?:partial|refuted|otherwise|informative)\s+if\b|\binformative:",
+            supported_clause,
+            maxsplit=1,
+        )[0]
+    outcome_lc = (outcome_name or "").lower()
+    if supported_clause:
+        if "unemployment" in outcome_lc:
+            if _re.search(r"\bnegative\b.{0,120}\bunemployment\b|\bunemployment\b.{0,120}<\s*0", supported_clause):
+                return "-"
+            if _re.search(r"\bpositive\b.{0,120}\bunemployment\b|\bunemployment\b.{0,120}>\s*0", supported_clause):
+                return "+"
+        if "employment" in outcome_lc and "unemployment" not in outcome_lc:
+            if _re.search(r"\bnegative\b.{0,120}\bemployment\b|\bemployment\b.{0,120}<\s*0", supported_clause):
+                return "-"
+            if _re.search(r"\bpositive\b.{0,120}\bemployment\b|\bemployment\b.{0,120}>\s*0", supported_clause):
+                return "+"
+        if _re.search(r"(?:β|beta|coefficient|coef)[^.;:]{0,120}\bnegative\b", supported_clause):
+            return "-"
+        if _re.search(r"(?:β|beta|coefficient|coef)[^.;:]{0,120}\bpositive\b", supported_clause):
+            return "+"
+        if _re.search(r"(?:β|beta|coefficient|coef|gap)[^.;:]{0,80}<\s*0", supported_clause):
+            return "-"
+        if _re.search(r"(?:β|beta|coefficient|coef|gap)[^.;:]{0,80}>\s*0", supported_clause):
+            return "+"
 
     # 1. Slug-suffix shortcut. Many hypothesis_ids encode direction.
     hid = (spec.get("hypothesis_id") or "").lower()
@@ -1612,6 +1659,12 @@ def verdict_from_estimate(est: dict, claim_dir: str) -> tuple[str, str]:
         return "INCONCLUSIVE_DATA_PENDING", est["error"]
     coef = est["coefficient"]
     pval = est["p_value"]
+    if not np.isfinite(pval):
+        return ("PARTIAL",
+                f"coef={coef:+.4g}, p=nan; standard error/p-value not estimable")
+    if abs(coef) < 1e-12:
+        return ("PARTIAL",
+                f"coef={coef:+.4g}, p={pval:.3g}; effect magnitude effectively zero")
     sign = "+" if coef >= 0 else "-"
     alpha = 0.10
     if pval < alpha:
@@ -1890,7 +1943,7 @@ def run_one(
         treatment_name,
         extra_regressors=extra_regressors,
     )
-    claim_dir = infer_claim_direction(spec)
+    claim_dir = infer_claim_direction(spec, outcome_name)
     verdict, reason = verdict_from_estimate(est, claim_dir)
     write_outputs(hid, spec, status, est, verdict, reason)
 
