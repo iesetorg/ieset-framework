@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: efw_market_panel_size_government_gross_savings_share_20260503
+version: 1
+status: pre_registered
+topic: fiscal
+claim: Across a pre-registered panel of EFW-covered OECD and major-market economies from 1970 to 2023, higher size-of-government
+  freedom scores predict higher domestic savings shares after country and year fixed effects and basic macro controls.
+  This is a hypothesis-only evidence-building test and does not create school-scoreboard links.
+methodology_note: Free-market panel wave using local Fraser EFW and WDI vintages. The sample, variables, expected
+  direction, and decision rule are registered before estimation; all null and contrary results count.
+evidence_type: associational
+sample:
+  countries:
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BGD
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - EGY
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KEN
+  - KOR
+  - LTU
+  - LVA
+  - MAR
+  - MEX
+  - MYS
+  - NGA
+  - NLD
+  - NOR
+  - NZL
+  - PAK
+  - PER
+  - PHL
+  - POL
+  - PRT
+  - ROU
+  - RUS
+  - SAU
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - UKR
+  - URY
+  - USA
+  - VNM
+  - ZAF
+  period:
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat as associational evidence unless a later causal/event design is registered
+scope:
+  period:
+  - 1970
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - capital_flows
+  - gdp_growth
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - smaller_government
+  - tax_burden
+  - fiscal_freedom
+variables:
+  outcome:
+  - name: gross_savings_share
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: level
+    notes: gross domestic savings as a share of GDP
+  treatment:
+  - name: efw_size_of_government_score
+    source: fraser_efw:size_of_government
+    transformation: level
+    notes: Fraser EFW size-of-government score
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: trade_openness_control
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: External-openness control.
+  - name: inflation_control
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: level
+    notes: Monetary-instability control.
+intervention_channel: fiscal
+intervention_channel_justification: The treatment uses Fraser EFW size-of-government score as a time-varying policy/institutional
+  proxy, not a movement label or ex-post outcome screen.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Two-way fixed effects with country-clustered standard errors.
+falsification:
+  rule: SUPPORTED if the coefficient on efw_size_of_government_score is positively signed at p<0.10 with at least
+    30 usable observations after listwise deletion. REFUTED if the coefficient is significantly opposite-signed
+    at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_efw_market_panel_size_government_gross_savings_share_20260503
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.54
+disclosure: This wave prioritizes throughput using broad but policy-relevant EFW proxies. A supported result is
+  an associational screen, not a final causal claim; event-study upgrades can be registered later.
+steelman: hypotheses/steelman/efw_market_panel_size_government_gross_savings_share_20260503.md
+notes: Hypothesis-only EFW/free-market panel test; no school-scoreboard linkage is asserted.
