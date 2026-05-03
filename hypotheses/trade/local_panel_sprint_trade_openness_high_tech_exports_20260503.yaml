@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: local_panel_sprint_trade_openness_high_tech_exports_20260503
+version: 1
+status: pre_registered
+topic: trade
+claim: Across a pre-registered panel of OECD and major emerging-market economies from 1996 to 2023, higher trade
+  openness predict higher high-technology export intensity after country and year fixed effects and basic macro
+  controls. This sprint test uses only local vintages and does not create school-scoreboard links.
+methodology_note: High-throughput local-data sprint wave. The spec is registered before estimation, uses only already-local
+  vintages, and deliberately omits position covers_claims so hypothesis testing can advance without creating fragile
+  school-scoreboard mappings.
+evidence_type: associational
+sample:
+  countries:
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - EGY
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KEN
+  - KOR
+  - LTU
+  - LVA
+  - MAR
+  - MEX
+  - MYS
+  - NGA
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - PHL
+  - POL
+  - PRT
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - URY
+  - USA
+  - ZAF
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat as associational evidence unless a later causal design is registered
+scope:
+  period:
+  - 1996
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - industrial_capability
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  - competition_policy
+  treatment_tags:
+  - trade_openness
+  - market_access
+  - competition
+variables:
+  outcome:
+  - name: high_tech_exports
+    source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+    transformation: level
+    notes: high-technology exports as a share of manufactured exports
+  treatment:
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: trade openness
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: government_consumption_control
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: Fiscal-demand control.
+intervention_channel: regulatory
+intervention_channel_justification: The treatment operationalizes trade openness as a time-varying policy or institutional
+  proxy rather than an ex-post result screen.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Two-way fixed effects with country-clustered standard errors.
+falsification:
+  rule: SUPPORTED if the coefficient on trade_openness is positively signed at p<0.10 with at least 30 usable observations
+    after listwise deletion. REFUTED if the coefficient is significantly opposite-signed at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_local_panel_sprint_trade_openness_high_tech_exports_20260503
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.55
+disclosure: This sprint intentionally prioritizes throughput and may include broad proxies. Favorable selection
+  risk is handled by committing the hypothesis, variables, sample, and direction before estimation; null and contrary
+  results count.
+steelman: hypotheses/steelman/local_panel_sprint_trade_openness_high_tech_exports_20260503.md
+notes: Hypothesis-only sprint test; no school-scoreboard linkage is asserted.
