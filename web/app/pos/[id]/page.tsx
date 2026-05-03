@@ -483,16 +483,26 @@ export default async function PositionPage({
 function ScoreBar({
   s,
 }: {
-  s: { total_claims: number; supports: number; refutes: number; partial: number; untested: number };
+  s: {
+    total_claims: number;
+    supports: number;
+    refutes: number;
+    partial_supports: number;
+    partial_refutes: number;
+    partial: number;
+    untested: number;
+  };
 }) {
   const total = s.total_claims;
   const seg = (n: number) => `${(n / total) * 100}%`;
   return (
     <div className="flex h-[8px] w-full">
-      <div style={{ background: "#2c7a4f", width: seg(s.supports) }} />
-      <div style={{ background: "#b7791f", width: seg(s.partial) }} />
-      <div style={{ background: "#9e2f2f", width: seg(s.refutes) }} />
-      <div style={{ background: "#e8e6e0", width: seg(s.untested) }} />
+      <div style={{ background: "#2c7a4f", width: seg(s.supports) }} title={`supports: ${s.supports}`} />
+      <div style={{ background: "#a8d4b5", width: seg(s.partial_supports) }} title={`partial+: ${s.partial_supports}`} />
+      <div style={{ background: "#b7791f", width: seg(s.partial) }} title={`neutral partial: ${s.partial}`} />
+      <div style={{ background: "#e3b5b0", width: seg(s.partial_refutes) }} title={`partial-: ${s.partial_refutes}`} />
+      <div style={{ background: "#9e2f2f", width: seg(s.refutes) }} title={`refutes: ${s.refutes}`} />
+      <div style={{ background: "#e8e6e0", width: seg(s.untested) }} title={`untested: ${s.untested}`} />
     </div>
   );
 }
