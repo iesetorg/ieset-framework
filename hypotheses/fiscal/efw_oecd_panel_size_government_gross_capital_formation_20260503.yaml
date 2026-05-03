@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: efw_oecd_panel_size_government_gross_capital_formation_20260503
+version: 1
+status: pre_registered
+topic: fiscal
+claim: Across a narrower pre-registered OECD and market-economy peer panel from 1970 to 2023, higher size-of-government
+  freedom scores predict higher gross-capital-formation shares after country and year fixed effects plus lean income
+  and demographic controls. This is a hypothesis-only screen and does not create school-scoreboard links.
+methodology_note: Lean EFW panel wave using local Fraser EFW and WDI vintages. This wave deliberately uses fewer
+  countries and fewer controls than the broad market panel to reduce preventable listwise-deletion failures; the
+  sample, variables, expected direction, and threshold are registered before estimation.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - ROU
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - URY
+  - USA
+  - ZAF
+  period:
+  - 1970
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat as associational evidence unless a later causal/event design is registered
+scope:
+  period:
+  - 1970
+  - 2023
+  countries:
+  - OECD
+  - GLOBAL
+  outcome_dim:
+  - capital_flows
+  - gdp_growth
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - smaller_government
+  - tax_burden
+  - fiscal_freedom
+variables:
+  outcome:
+  - name: gross_capital_formation
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: level
+    notes: gross capital formation as a share of GDP
+  treatment:
+  - name: efw_size_of_government_score
+    source: fraser_efw:size_of_government
+    transformation: level
+    notes: Fraser EFW size-of-government score
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+intervention_channel: fiscal
+intervention_channel_justification: The treatment uses Fraser EFW size-of-government score as a time-varying policy/institutional
+  proxy, not a movement label or ex-post outcome screen.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Two-way fixed effects with country-clustered standard errors.
+falsification:
+  rule: SUPPORTED if the coefficient on efw_size_of_government_score is positively signed at p<0.10 with at least
+    30 usable observations after listwise deletion. REFUTED if the coefficient is significantly opposite-signed
+    at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_efw_oecd_panel_size_government_gross_capital_formation_20260503
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.54
+disclosure: The design prioritizes throughput but preserves preregistration. Supported results are broad associational
+  screens; null and contrary results count against the registered proxy.
+steelman: hypotheses/steelman/efw_oecd_panel_size_government_gross_capital_formation_20260503.md
+notes: Hypothesis-only lean EFW/OECD-market panel test; no school-scoreboard linkage is asserted.
