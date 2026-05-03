@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_order_capital_account_openness_private_investment_share_panel
+version: 1
+status: pre_registered
+topic: trade
+claim: Across a pre-registered narrower OECD/market-peer panel from 1996 to 2021, more open capital accounts predict
+  higher private fixed-investment shares after country and year fixed effects and basic macro controls. This tests
+  the capital mobility, allocative-efficiency, and external-discipline channels as a second-wave market-order hypothesis
+  rather than reusing the Heritage latest-year cross-section.
+methodology_note: Second-wave market-order pre-registration. This spec narrows the country sample to OECD and market-peer
+  economies to improve panel completeness while preserving a pre-run fixed sample, variables, direction, and reciprocal
+  position links.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - USA
+  period:
+  - 1996
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat this as associational evidence unless a later event-study or DiD design is registered
+scope:
+  period:
+  - 1996
+  - 2021
+  countries:
+  - OECD
+  outcome_dim:
+  - gdp_growth
+  - capital_flows
+  policy_family:
+  - trade_policy
+  - exchange_rate_regime
+  - regulation
+  treatment_tags:
+  - capital_account_openness
+  - financial_openness
+  - market_access
+variables:
+  outcome:
+  - name: private_investment_share
+    source: world_bank_wdi:NE.GDI.FPRV.ZS
+    transformation: level
+    notes: private fixed investment as a share of GDP
+  treatment:
+  - name: capital_account_openness
+    source: chinn_ito:kaopen_index_normalized
+    transformation: level
+    notes: Chinn-Ito normalized capital-account openness
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control to reduce development-level bias.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: government_consumption_control
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: Fiscal-demand control; omitted for fiscal stance and fiscal-size treatments.
+intervention_channel: regulatory
+intervention_channel_justification: The treatment operationalizes Chinn-Ito normalized capital-account openness
+  as a time-varying policy or institutional channel, not an ex-post outcome screen.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Primary test is two-way fixed effects with country-clustered standard errors. This is a registered associational
+    hurdle; causal promotion requires a sharper subsequent design.
+falsification:
+  rule: SUPPORTED if the coefficient on capital_account_openness is positively signed at p<0.10 with at least 30
+    usable observations after listwise deletion. REFUTED if the coefficient is significantly opposite-signed at
+    p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_order_capital_account_openness_private_investment_share_panel
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.55
+disclosure: The author is actively stress-testing free-market, Austrian, and ordoliberal claims. Favorable selection
+  risk is handled by recording the claim, sample, variables, direction, and position links before estimation; null
+  or contrary results count.
+steelman: hypotheses/steelman/market_order_capital_account_openness_private_investment_share_panel.md
+covers_claims:
+- position_id: austrian
+  claim_index: 115
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: classical_liberal
+  claim_index: 139
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: ordoliberal
+  claim_index: 127
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: empirical_pragmatist
+  claim_index: 124
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+notes: Second-wave market-order panel test. Do not edit v1 after first run.

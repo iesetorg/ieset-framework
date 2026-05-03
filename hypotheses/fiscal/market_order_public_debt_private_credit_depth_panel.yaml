@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_order_public_debt_private_credit_depth_panel
+version: 1
+status: pre_registered
+topic: fiscal
+claim: Across a pre-registered narrower OECD/market-peer panel from 1996 to 2021, larger public-debt shares predict
+  shallower private credit intermediation after country and year fixed effects and basic macro controls. This tests
+  the debt-overhang, future-tax-expectation, and sovereign-risk channels as a second-wave market-order hypothesis
+  rather than reusing the Heritage latest-year cross-section.
+methodology_note: Second-wave market-order pre-registration. This spec narrows the country sample to OECD and market-peer
+  economies to improve panel completeness while preserving a pre-run fixed sample, variables, direction, and reciprocal
+  position links.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - USA
+  period:
+  - 1996
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat this as associational evidence unless a later event-study or DiD design is registered
+scope:
+  period:
+  - 1996
+  - 2021
+  countries:
+  - OECD
+  outcome_dim:
+  - financialisation
+  - capital_flows
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - public_debt
+  - debt_overhang
+  - fiscal_prudence
+variables:
+  outcome:
+  - name: private_credit_depth
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: level
+    notes: domestic credit to the private sector as a share of GDP
+  treatment:
+  - name: public_debt_share
+    source: world_bank_wdi:GC.DOD.TOTL.GD.ZS
+    transformation: level
+    notes: central government debt as a share of GDP
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control to reduce development-level bias.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: trade_openness_control
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: Goods-and-services openness control; omitted when external openness is the treatment.
+intervention_channel: fiscal
+intervention_channel_justification: The treatment operationalizes central government debt as a share of GDP as a
+  time-varying policy or institutional channel, not an ex-post outcome screen.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Primary test is two-way fixed effects with country-clustered standard errors. This is a registered associational
+    hurdle; causal promotion requires a sharper subsequent design.
+falsification:
+  rule: SUPPORTED if the coefficient on public_debt_share is negatively signed at p<0.10 with at least 30 usable
+    observations after listwise deletion. REFUTED if the coefficient is significantly opposite-signed at p<0.10.
+    Otherwise PARTIAL.
+  test: panel_fe_market_order_public_debt_private_credit_depth_panel
+  threshold:
+    expected_sign: '-'
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.52
+disclosure: The author is actively stress-testing free-market, Austrian, and ordoliberal claims. Favorable selection
+  risk is handled by recording the claim, sample, variables, direction, and position links before estimation; null
+  or contrary results count.
+steelman: hypotheses/steelman/market_order_public_debt_private_credit_depth_panel.md
+covers_claims:
+- position_id: austrian
+  claim_index: 125
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: ordoliberal
+  claim_index: 137
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: classical_liberal
+  claim_index: 149
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: chicago_monetarism
+  claim_index: 102
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+notes: Second-wave market-order panel test. Do not edit v1 after first run.

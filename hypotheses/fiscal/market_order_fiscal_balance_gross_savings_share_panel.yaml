@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_order_fiscal_balance_gross_savings_share_panel
+version: 1
+status: pre_registered
+topic: fiscal
+claim: Across a pre-registered narrower OECD/market-peer panel from 1996 to 2021, stronger fiscal balances predict
+  higher domestic savings shares after country and year fixed effects and basic macro controls. This tests the crowding-out,
+  risk-premium, and fiscal-expectations channels as a second-wave market-order hypothesis rather than reusing the
+  Heritage latest-year cross-section.
+methodology_note: Second-wave market-order pre-registration. This spec narrows the country sample to OECD and market-peer
+  economies to improve panel completeness while preserving a pre-run fixed sample, variables, direction, and reciprocal
+  position links.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - USA
+  period:
+  - 1996
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the outcome, treatment, or retained controls
+  - do not impute treatment values across countries
+  - treat this as associational evidence unless a later event-study or DiD design is registered
+scope:
+  period:
+  - 1996
+  - 2021
+  countries:
+  - OECD
+  outcome_dim:
+  - capital_flows
+  - gdp_growth
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - fiscal_balance
+  - fiscal_prudence
+  - deficit_discipline
+variables:
+  outcome:
+  - name: gross_savings_share
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: level
+    notes: gross domestic savings as a share of GDP
+  treatment:
+  - name: fiscal_balance_share
+    source: world_bank_wdi:GC.NLD.TOTL.GD.ZS
+    transformation: level
+    notes: general government net lending/borrowing as a share of GDP
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control to reduce development-level bias.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: trade_openness_control
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: Goods-and-services openness control; omitted when external openness is the treatment.
+intervention_channel: fiscal
+intervention_channel_justification: The treatment operationalizes general government net lending/borrowing as a
+  share of GDP as a time-varying policy or institutional channel, not an ex-post outcome screen.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Primary test is two-way fixed effects with country-clustered standard errors. This is a registered associational
+    hurdle; causal promotion requires a sharper subsequent design.
+falsification:
+  rule: SUPPORTED if the coefficient on fiscal_balance_share is positively signed at p<0.10 with at least 30 usable
+    observations after listwise deletion. REFUTED if the coefficient is significantly opposite-signed at p<0.10.
+    Otherwise PARTIAL.
+  test: panel_fe_market_order_fiscal_balance_gross_savings_share_panel
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.54
+disclosure: The author is actively stress-testing free-market, Austrian, and ordoliberal claims. Favorable selection
+  risk is handled by recording the claim, sample, variables, direction, and position links before estimation; null
+  or contrary results count.
+steelman: hypotheses/steelman/market_order_fiscal_balance_gross_savings_share_panel.md
+covers_claims:
+- position_id: austrian
+  claim_index: 119
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: ordoliberal
+  claim_index: 131
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: classical_liberal
+  claim_index: 143
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+- position_id: chicago_monetarism
+  claim_index: 96
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Pre-run coverage declaration for the 2026-05-03 market-order follow-up wave; position claim and hypothesis
+    claim were linked before estimation.
+notes: Second-wave market-order panel test. Do not edit v1 after first run.
