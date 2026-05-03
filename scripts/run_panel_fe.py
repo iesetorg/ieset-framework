@@ -433,7 +433,7 @@ def normalise_panel(df: pd.DataFrame, publisher: str) -> pd.DataFrame | None:
     cols = {c.lower(): c for c in df.columns}
     # Discover the country column.
     country_col = None
-    for cand in ("country_iso3", "iso3", "geo_code", "country", "ref_area", "region"):
+    for cand in ("country_iso3", "iso3", "ccode", "geo_code", "country", "ref_area", "region"):
         if cand in cols:
             country_col = cols[cand]
             break
