@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import run_descriptive
+import run_cointegration_vecm
 import run_did_callaway_santanna
 import run_event_study
 import run_local_projections
@@ -41,6 +42,7 @@ RUNNER_BY_TEMPLATE = {
     "did_callaway_santanna": run_did_callaway_santanna,
     "did_chaisemartin": run_did_callaway_santanna,
     "local_projections": run_local_projections,
+    "cointegration_vecm": run_cointegration_vecm,
     "synth_did": run_synth_did,
     "synthetic_control": run_synth_did,
 }

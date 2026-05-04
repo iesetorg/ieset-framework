@@ -7,12 +7,15 @@ Generated: 2026-05-04
 - This queue ranks already-linked pending hypotheses by coverage unlocked for under-covered schools.
 - It does not change verdicts, school predictions, polarity, or net scores.
 - The fastest fair path is to run or repair pending hypotheses before inventing new links.
+- New hypotheses are allowed only where linked coverage is still below the selected floor after the pending queue is exhausted.
 
 ## Summary
 
 - Under-covered schools: 0
 - Pending candidates with coverage benefit: 0
-- Top blocker types:
+- Top blocker types: none
+- Linked gap remaining after pending runs: 0
+- Tested gap remaining after exhausting pending runs: 0
 
 ## Highest-Leverage Queue
 

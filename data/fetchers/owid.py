@@ -36,6 +36,14 @@ SERIES_ALIASES = {
     "consumption-co2-per-capita": "consumption-co2",
     "annual-co2-emissions-per-country": "annual-co2-emissions",
     "economic-complexity-index": "economic-complexity-index-eci",
+    "intergenerational-earnings-elasticity": "intergenerational-and-cross-sectional-inequality",
+}
+SERIES_VALUE_COLUMNS = {
+    # The live OWID chart bundles the Corak/Chen-Forster-Llena-Nozal
+    # intergenerational elasticity with a cross-sectional Gini column. Force the
+    # preregistered mobility series to the elasticity measure so generic loaders
+    # do not silently pick the first numeric column.
+    "intergenerational-earnings-elasticity": "Intergenerational inequality (intergenerational elasticity)",
 }
 
 
@@ -56,6 +64,12 @@ def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult
     # OWID CSVs have consistent columns: Entity, Code, Year, <metric columns...>
     if "Code" in df.columns:
         df = df.rename(columns={"Code": "country_iso3", "Entity": "country_name", "Year": "year"})
+    value_col = SERIES_VALUE_COLUMNS.get(series_id)
+    if value_col:
+        if value_col not in df.columns:
+            raise OwidError(f"OWID {series_id}: expected value column {value_col!r} not found")
+        keep = [c for c in ("country_name", "country_iso3", "year") if c in df.columns]
+        df = df[keep + [value_col]].rename(columns={value_col: "value"})
     if "year" in df.columns:
         df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
 
@@ -83,6 +97,7 @@ def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult
         parquet_path=path_out,
         extra={
             "resolved_series_id": resolved,
+            "value_column": value_col,
             "n_columns": len(df.columns),
             "columns": list(df.columns),
             "vintage_utc": vintage_utc.isoformat() if vintage_utc else None,

@@ -859,6 +859,59 @@ def construct_variable_from_text(
             merged = merged.drop(columns=drop_cols, errors="ignore")
             return merged[["country_iso3", "year", name]], name
 
+    body_lc = body.lower()
+    if all(token in body_lc for token in ("wind", "solar", "share", "capacity")):
+        solar = load_variable("irena:installed_capacity_solar_pv")
+        wind = load_variable("irena:installed_capacity_wind")
+        total = load_variable("irena:installed_capacity_renewable")
+        if solar is not None and wind is not None and total is not None:
+            solar_df, _ = solar
+            wind_df, _ = wind
+            total_df, _ = total
+            merged = (
+                grid.merge(
+                    solar_df.rename(columns={"value": "_solar"})[["country_iso3", "year", "_solar"]],
+                    on=["country_iso3", "year"],
+                    how="left",
+                )
+                .merge(
+                    wind_df.rename(columns={"value": "_wind"})[["country_iso3", "year", "_wind"]],
+                    on=["country_iso3", "year"],
+                    how="left",
+                )
+                .merge(
+                    total_df.rename(columns={"value": "_total"})[["country_iso3", "year", "_total"]],
+                    on=["country_iso3", "year"],
+                    how="left",
+                )
+            )
+            denom = merged["_total"].replace({0: np.nan})
+            merged[name] = (merged["_solar"].fillna(0) + merged["_wind"].fillna(0)) / denom
+            merged = merged.dropna(subset=[name])
+            if not merged.empty:
+                return merged[["country_iso3", "year", name]], "constructed"
+
+    if (
+        "nuclear share" in body_lc
+        and "electricity" in body_lc
+        and ("change" in body_lc or "year-over-year" in body_lc)
+    ):
+        nuclear_share = load_variable("owid:share-electricity-nuclear")
+        if nuclear_share is not None:
+            nuclear_df, _ = nuclear_share
+            merged = grid.merge(
+                nuclear_df.rename(columns={"value": "_nuclear_share"})[
+                    ["country_iso3", "year", "_nuclear_share"]
+                ],
+                on=["country_iso3", "year"],
+                how="left",
+            )
+            merged = merged.sort_values(["country_iso3", "year"])
+            merged[name] = merged.groupby("country_iso3")["_nuclear_share"].diff()
+            merged = merged.dropna(subset=[name])
+            if not merged.empty:
+                return merged[["country_iso3", "year", name]], "constructed"
+
     out = grid.copy()
     out[name] = 0.0
     sample_countries = sorted(out["country_iso3"].dropna().astype(str).unique().tolist())

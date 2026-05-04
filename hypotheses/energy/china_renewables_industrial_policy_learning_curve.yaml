@@ -78,22 +78,22 @@ sample:
     - "drop country-years missing IRENA / EIA cumulative installed capacity series"
 variables:
   outcome:
-    - name: solar_pv_module_cost_usd_per_w
-      source: "irena:solar_pv_costs"
+    - name: solar_pv_lcoe_usd_per_mwh
+      source: "irena:lcoe_solar_pv"
       transformation: log
-      notes: "IRENA renewable cost database — module $/W. Primary learning-curve outcome. TODO swarm-6e: confirm exact series id when irena fetcher schema lands."
+      notes: "IRENA Renewable Power Generation Costs workbook - utility-scale solar PV LCOE converted to USD/MWh. Manual-drop required under data/manual/irena/ until the cost workbook parser is populated."
     - name: wind_turbine_lcoe_usd_per_mwh
-      source: "irena:wind_lcoe"
+      source: "irena:lcoe_wind_onshore"
       transformation: log
-      notes: "IRENA onshore wind LCOE. Secondary learning-curve outcome."
+      notes: "IRENA Renewable Power Generation Costs workbook - onshore wind LCOE converted to USD/MWh. Manual-drop required under data/manual/irena/ until the cost workbook parser is populated."
   treatment:
     - name: china_renewables_industrial_policy_indicator
       source: "constructed: indicator = 1 for CHN from 2005 onwards (Renewable Energy Law) covering solar+wind manufacturing scale-up"
       transformation: indicator
     - name: cumulative_installed_capacity_log
-      source: "irena:capacity"
+      source: "irena:installed_capacity_renewable"
       transformation: log
-      notes: "Learning-curve x-axis: cumulative MW installed (CHN vs OECD donor pool)."
+      notes: "Learning-curve x-axis: cumulative MW installed in each sample country-year. Technology-specific IRENA capacity vintages may replace this aggregate in a promoted follow-up."
   controls:
     - name: log_gdp_per_capita
       source: "world_bank_wdi:NY.GDP.PCAP.KD"

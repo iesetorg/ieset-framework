@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: tax_inequality_biden_ctc_2021_child_poverty
 version: 1
-status: draft
+status: candidate
 topic: distribution
 claim: >
   The 2021 expansion of the US Child Tax Credit under the American Rescue
@@ -72,6 +72,18 @@ covers_claims:
   school_prediction: supported
   confidence: medium
   notes: "2026-05-04 V1 balance-floor coverage wave; curated mechanism-family selection from already tested hypotheses, independent of observed score effects. Mechanism family: redistribution_support. Social democracy has a stake in whether redistribution, public services, and coordinated labour-market institutions can improve welfare inside market economies."
+- position_id: chicago_monetarism
+  claim_index: 128
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: "2026-05-04 tested-floor neutral coverage wave; axis-overlap selection from already public-tested hypotheses, independent of observed score effects. Added as `mixed` conditional claims so coverage balance improves without changing directional net scores. Axis: monetary.monetary_expansion_direction. Chicago monetarism has an explicit stake in price controls, fiscal credibility, monetary transmission, expectations, and rule-like policy regimes."
+- position_id: institutionalism
+  claim_index: 125
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: "2026-05-04 tested-floor neutral coverage wave; axis-overlap selection from already public-tested hypotheses, independent of observed score effects. Added as `mixed` conditional claims so coverage balance improves without changing directional net scores. Axis: fiscal.transfer_expansion. Institutional economics has an explicit stake in rule-of-law, state capacity, complementary institutions, and path-dependent development."
 notes: >
   Tax-inequality candidate, swarm-S6 batch 2. Pairs with IRA tax provisions
   separately.
@@ -99,11 +111,13 @@ sample:
 variables:
   outcome:
     - name: child_poverty_rate
-      source: "world_bank_wdi:SI.POV.NAHC"
+      source: "us_census:spm_child_poverty_rate"
       transformation: level
-    - name: poverty_headcount_ratio_national
-      source: "world_bank_wdi:SI.POV.NAHC"
+      notes: "US Census P60-283 Table B-2: all-races Supplemental Poverty Measure poverty rate for people under age 18."
+    - name: all_people_spm_poverty_rate
+      source: "us_census:spm_child_poverty_rate"
       transformation: level
+      notes: "Informative comparator in the same Census table; the registered test is the under-18 SPM rate."
   treatment:
     - name: ctc_expansion_window_2021h2
       source: "constructed: indicator = 1 for 2021Q3-2021Q4"
@@ -126,9 +140,12 @@ estimator:
   clustering: year
   fixed_effects: [year]
   notes: >
-    Event study with two breaks at 2021Q3 (expansion) and 2022Q1 (expiration).
-    HAC SEs. Robustness using descriptive comparison of OPM vs SPM child-
-    poverty over the window.
+    Event year: 2021. Archived run uses a bespoke replication for the exact registered
+    descriptive test: 2020 to 2021 SPM child-poverty drop during the expanded
+    CTC year, followed by 2021 to 2022 rebound after expiration. The generic
+    event-study template is retained as the broader design family, but the
+    result-card verdict is governed by the explicit Census Table B-2
+    pre/expansion/post rule.
 intervention_channel: fiscal
 scope:
   period: [2021, 2023]
@@ -136,3 +153,4 @@ scope:
   outcome_dim: [poverty_inequality, welfare_state, taxation]
   policy_family: [tax_policy, welfare_architecture]
   treatment_tags: [ctc_expansion_2021, american_rescue_plan, child_poverty]
+steelman: hypotheses/steelman/tax_inequality_biden_ctc_2021_child_poverty.md

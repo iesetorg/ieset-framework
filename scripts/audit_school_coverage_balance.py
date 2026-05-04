@@ -83,7 +83,7 @@ def has_web_public_verdict(hypothesis_id: str, hypotheses: dict[str, dict[str, A
     verdict = (diagnostics.get("verdict") or "").lower().strip()
     if not verdict:
         return False
-    if verdict.startswith(("inconclusive_data_pending", "blocked", "error", "no verdict")):
+    if verdict.startswith(("inconclusive", "blocked", "error", "no verdict")):
         return False
 
     falsification = hypothesis.get("falsification") or {}
@@ -215,7 +215,22 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
     summary = audit["summary"]
     floor = audit["methodology"]["v1_floor"]
     stretch = audit["methodology"]["stretch_floor"]
-    lines = [
+    if (
+        floor["unique_hypotheses"] == DEFAULT_LINKED_FLOOR
+        and floor["unique_tested"] == DEFAULT_TESTED_FLOOR
+    ):
+        floor_label = "V1"
+        balanced_status_label = "balanced_v1"
+    elif (
+        floor["unique_hypotheses"] == STRETCH_LINKED_FLOOR
+        and floor["unique_tested"] == STRETCH_TESTED_FLOOR
+    ):
+        floor_label = "Stretch"
+        balanced_status_label = "balanced_stretch"
+    else:
+        floor_label = "Selected"
+        balanced_status_label = "balanced_selected"
+    method_lines = [
         "# School Coverage Balance Audit",
         "",
         f"Generated: {audit['generated_at']}",
@@ -224,44 +239,52 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "",
         "- Coverage balance measures opportunity set only; it does not change scoreboard verdicts or net scores.",
         "- The unit is unique existing hypothesis IDs linked from a school's falsifiable claims.",
-        f"- V1 balanced means at least `{floor['unique_hypotheses']}` unique linked hypotheses and `{floor['unique_tested']}` unique tested hypotheses.",
-        f"- Stretch balanced means at least `{stretch['unique_hypotheses']}` unique linked hypotheses and `{stretch['unique_tested']}` unique tested hypotheses.",
+        f"- {floor_label} balanced means at least `{floor['unique_hypotheses']}` unique linked hypotheses and `{floor['unique_tested']}` unique tested hypotheses.",
+    ]
+    if floor_label != "Stretch":
+        method_lines.append(
+            f"- Stretch balanced means at least `{stretch['unique_hypotheses']}` unique linked hypotheses and `{stretch['unique_tested']}` unique tested hypotheses."
+        )
+    lines = method_lines + [
         "",
         "## Summary",
         "",
         f"- Schools tracked: {summary['schools']}",
-        f"- V1 balanced schools: {summary['balanced_v1']}",
+        f"- {floor_label} balanced schools: {summary['balanced_v1']}",
         f"- Under-covered schools: {summary['under_covered']}",
         f"- Unique linked hypothesis range: {summary['linked_range'][0]}-{summary['linked_range'][1]}",
         f"- Unique tested hypothesis range: {summary['tested_range'][0]}-{summary['tested_range'][1]}",
-        f"- V1 linked deficit remaining: {summary['total_linked_gap_to_floor']}",
-        f"- V1 tested deficit remaining: {summary['total_tested_gap_to_floor']}",
+        f"- {floor_label} linked deficit remaining: {summary['total_linked_gap_to_floor']}",
+        f"- {floor_label} tested deficit remaining: {summary['total_tested_gap_to_floor']}",
         "",
-        "## V1 Coverage Queue",
+        f"## {floor_label} Coverage Queue",
         "",
         "| school | linked | tested | pending | link gap | run gap | status | top pending axes |",
         "| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |",
     ]
 
     for row in audit["schools"]:
+        display_status = (
+            balanced_status_label if row["status"] == "balanced_v1" else row["status"]
+        )
         lines.append(
             f"| `{row['position_id']}` | {row['unique_hypotheses']} | {row['unique_tested']} | "
             f"{row['unique_pending']} | {row['linked_gap_to_floor']} | {row['tested_gap_to_floor']} | "
-            f"{row['status']} | {format_axes(row['top_pending_axes'])} |"
+            f"{display_status} | {format_axes(row['top_pending_axes'])} |"
         )
 
     lines += [
         "",
         "## Next Batch Recommendation",
         "",
-        "Run existing pending hypotheses first for schools with the largest V1 run gaps. Add new hypotheses only where linked coverage remains below the V1 floor after pending runs are exhausted.",
+        f"Run existing pending hypotheses first for schools with the largest {floor_label} run gaps. Add new hypotheses only where linked coverage remains below the {floor_label} floor after pending runs are exhausted.",
     ]
     for row in audit["schools"][:10]:
         if row["linked_gap_to_floor"] == 0 and row["tested_gap_to_floor"] == 0:
             continue
         lines.append(
             f"- `{row['position_id']}`: add {row['linked_gap_to_floor']} linked hypotheses and graduate "
-            f"{row['tested_gap_to_floor']} tested hypotheses to hit V1."
+            f"{row['tested_gap_to_floor']} tested hypotheses to hit {floor_label}."
         )
 
     out_base.with_suffix(".md").write_text("\n".join(lines) + "\n")

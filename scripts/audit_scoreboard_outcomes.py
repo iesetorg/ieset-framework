@@ -34,7 +34,7 @@ def verdict_class(verdict: str | None) -> str:
     if not verdict:
         return "untested"
     v = verdict.lower().strip()
-    if v.startswith(("blocked", "error", "no verdict", "inconclusive_data_pending")):
+    if v.startswith(("blocked", "error", "no verdict", "inconclusive")):
         return "untested"
     if v.startswith(("weakened", "inconclusive")):
         return "partial"

@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import run_descriptive
+import run_cointegration_vecm
 import run_did_callaway_santanna
 import run_event_study
 import run_local_projections
@@ -40,6 +41,7 @@ RUNNER_BY_TEMPLATE = {
     "did_callaway_santanna": run_did_callaway_santanna,
     "did_chaisemartin": run_did_callaway_santanna,
     "local_projections": run_local_projections,
+    "cointegration_vecm": run_cointegration_vecm,
     "synth_did": run_synth_did,
     "synthetic_control": run_synth_did,
 }
@@ -134,6 +136,16 @@ def classify_preflight_state(hid: str, template: str) -> str:
             if not (all(period) and len(period) == 2):
                 return "preflight_blocked"
         return "preflight_ready"
+
+    if template == "cointegration_vecm":
+        loaded = [
+            item.get("name")
+            for item in outcome_items
+            if item.get("name")
+            and item.get("name") in panel_filt.columns
+            and panel_filt[item.get("name")].notna().any()
+        ]
+        return "preflight_ready" if len(loaded) >= 2 else "preflight_blocked"
 
     return "unknown_template"
 

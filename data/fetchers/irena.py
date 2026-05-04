@@ -48,9 +48,10 @@ PXWEB_BASE = "https://pxweb.irena.org/api/v1/en/IRENASTAT/Power Capacity and Gen
 # Default PxWeb table; cycle suffix bumps annually. We try the latest known
 # cycle first and fall back to a couple of prior cycles if 404'd.
 _PXWEB_CAPACITY_TABLES = [
-    "RECAP_2024_cycle2.px",
-    "RECAP_2024_cycle1.px",
-    "RECAP_2023_cycle2.px",
+    "Country_ELECCAP_2026_H1_v-PX 1.px",
+    "Country_ELECCAP_2025_H2_v-PX 1.px",
+    "Country_ELECCAP_2025_H1_v-PX 1.px",
+    "Country_ELECSTAT_2025_H2_PX.px",
 ]
 
 
@@ -58,7 +59,7 @@ SUPPORTED: dict[str, dict[str, Any]] = {
     "installed_capacity_renewable": {
         "source": "pxweb",
         "table_candidates": _PXWEB_CAPACITY_TABLES,
-        "tech_filter": None,  # all renewables
+        "tech_filter": ["total renewable", "renewable energy"],
         "desc": "Total renewable installed capacity by country/year (MW)",
         "frequency": "annual",
         "units": "MW",
@@ -150,6 +151,48 @@ def _query_all(table: str) -> dict:
     return _pxweb_query(table, body)
 
 
+def _values_matching(var: dict, needles: list[str]) -> list[str]:
+    values = var.get("values") or []
+    labels = var.get("valueTexts") or values
+    out: list[str] = []
+    for code, label in zip(values, labels):
+        haystack = f"{code} {label}".lower()
+        if any(needle.lower() in haystack for needle in needles):
+            out.append(code)
+    return out
+
+
+def _query_capacity(table: str, tech_filter: list[str] | None) -> dict:
+    """Build a filtered PxWeb query below IRENA's 100k-cell limit."""
+    meta = _pxweb_metadata(table)
+    queries = []
+    for var in meta.get("variables", []) or []:
+        code = var.get("code")
+        values = var.get("values") or []
+        if not code or not values:
+            continue
+        code_l = code.lower()
+        selection = list(values)
+        if "technology" in code_l and tech_filter:
+            selection = _values_matching(var, tech_filter)
+        elif "grid" in code_l:
+            total = _values_matching(var, ["total", "all"])
+            if total:
+                selection = total[:1]
+        elif "data type" in code_l or code_l in ("datatype", "data_type"):
+            capacity = _values_matching(var, ["capacity"])
+            if capacity:
+                selection = capacity
+        if not selection:
+            raise IrenaError(f"no matching values for dimension {code!r} in {table}")
+        queries.append({
+            "code": code,
+            "selection": {"filter": "item", "values": selection},
+        })
+    body = {"query": queries, "response": {"format": "json-stat2"}}
+    return _pxweb_query(table, body)
+
+
 def _jsonstat_to_long(payload: dict) -> pd.DataFrame:
     """Flatten a JSON-stat 2.0 response into a long DataFrame.
 
@@ -161,6 +204,7 @@ def _jsonstat_to_long(payload: dict) -> pd.DataFrame:
     values = payload.get("value") or []
 
     # Build per-dimension ordered category-label arrays.
+    cat_codes: list[list[str]] = []
     cat_labels: list[list[str]] = []
     for d in dims:
         cat = dim_meta.get(d, {}).get("category", {})
@@ -174,6 +218,7 @@ def _jsonstat_to_long(payload: dict) -> pd.DataFrame:
             codes = list(idx)
         else:
             codes = []
+        cat_codes.append(codes)
         cat_labels.append([lbl.get(c, c) for c in codes])
 
     rows: list[dict] = []
@@ -197,8 +242,11 @@ def _jsonstat_to_long(payload: dict) -> pd.DataFrame:
             coords.append(rem // s)
             rem = rem % s
         row: dict[str, Any] = {}
-        for d, c, labels in zip(dims, coords, cat_labels):
-            row[d] = labels[c] if 0 <= c < len(labels) else None
+        for d, c, codes, labels in zip(dims, coords, cat_codes, cat_labels):
+            if d.lower() in ("country/area", "region/country/area"):
+                row[d] = codes[c] if 0 <= c < len(codes) else None
+            else:
+                row[d] = labels[c] if 0 <= c < len(labels) else None
         row["value"] = val
         rows.append(row)
 
@@ -210,7 +258,7 @@ def _normalise_capacity(df: pd.DataFrame, tech_filter: list[str] | None) -> pd.D
     rename = {}
     for c in df.columns:
         cl = c.lower()
-        if cl in ("country", "region", "country/area", "country_area"):
+        if cl in ("country", "region", "country/area", "country_area", "region/country/area"):
             rename[c] = "country"
         elif cl in ("year", "time", "period"):
             rename[c] = "year"
@@ -232,6 +280,12 @@ def _normalise_capacity(df: pd.DataFrame, tech_filter: list[str] | None) -> pd.D
         )
         df = df[mask].copy()
 
+    if "country" in df.columns and "year" in df.columns:
+        group_cols = ["country", "year"]
+        keep_cols = [c for c in group_cols if c in df.columns]
+        if keep_cols and "value" in df.columns:
+            df = df.groupby(keep_cols, as_index=False)["value"].sum()
+
     return df.reset_index(drop=True)
 
 
@@ -239,7 +293,7 @@ def _fetch_pxweb(spec: dict) -> tuple[pd.DataFrame, str]:
     last_err: Exception | None = None
     for table in spec["table_candidates"]:
         try:
-            payload = _query_all(table)
+            payload = _query_capacity(table, spec.get("tech_filter"))
             df = _jsonstat_to_long(payload)
             if df.empty:
                 last_err = IrenaError(f"empty payload for {table}")

@@ -104,24 +104,30 @@ scope:
 variables:
   outcome:
   - name: banking_crisis_indicator
-    source: constructed:laeven_valencia_crisis_database
+    source: laeven_valencia:banking_crisis_indicator
     transformation: indicator
   - name: currency_crisis_indicator
-    source: constructed:laeven_valencia_crisis_database
+    source: laeven_valencia:currency_crisis_indicator
     transformation: indicator
   - name: crisis_output_loss
-    source: constructed:peak_to_trough_gdp_loss_crisis_years
+    source: laeven_valencia:peak_to_trough_gdp_loss_crisis_years
     transformation: level
-    notes: Cumulative GDP loss relative to pre-crisis trend.
+    notes: Peak-to-trough real GDP-per-capita loss around Laeven-Valencia crisis event years.
   treatment:
   - name: financial_liberalisation_index
-    source: constructed:abiad_detragiache_quint_financial_reform_index
+    source: chinn_ito:kaopen
     transformation: level
-    notes: Abiad-Detragiache financial reform index; higher = more liberalised.
-  - name: prudential_regulation_index
-    source: constructed:basel_compliance_plus_macroprudential_score
+    notes: >-
+      Capital-account openness proxy for financial liberalisation
+      (higher = more open/liberalised).
+  - name: prudential_strength_proxy
+    source: world_bank_wdi:FB.BNK.CAPA.ZS
     transformation: level
-    notes: Composite of capital-adequacy compliance and macro-prudential policy intensity.
+    notes: >-
+      Bank capital-to-assets ratio proxy (higher = stronger prudential
+      buffers and supervision capacity). Interaction sign is expected to
+      be negative because the claim is about liberalisation under weak
+      prudential regimes.
   controls:
   - name: log_gdp_per_capita
     source: world_bank_wdi:NY.GDP.PCAP.KD
@@ -132,9 +138,9 @@ variables:
   - name: current_account_balance_gdp
     source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
     transformation: level
-  - name: exchange_rate_regime
-    source: constructed:Ilzetzki_Reinhart_Rogoff_fine
-    transformation: categorical
+  - name: exchange_rate_pressure_proxy
+    source: world_bank_wdi:PA.NUS.FCRF
+    transformation: log
 estimator:
   template: panel_fe
   fixed_effects:
@@ -143,14 +149,25 @@ estimator:
   clustering: country
 falsification:
   rule: >-
-    The hypothesis is falsified if financial liberalisation without prudential regulation
-    does not significantly raise crisis probability in a panel logit or linear probability
-    model, or if the liberalisation-crisis link disappears after controlling for credit
-    growth and current-account deficits.
+    The hypothesis is falsified if the interaction between financial
+    liberalisation and prudential-strength proxy is not significantly
+    negative, or if the interaction sign flips positive at conventional
+    significance after controls for credit growth and current-account
+    balance.
   test: panel_fe_financial_liberalisation_crisis_risk_1975_2020
   threshold:
-    supported: liberalisation_x_weak_prudential interaction > 0 at p < 0.10 for crisis probability
-    refuted: liberalisation coefficient not significant for crisis probability
+    expected_sign: "-"
+    supported: liberalisation_x_prudential_strength interaction < 0 at p < 0.10 for crisis probability
+    refuted: liberalisation_x_prudential_strength interaction >= 0 or p >= 0.10
+methodology_note: >-
+  2026-05-04 runnability repair for v1 candidate execution. The originally
+  cited Abiad-Detragiache and Basel/macroprudential composites are not yet
+  materialised as local vintages. This run pins transparent on-disk proxies:
+  Chinn-Ito KAOPEN for liberalisation and World Bank bank capital-to-assets
+  ratio for prudential strength. Because prudential is coded as strength
+  (not weakness), the interaction estimand is expected to be negative. This
+  preserves the claim logic ("liberalisation is riskier when prudential
+  buffers are weak") while allowing a reproducible local test.
 prior_confidence: 0.70
 disclosure: >-
   Author priors accept the financial-liberalisation crisis link from the Kaminsky-Reinhart

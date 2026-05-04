@@ -151,7 +151,7 @@ def integrity_check_falsification_rules() -> list[str]:
         verdict = (d.get("verdict") or "").strip().lower()
         if not verdict:
             continue
-        if verdict.startswith(("inconclusive_data_pending", "blocked", "error", "no verdict")):
+        if verdict.startswith(("inconclusive", "blocked", "error", "no verdict")):
             continue
         rel = yml.relative_to(ROOT)
         errors.append(

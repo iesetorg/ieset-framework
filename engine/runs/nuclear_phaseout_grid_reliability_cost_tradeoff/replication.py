@@ -9,10 +9,13 @@ The spec's PRIMARY outcomes are:
   (c) fossil-fired back-up capacity factor (ENTSO-E / EIA)
   (d) loss-of-load expectation (ENTSO-E MAF / NERC)
 
-Of those, only the spirit of (c) — fossil reliance — has a publisher-on-disk
-proxy: OWID share-electricity-fossil-fuels (Ember-derived). The headline
-outcomes (industrial price, wholesale volatility, LOLE) are NOT on disk
-because the IEA / Eurostat / ENTSO-E specialist fetchers have not shipped
+Of those, only the spirit of (c) — fossil reliance — has a full
+publisher-on-disk proxy for the preregistered cohort: OWID
+share-electricity-fossil-fuels (Ember-derived). Eurostat NRG_PC_205 is now
+on disk and is audited below, but it cannot satisfy the preregistered
+industrial-price leg without changing the country sample/coverage
+requirements. The headline wholesale volatility and LOLE outcomes are NOT
+on disk because ENTSO-E / market-price specialist fetchers have not shipped
 yet (per the spec's `notes:` field).
 
 Per HANDOFF guidance: do NOT substitute a different series silently to
@@ -80,12 +83,27 @@ FOSSIL_GAP_THRESHOLD_PP = 5.0
 
 # What the headline outcomes WOULD need (recorded only; not testable here)
 SPEC_PRIMARY_DATA_GAPS = [
-    "iea:industrial_electricity_price (band IC) — fetcher pending",
-    "eurostat:NRG_PC_205 (industry electricity price) — series fetch pending",
+    "iea:industrial_electricity_price (band IC) — no local vintage/manual drop on disk",
+    "eurostat:nrg_pc_205 (industry electricity price) — local vintage present but incomplete for preregistered cohort/period; see diagnostics.primary_coverage_audit",
     "entsoe:day_ahead_wholesale_prices — fetcher pending",
     "entsoe:fossil_capacity_factor — fetcher pending",
     "entsoe:MAF_LOLE — fetcher pending",
 ]
+
+EUROSTAT_PRICE_BAND = "MWH500-1999"  # Eurostat band IC / medium industry.
+EUROSTAT_PRICE_TAX = "I_TAX"
+EUROSTAT_PRICE_CURRENCY = "EUR"
+PRIMARY_PRICE_YEARS = list(range(2010, 2025))
+ISO3_TO_EUROSTAT_GEO = {
+    "DEU": "DE",
+    "BEL": "BE",
+    "CHE": "CH",
+    "FRA": "FR",
+    "FIN": "FI",
+    "SWE": "SE",
+    "USA": "US",
+    "GBR": "UK",
+}
 
 
 def sha256(p: Path) -> str:
@@ -102,6 +120,12 @@ def latest(pub: str, series: str) -> Path:
     if not files:
         raise FileNotFoundError(f"{pub}:{series}")
     return files[-1]
+
+
+def maybe_latest(pub: str, series: str) -> Path | None:
+    d = REPO_ROOT / "data" / "vintages" / pub
+    files = sorted(d.glob(f"{series}@*.parquet"), key=lambda p: p.stat().st_mtime)
+    return files[-1] if files else None
 
 
 def load_long(path: Path) -> pd.DataFrame:
@@ -141,6 +165,114 @@ def country_nearest_value(df: pd.DataFrame, iso3: str, target_year: int,
     return None, None
 
 
+def audit_eurostat_price_coverage() -> tuple[dict, dict | None]:
+    """Audit whether local Eurostat NRG_PC_205 can satisfy the price leg.
+
+    It cannot be used if doing so drops preregistered countries or years.
+    The diagnostics are intentionally explicit so a future worker can see
+    exactly what remains missing.
+    """
+    path = maybe_latest("eurostat", "nrg_pc_205")
+    audit = {
+        "source": "eurostat:nrg_pc_205",
+        "available": path is not None,
+        "selected_band": EUROSTAT_PRICE_BAND,
+        "tax": EUROSTAT_PRICE_TAX,
+        "currency": EUROSTAT_PRICE_CURRENCY,
+        "unit": "EUR/kWh",
+        "required_years": PRIMARY_PRICE_YEARS,
+        "required_phaseout_cohort": PHASEOUT,
+        "required_retain_cohort": RETAIN,
+        "country_coverage": [],
+        "can_satisfy_preregistered_price_leg": False,
+        "blockers": [],
+    }
+    if path is None:
+        audit["blockers"].append("No Eurostat NRG_PC_205 vintage exists on disk.")
+        return audit, None
+
+    manifest_entry = {
+        "publisher": "eurostat",
+        "series": "nrg_pc_205",
+        "vintage_file": str(path.relative_to(REPO_ROOT)),
+        "sha256": sha256(path),
+        "role": "coverage_audit_only",
+    }
+
+    df = pq.read_table(path).to_pandas()
+    required_columns = {"siec", "nrg_cons", "tax", "currency", "geo_code", "period", "value"}
+    missing_columns = sorted(required_columns - set(df.columns))
+    if missing_columns:
+        audit["blockers"].append(
+            f"Eurostat NRG_PC_205 vintage lacks expected columns: {', '.join(missing_columns)}."
+        )
+        return audit, manifest_entry
+
+    sub = df[
+        (df["siec"] == "E7000")
+        & (df["nrg_cons"] == EUROSTAT_PRICE_BAND)
+        & (df["tax"] == EUROSTAT_PRICE_TAX)
+        & (df["currency"] == EUROSTAT_PRICE_CURRENCY)
+    ].copy()
+    if sub.empty:
+        audit["blockers"].append(
+            "Eurostat NRG_PC_205 has no rows for E7000 / band IC / I_TAX / EUR."
+        )
+        return audit, manifest_entry
+
+    sub["year"] = pd.to_numeric(sub["period"].astype(str).str[:4], errors="coerce")
+    sub = sub.dropna(subset=["year"])
+    sub["year"] = sub["year"].astype(int)
+    audit["source_period_min"] = str(sub["period"].min())
+    audit["source_period_max"] = str(sub["period"].max())
+
+    for country in PHASEOUT + RETAIN:
+        geo = ISO3_TO_EUROSTAT_GEO[country]
+        csub = sub[sub["geo_code"] == geo].copy()
+        years = sorted(int(y) for y in csub["year"].dropna().unique())
+        missing_years = [y for y in PRIMARY_PRICE_YEARS if y not in years]
+        audit["country_coverage"].append({
+            "country": country,
+            "cohort": "phaseout" if country in PHASEOUT else "retain",
+            "eurostat_geo_code": geo,
+            "row_count": int(len(csub)),
+            "first_year": min(years) if years else None,
+            "last_year": max(years) if years else None,
+            "missing_years_2010_2024": missing_years,
+            "has_full_2010_2024": not missing_years,
+        })
+
+    no_rows = [
+        r["country"] for r in audit["country_coverage"]
+        if int(r["row_count"]) == 0
+    ]
+    partial = [
+        f"{r['country']} ({','.join(map(str, r['missing_years_2010_2024']))})"
+        for r in audit["country_coverage"]
+        if int(r["row_count"]) > 0 and r["missing_years_2010_2024"]
+    ]
+    if no_rows:
+        audit["blockers"].append(
+            "Eurostat NRG_PC_205 has no selected-band rows for preregistered countries: "
+            + ", ".join(no_rows)
+            + "."
+        )
+    if partial:
+        audit["blockers"].append(
+            "Eurostat NRG_PC_205 lacks full 2010-2024 selected-band coverage for: "
+            + "; ".join(partial)
+            + "."
+        )
+
+    audit["can_satisfy_preregistered_price_leg"] = not audit["blockers"]
+    if not audit["blockers"]:
+        audit["blockers"].append(
+            "Price leg has complete Eurostat coverage, but this still would not satisfy "
+            "the wholesale-volatility or LOLE primary outcomes."
+        )
+    return audit, manifest_entry
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -148,6 +280,7 @@ def main() -> None:
     fossil_path = latest("owid", "share-electricity-fossil-fuels")
     renew_path = latest("owid", "share-electricity-renewables")
     co2int_path = latest("owid", "co2-intensity")
+    price_audit, price_manifest = audit_eurostat_price_coverage()
 
     manifest = {
         "share_electricity_nuclear": {
@@ -175,6 +308,8 @@ def main() -> None:
             "sha256": sha256(co2int_path),
         },
     }
+    if price_manifest is not None:
+        manifest["eurostat_nrg_pc_205_industrial_price_audit"] = price_manifest
 
     nuclear = load_long(nuclear_path)
     fossil = load_long(fossil_path)
@@ -258,6 +393,7 @@ def main() -> None:
     # on disk. The verdict is structurally `inconclusive` regardless of what
     # the surrogate shows. We still report what the surrogate said.
     verdict_word = "inconclusive"
+    price_blocker_phrase = "; ".join(b.rstrip(".") for b in price_audit["blockers"])
     surrogate_phrase = (
         f"phase-out cohort fossil-share change {phaseout_change:+.1f}pp vs "
         f"retain cohort {retain_change:+.1f}pp — gap "
@@ -266,8 +402,11 @@ def main() -> None:
     )
     verdict = (
         f"inconclusive — Primary outcomes (industrial electricity price, "
-        f"wholesale day-ahead volatility, LOLE) require IEA / Eurostat "
-        f"NRG_PC_205 / ENTSO-E specialist fetchers that have not shipped. "
+        f"wholesale day-ahead volatility, LOLE) remain data-gated. "
+        f"Eurostat NRG_PC_205 is present locally but cannot satisfy the "
+        f"preregistered price leg without changing the cohort/period: "
+        f"{price_blocker_phrase}. IEA industrial prices and ENTSO-E "
+        f"wholesale/adequacy data are not on disk. "
         f"Testable surrogate (back-up reliance via fossil share of "
         f"electricity): {surrogate_phrase}. Treatment is observed: "
         f"phase-out cohort nuclear share fell from "
@@ -282,6 +421,39 @@ def main() -> None:
         "verdict": verdict,
         "verdict_word": verdict_word,
         "primary_data_gaps": SPEC_PRIMARY_DATA_GAPS,
+        "primary_coverage_audit": {
+            "industrial_electricity_price": price_audit,
+            "wholesale_price_volatility": {
+                "source": "ENTSO-E / EPEX / Nord Pool day-ahead prices",
+                "available": False,
+                "can_satisfy_preregistered_volatility_leg": False,
+                "blockers": [
+                    "No local ENTSO-E/EPEX/Nord Pool day-ahead wholesale price vintage exists."
+                ],
+            },
+            "fossil_backup_capacity_factor": {
+                "source": "ENTSO-E / EIA fossil-fired generation and capacity",
+                "available": False,
+                "can_satisfy_preregistered_capacity_factor_leg": False,
+                "blockers": [
+                    "No local ENTSO-E/EIA fossil capacity-factor vintage exists; OWID fossil share is only the preregistered informative surrogate."
+                ],
+            },
+            "loss_of_load_expectation_hours": {
+                "source": "ENTSO-E MAF / NERC reserve adequacy",
+                "available": False,
+                "can_satisfy_preregistered_lole_leg": False,
+                "blockers": [
+                    "No local ENTSO-E MAF/NERC LOLE vintage exists."
+                ],
+            },
+            "overall_primary_satisfied": False,
+            "surrogate_can_set_public_verdict": False,
+            "surrogate_public_verdict_blocker": (
+                "The YAML preregisters the OWID-Ember fossil-share test as informative-only, "
+                "and the observed gap is below the +5pp surrogate-support threshold."
+            ),
+        },
         "method_valid": method_valid,
         "method_notes": method_notes,
         "surrogate": {
@@ -371,7 +543,8 @@ def main() -> None:
         ],
         "sources": [
             {"publisher_id": v["publisher"], "series_id": v["series"], "vintage_file": v["vintage_file"]}
-            for v in manifest.values()
+            for k, v in manifest.items()
+            if k.startswith("share_electricity") or k == "co2_intensity"
         ],
         "permalink": f"/h/{HID}",
     }
@@ -398,6 +571,7 @@ def main() -> None:
         + "".join(
             f"  {k}:\n    publisher: {v['publisher']}\n    series: {v['series']}\n"
             f"    vintage_file: {v['vintage_file']}\n    sha256: {v['sha256']}\n"
+            + (f"    role: {v['role']}\n" if "role" in v else "")
             for k, v in manifest.items()
         )
     )
@@ -414,6 +588,20 @@ def main() -> None:
         ee = f"{e:.1f}" if e is not None else "—"
         return f"{ss} → {ee}"
 
+    price_rows = []
+    for r in price_audit["country_coverage"]:
+        missing = r["missing_years_2010_2024"]
+        span = (
+            f"{r['first_year']}-{r['last_year']}"
+            if r["first_year"] is not None and r["last_year"] is not None
+            else "none"
+        )
+        price_rows.append(
+            f"| {r['country']} | {r['cohort']} | {r['eurostat_geo_code']} | "
+            f"{r['row_count']} | {span} | "
+            f"{', '.join(map(str, missing)) if missing else 'none'} |"
+        )
+
     card = [
         f"# Nuclear phase-out — grid reliability / cost trade-off",
         "",
@@ -423,10 +611,12 @@ def main() -> None:
         "",
         f"- The spec's PRIMARY outcomes are industrial electricity price, "
         f"wholesale day-ahead volatility, fossil-fired back-up capacity "
-        f"factor, and loss-of-load expectation. The first two and the "
-        f"fourth are **not on disk** — the IEA / Eurostat NRG_PC_205 / "
-        f"ENTSO-E fetchers are pending. The headline tests cannot be run "
-        f"with publisher-pinned data; verdict is structurally **inconclusive**.",
+        f"factor, and loss-of-load expectation. Eurostat NRG_PC_205 is "
+        f"now on disk, but it does **not** cover the full preregistered "
+        f"industrial-price cohort/period. The IEA industrial-price and "
+        f"ENTSO-E wholesale/adequacy vintages are still absent, so the "
+        f"headline tests cannot be run without lowering the bar; verdict "
+        f"is structurally **inconclusive**.",
         f"- The third primary (fossil back-up reliance) has an OWID-Ember "
         f"surrogate: share-electricity-fossil-fuels. As a check on whether "
         f"the testable piece points the way the spec predicts:",
@@ -450,6 +640,23 @@ def main() -> None:
         f"- CO2-intensity of GDP: phase-out cohort {phaseout_co2int_change:+.1f}%, "
         f"retain cohort {retain_co2int_change:+.1f}% — both decarbonising; "
         f"phase-out cohort started higher and converged.",
+        "",
+        "## Blocker audit",
+        "",
+        "Eurostat NRG_PC_205 coverage audit for the preregistered price leg "
+        f"(E7000, band {EUROSTAT_PRICE_BAND}, {EUROSTAT_PRICE_TAX}, "
+        f"{EUROSTAT_PRICE_CURRENCY}; required years 2010–2024):",
+        "",
+        "| country | cohort | Eurostat geo | rows | first–last year | missing required years |",
+        "| --- | --- | --- | ---: | --- | --- |",
+        *price_rows,
+        "",
+        "Primary blockers:",
+        "",
+        *[f"- {b}" for b in price_audit["blockers"]],
+        "- No local ENTSO-E/EPEX/Nord Pool day-ahead wholesale-price vintage exists.",
+        "- No local ENTSO-E/EIA fossil capacity-factor vintage exists; OWID fossil share remains an informative surrogate only.",
+        "- No local ENTSO-E MAF/NERC loss-of-load-expectation vintage exists.",
         "",
         "## Method",
         "",

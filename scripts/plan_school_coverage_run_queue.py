@@ -57,7 +57,7 @@ def pending_reason(hypothesis_id: str, hypothesis: dict[str, Any]) -> str:
     verdict = (diagnostics.get("verdict") or "").lower().strip()
     if not verdict:
         return "needs_canonical_verdict"
-    if verdict.startswith(("inconclusive_data_pending", "blocked", "error", "no verdict")):
+    if verdict.startswith(("inconclusive", "blocked", "error", "no verdict")):
         return "needs_successful_rerun"
     if not replication_path.exists():
         return "needs_replication"
@@ -76,6 +76,8 @@ def pending_reason(hypothesis_id: str, hypothesis: dict[str, Any]) -> str:
 
 def collect_position_states(
     hypotheses: dict[str, dict[str, Any]],
+    linked_floor: int,
+    tested_floor: int,
 ) -> dict[str, dict[str, Any]]:
     states: dict[str, dict[str, Any]] = {}
     for path in sorted((ROOT / "positions").glob("*.yaml")):
@@ -105,16 +107,16 @@ def collect_position_states(
             "linked": sorted(linked),
             "tested": sorted(tested),
             "pending": sorted(pending),
-            "linked_gap": max(0, DEFAULT_LINKED_FLOOR - len(linked)),
-            "tested_gap": max(0, DEFAULT_TESTED_FLOOR - len(tested)),
+            "linked_gap": max(0, linked_floor - len(linked)),
+            "tested_gap": max(0, tested_floor - len(tested)),
         }
     return states
 
 
-def plan_queue(limit: int) -> dict[str, Any]:
+def plan_queue(limit: int, linked_floor: int, tested_floor: int) -> dict[str, Any]:
     hypotheses = build_web_hypothesis_index()
     axis_index = load_axis_index()
-    states = collect_position_states(hypotheses)
+    states = collect_position_states(hypotheses, linked_floor, tested_floor)
     under_covered = {
         position_id: state
         for position_id, state in states.items()
@@ -143,7 +145,7 @@ def plan_queue(limit: int) -> dict[str, Any]:
                 continue
             # Weight schools with bigger run gaps more heavily, while keeping
             # each additional school as a concrete benefit.
-            school_weight = 1.0 + (state["tested_gap"] / DEFAULT_TESTED_FLOOR)
+            school_weight = 1.0 + (state["tested_gap"] / max(1, tested_floor))
             entry["coverage_score"] += school_weight
             entry["helps_schools"].append(
                 {
@@ -182,17 +184,31 @@ def plan_queue(limit: int) -> dict[str, Any]:
         position_id: len(state["pending"])
         for position_id, state in under_covered.items()
     }
+    school_gap_counts = {
+        position_id: {
+            "linked_gap": state["linked_gap"],
+            "tested_gap": state["tested_gap"],
+            "pending": len(state["pending"]),
+        }
+        for position_id, state in under_covered.items()
+    }
+    remaining_link_gap_after_pending = sum(state["linked_gap"] for state in under_covered.values())
+    tested_gap_after_exhausting_pending = sum(
+        max(0, state["tested_gap"] - len(state["pending"]))
+        for state in under_covered.values()
+    )
 
     return {
         "generated_at": date.today().isoformat(),
         "methodology": {
             "principle": "Rank already-linked pending hypotheses by coverage unlocked for under-covered schools.",
             "coverage_floor": {
-                "unique_hypotheses": DEFAULT_LINKED_FLOOR,
-                "unique_tested": DEFAULT_TESTED_FLOOR,
+                "unique_hypotheses": linked_floor,
+                "unique_tested": tested_floor,
             },
-            "score": "For each under-covered school helped: 1 + tested_gap/60. One hypothesis can help multiple schools.",
+            "score": "For each under-covered school helped: 1 + tested_gap/selected_tested_floor. One hypothesis can help multiple schools.",
             "non_action": "This queue does not change scores or verdicts; it only prioritizes work.",
+            "new_hypothesis_gate": "Run/repair existing pending links first. Add new hypotheses only where linked coverage remains below the selected floor after pending runs are exhausted.",
         },
         "summary": {
             "under_covered_schools": len(under_covered),
@@ -200,6 +216,9 @@ def plan_queue(limit: int) -> dict[str, Any]:
             "reason_counts": dict(reason_counts),
             "top_axes": axis_counts.most_common(10),
             "school_pending_counts": school_pending_counts,
+            "school_gap_counts": school_gap_counts,
+            "remaining_link_gap_after_pending": remaining_link_gap_after_pending,
+            "tested_gap_after_exhausting_pending": tested_gap_after_exhausting_pending,
         },
         "queue": rows[:limit],
     }
@@ -221,6 +240,9 @@ def write_outputs(plan: dict[str, Any], out_base: Path) -> None:
     )
 
     summary = plan["summary"]
+    blocker_text = ", ".join(
+        f"{k}={v}" for k, v in Counter(summary["reason_counts"]).most_common(6)
+    ) or "none"
     lines = [
         "# School Coverage Run Queue",
         "",
@@ -231,12 +253,15 @@ def write_outputs(plan: dict[str, Any], out_base: Path) -> None:
         "- This queue ranks already-linked pending hypotheses by coverage unlocked for under-covered schools.",
         "- It does not change verdicts, school predictions, polarity, or net scores.",
         "- The fastest fair path is to run or repair pending hypotheses before inventing new links.",
+        "- New hypotheses are allowed only where linked coverage is still below the selected floor after the pending queue is exhausted.",
         "",
         "## Summary",
         "",
         f"- Under-covered schools: {summary['under_covered_schools']}",
         f"- Pending candidates with coverage benefit: {summary['pending_candidates']}",
-        f"- Top blocker types: {', '.join(f'{k}={v}' for k, v in Counter(summary['reason_counts']).most_common(6))}",
+        f"- Top blocker types: {blocker_text}",
+        f"- Linked gap remaining after pending runs: {summary['remaining_link_gap_after_pending']}",
+        f"- Tested gap remaining after exhausting pending runs: {summary['tested_gap_after_exhausting_pending']}",
         "",
         "## Highest-Leverage Queue",
         "",
@@ -254,7 +279,6 @@ def write_outputs(plan: dict[str, Any], out_base: Path) -> None:
         "## First Batch IDs",
         "",
         "Use the companion `.ids` file for automation input. The first 20 IDs are:",
-        "",
     ]
     for row in plan["queue"][:20]:
         lines.append(f"- `{row['hypothesis_id']}`")
@@ -265,12 +289,14 @@ def write_outputs(plan: dict[str, Any], out_base: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument("--linked-floor", type=int, default=DEFAULT_LINKED_FLOOR)
+    parser.add_argument("--tested-floor", type=int, default=DEFAULT_TESTED_FLOOR)
     parser.add_argument(
         "--out",
         default=str(ROOT / "engine" / "audits" / f"school_coverage_run_queue_{date.today().isoformat()}"),
     )
     args = parser.parse_args()
-    plan = plan_queue(args.limit)
+    plan = plan_queue(args.limit, args.linked_floor, args.tested_floor)
     out_base = Path(args.out)
     write_outputs(plan, out_base)
     print(f"Wrote {out_base.with_suffix('.json')}")

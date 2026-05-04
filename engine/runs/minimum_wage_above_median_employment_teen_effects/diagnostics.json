@@ -1,14 +1,14 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded",
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
   "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded",
+  "verdict_reason": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
   "hypothesis_id": "minimum_wage_above_median_employment_teen_effects",
   "template": "did_callaway_santanna",
   "claim_direction_inferred": "+",
   "falsification_rule_text": "Not supported if, across the five labelled cases: (a) the p10 wage FIRST-ORDER effect is positive and significant (confirming the acknowledged success) AND (b) at least 3 of 5 cases show no statistically meaningful teen-E/P divergence (>1.0pp below synthetic control at p<0.10) AND (c) no case shows the NEET third-order persistence. If FIRST-ORDER is confirmed but SECOND-ORDER and THIRD-ORDER effects are null across the majority of cases, the causal-chain claim is refuted even though the first-order mechanism is intact. The minimum-wage-employment literature places prior at a moderate level: bite ratio is the decisive moderator.\n",
   "falsification_test_text": "staggered_did_five_case_causal_chain",
   "estimate": {
-    "error": "no outcome variable loaded"
+    "error": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels"
   },
   "data_status": {
     "variables_loaded": [],
@@ -16,50 +16,51 @@
       {
         "role": "outcome",
         "name": "teen_employment_to_population_ratio_high_bite",
-        "source": "bls:LAU (US state teen E/P); ons:LFS (UK regional teen E/P); destatis:mikrozensus (DEU regional youth E/P)"
-      },
-      {
-        "role": "outcome",
-        "name": "low_skill_immigrant_employment_rate",
-        "source": "bls:CPS (US foreign-born by education); ons:APS (UK); destatis:mikrozensus (DEU foreign-born by education)"
-      },
-      {
-        "role": "outcome",
-        "name": "neet_rate_15_24",
-        "source": "oecd:NEET (15-24 not in employment, education, or training, by region)"
-      },
-      {
-        "role": "outcome",
-        "name": "informal_sector_employment_share",
-        "source": "ilo:ILOSTAT; proxies: US 1099/contractor share from BLS-CES, UK self-employment share from ONS"
+        "source": "bls:LAU_state_teen_employment_population_ratio_panel"
       },
       {
         "role": "outcome",
         "name": "wage_at_10th_percentile",
-        "source": "bls:OEWS (US state p10 hourly wage); ons:ASHE (UK regional p10); destatis:VSE (DEU Kreis p10)"
+        "source": "bls:OEWS_state_p10_hourly_wage_panel"
       },
       {
         "role": "treatment",
         "name": "minimum_wage_bite_ratio",
-        "source": "constructed: statutory minimum / median wage in same region and age-group; inputs from bls:OEWS, ons:ASHE, destatis:VSE"
-      },
-      {
-        "role": "controls",
-        "name": "regional_gdp_growth",
-        "source": "world_bank_wdi:NY.GDP.MKTP.KD (national-level proxy when sub-national series unavailable)"
-      },
-      {
-        "role": "controls",
-        "name": "adult_unemployment_rate",
-        "source": "bls:LAUST010000000000003; ons:LFS; destatis:arbeitsmarkt"
-      },
-      {
-        "role": "controls",
-        "name": "sector_composition_share_tradable",
-        "source": "bls:QCEW; ons:BRES; destatis:erwerbstaetige"
+        "source": "derived:minimum_wage_bite_ratio_subnational_panel"
       }
     ]
   },
-  "run_utc": "2026-04-30T09:47:25+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py"
+  "run_utc": "2026-05-04T14:53:46+00:00",
+  "runner": "scripts/run_did_callaway_santanna.py",
+  "method_valid": false,
+  "data_gap": true,
+  "minimum_wage_data_gate": true,
+  "required_exact_vintages": [
+    "bls:LAU_state_teen_employment_population_ratio_panel",
+    "bls:OEWS_state_p10_hourly_wage_panel",
+    "derived:minimum_wage_bite_ratio_subnational_panel"
+  ],
+  "missing_exact_vintages": [
+    "bls:LAU_state_teen_employment_population_ratio_panel",
+    "bls:OEWS_state_p10_hourly_wage_panel",
+    "derived:minimum_wage_bite_ratio_subnational_panel"
+  ],
+  "incompatible_local_vintages": [
+    "world_bank_wdi:NY.GDP.MKTP.KD is only a national GDP control proxy; it cannot identify high-bite subregional treatment.",
+    "The current BLS vintages are national LNS/CES/CUUR extracts and do not include LAU/OEWS/QCEW subnational panels.",
+    "No ONS ASHE/APS/BRES or Destatis Mikrozensus/VSE subregional wage-employment vintages are on disk."
+  ],
+  "secondary_or_verdict_completeness_sources_needed": [
+    "ons:ASHE_regional_p10_hourly_wage_panel and uk_low_pay_commission:NLW_history for UK regions.",
+    "destatis:VSE_kreis_p10_hourly_wage_panel and destatis:german_minimum_wage_history for German Kreise.",
+    "oecd:regional_neet_15_24_panel or national-statistical regional NEET panels for third-order persistence.",
+    "Subnational sector composition and adult unemployment controls keyed to the same unit-year frame."
+  ],
+  "runner_limitation": "The five-case high-bite design is subnational and multi-country. The runner needs unit_id-level panel support before these fetched sources can be estimated without collapsing the design to country-year aggregates.",
+  "data_repair_note": [
+    "bls:LAU_state_teen_employment_population_ratio_panel \u2014 US state/city teen employment-to-population panel for high-bite cases, keyed by subnational unit and year.",
+    "bls:OEWS_state_p10_hourly_wage_panel \u2014 BLS OEWS state p10 hourly wage panel, paired with median wages so the first-order wage effect and bite ratio can be tested honestly.",
+    "derived:minimum_wage_bite_ratio_subnational_panel \u2014 Constructed statutory minimum / local age-specific median wage panel for Seattle, NYC fast-food, California, UK NLW regions, and German Mindestlohn cases."
+  ],
+  "pre_registration_stub_rule": false
 }

@@ -1842,14 +1842,31 @@ def primary_country(spec: dict) -> str:
     return countries[0] if countries else "???"
 
 
+def supports_multi_metric_runner(spec: dict) -> bool:
+    """Accept canonical multi-metric evidence or explicit checklist template.
+
+    Some promoted hypotheses were tagged with generic evidence types while still
+    using estimator.template=multi_metric_checklist. Treat those as valid
+    checklist specs instead of blocking on metadata mismatch.
+    """
+    evidence_type = str(spec.get("evidence_type") or "").strip()
+    template = str((spec.get("estimator") or {}).get("template") or "").strip()
+    return (
+        evidence_type == "canonical_case_multi_metric"
+        or template == "multi_metric_checklist"
+    )
+
+
 def run_hypothesis(hid: str) -> dict:
     spec_path = find_hypothesis(hid)
     spec = yaml.safe_load(spec_path.read_text())
 
-    if spec.get("evidence_type") != "canonical_case_multi_metric":
+    if not supports_multi_metric_runner(spec):
         raise ValueError(
-            f"{hid} has evidence_type={spec.get('evidence_type')!r}; "
-            f"this runner only handles canonical_case_multi_metric"
+            f"{hid} has evidence_type={spec.get('evidence_type')!r} and "
+            f"estimator.template={(spec.get('estimator') or {}).get('template')!r}; "
+            "this runner requires canonical_case_multi_metric evidence or "
+            "estimator.template='multi_metric_checklist'"
         )
 
     if is_stub_falsification_rule(spec):
@@ -2053,14 +2070,14 @@ def _build_result_card(hid: str, spec: dict, results: list[MetricResult], agg: d
 # ---------------------------------------------------------------------------
 
 def list_multi_metric_hypotheses() -> list[str]:
-    """Find every hypothesis yaml with evidence_type: canonical_case_multi_metric."""
+    """Find every hypothesis yaml compatible with this checklist runner."""
     out = []
     for p in HYPOTHESES_DIR.glob("*/*.yaml"):
         try:
             spec = yaml.safe_load(p.read_text())
         except Exception:
             continue
-        if isinstance(spec, dict) and spec.get("evidence_type") == "canonical_case_multi_metric":
+        if isinstance(spec, dict) and supports_multi_metric_runner(spec):
             out.append(spec.get("hypothesis_id", p.stem))
     return sorted(set(out))
 

@@ -69,12 +69,13 @@ sample:
 variables:
   outcome:
     - name: fossil_fuel_subsidy_pct_gdp
-      source: "iea:fossil_fuel_subsidies; imf:imf_energy_subsidies"
+      source: "imf:imf_energy_subsidies"
       transformation: level_pct_gdp
-      notes: "TODO: IEA fossil-fuel subsidy database starts 2007; pre-2007 use IMF energy-subsidy estimates (Coady et al.); coverage gap 1980-2007 flagged."
+      notes: "IMF Fossil Fuel Subsidies country database is required for pct-GDP estimates. The local IMF DataMapper fetcher does not expose this series; use the official IMF accompanying spreadsheet / country-and-fuel database to create data/vintages/imf/imf_energy_subsidies@<UTC>.parquet. Coverage before 2010 remains a preregistered blocker unless an older Coady et al. country-year vintage is added."
     - name: fossil_fuel_subsidy_usd
-      source: "iea:fossil_fuel_subsidies"
+      source: "iea:fossil_subsidies_estimate"
       transformation: log_level
+      notes: "IEA Fossil Fuel Subsidies Database consumption-subsidy workbook. Manual-drop expected at data/manual/iea/fossil_subsidies_estimate/ before calling data.fetchers.iea.fetch('fossil_subsidies_estimate')."
   treatment:
     - name: paris_agreement_post_indicator
       source: "constructed: binary = 1 from 2015-12 (COP21 / Paris Agreement)"
@@ -93,4 +94,3 @@ variables:
     - name: government_effectiveness_wgi
       source: "wgi:GOV_WGI_GE.EST"
       transformation: level
-

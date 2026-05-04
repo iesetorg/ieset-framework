@@ -83,26 +83,33 @@ scope:
 variables:
   outcome:
   - name: manufacturing_tfp_growth
-    source: oecd_stan:manufacturing_tfp; constructed:unido_indstat
-    transformation: log_diff_5y
-    notes: Manufacturing total factor productivity growth from OECD STAN or UNIDO INDSTAT.
+    source: pwt:rtfpna
+    transformation: log_diff
+    notes: >-
+      Proxy for productivity growth using PWT TFP at constant national
+      prices (rtfpna), differenced in logs.
   - name: export_sophistication_index
-    source: constructed:hauskornrich_export_sophistication; world_bank_wits:product_complexity
+    source: world_bank_wdi:TX.VAL.TECH.MF.ZS
     transformation: level
-    notes: Hausmann-Klinger export sophistication or Harvard Economic Complexity Index.
+    notes: >-
+      High-technology exports share as a tractable on-disk proxy for export
+      sophistication.
   treatment:
   - name: industrial_policy_intensity
-    source: constructed:sectoral_subsidy_plus_credit_targeting
+    source: world_bank_wdi:GC.XPN.TOTL.GD.ZS
     transformation: level
-    notes: Composite of sectoral subsidies, directed credit, and tariff protection intensity.
+    notes: >-
+      Public-expenditure share proxy for state industrial-policy intensity.
   - name: governance_quality
     source: wgi:GE.EST
     transformation: level
     notes: WGI government effectiveness as governance proxy.
   - name: export_discipline_index
-    source: constructed:performance_criteria_and_sunset_clauses
+    source: world_bank_wdi:NE.EXP.GNFS.ZS
     transformation: level
-    notes: Proxy for conditional support and competitive benchmarking.
+    notes: >-
+      Export-share proxy for external competitiveness pressure and export
+      discipline.
   controls:
   - name: log_gdp_per_capita
     source: world_bank_wdi:NY.GDP.PCAP.KD
@@ -133,6 +140,16 @@ falsification:
     supported: industrial_policy_x_governance interaction > 0 at p < 0.10
     refuted: industrial_policy coefficient < 0 at p < 0.10 in high-governance subsample
 prior_confidence: 0.60
+methodology_note: >-
+  2026-05-04 runnability repair for candidate execution. The originally cited
+  OECD STAN manufacturing TFP / UNIDO INDSTAT and bespoke industrial-policy
+  composites are not yet fully materialised as local vintages. This candidate
+  run uses transparent local proxies: PWT `rtfpna` for productivity dynamics,
+  high-tech export share for sophistication, government spending share for
+  policy intensity, and export-share pressure for discipline. The core
+  interaction estimand (industrial policy × governance quality) is preserved,
+  but conclusions should be interpreted as proxy-based evidence pending
+  dedicated source ingestion.
 disclosure: >-
   Author priors accept that industrial policy can work under high governance but are
   sceptical of replication in low-governance settings. The test is designed to challenge

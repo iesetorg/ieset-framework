@@ -82,7 +82,7 @@ export function isHypothesisPubliclyVisible(
   const v = (run.verdict ?? "").toLowerCase().trim();
   if (!v) return false;
   if (
-    v.startsWith("inconclusive_data_pending") ||
+    v.startsWith("inconclusive") ||
     v.startsWith("blocked") ||
     v.startsWith("error") ||
     v.startsWith("no verdict")

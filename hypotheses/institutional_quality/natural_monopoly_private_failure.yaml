@@ -113,11 +113,15 @@ variables:
     notes: Electricity access, water access, or telecom penetration as relevant.
   treatment:
   - name: privatisation_indicator
-    source: constructed:privatisation_event_database
+    source: >-
+      constructed: indicator = 1 for GBR from 1986 onward; CHL from 1988 onward;
+      ARG from 1992 onward; MEX from 1992 onward; PER from 1994 onward; BRA from
+      1998 onward; ZAF from 1997 onward; POL from 1990 onward; HUN from 1990 onward;
+      CZE from 1993 onward; ROU from 1998 onward; BGR from 2000 onward
     transformation: indicator
     notes: Indicator for post-privatisation years in natural-monopoly sectors.
   - name: regulatory_independence_index
-    source: constructed:oecd_regulatory_governance_index
+    source: wgi:GOV_WGI_RQ.EST
     transformation: level
     notes: Proxy for strength of independent sectoral regulator.
   controls:
@@ -148,9 +152,18 @@ falsification:
     public ownership.
   test: event_study_natural_monopoly_privatisation_1985_2020
   threshold:
+    expected_sign: "?"
     supported: unregulated privatisation shows price increase >10% or quality decline vs public benchmark at p < 0.10
     refuted: unregulated privatisation shows price decrease >5% and quality improvement at p < 0.10
 prior_confidence: 0.60
+methodology_note: >-
+  2026-05-04 candidate runnability repair: replaces the missing manual
+  privatisation event database with an explicit country-year treatment
+  coding string and uses WGI regulatory quality as a tractable regulator
+  strength proxy. This preserves the event-study structure while keeping
+  outcome interpretation conservative (`claim_direction: ?`) because the
+  currently loadable outcome mix is narrower than the full preregistered
+  consumer-welfare basket.
 disclosure: >-
   Author priors are sceptical of unregulated natural-monopoly privatisation but acknowledge
   that regulated privatisation (e.g., UK water, Chile telecom) has sometimes succeeded. The

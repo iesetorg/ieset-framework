@@ -53,9 +53,10 @@ COUNTRIES = [
 ]
 PERIOD = (1990, 2020)
 
-# Required series the spec calls for. (publisher, series, role).
-# If ANY required outcome / channel series is missing on-disk, the
-# regression cannot run and we emit inconclusive.
+# Required series the spec calls for. (publisher, series).
+# The primary regression needs at least one true mobility outcome and all
+# three institutional channels. Controls are reported as gaps but are not
+# the binding blocker in the current local vintage set.
 REQUIRED_OUTCOME = [
     ("owid", "intergenerational-earnings-elasticity"),
     ("owid", "share-of-children-in-the-bottom-quintile-who-make-it-to-the-top-quintile"),
@@ -150,25 +151,53 @@ def main() -> None:
         and len(missing_channels) == 0
     )
 
-    # ---------- METHOD_VALID gate: not enough data → inconclusive ----------
+    # ---------- METHOD_VALID gate: not enough data -> inconclusive ----------
     if not can_run:
-        verdict = (
-            "inconclusive — data gap on "
-            + ", ".join(missing_outcome + missing_channels)
+        binding_missing = []
+        if len(missing_outcome) == len(REQUIRED_OUTCOME):
+            binding_missing.extend(missing_outcome)
+        binding_missing.extend(missing_channels)
+        if not binding_missing:
+            binding_missing = missing_outcome + missing_channels
+        available_outcomes = [
+            f"{p}:{s}" for p, s in REQUIRED_OUTCOME if f"{p}:{s}" in available
+        ]
+        verdict_reason = (
+            "data gap on "
+            + ", ".join(binding_missing)
             + ". The spec's primary regression cannot be estimated without "
             "a mobility outcome series and all three institutional-channel "
-            "series. v1 spec notes (lines 162-169) flag this gap explicitly: "
-            "OWID intergenerational-mobility mirror, OECD Education-at-a-Glance "
-            "subnational spending dispersion, and OECD Affordable Housing "
-            "Database segregation indices are pending fetcher work. "
-            "No coefficients computed."
+            "series. The v1 notes explicitly data-gate this test on an OWID "
+            "or OECD intergenerational-mobility mirror, OECD Education-at-a-"
+            "Glance subnational spending dispersion, and OECD Affordable "
+            "Housing Database income-segregation indices. No coefficients "
+            "computed."
+        )
+        verdict = (
+            "inconclusive - " + verdict_reason
+        )
+        data_repair_note = (
+            "2026-05-04 source repair fetched the live OWID Corak/Chen-"
+            "Forster-Llena-Nozal intergenerational earnings-elasticity mirror "
+            f"({', '.join(available_outcomes) or 'no mobility outcome available'}). "
+            "The primary regression still remains data-gated because the OECD "
+            "subnational education-spending dispersion and OECD Affordable "
+            "Housing income-segregation channels are not present locally. The "
+            "bottom-to-top-quintile mobility outcome is also still unavailable "
+            "as a robustness outcome. WDI GDP per capita or poverty-headcount "
+            "series are not valid substitutes for the preregistered mobility "
+            "outcomes or institutional channels."
         )
 
         diagnostics = {
             "verdict": verdict,
+            "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+            "verdict_reason": verdict_reason,
             "all_pass": False,
             "method_valid": False,
             "data_gap": True,
+            "data_repair_note": data_repair_note,
+            "binding_missing_series": binding_missing,
             "missing_outcome_series": missing_outcome,
             "missing_channel_series": missing_channels,
             "missing_control_series": missing_controls,
@@ -210,7 +239,7 @@ def main() -> None:
                     "type": "note",
                     "label": (
                         "Required-but-missing series: "
-                        + "; ".join(missing_outcome + missing_channels)
+                        + "; ".join(binding_missing)
                     ),
                 }
             ],
@@ -253,16 +282,22 @@ def main() -> None:
             "- The hypothesis requires a cross-country regression of mobility on "
             "three institutional channels (education-spending inequality, residential "
             "segregation, housing affordability) plus controls.",
-            "- v1 spec (notes, lines 162-169) flags the data gap explicitly: "
-            "OECD SDD SOC mobility extension, Chetty opportunity-atlas (US-only) "
-            "and OECD Affordable Housing Database extension are not in the "
-            "fetcher set yet.",
+            "- The v1 spec flags the data gap explicitly: OECD SDD SOC "
+            "mobility extension, Chetty opportunity-atlas (US-only), OECD "
+            "Education-at-a-Glance subnational spending dispersion, and OECD "
+            "Affordable Housing Database income-segregation support are not "
+            "fully present in the local vintage set.",
+            "- 2026-05-04 source repair: the live OWID elasticity chart was "
+            "mapped and fetched as the preregistered earnings-elasticity "
+            "outcome; the bottom-to-top-quintile robustness outcome and the "
+            "two OECD institutional-channel vintages remain unavailable.",
             f"- Required series: {len(REQUIRED_OUTCOME)} outcome, "
             f"{len(REQUIRED_CHANNELS)} institutional-channel, "
             f"{len(REQUIRED_CONTROLS)} controls.",
             f"- Found on-disk: {len(available)} of "
             f"{len(REQUIRED_OUTCOME)+len(REQUIRED_CHANNELS)+len(REQUIRED_CONTROLS)}.",
             f"- Missing outcome: {missing_outcome or '(none)'}.",
+            f"- Binding missing series: {binding_missing or '(none)'}.",
             f"- Missing channels: {missing_channels or '(none)'}.",
             f"- Missing controls: {missing_controls or '(none)'}.",
             "",
@@ -294,8 +329,8 @@ def main() -> None:
         card.append(
             "Promotion verdict: inconclusive (method-validity gate fails on data "
             "availability). Per HANDOFF_TO_RUN_AGENT.md a data gap is NOT a "
-            "refutation — the scoreboard treats this as neutral. Re-run when "
-            "the OWID mobility mirror and OECD subnational fetchers are wired."
+            "refutation - the scoreboard treats this as neutral. Re-run when "
+            "the remaining OECD subnational fetchers are wired."
         )
         (OUT_DIR / "result_card.md").write_text("\n".join(card) + "\n")
 

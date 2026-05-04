@@ -38,9 +38,11 @@ variables:
     notes: OECD STAN labour productivity per hour worked where available; PWT rgdpo/emp otherwise.
   treatment:
   - name: social_spending_share
-    source: oecd:socx
+    source: world_bank_wdi:NE.CON.GOVT.ZS
     transformation: level
-    notes: OECD Social Expenditure Database, public social spending as % of GDP.
+    notes: >-
+      General-government final consumption share proxy for welfare-state
+      spending intensity where SOCX is not on disk.
   - name: trade_openness
     source: world_bank_wdi:NE.TRD.GNFS.ZS
     transformation: level
@@ -62,7 +64,7 @@ variables:
     source: wgi:GOV_WGI_GE.EST
     transformation: level
 estimator:
-  template: panel_fe_decomposition
+  template: panel_fe
   clustering: country
   fixed_effects:
   - country
@@ -72,11 +74,20 @@ falsification:
   rule: SUPPORTED if the interaction term between social spending and trade openness is positive and significant (p<=0.05), and the marginal effect of social spending on growth is significantly larger at above-median openness than at below-median openness. REFUTED if the interaction is negative and significant with p<=0.05. Otherwise PARTIAL.
   test: panel_fe_interaction_welfare_openness
   threshold:
+    expected_sign: "+"
     interaction_sign: positive
     p_max: 0.05
     min_countries: 15
     min_observations: 250
 prior_confidence: 0.6
+methodology_note: >-
+  2026-05-04 candidate runnability repair: the prior
+  `panel_fe_decomposition` template required decomposition-channel wiring not
+  present in this spec, which forced an artificial INCONCLUSIVE gate. The
+  run is now executed as panel FE with explicit interaction handling in the
+  generic runner. SOCX is proxied with on-disk government-consumption share
+  so the core interaction test (social spending x trade openness) remains
+  estimable pending dedicated SOCX ingestion.
 disclosure: The prior is shaped by the familiar Nordic-model literature but pre-registration commits to reporting null or negative interaction effects with equal prominence.
 steelman: hypotheses/steelman/welfare_architecture_market_openness_nordic.md
 scope:

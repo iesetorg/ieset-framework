@@ -59,17 +59,6 @@ export default async function ScoreboardPage() {
   const balancedCoverage = coverageRows.filter(
     (r) => r.linkedGap === 0 && r.testedGap === 0
   ).length;
-  const linkedUnder = coverageRows.filter((r) => r.linkedGap > 0).length;
-  const testedUnder = coverageRows.filter((r) => r.testedGap > 0).length;
-  const minLinked = Math.min(...coverageRows.map((r) => r.linkedCount));
-  const maxLinked = Math.max(...coverageRows.map((r) => r.linkedCount));
-  const minTested = Math.min(...coverageRows.map((r) => r.testedCount));
-  const maxTested = Math.max(...coverageRows.map((r) => r.testedCount));
-  const totalLinkedGap = coverageRows.reduce((a, r) => a + r.linkedGap, 0);
-  const totalTestedGap = coverageRows.reduce((a, r) => a + r.testedGap, 0);
-  const coverageQueue = coverageRows.filter(
-    (r) => r.linkedGap > 0 || r.testedGap > 0
-  );
 
   return (
     <div className="mx-auto max-w-content px-8 py-10">
@@ -118,73 +107,6 @@ export default async function ScoreboardPage() {
           <em>is</em> the framework updating on evidence in public.
         </p>
       </div>
-
-      <section className="mb-8 rounded border border-amber/40 bg-[#fff8ec] p-5 text-[14px] leading-[1.6] text-ink">
-        <div className="sc mb-1.5 text-[10px] font-semibold tracking-[0.1em] text-amber">
-          coverage balance gate
-        </div>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-[760px]">
-            <h2 className="m-0 text-[18px] font-semibold">
-              Rankings are live, but coverage is not balanced yet.
-            </h2>
-            <p className="mt-2 mb-0 text-muted">
-              V1 balance requires each school to have at least{" "}
-              <strong>{COVERAGE_LINKED_FLOOR}</strong> unique existing
-              hypothesis links in the atlas and{" "}
-              <strong>{COVERAGE_TESTED_FLOOR}</strong> unique tested
-              hypotheses. Until then, support rates should be read with the
-              coverage queue beside them.
-            </p>
-          </div>
-          <div className="grid min-w-[260px] grid-cols-2 gap-3 text-sm">
-            <CoverageStat label="balanced schools" value={`${balancedCoverage}/${scores.length}`} />
-            <CoverageStat label="linked range" value={`${minLinked}-${maxLinked}`} />
-            <CoverageStat label="tested range" value={`${minTested}-${maxTested}`} />
-            <CoverageStat label="V1 gaps" value={`${totalLinkedGap} links / ${totalTestedGap} runs`} />
-          </div>
-        </div>
-        <div className="mt-4 text-[13px] text-muted">
-          {linkedUnder} school{linkedUnder === 1 ? "" : "s"} below the linked
-          floor; {testedUnder} school{testedUnder === 1 ? "" : "s"} below the
-          tested floor.
-        </div>
-        {coverageQueue.length > 0 && (
-          <div className="mt-4 overflow-x-auto rounded border border-rule bg-white">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-rule bg-panel">
-                  <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">Priority school</th>
-                  <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Linked</th>
-                  <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Tested</th>
-                  <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Pending</th>
-                  <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Link gap</th>
-                  <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Run gap</th>
-                </tr>
-              </thead>
-              <tbody>
-                {coverageQueue.slice(0, 10).map((r) => (
-                  <tr key={r.position_id} className="border-b border-rule last:border-0">
-                    <td className="p-3 align-top">
-                      <Link href={`/pos/${r.position_id}`} className="font-medium text-ink hover:underline">
-                        {r.school}
-                      </Link>
-                      <div className="mt-0.5 font-mono text-[10.5px] text-faint">
-                        {r.position_id}
-                      </div>
-                    </td>
-                    <td className="p-3 text-right align-top font-mono">{r.linkedCount}</td>
-                    <td className="p-3 text-right align-top font-mono">{r.testedCount}</td>
-                    <td className="p-3 text-right align-top font-mono text-muted">{r.pendingCount}</td>
-                    <td className="p-3 text-right align-top font-mono text-amber">{r.linkedGap}</td>
-                    <td className="p-3 text-right align-top font-mono text-amber">{r.testedGap}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
 
       <h2 className="mt-10 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
         Schools with tested predictions — ranked by support rate
@@ -301,19 +223,6 @@ export default async function ScoreboardPage() {
           </li>
         </ul>
       </section>
-    </div>
-  );
-}
-
-function CoverageStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded border border-rule bg-white px-3 py-2">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-        {label}
-      </div>
-      <div className="mt-1 font-mono text-[15px] font-semibold text-ink">
-        {value}
-      </div>
     </div>
   );
 }

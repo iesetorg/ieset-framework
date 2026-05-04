@@ -48,6 +48,10 @@ PHRASE_CUES: dict[str, list[str]] = {
     "capital gains": ["fiscal.tax_capital"],
     "inheritance tax": ["fiscal.tax_capital"],
     "estate tax": ["fiscal.tax_capital"],
+    "tax burden": ["fiscal.tax_progressivity", "fiscal.spending_level"],
+    "fiscal freedom": ["fiscal.tax_progressivity", "fiscal.spending_level"],
+    "child tax credit": ["fiscal.transfer_expansion", "fiscal.tax_progressivity"],
+    "ctc expansion": ["fiscal.transfer_expansion", "fiscal.tax_progressivity"],
     "transfer programme": ["fiscal.transfer_expansion"],
     "transfer program": ["fiscal.transfer_expansion"],
     "unemployment benefit": ["fiscal.transfer_expansion"],
@@ -105,6 +109,13 @@ PHRASE_CUES: dict[str, list[str]] = {
     "protectionism": ["regulatory.trade_openness"],
     "import substitution": ["regulatory.trade_openness"],
     "trade liberalisation": ["regulatory.trade_openness"],
+    "trade freedom": ["regulatory.trade_openness"],
+    "business freedom": [
+        "regulatory.product_market_competition",
+        "regulatory.sectoral_licensing",
+    ],
+    "labor freedom": ["regulatory.labour_market_flexibility"],
+    "labour freedom": ["regulatory.labour_market_flexibility"],
     # --- monetary ---
     "central bank independence": ["monetary.central_bank_independence"],
     "fiscal dominance": ["monetary.central_bank_independence"],
@@ -120,6 +131,28 @@ PHRASE_CUES: dict[str, list[str]] = {
     "corruption": ["institutional.rule_of_law"],
     "property rights": ["institutional.property_rights"],
     "expropriation": ["institutional.property_rights"],
+    "economic freedom": [
+        "institutional.property_rights",
+        "institutional.rule_of_law",
+        "regulatory.product_market_competition",
+        "regulatory.trade_openness",
+    ],
+    "financial freedom": ["regulatory.financial_deregulation"],
+    "government integrity": ["institutional.rule_of_law"],
+    "government spending": ["fiscal.spending_level"],
+    "investment freedom": [
+        "institutional.property_rights",
+        "regulatory.financial_deregulation",
+        "regulatory.trade_openness",
+    ],
+    "judicial effectiveness": [
+        "institutional.judicial_independence",
+        "institutional.rule_of_law",
+    ],
+    "monetary freedom": [
+        "monetary.monetary_expansion_direction",
+        "monetary.central_bank_independence",
+    ],
     "nationalisation": ["institutional.property_rights"],
     "nationalization": ["institutional.property_rights"],
     "land reform": ["institutional.property_rights"],
@@ -344,25 +377,52 @@ def load_hypotheses() -> list[tuple[Path, dict]]:
 def hypothesis_signal_text(doc: dict) -> str:
     """Concatenated signal surface for a hypothesis."""
     parts: list[str] = []
-    for k in ("hypothesis_id", "title", "claim", "description"):
+    for k in (
+        "hypothesis_id",
+        "title",
+        "claim",
+        "description",
+        "notes",
+        "methodology_note",
+        "intervention_channel",
+        "intervention_channel_justification",
+    ):
         v = doc.get(k)
         if isinstance(v, str):
             parts.append(v)
+    scope = doc.get("scope") or {}
+    if isinstance(scope, dict):
+        for key in ("outcome_dim", "policy_family", "treatment_tags"):
+            values = scope.get(key) or []
+            if isinstance(values, list):
+                parts.extend(str(value) for value in values)
+            elif isinstance(values, str):
+                parts.append(values)
     # variable names and notes
     for bucket in ("outcome", "treatment", "decomposition_channels", "controls"):
         for v in (doc.get("variables") or {}).get(bucket, []) or []:
             if isinstance(v, dict):
                 if v.get("name"):
                     parts.append(str(v["name"]))
+                if v.get("source"):
+                    parts.append(str(v["source"]))
                 if v.get("notes"):
                     parts.append(str(v["notes"]))
+    for metric in doc.get("canonical_metrics") or []:
+        if isinstance(metric, dict):
+            for key in ("metric_id", "description", "source"):
+                if isinstance(metric.get(key), str):
+                    parts.append(metric[key])
     # primary_outcome (wave-3 schema)
     po = doc.get("primary_outcome")
     if isinstance(po, dict):
         for k in ("metric", "expected_finding"):
             if isinstance(po.get(k), str):
                 parts.append(po[k])
-    return " ".join(parts).lower()
+    # Tags and identifiers often encode phrases with underscores
+    # (`tax_burden`, `trade_freedom`). Normalize them so curated phrase cues
+    # can beat generic claim wording such as "market-oriented".
+    return " ".join(parts).lower().replace("_", " ")
 
 
 def score_axes(

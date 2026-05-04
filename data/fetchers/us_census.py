@@ -14,6 +14,7 @@ This fetcher covers the nine series cited in the IESET long-tail spec:
     annual_state_population_estimates  — Population Estimates Program, state-level
     building_permits                   — Building Permits Survey (national, monthly EITS)
     cps_supplemental_poverty           — CPS ASEC supplemental poverty measure
+    spm_child_poverty_rate             — published child SPM rate, Table B-2
     population                         — Population Estimates Program, national
     saipe                              — Small Area Income and Poverty Estimates (state)
     trade_in_goods                     — International Trade — exports of goods (HS, monthly)
@@ -26,6 +27,7 @@ column, then persists via ``write_vintage``.
 from __future__ import annotations
 
 import os
+from io import BytesIO
 from datetime import datetime
 from typing import Any
 
@@ -37,6 +39,9 @@ from ._base import FetchResult, utc_now, write_vintage
 CENSUS_BASE = "https://api.census.gov/data"
 LICENSE = "US Government work — public domain"
 METHODOLOGY = "https://www.census.gov/data/developers/data-sets.html"
+SPM_TABLE_B2_2023_URL = (
+    "https://www2.census.gov/programs-surveys/demo/tables/p60/283/tableB-2.xlsx"
+)
 
 
 class CensusError(RuntimeError):
@@ -127,6 +132,16 @@ SUPPORTED: dict[str, dict[str, Any]] = {
         "units": "household-level supplemental poverty flag (0/1) with weight",
         "value_var": "SPM_POVUNIT_POV",
     },
+    "spm_child_poverty_rate": {
+        # Published Census Table B-2, used when the hypothesis targets the
+        # headline annual child SPM rate rather than CPS microdata reweighting.
+        "kind": "xlsx_table_b2",
+        "year": None,
+        "dataset": SPM_TABLE_B2_2023_URL,
+        "frequency": "annual",
+        "units": "percent of people under age 18 in poverty, Supplemental Poverty Measure",
+        "value_var": "under18_spm_poverty_rate_pct",
+    },
     "building_permits": {
         # Economic Indicators Time Series — Building Permits Survey, national.
         "year": None,
@@ -190,6 +205,94 @@ def _request(url: str, params: dict[str, str]) -> list[list[Any]]:
     return payload
 
 
+def _fetch_spm_child_poverty_table(fetch_ts: datetime) -> FetchResult:
+    """Fetch Census P60-283 Table B-2 and extract all-races under-18 SPM rates."""
+    r = requests.get(SPM_TABLE_B2_2023_URL, timeout=120)
+    if r.status_code != 200:
+        raise CensusError(
+            f"Census Table B-2 download failed {r.status_code}: {r.text[:300]}"
+        )
+    raw = pd.read_excel(BytesIO(r.content), sheet_name=0, header=None)
+
+    all_races_rows = raw.index[raw.iloc[:, 0].astype(str).str.strip().eq("ALL RACES")]
+    if all_races_rows.empty:
+        raise CensusError("Could not find ALL RACES section in Census Table B-2")
+    start = int(all_races_rows[0]) + 1
+
+    records: list[dict[str, Any]] = []
+    for _, row in raw.iloc[start:].iterrows():
+        year_raw = str(row.iloc[0]).strip()
+        if not year_raw or year_raw.lower() == "nan":
+            continue
+        year_match = year_raw[:4]
+        if not year_match.isdigit():
+            break
+        year = int(year_match)
+        value = pd.to_numeric(row.iloc[9], errors="coerce")
+        moe = pd.to_numeric(row.iloc[10], errors="coerce")
+        if pd.isna(value):
+            continue
+        records.append(
+            {
+                "country_iso3": "USA",
+                "country_name": "United States",
+                "geo_area": "USA",
+                "year": year,
+                "year_raw": year_raw,
+                "value": float(value),
+                "under18_spm_poverty_rate_pct": float(value),
+                "under18_spm_poverty_rate_moe_90_pctpt": (
+                    float(moe) if not pd.isna(moe) else None
+                ),
+                "all_people_spm_poverty_rate_pct": (
+                    float(pd.to_numeric(row.iloc[4], errors="coerce"))
+                    if not pd.isna(pd.to_numeric(row.iloc[4], errors="coerce"))
+                    else None
+                ),
+                "source_table": "P60-283 Table B-2",
+                "source_url": SPM_TABLE_B2_2023_URL,
+            }
+        )
+
+    if not records:
+        raise CensusError("No annual child SPM rows parsed from Census Table B-2")
+    df = (
+        pd.DataFrame.from_records(records)
+        .drop_duplicates(subset=["country_iso3", "year"], keep="first")
+        .sort_values("year")
+    )
+
+    path_out, sha = write_vintage(
+        publisher="us_census",
+        series_id="spm_child_poverty_rate",
+        frame=df,
+        fetch_utc=fetch_ts,
+    )
+    return FetchResult(
+        publisher="us_census",
+        series_id="spm_child_poverty_rate",
+        source_url=SPM_TABLE_B2_2023_URL,
+        methodology_url="https://www.census.gov/library/publications/2024/demo/p60-283.html",
+        license=LICENSE,
+        fetch_utc=fetch_ts,
+        rows=len(df),
+        frequency="annual",
+        units="percent of people under age 18 in poverty, Supplemental Poverty Measure",
+        currency=None,
+        start_date=str(int(df["year"].min())),
+        end_date=str(int(df["year"].max())),
+        sha256=sha,
+        parquet_path=path_out,
+        extra={
+            "table": "B-2",
+            "report": "Poverty in the United States: 2023",
+            "report_number": "P60-283",
+            "measure": "Supplemental Poverty Measure child poverty rate",
+            "moe": "90 percent margin of error, percentage points",
+        },
+    )
+
+
 def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult:
     """Fetch one cited Census series.
 
@@ -201,6 +304,9 @@ def fetch(series_id: str, *, vintage_utc: datetime | None = None) -> FetchResult
         )
     spec = SUPPORTED[series_id]
     fetch_ts = utc_now()
+    if spec.get("kind") == "xlsx_table_b2":
+        return _fetch_spm_child_poverty_table(fetch_ts)
+
     api_key = os.environ.get("CENSUS_API_KEY")
 
     url = _build_url(spec)
