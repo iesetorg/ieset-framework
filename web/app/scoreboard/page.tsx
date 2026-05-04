@@ -104,13 +104,44 @@ export default async function ScoreboardPage() {
           the school. A school with 1-of-1 tested prediction supported is not
           more vindicated than one with 3-of-5 — the <strong>Tested</strong>{" "}
           column matters as much as <strong>Rate</strong>. This scoreboard{" "}
-          <em>is</em> the framework updating on evidence in public. The{" "}
-          <strong>Q-net</strong> column is evidence-quality adjusted:
-          causal tests count 1×, associational tests 0.5×, and descriptive or
-          canonical-case pattern matches 0.25×. The raw net is still shown, but
-          schools are ranked by Q-net so generic pattern matches cannot dominate
-          doctrine-level claims. The <strong>Signal</strong> column adds a
-          no-call band for tiny margins.
+          <em>is</em> the framework updating on evidence in public.
+        </p>
+        <p className="mt-3 mb-0">
+          <strong>Raw net</strong> is the simple scoreboard: a clear win counts
+          +1, a partial win +0.5, a partial loss -0.5, and a clear loss -1.{" "}
+          <strong>Q-net</strong> starts from that same score, then asks how
+          strong the test design is. A study that can credibly test a causal
+          claim should move the scoreboard more than a broad pattern match like
+          &quot;this country got richer and healthier.&quot;
+        </p>
+        <div className="mt-3 grid gap-2 text-[13px] md:grid-cols-3">
+          <div className="rounded border border-rule bg-white px-3 py-2">
+            <strong>Causal tests: 1×</strong>
+            <div className="mt-1 text-muted">
+              Strongest scoreboard weight because the design targets cause and
+              effect.
+            </div>
+          </div>
+          <div className="rounded border border-rule bg-white px-3 py-2">
+            <strong>Associational tests: 0.5×</strong>
+            <div className="mt-1 text-muted">
+              Useful evidence, but weaker because correlation may not be the
+              mechanism.
+            </div>
+          </div>
+          <div className="rounded border border-rule bg-white px-3 py-2">
+            <strong>Descriptive patterns: 0.25×</strong>
+            <div className="mt-1 text-muted">
+              Real evidence, but mostly says the outcome happened, not why it
+              happened.
+            </div>
+          </div>
+        </div>
+        <p className="mt-3 mb-0">
+          Schools are ranked by <strong>Q-net</strong> so generic development
+          facts cannot swamp sharper policy tests. The original raw score stays
+          visible for transparency, and <strong>Signal</strong> marks tiny
+          Q-net margins as too close to call.
         </p>
       </div>
 

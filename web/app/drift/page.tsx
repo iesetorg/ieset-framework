@@ -1,6 +1,12 @@
 import Link from "next/link";
 
+import {
+  isHypothesisPubliclyVisible,
+  loadHypothesis,
+  loadRunArtifacts,
+} from "@/lib/content";
 import { loadDrift, countryName } from "@/lib/drift";
+import { verdictShort, verdictTone, type VerdictTone } from "@/lib/verdict";
 import { DriftChart } from "@/components/charts/DriftChartLoader";
 import { InteractiveDriftChart } from "@/components/charts/InteractiveDriftChartLoader";
 
@@ -147,6 +153,92 @@ const KEY_AXES_FOR_DRIFT: Array<{ axis: string; label: string; caption: string }
   },
 ];
 
+const DRIFT_HYPOTHESES = [
+  {
+    id: "liberal_democracy_managerial_flywheel_drift",
+    label: "Managerial flywheel",
+    question: "Do liberal democracies drift monotonically toward larger states?",
+  },
+  {
+    id: "fiscal_rule_presence_dampens_statist_drift",
+    label: "Fiscal-rule brake",
+    question: "Do binding fiscal rules dampen statist drift?",
+  },
+  {
+    id: "initial_state_share_predicts_drift_reversal",
+    label: "Initial-state reversal",
+    question: "Do high-state-share countries revert toward market drift?",
+  },
+] as const;
+
+function toneClasses(tone: VerdictTone): string {
+  if (tone === "green") return "bg-green-soft text-green";
+  if (tone === "amber") return "bg-amber-soft text-amber";
+  if (tone === "red") return "bg-red-soft text-red";
+  return "bg-panel text-muted";
+}
+
+function asRecord(v: unknown): Record<string, unknown> | null {
+  return v && typeof v === "object" && !Array.isArray(v)
+    ? (v as Record<string, unknown>)
+    : null;
+}
+
+function numberValue(v: unknown): number | null {
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+
+function formatSigned(v: number | null, digits = 2): string {
+  if (v === null) return "n/a";
+  return `${v >= 0 ? "+" : ""}${v.toFixed(digits)}`;
+}
+
+function formatPlain(v: number | null, digits = 2): string {
+  if (v === null) return "n/a";
+  return v.toFixed(digits);
+}
+
+function driftDiagnosticsSummary(
+  id: (typeof DRIFT_HYPOTHESES)[number]["id"],
+  diagnostics: Record<string, unknown> | undefined
+): string {
+  if (!diagnostics) return "No diagnostics artifact yet.";
+
+  if (id === "liberal_democracy_managerial_flywheel_drift") {
+    const median = numberValue(diagnostics.median_final_drift);
+    const positive = numberValue(diagnostics.positive_count);
+    const panel = numberValue(diagnostics.panel_size);
+    const slope = numberValue(diagnostics.median_slope_per_decade);
+    return `Median final drift ${formatSigned(median, 1)}; ${positive ?? "n/a"}/${
+      panel ?? "n/a"
+    } countries positive; median slope ${formatSigned(slope, 2)} per decade.`;
+  }
+
+  if (id === "fiscal_rule_presence_dampens_statist_drift") {
+    const gap = numberValue(diagnostics.median_gap_bound_minus_free);
+    const p = numberValue(diagnostics.mann_whitney_one_sided_p);
+    const bound = numberValue(diagnostics.median_slope_rule_bound);
+    const free = numberValue(diagnostics.median_slope_rule_free);
+    return `Rule-bound median ${formatSigned(bound, 2)} vs rule-free ${formatSigned(
+      free,
+      2
+    )}; gap ${formatSigned(gap, 2)}; one-sided p=${formatPlain(p, 4)}.`;
+  }
+
+  if (id === "initial_state_share_predicts_drift_reversal") {
+    const primary = asRecord(diagnostics.primary_univariate);
+    const beta = numberValue(primary?.beta_initial_share);
+    const p = numberValue(primary?.p_two_sided);
+    const r2 = numberValue(primary?.r2);
+    return `Primary beta ${formatSigned(beta, 4)}; p=${formatPlain(
+      p,
+      4
+    )}; R²=${formatPlain(r2, 3)}.`;
+  }
+
+  return "Diagnostics loaded.";
+}
+
 // Cap the number of trajectories drawn in any one composite chart so the
 // chart stays legible. Within a region we pick the top-N by movement_count
 // (the most-coded — and therefore best-anchored — entries).
@@ -165,6 +257,27 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+  const driftHypothesisCards = await Promise.all(
+    DRIFT_HYPOTHESES.map(async (spec) => {
+      const [hypothesis, run] = await Promise.all([
+        loadHypothesis(spec.id),
+        loadRunArtifacts(spec.id),
+      ]);
+      const visible = hypothesis ? isHypothesisPubliclyVisible(hypothesis, run) : false;
+      return {
+        ...spec,
+        hypothesis,
+        run,
+        visible,
+        verdictLabel: verdictShort(run.verdict),
+        tone: verdictTone(run.verdict),
+        summary: driftDiagnosticsSummary(spec.id, run.diagnostics),
+      };
+    })
+  );
+  const driftRunsWithDiagnostics = driftHypothesisCards.filter(
+    (card) => card.run.exists && card.run.verdict
+  ).length;
 
   // For each region, work out which countries are in the corpus + sort by
   // movement_count desc + slice to the per-panel limit.
@@ -265,7 +378,7 @@ export default async function DriftPage() {
         of legislated policy since {data.year_min}.&quot;
       </div>
 
-      <div className="mb-10 grid grid-cols-2 gap-6 rounded border border-rule bg-white p-5 text-[13.5px] md:grid-cols-4">
+      <div className="mb-10 grid grid-cols-2 gap-6 rounded border border-rule bg-white p-5 text-[13.5px] md:grid-cols-5">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
             Countries
@@ -298,7 +411,65 @@ export default async function DriftPage() {
             {REGIONS.length}
           </div>
         </div>
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+            Linked tests
+          </div>
+          <div className="mt-0.5 text-[24px] font-semibold tabular-nums">
+            {driftRunsWithDiagnostics}/{driftHypothesisCards.length}
+          </div>
+        </div>
       </div>
+
+      <section className="mb-10 rounded border border-rule bg-white p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="m-0 text-[20px] font-semibold tracking-[-0.01em]">
+              Hypothesis tests linked to this drift index
+            </h2>
+            <p className="m-0 mt-1 max-w-[820px] text-[13.5px] leading-[1.55] text-muted">
+              The charts stay descriptive; these linked hypotheses are the
+              formal testing layer. They now rerun against the refreshed
+              country_drift dataset, so visual drift and scoreboard evidence
+              are reading from the same corpus.
+            </p>
+          </div>
+          <span className="rounded-full bg-panel px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
+            {driftRunsWithDiagnostics} tested
+          </span>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {driftHypothesisCards.map((card) => (
+            <Link
+              key={card.id}
+              href={`/h/${card.id}`}
+              className="block rounded border border-rule bg-panel p-4 text-ink no-underline transition hover:border-accent hover:bg-accent-soft/40"
+            >
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[13.5px] font-semibold">{card.label}</span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${toneClasses(
+                    card.tone
+                  )}`}
+                >
+                  {card.verdictLabel}
+                </span>
+              </div>
+              <p className="m-0 mb-2 text-[13px] leading-[1.45] text-muted">
+                {card.question}
+              </p>
+              <p className="m-0 text-[12.5px] leading-[1.45] text-muted">
+                {card.summary}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2 text-[10.5px] uppercase tracking-wider text-faint">
+                <span>{card.hypothesis?.evidence_type ?? "evidence n/a"}</span>
+                <span>·</span>
+                <span>{card.visible ? "public" : "integrity gate pending"}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* Headline two-column leaderboard — every country, statist vs market */}
       <h2 className="mt-8 mb-3 text-[22px] font-semibold tracking-[-0.01em]">
@@ -583,10 +754,12 @@ export default async function DriftPage() {
           appear above — neither view wins by inspection alone.
         </p>
         <p className="m-0 text-muted">
-          The next layer is to formally regress the composite-drift slope on
-          country fixed effects + median-voter ageing + fiscal-rule presence +
-          labour-share dynamics. That belongs in a hypothesis YAML; this page
-          is a description, not yet a test.
+          That next layer is now attached above as pre-registered hypotheses:
+          the managerial-flywheel claim, the fiscal-rule dampening claim, and
+          the initial-state reversion claim. Keeping them separate is deliberate:
+          this page describes the coded policy trajectory, while the hypothesis
+          pages say exactly what would count as support, partial support, or
+          refutation.
         </p>
       </section>
     </div>

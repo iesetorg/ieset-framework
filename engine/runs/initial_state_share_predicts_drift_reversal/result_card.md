@@ -1,57 +1,57 @@
 # Initial state-share predicts drift reversal
 
-**Verdict:** partial — Direction is correct (β = -0.0245) but neither the significance threshold (p = 0.8254) nor the explanatory threshold (R² = 0.002) is met. Suggestive only.
+**Verdict:** partial — Direction is correct (β = -0.0233) but neither the significance threshold (p = 0.8246) nor the explanatory threshold (R² = 0.002) is met. Suggestive only.
 
 ## Primary specification (ISR excluded)
 
 - n = 25
-- β (initial_share) = -0.0245 per pp of GDP (SE = 0.1097, t = -0.223, two-sided p = 0.8254)
+- β (initial_share) = -0.0233 per pp of GDP (SE = 0.1038, t = -0.224, two-sided p = 0.8246)
 - R² = 0.002
 - Threshold: β < 0 AND p < 0.1 AND R² ≥ 0.2
 
 ## With log-GDP-pc control
 
 - n = 25
-- β (initial_share) = -0.0508 (p = 0.6585)
-- β (log_init_gdp_pc) = +1.7850 (p = 0.3562)
-- R² = 0.041
+- β (initial_share) = -0.0363 (p = 0.7417)
+- β (log_init_gdp_pc) = +0.8858 (p = 0.6309)
+- R² = 0.013
 
 ## Secondary spec — full sample with ISR
 
 - n = 26
-- β (initial_share) = -0.0732 (p = 0.4619)
-- R² = 0.023
+- β (initial_share) = -0.0655 (p = 0.4848)
+- R² = 0.021
 
 ## Country-level data
 
 | Country | Initial share (% GDP) | Slope/decade | Drift obs | Movements |
 |---|---:|---:|---:|---:|
-| KOR | 18.5 | +1.370 | 50 | 13 |
-| ESP | 24.0 | -5.768 | 49 | 16 |
-| JPN | 27.0 | +3.354 | 50 | 18 |
-| CHE | 27.5 | +1.236 | 50 | 3 |
+| KOR | 18.5 | +1.954 | 50 | 11 |
+| ESP | 24.0 | -5.018 | 49 | 15 |
+| JPN | 27.0 | +3.354 | 50 | 19 |
+| CHE | 27.5 | -0.577 | 50 | 3 |
 | GRC | 29.0 | -9.690 | 50 | 14 |
 | AUS | 29.0 | +1.201 | 50 | 9 |
-| USA | 29.5 | +5.065 | 50 | 29 |
+| USA | 29.5 | +6.273 | 50 | 25 |
 | PRT | 30.0 | -8.077 | 50 | 10 |
-| ITA | 37.5 | -11.046 | 50 | 25 |
+| ITA | 37.5 | -11.046 | 50 | 27 |
 | FIN | 37.5 | -6.597 | 47 | 12 |
-| NZL | 37.5 | -7.599 | 50 | 11 |
-| CAN | 39.5 | -7.406 | 46 | 11 |
-| CZE | 42.0 | -4.773 | 33 | 8 |
-| GBR | 42.5 | -0.432 | 50 | 20 |
-| DEU | 43.0 | +10.239 | 50 | 20 |
+| NZL | 37.5 | -5.662 | 50 | 10 |
+| CAN | 39.5 | -6.577 | 46 | 10 |
+| CZE | 42.0 | -5.836 | 33 | 10 |
+| GBR | 42.5 | -0.432 | 50 | 21 |
+| DEU | 43.0 | +7.970 | 50 | 20 |
 | IRL | 43.0 | -0.043 | 47 | 17 |
-| POL | 44.0 | -3.915 | 50 | 17 |
-| FRA | 44.5 | -0.709 | 50 | 17 |
+| POL | 44.0 | -1.011 | 50 | 16 |
+| FRA | 44.5 | -0.709 | 50 | 19 |
 | NOR | 46.0 | -1.484 | 50 | 9 |
 | AUT | 46.5 | +4.024 | 50 | 15 |
 | NLD | 49.0 | -6.662 | 49 | 18 |
-| HUN | 49.0 | -5.103 | 50 | 11 |
+| HUN | 49.0 | -3.123 | 50 | 10 |
 | BEL | 51.0 | -2.617 | 50 | 14 |
-| DNK | 51.0 | -5.365 | 50 | 10 |
+| DNK | 51.0 | -5.634 | 50 | 9 |
 | SWE | 55.5 | -0.451 | 50 | 14 |
-| ISR | 63.5 | -8.935 | 49 | 17 |
+| ISR | 63.5 | -7.931 | 49 | 16 |
 
 ## Method
 
