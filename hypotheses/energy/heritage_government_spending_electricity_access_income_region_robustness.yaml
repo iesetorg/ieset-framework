@@ -1,0 +1,269 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: heritage_government_spending_electricity_access_income_region_robustness
+version: 1
+status: candidate
+topic: energy
+claim: Conditional on latest real GDP per capita and broad Heritage region, countries with higher Heritage
+  lower-government-spending score in 2024 have higher latest-available electricity access. This tests
+  whether the free-market/market-order association survives a first income-and-region robustness screen.
+methodology_note: Second-stage Heritage market-order robustness wave. The original wave used top-vs-bottom
+  quartile contrasts; this wave estimates a controlled cross-sectional OLS coefficient for the same Heritage
+  pillar after log GDP per capita and Heritage region fixed effects.
+evidence_type: descriptive
+sample:
+  countries:
+  - AFG
+  - AGO
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LIE
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PNG
+  - POL
+  - PRK
+  - PRT
+  - PRY
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TWN
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - XKX
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2024
+  - 2024
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: Heritage IEF cleaned local vintages currently cover 2024-2026. The 2024
+    score is used to avoid post-outcome look-ahead. WDI outcome and income-control observations use latest
+    available country observations from 2018-2024.
+  exclusion_rules:
+  - drop countries missing the Heritage component score
+  - drop countries without a WDI outcome observation from 2018 through 2024
+  - drop countries without a WDI GDP-per-capita control observation from 2018 through 2024
+  - drop countries without a Heritage region label
+scope:
+  period:
+  - 2024
+  - 2024
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - energy
+  - welfare_state
+  policy_family:
+  - fiscal_policy
+  treatment_tags:
+  - heritage_ief
+  - government_spending
+  - state_size
+  - income_region_robustness
+intervention_channel: fiscal
+intervention_channel_justification: Heritage lower-government-spending score is used as a country-level
+  policy-regime/institutional score, not as a dated discrete policy shock.
+variables:
+  outcome:
+  - name: electricity_access
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: latest_available_country_level_since_2018
+  treatment:
+  - name: government_spending
+    source: heritage_ief:ief_panel
+    transformation: 2024_component_score:government_spending
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: latest_available_since_2018_log
+  - name: heritage_region_fixed_effects
+    source: heritage_ief:ief_panel
+    transformation: 2024_region_dummies
+estimator:
+  template: descriptive
+  notes: 'Controlled cross-sectional OLS: outcome on standardized Heritage pillar score, log GDP per capita,
+    and Heritage region fixed effects. This is still descriptive, but stricter than the first-wave top-vs-bottom
+    gap.'
+falsification:
+  rule: SUPPORTED if the controlled standardized market-score coefficient has the pre-registered direction
+    at p<=0.10. REFUTED if the opposite direction is significant at p<=0.10. Otherwise PARTIAL; insufficient
+    controlled coverage is INCONCLUSIVE_DATA_PENDING.
+  test: heritage_market_controlled_heritage_government_spending_electricity_access_income_region_robustness
+  threshold:
+    p_value: 0.1
+    expected_sign: +
+    treatment_component: government_spending
+    tail_quantile: 0.25
+    min_outcome_year: 2018
+    market_score_year: 2024
+    robustness_design: ols_income_region
+    income_control_source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    region_fixed_effects: true
+prior_confidence: 0.48
+disclosure: This is a harder follow-up to a pro-market screen and is expected to downgrade many first-wave
+  supports if income or region explain the association. It should be read as robustness triage, not causal
+  proof.
+steelman: hypotheses/steelman/heritage_government_spending_electricity_access_income_region_robustness.md
