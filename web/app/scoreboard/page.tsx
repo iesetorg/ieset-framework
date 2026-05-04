@@ -104,19 +104,27 @@ export default async function ScoreboardPage() {
           the school. A school with 1-of-1 tested prediction supported is not
           more vindicated than one with 3-of-5 — the <strong>Tested</strong>{" "}
           column matters as much as <strong>Rate</strong>. This scoreboard{" "}
-          <em>is</em> the framework updating on evidence in public.
+          <em>is</em> the framework updating on evidence in public. The{" "}
+          <strong>Q-net</strong> column is evidence-quality adjusted:
+          causal tests count 1×, associational tests 0.5×, and descriptive or
+          canonical-case pattern matches 0.25×. The raw net is still shown, but
+          schools are ranked by Q-net so generic pattern matches cannot dominate
+          doctrine-level claims. The <strong>Signal</strong> column adds a
+          no-call band for tiny margins.
         </p>
       </div>
 
       <h2 className="mt-10 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-        Schools with tested predictions — ranked by support rate
+        Schools with tested predictions — ranked by quality-adjusted net
       </h2>
       <div className="overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-rule bg-panel">
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">School</th>
-              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Weighted net: full wins + 0.5·partial-wins − 0.5·partial-losses − full losses">Net</th>
+              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Quality-adjusted net: raw outcome score discounted by evidence type">Q-net</th>
+              <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted" title="Interpretation band for the net score: tiny margins are not directional evidence">Signal</th>
+              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Raw weighted net: full wins + 0.5·partial-wins − 0.5·partial-losses − full losses">Raw net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Weighted support rate: partial directional verdicts count at half-weight">Rate</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Supports</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Direction-correct partial verdicts — weak evidence in school's favour">Partial +</th>
@@ -128,49 +136,70 @@ export default async function ScoreboardPage() {
             </tr>
           </thead>
           <tbody>
-            {tested.map((s) => (
-              <tr
-                key={s.position_id}
-                className="border-b border-rule last:border-0 hover:bg-panel"
-              >
-                <td className="p-3 align-top">
-                  <Link
-                    href={`/pos/${s.position_id}`}
-                    className="font-medium text-ink hover:underline"
-                  >
-                    {s.school}
-                  </Link>
-                  <div className="mt-0.5 font-mono text-[10.5px] text-faint">
-                    {s.position_id}
-                  </div>
-                </td>
-                <td className="p-3 text-right align-top font-mono text-[13px] font-semibold"
-                  style={{ color: s.net_score > 0 ? "#2c7a4f" : s.net_score < 0 ? "#9e2f2f" : "#57554e" }}
+            {tested.map((s) => {
+              const signal = signalTone(s.adjusted_score_signal);
+              return (
+                <tr
+                  key={s.position_id}
+                  className="border-b border-rule last:border-0 hover:bg-panel"
                 >
-                  {s.net_score > 0 ? "+" : ""}{s.net_score.toFixed(1)}
-                </td>
-                <td className="p-3 text-right align-top">
-                  <span
-                    className="inline-block rounded px-2 py-[3px] text-xs font-semibold"
-                    style={{
-                      background: rateTone(s.support_rate).bg,
-                      color: rateTone(s.support_rate).fg,
-                    }}
+                  <td className="p-3 align-top">
+                    <Link
+                      href={`/pos/${s.position_id}`}
+                      className="font-medium text-ink hover:underline"
+                    >
+                      {s.school}
+                    </Link>
+                    <div className="mt-0.5 font-mono text-[10.5px] text-faint">
+                      {s.position_id}
+                    </div>
+                  </td>
+                  <td
+                    className="p-3 text-right align-top font-mono text-[13px] font-semibold"
+                    style={{ color: signal.fg }}
+                    title={`Quality-adjusted no-call band: ±${s.adjusted_signal_threshold.toFixed(1)} points. Decisive-only raw net: ${s.decisive_net > 0 ? "+" : ""}${s.decisive_net}.`}
                   >
-                    {formatPct(s.support_rate)}
-                  </span>
-                </td>
-                <td className="p-3 text-right align-top text-green font-semibold">{s.supports}</td>
-                <td className="p-3 text-right align-top" style={{ color: "#5fa673" }}>{s.partial_supports}</td>
-                <td className="p-3 text-right align-top" style={{ color: "#c4756d" }}>{s.partial_refutes}</td>
-                <td className="p-3 text-right align-top text-red font-semibold">{s.refutes}</td>
-                <td className="p-3 text-right align-top text-amber">{s.partial}</td>
-                <td className="p-3 text-right align-top text-muted">{s.untested}</td>
-                <td className="p-3 align-top" style={{ minWidth: 180 }}>
-                  <StackedBar s={s} />
-                </td>
-              </tr>
-            ))}
+                    {s.adjusted_net_score > 0 ? "+" : ""}{s.adjusted_net_score.toFixed(1)}
+                  </td>
+                  <td className="p-3 align-top">
+                    <span
+                      className="inline-block rounded px-2 py-[3px] text-xs font-semibold"
+                      style={{ background: signal.bg, color: signal.fg }}
+                      title={`Quality-adjusted net margin is ${Math.abs(s.adjusted_net_margin_rate * 100).toFixed(1)}% of adjusted tested weight.`}
+                    >
+                      {signal.label}
+                    </span>
+                  </td>
+                  <td
+                    className="p-3 text-right align-top font-mono text-[13px]"
+                    title={`Raw no-call band: ±${s.signal_threshold.toFixed(1)} net points.`}
+                    style={{ color: signalTone(s.score_signal).fg }}
+                  >
+                    {s.net_score > 0 ? "+" : ""}{s.net_score.toFixed(1)}
+                  </td>
+                  <td className="p-3 text-right align-top">
+                    <span
+                      className="inline-block rounded px-2 py-[3px] text-xs font-semibold"
+                      style={{
+                        background: rateTone(s.support_rate).bg,
+                        color: rateTone(s.support_rate).fg,
+                      }}
+                    >
+                      {formatPct(s.support_rate)}
+                    </span>
+                  </td>
+                  <td className="p-3 text-right align-top text-green font-semibold">{s.supports}</td>
+                  <td className="p-3 text-right align-top" style={{ color: "#5fa673" }}>{s.partial_supports}</td>
+                  <td className="p-3 text-right align-top" style={{ color: "#c4756d" }}>{s.partial_refutes}</td>
+                  <td className="p-3 text-right align-top text-red font-semibold">{s.refutes}</td>
+                  <td className="p-3 text-right align-top text-amber">{s.partial}</td>
+                  <td className="p-3 text-right align-top text-muted">{s.untested}</td>
+                  <td className="p-3 align-top" style={{ minWidth: 180 }}>
+                    <StackedBar s={s} />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -231,6 +260,19 @@ function rateTone(r: number): { bg: string; fg: string } {
   if (r >= 0.66) return { bg: "#dff1e4", fg: "#2c7a4f" };
   if (r >= 0.33) return { bg: "#fdf1da", fg: "#b7791f" };
   return { bg: "#f3d9d9", fg: "#9e2f2f" };
+}
+
+function signalTone(signal: string): { label: string; bg: string; fg: string } {
+  if (signal === "positive_signal") {
+    return { label: "positive signal", bg: "#dff1e4", fg: "#2c7a4f" };
+  }
+  if (signal === "negative_signal") {
+    return { label: "negative signal", bg: "#f3d9d9", fg: "#9e2f2f" };
+  }
+  if (signal === "untested") {
+    return { label: "untested", bg: "#e8e6e0", fg: "#57554e" };
+  }
+  return { label: "too close", bg: "#e8e6e0", fg: "#57554e" };
 }
 
 function StackedBar({

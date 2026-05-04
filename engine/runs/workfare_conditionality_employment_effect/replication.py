@@ -1,14 +1,24 @@
 #!/usr/bin/env python3
-"""Replicate the registered panel-FE run for workfare_conditionality_employment_effect."""
+"""Replication wrapper for `workfare_conditionality_employment_effect`.
 
-from pathlib import Path
+Delegates to the canonical IESET methodology runner recorded for this run.
+This preserves one source of estimation logic while making the run artifact
+directly reproducible from engine/runs/workfare_conditionality_employment_effect/.
+"""
+from __future__ import annotations
+
 import sys
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
+RUNS_ROOT = Path(__file__).resolve().parents[1]
+if str(RUNS_ROOT) not in sys.path:
+    sys.path.insert(0, str(RUNS_ROOT))
 
-from scripts.run_panel_fe import run_one
+from _replication_runner import rerun
+
+HYPOTHESIS_ID = "workfare_conditionality_employment_effect"
+RUNNER = "scripts/run_panel_fe.py"
 
 
 if __name__ == "__main__":
-    print(run_one("workfare_conditionality_employment_effect", force=True, persist_preflight_inconclusive=True))
+    raise SystemExit(rerun(__file__, HYPOTHESIS_ID, RUNNER))

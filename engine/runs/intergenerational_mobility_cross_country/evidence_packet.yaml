@@ -1,0 +1,360 @@
+packet_version: 1
+generated_utc: '2026-05-04T20:34:54+00:00'
+repository:
+  root: .
+  git_commit: f34241b08392f87df0e485e858c3d566031ed4aa
+hypothesis:
+  id: intergenerational_mobility_cross_country
+  path: hypotheses/distribution/intergenerational_mobility_cross_country.yaml
+  school: null
+  topic: distribution
+  claim: "Cross-country variation in intergenerational income mobility (commonly measured\
+    \ as the rank-rank slope or intergenerational income elasticity) across OECD countries\
+    \ is substantially explained by institutional determinants \u2014 education-system\
+    \ equality of provision, residential segregation, and housing affordability \u2014\
+    \ rather than by the aggregate redistribution level. Specifically: countries with\
+    \ more equal public education spending across school districts, lower residential\
+    \ income segregation, and more affordable housing in high-opportunity regions\
+    \ should show higher mobility after controlling for GDP per capita, the level\
+    \ of disposable-income Gini, and institutional quality. The claim aligns with\
+    \ the Chetty-Hendren-Kline-Saez opportunity-atlas finding that mobility is generated\
+    \ by place-based mechanisms more than by transfer-based redistribution, and generalises\
+    \ it cross-country.\n"
+verdict:
+  raw: INCONCLUSIVE_DATA_PENDING
+  bucket: inconclusive
+  reason: data gap on oecd:OECD.EDU.IMEP_DSD_EAG_FIN_DF_FIN_RESOURCES_1.0. The spec's
+    primary regression cannot be estimated without a mobility outcome series and all
+    three institutional-channel series. The v1 notes explicitly data-gate this test
+    on an OWID or OECD intergenerational-mobility mirror, OECD Education-at-a-Glance
+    subnational spending dispersion, and OECD Affordable Housing Database income-segregation
+    indices. No coefficients computed.
+  status: data_gap_inconclusive
+preregistration:
+  claim: "Cross-country variation in intergenerational income mobility (commonly measured\
+    \ as the rank-rank slope or intergenerational income elasticity) across OECD countries\
+    \ is substantially explained by institutional determinants \u2014 education-system\
+    \ equality of provision, residential segregation, and housing affordability \u2014\
+    \ rather than by the aggregate redistribution level. Specifically: countries with\
+    \ more equal public education spending across school districts, lower residential\
+    \ income segregation, and more affordable housing in high-opportunity regions\
+    \ should show higher mobility after controlling for GDP per capita, the level\
+    \ of disposable-income Gini, and institutional quality. The claim aligns with\
+    \ the Chetty-Hendren-Kline-Saez opportunity-atlas finding that mobility is generated\
+    \ by place-based mechanisms more than by transfer-based redistribution, and generalises\
+    \ it cross-country.\n"
+  falsification_rule: 'Not supported if the three institutional channels (education
+    inequality, residential segregation, housing affordability) jointly account for
+    less than 40 percent of R-squared in the cross-country mobility regression after
+    controlling for GDP per capita, Gini, and government effectiveness. Separately,
+    if disposable-income Gini alone (controlling for nothing else) explains more variation
+    than the three institutional channels combined, the "institutional determinants
+    more than redistribution level" framing is weakened and the Piketty-style "compressed
+    income distributions mechanically produce mobility" reading earns standing. Given
+    n ~ 20 and the resulting statistical power limits, robust findings require the
+    institutional-channel result to survive leave-one-out robustness (no single country
+    swings the conclusion).
+
+    '
+  threshold: 'partial_r2_institutional_channels >= 0.40  AND partial_r2_institutional_channels
+    > partial_r2_gini_alone  AND loo_robust (no single country swings sign of primary
+    channel)
+
+    '
+  estimator:
+    template: panel_fe
+    clustering: country
+    notes: "Cross-sectional regression (n ~ 20 countries, one mobility point per country);\
+      \ no panel dimension. Specification:\n  mobility = b0 + b1*edu_inequality +\
+      \ b2*residential_segregation\n  + b3*housing_affordability + b4*controls + epsilon\n\
+      Given small n, report bootstrap SEs (1000 replications), partial-R2 decomposition,\
+      \ and robustness via Bayesian linear regression with weakly informative priors\
+      \ (Horseshoe on coefficients). Leave-one- out robustness to check Nordic-cluster\
+      \ and US outlier sensitivity. template=panel_fe slot used for the regression\
+      \ mechanics; no fixed effects (cross-section).\n"
+  steelman: hypotheses/steelman/intergenerational_mobility_cross_country.md
+reproduction:
+  run_dir: engine/runs/intergenerational_mobility_cross_country
+  runner: null
+  replication_script: engine/runs/intergenerational_mobility_cross_country/replication.py
+  suggested_command: python engine/runs/intergenerational_mobility_cross_country/replication.py
+data:
+  inputs:
+  - name: owid:intergenerational-earnings-elasticity
+    publisher: owid
+    series_id: intergenerational-earnings-elasticity
+    vintage_file: data/vintages/owid/intergenerational-earnings-elasticity@2026-05-04T134909Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3c6a1e5fa092ccae2b23ae3767f1d72d90b58fdbc4e507362e0bb6c26996eab6
+      computed_sha256: 3c6a1e5fa092ccae2b23ae3767f1d72d90b58fdbc4e507362e0bb6c26996eab6
+      status: match
+    source:
+      type: official
+      url: https://ourworldindata.org/grapher/intergenerational-and-cross-sectional-inequality.csv
+      methodology_url: https://ourworldindata.org/grapher/intergenerational-and-cross-sectional-inequality
+      license: cc_by_4_0
+      fetch_utc: '2026-05-04T13:49:09.347793+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-04T134910Z.yaml
+    coverage:
+      start_date: '2013'
+      end_date: '2013'
+      frequency: annual
+      rows: 12
+      units: per chart (see OWID page for units)
+      currency: null
+    extra:
+      resolved_series_id: intergenerational-and-cross-sectional-inequality
+      value_column: Intergenerational inequality (intergenerational elasticity)
+      n_columns: 4
+      columns:
+      - country_name
+      - country_iso3
+      - year
+      - value
+      vintage_utc: null
+  - name: oecd:OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0
+    publisher: oecd
+    series_id: OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0
+    vintage_file: data/vintages/oecd/OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0@2026-05-04T185316Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 96b80f357231b8b938124562182c55a38242939118e58096167c78d30cf6085c
+      computed_sha256: 96b80f357231b8b938124562182c55a38242939118e58096167c78d30cf6085c
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: bis:WS_SPP
+    publisher: bis
+    series_id: WS_SPP
+    vintage_file: data/vintages/bis/WS_SPP@2026-04-30T114304Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7
+      computed_sha256: 2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7
+      status: match
+    source:
+      type: official
+      url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/?format=csv
+      methodology_url: https://data.bis.org/topics/WS_SPP
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-04-30T11:43:04.829728+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: 1927-Q1
+      end_date: 2025-Q4
+      frequency: quarterly
+      rows: 35388
+      units: per dataflow metadata
+      currency: null
+    extra:
+      dataflow_description: Selected residential property prices (quarterly; includes
+        long series)
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - REF_AREA
+      - VALUE
+      - UNIT_MEASURE
+      - UNIT_MULT
+      - BREAKS
+      - COVERAGE
+      - TITLE_TS
+      - period
+      - value
+      - OBS_STATUS
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      vintage_utc: null
+  - name: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-30T135558Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      computed_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: world_bank_wdi:SI.POV.GINI
+    publisher: world_bank_wdi
+    series_id: SI.POV.GINI
+    vintage_file: data/vintages/world_bank_wdi/SI.POV.GINI@2026-04-30T140120Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c76659a92598fc6feebe9db4cf1b081983ef2b71a660de1596bbe176b68636db
+      computed_sha256: c76659a92598fc6feebe9db4cf1b081983ef2b71a660de1596bbe176b68636db
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: wgi:GOV_WGI_GE.EST
+    publisher: wgi
+    series_id: GOV_WGI_GE.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_GE.EST@2026-04-30T114219Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      computed_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:19.780146+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: Government Effectiveness - Governance estimate (approx. -2.5
+        to +2.5)
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: world_bank_wdi:SE.TER.CUAT.BA.ZS
+    publisher: world_bank_wdi
+    series_id: SE.TER.CUAT.BA.ZS
+    vintage_file: data/vintages/world_bank_wdi/SE.TER.CUAT.BA.ZS@2026-04-30T140201Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 2a075d3a95a43f49d2bdfd89e4425ea31c424fe87cc85d43f9e8192fd37cb9f4
+      computed_sha256: 2a075d3a95a43f49d2bdfd89e4425ea31c424fe87cc85d43f9e8192fd37cb9f4
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SE.TER.CUAT.BA.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SE.TER.CUAT.BA.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T14:02:01.380203+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-04-30T140220Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Educational attainment, at least Bachelor's or equivalent, population
+        25+, total (%) (cumulative)
+      source_note: The percentage of population ages 25 and over that attained or
+        completed Bachelor's or equivalent.
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - owid:share-of-children-in-the-bottom-quintile-who-make-it-to-the-top-quintile
+  - oecd:OECD.EDU.IMEP_DSD_EAG_FIN_DF_FIN_RESOURCES_1.0
+  data_quality:
+    grade: incomplete
+    input_count: 7
+    official_source_count: 4
+    manual_source_count: 0
+    hash_status_counts:
+      match: 7
+    missing_series_count: 2
+artifacts:
+- path: hypotheses/distribution/intergenerational_mobility_cross_country.yaml
+  sha256: f4d9d845fc990aea0fcc47ed1c79535cd565e7bd0d35fd05374a3a9361e6aec6
+  bytes: 14007
+- path: engine/runs/intergenerational_mobility_cross_country/manifest.yaml
+  sha256: 81a2bd0d308fb1cadb89587981adcea93f3a759b1b8b4cbe7ede6ccadabdeeb3
+  bytes: 2103
+- path: engine/runs/intergenerational_mobility_cross_country/diagnostics.json
+  sha256: 558d8a1c0c3aac885c38d96e7cb4a3c2becfe59b6a333404c75762c81fbf8579
+  bytes: 2499
+- path: engine/runs/intergenerational_mobility_cross_country/result_card.md
+  sha256: 71af267874d78dfc8033e805c74cbf994d16c653615efe0a504e3e7e91f8392e
+  bytes: 2988
+- path: engine/runs/intergenerational_mobility_cross_country/replication.py
+  sha256: 016488eaa24318b41d5fd08b31899a368ff1a62ab3fcdc722743e669e2576c50
+  bytes: 15560
+- path: engine/runs/intergenerational_mobility_cross_country/coefficients.parquet
+  sha256: 815424b398c926a16dea36a82405ed55b8ba9a05bce6ac94c3fb5e2779914d17
+  bytes: 2199
+- path: engine/runs/intergenerational_mobility_cross_country/chart_data.json
+  sha256: 5eee652278f01449011105d1f2b909d3e259144017c9d35f35c31e0ea873070a
+  bytes: 1997
+- path: hypotheses/steelman/intergenerational_mobility_cross_country.md
+  sha256: 410b260c690e44cc1b7c34ea58e014ea12d3686093f2e4aba37051f03c8da5f1
+  bytes: 5308
+references:
+- kind: source
+  publisher: owid
+  series_id: intergenerational-earnings-elasticity
+  url: https://ourworldindata.org/grapher/intergenerational-and-cross-sectional-inequality.csv
+- kind: methodology
+  publisher: owid
+  series_id: intergenerational-earnings-elasticity
+  url: https://ourworldindata.org/grapher/intergenerational-and-cross-sectional-inequality
+- kind: source
+  publisher: bis
+  series_id: WS_SPP
+  url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/?format=csv
+- kind: methodology
+  publisher: bis
+  series_id: WS_SPP
+  url: https://data.bis.org/topics/WS_SPP
+- kind: source
+  publisher: wgi
+  series_id: GOV_WGI_GE.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: GOV_WGI_GE.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SE.TER.CUAT.BA.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SE.TER.CUAT.BA.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SE.TER.CUAT.BA.ZS
+  url: https://data.worldbank.org/indicator/SE.TER.CUAT.BA.ZS
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

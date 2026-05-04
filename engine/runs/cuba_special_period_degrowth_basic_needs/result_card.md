@@ -1,36 +1,44 @@
-# Result card — cuba_special_period_degrowth_basic_needs
+# Cuba Special Period basic-needs preservation — v3 honesty correction
 
-**Verdict:** inconclusive (data gaps)
+**Verdict:** inconclusive — canonical basic-needs basket incomplete. v2 graded SUPPORTED on a 3-indicator favourable subset (LE/IMR/enrolment) while caloric supply collapsed ~30% (Garfield & Santana 1997) and the 1994 balsero crisis revealed mass emigration. v3 requires the canonical basket (Streeten/Sen/UNDP HDI extensions). Missing canonical inputs: P2_caloric_supply_1989_2000, P4_emigration_annual_1989_2000. FAO caloric obs in window: 0/12; emigration obs: 0/12.
 
-**Reason:** 1 metrics met, 3 pending; 3 more need resolution
+## Why v3 lands inconclusive
 
-Pre-registered rule: SUPPORT if >= 4 of 4 metrics met; REFUTE if <= 2 met (impossible to hit support).
+v2 graded SUPPORTED on a 3-indicator subset (LE / IMR / primary enrolment) while caveats explicitly noted that caloric supply per capita dropped ~30% from ~2,900 to ~1,800 kcal/cap/day between 1989 and 1993 (Garfield & Santana 1997 / FAO FBS) and that the 1994 balsero crisis produced ~35,000 emigration attempts in August alone. That's indicator gaming.
 
-**Counts:** 1 MET · 0 NOT_MET · 0 PENDING_DATA · 3 PENDING_EVAL
+Canonical basic-needs literature (Streeten 1981, Sen, UNDP HDI extensions) treats food security as the primary basic need; emigration as the canonical revealed-preference welfare metric. SUPPORTED on a favourable subset while the canonical-primary indicator collapsed is not an honest affirmation.
 
-**Primary country:** CUB
+## v3 canonical basket
 
-## Metric-by-metric
+| Dimension | Source | On disk for 1989-2000? |
+|---|---|---|
+| GDP per capita | WDI NY.GDP.PCAP.KD | ✓ |
+| Caloric supply / cap / day | FAO FBS | **✗** (slug covers 2010+ only) |
+| Life expectancy | WDI SP.DYN.LE00.IN | ✓ |
+| Infant mortality | WDI SP.DYN.IMRT.IN | ✓ |
+| Primary enrolment | WDI SE.PRM.ENRR | ✓ |
+| Emigration (annual) | cuba_manual | **✗** (decade-stamp only) |
 
-| # | Metric | Status | Observed | Threshold | Notes |
-|---|---|:---:|---:|---|---|
-| 1 | gdp_pc_peak_to_trough_contraction | MET | 36.6 (1993) [peak_to_trough_pct_decline] | `>=25% real GDP per capita decline from 1989 peak to 1991-1995 trough` |  |
-| 2 | life_expectancy_preserved | PENDING_EVAL | 2.85 (1991) [peak_to_trough_pct_decline] | `max(LE_1989 - LE_t for t in 1990..2000) / LE_1989 <= 0.10` | threshold expression unparseable by regex |
-| 3 | infant_mortality_preserved | PENDING_EVAL | 37 (2000) [peak_to_trough_pct_decline] | `max(IMR_t / IMR_1989 for t in 1990..2000) <= 1.10` | threshold expression unparseable by regex |
-| 4 | primary_school_enrolment_preserved | PENDING_EVAL | 4.46 (1995) [peak_to_trough_pct_decline] | `min(ENROL_t / ENROL_1989 for t in 1990..2000) >= 0.90` | threshold expression unparseable by regex |
+4 of 6 canonical dimensions testable; 2 are documented data gaps. Per the framework's indicator-integrity rule, omission of canonical indicators triggers METHOD_VALID failure → inconclusive, not SUPPORTED on the favourable subset.
 
-## Claim
+## INFORMATIVE-only v2 subset numbers (NOT a verdict)
 
-> Cuban post-1991 Special Period forced degrowth (real GDP per capita contracted ~35% over 1989-1993 after the Soviet bloc collapse cut off concessional sugar/oil terms) demonstrated that basic-needs provision (life expectancy, infant mortality, primary-school enrolment) can be maintained — or improved — during rapid material-throughput reduction when institutions are aligned around free universal health and education.
+- gdp_pc_peak_to_trough_decline_fraction: 0.3662
+- max_le_decline_fraction: 0.0000
+- max_imr_rise_fraction: 0.0000
+- max_enrol_decline_fraction: 0.0372
 
-## Interpretation
+## Documented qualitative evidence (un-tested)
 
-Verdict is **inconclusive (data gaps)** — 0 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 3 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
+- Caloric collapse 1989→1993: ~30% decline (Garfield & Santana 1997)
+- 1994 balsero crisis: ~35,000 attempts in August alone
+- Libreta persistence: 63% of households as of 2024
 
-## Steelman live concerns
+## Fetcher backlog
 
-See `hypotheses/steelman/cuba_special_period_degrowth_basic_needs.md` for the strongest opposing arguments. Canonical-case multi-metric evidence is a pattern match, not a causal identification — the result card should be read as 'outcome trajectory matches the predicted pattern to degree X' rather than 'policy P caused the outcome'.
+- faostat:food_balance_sheets full annual 1961+
+- cuba_manual emigration annual 1989-2000
 
-## Provenance
+## Archives
 
-Vintages pinned in `manifest.yaml`. Full per-metric diagnostics in `diagnostics.json`. Machine-readable results in `metric_results.parquet`.
+v0 at ARCHIVED_v0/. v2 (3-indicator subset, SUPPORTED) at ARCHIVED_v2/.

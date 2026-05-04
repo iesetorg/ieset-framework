@@ -421,8 +421,12 @@ export interface ScoredClaim {
   linked_hypothesis_id: string;
   school_prediction: string;
   claim_polarity: "aligned" | "inverted";
+  evidence_type?: string;
+  evidence_weight: number;
   verdict?: string;
   outcome: ClaimOutcome;
+  outcome_score: number;
+  adjusted_outcome_score: number;
   hypothesis_exists: boolean;
 }
 
@@ -439,8 +443,84 @@ export interface PositionScore {
   tested: number;
   /** sum of supports + 0.5*partial_supports - 0.5*partial_refutes - refutes */
   net_score: number;
+  /** evidence-quality-adjusted net_score */
+  adjusted_net_score: number;
+  /** sum of evidence weights for tested predictions */
+  adjusted_tested_weight: number;
+  /** full verdicts only: supports - refutes */
+  decisive_net: number;
+  /** heuristic no-call band for tiny aggregate margins */
+  signal_threshold: number;
+  /** net_score / tested, useful for detecting tiny aggregate margins */
+  net_margin_rate: number;
+  score_signal: "positive_signal" | "negative_signal" | "too_close_to_call" | "untested";
+  adjusted_signal_threshold: number;
+  adjusted_net_margin_rate: number;
+  adjusted_score_signal: "positive_signal" | "negative_signal" | "too_close_to_call" | "untested";
   support_rate: number;
   scored_claims: ScoredClaim[];
+}
+
+function evidenceWeight(evidenceType: string | undefined): number {
+  if (evidenceType === "causal") return 1;
+  if (evidenceType === "associational") return 0.5;
+  // Descriptive and canonical-case checklist runs are valuable evidence, but
+  // they are pattern matches rather than causal identification. Keep them on
+  // the board, but stop them from dominating doctrine-level school rankings.
+  if (evidenceType === "descriptive" || evidenceType === "canonical_case_multi_metric") {
+    return 0.25;
+  }
+  return 0.25;
+}
+
+function outcomeScore(outcome: ClaimOutcome): number {
+  if (outcome === "supports_position") return 1;
+  if (outcome === "partial_supports") return 0.5;
+  if (outcome === "partial_refutes") return -0.5;
+  if (outcome === "refutes_position") return -1;
+  return 0;
+}
+
+function scoreSignal(
+  netScore: number,
+  tested: number,
+  minimumThreshold = 5
+): Pick<PositionScore, "signal_threshold" | "net_margin_rate" | "score_signal"> {
+  if (tested <= 0) {
+    return {
+      signal_threshold: 0,
+      net_margin_rate: 0,
+      score_signal: "untested",
+    };
+  }
+  // A one- or two-claim wobble should not read as a school-level finding.
+  // The raw score remains available, but the UI/API expose this no-call band
+  // so small positive/negative margins are not presented as directional wins.
+  const signal_threshold = Math.max(minimumThreshold, tested * 0.05);
+  const net_margin_rate = netScore / tested;
+  if (Math.abs(netScore) <= signal_threshold) {
+    return { signal_threshold, net_margin_rate, score_signal: "too_close_to_call" };
+  }
+  return {
+    signal_threshold,
+    net_margin_rate,
+    score_signal: netScore > 0 ? "positive_signal" : "negative_signal",
+  };
+}
+
+function adjustedScoreSignal(
+  netScore: number,
+  adjustedTestedWeight: number
+): Pick<
+  PositionScore,
+  "adjusted_signal_threshold" | "adjusted_net_margin_rate" | "adjusted_score_signal"
+> {
+  const signal = scoreSignal(netScore, adjustedTestedWeight);
+  return {
+    adjusted_signal_threshold: signal.signal_threshold,
+    adjusted_net_margin_rate: signal.net_margin_rate,
+    adjusted_score_signal: signal.score_signal,
+  };
 }
 
 function verdictToOutcome(
@@ -483,8 +563,18 @@ function verdictToOutcome(
   // direction but didn't clear the pre-registered threshold (or significance,
   // or robustness). They carry weak evidentiary weight in favour of the
   // hypothesis.
+  //
+  // Some generic runners also emit PARTIAL for neutral test-quality states
+  // such as "direction inconclusive" or "effect magnitude effectively zero".
+  // Those should count as tested but should not give either side a half-win.
+  const hypNeutralPartial =
+    v.startsWith("partial") &&
+    (v.includes("direction inconclusive") ||
+      v.includes("claim direction not auto-inferred") ||
+      v.includes("effect magnitude effectively zero") ||
+      v.includes("standard error/p-value not estimable"));
   const hypPartialTowardSupport =
-    v.startsWith("partial") ||
+    (!hypNeutralPartial && v.startsWith("partial")) ||
     v.startsWith("mixed") ||
     v.startsWith("weakly supported") ||
     v.startsWith("weakly_supported") ||
@@ -505,7 +595,7 @@ function verdictToOutcome(
   // Test-quality failures — framework couldn't cleanly rule in or out.
   // Neutral partial regardless of polarity: neither school should win nor lose
   // from an identification failure.
-  if (hypWeakened || hypInconclusive) return "partial";
+  if (hypWeakened || hypInconclusive || hypNeutralPartial) return "partial";
 
   // Directional partial: weak signal in school's favour or against
   if (partialPolarity === "toward_support") {
@@ -564,15 +654,17 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       partial_refutes = 0,
       partial = 0,
       untested = 0;
+    let adjusted_net_score = 0;
+    let adjusted_tested_weight = 0;
 
     const hypById = new Map(hypotheses.map((h) => [h.hypothesis_id, h] as const));
     for (let idx = 0; idx < claims.length; idx++) {
       const c = claims[idx];
       const exists = hypIds.has(c.linked_hypothesis_id);
       let verdict: string | undefined;
+      const linkedHyp = hypById.get(c.linked_hypothesis_id);
       if (exists) {
         const run = await loadRunArtifacts(c.linked_hypothesis_id);
-        const linkedHyp = hypById.get(c.linked_hypothesis_id);
         // Public-visibility gate: only count verdicts from hypotheses that
         // pass the integrity bar (sharpened rule + real replication + real
         // verdict). Verdicts auto-graded against the generic falsification
@@ -595,13 +687,23 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       const school_prediction =
         coverageEntry?.school_prediction ?? c.school_prediction;
       const outcome = verdictToOutcome(verdict, school_prediction, polarity);
+      const evidence_type = linkedHyp?.evidence_type;
+      const evidence_weight = evidenceWeight(evidence_type);
+      const outcome_score = outcomeScore(outcome);
+      const adjusted_outcome_score = outcome_score * evidence_weight;
+      adjusted_net_score += adjusted_outcome_score;
+      if (outcome !== "untested") adjusted_tested_weight += evidence_weight;
       scored.push({
         claim: c.claim,
         linked_hypothesis_id: c.linked_hypothesis_id,
         school_prediction,
         claim_polarity: polarity,
+        evidence_type,
+        evidence_weight,
         verdict,
         outcome,
+        outcome_score,
+        adjusted_outcome_score,
         hypothesis_exists: exists,
       });
       if (outcome === "supports_position") supports++;
@@ -618,8 +720,12 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     // neutral partials (test-quality failures) count 0.
     const net_score =
       supports + 0.5 * partial_supports - 0.5 * partial_refutes - refutes;
-    // support_rate weights partial_supports at 0.5, partial_refutes at -0.5,
-    // neutral partials drop out entirely (they shouldn't dilute the rate).
+    const decisive_net = supports - refutes;
+    const signal = scoreSignal(net_score, tested);
+    const adjustedSignal = adjustedScoreSignal(adjusted_net_score, adjusted_tested_weight);
+    // support_rate is the share of directional, non-neutral evidence that
+    // agrees with the school. Partial supports count half; partial refutes
+    // remain in the denominator but do not add support.
     const weighted_pos = supports + 0.5 * partial_supports;
     const weighted_total =
       supports + refutes + partial_supports + partial_refutes;
@@ -635,6 +741,15 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       untested,
       tested,
       net_score,
+      adjusted_net_score,
+      adjusted_tested_weight,
+      decisive_net,
+      signal_threshold: signal.signal_threshold,
+      net_margin_rate: signal.net_margin_rate,
+      score_signal: signal.score_signal,
+      adjusted_signal_threshold: adjustedSignal.adjusted_signal_threshold,
+      adjusted_net_margin_rate: adjustedSignal.adjusted_net_margin_rate,
+      adjusted_score_signal: adjustedSignal.adjusted_score_signal,
       support_rate: weighted_total > 0 ? weighted_pos / weighted_total : 0,
       scored_claims: scored,
     });
@@ -644,8 +759,10 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     if (a.tested === 0 && b.tested === 0) return 0;
     if (a.tested === 0) return 1;
     if (b.tested === 0) return -1;
-    const netDiff = b.net_score - a.net_score;
+    const netDiff = b.adjusted_net_score - a.adjusted_net_score;
     if (Math.abs(netDiff) > 0.001) return netDiff;
+    const rawNetDiff = b.net_score - a.net_score;
+    if (Math.abs(rawNetDiff) > 0.001) return rawNetDiff;
     const rateDiff = b.support_rate - a.support_rate;
     if (Math.abs(rateDiff) > 0.001) return rateDiff;
     return b.tested - a.tested;

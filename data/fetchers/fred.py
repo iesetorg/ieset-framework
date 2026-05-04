@@ -9,6 +9,7 @@ attribution requirements (reported in series metadata).
 from __future__ import annotations
 
 import os
+import re
 import time
 from datetime import datetime
 from typing import Any
@@ -24,6 +25,10 @@ LICENSE = "mixed (US federal public domain for most series; per-series attributi
 
 class FredError(RuntimeError):
     pass
+
+
+def _redact_api_key(text: object) -> str:
+    return re.sub(r"api_key=[^&\\s)]+", "api_key=<redacted>", str(text))
 
 
 def _api_key() -> str:
@@ -43,13 +48,16 @@ def _request(path: str, params: dict[str, Any]) -> dict:
         try:
             r = requests.get(f"{FRED_BASE}/{path}", params=params, timeout=30)
         except requests.RequestException as e:
-            last = e
+            last = FredError(_redact_api_key(e))
             time.sleep(2**attempt)
             continue
         if r.status_code == 429 or 500 <= r.status_code < 600:
             time.sleep(2**attempt)
             continue
-        r.raise_for_status()
+        try:
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            raise FredError(_redact_api_key(e)) from None
         return r.json()
     raise FredError(f"FRED {path} retries exhausted: {last}")
 

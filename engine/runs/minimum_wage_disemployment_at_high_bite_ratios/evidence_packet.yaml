@@ -1,0 +1,136 @@
+packet_version: 1
+generated_utc: '2026-05-04T20:34:54+00:00'
+repository:
+  root: .
+  git_commit: f34241b08392f87df0e485e858c3d566031ed4aa
+hypothesis:
+  id: minimum_wage_disemployment_at_high_bite_ratios
+  path: hypotheses/labour/minimum_wage_disemployment_at_high_bite_ratios.yaml
+  school: null
+  topic: labour
+  claim: Minimum-wage increases above the local median-wage ratio produce disemployment
+    effects at the low-skill margin, even if aggregate employment effects are small.
+verdict:
+  raw: "inconclusive \u2014 data gap on bls:LAU_state_teen_employment_population_ratio_panel,\
+    \ bls:OES_state_median_hourly_wage_panel. The spec's primary stratified Callaway-Sant'Anna\
+    \ DiD on US-state cohorts split by bite ratio (state-min / state-median-hourly-wage)\
+    \ cannot be estimated without (a) the BLS LAU state teen employment-population\
+    \ panel, (b) the USDOL state minimum-wage history, and (c) the BLS OES state median-hourly-wage\
+    \ panel. On-disk BLS vintages currently include only national LNS/CES/CUUR series;\
+    \ the state fan-out has not been fetched. Cross-country OECD MWUSD bite-ratio\
+    \ fallback is also absent. No coefficients computed."
+  bucket: inconclusive
+  reason: null
+  status: data_gap_inconclusive
+preregistration:
+  claim: Minimum-wage increases above the local median-wage ratio produce disemployment
+    effects at the low-skill margin, even if aggregate employment effects are small.
+  falsification_rule: The hypothesis is considered falsified if the pre-registered
+    empirical test shows the opposite direction of the claim at conventional significance
+    (p > 0.10), or if the primary outcome measure moves less than 10% in the claimed
+    direction across the sample. Exact thresholds will be pinned in the variables
+    and estimator blocks when this stub is promoted from draft.
+  threshold: null
+  estimator:
+    template: did_callaway_santanna
+    clustering: state
+    fixed_effects:
+    - state
+    - year
+    notes: 'Staggered DiD across US state minimum-wage increases stratified by bite
+      ratio (minimum/median wage). Tests whether high-bite cohorts show measurable
+      low-skill (teen, low-education) disemployment relative to low-bite cohorts.
+
+      '
+  steelman: null
+reproduction:
+  run_dir: engine/runs/minimum_wage_disemployment_at_high_bite_ratios
+  runner: null
+  replication_script: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/replication.py
+  suggested_command: python engine/runs/minimum_wage_disemployment_at_high_bite_ratios/replication.py
+data:
+  inputs:
+  - name: usdol:state_minimum_wage_history
+    publisher: usdol
+    series_id: state_minimum_wage_history
+    vintage_file: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      computed_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      status: match
+    source:
+      type: official
+      url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+      methodology_url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+      license: public_domain_us_gov
+      fetch_utc: '2026-05-04T14:53:19.847437+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-04T145323Z.yaml
+    coverage:
+      start_date: '1968'
+      end_date: '2024'
+      frequency: annual
+      rows: 2106
+      units: USD/hour
+      currency: USD
+    extra:
+      columns:
+      - country_iso3
+      - unit_id
+      - state_abbr
+      - state_fips
+      - state_name
+      - year
+      - value
+      - state_rate_low
+      - state_rate_high
+      - federal_rate
+      - raw_value
+      - parse_note
+      jurisdictions: 54
+      effective_floor_rule: max(parsed_state_rate_high, federal_rate); federal fallback
+        when state rate missing
+      vintage_utc: null
+  missing_series:
+  - bls:LAU_state_teen_employment_population_ratio_panel
+  - bls:OES_state_median_hourly_wage_panel
+  - bls:QCEW_county_NAICS722_employment_panel
+  - oecd:MWUSD_minimum_to_median_wage_ratio
+  - oecd:DSD_LMS_low_education_unemployment_rate
+  data_quality:
+    grade: incomplete
+    input_count: 1
+    official_source_count: 1
+    manual_source_count: 0
+    hash_status_counts:
+      match: 1
+    missing_series_count: 5
+artifacts:
+- path: hypotheses/labour/minimum_wage_disemployment_at_high_bite_ratios.yaml
+  sha256: 038178b464032930a68bd49f98a6abea111648f91381df6fbde043c014145c5d
+  bytes: 8054
+- path: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/manifest.yaml
+  sha256: 8b76cab59096c7979ecf861b053ef5f3a80f4ec03f18bd9ffb2a4a58793fb07b
+  bytes: 668
+- path: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/diagnostics.json
+  sha256: 3a6c980b2b3e8252f50340091a5ebc15bbe5d747693656a18d60b91d4d53c665
+  bytes: 2206
+- path: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/result_card.md
+  sha256: c769d5e28497e3dae0debbd81d60f60782ee39c5e83e07c48025d4264d862ac2
+  bytes: 3887
+- path: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/replication.py
+  sha256: ff92a1f70a99e3438278dbc061ef024ab8555ffb3dbe9f9f8851a0e1eb009be9
+  bytes: 19737
+- path: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/coefficients.parquet
+  sha256: 9184cb286cf9ce635ab8fba2723313573aa88a41171b909fe5982f0a3f749fd1
+  bytes: 2347
+- path: engine/runs/minimum_wage_disemployment_at_high_bite_ratios/chart_data.json
+  sha256: c08a3f2e639dce55b19c605ab2cd52ef015077e1e92f762ff31be2d3e9ad7190
+  bytes: 1424
+references:
+- kind: source
+  publisher: usdol
+  series_id: state_minimum_wage_history
+  url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

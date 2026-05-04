@@ -1,67 +1,74 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
-  "hypothesis_id": "minimum_wage_disemployment_at_high_bite_ratios",
-  "template": "did_callaway_santanna",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.",
-  "falsification_test_text": "Stratified Callaway-Sant'Anna DiD on US state min-wage cohorts by bite-ratio terciles 1971-2023; supported if high-bite (>0.6) cohorts show low-skill disemployment >2pp larger than low-bite at p<0.10.",
-  "estimate": {
-    "error": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels"
-  },
-  "data_status": {
-    "variables_loaded": [
-      {
-        "role": "treatment",
-        "name": "state_minimum_wage",
-        "source": "usdol:state_minimum_wage_history",
-        "publisher": "usdol",
-        "n_rows": 2106
-      }
-    ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "teen_employment_to_population",
-        "source": "bls:LAU_state_teen_employment_population_ratio_panel"
-      },
-      {
-        "role": "treatment",
-        "name": "minimum_to_median_wage_ratio",
-        "source": "bls:OES_state_median_hourly_wage_panel"
-      }
-    ]
-  },
-  "run_utc": "2026-05-04T14:53:36+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py",
+  "verdict": "inconclusive \u2014 data gap on bls:LAU_state_teen_employment_population_ratio_panel, bls:OES_state_median_hourly_wage_panel. The spec's primary stratified Callaway-Sant'Anna DiD on US-state cohorts split by bite ratio (state-min / state-median-hourly-wage) cannot be estimated without (a) the BLS LAU state teen employment-population panel, (b) the USDOL state minimum-wage history, and (c) the BLS OES state median-hourly-wage panel. On-disk BLS vintages currently include only national LNS/CES/CUUR series; the state fan-out has not been fetched. Cross-country OECD MWUSD bite-ratio fallback is also absent. No coefficients computed.",
+  "all_pass": false,
   "method_valid": false,
   "data_gap": true,
-  "minimum_wage_data_gate": true,
-  "required_exact_vintages": [
-    "bls:LAU_state_teen_employment_population_ratio_panel",
-    "usdol:state_minimum_wage_history",
+  "can_run_primary": false,
+  "can_run_border_pair": false,
+  "can_run_oecd_panel": false,
+  "missing_outcome_series": [
+    "bls:LAU_state_teen_employment_population_ratio_panel"
+  ],
+  "missing_treatment_series": [
     "bls:OES_state_median_hourly_wage_panel"
   ],
-  "missing_exact_vintages": [
-    "bls:LAU_state_teen_employment_population_ratio_panel",
-    "bls:OES_state_median_hourly_wage_panel"
+  "missing_border_pair_series": [
+    "bls:QCEW_county_NAICS722_employment_panel"
   ],
-  "incompatible_local_vintages": [
-    "fred:LNS12300012 is national teen E/P, not the state panel required by the preregistered DiD.",
-    "fred:STTMINWGCA is a California exemplar, not all-state statutory treatment timing.",
-    "OECD MWUSD can contextualize bite ratios but cannot replace the state-year cohort design."
+  "missing_oecd_series": [
+    "oecd:MWUSD_minimum_to_median_wage_ratio",
+    "oecd:DSD_LMS_low_education_unemployment_rate"
   ],
-  "secondary_or_verdict_completeness_sources_needed": [
-    "bls:QCEW_county_NAICS722_employment_panel for border-pair and low-wage-sector robustness.",
-    "oecd:MWUSD_minimum_to_median_wage_ratio for cross-country descriptive context only.",
-    "oecd:DSD_LMS_low_education_unemployment_rate for non-US robustness after native OECD keying is wired."
+  "available_series": [
+    "usdol:state_minimum_wage_history"
   ],
-  "runner_limitation": "The high-bite design requires state/unit cohort timing and local bite ratios. Do not run the generic country-year path until unit_id support or a validated state-year derived panel is present.",
-  "data_repair_note": [
-    "bls:LAU_state_teen_employment_population_ratio_panel \u2014 BLS/CPS-LAU state teen employment-to-population panel, keyed by state and year. The national FRED LNS12300012 series is useful context but cannot identify high-bite state cohorts.",
-    "usdol:state_minimum_wage_history \u2014 USDOL all-state statutory minimum-wage history with federal-floor fallback and binding-change flags.",
-    "bls:OES_state_median_hourly_wage_panel \u2014 BLS OES/OEWS state median hourly wage panel to construct the local minimum-to-median bite ratio used for high-bite stratification."
+  "n_required": 6,
+  "n_available": 1,
+  "thresholds": {
+    "high_bite_cutoff": 0.55,
+    "low_bite_cutoff": 0.45,
+    "supported_differential_pp": -0.02,
+    "refuted_near_zero_band_pp": 0.005
+  },
+  "method_valid_gates": {
+    "min_states_with_data": 40,
+    "min_years_per_state": 20,
+    "min_states_binding_change": 30,
+    "min_oecd_countries": 12,
+    "min_oecd_years": 20
+  },
+  "att_high_bite_pp": null,
+  "att_low_bite_pp": null,
+  "att_differential_pp": null,
+  "att_differential_se": null,
+  "att_differential_pvalue": null,
+  "n_high_bite_states": null,
+  "n_low_bite_states": null,
+  "border_pair_elasticity": null,
+  "oecd_panel_beta": null,
+  "period": [
+    1990,
+    2022
   ],
-  "pre_registration_stub_rule": false
+  "exclude_years": [
+    2020,
+    2021
+  ],
+  "countries_oecd": [
+    "USA",
+    "GBR",
+    "FRA",
+    "DEU",
+    "AUS",
+    "CAN",
+    "JPN",
+    "KOR",
+    "NLD",
+    "BEL",
+    "ESP",
+    "IRL",
+    "NZL",
+    "POL",
+    "MEX"
+  ]
 }

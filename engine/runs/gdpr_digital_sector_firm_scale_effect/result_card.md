@@ -1,36 +1,28 @@
 # Result card — gdpr_digital_sector_firm_scale_effect
 
-**Verdict:** NOT SUPPORTED at sectoral aggregate — none of (ICT log GVA-per-hour, ICT log emp, ICT emp share) shows EU-post-2018 negative differential at p<0.10. This is the falsification path flagged in the YAML notes — sector aggregate may mask firm-scale-distribution effects, which need v1.1 commercial firm data.
+**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome variable loaded; missing: ['constructed: Crunchbase / PitchBook firm-level digital-sector revenue, aggregated to country-year mean (log). Firm-level data-gated fetcher pending.', 'constructed: total VC dollars invested in digital-sector firms per country-year / number of active digital firms. Crunchbase fetcher pending.', 'constructed: fraction of digital firms that transitioned from <100 to >500 employees within the country-year window. Crunchbase / PitchBook.', 'constructed: share of total employment in ISIC J (information and communication). OECD STAN or ILO where available.']
 
-**Estimator:** panel_fe (TWFE, country + year FE, country-clustered SE)  
-**Period:** 2010-2024  
-**Outcomes (sector proxy):** OECD PDB ICT-sector (ACTIVITY=J) GVA per hour, employment, employment share  
+## Pre-registration
+- **Claim:** The cumulative EU digital-sector regulatory stack — GDPR (2018), Digital Markets Act (2022), Digital Services Act (2022), AI Act (2024) — has imposed a measurable fixed-compliance-cost burden that falls disproportionately on scale of EU-headquartered digital firms relative to US counterparts. Over 2018-2024, EU-headquartered digital firms show lower revenue-per-firm, lower VC-funding-per-firm, lower mean-employee count, and a lower rate of scale-up (defined as growth from <100 to >500 employees) than comparable-stage US firms. The effect is hypothesised to operate through the fixed-cost channel (compliance cost is lumpy and amortised over revenue base; smaller market means thinner spreading). The hypothesis does NOT claim the regulations produce net welfare loss (GDPR's consumer-privacy externality is explicitly outside the outcome set) — only that firm-scale is differentially smaller on the measured dimensions.
+- **Falsification rule:** Not supported if (a) β_eu_post_2018 is non-negative or not statistically significant at p<0.10 on at least two of the four outcome measures, OR (b) the effect vanishes after controlling for capital-market depth and VC-raised-as-share-of-GDP, OR (c) placebo at pre-2018 fake date shows a similar-magnitude "effect" (indicating pre-existing trend rather than GDPR), OR (d) the scale-up rate difference is driven by US superstar firms rather than EU-firm scale-up deficit (decomposable via medians vs means). Report honestly if the scale-gap exists but cannot be attributed to regulation specifically — this is a real and legitimate null.
+- **Falsification test:** eu_digital_regulation_firm_scale_did
 
-## Sector-aggregate specs (EU × post-2018)
+## Estimate
+- _Error:_ no outcome variable loaded; missing: ['constructed: Crunchbase / PitchBook firm-level digital-sector revenue, aggregated to country-year mean (log). Firm-level data-gated fetcher pending.', 'constructed: total VC dollars invested in digital-sector firms per country-year / number of active digital firms. Crunchbase fetcher pending.', 'constructed: fraction of digital firms that transitioned from <100 to >500 employees within the country-year window. Crunchbase / PitchBook.', 'constructed: share of total employment in ISIC J (information and communication). OECD STAN or ILO where available.']
 
-| Outcome | β | SE | 95% CI | p | t | n |
-|---|---:|---:|:---:|---:|---:|---:|
-| log_ict_lp (GVA/hr) | -0.0444 | 0.0778 | [-0.197,+0.109] | 0.569 | -0.57 | 444 |
-| log_ict_emp | +0.0263 | 0.0333 | [-0.039,+0.092] | 0.430 | +0.79 | 473 |
-| ict_emp_share | -0.0002 | 0.0010 | [-0.002,+0.002] | 0.843 | -0.20 | 473 |
+## Variables resolved
+- `constructed: indicator = 1 for EU member states in year 2018 onwards. USA, CAN, GBR (post-2020) = control.` → eu_post_2018_gdpr_dummy (treatment, publisher=constructed, n=165)
+- `constructed: indicator for EU member states in 2022 onwards, incremental cumulative burden.` → eu_post_2022_dma_dsa_dummy (treatment, publisher=constructed, n=165)
+- `constructed: indicator for EU member states in 2024 onwards; 2024 effect will be shallow given recency.` → eu_post_2024_ai_act_dummy (treatment, publisher=constructed, n=165)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2` → oecd_pmr_digital_subindex (controls, publisher=oecd_pmr, n=105)
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → log_gdp_pc_ppp (controls, publisher=world_bank_wdi, n=8325)
 
-## Cumulative DMA/DSA (EU × post-2022 incremental)
+### Variables missing data
+- `constructed: Crunchbase / PitchBook firm-level digital-sector revenue, aggregated to country-year mean (log). Firm-level data-gated fetcher pending.` (outcome, name=log_mean_digital_firm_revenue) — vintage not on disk
+- `constructed: total VC dollars invested in digital-sector firms per country-year / number of active digital firms. Crunchbase fetcher pending.` (outcome, name=log_vc_funding_per_active_firm) — vintage not on disk
+- `constructed: fraction of digital firms that transitioned from <100 to >500 employees within the country-year window. Crunchbase / PitchBook.` (outcome, name=scaleup_rate) — vintage not on disk
+- `constructed: share of total employment in ISIC J (information and communication). OECD STAN or ILO where available.` (outcome, name=digital_sector_employment_share) — vintage not on disk
+- `constructed: domestic VC dollars raised as share of GDP (Invest Europe + NVCA). Fetcher pending.` (controls, name=capital_market_depth_proxy) — vintage not on disk
 
-- **eu_post_2018** on log_ict_lp: β=-0.0462 (p=0.518)
-- **eu_post_2022** on log_ict_lp: β=+0.0047 (p=0.892)
-
-## Placebo (fake EU × post-2014, pre-2018 sample)
-
-- β_placebo on log_ict_lp = -0.0081 (p=0.872); placebo CLEAN.
-
-## Falsification rule
-Hypothesis target outcomes (firm-revenue, scale-up rate, VC per firm) are data-gated on commercial Crunchbase / PitchBook. v1 weak proxy uses sector-aggregate ICT GVA-per-hour, employment, and employment share. Falsification: non-negative β on at least 2 of 3 outcomes at p<0.10, OR placebo flags pre-trend.
-
-## Caveats
-
-- This is the YAML's explicitly-flagged WEAK v1: sector-aggregate ICT outcomes 
-  do not test firm-scale distribution (the hypothesis's true target). v1.1 needs 
-  Crunchbase/PitchBook firm-level data.
-- Sectoral productivity rising AND employment falling is consistent with smaller-
-  firm exit + surviving-firm scale, which the firm-level test would distinguish.
-- Capital-market depth (EU VC thinness pre-dates GDPR) is not controlled here.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-04T19:47:47+00:00_

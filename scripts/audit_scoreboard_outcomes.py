@@ -44,6 +44,16 @@ def verdict_class(verdict: str | None) -> str:
         return "supported"
     if v.startswith(("refuted", "not supported", "not_supported")):
         return "refuted"
+    if v.startswith("partial") and any(
+        marker in v
+        for marker in (
+            "direction inconclusive",
+            "claim direction not auto-inferred",
+            "effect magnitude effectively zero",
+            "standard error/p-value not estimable",
+        )
+    ):
+        return "partial"
     if v.startswith(("partial", "mixed", "weakly supported", "weakly_supported")):
         return "partial_support"
     return "partial"
@@ -89,6 +99,49 @@ def position_outcome(verdict_kind: str, prediction: str, polarity: str = "aligne
     if pred == "mixed":
         return "partial"
     return "untested"
+
+
+def score_signal(net_score: float, tested: int) -> dict[str, Any]:
+    """Classify tiny aggregate margins as no-call, without changing raw net."""
+    if tested <= 0:
+        return {
+            "signal_threshold": 0.0,
+            "net_margin_rate": 0.0,
+            "score_signal": "untested",
+        }
+
+    signal_threshold = max(5.0, tested * 0.05)
+    net_margin_rate = net_score / tested
+    if abs(net_score) <= signal_threshold:
+        signal = "too_close_to_call"
+    elif net_score > 0:
+        signal = "positive_signal"
+    else:
+        signal = "negative_signal"
+    return {
+        "signal_threshold": signal_threshold,
+        "net_margin_rate": net_margin_rate,
+        "score_signal": signal,
+    }
+
+
+def evidence_weight(evidence_type: str | None) -> float:
+    if evidence_type == "causal":
+        return 1.0
+    if evidence_type == "associational":
+        return 0.5
+    if evidence_type in {"descriptive", "canonical_case_multi_metric"}:
+        return 0.25
+    return 0.25
+
+
+def outcome_score(outcome: str) -> float:
+    return {
+        "supports_position": 1.0,
+        "partial_supports": 0.5,
+        "partial_refutes": -0.5,
+        "refutes_position": -1.0,
+    }.get(outcome, 0.0)
 
 
 def hypothesis_public_verdict(hypothesis_id: str, hypotheses: dict[str, dict[str, Any]]) -> tuple[bool, str | None]:
@@ -154,6 +207,7 @@ def score_positions() -> dict[str, Any]:
         position_id = position.get("position_id") or path.stem
         school = position.get("short_name") or position.get("school") or position_id
         counts: Counter[str] = Counter()
+        adjusted_counts: Counter[str] = Counter()
         examples: list[dict[str, Any]] = []
 
         for claim_index, claim in enumerate(position.get("falsifiable_specific_claims") or []):
@@ -163,6 +217,8 @@ def score_positions() -> dict[str, Any]:
                 continue
 
             is_public, verdict = hypothesis_public_verdict(hypothesis_id, hypotheses)
+            evidence_type = (hypotheses.get(hypothesis_id) or {}).get("evidence_type")
+            weight = evidence_weight(evidence_type)
             if not is_public:
                 outcome = "untested"
                 prediction = claim.get("school_prediction")
@@ -175,6 +231,9 @@ def score_positions() -> dict[str, Any]:
                 public_claim_links += 1
 
             counts[outcome] += 1
+            adjusted_counts["net_score"] += outcome_score(outcome) * weight
+            if outcome != "untested":
+                adjusted_counts["tested_weight"] += weight
             if outcome != "untested" and len(examples) < 12:
                 examples.append(
                     {
@@ -182,6 +241,8 @@ def score_positions() -> dict[str, Any]:
                         "hypothesis_id": hypothesis_id,
                         "school_prediction": prediction,
                         "polarity": polarity,
+                        "evidence_type": evidence_type,
+                        "evidence_weight": weight,
                         "verdict": verdict,
                         "outcome": outcome,
                         "claim": str(claim.get("claim") or "")[:240],
@@ -221,6 +282,10 @@ def score_positions() -> dict[str, Any]:
             - 0.5 * counts["partial_refutes"]
             - counts["refutes_position"]
         )
+        decisive_net = counts["supports_position"] - counts["refutes_position"]
+        signal = score_signal(net_score, tested)
+        adjusted_net_score = adjusted_counts["net_score"]
+        adjusted_signal = score_signal(adjusted_net_score, adjusted_counts["tested_weight"])
         denominator = (
             counts["supports_position"]
             + counts["refutes_position"]
@@ -228,7 +293,7 @@ def score_positions() -> dict[str, Any]:
             + counts["partial_refutes"]
         )
         support_rate = (
-            (counts["supports_position"] + 0.5 * counts["partial_supports"] - 0.5 * counts["partial_refutes"])
+            (counts["supports_position"] + 0.5 * counts["partial_supports"])
             / denominator
             if denominator
             else 0.0
@@ -239,6 +304,13 @@ def score_positions() -> dict[str, Any]:
             "counts": dict(counts),
             "tested": tested,
             "net_score": net_score,
+            "adjusted_net_score": adjusted_net_score,
+            "adjusted_tested_weight": adjusted_counts["tested_weight"],
+            "decisive_net": decisive_net,
+            **signal,
+            "adjusted_signal_threshold": adjusted_signal["signal_threshold"],
+            "adjusted_net_margin_rate": adjusted_signal["net_margin_rate"],
+            "adjusted_score_signal": adjusted_signal["score_signal"],
             "support_rate": support_rate,
             "examples": examples,
         }
@@ -249,6 +321,8 @@ def score_positions() -> dict[str, Any]:
             "principle": "Score school outcomes from verdict + school_prediction + polarity; never from raw empirical_status alone.",
             "win_rule": "SUPPORTED hypothesis verdict supports schools that predicted supported and refutes schools that predicted falsified; REFUTED reverses that.",
             "partial_rule": "Directional partials count half-weight in the predicted direction; neutral partials do not affect net score.",
+            "signal_rule": "Rows with |weighted net| < max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",
+            "quality_adjustment_rule": "Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical_case_multi_metric=0.25.",
         },
         "public_claim_links": public_claim_links,
         "positions": positions,
@@ -261,7 +335,11 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
     out_base.with_suffix(".json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
 
     positions = audit["positions"]
-    ranked = sorted(positions.values(), key=lambda p: (p["net_score"], p["tested"]), reverse=True)
+    ranked = sorted(
+        positions.values(),
+        key=lambda p: (p["adjusted_net_score"], p["net_score"], p["tested"]),
+        reverse=True,
+    )
     lines = [
         "# Scoreboard Prediction-Outcome Audit",
         "",
@@ -273,16 +351,20 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "- Raw `empirical_status` is a hypothesis-verdict label, not automatically a school win.",
         "- `SUPPORTED` refutes a school that predicted `falsified`; `REFUTED` supports that school.",
         "- Directional partials count half-weight; neutral partials do not move net score.",
+        "- Tiny aggregate margins are a no-call: `abs(net) < max(5, 5% of tested)` is `too_close_to_call`.",
+        "- Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical=0.25.",
         "",
         "## Ranked School Outcomes",
         "",
-        "| school | net | tested | supports | partial + | partial - | refutes | neutral | untested |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| school | signal | q-net | q-band | raw net | decisive net | tested | supports | partial + | partial - | refutes | neutral | untested |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in ranked:
         c = Counter(row["counts"])
         lines.append(
-            f"| `{row['position_id']}` | {row['net_score']:.1f} | {row['tested']} | "
+            f"| `{row['position_id']}` | {row['adjusted_score_signal']} | "
+            f"{row['adjusted_net_score']:.1f} | ±{row['adjusted_signal_threshold']:.1f} | "
+            f"{row['net_score']:.1f} | {row['decisive_net']} | {row['tested']} | "
             f"{c['supports_position']} | {c['partial_supports']} | {c['partial_refutes']} | "
             f"{c['refutes_position']} | {c['partial']} | {c['untested']} |"
         )
@@ -319,7 +401,9 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
             continue
         c = Counter(row["counts"])
         lines.append(
-            f"- `{position_id}`: net={row['net_score']:.1f}; supports={c['supports_position']}; "
+            f"- `{position_id}`: signal={row['adjusted_score_signal']}; "
+            f"q-net={row['adjusted_net_score']:.1f}; raw-net={row['net_score']:.1f}; "
+            f"q-band=±{row['adjusted_signal_threshold']:.1f}; supports={c['supports_position']}; "
             f"partial+={c['partial_supports']}; partial-={c['partial_refutes']}; "
             f"refutes={c['refutes_position']}; neutral={c['partial']}; untested={c['untested']}."
         )

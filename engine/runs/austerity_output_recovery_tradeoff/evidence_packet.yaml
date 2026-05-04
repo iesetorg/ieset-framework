@@ -1,0 +1,276 @@
+packet_version: 1
+generated_utc: '2026-05-04T20:34:54+00:00'
+repository:
+  root: .
+  git_commit: f34241b08392f87df0e485e858c3d566031ed4aa
+hypothesis:
+  id: austerity_output_recovery_tradeoff
+  path: hypotheses/growth/austerity_output_recovery_tradeoff.yaml
+  school: null
+  topic: growth
+  claim: 'Post-2010 European fiscal consolidation intensity negatively predicts subsequent
+    output-gap closure speed and cumulative output over the 2010-2019 window, with
+    the effect concentrated in the Eurozone periphery where the combination of sovereign
+    spreads, no monetary- policy-at-country-level, and high initial output gaps produced
+    a multiplier larger than the pre-crisis consensus assumed. The hypothesis is consistent
+    with the Blanchard-Leigh 2013 finding that IMF fiscal-multiplier assumptions were
+    systematically too low in the early austerity period. The pre-registered claim
+    is that in the Eurozone sample 2010-2019, countries with larger cyclically-adjusted
+    primary-balance tightening over 2010-2013 experienced slower output- gap closure
+    relative to the post-2008 trough, holding initial output gap and debt level constant.
+    The core-vs-periphery split is expected to show the periphery effect substantially
+    larger than the core effect.
+
+    '
+verdict:
+  raw: "inconclusive \u2014 OLS coefficient on \u0394fiscal-balance is +1.287 pp/pp\
+    \ (p=0.289) \u2014 wrong sign but not significant. The spec mandated IV-2SLS (Blanchard-Leigh\
+    \ instrument) precisely because OLS on this relationship suffers from reverse-causality\
+    \ bias toward positive coefficients (worse-growth \u2192 larger forced consolidation).\
+    \ The April-2010 WEO forecast vintage needed for the instrument is not in the\
+    \ local data tree. With controls (initial debt, unemployment), \u03B2 = +2.540\
+    \ pp/pp (p = 0.007) \u2014 also wrong sign. Identification gap, not dispositive\
+    \ refutation. N=21."
+  bucket: inconclusive
+  reason: null
+  status: null
+preregistration:
+  claim: 'Post-2010 European fiscal consolidation intensity negatively predicts subsequent
+    output-gap closure speed and cumulative output over the 2010-2019 window, with
+    the effect concentrated in the Eurozone periphery where the combination of sovereign
+    spreads, no monetary- policy-at-country-level, and high initial output gaps produced
+    a multiplier larger than the pre-crisis consensus assumed. The hypothesis is consistent
+    with the Blanchard-Leigh 2013 finding that IMF fiscal-multiplier assumptions were
+    systematically too low in the early austerity period. The pre-registered claim
+    is that in the Eurozone sample 2010-2019, countries with larger cyclically-adjusted
+    primary-balance tightening over 2010-2013 experienced slower output- gap closure
+    relative to the post-2008 trough, holding initial output gap and debt level constant.
+    The core-vs-periphery split is expected to show the periphery effect substantially
+    larger than the core effect.
+
+    '
+  falsification_rule: "PRIMARY (dispositive, downgraded to OLS \u2014 see methodology_note):\
+    \ cross-section OLS across the 21-country European panel of cumulative log-GDP\
+    \ growth 2010\u21922019 on \u0394(general-govt net lending / GDP) 2010\u21922013\
+    \ with periphery dummy and periphery\xD7\u0394-FB interaction. The hypothesis\
+    \ is SUPPORTED if \u03B2_core < 0 with |\u03B2_core| \u2265 0.5 pp-cumulative-growth\
+    \ per 1pp-of-GDP consolidation at p<0.05 AND \u03B2_periphery (= \u03B2_core +\
+    \ \u03B4_interaction) is more negative than \u03B2_core (periphery effect larger\
+    \ as predicted). REFUTED if \u03B2_core is significantly POSITIVE at p<0.05 (consolidation\
+    \ associated with *more* growth, contradicting the austerity-damage claim and\
+    \ unable to be rescued by the OLS-vs-IV bias direction). INCONCLUSIVE if \u03B2\
+    _core is wrong-signed but not significant (consistent with the reverse-causality\
+    \ bias the IV was designed to remove) OR if data gates fail. INFORMATIVE: same-sign\
+    \ result on the unemployment cumulative-mean outcome; controlled-OLS robustness\
+    \ with debt-2010 and unemp-2010 as additional regressors. METHOD_VALID: \u2265\
+    12 of 21 countries with treatment+outcome data; \u22656 periphery and \u22656\
+    \ core countries."
+  threshold: 'PRIMARY: beta_core < 0 AND |beta_core| >= 0.5 AND p < 0.05 AND beta_periphery
+    < beta_core. REFUTED if beta_core > 0 at p < 0.05.'
+  estimator:
+    template: iv_2sls
+    clustering: country
+    notes: 'Primary specification: 2SLS using the Blanchard-Leigh 2013 forecast-error
+      approach. The first-stage regresses actual 2010-2013 CAPB change on IMF-forecast
+      CAPB change as of the April 2010 WEO; the forecast error becomes the plausibly-exogenous
+      instrument (countries did not systematically forecast-miss their own fiscal
+      choices). Second stage regresses cumulative 2010-2019 output on instrumented
+      consolidation. Alternative: panel FE on 2010-2019 with CAPB_change as regressor
+      reported as robustness. Both specs interact consolidation with the periphery
+      indicator.
+
+      '
+  steelman: hypotheses/steelman/austerity_output_recovery_tradeoff.md
+reproduction:
+  run_dir: engine/runs/austerity_output_recovery_tradeoff
+  runner: null
+  replication_script: engine/runs/austerity_output_recovery_tradeoff/replication.py
+  suggested_command: python engine/runs/austerity_output_recovery_tradeoff/replication.py
+data:
+  inputs:
+  - name: real_gdp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.MKTP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD@2026-04-30T140038Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 48246a85b73c7168a3a8abbf9f68e233b811524a4be095cd3d7a9cd3a28da702
+      computed_sha256: 48246a85b73c7168a3a8abbf9f68e233b811524a4be095cd3d7a9cd3a28da702
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T14:00:38.704211+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-04-30T140059Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. This indicator
+        is expressed in constant prices, meaning the series has been adjusted to account
+        for price changes over '
+      countries_param: all
+      vintage_utc: null
+  - name: fiscal_balance_pct_gdp
+    publisher: imf
+    series_id: GGXCNL_NGDP
+    vintage_file: data/vintages/imf/GGXCNL_NGDP@2026-04-30T114253Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f300443fbbcde35ff5f88b02180d14f2117e661a7fd4282bef2a012da59daa34
+      computed_sha256: f300443fbbcde35ff5f88b02180d14f2117e661a7fd4282bef2a012da59daa34
+      status: match
+    source:
+      type: official
+      url: https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP
+      methodology_url: https://www.imf.org/external/datamapper/GGXCNL_NGDP
+      license: IMF standard permissions (attribution required)
+      fetch_utc: '2026-04-30T11:42:53.695743+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1980'
+      end_date: '2031'
+      frequency: annual
+      rows: 8848
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_label: null
+      dataset: null
+      countries_filter: all
+      vintage_utc: null
+  - name: gov_debt_pct_gdp
+    publisher: imf
+    series_id: GGXWDG_NGDP
+    vintage_file: data/vintages/imf/GGXWDG_NGDP@2026-04-30T123034Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: e9b5a3be72e315a25baa9a3f55985a6b51f6a95299ed9fb0b1c0fb4e6a993ef4
+      computed_sha256: e9b5a3be72e315a25baa9a3f55985a6b51f6a95299ed9fb0b1c0fb4e6a993ef4
+      status: match
+    source:
+      type: official
+      url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+      methodology_url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+      license: IMF standard permissions (attribution required)
+      fetch_utc: '2026-04-30T12:30:34.170076+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-04-30T123048Z.yaml
+    coverage:
+      start_date: '1980'
+      end_date: '2031'
+      frequency: annual
+      rows: 8113
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_label: null
+      dataset: null
+      countries_filter: all
+      vintage_utc: null
+  - name: unemployment_rate
+    publisher: world_bank_wdi
+    series_id: SL.UEM.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/SL.UEM.TOTL.ZS@2026-04-30T135639Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: dfb2bae82f8ae7d95de21605e2d8c57f835cc7be4eeb53d58f8362da0b9e41c9
+      computed_sha256: dfb2bae82f8ae7d95de21605e2d8c57f835cc7be4eeb53d58f8362da0b9e41c9
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T13:56:39.296917+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-04-30T135659Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Unemployment, total (% of total labor force) (modeled ILO estimate)
+      source_note: Unemployment refers to the share of the labor force that is without
+        work but available for and seeking employment.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 4
+    official_source_count: 4
+    manual_source_count: 0
+    hash_status_counts:
+      match: 4
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/growth/austerity_output_recovery_tradeoff.yaml
+  sha256: 8365eaa282de3a7adede7c411514295b551d2532a739485845d464d56701bf4f
+  bytes: 9614
+- path: engine/runs/austerity_output_recovery_tradeoff/manifest.yaml
+  sha256: b0eab4e3d93b906e0759f0d877120c204aa7df2ac132b409093e4d21b5f4e7b0
+  bytes: 1099
+- path: engine/runs/austerity_output_recovery_tradeoff/diagnostics.json
+  sha256: 85b29470a516ab8edfde643c87adc5c06dffab70816b1341624c849a5fe0b2f9
+  bytes: 8370
+- path: engine/runs/austerity_output_recovery_tradeoff/result_card.md
+  sha256: e135176d1ae1aab180ca66445783dee220dced794ba3119333cbf23162ec32e6
+  bytes: 3126
+- path: engine/runs/austerity_output_recovery_tradeoff/replication.py
+  sha256: f94fbf5e04564756aba7770430528d5bf4abab6762a2089c5cbb87bad9f1618c
+  bytes: 26340
+- path: engine/runs/austerity_output_recovery_tradeoff/coefficients.parquet
+  sha256: fad9ac685026d3d79e32bfffce5b0f3f084d784ba989d065f7da418ab45600da
+  bytes: 3812
+- path: engine/runs/austerity_output_recovery_tradeoff/chart_data.json
+  sha256: 99b3f575a9dfb5e9b979cbdd9206841e99d44037198be6c82de6914c52a96e25
+  bytes: 3970
+- path: hypotheses/steelman/austerity_output_recovery_tradeoff.md
+  sha256: b47ccfc86bf75c4ba64eff48ccf7c40515467eefd481c209a1d054183fdddca2
+  bytes: 5422
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD
+- kind: source
+  publisher: imf
+  series_id: GGXCNL_NGDP
+  url: https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP
+- kind: methodology
+  publisher: imf
+  series_id: GGXCNL_NGDP
+  url: https://www.imf.org/external/datamapper/GGXCNL_NGDP
+- kind: source
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+- kind: methodology
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SL.UEM.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SL.UEM.TOTL.ZS
+  url: https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS
+caveats: []

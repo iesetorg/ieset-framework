@@ -1,17 +1,41 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: natural_rate_hypothesis_long_run_phillips_vertical
-version: 1
-status: draft
+version: 2
+status: candidate
 topic: labour
 claim: Cross-country Phillips-curve data post-1970 shows no stable unemployment-inflation tradeoff in the long run, consistent with Friedman's natural-rate hypothesis.
+methodology_note: >-
+  v2 promotion (2026-05-04). The v1 draft already specified the relevant
+  Johansen/cointegration estimand in falsification.test, and
+  scripts/run_cointegration_vecm.py already pinned the decisive constants:
+  at least 20 observations per country, at least 8 tested countries,
+  SUPPORTED if the no-cointegration share is >=80% at the 10% rank-0
+  Johansen trace-test critical value, REFUTED if the cointegrated share is
+  >=50%, and PARTIAL otherwise. This promotion replaces the generic stub
+  boilerplate with that dispositive rule without changing the statistic,
+  countries, period, or thresholds after seeing the run output.
 notes: Stub seeded from a Chicago-monetarist school prediction (Friedman natural-rate hypothesis). VECM/cointegration analysis is sensitive to lag and break specification; needs human review.
 prior_confidence: 0.7
 disclosure: Author's market-liberal priors strongly accept the long-run natural-rate proposition; could under-weight evidence of low-frequency Phillips relationships at horizons longer than 5y and over-weight
   the no-cointegration finding as conclusive.
+steelman: hypotheses/steelman/natural_rate_hypothesis_long_run_phillips_vertical.md
 falsification:
-  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
-    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
-  test: Johansen cointegration test on unemployment-inflation pair across OECD panel 1970-2023; supported if no stable cointegrating vector found at p>0.10 in 80% or more of country series.
+  rule: >-
+    PRIMARY (dispositive): run a country-by-country Johansen trace test on
+    CPI inflation year-over-year and unemployment for the registered OECD
+    sample. SUPPORTED if no stable rank-0 cointegrating vector is found at
+    the 10% critical value in >=80% of tested country series. REFUTED if
+    cointegration is found in >=50% of tested country series. PARTIAL if
+    at least 8 countries are tested but neither threshold clears.
+    METHOD_VALID if each tested country contributes at least 20 paired
+    inflation/unemployment observations and at least 8 countries are tested.
+  test: Country-level Johansen rank-0 trace-test screen on unemployment-inflation pairs across OECD 1970-2023.
+  threshold:
+    min_obs_per_country: 20
+    min_tested_countries: 8
+    johansen_rank0_alpha: 0.10
+    supported_no_cointegration_share_min: 0.80
+    refuted_cointegration_share_min: 0.50
 evidence_type: associational
 sample:
   countries:

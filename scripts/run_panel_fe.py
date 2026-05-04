@@ -232,8 +232,10 @@ SERIES_ALIAS_BY_PUBLISHER = {
         "REGULATION": "REGULATIONS",
         "REGULATIONS_OVERALL": "REGULATIONS",
         "NETWORK_SECTORS": "NETWORK_SECTORS",
+        "NETWORK_SECTORS_INDICATOR": "NETWORK_SECTORS",
         "BARRIERS_TO_TRADE": "BARRIER_TRADE",
         "FDI_RESTRICTIVENESS": "FDI_INDEX",
+        "OVERALL": "PMR",
         "PRICE_CONTROLS": "PRICE",
         "TARIFFS": "TARIFFS",
     },
@@ -282,13 +284,18 @@ SERIES_ALIAS_BY_PUBLISHER = {
         "MWUSD": "OECD.ELS.SAE,DSD_EARN@DF_MW_DOL_RPP,1.0",
         "DSD_EARN": "OECD.ELS.SAE,DSD_EARN@DF_EARN_LFS,1.0",
         "DSD_EARNINGS": "OECD.SDD.TPS,DSD_EARNINGS@DF_EARNINGS,1.0",
+        "DSD_LFS_BS@DF_EMP_RATE": "DSD_LFS_DF_LFS_INDIC",
+        "DSD_LFS_BS@DF_UNE_RATE": "DSD_LFS_DF_LFS_INDIC",
+        "DF_EMP_RATE": "DSD_LFS_DF_LFS_INDIC",
+        "DF_UNE_RATE": "DSD_LFS_DF_LFS_INDIC",
         "NEET": "OECD.ELS.EMP,DSD_LFS@DF_NEET,1.0",
         "OUTGAP": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
         "OUTPUTGAP": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
         "DSD_KEI": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
         "DSD_PDB": "OECD.SDD.TPS,DSD_PDB@DF_PDB_PT,1.0",
         "DSD_PENSIONS@DF_PENSIONS_REPL_RATE": "OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0",
-        "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_AGG,1.0",
+        "SOCX_AGG": "OECD.ELS.SPD,DSD_SOCX_AGG@DF_SOCX_AGG,1.0",
+        "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SPD,DSD_SOCX_AGG@DF_SOCX_AGG,1.0",
         "DSD_SOCX@DF_SOCX_ALMP": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0",
         "DSD_TAX": "OECD.CTP.TPS,DSD_TAX@DF_TAX_WAGES_COMP,2.1",
         "FDI_STATISTICS": "OECD.DAF.INV,DSD_FDI@DF_FDI_FLOWS,1.0",
@@ -310,6 +317,8 @@ SOURCE_BRIDGES = {
     ("imf", "WEO_GGXWDG_NGDP"): ("imf", "GGXWDG_NGDP"),
     ("imf", "WEO.NGAP_NPGDP"): ("imf", "NGAP_NPGDP"),
     ("imf", "ENDA_XDC_USD_RATE"): ("world_bank_wdi", "PA.NUS.FCRF"),
+    ("ilostat", "EMP_2EMP_SEX_AGE_RT_A"): ("world_bank_wdi", "SL.EMP.TOTL.SP.ZS"),
+    ("ilostat", "employment_to_population_ratio"): ("world_bank_wdi", "SL.EMP.TOTL.SP.ZS"),
     ("wid", "tax_top_rate"): ("owid", "top-marginal-income-tax-rate"),
     ("wid", "top_marginal_income_tax_rate"): ("owid", "top-marginal-income-tax-rate"),
 }
@@ -427,35 +436,43 @@ def latest_vintage(publisher: str, series: str) -> Path | None:
       2. Nested: data/vintages/<pub>/<series>/*.parquet
       3. Fuzzy contains: any file whose name (with @ and , and : stripped) contains the series.
     """
+    original_publisher = PUBLISHER_ALIAS_MAP.get(publisher, publisher)
+    original_series = str(series).strip()
     publisher, series = resolve_source_target(publisher, series)
     pub_dir = VINTAGES / publisher
     if not pub_dir.exists():
         return None
+    series_options = [series]
+    if original_publisher == publisher and original_series != series:
+        series_options.append(original_series)
 
     # 1. Exact prefix match: <series>@... or <series>.parquet
-    candidates = list(pub_dir.glob(f"{series}@*.parquet"))
-    candidates.extend(pub_dir.glob(f"{series}.parquet"))
-    # 2. Nested directory layout
-    nested = pub_dir / series
-    if nested.exists():
-        candidates.extend(nested.glob("*.parquet"))
+    candidates: list[Path] = []
+    for candidate_series in series_options:
+        candidates.extend(pub_dir.glob(f"{candidate_series}@*.parquet"))
+        candidates.extend(pub_dir.glob(f"{candidate_series}.parquet"))
+        # 2. Nested directory layout
+        nested = pub_dir / candidate_series
+        if nested.exists():
+            candidates.extend(nested.glob("*.parquet"))
     # 3. Fuzzy: normalise both filename and series, look for substring containment.
     if not candidates:
-        target = _normalise_series_token(series)
-        for f in pub_dir.glob("*.parquet"):
-            stem = f.stem.split("@", 1)[0]  # drop UTC stamp
-            if target and target in _normalise_series_token(stem):
-                candidates.append(f)
-        # Also peek into one level of subdirectory
-        for sub in pub_dir.iterdir():
-            if sub.is_dir():
-                for f in sub.glob("*.parquet"):
-                    stem = f.stem.split("@", 1)[0]
-                    if target and (
-                        target in _normalise_series_token(stem)
-                        or target in _normalise_series_token(sub.name)
-                    ):
-                        candidates.append(f)
+        targets = [_normalise_series_token(s) for s in series_options if s]
+        for target in targets:
+            for f in pub_dir.glob("*.parquet"):
+                stem = f.stem.split("@", 1)[0]  # drop UTC stamp
+                if target and target in _normalise_series_token(stem):
+                    candidates.append(f)
+            # Also peek into one level of subdirectory
+            for sub in pub_dir.iterdir():
+                if sub.is_dir():
+                    for f in sub.glob("*.parquet"):
+                        stem = f.stem.split("@", 1)[0]
+                        if target and (
+                            target in _normalise_series_token(stem)
+                            or target in _normalise_series_token(sub.name)
+                        ):
+                            candidates.append(f)
     if not candidates and publisher == "oecd":
         resolved = _resolve_oecd_urn_by_keyword(series)
         if resolved and resolved != series:
@@ -484,11 +501,99 @@ def normalise_country_code(value: object) -> str | None:
     return upper
 
 
-def normalise_panel(df: pd.DataFrame, publisher: str) -> pd.DataFrame | None:
+def _filter_oecd_socx_slice(
+    df: pd.DataFrame,
+    variable_name: str | None = None,
+) -> pd.DataFrame:
+    """Select a preregistered SOCX slice before reducing to country-year.
+
+    OECD SOCX aggregate vintages contain many programme, spending, and unit
+    dimensions in one parquet. Averaging the whole file would mix dollars per
+    person, percent-of-GDP, public/private expenditure, and programme families.
+    Keep this intentionally narrow: add explicit mappings as hypotheses need
+    them rather than guessing broad welfare aggregates.
+    """
+    required = {"UNIT_MEASURE", "EXPEND_SOURCE", "PROGRAMME_TYPE"}
+    if not required.issubset(df.columns):
+        return df
+
+    name = (variable_name or "").lower()
+    if name != "unemployment_benefit_expenditure_gdp":
+        return df
+
+    filtered = df[
+        df["UNIT_MEASURE"].astype(str).eq("PT_B1GQ")
+        & df["EXPEND_SOURCE"].astype(str).eq("ES10")
+        & df["PROGRAMME_TYPE"].astype(str).eq("TP71")
+    ].copy()
+    if "SPENDING_TYPE" in filtered.columns:
+        total = filtered[filtered["SPENDING_TYPE"].astype(str).eq("_T")]
+        if not total.empty:
+            filtered = total
+    if "PRICE_BASE" in filtered.columns:
+        not_applicable = filtered[filtered["PRICE_BASE"].astype(str).eq("_Z")]
+        if not not_applicable.empty:
+            filtered = not_applicable
+    return filtered if not filtered.empty else df
+
+
+def _filter_oecd_lfs_indic_slice(
+    df: pd.DataFrame,
+    variable_name: str | None = None,
+) -> pd.DataFrame:
+    """Select the requested OECD LFS indicator before country-year reduction."""
+    if "MEASURE" not in df.columns:
+        return df
+
+    name = (variable_name or "").lower()
+    measure = None
+    if any(token in name for token in ("employment", "emp_rate", "employment_rate")):
+        measure = "EMP_RATIO"
+    elif any(token in name for token in ("unemployment", "une_rate")):
+        measure = "UNE_RATE"
+    elif any(token in name for token in ("labour_force", "labor_force", "lfp", "participation")):
+        measure = "LF_RATE"
+    if measure is None:
+        return df
+
+    filtered = df[df["MEASURE"].astype(str).eq(measure)].copy()
+    if filtered.empty:
+        return df
+    if "SEX" in filtered.columns:
+        total = filtered[filtered["SEX"].astype(str).eq("_T")]
+        if not total.empty:
+            filtered = total
+    if "AGE" in filtered.columns:
+        for age_code in ("Y15T64", "_T", "Y15T74", "Y15T24"):
+            age = filtered[filtered["AGE"].astype(str).eq(age_code)]
+            if not age.empty:
+                filtered = age
+                break
+    if "LABOUR_FORCE_STATUS" in filtered.columns:
+        status_by_measure = {"EMP_RATIO": "EMP", "UNE_RATE": "UNE", "LF_RATE": "LF"}
+        status = status_by_measure.get(measure)
+        if status:
+            status_filtered = filtered[filtered["LABOUR_FORCE_STATUS"].astype(str).eq(status)]
+            if not status_filtered.empty:
+                filtered = status_filtered
+    return filtered
+
+
+def normalise_panel(
+    df: pd.DataFrame,
+    publisher: str,
+    series: str | None = None,
+    variable_name: str | None = None,
+) -> pd.DataFrame | None:
     """Project an arbitrary publisher's parquet schema onto (country_iso3, year, value).
 
     Returns None if the schema can't be normalised.
     """
+    if publisher == "oecd" and "DSD_SOCX_AGG" in str(series or ""):
+        df = _filter_oecd_socx_slice(df, variable_name=variable_name)
+    if publisher == "oecd" and "DF_LFS_INDIC" in str(series or ""):
+        df = _filter_oecd_lfs_indic_slice(df, variable_name=variable_name)
+
     cols = {c.lower(): c for c in df.columns}
     # Discover the country column.
     country_col = None
@@ -601,7 +706,10 @@ _META_PREFIXES = {"constructed", "derived", "manual", "academic", "proxies",
                   "fallback", "microdata", "dates"}
 
 
-def load_variable(source: str) -> tuple[pd.DataFrame, str] | None:
+def load_variable(
+    source: str,
+    variable_name: str | None = None,
+) -> tuple[pd.DataFrame, str] | None:
     """Try each candidate (publisher, series) in the source string in order
     and return the first one whose vintage exists and parses.
 
@@ -626,14 +734,19 @@ def load_variable(source: str) -> tuple[pd.DataFrame, str] | None:
             )
             if canonical_pub in _META_PREFIXES:
                 continue
-            path = latest_vintage(canonical_pub, canonical_series)
+            path = latest_vintage(clause["publisher"], clause["series"])
             if path is None:
                 continue
             try:
                 df = pd.read_parquet(path)
             except Exception:
                 continue
-            panel = normalise_panel(df, canonical_pub)
+            panel = normalise_panel(
+                df,
+                canonical_pub,
+                series=canonical_series,
+                variable_name=variable_name,
+            )
             if panel is None or panel.empty:
                 continue
             panel = apply_source_qualifier(panel, clause.get("qualifier"), explicit_countries)
@@ -659,14 +772,19 @@ def load_variable(source: str) -> tuple[pd.DataFrame, str] | None:
         )
         if canonical_pub in _META_PREFIXES:
             continue
-        path = latest_vintage(canonical_pub, canonical_series)
+        path = latest_vintage(clause["publisher"], clause["series"])
         if path is None:
             continue
         try:
             df = pd.read_parquet(path)
         except Exception:
             continue
-        panel = normalise_panel(df, canonical_pub)
+        panel = normalise_panel(
+            df,
+            canonical_pub,
+            series=canonical_series,
+            variable_name=variable_name,
+        )
         if panel is None or panel.empty:
             continue
         return panel, canonical_pub
@@ -1238,6 +1356,8 @@ def transform(s: pd.Series, kind: str) -> pd.Series:
         return s
     if kind == "log":
         return np.log(s.where(s > 0))
+    if kind in ("inverted_scale", "reverse_scale"):
+        return -s
     if kind in ("diff", "first_diff"):
         return s.diff()
     if kind in ("yoy", "log_diff"):
@@ -1294,9 +1414,13 @@ def has_dispositive_test_threshold(spec: dict) -> bool:
         return False
 
     significance_threshold = bool(
-        re.search(r"\bp\s*(?:<|<=|≤)\s*0?\.\d+\b", text)
+        re.search(r"\bp\s*(?:<|<=|>|>=|≤|≥)\s*0?\.\d+\b", text)
         or re.search(r"(?:alpha|α)\s*=?\s*0?\.\d+\b", text)
         or "conventional significance" in text
+    )
+    test_stat_threshold = bool(
+        re.search(r"\|?\s*t\s*\|?\s*(?:<|<=|>|>=|≤|≥)\s*\d+(?:\.\d+)?\b", text)
+        or re.search(r"\b(?:t-stat|t statistic|trace statistic|wald statistic)\s*(?:<|<=|>|>=|≤|≥)\s*\d+(?:\.\d+)?\b", text)
     )
     ranked_threshold = bool(
         re.search(r"\btop\s+(?:half|third|quartile|quintile|decile)\b", text)
@@ -1306,7 +1430,7 @@ def has_dispositive_test_threshold(spec: dict) -> bool:
         re.search(r"\b(?:more|less)\s+than\s+\d+(?:\.\d+)?\s*(?:%|pp|x|fold|times)\b", text)
         or re.search(r"\b(?:at\s+least|below|above)\s+\d+(?:\.\d+)?\s*(?:%|pp|x|fold|times)\b", text)
         or re.search(r"\bno\s*[<>]=?\s*\d+(?:\.\d+)?\s*(?:%|pp|x|fold|times)?\b", text)
-        or re.search(r"[<>]=?\s*\d+(?:\.\d+)?\s*(?:%|pp|bp|x|fold|times)\b", text)
+        or re.search(r"(?:<|<=|>|>=|≤|≥)\s*\d+(?:\.\d+)?\s*(?:%|pp|bp|x|fold|times)", text)
         or re.search(r"±\s*\d+(?:\.\d+)?\s*(?:%|pp|bp|sd)\b", text)
         or re.search(r"\b\d+(?:\.\d+)?\s*(?:%|pp|bp|x|fold|times)\b", text)
         or re.search(r"\b\d+\s+of\s+\d+\b", text)
@@ -1316,11 +1440,11 @@ def has_dispositive_test_threshold(spec: dict) -> bool:
         re.search(
             r"\b(?:positive|negative|higher|lower|increase|decrease|"
             r"opposite|matches|direction|rank|coefficient|gap|effect|"
-            r"supports?|refute|refutes|worse|better|peak|baseline)\b",
+            r"supports?|supported|refute|refutes|worse|better|peak|baseline)\b",
             text,
         )
     )
-    return significance_threshold or ranked_threshold or (
+    return significance_threshold or test_stat_threshold or ranked_threshold or (
         magnitude_threshold and directional_anchor
     )
 
@@ -1489,7 +1613,7 @@ def build_panel(spec: dict) -> tuple[pd.DataFrame, dict]:
             if source.lower().lstrip().startswith("constructed:"):
                 res = construct_variable_from_text(spec, item, existing_frames=frames)
             if res is None:
-                res = load_variable(source)
+                res = load_variable(source, variable_name=name)
             if (
                 res is None
                 and (
@@ -1718,6 +1842,25 @@ def run_panel_ols(
     if not entity and not time:
         entity, time = True, True
 
+    if entity:
+        within_entity_n = sub.groupby("country_iso3")[treatment_name].nunique(dropna=True)
+        if not within_entity_n.empty and bool((within_entity_n <= 1).all()):
+            return {
+                "error": (
+                    f"treatment {treatment_name!r} has no within-country variation "
+                    "under country fixed effects"
+                )
+            }
+    if time:
+        within_time_n = sub.groupby("year")[treatment_name].nunique(dropna=True)
+        if not within_time_n.empty and bool((within_time_n <= 1).all()):
+            return {
+                "error": (
+                    f"treatment {treatment_name!r} has no cross-country variation "
+                    "within years under year fixed effects"
+                )
+            }
+
     try:
         from linearmodels.panel import PanelOLS
 
@@ -1901,7 +2044,56 @@ def infer_claim_direction(spec: dict, outcome_name: str | None = None) -> str:
     return "?"
 
 
-def verdict_from_estimate(est: dict, claim_dir: str) -> tuple[str, str]:
+def infer_significance_alpha(spec: dict) -> float:
+    """Return the preregistered p-value cutoff, defaulting to 0.10.
+
+    The generic panel runner historically used alpha=0.10 for every spec.
+    Some hypotheses pin stricter thresholds in `falsification.threshold`
+    (`p_max: 0.05`) or in the prose rule. Use the strictest explicit p-value
+    threshold we can safely parse so candidate runs do not get inflated.
+    """
+    falsification = spec.get("falsification") or {}
+    candidates: list[float] = []
+
+    threshold = falsification.get("threshold")
+    if isinstance(threshold, dict):
+        for key in ("p_max", "alpha", "p_value_max", "max_p"):
+            value = threshold.get(key)
+            try:
+                p = float(value)
+            except (TypeError, ValueError):
+                continue
+            if 0 < p < 1:
+                candidates.append(p)
+
+    text = " ".join(
+        str(part or "")
+        for part in (
+            falsification.get("rule"),
+            falsification.get("test"),
+            threshold if isinstance(threshold, str) else "",
+            spec.get("methodology_note"),
+        )
+    )
+    for match in re.findall(r"\bp\s*(?:<|<=|≤)\s*(0?\.\d+)\b", text, flags=re.I):
+        try:
+            p = float(match)
+        except ValueError:
+            continue
+        if 0 < p < 1:
+            candidates.append(p)
+    for match in re.findall(r"(?:alpha|α)\s*=?\s*(0?\.\d+)\b", text, flags=re.I):
+        try:
+            p = float(match)
+        except ValueError:
+            continue
+        if 0 < p < 1:
+            candidates.append(p)
+
+    return min(candidates) if candidates else 0.10
+
+
+def verdict_from_estimate(est: dict, claim_dir: str, *, alpha: float = 0.10) -> tuple[str, str]:
     if "error" in est:
         return "INCONCLUSIVE_DATA_PENDING", est["error"]
     coef = est["coefficient"]
@@ -1913,7 +2105,6 @@ def verdict_from_estimate(est: dict, claim_dir: str) -> tuple[str, str]:
         return ("PARTIAL",
                 f"coef={coef:+.4g}, p={pval:.3g}; effect magnitude effectively zero")
     sign = "+" if coef >= 0 else "-"
-    alpha = 0.10
     if pval < alpha:
         if claim_dir == "?":
             return ("PARTIAL",
@@ -1924,7 +2115,7 @@ def verdict_from_estimate(est: dict, claim_dir: str) -> tuple[str, str]:
         return ("REFUTED",
                 f"coef={coef:+.4g} (sign opposite claim {claim_dir}), p={pval:.3g}")
     return ("PARTIAL",
-            f"coef={coef:+.4g}, p={pval:.3g} (above α=0.10); direction inconclusive")
+            f"coef={coef:+.4g}, p={pval:.3g} (above α={alpha:g}); direction inconclusive")
 
 
 # ---------------------------------------------------------------------------
@@ -2197,7 +2388,11 @@ def run_one(
         extra_regressors=extra_regressors,
     )
     claim_dir = infer_claim_direction(spec, outcome_name)
-    verdict, reason = verdict_from_estimate(est, claim_dir)
+    verdict, reason = verdict_from_estimate(
+        est,
+        claim_dir,
+        alpha=infer_significance_alpha(spec),
+    )
     write_outputs(hid, spec, status, est, verdict, reason)
 
     icon = {"SUPPORTED": "✓", "REFUTED": "✗", "PARTIAL": "·",

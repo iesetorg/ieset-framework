@@ -2,7 +2,11 @@
 // Kept loose (many optional fields) because draft/candidate specs have fewer fields populated.
 
 export type HypothesisStatus = "draft" | "candidate" | "pre_registered";
-export type EvidenceType = "causal" | "associational" | "descriptive";
+export type EvidenceType =
+  | "causal"
+  | "associational"
+  | "descriptive"
+  | "canonical_case_multi_metric";
 export type TemporalStructure = "panel" | "time_series" | "cross_section_with_justification";
 
 export interface Variable {

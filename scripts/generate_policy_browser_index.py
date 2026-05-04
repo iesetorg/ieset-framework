@@ -171,12 +171,23 @@ def load_run(hid: str) -> dict[str, Any] | None:
     if not doc:
         return None
     raw = doc.get("verdict_label") or doc.get("verdict") or doc.get("status") or ""
+    packet_path = RUNS / hid / "evidence_packet.yaml"
+    packet = load_yaml(packet_path) if packet_path.exists() else {}
+    data_quality = ((packet.get("data") or {}).get("data_quality") or {}) if packet else {}
     return {
         "verdict": raw,
         "bucket": verdict_bucket(raw),
         "template": doc.get("template") or "",
         "run_dir": str((RUNS / hid).relative_to(ROOT)),
         "diagnostics": doc,
+        "evidence_packet": {
+            "path": str(packet_path.relative_to(ROOT)) if packet_path.exists() else "",
+            "packet_version": packet.get("packet_version") if packet else None,
+            "data_quality": data_quality.get("grade") or "",
+            "input_count": data_quality.get("input_count") or 0,
+            "missing_series_count": data_quality.get("missing_series_count") or 0,
+            "reference_count": len(packet.get("references") or []) if packet else 0,
+        },
     }
 
 
@@ -269,6 +280,7 @@ def main() -> int:
                     "evidence_strength": strength,
                     "template": run["template"] if run else (((hyp or {}).get("estimator") or {}).get("template") or ""),
                     "run_dir": run["run_dir"] if run else "",
+                    "evidence_packet": run["evidence_packet"] if run else {},
                     "position_ids": sorted({claim["position_id"] for claim in claims}),
                     "link_sources": link["link_sources"],
                     "link_type": link["link_type"],

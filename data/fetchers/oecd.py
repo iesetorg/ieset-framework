@@ -33,6 +33,11 @@ from ._http import get as robust_get
 
 OECD_BASE = "https://sdmx.oecd.org/public/rest/data"
 LICENSE = "OECD standard permissions (attribution required)"
+EPL_XLSX_URL = (
+    "https://webfs.oecd.org/Els-com/Employment%20Protection%20Legislation/"
+    "OECDEmploymentProtectionLegislationDatabase.xlsx"
+)
+EPL_METHOD_URL = "https://www.oecd.org/en/data/datasets/oecd-indicators-of-employment-protection.html"
 
 _DSD_AGENCY: dict[str, str] = {
     "DSD_PRICES": "OECD.SDD.TPS", "DSD_PDB": "OECD.SDD.TPS",
@@ -79,7 +84,7 @@ _OECD_SHORTCUTS: dict[str, str] = {
     "NEET": "OECD.ELS.EMP,DSD_LFS@DF_NEET,1.0",
     "DSD_PDB": "OECD.SDD.TPS,DSD_PDB@DF_PDB_PT,1.0",
     "DSD_PENSIONS@DF_PENSIONS_REPL_RATE": "OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0",
-    "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_AGG,1.0",
+    "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SPD,DSD_SOCX_AGG@DF_SOCX_AGG,1.0",
     "DSD_SOCX@DF_SOCX_ALMP": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0",
     "FDI_statistics": "OECD.DAF.INV,DSD_FDI@DF_FDI_FLOWS,1.0",
     "OECD.EDU.IMEP_DSD_EAG_FIN_DF_FIN_RESOURCES_1.0": "OECD.EDU.IMEP,DSD_EAG_SUBNAT_UOE_FIN@DF_SUBNAT_UOE_FIN,1.0",
@@ -196,6 +201,80 @@ class OecdError(RuntimeError):
     pass
 
 
+def _fetch_epl_xlsx_fallback(
+    *,
+    series_id: str,
+    fetch_utc: datetime,
+    start_period: str | None,
+    end_period: str | None,
+    publisher_id: str,
+) -> FetchResult:
+    """Fetch OECD EPL from the official workbook when the SDMX dataflow 404s.
+
+    OECD's public dataset page currently links the EPL workbook directly while
+    the historical SDMX shortcut may return 404. Use the longest comparable
+    published summary (EPR Version 1, 1985-2019) as the local EPL_OV fallback.
+    Specs still decide whether to invert the scale.
+    """
+    payload = robust_get(
+        EPL_XLSX_URL,
+        timeout=120,
+        headers={"Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*"},
+    )
+    raw = pd.read_excel(
+        io.BytesIO(payload.content),
+        sheet_name="EPL dismissal regular workers",
+        header=[4, 5],
+    )
+    out = pd.DataFrame(
+        {
+            "country": raw[("Unnamed: 0_level_0", "Country")],
+            "year": raw[("Unnamed: 1_level_0", "Year")],
+            "value": raw[("Summary indicators: EPR", "Version 1")],
+            "indicator": "EPR_V1",
+            "indicator_label": "Employment protection for regular workers, summary indicator, Version 1",
+        }
+    )
+    out["year"] = pd.to_numeric(out["year"], errors="coerce").astype("Int64")
+    out["value"] = pd.to_numeric(out["value"], errors="coerce")
+    out = out.dropna(subset=["country", "year", "value"]).copy()
+    if start_period:
+        start_year = int(str(start_period)[:4])
+        out = out[out["year"] >= start_year]
+    if end_period:
+        end_year = int(str(end_period)[:4])
+        out = out[out["year"] <= end_year]
+
+    path, digest = write_vintage(
+        publisher=publisher_id,
+        series_id=series_id,
+        frame=out,
+        fetch_utc=fetch_utc,
+    )
+    return FetchResult(
+        publisher=publisher_id,
+        series_id=series_id,
+        source_url=EPL_XLSX_URL,
+        methodology_url=EPL_METHOD_URL,
+        license=LICENSE,
+        fetch_utc=fetch_utc,
+        rows=int(len(out)),
+        frequency="annual",
+        units="0-6 index; higher=stricter employment protection",
+        currency=None,
+        start_date=str(int(out["year"].min())) if len(out) else None,
+        end_date=str(int(out["year"].max())) if len(out) else None,
+        sha256=digest,
+        parquet_path=path,
+        extra={
+            "transport": payload.transport,
+            "fallback": "official_oecd_epl_workbook",
+            "indicator": "EPR Version 1",
+            "note": "SDMX EPL_OV returned 404; workbook is linked from OECD's EPL dataset page.",
+        },
+    )
+
+
 def fetch(
     series_id: str,
     *,
@@ -244,6 +323,14 @@ def fetch(
             zenrows_js_render=True,
         )
     if payload.status_code == 404:
+        if "DSD_EPL_OV@DF_EPL_OV" in resolved:
+            return _fetch_epl_xlsx_fallback(
+                series_id=resolved,
+                fetch_utc=fetch_ts,
+                start_period=start_period,
+                end_period=end_period,
+                publisher_id=publisher_id,
+            )
         raise OecdError(f"OECD 404 for {series_id} (resolved='{resolved}') key='{key}' — check dataflow id")
     if payload.status_code >= 400:
         raise OecdError(
