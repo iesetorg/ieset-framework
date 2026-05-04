@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { loadAllConditions } from "@/lib/content";
+import { loadConditionEvidenceIndex } from "@/lib/condition-evidence";
 import { Badge } from "@/components/badges/Badge";
 import type { Condition, ConditionConfidence } from "@/lib/types";
 
@@ -18,7 +19,10 @@ const CATEGORY_ORDER: Condition["category"][] = [
 ];
 
 export default async function ConditionsIndex() {
-  const all = await loadAllConditions();
+  const [all, evidenceIndex] = await Promise.all([
+    loadAllConditions(),
+    loadConditionEvidenceIndex(),
+  ]);
 
   const byCategory = new Map<Condition["category"], Condition[]>();
   for (const c of all) {
@@ -26,6 +30,18 @@ export default async function ConditionsIndex() {
     list.push(c);
     byCategory.set(c.category, list);
   }
+  const directTotal = all.reduce(
+    (sum, c) => sum + (evidenceIndex[c.id]?.direct_count ?? 0),
+    0
+  );
+  const relatedTotal = all.reduce(
+    (sum, c) => sum + (evidenceIndex[c.id]?.related_count ?? 0),
+    0
+  );
+  const testedTotal = all.reduce(
+    (sum, c) => sum + (evidenceIndex[c.id]?.tested_count ?? 0),
+    0
+  );
 
   return (
     <div className="mx-auto max-w-content px-8 py-10">
@@ -39,6 +55,32 @@ export default async function ConditionsIndex() {
         market/intervention dichotomy. Entries link to the hypotheses that
         furnish their empirical evidence.
       </p>
+
+      <div className="mb-6 grid gap-4 text-[14px] md:grid-cols-4">
+        <div className="rounded border border-rule bg-panel p-4">
+          <div className="sc text-[10px] text-muted">conditions</div>
+          <div className="mt-1 text-[24px] font-semibold">{all.length}</div>
+        </div>
+        <div className="rounded border border-rule bg-panel p-4">
+          <div className="sc text-[10px] text-muted">direct links</div>
+          <div className="mt-1 text-[24px] font-semibold">{directTotal}</div>
+        </div>
+        <div className="rounded border border-rule bg-panel p-4">
+          <div className="sc text-[10px] text-muted">related evidence shown</div>
+          <div className="mt-1 text-[24px] font-semibold">{relatedTotal}</div>
+        </div>
+        <div className="rounded border border-rule bg-panel p-4">
+          <div className="sc text-[10px] text-muted">tested shown</div>
+          <div className="mt-1 text-[24px] font-semibold">{testedTotal}</div>
+        </div>
+      </div>
+
+      <div className="mb-6 rounded border border-[#d8c99f] bg-[#fff8e8] px-4 py-3 text-[13px] leading-[1.5] text-[#6f5018]">
+        Method note: direct links are curated condition-hypothesis joins or
+        explicit hypothesis back-links. Related evidence is a labelled text
+        match against the hypothesis library and should be treated as a
+        navigation aid until promoted into a curated link.
+      </div>
 
       <div className="mb-6 flex flex-wrap gap-2 text-[13px]">
         <span className="text-muted">Filter by category:</span>
@@ -70,37 +112,50 @@ export default async function ConditionsIndex() {
                       Confidence
                     </th>
                     <th className="p-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted">
-                      Linked hypotheses
+                      Evidence links
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((c) => (
-                    <tr
-                      key={c.id}
-                      className="border-b border-rule hover:bg-panel"
-                    >
-                      <td className="p-2.5 align-top">
-                        <Link
-                          href={`/c/${c.id}`}
-                          className="font-medium text-ink"
-                        >
-                          {humanName(c.id)}
-                        </Link>
-                        <div className="mt-0.5 font-mono text-[11px] text-faint">
-                          {c.id}
-                        </div>
-                      </td>
-                      <td className="p-2.5 align-top">
-                        <Badge variant={confidenceVariant(c.confidence)} dot>
-                          {c.confidence.replace(/_/g, " ")}
-                        </Badge>
-                      </td>
-                      <td className="p-2.5 align-top text-muted">
-                        {c.linked_hypotheses?.length ?? 0}
-                      </td>
-                    </tr>
-                  ))}
+                  {items.map((c) => {
+                    const evidence = evidenceIndex[c.id];
+                    return (
+                      <tr
+                        key={c.id}
+                        className="border-b border-rule hover:bg-panel"
+                      >
+                        <td className="p-2.5 align-top">
+                          <Link
+                            href={`/c/${c.id}`}
+                            className="font-medium text-ink"
+                          >
+                            {humanName(c.id)}
+                          </Link>
+                          <div className="mt-0.5 font-mono text-[11px] text-faint">
+                            {c.id}
+                          </div>
+                        </td>
+                        <td className="p-2.5 align-top">
+                          <Badge variant={confidenceVariant(c.confidence)} dot>
+                            {c.confidence.replace(/_/g, " ")}
+                          </Badge>
+                        </td>
+                        <td className="p-2.5 align-top">
+                          <div className="flex flex-wrap gap-1.5 text-[11px]">
+                            <Badge variant={(evidence?.direct_count ?? 0) > 0 ? "green" : "muted"}>
+                              direct {evidence?.direct_count ?? 0}
+                            </Badge>
+                            <Badge variant={(evidence?.related_count ?? 0) > 0 ? "accent" : "muted"}>
+                              related {evidence?.related_count ?? 0}
+                            </Badge>
+                            <Badge variant={(evidence?.tested_count ?? 0) > 0 ? "amber" : "muted"}>
+                              tested {evidence?.tested_count ?? 0}
+                            </Badge>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

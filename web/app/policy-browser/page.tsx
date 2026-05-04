@@ -1,4 +1,5 @@
 import { PolicyEvidenceBrowser } from "@/components/policies/PolicyEvidenceBrowser";
+import { axisLabel } from "@/lib/policy-labels";
 import { loadPolicyBrowserIndex } from "@/lib/policy-browser";
 
 export const metadata = {
@@ -23,6 +24,12 @@ export default async function PolicyBrowserPage() {
         outcomes, then compresses the result into a policy-maker read: posture,
         evidence strength, open gaps, and what to monitor next.
       </p>
+      <div className="mt-5 rounded border border-[#d8c99f] bg-[#fff8e8] px-4 py-3 text-[13px] leading-[1.5] text-[#6f5018]">
+        Method note: policy cards can mix direct policy-specific hypotheses with
+        inferred analogues from the same policy axis. Treat this as a navigation
+        layer for evidence, not a replacement for opening the linked hypothesis
+        and checking its preregistered test.
+      </div>
 
       <div className="my-6 grid gap-4 text-[14px] md:grid-cols-4">
         <div className="rounded border border-rule bg-panel p-4">
@@ -39,8 +46,8 @@ export default async function PolicyBrowserPage() {
         </div>
         <div className="rounded border border-rule bg-panel p-4">
           <div className="sc text-[10px] text-muted">top axis</div>
-          <div className="mt-1 font-mono text-[14px] font-semibold">
-            {index.summary.top_axes[0]?.[0] ?? "none"}
+          <div className="mt-1 text-[15px] font-semibold">
+            {index.summary.top_axes[0]?.[0] ? axisLabel(index.summary.top_axes[0][0]) : "none"}
           </div>
         </div>
       </div>

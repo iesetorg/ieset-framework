@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_human_capital_upgrade_1965_2010
+version: 1
+status: pre_registered
+topic: labour
+claim: 'Singapore''s LKY-era and immediate post-LKY human-capital trajectory shows a large education
+  upgrade: PWT human-capital index roughly doubled, upper-secondary attainment rose sharply, tertiary
+  enrolment became mass-participation, and the 2010 human-capital level reached advanced-economy
+  territory.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  - TWN
+  period:
+  - 1965
+  - 2010
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: pwt_hc_index_gain
+  description: PWT human-capital index gain from 1965 to 2010
+  threshold: '>= 1.20 index points'
+  window: 1965-2010
+  source: pwt:hc
+  direction: supports_claim
+  independence_justification: PWT human-capital stock measure independent from WDI attainment/enrolment.
+- metric_id: pwt_hc_index_ratio
+  description: PWT human-capital index endpoint ratio
+  threshold: '>= 1.8x'
+  window: 1965-2010
+  source: pwt:hc
+  direction: supports_claim
+  independence_justification: Ratio check complements absolute index-point change.
+- metric_id: upper_secondary_attainment_gain
+  description: Upper-secondary attainment rose from 1980 to 2010
+  threshold: '>= 35pp increase'
+  window: 1980-2010
+  source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+  direction: supports_claim
+  independence_justification: Attainment stock measure distinct from PWT index.
+- metric_id: tertiary_enrolment_mass_participation
+  description: Tertiary gross enrolment reached mass-participation scale by 2010
+  threshold: '>= 70%'
+  window: '2010'
+  source: world_bank_wdi:SE.TER.ENRR
+  direction: supports_claim
+  independence_justification: Flow enrolment measure distinct from attainment stock.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: pwt_human_capital
+    source: pwt:hc
+    transformation: endpoint_change
+  - name: upper_secondary_attainment
+    source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+    transformation: endpoint_change
+  - name: tertiary_gross_enrolment
+    source: world_bank_wdi:SE.TER.ENRR
+    transformation: endpoint_level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Lee Kuan Yew / Singapore checklist using local WDI, WGI, PWT, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_human_capital_upgrade_1965_2010_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.78
+disclosure: Prior expects support; education data has gaps in the early WDI record, so the spec
+  uses PWT hc plus later WDI attainment/enrolment checks.
+steelman: hypotheses/steelman/singapore_lky_human_capital_upgrade_1965_2010.md
+scope:
+  period:
+  - 1965
+  - 2010
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  - TWN
+  outcome_dim:
+  - employment_labour
+  - productivity
+  - industrial_capability
+  policy_family:
+  - labour_market
+  - industrial_policy
+  - institutional_reform
+  treatment_tags:
+  - singapore_bilingual_education
+  - skills_upgrading
+  - human_capital_upgrade
+notes: Combines PWT and WDI because no single local series spans every desired education margin.

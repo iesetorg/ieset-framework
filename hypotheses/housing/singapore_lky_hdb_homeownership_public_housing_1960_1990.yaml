@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_hdb_homeownership_public_housing_1960_1990
+version: 1
+status: candidate
+topic: housing
+claim: Singapore's HDB public-housing and CPF housing-finance system increased mass homeownership
+  and reduced overcrowding between 1960 and 1990 without relying on a general tax-financed public-housing
+  entitlement model.
+evidence_type: descriptive
+sample:
+  countries:
+  - SGP
+  period:
+  - 1960
+  - 1990
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: homeownership_rate
+    source: singapore_hdb:homeownership_rate
+    transformation: endpoint_change
+  - name: share_population_in_hdb_flats
+    source: singapore_hdb:hdb_resident_share
+    transformation: endpoint_change
+  - name: persons_per_room_or_overcrowding
+    source: singapore_hdb:overcrowding
+    transformation: endpoint_change
+estimator:
+  template: descriptive
+  clustering: none
+  notes: Data-gated HDB/homeownership study; runner intentionally refuses to grade until Singapore
+    HDB vintages are present.
+falsification:
+  rule: SUPPORTED if homeownership rises by at least 45 percentage points, HDB resident share
+    exceeds 70 percent by 1990, and overcrowding falls materially. REFUTED if homeownership rises
+    by less than 20 percentage points or HDB resident share remains below 40 percent.
+  test: singapore_hdb_homeownership_endpoint_check
+  threshold: homeownership_change >= 45pp AND hdb_resident_share_1990 >= 70; refute if homeownership_change
+    < 20pp OR hdb_share_1990 < 40
+prior_confidence: 0.8
+disclosure: Prior expects support, but no local HDB vintage is present. The spec is included as
+  a visible data-repair target rather than auto-scored.
+steelman: hypotheses/steelman/singapore_lky_hdb_homeownership_public_housing_1960_1990.md
+scope:
+  period:
+  - 1960
+  - 1990
+  countries:
+  - SGP
+  outcome_dim:
+  - housing
+  - welfare_state
+  policy_family:
+  - housing_policy
+  - welfare_architecture
+  treatment_tags:
+  - hdb_1960
+  - cpf_housing_finance
+  - public_housing_homeownership
+notes: Major Singapore/LKY pillar. Requires HDB annual-report or SingStat housing vintage before
+  graduation.

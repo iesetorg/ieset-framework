@@ -32,6 +32,16 @@ const LIBRARY: NavDropdownItem[] = [
 
 const EXPLORE: NavDropdownItem[] = [
   {
+    href: "/scoreboard",
+    label: "Scoreboard",
+    blurb: "Schools of thought scored against tested predictions",
+  },
+  {
+    href: "/atlas",
+    label: "Atlas",
+    blurb: "Movements and policy trajectories across countries",
+  },
+  {
     href: "/drift",
     label: "Drift",
     blurb: "How movements move on the policy axes over time",
@@ -70,22 +80,10 @@ export function Topbar() {
             How it works
           </Link>
           <Link
-            href="/scoreboard"
-            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
-          >
-            Scoreboard
-          </Link>
-          <Link
             href="/policy-browser"
             className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
           >
             Policy Browser
-          </Link>
-          <Link
-            href="/atlas"
-            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
-          >
-            Atlas
           </Link>
           <NavDropdown label="Library" items={LIBRARY} />
           <NavDropdown label="Explore" items={EXPLORE} />

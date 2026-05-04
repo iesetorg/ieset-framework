@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_trade_openness_port_state_1965_1990
+version: 1
+status: pre_registered
+topic: trade
+claim: 'The LKY-era Singapore model was extraordinarily trade-open rather than autarkic: trade
+  and exports were far above GDP, trade openness beat regional peers, and manufactured exports
+  became a dominant share by 1990.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  period:
+  - 1965
+  - 1990
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: trade_openness_mean
+  description: Trade/GDP averaged extremely high
+  threshold: '>= 250% of GDP'
+  window: 1965-1990
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Trade/GDP is the core openness measure.
+- metric_id: exports_share_mean
+  description: Exports/GDP averaged above the size of domestic GDP
+  threshold: '>= 120% of GDP'
+  window: 1965-1990
+  source: world_bank_wdi:NE.EXP.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Exports/GDP separately checks outward orientation.
+- metric_id: trade_vs_peer_median_1990
+  description: Trade openness exceeded regional peer median in 1990
+  threshold: '>= 2.0x peer median'
+  window: '1990'
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Peer-median comparison reduces level-only interpretation.
+- metric_id: manufactured_exports_upgrade
+  description: Manufactured exports share rose strongly from 1965 to 1990
+  threshold: '>= 30pp increase'
+  window: 1965-1990
+  source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+  direction: supports_claim
+  independence_justification: Export composition check is independent from gross openness.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: annual_mean
+  - name: exports_pct_gdp
+    source: world_bank_wdi:NE.EXP.GNFS.ZS
+    transformation: annual_mean
+  - name: manufactured_exports_share
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: endpoint_change
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Lee Kuan Yew / Singapore checklist using local WDI, WGI, PWT, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_trade_openness_port_state_1965_1990_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.88
+disclosure: Prior is high because Singapore's entrepot and export orientation are canonical; the
+  test is valuable mainly to keep the claim pinned to data.
+steelman: hypotheses/steelman/singapore_lky_trade_openness_port_state_1965_1990.md
+scope:
+  period:
+  - 1965
+  - 1990
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  outcome_dim:
+  - trade_liberalisation
+  - industrial_capability
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  - institutional_reform
+  treatment_tags:
+  - singapore_port_state
+  - export_oriented_industrialisation
+  - container_port_1972
+notes: Port-state accounting is a central caveat; result card reports the descriptive pattern
+  only.

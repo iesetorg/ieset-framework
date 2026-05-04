@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 import { loadAllConditions, loadCondition } from "@/lib/content";
+import { loadConditionEvidence } from "@/lib/condition-evidence";
 import { Badge } from "@/components/badges/Badge";
 import type {
   Condition,
   ConditionCase,
   ConditionConfidence,
 } from "@/lib/types";
+import type { ConditionEvidenceLink } from "@/lib/condition-evidence";
 
 export async function generateStaticParams() {
   const all = await loadAllConditions();
@@ -35,7 +37,10 @@ export default async function ConditionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const c = await loadCondition(id);
+  const [c, evidence] = await Promise.all([
+    loadCondition(id),
+    loadConditionEvidence(id),
+  ]);
   if (!c) return notFound();
 
   const features = c.institutional_features_that_make_the_model_work ?? {};
@@ -194,6 +199,17 @@ export default async function ConditionPage({
               </dd>
               <dt className="text-muted">Category</dt>
               <dd>{categoryLabel(c.category)}</dd>
+              <dt className="text-muted">Direct</dt>
+              <dd>{evidence.direct_count}</dd>
+              <dt className="text-muted">Related</dt>
+              <dd>
+                {evidence.related_count}
+                {evidence.related_available_count > evidence.related_count && (
+                  <span className="text-faint"> of {evidence.related_available_count}</span>
+                )}
+              </dd>
+              <dt className="text-muted">Tested</dt>
+              <dd>{evidence.tested_count}</dd>
               {c._first_commit && (
                 <>
                   <dt className="text-muted">Added</dt>
@@ -203,18 +219,19 @@ export default async function ConditionPage({
             </dl>
           </div>
 
-          {c.linked_hypotheses && c.linked_hypotheses.length > 0 && (
+          {(evidence.direct.length > 0 || evidence.related.length > 0) && (
             <div className="mb-3.5 rounded border border-rule bg-white p-4">
-              <h3 className="sc mb-3">Linked hypotheses</h3>
-              <ul className="m-0 list-none space-y-2 p-0 text-[12.5px]">
-                {c.linked_hypotheses.map((hid) => (
-                  <li key={hid}>
-                    <Link href={`/h/${hid}`} className="font-mono text-[12px]">
-                      {hid}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <h3 className="sc mb-2">Evidence hypotheses</h3>
+              <p className="mb-3 text-[12px] leading-[1.45] text-muted">
+                Direct links are curated. Related links are labelled search
+                matches for discovery, not scored links.
+              </p>
+              {evidence.direct.length > 0 && (
+                <EvidenceList title="Direct" links={evidence.direct} />
+              )}
+              {evidence.related.length > 0 && (
+                <EvidenceList title="Related" links={evidence.related} />
+              )}
             </div>
           )}
 
@@ -235,6 +252,42 @@ export default async function ConditionPage({
           )}
         </aside>
       </div>
+    </div>
+  );
+}
+
+function EvidenceList({
+  title,
+  links,
+}: {
+  title: string;
+  links: ConditionEvidenceLink[];
+}) {
+  return (
+    <div className="mb-4 last:mb-0">
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
+        {title}
+      </div>
+      <ul className="m-0 list-none space-y-2 p-0 text-[12.5px]">
+        {links.map((link) => (
+          <li key={`${title}-${link.hypothesis_id}`} className="rounded border border-rule bg-panel p-2">
+            <Link href={`/h/${link.hypothesis_id}`} className="font-mono text-[11.5px]">
+              {link.hypothesis_id}
+            </Link>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <Badge variant={verdictVariant(link.verdict_tone)}>
+                {link.verdict_label}
+              </Badge>
+              <Badge variant={link.source === "related" ? "accent" : "green"}>
+                {sourceLabel(link.source)}
+              </Badge>
+            </div>
+            <p className="mt-1.5 text-[12px] leading-[1.45] text-muted">
+              {link.claim}
+            </p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -318,4 +371,15 @@ function confidenceVariant(
   if (c === "medium_high") return "accent";
   if (c === "medium") return "amber";
   return "muted";
+}
+
+function verdictVariant(tone: "green" | "amber" | "red" | "muted") {
+  return tone;
+}
+
+function sourceLabel(source: ConditionEvidenceLink["source"]) {
+  if (source === "curated") return "curated";
+  if (source === "reverse") return "back-link";
+  if (source === "model") return "model id";
+  return "related";
 }

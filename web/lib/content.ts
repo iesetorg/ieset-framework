@@ -320,7 +320,39 @@ export async function loadChartData(hypothesisId: string): Promise<unknown | nul
   const path = join(REPO_ROOT, "engine", "runs", hypothesisId, "chart_data.json");
   if (!existsSync(path)) return null;
   const raw = await readFile(path, "utf8");
-  return JSON.parse(raw);
+  const parsed = JSON.parse(raw);
+
+  // Only hand the chart component payloads matching its supported line-chart
+  // contract. Several run generators write tabular diagnostics to
+  // chart_data.json; those are useful artifacts, but rendering them as a line
+  // chart crashes on hydration because they do not have `series[].points`.
+  if (!isLineChartPayload(parsed)) return null;
+  return parsed;
+}
+
+function isLineChartPayload(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  if (record.type !== "line") return false;
+  if (!record.x_axis || typeof record.x_axis !== "object") return false;
+  if (!record.y_axis || typeof record.y_axis !== "object") return false;
+  if (!Array.isArray(record.series)) return false;
+
+  return record.series.every((series) => {
+    if (!series || typeof series !== "object" || Array.isArray(series)) {
+      return false;
+    }
+    const s = series as Record<string, unknown>;
+    if (typeof s.id !== "string" || typeof s.label !== "string") return false;
+    if (!Array.isArray(s.points)) return false;
+    return s.points.every((point) => {
+      if (!point || typeof point !== "object" || Array.isArray(point)) {
+        return false;
+      }
+      const p = point as Record<string, unknown>;
+      return typeof p.x === "number" && typeof p.y === "number";
+    });
+  });
 }
 
 // -----------------------------------------------------------------------------

@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_fdi_manufacturing_upgrade_1970_1990
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Singapore''s LKY-era industrial strategy worked through disciplined openness to foreign
+  capital and manufacturing upgrading: FDI inflows were persistently high, FDI intensity exceeded
+  regional peers, manufacturing value added rose sharply, and manufactured exports dominated by
+  1990.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  period:
+  - 1970
+  - 1990
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: fdi_intensity_mean
+  description: FDI inflows averaged a large GDP share
+  threshold: '>= 5% of GDP'
+  window: 1970-1990
+  source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+  direction: supports_claim
+  independence_justification: FDI inflow series is independent from manufacturing/output shares.
+- metric_id: fdi_vs_peer_median_1990
+  description: FDI intensity in 1990 exceeded regional peer median
+  threshold: '>= 3.0x peer median'
+  window: '1990'
+  source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+  direction: supports_claim
+  independence_justification: Cross-country FDI comparison tests exceptional capital openness.
+- metric_id: manufacturing_va_share_gain
+  description: Manufacturing value-added share rose during early industrialisation
+  threshold: '>= 10pp increase'
+  window: 1965-1980
+  source: world_bank_wdi:NV.IND.MANF.ZS
+  direction: supports_claim
+  independence_justification: Domestic production-structure check separate from FDI.
+- metric_id: manufactured_exports_share_1990
+  description: Manufactured exports were dominant by 1990
+  threshold: '>= 60% of merchandise exports'
+  window: '1990'
+  source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+  direction: supports_claim
+  independence_justification: Export-composition check separate from value added.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: fdi_inflows_pct_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: annual_mean
+  - name: manufacturing_value_added_pct_gdp
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: endpoint_change
+  - name: manufactured_exports_share
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: endpoint_level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Lee Kuan Yew / Singapore checklist using local WDI, WGI, PWT, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_fdi_manufacturing_upgrade_1970_1990_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.8
+disclosure: 'Prior expects support but acknowledges selection: this is the successful Singapore
+  case, not the distribution of all EDB-style industrial-policy attempts.'
+steelman: hypotheses/steelman/singapore_lky_fdi_manufacturing_upgrade_1970_1990.md
+scope:
+  period:
+  - 1970
+  - 1990
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  outcome_dim:
+  - industrial_capability
+  - capital_flows
+  - trade_liberalisation
+  policy_family:
+  - industrial_policy
+  - trade_policy
+  - institutional_reform
+  treatment_tags:
+  - edb_1961
+  - fdi_opening
+  - jurong_industrial_estate
+notes: Designed to avoid collapsing Singapore into either pure laissez-faire or pure planning.

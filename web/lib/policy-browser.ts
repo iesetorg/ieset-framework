@@ -15,6 +15,7 @@ export interface PolicyBrowserAxis {
 export interface PolicyBrowserEvidence {
   hypothesis_id: string;
   topic: string;
+  claim?: string;
   evidence_type: string;
   verdict: string;
   bucket: string;
@@ -22,6 +23,8 @@ export interface PolicyBrowserEvidence {
   template: string;
   run_dir: string;
   position_ids: string[];
+  link_sources?: string[];
+  link_type?: string;
 }
 
 export interface PolicyBrowserRow {
@@ -38,6 +41,7 @@ export interface PolicyBrowserRow {
   tested_hypothesis_count: number;
   verdict_counts: Record<string, number>;
   evidence_strength_counts: Record<string, number>;
+  link_type_counts?: Record<string, number>;
   decision_lens: {
     posture: string;
     tested_hypotheses: number;
@@ -68,20 +72,51 @@ export interface PolicyBrowserClientRow {
   title: string;
   countries: string[];
   year: number | null;
-  axes: { axis: string; channel: string; direction: string }[];
+  axes: { axis: string; channel: string; direction: string; magnitude?: string; intended?: boolean | null }[];
   coverage: string;
   linked_hypothesis_count: number;
   tested_hypothesis_count: number;
   verdict_counts: Record<string, number>;
+  evidence_strength_counts?: Record<string, number>;
+  link_type_counts?: Record<string, number>;
   posture: string;
   best_available_evidence: string;
   watch_points: string[];
-  top_hypotheses: { hypothesis_id: string; bucket: string; topic: string }[];
+  top_hypotheses: {
+    hypothesis_id: string;
+    bucket: string;
+    topic: string;
+    claim?: string;
+    evidence_strength?: string;
+    link_type?: string;
+    position_count?: number;
+  }[];
   schools: string[];
   search_terms: string[];
 }
 
 let cache: Promise<PolicyBrowserIndex> | null = null;
+
+function evidenceRank(evidence: PolicyBrowserEvidence): number {
+  const linkRank = evidence.link_type === "explicit" ? 100 : evidence.link_type === "legacy" ? 60 : 20;
+  const strengthRank =
+    evidence.evidence_strength === "strong"
+      ? 30
+      : evidence.evidence_strength === "moderate"
+        ? 20
+        : evidence.evidence_strength === "screening"
+          ? 10
+          : 0;
+  const verdictRank =
+    evidence.bucket === "supported" || evidence.bucket === "refuted"
+      ? 4
+      : evidence.bucket === "partial"
+        ? 3
+        : evidence.bucket === "inconclusive"
+          ? 1
+          : 0;
+  return linkRank + strengthRank + verdictRank;
+}
 
 export async function loadPolicyBrowserIndex(): Promise<PolicyBrowserIndex> {
   if (cache) return cache;
@@ -101,15 +136,20 @@ export async function loadPolicyBrowserIndex(): Promise<PolicyBrowserIndex> {
 export function toPolicyBrowserClientRows(index: PolicyBrowserIndex): PolicyBrowserClientRow[] {
   return index.policies.map((row) => {
     const schoolSet = new Set<string>();
-    const topHypotheses = row.evidence
+    const topHypotheses = [...row.evidence]
       .filter((e) => e.bucket !== "missing")
-      .slice(0, 6)
+      .sort((a, b) => evidenceRank(b) - evidenceRank(a) || a.hypothesis_id.localeCompare(b.hypothesis_id))
+      .slice(0, 3)
       .map((e) => {
         for (const positionId of e.position_ids ?? []) schoolSet.add(positionId);
         return {
           hypothesis_id: e.hypothesis_id,
           bucket: e.bucket,
           topic: e.topic,
+          claim: e.claim,
+          evidence_strength: e.evidence_strength,
+          link_type: e.link_type,
+          position_count: e.position_ids?.length ?? 0,
         };
       });
 
@@ -126,11 +166,15 @@ export function toPolicyBrowserClientRows(index: PolicyBrowserIndex): PolicyBrow
         axis: a.axis,
         channel: a.channel,
         direction: a.direction,
+        magnitude: a.magnitude,
+        intended: a.intended ?? null,
       })),
       coverage: row.coverage,
       linked_hypothesis_count: row.linked_hypothesis_count,
       tested_hypothesis_count: row.tested_hypothesis_count,
       verdict_counts: row.verdict_counts,
+      evidence_strength_counts: row.evidence_strength_counts,
+      link_type_counts: row.link_type_counts,
       posture: row.decision_lens.posture,
       best_available_evidence: row.decision_lens.best_available_evidence,
       watch_points: row.decision_lens.watch_points,

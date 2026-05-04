@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_growth_takeoff_1965_1990
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Singapore''s Lee Kuan Yew era growth takeoff from 1965 to 1990 was not a small city-state
+  accounting artifact: real GDP per capita grew rapidly, the level multiplied several-fold, investment
+  rates stayed high, and the 1990 income level exceeded regional market-economy peers by a large
+  margin.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  period:
+  - 1965
+  - 1990
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: real_gdp_pc_growth_avg
+  description: Average annual real GDP per-capita growth, 1965-1990
+  threshold: '>= 5.0%'
+  window: 1965-1990
+  source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+  direction: supports_claim
+  independence_justification: Annual growth-rate series distinct from endpoint level comparisons.
+- metric_id: real_gdp_pc_level_multiplier
+  description: Real GDP per-capita endpoint multiplier, 1965-1990
+  threshold: '>= 4.0x'
+  window: 1965-1990
+  source: world_bank_wdi:NY.GDP.PCAP.KD
+  direction: supports_claim
+  independence_justification: Level-based cumulative growth check separate from annual growth
+    rates.
+- metric_id: income_level_vs_peer_median_1990
+  description: Singapore 1990 real GDP per capita vs regional peer median
+  threshold: '>= 3.0x peer median'
+  window: '1990'
+  source: world_bank_wdi:NY.GDP.PCAP.KD
+  direction: supports_claim
+  independence_justification: Cross-country benchmark against nearby market-economy peers.
+- metric_id: investment_share_high
+  description: Gross capital formation averaged high during takeoff
+  threshold: '>= 30% of GDP'
+  window: 1965-1990
+  source: world_bank_wdi:NE.GDI.TOTL.ZS
+  direction: supports_claim
+  independence_justification: Investment share is an expenditure-side channel distinct from GDP
+    levels.
+- metric_id: city_state_peer_check
+  description: Singapore 1990 real GDP per capita at least matched Hong Kong
+  threshold: '>= 1.0x Hong Kong'
+  window: '1990'
+  source: world_bank_wdi:NY.GDP.PCAP.KD
+  direction: supports_claim
+  independence_justification: Hong Kong check reduces pure city-state geography objection.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+variables:
+  outcome:
+  - name: real_gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: annual_mean
+  - name: real_gdp_pc_level
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: endpoint_ratio
+  - name: gross_capital_formation_pct_gdp
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: annual_mean
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Lee Kuan Yew / Singapore checklist using local WDI, WGI, PWT, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 4 of 5 pre-registered metrics meet their thresholds. REFUTED if
+    at most 2 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_growth_takeoff_1965_1990_local_multimetric_checklist
+  threshold: MET >= 4 of 5; REFUTE when MET <= 2
+prior_confidence: 0.82
+disclosure: Prior expects the LKY-era growth pattern to clear descriptive thresholds; the design
+  does not isolate which part of the policy bundle caused the growth.
+steelman: hypotheses/steelman/singapore_lky_growth_takeoff_1965_1990.md
+scope:
+  period:
+  - 1965
+  - 1990
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  outcome_dim:
+  - gdp_growth
+  - productivity
+  policy_family:
+  - institutional_reform
+  - trade_policy
+  - industrial_policy
+  treatment_tags:
+  - lee_kuan_yew_1965
+  - singapore_export_oriented_growth
+  - edb_1961
+notes: Custom local-data checklist; descriptive, not causal identification.

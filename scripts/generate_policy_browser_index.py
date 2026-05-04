@@ -75,6 +75,13 @@ def evidence_strength(bucket: str, diagnostics: dict[str, Any] | None, hypothesi
     return "screening"
 
 
+def claim_preview(claim: object, limit: int = 200) -> str:
+    text = " ".join(str(claim or "").split())
+    if len(text) <= limit:
+        return text
+    return text[:limit].rstrip() + "..."
+
+
 def load_hypotheses() -> dict[str, dict[str, Any]]:
     out: dict[str, dict[str, Any]] = {}
     for path in HYPOTHESES.glob("*/*.yaml"):
@@ -115,13 +122,30 @@ def load_positions() -> tuple[dict[str, dict[str, Any]], dict[str, list[dict[str
     return positions, by_hypothesis
 
 
-def linked_hypotheses(policy: dict[str, Any]) -> list[str]:
-    ids: list[str] = []
+def linked_hypotheses(policy: dict[str, Any]) -> list[dict[str, Any]]:
+    sources_by_id: dict[str, set[str]] = defaultdict(set)
     for key in ("linked_hypotheses", "linked_hypotheses_inferred", "hypotheses"):
         value = policy.get(key)
         if isinstance(value, list):
-            ids.extend(str(item) for item in value if isinstance(item, (str, int)))
-    return sorted(dict.fromkeys(ids))
+            for item in value:
+                if isinstance(item, (str, int)):
+                    sources_by_id[str(item)].add(key)
+    out: list[dict[str, Any]] = []
+    for hid, sources in sorted(sources_by_id.items()):
+        if "linked_hypotheses" in sources:
+            link_type = "explicit"
+        elif "linked_hypotheses_inferred" in sources:
+            link_type = "inferred"
+        else:
+            link_type = "legacy"
+        out.append(
+            {
+                "hypothesis_id": hid,
+                "link_sources": sorted(sources),
+                "link_type": link_type,
+            }
+        )
+    return out
 
 
 def policy_axes(policy: dict[str, Any]) -> list[dict[str, Any]]:
@@ -164,6 +188,7 @@ def search_terms(policy: dict[str, Any], axes: list[dict[str, Any]], evidence: l
         " ".join(a["axis"] for a in axes),
         " ".join(e.get("hypothesis_id", "") for e in evidence),
         " ".join(e.get("topic", "") for e in evidence),
+        " ".join(e.get("claim", "") for e in evidence),
     ]
     return sorted({part.lower() for text in tokens for part in str(text).replace("_", " ").replace(".", " ").split() if len(part) >= 3})
 
@@ -214,12 +239,14 @@ def main() -> int:
         policy = load_yaml(path)
         pid = str(policy.get("policy_id") or path.stem)
         axes = policy_axes(policy)
-        hids = linked_hypotheses(policy)
+        links = linked_hypotheses(policy)
         evidence: list[dict[str, Any]] = []
         verdicts = Counter()
         strengths = Counter()
+        link_types = Counter()
 
-        for hid in hids:
+        for link in links:
+            hid = link["hypothesis_id"]
             hyp = hypotheses.get(hid)
             run = load_run(hid)
             bucket = run["bucket"] if run else "missing"
@@ -227,6 +254,7 @@ def main() -> int:
             global_verdicts[bucket] += 1
             strength = evidence_strength(bucket, run["diagnostics"] if run else None, hyp)
             strengths[strength] += 1
+            link_types[link["link_type"]] += 1
             claims = claims_by_hypothesis.get(hid, [])
             for claim in claims:
                 school_counts[claim["position_id"]] += 1
@@ -234,6 +262,7 @@ def main() -> int:
                 {
                     "hypothesis_id": hid,
                     "topic": (hyp or {}).get("topic") or "",
+                    "claim": claim_preview((hyp or {}).get("claim") or ""),
                     "evidence_type": (hyp or {}).get("evidence_type") or "",
                     "verdict": run["verdict"] if run else "",
                     "bucket": bucket,
@@ -241,6 +270,8 @@ def main() -> int:
                     "template": run["template"] if run else (((hyp or {}).get("estimator") or {}).get("template") or ""),
                     "run_dir": run["run_dir"] if run else "",
                     "position_ids": sorted({claim["position_id"] for claim in claims}),
+                    "link_sources": link["link_sources"],
+                    "link_type": link["link_type"],
                 }
             )
 
@@ -249,7 +280,7 @@ def main() -> int:
             cov = "tested"
         elif verdicts["inconclusive"] or verdicts["blocked"]:
             cov = "blocked_or_inconclusive"
-        elif hids:
+        elif links:
             cov = "linked_unrun"
         else:
             cov = "no_hypothesis_link"
@@ -269,10 +300,11 @@ def main() -> int:
             "path": str(path.relative_to(ROOT)),
             "axes": axes,
             "coverage": cov,
-            "linked_hypothesis_count": len(hids),
+            "linked_hypothesis_count": len(links),
             "tested_hypothesis_count": tested,
             "verdict_counts": dict(verdicts),
             "evidence_strength_counts": dict(strengths),
+            "link_type_counts": dict(link_types),
             "decision_lens": decision_lens(verdicts, strengths, axes),
             "evidence": evidence,
         }

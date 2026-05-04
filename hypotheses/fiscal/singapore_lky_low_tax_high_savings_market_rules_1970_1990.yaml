@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_low_tax_high_savings_market_rules_1970_1990
+version: 1
+status: pre_registered
+topic: fiscal
+claim: The LKY-era Singapore fiscal-market model combined high national savings, relatively low
+  tax take, fiscal surpluses, and high economic/trade-freedom scores rather than relying on a
+  large transfer state.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  period:
+  - 1970
+  - 1990
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: gross_savings_high
+  description: Gross savings averaged high after WDI coverage begins
+  threshold: '>= 30% of GNI'
+  window: 1972-1990
+  source: world_bank_wdi:NY.GNS.ICTR.ZS
+  direction: supports_claim
+  independence_justification: Savings series is separate from fiscal-balance and EFW measures.
+- metric_id: tax_take_low
+  description: Tax revenue share stayed relatively low
+  threshold: <= 18% of GDP
+  window: 1972-1990
+  source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+  direction: supports_claim
+  independence_justification: Tax share checks state financing footprint.
+- metric_id: net_lending_surplus
+  description: General government net lending averaged in surplus
+  threshold: '>= 3% of GDP'
+  window: 1972-1990
+  source: world_bank_wdi:GC.NLD.TOTL.GD.ZS
+  direction: supports_claim
+  independence_justification: Fiscal balance check distinct from tax/savings.
+- metric_id: economic_freedom_1990
+  description: EFW summary index reached high-market-rule level
+  threshold: '>= 8.0'
+  window: '1990'
+  source: fraser_efw:summary_index
+  direction: supports_claim
+  independence_justification: Market-rule institutional composite independent from WDI fiscal
+    data.
+- metric_id: trade_freedom_1990
+  description: EFW trade-freedom score reached near-ceiling by 1990
+  threshold: '>= 9.0'
+  window: '1990'
+  source: fraser_efw:freedom_to_trade_internationally
+  direction: supports_claim
+  independence_justification: Trade-freedom subindex separately checks openness-policy stance.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 2
+variables:
+  outcome:
+  - name: gross_savings_pct_gni
+    source: world_bank_wdi:NY.GNS.ICTR.ZS
+    transformation: annual_mean
+  - name: tax_revenue_pct_gdp
+    source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+    transformation: annual_mean
+  - name: net_lending_pct_gdp
+    source: world_bank_wdi:GC.NLD.TOTL.GD.ZS
+    transformation: annual_mean
+  - name: efw_summary_index
+    source: fraser_efw:summary_index
+    transformation: endpoint_level
+  - name: efw_trade_freedom
+    source: fraser_efw:freedom_to_trade_internationally
+    transformation: endpoint_level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Lee Kuan Yew / Singapore checklist using local WDI, WGI, PWT, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 4 of 5 pre-registered metrics meet their thresholds. REFUTED if
+    at most 2 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_low_tax_high_savings_market_rules_1970_1990_local_multimetric_checklist
+  threshold: MET >= 4 of 5; REFUTE when MET <= 2
+prior_confidence: 0.76
+disclosure: Prior expects support, but the framing risks overstating 'small state' because CPF/HDB
+  are compulsory and state-shaped even when not counted as transfer spending.
+steelman: hypotheses/steelman/singapore_lky_low_tax_high_savings_market_rules_1970_1990.md
+scope:
+  period:
+  - 1970
+  - 1990
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  outcome_dim:
+  - fiscal_policy
+  - taxation
+  - trade_liberalisation
+  - institutional_quality
+  policy_family:
+  - tax_policy
+  - institutional_reform
+  - trade_policy
+  - welfare_architecture
+  treatment_tags:
+  - cpf_forced_saving
+  - low_tax_state
+  - fiscal_surplus
+  - market_rules
+notes: Designed to separate tax/spending footprint from compulsory-saving and housing architecture
+  caveats.
