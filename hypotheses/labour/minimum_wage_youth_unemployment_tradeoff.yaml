@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: minimum_wage_youth_unemployment_tradeoff
+version: 1
+status: candidate
+topic: labour
+
+claim: >
+  In a broad-country panel 1990-2019, higher statutory minimum wages (relative
+  to median earnings) predict higher youth (ages 15-24) unemployment rates,
+  controlling for aggregate demand conditions, education attainment, and labour-
+  market institutions. The directional claim is that a 10 percentage-point
+  increase in the minimum-to-median wage ratio is associated with at least a
+  1 percentage-point increase in the youth unemployment rate.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU, BGR, ROU, HRV, BRA, ARG, URY, CRI, DOM, ECU, GTM, HND, NIC, PAN, SLV, BOL, PRY, JOR, KWT, SAU, ARE, QAT, BHR, OMN, DZA, TUN, MAR, GHA, ETH, TZA, UGA, BWA, ZMB, ZWE, MOZ, EGY]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop observations where minimum wage > 90% of median (likely data error)"
+
+scope:
+  period: [1990, 2019]
+  countries: [GLOBAL]
+  outcome_dim: [employment_labour, poverty_inequality]
+  policy_family: [labour_market, regulation]
+  treatment_tags: [minimum_wage, youth_unemployment, labour_market_regulation, price_floor]
+
+variables:
+  outcome:
+    - name: youth_unemployment_rate
+      source: "ilostat:UNE_2EAP_SEX_AGE_RT_A"
+      transformation: "level"
+      notes: "ILO unemployment rate, ages 15-24. Primary outcome."
+    - name: total_unemployment_rate
+      source: "ilostat:UNE_2EAP_SEX_AGE_RT_A"
+      transformation: "level"
+      notes: "Total ILO unemployment rate. Secondary outcome for comparison."
+  treatment:
+    - name: minimum_wage_to_median_ratio
+      source: "constructed: indicator = 1 for countries with statutory minimum wage, scaled by median earnings"
+      transformation: "level"
+      notes: "Minimum wage as % of median full-time earnings. Constructed from ILO, OECD, and national sources. v1 uses qualitative coding where detailed data unavailable."
+    - name: minimum_wage_indicator
+      source: "constructed: indicator = 1 for countries with statutory minimum wage"
+      transformation: "indicator"
+      notes: "Binary indicator for existence of statutory minimum wage."
+  controls:
+    - name: real_gdp_growth
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "level"
+    - name: tertiary_enrollment_rate
+      source: "world_bank_wdi:SE.TER.ENRR"
+      transformation: "level"
+      notes: "Tertiary school enrollment % gross. Controls for education-driven labour-force withdrawal."
+    - name: youth_population_share
+      source: "world_bank_wdi:SP.POP.1524.TO.ZS"
+      transformation: "level"
+    - name: epl_strictness
+      source: "oecd:EPL_OV"
+      transformation: "level"
+      notes: "OECD EPL overall strictness. Controls for correlated labour-market rigidity."
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Minimum wages are a regulatory-channel (price-floor) intervention in the
+  labour market.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel: youth_unemployment = β0 + β1*min_wage_ratio + controls + FE.
+    Robustness: (1) exclude USA (low minimum wage outlier) and France (high
+    minimum wage outlier); (2) use 5-year non-overlapping averages; (3)
+    instrument min_wage ratio with left-party government seat share; (4)
+    separate effects by youth share of labour force; (5) use employment-to-
+    population ratio instead of unemployment rate.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (min_wage_ratio) is positive and significant at p<0.10
+    for youth unemployment and larger than for total unemployment. PARTIAL if
+    positive and significant for youth but not total (targeted distortion).
+    REFUTED if β1 is negative and significant at p<0.10. INFORMATIVE: the
+    result should survive excluding USA and France; if not, it is driven by
+    outlier leverage.
+  test: panel_fe_minimum_wage_youth_unemployment
+  threshold: >
+    β_min_wage (youth unemployment) > 0 at p<=0.10  AND
+    |β_min_wage (youth)| > |β_min_wage (total)|  AND
+    Ex-USA-France robustness retains positive sign.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author has market-liberal priors that may overweight the monopsony-power
+  and price-floor mechanisms. Prior is 0.55 because: (a) recent empirical
+  work (Cengiz et al., Dube) finds small or zero employment effects in many
+  contexts; (b) minimum wages may reduce turnover and raise productivity,
+  offsetting job losses. Framing risk: the hypothesis may be read as endorsing
+  zero minimum wage; the spec tests only the marginal association across
+  observed ratios.
+
+steelman: hypotheses/steelman/minimum_wage_youth_unemployment_tradeoff.md
+
+linked_hypotheses:
+  - federal_minimum_wage_employment_meta
+  - employment_protection_youth_unemployment_long_run
+  - demo_female_lfp_growth_panel
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 26
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: classical_liberal claim that minimum wages create unemployment, especially among youth.
+  - position_id: chicago_monetarism
+    claim_index: 11
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: chicago_monetarism claim that price floors in labour markets reduce quantity demanded.

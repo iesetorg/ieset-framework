@@ -1,0 +1,120 @@
+hypothesis_id: australia_tobacco_excise_punitive_vs_harm_reduction_comparators
+version: 1
+status: candidate
+topic: fiscal
+claim: 'Australia''s punitive tobacco excise escalation (four 12.5% increases 2013-2020,
+  plus plain packaging 2012) reduced adult smoking prevalence more than comparator
+  countries that adopted less punitive, harm-reduction-friendly approaches: New Zealand
+  (legalised vaping 2020), the United Kingdom (NHS promotes vaping as quit aid), and
+  Sweden (snus as dominant harm-reduction product).'
+notes: The public-health / social-democratic consensus claims that price escalation
+  is the most effective smoking-reduction tool. The classical-liberal / Austrian counterclaim
+  is that punitive taxation (i) hits a Laffer-like ceiling where substitution to illicit/black-market
+  products displaces legal sales, (ii) produces violent organised-crime revenue, and
+  (iii) is less effective at reducing harm than allowing lower-risk substitutes (vaping,
+  snus, heated tobacco). This hypothesis tests the smoking-reduction channel only;
+  a sister hypothesis (blocked on ATO revenue + ABS crime data) will test the revenue
+  and illicit-trade channels.
+prior_confidence: 0.6
+disclosure: 'Author''s priors align with the classical-liberal prediction: Australia''s
+  approach has produced the world''s highest legal cigarette prices, a documented
+  illicit-tobacco trade (KPMG 2024 estimates >$4bn), and slower smoking-decline than
+  NZ/UK. But the framework must test the public-health claim on its own terms, not
+  strawman it.'
+methodology_note: 'v1 promotion (2026-05-03). Primary dispositive test: Australia''s
+  absolute decline in adult male smoking prevalence (WDI SH.PRV.SMOK.MA, 2000-2022)
+  must exceed the unweighted mean decline of the three comparator countries (NZL,
+  GBR, SWE) over the same window. The 2000-2022 window captures the full Australian
+  excise escalation (2013-2020) plus the post-vaping period in NZ/UK. Method-valid
+  gate: all four countries must have ≥5 non-null observations in the window.'
+falsification:
+  rule: 'PRIMARY (dispositive): SUPPORTED if Australia''s absolute decline in adult
+    male smoking prevalence 2000→2022 (pp) is STRICTLY GREATER than the unweighted
+    mean absolute decline of NZL + GBR + SWE over the same period. REFUTED if Australia''s
+    decline is LESS THAN OR EQUAL to the comparator mean. TIE-breaker: if equal to
+    within 0.5pp, verdict is PARTIAL. INFORMATIVE: (a) female-smoking decline (WDI
+    SH.PRV.SMOK.FE) reported for symmetry check; (b) relative-% decline reported;
+    (c) year-by-year trajectory charted. METHOD_VALID: WDI smoking-prevalence series
+    must have ≥5 non-null observations for each of the four countries in 2000-2022;
+    otherwise INCONCLUSIVE (data gap).'
+  test: wdi_smoking_prevalence_comparator_absolute_decline
+  threshold: 'PRIMARY: AUS decline (pp) > mean(NZL decline, GBR decline, SWE decline)'
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - NZL
+  - GBR
+  - SWE
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - none
+scope:
+  period:
+  - 2000
+  - 2022
+  countries:
+  - AUS
+  - NZL
+  - GBR
+  - SWE
+  outcome_dim:
+  - public_health
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  - regulatory_policy
+  treatment_tags:
+  - australia_tobacco_excise_escalation
+  - tobacco_plain_packaging_2012
+  - vaping_harm_reduction
+  - snus_harm_reduction
+variables:
+  outcome:
+  - name: male_smoking_prevalence
+    source: world_bank_wdi:SH.PRV.SMOK.MA
+    transformation: pct_level
+    notes: Primary outcome — adult male smoking prevalence (%). WDI series.
+  - name: female_smoking_prevalence
+    source: world_bank_wdi:SH.PRV.SMOK.FE
+    transformation: pct_level
+    notes: Informative secondary — adult female smoking prevalence (%).
+  treatment:
+  - name: australia_dummy
+    source: 'constructed: indicator = 1 for AUS, 0 for NZL/GBR/SWE'
+    transformation: binary
+    notes: Treatment is membership in the punitive-tax regime (Australia).
+  controls:
+  - name: initial_smoking_rate
+    source: world_bank_wdi:SH.PRV.SMOK.MA
+    transformation: level_2000
+    notes: Baseline smoking rate in 2000 controls for catch-up effects.
+  - name: gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+    notes: Controls for income level.
+covers_claims:
+- position_id: social_democratic
+  claim_index: 99
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: Social-democratic / public-health position predicts punitive taxation outperforms
+    harm-reduction alternatives on smoking reduction.
+- position_id: classical_liberal
+  claim_index: 154
+  polarity: inverted
+  school_prediction: supported
+  confidence: medium
+  notes: Classical-liberal position predicts punitive taxation is LESS effective than
+    harm-reduction alternatives; an inverted polarity because the hypothesis is phrased
+    as the public-health claim.
+estimator:
+  template: descriptive_cross_section
+  notes: 'Not a panel-FE regression. The dispositive test is a simple comparator calculation:
+    absolute decline 2000→2022 for each country, then AUS vs comparator mean. The
+    estimator script computes this directly from the WDI vintages and emits the primary
+    statistic.'

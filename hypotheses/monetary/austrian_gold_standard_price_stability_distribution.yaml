@@ -1,0 +1,44 @@
+hypothesis_id: austrian_gold_standard_price_stability_distribution
+version: 1
+status: draft
+topic: monetary
+claim: Countries on classical gold-standard or currency-board arrangements before
+  1914 or 1990s show lower inflation variance and smaller wealth-share volatility
+  than fiat-standard peers.
+evidence_type: associational
+sample:
+  countries: []
+  period:
+  - 1990
+  - 2023
+  temporal_structure: panel
+scope:
+  period:
+  - 1990
+  - 2023
+  countries:
+  - ALL
+  outcome_dim: []
+  policy_family: []
+variables:
+  outcome:
+  - name: outcome_var
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  treatment:
+  - name: treatment_var
+    source: fraser_efw:summary_index
+    transformation: level
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+falsification:
+  rule: SUPPORTED if coefficient > 0 and p < 0.10
+prior_confidence: 0.5

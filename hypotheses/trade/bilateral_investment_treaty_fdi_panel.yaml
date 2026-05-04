@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bilateral_investment_treaty_fdi_panel
+version: 1
+status: candidate
+topic: trade
+
+claim: >
+  In a broad-country panel 1990-2020, the cumulative stock of bilateral
+  investment treaties (BITs) signed predicts higher subsequent net FDI inflows
+  as a share of GDP and higher real GDP per capita growth, controlling for
+  institutional quality, market size, and trade openness. The directional claim
+  is that each additional BIT is associated with at least 0.1 percentage points
+  higher FDI/GDP and 0.05 percentage points higher annual growth over the
+  following 5-year window.
+
+evidence_type: associational
+
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BGR, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JPN, JOR, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, TWN, USA, URY, VNM, ZAF, ZMB, KEN, NGA, GHA, ETH, TZA, UGA, BWA, ZWE, MOZ, EGY, DZA, TUN, KWT, SAU, ARE, QAT, BHR, OMN, RUS, UKR, KAZ, UZB, AZE, ARM, GEO, KGZ, MNG, TJK, TKM, MDV, FJI, PNG, KHM, LAO, NPL, LKA, BGD, PAK]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years with active high-intensity civil conflict (UCDP intensity-2+)"
+    - "drop observations where FDI/GDP exceeds 50% (likely data error or tax-haven round-tripping)"
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, gdp_growth, institutional_quality]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [bilateral_investment_treaty, fdi, investment_protection, trade_liberalisation]
+
+variables:
+  outcome:
+    - name: fdi_inflows_share_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: "level"
+      notes: "Net FDI inflows % GDP. Primary outcome."
+    - name: real_gdp_per_capita_growth
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "level"
+      notes: "Annual real GDP per capita growth %. Secondary outcome."
+  treatment:
+    - name: cumulative_bits_signed
+      source: "constructed: indicator = 1 for cumulative count of bilateral investment treaties signed by each country"
+      transformation: "level"
+      notes: "Cumulative BIT count by country-year. Constructed from UNCTAD IIA Navigator data. v1 uses approximate counts based on major signing waves."
+    - name: bit_stocks_log
+      source: "constructed: indicator = 1 for cumulative count of bilateral investment treaties signed by each country"
+      transformation: "log_plus_one"
+      notes: "Log(1+cumulative BITs) to capture diminishing returns."
+  controls:
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: population_log
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: "log"
+    - name: inflation_rate
+      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
+      transformation: "level"
+
+intervention_channel: institutional
+intervention_channel_justification: >
+  BITs are an institutional-channel intervention that reduces expropriation
+  risk and improves investor protection, lowering the cost of capital for
+  cross-border investment.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with 5-year forward windows: FDI(t+1 to t+5) = β0 +
+    β1*BIT_stock(t) + controls + FE. Robustness: (1) exclude tax-haven
+    jurisdictions where FDI is round-tripped; (2) instrument BIT signing
+    with partner-country BIT propensity (shift-share); (3) use bilateral
+    FDI flows from OECD instead of aggregate WDI; (4) exclude China (dominant
+    FDI recipient).
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (BIT stock) is positive and significant at p<0.10 for
+    both FDI/GDP and GDP growth. PARTIAL if positive and significant for FDI
+    but not growth (investment without translation to aggregate growth).
+    REFUTED if β1 is negative and significant at p<0.10. INFORMATIVE:
+    excluding China should not eliminate the positive sign; if it does, the
+    result is driven by China's BIT-FDI link.
+  test: panel_fe_bit_fdi_growth_5yr_forward
+  threshold: >
+    β_BIT_stock (FDI/GDP) > 0 at p<=0.10  AND
+    β_BIT_stock (GDP growth) > 0 at p<=0.10  AND
+    Ex-China robustness retains positive sign.
+
+prior_confidence: 0.50
+
+disclosure: >
+  Author is neutral (0.50). The BIT-FDI literature (e.g. Egger-Merkx 2022)
+  finds mixed results: BITs increase FDI on average but the effect is
+  heterogeneous and often driven by developed-country signatories. Prior is
+  not higher because: (a) BITs may be signed after FDI has already increased,
+  creating reverse causality; (b) the investment protection may primarily
+  benefit investors from rich countries rather than raising host-country
+  growth. Framing risk: the hypothesis may be read as endorsing blanket BIT
+  adoption; the spec tests only the average association in the observed panel.
+
+steelman: hypotheses/steelman/bilateral_investment_treaty_fdi_panel.md
+
+linked_hypotheses:
+  - classical_property_rights_security_fdi_premium_panel
+  - contract_enforcement_fdi_productivity_spillovers
+  - export_openness_agricultural_diversification
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 22
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: classical_liberal claim that investment protection agreements boost capital flows.
+  - position_id: institutionalism
+    claim_index: 31
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: institutionalism claim that credible commitment devices attract FDI.

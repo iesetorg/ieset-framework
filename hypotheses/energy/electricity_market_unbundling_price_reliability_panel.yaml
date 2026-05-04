@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: electricity_market_unbundling_price_reliability_panel
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  In a broad-country panel 1990-2020, electricity-market liberalisation
+  episodes (vertical unbundling of generation/transmission/distribution,
+  introduction of wholesale markets, and retail competition) predict lower
+  industrial electricity prices and equal or improved system reliability
+  (lower outage frequency/duration), controlling for fuel mix, generation
+  capacity, and income level. The directional claim is that liberalisation
+  is associated with at least a 5% reduction in real industrial electricity
+  prices and no significant deterioration in reliability metrics within 5 years.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU, BGR, ROU, HRV, BRA, ARG, URY, DOM, ECU, PER, JOR, KWT, SAU, ARE, QAT, BHR, OMN, DZA, TUN, MAR, GHA, ETH, TZA, UGA, BWA, ZMB, ZWE, MOZ, EGY, NGA, KEN, BGD, PAK, VNM, THA, MYS, IDN, PHL, IND, CHN, RUS, UKR, KAZ, UZB, AZE, ARM, GEO, KGZ, MNG, JPN, KOR]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during major wars or systemic crises"
+    - "drop observations where industrial electricity price data is missing for more than 2 consecutive years"
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [energy, regulation_compliance_cost, competition_concentration]
+  policy_family: [privatisation_nationalisation, energy_policy, regulation]
+  treatment_tags: [electricity_market_liberalisation, unbundling, wholesale_competition, retail_competition]
+
+variables:
+  outcome:
+    - name: industrial_electricity_price_real
+      source: "eia:industrial_electricity_price"
+      transformation: "log"
+      notes: "Real industrial electricity price (USD/kWh or local currency deflated). Constructed from IEA, EIA, and national regulator data. v1 uses available cross-country estimates with explicit flag."
+    - name: system_average_interruption_duration_index
+      source: "constructed: indicator = 1 for SAIDI by country-year"
+      transformation: "log"
+      notes: "System Average Interruption Duration Index (minutes/year). Constructed from World Bank ESMAP and national regulator data."
+  treatment:
+    - name: electricity_liberalisation_indicator
+      source: "constructed: indicator = 1 for GBR from 1990; NOR from 1991; SWE from 1996; FIN from 1995; ESP from 1998; PRT from 2006; ITA from 1999; NLD from 1998; DEU from 1998; AUT from 2001; BEL from 1999; FRA from 2007; JPN from 2000; KOR from 2001; CHL from 1982; ARG from 1992; BRA from 1998; COL from 1994; PER from 2002; PHL from 2001; IND from 2003"
+      transformation: "indicator"
+      notes: "Electricity market liberalisation dummy based on documented unbundling and market-opening dates."
+    - name: years_since_liberalisation
+      source: "constructed: indicator = 1 for GBR from 1990; NOR from 1991; SWE from 1996; FIN from 1995; ESP from 1998; PRT from 2006; ITA from 1999; NLD from 1998; DEU from 1998; AUT from 2001; BEL from 1999; FRA from 2007; JPN from 2000; KOR from 2001; CHL from 1982; ARG from 1992; BRA from 1998; COL from 1994; PER from 2002; PHL from 2001; IND from 2003"
+      transformation: "years_since"
+      notes: "Linear trend since liberalisation to capture dynamic adjustment."
+  controls:
+    - name: fossil_fuel_share_generation
+      source: "owid:share-elec-by-source"
+      transformation: "level"
+      notes: "Fossil-fuel share of electricity generation. Controls for fuel-mix cost differences."
+    - name: installed_capacity_per_capita
+      source: "constructed: indicator = 1 for installed generation capacity per capita"
+      transformation: "level"
+      notes: "Installed generation capacity per capita. Controls for supply adequacy."
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Electricity-market liberalisation is a regulatory-channel intervention that
+  replaces vertical integration and cost-of-service regulation with competitive
+  wholesale and retail markets.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with staggered adoption: price = β0 + β1*liberalisation +
+    β2*years_since + controls + FE. Robustness: (1) exclude UK and Chile
+    (dominant early liberalisers); (2) use synthetic control for each adopter;
+    (3) control for renewable-energy share and carbon-price exposure; (4)
+    separate effects for generation-only vs full unbundling; (5) use household
+    prices instead of industrial prices as secondary outcome.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (liberalisation) is negative and significant at p<0.10
+    for industrial prices and not positive and significant for SAIDI (i.e.
+    prices fall without reliability loss). PARTIAL if prices fall but SAIDI
+    rises significantly (efficiency-reliability trade-off). REFUTED if β1
+    is positive and significant for prices at p<0.10. INFORMATIVE: excluding
+    UK and Chile should not eliminate the negative price effect; if it does,
+    the result is driven by two dominant cases.
+  test: panel_fe_electricity_liberalisation_price_reliability
+  threshold: >
+    β_liberalisation (industrial price) < 0 at p<=0.10  AND
+    β_liberalisation (SAIDI) not > 0 at p<=0.10  AND
+    Ex-UK-Chile robustness retains negative price effect.
+
+prior_confidence: 0.55
+
+disclosure: >
+  Author has market-liberal priors that may overweight the competition-price
+  mechanism. Prior is 0.55 because: (a) electricity markets have natural-
+  monopoly elements in transmission and distribution that limit competitive
+   pressure; (b) liberalisation often coincides with fossil-fuel price declines
+   that independently reduce generation costs. Framing risk: the hypothesis may
+   be read as endorsing full privatisation of all electricity assets; the spec
+   tests only the average association of unbundling/market-opening with prices
+   and reliability.
+
+steelman: hypotheses/steelman/electricity_market_unbundling_price_reliability_panel.md
+
+linked_hypotheses:
+  - uk_electricity_privatisation_price_decarbonisation
+  - energy_market_competition_household_cost
+  - energy_market_competition_reliability
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 36
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: classical_liberal claim that market opening reduces prices without quality loss.
+  - position_id: chicago_monetarism
+    claim_index: 17
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: chicago_monetarism claim that competition disciplines natural-monopoly incumbents.

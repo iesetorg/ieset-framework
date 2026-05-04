@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: capital_gains_tax_cut_investment_response_panel
+version: 1
+status: candidate
+topic: fiscal
+
+claim: >
+  In a broad-country panel 1990-2020, reductions in the top statutory capital-
+  gains tax rate predict higher subsequent gross fixed capital formation as a
+  share of GDP and higher business-startup rates, controlling for corporate-tax
+  rates, interest rates, and institutional quality. The directional claim is
+  that a 10 percentage-point reduction in the capital-gains tax rate is
+  associated with at least a 0.5 percentage-point increase in investment/GDP
+  and a 5% increase in new business registrations within 3 years.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, TUR, COL, LVA, SVN, SVK, LTU, BGR, ROU, HRV, BRA, ARG, URY, CRI, DOM, ECU, GTM, HND, NIC, PAN, SLV, BOL, PRY, JOR, KWT, SAU, ARE, QAT, BHR, OMN, DZA, TUN, MAR, GHA, ETH, TZA, UGA, BWA, ZMB, ZWE, MOZ, EGY, NGA, KEN, BGD, PAK, VNM, THA, MYS, IDN, PHL, IND, CHN, RUS, UKR, KAZ, UZB, AZE, ARM, GEO, KGZ, MNG]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years during severe recession (real GDP growth < -5%)"
+    - "drop observations where capital-gains rate changes exceed 20pp in one year (likely data error or regime change)"
+
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [capital_flows, taxation, productivity]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [capital_gains_tax, investment, entrepreneurship, supply_side]
+
+variables:
+  outcome:
+    - name: gross_fixed_capital_formation_share_gdp
+      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
+      transformation: "level"
+      notes: "Gross fixed capital formation % GDP. Primary outcome."
+    - name: new_business_density
+      source: "world_bank_wdi:IC.BUS.NREG"
+      transformation: "per_1000_working_age"
+      notes: "New business registrations per 1,000 people ages 15-64. Secondary outcome."
+  treatment:
+    - name: capital_gains_tax_rate
+      source: "constructed: indicator = 1 for top statutory capital-gains tax rate by country-year"
+      transformation: "level"
+      notes: "Top statutory capital-gains tax rate %. Constructed from OECD Tax Database, PwC, and IBFD. v1 uses approximate rates for non-OECD with explicit flag."
+    - name: capital_gains_tax_cut_indicator
+      source: "constructed: indicator = 1 for country-years following a >=10pp capital-gains tax cut"
+      transformation: "indicator"
+      notes: "Indicator for years following large capital-gains tax reductions."
+  controls:
+    - name: corporate_tax_rate
+      source: "constructed: indicator = 1 for statutory corporate income tax rate by country-year"
+      transformation: "level"
+      notes: "Statutory CIT rate %. Constructed from OECD and national sources."
+    - name: real_interest_rate
+      source: "world_bank_wdi:FR.INR.RINR"
+      transformation: "level"
+      notes: "Real interest rate %. Controls for monetary conditions."
+    - name: institutional_quality
+      source: "wgi:RL.EST"
+      transformation: "level"
+    - name: trade_openness
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: "level"
+    - name: log_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: "log"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Capital-gains taxation is a fiscal-channel (tax-policy) intervention that
+  affects the after-tax return on risky investment and entrepreneurship.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE panel with 3-year forward windows: investment(t+1 to t+3) = β0 +
+    β1*cap_gains_rate(t) + controls + FE. Robustness: (1) exclude USA (dominant
+    capital-gains-cut episodes); (2) use first-difference specification to
+    capture within-country rate changes; (3) instrument rate changes with
+    right-party government seat share; (4) separate short-run (1-yr) vs
+    medium-run (3-yr) responses; (5) control for stock-market capitalization
+    to separate real investment from asset-price effects.
+
+falsification:
+  rule: >
+    SUPPORTED if β1 (cap_gains_rate) is negative and significant at p<0.10
+    for both investment and new business density (i.e. lower rate → more
+    investment/entry). PARTIAL if negative and significant for investment
+    but not business density. REFUTED if β1 is positive and significant at
+    p<0.10. INFORMATIVE: excluding USA should not eliminate the negative
+    sign; if it does, the result is driven by US-specific episodes.
+  test: panel_fe_capital_gains_tax_investment_response
+  threshold: >
+    β_cap_gains_rate (investment) < 0 at p<=0.10  AND
+    β_cap_gains_rate (business density) < 0 at p<=0.10  AND
+    Ex-USA robustness retains negative sign.
+
+prior_confidence: 0.50
+
+disclosure: >
+  Author is neutral (0.50). The capital-gains-tax literature finds mixed
+  results: some studies report large realisation responses (lock-in effects)
+  but small or negligible real investment responses. Prior is not higher
+  because: (a) investors may defer realisation rather than increase real
+  investment; (b) capital-gains taxes are a small share of total tax burden
+  in most countries. Framing risk: the hypothesis may be read as endorsing
+  zero capital-gains taxation; the spec tests only the marginal association.
+
+steelman: hypotheses/steelman/capital_gains_tax_cut_investment_response_panel.md
+
+linked_hypotheses:
+  - tax_simplicity_entrepreneurship_panel
+  - tcja_2017_growth_effect
+  - tax_burden_frontier_growth_non_linear
+
+covers_claims:
+  - position_id: supply_side
+    claim_index: 4
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: supply_side claim that reducing capital-gains taxation stimulates investment.
+  - position_id: classical_liberal
+    claim_index: 14
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: classical_liberal claim that double taxation of capital income reduces investment.
