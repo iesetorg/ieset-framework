@@ -1,29 +1,30 @@
 # Result card — cbam_2026_implementation_carbon_leakage_test
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome variable loaded
+**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome variable loaded; missing: ['un_comtrade:HS72_HS76_HS25_HS31', 'un_comtrade:HS72_HS76_HS25_HS31_volume', 'constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) × tonnes imported. Manual-drop pending under data/manual/derived/.', 'constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).', 'un_comtrade:HS72_HS76_HS25_HS31']
 
 ## Pre-registration
 - **Claim:** The EU Carbon Border Adjustment Mechanism (CBAM) entered its definitive phase on 1 January 2026 (after a 2023-2025 transitional reporting-only phase), imposing financial liability on EU importers of cement, iron and steel, aluminium, fertilisers, electricity, and hydrogen embedding non-EU carbon costs. The carbon-leakage hypothesis (high-emission imports flow to non-EU producers because of EU ETS price differential) predicts that prior to CBAM (2018-2023), high-carbon-intensity imports had grown faster than low-carbon-intensity imports of the same products, and that CBAM phase-in (2026 onwards) reverses or attenuates this pattern. This hypothesis tests both legs: (a) the pre-CBAM leakage signature in cross- border carbon-intensity-weighted trade flows, and (b) the early post- CBAM-2026 flow re-routing measurable in 2026-2027 customs data.
 - **Falsification rule:** Pre-CBAM leakage leg not supported if (a) EU ETS price elasticity of carbon-intensity-weighted imports is zero or wrong-signed at p<0.10, OR (b) CBAM-product imports did not grow faster from high-intensity sources than low-intensity sources 2018-2023. Post-CBAM leg not supported if (c) the post-2026 × carbon-intensity-gap interaction is zero on EU imports, OR (d) trade-deflection (third-country to non-EU) is zero (suggesting volume just stops rather than reroutes — not leakage but demand destruction). Mixed verdict permitted: pre-leakage signature without post-CBAM reversal would suggest CBAM is inadequately calibrated.
+- **Falsification test:** cbam_carbon_leakage_pre_post_did
 
-## Estimate (Callaway-Sant'Anna staggered DiD, TWFE approximation)
-- _Error:_ no outcome variable loaded
+## Estimate
+- _Error:_ no outcome variable loaded; missing: ['un_comtrade:HS72_HS76_HS25_HS31', 'un_comtrade:HS72_HS76_HS25_HS31_volume', 'constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) × tonnes imported. Manual-drop pending under data/manual/derived/.', 'constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).', 'un_comtrade:HS72_HS76_HS25_HS31']
 
 ## Variables resolved
+- `constructed: indicator = 1 from 2023-10 (transitional reporting phase begin) onwards; 0 otherwise.` → cbam_transitional_dummy (treatment, publisher=constructed, n=170)
+- `constructed: indicator = 1 from 2026-01 (definitive phase, financial liability) onwards; 0 otherwise.` → cbam_definitive_dummy (treatment, publisher=constructed, n=170)
+- `world_bank_wdi:NY.GDP.MKTP.KD` → log_real_gdp_eu (controls, publisher=world_bank_wdi, n=14066)
+- `imf_pcps:POILBRE` → log_brent_oil (controls, publisher=imf_pcps, n=629)
+- `constructed: bilateral REER vs EUR for major CBAM exporters (CHN, TUR, IND, KOR, RUS). bis or imf source.` → exporter_country_real_exchange_rate_eur (controls, publisher=constructed, n=170)
 
-### Missing data
-- `un_comtrade:HS72_HS76_HS25_HS31` (outcome)
-- `un_comtrade:HS72_HS76_HS25_HS31_volume` (outcome)
-- `constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) × tonnes imported. Manual-drop pending under data/manual/derived/.` (outcome)
-- `constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).` (outcome)
-- `un_comtrade:HS72_HS76_HS25_HS31` (outcome)
-- `constructed: indicator = 1 from 2023-10 (transitional reporting phase begin) onwards; 0 otherwise.` (treatment)
-- `constructed: indicator = 1 from 2026-01 (definitive phase, financial liability) onwards; 0 otherwise.` (treatment)
-- `constructed: (exporter-country CO2/tonne for product) − (EU CO2/tonne benchmark for product). Higher gap = higher CBAM cost burden. Continuous treatment intensity.` (treatment)
-- `eea:eu_ets_verified_emissions` (controls)
-- `world_bank_wdi:NY.GDP.MKTP.KD` (controls)
-- `imf_pcps:POILBRE` (controls)
-- `constructed: TTF spot, monthly. eex fetcher pending or manual-drop.` (controls)
-- `constructed: bilateral REER vs EUR for major CBAM exporters (CHN, TUR, IND, KOR, RUS). bis or imf source.` (controls)
+### Variables missing data
+- `un_comtrade:HS72_HS76_HS25_HS31` (outcome, name=log_eu_imports_cbam_products_value) — vintage not on disk
+- `un_comtrade:HS72_HS76_HS25_HS31_volume` (outcome, name=log_eu_imports_cbam_products_volume_tonnes) — vintage not on disk
+- `constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) × tonnes imported. Manual-drop pending under data/manual/derived/.` (outcome, name=cbam_carbon_intensity_weighted_imports) — vintage not on disk
+- `constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).` (outcome, name=log_extra_eu_imports_share_of_consumption) — vintage not on disk
+- `un_comtrade:HS72_HS76_HS25_HS31` (outcome, name=log_third_country_exports_to_non_eu_destinations) — vintage not on disk
+- `constructed: (exporter-country CO2/tonne for product) − (EU CO2/tonne benchmark for product). Higher gap = higher CBAM cost burden. Continuous treatment intensity.` (treatment, name=cbam_carbon_intensity_gap_eu) — vintage not on disk
+- `eea:eu_ets_verified_emissions` (controls, name=log_eu_ets_price) — vintage not on disk
+- `constructed: TTF spot, monthly. eex fetcher pending or manual-drop.` (controls, name=log_natural_gas_ttf) — vintage not on disk
 
-_Generated by `scripts/run_did_callaway_santanna.py` at 2026-04-30T09:47:25+00:00_
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T07:07:19+00:00_

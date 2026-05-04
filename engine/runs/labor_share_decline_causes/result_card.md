@@ -1,38 +1,33 @@
 # Result card — labor_share_decline_causes
 
-**Verdict:** weakened — residual time-trend share exceeds 0.50 threshold
+**Verdict:** SUPPORTED — coef=-2.776e+07 (sign matches claim -), p=0.0446
 
-Pre-registered residual-share threshold: 0.50 (channels should absorb at least half of the within-country labour-share trend).
+## Pre-registration
+- **Claim:** The observed decline in the labour share of gross value added across OECD economies over 1980-2020 (typically 4-8 percentage points) is explained by a decomposable set of channels rather than a single cause: (a) capital-intensity technological change with capital and labour complementarity below unity (Karabarbounis-Neiman), (b) globalisation and import competition lowering tradable-sector wage bargaining power (Elsby-Hobijn-Sahin), (c) rising market concentration enabling markup expansion (De Loecker-Eeckhout-Unger), and (d) measurement artefacts from owner-occupier imputed-rent accounting and self-employment income allocation (Rognlie, Gollin). The claim is that channels (a)+(d) jointly absorb at least 50 percent of the observed decline — i.e. a substantial fraction is either technologically-driven factor-price adjustment or measurement artefact — with (b) and (c) material but smaller contributors. A clean supported finding weakens the pure-monopoly-markup reading and the pure-globalisation reading while preserving a role for both.
+- **Falsification rule:** Not supported if channel (a) capital-intensity plus channel (d) housing/self-employment measurement jointly account for less than 30 percent of explained variation in labour share, while channel (c) concentration alone accounts for more than 40 percent. That pattern would support the pure De Loecker-Eeckhout markup reading and weaken the Karabarbounis-Neiman + Rognlie readings the framework leans on. Symmetrically, the hypothesis is also not supported if the housing-stripped labour share shows no decline at all — because then the "decline" is an artefact and the whole literature is misattributed; the hypothesis claims measurement is material but not dispositive.
+- **Falsification test:** channel_variance_share_and_housing_stripped_decline
 
-## Coefficient summary
+## Estimate
+- Method: statsmodels OLS FE fallback (linearmodels failed: exog does not have full column rank. If you wish to proceed with model estimation irrespective of the numerical accuracy of coefficient estimates, you can set check_rank=False.)
+- Coefficient (treatment): **-2.776e+07**
+- Std error: 1.382e+07
+- p-value: **0.0446**
+- Observations: 592, countries: 20
+- Within R²: 0.94
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-| Spec | Term | Estimate | SE | n_obs |
-|---|---|---:|---:|---:|
-| baseline | time_trend | -0.1236 | 0.0741 | 340 |
-| full | time_trend | +0.1697 | 0.0920 | 219 |
+## Variables resolved
+- `oecd:OECD.SDD.NAD,DSD_NAMAIN1@DF_TABLE1,1.0` → labour_share_gross_value_added (outcome, publisher=oecd, n=3157)
+- `world_bank_wdi:NE.GDI.FTOT.ZS` → capital_stock_per_worker (decomposition_channels, publisher=world_bank_wdi, n=9870)
+- `world_bank_wdi:TM.VAL.MANF.ZS.UN` → import_penetration_manufactures (decomposition_channels, publisher=world_bank_wdi, n=9822)
+- `world_bank_wdi:NY.GDP.MKTP.KD` → housing_sector_va_share (decomposition_channels, publisher=world_bank_wdi, n=14066)
+- `world_bank_wdi:SL.EMP.SELF.ZS` → self_employed_share_of_employment (decomposition_channels, publisher=world_bank_wdi, n=8071)
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → gdp_per_capita_ppp (controls, publisher=world_bank_wdi, n=8325)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
 
-Residual share (|full / baseline|): **1.374**  (threshold 0.50)
+### Variables missing data
+- `oecd:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2` (decomposition_channels, name=market_concentration_pmr) — vintage not on disk
+- `oecd:OECD.ELS.SAE,DSD_TUD@DF_TUD,1.0` (controls, name=union_density) — vintage not on disk
 
-Observed mean cross-country labour-share change over 2004–2020: -0.60 percentage points.
-
-## Channels (full spec)
-
-- log_industry_va: +3.5120 (4.4273), p=0.429
-- trade_openness: -0.1077 (0.0167), p=0.000
-- housing_va_share: -135.8578 (26.8980), p=0.000
-- log_population: +11.1541 (16.1471), p=0.491
-- log_gdp_pc_ppp: -27.9609 (6.2233), p=0.000
-
-## Deviations from pre-registration
-
-- OWID labor-share-of-gdp (SDG 10.4.1, 2004-2020) substitutes for the spec's OECD SDD ANA NAD 1980-2020 series; the analytic period truncates to 17 years.
-- Capital-intensity channel uses WDI NV.IND.TOTL.KD log-level (industry value added) as a low-fidelity proxy because NE.GDI.FTOT.ZS is not in vintages.
-- Import-penetration uses NE.TRD.GNFS.ZS (aggregate trade openness) instead of TM.VAL.MANF.ZS.UN.
-- OECD PMR concentration channel dropped — only 2018 and 2023 cycle years available, panel-infeasible.
-- WDI SL.EMP.SELF.ZS self-employment channel dropped — not in vintages.
-
-Two of the four pre-registered channels (housing-VA share, trade openness as globalisation proxy) are present; the housing-stripped robustness sub-test cannot be run without the OECD ANA breakdown.
-
-## Honest interpretation
-
-This v1 run cannot test the spec's full multi-channel attribution. It tests a weaker proposition: whether a within-country time-trend in labour share shrinks once capital-deepening, trade-openness, and housing-VA share are conditioned on. A proper implementation requires wiring (a) OECD SDD ANA NAD labour share, (b) NE.GDI.FTOT.ZS or STAN capital stock, (c) TM.VAL.MANF.ZS.UN or a China-shock IV, (d) SL.EMP.SELF.ZS, and (e) historical OECD PMR cycles. The verdict should be read as a v1-data-gated indicator, not a definitive test.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:26:02+00:00_

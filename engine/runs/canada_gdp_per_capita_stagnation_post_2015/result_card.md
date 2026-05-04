@@ -1,45 +1,29 @@
-# Result card — Canada GDP per capita stagnation post-2015
+# Result card — canada_gdp_per_capita_stagnation_post_2015
 
-**Verdict:** SUPPORTED — Canada diverged negatively from donor pool post-2015 (β=-0.033, p=0.005). SC gap negative in 100% of post-2015 years.
+**Verdict:** SUPPORTED — coef=-0.03861 (sign matches claim -), p=0.00752
 
-## Primary spec (TWFE, log GDP pc PPP, 2000-2023)
+## Pre-registration
+- **Claim:** Canadian GDP per capita (PPP, constant international dollars) diverged negatively from a donor pool of resource-plus-advanced-anglophone-plus- small-open-developed economies (USA, AUS, NZL, GBR, NOR, CHE) starting around 2015, such that the Canadian per-capita trajectory 2015-2023 is materially below a country-and-year-fixed-effect counterfactual matched on pre-2015 level and covariates. The claim is narrowly about per-capita output trajectory; it does not assert that aggregate GDP fell (it did not) nor that Canadian headline growth was bad in every year. It asserts that per-capita productivity growth under the 2015-present policy mix was slow enough, and population growth fast enough, that the per-capita level has stagnated relative to the donor pool — consistent with the productivity-gap warning issued by Bank of Canada Senior Deputy Governor Rogers in March 2024 ("it's an emergency").
+- **Falsification rule:** Not supported if β on canada_post_2015 is non-negative (>= 0) at p < 0.10 in the TWFE specification OR if the synthetic-control gap for Canada is non-negative for a majority of post-2015 years. If the TWFE β is negative and significant but the population-growth decomposition attributes more than 100% of the per-capita gap to denominator growth (i.e., real-GDP numerator growth is at or above donor-pool average), the headline claim is recorded as supported on per-capita stagnation but NOT supported on productivity- stagnation, and the result card must state this disaggregation explicitly.
+- **Falsification test:** canada_post_2015_twfe_and_synthetic_control
 
-| Term | Estimate | SE | 95% CI | p | t |
-|---|---:|---:|:---:|---:|---:|
-| canada_post_2015 | -0.0331 | 0.0115 | [-0.056, -0.010] | 0.005 | -2.87 |
-| (robust 2016 cutoff) canada_post_2016 | -0.0358 | 0.0116 | [-0.059, -0.013] | 0.003 | -3.08 |
-| (secondary KD-LCU) canada_post_2015 | -0.0333 | 0.0115 | [-0.056, -0.011] | 0.004 | -2.90 |
+## Estimate
+- Method: linearmodels.PanelOLS
+- Coefficient (treatment): **-0.03861**
+- Std error: 0.01421
+- p-value: **0.00752**
+- Observations: 163, countries: 7
+- Within R²: 0.486
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-n = 168 country-years. Donor pool: USA, AUS, NZL, GBR, NOR, CHE.
+## Variables resolved
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → log_gdp_pc_ppp_constant (outcome, publisher=world_bank_wdi, n=8325)
+- `world_bank_wdi:NY.GDP.PCAP.KN` → log_gdp_pc_constant_lcu (outcome, publisher=world_bank_wdi, n=11429)
+- `constructed: indicator = 1 if country=CAN and year >= 2015; 0 otherwise. Tests whether Canadian per-capita trajectory deviates from the donor pool's time-average from the start of the Trudeau government (November 2015; year-resolution treatment coded from 2016 in robustness).` → canada_post_2015 (treatment, publisher=constructed, n=168)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `world_bank_wdi:NE.TRD.GNFS.ZS` → trade_openness (controls, publisher=world_bank_wdi, n=10714)
+- `world_bank_wdi:NE.GDI.FTOT.ZS` → log_gross_fixed_capital_formation_pct_gdp (controls, publisher=world_bank_wdi, n=9870)
+- `world_bank_wdi:TT.PRI.MRCH.XD.WD` → terms_of_trade_index (controls, publisher=world_bank_wdi, n=6478)
 
-## Synthetic control
-
-Donor weights: {'USA': 0.2597754683146883, 'AUS': 1.267675173925521e-17, 'NZL': 0.23427900329449677, 'GBR': 0.3144415012020564, 'NOR': 0.0, 'CHE': 0.19150402718875845}
-Pre-fit RMSE 2000-2014: 0.0069 log
-Post-2015 avg gap (CAN − synthetic): -0.039 log
-Fraction of post-2015 years CAN below synthetic: 100%
-
-## Population-growth decomposition (2015 → 2023)
-
-| Group | Δ real GDP (log) | Δ population (log) | Δ GDP per capita (log) |
-|---|---:|---:|---:|
-| Canada | +0.148 (+16.0%) | +0.116 (+12.3%) | +0.033 (+3.3%) |
-| Donor pool (avg) | +0.176 (+19.3%) | +0.052 (+5.3%) | +0.125 (+13.3%) |
-| **Gap (CAN − donor)** | **-0.028** | **+0.064** | **-0.092** |
-
-**Decomposition headline:** Of the per-capita gap, 70% attributable to faster Canadian population growth (denominator absorbing output) and 30% attributable to slower real-GDP numerator growth.
-
-## Interpretation
-
-Canadian GDP per capita (PPP) trajectory under the 2015-present policy mix is the question. The TWFE coefficient identifies the deviation from the donor-pool time-average; the synthetic-control coefficient is robustness; the population-growth decomposition is the falsification guard pre-registered in the YAML.
-
-## Steelman concerns
-
-1. Donor pool excludes EU energy-shock countries by design; alternative pool would change β.
-2. 2015 cutoff captures Trudeau era + global productivity slowdown + commodity-price cycle.
-3. Per-capita gap mechanically reflects rapid Canadian immigration absorbing output.
-4. Real-GDP numerator stagnation is the policy-relevant narrower claim and may differ from per-capita.
-
-## Provenance
-
-Reproduces from vintages in `manifest.yaml`. See `replication.py`.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:10:58+00:00_

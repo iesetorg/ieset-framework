@@ -1,63 +1,91 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 outcome 'total_factor_productivity' not loaded",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "outcome 'total_factor_productivity' not loaded",
   "hypothesis_id": "mitterrand_nationalised_firm_efficiency",
-  "template": "did_callaway_santanna",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.",
-  "falsification_test_text": "Callaway-Sant'Anna DiD on FRA firms 1978-1986: nationalised-1981/82 cohort vs matched private peers; TFP and ULC ATT |effect|<5% with p>0.10 supports null-efficiency-collapse claim.",
+  "verdict": "PARTIAL \u2014 FRA TFP growth 7.7% vs peer median 4.3% (gap 3.4pp); output/worker 0.8% vs 1.9% (gap -1.1pp), 1981-1986",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "FRA TFP growth 7.7% vs peer median 4.3% (gap 3.4pp); output/worker 0.8% vs 1.9% (gap -1.1pp), 1981-1986",
+  "method_valid": true,
+  "test": "pwt_france_macro_productivity_vs_western_europe_peers_1981_1986",
+  "evidence_type": "macro_productivity_proxy",
+  "scope_note": "macro productivity proxy supports no-collapse pattern; firm-level nationalised cohort remains data-gated",
+  "causal_attribution": "not identified; no firm-level nationalised-vs-private panel is present locally",
   "estimate": {
-    "error": "outcome 'total_factor_productivity' not loaded"
+    "tfp_growth_1981_1986": {
+      "FRA": 0.0771247148513794,
+      "BEL": 0.021866202354431152,
+      "DEU": 0.04281175136566162,
+      "ESP": 0.07961571216583252,
+      "GBR": 0.08570683002471924,
+      "ITA": -0.011903882026672363,
+      "NLD": 0.04413139820098877
+    },
+    "output_per_worker_growth_1981_1986": {
+      "FRA": 0.008210539817810059,
+      "BEL": -0.03252071142196655,
+      "DEU": 0.054993391036987305,
+      "ESP": 0.0025333166122436523,
+      "GBR": 0.05470478534698486,
+      "ITA": 0.03560137748718262,
+      "NLD": -0.013869524002075195
+    },
+    "investment_share_growth_1981_1986": {
+      "FRA": -0.05680263042449951,
+      "BEL": -0.08984494209289551,
+      "DEU": -0.02473682165145874,
+      "ESP": -0.049967944622039795,
+      "GBR": 0.30344629287719727,
+      "ITA": -0.004038393497467041,
+      "NLD": 0.13670456409454346
+    },
+    "tfp_peer_median_growth": 0.043471574783325195,
+    "output_per_worker_peer_median_growth": 0.019067347049713135,
+    "investment_share_peer_median_growth": -0.01438760757446289,
+    "tfp_gap_vs_peer_median_pp": 3.36531400680542,
+    "output_per_worker_gap_vs_peer_median_pp": -1.0856807231903076,
+    "investment_share_gap_vs_peer_median_pp": -4.241502285003662
+  },
+  "thresholds": {
+    "partial_support_min_gap_each_metric_pp": -5.0,
+    "refute_gap_any_metric_pp": -10.0
   },
   "data_status": {
     "variables_loaded": [
       {
-        "role": "controls",
-        "name": "macro_real_gdp_growth_fra",
-        "source": "world_bank_wdi:NY.GDP.MKTP.KD.ZG",
-        "publisher": "world_bank_wdi",
-        "n_rows": 13961
+        "name": "tfp_index",
+        "source": "pwt:rtfpna",
+        "publisher": "pwt"
+      },
+      {
+        "name": "output_per_worker",
+        "source": "pwt:rgdpo_per_emp",
+        "publisher": "pwt"
+      },
+      {
+        "name": "investment_share",
+        "source": "pwt:csh_i",
+        "publisher": "pwt"
       }
     ],
     "variables_missing": [
       {
-        "role": "outcome",
-        "name": "total_factor_productivity",
-        "source": "eu_klems:tfp_industry"
+        "name": "firm_level_tfp",
+        "source": "INSEE BRN/SUSE"
       },
       {
-        "role": "outcome",
-        "name": "value_added_per_worker",
-        "source": "eu_klems:value_added_per_worker"
-      },
-      {
-        "role": "outcome",
-        "name": "unit_labour_cost",
-        "source": "eu_klems:unit_labour_cost; oecd:ULCEEQ01"
-      },
-      {
-        "role": "treatment",
         "name": "nationalised_firm_indicator",
-        "source": "constructed: binary = 1 for the 1981-82 nationalised firms (Saint-Gobain, Pechiney, Rh\u00f4ne-Poulenc, Thomson, CGE, BNP, CL, SG, Suez, Paribas, Indosuez)"
-      },
-      {
-        "role": "treatment",
-        "name": "nationalisation_event",
-        "source": "constructed: event date = 1982-02-13 (Loi de nationalisation); secondary 1981-09 (announcement)"
-      },
-      {
-        "role": "controls",
-        "name": "industry_fixed_effects",
-        "source": "constructed: 2-digit NACE industry dummies"
-      },
-      {
-        "role": "controls",
-        "name": "real_franc_eer",
-        "source": "bis:WS_EER_M"
+        "source": "constructed firm cohort"
       }
     ]
   },
-  "run_utc": "2026-04-29T21:54:28+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py"
+  "vintages": {
+    "rtfpna": "data/vintages/pwt/rtfpna@2026-04-30T142938Z.parquet",
+    "rgdpo_per_emp": "data/vintages/pwt/rgdpo_per_emp@2026-04-30T142942Z.parquet",
+    "csh_i": "data/vintages/pwt/csh_i@2026-05-03T101937Z.parquet"
+  },
+  "sha256": {
+    "rtfpna": "61fcc04d6b74358ffd27eddd4f327872ccec59367ed80be822c63103b868039c",
+    "rgdpo_per_emp": "61d7900806151010f4f8dd7a8c9a5ee3822063d79052d51c8fb4e780c8d4d49c",
+    "csh_i": "b8d771c8f4915507314f345dca10ed412ea77d7fdad5a570d55046561d575270"
+  },
+  "run_utc": "2026-05-03T11:25:13+00:00",
+  "runner": "engine/runs/mitterrand_nationalised_firm_efficiency/replication.py"
 }

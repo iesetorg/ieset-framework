@@ -1,70 +1,321 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded",
-  "hypothesis_id": "nuclear_phaseout_grid_reliability_cost_tradeoff",
-  "template": "did_callaway_santanna",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "PRIMARY (dispositive, requires data not yet on disk): the hypothesis is SUPPORTED if (i) mean log industrial electricity price 2010-2024 in the phase-out cohort (DEU, BEL, CHE) exceeds the retain cohort (FRA, FIN, SWE, USA, GBR) by at least 0.08 log-points (~8.3%) AND (ii) wholesale day-ahead volatility CoV is higher in phase-out cohort by at least 20% AND (iii) the effect survives a drop-2021-2024 sensitivity that excludes the gas shock. REFUTED if any one of (i)-(iii) flips sign with confident methodology. Method-validity failure (data gap, FRA 2022 availability shock not handled, pre-trend RMSPE > 0.5\u00d7post-RMSPE in synth control) yields INCONCLUSIVE not refuted.\nSURROGATE (testable today on OWID-Ember data): mean change in fossil share of electricity 2005\u21922024 in phase-out cohort minus retain cohort. The hypothesis predicts a positive gap (phase-out countries leaned harder on fossils for back-up). Surrogate- supports threshold = +5pp gap. Surrogate is informative-only \u2014 it does NOT settle the cost or volatility primaries.",
-  "falsification_test_text": "nuclear_phaseout_cost_reliability_did",
-  "estimate": {
-    "error": "no outcome variable loaded"
+  "verdict": "inconclusive \u2014 Primary outcomes (industrial electricity price, wholesale day-ahead volatility, LOLE) require IEA / Eurostat NRG_PC_205 / ENTSO-E specialist fetchers that have not shipped. Testable surrogate (back-up reliance via fossil share of electricity): phase-out cohort fossil-share change -13.7pp vs retain cohort -18.2pp \u2014 gap +4.5pp (NOT consistent with +5.0pp threshold). Treatment is observed: phase-out cohort nuclear share fell from 41% to 24%; retain cohort held 40% to 34%.",
+  "verdict_word": "inconclusive",
+  "primary_data_gaps": [
+    "iea:industrial_electricity_price (band IC) \u2014 fetcher pending",
+    "eurostat:NRG_PC_205 (industry electricity price) \u2014 series fetch pending",
+    "entsoe:day_ahead_wholesale_prices \u2014 fetcher pending",
+    "entsoe:fossil_capacity_factor \u2014 fetcher pending",
+    "entsoe:MAF_LOLE \u2014 fetcher pending"
+  ],
+  "method_valid": true,
+  "method_notes": [],
+  "surrogate": {
+    "name": "fossil_share_change_pp_2005_to_2024",
+    "phaseout_cohort_change_pp": -13.667620933333332,
+    "retain_cohort_change_pp": -18.150600700000002,
+    "gap_pp": 4.48297976666667,
+    "threshold_pp": 5.0,
+    "supports_hypothesis": false
   },
-  "data_status": {
-    "variables_loaded": [],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "log_industrial_electricity_price_usd_mwh",
-        "source": "constructed: IEA industrial electricity price (band IC, medium industry) + Eurostat NRG_PC_205 cross-check, USD/MWh constant 2020. Specialist IEA fetcher pending."
-      },
-      {
-        "role": "outcome",
-        "name": "wholesale_price_volatility",
-        "source": "constructed: annual coefficient of variation of day-ahead wholesale electricity prices (EPEX, Nord Pool, ENTSO-E transparency platform). Fetcher pending."
-      },
-      {
-        "role": "outcome",
-        "name": "fossil_backup_capacity_factor",
-        "source": "constructed: ENTSO-E + EIA annual capacity factor of fossil-fired (gas + coal) plants, as proxy for back-up reliance. Fetcher pending."
-      },
-      {
-        "role": "outcome",
-        "name": "loss_of_load_expectation_hours",
-        "source": "constructed: ENTSO-E MAF / NERC equivalent reserve-adequacy indicator; interpolation required across non-harmonised reporting. Fetcher pending and difficult."
-      },
-      {
-        "role": "treatment",
-        "name": "nuclear_phaseout_legislated_dummy",
-        "source": "constructed: indicator = 1 in years after a country legislated a binding nuclear phase-out. DEU 2011+, BEL 2003+ (law), CHE 2017+ (referendum). USA, FRA, FIN, SWE, KOR, JPN = 0 (nuclear-retaining, though JPN has post-Fukushima effective pause \u2014 excluded for cleanness or coded as 'partial' in sensitivity)."
-      },
-      {
-        "role": "treatment",
-        "name": "nuclear_capacity_share_change",
-        "source": "constructed: year-over-year change in nuclear share of electricity generation, BP Statistical Review / IEA electricity statistics. Continuous treatment intensity."
-      },
-      {
-        "role": "controls",
-        "name": "gas_price_eu_ttf_proxy",
-        "source": "constructed: TTF-equivalent natural gas price (EUR/MWh) to partial out gas-shock exposure common to gas-indexed markets. Fetcher pending."
-      },
-      {
-        "role": "controls",
-        "name": "renewable_capacity_share",
-        "source": "constructed: IEA / IRENA wind + solar share of installed capacity. Fetcher pending."
-      },
-      {
-        "role": "controls",
-        "name": "interconnection_capacity_per_capita",
-        "source": "constructed: ENTSO-E interconnection NTC / population. Fetcher pending."
-      },
-      {
-        "role": "controls",
-        "name": "log_population",
-        "source": "world_bank_wdi:SP.POP.TOTL"
-      }
-    ]
+  "renewables_change_pp": {
+    "phaseout_cohort": 30.872137166666665,
+    "retain_cohort": 23.981211100000003
   },
-  "run_utc": "2026-04-30T09:47:24+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py"
+  "co2_intensity_change_pct": {
+    "phaseout_cohort": -46.411897208711416,
+    "retain_cohort": -46.110993462282565
+  },
+  "nuclear_table": [
+    {
+      "country": "DEU",
+      "year_start": 2005,
+      "nuclear_share_start": 26.58395,
+      "year_end": 2024,
+      "nuclear_share_end": 0.0,
+      "nuclear_change_pp": -26.58395
+    },
+    {
+      "country": "BEL",
+      "year_start": 2005,
+      "nuclear_share_start": 56.411472,
+      "year_end": 2024,
+      "nuclear_share_end": 41.11301,
+      "nuclear_change_pp": -15.298462
+    },
+    {
+      "country": "CHE",
+      "year_start": 2005,
+      "nuclear_share_start": 40.380623,
+      "year_end": 2024,
+      "nuclear_share_end": 30.649483,
+      "nuclear_change_pp": -9.73114
+    },
+    {
+      "country": "FRA",
+      "year_start": 2005,
+      "nuclear_share_start": 79.33549,
+      "year_end": 2024,
+      "nuclear_share_end": 67.72224,
+      "nuclear_change_pp": -11.613249999999994
+    },
+    {
+      "country": "FIN",
+      "year_start": 2005,
+      "nuclear_share_start": 32.979027,
+      "year_end": 2024,
+      "nuclear_share_end": 39.491215,
+      "nuclear_change_pp": 6.512187999999995
+    },
+    {
+      "country": "SWE",
+      "year_start": 2005,
+      "nuclear_share_start": 45.705986,
+      "year_end": 2024,
+      "nuclear_share_end": 29.433634,
+      "nuclear_change_pp": -16.272352
+    },
+    {
+      "country": "USA",
+      "year_start": 2005,
+      "nuclear_share_start": 19.38022,
+      "year_end": 2024,
+      "nuclear_share_end": 17.805885,
+      "nuclear_change_pp": -1.5743350000000014
+    },
+    {
+      "country": "GBR",
+      "year_start": 2005,
+      "nuclear_share_start": 20.48952,
+      "year_end": 2024,
+      "nuclear_share_end": 14.284206,
+      "nuclear_change_pp": -6.2053139999999996
+    },
+    {
+      "country": "JPN",
+      "year_start": 2005,
+      "nuclear_share_start": 25.413897,
+      "year_end": 2024,
+      "nuclear_share_end": 8.354077,
+      "nuclear_change_pp": -17.05982
+    },
+    {
+      "country": "KOR",
+      "year_start": 2005,
+      "nuclear_share_start": 37.687115,
+      "year_end": 2024,
+      "nuclear_share_end": 30.18165,
+      "nuclear_change_pp": -7.505464999999997
+    }
+  ],
+  "fossil_table": [
+    {
+      "country": "DEU",
+      "cohort": "phaseout",
+      "year_start": 2005,
+      "fossil_share_start": 63.07431,
+      "year_end": 2024,
+      "fossil_share_end": 41.35769,
+      "fossil_change_pp": -21.71662
+    },
+    {
+      "country": "BEL",
+      "cohort": "phaseout",
+      "year_start": 2005,
+      "fossil_share_start": 41.087936,
+      "year_end": 2024,
+      "fossil_share_end": 23.654781,
+      "fossil_change_pp": -17.433155
+    },
+    {
+      "country": "CHE",
+      "cohort": "phaseout",
+      "year_start": 2005,
+      "fossil_share_start": 3.7543254,
+      "year_end": 2024,
+      "fossil_share_end": 1.9012376,
+      "fossil_change_pp": -1.8530878
+    },
+    {
+      "country": "FRA",
+      "cohort": "retain",
+      "year_start": 2005,
+      "fossil_share_start": 11.004322,
+      "year_end": 2024,
+      "fossil_share_end": 5.1016407,
+      "fossil_change_pp": -5.9026813
+    },
+    {
+      "country": "FIN",
+      "cohort": "retain",
+      "year_start": 2005,
+      "fossil_share_start": 33.77268,
+      "year_end": 2024,
+      "fossil_share_end": 4.651726,
+      "fossil_change_pp": -29.120954
+    },
+    {
+      "country": "SWE",
+      "cohort": "retain",
+      "year_start": 2005,
+      "fossil_share_start": 3.0058098,
+      "year_end": 2024,
+      "fossil_share_end": 1.2082486,
+      "fossil_change_pp": -1.7975612000000003
+    },
+    {
+      "country": "USA",
+      "cohort": "retain",
+      "year_start": 2005,
+      "fossil_share_start": 71.870316,
+      "year_end": 2024,
+      "fossil_share_end": 58.130684,
+      "fossil_change_pp": -13.739632
+    },
+    {
+      "country": "GBR",
+      "cohort": "retain",
+      "year_start": 2005,
+      "fossil_share_start": 75.260445,
+      "year_end": 2024,
+      "fossil_share_end": 35.06827,
+      "fossil_change_pp": -40.192175000000006
+    }
+  ],
+  "renew_table": [
+    {
+      "country": "DEU",
+      "cohort": "phaseout",
+      "renew_share_start": 10.341735,
+      "renew_share_end": 58.64231,
+      "renew_change_pp": 48.300575
+    },
+    {
+      "country": "BEL",
+      "cohort": "phaseout",
+      "renew_share_start": 2.5005925,
+      "renew_share_end": 35.232204,
+      "renew_change_pp": 32.7316115
+    },
+    {
+      "country": "CHE",
+      "cohort": "phaseout",
+      "renew_share_start": 55.865055,
+      "renew_share_end": 67.44928,
+      "renew_change_pp": 11.584225000000004
+    },
+    {
+      "country": "FRA",
+      "cohort": "retain",
+      "renew_share_start": 9.660189,
+      "renew_share_end": 27.176117,
+      "renew_change_pp": 17.515928000000002
+    },
+    {
+      "country": "FIN",
+      "cohort": "retain",
+      "renew_share_start": 33.2483,
+      "renew_share_end": 55.857056,
+      "renew_change_pp": 22.608756
+    },
+    {
+      "country": "SWE",
+      "cohort": "retain",
+      "renew_share_start": 51.288204,
+      "renew_share_end": 69.35812,
+      "renew_change_pp": 18.069916
+    },
+    {
+      "country": "USA",
+      "cohort": "retain",
+      "renew_share_start": 8.749464,
+      "renew_share_end": 24.063429,
+      "renew_change_pp": 15.313965
+    },
+    {
+      "country": "GBR",
+      "cohort": "retain",
+      "renew_share_start": 4.2500315,
+      "renew_share_end": 50.647522,
+      "renew_change_pp": 46.3974905
+    }
+  ],
+  "co2int_table": [
+    {
+      "country": "DEU",
+      "cohort": "phaseout",
+      "co2int_start": 0.29465017,
+      "co2int_end": 0.17082076,
+      "co2int_change_pct": -42.025908215155624
+    },
+    {
+      "country": "BEL",
+      "cohort": "phaseout",
+      "co2int_start": 0.32994872,
+      "co2int_end": 0.1815783,
+      "co2int_change_pct": -44.96772104465202
+    },
+    {
+      "country": "CHE",
+      "cohort": "phaseout",
+      "co2int_start": 0.123340726,
+      "co2int_end": 0.058904987,
+      "co2int_change_pct": -52.24206236632659
+    },
+    {
+      "country": "FRA",
+      "cohort": "retain",
+      "co2int_start": 0.18596779,
+      "co2int_end": 0.11053573,
+      "co2int_change_pct": -40.561895153994136
+    },
+    {
+      "country": "FIN",
+      "cohort": "retain",
+      "co2int_start": 0.2956826,
+      "co2int_end": 0.1606731,
+      "co2int_change_pct": -45.6602789612916
+    },
+    {
+      "country": "SWE",
+      "cohort": "retain",
+      "co2int_start": 0.15172905,
+      "co2int_end": 0.07353519,
+      "co2int_change_pct": -51.53519382082733
+    },
+    {
+      "country": "USA",
+      "cohort": "retain",
+      "co2int_start": 0.4175396,
+      "co2int_end": 0.25934228,
+      "co2int_change_pct": -37.88797996645109
+    },
+    {
+      "country": "GBR",
+      "cohort": "retain",
+      "co2int_start": 0.2638343,
+      "co2int_end": 0.11896389,
+      "co2int_change_pct": -54.909619408848656
+    }
+  ],
+  "period": [
+    2005,
+    2024
+  ],
+  "phaseout_cohort": [
+    "DEU",
+    "BEL",
+    "CHE"
+  ],
+  "retain_cohort": [
+    "FRA",
+    "FIN",
+    "SWE",
+    "USA",
+    "GBR"
+  ],
+  "sensitivity_cohort": [
+    "JPN",
+    "KOR"
+  ]
 }

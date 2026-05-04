@@ -1,66 +1,34 @@
-# Result card — Growth vs distribution tradeoff (welfare architecture)
+# Result card — growth_vs_distribution_tradeoff
 
-**Verdict:** PARTIAL — directional but does not meet all three thresholds; Δgrowth=+1.11pp, Δgini=+8.6, Δdebt=+4.4pp.
+**Verdict:** REFUTED — coef=-2.18 (sign opposite claim +), p=8.99e-05
 
-_NOTE: spec calls for wealth Gini; this run uses disposable-income Gini (SI.POV.GINI) as proxy because wealth Gini is data-gated._
+## Pre-registration
+- **Claim:** Across advanced economies over 1985-2020, countries with forced-saving / architecture-based redistribution (Singapore CPF, Chilean AFP pre-2008, Australian Superannuation, Swiss mixed pension pillars) achieve comparable or superior long-run growth outcomes alongside comparable distributional improvements in household net wealth distribution relative to countries relying primarily on tax-and-transfer redistribution (Nordic cluster, UK, France). The specific claim is that architecture-based systems avoid the marginal-tax-rate deadweight loss while still compressing wealth inequality, because the redistribution happens via mandated channelling of current income into individual accounts that collectively aggregate to household sector wealth. A clean supported finding would show architecture-countries with growth-per-capita trajectories not statistically distinguishable from Nordic-cluster growth and with wealth Gini compression comparable to Nordic disposable-income Gini compression over the same period. Fiscal sustainability (gross debt-to- GDP trajectory) should differ measurably, with architecture-countries carrying lower average debt burdens.
+- **Falsification rule:** Not supported if the forced-saving-dominant country cluster shows either (a) statistically significant lower average growth per capita than the tax-transfer-dominant cluster by more than 0.5 percentage points per annum after controls and fixed effects, or (b) statistically significant higher wealth Gini than the tax-transfer cluster by more than 5 Gini points. Either would falsify the claim that forced-saving architectures deliver comparable distributional outcomes without a growth cost. Separately, the hypothesis requires that the forced-saving cluster show average gross-debt-to-GDP below the tax-transfer cluster's average by at least 10 percentage points over the sample period; if not, the fiscal-sustainability component of the claim is unsupported.
+- **Falsification test:** cluster_contrast_across_three_outcomes
 
-## Cluster means (between-country, descriptive)
+## Estimate
+- Method: statsmodels OLS FE fallback (linearmodels failed: 'redistribution_architecture_type')
+- Coefficient (treatment): **-2.18**
+- Std error: 0.5567
+- p-value: **8.99e-05**
+- Observations: 330, countries: 15
+- Within R²: 0.672
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-| Cluster | Growth (yoy %) | Gini (income, SI.POV.GINI) | Gross debt / GDP (%) |
-|---|---:|---:|---:|
-| forced_saving | 2.47 | 38.2 | 48.9 |
-| tax_transfer | 1.36 | 29.6 | 53.4 |
-| hybrid | 1.23 | 37.1 | 59.9 |
-| **forced − tax_transfer** | **+1.11** | **+8.6** | **debt: +4.4 (tt − fs)** |
+## Variables resolved
+- `world_bank_wdi:NY.GDP.PCAP.KD.ZG` → gdp_per_capita_real_growth (outcome, publisher=world_bank_wdi, n=13897)
+- `world_bank_wdi:SI.POV.GINI` → household_wealth_gini (outcome, publisher=world_bank_wdi, n=2430)
+- `imf:GGXWDG_NGDP` → gross_government_debt_gdp (outcome, publisher=imf, n=8113)
+- `manual:classification` → redistribution_architecture_type (treatment, publisher=constructed, n=540)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `world_bank_wdi:SP.URB.TOTL.IN.ZS` → urbanisation (controls, publisher=world_bank_wdi, n=16965)
+- `world_bank_wdi:NE.TRD.GNFS.ZS` → trade_openness (controls, publisher=world_bank_wdi, n=10714)
+- `wgi:GOV_WGI_GE.EST` → government_effectiveness (controls, publisher=wgi, n=5168)
 
-## TWFE regression coefficients (country + year FE; hybrid = reference)
+### Variables missing data
+- `manual:from_publisher_filings` (decomposition_channels, name=mandatory_savings_rate_pct_wage) — vintage not on disk
+- `oecd:OECD.SDD.NAD,DSD_HHDASH@DF_HHDASH,1.0` (decomposition_channels, name=household_savings_rate) — vintage not on disk
 
-Country FE absorb time-invariant architecture; identification comes from
-AUS 1992 super introduction and CHL 2008 solidarity-pillar transition.
-Coefficients are within-country deviation; the cluster means above are
-the between-country evidence the spec also asks for.
-
-### Outcome 1 — annual real GDP per capita growth (%)
-
-| Term | Estimate | SE | p | n |
-|---|---:|---:|---:|---:|
-| arch_forced_saving | +1.204 | 0.287 | 0.000 | 525 |
-| arch_tax_transfer  | +nan | nan | nan | — |
-
-### Outcome 2 — disposable-income Gini (SI.POV.GINI)
-
-| Term | Estimate | SE | p | n |
-|---|---:|---:|---:|---:|
-| arch_forced_saving | +5.157 | 1.802 | 0.005 | 321 |
-| arch_tax_transfer  | +nan | nan | nan | — |
-
-### Outcome 3 — gross general govt debt / GDP (IMF GGXWDG_NGDP)
-
-| Term | Estimate | SE | p | n |
-|---|---:|---:|---:|---:|
-| arch_forced_saving | +4.069 | 5.057 | 0.421 | 483 |
-| arch_tax_transfer  | +nan | nan | nan | — |
-
-## Falsification rule applied
-
-Spec requires ALL three thresholds:
-- Δ growth (forced − tax_transfer) > −0.5 pp/yr (one-sided): **✓** (+1.11pp)
-- Δ Gini (forced − tax_transfer) < +5 pts (one-sided): **✗** (+8.6pts)
-- Δ debt-to-GDP (tax_transfer − forced_saving) ≥ 10pp: **✗** (+4.4pp)
-
-## Steelman live concerns
-
-See `hypotheses/steelman/growth_vs_distribution_tradeoff.md`. Key concerns:
-1. Wealth Gini is the spec primary; income Gini under-states the architectural
-   distinction (forced-saving builds household wealth that is not in income flows).
-2. SGP and CHE score among the world's highest on government effectiveness;
-   architecture-vs-outcomes is heavily confounded with state capacity.
-3. Country FE absorb most architecture variation; identification leans on AUS 1992
-   and CHL 2008 transitions which have many other contemporaneous reforms.
-4. The N is too small for robust inference on cluster contrast — 4 forced-saving
-   countries (after AUS/CHL splits) vs 8 tax-transfer.
-
-## Provenance
-
-Data: WDI NY.GDP.PCAP.KD, SI.POV.GINI, NE.TRD.GNFS.ZS, SP.POP.TOTL, SP.URB.TOTL.IN.ZS;
-WGI GE.EST; IMF GGXWDG_NGDP. See `manifest.yaml`. Reproduces from `replication.py`.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:27:05+00:00_

@@ -1,32 +1,14 @@
-# Result card — singapore_temasek_public_ownership_efficiency
+# singapore_temasek_public_ownership_efficiency
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING
+**Verdict:** partial — Singapore beats peer medians on GDP-per-capita growth and institutional quality, but misses the registered PWT TFP growth metric, so the strong efficiency claim is not fully supported.
 
-**Reason:** no canonical metrics available to evaluate
+## Metrics
 
-Pre-registered rule: SUPPORT if >= 7 of 0 metrics met; REFUTE if <= 3 met (impossible to hit support).
+- gdp_pc_ppp_annual_growth_1990_2023: Singapore 0.0322, peer median 0.0314, meets=True.
+- tfp_annual_growth_1974_2019: Singapore -0.0006, peer median 0.0151, meets=False.
+- wgi_government_effectiveness_mean_1996_2024: Singapore 2.2106, peer median 1.4169, meets=True.
+- wgi_rule_of_law_mean_1996_2024: Singapore 1.4639, peer median 1.1423, meets=True.
 
-**Counts:** 0 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
+## Method Note
 
-**Primary country:** SGP
-
-## Metric-by-metric
-
-| # | Metric | Status | Observed | Threshold | Notes |
-|---|---|:---:|---:|---|---|
-
-## Claim
-
-> Singaporean state-holding-company model (Temasek, GIC) combines public ownership of commanding heights with competitive enterprise discipline, achieving sustained growth that falsifies the claim that all public ownership degrades efficiency.
-
-## Interpretation
-
-Verdict is **INCONCLUSIVE_DATA_PENDING** — 0 metric(s) cannot be evaluated because the underlying data source is not yet in the vintages pipeline, and 0 metric(s) have data but a threshold expression the auto-evaluator does not recognise (complex conditions, discrete event counts, cross-country gaps). Close these gaps then re-run.
-
-## Steelman live concerns
-
-See `` for the strongest opposing arguments. Canonical-case multi-metric evidence is a pattern match, not a causal identification — the result card should be read as 'outcome trajectory matches the predicted pattern to degree X' rather than 'policy P caused the outcome'.
-
-## Provenance
-
-Vintages pinned in `manifest.yaml`. Full per-metric diagnostics in `diagnostics.json`. Machine-readable results in `metric_results.parquet`.
+This is a descriptive comparator test; it does not causally attribute Singapore's outcomes to Temasek/GIC.

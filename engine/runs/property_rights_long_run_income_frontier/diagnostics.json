@@ -1,24 +1,95 @@
 {
+  "verdict": "PARTIAL \u2014 coef=-3673, p=0.173 (above \u03b1=0.10); direction inconclusive",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "coef=-3673, p=0.173 (above \u03b1=0.10); direction inconclusive",
   "hypothesis_id": "property_rights_long_run_income_frontier",
-  "verdict": "partial",
-  "reason": "TWFE \u03b2_RL=+0.0048 (SE 0.0044, p=0.277, n=2474), R\u00b2=0.466. Does not meet falsification threshold.",
-  "metrics": {
-    "n_observations": 2474,
-    "n_countries": 165,
-    "rl_coef": 0.00481771069391758,
-    "rl_se": 0.004429289313873342,
-    "rl_p": 0.2767302888819193,
-    "rl_ci_lo": -0.0038635368383822975,
-    "rl_ci_hi": 0.013498958226217456,
-    "r2_within": 0.4661415865585682
+  "template": "panel_fe",
+  "claim_direction_inferred": "+",
+  "falsification_rule_text": "Not supported if (a) the property-rights coefficient is not positive and significant at p<0.05 on GDP growth, OR (b) in the horse-race the state-investment-share coefficient has a larger absolute t-statistic than property rights, OR (c) the top- tercile vs bottom-tercile 40-year mean growth gap is below 0.3 pp/year. A state-led-development reading wins cleanly if state investment outperforms property rights in the horse-race.\n",
+  "falsification_test_text": "panel_fe_horserace_property_rights_vs_state_investment",
+  "estimate": {
+    "coefficient": -3673.1456214190284,
+    "std_error": 2698.661366763813,
+    "p_value": 0.17348236656604066,
+    "n_obs": 2539,
+    "n_countries": 51,
+    "r_squared_within": 0.8584754923821521,
+    "fe_entity": true,
+    "fe_time": false,
+    "cluster": "country",
+    "method": "statsmodels OLS FE fallback (linearmodels failed: 'property_rights_protection_index')",
+    "dropped_controls_due_to_overlap": []
   },
-  "threshold": "\u03b2_RL > 0 and p < 0.05",
-  "vintages": {
-    "wgi_rl": "data/vintages/wgi/GOV_WGI_RL.EST@2026-04-30T114227Z.parquet",
-    "maddison_gdppc": "data/vintages/maddison/gdppc@2026-04-30T114334Z.parquet"
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "real_gdp_per_capita_growth_40yr",
+        "source": "maddison:rgdpnapc",
+        "publisher": "maddison",
+        "n_rows": 19706
+      },
+      {
+        "role": "outcome",
+        "name": "real_gdp_per_capita_growth_10yr",
+        "source": "world_bank_wdi:NY.GDP.PCAP.KD.ZG",
+        "publisher": "world_bank_wdi",
+        "n_rows": 13897
+      },
+      {
+        "role": "treatment",
+        "name": "property_rights_protection_index",
+        "source": "constructed: 0.4\u00d7wgi:RL.EST + 0.3\u00d7fraser_efw:legal_system_property_rights + 0.3\u00d7heritage_efw:property_rights",
+        "publisher": "constructed",
+        "n_rows": 3111
+      },
+      {
+        "role": "treatment",
+        "name": "state_investment_share_gdp",
+        "source": "world_bank_wdi:NE.GDI.FTOT.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 9870
+      },
+      {
+        "role": "controls",
+        "name": "log_initial_gdp_pc",
+        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14066
+      },
+      {
+        "role": "controls",
+        "name": "trade_openness",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10714
+      },
+      {
+        "role": "controls",
+        "name": "life_expectancy_at_birth",
+        "source": "world_bank_wdi:SP.DYN.LE00.IN",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16931
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "treatment",
+        "name": "public_investment_share_gdp",
+        "source": "imf_weo:ggxwdn_ngdp"
+      },
+      {
+        "role": "controls",
+        "name": "years_schooling_average",
+        "source": "barro_lee:years_schooling"
+      },
+      {
+        "role": "controls",
+        "name": "tropical_landlocked_dummies",
+        "source": "constructed: geography_dummies"
+      }
+    ]
   },
-  "sha256": {
-    "wgi_rl": "63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d",
-    "maddison_gdppc": "7a2a32680d1eff8be7e0a25c5cc4c6299fc932d4c799cafdffb8178fa0fd842c"
-  }
+  "run_utc": "2026-05-03T06:12:23+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

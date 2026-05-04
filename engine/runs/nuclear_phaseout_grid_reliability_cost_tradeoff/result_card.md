@@ -1,27 +1,46 @@
-# Result card — nuclear_phaseout_grid_reliability_cost_tradeoff
+# Nuclear phase-out — grid reliability / cost trade-off
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome variable loaded
+**Verdict:** inconclusive — Primary outcomes (industrial electricity price, wholesale day-ahead volatility, LOLE) require IEA / Eurostat NRG_PC_205 / ENTSO-E specialist fetchers that have not shipped. Testable surrogate (back-up reliance via fossil share of electricity): phase-out cohort fossil-share change -13.7pp vs retain cohort -18.2pp — gap +4.5pp (NOT consistent with +5.0pp threshold). Treatment is observed: phase-out cohort nuclear share fell from 41% to 24%; retain cohort held 40% to 34%.
 
-## Pre-registration
-- **Claim:** Countries that legislated and executed nuclear phase-outs (Germany 2011-2023, Belgium 2003 law with 2025-2035 phase-out, Switzerland 2017 vote) experienced over 2010-2024 (a) higher industrial electricity prices, (b) higher wholesale electricity price volatility, and (c) greater reliance on fossil-fired back-up capacity for grid balancing, relative to nuclear-retaining peers (France, Finland post-2023 Olkiluoto 3, Sweden, USA). The hypothesis tests the narrow cost-reliability trade-off of nuclear phase-out as a policy choice. It does NOT evaluate the safety or waste-management argument for phase-out — those are outside the outcome set and are legitimate welfare considerations the phase-out countries weighed in their decisions.
-- **Falsification rule:** PRIMARY (dispositive, requires data not yet on disk): the hypothesis is SUPPORTED if (i) mean log industrial electricity price 2010-2024 in the phase-out cohort (DEU, BEL, CHE) exceeds the retain cohort (FRA, FIN, SWE, USA, GBR) by at least 0.08 log-points (~8.3%) AND (ii) wholesale day-ahead volatility CoV is higher in phase-out cohort by at least 20% AND (iii) the effect survives a drop-2021-2024 sensitivity that excludes the gas shock. REFUTED if any one of (i)-(iii) flips sign with confident methodology. Method-validity failure (data gap, FRA 2022 availability shock not handled, pre-trend RMSPE > 0.5×post-RMSPE in synth control) yields INCONCLUSIVE not refuted.
-SURROGATE (testable today on OWID-Ember data): mean change in fossil share of electricity 2005→2024 in phase-out cohort minus retain cohort. The hypothesis predicts a positive gap (phase-out countries leaned harder on fossils for back-up). Surrogate- supports threshold = +5pp gap. Surrogate is informative-only — it does NOT settle the cost or volatility primaries.
+## Summary
 
-## Estimate (Callaway-Sant'Anna staggered DiD, TWFE approximation)
-- _Error:_ no outcome variable loaded
+- The spec's PRIMARY outcomes are industrial electricity price, wholesale day-ahead volatility, fossil-fired back-up capacity factor, and loss-of-load expectation. The first two and the fourth are **not on disk** — the IEA / Eurostat NRG_PC_205 / ENTSO-E fetchers are pending. The headline tests cannot be run with publisher-pinned data; verdict is structurally **inconclusive**.
+- The third primary (fossil back-up reliance) has an OWID-Ember surrogate: share-electricity-fossil-fuels. As a check on whether the testable piece points the way the spec predicts:
 
-## Variables resolved
+  - Phase-out cohort (DEU, BEL, CHE) fossil-share change 2005→2024: **-13.7pp**
+  - Retain cohort (FRA, FIN, SWE, USA, GBR) fossil-share change 2005→2024: **-18.2pp**
+  - Gap: **+4.5pp** (surrogate does NOT support the +5.0pp threshold)
 
-### Missing data
-- `constructed: IEA industrial electricity price (band IC, medium industry) + Eurostat NRG_PC_205 cross-check, USD/MWh constant 2020. Specialist IEA fetcher pending.` (outcome)
-- `constructed: annual coefficient of variation of day-ahead wholesale electricity prices (EPEX, Nord Pool, ENTSO-E transparency platform). Fetcher pending.` (outcome)
-- `constructed: ENTSO-E + EIA annual capacity factor of fossil-fired (gas + coal) plants, as proxy for back-up reliance. Fetcher pending.` (outcome)
-- `constructed: ENTSO-E MAF / NERC equivalent reserve-adequacy indicator; interpolation required across non-harmonised reporting. Fetcher pending and difficult.` (outcome)
-- `constructed: indicator = 1 in years after a country legislated a binding nuclear phase-out. DEU 2011+, BEL 2003+ (law), CHE 2017+ (referendum). USA, FRA, FIN, SWE, KOR, JPN = 0 (nuclear-retaining, though JPN has post-Fukushima effective pause — excluded for cleanness or coded as 'partial' in sensitivity).` (treatment)
-- `constructed: year-over-year change in nuclear share of electricity generation, BP Statistical Review / IEA electricity statistics. Continuous treatment intensity.` (treatment)
-- `constructed: TTF-equivalent natural gas price (EUR/MWh) to partial out gas-shock exposure common to gas-indexed markets. Fetcher pending.` (controls)
-- `constructed: IEA / IRENA wind + solar share of installed capacity. Fetcher pending.` (controls)
-- `constructed: ENTSO-E interconnection NTC / population. Fetcher pending.` (controls)
-- `world_bank_wdi:SP.POP.TOTL` (controls)
+- Treatment is verifiable: phase-out cohort nuclear-share declined materially while retain cohort held steady. See diagnostics.json for the country-level breakout.
+- Renewables build-out: phase-out cohort +30.9pp, retain cohort +24.0pp — phase-out countries deployed renewables harder, partially substituting for the removed nuclear capacity (consistent with the spec's acknowledged collinearity).
+- CO2-intensity of GDP: phase-out cohort -46.4%, retain cohort -46.1% — both decarbonising; phase-out cohort started higher and converged.
 
-_Generated by `scripts/run_did_callaway_santanna.py` at 2026-04-30T09:47:24+00:00_
+## Method
+
+Period: 2005–2024. Phase-out cohort: DEU, BEL, CHE. Retain cohort: FRA, FIN, SWE, USA, GBR. Sensitivity cohort (excluded from primary cohorts): JPN, KOR.
+
+**Why inconclusive, not refuted/supported:**
+
+Per HYPOTHESIS_FRAMEWORK_AUDIT.md §E2, a method-valid failure (here: data gap on the headline outcomes) yields `inconclusive`, NOT `refuted`. Substituting a different series for industrial-electricity-price would violate provenance. The surrogate (fossil share) is reported as informative evidence only — it shares the spec's spirit on back-up reliance but does NOT settle the cost-of-electricity primary.
+
+**Specialist fetchers needed for v2:**
+
+- iea:industrial_electricity_price (band IC) — fetcher pending
+- eurostat:NRG_PC_205 (industry electricity price) — series fetch pending
+- entsoe:day_ahead_wholesale_prices — fetcher pending
+- entsoe:fossil_capacity_factor — fetcher pending
+- entsoe:MAF_LOLE — fetcher pending
+
+## Data
+
+- owid:share-electricity-nuclear (Ember-derived; treatment verification)
+- owid:share-electricity-fossil-fuels (Ember-derived; surrogate for back-up reliance)
+- owid:share-electricity-renewables (Ember-derived; informative)
+- owid:co2-intensity (informative)
+
+## Caveats
+
+- France's 2022 reactor-availability crisis (stress-corrosion cracking, ~half the fleet derated) confounds the FRA-as-control story for the gas-shock window. Steelman point #1.
+- Gas-price shock 2022-2024 dominates any cost-outcome data and is geographically correlated with the phase-out cohort. Steelman point #2; the planned drop-2021-2024 sensitivity needs the missing price data.
+- BEL extended Doel 4 / Tihange 3 beyond planned phase-out; CHE phase-out is passive. Treatment intensity is heterogeneous (steelman point #5).
+- Safety / waste-management benefits — the actual reasons for phase-out — are unmeasured here. The hypothesis answers a narrow trade-off question, not a net-welfare question.

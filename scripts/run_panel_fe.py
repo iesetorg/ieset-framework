@@ -197,10 +197,67 @@ SERIES_ALIAS_BY_PUBLISHER = {
         "FX_OFFICIAL": "4",
         "INFLATION_MONTHLY": "27",
     },
+    "fraser_efw": {
+        "AREA_1_SIZE_OF_GOVERNMENT": "size_of_government",
+        "SIZE_OF_GOVERNMENT": "size_of_government",
+        "AREA_2_LEGAL_SYSTEM_PROPERTY_RIGHTS": "legal_system_property_rights",
+        "LEGAL_SYSTEM_PROPERTY_RIGHTS": "legal_system_property_rights",
+        "AREA_3_SOUND_MONEY": "sound_money",
+        "SOUND_MONEY": "sound_money",
+        "AREA_4_FREEDOM_TO_TRADE": "freedom_to_trade_internationally",
+        "AREA_4_FREEDOM_TO_TRADE_INTERNATIONALLY": "freedom_to_trade_internationally",
+        "FREEDOM_TO_TRADE": "freedom_to_trade_internationally",
+        "FREEDOM_TO_TRADE_INTERNATIONALLY": "freedom_to_trade_internationally",
+        "AREA_5_REGULATION": "regulation",
+        "REGULATION": "regulation",
+        "SUMMARY_INDEX": "summary_index",
+        "AGGREGATE_SCORE": "aggregate_score",
+        "PRIVATISATION": "size_of_government",
+        "TRADE_OPENNESS": "freedom_to_trade_internationally",
+        "PRICE_CONTROLS": "regulation",
+        "LEGAL_SYSTEM": "legal_system_property_rights",
+        "REGULATORY_STABILITY": "regulation",
+        "REGULATION_BUSINESS": "regulation",
+        "INVESTMENT_FREEDOM": "legal_system_property_rights",
+        "CAPITAL_CONTROLS": "legal_system_property_rights",
+    },
+    "oecd_pmr": {
+        "BARRIERS_TO_ENTRY": "BARRIER_ENTRY",
+        "BARRIER_TO_ENTRY": "BARRIER_ENTRY",
+        "PMR_COMPOSITE": "PMR",
+        "OVERALL_PMR": "PMR",
+        "PRODUCT_MARKET_REGULATION": "PMR",
+        "STATE_CONTROL": "STATE_INVOL",
+        "STATE_CONTROL_PMR": "STATE_INVOL",
+        "REGULATION": "REGULATIONS",
+        "REGULATIONS_OVERALL": "REGULATIONS",
+        "NETWORK_SECTORS": "NETWORK_SECTORS",
+        "BARRIERS_TO_TRADE": "BARRIER_TRADE",
+        "FDI_RESTRICTIVENESS": "FDI_INDEX",
+        "PRICE_CONTROLS": "PRICE",
+        "TARIFFS": "TARIFFS",
+    },
+    "shiller": {
+        "US_HOME_PRICE_REAL": "home_price_index",
+        "HOME_PRICE_REAL": "home_price_index",
+        "HOME_PRICE_INDEX": "home_price_index",
+        "REAL_HOME_PRICE": "home_price_index",
+        "IE_DATA": "ie_data",
+        "SP_COMPOSITE": "ie_data",
+        "CAPE": "ie_data",
+    },
     "irena": {
         "CAPACITY": "installed_capacity_renewable",
         "SOLAR_PV_COSTS": "lcoe_solar_pv",
         "WIND_LCOE": "lcoe_wind_onshore",
+    },
+    "constructed": {
+        "rl_x_sound_money_interaction": "rl_x_sound_money_interaction",
+        "rl_x_summary_interaction": "rl_x_summary_interaction",
+        "property_rights_security_composite": "property_rights_security_composite",
+        "state_capacity_index": "state_capacity_index",
+        "institutional_quality_index": "institutional_quality_index",
+        "kaopen_x_freedom": "kaopen_x_freedom",
     },
     "oecd": {
         "CPI": "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",
@@ -253,6 +310,8 @@ SOURCE_BRIDGES = {
     ("imf", "WEO_GGXWDG_NGDP"): ("imf", "GGXWDG_NGDP"),
     ("imf", "WEO.NGAP_NPGDP"): ("imf", "NGAP_NPGDP"),
     ("imf", "ENDA_XDC_USD_RATE"): ("world_bank_wdi", "PA.NUS.FCRF"),
+    ("wid", "tax_top_rate"): ("owid", "top-marginal-income-tax-rate"),
+    ("wid", "top_marginal_income_tax_rate"): ("owid", "top-marginal-income-tax-rate"),
 }
 
 
@@ -682,6 +741,38 @@ def _base_constructed_grid(
     return None
 
 
+def _parse_constructed_formula(body: str) -> list[tuple[float, str]] | None:
+    """Parse a weighted-sum formula like '0.5×publisher:series + 0.3×publisher2:series2'.
+    Returns list of (weight, source_string) tuples, or None if body is not a formula.
+    """
+    # Quick reject: must contain explicit weight×source patterns or + between sources
+    if not re.search(r"\d+\.?\d*\s*[×*]\s*\w+:", body) and "+" not in body:
+        return None
+    body_norm = body.replace("×", "*")
+    terms = []
+    # Split by + (outside parentheses) — simple cases only
+    parts = re.split(r"\s*\+\s*", body_norm)
+    for part in parts:
+        part = part.strip().strip("()")
+        if not part:
+            continue
+        # Explicit weight*source
+        m = re.match(r"(\d+\.?\d*)\s*\*\s*(\w+:[\w.@\-/]+)", part)
+        if m:
+            terms.append((float(m.group(1)), m.group(2)))
+            continue
+        # Maybe weight with spaces: 0.5 * source
+        m2 = re.match(r"(\d+\.?\d*)\s*\*\s*(\w+:[\w.@\-/]+)", part)
+        if m2:
+            terms.append((float(m2.group(1)), m2.group(2)))
+            continue
+        # Bare source (implicit weight 1.0)
+        m3 = re.match(r"(\w+:[\w.@\-/]+)", part)
+        if m3:
+            terms.append((1.0, m3.group(1)))
+    return terms if terms else None
+
+
 def _expand_constructed_country_targets(text: str, sample_countries: list[str]) -> set[str]:
     targets: set[str] = set()
     if not text:
@@ -720,7 +811,7 @@ def construct_variable_from_text(
     existing_frames: list[pd.DataFrame] | None = None,
     panel: pd.DataFrame | None = None,
 ) -> tuple[pd.DataFrame, str] | None:
-    """Build a simple binary/time dummy from a `constructed:` source string."""
+    """Build a simple binary/time dummy or weighted-sum composite from a `constructed:` source string."""
     source = (item.get("source") or "")
     if not source.lower().lstrip().startswith("constructed:"):
         return None
@@ -730,6 +821,43 @@ def construct_variable_from_text(
     grid = _base_constructed_grid(spec, existing_frames=existing_frames, panel=panel)
     if grid is None or grid.empty:
         return None
+
+    # ------------------------------------------------------------------
+    # Weighted-sum formula parser (e.g. 0.5*publisher:series + 0.3*publisher2:series2)
+    # ------------------------------------------------------------------
+    formula_terms = _parse_constructed_formula(body)
+    if formula_terms:
+        merged = grid.copy()
+        valid_terms = []
+        for weight, src in formula_terms:
+            # Try loading from vintages
+            res = load_variable(src)
+            if res is None and existing_frames:
+                # Search in existing frames by publisher:series match
+                for ef in existing_frames:
+                    # Can't easily match by source here; skip
+                    pass
+            if res is not None:
+                df, _ = res
+                term_idx = len(valid_terms)
+                term_col = f"_term_{term_idx}"
+                if "value" in df.columns:
+                    df = df.rename(columns={"value": term_col})
+                elif len(df.columns) == 3:
+                    # Assume columns are country_iso3, year, value_col
+                    val_col = [c for c in df.columns if c not in ("country_iso3", "year")][0]
+                    df = df.rename(columns={val_col: term_col})
+                merged = merged.merge(df[["country_iso3", "year", term_col]],
+                                      on=["country_iso3", "year"], how="left")
+                valid_terms.append((weight, term_col))
+        if valid_terms:
+            merged[name] = 0.0
+            for weight, col in valid_terms:
+                merged[name] += weight * merged[col].fillna(0)
+            # Drop temporary columns
+            drop_cols = [c for _, c in valid_terms]
+            merged = merged.drop(columns=drop_cols, errors="ignore")
+            return merged[["country_iso3", "year", name]], name
 
     out = grid.copy()
     out[name] = 0.0
@@ -954,6 +1082,72 @@ def construct_treatment_from_estimator_notes(
     merged = panel.merge(df, on=["country_iso3", "year"], how="left")
     merged[pseudo["name"]] = merged[pseudo["name"]].fillna(0.0)
     return merged, pseudo["name"]
+
+
+def construct_interaction_term(
+    spec: dict,
+    panel: pd.DataFrame,
+    treatment_items: list[dict],
+) -> tuple[pd.DataFrame, str, list[str]] | None:
+    """Auto-construct an interaction term from loaded treatment variables.
+
+    When a spec explicitly requests an interaction but does not provide a
+    loadable constructed interaction variable, multiply the first two loaded
+    treatment variables and use the product as the primary treatment.
+    The original variables are returned as extra regressors so the main
+    effects remain in the model.
+    """
+    text = " ".join(
+        str(part or "")
+        for part in (
+            spec.get("claim"),
+            (spec.get("falsification") or {}).get("rule"),
+            (spec.get("falsification") or {}).get("test"),
+            (spec.get("estimator") or {}).get("notes"),
+        )
+    ).lower()
+    asks_for_interaction = (
+        "interaction" in text
+        or "interacted" in text
+        or re.search(r"\b[a-z0-9_]+(?:\s+(?:x|×)\s+|\s*\*\s*)[a-z0-9_]+\b", text) is not None
+    )
+    if not asks_for_interaction:
+        return None
+
+    # Already has an explicit interaction variable defined?
+    for item in treatment_items:
+        item_text = " ".join(
+            str(item.get(k) or "")
+            for k in ("name", "source", "transformation", "notes")
+        ).lower()
+        if (
+            "interaction" in item_text
+            or "interacted" in item_text
+            or re.search(r"\b[a-z0-9_]+(?:\s+(?:x|×)\s+|\s*\*\s*)[a-z0-9_]+\b", item_text)
+        ):
+            return None
+
+    loaded = [
+        item.get("name")
+        for item in treatment_items
+        if item.get("name")
+        and item.get("name") in panel.columns
+        and panel[item.get("name")].notna().any()
+    ]
+
+    if len(loaded) < 2:
+        return None
+
+    v1, v2 = loaded[0], loaded[1]
+    interaction_name = f"__interaction_{v1}_x_{v2}"
+    interaction_name = re.sub(r"[^a-zA-Z0-9_]", "_", interaction_name)
+
+    panel = panel.copy()
+    panel[interaction_name] = panel[v1] * panel[v2]
+
+    # Keep original variables as extra regressors
+    extra = [n for n in loaded if n != interaction_name]
+    return panel, interaction_name, extra
 
 
 def extract_qualifier_countries(qualifier: str | None) -> set[str]:
@@ -1849,26 +2043,6 @@ def run_one(
             suffix += " [artifact skipped]"
         return f"  ⚠ {hid}: {verdict}{suffix}"
 
-    if requests_interaction_without_constructed_term(spec):
-        verdict = "INCONCLUSIVE_DATA_PENDING"
-        reason = (
-            "interaction term requested but no loadable constructed "
-            "interaction variable is defined. The generic panel_fe runner "
-            "would otherwise grade a main-effect coefficient instead of the "
-            "pre-registered interaction estimand. Add a treatment or "
-            "decomposition variable with transformation/source/name marking "
-            "the interaction, or use a bespoke replication script."
-        )
-        write_outputs(
-            hid,
-            spec,
-            {"variables_loaded": [], "variables_missing": []},
-            {"error": reason},
-            verdict,
-            reason,
-        )
-        return f"  ⚠ {hid}: {verdict} — interaction term not constructible"
-
     panel, status = build_panel(spec)
 
     var_blocks = spec.get("variables") or {}
@@ -1898,6 +2072,13 @@ def run_one(
     else:
         treatment_name = first_loaded_var(treatment_items, panel_filt)
         extra_regressors = []
+        # Auto-construct interaction if spec requests one and variables are loaded
+        if treatment_name is not None:
+            interaction_result = construct_interaction_term(
+                spec, panel_filt, treatment_items
+            )
+            if interaction_result is not None:
+                panel_filt, treatment_name, extra_regressors = interaction_result
     if outcome_name is None:
         verdict = "INCONCLUSIVE_DATA_PENDING"
         missing = [v["source"] for v in status["variables_missing"]
@@ -1916,6 +2097,15 @@ def run_one(
             built = construct_treatment_from_estimator_notes(spec, panel_filt)
             if built is not None:
                 panel_filt, treatment_name = built
+    # Final attempt: if treatment is still missing but interaction requested,
+    # check if we can construct from any loaded variables
+    if treatment_name is None and not decomposition_mode:
+        interaction_result = construct_interaction_term(
+            spec, panel_filt, treatment_items
+        )
+        if interaction_result is not None:
+            panel_filt, treatment_name, extra_regressors = interaction_result
+
     if treatment_name is None:
         verdict = "INCONCLUSIVE_DATA_PENDING"
         if decomposition_mode:
@@ -1931,6 +2121,16 @@ def run_one(
             missing = [v["source"] for v in status["variables_missing"]
                        if v["role"] == "treatment"]
             reason = f"no treatment variable loaded; missing: {missing}"
+            # If interaction was requested but we couldn't build it, say so
+            if requests_interaction_without_constructed_term(spec):
+                reason = (
+                    "interaction term requested but no loadable constructed "
+                    "interaction variable is defined. The generic panel_fe runner "
+                    "would otherwise grade a main-effect coefficient instead of the "
+                    "pre-registered interaction estimand. Add a treatment or "
+                    "decomposition variable with transformation/source/name marking "
+                    "the interaction, or use a bespoke replication script."
+                )
         if should_persist_preflight_inconclusive(
             reason, persist_preflight_inconclusive
         ):

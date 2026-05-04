@@ -65,6 +65,13 @@ def latest(pub: str, series: str) -> Path:
     return files[-1]
 
 
+def latest_optional(pub: str, series: str) -> Path | None:
+    try:
+        return latest(pub, series)
+    except FileNotFoundError:
+        return None
+
+
 def load_long(path: Path) -> pd.DataFrame:
     """Standard normaliser: keep (country_iso3, year, value) rows."""
     t = pq.read_table(path).to_pandas()
@@ -82,20 +89,33 @@ def load_long(path: Path) -> pd.DataFrame:
     return t.dropna(subset=["year", "value"])
 
 
+def load_pwt_csh_i(path: Path) -> pd.DataFrame:
+    """Load csh_i from either a single-series vintage or pwt_full."""
+    t = pq.read_table(path).to_pandas()
+    if "value" in t.columns:
+        return load_long(path)
+    if "csh_i" not in t.columns:
+        raise ValueError(f"{path}: no csh_i column")
+    out = t[["country_iso3", "country", "year", "csh_i"]].rename(columns={"csh_i": "value"})
+    out["year"] = pd.to_numeric(out["year"], errors="coerce")
+    out["value"] = pd.to_numeric(out["value"], errors="coerce")
+    return out.dropna(subset=["year", "value"])
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    csh_i_path = latest("pwt", "csh_i")
+    csh_i_path = latest_optional("pwt", "pwt_full") or latest("pwt", "csh_i")
     manifest = {
         "csh_i": {
             "publisher": "pwt",
-            "series": "csh_i",
+            "series": csh_i_path.name.split("@", 1)[0],
             "vintage_file": str(csh_i_path.relative_to(REPO_ROOT)),
             "sha256": sha256(csh_i_path),
         },
     }
 
-    raw = load_long(csh_i_path)
+    raw = load_pwt_csh_i(csh_i_path)
     panel = raw[
         raw["country_iso3"].isin(COUNTRIES)
         & raw["year"].between(PERIOD[0], PERIOD[1])

@@ -1,43 +1,34 @@
-# Result card — Canada real disposable income post-2015 (PROXY)
+# Result card — canada_real_disposable_income_post_2015
 
-**Verdict:** WEAKENED — both proxy specs (GDP-pc PPP β=-0.034 p=0.050; GDP-pc constant LCU β=-0.035 p=0.047) show negative Canadian post-2015 trajectory, but the YAML's true two-spec rule requires OECD household disposable income + WDI GNI-per-capita PPP, neither of which is present in the local vintages. Both available proxies measure pre-tax-and-transfer aggregate output rather than household disposable income. Verdict capped at WEAKENED pending v1.1 OECD Household Dashboard fetcher.
+**Verdict:** PARTIAL — coef=-0.01706, p=0.472 (above α=0.10); direction inconclusive
 
-## Data gate
+## Pre-registration
+- **Claim:** Canadian real household disposable income per capita has stagnated or grown more slowly than in comparable resource-plus-anglophone-plus-small- open-developed economies (USA, AUS, NZL, GBR, NOR, CHE) over 2015-2023, once adjusted for CPI and household size. The claim is narrowly about the household-sector purchasing-power trajectory — not aggregate output and not pre-tax labour earnings in isolation — because the relevant welfare metric for a household under the 2015-present Canadian policy mix is after-tax-and-transfer real income per capita. The hypothesis additionally tests whether, once housing costs are netted out (real disposable income net of shelter expenditure), the Canadian trajectory is worse than the headline series suggests, since Canadian house prices and rents rose substantially faster than the donor-pool average over the sample window.
+- **Falsification rule:** Not supported if β_canada_post_2015 is non-negative (>= 0) at p < 0.10 in both (a) the OECD household-disposable-income primary spec and (b) the WDI GNI-per-capita proxy spec. Supported-tentative if negative and significant in only one of the two specs. Supported if negative and significant in both, with the housing-netted specification reported as secondary evidence on real purchasing- power. If the transfer-share decomposition channel shows that transfer-share increases in Canada fully offset pre-tax wage weakness (i.e., disposable income after transfers tracks the donor pool even while pre-tax wages do not), the result card must report this explicitly: Canadian redistribution absorbed the market-income shock, and the "household-income stagnation" framing is inaccurate even if the "market-income stagnation" framing is accurate.
+- **Falsification test:** canada_post_2015_household_income_twfe_two_spec
 
-The YAML's primary outcome is OECD household net disposable income per capita.
-That dataflow is not present in the local vintages and the URN was flagged in
-the YAML as v1.1 fetcher requirement. The YAML's secondary proxy WDI GNI per
-capita PPP (NY.GNP.PCAP.PP.KD) is also not present in vintages. This run
-substitutes the closest available proxy — WDI GDP per capita PPP — and a second
-proxy WDI GDP per capita constant LCU. Both are aggregate-output proxies that
-do NOT net taxes, transfers, or cross-border income flows. Findings are labelled
-PROXY and capped at WEAKENED until OECD Household Dashboard ships.
+## Estimate
+- Method: linearmodels.PanelOLS
+- Coefficient (treatment): **-0.01706**
+- Std error: 0.02367
+- p-value: **0.472**
+- Observations: 162, countries: 7
+- Within R²: 0.689
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-## Proxy spec 1 — log GDP per capita PPP (constant intl $)
+## Variables resolved
+- `world_bank_wdi:NY.GNP.PCAP.PP.KD` → gni_per_capita_ppp_constant (outcome, publisher=world_bank_wdi, n=5109)
+- `constructed: indicator = 1 if country=CAN and year >= 2015; 0 otherwise.` → canada_post_2015 (treatment, publisher=constructed, n=168)
+- `bis:WS_SPP_RPP` → real_house_price_index (decomposition_channels, publisher=bis, n=2272)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `world_bank_wdi:FP.CPI.TOTL.ZG` → cpi_inflation_annual (controls, publisher=world_bank_wdi, n=9066)
+- `world_bank_wdi:TT.PRI.MRCH.XD.WD` → terms_of_trade_index (controls, publisher=world_bank_wdi, n=6478)
 
-| Term | Estimate | SE | 95% CI | p | t |
-|---|---:|---:|:---:|---:|---:|
-| canada_post_2015 | -0.0343 | 0.0174 | [-0.069, -0.000] | 0.050 | -1.98 |
+### Variables missing data
+- `oecd:OECD.SDD.NAD,DSD_NASEC_T14@DF_T14,1.0` (outcome, name=real_household_net_disposable_income_per_capita) — vintage not on disk
+- `oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARN,1.0` (outcome, name=real_wage_growth_cumulative) — vintage not on disk
+- `oecd:OECD.SDD.NAD,DSD_NASEC_T7HH@DF_T7HH,1.0` (decomposition_channels, name=household_debt_to_disposable_income) — vintage not on disk
+- `oecd:OECD.SDD.NAD,DSD_NASEC_T14@DF_T14,1.0 (net current transfers received component)` (decomposition_channels, name=net_transfers_share_of_household_income) — vintage not on disk
 
-n = 168 country-years.
-
-## Proxy spec 2 — log GDP per capita (constant LCU)
-
-| Term | Estimate | SE | 95% CI | p | t |
-|---|---:|---:|:---:|---:|---:|
-| canada_post_2015 | -0.0345 | 0.0172 | [-0.069, -0.000] | 0.047 | -2.01 |
-
-n = 168 country-years.
-
-## Caveat per YAML pre-registration
-
-Aggregate-output proxies cannot speak to the transfer-share decomposition channel
-(CCB enhancement, CPP enhancement, COVID transfers, $10/day childcare) which the
-YAML flags as the most important interpretive guard. If those transfers fully
-offset pre-tax wage weakness in household disposable income, the household-stagnation
-framing would be inaccurate even if aggregate-output stagnation is real. This
-decomposition cannot be performed at v1; flagged for v1.1 OECD Household Dashboard run.
-
-## Provenance
-
-Reproduces from vintages in `manifest.yaml`. See `replication.py`.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:25:31+00:00_

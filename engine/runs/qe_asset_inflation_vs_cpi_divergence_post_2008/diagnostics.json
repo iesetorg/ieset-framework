@@ -1,61 +1,121 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient obs (16); LP needs >=50",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "insufficient obs (16); LP needs >=50",
-  "hypothesis_id": "qe_asset_inflation_vs_cpi_divergence_post_2008",
-  "template": "local_projections",
-  "claim_direction_inferred": "?",
-  "falsification_rule_text": "PRIMARY A (dispositive): for each country i in {USA, GBR, JPN, DEU, FRA, ITA, ESP, NLD}, define\n  GAP_i(h) = log(real_asset_index_i(h) / real_asset_index_i(2008))\n           - log(cpi_index_i(h) / cpi_index_i(2008))\nwhere the asset index is the equal-weighted REAL ASSET BASKET of three classes \u2014 (1) equity total return, (2) residential property price, (3) long-dated sovereign bond price index. A country counts toward the panel ONLY if at least 2 of 3 asset-class series are on disk; single-asset substitution does NOT satisfy the basket requirement and the country is dropped with a method-validity flag. The v1 spec (single-asset using Shiller for USA + BIS residential property for the other seven) was an unfair test because European house prices were weak 2008-2020 for idiosyncratic reasons (Spain crash, Italy flat, Germany sub-trend until 2015) while DAX/CAC/FTSE/Nikkei roughly doubled-to-tripled over the same window \u2014 i.e. the QE-portfolio-rebalancing channel operates precisely through the equity / long-bond legs that v1 omitted. v2 corrects this. The hypothesis is SUPPORTED iff at least 5 of 8 countries have GAP_i(2020) >= 0.30 log-points (~+35 pp asset-vs-CPI excess) on a qualifying basket. PRIMARY B (sanity check on regime-conditionality): at least 4 of the eligible countries (those with GAP_i(2020) > 0) must narrow the gap by at least 25 % between 2020 and 2023, i.e. GAP_i(2023) <= 0.75 * GAP_i(2020). The 25 % bar is weaker than the original 50 % because the post-2023 asset rally re-widened the gap in the US; promotion methodology_note records the change. REFUTED iff fewer than 3 of 8 countries cleared even a 0.10 log-point gap by 2020 (i.e. the divergence story does not survive a panel test). INFORMATIVE: per-country dispersion of GAP_2020; whether the USA central-bank balance sheet (FRED:WALCL / FRED:GDP) crossed 15 % in 2009-2020 (regime-confirmation indicator). METHOD_VALID: at least 5 of 8 countries must have BIS WS_LONG_CPI plus a qualifying asset basket (>=2 of {equity total return, residential property, sovereign bond price}) covering 2008-2020. If the gate fails \u2014 i.e. only residential property is available cross-country \u2014 emit `inconclusive \u2014 data gap on cross-country equity total returns and sovereign bond price indices`.",
-  "estimate": {
-    "error": "insufficient obs (16); LP needs >=50"
-  },
-  "data_status": {
-    "variables_loaded": [
-      {
-        "role": "outcome",
-        "name": "cumulative_real_equity_return",
-        "source": "shiller:ie_data (USA); bis:WS_SPP (all)",
-        "publisher": "shiller+bis",
-        "n_rows": 2371
-      },
-      {
-        "role": "outcome",
-        "name": "cumulative_real_house_price",
-        "source": "bis:WS_SPP",
-        "publisher": "bis",
-        "n_rows": 2272
-      },
-      {
-        "role": "outcome",
-        "name": "cumulative_core_cpi",
-        "source": "oecd:OECD.SDD.TPS,DSD_PRICES@DF_PRICES_N_CP,1.0; fred:CPILFESL (USA fallback)",
-        "publisher": "fred",
-        "n_rows": 70
-      },
-      {
-        "role": "treatment",
-        "name": "central_bank_balance_sheet_to_gdp",
-        "source": "fred:WALCL; fred:GDP; boj:monetary_base; fred:JPNASSETS",
-        "publisher": "fred",
-        "n_rows": 25
-      },
-      {
-        "role": "controls",
-        "name": "short_rate",
-        "source": "fred:DFF (USA); ecb:FM (EUR); boe:IUDSOIA (GBR); boj:policy_rate (JPN)",
-        "publisher": "fred+ecb+boe",
-        "n_rows": 136
-      },
-      {
-        "role": "controls",
-        "name": "output_gap",
-        "source": "oecd:OutputGap",
-        "publisher": "oecd",
-        "n_rows": 3331
-      }
-    ],
-    "variables_missing": []
-  },
-  "run_utc": "2026-05-01T08:59:40+00:00",
-  "runner": "scripts/run_local_projections.py"
+  "verdict": "refuted \u2014 Only 2 of 8 countries had even a 0.10 log-point asset-vs-CPI gap by 2020 (mean GAP_2020 = -0.02). The post-2008 divergence story does not survive a panel test.",
+  "all_pass": false,
+  "primary_a_pass": false,
+  "primary_b_pass": false,
+  "method_valid": true,
+  "n_countries_method_ok": 8,
+  "min_method_valid_countries": 5,
+  "n_above_primary_threshold": 1,
+  "n_above_refuted_floor": 2,
+  "n_narrowed_by_2023": 1,
+  "mean_gap_2020_log": -0.02087353589464759,
+  "mean_gap_2023_log": 0.2508401315675956,
+  "primary_a_threshold_log": 0.3,
+  "primary_a_min_countries": 5,
+  "primary_b_narrow_fraction": 0.25,
+  "primary_b_min_countries": 4,
+  "refuted_gap_floor_log": 0.1,
+  "qe_active_usa": true,
+  "walcl_to_gdp_2009_us": 0.14391872511638118,
+  "walcl_to_gdp_qe_threshold": 0.15,
+  "country_results": [
+    {
+      "country": "USA",
+      "iso2": "US",
+      "cpi_log_2020": 0.2217270858457901,
+      "cpi_log_2023": 0.38496125791263996,
+      "asset_log_2020": 0.7853045076031141,
+      "asset_log_2023": 0.9000638660542997,
+      "gap_2020": 0.563577421757324,
+      "gap_2023": 0.5151026081416596,
+      "asset_source": "shiller_real_total_return",
+      "method_ok": true
+    },
+    {
+      "country": "GBR",
+      "iso2": "GB",
+      "cpi_log_2020": 0.28497820336510327,
+      "cpi_log_2023": 0.46761898553306225,
+      "asset_log_2020": 0.17310795337130191,
+      "asset_log_2023": 0.2646778231787741,
+      "gap_2020": -0.11187024999380135,
+      "gap_2023": -0.20294116235428816,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    },
+    {
+      "country": "JPN",
+      "iso2": "JP",
+      "cpi_log_2020": 0.04694901293258718,
+      "cpi_log_2023": 0.10144162098438533,
+      "asset_log_2020": 0.09028460108112017,
+      "asset_log_2023": 0.23244434685613302,
+      "gap_2020": 0.04333558814853299,
+      "gap_2023": 0.1310027258717477,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    },
+    {
+      "country": "DEU",
+      "iso2": "DE",
+      "cpi_log_2020": 0.16644820720851441,
+      "cpi_log_2023": 0.32088456318615616,
+      "asset_log_2020": 0.4165372995547819,
+      "asset_log_2023": 0.42729962387553566,
+      "gap_2020": 0.2500890923462675,
+      "gap_2023": 0.1064150606893795,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    },
+    {
+      "country": "FRA",
+      "iso2": "FR",
+      "cpi_log_2020": 0.1443216457752837,
+      "cpi_log_2023": 0.2591553654334952,
+      "asset_log_2020": 0.08133043401516851,
+      "asset_log_2023": 0.14645313044169506,
+      "gap_2020": -0.06299121176011518,
+      "gap_2023": -0.11270223499180015,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    },
+    {
+      "country": "ITA",
+      "iso2": "IT",
+      "cpi_log_2020": 0.15536833318567664,
+      "cpi_log_2023": 0.3074392485130133,
+      "asset_log_2020": -0.23602721859348513,
+      "asset_log_2023": -0.23012754368007726,
+      "gap_2020": -0.39139555177916174,
+      "gap_2023": -0.5375667921930906,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    },
+    {
+      "country": "ESP",
+      "iso2": "ES",
+      "cpi_log_2020": 0.15568358680643762,
+      "cpi_log_2023": 0.3014300190909085,
+      "asset_log_2020": -0.19670964602061447,
+      "asset_log_2023": -0.1163292376755884,
+      "gap_2020": -0.3523932328270521,
+      "gap_2023": -0.4177592567664969,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    },
+    {
+      "country": "NLD",
+      "iso2": "NL",
+      "cpi_log_2020": 0.20931557246549984,
+      "cpi_log_2023": 0.36877180253420133,
+      "asset_log_2020": 0.10397542941632501,
+      "asset_log_2023": 0.27462498150630016,
+      "gap_2020": -0.10534014304917483,
+      "gap_2023": -0.09414682102790117,
+      "asset_source": "bis_residential_property",
+      "method_ok": true
+    }
+  ],
+  "missing_series": []
 }

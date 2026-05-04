@@ -1,32 +1,93 @@
 {
-  "verdict": "WEAKENED \u2014 both proxy specs (GDP-pc PPP \u03b2=-0.034 p=0.050; GDP-pc constant LCU \u03b2=-0.035 p=0.047) show negative Canadian post-2015 trajectory, but the YAML's true two-spec rule requires OECD household disposable income + WDI GNI-per-capita PPP, neither of which is present in the local vintages. Both available proxies measure pre-tax-and-transfer aggregate output rather than household disposable income. Verdict capped at WEAKENED pending v1.1 OECD Household Dashboard fetcher.",
-  "data_gate_status": "OECD household disposable income unavailable; WDI GNI-pc PPP also unavailable; falling back to GDP-pc PPP + GDP-pc constant LCU",
-  "proxy_ppp_twfe": {
-    "n_obs": 168,
-    "r2_within": 0.028646278871261255,
-    "coefs": {
-      "canada_post_2015": {
-        "estimate": -0.034337273998088017,
-        "se": 0.017360523397981303,
-        "ci_lo": -0.06866876413046949,
-        "ci_hi": -5.783865706543434e-06,
-        "p": 0.04996195709517015,
-        "t": -1.9778939385019223
-      }
-    }
+  "verdict": "PARTIAL \u2014 coef=-0.01706, p=0.472 (above \u03b1=0.10); direction inconclusive",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "coef=-0.01706, p=0.472 (above \u03b1=0.10); direction inconclusive",
+  "hypothesis_id": "canada_real_disposable_income_post_2015",
+  "template": "panel_fe",
+  "claim_direction_inferred": "-",
+  "falsification_rule_text": "Not supported if \u03b2_canada_post_2015 is non-negative (>= 0) at p < 0.10 in both (a) the OECD household-disposable-income primary spec and (b) the WDI GNI-per-capita proxy spec. Supported-tentative if negative and significant in only one of the two specs. Supported if negative and significant in both, with the housing-netted specification reported as secondary evidence on real purchasing- power. If the transfer-share decomposition channel shows that transfer-share increases in Canada fully offset pre-tax wage weakness (i.e., disposable income after transfers tracks the donor pool even while pre-tax wages do not), the result card must report this explicitly: Canadian redistribution absorbed the market-income shock, and the \"household-income stagnation\" framing is inaccurate even if the \"market-income stagnation\" framing is accurate.\n",
+  "falsification_test_text": "canada_post_2015_household_income_twfe_two_spec",
+  "estimate": {
+    "coefficient": -0.017063830963099203,
+    "std_error": 0.023668561037112106,
+    "p_value": 0.47225544521441387,
+    "n_obs": 162,
+    "n_countries": 7,
+    "r_squared_within": 0.6893130373299177,
+    "fe_entity": true,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "linearmodels.PanelOLS",
+    "dropped_controls_due_to_overlap": []
   },
-  "proxy_kd_twfe": {
-    "n_obs": 168,
-    "r2_within": 0.12906880010453836,
-    "coefs": {
-      "canada_post_2015": {
-        "estimate": -0.034513465621283615,
-        "se": 0.017212340981099954,
-        "ci_lo": -0.06855191601826482,
-        "ci_hi": -0.0004750152243024053,
-        "p": 0.046930815275531,
-        "t": -2.0051581396848457
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "gni_per_capita_ppp_constant",
+        "source": "world_bank_wdi:NY.GNP.PCAP.PP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 5109
+      },
+      {
+        "role": "treatment",
+        "name": "canada_post_2015",
+        "source": "constructed: indicator = 1 if country=CAN and year >= 2015; 0 otherwise.",
+        "publisher": "constructed",
+        "n_rows": 168
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "real_house_price_index",
+        "source": "bis:WS_SPP_RPP",
+        "publisher": "bis",
+        "n_rows": 2272
+      },
+      {
+        "role": "controls",
+        "name": "log_population",
+        "source": "world_bank_wdi:SP.POP.TOTL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16935
+      },
+      {
+        "role": "controls",
+        "name": "cpi_inflation_annual",
+        "source": "world_bank_wdi:FP.CPI.TOTL.ZG",
+        "publisher": "world_bank_wdi",
+        "n_rows": 9066
+      },
+      {
+        "role": "controls",
+        "name": "terms_of_trade_index",
+        "source": "world_bank_wdi:TT.PRI.MRCH.XD.WD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 6478
       }
-    }
-  }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "real_household_net_disposable_income_per_capita",
+        "source": "oecd:OECD.SDD.NAD,DSD_NASEC_T14@DF_T14,1.0"
+      },
+      {
+        "role": "outcome",
+        "name": "real_wage_growth_cumulative",
+        "source": "oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARN,1.0"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "household_debt_to_disposable_income",
+        "source": "oecd:OECD.SDD.NAD,DSD_NASEC_T7HH@DF_T7HH,1.0"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "net_transfers_share_of_household_income",
+        "source": "oecd:OECD.SDD.NAD,DSD_NASEC_T14@DF_T14,1.0 (net current transfers received component)"
+      }
+    ]
+  },
+  "run_utc": "2026-05-03T06:25:31+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

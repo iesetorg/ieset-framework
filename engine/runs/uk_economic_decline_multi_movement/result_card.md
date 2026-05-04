@@ -1,36 +1,28 @@
-# Result card — UK economic decline multi-movement
+# Result card — uk_economic_decline_multi_movement
 
-**Verdict:** SUPPORTED — UK diverged negatively from anglophone/advanced donor pool starting 2008 (β=-0.034, p=1.0e-05, |t|=4.54σ). Brexit-specific second wave β=-0.012 p=0.204 — direction-correct but noise-level, informative only. Synthetic-control robustness: UK below counterfactual in 100% of post-2016 years (passes 60% informative threshold).
+**Verdict:** PARTIAL — coef=-0.07641, p=0.377 (above α=0.10); direction inconclusive
 
-## Primary spec (TWFE with donor dummies + time FE)
+## Pre-registration
+- **Claim:** UK GDP per capita (PPP, constant international dollars) diverged negatively from a matched synthetic counterfactual of similar-income anglophone/developed economies (USA, CAN, AUS, NZL, DEU, NLD, CHE) starting around 2008 and widening post-2016 (Brexit referendum). The cumulative divergence by 2023 is meaningfully large and not explained by measurement differences or demographic composition. The policy- content fingerprint of UK decline is a combination of planning- restriction supply constraint + pro-cyclical fiscal stance 2001–2010 + austerity 2010–2016 + Brexit trade friction + industrial-energy-cost regime; no single movement is the decline, but the cumulative effect is identifiable.
+- **Falsification rule:** PRIMARY (dispositive): the hypothesis is SUPPORTED if β_uk_post_2008 < 0 at p < 0.10 — UK diverged negatively from the anglophone-peer counterfactual starting around 2008. REFUTED if the coefficient is zero or positive at that significance. INFORMATIVE (not gating): β_uk_post_brexit — a second-wave brexit- specific coefficient. A significant negative is expected evidence of a marginal brexit effect; a direction-correct insignificant coefficient (as v1 run showed, β=-0.012, p=0.20) is noise-level mechanism colour, not refutation of the primary claim. INFORMATIVE (not gating): synthetic-control coverage of UK-below- counterfactual in ≥60% of post-2016 years — a robustness check, not a separate falsification gate.
+- **Falsification test:** uk_decline_panel_fe_and_synthetic_control
 
-| Term | Estimate | SE | 95% CI | p | t | Expected | Pass? |
-|---|---:|---:|:---:|---:|---:|:---:|:---:|
-| uk_post_2008 | -0.0344 | 0.0076 | [-0.049, -0.019] | 0.000 | -4.54 | − | ✓ |
-| uk_post_brexit | -0.0116 | 0.0091 | [-0.030, +0.006] | 0.204 | -1.27 | − | ✗ |
+## Estimate
+- Method: statsmodels OLS FE fallback (linearmodels failed: 'uk_post_2008')
+- Coefficient (treatment): **-0.07641**
+- Std error: 0.08652
+- p-value: **0.377**
+- Observations: 224, countries: 8
+- Within R²: 0.989
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-n = 224 country-years. Donor pool: USA, CAN, AUS, NZL, DEU, NLD, CHE.
+## Variables resolved
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → log_gdp_pc_ppp (outcome, publisher=world_bank_wdi, n=8325)
+- `constructed: indicator = 1 if country=GBR and year >= 2008; 0 otherwise. Tests whether UK trajectory deviates from donor pool from the GFC onward.` → uk_post_2008 (treatment, publisher=constructed, n=224)
+- `constructed: indicator = 1 if country=GBR and year >= 2016; 0 otherwise. Tests whether UK deviates further after the Brexit referendum.` → uk_post_brexit (treatment, publisher=constructed, n=224)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `world_bank_wdi:SP.URB.TOTL.IN.ZS` → urbanisation (controls, publisher=world_bank_wdi, n=16965)
+- `world_bank_wdi:NE.TRD.GNFS.ZS` → trade_openness (controls, publisher=world_bank_wdi, n=10714)
 
-## Synthetic control gap analysis
-
-Donor weights (sum=1): {'USA': 0.0, 'CAN': 0.22208608724374368, 'AUS': 0.2633004259008625, 'NZL': 0.39566800656819895, 'DEU': 2.254759813669794e-17, 'NLD': 0.11894548028719482, 'CHE': 2.1158630023824165e-17}
-Pre-treatment fit RMSE (1996-2007): 0.0081 log-points
-Post-2008 avg gap (UK actual − synthetic): -0.051 log-points
-Post-2016 avg gap: -0.058 log-points
-Post-2016 fraction of years UK below synthetic: 100%
-
-## Interpretation
-
-All pre-registered thresholds met. UK trajectory diverged negatively from matched donor pool after 2008 (β=-0.034), with incremental decline post-2016 (β=-0.012). Synthetic control confirms: UK below synthetic counterfactual in 100% of post-2016 years. Consistent with user's framing that UK decline is real relative to comparable economies.
-
-## Steelman-live concerns
-
-1. Donor pool (NLD, CHE) may be cherry-picked small-high-institutional economies
-2. 2008 treatment date captures global GFC + UK-specific response; disentangling requires further work
-3. Post-2016 window dominated by Brexit + COVID + energy crisis; confound
-4. UK has cumulative multi-movement decline (planning + energy + Brexit + Brown + austerity); single-coefficient aggregation underspecifies the causal story
-5. PPP GDP per capita understates sterling-depreciation-driven nominal-USD decline but arguably overcounts real-decline
-
-## Provenance
-
-Reproduces from vintages in `manifest.yaml`. See `replication.py`.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:11:35+00:00_

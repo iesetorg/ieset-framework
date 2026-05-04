@@ -7,7 +7,7 @@ Steelman: hypotheses/steelman/german_manufacturing_va_decline_2017_2024.md
 Descriptive structural-decomposition analysis (SDA).
 
 Step 1: Document the manufacturing-VA-share trajectory for DEU vs peer
-        pool (FRA, ITA, NLD, SWE) using Eurostat nama_10_a64 (NACE C
+        pool (FRA, ITA, NLD, SWE) using Eurostat nama_10r_3gva (NACE C
         share of TOTAL, B1G basis, current-price). Test pre-registered
         2017-2024 share-change >= -2pp threshold.
 
@@ -23,15 +23,14 @@ Step 3: Channel-share attribution (via β attenuation when each channel
 DEVIATIONS from spec:
 - Eurostat NRG_PC_205 industrial electricity price not in vintages;
   energy-cost channel proxied indirectly via REER (BIS WS_EER) +
-  log unit labour cost (Eurostat lc_lci_r2_a manufacturing D11
-  wages-and-salaries index).
+  log unit labour cost (Eurostat nama_10_lp_ulc NULC_HW index).
 - OECD STAN manufacturing hours not in vintages; manufacturing
   employment-share channel skipped.
 - OECD TiVA China import penetration channel not in vintages;
   channel skipped (flagged in deviations).
 - External-demand channel not constructed (would require
   trade-weighted destination GDP from OECD or Comtrade).
-- Sample period clipped to 2010-2023 (Eurostat REER + lc_lci data
+- Sample period clipped to 2010-2023 (Eurostat REER + ULC data
   bounds); 2024 final values incomplete.
 """
 from __future__ import annotations
@@ -92,8 +91,9 @@ def load_long_wdi(path: Path, var: str) -> pd.DataFrame:
 def load_eurostat_manuf_share(path: Path) -> pd.DataFrame:
     """Manufacturing (NACE C) gross value-added share of total economy GVA."""
     t = pq.read_table(path).to_pandas()
-    sub = t[(t["na_item"] == "B1G") & (t["unit"] == "CP_MEUR") &
-            (t["nace_r2"].isin(["C", "TOTAL"]))].copy()
+    sub = t[(t["unit"] == "CP_MEUR") & (t["nace_r2"].isin(["C", "TOTAL"]))].copy()
+    if "na_item" in sub.columns:
+        sub = sub[sub["na_item"] == "B1G"].copy()
     sub["year"] = sub["period"].astype(int)
     sub["value"] = pd.to_numeric(sub["value"], errors="coerce")
     pivot = sub.pivot_table(index=["geo_code", "year"], columns="nace_r2",
@@ -107,10 +107,15 @@ def load_eurostat_manuf_share(path: Path) -> pd.DataFrame:
 
 
 def load_eurostat_manuf_lci(path: Path) -> pd.DataFrame:
-    """Manufacturing wage cost index (NACE C, D11 wages-and-salaries, 2020=100)."""
+    """Unit-labour-cost proxy, preferring manufacturing LCI when available."""
     t = pq.read_table(path).to_pandas()
-    sub = t[(t["nace_r2"] == "C") & (t["lcstruct"] == "D11") &
-            (t["unit"] == "I20")].copy()
+    if {"nace_r2", "lcstruct"}.issubset(t.columns):
+        sub = t[(t["nace_r2"] == "C") & (t["lcstruct"] == "D11") &
+                (t["unit"] == "I20")].copy()
+    else:
+        # On-disk Eurostat vintage is the national-accounts ULC dataset, not
+        # the labour-cost-index-by-NACE dataset used in the first draft.
+        sub = t[(t["na_item"] == "NULC_HW") & (t["unit"] == "I20")].copy()
     sub["year"] = sub["period"].astype(int)
     sub["value"] = pd.to_numeric(sub["value"], errors="coerce")
     sub["country"] = sub["geo_code"].map(EU2ISO3)
@@ -139,14 +144,14 @@ def load_bis_reer(path: Path) -> pd.DataFrame:
 def assemble() -> tuple[pd.DataFrame, dict]:
     manifest, frames = {}, []
 
-    p = latest("eurostat", "nama_10_a64")
-    manifest["manuf_va_share"] = {"publisher": "eurostat", "series": "nama_10_a64",
+    p = latest("eurostat", "nama_10r_3gva")
+    manifest["manuf_va_share"] = {"publisher": "eurostat", "series": "nama_10r_3gva",
                                   "vintage_file": str(p.relative_to(REPO_ROOT)),
                                   "sha256": sha256(p)}
     frames.append(load_eurostat_manuf_share(p))
 
-    p = latest("eurostat", "lc_lci_r2_a")
-    manifest["manuf_wage_cost_idx"] = {"publisher": "eurostat", "series": "lc_lci_r2_a",
+    p = latest("eurostat", "nama_10_lp_ulc")
+    manifest["manuf_wage_cost_idx"] = {"publisher": "eurostat", "series": "nama_10_lp_ulc",
                                        "vintage_file": str(p.relative_to(REPO_ROOT)),
                                        "sha256": sha256(p)}
     frames.append(load_eurostat_manuf_lci(p))
@@ -304,11 +309,11 @@ def main() -> int:
         "hypothesis_id": HID, "run_utc": pd.Timestamp.utcnow().isoformat(),
         "vintages": manifest,
         "deviations": [
-            "Outcome: Eurostat nama_10_a64 NACE-C share of TOTAL B1G (current price) replaces WDI NV.IND.MANF.CD (not in vintages).",
-            "Energy-cost channel: NRG_PC_205 industrial electricity price not in vintages; proxied via BIS REER + Eurostat lc_lci_r2_a manufacturing wage-cost index (D11, 2020=100).",
+            "Outcome: Eurostat nama_10r_3gva NACE-C share of TOTAL GVA (current price) replaces WDI NV.IND.MANF.CD in the bespoke decomposition.",
+            "Energy-cost channel: NRG_PC_205 industrial electricity price not in vintages; proxied via BIS REER + Eurostat nama_10_lp_ulc national-accounts ULC index (NULC_HW, 2020=100).",
             "Chinese import-penetration channel: OECD TiVA not in vintages; channel skipped.",
             "External-demand channel: trade-weighted destination GDP not constructed; channel skipped.",
-            "Period clipped to 2010-2023 (Eurostat lc_lci coverage); 2024 not yet final.",
+            "Period clipped to 2010-2023 for balanced peer coverage in the decomposition; 2024 not yet final for all peers.",
         ],
     }, sort_keys=False))
 
@@ -350,8 +355,8 @@ def main() -> int:
         "",
         "## Deviations from pre-registration",
         "",
-        "- Eurostat nama_10_a64 (NACE-C share of TOTAL B1G, current price) substitutes WDI NV.IND.MANF.CD (not in vintages).",
-        "- Energy-cost channel: NRG_PC_205 not in vintages; substituted via BIS REER (broad basket) and Eurostat lc_lci_r2_a manufacturing wage-cost index (D11). The substitution captures cost-competitiveness but NOT the energy-specific Energiewende+gas-shock pathway directly.",
+        "- Eurostat nama_10r_3gva (NACE-C share of TOTAL GVA, current price) supplies the manufacturing-share trajectory.",
+        "- Energy-cost channel: NRG_PC_205 not in vintages; substituted via BIS REER (broad basket) and Eurostat nama_10_lp_ulc national-accounts ULC index. The substitution captures cost-competitiveness but NOT the energy-specific Energiewende+gas-shock pathway directly.",
         "- China import-penetration channel and external-demand channel both skipped (TiVA + trade-weighted destination GDP not in vintages).",
         "- Period clipped to 2010-2023; final 2024 numbers will require re-run when data refreshes.",
         "",

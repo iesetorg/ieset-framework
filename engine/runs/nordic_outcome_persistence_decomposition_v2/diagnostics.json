@@ -1,82 +1,121 @@
 {
-  "verdict": "partially supported (primary outcome improved materially but did not meet 0.30 threshold)",
-  "material_delta_primary": true,
-  "per_outcome": {
-    "log_gdp_pc_ppp": {
-      "v1_residual_share": 0.7605691173440196,
-      "v2_residual_share": 0.43180710079055373,
-      "delta_vs_v1": -0.3287620165534658,
-      "threshold": 0.3,
-      "pass": false
-    },
-    "gini": {
-      "v1_residual_share": 0.8294962226905827,
-      "v2_residual_share": 0.5204326360175101,
-      "delta_vs_v1": -0.30906358667307254,
-      "threshold": 0.5,
-      "pass": false
-    },
-    "unemployment": {
-      "v1_residual_share": 0.08809183759076006,
-      "v2_residual_share": 0.3835015894321611,
-      "delta_vs_v1": 0.29540975184140106,
-      "threshold": 0.5,
-      "pass": true
-    }
+  "verdict": "PARTIAL \u2014 coef=-0.1405, p=0.185 (above \u03b1=0.10); direction inconclusive",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "coef=-0.1405, p=0.185 (above \u03b1=0.10); direction inconclusive",
+  "hypothesis_id": "nordic_outcome_persistence_decomposition_v2",
+  "template": "panel_fe_decomposition",
+  "claim_direction_inferred": "?",
+  "falsification_rule_text": "Not supported if the Nordic-dummy coefficient after including the eight decomposition channels (v1 three + v2 five) plus two controls and year fixed effects remains greater than 30% of the baseline Nordic-dummy coefficient on the primary outcome (log GDP per capita PPP). Secondary thresholds: residual_share(gini) \u2264 0.50, residual_share(unemployment) \u2264 0.50. All three must hold for v2 support. Additional falsifier: if v2's residual_share(log_gdp_pc_ppp) is not materially lower than v1's 0.98 (say, within 0.10), v2 is refuted as a specification- expansion explanation \u2014 the residual survives channel expansion and the story is not omitted-variable bias but rather a structural limitation of cross-sectional decomposition on this sample.\n",
+  "falsification_test_text": "nordic_dummy_residual_share_across_outcomes_v2",
+  "estimate": {
+    "coefficient": -0.1405389072739378,
+    "std_error": 0.10576234896429346,
+    "p_value": 0.1853165811631723,
+    "n_obs": 250,
+    "n_countries": 10,
+    "r_squared_within": -1.1783367712119728,
+    "fe_entity": false,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "linearmodels.PanelOLS",
+    "dropped_controls_due_to_overlap": []
   },
-  "leave_one_out_primary": [
-    {
-      "dropped": "gov_eff",
-      "nordic_coef": 0.22974829013180045,
-      "residual_share": 0.4744556915672054
-    },
-    {
-      "dropped": "rule_of_law",
-      "nordic_coef": 0.23805144319010413,
-      "residual_share": 0.4916026232122934
-    },
-    {
-      "dropped": "debt_gdp",
-      "nordic_coef": 0.19288480850564052,
-      "residual_share": 0.39832851491452576
-    },
-    {
-      "dropped": "cc",
-      "nordic_coef": 0.20827613909130963,
-      "residual_share": 0.4301133190276439
-    },
-    {
-      "dropped": "rq",
-      "nordic_coef": 0.22196120357339266,
-      "residual_share": 0.45837449446126155
-    },
-    {
-      "dropped": "net_lending_gdp",
-      "nordic_coef": 0.23979488190537546,
-      "residual_share": 0.4952030174562922
-    },
-    {
-      "dropped": "current_account_gdp",
-      "nordic_coef": 0.2670835777245794,
-      "residual_share": 0.5515571998505987
-    },
-    {
-      "dropped": "trade_openness",
-      "nordic_coef": 0.19828046663181453,
-      "residual_share": 0.40947114716761235
-    }
-  ],
-  "vifs": {
-    "gov_eff": 17.99,
-    "rule_of_law": 34.98,
-    "debt_gdp": 6.37,
-    "cc": 20.0,
-    "rq": 10.24,
-    "net_lending_gdp": 2.48,
-    "current_account_gdp": 2.7,
-    "trade_openness": 1.97,
-    "log_population": 4.09,
-    "urbanisation": 1.75
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "gdp_per_capita_ppp_constant",
+        "source": "world_bank_wdi:NY.GDP.PCAP.PP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 8325
+      },
+      {
+        "role": "outcome",
+        "name": "gini_disposable_income",
+        "source": "world_bank_wdi:SI.POV.GINI",
+        "publisher": "world_bank_wdi",
+        "n_rows": 2430
+      },
+      {
+        "role": "outcome",
+        "name": "unemployment_rate",
+        "source": "world_bank_wdi:SL.UEM.TOTL.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 8071
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "government_effectiveness",
+        "source": "wgi:GOV_WGI_GE.EST",
+        "publisher": "wgi",
+        "n_rows": 5168
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "rule_of_law",
+        "source": "wgi:GOV_WGI_RL.EST",
+        "publisher": "wgi",
+        "n_rows": 5296
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "debt_to_gdp_imf",
+        "source": "imf:GGXWDG_NGDP",
+        "publisher": "imf",
+        "n_rows": 8113
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "control_of_corruption",
+        "source": "wgi:GOV_WGI_CC.EST",
+        "publisher": "wgi",
+        "n_rows": 5201
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "regulatory_quality",
+        "source": "wgi:GOV_WGI_RQ.EST",
+        "publisher": "wgi",
+        "n_rows": 5169
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "fiscal_net_lending_gdp",
+        "source": "imf:GGXCNL_NGDP",
+        "publisher": "imf",
+        "n_rows": 8848
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "current_account_gdp",
+        "source": "imf:BCA_NGDPD",
+        "publisher": "imf",
+        "n_rows": 10556
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "trade_openness",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10714
+      },
+      {
+        "role": "controls",
+        "name": "log_population",
+        "source": "world_bank_wdi:SP.POP.TOTL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16935
+      },
+      {
+        "role": "controls",
+        "name": "urbanisation",
+        "source": "world_bank_wdi:SP.URB.TOTL.IN.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16965
+      }
+    ],
+    "variables_missing": []
   },
-  "all_pass": false
+  "run_utc": "2026-05-03T06:12:21+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

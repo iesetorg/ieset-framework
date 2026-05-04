@@ -1,39 +1,34 @@
-# Result card — Spain Sánchez economic trajectory 2018-2023
+# Result card — spain_sanchez_economic_trajectory_2018_2023
 
-**Verdict:** PARTIAL — pattern does not cleanly match either uniform direction. output β = -0.003 p=0.906; housing-affordability β = -0.139 p=0.082.
+**Verdict:** PARTIAL — coef=-0.01641, p=0.666 (above α=0.10); direction inconclusive
 
-## Multi-outcome TWFE (definition-controlled sub-analyses)
+## Pre-registration
+- **Claim:** Spain's headline macroeconomic trajectory under the 2018-present PSOE-led governments is NOT uniformly worse than a peer euro-area donor pool, once euro-area-common shocks (COVID 2020-2021, 2022 energy shock, ECB rate cycle) are absorbed by year fixed effects. Specifically: (a) on GDP per capita (PPP, constant) Spain tracks or slightly outperforms the euro- periphery donor pool 2018-2023, with a strong 2023 recovery year; (b) on the employment rate (15-64) Spain narrows its gap to the donor pool; (c) on unemployment Spain remains the highest in the pool in levels but the 2018-2023 change is broadly comparable to peers; (d) BUT on real wages net of housing costs and on house-price-to-income ratios Spain's trajectory is materially weaker, particularly in the 2022-2023 energy and rental-cost period. The hypothesis is deliberately nuanced: it pre-registers the expectation that the "Spain is doing badly under Sánchez" framing is UNSUPPORTED on headline output and employment metrics, and that the defensible negative-trajectory finding is on housing affordability and real wages net of housing, not on aggregate growth.
+- **Falsification rule:** The hypothesis is SUPPORTED if the pre-registered pattern holds: β_spain_post_2018 is non-negative on (log GDP pc, employment rate) AND negative on (real house price to income, real wage net of housing), all at p < 0.10. The hypothesis is REJECTED if Spain is uniformly negative (i.e., also negative on headline output and employment) — this would indicate the "Spain is doing badly" framing is correct in the aggregate, contrary to the framework's pre- registered nuanced expectation. The hypothesis is also REJECTED in the opposite direction if Spain is uniformly positive (including on housing and real wages) — this would indicate the critics' housing concerns are not data-supported. Either uniform direction falsifies the nuanced framing; only the pre-registered differentiated pattern supports it.
+- **Falsification test:** spain_post_2018_twfe_multi_outcome
 
-Each outcome reports β_spain_post_2018 separately to test the pre-registered
-DIFFERENTIATED pattern (non-negative on output, negative on housing-affordability).
+## Estimate
+- Method: linearmodels.PanelOLS
+- Coefficient (treatment): **-0.01641**
+- Std error: 0.0379
+- p-value: **0.666**
+- Observations: 171, countries: 9
+- Within R²: 0.692
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-| Outcome | β | SE | 95% CI | p | t | n |
-|---|---:|---:|:---:|---:|---:|---:|
-| log GDP pc PPP (output — expect ≥0) | -0.0030 | 0.0249 | [-0.052, +0.046] | 0.906 | -0.12 | 152 |
-| unemployment rate (lower=better) | -3.3736 | 1.2849 | [-5.924, -0.823] | 0.010 | -2.63 | 124 |
-| log house-price index (raw) | -0.1644 | 0.0879 | [-0.339, +0.010] | 0.064 | -1.87 | 124 |
-| log HPI / log GDP pc (affordability — expect >0 = worse) | -0.1386 | 0.0788 | [-0.295, +0.018] | 0.082 | -1.76 | 124 |
+## Variables resolved
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → log_gdp_pc_ppp_constant (outcome, publisher=world_bank_wdi, n=8325)
+- `eurostat:lfsi_emp_a` → employment_rate_15_64 (outcome, publisher=eurostat, n=634)
+- `eurostat:une_rt_a` → unemployment_rate_harmonised (outcome, publisher=eurostat, n=634)
+- `constructed: indicator = 1 if country=ESP and year >= 2018; 0 otherwise. Tests whether Spanish trajectory deviates from the euro-area donor pool from the June 2018 PSOE government onward.` → spain_post_2018 (treatment, publisher=constructed, n=171)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `world_bank_wdi:NE.TRD.GNFS.ZS` → trade_openness (controls, publisher=world_bank_wdi, n=10714)
+- `world_bank_wdi:NE.GDI.FTOT.ZS` → log_gross_fixed_capital_formation_pct_gdp (controls, publisher=world_bank_wdi, n=9870)
 
-Donor pool: FRA, ITA, PRT, GRC, DEU, NLD, BEL. IRL excluded from baseline (FDI distortion).
+### Variables missing data
+- `oecd:OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,1.0` (outcome, name=real_house_price_to_income_index) — vintage not on disk
+- `oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARN,1.0` (outcome, name=real_wage_index) — vintage not on disk
+- `constructed: 1 if country uses euro as of year, 0 otherwise. Absorbed by country FE but retained for interaction robustness.` (controls, name=euro_area_indicator) — vintage not on disk
 
-## Missing v1 outcomes (data-gated)
-
-- employment_rate_15_64 — Eurostat lfsi_emp_a not in local vintages
-- real_wage_index — OECD DF_EARN not in local vintages
-- OECD analytical real house-price-to-income — URN unverified, not in vintages
-
-Substituted: log(Eurostat HPI) / log(WDI GDP pc PPP) as a housing-affordability
-proxy. The proxy is upper-bound conservative because it uses national-average
-GDP per capita rather than household disposable income (which grew slower in
-Spain than GDP per capita).
-
-## Steelman concerns
-
-1. Donor pool is euro-area-only by design; pure monetary-regime confound absorbed.
-2. 2018 cutoff covers Sánchez but year FE absorb COVID + energy + ECB shocks common to euro-area.
-3. Housing-affordability mechanism may be Spain-supply-constraint (tourism, short-let, Madrid-Barcelona concentration) rather than Sánchez-policy-content.
-4. The HPI/GDPpc proxy is a coarser measure than OECD's real-house-price-to-income; sign should be informative even if magnitude is biased.
-
-## Provenance
-
-Reproduces from vintages in `manifest.yaml`. See `replication.py`.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:11:27+00:00_

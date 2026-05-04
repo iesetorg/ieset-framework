@@ -1,46 +1,30 @@
-# Result card — Nordic outcome persistence decomposition
+# Result card — nordic_outcome_persistence_decomposition
 
-**Verdict:** weakened — primary outcome residual share exceeds 0.30 threshold
+**Verdict:** PARTIAL — coef=+0.06903, p=0; claim direction not auto-inferred
 
-Pre-registered falsification rule: residual_share(log GDP per capita PPP) ≤ 0.30 AND residual_share(Gini) ≤ 0.50 AND residual_share(unemployment) ≤ 0.50.
+## Pre-registration
+- **Claim:** Nordic persistent outcome advantages (GDP per capita, Gini disposable income, unemployment) over comparable high-welfare Southern European economies over 1996-2023 are substantially explained by a decomposable set of institutional, market-economy, and fiscal-discipline features — specifically government effectiveness, rule of law, and debt-to-GDP ratio — rather than by welfare architecture or Nordic-specific cultural factors alone. Country-specific residuals after channel controls and country fixed effects should account for a minority of the raw Nordic-vs-Southern-Europe outcome gap.
+- **Falsification rule:** Not supported if the Nordic-dummy coefficient after including the three decomposition channels (government effectiveness, rule of law, debt/GDP) plus country and year fixed effects remains greater than 30 percent of the raw Nordic-dummy coefficient (pre-channel) across all three outcome specifications. A large residual would indicate Nordic-specific factors beyond the measured channels are doing most of the explanatory work, and the hypothesis — that decomposable institutional features explain the gap — would be weakened. A clean finding requires channels to absorb at least 70 percent of the raw gap on the primary outcome (log GDP per capita PPP) and at least 50 percent on the other two.
+- **Falsification test:** nordic_dummy_residual_share_across_outcomes
 
-## Coefficient summary
+## Estimate
+- Method: linearmodels.PanelOLS
+- Coefficient (treatment): **+0.06903**
+- Std error: 3.101e-15
+- p-value: **0**
+- Observations: 50, countries: 2
+- Within R²: -4.68
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-| Outcome | Baseline Nordic coef | Full Nordic coef | Residual share | Threshold | Pass? |
-|---|---:|---:|---:|---:|:---:|
-| `log_gdp_pc_ppp` | +0.377 (0.108) | +0.368 (0.224) | 0.98 | 0.30 | ✗ |
-| `gini` | -6.587 (0.617) | -5.546 (0.932) | 0.84 | 0.50 | ✗ |
-| `unemployment` | -5.573 (1.791) | -0.455 (5.944) | 0.08 | 0.50 | ✓ |
+## Variables resolved
+- `world_bank_wdi:NY.GDP.PCAP.PP.KD` → gdp_per_capita_ppp_constant (outcome, publisher=world_bank_wdi, n=8325)
+- `world_bank_wdi:SI.POV.GINI` → gini_disposable_income (outcome, publisher=world_bank_wdi, n=2430)
+- `world_bank_wdi:SL.UEM.TOTL.ZS` → unemployment_rate (outcome, publisher=world_bank_wdi, n=8071)
+- `wgi:GOV_WGI_GE.EST` → government_effectiveness (decomposition_channels, publisher=wgi, n=5168)
+- `wgi:GOV_WGI_RL.EST` → rule_of_law (decomposition_channels, publisher=wgi, n=5296)
+- `world_bank_wdi:GC.DOD.TOTL.GD.ZS` → debt_to_gdp (decomposition_channels, publisher=world_bank_wdi, n=1788)
+- `world_bank_wdi:SP.POP.TOTL` → log_population (controls, publisher=world_bank_wdi, n=16935)
+- `world_bank_wdi:SP.URB.TOTL.IN.ZS` → urbanisation (controls, publisher=world_bank_wdi, n=16965)
 
-Clustered SEs by country. Baseline: PanelOLS with time effects + nordic_dummy. Full: PanelOLS with time effects + nordic_dummy + 3 channels (WGI gov effectiveness, WGI rule of law, IMF general-govt debt/GDP) + 2 controls (log population, urbanisation). Country fixed effects are NOT included because they would absorb the time-invariant Nordic indicator, making the hypothesis untestable.
-
-### Debt source — deviation from spec literal
-
-The pre-reg YAML specifies `world_bank_wdi:GC.DOD.TOTL.GD.ZS` for debt/GDP and notes IMF `GGXWDG_NGDP` as a v2 alternative. The WDI series turns out to have only 54 non-null obs across the 10-country × 28-year sample (central-government reporting gaps), which is numerically infeasible for the full spec. IMF GGXWDG_NGDP is dense (278/278 obs) and is used as the primary v1 debt channel. The pre-reg-literal WDI spec is retained in the coefficients table as `spec=full_wdi_prereg_literal` for transparency; its numerical instability is documented in diagnostics.json.
-
-## Channels (log GDP PPP, full spec)
-
-- gov_eff:        -0.112 (0.110)
-- rule_of_law:    +0.102 (0.091)
-- debt_gdp:       -0.002 (0.001)
-- log_population: +0.056 (0.039)
-- urbanisation:   +0.005 (0.004)
-
-## Honest interpretation (engaging the steelman)
-
-The raw log-GDP-pc-PPP Nordic-vs-comparator gap is +0.377 (≈45.9% higher PPP GDP/capita in Nordic countries, on average, over 1996 – 2023). After adding the three channels and controls it shifts to +0.368 (residual share 0.98).
-
-The result is a weakening of the hypothesis's primary-outcome claim: the three institutional/fiscal channels account for only ≈2% of the Nordic-vs-comparator log-GDP-per-capita-PPP gap. On the secondary outcome (Gini) channels absorb ≈16%; on the tertiary (unemployment) they absorb ≈92%, a clean pass. This is the kind of mixed finding the framework's asymmetric-credit-for-prior-updating commitment in DISCLOSURE.md calls out explicitly: the author's prior favoured the decomposition; the data only partially supports it.
-
-The steelman's strongest objection — that WGI government-effectiveness is partly downstream of the outcomes it's being used to explain — is live. Channel coefficients are suggestive but an endogeneity-robust spec (e.g. V-Dem administrative indicators) is a v2 priority when the fetcher ships. The country-FE-absorbs-variation objection is valid: this v1 design cannot distinguish 'Nordic channels explain the gap' from 'Nordic countries have time-invariant unmeasured features that look like the measured channels in cross-section'. A v2 with within-country decomposition (country FE, examining channel movement over time within each country) would test a different but related claim.
-
-## Known v1 limitations (v2 roadmap)
-
-- OECD EPL (labour-market flexibility) channel omitted — fetcher pending.
-- WVS/V-Dem social-trust channel omitted — fetchers pending.
-- Gini sample is sparse; residual share for Gini is sensitive to coverage. Eurostat Gini as robustness is a v2 addition.
-- Norway SWF mechanism is absorbed into the NOR country-specific intercept; not modelled as a channel variable.
-
-## Provenance
-
-Run artifacts reproduce deterministically from the vintages listed in `manifest.yaml`. See `replication.py` for the full pipeline.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:26:54+00:00_

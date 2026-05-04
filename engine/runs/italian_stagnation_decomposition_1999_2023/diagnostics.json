@@ -1,25 +1,109 @@
 {
-  "sample": {
-    "countries": [
-      "DEU",
-      "ESP",
-      "FRA",
-      "GRC",
-      "ITA",
-      "PRT"
-    ],
-    "period": [
-      1999,
-      2023
-    ],
-    "n_obs_panel": 150
+  "verdict": "REFUTED \u2014 coef=-0.01029 (sign opposite claim +), p=0.00177",
+  "verdict_label": "REFUTED",
+  "verdict_reason": "coef=-0.01029 (sign opposite claim +), p=0.00177",
+  "hypothesis_id": "italian_stagnation_decomposition_1999_2023",
+  "template": "panel_fe_decomposition",
+  "claim_direction_inferred": "+",
+  "falsification_rule_text": "Not supported if (a) Italian GDP per capita in 2023 is NOT within 5% of its 1999 level (i.e., the stagnation stylised fact is falsified \u2014 unlikely given headline data), OR (b) the four channels together explain < 40% of the Italy-peer gap, OR (c) a single channel explains > 60% (monocausal), OR (d) the synthetic control's pre-1999 fit fails. If regulatory stringency alone accounts for majority of gap, report honestly \u2014 even though the framework prior expects multi-causal.\n",
+  "falsification_test_text": "italian_stagnation_multichannel_sda",
+  "estimate": {
+    "coefficient": -0.010294619226934403,
+    "std_error": 0.003227150100839036,
+    "p_value": 0.0017719609459236896,
+    "n_obs": 174,
+    "n_countries": 6,
+    "r_squared_within": -0.5145060261872629,
+    "fe_entity": true,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "linearmodels.PanelOLS",
+    "dropped_controls_due_to_overlap": []
   },
-  "baseline_italy_coef": 0.13848700699401717,
-  "full_italy_coef": 0.3443221215607443,
-  "residual_share": 2.486313546913607,
-  "threshold": 0.4,
-  "italy_log_gdp_pc_ppp_1999": 10.789188452333333,
-  "italy_log_gdp_pc_ppp_2023": 10.875597518007323,
-  "italy_cumulative_log_change": 0.08640906567399043,
-  "verdict": "weakened \u2014 residual_share 2.486 > threshold 0.40"
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "log_gdp_pc_ppp",
+        "source": "world_bank_wdi:NY.GDP.PCAP.PP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 8325
+      },
+      {
+        "role": "outcome",
+        "name": "gdp_growth_rate",
+        "source": "world_bank_wdi:NY.GDP.MKTP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14066
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "euro_entry_reer_overvaluation",
+        "source": "bis:WS_EER",
+        "publisher": "bis",
+        "n_rows": 2922
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "old_age_dependency_ratio",
+        "source": "world_bank_wdi:SP.POP.DPND.OL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16935
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "political_turnover_frequency",
+        "source": "constructed: count of governments per decade (ITA has had among the highest rates in OECD). Manual coding from DPI or V-Dem; fetcher pending.",
+        "publisher": "constructed",
+        "n_rows": 174
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "debt_to_gdp",
+        "source": "imf:GGXWDG_NGDP",
+        "publisher": "imf",
+        "n_rows": 8113
+      },
+      {
+        "role": "controls",
+        "name": "log_population",
+        "source": "world_bank_wdi:SP.POP.TOTL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16935
+      },
+      {
+        "role": "controls",
+        "name": "trade_openness",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10714
+      },
+      {
+        "role": "controls",
+        "name": "urbanisation",
+        "source": "world_bank_wdi:SP.URB.TOTL.IN.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16965
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "log_tfp_index",
+        "source": "constructed: Penn World Table 10.01 TFP index or OECD productivity where available."
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "oecd_pmr_overall",
+        "source": "oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "prime_age_lfp_rate",
+        "source": "constructed: OECD labour force participation rate 25-54, annual."
+      }
+    ]
+  },
+  "run_utc": "2026-05-03T06:27:47+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

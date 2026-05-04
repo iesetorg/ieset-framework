@@ -1,57 +1,33 @@
 # Result card — lula_bolsa_familia_poverty_reduction_decomposition_2003_2010
 
-**Verdict:** partial — Some Shapley conditions met but not all: BF+MW poverty share 9% < 40%; BF+MW Gini share 6% < 30%. Brazil 2003→2010 delta: poverty -9.4pp, Gini -4.3.
+**Verdict:** REFUTED — coef=-3.733 (sign opposite claim +), p=0.0154
 
-## Pre-registered thresholds
+## Pre-registration
+- **Claim:** Brazil's substantial 2003-2010 poverty reduction (extreme poverty headcount fell from ~10% to ~4% and Gini coefficient from ~0.58 to ~0.53 per PNAD/IPEA series) is decomposed across three channels: (a) Bolsa Família cash-transfer expansion (Lei 10,836 of January 2004 consolidating prior CCTs, reaching ~13 million families by 2010), (b) real minimum-wage valorisation (real minimum wage rose over 50% 2003-2010, pulling up the bottom of the formal wage distribution and indexed social transfers including BPC), and (c) the 2003-2008 commodity boom (export revenue surge, formal-employment growth, wage-bargaining leverage from tight labour markets). The pre-registered claim is that channels (a) and (b) — the policy channels — jointly account for at least 40% of the total observed reduction in extreme-poverty headcount AND at least 30% of the Gini decline, after controlling for the commodity boom channel via an oil-exporter LatAm donor pool (Mexico, Colombia, Peru).
+- **Falsification rule:** Not supported if EITHER (a) the Shapley variance share of channels (a) + (b) (BF + minimum wage) in explaining the 2003-2010 extreme-poverty headcount decline is less than 40%, OR (b) their share of the Gini decline is less than 30%, OR (c) the commodity-boom channel (c) alone accounts for more than 60% of either decomposition, OR (d) the synthetic-control robustness gap on the BRA series is not negative and distinguishable from the donor pool's own Gini trajectories at 10% permutation inference. Any one condition falsifies.
+- **Falsification test:** shapley_decomposition_poverty_gini_channel_shares
 
-- BF + minimum-wage Shapley share of poverty change: >= 0.40
-- BF + minimum-wage Shapley share of Gini change: >= 0.30
-- Commodity-boom Shapley share on either outcome: <= 0.60
+## Estimate
+- Method: statsmodels OLS FE fallback (linearmodels failed: 'bolsa_familia_coverage_intensity')
+- Coefficient (treatment): **-3.733**
+- Std error: 1.541
+- p-value: **0.0154**
+- Observations: 80, countries: 6
+- Within R²: 0.946
+- Fixed effects: entity=True, time=True
+- Clustering: country
 
-## Shapley shares
+## Variables resolved
+- `world_bank_wdi:SI.POV.DDAY (USD 2.15 2017 PPP poverty line); ipeadata:PNAD` → extreme_poverty_headcount (outcome, publisher=world_bank_wdi, n=2862)
+- `world_bank_wdi:SI.POV.GINI` → gini_coefficient (outcome, publisher=world_bank_wdi, n=2430)
+- `world_bank_wdi:SI.DST.FRST.40; wid:wid_all (post-fetch filter to bottom-40 share)` → bottom_40_income_share (outcome, publisher=wid, n=450)
+- `constructed: number of BF beneficiary families / total households (BRA); 0 for donor pool` → bolsa_familia_coverage_intensity (decomposition_channels, publisher=constructed, n=108)
+- `world_bank_wdi:TT.PRI.MRCH.XD.WD` → commodity_terms_of_trade (decomposition_channels, publisher=world_bank_wdi, n=6478)
+- `world_bank_wdi:NY.GDP.PCAP.KD.ZG` → gdp_per_capita_growth (controls, publisher=world_bank_wdi, n=13897)
+- `world_bank_wdi:SP.URB.TOTL.IN.ZS` → urbanisation_rate (controls, publisher=world_bank_wdi, n=16965)
 
-| Channel | Poverty share | Gini share |
-|---|---:|---:|
-| bf_intensity | +4.8% | +2.9% |
-| min_wage_log | +3.7% | +3.6% |
-| gdp_pc_growth | +7.9% | +3.8% |
-| urban | +83.5% | +89.7% |
-| **BF + minimum wage (policy)** | **+8.6%** | **+6.5%** |
+### Variables missing data
+- `ilostat:ILMS_wages; bls-equivalent minimum-wage series per country via national statistics offices` (decomposition_channels, name=real_minimum_wage_level) — vintage not on disk
+- `ilostat:employment_by_status (formal share); ipeadata for BRA` (decomposition_channels, name=formal_employment_share) — vintage not on disk
 
-Full-spec R^2 (poverty): 0.978 (baseline FE: 0.944; explainable above FE: 0.034).
-Full-spec R^2 (gini): 0.946 (baseline FE: 0.932; explainable above FE: 0.014).
-
-## Brazil observed change, 2003 → endpoint
-
-- Extreme-poverty headcount: 17.1 → 7.8 (endpoint 2010, delta -9.4pp).
-- Gini coefficient (×100): 57.6 → 53.3 (endpoint 2010, delta -4.3).
-
-## Method
-
-Panel: BRA + 5 LatAm donors (MEX, COL, PER, CHL, ARG), 1995-2012,
-with Argentina 2001-2003 and Mexico 2009 dropped per spec
-exclusion_rules. Decomposition window 2003-2010. OLS with country
-and year FE plus four channels (BF intensity, real-min-wage log,
-per-capita GDP growth as commodity-boom proxy, urbanisation rate).
-Shapley value for each channel is the average marginal incremental
-R^2 over all subset orderings, normalised to the explainable-R^2
-share above the country+year-FE baseline.
-
-## Data
-
-- world_bank_wdi:SI.POV.DDAY (extreme-poverty headcount, USD 2.15 PPP)
-- world_bank_wdi:SI.POV.GINI (Gini × 100)
-- world_bank_wdi:NY.GDP.PCAP.KD.ZG (per-capita real-GDP growth)
-- world_bank_wdi:SP.URB.TOTL.IN.ZS (urbanisation rate)
-
-## Caveats
-
-- Bolsa Família intensity and the real-minimum-wage index are
-  constructed BRA-only series (zero for donors), calibrated to
-  published IPEA / MDS / DIEESE timelines. Errors-in-variables on
-  these channels could attenuate their attributed share.
-- The commodity channel is reduced-form (per-capita growth), not a
-  terms-of-trade index — partly absorbing the same general boom
-  signal that drives donor-pool poverty declines but missing
-  cross-country heterogeneity in commodity-export concentration.
-- Synthetic-control robustness on BRA is deferred to v1.1.
+_Generated by `scripts/run_panel_fe.py` at 2026-05-03T06:09:45+00:00_

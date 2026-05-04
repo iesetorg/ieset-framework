@@ -1,23 +1,23 @@
 {
-  "verdict": "PARTIAL \u2014 coef=-4744, p=0.048; claim direction not auto-inferred",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=-4744, p=0.048; claim direction not auto-inferred",
+  "verdict": "REFUTED \u2014 coef=-4744 (sign opposite claim +), p=0.0382",
+  "verdict_label": "REFUTED",
+  "verdict_reason": "coef=-4744 (sign opposite claim +), p=0.0382",
   "hypothesis_id": "spain_reported_sexual_assault_rate_definition_controlled",
   "template": "panel_fe",
-  "claim_direction_inferred": "?",
+  "claim_direction_inferred": "+",
   "falsification_rule_text": "The hypothesis has two parts. Q1 is SUPPORTED if, on the pre-reform 2015-2021 window with reporting-propensity and media-attention controls, the Spain indicator is within \u00b10.10 log points of zero at p > 0.10 (i.e., Spain is NOT distinguishable from the European reporting-trend) \u2014 this would corroborate the interpretation that Spain's pre-reform trajectory tracked the European reporting- culture trend rather than representing a Spanish-specific offending surge. Q1 is NOT SUPPORTED if the Spain indicator is significantly positive (Spain deviates upward from Europe pre-reform), in which case the framework reports that Spain's pre-reform trajectory WAS distinct from Europe and the critics' pre-reform-rising-trend framing is data-supported.\nQ2 is SUPPORTED if the level-shift \u03b2 at 2022-10-07 is positive AND the definitional-component decomposition attributes the majority (>50%) of \u03b2 to reclassification \u2014 corroborating the interpretation that the post-2022 reported-rate spike is primarily a measurement- regime change rather than an underlying offending surge. Q2 is NOT SUPPORTED if the residual component is positive and large (>50% of \u03b2), in which case the framework reports that even after definitional adjustment there is a substantial residual component which it cannot further decompose from aggregate data and which requires dedicated victimisation-survey evidence (Encuesta Nacional de Violencia contra la Mujer waves pre- and post-reform) to interpret.\nEither outcome is an honest finding. The hypothesis is designed to be falsifiable in both directions and is pre-registered specifically to prevent selective reporting of whichever direction aligns with the commentator's priors.\n",
   "falsification_test_text": "spain_sexual_offence_rate_two_part_Q1_panel_Q2_event_study",
   "estimate": {
-    "coefficient": -4743.633276691554,
-    "std_error": 2398.6839629072897,
-    "p_value": 0.04797404359158706,
+    "coefficient": -4743.633276690371,
+    "std_error": 2253.8477727495697,
+    "p_value": 0.03823712063422402,
     "n_obs": 112,
     "n_countries": 8,
-    "r_squared_within": 0.9735920846861671,
+    "r_squared_within": -1.746575450685731,
     "fe_entity": true,
     "fe_time": true,
     "cluster": "country",
-    "method": "statsmodels OLS FE fallback (linearmodels failed: No module named 'linearmodels')",
+    "method": "linearmodels.PanelOLS",
     "dropped_controls_due_to_overlap": []
   },
   "data_status": {
@@ -28,6 +28,27 @@
         "source": "eurostat:crim_off_cat",
         "publisher": "eurostat",
         "n_rows": 671
+      },
+      {
+        "role": "treatment",
+        "name": "spain_post_2022_10_07",
+        "source": "constructed: indicator = 1 if country=ESP and year >= 2023 (or month >= 2022-10 for monthly specification); 0 otherwise. Effective date of LO 10/2022 is 7 October 2022; year-resolution treatment is coded from 2023 with 2022 treated as a transition year in robustness.",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "reporting_propensity_proxy",
+        "source": "constructed: European victimisation-survey series on reporting rate to police, where available (FRA-CVS, ITA-ISTAT delitti, ESP-ENVS 2019). Sparse; enters as a level covariate where country-year coverage permits.",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "migration_composition_share",
+        "source": "world_bank_wdi:SM.POP.TOTL.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 2080
       },
       {
         "role": "controls",
@@ -70,12 +91,12 @@
         "source": "manual: INE Estad\u00edstica de Condenados"
       },
       {
-        "role": "treatment",
-        "name": "spain_post_2022_10_07",
-        "source": "constructed: indicator = 1 if country=ESP and year >= 2023 (or month >= 2022-10 for monthly specification); 0 otherwise. Effective date of LO 10/2022 is 7 October 2022; year-resolution treatment is coded from 2023 with 2022 treated as a transition year in robustness."
+        "role": "decomposition_channels",
+        "name": "media_attention_proxy",
+        "source": "constructed: Google Trends index for country-language terms 'agresi\u00f3n sexual' / 'violaci\u00f3n' / equivalents; annual average. Proxy for reporting-climate effects (MeToo waves 2017-2018, La Manada verdict 2018-2019, public reaction to LO 10/2022)."
       }
     ]
   },
-  "run_utc": "2026-04-30T13:10:53+00:00",
+  "run_utc": "2026-05-03T06:13:00+00:00",
   "runner": "scripts/run_panel_fe.py"
 }

@@ -1,67 +1,95 @@
 {
-  "verdict": "PARTIAL \u2014 pattern does not cleanly match either uniform direction. output \u03b2 = -0.003 p=0.906; housing-affordability \u03b2 = -0.139 p=0.082.",
-  "results_by_outcome": {
-    "log_gdp_pc_ppp": {
-      "n_obs": 152,
-      "r2_within": 0.08893086215262103,
-      "coefs": {
-        "spain_post_2018": {
-          "estimate": -0.002953732573853917,
-          "se": 0.02487243449181859,
-          "ci_lo": -0.052179367336676136,
-          "ci_hi": 0.0462719021889683,
-          "p": 0.9056598839949435,
-          "t": -0.1187552659883576
-        }
-      }
-    },
-    "unemployment_rate": {
-      "n_obs": 124,
-      "r2_within": 0.11276082917369668,
-      "coefs": {
-        "spain_post_2018": {
-          "estimate": -3.3735906070749513,
-          "se": 1.2848770476184912,
-          "ci_lo": -5.923715874660565,
-          "ci_hi": -0.8234653394893376,
-          "p": 0.01005092085293735,
-          "t": -2.625613566160181
-        }
-      }
-    },
-    "log_house_price_index": {
-      "n_obs": 124,
-      "r2_within": -0.13716868289080764,
-      "coefs": {
-        "spain_post_2018": {
-          "estimate": -0.1644266339207386,
-          "se": 0.0879158554472839,
-          "ci_lo": -0.33889278779114573,
-          "ci_hi": 0.010039519949668507,
-          "p": 0.06443043898009382,
-          "t": -1.8702728089739409
-        }
-      }
-    },
-    "log_house_price_to_gdp_pc": {
-      "n_obs": 124,
-      "r2_within": -0.21903915077873948,
-      "coefs": {
-        "spain_post_2018": {
-          "estimate": -0.13860137058510366,
-          "se": 0.07882908678430219,
-          "ci_lo": -0.295035127777176,
-          "ci_hi": 0.017832386606968675,
-          "p": 0.08182667793900134,
-          "t": -1.7582516332372935
-        }
-      }
-    }
+  "verdict": "PARTIAL \u2014 coef=-0.01641, p=0.666 (above \u03b1=0.10); direction inconclusive",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "coef=-0.01641, p=0.666 (above \u03b1=0.10); direction inconclusive",
+  "hypothesis_id": "spain_sanchez_economic_trajectory_2018_2023",
+  "template": "panel_fe",
+  "claim_direction_inferred": "-",
+  "falsification_rule_text": "The hypothesis is SUPPORTED if the pre-registered pattern holds: \u03b2_spain_post_2018 is non-negative on (log GDP pc, employment rate) AND negative on (real house price to income, real wage net of housing), all at p < 0.10. The hypothesis is REJECTED if Spain is uniformly negative (i.e., also negative on headline output and employment) \u2014 this would indicate the \"Spain is doing badly\" framing is correct in the aggregate, contrary to the framework's pre- registered nuanced expectation. The hypothesis is also REJECTED in the opposite direction if Spain is uniformly positive (including on housing and real wages) \u2014 this would indicate the critics' housing concerns are not data-supported. Either uniform direction falsifies the nuanced framing; only the pre-registered differentiated pattern supports it.\n",
+  "falsification_test_text": "spain_post_2018_twfe_multi_outcome",
+  "estimate": {
+    "coefficient": -0.016406690171046606,
+    "std_error": 0.03789944779324623,
+    "p_value": 0.6657532257779595,
+    "n_obs": 171,
+    "n_countries": 9,
+    "r_squared_within": 0.6918995358746085,
+    "fe_entity": true,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "linearmodels.PanelOLS",
+    "dropped_controls_due_to_overlap": []
   },
-  "pattern_match_nonneg_output_negative_housing": false,
-  "missing_outcomes_v1": [
-    "employment_rate_15_64 (lfsi_emp_a not in vintages)",
-    "real_wage_index (OECD DF_EARN not in vintages)",
-    "real_house_price_to_income (OECD URN not in vintages \u2014 using HPI/GDPpc proxy)"
-  ]
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "log_gdp_pc_ppp_constant",
+        "source": "world_bank_wdi:NY.GDP.PCAP.PP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 8325
+      },
+      {
+        "role": "outcome",
+        "name": "employment_rate_15_64",
+        "source": "eurostat:lfsi_emp_a",
+        "publisher": "eurostat",
+        "n_rows": 634
+      },
+      {
+        "role": "outcome",
+        "name": "unemployment_rate_harmonised",
+        "source": "eurostat:une_rt_a",
+        "publisher": "eurostat",
+        "n_rows": 634
+      },
+      {
+        "role": "treatment",
+        "name": "spain_post_2018",
+        "source": "constructed: indicator = 1 if country=ESP and year >= 2018; 0 otherwise. Tests whether Spanish trajectory deviates from the euro-area donor pool from the June 2018 PSOE government onward.",
+        "publisher": "constructed",
+        "n_rows": 171
+      },
+      {
+        "role": "controls",
+        "name": "log_population",
+        "source": "world_bank_wdi:SP.POP.TOTL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16935
+      },
+      {
+        "role": "controls",
+        "name": "trade_openness",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10714
+      },
+      {
+        "role": "controls",
+        "name": "log_gross_fixed_capital_formation_pct_gdp",
+        "source": "world_bank_wdi:NE.GDI.FTOT.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 9870
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "real_house_price_to_income_index",
+        "source": "oecd:OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,1.0"
+      },
+      {
+        "role": "outcome",
+        "name": "real_wage_index",
+        "source": "oecd:OECD.ELS.SAE,DSD_EARNINGS@DF_EARN,1.0"
+      },
+      {
+        "role": "controls",
+        "name": "euro_area_indicator",
+        "source": "constructed: 1 if country uses euro as of year, 0 otherwise. Absorbed by country FE but retained for interaction robustness."
+      }
+    ]
+  },
+  "run_utc": "2026-05-03T06:11:27+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

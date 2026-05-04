@@ -1,24 +1,88 @@
 {
+  "verdict": "PARTIAL \u2014 coef=+0.09424, p=nan; standard error/p-value not estimable",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "coef=+0.09424, p=nan; standard error/p-value not estimable",
   "hypothesis_id": "product_market_regulation_tfp_30yr_panel",
-  "verdict": "partial",
-  "reason": "TWFE \u03b2_RQ=-0.0035 (SE 0.0046, p=0.448, n=1872), R\u00b2=0.428. Does not meet falsification threshold.",
-  "metrics": {
-    "n_observations": 1872,
-    "n_countries": 117,
-    "rq_coef": -0.003452343138803055,
-    "rq_se": 0.004551024777368307,
-    "rq_p": 0.44810032145921386,
-    "rq_ci_lo": -0.012372187795194355,
-    "rq_ci_hi": 0.005467501517588244,
-    "r2_within": 0.42796624989865517
+  "template": "panel_fe",
+  "claim_direction_inferred": "-",
+  "falsification_rule_text": "Not supported if (a) the panel-FE coefficient on PMR composite is not negative and significant at p<0.05 (higher PMR = lower TFP growth), OR (b) a one-SD PMR reduction corresponds to less than 0.15 pp higher annual TFP growth, OR (c) the coefficient becomes insignificant when EPL is omitted (indicating labour- market regulation is the true driver, not product-market regulation). A coordinated-market-economy / Varieties-of- Capitalism reading wins if PMR is insignificant but EPL or vocational-training variables are significant.\n",
+  "falsification_test_text": "panel_fe_pmr_on_tfp_growth_with_epl_robustness",
+  "estimate": {
+    "coefficient": 0.09423789339534827,
+    "std_error": null,
+    "p_value": null,
+    "n_obs": 35,
+    "n_countries": 35,
+    "r_squared_within": 1.0,
+    "fe_entity": true,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "statsmodels OLS FE fallback (linearmodels failed: No objects to concatenate)",
+    "dropped_controls_due_to_overlap": []
   },
-  "threshold": "\u03b2_RQ > 0 and p < 0.05",
-  "vintages": {
-    "wgi_rq": "data/vintages/wgi/GOV_WGI_RQ.EST@2026-04-30T114234Z.parquet",
-    "pwt": "data/vintages/pwt/pwt_full@2026-04-30T142427Z.parquet"
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "tfp_growth_10yr",
+        "source": "pwt:rtfpna",
+        "publisher": "pwt",
+        "n_rows": 6412
+      },
+      {
+        "role": "outcome",
+        "name": "labour_productivity_growth_10yr",
+        "source": "pwt:rgdpo_per_emp",
+        "publisher": "pwt",
+        "n_rows": 9529
+      },
+      {
+        "role": "treatment",
+        "name": "oecd_pmr_composite_index",
+        "source": "oecd_pmr:pmr_composite",
+        "publisher": "oecd_pmr",
+        "n_rows": 105
+      },
+      {
+        "role": "treatment",
+        "name": "oecd_pmr_barriers_to_entry",
+        "source": "oecd_pmr:barriers_to_entry",
+        "publisher": "oecd_pmr",
+        "n_rows": 105
+      },
+      {
+        "role": "controls",
+        "name": "log_initial_gdp_pc",
+        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14066
+      },
+      {
+        "role": "controls",
+        "name": "trade_openness",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10714
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "controls",
+        "name": "years_schooling_average",
+        "source": "barro_lee:years_schooling"
+      },
+      {
+        "role": "controls",
+        "name": "capital_deepening_rate",
+        "source": "pwt:rnna"
+      },
+      {
+        "role": "controls",
+        "name": "employment_protection_legislation",
+        "source": "oecd_pmr:epl_composite"
+      }
+    ]
   },
-  "sha256": {
-    "wgi_rq": "4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e",
-    "pwt": "f081fc093bc4aee806a81d69feb34b9fb8f738bad207fcc7853fe8557731bbc0"
-  }
+  "run_utc": "2026-05-03T06:47:28+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

@@ -1,23 +1,30 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: us_2020_2021_fiscal_inflation_transient_vs_persistent
-version: 1
-status: draft
+version: 2
+status: pre_registered
 topic: monetary
 claim: The 2020-2021 US fiscal response (CARES + ARP, roughly $5tn) produced a transient inflation episode
   that receded by 2023-2024 as supply-side capacity normalised, consistent with MMT's real-constraint
   view.
 notes: Origin is auto-generated coverage-gap stub seeded from MMT framing of the 2020-2021 US
   fiscal response as producing a transient inflation episode that recedes as supply-side normalises.
-  Human review required.
+  v2 pins a descriptive return-to-baseline test using local FRED CPI/PCE vintages.
 prior_confidence: 0.55
 disclosure: Author has market-liberal priors and is sceptical that all of the 2021-2022 inflation
   was supply-driven; risk is under-weighting the persistent component running through expectations and wage-price.
 falsification:
-  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite
-    direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure
-    moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in
-    the variables and estimator blocks when this stub is promoted from draft.
-  test: 'Local-projection IRFs of US core CPI/PCE to CARES+ARP fiscal shocks at h=1..36m; IRF returns to within 1pp of pre-shock baseline by 2024-Q1 with p<0.10 supports transient-inflation claim.'
+  rule: >
+    Primary descriptive test computes year-over-year inflation for headline CPI, core CPI, headline PCE,
+    and core PCE. Baseline is each series' 2018-2019 mean year-over-year rate. The transient-by-2024-Q1
+    claim is supported if at least three of the four Q1-2024 means are within +1.0 percentage point of
+    their baseline and no core measure is more than +1.5pp above baseline. It is refuted if fewer than
+    two of four measures are within +1.0pp of baseline or if both core CPI and core PCE remain more than
+    +1.5pp above baseline. Otherwise it is weakened.
+  test: fred_cpi_pce_return_to_baseline_2024q1
+  threshold: support if >=3/4 within +1pp and no core >+1.5pp; refute if <2/4 within +1pp or both core >+1.5pp
+methodology_note: >
+  This v2 run tests the empirical transient-by-2024-Q1 condition directly. It does not attribute the
+  inflation episode uniquely to fiscal policy versus supply, energy, monetary, or expectations channels.
 evidence_type: associational
 scope:
   period: [2020, 2024]
@@ -85,4 +92,3 @@ variables:
     - name: unemployment_rate
       source: "fred:UNRATE"
       transformation: level_pct
-

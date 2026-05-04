@@ -1,26 +1,24 @@
 {
-  "verdict": "PARTIAL \u2014 coef=+2.825, p=0.108 (above \u03b1=0.10); direction inconclusive",
+  "verdict": "PARTIAL \u2014 coef=-0.1808, p=0.685 (above \u03b1=0.10); direction inconclusive",
   "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=+2.825, p=0.108 (above \u03b1=0.10); direction inconclusive",
+  "verdict_reason": "coef=-0.1808, p=0.685 (above \u03b1=0.10); direction inconclusive",
   "hypothesis_id": "mena_gcc_oil_price_decoupling_2014_2024",
   "template": "panel_fe",
-  "claim_direction_inferred": "?",
+  "claim_direction_inferred": "-",
   "falsification_rule_text": "Not supported if the sub-period oil-sensitivity ratio (2014-2024 beta / 2000-2013 beta) on real-GDP-growth is greater than 0.50 (i.e. less than 50% reduction in sensitivity), OR if the oil_price_change \u00d7 post_2014 interaction coefficient is not significantly negative at p < 0.05. Robustness check: if including 2020 COVID flips the result direction, the decoupling claim is fragile and should be described as suggestive rather than confirmed.",
   "falsification_test_text": "panel_fe_sub_period_beta_ratio_test",
   "estimate": {
-    "coefficient": 2.825359004422812,
-    "std_error": 1.757569178216979,
-    "p_value": 0.10793643003944896,
+    "coefficient": -0.1807982058781742,
+    "std_error": 0.44505098808793697,
+    "p_value": 0.6845651231108874,
     "n_obs": 144,
     "n_countries": 6,
-    "r_squared_within": 0.5391233615911997,
+    "r_squared_within": 0.5284933221431611,
     "fe_entity": true,
     "fe_time": true,
     "cluster": "country",
-    "method": "statsmodels OLS FE fallback (linearmodels failed: No module named 'linearmodels')",
-    "dropped_controls_due_to_overlap": [
-      "us_policy_rate"
-    ]
+    "method": "statsmodels OLS FE fallback (linearmodels failed: 'post_2014_indicator')",
+    "dropped_controls_due_to_overlap": []
   },
   "data_status": {
     "variables_loaded": [
@@ -32,6 +30,20 @@
         "n_rows": 13897
       },
       {
+        "role": "outcome",
+        "name": "fiscal_balance_share_gdp",
+        "source": "world_bank_wdi:GC.NLD.TOTL.GD.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 5147
+      },
+      {
+        "role": "treatment",
+        "name": "post_2014_indicator",
+        "source": "constructed: 1 from 2014 onward",
+        "publisher": "constructed",
+        "n_rows": 150
+      },
+      {
         "role": "treatment",
         "name": "oil_price_change",
         "source": "fred:DCOILBRENTEU; imf:POILBRE",
@@ -39,11 +51,18 @@
         "n_rows": 40
       },
       {
+        "role": "treatment",
+        "name": "oil_price_x_post_2014",
+        "source": "constructed: oil_price_change \u00d7 post_2014_indicator",
+        "publisher": "constructed",
+        "n_rows": 150
+      },
+      {
         "role": "controls",
         "name": "us_policy_rate",
         "source": "fred:FEDFUNDS",
         "publisher": "fred",
-        "n_rows": 73
+        "n_rows": 438
       },
       {
         "role": "controls",
@@ -60,21 +79,6 @@
         "source": "imf:NGDP_NonOil_RPCH"
       },
       {
-        "role": "outcome",
-        "name": "fiscal_balance_share_gdp",
-        "source": "world_bank_wdi:GC.BAL.CASH.GD.ZS"
-      },
-      {
-        "role": "treatment",
-        "name": "post_2014_indicator",
-        "source": "constructed: 1 from 2014 onward"
-      },
-      {
-        "role": "treatment",
-        "name": "oil_price_x_post_2014",
-        "source": "constructed: oil_price_change \u00d7 post_2014_indicator"
-      },
-      {
         "role": "controls",
         "name": "vat_introduction_indicator",
         "source": "constructed: country-specific dummy from VAT-introduction year"
@@ -86,6 +90,6 @@
       }
     ]
   },
-  "run_utc": "2026-04-30T13:10:51+00:00",
+  "run_utc": "2026-05-03T06:11:21+00:00",
   "runner": "scripts/run_panel_fe.py"
 }

@@ -4,9 +4,10 @@
 Spec: hypotheses/labour/labour_market_flexibility_unemployment_duration.yaml
 Steelman: hypotheses/steelman/labour_market_flexibility_unemployment_duration.md
 
-Two-way FE panel: long-term unemployment share (Eurostat une_ltu_a) and
-unemployment rate (Eurostat une_rt_a, secondary), regressed on OECD EPL_R
-(employment protection — regular contracts).
+Two-way FE panel: long-term unemployment share (Eurostat une_ltu_a, falling
+back to lfst_r_lfu3rt when une_ltu_a is absent) and unemployment rate
+(Eurostat une_rt_a, secondary), regressed on OECD EPL_R when available or an
+inverted Fraser EFW regulation proxy when OECD EPL is absent.
 
 Pre-registered falsification:
   panel_FE_beta(EPL) on long_term_share > 0 at p<0.05 AND
@@ -15,10 +16,13 @@ Pre-registered falsification:
 
 DEVIATIONS:
   - OECD median_unemployment_duration / DSD_LMS not in vintages; substitute
-    the Eurostat une_ltu_a long-term-unemployment series (% of active pop)
-    as the primary outcome and the Eurostat une_rt_a total unemployment
-    rate as a secondary triangulation outcome (the spec's u-rate is
-    explicitly NOT the registered claim, but it provides triangulation).
+    the Eurostat long-term-unemployment rate series (% of active pop) as the
+    primary outcome and the Eurostat une_rt_a total unemployment rate as a
+    secondary triangulation outcome (the spec's u-rate is explicitly NOT the
+    registered claim, but it provides triangulation).
+  - OECD EPL is not in vintages; use inverted Fraser EFW area_5_regulation as
+    a strictness-oriented proxy. The spec permits comparable alternatives
+    where OECD EPL is missing; this remains a proxy test, not a clean EPL test.
   - OECD UI replacement-rate (DSD_UBR) not in vintages; UI-robustness
     sub-test cannot be run as designed. We instead use trade openness +
     log GDP per capita PPP as macro controls and report this deviation.
@@ -74,6 +78,13 @@ def latest(pub: str, ser: str) -> Path:
     return files[-1]
 
 
+def latest_optional(pub: str, ser: str) -> Path | None:
+    try:
+        return latest(pub, ser)
+    except FileNotFoundError:
+        return None
+
+
 def load_long_wdi(path: Path, var: str) -> pd.DataFrame:
     t = pq.read_table(path).to_pandas()
     t = t[(t["country_iso3"].notna()) & (t["country_iso3"].str.len() == 3)]
@@ -86,8 +97,12 @@ def load_long_wdi(path: Path, var: str) -> pd.DataFrame:
 def load_eurostat_unemp_ltu(path: Path) -> pd.DataFrame:
     """Long-term unemployment % of active population, both sexes, age 15-74."""
     t = pq.read_table(path).to_pandas()
-    sub = t[(t["sex"] == "T") & (t["age"] == "Y15-74") &
-            (t["unit"] == "PC_ACT") & (t["indic_em"] == "LTU")].copy()
+    if "indic_em" in t.columns:
+        sub = t[(t["sex"] == "T") & (t["age"] == "Y15-74") &
+                (t["unit"] == "PC_ACT") & (t["indic_em"] == "LTU")].copy()
+    else:
+        sub = t[(t["sex"] == "T") & (t["age"] == "Y15-74") &
+                (t["unit"] == "PC") & (t.get("isced11") == "TOTAL")].copy()
     sub["year"] = sub["period"].astype(int)
     sub["value"] = pd.to_numeric(sub["value"], errors="coerce")
     sub["country"] = sub["geo_code"].map(EU2ISO3)
@@ -110,12 +125,20 @@ def load_eurostat_unemp_rt(path: Path) -> pd.DataFrame:
 
 
 def load_oecd_epl(path: Path) -> pd.DataFrame:
-    """OECD EPL_R (employment protection, regular contracts)."""
+    """OECD EPL_R, or a strictness-oriented Fraser regulation proxy."""
     t = pq.read_table(path).to_pandas()
-    sub = t[t["MEASURE"] == "EPL_R"].copy()
-    sub["country"] = sub["REF_AREA"]
-    sub["year"] = sub["period"].astype(int)
-    sub["value"] = pd.to_numeric(sub["value"], errors="coerce")
+    if "MEASURE" in t.columns:
+        sub = t[t["MEASURE"] == "EPL_R"].copy()
+        sub["country"] = sub["REF_AREA"]
+        sub["year"] = sub["period"].astype(int)
+        sub["value"] = pd.to_numeric(sub["value"], errors="coerce")
+    else:
+        sub = t[["country_iso3", "year", "value"]].copy()
+        sub["country"] = sub["country_iso3"]
+        sub["year"] = sub["year"].astype(int)
+        # Fraser scores are freedom-oriented (higher = less regulation), while
+        # EPL is strictness-oriented. Invert to keep the pre-registered sign.
+        sub["value"] = 10.0 - pd.to_numeric(sub["value"], errors="coerce")
     return sub.groupby(["country", "year"], as_index=False)["value"].mean().rename(
         columns={"value": "epl_r"})
 
@@ -135,8 +158,8 @@ def assemble() -> tuple[pd.DataFrame, dict]:
                          "sha256": sha256(p)}
         frames.append(load_long_wdi(p, var))
 
-    p = latest("eurostat", "une_ltu_a")
-    manifest["long_term_unemp_share"] = {"publisher": "eurostat", "series": "une_ltu_a",
+    p = latest_optional("eurostat", "une_ltu_a") or latest("eurostat", "lfst_r_lfu3rt")
+    manifest["long_term_unemp_share"] = {"publisher": "eurostat", "series": p.name.split("@", 1)[0],
                                          "vintage_file": str(p.relative_to(REPO_ROOT)),
                                          "sha256": sha256(p)}
     frames.append(load_eurostat_unemp_ltu(p))
@@ -147,8 +170,8 @@ def assemble() -> tuple[pd.DataFrame, dict]:
                                  "sha256": sha256(p)}
     frames.append(load_eurostat_unemp_rt(p))
 
-    p = latest("oecd", "OECD.ELS.JAI_DSD_EPL_DF_EPL_1.0")
-    manifest["epl_r"] = {"publisher": "oecd", "series": "OECD.ELS.JAI:DSD_EPL@DF_EPL/EPL_R",
+    p = latest_optional("oecd", "OECD.ELS.JAI_DSD_EPL_DF_EPL_1.0") or latest("fraser_efw", "regulation")
+    manifest["epl_r"] = {"publisher": p.parent.name, "series": p.name.split("@", 1)[0],
                          "vintage_file": str(p.relative_to(REPO_ROOT)),
                          "sha256": sha256(p)}
     frames.append(load_oecd_epl(p))
@@ -254,6 +277,8 @@ def main() -> int:
         "vintages": manifest,
         "deviations": [
             "OECD DSD_LMS median-duration not in vintages; primary outcome substituted with Eurostat une_ltu_a (long-term-unemp share, % of active pop). Secondary outcome substituted with Eurostat une_rt_a unemployment rate.",
+            "Eurostat une_ltu_a not in vintages in this workspace; primary long-term-unemployment outcome loaded from Eurostat lfst_r_lfu3rt, total education, both sexes, age 15-74.",
+            "OECD EPL_R not in vintages; treatment substituted with inverted Fraser EFW area_5_regulation (10 - score) as a strictness-oriented proxy.",
             "OECD DSD_UBR UI replacement rate not in vintages; pre-registered UI-generosity robustness control replaced with macro controls (trade openness, log GDP pc PPP).",
             "ALMP, unionisation, output gap controls dropped (not in vintages).",
             "Sample restricted to Eurostat-reporting countries with EPL data; OECD non-EU members (USA, JPN, KOR, MEX, NZL, AUS, CAN) lack Eurostat outcome data and drop out of primary spec.",
@@ -280,6 +305,8 @@ def main() -> int:
         "## Deviations from pre-registration",
         "",
         "- Outcome substitution: Eurostat une_ltu_a long-term-unemployment share replaces OECD DSD_LMS median-duration (not in vintages).",
+        "- Workspace source substitution: Eurostat lfst_r_lfu3rt supplies long-term-unemployment rates because une_ltu_a is not on disk.",
+        "- Treatment substitution: inverted Fraser EFW area_5_regulation proxies labour/regulatory strictness because OECD EPL_R is not on disk.",
         "- UI-generosity robustness control replaced with macro controls (trade openness + log GDP pc PPP) because OECD DSD_UBR not in vintages.",
         "- Sample shrinks to EU/Eurostat-reporting countries (USA/JPN/KOR/MEX/AUS/NZL/CAN drop from primary because Eurostat lacks them).",
         "",

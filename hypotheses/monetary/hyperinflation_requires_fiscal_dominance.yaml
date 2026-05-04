@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: hyperinflation_requires_fiscal_dominance
-version: 1
+version: 2
 status: pre_registered
 topic: monetary
 claim: 'Every documented hyperinflation episode since 1900 (Weimar Germany, post-WW2 Hungary, Yugoslavia 1990s, Zimbabwe 2000s, Venezuela 2010s-2020s, among others) was preceded by fiscal dominance — a
@@ -55,11 +55,15 @@ estimator:
     '
 falsification:
   rule: 'Not supported if any documented hyperinflation episode (monthly inflation >= 50% per Cagan) occurred WITHOUT fiscal dominance being present in the preceding 24 months, as determined by the coding
-    rule. A single counter-example falsifies the claim.
+    rule. A single counter-example falsifies the claim. v2 uses the local Hanke-Krus hyperinflation table and an explicit qualitative fiscal-dominance episode ledger. Full support requires every Hanke row
+    to parse and every parsed episode to code fiscal_dominance=true. If all parsed episodes code true but some Hanke rows remain parser-pending, the result is partial rather than fully supported.
 
     '
   test: hyperinflation_episode_fiscal_dominance_coverage
-  threshold: 100% of qualifying episodes must exhibit fiscal dominance in the 24 months preceding Cagan threshold breach
+  threshold: support if 100% of all Hanke rows parse and code fiscal_dominance=true; partial if parsed rows are all true but parser-pending rows remain; refute if any parsed episode codes false
+methodology_note: >
+  The treatment is an explicit historical episode-coding ledger rather than a numeric panel regression.
+  Parser-pending Hanke rows are not silently dropped; they cap the verdict at partial until normalized.
 prior_confidence: 0.9
 disclosure: 'High prior confidence reflects the well-documented historical record (see Hanke-Krus catalogue, Reinhart-Rogoff, Bernholz). The hypothesis is included on the public platform because the political-economy
   implication — that central bank independence and fiscal discipline are the preconditions for price stability — is contested even where the historical record itself is not. Per DISCLOSURE.md, the author''s

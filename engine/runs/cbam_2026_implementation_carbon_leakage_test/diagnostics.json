@@ -1,17 +1,53 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded",
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded; missing: ['un_comtrade:HS72_HS76_HS25_HS31', 'un_comtrade:HS72_HS76_HS25_HS31_volume', 'constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) \u00d7 tonnes imported. Manual-drop pending under data/manual/derived/.', 'constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).', 'un_comtrade:HS72_HS76_HS25_HS31']",
   "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded",
+  "verdict_reason": "no outcome variable loaded; missing: ['un_comtrade:HS72_HS76_HS25_HS31', 'un_comtrade:HS72_HS76_HS25_HS31_volume', 'constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) \u00d7 tonnes imported. Manual-drop pending under data/manual/derived/.', 'constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).', 'un_comtrade:HS72_HS76_HS25_HS31']",
   "hypothesis_id": "cbam_2026_implementation_carbon_leakage_test",
   "template": "did_callaway_santanna",
   "claim_direction_inferred": "?",
   "falsification_rule_text": "Pre-CBAM leakage leg not supported if (a) EU ETS price elasticity of carbon-intensity-weighted imports is zero or wrong-signed at p<0.10, OR (b) CBAM-product imports did not grow faster from high-intensity sources than low-intensity sources 2018-2023. Post-CBAM leg not supported if (c) the post-2026 \u00d7 carbon-intensity-gap interaction is zero on EU imports, OR (d) trade-deflection (third-country to non-EU) is zero (suggesting volume just stops rather than reroutes \u2014 not leakage but demand destruction). Mixed verdict permitted: pre-leakage signature without post-CBAM reversal would suggest CBAM is inadequately calibrated.\n",
   "falsification_test_text": "cbam_carbon_leakage_pre_post_did",
   "estimate": {
-    "error": "no outcome variable loaded"
+    "error": "no outcome variable loaded; missing: ['un_comtrade:HS72_HS76_HS25_HS31', 'un_comtrade:HS72_HS76_HS25_HS31_volume', 'constructed: country-product CO2/tonne intensity (from CBAM transitional-phase declarations 2023-2025; cross-checked against IEA / OECD embedded-carbon-trade tables) \u00d7 tonnes imported. Manual-drop pending under data/manual/derived/.', 'constructed: extra-EU imports / (EU production + extra-EU imports - EU exports) for each CBAM product. Eurostat prom_dsx (production) + comtrade (trade).', 'un_comtrade:HS72_HS76_HS25_HS31']"
   },
   "data_status": {
-    "variables_loaded": [],
+    "variables_loaded": [
+      {
+        "role": "treatment",
+        "name": "cbam_transitional_dummy",
+        "source": "constructed: indicator = 1 from 2023-10 (transitional reporting phase begin) onwards; 0 otherwise.",
+        "publisher": "constructed",
+        "n_rows": 170
+      },
+      {
+        "role": "treatment",
+        "name": "cbam_definitive_dummy",
+        "source": "constructed: indicator = 1 from 2026-01 (definitive phase, financial liability) onwards; 0 otherwise.",
+        "publisher": "constructed",
+        "n_rows": 170
+      },
+      {
+        "role": "controls",
+        "name": "log_real_gdp_eu",
+        "source": "world_bank_wdi:NY.GDP.MKTP.KD",
+        "publisher": "world_bank_wdi",
+        "n_rows": 14066
+      },
+      {
+        "role": "controls",
+        "name": "log_brent_oil",
+        "source": "imf_pcps:POILBRE",
+        "publisher": "imf_pcps",
+        "n_rows": 629
+      },
+      {
+        "role": "controls",
+        "name": "exporter_country_real_exchange_rate_eur",
+        "source": "constructed: bilateral REER vs EUR for major CBAM exporters (CHN, TUR, IND, KOR, RUS). bis or imf source.",
+        "publisher": "constructed",
+        "n_rows": 170
+      }
+    ],
     "variables_missing": [
       {
         "role": "outcome",
@@ -40,16 +76,6 @@
       },
       {
         "role": "treatment",
-        "name": "cbam_transitional_dummy",
-        "source": "constructed: indicator = 1 from 2023-10 (transitional reporting phase begin) onwards; 0 otherwise."
-      },
-      {
-        "role": "treatment",
-        "name": "cbam_definitive_dummy",
-        "source": "constructed: indicator = 1 from 2026-01 (definitive phase, financial liability) onwards; 0 otherwise."
-      },
-      {
-        "role": "treatment",
         "name": "cbam_carbon_intensity_gap_eu",
         "source": "constructed: (exporter-country CO2/tonne for product) \u2212 (EU CO2/tonne benchmark for product). Higher gap = higher CBAM cost burden. Continuous treatment intensity."
       },
@@ -60,26 +86,11 @@
       },
       {
         "role": "controls",
-        "name": "log_real_gdp_eu",
-        "source": "world_bank_wdi:NY.GDP.MKTP.KD"
-      },
-      {
-        "role": "controls",
-        "name": "log_brent_oil",
-        "source": "imf_pcps:POILBRE"
-      },
-      {
-        "role": "controls",
         "name": "log_natural_gas_ttf",
         "source": "constructed: TTF spot, monthly. eex fetcher pending or manual-drop."
-      },
-      {
-        "role": "controls",
-        "name": "exporter_country_real_exchange_rate_eur",
-        "source": "constructed: bilateral REER vs EUR for major CBAM exporters (CHN, TUR, IND, KOR, RUS). bis or imf source."
       }
     ]
   },
-  "run_utc": "2026-04-30T09:47:25+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py"
+  "run_utc": "2026-05-03T07:07:19+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

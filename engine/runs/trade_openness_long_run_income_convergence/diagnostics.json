@@ -1,24 +1,100 @@
 {
+  "verdict": "PARTIAL \u2014 coef=-1.083e-13, p=0.827; effect magnitude effectively zero",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "coef=-1.083e-13, p=0.827; effect magnitude effectively zero",
   "hypothesis_id": "trade_openness_long_run_income_convergence",
-  "verdict": "supported",
-  "reason": "TWFE \u03b2_trade=+0.000243 (SE 0.000069, p=0.000, n=6344), R\u00b2=0.116. Higher trade openness predicts stronger income growth.",
-  "metrics": {
-    "n_observations": 6344,
-    "n_countries": 160,
-    "trade_coef": 0.00024333600424602947,
-    "trade_se": 6.936058923797016e-05,
-    "trade_p": 0.00045102298198556863,
-    "trade_ci_lo": 0.00010739174739313149,
-    "trade_ci_hi": 0.0003792802610989275,
-    "r2_within": 0.11567626877317772
+  "template": "panel_fe",
+  "claim_direction_inferred": "+",
+  "falsification_rule_text": "SUPPORTED if the interaction coefficient \u03b23 (initial_log_gdp \u00d7 openness) is positive and significant at p<0.10, while the corresponding interaction for industrial-policy intensity is either negative, insignificant, or materially smaller in magnitude. PARTIAL if both interactions are positive and significant but openness has the larger coefficient. REFUTED if the openness interaction is negative and significant at p<0.10, or if the industrial-policy interaction is positive and significantly larger.\n",
+  "falsification_test_text": "panel_fe_convergence_interaction_trade_vs_industrial_policy",
+  "estimate": {
+    "coefficient": -1.083451072904964e-13,
+    "std_error": 4.961029569957148e-13,
+    "p_value": 0.8271607195509887,
+    "n_obs": 1281,
+    "n_countries": 61,
+    "r_squared_within": 1.0,
+    "fe_entity": true,
+    "fe_time": true,
+    "cluster": "country",
+    "method": "linearmodels.PanelOLS",
+    "dropped_controls_due_to_overlap": []
   },
-  "threshold": "\u03b2_trade > 0 and p < 0.05",
-  "vintages": {
-    "wdi_trade": "data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-04-30T135618Z.parquet",
-    "pwt": "data/vintages/pwt/pwt_full@2026-04-30T142427Z.parquet"
+  "data_status": {
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "real_gdp_per_capita",
+        "source": "pwt:rgdpo",
+        "publisher": "pwt",
+        "n_rows": 10399
+      },
+      {
+        "role": "treatment",
+        "name": "trade_openness_pct_gdp",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10714
+      },
+      {
+        "role": "controls",
+        "name": "initial_log_gdp_per_capita",
+        "source": "pwt:rgdpo",
+        "publisher": "pwt",
+        "n_rows": 10399
+      },
+      {
+        "role": "controls",
+        "name": "human_capital_index",
+        "source": "pwt:hc",
+        "publisher": "pwt",
+        "n_rows": 8637
+      },
+      {
+        "role": "controls",
+        "name": "rule_of_law",
+        "source": "wgi:RL.EST",
+        "publisher": "wgi",
+        "n_rows": 5296
+      },
+      {
+        "role": "controls",
+        "name": "population_growth",
+        "source": "world_bank_wdi:SP.POP.GROW",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16672
+      },
+      {
+        "role": "controls",
+        "name": "investment_share_gdp",
+        "source": "world_bank_wdi:NE.GDI.TOTL.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 10428
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "convergence_speed_beta",
+        "source": "constructed: 20-year rolling regression of log GDP pc growth on initial log GDP pc"
+      },
+      {
+        "role": "treatment",
+        "name": "industrial_policy_intensity_index",
+        "source": "constructed: composite of state ownership share, directed credit, and sectoral subsidy intensity (CRDF/ITC + Fraser EFW subcomponents)"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "import_penetration_ratio",
+        "source": "world_bank_wits:import_value"
+      },
+      {
+        "role": "decomposition_channels",
+        "name": "export_diversification_index",
+        "source": "un_comtrade:export_product_diversity"
+      }
+    ]
   },
-  "sha256": {
-    "wdi_trade": "4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1",
-    "pwt": "f081fc093bc4aee806a81d69feb34b9fb8f738bad207fcc7853fe8557731bbc0"
-  }
+  "run_utc": "2026-05-03T06:25:55+00:00",
+  "runner": "scripts/run_panel_fe.py"
 }

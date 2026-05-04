@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: housing_cost_driven_real_wage_divergence
-version: 1
+version: 2
 status: pre_registered
 topic: distribution
 claim: 'Within Anglo-liberal economies (UK, US, Australia) over 1995-2020, housing-supply-restricted high-opportunity metro areas exhibit real-wage-net-of-housing-cost trajectories that diverge substantially
@@ -106,17 +106,21 @@ estimator:
     \ is identified via the interaction of elasticity with time trend; primary specification therefore includes supply_elasticity * time_trend as the key variable. Secondary specification: drop metro FE\
     \ and identify via cross-metro variation in elasticity, reported as robustness. Cluster-robust SEs at metro.\n"
 falsification:
-  rule: 'Not supported if the supply-elasticity-x-time-trend coefficient on net-of-housing real wage growth is statistically insignificant at the 5 percent level on cluster-robust SEs, or if its sign is
-    opposite to predicted (supply-restricted metros showing more favourable net-of-housing wage growth than elastic metros). The hypothesis also requires that the coefficient be quantitatively meaningful:
-    supply-restricted metros (bottom tercile elasticity) should show at least 0.5 percentage points per annum lower net- of-housing real wage growth than elastic metros (top tercile) over the sample period.
-    Separately, if headline real wage growth and net-of-housing real wage growth are highly correlated across metros (correlation > 0.9), the framework''s claim that headline series systematically mis-represent
-    welfare is empirically weak.
-
-    '
-  test: supply_elasticity_coefficient_sign_significance_magnitude
-  threshold: 'supply_elasticity_time_trend_coefficient: sign_positive AND p < 0.05 net_of_housing_gap_tercile: >= 0.5_pp_per_annum correlation(headline, net_of_housing): <= 0.9
-
-    '
+  rule: >
+    Primary v2 local diagnostic is a national US FRED proxy, not the full metro supply-elasticity
+    identification design. It compares total-private average hourly earnings deflated by all-items CPI
+    with the same earnings deflated by CPI shelter from 2006-03 through 2020-02, the longest clean
+    local FRED overlap ending before the pandemic. The diagnostic supports the narrower welfare-wage
+    measurement channel if all-items real wage growth exceeds shelter-deflated wage growth by at least
+    5 percentage points over the window and the year-over-year growth correlation is below 0.90. It is
+    refuted if the gap is below 2 percentage points or the correlation is at least 0.90. Otherwise it is
+    partial. Full support for the original claim still requires the metro supply-elasticity panel.
+  test: fred_us_ahe_all_cpi_vs_shelter_cpi_2006_2020
+  threshold: support if all-items real wage growth minus shelter-deflated wage growth >=5pp and yoy-growth correlation <0.90; refute if gap <2pp or correlation >=0.90
+methodology_note: >
+  v2 graduates a narrow measurement-channel test using local FRED data. It does not estimate Saiz,
+  Hilber-Vermeulen, or Kendall-Tulip metro supply-elasticity coefficients and therefore cannot deliver
+  full causal support for the original cross-metro claim.
 prior_confidence: 0.72
 disclosure: 'Author holds strong priors toward the housing-supply-restriction reading of Anglo-liberal real-wage trajectories, and has written on UK housing supply as a first-order economic policy issue.
   The 0.72 prior reflects this, and the falsification test is deliberately multi-pronged so the hypothesis does not pass on a significant-but- small coefficient alone. Conflict disclosure: author holds

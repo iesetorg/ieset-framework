@@ -1,19 +1,89 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 interaction term requested but no loadable constructed interaction variable is defined. The generic panel_fe runner would otherwise grade a main-effect coefficient instead of the pre-registered interaction estimand. Add a treatment or decomposition variable with transformation/source/name marking the interaction, or use a bespoke replication script.",
+  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient observations after listwise deletion (13)",
   "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "interaction term requested but no loadable constructed interaction variable is defined. The generic panel_fe runner would otherwise grade a main-effect coefficient instead of the pre-registered interaction estimand. Add a treatment or decomposition variable with transformation/source/name marking the interaction, or use a bespoke replication script.",
+  "verdict_reason": "insufficient observations after listwise deletion (13)",
   "hypothesis_id": "central_bank_balance_sheet_cpi_decoupling_panel_2008_2020",
   "template": "panel_fe",
   "claim_direction_inferred": "+",
   "falsification_rule_text": "The hypothesis is falsified if any of the following hold over 2008-2020 across the four institutions: (a) cumulative core-CPI divergence from each institution's pre-2008 5y trend exceeds 2 percentage points in any 6-month window in any of the four economies, (b) inflation-expectations 5y5y forward exits the pre-2008 anchored range (defined as \u00b10.75 pp around the pre-2008 mean) in any of the four jurisdictions, OR (c) panel Granger causality from balance-sheet to CPI rejects null at p<0.01 with positive coefficient at h=12-36 months after controlling for output gap and oil prices.",
   "falsification_test_text": "cb_balance_sheet_cpi_decoupling_cross_institution_panel",
   "estimate": {
-    "error": "interaction term requested but no loadable constructed interaction variable is defined. The generic panel_fe runner would otherwise grade a main-effect coefficient instead of the pre-registered interaction estimand. Add a treatment or decomposition variable with transformation/source/name marking the interaction, or use a bespoke replication script."
+    "error": "insufficient observations after listwise deletion (13)"
   },
   "data_status": {
-    "variables_loaded": [],
-    "variables_missing": []
+    "variables_loaded": [
+      {
+        "role": "outcome",
+        "name": "core_cpi_inflation_yoy",
+        "source": "fred:CPILFESL (USA); boj:core_cpi (JPN); ons:cpi_core (GBR)",
+        "publisher": "fred",
+        "n_rows": 70
+      },
+      {
+        "role": "outcome",
+        "name": "inflation_expectations_5y5y_forward",
+        "source": "fred:T5YIFR (USA); boe:gilt_implied_inflation_5y5y (GBR); boj:5y5y_inflation_swap (JPN)",
+        "publisher": "fred",
+        "n_rows": 24
+      },
+      {
+        "role": "outcome",
+        "name": "m2_broad_money_growth",
+        "source": "fred:M2SL (USA); ecb:BSI.M.U2.M2 (EUR); boj:money_stock_m2; boe:LPMVQJW (GBR)",
+        "publisher": "fred",
+        "n_rows": 68
+      },
+      {
+        "role": "treatment",
+        "name": "central_bank_balance_sheet_pct_gdp",
+        "source": "fred:WALCL; fred:GDP (USA); boj:monetary_base; fred:JPNNGDP (JPN); boe:GDP (GBR)",
+        "publisher": "fred",
+        "n_rows": 80
+      },
+      {
+        "role": "treatment",
+        "name": "monetary_base_growth",
+        "source": "fred:BOGMBASE (USA); boj:monetary_base; ecb:base_money; boe:monetary_base",
+        "publisher": "fred",
+        "n_rows": 68
+      },
+      {
+        "role": "controls",
+        "name": "short_rate",
+        "source": "fred:DFF (USA); ecb:FM (EUR); boj:policy_rate (JPN); boe:IUDBEDR (GBR)",
+        "publisher": "fred+ecb+boe",
+        "n_rows": 158
+      },
+      {
+        "role": "controls",
+        "name": "output_gap",
+        "source": "oecd:OutputGap",
+        "publisher": "oecd",
+        "n_rows": 3331
+      },
+      {
+        "role": "controls",
+        "name": "unemployment_rate",
+        "source": "fred:UNRATE; ilostat:unemployment_rate",
+        "publisher": "fred",
+        "n_rows": 632
+      },
+      {
+        "role": "controls",
+        "name": "oil_price",
+        "source": "imf_pcps:POILBRE",
+        "publisher": "imf_pcps",
+        "n_rows": 288
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "outcome",
+        "name": "core_cpi_divergence_from_pre2008_trend",
+        "source": "constructed: actual core-CPI YoY minus rolling pre-2008 5y trend"
+      }
+    ]
   },
-  "run_utc": "2026-05-01T08:59:43+00:00",
+  "run_utc": "2026-05-03T06:49:41+00:00",
   "runner": "scripts/run_panel_fe.py"
 }
