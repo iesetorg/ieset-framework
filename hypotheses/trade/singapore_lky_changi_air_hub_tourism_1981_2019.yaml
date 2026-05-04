@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_changi_air_hub_tourism_1981_2019
+version: 1
+status: pre_registered
+topic: trade
+claim: 'Singapore''s Changi airport, SIA, port-state, and open-city strategy produced a durable
+  air-services and visitor hub: by the pre-COVID endpoint, tourist arrivals were multiple times
+  resident population, receipts were material, and the same economy remained extremely trade-open.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  period:
+  - 1981
+  - 2019
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: visitor_arrivals_2019
+  description: Visitor arrivals reached large hub scale before COVID
+  threshold: '>= 15 million'
+  window: '2019'
+  source: world_bank_wdi:ST.INT.ARVL
+  direction: supports_claim
+  independence_justification: Arrivals count tests absolute hub scale.
+- metric_id: visitor_arrivals_per_capita_2019
+  description: Visitor arrivals exceeded resident population several-fold
+  threshold: '>= 3.0 arrivals per resident'
+  window: '2019'
+  source: world_bank_wdi:ST.INT.ARVL; world_bank_wdi:SP.POP.TOTL
+  direction: supports_claim
+  independence_justification: Per-capita intensity adjusts for city-state scale.
+- metric_id: tourism_receipts_export_share
+  description: Travel receipts remained material in export basket
+  threshold: '>= 2% of exports mean'
+  window: 1995-2019
+  source: world_bank_wdi:ST.INT.RCPT.XP.ZS
+  direction: supports_claim
+  independence_justification: Receipts share checks economic significance, not just passenger
+    counts.
+- metric_id: trade_openness_2019
+  description: Open-city model coincided with extreme trade openness
+  threshold: '>= 300% of GDP'
+  window: '2019'
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Trade/GDP checks the broader open-city context.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: tourist_arrivals
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: endpoint_level
+  - name: tourism_receipts_share_exports
+    source: world_bank_wdi:ST.INT.RCPT.XP.ZS
+    transformation: annual_mean
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: endpoint_level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Singapore/UAE case checklist using local WDI, WGI, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_changi_air_hub_tourism_1981_2019_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.74
+disclosure: Prior expects support; this is a hub-scale descriptive test and not proof that an
+  airport alone caused productivity growth.
+steelman: hypotheses/steelman/singapore_lky_changi_air_hub_tourism_1981_2019.md
+scope:
+  period:
+  - 1981
+  - 2019
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  outcome_dim:
+  - trade_liberalisation
+  - capital_flows
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  treatment_tags:
+  - changi_airport_1981
+  - singapore_airlines_hub
+  - open_city_services
+notes: Uses pre-COVID 2019 endpoint to avoid pandemic collapse contaminating the hub test.

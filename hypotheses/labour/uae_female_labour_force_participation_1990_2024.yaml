@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uae_female_labour_force_participation_1990_2024
+version: 1
+status: pre_registered
+topic: labour
+claim: The UAE's education, migration, and labour-market reforms were followed by a large rise
+  in female labour-force participation, placing the UAE above the GCC peer median by the 2020s.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 1990
+  - 2024
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: female_lfp_gain
+  description: Female labour-force participation rose strongly
+  threshold: '>= 20pp increase'
+  window: 1990-2024
+  source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+  direction: supports_claim
+  independence_justification: Domestic trend check.
+- metric_id: female_lfp_2024
+  description: Female labour-force participation exceeded half of working-age women
+  threshold: '>= 50%'
+  window: '2024'
+  source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+  direction: supports_claim
+  independence_justification: Endpoint level check.
+- metric_id: female_lfp_peer_gap_2024
+  description: Female LFP exceeded GCC peer median
+  threshold: '>= 8pp above peer median'
+  window: '2024'
+  source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+  direction: supports_claim
+  independence_justification: GCC peer benchmark.
+- metric_id: female_lfp_peer_ratio_2024
+  description: Female LFP ratio exceeded GCC peer median
+  threshold: '>= 1.15x peer median'
+  window: '2024'
+  source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+  direction: supports_claim
+  independence_justification: Scale-normalized peer benchmark.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: female_lfp
+    source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+    transformation: endpoint_change
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Singapore/UAE case checklist using local WDI, WGI, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: uae_female_labour_force_participation_1990_2024_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.7
+disclosure: Prior expects support; WDI LFP does not separate Emirati citizens from expatriate
+  women, so interpretation must stay population-level.
+steelman: hypotheses/steelman/uae_female_labour_force_participation_1990_2024.md
+scope:
+  period:
+  - 1990
+  - 2024
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - employment_labour
+  - demographics_migration
+  policy_family:
+  - labour_market
+  - regulation
+  treatment_tags:
+  - uae_women_workforce_strategy
+  - golden_visa_2019
+  - labour_reforms
+notes: Population-level labour-force outcome; citizen/expatriate split remains a data need.

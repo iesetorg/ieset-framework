@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uae_dubai_tourism_aviation_hub_2015_2019
+version: 1
+status: pre_registered
+topic: trade
+claim: Dubai/UAE aviation, airport, and tourism policy achieved exceptional pre-COVID visitor-hub
+  scale by Gulf standards, visible in absolute arrivals, arrivals per resident, and arrivals relative
+  to GCC peers.
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 2015
+  - 2019
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: visitor_arrivals_2019
+  description: International arrivals reached very large scale
+  threshold: '>= 20 million'
+  window: '2019'
+  source: world_bank_wdi:ST.INT.ARVL
+  direction: supports_claim
+  independence_justification: Absolute scale check.
+- metric_id: visitor_arrivals_per_capita_2019
+  description: Arrivals exceeded resident population multiple times
+  threshold: '>= 2.0 arrivals per resident'
+  window: '2019'
+  source: world_bank_wdi:ST.INT.ARVL; world_bank_wdi:SP.POP.TOTL
+  direction: supports_claim
+  independence_justification: Scale-adjusted hub intensity.
+- metric_id: visitor_arrivals_vs_gcc_2019
+  description: Arrivals exceeded GCC peer median
+  threshold: '>= 2.0x peer median'
+  window: '2019'
+  source: world_bank_wdi:ST.INT.ARVL
+  direction: supports_claim
+  independence_justification: GCC benchmark controls regional tourism trend.
+- metric_id: trade_openness_context_2019
+  description: Tourism hub sat inside a highly open economy
+  threshold: '>= 150% of GDP'
+  window: '2019'
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Open-economy context separate from arrivals.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: tourist_arrivals
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: endpoint_level
+  - name: population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: denominator
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Singapore/UAE case checklist using local WDI, WGI, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: uae_dubai_tourism_aviation_hub_2015_2019_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.78
+disclosure: Prior expects support; WDI UAE arrivals coverage starts only in 2015, so the test
+  is pre-COVID endpoint evidence rather than a full 1985-2019 time series.
+steelman: hypotheses/steelman/uae_dubai_tourism_aviation_hub_2015_2019.md
+scope:
+  period:
+  - 2015
+  - 2019
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - trade_liberalisation
+  - capital_flows
+  policy_family:
+  - trade_policy
+  - industrial_policy
+  treatment_tags:
+  - emirates_airline_1985
+  - dubai_airport_hub
+  - tourism_strategy
+notes: Uses 2019 pre-COVID endpoint because 2020 travel restrictions break the series.

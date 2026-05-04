@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: singapore_lky_public_health_outcomes_1965_1990
+version: 1
+status: pre_registered
+topic: healthcare
+claim: 'Singapore''s Lee Kuan Yew era public-health and disciplined social-policy bundle coincided
+  with first-world health outcome convergence by 1990: life expectancy rose strongly, infant mortality
+  collapsed, and Singapore beat regional market-economy peers on both endpoints.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  period:
+  - 1965
+  - 1990
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: life_expectancy_gain
+  description: Life expectancy gain during LKY prime-minister era
+  threshold: '>= 7 years'
+  window: 1965-1990
+  source: world_bank_wdi:SP.DYN.LE00.IN
+  direction: supports_claim
+  independence_justification: Mortality/longevity endpoint distinct from infant survival.
+- metric_id: infant_mortality_drop
+  description: Infant mortality decline during LKY prime-minister era
+  threshold: '>= 20 deaths per 1,000 live births decline'
+  window: 1965-1990
+  source: world_bank_wdi:SP.DYN.IMRT.IN
+  direction: supports_claim
+  independence_justification: Infant mortality is a separate health-outcome margin.
+- metric_id: life_expectancy_peer_gap_1990
+  description: Life expectancy exceeded Asian peer median by 1990
+  threshold: '>= 4 years above peer median'
+  window: '1990'
+  source: world_bank_wdi:SP.DYN.LE00.IN
+  direction: supports_claim
+  independence_justification: Peer endpoint check limits pure time-trend interpretation.
+- metric_id: infant_mortality_peer_ratio_1990
+  description: Infant mortality was less than half regional peer median
+  threshold: <= 0.50x peer median
+  window: '1990'
+  source: world_bank_wdi:SP.DYN.IMRT.IN
+  direction: supports_claim
+  independence_justification: Cross-sectional infant mortality check independent from domestic
+    trend.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: endpoint_change
+  - name: infant_mortality
+    source: world_bank_wdi:SP.DYN.IMRT.IN
+    transformation: endpoint_change
+  - name: health_spending_per_capita
+    source: world_bank_wdi:SH.XPD.CHEX.PC.CD
+    transformation: later_robustness
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Singapore/UAE case checklist using local WDI, WGI, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: singapore_lky_public_health_outcomes_1965_1990_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.78
+disclosure: Prior expects support, but the design is descriptive and cannot separate sanitation,
+  income growth, housing, primary care, and later Medisave channels.
+steelman: hypotheses/steelman/singapore_lky_public_health_outcomes_1965_1990.md
+scope:
+  period:
+  - 1965
+  - 1990
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - MYS
+  - THA
+  - IDN
+  - PHL
+  outcome_dim:
+  - life_expectancy_health
+  - welfare_state
+  policy_family:
+  - welfare_architecture
+  - institutional_reform
+  treatment_tags:
+  - lky_public_health
+  - singapore_medisave_1984
+  - urban_sanitation
+notes: Descriptive health-outcome convergence checklist using WDI endpoints.

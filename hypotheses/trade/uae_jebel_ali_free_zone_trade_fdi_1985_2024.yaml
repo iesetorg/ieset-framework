@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uae_jebel_ali_free_zone_trade_fdi_1985_2024
+version: 1
+status: pre_registered
+topic: trade
+claim: 'The UAE''s Jebel Ali and free-zone strategy produced a highly open trade and investment
+  platform by Gulf standards: trade intensity is high, exceeds the GCC peer median, FDI intensity
+  has become material, and trade-freedom scores remain high.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 1985
+  - 2024
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: trade_openness_mean
+  description: Trade/GDP averaged high after free-zone expansion
+  threshold: '>= 120% of GDP'
+  window: 1990-2024
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Gross openness measure.
+- metric_id: trade_openness_vs_gcc_2023
+  description: Trade/GDP exceeded GCC peer median
+  threshold: '>= 1.5x peer median'
+  window: '2023'
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Peer comparison separates general Gulf oil-exporter trend.
+- metric_id: fdi_intensity_mature_endpoint
+  description: FDI inflows reached material GDP share
+  threshold: '>= 5% of GDP'
+  window: '2024'
+  source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+  direction: supports_claim
+  independence_justification: External capital-flow channel separate from trade volume.
+- metric_id: trade_freedom_score
+  description: EFW trade-freedom score remained high
+  threshold: '>= 8.0'
+  window: '2023'
+  source: fraser_efw:freedom_to_trade_internationally
+  direction: supports_claim
+  independence_justification: Institutional trade-policy score independent from WDI trade volumes.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: annual_mean
+  - name: fdi_inflows_share_gdp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: annual_mean
+  - name: efw_trade_freedom
+    source: fraser_efw:freedom_to_trade_internationally
+    transformation: endpoint_level
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Singapore/UAE case checklist using local WDI, WGI, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: uae_jebel_ali_free_zone_trade_fdi_1985_2024_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.7
+disclosure: Prior expects support; the test does not separate geography, oil-financed infrastructure,
+  and free-zone legal design.
+steelman: hypotheses/steelman/uae_jebel_ali_free_zone_trade_fdi_1985_2024.md
+scope:
+  period:
+  - 1985
+  - 2024
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - trade_liberalisation
+  - capital_flows
+  policy_family:
+  - trade_policy
+  - regulation
+  - tax_policy
+  treatment_tags:
+  - jebel_ali_free_zone_1985
+  - free_zone_foreign_ownership
+  - reexport_hub
+notes: GCC peer benchmark keeps this from being a generic oil-state claim.

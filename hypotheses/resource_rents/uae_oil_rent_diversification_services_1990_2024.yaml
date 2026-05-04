@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: uae_oil_rent_diversification_services_1990_2024
+version: 1
+status: pre_registered
+topic: resource_rents
+claim: 'The UAE diversification model reduced direct oil-rent dependence and expanded services,
+  while still retaining hydrocarbon-export exposure. The claim is deliberately two-sided: support
+  requires services and oil-rent metrics to improve, but fuel-export dependence remains a risk
+  metric.'
+evidence_type: canonical_case_multi_metric
+sample:
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  period:
+  - 1990
+  - 2024
+  temporal_structure: panel
+canonical_metrics:
+- metric_id: oil_rents_share_decline
+  description: Oil rents/GDP declined materially
+  threshold: '>= 15pp decline'
+  window: 1990-2024
+  source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+  direction: supports_claim
+  independence_justification: Rent-share check captures fiscal/resource exposure.
+- metric_id: services_va_share_gain
+  description: Services value-added share rose materially
+  threshold: '>= 10pp increase'
+  window: 1990-2024
+  source: world_bank_wdi:NV.SRV.TOTL.ZS
+  direction: supports_claim
+  independence_justification: Sectoral-structure check separate from rents.
+- metric_id: fuel_exports_share_decline_post_2000
+  description: Fuel-export share declined after the 2000 oil-cycle endpoint
+  threshold: '>= 15pp decline'
+  window: 2000-2023
+  source: world_bank_wdi:TX.VAL.FUEL.ZS.UN
+  direction: supports_claim
+  independence_justification: Export-composition risk metric.
+- metric_id: trade_openness_mean
+  description: Diversification occurred inside a highly open economy
+  threshold: '>= 140% of GDP mean'
+  window: 1990-2024
+  source: world_bank_wdi:NE.TRD.GNFS.ZS
+  direction: supports_claim
+  independence_justification: Open-economy channel separate from resource shares.
+multi_metric_falsification:
+  total_metrics: 4
+  support_threshold: 3
+  refute_threshold: 1
+variables:
+  outcome:
+  - name: oil_rents_share_gdp
+    source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+    transformation: endpoint_change
+  - name: services_value_added_share
+    source: world_bank_wdi:NV.SRV.TOTL.ZS
+    transformation: endpoint_change
+  - name: fuel_exports_share
+    source: world_bank_wdi:TX.VAL.FUEL.ZS.UN
+    transformation: endpoint_change
+estimator:
+  template: multi_metric_checklist
+  clustering: none
+  notes: Custom Singapore/UAE case checklist using local WDI, WGI, and Fraser EFW vintages.
+falsification:
+  rule: SUPPORTED if at least 3 of 4 pre-registered metrics meet their thresholds. REFUTED if
+    at most 1 metrics meet after available data are evaluated. Otherwise PARTIAL or INCONCLUSIVE_DATA_PENDING.
+  test: uae_oil_rent_diversification_services_1990_2024_local_multimetric_checklist
+  threshold: MET >= 3 of 4; REFUTE when MET <= 1
+prior_confidence: 0.64
+disclosure: Prior expects support with caveats; the fuel-export metric is included to stop the
+  model from overclaiming non-oil transformation.
+steelman: hypotheses/steelman/uae_oil_rent_diversification_services_1990_2024.md
+scope:
+  period:
+  - 1990
+  - 2024
+  countries:
+  - ARE
+  - SAU
+  - KWT
+  - QAT
+  - OMN
+  - BHR
+  outcome_dim:
+  - energy
+  - trade_liberalisation
+  - capital_flows
+  policy_family:
+  - industrial_policy
+  - fiscal_policy
+  - trade_policy
+  treatment_tags:
+  - adia_diversification_1980s
+  - dubai_services_pivot
+  - abu_dhabi_sovereign_wealth
+notes: Uses 2000-2023 for fuel-export trend because early UAE fuel-export series has sparse/noisy
+  1980s-1990s values.
