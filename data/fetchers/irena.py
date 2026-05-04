@@ -31,6 +31,7 @@ Currently supported series_ids:
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import Any
 
@@ -38,6 +39,7 @@ import pandas as pd
 import requests
 
 from ._base import FetchResult, utc_now, write_vintage
+from ._http import get as robust_get
 from ._manual_utils import find_latest, ManualDropError
 
 LICENSE = "unknown"  # IRENA terms: free for use with attribution
@@ -113,9 +115,8 @@ class IrenaError(RuntimeError):
 
 def _pxweb_metadata(table: str) -> dict:
     url = f"{PXWEB_BASE}/{table}"
-    r = requests.get(url, timeout=60, headers={"User-Agent": "ieset-fetcher"})
-    r.raise_for_status()
-    return r.json()
+    payload = robust_get(url, timeout=60, headers={"Accept": "application/json,*/*;q=0.8"})
+    return json.loads(payload.text)
 
 
 def _pxweb_query(table: str, body: dict) -> dict:

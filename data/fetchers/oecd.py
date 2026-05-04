@@ -29,6 +29,7 @@ import pandas as pd
 import requests
 
 from ._base import FetchResult, utc_now, write_vintage
+from ._http import get as robust_get
 
 OECD_BASE = "https://sdmx.oecd.org/public/rest/data"
 LICENSE = "OECD standard permissions (attribution required)"
@@ -219,16 +220,21 @@ def fetch(
     # URL shape; keep that transport contract instead of relying on content
     # negotiation, which has recently started returning 403s for some calls.
     params["format"] = "csvfilewithlabels"
-    r = requests.get(
+    payload = robust_get(
         url,
         params=params,
         timeout=120,
-        headers={"User-Agent": "Mozilla/5.0 IESET"},
+        headers={"Accept": "text/csv,*/*;q=0.8"},
+        return_http_errors=True,
     )
-    if r.status_code == 404:
+    if payload.status_code == 404:
         raise OecdError(f"OECD 404 for {series_id} (resolved='{resolved}') key='{key}' — check dataflow id")
-    r.raise_for_status()
-    text = r.text
+    if payload.status_code >= 400:
+        raise OecdError(
+            f"OECD HTTP {payload.status_code} for {series_id} "
+            f"(resolved='{resolved}') key='{key}' via {payload.transport}"
+        )
+    text = payload.text
     if not text.strip():
         raise OecdError(f"OECD returned empty CSV for {series_id}")
     df = pd.read_csv(io.StringIO(text), low_memory=False)
@@ -270,6 +276,7 @@ def fetch(
             "start_period": start_period,
             "end_period": end_period,
             "columns": list(df.columns),
+            "http_transport": payload.transport,
             "vintage_utc": vintage_utc.isoformat() if vintage_utc else None,
         },
     )
