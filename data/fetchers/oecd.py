@@ -82,6 +82,10 @@ _OECD_SHORTCUTS: dict[str, str] = {
     "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_AGG,1.0",
     "DSD_SOCX@DF_SOCX_ALMP": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0",
     "FDI_statistics": "OECD.DAF.INV,DSD_FDI@DF_FDI_FLOWS,1.0",
+    "OECD.EDU.IMEP_DSD_EAG_FIN_DF_FIN_RESOURCES_1.0": "OECD.EDU.IMEP,DSD_EAG_SUBNAT_UOE_FIN@DF_SUBNAT_UOE_FIN,1.0",
+    "OECD.EDU.IMEP,DSD_EAG_FIN@DF_FIN_RESOURCES,1.0": "OECD.EDU.IMEP,DSD_EAG_SUBNAT_UOE_FIN@DF_SUBNAT_UOE_FIN,1.0",
+    "OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0": "OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,1.1",
+    "OECD.ELS.HD,DSD_HH_DASH@DF_HSG_INEQ,1.0": "OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,1.1",
     "HFCE": "OECD.SDD.NAD,DSD_NAMAIN1@DF_HFCE,1.0",
     "Gov_Exp": "OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0",
     "GovExp": "OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0",
@@ -102,17 +106,16 @@ def _load_dataflows() -> list[dict[str, str | None]]:
     if _OECD_DATAFLOW_CACHE is not None:
         return _OECD_DATAFLOW_CACHE
     try:
-        r = requests.get(
+        payload = robust_get(
             "https://sdmx.oecd.org/public/rest/dataflow/all/all/latest",
             timeout=30,
             headers={"User-Agent": "Mozilla/5.0 IESET"},
         )
-        r.raise_for_status()
         ns = {
             "s": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure",
             "c": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common",
         }
-        root = ET.fromstring(r.text)
+        root = ET.fromstring(payload.text)
         flows: list[dict[str, str | None]] = []
         for df in root.findall(".//s:Dataflow", ns):
             names = df.findall(".//c:Name", ns)
@@ -175,6 +178,10 @@ def _resolve_dataflow(series_id: str) -> str:
         return resolved
     if sid.startswith("OECD.") and "," in sid:
         return sid
+    shorthand = re.match(r"^(OECD(?:\.[A-Z0-9]+)+)_(DSD_[A-Z0-9_]+)_(DF_[A-Z0-9_]+)_([0-9.]+)$", sid)
+    if shorthand:
+        agency, dsd, dataflow, version = shorthand.groups()
+        return f"{agency},{dsd}@{dataflow},{version}"
     head = sid.split("@", 1)[0]
     if head in _DSD_AGENCY:
         agency = _DSD_AGENCY[head]
@@ -227,6 +234,15 @@ def fetch(
         headers={"Accept": "text/csv,*/*;q=0.8"},
         return_http_errors=True,
     )
+    if payload.status_code == 422 and payload.transport == "zenrows":
+        payload = robust_get(
+            url,
+            params=params,
+            timeout=180,
+            headers={"Accept": "text/csv,*/*;q=0.8"},
+            return_http_errors=True,
+            zenrows_js_render=True,
+        )
     if payload.status_code == 404:
         raise OecdError(f"OECD 404 for {series_id} (resolved='{resolved}') key='{key}' — check dataflow id")
     if payload.status_code >= 400:

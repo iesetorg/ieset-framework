@@ -80,6 +80,14 @@ def _zenrows_url(url: str, *, js_render: bool = False, premium_proxy: bool = Tru
     return "https://api.zenrows.com/v1/?" + urlencode(params)
 
 
+def _err(exc: Exception) -> str:
+    text = str(exc)
+    key = os.environ.get("ZENROWS_API_KEY")
+    if key:
+        text = text.replace(key, "<ZENROWS_API_KEY>")
+    return text
+
+
 def _looks_blocked(status_code: int, body: bytes) -> bool:
     if status_code in {401, 403, 407, 429, 503}:
         return True
@@ -119,7 +127,7 @@ def get(
     try:
         r = requests.get(url, params=params, headers=merged_headers, timeout=timeout)
     except Exception as exc:  # noqa: BLE001
-        errors.append(f"requests:{type(exc).__name__}")
+        errors.append(f"requests:{type(exc).__name__}:{_err(exc)}")
     else:
         if not _looks_blocked(r.status_code, r.content):
             if r.status_code >= 400 and not return_http_errors:
@@ -143,7 +151,7 @@ def get(
                 impersonate="chrome",
             )
         except Exception as exc:  # noqa: BLE001
-            errors.append(f"curl_cffi:{type(exc).__name__}")
+            errors.append(f"curl_cffi:{type(exc).__name__}:{_err(exc)}")
         else:
             if not _looks_blocked(r.status_code, r.content):
                 if r.status_code >= 400 and not return_http_errors:
@@ -165,7 +173,7 @@ def get(
                 timeout=max(timeout, 180),
             )
         except Exception as exc:  # noqa: BLE001
-            errors.append(f"zenrows:{type(exc).__name__}")
+            errors.append(f"zenrows:{type(exc).__name__}:{_err(exc)}")
         else:
             if not _looks_blocked(zr.status_code, zr.content):
                 if zr.status_code >= 400 and not return_http_errors:
