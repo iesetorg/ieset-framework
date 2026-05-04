@@ -76,6 +76,12 @@ export function Topbar() {
             Scoreboard
           </Link>
           <Link
+            href="/policy-browser"
+            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
+          >
+            Policy Browser
+          </Link>
+          <Link
             href="/atlas"
             className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
           >
