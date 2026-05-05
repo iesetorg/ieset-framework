@@ -14,6 +14,8 @@ export function Footer() {
           <Link href="/methodology" className="text-muted hover:text-ink hover:no-underline">Methodology</Link>
           <Link href="/disclosure" className="text-muted hover:text-ink hover:no-underline">Disclosure</Link>
           <Link href="/contribute" className="text-muted hover:text-ink hover:no-underline">Contribute</Link>
+          <Link href="/terms" className="text-muted hover:text-ink hover:no-underline">Terms</Link>
+          <Link href="/privacy" className="text-muted hover:text-ink hover:no-underline">Privacy</Link>
           <a
             href="https://twitter.com/IESETorg"
             target="_blank"

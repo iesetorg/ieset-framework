@@ -59,6 +59,26 @@ const ABOUT: NavDropdownItem[] = [
     label: "Methodology",
     blurb: "The six invariants the framework commits to",
   },
+  {
+    href: "/disclosure",
+    label: "Disclosure",
+    blurb: "Author priors, conflicts, and correction posture",
+  },
+  {
+    href: "/contribute",
+    label: "Contribute",
+    blurb: "How to challenge, repair, or extend the framework",
+  },
+  {
+    href: "/terms",
+    label: "Terms",
+    blurb: "Use, contribution, and research limitations",
+  },
+  {
+    href: "/privacy",
+    label: "Privacy",
+    blurb: "Visitor, contribution, and provenance data handling",
+  },
 ];
 
 export function Topbar() {
