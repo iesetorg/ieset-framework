@@ -16,6 +16,7 @@ import { FalsificationCard } from "@/components/cards/FalsificationCard";
 import { SteelmanBlock } from "@/components/cards/SteelmanBlock";
 import { CiteBlock } from "@/components/cards/CiteBlock";
 import { ResultBanner } from "@/components/cards/ResultBanner";
+import { PolicyBriefCard } from "@/components/cards/PolicyBriefCard";
 import { HypothesisChart } from "@/components/charts/HypothesisChart";
 
 export async function generateStaticParams() {
@@ -98,6 +99,9 @@ export default async function HypothesisPage({
 
       {/* ---------- RESULT BANNER: verdict first, above the fold ---------- */}
       <ResultBanner run={run} />
+
+      {/* ---------- PLAIN-ENGLISH POLICY BRIEF ---------- */}
+      <PolicyBriefCard hypothesis={h} run={run} variables={varRows} />
 
       {/* ---------- CHART SECTION ---------- */}
       <section className="mb-10">

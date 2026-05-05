@@ -10,11 +10,11 @@ const toneClasses = {
 
 const toneHelp: Record<"green" | "amber" | "red" | "muted", string> = {
   green:
-    "The data ran in the direction predicted and crossed the pre-registered threshold.",
+    "This is a clear pass for the claim as written. It still applies only to this sample, period, and method.",
   amber:
-    "Mixed evidence — some predictions held, others did not. The full claim is not established.",
+    "The result is useful, but not decisive. Treat it as a clue, not a settled conclusion.",
   red:
-    "The data ran against the prediction or failed the pre-registered threshold.",
+    "This test cuts against the claim as written or misses its pre-declared threshold.",
   muted: "Result card produced; verdict unclassified.",
 };
 
@@ -54,7 +54,7 @@ export function ResultBanner({ run }: { run: RunArtifacts }) {
           {run.verdict ?? "Result card available."}
         </p>
         <p className="mt-2 text-[12.5px] leading-[1.5] text-muted">
-          <span className="sc mr-1.5 text-[10px]">what this means</span>
+          <span className="sc mr-1.5 text-[10px]">confidence cue</span>
           {toneHelp[tone]}
         </p>
       </div>

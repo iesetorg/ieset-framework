@@ -363,6 +363,7 @@ export interface RunArtifacts {
   exists: boolean;
   verdict?: string;
   diagnostics?: Record<string, unknown>;
+  evidence_packet?: Record<string, unknown>;
   result_card_html?: string;
   run_dir_rel?: string;
 }
@@ -386,6 +387,18 @@ export async function loadRunArtifacts(hypothesisId: string): Promise<RunArtifac
       try {
         out.diagnostics = JSON.parse(await readFile(diagPath, "utf8"));
         out.verdict = out.diagnostics?.verdict as string | undefined;
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const packetPath = join(runDir, "evidence_packet.yaml");
+    if (existsSync(packetPath)) {
+      try {
+        const parsed = yaml.load(await readFile(packetPath, "utf8"));
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          out.evidence_packet = parsed as Record<string, unknown>;
+        }
       } catch {
         /* ignore */
       }
