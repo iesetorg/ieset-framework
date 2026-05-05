@@ -18,6 +18,25 @@ function sentenceCase(text: string): string {
 
 function friendlyName(text: string | undefined): string {
   const clean = humanize(text);
+  const direct: Record<string, string> = {
+    teen_employment_to_population: "teen job rate",
+    low_education_unemployment_rate: "unemployment among workers with less education",
+    low_skill_employment_share: "share of jobs held by lower-skill workers",
+    minimum_to_median_wage_ratio: "how high the minimum wage is compared with typical local pay",
+    state_minimum_wage: "state minimum wage",
+    minimum_wage_real_level: "inflation-adjusted minimum wage",
+    intergenerational_earnings_elasticity: "how strongly parents' income predicts their children's income",
+    bottom_to_top_quintile_transition_probability: "chance that children from low-income families reach the top",
+    education_spending_inequality: "unequal school funding",
+    residential_segregation_by_income: "income separation between neighborhoods",
+    price_to_income_ratio_tier1_cities: "housing costs in high-opportunity cities",
+    gdp_per_capita_real: "real income per person",
+    gdp_per_capita_ppp: "cost-of-living adjusted income per person",
+    disposable_income_gini: "income inequality after taxes and transfers",
+    government_effectiveness: "basic government quality",
+  };
+  if (text && direct[text]) return direct[text];
+
   const replacements: Record<string, string> = {
     gdp: "income",
     ppp: "cost-of-living adjusted",
@@ -173,13 +192,31 @@ function whyItMatters(hypothesis: Hypothesis): string {
   return `This matters because ${topic || "policy"} claims should change belief only when they survive a pre-declared empirical test.`;
 }
 
-function variableExplanation(v: VariableWithRole): string {
-  const name = sentenceCase(humanize(v.name));
-  if (v.role === "outcome") return `${name}: the thing we are trying to explain.`;
-  if (v.role === "treatment") return `${name}: the policy or condition whose effect is being tested.`;
-  if (v.role === "channel") return `${name}: a proposed pathway from policy to outcome.`;
-  if (v.role === "control") return `${name}: a background factor included so the comparison is fairer.`;
-  return `${name}: one of the measures used in the test.`;
+function measureGroups(variables: VariableWithRole[]): Array<{ title: string; items: string[] }> {
+  const outcomes = variables.filter((v) => v.role === "outcome").slice(0, 3).map((v) => friendlyName(v.name));
+  const treatments = variables.filter((v) => v.role === "treatment").slice(0, 2).map((v) => friendlyName(v.name));
+  const channels = variables.filter((v) => v.role === "channel").slice(0, 2).map((v) => friendlyName(v.name));
+
+  const groups = [];
+  if (treatments.length) {
+    groups.push({
+      title: "What changed",
+      items: treatments,
+    });
+  }
+  if (channels.length) {
+    groups.push({
+      title: "Possible pathway",
+      items: channels,
+    });
+  }
+  if (outcomes.length) {
+    groups.push({
+      title: "What we checked",
+      items: outcomes,
+    });
+  }
+  return groups;
 }
 
 function dataQuality(run: RunArtifacts): string {
@@ -201,7 +238,7 @@ export function PolicyBriefCard({
   variables: VariableWithRole[];
 }) {
   const question = plainQuestion(hypothesis, variables);
-  const topVariables = variables.slice(0, 4);
+  const measured = measureGroups(variables);
   const confidence = confidenceLabel(run);
 
   return (
@@ -240,15 +277,21 @@ export function PolicyBriefCard({
         <div className="p-5">
           <div className="mb-5">
             <div className="sc mb-2 text-[10px] font-semibold text-muted">what was measured</div>
-            {topVariables.length > 0 ? (
-              <ul className="m-0 list-none space-y-2 p-0">
-                {topVariables.map((v, i) => (
-                  <li key={`${v.role}-${v.name}-${i}`} className="text-[13px] leading-[1.45] text-muted">
-                    <span className="font-semibold text-ink">{v.role}</span>{" "}
-                    {variableExplanation(v)}
-                  </li>
+            {measured.length > 0 ? (
+              <div className="space-y-3">
+                {measured.map((group) => (
+                  <div key={group.title}>
+                    <div className="mb-1 text-[12px] font-semibold text-ink">{group.title}</div>
+                    <ul className="m-0 list-none space-y-1 p-0">
+                      {group.items.map((item) => (
+                        <li key={item} className="text-[13px] leading-[1.45] text-muted">
+                          {sentenceCase(item)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="m-0 text-[13px] text-muted">The run artifacts define the measured variables.</p>
             )}
