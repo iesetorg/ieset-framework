@@ -16,6 +16,26 @@ function sentenceCase(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+function friendlyName(text: string | undefined): string {
+  const clean = humanize(text);
+  const replacements: Record<string, string> = {
+    gdp: "income",
+    ppp: "cost-of-living adjusted",
+    tfp: "productivity",
+    gini: "inequality",
+    fdi: "foreign investment",
+    soe: "state-owned firms",
+    epl: "employment protection rules",
+    oecd: "rich-country",
+    pcap: "per person",
+    min: "minimum",
+  };
+  return clean
+    .split(" ")
+    .map((word) => replacements[word.toLowerCase()] ?? word)
+    .join(" ");
+}
+
 function firstSentence(text: string | undefined): string {
   const clean = (text ?? "").replace(/\s+/g, " ").trim();
   return clean.split(/(?<=[.!?])\s+/)[0] ?? clean;
@@ -63,6 +83,59 @@ function plainAnswer(run: RunArtifacts): string {
     return `This test cannot make a firm call yet. ${core}`;
   }
   return core;
+}
+
+function primaryVariable(variables: VariableWithRole[], role: string): string | undefined {
+  return variables.find((v) => v.role === role)?.name;
+}
+
+function plainQuestion(hypothesis: Hypothesis, variables: VariableWithRole[]): string {
+  const id = hypothesis.hypothesis_id.toLowerCase();
+  const claim = hypothesis.claim.toLowerCase();
+  const topic = humanize(hypothesis.topic).toLowerCase();
+  const outcome = friendlyName(primaryVariable(variables, "outcome"));
+  const treatment = friendlyName(primaryVariable(variables, "treatment"));
+  const channel = friendlyName(primaryVariable(variables, "channel"));
+  const period = hypothesis.sample?.period;
+  const periodText = period ? ` from ${period[0]} to ${period[1]}` : "";
+
+  if (claim.includes("minimum-wage") || claim.includes("minimum wage") || id.includes("minimum_wage")) {
+    return "When minimum wages rise high relative to normal local pay, do lower-skill workers keep their jobs, or does hiring fall at the margin?";
+  }
+
+  if (claim.includes("intergenerational") || claim.includes("mobility")) {
+    return "Do children have a better shot at moving up when schools, housing, and neighborhoods give them access to opportunity, rather than simply because a country redistributes more income?";
+  }
+
+  if (topic.includes("housing") || claim.includes("rent control") || claim.includes("zoning")) {
+    return "Does the housing rule being tested make homes easier to build, rent, or afford, or does it quietly reduce supply and push costs elsewhere?";
+  }
+
+  if (topic.includes("growth") || claim.includes("productivity") || claim.includes("income")) {
+    return "Over a long period, do more market-oriented institutions translate into higher income or productivity, once the comparison looks beyond a single success story?";
+  }
+
+  if (topic.includes("health") || claim.includes("healthcare") || claim.includes("medical")) {
+    return "Does the healthcare rule being tested improve access, cost, or outcomes for patients, or does it mainly shift pressure around the system?";
+  }
+
+  if (topic.includes("technology") || claim.includes("innovation") || claim.includes("patent")) {
+    return "Does the policy environment make innovation easier to fund, build, and scale, or does it slow down useful new technology?";
+  }
+
+  if (topic.includes("trade") || claim.includes("tariff") || claim.includes("openness")) {
+    return "When countries open more of the economy to trade and competition, do people end up with better long-run income or productivity outcomes?";
+  }
+
+  if (treatment && outcome) {
+    return `In plain terms, this asks whether ${treatment} is actually linked to better or worse ${outcome}${periodText}.`;
+  }
+
+  if (channel && outcome) {
+    return `In plain terms, this asks whether ${channel} is a real pathway to better or worse ${outcome}${periodText}.`;
+  }
+
+  return `In plain terms, this asks whether the policy story survives a real-world data check${periodText}.`;
 }
 
 function plainMethod(hypothesis: Hypothesis): string {
@@ -127,7 +200,7 @@ export function PolicyBriefCard({
   run: RunArtifacts;
   variables: VariableWithRole[];
 }) {
-  const question = firstSentence(hypothesis.claim);
+  const question = plainQuestion(hypothesis, variables);
   const topVariables = variables.slice(0, 4);
   const confidence = confidenceLabel(run);
 
@@ -141,7 +214,7 @@ export function PolicyBriefCard({
           </span>
         </div>
         <h2 className="m-0 max-w-[900px] text-[22px] font-semibold leading-[1.25] text-ink">
-          What this test is asking
+          In ordinary language
         </h2>
         <p className="mb-0 mt-2 max-w-[860px] text-[16px] leading-[1.55] text-ink">
           {question}
