@@ -5,15 +5,15 @@ import Link from "next/link";
  * directly under the hero, where readers naturally ask "OK but HOW are
  * these scored?" after the hero promises pre-registered predictions.
  *
- * Three visual steps mirror what actually happens in the codebase:
- *   1. hypothesis YAML committed to git BEFORE any data is touched
- *   2. fetcher pulls series from a primary publisher, freezes a vintage
- *   3. estimator runs on the pinned vintage; pre-registered threshold decides
+ * The visual steps mirror what actually happens in the codebase:
+ *   - hypothesis YAML committed to git BEFORE any data is touched
+ *   - fetcher pulls series from a primary publisher, freezes a vintage
+ *   - estimator runs on the pinned vintage; pre-registered threshold decides
  *
  * The publisher ribbon below the steps is a credibility signal — the names
  * are pulled from the actual list of fetchers in `data/fetchers/`. The
- * rendered count ("60+ public publishers") is conservative; the real
- * count of vintage subdirectories is ~65.
+ * homepage deliberately avoids aggregate counts; those live in the dataset
+ * pages where they cannot drift away from the corpus.
  */
 export function TestingExplainer() {
   return (
@@ -24,41 +24,36 @@ export function TestingExplainer() {
         </span>
       </div>
       <p className="m-0 mb-3 max-w-[760px] text-[14.5px] leading-[1.55] text-ink">
-        Three locked-down steps. The pass/fail rule is written first, then
-        the data is fetched, then the rule runs against the data. Nothing
-        about the rule moves once the data is touched — that&apos;s the whole
-        point.
+        The loop is locked down so arguments have to leave a paper trail.
+        The pass/fail rule is written first, then the data is fetched, then
+        the rule runs against the data. Nothing about the rule moves once the
+        data is touched — that&apos;s the whole point.
       </p>
 
       <div className="grid grid-cols-1 gap-2.5 text-[13px] sm:grid-cols-3">
         <Step
-          n={1}
           title="Write the rule first"
           body={
             <>
               The hypothesis YAML names the metrics, the threshold, and the
-              estimator — e.g.{" "}
-              <em>“supported if ≥7 of 11 outcome metrics meet threshold.”</em>{" "}
-              It&apos;s committed to git <strong>before</strong> any number is
-              fetched. The commit timestamp is the proof the rule didn&apos;t
-              bend to the data.
+              estimator. It&apos;s committed to git <strong>before</strong>{" "}
+              any data is fetched. The commit timestamp is the proof the rule
+              didn&apos;t bend to the result.
             </>
           }
         />
         <Step
-          n={2}
           title="Pull from primary publishers"
           body={
             <>
               Series are fetched from the original sources — World Bank, IMF,
               OECD, BIS, FRED, Eurostat — frozen as a versioned vintage with
-              a SHA-256 hash. Old vintages are never overwritten, so every
-              run stays reproducible from the bytes it actually saw.
+              a content hash. Old vintages are never overwritten, so every run
+              stays reproducible from the bytes it actually saw.
             </>
           }
         />
         <Step
-          n={3}
           title="Run the locked rule"
           body={
             <>
@@ -77,7 +72,7 @@ export function TestingExplainer() {
       {/* Publisher ribbon — credibility signal that the data is real */}
       <div className="mt-4 rounded border border-rule bg-white p-3">
         <div className="mb-2 text-[10.5px] font-semibold uppercase tracking-wider text-muted">
-          Data comes from 60+ public publishers
+          Data comes from public publishers
         </div>
         <div className="flex flex-wrap gap-1 text-[11.5px]">
           {PUBLISHERS.map((p) => (
@@ -90,7 +85,7 @@ export function TestingExplainer() {
             </span>
           ))}
           <span className="px-1.5 py-[1px] text-faint">
-            … and ~30 others
+            … and more in the source registry
           </span>
         </div>
       </div>
@@ -111,19 +106,17 @@ export function TestingExplainer() {
 }
 
 function Step({
-  n,
   title,
   body,
 }: {
-  n: number;
   title: string;
   body: React.ReactNode;
 }) {
   return (
     <div className="rounded border border-rule bg-white p-3">
       <div className="mb-1 flex items-center gap-1.5">
-        <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
-          {n}
+        <span className="inline-flex h-[9px] w-[9px] rounded-full bg-accent">
+          <span className="sr-only">step</span>
         </span>
         <span className="text-[12px] font-semibold uppercase tracking-wider text-muted">
           {title}
@@ -134,10 +127,9 @@ function Step({
   );
 }
 
-// 24 most-recognizable publishers used by the framework. The full list of
-// fetchers in data/fetchers/ is ~57 (plus manual sources), which the copy
-// rounds to "60+". `short` is what shows in the ribbon; `full` is the
-// title-attribute hover, useful when the abbreviation is opaque.
+// Recognizable publishers used by the framework. `short` is what shows in the
+// ribbon; `full` is the title-attribute hover, useful when the abbreviation is
+// opaque.
 const PUBLISHERS: { short: string; full: string }[] = [
   { short: "World Bank", full: "World Bank — WDI + WGI" },
   { short: "IMF", full: "International Monetary Fund — WEO" },

@@ -9,8 +9,8 @@ import Link from "next/link";
  * apples-to-apples across countries and decades.
  *
  * Variant "full" renders the long-form explainer with the worked example.
- * Variant "compact" renders a 3-step capsule for the homepage / inline
- * placements where space is tight.
+ * Variant "compact" renders a capsule for the homepage / inline placements
+ * where space is tight.
  */
 
 interface AxesExplainerProps {
@@ -27,15 +27,14 @@ export function AxesExplainer({ variant = "full" }: AxesExplainerProps) {
           </span>
         </div>
         <p className="m-0 mb-3 text-[14.5px] leading-[1.55] text-ink">
-          Party labels lie. &quot;Left&quot; and &quot;right&quot; mean
-          different things in different countries. The framework codes every
-          policy on <strong>19 channel-separated axes</strong> — fiscal,
-          regulatory, monetary, institutional — so the same content is scored
-          the same way no matter who enacted it.
+          Party labels are a bad measurement device. &quot;Left&quot; and
+          &quot;right&quot; mean different things in different countries, and
+          campaign mood is not evidence. The framework codes every policy by
+          channel — fiscal, regulatory, monetary, institutional — so the same
+          content is scored the same way no matter who enacted it.
         </p>
         <div className="grid grid-cols-1 gap-2.5 text-[13px] sm:grid-cols-3">
           <ExplainStep
-            n={1}
             title="Each policy moves axes"
             body={
               <>
@@ -49,7 +48,6 @@ export function AxesExplainer({ variant = "full" }: AxesExplainerProps) {
             }
           />
           <ExplainStep
-            n={2}
             title="Movements aggregate"
             body={
               <>
@@ -59,7 +57,6 @@ export function AxesExplainer({ variant = "full" }: AxesExplainerProps) {
             }
           />
           <ExplainStep
-            n={3}
             title="Hypotheses test"
             body={
               <>
@@ -78,7 +75,7 @@ export function AxesExplainer({ variant = "full" }: AxesExplainerProps) {
             href="/a"
             className="text-accent hover:underline"
           >
-            Browse all 19 axes →
+            Browse the axes →
           </Link>
           <Link
             href="/a"
@@ -97,13 +94,14 @@ export function AxesExplainer({ variant = "full" }: AxesExplainerProps) {
         What axes are, and how they work
       </h2>
       <p className="m-0 mb-4 max-w-[760px] text-[15px] leading-[1.6] text-ink">
-        Party labels lie. &quot;Left&quot; and &quot;right&quot; mean opposite
-        things in different countries — Hungary&apos;s Orbán is statist-left on
-        fiscal but hard-right on rule-of-law; Macron is centrist-left on social
-        policy but supply-side on labour and tax. Lumping them by label
-        destroys the information that matters. So instead the framework codes
-        every policy on a fixed set of <strong>19 channel-separated axes</strong>{" "}
-        that describe what the policy <em>actually does</em>.
+        Party labels are a bad measurement device. &quot;Left&quot; and
+        &quot;right&quot; mean opposite things in different countries —
+        Hungary&apos;s Orbán is statist-left on fiscal but hard-right on
+        rule-of-law; Macron is centrist-left on social policy but supply-side
+        on labour and tax. Lumping them by label destroys the information that
+        matters. So instead the framework codes every policy on a fixed set of
+        channel-separated axes that describe what the policy{" "}
+        <em>actually does</em>.
       </p>
 
       <div className="mb-5 grid grid-cols-2 gap-3 text-[13px] md:grid-cols-4">
@@ -189,19 +187,17 @@ POSITION   ──claims: axis X moving direction Y produces good outcome Z
 }
 
 function ExplainStep({
-  n,
   title,
   body,
 }: {
-  n: number;
   title: string;
   body: React.ReactNode;
 }) {
   return (
     <div className="rounded border border-rule bg-white p-3">
       <div className="mb-1 flex items-center gap-1.5">
-        <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
-          {n}
+        <span className="inline-flex h-[9px] w-[9px] rounded-full bg-accent">
+          <span className="sr-only">axis step</span>
         </span>
         <span className="text-[12px] font-semibold uppercase tracking-wider text-muted">
           {title}

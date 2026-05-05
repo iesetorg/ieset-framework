@@ -3,15 +3,13 @@ import Link from "next/link";
 import {
   loadAllHypotheses,
   loadRunArtifacts,
-  scoreAllPositions,
   isHypothesisPubliclyVisible,
 } from "@/lib/content";
-import { verdictTone, verdictShort } from "@/lib/verdict";
+import { verdictTone } from "@/lib/verdict";
 import { Badge } from "@/components/badges/Badge";
 import { VerdictLegend } from "@/components/badges/VerdictLegend";
 import { AxesExplainer } from "@/components/explainers/AxesExplainer";
 import { TestingExplainer } from "@/components/explainers/TestingExplainer";
-import { WorkedExamples } from "@/components/explainers/WorkedExamples";
 
 export default async function HomePage() {
   const all = await loadAllHypotheses();
@@ -46,10 +44,6 @@ export default async function HomePage() {
     .map((id) => byId.get(id))
     .filter((r): r is (typeof withResults)[number] => r !== undefined);
 
-  const scores = await scoreAllPositions();
-  const schoolsCount = scores.length;
-  const totalPredictions = scores.reduce((a, s) => a + s.total_claims, 0);
-
   return (
     <div className="mx-auto max-w-content px-8">
       {/* Hero */}
@@ -59,23 +53,32 @@ export default async function HomePage() {
           pre-registration-first economic framework
         </div>
         <h1 className="m-0 mb-4 max-w-[940px] text-[42px] font-semibold leading-[1.1] tracking-[-0.02em] md:text-[52px]">
-          The empirical scoreboard for competing schools of economic thought.
+          Economic politics should be settled by testable claims.
         </h1>
         <p className="mb-6 max-w-[720px] text-[18px] leading-[1.55] text-muted">
-          {schoolsCount} schools. {totalPredictions.toLocaleString()} predictions.
-          Each one written into git <em>before</em> any data is touched, then scored
-          against the actual record. {withResults.length} hypotheses are
-          publicly graded — sharpened falsification rule, real replication,
-          dispositive verdict. {preRegOnly.length} more are in draft, awaiting
-          rule-sharpening or data, and don&apos;t surface here until they pass
-          that integrity bar.
+          IESET is a public, pre-registration-first map of economic-policy
+          claims. It asks each school to say what should happen, writes that
+          prediction down before the data is touched, and then lets the record
+          update the scoreboard. Party labels, rhetorical confidence, and
+          ideological aesthetics do not get points; tested predictions do.
+        </p>
+        <p className="mb-6 max-w-[720px] text-[15px] leading-[1.6] text-muted">
+          The landing page explains the loop. Live counts, exact verdicts, and
+          policy totals live in the dataset pages so this front door never
+          drifts out of sync with the corpus.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/h"
             className="inline-block rounded border border-accent bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-[#183e61] hover:no-underline"
           >
-            Browse all hypotheses →
+            Browse the datasets →
+          </Link>
+          <Link
+            href="/scoreboard"
+            className="inline-block rounded border border-rule-strong bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-panel hover:no-underline"
+          >
+            Open the scoreboard
           </Link>
           <Link
             href="/methodology"
@@ -98,12 +101,7 @@ export default async function HomePage() {
         <AxesExplainer variant="compact" />
       </section>
 
-      {/* Two worked examples — concrete pre-reg → run → verdict snippets */}
-      <section className="border-b border-rule py-10">
-        <WorkedExamples />
-      </section>
-
-      {/* Results so far — show a curated 6, full list on /h */}
+      {/* Results so far — curated cards only; exact counts live on /h and /scoreboard. */}
       {withResults.length > 0 && (
         <section className="border-b border-rule py-12">
           <div className="mb-5 flex items-baseline justify-between">
@@ -111,7 +109,7 @@ export default async function HomePage() {
               Recent results
             </h2>
             <Link href="/h" className="text-sm text-muted hover:text-ink">
-              See all {withResults.length} →
+              Open the hypothesis library →
             </Link>
           </div>
           <div className="mb-4">
@@ -142,13 +140,10 @@ export default async function HomePage() {
                     <h3 className="mb-2 text-[16px] font-semibold leading-snug text-ink group-hover:text-accent">
                       {first}
                     </h3>
-                    {run.verdict && (
-                      <p className="m-0 text-[13.5px] leading-[1.5] text-muted">
-                        {run.verdict.length > 180
-                          ? run.verdict.slice(0, 180) + "…"
-                          : run.verdict}
-                      </p>
-                    )}
+                    <p className="m-0 text-[13.5px] leading-[1.5] text-muted">
+                      Open the result card for the exact estimator, threshold,
+                      data vintage, and diagnostic verdict.
+                    </p>
                     <div className="mt-3 font-mono text-[10.5px] text-faint">
                       {h.hypothesis_id}
                     </div>
@@ -160,7 +155,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Pre-registered, awaiting data/run — show a sample of 6, link to full */}
+      {/* Pre-registered, awaiting data/run — sample cards only; counts live in /h. */}
       {preRegOnly.length > 0 && (
         <section className="border-b border-rule py-12">
           <div className="mb-5 flex items-baseline justify-between">
@@ -169,13 +164,13 @@ export default async function HomePage() {
                 Pre-registered — awaiting data or run
               </h2>
               <p className="mt-2 text-[14px] text-muted">
-                {preRegOnly.length} hypotheses are committed to git with their
-                falsification criteria. Specs are locked; runs fire when data
-                substrate is ready. Six samples below.
+                Specs are committed to git with their falsification criteria.
+                The locked library is the source of truth; runs fire when the
+                data substrate is ready.
               </p>
             </div>
             <Link href="/h" className="text-sm text-muted hover:text-ink">
-              See all {preRegOnly.length} →
+              Browse locked specs →
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -187,11 +182,6 @@ export default async function HomePage() {
               >
                 <div className="mb-2 flex items-center gap-2">
                   <Badge variant="muted">{h.topic.replace(/_/g, " ")}</Badge>
-                  {h.prior_confidence != null && (
-                    <span className="text-[11px] text-faint">
-                      prior {h.prior_confidence.toFixed(2)}
-                    </span>
-                  )}
                 </div>
                 <h3 className="m-0 text-[14px] font-medium leading-snug text-ink">
                   {h.claim.split(/(?<=[.!?])\s+/)[0]}
@@ -202,16 +192,16 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Methodology in 60 seconds */}
+      {/* Methodology commitments */}
       <section className="py-12">
         <h2 className="mb-6 text-xs font-semibold uppercase tracking-wider text-muted">
-          The methodology in six commitments
+          Methodology commitments
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {INVARIANTS.map((inv, i) => (
             <div key={i} className="rounded border border-rule bg-white p-5">
               <div className="mb-1.5 font-mono text-[11px] text-accent">
-                invariant {i + 1}
+                method invariant
               </div>
               <h3 className="mb-1.5 text-[15px] font-semibold leading-snug">
                 {inv.title}
