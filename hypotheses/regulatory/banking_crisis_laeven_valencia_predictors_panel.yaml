@@ -1,87 +1,179 @@
-# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: banking_crisis_laeven_valencia_predictors_panel
 version: 1
 status: candidate
 topic: regulatory
-claim: >
-  In the Laeven-Valencia systemic-banking-crisis panel covering 1980-2020, four ex-ante
-  observables jointly predict crisis onset: (i) high private-credit-to-GDP, (ii) negative
-  current-account balance, (iii) real-effective-exchange-rate appreciation versus a
-  3-year trailing average, and (iv) low foreign-exchange reserve coverage of short-term
-  external liabilities. A logit on these four predictors plus country and year fixed
-  effects achieves out-of-sample crisis-prediction AUC of at least 0.75 on a
-  rolling-window cross-validation across the full advanced-and-emerging panel.
+claim: 'In the Laeven-Valencia systemic-banking-crisis panel covering 1980-2020, four ex-ante observables
+  jointly predict crisis onset: (i) high private-credit-to-GDP, (ii) negative current-account balance,
+  (iii) real-effective-exchange-rate appreciation versus a 3-year trailing average, and (iv) low foreign-exchange
+  reserve coverage of short-term external liabilities. A logit on these four predictors plus country and
+  year fixed effects achieves out-of-sample crisis-prediction AUC of at least 0.75 on a rolling-window
+  cross-validation across the full advanced-and-emerging panel.
+
+  '
 evidence_type: associational
 sample:
-  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, BEL, SWE, NOR, FIN, DNK, CHE, AUT, IRL, PRT, JPN, AUS, CAN, KOR, MEX, BRA, ARG, TUR, IDN, THA, MYS, PHL, ZAF, RUS, POL, HUN, CZE, ISL]
-  period: [1980, 2020]
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - SWE
+  - NOR
+  - FIN
+  - DNK
+  - CHE
+  - AUT
+  - IRL
+  - PRT
+  - JPN
+  - AUS
+  - CAN
+  - KOR
+  - MEX
+  - BRA
+  - ARG
+  - TUR
+  - IDN
+  - THA
+  - MYS
+  - PHL
+  - ZAF
+  - RUS
+  - POL
+  - HUN
+  - CZE
+  - ISL
+  period:
+  - 1980
+  - 2020
   temporal_structure: panel
   exclusion_rules:
-    - drop country-years with active hyperinflation
-    - drop country-years where any of the four predictors is unavailable for the relevant lag
+  - drop country-years with active hyperinflation
+  - drop country-years where any of the four predictors is unavailable for the relevant lag
 variables:
   outcome:
-    - name: systemic_banking_crisis_onset
-      source: "owid:systemic-banking-crises"
-      transformation: binary_first_year_of_episode
-      notes: Laeven-Valencia first-year-of-crisis flag; trailing crisis years excluded.
+  - name: systemic_banking_crisis_onset
+    source: owid:systemic-banking-crises
+    transformation: binary_first_year_of_episode
+    notes: Laeven-Valencia first-year-of-crisis flag; trailing crisis years excluded.
   treatment:
-    - name: private_credit_to_gdp
-      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
-      transformation: level_pct_of_gdp
-    - name: current_account_balance_pct_gdp
-      source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
-      transformation: level_pct_of_gdp
-    - name: reer_3y_change
-      source: "bis:WS_EER"
-      transformation: change_vs_3y_trailing_mean
-    - name: reserves_to_short_term_external_debt
-      source: "world_bank_wdi:FI.RES.TOTL.MO; imf:NGDPDPC"
-      transformation: ratio_in_months_of_imports
-      notes: Months-of-imports proxy where short-term external debt unavailable.
+  - name: private_credit_to_gdp
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: level_pct_of_gdp
+  - name: current_account_balance_pct_gdp
+    source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+    transformation: level_pct_of_gdp
+  - name: reer_3y_change
+    source: bis:WS_EER
+    transformation: change_vs_3y_trailing_mean
+  - name: reserves_to_short_term_external_debt
+    source: world_bank_wdi:FI.RES.TOTL.MO; imf:NGDPDPC
+    transformation: ratio_in_months_of_imports
+    notes: Months-of-imports proxy where short-term external debt unavailable.
   controls:
-    - name: real_gdp_growth
-      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
-      transformation: yoy_pct
-    - name: cpi_inflation
-      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
-      transformation: yoy_pct
-    - name: wgi_regulatory_quality
-      source: "wgi:GOV_WGI_RQ.EST"
-      transformation: level
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: yoy_pct
+  - name: cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: yoy_pct
+  - name: wgi_regulatory_quality
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: level
 intervention_channel: regulatory
-intervention_channel_justification: >
-  Predictor variables are macro-prudential observables; treatment is the joint vulnerability
-  bundle, which itself is shaped by regulatory architecture (capital-account openness,
+intervention_channel_justification: 'Predictor variables are macro-prudential observables; treatment is
+  the joint vulnerability bundle, which itself is shaped by regulatory architecture (capital-account openness,
   bank-supervision intensity, deposit insurance).
+
+  '
 estimator:
   template: panel_fe
   clustering: country
-  fixed_effects: [country, year]
+  fixed_effects:
+  - country
+  - year
   random_seed: 20260428
-  notes: >
-    Pooled-logit predictor model with country and year FE. Out-of-sample AUC by 5-year
-    rolling-origin cross-validation. Robustness: random-forest with same predictors;
-    pre-2000 vs post-2000 split.
+  notes: 'Pooled-logit predictor model with country and year FE. Out-of-sample AUC by 5-year rolling-origin
+    cross-validation. Robustness: random-forest with same predictors; pre-2000 vs post-2000 split.
+
+    '
 falsification:
-  rule: >
-    SUPPORTED if out-of-sample AUC across rolling-origin CV >= 0.75 AND each of the
-    four predictors carries a marginal coefficient with sign matching the literature
-    (credit +, CAB -, REER appreciation +, reserves -) at p < 0.10. PARTIAL if AUC in
-    [0.65, 0.75). REFUTED if AUC < 0.65 OR if at least two predictors flip sign.
+  rule: 'SUPPORTED if out-of-sample AUC across rolling-origin CV >= 0.75 AND each of the four predictors
+    carries a marginal coefficient with sign matching the literature (credit +, CAB -, REER appreciation
+    +, reserves -) at p < 0.10. PARTIAL if AUC in [0.65, 0.75). REFUTED if AUC < 0.65 OR if at least two
+    predictors flip sign.
+
+    '
   test: panel_logit_rolling_origin_cv
-  threshold: "out_of_sample_AUC >= 0.75 AND four_predictor_signs_match"
+  threshold: out_of_sample_AUC >= 0.75 AND four_predictor_signs_match
 prior_confidence: 0.7
-disclosure: >
-  Laeven-Valencia and the early-warning-indicator literature (Frankel-Saravelos 2012)
-  are well-replicated. Author's market-liberal prior treats fiscal/external-position
-  signals as more credible than narrative deregulation-event coding. Risk: AUC of 0.75
-  on rolling-origin is a stiffer test than headline in-sample AUC reported in the
-  source literature.
+disclosure: 'Laeven-Valencia and the early-warning-indicator literature (Frankel-Saravelos 2012) are well-replicated.
+  Author''s market-liberal prior treats fiscal/external-position signals as more credible than narrative
+  deregulation-event coding. Risk: AUC of 0.75 on rolling-origin is a stiffer test than headline in-sample
+  AUC reported in the source literature.
+
+  '
 steelman: hypotheses/steelman/banking_crisis_laeven_valencia_predictors_panel.md
 scope:
-  period: [1980, 2020]
-  countries: [USA, GBR, FRA, DEU, ITA, ESP, KOR, MEX, BRA, ARG, TUR, IDN, THA, MYS, PHL, ZAF, RUS, ISL, OECD, LATAM, ASIA_EM]
-  outcome_dim: [financial_crisis, financialisation, capital_flows]
-  policy_family: [regulation, monetary_policy, exchange_rate_regime]
-  treatment_tags: [laeven_valencia_predictors, early_warning_indicators, twin_crisis_panel]
+  period:
+  - 1980
+  - 2020
+  countries:
+  - USA
+  - GBR
+  - FRA
+  - DEU
+  - ITA
+  - ESP
+  - KOR
+  - MEX
+  - BRA
+  - ARG
+  - TUR
+  - IDN
+  - THA
+  - MYS
+  - PHL
+  - ZAF
+  - RUS
+  - ISL
+  - OECD
+  - LATAM
+  - ASIA_EM
+  outcome_dim:
+  - financial_crisis
+  - financialisation
+  - capital_flows
+  policy_family:
+  - regulation
+  - monetary_policy
+  - exchange_rate_regime
+  treatment_tags:
+  - laeven_valencia_predictors
+  - early_warning_indicators
+  - twin_crisis_panel
+covers_claims:
+- position_id: post_keynesian
+  claim_index: 132
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.
+- position_id: marxian
+  claim_index: 135
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.
+- position_id: democratic_socialist
+  claim_index: 138
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.
+- position_id: mmt
+  claim_index: 133
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.

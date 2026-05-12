@@ -3,9 +3,11 @@ hypothesis_id: regulatory_transparency_investment
 version: 1
 status: candidate
 topic: institutional_quality
-claim: Regulatory transparency and quality predict higher long-run investment shares.
+claim: Lower administrative and regulatory burdens, stronger impact assessment, and more stakeholder
+  engagement predict higher investment shares.
 methodology_note: Promoted from the third long-horizon market/QOL candidate wave as a local-data first-pass
-  screen.
+  screen. Upgraded on 2026-05-12 from generic WGI regulatory quality to direct OECD PMR regulatory-process
+  measures before scoreboard conversion.
 evidence_type: associational
 sample:
   countries:
@@ -50,7 +52,7 @@ sample:
   - PAK
   - LKA
   period: &id001
-  - 1996
+  - 2018
   - 2023
   temporal_structure: panel
   exclusion_rules:
@@ -70,36 +72,44 @@ scope:
   - investment
 variables:
   outcome:
-  - name: qol_or_prosperity_outcome
+  - name: investment_share
     source: world_bank_wdi:NE.GDI.TOTL.ZS
-    transformation: level_or_growth_proxy
+    transformation: country-year level
   treatment:
-  - name: market_or_intervention_proxy
-    source: wgi:RQ.EST
-    transformation: level
+  - name: pmr_administrative_regulatory_burden
+    source: oecd_pmr:ADREG_BURDEN
+    transformation: 0-6 score, higher means more restrictive
+  - name: pmr_regulatory_impact_assessment
+    source: oecd_pmr:IMPACT_ASSESSMENT
+    transformation: 0-6 score, higher means more restrictive
+  - name: pmr_stakeholder_engagement
+    source: oecd_pmr:STAKEHOLDER_ENGAG
+    transformation: 0-6 score, higher means more restrictive
   controls:
   - name: log_gdp_pc
     source: world_bank_wdi:NY.GDP.PCAP.KD
     transformation: log
-  - name: rule_of_law
-    source: wgi:RL.EST
-    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: percent of GDP
 estimator:
   template: panel_fe
   fixed_effects:
   - country
   - year
   clustering: country
-  notes: Local-data first-pass TWFE screen; upgrade to exact treatment/outcome datasets before scoreboard
-    promotion.
+  notes: Direct OECD PMR process-measure upgrade with WDI investment-share outcome. Uses 2018 and
+    2023 PMR waves plus country/year FE; cross-sectional change specification checks whether lower
+    2018 regulatory-process burden predicts 2018-2023 investment-share gains.
 falsification:
-  rule: SUPPORTED if the treatment coefficient has the pre-registered sign at p<0.10. REFUTED if the opposite
-    sign is significant at p<0.10. Otherwise PARTIAL.
-  test: panel_fe_regulatory_transparency_investment
+  rule: SUPPORTED if the direct PMR regulatory-process burden index has a negative coefficient for
+    investment share in the primary panel at p<0.10 and the 2018-2023 change check has the same sign.
+    REFUTED if the panel coefficient is positive and significant at p<0.10. Otherwise PARTIAL.
+  test: pmr_direct_regulatory_transparency_investment
   threshold:
     p_value: p<0.10
-    expected_sign: +
+    expected_sign: '-'
 prior_confidence: 0.55
-disclosure: These are proxy-first QOL screens. They are intended to identify promising evidence, not to
-  settle causal claims without robustness checks.
+disclosure: OECD PMR is available only for sparse benchmark waves, so this remains associational
+  evidence even after the direct-measure upgrade.
 steelman: hypotheses/steelman/regulatory_transparency_investment.md

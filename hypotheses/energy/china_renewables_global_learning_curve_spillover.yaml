@@ -1,133 +1,142 @@
-# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: china_renewables_global_learning_curve_spillover
 version: 1
 status: candidate
 topic: energy
-
-claim: >
-  China's 2010-2023 state-directed solar-PV and onshore-wind
-  manufacturing scale-up (Renewable Energy Law 2005, 12th and 13th
-  Five-Year Plan industrial-policy targets) is the dominant source
-  of the ~85% global decline in solar-PV module costs and the ~55%
-  decline in onshore-wind LCOE over the same window. The
-  cost-decline spillover to the rest of the world is a positive
-  industrial-policy externality, not an anti-competitive distortion
-  -- the global LCOE trajectory in a counterfactual without Chinese
+claim: 'China''s 2010-2023 state-directed solar-PV and onshore-wind manufacturing scale-up (Renewable
+  Energy Law 2005, 12th and 13th Five-Year Plan industrial-policy targets) is the dominant source of the
+  ~85% global decline in solar-PV module costs and the ~55% decline in onshore-wind LCOE over the same
+  window. The cost-decline spillover to the rest of the world is a positive industrial-policy externality,
+  not an anti-competitive distortion -- the global LCOE trajectory in a counterfactual without Chinese
   scale-up sits materially above the observed trajectory.
 
+  '
 evidence_type: descriptive
-
 sample:
-  countries: [CHN, DEU, USA, JPN, KOR, ESP, ITA, IND, BRA]
-  period: [2010, 2023]
+  countries:
+  - CHN
+  - DEU
+  - USA
+  - JPN
+  - KOR
+  - ESP
+  - ITA
+  - IND
+  - BRA
+  period:
+  - 2010
+  - 2023
   temporal_structure: panel
   exclusion_rules:
-    - "drop country-years missing IRENA cost-and-capacity panel"
-
+  - drop country-years missing IRENA cost-and-capacity panel
 variables:
   outcome:
-    - name: global_solar_pv_module_cost_usd_per_w
-      source: "irena:solar_pv_costs"
-      transformation: log
-      notes: "IRENA module-cost weighted-average global series."
-    - name: global_onshore_wind_lcoe_usd_per_mwh
-      source: "irena:wind_lcoe"
-      transformation: log
-    - name: china_share_global_solar_pv_capacity_additions
-      source: "irena:capacity"
-      transformation: pct_share
-      notes: "Annual share of new global solar-PV capacity additions installed in CHN."
-    - name: china_share_global_solar_pv_module_production
-      source: "iea:renewables_market_report"
-      transformation: pct_share
+  - name: global_solar_pv_module_cost_usd_per_w
+    source: irena:solar_pv_costs
+    transformation: log
+    notes: IRENA module-cost weighted-average global series.
+  - name: global_onshore_wind_lcoe_usd_per_mwh
+    source: irena:wind_lcoe
+    transformation: log
+  - name: china_share_global_solar_pv_capacity_additions
+    source: irena:capacity
+    transformation: pct_share
+    notes: Annual share of new global solar-PV capacity additions installed in CHN.
+  - name: china_share_global_solar_pv_module_production
+    source: iea:renewables_market_report
+    transformation: pct_share
   treatment:
-    - name: cumulative_china_renewables_capacity_log
-      source: "irena:capacity"
-      transformation: log
-      notes: "Cumulative CHN solar+wind capacity, the candidate driver of the global learning curve."
-    - name: cumulative_row_renewables_capacity_log
-      source: "irena:capacity"
-      transformation: log
-      notes: "Cumulative rest-of-world solar+wind capacity, the alternative driver."
+  - name: cumulative_china_renewables_capacity_log
+    source: irena:capacity
+    transformation: log
+    notes: Cumulative CHN solar+wind capacity, the candidate driver of the global learning curve.
+  - name: cumulative_row_renewables_capacity_log
+    source: irena:capacity
+    transformation: log
+    notes: Cumulative rest-of-world solar+wind capacity, the alternative driver.
   controls:
-    - name: silicon_polysilicon_price_index
-      source: "imf_pcps:PMETA"
-      transformation: log
-      notes: "Partials out upstream input-price cycles."
-    - name: log_oil_price
-      source: "imf_pcps:POILAPSP"
-      transformation: log
-
+  - name: silicon_polysilicon_price_index
+    source: imf_pcps:PMETA
+    transformation: log
+    notes: Partials out upstream input-price cycles.
+  - name: log_oil_price
+    source: imf_pcps:POILAPSP
+    transformation: log
 estimator:
   template: descriptive
   clustering: none
-  notes: >
-    Decomposed learning-curve regression: log_global_module_cost =
-    a + b1*log(cum_CHN_capacity) + b2*log(cum_ROW_capacity) +
-    controls. Bootstrap CIs on b1 and b2; report b1/(b1+b2) as the
-    Chinese-share-of-learning. Repeat for onshore wind LCOE.
-    Counterfactual exercise: holding cum_CHN_capacity at 2010
-    levels and projecting global cost using b2 alone gives the
-    no-China counterfactual cost trajectory; the gap between
-    counterfactual and observed cost in 2023 is the monetised
-    spillover. Not causal -- learning-by-doing is not an identified
-    treatment, only a fitted relationship; the counterfactual is a
-    descriptive what-if rather than an instrumented effect.
+  notes: 'Decomposed learning-curve regression: log_global_module_cost = a + b1*log(cum_CHN_capacity)
+    + b2*log(cum_ROW_capacity) + controls. Bootstrap CIs on b1 and b2; report b1/(b1+b2) as the Chinese-share-of-learning.
+    Repeat for onshore wind LCOE. Counterfactual exercise: holding cum_CHN_capacity at 2010 levels and
+    projecting global cost using b2 alone gives the no-China counterfactual cost trajectory; the gap between
+    counterfactual and observed cost in 2023 is the monetised spillover. Not causal -- learning-by-doing
+    is not an identified treatment, only a fitted relationship; the counterfactual is a descriptive what-if
+    rather than an instrumented effect.
 
+    '
 falsification:
-  rule: >
-    SUPPORTED iff (a) b1 (CHN learning coefficient) is negative and
-    statistically distinguishable from zero (bootstrap 90% CI
-    excludes 0), AND (b) Chinese-share-of-learning b1/(b1+b2) > 0.5
-    in both solar and wind specifications, AND (c) the
-    counterfactual no-CHN-scaleup global module cost in 2023
-    exceeds the observed cost by at least 50%. REFUTED if b1 is
-    insignificant or positive, OR if the share is < 0.3, OR if the
-    counterfactual gap is < 20%. PARTIAL between these. METHOD_VALID
-    requires IRENA cost-and-capacity panels with CHN coverage 2010-
-    2023 in both solar and wind; if either missing, downgrade.
+  rule: 'SUPPORTED iff (a) b1 (CHN learning coefficient) is negative and statistically distinguishable
+    from zero (bootstrap 90% CI excludes 0), AND (b) Chinese-share-of-learning b1/(b1+b2) > 0.5 in both
+    solar and wind specifications, AND (c) the counterfactual no-CHN-scaleup global module cost in 2023
+    exceeds the observed cost by at least 50%. REFUTED if b1 is insignificant or positive, OR if the share
+    is < 0.3, OR if the counterfactual gap is < 20%. PARTIAL between these. METHOD_VALID requires IRENA
+    cost-and-capacity panels with CHN coverage 2010- 2023 in both solar and wind; if either missing, downgrade.
+
+    '
   test: china_share_of_global_renewables_learning_curve_spillover
-  threshold: >-
-    PRIMARY: b1 negative at 90% CI AND b1/(b1+b2) > 0.5 in solar and
-    wind AND counterfactual cost gap 2023 >= 50%.
-
+  threshold: 'PRIMARY: b1 negative at 90% CI AND b1/(b1+b2) > 0.5 in solar and wind AND counterfactual
+    cost gap 2023 >= 50%.'
 prior_confidence: 0.7
-
-disclosure: >-
-  Eco-socialist authorial framing: the spec is structured to
-  favour finding a Chinese spillover effect because b1 and b2 are
-  jointly identified from time-series variation that is dominated
-  by the CHN scale-up. A market-liberal critique would note that
-  (i) the demand-pull from German FIT 2000-2012 and Spanish/Italian
-  feed-in regimes 2008-2012 is a confounded driver of the early
-  learning curve, and (ii) IP transfer to Chinese manufacturers
-  from Western firms is a one-time level shift, not a "Chinese
-  industrial policy" effect, and the spec does not separate these
-  channels. The "spillover" framing also treats Chinese solar-PV
-  dumping below cost as positive externality where the WTO record
-  classifies it as anti-competitive trade distortion. The
-  disclosure does not change the falsification rule but flags the
-  contested causal layer behind the descriptive coefficients.
-
+disclosure: 'Eco-socialist authorial framing: the spec is structured to favour finding a Chinese spillover
+  effect because b1 and b2 are jointly identified from time-series variation that is dominated by the
+  CHN scale-up. A market-liberal critique would note that (i) the demand-pull from German FIT 2000-2012
+  and Spanish/Italian feed-in regimes 2008-2012 is a confounded driver of the early learning curve, and
+  (ii) IP transfer to Chinese manufacturers from Western firms is a one-time level shift, not a "Chinese
+  industrial policy" effect, and the spec does not separate these channels. The "spillover" framing also
+  treats Chinese solar-PV dumping below cost as positive externality where the WTO record classifies it
+  as anti-competitive trade distortion. The disclosure does not change the falsification rule but flags
+  the contested causal layer behind the descriptive coefficients.'
 steelman: hypotheses/steelman/china_renewables_global_learning_curve_spillover.md
-
 scope:
-  period: [2010, 2023]
-  countries: [CHN, GLOBAL]
-  outcome_dim: [energy, industrial_capability, productivity]
-  policy_family: [industrial_policy, energy_policy]
-  treatment_tags: [china_renewables_law_2005, china_solar_scaleup, china_wind_scaleup]
-
+  period:
+  - 2010
+  - 2023
+  countries:
+  - CHN
+  - GLOBAL
+  outcome_dim:
+  - energy
+  - industrial_capability
+  - productivity
+  policy_family:
+  - industrial_policy
+  - energy_policy
+  treatment_tags:
+  - china_renewables_law_2005
+  - china_solar_scaleup
+  - china_wind_scaleup
 linked_hypotheses:
-  - china_renewables_industrial_policy_learning_curve
-  - green_transition_cost_trajectory_electricity_prices
+- china_renewables_industrial_policy_learning_curve
+- green_transition_cost_trajectory_electricity_prices
+notes: 'Distinct from china_renewables_industrial_policy_learning_curve which compares CHN learning rate
+  to the OECD cohort. This spec tests the spillover-to-global-cost channel and the counterfactual no-CHN
+  cost trajectory -- a different empirical test of the same eco-socialist proposition. IRENA cost panel
+  is on disk per repo notes; IEA renewables market report is a specialist fetcher (status: pending). Falsification
+  gates inconclusive on the IEA market-share leg.
 
-notes: >
-  Distinct from china_renewables_industrial_policy_learning_curve
-  which compares CHN learning rate to the OECD cohort. This spec
-  tests the spillover-to-global-cost channel and the
-  counterfactual no-CHN cost trajectory -- a different empirical
-  test of the same eco-socialist proposition. IRENA cost panel is
-  on disk per repo notes; IEA renewables market report is a
-  specialist fetcher (status: pending). Falsification gates
-  inconclusive on the IEA market-share leg.
+  '
+covers_claims:
+- position_id: developmentalism
+  claim_index: 132
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.
+- position_id: eco_socialist
+  claim_index: 135
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.
+- position_id: market_socialist
+  claim_index: 134
+  polarity: aligned
+  school_prediction: supported
+  notes: 2026-05-12 throughput mapping wave; reciprocal link for reviewed scoreboard conversion.

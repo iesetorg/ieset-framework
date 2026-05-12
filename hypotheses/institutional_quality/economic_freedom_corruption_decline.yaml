@@ -3,10 +3,11 @@ hypothesis_id: economic_freedom_corruption_decline
 version: 1
 status: candidate
 topic: institutional_quality
-claim: Market-compatible institutions predict higher control-of-corruption scores where rule of law constrains
-  discretion.
+claim: Rule-bound market-compatible institutions predict lower political corruption where legal constraints
+  reduce discretionary exchange.
 methodology_note: Promoted from the 200-item long-horizon market/QOL backlog as a local-data first-pass
-  screen.
+  screen. Upgraded on 2026-05-12 from a duplicated WGI regulatory-quality/control-of-corruption panel
+  to a direct V-Dem corruption and rule-of-law panel before scoreboard conversion.
 evidence_type: associational
 sample:
   countries:
@@ -70,36 +71,35 @@ scope:
   - corruption_decline
 variables:
   outcome:
-  - name: qol_or_prosperity_outcome
-    source: wgi:CC.EST
-    transformation: level_or_growth_proxy
+  - name: control_of_corruption_vdem
+    source: vdem:v2x_corr
+    transformation: 1 - political corruption index, higher means less corruption
   treatment:
-  - name: market_or_intervention_proxy
-    source: wgi:RQ.EST
-    transformation: level
+  - name: rule_of_law_vdem
+    source: vdem:v2xcl_rol
+    transformation: level, higher means stronger rule of law
   controls:
   - name: log_gdp_pc
     source: world_bank_wdi:NY.GDP.PCAP.KD
     transformation: log
-  - name: rule_of_law
-    source: wgi:RL.EST
-    transformation: level
 estimator:
   template: panel_fe
   fixed_effects:
   - country
   - year
   clustering: country
-  notes: Local-data first-pass TWFE screen; upgrade to exact outcome/treatment datasets before scoreboard
-    promotion.
+  notes: Direct V-Dem institutional-quality upgrade with country and year fixed effects. Robustness
+    checks repeat the sign test with public-sector corruption, executive corruption, and clientelism
+    outcomes transformed so higher values mean less corruption/clientelism.
 falsification:
-  rule: SUPPORTED if the treatment coefficient has the predicted sign at p<0.10. REFUTED if the opposite
-    sign is significant at p<0.10. Otherwise PARTIAL.
-  test: panel_fe_economic_freedom_corruption_decline
+  rule: SUPPORTED if V-Dem rule of law positively predicts the transformed V-Dem control-of-corruption
+    outcome at p<0.10 and at least two of three robustness outcomes have the same sign. REFUTED if
+    the primary coefficient is negative and significant at p<0.10. Otherwise PARTIAL.
+  test: vdem_rule_of_law_corruption_panel
   threshold:
     p_value: p<0.10
     expected_sign: +
 prior_confidence: 0.55
-disclosure: These are proxy-first QOL screens. They are intended to identify promising evidence, not to
-  settle causal claims without robustness checks.
+disclosure: This is a direct institutional association, not a causal design. V-Dem corruption and
+  rule-of-law measures are expert-coded and may share source-method bias.
 steelman: hypotheses/steelman/economic_freedom_corruption_decline.md
