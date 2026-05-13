@@ -1,0 +1,208 @@
+packet_version: 1
+generated_utc: '2026-05-05T12:25:12+00:00'
+repository:
+  root: .
+  git_commit: 277a555ef5b8241a70d49f624291d0470ea3efce
+hypothesis:
+  id: minimum_wage_employment_effect_us_states
+  path: hypotheses/labour/minimum_wage_employment_effect_us_states.yaml
+  school: null
+  topic: labour
+  claim: 'US state-level minimum-wage increases over 1990-2024 produce small, statistically
+    uncertain effects on teen and low-wage employment when compared to contiguous
+    counties or neighbouring states that did not raise their minimum. The Card-Krueger
+    1994 / Dube-Lester-Reich 2010 research design is the baseline: the hypothesis
+    predicts that the estimated employment elasticity with respect to the minimum
+    wage falls in the range [-0.15, +0.05] with the 95% confidence interval straddling
+    zero, consistent with the post-1990 border-discontinuity literature but inconsistent
+    with Neumark-Wascher-style nationwide panel findings of elasticities < -0.2. Pre-registered
+    direction of effect: minimum-wage elasticity is close to zero and typically not
+    significantly negative at the 5% level on the primary outcome.
+
+    '
+verdict:
+  raw: "inconclusive \u2014 data gap on bls:LAU_state_teen_employment_population_ratio_panel,\
+    \ bls:CES_state_NAICS722_employment_panel. The spec's primary Callaway-Sant'Anna\
+    \ staggered DiD on the 1990-2024 US-state panel cannot be estimated without the\
+    \ state-level BLS LAU teen employment-to-population series and the USDOL state\
+    \ minimum-wage history. On-disk BLS vintages currently include only national-level\
+    \ series (LNS*, CES05*, CUUR*); the state fan-out (SMS*, LAUST*, ENU*-county QCEW)\
+    \ and the USDOL state-history table have not been fetched. No coefficients computed."
+  bucket: inconclusive
+  reason: null
+  status: data_gap_inconclusive
+preregistration:
+  claim: 'US state-level minimum-wage increases over 1990-2024 produce small, statistically
+    uncertain effects on teen and low-wage employment when compared to contiguous
+    counties or neighbouring states that did not raise their minimum. The Card-Krueger
+    1994 / Dube-Lester-Reich 2010 research design is the baseline: the hypothesis
+    predicts that the estimated employment elasticity with respect to the minimum
+    wage falls in the range [-0.15, +0.05] with the 95% confidence interval straddling
+    zero, consistent with the post-1990 border-discontinuity literature but inconsistent
+    with Neumark-Wascher-style nationwide panel findings of elasticities < -0.2. Pre-registered
+    direction of effect: minimum-wage elasticity is close to zero and typically not
+    significantly negative at the 5% level on the primary outcome.
+
+    '
+  falsification_rule: 'PRIMARY (dispositive): the hypothesis is SUPPORTED if the Callaway-Sant''Anna
+    staggered-DiD elasticity of teen employment-to-population with respect to the
+    log state minimum wage over the 1990-2024 US-state panel falls in [-0.15, +0.05]
+    AND the 95% CI crosses zero. REFUTED if the elasticity is significantly below
+    -0.15 at the 5% level (Neumark-Wascher direction) OR significantly above +0.10
+    at the 5% level (positive-employment direction; the claim is "close to zero,"
+    not "positive"). SECONDARY (also dispositive): the Dube-Lester-Reich contiguous-county-pair
+    elasticity on QCEW NAICS-722 (accommodation/food services) county employment must
+    fall in [-0.20, +0.05]. INFORMATIVE: leave-one-state-out sign stability of the
+    CS-ATT coefficient; pre-trend test on the 4 years preceding each state''s first
+    minimum-wage hike. METHOD_VALID: state-level BLS LAU teen E/P available for at
+    least 40 of 50 states with >= 20 years of coverage; USDOL state minimum-wage history
+    available with at least one state-level binding change in at least 30 states;
+    QCEW NAICS-722 county-level employment available for the border- pair specification.'
+  threshold: 'PRIMARY: CS_ATT_elasticity in [-0.15, +0.05] AND 95% CI crosses zero
+    AND CS_ATT not significantly < -0.15 AND not significantly > +0.10. SECONDARY:
+    border_pair_elasticity in [-0.20, +0.05].'
+  estimator:
+    template: did_callaway_santanna
+    clustering: state
+    random_seed: 20260423
+    notes: 'Primary: Callaway-Sant''Anna staggered DiD exploiting state-level minimum-wage
+      changes 1990-2024 against never-/late-changing states. Secondary: Dube-Lester-Reich
+      contiguous-county-pair design using QCEW accommodation-and-food-services county
+      employment around state-border discontinuities. The border-pair design is the
+      cleaner identification but has narrower outcome coverage.
+
+      '
+  steelman: hypotheses/steelman/minimum_wage_employment_effect_us_states.md
+reproduction:
+  run_dir: engine/runs/minimum_wage_employment_effect_us_states
+  runner: null
+  replication_script: engine/runs/minimum_wage_employment_effect_us_states/replication.py
+  suggested_command: python engine/runs/minimum_wage_employment_effect_us_states/replication.py
+data:
+  inputs:
+  - name: usdol:state_minimum_wage_history
+    publisher: usdol
+    series_id: state_minimum_wage_history
+    vintage_file: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      computed_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      status: match
+    source:
+      type: official
+      url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+      methodology_url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+      license: public_domain_us_gov
+      fetch_utc: '2026-05-04T14:53:19.847437+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-04T145323Z.yaml
+    coverage:
+      start_date: '1968'
+      end_date: '2024'
+      frequency: annual
+      rows: 2106
+      units: USD/hour
+      currency: USD
+    extra:
+      columns:
+      - country_iso3
+      - unit_id
+      - state_abbr
+      - state_fips
+      - state_name
+      - year
+      - value
+      - state_rate_low
+      - state_rate_high
+      - federal_rate
+      - raw_value
+      - parse_note
+      jurisdictions: 54
+      effective_floor_rule: max(parsed_state_rate_high, federal_rate); federal fallback
+        when state rate missing
+      vintage_utc: null
+  - name: bls:QCEW_county_NAICS722_employment_panel
+    publisher: bls
+    series_id: QCEW_county_NAICS722_employment_panel
+    vintage_file: data/vintages/bls/QCEW_county_NAICS722_employment_panel@2026-05-05T073137Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f54abbc928de5ba6b0f7cbf957e67d60e27ca34aebd4592cdb0837889937bdfd
+      computed_sha256: f54abbc928de5ba6b0f7cbf957e67d60e27ca34aebd4592cdb0837889937bdfd
+      status: match
+    source:
+      type: official
+      url: https://data.bls.gov/cew/data/api/{year}/a/industry/722.csv
+      methodology_url: https://www.bls.gov/cew/downloadable-data-files.htm
+      license: public_domain
+      fetch_utc: '2026-05-05T07:31:37.759234+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T073241Z.yaml
+    coverage:
+      start_date: '2014'
+      end_date: '2024'
+      frequency: annual
+      rows: 35770
+      units: establishments, employment, wages, and pay by QCEW area/industry
+      currency: USD
+    extra:
+      qcew_year_start: 2014
+      qcew_year_end: 2024
+      qcew_geography: county
+      qcew_area_count: 3278
+      qcew_industry_code: '722'
+      qcew_ownership_code: '5'
+      qcew_agglvl_code: '75'
+  missing_series:
+  - bls:LAU_state_teen_employment_population_ratio_panel
+  - bls:CES_state_NAICS722_employment_panel
+  - manual:vaghul_zipperer_county_minimum_wage
+  - bls:LAU_state_unemployment_rate_panel
+  - fred:state_real_gdp_panel
+  data_quality:
+    grade: incomplete
+    input_count: 2
+    official_source_count: 2
+    manual_source_count: 0
+    hash_status_counts:
+      match: 2
+    missing_series_count: 5
+artifacts:
+- path: hypotheses/labour/minimum_wage_employment_effect_us_states.yaml
+  sha256: a5de20857ee8bd4f2123719bff1bf881c78e743f186fa61bd8f6e09d50bc74e4
+  bytes: 7816
+- path: engine/runs/minimum_wage_employment_effect_us_states/manifest.yaml
+  sha256: cd6940dba9d1363d4ef2c7ec6950bd066940c9d698e83d5764ec0c575051fdb9
+  bytes: 937
+- path: engine/runs/minimum_wage_employment_effect_us_states/diagnostics.json
+  sha256: abf832a1ef8d8759764b9d0bc4fb45127f05aabc70c7b96dfbdf01a29a45fb08
+  bytes: 1757
+- path: engine/runs/minimum_wage_employment_effect_us_states/result_card.md
+  sha256: b9ca00176aebe1e3d05fb3d6cf5e70708d0e665502c4cde7565986c326714c26
+  bytes: 3471
+- path: engine/runs/minimum_wage_employment_effect_us_states/replication.py
+  sha256: 10c2913baa7db02af988956d6b6cf9563cfdc03b089d6c178b7bd8844f00920f
+  bytes: 18114
+- path: engine/runs/minimum_wage_employment_effect_us_states/coefficients.parquet
+  sha256: 3a83a98ea9d4475bf23a04314808e7ce310650eec3914928004a5bec90709e53
+  bytes: 2211
+- path: engine/runs/minimum_wage_employment_effect_us_states/chart_data.json
+  sha256: b9c360e5e73febca75c2b7585024dd527a6d69ef78ca1bc02e662a9e3d30f6e4
+  bytes: 1418
+- path: hypotheses/steelman/minimum_wage_employment_effect_us_states.md
+  sha256: d658d5d8a3a53a46e3b735284d1f538e931741c16988c716714cc652e7032791
+  bytes: 5489
+references:
+- kind: source
+  publisher: usdol
+  series_id: state_minimum_wage_history
+  url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+- kind: source
+  publisher: bls
+  series_id: QCEW_county_NAICS722_employment_panel
+  url: https://data.bls.gov/cew/data/api/{year}/a/industry/722.csv
+- kind: methodology
+  publisher: bls
+  series_id: QCEW_county_NAICS722_employment_panel
+  url: https://www.bls.gov/cew/downloadable-data-files.htm
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.
