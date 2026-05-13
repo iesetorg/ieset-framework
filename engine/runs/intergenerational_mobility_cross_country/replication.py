@@ -120,6 +120,110 @@ def load_long(path: Path) -> pd.DataFrame:
     return t.dropna(subset=["year", "value"])
 
 
+ISO2_TO_ISO3 = {
+    "AU": "AUS", "AT": "AUT", "BE": "BEL", "CA": "CAN", "CH": "CHE",
+    "DE": "DEU", "DK": "DNK", "ES": "ESP", "FI": "FIN", "FR": "FRA",
+    "GB": "GBR", "IE": "IRL", "IT": "ITA", "JP": "JPN", "KR": "KOR",
+    "NL": "NLD", "NO": "NOR", "NZ": "NZL", "SE": "SWE", "US": "USA",
+}
+
+
+def ols(y: pd.Series, x: pd.DataFrame) -> tuple[pd.Series, pd.Series, float]:
+    X = np.column_stack([np.ones(len(x)), x.to_numpy(dtype=float)])
+    yv = y.to_numpy(dtype=float)
+    beta, *_ = np.linalg.lstsq(X, yv, rcond=None)
+    resid = yv - X @ beta
+    dof = max(len(yv) - X.shape[1], 1)
+    sigma2 = float((resid @ resid) / dof)
+    vcov = sigma2 * np.linalg.pinv(X.T @ X)
+    se = np.sqrt(np.diag(vcov))
+    ss_tot = float(((yv - yv.mean()) ** 2).sum())
+    r2 = 1.0 - float((resid @ resid) / ss_tot) if ss_tot else 0.0
+    names = ["intercept", *list(x.columns)]
+    return pd.Series(beta, index=names), pd.Series(se, index=names), r2
+
+
+def partial_r2(y: pd.Series, full_x: pd.DataFrame, reduced_x: pd.DataFrame) -> float:
+    _, _, r2_full = ols(y, full_x)
+    _, _, r2_reduced = ols(y, reduced_x)
+    if r2_reduced >= 1:
+        return 0.0
+    return float((r2_full - r2_reduced) / (1 - r2_reduced))
+
+
+def build_analysis_frame(available: dict[str, dict]) -> tuple[pd.DataFrame, dict[str, int]]:
+    mob = load_long(REPO_ROOT / available["owid:intergenerational-earnings-elasticity"]["vintage_file"])
+    mob = mob[mob["country_iso3"].isin(COUNTRIES)]
+    mob = mob.groupby("country_iso3", as_index=False)["value"].mean().rename(columns={"value": "mobility_ige"})
+
+    edu_path = REPO_ROOT / available["oecd:OECD.EDU.IMEP_DSD_EAG_FIN_DF_FIN_RESOURCES_1.0"]["vintage_file"]
+    edu = pq.read_table(edu_path).to_pandas()
+    edu["value"] = pd.to_numeric(edu["value"], errors="coerce")
+    edu["period"] = pd.to_numeric(edu["period"], errors="coerce")
+    edu = edu[
+        (edu["MEASURE"] == "FIN_PERSTUD")
+        & (edu["EDUCATION_LEV"].isin(["ISCED11_1T3", "ISCED11_3"]))
+        & (edu["EXP_SOURCE"] == "_T")
+        & (edu["EXP_DESTINATION"] == "INST_EDU")
+        & (edu["EXPENDITURE_TYPE"] == "DIR_EXP")
+        & (edu["UNIT_MEASURE"] == "USD_PPP_ST")
+        & edu["value"].notna()
+    ].copy()
+    edu_country_year = []
+    for (country, year), g in edu.groupby(["COUNTRY", "period"]):
+        region_values = g.groupby("REF_AREA")["value"].mean().dropna()
+        if len(region_values) < 2 or region_values.mean() == 0:
+            continue
+        edu_country_year.append({
+            "country_iso3": country,
+            "year": int(year),
+            "edu_spending_cv": float(region_values.std(ddof=0) / region_values.mean()),
+            "edu_region_count": int(len(region_values)),
+        })
+    edu_cv = pd.DataFrame(edu_country_year)
+    if not edu_cv.empty:
+        edu_cv = edu_cv.groupby("country_iso3", as_index=False).agg(
+            edu_spending_cv=("edu_spending_cv", "mean"),
+            edu_region_count=("edu_region_count", "max"),
+        )
+
+    h_path = REPO_ROOT / available["oecd:OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0"]["vintage_file"]
+    h = pq.read_table(h_path).to_pandas()
+    h["value"] = pd.to_numeric(h["value"], errors="coerce")
+    h["period"] = pd.to_numeric(h["period"], errors="coerce")
+    afford = h[(h["MEASURE"] == "3_2") & h["value"].notna()].groupby("REF_AREA", as_index=False)["value"].mean()
+    afford = afford.rename(columns={"REF_AREA": "country_iso3", "value": "housing_affordability"})
+    overburden = h[(h["MEASURE"] == "3_3") & h["value"].notna()].groupby("REF_AREA", as_index=False)["value"].mean()
+    overburden = overburden.rename(columns={"REF_AREA": "country_iso3", "value": "housing_overburden"})
+
+    bis_path = REPO_ROOT / available["bis:WS_SPP"]["vintage_file"]
+    bis = pq.read_table(bis_path).to_pandas()
+    bis["country_iso3"] = bis["REF_AREA"].map(ISO2_TO_ISO3)
+    bis["value"] = pd.to_numeric(bis["value"], errors="coerce")
+    house_price = bis[bis["country_iso3"].notna() & bis["value"].notna()].groupby("country_iso3", as_index=False)["value"].mean()
+    house_price = house_price.rename(columns={"value": "house_price_to_income"})
+
+    wdi_gdp = load_long(REPO_ROOT / available["world_bank_wdi:NY.GDP.PCAP.PP.KD"]["vintage_file"])
+    gdp = wdi_gdp[wdi_gdp["country_iso3"].isin(COUNTRIES)].groupby("country_iso3", as_index=False)["value"].mean()
+    gdp["log_gdp_pc"] = np.log(gdp["value"])
+    gdp = gdp[["country_iso3", "log_gdp_pc"]]
+
+    gini = load_long(REPO_ROOT / available["world_bank_wdi:SI.POV.GINI"]["vintage_file"])
+    gini = gini[gini["country_iso3"].isin(COUNTRIES)].groupby("country_iso3", as_index=False)["value"].mean()
+    gini = gini.rename(columns={"value": "gini"})
+
+    wgi = load_long(REPO_ROOT / available["wgi:GOV_WGI_GE.EST"]["vintage_file"])
+    wgi = wgi[wgi["country_iso3"].isin(COUNTRIES)].groupby("country_iso3", as_index=False)["value"].mean()
+    wgi = wgi.rename(columns={"value": "gov_effectiveness"})
+
+    frame = mob.merge(edu_cv, on="country_iso3", how="left")
+    for right in (afford, overburden, house_price, gdp, gini, wgi):
+        frame = frame.merge(right, on="country_iso3", how="left")
+
+    coverage = {col: int(frame[col].notna().sum()) for col in frame.columns if col != "country_iso3"}
+    return frame, coverage
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -337,16 +441,193 @@ def main() -> None:
         print(f"verdict: {verdict}")
         return
 
-    # ---------- (Future v2) — full regression path ----------
-    # Reserved: when the missing series are fetched, this branch should
-    # implement the OLS + bootstrap + LOO + partial-R2 pipeline against
-    # MIN_COUNTRIES_WITH_DATA-of-20 thresholds.
-    raise NotImplementedError(
-        "Regression branch not implemented; v1 is data-gated. When the "
-        "OWID mobility mirror + OECD subnational fetchers land, extend "
-        "this script with the cross-section regression and LOO loop, "
-        "writing the same four artifacts."
-    )
+    # ---------- Regression path ----------
+    frame, coverage = build_analysis_frame(available)
+    channels = ["edu_spending_cv", "housing_overburden", "house_price_to_income"]
+    controls = ["log_gdp_pc", "gini", "gov_effectiveness"]
+    regression_cols = ["mobility_ige", *channels, *controls]
+    reg = frame.dropna(subset=regression_cols).copy()
+
+    if len(reg) < MIN_COUNTRIES_WITH_DATA:
+        verdict = (
+            "inconclusive - data coverage below method-valid threshold. "
+            f"All required vintages are now present, but only {len(reg)} "
+            f"countries have non-null mobility, institutional-channel, and "
+            f"control observations for the preregistered regression; threshold "
+            f"is {MIN_COUNTRIES_WITH_DATA}."
+        )
+        diagnostics = {
+            "verdict": verdict,
+            "verdict_label": "INCONCLUSIVE_COVERAGE_PENDING",
+            "all_pass": False,
+            "method_valid": False,
+            "data_gap": False,
+            "coverage_gap": True,
+            "available_series": sorted(available.keys()),
+            "missing_outcome_series": missing_outcome,
+            "missing_channel_series": missing_channels,
+            "missing_control_series": missing_controls,
+            "coverage_by_variable": coverage,
+            "n_countries_in_sample": len(COUNTRIES),
+            "n_countries_with_complete_regression_data": int(len(reg)),
+            "countries_with_complete_regression_data": sorted(reg["country_iso3"].tolist()),
+            "min_countries_required": MIN_COUNTRIES_WITH_DATA,
+            "partial_r2_institutional_channels": None,
+            "partial_r2_gini_alone": None,
+            "loo_robust": None,
+            "primary_threshold_partial_r2": PARTIAL_R2_INSTITUTIONAL_THRESHOLD,
+        }
+        coeff = frame[["country_iso3", *regression_cols]].copy()
+        coeff.to_parquet(OUT_DIR / "coefficients.parquet", index=False)
+        chart_data = {
+            "kind": "result",
+            "chart_id": f"{HID}/fig1",
+            "title": "Intergenerational mobility cross-country — COVERAGE GAP",
+            "subtitle": f"{len(reg)} complete countries; threshold is {MIN_COUNTRIES_WITH_DATA}.",
+            "type": "scatter",
+            "x_axis": {"label": "education-spending dispersion", "type": "linear"},
+            "y_axis": {"label": "intergenerational earnings elasticity", "type": "linear"},
+            "series": [
+                {
+                    "name": "available countries",
+                    "points": [
+                        {
+                            "x": None if pd.isna(row.edu_spending_cv) else float(row.edu_spending_cv),
+                            "y": None if pd.isna(row.mobility_ige) else float(row.mobility_ige),
+                            "label": row.country_iso3,
+                        }
+                        for row in frame.itertuples()
+                    ],
+                }
+            ],
+            "annotations": [{"type": "note", "label": verdict}],
+            "sources": [
+                {"publisher_id": v["publisher"], "series_id": v["series"], "vintage_file": v["vintage_file"]}
+                for v in available.values()
+            ],
+            "permalink": f"/h/{HID}",
+        }
+        status = "coverage_gap_inconclusive"
+    else:
+        y = reg["mobility_ige"]
+        full_x = reg[channels + controls]
+        control_x = reg[controls]
+        gini_x = reg[["gini"] + [c for c in controls if c != "gini"]]
+        beta, se, r2_full = ols(y, full_x)
+        p_channels = partial_r2(y, full_x, control_x)
+        p_gini = partial_r2(y, gini_x, reg[[c for c in controls if c != "gini"]])
+
+        signs = np.sign(beta[channels])
+        loo_flip = False
+        loo_rows = []
+        for country in reg["country_iso3"]:
+            sub = reg[reg["country_iso3"] != country]
+            b_sub, _, _ = ols(sub["mobility_ige"], sub[channels + controls])
+            sub_signs = np.sign(b_sub[channels])
+            flips = [c for c in channels if signs[c] != 0 and sub_signs[c] != 0 and signs[c] != sub_signs[c]]
+            loo_flip = loo_flip or bool(flips)
+            loo_rows.append({"dropped_country": country, "flipped_terms": flips})
+
+        all_pass = (
+            p_channels >= PARTIAL_R2_INSTITUTIONAL_THRESHOLD
+            and p_channels > p_gini
+            and not loo_flip
+        )
+        verdict = "supported" if all_pass else "refuted"
+        verdict += (
+            f" - institutional-channel partial R2={p_channels:.3f}, "
+            f"Gini partial R2={p_gini:.3f}, leave-one-out robust={not loo_flip}."
+        )
+        diagnostics = {
+            "verdict": verdict,
+            "verdict_label": verdict.split()[0].upper(),
+            "all_pass": all_pass,
+            "method_valid": True,
+            "data_gap": False,
+            "coverage_gap": False,
+            "available_series": sorted(available.keys()),
+            "coverage_by_variable": coverage,
+            "n_countries_with_complete_regression_data": int(len(reg)),
+            "countries_with_complete_regression_data": sorted(reg["country_iso3"].tolist()),
+            "r2_full": r2_full,
+            "partial_r2_institutional_channels": p_channels,
+            "partial_r2_gini_alone": p_gini,
+            "loo_robust": not loo_flip,
+            "loo_diagnostics": loo_rows,
+            "primary_threshold_partial_r2": PARTIAL_R2_INSTITUTIONAL_THRESHOLD,
+        }
+        coeff = pd.DataFrame(
+            [
+                {"spec": "primary_ols", "term": term, "estimate": float(beta[term]), "std_error": float(se[term])}
+                for term in beta.index
+            ]
+            + [
+                {"spec": "partial_r2", "term": "institutional_channels", "estimate": float(p_channels), "std_error": np.nan},
+                {"spec": "partial_r2", "term": "gini_alone", "estimate": float(p_gini), "std_error": np.nan},
+            ]
+        )
+        coeff.to_parquet(OUT_DIR / "coefficients.parquet", index=False)
+        chart_data = {
+            "kind": "result",
+            "chart_id": f"{HID}/fig1",
+            "title": "Intergenerational mobility decomposition",
+            "subtitle": verdict,
+            "type": "bar",
+            "x_axis": {"label": "component", "type": "category"},
+            "y_axis": {"label": "partial R2", "type": "linear"},
+            "series": [
+                {
+                    "name": "partial R2",
+                    "points": [
+                        {"x": "institutional channels", "y": float(p_channels)},
+                        {"x": "gini alone", "y": float(p_gini)},
+                    ],
+                }
+            ],
+            "sources": [
+                {"publisher_id": v["publisher"], "series_id": v["series"], "vintage_file": v["vintage_file"]}
+                for v in available.values()
+            ],
+            "permalink": f"/h/{HID}",
+        }
+        status = "completed"
+
+    (OUT_DIR / "diagnostics.json").write_text(json.dumps(diagnostics, indent=2) + "\n")
+    (OUT_DIR / "chart_data.json").write_text(json.dumps(chart_data, indent=2) + "\n")
+
+    manifest_lines = [
+        f"hypothesis_id: {HID}",
+        f"run_utc: '{pd.Timestamp.utcnow().isoformat()}'",
+        f"status: {status}",
+        "missing_series: []",
+        "vintages:",
+    ]
+    for k, v in available.items():
+        manifest_lines.append(f"  '{k}':")
+        manifest_lines.append(f"    publisher: {v['publisher']}")
+        manifest_lines.append(f"    series: {v['series']}")
+        manifest_lines.append(f"    vintage_file: {v['vintage_file']}")
+        manifest_lines.append(f"    sha256: {v['sha256']}")
+    (OUT_DIR / "manifest.yaml").write_text("\n".join(manifest_lines) + "\n")
+
+    card = [
+        "# Intergenerational mobility — cross-country decomposition",
+        "",
+        f"**Verdict:** {verdict}",
+        "",
+        "## Summary",
+        "",
+        f"- Required vintages are now present; complete regression coverage is {len(reg)} countries.",
+        f"- Method-valid threshold is {MIN_COUNTRIES_WITH_DATA} countries.",
+        f"- Coverage by variable: {coverage}.",
+        "",
+        "## Data",
+        "",
+    ]
+    for pub, series in REQUIRED_OUTCOME + REQUIRED_CHANNELS + REQUIRED_CONTROLS:
+        card.append(f"- `{pub}:{series}` — available")
+    (OUT_DIR / "result_card.md").write_text("\n".join(card) + "\n")
+    print(f"verdict: {verdict}")
 
 
 if __name__ == "__main__":
