@@ -24,6 +24,14 @@ POSITIONS = ROOT / "positions"
 RUNS = ROOT / "engine" / "runs"
 OUT_JSON = ROOT / "engine" / "policy_browser_index.json"
 OUT_MD = ROOT / "engine" / "policy_browser_index.md"
+LEGACY_HYPOTHESIS_ID_MAP = {
+    "oecd_minimum_wage_bite_low_education_unemployment": "oecd_low_education_unemployment_minimum_wage_bite",
+    "us_qcew_county_food_service_minimum_wage_panel": "bls_qcew_county_food_service_minimum_wage_growth",
+}
+
+
+def canonical_hypothesis_id(hypothesis_id: str) -> str:
+    return LEGACY_HYPOTHESIS_ID_MAP.get(hypothesis_id, hypothesis_id)
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -88,9 +96,12 @@ def load_hypotheses() -> dict[str, dict[str, Any]]:
         if path.parent.name in {"steelman", "conditional_taxonomy"}:
             continue
         doc = load_yaml(path)
-        hid = str(doc.get("hypothesis_id") or path.stem)
+        hid = canonical_hypothesis_id(str(doc.get("hypothesis_id") or path.stem))
         doc["_path"] = str(path.relative_to(ROOT))
         out[hid] = doc
+    for legacy, canonical in LEGACY_HYPOTHESIS_ID_MAP.items():
+        if canonical in out:
+            out[legacy] = out[canonical]
     return out
 
 
@@ -109,6 +120,7 @@ def load_positions() -> tuple[dict[str, dict[str, Any]], dict[str, list[dict[str
             hid = str(claim.get("linked_hypothesis_id") or "").strip()
             if not hid:
                 continue
+            hid = canonical_hypothesis_id(hid)
             by_hypothesis[hid].append(
                 {
                     "position_id": pid,
@@ -129,7 +141,7 @@ def linked_hypotheses(policy: dict[str, Any]) -> list[dict[str, Any]]:
         if isinstance(value, list):
             for item in value:
                 if isinstance(item, (str, int)):
-                    sources_by_id[str(item)].add(key)
+                    sources_by_id[canonical_hypothesis_id(str(item))].add(key)
     out: list[dict[str, Any]] = []
     for hid, sources in sorted(sources_by_id.items()):
         if "linked_hypotheses" in sources:
@@ -167,18 +179,31 @@ def policy_axes(policy: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def load_run(hid: str) -> dict[str, Any] | None:
-    doc = load_json(RUNS / hid / "diagnostics.json")
+    canonical = canonical_hypothesis_id(hid)
+    run_id = canonical
+    diag_path = RUNS / run_id / "diagnostics.json"
+    if not diag_path.exists():
+        if hid != canonical:
+            run_id = hid
+            diag_path = RUNS / run_id / "diagnostics.json"
+        if not diag_path.exists():
+            for legacy, mapped in LEGACY_HYPOTHESIS_ID_MAP.items():
+                if mapped == canonical and (RUNS / legacy / "diagnostics.json").exists():
+                    run_id = legacy
+                    diag_path = RUNS / run_id / "diagnostics.json"
+                    break
+    doc = load_json(diag_path)
     if not doc:
         return None
     raw = doc.get("verdict_label") or doc.get("verdict") or doc.get("status") or ""
-    packet_path = RUNS / hid / "evidence_packet.yaml"
+    packet_path = RUNS / run_id / "evidence_packet.yaml"
     packet = load_yaml(packet_path) if packet_path.exists() else {}
     data_quality = ((packet.get("data") or {}).get("data_quality") or {}) if packet else {}
     return {
         "verdict": raw,
         "bucket": verdict_bucket(raw),
         "template": doc.get("template") or "",
-        "run_dir": str((RUNS / hid).relative_to(ROOT)),
+        "run_dir": str((RUNS / run_id).relative_to(ROOT)),
         "diagnostics": doc,
         "evidence_packet": {
             "path": str(packet_path.relative_to(ROOT)) if packet_path.exists() else "",

@@ -35,6 +35,10 @@ INDEX_JSON = ROOT / "engine" / "evidence_packets_index.json"
 INDEX_MD = ROOT / "engine" / "evidence_packets_index.md"
 
 PACKET_VERSION = 1
+LEGACY_HYPOTHESIS_ID_MAP = {
+    "oecd_minimum_wage_bite_low_education_unemployment": "oecd_low_education_unemployment_minimum_wage_bite",
+    "us_qcew_county_food_service_minimum_wage_panel": "bls_qcew_county_food_service_minimum_wage_growth",
+}
 RUN_ARTIFACTS = [
     "hypothesis.yaml",
     "manifest.yaml",
@@ -114,7 +118,12 @@ def git_commit() -> str | None:
     return out.strip() or None
 
 
+def canonical_hypothesis_id(hypothesis_id: str) -> str:
+    return LEGACY_HYPOTHESIS_ID_MAP.get(hypothesis_id, hypothesis_id)
+
+
 def hypothesis_path(hypothesis_id: str) -> Path | None:
+    hypothesis_id = canonical_hypothesis_id(hypothesis_id)
     for path in HYPOTHESES.glob("*/*.yaml"):
         if path.parent.name in {"steelman", "conditional_taxonomy"}:
             continue
@@ -136,6 +145,9 @@ def hypothesis_lookup() -> dict[str, Path]:
         hid = doc.get("hypothesis_id")
         if hid:
             out[str(hid)] = path
+    for legacy, canonical in LEGACY_HYPOTHESIS_ID_MAP.items():
+        if canonical in out:
+            out[legacy] = out[canonical]
     return out
 
 
@@ -283,7 +295,8 @@ def build_packet(
     commit: str | None,
     hypotheses: dict[str, Path] | None = None,
 ) -> dict[str, Any]:
-    hid = run_dir.name
+    run_hid = run_dir.name
+    hid = canonical_hypothesis_id(run_hid)
     diagnostics = load_json(run_dir / "diagnostics.json")
     manifest = load_yaml(run_dir / "manifest.yaml")
     hyp_path = (hypotheses or {}).get(hid) or hypothesis_path(hid)
@@ -362,6 +375,7 @@ def build_packet(
         },
         "hypothesis": {
             "id": hid,
+            "legacy_id": run_hid if run_hid != hid else None,
             "path": rel(hyp_path) if hyp_path else None,
             "school": hypothesis.get("school"),
             "topic": hypothesis.get("topic") or hypothesis.get("category"),
