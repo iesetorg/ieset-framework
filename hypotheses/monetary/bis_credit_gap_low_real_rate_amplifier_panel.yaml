@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_credit_gap_low_real_rate_amplifier_panel
+version: 1
+status: candidate
+topic: monetary
+claim: Credit-gap stress is more dangerous when real interest rates are unusually
+  low.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HKG
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - MYS
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - RUS
+  - SAU
+  - SGP
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period:
+  - 1970
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years or country-quarters missing the predeclared BIS treatment
+  - drop rows missing the WDI outcome or controls
+  - require forward outcome coverage before evaluating the row
+variables:
+  outcome:
+  - name: fwd_unemployment_change_2y
+    source: constructed from local BIS/WDI vintages
+    transformation: forward_change_or_forward_average
+  treatment:
+  - name: credit_gap_x_low_real_rate
+    source: bis:WS_CREDIT_GAP; bis:WS_DSR; bis:WS_SPP; world_bank_wdi
+    transformation: threshold_or_interaction_predeclared_in_runner
+  controls:
+  - name: credit_gap
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+  - name: real_interest_rate
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+  - name: unemployment_rate
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Compact panel screen with country and calendar-year fixed effects. Standard
+    errors clustered by country.
+falsification:
+  rule: Supported only if the coefficient on credit_gap_x_low_real_rate and the raw
+    treated-control contrast clear the predeclared direction and magnitude gates.
+  test: bis_credit_gap_low_real_rate_amplifier_panel
+  threshold: '{"coef_min": 0.25, "mean_diff_min": 0.25, "min_countries": 15, "min_observations":
+    450, "p_max": 0.1}'
+prior_confidence: 0.58
+disclosure: This is a predictive panel screen, not a structural causal estimate.
+steelman: hypotheses/steelman/bis_credit_gap_low_real_rate_amplifier_panel.md
+scope:
+  period:
+  - 1970
+  - 2025
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - financial_crisis
+  - employment_labour
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - credit_gap_x_low_real_rate
+notes: Generated and runnable via engine/runs/bis_credit_gap_low_real_rate_amplifier_panel/replication.py
+  from local BIS/WDI vintages.

@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_pdb_market_reform_productivity_compounder
+version: 1
+status: candidate
+topic: growth
+claim: Countries with larger PMR declines from 2018 to 2023 saw faster PDB labour-productivity growth
+  in the following window.
+methodology_note: Promoted for Batch 03 on 2026-05-12 using the local OECD Productivity Database vintage,
+  with PMR added only for the product-market-reform cross-section.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period: &id001
+  - 2018
+  - 2024
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: PMR-reform exposure is observed as a 2018-2023 change and tested against
+    following-window productivity growth.
+  exclusion_rules:
+  - drop non-OECD observations and country-years missing the primary outcome or treatment
+variables:
+  outcome:
+  - name: lp_growth_2018_2024
+    source: oecd:OECD.SDD.TPS,DSD_PDB@DF_PDB,2.0
+    transformation: growth_or_level_as_named
+  treatment:
+  - name: pmr_decline_2018_2023
+    source: oecd_pmr:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2
+    transformation: lagged_level_or_change_as_named
+  controls: []
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: country
+  notes: Local first-pass throughput screen; upgrade robustness before scoreboard conversion.
+falsification:
+  rule: 'Estimate `lp_growth_2018_2024 ~ pmr_decline_2018_2023` on the landed OECD PDB vintage; expected
+    sign: positive. SUPPORTED requires the pre-registered sign at p<0.10 or the named dominance criterion;
+    otherwise the result is partial or weak.'
+  test: oecd_pdb_batch03_oecd_pdb_market_reform_productivity_compounder
+  threshold: p<0.10 with pre-registered sign, except dominance tests compare the named contribution magnitudes
+prior_confidence: 0.55
+disclosure: These OECD productivity screens are proxy-first associational tests intended to identify scoreboard
+  candidates, not final causal estimates.
+steelman: hypotheses/steelman/oecd_pdb_market_reform_productivity_compounder.md
+scope:
+  period: *id001
+  countries:
+  - OECD
+  outcome_dim:
+  - productivity
+  - gdp_growth
+  policy_family:
+  - regulation
+  treatment_tags:
+  - pmr_decline_2018_2023
+  - oecd_pdb_batch03
+covers_claims: []

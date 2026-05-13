@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_reer_depreciation_current_account_repair_panel_1964_2026
+version: 1
+status: candidate
+topic: monetary
+claim: Large real exchange-rate depreciations predict current-account improvement
+  over the following three years.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HKG
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - MYS
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - RUS
+  - SAU
+  - SGP
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period:
+  - 1964
+  - 2026
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the predeclared BIS treatment
+  - drop country-years missing the WDI outcome or controls
+  - require forward outcome coverage before evaluating the row
+variables:
+  outcome:
+  - name: fwd_current_account_change_3y
+    source: 'constructed: forward outcome from WDI or BIS local vintage'
+    transformation: forward_change_or_forward_average
+  treatment:
+  - name: large_reer_depreciation
+    source: bis:WS_CREDIT_GAP; bis:WS_DSR; bis:WS_EER; bis:WS_SPP
+    transformation: threshold_or_interaction_predeclared_in_runner
+  controls:
+  - name: current_account_balance_gdp
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Compact panel screen with country and calendar-year fixed effects. Standard
+    errors clustered by country.
+falsification:
+  rule: Supported only if the coefficient on large_reer_depreciation and the raw treated-control
+    contrast clear the predeclared direction and magnitude gates.
+  test: bis_reer_depreciation_current_account_repair_panel_1964_2026
+  threshold: '{"coef_min": 0.5, "mean_diff_min": 0.5, "min_countries": 20, "min_observations":
+    900, "p_max": 0.1}'
+prior_confidence: 0.58
+disclosure: This is a predictive panel screen, not a structural causal estimate. It
+  is designed to test whether broad macro-financial signals generalise across countries
+  and time.
+steelman: hypotheses/steelman/bis_reer_depreciation_current_account_repair_panel_1964_2026.md
+scope:
+  period:
+  - 1964
+  - 2026
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - capital_flows
+  - trade_liberalisation
+  policy_family:
+  - exchange_rate_regime
+  - monetary_policy
+  treatment_tags:
+  - large_reer_depreciation
+notes: Generated and runnable via engine/runs/bis_reer_depreciation_current_account_repair_panel_1964_2026/replication.py
+  from local BIS/WDI vintages.

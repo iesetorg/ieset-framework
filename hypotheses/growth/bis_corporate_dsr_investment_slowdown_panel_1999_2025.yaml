@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_corporate_dsr_investment_slowdown_panel_1999_2025
+version: 1
+status: candidate
+topic: growth
+claim: High non-financial corporate debt-service burdens predict later private-investment-share
+  declines.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HKG
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - MYS
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - RUS
+  - SAU
+  - SGP
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period:
+  - 1970
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years or country-quarters missing the predeclared BIS treatment
+  - drop rows missing the WDI outcome or controls
+  - require forward outcome coverage before evaluating the row
+variables:
+  outcome:
+  - name: fwd_private_investment_share_change_3y
+    source: constructed from local BIS/WDI vintages
+    transformation: forward_change_or_forward_average
+  treatment:
+  - name: high_corporate_dsr
+    source: bis:WS_CREDIT_GAP; bis:WS_DSR; bis:WS_SPP; world_bank_wdi
+    transformation: threshold_or_interaction_predeclared_in_runner
+  controls:
+  - name: corporate_dsr
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+  - name: private_investment_share
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+  - name: gdp_growth
+    source: world_bank_wdi or BIS local vintage
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Compact panel screen with country and calendar-year fixed effects. Standard
+    errors clustered by country.
+falsification:
+  rule: Supported only if the coefficient on high_corporate_dsr and the raw treated-control
+    contrast clear the predeclared direction and magnitude gates.
+  test: bis_corporate_dsr_investment_slowdown_panel_1999_2025
+  threshold: '{"coef_max": -0.5, "mean_diff_max": -0.5, "min_countries": 15, "min_observations":
+    450, "p_max": 0.1}'
+prior_confidence: 0.58
+disclosure: This is a predictive panel screen, not a structural causal estimate.
+steelman: hypotheses/steelman/bis_corporate_dsr_investment_slowdown_panel_1999_2025.md
+scope:
+  period:
+  - 1970
+  - 2025
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  - financialisation
+  policy_family:
+  - monetary_policy
+  - regulation
+  treatment_tags:
+  - high_corporate_dsr
+notes: Generated and runnable via engine/runs/bis_corporate_dsr_investment_slowdown_panel_1999_2025/replication.py
+  from local BIS/WDI vintages.

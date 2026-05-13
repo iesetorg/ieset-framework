@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_pdb_gdp_hour_frontier_convergence_1950_2025
+version: 1
+status: candidate
+topic: growth
+claim: Countries farther below the annual OECD labour-productivity frontier subsequently grow faster in
+  GDP per hour.
+methodology_note: Promoted for Batch 03 on 2026-05-12 using the local OECD Productivity Database vintage,
+  with PMR added only for the product-market-reform cross-section.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - JPN
+  - KOR
+  - LUX
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period: &id001
+  - 1971
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop non-OECD observations and country-years missing the primary outcome or treatment
+variables:
+  outcome:
+  - name: gdp_hour_growth
+    source: oecd:OECD.SDD.TPS,DSD_PDB@DF_PDB,2.0
+    transformation: growth_or_level_as_named
+  treatment:
+  - name: frontier_gap_lag
+    source: oecd:OECD.SDD.TPS,DSD_PDB@DF_PDB,2.0
+    transformation: lagged_level_or_change_as_named
+  controls: []
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Local first-pass throughput screen; upgrade robustness before scoreboard conversion.
+falsification:
+  rule: 'Estimate `gdp_hour_growth ~ frontier_gap_lag + C(country) + C(year)` on the landed OECD PDB vintage;
+    expected sign: positive. SUPPORTED requires the pre-registered sign at p<0.10 or the named dominance
+    criterion; otherwise the result is partial or weak.'
+  test: oecd_pdb_batch03_oecd_pdb_gdp_hour_frontier_convergence_1950_2025
+  threshold: p<0.10 with pre-registered sign, except dominance tests compare the named contribution magnitudes
+prior_confidence: 0.55
+disclosure: These OECD productivity screens are proxy-first associational tests intended to identify scoreboard
+  candidates, not final causal estimates.
+steelman: hypotheses/steelman/oecd_pdb_gdp_hour_frontier_convergence_1950_2025.md
+scope:
+  period: *id001
+  countries:
+  - OECD
+  outcome_dim:
+  - productivity
+  - gdp_growth
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - frontier_gap_lag
+  - oecd_pdb_batch03
+covers_claims: []
