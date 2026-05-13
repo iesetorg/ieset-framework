@@ -150,8 +150,7 @@ export async function WorkedExamples() {
         <em>before</em> the run, the data substrate is logged with vintages,
         the replication.py is reproducible end-to-end, and the verdict is
         whatever the rule says — no post-hoc reframing. The right-hand card
-        explicitly rebuked one of the framework author&apos;s priors. That&apos;s
-        the system working.
+        moved against the pre-run expectation. That&apos;s the system working.
       </p>
     </div>
   );

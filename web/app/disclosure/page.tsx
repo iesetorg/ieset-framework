@@ -1,9 +1,9 @@
 import { loadRepoMarkdown } from "@/lib/content";
 
 export const metadata = {
-  title: "Disclosure",
+  title: "Transparency",
   description:
-    "Author priors, conflicts, and structural commitments. The framework does not claim neutrality.",
+    "Author perspective, broad economic exposure, and the methodological commitments that keep IESET auditable.",
 };
 
 export default async function DisclosurePage() {

@@ -372,7 +372,6 @@ function hypothesisText(hypothesis: Hypothesis): string {
     hypothesis.claim,
     hypothesis.notes,
     hypothesis.methodology_note,
-    hypothesis.disclosure,
     scope?.countries,
     scope?.outcome_dim,
     scope?.policy_family,

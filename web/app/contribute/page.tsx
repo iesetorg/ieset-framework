@@ -3,7 +3,7 @@ import { loadRepoMarkdown } from "@/lib/content";
 export const metadata = {
   title: "Contribute",
   description:
-    "Adversarial review protocol. Reviewers with priors different from the author's are the most valuable contributors.",
+    "How to challenge, repair, or extend IESET with specific evidence, code, and mapping corrections.",
 };
 
 export default async function ContributePage() {

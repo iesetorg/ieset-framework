@@ -107,6 +107,15 @@ export default async function ScoreboardPage() {
           <em>is</em> the framework updating on evidence in public.
         </p>
         <p className="mt-3 mb-0">
+          A central pattern to watch is whether a school predicts{" "}
+          <strong>positive-sum coordination</strong> or mostly{" "}
+          <strong>zero-sum allocation</strong>. Many Marxian or heavily
+          interventionist claims can look defensible on distributional intent,
+          but the scoreboard asks the harder empirical question: did the policy
+          expand the surplus being shared, simply move it around, or reduce it
+          through weaker investment, productivity, supply, or fiscal capacity?
+        </p>
+        <p className="mt-3 mb-0">
           <strong>Raw net</strong> is the simple scoreboard: a clear win counts
           +1, a partial win +0.5, a partial loss -0.5, and a clear loss -1.{" "}
           <strong>Q-net</strong> starts from that same score, then asks how
@@ -276,6 +285,12 @@ export default async function ScoreboardPage() {
             Predictions marked &quot;untested&quot; are either hypotheses we haven&apos;t
             run yet, or hypotheses we haven&apos;t written yet. Both are tracked
             as open work.
+          </li>
+          <li>
+            Distributional wins are not treated as fake wins. They are treated
+            as incomplete until the associated surplus question is visible: did
+            the intervention create durable gains, trade off against other
+            groups, or shrink the base it redistributed from?
           </li>
           <li>
             The score updates automatically when hypothesis runs land. This page

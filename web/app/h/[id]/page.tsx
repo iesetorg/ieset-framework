@@ -320,25 +320,6 @@ export default async function HypothesisPage({
             </section>
           )}
 
-          {/* Disclosures */}
-          {(h.disclosure || h.conflict_disclosure) && (
-            <section className="mb-10">
-              <SectionHeader>Disclosures</SectionHeader>
-              {h.disclosure && (
-                <div className="mb-3 border-l-[3px] border-faint bg-panel px-4 py-3 text-[14px] text-muted">
-                  <strong className="font-semibold text-ink">Author prior:</strong>{" "}
-                  {h.disclosure.trim()}
-                </div>
-              )}
-              {h.conflict_disclosure && (
-                <div className="mb-3 border-l-[3px] border-faint bg-panel px-4 py-3 text-[14px] text-muted">
-                  <strong className="font-semibold text-ink">Conflict disclosure:</strong>{" "}
-                  {h.conflict_disclosure.trim()}
-                </div>
-              )}
-            </section>
-          )}
-
           {/* Notes */}
           {h.notes && (
             <section className="mb-10">
@@ -367,12 +348,6 @@ export default async function HypothesisPage({
                 <>
                   <dt className="text-muted">Evidence</dt>
                   <dd className="capitalize">{h.evidence_type}</dd>
-                </>
-              )}
-              {h.prior_confidence != null && (
-                <>
-                  <dt className="text-muted">Prior</dt>
-                  <dd className="font-semibold">{h.prior_confidence.toFixed(2)}</dd>
                 </>
               )}
               {h.sample && (
@@ -444,6 +419,13 @@ export default async function HypothesisPage({
             </a>
           </div>
         </aside>
+      </div>
+      <div className="border-t border-rule py-5 text-center text-[11.5px] text-faint">
+        Authored framework.{" "}
+        <Link href="/disclosure" className="text-muted hover:text-ink">
+          Read the transparency note
+        </Link>
+        .
       </div>
     </div>
   );

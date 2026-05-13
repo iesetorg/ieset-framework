@@ -9,7 +9,7 @@ import { Legend } from "@/components/diagrams/Legend";
 export const metadata = {
   title: "How it works",
   description:
-    "How IESET's hypotheses, policies, movements, positions, and axes relate — and how the pre-registration pipeline, matching engine, and adversarial-review loop fit together.",
+    "How IESET turns economic-policy claims into pre-registered tests, reproducible data runs, linked evidence pages, and scoreboard updates.",
 };
 
 interface TabCard {
@@ -19,6 +19,33 @@ interface TabCard {
   example: string;
   howItFits: string;
 }
+
+const LOOP_STEPS = [
+  {
+    kicker: "01",
+    title: "State the claim",
+    body:
+      "A prediction has to name the mechanism, outcome, sample, period, and what evidence would count against it.",
+  },
+  {
+    kicker: "02",
+    title: "Lock the rule",
+    body:
+      "The hypothesis and falsification rule are committed before estimation, so the target cannot move after the data arrives.",
+  },
+  {
+    kicker: "03",
+    title: "Run the record",
+    body:
+      "Publisher data is pinned to a vintage, the estimator runs, and the result is published with code and diagnostics.",
+  },
+  {
+    kicker: "04",
+    title: "Update the map",
+    body:
+      "Verdicts flow back to policies, movements, schools, axes, and the scoreboard, with steelmen and critiques kept attached.",
+  },
+];
 
 const tabs: TabCard[] = [
   {
@@ -75,9 +102,9 @@ const tabs: TabCard[] = [
     href: "/scoreboard",
     name: "/scoreboard",
     plainEnglish:
-      "A leaderboard showing how each school of thought is doing against the evidence — what fraction of its predictions held up once tested.",
+      "A leaderboard showing how each school of thought is doing against the evidence — what fraction of its predictions held up once tested, and whether those wins look positive-sum or merely redistributive.",
     example:
-      "Example: a school with 3 of 5 tested predictions supported ranks differently from one with 1 of 1. Both the rate and the sample size matter. The scoreboard updates automatically when a hypothesis finishes running.",
+      "Example: a school with 3 of 5 tested predictions supported ranks differently from one with 1 of 1. Both the rate and the sample size matter. If a Marxian or interventionist claim shows a short-run distributional gain, the next question is whether it created durable surplus or shifted costs into investment, productivity, supply, inflation, or fiscal capacity. The scoreboard updates automatically when a hypothesis finishes running.",
     howItFits:
       "The scoreboard is what you get when you roll up all positions × their predictions × their hypotheses' verdicts. It's the public summary of 'which schools the data supports so far'.",
   },
@@ -100,12 +127,42 @@ export default function HowItWorksPage() {
       <h1 className="m-0 mb-3 text-[30px] font-semibold tracking-[-0.02em] md:text-[34px]">
         How it works
       </h1>
-      <p className="mb-10 max-w-[780px] text-[17px] leading-[1.55] text-muted">
-        IESET answers specific economic-policy questions the way science
-        should: pre-register the claim, fix the data vintage, run a
-        replicable estimator, and publish whether the data agreed. This page
-        shows the moving parts, how they connect, and what to click when.
+      <p className="mb-5 max-w-[820px] text-[17px] leading-[1.55] text-muted">
+        IESET turns economic arguments into auditable bets. A school, policy
+        proposal, or historical claim has to say what should happen in the
+        world; the rule is written down before the data is touched; the run
+        uses pinned public-source data; the result updates the pages that
+        depended on that claim.
       </p>
+      <p className="mb-8 max-w-[820px] text-[15px] leading-[1.65] text-muted">
+        The goal is not to make politics bloodless. The goal is to stop
+        confident narratives from floating above the record. If a claim is
+        important enough to shape policy, it should be specific enough to
+        test, strong enough to steelman, and open enough for critics to break.
+      </p>
+      <p className="mb-8 max-w-[820px] text-[15px] leading-[1.65] text-muted">
+        That is why the framework separates moral intent from empirical
+        mechanism. A policy can redistribute income and still fail its broader
+        claim if the evidence shows a zero-sum tradeoff, weaker production, or
+        a shrinking base. The live scoreboard is where those tradeoffs become
+        visible instead of staying hidden inside rhetoric.
+      </p>
+
+      <section className="mb-10 grid grid-cols-1 gap-3 md:grid-cols-4">
+        {LOOP_STEPS.map((step) => (
+          <div key={step.title} className="rounded border border-rule bg-white p-4">
+            <div className="mb-1 font-mono text-[11px] text-accent">
+              {step.kicker}
+            </div>
+            <h2 className="mb-1.5 text-[15px] font-semibold leading-snug text-ink">
+              {step.title}
+            </h2>
+            <p className="m-0 text-[13px] leading-[1.55] text-muted">
+              {step.body}
+            </p>
+          </div>
+        ))}
+      </section>
 
       {/* ----- A — Entity map ----- */}
       <DiagramSection

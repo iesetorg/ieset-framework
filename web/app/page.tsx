@@ -56,23 +56,32 @@ export default async function HomePage() {
           Economic politics should be settled by testable claims.
         </h1>
         <p className="mb-6 max-w-[720px] text-[18px] leading-[1.55] text-muted">
-          IESET is a public, pre-registration-first map of economic-policy
-          claims. It asks each school to say what should happen, writes that
-          prediction down before the data is touched, and then lets the record
-          update the scoreboard. Party labels, rhetorical confidence, and
-          ideological aesthetics do not get points; tested predictions do.
+          IESET is a public evidence map for economic policy. Instead of
+          asking which tribe sounds most confident, it asks every school to
+          make claims that can lose: what should happen, where, over what
+          period, and what data would change our mind. Those claims are
+          registered before analysis and scored against reproducible runs.
         </p>
         <p className="mb-6 max-w-[720px] text-[15px] leading-[1.6] text-muted">
-          The landing page explains the loop. Live counts, exact verdicts, and
-          policy totals live in the dataset pages so this front door never
-          drifts out of sync with the corpus.
+          Start with a claim, a school of thought, a policy, or a country. The
+          library links each one through shared policy levers so a slogan can
+          be traced down to its test, data vintage, code, steelman, and
+          scoreboard impact.
+        </p>
+        <p className="mb-6 max-w-[720px] text-[15px] leading-[1.6] text-muted">
+          One pattern already visible in the scoreboard: market institutions
+          tend to turn conflict into positive-sum coordination, while many
+          Marxian or heavily interventionist claims look, at best, like
+          redistribution without durable surplus creation. The point is not to
+          settle the argument by label; it is to ask whether the surplus grows,
+          merely moves, or shrinks.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/h"
             className="inline-block rounded border border-accent bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-[#183e61] hover:no-underline"
           >
-            Browse the datasets →
+            Search hypotheses →
           </Link>
           <Link
             href="/scoreboard"
@@ -81,7 +90,7 @@ export default async function HomePage() {
             Open the scoreboard
           </Link>
           <Link
-            href="/methodology"
+            href="/how-it-works"
             className="inline-block rounded border border-rule-strong bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-panel hover:no-underline"
           >
             How it works
@@ -201,7 +210,7 @@ export default async function HomePage() {
           {INVARIANTS.map((inv, i) => (
             <div key={i} className="rounded border border-rule bg-white p-5">
               <div className="mb-1.5 font-mono text-[11px] text-accent">
-                method invariant
+                {String(i + 1).padStart(2, "0")}
               </div>
               <h3 className="mb-1.5 text-[15px] font-semibold leading-snug">
                 {inv.title}
@@ -239,6 +248,11 @@ const INVARIANTS = [
       "Reforms are scored by what they did on each axis, not by party label. Schröder's market-oriented labour reform is coded as market-oriented regardless of SPD.",
   },
   {
+    title: "Surplus before sentiment",
+    body:
+      "Redistribution can be a real policy objective, but the scoreboard asks whether a claim creates durable gains or mostly reallocates a fixed pie.",
+  },
+  {
     title: "Channel-separated measurement",
     body:
       "Fiscal and regulatory interventions are measured on independent axes. They correlate politically but are causally distinct.",
@@ -249,8 +263,8 @@ const INVARIANTS = [
       "Within-country change over time is the default analytical lens. Point-in-time cross-country comparison requires justification.",
   },
   {
-    title: "Legibly biased, structurally open",
+    title: "Authored, reproducible, correctable",
     body:
-      "The framework does not claim neutrality — author priors are disclosed. The defence is openness to adversarial correction at every level.",
+      "IESET is authored, but the claims are pre-registered, reproducible, and open to specific correction.",
   },
 ];

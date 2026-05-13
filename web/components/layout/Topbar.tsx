@@ -61,8 +61,8 @@ const ABOUT: NavDropdownItem[] = [
   },
   {
     href: "/disclosure",
-    label: "Disclosure",
-    blurb: "Author priors, conflicts, and correction posture",
+    label: "Transparency",
+    blurb: "Author perspective and audit commitments",
   },
   {
     href: "/contribute",
@@ -104,6 +104,12 @@ export function Topbar() {
             className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
           >
             Policy Browser
+          </Link>
+          <Link
+            href="/h"
+            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
+          >
+            Hypotheses
           </Link>
           <NavDropdown label="Library" items={LIBRARY} />
           <NavDropdown label="Explore" items={EXPLORE} />

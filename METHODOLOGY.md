@@ -40,9 +40,9 @@ The default analytical lens is within-country change over time, not cross-sectio
 
 **Enforced by:** schema (`sample.temporal_structure` must be `panel`, `time_series`, or `cross_section_with_justification`) and review.
 
-### 6. Legibly biased, structurally open
+### 6. Authored, reproducible, open to correction
 
-The framework does not claim neutrality. [DISCLOSURE.md](DISCLOSURE.md) names the author's priors. Every hypothesis YAML includes the author's `prior_confidence` before the run. The framework's defence is not absent bias but structural openness to adversarial correction: pre-registration commits, public replication notebooks, bug-bounty-funded challenges, and a public review log.
+IESET is an authored framework, not an anonymous consensus document. [DISCLOSURE.md](DISCLOSURE.md) records the author's perspective and broad economic exposure. Every hypothesis YAML includes a pre-run `prior_confidence`, not as a badge of truth, but as an audit marker for how surprising the result was expected to be. The framework's defence is reproducibility and correction: pre-registration commits, public replication code, challengeable mappings, and visible updates when a test changes the record.
 
 **Enforced by:** every hypothesis YAML must include a `disclosure` field and a non-null `prior_confidence` in `[0, 1]`.
 
@@ -89,7 +89,7 @@ Falsification is not failure — it is the framework working. A falsified hypoth
 3. Triggers a public note in `/updates` on the platform.
 4. Counts positively toward framework credibility, not negatively.
 
-Framework updates that move the author's belief *against* their disclosed prior direction are the most credibility-generating events. They are called out prominently.
+Framework updates that move against the pre-run expectation are useful stress tests. They should remain visible because they show the scoring rule can bind the framework as well as its critics.
 
 ---
 
