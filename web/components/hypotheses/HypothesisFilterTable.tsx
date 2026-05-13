@@ -16,6 +16,7 @@ export interface HypothesisFilterRow {
   topic: string;
   status: string;
   evidence_type?: string;
+  is_public: boolean;
   verdict?: string;
   verdict_label: string;
   verdict_tone: VerdictTone;
@@ -119,6 +120,7 @@ export function HypothesisFilterTable({
   const [channel, setChannel] = useState("");
   const [evidence, setEvidence] = useState("");
   const [linkage, setLinkage] = useState("");
+  const [visibility, setVisibility] = useState("");
   const [yearFrom, setYearFrom] = useState("");
   const [yearTo, setYearTo] = useState("");
 
@@ -177,6 +179,8 @@ export function HypothesisFilterTable({
       if (channel && !row.axes.some((a) => channelFor(a.axis, axesMap) === channel))
         return false;
       if (evidence && row.evidence_type !== evidence) return false;
+      if (visibility === "public" && !row.is_public) return false;
+      if (visibility === "pending" && row.is_public) return false;
       if (linkage === "school-linked" && row.schools.length === 0) return false;
       if (linkage === "school-unlinked" && row.schools.length > 0) return false;
       if (linkage === "axis-linked" && row.axes.length === 0) return false;
@@ -214,6 +218,7 @@ export function HypothesisFilterTable({
     validYearFrom,
     validYearTo,
     verdict,
+    visibility,
   ]);
 
   const counts = useMemo(() => {
@@ -231,6 +236,7 @@ export function HypothesisFilterTable({
     channel ||
     evidence ||
     linkage ||
+    visibility ||
     yearFrom ||
     yearTo;
 
@@ -243,6 +249,7 @@ export function HypothesisFilterTable({
     setChannel("");
     setEvidence("");
     setLinkage("");
+    setVisibility("");
     setYearFrom("");
     setYearTo("");
   };
@@ -368,6 +375,20 @@ export function HypothesisFilterTable({
           </label>
 
           <label className="flex items-center gap-2 text-[12px] text-muted">
+            <span className="sc text-[10px]">visibility</span>
+            <select
+              aria-label="Filter by public visibility"
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-1.5 text-[12px] text-ink focus:border-accent focus:outline-none"
+            >
+              <option value="">all</option>
+              <option value="public">public verdicts</option>
+              <option value="pending">pending / not public</option>
+            </select>
+          </label>
+
+          <label className="flex items-center gap-2 text-[12px] text-muted">
             <span className="sc text-[10px]">linkage</span>
             <select
               aria-label="Filter by linkage"
@@ -479,6 +500,11 @@ export function HypothesisFilterTable({
                     {row.claim.split(/(?<=[.!?])\s+/)[0]}
                   </Link>
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-[10.5px] text-faint">
+                    {!row.is_public && (
+                      <span className="rounded border border-rule bg-panel px-1.5 py-[1px] text-[10px] uppercase tracking-wide text-muted">
+                        not public yet
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => setQuery(row.hypothesis_id)}
