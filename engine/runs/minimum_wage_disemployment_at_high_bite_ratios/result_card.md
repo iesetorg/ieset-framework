@@ -1,51 +1,32 @@
-# Minimum-wage disemployment at high bite ratios, 1990-2022
+# Result card — minimum_wage_disemployment_at_high_bite_ratios
 
-**Verdict:** inconclusive — data gap on bls:LAU_state_teen_employment_population_ratio_panel, bls:OES_state_median_hourly_wage_panel. The spec's primary stratified Callaway-Sant'Anna DiD on US-state cohorts split by bite ratio (state-min / state-median-hourly-wage) cannot be estimated without (a) the BLS LAU state teen employment-population panel, (b) the USDOL state minimum-wage history, and (c) the BLS OES state median-hourly-wage panel. On-disk BLS vintages currently include only national LNS/CES/CUUR series; the state fan-out has not been fetched. Cross-country OECD MWUSD bite-ratio fallback is also absent. No coefficients computed.
+**Verdict:** INCONCLUSIVE_DATA_PENDING — minimum-wage data gate failed; missing state/subnational outcome/treatment panels
 
-## Summary
+## Pre-registration
+- **Claim:** Minimum-wage increases above the local median-wage ratio produce disemployment effects at the low-skill margin, even if aggregate employment effects are small.
+- **Falsification rule:** The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
 
-- Tests the Chicago-monetarist claim that high bite-ratio (state-min / state-median-hourly-wage ≥ 0.55) cohorts show measurable extra teen disemployment vs low bite-ratio (< 0.45) cohorts in the 1990-2022 US-state panel.
-- Primary statistic: ATT(high-bite) − ATT(low-bite) on teen E/P, percentage points. SUPPORTED iff ≤ −0.020 pp at p<0.10.
-- Informative: Dube-Lester-Reich border-county elasticity on QCEW NAICS-722 (food services); cross-country OECD bite-ratio panel regression for the 15 spec countries.
-- Required series: 1 outcome, 2 treatment (state min-wage history + state median hourly wage), 1 border-pair, 2 OECD = 6 total.
-- Found on-disk: 1 of 6.
-- Missing primary outcome: ['bls:LAU_state_teen_employment_population_ratio_panel'].
-- Missing treatment: ['bls:OES_state_median_hourly_wage_panel'].
-- Missing border-pair: ['bls:QCEW_county_NAICS722_employment_panel'].
-- Missing OECD cross-country: ['oecd:MWUSD_minimum_to_median_wage_ratio', 'oecd:DSD_LMS_low_education_unemployment_rate'].
+## Estimate (Callaway-Sant'Anna staggered DiD, TWFE approximation)
+- _Error:_ minimum-wage data gate failed; missing state/subnational outcome/treatment panels
 
-## Method
+## Variables resolved
+- `usdol:state_minimum_wage_history` → state_minimum_wage (treatment, n=2106)
 
-Pre-registered specification (50-state panel, 1990-2022, excluding 2020-2021 COVID labour-market shock):
+### Missing data
+- `bls:LAU_state_teen_employment_population_ratio_panel` (outcome)
+- `bls:OES_state_median_hourly_wage_panel` (treatment)
 
-    Step 1: bite_ratio_{s,t} = state_min_wage_{s,t} /
-                                state_median_hourly_wage_{s,t}
-    Step 2: assign each (state, treatment-cohort) to
-            HIGH-BITE if max(bite_ratio) >= 0.55
-            LOW-BITE  if max(bite_ratio) <  0.45
-    Step 3: Callaway-Sant'Anna 2021 staggered DiD on teen E/P,
-            state and year FE, never- and late-treated controls,
-            state-clustered SE.
-    Step 4: Differential = ATT_high - ATT_low (percentage points).
+## Data repair note
+- The preregistered minimum-wage design is state/subnational; national or single-state exemplar series are not compatible evidence.
+- Required: `bls:LAU_state_teen_employment_population_ratio_panel` — BLS/CPS-LAU state teen employment-to-population panel, keyed by state and year. The national FRED LNS12300012 series is useful context but cannot identify high-bite state cohorts.
+- Required: `usdol:state_minimum_wage_history` — USDOL all-state statutory minimum-wage history with federal-floor fallback and binding-change flags.
+- Required: `bls:OES_state_median_hourly_wage_panel` — BLS OES/OEWS state median hourly wage panel to construct the local minimum-to-median bite ratio used for high-bite stratification.
+- Also needed for full verdict completeness: bls:QCEW_county_NAICS722_employment_panel for border-pair and low-wage-sector robustness.
+- Also needed for full verdict completeness: oecd:MWUSD_minimum_to_median_wage_ratio for cross-country descriptive context only.
+- Also needed for full verdict completeness: oecd:DSD_LMS_low_education_unemployment_rate for non-US robustness after native OECD keying is wired.
+- Not used as compatible evidence: fred:LNS12300012 is national teen E/P, not the state panel required by the preregistered DiD.
+- Not used as compatible evidence: fred:STTMINWGCA is a California exemplar, not all-state statutory treatment timing.
+- Not used as compatible evidence: OECD MWUSD can contextualize bite ratios but cannot replace the state-year cohort design.
+- Runner limitation: The high-bite design requires state/unit cohort timing and local bite ratios. Do not run the generic country-year path until unit_id support or a validated state-year derived panel is present.
 
-Falsification thresholds (dispositive):
-  PRIMARY: differential ≤ -0.020 pp at p<0.10 → SUPPORTED.
-  REFUTED if differential ≥ 0 at p<0.10 (Chicago direction wrong).
-  REFUTED if |differential| < +0.005 pp with sufficient power (effect too small to support the claim).
-
-Informative (not gating):
-  Border-county DLR elasticity on QCEW NAICS-722 employment for state-pairs whose bite ratios diverge by ≥ 0.10.
-  OECD MWUSD bite-ratio panel: low-skill unemployment rate ~ bite-ratio + country FE + year FE on the 15-country spec sample.
-
-## Data
-
-Required (per spec):
-
-- `bls:LAU_state_teen_employment_population_ratio_panel` — **missing**
-- `usdol:state_minimum_wage_history` — available
-- `bls:OES_state_median_hourly_wage_panel` — **missing**
-- `bls:QCEW_county_NAICS722_employment_panel` — **missing**
-- `oecd:MWUSD_minimum_to_median_wage_ratio` — **missing**
-- `oecd:DSD_LMS_low_education_unemployment_rate` — **missing**
-
-Promotion verdict: inconclusive (method-validity gate fails on data availability — state-level BLS series and OECD MWUSD bite-ratio are not on disk; the BLS fetcher currently exposes only national LNS/CES/CUUR series, and the OECD harvester does not cover the MWUSD dataflow). Per HANDOFF_TO_RUN_AGENT.md a data gap is NOT a refutation — the scoreboard treats this as neutral. Re-run when (a) the BLS state fan-out lands (LAU state teen E/P panel, OES state median hourly wage), (b) the USDOL state-minimum-wage history is dropped, and (c) the OECD MWUSD bite-ratio dataflow is harvested.
+_Generated by `scripts/run_did_callaway_santanna.py` at 2026-05-12T14:22:20+00:00_

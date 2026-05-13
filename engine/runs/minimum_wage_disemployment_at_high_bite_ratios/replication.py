@@ -102,7 +102,7 @@ REQUIRED_BORDER_PAIR = [
 ]
 REQUIRED_OECD = [
     # OECD MWUSD: cross-country bite-ratio (min/median full-time wage).
-    ("oecd", "MWUSD_minimum_to_median_wage_ratio"),
+    ("oecd", "MWUSD"),
     # OECD low-skill unemployment-rate panel (DSD_LMS).
     ("oecd", "DSD_LMS_low_education_unemployment_rate"),
 ]

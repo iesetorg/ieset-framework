@@ -1,31 +1,44 @@
-# Result card — minimum_wage_employment_effect_us_states
+# US state minimum-wage employment effects, 1990-2024
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — minimum-wage data gate failed; missing state/subnational outcome/treatment panels
+**Verdict:** inconclusive — data gap on bls:LAU_state_teen_employment_population_ratio_panel, bls:CES_state_NAICS722_employment_panel. The spec's primary Callaway-Sant'Anna staggered DiD on the 1990-2024 US-state panel cannot be estimated without the state-level BLS LAU teen employment-to-population series and the USDOL state minimum-wage history. On-disk BLS vintages currently include only national-level series (LNS*, CES05*, CUUR*); the state fan-out (SMS*, LAUST*, ENU*-county QCEW) and the USDOL state-history table have not been fetched. No coefficients computed.
 
-## Pre-registration
-- **Claim:** US state-level minimum-wage increases over 1990-2024 produce small, statistically uncertain effects on teen and low-wage employment when compared to contiguous counties or neighbouring states that did not raise their minimum. The Card-Krueger 1994 / Dube-Lester-Reich 2010 research design is the baseline: the hypothesis predicts that the estimated employment elasticity with respect to the minimum wage falls in the range [-0.15, +0.05] with the 95% confidence interval straddling zero, consistent with the post-1990 border-discontinuity literature but inconsistent with Neumark-Wascher-style nationwide panel findings of elasticities < -0.2. Pre-registered direction of effect: minimum-wage elasticity is close to zero and typically not significantly negative at the 5% level on the primary outcome.
-- **Falsification rule:** PRIMARY (dispositive): the hypothesis is SUPPORTED if the Callaway-Sant'Anna staggered-DiD elasticity of teen employment-to-population with respect to the log state minimum wage over the 1990-2024 US-state panel falls in [-0.15, +0.05] AND the 95% CI crosses zero. REFUTED if the elasticity is significantly below -0.15 at the 5% level (Neumark-Wascher direction) OR significantly above +0.10 at the 5% level (positive-employment direction; the claim is "close to zero," not "positive"). SECONDARY (also dispositive): the Dube-Lester-Reich contiguous-county-pair elasticity on QCEW NAICS-722 (accommodation/food services) county employment must fall in [-0.20, +0.05]. INFORMATIVE: leave-one-state-out sign stability of the CS-ATT coefficient; pre-trend test on the 4 years preceding each state's first minimum-wage hike. METHOD_VALID: state-level BLS LAU teen E/P available for at least 40 of 50 states with >= 20 years of coverage; USDOL state minimum-wage history available with at least one state-level binding change in at least 30 states; QCEW NAICS-722 county-level employment available for the border- pair specification.
+## Summary
 
-## Estimate (Callaway-Sant'Anna staggered DiD, TWFE approximation)
-- _Error:_ minimum-wage data gate failed; missing state/subnational outcome/treatment panels
+- The hypothesis tests the post-1990 Card-Krueger / Dube-Lester-Reich consensus that state-level minimum-wage elasticities are small (in the [-0.15, +0.05] band) against the Neumark-Wascher claim of elasticities < -0.2.
+- Primary statistic: Callaway-Sant'Anna staggered-DiD elasticity of teen employment-to-population ratio with respect to log state minimum wage on the 1990-2024 US-state panel.
+- Secondary: Dube-Lester-Reich contiguous-county-pair elasticity on QCEW NAICS-722 (accommodation/food services) county employment.
+- Required series: 2 outcome, 1 treatment, 2 border-pair, 2 controls = 7 total.
+- Found on-disk: 2 of 7.
+- Missing primary outcome: ['bls:LAU_state_teen_employment_population_ratio_panel', 'bls:CES_state_NAICS722_employment_panel'].
+- Missing treatment: (none).
+- Missing border-pair: ['manual:vaghul_zipperer_county_minimum_wage'].
+- Missing controls: ['bls:LAU_state_unemployment_rate_panel', 'fred:state_real_gdp_panel'].
 
-## Variables resolved
-- `usdol:state_minimum_wage_history` → state_minimum_wage_log_level (treatment, n=2106)
+## Method
 
-### Missing data
-- `bls:LAU_state_teen_employment_population_ratio_panel` (outcome)
+Pre-registered specification (50-state panel, 1990-2024, excluding 2020 COVID and federal-floor-binding state-years):
 
-## Data repair note
-- The preregistered minimum-wage design is state/subnational; national or single-state exemplar series are not compatible evidence.
-- Required: `bls:LAU_state_teen_employment_population_ratio_panel` — BLS/CPS-LAU state panel for ages 16-19, keyed by state and year, covering 1990-2024 with at least 40 states and 20 years per state.
-- Required: `usdol:state_minimum_wage_history` — USDOL state statutory minimum-wage history, keyed by state and year, with federal-floor fallback and at least 30 states with binding state changes.
-- Also needed for full verdict completeness: bls:CES_state_NAICS722_employment_panel for state accommodation/food-services employment.
-- Also needed for full verdict completeness: bls:QCEW_county_NAICS722_employment_panel plus manual:vaghul_zipperer_county_minimum_wage for the border-pair robustness.
-- Also needed for full verdict completeness: bls:LAU_state_unemployment_rate_panel and fred:state_real_gdp_panel for controls.
-- Not used as compatible evidence: fred:LNS12300012 is national teen E/P, not a state panel.
-- Not used as compatible evidence: fred:STTMINWGCA is California's minimum wage exemplar, not the USDOL all-state history.
-- Not used as compatible evidence: fred:NYNGSP is New York GSP exemplar, not an all-state GDP panel.
-- Not used as compatible evidence: bls:CES* vintages currently on disk are national/current-window CES series, not state NAICS-722 panels.
-- Runner limitation: The generic DID runner currently normalizes vintages to country_iso3/year. A clean state-level verdict needs either a subnational unit_id path in this runner or a pre-derived state-year panel that the runner can treat as the estimation unit.
+    log(teen_E/P)_{s,t} = beta * log(min_wage)_{s,t}
+                        + alpha_s + tau_t + X_{s,t}'gamma + e
 
-_Generated by `scripts/run_did_callaway_santanna.py` at 2026-05-04T14:53:36+00:00_
+with state and year fixed effects, Callaway-Sant'Anna 2021 estimator using never- and late-treated states as controls. Standard errors clustered by state. Border-pair robustness uses Dube-Lester-Reich 2010 contiguous-county-pair fixed effects on QCEW NAICS-722 employment.
+
+Falsification thresholds (dispositive):
+  PRIMARY: CS_ATT_elasticity in [-0.15, +0.05] with 95% CI crossing zero → SUPPORTED.
+  CS_ATT_elasticity < -0.15 significant at 5% → REFUTED (Neumark-Wascher direction).
+  CS_ATT_elasticity > +0.10 significant at 5% → REFUTED (positive-effect direction).
+  SECONDARY: border_pair_elasticity in [-0.20, +0.05] required for full SUPPORTED verdict.
+
+## Data
+
+Required (per spec):
+
+- `bls:LAU_state_teen_employment_population_ratio_panel` — **missing**
+- `bls:CES_state_NAICS722_employment_panel` — **missing**
+- `usdol:state_minimum_wage_history` — available
+- `bls:QCEW_county_NAICS722_employment_panel` — available
+- `manual:vaghul_zipperer_county_minimum_wage` — **missing**
+- `bls:LAU_state_unemployment_rate_panel` — **missing**
+- `fred:state_real_gdp_panel` — **missing**
+
+Promotion verdict: inconclusive (method-validity gate fails on data availability — state-level BLS series are not on disk; the BLS fetcher currently exposes only national LNS/CES/CUUR series). Per HANDOFF_TO_RUN_AGENT.md a data gap is NOT a refutation — the scoreboard treats this as neutral. Re-run when the BLS state fan-out (LAU state teen E/P, SMS state CES, ENU county QCEW) and USDOL state minimum-wage history fetchers are wired and the Vaghul-Zipperer county-minimum dataset is dropped into data/manual/.

@@ -1,60 +1,53 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
-  "hypothesis_id": "minimum_wage_employment_effect_us_states",
-  "template": "did_callaway_santanna",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "PRIMARY (dispositive): the hypothesis is SUPPORTED if the Callaway-Sant'Anna staggered-DiD elasticity of teen employment-to-population with respect to the log state minimum wage over the 1990-2024 US-state panel falls in [-0.15, +0.05] AND the 95% CI crosses zero. REFUTED if the elasticity is significantly below -0.15 at the 5% level (Neumark-Wascher direction) OR significantly above +0.10 at the 5% level (positive-employment direction; the claim is \"close to zero,\" not \"positive\"). SECONDARY (also dispositive): the Dube-Lester-Reich contiguous-county-pair elasticity on QCEW NAICS-722 (accommodation/food services) county employment must fall in [-0.20, +0.05]. INFORMATIVE: leave-one-state-out sign stability of the CS-ATT coefficient; pre-trend test on the 4 years preceding each state's first minimum-wage hike. METHOD_VALID: state-level BLS LAU teen E/P available for at least 40 of 50 states with >= 20 years of coverage; USDOL state minimum-wage history available with at least one state-level binding change in at least 30 states; QCEW NAICS-722 county-level employment available for the border- pair specification.",
-  "falsification_test_text": "staggered_did_plus_border_pair_both_in_range",
-  "estimate": {
-    "error": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels"
-  },
-  "data_status": {
-    "variables_loaded": [
-      {
-        "role": "treatment",
-        "name": "state_minimum_wage_log_level",
-        "source": "usdol:state_minimum_wage_history",
-        "publisher": "usdol",
-        "n_rows": 2106
-      }
-    ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "teen_employment_to_population_ratio",
-        "source": "bls:LAU_state_teen_employment_population_ratio_panel"
-      }
-    ]
-  },
-  "run_utc": "2026-05-04T14:53:36+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py",
+  "verdict": "inconclusive \u2014 data gap on bls:LAU_state_teen_employment_population_ratio_panel, bls:CES_state_NAICS722_employment_panel. The spec's primary Callaway-Sant'Anna staggered DiD on the 1990-2024 US-state panel cannot be estimated without the state-level BLS LAU teen employment-to-population series and the USDOL state minimum-wage history. On-disk BLS vintages currently include only national-level series (LNS*, CES05*, CUUR*); the state fan-out (SMS*, LAUST*, ENU*-county QCEW) and the USDOL state-history table have not been fetched. No coefficients computed.",
+  "all_pass": false,
   "method_valid": false,
   "data_gap": true,
-  "minimum_wage_data_gate": true,
-  "required_exact_vintages": [
+  "can_run_primary": false,
+  "can_run_border_pair": false,
+  "missing_outcome_series": [
     "bls:LAU_state_teen_employment_population_ratio_panel",
+    "bls:CES_state_NAICS722_employment_panel"
+  ],
+  "missing_treatment_series": [],
+  "missing_border_pair_series": [
+    "manual:vaghul_zipperer_county_minimum_wage"
+  ],
+  "missing_control_series": [
+    "bls:LAU_state_unemployment_rate_panel",
+    "fred:state_real_gdp_panel"
+  ],
+  "available_series": [
+    "bls:QCEW_county_NAICS722_employment_panel",
     "usdol:state_minimum_wage_history"
   ],
-  "missing_exact_vintages": [
-    "bls:LAU_state_teen_employment_population_ratio_panel"
+  "n_required": 7,
+  "n_available": 2,
+  "min_states_required": 40,
+  "min_years_per_state": 20,
+  "primary_elasticity_band": [
+    -0.15,
+    0.05
   ],
-  "incompatible_local_vintages": [
-    "fred:LNS12300012 is national teen E/P, not a state panel.",
-    "fred:STTMINWGCA is California's minimum wage exemplar, not the USDOL all-state history.",
-    "fred:NYNGSP is New York GSP exemplar, not an all-state GDP panel.",
-    "bls:CES* vintages currently on disk are national/current-window CES series, not state NAICS-722 panels."
+  "primary_refute_below": -0.15,
+  "primary_refute_above": 0.1,
+  "border_pair_elasticity_band": [
+    -0.2,
+    0.05
   ],
-  "secondary_or_verdict_completeness_sources_needed": [
-    "bls:CES_state_NAICS722_employment_panel for state accommodation/food-services employment.",
-    "bls:QCEW_county_NAICS722_employment_panel plus manual:vaghul_zipperer_county_minimum_wage for the border-pair robustness.",
-    "bls:LAU_state_unemployment_rate_panel and fred:state_real_gdp_panel for controls."
+  "cs_att_elasticity": null,
+  "cs_att_se": null,
+  "cs_att_ci95": null,
+  "border_pair_elasticity": null,
+  "border_pair_se": null,
+  "border_pair_ci95": null,
+  "n_states": null,
+  "n_state_years": null,
+  "period": [
+    1990,
+    2024
   ],
-  "runner_limitation": "The generic DID runner currently normalizes vintages to country_iso3/year. A clean state-level verdict needs either a subnational unit_id path in this runner or a pre-derived state-year panel that the runner can treat as the estimation unit.",
-  "data_repair_note": [
-    "bls:LAU_state_teen_employment_population_ratio_panel \u2014 BLS/CPS-LAU state panel for ages 16-19, keyed by state and year, covering 1990-2024 with at least 40 states and 20 years per state.",
-    "usdol:state_minimum_wage_history \u2014 USDOL state statutory minimum-wage history, keyed by state and year, with federal-floor fallback and at least 30 states with binding state changes."
-  ],
-  "pre_registration_stub_rule": false
+  "exclude_years": [
+    2020
+  ]
 }
