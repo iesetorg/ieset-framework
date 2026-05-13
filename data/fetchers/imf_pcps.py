@@ -40,6 +40,8 @@ SERIES_ALIASES = {
     "PRIMARY": "PALLFNF",
     "OIL": "POILAPSP",
     "PNG_USD": "PNGASEU",
+    "PNGASEUUSDM": "PNGASEU",
+    "PCOPPUSDM": "PCOPP",
 }
 
 

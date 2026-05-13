@@ -177,7 +177,10 @@ def get(
         else:
             if not _looks_blocked(zr.status_code, zr.content):
                 if zr.status_code >= 400 and not return_http_errors:
-                    zr.raise_for_status()
+                    errors.append(f"zenrows:{zr.status_code}:{zr.text[:240]}")
+                    raise BlockedSourceError(
+                        f"blocked or failed GET for {url}: {', '.join(_err(Exception(e)) for e in errors)}"
+                    )
                 return HttpPayload(
                     content=zr.content,
                     url=target,

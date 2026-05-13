@@ -342,6 +342,40 @@ def _fetch_manual(series_id: str, hint: str | None) -> tuple[pd.DataFrame, str]:
         except Exception:  # noqa: BLE001
             pass
 
+    if series_id in {"lcoe_solar_pv", "lcoe_wind_onshore"} and path.suffix.lower() in (".xlsx", ".xls"):
+        tech = {
+            "lcoe_solar_pv": "Solar photovoltaic",
+            "lcoe_wind_onshore": "Onshore wind",
+        }[series_id]
+        raw = pd.read_excel(path, sheet_name="Fig S.1", header=None)
+        year_row = raw.apply(
+            lambda row: pd.to_numeric(row, errors="coerce").between(1900, 2100).sum(),
+            axis=1,
+        ).idxmax()
+        years = pd.to_numeric(raw.loc[year_row], errors="coerce")
+        tech_rows = raw.index[raw.apply(lambda row: row.astype(str).str.contains(tech, case=False, regex=False).any(), axis=1)]
+        if len(tech_rows) == 0:
+            raise IrenaError(f"manual IRENA workbook did not contain technology row {tech!r}")
+        values = pd.to_numeric(raw.loc[int(tech_rows[0])], errors="coerce")
+        rows = []
+        for col, year in years.dropna().items():
+            value = values.get(col)
+            if pd.notna(value):
+                rows.append(
+                    {
+                        "country": "World",
+                        "technology": tech,
+                        "year": int(year),
+                        "value": float(value) * 1000.0,
+                        "value_original": float(value),
+                        "original_units": "2024 USD/kWh",
+                    }
+                )
+        df = pd.DataFrame(rows)
+        if df.empty:
+            raise IrenaError(f"manual IRENA workbook yielded no LCOE rows for {tech!r}")
+        return df, f"manual://{path.name}#Fig S.1"
+
     if path.suffix.lower() in (".xlsx", ".xls"):
         xls = pd.ExcelFile(path)
         df = xls.parse(xls.sheet_names[0])

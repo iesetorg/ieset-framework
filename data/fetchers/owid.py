@@ -35,7 +35,7 @@ SERIES_ALIASES = {
     "co-emissions-per-capita": "co2-emissions-per-capita",
     "consumption-co2-per-capita": "consumption-co2",
     "annual-co2-emissions-per-country": "annual-co2-emissions",
-    "economic-complexity-index": "economic-complexity-index-eci",
+    "economic-complexity-index": "economic-complexity-rankings",
     "intergenerational-earnings-elasticity": "intergenerational-and-cross-sectional-inequality",
 }
 SERIES_VALUE_COLUMNS = {

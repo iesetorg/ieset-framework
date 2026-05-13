@@ -94,8 +94,16 @@ def fetch(series_id: str = "hyperinflation_table", *, vintage_utc: datetime | No
         frequency="episode",
         units="monthly inflation rate at peak; episode-level",
         currency=None,
-        start_date=str(df["start_date"].min()) if "start_date" in df.columns else None,
-        end_date=str(df["end_date"].max()) if "end_date" in df.columns else None,
+        start_date=(
+            str(df["start_date"].dropna().astype(str).min())
+            if "start_date" in df.columns and df["start_date"].notna().any()
+            else None
+        ),
+        end_date=(
+            str(df["end_date"].dropna().astype(str).max())
+            if "end_date" in df.columns and df["end_date"].notna().any()
+            else None
+        ),
         sha256=sha,
         parquet_path=path_out,
         extra={

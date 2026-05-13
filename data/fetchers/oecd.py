@@ -59,7 +59,7 @@ _DSD_AGENCY: dict[str, str] = {
 _OECD_SHORTCUTS: dict[str, str] = {
     "EPL_OV": "OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0",
     "EPL_indicators": "OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0",
-    "MWUSD": "OECD.ELS.SAE,DSD_EARN@DF_MW_DOL_RPP,1.0",
+    "MWUSD": "OECD.ELS.SAE,DSD_EARNINGS@MIN2AVE,1.0",
     "OUTGAP": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
     "OutputGap": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
     "DSD_KEI": "OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0",
@@ -75,14 +75,16 @@ _OECD_SHORTCUTS: dict[str, str] = {
     "trade_union_density": "OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0",
     "HEALTH_STAT@DF_AMENABLE_MORT": "OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0",
     "HOUSE_PRICES": "OECD.SDD.PIN,DSD_RHPI@DF_RHPI,1.0",
-    "DSD_IDD": "OECD.WISE.INE,DSD_IDD@DF_IDD,1.0",
-    "DSD_IDD@DF_IDD": "OECD.WISE.INE,DSD_IDD@DF_IDD,1.0",
-    "DSD_IDD@DF_CHILD_POV": "OECD.WISE.INE,DSD_IDD@DF_CHILD_POV,1.0",
-    "POVERTY": "OECD.WISE.INE,DSD_IDD@DF_IDD,1.0",
+    "DSD_IDD": "OECD.WISE.INE,DSD_WISE_IDD@DF_IDD,1.0",
+    "DSD_IDD@DF_IDD": "OECD.WISE.INE,DSD_WISE_IDD@DF_IDD,1.0",
+    "DSD_IDD@DF_CHILD_POV": "OECD.WISE.INE,DSD_WISE_IDD@DF_CHILD_POV,1.0",
+    "POVERTY": "OECD.WISE.INE,DSD_WISE_IDD@DF_IDD,1.0",
     "DSD_EARN": "OECD.ELS.SAE,DSD_EARN@DF_EARN_LFS,1.0",
     "DSD_EARNINGS": "OECD.SDD.TPS,DSD_EARNINGS@DF_EARNINGS,1.0",
     "NEET": "OECD.ELS.EMP,DSD_LFS@DF_NEET,1.0",
-    "DSD_PDB": "OECD.SDD.TPS,DSD_PDB@DF_PDB_PT,1.0",
+    "DSD_PDB": "OECD.SDD.TPS,DSD_PDB@DF_PDB,2.0",
+    "PMR": "OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2",
+    "DF_PMR": "OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2",
     "DSD_PENSIONS@DF_PENSIONS_REPL_RATE": "OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0",
     "DSD_SOCX@DF_SOCX_AGG": "OECD.ELS.SPD,DSD_SOCX_AGG@DF_SOCX_AGG,1.0",
     "DSD_SOCX@DF_SOCX_ALMP": "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0",
@@ -97,6 +99,7 @@ _OECD_SHORTCUTS: dict[str, str] = {
     "GGEXP": "OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0",
     "STAN": "OECD.SDD.TPS,DSD_STAN@DF_STAN,1.0",
     "STAN_VA": "OECD.SDD.TPS,DSD_STAN@DF_STAN,1.0",
+    "DSD_LMS_low_education_unemployment_rate": "OECD.EDU.IMEP,DSD_EAG_LSO_EA@DF_LSO_NEAC_UNEMP,1.0",
 }
 
 _OECD_DATAFLOW_CACHE: list[dict[str, str | None]] | None = None
@@ -356,8 +359,13 @@ def fetch(
         fetch_utc=fetch_ts,
     )
 
-    start = str(df["period"].min()) if "period" in df.columns and len(df) else None
-    end = str(df["period"].max()) if "period" in df.columns and len(df) else None
+    if "period" in df.columns and len(df):
+        period_values = df["period"].dropna().astype(str)
+        start = str(period_values.min()) if len(period_values) else None
+        end = str(period_values.max()) if len(period_values) else None
+    else:
+        start = None
+        end = None
 
     return FetchResult(
         publisher=publisher_id,
