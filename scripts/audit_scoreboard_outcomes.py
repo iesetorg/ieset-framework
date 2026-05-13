@@ -102,16 +102,29 @@ def position_outcome(verdict_kind: str, prediction: str, polarity: str = "aligne
 
 
 def score_signal(net_score: float, tested: int) -> dict[str, Any]:
-    """Classify tiny aggregate margins as no-call, without changing raw net."""
+    """Classify aggregate margins while preserving the signed lean.
+
+    The public signal is deliberately conservative: small margins are no-calls.
+    The signed lean is still useful for audits, because a cluster of no-call
+    rows can all lean the same way without crossing the headline threshold.
+    """
     if tested <= 0:
         return {
             "signal_threshold": 0.0,
             "net_margin_rate": 0.0,
             "score_signal": "untested",
+            "signed_lean": "untested",
         }
 
     signal_threshold = max(5.0, tested * 0.05)
     net_margin_rate = net_score / tested
+    if net_score > 0:
+        signed_lean = "positive_lean"
+    elif net_score < 0:
+        signed_lean = "negative_lean"
+    else:
+        signed_lean = "flat"
+
     if abs(net_score) <= signal_threshold:
         signal = "too_close_to_call"
     elif net_score > 0:
@@ -122,6 +135,7 @@ def score_signal(net_score: float, tested: int) -> dict[str, Any]:
         "signal_threshold": signal_threshold,
         "net_margin_rate": net_margin_rate,
         "score_signal": signal,
+        "signed_lean": signed_lean,
     }
 
 
@@ -311,6 +325,7 @@ def score_positions() -> dict[str, Any]:
             "adjusted_signal_threshold": adjusted_signal["signal_threshold"],
             "adjusted_net_margin_rate": adjusted_signal["net_margin_rate"],
             "adjusted_score_signal": adjusted_signal["score_signal"],
+            "adjusted_signed_lean": adjusted_signal["signed_lean"],
             "support_rate": support_rate,
             "examples": examples,
         }
@@ -321,7 +336,7 @@ def score_positions() -> dict[str, Any]:
             "principle": "Score school outcomes from verdict + school_prediction + polarity; never from raw empirical_status alone.",
             "win_rule": "SUPPORTED hypothesis verdict supports schools that predicted supported and refutes schools that predicted falsified; REFUTED reverses that.",
             "partial_rule": "Directional partials count half-weight in the predicted direction; neutral partials do not affect net score.",
-            "signal_rule": "Rows with |weighted net| < max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",
+            "signal_rule": "Rows with |weighted net| <= max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",
             "quality_adjustment_rule": "Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical_case_multi_metric=0.25.",
         },
         "public_claim_links": public_claim_links,
@@ -351,19 +366,20 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "- Raw `empirical_status` is a hypothesis-verdict label, not automatically a school win.",
         "- `SUPPORTED` refutes a school that predicted `falsified`; `REFUTED` supports that school.",
         "- Directional partials count half-weight; neutral partials do not move net score.",
-        "- Tiny aggregate margins are a no-call: `abs(net) < max(5, 5% of tested)` is `too_close_to_call`.",
+        "- Tiny aggregate margins are a no-call: `abs(net) <= max(5, 5% of tested)` is `too_close_to_call`.",
+        "- The audit keeps a separate signed lean so no-call rows still show whether the net is positive, negative, or flat.",
         "- Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical=0.25.",
         "",
         "## Ranked School Outcomes",
         "",
-        "| school | signal | q-net | q-band | raw net | decisive net | tested | supports | partial + | partial - | refutes | neutral | untested |",
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| school | signal | lean | q-net | q-band | raw net | decisive net | tested | supports | partial + | partial - | refutes | neutral | untested |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in ranked:
         c = Counter(row["counts"])
         lines.append(
             f"| `{row['position_id']}` | {row['adjusted_score_signal']} | "
-            f"{row['adjusted_net_score']:.1f} | ±{row['adjusted_signal_threshold']:.1f} | "
+            f"{row['adjusted_signed_lean']} | {row['adjusted_net_score']:.1f} | ±{row['adjusted_signal_threshold']:.1f} | "
             f"{row['net_score']:.1f} | {row['decisive_net']} | {row['tested']} | "
             f"{c['supports_position']} | {c['partial_supports']} | {c['partial_refutes']} | "
             f"{c['refutes_position']} | {c['partial']} | {c['untested']} |"
@@ -389,6 +405,36 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
             )
     else:
         lines.append("- None")
+
+    lines += [
+        "",
+        "## Left-Cluster Readout",
+        "",
+    ]
+    left_cluster = (
+        "degrowth",
+        "eco_socialist",
+        "democratic_socialist",
+        "market_socialist",
+        "marxian",
+        "marxist_leninist",
+        "mmt",
+        "post_keynesian",
+        "social_democratic",
+    )
+    for position_id in left_cluster:
+        row = positions.get(position_id)
+        if not row:
+            continue
+        c = Counter(row["counts"])
+        lines.append(
+            f"- `{position_id}`: signal={row['adjusted_score_signal']}; "
+            f"lean={row['adjusted_signed_lean']}; q-net={row['adjusted_net_score']:.1f}; "
+            f"raw-net={row['net_score']:.1f}; q-band=±{row['adjusted_signal_threshold']:.1f}; "
+            f"supports={c['supports_position']}; partial+={c['partial_supports']}; "
+            f"partial-={c['partial_refutes']}; refutes={c['refutes_position']}; "
+            f"neutral={c['partial']}; untested={c['untested']}."
+        )
 
     lines += [
         "",

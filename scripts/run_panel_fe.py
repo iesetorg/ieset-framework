@@ -319,6 +319,14 @@ SOURCE_BRIDGES = {
     ("imf", "ENDA_XDC_USD_RATE"): ("world_bank_wdi", "PA.NUS.FCRF"),
     ("ilostat", "EMP_2EMP_SEX_AGE_RT_A"): ("world_bank_wdi", "SL.EMP.TOTL.SP.ZS"),
     ("ilostat", "employment_to_population_ratio"): ("world_bank_wdi", "SL.EMP.TOTL.SP.ZS"),
+    ("ilostat", "EAR_4MTH_SEX_RT"): ("ilostat", "EAR_EHRA_SEX_NB_A"),
+    ("ilostat", "unemployment_rate"): ("ilostat", "UNE_2EAP_SEX_AGE_RT_A"),
+    ("oecd", "OECD.SDD.TPS,DSD_PDB@DF_PDB_PT,1.0"): ("oecd", "DSD_PDB"),
+    ("oecd", "OECD.SDD.NAD.PROD,DSD_PDB@DF_PDB_PT,1.0"): ("oecd", "DSD_PDB"),
+    ("oecd", "OECD.SDD.NAD.PROD,DSD_PDB@DF_PDB_LV,1.0"): ("oecd", "DSD_PDB"),
+    ("oecd", "OECD.SDD.NAD.PROD,DSD_PDB@DF_PDB_GR,1.0"): ("oecd", "DSD_PDB"),
+    ("oecd", "OECD.ELS.SPD,DSD_SOCX_AGG@DF_SOCX_AGG,1.0"): ("oecd", "DSD_SOCX@DF_SOCX_AGG"),
+    ("oecd", "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_AGG,1.0"): ("oecd", "DSD_SOCX@DF_SOCX_AGG"),
     ("wid", "tax_top_rate"): ("owid", "top-marginal-income-tax-rate"),
     ("wid", "top_marginal_income_tax_rate"): ("owid", "top-marginal-income-tax-rate"),
 }
@@ -593,11 +601,17 @@ def normalise_panel(
         df = _filter_oecd_socx_slice(df, variable_name=variable_name)
     if publisher == "oecd" and "DF_LFS_INDIC" in str(series or ""):
         df = _filter_oecd_lfs_indic_slice(df, variable_name=variable_name)
+    if publisher == "bis" and str(series or "").upper() == "WS_CREDIT_GAP" and "CG_DTYPE" in df.columns:
+        name = (variable_name or "").lower()
+        dtype = "C" if "gap" in name else "B"
+        filtered = df[df["CG_DTYPE"].astype(str).eq(dtype)].copy()
+        if not filtered.empty:
+            df = filtered
 
     cols = {c.lower(): c for c in df.columns}
     # Discover the country column.
     country_col = None
-    for cand in ("country_iso3", "iso3", "ccode", "geo_code", "country", "ref_area", "region"):
+    for cand in ("country_iso3", "iso3", "ccode", "geo_code", "country", "ref_area", "borrowers_cty", "region"):
         if cand in cols:
             country_col = cols[cand]
             break
