@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurostat_household_electricity_price_consumption_panel
+version: 1
+status: draft
+topic: energy
+claim: Higher household electricity prices reduce real household consumption growth.
+methodology_note: Promoted for Batch 06 on 2026-05-12 using local Eurostat nrg_pc_205 and companion local
+  vintages.
+evidence_type: associational
+sample:
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  period:
+  - 2019
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop non-country aggregates and country-years missing treatment/outcome
+variables:
+  outcome:
+  - name: household_consumption_pc
+    source: local_batch06_derived
+    transformation: level_or_growth
+  treatment:
+  - name: household_electricity_price
+    source: local_batch06_derived
+    transformation: annual_mean_or_growth
+  controls:
+  - name: gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Short-panel throughput screen; household/distribution claims require additional local tables
+    before running.
+falsification:
+  rule: SUPPORTED if treatment coefficient has the predicted sign at p<0.10; REFUTED if opposite sign
+    at p<0.10; otherwise PARTIAL.
+  test: panel_fe_eurostat_household_electricity_price_consumption_panel
+  threshold: p<0.10 with pre-registered sign
+prior_confidence: 0.5
+disclosure: Local Eurostat inventory has nrg_pc_205 industrial prices only; nrg_pc_204 household electricity
+  prices are not present.
+steelman: hypotheses/steelman/eurostat_household_electricity_price_consumption_panel.md
+scope:
+  period:
+  - 2019
+  - 2025
+  countries:
+  - EU
+  outcome_dim:
+  - energy
+  - welfare_state
+  policy_family:
+  - energy_policy
+  - welfare_architecture
+  treatment_tags:
+  - electricity_prices
+  - energy_transition
+  - eurostat_batch06

@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurostat_electricity_price_volatility_industrial_exit
+version: 1
+status: candidate
+topic: energy
+claim: Industrial electricity-price volatility predicts industrial employment-share decline.
+methodology_note: Promoted for Batch 06 on 2026-05-12 using local Eurostat nrg_pc_205 and companion local
+  vintages.
+evidence_type: associational
+sample:
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  period:
+  - 2019
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - drop non-country aggregates and country-years missing treatment/outcome
+variables:
+  outcome:
+  - name: industry_employment_share
+    source: local_batch06_derived
+    transformation: level_or_growth
+  treatment:
+  - name: electricity_price_volatility
+    source: local_batch06_derived
+    transformation: annual_mean_or_growth
+  controls:
+  - name: gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Short-panel throughput screen; household/distribution claims require additional local tables
+    before running.
+falsification:
+  rule: SUPPORTED if treatment coefficient has the predicted sign at p<0.10; REFUTED if opposite sign
+    at p<0.10; otherwise PARTIAL.
+  test: panel_fe_eurostat_electricity_price_volatility_industrial_exit
+  threshold: p<0.10 with pre-registered sign
+prior_confidence: 0.5
+disclosure: Associational short-panel design; energy shocks, market design, and industrial composition
+  remain possible confounders.
+steelman: hypotheses/steelman/eurostat_electricity_price_volatility_industrial_exit.md
+scope:
+  period:
+  - 2019
+  - 2025
+  countries:
+  - EU
+  outcome_dim:
+  - energy
+  - employment_labour
+  policy_family:
+  - energy_policy
+  - industrial_policy
+  treatment_tags:
+  - electricity_prices
+  - energy_transition
+  - eurostat_batch06
