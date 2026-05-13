@@ -1,0 +1,322 @@
+{
+  "batch": "06_eurostat_energy_prices_nuclear_transition",
+  "run_utc": "2026-05-12T19:55:25+00:00",
+  "attempted_ids": 10,
+  "promoted_specs": 10,
+  "runnable_results": 8,
+  "blocked": [
+    {
+      "hypothesis_id": "eurostat_household_electricity_price_consumption_panel",
+      "blocker": "Local Eurostat inventory has nrg_pc_205 industrial prices only; nrg_pc_204 household electricity prices are not present."
+    },
+    {
+      "hypothesis_id": "eurostat_energy_price_household_distribution_stress",
+      "blocker": "No local household electricity-price vintage, EU-SILC distribution table, or poverty stress panel was present for this batch."
+    }
+  ],
+  "verdict_tally": {
+    "PARTIAL": 7,
+    "SUPPORTED": 1
+  },
+  "inventory": {
+    "eurostat_nrg_pc_205": {
+      "publisher": "eurostat",
+      "series": "nrg_pc_205",
+      "label": "industrial electricity prices, medium band, EUR/kWh incl. taxes",
+      "vintage_file": "data/vintages/eurostat/nrg_pc_205@2026-05-12T135519Z.parquet",
+      "sha256": "87ea4ed0922794d8944d4a3c764e7a715871e2a7133906d4775766a65fc94a74"
+    },
+    "eurostat_sectoral": {
+      "publisher": "eurostat",
+      "series": "nama_10_a10_e",
+      "label": "Eurostat sector employment shares",
+      "vintage_file": "data/vintages/eurostat/nama_10_a10_e@2026-04-30T115840Z.parquet",
+      "sha256": "4c697d22469db2e9f2aa0b3ca9fd86bf00edfeeafc4da126452495248214163c"
+    },
+    "eurostat_labour": {
+      "publisher": "eurostat",
+      "series": "une_rt_a",
+      "label": "Eurostat unemployment rate, age 15-74, total sex",
+      "vintage_file": "data/vintages/eurostat/une_rt_a@2026-05-12T134235Z.parquet",
+      "sha256": "251ceda552026f2f55b5f18365d705cbf0c447f695323c3b984a6893bbce782d"
+    },
+    "irena": {
+      "publisher": "irena",
+      "series": "installed_capacity_renewable",
+      "label": "renewable_capacity_mw",
+      "vintage_file": "data/vintages/irena/installed_capacity_renewable@2026-05-05T212311Z.parquet",
+      "sha256": "12d11cd77fad18a9d2e2bbdeafdfc4f149d720aac688469e0b9a1dcd3d96c556"
+    },
+    "wdi_examples": {
+      "manufacturing_va_share": {
+        "publisher": "world_bank_wdi",
+        "series": "NV.IND.MANF.ZS",
+        "label": "manufacturing_va_share",
+        "vintage_file": "data/vintages/world_bank_wdi/NV.IND.MANF.ZS@2026-05-05T194954Z.parquet",
+        "sha256": "a440c8b254408d43b810059921c1d72c15612c8d9921fbec60a87b331adc2499"
+      },
+      "export_share": {
+        "publisher": "world_bank_wdi",
+        "series": "NE.EXP.GNFS.ZS",
+        "label": "export_share",
+        "vintage_file": "data/vintages/world_bank_wdi/NE.EXP.GNFS.ZS@2026-05-05T203013Z.parquet",
+        "sha256": "a53b48aa292a8b461a32c19943ad7bbca52f3625899a79d7c92e640724cfb121"
+      },
+      "cpi_inflation": {
+        "publisher": "world_bank_wdi",
+        "series": "FP.CPI.TOTL.ZG",
+        "label": "cpi_inflation",
+        "vintage_file": "data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet",
+        "sha256": "dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0"
+      }
+    }
+  },
+  "results": [
+    {
+      "hypothesis_id": "eurostat_industrial_electricity_price_manufacturing_va_2007_2025",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 221,
+      "n_countries": 38,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('manufacturing_va_share') ~ Q('industrial_electricity_price') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": -4.507910981179922,
+      "standard_error_cluster_country": 3.053394281142292,
+      "p_value": 0.13984711662297367,
+      "ci95": [
+        -10.492453802819384,
+        1.4766318404595387
+      ],
+      "direction": "-",
+      "treatment": "industrial_electricity_price",
+      "outcome": "manufacturing_va_share",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "classical_liberal",
+        "ordoliberal",
+        "developmentalism"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_electricity_price_inflation_pass_through",
+      "verdict_label": "SUPPORTED",
+      "verdict_reason": "coefficient is statistically significant in the predicted direction",
+      "n_observations": 226,
+      "n_countries": 39,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('cpi_inflation') ~ Q('electricity_price_yoy') + C(country) + C(year)",
+      "coefficient": 0.02606400225320117,
+      "standard_error_cluster_country": 0.012059384154366587,
+      "p_value": 0.030671819065187473,
+      "ci95": [
+        0.002428043634909647,
+        0.0496999608714927
+      ],
+      "direction": "+",
+      "treatment": "electricity_price_yoy",
+      "outcome": "cpi_inflation",
+      "controls": [],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "new_keynesian",
+        "post_keynesian",
+        "chicago_monetarism"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_nuclear_retention_industrial_price_panel",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 227,
+      "n_countries": 39,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('industrial_electricity_price') ~ Q('nuclear_share') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": -0.0004556926025351041,
+      "standard_error_cluster_country": 0.0013893391313379185,
+      "p_value": 0.7429174490167514,
+      "ci95": [
+        -0.003178747262269588,
+        0.00226736205719938
+      ],
+      "direction": "-",
+      "treatment": "nuclear_share",
+      "outcome": "industrial_electricity_price",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "ordoliberal",
+        "developmentalism",
+        "eco_socialist"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_renewable_share_electricity_price_transition_cost",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 227,
+      "n_countries": 39,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('industrial_electricity_price') ~ Q('renewable_share') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": 0.0006556415055635689,
+      "standard_error_cluster_country": 0.000711313857031891,
+      "p_value": 0.3566678261123032,
+      "ci95": [
+        -0.0007385080359232105,
+        0.0020497910470503485
+      ],
+      "direction": "+",
+      "treatment": "renewable_share",
+      "outcome": "industrial_electricity_price",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "eco_socialist",
+        "degrowth",
+        "classical_liberal"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_energy_price_export_competitiveness_panel",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 227,
+      "n_countries": 39,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('export_share') ~ Q('industrial_electricity_price') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": -6.884501744905269,
+      "standard_error_cluster_country": 10.855362564426086,
+      "p_value": 0.5259484557533796,
+      "ci95": [
+        -28.16062141030476,
+        14.391617920494223
+      ],
+      "direction": "-",
+      "treatment": "industrial_electricity_price",
+      "outcome": "export_share",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "classical_liberal",
+        "developmentalism",
+        "ordoliberal"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_energy_price_unemployment_regional_panel",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 198,
+      "n_countries": 34,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('unemployment_rate') ~ Q('industrial_electricity_price') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": 0.5975848094518639,
+      "standard_error_cluster_country": 2.4391448440251615,
+      "p_value": 0.8064582335996757,
+      "ci95": [
+        -4.18305123791402,
+        5.378220856817748
+      ],
+      "direction": "+",
+      "treatment": "industrial_electricity_price",
+      "outcome": "unemployment_rate",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "post_keynesian",
+        "ordoliberal",
+        "empirical_pragmatist"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_electricity_price_volatility_industrial_exit",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 192,
+      "n_countries": 33,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('industry_employment_share') ~ Q('electricity_price_volatility') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": 0.0054811455306699695,
+      "standard_error_cluster_country": 0.004536005836298124,
+      "p_value": 0.22690733383028083,
+      "ci95": [
+        -0.0034092625421378413,
+        0.01437155360347778
+      ],
+      "direction": "-",
+      "treatment": "electricity_price_volatility",
+      "outcome": "industry_employment_share",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "austrian",
+        "ordoliberal",
+        "developmentalism"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    },
+    {
+      "hypothesis_id": "eurostat_energy_price_services_vs_industry_reallocation",
+      "verdict_label": "PARTIAL",
+      "verdict_reason": "coefficient is not statistically decisive at p<0.10",
+      "n_observations": 192,
+      "n_countries": 33,
+      "period_min": 2019,
+      "period_max": 2024,
+      "formula": "Q('services_minus_industry_employment_share') ~ Q('industrial_electricity_price') + Q('gdp_pc_growth') + C(country) + C(year)",
+      "coefficient": 1.3720336093580912,
+      "standard_error_cluster_country": 2.575611619251097,
+      "p_value": 0.5942398415319773,
+      "ci95": [
+        -3.676072402536949,
+        6.420139621253131
+      ],
+      "direction": "+",
+      "treatment": "industrial_electricity_price",
+      "outcome": "services_minus_industry_employment_share",
+      "controls": [
+        "gdp_pc_growth"
+      ],
+      "run_utc": "2026-05-12T19:55:25+00:00",
+      "runner": "scripts/promote_eurostat_energy_batch06_2026_05_12.py",
+      "school_focus": [
+        "empirical_pragmatist",
+        "developmentalism",
+        "degrowth"
+      ],
+      "batch": "06_eurostat_energy_prices_nuclear_transition"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+# IESET Mega Data Roundup 3
+
+- generated_utc: `2026-05-05T212957Z`
+- manifest: `data/manifests/fetch_run_2026-05-05T212957Z.yaml`
+- jobs: 68
+- ok: 46
+- failed: 22
+- rows landed: 86,165
+
+## Landed
+
+- `irr:era_classification_monthly_1940_2019` — 1,913 rows, None to None — Ilzetzki-Reinhart-Rogoff exchange-rate regimes
+- `irr:unified_market_analysis_1946_2021` — 6,976 rows, None to None — IRR unified exchange-rate market analysis
+- `irr:anchor_currency_monthly_1946_2019` — 7,190 rows, None to None — IRR anchor currency classifications
+- `hanke:hyperinflation_table` — 53 rows, Apr. 1984 to Sep. 1994 — Hanke-Krus hyperinflation episode table
+- `unhcr:population` — 50 rows, 1975 to 2024 — UNHCR population by country of asylum
+- `unhcr:population_origin` — 1,500 rows, 1975 to 2024 — UNHCR displacement by country of origin
+- `unhcr:asylum_decisions` — 0 rows, 1975 to 2024 — UNHCR asylum decisions
+- `unhcr:solutions` — 50 rows, 1975 to 2024 — UNHCR durable solutions
+- `un_desa:international_migrant_stock` — 16 rows, 1990 to 2023 — UN DESA international migrant stock seed panel
+- `irena:installed_capacity_renewable` — 5,848 rows, 2000 to 2025 — IRENA renewable installed capacity
+- `irena:installed_capacity_solar_pv` — 4,237 rows, 2000 to 2025 — IRENA solar PV installed capacity
+- `irena:installed_capacity_wind` — 3,091 rows, 2000 to 2025 — IRENA wind installed capacity
+- `us_census:ACS` — 52 rows, 2022 to 2022 — US Census ACS state income and population
+- `us_census:acs_education_attainment` — 52 rows, 2022 to 2022 — US Census ACS education attainment
+- `us_census:acs_school_enrollment` — 52 rows, 2022 to 2022 — US Census ACS school enrollment
+- `us_census:saipe` — 255 rows, 2018 to 2022 — US Census SAIPE state poverty/income
+- `us_census:spm_child_poverty_rate` — 15 rows, 2009 to 2023 — US Census child SPM poverty
+- `us_census:trade_in_goods` — 3,005 rows, 2023 to 2023 — US Census goods exports
+- `ons:ABMI` — 362 rows, 1948 to 2025 Q4 — ONS UK real GDP
+- `ons:D7BT` — 650 rows, 1988 to 2026 Q1 — ONS UK CPI
+- `ons:MGSX` — 935 rows, 1971 to 2026 JAN — ONS UK unemployment
+- `ons:KAB9` — 444 rows, 2000 to 2026 JAN — ONS UK real average weekly earnings
+- `ons:IHXW` — 400 rows, 1946 to 2025 Q4 — ONS UK real GDP per head
+- `ons:LZVB` — 273 rows, 1971 to 2025 Q3 — ONS UK output per hour
+- `ons:LF24` — 935 rows, 1971 to 2026 JAN — ONS UK employment rate
+- `boe:LPMAUYM` — 526 rows, 1982-06-30 to 2026-03-31 — Bank of England M4 monetary stock
+- `destatis:42153` — 25 rows, None to None — Destatis industrial production
+- `destatis:61111` — 25 rows, None to None — Destatis consumer price index
+- `destatis:81000` — 25 rows, None to None — Destatis GDP and components
+- `destatis:62121` — 25 rows, None to None — Destatis nominal and real earnings
+- `destatis:13231` — 25 rows, None to None — Destatis labour-force participation
+- `scb:population` — 113 rows, 1968 to 2024 — Statistics Sweden population
+- `scb:cpi` — 2,460 rows, 1980M01 to 2025M12 — Statistics Sweden CPI
+- `ssb:GDP` — 1,718 rows, 1978K1 to 2025K4 — Statistics Norway GDP
+- `ssb:formuesskatt_base` — 27 rows, 1999 to 2025 — Statistics Norway wealth-tax base
+- `ssb:skatteinntekter` — 750 rows, 2015 to 2016 — Statistics Norway tax revenue
+- `ssb:utvandring` — 36 rows, 1950 to 1985 — Statistics Norway migration by citizenship
+- `ine:IPC_general` — 14,976 rows, 2001-12-31 to 2025-11-30 — INE Spain CPI
+- `ine:EPA_PARO` — 5,040 rows, 2020-12-31 to 2023-09-30 — INE Spain unemployment
+- `ine:EPA_OCUPADOS` — 3,600 rows, 2020-12-31 to 2023-09-30 — INE Spain employment
+- `ine:CNTR_PIB` — 15,932 rows, 1994-12-31 to 2024-03-31 — INE Spain GDP
+- `ine:ECV_pobreza` — 720 rows, 2007-12-31 to 2024-12-31 — INE Spain poverty rate
+- `ipeadata:IPCA` — 556 rows, 1979-12-01 to 2026-03-01 — IPEADATA Brazil CPI
+- `ipeadata:MIN_WAGE` — 1,038 rows, 1940-07-01 to 2026-12-01 — IPEADATA Brazil minimum wage
+- `ipeadata:UNEMPLOYMENT` — 169 rows, 2012-03-01 to 2026-03-01 — IPEADATA Brazil unemployment
+- `eia:international_energy_statistics` — 25 rows, 1999 to 2023 — EIA Venezuela crude production seed
+
+## Failed / Needs Scrape Or Repair
+
+- `chinn_ito:kaopen_components` — KeyError: "chinn_ito: component columns (k1..k4) not found; have ['cn', 'ccode', 'country_name', 'year', 'kaopen', 'ka_open']"
+- `unodc:intentional_homicide` — ValueError: UNODC returned HTML instead of an Excel workbook
+- `unodc:violent_crime` — ValueError: UNODC returned HTML instead of an Excel workbook
+- `unodc:corruption` — ValueError: UNODC returned HTML instead of an Excel workbook
+- `unodc:prisons` — ValueError: UNODC returned HTML instead of an Excel workbook
+- `eu_klems:tfp` — EUKlemsError: EU KLEMS auto-download failed and no manual file present. Either fix BULK_URL in eu_klems.py or place the latest EU KLEMS release archive in ./data/manual/eu_klems/. Original error: No manual-drop dir for 'eu_klems'. Cre
+- `eu_klems:tfp_industry` — EUKlemsError: EU KLEMS auto-download failed and no manual file present. Either fix BULK_URL in eu_klems.py or place the latest EU KLEMS release archive in ./data/manual/eu_klems/. Original error: No manual-drop dir for 'eu_klems'. Cre
+- `eu_klems:unit_labour_cost` — EUKlemsError: EU KLEMS auto-download failed and no manual file present. Either fix BULK_URL in eu_klems.py or place the latest EU KLEMS release archive in ./data/manual/eu_klems/. Original error: No manual-drop dir for 'eu_klems'. Cre
+- `eu_klems:value_added_per_hour` — EUKlemsError: EU KLEMS auto-download failed and no manual file present. Either fix BULK_URL in eu_klems.py or place the latest EU KLEMS release archive in ./data/manual/eu_klems/. Original error: No manual-drop dir for 'eu_klems'. Cre
+- `eu_klems:value_added_per_worker` — EUKlemsError: EU KLEMS auto-download failed and no manual file present. Either fix BULK_URL in eu_klems.py or place the latest EU KLEMS release archive in ./data/manual/eu_klems/. Original error: No manual-drop dir for 'eu_klems'. Cre
+- `us_census:annual_state_population_estimates` — CensusError: Census API error 404 for https://api.census.gov/data/2022/pep/population params={'get': 'NAME,POP_2022', 'for': 'state:*'}: <!doctype html><html lang="en"><head><title>HTTP Status 404 ? Not Found</title><style type="text/css">body {font-fam
+- `us_census:population` — CensusError: Census API error 404 for https://api.census.gov/data/2022/pep/population params={'get': 'NAME,POP_2022', 'for': 'us:*'}: <!doctype html><html lang="en"><head><title>HTTP Status 404 ? Not Found</title><style type="text/css">body {font-family
+- `us_census:building_permits` — CensusError: Census API error 404 for https://api.census.gov/data/timeseries/eits/bps params={'get': 'cell_value,data_type_code,time_slot_id,error_data,category_code,seasonally_adj', 'time': 'from 2020 to 2023', 'category_code': '00', 'data_type_code':
+- `ons:CDKO` — OnsError: ONS 404 for series='CDKO' dataset='hpi' — check CDID/dataset pair
+- `rba:d03hist` — missing_fetcher: known fetchers: ['apra', 'bak_swiss', 'bcra', 'bcv', 'bis', 'bls', 'boe', 'boj', 'brazil_ipea', 'chile_spensiones', 'chinn_ito', 'cuba_manual', 'destatis', 'destatis_germany', 'dolartoday', 'ecb', 'eea', 'eia', 'encovi_ucab', 'eu_klems', 'e
+- `rba:f01hist` — missing_fetcher: known fetchers: ['apra', 'bak_swiss', 'bcra', 'bcv', 'bis', 'bls', 'boe', 'boj', 'brazil_ipea', 'chile_spensiones', 'chinn_ito', 'cuba_manual', 'destatis', 'destatis_germany', 'dolartoday', 'ecb', 'eea', 'eia', 'encovi_ucab', 'eu_klems', 'e
+- `rba:g01hist` — missing_fetcher: known fetchers: ['apra', 'bak_swiss', 'bcra', 'bcv', 'bis', 'bls', 'boe', 'boj', 'brazil_ipea', 'chile_spensiones', 'chinn_ito', 'cuba_manual', 'destatis', 'destatis_germany', 'dolartoday', 'ecb', 'eea', 'eia', 'encovi_ucab', 'eu_klems', 'e
+- `rba:f11hist` — missing_fetcher: known fetchers: ['apra', 'bak_swiss', 'bcra', 'bcv', 'bis', 'bls', 'boe', 'boj', 'brazil_ipea', 'chile_spensiones', 'chinn_ito', 'cuba_manual', 'destatis', 'destatis_germany', 'dolartoday', 'ecb', 'eea', 'eia', 'encovi_ucab', 'eu_klems', 'e
+- `scb:gdp` — SCBError: SCB POST NR/NR0103/NR0103A/NR0103ENS2010T01A failed [400]: Bad Request
+- `scb:unemployment` — SCBError: SCB POST AM/AM0401/AM0401A/NAKUBefolkning2Ny failed [400]: Bad Request
+- `ipeadata:GDP` — IpeadataError: IPEADATA GDP (http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='BM12_PIBPM12')) returned no observations
+- `ipeadata:BOLSA_FAMILIA` — IpeadataError: IPEADATA BOLSA_FAMILIA (http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='MDS_BFCOB')) returned no observations

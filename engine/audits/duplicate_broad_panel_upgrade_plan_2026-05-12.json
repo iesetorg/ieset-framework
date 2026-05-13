@@ -1,0 +1,416 @@
+{
+  "generated_at": "2026-05-12",
+  "source_audit": "engine/audits/throughput_scoreboard_conversion_2026-05-12.json",
+  "local_data_inventory": {
+    "vdem_full": "data/vintages/vdem/vdem_cy_full@2026-05-05T200021Z.parquet",
+    "vdem_codebook": "data/vintages/vdem/codebook@2026-05-05T200035Z.parquet",
+    "oecd_pmr": "data/vintages/oecd_pmr/PMR@2026-05-05T200616Z.parquet",
+    "wdi_investment_share": "data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet",
+    "wgi_regulatory_quality": "data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet",
+    "wgi_control_corruption": "data/vintages/wgi/GOV_WGI_CC.EST@2026-05-05T195223Z.parquet"
+  },
+  "summary": {
+    "held_duplicate_broad_panel_items": 18,
+    "duplicate_fingerprint_groups": 5,
+    "priority_1_near_term_upgrades": [],
+    "priority_2_data_gap_upgrades": [
+      "occupational_licensing_income_mobility"
+    ],
+    "not_direct_scoreboard_items": [
+      "market_governance_qol_broad_scope",
+      "qol_anomaly_weight_broad_scope_test"
+    ]
+  },
+  "duplicate_groups": [
+    {
+      "fingerprint": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "size": 5,
+      "hypotheses": [
+        "CBDC_design_privacy_tradeoff",
+        "active_labour_market_policy_conditionality_works",
+        "agricultural_export_ban_price_instability",
+        "agricultural_trade_liberalisation_food_security",
+        "apprenticeship_employer_chamber_quality"
+      ]
+    },
+    {
+      "fingerprint": "coef=+0.205 (sign matches claim +), p=0.0329",
+      "size": 4,
+      "hypotheses": [
+        "crony_capitalism_not_market_freedom",
+        "market_governance_qol_broad_scope",
+        "procurement_competition_corruption",
+        "licensing_discretion_bribery"
+      ]
+    },
+    {
+      "fingerprint": "coef=+3078 (sign matches claim +), p=0.00422",
+      "size": 3,
+      "hypotheses": [
+        "qol_anomaly_weight_broad_scope_test",
+        "occupational_licensing_income_mobility",
+        "labor_reform_real_wage_growth"
+      ]
+    },
+    {
+      "fingerprint": "coef=+3078 (sign opposite claim -), p=0.00422",
+      "size": 3,
+      "hypotheses": [
+        "price_signal_integrity_qol_panel",
+        "market_institution_duration_qol_persistence",
+        "market_reform_inflation_adjusted_wages"
+      ]
+    },
+    {
+      "fingerprint": "coef=-0.3453 (sign matches claim -), p=0.0312",
+      "size": 3,
+      "hypotheses": [
+        "intervention_reversal_qol_loss_1980_2024",
+        "intervention_intensity_qol_volatility_1970_2024",
+        "campaign_favoritism_subsidy_allocation"
+      ]
+    }
+  ],
+  "upgrade_queue": [
+    {
+      "hypothesis_id": "occupational_licensing_income_mobility",
+      "hypothesis_path": "hypotheses/labour/occupational_licensing_income_mobility.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+3078 (sign matches claim +), p=0.00422",
+      "fingerprint": "coef=+3078 (sign matches claim +), p=0.00422",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 2,
+      "decision": "data_gap_then_upgrade",
+      "problem": "The present test measures GDP per capita against WGI RQ, not occupational licensing or mobility.",
+      "upgrade": "Rebuild with a direct licensing-burden treatment and a mobility/wage outcome.",
+      "candidate_data": [
+        "US state occupational licensing coverage or license burden panels",
+        "OECD PMR professional-services restrictions",
+        "IPUMS/CPS wage mobility or employment transitions",
+        "Opportunity Atlas / Chetty mobility measures for US geography"
+      ],
+      "local_data": [
+        "OECD PMR professional-services restrictions are available as a partial licensing proxy.",
+        "A direct mobility/wage-transition outcome is not yet confirmed locally."
+      ],
+      "scoreboard_rule": "Eligible only after direct licensing treatment and mobility/labour outcome are present."
+    },
+    {
+      "hypothesis_id": "market_governance_qol_broad_scope",
+      "hypothesis_path": "hypotheses/institutional_quality/market_governance_qol_broad_scope.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+0.205 (sign matches claim +), p=0.0329",
+      "fingerprint": "coef=+0.205 (sign matches claim +), p=0.0329",
+      "duplicate_group_size": 4,
+      "qa_flags": [
+        "broad_scope",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 3,
+      "decision": "split_or_demote_to_meta_screen",
+      "problem": "The claim is intentionally broad and currently duplicates the same WGI corruption/regulatory-quality panel as the corruption hypothesis.",
+      "upgrade": "Split into narrower outcome-specific hypotheses or keep as a meta-audit that summarizes independent tests rather than scoring directly.",
+      "candidate_data": [
+        "one governance-specific child test",
+        "one income or life-expectancy child test",
+        "one business dynamism or investment child test"
+      ],
+      "local_data": [
+        "Use existing verdict inventory and local WDI/WGI/V-Dem/PMR panels to build child tests; do not reuse this broad parent as direct evidence."
+      ],
+      "scoreboard_rule": "Do not convert the broad parent directly; score only child tests with distinct datasets."
+    },
+    {
+      "hypothesis_id": "qol_anomaly_weight_broad_scope_test",
+      "hypothesis_path": "hypotheses/growth/qol_anomaly_weight_broad_scope_test.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+3078 (sign matches claim +), p=0.00422",
+      "fingerprint": "coef=+3078 (sign matches claim +), p=0.00422",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "broad_scope",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 4,
+      "decision": "demote_to_meta_audit",
+      "problem": "This is a framework-level anomaly-weight claim, but the current run is just a GDP-per-capita/WGI RQ panel that duplicates other verdicts.",
+      "upgrade": "Convert into a meta-evidence audit over independent scored hypotheses, with anomaly weights computed from the verdict inventory.",
+      "candidate_data": [
+        "scoreboard verdict inventory",
+        "evidence quality weights",
+        "country/period coverage metadata"
+      ],
+      "local_data": [
+        "Use the conversion audit, scoreboard audit, and result-card metadata already generated in engine/audits and engine/runs."
+      ],
+      "scoreboard_rule": "Do not score as a direct policy verdict; use it to explain confidence and anomaly handling in the policy browser."
+    },
+    {
+      "hypothesis_id": "CBDC_design_privacy_tradeoff",
+      "hypothesis_path": "hypotheses/monetary/CBDC_design_privacy_tradeoff.yaml",
+      "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "fingerprint": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "duplicate_group_size": 5,
+      "qa_flags": [
+        "zero_effect_partial",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "active_labour_market_policy_conditionality_works",
+      "hypothesis_path": "hypotheses/labour/active_labour_market_policy_conditionality_works.yaml",
+      "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "fingerprint": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "duplicate_group_size": 5,
+      "qa_flags": [
+        "zero_effect_partial",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "agricultural_export_ban_price_instability",
+      "hypothesis_path": "hypotheses/growth/agricultural_export_ban_price_instability.yaml",
+      "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "fingerprint": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "duplicate_group_size": 5,
+      "qa_flags": [
+        "zero_effect_partial",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "agricultural_trade_liberalisation_food_security",
+      "hypothesis_path": "hypotheses/trade/agricultural_trade_liberalisation_food_security.yaml",
+      "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "fingerprint": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "duplicate_group_size": 5,
+      "qa_flags": [
+        "zero_effect_partial",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "apprenticeship_employer_chamber_quality",
+      "hypothesis_path": "hypotheses/labour/apprenticeship_employer_chamber_quality.yaml",
+      "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "fingerprint": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+      "duplicate_group_size": 5,
+      "qa_flags": [
+        "zero_effect_partial",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "campaign_favoritism_subsidy_allocation",
+      "hypothesis_path": "hypotheses/fiscal/campaign_favoritism_subsidy_allocation.yaml",
+      "verdict": "SUPPORTED \u2014 coef=-0.3453 (sign matches claim -), p=0.0312",
+      "fingerprint": "coef=-0.3453 (sign matches claim -), p=0.0312",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "crony_capitalism_not_market_freedom",
+      "hypothesis_path": "hypotheses/institutional_quality/crony_capitalism_not_market_freedom.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+0.205 (sign matches claim +), p=0.0329",
+      "fingerprint": "coef=+0.205 (sign matches claim +), p=0.0329",
+      "duplicate_group_size": 4,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "intervention_intensity_qol_volatility_1970_2024",
+      "hypothesis_path": "hypotheses/growth/intervention_intensity_qol_volatility_1970_2024.yaml",
+      "verdict": "SUPPORTED \u2014 coef=-0.3453 (sign matches claim -), p=0.0312",
+      "fingerprint": "coef=-0.3453 (sign matches claim -), p=0.0312",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "broad_scope",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "intervention_reversal_qol_loss_1980_2024",
+      "hypothesis_path": "hypotheses/growth/intervention_reversal_qol_loss_1980_2024.yaml",
+      "verdict": "SUPPORTED \u2014 coef=-0.3453 (sign matches claim -), p=0.0312",
+      "fingerprint": "coef=-0.3453 (sign matches claim -), p=0.0312",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "broad_scope",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "labor_reform_real_wage_growth",
+      "hypothesis_path": "hypotheses/labour/labor_reform_real_wage_growth.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+3078 (sign matches claim +), p=0.00422",
+      "fingerprint": "coef=+3078 (sign matches claim +), p=0.00422",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "licensing_discretion_bribery",
+      "hypothesis_path": "hypotheses/institutional_quality/licensing_discretion_bribery.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+0.205 (sign matches claim +), p=0.0329",
+      "fingerprint": "coef=+0.205 (sign matches claim +), p=0.0329",
+      "duplicate_group_size": 4,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "market_institution_duration_qol_persistence",
+      "hypothesis_path": "hypotheses/growth/market_institution_duration_qol_persistence.yaml",
+      "verdict": "REFUTED \u2014 coef=+3078 (sign opposite claim -), p=0.00422",
+      "fingerprint": "coef=+3078 (sign opposite claim -), p=0.00422",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "broad_scope",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "market_reform_inflation_adjusted_wages",
+      "hypothesis_path": "hypotheses/growth/market_reform_inflation_adjusted_wages.yaml",
+      "verdict": "REFUTED \u2014 coef=+3078 (sign opposite claim -), p=0.00422",
+      "fingerprint": "coef=+3078 (sign opposite claim -), p=0.00422",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "price_signal_integrity_qol_panel",
+      "hypothesis_path": "hypotheses/regulatory/price_signal_integrity_qol_panel.yaml",
+      "verdict": "REFUTED \u2014 coef=+3078 (sign opposite claim -), p=0.00422",
+      "fingerprint": "coef=+3078 (sign opposite claim -), p=0.00422",
+      "duplicate_group_size": 3,
+      "qa_flags": [
+        "broad_scope",
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    },
+    {
+      "hypothesis_id": "procurement_competition_corruption",
+      "hypothesis_path": "hypotheses/institutional_quality/procurement_competition_corruption.yaml",
+      "verdict": "SUPPORTED \u2014 coef=+0.205 (sign matches claim +), p=0.0329",
+      "fingerprint": "coef=+0.205 (sign matches claim +), p=0.0329",
+      "duplicate_group_size": 4,
+      "qa_flags": [
+        "associational_panel",
+        "duplicate_fingerprint"
+      ],
+      "priority": 5,
+      "decision": "review_duplicate_context",
+      "problem": "Held because this verdict shares a broad-panel fingerprint with other hypotheses.",
+      "upgrade": "Inspect claim wording and replace generic proxy inputs with claim-specific treatment and outcome data.",
+      "candidate_data": [],
+      "scoreboard_rule": "Keep out of scoreboard until the duplicate evidence path is resolved."
+    }
+  ]
+}

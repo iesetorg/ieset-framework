@@ -1,0 +1,103 @@
+# IESET Mega Data Roundup 2
+
+- generated_utc: `2026-05-05T210519Z`
+- manifest: `data/manifests/fetch_run_2026-05-05T210519Z.yaml`
+- jobs: 89
+- ok: 59
+- failed: 30
+- rows landed: 47,956,508
+
+## Landed
+
+- `world_bank_wdi:GC.REV.XGRT.GD.ZS` — 5,000 rows, 1960 to 2025 — government revenue excluding grants
+- `world_bank_wdi:GB.XPD.RSDV.GD.ZS` — 17,556 rows, 1960 to 2025 — research and development share
+- `world_bank_wdi:IP.PAT.RESD` — 17,556 rows, 1960 to 2025 — resident patent applications
+- `world_bank_wdi:IT.NET.USER.ZS` — 17,556 rows, 1960 to 2025 — internet users share
+- `world_bank_wdi:FX.OWN.TOTL.ZS` — 17,556 rows, 1960 to 2025 — financial account ownership
+- `world_bank_wdi:IC.BUS.NREG` — 17,556 rows, 1960 to 2025 — new business registrations
+- `world_bank_wdi:SH.MED.PHYS.ZS` — 17,556 rows, 1960 to 2025 — physicians per 1,000 people
+- `world_bank_wdi:SH.XPD.CHEX.GD.ZS` — 17,556 rows, 1960 to 2025 — current health expenditure share
+- `world_bank_wdi:SH.XPD.OOPC.CH.ZS` — 17,556 rows, 1960 to 2025 — out-of-pocket health spending share
+- `world_bank_wdi:SH.STA.MMRT` — 17,556 rows, 1960 to 2025 — maternal mortality ratio
+- `world_bank_wdi:SH.DYN.NMRT` — 17,556 rows, 1960 to 2025 — neonatal mortality rate
+- `world_bank_wdi:SP.POP.1564.TO.ZS` — 17,556 rows, 1960 to 2025 — working-age population share
+- `world_bank_wdi:SP.POP.DPND.OL` — 17,556 rows, 1960 to 2025 — old-age dependency ratio
+- `world_bank_wdi:SP.URB.TOTL.IN.ZS` — 17,556 rows, 1960 to 2025 — urban population share
+- `world_bank_wdi:SL.AGR.EMPL.ZS` — 17,556 rows, 1960 to 2025 — agriculture employment share
+- `world_bank_wdi:SL.IND.EMPL.ZS` — 17,556 rows, 1960 to 2025 — industry employment share
+- `world_bank_wdi:SL.SRV.EMPL.ZS` — 17,556 rows, 1960 to 2025 — services employment share
+- `world_bank_wdi:NV.AGR.TOTL.ZS` — 17,556 rows, 1960 to 2025 — agriculture value-added share
+- `world_bank_wdi:NV.IND.TOTL.ZS` — 17,556 rows, 1960 to 2025 — industry value-added share
+- `world_bank_wdi:AG.LND.AGRI.ZS` — 17,556 rows, 1960 to 2025 — agricultural land share
+- `world_bank_wdi:AG.PRD.FOOD.XD` — 17,556 rows, 1960 to 2025 — food production index
+- `world_bank_wdi:EG.USE.ELEC.KH.PC` — 17,556 rows, 1960 to 2025 — electricity use per capita
+- `world_bank_wdi:EG.ELC.FOSL.ZS` — 17,556 rows, 1960 to 2025 — fossil electricity share
+- `world_bank_wdi:EG.ELC.RNEW.ZS` — 17,556 rows, 1960 to 2025 — renewable electricity share
+- `world_bank_wdi:ST.INT.ARVL` — 17,556 rows, 1960 to 2025 — international tourist arrivals
+- `world_bank_wdi:SE.SEC.ENRR` — 17,556 rows, 1960 to 2025 — secondary enrolment
+- `world_bank_wdi:SE.PRM.CMPT.ZS` — 17,556 rows, 1960 to 2025 — primary completion
+- `world_bank_wdi:SE.XPD.TOTL.GD.ZS` — 17,556 rows, 1960 to 2025 — education spending share
+- `undp_hdi:hdi` — 6,314 rows, 1990 to 2023 — UNDP Human Development Index
+- `undp_hdi:life_expectancy` — 7,004 rows, 1990 to 2023 — UNDP life expectancy component
+- `undp_hdi:mean_years_schooling` — 6,455 rows, 1990 to 2023 — UNDP mean schooling component
+- `undp_hdi:expected_years_schooling` — 6,684 rows, 1990 to 2023 — UNDP expected schooling component
+- `undp_hdi:gni_per_capita` — 6,852 rows, 1990 to 2023 — UNDP GNI per capita component
+- `heritage_ief:ief_2024` — 184 rows, 2024 to 2024 — Heritage IEF release 2024
+- `heritage_ief:ief_2025` — 184 rows, 2025 to 2025 — Heritage IEF release 2025
+- `heritage_ief:ief_2026` — 184 rows, 2026 to 2026 — Heritage IEF release 2026
+- `heritage_ief:ief_panel` — 549 rows, 2024 to 2026 — Heritage annual panel from local releases
+- `wid:wid_all` — 27,663,834 rows, 1800 to 2024 — WID targeted bulk extract for broad inequality variables
+- `wid:top-0-1-share-of-total-income` — 3,273 rows, 1820 to 2024 — WID top 0.1 percent income share
+- `faostat:food_balance_sheets` — 290 rows, 2010 to 2023 — FAOSTAT food import dependence panel
+- `bls:LAU_state_unemployment_rate_panel` — 21,420 rows, 1990 to 2024 — BLS state unemployment rates
+- `bls:QCEW_state_total_employment_panel` — 561 rows, 2014 to 2024 — BLS QCEW state total employment
+- `bls:QCEW_state_NAICS722_employment_panel` — 561 rows, 2014 to 2024 — BLS QCEW state food-service employment
+- `bls:QCEW_county_NAICS722_employment_panel` — 35,770 rows, 2014 to 2024 — BLS QCEW county food-service employment
+- `eurostat:nama_10_gdp` — 1,099,850 rows, 1975 to 2025 — Eurostat national accounts GDP
+- `eurostat:nama_10_a10` — 869,177 rows, 1975 to 2025 — Eurostat sectoral national accounts
+- `eurostat:nama_10_lp_ulc` — 64,088 rows, 1975 to 2025 — Eurostat labour productivity and unit labour costs
+- `eurostat:une_rt_a` — 39,669 rows, 2003 to 2025 — Eurostat annual unemployment
+- `eurostat:lfsa_egan` — 414,005 rows, 1995 to 2025 — Eurostat employment by activity
+- `eurostat:ilc_di12` — 868 rows, 2014 to 2025 — Eurostat income distribution
+- `eurostat:ilc_li02` — 1,112,646 rows, 1995 to 2025 — Eurostat at-risk-of-poverty threshold
+- `eurostat:demo_pjan` — 739,082 rows, 1960 to 2025 — Eurostat population by age/sex
+- `eurostat:migr_imm1ctz` — 12,193,206 rows, 1998 to 2024 — Eurostat immigration by citizenship
+- `eurostat:rd_e_gerdtot` — 43,474 rows, 1980 to 2024 — Eurostat R&D expenditure
+- `eurostat:nrg_pc_205` — 79,560 rows, 2007-S1 to 2025-S2 — Eurostat electricity prices
+- `oecd:DSD_SOCX@DF_SOCX_AGG` — 3,060,473 rows, 1980 to 2024 — OECD social expenditure aggregates
+- `ecb:ICP__M.U2.N.000000.4.ANR` — 348 rows, 1997-01 to 2025-12 — ECB harmonised inflation euro area
+- `ecb:FM__M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA` — 388 rows, 1994-01 to 2026-04 — ECB euribor money-market rate
+- `ecb:BSI__M.U2.Y.V.M30.X.I.U2.2300.Z01.A` — 543 rows, 1981-01 to 2026-03 — ECB euro-area M3 annual growth
+
+## Failed / Needs Scrape Or Repair
+
+- `world_bank_wdi:IC.REG.DURS` — WorldBankError: WDI error for IC.REG.DURS: {'message': [{'id': '175', 'key': 'Invalid format', 'value': 'The indicator was not found. It may have been deleted or archived.'}]}
+- `world_bank_wdi:EN.ATM.CO2E.PC` — WorldBankError: WDI error for EN.ATM.CO2E.PC: {'message': [{'id': '175', 'key': 'Invalid format', 'value': 'The indicator was not found. It may have been deleted or archived.'}]}
+- `heritage_ief:ief_2010` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2010/2010_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2011` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2011/2011_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2012` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2012/2012_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2013` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2013/2013_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2014` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2014/2014_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2015` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2015/2015_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2016` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2016/2016_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2017` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2017/2017_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2018` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2018/2018_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2019` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2019/2019_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2020` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2020/2020_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2021` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2021/2021_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2022` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2022/2022_indexofeconomicfreedom_data.xlsx
+- `heritage_ief:ief_2023` — HTTPError: 404 Client Error: Not Found for url: https://static.heritage.org/index/data/2023/2023_indexofeconomicfreedom_data.xlsx
+- `unctad:US.FDI` — UnctadError: all UNCTAD bulk URLs failed for US.FdiFlowsStock: HTTP 404 for https://unctadstat.unctad.org/7zip/US_FdiFlowsStock.zip
+- `unctad:US.FDIstock` — UnctadError: all UNCTAD bulk URLs failed for US.FdiFlowsStock: HTTP 404 for https://unctadstat.unctad.org/7zip/US_FdiFlowsStock.zip
+- `unctad:US.TradeMerchTotal` — UnctadError: all UNCTAD bulk URLs failed for US.TradeMatrix: HTTP 404 for https://unctadstat.unctad.org/7zip/US_TradeMatrix.zip
+- `unctad:US.TradeServ` — UnctadError: all UNCTAD bulk URLs failed for US.ServicesByCategory: HTTP 404 for https://unctadstat.unctad.org/7zip/US_ServicesByCategory.zip
+- `unctad:US.GVCParticipation` — UnctadError: all UNCTAD bulk URLs failed for US.GVCParticipation: HTTP 404 for https://unctadstat.unctad.org/7zip/US_GVCParticipation.zip
+- `bls:LAU_state_employment_population_ratio_panel` — BlsError: BLS batch failed: REQUEST_NOT_PROCESSED — ['Request could not be serviced, as the daily threshold for total number of requests allocated to the user with registration key  has been reached.']
+- `oecd:DSD_KEI` — OecdError: OECD 404 for DSD_KEI (resolved='OECD.ECO.MAD,DSD_KEI@DF_KEI,1.0') key='' — check dataflow id
+- `oecd:DSD_TAX` — OecdError: OECD 404 for DSD_TAX (resolved='OECD.CTP.TPS,DSD_TAX@DF_TAX_WAGES_COMP,2.1') key='' — check dataflow id
+- `oecd:DSD_PENSIONS@DF_PENSIONS_REPL_RATE` — OecdError: OECD 404 for DSD_PENSIONS@DF_PENSIONS_REPL_RATE (resolved='OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0') key='' — check dataflow id
+- `oecd:HEALTH_STAT@DF_AMENABLE_MORT` — OecdError: OECD 404 for HEALTH_STAT@DF_AMENABLE_MORT (resolved='OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0') key='' — check dataflow id
+- `oecd:HOUSE_PRICES` — OecdError: OECD 404 for HOUSE_PRICES (resolved='OECD.SDD.PIN,DSD_RHPI@DF_RHPI,1.0') key='' — check dataflow id
+- `oecd:HFCE` — OecdError: OECD 404 for HFCE (resolved='OECD.SDD.NAD,DSD_NAMAIN1@DF_HFCE,1.0') key='' — check dataflow id
+- `oecd:GGEXP` — OecdError: OECD 404 for GGEXP (resolved='OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0') key='' — check dataflow id
+- `ecb:financial_markets_yields_10yr` — EcbError: ECB 404 for FM/M.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y — check flow + key format
