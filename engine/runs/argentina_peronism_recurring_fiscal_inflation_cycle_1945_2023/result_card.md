@@ -1,6 +1,6 @@
 # Result card — argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023
 
-**Verdict:** PARTIAL — cointegration rank=1, α_infl=-0.0030732350913415377; episode precedence 2/5 below 8/12 threshold.
+**Verdict:** PARTIAL — cointegration rank=1, α_infl=-0.003073235091341539; episode precedence 2/5 below 8/12 threshold.
 
 ## Joint-system Johansen cointegration test
 
@@ -14,7 +14,7 @@
 
 ## VECM(1,1) — rank 1
 
-- Cointegrating vector (β, normalised): {'deficit_pct_gdp': 1.0, 'log_inflation': -220.71655754364787}
+- Cointegrating vector (β, normalised): {'deficit_pct_gdp': 1.0, 'log_inflation': -220.71655754364772}
 - α (deficit eq):    +0.0391 (p=0.002)
 - α (inflation eq):  -0.0031 (p=0.000)
 - **Half-life of deviation:** 225.20 years
