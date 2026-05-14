@@ -8,6 +8,7 @@ Inputs:
 
 Outputs:
 - `derived:minimum_wage_bite_ratio_state_panel`
+- `derived:minimum_wage_bite_ratio_subnational_panel`
 - `derived:minimum_wage_low_tail_bite_ratio_state_panel`
 """
 from __future__ import annotations
@@ -45,11 +46,12 @@ def build(kind: str, wage_path: Path, minwage_path: Path, fetch_ts: datetime) ->
     panel["denominator"] = kind
     panel = panel.dropna(subset=["minimum_wage", "denominator_wage", "bite_ratio"])
     panel = panel.sort_values(["state_fips", "year"]).reset_index(drop=True)
-    series_id = (
-        "minimum_wage_bite_ratio_state_panel"
-        if kind == "median"
-        else "minimum_wage_low_tail_bite_ratio_state_panel"
-    )
+    series_ids = {
+        "median": "minimum_wage_bite_ratio_state_panel",
+        "subnational_median_alias": "minimum_wage_bite_ratio_subnational_panel",
+        "p10": "minimum_wage_low_tail_bite_ratio_state_panel",
+    }
+    series_id = series_ids[kind]
     out, sha = write_vintage(
         publisher="derived",
         series_id=series_id,
@@ -76,6 +78,7 @@ def build(kind: str, wage_path: Path, minwage_path: Path, fetch_ts: datetime) ->
             "input_wage_vintage": str(wage_path.relative_to(ROOT)),
             "state_count": int(panel["state_fips"].nunique()),
             "denominator": kind,
+            "geographic_level": "state",
         },
     )
 
@@ -87,6 +90,7 @@ def main() -> int:
     p10 = latest("data/vintages/bls/OEWS_state_p10_hourly_wage_panel@*.parquet")
     results = [
         build("median", median, minwage, fetch_ts),
+        build("subnational_median_alias", median, minwage, fetch_ts),
         build("p10", p10, minwage, fetch_ts),
     ]
     manifest = write_manifest(results)
