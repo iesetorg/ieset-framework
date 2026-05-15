@@ -1,14 +1,15 @@
 packet_version: 1
-generated_utc: '2026-05-04T20:34:53+00:00'
+generated_utc: '2026-05-15T16:24:04+00:00'
 repository:
   root: .
-  git_commit: f34241b08392f87df0e485e858c3d566031ed4aa
+  git_commit: 4494fc07687d99657c3a7cf4bcf0d06081e36fd3
 hypothesis:
   id: capital_gains_tax_cut_investment_response_panel
+  legacy_id: null
   path: hypotheses/fiscal/capital_gains_tax_cut_investment_response_panel.yaml
   school: null
   topic: fiscal
-  claim: 'In a broad-country panel 1990-2020, reductions in the top statutory capital-
+  claim: 'In an OECD-country panel 2014-2024, reductions in the top statutory capital-
     gains tax rate predict higher subsequent gross fixed capital formation as a share
     of GDP and higher business-startup rates, controlling for corporate-tax rates,
     interest rates, and institutional quality. The directional claim is that a 10
@@ -18,14 +19,13 @@ hypothesis:
 
     '
 verdict:
-  raw: INCONCLUSIVE_DATA_PENDING
-  bucket: inconclusive
-  reason: 'no treatment variable loaded; missing: [''constructed: indicator = 1 for
-    top statutory capital-gains tax rate by country-year'', ''constructed: indicator
-    = 1 for country-years following a >=10pp capital-gains tax cut'']'
-  status: null
+  raw: PARTIAL
+  bucket: partial
+  reason: capital-gains rate is negative and significant for investment, but not for
+    the business-entry outcome
+  status: PARTIAL
 preregistration:
-  claim: 'In a broad-country panel 1990-2020, reductions in the top statutory capital-
+  claim: 'In an OECD-country panel 2014-2024, reductions in the top statutory capital-
     gains tax rate predict higher subsequent gross fixed capital formation as a share
     of GDP and higher business-startup rates, controlling for corporate-tax rates,
     interest rates, and institutional quality. The directional claim is that a 10
@@ -58,32 +58,515 @@ preregistration:
   steelman: hypotheses/steelman/capital_gains_tax_cut_investment_response_panel.md
 reproduction:
   run_dir: engine/runs/capital_gains_tax_cut_investment_response_panel
-  runner: null
-  replication_script: null
-  suggested_command: null
+  runner: engine/runs/capital_gains_tax_cut_investment_response_panel/replication.py
+  replication_script: engine/runs/capital_gains_tax_cut_investment_response_panel/replication.py
+  suggested_command: python engine/runs/capital_gains_tax_cut_investment_response_panel/replication.py
 data:
-  inputs: []
+  inputs:
+  - name: gross_fixed_capital_formation_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FTOT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      computed_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:56.960422+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation (% of GDP)
+      source_note: Gross fixed capital formation includes acquisitions less disposals
+        of fixed assets during the accounting period, including certain specified
+        expenditures on services that add to the value of non-produced assets. This
+        indicator is expressed as a percentage of Gross Domestic Product (GDP) which
+        is the total income earned through the production of goods and services in
+        an economic territory during an
+      countries_param: all
+      vintage_utc: null
+  - name: new_business_density
+    publisher: world_bank_wdi
+    series_id: IC.BUS.NREG
+    vintage_file: data/vintages/world_bank_wdi/IC.BUS.NREG@2026-05-05T203439Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 213a70ca7b1b8259d58f3a3b9e90b9fb84cce3f77b881667f8811a71d25e75ae
+      computed_sha256: 213a70ca7b1b8259d58f3a3b9e90b9fb84cce3f77b881667f8811a71d25e75ae
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/IC.BUS.NREG?format=json
+      methodology_url: https://data.worldbank.org/indicator/IC.BUS.NREG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:34:39.358332+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: New businesses registered (number)
+      source_note: New businesses registered are the number of new limited liability
+        corporations (or its equivalent) registered in the calendar year.
+      countries_param: all
+      vintage_utc: null
+  - name: capital_gains_tax_rate
+    publisher: taxfoundation_itci
+    series_id: capital_gains_tax_rate_panel
+    vintage_file: data/vintages/taxfoundation_itci/capital_gains_tax_rate_panel@2026-05-15T161843Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: a63114553d98313652e5a0dec449023cce09d36ae8640f2daf4890db759d225a
+      computed_sha256: a63114553d98313652e5a0dec449023cce09d36ae8640f2daf4890db759d225a
+      status: match
+    source:
+      type: official
+      url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+        ... final_index_data_2025.csv
+      methodology_url: https://github.com/TaxFoundation/international-tax-competitiveness-index#explanation-of-data
+      license: Tax Foundation public GitHub dataset; see repository terms
+      fetch_utc: '2026-05-15T16:18:43.181842+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-15T161857Z.yaml
+    coverage:
+      start_date: '2014'
+      end_date: '2025'
+      frequency: annual
+      rows: 456
+      units: percentage points
+      currency: null
+    extra:
+      variable_definition: 'Tax Foundation ITCI capital_gains_rate: tax rate for capital
+        gains after imputation, credit, or offset; listed shares after extended holding
+        period when asset-specific rates vary.'
+      country_count: 38
+      source_files:
+      - year: 2014
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+        sha256: a2ab45210d9ceefdbec442253e00503e568e6d47fe2e047117b133718f6e19f6
+        rows: 38
+      - year: 2015
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2015.csv
+        sha256: 2ce975c78c85438f9bde0be02ffa7405920665dfc6a24c6b45ef8a440c99ea1e
+        rows: 38
+      - year: 2016
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2016.csv
+        sha256: 620dd2e999ff981cf293a74d63f8f91ca54c2162dad61912acfb2a36de742374
+        rows: 38
+      - year: 2017
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2017.csv
+        sha256: 46c6af372773ab97ab0804aef278e994e9e2974e91fc2497fea8d6acd0a69f2e
+        rows: 38
+      - year: 2018
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2018.csv
+        sha256: 22cd71d6f86fdc9ecd507a4bb55236a70a74f3bebe04b0627da3e3eeaf7f25fd
+        rows: 38
+      - year: 2019
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2019.csv
+        sha256: 4bec885e8eed308e5d1fd34e52dcbdc42224fe5f7667e3f5333b8fbb7d01922a
+        rows: 38
+      - year: 2020
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2020.csv
+        sha256: e95d4b05f38398f5707f92081d83dcad25ec667c4fd32de700cac3c1daeac52f
+        rows: 38
+      - year: 2021
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2021.csv
+        sha256: 975154461006124dc512209261703c229a2e0436565222e7f0d29d98771fa12d
+        rows: 38
+      - year: 2022
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2022.csv
+        sha256: 79c50cc6fee2966d8779547f9a3c32aac9e335f3f9acd7ee78c9712f5057c2f3
+        rows: 38
+      - year: 2023
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2023.csv
+        sha256: 9f07b64b5503f480bf07f57d95f5bc29755aa4a674ac284c0a130ba2b9135355
+        rows: 38
+      - year: 2024
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2024.csv
+        sha256: d1e2d007a8003a436bee1a0af3db780198453c750de3f25ba6c67aa178d97ca1
+        rows: 38
+      - year: 2025
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2025.csv
+        sha256: 20ea3f8c26516a792b8ecf9609c0b6036ca25c25224549e4edd05813b5f9c57f
+        rows: 38
+  - name: capital_gains_tax_cut_indicator
+    publisher: taxfoundation_itci
+    series_id: capital_gains_tax_cut_indicator_panel
+    vintage_file: data/vintages/taxfoundation_itci/capital_gains_tax_cut_indicator_panel@2026-05-15T161843Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c9bc124d9c61c2176704251c37ad6718b0192a9e4e8e286fb101aa24069b2615
+      computed_sha256: c9bc124d9c61c2176704251c37ad6718b0192a9e4e8e286fb101aa24069b2615
+      status: match
+    source:
+      type: official
+      url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+        ... final_index_data_2025.csv
+      methodology_url: https://github.com/TaxFoundation/international-tax-competitiveness-index#explanation-of-data
+      license: Tax Foundation public GitHub dataset; see repository terms
+      fetch_utc: '2026-05-15T16:18:43.181842+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-15T161857Z.yaml
+    coverage:
+      start_date: '2014'
+      end_date: '2025'
+      frequency: annual
+      rows: 456
+      units: 0/1 indicator
+      currency: null
+    extra:
+      definition: Equals 1 in the year of and three following years after a country
+        records a capital-gains-rate decline of at least 10 percentage points.
+      event_count: 8
+      source_files:
+      - year: 2014
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+        sha256: a2ab45210d9ceefdbec442253e00503e568e6d47fe2e047117b133718f6e19f6
+        rows: 38
+      - year: 2015
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2015.csv
+        sha256: 2ce975c78c85438f9bde0be02ffa7405920665dfc6a24c6b45ef8a440c99ea1e
+        rows: 38
+      - year: 2016
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2016.csv
+        sha256: 620dd2e999ff981cf293a74d63f8f91ca54c2162dad61912acfb2a36de742374
+        rows: 38
+      - year: 2017
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2017.csv
+        sha256: 46c6af372773ab97ab0804aef278e994e9e2974e91fc2497fea8d6acd0a69f2e
+        rows: 38
+      - year: 2018
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2018.csv
+        sha256: 22cd71d6f86fdc9ecd507a4bb55236a70a74f3bebe04b0627da3e3eeaf7f25fd
+        rows: 38
+      - year: 2019
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2019.csv
+        sha256: 4bec885e8eed308e5d1fd34e52dcbdc42224fe5f7667e3f5333b8fbb7d01922a
+        rows: 38
+      - year: 2020
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2020.csv
+        sha256: e95d4b05f38398f5707f92081d83dcad25ec667c4fd32de700cac3c1daeac52f
+        rows: 38
+      - year: 2021
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2021.csv
+        sha256: 975154461006124dc512209261703c229a2e0436565222e7f0d29d98771fa12d
+        rows: 38
+      - year: 2022
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2022.csv
+        sha256: 79c50cc6fee2966d8779547f9a3c32aac9e335f3f9acd7ee78c9712f5057c2f3
+        rows: 38
+      - year: 2023
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2023.csv
+        sha256: 9f07b64b5503f480bf07f57d95f5bc29755aa4a674ac284c0a130ba2b9135355
+        rows: 38
+      - year: 2024
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2024.csv
+        sha256: d1e2d007a8003a436bee1a0af3db780198453c750de3f25ba6c67aa178d97ca1
+        rows: 38
+      - year: 2025
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2025.csv
+        sha256: 20ea3f8c26516a792b8ecf9609c0b6036ca25c25224549e4edd05813b5f9c57f
+        rows: 38
+  - name: corporate_tax_rate
+    publisher: taxfoundation_itci
+    series_id: corporate_tax_rate_panel
+    vintage_file: data/vintages/taxfoundation_itci/corporate_tax_rate_panel@2026-05-15T161843Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 577320a5ec23c3586121b2ca916928672574817718f8c55cc663b47c384094a4
+      computed_sha256: 577320a5ec23c3586121b2ca916928672574817718f8c55cc663b47c384094a4
+      status: match
+    source:
+      type: official
+      url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+        ... final_index_data_2025.csv
+      methodology_url: https://github.com/TaxFoundation/international-tax-competitiveness-index#explanation-of-data
+      license: Tax Foundation public GitHub dataset; see repository terms
+      fetch_utc: '2026-05-15T16:18:43.181842+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-15T161857Z.yaml
+    coverage:
+      start_date: '2014'
+      end_date: '2025'
+      frequency: annual
+      rows: 456
+      units: percentage points
+      currency: null
+    extra:
+      variable_definition: 'Tax Foundation ITCI corporate_rate: top marginal corporate
+        tax rate.'
+      country_count: 38
+      source_files:
+      - year: 2014
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+        sha256: a2ab45210d9ceefdbec442253e00503e568e6d47fe2e047117b133718f6e19f6
+        rows: 38
+      - year: 2015
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2015.csv
+        sha256: 2ce975c78c85438f9bde0be02ffa7405920665dfc6a24c6b45ef8a440c99ea1e
+        rows: 38
+      - year: 2016
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2016.csv
+        sha256: 620dd2e999ff981cf293a74d63f8f91ca54c2162dad61912acfb2a36de742374
+        rows: 38
+      - year: 2017
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2017.csv
+        sha256: 46c6af372773ab97ab0804aef278e994e9e2974e91fc2497fea8d6acd0a69f2e
+        rows: 38
+      - year: 2018
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2018.csv
+        sha256: 22cd71d6f86fdc9ecd507a4bb55236a70a74f3bebe04b0627da3e3eeaf7f25fd
+        rows: 38
+      - year: 2019
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2019.csv
+        sha256: 4bec885e8eed308e5d1fd34e52dcbdc42224fe5f7667e3f5333b8fbb7d01922a
+        rows: 38
+      - year: 2020
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2020.csv
+        sha256: e95d4b05f38398f5707f92081d83dcad25ec667c4fd32de700cac3c1daeac52f
+        rows: 38
+      - year: 2021
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2021.csv
+        sha256: 975154461006124dc512209261703c229a2e0436565222e7f0d29d98771fa12d
+        rows: 38
+      - year: 2022
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2022.csv
+        sha256: 79c50cc6fee2966d8779547f9a3c32aac9e335f3f9acd7ee78c9712f5057c2f3
+        rows: 38
+      - year: 2023
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2023.csv
+        sha256: 9f07b64b5503f480bf07f57d95f5bc29755aa4a674ac284c0a130ba2b9135355
+        rows: 38
+      - year: 2024
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2024.csv
+        sha256: d1e2d007a8003a436bee1a0af3db780198453c750de3f25ba6c67aa178d97ca1
+        rows: 38
+      - year: 2025
+        url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2025.csv
+        sha256: 20ea3f8c26516a792b8ecf9609c0b6036ca25c25224549e4edd05813b5f9c57f
+        rows: 38
+  - name: real_interest_rate
+    publisher: world_bank_wdi
+    series_id: FR.INR.RINR
+    vintage_file: data/vintages/world_bank_wdi/FR.INR.RINR@2026-04-30T114938Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 297377cdbde6e536355c560f92d16b6e416e27fd133d1597de712076ede424fd
+      computed_sha256: 297377cdbde6e536355c560f92d16b6e416e27fd133d1597de712076ede424fd
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FR.INR.RINR?format=json
+      methodology_url: https://data.worldbank.org/indicator/FR.INR.RINR
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:49:38.261864+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Real interest rate (%)
+      source_note: An interest rate is the amount charged, expressed as a percentage
+        of the principal over a period of time, by the owners of certain kinds of
+        financial assets for putting the financial assets at the disposal of another
+        institutional unit. The real interest rate is the lending interest rate adjusted
+        for inflation as measured by the GDP deflator. The terms and conditions attached
+        to lending rates diff
+      countries_param: all
+      vintage_utc: null
+  - name: institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
   missing_series: []
   data_quality:
-    grade: no_input_vintages_recorded
-    input_count: 0
-    official_source_count: 0
+    grade: reproducible_hash_verified
+    input_count: 9
+    official_source_count: 9
     manual_source_count: 0
-    hash_status_counts: {}
+    hash_status_counts:
+      match: 9
     missing_series_count: 0
 artifacts:
 - path: hypotheses/fiscal/capital_gains_tax_cut_investment_response_panel.yaml
-  sha256: 6af74d91de433bfb8e3ef42943c0ef9fc0c60c2bb7a8f8a81d0acaf792a44a0a
-  bytes: 5804
+  sha256: bae176977eadc2b31a2b4d4ef74d570cb5b98b2ac493bccc9015f980ef401d03
+  bytes: 5940
+- path: engine/runs/capital_gains_tax_cut_investment_response_panel/manifest.yaml
+  sha256: ce8c5b655e4a8d5c709ca45363421566fca456907b853a43a76567b557aeccdf
+  bytes: 1244
 - path: engine/runs/capital_gains_tax_cut_investment_response_panel/diagnostics.json
-  sha256: d7eda32ac14ac5346361a99b0ce22f5bd114a7ff49b9a70dcb2d03d2c00dd790
-  bytes: 3391
+  sha256: 0ffe128d9cc3319448e0baa91d1b70659734d13e598bec9fedeb79388d9daf17
+  bytes: 3869
 - path: engine/runs/capital_gains_tax_cut_investment_response_panel/result_card.md
-  sha256: 27c62fb413f779e4b9a4748a19a371507e2608fce472b16a82d1df0811d04073
-  bytes: 2815
+  sha256: 42a35f6ed1e8fbcb467b2173249daed6da7afda00e0b3477214bc19c5b262c59
+  bytes: 2576
+- path: engine/runs/capital_gains_tax_cut_investment_response_panel/replication.py
+  sha256: d666a06bffb39a068180832b01183813a3555d4ae3a62246880a97879cab4d61
+  bytes: 5744
 - path: hypotheses/steelman/capital_gains_tax_cut_investment_response_panel.md
   sha256: a851a30f2cdc244fb7b5c3118d133d10a5d6580aab7c3f2f56a577dae12689b1
   bytes: 1914
-references: []
-caveats:
-- Run manifest records no input vintages; provenance is limited to result artifacts.
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: IC.BUS.NREG
+  url: https://api.worldbank.org/v2/country/all/indicator/IC.BUS.NREG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: IC.BUS.NREG
+  url: https://data.worldbank.org/indicator/IC.BUS.NREG
+- kind: source
+  publisher: taxfoundation_itci
+  series_id: capital_gains_tax_rate_panel
+  url: https://raw.githubusercontent.com/TaxFoundation/international-tax-competitiveness-index/master/final_data/final_index_data_2014.csv
+    ... final_index_data_2025.csv
+- kind: methodology
+  publisher: taxfoundation_itci
+  series_id: capital_gains_tax_rate_panel
+  url: https://github.com/TaxFoundation/international-tax-competitiveness-index#explanation-of-data
+- kind: source
+  publisher: world_bank_wdi
+  series_id: FR.INR.RINR
+  url: https://api.worldbank.org/v2/country/all/indicator/FR.INR.RINR?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: FR.INR.RINR
+  url: https://data.worldbank.org/indicator/FR.INR.RINR
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+caveats: []
