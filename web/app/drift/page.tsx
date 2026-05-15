@@ -24,9 +24,9 @@ interface RegionSpec {
 }
 
 /**
- * Region panels — every country in the corpus belongs to exactly one panel,
- * so "All regions" together = the full 74-country corpus. Within each panel
- * we show the top-N most-coded countries to keep the chart legible.
+ * Region panels — every country in the drift dataset belongs to exactly one
+ * panel. Within each panel we show the top-N most-coded countries to keep the
+ * chart legible.
  */
 const REGIONS: RegionSpec[] = [
   {
@@ -52,7 +52,9 @@ const REGIONS: RegionSpec[] = [
       "CHE",
       "POL",
       "CZE",
+      "SVK",
       "HUN",
+      "BGR",
       "AUS",
       "NZL",
       "CAN",
@@ -80,13 +82,14 @@ const REGIONS: RegionSpec[] = [
       "CUB",
       "SLV",
       "NIC",
+      "CRI",
     ],
     blurb:
       "Punctuated by stabilisation episodes, populist swings, and commodity cycles. Drift is non-monotonic by design — the boom-bust pattern is the story.",
   },
   {
     id: "asia",
-    label: "Asia (non-OECD)",
+    label: "Asia-Pacific (non-OECD)",
     countries: [
       "CHN",
       "IND",
@@ -98,7 +101,13 @@ const REGIONS: RegionSpec[] = [
       "PAK",
       "BGD",
       "LKA",
+      "KHM",
+      "LAO",
+      "MMR",
+      "AFG",
+      "PNG",
       "SGP",
+      "TWN",
     ],
     blurb:
       "Most countries here started at high state-share and drifted market-ward via reform episodes (Deng, 1991 India, Doi Moi). Drift index measures direction not level.",
@@ -106,21 +115,49 @@ const REGIONS: RegionSpec[] = [
   {
     id: "mena",
     label: "Middle East & North Africa",
-    countries: ["TUR", "IRN", "EGY", "SAU", "ARE", "LBN"],
+    countries: [
+      "TUR",
+      "IRN",
+      "EGY",
+      "SAU",
+      "ARE",
+      "LBN",
+      "KWT",
+      "DZA",
+      "MAR",
+      "TUN",
+      "IRQ",
+      "SYR",
+    ],
     blurb:
       "Mixed regime types; Turkey + Iran show fiscal heterodox cycles, Gulf states show state-led developmental architecture, Egypt shows IMF-conditioned austerity moves.",
   },
   {
     id: "africa",
     label: "Sub-Saharan Africa",
-    countries: ["ZAF", "NGA", "KEN", "GHA", "ETH", "TZA", "RWA", "BWA", "ZMB", "ZWE"],
+    countries: [
+      "ZAF",
+      "NGA",
+      "KEN",
+      "GHA",
+      "ETH",
+      "TZA",
+      "RWA",
+      "BWA",
+      "ZMB",
+      "ZWE",
+      "AGO",
+      "CIV",
+      "COD",
+      "SEN",
+    ],
     blurb:
       "Structural-adjustment-era market moves followed by partial reversals; Ethiopia's Abiy reforms + Nigeria's Tinubu naira+subsidy package + Zimbabwean collapse all show up.",
   },
   {
     id: "post_communist",
     label: "Post-communist transitions + defunct states",
-    countries: ["RUS", "SUN", "YUG", "CSK", "ROU"],
+    countries: ["RUS", "SUN", "YUG", "CSK", "ROU", "BLR", "UKR", "KAZ"],
     blurb:
       "Soviet Union and Yugoslavia included as historical priors; Russia + Romania track post-1989 transition trajectories.",
   },

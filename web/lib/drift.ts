@@ -72,7 +72,7 @@ export function topCoveredCountries(
   return entries;
 }
 
-/** ISO3 → human-readable country name for the small set we visualise. */
+/** ISO3 -> human-readable country names for the drift dataset. */
 export const COUNTRY_NAME: Record<string, string> = {
   USA: "United States",
   GBR: "United Kingdom",
@@ -146,6 +146,27 @@ export const COUNTRY_NAME: Record<string, string> = {
   YUG: "Yugoslavia",
   CSK: "Czechoslovakia",
   SUN: "Soviet Union",
+  AFG: "Afghanistan",
+  AGO: "Angola",
+  BGR: "Bulgaria",
+  BLR: "Belarus",
+  CIV: "Cote d'Ivoire",
+  COD: "Democratic Republic of the Congo",
+  CRI: "Costa Rica",
+  DZA: "Algeria",
+  IRQ: "Iraq",
+  KAZ: "Kazakhstan",
+  KHM: "Cambodia",
+  KWT: "Kuwait",
+  LAO: "Laos",
+  MAR: "Morocco",
+  MMR: "Myanmar",
+  PNG: "Papua New Guinea",
+  SEN: "Senegal",
+  SYR: "Syria",
+  TUN: "Tunisia",
+  TWN: "Taiwan",
+  UKR: "Ukraine",
 };
 
 export function countryName(iso3: string): string {
