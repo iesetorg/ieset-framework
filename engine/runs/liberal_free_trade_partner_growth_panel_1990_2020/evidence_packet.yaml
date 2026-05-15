@@ -1,0 +1,280 @@
+packet_version: 1
+generated_utc: '2026-05-15T17:26:37+00:00'
+repository:
+  root: .
+  git_commit: bef05e1156e2f749f4c17fc10b30223f110d56d9
+hypothesis:
+  id: liberal_free_trade_partner_growth_panel_1990_2020
+  legacy_id: null
+  path: hypotheses/trade/liberal_free_trade_partner_growth_panel_1990_2020.yaml
+  school: null
+  topic: trade
+  claim: "Across countries 1990-2020, accession to a substantive free-trade agreement\
+    \ (FTA) \u2014 defined as a WTO-notified preferential-trade agreement going beyond\
+    \ MFN with measurable bilateral tariff reductions \u2014 is followed by higher\
+    \ trade openness and higher per-capita real GDP growth in the post-accession 5-year\
+    \ window than in the matched pre-accession 5-year window. The Ricardian / Smithian\
+    \ claim is that voluntary trade liberalisation between partners produces measurable\
+    \ growth gains via specialisation, scale, and cheaper imported inputs; the test\
+    \ is a panel of FTA-accession events using country-year fixed effects to absorb\
+    \ global trends and country idiosyncrasies.\n"
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "ATT=-4.069, p=0.264, N=1342, treated_countries=61 (above \u03B1=0.10)"
+  status: null
+preregistration:
+  claim: "Across countries 1990-2020, accession to a substantive free-trade agreement\
+    \ (FTA) \u2014 defined as a WTO-notified preferential-trade agreement going beyond\
+    \ MFN with measurable bilateral tariff reductions \u2014 is followed by higher\
+    \ trade openness and higher per-capita real GDP growth in the post-accession 5-year\
+    \ window than in the matched pre-accession 5-year window. The Ricardian / Smithian\
+    \ claim is that voluntary trade liberalisation between partners produces measurable\
+    \ growth gains via specialisation, scale, and cheaper imported inputs; the test\
+    \ is a panel of FTA-accession events using country-year fixed effects to absorb\
+    \ global trends and country idiosyncrasies.\n"
+  falsification_rule: "SUPPORTED if both (a) the average treatment effect on the treated\
+    \ for FTA accession on 5yr-post real-GDP-per-capita cumulative log-growth is positive\
+    \ and significant at p<0.05, AND (b) the corresponding ATT on 5yr-post trade-openness\
+    \ is positive and significant at p<0.05 (mechanism check). PARTIAL if (b) holds\
+    \ but (a) is insignificant \u2014 accession increased trade but didn't measurably\
+    \ move growth, the weak Ricardian win. REFUTED if (a) is wrong-signed at p<0.05.\
+    \ INFORMATIVE: drop EU-accession events; the coefficient should survive at >50%\
+    \ of full-sample magnitude.\n"
+  threshold: "PRIMARY: cs_did_ATT(growth_5yr_post) > 0 at p<0.05 AND cs_did_ATT(openness_5yr_post)\
+    \ > 0 at p<0.05. INFORMATIVE: ex-EU coefficient retained at >=0.5 \xD7 full-sample\
+    \ magnitude.\n"
+  estimator:
+    template: did_callaway_santanna
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: 'Staggered DiD using Callaway-Sant''Anna estimator on the FTA- accession
+      events. Pre-accession trend growth is included as a control to attenuate the
+      parallel-trends violation that typically plagues FTA-event studies. Robustness:
+      drop EU- accession events (which are bundled with substantial institutional
+      reforms and may inflate the estimate).
+
+      '
+  steelman: hypotheses/steelman/liberal_free_trade_partner_growth_panel_1990_2020.md
+reproduction:
+  run_dir: engine/runs/liberal_free_trade_partner_growth_panel_1990_2020
+  runner: scripts/run_did_callaway_santanna.py
+  replication_script: engine/runs/liberal_free_trade_partner_growth_panel_1990_2020/replication.py
+  suggested_command: python engine/runs/liberal_free_trade_partner_growth_panel_1990_2020/replication.py
+data:
+  inputs:
+  - name: trade_openness_pct_gdp_5yr_post
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: real_gdp_pc_growth_5yr_post
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: fta_accession_indicator
+    publisher: cepii
+    series_id: fta_accession_indicator
+    vintage_file: data/vintages/cepii/fta_accession_indicator@2026-05-15T172455Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3125c268836d9e1e66d018d4b7d0acf3a7c918bd9f7fd77c3814109f65c09645
+      computed_sha256: 3125c268836d9e1e66d018d4b7d0acf3a7c918bd9f7fd77c3814109f65c09645
+      status: match
+    source:
+      type: official
+      url: https://www.cepii.fr/DATA_DOWNLOAD/gravity/data/Gravity_csv_V202211.zip
+      methodology_url: https://www.cepii.fr/DATA_DOWNLOAD/gravity/doc/Gravity_documentation.pdf
+      license: null
+      fetch_utc: null
+      fetch_manifest: data/manifests/fetch_run_2026-05-15T172455Z_cepii_fta_accession.yaml
+    coverage:
+      start_date: 1948
+      end_date: 2020
+      frequency: annual
+      rows: 17739
+      units: binary indicator for first year with expanded WTO RTA partner coverage,
+        1990+
+      currency: null
+    extra: {}
+  - name: investment_share
+    publisher: world_bank_wdi
+    series_id: NE.GDI.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      computed_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:59.823578+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross capital formation (% of GDP)
+      source_note: Gross capital formation includes acquisitions less disposals of
+        produced assets for purposes of fixed capital formation, inventories or valuables.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: wgi_rule_of_law
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_RL.EST@2026-05-05T195218Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:52:18.004745+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: Rule of Law - Governance estimate (approx. -2.5 to +2.5)
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 5
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 5
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/trade/liberal_free_trade_partner_growth_panel_1990_2020.yaml
+  sha256: 5c9ec5be5a495a3c0cf5e67313ef5f1c201be4c8a36c62102f28fc92addaea99
+  bytes: 6088
+- path: engine/runs/liberal_free_trade_partner_growth_panel_1990_2020/manifest.yaml
+  sha256: fe3857199b858e62e3d2d310869b40c80d388cf27c11a1d2688ed109115a3f86
+  bytes: 2724
+- path: engine/runs/liberal_free_trade_partner_growth_panel_1990_2020/diagnostics.json
+  sha256: 1a82974e200c437b2fff17cefb0df92749994fcde04593ba15d6eae24c69d9ce
+  bytes: 3370
+- path: engine/runs/liberal_free_trade_partner_growth_panel_1990_2020/result_card.md
+  sha256: 9ce05d2e86cff496ee5d9ad2bf99eca36ee823ebdbe54781de773fe937f84470
+  bytes: 2846
+- path: engine/runs/liberal_free_trade_partner_growth_panel_1990_2020/replication.py
+  sha256: ca877897639a5e323e2451f28634bc8fca7df39735c997896dcd58d560895c60
+  bytes: 746
+- path: hypotheses/steelman/liberal_free_trade_partner_growth_panel_1990_2020.md
+  sha256: 140c2ba4a984cbfdce6aa1093dd4b19228be7a0c46f5f6e978db117fc5a36265
+  bytes: 2650
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://databank.worldbank.org/source/world-development-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: cepii
+  series_id: fta_accession_indicator
+  url: https://www.cepii.fr/DATA_DOWNLOAD/gravity/data/Gravity_csv_V202211.zip
+- kind: methodology
+  publisher: cepii
+  series_id: fta_accession_indicator
+  url: https://www.cepii.fr/DATA_DOWNLOAD/gravity/doc/Gravity_documentation.pdf
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+caveats:
+- The generic DID runner estimates the first CEPII-derived FTA expansion cohort as
+  a post-treatment indicator. This is a broad country-year accession proxy, not a
+  treaty-by-treaty depth model.
+- 'The verdict is partial: the estimated effect is negative and statistically insignificant,
+  so this does not provide clean support for the broad FTA-growth claim.'
