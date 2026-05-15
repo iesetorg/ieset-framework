@@ -175,7 +175,7 @@ def main() -> None:
         and "usdol:state_minimum_wage_history" in available
     )
     can_run_oecd = (
-        "oecd:MWUSD_minimum_to_median_wage_ratio" in available
+        "oecd:MWUSD" in available
         and "oecd:DSD_LMS_low_education_unemployment_rate" in available
     )
 
@@ -192,12 +192,19 @@ def main() -> None:
             "minimum-wage history, and (c) the BLS OES state "
             "median-hourly-wage panel. On-disk BLS vintages currently "
             "include only national LNS/CES/CUUR series; the state "
-            "fan-out has not been fetched. Cross-country OECD MWUSD "
-            "bite-ratio fallback is also absent. No coefficients computed."
+            "fan-out has not been fetched. OECD contextual panels are "
+            "present but cannot replace the preregistered US state "
+            "cohort design. No coefficients computed."
         )
 
         diagnostics = {
             "verdict": verdict,
+            "hold_status": "HOLD",
+            "hold_reason": (
+                "Minimum-wage bundle remains on hold until sibling-panel "
+                "signs reconcile with the preregistered high-bite "
+                "disemployment direction."
+            ),
             "all_pass": False,
             "method_valid": False,
             "data_gap": True,
@@ -236,6 +243,10 @@ def main() -> None:
             "period": list(PERIOD),
             "exclude_years": sorted(EXCLUDE_YEARS),
             "countries_oecd": OECD_COUNTRIES,
+            "caveats": [
+                "HOLD: minimum-wage bundle should not be promoted until sibling-panel signs reconcile.",
+                "OECD contextual panels are present but cannot replace the preregistered US state cohort design.",
+            ],
         }
         (OUT_DIR / "diagnostics.json").write_text(
             json.dumps(diagnostics, indent=2) + "\n"
@@ -262,8 +273,8 @@ def main() -> None:
                 f"{len(REQUIRED_OUTCOME) + len(REQUIRED_TREATMENT)} required "
                 "primary state-panel series not yet fetched. Stratified "
                 "Callaway-Sant'Anna DiD on US-state bite-ratio cohorts "
-                "cannot be estimated; OECD cross-country bite-ratio fallback "
-                "is also absent."
+                "cannot be estimated; OECD contextual panels cannot replace "
+                "the preregistered state cohort design."
             ),
             "type": "line",
             "x_axis": {"label": "Year", "type": "linear"},
@@ -283,6 +294,14 @@ def main() -> None:
                             + missing_border
                             + missing_oecd
                         )
+                    ),
+                },
+                {
+                    "type": "note",
+                    "label": (
+                        "HOLD: do not promote this bundle until sibling-panel "
+                        "signs reconcile with the preregistered high-bite "
+                        "disemployment direction."
                     ),
                 },
                 {
@@ -356,6 +375,8 @@ def main() -> None:
             f"- Missing treatment: {missing_treatment or '(none)'}.",
             f"- Missing border-pair: {missing_border or '(none)'}.",
             f"- Missing OECD cross-country: {missing_oecd or '(none)'}.",
+            "- Hold marker: HOLD until sibling-panel signs reconcile with "
+            "the preregistered high-bite disemployment direction.",
             "",
             "## Method",
             "",
@@ -398,15 +419,15 @@ def main() -> None:
         card.append("")
         card.append(
             "Promotion verdict: inconclusive (method-validity gate fails on "
-            "data availability — state-level BLS series and OECD MWUSD "
-            "bite-ratio are not on disk; the BLS fetcher currently exposes "
-            "only national LNS/CES/CUUR series, and the OECD harvester does "
-            "not cover the MWUSD dataflow). Per HANDOFF_TO_RUN_AGENT.md a "
+            "data availability — the primary state-level BLS outcome and "
+            "median-wage bite-ratio inputs are not on disk; OECD contextual "
+            "panels are present but cannot replace the preregistered US "
+            "state cohort design). Per HANDOFF_TO_RUN_AGENT.md a "
             "data gap is NOT a refutation — the scoreboard treats this as "
             "neutral. Re-run when (a) the BLS state fan-out lands "
             "(LAU state teen E/P panel, OES state median hourly wage), "
-            "(b) the USDOL state-minimum-wage history is dropped, and "
-            "(c) the OECD MWUSD bite-ratio dataflow is harvested."
+            "and (b) sibling-panel signs reconcile with the preregistered "
+            "high-bite disemployment direction."
         )
         (OUT_DIR / "result_card.md").write_text("\n".join(card) + "\n")
 

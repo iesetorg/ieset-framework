@@ -8,15 +8,20 @@ entry estimates.
 from __future__ import annotations
 
 import json
+import importlib.util
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
-from scripts import run_panel_fe  # noqa: E402
+RUN_PANEL_FE = ROOT / "scripts" / "run_panel_fe.py"
+spec = importlib.util.spec_from_file_location("run_panel_fe", RUN_PANEL_FE)
+if spec is None or spec.loader is None:
+    raise ImportError(f"Cannot load {RUN_PANEL_FE}")
+run_panel_fe = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = run_panel_fe
+spec.loader.exec_module(run_panel_fe)
 
 
 HYPOTHESIS_ID = "capital_gains_tax_cut_investment_response_panel"

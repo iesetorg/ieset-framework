@@ -233,6 +233,8 @@ def main() -> int:
     manifest = {
         "hypothesis_id": HYPOTHESIS_ID,
         "generated_utc": generated_utc,
+        "verdict_label": verdict,
+        "verdict_detail": detail,
         "sources": sources,
         "vintages": {
             key: {
