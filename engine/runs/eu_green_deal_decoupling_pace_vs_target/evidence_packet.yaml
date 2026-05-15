@@ -1,0 +1,208 @@
+packet_version: 1
+generated_utc: '2026-05-15T20:48:51+00:00'
+repository:
+  root: .
+  git_commit: ed4e9e69d29b23d798cc07dcac70bdc336108b5b
+hypothesis:
+  id: eu_green_deal_decoupling_pace_vs_target
+  legacy_id: null
+  path: hypotheses/growth/eu_green_deal_decoupling_pace_vs_target.yaml
+  school: null
+  topic: growth
+  claim: EU Green Deal 2020-present emissions reductions have outpaced aggregate GDP
+    growth, showing partial decoupling, but at rates still below 1.5C-consistent pathways.
+verdict:
+  raw: "SUPPORTED \u2014 EU panel shows partial decoupling 2019->2023: mean per-capita\
+    \ CO2 -18.3%, mean per-capita real GDP +4.6%. 13/16 countries showed both falling\
+    \ emissions and rising GDP. Pace is BELOW 1.5C path: 2023 mean emissions at 83%\
+    \ of 2019 vs benchmark 82% (gap +2pp). 11/16 above the 1.5C share."
+  bucket: supported
+  reason: null
+  status: null
+preregistration:
+  claim: EU Green Deal 2020-present emissions reductions have outpaced aggregate GDP
+    growth, showing partial decoupling, but at rates still below 1.5C-consistent pathways.
+  falsification_rule: 'PRIMARY (dispositive, both required for SUPPORTED): (1) Relative
+    decoupling 2019->2023: mean per-capita CO2 log-change across the 16-country EU
+    panel is at most -2% AND mean per-capita real GDP log-change is at least +1%.
+    (2) Pace insufficient vs 1.5C path: mean 2023 per-capita CO2 (as a fraction of
+    2019) is strictly above the linear 1.5C-consistent benchmark for 2023, where the
+    benchmark is the linear path from 2019 = 1.0 to 2030 = 0.50 (benchmark at 2023
+    ~= 0.818). REFUTED if neither leg holds (no decoupling AND pace is on/below 1.5C
+    path). PARTIAL if exactly one leg holds. INFORMATIVE: country-level dispersion
+    of the two legs reported in diagnostics.json. METHOD_VALID: at least 12 of 16
+    panel countries must have both 2019 and 2023 observations on OWID co2-emissions-per-capita
+    and on WDI NY.GDP.MKTP.KD / SP.POP.TOTL; otherwise verdict is inconclusive.'
+  threshold: 'PRIMARY: mean(log_change_co2_pc, 2019->2023) <= -0.02 AND mean(log_change_gdpc_pc,
+    2019->2023) >= +0.01 AND mean(co2_2023 / co2_2019) > benchmark_fraction_2023 (=
+    0.818).'
+  estimator:
+    template: descriptive
+    clustering: none
+    notes: 'Descriptive comparison of EU emissions trajectory (territorial and consumption-based
+      CO2) against real GDP growth and against the linear 1.5C-consistent pathway
+      2020-2050. Reports the pace of relative and absolute decoupling and the gap
+      to the target trajectory.
+
+      '
+  steelman: null
+reproduction:
+  run_dir: engine/runs/eu_green_deal_decoupling_pace_vs_target
+  runner: null
+  replication_script: engine/runs/eu_green_deal_decoupling_pace_vs_target/replication.py
+  suggested_command: python engine/runs/eu_green_deal_decoupling_pace_vs_target/replication.py
+data:
+  inputs:
+  - name: real_gdp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.MKTP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD@2026-05-05T194653Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 48246a85b73c7168a3a8abbf9f68e233b811524a4be095cd3d7a9cd3a28da702
+      computed_sha256: 48246a85b73c7168a3a8abbf9f68e233b811524a4be095cd3d7a9cd3a28da702
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:53.195277+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. This indicator
+        is expressed in constant prices, meaning the series has been adjusted to account
+        for price changes over '
+      countries_param: all
+      vintage_utc: null
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      computed_sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.TOTL
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:26.845195+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population, total
+      source_note: Total population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship. The
+        values shown are midyear estimates.
+      countries_param: all
+      vintage_utc: null
+  - name: co2_emissions_per_capita
+    publisher: owid
+    series_id: co2-emissions-per-capita
+    vintage_file: data/vintages/owid/co2-emissions-per-capita@2026-05-05T195318Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 9d9862437aa089012e43dba4c665168984f50247b120c7fbe5399c3714dc0ed9
+      computed_sha256: 9d9862437aa089012e43dba4c665168984f50247b120c7fbe5399c3714dc0ed9
+      status: match
+    source:
+      type: official
+      url: https://ourworldindata.org/grapher/co2-emissions-per-capita.csv
+      methodology_url: https://ourworldindata.org/grapher/co2-emissions-per-capita
+      license: cc_by_4_0
+      fetch_utc: '2026-05-05T19:53:18.912220+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1750'
+      end_date: '2024'
+      frequency: annual
+      rows: 26509
+      units: per chart (see OWID page for units)
+      currency: null
+    extra:
+      resolved_series_id: co2-emissions-per-capita
+      value_column: null
+      n_columns: 4
+      columns:
+      - country_name
+      - country_iso3
+      - year
+      - "CO\xE2\x82\x82 emissions per capita"
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 3
+    official_source_count: 3
+    manual_source_count: 0
+    hash_status_counts:
+      match: 3
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/growth/eu_green_deal_decoupling_pace_vs_target.yaml
+  sha256: 8cc0d94b3c71c1570cafcd703c56a7faaffc8fa5765e57a19b360a403f1d0135
+  bytes: 5148
+- path: engine/runs/eu_green_deal_decoupling_pace_vs_target/manifest.yaml
+  sha256: 056e811970009718104c7a0b7b9224e74231feb71991e9bdcb5981b3b9b2acde
+  bytes: 826
+- path: engine/runs/eu_green_deal_decoupling_pace_vs_target/diagnostics.json
+  sha256: 0aeceba65019c35dbd48e1671c0901bd0ce1cef35eb55d7aaa7419fc37f5f046
+  bytes: 2474
+- path: engine/runs/eu_green_deal_decoupling_pace_vs_target/result_card.md
+  sha256: 1e09db281bde3f13e0ac28c3a857859923d62f5e23fbe7776b86189827b55f38
+  bytes: 1939
+- path: engine/runs/eu_green_deal_decoupling_pace_vs_target/replication.py
+  sha256: 84acfbe9c786af3eb776693edd7ce4461992e065354ce8263598ef3f03992dca
+  bytes: 18051
+- path: engine/runs/eu_green_deal_decoupling_pace_vs_target/coefficients.parquet
+  sha256: 83af443abdda45148924d8ffc28fec128728f07df89124902ba851b2647618a5
+  bytes: 2387
+- path: engine/runs/eu_green_deal_decoupling_pace_vs_target/chart_data.json
+  sha256: 8b3e385006ae4de17b5989cf44d9dffa1fd9804ad33e4e5ebfdc831b4acaa071
+  bytes: 21237
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://data.worldbank.org/indicator/SP.POP.TOTL
+- kind: source
+  publisher: owid
+  series_id: co2-emissions-per-capita
+  url: https://ourworldindata.org/grapher/co2-emissions-per-capita.csv
+- kind: methodology
+  publisher: owid
+  series_id: co2-emissions-per-capita
+  url: https://ourworldindata.org/grapher/co2-emissions-per-capita
+caveats: []

@@ -12,7 +12,7 @@
   - EU-12 mean delta (post − pre): +19.09 pp.
   - Non-EU OECD mean delta (post − pre): +7.28 pp.
 
-- **Informative (PWT rtfpna DiD):** +0.0050 index points (no gating threshold; reported for context).
+- **Informative (PWT rtfpna DiD):** -0.0042 index points (no gating threshold; reported for context).
 
 ## Method
 

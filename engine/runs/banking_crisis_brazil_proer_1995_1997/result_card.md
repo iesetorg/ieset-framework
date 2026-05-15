@@ -2,11 +2,11 @@
 
 **Verdict:** supported
 
-**Reason:** 3 of 4 metrics met threshold (support threshold 3)
+**Reason:** 4 of 4 metrics met threshold (support threshold 3)
 
 Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impossible to hit support).
 
-**Counts:** 3 MET · 0 NOT_MET · 0 PENDING_DATA · 1 PENDING_EVAL
+**Counts:** 4 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 
 **Primary country:** BRA
 
@@ -17,7 +17,7 @@ Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impos
 | 1 | proer_facility_creation_1995 | MET | 1 (1995) [yes_no_indicator_max] | `yes/no — yes counts as breach` | yes/no event evaluated from binary event indicator |
 | 2 | bank_interventions_1995_1997 | MET | 3 (1997) [event_count_indicator_max] | `all three interventions executed by 1997` | all-three event threshold evaluated from coded count |
 | 3 | laeven_valencia_systemic_banking_crisis | MET | 1 (1995) [coded_yes_indicator_max] | `coded yes (recognising PROER episode counts as systemic in LV)` | coded YES evaluated from binary event indicator |
-| 4 | real_gdp_growth_undisturbed | PENDING_EVAL | 0 (1995) [pct_increase_from_baseline] | `annual growth >= 2% in each year (negative-control: PROER pre-empted macro spillover)` | threshold expression unparseable by regex |
+| 4 | real_gdp_growth_undisturbed | MET | 2.21 (1997) [annual_growth_rate_value] | `annual growth >= 2% in each year (negative-control: PROER pre-empted macro spillover)` | annual growth values: 1995=4.224, 1996=2.209, 1997=3.395; threshold each >=2 |
 
 ## Claim
 
@@ -25,7 +25,7 @@ Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impos
 
 ## Interpretation
 
-The canonical-case pattern match is satisfied: 3 of 4 pre-registered metrics meet their thresholds, above the support threshold of 3. Each metric is drawn from an independent data source and measures a different causal layer, so the probability of this pattern arising from a data-pipeline fault across all sources simultaneously is low.
+The canonical-case pattern match is satisfied: 4 of 4 pre-registered metrics meet their thresholds, above the support threshold of 3. Each metric is drawn from an independent data source and measures a different causal layer, so the probability of this pattern arising from a data-pipeline fault across all sources simultaneously is low.
 
 ## Steelman live concerns
 

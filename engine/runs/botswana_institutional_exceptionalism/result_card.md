@@ -16,10 +16,10 @@
 
 - Donor pool (post-fit-coverage filter): ['ZMB', 'ZWE', 'NGA', 'AGO', 'COD', 'GAB', 'GHA', 'CIV', 'NAM', 'ZAF']
 - Pre-fit window: 1966-1975; treatment year: 1976
-- Pre-fit RMSE (log): 0.3547897430309286
+- Pre-fit RMSE (log): 0.35478974303094146
 - Donor weights (>0.5%): COD=0.85, NGA=0.15
-- Post-treatment mean log-gap: 2.0313779359684454
-- Post-treatment mean level gap: 662.4585314023415%
+- Post-treatment mean log-gap: 2.031377907067469
+- Post-treatment mean level gap: 662.4585093665457%
 - 2023 terminal log-gap: None
 
 ## Growth gap
