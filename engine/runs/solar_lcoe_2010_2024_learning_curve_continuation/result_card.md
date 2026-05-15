@@ -1,26 +1,28 @@
-# Result card — solar_lcoe_2010_2024_learning_curve_continuation
+# Result card - solar_lcoe_2010_2024_learning_curve_continuation
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome variable loaded; missing: ['irena:solar_pv_costs', 'irena:lcoe_solar_pv', 'constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/.', 'constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending.']
+**Verdict:** partial - Headline learning curve continued and 2024 LCOE is below 2019, but the post-2020 interaction shows statistically visible flattening and the module/BOS component checks remain unavailable in the current local data.
 
-## Pre-registration
-- **Claim:** The photovoltaic (PV) learning curve — log cost of utility-scale solar modules and levelised cost of electricity (LCOE) declining linearly in log cumulative installed capacity at a learning rate of approximately 20-25% per doubling — continued through the 2020-2024 period despite (a) the COVID supply-chain shock 2020-2022, (b) the 2022 polysilicon + freight-rate spike, (c) the 2022-2023 inflation shock that reversed cost declines in many other capital-equipment classes, (d) US + EU trade defences against Chinese modules. Specifically, global utility- scale solar module prices ($/W) and LCOE ($/MWh) by 2024 were lower than 2019 levels in real terms despite the macro inflation shock, and the implied 2010-2024 learning rate is statistically indistinguishable from the 2010-2019 learning rate. This is a sharp test against the alternative hypothesis that the PV learning curve flattened post-2020 due to commoditisation + supply-chain pressures.
-- **Falsification rule:** Not supported if (a) β_full < 0.7 × β_pre (learning rate flattened by more than 30%), OR (b) Chow-test for break in 2020-2022 rejects no-break at p<0.10 with break that is a slowdown, OR (c) module $/W in 2024 exceeds 2019 real $/W (no progress despite cumulative capacity tripling), OR (d) the BOS-cost component shows zero or positive learning rate (BOS-cost learning has historically been weaker; if it has flatlined entirely, LCOE story is more fragile).
-- **Falsification test:** solar_learning_curve_2010_2024
+## Plain-English Brief
+Solar power kept getting cheaper after the 2020 supply-chain and inflation shocks, but not quite as cleanly as the strongest version of the hypothesis predicted.
 
-## Estimate
-- _Error:_ no outcome variable loaded; missing: ['irena:solar_pv_costs', 'irena:lcoe_solar_pv', 'constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/.', 'constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending.']
+## What Was Measured
+- Global utility-scale solar PV LCOE from IRENA, in 2024 USD per MWh.
+- Global installed solar PV capacity, summed from the IRENA country panel.
+- The learning-curve slope: how much cost falls when cumulative capacity doubles.
+- A post-2020 slowdown check: whether the cost decline visibly flattened after the shock period.
 
-## Variables resolved
+## Result
+- 2010-2019 learning rate per doubling: **38.8%**.
+- 2010-2024 learning rate per doubling: **36.8%**.
+- Full-sample slope retained **93.5%** of the pre-2020 slope.
+- Solar LCOE moved from **$68.64/MWh in 2019** to **$42.62/MWh in 2024**.
+- Post-2020 flattening interaction: coefficient **0.311**, p-value **0.005**.
 
-### Variables missing data
-- `irena:solar_pv_costs` (outcome, name=log_solar_pv_module_price_usd_per_w) — vintage not on disk
-- `irena:lcoe_solar_pv` (outcome, name=log_solar_pv_lcoe_usd_per_mwh) — vintage not on disk
-- `constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/.` (outcome, name=log_polysilicon_spot_price_usd_per_kg) — vintage not on disk
-- `constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending.` (outcome, name=log_solar_module_efficiency_pct) — vintage not on disk
-- `irena:capacity` (treatment, name=log_cumulative_installed_solar_capacity_gw) — vintage not on disk
-- `constructed: indicator = 1 from 2020-Q1 onwards (COVID supply-chain shock + subsequent commodity + freight inflation).` (treatment, name=post_2020_inflation_shock_dummy) — vintage not on disk
-- `imf_pcps:POILBRE` (controls, name=log_brent_oil) — vintage not on disk
-- `imf_pcps:PMETA` (controls, name=log_industrial_metals_index) — vintage not on disk
-- `fred:CPIAUCSL` (controls, name=log_us_cpi) — vintage not on disk
+## Why This Is Partial
+The main cost decline clearly continued: 2024 is far below 2019, and the full-period learning slope is close to the pre-2020 slope. But the stricter pre-registration also asked for no statistically visible post-2020 slowdown and for module/BOS component checks. The slowdown check is visible, and the component data is not in the current local dataset.
 
-_Generated by `scripts/run_panel_fe.py` at 2026-04-30T09:47:25+00:00_
+## Sources
+- `data/vintages/irena/lcoe_solar_pv@2026-05-12T125721Z.parquet`
+- `data/vintages/irena/installed_capacity_solar_pv@2026-05-05T212314Z.parquet`
+
+_Generated by `replication.py` at 2026-05-15T15:34:44+00:00_

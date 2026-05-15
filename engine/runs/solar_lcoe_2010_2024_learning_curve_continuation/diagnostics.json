@@ -1,65 +1,119 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded; missing: ['irena:solar_pv_costs', 'irena:lcoe_solar_pv', 'constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/.', 'constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending.']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded; missing: ['irena:solar_pv_costs', 'irena:lcoe_solar_pv', 'constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/.', 'constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending.']",
   "hypothesis_id": "solar_lcoe_2010_2024_learning_curve_continuation",
-  "template": "panel_fe",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "Not supported if (a) \u03b2_full < 0.7 \u00d7 \u03b2_pre (learning rate flattened by more than 30%), OR (b) Chow-test for break in 2020-2022 rejects no-break at p<0.10 with break that is a slowdown, OR (c) module $/W in 2024 exceeds 2019 real $/W (no progress despite cumulative capacity tripling), OR (d) the BOS-cost component shows zero or positive learning rate (BOS-cost learning has historically been weaker; if it has flatlined entirely, LCOE story is more fragile).\n",
-  "falsification_test_text": "solar_learning_curve_2010_2024",
-  "estimate": {
-    "error": "no outcome variable loaded; missing: ['irena:solar_pv_costs', 'irena:lcoe_solar_pv', 'constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/.', 'constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending.']"
+  "verdict_label": "partial",
+  "verdict_reason": "Headline learning curve continued and 2024 LCOE is below 2019, but the post-2020 interaction shows statistically visible flattening and the module/BOS component checks remain unavailable in the current local data.",
+  "pre_2010_2019": {
+    "n": 10,
+    "beta_log_cost_on_log_capacity": -0.7089872745045523,
+    "learning_rate_per_capacity_doubling": 0.3882505834357016,
+    "p_value": 4.553586547887244e-09,
+    "r_squared": 0.9886530616184007
   },
-  "data_status": {
-    "variables_loaded": [],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "log_solar_pv_module_price_usd_per_w",
-        "source": "irena:solar_pv_costs"
-      },
-      {
-        "role": "outcome",
-        "name": "log_solar_pv_lcoe_usd_per_mwh",
-        "source": "irena:lcoe_solar_pv"
-      },
-      {
-        "role": "outcome",
-        "name": "log_polysilicon_spot_price_usd_per_kg",
-        "source": "constructed: BloombergNEF / PV InfoLink polysilicon spot index, monthly. Manual-drop pending under data/manual/derived/."
-      },
-      {
-        "role": "outcome",
-        "name": "log_solar_module_efficiency_pct",
-        "source": "constructed: ITRPV (International Technology Roadmap for Photovoltaic) annual industry-average mono-PERC + TOPCon + heterojunction efficiency. Manual-drop pending."
-      },
-      {
-        "role": "treatment",
-        "name": "log_cumulative_installed_solar_capacity_gw",
-        "source": "irena:capacity"
-      },
-      {
-        "role": "treatment",
-        "name": "post_2020_inflation_shock_dummy",
-        "source": "constructed: indicator = 1 from 2020-Q1 onwards (COVID supply-chain shock + subsequent commodity + freight inflation)."
-      },
-      {
-        "role": "controls",
-        "name": "log_brent_oil",
-        "source": "imf_pcps:POILBRE"
-      },
-      {
-        "role": "controls",
-        "name": "log_industrial_metals_index",
-        "source": "imf_pcps:PMETA"
-      },
-      {
-        "role": "controls",
-        "name": "log_us_cpi",
-        "source": "fred:CPIAUCSL"
-      }
-    ]
+  "full_2010_2024": {
+    "n": 15,
+    "beta_log_cost_on_log_capacity": -0.662579048683957,
+    "learning_rate_per_capacity_doubling": 0.36825206378460473,
+    "p_value": 1.1753750324924672e-13,
+    "r_squared": 0.9870438248702216
   },
-  "run_utc": "2026-04-30T09:47:25+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "slope_retention_full_vs_pre": 0.9345429354101935,
+  "post_2020_interaction": {
+    "coefficient": 0.3110236732927637,
+    "p_value": 0.005100581124997119,
+    "r_squared": 0.9941922338734638
+  },
+  "lcoe_2019_2024": {
+    "lcoe_2019_2024_usd_per_mwh": 68.64203752628606,
+    "lcoe_2024_2024_usd_per_mwh": 42.61977004531659,
+    "percent_change": -37.91010351492611
+  },
+  "criteria": {
+    "full_slope_retains_at_least_85pct_of_pre_2020_slope": true,
+    "lcoe_2024_below_2019": true,
+    "post_2020_slowdown_not_significant_at_10pct": false,
+    "module_price_and_bos_components_available": false
+  },
+  "input_vintages": {
+    "irena_lcoe_solar_pv": "data/vintages/irena/lcoe_solar_pv@2026-05-12T125721Z.parquet",
+    "irena_installed_capacity_solar_pv": "data/vintages/irena/installed_capacity_solar_pv@2026-05-05T212314Z.parquet"
+  },
+  "panel": [
+    {
+      "year": 2010,
+      "solar_lcoe_2024_usd_per_mwh": 416.9561538738537,
+      "global_solar_capacity_mw": 41209.35
+    },
+    {
+      "year": 2011,
+      "solar_lcoe_2024_usd_per_mwh": 349.90243801537684,
+      "global_solar_capacity_mw": 72240.06999999999
+    },
+    {
+      "year": 2012,
+      "solar_lcoe_2024_usd_per_mwh": 260.02211662110886,
+      "global_solar_capacity_mw": 102573.76
+    },
+    {
+      "year": 2013,
+      "solar_lcoe_2024_usd_per_mwh": 200.22081792983846,
+      "global_solar_capacity_mw": 138838.38
+    },
+    {
+      "year": 2014,
+      "solar_lcoe_2024_usd_per_mwh": 182.8659778830015,
+      "global_solar_capacity_mw": 178487.0
+    },
+    {
+      "year": 2015,
+      "solar_lcoe_2024_usd_per_mwh": 135.1051695087876,
+      "global_solar_capacity_mw": 227246.0
+    },
+    {
+      "year": 2016,
+      "solar_lcoe_2024_usd_per_mwh": 118.34881198627744,
+      "global_solar_capacity_mw": 300510.56
+    },
+    {
+      "year": 2017,
+      "solar_lcoe_2024_usd_per_mwh": 92.94475340248562,
+      "global_solar_capacity_mw": 398165.07
+    },
+    {
+      "year": 2018,
+      "solar_lcoe_2024_usd_per_mwh": 78.64044173006133,
+      "global_solar_capacity_mw": 498847.29
+    },
+    {
+      "year": 2019,
+      "solar_lcoe_2024_usd_per_mwh": 68.64203752628606,
+      "global_solar_capacity_mw": 606689.68
+    },
+    {
+      "year": 2020,
+      "solar_lcoe_2024_usd_per_mwh": 60.99978009008258,
+      "global_solar_capacity_mw": 743458.98
+    },
+    {
+      "year": 2021,
+      "solar_lcoe_2024_usd_per_mwh": 54.526169305804885,
+      "global_solar_capacity_mw": 894617.28
+    },
+    {
+      "year": 2022,
+      "solar_lcoe_2024_usd_per_mwh": 51.09163828124907,
+      "global_solar_capacity_mw": 1092969.23
+    },
+    {
+      "year": 2023,
+      "solar_lcoe_2024_usd_per_mwh": 42.377860773002794,
+      "global_solar_capacity_mw": 1464948.3
+    },
+    {
+      "year": 2024,
+      "solar_lcoe_2024_usd_per_mwh": 42.61977004531659,
+      "global_solar_capacity_mw": 1933302.04
+    }
+  ],
+  "run_utc": "2026-05-15T15:34:44+00:00",
+  "runner": "engine/runs/solar_lcoe_2010_2024_learning_curve_continuation/replication.py"
 }
