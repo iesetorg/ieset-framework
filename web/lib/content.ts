@@ -320,7 +320,7 @@ export async function loadChartData(hypothesisId: string): Promise<unknown | nul
   const path = join(REPO_ROOT, "engine", "runs", hypothesisId, "chart_data.json");
   if (!existsSync(path)) return null;
   const raw = await readFile(path, "utf8");
-  const parsed = JSON.parse(raw);
+  const parsed = parseJsonArtifact(raw, path);
 
   // Only hand the chart component payloads matching its supported line-chart
   // contract. Several run generators write tabular diagnostics to
@@ -328,6 +328,20 @@ export async function loadChartData(hypothesisId: string): Promise<unknown | nul
   // chart crashes on hydration because they do not have `series[].points`.
   if (!isLineChartPayload(parsed)) return null;
   return parsed;
+}
+
+function parseJsonArtifact(raw: string, path: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    const sanitized = raw.replace(
+      /([:[,]\s*)(?:NaN|-?Infinity)(\s*[,}\]])/g,
+      "$1null$2"
+    );
+    if (sanitized !== raw) return JSON.parse(sanitized);
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Could not parse JSON artifact ${path}: ${msg}`);
+  }
 }
 
 function isLineChartPayload(value: unknown): boolean {
@@ -385,7 +399,10 @@ export async function loadRunArtifacts(hypothesisId: string): Promise<RunArtifac
     const diagPath = join(runDir, "diagnostics.json");
     if (existsSync(diagPath)) {
       try {
-        out.diagnostics = JSON.parse(await readFile(diagPath, "utf8"));
+        out.diagnostics = parseJsonArtifact(
+          await readFile(diagPath, "utf8"),
+          diagPath
+        ) as Record<string, unknown>;
         out.verdict = out.diagnostics?.verdict as string | undefined;
       } catch {
         /* ignore */
