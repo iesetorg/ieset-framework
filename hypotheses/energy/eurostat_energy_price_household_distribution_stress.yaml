@@ -1,11 +1,12 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: eurostat_energy_price_household_distribution_stress
 version: 1
-status: draft
+status: candidate
 topic: energy
 claim: Energy-price spikes increase household distributional stress.
-methodology_note: Promoted for Batch 06 on 2026-05-12 using local Eurostat nrg_pc_205 and companion local
-  vintages.
+methodology_note: Promoted for Batch 06 on 2026-05-12; graduated on 2026-05-15 after
+  Eurostat nrg_pc_204 household electricity prices and ilc_mdes01 home-warmth stress
+  data were fetched.
 evidence_type: associational
 sample:
   countries:
@@ -49,12 +50,12 @@ sample:
 variables:
   outcome:
   - name: distribution_stress
-    source: local_batch06_derived
-    transformation: level_or_growth
+    source: eurostat:ilc_mdes01
+    transformation: level
   treatment:
   - name: household_electricity_price
-    source: local_batch06_derived
-    transformation: annual_mean_or_growth
+    source: eurostat:nrg_pc_204
+    transformation: annual_mean_level
   controls:
   - name: gdp_pc_growth
     source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
@@ -73,8 +74,10 @@ falsification:
   test: panel_fe_eurostat_energy_price_household_distribution_stress
   threshold: p<0.10 with pre-registered sign
 prior_confidence: 0.5
-disclosure: No local household electricity-price vintage, EU-SILC distribution table, or poverty stress
-  panel was present for this batch.
+disclosure: Uses Eurostat nrg_pc_204 household electricity prices for the 2,500-4,999 kWh
+  annual-consumption band, inclusive of taxes, averaged from semester observations to annual
+  country-year prices. Distribution stress uses Eurostat EU-SILC ilc_mdes01, total
+  household type and total income group, measuring population unable to keep home adequately warm.
 steelman: hypotheses/steelman/eurostat_energy_price_household_distribution_stress.md
 scope:
   period:
