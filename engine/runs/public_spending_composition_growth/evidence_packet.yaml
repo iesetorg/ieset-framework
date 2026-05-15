@@ -1,0 +1,410 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:33:33+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: public_spending_composition_growth
+  legacy_id: null
+  path: hypotheses/fiscal/public_spending_composition_growth.yaml
+  school: null
+  topic: fiscal
+  claim: 'Public investment in basic infrastructure (transport, energy, water, sanitation)
+    has strong catch-up returns to real GDP per capita growth in developing and emerging
+    economies, while persistent public transfers and subsidies have weaker or insignificant
+    long-run growth effects, in a broad-country panel 1980-2020. The directional claim
+    is that a 1-percentage- point increase in public-investment share of GDP predicts
+    a 0.1-0.3 percentage point increase in annual growth, while an equivalent increase
+    in transfers/subsidies share predicts no significant growth effect or a negative
+    effect, controlling for initial income, institutions, and debt.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=+140, p=0.165 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: 'Public investment in basic infrastructure (transport, energy, water, sanitation)
+    has strong catch-up returns to real GDP per capita growth in developing and emerging
+    economies, while persistent public transfers and subsidies have weaker or insignificant
+    long-run growth effects, in a broad-country panel 1980-2020. The directional claim
+    is that a 1-percentage- point increase in public-investment share of GDP predicts
+    a 0.1-0.3 percentage point increase in annual growth, while an equivalent increase
+    in transfers/subsidies share predicts no significant growth effect or a negative
+    effect, controlling for initial income, institutions, and debt.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B21 (public investment) is positive and significant\
+    \ at p<0.10 while \u03B22 (transfers/subsidies) is insignificant or negative.\
+    \ PARTIAL if both are positive but \u03B21 > \u03B22. REFUTED if \u03B22 is positive\
+    \ and significantly larger than \u03B21, or if both are insignificant. INFORMATIVE:\
+    \ the public-investment coefficient should be larger and more significant in the\
+    \ catch-up subsample than in the frontier subsample; if the opposite holds, the\
+    \ result is a frontier-specific anomaly.\n"
+  threshold: "\u03B2_public_investment > 0 at p<=0.10  AND \u03B2_transfers_subsidies\
+    \ p >= 0.10 or coefficient <= 0  AND Catch-up subsample \u03B2_public_investment\
+    \ >= frontier subsample \u03B2_public_investment.\n"
+  estimator:
+    template: panel_fe_decomposition
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Two-way FE panel with decomposition: growth = \u03B20 + \u03B21*public_investment\
+      \ + \u03B22*transfers_subsidies + controls + FE. Mechanism decomposition via\
+      \ infrastructure quality and private investment channels. Robustness: (1) 5-year\
+      \ non-overlapping averages to capture medium-run effects; (2) subsample by income\
+      \ level (catch-up vs frontier); (3) IV for public investment using lagged public\
+      \ investment and electoral-cycle timing (political budget cycles). Separate\
+      \ catch-up and frontier specifications pre-registered.\n"
+  steelman: hypotheses/steelman/public_spending_composition_growth.md
+reproduction:
+  run_dir: engine/runs/public_spending_composition_growth
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/public_spending_composition_growth/replication.py
+  suggested_command: python engine/runs/public_spending_composition_growth/replication.py
+data:
+  inputs:
+  - name: outcome_real_gdp_per_capita_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: outcome_total_factor_productivity_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: treatment_public_investment_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FTOT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      computed_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:56.960422+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation (% of GDP)
+      source_note: Gross fixed capital formation includes acquisitions less disposals
+        of fixed assets during the accounting period, including certain specified
+        expenditures on services that add to the value of non-produced assets. This
+        indicator is expressed as a percentage of Gross Domestic Product (GDP) which
+        is the total income earned through the production of goods and services in
+        an economic territory during an
+      countries_param: all
+      vintage_utc: null
+  - name: decomposition_channels_private_investment_share
+    publisher: world_bank_wdi
+    series_id: NE.GDI.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      computed_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:59.823578+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross capital formation (% of GDP)
+      source_note: Gross capital formation includes acquisitions less disposals of
+        produced assets for purposes of fixed capital formation, inventories or valuables.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: controls_debt_to_gdp
+    publisher: imf
+    series_id: GGXWDG_NGDP
+    vintage_file: data/vintages/imf/GGXWDG_NGDP@2026-05-05T195336Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: e9b5a3be72e315a25baa9a3f55985a6b51f6a95299ed9fb0b1c0fb4e6a993ef4
+      computed_sha256: e9b5a3be72e315a25baa9a3f55985a6b51f6a95299ed9fb0b1c0fb4e6a993ef4
+      status: match
+    source:
+      type: official
+      url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+      methodology_url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+      license: IMF standard permissions (attribution required)
+      fetch_utc: '2026-05-05T19:53:36.145743+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1980'
+      end_date: '2031'
+      frequency: annual
+      rows: 8113
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_label: null
+      dataset: null
+      countries_filter: all
+      vintage_utc: null
+  - name: controls_trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_population_growth
+    publisher: world_bank_wdi
+    series_id: SP.POP.GROW
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.GROW@2026-05-05T194839Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      computed_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.GROW
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:39.147679+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population growth (annual %)
+      source_note: Annual population growth rate for year t is the exponential rate
+        of growth of midyear population from year t-1 to t, expressed as a percentage.
+        Population is based on the de facto definition of population, which counts
+        all residents regardless of legal status or citizenship.
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - imf_gfs:transfers_and_subsidies
+  - wef_gci:infrastructure_quality
+  data_quality:
+    grade: incomplete
+    input_count: 8
+    official_source_count: 8
+    manual_source_count: 0
+    hash_status_counts:
+      match: 8
+    missing_series_count: 2
+artifacts:
+- path: hypotheses/fiscal/public_spending_composition_growth.yaml
+  sha256: e835df861834c6fb0d718ea2078eb7cc184ffc83333bfc2a14037a04b6636723
+  bytes: 6575
+- path: engine/runs/public_spending_composition_growth/manifest.yaml
+  sha256: 872a5b3c8b0c6ab52061c8e9b5fadfaa60a04b9b08f0bf967d953429e05c5035
+  bytes: 3004
+- path: engine/runs/public_spending_composition_growth/diagnostics.json
+  sha256: 8f3da6cb59f46b8c5da17fdf40279caca96bef8eda56bd5dce2995b6da724f45
+  bytes: 3557
+- path: engine/runs/public_spending_composition_growth/result_card.md
+  sha256: a70e6efe63f33bf49ead3244c705338b20a95669eb349326f0212922c5b502db
+  bytes: 2892
+- path: engine/runs/public_spending_composition_growth/replication.py
+  sha256: 74639d278eea5d6cdd9647cff7ac26e49e496ea083919505ff106b365b3f614c
+  bytes: 733
+- path: hypotheses/steelman/public_spending_composition_growth.md
+  sha256: c33a3c1a6b9e3bf2650c30122137dd194449d2b6d4da0449e39353759a4a1fe5
+  bytes: 4059
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+- kind: methodology
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://data.worldbank.org/indicator/SP.POP.GROW
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

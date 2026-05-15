@@ -1,0 +1,354 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:33:32+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: contract_enforcement_fdi_productivity_spillovers
+  legacy_id: null
+  path: hypotheses/institutional_quality/contract_enforcement_fdi_productivity_spillovers.yaml
+  school: null
+  topic: institutional_quality
+  claim: "Across emerging-market and developing economies 1990-2020, stronger contract\
+    \ enforcement \u2014 measured by years to resolve a commercial dispute, contract-enforcement\
+    \ index, and legal-origin dummies \u2014 predicts whether foreign-direct-investment\
+    \ inflows produce productivity spillovers to domestic firms rather than enclave\
+    \ effects. The pre-registered claim is that the correlation between FDI inflows\
+    \ and subsequent domestic-firm TFP growth is positive and significant at p<0.05\
+    \ only in countries with above-median contract enforcement, and is insignificant\
+    \ or negative in countries with below-median enforcement.\n"
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=+0.1006 (sign matches claim +), p=0.0107
+  status: SUPPORTED
+preregistration:
+  claim: "Across emerging-market and developing economies 1990-2020, stronger contract\
+    \ enforcement \u2014 measured by years to resolve a commercial dispute, contract-enforcement\
+    \ index, and legal-origin dummies \u2014 predicts whether foreign-direct-investment\
+    \ inflows produce productivity spillovers to domestic firms rather than enclave\
+    \ effects. The pre-registered claim is that the correlation between FDI inflows\
+    \ and subsequent domestic-firm TFP growth is positive and significant at p<0.05\
+    \ only in countries with above-median contract enforcement, and is insignificant\
+    \ or negative in countries with below-median enforcement.\n"
+  falsification_rule: 'Not supported if (a) the interaction coefficient is not positive
+    and significant at p<0.05, OR (b) the marginal effect of FDI on domestic TFP is
+    positive and significant even in below-median contract-enforcement countries (no
+    threshold), OR (c) the result is driven entirely by common-law countries (legal-origin
+    confound rather than enforcement per se). An "FDI always helps" reading wins if
+    (b) holds; a "institutions don''t matter for FDI" reading wins if the interaction
+    is insignificant and FDI main effect dominates.
+
+    '
+  threshold: "panel_FE_beta(FDI \xD7 contract_enforcement) > 0 at p<0.05 AND marginal_effect_FDI_at_below_median_enforcement\
+    \ NOT > 0 at p<0.10 AND result robust to excluding_common_law_countries at p<0.10\n"
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: "Panel FE with interaction: FDI inflows \xD7 contract enforcement. Primary\
+      \ test: sign and significance of interaction on domestic- firm TFP growth. Sub-sample\
+      \ analysis: above-median vs below- median contract enforcement. Robustness:\
+      \ use legal-origin dummies instead of Doing Business enforcement measure; IV\
+      \ using colonial-legal-origin as instrument for contract enforcement.\n"
+  steelman: hypotheses/steelman/contract_enforcement_fdi_productivity_spillovers.md
+reproduction:
+  run_dir: engine/runs/contract_enforcement_fdi_productivity_spillovers
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/contract_enforcement_fdi_productivity_spillovers/replication.py
+  suggested_command: python engine/runs/contract_enforcement_fdi_productivity_spillovers/replication.py
+data:
+  inputs:
+  - name: outcome_aggregate_tfp_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: treatment_contract_enforcement_rule_of_law_proxy
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: controls_log_initial_gdp_pc
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: controls_human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls_trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_financial_development
+    publisher: world_bank_wdi
+    series_id: FS.AST.PRVT.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/FS.AST.PRVT.GD.ZS@2026-05-05T194720Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      computed_sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FS.AST.PRVT.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/FS.AST.PRVT.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:20.751404+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Domestic credit to private sector (% of GDP)
+      source_note: Domestic credit to private sector refers to financial resources
+        provided to the private sector by financial corporations, such as through
+        loans, purchases of nonequity securities, and trade credits and other accounts
+        receivable, that establish a claim for repayment. For some countries these
+        claims include credit to public enterprises. The financial corporations include
+        monetary authorities and dep
+      countries_param: all
+      vintage_utc: null
+  - name: controls_infrastructure_quality
+    publisher: wgi
+    series_id: GE.EST
+    vintage_file: data/vintages/wgi/GE.EST@2026-04-30T114242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      computed_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GE.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:42.165458+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  missing_series:
+  - 'constructed: tfp_growth_domestic_firms_from_enterprise_surveys'
+  - 'constructed: correlation_fdi_inflows_and_domestic_productivity_growth'
+  - world_bank_wdi:IC.LGL.DURS
+  - world_bank_wdi:IC.LGL.DURS
+  - 'constructed: la_porta_legal_origin_dummy'
+  data_quality:
+    grade: incomplete
+    input_count: 7
+    official_source_count: 7
+    manual_source_count: 0
+    hash_status_counts:
+      match: 7
+    missing_series_count: 5
+artifacts:
+- path: hypotheses/institutional_quality/contract_enforcement_fdi_productivity_spillovers.yaml
+  sha256: 79cbc1465633563f5f8d6d114a7e413d40c005b2a09525762bbfb61ae1ec69dc
+  bytes: 9163
+- path: engine/runs/contract_enforcement_fdi_productivity_spillovers/manifest.yaml
+  sha256: 8aa188fa0e4d6f4bffa88eb829d4afef8531f85e7abd3614baa9cdfecb23939f
+  bytes: 2736
+- path: engine/runs/contract_enforcement_fdi_productivity_spillovers/diagnostics.json
+  sha256: 89c776318455f215af14ce33c39442c63c78a57b648f9163eba976fdb2ae55fe
+  bytes: 3559
+- path: engine/runs/contract_enforcement_fdi_productivity_spillovers/result_card.md
+  sha256: 3479d39202367239ce565f7f704814917c10128761fdca5b028f1a942086c1fc
+  bytes: 2986
+- path: engine/runs/contract_enforcement_fdi_productivity_spillovers/replication.py
+  sha256: 7f2c59e4b94ef971113861517d6afc8e6a6b1a39bbee2d9c2cbd6e60d37db8a6
+  bytes: 700
+- path: hypotheses/steelman/contract_enforcement_fdi_productivity_spillovers.md
+  sha256: b8b678992f0a4b642dc8e8c5206f1738b0bd7e503caf920d56e4c9750cf84377
+  bytes: 3112
+references:
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: FS.AST.PRVT.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/FS.AST.PRVT.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: FS.AST.PRVT.GD.ZS
+  url: https://data.worldbank.org/indicator/FS.AST.PRVT.GD.ZS
+- kind: source
+  publisher: wgi
+  series_id: GE.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GE.EST?format=json&source=3
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

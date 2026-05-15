@@ -1,0 +1,322 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:33:32+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: trade_openness_long_run_income_convergence
+  legacy_id: null
+  path: hypotheses/trade/trade_openness_long_run_income_convergence.yaml
+  school: null
+  topic: trade
+  claim: "Across a broad panel of countries 1960-2019, higher trade openness predicts\
+    \ faster long-run convergence of real GDP per capita toward the global frontier\
+    \ (the United States) than industrial-policy intensity does. Convergence is measured\
+    \ by \u03B2-convergence \u2014 the coefficient on initial log GDP per capita becomes\
+    \ less negative (or more positive in a conditional-convergence specification)\
+    \ when interacted with trade openness \u2014 and by \u03C3-convergence, the declining\
+    \ cross-sectional standard deviation of log GDP per capita over 20-year windows.\
+    \ The hypothesis tests the Smithian-Ricardian claim that openness is a more reliable\
+    \ convergence engine than dirigiste industrial targeting.\n"
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: coef=-1.083e-13, p=0.827; effect magnitude effectively zero
+  status: PARTIAL
+preregistration:
+  claim: "Across a broad panel of countries 1960-2019, higher trade openness predicts\
+    \ faster long-run convergence of real GDP per capita toward the global frontier\
+    \ (the United States) than industrial-policy intensity does. Convergence is measured\
+    \ by \u03B2-convergence \u2014 the coefficient on initial log GDP per capita becomes\
+    \ less negative (or more positive in a conditional-convergence specification)\
+    \ when interacted with trade openness \u2014 and by \u03C3-convergence, the declining\
+    \ cross-sectional standard deviation of log GDP per capita over 20-year windows.\
+    \ The hypothesis tests the Smithian-Ricardian claim that openness is a more reliable\
+    \ convergence engine than dirigiste industrial targeting.\n"
+  falsification_rule: "SUPPORTED if the interaction coefficient \u03B23 (initial_log_gdp\
+    \ \xD7 openness) is positive and significant at p<0.10, while the corresponding\
+    \ interaction for industrial-policy intensity is either negative, insignificant,\
+    \ or materially smaller in magnitude. PARTIAL if both interactions are positive\
+    \ and significant but openness has the larger coefficient. REFUTED if the openness\
+    \ interaction is negative and significant at p<0.10, or if the industrial-policy\
+    \ interaction is positive and significantly larger.\n"
+  threshold: "\u03B23_trade_openness > 0 at p<=0.10  AND |\u03B23_trade_openness|\
+    \ > |\u03B23_industrial_policy|  AND \u03C3-convergence (20yr window SD of log\
+    \ GDP pc) declines more in high-openness decades than in high-industrial-policy\
+    \ decades.\n"
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Two-way fixed-effects panel with Driscoll-Kraay standard errors. Primary\
+      \ specification: growth of log GDP pc = \u03B20 + \u03B21*initial_log_gdp +\
+      \ \u03B22*openness + \u03B23*(initial_log_gdp \xD7 openness) + controls + country\
+      \ FE + year FE. The interaction term \u03B23 is the convergence test: if \u03B2\
+      3 > 0, openness accelerates convergence. A parallel specification replaces openness\
+      \ with industrial-policy intensity. Robustness: 20-year non-overlapping windows\
+      \ to avoid serial correlation; entrep\xF4t outliers dropped or downweighted.\n"
+  steelman: hypotheses/steelman/trade_openness_long_run_income_convergence.md
+reproduction:
+  run_dir: engine/runs/trade_openness_long_run_income_convergence
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/trade_openness_long_run_income_convergence/replication.py
+  suggested_command: python engine/runs/trade_openness_long_run_income_convergence/replication.py
+data:
+  inputs:
+  - name: outcome_real_gdp_per_capita
+    publisher: pwt
+    series_id: rgdpo
+    vintage_file: data/vintages/pwt/rgdpo@2026-04-30T144524Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      computed_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: treatment_trade_openness_pct_gdp
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls_rule_of_law
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: controls_population_growth
+    publisher: world_bank_wdi
+    series_id: SP.POP.GROW
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.GROW@2026-05-05T194839Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      computed_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.GROW
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:39.147679+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population growth (annual %)
+      source_note: Annual population growth rate for year t is the exponential rate
+        of growth of midyear population from year t-1 to t, expressed as a percentage.
+        Population is based on the de facto definition of population, which counts
+        all residents regardless of legal status or citizenship.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_investment_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      computed_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:59.823578+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross capital formation (% of GDP)
+      source_note: Gross capital formation includes acquisitions less disposals of
+        produced assets for purposes of fixed capital formation, inventories or valuables.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - 'constructed: 20-year rolling regression of log GDP pc growth on initial log GDP
+    pc'
+  - 'constructed: composite of state ownership share, directed credit, and sectoral
+    subsidy intensity (CRDF/ITC + Fraser EFW subcomponents)'
+  - world_bank_wits:import_value
+  - un_comtrade:export_product_diversity
+  data_quality:
+    grade: incomplete
+    input_count: 6
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 6
+    missing_series_count: 4
+artifacts:
+- path: hypotheses/trade/trade_openness_long_run_income_convergence.yaml
+  sha256: e106e344bfd957e0e6ec7e42b0887c7f3f3a5f8dedcc3ecd12565ee9dafb4a6b
+  bytes: 7525
+- path: engine/runs/trade_openness_long_run_income_convergence/manifest.yaml
+  sha256: fd955d313be9e9036f5a2fa51aae6b99b430fde719de81470e563184ab20a890
+  bytes: 2435
+- path: engine/runs/trade_openness_long_run_income_convergence/diagnostics.json
+  sha256: 9dae23f9d1bd2a3112f02f64b510b389ab3e76017b55b4b718af014caa8a6f54
+  bytes: 3516
+- path: engine/runs/trade_openness_long_run_income_convergence/result_card.md
+  sha256: c90eba79d9a4c1f43ad09d8adceec1c8a356690af92a9a6a98dd085e18c7b8f9
+  bytes: 3049
+- path: engine/runs/trade_openness_long_run_income_convergence/replication.py
+  sha256: 1b80fc731477c73c8a30eaedee933412f3cc01b6a668a858a776dd5fcf901e97
+  bytes: 757
+- path: engine/runs/trade_openness_long_run_income_convergence/chart_data.json
+  sha256: b143f6a8f12a97f256e85c9315d1f90cc185142dee797e9102ce731ab869fda1
+  bytes: 34089
+- path: hypotheses/steelman/trade_openness_long_run_income_convergence.md
+  sha256: bfa2a37e2425d80783b84027b66f8f5849cff90d59201a5077d6a1cc7e44dd7c
+  bytes: 3692
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: pwt
+  series_id: hc
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: hc
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://data.worldbank.org/indicator/SP.POP.GROW
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

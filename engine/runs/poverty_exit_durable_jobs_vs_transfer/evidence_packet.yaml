@@ -1,0 +1,241 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:35:51+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: poverty_exit_durable_jobs_vs_transfer
+  legacy_id: null
+  path: hypotheses/distribution/poverty_exit_durable_jobs_vs_transfer.yaml
+  school: null
+  topic: distribution
+  claim: Durable exit from extreme poverty (sustained above-poverty-line household
+    consumption for at least 5 consecutive years) is more strongly associated with
+    private formal-sector job creation than with the expansion of cash transfers or
+    social-assistance programmes alone, over 15-25 year windows in low- and middle-income
+    countries 1995-2020. The claim is conditional on controlling for initial poverty
+    depth, human capital, and agricultural productivity growth.
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=+0.4507, p=0.154 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: Durable exit from extreme poverty (sustained above-poverty-line household
+    consumption for at least 5 consecutive years) is more strongly associated with
+    private formal-sector job creation than with the expansion of cash transfers or
+    social-assistance programmes alone, over 15-25 year windows in low- and middle-income
+    countries 1995-2020. The claim is conditional on controlling for initial poverty
+    depth, human capital, and agricultural productivity growth.
+  falsification_rule: The hypothesis is falsified if cash-transfer expansion has a
+    positive and significant (p < 0.10) association with durable poverty exit larger
+    in magnitude than formal job creation, or if formal job creation is negatively
+    and significantly associated with poverty exit.
+  threshold:
+    supported: formal_jobs coefficient > 0 at p < 0.10 AND larger than cash_transfer
+      coefficient
+    refuted: formal_jobs coefficient < 0 at p < 0.10
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+  steelman: hypotheses/steelman/poverty_exit_durable_jobs_vs_transfer.md
+reproduction:
+  run_dir: engine/runs/poverty_exit_durable_jobs_vs_transfer
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/poverty_exit_durable_jobs_vs_transfer/replication.py
+  suggested_command: python engine/runs/poverty_exit_durable_jobs_vs_transfer/replication.py
+data:
+  inputs:
+  - name: outcome:poverty_exit_rate_5y
+    publisher: world_bank_wdi
+    series_id: SI.POV.DDAY
+    vintage_file: data/vintages/world_bank_wdi/SI.POV.DDAY@2026-05-05T194939Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3f816fbe1a546495ff8b9adf6065bcd8a0cfec91026ce80865dafbe66bcb8b55
+      computed_sha256: 3f816fbe1a546495ff8b9adf6065bcd8a0cfec91026ce80865dafbe66bcb8b55
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SI.POV.DDAY?format=json
+      methodology_url: https://data.worldbank.org/indicator/SI.POV.DDAY
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:49:39.336676+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 2862
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Poverty headcount ratio at $3.00 a day (2021 PPP) (% of population)
+      source_note: Poverty headcount ratio at $3.00 a day is the percentage of the
+        population living on less than $3.00 a day at 2021 purchasing power adjusted
+        prices. As a result of revisions in PPP exchange rates, poverty rates for
+        individual countries cannot be compared with poverty rates reported in earlier
+        editions.
+      countries_param: all
+      vintage_utc: null
+  - name: treatment:formal_private_jobs_growth
+    publisher: world_bank_wdi
+    series_id: SL.EMP.TOTL.SP.ZS
+    vintage_file: data/vintages/world_bank_wdi/SL.EMP.TOTL.SP.ZS@2026-05-05T194751Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 13dd1ff36a27d38b5398196789130886c158c0d48ff0d8327567c9673bdbaeef
+      computed_sha256: 13dd1ff36a27d38b5398196789130886c158c0d48ff0d8327567c9673bdbaeef
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SL.EMP.TOTL.SP.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SL.EMP.TOTL.SP.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:51.768795+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 8071
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Employment to population ratio, 15+, total (%) (modeled ILO
+        estimate)
+      source_note: Employment to population ratio is the proportion of a country's
+        population that is employed.
+      countries_param: all
+      vintage_utc: null
+  - name: controls:human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 8637
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls:log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 14066
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - constructed:lsms_household_survey_panels
+  - constructed:aspire_world_bank; world_bank_wdi:per_si_allsi.cov_pop_tot
+  - constructed:aspire_world_bank
+  - world_bank_wdi:EA.PRD.AGRI.KD
+  data_quality:
+    grade: incomplete
+    input_count: 4
+    official_source_count: 4
+    manual_source_count: 0
+    hash_status_counts:
+      match: 4
+    missing_series_count: 4
+artifacts:
+- path: hypotheses/distribution/poverty_exit_durable_jobs_vs_transfer.yaml
+  sha256: a9d75949e8bace94554753fdbd32ff1d5ca9a57c9a6af724cdb0842ab932dafc
+  bytes: 4096
+- path: engine/runs/poverty_exit_durable_jobs_vs_transfer/manifest.yaml
+  sha256: 868df2596f65f0817cbc58620f30332a30131d3479ebed8f6dadd3c593f97c83
+  bytes: 1605
+- path: engine/runs/poverty_exit_durable_jobs_vs_transfer/diagnostics.json
+  sha256: 441c2cd3813218c600c68dbbc27c27e50911fb899b90885788b57ece42b9bf6e
+  bytes: 2917
+- path: engine/runs/poverty_exit_durable_jobs_vs_transfer/result_card.md
+  sha256: aad2ba39596d142f1e53f1a8a1c4aa9bbda5df2651416ed38915631c429dcf70
+  bytes: 2403
+- path: engine/runs/poverty_exit_durable_jobs_vs_transfer/replication.py
+  sha256: 6aa32af5a72593f456b913c5e2987a5ac76130afd16a561a1cb83fd57c39f18e
+  bytes: 742
+- path: hypotheses/steelman/poverty_exit_durable_jobs_vs_transfer.md
+  sha256: 3f13aafc1ac5dcad50915df31fc83fddce648e0ebd238ccd8216363b6fc95c45
+  bytes: 2857
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SI.POV.DDAY
+  url: https://api.worldbank.org/v2/country/all/indicator/SI.POV.DDAY?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SI.POV.DDAY
+  url: https://data.worldbank.org/indicator/SI.POV.DDAY
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SL.EMP.TOTL.SP.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SL.EMP.TOTL.SP.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SL.EMP.TOTL.SP.ZS
+  url: https://data.worldbank.org/indicator/SL.EMP.TOTL.SP.ZS
+- kind: source
+  publisher: pwt
+  series_id: hc
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: hc
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

@@ -1,0 +1,305 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:35:51+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: life_satisfaction_income_market_institutions
+  legacy_id: null
+  path: hypotheses/distribution/life_satisfaction_income_market_institutions.yaml
+  school: null
+  topic: distribution
+  claim: In high-income countries 1990-2020, gains in life satisfaction (subjective
+    well-being) are more strongly associated with real income growth, employment opportunity,
+    and institutional trust than with the intensity of state economic planning or
+    public-sector employment share. The claim is bounded to countries already above
+    the World Bank high- income threshold, separating catch-up wellbeing gains from
+    frontier dynamics.
+verdict:
+  raw: INCONCLUSIVE_DATA_PENDING
+  bucket: inconclusive
+  reason: 'no outcome variable loaded; missing: [''world_bank_wdi:SWB.LS'', ''constructed:world_happiness_report_ladder'']'
+  status: INCONCLUSIVE_DATA_PENDING
+preregistration:
+  claim: In high-income countries 1990-2020, gains in life satisfaction (subjective
+    well-being) are more strongly associated with real income growth, employment opportunity,
+    and institutional trust than with the intensity of state economic planning or
+    public-sector employment share. The claim is bounded to countries already above
+    the World Bank high- income threshold, separating catch-up wellbeing gains from
+    frontier dynamics.
+  falsification_rule: The hypothesis is falsified if state-planning intensity has
+    a positive and significant (p < 0.10) association with life-satisfaction gains
+    larger than that of income growth or employment opportunity in a high-income panel,
+    or if market-institution proxies are negatively and significantly associated with
+    well-being.
+  threshold:
+    supported: income/employment/trust coefficients positive and significant; state-planning
+      coefficient not larger and not significant
+    refuted: state-planning coefficient > income coefficient at p < 0.10
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+  steelman: hypotheses/steelman/life_satisfaction_income_market_institutions.md
+reproduction:
+  run_dir: engine/runs/life_satisfaction_income_market_institutions
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/life_satisfaction_income_market_institutions/replication.py
+  suggested_command: python engine/runs/life_satisfaction_income_market_institutions/replication.py
+data:
+  inputs:
+  - name: treatment:real_gdp_per_capita_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD.ZG
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD.ZG@2026-05-05T194650Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf
+      computed_sha256: 3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:50.855882+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 13897
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita growth (annual %)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator denotes t'
+      countries_param: all
+      vintage_utc: null
+  - name: treatment:employment_rate
+    publisher: oecd
+    series_id: OECD.ELS.SAE
+    vintage_file: data/vintages/oecd/OECD.ELS.SAE_DSD_TUD_CBC_DF_TUD_1.0@2026-05-01T071140Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 01ac4f0e100915330f53f4be310e9b26bfe33e7bcbd05f22cfa894447438a417
+      computed_sha256: 01ac4f0e100915330f53f4be310e9b26bfe33e7bcbd05f22cfa894447438a417
+      status: match
+    source:
+      type: official
+      url: https://sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0/all?format=csvfilewithlabels
+      methodology_url: https://data-explorer.oecd.org/vis?fs[0]=Topic&df[ds]=dsDisseminateFinalDMZ&df[id]=OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0
+      license: OECD standard permissions (attribution required)
+      fetch_utc: '2026-05-01T07:11:40.104765+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-01T071155Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2024'
+      frequency: unknown
+      rows: 1825
+      units: per dataflow metadata
+      currency: null
+    extra:
+      sdmx_key: (all)
+      start_period: '1960'
+      end_period: '2025'
+      columns:
+      - STRUCTURE
+      - STRUCTURE_ID
+      - STRUCTURE_NAME
+      - ACTION
+      - REF_AREA
+      - Reference area
+      - MEASURE
+      - Measure
+      - UNIT_MEASURE
+      - Unit of measure
+      - period
+      - Time period
+      - value
+      - Observation value
+      - OBS_STATUS
+      - Observation status
+      - UNIT_MULT
+      - Unit multiplier
+      - DECIMALS
+      - Decimals
+      vintage_utc: null
+  - name: controls:log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 14066
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: controls:unemployment_rate
+    publisher: world_bank_wdi
+    series_id: SL.UEM.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/SL.UEM.TOTL.ZS@2026-05-05T200521Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: dfb2bae82f8ae7d95de21605e2d8c57f835cc7be4eeb53d58f8362da0b9e41c9
+      computed_sha256: dfb2bae82f8ae7d95de21605e2d8c57f835cc7be4eeb53d58f8362da0b9e41c9
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:05:21.373198+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200618Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 8071
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Unemployment, total (% of total labor force) (modeled ILO estimate)
+      source_note: Unemployment refers to the share of the labor force that is without
+        work but available for and seeking employment.
+      countries_param: all
+      vintage_utc: null
+  - name: controls:gini_index
+    publisher: world_bank_wdi
+    series_id: SI.POV.GINI
+    vintage_file: data/vintages/world_bank_wdi/SI.POV.GINI@2026-05-05T194923Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c76659a92598fc6feebe9db4cf1b081983ef2b71a660de1596bbe176b68636db
+      computed_sha256: c76659a92598fc6feebe9db4cf1b081983ef2b71a660de1596bbe176b68636db
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SI.POV.GINI?format=json
+      methodology_url: https://data.worldbank.org/indicator/SI.POV.GINI
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:49:23.948047+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 2430
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gini index
+      source_note: Gini index measures the extent to which the distribution of income
+        (or, in some cases, consumption expenditure) among individuals or households
+        within an economy deviates from a perfectly equal distribution. A Lorenz curve
+        plots the cumulative percentages of total income received against the cumulative
+        number of recipients, starting with the poorest individual or household. The
+        Gini index measures
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - world_bank_wdi:SWB.LS
+  - constructed:world_happiness_report_ladder
+  - vdem:v2x_corr
+  - constructed:government_consumption_plus_soe_share
+  - oecd:OECD.SOCX
+  data_quality:
+    grade: incomplete
+    input_count: 5
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 5
+    missing_series_count: 5
+artifacts:
+- path: hypotheses/distribution/life_satisfaction_income_market_institutions.yaml
+  sha256: 7becefa762c7567b4b76ffd18143158bad8ec4960786a27cbe26e3c3eaaf1a5c
+  bytes: 3961
+- path: engine/runs/life_satisfaction_income_market_institutions/manifest.yaml
+  sha256: 9967f9374eea67fb5bf70e97b160c97c24f685cd8c7b0cbc314c5b2a2ff0e487
+  bytes: 1934
+- path: engine/runs/life_satisfaction_income_market_institutions/diagnostics.json
+  sha256: 46c485dd267859901f9837c9949f845cb13d571eac1135562405d1bc05fc2096
+  bytes: 2852
+- path: engine/runs/life_satisfaction_income_market_institutions/result_card.md
+  sha256: a5f831ba3920e7820920e15a4859d01c64fc35dcc8e0ccce25d0b68a052fb9e9
+  bytes: 2320
+- path: engine/runs/life_satisfaction_income_market_institutions/replication.py
+  sha256: c1821b87f3a7c08454c5a71d25da9a6dfb7875372fb1441ce9cc27ad071387e1
+  bytes: 662
+- path: hypotheses/steelman/life_satisfaction_income_market_institutions.md
+  sha256: 5c82321a6c5807cddc4af43079c5dc53be2a74d25e9df46c31e441b9e5ccf817
+  bytes: 2918
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD.ZG
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD.ZG
+- kind: source
+  publisher: oecd
+  series_id: OECD.ELS.SAE
+  url: https://sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0/all?format=csvfilewithlabels
+- kind: methodology
+  publisher: oecd
+  series_id: OECD.ELS.SAE
+  url: https://data-explorer.oecd.org/vis?fs[0]=Topic&df[ds]=dsDisseminateFinalDMZ&df[id]=OECD.ELS.SAE,DSD_TUD_CBC@DF_TUD,1.0
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SL.UEM.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SL.UEM.TOTL.ZS
+  url: https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SI.POV.GINI
+  url: https://api.worldbank.org/v2/country/all/indicator/SI.POV.GINI?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SI.POV.GINI
+  url: https://data.worldbank.org/indicator/SI.POV.GINI
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

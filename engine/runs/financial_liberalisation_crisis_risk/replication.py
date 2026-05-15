@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -21,7 +22,7 @@ RUN_DIR = ROOT / "engine" / "runs" / HYPOTHESIS_ID
 
 def main() -> None:
     subprocess.run(
-        ["python3", str(RUNNER), HYPOTHESIS_ID],
+        [sys.executable, str(RUNNER), HYPOTHESIS_ID, "--force"],
         cwd=str(ROOT),
         check=True,
     )

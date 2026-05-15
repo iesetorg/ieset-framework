@@ -1,0 +1,323 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:33:33+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: welfare_state_market_flexibility_complement
+  legacy_id: null
+  path: hypotheses/fiscal/welfare_state_market_flexibility_complement.yaml
+  school: null
+  topic: fiscal
+  claim: 'Large welfare states sustain long-run real GDP per capita growth when paired
+    with market flexibility (low product- and labour-market barriers), trade openness,
+    and fiscal discipline (debt-to-GDP below 90%), but not when paired with rigid
+    product and labour markets, in an OECD and rich- country panel 1980-2020. The
+    directional claim is that the interaction between welfare-state size (social transfers
+    + public consumption as % of GDP) and a composite flexibility-openness-discipline
+    index is positive and significant for growth, while welfare-state size alone shows
+    no effect or a negative effect.
+
+    '
+verdict:
+  raw: INCONCLUSIVE_DATA_PENDING
+  bucket: inconclusive
+  reason: interaction term requested but no loadable constructed interaction variable
+    is defined. The generic panel_fe runner would otherwise grade a main-effect coefficient
+    instead of the pre-registered interaction estimand. Add a treatment or decomposition
+    variable with transformation/source/name marking the interaction, or use a bespoke
+    replication script.
+  status: INCONCLUSIVE_DATA_PENDING
+preregistration:
+  claim: 'Large welfare states sustain long-run real GDP per capita growth when paired
+    with market flexibility (low product- and labour-market barriers), trade openness,
+    and fiscal discipline (debt-to-GDP below 90%), but not when paired with rigid
+    product and labour markets, in an OECD and rich- country panel 1980-2020. The
+    directional claim is that the interaction between welfare-state size (social transfers
+    + public consumption as % of GDP) and a composite flexibility-openness-discipline
+    index is positive and significant for growth, while welfare-state size alone shows
+    no effect or a negative effect.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B23 (welfare \xD7 flexibility) is positive\
+    \ and significant at p<0.10, AND the marginal welfare effect is negative or insignificant\
+    \ in the bottom tercile of flexibility and positive or insignificant in the top\
+    \ tercile. PARTIAL if \u03B23 is positive and significant but \u03B21 is also\
+    \ positive (welfare helps regardless, just more with flexibility). REFUTED if\
+    \ \u03B23 is negative and significant. INFORMATIVE: the result should survive\
+    \ excluding the Nordic countries; if not, it is a Nordic- specific story.\n"
+  threshold: "\u03B2_interaction > 0 at p<=0.10  AND Marginal welfare effect <= 0\
+    \ or p>=0.10 in bottom tercile  AND Marginal welfare effect >= 0 or p>=0.10 in\
+    \ top tercile  AND Ex-Nordic robustness retains sign of \u03B2_interaction.\n"
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Two-way FE panel with interaction: growth = \u03B20 + \u03B21*welfare_size\
+      \ + \u03B22*flexibility_index + \u03B23*(welfare_size \xD7 flexibility_index)\
+      \ + controls + FE. Subsample analysis at terciles of flexibility index. Robustness:\
+      \ (1) use Fraser EFW overall index instead of constructed composite; (2) exclude\
+      \ Nordic countries; (3) use 5-year non-overlapping averages; (4) separate product-market\
+      \ and labour-market flexibility interactions.\n"
+  steelman: hypotheses/steelman/welfare_state_market_flexibility_complement.md
+reproduction:
+  run_dir: engine/runs/welfare_state_market_flexibility_complement
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/welfare_state_market_flexibility_complement/replication.py
+  suggested_command: python engine/runs/welfare_state_market_flexibility_complement/replication.py
+data:
+  inputs:
+  - name: outcome_real_gdp_per_capita_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: decomposition_channels_labour_productivity_growth
+    publisher: pwt
+    series_id: rgdpo
+    vintage_file: data/vintages/pwt/rgdpo@2026-04-30T144524Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      computed_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: controls_human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls_investment_share
+    publisher: world_bank_wdi
+    series_id: NE.GDI.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      computed_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:59.823578+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross capital formation (% of GDP)
+      source_note: Gross capital formation includes acquisitions less disposals of
+        produced assets for purposes of fixed capital formation, inventories or valuables.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: controls_age_dependency_ratio
+    publisher: world_bank_wdi
+    series_id: SP.POP.DPND
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.DPND@2026-04-30T115149Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 55e8f700801c26542bc91239571687d0a8219db7cdc2e93c4cf38ad136d1953d
+      computed_sha256: 55e8f700801c26542bc91239571687d0a8219db7cdc2e93c4cf38ad136d1953d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.DPND?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.DPND
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:51:49.340788+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Age dependency ratio (% of working-age population)
+      source_note: Age dependency ratio is the ratio of dependents--people younger
+        than 15 or older than 64--to the working-age population--those ages 15-64.
+        Data are shown as the proportion of dependents per 100 working-age population.
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - 'constructed: OECD SNA household disposable income per capita real growth'
+  - oecd_social_expenditure:public_social_expenditure
+  - 'constructed: composite of OECD PMR (inverted), OECD EPL (inverted), trade openness
+    (WDI), and debt-to-GDP (IMF, inverted above 90%)'
+  - oecd_lfs:employment_rate_15_64
+  data_quality:
+    grade: incomplete
+    input_count: 6
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 6
+    missing_series_count: 4
+artifacts:
+- path: hypotheses/fiscal/welfare_state_market_flexibility_complement.yaml
+  sha256: 52f0ae505377bb8ffba9b05206dd27a9383a8b0a88f714b27ac6cf0c0133d8bd
+  bytes: 6583
+- path: engine/runs/welfare_state_market_flexibility_complement/manifest.yaml
+  sha256: d8b266ae46bd1f4e458116ee4c13ca8392cefe832fef529ebd260886cebaf942
+  bytes: 2838
+- path: engine/runs/welfare_state_market_flexibility_complement/diagnostics.json
+  sha256: 0c205e8c6da930046e03c8e77c5b028e266abcbf46306e782df75e5931d3e8f9
+  bytes: 4234
+- path: engine/runs/welfare_state_market_flexibility_complement/result_card.md
+  sha256: d66038b28aff7f2e4de69dacf24f5e760ddead84f01c685e572e9187d8b9367a
+  bytes: 3465
+- path: engine/runs/welfare_state_market_flexibility_complement/replication.py
+  sha256: b974f28694ade9187cd44043ce57e12345fe40160e3df0ff79aa601ef75d084f
+  bytes: 760
+- path: hypotheses/steelman/welfare_state_market_flexibility_complement.md
+  sha256: fa4b6e1fce9f30c2384c4872d382c481ed3aef879dcd84c525ea3feb4532e266
+  bytes: 4088
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: pwt
+  series_id: hc
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: hc
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.DPND
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.DPND?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.DPND
+  url: https://data.worldbank.org/indicator/SP.POP.DPND
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

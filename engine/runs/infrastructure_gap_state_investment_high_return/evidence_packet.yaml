@@ -1,0 +1,309 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:35:52+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: infrastructure_gap_state_investment_high_return
+  legacy_id: null
+  path: hypotheses/growth/infrastructure_gap_state_investment_high_return.yaml
+  school: null
+  topic: growth
+  claim: 'State-led infrastructure investment (transport, energy, water, telecommunications)
+    has high economic returns in countries below basic access thresholds (paved-road
+    density <20 km per 100 km2, electricity access <80%, clean water access <90%),
+    confirming developmentalist catch-up logic. Returns are measured by subsequent
+    GDP growth, firm productivity, and agricultural yield improvements in connected
+    regions, over 1990-2020. The claim is adversarial: it validates a core developmentalist
+    argument under specific boundary conditions.'
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=-0.001855, p=0.973 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: 'State-led infrastructure investment (transport, energy, water, telecommunications)
+    has high economic returns in countries below basic access thresholds (paved-road
+    density <20 km per 100 km2, electricity access <80%, clean water access <90%),
+    confirming developmentalist catch-up logic. Returns are measured by subsequent
+    GDP growth, firm productivity, and agricultural yield improvements in connected
+    regions, over 1990-2020. The claim is adversarial: it validates a core developmentalist
+    argument under specific boundary conditions.'
+  falsification_rule: The hypothesis is falsified if public infrastructure investment
+    has a negative and significant (p < 0.10) association with GDP or productivity
+    growth in below-threshold countries, or if the coefficient is not distinguishable
+    from zero after controlling for governance and initial income.
+  threshold:
+    supported: infrastructure_investment coefficient > 0 at p < 0.10 in below-threshold
+      subsample
+    refuted: coefficient < 0 at p < 0.10 in below-threshold subsample
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+  steelman: hypotheses/steelman/infrastructure_gap_state_investment_high_return.md
+reproduction:
+  run_dir: engine/runs/infrastructure_gap_state_investment_high_return
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/infrastructure_gap_state_investment_high_return/replication.py
+  suggested_command: python engine/runs/infrastructure_gap_state_investment_high_return/replication.py
+data:
+  inputs:
+  - name: outcome:real_gdp_per_capita_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD.ZG
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD.ZG@2026-05-05T194650Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf
+      computed_sha256: 3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:50.855882+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 13897
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita growth (annual %)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator denotes t'
+      countries_param: all
+      vintage_utc: null
+  - name: treatment:public_infrastructure_investment_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FTOT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      computed_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:56.960422+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 9870
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation (% of GDP)
+      source_note: Gross fixed capital formation includes acquisitions less disposals
+        of fixed assets during the accounting period, including certain specified
+        expenditures on services that add to the value of non-produced assets. This
+        indicator is expressed as a percentage of Gross Domestic Product (GDP) which
+        is the total income earned through the production of goods and services in
+        an economic territory during an
+      countries_param: all
+      vintage_utc: null
+  - name: controls:log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 14066
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: controls:human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 8637
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls:trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 10714
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls:political_stability
+    publisher: wgi
+    series_id: PV.EST
+    vintage_file: data/vintages/wgi/PV.EST@2026-05-02T220000Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0b30bf4fbcbbc75a6c8ccbc985cb7301a4339d53783cb2cdfb27dfac514ab043
+      computed_sha256: 0b30bf4fbcbbc75a6c8ccbc985cb7301a4339d53783cb2cdfb27dfac514ab043
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: 5255
+      units: null
+      currency: null
+    extra: {}
+  missing_series:
+  - world_bank_wdi:EA.PRD.AGRI.KD
+  - constructed:world_bank_enterprise_surveys_tfp
+  - constructed:road_density_electricity_water_composite
+  data_quality:
+    grade: incomplete
+    input_count: 6
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 6
+    missing_series_count: 3
+artifacts:
+- path: hypotheses/growth/infrastructure_gap_state_investment_high_return.yaml
+  sha256: 04a52ae05460decffbfb5d4d85ab416a56ba6141bffab25ce310db3fe0dd4cb8
+  bytes: 4124
+- path: engine/runs/infrastructure_gap_state_investment_high_return/manifest.yaml
+  sha256: f1e8ae05f89190b23c827d6bf6bde627323a0d8f7368d6cf4a7407c676374bb0
+  bytes: 2083
+- path: engine/runs/infrastructure_gap_state_investment_high_return/diagnostics.json
+  sha256: c1cd97add16813e7d751e36f605f0c111e284171ee8bb14c4ea7edc60363e9dd
+  bytes: 2913
+- path: engine/runs/infrastructure_gap_state_investment_high_return/result_card.md
+  sha256: 4780a17c4102028e69093db2d45c5c8f26d5c6f0b2835579d4ddb7c54632d605
+  bytes: 2417
+- path: engine/runs/infrastructure_gap_state_investment_high_return/replication.py
+  sha256: 86a09bdaa5ed71b982c517d2a278b13c3dcec40c461f7179015cfc640eb03e5b
+  bytes: 772
+- path: hypotheses/steelman/infrastructure_gap_state_investment_high_return.md
+  sha256: 48c9b4f069f93c9e60e15eb9ab6b37b836ad1be247044a5bcd5d581ecd3e3461
+  bytes: 2805
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD.ZG
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD.ZG
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: pwt
+  series_id: hc
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: hc
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.
