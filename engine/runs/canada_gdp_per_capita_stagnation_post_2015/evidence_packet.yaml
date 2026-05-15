@@ -1,0 +1,314 @@
+packet_version: 1
+generated_utc: '2026-05-15T18:01:20+00:00'
+repository:
+  root: .
+  git_commit: 410f4a87d487265e2b1f6ed9e6a90492b38398c4
+hypothesis:
+  id: canada_gdp_per_capita_stagnation_post_2015
+  legacy_id: null
+  path: hypotheses/growth/canada_gdp_per_capita_stagnation_post_2015.yaml
+  school: null
+  topic: growth
+  claim: "Canadian GDP per capita (PPP, constant international dollars) diverged negatively\
+    \ from a donor pool of resource-plus-advanced-anglophone-plus- small-open-developed\
+    \ economies (USA, AUS, NZL, GBR, NOR, CHE) starting around 2015, such that the\
+    \ Canadian per-capita trajectory 2015-2023 is materially below a country-and-year-fixed-effect\
+    \ counterfactual matched on pre-2015 level and covariates. The claim is narrowly\
+    \ about per-capita output trajectory; it does not assert that aggregate GDP fell\
+    \ (it did not) nor that Canadian headline growth was bad in every year. It asserts\
+    \ that per-capita productivity growth under the 2015-present policy mix was slow\
+    \ enough, and population growth fast enough, that the per-capita level has stagnated\
+    \ relative to the donor pool \u2014 consistent with the productivity-gap warning\
+    \ issued by Bank of Canada Senior Deputy Governor Rogers in March 2024 (\"it's\
+    \ an emergency\").\n"
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=-0.03861 (sign matches claim -), p=0.00752
+  status: null
+preregistration:
+  claim: "Canadian GDP per capita (PPP, constant international dollars) diverged negatively\
+    \ from a donor pool of resource-plus-advanced-anglophone-plus- small-open-developed\
+    \ economies (USA, AUS, NZL, GBR, NOR, CHE) starting around 2015, such that the\
+    \ Canadian per-capita trajectory 2015-2023 is materially below a country-and-year-fixed-effect\
+    \ counterfactual matched on pre-2015 level and covariates. The claim is narrowly\
+    \ about per-capita output trajectory; it does not assert that aggregate GDP fell\
+    \ (it did not) nor that Canadian headline growth was bad in every year. It asserts\
+    \ that per-capita productivity growth under the 2015-present policy mix was slow\
+    \ enough, and population growth fast enough, that the per-capita level has stagnated\
+    \ relative to the donor pool \u2014 consistent with the productivity-gap warning\
+    \ issued by Bank of Canada Senior Deputy Governor Rogers in March 2024 (\"it's\
+    \ an emergency\").\n"
+  falsification_rule: "Not supported if \u03B2 on canada_post_2015 is non-negative\
+    \ (>= 0) at p < 0.10 in the TWFE specification OR if the synthetic-control gap\
+    \ for Canada is non-negative for a majority of post-2015 years. If the TWFE \u03B2\
+    \ is negative and significant but the population-growth decomposition attributes\
+    \ more than 100% of the per-capita gap to denominator growth (i.e., real-GDP numerator\
+    \ growth is at or above donor-pool average), the headline claim is recorded as\
+    \ supported on per-capita stagnation but NOT supported on productivity- stagnation,\
+    \ and the result card must state this disaggregation explicitly.\n"
+  threshold: "\u03B2_canada_post_2015 < 0 at p < 0.10  AND  synthetic-control gap\
+    \ post_2015 negative in \u226560% of years. Population-growth decomposition reported\
+    \ alongside as interpretation guard.\n"
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Primary: TWFE with country + year fixed effects. \u03B2 on the canada_post_2015\
+      \ indicator identifies the Canadian per-capita trajectory deviation from the\
+      \ donor pool's time-average under fixed-effects adjustment, with clustered standard\
+      \ errors.\nSecondary: synthetic-control robustness. For each post-2015 year,\
+      \ compute synthetic Canada as the weighted average of donor countries matched\
+      \ on 2000-2014 outcome + pre-2015 covariate means. Report Canada-actual minus\
+      \ Canada-synthetic gap.\nTreatment-date robustness: re-run with 2016 cutoff\
+      \ (first full year under the Trudeau government) and report both coefficients.\n\
+      Population-growth decomposition: Canadian population grew ~15% 2015-2023, substantially\
+      \ faster than the donor pool average. A mechanical accounting decomposition\
+      \ reports the share of the per-capita gap attributable to faster denominator\
+      \ growth vs slower numerator (real GDP) growth. This is descriptive, not causal,\
+      \ but is essential for interpretation: a large portion of Canadian per-capita\
+      \ stagnation reflects rapid immigration-driven population growth absorbing output,\
+      \ not an absolute contraction of the productive base.\n"
+  steelman: hypotheses/steelman/canada_gdp_per_capita_stagnation_post_2015.md
+reproduction:
+  run_dir: engine/runs/canada_gdp_per_capita_stagnation_post_2015
+  runner: null
+  replication_script: engine/runs/canada_gdp_per_capita_stagnation_post_2015/replication.py
+  suggested_command: python engine/runs/canada_gdp_per_capita_stagnation_post_2015/replication.py
+data:
+  inputs:
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-24T093414Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 751ca2ec9be31a601ee1180fd88f2df8f8aad41c38683244dcabf96daea654f7
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:14.734865+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  - name: gdp_pc_kd
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-04-24T093402Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: dc39af2ee8fdf8d908039f28a7bdc7f2e26fcef8c50137f1a3ef5341d6ca6790
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:02.707437+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-04-24T093436Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 41b4cf786c937365599f45b566769cad95a93835c32a3884b261d40e116edb42
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.TOTL
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:36.084322+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population, total
+      source_note: Total population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship. The
+        values shown are midyear estimates.
+      countries_param: all
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-04-24T093539Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: e007bd45f1de4803988352635a60900a3c9d0e0cad0e81014537326400c1b431
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:35:39.615378+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: urbanisation
+    publisher: world_bank_wdi
+    series_id: SP.URB.TOTL.IN.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-04-24T093457Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 6875bd0d6440d943b743d77ef977bffec3b37a83f14131bb9c4f3ccc5292a30f
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:57.837140+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Urban population (% of total population)
+      source_note: Urban population refers to people living in urban areas as defined
+        by national statistical offices. The data are collected and smoothed by United
+        Nations Population Division.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 5
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 5
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/growth/canada_gdp_per_capita_stagnation_post_2015.yaml
+  sha256: ac6aa016b59dbd7e99cb9a36079022d98f76766c47f60e403c980a328c431c7f
+  bytes: 12453
+- path: engine/runs/canada_gdp_per_capita_stagnation_post_2015/manifest.yaml
+  sha256: 04102715e96521f7674584666b9646d625b9d1a39b27bba7f0e4502edc45c677
+  bytes: 1308
+- path: engine/runs/canada_gdp_per_capita_stagnation_post_2015/diagnostics.json
+  sha256: 0c0b96ebe04fcaa783812b5833db5df2fe931c9bce359f716f43f72135562e80
+  bytes: 3211
+- path: engine/runs/canada_gdp_per_capita_stagnation_post_2015/result_card.md
+  sha256: 3031bca6d7fed5b859d8508d9535ee6dcd159826cd3c2ed61f47d660e1470590
+  bytes: 3092
+- path: engine/runs/canada_gdp_per_capita_stagnation_post_2015/replication.py
+  sha256: 5c94269486227baf11b418fba194aec1093d9f2bb4853cc40266c3c43213c261
+  bytes: 19606
+- path: engine/runs/canada_gdp_per_capita_stagnation_post_2015/coefficients.parquet
+  sha256: 02b57b7aaaa9b5a62efd9053b5e5c5cf1730c78f7391041a4f59ec9e9a0741d9
+  bytes: 5610
+- path: engine/runs/canada_gdp_per_capita_stagnation_post_2015/chart_data.json
+  sha256: aaf9df14192abae255f7b3850434c9d17a1bb1bdc59a571e95047e0d0fc04a8f
+  bytes: 15301
+- path: hypotheses/steelman/canada_gdp_per_capita_stagnation_post_2015.md
+  sha256: 941d42277fe512dde0e5166daaa602f3a23ffdb12a5455e51a9fee37bbc5447c
+  bytes: 6627
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://data.worldbank.org/indicator/SP.POP.TOTL
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+caveats: []

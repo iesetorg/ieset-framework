@@ -1,0 +1,7 @@
+# Steelman - wdi_business_entry_rule_of_law_growth_panel
+
+The strongest case for the claim is that formal entry is most economically meaningful when courts, contract enforcement, property security, and administrative predictability make registered firms able to invest beyond subsistence or compliance motives. Under that interpretation, a new-business-registration panel should not merely ask whether entry counts correlate with growth; it should ask whether the entry-growth relationship is stronger where rule of law gives registration a better chance to become durable productive activity.
+
+The strongest objection is that business registrations are an imperfect entrepreneurship proxy. Registration campaigns, changes in online filing rules, informal-sector formalisation drives, shell firms, and tax-code incentives can all raise the count without raising real productive dynamism. Rule of law is also slow moving and correlated with income, state capacity, education, and financial depth. Country and year fixed effects plus same-year growth controls reduce some obvious confounding, but this remains an associational screen.
+
+If the interaction is supported, the result should be read as evidence that market-process indicators need institutional boundary conditions. If it is partial or refuted, the sensible update is that WDI registration counts are too noisy, too policy-sensitive, or too weakly linked to growth to carry the entrepreneurship mechanism in a simple global FE design.
