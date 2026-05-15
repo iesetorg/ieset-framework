@@ -1,0 +1,346 @@
+packet_version: 1
+generated_utc: '2026-05-15T20:04:49+00:00'
+repository:
+  root: .
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
+hypothesis:
+  id: us_eu_divergence_decomposition
+  legacy_id: null
+  path: hypotheses/growth/us_eu_divergence_decomposition.yaml
+  school: null
+  topic: growth
+  claim: 'The US-EU GDP per capita (PPP, constant international dollars) gap has widened
+    materially between 2000 and 2023. The gap ratio (US divided by EU-27 average)
+    grew from approximately 1.25 in 2000 to approximately 1.45 by 2023, a divergence
+    of ~20 percentage points. The widening is not primarily demographic (both regions
+    age) or measurement-artefact; it is associated with specific policy-content differences:
+    US energy- cost advantage post-2010 shale revolution, EU cumulative regulatory
+    burden on the digital sector (GDPR 2018, DMA 2022, AI Act 2024), US capital-market
+    depth enabling tech-sector scale that EU bank-financed systems produce less of,
+    and EU Stability and Growth Pact constraining countercyclical fiscal response.
+    This hypothesis establishes the divergence as a stylised fact and attempts a first-pass
+    decomposition.
+
+    '
+verdict:
+  raw: "partial \u2014 gap widened +0.044 log-points but less than 0.10 threshold"
+  bucket: partial
+  reason: null
+  status: null
+preregistration:
+  claim: 'The US-EU GDP per capita (PPP, constant international dollars) gap has widened
+    materially between 2000 and 2023. The gap ratio (US divided by EU-27 average)
+    grew from approximately 1.25 in 2000 to approximately 1.45 by 2023, a divergence
+    of ~20 percentage points. The widening is not primarily demographic (both regions
+    age) or measurement-artefact; it is associated with specific policy-content differences:
+    US energy- cost advantage post-2010 shale revolution, EU cumulative regulatory
+    burden on the digital sector (GDPR 2018, DMA 2022, AI Act 2024), US capital-market
+    depth enabling tech-sector scale that EU bank-financed systems produce less of,
+    and EU Stability and Growth Pact constraining countercyclical fiscal response.
+    This hypothesis establishes the divergence as a stylised fact and attempts a first-pass
+    decomposition.
+
+    '
+  falsification_rule: 'Not supported if (a) the US-EU gap ratio did not widen materially
+    (less than 10 percentage points) between 2000 and 2023, OR (b) the gap is flat
+    or closing rather than widening, OR (c) the widening is fully explained by demographic
+    or measurement artefact (requires a separate demographic-decomposition robustness).
+
+    '
+  threshold: 'gap_2023 - gap_2000 >= 0.10 (log units)  AND post-2010 interaction coefficient
+    > 0  AND the widening survives a demographic controls robustness
+
+    '
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Two-stage:\nStage 1 (descriptive): compute log(US GDP pc PPP) \u2212 log(EU\
+      \ population-weighted GDP pc PPP) per year. Plot trajectory 2000-2023. Confirm\
+      \ widening magnitude and timing.\nStage 2 (decomposition): PanelOLS with US\
+      \ vs EU-member country FE + year FE, interaction of US dummy with post-2010\
+      \ (shale) indicator, post-2018 (GDPR-era digital regulation) indicator, post-2021\
+      \ (EU energy crisis) indicator. Each interaction coefficient attributes incremental\
+      \ divergence to the period it names.\nThis is explicitly a DESCRIPTIVE / DECOMPOSITION\
+      \ hypothesis, not a causal identification. The evidence_type reflects that \u2014\
+      \ we claim to document a pattern and propose a decomposition, not to causally\
+      \ identify each channel's contribution.\n"
+  steelman: hypotheses/steelman/us_eu_divergence_decomposition.md
+reproduction:
+  run_dir: engine/runs/us_eu_divergence_decomposition
+  runner: null
+  replication_script: engine/runs/us_eu_divergence_decomposition/replication.py
+  suggested_command: python engine/runs/us_eu_divergence_decomposition/replication.py
+data:
+  inputs:
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      computed_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:48.372391+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  - name: gdp_total
+    publisher: world_bank_wdi
+    series_id: NY.GDP.MKTP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD@2026-05-05T194653Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 48246a85b73c7168a3a8abbf9f68e233b811524a4be095cd3d7a9cd3a28da702
+      computed_sha256: 48246a85b73c7168a3a8abbf9f68e233b811524a4be095cd3d7a9cd3a28da702
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:53.195277+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. This indicator
+        is expressed in constant prices, meaning the series has been adjusted to account
+        for price changes over '
+      countries_param: all
+      vintage_utc: null
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      computed_sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.TOTL
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:26.845195+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population, total
+      source_note: Total population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship. The
+        values shown are midyear estimates.
+      countries_param: all
+      vintage_utc: null
+  - name: urbanisation
+    publisher: world_bank_wdi
+    series_id: SP.URB.TOTL.IN.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-05-05T203650Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: d3545e1c27b14eabafd3cbe7bbbc5edb5f21c7b97954ab76fc70392599c675f6
+      computed_sha256: d3545e1c27b14eabafd3cbe7bbbc5edb5f21c7b97954ab76fc70392599c675f6
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:36:50.662542+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Urban population (% of total population)
+      source_note: Urban population refers to people living in urban areas as defined
+        by national statistical offices. The data are collected and smoothed by United
+        Nations Population Division.
+      countries_param: all
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: debt_gdp
+    publisher: imf
+    series_id: GGXWDG_NGDP
+    vintage_file: data/vintages/imf/GGXWDG_NGDP@2026-05-05T195336Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: e9b5a3be72e315a25baa9a3f55985a6b51f6a95299ed9fb0b1c0fb4e6a993ef4
+      computed_sha256: e9b5a3be72e315a25baa9a3f55985a6b51f6a95299ed9fb0b1c0fb4e6a993ef4
+      status: match
+    source:
+      type: official
+      url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+      methodology_url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+      license: IMF standard permissions (attribution required)
+      fetch_utc: '2026-05-05T19:53:36.145743+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1980'
+      end_date: '2031'
+      frequency: annual
+      rows: 8113
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_label: null
+      dataset: null
+      countries_filter: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 6
+    official_source_count: 6
+    manual_source_count: 0
+    hash_status_counts:
+      match: 6
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/growth/us_eu_divergence_decomposition.yaml
+  sha256: 344cd73d82f0bd9df0dadecedc51e0d1b33e9f696091da96efc047ecbbd5efba
+  bytes: 9771
+- path: engine/runs/us_eu_divergence_decomposition/manifest.yaml
+  sha256: a7c2fd61b12fabd8fa5800e65310c9e8545bc9a3ea7ce92dd7f5832c617deec0
+  bytes: 1503
+- path: engine/runs/us_eu_divergence_decomposition/diagnostics.json
+  sha256: 11f8b4f5861f2a8dc79ad23dd591603ae0692be2d1fb7d0ba9f909b70bb9cfea
+  bytes: 3086
+- path: engine/runs/us_eu_divergence_decomposition/result_card.md
+  sha256: 7183bf77f13ff44793dadb96f6ab1bdeee987ccfb80ec86e85ab2f88275922b0
+  bytes: 1966
+- path: engine/runs/us_eu_divergence_decomposition/replication.py
+  sha256: efa6eb4e2377ea9e171b63dafeb2af0e6647c09774a9b9a7abee617027351501
+  bytes: 15942
+- path: engine/runs/us_eu_divergence_decomposition/coefficients.parquet
+  sha256: 29953a2359be7498b1568748082087607a8f02ffb5bd6b8bb7f50a17e5afd028
+  bytes: 5710
+- path: engine/runs/us_eu_divergence_decomposition/chart_data.json
+  sha256: e7655e14e2057c04d5e606a254e20cf24d7ab7c4d52ca4528034c33c50dd10f0
+  bytes: 23161
+- path: hypotheses/steelman/us_eu_divergence_decomposition.md
+  sha256: 75779cf54ef5ae0096712e2efa2897f568ffa2a223241ccbe2da815fa19fa5f9
+  bytes: 1396
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://data.worldbank.org/indicator/SP.POP.TOTL
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+- kind: methodology
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+caveats: []

@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-"""Replication script for post_soviet_transition_institutional_variation."""
+"""Replication wrapper for `post_soviet_transition_institutional_variation`."""
 from __future__ import annotations
 
-import subprocess
+import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-CMD = [str(ROOT / "venv/bin/python"), str(ROOT / "scripts/run_panel_fe.py"), "post_soviet_transition_institutional_variation", "--force"]
+RUNS_ROOT = Path(__file__).resolve().parents[1]
+if str(RUNS_ROOT) not in sys.path:
+    sys.path.insert(0, str(RUNS_ROOT))
+
+from _replication_runner import rerun
+
+HYPOTHESIS_ID = "post_soviet_transition_institutional_variation"
+RUNNER = "scripts/run_panel_fe.py"
 
 if __name__ == "__main__":
-    raise SystemExit(subprocess.run(CMD, cwd=ROOT).returncode)
+    raise SystemExit(rerun(__file__, HYPOTHESIS_ID, RUNNER))

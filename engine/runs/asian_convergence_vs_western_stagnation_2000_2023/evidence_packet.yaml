@@ -1,0 +1,170 @@
+packet_version: 1
+generated_utc: '2026-05-15T20:04:49+00:00'
+repository:
+  root: .
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
+hypothesis:
+  id: asian_convergence_vs_western_stagnation_2000_2023
+  legacy_id: null
+  path: hypotheses/growth/asian_convergence_vs_western_stagnation_2000_2023.yaml
+  school: null
+  topic: growth
+  claim: "From 2000 to 2023, Asian economies that continued market-oriented institutional\
+    \ reform from a low starting GDP-per-capita base \u2014 China, India, Vietnam,\
+    \ Indonesia, Malaysia, Thailand, Philippines, Bangladesh, Sri Lanka, Cambodia\
+    \ \u2014 converged rapidly on Western income levels, with cumulative log GDP-per-capita-PPP\
+    \ growth materially greater than incumbent Western economies. The Western group\
+    \ showed heterogeneous outcomes \u2014 US and some Nordic economies matched or\
+    \ exceeded Asian convergence on levels, while continental EU (Germany, France,\
+    \ Italy, Spain) and UK lagged. The divergence is explained primarily by (a) low-base\
+    \ catch-up dynamics + market-reform continuation in Asia and (b) specific regulatory-accretion\
+    \ + energy-policy constraints in underperforming Western cases \u2014 NOT by a\
+    \ generic \"Western socialism\" story. The framework's test: decomposing the cross-regional\
+    \ divergence into catch-up dynamics vs policy-regime effects.\n"
+verdict:
+  raw: "SUPPORTED \u2014 gap +0.74 log-points (>= 0.30 threshold), ~+109% relative.\
+    \ Asian mean log-growth +0.98, Western +0.24. Conditional-convergence \u03B2_asian\
+    \ = -0.037 (p=0.720) \u2014 reported as informative mechanism colour only; a near-zero\
+    \ coefficient is a Solow-regression construction artefact when log_2000 absorbs\
+    \ the catch-up signal, not evidence against convergence."
+  bucket: supported
+  reason: null
+  status: null
+preregistration:
+  claim: "From 2000 to 2023, Asian economies that continued market-oriented institutional\
+    \ reform from a low starting GDP-per-capita base \u2014 China, India, Vietnam,\
+    \ Indonesia, Malaysia, Thailand, Philippines, Bangladesh, Sri Lanka, Cambodia\
+    \ \u2014 converged rapidly on Western income levels, with cumulative log GDP-per-capita-PPP\
+    \ growth materially greater than incumbent Western economies. The Western group\
+    \ showed heterogeneous outcomes \u2014 US and some Nordic economies matched or\
+    \ exceeded Asian convergence on levels, while continental EU (Germany, France,\
+    \ Italy, Spain) and UK lagged. The divergence is explained primarily by (a) low-base\
+    \ catch-up dynamics + market-reform continuation in Asia and (b) specific regulatory-accretion\
+    \ + energy-policy constraints in underperforming Western cases \u2014 NOT by a\
+    \ generic \"Western socialism\" story. The framework's test: decomposing the cross-regional\
+    \ divergence into catch-up dynamics vs policy-regime effects.\n"
+  falsification_rule: "PRIMARY (dispositive): the hypothesis is falsified if cumulative\
+    \ log GDP-per-capita-PPP growth of the Asian treated group mean minus the Western\
+    \ comparison group mean over 2000\u20132023 is less than 0.30 log-points (~35%\
+    \ relative), OR the rank order is reversed (Western mean grows faster than Asian\
+    \ mean in log terms). INFORMATIVE (not dispositive): the conditional-convergence\
+    \ coefficient \u03B2_asian (sign expected positive; known to collapse when log_2000\
+    \ absorbs the catch-up signal \u2014 a Solow-regression construction artefact).\
+    \ Reported in diagnostics as mechanism colour only.\n"
+  threshold: 'PRIMARY: cumulative_log_growth(asian_mean) - cumulative_log_growth(western_mean)
+    >= 0.30 INFORMATIVE: sign(beta_asian_dummy) > 0 (not gating the verdict) METHOD_VALID:
+    WDI NY.GDP.PCAP.PP.KD for all 24 countries, 2020-2021 COVID years excluded per
+    sample.exclusion_rules.
+
+    '
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - year
+    notes: 'Two-step design:
+
+      Step 1 (descriptive): compute cumulative log GDP-per-capita-PPP growth 2000-2023
+      per country. Rank countries by growth. Expected: Asian treated group in the
+      top half; incumbent Western group in the bottom half on cumulative log-growth,
+      but NOT on levels (Western still higher in 2023 on absolute GDP-per-capita).
+
+      Step 2 (conditional-convergence test): pooled cross-sectional regression of
+      2023 log GDP-per-capita on 2000 log level + asian_treated dummy + controls.
+      Coefficient on the dummy, controlling for starting level, identifies Asian-specific
+      excess growth conditional on initial income (convergence rate differential).
+
+      Secondary decomposition (data-gated): wealth-tier expansion using Credit Suisse
+      / UBS Global Wealth Report (millionaire count by country, annual 2000-present)
+      + Forbes billionaire count annual 2000-present. These are specialized data sources
+      requiring custom fetchers; pre-registered here for v1.1 run once fetchers land.
+
+      Primary outcome test: cumulative log GDP-per-capita-PPP growth gap between groups.
+      Wealth-tier results inform mechanism (growth-driven vs capital-concentration-driven).
+
+      '
+  steelman: hypotheses/steelman/asian_convergence_vs_western_stagnation_2000_2023.md
+reproduction:
+  run_dir: engine/runs/asian_convergence_vs_western_stagnation_2000_2023
+  runner: null
+  replication_script: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/replication.py
+  suggested_command: python engine/runs/asian_convergence_vs_western_stagnation_2000_2023/replication.py
+data:
+  inputs:
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      computed_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:48.372391+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 1
+    official_source_count: 1
+    manual_source_count: 0
+    hash_status_counts:
+      match: 1
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/growth/asian_convergence_vs_western_stagnation_2000_2023.yaml
+  sha256: 47e3a1d33508ba042e300e0ee2efc315d8309e7a1357def85639e87a7bb5b5d4
+  bytes: 12981
+- path: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/manifest.yaml
+  sha256: 254dcbcfaf29166c4673dac55c69d129b30c716ede8a6558da23bbe4e95593ac
+  bytes: 362
+- path: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/diagnostics.json
+  sha256: 6fde8d125c9970681815bc6439d7283b81858b8d8d3be0a854f60f58e94e1298
+  bytes: 6617
+- path: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/result_card.md
+  sha256: 584653cbdc51b7cdef20802d64c70d5a681f589bbe4ce44975392549b7a06518
+  bytes: 4332
+- path: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/replication.py
+  sha256: 494a5d06d48fccbf6f409de4409f6d27ef38f4035dc495829d14fa45bd842d43
+  bytes: 14054
+- path: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/coefficients.parquet
+  sha256: 6d2ece566c0f7f882e2d78a76a110fb4c39829513c0492df5b7fb3c37978e9cb
+  bytes: 2280
+- path: engine/runs/asian_convergence_vs_western_stagnation_2000_2023/chart_data.json
+  sha256: 7a765ffbc87ea728c62c92b708b545cee71483baf5320e2472f310e589296156
+  bytes: 47599
+- path: hypotheses/steelman/asian_convergence_vs_western_stagnation_2000_2023.md
+  sha256: 114638cb6f8d6f9484596ebcd01f5e762321c5982ea81540edd9b889b0723dca
+  bytes: 4838
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+caveats: []

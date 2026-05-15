@@ -1,0 +1,365 @@
+packet_version: 1
+generated_utc: '2026-05-15T20:00:26+00:00'
+repository:
+  root: .
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
+hypothesis:
+  id: mortgage_market_liberalisation_homeownership_panel
+  legacy_id: null
+  path: hypotheses/housing/mortgage_market_liberalisation_homeownership_panel.yaml
+  school: null
+  topic: housing
+  claim: 'In a broad-country panel 1990-2020, mortgage-market liberalisation episodes
+    (abolition of interest-rate caps, reduction of down-payment requirements, privatisation
+    of state mortgage banks, and introduction of securitisation) predict higher homeownership
+    rates, higher residential investment as a share of GDP, and lower housing-rent-to-income
+    ratios, controlling for income growth, demographic structure, and urbanisation.
+    The directional claim is that mortgage liberalisation is associated with at least
+    a 3 percentage-point increase in the homeownership rate and a 0.5 percentage-point
+    increase in residential investment/GDP within 5 years.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=+1.307, p=0.379 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: 'In a broad-country panel 1990-2020, mortgage-market liberalisation episodes
+    (abolition of interest-rate caps, reduction of down-payment requirements, privatisation
+    of state mortgage banks, and introduction of securitisation) predict higher homeownership
+    rates, higher residential investment as a share of GDP, and lower housing-rent-to-income
+    ratios, controlling for income growth, demographic structure, and urbanisation.
+    The directional claim is that mortgage liberalisation is associated with at least
+    a 3 percentage-point increase in the homeownership rate and a 0.5 percentage-point
+    increase in residential investment/GDP within 5 years.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B21 (mortgage liberalisation) is positive\
+    \ and significant at p<0.10 for both homeownership and residential investment.\
+    \ PARTIAL if positive and significant for homeownership but not investment (demand\
+    \ reallocation without supply response). REFUTED if \u03B21 is negative and significant\
+    \ at p<0.10. INFORMATIVE: excluding USA and UK should not eliminate the positive\
+    \ sign; if it does, the result is driven by Anglo- Saxon cases.\n"
+  threshold: "\u03B2_mortgage_lib (homeownership) > 0 at p<=0.10  AND \u03B2_mortgage_lib\
+    \ (residential investment) > 0 at p<=0.10  AND Ex-USA-UK robustness retains positive\
+    \ sign.\n"
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: "Two-way FE panel with staggered adoption: homeownership = \u03B20 + \u03B2\
+      1*mortgage liberalisation + controls + FE. Robustness: (1) exclude USA and UK\
+      \ (dominant liberalisation cases); (2) use synthetic control for each adopter;\
+      \ (3) control for house-price growth to separate credit access from asset-price\
+      \ effects; (4) subsample by initial financial depth; (5) use 5-year forward\
+      \ averages to capture medium-run housing-stock adjustment.\n"
+  steelman: hypotheses/steelman/mortgage_market_liberalisation_homeownership_panel.md
+reproduction:
+  run_dir: engine/runs/mortgage_market_liberalisation_homeownership_panel
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/mortgage_market_liberalisation_homeownership_panel/replication.py
+  suggested_command: python engine/runs/mortgage_market_liberalisation_homeownership_panel/replication.py
+data:
+  inputs:
+  - name: residential_investment_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FTOT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      computed_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:56.960422+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation (% of GDP)
+      source_note: Gross fixed capital formation includes acquisitions less disposals
+        of fixed assets during the accounting period, including certain specified
+        expenditures on services that add to the value of non-produced assets. This
+        indicator is expressed as a percentage of Gross Domestic Product (GDP) which
+        is the total income earned through the production of goods and services in
+        an economic territory during an
+      countries_param: all
+      vintage_utc: null
+  - name: private_credit_depth
+    publisher: world_bank_wdi
+    series_id: GFDD.DI.14
+    vintage_file: data/vintages/world_bank_wdi/GFDD.DI.14@2026-05-03T053937Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f061d21445f5e8adecfd9106791c9e0faaa23dd1d4b625ceb236ad41a90a7042
+      computed_sha256: f061d21445f5e8adecfd9106791c9e0faaa23dd1d4b625ceb236ad41a90a7042
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: urban_population_share
+    publisher: world_bank_wdi
+    series_id: SP.URB.TOTL.IN.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-05-05T203650Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: d3545e1c27b14eabafd3cbe7bbbc5edb5f21c7b97954ab76fc70392599c675f6
+      computed_sha256: d3545e1c27b14eabafd3cbe7bbbc5edb5f21c7b97954ab76fc70392599c675f6
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:36:50.662542+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Urban population (% of total population)
+      source_note: Urban population refers to people living in urban areas as defined
+        by national statistical offices. The data are collected and smoothed by United
+        Nations Population Division.
+      countries_param: all
+      vintage_utc: null
+  - name: working_age_population_share
+    publisher: world_bank_wdi
+    series_id: SP.POP.1564.TO.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.1564.TO.ZS@2026-05-05T203617Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3099ca75ff53c94c46244648e2efa883dfd391d6c7823ec1cb8a5976ba7e53c2
+      computed_sha256: 3099ca75ff53c94c46244648e2efa883dfd391d6c7823ec1cb8a5976ba7e53c2
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.1564.TO.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.1564.TO.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:36:17.929335+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population ages 15-64 (% of total population)
+      source_note: Total population between the ages 15 to 64 as a percentage of the
+        total population. Population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship.
+      countries_param: all
+      vintage_utc: null
+  - name: inflation_rate
+    publisher: world_bank_wdi
+    series_id: FP.CPI.TOTL.ZG
+    vintage_file: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+      computed_sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:37.553129+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Inflation, consumer prices (annual %)
+      source_note: Inflation as measured by the consumer price index reflects the
+        annual percentage change in the cost to the average consumer of acquiring
+        a basket of goods and services that may be fixed or changed at specified intervals,
+        such as yearly. This indicator denotes the percentage change over each previous
+        year of the constant price (base year 2015) series in United States dollars.
+      countries_param: all
+      vintage_utc: null
+  - name: real_interest_rate
+    publisher: world_bank_wdi
+    series_id: FR.INR.RINR
+    vintage_file: data/vintages/world_bank_wdi/FR.INR.RINR@2026-04-30T114938Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 297377cdbde6e536355c560f92d16b6e416e27fd133d1597de712076ede424fd
+      computed_sha256: 297377cdbde6e536355c560f92d16b6e416e27fd133d1597de712076ede424fd
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FR.INR.RINR?format=json
+      methodology_url: https://data.worldbank.org/indicator/FR.INR.RINR
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:49:38.261864+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Real interest rate (%)
+      source_note: An interest rate is the amount charged, expressed as a percentage
+        of the principal over a period of time, by the owners of certain kinds of
+        financial assets for putting the financial assets at the disposal of another
+        institutional unit. The real interest rate is the lending interest rate adjusted
+        for inflation as measured by the GDP deflator. The terms and conditions attached
+        to lending rates diff
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - constructed:homeownership_rate_country_year
+  data_quality:
+    grade: incomplete
+    input_count: 7
+    official_source_count: 6
+    manual_source_count: 0
+    hash_status_counts:
+      match: 7
+    missing_series_count: 1
+artifacts:
+- path: hypotheses/housing/mortgage_market_liberalisation_homeownership_panel.yaml
+  sha256: e8fb957e6abf36ed78910efa5d8dff03b11220c4f013f298eba3fcec6a27c49c
+  bytes: 6095
+- path: engine/runs/mortgage_market_liberalisation_homeownership_panel/manifest.yaml
+  sha256: 62aed6d500fca423d10022133dae5c951643756eef5b0292db215a4ab5301b98
+  bytes: 2182
+- path: engine/runs/mortgage_market_liberalisation_homeownership_panel/diagnostics.json
+  sha256: 223daed9d598a0e90d424349b850394e6395a822ffcbed42cdec279437bf49df
+  bytes: 3490
+- path: engine/runs/mortgage_market_liberalisation_homeownership_panel/result_card.md
+  sha256: 71d9105536bde9b9da723149a5242541ef364f6baa813c917cba271ff7b6e57e
+  bytes: 2985
+- path: engine/runs/mortgage_market_liberalisation_homeownership_panel/replication.py
+  sha256: d39beba6db508a69244ab5afe20bb4fac01905395acecc7b214cd0fd1d7d8b62
+  bytes: 431
+- path: hypotheses/steelman/mortgage_market_liberalisation_homeownership_panel.md
+  sha256: d01969e23eb3a6bd8d2bf04035cbb609d11406e31f804b66d850c78a43fdc30c
+  bytes: 2006
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.1564.TO.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.1564.TO.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.1564.TO.ZS
+  url: https://data.worldbank.org/indicator/SP.POP.1564.TO.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: FP.CPI.TOTL.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: FP.CPI.TOTL.ZG
+  url: https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG
+- kind: source
+  publisher: world_bank_wdi
+  series_id: FR.INR.RINR
+  url: https://api.worldbank.org/v2/country/all/indicator/FR.INR.RINR?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: FR.INR.RINR
+  url: https://data.worldbank.org/indicator/FR.INR.RINR
+caveats:
+- Mortgage liberalisation treatment is a constructed country-year indicator with no
+  separate local vintage file.
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.
+- The rerun estimates residential investment only; the registered homeownership-rate
+  outcome remains data-pending.

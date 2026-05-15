@@ -1,0 +1,405 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:58:32+00:00'
+repository:
+  root: .
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
+hypothesis:
+  id: government_spending_tfp_drag_panel
+  legacy_id: null
+  path: hypotheses/fiscal/government_spending_tfp_drag_panel.yaml
+  school: null
+  topic: fiscal
+  claim: 'In a broad-country panel 1980-2019, a larger government expenditure share
+    of GDP predicts lower subsequent total-factor-productivity (TFP) growth, controlling
+    for initial income, trade openness, and human capital. The directional claim is
+    that a 10 percentage-point increase in government spending/GDP is associated with
+    at least 0.3 percentage points lower annual TFP growth over the following decade,
+    and that this relationship is monotonic across the observed spending range.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=-0.002033, p=0.157 (above \u03B1=0.05); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: 'In a broad-country panel 1980-2019, a larger government expenditure share
+    of GDP predicts lower subsequent total-factor-productivity (TFP) growth, controlling
+    for initial income, trade openness, and human capital. The directional claim is
+    that a 10 percentage-point increase in government spending/GDP is associated with
+    at least 0.3 percentage points lower annual TFP growth over the following decade,
+    and that this relationship is monotonic across the observed spending range.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B21 (govt spending) is negative and significant\
+    \ at p<0.05 for both TFP growth and labour productivity growth. PARTIAL if negative\
+    \ and significant for TFP but not labour productivity. REFUTED if \u03B21 is positive\
+    \ and significant at p<0.05. INFORMATIVE: excluding oil exporters should not eliminate\
+    \ the negative sign; if it does, the result is driven by resource rent endogeneity.\n"
+  threshold: "\u03B2_govt_spending (TFP growth) < 0 at p<=0.05  AND \u03B2_govt_spending\
+    \ (labour productivity) < 0 at p<=0.05  AND Ex-oil-exporter robustness retains\
+    \ negative sign.\n"
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - decade
+    clustering: country
+    notes: "Panel FE with non-overlapping 5-year averages to capture medium-run effects\
+      \ and reduce noise: TFP_growth = \u03B20 + \u03B21*govt_spending/GDP + controls\
+      \ + FE. Robustness: (1) exclude oil exporters where spending is endogenous to\
+      \ resource rents; (2) use Fraser EFW size-of-government sub-index instead of\
+      \ WDI spending; (3) subsample by income level; (4) 10-year forward growth to\
+      \ reduce reverse causality.\n"
+  steelman: hypotheses/steelman/government_spending_tfp_drag_panel.md
+reproduction:
+  run_dir: engine/runs/government_spending_tfp_drag_panel
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/government_spending_tfp_drag_panel/replication.py
+  suggested_command: python engine/runs/government_spending_tfp_drag_panel/replication.py
+data:
+  inputs:
+  - name: tfp_growth_annual
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: labour_productivity_growth
+    publisher: pwt
+    series_id: rgdpo_per_emp
+    vintage_file: data/vintages/pwt/rgdpo_per_emp@2026-04-30T142942Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: 61d7900806151010f4f8dd7a8c9a5ee3822063d79052d51c8fb4e780c8d4d49c
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: government_spending_share_gdp
+    publisher: world_bank_wdi
+    series_id: GC.XPN.TOTL.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/GC.XPN.TOTL.GD.ZS@2026-04-30T131014Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: 6415fec35cc561ac0d5743aa3ef38de80ea1e8a831eb95dbb214f6f58a5ed9ad
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: government_consumption_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.CON.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.TOTL.ZS@2026-04-30T143521Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 74e093bdacca97631ac4e4a143dc4459fab60d92fefa5f4c231b61f3320e09f7
+      computed_sha256: 74e093bdacca97631ac4e4a143dc4459fab60d92fefa5f4c231b61f3320e09f7
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.CON.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T14:35:21.631896+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T143737Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Final consumption expenditure (% of GDP)
+      source_note: Final consumption expenditure is expenditure on goods and services
+        by resident institutional units for the direct satisfaction of human needs
+        or wants, whether individual or collective. Final consumption expenditure
+        can be measured for households, general government, the central bank and non-profit
+        institutions serving households. This indicator is expressed as a percentage
+        of Gross Domestic Produ
+      countries_param: all
+      vintage_utc: null
+  - name: log_initial_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: investment_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FTOT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      computed_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:56.960422+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation (% of GDP)
+      source_note: Gross fixed capital formation includes acquisitions less disposals
+        of fixed assets during the accounting period, including certain specified
+        expenditures on services that add to the value of non-produced assets. This
+        indicator is expressed as a percentage of Gross Domestic Product (GDP) which
+        is the total income earned through the production of goods and services in
+        an economic territory during an
+      countries_param: all
+      vintage_utc: null
+  - name: population_growth
+    publisher: world_bank_wdi
+    series_id: SP.POP.GROW
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.GROW@2026-05-05T194839Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      computed_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.GROW
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:39.147679+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population growth (annual %)
+      source_note: Annual population growth rate for year t is the exponential rate
+        of growth of midyear population from year t-1 to t, expressed as a percentage.
+        Population is based on the de facto definition of population, which counts
+        all residents regardless of legal status or citizenship.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 9
+    official_source_count: 7
+    manual_source_count: 0
+    hash_status_counts:
+      computed_only: 2
+      match: 7
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/fiscal/government_spending_tfp_drag_panel.yaml
+  sha256: f38d38ba5ba9a908aa5cc10be0fb2f9ece1a58578196cfa8ead449aa1025e8c7
+  bytes: 5466
+- path: engine/runs/government_spending_tfp_drag_panel/manifest.yaml
+  sha256: 343f64cf3621a8609c0b89d58b3d7f2809a78a9de845e659e84da18cef022902
+  bytes: 1041
+- path: engine/runs/government_spending_tfp_drag_panel/diagnostics.json
+  sha256: 5d56d5a6fc3076c11f57c03cac489f26c339ba49dc2fbba628abce61b05171b5
+  bytes: 3100
+- path: engine/runs/government_spending_tfp_drag_panel/result_card.md
+  sha256: d9f1a95f29ca302f9e8aa3583c79151e4ba7ab36f1f5f2b9121fd9fb0cbd3870
+  bytes: 2347
+- path: engine/runs/government_spending_tfp_drag_panel/replication.py
+  sha256: 65213aceb95d8c34bff3da58141fd146589f8b7f1b1a38d3378ea7cf6e3a9dc7
+  bytes: 399
+- path: hypotheses/steelman/government_spending_tfp_drag_panel.md
+  sha256: 654b505d960d9320d10f0a78b6de27a854bf96f0e396b9c8f5e91efb86370cd6
+  bytes: 1713
+references:
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.CON.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.CON.TOTL.ZS
+  url: https://data.worldbank.org/indicator/NE.CON.TOTL.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://data.worldbank.org/indicator/SP.POP.GROW
+caveats: []
