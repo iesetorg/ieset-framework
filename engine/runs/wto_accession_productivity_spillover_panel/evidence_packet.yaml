@@ -1,0 +1,311 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:33:32+00:00'
+repository:
+  root: .
+  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+hypothesis:
+  id: wto_accession_productivity_spillover_panel
+  legacy_id: null
+  path: hypotheses/trade/wto_accession_productivity_spillover_panel.yaml
+  school: null
+  topic: trade
+  claim: 'WTO accession predicts total factor productivity (TFP) growth spillovers
+    through increased import competition and expanded export market access, especially
+    in episodes where domestic entry barriers also fall, in a panel of accession and
+    non-accession countries 1995-2020. The directional claim is that accession countries
+    experience faster TFP growth in the 10-year post-accession window than matched
+    non-accession peers, with the effect magnified when domestic product-market regulation
+    (entry barriers) declines concurrently.
+
+    '
+verdict:
+  raw: INCONCLUSIVE_DATA_PENDING
+  bucket: inconclusive
+  reason: treatment 'wto_accession_indicator' has no within-country variation under
+    country fixed effects
+  status: INCONCLUSIVE_DATA_PENDING
+preregistration:
+  claim: 'WTO accession predicts total factor productivity (TFP) growth spillovers
+    through increased import competition and expanded export market access, especially
+    in episodes where domestic entry barriers also fall, in a panel of accession and
+    non-accession countries 1995-2020. The directional claim is that accession countries
+    experience faster TFP growth in the 10-year post-accession window than matched
+    non-accession peers, with the effect magnified when domestic product-market regulation
+    (entry barriers) declines concurrently.
+
+    '
+  falsification_rule: 'SUPPORTED if the ATT on TFP growth over the 10-year post-accession
+    window is positive and significant at p<0.10, AND the effect is larger (by at
+    least 50% in point estimate) for the subsample where domestic entry barriers also
+    fell. PARTIAL if the main ATT is positive and significant but the interaction
+    with entry-barrier reduction is insignificant (market access alone drives the
+    effect). REFUTED if the ATT is negative and significant at p<0.10. INFORMATIVE:
+    pre-trend coefficients t-5 to t-1 should be jointly insignificant; significant
+    pre-trends invalidate the parallel-trends assumption.
+
+    '
+  threshold: "ATT (TFP growth, 10yr post) > 0 at p<=0.10  AND ATT_entry_barrier_fall\
+    \ >= 1.5 \xD7 ATT_entry_barrier_stable  AND Pre-trend F-test p >= 0.10.\n"
+  estimator:
+    template: event_study
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: 'Event-study design with dynamic treatment effects estimated year-by-year
+      from t-5 to t+10 relative to WTO accession. Parallel trends assessed via pre-trend
+      coefficients. Primary estimator: Callaway-Sant''Anna staggered DiD with not-yet-treated
+      and never-treated controls. Secondary: synthetic DiD (Arkhangelsky et al.) for
+      robustness to heterogeneous treatment effects. Interaction with domestic entry-barrier
+      reduction estimated via subsample split and via explicit interaction term.
+
+      '
+  steelman: hypotheses/steelman/wto_accession_productivity_spillover_panel.md
+reproduction:
+  run_dir: engine/runs/wto_accession_productivity_spillover_panel
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/wto_accession_productivity_spillover_panel/replication.py
+  suggested_command: python engine/runs/wto_accession_productivity_spillover_panel/replication.py
+data:
+  inputs:
+  - name: outcome_total_factor_productivity_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: outcome_labour_productivity_growth
+    publisher: pwt
+    series_id: rgdpo
+    vintage_file: data/vintages/pwt/rgdpo@2026-04-30T144524Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      computed_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: controls_log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: controls_human_capital
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls_infrastructure_quality
+    publisher: wgi
+    series_id: GE.EST
+    vintage_file: data/vintages/wgi/GE.EST@2026-04-30T114242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      computed_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GE.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:42.165458+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: controls_fdi_inflows_pct_gdp
+    publisher: world_bank_wdi
+    series_id: BX.KLT.DINV.WD.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      computed_sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/BX.KLT.DINV.WD.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:51:06.923165+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Foreign direct investment, net inflows (% of GDP)
+      source_note: Foreign direct investment are the net inflows of investment to
+        acquire a lasting management interest (10 percent or more of voting stock)
+        in an enterprise operating in an economy other than that of the investor.
+        It is the sum of equity capital, reinvestment of earnings, other long-term
+        capital, and short-term capital as shown in the balance of payments. This
+        series shows net inflows (new investmen
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - oecd_pmr:ETCR
+  - world_bank_wits:import_value
+  - 'constructed: weighted foreign tariff faced by exporter'
+  data_quality:
+    grade: incomplete
+    input_count: 6
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 6
+    missing_series_count: 3
+artifacts:
+- path: hypotheses/trade/wto_accession_productivity_spillover_panel.yaml
+  sha256: 2796896d4220c9884bac3c76e84a6b13d7c99992acc416f73c7d7dc8387846d6
+  bytes: 6454
+- path: engine/runs/wto_accession_productivity_spillover_panel/manifest.yaml
+  sha256: 014c877b3116f723ff0ec7e3c838a28f57a1619391619ed4ab1b448c53913fa1
+  bytes: 2325
+- path: engine/runs/wto_accession_productivity_spillover_panel/diagnostics.json
+  sha256: 190bf11552061a4dd53458da405df050dd1dca85f268dedbe268f2872f11105b
+  bytes: 3427
+- path: engine/runs/wto_accession_productivity_spillover_panel/result_card.md
+  sha256: c99160fa1c67ba1bd98b3edcfb5ce7df4f2b18f576f16daecb46151dd949fe52
+  bytes: 2804
+- path: engine/runs/wto_accession_productivity_spillover_panel/replication.py
+  sha256: d30f07c182a6b3434c0d9984d9e20131d51a149d1179f2991649eb38c7a7e3df
+  bytes: 757
+- path: hypotheses/steelman/wto_accession_productivity_spillover_panel.md
+  sha256: 33d39a7f65b6e9b6dd2f3dda05cb2f0afc40d3bd3e14684aec8defc8c6acfe5b
+  bytes: 3224
+references:
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: wgi
+  series_id: GE.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GE.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: GE.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: BX.KLT.DINV.WD.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/BX.KLT.DINV.WD.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: BX.KLT.DINV.WD.GD.ZS
+  url: https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

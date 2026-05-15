@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: onshore_wind_lcoe_2010_2024_learning_curve_continuation
+version: 1
+status: candidate
+topic: energy
+
+claim: >
+  The onshore wind learning curve continued through the 2020-2024 supply-chain,
+  commodity-price, and inflation shocks. Global onshore-wind levelised cost of
+  electricity (LCOE) in 2024 remained below 2019 levels in real terms, and the
+  2010-2024 cost-capacity learning slope did not flatten materially relative to
+  the 2010-2019 slope.
+
+evidence_type: associational
+
+sample:
+  countries: [GLOBAL]
+  period: [2010, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "global learning curve fitted on IRENA world LCOE and country-summed installed onshore-wind capacity"
+
+scope:
+  period: [2010, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [energy, productivity, industrial_capability]
+  policy_family: [energy_policy, industrial_policy, none]
+  treatment_tags: [wind_power_learning_curve, renewable_energy_scaleup, clean_energy_supply_chain_shock]
+
+variables:
+  outcome:
+    - name: log_onshore_wind_lcoe_usd_per_mwh
+      source: "irena:lcoe_wind_onshore"
+      transformation: log
+      notes: "IRENA renewable cost database, global onshore-wind LCOE in 2024 USD/MWh."
+  treatment:
+    - name: log_cumulative_installed_wind_capacity_mw
+      source: "irena:installed_capacity_wind"
+      transformation: log
+      notes: "Country-summed IRENA installed wind capacity, used as the learning-curve x-axis."
+    - name: post_2020_supply_chain_shock_dummy
+      source: "constructed: indicator = 1 from 2020 onward"
+      transformation: indicator
+
+estimator:
+  template: descriptive
+  notes: >
+    Fit log(global onshore-wind LCOE) on log(global installed wind capacity),
+    first for 2010-2019 and then for 2010-2024. Compare the implied learning
+    rate per capacity doubling. A post-2020 interaction tests whether the
+    slope materially flattened during the shock period.
+
+falsification:
+  rule: >
+    SUPPORTED if 2024 onshore-wind LCOE is below 2019 LCOE, the full 2010-2024
+    learning slope retains at least 85% of the absolute 2010-2019 slope, and
+    the post-2020 flattening interaction is not positive and significant at
+    p<0.10. PARTIAL if the LCOE level improves but one slope condition fails.
+    REFUTED if 2024 LCOE is above 2019 or the full-sample learning slope
+    retains less than 70% of the pre-2020 slope.
+  test: onshore_wind_learning_curve_2010_2024
+  threshold: "2024 LCOE < 2019 LCOE; slope retention >= 0.85; no significant positive post-2020 slope interaction."
+
+prior_confidence: 0.68
+
+disclosure: >
+  This is a global technology-cost test, not a causal estimate of any single
+  country's wind policy. It cannot distinguish learning-by-doing from turbine
+  size, financing costs, site quality, grid connection, or commodity-price
+  changes. It is useful as an energy-cost trajectory test, not as proof that
+  subsidy policy or industrial policy caused the decline.
+
+steelman: hypotheses/steelman/onshore_wind_lcoe_2010_2024_learning_curve_continuation.md
+
+linked_hypotheses:
+  - solar_lcoe_2010_2024_learning_curve_continuation
+  - china_renewables_global_learning_curve_spillover
+  - china_renewables_industrial_policy_learning_curve
+
+notes: >
+  Created during the 2026-05-15 diverse data unlock pass after the IRENA
+  onshore-wind LCOE workbook and installed-capacity panel were confirmed
+  available locally.

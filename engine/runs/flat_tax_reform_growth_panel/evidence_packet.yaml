@@ -1,0 +1,330 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:58:32+00:00'
+repository:
+  root: .
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
+hypothesis:
+  id: flat_tax_reform_growth_panel
+  legacy_id: null
+  path: hypotheses/fiscal/flat_tax_reform_growth_panel.yaml
+  school: null
+  topic: fiscal
+  claim: 'Countries that adopted a flat personal-income-tax regime between 1994 and
+    2012 experienced faster real GDP per capita growth in the decade following reform
+    than matched non-reforming peers, controlling for initial income, institutional
+    quality, and trade openness. The directional claim is that flat-tax adoption is
+    associated with at least 0.5 percentage points higher annual real GDP per capita
+    growth over the post-reform decade.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=-0.5794, p=0.46 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: 'Countries that adopted a flat personal-income-tax regime between 1994 and
+    2012 experienced faster real GDP per capita growth in the decade following reform
+    than matched non-reforming peers, controlling for initial income, institutional
+    quality, and trade openness. The directional claim is that flat-tax adoption is
+    associated with at least 0.5 percentage points higher annual real GDP per capita
+    growth over the post-reform decade.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B21 (flat-tax indicator) is positive and significant\
+    \ at p<0.10 and the post-reform decade mean growth gap vs synthetic counterfactual\
+    \ is at least 0.3 pp/year. PARTIAL if positive and significant in FE but not in\
+    \ synthetic-control estimates. REFUTED if \u03B21 is negative and significant\
+    \ at p<0.10. INFORMATIVE: excluding Russia and Estonia should not eliminate the\
+    \ positive sign; if it does, the result is driven by two dominant cases.\n"
+  threshold: "\u03B2_flat_tax (GDP pc growth) > 0 at p<=0.10  AND Synthetic-control\
+    \ post-reform gap >= 0.30 pp/yr  AND Ex-Russia-Estonia robustness retains positive\
+    \ sign.\n"
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: "Two-way FE panel with staggered adoption: growth = \u03B20 + \u03B21*flat_tax\
+      \ + \u03B22*years_since + controls + FE. Robustness: (1) exclude Russia and\
+      \ Estonia (dominant early adopters); (2) use synthetic control for each adopter\
+      \ vs matched non-adopters; (3) subsample by OECD vs non-OECD; (4) use Fraser\
+      \ EFW tax-burden sub-index as continuous alternative treatment.\n"
+  steelman: hypotheses/steelman/flat_tax_reform_growth_panel.md
+reproduction:
+  run_dir: engine/runs/flat_tax_reform_growth_panel
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/flat_tax_reform_growth_panel/replication.py
+  suggested_command: python engine/runs/flat_tax_reform_growth_panel/replication.py
+data:
+  inputs:
+  - name: real_gdp_per_capita_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD.ZG
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD.ZG@2026-05-05T194650Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf
+      computed_sha256: 3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:50.855882+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita growth (annual %)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator denotes t'
+      countries_param: all
+      vintage_utc: null
+  - name: real_gdp_per_capita_level
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: inflation_rate
+    publisher: world_bank_wdi
+    series_id: FP.CPI.TOTL.ZG
+    vintage_file: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+      computed_sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:37.553129+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Inflation, consumer prices (annual %)
+      source_note: Inflation as measured by the consumer price index reflects the
+        annual percentage change in the cost to the average consumer of acquiring
+        a basket of goods and services that may be fixed or changed at specified intervals,
+        such as yearly. This indicator denotes the percentage change over each previous
+        year of the constant price (base year 2015) series in United States dollars.
+      countries_param: all
+      vintage_utc: null
+  - name: investment_share_gdp
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FTOT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      computed_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:56.960422+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation (% of GDP)
+      source_note: Gross fixed capital formation includes acquisitions less disposals
+        of fixed assets during the accounting period, including certain specified
+        expenditures on services that add to the value of non-produced assets. This
+        indicator is expressed as a percentage of Gross Domestic Product (GDP) which
+        is the total income earned through the production of goods and services in
+        an economic territory during an
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 6
+    official_source_count: 6
+    manual_source_count: 0
+    hash_status_counts:
+      match: 6
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/fiscal/flat_tax_reform_growth_panel.yaml
+  sha256: 9760de77dc933c64095a9e86daf49c0cb1eba53cf8a03f88b9667f0313cf32f4
+  bytes: 5444
+- path: engine/runs/flat_tax_reform_growth_panel/manifest.yaml
+  sha256: 46996130007bdb4765afc657ed2a3f4ded8a20e0c2f472163a46db60195666a3
+  bytes: 764
+- path: engine/runs/flat_tax_reform_growth_panel/diagnostics.json
+  sha256: e7423ddfa88bdb3ae2747e7c3f154e883dd6017ff1715053b0b9adb15a56302e
+  bytes: 3730
+- path: engine/runs/flat_tax_reform_growth_panel/result_card.md
+  sha256: a4722312dbf9b2bb2362664213bb0cd2c6c9980bd1f597fb010bb7074b6dea1b
+  bytes: 2934
+- path: engine/runs/flat_tax_reform_growth_panel/replication.py
+  sha256: 7f30f4d81b78d384ec1480afa86360f9428fd672f2e5cf5f4eaa051f01962bf4
+  bytes: 387
+- path: hypotheses/steelman/flat_tax_reform_growth_panel.md
+  sha256: 3b5748ee381848deb8018b4a4d5b6a89113799fb0ed48bbbfd9646aee2f06793
+  bytes: 1856
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD.ZG
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD.ZG
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: FP.CPI.TOTL.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: FP.CPI.TOTL.ZG
+  url: https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FTOT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FTOT.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.FTOT.ZS
+caveats: []

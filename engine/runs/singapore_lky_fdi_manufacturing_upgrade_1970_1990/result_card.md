@@ -19,8 +19,8 @@
 This is a pre-registered descriptive checklist over local vintages. It grades whether the observed Singapore pattern clears the stated thresholds; it does not identify a single causal lever inside the LKY-era bundle.
 
 ## Sources
-- `world_bank_wdi:BX.KLT.DINV.WD.GD.ZS` -> `data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-04-30T140100Z.parquet`
-- `world_bank_wdi:NV.IND.MANF.ZS` -> `data/vintages/world_bank_wdi/NV.IND.MANF.ZS@2026-04-30T140203Z.parquet`
+- `world_bank_wdi:BX.KLT.DINV.WD.GD.ZS` -> `data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet`
+- `world_bank_wdi:NV.IND.MANF.ZS` -> `data/vintages/world_bank_wdi/NV.IND.MANF.ZS@2026-05-05T194954Z.parquet`
 - `world_bank_wdi:TX.VAL.MANF.ZS.UN` -> `data/vintages/world_bank_wdi/TX.VAL.MANF.ZS.UN@2026-04-30T115209Z.parquet`
 
 ## Steelman

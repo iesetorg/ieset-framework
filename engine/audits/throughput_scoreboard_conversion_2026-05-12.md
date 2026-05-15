@@ -1,6 +1,6 @@
 # Throughput Scoreboard Conversion Audit
 
-Generated: 2026-05-13
+Generated: 2026-05-15
 
 ## Methodology Gate
 
@@ -14,9 +14,9 @@ Generated: 2026-05-13
 
 - batch_files: ['engine/audits/monthly_hypothesis_throughput_kickoff_2026-05-12.md', 'engine/audits/monthly_hypothesis_throughput_batch_02_2026-05-12.md', 'engine/audits/monthly_hypothesis_throughput_batch_03_2026-05-12.md', 'engine/audits/monthly_hypothesis_throughput_batch_04_2026-05-12.md']
 - hypotheses_reviewed: 129
-- verdict_counts: {'inconclusive': 21, 'partial': 41, 'refuted': 25, 'supported': 42}
-- conversion_counts: {'repair_data_or_design': 21, 'hold_interpretation_qa': 29, 'needs_position_claim_mapping': 3, 'scoreboard_ready_existing_mapping': 56, 'hold_duplicate_broad_panel_qa': 18, 'hold_broad_panel_upgrade': 2}
-- qa_flag_counts: {'associational_panel': 89, 'direction_inconclusive': 20, 'zero_effect_partial': 6, 'broad_scope': 17, 'duplicate_fingerprint': 18, 'direction_ambiguous': 8}
+- verdict_counts: {'inconclusive': 14, 'partial': 44, 'refuted': 26, 'supported': 45}
+- conversion_counts: {'repair_data_or_design': 14, 'hold_interpretation_qa': 32, 'scoreboard_ready_existing_mapping': 58, 'hold_duplicate_broad_panel_qa': 18, 'needs_position_claim_mapping': 5, 'hold_broad_panel_upgrade': 2}
+- qa_flag_counts: {'associational_panel': 89, 'direction_inconclusive': 20, 'zero_effect_partial': 7, 'broad_scope': 17, 'duplicate_fingerprint': 18, 'direction_ambiguous': 10}
 - duplicate_fingerprint_groups: 6
 
 ## Conversion Buckets
@@ -25,10 +25,10 @@ Generated: 2026-05-13
 | --- | ---: |
 | `hold_broad_panel_upgrade` | 2 |
 | `hold_duplicate_broad_panel_qa` | 18 |
-| `hold_interpretation_qa` | 29 |
-| `needs_position_claim_mapping` | 3 |
-| `repair_data_or_design` | 21 |
-| `scoreboard_ready_existing_mapping` | 56 |
+| `hold_interpretation_qa` | 32 |
+| `needs_position_claim_mapping` | 5 |
+| `repair_data_or_design` | 14 |
+| `scoreboard_ready_existing_mapping` | 58 |
 
 ## Records
 
@@ -37,8 +37,8 @@ Generated: 2026-05-13
 | `industrial_concentration_labour_share_link` | inconclusive | associational | 1 | 1 | `repair_data_or_design` | associational_panel |
 | `us_eu_gdp_per_capita_divergence_policy_causes` | partial | associational | 6 | 6 | `hold_interpretation_qa` | direction_inconclusive |
 | `federal_minimum_wage_employment_meta` | inconclusive | associational | 1 | 1 | `repair_data_or_design` | - |
-| `oecd_low_education_unemployment_minimum_wage_bite` | refuted | associational | 0 | 0 | `needs_position_claim_mapping` | - |
-| `bls_qcew_county_food_service_minimum_wage_growth` | refuted | associational | 0 | 0 | `needs_position_claim_mapping` | - |
+| `oecd_low_education_unemployment_minimum_wage_bite` | refuted | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
+| `bls_qcew_county_food_service_minimum_wage_growth` | refuted | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
 | `china_renewables_global_learning_curve_spillover` | refuted | descriptive | 3 | 3 | `scoreboard_ready_existing_mapping` | - |
 | `ira_2022_clean_energy_investment_decomposition` | inconclusive | causal | 0 | 0 | `repair_data_or_design` | - |
 | `financial_negative_rates_eurozone_2014_2022` | inconclusive | descriptive | 0 | 0 | `repair_data_or_design` | - |
@@ -72,21 +72,21 @@ Generated: 2026-05-13
 | `government_spending_tfp_drag_panel` | partial | associational | 0 | 0 | `hold_interpretation_qa` | broad_scope, direction_inconclusive, associational_panel |
 | `flat_tax_reform_growth_panel` | partial | associational | 0 | 0 | `hold_interpretation_qa` | direction_inconclusive, associational_panel |
 | `mortgage_market_liberalisation_homeownership_panel` | partial | associational | 0 | 0 | `hold_interpretation_qa` | broad_scope, direction_inconclusive, associational_panel |
-| `privatisation_transition_tfp_panel` | inconclusive | associational | 5 | 5 | `repair_data_or_design` | associational_panel |
+| `privatisation_transition_tfp_panel` | partial | associational | 5 | 5 | `hold_interpretation_qa` | zero_effect_partial, associational_panel |
 | `business_dynamism_frontier_income_growth` | refuted | associational | 3 | 3 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `price_signal_integrity_qol_panel` | refuted | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | broad_scope, associational_panel, duplicate_fingerprint |
 | `platform_competition_dissipates_monopoly_rent` | refuted | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `intervention_reversal_qol_loss_1980_2024` | supported | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | broad_scope, associational_panel, duplicate_fingerprint |
 | `latam_resource_nationalisation_social_outcome_tradeoff` | partial | associational | 10 | 10 | `hold_interpretation_qa` | direction_ambiguous, associational_panel |
 | `price_controls_food_output_decline_panel` | refuted | associational | 4 | 4 | `scoreboard_ready_existing_mapping` | associational_panel |
-| `caribbean_climate_resilience_panel_1990_2024` | inconclusive | causal | 0 | 0 | `repair_data_or_design` | - |
+| `caribbean_climate_resilience_panel_1990_2024` | supported | causal | 0 | 0 | `needs_position_claim_mapping` | - |
 | `gfc_household_debt_wage_stagnation_link` | partial | associational | 10 | 10 | `hold_interpretation_qa` | direction_ambiguous, associational_panel |
 | `market_reform_female_education` | supported | associational | 3 | 3 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `asia_bangladesh_apparel_growth_1985_2024` | inconclusive | associational | 0 | 0 | `repair_data_or_design` | associational_panel |
 | `spectrum_auction_vs_administrative_allocation_telecom` | supported | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `sea_singapore_fta_cascade_post_2014` | refuted | associational | 3 | 3 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `banking_crisis_schularick_taylor_credit_boom_panel_post1980` | supported | associational | 4 | 4 | `scoreboard_ready_existing_mapping` | associational_panel |
-| `japan_miti_success_then_stagnation_panel` | inconclusive | associational | 0 | 0 | `repair_data_or_design` | associational_panel |
+| `japan_miti_success_then_stagnation_panel` | supported | associational | 0 | 0 | `needs_position_claim_mapping` | associational_panel |
 | `china_soe_vs_cee_privatised_growth` | inconclusive | associational | 8 | 8 | `repair_data_or_design` | associational_panel |
 | `generic_substitution_mandate_savings_no_harm` | supported | associational | 3 | 3 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `demo_canada_points_system_immigration` | inconclusive | associational | 0 | 0 | `repair_data_or_design` | associational_panel |
@@ -129,24 +129,24 @@ Generated: 2026-05-13
 | `gfc_balance_sheet_recession_post_2008_household_dual_mandate` | inconclusive | associational | 0 | 0 | `repair_data_or_design` | associational_panel |
 | `housing_tax_distortion_mobility` | refuted | associational | 0 | 0 | `hold_broad_panel_upgrade` | broad_scope, associational_panel |
 | `licensing_discretion_bribery` | supported | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | associational_panel, duplicate_fingerprint |
-| `dialysis_market_competition_outcome_quality` | inconclusive | associational | 0 | 0 | `repair_data_or_design` | associational_panel |
+| `dialysis_market_competition_outcome_quality` | supported | associational | 0 | 0 | `needs_position_claim_mapping` | associational_panel |
 | `sea_philippines_bpo_industrial_policy_2005_2024` | supported | associational | 3 | 3 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `venture_capital_market_depth_innovation` | refuted | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `banking_crisis_laeven_valencia_predictors_panel` | supported | associational | 4 | 4 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `CBDC_design_privacy_tradeoff` | partial | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | zero_effect_partial, associational_panel, duplicate_fingerprint |
-| `abenomics_monetary_fiscal_coordination_effect` | inconclusive | associational | 1 | 1 | `repair_data_or_design` | - |
+| `abenomics_monetary_fiscal_coordination_effect` | refuted | associational | 1 | 1 | `scoreboard_ready_existing_mapping` | - |
 | `absolute_decoupling_global_material_throughput` | supported | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
 | `active_labour_market_policy_conditionality_works` | partial | associational | 8 | 8 | `hold_duplicate_broad_panel_qa` | zero_effect_partial, associational_panel, duplicate_fingerprint |
-| `africa_botswana_diamond_dependency_post_2014` | partial | causal | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
+| `africa_botswana_diamond_dependency_post_2014` | partial | causal | 2 | 2 | `hold_interpretation_qa` | direction_ambiguous |
 | `africa_ethiopia_gerd_economic_effect_2011_2024` | partial | causal | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
 | `africa_ethiopia_tigray_war_economic_collapse_2020_2022` | partial | causal | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
 | `africa_ghana_imf_program_2022_debt_distress` | partial | causal | 0 | 0 | `hold_interpretation_qa` | direction_ambiguous |
-| `africa_kenya_mpesa_digital_payments_formalisation_2007_2024` | inconclusive | causal | 0 | 0 | `repair_data_or_design` | - |
+| `africa_kenya_mpesa_digital_payments_formalisation_2007_2024` | partial | causal | 0 | 0 | `needs_position_claim_mapping` | - |
 | `africa_mauritius_export_zone_model_1980_2024` | partial | causal | 0 | 0 | `hold_interpretation_qa` | direction_ambiguous |
-| `africa_nigeria_fuel_subsidy_removal_2023` | inconclusive | causal | 0 | 0 | `repair_data_or_design` | - |
+| `africa_nigeria_fuel_subsidy_removal_2023` | partial | causal | 0 | 0 | `needs_position_claim_mapping` | - |
 | `africa_nigeria_naira_redesign_2023_cash_crisis` | partial | causal | 0 | 0 | `hold_interpretation_qa` | direction_ambiguous |
 | `africa_rwanda_post_genocide_growth_model_1995_2024` | partial | causal | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
-| `africa_south_africa_load_shedding_manufacturing_2007_2024` | partial | causal | 0 | 0 | `needs_position_claim_mapping` | broad_scope |
+| `africa_south_africa_load_shedding_manufacturing_2007_2024` | partial | causal | 0 | 0 | `hold_interpretation_qa` | broad_scope, direction_ambiguous |
 | `africa_ssa_post_covid_recovery_divergence_2020_2024` | refuted | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `agricultural_export_ban_price_instability` | partial | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | zero_effect_partial, associational_panel, duplicate_fingerprint |
 | `agricultural_trade_liberalisation_food_security` | partial | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | zero_effect_partial, associational_panel, duplicate_fingerprint |

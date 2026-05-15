@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wid_top_income_share_trade_openness_panel
+version: 1
+status: pre_registered
+topic: distribution
+claim: >
+  Higher trade openness predicts higher top-income concentration in a country-year
+  panel: after country and year fixed effects, log GDP per capita, population, and
+  regulatory-quality controls, WDI trade as a share of GDP should be positively
+  associated with the WID top 0.1 percent pre-tax income share. The test is an
+  associational screen of whether openness coincides with rising very-top income
+  shares, not a causal estimate of trade shocks or a claim about post-tax inequality.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GRC, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, NLD, NOR, NZL, PER, POL, PRT, SGP, SWE, TUR, USA, ZAF]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID top 0.1 percent pre-tax income share"
+    - "drop country-years missing WDI trade openness, GDP per capita, population, or WGI regulatory quality"
+    - "require at least 15 paired observations per country after the WGI join"
+variables:
+  outcome:
+    - name: top_0_1_pretax_income_share
+      source: "wid:top-0-1-share-of-total-income"
+      transformation: level
+      notes: "WID/OWID-targeted top 0.1 percent share of total pre-tax income, expressed as percent of income."
+  treatment:
+    - name: trade_open_gdp
+      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
+      transformation: level
+      notes: "Trade in goods and services as percent of GDP; higher values mean more open trade exposure."
+  controls:
+    - name: log_gdp_pc_ppp
+      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
+      transformation: log
+    - name: regulatory_quality
+      source: "wgi:GOV_WGI_RQ.EST"
+      transformation: level
+    - name: log_population
+      source: "world_bank_wdi:SP.POP.TOTL"
+      transformation: log
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country, year]
+  notes: >
+    Two-way fixed-effects panel using country and year effects, clustered by
+    country. Primary coefficient is trade_open_gdp. Controls are log GDP per
+    capita PPP, WGI regulatory quality, and log population. The run reports a
+    descriptive high-trade quartile contrast as secondary context only.
+falsification:
+  rule: >
+    SUPPORTED if the trade_open_gdp coefficient is positive and significant at
+    p<0.10. REFUTED if it is negative and significant at p<0.10. PARTIAL
+    otherwise. METHOD_VALID requires at least 500 observations, at least 25
+    countries, and at least 15 paired observations per country after all joins.
+  test: "PanelOLS(top_0_1_pretax_income_share ~ trade_open_gdp + log_gdp_pc_ppp + regulatory_quality + log_population + country_FE + year_FE), clustered by country"
+  threshold:
+    p_max: 0.10
+    min_observations: 500
+    min_countries: 25
+    min_obs_per_country: 15
+prior_confidence: 0.55
+disclosure: >
+  The prior leans slightly toward a positive openness-top-share association
+  because trade and capital mobility can raise returns to scarce skills and
+  owners of internationally scalable firms. The specification is deliberately
+  conservative about interpretation: it does not claim that trade openness
+  alone causes inequality, and a null result would mainly show that broad
+  country-year openness is too blunt to explain very-top income shares.
+steelman: hypotheses/steelman/wid_top_income_share_trade_openness_panel.md
+scope:
+  period: [1996, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [poverty_inequality, trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [trade_openness]
+notes: >
+  Promoted from the Wave 2 Batch 30 plan as the first low-duplicate runnable
+  WID/trade-openness candidate with fully local data. The on-disk targeted WID
+  extract is top 0.1 percent, so this v1 pins that exact inequality concept
+  rather than mixing it with top 1 or top 10 measures.

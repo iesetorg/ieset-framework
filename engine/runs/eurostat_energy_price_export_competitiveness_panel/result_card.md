@@ -18,8 +18,8 @@ classical_liberal, developmentalism, ordoliberal
 
 ## Results
 
-- Usable panel: **227 observations**, **39 countries**, 2019-2024.
-- Coefficient on treatment: **-6.8845** (SE 10.8554, p=0.5259).
+- Usable panel: **176 observations**, **30 countries**, 2019-2024.
+- Coefficient on treatment: **-7.1312** (SE 13.6697, p=0.6019).
 
 ## Specification
 

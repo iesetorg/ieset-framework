@@ -1,6 +1,6 @@
 # Result card - catch_up_capital_deepening_not_tfp
 
-**Verdict:** supported - Early capital+human-capital share 61.2% >= 60% and later TFP contribution falls from 1.47pp/yr to 0.85pp/yr.
+**Verdict:** supported - Early capital+human-capital share 65.0% >= 60% and later TFP contribution falls from 1.28pp/yr to 0.57pp/yr.
 
 ## Design
 
@@ -23,32 +23,32 @@ at least 50% and later TFP contribution does not fall. Otherwise PARTIAL.
 | Observations | 241 | 359 |
 | Countries | 17 | 16 |
 | Output-per-worker growth | +4.90%/yr | +3.97%/yr |
-| Capital contribution | +2.40%/yr | +1.91%/yr |
+| Capital contribution | +2.59%/yr | +2.19%/yr |
 | Human-capital contribution | +0.60%/yr | +0.64%/yr |
-| TFP contribution | +1.47%/yr | +0.85%/yr |
-| Capital + human-capital share | 61.2% | 64.1% |
-| TFP share | 29.9% | 21.4% |
+| TFP contribution | +1.28%/yr | +0.57%/yr |
+| Capital + human-capital share | 65.0% | 71.2% |
+| TFP share | 26.1% | 14.3% |
 
 ## Country Summary
 
 | ISO3 | Start | Early output growth | Early K+HC share | Early TFP | Later TFP |
 |---|---:|---:|---:|---:|---:|
-| BRA | 1964 | +3.17% | 74.0% | +1.53% | -0.24% |
-| CHL | 1974 | +2.79% | 36.4% | +1.89% | +0.56% |
-| CHN | 1978 | +3.95% | 86.0% | +0.56% | +0.90% |
-| EST | 1992 | +5.83% | 42.8% | +2.81% | +0.70% |
-| IDN | 1967 | +4.41% | 62.3% | +0.92% | +1.01% |
-| IND | 1991 | +6.23% | 52.5% | +1.40% | +1.94% |
-| IRL | 1987 | +5.04% | 21.4% | +2.50% | +0.71% |
-| JPN | 1960 | +6.74% | 62.8% | +2.09% | +0.62% |
-| KOR | 1962 | +7.24% | 46.9% | +2.16% | +1.64% |
-| MEX | 1960 | +2.50% | 86.3% | +0.34% | -0.35% |
-| MYS | 1971 | +3.43% | 164.6% | -2.06% | +0.62% |
-| POL | 1990 | +4.50% | 45.1% | +1.89% | +1.09% |
-| SGP | 1965 | +6.51% | 70.9% | +0.21% | +0.01% |
-| THA | 1961 | +6.43% | 48.7% | +3.21% | +1.46% |
-| TUR | 1980 | +1.96% | 143.1% | -0.43% | +0.04% |
-| TWN | 1960 | +6.85% | 47.2% | +3.36% | +2.08% |
+| BRA | 1964 | +3.17% | 77.3% | +1.43% | -0.41% |
+| CHL | 1974 | +2.79% | 39.5% | +1.80% | +0.41% |
+| CHN | 1978 | +3.95% | 90.5% | +0.38% | +0.66% |
+| EST | 1992 | +5.83% | 46.9% | +2.57% | +0.54% |
+| IDN | 1967 | +4.41% | 67.9% | +0.68% | +0.86% |
+| IND | 1991 | +6.23% | 56.3% | +1.16% | +1.78% |
+| IRL | 1987 | +5.04% | 25.8% | +2.28% | +0.54% |
+| JPN | 1960 | +6.74% | 62.3% | +2.12% | +0.46% |
+| KOR | 1962 | +7.24% | 47.6% | +2.11% | +1.44% |
+| MEX | 1960 | +2.50% | 92.4% | +0.19% | -0.51% |
+| MYS | 1971 | +3.43% | 174.1% | -2.39% | -0.04% |
+| POL | 1990 | +4.50% | 52.3% | +1.57% | +0.80% |
+| SGP | 1965 | +6.51% | 76.8% | -0.18% | -0.34% |
+| THA | 1961 | +6.43% | 50.3% | +3.11% | +0.98% |
+| TUR | 1980 | +1.96% | 158.7% | -0.73% | -0.34% |
+| TWN | 1960 | +6.85% | 48.3% | +3.28% | +1.76% |
 
 ## Limitations
 

@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_business_entry_rule_of_law_growth_panel
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim: Across country-years with local WDI and WGI coverage, new business registrations predict stronger three-year forward GDP-per-capita growth mainly where rule of law is higher; in weak-rule-of-law settings, the same business-entry count is a noisier proxy for productive market-process entrepreneurship.
+evidence_type: associational
+sample:
+  countries:
+  - ALB
+  - ARG
+  - AUS
+  - AUT
+  - BEL
+  - BGD
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - ISR
+  - ITA
+  - JPN
+  - KAZ
+  - KEN
+  - KOR
+  - LTU
+  - LVA
+  - MAR
+  - MEX
+  - MYS
+  - NGA
+  - NLD
+  - NOR
+  - NZL
+  - PAK
+  - PER
+  - PHL
+  - POL
+  - PRT
+  - ROU
+  - RUS
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - UKR
+  - USA
+  - VNM
+  - ZAF
+  period: &period
+  - 2006
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Drop country-years missing WDI new business registrations, population, GDP-per-capita
+    growth, or WGI rule of law.
+  - Use three forward growth years, so terminal years without t+1 through t+3 growth
+    outcomes are not scored.
+variables:
+  outcome:
+  - name: fwd_gdp_pc_growth_3y_avg
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: Average of real GDP per-capita growth in years t+1 through t+3.
+  treatment:
+  - name: log_business_entry_per_million
+    source: world_bank_wdi:IC.BUS.NREG; world_bank_wdi:SP.POP.TOTL
+    transformation: log(1 + new business registrations per million population).
+  - name: rule_of_law
+    source: wgi:GOV_WGI_RL.EST
+    transformation: WGI rule-of-law estimate, interacted with business-entry intensity.
+  controls:
+  - name: gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: Same-year real GDP per-capita growth control.
+intervention_channel: institutional
+intervention_channel_justification: Rule of law is an institutional boundary condition
+  for whether formal business entry reflects productive entrepreneurship rather than
+  defensive registration or informality churn.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS panel FE with clustered standard errors; primary coefficient is the
+    interaction log_business_entry_per_million x rule_of_law.
+falsification:
+  rule: The hypothesis is supported only if the interaction coefficient is positive,
+    at least 0.25 GDP-growth points per one-unit WGI rule-of-law increase per log
+    entry intensity, has p <= 0.10, the model-implied marginal entry effect is at
+    least 0.40 points higher at the sample p75 rule-of-law value than at p25, and
+    the joined panel has at least 700 observations across 50 countries.
+  test: wdi_business_entry_rule_of_law_growth_panel
+  threshold:
+    interaction_coef_min: 0.25
+    interaction_p_max: 0.10
+    marginal_gap_min: 0.40
+    min_observations: 700
+    min_countries: 50
+prior_confidence: 0.58
+disclosure: This was selected from the A-grade corpus packet because all required
+  sources were already local. The design is a screening panel, not a causal natural
+  experiment, so supported results should be treated as a promotion candidate for
+  richer identification rather than a final institutional-growth theorem.
+steelman: hypotheses/steelman/wdi_business_entry_rule_of_law_growth_panel.md
+scope:
+  period: *period
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - wdi_business_entry
+  - rule_of_law
+  - entrepreneurship
+  - growth
+linked_hypotheses: []
+linked_conditions: []

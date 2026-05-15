@@ -81,12 +81,93 @@ def event_month_offset(d: pd.Timestamp) -> int:
     return (d.year - EVENT_YEAR) * 12 + (d.month - EVENT_MONTH)
 
 
+def emit_data_pending(missing: str) -> None:
+    reason = (
+        "INDEC IPC Nacional vintage missing from local data/vintages; "
+        f"expected indec:148.3_INIVELNAL_DICI_M_26 ({missing})."
+    )
+    verdict = "INCONCLUSIVE_DATA_PENDING"
+    diagnostics = {
+        "verdict": f"{verdict} - {reason}",
+        "verdict_label": verdict,
+        "verdict_reason": reason,
+        "all_pass": False,
+        "method_valid": False,
+        "event_date": f"{EVENT_YEAR}-{EVENT_MONTH:02d}",
+        "missing_series": ["indec:148.3_INIVELNAL_DICI_M_26"],
+        "run_utc": pd.Timestamp.utcnow().isoformat(),
+    }
+    (OUT_DIR / "diagnostics.json").write_text(json.dumps(diagnostics, indent=2) + "\n")
+
+    chart_data = {
+        "kind": "result",
+        "chart_id": f"{HID}/fig1",
+        "title": "Argentine monthly CPI inflation",
+        "subtitle": reason,
+        "type": "line",
+        "x_axis": {"label": "Month", "type": "time"},
+        "y_axis": {"label": "Monthly CPI change (%)", "type": "linear"},
+        "series": [],
+        "annotations": [{"type": "note", "label": reason}],
+        "sources": [],
+        "permalink": f"/h/{HID}",
+    }
+    (OUT_DIR / "chart_data.json").write_text(json.dumps(chart_data, indent=2) + "\n")
+
+    pd.DataFrame(
+        [
+            {
+                "spec": "data_gate",
+                "term": "missing_series",
+                "estimate": np.nan,
+                "note": "indec:148.3_INIVELNAL_DICI_M_26",
+            }
+        ]
+    ).to_parquet(OUT_DIR / "coefficients.parquet", index=False)
+
+    (OUT_DIR / "manifest.yaml").write_text(
+        f"hypothesis_id: {HID}\n"
+        f"run_utc: '{pd.Timestamp.utcnow().isoformat()}'\n"
+        "status: INCONCLUSIVE_DATA_PENDING\n"
+        f"reason: {json.dumps(reason)}\n"
+        "runner: engine/runs/milei_reforms_reduce_argentine_inflation/replication.py\n"
+        "missing_series:\n"
+        "  - indec:148.3_INIVELNAL_DICI_M_26\n"
+        "vintages:\n"
+        "  indec_ipc_monthly_index:\n"
+        "    publisher: indec\n"
+        "    series: 148.3_INIVELNAL_DICI_M_26\n"
+        "    vintage_file: data/vintages/indec/148.3_INIVELNAL_DICI_M_26@*.parquet\n"
+    )
+
+    card = [
+        "# Milei reforms reduce Argentine inflation",
+        "",
+        f"**Verdict:** {verdict} - {reason}",
+        "",
+        "## Data Gate",
+        "",
+        "- Required local vintage: `data/vintages/indec/148.3_INIVELNAL_DICI_M_26@*.parquet`.",
+        "- The current workspace does not contain an `indec` vintage directory or matching INDEC IPC file.",
+        "- The prior supported result cannot be reproduced in this lane without the registered INDEC input.",
+    ]
+    (OUT_DIR / "result_card.md").write_text("\n".join(card) + "\n")
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # INDEC IPC Nacional — series 148.3_INIVELNAL_DICI_M_26 is the
     # monthly index level (Dec 2016 = 100).
-    indec_path = latest_glob("indec", "148.3_INIVELNAL_DICI_M_26@*.parquet")
+    try:
+        indec_path = latest_glob("indec", "148.3_INIVELNAL_DICI_M_26@*.parquet")
+    except FileNotFoundError as exc:
+        emit_data_pending(str(exc))
+        print(
+            "verdict: INCONCLUSIVE_DATA_PENDING - "
+            "missing indec:148.3_INIVELNAL_DICI_M_26"
+        )
+        return
 
     manifest = {
         "indec_ipc_monthly_index": {

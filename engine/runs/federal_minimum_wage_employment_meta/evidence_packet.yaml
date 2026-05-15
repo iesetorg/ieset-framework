@@ -1,10 +1,11 @@
 packet_version: 1
-generated_utc: '2026-05-04T20:34:54+00:00'
+generated_utc: '2026-05-15T20:01:20+00:00'
 repository:
   root: .
-  git_commit: f34241b08392f87df0e485e858c3d566031ed4aa
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
 hypothesis:
   id: federal_minimum_wage_employment_meta
+  legacy_id: null
   path: hypotheses/labour/federal_minimum_wage_employment_meta.yaml
   school: null
   topic: labour
@@ -12,11 +13,11 @@ hypothesis:
     of state-level evidence, would not produce the 1.3m-job loss CBO low-end estimate;
     effect is closer to zero.
 verdict:
-  raw: INCONCLUSIVE_DATA_PENDING
-  bucket: inconclusive
-  reason: minimum-wage data gate failed; missing state/subnational outcome/treatment
-    panels
-  status: null
+  raw: PARTIAL
+  bucket: partial
+  reason: local state FE elasticity -0.0142 is near zero, but the 90% CI [-0.0750,
+    +0.0466] is not contained in [-0.05, +0.05]
+  status: partial
 preregistration:
   claim: US Sanders 2016/2020 $15 federal minimum wage proposal, in meta-analyses
     of state-level evidence, would not produce the 1.3m-job loss CBO low-end estimate;
@@ -42,29 +43,164 @@ preregistration:
   steelman: null
 reproduction:
   run_dir: engine/runs/federal_minimum_wage_employment_meta
-  runner: null
-  replication_script: null
-  suggested_command: null
+  runner: engine/runs/federal_minimum_wage_employment_meta/replication.py
+  replication_script: engine/runs/federal_minimum_wage_employment_meta/replication.py
+  suggested_command: python engine/runs/federal_minimum_wage_employment_meta/replication.py
 data:
-  inputs: []
+  inputs:
+  - name: qcew
+    publisher: bls
+    series_id: QCEW_state_total_employment_panel
+    vintage_file: data/vintages/bls/QCEW_state_total_employment_panel@2026-05-05T204746Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3b49865ac7d37f6eca2633974d29924d36ee4f08516864f8822d288f6cc8c415
+      computed_sha256: 3b49865ac7d37f6eca2633974d29924d36ee4f08516864f8822d288f6cc8c415
+      status: match
+    source:
+      type: official
+      url: https://data.bls.gov/cew/data/api/{year}/a/industry/10.csv
+      methodology_url: https://www.bls.gov/cew/downloadable-data-files.htm
+      license: public_domain
+      fetch_utc: '2026-05-05T20:47:46.170736+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '2014'
+      end_date: '2024'
+      frequency: annual
+      rows: 561
+      units: establishments, employment, wages, and pay by QCEW area/industry
+      currency: USD
+    extra:
+      qcew_year_start: 1990
+      qcew_year_end: 2024
+      qcew_geography: state
+      qcew_area_count: 51
+      qcew_industry_code: '10'
+      qcew_ownership_code: '0'
+      qcew_agglvl_code: null
+  - name: minwage
+    publisher: usdol
+    series_id: state_minimum_wage_history
+    vintage_file: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      computed_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      status: match
+    source:
+      type: official
+      url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+      methodology_url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+      license: public_domain_us_gov
+      fetch_utc: '2026-05-04T14:53:19.847437+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-04T145323Z.yaml
+    coverage:
+      start_date: '1968'
+      end_date: '2024'
+      frequency: annual
+      rows: 2106
+      units: USD/hour
+      currency: USD
+    extra:
+      columns:
+      - country_iso3
+      - unit_id
+      - state_abbr
+      - state_fips
+      - state_name
+      - year
+      - value
+      - state_rate_low
+      - state_rate_high
+      - federal_rate
+      - raw_value
+      - parse_note
+      jurisdictions: 54
+      effective_floor_rule: max(parsed_state_rate_high, federal_rate); federal fallback
+        when state rate missing
+      vintage_utc: null
+  - name: bite
+    publisher: derived
+    series_id: minimum_wage_bite_ratio_subnational_panel
+    vintage_file: data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f
+      computed_sha256: 22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f
+      status: match
+    source:
+      type: derived
+      url: derived://usdol:state_minimum_wage_history + bls:OEWS_state_*_hourly_wage_panel
+      methodology_url: engine/audits/data_gap_unlock_assessment_2026-05-12.md
+      license: composite; see input vintages
+      fetch_utc: '2026-05-14T11:10:58.588107+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-14T111058Z.yaml
+    coverage:
+      start_date: '2014'
+      end_date: '2024'
+      frequency: annual
+      rows: 474
+      units: ratio
+      currency: null
+    extra:
+      input_minimum_wage_vintage: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+      input_wage_vintage: data/vintages/bls/OEWS_state_median_hourly_wage_panel@2026-05-12T125636Z.parquet
+      state_count: 54
+      denominator: subnational_median_alias
+      geographic_level: state
   missing_series: []
   data_quality:
-    grade: no_input_vintages_recorded
-    input_count: 0
-    official_source_count: 0
+    grade: reproducible_hash_verified
+    input_count: 3
+    official_source_count: 2
     manual_source_count: 0
-    hash_status_counts: {}
+    hash_status_counts:
+      match: 3
     missing_series_count: 0
 artifacts:
 - path: hypotheses/labour/federal_minimum_wage_employment_meta.yaml
   sha256: 9b82042e0396868d81f0928edc90affc8160d6282eaa01ceb140c8a81199b436
   bytes: 4263
+- path: engine/runs/federal_minimum_wage_employment_meta/manifest.yaml
+  sha256: b16a2ceb809bd385c30c598bccd78bdc516d9112a76966ad83c37de93b148187
+  bytes: 1279
 - path: engine/runs/federal_minimum_wage_employment_meta/diagnostics.json
-  sha256: 4e249614b82c524859527c8374d4697476b1363c5b1d7304d307a455795d3615
-  bytes: 3856
+  sha256: 06571eb0a4faac3ba5f0ba430d1c9842d2e7729bdc5f096b55d024dd92e92616
+  bytes: 5403
 - path: engine/runs/federal_minimum_wage_employment_meta/result_card.md
-  sha256: 8c821418b8a5606e26ee1f048068150feb334724593601cda09de7f4bd90cfda
-  bytes: 3049
-references: []
+  sha256: 51292681d539055a8b8d533a517871bcc9b85e31013074041c9ff637f87c257c
+  bytes: 2476
+- path: engine/runs/federal_minimum_wage_employment_meta/replication.py
+  sha256: 7428a20d516dddf14b5e9fcf20fb34a1735fe4831fc262119d92ebb5fcd62a40
+  bytes: 13212
+references:
+- kind: source
+  publisher: bls
+  series_id: QCEW_state_total_employment_panel
+  url: https://data.bls.gov/cew/data/api/{year}/a/industry/10.csv
+- kind: methodology
+  publisher: bls
+  series_id: QCEW_state_total_employment_panel
+  url: https://www.bls.gov/cew/downloadable-data-files.htm
+- kind: source
+  publisher: usdol
+  series_id: state_minimum_wage_history
+  url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+- kind: source
+  publisher: derived
+  series_id: minimum_wage_bite_ratio_subnational_panel
+  url: derived://usdol:state_minimum_wage_history + bls:OEWS_state_*_hourly_wage_panel
+- kind: methodology
+  publisher: derived
+  series_id: minimum_wage_bite_ratio_subnational_panel
+  url: engine/audits/data_gap_unlock_assessment_2026-05-12.md
 caveats:
-- Run manifest records no input vintages; provenance is limited to result artifacts.
+- QCEW low-wage-sector and state labour-market controls remain robustness work, not
+  primary inputs here.
+- The CBO federal-floor extrapolation needs human mapping review before scoreboard
+  conversion.
+- The revived local panel begins in 2014, so it cannot cover the registered 1990-2022
+  window.
+- The top-level hypothesis remains draft and the falsification rule is generic boilerplate.
+- This is a state-year FE screen, not a full Callaway-Sant'Anna estimator.

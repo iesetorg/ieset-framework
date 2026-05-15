@@ -1,15 +1,80 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels",
+  "verdict": "PARTIAL - local state FE elasticity -0.0142 is near zero, but the 90% CI [-0.0750, +0.0466] is not contained in [-0.05, +0.05]",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "local state FE elasticity -0.0142 is near zero, but the 90% CI [-0.0750, +0.0466] is not contained in [-0.05, +0.05]",
   "hypothesis_id": "federal_minimum_wage_employment_meta",
-  "template": "did_callaway_santanna",
-  "claim_direction_inferred": "?",
+  "template": "run_local_minimum_wage_state_panel",
+  "claim_direction_inferred": "near_zero",
   "falsification_rule_text": "The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.",
   "falsification_test_text": "Callaway-Sant'Anna staggered DiD on US state minimum-wage increases 1990-2022 with QCEW state-quarter employment and state/year FE; supported if pooled employment elasticity falls within [-0.05, +0.05] interval at p<0.10, contradicting CBO low-end magnitude.",
   "estimate": {
-    "error": "minimum-wage data gate failed; missing state/subnational outcome/treatment panels"
+    "name": "primary_log_employment_elasticity",
+    "formula": "log_emp ~ log_min_wage + C(state_fips) + C(year_fe)",
+    "term": "log_min_wage",
+    "coefficient": -0.014161062829778465,
+    "std_error_cluster_state": 0.036964910982642964,
+    "p_value": 0.7016495222093491,
+    "ci90": [
+      -0.07496834139622614,
+      0.04664621573666921
+    ],
+    "ci95": [
+      -0.08661228835575868,
+      0.05829016269620175
+    ],
+    "n_obs": 561,
+    "n_states": 51,
+    "years": [
+      2014,
+      2024
+    ]
   },
+  "robustness": [
+    {
+      "name": "employment_growth_on_minimum_wage_growth",
+      "formula": "employment_growth_pct ~ min_wage_growth_pct + C(state_fips) + C(year_fe)",
+      "term": "min_wage_growth_pct",
+      "coefficient": 0.01048181605298791,
+      "std_error_cluster_state": 0.012434077909597772,
+      "p_value": 0.3992334645992477,
+      "ci90": [
+        -0.009972242108300423,
+        0.030935874214276245
+      ],
+      "ci95": [
+        -0.013888976649823723,
+        0.03485260875579954
+      ],
+      "n_obs": 561,
+      "n_states": 51,
+      "years": [
+        2014,
+        2024
+      ]
+    },
+    {
+      "name": "employment_growth_on_bite_ratio",
+      "formula": "employment_growth_pct ~ bite_ratio + C(state_fips) + C(year_fe)",
+      "term": "bite_ratio",
+      "coefficient": -1.5742516830511954,
+      "std_error_cluster_state": 1.178765147267544,
+      "p_value": 0.18170975059636274,
+      "ci90": [
+        -3.513320350306305,
+        0.3648169842039144
+      ],
+      "ci95": [
+        -3.8846313716955816,
+        0.7361280055931907
+      ],
+      "n_obs": 459,
+      "n_states": 51,
+      "years": [
+        2014,
+        2024
+      ]
+    }
+  ],
   "data_status": {
     "variables_loaded": [
       {
@@ -25,44 +90,58 @@
         "source": "usdol:state_minimum_wage_history",
         "publisher": "usdol",
         "n_rows": 2106
-      }
-    ],
-    "variables_missing": [
+      },
       {
         "role": "treatment",
         "name": "minimum_to_median_wage_ratio",
-        "source": "derived:minimum_wage_bite_ratio_subnational_panel"
+        "source": "derived:minimum_wage_bite_ratio_subnational_panel",
+        "publisher": "derived",
+        "n_rows": 474
       }
-    ]
+    ],
+    "variables_missing": []
   },
-  "run_utc": "2026-05-04T20:29:41+00:00",
-  "runner": "scripts/run_did_callaway_santanna.py",
-  "method_valid": false,
-  "data_gap": true,
-  "minimum_wage_data_gate": true,
-  "required_exact_vintages": [
-    "bls:QCEW_state_total_employment_panel",
-    "usdol:state_minimum_wage_history",
-    "derived:minimum_wage_bite_ratio_subnational_panel"
-  ],
-  "missing_exact_vintages": [
-    "derived:minimum_wage_bite_ratio_subnational_panel"
-  ],
-  "incompatible_local_vintages": [
-    "fred:FEDMINNFRWG is federal level history, not state cohort treatment timing.",
-    "fred:STTMINWGCA is a single-state exemplar, not an all-state statutory history.",
-    "Current BLS CES/OEWS single-series pulls are not QCEW state employment panels."
-  ],
-  "secondary_or_verdict_completeness_sources_needed": [
-    "bls:QCEW_state_NAICS72_employment_panel for low-wage-sector employment robustness.",
-    "bls:LAU_state_unemployment_rate_panel and state population/GDP controls keyed to the same state-period frame.",
-    "CBO scenario assumptions should be recorded as metadata, not treated as outcome data."
-  ],
-  "runner_limitation": "The federal-floor meta test is an extrapolation from state-level evidence. It needs state/unit panel support and bite-ratio diagnostics before any employment-effect verdict can be credible.",
-  "data_repair_note": [
-    "bls:QCEW_state_total_employment_panel \u2014 BLS QCEW state-quarter or state-year employment counts, keyed by state and period, for the meta-style aggregation of state evidence.",
-    "usdol:state_minimum_wage_history \u2014 USDOL all-state statutory minimum-wage history with binding increase timing; federal-only FRED series is not sufficient for state cohort identification.",
-    "derived:minimum_wage_bite_ratio_subnational_panel \u2014 State/local minimum-to-median wage bite panel needed to evaluate whether Sanders-style federal bite ratios extrapolate beyond the historical state evidence."
-  ],
-  "pre_registration_stub_rule": false
+  "panel": {
+    "n_obs_state_year": 561,
+    "n_states": 51,
+    "years": [
+      2014,
+      2024
+    ],
+    "bite_nonnull_state_years": 459
+  },
+  "selected_vintages": {
+    "qcew": {
+      "source": "bls:QCEW_state_total_employment_panel",
+      "vintage_file": "data/vintages/bls/QCEW_state_total_employment_panel@2026-05-05T204746Z.parquet",
+      "sha256": "3b49865ac7d37f6eca2633974d29924d36ee4f08516864f8822d288f6cc8c415",
+      "rows": 561
+    },
+    "minwage": {
+      "source": "usdol:state_minimum_wage_history",
+      "vintage_file": "data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet",
+      "sha256": "f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb",
+      "rows": 2106
+    },
+    "bite": {
+      "source": "derived:minimum_wage_bite_ratio_subnational_panel",
+      "vintage_file": "data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet",
+      "sha256": "22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f",
+      "rows": 474
+    }
+  },
+  "run_utc": "2026-05-15T19:57:07+00:00",
+  "runner": "engine/runs/federal_minimum_wage_employment_meta/replication.py",
+  "method_valid": true,
+  "data_gap": false,
+  "minimum_wage_data_gate": false,
+  "pre_registration_stub_rule": true,
+  "scoreboard_posture": "needs_mapping_review",
+  "caveats": [
+    "The top-level hypothesis remains draft and the falsification rule is generic boilerplate.",
+    "This is a state-year FE screen, not a full Callaway-Sant'Anna estimator.",
+    "The revived local panel begins in 2014, so it cannot cover the registered 1990-2022 window.",
+    "QCEW low-wage-sector and state labour-market controls remain robustness work, not primary inputs here.",
+    "The CBO federal-floor extrapolation needs human mapping review before scoreboard conversion."
+  ]
 }

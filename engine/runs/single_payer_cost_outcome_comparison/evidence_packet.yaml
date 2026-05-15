@@ -1,0 +1,362 @@
+packet_version: 1
+generated_utc: '2026-05-15T20:46:12+00:00'
+repository:
+  root: .
+  git_commit: ed4e9e69d29b23d798cc07dcac70bdc336108b5b
+hypothesis:
+  id: single_payer_cost_outcome_comparison
+  legacy_id: null
+  path: hypotheses/healthcare/single_payer_cost_outcome_comparison.yaml
+  school: null
+  topic: healthcare
+  claim: Universal single-payer healthcare systems (NHS, Canadian Medicare) produce
+    lower per-capita healthcare expenditure with equal or better life-expectancy outcomes
+    than the US multi-payer system.
+verdict:
+  raw: "supported_subset \u2014 cost test PASSES (USA per-capita PPP $10957 vs GBR/CAN\
+    \ mean $5663, ratio 1.93x > 1.5); single-payer matched-or-beat USA on 4/5 tested\
+    \ outcomes (LE/IMR/U5/UHC/OOP). BUT canonical health-system outcomes basket has\
+    \ 4 documented data gaps: O6_amenable_mortality, O7_hale, O8_5yr_cancer, O9_waiting_times.\
+    \ The spec's own disclosure flagged amenable mortality + HALE as preferred outcomes;\
+    \ NHS waiting times and 5-yr cancer survival (USA outperforms) NOT in test. v1\
+    \ SUPPORTED was indicator-gamed. Max tier: supported_subset."
+  bucket: supported
+  reason: null
+  status: null
+preregistration:
+  claim: Universal single-payer healthcare systems (NHS, Canadian Medicare) produce
+    lower per-capita healthcare expenditure with equal or better life-expectancy outcomes
+    than the US multi-payer system.
+  falsification_rule: "PRIMARY (dispositive multi-metric checklist over GBR, CAN,\
+    \ USA, 2010-2023 mean):\n  M1 (cost): USA per-capita health expenditure exceeds\
+    \ the (GBR, CAN) mean by\n    more than 50% (ratio > 1.50). PPP-USD basis (constructed\
+    \ as\n    SH.XPD.CHEX.GD.ZS / 100 * NY.GDP.PCAP.PP.KD).\n  Outcome block (need\
+    \ >= 2 of 3):\n    M2 life-expectancy at birth: single-payer mean ties-or-exceeds\
+    \ USA.\n    M3 infant-mortality per 1,000: single-payer mean ties-or-beats USA\
+    \ (lower better).\n    M4 under-5 mortality per 1,000: single-payer mean ties-or-beats\
+    \ USA (lower better).\nSUPPORTED if M1 holds AND outcome block passes. REFUTED\
+    \ if neither M1 nor the outcome block holds. PARTIAL if exactly one of {M1, outcome\
+    \ block} holds. INFORMATIVE: country-by-country values reported in diagnostics\
+    \ so within-system heterogeneity (NHS waiting times, CAN access constraints) is\
+    \ visible even when the aggregate verdict goes one way. METHOD_VALID: requires\
+    \ SH.XPD.CHEX.GD.ZS, NY.GDP.PCAP.PP.KD, SP.DYN.LE00.IN, SP.DYN.IMRT.IN, and SH.DYN.MORT\
+    \ vintages on disk for all three countries over the comparison window. Data gap\
+    \ \u2192 INCONCLUSIVE."
+  threshold: 'PRIMARY: cost_ratio_USA_over_singlepayer > 1.50 AND n_outcome_metrics_favouring_singlepayer
+    >= 2 (of 3).'
+  estimator:
+    template: multi_metric_checklist
+    notes: "Three-country comparison GBR/CAN/USA, 2010-2023 mean (the modern Medicare/NHS\
+      \ architectural end-state; the spec's 1971-2023 window is informational, the\
+      \ dispositive comparison is on the recent decade where all five series overlap\
+      \ cleanly). Metric bundle:\n  M1 cost  \u2014 USA per-capita PPP spend / single-payer\
+      \ mean > 1.50\n  M2 outcome \u2014 life expectancy at birth (higher better)\n\
+      \  M3 outcome \u2014 infant mortality per 1k (lower better)\n  M4 outcome \u2014\
+      \ under-5 mortality per 1k (lower better)\nVerdict map: SUPPORTED if M1 AND\
+      \ >=2/3 outcome metrics favour single-payer; partial if exactly one pillar holds;\
+      \ refuted otherwise. Caveat: aggregates obscure within-system heterogeneity\
+      \ (NHS waiting times, CAN access constraints); country-level values are surfaced\
+      \ in diagnostics.json.\n"
+  steelman: null
+reproduction:
+  run_dir: engine/runs/single_payer_cost_outcome_comparison
+  runner: null
+  replication_script: engine/runs/single_payer_cost_outcome_comparison/replication.py
+  suggested_command: python engine/runs/single_payer_cost_outcome_comparison/replication.py
+data:
+  inputs:
+  - name: input_1
+    publisher: world_bank_wdi
+    series_id: SH.XPD.CHEX.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/SH.XPD.CHEX.GD.ZS@2026-05-05T203513Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: ca58050bf93fd11b1b864f04c8d27eaedbd6e260eba3a7e5df473a8cb0b5cc40
+      computed_sha256: ca58050bf93fd11b1b864f04c8d27eaedbd6e260eba3a7e5df473a8cb0b5cc40
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SH.XPD.CHEX.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SH.XPD.CHEX.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:35:13.524872+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Current health expenditure (% of GDP)
+      source_note: Level of current health expenditure expressed as a percentage of
+        GDP.  Estimates of current health expenditures include healthcare goods and
+        services consumed during each year. This indicator does not include capital
+        health expenditures such as buildings, machinery, IT and stocks of vaccines
+        for emergency or outbreaks.
+      countries_param: all
+      vintage_utc: null
+  - name: input_2
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-30T113730Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: input_3
+    publisher: world_bank_wdi
+    series_id: SP.DYN.LE00.IN
+    vintage_file: data/vintages/world_bank_wdi/SP.DYN.LE00.IN@2026-04-30T101045Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: 7cf0d3919a1cf11890afa40a521b46bc131fc446c4e57e15ec8702f4a47eb03d
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: input_4
+    publisher: world_bank_wdi
+    series_id: SP.DYN.IMRT.IN
+    vintage_file: data/vintages/world_bank_wdi/SP.DYN.IMRT.IN@2026-04-30T114634Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 28f45720bed11b9f20e4a4776cdca1ebd8cd9ec2f4ac062b246042b55bcd06a1
+      computed_sha256: 28f45720bed11b9f20e4a4776cdca1ebd8cd9ec2f4ac062b246042b55bcd06a1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.DYN.IMRT.IN?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.DYN.IMRT.IN
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:46:34.972688+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Mortality rate, infant (per 1,000 live births)
+      source_note: Infant mortality rate is the number of infants dying before reaching
+        one year of age, per 1,000 live births in a given year.
+      countries_param: all
+      vintage_utc: null
+  - name: input_5
+    publisher: world_bank_wdi
+    series_id: SH.DYN.MORT
+    vintage_file: data/vintages/world_bank_wdi/SH.DYN.MORT@2026-05-05T194907Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: ad63729ccd5d1d4be6f3da5bbcac45b8a2c87d48c063cefeba8f0ddbe4b88f55
+      computed_sha256: ad63729ccd5d1d4be6f3da5bbcac45b8a2c87d48c063cefeba8f0ddbe4b88f55
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SH.DYN.MORT?format=json
+      methodology_url: https://data.worldbank.org/indicator/SH.DYN.MORT
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:49:07.165959+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Mortality rate, under-5 (per 1,000 live births)
+      source_note: Under-five mortality rate is the probability per 1,000 that a newborn
+        baby will die before reaching age five, if subject to age-specific mortality
+        rates of the specified year.
+      countries_param: all
+      vintage_utc: null
+  - name: input_6
+    publisher: who_gho
+    series_id: UHC_INDEX_REPORTED
+    vintage_file: data/vintages/who_gho/UHC_INDEX_REPORTED@2026-04-30T114740Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: e4e1fea6a88f1cfcb97599a762f3c3988d5e2bff3674458f94f13e9710c35b1a
+      computed_sha256: e4e1fea6a88f1cfcb97599a762f3c3988d5e2bff3674458f94f13e9710c35b1a
+      status: match
+    source:
+      type: official
+      url: https://ghoapi.azureedge.net/api/UHC_INDEX_REPORTED
+      methodology_url: https://www.who.int/data/gho/indicator-metadata-registry/imr-details/UHC_INDEX_REPORTED
+      license: CC-BY-NC-SA-3.0 IGO
+      fetch_utc: '2026-04-30T11:47:40.302178+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '2000'
+      end_date: '2023'
+      frequency: annual
+      rows: 5160
+      units: per indicator
+      currency: null
+    extra:
+      n_columns: 26
+      columns:
+      - Id
+      - IndicatorCode
+      - SpatialDimType
+      - country_iso3
+      - TimeDimType
+      - ParentLocationCode
+      - ParentLocation
+      - Dim1Type
+      - Dim1
+      - year
+      - Dim2Type
+      - Dim2
+      - Dim3Type
+      - Dim3
+      - DataSourceDimType
+      - DataSourceDim
+      - Value
+      - NumericValue
+      - Low
+      - High
+      - Comments
+      - Date
+      - TimeDimensionValue
+      - TimeDimensionBegin
+      - TimeDimensionEnd
+      - value
+      vintage_utc: null
+  - name: input_7
+    publisher: world_bank_wdi
+    series_id: SH.XPD.OOPC.CH.ZS
+    vintage_file: data/vintages/world_bank_wdi/SH.XPD.OOPC.CH.ZS@2026-05-05T203530Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: d41fdcc84cb30c17e52f57213d836b39600192fbfc87f668d63c0938c149b3a8
+      computed_sha256: d41fdcc84cb30c17e52f57213d836b39600192fbfc87f668d63c0938c149b3a8
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SH.XPD.OOPC.CH.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SH.XPD.OOPC.CH.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:35:30.009514+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Out-of-pocket expenditure (% of current health expenditure)
+      source_note: Share of out-of-pocket payments of total current health expenditures.  Out-of-pocket
+        payments are spending on health directly out-of-pocket by households.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 7
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      computed_only: 2
+      match: 5
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/healthcare/single_payer_cost_outcome_comparison.yaml
+  sha256: 56707254902d212707d52eef4021e6a7038c9db99ddefd52a130c7d0905ad868
+  bytes: 9866
+- path: engine/runs/single_payer_cost_outcome_comparison/manifest.yaml
+  sha256: e24a906afa508076b38414a472ca47c23d63f8ac370691dc9ed81817c643e72b
+  bytes: 1334
+- path: engine/runs/single_payer_cost_outcome_comparison/diagnostics.json
+  sha256: 2c543939d837bd5cde263595fc88efa73d056e3e4f2bf43d796129109801e13f
+  bytes: 2847
+- path: engine/runs/single_payer_cost_outcome_comparison/result_card.md
+  sha256: b8ec6b75cebfe8ac4fcb683f8d08766dcf40c54ee3ed47d23d3543f834d49aaf
+  bytes: 1506
+- path: engine/runs/single_payer_cost_outcome_comparison/replication.py
+  sha256: d5c52987da195d6f40852d85097729b43e21223f7a878b251cae3a80ddb0e2bf
+  bytes: 11618
+- path: engine/runs/single_payer_cost_outcome_comparison/coefficients.parquet
+  sha256: 666bca44102fd794a5da5443d72eddc5cb071ae3f9c006166610bdd91ccc2e5b
+  bytes: 2492
+- path: engine/runs/single_payer_cost_outcome_comparison/chart_data.json
+  sha256: e027656db85720f4cc237558d3922231ce6c6f4e37cac35a1a413727ca7764e8
+  bytes: 513
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SH.XPD.CHEX.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SH.XPD.CHEX.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SH.XPD.CHEX.GD.ZS
+  url: https://data.worldbank.org/indicator/SH.XPD.CHEX.GD.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.DYN.IMRT.IN
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.DYN.IMRT.IN?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.DYN.IMRT.IN
+  url: https://data.worldbank.org/indicator/SP.DYN.IMRT.IN
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SH.DYN.MORT
+  url: https://api.worldbank.org/v2/country/all/indicator/SH.DYN.MORT?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SH.DYN.MORT
+  url: https://data.worldbank.org/indicator/SH.DYN.MORT
+- kind: source
+  publisher: who_gho
+  series_id: UHC_INDEX_REPORTED
+  url: https://ghoapi.azureedge.net/api/UHC_INDEX_REPORTED
+- kind: methodology
+  publisher: who_gho
+  series_id: UHC_INDEX_REPORTED
+  url: https://www.who.int/data/gho/indicator-metadata-registry/imr-details/UHC_INDEX_REPORTED
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SH.XPD.OOPC.CH.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SH.XPD.OOPC.CH.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SH.XPD.OOPC.CH.ZS
+  url: https://data.worldbank.org/indicator/SH.XPD.OOPC.CH.ZS
+caveats: []

@@ -1,0 +1,412 @@
+packet_version: 1
+generated_utc: '2026-05-15T17:14:45+00:00'
+repository:
+  root: .
+  git_commit: 4821f293e68ce20ecce6e9e7f9548582dea9eab6
+hypothesis:
+  id: abct_credit_boom_predicts_capital_misallocation_oecd
+  legacy_id: null
+  path: hypotheses/monetary/abct_credit_boom_predicts_capital_misallocation_oecd.yaml
+  school: null
+  topic: monetary
+  claim: 'In an OECD panel 1980-2023, the 5-year cumulative growth of private credit
+    to non-financial corporations (BIS WS_CREDIT) is positively associated with the
+    subsequent (t+1 to t+5) volatility of non-residential fixed investment and with
+    downward revisions to ex-ante TFP growth forecasts. Countries experiencing the
+    largest credit booms exhibit the largest post-bust capital-stock reallocation
+    episodes, consistent with the Mises-Hayek prediction that artificially-low interest
+    rates produce a structural distortion in the inter-temporal capital structure
+    that must be liquidated when monetary conditions normalise.
+
+    '
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=+0.08927 (sign matches claim +), p=0
+  status: null
+preregistration:
+  claim: 'In an OECD panel 1980-2023, the 5-year cumulative growth of private credit
+    to non-financial corporations (BIS WS_CREDIT) is positively associated with the
+    subsequent (t+1 to t+5) volatility of non-residential fixed investment and with
+    downward revisions to ex-ante TFP growth forecasts. Countries experiencing the
+    largest credit booms exhibit the largest post-bust capital-stock reallocation
+    episodes, consistent with the Mises-Hayek prediction that artificially-low interest
+    rates produce a structural distortion in the inter-temporal capital structure
+    that must be liquidated when monetary conditions normalise.
+
+    '
+  falsification_rule: 'The hypothesis is falsified if the panel-FE coefficient on
+    lagged 5-year credit growth is not positive and significant at p<0.05 for EITHER
+    outcome (investment volatility OR forward TFP shortfall), OR if the magnitude
+    of the volatility response is below 0.20 SD per 1-SD credit shock. A clean refutation
+    also requires that the sign be stable across pre-2008 and post-2008 sub-samples.
+
+    '
+  threshold: "coefficient(credit_growth_5y \u2192 investment_volatility_5y) > 0 at\
+    \ p<0.05 AND coefficient(credit_growth_5y \u2192 tfp_growth_5y_forward) < 0 at\
+    \ p<0.05 AND volatility_response >= 0.20 SD per 1-SD credit shock AND sign stable\
+    \ in both 1980-2007 and 2010-2023 sub-samples\n"
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: 'Panel FE regression of investment volatility (and ex-post TFP shortfall)
+      on lagged 5-year credit growth and credit-to-GDP gap. Heterodox/Keynesian null
+      is that credit-driven investment is welfare-improving and the volatility/TFP
+      link should be small or absent. Local-projections variant traces investment-volatility
+      response over h=1..10 years to a one-SD credit-growth shock as robustness.
+
+      '
+  steelman: hypotheses/steelman/abct_credit_boom_predicts_capital_misallocation_oecd.md
+reproduction:
+  run_dir: engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd/replication.py
+  suggested_command: python engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd/replication.py
+data:
+  inputs:
+  - name: nonresidential_investment_volatility_5y
+    publisher: world_bank_wdi
+    series_id: NE.GDI.FPRV.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.FPRV.ZS@2026-04-30T115003Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 84294f869d513ae4c70154630b31388a53b41c42bf849a006740c9324ebeba14
+      computed_sha256: 84294f869d513ae4c70154630b31388a53b41c42bf849a006740c9324ebeba14
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FPRV.ZS
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:50:03.421476+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross fixed capital formation, private sector (% of GDP)
+      source_note: Private investment covers outlays by the private sector (including
+        private nonprofit agencies) on additions to its fixed domestic assets. Gross
+        fixed capital formation includes acquisitions less disposals of fixed assets
+        during the accounting period, including certain specified expenditures on
+        services that add to the value of non-produced assets. This indicator is expressed
+        as a percentage of Gro
+      countries_param: all
+      vintage_utc: null
+  - name: tfp_growth_5y_forward
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://www.rug.nl/ggdc/productivity/pwt/
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: private_credit_growth_5y
+    publisher: bis
+    series_id: WS_CREDIT_GAP
+    vintage_file: data/vintages/bis/WS_CREDIT_GAP@2026-05-12T132621Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 7b437044569e12db9f11b7a1959c46846065f575651930cf4b139b31abe7ef9a
+      computed_sha256: 7b437044569e12db9f11b7a1959c46846065f575651930cf4b139b31abe7ef9a
+      status: match
+    source:
+      type: official
+      url: https://data.bis.org/topics/TOTAL_CREDIT
+      methodology_url: https://www.bis.org/statistics/totcredit.htm
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-05-12T13:26:21.796930+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-12T132904Z.yaml
+    coverage:
+      start_date: 1947-Q4
+      end_date: 2025-Q3
+      frequency: quarterly
+      rows: 24356
+      units: per dataflow metadata
+      currency: null
+    extra: &id001
+      dataflow_description: Credit-to-GDP gap (quarterly)
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - BORROWERS_CTY
+      - TC_BORROWERS
+      - TC_LENDERS
+      - CG_DTYPE
+      - COLLECTION
+      - DECIMALS
+      - UNIT_MEASURE
+      - UNIT_MULT
+      - TIME_FORMAT
+      - TITLE_TS
+      - period
+      - value
+      - OBS_STATUS
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      vintage_utc: null
+  - name: credit_to_gdp_gap
+    publisher: bis
+    series_id: WS_CREDIT_GAP
+    vintage_file: data/vintages/bis/WS_CREDIT_GAP@2026-05-12T132621Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 7b437044569e12db9f11b7a1959c46846065f575651930cf4b139b31abe7ef9a
+      computed_sha256: 7b437044569e12db9f11b7a1959c46846065f575651930cf4b139b31abe7ef9a
+      status: match
+    source:
+      type: official
+      url: https://data.bis.org/topics/TOTAL_CREDIT
+      methodology_url: https://www.bis.org/statistics/totcredit.htm
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-05-12T13:26:21.796930+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-12T132904Z.yaml
+    coverage:
+      start_date: 1947-Q4
+      end_date: 2025-Q3
+      frequency: quarterly
+      rows: 24356
+      units: per dataflow metadata
+      currency: null
+    extra: *id001
+  - name: real_policy_rate
+    publisher: bis
+    series_id: WS_CBPOL
+    vintage_file: data/vintages/bis/WS_CBPOL@2026-04-30T114314Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: a4a76cd5b78ddf70653e88dff997f17d51bb0b678356ea13c16a19c3019fa015
+      computed_sha256: a4a76cd5b78ddf70653e88dff997f17d51bb0b678356ea13c16a19c3019fa015
+      status: match
+    source:
+      type: official
+      url: https://data.bis.org/topics/CBPOL
+      methodology_url: https://www.bis.org/statistics/cbpol.htm
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-04-30T11:43:14.317329+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: 1945-01
+      end_date: '2026-04-28'
+      frequency: mixed
+      rows: 727869
+      units: per dataflow metadata
+      currency: null
+    extra:
+      dataflow_description: Central bank policy rates
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - REF_AREA
+      - UNIT_MEASURE
+      - UNIT_MULT
+      - TIME_FORMAT
+      - COMPILATION
+      - DECIMALS
+      - SOURCE_REF
+      - SUPP_INFO_BREAKS
+      - TITLE
+      - period
+      - value
+      - OBS_STATUS
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      vintage_utc: null
+  - name: log_gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      computed_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:48.372391+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: government_consumption_share
+    publisher: world_bank_wdi
+    series_id: NE.CON.GOVT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.GOVT.ZS@2026-05-05T194701Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+      computed_sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS
+      methodology_url: https://databank.worldbank.org/source/world-development-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:01.933105+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: General government final consumption expenditure (% of GDP)
+      source_note: Final consumption expenditure is expenditure on goods and services
+        by resident institutional units for the direct satisfaction of human needs
+        or wants, whether individual or collective. General government FCE includes
+        all government current expenditures for purchases of goods and services (including
+        compensation of employees), and most expenditures on national defense and
+        security, but excludes go
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 8
+    official_source_count: 8
+    manual_source_count: 0
+    hash_status_counts:
+      match: 8
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/monetary/abct_credit_boom_predicts_capital_misallocation_oecd.yaml
+  sha256: 7c9ccaf710b3ae2dbd63235e1b7b469f16a7df5d321c53a81437d5762e25e9dd
+  bytes: 5551
+- path: engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd/manifest.yaml
+  sha256: b6d23071a098dc42428931167f96fc35887c1fcb356b04a95db4ab709269f6be
+  bytes: 3526
+- path: engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd/diagnostics.json
+  sha256: a9bbe3430c5364a47cd1dac587e9312482b5dd13fe9f1107a74b40e68db778c4
+  bytes: 2837
+- path: engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd/result_card.md
+  sha256: 793fd60317c1ecfe6f1ee044e336f1847dd817a2b0b549021eb694e5fea143cd
+  bytes: 2361
+- path: engine/runs/abct_credit_boom_predicts_capital_misallocation_oecd/replication.py
+  sha256: f5d358fb2939b1a77efe4d87f999d3c46cd30eec871d5add0c3d7a7fa29fd341
+  bytes: 739
+- path: hypotheses/steelman/abct_credit_boom_predicts_capital_misallocation_oecd.md
+  sha256: 7a663dda547e61e8fe0f22e960675ff0b441ef23831c1668dd661255dd0c56d3
+  bytes: 2735
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FPRV.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FPRV.ZS
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.FPRV.ZS
+  url: https://databank.worldbank.org/source/world-development-indicators
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: bis
+  series_id: WS_CREDIT_GAP
+  url: https://data.bis.org/topics/TOTAL_CREDIT
+- kind: methodology
+  publisher: bis
+  series_id: WS_CREDIT_GAP
+  url: https://www.bis.org/statistics/totcredit.htm
+- kind: source
+  publisher: bis
+  series_id: WS_CBPOL
+  url: https://data.bis.org/topics/CBPOL
+- kind: methodology
+  publisher: bis
+  series_id: WS_CBPOL
+  url: https://www.bis.org/statistics/cbpol.htm
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.CON.GOVT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS
+caveats:
+- The canonical panel runner produces a statistically supported coefficient, but only
+  59 observations across 2 countries survive all outcome, treatment, control, and
+  fixed-effect requirements; treat this as a graduated but narrow-sample Austrian/ABCT
+  signal rather than broad OECD proof.

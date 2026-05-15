@@ -1,84 +1,120 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded; missing: ['oecd:avwage_growth_real', 'oecd:gdp_per_hour_worked_growth', 'ilo:median_wages_real_growth']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded; missing: ['oecd:avwage_growth_real', 'oecd:gdp_per_hour_worked_growth', 'ilo:median_wages_real_growth']",
+  "verdict": "PARTIAL - proxy-only local rerun does not clear the registered positive/significant wage and productivity thresholds",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "proxy-only local rerun does not clear the registered positive/significant wage and productivity thresholds",
   "hypothesis_id": "frontier_real_wage_growth_market_competition_1980_2024",
-  "template": "panel_fe",
-  "claim_direction_inferred": "-",
+  "template": "panel_fe_proxy_local",
+  "runner": "engine/runs/frontier_real_wage_growth_market_competition_1980_2024/replication.py",
+  "run_utc": "2026-05-15T20:03:07+00:00",
   "falsification_rule_text": "Not supported if (a) the coefficient on product-market competition is not positive and significant at p<0.05 on real wage growth, OR (b) the coefficient is not positive and significant at p<0.05 on labour- productivity growth, OR (c) the implied effect of a one-SD competition improvement on real wage growth is below 0.20 pp/year. A \"monopsony- power / rent-sharing\" reading wins if coefficients are negative (suggesting more competition hurts worker bargaining power).\n",
   "falsification_test_text": "panel_fe_product_market_competition_on_real_wage_growth",
-  "estimate": {
-    "error": "no outcome variable loaded; missing: ['oecd:avwage_growth_real', 'oecd:gdp_per_hour_worked_growth', 'ilo:median_wages_real_growth']"
+  "claim": "Across OECD and high-income economies 1980-2024, real wage growth at the productivity frontier is stronger in countries with more competitive product markets and lower barriers to firm entry. The pre-registered claim is that a one-standard-deviation improvement in product-market competition is associated with at least 0.4 percentage points higher annual real wage growth and at least 0.3 percentage points higher labour-productivity growth, after controlling for initial income, trade openness, union density, and sectoral composition.\n",
+  "estimates": {
+    "real_wage_growth_proxy": {
+      "outcome": "real_wage_growth_proxy",
+      "method": "PanelOLS with country and year fixed effects",
+      "covariance": "country-clustered",
+      "coefficient": -5.28549776999148,
+      "std_error": 12.702645467758408,
+      "p_value": 0.6846860369755117,
+      "n_obs": 47,
+      "n_countries": 29,
+      "years": [
+        2018,
+        2023
+      ],
+      "r_squared_within": 0.27278765037654906,
+      "controls": [
+        "log_initial_gdp_pc",
+        "trade_openness",
+        "union_density",
+        "services_share_gdp"
+      ]
+    },
+    "labour_productivity_growth": {
+      "outcome": "labour_productivity_growth",
+      "method": "PanelOLS with country and year fixed effects",
+      "covariance": "country-clustered",
+      "coefficient": -5.847637460940207,
+      "std_error": 7.380379748109607,
+      "p_value": 0.4435550113107727,
+      "n_obs": 47,
+      "n_countries": 29,
+      "years": [
+        2018,
+        2023
+      ],
+      "r_squared_within": 0.7090807206077646,
+      "controls": [
+        "log_initial_gdp_pc",
+        "trade_openness",
+        "union_density",
+        "services_share_gdp"
+      ]
+    }
+  },
+  "coverage": {
+    "candidate_rows_after_pmr_fraser_outcomes": 66,
+    "candidate_countries": 33,
+    "union_density_missing_rows": 16,
+    "real_interest_missing_rows": 47
   },
   "data_status": {
     "variables_loaded": [
       {
-        "role": "controls",
-        "name": "log_initial_gdp_pc",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
-      },
-      {
-        "role": "controls",
-        "name": "trade_openness",
-        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10714
-      },
-      {
-        "role": "controls",
-        "name": "services_share_gdp",
-        "source": "world_bank_wdi:NV.SRV.TOTL.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10330
-      },
-      {
-        "role": "controls",
-        "name": "real_interest_rate",
-        "source": "world_bank_wdi:FR.INR.RINR",
-        "publisher": "world_bank_wdi",
-        "n_rows": 4694
-      }
-    ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "real_wage_growth",
-        "source": "oecd:avwage_growth_real"
+        "role": "outcome_proxy",
+        "name": "real_wage_growth_proxy",
+        "source": "oecd_pdb:LCHRS_GY minus world_bank_wdi:FP.CPI.TOTL.ZG"
       },
       {
         "role": "outcome",
         "name": "labour_productivity_growth",
-        "source": "oecd:gdp_per_hour_worked_growth"
-      },
-      {
-        "role": "outcome",
-        "name": "median_real_wage_growth",
-        "source": "ilo:median_wages_real_growth"
+        "source": "oecd_pdb:GDPHRS_GY"
       },
       {
         "role": "treatment",
         "name": "product_market_competition_index",
-        "source": "constructed: 0.6\u00d7oecd_pmr:overall_pmr + 0.4\u00d7fraser_efw:regulation_business"
+        "source": "0.6 * inverted oecd_pmr:PMR + 0.4 * fraser_efw:regulation"
       },
       {
-        "role": "treatment",
-        "name": "barriers_to_entry_index",
-        "source": "oecd_pmr:barriers_to_entry"
-      },
-      {
-        "role": "treatment",
-        "name": "fraser_efw_competition",
-        "source": "fraser_efw:competition_policy"
-      },
-      {
-        "role": "controls",
+        "role": "control",
         "name": "union_density",
-        "source": "oecd:union_density"
+        "source": "oecd:TUD"
+      },
+      {
+        "role": "control",
+        "name": "log_initial_gdp_pc",
+        "source": "world_bank_wdi:NY.GDP.PCAP.KD"
+      },
+      {
+        "role": "control",
+        "name": "trade_openness",
+        "source": "world_bank_wdi:NE.TRD.GNFS.ZS"
+      },
+      {
+        "role": "control",
+        "name": "services_share_gdp",
+        "source": "world_bank_wdi:NV.SRV.TOTL.ZS"
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "exact_outcome",
+        "name": "real_wage_growth",
+        "source": "oecd:avwage_growth_real"
+      },
+      {
+        "role": "exact_outcome",
+        "name": "median_real_wage_growth",
+        "source": "ilo:median_wages_real_growth"
       }
     ]
   },
-  "run_utc": "2026-05-03T06:32:02+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "caveats": [
+    "Proxy-only: OECD PDB labour compensation per hour deflated by WDI CPI replaces the unavailable OECD average-wage real-growth series.",
+    "OECD earnings vintages on disk are wage-gap tables, not average annual wages, so they are not used as the wage outcome.",
+    "PMR overall and barriers-to-entry coverage in local vintages is limited to 2018 and 2023.",
+    "WDI real interest rate is documented but excluded from the fitted model because it leaves only 16 complete observations.",
+    "Result should remain research_only, not a scoreboard candidate, unless exact wage series and wider PMR coverage are added."
+  ]
 }

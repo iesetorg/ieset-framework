@@ -65,6 +65,8 @@ _ISO2_TO_ISO3 = {
 }
 
 _COUNTRY_NAME_TO_ISO3 = {
+    "WORLD": "GLOBAL",
+    "GLOBAL": "GLOBAL",
     "UNITED STATES": "USA",
     "UNITED KINGDOM": "GBR",
     "GREAT BRITAIN": "GBR",
@@ -251,7 +253,10 @@ SERIES_ALIAS_BY_PUBLISHER = {
     "irena": {
         "CAPACITY": "installed_capacity_renewable",
         "SOLAR_PV_COSTS": "lcoe_solar_pv",
+        "LCOE_SOLAR_PV": "lcoe_solar_pv",
         "WIND_LCOE": "lcoe_wind_onshore",
+        "LCOE_WIND_ONSHORE": "lcoe_wind_onshore",
+        "WIND_ONSHORE_LCOE": "lcoe_wind_onshore",
     },
     "constructed": {
         "rl_x_sound_money_interaction": "rl_x_sound_money_interaction",

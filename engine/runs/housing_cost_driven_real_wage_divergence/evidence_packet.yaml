@@ -1,0 +1,205 @@
+packet_version: 1
+generated_utc: '2026-05-15T19:59:21+00:00'
+repository:
+  root: .
+  git_commit: 59ce3d103d6f98f5b186b89be87e4d952ffa2c6c
+hypothesis:
+  id: housing_cost_driven_real_wage_divergence
+  legacy_id: null
+  path: hypotheses/distribution/housing_cost_driven_real_wage_divergence.yaml
+  school: null
+  topic: distribution
+  claim: "Within Anglo-liberal economies (UK, US, Australia) over 1995-2020, housing-supply-restricted\
+    \ high-opportunity metro areas exhibit real-wage-net-of-housing-cost trajectories\
+    \ that diverge substantially from their headline real-wage trajectories, such\
+    \ that the standard \"real wage stagnation\" story for these metros is amplified\
+    \ (larger stagnation) when housing costs are properly netted out, while housing-supply-elastic\
+    \ metros show the opposite pattern \u2014 headline real-wage stagnation looks\
+    \ less severe after housing is netted. The specific claim is that the cross-metro\
+    \ divergence in housing supply elasticity (Hilber-Vermeulen for UK, Saiz for US,\
+    \ Kendall- Tulip for Australia) is a first-order driver of cross-metro differences\
+    \ in welfare-relevant real wage growth, and that national aggregate real-wage\
+    \ series systematically understate welfare losses in supply-restricted metros\
+    \ while overstating them in supply-elastic metros. A clean supported finding would\
+    \ show that the supply- elasticity coefficient on net-of-housing real wage growth\
+    \ is statistically significant and quantitatively large (at least 20% of cross-metro\
+    \ variance in welfare-adjusted real wage trajectories).\n"
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: 'US FRED proxy: all-items real AHE growth 9.7% vs shelter-deflated 0.6%
+    from 2006-03 to 2020-02; gap 9.1pp; YoY correlation 0.07'
+  status: PARTIAL
+preregistration:
+  claim: "Within Anglo-liberal economies (UK, US, Australia) over 1995-2020, housing-supply-restricted\
+    \ high-opportunity metro areas exhibit real-wage-net-of-housing-cost trajectories\
+    \ that diverge substantially from their headline real-wage trajectories, such\
+    \ that the standard \"real wage stagnation\" story for these metros is amplified\
+    \ (larger stagnation) when housing costs are properly netted out, while housing-supply-elastic\
+    \ metros show the opposite pattern \u2014 headline real-wage stagnation looks\
+    \ less severe after housing is netted. The specific claim is that the cross-metro\
+    \ divergence in housing supply elasticity (Hilber-Vermeulen for UK, Saiz for US,\
+    \ Kendall- Tulip for Australia) is a first-order driver of cross-metro differences\
+    \ in welfare-relevant real wage growth, and that national aggregate real-wage\
+    \ series systematically understate welfare losses in supply-restricted metros\
+    \ while overstating them in supply-elastic metros. A clean supported finding would\
+    \ show that the supply- elasticity coefficient on net-of-housing real wage growth\
+    \ is statistically significant and quantitatively large (at least 20% of cross-metro\
+    \ variance in welfare-adjusted real wage trajectories).\n"
+  falsification_rule: 'Primary v2 local diagnostic is a national US FRED proxy, not
+    the full metro supply-elasticity identification design. It compares total-private
+    average hourly earnings deflated by all-items CPI with the same earnings deflated
+    by CPI shelter from 2006-03 through 2020-02, the longest clean local FRED overlap
+    ending before the pandemic. The diagnostic supports the narrower welfare-wage
+    measurement channel if all-items real wage growth exceeds shelter-deflated wage
+    growth by at least 5 percentage points over the window and the year-over-year
+    growth correlation is below 0.90. It is refuted if the gap is below 2 percentage
+    points or the correlation is at least 0.90. Otherwise it is partial. Full support
+    for the original claim still requires the metro supply-elasticity panel.
+
+    '
+  threshold: support if all-items real wage growth minus shelter-deflated wage growth
+    >=5pp and yoy-growth correlation <0.90; refute if gap <2pp or correlation >=0.90
+  estimator:
+    template: panel_fe
+    clustering: metro
+    fixed_effects:
+    - metro
+    - country_year
+    notes: "Panel metro x year. Primary specification:\n  net_real_wage_growth_mt\
+      \ = b0 + b1*supply_elasticity_m\n  + b2*productivity_growth_mt + b3*controls\
+      \ + alpha_m (metro FE)\n  + gamma_ct (country-year FE) + epsilon\nCountry-year\
+      \ FE absorb national-level policy and macro shocks. Metro FE absorb time-invariant\
+      \ metro features. Supply elasticity is time-invariant per its academic construction,\
+      \ so b1 is identified via the interaction of elasticity with time trend; primary\
+      \ specification therefore includes supply_elasticity * time_trend as the key\
+      \ variable. Secondary specification: drop metro FE and identify via cross-metro\
+      \ variation in elasticity, reported as robustness. Cluster-robust SEs at metro.\n"
+  steelman: hypotheses/steelman/housing_cost_driven_real_wage_divergence.md
+reproduction:
+  run_dir: engine/runs/housing_cost_driven_real_wage_divergence
+  runner: engine/runs/housing_cost_driven_real_wage_divergence/replication.py
+  replication_script: engine/runs/housing_cost_driven_real_wage_divergence/replication.py
+  suggested_command: python engine/runs/housing_cost_driven_real_wage_divergence/replication.py
+data:
+  inputs:
+  - name: CES0500000003
+    publisher: fred
+    series_id: CES0500000003
+    vintage_file: data/vintages/fred/CES0500000003@2026-04-30T114914Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: a2333cd84d7e5850771e454e69b672b5702bb766e01ccae0e8081422f74289fd
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: CPIAUCSL
+    publisher: fred
+    series_id: CPIAUCSL
+    vintage_file: data/vintages/fred/CPIAUCSL@2026-04-30T114528Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f2b7f88f7228f41206fffc35266e4eb0ebcf6c51a7c82d0d5d708dcd579618e7
+      computed_sha256: f2b7f88f7228f41206fffc35266e4eb0ebcf6c51a7c82d0d5d708dcd579618e7
+      status: match
+    source:
+      type: official
+      url: https://api.stlouisfed.org/fred/series/observations?series_id=CPIAUCSL
+      methodology_url: https://fred.stlouisfed.org/series/CPIAUCSL
+      license: mixed (US federal public domain for most series; per-series attribution
+        otherwise)
+      fetch_utc: '2026-04-30T11:45:28.647275+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1947-01-01'
+      end_date: '2026-03-01'
+      frequency: M
+      rows: 951
+      units: Index 1982-1984=100
+      currency: null
+    extra:
+      title: 'Consumer Price Index for All Urban Consumers: All Items in U.S. City
+        Average'
+      seasonal_adjustment: SA
+      last_updated: '2026-04-10 08:08:20-05'
+      vintage_utc: null
+  - name: CUSR0000SAH1
+    publisher: fred
+    series_id: CUSR0000SAH1
+    vintage_file: data/vintages/fred/CUSR0000SAH1@2026-04-30T114937Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: d160cb3ce40e677e90502cf353508795d02999d8e32eb25ea5bf757b826a1ce5
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 3
+    official_source_count: 1
+    manual_source_count: 0
+    hash_status_counts:
+      computed_only: 2
+      match: 1
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/distribution/housing_cost_driven_real_wage_divergence.yaml
+  sha256: 4f116d6828a8d2003cb073c4bc7a1924ac9781c4a10903cd445788bbc2b696a3
+  bytes: 13564
+- path: engine/runs/housing_cost_driven_real_wage_divergence/manifest.yaml
+  sha256: 8bb6d3497f62409704bbe38d89e2f3d26707fe937d1bdb72d7ebd3b60edb0a91
+  bytes: 601
+- path: engine/runs/housing_cost_driven_real_wage_divergence/diagnostics.json
+  sha256: 4a316847045456d27e7c784523353f472cd7c1efb4ea54ab368632b19ce7ae82
+  bytes: 2486
+- path: engine/runs/housing_cost_driven_real_wage_divergence/result_card.md
+  sha256: 37ad442891f1154edd55ed4724231a33c8a9c967983c1073805064b97e34aa7b
+  bytes: 779
+- path: engine/runs/housing_cost_driven_real_wage_divergence/replication.py
+  sha256: 2e0949697921413cfc779194b8583a895ddb612b1ad96f73e3fdcf9e54fb8859
+  bytes: 7809
+- path: engine/runs/housing_cost_driven_real_wage_divergence/coefficients.parquet
+  sha256: fa088c2a56c038edb83a1bbd9feffd30fde78e977f389a8f476cfdc3da1d41de
+  bytes: 15916
+- path: hypotheses/steelman/housing_cost_driven_real_wage_divergence.md
+  sha256: afda6c13b3e6871a4ae60099702f716dfbc71dbb6216cc2f5c1b070f15a1a959
+  bytes: 5723
+references:
+- kind: source
+  publisher: fred
+  series_id: CPIAUCSL
+  url: https://api.stlouisfed.org/fred/series/observations?series_id=CPIAUCSL
+- kind: methodology
+  publisher: fred
+  series_id: CPIAUCSL
+  url: https://fred.stlouisfed.org/series/CPIAUCSL
+caveats: []
