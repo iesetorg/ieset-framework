@@ -85,6 +85,17 @@ def classify_movement_tone(m: dict) -> str:
         return "centrist"
     return "neutral"
 
+
+def movement_leader_label(m: dict) -> str | None:
+    """Return the first leader's name, stripped of role/date detail."""
+    leaders = m.get("leaders") or []
+    if not leaders:
+        return None
+    raw = str(leaders[0]).strip()
+    if not raw:
+        return None
+    return raw.split("(", 1)[0].strip().rstrip(",-;") or None
+
 # Axes whose `+` direction indicates the state expanding (more spending,
 # transfers, regulation, monetisation). Index contribution sign = +1.
 PRO_STATE_AXES = {
@@ -219,6 +230,7 @@ def build_drift(movements):
                 m_events.append({
                     "movement_id": m["movement_id"],
                     "name": m.get("name") or m["movement_id"],
+                    "leader_label": movement_leader_label(m),
                     "year": m["_start"],
                     "end": m.get("_end"),
                     "tone": classify_movement_tone(m),

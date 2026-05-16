@@ -26,6 +26,7 @@ export interface CountryDrift {
   movements: Array<{
     movement_id: string;
     name: string;
+    leader_label?: string | null;
     year: number;
     end: number | null;
     tone?: "left" | "right" | "centrist" | "auth" | "neutral";

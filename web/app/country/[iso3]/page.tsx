@@ -28,6 +28,12 @@ export async function generateMetadata({
 
 const CHANNEL_ORDER = ["fiscal", "regulatory", "monetary", "institutional"];
 
+function shortMovementLabel(name: string) {
+  const label = name.split("—", 1)[0].replace(/\s*\([^)]*\)\s*$/g, "").trim();
+  if (!label) return name;
+  return label.length > 24 ? `${label.slice(0, 23)}…` : label;
+}
+
 export default async function CountryPage({
   params,
 }: {
@@ -151,7 +157,7 @@ export default async function CountryPage({
             .map((m) => ({
               country: iso3,
               year: m.year,
-              label: m.name.length > 28 ? m.name.slice(0, 26) + "…" : m.name,
+              label: m.leader_label || shortMovementLabel(m.name),
               tone: m.tone ?? "neutral",
             }))}
           height={300}

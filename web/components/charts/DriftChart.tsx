@@ -64,6 +64,12 @@ const TONE_COLOR: Record<string, string> = {
   neutral: "#3a3a35",
 };
 
+function compactLeaderLabel(label: string) {
+  const parts = label.trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return label;
+  return parts[parts.length - 1];
+}
+
 export function DriftChart({
   series,
   years,
@@ -83,6 +89,7 @@ export function DriftChart({
       if (!ref.current) return;
       // Observable Plot is dynamically loaded so it never goes through SSR.
       const Plot = await import("@observablehq/plot");
+      const chartWidth = ref.current.clientWidth;
 
       // Flatten to long form.
       const points: SeriesPoint[] = [];
@@ -109,13 +116,14 @@ export function DriftChart({
       const xMin = Math.min(...years);
       const xMax = Math.max(...years);
 
+      const hasMovementLabels = Boolean(movements && movements.length > 0);
       const node = Plot.plot({
-        width: ref.current.clientWidth,
+        width: chartWidth,
         height,
         marginLeft: 56,
-        marginRight: 24,
+        marginRight: hasMovementLabels ? 64 : 34,
         marginBottom: 36,
-        marginTop: 12,
+        marginTop: hasMovementLabels ? 28 : 12,
         x: {
           label: "year",
           domain: [xMin, xMax],
@@ -154,15 +162,9 @@ export function DriftChart({
               textAnchor: "start",
             }
           ),
-          // Movement annotations on the trajectory line — colored dots only.
-          // We removed the on-chart text labels because adjacent-year
-          // movements (e.g. Canada 1980-2006 with 8 governments inside 26
-          // years) made labels overlap unreadably no matter how we
-          // staggered them. The full labelled timeline lives in the
-          // movement-timeline table below the chart, which is more
-          // legible and accessible than cramped on-chart text. The dots
-          // alone still tell the user "an event happened in this year,
-          // tone-coloured by its policy direction."
+          // Movement annotations on the trajectory line. The visible labels
+          // stay short by using the movement's lead figure, while the timeline
+          // below carries the full movement name and context.
           ...(movements && movements.length > 0
             ? (() => {
                 type AnnotatedDot = {
@@ -171,8 +173,12 @@ export function DriftChart({
                   country: string;
                   tone: "left" | "right" | "centrist" | "auth" | "neutral";
                   label: string;
+                  displayLabel: string;
+                  labelDy: number;
+                  labelAnchor: "start" | "end";
                 };
-                const dots: AnnotatedDot[] = movements
+                const compactLabels = chartWidth < 640;
+                const rawDots = movements
                   .map((m): AnnotatedDot | null => {
                     const traj = series[m.country];
                     if (!traj) return null;
@@ -184,10 +190,59 @@ export function DriftChart({
                       country: m.country,
                       tone: m.tone ?? "neutral",
                       label: m.label,
+                      displayLabel: m.label,
+                      labelDy: -11,
+                      labelAnchor: "start",
                     };
                   })
                   .filter((x): x is AnnotatedDot => x !== null);
+                const dots = [...rawDots].sort((a, b) => a.year - b.year);
+                let lane = 0;
+                let previousYear = Number.NEGATIVE_INFINITY;
+                for (const dot of dots) {
+                  lane = dot.year - previousYear <= 3 ? (lane + 1) % 4 : 0;
+                  previousYear = dot.year;
+                  const nearRightEdge = dot.year >= xMax - 3;
+                  dot.labelAnchor =
+                    nearRightEdge || (compactLabels && lane >= 2)
+                      ? "end"
+                      : "start";
+                  dot.labelDy = [-12, 14, -28, 30][lane];
+                  dot.displayLabel =
+                    compactLabels && !(lane <= 1 || nearRightEdge)
+                      ? ""
+                      : compactLabels
+                      ? compactLeaderLabel(dot.label)
+                      : dot.label;
+                }
+                const labelMarks = [-28, -12, 14, 30].flatMap((dy) =>
+                  (["start", "end"] as const).flatMap((anchor) => {
+                    const labelled = dots.filter(
+                      (d) =>
+                        d.displayLabel &&
+                        d.labelDy === dy &&
+                        d.labelAnchor === anchor
+                    );
+                    if (labelled.length === 0) return [];
+                    return [
+                      Plot.text(labelled, {
+                        x: "year",
+                        y: "value",
+                        text: (d: { displayLabel: string }) => d.displayLabel,
+                        dx: anchor === "end" ? -8 : 8,
+                        dy,
+                        textAnchor: anchor,
+                        fontSize: compactLabels ? 9.5 : 10.5,
+                        fill: "#4a4a45",
+                        stroke: "white",
+                        strokeWidth: 4,
+                        paintOrder: "stroke",
+                      }),
+                    ];
+                  })
+                );
                 return [
+                  ...labelMarks,
                   Plot.dot(dots, {
                     x: "year",
                     y: "value",
@@ -196,8 +251,7 @@ export function DriftChart({
                       TONE_COLOR[d.tone] ?? TONE_COLOR.neutral,
                     stroke: "white",
                     strokeWidth: 1.5,
-                    title: (d: { label: string; year: number }) =>
-                      `${d.year} · ${d.label}`,
+                    title: (d: { label: string }) => d.label,
                   }),
                 ];
               })()
