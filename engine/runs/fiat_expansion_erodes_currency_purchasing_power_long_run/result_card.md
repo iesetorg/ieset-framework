@@ -1,19 +1,23 @@
 # Result card — fiat_expansion_erodes_currency_purchasing_power_long_run
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome or no treatment variable in spec
+**Verdict:** SUPPORTED — 7/7 fiat currencies lost purchasing power against at least one hard-asset benchmark
 
 ## Pre-registration
 - **Claim:** Over 50+ year horizons since the 1971 collapse of Bretton Woods, major fiat currencies (USD, GBP, EUR legacy components, JPY, AUD) have lost substantial purchasing power against hard assets (gold, broad commodity baskets, residential real estate). This is documented fact; the hypothesis re-establishes the pattern using provenanced public data.
 - **Falsification rule:** Not supported if any of the seven listed fiat currencies maintained or gained purchasing power against all three reference assets (gold, real estate, commodity basket) across the 1971-2025 period.
 - **Falsification test:** currency_purchasing_power_trajectory
 
-## Estimate
-- _Error:_ no outcome or no treatment variable in spec
+## Comparison
+- **shape:** fiat_hard_asset_endpoint_check
+- **countries_tested:** 7
+- **countries_passing_any_asset:** 7
+- **rule:** end-of-period purchasing-power index < 100 against at least one hard-asset benchmark
+- **rows:** [{'country': 'USA', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 4.584818648896271, 'purchasing_power_index_end': 21.81111351570548, 'passes': True}], 'passes_any_asset': True}, {'country': 'GBR', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 7.171745106764663, 'purchasing_power_index_end': 13.943607659128347, 'passes': True}], 'passes_any_asset': True}, {'country': 'DEU', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 1.6634249662849847, 'purchasing_power_index_end': 60.1169286423152, 'passes': True}], 'passes_any_asset': True}, {'country': 'FRA', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 4.234610494551768, 'purchasing_power_index_end': 23.61492281962168, 'passes': True}], 'passes_any_asset': True}, {'country': 'ITA', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 4.162785641482327, 'purchasing_power_index_end': 24.022375546676233, 'passes': True}], 'passes_any_asset': True}, {'country': 'JPN', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 1.548655215321835, 'purchasing_power_index_end': 64.57215202624583, 'passes': True}], 'passes_any_asset': True}, {'country': 'AUS', 'assets': [{'asset': 'commodity_basket', 'publisher': 'imf_pcps', 'start_year': 1990, 'end_year': 2025, 'asset_ratio_end_to_start': 3.0656722691538576, 'purchasing_power_index_end': 32.61927277947442, 'passes': True}, {'asset': 'real_residential_property', 'publisher': 'bis', 'start_year': 1971, 'end_year': 2025, 'asset_ratio_end_to_start': 6.406594383957958, 'purchasing_power_index_end': 15.608917001269646, 'passes': True}], 'passes_any_asset': True}]
 
 ## Variables resolved
 - `fred:GOLDAMGBD228NLBM; bis:WS_EER` → currency_purchasing_power_vs_gold (outcome, publisher=bis, n=2922)
 - `bis:WS_SPP; shiller:home_price_index` → currency_purchasing_power_vs_real_estate (outcome, publisher=bis, n=2272)
-- `imf:primary_commodity_prices; fred:PPIACO` → currency_purchasing_power_vs_commodity_basket (outcome, publisher=fred, n=114)
+- `imf_pcps:PALLFNF; fred:PPIACO` → currency_purchasing_power_vs_commodity_basket (outcome, publisher=imf_pcps, n=37)
 - `world_bank_wdi:NY.GDP.PCAP.KD` → gdp_per_capita_real (controls, publisher=world_bank_wdi, n=14066)
 
-_Generated by `scripts/run_panel_fe.py` at 2026-05-04T13:02:34+00:00_
+_Generated by `scripts/run_descriptive.py` at 2026-05-17T07:59:46+00:00_

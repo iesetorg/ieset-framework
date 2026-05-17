@@ -48,7 +48,8 @@ _PSEUDO_SERIES: set[str] = {
     "ccon", "cda", "cgdpe", "cgdpo", "cn", "ck", "ctfp", "cwtfp",
     "rconna", "rdana", "rnna", "rkna", "rwtfpna", "labsh", "irr",
     "delta", "xr", "pl_con", "pl_da", "pl_gdpo", "rgdpe_per_capita",
-    "rgdpo_per_emp", "rkna_to_rgdpna", "rkna_per_emp",
+    "rgdpo_pop", "rgdpo_per_emp", "rkna_to_rgdpna", "rkna_per_emp",
+    "ccon_pop", "csh_i", "csh_x",
 }
 
 
@@ -88,12 +89,16 @@ def fetch(series_id: str = "pwt_full", *, vintage_utc: datetime | None = None) -
         # Handle synthetic per-capita / per-emp / ratio series.
         if col == "rgdpe_per_capita" and col not in df_full.columns:
             df_full[col] = df_full["rgdpe"] / df_full["pop"]
+        elif col == "rgdpo_pop" and col not in df_full.columns:
+            df_full[col] = df_full["rgdpo"] / df_full["pop"]
         elif col == "rgdpo_per_emp" and col not in df_full.columns:
             df_full[col] = df_full["rgdpo"] / df_full["emp"]
         elif col == "rkna_to_rgdpna" and col not in df_full.columns:
             df_full[col] = df_full["rkna"] / df_full["rgdpna"]
         elif col == "rkna_per_emp" and col not in df_full.columns:
             df_full[col] = df_full["rkna"] / df_full["emp"]
+        elif col == "ccon_pop" and col not in df_full.columns:
+            df_full[col] = df_full["ccon"] / df_full["pop"]
 
         if col not in df_full.columns:
             raise KeyError(f"{col} not in PWT columns and no synthetic recipe defined")

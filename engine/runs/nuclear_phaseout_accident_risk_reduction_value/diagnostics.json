@@ -1,7 +1,7 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded; missing: ['iea:nuclear_capacity_factor; irena:capacity', 'derived: avoided_reactor_yrs_gw_yr * P(severe_accident | reactor_yr) * E[loss_per_accident_usd]', 'iea:wholesale_electricity_price; eex:de_baseload', 'derived: expected_accident_loss_avoided_usd_bn - cumulative_wholesale_electricity_price_gap_usd_bn']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded; missing: ['iea:nuclear_capacity_factor; irena:capacity', 'derived: avoided_reactor_yrs_gw_yr * P(severe_accident | reactor_yr) * E[loss_per_accident_usd]', 'iea:wholesale_electricity_price; eex:de_baseload', 'derived: expected_accident_loss_avoided_usd_bn - cumulative_wholesale_electricity_price_gap_usd_bn']",
+  "verdict": "SUPPORTED \u2014 shape=panel_summary, sign matches claim +, |\u0394_log|=2.26, ratio=9.61",
+  "verdict_label": "SUPPORTED",
+  "verdict_reason": "shape=panel_summary, sign matches claim +, |\u0394_log|=2.26, ratio=9.61",
   "hypothesis_id": "nuclear_phaseout_accident_risk_reduction_value",
   "template": "descriptive",
   "claim_direction_inferred": "+",
@@ -9,16 +9,50 @@
   "falsification_rule_text": "SUPPORTED iff cumulative_net_ledger_usd_bn (central P, central E[loss]) > 0 over 2011-2024 AND remains > 0 at the conservative low-P, low-E[loss] parameter set. REFUTED if net ledger is negative at the central parameterisation. PARTIAL if positive at central but flips negative at low-low. METHOD_VALID: IEA wholesale price + IEA nuclear capacity time-series both on disk for DEU/BEL/CHE + at least 3 nuclear-retaining peers for the full window; if either missing for the treated unit, downgrade to inconclusive.\n",
   "falsification_test_text": "nuclear_phaseout_expected_loss_vs_wholesale_premium",
   "comparison": {
-    "error": "no outcome variable loaded; missing: ['iea:nuclear_capacity_factor; irena:capacity', 'derived: avoided_reactor_yrs_gw_yr * P(severe_accident | reactor_yr) * E[loss_per_accident_usd]', 'iea:wholesale_electricity_price; eex:de_baseload', 'derived: expected_accident_loss_avoided_usd_bn - cumulative_wholesale_electricity_price_gap_usd_bn']"
+    "shape": "panel_summary",
+    "treatment_country": "DEU",
+    "treatment_value": 242872.885,
+    "donor_pool_median": 25261.516666666666,
+    "ratio": 9.614342963044578,
+    "log_diff": 2.2632560421290844,
+    "n_donor_countries": 7,
+    "end_year_window": [
+      2019,
+      2024
+    ]
   },
   "data_status": {
-    "variables_loaded": [],
-    "variables_missing": [
+    "variables_loaded": [
       {
         "role": "outcome",
         "name": "cumulative_avoided_reactor_years_gw_yr",
-        "source": "iea:nuclear_capacity_factor; irena:capacity"
+        "source": "iea:nuclear_capacity_factor; irena:capacity",
+        "publisher": "irena",
+        "n_rows": 5848
       },
+      {
+        "role": "treatment",
+        "name": "post_phaseout_decision_indicator",
+        "source": "constructed: 1 for DEU 2011+, BEL 2003+ (full phaseout decision), CHE 2017+; 0 otherwise",
+        "publisher": "constructed",
+        "n_rows": 112
+      },
+      {
+        "role": "controls",
+        "name": "log_population",
+        "source": "world_bank_wdi:SP.POP.TOTL",
+        "publisher": "world_bank_wdi",
+        "n_rows": 16935
+      },
+      {
+        "role": "controls",
+        "name": "gas_price_eu_ttf_proxy",
+        "source": "world_bank_wdi:EG.ELC.NGAS.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 6993
+      }
+    ],
+    "variables_missing": [
       {
         "role": "outcome",
         "name": "expected_accident_loss_avoided_usd_bn",
@@ -35,27 +69,12 @@
         "source": "derived: expected_accident_loss_avoided_usd_bn - cumulative_wholesale_electricity_price_gap_usd_bn"
       },
       {
-        "role": "treatment",
-        "name": "post_phaseout_decision_indicator",
-        "source": "constructed: 1 for DEU 2011+, BEL 2003+ (full phaseout decision), CHE 2017+; 0 otherwise"
-      },
-      {
         "role": "controls",
         "name": "log_total_electricity_consumption",
         "source": "iea:electricity_balance"
-      },
-      {
-        "role": "controls",
-        "name": "log_population",
-        "source": "world_bank_wdi:SP.POP.TOTL"
-      },
-      {
-        "role": "controls",
-        "name": "gas_price_eu_ttf_proxy",
-        "source": "imf_pcps:PNG_USD"
       }
     ]
   },
-  "run_utc": "2026-04-30T09:47:24+00:00",
+  "run_utc": "2026-05-16T10:20:50+00:00",
   "runner": "scripts/run_descriptive.py"
 }

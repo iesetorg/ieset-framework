@@ -55,6 +55,7 @@ from run_panel_fe import (
     is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, build_panel, infer_claim_direction, filter_sample,
     first_loaded_var, construct_treatment_from_text,
+    latest_vintage,
     should_persist_preflight_inconclusive,
     bump_bulk_run_count, print_bulk_run_summary, fit_fe_ols_fallback,
     prune_controls_for_overlap,
@@ -275,6 +276,79 @@ def event_study_verdict(comp: dict, claim_dir: str, threshold: dict,
     return "INCONCLUSIVE_DATA_PENDING", f"unknown shape {shape}"
 
 
+def arpa_ctc_census_spm_comparison(status: dict) -> dict:
+    path = latest_vintage("us_census", "spm_child_poverty_rate")
+    if path is None:
+        return {"error": "missing us_census:spm_child_poverty_rate vintage"}
+    df = pd.read_parquet(path)
+    required = {"year", "value"}
+    if not required.issubset(df.columns):
+        return {"error": f"unexpected SPM child-poverty schema: {list(df.columns)}"}
+    if "country_iso3" in df.columns:
+        df = df[df["country_iso3"].eq("USA")]
+    df = df.dropna(subset=["year", "value"]).copy()
+    df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
+    rows = df[(df["year"] >= 2018) & (df["year"] <= 2023)].sort_values("year")
+    if rows.empty or not {2020, 2021, 2022}.issubset(set(rows["year"].astype(int))):
+        return {"error": "SPM child-poverty vintage lacks 2020-2022 gate years"}
+
+    status.setdefault("variables_loaded", []).append(
+        {
+            "role": "supplemental_outcome",
+            "name": "spm_child_poverty_rate",
+            "source": "us_census:spm_child_poverty_rate",
+            "publisher": "us_census",
+            "n_rows": int(len(df)),
+            "vintage": str(path.relative_to(ROOT)),
+        }
+    )
+
+    rates = {
+        int(row.year): float(row.value)
+        for row in rows.itertuples(index=False)
+    }
+    onset_drop = rates[2020] - rates[2021]
+    expiration_rebound = rates[2022] - rates[2021]
+    lfp_loaded = False
+    lfp_note = "Parental LFP six-month ATT is not loaded; BLS:LNS11300000 is aggregate LFP and local vintage does not cover the 2021 event window."
+    return {
+        "shape": "arpa_ctc_census_spm_annual_gate",
+        "vintage_file": str(path.relative_to(ROOT)),
+        "rates": [
+            {"year": int(row.year), "spm_child_poverty_rate_pct": float(row.value)}
+            for row in rows.itertuples(index=False)
+        ],
+        "onset_drop_2020_2021_pp": float(onset_drop),
+        "expiration_rebound_2021_2022_pp": float(expiration_rebound),
+        "onset_gate_pass_drop_ge_4pp": bool(onset_drop >= 4.0),
+        "expiration_gate_pass_rebound_ge_3pp": bool(expiration_rebound >= 3.0),
+        "parental_lfp_gate_loaded": lfp_loaded,
+        "parental_lfp_gate_note": lfp_note,
+        "method_note": "Annual Census SPM child-poverty rates are used as a conservative fallback for the preferred CPSP monthly series.",
+    }
+
+
+def arpa_ctc_census_spm_verdict(comp: dict) -> tuple[str, str]:
+    if "error" in comp:
+        return "INCONCLUSIVE_DATA_PENDING", comp["error"]
+    drop = comp["onset_drop_2020_2021_pp"]
+    rebound = comp["expiration_rebound_2021_2022_pp"]
+    if drop < 1.5 or rebound < 1.0:
+        return (
+            "REFUTED",
+            f"SPM child-poverty drop/rebound are too small: {drop:.1f}pp and {rebound:.1f}pp",
+        )
+    if comp["onset_gate_pass_drop_ge_4pp"] and comp["expiration_gate_pass_rebound_ge_3pp"]:
+        return (
+            "WEAKENED",
+            f"SPM child poverty fell {drop:.1f}pp and rebounded {rebound:.1f}pp; monthly CPSP and parental-LFP gates not loaded",
+        )
+    return (
+        "PARTIAL",
+        f"SPM child-poverty movement is directional but below a primary gate: drop {drop:.1f}pp, rebound {rebound:.1f}pp",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Output (mirrors run_panel_fe / run_descriptive)
 # ---------------------------------------------------------------------------
@@ -404,6 +478,17 @@ def run_one(
         ):
             write_outputs(hid, spec, status, {"error": reason}, {}, verdict, reason, None)
         return f"  ⚠ {hid}: {verdict}"
+    if hid == "welfare_transfer_us_arpa_expanded_ctc_2021":
+        threshold = extract_threshold(
+            (spec.get("claim") or "") + " " +
+            (spec.get("falsification") or {}).get("test", "")
+        )
+        comp = arpa_ctc_census_spm_comparison(status)
+        verdict, reason = arpa_ctc_census_spm_verdict(comp)
+        write_outputs(hid, spec, status, comp, threshold, verdict, reason, 2021)
+        icon = {"SUPPORTED": "✓", "REFUTED": "✗", "PARTIAL": "·",
+                "WEAKENED": "·", "INCONCLUSIVE_DATA_PENDING": "⚠"}.get(verdict, " ")
+        return f"  {icon} {hid}: {verdict} — {reason}"
     panel_filt = filter_sample(panel, spec)
     outcome_name = first_loaded_var(outcome_items, panel_filt)
     if outcome_name is None:

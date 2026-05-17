@@ -321,6 +321,8 @@ SOURCE_BRIDGES = {
     ("imf", "general_government_gross_debt_pct_gdp"): ("imf", "GGXWDG_NGDP"),
     ("imf", "WEO_GGXWDG_NGDP"): ("imf", "GGXWDG_NGDP"),
     ("imf", "WEO.NGAP_NPGDP"): ("imf", "NGAP_NPGDP"),
+    ("imf", "WEO.NGDP_RPCH"): ("imf", "NGDP_RPCH"),
+    ("imf", "primary_commodity_prices"): ("imf_pcps", "PALLFNF"),
     ("imf", "ENDA_XDC_USD_RATE"): ("world_bank_wdi", "PA.NUS.FCRF"),
     ("ilostat", "EMP_2EMP_SEX_AGE_RT_A"): ("world_bank_wdi", "SL.EMP.TOTL.SP.ZS"),
     ("ilostat", "employment_to_population_ratio"): ("world_bank_wdi", "SL.EMP.TOTL.SP.ZS"),
@@ -332,6 +334,9 @@ SOURCE_BRIDGES = {
     ("oecd", "OECD.SDD.NAD.PROD,DSD_PDB@DF_PDB_GR,1.0"): ("oecd", "DSD_PDB"),
     ("oecd", "OECD.ELS.SPD,DSD_SOCX_AGG@DF_SOCX_AGG,1.0"): ("oecd", "DSD_SOCX@DF_SOCX_AGG"),
     ("oecd", "OECD.ELS.SOC,DSD_SOCX@DF_SOCX_AGG,1.0"): ("oecd", "DSD_SOCX@DF_SOCX_AGG"),
+    ("oecd", "OECD.ELS.SAE,DSD_SOCX_AGG@DF_SOCX_AGG,1.0"): ("oecd", "DSD_SOCX@DF_SOCX_AGG"),
+    ("pwt", "rgdpo_emp"): ("pwt", "rgdpo_per_emp"),
+    ("un_comtrade", "export_product_concentration"): ("wits", "export_product_hhi_wits"),
     ("wid", "tax_top_rate"): ("owid", "top-marginal-income-tax-rate"),
     ("wid", "top_marginal_income_tax_rate"): ("owid", "top-marginal-income-tax-rate"),
 }
@@ -458,6 +463,10 @@ def latest_vintage(publisher: str, series: str) -> Path | None:
     series_options = [series]
     if original_publisher == publisher and original_series != series:
         series_options.append(original_series)
+    if publisher == "oecd" and (
+        "SOCX_AGG" in original_series.upper() or "SOCX_AGG" in str(series).upper()
+    ):
+        series_options.extend(["DSD_SOCX_DF_SOCX_AGG", "DSD_SOCX@DF_SOCX_AGG"])
 
     # 1. Exact prefix match: <series>@... or <series>.parquet
     candidates: list[Path] = []
@@ -531,6 +540,23 @@ def _filter_oecd_socx_slice(
         return df
 
     name = (variable_name or "").lower()
+    if name in {"welfare_state_size", "public_pension_expenditure_share_gdp"}:
+        programme_type = "_T" if name == "welfare_state_size" else "TP11"
+        filtered = df[
+            df["UNIT_MEASURE"].astype(str).eq("PT_B1GQ")
+            & df["EXPEND_SOURCE"].astype(str).eq("ES10")
+            & df["PROGRAMME_TYPE"].astype(str).eq(programme_type)
+        ].copy()
+        if "SPENDING_TYPE" in filtered.columns:
+            total = filtered[filtered["SPENDING_TYPE"].astype(str).eq("_T")]
+            if not total.empty:
+                filtered = total
+        if "PRICE_BASE" in filtered.columns:
+            not_applicable = filtered[filtered["PRICE_BASE"].astype(str).eq("_Z")]
+            if not not_applicable.empty:
+                filtered = not_applicable
+        return filtered if not filtered.empty else df
+
     if name != "unemployment_benefit_expenditure_gdp":
         return df
 
@@ -602,7 +628,7 @@ def normalise_panel(
 
     Returns None if the schema can't be normalised.
     """
-    if publisher == "oecd" and "DSD_SOCX_AGG" in str(series or ""):
+    if publisher == "oecd" and "SOCX_AGG" in str(series or ""):
         df = _filter_oecd_socx_slice(df, variable_name=variable_name)
     if publisher == "oecd" and "DF_LFS_INDIC" in str(series or ""):
         df = _filter_oecd_lfs_indic_slice(df, variable_name=variable_name)
@@ -628,9 +654,24 @@ def normalise_panel(
             "bcra": "ARG", "bcv": "VEN", "cbr": "RUS", "cia": "USA",
             "destatis": "DEU", "destatis_germany": "DEU",
         }
-        if publisher in single_country_fallback:
+        fallback_country = single_country_fallback.get(publisher)
+        if publisher == "fred":
+            series_key = str(series or "").upper()
+            fred_country_hints = {
+                "BOGMBASE_JPN": "JPN",
+                "DEXJPUS": "JPN",
+                "IRLTLT01JPM156N": "JPN",
+                "IRLTLT30JPM156N": "JPN",
+                "JPNASSETS": "JPN",
+                "JPNCPIALLMINMEI": "JPN",
+                "JPNNGDP": "JPN",
+            }
+            if series_key.startswith("JPN"):
+                fallback_country = "JPN"
+            fallback_country = fred_country_hints.get(series_key, fallback_country)
+        if fallback_country is not None:
             df = df.copy()
-            df["country_iso3"] = single_country_fallback[publisher]
+            df["country_iso3"] = fallback_country
             country_col = "country_iso3"
         else:
             return None
@@ -1049,6 +1090,70 @@ def construct_variable_from_text(
             if not merged.empty:
                 return merged[["country_iso3", "year", name]], "constructed"
 
+    if (
+        ("hirschman" in body_lc or "hhi" in body_lc or "theil" in body_lc)
+        and "export" in body_lc
+        and "diversification" in name.lower()
+    ):
+        path = latest_vintage("derived", "export_diversification_index")
+        if path is not None:
+            try:
+                df = pd.read_parquet(path)
+            except Exception:
+                df = None
+            if df is not None:
+                panel = normalise_panel(
+                    df,
+                    "derived",
+                    series="export_diversification_index",
+                    variable_name=name,
+                )
+                if panel is not None and not panel.empty:
+                    panel = panel.rename(columns={"value": name})
+                    return panel[["country_iso3", "year", name]], "derived"
+
+    if name == "market_flexibility_openness_discipline_index":
+        component_specs = [
+            ("pmr_inverted", "oecd_pmr:PMR", -1.0),
+            ("epl_inverted", "oecd:EPL_OV", -1.0),
+            ("trade_openness", "world_bank_wdi:NE.TRD.GNFS.ZS", 1.0),
+            ("debt_discipline", "imf:GGXWDG_NGDP", 1.0),
+        ]
+        merged = grid.copy()
+        raw_cols: list[str] = []
+        for col, src, sign in component_specs:
+            res = load_variable(src, variable_name=col)
+            if res is None:
+                continue
+            df, _ = res
+            df = df.rename(columns={"value": col})
+            merged = merged.merge(
+                df[["country_iso3", "year", col]],
+                on=["country_iso3", "year"],
+                how="left",
+            )
+            if col == "debt_discipline":
+                merged[col] = -np.maximum(merged[col] - 90.0, 0.0)
+            else:
+                merged[col] = sign * merged[col]
+            raw_cols.append(col)
+
+        z_cols: list[str] = []
+        for col in raw_cols:
+            s = pd.to_numeric(merged[col], errors="coerce")
+            sd = float(s.std(skipna=True) or 0.0)
+            if not np.isfinite(sd) or sd <= 0:
+                continue
+            z_col = f"_{col}_z"
+            merged[z_col] = (s - float(s.mean(skipna=True))) / sd
+            z_cols.append(z_col)
+        if z_cols:
+            merged["_component_count"] = merged[z_cols].notna().sum(axis=1)
+            merged[name] = merged[z_cols].mean(axis=1, skipna=True)
+            merged = merged[merged["_component_count"] >= 2].dropna(subset=[name])
+            if not merged.empty:
+                return merged[["country_iso3", "year", name]], "constructed"
+
     out = grid.copy()
     out[name] = 0.0
     sample_countries = sorted(out["country_iso3"].dropna().astype(str).unique().tolist())
@@ -1097,9 +1202,15 @@ def construct_variable_from_text(
         gm = re.search(pat, stripped, flags=re.I)
         if not gm:
             continue
-        years = _extract_year_window(" ".join(g for g in gm.groups() if g))
-        if years is not None:
-            apply_assignment(None, years[0], years[1] if len(years) > 1 else None)
+        raw_years = [
+            int(y)
+            for y in re.findall(
+                r"(?<!\d)(19\d{2}|20\d{2})(?!\d)",
+                " ".join(g for g in gm.groups() if g),
+            )
+        ]
+        if raw_years:
+            apply_assignment(None, raw_years[0], raw_years[1] if len(raw_years) > 1 else None)
 
     segments = [seg.strip() for seg in re.split(r";|\.\s+", body) if seg.strip()]
     for seg in segments:
@@ -1145,9 +1256,15 @@ def construct_variable_from_text(
         )
         if m:
             targets = _expand_constructed_country_targets(m.group(1), sample_countries)
-            start_end = _extract_year_window(" ".join(x for x in m.groups()[1:] if x))
-            if start_end is not None:
-                apply_assignment(targets, start_end[0], start_end[1] if len(start_end) > 1 else None)
+            raw_years = [
+                int(y)
+                for y in re.findall(
+                    r"(?<!\d)(19\d{2}|20\d{2})(?!\d)",
+                    " ".join(x for x in m.groups()[1:] if x),
+                )
+            ]
+            if raw_years:
+                apply_assignment(targets, raw_years[0], raw_years[1] if len(raw_years) > 1 else None)
                 continue
 
         if " for " in seg.lower():
@@ -1369,11 +1486,53 @@ def apply_source_qualifier(
     return panel
 
 
+def transform_panel_values(df: pd.DataFrame, value_col: str, kind: str) -> pd.DataFrame:
+    """Apply transformations that need country-year context."""
+    kind_l = (kind or "level").lower()
+    if "country_iso3" not in df.columns or "year" not in df.columns:
+        df[value_col] = transform(df[value_col], kind)
+        return df
+
+    out = df.sort_values(["country_iso3", "year"]).copy()
+
+    if (
+        "five" in kind_l
+        and "year" in kind_l
+        and "annual" in kind_l
+        and ("growth" in kind_l or "annualized" in kind_l or "annualised" in kind_l)
+    ):
+        prev = out.groupby("country_iso3", sort=False)[value_col].shift(5)
+        ratio = out[value_col] / prev
+        ratio = ratio.where(ratio > 0)
+        out[value_col] = (np.power(ratio, 1.0 / 5.0) - 1.0) * 100.0
+        return out
+
+    if kind_l in {"annual_pct", "annual_percent", "annual_pct_change"} or (
+        "annual" in kind_l and ("pct" in kind_l or "percent" in kind_l)
+    ):
+        out[value_col] = out.groupby("country_iso3", sort=False)[value_col].pct_change() * 100.0
+        return out
+
+    if "share of us" in kind_l or "share of u.s" in kind_l or "share of usa" in kind_l:
+        us = (
+            out[out["country_iso3"].eq("USA")][["year", value_col]]
+            .dropna()
+            .rename(columns={value_col: "_us_value"})
+        )
+        out = out.merge(us, on="year", how="left")
+        denom = out["_us_value"].replace({0: np.nan})
+        out[value_col] = out[value_col] / denom
+        return out.drop(columns=["_us_value"])
+
+    out[value_col] = transform(out[value_col], kind)
+    return out
+
+
 def transform(s: pd.Series, kind: str) -> pd.Series:
     kind = (kind or "level").lower()
     if kind in ("level", "raw"):
         return s
-    if kind == "log":
+    if "log" in kind:
         return np.log(s.where(s > 0))
     if kind in ("inverted_scale", "reverse_scale"):
         return -s
@@ -1618,6 +1777,7 @@ def build_panel(spec: dict) -> tuple[pd.DataFrame, dict]:
     """
     status: dict = {"variables_loaded": [], "variables_missing": []}
     frames: list[pd.DataFrame] = []
+    loaded_names: set[str] = set()
     var_blocks = spec.get("variables") or {}
     sample_countries = _sample_countries(spec)
     for role in ("outcome", "treatment", "decomposition_channels", "controls"):
@@ -1654,7 +1814,7 @@ def build_panel(spec: dict) -> tuple[pd.DataFrame, dict]:
                     {"role": role, "name": name, "source": source}
                 )
                 continue
-            df[value_col] = transform(df[value_col], kind)
+            df = transform_panel_values(df, value_col, kind)
             if value_col != name:
                 df.rename(columns={value_col: name}, inplace=True)
             if (
@@ -1669,8 +1829,15 @@ def build_panel(spec: dict) -> tuple[pd.DataFrame, dict]:
                         [sample_countries, common["year"].tolist()],
                         names=["country_iso3", "year"],
                     ).to_frame(index=False).merge(common, on="year", how="left")
+            if name in loaded_names:
+                status["variables_loaded"].append(
+                    {"role": role, "name": name, "source": source, "publisher": pub,
+                     "n_rows": int(len(df)), "reused_existing_column": True}
+                )
+                continue
             df["_role"] = role
             frames.append(df[["country_iso3", "year", name]])
+            loaded_names.add(name)
             status["variables_loaded"].append(
                 {"role": role, "name": name, "source": source, "publisher": pub,
                  "n_rows": int(len(df))}
@@ -1822,6 +1989,48 @@ def fit_fe_ols_fallback(
     }
 
 
+def fit_time_series_ols(
+    sub: pd.DataFrame,
+    outcome_name: str,
+    rhs: list[str],
+    treatment_name: str,
+    *,
+    maxlags: int = 4,
+) -> dict:
+    """Single-country time-series fallback with HAC standard errors."""
+    try:
+        import statsmodels.api as sm
+    except Exception as exc:
+        return {"error": f"statsmodels time-series fallback unavailable: {exc}"}
+
+    model_df = sub[["country_iso3", "year", outcome_name] + rhs].copy()
+    model_df = model_df.sort_values(["country_iso3", "year"]).reset_index(drop=True)
+    X = sm.add_constant(model_df[rhs].astype(float), has_constant="add")
+    y = model_df[outcome_name].astype(float)
+    try:
+        lag_count = max(0, min(int(maxlags), max(0, len(model_df) // 4)))
+        cov_type = "HAC" if lag_count > 0 else "HC1"
+        cov_kwds = {"maxlags": lag_count} if cov_type == "HAC" else {}
+        res = sm.OLS(y, X).fit(cov_type=cov_type, cov_kwds=cov_kwds)
+    except Exception as exc:
+        return {"error": f"statsmodels time-series fallback failed: {exc}"}
+
+    if treatment_name not in res.params.index:
+        return {"error": f"treatment {treatment_name!r} absent from time-series regression"}
+    return {
+        "coefficient": float(res.params[treatment_name]),
+        "std_error": float(res.bse[treatment_name]),
+        "p_value": float(res.pvalues[treatment_name]),
+        "n_obs": int(len(model_df)),
+        "n_countries": int(model_df["country_iso3"].nunique()),
+        "r_squared_within": float(getattr(res, "rsquared", 0.0) or 0.0),
+        "fe_entity": False,
+        "fe_time": False,
+        "cluster": f"HAC(maxlags={lag_count})",
+        "method": "statsmodels OLS time-series fallback",
+    }
+
+
 def run_panel_ols(
     panel: pd.DataFrame,
     spec: dict,
@@ -1839,6 +2048,13 @@ def run_panel_ols(
     extra_regressors = [r for r in (extra_regressors or []) if r]
     fe_spec = (spec.get("estimator") or {}).get("fixed_effects", []) or []
     cluster_spec = (spec.get("estimator") or {}).get("clustering", "country")
+    sample = spec.get("sample") or {}
+    sample_countries = _sample_countries(spec)
+    single_country_time_series = (
+        str(sample.get("temporal_structure") or "").lower() == "time_series"
+        and len(sample_countries) <= 1
+    )
+    min_obs = 12 if single_country_time_series else 30
 
     # Drop rows missing outcome/treatment, and stop a single all-null control
     # from collapsing the entire runnable sample.
@@ -1850,16 +2066,81 @@ def run_panel_ols(
             for c in (control_names + extra_regressors)
             if c in panel.columns and c != treatment_name
         ],
-        min_obs=30,
+        min_obs=min_obs,
     )
-    if sub.empty or len(sub) < 30:
+    if sub.empty or len(sub) < min_obs:
         return {"error": f"insufficient observations after listwise deletion ({len(sub)})"}
     rhs = [treatment_name] + usable_controls
     sub_plain = sub.copy()
     entity = "country" in [str(x).lower() for x in fe_spec]
     time = "year" in [str(x).lower() for x in fe_spec]
-    if not entity and not time:
+    if not entity and not time and not single_country_time_series:
         entity, time = True, True
+    if single_country_time_series:
+        ts_result = fit_time_series_ols(
+            sub_plain,
+            outcome_name,
+            rhs,
+            treatment_name,
+        )
+        if "error" not in ts_result:
+            ts_result["dropped_controls_due_to_overlap"] = dropped_controls
+        return ts_result
+
+    def treatment_has_fe_variation(frame: pd.DataFrame) -> bool:
+        if entity:
+            within_entity_n = frame.groupby("country_iso3")[treatment_name].nunique(dropna=True)
+            if not within_entity_n.empty and bool((within_entity_n <= 1).all()):
+                return False
+        if time:
+            within_time_n = frame.groupby("year")[treatment_name].nunique(dropna=True)
+            if not within_time_n.empty and bool((within_time_n <= 1).all()):
+                return False
+        return True
+
+    def sample_with_controls(cols: list[str]) -> pd.DataFrame:
+        keep = ["country_iso3", "year", outcome_name, treatment_name] + cols
+        return panel[keep].dropna()
+
+    def fe_variation_score(frame: pd.DataFrame) -> tuple[int, int, int, int]:
+        entity_score = 1
+        time_score = 1
+        if entity:
+            within_entity_n = frame.groupby("country_iso3")[treatment_name].nunique(dropna=True)
+            entity_score = int((within_entity_n > 1).sum())
+        if time:
+            within_time_n = frame.groupby("year")[treatment_name].nunique(dropna=True)
+            time_score = int((within_time_n > 1).sum())
+        return (
+            int(treatment_has_fe_variation(frame)),
+            entity_score,
+            time_score,
+            len(frame),
+        )
+
+    while usable_controls and not treatment_has_fe_variation(sub):
+        best_control = None
+        best_sub = None
+        best_controls: list[str] | None = None
+        best_score: tuple[int, int, int, int] | None = None
+        for control in usable_controls:
+            alt_controls = [c for c in usable_controls if c != control]
+            alt_sub = sample_with_controls(alt_controls)
+            if len(alt_sub) < min_obs:
+                continue
+            score = fe_variation_score(alt_sub)
+            if best_score is None or score > best_score:
+                best_control = control
+                best_sub = alt_sub
+                best_controls = alt_controls
+                best_score = score
+        if best_control is None or best_sub is None or best_controls is None:
+            break
+        usable_controls = best_controls
+        dropped_controls.append(best_control)
+        sub = best_sub
+        rhs = [treatment_name] + usable_controls
+        sub_plain = sub.copy()
 
     if entity:
         within_entity_n = sub.groupby("country_iso3")[treatment_name].nunique(dropna=True)
@@ -2326,7 +2607,9 @@ def run_one(
     panel_filt = filter_sample(panel, spec)
     outcome_name = first_loaded_var(outcome_items, panel_filt)
     if decomposition_mode:
-        treatment_name = first_loaded_var(decomposition_items, panel_filt)
+        treatment_name = first_loaded_var(treatment_items, panel_filt)
+        if treatment_name is None:
+            treatment_name = first_loaded_var(decomposition_items, panel_filt)
         extra_regressors = [
             item.get("name")
             for item in decomposition_items

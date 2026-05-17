@@ -1,6 +1,6 @@
 # Result card — japan_sargent_wallace_refutation_1990_2024
 
-**Verdict:** INCONCLUSIVE_DATA_PENDING — no outcome variable loaded; missing: ['boj:bond_yields_10y; fred:IRLTLT01JPM156N', 'boj:bond_yields_30y; fred:IRLTLT30JPM156N', 'fred:JPNCPIALLMINMEI; boj:CPI', "constructed: zero events 1990-2024 documented from Moody's-S&P-Fitch sovereign tables and IMF Article IV"]
+**Verdict:** WEAKENED — no observed yield/CPI/regression breach after crossed thresholds; local IMF debt vintage does not cross 250%; CPI coverage stops 2021; distress-event count is spec-coded, not machine-fetched
 
 ## Pre-registration
 - **Claim:** Japan crossed every debt-to-GDP threshold predicted by Sargent-Wallace (1981) "unpleasant monetarist arithmetic" framing — 100% (1996), 150% (2002), 200% (2010), 250% (2020) — without producing the predicted outcomes: 10y JGB yields fell rather than rose across the full 1990-2024 window, CPI inflation averaged below 1% over 1995-2020 and did not breach 4% even at the 2022-2024 global price shock peak, and no sovereign-debt distress event occurred. The Sargent-Wallace prediction that a sufficiently large debt stock forces eventual monetisation and inflation regardless of central-bank preferences is refuted at a sovereign currency-issuer over a 34-year window.
@@ -8,20 +8,30 @@
 - **Falsification test:** japan_debt_yield_inflation_threshold_pattern_1990_2024
 
 ## Comparison
-- _Error:_ no outcome variable loaded; missing: ['boj:bond_yields_10y; fred:IRLTLT01JPM156N', 'boj:bond_yields_30y; fred:IRLTLT30JPM156N', 'fred:JPNCPIALLMINMEI; boj:CPI', "constructed: zero events 1990-2024 documented from Moody's-S&P-Fitch sovereign tables and IMF Article IV"]
+- **shape:** japan_debt_threshold_gate
+- **country:** JPN
+- **period:** [1990, 2024]
+- **threshold_rows:** [{'threshold_debt_pct_gdp': 100.0, 'status': 'crossed', 'cross_year': 1998, 'debt_pct_gdp_at_cross': 101.6, 'pre_cross_yield': {'year': 1997, 'value': 2.373666666666667}, 'max_10y_yield_next_2y': 1.7489999999999999, 'yield_spike_pp_next_2y': -0.6246666666666669, 'max_cpi_yoy_next_2y': 0.648418220563296, 'yield_spike_breach_gt_3pp': False, 'cpi_breach_gt_5pct': False}, {'threshold_debt_pct_gdp': 150.0, 'status': 'crossed', 'cross_year': 2005, 'debt_pct_gdp_at_cross': 153.4, 'pre_cross_yield': {'year': 2004, 'value': 1.4926666666666666}, 'max_10y_yield_next_2y': 1.7405, 'yield_spike_pp_next_2y': 0.24783333333333335, 'max_cpi_yoy_next_2y': 0.2538075233387893, 'yield_spike_breach_gt_3pp': False, 'cpi_breach_gt_5pct': False}, {'threshold_debt_pct_gdp': 200.0, 'status': 'crossed', 'cross_year': 2013, 'debt_pct_gdp_at_cross': 201.2, 'pre_cross_yield': {'year': 2012, 'value': 0.8355833333333332}, 'max_10y_yield_next_2y': 0.6896666666666667, 'yield_spike_pp_next_2y': -0.14591666666666658, 'max_cpi_yoy_next_2y': 2.7592334693625986, 'yield_spike_breach_gt_3pp': False, 'cpi_breach_gt_5pct': False}, {'threshold_debt_pct_gdp': 250.0, 'status': 'not_crossed_in_local_vintage', 'max_local_debt_pct_gdp': 228.8}]
+- **post_first_debt_crossing_gate:** {'start_year': 1998, 'max_10y_yield_after_first_cross': 1.7489999999999999, 'max_cpi_yoy_after_first_cross': 2.7592334693625986, 'cpi_latest_year': 2021}
+- **debt_yield_regression:** {'sample_years': [1998, 2015], 'n_obs': 18, 'debt_to_yield_coefficient': -0.0002596738318602571, 'debt_to_yield_p_value': 0.9774096917846387, 'positive_significant_at_1pct': False}
+- **distress_event_count:** 0
+- **distress_event_count_source:** spec-coded zero-event claim; not a machine-fetched vintage
+- **data_coverage:** {'debt_years': [1980, 2031], 'jgb_years': [1989, 2026], 'cpi_years': [1955, 2021]}
+
+## Extracted threshold: {'percent': 100.0}
 
 ## Variables resolved
+- `boj:bond_yields_10y; fred:IRLTLT01JPM156N` → jgb_yield_10y (outcome, publisher=fred, n=38)
+- `fred:JPNCPIALLMINMEI; boj:CPI` → cpi_inflation_yoy (outcome, publisher=fred, n=67)
+- `imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS` → gross_public_debt_pct_gdp (treatment, publisher=imf, n=8113)
+- `world_bank_wdi:NY.GDP.MKTP.KD.ZG` → real_gdp_growth (controls, publisher=world_bank_wdi, n=13897)
+- `world_bank_wdi:SP.POP.1564.TO.ZS` → working_age_population_share (controls, publisher=world_bank_wdi, n=16965)
+- `imf:BCA_NGDPD` → current_account_pct_gdp (controls, publisher=imf, n=10556)
+- `imf_pcps:POILBRE` → oil_price (controls, publisher=imf_pcps, n=37)
 
 ### Variables missing data
-- `boj:bond_yields_10y; fred:IRLTLT01JPM156N` (outcome, name=jgb_yield_10y)
 - `boj:bond_yields_30y; fred:IRLTLT30JPM156N` (outcome, name=jgb_yield_30y)
-- `fred:JPNCPIALLMINMEI; boj:CPI` (outcome, name=cpi_inflation_yoy)
 - `constructed: zero events 1990-2024 documented from Moody's-S&P-Fitch sovereign tables and IMF Article IV` (outcome, name=japan_sovereign_distress_event_count)
-- `imf:GGXWDG_NGDP; world_bank_wdi:GC.DOD.TOTL.GD.ZS` (treatment, name=gross_public_debt_pct_gdp)
 - `boj:flow_of_funds_jgb_holdings` (treatment, name=boj_jgb_holdings_pct_outstanding)
-- `world_bank_wdi:NY.GDP.MKTP.KD.ZG` (controls, name=real_gdp_growth)
-- `world_bank_wdi:SP.POP.1564.TO.ZS` (controls, name=working_age_population_share)
-- `imf:BCA_NGDPD` (controls, name=current_account_pct_gdp)
-- `imf_pcps:POILBRE` (controls, name=oil_price)
 
-_Generated by `scripts/run_descriptive.py` at 2026-04-30T09:47:25+00:00_
+_Generated by `scripts/run_descriptive.py` at 2026-05-16T13:19:42+00:00_

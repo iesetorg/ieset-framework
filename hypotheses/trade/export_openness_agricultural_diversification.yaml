@@ -53,22 +53,24 @@ variables:
     transformation: level_or_growth_proxy
   treatment:
   - name: policy_or_institution_proxy
-    source: 'constructed: 1 for CHL from 1975 onward; NZL from 1984 onward; VNM from 1988 onward'
+    source: 'constructed: CHL years >= 1975; NZL years >= 1984; VNM years >= 1988'
     transformation: indicator_or_level
   controls:
   - name: log_gdp_pc
     source: world_bank_wdi:NY.GDP.PCAP.KD
     transformation: log
-  - name: rule_of_law
-    source: wgi:RL.EST
-    transformation: level
 estimator:
   template: panel_fe
   fixed_effects:
   - country
   - year
   clustering: country
-  notes: Proxy-first TWFE screen; upgrade to bespoke replication when exact sector datasets are fetched.
+  notes: >
+    Proxy-first staggered reform panel. Rule-of-law is excluded from the
+    primary model because WGI begins after the 1975/1984/1988 reform onsets
+    and mechanically deletes identifying pre-reform years; report it only as
+    a post-1996 robustness/descriptive check. Upgrade to bespoke replication
+    when exact sector datasets are fetched.
 falsification:
   rule: SUPPORTED if the treatment coefficient has the predicted sign at p<0.10. REFUTED if the opposite
     sign is significant at p<0.10. Otherwise PARTIAL.
@@ -90,3 +92,23 @@ scope:
   - trade_policy
   treatment_tags:
   - agricultural_export_openness
+
+covers_claims:
+- position_id: classical_liberal
+  claim_index: 190
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 2026-05-17 unblocking batch; agricultural export-openness claim maps directly to this result.
+- position_id: developmentalism
+  claim_index: 149
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 2026-05-17 unblocking batch; agricultural upgrading claim maps directly to this result.
+- position_id: empirical_pragmatist
+  claim_index: 154
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 2026-05-17 unblocking batch; mechanism-outcome claim maps directly to this result.

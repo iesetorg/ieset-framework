@@ -27,6 +27,7 @@ from run_panel_fe import (
     is_stub_falsification_rule,    has_committed_verdict,
     ROOT, RUNS, load_spec, build_panel, infer_claim_direction, filter_sample,
     first_loaded_var, construct_treatment_from_text,
+    latest_vintage,
     should_persist_preflight_inconclusive,
     bump_bulk_run_count, print_bulk_run_summary, fit_fe_ols_fallback,
     prune_controls_for_overlap,
@@ -142,6 +143,106 @@ def compute_verdict(est: dict, claim_dir: str) -> tuple[str, str]:
     return "PARTIAL", f"{mag} (above α=0.10)"
 
 
+def _quarterly_fred_series(series: str, start: str, end: str) -> pd.DataFrame | None:
+    path = latest_vintage("fred", series)
+    if path is None:
+        return None
+    df = pd.read_parquet(path)
+    if "date" not in df.columns or "value" not in df.columns:
+        return None
+    out = df.dropna(subset=["value"]).copy()
+    out["date"] = pd.to_datetime(out["date"], errors="coerce")
+    out = out.dropna(subset=["date"])
+    out = out[(out["date"] >= pd.Timestamp(start)) & (out["date"] <= pd.Timestamp(end))]
+    out = out.sort_values("date").copy()
+    out["year"] = out["date"].dt.year
+    out["quarter"] = out["date"].dt.quarter
+    out["t"] = (out["year"] - int(start[:4])) * 4 + (out["quarter"] - 1)
+    out["vintage_file"] = str(path.relative_to(ROOT))
+    return out
+
+
+def _pretrend_gap(series: str, start: str, pre_end: str, post_start: str, post_end: str) -> dict | None:
+    df = _quarterly_fred_series(series, start, post_end)
+    if df is None or df.empty:
+        return None
+    pre = df[df["date"] <= pd.Timestamp(pre_end)]
+    post = df[(df["date"] >= pd.Timestamp(post_start)) & (df["date"] <= pd.Timestamp(post_end))]
+    if len(pre) < 8 or len(post) < 4:
+        return None
+    x = np.vstack([np.ones(len(pre)), pre["t"].to_numpy(dtype=float)]).T
+    y = np.log(pre["value"].to_numpy(dtype=float))
+    beta = np.linalg.lstsq(x, y, rcond=None)[0]
+    x_post = np.vstack([np.ones(len(post)), post["t"].to_numpy(dtype=float)]).T
+    trend = np.exp(x_post @ beta)
+    actual = post["value"].to_numpy(dtype=float)
+    gap_pct = 100.0 * (actual / trend - 1.0)
+    gap_log_ppt = 100.0 * (np.log(actual) - np.log(trend))
+    return {
+        "series": series,
+        "vintage_file": str(df["vintage_file"].iloc[0]),
+        "pretrend_window": [start, pre_end],
+        "post_window": [post_start, post_end],
+        "n_pre_quarters": int(len(pre)),
+        "n_post_quarters": int(len(post)),
+        "mean_gap_pct": float(gap_pct.mean()),
+        "cumulative_gap_pct_of_trend_output": float((actual.sum() / trend.sum() - 1.0) * 100.0),
+        "cumulative_log_gap_ppt_sum": float(gap_log_ppt.sum()),
+        "end_gap_pct": float(gap_pct[-1]),
+        "post_quarters": [
+            {
+                "quarter": f"{int(row.year)}Q{int(row.quarter)}",
+                "actual": float(row.value),
+                "trend": float(trend[i]),
+                "gap_pct": float(gap_pct[i]),
+            }
+            for i, row in enumerate(post.itertuples(index=False))
+        ],
+    }
+
+
+def tcja_growth_threshold_estimate() -> dict:
+    gdp = _pretrend_gap("GDPC1", "2010-01-01", "2017-09-30", "2018-01-01", "2019-12-31")
+    pnfi = _pretrend_gap("PNFI", "2010-01-01", "2017-09-30", "2018-01-01", "2019-12-31")
+    if gdp is None or pnfi is None:
+        missing = []
+        if gdp is None:
+            missing.append("FRED:GDPC1 quarterly pretrend window")
+        if pnfi is None:
+            missing.append("FRED:PNFI quarterly pretrend window")
+        return {"error": f"missing TCJA threshold series: {missing}"}
+    gdp_gate = gdp["cumulative_gap_pct_of_trend_output"] < 1.0
+    supply_side_refute_gate = gdp["cumulative_gap_pct_of_trend_output"] > 2.5
+    return {
+        "shape": "tcja_pre_covid_pretrend_threshold_gate",
+        "method": "log-linear 2010Q1-2017Q3 pretrend projected over 2018Q1-2019Q4",
+        "gdp_gap": gdp,
+        "private_nonresidential_investment_gap": pnfi,
+        "gdp_support_gate_lt_1pp": bool(gdp_gate),
+        "gdp_refute_gate_gt_2_5pp": bool(supply_side_refute_gate),
+        "investment_supply_side_overshoot_observed": bool(pnfi["mean_gap_pct"] > 0.0),
+        "emtr_elasticity_gate_loaded": False,
+        "emtr_elasticity_gate_note": "No machine-readable TCJA EMTR vintage is loaded; PNFI relative-to-pretrend is reported as an investment-response diagnostic, not the registered elasticity.",
+    }
+
+
+def tcja_growth_threshold_verdict(est: dict) -> tuple[str, str]:
+    if "error" in est:
+        return "INCONCLUSIVE_DATA_PENDING", est["error"]
+    gdp_gap = est["gdp_gap"]["cumulative_gap_pct_of_trend_output"]
+    pnfi_gap = est["private_nonresidential_investment_gap"]["mean_gap_pct"]
+    if est["gdp_refute_gate_gt_2_5pp"]:
+        return "REFUTED", f"2018-2019 real GDP exceeds pre-TCJA trend by {gdp_gap:.2f}pp"
+    if est["gdp_support_gate_lt_1pp"] and pnfi_gap <= 0 and not est["emtr_elasticity_gate_loaded"]:
+        return (
+            "WEAKENED",
+            f"GDP gate clears at {gdp_gap:.2f}pp and PNFI is {pnfi_gap:.2f}% below pretrend; EMTR-elasticity gate not loaded",
+        )
+    if est["gdp_support_gate_lt_1pp"]:
+        return "PARTIAL", f"GDP gate clears at {gdp_gap:.2f}pp, but investment/EMTR gate is incomplete"
+    return "PARTIAL", f"GDP trend gap is {gdp_gap:.2f}pp, between support and refutation gates"
+
+
 def write_outputs(hid: str, spec: dict, status: dict, est: dict,
                   v: str, reason: str) -> None:
     out_dir = RUNS / hid
@@ -170,6 +271,23 @@ def write_outputs(hid: str, spec: dict, status: dict, est: dict,
     ]
     if "error" in est:
         md.append(f"- _Error:_ {est['error']}")
+    elif est.get("shape") == "tcja_pre_covid_pretrend_threshold_gate":
+        md[-1] = "## Threshold Check"
+        md.append(f"- Method: {est.get('method')}")
+        gdp = est.get("gdp_gap") or {}
+        pnfi = est.get("private_nonresidential_investment_gap") or {}
+        md.append(
+            "- Real GDP cumulative 2018-2019 gap vs pre-TCJA trend: "
+            f"**{gdp.get('cumulative_gap_pct_of_trend_output', float('nan')):+.2f}pp**"
+        )
+        md.append(
+            "- Private nonresidential investment mean 2018-2019 gap vs pre-TCJA trend: "
+            f"**{pnfi.get('mean_gap_pct', float('nan')):+.2f}%**"
+        )
+        md.append(f"- GDP support gate (<1pp): {est.get('gdp_support_gate_lt_1pp')}")
+        md.append(f"- GDP refutation gate (>2.5pp): {est.get('gdp_refute_gate_gt_2_5pp')}")
+        md.append(f"- EMTR elasticity gate loaded: {est.get('emtr_elasticity_gate_loaded')}")
+        md.append(f"- EMTR note: {est.get('emtr_elasticity_gate_note')}")
     else:
         md.append(f"- Method: {est.get('method')}")
         md.append(f"- Cumulative effect: **{est['cumulative_coefficient']:+.4g}**")
@@ -243,6 +361,13 @@ def run_one(
         if should_persist_preflight_inconclusive(r, persist_preflight_inconclusive):
             write_outputs(hid, spec, status, {"error": r}, v, r)
         return f"  ⚠ {hid}: {v}"
+    if hid == "tcja_2017_growth_effect":
+        est = tcja_growth_threshold_estimate()
+        v, r = tcja_growth_threshold_verdict(est)
+        write_outputs(hid, spec, status, est, v, r)
+        icon = {"SUPPORTED": "✓", "REFUTED": "✗", "PARTIAL": "·",
+                "WEAKENED": "·", "INCONCLUSIVE_DATA_PENDING": "⚠"}.get(v, " ")
+        return f"  {icon} {hid}: {v} — {r}"
     panel_filt = filter_sample(panel, spec)
     o = first_loaded_var(outcome_items, panel_filt)
     t = first_loaded_var(treatment_items, panel_filt)

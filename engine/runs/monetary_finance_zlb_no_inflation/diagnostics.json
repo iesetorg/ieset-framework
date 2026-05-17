@@ -1,76 +1,99 @@
 {
-  "verdict": "PARTIAL \u2014 cumulative_effect=+0.06989, h=5, p_h=0.504 (above \u03b1=0.10)",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "cumulative_effect=+0.06989, h=5, p_h=0.504 (above \u03b1=0.10)",
+  "verdict": "REFUTED \u2014 CPI threshold breach: USA zlb_2008_2014 peak 3.81% in 2008; USA covid_2020_2021 peak 4.68% in 2021; Eurozone CPI not loaded",
+  "verdict_label": "REFUTED",
+  "verdict_reason": "CPI threshold breach: USA zlb_2008_2014 peak 3.81% in 2008; USA covid_2020_2021 peak 4.68% in 2021; Eurozone CPI not loaded",
   "hypothesis_id": "monetary_finance_zlb_no_inflation",
-  "template": "local_projections",
+  "template": "descriptive",
   "claim_direction_inferred": "?",
+  "threshold_extracted": {
+    "percent": 15.0
+  },
   "falsification_rule_text": "The hypothesis is falsified if any of the following hold: (a) CPI YoY exceeds 3% in any 6-month rolling window during 2008-2014 in USA or Japan or the Eurozone, (b) CPI YoY exceeds 3% in any 6-month window during 2020-2021 in any of the three economies, or (c) Granger causality from central-bank balance sheet to CPI rejects null at p<0.01 with positive coefficient at h=12-24 months on the joint 2008-2021 sample after controlling for output gap and oil prices.",
-  "estimate": {
-    "shape": "local_projections",
-    "horizons": [
+  "falsification_test_text": "balance_sheet_to_cpi_pass_through_slack_regime",
+  "comparison": {
+    "shape": "monetary_finance_cpi_threshold_gate",
+    "cpi_source_publisher": "fred",
+    "threshold": "CPI YoY must stay below 3% in 2008-2014 and 2020-2021 windows",
+    "rows": [
       {
-        "horizon": 0,
-        "coefficient": 0.21202542969437632,
-        "std_error": 0.39225991665498083,
-        "p_value": 0.5888365394956334,
-        "n_obs": 84
+        "country": "USA",
+        "window": "zlb_2008_2014",
+        "status": "observed",
+        "n_obs": 7,
+        "max_cpi_yoy": 3.8149533987371864,
+        "max_cpi_yoy_year": 2008,
+        "breach_gt_3pct": true
       },
       {
-        "horizon": 1,
-        "coefficient": 0.31782165038926036,
-        "std_error": 0.3810549543799451,
-        "p_value": 0.40424871914664995,
-        "n_obs": 78
+        "country": "USA",
+        "window": "covid_2020_2021",
+        "status": "observed",
+        "n_obs": 2,
+        "max_cpi_yoy": 4.681242996018686,
+        "max_cpi_yoy_year": 2021,
+        "breach_gt_3pct": true
       },
       {
-        "horizon": 2,
-        "coefficient": 0.09018639237568887,
-        "std_error": 0.4063288046718611,
-        "p_value": 0.8243495225781838,
-        "n_obs": 72
+        "country": "JPN",
+        "window": "zlb_2008_2014",
+        "status": "observed",
+        "n_obs": 7,
+        "max_cpi_yoy": 2.7592334693625986,
+        "max_cpi_yoy_year": 2014,
+        "breach_gt_3pct": false
       },
       {
-        "horizon": 3,
-        "coefficient": 0.29410697166935823,
-        "std_error": 0.4580339600389447,
-        "p_value": 0.520803484828861,
-        "n_obs": 66
-      },
-      {
-        "horizon": 4,
-        "coefficient": -0.35222049786757,
-        "std_error": 0.8374448436209199,
-        "p_value": 0.674054871223199,
-        "n_obs": 60
-      },
-      {
-        "horizon": 5,
-        "coefficient": -0.49203468716898113,
-        "std_error": 0.7363843182129532,
-        "p_value": 0.504020942277793,
-        "n_obs": 54
+        "country": "JPN",
+        "window": "covid_2020_2021",
+        "status": "observed",
+        "n_obs": 2,
+        "max_cpi_yoy": -0.025010459216900927,
+        "max_cpi_yoy_year": 2020,
+        "breach_gt_3pct": false
       }
     ],
-    "cumulative_coefficient": 0.06988525909213261,
-    "horizon_h_coefficient": -0.49203468716898113,
-    "horizon_h_std_error": 0.7363843182129532,
-    "horizon_h_p_value": 0.504020942277793,
-    "max_horizon": 5,
-    "n_countries": 6,
-    "method": "Jord\u00e0 local projections (TWFE, country-clustered)",
-    "dropped_controls_due_to_overlap": [
-      "short_rate"
-    ]
+    "coverage": {
+      "USA": [
+        1948,
+        2026
+      ],
+      "JPN": [
+        1956,
+        2021
+      ],
+      "U2": null
+    },
+    "missing_eurozone_cpi": true
   },
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
         "name": "cpi_inflation_yoy",
-        "source": "fred:CPIAUCSL (USA); fred:JPNCPIALLMINMEI (JPN); ecb:ICP.M.U2.N.000000.4.ANR (EUR aggregate); eurostat:HICP (per-country)",
-        "publisher": "ecb+eurostat",
-        "n_rows": 1229
+        "source": "fred:CPIAUCSL (USA); fred:JPNCPIALLMINMEI (JPN); ecb:ICP.M.U2.N.000000.4.ANR (EUR aggregate))",
+        "publisher": "fred",
+        "n_rows": 147
+      },
+      {
+        "role": "outcome",
+        "name": "core_cpi_inflation_yoy",
+        "source": "fred:CPILFESL (USA); boj:core_cpi (JPN)",
+        "publisher": "fred",
+        "n_rows": 70
+      },
+      {
+        "role": "outcome",
+        "name": "inflation_expectations_5y5y_forward",
+        "source": "fred:T5YIFR (USA)",
+        "publisher": "fred",
+        "n_rows": 24
+      },
+      {
+        "role": "treatment",
+        "name": "central_bank_balance_sheet_pct_gdp",
+        "source": "fred:WALCL; fred:GDP (USA); boj:monetary_base; fred:JPNNGDP (JPN)",
+        "publisher": "fred",
+        "n_rows": 112
       },
       {
         "role": "treatment",
@@ -83,48 +106,39 @@
         "role": "controls",
         "name": "short_rate",
         "source": "fred:DFF (USA); ecb:FM (EUR); boj:policy_rate (JPN)",
-        "publisher": "ecb",
-        "n_rows": 33
-      }
-    ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "core_cpi_inflation_yoy",
-        "source": "fred:CPILFESL (USA); boj:core_cpi (JPN); ecb:ICP_core (EUR)"
-      },
-      {
-        "role": "outcome",
-        "name": "inflation_expectations_5y5y_forward",
-        "source": "fred:T5YIFR (USA); ecb:5Y5Y_inflation_swap (EUR)"
-      },
-      {
-        "role": "treatment",
-        "name": "central_bank_balance_sheet_pct_gdp",
-        "source": "fred:WALCL; fred:GDP (USA); boj:monetary_base; fred:JPNNGDP (JPN); ecb:ILM; ecb:NGDP (EUR)"
-      },
-      {
-        "role": "treatment",
-        "name": "monetary_finance_indicator",
-        "source": "constructed: binary = 1 in country-fiscal-years where central-bank net JGB/Treasury/sovereign purchases > 50% of net government debt issuance; coded from BoJ flow-of-funds, Fed SOMA holdings, ECB asset purchase reports"
+        "publisher": "fred+ecb",
+        "n_rows": 106
       },
       {
         "role": "controls",
         "name": "output_gap",
-        "source": "imf:NGAP_NPGDP"
+        "source": "oecd:OutputGap",
+        "publisher": "oecd",
+        "n_rows": 3331
       },
       {
         "role": "controls",
         "name": "oil_price",
-        "source": "imf_pcps:POILBRE"
+        "source": "imf_pcps:POILBRE",
+        "publisher": "imf_pcps",
+        "n_rows": 259
       },
       {
         "role": "controls",
         "name": "unemployment_rate",
-        "source": "fred:UNRATE (USA); ilostat:unemployment_rate; eurostat:lfsa_urgan"
+        "source": "fred:UNRATE (USA); ilostat:unemployment_rate",
+        "publisher": "fred+ilostat",
+        "n_rows": 10231
+      }
+    ],
+    "variables_missing": [
+      {
+        "role": "treatment",
+        "name": "monetary_finance_indicator",
+        "source": "constructed: binary = 1 in country-fiscal-years where central-bank net JGB/Treasury/sovereign purchases > 50% of net government debt issuance; coded from BoJ flow-of-funds, Fed SOMA holdings, ECB asset purchase reports"
       }
     ]
   },
-  "run_utc": "2026-04-30T10:51:42+00:00",
-  "runner": "scripts/run_local_projections.py"
+  "run_utc": "2026-05-16T13:24:25+00:00",
+  "runner": "scripts/run_descriptive.py"
 }
