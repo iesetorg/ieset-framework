@@ -1,103 +1,70 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient pre/post obs (pre=2, post=4)",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "insufficient pre/post obs (pre=2, post=4)",
+  "verdict": "REFUTED - cumulative term-premium response is non-positive",
+  "verdict_label": "REFUTED",
+  "verdict_reason": "cumulative term-premium response is non-positive",
   "hypothesis_id": "fed_qt_balance_sheet_unwind_2022_2025_market_response",
-  "template": "event_study",
-  "claim_direction_inferred": "-",
-  "event_year": 2022,
-  "threshold_extracted": {},
-  "falsification_rule_text": "Daily event study around six QT-related Fed communications: 2022-05-04 (May FOMC QT plan), 2022-06-01 (QT begins), 2022-09-01 (cap doubles), 2024-05-01 (QT taper announced), 2024-06-01 (taper begins), 2025-01 (further taper or end announcement). For each event, compute 1-day and 5-day changes in 10y term premium (NY Fed ACM model) and 30y mortgage spread to 10y Treasury. SUPPORTED if (a) cumulative 1-day term-premium change across all six events is positive AND in [+10bp, +40bp] AND (b) per-dollar effect (cumulative bp / cumulative balance-sheet movement in $T) is in [3bp/$T, 12bp/$T], materially smaller than QE-era estimate (~25bp/$T per Bauer-Rudebusch 2014). REFUTED if cumulative term-premium change <=0 (no QT effect) OR per-dollar effect >20bp/$T (symmetric, contradicts asymmetry prediction).",
-  "falsification_test_text": "fed_qt_2022_2025_event_study_term_premium_mortgage_spread",
-  "comparison": {
-    "error": "insufficient pre/post obs (pre=2, post=4)"
+  "template": "event_study_daily_exact",
+  "events": [
+    {
+      "event_date": "2022-05-04",
+      "term_premium_1d_bp": -2.279999999999993,
+      "mortgage_treasury_spread_bp": -6.0
+    },
+    {
+      "event_date": "2022-06-01",
+      "term_premium_1d_bp": 4.750000000000004,
+      "mortgage_treasury_spread_bp": -17.99999999999997
+    },
+    {
+      "event_date": "2022-09-01",
+      "term_premium_1d_bp": 4.349999999999998,
+      "mortgage_treasury_spread_bp": -3.9999999999999716
+    },
+    {
+      "event_date": "2024-05-01",
+      "term_premium_1d_bp": -2.579999999999999,
+      "mortgage_treasury_spread_bp": 12.0
+    },
+    {
+      "event_date": "2024-06-03",
+      "term_premium_1d_bp": -5.200000000000005,
+      "mortgage_treasury_spread_bp": 29.0
+    }
+  ],
+  "summary": {
+    "cumulative_term_premium_1d_bp": -0.9599999999999946,
+    "balance_sheet_change_trn_2022_06_to_2024_06": -1.659363,
+    "term_premium_bp_per_trn_abs_runoff": -0.5785352572041167,
+    "note": "The 2025-01 event in the YAML is not date-pinned, so this exact wrapper grades the five pinned QT events."
   },
   "data_status": {
     "variables_loaded": [
       {
-        "role": "outcome",
-        "name": "treasury_yield_10y",
-        "source": "fred:DGS10",
-        "publisher": "fred",
-        "n_rows": 65
-      },
-      {
-        "role": "outcome",
-        "name": "treasury_yield_30y",
-        "source": "fred:DGS30",
-        "publisher": "fred",
-        "n_rows": 50
-      },
-      {
-        "role": "outcome",
-        "name": "ny_fed_acm_term_premium_10y",
         "source": "fred:THREEFYTP10",
-        "publisher": "fred",
-        "n_rows": 37
+        "vintage_file": "data/vintages/fred/THREEFYTP10@2026-04-30T115151Z.parquet",
+        "sha256": "09e293065c02e0ebdddc9622c821c3fe566b9bdec2ae39daa145c89a2b4ef9ad"
       },
       {
-        "role": "outcome",
-        "name": "mortgage_30y_rate",
+        "source": "fred:DGS10",
+        "vintage_file": "data/vintages/fred/DGS10@2026-04-30T114534Z.parquet",
+        "sha256": "e7c02098fd61d4d85bc9c876d690d9e13a31b518c1265e14945ab6d71fc37325"
+      },
+      {
         "source": "fred:MORTGAGE30US",
-        "publisher": "fred",
-        "n_rows": 56
+        "vintage_file": "data/vintages/fred/MORTGAGE30US@2026-04-30T114542Z.parquet",
+        "sha256": "0dcefed489d4f679743674d1e653aa06deb1bc72fd59716c61589fe03ca04ff8"
       },
       {
-        "role": "outcome",
-        "name": "mortgage_treasury_spread",
-        "source": "fred:MORTGAGE30US; fred:DGS10",
-        "publisher": "fred",
-        "n_rows": 56
-      },
-      {
-        "role": "treatment",
-        "name": "fed_balance_sheet_walcl",
         "source": "fred:WALCL",
-        "publisher": "fred",
-        "n_rows": 25
-      },
-      {
-        "role": "treatment",
-        "name": "fed_funds_target",
-        "source": "fred:DFEDTARU",
-        "publisher": "fred",
-        "n_rows": 19
-      },
-      {
-        "role": "controls",
-        "name": "treasury_issuance_pace",
-        "source": "fred:MTSDS133FMS",
-        "publisher": "fred",
-        "n_rows": 47
-      },
-      {
-        "role": "controls",
-        "name": "vix",
-        "source": "fred:VIXCLS",
-        "publisher": "fred",
-        "n_rows": 37
-      },
-      {
-        "role": "controls",
-        "name": "cpi_yoy",
-        "source": "fred:CPIAUCSL",
-        "publisher": "fred",
-        "n_rows": 80
+        "vintage_file": "data/vintages/fred/WALCL@2026-04-30T114611Z.parquet",
+        "sha256": "ba1f00ecdc3269be772f02c1ee41ba13cdb288f5fd084f92d31e66c01a61bf7a"
       }
     ],
     "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "mbs_oas_spread",
-        "source": "fred:BAMLC0A0CMTRIV"
-      },
-      {
-        "role": "treatment",
-        "name": "qt_announcement_event",
-        "source": "constructed: 6 events 2022-05-04, 2022-06-01, 2022-09-01, 2024-05-01, 2024-06-01, 2025-01-XX"
-      }
+      "fred:BAMLC0A0CMTRIV",
+      "constructed:2025-01 QT event date"
     ]
   },
-  "run_utc": "2026-05-04T12:34:14+00:00",
-  "runner": "scripts/run_event_study.py"
+  "run_utc": "2026-05-17T18:10:06+00:00",
+  "runner": "engine/runs/fed_qt_balance_sheet_unwind_2022_2025_market_response/replication.py"
 }
