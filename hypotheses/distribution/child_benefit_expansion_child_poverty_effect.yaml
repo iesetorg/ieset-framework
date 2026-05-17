@@ -1,19 +1,35 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: child_benefit_expansion_child_poverty_effect
 version: 1
-status: draft
+status: candidate
 topic: distribution
 claim: Universal child-benefit / expanded child tax credit expansions (US ARP 2021, UK pre-2013 child benefit) reduced child poverty rates by measurable magnitudes in real time.
-notes: Maps the democratic-socialist school's child-benefit/child-poverty claim to a staggered DiD on US ARP-2021 CTC and UK pre-2013 child benefit. Estimator and prior set; full pre-registration awaits
-  steelman + human sign-off.
+methodology_note: >
+  Worker B 2026-05-18 repair: the generic staggered-DiD panel collapses under
+  local coverage, so the archived result uses an exact descriptive benchmark.
+  The US leg uses the local Census SPM under-18 poverty table and its 90%
+  margins of error. The UK leg uses OECD IDD under-18 disposable-income poverty
+  around the 2013 child-benefit means-test tightening as a sign check, not a
+  clean causal event study.
+notes: Maps the democratic-socialist school's child-benefit/child-poverty claim to a local-data exact benchmark on US ARP-2021 CTC and UK pre-2013 child benefit. The original staggered DiD remains a
+  richer target once harmonised CPS/FRS microdata are wired.
 prior_confidence: 0.7
 disclosure: Author prior is sympathetic to direct-cash interventions reducing child poverty in the short run (the literature is unusually clear here); the DiD spec leans on CPS / FRS poverty series whose
   definitions differ between US and UK and may bias cross-country comparisons.
+steelman: hypotheses/steelman/child_benefit_expansion_child_poverty_effect.md
 falsification:
-  rule: The hypothesis is considered falsified if the pre-registered empirical test shows the opposite direction of the claim at conventional significance (p > 0.10), or if the primary outcome measure moves
-    less than 10% in the claimed direction across the sample. Exact thresholds will be pinned in the variables and estimator blocks when this stub is promoted from draft.
-  test: Callaway-Sant'Anna staggered DiD of child poverty headcount (SPM/HBAI) on ARP-CTC-2021 and UK pre-2013 child-benefit episodes; event-study windows ±2y. Refute if pooled ATT non-negative or sign-flipped
-    at p<0.10.
+  rule: >
+    SUPPORTED if the US Census SPM under-18 poverty rate falls by at least
+    3.0 percentage points from 2020 to 2021 and rebounds by at least 2.0
+    percentage points from 2021 to 2022, both clearing a p<0.10
+    normal-approximation check using Census 90% MOEs, and the UK OECD IDD
+    under-18 PL50 poverty rate is at least 1.0 percentage point higher on
+    average in 2014-2019 than in 2011-2013 after the child-benefit
+    means-test tightening. PARTIAL if only one country leg clears.
+    REFUTED if the US drop/rebound are both below 1.5 percentage points or
+    the UK sign check moves more than 1.0 percentage point in the opposite
+    direction.
+  test: Exact descriptive US SPM pre/expansion/expiration gate plus UK OECD IDD post-tightening child-poverty sign check.
 sample:
   countries:
   - USA
@@ -26,11 +42,14 @@ sample:
   - exclude pandemic-confound years 2020Q2-2021Q1 from primary spec; report as robustness
 variables:
   outcome:
-  - name: child_poverty_rate
-    source: oecd:OECD.WISE.INE,DSD_IDD@DF_CHILD_POV,1.0
+  - name: us_spm_child_poverty_rate
+    source: us_census:spm_child_poverty_rate
     transformation: level
-    notes: 'OECD Income Distribution Database child poverty headcount (under-18 below 50% median equivalised disposable income). TODO: cross-check against US Census SPM child poverty for the ARP-CTC robustness
-      window.
+    notes: US Census P60-283 Table B-2, under-18 Supplemental Poverty Measure poverty rate and 90% MOE.
+  - name: child_poverty_rate
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: level
+    notes: 'OECD Income Distribution Database child poverty headcount (under-18 below 50% median equivalised disposable income; MEASURE=PR_INC_DISP, AGE=Y_LT18, POVERTY_LINE=PL_50).
 
       '
   - name: child_poverty_rate_world_bank_proxy
