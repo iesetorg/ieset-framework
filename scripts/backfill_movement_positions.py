@@ -47,6 +47,34 @@ from statistics import mean
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+POSITION_ALIASES = {
+    "chicago_monetarist": "chicago_monetarism",
+    "christian_democratic": "institutionalism",
+    "conservative_nationalism": "developmentalism",
+    "dependency_theory": "marxian",
+    "developmentalist": "developmentalism",
+    "ethno_nationalist_developmentalism": "developmentalism",
+    "ecological": "eco_socialist",
+    "green_interventionism": "eco_socialist",
+    "green_political_economy": "eco_socialist",
+    "imf_washington_consensus": "chicago_monetarism",
+    "keynesian": "new_keynesian",
+    "libertarian": "austrian",
+    "market_liberal": "classical_liberal",
+    "modern_monetary_theory": "mmt",
+    "national_conservative": "developmentalism",
+    "neoclassical": "empirical_pragmatist",
+    "neoconservative": "developmentalism",
+    "neoliberal": "classical_liberal",
+    "ordo_liberal": "ordoliberal",
+    "political_islam": "developmentalism",
+    "populist_nationalism": "developmentalism",
+    "right_populism": "developmentalism",
+    "social_democracy": "social_democratic",
+    "social_liberal": "empirical_pragmatist",
+    "supply_side": "chicago_monetarism",
+    "third_way": "social_democratic",
+}
 
 # Direction encoding for axes_summary entries.
 DIR_VALUE = {"+": 1.0, "-": -1.0, "0": 0.0, "mixed": 0.0}
@@ -61,6 +89,33 @@ MIN_TRAINING = 5            # position needs ≥ this many curated alignments
 THRESHOLD_HIGH = 0.45       # score > this → aligned/opposed
 THRESHOLD_PARTIAL = 0.18    # |score| > this but < HIGH → partially_aligned
 MIN_OVERLAP_AXES = 2        # movement must share ≥ this many axes with the position profile
+
+
+def valid_position_ids() -> set[str]:
+    ids: set[str] = set()
+    for p in sorted((ROOT / "positions").glob("*.yaml")):
+        if p.stem.startswith("_"):
+            continue
+        with p.open() as f:
+            doc = yaml.safe_load(f) or {}
+        position_id = doc.get("position_id")
+        if not position_id:
+            raise ValueError(f"{p} is missing position_id")
+        if position_id != p.stem:
+            raise ValueError(
+                f"{p} has position_id={position_id!r}; expected {p.stem!r}"
+            )
+        ids.add(position_id)
+    return ids
+
+
+def canonical_position_id(position_id: str, valid_ids: set[str]) -> str | None:
+    if position_id in valid_ids:
+        return position_id
+    alias = POSITION_ALIASES.get(position_id)
+    if alias in valid_ids:
+        return alias
+    return None
 
 
 def load_movements() -> list[tuple[Path, dict]]:
@@ -87,16 +142,23 @@ def axis_direction_map(axes_summary) -> dict[str, float]:
     return out
 
 
-def build_position_profiles(curated: list[tuple[dict, dict]]) -> dict[str, dict[str, float]]:
+def build_position_profiles(
+    curated: list[tuple[dict, dict]], valid_ids: set[str]
+) -> tuple[dict[str, dict[str, float]], dict[str, int], dict[str, int]]:
     """Returns position_id → axis_id → preferred direction (in [-1, 1])."""
     # accum: position -> axis -> list of (axis_dir, alignment_weight)
     accum: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(lambda: defaultdict(list))
     counts: dict[str, int] = defaultdict(int)
+    skipped_source_ids: dict[str, int] = defaultdict(int)
     for movement, alignment in curated:
         axis_dirs = axis_direction_map(movement.get("axes_summary"))
         if not axis_dirs:
             continue
-        pos_id = alignment["position_id"]
+        raw_pos_id = alignment.get("position_id")
+        pos_id = canonical_position_id(raw_pos_id, valid_ids) if raw_pos_id else None
+        if not pos_id:
+            skipped_source_ids[raw_pos_id or "<missing>"] += 1
+            continue
         weight = ALIGN_WEIGHT.get(alignment.get("alignment"), 0.0)
         if weight == 0.0:
             continue
@@ -122,7 +184,7 @@ def build_position_profiles(curated: list[tuple[dict, dict]]) -> dict[str, dict[
             prof[axis] = num / denom
         if prof:
             profiles[pos_id] = prof
-    return profiles, counts
+    return profiles, counts, skipped_source_ids
 
 
 def score_movement(
@@ -183,7 +245,19 @@ def predict_alignments(
             a["position_id"],
         )
     )
-    return out
+    deduped: dict[str, dict] = {}
+    label_rank = {"aligned": 3, "partially_aligned": 2, "opposed": 1}
+    for alignment in out:
+        current = deduped.get(alignment["position_id"])
+        if current is None or label_rank[alignment["alignment"]] > label_rank[current["alignment"]]:
+            deduped[alignment["position_id"]] = alignment
+    return sorted(
+        deduped.values(),
+        key=lambda a: (
+            {"aligned": 0, "partially_aligned": 1, "opposed": 2}[a["alignment"]],
+            a["position_id"],
+        ),
+    )
 
 
 def insert_position_alignments_yaml(text: str, alignments: list[dict]) -> str:
@@ -220,6 +294,8 @@ def main() -> int:
 
     movements = load_movements()
     print(f"loaded {len(movements)} movements")
+    valid_ids = valid_position_ids()
+    print(f"  valid positions: {len(valid_ids)}")
 
     # Build training set.
     curated_pairs: list[tuple[dict, dict]] = []
@@ -228,10 +304,14 @@ def main() -> int:
             curated_pairs.append((m, a))
     print(f"  curated pairs: {len(curated_pairs)}")
 
-    profiles, counts = build_position_profiles(curated_pairs)
+    profiles, counts, skipped_source_ids = build_position_profiles(curated_pairs, valid_ids)
     print(f"  position profiles built: {len(profiles)} (require ≥{MIN_TRAINING} curated)")
     for pid in sorted(profiles):
         print(f"    {pid}: k={counts[pid]}, axes={len(profiles[pid])}")
+    if skipped_source_ids:
+        print("  skipped source position IDs not mapped to positions:")
+        for pid, count in sorted(skipped_source_ids.items()):
+            print(f"    {pid}: {count}")
 
     # Predict for movements lacking position_alignments.
     targets = [
@@ -244,6 +324,20 @@ def main() -> int:
         preds = predict_alignments(m, profiles)
         if preds:
             predictions.append((p, m, preds))
+
+    invalid_predicted = sorted(
+        {
+            a["position_id"]
+            for _, _, preds in predictions
+            for a in preds
+            if a["position_id"] not in valid_ids
+        }
+    )
+    if invalid_predicted:
+        raise SystemExit(
+            "Refusing to continue: predicted noncanonical position IDs: "
+            + ", ".join(invalid_predicted)
+        )
 
     if args.limit:
         predictions = predictions[: args.limit]
