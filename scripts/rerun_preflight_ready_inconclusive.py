@@ -55,6 +55,171 @@ def is_inconclusive(doc: dict) -> bool:
     return verdict_text(doc).upper().startswith("INCONCLUSIVE")
 
 
+def control_names(spec: dict, panel) -> list[str]:
+    var_blocks = spec.get("variables") or {}
+    return [
+        c["name"]
+        for c in (var_blocks.get("controls") or [])
+        if c.get("name") and c["name"] in panel.columns
+    ]
+
+
+def panel_min_obs(spec: dict) -> int:
+    sample = spec.get("sample") or {}
+    countries = sample.get("countries") or []
+    single_country_time_series = (
+        str(sample.get("temporal_structure") or "").lower() == "time_series"
+        and len(countries) <= 1
+    )
+    return 12 if single_country_time_series else 30
+
+
+def has_fe_treatment_variation(frame, spec: dict, treatment: str) -> bool:
+    fe_spec = (spec.get("estimator") or {}).get("fixed_effects", []) or []
+    sample = spec.get("sample") or {}
+    countries = sample.get("countries") or []
+    single_country_time_series = (
+        str(sample.get("temporal_structure") or "").lower() == "time_series"
+        and len(countries) <= 1
+    )
+    entity = "country" in [str(x).lower() for x in fe_spec]
+    time = "year" in [str(x).lower() for x in fe_spec]
+    if not entity and not time and not single_country_time_series:
+        entity, time = True, True
+    if entity:
+        within_entity = frame.groupby("country_iso3")[treatment].nunique(dropna=True)
+        if not within_entity.empty and bool((within_entity <= 1).all()):
+            return False
+    if time:
+        within_time = frame.groupby("year")[treatment].nunique(dropna=True)
+        if not within_time.empty and bool((within_time <= 1).all()):
+            return False
+    return True
+
+
+def panel_fe_estimand_ready(panel, spec: dict, outcome: str, treatment: str) -> bool:
+    min_obs = panel_min_obs(spec)
+    sub, usable_controls, _dropped = run_panel_fe.prune_controls_for_overlap(
+        panel,
+        [outcome, treatment],
+        control_names(spec, panel),
+        min_obs=min_obs,
+    )
+    if len(sub) < min_obs:
+        return False
+    if has_fe_treatment_variation(sub, spec, treatment):
+        return True
+    no_controls = panel[["country_iso3", "year", outcome, treatment]].dropna()
+    return len(no_controls) >= min_obs and has_fe_treatment_variation(
+        no_controls,
+        spec,
+        treatment,
+    )
+
+
+def did_estimand_ready(panel, spec: dict, outcome: str, treatment: str) -> bool:
+    sub, _usable_controls, _dropped = run_panel_fe.prune_controls_for_overlap(
+        panel,
+        [outcome, treatment],
+        control_names(spec, panel),
+        min_obs=30,
+    )
+    if len(sub) < 30:
+        return False
+    treated = (sub[treatment] >= 0.5)
+    return bool(treated.any() and (~treated).any())
+
+
+def local_projection_estimand_ready(panel, spec: dict, outcome: str, treatment: str) -> bool:
+    sub, _usable_controls, _dropped = run_panel_fe.prune_controls_for_overlap(
+        panel,
+        [outcome, treatment],
+        control_names(spec, panel),
+        min_obs=50,
+    )
+    return len(sub) >= 50
+
+
+def pre_post_ready(panel, outcome: str, country: str, cut_year: int, period: list[int]) -> bool:
+    sub = panel[panel["country_iso3"] == country].dropna(subset=[outcome])
+    if period and period[0] is not None:
+        sub = sub[sub["year"] >= int(period[0])]
+    if period and period[1] is not None:
+        sub = sub[sub["year"] <= int(period[1])]
+    pre = sub[sub["year"] < cut_year]
+    post = sub[sub["year"] >= cut_year]
+    return len(pre) >= 3 and len(post) >= 3
+
+
+def event_study_ready(panel, spec: dict, outcome: str, treatment: str | None) -> bool:
+    sample = spec.get("sample") or {}
+    countries = sample.get("countries") or []
+    period = sample.get("period") or [None, None]
+    if len(countries) == 1:
+        event_year = run_event_study.find_event_year(spec)
+        if event_year is None:
+            return False
+        sub = panel[panel["country_iso3"] == countries[0]].dropna(subset=[outcome])
+        if period and period[0] is not None:
+            sub = sub[sub["year"] >= int(period[0])]
+        if period and period[1] is not None:
+            sub = sub[sub["year"] <= int(period[1])]
+        pre = sub[sub["year"] < event_year]
+        post = sub[sub["year"] >= event_year]
+        return len(pre) >= 4 and len(post) >= 3
+    if treatment is None or treatment not in panel.columns:
+        built = run_panel_fe.construct_treatment_from_text(spec, panel)
+        if built is not None:
+            panel, treatment = built
+        else:
+            return False
+    sub, _usable_controls, _dropped = run_panel_fe.prune_controls_for_overlap(
+        panel,
+        [outcome, treatment],
+        control_names(spec, panel),
+        min_obs=30,
+    )
+    return len(sub) >= 30
+
+
+def synth_did_ready(panel, spec: dict, outcome: str) -> bool:
+    sample = spec.get("sample") or {}
+    countries = sample.get("countries") or []
+    if len(countries) < 3:
+        return False
+    event_year = run_event_study.find_event_year(spec)
+    if event_year is None:
+        period = sample.get("period") or [None, None]
+        if not (all(period) and len(period) == 2):
+            return False
+        event_year = (int(period[0]) + int(period[1])) // 2
+    treated, donors = countries[0], countries[1:]
+    sub = panel[panel["country_iso3"].isin([treated] + donors)].dropna(subset=[outcome])
+    if sub.empty:
+        return False
+    wide = sub.pivot_table(index="year", columns="country_iso3", values=outcome, aggfunc="mean")
+    if treated not in wide.columns:
+        return False
+    pre = wide[wide.index < event_year]
+    post = wide[wide.index >= event_year]
+    available_donors = [d for d in donors if d in pre.columns]
+    if len(available_donors) < 2:
+        return False
+    pre_treated = pre[treated].dropna()
+    pre_donors = pre[available_donors].dropna(how="all", axis=1).dropna(axis=1)
+    common_years = pre_treated.index.intersection(pre_donors.index)
+    if len(common_years) < 4 or pre_donors.shape[1] < 2:
+        return False
+    post_treated = post[treated].dropna()
+    if post_treated.empty:
+        return False
+    donor_names = list(pre_donors.columns)
+    post_donors = post[donor_names].dropna(how="any")
+    if post_donors.empty:
+        return False
+    return len(post_treated.index.intersection(post_donors.index)) > 0
+
+
 def classify_preflight_state(hid: str, template: str) -> str:
     found = run_panel_fe.load_spec(hid)
     if not found:
@@ -75,7 +240,11 @@ def classify_preflight_state(hid: str, template: str) -> str:
             return "missing_spec_vars"
         o = run_panel_fe.first_loaded_var(outcome_items, panel_filt)
         t = run_panel_fe.first_loaded_var(decomposition_items, panel_filt)
-        return "preflight_ready" if (o is not None and t is not None) else "preflight_blocked"
+        return (
+            "preflight_ready"
+            if (o is not None and t is not None and panel_fe_estimand_ready(panel_filt, spec, o, t))
+            else "preflight_blocked"
+        )
 
     if template in ("panel_fe", "did_callaway_santanna", "did_chaisemartin", "local_projections"):
         if not outcome_items:
@@ -88,7 +257,15 @@ def classify_preflight_state(hid: str, template: str) -> str:
                 _, t = built
         if not treatment_items and template != "panel_fe":
             return "missing_spec_vars"
-        return "preflight_ready" if (o is not None and t is not None) else "preflight_blocked"
+        if o is None or t is None:
+            return "preflight_blocked"
+        if template == "panel_fe":
+            ready = panel_fe_estimand_ready(panel_filt, spec, o, t)
+        elif template in ("did_callaway_santanna", "did_chaisemartin"):
+            ready = did_estimand_ready(panel_filt, spec, o, t)
+        else:
+            ready = local_projection_estimand_ready(panel_filt, spec, o, t)
+        return "preflight_ready" if ready else "preflight_blocked"
 
     if template == "descriptive":
         if not outcome_items:
@@ -105,6 +282,8 @@ def classify_preflight_state(hid: str, template: str) -> str:
                 cut = (period[0] + period[1]) // 2 if len(period) == 2 and all(period) else None
             if cut is None:
                 return "preflight_blocked"
+            if not pre_post_ready(panel_filt, o, countries[0], cut, period):
+                return "preflight_blocked"
         elif not countries:
             return "preflight_blocked"
         return "preflight_ready"
@@ -119,7 +298,9 @@ def classify_preflight_state(hid: str, template: str) -> str:
         countries = sample.get("countries") or []
         if len(countries) == 1 and run_event_study.find_event_year(spec) is None:
             return "preflight_blocked"
-        return "preflight_ready"
+        treatment_items = var_blocks.get("treatment") or []
+        t = run_panel_fe.first_loaded_var(treatment_items, panel_filt)
+        return "preflight_ready" if event_study_ready(panel_filt, spec, o, t) else "preflight_blocked"
 
     if template in ("synth_did", "synthetic_control"):
         if not outcome_items:
@@ -135,7 +316,7 @@ def classify_preflight_state(hid: str, template: str) -> str:
             period = sample.get("period") or [None, None]
             if not (all(period) and len(period) == 2):
                 return "preflight_blocked"
-        return "preflight_ready"
+        return "preflight_ready" if synth_did_ready(panel_filt, spec, o) else "preflight_blocked"
 
     if template == "cointegration_vecm":
         loaded = [

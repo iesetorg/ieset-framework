@@ -21,6 +21,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 STUB_RULE_MARKER = "when this stub is promoted from draft"
+BENCHMARK_CONTROL_POSITION_IDS = {"empirical_pragmatist"}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -220,6 +221,9 @@ def score_positions() -> dict[str, Any]:
         position = load_yaml(path)
         position_id = position.get("position_id") or path.stem
         school = position.get("short_name") or position.get("school") or position_id
+        scoreboard_role = position.get("scoreboard_role") or (
+            "benchmark_control" if position_id in BENCHMARK_CONTROL_POSITION_IDS else "school"
+        )
         counts: Counter[str] = Counter()
         adjusted_counts: Counter[str] = Counter()
         examples: list[dict[str, Any]] = []
@@ -315,6 +319,7 @@ def score_positions() -> dict[str, Any]:
         positions[position_id] = {
             "position_id": position_id,
             "school": school,
+            "scoreboard_role": scoreboard_role,
             "counts": dict(counts),
             "tested": tested,
             "net_score": net_score,
@@ -338,6 +343,7 @@ def score_positions() -> dict[str, Any]:
             "partial_rule": "Directional partials count half-weight in the predicted direction; neutral partials do not affect net score.",
             "signal_rule": "Rows with |weighted net| <= max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",
             "quality_adjustment_rule": "Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical_case_multi_metric=0.25.",
+            "benchmark_control_rule": "Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.",
         },
         "public_claim_links": public_claim_links,
         "positions": positions,
@@ -350,8 +356,13 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
     out_base.with_suffix(".json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
 
     positions = audit["positions"]
+    benchmark_controls = sorted(
+        [row for row in positions.values() if row.get("scoreboard_role") == "benchmark_control"],
+        key=lambda p: (p["adjusted_net_score"], p["net_score"], p["tested"]),
+        reverse=True,
+    )
     ranked = sorted(
-        positions.values(),
+        [row for row in positions.values() if row.get("scoreboard_role") != "benchmark_control"],
         key=lambda p: (p["adjusted_net_score"], p["net_score"], p["tested"]),
         reverse=True,
     )
@@ -369,21 +380,42 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "- Tiny aggregate margins are a no-call: `abs(net) <= max(5, 5% of tested)` is `too_close_to_call`.",
         "- The audit keeps a separate signed lean so no-call rows still show whether the net is positive, negative, or flat.",
         "- Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical=0.25.",
+        "- Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.",
         "",
         "## Ranked School Outcomes",
         "",
-        "| school | signal | lean | q-net | q-band | raw net | decisive net | tested | supports | partial + | partial - | refutes | neutral | untested |",
-        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| school | lean | q-net | q-band | raw net | decisive net | tested | supports | partial + | partial - | refutes | neutral | untested |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in ranked:
         c = Counter(row["counts"])
         lines.append(
-            f"| `{row['position_id']}` | {row['adjusted_score_signal']} | "
-            f"{row['adjusted_signed_lean']} | {row['adjusted_net_score']:.1f} | ±{row['adjusted_signal_threshold']:.1f} | "
+            f"| `{row['position_id']}` | {row['adjusted_signed_lean']} | "
+            f"{row['adjusted_net_score']:.1f} | ±{row['adjusted_signal_threshold']:.1f} | "
             f"{row['net_score']:.1f} | {row['decisive_net']} | {row['tested']} | "
             f"{c['supports_position']} | {c['partial_supports']} | {c['partial_refutes']} | "
             f"{c['refutes_position']} | {c['partial']} | {c['untested']} |"
         )
+
+    if benchmark_controls:
+        lines += [
+            "",
+            "## Benchmark Control Readout",
+            "",
+            "These rows are calibration/house-position controls. They are not ranked as ideological schools.",
+            "",
+            "| control | lean | q-net | q-band | raw net | decisive net | tested | supports | partial + | partial - | refutes | neutral | untested |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        ]
+        for row in benchmark_controls:
+            c = Counter(row["counts"])
+            lines.append(
+                f"| `{row['position_id']}` | {row['adjusted_signed_lean']} | "
+                f"{row['adjusted_net_score']:.1f} | ±{row['adjusted_signal_threshold']:.1f} | "
+                f"{row['net_score']:.1f} | {row['decisive_net']} | {row['tested']} | "
+                f"{c['supports_position']} | {c['partial_supports']} | {c['partial_refutes']} | "
+                f"{c['refutes_position']} | {c['partial']} | {c['untested']} |"
+            )
 
     lines += [
         "",
