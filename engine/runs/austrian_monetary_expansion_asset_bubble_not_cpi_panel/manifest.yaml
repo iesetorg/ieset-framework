@@ -1,0 +1,42 @@
+hypothesis_id: austrian_monetary_expansion_asset_bubble_not_cpi_panel
+run_utc: '2026-05-18T19:35:40+00:00'
+verdict_label: REFUTED
+runner: engine/runs/austrian_monetary_expansion_asset_bubble_not_cpi_panel/replication.py
+vintages:
+  real_home_price_index:
+    publisher: bis
+    series: WS_SPP
+    label: BIS real residential property price index
+    vintage_file: data/vintages/bis/WS_SPP@2026-05-12T132625Z.parquet
+    sha256: 2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7
+  broad_money_to_gdp:
+    publisher: world_bank_wdi
+    series: FM.LBL.BMNY.GD.ZS
+    label: Broad money as percent of GDP
+    vintage_file: data/vintages/world_bank_wdi/FM.LBL.BMNY.GD.ZS@2026-05-05T203200Z.parquet
+    sha256: d48d61e5a3a14cc45df97c945d3ff98a512e84ba33c17ad722870cd6d7656c33
+  cpi_inflation:
+    publisher: world_bank_wdi
+    series: FP.CPI.TOTL.ZG
+    label: CPI inflation
+    vintage_file: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+    sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+  real_gdp_growth:
+    publisher: world_bank_wdi
+    series: NY.GDP.MKTP.KD.ZG
+    label: Real GDP growth
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+    sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+  trade_openness:
+    publisher: world_bank_wdi
+    series: NE.TRD.GNFS.ZS
+    label: Trade openness
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+formula:
+  asset: asset_growth ~ money_growth + real_gdp_growth + trade_openness + C(country_iso3)
+    + C(year)
+  cpi: cpi_inflation ~ money_growth + real_gdp_growth + trade_openness + C(country_iso3)
+    + C(year)
+proxy_note: Broad money growth is proxied by the annual change in WDI broad money
+  as percent of GDP; asset prices use BIS real residential property prices.

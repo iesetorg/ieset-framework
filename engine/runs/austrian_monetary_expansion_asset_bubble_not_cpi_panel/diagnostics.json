@@ -1,76 +1,72 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 insufficient observations after listwise deletion (21)",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "insufficient observations after listwise deletion (21)",
+  "verdict": "REFUTED - local proxy asset-price coefficient is not positive and significant at p<0.05",
+  "verdict_label": "REFUTED",
+  "verdict_reason": "local proxy asset-price coefficient is not positive and significant at p<0.05",
   "hypothesis_id": "austrian_monetary_expansion_asset_bubble_not_cpi_panel",
-  "template": "panel_fe",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "Hypothesis is falsified if the coefficient on broad-money growth in the asset-price regression is not at least 3x the coefficient in the CPI regression at p<0.05, OR if the asset-price coefficient is itself not positive and significant.\n",
-  "falsification_test_text": "panel_fe_money_asset_vs_money_cpi_coefficient_ratio",
+  "template": "panel_fe_exact_local_proxy",
   "estimate": {
-    "error": "insufficient observations after listwise deletion (21)"
-  },
-  "data_status": {
-    "variables_loaded": [
-      {
-        "role": "outcome",
-        "name": "real_home_price_index",
-        "source": "bis:WS_SPP",
-        "publisher": "bis",
-        "n_rows": 2272
-      },
-      {
-        "role": "outcome",
-        "name": "real_equity_price_index",
-        "source": "shiller:us_home_price_real; oecd:share_price_index",
-        "publisher": "shiller",
-        "n_rows": 134
-      },
-      {
-        "role": "outcome",
-        "name": "cpi_inflation_yoy",
-        "source": "world_bank_wdi:FP.CPI.TOTL.ZG",
-        "publisher": "world_bank_wdi",
-        "n_rows": 9066
-      },
-      {
-        "role": "treatment",
-        "name": "broad_money_growth_yoy",
-        "source": "fred:M2SL; ecb:BSI.M.U2.Y.V.M30.X.1.U2.2300.Z01.E; boe:LPMVWYR",
-        "publisher": "fred",
-        "n_rows": 68
-      },
-      {
-        "role": "treatment",
-        "name": "base_money_growth_yoy",
-        "source": "fred:BOGMBASE",
-        "publisher": "fred",
-        "n_rows": 68
-      },
-      {
-        "role": "controls",
-        "name": "real_gdp_growth",
-        "source": "world_bank_wdi:NY.GDP.MKTP.KD.ZG",
-        "publisher": "world_bank_wdi",
-        "n_rows": 13897
-      },
-      {
-        "role": "controls",
-        "name": "short_term_rate",
-        "source": "bis:WS_CBPOL",
-        "publisher": "bis",
-        "n_rows": 2119
-      },
-      {
-        "role": "controls",
-        "name": "trade_openness",
-        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10714
-      }
+    "method": "OLS with country and year fixed effects; SE clustered by country",
+    "proxy_note": "Broad money growth is proxied by the annual change in WDI broad money as percent of GDP; asset prices use BIS real residential property prices.",
+    "n_obs": 147,
+    "n_countries": 7,
+    "countries_used": [
+      "AUS",
+      "CAN",
+      "CHE",
+      "GBR",
+      "JPN",
+      "SWE",
+      "USA"
     ],
-    "variables_missing": []
+    "asset_formula": "asset_growth ~ money_growth + real_gdp_growth + trade_openness + C(country_iso3) + C(year)",
+    "cpi_formula": "cpi_inflation ~ money_growth + real_gdp_growth + trade_openness + C(country_iso3) + C(year)",
+    "asset_coefficient": 0.04452649173036138,
+    "asset_std_error": 0.04336719416411299,
+    "asset_p_value": 0.3045466145488771,
+    "cpi_coefficient": -0.0008234270874997922,
+    "cpi_std_error": 0.006813030735680331,
+    "cpi_p_value": 0.9038014377798106,
+    "asset_to_cpi_coefficient_ratio": -54.07460163298625,
+    "asset_positive_significant_gate": false,
+    "ratio_gate_ge_3": false
   },
-  "run_utc": "2026-05-04T12:34:21+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "vintages": {
+    "real_home_price_index": {
+      "publisher": "bis",
+      "series": "WS_SPP",
+      "label": "BIS real residential property price index",
+      "vintage_file": "data/vintages/bis/WS_SPP@2026-05-12T132625Z.parquet",
+      "sha256": "2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7"
+    },
+    "broad_money_to_gdp": {
+      "publisher": "world_bank_wdi",
+      "series": "FM.LBL.BMNY.GD.ZS",
+      "label": "Broad money as percent of GDP",
+      "vintage_file": "data/vintages/world_bank_wdi/FM.LBL.BMNY.GD.ZS@2026-05-05T203200Z.parquet",
+      "sha256": "d48d61e5a3a14cc45df97c945d3ff98a512e84ba33c17ad722870cd6d7656c33"
+    },
+    "cpi_inflation": {
+      "publisher": "world_bank_wdi",
+      "series": "FP.CPI.TOTL.ZG",
+      "label": "CPI inflation",
+      "vintage_file": "data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet",
+      "sha256": "dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0"
+    },
+    "real_gdp_growth": {
+      "publisher": "world_bank_wdi",
+      "series": "NY.GDP.MKTP.KD.ZG",
+      "label": "Real GDP growth",
+      "vintage_file": "data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet",
+      "sha256": "db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58"
+    },
+    "trade_openness": {
+      "publisher": "world_bank_wdi",
+      "series": "NE.TRD.GNFS.ZS",
+      "label": "Trade openness",
+      "vintage_file": "data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet",
+      "sha256": "4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1"
+    }
+  },
+  "run_utc": "2026-05-18T19:35:40+00:00",
+  "runner": "engine/runs/austrian_monetary_expansion_asset_bubble_not_cpi_panel/replication.py"
 }

@@ -1,61 +1,52 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded; missing: ['ecb:EON; ecb:ESTR']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded; missing: ['ecb:EON; ecb:ESTR']",
+  "verdict": "PARTIAL - money-market passthrough clears and no broad-money run appears, but M3 growth is not within 2pp of pre-2014 trend and exact household-deposit/core-yield gates are not loaded",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "money-market passthrough clears and no broad-money run appears, but M3 growth is not within 2pp of pre-2014 trend and exact household-deposit/core-yield gates are not loaded",
   "hypothesis_id": "financial_negative_rates_eurozone_2014_2022",
-  "template": "descriptive",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "SUPPORTED if (i) Eonia/ESTR tracked DFR within 10 bp on average through 2014-2022, (ii) at least one of {DE 2y, NL 2y, FR 2y, FI 2y} sovereign yield went below zero for at least 24 cumulative months, AND (iii) aggregate eurozone household deposits grew within 2 pp/year of the 2010-2013 trend during 2014-2022. PARTIAL if 2 of 3 conditions hold. REFUTED if any of (i) or (iii) fails by a large margin (e.g. deposit run-down > 5% annualised) or if no core sovereign yield went negative.\n",
-  "falsification_test_text": "descriptive_passthrough_and_deposit_stability",
+  "template": "descriptive_exact_local_proxy",
   "estimate": {
-    "error": "no outcome variable loaded; missing: ['ecb:EON; ecb:ESTR']"
-  },
-  "data_status": {
-    "variables_loaded": [
-      {
-        "role": "outcome",
-        "name": "ten_year_sovereign_yield_core",
-        "source": "ecb:IRS; fred:IRLTLT01DEM156N",
-        "publisher": "fred",
-        "n_rows": 71
-      },
-      {
-        "role": "outcome",
-        "name": "eurozone_household_deposits_growth",
-        "source": "ecb:BSI",
-        "publisher": "ecb",
-        "n_rows": 46
-      },
-      {
-        "role": "treatment",
-        "name": "ecb_dfr_negative",
-        "source": "ecb:DFR",
-        "publisher": "ecb",
-        "n_rows": 21
-      },
-      {
-        "role": "controls",
-        "name": "cpi_inflation_eurozone",
-        "source": "ecb:ICP; eurostat:prc_hicp_manr",
-        "publisher": "ecb",
-        "n_rows": 435
-      },
-      {
-        "role": "controls",
-        "name": "real_gdp_growth_eurozone",
-        "source": "eurostat:nama_10_gdp",
-        "publisher": "eurostat",
-        "n_rows": 1452
-      }
+    "method": "monthly ECB DFR, 3-month Euribor, and M3 annual-growth proxy checks",
+    "window": [
+      "2014-06",
+      "2022-07"
     ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "eonia_estr_short_end_rate",
-        "source": "ecb:EON; ecb:ESTR"
-      }
-    ]
+    "avg_euribor3m_minus_dfr_bp": 9.370174897959185,
+    "median_euribor3m_minus_dfr_bp": 8.172715,
+    "negative_euribor_months": 86,
+    "window_months": 98,
+    "m3_pre_2010_2013_mean_yoy_pct": 1.7911129852497145,
+    "m3_negative_rate_window_mean_yoy_pct": 5.708541820959,
+    "m3_window_minus_pre_pp": 3.917428835709285,
+    "m3_window_min_yoy_pct": 1.711126773948246,
+    "passthrough_gate_spread_le_10bp": true,
+    "short_end_negative_gate_ge_24_months": true,
+    "broad_money_no_run_gate_min_gt_minus_5pct": true,
+    "exact_deposit_trend_gate_within_2pp": false,
+    "proxy_note": "Eonia/ESTR, household deposits, and core 2y sovereign yields are not present locally; Euribor 3M and M3 annual growth are used as conservative local proxies."
   },
-  "run_utc": "2026-05-12T10:07:13+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "vintages": {
+    "dfr": {
+      "publisher": "ecb",
+      "series": "FM__B.U2.EUR.4F.KR.DFR.LEV",
+      "label": "ECB deposit facility rate",
+      "vintage_file": "data/vintages/ecb/FM__B.U2.EUR.4F.KR.DFR.LEV@2026-04-30T123604Z.parquet",
+      "sha256": "3cea630aed32e5a8e8702afaad2b2ba907c560f8dcbc56548832cd800973e38c"
+    },
+    "euribor3m": {
+      "publisher": "ecb",
+      "series": "FM__M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA",
+      "label": "3-month Euribor",
+      "vintage_file": "data/vintages/ecb/FM__M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA@2026-05-05T210516Z.parquet",
+      "sha256": "3c6daaf82219f077a782507f2226a3d1cb0e4726c04a3c9b6926865292a295cf"
+    },
+    "m3_yoy": {
+      "publisher": "ecb",
+      "series": "BSI__M.U2.Y.V.M30.X.I.U2.2300.Z01.A",
+      "label": "Euro area M3 annual growth",
+      "vintage_file": "data/vintages/ecb/BSI__M.U2.Y.V.M30.X.I.U2.2300.Z01.A@2026-05-05T210518Z.parquet",
+      "sha256": "f6e39179806254152903934a5310e7e5351ffcf608f96302ee06a1b706c3a999"
+    }
+  },
+  "run_utc": "2026-05-18T19:35:40+00:00",
+  "runner": "engine/runs/financial_negative_rates_eurozone_2014_2022/replication.py"
 }
