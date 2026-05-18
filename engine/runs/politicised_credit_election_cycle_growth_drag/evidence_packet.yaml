@@ -1,0 +1,201 @@
+packet_version: 1
+generated_utc: '2026-05-18T20:17:26+00:00'
+repository:
+  root: .
+  git_commit: 2b167692f828fe77c2d93876017db03478490156
+hypothesis:
+  id: politicised_credit_election_cycle_growth_drag
+  legacy_id: null
+  path: hypotheses/growth/politicised_credit_election_cycle_growth_drag.yaml
+  school: null
+  topic: growth
+  claim: 'Politicised development-bank lending that increases around election cycles
+    predicts weaker subsequent total-factor-productivity growth and higher non-performing
+    loan ratios in a broad panel of emerging and developing economies during 1990-2020.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "shape=TWFE, coef=+3.326e+12, p=0.455 (above \u03B1=0.10)"
+  status: PARTIAL
+preregistration:
+  claim: 'Politicised development-bank lending that increases around election cycles
+    predicts weaker subsequent total-factor-productivity growth and higher non-performing
+    loan ratios in a broad panel of emerging and developing economies during 1990-2020.
+
+    '
+  falsification_rule: 'Falsified if election-year development-bank lending surges
+    do not show a statistically significant negative association with subsequent TFP
+    growth and a positive association with NPL ratios after controlling for private
+    credit growth and institutional quality.
+
+    '
+  threshold:
+    tfp_coefficient: negative_p_lt_0.10
+    npl_coefficient: positive_p_lt_0.10
+    lag_years: 1_to_3
+  estimator:
+    template: event_study
+    clustering: country
+    notes: 'Event-study around election years with development-bank lending surges.
+      Panel FE with election-year interaction as robustness.
+
+      '
+  steelman: hypotheses/steelman/politicised_credit_election_cycle_growth_drag.md
+reproduction:
+  run_dir: engine/runs/politicised_credit_election_cycle_growth_drag
+  runner: scripts/run_event_study.py
+  replication_script: engine/runs/politicised_credit_election_cycle_growth_drag/replication.py
+  suggested_command: python engine/runs/politicised_credit_election_cycle_growth_drag/replication.py
+data:
+  inputs:
+  - name: outcome_total_factor_productivity_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: outcome_real_gdp_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.MKTP.KD.ZG
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+      computed_sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:55.455457+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP growth (annual %)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. This indicator
+        denotes the percentage change over each previous year of the constant price
+        (base year 2015) series in U'
+      countries_param: all
+      vintage_utc: null
+  - name: controls_institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  missing_series:
+  - 'world_bank_wdi:GFDD.DM.04 (outcome: nonperforming_loan_ratio)'
+  - 'constructed:binary (treatment: election_year_dummy)'
+  - 'world_bank_wdi:GFDD.DM.02 (controls: private_credit_growth)'
+  - 'constructed:terms_of_trade_index (controls: commodity_price_index)'
+  data_quality:
+    grade: incomplete
+    input_count: 3
+    official_source_count: 3
+    manual_source_count: 0
+    hash_status_counts:
+      match: 3
+    missing_series_count: 4
+artifacts:
+- path: hypotheses/growth/politicised_credit_election_cycle_growth_drag.yaml
+  sha256: 8f2f309b387a64b2921036d84b297f96eb7eb7b2c33a0f0504bbdae2f8afb3e3
+  bytes: 4335
+- path: engine/runs/politicised_credit_election_cycle_growth_drag/manifest.yaml
+  sha256: 92147e4389ab6a01d05083f77603558fce27642a3d1d19c1422fac1a3bc04d68
+  bytes: 1622
+- path: engine/runs/politicised_credit_election_cycle_growth_drag/diagnostics.json
+  sha256: cac5bfb24d068e71f20fe17ac9bdefec07613d6991380f1437e92076fe8453a6
+  bytes: 2696
+- path: engine/runs/politicised_credit_election_cycle_growth_drag/result_card.md
+  sha256: 1a2d36e6cfe11bad470379cd835c951b46fbc632e1a706ebe965ce28d8a495a1
+  bytes: 2052
+- path: engine/runs/politicised_credit_election_cycle_growth_drag/replication.py
+  sha256: 82edcf72ac3d7364171a619d7b864aa1d2d5a79060d4fb72dcf0ca0e3c952de9
+  bytes: 769
+- path: hypotheses/steelman/politicised_credit_election_cycle_growth_drag.md
+  sha256: bda38cab40d8bd17c4fa5a3a6aaa82caf4b5ebb9ee83a60587ca79745c1c9d17
+  bytes: 2265
+references:
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD.ZG
+  url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

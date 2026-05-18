@@ -1,0 +1,384 @@
+packet_version: 1
+generated_utc: '2026-05-18T20:17:26+00:00'
+repository:
+  root: .
+  git_commit: 2b167692f828fe77c2d93876017db03478490156
+hypothesis:
+  id: firm_entry_rate_long_run_productivity
+  legacy_id: null
+  path: hypotheses/regulatory/firm_entry_rate_long_run_productivity.yaml
+  school: null
+  topic: regulatory
+  claim: 'Across an unbalanced panel of OECD and emerging-market economies 1980-2020,
+    higher firm-entry rates (new business registrations per 1000 working-age population)
+    predict stronger subsequent 20-year total-factor-productivity growth, after controlling
+    for initial GDP per capita, human capital, and capital-deepening rates. The Schumpeterian-Kirznerian
+    claim is that entry is the primary engine of creative destruction and productivity
+    catch-up; the test distinguishes the entry channel from incumbent-scale and state-investment
+    channels.
+
+    '
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=+0.04691 (sign matches claim +), p=0.0185
+  status: SUPPORTED
+preregistration:
+  claim: 'Across an unbalanced panel of OECD and emerging-market economies 1980-2020,
+    higher firm-entry rates (new business registrations per 1000 working-age population)
+    predict stronger subsequent 20-year total-factor-productivity growth, after controlling
+    for initial GDP per capita, human capital, and capital-deepening rates. The Schumpeterian-Kirznerian
+    claim is that entry is the primary engine of creative destruction and productivity
+    catch-up; the test distinguishes the entry channel from incumbent-scale and state-investment
+    channels.
+
+    '
+  falsification_rule: 'Not supported if the panel-FE coefficient on firm-entry rate
+    is not positive and significant at p<0.05 on 20-year-forward TFP growth, OR if
+    the cross-sectional bivariate correlation between mean entry rate and mean TFP
+    growth is negative. A developmentalist alternative wins if state-investment share
+    outperforms entry rate in a horse-race regression (both entered simultaneously
+    and state-investment coefficient is larger and more significant).
+
+    '
+  threshold: "panel_FE_beta(entry_rate \u2192 tfp_growth_20yr) > 0 at p<0.05 AND cross_section_beta(entry_rate_mean\
+    \ \u2192 tfp_growth_mean) > 0 at p<0.10 AND in horse-race, |t-stat(entry_rate)|\
+    \ >= |t-stat(state_investment_share)|\n"
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: 'Two-way fixed-effects panel with 20-year forward-differenced outcomes
+      on lagged entry-rate levels. Country+year FE absorb much cross-sectional variation;
+      identification relies on within-country changes in entry regimes over long horizons.
+      Robustness: 10-year non-overlapping windows; cross-sectional long-difference
+      (1980-2000 vs 2000-2020) as placebo.
+
+      '
+  steelman: hypotheses/steelman/firm_entry_rate_long_run_productivity.md
+reproduction:
+  run_dir: engine/runs/firm_entry_rate_long_run_productivity
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/firm_entry_rate_long_run_productivity/replication.py
+  suggested_command: python engine/runs/firm_entry_rate_long_run_productivity/replication.py
+data:
+  inputs:
+  - name: outcome_tfp_growth_20yr_forward
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: outcome_labour_productivity_growth_20yr
+    publisher: pwt
+    series_id: rgdpo_per_emp
+    vintage_file: data/vintages/pwt/rgdpo_per_emp@2026-04-30T142942Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61d7900806151010f4f8dd7a8c9a5ee3822063d79052d51c8fb4e780c8d4d49c
+      computed_sha256: 61d7900806151010f4f8dd7a8c9a5ee3822063d79052d51c8fb4e780c8d4d49c
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: treatment_firm_entry_regulatory_quality_proxy
+    publisher: wgi
+    series_id: RQ.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+      computed_sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:52:13.487618+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: Regulatory Quality - Governance estimate (approx. -2.5 to +2.5)
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: treatment_firm_entry_rate
+    publisher: world_bank_wdi
+    series_id: IC.BUS.NREG
+    vintage_file: data/vintages/world_bank_wdi/IC.BUS.NREG@2026-05-05T203439Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 213a70ca7b1b8259d58f3a3b9e90b9fb84cce3f77b881667f8811a71d25e75ae
+      computed_sha256: 213a70ca7b1b8259d58f3a3b9e90b9fb84cce3f77b881667f8811a71d25e75ae
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/IC.BUS.NREG?format=json
+      methodology_url: https://data.worldbank.org/indicator/IC.BUS.NREG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:34:39.358332+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: New businesses registered (number)
+      source_note: New businesses registered are the number of new limited liability
+        corporations (or its equivalent) registered in the calendar year.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_log_initial_gdp_pc
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: controls_human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls_trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_government_size
+    publisher: world_bank_wdi
+    series_id: NE.CON.GOVT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.GOVT.ZS@2026-05-05T194701Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+      computed_sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.CON.GOVT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:01.933105+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: General government final consumption expenditure (% of GDP)
+      source_note: Final consumption expenditure is expenditure on goods and services
+        by resident institutional units for the direct satisfaction of human needs
+        or wants, whether individual or collective. General government FCE includes
+        all government current expenditures for purchases of goods and services (including
+        compensation of employees), and most expenditures on national defense and
+        security, but excludes go
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - 'world_bank_wdi:IC.BUS.DENS (treatment: business_density)'
+  - 'world_bank_wdi:IC.BUS.DENS (treatment: firm_entry_rate_interaction_proxy)'
+  - 'pwt:rnna (controls: capital_deepening_rate)'
+  data_quality:
+    grade: incomplete
+    input_count: 8
+    official_source_count: 7
+    manual_source_count: 0
+    hash_status_counts:
+      match: 8
+    missing_series_count: 3
+artifacts:
+- path: hypotheses/regulatory/firm_entry_rate_long_run_productivity.yaml
+  sha256: 35c4b7cec1f0e257d442fb6717079eaced32fb7956c0c5b7e1cf3aff23ae01c2
+  bytes: 9260
+- path: engine/runs/firm_entry_rate_long_run_productivity/manifest.yaml
+  sha256: 824ca9029936d243461cbfb025b3dbcb45c1edc1e397f59569cc53cb26f59e02
+  bytes: 3025
+- path: engine/runs/firm_entry_rate_long_run_productivity/diagnostics.json
+  sha256: ef9e871e0f0f996a3994907083b88823a89a64ded97fa511787a3be76c74980e
+  bytes: 3293
+- path: engine/runs/firm_entry_rate_long_run_productivity/result_card.md
+  sha256: 20b33fd5efe49e1907ab31753811b84dc5a67620623dc413120100d89749b28a
+  bytes: 2630
+- path: engine/runs/firm_entry_rate_long_run_productivity/replication.py
+  sha256: 0bb75688782da77e02129ee90d6f8f01d03a9f34bada06e4135e4f0d894b1ec8
+  bytes: 387
+- path: hypotheses/steelman/firm_entry_rate_long_run_productivity.md
+  sha256: fe5b00719c8ef031dafaa1d8e8abb829b0eced8b11b9a01b050521cc1326d3da
+  bytes: 3414
+references:
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: wgi
+  series_id: RQ.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RQ.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: IC.BUS.NREG
+  url: https://api.worldbank.org/v2/country/all/indicator/IC.BUS.NREG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: IC.BUS.NREG
+  url: https://data.worldbank.org/indicator/IC.BUS.NREG
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.CON.GOVT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.CON.GOVT.ZS
+  url: https://data.worldbank.org/indicator/NE.CON.GOVT.ZS
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

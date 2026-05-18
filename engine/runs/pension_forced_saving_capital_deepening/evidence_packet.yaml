@@ -1,0 +1,368 @@
+packet_version: 1
+generated_utc: '2026-05-18T20:17:26+00:00'
+repository:
+  root: .
+  git_commit: 2b167692f828fe77c2d93876017db03478490156
+hypothesis:
+  id: pension_forced_saving_capital_deepening
+  legacy_id: null
+  path: hypotheses/fiscal/pension_forced_saving_capital_deepening.yaml
+  school: null
+  topic: fiscal
+  claim: 'Forced-saving pension systems (mandatory defined-contribution or provident
+    funds with significant asset accumulation) raise capital deepening (capital per
+    worker) and support catch-up real GDP per worker growth in developing and emerging
+    economies, but do not guarantee frontier total factor productivity growth, in
+    a broad-country panel 1980-2020. The directional claim is that a 10-percentage-point
+    increase in pension-fund assets under management as a share of GDP predicts a
+    5-15% increase in capital per worker over the following decade, with the effect
+    on TFP growth insignificant or smaller than the capital-deepening effect.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=+0.001942, p=0.172 (above \u03B1=0.10); direction inconclusive"
+  status: PARTIAL
+preregistration:
+  claim: 'Forced-saving pension systems (mandatory defined-contribution or provident
+    funds with significant asset accumulation) raise capital deepening (capital per
+    worker) and support catch-up real GDP per worker growth in developing and emerging
+    economies, but do not guarantee frontier total factor productivity growth, in
+    a broad-country panel 1980-2020. The directional claim is that a 10-percentage-point
+    increase in pension-fund assets under management as a share of GDP predicts a
+    5-15% increase in capital per worker over the following decade, with the effect
+    on TFP growth insignificant or smaller than the capital-deepening effect.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B21 (pension assets) is positive and significant\
+    \ at p<0.10 for capital-per-worker growth, AND is insignificant or materially\
+    \ smaller for TFP growth. PARTIAL if positive and significant for both but the\
+    \ capital-deepening coefficient is at least twice the TFP coefficient. REFUTED\
+    \ if \u03B21 is negative and significant for capital per worker, or if \u03B2\
+    1 is positive and significant for TFP growth with no capital-deepening effect\
+    \ (suggesting a spurious correlation). INFORMATIVE: the result should survive\
+    \ excluding Singapore and Chile; if not, it is a two-country story.\n"
+  threshold: "\u03B2_pension_assets (capital per worker) > 0 at p<=0.10  AND \u03B2\
+    _pension_assets (TFP) p >= 0.10 or |\u03B2_tfp| < 0.5 \xD7 |\u03B2_capital|  AND\
+    \ Ex-Singapore-Chile robustness retains sign of \u03B2_pension_assets for capital.\n"
+  estimator:
+    template: panel_fe_decomposition
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Two-way FE panel with decomposition: capital per worker growth = \u03B2\
+      0 + \u03B21*pension_assets + controls + FE. TFP growth regressed separately.\
+      \ Mechanism decomposition via domestic investment and stock-market capitalisation\
+      \ channels. Robustness: (1) IV for pension assets using year-of-pension-reform\
+      \ indicators (major DC reforms: Chile 1981, Australia 1992, etc.); (2) subsample\
+      \ by income level (catch-up vs frontier); (3) exclude Singapore and Chile (dominant\
+      \ forced-saving cases).\n"
+  steelman: hypotheses/steelman/pension_forced_saving_capital_deepening.md
+reproduction:
+  run_dir: engine/runs/pension_forced_saving_capital_deepening
+  runner: scripts/run_panel_fe.py
+  replication_script: engine/runs/pension_forced_saving_capital_deepening/replication.py
+  suggested_command: python engine/runs/pension_forced_saving_capital_deepening/replication.py
+data:
+  inputs:
+  - name: outcome_total_factor_productivity_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: outcome_real_gdp_per_worker_growth
+    publisher: pwt
+    series_id: rgdpo
+    vintage_file: data/vintages/pwt/rgdpo@2026-04-30T144524Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      computed_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: decomposition_channels_domestic_investment_share
+    publisher: world_bank_wdi
+    series_id: NE.GDI.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      computed_sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:59.823578+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Gross capital formation (% of GDP)
+      source_note: Gross capital formation includes acquisitions less disposals of
+        produced assets for purposes of fixed capital formation, inventories or valuables.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_initial_log_gdp_per_worker
+    publisher: pwt
+    series_id: rgdpo
+    vintage_file: data/vintages/pwt/rgdpo@2026-04-30T144524Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      computed_sha256: 37ec293b0bf58a75f0d4a29beb7d86aae43d71e0d8de071e64b5f1f1b4eb0655
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: controls_institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: controls_financial_depth
+    publisher: world_bank_wdi
+    series_id: GFDD.DI.14
+    vintage_file: data/vintages/world_bank_wdi/GFDD.DI.14@2026-05-03T053937Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: f061d21445f5e8adecfd9106791c9e0faaa23dd1d4b625ceb236ad41a90a7042
+      computed_sha256: f061d21445f5e8adecfd9106791c9e0faaa23dd1d4b625ceb236ad41a90a7042
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: controls_trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_population_growth
+    publisher: world_bank_wdi
+    series_id: SP.POP.GROW
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.GROW@2026-05-05T194839Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      computed_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.GROW
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:39.147679+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population growth (annual %)
+      source_note: Annual population growth rate for year t is the exponential rate
+        of growth of midyear population from year t-1 to t, expressed as a percentage.
+        Population is based on the de facto definition of population, which counts
+        all residents regardless of legal status or citizenship.
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - 'pwt:rnna (outcome: capital_per_worker_growth)'
+  - 'oecd_pension_statistics:pension_fund_assets (treatment: pension_fund_assets_pct_gdp)'
+  - 'ilo:social_security_contribution_rate (treatment: forced_saving_mandatory_contribution_rate)'
+  - 'world_bank_wdi:GFDD.DM.02 (decomposition_channels: stock_market_capitalisation)'
+  - 'world_bank_wdi:SP.POP.65UP.TO.ZS (controls: old_age_dependency_ratio)'
+  data_quality:
+    grade: incomplete
+    input_count: 8
+    official_source_count: 5
+    manual_source_count: 0
+    hash_status_counts:
+      match: 8
+    missing_series_count: 5
+artifacts:
+- path: hypotheses/fiscal/pension_forced_saving_capital_deepening.yaml
+  sha256: 504ca0ccea2de34b07a20c93be6390f64d55373898a2910ee489ac5c290385d8
+  bytes: 7157
+- path: engine/runs/pension_forced_saving_capital_deepening/manifest.yaml
+  sha256: c013077bbef3ee92392117b083b8fb180300173743e451ef0319d878efcaa103
+  bytes: 3255
+- path: engine/runs/pension_forced_saving_capital_deepening/diagnostics.json
+  sha256: 66d238eb02b289797db6881f39748821e6c3fe0f9fcee021bf868f3c7a2cd7d0
+  bytes: 3846
+- path: engine/runs/pension_forced_saving_capital_deepening/result_card.md
+  sha256: 121b52afdd72cc9100cb2de9c2faf88955e6c881bc7b13c6d0e67dbce6cc7e12
+  bytes: 3152
+- path: engine/runs/pension_forced_saving_capital_deepening/replication.py
+  sha256: 51572646f879ce161e64577691cf25e0370727b1cca6a86bef6cf7cf5b04f60c
+  bytes: 748
+- path: hypotheses/steelman/pension_forced_saving_capital_deepening.md
+  sha256: 545df9ffd05e3e5b132a2582437a546302decbd4bd9854828335b0d0d7b72f6d
+  bytes: 3820
+references:
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.GDI.TOTL.ZS
+  url: https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://data.worldbank.org/indicator/SP.POP.GROW
+caveats:
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.

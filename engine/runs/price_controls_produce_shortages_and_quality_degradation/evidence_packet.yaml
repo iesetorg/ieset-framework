@@ -1,0 +1,222 @@
+packet_version: 1
+generated_utc: '2026-05-18T20:18:35+00:00'
+repository:
+  root: .
+  git_commit: 2b167692f828fe77c2d93876017db03478490156
+hypothesis:
+  id: price_controls_produce_shortages_and_quality_degradation
+  legacy_id: null
+  path: hypotheses/regulatory/price_controls_produce_shortages_and_quality_degradation.yaml
+  school: null
+  topic: regulatory
+  claim: "Statutory price ceilings set below market-clearing prices reliably produce\
+    \ shortages, rationing via queue or privilege, quality degradation, and black-market\
+    \ arbitrage \u2014 across every documented episode where enforcement is sustained.\
+    \ The empirical record is uniform: US wage-price controls 1971-1974 (Nixon freeze\
+    \ + Phase II-IV), US oil price controls 1973-1981 (gasoline lines + shortage crises),\
+    \ Venezuela 2003-present (chronic shortage + CPI-deflated official prices diverging\
+    \ from parallel-market prices by orders of magnitude), Zimbabwe 2007-2008 (shop-shelf\
+    \ emptying), Argentina Precios Cuidados 2014-2023 (product disappearance), Soviet\
+    \ peacetime price controls (queueing equilibrium). No documented sustained binding\
+    \ price ceiling has produced improved allocation outcomes at policy-relevant scale.\n"
+verdict:
+  raw: INCONCLUSIVE_DATA_PENDING
+  bucket: inconclusive
+  reason: insufficient pre-period coverage (years=41, donors=1)
+  status: INCONCLUSIVE_DATA_PENDING
+preregistration:
+  claim: "Statutory price ceilings set below market-clearing prices reliably produce\
+    \ shortages, rationing via queue or privilege, quality degradation, and black-market\
+    \ arbitrage \u2014 across every documented episode where enforcement is sustained.\
+    \ The empirical record is uniform: US wage-price controls 1971-1974 (Nixon freeze\
+    \ + Phase II-IV), US oil price controls 1973-1981 (gasoline lines + shortage crises),\
+    \ Venezuela 2003-present (chronic shortage + CPI-deflated official prices diverging\
+    \ from parallel-market prices by orders of magnitude), Zimbabwe 2007-2008 (shop-shelf\
+    \ emptying), Argentina Precios Cuidados 2014-2023 (product disappearance), Soviet\
+    \ peacetime price controls (queueing equilibrium). No documented sustained binding\
+    \ price ceiling has produced improved allocation outcomes at policy-relevant scale.\n"
+  falsification_rule: 'Not supported if (a) synthetic-DiD effect on the primary outcome
+    (parallel-market divergence or shortage incidence) is not positive and significant
+    at 5% across episodes, OR (b) any single documented binding episode at policy-relevant
+    scale (>=12 months duration, >= 1M population affected) produced measurable overall
+    welfare improvement on the joint outcome vector (allocation efficiency + availability
+    + quality + informal-market size) relative to its synthetic control.
+
+    '
+  threshold: ATT >0, p<0.05; zero counterexamples at policy-relevant scale
+  estimator:
+    template: synth_did
+    clustering: episode
+    random_seed: 20260423
+    notes: 'Synthetic DiD: for each documented binding episode, construct a synthetic
+      control from non-treated country-years matched on inflation rate, monetary expansion,
+      and institutional quality pre-treatment. Report supply-side outcome divergence
+      post-treatment. Primary outcome is the official-vs-parallel-market price ratio
+      (when parallel market exists) or queue/shortage incidence.
+
+      '
+  steelman: hypotheses/steelman/price_controls_produce_shortages_and_quality_degradation.md
+reproduction:
+  run_dir: engine/runs/price_controls_produce_shortages_and_quality_degradation
+  runner: scripts/run_synth_did.py
+  replication_script: engine/runs/price_controls_produce_shortages_and_quality_degradation/replication.py
+  suggested_command: python engine/runs/price_controls_produce_shortages_and_quality_degradation/replication.py
+data:
+  inputs:
+  - name: cpi_divergence_official_vs_alternative
+    publisher: bis
+    series_id: WS_LONG_CPI
+    vintage_file: data/vintages/bis/WS_LONG_CPI@2026-04-30T114328Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5f0f28da9e03502ca0d7aab68da317356fa9fad991e29f2a45e802b2e2a288d8
+      computed_sha256: 5f0f28da9e03502ca0d7aab68da317356fa9fad991e29f2a45e802b2e2a288d8
+      status: match
+    source:
+      type: official
+      url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_LONG_CPI/1.0/?format=csv
+      methodology_url: https://data.bis.org/topics/WS_LONG_CPI
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-04-30T11:43:28.427893+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1661'
+      end_date: 2026-03
+      frequency: mixed
+      rows: 105469
+      units: per dataflow metadata
+      currency: null
+    extra:
+      dataflow_description: Long consumer price inflation series (annual, 1800s-)
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - REF_AREA
+      - UNIT_MEASURE
+      - UNIT_MULT
+      - TIME_FORMAT
+      - BREAKS
+      - COVERAGE
+      - DECIMALS
+      - TITLE_TS
+      - period
+      - value
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      - OBS_STATUS
+      vintage_utc: null
+  - name: monetary_expansion_rate
+    publisher: imf
+    series_id: PCPIPCH
+    vintage_file: data/vintages/imf/PCPIPCH@2026-05-05T195353Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 617bbf95b3c33277a245e7ae7f95c17d23230b7bec80fd24de24d51f7e191d18
+      computed_sha256: 617bbf95b3c33277a245e7ae7f95c17d23230b7bec80fd24de24d51f7e191d18
+      status: match
+    source:
+      type: official
+      url: https://www.imf.org/external/datamapper/api/v1/PCPIPCH
+      methodology_url: https://www.imf.org/external/datamapper/PCPIPCH
+      license: IMF standard permissions (attribution required)
+      fetch_utc: '2026-05-05T19:53:53.434532+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1980'
+      end_date: '2031'
+      frequency: annual
+      rows: 10789
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_label: null
+      dataset: null
+      countries_filter: all
+      vintage_utc: null
+  - name: import_restriction_regime
+    publisher: wb
+    series_id: TG.VAL.TOTL.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/TG.VAL.TOTL.GD.ZS@2026-04-30T115201Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 04cb1b3f04fb3dcd0a3518d4570c872a8ab97292d1bbeb26d39e7ab5aa1e22b7
+      computed_sha256: 04cb1b3f04fb3dcd0a3518d4570c872a8ab97292d1bbeb26d39e7ab5aa1e22b7
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/TG.VAL.TOTL.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/TG.VAL.TOTL.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:52:01.726299+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Merchandise trade (% of GDP)
+      source_note: 'General merchandise trade includes goods whose economic ownership
+        is changed between a resident and a non-resident and that are not included
+        in the following specific categories: goods under merchanting, non-monetary
+        gold, and parts of travel, construction, and government goods and services
+        n.i.e. It is the total of merchandise exports plus merchandise imports. This
+        indicator is expressed as a per'
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 3
+    official_source_count: 3
+    manual_source_count: 0
+    hash_status_counts:
+      match: 3
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/regulatory/price_controls_produce_shortages_and_quality_degradation.yaml
+  sha256: 1f67c4a8f7c0e3c2131830490ce5d294d01be92b764e26167405ec1b749b9414
+  bytes: 6107
+- path: engine/runs/price_controls_produce_shortages_and_quality_degradation/manifest.yaml
+  sha256: 23633331cdbef26d01e4d0b694e80f8d13e80e250f689123c94978f1dda13243
+  bytes: 1673
+- path: engine/runs/price_controls_produce_shortages_and_quality_degradation/diagnostics.json
+  sha256: 4a97ffb3a3b4632290d0578c16749fe4fd6d1b61069204cd67d5a1291b0dbc5e
+  bytes: 2752
+- path: engine/runs/price_controls_produce_shortages_and_quality_degradation/result_card.md
+  sha256: d7fc337d64de8577caeea25f263d35e21595fbebf796f934150ad4a856b016eb
+  bytes: 1971
+- path: engine/runs/price_controls_produce_shortages_and_quality_degradation/replication.py
+  sha256: c975525920b133d66e66765fd86936427d45f608a042bcb3460a4c63851b7623
+  bytes: 549
+- path: hypotheses/steelman/price_controls_produce_shortages_and_quality_degradation.md
+  sha256: 29f1e95d46e62f7644190cbbde0230b248cdada19df002c9b695299f3079166b
+  bytes: 3997
+references:
+- kind: source
+  publisher: bis
+  series_id: WS_LONG_CPI
+  url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_LONG_CPI/1.0/?format=csv
+- kind: methodology
+  publisher: bis
+  series_id: WS_LONG_CPI
+  url: https://data.bis.org/topics/WS_LONG_CPI
+- kind: source
+  publisher: imf
+  series_id: PCPIPCH
+  url: https://www.imf.org/external/datamapper/api/v1/PCPIPCH
+- kind: methodology
+  publisher: imf
+  series_id: PCPIPCH
+  url: https://www.imf.org/external/datamapper/PCPIPCH
+- kind: source
+  publisher: wb
+  series_id: TG.VAL.TOTL.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/TG.VAL.TOTL.GD.ZS?format=json
+- kind: methodology
+  publisher: wb
+  series_id: TG.VAL.TOTL.GD.ZS
+  url: https://data.worldbank.org/indicator/TG.VAL.TOTL.GD.ZS
+caveats: []

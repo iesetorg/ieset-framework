@@ -1,0 +1,237 @@
+packet_version: 1
+generated_utc: '2026-05-18T20:09:19+00:00'
+repository:
+  root: .
+  git_commit: 2b167692f828fe77c2d93876017db03478490156
+hypothesis:
+  id: canada_real_disposable_income_post_2015
+  legacy_id: null
+  path: hypotheses/labour/canada_real_disposable_income_post_2015.yaml
+  school: null
+  topic: labour
+  claim: "Canadian real household disposable income per capita has stagnated or grown\
+    \ more slowly than in comparable resource-plus-anglophone-plus-small- open-developed\
+    \ economies (USA, AUS, NZL, GBR, NOR, CHE) over 2015-2023, once adjusted for CPI\
+    \ and household size. The claim is narrowly about the household-sector purchasing-power\
+    \ trajectory \u2014 not aggregate output and not pre-tax labour earnings in isolation\
+    \ \u2014 because the relevant welfare metric for a household under the 2015-present\
+    \ Canadian policy mix is after-tax-and-transfer real income per capita. The hypothesis\
+    \ additionally tests whether, once housing costs are netted out (real disposable\
+    \ income net of shelter expenditure), the Canadian trajectory is worse than the\
+    \ headline series suggests, since Canadian house prices and rents rose substantially\
+    \ faster than the donor-pool average over the sample window.\n"
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=-0.01706, p=0.472 (above \u03B1=0.10); direction inconclusive"
+  status: null
+preregistration:
+  claim: "Canadian real household disposable income per capita has stagnated or grown\
+    \ more slowly than in comparable resource-plus-anglophone-plus-small- open-developed\
+    \ economies (USA, AUS, NZL, GBR, NOR, CHE) over 2015-2023, once adjusted for CPI\
+    \ and household size. The claim is narrowly about the household-sector purchasing-power\
+    \ trajectory \u2014 not aggregate output and not pre-tax labour earnings in isolation\
+    \ \u2014 because the relevant welfare metric for a household under the 2015-present\
+    \ Canadian policy mix is after-tax-and-transfer real income per capita. The hypothesis\
+    \ additionally tests whether, once housing costs are netted out (real disposable\
+    \ income net of shelter expenditure), the Canadian trajectory is worse than the\
+    \ headline series suggests, since Canadian house prices and rents rose substantially\
+    \ faster than the donor-pool average over the sample window.\n"
+  falsification_rule: "Not supported if \u03B2_canada_post_2015 is non-negative (>=\
+    \ 0) at p < 0.10 in both (a) the OECD household-disposable-income primary spec\
+    \ and (b) the WDI GNI-per-capita proxy spec. Supported-tentative if negative and\
+    \ significant in only one of the two specs. Supported if negative and significant\
+    \ in both, with the housing-netted specification reported as secondary evidence\
+    \ on real purchasing- power. If the transfer-share decomposition channel shows\
+    \ that transfer-share increases in Canada fully offset pre-tax wage weakness (i.e.,\
+    \ disposable income after transfers tracks the donor pool even while pre-tax wages\
+    \ do not), the result card must report this explicitly: Canadian redistribution\
+    \ absorbed the market-income shock, and the \"household-income stagnation\" framing\
+    \ is inaccurate even if the \"market-income stagnation\" framing is accurate.\n"
+  threshold: "\u03B2_canada_post_2015 < 0 at p < 0.10 in OECD primary spec  AND \u03B2\
+    _canada_post_2015 < 0 at p < 0.10 in WDI GNI proxy spec.\n"
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Primary: TWFE on log real household disposable income per capita with\
+      \ country and year fixed effects. \u03B2_canada_post_2015 identifies the Canadian\
+      \ household-income trajectory deviation from the donor pool's time-average.\n\
+      Two-spec rule (per METHODOLOGY.md): the primary spec uses OECD household disposable\
+      \ income; the secondary spec uses WDI GNI per capita (PPP, constant) as proxy,\
+      \ with identical fixed effects and treatment indicator. Both specifications\
+      \ reported. A finding supported under BOTH passes the two-spec rule; supported\
+      \ under only one is reported as tentative.\nHousing-netted specification: construct\
+      \ \"real household disposable income net of shelter\" = household disposable\
+      \ income per capita minus a fitted shelter-expenditure estimate (BIS RPP \xD7\
+      \ shelter- weight from OECD household accounts). Re-estimate the TWFE on this\
+      \ netted series. Expected direction: Canadian gap widens once shelter is netted\
+      \ out, because housing cost growth absorbed a larger share of nominal income\
+      \ in Canada than in the donor pool.\nData-gate: this hypothesis is flagged as\
+      \ v1.1 fetcher requirement. The OECD Household Dashboard dataflow URNs must\
+      \ be verified before first run; the Statistics Canada cross-walk must be implemented\
+      \ for Canada-specific robustness. Until the primary series is available, runs\
+      \ will use GNI-per-capita proxy only and explicitly label findings as proxy-based.\n"
+  steelman: hypotheses/steelman/canada_real_disposable_income_post_2015.md
+reproduction:
+  run_dir: engine/runs/canada_real_disposable_income_post_2015
+  runner: null
+  replication_script: engine/runs/canada_real_disposable_income_post_2015/replication.py
+  suggested_command: python engine/runs/canada_real_disposable_income_post_2015/replication.py
+data:
+  inputs:
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-28T124148Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 751ca2ec9be31a601ee1180fd88f2df8f8aad41c38683244dcabf96daea654f7
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: gdp_pc_kd
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-04-28T125340Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: dc39af2ee8fdf8d908039f28a7bdc7f2e26fcef8c50137f1a3ef5341d6ca6790
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-04-28T124148Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 41b4cf786c937365599f45b566769cad95a93835c32a3884b261d40e116edb42
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-04-28T124156Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: e007bd45f1de4803988352635a60900a3c9d0e0cad0e81014537326400c1b431
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: cpi
+    publisher: world_bank_wdi
+    series_id: FP.CPI.TOTL.ZG
+    vintage_file: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-04-28T125336Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 7549eb787c53c03f8b4c568226d1e9ed077d5108c650eb85d95875619af33d28
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 5
+    official_source_count: 0
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 5
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/labour/canada_real_disposable_income_post_2015.yaml
+  sha256: 1c12584221526b52963f6ed15b771165269789b4c31454ec04d2a64a482c8fa0
+  bytes: 13722
+- path: engine/runs/canada_real_disposable_income_post_2015/manifest.yaml
+  sha256: 3da31085d83dbbb4f7a1d6fec15cb9343e7263b45bc55597dbb0f3accae5a628
+  bytes: 1378
+- path: engine/runs/canada_real_disposable_income_post_2015/diagnostics.json
+  sha256: d0fb0c6a5c45f9fad1f7d498211d05ba0228e174008d9b2f0aa8796587f3cd07
+  bytes: 3800
+- path: engine/runs/canada_real_disposable_income_post_2015/result_card.md
+  sha256: ac85732024b0534e9ce5876e201e24bdd6cd577288238bf54a7d36f432768ab7
+  bytes: 3586
+- path: engine/runs/canada_real_disposable_income_post_2015/replication.py
+  sha256: 3949ec4bccaa9dd30b1d740f62a6c152f5df4b6d1d471df8582f2134a9ddace1
+  bytes: 11217
+- path: engine/runs/canada_real_disposable_income_post_2015/coefficients.parquet
+  sha256: 0d057882c632d0b85819cb0af4e045766c4f32215d8bc176b78a056314853917
+  bytes: 5485
+- path: hypotheses/steelman/canada_real_disposable_income_post_2015.md
+  sha256: 7f8b54a455b9d265ec7d3e9735de26ec9e43667c32151068718107de1bf0b697
+  bytes: 6381
+references: []
+caveats: []

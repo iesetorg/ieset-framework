@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: heritage_business_freedom_life_expectancy_wgi_panel
+version: 1
+status: pre_registered
+topic: healthcare
+claim: In a 1996-2023 country panel, stronger regulatory quality predicts higher life expectancy after country and year fixed effects and basic macro controls.
+claim_direction: "+"
+methodology_note: Graduates rank 9 from engine/queue_heritage_market_graduation.yaml. The Heritage income-region screen is used only for triage and is not scoreboard evidence; this registered follow-up replaces the latest-year Heritage business-freedom score with time-varying WGI regulatory quality and WDI panel outcomes before estimation.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GHA, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SVK, SVN, SWE, THA, TUR, URY, USA, ZAF]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the outcome, treatment, or retained controls
+  - do not impute WGI or WDI observations across countries
+  - treat the first verdict as associational panel evidence, not causal scoreboard proof
+scope:
+  period: [1996, 2023]
+  countries: [OECD, GLOBAL]
+  outcome_dim: [life_expectancy_health]
+  policy_family: [regulation, competition_policy]
+  treatment_tags: [business_freedom, regulatory_quality, life_expectancy, heritage_graduation_wgi_panel]
+variables:
+  outcome:
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+    notes: Life expectancy at birth, total years.
+  treatment:
+  - name: regulatory_quality_wgi
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: level
+    notes: WGI regulatory quality point estimate.
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: trade_openness_control
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: Openness control.
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: Fiscal-demand control.
+intervention_channel: regulatory
+intervention_channel_justification: WGI regulatory quality is a time-varying proxy for the business-freedom and market-entry channel.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: Two-way fixed effects with country-clustered standard errors; optional leave-one-region-out checks remain a later robustness extension.
+falsification:
+  rule: SUPPORTED if the coefficient on regulatory_quality_wgi is positive at p<0.10 with at least 30 usable observations. REFUTED if it is negative at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_heritage_business_freedom_life_expectancy_wgi_panel
+  threshold:
+    expected_sign: "+"
+    p_max: 0.1
+    min_observations: 30
+prior_confidence: 0.55
+disclosure: This was selected from a favorable Heritage screen; the registered WGI/WDI panel must count null or opposite-signed results.
+steelman: hypotheses/steelman/heritage_business_freedom_life_expectancy_income_region_robustness.md

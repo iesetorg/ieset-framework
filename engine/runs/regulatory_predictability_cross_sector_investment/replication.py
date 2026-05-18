@@ -1,12 +1,24 @@
 #!/usr/bin/env python3
-"""Replicate this panel run from the preregistered hypothesis spec."""
-from pathlib import Path
+"""Replication wrapper for `regulatory_predictability_cross_sector_investment`.
+
+Delegates to the canonical IESET methodology runner recorded for this run.
+This preserves one source of estimation logic while making the run artifact
+directly reproducible from engine/runs/regulatory_predictability_cross_sector_investment/.
+"""
+from __future__ import annotations
+
 import sys
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "scripts"))
+RUNS_ROOT = Path(__file__).resolve().parents[1]
+if str(RUNS_ROOT) not in sys.path:
+    sys.path.insert(0, str(RUNS_ROOT))
 
-from run_panel_fe import run_one
+from _replication_runner import rerun
 
-if __name__ == '__main__':
-    print(run_one('regulatory_predictability_cross_sector_investment', force=True, persist_preflight_inconclusive=True))
+HYPOTHESIS_ID = "regulatory_predictability_cross_sector_investment"
+RUNNER = "scripts/run_panel_fe.py"
+
+
+if __name__ == "__main__":
+    raise SystemExit(rerun(__file__, HYPOTHESIS_ID, RUNNER))

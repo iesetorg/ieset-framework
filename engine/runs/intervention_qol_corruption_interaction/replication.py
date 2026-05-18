@@ -16,8 +16,8 @@ if str(RUNS_ROOT) not in sys.path:
 
 from _replication_runner import rerun
 
-HYPOTHESIS_ID = 'intervention_qol_corruption_interaction'
-RUNNER = 'scripts/run_panel_fe.py'
+HYPOTHESIS_ID = "intervention_qol_corruption_interaction"
+RUNNER = "scripts/run_panel_fe.py"
 
 
 if __name__ == "__main__":

@@ -16,8 +16,8 @@ if str(RUNS_ROOT) not in sys.path:
 
 from _replication_runner import rerun
 
-HYPOTHESIS_ID = 'state_ownership_media_freedom'
-RUNNER = 'scripts/run_panel_fe.py'
+HYPOTHESIS_ID = "state_ownership_media_freedom"
+RUNNER = "scripts/run_panel_fe.py"
 
 
 if __name__ == "__main__":

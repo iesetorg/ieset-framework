@@ -1,8 +1,8 @@
 packet_version: 1
-generated_utc: '2026-05-15T19:35:52+00:00'
+generated_utc: '2026-05-18T20:18:35+00:00'
 repository:
   root: .
-  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+  git_commit: 2b167692f828fe77c2d93876017db03478490156
 hypothesis:
   id: industrial_policy_high_governance_success
   legacy_id: null
@@ -17,11 +17,10 @@ hypothesis:
     free-market claims by documenting conditions under which state-led sectoral promotion
     outperforms laissez-faire.'
 verdict:
-  raw: supported
-  bucket: supported
-  reason: High-gov + high-state growth +2.80%/yr vs high-gov + low-state +2.63%/yr
-    (diff +0.17pp, p=0.658).
-  status: supported
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=+0.002981, p=0.209 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
 preregistration:
   claim: 'Industrial policy (sectoral targeting, export subsidies, conditional credit,
     technology push) succeeds in raising long-run manufacturing productivity and export
@@ -46,15 +45,97 @@ preregistration:
   steelman: hypotheses/steelman/industrial_policy_high_governance_success.md
 reproduction:
   run_dir: engine/runs/industrial_policy_high_governance_success
-  runner: null
+  runner: scripts/run_panel_fe.py
   replication_script: engine/runs/industrial_policy_high_governance_success/replication.py
   suggested_command: python engine/runs/industrial_policy_high_governance_success/replication.py
 data:
   inputs:
-  - name: wdi_ge
+  - name: manufacturing_tfp_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: export_sophistication_index
+    publisher: world_bank_wdi
+    series_id: TX.VAL.TECH.MF.ZS
+    vintage_file: data/vintages/world_bank_wdi/TX.VAL.TECH.MF.ZS@2026-05-05T195027Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: b99e36dfce6c0ccbebed61124508f11dd2aac6e6d635bacca7955eacf20a1994
+      computed_sha256: b99e36dfce6c0ccbebed61124508f11dd2aac6e6d635bacca7955eacf20a1994
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.MF.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/TX.VAL.TECH.MF.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:50:27.021387+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: High-technology exports (% of manufactured exports)
+      source_note: High-technology exports are products with high R&D intensity, such
+        as in aerospace, computers, pharmaceuticals, scientific instruments, and electrical
+        machinery.
+      countries_param: all
+      vintage_utc: null
+  - name: industrial_policy_intensity
+    publisher: world_bank_wdi
+    series_id: GC.XPN.TOTL.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/GC.XPN.TOTL.GD.ZS@2026-04-30T131014Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: null
+      computed_sha256: 6415fec35cc561ac0d5743aa3ef38de80ea1e8a831eb95dbb214f6f58a5ed9ad
+      status: computed_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: governance_quality
     publisher: wgi
-    series_id: GOV_WGI_GE.EST
-    vintage_file: data/vintages/wgi/GOV_WGI_GE.EST@2026-05-05T195208Z.parquet
+    series_id: GE.EST
+    vintage_file: data/vintages/wgi/GE.EST@2026-04-30T114242Z.parquet
     exists_locally: true
     hash:
       declared_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
@@ -62,11 +143,11 @@ data:
       status: match
     source:
       type: official
-      url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+      url: https://api.worldbank.org/v2/country/all/indicator/GE.EST?format=json&source=3
       methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
       license: CC-BY-4.0
-      fetch_utc: '2026-05-05T19:52:08.858159+00:00'
-      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      fetch_utc: '2026-04-30T11:42:42.165458+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
     coverage:
       start_date: '1996'
       end_date: '2024'
@@ -75,90 +156,192 @@ data:
       units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
       currency: null
     extra:
-      indicator_name: Government Effectiveness - Governance estimate (approx. -2.5
-        to +2.5)
+      indicator_name: null
       source_note: ''
       countries_param: all
       wb_source_id: 3
       vintage_utc: null
-  - name: vdem
-    publisher: vdem
-    series_id: vdem_cy_full
-    vintage_file: data/vintages/vdem/vdem_cy_full@2026-05-05T200021Z.parquet
+  - name: export_discipline_index
+    publisher: world_bank_wdi
+    series_id: NE.EXP.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.EXP.GNFS.ZS@2026-05-05T203013Z.parquet
     exists_locally: true
     hash:
-      declared_sha256: 89afa79fba1ec71f06e60cc01d66d186b028636af63506f6bf7a1de36a7370ff
-      computed_sha256: 89afa79fba1ec71f06e60cc01d66d186b028636af63506f6bf7a1de36a7370ff
+      declared_sha256: a53b48aa292a8b461a32c19943ad7bbca52f3625899a79d7c92e640724cfb121
+      computed_sha256: a53b48aa292a8b461a32c19943ad7bbca52f3625899a79d7c92e640724cfb121
       status: match
     source:
       type: official
-      url: https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData
-      methodology_url: https://v-dem.net/data/reference-documents/
-      license: "academic \u2014 V-Dem Institute; citation required"
-      fetch_utc: '2026-05-05T20:00:21.916195+00:00'
-      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.EXP.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.EXP.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T20:30:13.432848+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
     coverage:
-      start_date: '1789.0'
-      end_date: '2025.0'
+      start_date: '1960'
+      end_date: '2025'
       frequency: annual
-      rows: 28092
-      units: per variable (see codebook)
+      rows: 17556
+      units: per indicator definition
       currency: null
     extra:
-      rdata_object_key: vdem
-      parser_backend: rdata
-      n_columns: 4618
-      description: V-Dem country-year full dataset (1789-present, ~500 columns)
+      indicator_name: Exports of goods and services (% of GDP)
+      source_note: Exports of goods includes changes in the economic ownership of
+        goods from residents of the compiling economy to non-residents, irrespective
+        of physical movement of goods across national borders. Exports of services
+        includes services provided by residents to non-residents. This indicator is
+        expressed as a percentage of Gross Domestic Product (GDP) which is the total
+        income earned through the produc
+      countries_param: all
       vintage_utc: null
-  - name: pwt
-    publisher: pwt
-    series_id: pwt_full
-    vintage_file: data/vintages/pwt/pwt_full@2026-05-05T195237Z.parquet
+  - name: log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
     exists_locally: true
     hash:
-      declared_sha256: a125939373ac2662c8c9b5031bba3b62b3fc50d069fa140e81da551ebef3c844
-      computed_sha256: a125939373ac2662c8c9b5031bba3b62b3fc50d069fa140e81da551ebef3c844
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
       status: match
     source:
       type: official
       url: https://dataverse.nl/api/access/datafile/354095
       methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
       license: academic_citation
-      fetch_utc: '2026-05-05T19:52:37.400851+00:00'
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
       fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
     coverage:
       start_date: '1950'
       end_date: '2019'
       frequency: annual
       rows: 12810
-      units: rgdpo/rgdpe (2017 PPP $bn); cn (capital stock); tfp; emp; hc; pop; etc.
+      units: hc
       currency: int_usd_2017_ppp
     extra:
       source_note: dataverse
-      n_columns: 52
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: fdi_inflows_gdp
+    publisher: world_bank_wdi
+    series_id: BX.KLT.DINV.WD.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      computed_sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/BX.KLT.DINV.WD.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:51:06.923165+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Foreign direct investment, net inflows (% of GDP)
+      source_note: Foreign direct investment are the net inflows of investment to
+        acquire a lasting management interest (10 percent or more of voting stock)
+        in an enterprise operating in an economy other than that of the investor.
+        It is the sum of equity capital, reinvestment of earnings, other long-term
+        capital, and short-term capital as shown in the balance of payments. This
+        series shows net inflows (new investmen
+      countries_param: all
       vintage_utc: null
   missing_series: []
   data_quality:
-    grade: reproducible_hash_verified
-    input_count: 3
-    official_source_count: 3
+    grade: partial_provenance
+    input_count: 9
+    official_source_count: 8
     manual_source_count: 0
     hash_status_counts:
-      match: 3
+      computed_only: 1
+      match: 8
     missing_series_count: 0
 artifacts:
 - path: hypotheses/growth/industrial_policy_high_governance_success.yaml
   sha256: 616740fd5813e710d4e8ff2f245cf1c2426038b01219bb92596f0af29e2d9d5a
   bytes: 7318
 - path: engine/runs/industrial_policy_high_governance_success/manifest.yaml
-  sha256: d5d09c0ca28a0ff0cac6561034d17fd1e590bf4ea6bb69dc08851cccd9147ece
-  bytes: 389
+  sha256: 78ac011d1e80a6c95011c824c1a86f41b3e48743648b8f7f30546d9644244f6e
+  bytes: 1926
 - path: engine/runs/industrial_policy_high_governance_success/diagnostics.json
-  sha256: c33a6237feafcc0d039c77459cca432a7bde6abcd61dbd13514f311b2a908c9f
-  bytes: 746
+  sha256: 91a11dab413ddf250ee91612c990d62c9d0834320af1fedf1ddf41737e87effb
+  bytes: 2999
 - path: engine/runs/industrial_policy_high_governance_success/result_card.md
-  sha256: 1829dc8d10b45256bdfb36742c653867f9789ca89dd71b1239c02d1564712a3b
-  bytes: 312
+  sha256: 29b88b03f8e51dbbb5b137d5265438a4fc1d76eecb273926212c2a021282c959
+  bytes: 2305
 - path: engine/runs/industrial_policy_high_governance_success/replication.py
   sha256: ad2bbf1b2a0d72c1590877aa467d5d078df3d6c944a020a1ebe02167accd3968
   bytes: 7131
@@ -167,27 +350,59 @@ artifacts:
   bytes: 2959
 references:
 - kind: source
-  publisher: wgi
-  series_id: GOV_WGI_GE.EST
-  url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
-- kind: methodology
-  publisher: wgi
-  series_id: GOV_WGI_GE.EST
-  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
-- kind: source
-  publisher: vdem
-  series_id: vdem_cy_full
-  url: https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData
-- kind: methodology
-  publisher: vdem
-  series_id: vdem_cy_full
-  url: https://v-dem.net/data/reference-documents/
-- kind: source
   publisher: pwt
-  series_id: pwt_full
+  series_id: rtfpna
   url: https://dataverse.nl/api/access/datafile/354095
 - kind: methodology
   publisher: pwt
-  series_id: pwt_full
+  series_id: rtfpna
   url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: TX.VAL.TECH.MF.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.MF.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: TX.VAL.TECH.MF.ZS
+  url: https://data.worldbank.org/indicator/TX.VAL.TECH.MF.ZS
+- kind: source
+  publisher: wgi
+  series_id: GE.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GE.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: GE.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.EXP.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.EXP.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.EXP.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.EXP.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: BX.KLT.DINV.WD.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/BX.KLT.DINV.WD.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: BX.KLT.DINV.WD.GD.ZS
+  url: https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS
 caveats: []
