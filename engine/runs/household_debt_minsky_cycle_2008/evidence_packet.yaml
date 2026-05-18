@@ -1,0 +1,392 @@
+packet_version: 1
+generated_utc: '2026-05-18T21:04:59+00:00'
+repository:
+  root: .
+  git_commit: 98e75f20977c6e015c01f1a9885400a527b8c9c5
+hypothesis:
+  id: household_debt_minsky_cycle_2008
+  legacy_id: null
+  path: hypotheses/monetary/household_debt_minsky_cycle_2008.yaml
+  school: null
+  topic: monetary
+  claim: 'Post-Keynesian / Minsky reading: across advanced economies in the decade
+    preceding the 2008 GFC, the rise in household credit-to-GDP was the leading indicator
+    of subsequent banking-sector distress. The hypothesis tests, in a panel of OECD
+    countries 1995-2010, whether the change in household credit-to-GDP over a five-year
+    window predicts Laeven-Valencia-classified banking-crisis onset 2007-2010, with
+    a predictive coefficient material in magnitude and surviving conditioning on standard
+    macro controls. A market-liberal "subprime-as-policy- failure" reading attributes
+    the same pattern to a US-specific Community Reinvestment Act / GSE channel; the
+    cross-country panel test discriminates by showing the relationship holds across
+    countries with very different mortgage policy regimes.
+
+    '
+verdict:
+  raw: REFUTED
+  bucket: refuted
+  reason: coef=+0.3776 (sign opposite claim -), p=0.00198
+  status: REFUTED
+preregistration:
+  claim: 'Post-Keynesian / Minsky reading: across advanced economies in the decade
+    preceding the 2008 GFC, the rise in household credit-to-GDP was the leading indicator
+    of subsequent banking-sector distress. The hypothesis tests, in a panel of OECD
+    countries 1995-2010, whether the change in household credit-to-GDP over a five-year
+    window predicts Laeven-Valencia-classified banking-crisis onset 2007-2010, with
+    a predictive coefficient material in magnitude and surviving conditioning on standard
+    macro controls. A market-liberal "subprime-as-policy- failure" reading attributes
+    the same pattern to a US-specific Community Reinvestment Act / GSE channel; the
+    cross-country panel test discriminates by showing the relationship holds across
+    countries with very different mortgage policy regimes.
+
+    '
+  falsification_rule: 'Not supported if (a) the coefficient on household-credit-GDP
+    five-year change is statistically zero or negative as a crisis predictor (p >
+    0.10), OR (b) the predictive power disappears after conditioning on real house-price
+    change (i.e. household credit predicts only because it is collinear with the housing
+    boom and adds no independent information), OR (c) the AUC of household-credit
+    change as a crisis predictor is below 0.65 in the OECD pre-2008 panel, indicating
+    it is not a useful predictor relative to alternatives like current-account deficit.
+
+    '
+  threshold: 'coef(household_credit_change) > 0 at p < 0.10 AND coefficient survives
+    real-house-price conditioning AND AUC of household-credit change >= 0.65
+
+    '
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    notes: 'Panel logit / linear-probability regression of 2007-2010 banking-crisis-onset
+      indicator on lagged household-credit-GDP five-year change, conditioning on real
+      house-price change and macro controls. Country FE only (year FE would absorb
+      the crisis- onset year). Robustness: Schularick-Taylor JST long-run banking
+      crisis sample for cross-validation, and ROC-curve report of AUC for credit-change
+      vs alternatives as crisis predictor.
+
+      '
+  steelman: hypotheses/steelman/household_debt_minsky_cycle_2008.md
+reproduction:
+  run_dir: engine/runs/household_debt_minsky_cycle_2008
+  runner: engine/runs/household_debt_minsky_cycle_2008/replication.py
+  replication_script: engine/runs/household_debt_minsky_cycle_2008/replication.py
+  suggested_command: python engine/runs/household_debt_minsky_cycle_2008/replication.py
+data:
+  inputs:
+  - name: banking_crisis_indicator
+    publisher: bis
+    series_id: WS_CREDIT_GAP
+    vintage_file: data/vintages/bis/WS_CREDIT_GAP@2026-05-12T132621Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 7b437044569e12db9f11b7a1959c46846065f575651930cf4b139b31abe7ef9a
+      computed_sha256: 7b437044569e12db9f11b7a1959c46846065f575651930cf4b139b31abe7ef9a
+      status: match
+    source:
+      type: official
+      url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CREDIT_GAP/1.0/?format=csv
+      methodology_url: https://data.bis.org/topics/WS_CREDIT_GAP
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-05-12T13:26:21.796930+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-12T132904Z.yaml
+    coverage:
+      start_date: 1947-Q4
+      end_date: 2025-Q3
+      frequency: quarterly
+      rows: 24356
+      units: per dataflow metadata
+      currency: null
+    extra:
+      dataflow_description: Credit-to-GDP gap (quarterly)
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - BORROWERS_CTY
+      - TC_BORROWERS
+      - TC_LENDERS
+      - CG_DTYPE
+      - COLLECTION
+      - DECIMALS
+      - UNIT_MEASURE
+      - UNIT_MULT
+      - TIME_FORMAT
+      - TITLE_TS
+      - period
+      - value
+      - OBS_STATUS
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      vintage_utc: null
+  - name: household_credit_gdp_5y_change
+    publisher: world_bank_wdi
+    series_id: FS.AST.PRVT.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/FS.AST.PRVT.GD.ZS@2026-05-05T194720Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      computed_sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FS.AST.PRVT.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/FS.AST.PRVT.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:20.751404+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra: &id001
+      indicator_name: Domestic credit to private sector (% of GDP)
+      source_note: Domestic credit to private sector refers to financial resources
+        provided to the private sector by financial corporations, such as through
+        loans, purchases of nonequity securities, and trade credits and other accounts
+        receivable, that establish a claim for repayment. For some countries these
+        claims include credit to public enterprises. The financial corporations include
+        monetary authorities and dep
+      countries_param: all
+      vintage_utc: null
+  - name: household_credit_gdp_level
+    publisher: world_bank_wdi
+    series_id: FS.AST.PRVT.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/FS.AST.PRVT.GD.ZS@2026-05-05T194720Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      computed_sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/FS.AST.PRVT.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/FS.AST.PRVT.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:20.751404+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra: *id001
+  - name: real_house_price_5y_change
+    publisher: bis
+    series_id: WS_SPP
+    vintage_file: data/vintages/bis/WS_SPP@2026-05-12T132625Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7
+      computed_sha256: 2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7
+      status: match
+    source:
+      type: official
+      url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/?format=csv
+      methodology_url: https://data.bis.org/topics/WS_SPP
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-05-12T13:26:25.377682+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-12T132904Z.yaml
+    coverage:
+      start_date: 1927-Q1
+      end_date: 2025-Q4
+      frequency: quarterly
+      rows: 35388
+      units: per dataflow metadata
+      currency: null
+    extra:
+      dataflow_description: Selected residential property prices (quarterly; includes
+        long series)
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - REF_AREA
+      - VALUE
+      - UNIT_MEASURE
+      - UNIT_MULT
+      - BREAKS
+      - COVERAGE
+      - TITLE_TS
+      - period
+      - value
+      - OBS_STATUS
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      vintage_utc: null
+  - name: current_account_balance_gdp
+    publisher: world_bank_wdi
+    series_id: BN.CAB.XOKA.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/BN.CAB.XOKA.GD.ZS@2026-05-05T195123Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 977f10a40e15becc1f1f7abdee7e3f8a99ab7c39ffdc6e3994d5a993efa4f168
+      computed_sha256: 977f10a40e15becc1f1f7abdee7e3f8a99ab7c39ffdc6e3994d5a993efa4f168
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/BN.CAB.XOKA.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/BN.CAB.XOKA.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:51:23.152877+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Current account balance (% of GDP)
+      source_note: 'Balance of current transactions (transactions in goods and services,
+        earned income and transfer income) between residents and non-residents. The
+        term current account balance is used in the external accounts and is expressed
+        from the perspective of resident units. The term current external balance
+        is used in the national accounts and is expressed from the perspective of
+        the non-resident units, and '
+      countries_param: all
+      vintage_utc: null
+  - name: real_gdp_growth_5y_avg
+    publisher: world_bank_wdi
+    series_id: NY.GDP.MKTP.KD.ZG
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+      computed_sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:55.455457+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP growth (annual %)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. This indicator
+        denotes the percentage change over each previous year of the constant price
+        (base year 2015) series in U'
+      countries_param: all
+      vintage_utc: null
+  - name: log_population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      computed_sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.TOTL
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:26.845195+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population, total
+      source_note: Total population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship. The
+        values shown are midyear estimates.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 7
+    official_source_count: 7
+    manual_source_count: 0
+    hash_status_counts:
+      match: 7
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/monetary/household_debt_minsky_cycle_2008.yaml
+  sha256: 1d24fe315096b52a6f9e93c487d0b6b49de5734751f0412574b682d74bb9f28a
+  bytes: 5696
+- path: engine/runs/household_debt_minsky_cycle_2008/manifest.yaml
+  sha256: 3d5a66c2d13e60542c98cb2e6e049eaf25842e8ac0c0b26f9c3bdca73596f69e
+  bytes: 4878
+- path: engine/runs/household_debt_minsky_cycle_2008/diagnostics.json
+  sha256: 8d21e33ab84d024f7a61283707f0939f4a798dc7c9c013158a8d250409daee00
+  bytes: 3063
+- path: engine/runs/household_debt_minsky_cycle_2008/result_card.md
+  sha256: fa516431d47700191773a11edd20b17bf282fb1750c57407586a36b25caad6b1
+  bytes: 2823
+- path: engine/runs/household_debt_minsky_cycle_2008/replication.py
+  sha256: 5b90473ec1072b89b9c986099b85d3c8ef9e7e1477e3421ee66cd92048be4ae1
+  bytes: 727
+- path: hypotheses/steelman/household_debt_minsky_cycle_2008.md
+  sha256: f55b3a21cb77750183375393afed8f1df75f700936870ffc08c1a7f43ab72b10
+  bytes: 4160
+references:
+- kind: source
+  publisher: bis
+  series_id: WS_CREDIT_GAP
+  url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CREDIT_GAP/1.0/?format=csv
+- kind: methodology
+  publisher: bis
+  series_id: WS_CREDIT_GAP
+  url: https://data.bis.org/topics/WS_CREDIT_GAP
+- kind: source
+  publisher: world_bank_wdi
+  series_id: FS.AST.PRVT.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/FS.AST.PRVT.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: FS.AST.PRVT.GD.ZS
+  url: https://data.worldbank.org/indicator/FS.AST.PRVT.GD.ZS
+- kind: source
+  publisher: bis
+  series_id: WS_SPP
+  url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/?format=csv
+- kind: methodology
+  publisher: bis
+  series_id: WS_SPP
+  url: https://data.bis.org/topics/WS_SPP
+- kind: source
+  publisher: world_bank_wdi
+  series_id: BN.CAB.XOKA.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/BN.CAB.XOKA.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: BN.CAB.XOKA.GD.ZS
+  url: https://data.worldbank.org/indicator/BN.CAB.XOKA.GD.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD.ZG
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.MKTP.KD.ZG
+  url: https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://data.worldbank.org/indicator/SP.POP.TOTL
+caveats: []

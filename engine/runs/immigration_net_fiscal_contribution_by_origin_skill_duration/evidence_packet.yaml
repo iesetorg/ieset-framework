@@ -1,0 +1,167 @@
+packet_version: 1
+generated_utc: '2026-05-18T21:04:59+00:00'
+repository:
+  root: .
+  git_commit: 98e75f20977c6e015c01f1a9885400a527b8c9c5
+hypothesis:
+  id: immigration_net_fiscal_contribution_by_origin_skill_duration
+  legacy_id: null
+  path: hypotheses/labour/immigration_net_fiscal_contribution_by_origin_skill_duration.yaml
+  school: null
+  topic: labour
+  claim: "The net fiscal contribution of immigrants (taxes paid minus public services\
+    \ + transfers received, measured in lifetime NPV terms) varies systematically\
+    \ by (a) origin-country institutional quality, (b) skill level at arrival, (c)\
+    \ age at arrival, (d) duration of residence, and (e) legal status (working-age\
+    \ visa / family reunification / asylum). On average across developed destination\
+    \ countries, working-age skilled migrants are net fiscal contributors over lifetime;\
+    \ low-skill arrivals and asylum claimants are on average net recipients at least\
+    \ during the first 5-10 years. These differences are empirically identified and\
+    \ not reducible to ethnicity as a biological variable \u2014 ethnicity correlates\
+    \ with outcomes only because it correlates with origin institutions + selection\
+    \ + duration.\n"
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=-1.127 (sign matches claim -), p=0.0206
+  status: null
+preregistration:
+  claim: "The net fiscal contribution of immigrants (taxes paid minus public services\
+    \ + transfers received, measured in lifetime NPV terms) varies systematically\
+    \ by (a) origin-country institutional quality, (b) skill level at arrival, (c)\
+    \ age at arrival, (d) duration of residence, and (e) legal status (working-age\
+    \ visa / family reunification / asylum). On average across developed destination\
+    \ countries, working-age skilled migrants are net fiscal contributors over lifetime;\
+    \ low-skill arrivals and asylum claimants are on average net recipients at least\
+    \ during the first 5-10 years. These differences are empirically identified and\
+    \ not reducible to ethnicity as a biological variable \u2014 ethnicity correlates\
+    \ with outcomes only because it correlates with origin institutions + selection\
+    \ + duration.\n"
+  falsification_rule: 'Not supported if the channel coefficients do NOT have predicted
+    signs at p<0.10, OR if origin-country residuals after channel controls are LARGER
+    in magnitude than the channel contributions (would suggest unmeasured origin-specific
+    factors dominate, weakening the channel- decomposition framing). Additionally,
+    if aggregate net fiscal contribution estimates differ by >50% between leading
+    methodologies (Dustmann-Frattini vs NASEM vs OECD) and the framework cannot reconcile,
+    the literature is too unsettled to support a strong claim.
+
+    '
+  threshold: "All 5 channel coefficients with predicted signs at p<0.10  AND mean|origin-country\
+    \ residual| < mean|channel contribution|  AND leading-methodology estimates within\
+    \ \xB150% of each other\n"
+  estimator:
+    template: panel_fe_decomposition
+    fixed_effects:
+    - destination_country
+    - year
+    clustering: destination_country
+    notes: "Two-stage decomposition:\nStage 1: regress per-migrant net fiscal contribution\
+      \ on the 5 channels above + destination country FE + year FE. Test whether coefficients\
+      \ have predicted signs (origin WGI \u2191 \u2192 contribution \u2191; skilled\
+      \ \u2191 \u2192 contribution \u2191; age-at-arrival working-age \u2192 contribution\
+      \ \u2191; years-since-arrival \u2191 \u2192 contribution \u2191 with convergence\
+      \ to native; asylum initially negative, converges with time).\nStage 2: after\
+      \ controlling for the 5 channels, compute residual variation attributable to\
+      \ origin-country dummies. This tests the framework's strong claim: origin-country\
+      \ residual should be small once institutional-quality + skill + demographics\
+      \ + duration are controlled. If origin-country residuals remain large, ethnicity-\
+      \ like effects would be identified \u2014 but the honest read is such residuals\
+      \ would reflect further unmeasured selection + destination- country reception\
+      \ effects (discrimination, integration policy), not biology.\nData requirement:\
+      \ destination-country administrative fiscal + migration microdata. Not all 9\
+      \ countries have open access \u2014 UK (HMRC+DWP linked), Germany (SOEP), Netherlands\
+      \ (CBS), Sweden (SCB), Norway (Statistics Norway), Denmark (Statistics Denmark)\
+      \ publish partial data; US relies on NASEM 2017 cohort imputations; AUS + CAN\
+      \ published government fiscal models.\n"
+  steelman: hypotheses/steelman/immigration_net_fiscal_contribution_by_origin_skill_duration.md
+reproduction:
+  run_dir: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration
+  runner: null
+  replication_script: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/replication.py
+  suggested_command: python engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/replication.py
+data:
+  inputs:
+  - name: wgi_government_effectiveness
+    publisher: wgi
+    series_id: GOV_WGI_GE.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_GE.EST@2026-04-26T133806Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 874b818331cc4920c44a143636338e7f3fb41540c804f45c02c6525638b7d464
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: un_desa_international_migrant_stock
+    publisher: un_desa
+    series_id: international_migrant_stock
+    vintage_file: data/vintages/un_desa/international_migrant_stock@2026-04-25T040900Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: e825bad5d771974f55efbe1adad4c0c7d778a3a3779045e22557c59fa372cc13
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 2
+    official_source_count: 0
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 2
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/labour/immigration_net_fiscal_contribution_by_origin_skill_duration.yaml
+  sha256: f8c392b20518e679dc857e6805208eafaa5dee6898fcad24b78123fe1f9afca7
+  bytes: 7445
+- path: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/manifest.yaml
+  sha256: d6b296e605ee7bae386219090ec4d3d4ba4e88fb9f693888521863f1ec2d14a3
+  bytes: 1399
+- path: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/diagnostics.json
+  sha256: 630a5bd7c10b6b8a6b71970af885223b301ec440f627d48db67a5c3d42134197
+  bytes: 3170
+- path: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/result_card.md
+  sha256: 2b1de23c203d6d9a7c85ea05e9c1df17e199a2241a6ae92f1ec5d774492ea3b3
+  bytes: 3226
+- path: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/replication.py
+  sha256: 3c02602d7ed56c9eb014ffa9dcdc16eae655b9c538dc4cc2224d7a200be11739
+  bytes: 295
+- path: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/coefficients.parquet
+  sha256: bc4ba6b2cecb6c123c640c723fd5e3fb114247a33582956606ce276da5fe254d
+  bytes: 2488
+- path: engine/runs/immigration_net_fiscal_contribution_by_origin_skill_duration/chart_data.json
+  sha256: dcc160bdef5b7de34cdb0f1ec7ec8e8d502d24ae6bda5684ccd7b19cb75485a1
+  bytes: 2112
+- path: hypotheses/steelman/immigration_net_fiscal_contribution_by_origin_skill_duration.md
+  sha256: 2c5df1a40cea5994bd8a3d82be12d90929d71133a6ed3c1eb87c8f4a4df48294
+  bytes: 4283
+references: []
+caveats: []
