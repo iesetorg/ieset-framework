@@ -1,86 +1,98 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no outcome variable loaded; missing: ['oecd_stan:tfp_growth', 'constructed: EU KLEMS or OECD STAN sectoral TFP for services']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no outcome variable loaded; missing: ['oecd_stan:tfp_growth', 'constructed: EU KLEMS or OECD STAN sectoral TFP for services']",
   "hypothesis_id": "services_trade_liberalisation_frontier_growth",
-  "template": "panel_fe",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "SUPPORTED if \u03b21 (services liberalisation) is positive and significant at p<0.10 while \u03b22 (goods industrial policy) is insignificant or negative, AND |\u03b21| > |\u03b22|. PARTIAL if both are positive and significant but \u03b21 > \u03b22. REFUTED if \u03b21 is negative and significant or if \u03b22 is positive and significantly larger than \u03b21. INFORMATIVE: the result should survive excluding the United States; if not, it is a US deregulation story rather than a general services-liberalisation effect.\n",
-  "falsification_test_text": "panel_fe_services_vs_goods_industrial_policy_tfp_frontier",
-  "estimate": {
-    "error": "no outcome variable loaded; missing: ['oecd_stan:tfp_growth', 'constructed: EU KLEMS or OECD STAN sectoral TFP for services']"
-  },
+  "verdict": "INCONCLUSIVE_DATA_PENDING - local PMR trade-barrier proxy does not settle the STRI/services-TFP hypothesis",
+  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
+  "verdict_reason": "local PMR trade-barrier proxy does not settle the STRI/services-TFP hypothesis",
+  "method": "Cross-sectional OECD proxy: decline in PMR barriers to trade/investment from 2018 to 2023 predicts 2019-2024 PDB services MFP growth, compared with state-involvement/tariff goods-policy proxy.",
+  "runner": "engine/runs/services_trade_liberalisation_frontier_growth/replication.py",
+  "run_utc": "2026-05-18T20:02:25+00:00",
+  "claim": "Services trade liberalisation predicts stronger total factor productivity growth in high-income frontier economies after 1990 than goods-sector industrial policy does. The directional claim is that a one-standard- deviation reduction in services trade restrictiveness (OECD STRI or equivalent) predicts larger TFP growth gains in the subsequent decade than a one-standard-deviation increase in goods-sector subsidy or tariff-protection intensity, in an OECD and high-income panel 1990-2020.\n",
+  "falsification_rule": "SUPPORTED if beta1 (services liberalisation) is positive and significant at p<0.10 while beta2 (goods industrial policy) is insignificant or negative, AND |beta1| > |beta2|. PARTIAL if both are positive and significant but beta1 > beta2. REFUTED if beta1 is negative and significant or if beta2 is positive and significantly larger than beta1. INFORMATIVE: the result should survive excluding the United States; if not, it is a US deregulation story rather than a general services-liberalisation effect.\n",
+  "falsification_test": "panel_fe_services_vs_goods_industrial_policy_tfp_frontier",
+  "estimates": [
+    {
+      "outcome": "services_mfp_growth_2019_2024",
+      "predictors": [
+        "services_trade_liberalisation_z",
+        "goods_policy_intensity_z",
+        "log_gdp_pc_2018",
+        "log_tfp_2018"
+      ],
+      "n_obs": 17,
+      "n_countries": 17,
+      "year_min": 2024,
+      "year_max": 2024,
+      "r_squared": 0.14224399002906374,
+      "entity_fe": false,
+      "time_fe": false,
+      "covariance": "HC1 robust",
+      "terms": {
+        "services_trade_liberalisation_z": {
+          "coefficient": 0.8831241658047185,
+          "std_error": 0.7895747585346388,
+          "p_value": 0.2852524448485041
+        },
+        "goods_policy_intensity_z": {
+          "coefficient": 0.2103327550530082,
+          "std_error": 0.2604083643430096,
+          "p_value": 0.43498033303299266
+        },
+        "log_gdp_pc_2018": {
+          "coefficient": -0.0727415968166054,
+          "std_error": 0.9049348434690174,
+          "p_value": 0.9372575009063209
+        },
+        "log_tfp_2018": {
+          "coefficient": 18.49426311100227,
+          "std_error": 26.543553271402786,
+          "p_value": 0.4992334865583995
+        }
+      }
+    }
+  ],
   "data_status": {
     "variables_loaded": [
       {
-        "role": "treatment",
-        "name": "services_trade_restrictiveness_index",
-        "source": "oecd_stri:overall_stri",
-        "publisher": "constructed",
-        "n_rows": 1085
+        "role": "outcome_proxy",
+        "name": "services_mfp_growth_2019_2024",
+        "source": "oecd_pdb:MFPH_GY_LR averaged over G,H,J,M_N"
+      },
+      {
+        "role": "treatment_proxy",
+        "name": "services_trade_liberalisation_2018_2023",
+        "source": "decline in oecd_pmr:BARRIER_TRADE"
+      },
+      {
+        "role": "horse_race_proxy",
+        "name": "goods_policy_intensity_z",
+        "source": "oecd_pmr:STATE_INVOL and TARIFFS"
       },
       {
         "role": "controls",
-        "name": "initial_log_tfp",
-        "source": "pwt:rtfpna",
-        "publisher": "pwt",
-        "n_rows": 6412
-      },
-      {
-        "role": "controls",
-        "name": "log_gdp_per_capita",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
-      },
-      {
-        "role": "controls",
-        "name": "human_capital_index",
-        "source": "pwt:hc",
-        "publisher": "pwt",
-        "n_rows": 8637
-      },
-      {
-        "role": "controls",
-        "name": "regulatory_quality",
-        "source": "wgi:RQ.EST",
-        "publisher": "wgi",
-        "n_rows": 5169
+        "name": "log_gdp_pc_2018, log_tfp_2018",
+        "source": "WDI and PWT"
       }
     ],
-    "variables_missing": [
+    "variables_missing_or_proxied": [
       {
-        "role": "outcome",
-        "name": "total_factor_productivity_growth",
-        "source": "oecd_stan:tfp_growth"
+        "role": "exact_treatment",
+        "name": "OECD STRI overall/services-sector index",
+        "source": "not local"
       },
       {
-        "role": "outcome",
-        "name": "services_sector_tfp_growth",
-        "source": "constructed: EU KLEMS or OECD STAN sectoral TFP for services"
+        "role": "exact_outcome",
+        "name": "EU KLEMS/OECD STAN sectoral TFP for services",
+        "source": "not local beyond PDB MFP proxy"
       },
       {
-        "role": "treatment",
-        "name": "goods_sector_industrial_policy_intensity",
-        "source": "constructed: goods-sector subsidy intensity + tariff dispersion (CRDF/ITC + WITS)"
-      },
-      {
-        "role": "decomposition_channels",
-        "name": "services_export_share",
-        "source": "world_bank_wdi:BX.GSR.CMCP.ZS"
-      },
-      {
-        "role": "decomposition_channels",
-        "name": "fdi_services_inflows",
-        "source": "oecd_fdi:fdi_services_inward"
-      },
-      {
-        "role": "controls",
-        "name": "digital_infrastructure_index",
-        "source": "constructed: broadband penetration + mobile subscriptions (ITU)"
+        "role": "exact_horse_race",
+        "name": "goods-sector subsidy intensity",
+        "source": "CRDF/ITC/WITS subsidy panel not local"
       }
     ]
   },
-  "run_utc": "2026-05-03T05:56:43+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "caveats": [
+    "PMR barriers to trade are a broad trade/investment-barrier proxy, not the OECD STRI.",
+    "Only the 2018-2023 PMR change is local, so this is a short-window screen."
+  ]
 }

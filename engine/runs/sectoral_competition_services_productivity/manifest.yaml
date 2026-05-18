@@ -1,0 +1,70 @@
+hypothesis_id: sectoral_competition_services_productivity
+status: PARTIAL
+reason: proxy horse-race does not clear the registered positive/significant services-productivity
+  gate
+method: Cross-sectional OECD 2023 PMR services-competition proxy against 2019-2024
+  PDB services labour-productivity growth; HC1 robust OLS with initial income and
+  manufacturing-share controls.
+runner: engine/runs/sectoral_competition_services_productivity/replication.py
+run_utc: '2026-05-18T20:02:21+00:00'
+vintages:
+- name: OECD Productivity Database
+  publisher: oecd
+  series_id: DSD_PDB
+  vintage_file: data/vintages/oecd/DSD_PDB@2026-05-12T133454Z.parquet
+  sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+- name: OECD product market regulation
+  publisher: oecd_pmr
+  series_id: PMR
+  vintage_file: data/vintages/oecd_pmr/PMR@2026-05-05T200616Z.parquet
+  sha256: a23b4b9912fc89eac7d8e5ea3a5bfff82a3204288b6f9d511d30dfce61b5b45f
+- name: OECD PMR barriers to entry
+  publisher: oecd_pmr
+  series_id: BARRIER_ENTRY
+  vintage_file: data/vintages/oecd_pmr/BARRIER_ENTRY@2026-05-02T220000Z.parquet
+  sha256: 72c9528c0c4abbca3e516ca7e6c7d3e126068fe1f451c4b9f0ff8406dc0dbc4b
+- name: OECD PMR network-sector regulation
+  publisher: oecd_pmr
+  series_id: NETWORK_SECTORS
+  vintage_file: data/vintages/oecd_pmr/NETWORK_SECTORS@2026-05-02T220000Z.parquet
+  sha256: f1ccf3fdd41d51212f765a44f6ecb5f4ec540923340ecdfaaaa121a90898fb1e
+- name: OECD PMR state involvement
+  publisher: oecd_pmr
+  series_id: STATE_INVOL
+  vintage_file: data/vintages/oecd_pmr/STATE_INVOL@2026-05-02T220000Z.parquet
+  sha256: 9be1b425a53bcff61fc539a2c7aae574c387c866e39093252f28f9d8bbb7adef
+- name: WDI real GDP per capita
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-04-30T113730Z.parquet
+  sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+- name: WDI manufacturing share
+  publisher: world_bank_wdi
+  series_id: NV.IND.MANF.ZS
+  vintage_file: data/vintages/world_bank_wdi/NV.IND.MANF.ZS@2026-05-05T194954Z.parquet
+  sha256: a440c8b254408d43b810059921c1d72c15612c8d9921fbec60a87b331adc2499
+variables_loaded:
+- role: outcome
+  name: services_productivity_growth_2019_2024
+  source: oecd_pdb:GVAHRS_GY_L averaged over G,H,J,M_N
+- role: treatment
+  name: services_competition_index
+  source: inverted z-score of OECD PMR PROFSERV, BARRIER_ENTRY, NETWORK_SECTORS
+- role: horse_race_proxy
+  name: state_involvement_z
+  source: oecd_pmr:STATE_INVOL
+- role: controls
+  name: log_gdp_pc_2018, manufacturing_share_2018
+  source: world_bank_wdi
+missing_or_proxied_series:
+- role: exact_treatment
+  name: manufacturing_industrial_policy_spending
+  source: constructed state-aid/subsidy/directed-credit series not local
+- role: exact_treatment
+  name: services-sector churn
+  source: firm entry/exit microdata not local
+deviations:
+- PMR coverage is limited to 2018 and 2023, so the test is a short-window proxy rather
+  than a 1990-2020 panel.
+- Services productivity uses PDB GVA per hour for retail/transport/information/professional
+  activities as the local STAN-equivalent proxy.

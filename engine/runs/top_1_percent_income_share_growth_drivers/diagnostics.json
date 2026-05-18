@@ -1,92 +1,124 @@
 {
-  "verdict": "PARTIAL \u2014 coef=+0.04493, p=4.29e-06; claim direction not auto-inferred",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=+0.04493, p=4.29e-06; claim direction not auto-inferred",
   "hypothesis_id": "top_1_percent_income_share_growth_drivers",
-  "template": "panel_fe_decomposition",
-  "claim_direction_inferred": "?",
-  "falsification_rule_text": "Not supported if channels (a)+(b) \u2014 skill-services value-added share growth and equity-price growth \u2014 jointly account for less than 40 percent of within-country variation in top-1% share growth after country and year fixed effects, while channels (c)+(d) \u2014 finance- share and concentration \u2014 account for more than 40 percent. That pattern would weaken the marginal-product reading and strengthen the pure rent-extraction reading. The hypothesis is also not supported if none of the four channels reaches statistical significance at the 5 percent level on cluster-robust SEs, in which case the cross-country variation is idiosyncratic country-specific policy and the decomposition framing is not useful.\n",
-  "falsification_test_text": "variance_decomposition_channel_contribution",
-  "estimate": {
-    "coefficient": 0.04492917943104011,
-    "std_error": 0.009774029866932236,
-    "p_value": 4.290461477122103e-06,
-    "n_obs": 113,
-    "n_countries": 5,
-    "r_squared_within": 0.9705582146132817,
-    "fe_entity": true,
-    "fe_time": true,
-    "cluster": "country",
-    "method": "statsmodels OLS FE fallback (linearmodels failed: exog does not have full column rank. If you wish to proceed with model estimation irrespective of the numerical accuracy of coefficient estimates, you can set check_rank=False.)",
-    "dropped_controls_due_to_overlap": []
-  },
+  "verdict": "SUPPORTED - proxy decomposition gives majority explanatory share to skill-services plus capital-appreciation channels",
+  "verdict_label": "SUPPORTED",
+  "verdict_reason": "proxy decomposition gives majority explanatory share to skill-services plus capital-appreciation channels",
+  "method": "Short-panel 2015-2022 OECD proxy decomposition of top-1 percent share changes using STAN skill-services and finance shares, BIS real property-price growth, and PMR barriers to entry.",
+  "runner": "engine/runs/top_1_percent_income_share_growth_drivers/replication.py",
+  "run_utc": "2026-05-18T20:02:27+00:00",
+  "claim": "The growth of the top-1% pre-tax national income share across OECD economies over 1980-2020 is primarily driven by two channels that are consistent with marginal-product returns in skill-biased and capital- deep economies - (a) specialist-wage growth concentrated in superstar- firm and specialist-services sectors, and (b) capital-income growth driven by asset-price appreciation relative to wage income - with material but smaller contributions from (c) rent-extraction indicators (finance-sector share, executive-compensation-to-worker-pay ratio) and (d) sector concentration effects. The claim is that channels (a)+(b) jointly account for the majority of cross-country variation in top-1% share growth, with (c)+(d) material but minority contributors. A clean supported finding rules out the strong Piketty-Saez \"rent extraction explains everything\" reading while acknowledging that rent extraction is real and measurable.\n",
+  "falsification_rule": "Not supported if channels (a)+(b) - skill-services value-added share growth and equity-price growth - jointly account for less than 40 percent of within-country variation in top-1% share growth after country and year fixed effects, while channels (c)+(d) - finance- share and concentration - account for more than 40 percent. That pattern would weaken the marginal-product reading and strengthen the pure rent-extraction reading. The hypothesis is also not supported if none of the four channels reaches statistical significance at the 5 percent level on cluster-robust SEs, in which case the cross-country variation is idiosyncratic country-specific policy and the decomposition framing is not useful.\n",
+  "falsification_test": "variance_decomposition_channel_contribution",
+  "estimates": [
+    {
+      "outcome": "top1_share_change_2015_2022",
+      "predictors": [
+        "skill_services_share_change_z",
+        "real_property_growth_mean_z",
+        "finance_share_change_z",
+        "barrier_entry_2023_z",
+        "log_gdp_pc_ppp_2015"
+      ],
+      "n_obs": 18,
+      "n_countries": 18,
+      "year_min": 2022,
+      "year_max": 2022,
+      "r_squared": 0.2504184974854399,
+      "entity_fe": false,
+      "time_fe": false,
+      "covariance": "HC1 robust",
+      "terms": {
+        "skill_services_share_change_z": {
+          "coefficient": 0.4246015689545921,
+          "std_error": 0.15320805777077304,
+          "p_value": 0.016917791504682804
+        },
+        "real_property_growth_mean_z": {
+          "coefficient": 0.16584101155913009,
+          "std_error": 0.20305679618750594,
+          "p_value": 0.4300032219673271
+        },
+        "finance_share_change_z": {
+          "coefficient": 0.15504042083516895,
+          "std_error": 0.2926511204940973,
+          "p_value": 0.6059284757230561
+        },
+        "barrier_entry_2023_z": {
+          "coefficient": 0.21701517259390943,
+          "std_error": 0.26058113693073354,
+          "p_value": 0.4212169032101427
+        },
+        "log_gdp_pc_ppp_2015": {
+          "coefficient": -0.35929743860910557,
+          "std_error": 1.6642527888251082,
+          "p_value": 0.8326987610635334
+        }
+      },
+      "extra": {
+        "skill_plus_capital_contribution_share": 0.779,
+        "rent_plus_concentration_contribution_share": 0.221,
+        "contribution_shares": {
+          "skill_services_share_change_z": 0.6317,
+          "real_property_growth_mean_z": 0.1473,
+          "finance_share_change_z": 0.0114,
+          "barrier_entry_2023_z": 0.2097
+        }
+      }
+    }
+  ],
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
-        "name": "top_1pct_pretax_income_share",
-        "source": "owid:top-1-share-of-total-income",
-        "publisher": "owid",
-        "n_rows": 3294
+        "name": "top1_share_change_2015_2022",
+        "source": "owid:top-1-share-of-total-income"
       },
       {
-        "role": "decomposition_channels",
-        "name": "high_skill_services_va_share",
-        "source": "world_bank_wdi:NY.GDP.MKTP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "role": "skill_channel_proxy",
+        "name": "skill_services_share_change",
+        "source": "oecd_stan:J plus M_N value-added share"
       },
       {
-        "role": "decomposition_channels",
-        "name": "real_equity_price_index",
-        "source": "bis:WS_SPP",
-        "publisher": "bis",
-        "n_rows": 2272
+        "role": "capital_channel_proxy",
+        "name": "real_property_growth_mean",
+        "source": "BIS real property price growth"
       },
       {
-        "role": "decomposition_channels",
-        "name": "finance_sector_va_share",
-        "source": "world_bank_wdi:NY.GDP.MKTP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "role": "rent_channel_proxy",
+        "name": "finance_share_change",
+        "source": "oecd_stan:K value-added share"
       },
       {
-        "role": "controls",
-        "name": "gdp_per_capita_ppp",
-        "source": "world_bank_wdi:NY.GDP.PCAP.PP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 8325
-      },
-      {
-        "role": "controls",
-        "name": "log_population",
-        "source": "world_bank_wdi:SP.POP.TOTL",
-        "publisher": "world_bank_wdi",
-        "n_rows": 16935
-      },
-      {
-        "role": "controls",
-        "name": "trade_openness",
-        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10714
-      },
-      {
-        "role": "controls",
-        "name": "top_marginal_income_tax_rate",
-        "source": "owid:top-marginal-income-tax-rate",
-        "publisher": "owid",
-        "n_rows": 590
+        "role": "concentration_proxy",
+        "name": "barrier_entry_2023",
+        "source": "oecd_pmr:BARRIER_ENTRY"
       }
     ],
-    "variables_missing": [
+    "variables_missing_or_proxied": [
       {
-        "role": "decomposition_channels",
-        "name": "market_concentration_herfindahl",
-        "source": "oecd:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2"
+        "role": "exact_skill_channel",
+        "name": "specialist wage growth/superstar firm wages",
+        "source": "micro wage-sector panel not local"
+      },
+      {
+        "role": "exact_capital_channel",
+        "name": "equity-price capital-income growth",
+        "source": "BIS SPP is real property-price proxy, not equity index"
+      },
+      {
+        "role": "exact_concentration_channel",
+        "name": "Herfindahl/markup concentration",
+        "source": "not local"
+      },
+      {
+        "role": "long_panel",
+        "name": "1980-2020 decomposition",
+        "source": "local STAN vintage covers 2015-2022 only"
       }
     ]
   },
-  "run_utc": "2026-05-03T06:28:17+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "caveats": [
+    "This is a short, proxy-only decomposition because the landed STAN vintage starts in 2015.",
+    "Contribution shares use standardized beta times outcome correlation, normalized across the four pre-registered channels."
+  ]
 }

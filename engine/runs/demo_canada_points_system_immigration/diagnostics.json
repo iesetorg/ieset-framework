@@ -1,55 +1,66 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 treatment 'points_system_indicator' has no within-country variation under country fixed effects",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "treatment 'points_system_indicator' has no within-country variation under country fixed effects",
+  "verdict": "WEAKENED - local tertiary-employment bridge premium +0.15pp is below the +5pp refutation screen; direct DIOC attainment share and identified points coefficient are missing",
+  "verdict_label": "WEAKENED",
+  "verdict_reason": "local tertiary-employment bridge premium +0.15pp is below the +5pp refutation screen; direct DIOC attainment share and identified points coefficient are missing",
   "hypothesis_id": "demo_canada_points_system_immigration",
-  "template": "panel_fe",
-  "claim_direction_inferred": "+",
+  "template": "static_reform_worker_a_exact",
   "falsification_rule_text": "SUPPORTED if Canada's foreign-born tertiary-attainment share exceeds the OECD destination median (excl AUS, NZL) by at least 10 pp on average 2000-2023, AND points-system country fixed-effect coefficient on foreign-born tertiary share is positive and significant at p<0.05. REFUTED if Canadian premium is < 5 pp or coefficient is insignificant.",
   "falsification_test_text": "panel_fe_canada_points_system_skill_premium",
   "estimate": {
-    "error": "treatment 'points_system_indicator' has no within-country variation under country fixed effects"
+    "shape": "canada_points_static_bridge",
+    "tertiary_employment_bridge": {
+      "years": [
+        2019,
+        2023
+      ],
+      "n_years": 5,
+      "canada_mean": 79.74324646,
+      "median_ex_can_aus_nzl_mean": 79.589550018,
+      "premium_pp_mean": 0.15369644200000038,
+      "support_gate_pp": 10.0,
+      "refutation_screen_pp": 5.0
+    },
+    "gdp_pc_growth_context": {
+      "years": [
+        2000,
+        2023
+      ],
+      "n_years": 24,
+      "canada_mean_growth": 0.9190660377306642,
+      "median_ex_can_aus_nzl_mean_growth": 1.0709694627603554,
+      "gap_pp_mean": -0.15190342502969126
+    }
   },
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
-        "name": "foreign_born_tertiary_share",
+        "name": "foreign_born_tertiary_employment_rate_bridge",
         "source": "oecd:OECD.ELS.IMD,DSD_MIG@DF_MIG_EMP_EDU,1.0",
         "publisher": "oecd",
-        "n_rows": 359
+        "n_rows": 2702,
+        "vintage_file": "data/vintages/oecd/OECD.ELS.IMD_DSD_MIG_DF_MIG_EMP_EDU_1.0@2026-05-12T120747Z.parquet",
+        "sha256": "96b522cb77e78684c050d96efb7412489773b735243d6ada537e757817c25536"
       },
       {
-        "role": "outcome",
+        "role": "secondary_outcome",
         "name": "real_gdp_per_capita_growth",
         "source": "world_bank_wdi:NY.GDP.PCAP.KD.ZG",
         "publisher": "world_bank_wdi",
-        "n_rows": 13897
-      },
-      {
-        "role": "treatment",
-        "name": "points_system_indicator",
-        "source": "constructed: indicator = 1 for CAN; CAN = points-system reference; comparators = 0 unless they introduced equivalent points systems.",
-        "publisher": "constructed",
-        "n_rows": 442
-      },
-      {
-        "role": "controls",
-        "name": "gdp_per_capita_ppp",
-        "source": "world_bank_wdi:NY.GDP.PCAP.PP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 8325
-      },
-      {
-        "role": "controls",
-        "name": "total_migrant_share",
-        "source": "un_desa:international_migrant_stock",
-        "publisher": "un_desa",
-        "n_rows": 16
+        "n_rows": 14133,
+        "vintage_file": "data/vintages/world_bank_wdi/NY.GDP.PCAP.KD.ZG@2026-05-05T194650Z.parquet",
+        "sha256": "3bd65e60a77a1ad1cddeb9847cc579508c7e0f1c5e920c507b6953478f9604cf"
       }
     ],
-    "variables_missing": []
+    "variables_missing": [
+      "direct OECD DIOC foreign-born tertiary-attainment share by destination and year",
+      "identified points-system coefficient or owner-approved year-FE/cross-sectional replacement design"
+    ]
   },
-  "run_utc": "2026-05-17T18:00:15+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "limitations": [
+    "The local OECD IMD file measures employment rates by education and birthplace, not the foreign-born tertiary-attainment share requested by the claim.",
+    "The points-system treatment is static by country, so a country-FE coefficient is not identified without a recoded event or cross-sectional design."
+  ],
+  "run_utc": "2026-05-18T20:02:08+00:00",
+  "runner": "engine/runs/demo_canada_points_system_immigration/replication.py"
 }

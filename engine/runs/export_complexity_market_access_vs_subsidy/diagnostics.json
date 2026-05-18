@@ -1,84 +1,130 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 no decomposition channel loaded; missing: ['world_bank_wits:high_tech_exports', 'un_comtrade:unique_hs6_products']",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "no decomposition channel loaded; missing: ['world_bank_wits:high_tech_exports', 'un_comtrade:unique_hs6_products']",
+  "verdict": "PARTIAL - proxy screen: market access predicts higher WDI high-tech export share, but broad diversification does not confirm",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "proxy screen: market access predicts higher WDI high-tech export share, but broad diversification does not confirm",
   "hypothesis_id": "export_complexity_market_access_vs_subsidy",
-  "template": "panel_fe_decomposition",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "SUPPORTED if \u03b21 (market access) is positive and significant at p<0.05 while \u03b22 (subsidy) is insignificant or negative, AND |\u03b21| > |\u03b22|. PARTIAL if both are positive and significant but \u03b21 > \u03b22. REFUTED if \u03b21 is negative and significant or if \u03b22 is positive and significantly larger than \u03b21. INFORMATIVE: excluding China should not flip the sign of \u03b21; if it does, the result is a China-driven artefact.\n",
-  "falsification_test_text": "panel_fe_decomposition_eci_market_access_vs_subsidy",
-  "estimate": {
-    "error": "no decomposition channel loaded; missing: ['world_bank_wits:high_tech_exports', 'un_comtrade:unique_hs6_products']"
+  "template": "proxy_panel_fe_decomposition",
+  "runner": "engine/runs/export_complexity_market_access_vs_subsidy/replication.py",
+  "run_utc": "2026-05-18T20:02:10+00:00",
+  "proxy_scope": {
+    "market_access_index": "mean z-score of WDI trade openness, inverse OECD PMR trade barriers, and Fraser trade freedom",
+    "subsidy_state_burden_index": "mean z-score of WDI government consumption and inverse Fraser size-of-government score",
+    "outcomes": [
+      "WDI high-tech exports share",
+      "derived export diversification index"
+    ],
+    "primary_unavailable_inputs": [
+      "constructed: Atlas of Economic Complexity (Harvard CID)",
+      "direct subsidy industrial-policy intensity panel",
+      "direct tariff-faced-abroad market-access panel"
+    ]
+  },
+  "models": {
+    "high_tech_market_access": {
+      "coefficient": 4.587250139130536,
+      "std_error": 2.1111645200564344,
+      "p_value": 0.03029024576279271,
+      "n_obs": 531,
+      "n_countries": 44,
+      "r_squared_within": -0.03387842071159164,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    },
+    "high_tech_subsidy_burden": {
+      "coefficient": 0.41874933346233795,
+      "std_error": 1.8228470723493848,
+      "p_value": 0.8184072024276592,
+      "n_obs": 531,
+      "n_countries": 44,
+      "r_squared_within": -0.03387842071159164,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    },
+    "diversification_market_access": {
+      "coefficient": -0.0170169999845486,
+      "std_error": 0.01817579193413971,
+      "p_value": 0.3493478284571834,
+      "n_obs": 1203,
+      "n_countries": 44,
+      "r_squared_within": -0.11232896198282138,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    },
+    "diversification_subsidy_burden": {
+      "coefficient": 0.008941383796964292,
+      "std_error": 0.02076637804596803,
+      "p_value": 0.6668633788554432,
+      "n_obs": 1203,
+      "n_countries": 44,
+      "r_squared_within": -0.11232896198282138,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    }
+  },
+  "sample": {
+    "rows_any": 1395,
+    "countries_any": 45,
+    "year_min": 1990,
+    "year_max": 2020
   },
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
-        "name": "export_diversification_theil",
-        "source": "un_comtrade:export_product_concentration",
-        "publisher": "wits",
-        "n_rows": 4669
-      },
-      {
-        "role": "controls",
-        "name": "log_gdp_per_capita",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
+        "name": "high_tech_export_share",
+        "source": "world_bank_wdi:TX.VAL.TECH.MF.ZS",
         "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "n_rows": 574
       },
       {
-        "role": "controls",
-        "name": "human_capital_index",
-        "source": "pwt:hc",
-        "publisher": "pwt",
-        "n_rows": 8637
+        "role": "outcome",
+        "name": "export_diversification_index",
+        "source": "derived:export_diversification_index",
+        "publisher": "derived",
+        "n_rows": 1254
       },
       {
-        "role": "controls",
-        "name": "fdi_inflows_pct_gdp",
-        "source": "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 11580
+        "role": "treatment",
+        "name": "market_access_index",
+        "source": "constructed from WDI/OECD PMR/Fraser",
+        "publisher": "derived",
+        "n_rows": 1369
+      },
+      {
+        "role": "treatment",
+        "name": "subsidy_state_burden_index",
+        "source": "constructed from WDI/Fraser",
+        "publisher": "derived",
+        "n_rows": 1368
       }
     ],
     "variables_missing": [
       {
-        "role": "outcome",
-        "name": "economic_complexity_index",
         "source": "constructed: Atlas of Economic Complexity (Harvard CID)"
       },
       {
-        "role": "treatment",
-        "name": "market_access_and_competition_index",
-        "source": "constructed: composite of foreign market access (tariff faced abroad, FTA depth) and domestic entry barriers (OECD PMR, WBG Doing Business)"
+        "source": "direct subsidy industrial-policy intensity panel"
       },
       {
-        "role": "treatment",
-        "name": "subsidy_industrial_policy_index",
-        "source": "constructed: state aid / GDP, directed credit, and sectoral subsidy intensity (CRDF/ITC + Fraser EFW Area 4)"
-      },
-      {
-        "role": "decomposition_channels",
-        "name": "high_tech_export_share",
-        "source": "world_bank_wits:high_tech_exports"
-      },
-      {
-        "role": "decomposition_channels",
-        "name": "number_of_export_products",
-        "source": "un_comtrade:unique_hs6_products"
-      },
-      {
-        "role": "controls",
-        "name": "initial_eci",
-        "source": "constructed: Atlas of Economic Complexity"
-      },
-      {
-        "role": "controls",
-        "name": "exchange_rate_volatility",
-        "source": "imf_weo:exchange_rate_volatility"
+        "source": "direct tariff-faced-abroad market-access panel"
       }
     ]
   },
-  "run_utc": "2026-05-17T20:42:39+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "limitations": [
+    "Proxy screen uses WDI high-tech export share and derived/WITS diversification, not Harvard ECI.",
+    "Subsidy/state-burden proxy uses government consumption and Fraser size-of-government; it is not direct sectoral subsidy spending.",
+    "Do not scoreboard-map this as a final ECI/subsidy causal result without the missing primary data."
+  ]
 }

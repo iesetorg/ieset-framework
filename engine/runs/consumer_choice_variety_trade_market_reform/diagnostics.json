@@ -1,71 +1,107 @@
 {
-  "verdict": "INCONCLUSIVE_DATA_PENDING \u2014 treatment 'competition_reform_episode' has no within-country variation under country fixed effects",
-  "verdict_label": "INCONCLUSIVE_DATA_PENDING",
-  "verdict_reason": "treatment 'competition_reform_episode' has no within-country variation under country fixed effects",
+  "verdict": "REFUTED - proxy screen: PWT consumption coefficient is negative and significant; WITS product-variety proxy is not positive/significant",
+  "verdict_label": "REFUTED",
+  "verdict_reason": "proxy screen: PWT consumption coefficient is negative and significant; WITS product-variety proxy is not positive/significant",
   "hypothesis_id": "consumer_choice_variety_trade_market_reform",
-  "template": "panel_fe",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "The hypothesis is falsified if the post-reform coefficient on trade/competition episodes is negative and significant (p < 0.10) for variety or welfare, or if industrial-policy episodes show a significantly larger positive coefficient than trade/competition episodes in a head-to-head panel specification.",
-  "falsification_test_text": "panel_fe_consumer_variety_reform_episodes_1980_2020",
-  "estimate": {
-    "error": "treatment 'competition_reform_episode' has no within-country variation under country fixed effects"
+  "template": "proxy_panel_fe",
+  "runner": "engine/runs/consumer_choice_variety_trade_market_reform/replication.py",
+  "run_utc": "2026-05-18T20:02:07+00:00",
+  "proxy_scope": {
+    "primary_unavailable_inputs": [
+      "constructed:wacziarg_welch_trade_liberalisation_dates",
+      "constructed:state_ownership_share_and_sectoral_targeting",
+      "final-goods SKU availability indices"
+    ],
+    "treatment_proxy": "z-scored WDI trade openness",
+    "welfare_proxy": "log PWT rconna",
+    "variety_proxy": "log WITS number_of_products in export HHI workbook"
+  },
+  "models": {
+    "consumption": {
+      "coefficient": -0.1431393692984522,
+      "std_error": 0.037589269048757375,
+      "p_value": 0.00014705882682042315,
+      "n_obs": 1302,
+      "n_countries": 38,
+      "r_squared_within": 0.8205950843093693,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    },
+    "variety": {
+      "coefficient": -0.0038625497293439323,
+      "std_error": 0.027252002110173087,
+      "p_value": 0.8873178804521762,
+      "n_obs": 1086,
+      "n_countries": 38,
+      "r_squared_within": -0.009273425158386805,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    },
+    "concentration": {
+      "coefficient": 0.005928807722031721,
+      "std_error": 0.006432869274073343,
+      "p_value": 0.3569343613406839,
+      "n_obs": 1086,
+      "n_countries": 38,
+      "r_squared_within": 0.03475700289812278,
+      "fe_entity": true,
+      "fe_time": true,
+      "cluster": "country",
+      "method": "linearmodels.PanelOLS",
+      "dropped_controls_due_to_overlap": []
+    }
+  },
+  "sample": {
+    "rows_any": 1558,
+    "countries_any": 38,
+    "year_min": 1980,
+    "year_max": 2020
   },
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
-        "name": "real_quality_adjusted_consumption",
+        "name": "log_real_consumption",
         "source": "pwt:rconna",
         "publisher": "pwt",
-        "n_rows": 10399
+        "n_rows": 1520
+      },
+      {
+        "role": "outcome",
+        "name": "import_product_variety_proxy",
+        "source": "wits:export_product_hhi_wits",
+        "publisher": "wits",
+        "n_rows": 1130
       },
       {
         "role": "treatment",
-        "name": "competition_reform_episode",
-        "source": "oecd_pmr:overall_pmr",
-        "publisher": "oecd_pmr",
-        "n_rows": 105
-      },
-      {
-        "role": "controls",
-        "name": "log_gdp_per_capita",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
-      },
-      {
-        "role": "controls",
-        "name": "trade_openness",
+        "name": "trade_openness_z",
         "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
         "publisher": "world_bank_wdi",
-        "n_rows": 10714
-      },
-      {
-        "role": "controls",
-        "name": "services_share_gdp",
-        "source": "world_bank_wdi:NV.SRV.TOTL.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10330
+        "n_rows": 1551
       }
     ],
     "variables_missing": [
       {
-        "role": "outcome",
-        "name": "import_product_variety_count",
-        "source": "un_comtrade:product_lines; world_bank_wits:product_concentration"
-      },
-      {
-        "role": "treatment",
-        "name": "trade_liberalisation_episode",
         "source": "constructed:wacziarg_welch_trade_liberalisation_dates"
       },
       {
-        "role": "treatment",
-        "name": "industrial_policy_intensity",
         "source": "constructed:state_ownership_share_and_sectoral_targeting"
+      },
+      {
+        "source": "final-goods SKU availability indices"
       }
     ]
   },
-  "run_utc": "2026-05-17T20:42:43+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "limitations": [
+    "Proxy screen uses continuous trade openness, not preregistered reform episodes.",
+    "WITS product counts are broad export-product counts, not domestic final-goods SKU availability.",
+    "Do not scoreboard-map this as a causal episode verdict without the missing episode/SKU data."
+  ]
 }

@@ -1,100 +1,98 @@
 {
-  "verdict": "PARTIAL \u2014 coef=-0.000261, p=0.12 (above \u03b1=0.10); direction inconclusive",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=-0.000261, p=0.12 (above \u03b1=0.10); direction inconclusive",
   "hypothesis_id": "sectoral_competition_services_productivity",
-  "template": "panel_fe",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "Not supported if (a) the services-competition coefficient is not positive and significant at p<0.05 on productivity growth, OR (b) in the horse-race the manufacturing-industrial-policy coefficient has a larger absolute t-statistic than services competition, OR (c) the top-tercile vs bottom-tercile productivity growth gap is below 0.15 pp/year. A manufacturing-first / industrial-policy reading wins cleanly if manufacturing policy outperforms services competition in the horse-race.\n",
-  "falsification_test_text": "panel_fe_horserace_services_competition_vs_manufacturing_policy",
-  "estimate": {
-    "coefficient": -0.00026099420887591804,
-    "std_error": 0.00016754304287889694,
-    "p_value": 0.11976185488900448,
-    "n_obs": 727,
-    "n_countries": 33,
-    "r_squared_within": 0.05949756733761613,
-    "fe_entity": true,
-    "fe_time": true,
-    "cluster": "country",
-    "method": "linearmodels.PanelOLS",
-    "dropped_controls_due_to_overlap": []
-  },
+  "verdict": "PARTIAL - proxy horse-race does not clear the registered positive/significant services-productivity gate",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "proxy horse-race does not clear the registered positive/significant services-productivity gate",
+  "method": "Cross-sectional OECD 2023 PMR services-competition proxy against 2019-2024 PDB services labour-productivity growth; HC1 robust OLS with initial income and manufacturing-share controls.",
+  "runner": "engine/runs/sectoral_competition_services_productivity/replication.py",
+  "run_utc": "2026-05-18T20:02:21+00:00",
+  "claim": "Among high-income economies 1990-2020, services-sector competition - measured by low barriers to entry, low incumbent-protection scores, and high churn in retail, transport, communications, and professional services - predicts long-run prosperity (real GDP per capita growth and labour-productivity growth) better than manufacturing-specific industrial policy spending. The pre- registered claim is that, in a horse-race regression, the coefficient on services-sector competition is larger in absolute t-statistic than the coefficient on manufacturing industrial- policy spending, and that countries in the top tercile of services competition show at least 0.3 percentage points higher annual labour-productivity growth than countries in the bottom tercile.\n",
+  "falsification_rule": "Not supported if (a) the services-competition coefficient is not positive and significant at p<0.05 on productivity growth, OR (b) in the horse-race the manufacturing-industrial-policy coefficient has a larger absolute t-statistic than services competition, OR (c) the top-tercile vs bottom-tercile productivity growth gap is below 0.15 pp/year. A manufacturing-first / industrial-policy reading wins cleanly if manufacturing policy outperforms services competition in the horse-race.\n",
+  "falsification_test": "panel_fe_horserace_services_competition_vs_manufacturing_policy",
+  "estimates": [
+    {
+      "outcome": "services_productivity_growth_2019_2024",
+      "predictors": [
+        "services_competition_index",
+        "state_involvement_z",
+        "log_gdp_pc_2018",
+        "manufacturing_share_2018"
+      ],
+      "n_obs": 30,
+      "n_countries": 30,
+      "year_min": 2023,
+      "year_max": 2023,
+      "r_squared": 0.09032489441856117,
+      "entity_fe": false,
+      "time_fe": false,
+      "covariance": "HC1 robust",
+      "terms": {
+        "services_competition_index": {
+          "coefficient": -0.11815780276204987,
+          "std_error": 0.2087678515575183,
+          "p_value": 0.5764549719051778
+        },
+        "state_involvement_z": {
+          "coefficient": 0.14176962711608238,
+          "std_error": 0.24051930295156135,
+          "p_value": 0.560861437944903
+        },
+        "log_gdp_pc_2018": {
+          "coefficient": -0.13177504917592722,
+          "std_error": 0.2900128424562941,
+          "p_value": 0.6534784192793116
+        },
+        "manufacturing_share_2018": {
+          "coefficient": -0.008109444304438867,
+          "std_error": 0.026371775375824837,
+          "p_value": 0.7610064174843907
+        }
+      },
+      "extra": {
+        "top_minus_bottom_services_competition_gap_pp_per_year": -0.9509,
+        "top_tercile_mean": 1.2219,
+        "bottom_tercile_mean": 2.1728
+      }
+    }
+  ],
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
-        "name": "labour_productivity_growth",
-        "source": "pwt:rgdpo_per_emp",
-        "publisher": "pwt",
-        "n_rows": 9529
-      },
-      {
-        "role": "outcome",
-        "name": "real_gdp_per_capita_growth",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD.ZG",
-        "publisher": "world_bank_wdi",
-        "n_rows": 13897
+        "name": "services_productivity_growth_2019_2024",
+        "source": "oecd_pdb:GVAHRS_GY_L averaged over G,H,J,M_N"
       },
       {
         "role": "treatment",
-        "name": "trade_openness",
-        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10714
+        "name": "services_competition_index",
+        "source": "inverted z-score of OECD PMR PROFSERV, BARRIER_ENTRY, NETWORK_SECTORS"
+      },
+      {
+        "role": "horse_race_proxy",
+        "name": "state_involvement_z",
+        "source": "oecd_pmr:STATE_INVOL"
       },
       {
         "role": "controls",
-        "name": "log_initial_gdp_pc",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
-      },
-      {
-        "role": "controls",
-        "name": "rd_spending_share_gdp",
-        "source": "world_bank_wdi:GB.XPD.RSDV.GD.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 3140
-      },
-      {
-        "role": "controls",
-        "name": "human_capital_index",
-        "source": "pwt:hc",
-        "publisher": "pwt",
-        "n_rows": 8637
-      },
-      {
-        "role": "controls",
-        "name": "manufacturing_share_gdp",
-        "source": "world_bank_wdi:NV.IND.MANF.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 9698
+        "name": "log_gdp_pc_2018, manufacturing_share_2018",
+        "source": "world_bank_wdi"
       }
     ],
-    "variables_missing": [
+    "variables_missing_or_proxied": [
       {
-        "role": "outcome",
-        "name": "services_sector_productivity_growth",
-        "source": "oecd_stan:va_per_hour_services"
-      },
-      {
-        "role": "treatment",
-        "name": "services_sector_competition_index",
-        "source": "oecd_pmr:pmr_services"
-      },
-      {
-        "role": "treatment",
+        "role": "exact_treatment",
         "name": "manufacturing_industrial_policy_spending",
-        "source": "constructed: state_aid_manufacturing + subsidies + directed_credit_manufacturing"
+        "source": "constructed state-aid/subsidy/directed-credit series not local"
       },
       {
-        "role": "controls",
-        "name": "product_market_regulation_overall",
-        "source": "oecd_pmr:pmr_composite"
+        "role": "exact_treatment",
+        "name": "services-sector churn",
+        "source": "firm entry/exit microdata not local"
       }
     ]
   },
-  "run_utc": "2026-05-03T06:14:08+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "caveats": [
+    "PMR coverage is limited to 2018 and 2023, so the test is a short-window proxy rather than a 1990-2020 panel.",
+    "Services productivity uses PDB GVA per hour for retail/transport/information/professional activities as the local STAN-equivalent proxy."
+  ]
 }

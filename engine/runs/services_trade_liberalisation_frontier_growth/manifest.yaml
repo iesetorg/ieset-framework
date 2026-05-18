@@ -1,0 +1,65 @@
+hypothesis_id: services_trade_liberalisation_frontier_growth
+status: INCONCLUSIVE_DATA_PENDING
+reason: local PMR trade-barrier proxy does not settle the STRI/services-TFP hypothesis
+method: 'Cross-sectional OECD proxy: decline in PMR barriers to trade/investment from
+  2018 to 2023 predicts 2019-2024 PDB services MFP growth, compared with state-involvement/tariff
+  goods-policy proxy.'
+runner: engine/runs/services_trade_liberalisation_frontier_growth/replication.py
+run_utc: '2026-05-18T20:02:25+00:00'
+vintages:
+- name: OECD Productivity Database
+  publisher: oecd
+  series_id: DSD_PDB
+  vintage_file: data/vintages/oecd/DSD_PDB@2026-05-12T133454Z.parquet
+  sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+- name: OECD PMR barriers to trade/investment
+  publisher: oecd_pmr
+  series_id: BARRIER_TRADE
+  vintage_file: data/vintages/oecd_pmr/BARRIER_TRADE@2026-05-02T220000Z.parquet
+  sha256: 4fff26f5b44c36be9fc14f877e674640283cb32dac71a1f0765b0b194960e54a
+- name: OECD PMR state involvement
+  publisher: oecd_pmr
+  series_id: STATE_INVOL
+  vintage_file: data/vintages/oecd_pmr/STATE_INVOL@2026-05-02T220000Z.parquet
+  sha256: 9be1b425a53bcff61fc539a2c7aae574c387c866e39093252f28f9d8bbb7adef
+- name: OECD PMR tariffs
+  publisher: oecd_pmr
+  series_id: TARIFFS
+  vintage_file: data/vintages/oecd_pmr/TARIFFS@2026-05-02T220000Z.parquet
+  sha256: e8a5cedf0f2d40a254a6d3cc196d8bd715561d8b718fc3c784a76a21961103b6
+- name: Penn World Table full panel
+  publisher: pwt
+  series_id: pwt_full
+  vintage_file: data/vintages/pwt/pwt_full@2026-05-05T195237Z.parquet
+  sha256: a125939373ac2662c8c9b5031bba3b62b3fc50d069fa140e81da551ebef3c844
+- name: WDI real GDP per capita
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-04-30T113730Z.parquet
+  sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+variables_loaded:
+- role: outcome_proxy
+  name: services_mfp_growth_2019_2024
+  source: oecd_pdb:MFPH_GY_LR averaged over G,H,J,M_N
+- role: treatment_proxy
+  name: services_trade_liberalisation_2018_2023
+  source: decline in oecd_pmr:BARRIER_TRADE
+- role: horse_race_proxy
+  name: goods_policy_intensity_z
+  source: oecd_pmr:STATE_INVOL and TARIFFS
+- role: controls
+  name: log_gdp_pc_2018, log_tfp_2018
+  source: WDI and PWT
+missing_or_proxied_series:
+- role: exact_treatment
+  name: OECD STRI overall/services-sector index
+  source: not local
+- role: exact_outcome
+  name: EU KLEMS/OECD STAN sectoral TFP for services
+  source: not local beyond PDB MFP proxy
+- role: exact_horse_race
+  name: goods-sector subsidy intensity
+  source: CRDF/ITC/WITS subsidy panel not local
+deviations:
+- PMR barriers to trade are a broad trade/investment-barrier proxy, not the OECD STRI.
+- Only the 2018-2023 PMR change is local, so this is a short-window screen.

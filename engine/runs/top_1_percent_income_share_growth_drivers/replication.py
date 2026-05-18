@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Replication wrapper for `top_1_percent_income_share_growth_drivers`.
-
-Re-runs the canonical `scripts/run_panel_fe.py` pipeline with `--force` so the run artifact can
-be reproduced without duplicating methodology code in this directory.
-"""
+"""Run the Worker D exact/proxy OECD productivity artifact."""
 from __future__ import annotations
 
 import sys
@@ -13,11 +9,8 @@ RUNS_ROOT = Path(__file__).resolve().parents[1]
 if str(RUNS_ROOT) not in sys.path:
     sys.path.insert(0, str(RUNS_ROOT))
 
-from _replication_runner import rerun
-
-HYPOTHESIS_ID = 'top_1_percent_income_share_growth_drivers'
-RUNNER = 'scripts/run_panel_fe.py'
+from oecd_productivity_worker_d_exact import main
 
 
 if __name__ == "__main__":
-    raise SystemExit(rerun(__file__, HYPOTHESIS_ID, RUNNER))
+    raise SystemExit(main([__file__, "top_1_percent_income_share_growth_drivers"]))

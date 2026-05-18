@@ -1,0 +1,35 @@
+hypothesis_id: working_time_regulation_productivity_per_hour
+status: SUPPORTED
+reason: hours reductions predict higher hourly productivity and lower output per worker
+method: 'OECD PDB country-year FE panel: GDP per hour and GDP per employed person
+  growth on reductions in average hours worked per employee, with country and year
+  fixed effects clustered by country.'
+runner: engine/runs/working_time_regulation_productivity_per_hour/replication.py
+run_utc: '2026-05-18T20:03:09+00:00'
+vintages:
+- name: OECD Productivity Database
+  publisher: oecd
+  series_id: DSD_PDB
+  vintage_file: data/vintages/oecd/DSD_PDB@2026-05-12T133454Z.parquet
+  sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+variables_loaded:
+- role: treatment_proxy
+  name: hours_reduction
+  source: negative of oecd_pdb:HRSAV_GY total economy
+- role: outcome
+  name: hourly_productivity_growth
+  source: oecd_pdb:GDPHRS_GY total economy
+- role: outcome
+  name: output_per_worker_growth
+  source: oecd_pdb:GDPEMP_GY total economy
+missing_or_proxied_series:
+- role: exact_treatment
+  name: statutory working-time limits
+  source: policy/legal panel not local
+- role: welfare_outcome
+  name: welfare effects
+  source: not tested by PDB productivity data
+deviations:
+- Average-hours reductions are an observed-outcome proxy for stricter working-time
+  regulation.
+- The result should not be read causally without statutory reform timing or instruments.

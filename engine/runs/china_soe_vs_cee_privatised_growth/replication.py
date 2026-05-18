@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Replicate this panel run from the preregistered hypothesis spec."""
-from pathlib import Path
+"""Exact aggregate-industry bridge for the China vs CEE ownership hypothesis."""
+from __future__ import annotations
+
 import sys
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "scripts"))
+RUNS_ROOT = Path(__file__).resolve().parents[1]
+if str(RUNS_ROOT) not in sys.path:
+    sys.path.insert(0, str(RUNS_ROOT))
 
-from run_panel_fe import run_one
+from static_reform_worker_a_exact import run_case
 
-if __name__ == '__main__':
-    print(run_one('china_soe_vs_cee_privatised_growth', force=True, persist_preflight_inconclusive=True))
+
+if __name__ == "__main__":
+    raise SystemExit(run_case("china_soe_vs_cee_privatised_growth"))

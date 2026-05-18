@@ -1,76 +1,169 @@
 {
-  "verdict": "PARTIAL \u2014 coef=-1.044e+12, p=0.29 (above \u03b1=0.10); direction inconclusive",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=-1.044e+12, p=0.29 (above \u03b1=0.10); direction inconclusive",
   "hypothesis_id": "green_transition_cost_trajectory_electricity_prices",
-  "template": "panel_fe",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "Not supported if (a) \u03b2_aggressive_green on log industrial electricity price is zero or negative at p<0.10 (should be positive: treatment raises prices), OR (b) the second-stage manufacturing VA effect is zero, OR (c) the pre-trend placebo detects spurious effects. Sensitivity drops 2020-2023 (war + COVID) \u2014 if the effect relies on those years, report honestly that the attribution is confounded by exogenous shocks rather than persistent policy-content effect.\n",
-  "falsification_test_text": "aggressive_green_transition_price_and_output_transmission",
-  "estimate": {
-    "coefficient": -1043852639733.1151,
-    "std_error": 987146788560.9691,
-    "p_value": 0.2903089112128281,
-    "n_obs": 226,
-    "n_countries": 12,
-    "r_squared_within": 0.9847182578923616,
-    "fe_entity": true,
-    "fe_time": true,
-    "cluster": "country",
-    "method": "statsmodels OLS FE fallback (linearmodels failed: 'aggressive_green_transition_dummy')",
-    "dropped_controls_due_to_overlap": []
+  "verdict": "PARTIAL - Eurostat industrial-price gap is clear, but WDI real manufacturing value added does not show the predicted 2019-2023 high-transition output underperformance.",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "Eurostat industrial-price gap is clear, but WDI real manufacturing value added does not show the predicted 2019-2023 high-transition output underperformance.",
+  "scope_note": "Exact local diagnostic only. It excludes USA/JPN/KOR and UK post-2020 because the local Eurostat price vintage does not cover those comparators over the full 2015-2023 window.",
+  "test_window": [
+    2015,
+    2023
+  ],
+  "price_band": "Eurostat NRG_PC_205 industrial electricity band MWH2000-19999, EUR/kWh incl. taxes",
+  "groups": {
+    "BE": "high_transition",
+    "DE": "high_transition",
+    "NL": "high_transition",
+    "ES": "measured_transition",
+    "FR": "measured_transition",
+    "IT": "measured_transition",
+    "NO": "measured_transition",
+    "SE": "measured_transition"
   },
-  "data_status": {
-    "variables_loaded": [
-      {
-        "role": "outcome",
-        "name": "log_manufacturing_value_added",
-        "source": "world_bank_wdi:NV.IND.MANF.CD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 9722
-      },
-      {
-        "role": "treatment",
-        "name": "aggressive_green_transition_dummy",
-        "source": "constructed: indicator = 1 for country-years with (a) legislated nuclear/coal phase-out AND (b) gas-indexed wholesale market AND (c) renewable-share target >30% by 2030. DEU (from 2011), GBR (from 2008 Climate Change Act binding), BEL, NLD qualify; FRA does not (retained nuclear); USA does not (grid more gas/renewables mix no firm phase-out); SWE/NOR do not (hydro baseload). Treatment date per country.",
-        "publisher": "constructed",
-        "n_rows": 228
-      },
-      {
-        "role": "controls",
-        "name": "log_population",
-        "source": "world_bank_wdi:SP.POP.TOTL",
-        "publisher": "world_bank_wdi",
-        "n_rows": 16935
-      },
-      {
-        "role": "controls",
-        "name": "trade_openness",
-        "source": "world_bank_wdi:NE.TRD.GNFS.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 10714
-      },
-      {
-        "role": "controls",
-        "name": "urbanisation",
-        "source": "world_bank_wdi:SP.URB.TOTL.IN.ZS",
-        "publisher": "world_bank_wdi",
-        "n_rows": 16965
-      }
-    ],
-    "variables_missing": [
-      {
-        "role": "outcome",
-        "name": "log_industrial_electricity_price",
-        "source": "constructed: IEA industrial electricity price series + Eurostat NRG_PC_205 (industrial electricity prices), USD/MWh constant 2020. Fetcher pending for IEA."
-      },
-      {
-        "role": "outcome",
-        "name": "energy_intensive_sector_output_share",
-        "source": "constructed: share of manufacturing value added from chemicals + metals + cement + paper (OECD STAN)"
-      }
-    ]
+  "metrics": {
+    "average_price_gap_pct_2015_2023": 28.730355857511736,
+    "price_gap_pct_2023": 49.363497218800134,
+    "price_level_log_coef_high_transition_year_fe": 0.26928200924973145,
+    "price_level_p_value_cluster_geo": 0.13852832700249657,
+    "post_2021_interaction_log_coef": 0.008384184265879863,
+    "post_2021_interaction_p_value_cluster_geo": 0.9514954184056652,
+    "manufacturing_va_pct_change_2019_2023_high_transition": 4.682151113479264,
+    "manufacturing_va_pct_change_2019_2023_measured_transition": 2.0660773005443245,
+    "manufacturing_va_gap_pp_high_minus_measured": 2.61607381293494
   },
-  "run_utc": "2026-05-03T06:10:24+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "criteria": {
+    "price_leg_supported": true,
+    "output_leg_supported": false
+  },
+  "annual_group_prices": [
+    {
+      "year": 2015,
+      "high_transition": 0.12881666666666666,
+      "measured_transition": 0.10517000000000001,
+      "price_gap_pct": 22.484231878545824
+    },
+    {
+      "year": 2016,
+      "high_transition": 0.12636666666666665,
+      "measured_transition": 0.10142,
+      "price_gap_pct": 24.59738381647274
+    },
+    {
+      "year": 2017,
+      "high_transition": 0.12255,
+      "measured_transition": 0.09778,
+      "price_gap_pct": 25.33237880957251
+    },
+    {
+      "year": 2018,
+      "high_transition": 0.12271666666666665,
+      "measured_transition": 0.1008,
+      "price_gap_pct": 21.74272486772486
+    },
+    {
+      "year": 2019,
+      "high_transition": 0.13326666666666667,
+      "measured_transition": 0.1066,
+      "price_gap_pct": 25.015634771732344
+    },
+    {
+      "year": 2020,
+      "high_transition": 0.14338333333333333,
+      "measured_transition": 0.09190000000000001,
+      "price_gap_pct": 56.021037359448655
+    },
+    {
+      "year": 2021,
+      "high_transition": 0.15701666666666667,
+      "measured_transition": 0.12323999999999999,
+      "price_gap_pct": 27.407227090771414
+    },
+    {
+      "year": 2022,
+      "high_transition": 0.22588333333333332,
+      "measured_transition": 0.21188,
+      "price_gap_pct": 6.6090869045371425
+    },
+    {
+      "year": 2023,
+      "high_transition": 0.2667333333333333,
+      "measured_transition": 0.17858000000000002,
+      "price_gap_pct": 49.363497218800134
+    }
+  ],
+  "manufacturing_endpoints": [
+    {
+      "geo_code": "BE",
+      "country_iso3": "BEL",
+      "transition_group": "high_transition",
+      "2019": 60747586216.2121,
+      "2023": 61289897368.8358,
+      "pct_change": 0.8927287261974781
+    },
+    {
+      "geo_code": "DE",
+      "country_iso3": "DEU",
+      "transition_group": "high_transition",
+      "2019": 739104871912.434,
+      "2023": 742630557182.96,
+      "pct_change": 0.4770209755759369
+    },
+    {
+      "geo_code": "ES",
+      "country_iso3": "ESP",
+      "transition_group": "measured_transition",
+      "2019": 143499885626.636,
+      "2023": 150457553336.369,
+      "pct_change": 4.8485527910703485
+    },
+    {
+      "geo_code": "FR",
+      "country_iso3": "FRA",
+      "transition_group": "measured_transition",
+      "2019": 268228939748.96,
+      "2023": 262651683086.535,
+      "pct_change": -2.079289679795493
+    },
+    {
+      "geo_code": "IT",
+      "country_iso3": "ITA",
+      "transition_group": "measured_transition",
+      "2019": 281671948544.617,
+      "2023": 286904206830.792,
+      "pct_change": 1.8575716585232493
+    },
+    {
+      "geo_code": "NL",
+      "country_iso3": "NLD",
+      "transition_group": "high_transition",
+      "2019": 91846859358.2205,
+      "2023": 103490013520.483,
+      "pct_change": 12.676703638664378
+    },
+    {
+      "geo_code": "NO",
+      "country_iso3": "NOR",
+      "transition_group": "measured_transition",
+      "2019": 26900113657.5174,
+      "2023": 27290358636.4884,
+      "pct_change": 1.450718699331377
+    },
+    {
+      "geo_code": "SE",
+      "country_iso3": "SWE",
+      "transition_group": "measured_transition",
+      "2019": 73942791528.8782,
+      "2023": 77087454992.9785,
+      "pct_change": 4.2528330335921405
+    }
+  ],
+  "vintages": {
+    "eurostat_nrg_pc_205": "data/vintages/eurostat/nrg_pc_205@2026-05-12T135519Z.parquet",
+    "wdi_real_manufacturing_va": "data/vintages/world_bank_wdi/NV.IND.MANF.KD@2026-04-30T140100Z.parquet"
+  },
+  "sha256": {
+    "eurostat_nrg_pc_205": "87ea4ed0922794d8944d4a3c764e7a715871e2a7133906d4775766a65fc94a74",
+    "wdi_real_manufacturing_va": "fc4f4fcf319edbb0fba84ee91ec3e7780b84328a72abd36330feda40dbfad0b9"
+  },
+  "run_utc": "2026-05-18T20:02:11+00:00",
+  "runner": "engine/runs/green_transition_cost_trajectory_electricity_prices/replication.py"
 }

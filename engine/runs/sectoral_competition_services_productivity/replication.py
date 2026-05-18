@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Replication wrapper for `sectoral_competition_services_productivity`.
-
-Delegates to the canonical IESET methodology runner recorded for this run.
-This preserves one source of estimation logic while making the run artifact
-directly reproducible from engine/runs/sectoral_competition_services_productivity/.
-"""
+"""Run the Worker D exact/proxy OECD productivity artifact."""
 from __future__ import annotations
 
 import sys
@@ -14,11 +9,8 @@ RUNS_ROOT = Path(__file__).resolve().parents[1]
 if str(RUNS_ROOT) not in sys.path:
     sys.path.insert(0, str(RUNS_ROOT))
 
-from _replication_runner import rerun
-
-HYPOTHESIS_ID = 'sectoral_competition_services_productivity'
-RUNNER = 'scripts/run_panel_fe.py'
+from oecd_productivity_worker_d_exact import main
 
 
 if __name__ == "__main__":
-    raise SystemExit(rerun(__file__, HYPOTHESIS_ID, RUNNER))
+    raise SystemExit(main([__file__, "sectoral_competition_services_productivity"]))

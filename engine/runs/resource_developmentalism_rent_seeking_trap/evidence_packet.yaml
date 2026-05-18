@@ -1,8 +1,8 @@
 packet_version: 1
-generated_utc: '2026-05-15T19:29:56+00:00'
+generated_utc: '2026-05-18T19:45:59+00:00'
 repository:
   root: .
-  git_commit: ba8b37eef0c54fdbe2f48c5b77ef147204f9d87f
+  git_commit: fdec4dff28b0e4c390f5bbeef13f9392fe2665a8
 hypothesis:
   id: resource_developmentalism_rent_seeking_trap
   legacy_id: null
@@ -16,10 +16,10 @@ hypothesis:
 
     '
 verdict:
-  raw: INCONCLUSIVE_DATA_PENDING
-  bucket: inconclusive
-  reason: 'no treatment variable loaded; missing: [''constructed:binary_coded_from_policy_description'']'
-  status: null
+  raw: PARTIAL
+  bucket: partial
+  reason: "coef=-0.008094, p=0.758 (above \u03B1=0.1); direction inconclusive"
+  status: PARTIAL
 preregistration:
   claim: 'Resource-funded developmentalist states produce early public-investment
     gains but weaker long-run economic diversification and lower TFP growth than market-open
@@ -50,35 +50,413 @@ preregistration:
   steelman: hypotheses/steelman/resource_developmentalism_rent_seeking_trap.md
 reproduction:
   run_dir: engine/runs/resource_developmentalism_rent_seeking_trap
-  runner: null
+  runner: scripts/run_panel_fe.py
   replication_script: engine/runs/resource_developmentalism_rent_seeking_trap/replication.py
   suggested_command: python engine/runs/resource_developmentalism_rent_seeking_trap/replication.py
 data:
-  inputs: []
-  missing_series: []
+  inputs:
+  - name: outcome_export_diversification_index
+    publisher: derived
+    series_id: export_diversification_index
+    vintage_file: data/vintages/derived/export_diversification_index@2026-05-16T085311Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: ae2e696985c7ed68dde27e0bddf77730ef495cc12749cfe23247b59b61689b04
+      computed_sha256: ae2e696985c7ed68dde27e0bddf77730ef495cc12749cfe23247b59b61689b04
+      status: match
+    source:
+      type: derived
+      url: derived://world_bank_wdi:TX.VAL.AGRI.ZS.UN+TX.VAL.FUEL.ZS.UN+TX.VAL.MANF.ZS.UN+TX.VAL.MMTL.ZS.UN
+      methodology_url: local://scripts/build_export_diversification_vintage.py
+      license: internal_derived_from_wdi_cc_by_4_0
+      fetch_utc: '2026-05-16T08:53:11.484886+00:00'
+      fetch_manifest: data/manifests/fetch_run_export_diversification_2026-05-16T085311Z.yaml
+    coverage:
+      start_date: '1962'
+      end_date: '2024'
+      frequency: annual
+      rows: 9623
+      units: 1 - broad merchandise export-share HHI; higher means more diversified
+      currency: null
+    extra:
+      recipe: clip WDI merchandise export shares to [0,100], divide by 100, renormalise
+        rows whose observed broad shares exceed 100%, add residual other share, then
+        compute HHI=sum(shares^2)
+      components:
+        agricultural_raw_materials: TX.VAL.AGRI.ZS.UN
+        fuel: TX.VAL.FUEL.ZS.UN
+        manufactures: TX.VAL.MANF.ZS.UN
+        ores_metals: TX.VAL.MMTL.ZS.UN
+      min_components: 3
+  - name: outcome_total_factor_productivity_growth
+    publisher: pwt
+    series_id: rtfpna
+    vintage_file: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      computed_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:42.884401+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: rtfpna
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: outcome_manufacturing_va_share
+    publisher: world_bank_wdi
+    series_id: NV.IND.MANF.ZS
+    vintage_file: data/vintages/world_bank_wdi/NV.IND.MANF.ZS@2026-05-05T194954Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: a440c8b254408d43b810059921c1d72c15612c8d9921fbec60a87b331adc2499
+      computed_sha256: a440c8b254408d43b810059921c1d72c15612c8d9921fbec60a87b331adc2499
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NV.IND.MANF.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NV.IND.MANF.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:49:54.909130+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Manufacturing, value added (% of GDP)
+      source_note: Manufacturing includes industries classified in ISIC (Rev. 3) major
+        division C and is defined as the physical or chemical tranformation of materials
+        or components into new products. Value added is the contribution to the economy
+        by a producer or an industry or an institutional sector, which is estimated
+        by the total value of output produced and deducting the total value of intermediate
+        consumption
+      countries_param: all
+      vintage_utc: null
+  - name: treatment_resource_developmentalism
+    publisher: movements
+    series_id: resource_developmentalism
+    vintage_file: data/vintages/movements/resource_developmentalism@2026-05-16T084233Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 1c0c493af87d02d54e6ae8fd90c4cd51f986007747b78dfd18780d6eacc5786c
+      computed_sha256: 1c0c493af87d02d54e6ae8fd90c4cd51f986007747b78dfd18780d6eacc5786c
+      status: match
+    source:
+      type: unknown
+      url: local://movements/*.yaml + world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      methodology_url: local://scripts/build_movement_vintages.py
+      license: internal_derived_from_curated_yaml
+      fetch_utc: '2026-05-16T08:42:33.419736+00:00'
+      fetch_manifest: data/manifests/fetch_run_movement_vintages_2026-05-16T084233Z.yaml
+    coverage:
+      start_date: '1800'
+      end_date: '2026'
+      frequency: annual
+      rows: 61744
+      units: positive developmentalism alignment in country-years with resource rents
+        >= 5% of GDP
+      currency: null
+    extra:
+      base_position_id: developmentalism
+      resource_rent_series: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      resource_rent_threshold_pct_gdp: 5.0
+  - name: treatment_resource_rents
+    publisher: world_bank_wdi
+    series_id: NY.GDP.TOTL.RT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.TOTL.RT.ZS@2026-04-30T115056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: db6778300a832f2f90f3855b5583293007ca9b5c7760e52904ba0da493b7ccd2
+      computed_sha256: db6778300a832f2f90f3855b5583293007ca9b5c7760e52904ba0da493b7ccd2
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.TOTL.RT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.TOTL.RT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:50:56.904189+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra: &id001
+      indicator_name: Total natural resources rents (% of GDP)
+      source_note: Total natural resources rents are the sum of oil rents, natural
+        gas rents, coal rents (hard and soft), mineral rents, and forest rents.
+      countries_param: all
+      vintage_utc: null
+  - name: controls_resource_rents
+    publisher: world_bank_wdi
+    series_id: NY.GDP.TOTL.RT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.TOTL.RT.ZS@2026-04-30T115056Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: db6778300a832f2f90f3855b5583293007ca9b5c7760e52904ba0da493b7ccd2
+      computed_sha256: db6778300a832f2f90f3855b5583293007ca9b5c7760e52904ba0da493b7ccd2
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.TOTL.RT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.TOTL.RT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:50:56.904189+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra: *id001
+  - name: controls_initial_gdp_per_capita
+    publisher: maddison
+    series_id: mpd2020
+    vintage_file: data/vintages/maddison/mpd2020@2026-05-05T195302Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 7a2a32680d1eff8be7e0a25c5cc4c6299fc932d4c799cafdffb8178fa0fd842c
+      computed_sha256: 7a2a32680d1eff8be7e0a25c5cc4c6299fc932d4c799cafdffb8178fa0fd842c
+      status: match
+    source:
+      type: official
+      url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
+      methodology_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/
+      license: "academic \u2014 GGDC Maddison Project; citation required (Bolt & van\
+        \ Zanden 2020)"
+      fetch_utc: '2026-05-05T19:53:02.465965+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1'
+      end_date: '2018'
+      frequency: annual
+      rows: 21682
+      units: real GDP per capita (2011 int'l $); population (000s)
+      currency: int_usd_2011
+    extra:
+      sheet_used: Full data
+      columns:
+      - country_iso3
+      - country
+      - year
+      - gdppc
+      - pop
+      vintage_utc: null
+  - name: controls_institutional_quality
+    publisher: wgi
+    series_id: RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      computed_sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-30T11:42:45.951028+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: null
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: sidecar_manual_subtype_coding
+    publisher: manual
+    series_id: resource_developmentalism_subtype_coding
+    vintage_file: data/manual/resource_developmentalism_subtype_coding_2026-05-16.csv
+    exists_locally: true
+    hash:
+      declared_sha256: 70473e24615b82a29697ffd6d5e4f877bd9a000eedb4ea2fd804695e2a0595e6
+      computed_sha256: 70473e24615b82a29697ffd6d5e4f877bd9a000eedb4ea2fd804695e2a0595e6
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: sidecar_annual_panel
+    publisher: derived
+    series_id: resource_developmentalism_subtype_annual_panel
+    vintage_file: engine/runs/resource_developmentalism_rent_seeking_trap/resource_developmentalism_subtype_annual_panel_2026-05-17.csv
+    exists_locally: true
+    hash:
+      declared_sha256: 09a7844c990b20a707779dfbec6a1dd40ee37302dce0271a4a885fd4b3264b2c
+      computed_sha256: 09a7844c990b20a707779dfbec6a1dd40ee37302dce0271a4a885fd4b3264b2c
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: sidecar_diagnostics
+    publisher: derived
+    series_id: resource_developmentalism_subtype_fallback_diagnostics
+    vintage_file: engine/runs/resource_developmentalism_rent_seeking_trap/subtype_fallback_diagnostics_2026-05-17.json
+    exists_locally: true
+    hash:
+      declared_sha256: 3bcc15fddba6cd845c1be652d37b72484d617725ed46d234550f1e25a6e6679b
+      computed_sha256: 3bcc15fddba6cd845c1be652d37b72484d617725ed46d234550f1e25a6e6679b
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  missing_series:
+  - country+year FE causal scoring is not estimable on the clean subtype-comparator
+    sample because treatment is between-country within eligible rows
+  - product-level or official country-year export HHI payloads are not present locally;
+    the WITS workbook is only a URL catalog
+  - current result_card remains a broad WDI proxy screen and should not be promoted
   data_quality:
-    grade: no_input_vintages_recorded
-    input_count: 0
-    official_source_count: 0
+    grade: incomplete
+    input_count: 11
+    official_source_count: 6
     manual_source_count: 0
-    hash_status_counts: {}
-    missing_series_count: 0
+    hash_status_counts:
+      match: 11
+    missing_series_count: 3
 artifacts:
 - path: hypotheses/growth/resource_developmentalism_rent_seeking_trap.yaml
-  sha256: e57e599183efc2d83977eb47ce870781fcbeb3bcc5a383624645f6d67a4e641d
-  bytes: 4375
+  sha256: c181f8c435b5d83480c2e5d286ea85a520377e2565cc9ef6b4f9831e4172a5d3
+  bytes: 4447
+- path: engine/runs/resource_developmentalism_rent_seeking_trap/manifest.yaml
+  sha256: b7eb0314b349f9a3ff45a91457439c9fee5109e17490049a33da18c91f6d666a
+  bytes: 4891
 - path: engine/runs/resource_developmentalism_rent_seeking_trap/diagnostics.json
-  sha256: 91d6022f4c83b09408ee8f3810f946438e4dfa0d5e7a40f4008a6de03bfd1790
-  bytes: 2557
+  sha256: 38d08eb99527cb61169bfd1a4e9aa2aa80a01405d52f5825f2535ccfd3ccebf5
+  bytes: 2857
 - path: engine/runs/resource_developmentalism_rent_seeking_trap/result_card.md
-  sha256: 71d9c24364914daf055ea07a58a705d02e31f8b5cbcc50304d36679c0033af4d
-  bytes: 1899
+  sha256: 9b785552b89dbe60b7aeb15966ce340ba925152fc92eab38797057d988be1413
+  bytes: 1946
 - path: engine/runs/resource_developmentalism_rent_seeking_trap/replication.py
   sha256: 7f77545d6c68d9874214d09ac5723081ea9926599d6726b7e6ec165ed87eb6ea
   bytes: 455
 - path: hypotheses/steelman/resource_developmentalism_rent_seeking_trap.md
   sha256: a2d3eeb89f16dfbc55e7880380e42d8bae8d721abdfd18451d1edf42d87b6a6d
   bytes: 2499
-references: []
+references:
+- kind: source
+  publisher: derived
+  series_id: export_diversification_index
+  url: derived://world_bank_wdi:TX.VAL.AGRI.ZS.UN+TX.VAL.FUEL.ZS.UN+TX.VAL.MANF.ZS.UN+TX.VAL.MMTL.ZS.UN
+- kind: methodology
+  publisher: derived
+  series_id: export_diversification_index
+  url: local://scripts/build_export_diversification_vintage.py
+- kind: source
+  publisher: pwt
+  series_id: rtfpna
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: rtfpna
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NV.IND.MANF.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NV.IND.MANF.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NV.IND.MANF.ZS
+  url: https://data.worldbank.org/indicator/NV.IND.MANF.ZS
+- kind: source
+  publisher: movements
+  series_id: resource_developmentalism
+  url: local://movements/*.yaml + world_bank_wdi:NY.GDP.TOTL.RT.ZS
+- kind: methodology
+  publisher: movements
+  series_id: resource_developmentalism
+  url: local://scripts/build_movement_vintages.py
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.TOTL.RT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.TOTL.RT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.TOTL.RT.ZS
+  url: https://data.worldbank.org/indicator/NY.GDP.TOTL.RT.ZS
+- kind: source
+  publisher: maddison
+  series_id: mpd2020
+  url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
+- kind: methodology
+  publisher: maddison
+  series_id: mpd2020
+  url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/
+- kind: source
+  publisher: wgi
+  series_id: RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: RL.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
 caveats:
-- Run manifest records no input vintages; provenance is limited to result artifacts.
+- Broad result card remains a proxy screen and should not be promoted as a clean subtype
+  causal estimate.
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.
+- Subtype sidecar shows clean country+year FE causal scoring remains blocked because
+  treatment is between-country in eligible rows.

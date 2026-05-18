@@ -1,0 +1,69 @@
+hypothesis_id: top_1_percent_income_share_growth_drivers
+status: SUPPORTED
+reason: proxy decomposition gives majority explanatory share to skill-services plus
+  capital-appreciation channels
+method: Short-panel 2015-2022 OECD proxy decomposition of top-1 percent share changes
+  using STAN skill-services and finance shares, BIS real property-price growth, and
+  PMR barriers to entry.
+runner: engine/runs/top_1_percent_income_share_growth_drivers/replication.py
+run_utc: '2026-05-18T20:02:27+00:00'
+vintages:
+- name: OWID/WID top 1 percent income share
+  publisher: owid
+  series_id: top-1-share-of-total-income
+  vintage_file: data/vintages/owid/top-1-share-of-total-income@2026-05-05T195312Z.parquet
+  sha256: 2bacb0586f2e9bac19077a778a5731ab18da447f89b6bc0663ea6ef316a9461a
+- name: OECD STAN value added
+  publisher: oecd_stan
+  series_id: STAN
+  vintage_file: data/vintages/oecd_stan/STAN@DF_STAN_2015_2022@2026-05-02T201942Z.parquet
+  sha256: aad25afe7f2ab27e00f6dc10cfc049affe40d679e08528503416bf1e9c19d0c7
+- name: BIS real property price index
+  publisher: bis
+  series_id: WS_SPP
+  vintage_file: data/vintages/bis/WS_SPP@2026-05-12T132625Z.parquet
+  sha256: 2855aa30ebe1e44e449e0f5859049a3868e1fbe0a2fbe20892ba6605631bfda7
+- name: OECD PMR barriers to entry
+  publisher: oecd_pmr
+  series_id: BARRIER_ENTRY
+  vintage_file: data/vintages/oecd_pmr/BARRIER_ENTRY@2026-05-02T220000Z.parquet
+  sha256: 72c9528c0c4abbca3e516ca7e6c7d3e126068fe1f451c4b9f0ff8406dc0dbc4b
+- name: WDI real GDP per capita PPP
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+  sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+variables_loaded:
+- role: outcome
+  name: top1_share_change_2015_2022
+  source: owid:top-1-share-of-total-income
+- role: skill_channel_proxy
+  name: skill_services_share_change
+  source: oecd_stan:J plus M_N value-added share
+- role: capital_channel_proxy
+  name: real_property_growth_mean
+  source: BIS real property price growth
+- role: rent_channel_proxy
+  name: finance_share_change
+  source: oecd_stan:K value-added share
+- role: concentration_proxy
+  name: barrier_entry_2023
+  source: oecd_pmr:BARRIER_ENTRY
+missing_or_proxied_series:
+- role: exact_skill_channel
+  name: specialist wage growth/superstar firm wages
+  source: micro wage-sector panel not local
+- role: exact_capital_channel
+  name: equity-price capital-income growth
+  source: BIS SPP is real property-price proxy, not equity index
+- role: exact_concentration_channel
+  name: Herfindahl/markup concentration
+  source: not local
+- role: long_panel
+  name: 1980-2020 decomposition
+  source: local STAN vintage covers 2015-2022 only
+deviations:
+- This is a short, proxy-only decomposition because the landed STAN vintage starts
+  in 2015.
+- Contribution shares use standardized beta times outcome correlation, normalized
+  across the four pre-registered channels.

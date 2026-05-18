@@ -1,51 +1,91 @@
 {
-  "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
   "hypothesis_id": "working_time_regulation_productivity_per_hour",
-  "template": "panel_fe",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "SUPPORTED if coefficient > 0 and p < 0.10",
-  "falsification_test_text": null,
-  "estimate": {
-    "coefficient": 9.40476451611852e-17,
-    "std_error": 1.638819249697823e-17,
-    "p_value": 1.0262260818905133e-08,
-    "n_obs": 4097,
-    "n_countries": 164,
-    "r_squared_within": 1.0,
-    "fe_entity": true,
-    "fe_time": true,
-    "cluster": "country",
-    "method": "linearmodels.PanelOLS",
-    "dropped_controls_due_to_overlap": []
-  },
+  "verdict": "SUPPORTED - hours reductions predict higher hourly productivity and lower output per worker",
+  "verdict_label": "SUPPORTED",
+  "verdict_reason": "hours reductions predict higher hourly productivity and lower output per worker",
+  "method": "OECD PDB country-year FE panel: GDP per hour and GDP per employed person growth on reductions in average hours worked per employee, with country and year fixed effects clustered by country.",
+  "runner": "engine/runs/working_time_regulation_productivity_per_hour/replication.py",
+  "run_utc": "2026-05-18T20:03:09+00:00",
+  "claim": "Stricter working-time limits predict higher hourly productivity but lower total output per worker, with ambiguous welfare effects.",
+  "falsification_rule": "SUPPORTED if coefficient > 0 and p < 0.10",
+  "falsification_test": "",
+  "estimates": [
+    {
+      "outcome": "hourly_productivity_growth",
+      "predictors": [
+        "hours_reduction"
+      ],
+      "n_obs": 934,
+      "n_countries": 32,
+      "year_min": 1990,
+      "year_max": 2023,
+      "r_squared": 0.46805565860283593,
+      "entity_fe": true,
+      "time_fe": true,
+      "covariance": "clustered by country",
+      "terms": {
+        "hours_reduction": {
+          "coefficient": 0.7044250361923803,
+          "std_error": 0.0830355996434015,
+          "p_value": 1.3939204782427234e-09
+        }
+      }
+    },
+    {
+      "outcome": "output_per_worker_growth",
+      "predictors": [
+        "hours_reduction"
+      ],
+      "n_obs": 934,
+      "n_countries": 32,
+      "year_min": 1990,
+      "year_max": 2023,
+      "r_squared": 0.43966416500408034,
+      "entity_fe": true,
+      "time_fe": true,
+      "covariance": "clustered by country",
+      "terms": {
+        "hours_reduction": {
+          "coefficient": -0.30975332198411637,
+          "std_error": 0.07760204132856874,
+          "p_value": 0.0003739731294643266
+        }
+      }
+    }
+  ],
   "data_status": {
     "variables_loaded": [
       {
+        "role": "treatment_proxy",
+        "name": "hours_reduction",
+        "source": "negative of oecd_pdb:HRSAV_GY total economy"
+      },
+      {
         "role": "outcome",
-        "name": "outcome_var",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "name": "hourly_productivity_growth",
+        "source": "oecd_pdb:GDPHRS_GY total economy"
       },
       {
-        "role": "treatment",
-        "name": "treatment_var",
-        "source": "fraser_efw:summary_index",
-        "publisher": "fraser_efw",
-        "n_rows": 4557
-      },
-      {
-        "role": "controls",
-        "name": "log_gdp_pc",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "role": "outcome",
+        "name": "output_per_worker_growth",
+        "source": "oecd_pdb:GDPEMP_GY total economy"
       }
     ],
-    "variables_missing": []
+    "variables_missing_or_proxied": [
+      {
+        "role": "exact_treatment",
+        "name": "statutory working-time limits",
+        "source": "policy/legal panel not local"
+      },
+      {
+        "role": "welfare_outcome",
+        "name": "welfare effects",
+        "source": "not tested by PDB productivity data"
+      }
+    ]
   },
-  "run_utc": "2026-05-03T06:13:04+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "caveats": [
+    "Average-hours reductions are an observed-outcome proxy for stricter working-time regulation.",
+    "The result should not be read causally without statutory reform timing or instruments."
+  ]
 }

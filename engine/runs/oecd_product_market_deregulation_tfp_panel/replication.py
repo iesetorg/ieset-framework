@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-"""Replicate the registered panel-FE run for oecd_product_market_deregulation_tfp_panel."""
+"""Run the Worker D exact/proxy OECD productivity artifact."""
+from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "scripts"))
+RUNS_ROOT = Path(__file__).resolve().parents[1]
+if str(RUNS_ROOT) not in sys.path:
+    sys.path.insert(0, str(RUNS_ROOT))
 
-from run_panel_fe import run_one
+from oecd_productivity_worker_d_exact import main
 
 
 if __name__ == "__main__":
-    print(run_one("oecd_product_market_deregulation_tfp_panel", force=True, persist_preflight_inconclusive=True))
+    raise SystemExit(main([__file__, "oecd_product_market_deregulation_tfp_panel"]))

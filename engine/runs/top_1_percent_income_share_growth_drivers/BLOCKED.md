@@ -1,22 +1,23 @@
-# BLOCKED — top_1_percent_income_share_growth_drivers
+# BLOCKED - top_1_percent_income_share_growth_drivers
 
-**Status:** blocked at v1 wiring stage.
+**Status:** superseded by the Worker D2 proxy artifact on 2026-05-18.
 
-## Reason
+## What changed
 
-The pre-registered outcome — top-1% pre-tax national income share (`owid:top-1-share-of-total-income` per spec, ultimately WID.world) — is not present in `data/vintages/owid/` or any other publisher folder. Available OWID inequality vintages cover `economic-inequality-gini-index` and `gini-coefficient-after-tax-lis` only. Without the outcome series the decomposition cannot run.
+The earlier wiring blocker is no longer accurate for the local proxy screen:
+`owid:top-1-share-of-total-income` and `bis:WS_SPP` are now present in local
+vintages, and `replication.py` writes a short-panel 2015-2022 decomposition
+with OECD STAN skill-services/finance shares and OECD PMR barriers to entry.
 
-Channel availability is also partially gated:
-- `eurostat:nama_10_a64` (skill-services + finance VA share) — available.
-- `bis:WS_SPP` (equity index) — not in current vintages.
-- `oecd:OECD.ECO.GCRD,DSD_PMR@DF_PMR,1.2` (concentration) — present but only 2 cycle years (2018, 2023), insufficient for a 1980-2020 panel.
-- `owid:top-marginal-income-tax-rate` — not in vintages.
+## Remaining exact-data gaps
 
-## Path to unblock
+- Native WID top-1% pre-tax series is still preferable to the OWID mirror.
+- BIS `WS_SPP` is used as a real property-price proxy, not an equity-price
+  capital-income series.
+- OECD STAN local coverage starts in 2015, so the registered 1980-2020 panel is
+  not fully available.
+- Historical Herfindahl/markup concentration and top marginal tax controls are
+  still missing or too sparse.
 
-1. Wire WID native fetcher (`wid_world` publisher) for top-1% pre-tax share, OR add OWID `top-1-share-of-total-income` mirror to the run-bootstrap manifest.
-2. Add BIS `WS_SPP` to the fetch manifest.
-3. Backfill OECD PMR with historical vintages (2003, 2008, 2013).
-4. Add OWID `top-marginal-income-tax-rate` to the bootstrap manifest.
-
-Pre-registration is preserved; v1 will run when these vintages ship.
+The current verdict lives in `result_card.md`; this file is retained only to
+document why the old blocked status was downgraded to a proxy-data caveat.

@@ -1,58 +1,120 @@
 {
-  "verdict": "SUPPORTED \u2014 coef=+3078 (sign matches claim +), p=0.00422",
-  "verdict_label": "SUPPORTED",
-  "verdict_reason": "coef=+3078 (sign matches claim +), p=0.00422",
   "hypothesis_id": "labor_reform_real_wage_growth",
-  "template": "panel_fe",
-  "claim_direction_inferred": "+",
-  "falsification_rule_text": "SUPPORTED if the treatment coefficient has the pre-registered sign at p<0.10. REFUTED if the opposite sign is significant at p<0.10. Otherwise PARTIAL.",
-  "falsification_test_text": "panel_fe_labor_reform_real_wage_growth",
-  "estimate": {
-    "coefficient": 3077.787733358589,
-    "std_error": 1072.9113484551353,
-    "p_value": 0.004215479753616691,
-    "n_obs": 1000,
-    "n_countries": 40,
-    "r_squared_within": 0.040865441987196216,
-    "fe_entity": true,
-    "fe_time": true,
-    "cluster": "country",
-    "method": "linearmodels.PanelOLS",
-    "dropped_controls_due_to_overlap": []
-  },
+  "verdict": "PARTIAL - exact wage/productivity proxy does not clear the positive/significant wage gate",
+  "verdict_label": "PARTIAL",
+  "verdict_reason": "exact wage/productivity proxy does not clear the positive/significant wage gate",
+  "method": "Country-year FE panel using OECD PDB labour compensation per hour deflated by WDI CPI as the real-wage proxy, with lagged WGI regulatory quality and rule-of-law/income controls.",
+  "runner": "engine/runs/labor_reform_real_wage_growth/replication.py",
+  "run_utc": "2026-05-18T20:02:14+00:00",
+  "claim": "Higher market-compatible regulatory quality predicts stronger long-run real wage and income proxies.",
+  "falsification_rule": "SUPPORTED if the treatment coefficient has the pre-registered sign at p<0.10. REFUTED if the opposite sign is significant at p<0.10. Otherwise PARTIAL.",
+  "falsification_test": "panel_fe_labor_reform_real_wage_growth",
+  "estimates": [
+    {
+      "outcome": "real_comp_hour_growth_proxy",
+      "predictors": [
+        "regulatory_quality_lag",
+        "log_gdp_pc",
+        "rule_of_law"
+      ],
+      "n_obs": 448,
+      "n_countries": 21,
+      "year_min": 1998,
+      "year_max": 2023,
+      "r_squared": 0.44708930672929437,
+      "entity_fe": true,
+      "time_fe": true,
+      "covariance": "clustered by country",
+      "terms": {
+        "regulatory_quality_lag": {
+          "coefficient": 0.510613778607713,
+          "std_error": 0.996722905490881,
+          "p_value": 0.6140573144272891
+        },
+        "log_gdp_pc": {
+          "coefficient": 2.5593126246869846,
+          "std_error": 2.0681888201157412,
+          "p_value": 0.2302464052586841
+        },
+        "rule_of_law": {
+          "coefficient": -2.9790999120339983,
+          "std_error": 1.643751897069085,
+          "p_value": 0.0849688375046324
+        }
+      }
+    },
+    {
+      "outcome": "labour_productivity_growth",
+      "predictors": [
+        "regulatory_quality_lag",
+        "log_gdp_pc",
+        "rule_of_law"
+      ],
+      "n_obs": 434,
+      "n_countries": 20,
+      "year_min": 1998,
+      "year_max": 2023,
+      "r_squared": 0.3202993541081095,
+      "entity_fe": true,
+      "time_fe": true,
+      "covariance": "clustered by country",
+      "terms": {
+        "regulatory_quality_lag": {
+          "coefficient": -0.029537471719150898,
+          "std_error": 0.5952234914290901,
+          "p_value": 0.9609398453713406
+        },
+        "log_gdp_pc": {
+          "coefficient": -1.924990918797418,
+          "std_error": 1.1068587122701443,
+          "p_value": 0.09818547605838263
+        },
+        "rule_of_law": {
+          "coefficient": -1.4718868961467717,
+          "std_error": 0.7915769585051716,
+          "p_value": 0.07852218514462632
+        }
+      }
+    }
+  ],
   "data_status": {
     "variables_loaded": [
       {
+        "role": "outcome_proxy",
+        "name": "real_comp_hour_growth_proxy",
+        "source": "oecd_pdb:LCHRS_GY total economy minus WDI CPI inflation"
+      },
+      {
         "role": "outcome",
-        "name": "qol_or_prosperity_outcome",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "name": "labour_productivity_growth",
+        "source": "oecd_pdb:GDPHRS_GY total economy"
       },
       {
         "role": "treatment",
-        "name": "market_or_intervention_proxy",
-        "source": "wgi:RQ.EST",
-        "publisher": "wgi",
-        "n_rows": 5169
+        "name": "regulatory_quality_lag",
+        "source": "wgi:GOV_WGI_RQ.EST lagged one year"
       },
       {
         "role": "controls",
-        "name": "log_gdp_pc",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
-        "publisher": "world_bank_wdi",
-        "n_rows": 14066
-      },
-      {
-        "role": "controls",
-        "name": "rule_of_law",
-        "source": "wgi:RL.EST",
-        "publisher": "wgi",
-        "n_rows": 5296
+        "name": "log_gdp_pc, rule_of_law",
+        "source": "WDI and WGI"
       }
     ],
-    "variables_missing": []
+    "variables_missing_or_proxied": [
+      {
+        "role": "exact_outcome",
+        "name": "real wage growth",
+        "source": "OECD average-wage/median-wage real series not local for broad sample"
+      },
+      {
+        "role": "exact_treatment",
+        "name": "labour-market reform episodes",
+        "source": "policy event panel not local"
+      }
+    ]
   },
-  "run_utc": "2026-05-12T10:24:10+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "caveats": [
+    "The wage outcome is labour compensation per hour deflated by CPI, not a worker-level real wage series.",
+    "Regulatory quality is a broad institutional proxy, not a specific labour reform treatment."
+  ]
 }

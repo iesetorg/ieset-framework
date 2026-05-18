@@ -1,0 +1,456 @@
+packet_version: 1
+generated_utc: '2026-05-18T19:45:59+00:00'
+repository:
+  root: .
+  git_commit: fdec4dff28b0e4c390f5bbeef13f9392fe2665a8
+hypothesis:
+  id: export_complexity_market_access_vs_subsidy
+  legacy_id: null
+  path: hypotheses/trade/export_complexity_market_access_vs_subsidy.yaml
+  school: null
+  topic: trade
+  claim: 'In a panel of middle-income countries 1990-2020, export complexity (Hausmann-Hidalgo
+    Economic Complexity Index) rises more following reforms that improve foreign market
+    access and reduce domestic entry barriers than following expansions of subsidy-only
+    industrial policy. The claim is directional: a one-standard-deviation improvement
+    in market-access and competition conditions predicts a larger ECI gain over the
+    subsequent decade than a one-standard-deviation increase in subsidy intensity,
+    controlling for initial complexity, income, and human capital.
+
+    '
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: 'proxy screen: market access predicts higher WDI high-tech export share,
+    but broad diversification does not confirm'
+  status: PARTIAL
+preregistration:
+  claim: 'In a panel of middle-income countries 1990-2020, export complexity (Hausmann-Hidalgo
+    Economic Complexity Index) rises more following reforms that improve foreign market
+    access and reduce domestic entry barriers than following expansions of subsidy-only
+    industrial policy. The claim is directional: a one-standard-deviation improvement
+    in market-access and competition conditions predicts a larger ECI gain over the
+    subsequent decade than a one-standard-deviation increase in subsidy intensity,
+    controlling for initial complexity, income, and human capital.
+
+    '
+  falsification_rule: "SUPPORTED if \u03B21 (market access) is positive and significant\
+    \ at p<0.05 while \u03B22 (subsidy) is insignificant or negative, AND |\u03B2\
+    1| > |\u03B22|. PARTIAL if both are positive and significant but \u03B21 > \u03B2\
+    2. REFUTED if \u03B21 is negative and significant or if \u03B22 is positive and\
+    \ significantly larger than \u03B21. INFORMATIVE: excluding China should not flip\
+    \ the sign of \u03B21; if it does, the result is a China-driven artefact.\n"
+  threshold: "\u03B2_market_access > 0 at p<=0.05  AND |\u03B2_market_access| > |\u03B2\
+    _subsidy|  AND Ex-China robustness retains sign of \u03B2_market_access.\n"
+  estimator:
+    template: panel_fe_decomposition
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Two-way FE panel with decade-long differences (1990-2000, 2000-2010, 2010-2020)\
+      \ to reduce noise and capture medium-run structural change. Primary specification:\
+      \ \u0394ECI = \u03B21*\u0394market_access + \u03B22*\u0394subsidy_index + controls\
+      \ + FE. Mechanism decomposition via high-tech export share and product-count\
+      \ channels. Robustness: exclude China (dominates ECI dynamics) and check if\
+      \ result holds.\n"
+  steelman: hypotheses/steelman/export_complexity_market_access_vs_subsidy.md
+reproduction:
+  run_dir: engine/runs/export_complexity_market_access_vs_subsidy
+  runner: engine/runs/export_complexity_market_access_vs_subsidy/replication.py
+  replication_script: engine/runs/export_complexity_market_access_vs_subsidy/replication.py
+  suggested_command: python engine/runs/export_complexity_market_access_vs_subsidy/replication.py
+data:
+  inputs:
+  - name: outcome_high_tech_export_share
+    publisher: world_bank_wdi
+    series_id: TX.VAL.TECH.MF.ZS
+    vintage_file: data/vintages/world_bank_wdi/TX.VAL.TECH.MF.ZS@2026-05-05T195027Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: b99e36dfce6c0ccbebed61124508f11dd2aac6e6d635bacca7955eacf20a1994
+      computed_sha256: b99e36dfce6c0ccbebed61124508f11dd2aac6e6d635bacca7955eacf20a1994
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.MF.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/TX.VAL.TECH.MF.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:50:27.021387+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: High-technology exports (% of manufactured exports)
+      source_note: High-technology exports are products with high R&D intensity, such
+        as in aerospace, computers, pharmaceuticals, scientific instruments, and electrical
+        machinery.
+      countries_param: all
+      vintage_utc: null
+  - name: outcome_export_diversification_index
+    publisher: derived
+    series_id: export_diversification_index
+    vintage_file: data/vintages/derived/export_diversification_index@2026-05-16T085311Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: ae2e696985c7ed68dde27e0bddf77730ef495cc12749cfe23247b59b61689b04
+      computed_sha256: ae2e696985c7ed68dde27e0bddf77730ef495cc12749cfe23247b59b61689b04
+      status: match
+    source:
+      type: derived
+      url: derived://scripts/build_export_diversification_vintage.py
+      methodology_url: local://scripts/build_export_diversification_vintage.py
+      license: internal_derived_from_wdi_cc_by_4_0
+      fetch_utc: '2026-05-16T08:53:11.484886+00:00'
+      fetch_manifest: data/manifests/fetch_run_export_diversification_2026-05-16T085311Z.yaml
+    coverage:
+      start_date: '1962'
+      end_date: '2024'
+      frequency: annual
+      rows: 9623
+      units: 1 - broad merchandise export-share HHI; higher means more diversified
+      currency: null
+    extra:
+      recipe: clip WDI merchandise export shares to [0,100], divide by 100, renormalise
+        rows whose observed broad shares exceed 100%, add residual other share, then
+        compute HHI=sum(shares^2)
+      components:
+        agricultural_raw_materials: TX.VAL.AGRI.ZS.UN
+        fuel: TX.VAL.FUEL.ZS.UN
+        manufactures: TX.VAL.MANF.ZS.UN
+        ores_metals: TX.VAL.MMTL.ZS.UN
+      min_components: 3
+  - name: treatment_trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: treatment_oecd_pmr_trade_barrier
+    publisher: oecd_pmr
+    series_id: BARRIER_TRADE
+    vintage_file: data/vintages/oecd_pmr/BARRIER_TRADE@2026-05-02T220000Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4fff26f5b44c36be9fc14f877e674640283cb32dac71a1f0765b0b194960e54a
+      computed_sha256: 4fff26f5b44c36be9fc14f877e674640283cb32dac71a1f0765b0b194960e54a
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: treatment_fraser_trade_freedom
+    publisher: fraser_efw
+    series_id: freedom_to_trade_internationally
+    vintage_file: data/vintages/fraser_efw/freedom_to_trade_internationally@2026-05-02T220000Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4118212411b867f4c04948c4dd0afb434f79347b569b7a67dae77ee2888af6ae
+      computed_sha256: 4118212411b867f4c04948c4dd0afb434f79347b569b7a67dae77ee2888af6ae
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: treatment_government_consumption_share
+    publisher: world_bank_wdi
+    series_id: NE.CON.GOVT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.GOVT.ZS@2026-05-05T194701Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+      computed_sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.CON.GOVT.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:01.933105+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: General government final consumption expenditure (% of GDP)
+      source_note: Final consumption expenditure is expenditure on goods and services
+        by resident institutional units for the direct satisfaction of human needs
+        or wants, whether individual or collective. General government FCE includes
+        all government current expenditures for purchases of goods and services (including
+        compensation of employees), and most expenditures on national defense and
+        security, but excludes go
+      countries_param: all
+      vintage_utc: null
+  - name: treatment_fraser_size_of_government
+    publisher: fraser_efw
+    series_id: size_of_government
+    vintage_file: data/vintages/fraser_efw/size_of_government@2026-05-02T220000Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 139adb24a0b3996c3e89468e746ae6ced2f725cc9fe460dd4479153e42e37862
+      computed_sha256: 139adb24a0b3996c3e89468e746ae6ced2f725cc9fe460dd4479153e42e37862
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: controls_log_gdp_per_capita
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita (constant 2015 US$)
+      source_note: 'Gross domestic product is the total income earned through the
+        production of goods and services in an economic territory during an accounting
+        period. It can be measured in three different ways: using either the expenditure
+        approach, the income approach, or the production approach. The core indicator
+        has been divided by the general population to achieve a per capita estimate.This
+        indicator is expres'
+      countries_param: all
+      vintage_utc: null
+  - name: controls_human_capital_index
+    publisher: pwt
+    series_id: hc
+    vintage_file: data/vintages/pwt/hc@2026-05-05T195252Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      computed_sha256: 61cba8b8b256ca170f55154805cf394cd0a24c0b2c1d5372f170622e48b66b9b
+      status: match
+    source:
+      type: official
+      url: https://dataverse.nl/api/access/datafile/354095
+      methodology_url: https://www.rug.nl/ggdc/productivity/pwt/
+      license: academic_citation
+      fetch_utc: '2026-05-05T19:52:52.660952+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1950'
+      end_date: '2019'
+      frequency: annual
+      rows: 12810
+      units: hc
+      currency: int_usd_2017_ppp
+    extra:
+      source_note: dataverse
+      pseudo_series: true
+      parent: pwt_full
+      vintage_utc: null
+  - name: controls_fdi_inflows_pct_gdp
+    publisher: world_bank_wdi
+    series_id: BX.KLT.DINV.WD.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      computed_sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/BX.KLT.DINV.WD.GD.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:51:06.923165+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Foreign direct investment, net inflows (% of GDP)
+      source_note: Foreign direct investment are the net inflows of investment to
+        acquire a lasting management interest (10 percent or more of voting stock)
+        in an enterprise operating in an economy other than that of the investor.
+        It is the sum of equity capital, reinvestment of earnings, other long-term
+        capital, and short-term capital as shown in the balance of payments. This
+        series shows net inflows (new investmen
+      countries_param: all
+      vintage_utc: null
+  missing_series:
+  - 'constructed: Atlas of Economic Complexity (Harvard CID)'
+  - direct subsidy industrial-policy intensity panel
+  - direct tariff-faced-abroad market-access panel
+  data_quality:
+    grade: incomplete
+    input_count: 10
+    official_source_count: 6
+    manual_source_count: 0
+    hash_status_counts:
+      match: 10
+    missing_series_count: 3
+artifacts:
+- path: hypotheses/trade/export_complexity_market_access_vs_subsidy.yaml
+  sha256: 0aee4c8c813af5c21941f3260ecc5a31d7b24b77c6fa76b5fa6fa0ecaaf72f5c
+  bytes: 6358
+- path: engine/runs/export_complexity_market_access_vs_subsidy/manifest.yaml
+  sha256: 224d0029cfe7531cb28c9cb8758685f6cde9847a148e4323c210402c0fc368bd
+  bytes: 4019
+- path: engine/runs/export_complexity_market_access_vs_subsidy/diagnostics.json
+  sha256: 63bcf776a2c0e3eebd5a3ef720b6ba343f46e095c9a8d0e1f9c7fc57c8a81e6e
+  bytes: 4461
+- path: engine/runs/export_complexity_market_access_vs_subsidy/result_card.md
+  sha256: e8a808b551d0e09943fbf125d743fa66d36900cbfaae8b2a472af52430884267
+  bytes: 1280
+- path: engine/runs/export_complexity_market_access_vs_subsidy/replication.py
+  sha256: f1bf5096f54b445c2f0809b5f579ad6e724ea1323652f5434397207d1452df45
+  bytes: 15807
+- path: engine/runs/export_complexity_market_access_vs_subsidy/chart_data.json
+  sha256: 7635df9e758936e078e6468799c8dec142562f59e536221f458db094f657e0af
+  bytes: 5317
+- path: hypotheses/steelman/export_complexity_market_access_vs_subsidy.md
+  sha256: 2eaf8782489f8250b9cdbe574341db5fd13a9336ab6aedd600d471c6e3807e95
+  bytes: 3842
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: TX.VAL.TECH.MF.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.MF.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: TX.VAL.TECH.MF.ZS
+  url: https://data.worldbank.org/indicator/TX.VAL.TECH.MF.ZS
+- kind: source
+  publisher: derived
+  series_id: export_diversification_index
+  url: derived://scripts/build_export_diversification_vintage.py
+- kind: methodology
+  publisher: derived
+  series_id: export_diversification_index
+  url: local://scripts/build_export_diversification_vintage.py
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.CON.GOVT.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.CON.GOVT.ZS
+  url: https://data.worldbank.org/indicator/NE.CON.GOVT.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+- kind: source
+  publisher: pwt
+  series_id: hc
+  url: https://dataverse.nl/api/access/datafile/354095
+- kind: methodology
+  publisher: pwt
+  series_id: hc
+  url: https://www.rug.nl/ggdc/productivity/pwt/
+- kind: source
+  publisher: world_bank_wdi
+  series_id: BX.KLT.DINV.WD.GD.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/BX.KLT.DINV.WD.GD.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: BX.KLT.DINV.WD.GD.ZS
+  url: https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS
+caveats:
+- Do not scoreboard-map this as a final ECI/subsidy causal result without the missing
+  primary data.
+- Proxy screen uses WDI high-tech export share and derived/WITS diversification, not
+  Harvard ECI.
+- Run has unresolved missing-series gates; verdict should not be treated as dispositive.
+- Subsidy/state-burden proxy uses government consumption and Fraser size-of-government;
+  it is not direct sectoral subsidy spending.

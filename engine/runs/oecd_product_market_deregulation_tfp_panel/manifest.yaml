@@ -1,0 +1,54 @@
+hypothesis_id: oecd_product_market_deregulation_tfp_panel
+status: PARTIAL
+reason: short-window PMR decline proxy does not clear both positive/significant productivity
+  gates
+method: OECD cross-section replacing the infeasible two-year TWFE PMR panel with PMR
+  decline from 2018 to 2023 and 2019-2024 PDB MFP/labour-productivity growth.
+runner: engine/runs/oecd_product_market_deregulation_tfp_panel/replication.py
+run_utc: '2026-05-18T20:02:16+00:00'
+vintages:
+- name: OECD Productivity Database
+  publisher: oecd
+  series_id: DSD_PDB
+  vintage_file: data/vintages/oecd/DSD_PDB@2026-05-12T133454Z.parquet
+  sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+- name: OECD product market regulation
+  publisher: oecd_pmr
+  series_id: PMR
+  vintage_file: data/vintages/oecd_pmr/PMR@2026-05-05T200616Z.parquet
+  sha256: a23b4b9912fc89eac7d8e5ea3a5bfff82a3204288b6f9d511d30dfce61b5b45f
+- name: Penn World Table full panel
+  publisher: pwt
+  series_id: pwt_full
+  vintage_file: data/vintages/pwt/pwt_full@2026-05-05T195237Z.parquet
+  sha256: a125939373ac2662c8c9b5031bba3b62b3fc50d069fa140e81da551ebef3c844
+- name: WDI trade openness
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+  sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+variables_loaded:
+- role: outcome
+  name: mfp_growth_2019_2024
+  source: oecd_pdb:MFPH_GY_LR total economy
+- role: outcome
+  name: lp_growth_2019_2024
+  source: oecd_pdb:GDPHRS_GY_L total economy
+- role: treatment
+  name: pmr_decline_2018_2023
+  source: decline in OECD PMR overall index
+- role: controls
+  name: log_tfp_2018, hc, trade_openness_2018
+  source: PWT and WDI
+missing_or_proxied_series:
+- role: exact_design
+  name: 1998-2019 PMR panel
+  source: local PMR vintage has only 2018 and 2023
+- role: control
+  name: R&D intensity
+  source: not used because PDB R&D extraction is sparse in this window
+deviations:
+- This repairs the previous no-within-country-variation failure by using the pre-registered
+  PMR-change exposure as a cross-section.
+- PDB MFP coverage is used instead of PWT TFP because the local PWT vintage ends before
+  the 2023 PMR endpoint.

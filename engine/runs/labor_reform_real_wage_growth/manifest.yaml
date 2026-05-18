@@ -1,0 +1,60 @@
+hypothesis_id: labor_reform_real_wage_growth
+status: PARTIAL
+reason: exact wage/productivity proxy does not clear the positive/significant wage
+  gate
+method: Country-year FE panel using OECD PDB labour compensation per hour deflated
+  by WDI CPI as the real-wage proxy, with lagged WGI regulatory quality and rule-of-law/income
+  controls.
+runner: engine/runs/labor_reform_real_wage_growth/replication.py
+run_utc: '2026-05-18T20:02:14+00:00'
+vintages:
+- name: OECD Productivity Database
+  publisher: oecd
+  series_id: DSD_PDB
+  vintage_file: data/vintages/oecd/DSD_PDB@2026-05-12T133454Z.parquet
+  sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+- name: WDI CPI inflation
+  publisher: world_bank_wdi
+  series_id: FP.CPI.TOTL.ZG
+  vintage_file: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-04-30T135619Z.parquet
+  sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+- name: World Governance Indicators regulatory quality
+  publisher: wgi
+  series_id: GOV_WGI_RQ.EST
+  vintage_file: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+  sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+- name: World Governance Indicators rule of law
+  publisher: wgi
+  series_id: GOV_WGI_RL.EST
+  vintage_file: data/vintages/wgi/GOV_WGI_RL.EST@2026-05-05T195218Z.parquet
+  sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+- name: WDI real GDP per capita
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-04-30T113730Z.parquet
+  sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+variables_loaded:
+- role: outcome_proxy
+  name: real_comp_hour_growth_proxy
+  source: oecd_pdb:LCHRS_GY total economy minus WDI CPI inflation
+- role: outcome
+  name: labour_productivity_growth
+  source: oecd_pdb:GDPHRS_GY total economy
+- role: treatment
+  name: regulatory_quality_lag
+  source: wgi:GOV_WGI_RQ.EST lagged one year
+- role: controls
+  name: log_gdp_pc, rule_of_law
+  source: WDI and WGI
+missing_or_proxied_series:
+- role: exact_outcome
+  name: real wage growth
+  source: OECD average-wage/median-wage real series not local for broad sample
+- role: exact_treatment
+  name: labour-market reform episodes
+  source: policy event panel not local
+deviations:
+- The wage outcome is labour compensation per hour deflated by CPI, not a worker-level
+  real wage series.
+- Regulatory quality is a broad institutional proxy, not a specific labour reform
+  treatment.
