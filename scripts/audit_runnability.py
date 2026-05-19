@@ -125,6 +125,11 @@ _SERIES_REVERSE_ALIASES: dict[str, dict[str, set[str]]] = {
     "oecd": {
         "OECD.SDD.NAD_DSD_NAMAIN1_DF_TABLE1_1.0": {"OECD.SDD.NAD"},
         "OECD.SDD.TPS_DSD_PRICES_DF_PRICES_ALL_1.0": {"OECD.SDD.TPS"},
+        "OECD.ECO.MAD_DSD_KEI_DF_KEI_1.0": {"OutputGap", "OUTGAP", "DSD_KEI"},
+        "DSD_PDB": {"LabourShare", "RealAverageWages", "real_average_wage", "avwage_growth_real"},
+        "DSD_LFS_DF_LFS_INDIC": {"harmonised_unemployment", "unemployment"},
+        "DSD_LMS_low_education_unemployment_rate": {"harmonised_unemployment"},
+        "DSD_EARN_DF_EARN_LFS": {"RealAverageWages", "real_average_wage", "avwage_growth_real"},
         "DSD_SOCX_DF_SOCX_AGG": {"DSD_SOCX@DF_SOCX_AGG"},
     },
     "oecd_pmr": {
@@ -141,7 +146,27 @@ _SERIES_REVERSE_ALIASES: dict[str, dict[str, set[str]]] = {
     },
     "ecb": {
         "ICP__M.U2.N.000000.4.ANR": {"ICP.M.U2.N.000000.4.ANR"},
-        "FM__D.U2.EUR.4F.KR.MRR_RT.LEV": {"FM", "FM:STN", "FM.M.U2.EUR.4F.KR.MRR_FR.LEV"},
+        "EXR__D.GBP.EUR.SP00.A": {"EXR.D.GBP.EUR"},
+        "MIR__M.DE.B.A2A.A.R.A.2240.EUR.N": {"IRS.M.DE", "interest_rates"},
+        "MIR__M.U2.B.A2A.A.R.A.2240.EUR.N": {"IRS", "irs_10y", "mfi_lending_rates"},
+        "FM__B.U2.EUR.4F.KR.DFR.LEV": {"FM.B.U2.EUR.4F.KR.MRR_FR.LEV", "DFR"},
+        "FM__M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA": {"euribor"},
+        "FM__D.U2.EUR.4F.KR.MRR_RT.LEV": {"FM", "FM:STN", "FM.M.U2.EUR.4F.KR.MRR_FR.LEV", "FM.D.U2.EUR.4F.KR.MRR_FR.LEV"},
+    },
+    "wits": {
+        "export_product_hhi_wits": {"product_concentration"},
+    },
+    "world_bank_wits": {
+        "export_product_hhi_wits": {"product_concentration"},
+    },
+    "wipo": {
+        "patent_applications_resident": {"patent_applications_residents"},
+        "patent_applications_non_resident": {"patent_applications_nonresident"},
+        "patent_applications": {"ip_statistics_data_center"},
+    },
+    "boj": {
+        "money_stock_m2": {"M2"},
+        "policy_rate": {"JPNDISCOUNT"},
     },
 }
 

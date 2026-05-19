@@ -34,6 +34,9 @@ Canonical series for IESET:
 """
 from __future__ import annotations
 
+import io
+import re
+import zipfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -41,6 +44,7 @@ from typing import Any
 import pandas as pd
 
 from ._base import FetchResult, utc_now, write_vintage
+from ._http import get as robust_get
 from ._manual_utils import MANUAL_ROOT, ManualDropError
 
 LICENSE = "academic_citation"  # IEA terms — non-commercial, attribution.
@@ -60,6 +64,7 @@ SUPPORTED: dict[str, dict[str, Any]] = {
         "methodology_url": (
             "https://www.iea.org/reports/energy-prices-2024"
         ),
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/energy-prices",
     },
     "fossil_subsidies_estimate": {
         "title": "IEA Fossil-Fuel Subsidies tracker — consumption subsidies (annual)",
@@ -72,6 +77,7 @@ SUPPORTED: dict[str, dict[str, Any]] = {
         "methodology_url": (
             "https://www.iea.org/topics/fossil-fuel-subsidies"
         ),
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/fossil-fuel-subsidies-database",
     },
     "co2_emissions_from_fuel_combustion": {
         "title": "IEA CO2 Emissions from Fuel Combustion — Highlights (annual)",
@@ -85,6 +91,43 @@ SUPPORTED: dict[str, dict[str, Any]] = {
         "methodology_url": (
             "https://www.iea.org/reports/co2-emissions-in-2023"
         ),
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/greenhouse-gas-emissions-from-energy-highlights",
+    },
+    "electricity_statistics": {
+        "title": "IEA electricity statistics / monthly electricity data",
+        "frequency": "monthly",
+        "currency": None,
+        "units": "per IEA electricity data metadata",
+        "source_url": "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics",
+        "methodology_url": "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics",
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics",
+    },
+    "electricity_balance": {
+        "title": "IEA electricity statistics / electricity balance",
+        "frequency": "annual",
+        "currency": None,
+        "units": "per IEA electricity data metadata",
+        "source_url": "https://www.iea.org/data-and-statistics/data-product/electricity-information",
+        "methodology_url": "https://www.iea.org/data-and-statistics/data-product/electricity-information",
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/electricity-information",
+    },
+    "nuclear_capacity_factor": {
+        "title": "IEA electricity statistics / nuclear generation and capacity proxy",
+        "frequency": "annual",
+        "currency": None,
+        "units": "per IEA electricity data metadata",
+        "source_url": "https://www.iea.org/data-and-statistics/data-product/electricity-information",
+        "methodology_url": "https://www.iea.org/data-and-statistics/data-product/electricity-information",
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/electricity-information",
+    },
+    "electricity_consumption_per_capita": {
+        "title": "IEA electricity consumption per-capita inputs",
+        "frequency": "annual",
+        "currency": None,
+        "units": "per IEA electricity data metadata",
+        "source_url": "https://www.iea.org/data-and-statistics/data-product/world-energy-balances",
+        "methodology_url": "https://www.iea.org/data-and-statistics/data-product/world-energy-balances",
+        "landing_url": "https://www.iea.org/data-and-statistics/data-product/world-energy-balances",
     },
 }
 
@@ -127,6 +170,27 @@ def _find_manual_for_series(series_id: str) -> Path:
     return max(candidates, key=lambda p: (p.name, p.stat().st_mtime))
 
 
+def _candidate_downloads(html: str) -> list[str]:
+    urls = re.findall(r"https?://[^\"'<> )]+", html)
+    hrefs = re.findall(r"""href=["']([^"']+)["']""", html, flags=re.I)
+    urls.extend(h for h in hrefs if h.startswith("https://"))
+    wanted = []
+    for url in urls:
+        clean = url.replace("\\u0026", "&").replace("&amp;", "&")
+        if re.search(r"\.(csv|xlsx?|zip)(?:\?|$)", clean, flags=re.I):
+            wanted.append(clean)
+        elif "download" in clean.lower() and any(token in clean.lower() for token in ("csv", "xlsx", "xls", "zip")):
+            wanted.append(clean)
+    # Preserve order while de-duping.
+    seen: set[str] = set()
+    out: list[str] = []
+    for url in wanted:
+        if url not in seen:
+            seen.add(url)
+            out.append(url)
+    return out
+
+
 def _read_any(path: Path) -> pd.DataFrame:
     if path.suffix.lower() in (".xlsx", ".xls"):
         xls = pd.ExcelFile(path)
@@ -145,6 +209,58 @@ def _read_any(path: Path) -> pd.DataFrame:
     return df
 
 
+def _read_payload(content: bytes, content_type: str | None) -> pd.DataFrame:
+    if content[:2] == b"PK" and content[:4] == b"PK\x03\x04":
+        try:
+            return pd.read_excel(io.BytesIO(content))
+        except Exception:
+            pass
+    if content[:2] == b"PK" or (content_type and "zip" in content_type.lower()):
+        z = zipfile.ZipFile(io.BytesIO(content))
+        names = [n for n in z.namelist() if n.lower().endswith((".csv", ".xlsx", ".xls"))]
+        if not names:
+            raise IEAError(f"download zip contains no csv/xlsx files: {z.namelist()[:8]}")
+        with z.open(names[0]) as handle:
+            payload = handle.read()
+        return _read_payload(payload, "application/octet-stream")
+    try:
+        return pd.read_csv(io.BytesIO(content), low_memory=False)
+    except Exception:
+        return pd.read_excel(io.BytesIO(content))
+
+
+def _fetch_official_download(series_id: str, meta: dict[str, Any]) -> tuple[pd.DataFrame, str, str]:
+    landing = meta.get("landing_url") or meta.get("source_url")
+    if not landing:
+        raise IEAError(f"no landing URL registered for {series_id}")
+    page = robust_get(
+        landing,
+        timeout=180,
+        return_http_errors=True,
+        zenrows_js_render=True,
+    )
+    if page.status_code >= 400:
+        raise IEAError(f"IEA landing page HTTP {page.status_code} for {series_id} via {page.transport}")
+    downloads = _candidate_downloads(page.text)
+    if not downloads:
+        raise IEAError(f"no public CSV/XLSX download link found on {landing}")
+    last_err: Exception | None = None
+    for url in downloads:
+        try:
+            payload = robust_get(
+                url,
+                timeout=240,
+                headers={"Accept": "text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*"},
+            )
+            df = _read_payload(payload.content, payload.content_type)
+            if not df.empty:
+                return df, url, payload.transport
+        except Exception as exc:  # noqa: BLE001
+            last_err = exc
+            continue
+    raise IEAError(f"all discovered IEA downloads failed for {series_id}: {last_err}")
+
+
 def fetch(
     series_id: str = "industrial_electricity_price",
     *,
@@ -158,10 +274,19 @@ def fetch(
     """
     fetch_ts = utc_now()
     meta = SUPPORTED.get(series_id, {})
-    path = _find_manual_for_series(series_id)
-    df = _read_any(path)
+    source_url = ""
+    transport = ""
+    manual_file = None
+    try:
+        df, source_url, transport = _fetch_official_download(series_id, meta)
+    except Exception:
+        path = _find_manual_for_series(series_id)
+        df = _read_any(path)
+        source_url = f"manual://{path.name}"
+        transport = "manual_drop"
+        manual_file = path.name
     if df.empty:
-        raise IEAError(f"IEA manual file {path.name} parsed to 0 rows")
+        raise IEAError(f"IEA {series_id} parsed to 0 rows")
 
     out, sha = write_vintage(
         publisher="iea",
@@ -173,7 +298,7 @@ def fetch(
     return FetchResult(
         publisher="iea",
         series_id=series_id,
-        source_url=f"manual://{path.name}",
+        source_url=source_url,
         methodology_url=meta.get(
             "methodology_url",
             "https://www.iea.org/data-and-statistics",
@@ -189,9 +314,10 @@ def fetch(
         sha256=sha,
         parquet_path=out,
         extra={
-            "manual_file": path.name,
+            "manual_file": manual_file,
             "n_columns": len(df.columns),
             "title": meta.get("title", ""),
+            "transport": transport,
             "publisher_source_url": meta.get(
                 "source_url",
                 "https://www.iea.org/data-and-statistics",

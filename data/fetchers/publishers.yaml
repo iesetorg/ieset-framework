@@ -99,12 +99,13 @@ publishers:
     auth_required: false
     license: mixed
     credibility_tier: 2
-    status: pending
+    status: ready
+    fetcher_module: data.fetchers.wits
     aliases:
     - world_bank_wits
     catalogue_url: https://wits.worldbank.org/
     vintage_behaviour: revisable
-    notes: Trade-policy and product-variety panels. Local vintages currently include WITS-derived export concentration panels; tariff/import aliases should be filled by targeted WITS fetches.
+    notes: Trade-policy and product-variety panels. Uses WITS JSON API for trade/tariff/product indicators, with World Bank WDI mirrors for high-tech export indicators. Local vintages include WITS-derived export concentration panels.
   usdol:
     name: U.S. Department of Labor Wage and Hour Division
     endpoint: https://www.dol.gov/agencies/whd
@@ -1490,9 +1491,8 @@ publishers:
     fetcher_module: data.fetchers.iea
     catalogue_url: https://www.iea.org/data-and-statistics/data-product
     vintage_behaviour: revisable
-    notes: 'IEA energy statistics. Most core IEA data is paywalled; the free public datasets (Energy Prices, Fossil-Fuel Subsidies, CO2 Highlights) sit behind Cloudflare gating that blocks plain HTTP fetches.
-      MANUAL-DROP pattern: drop the IEA-published CSV/XLSX into data/manual/iea/<series_id>/ and call data.fetchers.iea.fetch(series_id). Supported series: industrial_electricity_price, fossil_subsidies_estimate,
-      co2_emissions_from_fuel_combustion.'
+    notes: 'IEA energy statistics. Most core IEA data is paywalled; the fetcher first probes free public data-product pages with the robust HTTP/ZenRows helper and then falls back to MANUAL-DROP under data/manual/iea/<series_id>/.
+      Supported series include industrial_electricity_price, fossil_subsidies_estimate, co2_emissions_from_fuel_combustion, electricity_statistics, electricity_balance, nuclear_capacity_factor, and electricity_consumption_per_capita.'
   noaa_viirs:
     name: NOAA VIIRS Nightlights
     endpoint: https://eogdata.mines.edu/products/vnl/
@@ -1720,14 +1720,15 @@ publishers:
   un_comtrade:
     name: UN Comtrade
     endpoint: https://comtradeapi.un.org/data/v1/get
-    auth_required: true
+    auth_required: false
     auth_env_var: UN_COMTRADE_KEY
     license: cc_by_4_0
     credibility_tier: 2
-    status: pending
+    status: ready
+    fetcher_module: data.fetchers.un_comtrade
     catalogue_url: https://comtradeplus.un.org/
     vintage_behaviour: revisable
-    notes: UN bilateral merchandise-trade database. Free key with quota. Fetcher TBD.
+    notes: UN bilateral merchandise-trade database. Public API works for bounded annual panels; UN_COMTRADE_KEY raises quota where available. Fetcher targets CBAM HS2 baskets and broad HS2 export/merchandise panels, while HS6 product-line builders remain a separate high-volume derived job.
   un_igme:
     name: UN Inter-agency Group for Child Mortality Estimation
     endpoint: https://childmortality.org/
@@ -1815,10 +1816,11 @@ publishers:
     auth_required: false
     license: cc_by_4_0
     credibility_tier: 2
-    status: pending
+    status: ready
+    fetcher_module: data.fetchers.wipo
     catalogue_url: https://www.wipo.int/ipstats/en/
     vintage_behaviour: revisable
-    notes: WIPO IP statistics — patent, trademark, design filings. Fetcher TBD.
+    notes: WIPO IP statistics. Public country-year patent-application measures are fetched via the World Bank WDI API mirror for WIPO-sourced indicators IP.PAT.RESD and IP.PAT.NRES; citation-heavy/patent-family measures still require PATSTAT, Dimensions, or manual WIPO extracts.
   kipo:
     name: Korean Intellectual Property Office
     endpoint: https://www.kipo.go.kr/

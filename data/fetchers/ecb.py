@@ -26,9 +26,9 @@ import io
 from datetime import datetime
 
 import pandas as pd
-import requests
 
 from ._base import FetchResult, utc_now, write_vintage
+from ._http import get as robust_get
 
 BASE = "https://data-api.ecb.europa.eu/service"
 LICENSE = "oecd_terms"
@@ -37,6 +37,8 @@ _ECB_SHORTCUTS: dict[str, tuple[str, str]] = {
     "FM": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
     "FM:STN": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
     "FM.M.U2.EUR.4F.KR.MRR_FR.LEV": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
+    "FM.B.U2.EUR.4F.KR.MRR_FR.LEV": ("FM", "B.U2.EUR.4F.KR.DFR.LEV"),
+    "FM.D.U2.EUR.4F.KR.MRR_FR.LEV": ("FM", "D.U2.EUR.4F.KR.MRR_RT.LEV"),
     "financial_markets_money_market_OIS": ("FM", "M.U2.EUR.4F.MM.EONIA_.HSTA"),
     "euribor": ("FM", "M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA"),
     "financial_markets_yields_2yr": ("FM", "M.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y"),
@@ -45,7 +47,11 @@ _ECB_SHORTCUTS: dict[str, tuple[str, str]] = {
     "financial_markets_inflation_linked_swaps": ("FM", "M.I8.EUR.RT.MM.EONIA_.HSTA"),
     "EXR.D.GBP.EUR": ("EXR", "D.GBP.EUR.SP00.A"),
     "ICP": ("ICP", "M.U2.N.000000.4.ANR"),
+    "HICP": ("ICP", "M.U2.N.000000.4.ANR"),
     "IRS": ("MIR", "M.U2.B.A2A.A.R.A.2240.EUR.N"),
+    "irs_10y": ("MIR", "M.U2.B.A2A.A.R.A.2240.EUR.N"),
+    "interest_rates": ("MIR", "M.DE.B.A2A.A.R.A.2240.EUR.N"),
+    "mfi_lending_rates": ("MIR", "M.U2.B.A2A.A.R.A.2240.EUR.N"),
     "IRS.M.DE": ("MIR", "M.DE.B.A2A.A.R.A.2240.EUR.N"),
     "ILM": ("ILM", "W.U2.C.LT00.Z5.Z01.E"),
     "EMBI": ("FM", "D.U2.EUR.4F.G_N_C.SV_C_YM.SR_10Y"),
@@ -95,11 +101,18 @@ def fetch(
         params["startPeriod"] = start_period
     if end_period:
         params["endPeriod"] = end_period
-    r = requests.get(url, params=params, timeout=120, headers={"Accept": "text/csv"})
-    if r.status_code == 404:
+    payload = robust_get(
+        url,
+        params=params,
+        timeout=120,
+        headers={"Accept": "text/csv,*/*;q=0.8"},
+        return_http_errors=True,
+    )
+    if payload.status_code == 404:
         raise EcbError(f"ECB 404 for {series_id}/{path} — check flow + key format")
-    r.raise_for_status()
-    text = r.text
+    if payload.status_code >= 400:
+        raise EcbError(f"ECB HTTP {payload.status_code} for {series_id}/{path} via {payload.transport}")
+    text = payload.text
     if not text.strip():
         raise EcbError(f"ECB returned empty CSV for {series_id}/{path}")
     df = pd.read_csv(io.StringIO(text), low_memory=False)
@@ -140,6 +153,7 @@ def fetch(
             "start_period": start_period,
             "end_period": end_period,
             "columns": list(df.columns),
+            "http_transport": payload.transport,
             "vintage_utc": vintage_utc.isoformat() if vintage_utc else None,
         },
     )
