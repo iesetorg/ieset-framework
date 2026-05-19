@@ -1,0 +1,282 @@
+packet_version: 1
+generated_utc: '2026-05-19T08:57:09+00:00'
+repository:
+  root: .
+  git_commit: a3f2bb6578006d61cb08f28e676c7d76d650c699
+hypothesis:
+  id: labor_share_decline_causes
+  legacy_id: null
+  path: hypotheses/distribution/labor_share_decline_causes.yaml
+  school: null
+  topic: distribution
+  claim: "The observed decline in the labour share of gross value added across OECD\
+    \ economies over 1980-2020 (typically 4-8 percentage points) is explained by a\
+    \ decomposable set of channels rather than a single cause: (a) capital-intensity\
+    \ technological change with capital and labour complementarity below unity (Karabarbounis-Neiman),\
+    \ (b) globalisation and import competition lowering tradable-sector wage bargaining\
+    \ power (Elsby-Hobijn-Sahin), (c) rising market concentration enabling markup\
+    \ expansion (De Loecker-Eeckhout-Unger), and (d) measurement artefacts from owner-occupier\
+    \ imputed-rent accounting and self-employment income allocation (Rognlie, Gollin).\
+    \ The claim is that channels (a)+(d) jointly absorb at least 50 percent of the\
+    \ observed decline \u2014 i.e. a substantial fraction is either technologically-driven\
+    \ factor-price adjustment or measurement artefact \u2014 with (b) and (c) material\
+    \ but smaller contributors. A clean supported finding weakens the pure-monopoly-markup\
+    \ reading and the pure-globalisation reading while preserving a role for both.\n"
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=-2.776e+07 (sign matches claim -), p=0.0446
+  status: null
+preregistration:
+  claim: "The observed decline in the labour share of gross value added across OECD\
+    \ economies over 1980-2020 (typically 4-8 percentage points) is explained by a\
+    \ decomposable set of channels rather than a single cause: (a) capital-intensity\
+    \ technological change with capital and labour complementarity below unity (Karabarbounis-Neiman),\
+    \ (b) globalisation and import competition lowering tradable-sector wage bargaining\
+    \ power (Elsby-Hobijn-Sahin), (c) rising market concentration enabling markup\
+    \ expansion (De Loecker-Eeckhout-Unger), and (d) measurement artefacts from owner-occupier\
+    \ imputed-rent accounting and self-employment income allocation (Rognlie, Gollin).\
+    \ The claim is that channels (a)+(d) jointly absorb at least 50 percent of the\
+    \ observed decline \u2014 i.e. a substantial fraction is either technologically-driven\
+    \ factor-price adjustment or measurement artefact \u2014 with (b) and (c) material\
+    \ but smaller contributors. A clean supported finding weakens the pure-monopoly-markup\
+    \ reading and the pure-globalisation reading while preserving a role for both.\n"
+  falsification_rule: "Not supported if channel (a) capital-intensity plus channel\
+    \ (d) housing/self-employment measurement jointly account for less than 30 percent\
+    \ of explained variation in labour share, while channel (c) concentration alone\
+    \ accounts for more than 40 percent. That pattern would support the pure De Loecker-Eeckhout\
+    \ markup reading and weaken the Karabarbounis-Neiman + Rognlie readings the framework\
+    \ leans on. Symmetrically, the hypothesis is also not supported if the housing-stripped\
+    \ labour share shows no decline at all \u2014 because then the \"decline\" is\
+    \ an artefact and the whole literature is misattributed; the hypothesis claims\
+    \ measurement is material but not dispositive.\n"
+  threshold: 'capital_plus_measurement_share >= 0.30  AND concentration_share <= 0.40  AND
+    housing_stripped_decline >= 2_percentage_points_over_sample_period
+
+    '
+  estimator:
+    template: panel_fe_decomposition
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: 'Specification: labour_share = b0 + b1*log(K/L) + b2*import_pen + b3*concentration
+      + b4*housing_va_share + b5*self_emp_share + b6*union_density + b7*log(gdp_pc)
+      + b8*log(pop) + alpha_i + gamma_t + epsilon. Driscoll-Kraay SEs clustered by
+      country. Variance decomposition (Shapley-style R-squared attribution) reports
+      each channel''s share of explained variation. Robustness: re-estimate on housing-stripped
+      labour share per Rognlie; re-estimate on corporate- sector-only labour share
+      to neutralise self-employment channel.
+
+      '
+  steelman: hypotheses/steelman/labor_share_decline_causes.md
+reproduction:
+  run_dir: engine/runs/labor_share_decline_causes
+  runner: null
+  replication_script: engine/runs/labor_share_decline_causes/replication.py
+  suggested_command: python engine/runs/labor_share_decline_causes/replication.py
+data:
+  inputs:
+  - name: labour_share
+    publisher: owid
+    series_id: labor-share-of-gdp
+    vintage_file: data/vintages/owid/labor-share-of-gdp@2026-04-28T124352Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: e4afc91d7718ae24b4fc803d1079cd61273bb3dbf9a3360e224cb44614e85bd1
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: industry_va
+    publisher: world_bank_wdi
+    series_id: NV.IND.TOTL.KD
+    vintage_file: data/vintages/world_bank_wdi/NV.IND.TOTL.KD@2026-04-28T125257Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 4cac85bc81bdba4d7d8640f54e6ec3271f988ff5a852d5a303758ebd3a25347f
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-04-28T124156Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: e007bd45f1de4803988352635a60900a3c9d0e0cad0e81014537326400c1b431
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-28T124148Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 751ca2ec9be31a601ee1180fd88f2df8f8aad41c38683244dcabf96daea654f7
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-04-28T124148Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 41b4cf786c937365599f45b566769cad95a93835c32a3884b261d40e116edb42
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: housing_va_share
+    publisher: eurostat
+    series_id: nama_10_a64
+    vintage_file: data/vintages/eurostat/nama_10_a64@2026-04-24T095756Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: b7f43734835b5f5ea2599575772a88a30bba01dd3cbf850da03675c0055c7c9a
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_a64?format=JSON
+      methodology_url: https://ec.europa.eu/eurostat/databrowser/view/nama_10_a64
+      license: cc_by_4_0
+      fetch_utc: '2026-04-24T09:57:56.273764+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1975'
+      end_date: '2025'
+      frequency: annual
+      rows: 8911646
+      units: per dataset metadata
+      currency: null
+    extra:
+      label: Gross value added and income by detailed industry (NACE Rev.2 )
+      updated: 2026-04-21T23:00:00+0200
+      filter_params: {}
+      columns:
+      - freq
+      - unit
+      - nace_r2
+      - na_item
+      - geo_code
+      - period
+      - value
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 6
+    official_source_count: 1
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 6
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/distribution/labor_share_decline_causes.yaml
+  sha256: f1c9987481fc7b4603769141ed622e404f7bf34bf7dfb62ce885b91a28c0536c
+  bytes: 13436
+- path: engine/runs/labor_share_decline_causes/manifest.yaml
+  sha256: 1ee9c895410c1c50dc83e998a472ec7d04108295e7508f3c95b11a73bd6f4da8
+  bytes: 1961
+- path: engine/runs/labor_share_decline_causes/diagnostics.json
+  sha256: 90521a7b0f379a8913a382f668486c2767626d96692b800a94cde13a4ac547ed
+  bytes: 3633
+- path: engine/runs/labor_share_decline_causes/result_card.md
+  sha256: 8b43261fedc9a80a2a8345555cb078842ba5d9ac3c53475fcd98e0fe477c15ff
+  bytes: 3606
+- path: engine/runs/labor_share_decline_causes/replication.py
+  sha256: a0d2a412e26e58ba8519a380f3979024916e27f8e978a270628e5dec05b05e80
+  bytes: 15509
+- path: engine/runs/labor_share_decline_causes/coefficients.parquet
+  sha256: 158bba85597b5ba651fed3d08e9242d039c90b91c535dc63e0e7cf01431272fe
+  bytes: 4067
+- path: hypotheses/steelman/labor_share_decline_causes.md
+  sha256: b4de1ad1c985c25ac43f6b3f014dc7092597587f3431a6284ed7617e3485582e
+  bytes: 5268
+references:
+- kind: source
+  publisher: eurostat
+  series_id: nama_10_a64
+  url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_a64?format=JSON
+- kind: methodology
+  publisher: eurostat
+  series_id: nama_10_a64
+  url: https://ec.europa.eu/eurostat/databrowser/view/nama_10_a64
+caveats:
+- 'capital channel substitution: WDI NV.IND.TOTL.KD log-level used instead of NE.GDI.FTOT.ZS.'
+- 'concentration channel dropped: OECD PMR only 2 cycle years (2018, 2023) available.'
+- 'import-pen channel substitution: trade openness used instead of TM.VAL.MANF.ZS.UN.'
+- 'outcome series substitution: OWID labor-share-of-gdp (2004-2020) replaces OECD
+  SDD ANA NAD (1980-2020).'
+- 'self-employment channel dropped: SL.EMP.SELF.ZS not in vintages.'

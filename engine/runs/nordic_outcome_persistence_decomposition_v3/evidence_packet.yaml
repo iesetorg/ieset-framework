@@ -1,0 +1,273 @@
+packet_version: 1
+generated_utc: '2026-05-19T08:57:08+00:00'
+repository:
+  root: .
+  git_commit: a3f2bb6578006d61cb08f28e676c7d76d650c699
+hypothesis:
+  id: nordic_outcome_persistence_decomposition_v3
+  legacy_id: null
+  path: hypotheses/institutional_quality/nordic_outcome_persistence_decomposition_v3.yaml
+  school: null
+  topic: institutional_quality
+  claim: 'Countries that enacted market-oriented structural reforms with credible
+    institutional commitment (Norway handlingsregel 2001, Sweden pension- architecture
+    reform 1999) experienced systematically better post-treatment GDP-per-capita and
+    unemployment trajectories than their own pre-treatment trends would have predicted.
+    Countries that entered the euro area without corresponding structural adjustment
+    (Italy 1999, Greece 2001) experienced systematically worse post-treatment trajectories.
+    The v3 hypothesis predicts a positive within-country effect for the reform group
+    and a negative within-country effect for the fiscal-dominance group, identified
+    off their own pre-treatment baselines via country and year fixed effects. This
+    directly addresses the v1/v2 structural limitation: cross-sectional decomposition
+    cannot see timing, but within-country DiD can.
+
+    '
+verdict:
+  raw: REFUTED
+  bucket: refuted
+  reason: coef=+1.284 (sign opposite claim -), p=0.00101
+  status: null
+preregistration:
+  claim: 'Countries that enacted market-oriented structural reforms with credible
+    institutional commitment (Norway handlingsregel 2001, Sweden pension- architecture
+    reform 1999) experienced systematically better post-treatment GDP-per-capita and
+    unemployment trajectories than their own pre-treatment trends would have predicted.
+    Countries that entered the euro area without corresponding structural adjustment
+    (Italy 1999, Greece 2001) experienced systematically worse post-treatment trajectories.
+    The v3 hypothesis predicts a positive within-country effect for the reform group
+    and a negative within-country effect for the fiscal-dominance group, identified
+    off their own pre-treatment baselines via country and year fixed effects. This
+    directly addresses the v1/v2 structural limitation: cross-sectional decomposition
+    cannot see timing, but within-country DiD can.
+
+    '
+  falsification_rule: "Not supported if either \u03B2_reform or \u03B2_stagnation\
+    \ has the opposite sign from the pre-registered expectation (positive for reform,\
+    \ negative for stagnation) at the 90% confidence level on the primary outcome\
+    \ (log GDP per capita PPP). Also not supported if the pre-trend placebo detects\
+    \ spurious effects \u2014 that would indicate parallel trends is violated and\
+    \ the identification is not clean. A clean pass requires \u03B2_reform > 0 at\
+    \ p < 0.10, \u03B2_stagnation < 0 at p < 0.10, and the pre-trend placebo coefficient\
+    \ at |t+<0|<1.65 (not statistically distinguishable from zero).\n"
+  threshold: "\u03B2_reform > 0 at p < 0.10  AND \u03B2_stagnation < 0 at p < 0.10\
+    \  AND pre_trend_placebo_t < 1.65 absolute\n"
+  estimator:
+    template: panel_fe
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "PanelOLS with country + year fixed effects, cluster-robust SEs by country.\
+      \ Specification:\noutcome_{i,t} = \u03B1_i + \u03B3_t + \u03B2_reform * reform_post_{i,t}\n\
+      \              + \u03B2_stagnation * fiscal_dominance_post_{i,t}\n         \
+      \     + X\u03B2 + \u03B5_{i,t}\n\nCountry FE absorb all time-invariant country\
+      \ features (Nordic culture, geography, social trust, population homogeneity,\
+      \ pre-existing institutional quality) \u2014 the concern v1 and v2 could not\
+      \ control for. Year FE absorb global trends and common shocks (2008 GFC, 2020\
+      \ COVID, etc). \u03B2_reform identifies the average post-treatment deviation\
+      \ from each treated country's own pre-treatment trend, net of global year effects.\n\
+      This is a staggered two-way fixed effects DiD. TWFE with staggered treatment\
+      \ has known bias under heterogeneous treatment effects (Goodman-Bacon 2021);\
+      \ v3.1 will run Callaway-Sant'Anna as robustness once that package is installed.\
+      \ For v3 v1, TWFE is the simplest identification that tests the core claim.\n\
+      Secondary specs (reported alongside primary): - event study with \xB15 year\
+      \ leads and lags around each treatment date - pre-trend placebo: fake treatment\
+      \ at t-5 to test parallel trends - drop-COVID robustness (2020-2021 excluded)\n"
+  steelman: hypotheses/steelman/nordic_outcome_persistence_decomposition_v3.md
+reproduction:
+  run_dir: engine/runs/nordic_outcome_persistence_decomposition_v3
+  runner: null
+  replication_script: engine/runs/nordic_outcome_persistence_decomposition_v3/replication.py
+  suggested_command: python engine/runs/nordic_outcome_persistence_decomposition_v3/replication.py
+data:
+  inputs:
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-24T093414Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 751ca2ec9be31a601ee1180fd88f2df8f8aad41c38683244dcabf96daea654f7
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:14.734865+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  - name: unemployment
+    publisher: world_bank_wdi
+    series_id: SL.UEM.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/SL.UEM.TOTL.ZS@2026-04-24T093529Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 0a1496efde6f53728e4e6c774933042e2cf5befb32222c40e7f80cf7eaff86d1
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:35:29.614185+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Unemployment, total (% of total labor force) (modeled ILO estimate)
+      source_note: Unemployment refers to the share of the labor force that is without
+        work but available for and seeking employment.
+      countries_param: all
+      vintage_utc: null
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-04-24T093436Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 41b4cf786c937365599f45b566769cad95a93835c32a3884b261d40e116edb42
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.TOTL
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:36.084322+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population, total
+      source_note: Total population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship. The
+        values shown are midyear estimates.
+      countries_param: all
+      vintage_utc: null
+  - name: urbanisation
+    publisher: world_bank_wdi
+    series_id: SP.URB.TOTL.IN.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-04-24T093457Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 6875bd0d6440d943b743d77ef977bffec3b37a83f14131bb9c4f3ccc5292a30f
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:57.837140+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Urban population (% of total population)
+      source_note: Urban population refers to people living in urban areas as defined
+        by national statistical offices. The data are collected and smoothed by United
+        Nations Population Division.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 4
+    official_source_count: 4
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 4
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/institutional_quality/nordic_outcome_persistence_decomposition_v3.yaml
+  sha256: e8abaaf6e0fd4875ab77c18d396661c8bd68b0de8dd5453615db25c895aebad5
+  bytes: 12896
+- path: engine/runs/nordic_outcome_persistence_decomposition_v3/manifest.yaml
+  sha256: 87f8faf53c2217665a7b19d3b7bea4703264a5b200e43213e9558673d2fb6786
+  bytes: 1071
+- path: engine/runs/nordic_outcome_persistence_decomposition_v3/diagnostics.json
+  sha256: a727c9a05071992ccfa40c6002eda2e10852185b22c1b60806e80bf126c1a042
+  bytes: 3235
+- path: engine/runs/nordic_outcome_persistence_decomposition_v3/result_card.md
+  sha256: 6ebcb609fac3b28b20e098c2258e85306ffd3df159ed4785a6f4105a691da740
+  bytes: 3159
+- path: engine/runs/nordic_outcome_persistence_decomposition_v3/replication.py
+  sha256: 58847bde90c050e2f31ed15ab95168eac210f3cb85e8e282edb30f8e1339d104
+  bytes: 21371
+- path: engine/runs/nordic_outcome_persistence_decomposition_v3/coefficients.parquet
+  sha256: 61d7f307feb5e8aff44d58f04e7c1d19c49ae7417818f0918147b2a132c96b6a
+  bytes: 5903
+- path: engine/runs/nordic_outcome_persistence_decomposition_v3/chart_data.json
+  sha256: 132750c559cfa9c11795428ab6458b83bdc4aa15fe940d622cbc790e36280624
+  bytes: 24043
+- path: hypotheses/steelman/nordic_outcome_persistence_decomposition_v3.md
+  sha256: 0ed2ac3b1a0af1b693afdf37bb29e15e3dc591f252663b35dac90e985ef543f0
+  bytes: 4379
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SL.UEM.TOTL.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SL.UEM.TOTL.ZS
+  url: https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://data.worldbank.org/indicator/SP.POP.TOTL
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+caveats: []

@@ -1,0 +1,223 @@
+packet_version: 1
+generated_utc: '2026-05-19T08:57:08+00:00'
+repository:
+  root: .
+  git_commit: a3f2bb6578006d61cb08f28e676c7d76d650c699
+hypothesis:
+  id: lula_bolsa_familia_poverty_reduction_decomposition_2003_2010
+  legacy_id: null
+  path: hypotheses/distribution/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010.yaml
+  school: null
+  topic: distribution
+  claim: "Brazil's substantial 2003-2010 poverty reduction (extreme poverty headcount\
+    \ fell from ~10% to ~4% and Gini coefficient from ~0.58 to ~0.53 per PNAD/IPEA\
+    \ series) is decomposed across three channels: (a) Bolsa Fam\xEDlia cash-transfer\
+    \ expansion (Lei 10,836 of January 2004 consolidating prior CCTs, reaching ~13\
+    \ million families by 2010), (b) real minimum-wage valorisation (real minimum\
+    \ wage rose over 50% 2003-2010, pulling up the bottom of the formal wage distribution\
+    \ and indexed social transfers including BPC), and (c) the 2003-2008 commodity\
+    \ boom (export revenue surge, formal-employment growth, wage-bargaining leverage\
+    \ from tight labour markets). The pre-registered claim is that channels (a) and\
+    \ (b) \u2014 the policy channels \u2014 jointly account for at least 40% of the\
+    \ total observed reduction in extreme-poverty headcount AND at least 30% of the\
+    \ Gini decline, after controlling for the commodity boom channel via an oil-exporter\
+    \ LatAm donor pool (Mexico, Colombia, Peru).\n"
+verdict:
+  raw: REFUTED
+  bucket: refuted
+  reason: coef=-3.733 (sign opposite claim +), p=0.0154
+  status: null
+preregistration:
+  claim: "Brazil's substantial 2003-2010 poverty reduction (extreme poverty headcount\
+    \ fell from ~10% to ~4% and Gini coefficient from ~0.58 to ~0.53 per PNAD/IPEA\
+    \ series) is decomposed across three channels: (a) Bolsa Fam\xEDlia cash-transfer\
+    \ expansion (Lei 10,836 of January 2004 consolidating prior CCTs, reaching ~13\
+    \ million families by 2010), (b) real minimum-wage valorisation (real minimum\
+    \ wage rose over 50% 2003-2010, pulling up the bottom of the formal wage distribution\
+    \ and indexed social transfers including BPC), and (c) the 2003-2008 commodity\
+    \ boom (export revenue surge, formal-employment growth, wage-bargaining leverage\
+    \ from tight labour markets). The pre-registered claim is that channels (a) and\
+    \ (b) \u2014 the policy channels \u2014 jointly account for at least 40% of the\
+    \ total observed reduction in extreme-poverty headcount AND at least 30% of the\
+    \ Gini decline, after controlling for the commodity boom channel via an oil-exporter\
+    \ LatAm donor pool (Mexico, Colombia, Peru).\n"
+  falsification_rule: 'Not supported if EITHER (a) the Shapley variance share of channels
+    (a) + (b) (BF + minimum wage) in explaining the 2003-2010 extreme-poverty headcount
+    decline is less than 40%, OR (b) their share of the Gini decline is less than
+    30%, OR (c) the commodity-boom channel (c) alone accounts for more than 60% of
+    either decomposition, OR (d) the synthetic-control robustness gap on the BRA series
+    is not negative and distinguishable from the donor pool''s own Gini trajectories
+    at 10% permutation inference. Any one condition falsifies.
+
+    '
+  threshold: 'variance_share(BF + minwage, poverty_headcount) >= 0.40 AND variance_share(BF
+    + minwage, gini) >= 0.30 AND variance_share(commodity, both outcomes) <= 0.60
+    AND synth_control_gap on BRA negative at p_perm < 0.10
+
+    '
+  estimator:
+    template: panel_fe_decomposition
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: 'Panel FE decomposition with Shapley-style variance attribution across
+      three channels (BF, min wage, commodity boom). Primary outcome regressions:
+      poverty headcount and Gini on channel intensities with country and year FE.
+      Donor pool (MEX, COL, PER, CHL, ARG) anchors the commodity-boom counterfactual:
+      these LatAm peers experienced the same boom but lacked BF- scale CCT expansion
+      and (for some) minimum-wage valorisation. Shapley decomposition reports each
+      channel''s marginal share of the explained within-Brazil variance. Robustness:
+      synthetic control on BRA using the donor pool, with the synthetic-control gap
+      interpreted as the combined BF + minimum-wage effect.
+
+      '
+  steelman: hypotheses/steelman/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010.md
+reproduction:
+  run_dir: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010
+  runner: null
+  replication_script: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/replication.py
+  suggested_command: python engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/replication.py
+data:
+  inputs:
+  - name: poverty
+    publisher: world_bank_wdi
+    series_id: SI.POV.DDAY
+    vintage_file: data/vintages/world_bank_wdi/SI.POV.DDAY@2026-04-28T125341Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 3678d0c621611ef50ba27c68c545ee36f5686fdf103d37b43fcd8caab308b3e8
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: gini
+    publisher: world_bank_wdi
+    series_id: SI.POV.GINI
+    vintage_file: data/vintages/world_bank_wdi/SI.POV.GINI@2026-04-28T124148Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 74e54ceeae73e99a040efaf5403588302b27a80a988d3d37c223493132f2f361
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: gdp_pc_growth
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD.ZG
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD.ZG@2026-04-28T125301Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 2740d87870c135af5f86f7af466e7c92419a336874a02e85172ca93c76558c8c
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: urban
+    publisher: world_bank_wdi
+    series_id: SP.URB.TOTL.IN.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-04-28T092542Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 6875bd0d6440d943b743d77ef977bffec3b37a83f14131bb9c4f3ccc5292a30f
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 4
+    official_source_count: 0
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 4
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/distribution/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010.yaml
+  sha256: cc052e7a28e961ccdfc1ec75ab15f9e2ae8f6454b71470a7a97fc02553ad52e1
+  bytes: 11919
+- path: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/manifest.yaml
+  sha256: 59a7a693ca785c66b110e1ede0d63a7513a3d990500fd784140fb5ce69103e48
+  bytes: 2047
+- path: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/diagnostics.json
+  sha256: 9cd1d3b5d56dacde9d42389a9642aba39dec3d8a257f403b5312c32d10ebe44d
+  bytes: 3567
+- path: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/result_card.md
+  sha256: 045dae628c785c719dddd0b620d8e7d81835e48605743815214688038d74a3a6
+  bytes: 3467
+- path: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/replication.py
+  sha256: 4f86cfd85725c4d05aea1f00b6cf7b3fdfda0d8ed9060fe7e4da7e6fbae07a95
+  bytes: 25034
+- path: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/coefficients.parquet
+  sha256: 7fdf4d173fba2f4aae500dbd6519d6b151559fa303186b4d2369d5d5d80e6f6f
+  bytes: 3205
+- path: engine/runs/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010/chart_data.json
+  sha256: b09b6df4688ec887b1ee69fafe2685af1fc1d7ee04ba94844f2d601b4bbbe1b4
+  bytes: 7065
+- path: hypotheses/steelman/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010.md
+  sha256: 4fb22f814aaa5a494fac793d2bdae805fe6674da50b7d89eb921d488aede1600
+  bytes: 3926
+references: []
+caveats:
+- "Bolsa Fam\xEDlia coverage and minimum-wage indices are constructed from published\
+  \ programme/IPEA timelines, not pulled as a versioned vintage \u2014 a 'BF coverage'\
+  \ parquet would let this re-run mechanically."
+- Commodity-boom channel proxied by per-capita real-GDP growth (NY.GDP.PCAP.KD.ZG);
+  spec called for TT.PRI.MRCH.XD.WD terms-of-trade index, not in vintages.
+- Synthetic-control robustness sub-spec deferred; verdict relies on Shapley-style
+  R-squared decomposition.
+- ipeadata PNAD higher-frequency BRA series not used; rely on WDI SI.POV.DDAY (USD
+  2.15 2017 PPP) for cross-country comparability.

@@ -1,0 +1,446 @@
+packet_version: 1
+generated_utc: '2026-05-19T08:57:08+00:00'
+repository:
+  root: .
+  git_commit: a3f2bb6578006d61cb08f28e676c7d76d650c699
+hypothesis:
+  id: italian_stagnation_decomposition_1999_2023
+  legacy_id: null
+  path: hypotheses/growth/italian_stagnation_decomposition_1999_2023.yaml
+  school: null
+  topic: growth
+  claim: "Italy's real GDP per capita (PPP, constant international dollars) was approximately\
+    \ unchanged between 1999 (euro launch) and 2023 \u2014 a quarter-century of near-zero\
+    \ cumulative growth, with modest levels of variation around a flat trend. This\
+    \ hypothesis decomposes Italian stagnation into four channels: (1) euro-entry\
+    \ real-exchange-rate lock-in (loss of devaluation as adjustment instrument combined\
+    \ with a persistently overvalued real rate for the Italian tradeable sector),\
+    \ (2) regulatory and administrative stringency (OECD PMR Italy consistently high\
+    \ relative to peers; judicial slowness imposing contract-enforcement costs), (3)\
+    \ demographic drag (accelerating population aging, persistent below-replacement\
+    \ fertility, weak prime-age labour force participation, emigration of educated\
+    \ young), and (4) political-instability / fiscal-dominance channels (frequent\
+    \ government turnover, reform reversals, high-debt-stock interest burden). The\
+    \ decomposition is descriptive growth-accounting; no single channel is expected\
+    \ to dominate.\n"
+verdict:
+  raw: REFUTED
+  bucket: refuted
+  reason: coef=-0.01029 (sign opposite claim +), p=0.00177
+  status: null
+preregistration:
+  claim: "Italy's real GDP per capita (PPP, constant international dollars) was approximately\
+    \ unchanged between 1999 (euro launch) and 2023 \u2014 a quarter-century of near-zero\
+    \ cumulative growth, with modest levels of variation around a flat trend. This\
+    \ hypothesis decomposes Italian stagnation into four channels: (1) euro-entry\
+    \ real-exchange-rate lock-in (loss of devaluation as adjustment instrument combined\
+    \ with a persistently overvalued real rate for the Italian tradeable sector),\
+    \ (2) regulatory and administrative stringency (OECD PMR Italy consistently high\
+    \ relative to peers; judicial slowness imposing contract-enforcement costs), (3)\
+    \ demographic drag (accelerating population aging, persistent below-replacement\
+    \ fertility, weak prime-age labour force participation, emigration of educated\
+    \ young), and (4) political-instability / fiscal-dominance channels (frequent\
+    \ government turnover, reform reversals, high-debt-stock interest burden). The\
+    \ decomposition is descriptive growth-accounting; no single channel is expected\
+    \ to dominate.\n"
+  falsification_rule: "Not supported if (a) Italian GDP per capita in 2023 is NOT\
+    \ within 5% of its 1999 level (i.e., the stagnation stylised fact is falsified\
+    \ \u2014 unlikely given headline data), OR (b) the four channels together explain\
+    \ < 40% of the Italy-peer gap, OR (c) a single channel explains > 60% (monocausal),\
+    \ OR (d) the synthetic control's pre-1999 fit fails. If regulatory stringency\
+    \ alone accounts for majority of gap, report honestly \u2014 even though the framework\
+    \ prior expects multi-causal.\n"
+  threshold: 'abs(log_gdp_pc_ppp_2023 - log_gdp_pc_ppp_1999) < 0.10 (confirming stagnation)
+    AND combined_channel_contribution >= 0.40 of Italy-peer gap AND no single channel
+    > 0.60 of explained gap
+
+    '
+  estimator:
+    template: panel_fe_decomposition
+    clustering: country
+    fixed_effects:
+    - country
+    - year
+    notes: "Primary specification: multiplicative growth-accounting decomposition\
+      \ of Italy-minus-peer-average GDP per capita growth across the four channels,\
+      \ over 1999-2023. Peers = DEU + FRA + ESP weighted average. Each channel's contribution\
+      \ computed as (channel_ITA - channel_peer) \xD7 channel_elasticity.\nSecondary\
+      \ specification: panel FE with ITA vs peers, year FE, channels as covariates.\
+      \ \u03B2 on each channel \xD7 ITA dummy identifies Italy-specific loading on\
+      \ each channel.\nThird specification: synthetic control for Italy using peer\
+      \ pool, with treatment = 1999 euro entry. Compares Italy vs synthetic Italy\
+      \ on GDP per capita trajectory.\nThis is a DESCRIPTIVE hypothesis. Channel elasticities\
+      \ come from external literature (Lane 2006 on euro effects; Bloom et al. on\
+      \ management-practice productivity; Giavazzi-Pagano on Italian reform dynamics);\
+      \ identification is not attempted from scratch.\nKnown limitations: (1) Four\
+      \ channels are partially overlapping. PMR regulatory\n    stringency interacts\
+      \ with judicial slowness; political\n    turnover produces reform reversal that\
+      \ shows up as\n    regulatory stringency. Decomposition shares are order-\n\
+      \    sensitive.\n(2) Demographic channel cannot be fully separated from economic\n\
+      \    stagnation causes \u2014 young Italians emigrate partly because\n    of\
+      \ weak labour market, which is itself an outcome. Feedback\n    loops are real.\n\
+      (3) The 2008-2013 eurozone crisis is a one-off shock that the\n    decomposition\
+      \ cannot cleanly attribute to \"euro entry\" vs\n    \"political mismanagement\"\
+      \ vs \"external shock.\"\n(4) 2020-2021 COVID distorts; year FE absorb common\
+      \ shocks but\n    Italy was hit disproportionately.\n"
+  steelman: hypotheses/steelman/italian_stagnation_decomposition_1999_2023.md
+reproduction:
+  run_dir: engine/runs/italian_stagnation_decomposition_1999_2023
+  runner: null
+  replication_script: engine/runs/italian_stagnation_decomposition_1999_2023/replication.py
+  suggested_command: python engine/runs/italian_stagnation_decomposition_1999_2023/replication.py
+data:
+  inputs:
+  - name: gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-04-24T093414Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 751ca2ec9be31a601ee1180fd88f2df8f8aad41c38683244dcabf96daea654f7
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:14.734865+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  - name: trade_openness
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-04-24T093539Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: e007bd45f1de4803988352635a60900a3c9d0e0cad0e81014537326400c1b431
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:35:39.615378+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  - name: urbanisation
+    publisher: world_bank_wdi
+    series_id: SP.URB.TOTL.IN.ZS
+    vintage_file: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-04-24T093457Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 6875bd0d6440d943b743d77ef977bffec3b37a83f14131bb9c4f3ccc5292a30f
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:57.837140+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Urban population (% of total population)
+      source_note: Urban population refers to people living in urban areas as defined
+        by national statistical offices. The data are collected and smoothed by United
+        Nations Population Division.
+      countries_param: all
+      vintage_utc: null
+  - name: population
+    publisher: world_bank_wdi
+    series_id: SP.POP.TOTL
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-04-24T093436Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 41b4cf786c937365599f45b566769cad95a93835c32a3884b261d40e116edb42
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.TOTL
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:34:36.084322+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population, total
+      source_note: Total population is based on the de facto definition of population,
+        which counts all residents regardless of legal status or citizenship. The
+        values shown are midyear estimates.
+      countries_param: all
+      vintage_utc: null
+  - name: debt_gdp
+    publisher: imf
+    series_id: GGXWDG_NGDP
+    vintage_file: data/vintages/imf/GGXWDG_NGDP@2026-04-24T093642Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 0c0b5bdf70d9ef4556ea8c883264356af17d2bbb2db2633fafbaf012c23ec3ea
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+      methodology_url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+      license: IMF standard permissions (attribution required)
+      fetch_utc: '2026-04-24T09:36:42.699766+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1980'
+      end_date: '2031'
+      frequency: annual
+      rows: 8113
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_label: null
+      dataset: null
+      countries_filter: all
+      vintage_utc: null
+  - name: gov_eff
+    publisher: wgi
+    series_id: GOV_WGI_GE.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_GE.EST@2026-04-24T093600Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: 874b818331cc4920c44a143636338e7f3fb41540c804f45c02c6525638b7d464
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:36:00.608124+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: Government Effectiveness - Governance estimate (approx. -2.5
+        to +2.5)
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: rule_of_law
+    publisher: wgi
+    series_id: GOV_WGI_RL.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_RL.EST@2026-04-24T093604Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: cdac7acb560f3c080d76a3cc95128e95a1c98af1a5b86b71b4d7bbe59de4403b
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RL.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-04-24T09:36:04.340102+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      rows: 5616
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+      currency: null
+    extra:
+      indicator_name: Rule of Law - Governance estimate (approx. -2.5 to +2.5)
+      source_note: ''
+      countries_param: all
+      wb_source_id: 3
+      vintage_utc: null
+  - name: reer
+    publisher: bis
+    series_id: WS_EER
+    vintage_file: data/vintages/bis/WS_EER@2026-04-24T093737Z.parquet
+    exists_locally: false
+    hash:
+      declared_sha256: b8434de5a08c935ab8db66c1566719e0a585f8dd57eb4e8ec1c50161f378feae
+      computed_sha256: null
+      status: declared_only
+    source:
+      type: official
+      url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_EER/1.0/?format=csv
+      methodology_url: https://data.bis.org/topics/WS_EER
+      license: BIS Statistical Bulletin (public-use; attribution required)
+      fetch_utc: '2026-04-24T09:37:37.487545+00:00'
+      fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-24T120543Z.yaml
+    coverage:
+      start_date: 1964-01
+      end_date: '2026-04-21'
+      frequency: mixed
+      rows: 1195171
+      units: per dataflow metadata
+      currency: null
+    extra:
+      dataflow_description: Effective exchange rates (monthly, NEER + REER, narrow
+        + broad)
+      sdmx_key: (all)
+      columns:
+      - FREQ
+      - EER_TYPE
+      - EER_BASKET
+      - REF_AREA
+      - UNIT_MEASURE
+      - TIME_FORMAT
+      - COLLECTION
+      - TITLE_TS
+      - period
+      - value
+      - OBS_STATUS
+      - OBS_CONF
+      - OBS_PRE_BREAK
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: partial_provenance
+    input_count: 8
+    official_source_count: 8
+    manual_source_count: 0
+    hash_status_counts:
+      declared_only: 8
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/growth/italian_stagnation_decomposition_1999_2023.yaml
+  sha256: 6dcdd8bedcbfa52a70ec0cd864310c440098269fcc4da17bba35182bc979bd67
+  bytes: 12231
+- path: engine/runs/italian_stagnation_decomposition_1999_2023/manifest.yaml
+  sha256: d0a13b338ef023aa3b652498ad41374ec64a63ca4ad60dabaf717d47d8f1469c
+  bytes: 2174
+- path: engine/runs/italian_stagnation_decomposition_1999_2023/diagnostics.json
+  sha256: 88c89f04e1f59b286395e56177afdb8168f3f08ae3295022c0494f4548a77041
+  bytes: 3857
+- path: engine/runs/italian_stagnation_decomposition_1999_2023/result_card.md
+  sha256: 92e28c3a54e025da47d8de3dd70e409b123974e3293b0ac70b783be9aa40fa8b
+  bytes: 3576
+- path: engine/runs/italian_stagnation_decomposition_1999_2023/replication.py
+  sha256: 4f97a2a7ca308fb14ec272562f08912c4987938f466fc5b551337f60e5709202
+  bytes: 11815
+- path: engine/runs/italian_stagnation_decomposition_1999_2023/coefficients.parquet
+  sha256: 8338b07af5a3a288ed2da3295f4667ea2c4e2484568cf2825387ad1913f7166d
+  bytes: 4138
+- path: engine/runs/italian_stagnation_decomposition_1999_2023/chart_data.json
+  sha256: ac2b7ef7343b4f192153a3a9f0a428c42bcc28d50c0a12aebf8f3d20ab37b45e
+  bytes: 14399
+- path: hypotheses/steelman/italian_stagnation_decomposition_1999_2023.md
+  sha256: cae9660cacc2e14ff5177d02c10cdb02c528feec38a3f61829028ba2cf97d0d5
+  bytes: 4901
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.URB.TOTL.IN.ZS
+  url: https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.TOTL
+  url: https://data.worldbank.org/indicator/SP.POP.TOTL
+- kind: source
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP
+- kind: methodology
+  publisher: imf
+  series_id: GGXWDG_NGDP
+  url: https://www.imf.org/external/datamapper/GGXWDG_NGDP
+- kind: source
+  publisher: wgi
+  series_id: GOV_WGI_GE.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+- kind: methodology
+  publisher: wgi
+  series_id: GOV_WGI_GE.EST
+  url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+- kind: source
+  publisher: wgi
+  series_id: GOV_WGI_RL.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RL.EST?format=json&source=3
+- kind: source
+  publisher: bis
+  series_id: WS_EER
+  url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_EER/1.0/?format=csv
+- kind: methodology
+  publisher: bis
+  series_id: WS_EER
+  url: https://data.bis.org/topics/WS_EER
+caveats:
+- Spec channels prime_age_lfp, PWT TFP, political_turnover coding not in vintages;
+  substituted WGI gov_eff + rule_of_law as institutional/political proxies and IMF
+  debt + REER + trade openness as macroeconomic channels.
+- Synthetic-control sub-spec not run.

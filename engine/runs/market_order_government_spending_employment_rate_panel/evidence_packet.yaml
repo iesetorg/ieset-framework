@@ -1,0 +1,263 @@
+packet_version: 1
+generated_utc: '2026-05-19T08:57:09+00:00'
+repository:
+  root: .
+  git_commit: a3f2bb6578006d61cb08f28e676c7d76d650c699
+hypothesis:
+  id: market_order_government_spending_employment_rate_panel
+  legacy_id: null
+  path: hypotheses/fiscal/market_order_government_spending_employment_rate_panel.yaml
+  school: null
+  topic: fiscal
+  claim: Across a pre-registered panel of OECD and major emerging-market economies
+    from 1996 to 2023, larger government expenditure shares predict lower employment
+    rates after country and year fixed effects and basic macro controls. This tests
+    the crowding-out, tax-expectation, and discretionary-allocation channels without
+    using the Heritage latest-year cross-section as the treatment.
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: coef=-0.1949 (sign matches claim -), p=0.000187
+  status: SUPPORTED
+preregistration:
+  claim: Across a pre-registered panel of OECD and major emerging-market economies
+    from 1996 to 2023, larger government expenditure shares predict lower employment
+    rates after country and year fixed effects and basic macro controls. This tests
+    the crowding-out, tax-expectation, and discretionary-allocation channels without
+    using the Heritage latest-year cross-section as the treatment.
+  falsification_rule: SUPPORTED if the coefficient on government_spending_share is
+    negatively signed at p<0.10 with at least 30 usable observations after listwise
+    deletion. REFUTED if the coefficient is significantly opposite-signed at p<0.10.
+    Otherwise PARTIAL.
+  threshold:
+    expected_sign: '-'
+    p_max: 0.1
+    min_observations: 30
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: Primary test is two-way fixed effects with country-clustered standard errors.
+      The first public verdict should not be treated as causal; it is the registered
+      panel hurdle before any scoreboard interpretation.
+  steelman: hypotheses/steelman/market_order_government_spending_employment_rate_panel.md
+reproduction:
+  run_dir: engine/runs/market_order_government_spending_employment_rate_panel
+  runner: engine/runs/market_order_government_spending_employment_rate_panel/replication.py
+  replication_script: engine/runs/market_order_government_spending_employment_rate_panel/replication.py
+  suggested_command: python engine/runs/market_order_government_spending_employment_rate_panel/replication.py
+data:
+  inputs:
+  - name: employment_rate
+    publisher: world_bank_wdi
+    series_id: SL.EMP.TOTL.SP.ZS
+    vintage_file: data/vintages/world_bank_wdi/SL.EMP.TOTL.SP.ZS@2026-05-05T194751Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 13dd1ff36a27d38b5398196789130886c158c0d48ff0d8327567c9673bdbaeef
+      computed_sha256: 13dd1ff36a27d38b5398196789130886c158c0d48ff0d8327567c9673bdbaeef
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SL.EMP.TOTL.SP.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/SL.EMP.TOTL.SP.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:47:51.768795+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Employment to population ratio, 15+, total (%) (modeled ILO
+        estimate)
+      source_note: Employment to population ratio is the proportion of a country's
+        population that is employed.
+      countries_param: all
+      vintage_utc: null
+  - name: government_spending_share
+    publisher: world_bank_wdi
+    series_id: GC.XPN.TOTL.GD.ZS
+    vintage_file: data/vintages/world_bank_wdi/GC.XPN.TOTL.GD.ZS@2026-04-30T131014Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6415fec35cc561ac0d5743aa3ef38de80ea1e8a831eb95dbb214f6f58a5ed9ad
+      computed_sha256: 6415fec35cc561ac0d5743aa3ef38de80ea1e8a831eb95dbb214f6f58a5ed9ad
+      status: match
+    source:
+      type: unknown
+      url: null
+      methodology_url: null
+      license: null
+      fetch_utc: null
+      fetch_manifest: null
+    coverage:
+      start_date: null
+      end_date: null
+      frequency: null
+      rows: null
+      units: null
+      currency: null
+    extra: {}
+  - name: log_gdp_pc_ppp
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      computed_sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:48.372391+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: GDP per capita, PPP (constant 2021 international $)
+      source_note: This indicator provides values for gross domestic product (GDP)
+        per person expressed in constant international dollars, converted by purchasing
+        power parities (PPPs). PPPs account for the different price levels across
+        countries and thus PPP-based comparisons of economic output are more appropriate
+        for comparing the output of economies and the average material well-being
+        of their inhabitants than e
+      countries_param: all
+      vintage_utc: null
+  - name: population_growth
+    publisher: world_bank_wdi
+    series_id: SP.POP.GROW
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.GROW@2026-05-05T194839Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      computed_sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+      methodology_url: https://data.worldbank.org/indicator/SP.POP.GROW
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:48:39.147679+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Population growth (annual %)
+      source_note: Annual population growth rate for year t is the exponential rate
+        of growth of midyear population from year t-1 to t, expressed as a percentage.
+        Population is based on the de facto definition of population, which counts
+        all residents regardless of legal status or citizenship.
+      countries_param: all
+      vintage_utc: null
+  - name: trade_openness_control
+    publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      computed_sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:57.739528+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      rows: 17556
+      units: per indicator definition
+      currency: null
+    extra:
+      indicator_name: Trade (% of GDP)
+      source_note: Trade is the sum of exports and imports of goods and services.
+        This indicator is expressed as a percentage of Gross Domestic Product (GDP)
+        which is the total income earned through the production of goods and services
+        in an economic territory during an accounting period.
+      countries_param: all
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 5
+    official_source_count: 4
+    manual_source_count: 0
+    hash_status_counts:
+      match: 5
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/fiscal/market_order_government_spending_employment_rate_panel.yaml
+  sha256: aa85c7379e8af4370c5e4394f6691ca27a9fc28560822145140b4a2a166b704e
+  bytes: 9004
+- path: engine/runs/market_order_government_spending_employment_rate_panel/manifest.yaml
+  sha256: 5d075554baab73507fd47d95be577ef99a0834bb3de4c879052a40b8b5940840
+  bytes: 2156
+- path: engine/runs/market_order_government_spending_employment_rate_panel/diagnostics.json
+  sha256: 575e02b91253a0aee1abd02492608bcd8ac1684bd8e1cfdfa5d44d024573ba24
+  bytes: 2224
+- path: engine/runs/market_order_government_spending_employment_rate_panel/result_card.md
+  sha256: 8746d822261cc555859545a3c6a2ba62401ea2a6305a10c4444c135b9234db79
+  bytes: 1779
+- path: engine/runs/market_order_government_spending_employment_rate_panel/replication.py
+  sha256: c74b9acad4ad9cfee1452937cc3b8773d1398ee27d62a1cb80121c6f76ea8de8
+  bytes: 410
+- path: hypotheses/steelman/market_order_government_spending_employment_rate_panel.md
+  sha256: c7b7d82241f2d0182e3a01fdf6b98e218107351bc73b4ddc367d4c1ccf2d394a
+  bytes: 1343
+references:
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SL.EMP.TOTL.SP.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/SL.EMP.TOTL.SP.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SL.EMP.TOTL.SP.ZS
+  url: https://data.worldbank.org/indicator/SL.EMP.TOTL.SP.ZS
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.PP.KD
+  url: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+- kind: source
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: SP.POP.GROW
+  url: https://data.worldbank.org/indicator/SP.POP.GROW
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+- kind: methodology
+  publisher: world_bank_wdi
+  series_id: NE.TRD.GNFS.ZS
+  url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+caveats: []

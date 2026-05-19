@@ -77,7 +77,23 @@ REQUIRED_FIELDS = ("hypothesis_id", "version", "topic", "claim", "status")
 # followed by ":" and a series id. The "constructed:" prefix is special and
 # means the variable is derived in-script — not a fetcher dependency.
 SOURCE_TOKEN_RE = re.compile(r"\b([a-z][a-z0-9_]*)\s*:\s*([^\s;,#)]+)")
-CONSTRUCTED_PREFIXES = {"constructed", "derived", "manual", "academic", "proxies"}
+CONSTRUCTED_PREFIXES = {
+    "constructed",
+    "derived",
+    "manual",
+    "academic",
+    "proxies",
+    "proxy",
+    "microdata",
+    "dates",
+    "policy_axes",
+    "movement_position_alignments",
+    "trajectory",
+    "checks",
+    "tabulation",
+    "fallback",
+    "capex",
+}
 
 
 def load_yaml(path: Path) -> dict | None:
@@ -95,6 +111,33 @@ _SERIES_REVERSE_ALIASES: dict[str, dict[str, set[str]]] = {
         "EAP_2WAP_SEX_AGE_RT_A": {"EAP_2WAP_SEX_AGE_RT"},
         "EAR_EHRA_SEX_NB_A": {"EAR_4MTH_SEX_RT"},
         "UNE_2EAP_SEX_AGE_RT_A": {"unemployment_rate"},
+    },
+    "irena": {
+        "installed_capacity_renewable": {"capacity"},
+        "lcoe_solar_pv": {"solar_pv_costs"},
+        "lcoe_wind_onshore": {"wind_lcoe"},
+    },
+    "wgi": {
+        "GOV_WGI_RQ.EST": {"RQ.EST"},
+        "RL.EST": {"rule_of_law"},
+        "RuleOfLaw": {"rule_of_law"},
+    },
+    "oecd": {
+        "OECD.SDD.NAD_DSD_NAMAIN1_DF_TABLE1_1.0": {"OECD.SDD.NAD"},
+        "OECD.SDD.TPS_DSD_PRICES_DF_PRICES_ALL_1.0": {"OECD.SDD.TPS"},
+        "DSD_SOCX_DF_SOCX_AGG": {"DSD_SOCX@DF_SOCX_AGG"},
+    },
+    "oecd_pmr": {
+        "PMR": {"overall_pmr", "pmr_composite", "pmr"},
+        "BARRIER_ENTRY": {"barriers_to_entry"},
+    },
+    "pwt": {
+        "rgdpo_per_emp": {"rgdpo_emp"},
+    },
+    "fraser_efw": {
+        "legal_system_property_rights": {"property_rights"},
+        "regulation": {"regulation_business"},
+        "sound_money": {"area_3"},
     },
     "ecb": {
         "ICP__M.U2.N.000000.4.ANR": {"ICP.M.U2.N.000000.4.ANR"},
@@ -127,10 +170,18 @@ def list_publishers_with_data() -> dict[str, set[str]]:
             with publishers_yaml.open() as f:
                 pubs = yaml.safe_load(f)
             for pub_id, info in (pubs.get("publishers") or {}).items():
-                if pub_id in result:
-                    for alias in info.get("aliases", []):
-                        if alias not in result:
-                            result[alias] = result[pub_id]
+                aliases = list(info.get("aliases", []))
+                known_names = [pub_id, *aliases]
+                backing_series = None
+                for name in known_names:
+                    if name in result:
+                        backing_series = result[name]
+                        break
+                if backing_series is None:
+                    continue
+                for name in known_names:
+                    if name not in result:
+                        result[name] = backing_series
         except Exception:
             pass
     # Apply reverse aliases (stored name -> requested name)
