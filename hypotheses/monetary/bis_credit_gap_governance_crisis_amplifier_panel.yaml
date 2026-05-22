@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_credit_gap_governance_crisis_amplifier_panel
+version: 1
+status: candidate
+topic: monetary
+claim_direction: "+"
+claim: >
+  BIS credit-gap booms are followed by higher unemployment, and the association
+  is larger where regulatory quality is weaker. The core claim is not that
+  every credit expansion is harmful, but that above-trend private credit becomes
+  more fragile when the rule-bound governance environment is weak.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed BIS credit-gap,
+  WDI labour/macro, and WGI governance panels.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, GRC, HKG, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, LUX, MEX, MYS, NLD, NOR, NZL, POL, PRT, RUS, SAU, SGP, SWE, THA, TUR, USA, ZAF]
+  period: [1996, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing unemployment, credit gap, GDP growth, or WGI controls
+    - winsorize credit-gap observations outside the 1st and 99th percentile in robustness checks
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+  treatment:
+    - name: credit_gap
+      source: bis:WS_CREDIT_GAP
+      transformation: level
+      notes: BIS credit-to-GDP gap, filtered to credit-gap measure by the generic runner.
+    - name: regulatory_quality_inverted
+      source: wgi:RQ.EST
+      transformation: inverted_scale
+      notes: Higher values mean weaker regulatory quality for the interaction term.
+  controls:
+    - name: gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary estimand is the interaction credit_gap x regulatory_quality_inverted,
+    with credit_gap and the governance main effect retained as regressors.
+falsification:
+  rule: >
+    SUPPORTED only if the credit_gap x regulatory_quality_inverted coefficient is
+    positive at p<=0.10 with at least 450 usable country-year observations and 15
+    countries. REFUTED if the interaction is negative at p<=0.10.
+  test: panel_fe_bis_credit_gap_governance_crisis_amplifier_panel
+  threshold:
+    coef_min: 0.05
+    p_max: 0.10
+    min_observations: 450
+    min_countries: 15
+prior_confidence: 0.58
+disclosure: >
+  The prior leans toward macro-financial fragility in weak governance settings,
+  but the spec is intentionally associational because credit booms may also
+  reflect catch-up financial deepening.
+steelman: hypotheses/steelman/bis_credit_gap_governance_crisis_amplifier_panel.md
+scope:
+  period: [1996, 2025]
+  countries: [GLOBAL]
+  outcome_dim: [employment_labour, financial_crisis, institutional_quality]
+  policy_family: [monetary_policy, regulation, institutional_reform]
+  treatment_tags: [credit_gap, regulatory_quality, financial_fragility]
+covers_claims: []
+notes: >
+  First-pass runnable through scripts/run_panel_fe.py with the landed BIS/WDI/WGI
+  vintages. A later bespoke replication should lag credit-gap treatments one to
+  two years and report crisis-window unemployment changes.

@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: state_trade_barriers_consumption_variety_panel
+version: 1
+status: candidate
+topic: trade
+claim_direction: "-"
+claim: >
+  Higher state-imposed trade barriers predict weaker household consumption
+  growth and narrower imported product variety in country-year panels. The
+  market mechanism is that lower barriers expand consumer and producer choice
+  through price competition and input access; the protectionist state-control
+  counterclaim is that restricting imports preserves domestic production
+  without material consumer-welfare costs.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1988, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop aggregate regions and non-country WITS rows
+    - drop country-years missing tariff data or real consumption data
+    - retain only countries with at least 10 usable annual observations
+scope:
+  period: [1988, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, currency_purchasing_power, poverty_inequality]
+  policy_family: [trade_policy]
+  treatment_tags: [tariffs, import_variety, consumer_welfare]
+variables:
+  outcome:
+    - name: real_household_consumption_per_capita_growth
+      source: world_bank_wdi:NE.CON.PRVT.PC.KD.ZG
+      transformation: level
+      notes: Primary welfare proxy for consumer purchasing power over time.
+    - name: import_hs6_product_lines
+      source: wits:product_lines
+      transformation: log
+      notes: Secondary product-variety outcome; useful for mechanism tracing.
+  treatment:
+    - name: applied_tariff_rate
+      source: wits:tariff_average
+      transformation: level
+    - name: import_product_concentration
+      source: wits:import_concentration
+      transformation: level
+      notes: Secondary state-barrier proxy when tariff coverage is thin.
+  controls:
+    - name: log_gdp_pc
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: inflation
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Tariffs and import restrictions are regulatory trade-policy instruments that
+  alter price signals and market access.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary test estimates consumption-growth response to applied tariffs with
+    country and year fixed effects. Product-line variety is reported as a
+    mechanism check rather than a dispositive second hurdle.
+falsification:
+  rule: >
+    SUPPORTED if applied_tariff_rate is negative for real household consumption
+    per-capita growth at p<=0.10 with at least 300 observations and 25
+    countries. REFUTED if applied_tariff_rate is positive at p<=0.10 under the
+    same sample floor. Otherwise PARTIAL or INCONCLUSIVE depending on coverage.
+  test: panel_fe_state_trade_barriers_consumption_variety_panel
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 25
+prior_confidence: 0.56
+disclosure: >
+  The author has market-opening priors, but the consumption outcome is noisy
+  and tariffs may rise endogenously during downturns. A supported result would
+  be evidence against protection-without-cost claims, not a complete welfare
+  accounting of every tariff episode.
+steelman: hypotheses/steelman/state_trade_barriers_consumption_variety_panel.md
+notes: >
+  Uses WITS tariff/product panels and WDI macro outcomes so the first pass
+  should be runnable with existing fetchers.

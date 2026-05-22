@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_dynamism_tariff_reduction_consumption_pc
+version: 1
+status: candidate
+topic: growth
+claim: Lower applied tariff rates predict faster real private-consumption-per-capita growth.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, DEU, FRA, ITA, ESP, NLD, SWE, NOR, DNK, FIN, JPN, KOR, CHN, IND, BRA, MEX, CHL, ARG, TUR, ZAF, POL, EST, VNM, THA, MYS, IDN, COL, PER, PHL, EGY, MAR, KEN, NGA, BGD, PAK, LKA]
+  period: [1988, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing WITS tariff treatment or WDI private-consumption outcome
+  - lag tariff treatment one year to reduce contemporaneous demand feedback
+  - require at least 20 countries and 250 country-year observations
+scope:
+  period: [1988, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, welfare_state, trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [tariff_reduction, import_competition, consumer_welfare]
+intervention_channel: regulatory
+intervention_channel_justification: Applied tariffs are policy-set trade barriers; they enter as a regulatory trade-policy treatment.
+variables:
+  outcome:
+  - name: real_private_consumption_pc_growth
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: annual_log_growth
+  treatment:
+  - name: weighted_mean_applied_tariff
+    source: wits:weighted_mean_applied_tariff
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: real_gdp_pc_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+    transformation: level
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: This is a consumer-welfare screen for openness; it does not isolate tariff reforms from broader stabilization or exchange-rate changes.
+falsification:
+  rule: SUPPORTED if the tariff coefficient is negative at p<0.10 for real private-consumption-per-capita growth. REFUTED if it is positive at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_dynamism_tariff_reduction_consumption_pc
+  threshold:
+    p_value: "p<0.10"
+    expected_sign: "-"
+    minimum_countries: 20
+    minimum_observations: 250
+prior_confidence: 0.56
+disclosure: The prior favors openness improving consumer welfare, but commodity importers, infant-industry episodes, and crisis liberalizations can plausibly reverse the sign.
+steelman: hypotheses/steelman/market_dynamism_tariff_reduction_consumption_pc.md

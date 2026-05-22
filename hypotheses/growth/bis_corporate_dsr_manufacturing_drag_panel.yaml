@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_corporate_dsr_manufacturing_drag_panel
+version: 1
+status: candidate
+topic: growth
+claim_direction: "-"
+claim: >
+  High non-financial corporate debt-service burdens predict lower manufacturing
+  value-added shares, consistent with balance-sheet pressure crowding out
+  tradable-sector reinvestment and slowing industrial upgrading.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed BIS DSR, WDI
+  manufacturing, WDI macro, and WGI governance panels.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, GRC, HKG, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, LUX, MEX, MYS, NLD, NOR, NZL, POL, PRT, RUS, SAU, SGP, SWE, THA, TUR, USA, ZAF]
+  period: [1999, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing corporate DSR or manufacturing share
+    - require at least five years of within-country observations in robustness checks
+variables:
+  outcome:
+    - name: manufacturing_share
+      source: world_bank_wdi:NV.IND.MANF.ZS
+      transformation: level
+  treatment:
+    - name: corporate_dsr
+      source: bis:WS_DSR
+      transformation: level
+      notes: BIS debt-service ratio filtered to non-financial corporations.
+  controls:
+    - name: gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: regulatory_quality
+      source: wgi:RQ.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way fixed effects screen of manufacturing share on corporate DSR and
+    macro controls. Bespoke follow-up should test one- to three-year leads.
+falsification:
+  rule: >
+    SUPPORTED only if corporate_dsr is negative at p<=0.10 with at least 450
+    observations and 15 countries. REFUTED if corporate_dsr is positive at
+    p<=0.10.
+  test: panel_fe_bis_corporate_dsr_manufacturing_drag_panel
+  threshold:
+    coef_max: -0.05
+    p_max: 0.10
+    min_observations: 450
+    min_countries: 15
+prior_confidence: 0.55
+disclosure: >
+  The claim is plausible but not automatic: debt service can rise in successful
+  investment booms, so the result must survive country and year effects.
+steelman: hypotheses/steelman/bis_corporate_dsr_manufacturing_drag_panel.md
+scope:
+  period: [1999, 2025]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability, productivity, financialisation]
+  policy_family: [monetary_policy, regulation]
+  treatment_tags: [corporate_dsr, manufacturing_share, balance_sheet_pressure]
+covers_claims: []
+notes: >
+  The generic runner now filters BIS WS_DSR by borrower sector using the
+  variable name, so corporate_dsr selects the non-financial corporate slice.

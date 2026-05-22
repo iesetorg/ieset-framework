@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_dynamism_property_rights_investment_growth
+version: 1
+status: candidate
+topic: growth
+claim: Higher security of property rights predicts higher investment shares and faster subsequent real GDP per-capita growth.
+claim_direction: "+"
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, DEU, FRA, ITA, ESP, NLD, SWE, NOR, DNK, FIN, JPN, KOR, CHN, IND, BRA, MEX, CHL, ARG, TUR, ZAF, POL, EST, VNM, THA, MYS, IDN, COL, PER, PHL, EGY, MAR, KEN, NGA, BGD, PAK, LKA]
+  period: [1990, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing Fraser property-rights treatment, WDI investment outcome, or GDP-per-capita controls
+  - require at least 20 countries and 250 country-year observations after lags and leads
+scope:
+  period: [1990, 2022]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, institutional_quality]
+  policy_family: [institutional_reform]
+  treatment_tags: [property_rights, private_investment, market_order]
+intervention_channel: institutional
+intervention_channel_justification: Property-rights security is treated as an institutional regime measure rather than a discrete fiscal or monetary intervention.
+variables:
+  outcome:
+  - name: gross_capital_formation_share
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: level
+  - name: real_gdp_pc_growth_5yr_forward
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: cumulative_log_growth_5yr_forward
+  treatment:
+  - name: property_rights_security
+    source: fraser_efw:legal_system_property_rights
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: Two-way fixed-effects screen using lagged institutional scores; interpret as associational evidence because institutional quality may co-move with omitted reforms.
+falsification:
+  rule: SUPPORTED if the lagged property-rights coefficient is positive at p<0.10 for both investment share and forward growth. REFUTED if both primary coefficients are negative and at least one is significant at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_dynamism_property_rights_investment_growth
+  threshold:
+    p_value: "p<0.10"
+    expected_sign: "+"
+    minimum_countries: 20
+    minimum_observations: 250
+prior_confidence: 0.6
+disclosure: The prior favors property-rights mechanisms, but the spec is intentionally associational and allows null or negative estimates to count against the pro-market channel.
+steelman: hypotheses/steelman/market_dynamism_property_rights_investment_growth.md

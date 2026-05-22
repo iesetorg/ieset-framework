@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_dynamism_investment_freedom_renewables_diffusion
+version: 1
+status: candidate
+topic: growth
+claim: Higher investment freedom and private-credit depth predict faster renewable-electricity capacity diffusion.
+claim_direction: "+"
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, DEU, FRA, ITA, ESP, NLD, SWE, NOR, DNK, FIN, JPN, KOR, CHN, IND, BRA, MEX, CHL, ARG, TUR, ZAF, POL, EST, VNM, THA, MYS, IDN, COL, PER, PHL, EGY, MAR, KEN, NGA, BGD, PAK, LKA]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing IRENA renewable capacity, investment-freedom treatment, or private-credit control
+  - require nonnegative renewable capacity values and at least five observed years per country
+  - require at least 20 countries and 250 country-year observations
+scope:
+  period: [2000, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [energy, capital_flows, productivity]
+  policy_family: [energy_policy, institutional_reform]
+  treatment_tags: [investment_freedom, private_capital_allocation, renewable_capacity]
+intervention_channel: institutional
+intervention_channel_justification: Investment freedom is treated as an institutional openness measure governing entry and private capital allocation.
+variables:
+  outcome:
+  - name: renewable_capacity_growth
+    source: irena:installed_capacity_renewable
+    transformation: annual_log_growth_or_first_difference_when_zero
+  treatment:
+  - name: investment_freedom
+    source: heritage_ief:ief_panel
+    transformation: component_score_investment_freedom_lagged_one_year
+  - name: private_credit_depth
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: electricity_access
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: level
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: This tests whether private-capital openness is compatible with green diffusion; it does not deny that mandates or subsidies may matter.
+falsification:
+  rule: SUPPORTED if both investment freedom and private-credit depth are positive and at least one is significant at p<0.10 for renewable capacity growth. REFUTED if both coefficients are negative and at least one is significant at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_dynamism_investment_freedom_renewables_diffusion
+  threshold:
+    p_value: "p<0.10"
+    expected_sign: "+"
+    minimum_countries: 20
+    minimum_observations: 250
+prior_confidence: 0.5
+disclosure: The prior is deliberately neutral because renewable deployment often combines public policy, network planning, and private finance; the result should not be over-read as a single-cause test.
+steelman: hypotheses/steelman/market_dynamism_investment_freedom_renewables_diffusion.md

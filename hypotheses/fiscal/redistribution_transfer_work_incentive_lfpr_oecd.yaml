@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: redistribution_transfer_work_incentive_lfpr_oecd
+version: 1
+status: candidate
+topic: fiscal
+claim: >
+  In OECD countries from 1990 to 2023, transfer-heavy welfare states predict lower prime-age labour-force
+  participation when transfer expansion is not accompanied by strong work incentives, after controlling for income
+  level, female education, ageing, unemployment, and macro shocks. The mechanism tested is the substitution and
+  participation margin: redistribution can reduce durable poverty if it protects work attachment, but should weaken it
+  when benefit design makes non-work relatively more attractive.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISR, ITA, JPN, KOR, LTU, LVA, LUX, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years with real GDP growth below negative 5 percent in the primary specification
+    - require at least 15 years of labour-force participation data per country
+    - use five-year averages as robustness to reduce cyclical noise
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state, fiscal_policy]
+  policy_family: [welfare_architecture, fiscal_policy, tax_policy]
+  treatment_tags: [transfer_expansion, work_incentives, labour_force_participation]
+variables:
+  outcome:
+    - name: labour_force_participation_total
+      source: world_bank_wdi:SL.TLF.CACT.ZS
+      transformation: level
+      notes: Total labour-force participation rate; prime-age OECD LFS version should replace this when wired.
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+  treatment:
+    - name: social_spending_share
+      source: oecd:OECD.SOCX
+      transformation: level
+      notes: OECD social expenditure as a share of GDP where available.
+    - name: tax_revenue_share
+      source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+      transformation: level
+      notes: Financing-side proxy when SOCX category detail is unavailable.
+    - name: work_incentive_proxy
+      source: fraser_efw:size_of_government
+      transformation: level
+      notes: Higher EFW size-of-government scores proxy lower marginal tax and transfer disincentives; use as an interaction term, not a standalone welfare-quality measure.
+  controls:
+    - name: log_gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: female_tertiary_attainment
+      source: world_bank_wdi:SE.TER.CUAT.BA.FE.ZS
+      transformation: level
+    - name: old_age_dependency_ratio
+      source: world_bank_wdi:SP.POP.DPND.OL
+      transformation: level
+    - name: unemployment_rate
+      source: world_bank_wdi:SL.UEM.TOTL.ZS
+      transformation: level
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Social spending and tax revenue are fiscal channels. The work-incentive proxy is used only to distinguish welfare
+  architecture within fiscal redistribution systems.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary specification includes social_spending_share, work_incentive_proxy, and their interaction. The mechanism is
+    supported only if social spending has a more negative marginal association with participation when work incentives
+    are weak.
+falsification:
+  rule: >
+    Supported if social_spending_share is negative at p <= 0.10 at below-median work_incentive_proxy and the interaction
+    with work_incentive_proxy is positive. Refuted if social_spending_share is positive at below-median work incentives,
+    or if the interaction is negative at p <= 0.10. Otherwise partial.
+  test: panel_fe_transfer_work_incentive_lfpr
+  threshold:
+    marginal_effect_low_incentive_expected_sign: "-"
+    interaction_expected_sign: "+"
+    p_max: 0.10
+    min_observations: 350
+prior_confidence: 0.58
+disclosure: >
+  The author's prior favours work incentives, but a generous universal welfare state with high trust and active labour
+  markets could raise participation by reducing risk. The interaction rule gives that countercase a direct route to
+  refuting the claim.
+steelman: hypotheses/steelman/redistribution_transfer_work_incentive_lfpr_oecd.md
+notes: >
+  Intended as a mechanism test for redistribution-heavy poverty claims: the key question is whether transfer design
+  preserves labour-market attachment, not whether transfers reduce measured poverty in the same year.

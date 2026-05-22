@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_bargaining_extension_youth_entry_penalty
+version: 1
+status: candidate
+topic: labour
+claim: |
+  In OECD panels from 1990 to 2023, collective-bargaining systems where legal or administrative extension raises bargaining coverage far above union membership predict weaker labour-market entry for young workers and lower new-business density. The directional claim is that a 10 percentage-point increase in the bargaining-extension gap is associated with at least a 0.7 percentage-point lower youth employment rate and lower new-business density, conditional on the business cycle, education, tax wedge, and institutional quality.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing both bargaining coverage and union-density measures
+    - exclude crisis years with real GDP growth below -5 percent from the primary specification
+variables:
+  outcome:
+    - name: youth_employment_rate
+      source: ilostat:EMP_2EMP_SEX_AGE_RT_A
+      transformation: level_pct
+      notes: Employment-to-population ratio for ages 15-24.
+    - name: new_business_density
+      source: world_bank_wdi:IC.BUS.NDNS.ZS
+      transformation: level
+  treatment:
+    - name: bargaining_extension_gap
+      source: oecd:collective_bargaining_coverage_minus_union_density
+      transformation: difference_pct_points
+      notes: Constructed as collective-bargaining coverage less trade-union density; positive values proxy legal extension to non-signatory firms.
+    - name: collective_bargaining_coverage
+      source: oecd:DSD_TU@DF_TU
+      transformation: level_pct
+  controls:
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level_pct
+    - name: low_wage_tax_wedge
+      source: oecd:taxing_wages_67_percent_average_wage
+      transformation: level_pct
+    - name: tertiary_enrolment
+      source: world_bank_wdi:SE.TER.ENRR
+      transformation: level_pct
+    - name: regulatory_quality
+      source: wgi:RQ.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: |
+  Bargaining extension is a regulatory labour-market rule that makes wage floors and contract terms binding on firms that did not directly negotiate them.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Two-way FE panel with bargaining-extension gap as the treatment. Robustness checks use five-year averages, exclude countries with Ghent-style union unemployment insurance, and compare youth outcomes to prime-age outcomes as a placebo.
+falsification:
+  rule: |
+    Refuted if the bargaining-extension gap coefficient is zero or positive for youth employment, or if the coefficient on new-business density is non-negative after controlling for GDP growth, tax wedge, education, and regulatory quality. A result concentrated only in recession years is treated as inconclusive rather than support.
+  test: panel_fe_bargaining_extension_youth_entry
+  threshold: beta_extension_gap_youth_employment_10pp <= -0.7pp and beta_extension_gap_new_business_density < 0
+prior_confidence: 0.57
+disclosure: |
+  Author has market-liberal priors that wage-setting rigidity can price out marginal entrants and small firms. The prior is below 0.60 because coordinated bargaining can also compress inefficient turnover, support training, and reduce search frictions in high-trust economies.
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, regulation_compliance_cost, productivity]
+  policy_family: [labour_market, regulation]
+  treatment_tags: [collective_bargaining_extension, union_rigidity, youth_employment, firm_entry]
+steelman: hypotheses/steelman/oecd_bargaining_extension_youth_entry_penalty.md
+notes: |
+  Candidate Worker C spec. This directly tests whether labour-market-control tools that extend negotiated terms beyond union members reduce entry margins, without assuming the answer.

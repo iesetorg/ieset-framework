@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wits_tariff_cuts_import_variety_panel
+version: 1
+status: candidate
+topic: trade
+claim_direction: "-"
+claim: >
+  Higher applied tariff rates predict lower imported product variety. The
+  mechanism is straightforward: tariff barriers make marginal HS6 product lines
+  less economical to import, narrowing the range of foreign inputs and consumer
+  goods available in the domestic market.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed WITS tariff,
+  product-line, product-diversity, and import-value panels.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1988, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop aggregate income groups and non-country rows
+    - drop country-years missing applied tariffs or import product-line counts
+variables:
+  outcome:
+    - name: import_hs6_product_lines
+      source: wits:product_lines
+      transformation: log
+  treatment:
+    - name: applied_tariff
+      source: wits:tariff_average
+      transformation: level
+  controls:
+    - name: export_hs6_products
+      source: wits:unique_hs6_products
+      transformation: log
+    - name: import_value
+      source: wits:import_value
+      transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE screen of log import product lines on applied tariffs and trade
+    scale controls.
+falsification:
+  rule: >
+    SUPPORTED only if applied_tariff is negative at p<=0.10 with at least 300
+    observations and 20 countries. REFUTED if applied_tariff is positive at
+    p<=0.10.
+  test: panel_fe_wits_tariff_cuts_import_variety_panel
+  threshold:
+    coef_max: -0.005
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 20
+prior_confidence: 0.62
+disclosure: >
+  The prior strongly favours the import-variety channel, but WITS product-line
+  counts can reflect reporting thresholds and customs classification changes.
+steelman: hypotheses/steelman/wits_tariff_cuts_import_variety_panel.md
+scope:
+  period: [1988, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, industrial_capability, currency_purchasing_power]
+  policy_family: [trade_policy]
+  treatment_tags: [tariffs, import_variety, product_lines]
+covers_claims: []
+notes: >
+  Uses only May 2026 WITS bridge panels with normalized country-year structure.

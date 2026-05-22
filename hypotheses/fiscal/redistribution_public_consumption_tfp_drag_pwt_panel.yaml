@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: redistribution_public_consumption_tfp_drag_pwt_panel
+version: 1
+status: candidate
+topic: fiscal
+claim: >
+  Across a broad country panel from 1990 to 2019, larger government final consumption shares predict slower total
+  factor productivity growth after country and year fixed effects, human-capital controls, trade openness, investment
+  share, and rule of law. The mechanism is that redistribution-heavy public consumption can protect current incomes
+  while weakening capital reallocation, firm discipline, and productivity growth relative to market-led income growth.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GHA, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SVK, SVN, SWE, THA, TUR, URY, USA, ZAF]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - Penn World Table 10.01 ends in 2019; do not extend with non-PWT TFP proxies in v1
+    - drop country-years with missing TFP, human capital, or government consumption
+    - exclude transition economies 1990 through 1994 in the primary specification and report them as robustness
+scope:
+  period: [1990, 2019]
+  countries: [GLOBAL, OECD]
+  outcome_dim: [productivity, fiscal_policy, gdp_growth]
+  policy_family: [fiscal_policy, welfare_architecture]
+  treatment_tags: [government_consumption_share, redistribution_current_consumption, tfp_growth]
+variables:
+  outcome:
+    - name: total_factor_productivity_growth
+      source: pwt:rtfpna
+      transformation: annual_log_change
+  treatment:
+    - name: government_consumption_share
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: level
+      notes: General government final consumption expenditure as a share of GDP.
+  controls:
+    - name: human_capital_index
+      source: pwt:hc
+      transformation: level
+    - name: capital_stock_per_worker
+      source: pwt:rkna
+      transformation: log
+    - name: gross_capital_formation_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Government consumption is a fiscal expenditure channel. The specification deliberately separates current public
+  consumption from public investment, which should be tested with a different treatment.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way fixed effects using annual PWT TFP growth. Report a three-year moving-average robustness check because TFP
+    is noisy at annual frequency. The investment-share control helps distinguish pure fiscal drag from capital-deepening
+    channels.
+falsification:
+  rule: >
+    Supported if government_consumption_share is negative at p <= 0.10 in the annual and three-year-smoothed
+    specifications. Refuted if it is positive at p <= 0.10 in either primary specification. Null estimates are partial.
+  test: panel_fe_public_consumption_tfp_drag
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_countries: 30
+    min_observations: 500
+prior_confidence: 0.56
+disclosure: >
+  The author expects current public consumption to be less productivity-enhancing than private investment, but high
+  government consumption may proxy social stability, health, and education inputs. The spec is falsifiable if those
+  channels dominate in the data.
+steelman: hypotheses/steelman/redistribution_public_consumption_tfp_drag_pwt_panel.md
+notes: >
+  This is a productivity-mechanism candidate rather than a welfare verdict. It can be refuted by high-tax systems that
+  sustain TFP growth after controls.

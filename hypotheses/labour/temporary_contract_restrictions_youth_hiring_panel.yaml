@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: temporary_contract_restrictions_youth_hiring_panel
+version: 1
+status: candidate
+topic: labour
+claim: |
+  In OECD country panels from 1990 to 2023, stricter regulation of temporary and fixed-term contracts predicts lower youth employment rates and slower recovery of youth employment after recessions. The directional claim is that a one-point increase in OECD temporary-contract EPL strictness is associated with at least a 0.8 percentage-point lower youth employment rate within three years, conditional on permanent-contract EPL, GDP growth, education enrolment, and active labour-market spending.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years without separate temporary-contract EPL measures
+    - exclude years in which youth employment series break due to survey redesign if no harmonised backcast is available
+variables:
+  outcome:
+    - name: youth_employment_rate
+      source: ilostat:EMP_2EMP_SEX_AGE_RT_A
+      transformation: level_pct
+    - name: youth_unemployment_rate
+      source: ilostat:UNE_2EAP_SEX_AGE_RT_A
+      transformation: level_pct
+    - name: youth_employment_recovery_gap
+      source: ilostat:EMP_2EMP_SEX_AGE_RT_A
+      transformation: deviation_from_pre_recession_peak
+      notes: Recovery gap measured three years after national recession troughs.
+  treatment:
+    - name: temporary_contract_epl_strictness
+      source: oecd:EPL_TEMP
+      transformation: level
+    - name: permanent_contract_epl_strictness
+      source: oecd:EPL_REG
+      transformation: level
+  controls:
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level_pct
+    - name: tertiary_enrolment
+      source: world_bank_wdi:SE.TER.ENRR
+      transformation: level_pct
+    - name: almp_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+    - name: regulatory_quality
+      source: wgi:RQ.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: |
+  Temporary-contract rules are regulatory-channel labour-market restrictions governing permissible hiring forms and contract duration.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Two-way FE model with temporary-contract EPL and permanent-contract EPL entered jointly. Recession-recovery robustness estimates local projections of youth employment gaps at horizons one to three after recession troughs.
+falsification:
+  rule: |
+    Refuted if temporary-contract EPL is non-negative for youth employment or non-positive for youth unemployment in the primary specification, or if recession-recovery local projections show no slower recovery in high-restriction country-years. If stricter temporary-contract rules only reduce temporary work while increasing permanent youth jobs, the claim is refuted rather than partially supported.
+  test: panel_fe_temporary_contract_epl_youth_hiring
+  threshold: beta_temp_epl_youth_employment <= -0.8pp per EPL point and beta_temp_epl_youth_unemployment > 0
+prior_confidence: 0.56
+disclosure: |
+  Author has market-liberal priors that flexible entry contracts help young workers enter employment. The prior is tempered because temporary-contract liberalisation can create dual labour markets and churn rather than durable opportunity.
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, regulation_compliance_cost]
+  policy_family: [labour_market, regulation]
+  treatment_tags: [temporary_contracts, fixed_term_contracts, youth_hiring, employment_protection]
+steelman: hypotheses/steelman/temporary_contract_restrictions_youth_hiring_panel.md
+notes: |
+  Candidate Worker C spec. The empirical challenge is to claims that labour-market control can protect insiders and entrants without reducing the entry margin.

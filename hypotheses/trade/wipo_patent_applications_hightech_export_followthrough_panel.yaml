@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wipo_patent_applications_hightech_export_followthrough_panel
+version: 1
+status: candidate
+topic: trade
+claim_direction: "+"
+claim: >
+  Resident patent applications predict stronger high-tech export performance in
+  later country-year panels, even after accounting for non-resident patenting
+  and export scale. The claim tests whether domestic inventive activity has
+  measurable trade follow-through.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed WIPO resident and
+  non-resident patent panels joined to WITS high-tech export panels.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BRA, CAN, CHE, CHL, CHN, DEU, DNK, ESP, FIN, FRA, GBR, IND, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, POL, RUS, SGP, SWE, TUR, USA, ZAF]
+  period: [1980, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing resident patent applications or high-tech exports
+    - drop aggregate income groups and non-country rows
+variables:
+  outcome:
+    - name: high_tech_exports
+      source: wits:high_tech_exports
+      transformation: log
+  treatment:
+    - name: resident_patent_applications
+      source: wipo:patent_applications_resident
+      transformation: log
+  controls:
+    - name: nonresident_patent_applications
+      source: wipo:patent_applications_non_resident
+      transformation: log
+    - name: export_scale
+      source: wits:export_value_constant_usd
+      transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE screen. Bespoke follow-up should lead high-tech exports by two
+    years and distinguish resident from non-resident patenting quality.
+falsification:
+  rule: >
+    SUPPORTED only if resident_patent_applications is positive at p<=0.10 with
+    at least 300 observations and 20 countries. REFUTED if it is negative at
+    p<=0.10.
+  test: panel_fe_wipo_patent_applications_hightech_export_followthrough_panel
+  threshold:
+    coef_min: 0.02
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 20
+prior_confidence: 0.60
+disclosure: >
+  The prior expects domestic inventive activity to help high-tech exports, but
+  patents vary sharply in quality and may follow industrial success rather than
+  cause it.
+steelman: hypotheses/steelman/wipo_patent_applications_hightech_export_followthrough_panel.md
+scope:
+  period: [1980, 2021]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability, productivity, trade_liberalisation]
+  policy_family: [industrial_policy, institutional_reform]
+  treatment_tags: [resident_patents, hightech_exports, innovation_followthrough]
+covers_claims: []
+notes: >
+  This is the cleanest WIPO/WITS bridge test from the first swarm pass because
+  both sides are normalized country-year panels.

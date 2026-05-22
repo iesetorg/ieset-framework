@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: energy_market_competition_renewable_capacity_panel
+version: 1
+status: candidate
+topic: energy
+claim_direction: "+"
+claim: >
+  More competitive electricity-market institutions predict faster renewable
+  capacity additions after controlling for income, demand growth, and fossil
+  fuel rents. The market mechanism is that contestable generation entry and
+  price discovery accelerate technology diffusion; the state-control
+  counterclaim is that public monopoly planning is at least as effective at
+  scaling clean generation.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [2000, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing renewable-capacity or regulatory-quality data
+    - retain countries with at least 8 usable annual observations
+    - winsorize renewable-capacity growth at the 1st and 99th percentiles
+scope:
+  period: [2000, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [energy, industrial_capability, competition_concentration]
+  policy_family: [energy_policy, competition_policy, regulation]
+  treatment_tags: [electricity_competition, renewable_capacity, market_entry]
+variables:
+  outcome:
+    - name: renewable_capacity_per_capita_growth
+      source: irena:installed_capacity_renewable
+      transformation: annual_log_change_per_capita
+      notes: IRENA renewable electricity capacity by country-year, scaled by population.
+  treatment:
+    - name: electricity_market_entry_quality
+      source: fraser_efw:efw_panel
+      transformation: area_5_regulation_inverted_or_component
+      notes: Fraser regulation area or energy-entry component if available; higher values should indicate more contestable entry.
+    - name: regulatory_quality
+      source: wgi:RQ.EST
+      transformation: level
+      notes: Secondary broad institutional proxy for predictable market entry.
+  controls:
+    - name: log_gdp_pc_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: electricity_access
+      source: world_bank_wdi:EG.ELC.ACCS.ZS
+      transformation: level
+    - name: fossil_fuel_rents
+      source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      transformation: level
+    - name: population_growth
+      source: world_bank_wdi:SP.POP.GROW
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  The treatment captures rules governing entry, competition, and market
+  contestability in energy supply.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary test uses Fraser EFW regulation or a documented energy-entry proxy
+    where available. WGI regulatory quality is a secondary robustness proxy,
+    not a substitute for the primary competition measure.
+falsification:
+  rule: >
+    SUPPORTED if electricity_market_entry_quality is positive for renewable
+    capacity-per-capita growth at p<=0.10 with at least 300 observations and 25
+    countries. REFUTED if the coefficient is negative at p<=0.10 under the
+    same sample floor. Otherwise PARTIAL or INCONCLUSIVE.
+  test: panel_fe_energy_market_competition_renewable_capacity_panel
+  threshold:
+    expected_sign: "+"
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 25
+prior_confidence: 0.54
+disclosure: >
+  The author is sympathetic to competition and entry mechanisms but expects
+  public auctions, grid planning, and subsidy design to matter. A supported
+  result would not imply laissez-faire energy policy; it would test whether
+  contestable entry helps diffusion at the margin.
+steelman: hypotheses/steelman/energy_market_competition_renewable_capacity_panel.md
+notes: >
+  Uses IRENA, Fraser EFW, WGI, and WDI sources already represented in the
+  publisher registry.

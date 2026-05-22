@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_almp_epl_low_education_unemployment_interaction_panel
+version: 1
+status: candidate
+topic: labour
+claim_direction: "+"
+claim: >
+  Active labour-market spending is less effective at reducing low-education
+  unemployment when employment protection legislation is stricter. The
+  discriminating claim is an ALMP x EPL interaction, not a simple claim that
+  either policy is always good or always bad.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed OECD low-education
+  unemployment, OECD SOCX/ALMP, OECD EPL, WDI macro, and WGI panels.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BGR, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, PER, POL, PRT, ROU, SVK, SVN, SWE, TUR, USA]
+  period: [1996, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing low-education unemployment, ALMP spending, EPL, or GDP growth
+variables:
+  outcome:
+    - name: low_education_unemployment
+      source: oecd:DSD_LMS_low_education_unemployment_rate
+      transformation: level
+  treatment:
+    - name: almp_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level
+      notes: Active labour-market programme spending as percent of GDP; runner selects PROGRAMME_TYPE=TP60.
+    - name: epl
+      source: oecd:EPL_OV
+      transformation: level
+  controls:
+    - name: gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: log_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: government_effectiveness
+      source: wgi:GE.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary estimand is almp_spending_gdp x epl. A positive coefficient means
+    stricter EPL weakens the unemployment-reducing association of ALMP spending.
+falsification:
+  rule: >
+    SUPPORTED only if the ALMP x EPL interaction is positive at p<=0.10, with a
+    negative ALMP main effect in the low-EPL part of the distribution. REFUTED if
+    the interaction is negative at p<=0.10.
+  test: panel_fe_oecd_almp_epl_low_education_unemployment_interaction_panel
+  threshold:
+    interaction_coef_min: 0.05
+    p_max: 0.10
+    min_observations: 450
+    min_countries: 20
+prior_confidence: 0.54
+disclosure: >
+  The prior follows flexicurity logic, but ALMP spending may rise endogenously in
+  weak labour markets, so the first pass should be treated as a screening test.
+steelman: hypotheses/steelman/oecd_almp_epl_low_education_unemployment_interaction_panel.md
+scope:
+  period: [1996, 2019]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [active_labour_market_policy, employment_protection, low_education_unemployment]
+covers_claims: []
+notes: >
+  This extends the earlier separate OECD ALMP and EPL low-education unemployment
+  screens into a single complementarity test.

@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: owid_fossil_subsidy_hightech_export_drag_panel
+version: 1
+status: candidate
+topic: energy
+claim_direction: "-"
+claim: >
+  Larger fossil-fuel consumption subsidies predict weaker high-tech export
+  upgrading. The channel is that subsidy-heavy energy systems preserve
+  incumbent production structures and reduce incentives to move into more
+  technology-intensive export baskets.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 using the newly landed OWID/IEA
+  fossil-subsidy mirror joined to landed WITS high-tech export and tariff panels.
+evidence_type: associational
+sample:
+  countries: [ARG, AUT, CHN, COL, EGY, FRA, GBR, GHA, HUN, IDN, IND, MEX, MYS, NGA, PAK, POL, RUS, SAU, THA, VNM, ZAF]
+  period: [2010, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing fossil subsidy values or high-tech exports
+    - report oil-exporter sensitivity excluding RUS and SAU
+variables:
+  outcome:
+    - name: high_tech_exports
+      source: wits:high_tech_exports
+      transformation: log
+  treatment:
+    - name: fossil_subsidies
+      source: owid:consumption-subsidies-for-fossil-fuels
+      transformation: log
+  controls:
+    - name: tariff_average
+      source: wits:tariff_average
+      transformation: level
+    - name: export_scale
+      source: wits:export_value_constant_usd
+      transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE screen over the 2010-2023 OWID/IEA fossil-subsidy window.
+falsification:
+  rule: >
+    SUPPORTED only if fossil_subsidies is negative at p<=0.10 with at least 150
+    observations and 15 countries. REFUTED if fossil_subsidies is positive at
+    p<=0.10.
+  test: panel_fe_owid_fossil_subsidy_hightech_export_drag_panel
+  threshold:
+    coef_max: -0.02
+    p_max: 0.10
+    min_observations: 150
+    min_countries: 15
+prior_confidence: 0.52
+disclosure: >
+  The prior is modest: fossil subsidies plausibly delay upgrading, but resource
+  exporters and industrializing economies may subsidize energy for different
+  reasons.
+steelman: hypotheses/steelman/owid_fossil_subsidy_hightech_export_drag_panel.md
+scope:
+  period: [2010, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [energy, industrial_capability, trade_liberalisation]
+  policy_family: [energy_policy, industrial_policy]
+  treatment_tags: [fossil_subsidies, hightech_exports, energy_lock_in]
+covers_claims: []
+notes: >
+  This converts today's OWID/IEA mirror acquisition into a directly testable
+  cross-country upgrading hypothesis while direct IEA access remains gated.

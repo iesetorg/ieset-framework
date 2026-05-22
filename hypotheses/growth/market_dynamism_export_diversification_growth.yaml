@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_dynamism_export_diversification_growth
+version: 1
+status: candidate
+topic: growth
+claim: Lower export-product concentration predicts faster subsequent real GDP per-capita growth and stronger high-technology export performance.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, DEU, FRA, ITA, ESP, NLD, SWE, NOR, DNK, FIN, JPN, KOR, CHN, IND, BRA, MEX, CHL, ARG, TUR, ZAF, POL, EST, VNM, THA, MYS, IDN, COL, PER, PHL, EGY, MAR, KEN, NGA, BGD, PAK, LKA]
+  period: [1988, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing WITS product-concentration treatment or WDI growth outcome
+  - exclude countries whose fuel exports exceed half of merchandise exports in the current year when fuel-share data are available
+  - require at least 20 countries and 200 country-year observations
+scope:
+  period: [1988, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, industrial_capability, competition_concentration]
+  policy_family: [trade_policy, competition_policy]
+  treatment_tags: [export_diversification, competition, product_discovery]
+variables:
+  outcome:
+  - name: real_gdp_pc_growth_5yr_forward
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: cumulative_log_growth_5yr_forward
+  - name: high_tech_exports_share
+    source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+    transformation: level
+  treatment:
+  - name: export_product_concentration
+    source: wits:product_concentration
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: private_credit_depth
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: Export diversification is treated as a revealed market-discovery outcome, not as proof that laissez-faire caused diversification.
+falsification:
+  rule: SUPPORTED if export concentration is negative at p<0.10 for forward income growth and negative or null for high-tech exports. REFUTED if it is positive at p<0.10 for forward growth. Otherwise PARTIAL.
+  test: panel_fe_market_dynamism_export_diversification_growth
+  threshold:
+    p_value: "p<0.10"
+    expected_sign: "-"
+    minimum_countries: 20
+    minimum_observations: 200
+prior_confidence: 0.53
+disclosure: Diversification can reflect industrial policy, geography, and resource endowments, so this is a mechanism screen rather than a verdict for free markets by itself.
+steelman: hypotheses/steelman/market_dynamism_export_diversification_growth.md

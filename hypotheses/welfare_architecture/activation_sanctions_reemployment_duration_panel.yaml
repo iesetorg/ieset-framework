@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: activation_sanctions_reemployment_duration_panel
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  In OECD unemployment-insurance panels from 1995 to 2023, stronger job-search conditionality and enforceable sanction regimes predict shorter unemployment duration and higher reemployment among benefit recipients at a given replacement rate. The directional claim is that stricter activation conditionality is associated with at least a 0.5 percentage-point lower long-term-unemployment share, conditional on benefit generosity, ALMP spending, GDP growth, and employment protection.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1995, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop countries without at least two observed conditionality-regime changes or usable cross-country strictness scores
+    - exclude years with unemployment-rate increases above 5 percentage points from the primary duration specification
+variables:
+  outcome:
+    - name: long_term_unemployment_share
+      source: ilostat:UNE_2EAP_SEX_AGE_DUR_RT_A
+      transformation: level_pct
+      notes: Share unemployed for 12 months or longer where available.
+    - name: unemployment_rate
+      source: ilostat:UNE_2EAP_SEX_AGE_RT_A
+      transformation: level_pct
+    - name: employment_to_population_ratio
+      source: ilostat:EMP_2EMP_SEX_AGE_RT_A
+      transformation: level_pct
+  treatment:
+    - name: activation_conditionality_strictness
+      source: oecd:benefits_and_wages_jobsearch_conditionality
+      transformation: index
+      notes: Job-search monitoring, availability requirements, and sanction strictness index; local coding may use OECD/European Commission activation strictness vintages.
+    - name: sanction_enforcement_indicator
+      source: oecd:benefits_and_wages_sanction_rules
+      transformation: indicator
+  controls:
+    - name: net_replacement_rate
+      source: oecd:TaxBEN_net_replacement_rate
+      transformation: level_pct
+    - name: almp_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level_pct
+    - name: epl_strictness
+      source: oecd:EPL_OV
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: |
+  Activation conditionality combines fiscal eligibility rules with labour-market services and enforcement, so bundled is more accurate than a pure fiscal or regulatory channel.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Two-way FE with conditionality strictness and replacement rates entered jointly. Robustness checks split monitoring requirements from sanctions, control for ALMP spending intensity, and test whether effects vanish when job-search assistance is absent.
+falsification:
+  rule: |
+    Refuted if stricter conditionality does not reduce long-term unemployment, or if any apparent reduction is explained entirely by benefit exits without a positive employment-to-population response. A rise in non-employment outside registered unemployment is treated as refutation rather than support.
+  test: panel_fe_activation_sanctions_reemployment_duration
+  threshold: beta_conditionality_long_term_unemployment <= -0.5pp and beta_conditionality_employment_to_population > 0
+prior_confidence: 0.57
+disclosure: |
+  Author has market-liberal priors that conditionality can improve search intensity. The prior is modest because sanctions can push people out of measured unemployment into poverty or disability rolls without durable work, which would falsify the substantive claim.
+scope:
+  period: [1995, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [activation_conditionality, sanctions, unemployment_insurance, reemployment]
+steelman: hypotheses/steelman/activation_sanctions_reemployment_duration_panel.md
+notes: |
+  Candidate Worker C spec testing welfare conditionality as a work-incentive mechanism, not as a moral claim about recipients.

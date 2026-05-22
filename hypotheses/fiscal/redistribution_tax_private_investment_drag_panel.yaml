@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: redistribution_tax_private_investment_drag_panel
+version: 1
+status: candidate
+topic: fiscal
+claim: >
+  In country-year panels since 1996, higher tax revenue as a share of GDP predicts lower private investment as a share
+  of GDP after country and year fixed effects, income-level controls, demographics, trade openness, and rule-of-law
+  controls. The mechanism tested is not that every tax-funded public good is harmful, but that redistribution financed
+  by broad tax extraction reduces retained earnings, expected after-tax returns, and investable cash flow relative to a
+  market-led growth path.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GHA, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SVK, SVN, SWE, THA, TUR, URY, USA, ZAF]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing outcome, treatment, or baseline controls
+    - winsorise private investment share and tax revenue share at the 1st and 99th percentiles
+    - exclude resource-rent economies where natural-resource rents exceed 20 percent of GDP in a year
+scope:
+  period: [1996, 2023]
+  countries: [GLOBAL, OECD]
+  outcome_dim: [capital_flows, gdp_growth, taxation]
+  policy_family: [fiscal_policy, tax_policy]
+  treatment_tags: [tax_revenue_share, redistribution_financing, private_investment]
+variables:
+  outcome:
+    - name: private_investment_share
+      source: world_bank_wdi:NE.GDI.FPRV.ZS
+      transformation: level
+      notes: Private gross fixed capital formation as a share of GDP.
+  treatment:
+    - name: tax_revenue_share
+      source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+      transformation: level
+      notes: Tax revenue as a share of GDP; primary proxy for redistribution financing pressure.
+  controls:
+    - name: log_gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: population_growth
+      source: world_bank_wdi:SP.POP.GROW
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+    - name: inflation
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The treatment is tax revenue as a share of GDP, a fiscal financing channel for redistribution and public expenditure.
+  Regulatory and monetary channels are controlled only indirectly and should be tested in separate hypotheses.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way fixed-effects panel. Report the contemporaneous coefficient and a three-year lag specification to reduce
+    reverse-causality from recessions raising tax ratios mechanically. The result is associational unless a later tax
+    reform event-study is registered.
+falsification:
+  rule: >
+    Supported if the coefficient on tax_revenue_share is negative at p <= 0.10 in the baseline and remains negative in
+    the three-year lag specification. Refuted if the baseline coefficient is positive at p <= 0.10, or if the lag
+    specification is positive at p <= 0.10. Otherwise the result is partial or inconclusive.
+  test: panel_fe_tax_revenue_private_investment_drag
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_countries: 30
+    min_observations: 300
+prior_confidence: 0.57
+disclosure: >
+  The author prior is market-liberal and expects tax-financed redistribution to have an investment cost. The steelman
+  is strong: tax revenue can fund infrastructure, education, health, and social stability that raise private returns.
+  A null or positive coefficient would count against the mechanism rather than being explained away.
+steelman: hypotheses/steelman/redistribution_tax_private_investment_drag_panel.md
+notes: >
+  Mechanism-targeted test for redistribution-heavy claims: it asks whether the financing side of redistribution
+  reduces private investment before making any welfare claim about the spending side.

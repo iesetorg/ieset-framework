@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_credit_gap_reer_appreciation_export_squeeze_panel
+version: 1
+status: candidate
+topic: trade
+claim_direction: "-"
+claim: >
+  Credit booms are more damaging for export performance when paired with real
+  exchange-rate appreciation. Domestic credit excess and currency overvaluation
+  should jointly squeeze tradable-sector competitiveness more than either
+  condition alone.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed BIS credit-gap, BIS
+  EER, WDI export-growth, and external-balance panels.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, GRC, HKG, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, LUX, MEX, MYS, NLD, NOR, NZL, POL, PRT, RUS, SAU, SGP, SWE, THA, TUR, USA, ZAF]
+  period: [1970, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing BIS credit gap, BIS real EER, or real export growth
+    - drop entrepot outliers with trade openness above 250 percent of GDP in robustness checks
+variables:
+  outcome:
+    - name: export_growth
+      source: world_bank_wdi:NE.EXP.GNFS.KD.ZG
+      transformation: level
+  treatment:
+    - name: credit_gap
+      source: bis:WS_CREDIT_GAP
+      transformation: level
+    - name: reer_appreciation
+      source: bis:WS_EER
+      transformation: annual_pct_change
+      notes: Real broad EER annual percent change; positive values are appreciations.
+  controls:
+    - name: current_account_balance_gdp
+      source: world_bank_wdi:BN.CAB.XOKA.GD.ZS
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary estimand is credit_gap x reer_appreciation. The generic runner
+    constructs the interaction from the two loaded treatment variables and keeps
+    both main effects.
+falsification:
+  rule: >
+    SUPPORTED only if the credit_gap x reer_appreciation coefficient is negative
+    at p<=0.10 with at least 700 observations and 20 countries. REFUTED if the
+    interaction is positive at p<=0.10.
+  test: panel_fe_bis_credit_gap_reer_appreciation_export_squeeze_panel
+  threshold:
+    coef_max: -0.02
+    p_max: 0.10
+    min_observations: 700
+    min_countries: 20
+prior_confidence: 0.57
+disclosure: >
+  The prior favours the tradable-sector squeeze channel, but export growth can
+  also respond to global demand shocks that are only partially absorbed by year
+  effects.
+steelman: hypotheses/steelman/bis_credit_gap_reer_appreciation_export_squeeze_panel.md
+scope:
+  period: [1970, 2025]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, industrial_capability, financialisation]
+  policy_family: [monetary_policy, exchange_rate_regime, industrial_policy]
+  treatment_tags: [credit_gap, reer_appreciation, export_competitiveness]
+covers_claims: []
+notes: >
+  This is a predeclared interaction extension of existing BIS credit-gap and
+  EER export screens.

@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wits_export_concentration_hightech_drag_panel
+version: 1
+status: candidate
+topic: trade
+claim_direction: "-"
+claim: >
+  More concentrated export baskets predict weaker high-tech export performance.
+  The claim is that economies dependent on a narrow set of traded products have
+  less follow-through into high-tech export upgrading after country and year
+  effects are absorbed.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed WITS export-product
+  HHI, high-tech export, product-diversity, and export-value panels.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1988, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop aggregate income groups and non-country rows
+    - drop country-years missing export concentration or high-tech exports
+variables:
+  outcome:
+    - name: high_tech_exports
+      source: wits:high_tech_exports
+      transformation: log
+  treatment:
+    - name: export_product_hhi
+      source: wits:export_product_hhi_wits
+      transformation: level
+  controls:
+    - name: export_hs6_products
+      source: wits:unique_hs6_products
+      transformation: log
+    - name: merchandise_exports
+      source: wits:export_value_constant_usd
+      transformation: log
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE screen. The high-tech export outcome is logged to reduce scale
+    dominance by large exporters.
+falsification:
+  rule: >
+    SUPPORTED only if export_product_hhi is negative at p<=0.10 with at least
+    250 observations and 20 countries. REFUTED if export_product_hhi is positive
+    at p<=0.10.
+  test: panel_fe_wits_export_concentration_hightech_drag_panel
+  threshold:
+    coef_max: -0.01
+    p_max: 0.10
+    min_observations: 250
+    min_countries: 20
+prior_confidence: 0.58
+disclosure: >
+  The prior expects diversification to matter for upgrading, but high-tech
+  exporting is path-dependent and may be concentrated by successful specialization.
+steelman: hypotheses/steelman/wits_export_concentration_hightech_drag_panel.md
+scope:
+  period: [1988, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, industrial_capability, productivity]
+  policy_family: [trade_policy, industrial_policy]
+  treatment_tags: [export_concentration, hightech_exports, product_diversification]
+covers_claims: []
+notes: >
+  This spec is built from the WITS bridge rather than waiting on UN Comtrade
+  product-diversity access.

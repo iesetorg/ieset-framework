@@ -1,125 +1,159 @@
-# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: singapore_temasek_public_ownership_efficiency
 version: 2
 status: pre_registered
 topic: growth
-claim: Singaporean state-holding-company model (Temasek, GIC) combines public ownership of commanding
-  heights with competitive enterprise discipline, achieving sustained growth that falsifies the claim
-  that all public ownership degrades efficiency.
-notes: Seeded from a market-socialist claim that Singapore's Temasek/GIC state-holding-company model proves
-  public ownership can coexist with competitive discipline. v2 pins a local-data multi-metric comparator
-  test using WDI GDP per capita, PWT TFP, and WGI institutional-quality measures. Portfolio-return
-  measurement remains out of scope until Temasek/GIC annual-report data are ingested.
+claim: Singaporean state-holding-company model (Temasek, GIC) combines public ownership of commanding heights with competitive enterprise discipline, achieving sustained growth that falsifies the claim that all public ownership degrades efficiency.
+notes: Seeded from a market-socialist claim that Singapore's Temasek/GIC state-holding-company model proves public ownership can coexist with competitive discipline. v2 pins a local-data multi-metric comparator test using WDI GDP per capita, PWT TFP, and WGI institutional-quality measures. Portfolio-return measurement remains out of scope until Temasek/GIC annual-report data are ingested.
 prior_confidence: 0.55
-disclosure: >-
-  Authorial bias risk: market-socialist framing wants to retain Singapore as a "publicly owned" success; Temasek/GIC operate at arm's length under commercial discipline and most Singapore-resident MNCs are private foreign capital, so the "public ownership of commanding heights" frame may overstate the SOE share.
+disclosure: 'Authorial bias risk: market-socialist framing wants to retain Singapore as a "publicly owned" success; Temasek/GIC operate at arm''s length under commercial discipline and most Singapore-resident MNCs are private foreign capital, so the "public ownership of commanding heights" frame may overstate the SOE share.'
 falsification:
-  rule: >
-    Multi-metric descriptive comparator test. Metrics: (1) Singapore real GDP per capita PPP annual
-    growth versus HKG/KOR peer median over the WDI-covered 1990-2023 window; (2) Singapore PWT TFP
-    annual growth versus HKG/KOR/TWN peer median over 1974-2019; (3) Singapore WGI government
-    effectiveness mean versus HKG/KOR peer median over 1996-2024; (4) Singapore WGI rule-of-law mean
-    versus HKG/KOR peer median over 1996-2024. Supported only if TFP and at least two of the three
-    other metrics meet or exceed the peer median. Refuted if both GDP per capita growth and TFP growth
-    miss the peer median. Otherwise partial.
+  rule: 'Multi-metric descriptive comparator test. Metrics: (1) Singapore real GDP per capita PPP annual growth versus HKG/KOR peer median over the WDI-covered 1990-2023 window; (2) Singapore PWT TFP annual growth versus HKG/KOR/TWN peer median over 1974-2019; (3) Singapore WGI government effectiveness mean versus HKG/KOR peer median over 1996-2024; (4) Singapore WGI rule-of-law mean versus HKG/KOR peer median over 1996-2024. Supported only if TFP and at least two of the three other metrics meet or exceed the peer median. Refuted if both GDP per capita growth and TFP growth miss the peer median. Otherwise partial.
+
+    '
   test: singapore_temasek_peer_metric_panel
   threshold: supported if TFP plus >=2 other metrics beat peer median; refuted if GDP and TFP both miss; partial otherwise
-methodology_note: >
-  This test does not attribute Singapore's performance causally to Temasek/GIC ownership. It asks the
-  narrower falsification question: whether the canonical public-holding-company case is plainly
-  inconsistent with competitive-discipline and sustained-growth outcomes.
+methodology_note: 'This test does not attribute Singapore''s performance causally to Temasek/GIC ownership. It asks the narrower falsification question: whether the canonical public-holding-company case is plainly inconsistent with competitive-discipline and sustained-growth outcomes.
+
+  '
 evidence_type: canonical_case_multi_metric
-
 sample:
-  countries: [SGP, HKG, KOR, TWN]
-  period: [1974, 2023]
+  countries:
+  - SGP
+  - HKG
+  - KOR
+  - TWN
+  period:
+  - 1974
+  - 2023
   temporal_structure: panel
-
 variables:
   outcome:
-    - name: log_gdp_pc_ppp
-      source: "world_bank_wdi:NY.GDP.PCAP.PP.KD"
-      transformation: log
-    - name: tfp_index
-      source: "pwt:rtfpna"
-      transformation: level
-    - name: gross_capital_formation_pct_gdp
-      source: "world_bank_wdi:NE.GDI.TOTL.ZS"
-      transformation: level
-    - name: government_effectiveness
-      source: "wgi:GE.EST"
-      transformation: level
-    - name: rule_of_law
-      source: "wgi:RL.EST"
-      transformation: level
-
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+  - name: tfp_index
+    source: pwt:rtfpna
+    transformation: level
+  - name: gross_capital_formation_pct_gdp
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: level
+  - name: government_effectiveness
+    source: wgi:GE.EST
+    transformation: level
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
   treatment:
-    - name: temasek_treated
-      source: "constructed: indicator = 1 for SGP, year >= 1974 (Temasek incorporation)"
-      transformation: indicator
-
+  - name: temasek_treated
+    source: 'constructed: indicator = 1 for SGP, year >= 1974 (Temasek incorporation)'
+    transformation: indicator
   controls:
-    - name: log_initial_gdp_pc
-      source: "world_bank_wdi:NY.GDP.PCAP.KD"
-      transformation: log
-    - name: log_population
-      source: "world_bank_wdi:SP.POP.TOTL"
-      transformation: log
-    - name: trade_openness
-      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
-      transformation: level
-
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
 estimator:
   template: multi_metric_checklist
   clustering: none
-  notes: >
-    Single-country canonical case (Singapore Temasek/GIC model 1974-2023).
-    Pattern-match across Singapore's GDP per capita trajectory, TFP, and
-    state-holding-company portfolio returns vs comparable city-state and
-    advanced-economy peers. Tests whether public ownership of commanding
-    heights coexisted with sustained productivity growth.
+  notes: 'Single-country canonical case (Singapore Temasek/GIC model 1974-2023). Pattern-match across Singapore''s GDP per capita trajectory, TFP, and state-holding-company portfolio returns vs comparable city-state and advanced-economy peers. Tests whether public ownership of commanding heights coexisted with sustained productivity growth.
 
+    '
 scope:
-  period: [1974, 2023]
-  countries: [SGP]
-  outcome_dim: [productivity, gdp_growth, institutional_quality]
-  policy_family: [privatisation_nationalisation, institutional_reform]
-  treatment_tags: [singapore_temasek_1974, singapore_gic_1981]
-
+  period:
+  - 1974
+  - 2023
+  countries:
+  - SGP
+  outcome_dim:
+  - productivity
+  - gdp_growth
+  - institutional_quality
+  policy_family:
+  - privatisation_nationalisation
+  - institutional_reform
+  treatment_tags:
+  - singapore_temasek_1974
+  - singapore_gic_1981
 covers_claims:
-  - position_id: market_socialist
-    claim_index: 10
-    polarity: aligned
-    school_prediction: supported
-    confidence: medium
-    notes: "Direct alignment: claim asserts Singapore's Temasek/GIC state-holding-company model shows public ownership can coexist with competitive discipline and sustained growth."
-  - position_id: democratic_socialist
-    claim_index: 119
-    polarity: aligned
-    school_prediction: supported
-    confidence: medium
-    notes: "2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Democratic socialism has an explicit stake in redistribution, decommodified public goods, worker power, and democratic public ownership."
-  - position_id: eco_socialist
-    claim_index: 118
-    polarity: aligned
-    school_prediction: supported
-    confidence: medium
-    notes: "2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Eco-socialism has an explicit stake in public control, ecological planning, fossil-fuel lock-in, and wellbeing beyond GDP."
-  - position_id: social_democratic
-    claim_index: 119
-    polarity: aligned
-    school_prediction: mixed
-    confidence: medium
-    notes: "2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Social democracy has an explicit stake in welfare states, unions, fiscal stabilization, public services, and coordinated market institutions."
-  - position_id: degrowth
-    claim_index: 117
-    polarity: aligned
-    school_prediction: supported
-    confidence: medium
-    notes: "2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Degrowth has an explicit stake in wellbeing/GDP divergence, material throughput, reduced working time, universal basic services, and ecological limits."
-  - position_id: institutionalism
-    claim_index: 115
-    polarity: aligned
-    school_prediction: supported
-    confidence: high
-    notes: "2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: state_capacity_condition. Institutional economics has an explicit stake in rule-of-law, state capacity, complementary institutions, and path-dependent development."
+- position_id: market_socialist
+  claim_index: 10
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: 'Direct alignment: claim asserts Singapore''s Temasek/GIC state-holding-company model shows public ownership can coexist with competitive discipline and sustained growth.'
+- position_id: democratic_socialist
+  claim_index: 119
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: '2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Democratic socialism has an explicit stake in redistribution, decommodified public goods, worker power, and democratic public ownership.'
+- position_id: eco_socialist
+  claim_index: 118
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: '2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Eco-socialism has an explicit stake in public control, ecological planning, fossil-fuel lock-in, and wellbeing beyond GDP.'
+- position_id: social_democratic
+  claim_index: 119
+  polarity: aligned
+  school_prediction: mixed
+  confidence: medium
+  notes: '2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Social democracy has an explicit stake in welfare states, unions, fiscal stabilization, public services, and coordinated market institutions.'
+- position_id: degrowth
+  claim_index: 117
+  polarity: aligned
+  school_prediction: supported
+  confidence: medium
+  notes: '2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: public_ownership_conditional. Degrowth has an explicit stake in wellbeing/GDP divergence, material throughput, reduced working time, universal basic services, and ecological limits.'
+- position_id: institutionalism
+  claim_index: 115
+  polarity: aligned
+  school_prediction: supported
+  confidence: high
+  notes: '2026-05-04 target-120 coverage wave; mechanism-based selection from already public-tested hypotheses, independent of observed score effects. Mechanism family: state_capacity_condition. Institutional economics has an explicit stake in rule-of-law, state capacity, complementary institutions, and path-dependent development.'
+steelman: hypotheses/steelman/singapore_temasek_public_ownership_efficiency.md
+canonical_metrics:
+- metric_id: log_gdp_pc_ppp
+  description: Checklist metric based on log_gdp_pc_ppp.
+  threshold: Evaluate against the registered falsification rule for this canonical case.
+  window: 1974-2023
+  source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+  direction: supports_claim
+  independence_justification: Metric uses a separately named outcome/source in the registered canonical-case checklist.
+- metric_id: tfp_index
+  description: Checklist metric based on tfp_index.
+  threshold: Evaluate against the registered falsification rule for this canonical case.
+  window: 1974-2023
+  source: pwt:rtfpna
+  direction: supports_claim
+  independence_justification: Metric uses a separately named outcome/source in the registered canonical-case checklist.
+- metric_id: gross_capital_formation_pct_gdp
+  description: Checklist metric based on gross_capital_formation_pct_gdp.
+  threshold: Evaluate against the registered falsification rule for this canonical case.
+  window: 1974-2023
+  source: world_bank_wdi:NE.GDI.TOTL.ZS
+  direction: supports_claim
+  independence_justification: Metric uses a separately named outcome/source in the registered canonical-case checklist.
+- metric_id: government_effectiveness
+  description: Checklist metric based on government_effectiveness.
+  threshold: Evaluate against the registered falsification rule for this canonical case.
+  window: 1974-2023
+  source: wgi:GE.EST
+  direction: supports_claim
+  independence_justification: Metric uses a separately named outcome/source in the registered canonical-case checklist.
+- metric_id: rule_of_law
+  description: Checklist metric based on rule_of_law.
+  threshold: Evaluate against the registered falsification rule for this canonical case.
+  window: 1974-2023
+  source: wgi:RL.EST
+  direction: supports_claim
+  independence_justification: Metric uses a separately named outcome/source in the registered canonical-case checklist.
+multi_metric_falsification:
+  total_metrics: 5
+  support_threshold: 4
+  refute_threshold: 1

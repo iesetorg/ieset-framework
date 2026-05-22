@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: business_freedom_employer_entry_employment_panel
+version: 1
+status: candidate
+topic: labour
+claim: |
+  Across broad country panels from 1995 to 2024, higher business freedom and lower business-regulation burdens predict higher employer entry, higher new-business density, and higher working-age employment rates. The directional claim is that a one-standard-deviation increase in business-freedom measures predicts at least 0.3 additional new registered businesses per 1,000 working-age people and a positive employment-rate coefficient after controlling for income, education, trade openness, and rule of law.
+claim_direction: "+"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing new-business density or business-freedom treatment values
+    - winsorize new-business-density outliers above the 99th percentile in robustness only
+variables:
+  outcome:
+    - name: new_business_density
+      source: world_bank_wdi:IC.BUS.NDNS.ZS
+      transformation: level
+      notes: New limited liability business registrations per 1,000 people ages 15-64.
+    - name: employer_share_of_employment
+      source: ilostat:EMP_2EMP_SEX_STE_NB_A
+      transformation: share_pct
+      notes: Status-in-employment series; employer share is preferred where available.
+    - name: working_age_employment_rate
+      source: ilostat:EMP_2EMP_SEX_AGE_RT_A
+      transformation: level_pct
+  treatment:
+    - name: business_freedom
+      source: heritage_ief:business_freedom
+      transformation: z_score
+    - name: business_regulation_freedom
+      source: fraser_efw:5a_business_regulations
+      transformation: z_score
+      notes: Higher values indicate fewer regulatory barriers in the Fraser EFW business-regulation component.
+  controls:
+    - name: log_real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: tertiary_enrolment
+      source: world_bank_wdi:SE.TER.ENRR
+      transformation: level_pct
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level_pct
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: |
+  Business freedom and business-regulation burdens are regulatory-channel measures affecting entry costs, licensing time, and firm formation.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Estimate separate panel-FE models for new-business density, employer share, and working-age employment. Robustness checks replace Heritage with Fraser EFW, lag treatment by three years, and exclude high-income financial centres where registration data may reflect tax planning rather than operating firms.
+falsification:
+  rule: |
+    Refuted if business-freedom coefficients are non-positive for new-business density and employer share, or if the estimated one-standard-deviation effect is below +0.3 businesses per 1,000 working-age people with p > 0.10 in the primary specification. Employment-rate neutrality alone is not refutation if entry outcomes are positive.
+  test: panel_fe_business_freedom_employer_entry
+  threshold: beta_business_freedom_new_business_density_sd >= +0.3 and beta_business_freedom_employer_share > 0
+prior_confidence: 0.62
+disclosure: |
+  Author has market-liberal priors that lower entry barriers increase entrepreneurship. The main bias risk is treating all new registrations as productive entrepreneurship; the steelman therefore emphasizes necessity self-employment, tax arbitrage, and institutional confounding.
+scope:
+  period: [1995, 2024]
+  countries: [OECD]
+  outcome_dim: [employment_labour, productivity, regulation_compliance_cost]
+  policy_family: [regulation, labour_market, competition_policy]
+  treatment_tags: [business_freedom, entrepreneurship, firm_entry, labour_flexibility]
+steelman: hypotheses/steelman/business_freedom_employer_entry_employment_panel.md
+notes: |
+  Candidate Worker C spec testing whether market entry and entrepreneurship margins outperform labour-market-control accounts of job creation.

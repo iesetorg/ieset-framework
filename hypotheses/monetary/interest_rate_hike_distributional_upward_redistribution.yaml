@@ -1,118 +1,105 @@
-# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: interest_rate_hike_distributional_upward_redistribution
 version: 1
 status: candidate
 topic: monetary
-claim: >-
-  Sustained policy-rate hikes (≥300bp cumulative within 18 months) in
-  advanced economies redistribute disposable income upward across
-  household quintiles in the 24 months after the hike begins:
-  net-saver households (top quintile, 60-80% of net interest-bearing
-  assets) gain interest income while net-debtor and renter households
-  (bottom three quintiles) face higher mortgage costs, higher rents
-  passed through from landlord financing costs, and tightened consumer
-  credit. The distributional incidence of contractionary monetary
-  policy is regressive in advanced economies, contradicting the
-  textbook "monetary policy is distribution-neutral" framing implicit
-  in standard New-Keynesian models. Effect tested on the post-2022 Fed,
-  ECB, BoE tightening cycles using LIS / OECD distributional accounts.
-notes: >-
-  PK-Minsky and Marxian readings of monetary policy emphasise the
-  distributional channel: contractionary money targets the wage-price
-  spiral by raising debtor-side costs, with the distributional incidence
-  systematically falling on lower-income households. Mainstream framings
-  treat the distributional effect as a side-effect of an aggregate-demand
-  intervention; PK reads it as the operative channel. Hypothesis tests
-  the distributional incidence directly using OECD/Eurostat distributional
-  national accounts plus mortgage/rental affordability indicators.
+claim: "Sustained policy-rate hikes (\u2265300bp cumulative within 18 months) in advanced economies redistribute disposable income upward across household quintiles in the 24 months after the hike begins: net-saver households (top quintile, 60-80% of net interest-bearing assets) gain interest income while net-debtor and renter households (bottom three quintiles) face higher mortgage costs, higher rents passed through from landlord financing costs, and tightened consumer credit. The distributional incidence of contractionary monetary policy is regressive in advanced economies, contradicting the textbook \"monetary policy is distribution-neutral\" framing implicit in standard New-Keynesian models. Effect tested on the post-2022 Fed, ECB, BoE tightening cycles using LIS / OECD distributional accounts."
+notes: 'PK-Minsky and Marxian readings of monetary policy emphasise the distributional channel: contractionary money targets the wage-price spiral by raising debtor-side costs, with the distributional incidence systematically falling on lower-income households. Mainstream framings treat the distributional effect as a side-effect of an aggregate-demand intervention; PK reads it as the operative channel. Hypothesis tests the distributional incidence directly using OECD/Eurostat distributional national accounts plus mortgage/rental affordability indicators.'
 prior_confidence: 0.65
-disclosure: >-
-  Author has market-liberal priors and is not a priori PK-aligned, but
-  the distributional-incidence reading is well-evidenced empirically;
-  the contested step is whether the incidence is the *operative* channel
-  of monetary policy or a side-effect. Spec is formulated as an
-  incidence-decomposition question to avoid that adjudication.
+disclosure: Author has market-liberal priors and is not a priori PK-aligned, but the distributional-incidence reading is well-evidenced empirically; the contested step is whether the incidence is the *operative* channel of monetary policy or a side-effect. Spec is formulated as an incidence-decomposition question to avoid that adjudication.
 falsification:
-  rule: >-
-    The hypothesis is falsified if any of the following hold across the
-    USA, GBR, and the Eurozone Big-4 (DEU, FRA, ITA, ESP) over the
-    2022Q3-2024Q4 tightening cycle: (a) bottom-quintile real disposable
-    income falls by less than top-quintile real disposable income in the
-    24 months following the rate-hike start, (b) the gap in disposable-income
-    growth between top and bottom quintiles is less than 2 percentage
-    points cumulative, OR (c) the renter vs mortgage-holder housing-cost
-    ratio does not widen in favour of mortgage holders by at least 5%
-    over the hike cycle. Falsification requires majority (≥4 of 6)
-    country failure on the primary gate (a).
+  rule: "The hypothesis is falsified if any of the following hold across the USA, GBR, and the Eurozone Big-4 (DEU, FRA, ITA, ESP) over the 2022Q3-2024Q4 tightening cycle: (a) bottom-quintile real disposable income falls by less than top-quintile real disposable income in the 24 months following the rate-hike start, (b) the gap in disposable-income growth between top and bottom quintiles is less than 2 percentage points cumulative, OR (c) the renter vs mortgage-holder housing-cost ratio does not widen in favour of mortgage holders by at least 5% over the hike cycle. Falsification requires majority (\u22654 of 6) country failure on the primary gate (a)."
   test: distributional_incidence_post_2022_tightening_cycle
   threshold: bottom_q_disposable_income_growth - top_q_disposable_income_growth <= -2 pp in >=4 of 6 countries over 2022Q3-2024Q4
 evidence_type: associational
 sample:
-  countries: [USA, GBR, DEU, FRA, ITA, ESP]
-  period: [2018, 2024]
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  period:
+  - 2018
+  - 2024
   temporal_structure: panel
   exclusion_rules:
-    - drop country-quarters during pandemic-emergency-transfer windows (2020Q2-2021Q4) where transfer programmes swamped distributional dynamics; included as separate descriptive context
-    - require at least 6 quarters of post-tightening-start data per country
+  - drop country-quarters during pandemic-emergency-transfer windows (2020Q2-2021Q4) where transfer programmes swamped distributional dynamics; included as separate descriptive context
+  - require at least 6 quarters of post-tightening-start data per country
 variables:
   outcome:
-    - name: real_disposable_income_growth_by_quintile
-      source: oecd:distributional_national_accounts; lis:disposable_income_quintile (manual)
-      transformation: pct_yoy_real_per_quintile
-      notes: "Primary outcome — Q1 (bottom) through Q5 (top) of disposable income. TODO: LIS manual-drop required where OECD DNA lags."
-    - name: net_interest_income_share_by_quintile
-      source: oecd:distributional_national_accounts; eurostat:icw_sr_05
-      transformation: share_of_disposable_income
-      notes: Direct measurement of interest income flow distribution; net of interest paid.
-    - name: mortgage_payment_to_income_ratio
-      source: oecd:OECD_AffordableHousing; fred:HHDFA (USA)
-      transformation: ratio
-    - name: rent_to_income_ratio_by_quintile
-      source: eurostat:ilc_lvho07c; bls:CES (USA)
-      transformation: ratio_by_quintile
+  - name: real_disposable_income_growth_by_quintile
+    source: oecd:distributional_national_accounts; lis:disposable_income_quintile (manual)
+    transformation: pct_yoy_real_per_quintile
+    notes: "Primary outcome \u2014 Q1 (bottom) through Q5 (top) of disposable income. TODO: LIS manual-drop required where OECD DNA lags."
+  - name: net_interest_income_share_by_quintile
+    source: oecd:distributional_national_accounts; eurostat:icw_sr_05
+    transformation: share_of_disposable_income
+    notes: Direct measurement of interest income flow distribution; net of interest paid.
+  - name: mortgage_payment_to_income_ratio
+    source: oecd:OECD_AffordableHousing; fred:HHDFA (USA)
+    transformation: ratio
+  - name: rent_to_income_ratio_by_quintile
+    source: eurostat:ilc_lvho07c; bls:CES (USA)
+    transformation: ratio_by_quintile
   treatment:
-    - name: cumulative_policy_rate_change
-      source: fred:DFF (USA); ecb:FM (EUR); boe:IUDBEDR (GBR)
-      transformation: bp_cumulative_18m
-      notes: Crosses 300bp by 2023Q3 in all three economies. Identifies the tightening-cycle treatment.
-    - name: tightening_cycle_indicator
-      source: "constructed: indicator = 1 from 2022Q3 (Fed/ECB) or 2021Q4 (BoE) through 2024Q4"
-      transformation: binary
+  - name: cumulative_policy_rate_change
+    source: fred:DFF (USA); ecb:FM (EUR); boe:IUDBEDR (GBR)
+    transformation: bp_cumulative_18m
+    notes: Crosses 300bp by 2023Q3 in all three economies. Identifies the tightening-cycle treatment.
+  - name: tightening_cycle_indicator
+    source: 'constructed: indicator = 1 from 2022Q3 (Fed/ECB) or 2021Q4 (BoE) through 2024Q4'
+    transformation: binary
   controls:
-    - name: real_gdp_growth
-      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
-      transformation: pct_change_yoy
-    - name: unemployment_rate_by_quintile
-      source: ilostat:unemployment_rate
-      transformation: pct_labour_force
-    - name: cpi_inflation_yoy
-      source: fred:CPIAUCSL (USA); ecb:HICP (EUR); boe:CPI (GBR)
-      transformation: pct_change_yoy
-      notes: Required to compute REAL disposable income; primary CPI is national.
-    - name: cpi_inflation_by_quintile
-      source: ons:lcf_quintile_cpi; bls:cex_lower_income_cpi
-      transformation: pct_yoy_per_quintile
-      notes: Lower-quintile inflation tends to exceed headline due to food-energy weight; relevant for computing real distributional outcomes.
+  - name: real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: pct_change_yoy
+  - name: unemployment_rate_by_quintile
+    source: ilostat:unemployment_rate
+    transformation: pct_labour_force
+  - name: cpi_inflation_yoy
+    source: fred:CPIAUCSL (USA); ecb:HICP (EUR); boe:CPI (GBR)
+    transformation: pct_change_yoy
+    notes: Required to compute REAL disposable income; primary CPI is national.
+  - name: cpi_inflation_by_quintile
+    source: ons:lcf_quintile_cpi; bls:cex_lower_income_cpi
+    transformation: pct_yoy_per_quintile
+    notes: Lower-quintile inflation tends to exceed headline due to food-energy weight; relevant for computing real distributional outcomes.
 intervention_channel: monetary
 estimator:
   template: panel_fe
   clustering: country
-  fixed_effects: [country, year]
-  notes: >-
-    Country-quarter panel with quintile-level disposable-income growth
-    as outcome, cumulative policy-rate change as treatment, with
-    quintile-by-tightening-cycle interaction. Robustness: difference-in-differences
-    across pre/post tightening start using LIS micro-data where
-    available. Reports both nominal and real (deflated by
-    quintile-specific CPI) disposable-income growth.
+  fixed_effects:
+  - country
+  - year
+  notes: 'Country-quarter panel with quintile-level disposable-income growth as outcome, cumulative policy-rate change as treatment, with quintile-by-tightening-cycle interaction. Robustness: difference-in-differences across pre/post tightening start using LIS micro-data where available. Reports both nominal and real (deflated by quintile-specific CPI) disposable-income growth.'
 scope:
-  period: [2022, 2024]
-  countries: [USA, GBR, DEU, FRA, ITA, ESP, EUROZONE]
-  outcome_dim: [poverty_inequality, monetary_policy, housing, currency_purchasing_power]
-  policy_family: [monetary_policy]
-  treatment_tags: [fed_tightening_2022, ecb_tightening_cycle_2022, boe_tightening_2021, post_2022_rate_hikes, distributional_monetary_policy]
-covers_claims:
+  period:
+  - 2022
+  - 2024
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - EUROZONE
+  outcome_dim:
+  - poverty_inequality
+  - monetary_policy
+  - housing
+  - currency_purchasing_power
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - fed_tightening_2022
+  - ecb_tightening_cycle_2022
+  - boe_tightening_2021
+  - post_2022_rate_hikes
+  - distributional_monetary_policy
+covers_claims: []
 steelman: hypotheses/steelman/interest_rate_hike_distributional_upward_redistribution.md
 linked_hypotheses:
-  - inflation_cost_push_distributional_conflict_eurozone_2021_2024
-  - qe_asset_inflation_vs_cpi_divergence_post_2008
+- inflation_cost_push_distributional_conflict_eurozone_2021_2024
+- qe_asset_inflation_vs_cpi_divergence_post_2008

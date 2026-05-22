@@ -1,0 +1,5 @@
+# Steelman: OECD Tax Wedge Low-Wage Employment Penalty
+
+The strongest counterargument is that tax wedges are not pure deadweight wedges in high-capacity welfare states. They finance childcare, health insurance, transport, wage subsidies, and active labour-market services that can raise employment enough to offset the mechanical incentive cost. Nordic countries combine high tax wedges with high employment, especially among women, which suggests complementarity rather than a simple penalty.
+
+The empirical design also faces reverse causality: countries with weak employment may raise social contributions to fund unemployment and pension obligations, making the tax wedge a symptom rather than a cause. Incidence is ambiguous because employers may absorb part of payroll taxes through lower profits or productivity adjustments. A decisive refutation would show that the tax-wedge coefficient becomes zero or positive once public-service quality, childcare coverage, and ALMP intensity are included.

@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: redistribution_social_spending_bottom40_growth_panel
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  Across countries with repeated distribution data from 1995 to 2023, bottom-40 income-share gains are more durable
+  when accompanied by employment and GDP per capita growth than when driven by social-spending or tax-share expansion
+  alone. The mechanism tested is whether redistribution changes shares temporarily while market-led work and productivity
+  growth sustain lower-half income gains.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GHA, GRC, HUN, IDN, IND, IRL, ISR, ITA, JPN, KEN, KOR, LTU, LVA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SVK, SVN, SWE, THA, TUR, URY, USA, ZAF]
+  period: [1995, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - require at least three observations of bottom-40 income share per country
+    - use five-year changes to limit survey-frequency artifacts
+    - drop years with hyperinflation above 50 percent annual CPI in primary runs
+scope:
+  period: [1995, 2023]
+  countries: [GLOBAL, OECD]
+  outcome_dim: [poverty_inequality, employment_labour, gdp_growth]
+  policy_family: [welfare_architecture, fiscal_policy, labour_market]
+  treatment_tags: [bottom40_growth, social_spending, employment_growth, tax_share]
+variables:
+  outcome:
+    - name: bottom_income_share_proxy
+      source: world_bank_wdi:SI.DST.FRST.20
+      transformation: five_year_change
+      notes: Lowest-quintile income share is the local WDI proxy until a full bottom-40 series is fetched.
+    - name: extreme_poverty_headcount
+      source: world_bank_wdi:SI.POV.DDAY
+      transformation: five_year_change
+  treatment:
+    - name: tax_revenue_share
+      source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+      transformation: five_year_mean
+    - name: government_consumption_share
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: five_year_mean
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: five_year_change
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: five_year_mean
+  controls:
+    - name: initial_bottom_income_share_proxy
+      source: world_bank_wdi:SI.DST.FRST.20
+      transformation: lagged_level
+      notes: Lowest-quintile income share is the local WDI proxy until a full bottom-40 series is fetched.
+    - name: log_gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: human_capital_index
+      source: pwt:hc
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  The test compares fiscal redistribution proxies with employment and market-income growth channels, so it is bundled
+  by design.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Five-year panel FE with standardized coefficients. A gain is counted as durable only if the bottom-40 share remains
+    above its starting value in the following observed distribution year.
+falsification:
+  rule: >
+    Supported if employment and GDP growth coefficients jointly exceed tax and government-consumption coefficients in
+    standardized magnitude and at least one market channel is significant at p <= 0.10. Refuted if tax or government
+    consumption channels dominate and market channels are null or wrong-signed.
+  test: panel_fe_bottom40_market_vs_social_spending_channels
+  threshold:
+    market_channel_standardized_sum_gt_fiscal_sum: true
+    p_max_any_market_channel: 0.10
+    min_countries: 25
+prior_confidence: 0.55
+disclosure: >
+  The author's prior favours work and productivity channels, but bottom-40 shares are exactly where redistribution may
+  perform best. If fiscal channels dominate without later reversal, the market-led durability claim should be updated.
+steelman: hypotheses/steelman/redistribution_social_spending_bottom40_growth_panel.md
+notes: >
+  Designed to be refutable by redistribution-heavy countries that deliver persistent bottom-40 gains without strong
+  employment or GDP per capita growth.

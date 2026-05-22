@@ -1,128 +1,111 @@
-# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: inflation_cost_push_distributional_conflict_eurozone_2021_2024
 version: 1
 status: candidate
 topic: monetary
-claim: >-
-  The 2021-2024 Eurozone inflation episode is best decomposed as a
-  cost-push / distributional-conflict process rather than a
-  demand-pull / monetary-overhang process: profit-margin expansion in
-  energy, food, and tradable-goods sectors accounts for at least 40% of
-  cumulative GDP-deflator growth 2021Q1-2023Q4 per the ECB and IMF
-  unit-labour-cost decomposition framework, wage growth lagged price
-  growth across the entire 2021-2023 window with real wages declining
-  in every Eurozone economy, and the inflation moderation in 2024 is
-  driven by terms-of-trade reversal rather than wage-side moderation.
-  This pattern is consistent with the Post-Keynesian / heterodox
-  framing of inflation as the outcome of unresolved
-  wage-price-margin distributional conflict, and inconsistent with the
-  monetarist-demand-pull framing that animates standard Phillips-curve
-  policy responses.
-notes: >-
-  Standard mainstream framing of the post-2021 inflation episode
-  emphasises monetary-overhang from prior QE / fiscal transfers; the PK
-  framing reads it as a cost-push shock that fed through to a
-  distributional-conflict spiral mediated by margins rather than
-  wages. Test follows the IMF (Hansen-Toscani-Zhou 2023) and ECB
-  (Arce-Hahn-Koester 2023) decomposition methodology to allocate
-  GDP-deflator growth between unit labour costs, unit profits, and
-  unit taxes. Counters the wage-price-spiral framing on which the ECB
-  rate-hike cycle was partly justified.
+claim: 'The 2021-2024 Eurozone inflation episode is best decomposed as a cost-push / distributional-conflict process rather than a demand-pull / monetary-overhang process: profit-margin expansion in energy, food, and tradable-goods sectors accounts for at least 40% of cumulative GDP-deflator growth 2021Q1-2023Q4 per the ECB and IMF unit-labour-cost decomposition framework, wage growth lagged price growth across the entire 2021-2023 window with real wages declining in every Eurozone economy, and the inflation moderation in 2024 is driven by terms-of-trade reversal rather than wage-side moderation. This pattern is consistent with the Post-Keynesian / heterodox framing of inflation as the outcome of unresolved wage-price-margin distributional conflict, and inconsistent with the monetarist-demand-pull framing that animates standard Phillips-curve policy responses.'
+notes: Standard mainstream framing of the post-2021 inflation episode emphasises monetary-overhang from prior QE / fiscal transfers; the PK framing reads it as a cost-push shock that fed through to a distributional-conflict spiral mediated by margins rather than wages. Test follows the IMF (Hansen-Toscani-Zhou 2023) and ECB (Arce-Hahn-Koester 2023) decomposition methodology to allocate GDP-deflator growth between unit labour costs, unit profits, and unit taxes. Counters the wage-price-spiral framing on which the ECB rate-hike cycle was partly justified.
 prior_confidence: 0.65
-disclosure: >-
-  Author has market-liberal priors and is sceptical of the strongest
-  PK reading that profits "caused" the inflation; the spec is
-  formulated narrowly as a decomposition question (what share of
-  deflator growth was margin-driven) rather than a causation claim.
-  Specification risk: the IMF/ECB decomposition methodology has been
-  contested on the grounds that profit margins in nominal terms can
-  rise in response to demand without margin-power being the cause —
-  the test reports the decomposition shares but does not pin a single
-  causal narrative.
+disclosure: "Author has market-liberal priors and is sceptical of the strongest PK reading that profits \"caused\" the inflation; the spec is formulated narrowly as a decomposition question (what share of deflator growth was margin-driven) rather than a causation claim. Specification risk: the IMF/ECB decomposition methodology has been contested on the grounds that profit margins in nominal terms can rise in response to demand without margin-power being the cause \u2014 the test reports the decomposition shares but does not pin a single causal narrative."
 falsification:
-  rule: >-
-    The hypothesis is falsified if any of the following hold over
-    2021Q1-2023Q4 in the Eurozone aggregate or in at least 6 of 8
-    Eurozone Big-8 economies: (a) unit-profit contribution to
-    GDP-deflator growth is below 25% of cumulative deflator growth,
-    (b) real wages rise rather than fall in any 12-month window
-    during 2021-2023, OR (c) wage growth leads price growth at any
-    quarter during 2021-2023 in the Granger-causality sense at p<0.05.
-    Additionally, falsification if 2024 disinflation is driven >50% by
-    wage-side moderation rather than terms-of-trade reversal in the
-    ECB decomposition.
+  rule: 'The hypothesis is falsified if any of the following hold over 2021Q1-2023Q4 in the Eurozone aggregate or in at least 6 of 8 Eurozone Big-8 economies: (a) unit-profit contribution to GDP-deflator growth is below 25% of cumulative deflator growth, (b) real wages rise rather than fall in any 12-month window during 2021-2023, OR (c) wage growth leads price growth at any quarter during 2021-2023 in the Granger-causality sense at p<0.05. Additionally, falsification if 2024 disinflation is driven >50% by wage-side moderation rather than terms-of-trade reversal in the ECB decomposition.'
   test: deflator_decomposition_eurozone_panel_2021_2024
   threshold: unit_profit_share_of_deflator_growth >= 0.40 AND real_wage_growth_2021_2023 < 0 in EUR aggregate AND >=6/8 country-level
 evidence_type: associational
 sample:
-  countries: [DEU, FRA, ITA, ESP, NLD, BEL, AUT, IRL]
-  period: [2019, 2024]
+  countries:
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - IRL
+  period:
+  - 2019
+  - 2024
   temporal_structure: panel
   exclusion_rules:
-    - drop country-quarters with measurement breaks in eurostat NA decomposition (Ireland 2015 GDP revision noted but post-2019 series clean)
-    - 2020 COVID shutdown quarter (2020Q2) excluded from primary decomposition; included as sensitivity
+  - drop country-quarters with measurement breaks in eurostat NA decomposition (Ireland 2015 GDP revision noted but post-2019 series clean)
+  - 2020 COVID shutdown quarter (2020Q2) excluded from primary decomposition; included as sensitivity
 variables:
   outcome:
-    - name: gdp_deflator_yoy
-      source: eurostat:nama_10_gdp; ecb:MNA.Q.N.U2.W2.S1.S1.B.B1GQ._Z._Z._Z.IX.D.N
-      transformation: pct_change_yoy
-      notes: Primary outcome for decomposition.
-    - name: unit_profit_contribution_to_deflator
-      source: "constructed: gross operating surplus per unit of real GDP, growth rate; eurostat nama_10_gdp + nama_10_a64"
-      transformation: pct_yoy_contribution
-      notes: Following IMF Hansen-Toscani-Zhou (2023) and ECB Arce-Hahn-Koester (2023) methodology.
-    - name: unit_labour_cost_contribution_to_deflator
-      source: "constructed: compensation of employees per unit of real GDP; eurostat nama_10_gdp + namq_10_lp_ulc"
-      transformation: pct_yoy_contribution
-    - name: real_wage_index
-      source: oecd:real_average_wage
-      transformation: index_real_2019_100
-    - name: hicp_inflation_yoy
-      source: ecb:ICP.M.U2.N.000000.4.ANR
-      transformation: pct_change_yoy
+  - name: gdp_deflator_yoy
+    source: eurostat:nama_10_gdp; ecb:MNA.Q.N.U2.W2.S1.S1.B.B1GQ._Z._Z._Z.IX.D.N
+    transformation: pct_change_yoy
+    notes: Primary outcome for decomposition.
+  - name: unit_profit_contribution_to_deflator
+    source: 'constructed: gross operating surplus per unit of real GDP, growth rate; eurostat nama_10_gdp + nama_10_a64'
+    transformation: pct_yoy_contribution
+    notes: Following IMF Hansen-Toscani-Zhou (2023) and ECB Arce-Hahn-Koester (2023) methodology.
+  - name: unit_labour_cost_contribution_to_deflator
+    source: 'constructed: compensation of employees per unit of real GDP; eurostat nama_10_gdp + namq_10_lp_ulc'
+    transformation: pct_yoy_contribution
+  - name: real_wage_index
+    source: oecd:real_average_wage
+    transformation: index_real_2019_100
+  - name: hicp_inflation_yoy
+    source: ecb:ICP.M.U2.N.000000.4.ANR
+    transformation: pct_change_yoy
   treatment:
-    - name: terms_of_trade_shock
-      source: eurostat:bop_external; ecb:terms_of_trade_index
-      transformation: pct_yoy
-      notes: Identifies the cost-push origin (energy + import prices). Russia-Ukraine 2022 and Red Sea 2023-2024 shocks.
-    - name: gas_import_price_index
-      source: eurostat:nrg_pc; ecb:energy_commodity_prices
-      transformation: log_diff
-    - name: ecb_policy_rate
-      source: ecb:FM.D.U2.EUR.4F.KR.MRR_FR.LEV
-      transformation: level_pct
-      notes: Tightening cycle began 2022Q3; tests whether rate hikes affected outcomes via ULC channel (mainstream prediction) or via aggregate-demand channel (mixed prediction).
+  - name: terms_of_trade_shock
+    source: eurostat:bop_external; ecb:terms_of_trade_index
+    transformation: pct_yoy
+    notes: Identifies the cost-push origin (energy + import prices). Russia-Ukraine 2022 and Red Sea 2023-2024 shocks.
+  - name: gas_import_price_index
+    source: eurostat:nrg_pc; ecb:energy_commodity_prices
+    transformation: log_diff
+  - name: ecb_policy_rate
+    source: ecb:FM.D.U2.EUR.4F.KR.MRR_FR.LEV
+    transformation: level_pct
+    notes: Tightening cycle began 2022Q3; tests whether rate hikes affected outcomes via ULC channel (mainstream prediction) or via aggregate-demand channel (mixed prediction).
   controls:
-    - name: output_gap
-      source: oecd:OutputGap
-      transformation: level_pct
-    - name: unemployment_rate
-      source: ilostat:unemployment_rate
-      transformation: pct_labour_force
-    - name: import_price_index
-      source: eurostat:sts_inppd_q
-      transformation: pct_yoy
+  - name: output_gap
+    source: oecd:OutputGap
+    transformation: level_pct
+  - name: unemployment_rate
+    source: ilostat:unemployment_rate
+    transformation: pct_labour_force
+  - name: import_price_index
+    source: eurostat:sts_inppd_q
+    transformation: pct_yoy
 intervention_channel: monetary
 estimator:
   template: panel_fe_decomposition
   clustering: country
-  fixed_effects: [country, year]
-  notes: >-
-    Hansen-Toscani-Zhou / Arce-Hahn-Koester decomposition of the
-    GDP-deflator into unit labour cost, unit profit, and unit tax
-    contributions. Panel fixed-effects regression of deflator on
-    terms-of-trade shock, with profit-margin and wage-side
-    decomposition reported separately. Robustness: country-level
-    cointegration test of profit margins vs deflator 2019-2024.
+  fixed_effects:
+  - country
+  - year
+  notes: 'Hansen-Toscani-Zhou / Arce-Hahn-Koester decomposition of the GDP-deflator into unit labour cost, unit profit, and unit tax contributions. Panel fixed-effects regression of deflator on terms-of-trade shock, with profit-margin and wage-side decomposition reported separately. Robustness: country-level cointegration test of profit margins vs deflator 2019-2024.'
 scope:
-  period: [2021, 2024]
-  countries: [DEU, FRA, ITA, ESP, NLD, BEL, AUT, IRL, EUROZONE]
-  outcome_dim: [inflation, monetary_policy, poverty_inequality, currency_purchasing_power]
-  policy_family: [monetary_policy]
-  treatment_tags: [post_covid_inflation_2021, russia_ukraine_energy_shock_2022, ecb_tightening_cycle_2022, eurozone_cost_push_inflation]
-covers_claims:
+  period:
+  - 2021
+  - 2024
+  countries:
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - IRL
+  - EUROZONE
+  outcome_dim:
+  - inflation
+  - monetary_policy
+  - poverty_inequality
+  - currency_purchasing_power
+  policy_family:
+  - monetary_policy
+  treatment_tags:
+  - post_covid_inflation_2021
+  - russia_ukraine_energy_shock_2022
+  - ecb_tightening_cycle_2022
+  - eurozone_cost_push_inflation
+covers_claims: []
 steelman: hypotheses/steelman/inflation_cost_push_distributional_conflict_eurozone_2021_2024.md
 linked_hypotheses:
-  - qe_asset_inflation_vs_cpi_divergence_post_2008
-  - monetary_finance_zlb_no_inflation
-  - inflation_expectations_anchoring_flattens_phillips_curve
+- qe_asset_inflation_vs_cpi_divergence_post_2008
+- monetary_finance_zlb_no_inflation
+- inflation_expectations_anchoring_flattens_phillips_curve

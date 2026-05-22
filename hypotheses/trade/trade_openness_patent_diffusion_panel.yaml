@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_openness_patent_diffusion_panel
+version: 1
+status: candidate
+topic: trade
+claim_direction: "+"
+claim: >
+  Countries with higher trade openness subsequently show faster diffusion of
+  frontier innovation, measured by resident patent applications and
+  high-technology export intensity. The market mechanism is that open import
+  and export channels expose firms to foreign inputs, embodied technology, and
+  competitive pressure; the state-allocation counterclaim is that innovation
+  diffusion depends more on protected domestic planning than on market access.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1995, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing the primary outcome, treatment, or income control
+    - use lagged trade openness to reduce contemporaneous reverse-causality pressure
+    - retain only country panels with at least 8 usable annual observations
+scope:
+  period: [1995, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [trade_policy, institutional_reform]
+  treatment_tags: [trade_openness, innovation_diffusion, patents]
+variables:
+  outcome:
+    - name: resident_patent_applications_per_million
+      source: wipo:patent_applications_resident
+      transformation: log_per_million_population
+      notes: WIPO resident patent applications, scaled by population; WIPO fetcher uses the WDI mirror where available.
+    - name: high_technology_exports_share
+      source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+      transformation: level
+      notes: Secondary innovation-diffusion outcome; informative but not the primary falsification target.
+  treatment:
+    - name: lagged_trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: one_year_lag_level
+      notes: Exports plus imports as percent of GDP, lagged one year.
+  controls:
+    - name: log_gdp_pc_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: log
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+    - name: investment_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Trade openness is a policy-regime measure shaped by tariffs, quotas,
+  licensing, customs administration, and treaty commitments, so the channel is
+  regulatory even though the treatment is measured as realized openness.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary regression uses two-way fixed effects with lagged trade openness.
+    The high-technology export outcome is a secondary robustness check because
+    it can mechanically reflect trade composition as well as innovation.
+falsification:
+  rule: >
+    SUPPORTED if the coefficient on lagged_trade_openness is positive for
+    resident_patent_applications_per_million at p<=0.10 with at least 300
+    observations and 25 countries. REFUTED if the coefficient is negative at
+    p<=0.10 under the same sample floor. Otherwise PARTIAL or INCONCLUSIVE
+    depending on data coverage.
+  test: panel_fe_trade_openness_patent_diffusion_panel
+  threshold:
+    expected_sign: "+"
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 25
+prior_confidence: 0.58
+disclosure: >
+  The author expects openness to aid diffusion but recognizes reverse causality:
+  innovative economies may choose or sustain more openness. This candidate is
+  therefore framed as an associational hurdle, not causal proof against
+  industrial-policy or planning accounts.
+steelman: hypotheses/steelman/trade_openness_patent_diffusion_panel.md
+notes: >
+  Uses common publishers already present in the repo: world_bank_wdi, wgi, and
+  wipo. Later causal upgrades could use treaty accession or tariff-reform
+  events.

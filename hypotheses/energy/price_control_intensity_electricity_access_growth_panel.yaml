@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: price_control_intensity_electricity_access_growth_panel
+version: 1
+status: candidate
+topic: energy
+claim_direction: "+"
+claim: >
+  Countries with stronger price-signal institutions, proxied by higher
+  Heritage monetary-freedom scores, achieve faster electricity-access gains
+  from below-universal-access baselines. The market mechanism is that prices
+  and cost recovery guide investment and ration scarce supply; the price-control
+  counterclaim is that administratively cheap energy can expand access without
+  damaging investment incentives.
+evidence_type: associational
+sample:
+  countries: [ARG, BGD, BRA, CHL, CHN, COL, EGY, ETH, GHA, IDN, IND, KEN, MAR, MEX, MYS, NGA, PAK, PER, PHL, THA, TUN, TUR, UGA, VNM, ZAF, ZMB]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - include only countries with electricity access below 98 percent in at least one pre-2010 year
+    - drop country-years missing Heritage monetary freedom or electricity-access data
+    - retain countries with at least 8 usable annual observations
+scope:
+  period: [1995, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [energy, currency_purchasing_power, regulation_compliance_cost]
+  policy_family: [energy_policy, regulation]
+  treatment_tags: [price_controls, electricity_access, cost_recovery]
+variables:
+  outcome:
+    - name: electricity_access_growth
+      source: world_bank_wdi:EG.ELC.ACCS.ZS
+      transformation: annual_change
+      notes: Annual percentage-point change in access to electricity.
+  treatment:
+    - name: monetary_freedom_price_signal_proxy
+      source: heritage_ief:ief_panel
+      transformation: monetary_freedom_level
+      notes: Heritage monetary freedom incorporates inflation and price-control penalties; higher values proxy less severe price controls.
+  controls:
+    - name: log_gdp_pc
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: urban_population_share
+      source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+      transformation: level
+    - name: fossil_fuel_rents
+      source: world_bank_wdi:NY.GDP.TOTL.RT.ZS
+      transformation: level
+    - name: government_effectiveness
+      source: wgi:GOV_WGI_GE.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  The treatment is a broad price-control and price-stability institutional
+  proxy relevant to regulated utility pricing and investment recovery.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary sample is restricted to countries with room for access expansion.
+    Replication should report whether the result survives controls for income,
+    urbanization, fuel rents, and government effectiveness.
+falsification:
+  rule: >
+    SUPPORTED if monetary_freedom_price_signal_proxy is positive for
+    electricity_access_growth at p<=0.10 with at least 180 observations and 18
+    countries. REFUTED if the coefficient is negative at p<=0.10 under the
+    same sample floor. Otherwise PARTIAL or INCONCLUSIVE.
+  test: panel_fe_price_control_intensity_electricity_access_growth_panel
+  threshold:
+    expected_sign: "+"
+    p_max: 0.10
+    min_observations: 180
+    min_countries: 18
+prior_confidence: 0.52
+disclosure: >
+  The Heritage monetary-freedom proxy is broad and may capture inflation
+  management rather than energy-specific price controls. The prior is modest
+  because subsidized access programs can work when fiscally funded and targeted.
+steelman: hypotheses/steelman/price_control_intensity_electricity_access_growth_panel.md
+notes: >
+  Candidate uses ready WDI, WGI, and Heritage IEF sources; a stronger v2 would
+  replace the broad price-control proxy with utility-tariff cost-recovery data.

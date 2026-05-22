@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: unconditional_transfer_work_hours_response_panel
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  In OECD and high-income country panels from 1990 to 2023, larger unconditional cash-transfer intensity for working-age households predicts lower average hours worked and lower labour-force participation than equally costly work-conditioned or in-kind support. The directional claim is that a 1 percentage-point-of-GDP increase in unconditional working-age cash-transfer intensity is associated with a negative hours-worked coefficient and at least a 0.4 percentage-point lower labour-force-participation rate, after controlling for unemployment, income, age structure, and total social spending.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1990, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - exclude old-age pension spending from the working-age unconditional-transfer treatment
+    - drop country-years where cash and in-kind social expenditure cannot be separated
+variables:
+  outcome:
+    - name: average_annual_hours_worked
+      source: oecd:DSD_LFS_BS@DF_HRS
+      transformation: level
+    - name: labour_force_participation_rate
+      source: ilostat:EAP_2WAP_SEX_AGE_RT_A
+      transformation: level_pct
+    - name: employment_to_population_ratio
+      source: ilostat:EMP_2EMP_SEX_AGE_RT_A
+      transformation: level_pct
+  treatment:
+    - name: unconditional_working_age_cash_transfers_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+      notes: Working-age cash transfers excluding unemployment insurance, active labour-market programmes, and old-age pensions where decomposition is available.
+    - name: work_conditioned_transfer_intensity
+      source: oecd:TaxBEN_in_work_benefit_67aw
+      transformation: level_pct_of_gross_wage
+  controls:
+    - name: total_social_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+    - name: unemployment_rate
+      source: ilostat:UNE_2EAP_SEX_AGE_RT_A
+      transformation: level_pct
+    - name: log_real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level_pct
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Unconditional cash transfers are fiscal welfare payments not conditioned on employment or job-search behaviour.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Estimate two-way FE with unconditional cash intensity and work-conditioned transfer intensity jointly, holding total social spending constant. Robustness checks exclude disability-related cash transfers, use five-year averages, and separate extensive-margin LFP from intensive-margin hours.
+falsification:
+  rule: |
+    Refuted if unconditional working-age cash-transfer intensity has a non-negative coefficient on hours and labour-force participation, or if work-conditioned transfers show equal or larger negative labour-supply coefficients at the same spending level. Poverty-reduction gains are reported separately and do not by themselves support or refute the labour-supply claim.
+  test: panel_fe_unconditional_transfer_work_hours_response
+  threshold: beta_unconditional_cash_lfp_1pp_gdp <= -0.4pp and beta_unconditional_cash_hours < 0
+prior_confidence: 0.54
+disclosure: |
+  Author has market-liberal priors that unconditional transfers can reduce labour supply through income effects. The prior is only slightly above even because many experiments find small work responses, and unconditional support may improve search quality, health, or caregiving constraints.
+scope:
+  period: [1990, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state, poverty_inequality]
+  policy_family: [welfare_architecture, fiscal_policy, labour_market]
+  treatment_tags: [unconditional_cash_transfers, labour_supply, work_conditioned_transfers, hours_worked]
+steelman: hypotheses/steelman/unconditional_transfer_work_hours_response_panel.md
+notes: |
+  Candidate Worker C spec. The hypothesis challenges claims that unconditional redistribution is labour-supply neutral, but it is designed so null or positive labour-supply findings overturn the claim.

@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_reer_appreciation_trade_open_disinflation_panel
+version: 1
+status: candidate
+topic: monetary
+claim_direction: "-"
+claim: >
+  Real effective exchange-rate appreciations predict lower inflation, and the
+  disinflationary association is stronger in more trade-open economies where
+  import-price pass-through is more exposed to currency movements.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed BIS EER, WDI CPI
+  inflation, WDI trade-openness, and GDP-growth panels.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, GRC, HKG, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, LUX, MEX, MYS, NLD, NOR, NZL, POL, PRT, RUS, SAU, SGP, SWE, THA, TUR, USA, ZAF]
+  period: [1970, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop hyperinflation country-years above 100 percent CPI inflation in robustness checks
+    - drop country-years missing BIS real EER or CPI inflation
+variables:
+  outcome:
+    - name: inflation
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+  treatment:
+    - name: reer_appreciation
+      source: bis:WS_EER
+      transformation: annual_pct_change
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+  controls:
+    - name: gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary estimand is reer_appreciation x trade_openness. Negative values
+    support stronger import-price disinflation in open economies.
+falsification:
+  rule: >
+    SUPPORTED only if the interaction coefficient is negative at p<=0.10 with at
+    least 900 observations and 20 countries. REFUTED if the interaction is
+    positive at p<=0.10.
+  test: panel_fe_bis_reer_appreciation_trade_open_disinflation_panel
+  threshold:
+    coef_max: -0.002
+    p_max: 0.10
+    min_observations: 900
+    min_countries: 20
+prior_confidence: 0.56
+disclosure: >
+  Exchange-rate pass-through is well motivated, but monetary-regime shifts and
+  commodity-price shocks can attenuate the simple annual panel relationship.
+steelman: hypotheses/steelman/bis_reer_appreciation_trade_open_disinflation_panel.md
+scope:
+  period: [1970, 2025]
+  countries: [GLOBAL]
+  outcome_dim: [inflation, currency_purchasing_power, capital_flows]
+  policy_family: [monetary_policy, exchange_rate_regime, trade_policy]
+  treatment_tags: [reer_appreciation, trade_openness, exchange_rate_pass_through]
+covers_claims: []
+notes: >
+  This is the appreciation-side equivalent of a depreciation pass-through test,
+  chosen because the generic runner can directly compute EER annual appreciation.

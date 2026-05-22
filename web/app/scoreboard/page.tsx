@@ -149,8 +149,8 @@ export default async function ScoreboardPage() {
         <p className="mt-3 mb-0">
           Schools are ranked by <strong>Q-net</strong> so generic development
           facts cannot swamp sharper policy tests. The original raw score stays
-          visible for transparency, and <strong>Signal</strong> marks tiny
-          Q-net margins as too close to call.
+          visible for transparency, while tiny Q-net margins are muted as too
+          close to call.
         </p>
       </div>
 
@@ -163,7 +163,6 @@ export default async function ScoreboardPage() {
             <tr className="border-b border-rule bg-panel">
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">School</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Quality-adjusted net: raw outcome score discounted by evidence type">Q-net</th>
-              <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted" title="Interpretation band for the net score: tiny margins are not directional evidence">Signal</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Raw weighted net: full wins + 0.5·partial-wins − 0.5·partial-losses − full losses">Raw net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Weighted support rate: partial directional verdicts count at half-weight">Rate</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Supports</th>
@@ -177,7 +176,7 @@ export default async function ScoreboardPage() {
           </thead>
           <tbody>
             {tested.map((s) => {
-              const signal = signalTone(s.adjusted_score_signal);
+              const scoreColor = scoreTone(s.adjusted_score_signal);
               return (
                 <tr
                   key={s.position_id}
@@ -196,24 +195,15 @@ export default async function ScoreboardPage() {
                   </td>
                   <td
                     className="p-3 text-right align-top font-mono text-[13px] font-semibold"
-                    style={{ color: signal.fg }}
+                    style={{ color: scoreColor }}
                     title={`Quality-adjusted no-call band: ±${s.adjusted_signal_threshold.toFixed(1)} points. Decisive-only raw net: ${s.decisive_net > 0 ? "+" : ""}${s.decisive_net}.`}
                   >
                     {s.adjusted_net_score > 0 ? "+" : ""}{s.adjusted_net_score.toFixed(1)}
                   </td>
-                  <td className="p-3 align-top">
-                    <span
-                      className="inline-block rounded px-2 py-[3px] text-xs font-semibold"
-                      style={{ background: signal.bg, color: signal.fg }}
-                      title={`Quality-adjusted net margin is ${Math.abs(s.adjusted_net_margin_rate * 100).toFixed(1)}% of adjusted tested weight.`}
-                    >
-                      {signal.label}
-                    </span>
-                  </td>
                   <td
                     className="p-3 text-right align-top font-mono text-[13px]"
                     title={`Raw no-call band: ±${s.signal_threshold.toFixed(1)} net points.`}
-                    style={{ color: signalTone(s.score_signal).fg }}
+                    style={{ color: scoreTone(s.score_signal) }}
                   >
                     {s.net_score > 0 ? "+" : ""}{s.net_score.toFixed(1)}
                   </td>
@@ -308,17 +298,17 @@ function rateTone(r: number): { bg: string; fg: string } {
   return { bg: "#f3d9d9", fg: "#9e2f2f" };
 }
 
-function signalTone(signal: string): { label: string; bg: string; fg: string } {
+function scoreTone(signal: string): string {
   if (signal === "positive_signal") {
-    return { label: "positive signal", bg: "#dff1e4", fg: "#2c7a4f" };
+    return "#2c7a4f";
   }
   if (signal === "negative_signal") {
-    return { label: "negative signal", bg: "#f3d9d9", fg: "#9e2f2f" };
+    return "#9e2f2f";
   }
   if (signal === "untested") {
-    return { label: "untested", bg: "#e8e6e0", fg: "#57554e" };
+    return "#57554e";
   }
-  return { label: "too close", bg: "#e8e6e0", fg: "#57554e" };
+  return "#57554e";
 }
 
 function StackedBar({

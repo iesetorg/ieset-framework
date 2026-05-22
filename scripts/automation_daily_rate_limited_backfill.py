@@ -41,8 +41,51 @@ def _utc_tag() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")
 
 
+def _classify_error(exc: Exception) -> dict[str, str]:
+    msg = str(exc)
+    msg_lower = msg.lower()
+    et = type(exc).__name__
+
+    # Common offline/blocked environment markers.
+    if "nodename nor servname provided, or not known" in msg_lower or "errno 8" in msg_lower:
+        return {"blocker_category": "dns_resolution", "error_hint": "DNS resolver unavailable in runtime"}
+    if "name or service not known" in msg_lower:
+        return {"blocker_category": "dns_resolution", "error_hint": "DNS lookup failed"}
+    if "network is unreachable" in msg_lower or "errno 101" in msg_lower:
+        return {"blocker_category": "network_unreachable", "error_hint": "network unreachable"}
+    if "timed out" in msg_lower or "timeout" in msg_lower:
+        return {"blocker_category": "timeout", "error_hint": "request timed out"}
+
+    # Rate limit-ish.
+    if "429" in msg_lower or "too many requests" in msg_lower:
+        return {"blocker_category": "rate_limited", "error_hint": "HTTP 429 / rate limited"}
+
+    # BLS often blocks bot-like downloads with 403/Access Denied for some bulk files.
+    if "403" in msg_lower or "access denied" in msg_lower or "forbidden" in msg_lower:
+        return {"blocker_category": "blocked_403", "error_hint": "HTTP 403 / access denied"}
+
+    return {"blocker_category": "unknown", "error_hint": f"{et}"}
+
+
+def _expected_source_metadata(job: Job) -> dict[str, str | None]:
+    if job.publisher != "bls":
+        return {"expected_source_url": None, "expected_methodology_url": None}
+    if job.series_id.startswith("LAU_state_"):
+        return {
+            "expected_source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+            "expected_methodology_url": "https://www.bls.gov/lau/",
+        }
+    if job.series_id.startswith("QCEW_"):
+        return {
+            "expected_source_url": "https://data.bls.gov/cew/data/api/{year}/a/industry/10.csv",
+            "expected_methodology_url": "https://www.bls.gov/cew/downloadable-data-files.htm",
+        }
+    return {"expected_source_url": None, "expected_methodology_url": None}
+
+
 def _run_job(job: Job) -> tuple[FetchResult | None, dict[str, Any]]:
     started = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    expected = _expected_source_metadata(job)
     if job.publisher not in REGISTRY:
         return None, {
             "publisher": job.publisher,
@@ -53,10 +96,12 @@ def _run_job(job: Job) -> tuple[FetchResult | None, dict[str, Any]]:
             "rationale": job.rationale,
             "kwargs": job.kwargs or {},
             "error": f"known fetchers: {sorted(REGISTRY)}",
+            **expected,
         }
     try:
         result = REGISTRY[job.publisher].fetch(job.series_id, **(job.kwargs or {}))
     except Exception as exc:  # noqa: BLE001
+        classified = _classify_error(exc)
         return None, {
             "publisher": job.publisher,
             "series_id": job.series_id,
@@ -67,6 +112,8 @@ def _run_job(job: Job) -> tuple[FetchResult | None, dict[str, Any]]:
             "kwargs": job.kwargs or {},
             "error_type": type(exc).__name__,
             "error": str(exc)[:2400],
+            **classified,
+            **expected,
         }
     return result, {
         "publisher": result.publisher,
@@ -83,6 +130,8 @@ def _run_job(job: Job) -> tuple[FetchResult | None, dict[str, Any]]:
         "sha256": result.sha256,
         "source_url": result.source_url,
         "methodology_url": result.methodology_url,
+        "expected_source_url": expected.get("expected_source_url"),
+        "expected_methodology_url": expected.get("expected_methodology_url"),
         "extra": result.extra,
     }
 
@@ -136,6 +185,12 @@ def _write_audit(tag: str, records: list[dict[str, Any]], results: list[FetchRes
         lines.extend(["", "## Failed / Still Blocked", ""])
         for r in failed:
             lines.append(f"- `{r['publisher']}:{r['series_id']}` — {r.get('error_type', r['status'])}: {r.get('error', '')}")
+            if r.get("blocker_category"):
+                lines.append(f"  - blocker_category: `{r.get('blocker_category')}`")
+            if r.get("expected_source_url"):
+                lines.append(f"  - expected_source_url: `{r.get('expected_source_url')}`")
+            if r.get("expected_methodology_url"):
+                lines.append(f"  - expected_methodology_url: `{r.get('expected_methodology_url')}`")
 
     lines.extend(["", "## Run Settings", ""])
     for key in (

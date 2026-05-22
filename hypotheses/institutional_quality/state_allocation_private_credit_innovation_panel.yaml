@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: state_allocation_private_credit_innovation_panel
+version: 1
+status: candidate
+topic: institutional_quality
+claim_direction: "-"
+claim: >
+  Larger state-allocation footprints predict weaker private-credit depth and
+  slower innovation diffusion after country and year fixed effects. The market
+  mechanism is that decentralized credit allocation and private entry reveal
+  dispersed information; the state-allocation counterclaim is that public
+  direction can allocate capital toward strategic innovation without crowding
+  out private discovery.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing state-allocation proxy or private-credit outcome
+    - retain countries with at least 8 usable annual observations
+    - report China separately as an influential mixed-market outlier check
+scope:
+  period: [1996, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [institutional_quality, financialisation, industrial_capability]
+  policy_family: [institutional_reform, industrial_policy, regulation]
+  treatment_tags: [state_allocation, private_credit, innovation_diffusion]
+variables:
+  outcome:
+    - name: private_credit_depth
+      source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+      transformation: level
+      notes: Domestic credit to private sector by banks as percent of GDP.
+    - name: resident_patent_applications_per_million
+      source: wipo:patent_applications_resident
+      transformation: log_per_million_population
+      notes: Secondary innovation-diffusion outcome.
+  treatment:
+    - name: government_consumption_share
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: level
+      notes: Broad state-allocation footprint proxy; higher values indicate more resources allocated through government consumption.
+    - name: efw_size_of_government
+      source: fraser_efw:efw_panel
+      transformation: area_1_size_of_government_inverted
+      notes: Secondary institutional proxy for state allocation where Fraser coverage is available.
+  controls:
+    - name: log_gdp_pc_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+    - name: inflation
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >
+  The treatment measures the institutional allocation channel: resources routed
+  through government command or budget processes rather than private credit and
+  market entry.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary outcome is private_credit_depth. Patent applications are reported
+    as an innovation-diffusion mechanism check and should not determine the
+    primary verdict by itself.
+falsification:
+  rule: >
+    SUPPORTED if government_consumption_share is negative for private_credit_depth
+    at p<=0.10 with at least 300 observations and 25 countries. REFUTED if the
+    coefficient is positive at p<=0.10 under the same sample floor. Otherwise
+    PARTIAL or INCONCLUSIVE.
+  test: panel_fe_state_allocation_private_credit_innovation_panel
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 25
+prior_confidence: 0.55
+disclosure: >
+  The author has market-process priors, but government consumption is a blunt
+  proxy and can include high-quality public goods. This spec tests broad
+  allocation footprint, not whether every public investment program crowds out
+  innovation.
+steelman: hypotheses/steelman/state_allocation_private_credit_innovation_panel.md
+notes: >
+  Uses WDI, WGI, Fraser EFW, and WIPO-ready sources. Later versions could use
+  bank ownership or directed-credit datasets for a sharper treatment.

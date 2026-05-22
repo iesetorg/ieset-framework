@@ -1,117 +1,200 @@
-# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: government_spending_tfp_drag_panel
 version: 1
 status: pre_registered
 topic: fiscal
+claim: 'In a broad-country panel 1980-2019, a larger government expenditure share of GDP predicts lower subsequent total-factor-productivity (TFP) growth, controlling for initial income, trade openness, and human capital. The directional claim is that a 10 percentage-point increase in government spending/GDP is associated with at least 0.3 percentage points lower annual TFP growth over the following decade, and that this relationship is monotonic across the observed spending range.
 
-claim: >
-  In a broad-country panel 1980-2019, a larger government expenditure share of
-  GDP predicts lower subsequent total-factor-productivity (TFP) growth, controlling
-  for initial income, trade openness, and human capital. The directional claim is
-  that a 10 percentage-point increase in government spending/GDP is associated with
-  at least 0.3 percentage points lower annual TFP growth over the following decade,
-  and that this relationship is monotonic across the observed spending range.
-
+  '
 evidence_type: associational
-
 sample:
-  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, SWE, NOR, DNK, FIN, IRL, CHE, PRT, GRC, JPN, CAN, AUS, NZL, KOR, ISR, EST, POL, CZE, HUN, CHL, MEX, ZAF, TUR, BRA, ARG, COL, THA, MYS, IDN, PHL, IND, CHN, EGY, NGA, KEN, BGD, PAK, VNM, UKR, RUS, PER, MAR, LKA, URY, CRI, DOM, ECU, GTM, HND, NIC, PAN, SLV, BOL, PRY, JOR, LBN, KWT, SAU, ARE, QAT, BHR, OMN, DZA, TUN, MAR, GHA, ETH, TZA, UGA, RWA, BWA, ZMB, ZWE, MOZ, MDG, MLI, SEN, BEN, TCD, COG, CMR, CIV, GIN, SLE, LBR, BDI, RWA, MDV, FJI, PNG, KHM, LAO, MNG, NPL, LKA, BGD, PAK, AFG, IRN, IRQ, SYR, YEM, OMN, JOR, LBN, PSE]
-  period: [1980, 2019]
+  countries:
+  - USA
+  - GBR
+  - DEU
+  - FRA
+  - ITA
+  - ESP
+  - NLD
+  - BEL
+  - AUT
+  - SWE
+  - NOR
+  - DNK
+  - FIN
+  - IRL
+  - CHE
+  - PRT
+  - GRC
+  - JPN
+  - CAN
+  - AUS
+  - NZL
+  - KOR
+  - ISR
+  - EST
+  - POL
+  - CZE
+  - HUN
+  - CHL
+  - MEX
+  - ZAF
+  - TUR
+  - BRA
+  - ARG
+  - COL
+  - THA
+  - MYS
+  - IDN
+  - PHL
+  - IND
+  - CHN
+  - EGY
+  - NGA
+  - KEN
+  - BGD
+  - PAK
+  - VNM
+  - UKR
+  - RUS
+  - PER
+  - MAR
+  - LKA
+  - URY
+  - CRI
+  - DOM
+  - ECU
+  - GTM
+  - HND
+  - NIC
+  - PAN
+  - SLV
+  - BOL
+  - PRY
+  - JOR
+  - LBN
+  - KWT
+  - SAU
+  - ARE
+  - QAT
+  - BHR
+  - OMN
+  - DZA
+  - TUN
+  - GHA
+  - ETH
+  - TZA
+  - UGA
+  - RWA
+  - BWA
+  - ZMB
+  - ZWE
+  - MOZ
+  - MDG
+  - MLI
+  - SEN
+  - BEN
+  - TCD
+  - COG
+  - CMR
+  - CIV
+  - GIN
+  - SLE
+  - LBR
+  - BDI
+  - MDV
+  - FJI
+  - PNG
+  - KHM
+  - LAO
+  - MNG
+  - NPL
+  - AFG
+  - IRN
+  - IRQ
+  - SYR
+  - YEM
+  - PSE
+  period:
+  - 1980
+  - 2019
   temporal_structure: panel
   exclusion_rules:
-    - "drop country-years with active high-intensity civil conflict (UCDP intensity-2+)"
-    - "drop transition-economy years 1989-1994 for ex-communist countries where institutions were in flux"
-    - "drop observations where government spending/GDP > 90% (likely wartime or data error)"
-
+  - drop country-years with active high-intensity civil conflict (UCDP intensity-2+)
+  - drop transition-economy years 1989-1994 for ex-communist countries where institutions were in flux
+  - drop observations where government spending/GDP > 90% (likely wartime or data error)
 scope:
-  period: [1980, 2019]
-  countries: [GLOBAL]
-  outcome_dim: [productivity, fiscal_policy]
-  policy_family: [fiscal_policy, tax_policy]
-  treatment_tags: [government_spending, tfp_growth, state_size, crowding_out]
-
+  period:
+  - 1980
+  - 2019
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  - fiscal_policy
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - government_spending
+  - tfp_growth
+  - state_size
+  - crowding_out
 variables:
   outcome:
-    - name: tfp_growth_annual
-      source: "pwt:rtfpna"
-      transformation: "log_diff_annual"
-      notes: "PWT TFP at constant national prices, annual log-difference. Primary productivity outcome."
-    - name: labour_productivity_growth
-      source: "pwt:rgdpo_per_emp"
-      transformation: "log_diff_annual"
-      notes: "Real output per worker, annual log-difference. Secondary outcome."
+  - name: tfp_growth_annual
+    source: pwt:rtfpna
+    transformation: log_diff_annual
+    notes: PWT TFP at constant national prices, annual log-difference. Primary productivity outcome.
+  - name: labour_productivity_growth
+    source: pwt:rgdpo_per_emp
+    transformation: log_diff_annual
+    notes: Real output per worker, annual log-difference. Secondary outcome.
   treatment:
-    - name: government_spending_share_gdp
-      source: "world_bank_wdi:GC.XPN.TOTL.GD.ZS"
-      transformation: "level"
-      notes: "General government final consumption expenditure % GDP."
-    - name: government_consumption_share_gdp
-      source: "world_bank_wdi:NE.CON.TOTL.ZS"
-      transformation: "level"
-      notes: "Alternative measure: total consumption expenditure % GDP."
+  - name: government_spending_share_gdp
+    source: world_bank_wdi:GC.XPN.TOTL.GD.ZS
+    transformation: level
+    notes: General government final consumption expenditure % GDP.
+  - name: government_consumption_share_gdp
+    source: world_bank_wdi:NE.CON.TOTL.ZS
+    transformation: level
+    notes: 'Alternative measure: total consumption expenditure % GDP.'
   controls:
-    - name: log_initial_gdp_per_capita
-      source: "world_bank_wdi:NY.GDP.PCAP.KD"
-      transformation: "log"
-    - name: trade_openness
-      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
-      transformation: "level"
-    - name: human_capital_index
-      source: "pwt:hc"
-      transformation: "level"
-    - name: investment_share_gdp
-      source: "world_bank_wdi:NE.GDI.FTOT.ZS"
-      transformation: "level"
-    - name: population_growth
-      source: "world_bank_wdi:SP.POP.GROW"
-      transformation: "level"
-
+  - name: log_initial_gdp_per_capita
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: human_capital_index
+    source: pwt:hc
+    transformation: level
+  - name: investment_share_gdp
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: level
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
 intervention_channel: fiscal
-intervention_channel_justification: >
-  Government spending share is a direct fiscal-channel intervention. The test
-  isolates the association between state size and productivity growth.
+intervention_channel_justification: 'Government spending share is a direct fiscal-channel intervention. The test isolates the association between state size and productivity growth.
 
+  '
 estimator:
   template: panel_fe
-  fixed_effects: [country, decade]
+  fixed_effects:
+  - country
+  - decade
   clustering: country
-  notes: >
-    Panel FE with non-overlapping 5-year averages to capture medium-run effects
-    and reduce noise: TFP_growth = β0 + β1*govt_spending/GDP + controls + FE.
-    Robustness: (1) exclude oil exporters where spending is endogenous to
-    resource rents; (2) use Fraser EFW size-of-government sub-index instead of
-    WDI spending; (3) subsample by income level; (4) 10-year forward growth to
-    reduce reverse causality.
-
+  notes: "Panel FE with non-overlapping 5-year averages to capture medium-run effects and reduce noise: TFP_growth = \u03B20 + \u03B21*govt_spending/GDP + controls + FE. Robustness: (1) exclude oil exporters where spending is endogenous to resource rents; (2) use Fraser EFW size-of-government sub-index instead of WDI spending; (3) subsample by income level; (4) 10-year forward growth to reduce reverse causality.\n"
 falsification:
-  rule: >
-    SUPPORTED if β1 (govt spending) is negative and significant at p<0.05 for
-    both TFP growth and labour productivity growth. PARTIAL if negative and
-    significant for TFP but not labour productivity. REFUTED if β1 is positive
-    and significant at p<0.05. INFORMATIVE: excluding oil exporters should not
-    eliminate the negative sign; if it does, the result is driven by resource
-    rent endogeneity.
+  rule: "SUPPORTED if \u03B21 (govt spending) is negative and significant at p<0.05 for both TFP growth and labour productivity growth. PARTIAL if negative and significant for TFP but not labour productivity. REFUTED if \u03B21 is positive and significant at p<0.05. INFORMATIVE: excluding oil exporters should not eliminate the negative sign; if it does, the result is driven by resource rent endogeneity.\n"
   test: panel_fe_govt_spending_tfp_drag_5yr
-  threshold: >
-    β_govt_spending (TFP growth) < 0 at p<=0.05  AND
-    β_govt_spending (labour productivity) < 0 at p<=0.05  AND
-    Ex-oil-exporter robustness retains negative sign.
+  threshold: "\u03B2_govt_spending (TFP growth) < 0 at p<=0.05  AND \u03B2_govt_spending (labour productivity) < 0 at p<=0.05  AND Ex-oil-exporter robustness retains negative sign.\n"
+prior_confidence: 0.6
+disclosure: 'Author has market-liberal priors that may overweight the crowding-out mechanism and under-weight productive public investment (infrastructure, education, basic R&D) that could raise TFP. Prior is 0.60 rather than higher because: (a) public goods provision can be productivity-enhancing; (b) endogeneity runs both ways (low TFP growth may invite more stabilisation spending). Framing risk: the hypothesis may be read as endorsing zero government spending; the spec tests only the marginal association across the observed range and does not claim that all spending is harmful.
 
-prior_confidence: 0.60
-
-disclosure: >
-  Author has market-liberal priors that may overweight the crowding-out
-  mechanism and under-weight productive public investment (infrastructure,
-  education, basic R&D) that could raise TFP. Prior is 0.60 rather than higher
-  because: (a) public goods provision can be productivity-enhancing; (b)
-  endogeneity runs both ways (low TFP growth may invite more stabilisation
-  spending). Framing risk: the hypothesis may be read as endorsing zero
-  government spending; the spec tests only the marginal association across the
-  observed range and does not claim that all spending is harmful.
-
+  '
 steelman: hypotheses/steelman/government_spending_tfp_drag_panel.md
-
 linked_hypotheses:
-  - government_consumption_share_tfp
-  - fiscal_consolidation_credibility_growth
-  - tax_burden_frontier_growth_non_linear
+- government_consumption_share_tfp
+- fiscal_consolidation_credibility_growth
+- tax_burden_frontier_growth_non_linear

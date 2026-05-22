@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: price_signal_freedom_inflation_volatility_panel
+version: 1
+status: candidate
+topic: institutional_quality
+claim_direction: "-"
+claim: >
+  Stronger price-signal freedom predicts lower inflation volatility and higher
+  private investment in country-year panels. The market mechanism is that
+  flexible prices transmit scarcity and investment information; the price-control
+  counterclaim is that administrative price management can stabilize purchasing
+  power without undermining investment.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [1995, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing Heritage IEF or inflation data
+    - compute inflation volatility only when at least 4 of 5 rolling-window observations are available
+    - exclude hyperinflation country-years above 1000 percent inflation from the primary regression and report them separately
+scope:
+  period: [1995, 2024]
+  countries: [GLOBAL]
+  outcome_dim: [institutional_quality, inflation, currency_purchasing_power]
+  policy_family: [institutional_reform, monetary_policy, regulation]
+  treatment_tags: [price_signals, price_controls, monetary_freedom]
+variables:
+  outcome:
+    - name: inflation_volatility_5y
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: rolling_5y_standard_deviation
+      notes: "Primary outcome: rolling five-year volatility of CPI inflation."
+    - name: private_investment_share
+      source: world_bank_wdi:NE.GDI.FPRV.ZS
+      transformation: level
+      notes: Secondary investment outcome where WDI coverage permits.
+  treatment:
+    - name: monetary_freedom_price_signal_proxy
+      source: heritage_ief:ief_panel
+      transformation: monetary_freedom_level
+      notes: Heritage monetary freedom penalizes inflation and price controls; higher values proxy freer price signals.
+  controls:
+    - name: log_gdp_pc
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: government_consumption_share
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: control_of_corruption
+      source: wgi:CC.EST
+      transformation: level
+intervention_channel: institutional
+intervention_channel_justification: >
+  Price controls and monetary freedom are institutional rules governing the
+  price system, not merely macro outcomes.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary test uses rolling inflation volatility. Private investment is a
+    secondary mechanism check because WDI private-investment coverage is
+    thinner than total investment coverage.
+falsification:
+  rule: >
+    SUPPORTED if monetary_freedom_price_signal_proxy is negative for
+    inflation_volatility_5y at p<=0.10 with at least 300 observations and 25
+    countries. REFUTED if the coefficient is positive at p<=0.10 under the same
+    sample floor. Otherwise PARTIAL or INCONCLUSIVE.
+  test: panel_fe_price_signal_freedom_inflation_volatility_panel
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_observations: 300
+    min_countries: 25
+prior_confidence: 0.59
+disclosure: >
+  The author expects price controls to create distortions, but the Heritage
+  monetary-freedom measure partly embeds inflation performance. That overlap
+  means a supported association is useful but not a clean causal estimate of
+  price controls alone.
+steelman: hypotheses/steelman/price_signal_freedom_inflation_volatility_panel.md
+notes: >
+  Candidate intentionally uses common WDI, WGI, and Heritage IEF data. A later
+  causal version should separate price-control legal coding from inflation
+  outcomes.

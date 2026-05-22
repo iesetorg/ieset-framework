@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: rent_price_controls_building_permits_eu_panel
+version: 1
+status: candidate
+topic: housing
+claim_direction: "-"
+claim: >
+  Stricter rent-price controls predict slower residential building-permit
+  growth in European country panels. The market mechanism is that binding rent
+  ceilings reduce expected returns to new rental housing and maintenance; the
+  redistribution counterclaim is that rent controls can transfer surplus to
+  tenants without reducing future supply.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LVA, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+  period: [2000, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop countries without rent-control coding or building-permit data
+    - drop country-years with wartime or disaster-driven construction collapses
+    - retain only panels with at least 8 usable annual observations
+scope:
+  period: [2000, 2024]
+  countries: [EU]
+  outcome_dim: [housing, regulation_compliance_cost]
+  policy_family: [housing_policy, regulation]
+  treatment_tags: [rent_control, price_controls, building_permits]
+variables:
+  outcome:
+    - name: residential_building_permits_index_growth
+      source: eurostat:bldg_pi_lt
+      transformation: annual_log_change
+      notes: Eurostat residential building-permit index, transformed to annual log growth.
+    - name: housing_cost_overburden_rate
+      source: eurostat:ilc_lvho07a
+      transformation: level
+      notes: Secondary tenant-burden outcome; not part of the primary falsification rule.
+  treatment:
+    - name: rent_control_intensity
+      source: constructed:european_rent_control_index
+      transformation: level
+      notes: Country-year coding of rent caps, rent freezes, and renewal restrictions, to be documented at replication time.
+  controls:
+    - name: log_gdp_pc
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: population_growth
+      source: world_bank_wdi:SP.POP.GROW
+      transformation: level
+    - name: real_interest_rate
+      source: world_bank_wdi:FR.INR.RINR
+      transformation: level
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Rent controls are regulatory price ceilings in the housing market.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way fixed effects with country-clustered errors. The overburden-rate
+    outcome is reported separately because rent controls can lower measured
+    incumbent rents while reducing supply for future tenants.
+falsification:
+  rule: >
+    SUPPORTED if rent_control_intensity is negative for residential
+    building-permit growth at p<=0.10 with at least 150 observations and 15
+    countries. REFUTED if rent_control_intensity is positive at p<=0.10 under
+    the same sample floor. Otherwise PARTIAL or INCONCLUSIVE depending on data
+    coverage.
+  test: panel_fe_rent_price_controls_building_permits_eu_panel
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_observations: 150
+    min_countries: 15
+prior_confidence: 0.60
+disclosure: >
+  The author expects binding price ceilings to reduce supply, but European
+  rent-control regimes differ sharply in exemptions, new-build treatment, and
+  enforcement. The candidate should not be read as assuming all tenant
+  protections have the same supply effect.
+steelman: hypotheses/steelman/rent_price_controls_building_permits_eu_panel.md
+notes: >
+  Eurostat and WDI are ready publishers. The main blocker for a runnable
+  replication is transparent construction of the rent-control intensity index.

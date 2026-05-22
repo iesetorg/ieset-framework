@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: market_dynamism_entrepreneurial_entry_income_growth
+version: 1
+status: candidate
+topic: growth
+claim: Higher formal new-business entry density predicts faster subsequent real income growth.
+claim_direction: "+"
+evidence_type: associational
+sample:
+  countries: [USA, GBR, CAN, AUS, NZL, DEU, FRA, ITA, ESP, NLD, SWE, NOR, DNK, FIN, JPN, KOR, CHN, IND, BRA, MEX, CHL, ARG, TUR, ZAF, POL, EST, VNM, THA, MYS, IDN, COL, PER, PHL, EGY, MAR, KEN, NGA, BGD, PAK, LKA]
+  period: [2006, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing new-business-density treatment or GDP-per-capita outcome
+  - require at least three observed treatment years per country
+  - require at least 15 countries and 120 country-year observations after constructing forward outcomes
+scope:
+  period: [2006, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity, employment_labour]
+  policy_family: [regulation, competition_policy]
+  treatment_tags: [entrepreneurship, new_firm_entry, business_dynamism]
+variables:
+  outcome:
+  - name: real_gdp_pc_growth_3yr_forward
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: cumulative_log_growth_3yr_forward
+  treatment:
+  - name: new_business_density
+    source: world_bank_wdi:IC.BUS.NDNS.ZS
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: Formal registrations miss informal entrepreneurship, so the treatment is a conservative proxy for market entry.
+falsification:
+  rule: SUPPORTED if lagged new-business density is positive at p<0.10 for forward income growth. REFUTED if the coefficient is negative at p<0.10. Otherwise PARTIAL.
+  test: panel_fe_market_dynamism_entrepreneurial_entry_income_growth
+  threshold:
+    p_value: "p<0.10"
+    expected_sign: "+"
+    minimum_countries: 15
+    minimum_observations: 120
+prior_confidence: 0.54
+disclosure: Entry data are noisy and may partly measure legal formality rather than entrepreneurship; this makes a null result meaningful rather than surprising.
+steelman: hypotheses/steelman/market_dynamism_entrepreneurial_entry_income_growth.md

@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: in_work_benefits_low_income_employment_panel
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  OECD countries that deliver a larger share of low-income support through in-work benefits and earnings disregards, rather than through non-work-conditioned transfers, have higher employment rates among low-education adults and single parents without mechanically higher relative poverty. The directional claim is that stronger in-work benefit intensity predicts a positive low-income employment coefficient and a non-positive relative-poverty coefficient after controlling for total social spending, childcare spending, and macroeconomic conditions.
+claim_direction: "+"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [2001, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - require at least ten years of overlap between in-work benefit measures and low-education employment outcomes
+    - drop country-years where poverty series are missing before estimating the poverty robustness model
+variables:
+  outcome:
+    - name: low_education_employment_rate
+      source: ilostat:EMP_2EMP_SEX_EDU_RT_A
+      transformation: level_pct
+    - name: single_parent_employment_rate
+      source: oecd:LFS_single_parent_employment
+      transformation: level_pct
+    - name: relative_poverty_rate
+      source: oecd:IDD_relative_income_poverty
+      transformation: level_pct
+  treatment:
+    - name: in_work_benefit_intensity
+      source: oecd:TaxBEN_in_work_benefit_67aw
+      transformation: level_pct_of_gross_wage
+      notes: Modelled net-income gain from in-work credits, earnings disregards, or employment-conditional supplements at low wages.
+    - name: non_work_cash_transfer_intensity
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+  controls:
+    - name: total_social_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+    - name: childcare_family_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level_pct
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  In-work benefits are fiscal transfer designs that condition benefit receipt or generosity on earned income.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Two-way FE model comparing in-work benefit intensity with non-work cash-transfer intensity while holding total social spending constant. Robustness checks estimate first differences around major EITC, Working Tax Credit, Prime d'activite, and similar reforms where local coding permits.
+falsification:
+  rule: |
+    Refuted if in-work benefit intensity is non-positive for low-education and single-parent employment, or if the positive employment coefficient is accompanied by a positive and significant relative-poverty coefficient after controlling for total social spending. If in-work benefits merely relabel existing employment without raising employment, the claim is refuted.
+  test: panel_fe_in_work_benefits_low_income_employment
+  threshold: beta_in_work_employment > 0 and beta_in_work_relative_poverty <= 0 at p <= 0.10 where measured
+prior_confidence: 0.61
+disclosure: |
+  Author has market-liberal priors favouring work-conditioned transfers over broad non-work transfers. The specification may underweight stigma, administrative burden, and take-up frictions in in-work schemes, so poverty and take-up robustness checks are essential.
+scope:
+  period: [2001, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state, poverty_inequality, taxation]
+  policy_family: [welfare_architecture, tax_policy, labour_market]
+  treatment_tags: [in_work_benefits, earnings_disregards, low_income_employment, work_incentives]
+steelman: hypotheses/steelman/in_work_benefits_low_income_employment_panel.md
+notes: |
+  Candidate Worker C spec. It challenges redistribution claims that ignore work-conditioning design, while remaining open to the possibility that unconditional support performs equally well.

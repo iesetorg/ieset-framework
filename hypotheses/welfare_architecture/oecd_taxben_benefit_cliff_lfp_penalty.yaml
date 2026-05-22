@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_taxben_benefit_cliff_lfp_penalty
+version: 1
+status: candidate
+topic: welfare_architecture
+claim: |
+  In OECD TaxBEN panels since 2001, higher participation tax rates and effective marginal tax rates at the transition from non-work to low-wage work predict lower labour-force participation and employment among single parents and low-education adults. The directional claim is that a 10 percentage-point higher modelled benefit-cliff rate is associated with at least a 0.8 percentage-point lower single-parent or low-education employment rate within three years, after controlling for unemployment, childcare spending, minimum wages, and GDP growth.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [2001, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years where TaxBEN household-type cells are missing for single parents or low-wage workers
+    - exclude 2020-2021 from primary estimates and report pandemic-inclusive robustness separately
+variables:
+  outcome:
+    - name: single_parent_employment_rate
+      source: oecd:LFS_single_parent_employment
+      transformation: level_pct
+      notes: Preferred OECD family-employment tabulation; use ILO low-education employment as fallback if household-type cells are unavailable.
+    - name: low_education_employment_rate
+      source: ilostat:EMP_2EMP_SEX_EDU_RT_A
+      transformation: level_pct
+    - name: prime_age_lfp_rate
+      source: ilostat:EAP_2WAP_SEX_AGE_RT_A
+      transformation: level_pct
+  treatment:
+    - name: participation_tax_rate_low_wage_single_parent
+      source: oecd:TaxBEN_participation_tax_rate_single_parent_67aw
+      transformation: level_pct
+    - name: effective_marginal_tax_rate_low_wage
+      source: oecd:TaxBEN_effective_marginal_tax_rate_67aw
+      transformation: level_pct
+  controls:
+    - name: unemployment_rate
+      source: ilostat:UNE_2EAP_SEX_AGE_RT_A
+      transformation: level_pct
+    - name: childcare_family_spending_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level_pct_gdp
+    - name: minimum_wage_relative_median
+      source: oecd:DSD_EARNINGS@DF_MIN_REL_MED
+      transformation: level_pct
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level_pct
+intervention_channel: fiscal
+intervention_channel_justification: |
+  Benefit cliffs arise from tax-transfer eligibility rules and withdrawal schedules, so the treatment is a fiscal welfare-architecture design.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Estimate two-way FE models with one- and three-year lagged TaxBEN cliff measures. Robustness checks separate participation tax rates from marginal rates, compare single-parent and childless-adult household types, and add country-specific trends.
+falsification:
+  rule: |
+    Refuted if participation-tax-rate and effective-marginal-tax-rate coefficients are non-negative for employment/LFP, or if a 10 percentage-point higher benefit-cliff rate implies less than minus-0.8 percentage points and p > 0.10 in the primary single-parent or low-education employment outcome. A poverty-reduction effect without employment decline is counted as refutation of the work-incentive penalty claim.
+  test: panel_fe_taxben_benefit_cliff_lfp_penalty
+  threshold: beta_cliff_10pp <= -0.8pp for single_parent_or_low_education_employment and p <= 0.10
+prior_confidence: 0.60
+disclosure: |
+  Author has market-liberal priors that sharp benefit withdrawal weakens work incentives. The design explicitly allows falsification if high-cliff systems pair transfers with childcare, health insurance, or job placement strongly enough to preserve employment.
+scope:
+  period: [2001, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state, taxation]
+  policy_family: [welfare_architecture, tax_policy, labour_market]
+  treatment_tags: [benefit_cliffs, participation_tax_rate, effective_marginal_tax_rate, single_parents]
+steelman: hypotheses/steelman/oecd_taxben_benefit_cliff_lfp_penalty.md
+notes: |
+  Candidate Worker C spec. It tests a welfare-architecture mechanism rather than a general anti-transfer proposition.

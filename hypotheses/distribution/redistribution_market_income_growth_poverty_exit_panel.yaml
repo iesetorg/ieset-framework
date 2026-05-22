@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: redistribution_market_income_growth_poverty_exit_panel
+version: 1
+status: candidate
+topic: distribution
+claim: >
+  In low- and middle-income country panels from 1995 to 2023, sustained reductions in extreme poverty are more strongly
+  predicted by market-income growth and employment gains than by higher tax revenue or government consumption shares
+  alone. The mechanism tests whether durable poverty reduction comes primarily through productivity and work attachment
+  rather than redistribution of a fixed income stock.
+evidence_type: associational
+sample:
+  countries: [ARG, BGD, BOL, BRA, CHL, CHN, COL, CRI, DOM, EGY, ETH, GHA, GTM, HND, IDN, IND, KEN, LKA, MAR, MEX, MYS, NGA, PAK, PER, PHL, RWA, SEN, THA, TUN, TUR, TZA, UGA, VNM, ZAF, ZMB]
+  period: [1995, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - require at least three non-interpolated poverty observations per country
+    - drop country-years with active major conflict in the primary specification if a conflict flag is available
+    - use five-year changes as the primary outcome to reduce survey timing noise
+scope:
+  period: [1995, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [poverty_inequality, gdp_growth, employment_labour]
+  policy_family: [welfare_architecture, fiscal_policy, labour_market]
+  treatment_tags: [poverty_exit, market_income_growth, employment_growth, redistribution]
+variables:
+  outcome:
+    - name: extreme_poverty_headcount
+      source: world_bank_wdi:SI.POV.DDAY
+      transformation: five_year_change
+      notes: Declines in the USD 2.15/day poverty headcount are coded as poverty reduction.
+  treatment:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: five_year_mean
+    - name: employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: five_year_change
+    - name: tax_revenue_share
+      source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+      transformation: five_year_mean
+    - name: government_consumption_share
+      source: world_bank_wdi:NE.CON.GOVT.ZS
+      transformation: five_year_mean
+  controls:
+    - name: initial_extreme_poverty
+      source: world_bank_wdi:SI.POV.DDAY
+      transformation: lagged_level
+    - name: log_gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: log
+    - name: human_capital_index
+      source: pwt:hc
+      transformation: level
+    - name: inflation
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+intervention_channel: bundled
+intervention_channel_justification: >
+  The hypothesis compares market-income growth and employment channels with fiscal redistribution proxies, so the
+  treatment bundle spans fiscal and labour-market mechanisms.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Regress five-year changes in extreme poverty on five-year means or changes in growth, employment, tax revenue, and
+    government consumption. Coefficients are standardized before relative-strength comparisons.
+falsification:
+  rule: >
+    Supported if standardized coefficients for real_gdp_per_capita_growth and employment_to_population_ratio jointly
+    predict larger poverty reductions than tax_revenue_share and government_consumption_share, with at least one market
+    channel significant at p <= 0.10. Refuted if fiscal redistribution proxies jointly dominate the market channels or
+    if growth and employment have wrong-signed significant coefficients.
+  test: panel_fe_market_growth_vs_redistribution_poverty_exit
+  threshold:
+    market_channel_standardized_sum_gt_fiscal_sum: true
+    p_max_any_market_channel: 0.10
+    min_countries: 25
+prior_confidence: 0.60
+disclosure: >
+  The author expects market income growth to dominate durable poverty reduction, but direct transfers can have large
+  effects where states target well and labour markets are weak. This test can therefore be refuted by transfer-heavy
+  poverty declines that persist after growth and employment controls.
+steelman: hypotheses/steelman/redistribution_market_income_growth_poverty_exit_panel.md
+notes: >
+  Mechanism target: Marxian and redistribution-first accounts often treat poverty as primarily a distribution problem.
+  This candidate asks whether poverty exit empirically tracks production and work channels more strongly.

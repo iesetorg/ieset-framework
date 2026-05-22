@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: construction_permit_burden_housing_output_panel
+version: 1
+status: candidate
+topic: housing
+claim_direction: "-"
+claim: >
+  Longer and more burdensome construction-permit processes predict lower
+  housing-output growth after controlling for income, population growth, and
+  interest rates. The market mechanism is that entry and permitting frictions
+  restrict supply response; the state-control counterclaim is that intensive
+  permitting improves planning quality without materially constraining housing
+  output.
+evidence_type: associational
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ISR, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+  period: [2005, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing construction-permit burden or housing-output proxy
+    - do not extrapolate Doing Business permitting data after its final publication
+    - retain countries with at least 6 usable annual observations
+scope:
+  period: [2005, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [housing, regulation_compliance_cost]
+  policy_family: [housing_policy, regulation]
+  treatment_tags: [construction_permits, entry_barriers, housing_supply]
+variables:
+  outcome:
+    - name: residential_construction_value_added_growth
+      source: world_bank_wdi:NV.IND.CNST.KD.ZG
+      transformation: level
+      notes: Construction-sector real value-added growth used as broad housing-output proxy where direct dwelling completions are unavailable.
+    - name: urban_population_growth
+      source: world_bank_wdi:SP.URB.GROW
+      transformation: level
+      notes: Secondary demand-pressure diagnostic, not the primary outcome.
+  treatment:
+    - name: days_to_deal_with_construction_permits
+      source: world_bank_wdi:IC.CNST.PRMT
+      transformation: log
+      notes: World Bank Doing Business days required to obtain construction permits.
+  controls:
+    - name: log_gdp_pc
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: population_growth
+      source: world_bank_wdi:SP.POP.GROW
+      transformation: level
+    - name: real_interest_rate
+      source: world_bank_wdi:FR.INR.RINR
+      transformation: level
+    - name: regulatory_quality
+      source: wgi:RQ.EST
+      transformation: level
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Permitting delays are a regulatory barrier to housing supply and construction
+  entry.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary panel FE test uses log permit days. Robustness should replace the
+    broad construction-sector outcome with dwelling completions where national
+    or Eurostat housing-output series are available.
+falsification:
+  rule: >
+    SUPPORTED if days_to_deal_with_construction_permits is negative for
+    residential_construction_value_added_growth at p<=0.10 with at least 250
+    observations and 25 countries. REFUTED if the coefficient is positive at
+    p<=0.10 under the same sample floor. Otherwise PARTIAL or INCONCLUSIVE.
+  test: panel_fe_construction_permit_burden_housing_output_panel
+  threshold:
+    expected_sign: "-"
+    p_max: 0.10
+    min_observations: 250
+    min_countries: 25
+prior_confidence: 0.57
+disclosure: >
+  The author expects permitting burdens to reduce supply, but the WDI
+  construction-value-added outcome includes non-residential activity. A null
+  result may indicate measurement noise rather than vindication of every
+  permitting regime.
+steelman: hypotheses/steelman/construction_permit_burden_housing_output_panel.md
+notes: >
+  Built around WDI and WGI fields to keep the candidate runnable without a
+  bespoke municipal housing dataset.

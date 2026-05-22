@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_tax_wedge_low_wage_employment_penalty
+version: 1
+status: candidate
+topic: labour
+claim: |
+  In OECD country-year panels since 2001, higher employer-plus-employee labour tax wedges on low-wage workers predict lower employment rates for adults with below-upper-secondary education and higher inactivity among prime-age workers. The directional claim is that a 10 percentage-point increase in the low-wage tax wedge is associated with at least a 1 percentage-point lower low-education employment rate within five years, after controlling for output growth, education mix, employment protection, union density, and institutional quality.
+claim_direction: "-"
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [2001, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing the low-wage tax-wedge treatment or low-education employment outcome
+    - exclude COVID shock years 2020-2021 from the primary specification and restore them only in robustness checks
+variables:
+  outcome:
+    - name: low_education_employment_rate
+      source: ilostat:EMP_2EMP_SEX_EDU_RT_A
+      transformation: level_pct
+      notes: Employment rate for adults with below-upper-secondary education; use OECD LFS harmonised series where ILO education cells are sparse.
+    - name: prime_age_inactivity_rate
+      source: ilostat:EIP_2EIP_SEX_AGE_RT_A
+      transformation: level_pct
+  treatment:
+    - name: low_wage_tax_wedge
+      source: oecd:taxing_wages_67_percent_average_wage
+      transformation: level_pct
+      notes: Total labour tax wedge for a single worker at 67 percent of average wage, including employer social contributions where available.
+  controls:
+    - name: real_gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level_pct
+    - name: log_real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: epl_strictness
+      source: oecd:EPL_OV
+      transformation: level
+    - name: union_density
+      source: oecd:DSD_TU@DF_TU
+      transformation: level_pct
+    - name: rule_of_law
+      source: wgi:RL.EST
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: |
+  The tax wedge is a fiscal-channel intervention because it changes statutory and effective taxes on labour income and social insurance contributions.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: |
+    Estimate two-way fixed effects with lagged tax-wedge exposure and five-year non-overlapping averages as robustness. The preferred coefficient is on the low-wage tax wedge. Robustness checks add country-specific linear trends, exclude Nordic countries, and compare the 67-percent-average-wage wedge to the average-wage wedge.
+falsification:
+  rule: |
+    Refuted if the low-wage tax-wedge coefficient is non-negative for low-education employment, or if the implied effect of a 10 percentage-point higher wedge is smaller than minus-1 percentage point and statistically indistinguishable from zero at p <= 0.10 in both annual and five-year-average panels.
+  test: panel_fe_low_wage_tax_wedge_low_education_employment
+  threshold: beta_tax_wedge_10pp <= -1.0pp and p <= 0.10 in the primary employment outcome
+prior_confidence: 0.58
+disclosure: |
+  Author has market-liberal priors that high marginal labour taxes weaken work incentives and job creation. The prior is moderate because high-tax countries can finance childcare, health care, and active labour-market services that raise employment, so the hypothesis is designed to be falsified by Nordic-style complementarity.
+scope:
+  period: [2001, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, taxation, welfare_state]
+  policy_family: [tax_policy, labour_market, welfare_architecture]
+  treatment_tags: [tax_wedge, low_wage_workers, work_incentives]
+steelman: hypotheses/steelman/oecd_tax_wedge_low_wage_employment_penalty.md
+notes: |
+  Candidate Worker C spec. This is framed as an empirical challenge to claims that redistribution financed through labour taxation is employment-neutral, but the design is evidence-neutral and should not be mapped with covers_claims until a separate linkage pass.

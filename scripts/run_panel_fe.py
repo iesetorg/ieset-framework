@@ -540,8 +540,13 @@ def _filter_oecd_socx_slice(
         return df
 
     name = (variable_name or "").lower()
-    if name in {"welfare_state_size", "public_pension_expenditure_share_gdp"}:
-        programme_type = "_T" if name == "welfare_state_size" else "TP11"
+    programme_by_name = {
+        "welfare_state_size": "_T",
+        "public_pension_expenditure_share_gdp": "TP11",
+        "almp_spending_gdp": "TP60",
+    }
+    if name in programme_by_name:
+        programme_type = programme_by_name[name]
         filtered = df[
             df["UNIT_MEASURE"].astype(str).eq("PT_B1GQ")
             & df["EXPEND_SOURCE"].astype(str).eq("ES10")
@@ -618,6 +623,118 @@ def _filter_oecd_lfs_indic_slice(
     return filtered
 
 
+def _filter_bis_dsr_slice(
+    df: pd.DataFrame,
+    variable_name: str | None = None,
+) -> pd.DataFrame:
+    """Select the debt-service-ratio borrower sector requested by a variable."""
+    if "DSR_BORROWERS" not in df.columns:
+        return df
+
+    name = (variable_name or "").lower()
+    borrower = None
+    if any(token in name for token in ("corporate", "business", "nonfinancial", "non_financial")):
+        borrower = "N"
+    elif "household" in name:
+        borrower = "H"
+    elif any(token in name for token in ("private", "total")):
+        borrower = "P"
+    if borrower is None:
+        return df
+
+    filtered = df[df["DSR_BORROWERS"].astype(str).eq(borrower)].copy()
+    return filtered if not filtered.empty else df
+
+
+def _filter_bis_eer_slice(
+    df: pd.DataFrame,
+    variable_name: str | None = None,
+) -> pd.DataFrame:
+    """Prefer the real broad monthly EER slice for REER-style variables."""
+    name = (variable_name or "").lower()
+    filtered = df.copy()
+    if "EER_TYPE" in filtered.columns:
+        desired = "R" if ("reer" in name or "real" in name or "eer" in name) else None
+        if desired:
+            candidate = filtered[filtered["EER_TYPE"].astype(str).eq(desired)]
+            if not candidate.empty:
+                filtered = candidate
+    if "EER_BASKET" in filtered.columns:
+        desired = "N" if "narrow" in name else "B"
+        candidate = filtered[filtered["EER_BASKET"].astype(str).eq(desired)]
+        if not candidate.empty:
+            filtered = candidate
+    if "FREQ" in filtered.columns:
+        monthly = filtered[filtered["FREQ"].astype(str).eq("M")]
+        if not monthly.empty:
+            filtered = monthly
+    return filtered
+
+
+def _filter_eurostat_slice(
+    df: pd.DataFrame,
+    series: str | None = None,
+    variable_name: str | None = None,
+) -> pd.DataFrame:
+    """Select common Eurostat slices before reducing dimensional tables."""
+    stem = str(series or "").lower()
+    name = (variable_name or "").lower()
+    filtered = df
+
+    if stem == "nrg_pc_205":
+        required = {"siec", "nrg_cons", "unit", "tax", "currency"}
+        if required.issubset(filtered.columns):
+            candidate = filtered[
+                filtered["siec"].astype(str).eq("E7000")
+                & filtered["nrg_cons"].astype(str).eq("MWH2000-19999")
+                & filtered["unit"].astype(str).eq("KWH")
+                & filtered["tax"].astype(str).eq("I_TAX")
+                & filtered["currency"].astype(str).eq("EUR")
+            ].copy()
+            if not candidate.empty:
+                filtered = candidate
+
+    elif stem == "nama_10_a10":
+        if "nace_r2" in filtered.columns and "manufacturing" in name:
+            candidate = filtered[filtered["nace_r2"].astype(str).eq("C")].copy()
+            if not candidate.empty:
+                filtered = candidate
+        if "na_item" in filtered.columns:
+            candidate = filtered[filtered["na_item"].astype(str).eq("B1G")].copy()
+            if not candidate.empty:
+                filtered = candidate
+        if "unit" in filtered.columns and any(token in name for token in ("real", "volume", "growth")):
+            candidate = filtered[filtered["unit"].astype(str).str.startswith("CLV")].copy()
+            if not candidate.empty:
+                filtered = candidate
+
+    elif stem == "nama_10_gdp":
+        if "na_item" in filtered.columns:
+            candidate = filtered[filtered["na_item"].astype(str).eq("B1G")].copy()
+            if not candidate.empty:
+                filtered = candidate
+        if "unit" in filtered.columns and any(token in name for token in ("real", "volume", "growth")):
+            candidate = filtered[filtered["unit"].astype(str).str.startswith("CLV")].copy()
+            if not candidate.empty:
+                filtered = candidate
+
+    elif stem == "une_rt_a":
+        for col, val in (("sex", "T"), ("age", "Y15-74"), ("unit", "PC_ACT")):
+            if col in filtered.columns:
+                candidate = filtered[filtered[col].astype(str).eq(val)].copy()
+                if not candidate.empty:
+                    filtered = candidate
+
+    elif stem == "ilc_di12":
+        for col, val in (("age", "TOTAL"), ("statinfo", "GINI_HND")):
+            if col in filtered.columns:
+                candidate = filtered[filtered[col].astype(str).eq(val)].copy()
+                if not candidate.empty:
+                    filtered = candidate
+
+    return filtered
+
+
 def normalise_panel(
     df: pd.DataFrame,
     publisher: str,
@@ -632,12 +749,18 @@ def normalise_panel(
         df = _filter_oecd_socx_slice(df, variable_name=variable_name)
     if publisher == "oecd" and "DF_LFS_INDIC" in str(series or ""):
         df = _filter_oecd_lfs_indic_slice(df, variable_name=variable_name)
+    if publisher == "bis" and str(series or "").upper() == "WS_DSR":
+        df = _filter_bis_dsr_slice(df, variable_name=variable_name)
+    if publisher == "bis" and str(series or "").upper() == "WS_EER":
+        df = _filter_bis_eer_slice(df, variable_name=variable_name)
     if publisher == "bis" and str(series or "").upper() == "WS_CREDIT_GAP" and "CG_DTYPE" in df.columns:
         name = (variable_name or "").lower()
         dtype = "C" if "gap" in name else "B"
         filtered = df[df["CG_DTYPE"].astype(str).eq(dtype)].copy()
         if not filtered.empty:
             df = filtered
+    if publisher == "eurostat":
+        df = _filter_eurostat_slice(df, series=series, variable_name=variable_name)
 
     cols = {c.lower(): c for c in df.columns}
     # Discover the country column.

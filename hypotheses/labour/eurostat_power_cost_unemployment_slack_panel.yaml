@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurostat_power_cost_unemployment_slack_panel
+version: 1
+status: candidate
+topic: labour
+claim_direction: "+"
+claim: >
+  Higher industrial electricity-price growth predicts higher unemployment in
+  European country panels, especially during the post-2021 energy-cost shock
+  window when power-intensive producers faced larger input-cost pressure.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed Eurostat electricity
+  price, unemployment, and GDP panels.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, MLT, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+  period: [2008, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop non-country aggregates and country-years missing industrial prices or unemployment
+variables:
+  outcome:
+    - name: unemployment_rate
+      source: eurostat:une_rt_a
+      transformation: level
+  treatment:
+    - name: industrial_power_price_growth
+      source: eurostat:nrg_pc_205
+      transformation: annual_pct_change
+  controls:
+    - name: real_gdp_growth
+      source: eurostat:nama_10_gdp
+      transformation: annual_pct_change
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE screen; a bespoke follow-up should add energy-intensity
+    interactions once Eurostat sector energy-use panels are normalized.
+falsification:
+  rule: >
+    SUPPORTED only if industrial_power_price_growth is positive at p<=0.10 with
+    at least 250 observations and 20 countries. REFUTED if it is negative at
+    p<=0.10.
+  test: panel_fe_eurostat_power_cost_unemployment_slack_panel
+  threshold:
+    coef_min: 0.02
+    p_max: 0.10
+    min_observations: 250
+    min_countries: 20
+prior_confidence: 0.51
+disclosure: >
+  Prior confidence is modest because labour hoarding, fiscal support, and price
+  caps may hide short-run unemployment effects even if margins compress.
+steelman: hypotheses/steelman/eurostat_power_cost_unemployment_slack_panel.md
+scope:
+  period: [2008, 2025]
+  countries: [EU]
+  outcome_dim: [employment_labour, energy, industrial_capability]
+  policy_family: [energy_policy, labour_market]
+  treatment_tags: [industrial_electricity_prices, unemployment, energy_cost_shock]
+covers_claims: []
+notes: >
+  This is designed as a clean Eurostat-only companion to the manufacturing real
+  GVA power-cost test.

@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_socx_welfare_employment_capacity_interaction_panel
+version: 1
+status: candidate
+topic: welfare_architecture
+claim_direction: "+"
+claim: >
+  Public social spending has a smaller employment penalty in OECD countries
+  with higher government effectiveness. The claim is that administrative
+  capacity conditions whether large welfare states act as passive transfers or
+  employment-compatible social insurance.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed OECD SOCX aggregate,
+  WDI employment, WDI macro, and WGI government-effectiveness panels.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BGR, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, PER, POL, PRT, ROU, SVK, SVN, SWE, TUR, USA]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing employment, SOCX, GDP growth, or WGI government effectiveness
+variables:
+  outcome:
+    - name: employment_rate
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: level
+  treatment:
+    - name: welfare_state_size
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: level
+      notes: Public total social expenditure as percent of GDP; selected by runner SOCX slice.
+    - name: government_effectiveness
+      source: wgi:GE.EST
+      transformation: level
+  controls:
+    - name: gdp_growth
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: level
+    - name: log_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log
+    - name: regulatory_quality
+      source: wgi:RQ.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Primary estimand is welfare_state_size x government_effectiveness. A
+    positive interaction means state capacity offsets the employment penalty
+    associated with larger social spending.
+falsification:
+  rule: >
+    SUPPORTED only if the interaction coefficient is positive at p<=0.10 and
+    the implied social-spending marginal effect is less negative at high
+    government effectiveness than at low effectiveness. REFUTED if the
+    interaction is negative at p<=0.10.
+  test: panel_fe_oecd_socx_welfare_employment_capacity_interaction_panel
+  threshold:
+    coef_min: 0.01
+    p_max: 0.10
+    min_observations: 500
+    min_countries: 20
+prior_confidence: 0.57
+disclosure: >
+  The prior favours institutional complementarity, but SOCX composition differs
+  across countries and the first-pass panel cannot fully separate passive from
+  active spending.
+steelman: hypotheses/steelman/oecd_socx_welfare_employment_capacity_interaction_panel.md
+scope:
+  period: [1996, 2023]
+  countries: [OECD]
+  outcome_dim: [employment_labour, welfare_state, institutional_quality]
+  policy_family: [welfare_architecture, institutional_reform]
+  treatment_tags: [social_spending, government_effectiveness, employment_compatibility]
+covers_claims: []
+notes: >
+  Variable name welfare_state_size intentionally triggers the existing SOCX
+  aggregate slice in scripts/run_panel_fe.py.

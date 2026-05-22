@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurostat_unemployment_gini_stabilizer_panel
+version: 1
+status: candidate
+topic: distribution
+claim_direction: "+"
+claim: >
+  Unemployment shocks raise disposable-income Gini even in European welfare
+  states. The claim tests whether automatic stabilizers fully offset labour
+  slack for household income distribution, rather than assuming they do.
+methodology_note: >
+  Data-hunt swarm spec promoted on 2026-05-21 from landed Eurostat unemployment,
+  disposable-income Gini, and real GDP panels.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, MLT, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+  period: [2014, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop country-years missing Gini, unemployment, or real GDP growth
+variables:
+  outcome:
+    - name: disposable_income_gini
+      source: eurostat:ilc_di12
+      transformation: level
+  treatment:
+    - name: unemployment_rate
+      source: eurostat:une_rt_a
+      transformation: level
+  controls:
+    - name: real_gdp_growth
+      source: eurostat:nama_10_gdp
+      transformation: annual_pct_change
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Two-way FE screen of disposable-income Gini on total unemployment and real
+    GDP growth. Eurostat Gini and unemployment slices are filtered by the runner.
+falsification:
+  rule: >
+    SUPPORTED only if unemployment_rate is positive at p<=0.10 with at least 150
+    observations and 20 countries. REFUTED if unemployment_rate is negative at
+    p<=0.10.
+  test: panel_fe_eurostat_unemployment_gini_stabilizer_panel
+  threshold:
+    coef_min: 0.10
+    p_max: 0.10
+    min_observations: 150
+    min_countries: 20
+prior_confidence: 0.59
+disclosure: >
+  The prior expects unemployment to raise inequality, but Europe is the hard
+  case because taxes and transfers are deliberately designed to buffer shocks.
+steelman: hypotheses/steelman/eurostat_unemployment_gini_stabilizer_panel.md
+scope:
+  period: [2014, 2025]
+  countries: [EU]
+  outcome_dim: [poverty_inequality, employment_labour, welfare_state]
+  policy_family: [welfare_architecture, labour_market]
+  treatment_tags: [unemployment, disposable_income_gini, automatic_stabilizers]
+covers_claims: []
+notes: >
+  This is a distributional companion to the Eurostat labour-market and energy
+  panels already landed in the local vintage store.

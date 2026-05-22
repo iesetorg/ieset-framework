@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: redistribution_progressive_tax_growth_threshold_oecd
+version: 1
+status: candidate
+topic: fiscal
+claim: >
+  Among OECD and high-income peer economies from 1995 to 2023, tax-heavy redistribution predicts slower real GDP per
+  capita growth once the tax take exceeds the sample median, controlling for initial income, working-age population
+  share, trade openness, inflation, and government effectiveness. The empirical mechanism is a threshold in marginal
+  financing pressure: redistribution funded by high recurring tax shares should reduce growth through labour-supply,
+  entrepreneurship, and capital-allocation margins if the market-incentive critique is correct.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISR, ITA, JPN, KOR, LTU, LVA, LUX, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [1995, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - drop COVID shock years 2020 and 2021 in the primary specification; report them as robustness only
+    - drop country-years missing tax revenue, GDP per capita growth, or government effectiveness
+    - do not impute missing tax revenue across multi-year gaps
+scope:
+  period: [1995, 2023]
+  countries: [OECD]
+  outcome_dim: [gdp_growth, taxation, fiscal_policy]
+  policy_family: [fiscal_policy, tax_policy, welfare_architecture]
+  treatment_tags: [high_tax_threshold, progressive_tax_financing, redistribution]
+variables:
+  outcome:
+    - name: real_gdp_per_capita_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: level
+  treatment:
+    - name: tax_revenue_share
+      source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+      transformation: level
+      notes: Primary continuous treatment.
+    - name: high_tax_regime
+      source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+      transformation: indicator_above_sample_median
+      notes: Threshold treatment. The cutoff is fixed as the sample-median country-year tax revenue share computed before outcome estimation.
+  decomposition_channels:
+    - name: investment_share
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: level
+    - name: labour_force_participation
+      source: world_bank_wdi:SL.TLF.CACT.ZS
+      transformation: level
+  controls:
+    - name: log_initial_gdp_per_capita_ppp
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: lagged_log
+    - name: working_age_population_share
+      source: world_bank_wdi:SP.POP.1564.TO.ZS
+      transformation: level
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+    - name: inflation
+      source: world_bank_wdi:FP.CPI.TOTL.ZG
+      transformation: level
+    - name: government_effectiveness
+      source: wgi:GE.EST
+      transformation: level
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The treatment is recurring tax financing intensity. The hypothesis does not test public ownership or planning except
+  insofar as those systems require high fiscal extraction.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Estimate GDP-per-capita growth on tax_revenue_share, high_tax_regime, and controls with country and year fixed
+    effects. The threshold claim is evaluated on high_tax_regime and on the marginal effect of tax_revenue_share above
+    the median. Channel checks report whether investment_share or labour_force_participation attenuates the coefficient.
+falsification:
+  rule: >
+    Supported if high_tax_regime is negative at p <= 0.10 and the above-median marginal tax coefficient is more
+    negative than the below-median coefficient. Refuted if high_tax_regime is positive at p <= 0.10, or if the
+    above-median marginal coefficient is not more negative than the below-median coefficient. A null result is partial.
+  test: panel_fe_oecd_high_tax_growth_threshold
+  threshold:
+    expected_sign_high_tax: "-"
+    p_max: 0.10
+    min_countries: 25
+    min_observations: 400
+prior_confidence: 0.54
+disclosure: >
+  The author's prior expects a tax threshold, but high-income welfare states are the hard counterexample: they may use
+  high taxes to fund productivity-enhancing public goods and insurance. The threshold design can therefore refute the
+  claim if high-tax years do not underperform.
+steelman: hypotheses/steelman/redistribution_progressive_tax_growth_threshold_oecd.md
+notes: >
+  This candidate is framed against redistribution claims by mechanism rather than ideology: the estimand is the growth
+  cost of high recurring tax finance, not the moral status of redistribution.
