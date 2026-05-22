@@ -126,6 +126,45 @@ _EU_MEMBER_ISO3 = {
     "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE",
 }
 
+_SCHEMA_COUNTRY_GROUPS = {
+    # GLOBAL is handled as "no country filter"; the other schema-level groups
+    # expand to concrete ISO3 codes for runner sample filtering.
+    "OECD": {
+        "AUS", "AUT", "BEL", "CAN", "CHE", "CHL", "COL", "CRI", "CZE", "DEU",
+        "DNK", "ESP", "EST", "FIN", "FRA", "GBR", "GRC", "HUN", "IRL", "ISL",
+        "ISR", "ITA", "JPN", "KOR", "LTU", "LUX", "LVA", "MEX", "NLD", "NOR",
+        "NZL", "POL", "PRT", "SVK", "SVN", "SWE", "TUR", "USA",
+    },
+    "LATAM": {
+        "ARG", "BOL", "BRA", "CHL", "COL", "CRI", "DOM", "ECU", "SLV", "GTM",
+        "HND", "JAM", "MEX", "NIC", "PAN", "PER", "PRY", "URY", "VEN",
+    },
+    "EU": _EU_MEMBER_ISO3,
+    "EUROZONE": {
+        "AUT", "BEL", "HRV", "CYP", "EST", "FIN", "FRA", "DEU", "GRC", "IRL",
+        "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "PRT", "SVK", "SVN", "ESP",
+    },
+    "ASIA_EM": {
+        "CHN", "IND", "IDN", "MYS", "PHL", "THA", "VNM", "PAK", "BGD", "LKA",
+    },
+    "AFRICA": {
+        "DZA", "AGO", "BEN", "BWA", "BFA", "CMR", "CIV", "EGY", "ETH", "GHA",
+        "KEN", "MAR", "MOZ", "NAM", "NGA", "RWA", "SEN", "TZA", "TUN", "UGA",
+        "ZAF", "ZMB", "ZWE",
+    },
+    "MENA": {
+        "DZA", "BHR", "EGY", "IRN", "IRQ", "ISR", "JOR", "KWT", "LBN", "MAR",
+        "OMN", "QAT", "SAU", "TUN", "TUR", "ARE",
+    },
+    "POST_SOVIET": {
+        "ARM", "AZE", "BLR", "EST", "GEO", "KAZ", "KGZ", "LVA", "LTU", "MDA",
+        "RUS", "TJK", "TKM", "UKR", "UZB",
+    },
+    "NORDIC": {"DNK", "FIN", "ISL", "NOR", "SWE"},
+    "SOUTHERN_EUROPE": {"GRC", "ITA", "PRT", "ESP"},
+    "ANGLO": {"AUS", "CAN", "GBR", "IRL", "NZL", "USA"},
+}
+
 _CONSTRUCTED_GROUP_ALIASES = {
     "founding eurozone members": {
         "AUT", "BEL", "DEU", "ESP", "FIN", "FRA", "IRL", "ITA", "LUX",
@@ -544,6 +583,9 @@ def _filter_oecd_socx_slice(
         "welfare_state_size": "_T",
         "public_pension_expenditure_share_gdp": "TP11",
         "almp_spending_gdp": "TP60",
+        "family_benefit_expenditure_gdp": "TP51",
+        "childcare_spending_gdp": "TP521",
+        "housing_assistance_expenditure_gdp": "TP82",
     }
     if name in programme_by_name:
         programme_type = programme_by_name[name]
@@ -695,10 +737,16 @@ def _filter_eurostat_slice(
                 filtered = candidate
 
     elif stem == "nama_10_a10":
-        if "nace_r2" in filtered.columns and "manufacturing" in name:
-            candidate = filtered[filtered["nace_r2"].astype(str).eq("C")].copy()
-            if not candidate.empty:
-                filtered = candidate
+        if "nace_r2" in filtered.columns:
+            sector = None
+            if "manufacturing" in name:
+                sector = "C"
+            elif "construction" in name:
+                sector = "F"
+            if sector:
+                candidate = filtered[filtered["nace_r2"].astype(str).eq(sector)].copy()
+                if not candidate.empty:
+                    filtered = candidate
         if "na_item" in filtered.columns:
             candidate = filtered[filtered["na_item"].astype(str).eq("B1G")].copy()
             if not candidate.empty:
@@ -1008,6 +1056,38 @@ def _sample_countries(spec: dict) -> list[str]:
         if iso3:
             countries.append(iso3)
     return list(dict.fromkeys(countries))
+
+
+def _expand_sample_country_filter(raw_countries: list[object]) -> list[str]:
+    """Expand schema group tokens to concrete ISO3 filters for panel runs.
+
+    Hypothesis specs are allowed to use scope tokens such as GLOBAL, OECD, EU,
+    and LATAM. Scope validators understand those, but the runner needs concrete
+    country codes. GLOBAL means the full country panel, so it deliberately
+    returns an empty filter.
+    """
+    if not raw_countries:
+        return []
+    normalized = []
+    for raw in raw_countries:
+        raw_token = str(raw).strip().upper()
+        if raw_token in _SCHEMA_COUNTRY_GROUPS or raw_token == "GLOBAL":
+            normalized.append(raw_token)
+            continue
+        code = normalise_country_code(raw)
+        if code:
+            normalized.append(code)
+    if "GLOBAL" in normalized:
+        return []
+
+    expanded: list[str] = []
+    for code in normalized:
+        group_members = _SCHEMA_COUNTRY_GROUPS.get(code)
+        if group_members:
+            expanded.extend(sorted(group_members))
+        else:
+            expanded.append(code)
+    return list(dict.fromkeys(expanded))
 
 
 def _base_constructed_grid(
@@ -1977,7 +2057,7 @@ def build_panel(spec: dict) -> tuple[pd.DataFrame, dict]:
 
 def filter_sample(panel: pd.DataFrame, spec: dict) -> pd.DataFrame:
     sample = spec.get("sample") or {}
-    countries = sample.get("countries") or []
+    countries = _expand_sample_country_filter(sample.get("countries") or [])
     period = sample.get("period") or [None, None]
     out = panel.copy()
     if "country_iso3" not in out.columns or "year" not in out.columns:

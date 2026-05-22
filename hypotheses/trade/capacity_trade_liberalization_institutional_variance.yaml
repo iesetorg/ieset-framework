@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: capacity_trade_liberalization_institutional_variance
+version: 1
+status: candidate
+topic: trade
+claim: Tariff reductions increase consumption and export variety in high-rule-of-law and high-human-capital countries, but generate weak or negative medium-run growth in low-capacity countries with shallow finance.
+claim_direction: +
+methodology_note: Promoted from the 2026-05-22 200-hypothesis READY_NOW swarm. This is a first-pass candidate spec using one primary treatment and one primary outcome; bespoke replication should refine multi-outcome claims before scoreboard mapping.
+evidence_type: associational
+sample:
+  countries: &id002
+  - GLOBAL
+  period: &id001
+  - 1980
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the primary treatment, outcome, or core controls
+  - require at least 12 countries and 180 country-year observations for a panel verdict
+  - treat generic-runner output as triage until a reviewer checks treatment timing and variable semantics
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - trade_liberalisation
+  - gdp_growth
+  policy_family:
+  - trade_policy
+  treatment_tags:
+  - capacity_trade_liberalization_institutional_variance
+intervention_channel: regulatory
+intervention_channel_justification: The treatment is a measured policy, institutional, macro, or market-structure variable associated with trade_policy.
+variables:
+  outcome:
+  - name: real_consumption_per_capita
+    source: pwt:ccon_pop
+    transformation: annual_growth
+  treatment:
+  - name: applied_tariff_rate
+    source: wits:weighted_mean_applied_tariff
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: government_effectiveness
+    source: wgi:GE.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: First-pass panel fixed effects screen. Multi-outcome or threshold language from the source backlog should be upgraded to a bespoke replication before scoreboard conversion.
+falsification:
+  rule: SUPPORTED if the primary treatment coefficient has the pre-registered + sign at p<=0.10 with minimum sample gates. REFUTED if the coefficient has the opposite sign at p<=0.10. Otherwise PARTIAL; missing data or failed sample gates are INCONCLUSIVE_DATA_PENDING.
+  test: panel_fe_capacity_trade_liberalization_institutional_variance
+  threshold:
+    p_value: p<=0.10
+    expected_sign: +
+    minimum_countries: 12
+    minimum_observations: 180
+prior_confidence: 0.52
+disclosure: This candidate was generated from a theory-balanced swarm backlog. The prior is intentionally modest because many READY_NOW claims rely on broad panel proxies.
+steelman: hypotheses/steelman/capacity_trade_liberalization_institutional_variance.md
+covers_claims: []
+notes: 'Source shard: engine/audits/swarm_2026-05-22_200_hypotheses_worker_C_state_capacity_mixed.md. Backlog source families: not specified. No scoreboard mapping was added in this promotion pass.'

@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ml_energy_price_controls_shortage_fiscal_burden
+version: 1
+status: candidate
+topic: energy
+claim: sustained household fuel or electricity price controls predict higher shortage frequency, larger fiscal subsidy burdens, and lower energy-sector investment.
+claim_direction: '-'
+methodology_note: Promoted from the 2026-05-22 200-hypothesis NEEDS_ALIAS swarm batch 2. This is a first-pass alias-repair candidate using a local proxy source where the source family exists but the exact original variable needs later bespoke refinement.
+evidence_type: associational
+sample:
+  countries: &id002
+  - GLOBAL
+  period: &id001
+  - 1990
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - drop country-years missing the primary treatment, outcome, or core controls
+  - require at least 12 countries and 120 country-year observations for a panel verdict
+  - treat generic-runner output as alias-repair triage until a reviewer checks source semantics
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - energy
+  - gdp_growth
+  policy_family:
+  - energy_policy
+  treatment_tags:
+  - ml_energy_price_controls_shortage_fiscal_burden
+intervention_channel: regulatory
+intervention_channel_justification: 'The treatment is a measured proxy for the local source family named in the alias queue: owid:consumption-subsidies-for-fossil-fuels.'
+variables:
+  outcome:
+  - name: electricity_access
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: level
+  treatment:
+  - name: fossil_fuel_consumption_subsidies
+    source: owid:consumption-subsidies-for-fossil-fuels
+    transformation: level_lagged_one_year
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+  - name: government_effectiveness
+    source: wgi:GE.EST
+    transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Alias-batch panel fixed effects screen. The proxy source is explicitly local and runnable, but exact policy semantics should be upgraded before scoreboard conversion.
+falsification:
+  rule: SUPPORTED if the primary treatment coefficient has the pre-registered - sign at p<=0.10 with minimum sample gates. REFUTED if the coefficient has the opposite sign at p<=0.10. Otherwise PARTIAL; missing data or failed sample gates are INCONCLUSIVE_DATA_PENDING.
+  test: panel_fe_ml_energy_price_controls_shortage_fiscal_burden
+  threshold:
+    p_value: p<=0.10
+    expected_sign: '-'
+    minimum_countries: 12
+    minimum_observations: 120
+prior_confidence: 0.48
+disclosure: This candidate was generated from the alias-repair lane. A decisive first-pass verdict is useful triage, not final scoreboard evidence.
+steelman: hypotheses/steelman/ml_energy_price_controls_shortage_fiscal_burden.md
+covers_claims: []
+notes: 'Source shard: engine/audits/swarm_2026-05-22_200_hypotheses_worker_A_market_liberal.md. Backlog source families: IMF energy subsidies, IEA, WDI, RISE, national tariff schedules.. Alias proxy used: owid:consumption-subsidies-for-fossil-fuels -> world_bank_wdi:EG.ELC.ACCS.ZS. No scoreboard mapping was added in this promotion pass.'
