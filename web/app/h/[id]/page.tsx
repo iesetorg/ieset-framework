@@ -129,9 +129,23 @@ export default async function HypothesisPage({
               {schoolPredictions.length === 1
                 ? "1 school"
                 : `${schoolPredictions.length} schools`}{" "}
-              list this hypothesis as a test of their position. Verdict colour
-              shows whether each school&apos;s polarity-corrected prediction
-              {run.verdict ? " agrees with the actual run" : " is still pre-registered (no run yet)"}.
+              list this hypothesis as a test of their position. The chips below
+              are school-level scoreboard outcomes, not a second hypothesis
+              verdict.
+            </p>
+          </div>
+          <div className="mb-3 rounded border-l-[3px] border-amber bg-[#fff8e8] px-4 py-3 text-[13px] leading-[1.55] text-ink">
+            <div className="sc mb-1 text-[10px] font-semibold tracking-[0.1em] text-amber">
+              hypothesis verdict vs scoreboard outcome
+            </div>
+            <p className="m-0">
+              The banner verdict judges this hypothesis as written. The
+              scoreboard asks whether each school&apos;s polarity-corrected
+              prediction was right. Raw status is not a school win:{" "}
+              <code className="font-mono text-[12px]">SUPPORTED</code> supports
+              schools that needed <code className="font-mono text-[12px]">SUPPORTED</code>,
+              but refutes schools that needed{" "}
+              <code className="font-mono text-[12px]">REFUTED</code>.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -167,16 +181,35 @@ export default async function HypothesisPage({
                   : tone === "amber"
                   ? "border-amber bg-[#fdf1da] text-[#b7791f]"
                   : "border-rule bg-white text-muted";
+              const expectedVerdictLabel =
+                sp.expected_verdict === "supported"
+                  ? "SUPPORTED"
+                  : sp.expected_verdict === "falsified"
+                  ? "REFUTED"
+                  : "MIXED";
+              const schoolOutcomeLabel =
+                !run.exists || !run.verdict
+                  ? "scoreboard pending"
+                  : tone === "green"
+                  ? "school supported"
+                  : tone === "red"
+                  ? "school refuted"
+                  : tone === "amber"
+                  ? "partial/no-call"
+                  : "scoreboard no-call";
               return (
                 <Link
                   key={sp.position_id}
                   href={`/pos/${sp.position_id}`}
                   className={`group inline-flex items-center gap-2 rounded border px-3 py-1.5 text-[13px] hover:no-underline ${toneClass}`}
-                  title={`predicts ${sp.expected_verdict}${sp.polarity === "inverted" ? " (polarity-inverted)" : ""}`}
+                  title={`School wins if this hypothesis is ${expectedVerdictLabel}; current school-level outcome: ${schoolOutcomeLabel}${sp.polarity === "inverted" ? " (polarity-inverted)" : ""}`}
                 >
                   <span className="font-medium">{sp.school}</span>
                   <span className="text-[10.5px] uppercase tracking-wider opacity-75">
-                    expects {sp.expected_verdict}
+                    wins if {expectedVerdictLabel}
+                  </span>
+                  <span className="inline-flex items-center rounded-sm bg-white/60 px-1.5 py-[2px] text-[9.5px] font-semibold uppercase tracking-wider opacity-90">
+                    {schoolOutcomeLabel}
                   </span>
                   {sp.polarity === "inverted" && (
                     <span

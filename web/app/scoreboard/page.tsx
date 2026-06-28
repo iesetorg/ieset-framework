@@ -94,8 +94,8 @@ export default async function ScoreboardPage() {
       <div className="mb-4">
         <VerdictLegend />
       </div>
-      <div className="mb-6 rounded border-l-[3px] border-accent bg-accent-soft px-5 py-4 text-[14px] leading-[1.6] text-ink">
-        <div className="sc mb-1.5 text-[10px] font-semibold tracking-[0.1em] text-accent">
+      <div className="mb-6 border-l-[3px] border-accent bg-panel px-4 py-3 text-[13.5px] leading-[1.55] text-ink">
+        <div className="sc mb-1 text-[10px] font-semibold tracking-[0.1em] text-accent">
           how to read this
         </div>
         <p className="m-0">
@@ -123,24 +123,24 @@ export default async function ScoreboardPage() {
           claim should move the scoreboard more than a broad pattern match like
           &quot;this country got richer and healthier.&quot;
         </p>
-        <div className="mt-3 grid gap-2 text-[13px] md:grid-cols-3">
-          <div className="rounded border border-rule bg-white px-3 py-2">
+        <div className="mt-3 grid gap-px overflow-hidden border border-rule bg-rule text-[12.5px] md:grid-cols-3">
+          <div className="bg-white px-3 py-2">
             <strong>Causal tests: 1×</strong>
-            <div className="mt-1 text-muted">
+            <div className="mt-0.5 text-muted">
               Strongest scoreboard weight because the design targets cause and
               effect.
             </div>
           </div>
-          <div className="rounded border border-rule bg-white px-3 py-2">
+          <div className="bg-white px-3 py-2">
             <strong>Associational tests: 0.5×</strong>
-            <div className="mt-1 text-muted">
+            <div className="mt-0.5 text-muted">
               Useful evidence, but weaker because correlation may not be the
               mechanism.
             </div>
           </div>
-          <div className="rounded border border-rule bg-white px-3 py-2">
+          <div className="bg-white px-3 py-2">
             <strong>Descriptive patterns: 0.25×</strong>
-            <div className="mt-1 text-muted">
+            <div className="mt-0.5 text-muted">
               Real evidence, but mostly says the outcome happened, not why it
               happened.
             </div>
