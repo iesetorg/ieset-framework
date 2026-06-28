@@ -453,10 +453,18 @@ export interface ScoredClaim {
   claim_polarity: "aligned" | "inverted";
   evidence_type?: string;
   evidence_weight: number;
+  coverage_confidence?: string;
+  coverage_confidence_weight: number;
+  hypothesis_prior_confidence?: number;
+  screening_weight: number;
+  attribution_weight: number;
+  integrity_weight: number;
   verdict?: string;
   outcome: ClaimOutcome;
   outcome_score: number;
   adjusted_outcome_score: number;
+  integrity_outcome_score: number;
+  integrity_flags: string[];
   hypothesis_exists: boolean;
 }
 
@@ -477,6 +485,13 @@ export interface PositionScore {
   adjusted_net_score: number;
   /** sum of evidence weights for tested predictions */
   adjusted_tested_weight: number;
+  /**
+   * attribution-aware score: evidence type × claim-link confidence × screening
+   * caution × causal-attribution discount for negative-prediction wins.
+   */
+  integrity_net_score: number;
+  /** sum of integrity weights for tested predictions */
+  integrity_tested_weight: number;
   /** full verdicts only: supports - refutes */
   decisive_net: number;
   /** heuristic no-call band for tiny aggregate margins */
@@ -487,6 +502,9 @@ export interface PositionScore {
   adjusted_signal_threshold: number;
   adjusted_net_margin_rate: number;
   adjusted_score_signal: "positive_signal" | "negative_signal" | "too_close_to_call" | "untested";
+  integrity_signal_threshold: number;
+  integrity_net_margin_rate: number;
+  integrity_score_signal: "positive_signal" | "negative_signal" | "too_close_to_call" | "untested";
   support_rate: number;
   scored_claims: ScoredClaim[];
 }
@@ -509,6 +527,137 @@ function outcomeScore(outcome: ClaimOutcome): number {
   if (outcome === "partial_refutes") return -0.5;
   if (outcome === "refutes_position") return -1;
   return 0;
+}
+
+function coverageConfidenceWeight(confidence: string | undefined): number {
+  if (confidence === "high") return 1;
+  if (confidence === "medium") return 0.75;
+  if (confidence === "low") return 0.5;
+  return 0.75;
+}
+
+function compactLowerText(parts: Array<string | number | undefined | null>): string {
+  return parts
+    .filter((p) => p !== undefined && p !== null)
+    .map((p) => String(p).toLowerCase())
+    .join(" ");
+}
+
+function methodologyScreeningWeight(
+  h: Hypothesis | undefined,
+  coverageNotes: string | undefined
+): { weight: number; flags: string[] } {
+  if (!h) return { weight: 0.75, flags: ["missing_hypothesis_metadata"] };
+  const text = compactLowerText([
+    coverageNotes,
+    h.methodology_note,
+    h.disclosure,
+    h.conflict_disclosure,
+    h.notes,
+    h.estimator?.notes,
+  ]);
+  const flags: string[] = [];
+  let weight = 1;
+
+  if (
+    text.includes("triage") ||
+    text.includes("not bespoke") ||
+    text.includes("not final scoreboard evidence") ||
+    text.includes("generic panel") ||
+    text.includes("alias-repair")
+  ) {
+    weight = Math.min(weight, 0.5);
+    flags.push("screening_or_triage_evidence");
+  } else if (
+    text.includes("first-pass") ||
+    text.includes("proxy-first") ||
+    text.includes("candidate screen") ||
+    text.includes("candidate spec") ||
+    text.includes("broad panel proxies") ||
+    text.includes("throughput wave") ||
+    text.includes("swarm") ||
+    text.includes("local-data first-pass") ||
+    text.includes("generated from")
+  ) {
+    weight = Math.min(weight, 0.7);
+    flags.push("first_pass_or_proxy_evidence");
+  }
+
+  if (
+    text.includes("identification challenge is severe") ||
+    text.includes("endogenously chosen") ||
+    text.includes("data-gated") ||
+    text.includes("manual assembly")
+  ) {
+    weight = Math.min(weight, 0.85);
+    flags.push("identification_caveat");
+  }
+
+  return { weight, flags };
+}
+
+function hasMechanismDiscriminatingDesign(h: Hypothesis | undefined): boolean {
+  if (!h) return false;
+  if ((h.variables?.decomposition_channels ?? []).length > 0) return true;
+  const text = compactLowerText([
+    h.estimator?.template,
+    h.estimator?.notes,
+    h.falsification?.test,
+    h.falsification?.rule,
+    h.methodology_note,
+    h.notes,
+  ]);
+  return (
+    text.includes("natural experiment") ||
+    text.includes("synthetic control") ||
+    text.includes("difference-in-differences") ||
+    text.includes("diff-in-diff") ||
+    text.includes("event study") ||
+    text.includes("instrument") ||
+    text.includes("mechanism") ||
+    text.includes("decomposition")
+  );
+}
+
+function attributionWeightForClaim(params: {
+  schoolPrediction: string;
+  outcomeScore: number;
+  evidenceType: string | undefined;
+  linkedHyp: Hypothesis | undefined;
+  screeningWeight: number;
+}): { weight: number; flags: string[] } {
+  const prediction = params.schoolPrediction.toLowerCase();
+  if (prediction !== "falsified" || params.outcomeScore <= 0) {
+    return { weight: 1, flags: [] };
+  }
+
+  const flags = ["negative_prediction_attribution_discount"];
+  let weight = 0.25;
+  if (params.evidenceType === "causal") {
+    weight = 0.75;
+    flags.push("causal_failure_test");
+  } else if (hasMechanismDiscriminatingDesign(params.linkedHyp)) {
+    weight = 0.5;
+    flags.push("mechanism_discriminating_test");
+  } else if (
+    params.evidenceType === "descriptive" ||
+    params.evidenceType === "canonical_case_multi_metric"
+  ) {
+    weight = 0.1;
+    flags.push("descriptive_failure_not_causal_attribution");
+  } else {
+    flags.push("associational_failure_not_causal_attribution");
+  }
+
+  if (params.screeningWeight <= 0.5) {
+    weight = Math.min(weight, 0.15);
+    flags.push("screening_failure_credit_cap");
+  } else if (params.screeningWeight < 0.8) {
+    weight = Math.min(weight, 0.25);
+    flags.push("first_pass_failure_credit_cap");
+  }
+
+  return { weight, flags };
 }
 
 function scoreSignal(
@@ -686,6 +835,8 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       untested = 0;
     let adjusted_net_score = 0;
     let adjusted_tested_weight = 0;
+    let integrity_net_score = 0;
+    let integrity_tested_weight = 0;
 
     const hypById = new Map(hypotheses.map((h) => [h.hypothesis_id, h] as const));
     for (let idx = 0; idx < claims.length; idx++) {
@@ -721,8 +872,26 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       const evidence_weight = evidenceWeight(evidence_type);
       const outcome_score = outcomeScore(outcome);
       const adjusted_outcome_score = outcome_score * evidence_weight;
+      const coverage_confidence = coverageEntry?.confidence;
+      const coverage_confidence_weight = coverageConfidenceWeight(coverage_confidence);
+      const screening = methodologyScreeningWeight(linkedHyp, coverageEntry?.notes);
+      const attribution = attributionWeightForClaim({
+        schoolPrediction: school_prediction,
+        outcomeScore: outcome_score,
+        evidenceType: evidence_type,
+        linkedHyp,
+        screeningWeight: screening.weight,
+      });
+      const integrity_weight =
+        evidence_weight *
+        coverage_confidence_weight *
+        screening.weight *
+        attribution.weight;
+      const integrity_outcome_score = outcome_score * integrity_weight;
       adjusted_net_score += adjusted_outcome_score;
+      integrity_net_score += integrity_outcome_score;
       if (outcome !== "untested") adjusted_tested_weight += evidence_weight;
+      if (outcome !== "untested") integrity_tested_weight += integrity_weight;
       scored.push({
         claim: c.claim,
         linked_hypothesis_id: c.linked_hypothesis_id,
@@ -730,10 +899,18 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         claim_polarity: polarity,
         evidence_type,
         evidence_weight,
+        coverage_confidence,
+        coverage_confidence_weight,
+        hypothesis_prior_confidence: linkedHyp?.prior_confidence,
+        screening_weight: screening.weight,
+        attribution_weight: attribution.weight,
+        integrity_weight,
         verdict,
         outcome,
         outcome_score,
         adjusted_outcome_score,
+        integrity_outcome_score,
+        integrity_flags: [...screening.flags, ...attribution.flags],
         hypothesis_exists: exists,
       });
       if (outcome === "supports_position") supports++;
@@ -753,6 +930,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     const decisive_net = supports - refutes;
     const signal = scoreSignal(net_score, tested);
     const adjustedSignal = adjustedScoreSignal(adjusted_net_score, adjusted_tested_weight);
+    const integritySignal = scoreSignal(integrity_net_score, integrity_tested_weight);
     // support_rate is the share of directional, non-neutral evidence that
     // agrees with the school. Partial supports count half; partial refutes
     // remain in the denominator but do not add support.
@@ -773,6 +951,8 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       net_score,
       adjusted_net_score,
       adjusted_tested_weight,
+      integrity_net_score,
+      integrity_tested_weight,
       decisive_net,
       signal_threshold: signal.signal_threshold,
       net_margin_rate: signal.net_margin_rate,
@@ -780,6 +960,9 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       adjusted_signal_threshold: adjustedSignal.adjusted_signal_threshold,
       adjusted_net_margin_rate: adjustedSignal.adjusted_net_margin_rate,
       adjusted_score_signal: adjustedSignal.adjusted_score_signal,
+      integrity_signal_threshold: integritySignal.signal_threshold,
+      integrity_net_margin_rate: integritySignal.net_margin_rate,
+      integrity_score_signal: integritySignal.score_signal,
       support_rate: weighted_total > 0 ? weighted_pos / weighted_total : 0,
       scored_claims: scored,
     });
@@ -789,8 +972,10 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     if (a.tested === 0 && b.tested === 0) return 0;
     if (a.tested === 0) return 1;
     if (b.tested === 0) return -1;
-    const netDiff = b.adjusted_net_score - a.adjusted_net_score;
+    const netDiff = b.integrity_net_score - a.integrity_net_score;
     if (Math.abs(netDiff) > 0.001) return netDiff;
+    const forecastNetDiff = b.adjusted_net_score - a.adjusted_net_score;
+    if (Math.abs(forecastNetDiff) > 0.001) return forecastNetDiff;
     const rawNetDiff = b.net_score - a.net_score;
     if (Math.abs(rawNetDiff) > 0.001) return rawNetDiff;
     const rateDiff = b.support_rate - a.support_rate;

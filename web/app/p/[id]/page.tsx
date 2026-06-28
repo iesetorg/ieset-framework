@@ -43,6 +43,25 @@ function verdictTone(v: string | undefined): "green" | "amber" | "red" | "muted"
   return "muted";
 }
 
+function formatReference(reference: unknown): string {
+  if (typeof reference === "string") return reference;
+  if (typeof reference === "number" || typeof reference === "boolean") {
+    return String(reference);
+  }
+  if (Array.isArray(reference)) {
+    return reference.map(formatReference).filter(Boolean).join("; ");
+  }
+  if (reference && typeof reference === "object") {
+    return Object.entries(reference)
+      .map(([key, value]) => {
+        const formatted = formatReference(value);
+        return formatted ? `${key}: ${formatted}` : key;
+      })
+      .join("; ");
+  }
+  return "";
+}
+
 export default async function PolicyPage({
   params,
 }: {
@@ -412,7 +431,7 @@ export default async function PolicyPage({
           </h2>
           <ul className="m-0 list-none space-y-1 p-0 text-[13px] text-ink">
             {policy.references.map((r, i) => (
-              <li key={i}>· {r}</li>
+              <li key={i}>· {formatReference(r)}</li>
             ))}
           </ul>
         </section>

@@ -6,7 +6,7 @@ import { VerdictLegend } from "@/components/badges/VerdictLegend";
 export const metadata = {
   title: "Scoreboard — which schools of thought the data actually supports",
   description:
-    "Every position makes specific predictions linked to specific hypotheses. This page scores each school on how well its predictions have fared against real data.",
+    "Every position makes specific predictions linked to specific hypotheses. This page separates forecast accuracy from attribution-aware evidence about school-level mechanisms.",
 };
 
 function formatPct(n: number): string {
@@ -68,8 +68,9 @@ export default async function ScoreboardPage() {
       <p className="mt-4 max-w-[780px] text-[17px] leading-[1.55] text-muted">
         Every school of thought (position) lists specific predictions it makes,
         each linked to a hypothesis in the library. When a hypothesis runs, its
-        verdict feeds back into the schools that predicted an outcome on it.
-        This page aggregates the track record so far.
+        verdict feeds back into the schools that predicted an outcome on it,
+        while discounting broad failure calls that do not identify why a policy
+        failed. This page aggregates the track record so far.
       </p>
 
       <div className="my-6 flex flex-wrap gap-6 text-[14px]">
@@ -116,14 +117,21 @@ export default async function ScoreboardPage() {
           through weaker investment, productivity, supply, or fiscal capacity?
         </p>
         <p className="mt-3 mb-0">
-          <strong>Raw net</strong> is the simple scoreboard: a clear win counts
+          <strong>Raw net</strong> is the simple forecast scoreboard: a clear win counts
           +1, a partial win +0.5, a partial loss -0.5, and a clear loss -1.{" "}
-          <strong>Q-net</strong> starts from that same score, then asks how
+          <strong>Forecast Q-net</strong> starts from that same score, then asks how
           strong the test design is. A study that can credibly test a causal
           claim should move the scoreboard more than a broad pattern match like
           &quot;this country got richer and healthier.&quot;
         </p>
-        <div className="mt-3 grid gap-px overflow-hidden border border-rule bg-rule text-[12.5px] md:grid-cols-3">
+        <p className="mt-3 mb-0">
+          <strong>Attribution net</strong> is stricter. It keeps the evidence
+          quality discount, then also applies claim-link confidence, first-pass
+          screening cautions, and a causal-attribution discount when a school
+          gets credit merely because it predicted a failure. A failed policy is
+          not treated as proof that every opponent&apos;s mechanism was right.
+        </p>
+        <div className="mt-3 grid gap-px overflow-hidden border border-rule bg-rule text-[12.5px] md:grid-cols-4">
           <div className="bg-white px-3 py-2">
             <strong>Causal tests: 1×</strong>
             <div className="mt-0.5 text-muted">
@@ -145,24 +153,32 @@ export default async function ScoreboardPage() {
               happened.
             </div>
           </div>
+          <div className="bg-white px-3 py-2">
+            <strong>Failure attribution: capped</strong>
+            <div className="mt-0.5 text-muted">
+              Negative forecasts get full losses when wrong, but only limited
+              wins unless the test identifies the failure mechanism.
+            </div>
+          </div>
         </div>
         <p className="mt-3 mb-0">
-          Schools are ranked by <strong>Q-net</strong> so generic development
-          facts cannot swamp sharper policy tests. The original raw score stays
-          visible for transparency, while tiny Q-net margins are muted as too
-          close to call.
+          Schools are ranked by <strong>Attribution net</strong> so generic
+          development facts and broad failure predictions cannot swamp sharper
+          policy tests. The forecast Q-net and original raw score stay visible
+          for transparency, while tiny margins are muted as too close to call.
         </p>
       </div>
 
       <h2 className="mt-10 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-        Schools with tested predictions — ranked by quality-adjusted net
+        Schools with tested predictions — ranked by attribution-adjusted net
       </h2>
       <div className="overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-rule bg-panel">
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">School</th>
-              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Quality-adjusted net: raw outcome score discounted by evidence type">Q-net</th>
+              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Attribution-adjusted net: evidence type × link confidence × screening caution × failure-attribution discount">A-net</th>
+              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Forecast quality net: raw outcome score discounted by evidence type">Forecast Q-net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Raw weighted net: full wins + 0.5·partial-wins − 0.5·partial-losses − full losses">Raw net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Weighted support rate: partial directional verdicts count at half-weight">Rate</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Supports</th>
@@ -176,7 +192,7 @@ export default async function ScoreboardPage() {
           </thead>
           <tbody>
             {tested.map((s) => {
-              const scoreColor = scoreTone(s.adjusted_score_signal);
+              const scoreColor = scoreTone(s.integrity_score_signal);
               return (
                 <tr
                   key={s.position_id}
@@ -196,7 +212,14 @@ export default async function ScoreboardPage() {
                   <td
                     className="p-3 text-right align-top font-mono text-[13px] font-semibold"
                     style={{ color: scoreColor }}
-                    title={`Quality-adjusted no-call band: ±${s.adjusted_signal_threshold.toFixed(1)} points. Decisive-only raw net: ${s.decisive_net > 0 ? "+" : ""}${s.decisive_net}.`}
+                    title={`Attribution-adjusted no-call band: ±${s.integrity_signal_threshold.toFixed(1)} points. Decisive-only raw net: ${s.decisive_net > 0 ? "+" : ""}${s.decisive_net}.`}
+                  >
+                    {s.integrity_net_score > 0 ? "+" : ""}{s.integrity_net_score.toFixed(1)}
+                  </td>
+                  <td
+                    className="p-3 text-right align-top font-mono text-[13px]"
+                    title={`Forecast Q-net no-call band: ±${s.adjusted_signal_threshold.toFixed(1)} points.`}
+                    style={{ color: scoreTone(s.adjusted_score_signal) }}
                   >
                     {s.adjusted_net_score > 0 ? "+" : ""}{s.adjusted_net_score.toFixed(1)}
                   </td>
@@ -264,6 +287,12 @@ export default async function ScoreboardPage() {
             with well-documented patterns the framework hasn&apos;t seriously
             challenged yet. Small-n wins don&apos;t imply the school is right;
             they imply the framework has tested few things.
+          </li>
+          <li>
+            A failed policy can count as a correct forecast without proving
+            the opponent&apos;s causal story. Attribution net discounts those
+            wins unless the underlying hypothesis is causal or mechanism
+            discriminating.
           </li>
           <li>
             A school can look refuted because a specific prediction failed on a
