@@ -70,6 +70,7 @@ export interface PolicyBrowserIndex {
 export interface PolicyBrowserClientRow {
   policy_id: string;
   title: string;
+  description?: string;
   countries: string[];
   year: number | null;
   axes: { axis: string; channel: string; direction: string; magnitude?: string; intended?: boolean | null }[];
@@ -160,6 +161,7 @@ export function toPolicyBrowserClientRows(index: PolicyBrowserIndex): PolicyBrow
     return {
       policy_id: row.policy_id,
       title: row.title,
+      description: row.description,
       countries: row.countries,
       year: row.timeframe?.start ?? null,
       axes: row.axes.map((a) => ({

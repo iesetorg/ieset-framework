@@ -16,6 +16,11 @@ import {
   postureLabel,
 } from "@/lib/policy-labels";
 import type { PolicyBrowserClientRow } from "@/lib/policy-browser";
+import {
+  POLICY_QUERY_EXAMPLES,
+  analyzePolicyQuery,
+  scorePolicyQuery,
+} from "@/lib/policy-query";
 
 const VERDICT_BUCKETS = ["supported", "partial", "refuted", "inconclusive", "missing"];
 const EVIDENCE_STRENGTHS = ["strong", "moderate", "screening", "unresolved"];
@@ -94,6 +99,13 @@ function compareRows(sort: string, a: PolicyBrowserClientRow, b: PolicyBrowserCl
   );
 }
 
+function matchScoreLabel(score: number) {
+  if (score >= 60) return "very close";
+  if (score >= 42) return "close";
+  if (score >= 26) return "related";
+  return "weak";
+}
+
 export function PolicyEvidenceBrowser() {
   const [rows, setRows] = useState<PolicyBrowserClientRow[]>([]);
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
@@ -151,113 +163,184 @@ export function PolicyEvidenceBrowser() {
     return [...set].sort();
   }, [rows]);
 
+  const queryAnalysis = useMemo(() => analyzePolicyQuery(query), [query]);
+  const queryActive = Boolean(queryAnalysis.normalized);
+
+  const matchById = useMemo(() => {
+    const matches = new Map<string, ReturnType<typeof scorePolicyQuery>>();
+    if (!queryAnalysis.normalized) return matches;
+    for (const row of rows) {
+      matches.set(row.policy_id, scorePolicyQuery(row, queryAnalysis));
+    }
+    return matches;
+  }, [rows, queryAnalysis]);
+
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
     const matches = rows.filter((row) => {
       if (country && !row.countries.includes(country)) return false;
       if (axis && !row.axes.some((a) => a.axis === axis)) return false;
       if (posture && row.posture !== posture) return false;
       if (evidence && row.best_available_evidence !== evidence) return false;
       if (coverage && row.coverage !== coverage) return false;
-      if (!q) return true;
-      const haystack = [
-        row.policy_id,
-        row.title,
-        row.countries.join(" "),
-        row.countries.map((c) => countryShortLabel(c)).join(" "),
-        row.axes.map((a) => a.axis).join(" "),
-        row.axes.map((a) => axisLabel(a.axis)).join(" "),
-        row.schools.join(" "),
-        row.search_terms.join(" "),
-        row.top_hypotheses.map((h) => h.hypothesis_id).join(" "),
-        row.top_hypotheses.map((h) => h.topic).join(" "),
-        row.top_hypotheses.map((h) => h.claim ?? "").join(" "),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(q);
+      if (!queryActive) return true;
+      return (matchById.get(row.policy_id)?.score ?? 0) > 0;
     });
-    return matches.sort((a, b) => compareRows(sort, a, b));
-  }, [rows, query, country, axis, posture, evidence, coverage, sort]);
+    return matches.sort((a, b) => {
+      if (queryActive) {
+        const scoreDelta = (matchById.get(b.policy_id)?.score ?? 0) - (matchById.get(a.policy_id)?.score ?? 0);
+        if (Math.abs(scoreDelta) > 0.001) return scoreDelta;
+      }
+      return compareRows(sort, a, b);
+    });
+  }, [rows, queryActive, matchById, country, axis, posture, evidence, coverage, sort]);
 
   const hasFilters = Boolean(query || country || axis || posture || evidence || coverage);
 
   return (
     <div>
       <div className="mb-4 rounded border border-rule bg-[#fbfaf6] p-4">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.4fr_210px_260px_190px_190px_170px]">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search policies, countries, axes, hypothesis claims"
-            className="min-w-[220px] rounded border border-rule-strong bg-white px-3 py-2 text-[13px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
-          />
-          <select
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
-            aria-label="Country filter"
-          >
-            <option value="">all countries</option>
-            {countries.map((c) => (
-              <option key={c} value={c}>
-                {countryLabel(c)}
-              </option>
-            ))}
-          </select>
-          <select
-            value={axis}
-            onChange={(e) => setAxis(e.target.value)}
-            className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
-            aria-label="Policy axis filter"
-          >
-            <option value="">all policy axes</option>
-            {axes.map((a) => (
-              <option key={a} value={a}>
-                {axisLabel(a)} - {a}
-              </option>
-            ))}
-          </select>
-          <select
-            value={posture}
-            onChange={(e) => setPosture(e.target.value)}
-            className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
-            aria-label="Evidence posture filter"
-          >
-            <option value="">all postures</option>
-            <option value="promising">{postureLabel("promising")}</option>
-            <option value="mixed">{postureLabel("mixed")}</option>
-            <option value="caution">{postureLabel("caution")}</option>
-            <option value="evidence_gap">{postureLabel("evidence_gap")}</option>
-          </select>
-          <select
-            value={evidence}
-            onChange={(e) => setEvidence(e.target.value)}
-            className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
-            aria-label="Evidence strength filter"
-          >
-            <option value="">all evidence strength</option>
-            {EVIDENCE_STRENGTHS.map((strength) => (
-              <option key={strength} value={strength}>
-                {evidenceStrengthLabel(strength)}
-              </option>
-            ))}
-          </select>
-          <select
-            value={coverage}
-            onChange={(e) => setCoverage(e.target.value)}
-            className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
-            aria-label="Coverage filter"
-          >
-            <option value="">all coverage</option>
-            {coverageOptions.map((value) => (
-              <option key={value} value={value}>
-                {value.replace(/_/g, " ")}
-              </option>
-            ))}
-          </select>
+        <div className="grid gap-3 xl:grid-cols-[minmax(300px,1.2fr)_minmax(320px,1fr)]">
+          <div>
+            <textarea
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search a policy idea or paste a policy announcement"
+              rows={4}
+              className="min-h-[96px] w-full resize-y rounded border border-rule-strong bg-white px-3 py-2 text-[13px] leading-[1.45] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+            />
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {POLICY_QUERY_EXAMPLES.map((example) => (
+                <button
+                  key={example.label}
+                  type="button"
+                  onClick={() => setQuery(example.query)}
+                  className="rounded border border-rule bg-white px-2 py-1 text-[11px] text-muted hover:border-accent hover:text-accent"
+                >
+                  {example.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <select
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
+              aria-label="Country filter"
+            >
+              <option value="">all countries</option>
+              {countries.map((c) => (
+                <option key={c} value={c}>
+                  {countryLabel(c)}
+                </option>
+              ))}
+            </select>
+            <select
+              value={axis}
+              onChange={(e) => setAxis(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
+              aria-label="Policy axis filter"
+            >
+              <option value="">all policy axes</option>
+              {axes.map((a) => (
+                <option key={a} value={a}>
+                  {axisLabel(a)} - {a}
+                </option>
+              ))}
+            </select>
+            <select
+              value={posture}
+              onChange={(e) => setPosture(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
+              aria-label="Evidence posture filter"
+            >
+              <option value="">all postures</option>
+              <option value="promising">{postureLabel("promising")}</option>
+              <option value="mixed">{postureLabel("mixed")}</option>
+              <option value="caution">{postureLabel("caution")}</option>
+              <option value="evidence_gap">{postureLabel("evidence_gap")}</option>
+            </select>
+            <select
+              value={evidence}
+              onChange={(e) => setEvidence(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
+              aria-label="Evidence strength filter"
+            >
+              <option value="">all evidence strength</option>
+              {EVIDENCE_STRENGTHS.map((strength) => (
+                <option key={strength} value={strength}>
+                  {evidenceStrengthLabel(strength)}
+                </option>
+              ))}
+            </select>
+            <select
+              value={coverage}
+              onChange={(e) => setCoverage(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
+              aria-label="Coverage filter"
+            >
+              <option value="">all coverage</option>
+              {coverageOptions.map((value) => (
+                <option key={value} value={value}>
+                  {value.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        {queryActive && (
+          <div className="mt-3 border-t border-rule pt-3">
+            <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
+              <span className="sc text-[10px] text-faint">detected</span>
+              {queryAnalysis.intents.length > 0 ? (
+                queryAnalysis.intents.slice(0, 5).map((intent) => (
+                  <span key={intent.id} className="rounded border border-rule bg-white px-2 py-1">
+                    {intent.label}
+                  </span>
+                ))
+              ) : (
+                <span className="rounded border border-rule bg-white px-2 py-1">plain text</span>
+              )}
+              {queryAnalysis.isAnnouncementLike && (
+                <span className="rounded border border-[#d8c99f] bg-[#fff8e8] px-2 py-1 text-[#6f5018]">
+                  announcement
+                </span>
+              )}
+              {queryAnalysis.countryHints.slice(0, 4).map((hint) => (
+                <button
+                  key={hint.code}
+                  type="button"
+                  onClick={() => setCountry(hint.code)}
+                  className="rounded border border-rule bg-white px-2 py-1 hover:border-accent hover:text-accent"
+                  title={countryLabel(hint.code)}
+                >
+                  {hint.code}
+                </button>
+              ))}
+            </div>
+
+            {queryAnalysis.axes.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
+                <span className="sc mr-1 text-[10px] text-faint">axis fingerprint</span>
+                {queryAnalysis.axes.slice(0, 8).map((move) => (
+                  <button
+                    key={`${move.axis}-${move.direction}-${move.sourceIntentId}`}
+                    type="button"
+                    onClick={() => setAxis(move.axis)}
+                    className="rounded border border-rule bg-white px-2 py-1 hover:border-accent hover:text-accent"
+                    title={move.reason}
+                  >
+                    <span className="font-mono font-semibold">{directionGlyph(move.direction)}</span>{" "}
+                    {axisLabel(move.axis)}
+                    <span className="ml-1 text-faint">({move.magnitude})</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2 text-[11px] text-muted">
@@ -314,6 +397,7 @@ export function PolicyEvidenceBrowser() {
         {filtered.slice(0, 120).map((row) => {
           const explicitLinks = row.link_type_counts?.explicit ?? 0;
           const inferredLinks = row.link_type_counts?.inferred ?? 0;
+          const match = queryActive ? matchById.get(row.policy_id) : undefined;
           const unresolvedCount =
             (row.verdict_counts.inconclusive ?? 0) +
             (row.verdict_counts.blocked ?? 0) +
@@ -337,9 +421,19 @@ export function PolicyEvidenceBrowser() {
                     ))}
                   </div>
                 </div>
-                <span className={`rounded border px-2 py-1 text-[11px] font-semibold ${postureTone(row.posture)}`}>
-                  {postureLabel(row.posture)}
-                </span>
+                <div className="flex flex-wrap items-start justify-end gap-2">
+                  {match && match.score > 0 && (
+                    <span
+                      className="rounded border border-[#c9d4e6] bg-[#f3f7fc] px-2 py-1 text-[11px] font-semibold text-[#38577a]"
+                      title={`axis ${match.axisScore.toFixed(1)} / text ${match.textScore.toFixed(1)} / evidence ${match.evidenceScore.toFixed(1)}`}
+                    >
+                      {matchScoreLabel(match.score)}
+                    </span>
+                  )}
+                  <span className={`rounded border px-2 py-1 text-[11px] font-semibold ${postureTone(row.posture)}`}>
+                    {postureLabel(row.posture)}
+                  </span>
+                </div>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
@@ -391,6 +485,34 @@ export function PolicyEvidenceBrowser() {
                 ))}
               </div>
 
+              {match && (match.matchedAxes.length > 0 || match.matchedTerms.length > 0) && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
+                  <span className="sc mr-1 text-[10px] text-faint">query match</span>
+                  {match.matchedAxes.slice(0, 5).map((a) => (
+                    <button
+                      key={`${row.policy_id}-${a.axis}-${a.queryDirection}-${a.rowDirection}`}
+                      type="button"
+                      onClick={() => setAxis(a.axis)}
+                      className={`rounded border px-2 py-1 ${
+                        a.sameDirection
+                          ? "border-[#bcdcc4] bg-[#f2faf4] text-[#245f3e]"
+                          : "border-[#ecd6a6] bg-[#fff8e8] text-[#7c5415]"
+                      }`}
+                      title={`${a.intentLabel}: query ${directionLabel(a.queryDirection)}, policy ${directionLabel(a.rowDirection)}`}
+                    >
+                      <span className="font-mono font-semibold">{directionGlyph(a.rowDirection)}</span>{" "}
+                      {axisLabel(a.axis)}
+                      {!a.sameDirection && <span className="ml-1 text-faint">contrast</span>}
+                    </button>
+                  ))}
+                  {match.matchedTerms.slice(0, Math.max(0, 5 - match.matchedAxes.length)).map((term) => (
+                    <span key={`${row.policy_id}-${term}`} className="rounded border border-rule bg-panel px-2 py-1">
+                      {term}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {row.top_hypotheses.length > 0 ? (
                 <div className="mt-3 grid gap-1.5">
                   {row.top_hypotheses.slice(0, 3).map((h) => {
@@ -440,6 +562,12 @@ export function PolicyEvidenceBrowser() {
           );
         })}
       </div>
+
+      {loadingState === "ready" && filtered.length === 0 && (
+        <div className="rounded border border-rule bg-panel px-4 py-3 text-[13px] text-muted">
+          No matching policy evidence cards. Try clearing one filter or using a broader policy phrase.
+        </div>
+      )}
 
       {filtered.length > 120 && (
         <div className="mt-4 rounded border border-rule bg-panel px-4 py-3 text-[13px] text-muted">
