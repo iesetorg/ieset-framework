@@ -55,6 +55,118 @@ variables:
   - name: fiscal_deficit
     source: imf:GGXCNL_NGDP
     transformation: level_pct_of_gdp
+mechanism_measurement:
+  mechanism_type: price_control
+  design_features:
+  - controlled_vs_uncontrolled_categories
+  - high_frequency_event_study
+  - border_comparison
+  - welfare_accounting
+  - distributional_decomposition
+  - quality_margin
+  - leakage_substitution
+  comparison_structure:
+    treated_units:
+    - Venezuela controlled staples, 2003-2023
+    - Argentina Precios Cuidados goods, 2014-2023
+    - Soviet administered retail goods, 1980-1991
+    - US petroleum price-controlled fuels, 1973-1981
+    control_units:
+    - uncapped substitutes within each episode where available
+    - donor country-years without binding ceilings
+    controlled_or_regulated_units:
+    - statutory controlled baskets or fuels
+    exempt_or_uncontrolled_units:
+    - uncapped substitutes, parallel markets, imports, or exempt sellers
+    adjacent_or_border_markets:
+    - cross-border arbitrage markets for Venezuela and Hungary-style extensions
+    - US regional gasoline markets during phased petroleum decontrol
+    time_frequency: mixed
+    notes: >
+      This spec tests whether the canonical shortage signature appears. It is
+      not a complete welfare-accounting design until stockout, queue, quality,
+      and incidence data are measured per category.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: The official controlled price is held below the parallel or market-clearing price.
+    variable_names: [official_vs_parallel_price_ratio]
+    candidate_sources:
+    - Hanke Troubled Currencies and parallel-market datasets
+    - official price schedules
+    - spot fuel and controlled-fuel price series
+    measurement_status: measured
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Suppliers reduce output, official-channel availability, or inventories when controlled prices bind.
+    variable_names: [stockout_incidence]
+    candidate_sources:
+    - IMF and World Bank country reports
+    - station outage or inventory records
+    - retail shelf-availability surveys
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: allocation_distortion
+    mechanism: Queues, rationing, favoritism, and non-price allocation replace market clearing.
+    variable_names: [stockout_incidence]
+    candidate_sources:
+    - documented queue lengths
+    - ration-card or allocation records
+    - local retail surveys
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: leakage_or_substitution
+    mechanism: Demand and supply move to black markets, smuggling, imports, or uncapped substitute goods.
+    variable_names: [official_vs_parallel_price_ratio]
+    candidate_sources:
+    - parallel market prices
+    - border seizure/smuggling records
+    - informal-market expenditure shares
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: quality_margin
+    mechanism: Controlled goods degrade in size, quality, variety, or service level before measured price changes.
+    variable_names: []
+    candidate_sources:
+    - product disappearance counts
+    - package-size and quality-adjusted price datasets
+    - consumer complaints and substitution surveys
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Consumer transfer must be netted against shortage, queue, black-market, quality, and enforcement costs.
+    variable_names: []
+    candidate_sources:
+    - constructed welfare ledger by episode and category
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: distributional_incidence
+    mechanism: Covered buyers, uncovered buyers, producers, informal intermediaries, and future consumers receive different effects.
+    variable_names: []
+    candidate_sources:
+    - household expenditure surveys
+    - producer margin surveys
+    - rationing entitlement records
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - future_cohorts
+  - enforcement_targets
+  welfare_accounting:
+    first_order_transfer: official market-clearing price gap times official-channel quantity
+    deadweight_loss: quantity rationing and foregone trades
+    quality_loss: quality-adjusted price or product-disappearance losses
+    search_or_queue_cost: queue time and stockout search effort
+    future_supply_loss: output, inventory, investment, or capacity reductions
+    fiscal_or_enforcement_cost: inspection, penalty, subsidy, and policing costs
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: dispositive_with_documented_layer_gaps
+  notes: >
+    The existing run is strong evidence for the pre-registered shortage
+    signature. Full mechanism attribution still needs category-level quality,
+    incidence, and welfare components.
 intervention_channel: regulatory
 intervention_channel_justification: 'Price controls are a regulatory price intervention. Where they are bundled with subsidies, rationing, or currency controls those are separately coded. Note: topic is
   ''fiscal'' per the filename path assignment, but the intervention channel is regulatory — this is permitted because topic is an organisational tag for the scoreboard while intervention_channel carries

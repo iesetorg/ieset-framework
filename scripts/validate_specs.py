@@ -187,6 +187,31 @@ def cross_ref_policies(known_policy_ids: set[str]) -> tuple[list[str], list[str]
     return hard_errors, warnings
 
 
+def load_publisher_ids() -> set[str]:
+    pub_path = ROOT / "data" / "fetchers" / "publishers.yaml"
+    if not pub_path.exists():
+        return set()
+    doc = load_yaml(pub_path) or {}
+    return set((doc.get("publishers") or {}).keys())
+
+
+def cross_ref_second_order_sources(known_publisher_ids: set[str]) -> list[str]:
+    """Every publisher_ref in data/second_order_sources.yaml must be registered."""
+    errors: list[str] = []
+    path = ROOT / "data" / "second_order_sources.yaml"
+    if not path.exists():
+        return errors
+    doc = load_yaml(path) or {}
+    for family_id, rec in (doc.get("source_families") or {}).items():
+        for publisher_id in rec.get("publisher_refs") or []:
+            if publisher_id not in known_publisher_ids:
+                errors.append(
+                    f"{path.relative_to(ROOT)}: source_families.{family_id}.publisher_refs "
+                    f"contains unknown publisher {publisher_id!r}"
+                )
+    return errors
+
+
 def main() -> int:
     registry = build_schema_registry()
     def _v(name: str) -> Draft202012Validator:
@@ -199,6 +224,7 @@ def main() -> int:
     axes_v     = _v("axes.schema.json")
     policy_v   = _v("policy.schema.json")
     movement_v = _v("movement.schema.json")
+    second_order_sources_v = _v("second_order_sources.schema.json")
 
     errors: list[str] = []
     checked = 0
@@ -231,6 +257,12 @@ def main() -> int:
         checked += 1
         errors.extend(validate_one(pub_path, pub_v))
 
+    # Second-order source family registry
+    second_order_sources_path = ROOT / "data" / "second_order_sources.yaml"
+    if second_order_sources_path.exists():
+        checked += 1
+        errors.extend(validate_one(second_order_sources_path, second_order_sources_v))
+
     # Axes registry
     axes_path = ROOT / "axes.yaml"
     if axes_path.exists():
@@ -261,6 +293,8 @@ def main() -> int:
         errors.extend(cross_ref_axes(axis_ids))
     policy_errors, policy_warnings = cross_ref_policies(known_policy_ids)
     errors.extend(policy_errors)
+    publisher_ids = load_publisher_ids()
+    errors.extend(cross_ref_second_order_sources(publisher_ids))
 
     # Integrity gate: stub falsification rule + real verdict is forbidden.
     # See integrity_check_falsification_rules() for the rationale + exit states.

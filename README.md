@@ -33,8 +33,9 @@ IESET is structured to fix that:
 4. **Vintaged data substrate** — Every datapoint carries `(publisher, series, vintage_utc, sha256)`. A re-run from a year later picks up the new vintage; the old run remains reproducible against the old vintage forever.
 5. **Adversarial review** — Anyone can submit a coherent challenge to a verdict via the `review/` machinery. A successful challenge re-opens the verdict; the audit trail is permanent.
 6. **Indicator-set integrity** — For social-outcome claims (basic needs, wellbeing, human development, poverty), the spec must enumerate the canonical-literature basket and either test each dimension or document it as a data gap. Omitted canonical dimensions cap the verdict at `supported_subset`. This catches the upstream gaming pattern that pre-registration alone cannot reach.
+7. **Second-order policy measurement** — Policy tests must measure or disclose the mechanism layers implied by their axes: supply response, quality, substitution, incidence, enforcement cost, macro feedback, and net welfare where relevant. A price or rent control that only measures the controlled price is not scoreboard-grade evidence; it is a candidate screen until the shortage, quality, supply, search-cost, and welfare channels are tested.
 
-These six invariants are spelled out in `METHODOLOGY.md`.
+These seven invariants are spelled out in `METHODOLOGY.md`.
 
 ---
 

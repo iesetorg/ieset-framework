@@ -93,6 +93,10 @@
         "instruments": {"type": "array", "items": {"$ref": "#/$defs/variable"}}
       }
     },
+    "mechanism_measurement": {
+      "$ref": "#/$defs/mechanism_measurement",
+      "description": "Structured measurement contract for policy experiments where first-order effects can mask second-order behavioral, supply, allocation, quality, leakage, fiscal, welfare, distributional, institutional, or dynamic effects. Required by project convention for upgraded causal and scoreboard-promoted specs; optional for legacy specs."
+    },
     "intervention_channel": {
       "type": "string",
       "enum": ["fiscal", "regulatory", "monetary", "institutional", "bundled"],
@@ -352,6 +356,183 @@
           "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
           "description": "Named actors/policies/events specifically tested. Use snake_case canonical tags, e.g. reagan_tax_1981, thatcher_1979, brexit_2016, nafta_1994, tcja_2017, milei_2023, chavismo_1999, volcker_1979, abenomics_2013, agenda_2010, macron_reforms_2017. For generic cross-country panels with no named treatment, leave empty or omit."
         }
+      }
+    },
+    "mechanism_measurement": {
+      "type": "object",
+      "required": ["mechanism_type", "design_features", "causal_layers"],
+      "additionalProperties": false,
+      "properties": {
+        "mechanism_type": {
+          "type": "string",
+          "enum": [
+            "rent_control",
+            "price_control",
+            "price_signal_distortion",
+            "administered_price_subsidy",
+            "tax_policy",
+            "fiscal_transfer",
+            "public_spending",
+            "monetary_policy",
+            "trade_policy",
+            "labour_market",
+            "industrial_policy",
+            "competition_policy",
+            "financial_regulation",
+            "environmental_policy",
+            "energy_policy",
+            "healthcare_policy",
+            "welfare_policy",
+            "housing_supply_policy",
+            "institutional_reform",
+            "privatisation_nationalisation",
+            "migration_policy",
+            "education_policy",
+            "other"
+          ],
+          "description": "Policy mechanism whose second-order channels must be measured separately from the immediate visible effect."
+        },
+        "design_features": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "controlled_vs_uncontrolled_units",
+              "controlled_vs_uncontrolled_categories",
+              "treated_vs_untreated_units",
+              "eligible_vs_ineligible_groups",
+              "phase_in_or_threshold_comparison",
+              "adjacent_market_comparison",
+              "border_comparison",
+              "high_frequency_event_study",
+              "triple_difference",
+              "synthetic_control",
+              "panel_fe_screen",
+              "welfare_accounting",
+              "distributional_decomposition",
+              "quality_margin",
+              "leakage_substitution",
+              "implementation_capacity_check",
+              "mechanism_channel_decomposition",
+              "dynamic_investment_followup",
+              "spillover_tracking"
+            ]
+          },
+          "description": "Identification and measurement features that keep second-order effects from being washed out by broad aggregates."
+        },
+        "comparison_structure": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "treated_units": {"type": "array", "items": {"type": "string"}},
+            "control_units": {"type": "array", "items": {"type": "string"}},
+            "controlled_or_regulated_units": {"type": "array", "items": {"type": "string"}},
+            "exempt_or_uncontrolled_units": {"type": "array", "items": {"type": "string"}},
+            "adjacent_or_border_markets": {"type": "array", "items": {"type": "string"}},
+            "time_frequency": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly", "quarterly", "annual", "mixed", "unknown"]
+            },
+            "notes": {"type": "string"}
+          }
+        },
+        "causal_layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/causal_layer_measurement"},
+          "description": "Layer-by-layer measurement of direct benefits and second/third-order distortions."
+        },
+        "distributional_groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "incumbent_beneficiaries",
+              "new_entrants",
+              "uncovered_consumers",
+              "low_income_uncovered_households",
+              "suppliers",
+              "future_cohorts",
+              "taxpayers",
+              "neighbouring_market_users",
+              "enforcement_targets"
+            ]
+          },
+          "description": "Groups whose effects must be separated before a policy can be treated as distributionally measured."
+        },
+        "welfare_accounting": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "first_order_transfer": {"type": "string"},
+            "deadweight_loss": {"type": "string"},
+            "quality_loss": {"type": "string"},
+            "search_or_queue_cost": {"type": "string"},
+            "future_supply_loss": {"type": "string"},
+            "fiscal_or_enforcement_cost": {"type": "string"},
+            "net_welfare_formula": {"type": "string"}
+          },
+          "description": "Explicit welfare ledger. Use data-gap markers where a component is not yet measured."
+        },
+        "promotion_gate": {
+          "type": "string",
+          "enum": [
+            "screen_only_until_second_order_measured",
+            "dispositive_if_all_required_layers_measured",
+            "dispositive_with_documented_layer_gaps",
+            "descriptive_only"
+          ],
+          "description": "Whether the current measurement design can support public scoreboard promotion."
+        },
+        "notes": {"type": "string"}
+      }
+    },
+    "causal_layer_measurement": {
+      "type": "object",
+      "required": ["layer", "mechanism", "measurement_status"],
+      "additionalProperties": false,
+      "properties": {
+        "layer": {
+          "type": "string",
+          "enum": [
+            "first_order_price_or_transfer",
+            "first_order_policy_effect",
+            "second_order_supply_response",
+            "behavioral_response",
+            "allocation_distortion",
+            "leakage_or_substitution",
+            "quality_margin",
+            "fiscal_or_enforcement_cost",
+            "implementation_capacity",
+            "market_structure_response",
+            "dynamic_investment_response",
+            "macro_feedback",
+            "externality_or_spillover",
+            "net_welfare",
+            "distributional_incidence"
+          ]
+        },
+        "mechanism": {"type": "string", "minLength": 10},
+        "variable_names": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Names from variables.outcome/treatment/decomposition_channels/controls that operationalise this layer."
+        },
+        "candidate_sources": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Publisher:series or constructed-source candidates, including sources not yet on disk."
+        },
+        "measurement_status": {
+          "type": "string",
+          "enum": ["measured", "proxy_only", "data_gap", "not_applicable"]
+        },
+        "required_for_dispositive_verdict": {
+          "type": "boolean",
+          "description": "True when missing this layer should cap a result at PARTIAL, supported_subset, or inconclusive rather than full SUPPORTED/REFUTED."
+        },
+        "notes": {"type": "string"}
       }
     }
   },

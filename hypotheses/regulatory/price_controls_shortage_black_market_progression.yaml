@@ -75,6 +75,125 @@ variables:
       source: "world_bank_wdi:PA.NUS.FCRF"
       transformation: log_level
 
+mechanism_measurement:
+  mechanism_type: price_control
+  design_features:
+    - controlled_vs_uncontrolled_categories
+    - high_frequency_event_study
+    - border_comparison
+    - welfare_accounting
+    - distributional_decomposition
+    - quality_margin
+    - leakage_substitution
+  comparison_structure:
+    treated_units:
+      - Venezuela Ley de Precios Justos controlled categories
+      - Argentina Precios Cuidados categories
+      - Turkey food-price cap categories
+      - Hungary fuel and staple-food capped categories
+      - Zimbabwe 2007 controlled retail goods
+    control_units:
+      - uncapped substitutes and untreated category cells within each country
+      - donor country-category cells without binding controls
+    controlled_or_regulated_units:
+      - statutory controlled baskets and fuels
+    exempt_or_uncontrolled_units:
+      - uncapped substitutes
+      - informal sellers
+      - cross-border markets
+      - exempt producers or retailers
+    adjacent_or_border_markets:
+      - Hungary border fuel markets
+      - Venezuela-Colombia arbitrage channels
+      - Argentina parallel-market goods and FX channels
+    time_frequency: monthly
+    notes: >
+      The event-study should be promoted only when category-level controlled
+      vs uncontrolled outcomes resolve, because national CPI and money-growth
+      controls cannot identify scarcity leakage by themselves.
+  causal_layers:
+    - layer: first_order_price_or_transfer
+      mechanism: Official prices of the controlled basket are capped in the initial window.
+      variable_names: [official_cpi_controlled_basket]
+      candidate_sources:
+        - national CPI controlled-basket components
+        - official price schedules
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: second_order_supply_response
+      mechanism: Supply to official channels contracts and stockouts rise.
+      variable_names: [controlled_basket_official_availability]
+      candidate_sources:
+        - shelf-availability surveys
+        - retail sales volume by capped category
+        - station outage data
+      measurement_status: proxy_only
+      required_for_dispositive_verdict: true
+    - layer: allocation_distortion
+      mechanism: Queues, rationing, favoritism, and privilege allocation emerge after official-channel scarcity.
+      variable_names: [controlled_basket_official_availability]
+      candidate_sources:
+        - queue surveys
+        - rationing and allocation records
+        - press-coded stockout and queue archives
+      measurement_status: proxy_only
+      required_for_dispositive_verdict: true
+    - layer: leakage_or_substitution
+      mechanism: Scarcity arbitrage expands into black markets, cross-border resale, informal channels, and uncapped substitutes.
+      variable_names: [official_black_market_price_gap, informal_market_share_controlled_goods]
+      candidate_sources:
+        - parallel-market price archives
+        - household expenditure surveys
+        - border seizure and smuggling reports
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: quality_margin
+      mechanism: Sellers shrink packages, dilute products, reduce variety, or shift away from premium variants.
+      variable_names: []
+      candidate_sources:
+        - scanner data
+        - package-size archives
+        - consumer protection complaints
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: net_welfare
+      mechanism: First-order consumer gain is offset by rationing, quality, informal-market, enforcement, and future supply losses.
+      variable_names: [aggregate_welfare_loss_proxy]
+      candidate_sources:
+        - Deaton-Muellbauer quantity-rationing welfare ledger
+        - controlled vs parallel quantity and price panels
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: distributional_incidence
+      mechanism: Covered consumers, uncovered consumers, suppliers, informal arbitrageurs, and enforcement targets receive different effects.
+      variable_names: []
+      candidate_sources:
+        - household expenditure surveys
+        - producer and retailer margin data
+        - enforcement and inspection records
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+  distributional_groups:
+    - incumbent_beneficiaries
+    - uncovered_consumers
+    - suppliers
+    - taxpayers
+    - future_cohorts
+    - enforcement_targets
+  welfare_accounting:
+    first_order_transfer: controlled price discount times official-channel quantity for the capped basket
+    deadweight_loss: rationed quantity, informal markup, and foregone legal-market transactions
+    quality_loss: package-size, variety, or quality-adjusted price deterioration
+    search_or_queue_cost: queue time, repeat shopping, and stockout search effort
+    future_supply_loss: producer exit, inventory depletion, and investment decline
+    fiscal_or_enforcement_cost: inspection, penalty, subsidy, and enforcement costs
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    The existing run uses constructed availability but lacks several key
+    outcomes listed in the result card. The structured gate keeps a positive
+    event-study coefficient from becoming full mechanism attribution.
+
 intervention_channel: regulatory
 intervention_channel_justification: >
   Statutory price caps are regulatory price ceilings. Monetary and

@@ -22,6 +22,7 @@ export default async function ScoreboardPage() {
   const untestedOnly = scores.filter((s) => s.tested === 0);
   const totalRun = scores.reduce((a, s) => a + s.tested, 0);
   const totalClaims = scores.reduce((a, s) => a + s.total_claims, 0);
+  const totalIntegrityWeight = scores.reduce((a, s) => a + s.integrity_tested_weight, 0);
   const coverageRows = scores
     .map((s) => {
       const linked = new Set(
@@ -87,6 +88,10 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{totalRun}</div>
         </div>
         <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">High-integrity tested weight</div>
+          <div className="text-[22px] font-semibold">{totalIntegrityWeight.toFixed(1)}</div>
+        </div>
+        <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">V1 coverage balanced</div>
           <div className="text-[22px] font-semibold">{balancedCoverage}/{scores.length}</div>
         </div>
@@ -129,14 +134,18 @@ export default async function ScoreboardPage() {
           quality discount, then also applies claim-link confidence, first-pass
           screening cautions, and a causal-attribution discount when a school
           gets credit merely because it predicted a failure. A failed policy is
-          not treated as proof that every opponent&apos;s mechanism was right.
+          not treated as proof that every opponent&apos;s mechanism was right. It
+          now also applies the strict second-order gate: policy-experiment
+          evidence does not move A-net until required mechanism, incidence,
+          supply, quality, leakage, fiscal, and welfare layers are measured or
+          explicitly cleared.
         </p>
         <div className="mt-3 grid gap-px overflow-hidden border border-rule bg-rule text-[12.5px] md:grid-cols-4">
           <div className="bg-white px-3 py-2">
             <strong>Causal tests: 1×</strong>
             <div className="mt-0.5 text-muted">
-              Strongest scoreboard weight because the design targets cause and
-              effect.
+              Strongest base weight, but still gated if second-order mechanism
+              layers are missing.
             </div>
           </div>
           <div className="bg-white px-3 py-2">
@@ -156,16 +165,16 @@ export default async function ScoreboardPage() {
           <div className="bg-white px-3 py-2">
             <strong>Failure attribution: capped</strong>
             <div className="mt-0.5 text-muted">
-              Negative forecasts get full losses when wrong, but only limited
-              wins unless the test identifies the failure mechanism.
+              Negative forecasts get full losses when wrong, but wins are held
+              or capped unless the test identifies the failure mechanism.
             </div>
           </div>
         </div>
         <p className="mt-3 mb-0">
-          Schools are ranked by <strong>Attribution net</strong> so generic
-          development facts and broad failure predictions cannot swamp sharper
-          policy tests. The forecast Q-net and original raw score stay visible
-          for transparency, while tiny margins are muted as too close to call.
+          Schools are ranked by <strong>Attribution net</strong>, now the
+          strict second-order-gated score. The forecast Q-net and original raw
+          score stay visible for transparency, while tiny margins are muted as
+          too close to call.
         </p>
       </div>
 

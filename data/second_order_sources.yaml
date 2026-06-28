@@ -1,0 +1,1088 @@
+version: 1
+source_families:
+  policy_event_treatment_registry:
+    name: Policy event and treatment-definition registry
+    description: Policy statutes, effective dates, phase-in thresholds, eligibility rules, exemption rules, and axis-coded treatment definitions.
+    layers:
+      - first_order_policy_effect
+      - first_order_price_or_transfer
+      - implementation_capacity
+    policy_domains:
+      - price_control
+      - administered_price_subsidy
+      - rent_control
+      - land_use_regulation
+      - tax_policy
+      - fiscal_transfer
+      - public_spending
+      - monetary_policy
+      - trade_policy
+      - labour_market
+      - industrial_policy
+      - competition_policy
+      - financial_regulation
+      - environmental_policy
+      - energy_policy
+      - healthcare_policy
+      - welfare_policy
+      - housing_supply_policy
+      - institutional_reform
+      - migration_policy
+      - education_policy
+    readiness: partial_ready
+    publisher_refs: []
+    existing_fetchers:
+      - scripts.generate_policy_event_treatment_registry
+    aliases:
+      - policy event
+      - treatment definition
+      - effective date
+      - phase-in
+      - threshold
+      - eligibility rule
+      - exemption rule
+      - statutory treatment
+    frequency: event dated
+    unit_of_observation: policy by jurisdiction and affected unit
+    geographic_granularity: jurisdiction, subjurisdiction, or treated unit
+    legal_access: assembled from public statutes, gazettes, regulator notices, and IESET policy YAMLs
+    priority: high
+    notes: IESET now derives a first-pass registry from policy YAML timeframe, axes_moved, and evaluation_design fields; statutory details and subunit treatment coding still require hand reconstruction for many policies.
+  macro_panel_outcome_vintages:
+    name: Macro outcome and feedback panels
+    description: Vintaged macroeconomic outcome panels for growth, inflation, debt, trade, investment, employment, current account, exchange rates, and productivity feedback.
+    layers:
+      - macro_feedback
+      - first_order_policy_effect
+      - behavioral_response
+      - dynamic_investment_response
+    policy_domains:
+      - tax_policy
+      - fiscal_transfer
+      - public_spending
+      - monetary_policy
+      - trade_policy
+      - industrial_policy
+      - energy_policy
+      - institutional_reform
+    readiness: partial_ready
+    publisher_refs:
+      - world_bank_wdi
+      - oecd
+      - imf
+      - imf_ifs
+      - fred
+      - bis
+      - pwt
+      - maddison
+    existing_fetchers:
+      - data.fetchers.world_bank_wdi
+      - data.fetchers.oecd
+      - data.fetchers.imf_weo
+      - data.fetchers.imf_ifs
+      - data.fetchers.fred
+      - data.fetchers.bis
+      - data.fetchers.pwt
+      - data.fetchers.maddison
+    aliases:
+      - macro feedback
+      - growth feedback
+      - inflation feedback
+      - gdp
+      - investment
+      - productivity
+      - current account
+      - exchange rate
+      - debt service
+    frequency: monthly to annual
+    unit_of_observation: country, region, or sector
+    geographic_granularity: country and region where available
+    legal_access: public APIs, bulk files, and manual-drop vintages
+    priority: medium
+    notes: Macro panels are rarely dispositive on their own but are required to measure feedback channels and avoid partial-equilibrium claims.
+  national_building_permits_completions:
+    name: Building permits and housing completions
+    description: Permit, start, completion, and vacancy panels used to measure supply response and investment timing after housing and land-use interventions.
+    layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    policy_domains:
+      - housing_supply_policy
+      - rent_control
+      - land_use_regulation
+    readiness: partial_ready
+    publisher_refs:
+      - us_census
+      - eurostat
+      - destatis
+      - ons
+    existing_fetchers:
+      - data.fetchers.us_census
+      - data.fetchers.eurostat
+      - data.fetchers.destatis
+      - data.fetchers.ons
+    aliases:
+      - building permit
+      - building-permit
+      - completion
+      - vacancy
+      - eurostat:bldg_pi_lt
+      - national building-permit
+      - us census bps
+      - bps metro permits
+      - supply elasticity
+      - city-level supply
+    frequency: monthly to annual
+    unit_of_observation: jurisdiction by unit type
+    geographic_granularity: national, region, city where publisher exposes it
+    legal_access: public API or bulk table for major publishers; local microdata varies
+    priority: high
+    notes: Existing fetchers cover many aggregate permit panels, but regulated-vs-exempt unit flags usually require local administrative joins.
+  rent_registry_cadastral_tenancy_microdata:
+    name: Rent registry, tenancy, and cadastral microdata
+    description: Unit-level rent, tenure duration, exemption status, cadastral, and occupancy records needed to separate incumbent gains from entrant and future-cohort losses.
+    layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+      - allocation_distortion
+      - quality_margin
+    policy_domains:
+      - rent_control
+      - housing_supply_policy
+      - property_tax_policy
+    readiness: reconstruct_needed
+    publisher_refs:
+      - eurostat
+    existing_fetchers:
+      - data.fetchers.eurostat
+    aliases:
+      - rent registry
+      - rental contract
+      - tenancy-duration
+      - cadastral
+      - regulated/exempt classification
+      - unit-level regulated
+      - tenant registry
+      - tenure transition
+      - city rent microdata
+      - controlled versus uncontrolled status
+      - controlled vs uncontrolled status
+      - property-condition survey
+      - lease duration
+      - move records
+      - assessor condominium
+      - condominium conversion
+      - property tax class
+      - maintenance expenditure
+      - mobility and quality
+    frequency: monthly to annual
+    unit_of_observation: dwelling unit, tenancy, or household
+    geographic_granularity: city or national registry where legally accessible
+    legal_access: often restricted microdata or city open-data extract
+    priority: high
+    notes: This is the core missing dataset for high-integrity rent-control evaluation.
+  rental_listing_unit_microdata:
+    name: Rental listings and advertised-unit microdata
+    description: Advertised rent, days-on-market, quality description, exemption flag, furnished/short-term status, and withdrawal behavior from online listing platforms.
+    layers:
+      - first_order_price_or_transfer
+      - leakage_or_substitution
+      - quality_margin
+      - allocation_distortion
+      - dynamic_investment_response
+    policy_domains:
+      - rent_control
+      - housing_supply_policy
+      - tourism_short_term_rental_policy
+    readiness: scrape_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - listings
+      - listing microdata
+      - advertised rent
+      - short-term rental
+      - days-on-market
+      - listings linked to exemption status
+      - immoscout
+      - zillow
+      - apartment list
+      - city rent panels
+    frequency: daily to monthly
+    unit_of_observation: advertised dwelling listing
+    geographic_granularity: address, neighborhood, or city
+    legal_access: platform terms and robots rules must be reviewed before scrape
+    priority: high
+    notes: Essential for adjacent-market and triple-difference rent-control designs.
+  city_rent_affordability_panel:
+    name: City rent and affordability panels
+    description: City, metro, or local-authority rent levels, rent indices, rent burden, fair-market-rent schedules, and tenant cost panels used to identify first-order rent effects and local affordability incidence.
+    layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+      - net_welfare
+    policy_domains:
+      - rent_control
+      - housing_supply_policy
+      - housing_affordability
+    readiness: partial_ready
+    publisher_refs:
+      - bls
+      - eurostat
+      - oecd
+      - us_census
+    existing_fetchers:
+      - data.fetchers.bls
+      - data.fetchers.eurostat
+      - data.fetchers.oecd
+      - data.fetchers.us_census
+    aliases:
+      - city rent index
+      - metro rent index
+      - local authority private rent
+      - fair market rent
+      - small area fair market rent
+      - rent burden
+      - rent-to-income
+      - zillow observed rent index
+      - apartment list rent estimates
+      - eurostat city rent
+      - hud fmr
+      - bls msa rent cpi
+    frequency: monthly to annual
+    unit_of_observation: city, metro, local authority, census tract, or dwelling segment
+    geographic_granularity: city, metro, local authority, tract, and submarket depending on publisher
+    legal_access: public APIs and bulk files for official series; private listing series require terms review
+    priority: high
+    notes: This family upgrades rent-control tests from country-level affordability screens to city-level first-order rent panels.
+  municipal_housing_policy_event_registry:
+    name: Municipal housing-policy event registries
+    description: Dated local ordinances, rent-control coverage rules, exemption rules, zoning reforms, tenant protections, and enforcement changes needed to define city-year treatment intensity.
+    layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    policy_domains:
+      - rent_control
+      - housing_supply_policy
+      - land_use_regulation
+      - tenant_protection_policy
+    readiness: reconstruct_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - local ordinance
+      - municipal ordinance
+      - rent control law
+      - rent stabilization law
+      - rent cap effective date
+      - exemption rule
+      - tenant protection
+      - just cause eviction
+      - inclusionary zoning
+      - zoning reform
+      - policy event registry
+      - city policy panel
+    frequency: event dated
+    unit_of_observation: jurisdiction-policy-event
+    geographic_granularity: city, municipality, county, state, province, or metro
+    legal_access: public legal codes, gazettes, council records, and policy observatories; normalization is manual-heavy
+    priority: high
+    notes: This is the treatment spine for top-1000-city rent-control and housing-policy tests.
+  city_housing_code_violation_inspection_panel:
+    name: City housing-code violation and inspection panels
+    description: Address-level or building-level housing complaints, code violations, inspections, repair orders, and maintenance enforcement records used to measure quality-margin responses.
+    layers:
+      - quality_margin
+      - implementation_capacity
+      - distributional_incidence
+    policy_domains:
+      - rent_control
+      - housing_supply_policy
+      - tenant_protection_policy
+    readiness: scrape_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - code violation
+      - code violations
+      - housing complaint
+      - maintenance complaint
+      - building inspection
+      - repair order
+      - housing quality
+      - property condition
+      - complaint portal
+      - hpd complaint
+      - data sf code enforcement
+    frequency: daily to annual
+    unit_of_observation: complaint, inspection, building, parcel, or dwelling
+    geographic_granularity: address, parcel, neighborhood, city, and borough
+    legal_access: many large-city open-data portals expose public extracts; privacy and address geocoding rules vary
+    priority: high
+    notes: Rent-control claims should not be promoted without a quality-margin layer; this family makes that gap explicit.
+  eviction_filing_tenant_mobility_panel:
+    name: Eviction filings, tenure, and tenant-mobility panels
+    description: Eviction filings, landlord-tenant court records, tenure duration, household moves, and waitlist or queue measures used to identify allocation distortions and distributional incidence.
+    layers:
+      - allocation_distortion
+      - distributional_incidence
+      - behavioral_response
+    policy_domains:
+      - rent_control
+      - tenant_protection_policy
+      - housing_affordability
+    readiness: partial_ready
+    publisher_refs:
+      - us_census
+    existing_fetchers:
+      - data.fetchers.us_census
+    aliases:
+      - eviction filing
+      - eviction filings
+      - tenant mobility
+      - renter mobility
+      - waitlist
+      - waiting list
+      - queue years
+      - housing lottery
+      - tenancy duration
+      - moving rate
+      - acs migration tenure
+      - eviction lab
+    frequency: daily to annual
+    unit_of_observation: filing, household, tenancy, waitlist applicant, or city-year
+    geographic_granularity: address, tract, county, city, or metro depending on source
+    legal_access: public aggregated panels exist in some countries; microdata often has court-access or privacy limits
+    priority: high
+    notes: This family separates incumbent protection from entrant and mobile-household costs.
+  municipal_short_term_rental_conversion_registry:
+    name: Short-term rental, condominium-conversion, and tenure-shift registries
+    description: Local short-term-rental licenses, owner-occupation shifts, condominium conversions, demolition permits, and property-class transitions used to measure leakage from controlled rental stock.
+    layers:
+      - leakage_or_substitution
+      - market_structure_response
+      - dynamic_investment_response
+    policy_domains:
+      - rent_control
+      - tourism_short_term_rental_policy
+      - housing_supply_policy
+    readiness: scrape_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - short-term rental registry
+      - short term rental registry
+      - airbnb registry
+      - condominium conversion
+      - condo conversion
+      - owner occupation transition
+      - property class transition
+      - rental base erosion
+      - demolition permit
+      - corporate let
+      - exempt tenure
+    frequency: daily to annual
+    unit_of_observation: license, parcel, unit, property-class transition, or city-year
+    geographic_granularity: address, parcel, neighborhood, and city
+    legal_access: mixed municipal open data, FOIA, commercial datasets, and manual registry extraction
+    priority: high
+    notes: This is the leakage channel that prevents rent-control designs from treating nominally regulated markets as closed systems.
+  retail_scanner_price_quantity_panel:
+    name: Retail scanner price and quantity panels
+    description: UPC or category-level price, quantity, package-size, substitution, and retailer margin data needed for capped-vs-uncapped goods tests.
+    layers:
+      - first_order_price_or_transfer
+      - leakage_or_substitution
+      - quality_margin
+      - net_welfare
+      - distributional_incidence
+    policy_domains:
+      - price_control
+      - administered_price_subsidy
+      - consumption_tax_policy
+      - competition_policy
+    readiness: proprietary_gap
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - scanner
+      - scanner data
+      - category scanner
+      - retail sales by controlled category
+      - retailer margin
+      - producer margin
+      - margin survey
+      - producer and retailer margin
+      - package-size
+      - product-quality
+    frequency: weekly to monthly
+    unit_of_observation: product by store or product by market
+    geographic_granularity: store, city, region, or country depending on vendor
+    legal_access: generally proprietary; public alternatives require competition authority or statistics-office access
+    priority: high
+    notes: Without quantities and margins, price-cap tests can miss substitution, shrinkflation, and quality margins.
+  shelf_availability_stockout_surveys:
+    name: Shelf availability, stockout, and shortage surveys
+    description: Store-level or category-level stockout, queue, rationing, complaint, and availability records that identify non-price scarcity under controls.
+    layers:
+      - second_order_supply_response
+      - allocation_distortion
+      - leakage_or_substitution
+      - implementation_capacity
+      - net_welfare
+    policy_domains:
+      - price_control
+      - rationing_policy
+      - emergency_subsidy_policy
+    readiness: reconstruct_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - stockout
+      - shelf availability
+      - shelf-availability
+      - shortage indicator
+      - product disappearance
+      - market-arrival
+      - market arrival
+      - consumer complaint
+      - rationing
+      - queue
+    frequency: daily to monthly
+    unit_of_observation: store by category or complaint by product
+    geographic_granularity: store, city, or region
+    legal_access: often survey, FOIA, regulator portal, or manual archive
+    priority: high
+    notes: This is the main second-order evidence family for food, medicine, and fuel price controls.
+  official_price_schedule_control_registry:
+    name: Official price schedules and controlled-category registries
+    description: Statutory maximum prices, eligible categories, exemption rules, and effective dates that define treatment intensity and first-order legal exposure.
+    layers:
+      - first_order_price_or_transfer
+      - implementation_capacity
+    policy_domains:
+      - price_control
+      - rent_control
+      - wage_price_control
+      - administered_price_subsidy
+    readiness: scrape_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - official price schedule
+      - price schedule
+      - controlled basket
+      - controlled-basket
+      - capped category
+      - capped goods
+      - official maximum price
+      - cpi food micro
+      - cpi category microdata
+      - cpi controlled-basket
+      - rent cpi
+      - cpi subcomponents
+      - bls msa rent
+      - fao producer-price
+    frequency: event dated to monthly
+    unit_of_observation: product, dwelling type, service, or category
+    geographic_granularity: national, province, or city
+    legal_access: public gazettes and regulator pages, but formats vary widely
+    priority: high
+    notes: Needed before capped-vs-uncapped category designs can be treated as well-defined.
+  parallel_market_black_market_prices:
+    name: Parallel-market and black-market price archives
+    description: Unofficial exchange, goods, rent, and resale-market prices used to measure leakage, arbitrage, and suppressed inflation under controls.
+    layers:
+      - leakage_or_substitution
+      - allocation_distortion
+      - net_welfare
+    policy_domains:
+      - price_control
+      - exchange_control
+      - rationing_policy
+      - import_control
+    readiness: partial_ready
+    publisher_refs:
+      - dolartoday
+      - bcv
+      - hanke
+      - hanke_tc
+    existing_fetchers:
+      - data.fetchers.dolartoday
+      - data.fetchers.bcv
+      - data.fetchers.hanke
+      - data.fetchers.hanke_tc
+    aliases:
+      - parallel-market
+      - parallel market
+      - black market
+      - informal market
+      - parallel prices
+      - parallel price
+      - official vs parallel
+      - controlled vs parallel
+      - parallel quantity and price
+      - border seizure
+      - smuggling
+    frequency: daily to monthly
+    unit_of_observation: product, exchange-rate quote, or border event
+    geographic_granularity: city, national, or border region
+    legal_access: mixed public archives, manual-drop, and research series
+    priority: high
+    notes: Existing Venezuela/inflation tooling helps, but broad product-level black-market coverage remains incomplete.
+  fuel_inventory_station_outage_queue_panel:
+    name: Fuel inventories, station outages, and queue panels
+    description: Station-level outage, inventory, allocation, search-time, and queue measures for fuel price caps and energy emergency policies.
+    layers:
+      - second_order_supply_response
+      - allocation_distortion
+      - fiscal_or_enforcement_cost
+      - net_welfare
+    policy_domains:
+      - energy_policy
+      - price_control
+      - administered_price_subsidy
+    readiness: reconstruct_needed
+    publisher_refs:
+      - eia
+      - iea
+    existing_fetchers:
+      - data.fetchers.eia
+      - data.fetchers.iea
+    aliases:
+      - station-level stockout
+      - station-level outage
+      - fuel inventory
+      - fuel inventories
+      - regional allocation quantity
+      - consumer time-cost
+      - queue panel
+    frequency: daily to monthly
+    unit_of_observation: station, region, or fuel product
+    geographic_granularity: station, city, state, or country
+    legal_access: public aggregate energy data plus emergency/regulator archives; station microdata often private
+    priority: high
+    notes: Aggregate fuel inventories are not enough; queue/search cost and station outage panels are the decisive second-order layer.
+  energy_reliability_outage_operator_data:
+    name: Electricity reliability and outage operator data
+    description: Grid outage, curtailment, reserve margin, load-shedding, reliability, and capacity-adequacy data for energy price, subsidy, and market-design tests.
+    layers:
+      - second_order_supply_response
+      - quality_margin
+      - implementation_capacity
+      - dynamic_investment_response
+      - externality_or_spillover
+    policy_domains:
+      - energy_policy
+      - environmental_policy
+      - industrial_policy
+    readiness: partial_ready
+    publisher_refs:
+      - eia
+      - iea
+      - irena
+      - eea
+      - world_bank_wdi
+    existing_fetchers:
+      - data.fetchers.eia
+      - data.fetchers.iea
+      - data.fetchers.irena
+      - data.fetchers.eea
+      - data.fetchers.world_bank_wdi
+    aliases:
+      - outage
+      - reliability
+      - load shedding
+      - load-shedding
+      - reserve margin
+      - electricity access
+      - curtailment
+      - energy-sector investment
+      - utility customer class
+    frequency: hourly to annual
+    unit_of_observation: grid node, balancing area, region, or country
+    geographic_granularity: plant, grid region, country
+    legal_access: public system-operator data in some countries; uneven globally
+    priority: high
+    notes: Useful for moving energy-policy tests beyond prices into service quality and capacity response.
+  household_distributional_microdata:
+    name: Household income, consumption, and incidence microdata
+    description: Household survey and administrative data needed to split effects across incumbents, entrants, low-income uncovered households, suppliers, taxpayers, and future cohorts.
+    layers:
+      - distributional_incidence
+      - behavioral_response
+      - net_welfare
+    policy_domains:
+      - tax_policy
+      - welfare_policy
+      - housing_supply_policy
+      - healthcare_policy
+      - education_policy
+      - energy_policy
+    readiness: partial_ready
+    publisher_refs:
+      - eurostat
+      - oecd
+      - us_census
+      - wid
+      - world_bank_wdi
+    existing_fetchers:
+      - data.fetchers.eurostat
+      - data.fetchers.oecd
+      - data.fetchers.us_census
+      - data.fetchers.wid
+      - data.fetchers.world_bank_wdi
+    aliases:
+      - eu-silc
+      - eurostat tenure
+      - eurostat ilc_lvho07a
+      - household
+      - low-income
+      - distributional
+      - incidence
+      - income microdata
+      - tenure-income
+      - housing-cost microdata
+      - subsidy incidence
+      - acs commute
+      - acs migration
+      - tenure records
+      - migration microdata
+    frequency: annual to multi-year waves
+    unit_of_observation: household or person
+    geographic_granularity: household, region, or country
+    legal_access: public aggregates are ready; microdata access requires licensing in many jurisdictions
+    priority: high
+    notes: High-priority backbone for the user-requested incumbent vs entrant vs future-cohort decomposition.
+  firm_entry_exit_balance_sheet_panel:
+    name: Firm entry, exit, balance-sheet, and productivity panels
+    description: Firm dynamics, balance sheets, sectoral productivity, MPK dispersion, and industrial census panels for misallocation, investment, and market-structure mechanisms.
+    layers:
+      - allocation_distortion
+      - market_structure_response
+      - dynamic_investment_response
+      - second_order_supply_response
+    policy_domains:
+      - competition_policy
+      - industrial_policy
+      - financial_regulation
+      - price_signal_distortion
+      - trade_policy
+    readiness: partial_ready
+    publisher_refs:
+      - oecd
+      - eurostat
+      - world_bank_wdi
+      - bis
+      - ons
+      - destatis
+    existing_fetchers:
+      - data.fetchers.oecd
+      - data.fetchers.eurostat
+      - data.fetchers.world_bank_wdi
+      - data.fetchers.bis
+      - data.fetchers.ons
+      - data.fetchers.destatis
+    aliases:
+      - firm entry
+      - firm exit
+      - balance sheet
+      - industrial census
+      - mpk
+      - hseih-klenow
+      - hsieh-klenow
+      - oecd stan
+      - sector productivity
+      - value-added per worker
+      - enterprise surveys
+    frequency: annual to quarterly
+    unit_of_observation: firm, plant, sector, or country
+    geographic_granularity: firm to country
+    legal_access: aggregates public; firm microdata often restricted
+    priority: high
+    notes: The broad price-signal and capital-misallocation hypotheses should not score without this family or an explicit substitute.
+  labour_market_admin_payroll_panel:
+    name: Labour-force, payroll, wage, and hours panels
+    description: Employment, wage, hours, low-tail bite, vacancies, and participation panels for minimum-wage, labour-market, transfer, and tax behavioral responses.
+    layers:
+      - behavioral_response
+      - distributional_incidence
+      - allocation_distortion
+      - net_welfare
+    policy_domains:
+      - labour_market
+      - tax_policy
+      - welfare_policy
+      - migration_policy
+    readiness: partial_ready
+    publisher_refs:
+      - bls
+      - ilostat
+      - oecd
+      - eurostat
+      - usdol
+    existing_fetchers:
+      - data.fetchers.bls
+      - data.fetchers.ilostat
+      - data.fetchers.oecd
+      - data.fetchers.eurostat
+      - data.fetchers.usdol
+    aliases:
+      - labour force
+      - labor force
+      - payroll
+      - wage
+      - hours
+      - employment
+      - minimum wage bite
+      - vacancy
+    frequency: monthly to annual
+    unit_of_observation: worker, establishment, occupation, or region
+    geographic_granularity: national, state, region, or metro
+    legal_access: public aggregate APIs and some restricted microdata
+    priority: medium
+    notes: Existing coverage is relatively strong; distributional and employer-level margins remain thinner.
+  fiscal_tax_admin_compliance_panel:
+    name: Fiscal, tax-admin, compliance, and enforcement panels
+    description: Revenue, compliance, audit, fiscal-cost, tax-base migration, and enforcement records for tax, subsidy, transfer, and fiscal-policy welfare accounting.
+    layers:
+      - fiscal_or_enforcement_cost
+      - behavioral_response
+      - distributional_incidence
+      - net_welfare
+      - implementation_capacity
+    policy_domains:
+      - tax_policy
+      - fiscal_transfer
+      - public_spending
+      - welfare_policy
+      - industrial_policy
+    readiness: partial_ready
+    publisher_refs:
+      - imf
+      - oecd
+      - world_bank_wdi
+      - ssb
+      - ine
+    existing_fetchers:
+      - data.fetchers.imf_weo
+      - data.fetchers.oecd
+      - data.fetchers.world_bank_wdi
+      - data.fetchers.ssb
+      - data.fetchers.ine
+    aliases:
+      - tax admin
+      - compliance
+      - enforcement cost
+      - budget subsidy
+      - fiscal cost
+      - realized revenue
+      - revenue forecast
+      - tax base
+      - budget transfer
+      - connection subsidy
+      - energy subsidy database
+      - imf energy subsidy
+      - transfer recipient
+      - quasi-fiscal deficit
+      - utility arrears
+    frequency: annual to monthly
+    unit_of_observation: taxpayer group, program, country, or subnational unit
+    geographic_granularity: country or subnational where tax authority reports it
+    legal_access: public aggregates; audits and compliance microdata restricted
+    priority: medium
+    notes: Important for welfare ledgers because many apparent transfers are partly offset by fiscal or enforcement costs.
+  regulatory_enforcement_inspection_records:
+    name: Regulatory enforcement, inspection, penalty, and complaint records
+    description: Inspection, penalty, compliance, complaint, rationing-enforcement, and case records needed to measure implementation capacity and enforcement costs.
+    layers:
+      - implementation_capacity
+      - fiscal_or_enforcement_cost
+      - quality_margin
+      - leakage_or_substitution
+    policy_domains:
+      - price_control
+      - rent_control
+      - environmental_policy
+      - competition_policy
+      - financial_regulation
+      - labour_market
+    readiness: reconstruct_needed
+    publisher_refs:
+      - mercatus
+      - world_bank_wdi
+    existing_fetchers:
+      - data.fetchers.mercatus
+      - data.fetchers.world_bank_wdi
+    aliases:
+      - enforcement action
+      - enforcement action microdata
+      - enforcement agency
+      - inspection records
+      - inspection and penalty
+      - penalty counts
+      - compliance enforcement
+      - regulator notebook
+      - complaint records
+      - code violation
+      - maintenance complaint
+      - consumer protection complaint
+      - municipal waitlist
+    frequency: event to annual
+    unit_of_observation: enforcement action, inspection, firm, agency, or jurisdiction
+    geographic_granularity: agency, local jurisdiction, region, or country
+    legal_access: public portals, FOIA, or manual archive; formats vary heavily
+    priority: high
+    notes: This family prevents implementation-heavy policies from scoring on statutory design alone.
+  welfare_accounting_case_ledger:
+    name: Explicit welfare-accounting ledgers
+    description: Constructed ledgers combining transfer, deadweight loss, quality loss, queue/search cost, fiscal cost, and future-supply-loss components.
+    layers:
+      - net_welfare
+      - distributional_incidence
+      - fiscal_or_enforcement_cost
+      - allocation_distortion
+    policy_domains:
+      - price_control
+      - rent_control
+      - tax_policy
+      - fiscal_transfer
+      - public_spending
+      - energy_policy
+      - healthcare_policy
+    readiness: reconstruct_needed
+    publisher_refs: []
+    existing_fetchers: []
+    aliases:
+      - constructed welfare ledger
+      - welfare ledger
+      - net welfare ledger
+      - transfer-vs-price-control welfare ledger
+      - energy welfare ledger
+      - food-category welfare ledger
+      - drug-launch welfare ledger
+      - category welfare ledger
+      - deaton-muellbauer
+    frequency: policy episode
+    unit_of_observation: policy episode by causal layer and distributional group
+    geographic_granularity: policy jurisdiction
+    legal_access: constructed from public and restricted components; no single publisher
+    priority: high
+    notes: Use this as the auditable assembly layer, not as a substitute for missing component data.
+  pharmaceutical_launch_price_access_panel:
+    name: Pharmaceutical launch, price, reimbursement, and access panels
+    description: Drug launch dates, approval dates, reimbursement delays, formulary restrictions, national price registries, and country-drug availability panels for pharmaceutical price-control tests.
+    layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - allocation_distortion
+      - quality_margin
+      - distributional_incidence
+      - net_welfare
+    policy_domains:
+      - healthcare_policy
+      - price_control
+      - industrial_policy
+      - competition_policy
+    readiness: proprietary_gap
+    publisher_refs:
+      - oecd
+      - who_gho
+    existing_fetchers:
+      - data.fetchers.oecd
+      - data.fetchers.who_gho
+    aliases:
+      - iqvia
+      - drug launch
+      - launch dates
+      - launch and price
+      - country-drug availability
+      - reimbursement approval
+      - reimbursement delay
+      - formulary restriction
+      - drug price registries
+      - pharmaceutical spending
+      - medicine price
+      - ema/fda
+      - ema fda
+    frequency: event dated to annual
+    unit_of_observation: drug by country or payer
+    geographic_granularity: country, payer, or therapeutic category
+    legal_access: public approval data exists, but launch/pricing/access panels are often proprietary
+    priority: high
+    notes: Needed to avoid treating lower listed drug prices as success when launch delay or access restrictions dominate.
+  healthcare_access_quality_wait_times:
+    name: Healthcare access, quality, outcome, and waiting-time panels
+    description: Wait times, access, amenable mortality, coverage, quality, and fiscal-cost measures for healthcare reform second-order effects.
+    layers:
+      - quality_margin
+      - distributional_incidence
+      - fiscal_or_enforcement_cost
+      - implementation_capacity
+      - net_welfare
+    policy_domains:
+      - healthcare_policy
+      - welfare_policy
+      - public_spending
+    readiness: partial_ready
+    publisher_refs:
+      - oecd
+      - who_gho
+      - world_bank_wdi
+    existing_fetchers:
+      - data.fetchers.oecd
+      - data.fetchers.who_gho
+      - data.fetchers.world_bank_wdi
+    aliases:
+      - healthcare quality
+      - health care quality
+      - wait time
+      - waiting time
+      - amenable mortality
+      - coverage
+      - patient outcome
+    frequency: annual to quarterly
+    unit_of_observation: patient group, provider, region, or country
+    geographic_granularity: provider, region, or country
+    legal_access: public aggregate panels; patient microdata restricted
+    priority: medium
+    notes: Prevents healthcare tests from stopping at spending or coverage alone.
+  education_quality_attainment_panel:
+    name: Education quality, attainment, and cohort panels
+    description: Learning outcomes, completion, enrollment, cohort mobility, and school-quality data for education-policy second-order effects.
+    layers:
+      - quality_margin
+      - distributional_incidence
+      - behavioral_response
+      - dynamic_investment_response
+    policy_domains:
+      - education_policy
+      - public_spending
+      - migration_policy
+    readiness: partial_ready
+    publisher_refs:
+      - oecd
+      - world_bank_wdi
+      - us_census
+    existing_fetchers:
+      - data.fetchers.oecd
+      - data.fetchers.world_bank_wdi
+      - data.fetchers.us_census
+    aliases:
+      - test score
+      - pisa
+      - attainment
+      - enrollment
+      - school quality
+      - completion
+      - cohort
+    frequency: annual to assessment waves
+    unit_of_observation: student, school, cohort, region, or country
+    geographic_granularity: school to country
+    legal_access: public aggregates and restricted microdata
+    priority: medium
+    notes: Useful for separating enrollment expansion from learning and cohort outcomes.
+  trade_customs_product_panel:
+    name: Customs, tariff, and product-level trade panels
+    description: Product-level tariffs, trade values, quantities, concentration, variety, and customs indicators for trade-policy leakage and market-access mechanisms.
+    layers:
+      - first_order_policy_effect
+      - leakage_or_substitution
+      - market_structure_response
+      - dynamic_investment_response
+    policy_domains:
+      - trade_policy
+      - industrial_policy
+      - competition_policy
+    readiness: ready
+    publisher_refs:
+      - wits
+      - un_comtrade
+      - unctad
+      - world_bank_wdi
+    existing_fetchers:
+      - data.fetchers.wits
+      - data.fetchers.un_comtrade
+      - data.fetchers.unctad
+      - data.fetchers.world_bank_wdi
+    aliases:
+      - customs
+      - tariff
+      - hs6
+      - product variety
+      - product concentration
+      - import value
+      - export value
+    frequency: annual to monthly
+    unit_of_observation: product by country pair
+    geographic_granularity: country pair and product
+    legal_access: public APIs and bulk files
+    priority: medium
+    notes: One of the strongest existing second-order source families in the repo.
+  environmental_externality_emissions_air_panel:
+    name: Emissions, air-quality, and environmental externality panels
+    description: Emissions, local air pollution, carbon intensity, land-use, and externality outcome panels for environmental-policy welfare and spillover accounting.
+    layers:
+      - externality_or_spillover
+      - quality_margin
+      - net_welfare
+      - distributional_incidence
+    policy_domains:
+      - environmental_policy
+      - energy_policy
+      - industrial_policy
+    readiness: partial_ready
+    publisher_refs:
+      - owid
+      - eea
+      - world_bank_wdi
+      - iea
+    existing_fetchers:
+      - data.fetchers.owid
+      - data.fetchers.eea
+      - data.fetchers.world_bank_wdi
+      - data.fetchers.iea
+    aliases:
+      - emissions
+      - air quality
+      - pm2.5
+      - pollution
+      - carbon intensity
+      - externality
+      - spillover
+    frequency: annual to daily
+    unit_of_observation: monitor, grid cell, sector, region, or country
+    geographic_granularity: monitor to country
+    legal_access: public APIs and bulk files for many aggregate series
+    priority: medium
+    notes: Needs distributional incidence joins for high-integrity welfare accounting.
+  public_procurement_contract_microdata:
+    name: Public procurement and contract microdata
+    description: Tender, award, bid-count, contract-modification, supplier, and delivery-quality records for procurement, industrial policy, and corruption mechanisms.
+    layers:
+      - implementation_capacity
+      - market_structure_response
+      - fiscal_or_enforcement_cost
+      - quality_margin
+    policy_domains:
+      - public_spending
+      - industrial_policy
+      - competition_policy
+      - institutional_reform
+    readiness: scrape_needed
+    publisher_refs:
+      - world_bank_wdi
+    existing_fetchers:
+      - data.fetchers.world_bank_wdi
+    aliases:
+      - procurement
+      - contract
+      - tender
+      - bid count
+      - supplier concentration
+    frequency: event to annual
+    unit_of_observation: tender, contract, supplier, or buyer
+    geographic_granularity: agency, locality, or country
+    legal_access: public portals in many countries but heterogeneous formats
+    priority: medium
+    notes: Needed before public-spending and industrial-policy claims can distinguish spending volume from implementation capacity.

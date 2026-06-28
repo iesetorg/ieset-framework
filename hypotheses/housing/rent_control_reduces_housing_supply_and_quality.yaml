@@ -54,6 +54,125 @@ variables:
       source: "pending"
       transformation: level
 
+mechanism_measurement:
+  mechanism_type: rent_control
+  design_features:
+    - controlled_vs_uncontrolled_units
+    - adjacent_market_comparison
+    - high_frequency_event_study
+    - triple_difference
+    - welfare_accounting
+    - distributional_decomposition
+    - quality_margin
+    - leakage_substitution
+  comparison_structure:
+    treated_units:
+      - Berlin Mietendeckel 2020-2021 regulated rentals
+      - San Francisco 1994 expansion units
+      - Stockholm regulated rental queue segment
+    control_units:
+      - comparable non-treated German cities
+      - San Francisco exempt or non-covered units
+      - non-regulated Stockholm rental or owner-occupied segment
+    controlled_or_regulated_units:
+      - incumbent covered rental contracts
+      - renewal-capped units
+    exempt_or_uncontrolled_units:
+      - new construction exemptions where applicable
+      - owner-occupied and condo-converted units
+      - market-rate or short-term rental leakage channels
+    adjacent_or_border_markets:
+      - Minneapolis for St Paul-style v1.1 extension
+      - non-Berlin German city donor pool
+      - Bay Area donor metros for San Francisco
+    time_frequency: monthly
+    notes: >
+      The dispositive design is city/metro or unit-level. Country-level proxy
+      panels are not sufficient because rent-control effects concentrate in
+      regulated versus exempt units and nearby substitution markets.
+  causal_layers:
+    - layer: first_order_price_or_transfer
+      mechanism: Incumbent tenants in covered units receive below-market rent and tenure-security transfers.
+      variable_names: [rent_growth_rate]
+      candidate_sources:
+        - BLS MSA rent CPI subcomponents
+        - Zillow/Apartment List city rent panels
+        - Berlin ImmoScout regulated-listing rents
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: second_order_supply_response
+      mechanism: Expected rental returns fall, lowering permits, completions, rental listings, and maintenance investment.
+      variable_names: [housing_stock_growth]
+      candidate_sources:
+        - US Census Building Permits Survey metro data
+        - Eurostat subnational building-permit series
+        - municipal completions and rental-listing feeds
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: allocation_distortion
+      mechanism: Below-market contracts create queueing, mismatch, and mobility lock-in.
+      variable_names: []
+      candidate_sources:
+        - Stockholm Bostadsformedlingen queue years
+        - ACS migration and tenure microdata
+        - municipal waitlist records
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: leakage_or_substitution
+      mechanism: Owners substitute toward exempt new construction, condo conversion, owner-occupation, or short-term rentals.
+      variable_names: []
+      candidate_sources:
+        - assessor condominium conversion records
+        - AirDNA or municipal short-term rental registries
+        - property tax class transitions
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: quality_margin
+      mechanism: Lower allowed rents reduce repair incentives and show up in complaints, code violations, or repair spending.
+      variable_names: [housing_quality_proxy]
+      candidate_sources:
+        - city code violation databases
+        - maintenance complaint portals
+        - property-condition survey microdata
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: net_welfare
+      mechanism: Incumbent tenant transfer must be netted against deadweight loss, queue/search cost, quality loss, and future supply loss.
+      variable_names: []
+      candidate_sources:
+        - constructed welfare ledger from rent gaps, quantities, wait times, quality, and supply response
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: distributional_incidence
+      mechanism: Benefits accrue to incumbents while entrants, mobile workers, uncovered renters, landlords, and future cohorts can lose.
+      variable_names: []
+      candidate_sources:
+        - ACS/Census tenure-income microdata
+        - household expenditure surveys
+        - unit-level tenancy-duration records where accessible
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+  distributional_groups:
+    - incumbent_beneficiaries
+    - new_entrants
+    - uncovered_consumers
+    - low_income_uncovered_households
+    - suppliers
+    - future_cohorts
+  welfare_accounting:
+    first_order_transfer: covered-unit market rent minus regulated rent times covered quantity
+    deadweight_loss: lost rental units and foregone mutually beneficial moves from supply and mobility response
+    quality_loss: monetized code violations, maintenance complaints, or repair-spending shortfall
+    search_or_queue_cost: waitlist years, time-to-lease, and mobility-lock cost valued at wage/time benchmarks
+    future_supply_loss: discounted value of foregone permits, completions, and rental stock growth
+    fiscal_or_enforcement_cost: municipal enforcement, tribunal, and inspection costs where available
+    net_welfare_formula: tenant_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    This pre-registration remains blocked until city/metro data land. The
+    structured mechanism contract prevents country-level proxy runs from
+    being interpreted as dispositive support or refutation.
+
 estimator:
   template: did_callaway_santanna
   clustering: metro

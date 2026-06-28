@@ -84,6 +84,81 @@ variables:
   - name: rule_of_law
     source: wgi:RL.EST
     transformation: level
+mechanism_measurement:
+  mechanism_type: administered_price_subsidy
+  design_features:
+  - panel_fe_screen
+  - controlled_vs_uncontrolled_categories
+  - high_frequency_event_study
+  - welfare_accounting
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - country-years with high state-consumption burden proxy
+    control_units:
+    - country-years with lower state-consumption burden proxy
+    controlled_or_regulated_units:
+    - household energy prices where pass-through is suppressed
+    exempt_or_uncontrolled_units:
+    - unsubsidized fuels or customer classes where available
+    time_frequency: annual
+    notes: >
+      Government consumption is not an energy price-control treatment. This
+      run is a broad screen until exact tariff, subsidy, outage, and investment
+      data are substituted.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Administered energy prices or subsidies reduce household energy bills.
+    variable_names: []
+    candidate_sources:
+    - national tariff schedules
+    - IMF energy subsidy database
+    - household energy CPI components
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Below-cost pricing weakens investment, access quality, inventories, or outage performance.
+    variable_names: [qol_or_prosperity_outcome]
+    candidate_sources:
+    - WDI electricity access
+    - SAIDI/SAIFI outage metrics
+    - IEA/World Bank investment and generation capacity
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Price suppression creates fiscal transfers, utility arrears, or quasi-fiscal losses.
+    variable_names: [market_or_intervention_proxy]
+    candidate_sources:
+    - IMF energy subsidy estimates
+    - utility arrears
+    - budget transfers
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Energy access gains must be netted against fiscal, outage, shortage, and future investment costs.
+    variable_names: []
+    candidate_sources:
+    - constructed access and reliability welfare ledger
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - taxpayers
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: subsidized tariff discount times covered consumption
+    deadweight_loss: rationed energy or excess demand
+    quality_loss: outage and reliability deterioration
+    search_or_queue_cost: fuel queue or service-interruption search costs
+    future_supply_loss: foregone utility investment and maintenance
+    fiscal_or_enforcement_cost: budget subsidy, arrears, and quasi-fiscal losses
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    Treat current PARTIAL output as non-dispositive. Exact energy-price-control
+    variables are required before school forecast scoring.
 estimator:
   template: panel_fe
   fixed_effects:

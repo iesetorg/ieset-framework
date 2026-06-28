@@ -50,6 +50,90 @@ variables:
     - name: government_effectiveness
       source: wgi:GOV_WGI_GE.EST
       transformation: level
+mechanism_measurement:
+  mechanism_type: price_signal_distortion
+  design_features:
+    - panel_fe_screen
+    - controlled_vs_uncontrolled_categories
+    - high_frequency_event_study
+    - welfare_accounting
+    - distributional_decomposition
+  comparison_structure:
+    treated_units:
+      - country-years with lower monetary-freedom price-signal proxy
+    control_units:
+      - country-years with higher monetary-freedom price-signal proxy
+    controlled_or_regulated_units:
+      - utility tariffs with below-cost recovery where measured
+    exempt_or_uncontrolled_units:
+      - customer classes or fuels priced closer to cost recovery
+    time_frequency: annual
+    notes: >
+      Heritage monetary freedom is a broad proxy. A v2 should replace it with
+      utility tariff cost-recovery, subsidy, arrears, outage, and investment
+      data before claiming a price-control mechanism.
+  causal_layers:
+    - layer: first_order_price_or_transfer
+      mechanism: Administered utility prices lower consumer costs below cost recovery.
+      variable_names: [monetary_freedom_price_signal_proxy]
+      candidate_sources:
+        - national electricity tariff schedules
+        - IMF energy subsidy database
+        - utility cost-recovery studies
+      measurement_status: proxy_only
+      required_for_dispositive_verdict: true
+    - layer: second_order_supply_response
+      mechanism: Cost recovery affects connection expansion, generation capacity, and service reliability.
+      variable_names: [electricity_access_growth]
+      candidate_sources:
+        - WDI electricity access
+        - SAIDI/SAIFI outage metrics
+        - IEA generation and grid investment
+      measurement_status: proxy_only
+      required_for_dispositive_verdict: true
+    - layer: fiscal_or_enforcement_cost
+      mechanism: Below-cost prices shift costs to budgets, utility arrears, or under-maintenance.
+      variable_names: []
+      candidate_sources:
+        - utility arrears
+        - budget transfers
+        - quasi-fiscal deficit estimates
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: distributional_incidence
+      mechanism: Cheap administered energy may help connected households while excluding unconnected households and future users.
+      variable_names: []
+      candidate_sources:
+        - household electricity access and expenditure microdata
+        - connection subsidy records
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: net_welfare
+      mechanism: Access gains must be netted against reliability losses, fiscal cost, and delayed future expansion.
+      variable_names: []
+      candidate_sources:
+        - constructed access/reliability/fiscal welfare ledger
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+  distributional_groups:
+    - incumbent_beneficiaries
+    - low_income_uncovered_households
+    - uncovered_consumers
+    - suppliers
+    - taxpayers
+    - future_cohorts
+  welfare_accounting:
+    first_order_transfer: tariff discount times connected-household consumption
+    deadweight_loss: excess demand and rationed or unreliable electricity
+    quality_loss: outages, voltage instability, and service-quality loss
+    search_or_queue_cost: connection wait time and outage coping costs
+    future_supply_loss: delayed grid, generation, and maintenance investment
+    fiscal_or_enforcement_cost: budget subsidies, arrears, and quasi-fiscal utility losses
+    net_welfare_formula: connected_household_transfer + access_gain - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    Current INCONCLUSIVE_DATA_PENDING status is appropriate; no scoreboard
+    claim should be made from this proxy until cost-recovery data land.
 intervention_channel: regulatory
 intervention_channel_justification: >
   The treatment is a broad price-control and price-stability institutional

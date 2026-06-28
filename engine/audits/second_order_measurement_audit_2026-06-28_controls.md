@@ -1,0 +1,401 @@
+# Second-order measurement audit
+
+This audit checks whether policy-experiment artifacts separate first-order effects from second-order behavioral, supply, allocation, leakage, quality, welfare, distributional, implementation, and spillover effects.
+
+## Summary
+- **matched_hypotheses**: 26
+- **hypotheses_with_contract**: 12
+- **control_focused_hypotheses**: 26
+- **matched_policies**: 79
+- **policies_with_evaluation_design**: 6
+- **policies_with_axis_second_order_requirements**: 79
+- **policies_missing_explicit_design_but_axis_requirements**: 73
+- **control_focused_policies**: 79
+- **matched_movements**: 44
+- **movements_with_control_axis**: 5
+- **matched_axes**: 2
+- **axes_with_second_order_measurement**: 2
+
+## Hypotheses missing contracts
+- `energy_crisis_2022_european_industrial_relocation` (candidate, hypotheses/energy/energy_crisis_2022_european_industrial_relocation.yaml)
+- `us_wwii_fiscal_expansion_inflation_aftermath` (draft, hypotheses/fiscal/us_wwii_fiscal_expansion_inflation_aftermath.yaml)
+- `bolivia_morales_resource_nationalism_2006_2019` (candidate, hypotheses/growth/bolivia_morales_resource_nationalism_2006_2019.yaml)
+- `chile_vs_venezuela_divergence_1999_2023` (pre_registered, hypotheses/growth/chile_vs_venezuela_divergence_1999_2023.yaml)
+- `russia_sanctions_2022_2025_economic_response_decomposition` (candidate, hypotheses/growth/russia_sanctions_2022_2025_economic_response_decomposition.yaml)
+- `rent_control_housing_supply_destruction_panel` (candidate, hypotheses/housing/rent_control_housing_supply_destruction_panel.yaml)
+- `post_soviet_market_reform_life_expectancy` (pre_registered, hypotheses/institutional_quality/post_soviet_market_reform_life_expectancy.yaml)
+- `venezuela_chavismo_canonical_case_multi_metric` (pre_registered, hypotheses/institutional_quality/venezuela_chavismo_canonical_case_multi_metric.yaml)
+- `venezuela_chavismo_framework_validation` (pre_registered, hypotheses/institutional_quality/venezuela_chavismo_framework_validation.yaml)
+- `biden_ira_chips_fiscal_inflation_pass_through` (pre_registered, hypotheses/labour/biden_ira_chips_fiscal_inflation_pass_through.yaml)
+- `wage_inflation_spiral_post_2021_oecd_panel` (candidate, hypotheses/labour/wage_inflation_spiral_post_2021_oecd_panel.yaml)
+- `inflation_cost_push_distributional_conflict_eurozone_2021_2024` (candidate, hypotheses/monetary/inflation_cost_push_distributional_conflict_eurozone_2021_2024.yaml)
+- `interest_rate_hike_distributional_upward_redistribution` (candidate, hypotheses/monetary/interest_rate_hike_distributional_upward_redistribution.yaml)
+- `lucas_expectations_anchoring_post_volcker_us_inflation_persistence` (candidate, hypotheses/monetary/lucas_expectations_anchoring_post_volcker_us_inflation_persistence.yaml)
+
+## Screen-only or non-promotable hypotheses
+- `capacity_energy_shock_transfers_vs_price_controls` -> `screen_only_until_second_order_measured`; required gaps: second_order_supply_response, distributional_incidence, net_welfare
+- `ml_energy_price_controls_shortage_fiscal_burden` -> `screen_only_until_second_order_measured`; required gaps: net_welfare, distributional_incidence
+- `pharma_price_control_launch_delay` -> `descriptive_only`; required gaps: first_order_price_or_transfer, second_order_supply_response, allocation_distortion, net_welfare
+- `price_controls_food_output_decline_panel` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, leakage_or_substitution, quality_margin, net_welfare
+- `rent_control_housing_supply_elasticity` -> `descriptive_only`; required gaps: first_order_price_or_transfer, second_order_supply_response, allocation_distortion
+- `rent_control_housing_supply_quality_decay_chain` -> `screen_only_until_second_order_measured`; required gaps: second_order_supply_response, net_welfare, distributional_incidence
+- `rent_control_reduces_housing_supply_and_quality` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, second_order_supply_response, allocation_distortion, leakage_or_substitution, quality_margin, net_welfare, distributional_incidence
+- `rent_price_controls_building_permits_eu_panel` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, second_order_supply_response, leakage_or_substitution, quality_margin, distributional_incidence
+- `price_controls_produce_shortages_and_quality_degradation` -> `screen_only_until_second_order_measured`; required gaps: quality_margin, fiscal_or_enforcement_cost, net_welfare, distributional_incidence
+- `price_controls_shortage_black_market_progression` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, leakage_or_substitution, quality_margin, net_welfare, distributional_incidence
+- `price_signal_distortion_capital_misallocation` -> `screen_only_until_second_order_measured`; required gaps: second_order_supply_response, allocation_distortion, distributional_incidence
+
+## Policies missing evaluation designs
+- `ao_fuel_subsidy_phaseout_2023` (policies/ao_fuel_subsidy_phaseout_2023.yaml); explicit control axes: regulatory.price_control_intensity
+- `ar_fernandez_precios_cuidados_justos_2019` (policies/ar_fernandez_precios_cuidados_justos_2019.yaml); explicit control axes: none
+- `argentina_deregulation_omnibus_2024` (policies/argentina_deregulation_omnibus_2024.yaml); explicit control axes: none
+- `argentina_fuel_subsidies_2003_2015` (policies/argentina_fuel_subsidies_2003_2015.yaml); explicit control axes: none
+- `be_energy_crisis_response_1974_1976` (policies/be_energy_crisis_response_1974_1976.yaml); explicit control axes: none
+- `be_index_jump_2015` (policies/be_index_jump_2015.yaml); explicit control axes: none
+- `be_sauts_dindex_1982_1984` (policies/be_sauts_dindex_1982_1984.yaml); explicit control axes: none
+- `br_cruzado_plan_1986` (policies/br_cruzado_plan_1986.yaml); explicit control axes: none
+- `br_maxi_devaluation_1983` (policies/br_maxi_devaluation_1983.yaml); explicit control axes: none
+- `br_nova_matriz_economica_2011_2014` (policies/br_nova_matriz_economica_2011_2014.yaml); explicit control axes: none
+- `cn_austerity_rectification_1988_1991` (policies/cn_austerity_rectification_1988_1991.yaml); explicit control axes: none
+- `cz_energy_price_cap_2025` (policies/cz_energy_price_cap_2025.yaml); explicit control axes: none
+- `dk_august_package_1977` (policies/dk_august_package_1977.yaml); explicit control axes: none
+- `dk_kartoffelkur_october_1982_package` (policies/dk_kartoffelkur_october_1982_package.yaml); explicit control axes: none
+- `dk_wage_indexation_abolition_1982` (policies/dk_wage_indexation_abolition_1982.yaml); explicit control axes: none
+- `ec_borja_gradualist_stabilisation_1988_1992` (policies/ec_borja_gradualist_stabilisation_1988_1992.yaml); explicit control axes: none
+- `egypt_ersap_1991` (policies/egypt_ersap_1991.yaml); explicit control axes: none
+- `france_pinay_rueff_stabilisation_1958` (policies/france_pinay_rueff_stabilisation_1958.yaml); explicit control axes: none
+- `france_price_control_liberalisation_1978_1980` (policies/france_price_control_liberalisation_1978_1980.yaml); explicit control axes: none
+- `france_tournant_de_la_rigueur_1983` (policies/france_tournant_de_la_rigueur_1983.yaml); explicit control axes: none
+- `germany_currency_reform_1948` (policies/germany_currency_reform_1948.yaml); explicit control axes: none
+- `germany_price_liberalisation_1948` (policies/germany_price_liberalisation_1948.yaml); explicit control axes: none
+- `greece_ata_indexation_1982` (policies/greece_ata_indexation_1982.yaml); explicit control axes: none
+- `id_rupiah_devaluation_kenaikan_1978` (policies/id_rupiah_devaluation_kenaikan_1978.yaml); explicit control axes: none
+- `il_1984_package_deals_wage_price_coord` (policies/il_1984_package_deals_wage_price_coord.yaml); explicit control axes: none
+- `il_stabilisation_plan_1985` (policies/il_stabilisation_plan_1985.yaml); explicit control axes: none
+- `ir_iran_iraq_war_economy_1980_1988` (policies/ir_iran_iraq_war_economy_1980_1988.yaml); explicit control axes: none
+- `iran_targeted_subsidies_reform_2010` (policies/iran_targeted_subsidies_reform_2010.yaml); explicit control axes: none
+- `israel_1985_stabilization_plan` (policies/israel_1985_stabilization_plan.yaml); explicit control axes: none
+- `israel_bank_of_israel_no_printing_law_1985` (policies/israel_bank_of_israel_no_printing_law_1985.yaml); explicit control axes: none
+- `israel_stabilisation_plan_1985` (policies/israel_stabilisation_plan_1985.yaml); explicit control axes: none
+- `israel_wage_price_freeze_1985` (policies/israel_wage_price_freeze_1985.yaml); explicit control axes: none
+- `italy_accord_scotti_scala_mobile_1983` (policies/italy_accord_scotti_scala_mobile_1983.yaml); explicit control axes: none
+- `italy_decreto_san_valentino_scala_mobile_1984` (policies/italy_decreto_san_valentino_scala_mobile_1984.yaml); explicit control axes: none
+- `italy_protocollo_ciampi_scala_mobile_1993` (policies/italy_protocollo_ciampi_scala_mobile_1993.yaml); explicit control axes: none
+- `jp_boj_ycc_exit_2024` (policies/jp_boj_ycc_exit_2024.yaml); explicit control axes: none
+- `korea_park_hci_1973` (policies/korea_park_hci_1973.yaml); explicit control axes: none
+- `mexico_pacto_de_solidaridad` (policies/mexico_pacto_de_solidaridad.yaml); explicit control axes: none
+- `ng_naira_float_unification_2023` (policies/ng_naira_float_unification_2023.yaml); explicit control axes: none
+- `nicaragua_1988_stabilisation` (policies/nicaragua_1988_stabilisation.yaml); explicit control axes: none
+- `nl_energieplafond_price_cap_2023` (policies/nl_energieplafond_price_cap_2023.yaml); explicit control axes: none
+- `nl_housing_market_deregulation_2024` (policies/nl_housing_market_deregulation_2024.yaml); explicit control axes: none
+- `no_kleppe_packages_counter_cyclical_1975_1978` (policies/no_kleppe_packages_counter_cyclical_1975_1978.yaml); explicit control axes: none
+- `no_petroleum_moderate_pace_doctrine_1977` (policies/no_petroleum_moderate_pace_doctrine_1977.yaml); explicit control axes: none
+- `no_salmon_resource_rent_tax_2023` (policies/no_salmon_resource_rent_tax_2023.yaml); explicit control axes: none
+- `no_wage_price_freeze_1978_1979` (policies/no_wage_price_freeze_1978_1979.yaml); explicit control axes: none
+- `nz_wage_price_freeze_1982` (policies/nz_wage_price_freeze_1982.yaml); explicit control axes: none
+- `pe_mining_tax_regime_proposal_2021_2022` (policies/pe_mining_tax_regime_proposal_2021_2022.yaml); explicit control axes: none
+- `peru_fujishock_1990` (policies/peru_fujishock_1990.yaml); explicit control axes: none
+- `ph_oil_industry_deregulation_1996_1998` (policies/ph_oil_industry_deregulation_1996_1998.yaml); explicit control axes: none
+- `pl_zloty_devaluation_price_reform_1982` (policies/pl_zloty_devaluation_price_reform_1982.yaml); explicit control axes: none
+- `portugal_imf_standby_1983_1985` (policies/portugal_imf_standby_1983_1985.yaml); explicit control axes: none
+- `pt_golden_visa_real_estate_rollback_2023` (policies/pt_golden_visa_real_estate_rollback_2023.yaml); explicit control axes: none
+- `ru_ukraine_full_scale_invasion_2022` (policies/ru_ukraine_full_scale_invasion_2022.yaml); explicit control axes: none
+- `spain_housing_law_12_2023` (policies/spain_housing_law_12_2023.yaml); explicit control axes: none
+- `th_abhisit_thai_khem_khaeng_stimulus_2009` (policies/th_abhisit_thai_khem_khaeng_stimulus_2009.yaml); explicit control axes: none
+- `th_energy_price_caps_2023_2024` (policies/th_energy_price_caps_2023_2024.yaml); explicit control axes: none
+- `tr_january_24_1980_stabilisation_package` (policies/tr_january_24_1980_stabilisation_package.yaml); explicit control axes: none
+- `uk_electricity_privatisation_1989_1990` (policies/uk_electricity_privatisation_1989_1990.yaml); explicit control axes: none
+- `uk_network_charge_structure` (policies/uk_network_charge_structure.yaml); explicit control axes: none
+- `uk_truss_mini_budget_2022` (policies/uk_truss_mini_budget_2022.yaml); explicit control axes: none
+- `uk_wholesale_market_gas_indexation` (policies/uk_wholesale_market_gas_indexation.yaml); explicit control axes: none
+- `us_bretton_woods_exit_1971` (policies/us_bretton_woods_exit_1971.yaml); explicit control axes: none
+- `us_doe_creation_1977` (policies/us_doe_creation_1977.yaml); explicit control axes: none
+- `us_health_security_act_failure_1993_1994` (policies/us_health_security_act_failure_1993_1994.yaml); explicit control axes: none
+- `us_natural_gas_policy_act_1978` (policies/us_natural_gas_policy_act_1978.yaml); explicit control axes: none
+- `us_osha_1970` (policies/us_osha_1970.yaml); explicit control axes: none
+- `us_phase_ii_iv_controls_1971_1974` (policies/us_phase_ii_iv_controls_1971_1974.yaml); explicit control axes: none
+- `ve_agenda_venezuela_imf_1996` (policies/ve_agenda_venezuela_imf_1996.yaml); explicit control axes: none
+- `ve_exchange_controls_1994_1996` (policies/ve_exchange_controls_1994_1996.yaml); explicit control axes: none
+- `ve_gran_viraje_imf_package_1989` (policies/ve_gran_viraje_imf_package_1989.yaml); explicit control axes: none
+- `zambia_price_control_abolition_1991` (policies/zambia_price_control_abolition_1991.yaml); explicit control axes: none
+- `zimbabwe_rbz_fiscal_financing_2003_2009` (policies/zimbabwe_rbz_fiscal_financing_2003_2009.yaml); explicit control axes: none
+
+## Axis-inherited policy requirements
+
+- Policies with axis-inherited second-order requirements: 79
+- Policies missing explicit evaluation design despite axis requirements: 73
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 73, "explicit": 6}`
+- Source readiness across policy-axis requirements: `{"partial_ready": 911, "proprietary_gap": 158, "ready": 79, "reconstruct_needed": 391, "scrape_needed": 181}`
+
+### Most common required layers
+- `distributional_incidence` (78)
+- `net_welfare` (77)
+- `first_order_policy_effect` (72)
+- `behavioral_response` (69)
+- `macro_feedback` (66)
+- `fiscal_or_enforcement_cost` (59)
+- `quality_margin` (59)
+- `allocation_distortion` (58)
+- `second_order_supply_response` (58)
+- `leakage_or_substitution` (56)
+- `market_structure_response` (56)
+- `externality_or_spillover` (54)
+- `implementation_capacity` (28)
+- `dynamic_investment_response` (24)
+- `first_order_price_or_transfer` (7)
+
+### Top source-family requirements
+- `education_quality_attainment_panel` (79)
+- `energy_reliability_outage_operator_data` (79)
+- `environmental_externality_emissions_air_panel` (79)
+- `fiscal_tax_admin_compliance_panel` (79)
+- `healthcare_access_quality_wait_times` (79)
+- `household_distributional_microdata` (79)
+- `labour_market_admin_payroll_panel` (79)
+- `pharmaceutical_launch_price_access_panel` (79)
+- `public_procurement_contract_microdata` (79)
+- `rent_registry_cadastral_tenancy_microdata` (79)
+- `retail_scanner_price_quantity_panel` (79)
+- `trade_customs_product_panel` (79)
+- `welfare_accounting_case_ledger` (79)
+- `fuel_inventory_station_outage_queue_panel` (78)
+- `shelf_availability_stockout_surveys` (78)
+- `parallel_market_black_market_prices` (77)
+- `regulatory_enforcement_inspection_records` (77)
+- `firm_entry_exit_balance_sheet_panel` (75)
+- `policy_event_treatment_registry` (73)
+- `macro_panel_outcome_vintages` (72)
+- `rental_listing_unit_microdata` (71)
+- `national_building_permits_completions` (61)
+- `official_price_schedule_control_registry` (31)
+
+### Missing explicit design queue
+- `ao_fuel_subsidy_phaseout_2023` (candidate, policies/ao_fuel_subsidy_phaseout_2023.yaml): axes=fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.price_control_intensity; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `ar_fernandez_precios_cuidados_justos_2019` (candidate, policies/ar_fernandez_precios_cuidados_justos_2019.yaml): axes=fiscal.sectoral_subsidy, regulatory.product_market_competition; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `argentina_deregulation_omnibus_2024` (candidate, policies/argentina_deregulation_omnibus_2024.yaml): axes=fiscal.sectoral_subsidy, fiscal.spending_level, fiscal.tax_corporate, regulatory.labour_market_flexibility, regulatory.product_market_competition, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `argentina_fuel_subsidies_2003_2015` (candidate, policies/argentina_fuel_subsidies_2003_2015.yaml): axes=fiscal.spending_level, fiscal.transfer_expansion, monetary.central_bank_independence, regulatory.product_market_competition; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `be_energy_crisis_response_1974_1976` (candidate, policies/be_energy_crisis_response_1974_1976.yaml): axes=fiscal.sectoral_subsidy, regulatory.energy_supply_security; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `be_index_jump_2015` (candidate, policies/be_index_jump_2015.yaml): axes=fiscal.transfer_expansion, regulatory.labour_market_flexibility; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `be_sauts_dindex_1982_1984` (candidate, policies/be_sauts_dindex_1982_1984.yaml): axes=monetary.monetary_expansion_direction, regulatory.labour_market_flexibility; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `br_cruzado_plan_1986` (candidate, policies/br_cruzado_plan_1986.yaml): axes=monetary.monetary_expansion_direction, regulatory.financial_deregulation, regulatory.product_market_competition; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `br_maxi_devaluation_1983` (candidate, policies/br_maxi_devaluation_1983.yaml): axes=monetary.monetary_expansion_direction, regulatory.trade_openness; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 1}`
+- `br_nova_matriz_economica_2011_2014` (candidate, policies/br_nova_matriz_economica_2011_2014.yaml): axes=fiscal.sectoral_subsidy, monetary.central_bank_independence, regulatory.product_market_competition; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `cn_austerity_rectification_1988_1991` (candidate, policies/cn_austerity_rectification_1988_1991.yaml): axes=monetary.monetary_expansion_direction, regulatory.financial_deregulation, regulatory.product_market_competition; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `cz_energy_price_cap_2025` (candidate, policies/cz_energy_price_cap_2025.yaml): axes=fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.product_market_competition; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `dk_august_package_1977` (candidate, policies/dk_august_package_1977.yaml): axes=fiscal.spending_level, regulatory.labour_market_flexibility; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `dk_kartoffelkur_october_1982_package` (candidate, policies/dk_kartoffelkur_october_1982_package.yaml): axes=fiscal.spending_level, monetary.central_bank_independence; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `dk_wage_indexation_abolition_1982` (candidate, policies/dk_wage_indexation_abolition_1982.yaml): axes=regulatory.labour_market_flexibility; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ec_borja_gradualist_stabilisation_1988_1992` (candidate, policies/ec_borja_gradualist_stabilisation_1988_1992.yaml): axes=monetary.monetary_expansion_direction, regulatory.trade_openness; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 1}`
+- `egypt_ersap_1991` (candidate, policies/egypt_ersap_1991.yaml): axes=fiscal.tax_corporate, fiscal.tax_progressivity, regulatory.product_market_competition, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `france_pinay_rueff_stabilisation_1958` (candidate, policies/france_pinay_rueff_stabilisation_1958.yaml): axes=fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.sectoral_licensing, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `france_price_control_liberalisation_1978_1980` (candidate, policies/france_price_control_liberalisation_1978_1980.yaml): axes=regulatory.product_market_competition; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `france_tournant_de_la_rigueur_1983` (candidate, policies/france_tournant_de_la_rigueur_1983.yaml): axes=fiscal.spending_level, monetary.monetary_expansion_direction, regulatory.labour_market_flexibility; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `germany_currency_reform_1948` (candidate, policies/germany_currency_reform_1948.yaml): axes=monetary.central_bank_independence, regulatory.labour_market_flexibility, regulatory.product_market_competition, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `germany_price_liberalisation_1948` (candidate, policies/germany_price_liberalisation_1948.yaml): axes=monetary.central_bank_independence, regulatory.labour_market_flexibility, regulatory.product_market_competition, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `greece_ata_indexation_1982` (candidate, policies/greece_ata_indexation_1982.yaml): axes=monetary.monetary_expansion_direction, regulatory.labour_market_flexibility; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `id_rupiah_devaluation_kenaikan_1978` (candidate, policies/id_rupiah_devaluation_kenaikan_1978.yaml): axes=fiscal.sectoral_subsidy, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `il_1984_package_deals_wage_price_coord` (candidate, policies/il_1984_package_deals_wage_price_coord.yaml): axes=regulatory.labour_market_flexibility, regulatory.product_market_competition; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+
+## Movement axis/design gaps
+- `argentina_alberto_fernandez_fdt_2019_2023` has audited policies ['ar_fernandez_precios_cuidados_justos_2019'] but no child policy has an evaluation design.
+- `belgium_tindemans_cvp_1974_1978` has audited policies ['be_energy_crisis_response_1974_1976'] but no child policy has an evaluation design.
+- `china_tiananmen_austerity_1989_1992` has audited policies ['cn_austerity_rectification_1988_1991'] but no child policy has an evaluation design.
+- `czech_republic_babis_ano_second_2025_present` has audited policies ['cz_energy_price_cap_2025'] but no child policy has an evaluation design.
+- `denmark_anker_jorgensen_socdem_1975_1982` has audited policies ['dk_august_package_1977'] but no child policy has an evaluation design.
+- `ecuador_borja_id_1988_1992` has audited policies ['ec_borja_gradualist_stabilisation_1988_1992'] but no child policy has an evaluation design.
+- `france_giscard_udf_1974_1981` has audited policies ['france_price_control_liberalisation_1978_1980'] but no child policy has an evaluation design.
+- `france_mitterrand_first_term_1981_1988` has audited policies ['france_tournant_de_la_rigueur_1983'] but no child policy has an evaluation design.
+- `germany_wirtschaftswunder_erhard_1948_1966` has audited policies ['germany_currency_reform_1948', 'germany_price_liberalisation_1948'] but no child policy has an evaluation design.
+- `indonesia_suharto_oil_boom_1976_1985` has audited policies ['id_rupiah_devaluation_kenaikan_1978'] but no child policy has an evaluation design.
+- `israel_peres_national_unity_1984_1986` has audited policies ['il_stabilisation_plan_1985', 'israel_1985_stabilization_plan'] but no child policy has an evaluation design.
+- `israel_shamir_likud_first_1983_1984` has audited policies ['il_1984_package_deals_wage_price_coord'] but no child policy has an evaluation design.
+- `kirchner_fernandez_expansionary_2003_2015` has audited policies ['argentina_fuel_subsidies_2003_2015'] but no child policy has an evaluation design.
+- `milei_shock_therapy_argentina_2023` has audited policies ['argentina_deregulation_omnibus_2024'] but no child policy has an evaluation design.
+- `netherlands_rutte_iv_2022_2024` has audited policies ['nl_energieplafond_price_cap_2023'] but no child policy has an evaluation design.
+- `netherlands_schoof_rightwing_2024_present` has audited policies ['nl_housing_market_deregulation_2024'] but no child policy has an evaluation design.
+- `newzealand_muldoon_national_1975_1984` has audited policies ['nz_wage_price_freeze_1982'] but no child policy has an evaluation design.
+- `nicaragua_sandinista_1979_1990` has audited policies ['nicaragua_1988_stabilisation'] but no child policy has an evaluation design.
+- `norway_nordli_ap_1976_1981` has audited policies ['no_kleppe_packages_counter_cyclical_1975_1978', 'no_petroleum_moderate_pace_doctrine_1977', 'no_wage_price_freeze_1978_1979'] but no child policy has an evaluation design.
+- `norway_store_ap_sp_2021_present` has audited policies ['no_salmon_resource_rent_tax_2023'] but no child policy has an evaluation design.
+- `spain_sanchez_2018_present` has audited policies ['spain_housing_law_12_2023'] but no child policy has an evaluation design.
+- `thailand_srettha_pheu_thai_2023_2024` has audited policies ['th_energy_price_caps_2023_2024'] but no child policy has an evaluation design.
+- `turkey_pre_coup_instability_1975_1980` has audited policies ['tr_january_24_1980_stabilisation_package'] but no child policy has an evaluation design.
+- `venezuela_caldera_convergencia_1994_1999` has audited policies ['ve_agenda_venezuela_imf_1996', 've_exchange_controls_1994_1996'] but no child policy has an evaluation design.
+- `zambia_msunwe_structural_adjustment_1991_2001` has audited policies ['zambia_price_control_abolition_1991'] but no child policy has an evaluation design.
+
+## Axes missing second-order guidance
+- None among matched axes.
+
+## Data/fetcher gap candidates
+- household expenditure surveys (5)
+- producer margin surveys (2)
+- product disappearance counts (2)
+- enforcement action microdata (2)
+- constructed transfer-vs-price-control welfare ledger (1)
+- electricity outage frequency (1)
+- energy-sector investment (1)
+- fuel inventories and station outages (1)
+- household energy expenditure microdata (1)
+- transfer recipient records (1)
+- constructed energy welfare ledger (1)
+- household energy expenditure surveys (1)
+- utility customer class data (1)
+- constructed welfare ledger by episode and category (1)
+- consumer complaints and substitution surveys (1)
+- package-size and quality-adjusted price datasets (1)
+- rationing entitlement records (1)
+- EMA/FDA/national reimbursement approval dates (1)
+- IQVIA launch and price datasets (1)
+- IQVIA launch dates (1)
+- OECD pharmaceutical spending and price indices (1)
+- constructed drug-launch welfare ledger (1)
+- country-drug availability panels (1)
+- formulary restriction data (1)
+- national drug price registries (1)
+- prescription wait-time surveys (1)
+- reimbursement delay records (1)
+- CPI food micro-components (1)
+- FAO producer-price data (1)
+- constructed food-category welfare ledger (1)
+- consumer complaint records (1)
+- food quality inspection records (1)
+- market-arrival data by channel (1)
+- official procurement-price schedules (1)
+- scanner package-size data (1)
+- trade and border seizure records (1)
+- ACS commute and migration microdata (1)
+- building permits (1)
+- city rent microdata by controlled versus uncontrolled status (1)
+- city-level supply elasticity estimates (1)
+- completions (1)
+- lease duration and move records (1)
+- rental listings (1)
+- ACS household microdata (1)
+- ACS migration and tenure records (1)
+- US Census BPS metro permits (1)
+- constructed rent-gap plus quantity, queue, quality, and stock-flow ledger (1)
+- household income and tenure crosswalks (1)
+- municipal completion records (1)
+- rent-board tenancy duration (1)
+- rental listings by regulated/exempt status (1)
+- ACS migration and tenure microdata (1)
+- ACS/Census tenure-income microdata (1)
+- AirDNA or municipal short-term rental registries (1)
+- BLS MSA rent CPI subcomponents (1)
+- Berlin ImmoScout regulated-listing rents (1)
+- Eurostat subnational building-permit series (1)
+- Stockholm Bostadsformedlingen queue years (1)
+- US Census Building Permits Survey metro data (1)
+- Zillow/Apartment List city rent panels (1)
+- assessor condominium conversion records (1)
+- city code violation databases (1)
+- constructed welfare ledger from rent gaps, quantities, wait times, quality, and supply response (1)
+- maintenance complaint portals (1)
+- municipal completions and rental-listing feeds (1)
+- municipal waitlist records (1)
+- property tax class transitions (1)
+- property-condition survey microdata (1)
+- unit-level tenancy-duration records where accessible (1)
+- EU-SILC housing deprivation by tenure (1)
+- EU-SILC tenure-income microdata (1)
+- EU-SILC tenure-specific housing-cost microdata (1)
+- Eurostat tenure-share panels (1)
+- eurostat:bldg_pi_lt (1)
+- eurostat:ilc_lvho07a (1)
+- national building-permit and completion registers (1)
+- national cadastral tenure transitions (1)
+- national maintenance expenditure surveys (1)
+- national rental contract duration panels (1)
+- short-term rental registries (1)
+- budget subsidy lines (1)
+- constructed episode/category welfare ledger (1)
+- consumer complaint surveys (1)
+- enforcement agency records (1)
+- inspection and penalty counts (1)
+- rationing eligibility records (1)
+- scanner package-size microdata (1)
+- Deaton-Muellbauer quantity-rationing welfare ledger (1)
+- border seizure and smuggling reports (1)
+- consumer protection complaints (1)
+- controlled vs parallel quantity and price panels (1)
+- enforcement and inspection records (1)
+- national CPI controlled-basket components (1)
+- official price schedules (1)
+- package-size archives (1)
+- parallel-market price archives (1)
+- producer and retailer margin data (1)
+- scanner data (1)
+- Hsieh-Klenow style MPK dispersion (1)
+- OECD STAN sector productivity (1)
+- WB Enterprise Surveys (1)
+- firm entry/exit (1)
+- firm-level balance sheet panels (1)
+- national industrial censuses (1)
+- sector employment and wage panels (1)
+- sectoral value-added per worker dispersion (1)
+- subsidy incidence by income or firm age (1)
+- unit-level regulated/exempt classification (1)
+- listings linked to exemption status (1)
+- city-level mobility and quality/maintenance measures (1)
+- station-level stockout panel (1)
+- capped vs uncapped category scanner data (1)
+- retailer margin and compensation microdata (1)
+- monthly category shortage indicators beyond petroleum and beef (1)
+- product-quality and substitution measures (1)
+- compliance/enforcement cost data (1)
+- station-level outage and queue panel (1)
+- regional allocation quantity data (1)
+- consumer time-cost estimates (1)
+- consistent monthly controlled-basket shelf availability (1)
+- category-level official vs parallel prices (1)
+- weekly or monthly shelf-availability panel (1)
+- category-level parallel prices (1)
+
+## Data/fetcher readiness
+
+- Registered source families: 23
+- Mentioned source families: 17
+- Mentions by readiness: `{"partial_ready": 8, "proprietary_gap": 2, "reconstruct_needed": 5, "scrape_needed": 2}`
+- Unmatched candidate source labels: 0
+
+### Mentioned source families
+- `household_distributional_microdata` (partial_ready, priority=high): 19 mention(s); fetchers: data.fetchers.eurostat, data.fetchers.oecd, data.fetchers.us_census, data.fetchers.wid, data.fetchers.world_bank_wdi
+- `shelf_availability_stockout_surveys` (reconstruct_needed, priority=high): 13 mention(s); fetchers: none
+- `rent_registry_cadastral_tenancy_microdata` (reconstruct_needed, priority=high): 12 mention(s); fetchers: data.fetchers.eurostat
+- `retail_scanner_price_quantity_panel` (proprietary_gap, priority=high): 11 mention(s); fetchers: none
+- `regulatory_enforcement_inspection_records` (reconstruct_needed, priority=high): 11 mention(s); fetchers: data.fetchers.mercatus, data.fetchers.world_bank_wdi
+- `national_building_permits_completions` (partial_ready, priority=high): 10 mention(s); fetchers: data.fetchers.us_census, data.fetchers.eurostat, data.fetchers.destatis, data.fetchers.ons
+- `pharmaceutical_launch_price_access_panel` (proprietary_gap, priority=high): 8 mention(s); fetchers: data.fetchers.oecd, data.fetchers.who_gho
+- `welfare_accounting_case_ledger` (reconstruct_needed, priority=high): 8 mention(s); fetchers: none
+- `firm_entry_exit_balance_sheet_panel` (partial_ready, priority=high): 7 mention(s); fetchers: data.fetchers.oecd, data.fetchers.eurostat, data.fetchers.world_bank_wdi, data.fetchers.bis, data.fetchers.ons, data.fetchers.destatis
+- `rental_listing_unit_microdata` (scrape_needed, priority=high): 7 mention(s); fetchers: none
+- `parallel_market_black_market_prices` (partial_ready, priority=high): 6 mention(s); fetchers: data.fetchers.dolartoday, data.fetchers.bcv, data.fetchers.hanke, data.fetchers.hanke_tc
+- `official_price_schedule_control_registry` (scrape_needed, priority=high): 6 mention(s); fetchers: none
+- `fuel_inventory_station_outage_queue_panel` (reconstruct_needed, priority=high): 5 mention(s); fetchers: data.fetchers.eia, data.fetchers.iea
+- `energy_reliability_outage_operator_data` (partial_ready, priority=high): 3 mention(s); fetchers: data.fetchers.eia, data.fetchers.iea, data.fetchers.irena, data.fetchers.eea, data.fetchers.world_bank_wdi
+- `fiscal_tax_admin_compliance_panel` (partial_ready, priority=medium): 2 mention(s); fetchers: data.fetchers.imf_weo, data.fetchers.oecd, data.fetchers.world_bank_wdi, data.fetchers.ssb, data.fetchers.ine
+- `healthcare_access_quality_wait_times` (partial_ready, priority=medium): 1 mention(s); fetchers: data.fetchers.oecd, data.fetchers.who_gho, data.fetchers.world_bank_wdi
+- `labour_market_admin_payroll_panel` (partial_ready, priority=medium): 1 mention(s); fetchers: data.fetchers.bls, data.fetchers.ilostat, data.fetchers.oecd, data.fetchers.eurostat, data.fetchers.usdol
+
+## Scoreboard impact
+
+- Current public claim links: 4739
+- After declared second-order gates: 4660 public, 79 held
+- After strict missing-contract gate: 4610 public, 129 held
+- Declared-gate hold reasons: `{"declared_measurement_hold": 79}`
+- Strict-gate hold reasons: `{"declared_measurement_hold": 79, "missing_contract_hold": 50}`
+
+### Largest declared-gate scoreboard deltas
+- `degrowth`: q-net -5.6 -> -4.6 (+1.0); tested weight 141.2 -> 137.8
+- `market_socialist`: q-net -6.0 -> -5.0 (+1.0); tested weight 141.5 -> 138.0
+- `marxian`: q-net -2.8 -> -1.8 (+1.0); tested weight 145.0 -> 141.5
+- `mmt`: q-net -4.0 -> -3.0 (+1.0); tested weight 142.2 -> 138.8
+- `social_democratic`: q-net -5.8 -> -4.8 (+1.0); tested weight 156.2 -> 152.8
+- `democratic_socialist`: q-net -6.5 -> -5.5 (+1.0); tested weight 143.2 -> 140.2
+- `eco_socialist`: q-net -5.5 -> -4.5 (+1.0); tested weight 143.8 -> 140.8
+- `marxist_leninist`: q-net 0.0 -> 1.0 (+1.0); tested weight 142.2 -> 139.2
+- `post_keynesian`: q-net -4.4 -> -3.4 (+1.0); tested weight 147.0 -> 144.0
+- `austrian`: q-net 18.9 -> 18.4 (-0.5); tested weight 156.0 -> 152.5
+- `chicago_monetarism`: q-net 25.4 -> 24.9 (-0.5); tested weight 154.8 -> 151.2
+- `classical_liberal`: q-net 22.6 -> 22.1 (-0.5); tested weight 177.8 -> 174.2
+

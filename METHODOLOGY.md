@@ -6,7 +6,7 @@ Changes to this document are themselves tracked in git history. An invariant can
 
 ---
 
-## The six invariants
+## The seven invariants
 
 ### 1. Pre-registration precedes estimation
 
@@ -40,7 +40,13 @@ The default analytical lens is within-country change over time, not cross-sectio
 
 **Enforced by:** schema (`sample.temporal_structure` must be `panel`, `time_series`, or `cross_section_with_justification`) and review.
 
-### 6. Authored, reproducible, open to correction
+### 6. Second-order mechanism accounting before public promotion
+
+Policy experiments do not earn high-integrity public promotion from headline outcomes alone. A policy test must either measure the second-order channels implied by its coded axes or explicitly mark those channels as data gaps. For price controls and rent control this includes shortages, quality, search or queue costs, entry and exit, supply response, leakage, distributional incidence, and net welfare. For other policies the required layers are inherited from `axes.yaml`.
+
+**Enforced by:** schema and audit. Policy specs may declare `evaluation_design`; axes declare `second_order_measurement`; `scripts/audit_second_order_measurement.py` and `engine/policy_second_order_requirements_index.*` expand every policy into required layers, preferred designs, and source-family gaps. Claims that lack the required mechanism contract remain candidate, descriptive, or screen-only until the missing layers are measured.
+
+### 7. Authored, reproducible, open to correction
 
 IESET is an authored framework, not an anonymous consensus document. [DISCLOSURE.md](DISCLOSURE.md) records the author's perspective and broad economic exposure. Every hypothesis YAML includes a pre-run `prior_confidence`, not as a badge of truth, but as an audit marker for how surprising the result was expected to be. The framework's defence is reproducibility and correction: pre-registration commits, public replication code, challengeable mappings, and visible updates when a test changes the record.
 

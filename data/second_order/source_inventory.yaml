@@ -1,0 +1,949 @@
+# yaml-language-server: $schema=../../schemas/second_order_data_source_inventory.schema.json
+version: 1
+last_seeded_utc: "2026-06-28T00:00:00Z"
+program: second_order_gate_data_acquisition
+backlog_snapshot:
+  strict_held_public_claim_links: 4720
+  strict_eligible_public_claim_links: 19
+  held_hypotheses: 620
+  policies_missing_explicit_design: 3169
+  policies_needing_treated_comparison_units: 3169
+  policies_needing_exact_event_dates: 1208
+
+source_records:
+  - source_id: ieset_policy_event_treatment_contracts
+    source_name: IESET policy event and treatment-definition contract corpus
+    source_family_id: policy_event_treatment_registry
+    publisher: IESET plus official statutes, gazettes, and regulator notices
+    domain: cross_policy_treatment_definition
+    geography: global
+    unit_of_observation: policy-event by jurisdiction, treated unit, comparison unit, and effective date
+    time_coverage: 1800-present as policy specs are backfilled
+    policy_or_outcome_fields:
+      - policy_id
+      - effective_date
+      - end_date
+      - treated_units
+      - comparison_units
+      - eligibility_rules
+      - exemptions
+      - thresholds
+      - treatment_intensity
+      - source_url
+      - confidence
+    access_format: YAML and generated JSON/Parquet once normalized
+    source_url: https://framework.ieset.org/
+    license_or_terms: IESET internal derived registry with official-source provenance; source documents retain publisher terms
+    update_frequency: continuous backfill
+    second_order_layers:
+      - first_order_policy_effect
+      - first_order_price_or_transfer
+      - implementation_capacity
+    gate_unlocks:
+      - Defines treatment timing and unit splits for event studies, DiD, border comparisons, and triple differences.
+      - Unblocks the 3169 policies needing treated/comparison unit coding.
+      - Unblocks the 1208 policies needing exact event dates.
+    acquisition_status: partial_ready
+    ingestion_difficulty: high
+    immediate_payoff_rank: 1
+    verification_status: seed_verified_official_page
+    notes: >
+      This is the first data spine to build. Outcome datasets cannot pass the
+      second-order gate without treatment dates, coverage rules, exemptions,
+      and comparison-unit definitions.
+
+  - source_id: euromod_eu_silc_hbs_spine
+    source_name: EUROMOD with Eurostat EU-SILC and Household Budget Survey microdata
+    source_family_id: household_distributional_microdata
+    publisher: European Commission Joint Research Centre and Eurostat
+    domain: tax_benefit_distributional_microdata
+    geography: European Union and associated EUROMOD countries
+    unit_of_observation: household and person by survey year or policy simulation
+    time_coverage: survey and EUROMOD release dependent
+    policy_or_outcome_fields:
+      - market_income
+      - disposable_income
+      - taxes
+      - transfers
+      - household_consumption
+      - demographic_group
+      - weights
+      - simulated_policy_rule
+    access_format: EUROMOD model files plus restricted Eurostat research microdata
+    source_url: https://euromod-web.jrc.ec.europa.eu/overview/what-is-euromod
+    license_or_terms: EUROMOD is distributed under its terms; input microdata require Eurostat research access
+    update_frequency: annual or release-based
+    second_order_layers:
+      - distributional_incidence
+      - behavioral_response
+      - fiscal_or_enforcement_cost
+      - net_welfare
+    gate_unlocks:
+      - Measures incidence and tax-benefit channels for fiscal, welfare, labor, and energy policies.
+      - Supplies distributional weights for welfare-accounting case ledgers.
+    acquisition_status: restricted_access
+    ingestion_difficulty: high
+    immediate_payoff_rank: 2
+    verification_status: seed_verified_official_page
+    notes: >
+      Highest leverage for European distributional incidence. Store access
+      notes separately from raw microdata; do not commit restricted files.
+
+  - source_id: lis_lws_harmonized_microdata
+    source_name: LIS and LWS harmonized income and wealth microdata
+    source_family_id: household_distributional_microdata
+    publisher: Luxembourg Income Study Data Center
+    domain: household_distributional_microdata
+    geography: cross-national
+    unit_of_observation: household and person by country wave
+    time_coverage: country-wave dependent
+    policy_or_outcome_fields:
+      - disposable_income
+      - market_income
+      - labor_income
+      - transfers
+      - taxes
+      - wealth
+      - household_demographics
+      - weights
+    access_format: remote research access and harmonized files
+    source_url: https://www.lisdatacenter.org/our-data/lis-database/
+    license_or_terms: restricted research access under LIS terms
+    update_frequency: release-based
+    second_order_layers:
+      - distributional_incidence
+      - behavioral_response
+      - net_welfare
+    gate_unlocks:
+      - Gives cross-national incidence and household distributional measures where national microdata are hard to harmonize.
+      - Supports welfare, tax, labor, housing, and transfer decomposition.
+    acquisition_status: restricted_access
+    ingestion_difficulty: high
+    immediate_payoff_rank: 3
+    verification_status: seed_verified_official_page
+    notes: >
+      Use for harmonized analysis and metadata first; raw access requires
+      project approval and cannot be committed into the repo.
+
+  - source_id: ceq_fiscal_redistribution_data_center
+    source_name: Commitment to Equity fiscal redistribution indicators and microdata
+    source_family_id: household_distributional_microdata
+    publisher: Commitment to Equity Institute
+    domain: fiscal_distributional_incidence
+    geography: cross-national, strongest in developing and middle-income countries
+    unit_of_observation: country-year, income group, household where microdata are open
+    time_coverage: study dependent
+    policy_or_outcome_fields:
+      - pre_fiscal_income
+      - post_fiscal_income
+      - taxes
+      - transfers
+      - poverty
+      - inequality
+      - income_decile
+      - fiscal_incidence_component
+    access_format: public indicators and selected harmonized microdata
+    source_url: https://commitmentoequity.org/datacenter/
+    license_or_terms: CEQ terms; source survey restrictions vary by country
+    update_frequency: release-based
+    second_order_layers:
+      - distributional_incidence
+      - fiscal_or_enforcement_cost
+      - net_welfare
+    gate_unlocks:
+      - Directly measures fiscal incidence for tax, transfer, subsidy, and welfare architecture tests.
+      - Useful bridge where EUROMOD/LIS coverage is weak.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 4
+    verification_status: seed_verified_official_page
+    notes: >
+      Good early target because public indicators can land before restricted
+      household microdata access is arranged.
+
+  - source_id: world_bank_lsms_microdata
+    source_name: World Bank Living Standards Measurement Study microdata
+    source_family_id: household_distributional_microdata
+    publisher: World Bank
+    domain: household_consumption_income_welfare
+    geography: global, strong Global South coverage
+    unit_of_observation: household, person, plot, enterprise, and community by survey wave
+    time_coverage: country survey dependent
+    policy_or_outcome_fields:
+      - consumption
+      - income
+      - employment
+      - agriculture
+      - assets
+      - program_participation
+      - household_demographics
+      - weights
+    access_format: microdata catalog downloads and licensed access
+    source_url: https://www.worldbank.org/en/programs/lsms
+    license_or_terms: World Bank microdata catalog terms and country survey restrictions
+    update_frequency: survey-wave based
+    second_order_layers:
+      - distributional_incidence
+      - behavioral_response
+      - net_welfare
+    gate_unlocks:
+      - Supplies household welfare and consumption incidence for non-OECD policy tests.
+      - Supports subsidy, transfer, food, agriculture, and labor response channels.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 5
+    verification_status: seed_verified_official_page
+    notes: >
+      Prioritize surveys linked to high-priority held hypotheses before trying
+      to ingest the whole LSMS universe.
+
+  - source_id: ipums_cps_acs_sipp_cex_irs_spine
+    source_name: US household tax-benefit-labor spine from IPUMS, CEX, SIPP, ACS, and IRS SOI
+    source_family_id: household_distributional_microdata
+    publisher: IPUMS, BLS, Census Bureau, and IRS SOI
+    domain: us_household_distribution_labor_tax
+    geography: United States
+    unit_of_observation: person, household, tax unit, and aggregate percentile table
+    time_coverage: source dependent, mostly annual or monthly
+    policy_or_outcome_fields:
+      - household_income
+      - employment
+      - transfers
+      - taxes
+      - consumption
+      - rent_burden
+      - demographics
+      - tax_percentile
+      - weights
+    access_format: public-use microdata, registered downloads, and public statistical tables
+    source_url: https://cps.ipums.org/cps/
+    license_or_terms: source-specific public-use and registration terms; IRS microdata access is evolving
+    update_frequency: annual or monthly depending on source
+    second_order_layers:
+      - distributional_incidence
+      - behavioral_response
+      - net_welfare
+      - first_order_policy_effect
+    gate_unlocks:
+      - Fastest US incidence spine for tax, welfare, labor, housing, and inflation burden tests.
+      - Can feed the welfare-accounting ledger without waiting for restricted admin data.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 6
+    verification_status: seed_verified_official_page
+    notes: >
+      Treat this as a US bundle with multiple source manifests rather than one
+      raw file. Keep provenance for each component.
+
+  - source_id: bls_qcew_downloadable_files
+    source_name: BLS Quarterly Census of Employment and Wages downloadable files
+    source_family_id: labour_market_admin_payroll_panel
+    publisher: U.S. Bureau of Labor Statistics
+    domain: labor_payroll_admin_panel
+    geography: United States
+    unit_of_observation: geography, industry, ownership, quarter or year
+    time_coverage: modern QCEW releases, annual and quarterly
+    policy_or_outcome_fields:
+      - employment
+      - wages
+      - establishments
+      - industry
+      - geography
+      - ownership
+      - period
+    access_format: downloadable files and public tables
+    source_url: https://www.bls.gov/cew/downloadable-data-files.htm
+    license_or_terms: U.S. public data; verify BLS terms per release
+    update_frequency: quarterly
+    second_order_layers:
+      - behavioral_response
+      - distributional_incidence
+      - allocation_distortion
+      - net_welfare
+    gate_unlocks:
+      - Measures employment and wage responses for labor, tax, wage, sectoral, and local policy tests.
+      - Provides public fallback before restricted linked employer-employee access.
+    acquisition_status: partial_ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 7
+    verification_status: seed_verified_official_page
+    notes: >
+      Existing BLS fetcher likely covers some surfaces; this wave should
+      confirm QCEW exact files and add second-order manifests.
+
+  - source_id: census_lehd_qwi_j2j
+    source_name: Census LEHD QWI and Job-to-Job Flows
+    source_family_id: labour_market_admin_payroll_panel
+    publisher: U.S. Census Bureau
+    domain: linked_employer_employee_public_tabulations
+    geography: United States
+    unit_of_observation: geography, industry, demographic group, quarter
+    time_coverage: state and series dependent
+    policy_or_outcome_fields:
+      - hires
+      - separations
+      - earnings
+      - job_flows
+      - worker_demographics
+      - industry
+      - geography
+    access_format: public tabulations and APIs; confidential microdata through FSRDC
+    source_url: https://lehd.ces.census.gov/data/
+    license_or_terms: Census data terms; confidential microdata require approved access
+    update_frequency: quarterly
+    second_order_layers:
+      - behavioral_response
+      - allocation_distortion
+      - distributional_incidence
+      - dynamic_investment_response
+    gate_unlocks:
+      - Measures job flows and earnings dynamics around tax, wage, welfare, migration, and labor-law treatments.
+      - Adds worker heterogeneity that QCEW lacks.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 8
+    verification_status: seed_verified_official_page
+    notes: >
+      Start from public QWI/J2J before proposing restricted FSRDC work.
+
+  - source_id: ilostat_global_labor_indicators
+    source_name: ILOSTAT global labor indicators
+    source_family_id: labour_market_admin_payroll_panel
+    publisher: International Labour Organization
+    domain: global_labor_market_panel
+    geography: global
+    unit_of_observation: country, demographic group, sector, period
+    time_coverage: annual and higher-frequency series depending on indicator
+    policy_or_outcome_fields:
+      - employment
+      - unemployment
+      - labor_force_participation
+      - hours
+      - wages
+      - informality
+      - demographics
+    access_format: public API and bulk downloads
+    source_url: https://ilostat.ilo.org/data/
+    license_or_terms: ILOSTAT terms
+    update_frequency: periodic
+    second_order_layers:
+      - behavioral_response
+      - distributional_incidence
+      - macro_feedback
+    gate_unlocks:
+      - Gives global labor response coverage for hypotheses outside US/EU microdata.
+      - Useful as an aggregate fallback for labor and welfare channels.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 9
+    verification_status: seed_verified_official_page
+    notes: >
+      Existing ILOSTAT fetcher should be checked for the specific labor
+      dimensions needed by held hypotheses.
+
+  - source_id: oecd_global_revenue_statistics
+    source_name: OECD Global Revenue Statistics Database
+    source_family_id: fiscal_tax_admin_compliance_panel
+    publisher: OECD
+    domain: fiscal_tax_structure_panel
+    geography: global and regional OECD coverage
+    unit_of_observation: country, year, tax type, level of government
+    time_coverage: country dependent annual series
+    policy_or_outcome_fields:
+      - tax_revenue
+      - tax_type
+      - social_security_contributions
+      - level_of_government
+      - gdp_share
+      - country
+      - year
+    access_format: OECD Data Explorer/API and downloadable tables
+    source_url: https://www.oecd.org/en/data/datasets/global-revenue-statistics-database.html
+    license_or_terms: OECD terms
+    update_frequency: annual
+    second_order_layers:
+      - fiscal_or_enforcement_cost
+      - behavioral_response
+      - distributional_incidence
+      - net_welfare
+    gate_unlocks:
+      - Provides public tax-structure backbone for fiscal cost and tax mix tests.
+      - Feeds welfare ledgers and tax-policy treatment intensity measures.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 10
+    verification_status: seed_verified_official_page
+    notes: >
+      Not sufficient for incidence alone, but essential for fiscal ledger
+      scaffolding and country-year tax intensity.
+
+  - source_id: wid_distributional_national_accounts
+    source_name: WID.world distributional national accounts
+    source_family_id: household_distributional_microdata
+    publisher: World Inequality Database
+    domain: distributional_national_accounts
+    geography: global
+    unit_of_observation: country, year, percentile or fractile
+    time_coverage: long historical series, country dependent
+    policy_or_outcome_fields:
+      - income_share
+      - wealth_share
+      - average_income
+      - percentile
+      - country
+      - year
+    access_format: public downloads and API
+    source_url: https://wid.world/
+    license_or_terms: WID terms
+    update_frequency: release-based
+    second_order_layers:
+      - distributional_incidence
+      - net_welfare
+      - macro_feedback
+    gate_unlocks:
+      - Provides public distributional aggregates where microdata access is delayed.
+      - Useful for long-horizon tax, wealth, and inequality claims.
+    acquisition_status: partial_ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 11
+    verification_status: seed_verified_official_page
+    notes: >
+      Use as an aggregate incidence patch, not as a substitute for policy-unit
+      household microdata where causal identification needs micro records.
+
+  - source_id: ocds_open_contracting
+    source_name: Open Contracting Data Standard publisher ecosystem
+    source_family_id: public_procurement_contract_microdata
+    publisher: Open Contracting Partnership and OCDS publishers
+    domain: public_procurement_contract_microdata
+    geography: multi-country
+    unit_of_observation: tender, award, contract, buyer, supplier
+    time_coverage: publisher dependent
+    policy_or_outcome_fields:
+      - buyer
+      - supplier
+      - tender_value
+      - award_value
+      - procurement_method
+      - contract_period
+      - item_classification
+      - amendments
+      - competition_count
+    access_format: OCDS JSON/CSV and publisher APIs
+    source_url: https://standard.open-contracting.org/latest/en/
+    license_or_terms: publisher-specific open contracting terms
+    update_frequency: publisher dependent
+    second_order_layers:
+      - implementation_capacity
+      - market_structure_response
+      - fiscal_or_enforcement_cost
+      - quality_margin
+    gate_unlocks:
+      - Measures industrial policy targeting, fiscal cost, procurement concentration, and implementation capacity.
+      - Provides firm and supplier exposure for subsidy and state-capacity tests.
+    acquisition_status: scrape_needed
+    ingestion_difficulty: high
+    immediate_payoff_rank: 12
+    verification_status: seed_verified_official_page
+    notes: >
+      Use OCDS as the normalization target even when individual portals expose
+      non-OCDS source files.
+
+  - source_id: eu_ted_procurement_notices
+    source_name: Tenders Electronic Daily public procurement notices
+    source_family_id: public_procurement_contract_microdata
+    publisher: Publications Office of the European Union
+    domain: eu_public_procurement
+    geography: European Union and covered procurement markets
+    unit_of_observation: procurement notice, tender, award, buyer, supplier
+    time_coverage: EU procurement releases, historical and current
+    policy_or_outcome_fields:
+      - buyer
+      - supplier
+      - cpv_code
+      - contract_value
+      - award_date
+      - procedure_type
+      - country
+      - notice_type
+    access_format: EU portal, API, and bulk datasets
+    source_url: https://ted.europa.eu/en/
+    license_or_terms: EU reuse terms; verify per TED dataset
+    update_frequency: daily or release-based
+    second_order_layers:
+      - implementation_capacity
+      - fiscal_or_enforcement_cost
+      - market_structure_response
+      - quality_margin
+    gate_unlocks:
+      - High-coverage procurement layer for EU industrial policy, public spending, and competition tests.
+      - Can be normalized to the welfare and procurement ledgers.
+    acquisition_status: scrape_needed
+    ingestion_difficulty: high
+    immediate_payoff_rank: 13
+    verification_status: seed_verified_official_page
+    notes: >
+      Prioritize a narrow TED pilot with CPV, award value, buyer, supplier,
+      and procedure variables before broad historical ingestion.
+
+  - source_id: wits_trade_tariff_api
+    source_name: World Integrated Trade Solution trade and tariff API
+    source_family_id: trade_customs_product_panel
+    publisher: World Bank
+    domain: trade_customs_tariff_panel
+    geography: global
+    unit_of_observation: reporter, partner, product, year, trade flow
+    time_coverage: historical annual series, source dependent
+    policy_or_outcome_fields:
+      - reporter
+      - partner
+      - hs_product_code
+      - trade_value
+      - quantity
+      - tariff_rate
+      - flow
+      - year
+    access_format: public API and downloads
+    source_url: https://wits.worldbank.org/witsapiintro.aspx?lang=en
+    license_or_terms: World Bank and WITS terms
+    update_frequency: periodic
+    second_order_layers:
+      - first_order_policy_effect
+      - leakage_or_substitution
+      - market_structure_response
+      - dynamic_investment_response
+    gate_unlocks:
+      - Fastest ready source for trade leakage, substitution, industrial policy, and tariff tests.
+      - Links product-level exposure to firm and welfare ledgers.
+    acquisition_status: ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 14
+    verification_status: endpoint_verified
+    notes: >
+      Existing WITS fetcher exists; this program should map it into
+      second-order gate layers and manifests.
+
+  - source_id: un_comtrade_plus
+    source_name: UN Comtrade Plus
+    source_family_id: trade_customs_product_panel
+    publisher: United Nations Statistics Division
+    domain: product_trade_panel
+    geography: global
+    unit_of_observation: reporter, partner, commodity, period, trade flow
+    time_coverage: historical and current trade data
+    policy_or_outcome_fields:
+      - commodity_code
+      - trade_value
+      - quantity
+      - reporter
+      - partner
+      - flow
+      - period
+    access_format: public portal/API and bulk downloads
+    source_url: https://comtradeplus.un.org/
+    license_or_terms: UN Comtrade terms
+    update_frequency: regular releases
+    second_order_layers:
+      - first_order_policy_effect
+      - leakage_or_substitution
+      - market_structure_response
+    gate_unlocks:
+      - Complements WITS for product-level trade flows and leakage checks.
+      - Useful for price controls, sanctions, tariffs, and industrial policy exposure.
+    acquisition_status: ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 15
+    verification_status: seed_verified_official_page
+    notes: >
+      Existing UN Comtrade fetcher should be integrated with treatment
+      contracts and HS concordances.
+
+  - source_id: unctadstat_trade_development
+    source_name: UNCTADstat trade and development data
+    source_family_id: trade_customs_product_panel
+    publisher: UNCTAD
+    domain: trade_development_panel
+    geography: global
+    unit_of_observation: country, product or indicator, year
+    time_coverage: indicator dependent
+    policy_or_outcome_fields:
+      - trade_indicator
+      - country
+      - partner
+      - product
+      - value
+      - year
+    access_format: public portal/API and downloads
+    source_url: https://unctadstat.unctad.org/EN/
+    license_or_terms: UNCTAD terms
+    update_frequency: periodic
+    second_order_layers:
+      - macro_feedback
+      - first_order_policy_effect
+      - market_structure_response
+    gate_unlocks:
+      - Adds country-level trade and development indicators around product-level WITS/Comtrade panels.
+      - Useful for macro feedback and trade-policy spillover layers.
+    acquisition_status: ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 16
+    verification_status: seed_verified_official_page
+    notes: >
+      Treat as a macro/trade complement rather than a product microdata
+      replacement.
+
+  - source_id: world_bank_enterprise_surveys
+    source_name: World Bank Enterprise Surveys
+    source_family_id: firm_entry_exit_balance_sheet_panel
+    publisher: World Bank
+    domain: firm_survey_microdata
+    geography: global developing and transition economies
+    unit_of_observation: firm survey response
+    time_coverage: country survey-wave dependent
+    policy_or_outcome_fields:
+      - firm_size
+      - sector
+      - sales
+      - employment
+      - investment
+      - finance_constraints
+      - regulation_constraints
+      - exporter_status
+      - productivity_proxy
+    access_format: public indicators and microdata downloads
+    source_url: https://www.enterprisesurveys.org/en/data
+    license_or_terms: World Bank Enterprise Surveys terms
+    update_frequency: survey-wave based
+    second_order_layers:
+      - market_structure_response
+      - allocation_distortion
+      - dynamic_investment_response
+      - implementation_capacity
+    gate_unlocks:
+      - Measures firm constraints, productivity proxies, and investment responses in non-OECD policy cases.
+      - Useful for industrial policy, regulation, finance, trade, and institutional reform hypotheses.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 17
+    verification_status: seed_verified_official_page
+    notes: >
+      Start with public indicators and survey metadata, then pull country
+      waves relevant to held hypotheses.
+
+  - source_id: eu_klems_intanprod_productivity
+    source_name: EU KLEMS and INTANProd productivity database
+    source_family_id: firm_entry_exit_balance_sheet_panel
+    publisher: LUISS and EU KLEMS consortium
+    domain: sector_productivity_growth_accounting
+    geography: EU, US, Japan, and other covered economies depending on release
+    unit_of_observation: country, industry, year
+    time_coverage: release dependent historical series
+    policy_or_outcome_fields:
+      - value_added
+      - labor_input
+      - capital_input
+      - tfp
+      - industry
+      - country
+      - year
+    access_format: public downloads
+    source_url: https://euklems-intanprod-llee.luiss.it/
+    license_or_terms: EU KLEMS/INTANProd terms
+    update_frequency: release-based
+    second_order_layers:
+      - dynamic_investment_response
+      - market_structure_response
+      - allocation_distortion
+      - macro_feedback
+    gate_unlocks:
+      - Adds sector productivity response to competition, regulation, trade, and industrial-policy tests.
+      - Useful where firm microdata are restricted.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 18
+    verification_status: seed_verified_official_page
+    notes: >
+      Existing EU KLEMS fetcher should be checked against second-order gate
+      target fields.
+
+  - source_id: eia_open_data_energy_reliability
+    source_name: EIA Open Data energy, electricity, petroleum, and stock series
+    source_family_id: energy_reliability_outage_operator_data
+    publisher: U.S. Energy Information Administration
+    domain: energy_reliability_supply_price_panel
+    geography: United States with some international series
+    unit_of_observation: plant, balancing area, region, fuel, product, period
+    time_coverage: series dependent
+    policy_or_outcome_fields:
+      - generation
+      - demand
+      - fuel_stocks
+      - petroleum_stocks
+      - price
+      - capacity
+      - outages
+      - imports_exports
+    access_format: public API and downloads
+    source_url: https://www.eia.gov/opendata/
+    license_or_terms: EIA public data terms; verify per API
+    update_frequency: high-frequency to annual depending on series
+    second_order_layers:
+      - second_order_supply_response
+      - quality_margin
+      - implementation_capacity
+      - dynamic_investment_response
+      - externality_or_spillover
+    gate_unlocks:
+      - Measures reliability, stocks, price, and supply response for energy price controls and transition policies.
+      - Supports fuel outage and queue proxy construction.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 19
+    verification_status: seed_verified_official_page
+    notes: >
+      Existing EIA fetcher should be extended with a second-order manifest
+      rather than rebuilt from scratch.
+
+  - source_id: entso_e_transparency_platform
+    source_name: ENTSO-E Transparency Platform
+    source_family_id: energy_reliability_outage_operator_data
+    publisher: ENTSO-E
+    domain: european_grid_reliability_operator_data
+    geography: Europe
+    unit_of_observation: bidding zone, plant, interconnector, period
+    time_coverage: platform dependent high-frequency series
+    policy_or_outcome_fields:
+      - generation
+      - load
+      - outages
+      - balancing
+      - cross_border_flows
+      - prices
+      - congestion
+    access_format: API and platform downloads, API token may be required
+    source_url: https://transparency.entsoe.eu/
+    license_or_terms: ENTSO-E platform terms
+    update_frequency: high-frequency
+    second_order_layers:
+      - second_order_supply_response
+      - quality_margin
+      - implementation_capacity
+      - externality_or_spillover
+    gate_unlocks:
+      - European grid reliability and price layer for nuclear, renewable, price-cap, and industrial electricity tests.
+      - Supports high-frequency event studies around energy interventions.
+    acquisition_status: restricted_access
+    ingestion_difficulty: high
+    immediate_payoff_rank: 20
+    verification_status: seed_unverified_url
+    notes: >
+      Needs API-key and redistribution review before production ingestion.
+
+  - source_id: zillow_research_rent_data
+    source_name: Zillow Research rent and housing market data
+    source_family_id: city_rent_affordability_panel
+    publisher: Zillow Research
+    domain: city_rent_market_panel
+    geography: United States
+    unit_of_observation: geography, housing type, month
+    time_coverage: series dependent monthly data
+    policy_or_outcome_fields:
+      - observed_rent_index
+      - listings
+      - inventory
+      - days_on_market
+      - geography
+      - period
+    access_format: public CSV downloads
+    source_url: https://www.zillow.com/research/data/
+    license_or_terms: Zillow research data terms; verify before redistribution
+    update_frequency: monthly
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+      - allocation_distortion
+    gate_unlocks:
+      - First-order rent and market tightness layer for US rent-control and housing-supply event studies.
+      - Works with permits, ACS, quality, and treatment registries.
+    acquisition_status: partial_ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 21
+    verification_status: seed_verified_official_page
+    notes: >
+      City-level sprint already landed a Zillow panel; this program keeps it
+      wired into broader second-order gates.
+
+  - source_id: us_census_building_permits_survey
+    source_name: U.S. Census Building Permits Survey
+    source_family_id: national_building_permits_completions
+    publisher: U.S. Census Bureau
+    domain: housing_supply_response
+    geography: United States
+    unit_of_observation: permit-issuing geography, structure type, month or year
+    time_coverage: monthly and annual series
+    policy_or_outcome_fields:
+      - permits
+      - units
+      - structure_type
+      - geography
+      - period
+    access_format: public downloads and API
+    source_url: https://www.census.gov/construction/bps/
+    license_or_terms: U.S. public data; verify table metadata
+    update_frequency: monthly
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    gate_unlocks:
+      - Supply-response layer for rent control, zoning, and local housing policy tests.
+      - Supports triple-difference designs when treatment units are coded.
+    acquisition_status: partial_ready
+    ingestion_difficulty: low
+    immediate_payoff_rank: 22
+    verification_status: endpoint_verified
+    notes: >
+      City-level sprint already landed BPS output; next loop should link it to
+      treatment contracts and donor pools.
+
+  - source_id: nyc_open_data_housing_quality_bundle
+    source_name: NYC Open Data housing quality, complaints, violations, and stock records
+    source_family_id: city_housing_code_violation_inspection_panel
+    publisher: New York City Open Data and housing agencies
+    domain: housing_quality_supply_leakage
+    geography: New York City
+    unit_of_observation: building, complaint, violation, permit, date
+    time_coverage: dataset dependent
+    policy_or_outcome_fields:
+      - housing_complaints
+      - code_violations
+      - inspections
+      - building_permits
+      - property_class
+      - geography
+      - date
+    access_format: Socrata APIs and downloads
+    source_url: https://opendata.cityofnewyork.us/
+    license_or_terms: NYC Open Data terms
+    update_frequency: dataset dependent
+    second_order_layers:
+      - quality_margin
+      - implementation_capacity
+      - distributional_incidence
+      - allocation_distortion
+    gate_unlocks:
+      - Quality and enforcement layer for NYC rent stabilization and tenant-protection cases.
+      - Provides template for other city open-data housing bundles.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 23
+    verification_status: endpoint_verified
+    notes: >
+      City sprint landed a NYC panel; preserve Socrata IDs and codebook
+      references when promoting to production.
+
+  - source_id: kilts_retail_scanner_datasets
+    source_name: Kilts Center retail scanner and consumer panel datasets
+    source_family_id: retail_scanner_price_quantity_panel
+    publisher: Kilts Center for Marketing, Chicago Booth
+    domain: retail_scanner_price_quantity
+    geography: United States, vendor dependent
+    unit_of_observation: UPC, store, market, household, week
+    time_coverage: licensed dataset dependent
+    policy_or_outcome_fields:
+      - price
+      - quantity
+      - product
+      - store
+      - market
+      - household
+      - week
+      - category
+    access_format: licensed research datasets
+    source_url: https://www.chicagobooth.edu/research/kilts/datasets
+    license_or_terms: licensed/proprietary research terms
+    update_frequency: license/release dependent
+    second_order_layers:
+      - first_order_price_or_transfer
+      - leakage_or_substitution
+      - quality_margin
+      - net_welfare
+      - distributional_incidence
+    gate_unlocks:
+      - Measures controlled versus uncontrolled categories, substitution, shrinkflation, and quantity response.
+      - Critical for price-control tests that cannot rely on CPI alone.
+    acquisition_status: proprietary_gap
+    ingestion_difficulty: high
+    immediate_payoff_rank: 24
+    verification_status: seed_verified_official_page
+    notes: >
+      Track as an access target. Do not block public alternatives such as
+      regulator stockout records and official price schedules.
+
+  - source_id: official_price_schedule_registry
+    source_name: Official price schedule and control order registry
+    source_family_id: official_price_schedule_control_registry
+    publisher: national and subnational price-control regulators
+    domain: price_control_treatment_registry
+    geography: global, policy dependent
+    unit_of_observation: controlled product, jurisdiction, effective date, legal order
+    time_coverage: policy dependent
+    policy_or_outcome_fields:
+      - controlled_product
+      - capped_price
+      - reference_price
+      - effective_date
+      - end_date
+      - enforcement_body
+      - legal_source_url
+      - exemption_rule
+    access_format: official gazettes, regulator tables, PDFs, HTML pages
+    source_url: https://framework.ieset.org/
+    license_or_terms: official-source terms; verify per jurisdiction
+    update_frequency: policy dependent
+    second_order_layers:
+      - first_order_price_or_transfer
+      - implementation_capacity
+    gate_unlocks:
+      - Defines capped versus uncapped goods for controlled category tests.
+      - Gives product-level treatment timing for stockout, scanner, and black-market panels.
+    acquisition_status: scrape_needed
+    ingestion_difficulty: high
+    immediate_payoff_rank: 25
+    verification_status: scout_reported_unverified
+    notes: >
+      This is a jurisdiction-by-jurisdiction reconstruction lane, not a single
+      global publisher.
+
+  - source_id: dolartoday_bcv_hanke_parallel_prices
+    source_name: DolarToday, BCV, and Hanke parallel-market price and exchange-rate sources
+    source_family_id: parallel_market_black_market_prices
+    publisher: DolarToday, Banco Central de Venezuela, and Hanke/Krus research sources
+    domain: parallel_market_price_leakage
+    geography: Venezuela and selected exchange-control/black-market cases
+    unit_of_observation: quote, source, date, currency or product
+    time_coverage: source dependent
+    policy_or_outcome_fields:
+      - parallel_exchange_rate
+      - official_exchange_rate
+      - quote_date
+      - source
+      - currency
+      - inflation_proxy
+    access_format: fetchers, official tables, and research reconstructions
+    source_url: https://www.bcv.org.ve/estadisticas/tipos-de-cambio
+    license_or_terms: source-specific terms
+    update_frequency: daily to release-based
+    second_order_layers:
+      - leakage_or_substitution
+      - allocation_distortion
+      - net_welfare
+    gate_unlocks:
+      - Measures black-market leakage and hidden inflation under price and exchange controls.
+      - Useful for Venezuela, Zimbabwe, Argentina, and other control cases.
+    acquisition_status: partial_ready
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 26
+    verification_status: endpoint_verified
+    notes: >
+      Existing fetchers cover several sources; next loop should harmonize them
+      into a second-order leakage panel.

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/second_order_sources.schema.json",
+  "title": "IESET Second-Order Source Family Registry",
+  "description": "Registry of dataset and fetcher families needed to measure second-order policy effects such as supply response, allocation distortion, leakage, quality, welfare, distributional incidence, implementation capacity, and spillovers.",
+  "type": "object",
+  "required": ["version", "source_families"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "source_families": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*[a-z0-9]$": {
+          "type": "object",
+          "required": [
+            "name",
+            "description",
+            "layers",
+            "policy_domains",
+            "readiness",
+            "priority"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {"type": "string", "minLength": 5},
+            "description": {"type": "string", "minLength": 30},
+            "layers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "first_order_price_or_transfer",
+                  "first_order_policy_effect",
+                  "second_order_supply_response",
+                  "behavioral_response",
+                  "allocation_distortion",
+                  "leakage_or_substitution",
+                  "quality_margin",
+                  "fiscal_or_enforcement_cost",
+                  "implementation_capacity",
+                  "market_structure_response",
+                  "dynamic_investment_response",
+                  "macro_feedback",
+                  "externality_or_spillover",
+                  "net_welfare",
+                  "distributional_incidence"
+                ]
+              }
+            },
+            "policy_domains": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"type": "string"}
+            },
+            "readiness": {
+              "type": "string",
+              "enum": [
+                "ready",
+                "partial_ready",
+                "manual_drop",
+                "scrape_needed",
+                "reconstruct_needed",
+                "proprietary_gap",
+                "no_known_source"
+              ]
+            },
+            "publisher_refs": {
+              "type": "array",
+              "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+            },
+            "existing_fetchers": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "aliases": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 3},
+              "description": "Lowercase phrases that map free-form candidate_sources / known_data_gaps text to this family."
+            },
+            "frequency": {"type": "string"},
+            "unit_of_observation": {"type": "string"},
+            "geographic_granularity": {"type": "string"},
+            "legal_access": {"type": "string"},
+            "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+            "notes": {"type": "string"}
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

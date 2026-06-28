@@ -1,0 +1,268 @@
+# yaml-language-server: $schema=../../schemas/second_order_data_ingestion_queue.schema.json
+version: 1
+created_utc: "2026-06-28T00:00:00Z"
+
+waves:
+  - wave_id: treatment_contracts_backfill_v0
+    objective: Backfill exact event dates, treated units, comparison units, exemptions, thresholds, and phase-ins for the highest-priority held hypotheses and all control-focused policies.
+    status: schema_design_ready
+    owner_lane: treatment_contract_swarm
+    loop_type: scout
+    cadence: continuous until top 200 held hypotheses and 79 control policies are coded
+    source_ids:
+      - ieset_policy_event_treatment_contracts
+      - official_price_schedule_registry
+    source_family_ids:
+      - policy_event_treatment_registry
+      - official_price_schedule_control_registry
+      - municipal_housing_policy_event_registry
+    target_gate_layers:
+      - first_order_policy_effect
+      - first_order_price_or_transfer
+      - implementation_capacity
+    target_cases:
+      - price_controls_shortage_black_market_progression
+      - rent_control_housing_supply_quality_decay_chain
+      - capacity_energy_shock_transfers_vs_price_controls
+      - ml_energy_price_controls_shortage_fiscal_burden
+    expected_outputs:
+      - data/second_order/derived/policy_treatment_contracts_top200.yaml
+      - data/second_order/derived/policy_treatment_contracts_top200.json
+      - data/manifests/fetch_run_<utc>_second_order_treatment_contracts.yaml
+    acceptance_checks:
+      - Each contract has an official statute, gazette, regulator notice, or policy source URL.
+      - Effective dates, repeal/end dates when applicable, treated units, comparison units, exemptions, and thresholds are explicit.
+      - Treatment jurisdiction is separated from outcome geography and linked through a crosswalk where needed.
+      - Event confidence is recorded separately from outcome-data quality.
+      - The queue reduces `needs_treated_and_comparison_unit_coding` and `needs_exact_event_dates` counts in the generated registry.
+
+  - wave_id: household_distribution_spine_v0
+    objective: Build a household incidence spine from public or research-access household, tax-benefit, consumption, and distributional sources.
+    status: research_pending
+    owner_lane: distributional_microdata_swarm
+    loop_type: restricted_access
+    cadence: weekly access and metadata loop, with public aggregate pulls whenever available
+    source_ids:
+      - euromod_eu_silc_hbs_spine
+      - lis_lws_harmonized_microdata
+      - ceq_fiscal_redistribution_data_center
+      - world_bank_lsms_microdata
+      - ipums_cps_acs_sipp_cex_irs_spine
+      - wid_distributional_national_accounts
+    source_family_ids:
+      - household_distributional_microdata
+    target_gate_layers:
+      - distributional_incidence
+      - behavioral_response
+      - fiscal_or_enforcement_cost
+      - net_welfare
+    expected_outputs:
+      - data/second_order/derived/household_distribution_spine_metadata.yaml
+      - data/second_order/derived/household_distribution_public_aggregates.parquet
+      - data/manifests/fetch_run_<utc>_household_distribution_spine.yaml
+    acceptance_checks:
+      - Restricted datasets are represented by access notes and metadata only; no restricted raw microdata are committed.
+      - Public aggregates retain publisher variables, country codes, year, income group, and weighting notes.
+      - Each row maps to at least one second-order layer and one source-family ID.
+      - Redistribution and survey terms are pinned before any production ingestion.
+
+  - wave_id: labor_payroll_spine_v0
+    objective: Pull public labor/payroll panels and define restricted linked-employer-employee access targets.
+    status: ready_for_fetcher_design
+    owner_lane: labor_payroll_swarm
+    loop_type: fetcher_design
+    cadence: daily until public QCEW, LEHD/QWI, and ILOSTAT manifests are in place
+    source_ids:
+      - bls_qcew_downloadable_files
+      - census_lehd_qwi_j2j
+      - ilostat_global_labor_indicators
+    source_family_ids:
+      - labour_market_admin_payroll_panel
+    target_gate_layers:
+      - behavioral_response
+      - distributional_incidence
+      - allocation_distortion
+      - net_welfare
+    expected_outputs:
+      - data/second_order/derived/labor_payroll_public_panel.parquet
+      - data/second_order/derived/labor_payroll_restricted_access_targets.yaml
+      - data/manifests/fetch_run_<utc>_labor_payroll_spine.yaml
+    acceptance_checks:
+      - Public panels preserve geography, sector, period, demographic splits, and source-native IDs.
+      - Restricted sources are listed with access pathway, target variables, and reason they are needed.
+      - Labor outcomes can join to treatment contracts by geography/sector/period.
+
+  - wave_id: welfare_ledger_v0
+    objective: Create a reusable welfare-accounting ledger schema and populate first public case rows from treatment, household, labor, fiscal, price, quality, and externality panels.
+    status: schema_design_ready
+    owner_lane: welfare_accounting_swarm
+    loop_type: normalization
+    cadence: weekly ledger build loop
+    source_ids:
+      - ieset_policy_event_treatment_contracts
+      - ceq_fiscal_redistribution_data_center
+      - oecd_global_revenue_statistics
+      - wid_distributional_national_accounts
+      - bls_qcew_downloadable_files
+      - eia_open_data_energy_reliability
+      - wits_trade_tariff_api
+    source_family_ids:
+      - welfare_accounting_case_ledger
+      - household_distributional_microdata
+      - fiscal_tax_admin_compliance_panel
+      - labour_market_admin_payroll_panel
+      - trade_customs_product_panel
+      - energy_reliability_outage_operator_data
+    target_gate_layers:
+      - net_welfare
+      - distributional_incidence
+      - fiscal_or_enforcement_cost
+      - allocation_distortion
+      - quality_margin
+    expected_outputs:
+      - data/second_order/derived/welfare_accounting_ledger_schema.yaml
+      - data/second_order/derived/welfare_accounting_case_ledger.parquet
+      - data/manifests/fetch_run_<utc>_welfare_accounting_ledger.yaml
+    acceptance_checks:
+      - Ledger separates transfer/direct benefit, payer burden, fiscal cost, deadweight loss, quality/search/queue cost, supply/investment response, and externality terms.
+      - Every estimate has source panel, method note, uncertainty/confidence, and affected group.
+      - Missing terms are explicit data gaps, not silently zeroed.
+
+  - wave_id: trade_procurement_firm_fast_lane_v0
+    objective: Use ready trade sources first, then normalize procurement and firm dynamics panels for industrial policy, trade, competition, and implementation-capacity tests.
+    status: ready_for_fetcher_design
+    owner_lane: trade_procurement_firm_swarm
+    loop_type: fetcher_design
+    cadence: daily for ready trade panels, weekly for procurement and firm microdata
+    source_ids:
+      - wits_trade_tariff_api
+      - un_comtrade_plus
+      - unctadstat_trade_development
+      - ocds_open_contracting
+      - eu_ted_procurement_notices
+      - world_bank_enterprise_surveys
+      - eu_klems_intanprod_productivity
+    source_family_ids:
+      - trade_customs_product_panel
+      - public_procurement_contract_microdata
+      - firm_entry_exit_balance_sheet_panel
+    target_gate_layers:
+      - first_order_policy_effect
+      - leakage_or_substitution
+      - market_structure_response
+      - dynamic_investment_response
+      - implementation_capacity
+      - allocation_distortion
+      - fiscal_or_enforcement_cost
+    expected_outputs:
+      - data/second_order/derived/trade_customs_product_panel.parquet
+      - data/second_order/derived/procurement_contract_microdata_index.parquet
+      - data/second_order/derived/firm_dynamics_public_panel.parquet
+      - data/manifests/fetch_run_<utc>_trade_procurement_firm_fast_lane.yaml
+    acceptance_checks:
+      - WITS, Comtrade, and UNCTAD outputs preserve product codes, reporter/partner, period, flow, value, quantity, and tariff fields.
+      - Procurement rows preserve buyer, supplier, award value, procurement method, sector/product code, and competition markers.
+      - Firm panels preserve industry, geography, period, entry/exit or productivity fields, and policy exposure joins.
+
+  - wave_id: energy_reliability_outage_v0
+    objective: Pull energy reliability, outage, fuel-stock, and price panels for energy price controls, subsidies, and transition-policy second-order tests.
+    status: ready_for_fetcher_design
+    owner_lane: energy_reliability_swarm
+    loop_type: fetcher_design
+    cadence: daily for EIA public data, weekly scout loop for ENTSO-E and regulator portals
+    source_ids:
+      - eia_open_data_energy_reliability
+      - entso_e_transparency_platform
+    source_family_ids:
+      - energy_reliability_outage_operator_data
+      - fuel_inventory_station_outage_queue_panel
+    target_gate_layers:
+      - second_order_supply_response
+      - quality_margin
+      - implementation_capacity
+      - dynamic_investment_response
+      - externality_or_spillover
+    target_cases:
+      - capacity_energy_shock_transfers_vs_price_controls
+      - ml_energy_price_controls_shortage_fiscal_burden
+    expected_outputs:
+      - data/second_order/derived/energy_reliability_public_panel.parquet
+      - data/second_order/derived/fuel_inventory_outage_proxy_panel.parquet
+      - data/manifests/fetch_run_<utc>_energy_reliability_outage.yaml
+    acceptance_checks:
+      - EIA output preserves series IDs, geography, fuel/product, period, unit, and revision/vintage metadata.
+      - Outage/reliability proxies are separated from direct station-level stockout evidence.
+      - API keys or restricted access requirements are documented without committing secrets.
+
+  - wave_id: city_housing_control_stack_v0
+    objective: Extend the existing city-level sprint into second-order gate promotion by joining regulated/exempt treatment coding to rent, permits, quality, eviction, listing, and mobility layers.
+    status: in_progress
+    owner_lane: city_housing_control_swarm
+    loop_type: normalization
+    cadence: every 2 hours through the existing city-level hunt loop
+    source_ids:
+      - zillow_research_rent_data
+      - us_census_building_permits_survey
+      - nyc_open_data_housing_quality_bundle
+      - ieset_policy_event_treatment_contracts
+    source_family_ids:
+      - city_rent_affordability_panel
+      - national_building_permits_completions
+      - city_housing_code_violation_inspection_panel
+      - municipal_housing_policy_event_registry
+      - rent_registry_cadastral_tenancy_microdata
+      - rental_listing_unit_microdata
+    target_gate_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - quality_margin
+      - allocation_distortion
+      - distributional_incidence
+      - dynamic_investment_response
+    target_cases:
+      - rent_control_housing_supply_quality_decay_chain
+      - rent_control_reduces_housing_supply_and_quality
+    expected_outputs:
+      - data/second_order/derived/city_housing_control_stack.parquet
+      - data/second_order/derived/city_housing_treatment_outcome_crosswalk.yaml
+      - data/manifests/fetch_run_<utc>_city_housing_control_stack.yaml
+    acceptance_checks:
+      - Regulated/exempt unit definitions remain separate from aggregate city rent outcomes.
+      - Supply, quality, eviction, and listing panels retain source-native geographies and crosswalk confidence.
+      - Any triple-difference-ready claim has treated city/control city, regulated/exempt unit, and before/after event coding.
+
+  - wave_id: retail_scarcity_price_control_v0
+    objective: Build price-control scarcity layers from official price schedules, scanner access targets, stockout/complaint sources, and parallel-market price panels.
+    status: research_pending
+    owner_lane: retail_scarcity_swarm
+    loop_type: scout
+    cadence: weekly source discovery and access loop
+    source_ids:
+      - official_price_schedule_registry
+      - kilts_retail_scanner_datasets
+      - dolartoday_bcv_hanke_parallel_prices
+      - ieset_policy_event_treatment_contracts
+    source_family_ids:
+      - official_price_schedule_control_registry
+      - retail_scanner_price_quantity_panel
+      - shelf_availability_stockout_surveys
+      - parallel_market_black_market_prices
+    target_gate_layers:
+      - first_order_price_or_transfer
+      - leakage_or_substitution
+      - quality_margin
+      - net_welfare
+      - distributional_incidence
+      - allocation_distortion
+    target_cases:
+      - price_controls_shortage_black_market_progression
+      - price_controls_produce_shortages_and_quality_degradation
+    expected_outputs:
+      - data/second_order/derived/official_price_control_schedule_registry.yaml
+      - data/second_order/derived/retail_scarcity_source_access_targets.yaml
+      - data/second_order/derived/parallel_market_price_panel.parquet
+      - data/manifests/fetch_run_<utc>_retail_scarcity_price_control.yaml
+    acceptance_checks:
+      - Controlled and uncontrolled product categories are explicitly coded before outcome joins.
+      - Scanner data access limitations are recorded separately from public stockout and complaint sources.
+      - Stockout, queue, shortage, and black-market evidence is not inferred from price series alone.

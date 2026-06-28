@@ -33,6 +33,70 @@ variables:
   - name: log_gdp_pc
     source: world_bank_wdi:NY.GDP.PCAP.KD
     transformation: log
+mechanism_measurement:
+  mechanism_type: price_control
+  design_features:
+  - panel_fe_screen
+  - controlled_vs_uncontrolled_categories
+  - high_frequency_event_study
+  - welfare_accounting
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - placeholder global country-years
+    control_units:
+    - placeholder global country-years
+    controlled_or_regulated_units:
+    - not measured in draft placeholder
+    exempt_or_uncontrolled_units:
+    - not measured in draft placeholder
+    time_frequency: annual
+    notes: Current variables do not measure pharmaceutical price controls, launch timing, availability, or therapeutic categories.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Regulated pharmaceutical prices fall relative to international or therapeutic-comparator benchmarks.
+    variable_names: []
+    candidate_sources:
+    - national drug price registries
+    - OECD pharmaceutical spending and price indices
+    - IQVIA launch and price datasets
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Firms delay launches, skip markets, or reduce availability when expected returns fall.
+    variable_names: []
+    candidate_sources:
+    - IQVIA launch dates
+    - EMA/FDA/national reimbursement approval dates
+    - country-drug availability panels
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: allocation_distortion
+    mechanism: Price caps can shift access toward waitlists, prior authorization, or constrained formularies.
+    variable_names: []
+    candidate_sources:
+    - formulary restriction data
+    - reimbursement delay records
+    - prescription wait-time surveys
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Consumer savings must be netted against launch delay, lower availability, and health losses from delayed access.
+    variable_names: []
+    candidate_sources:
+    - constructed drug-launch welfare ledger
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - future_cohorts
+  - taxpayers
+  promotion_gate: descriptive_only
+  notes: >
+    The existing result card is a placeholder artifact and should be excluded
+    from scoreboard or mechanism-attribution use until drug-launch data land.
 estimator:
   template: panel_fe
   fixed_effects:

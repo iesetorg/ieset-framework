@@ -1,0 +1,5911 @@
+# Second-order measurement audit
+
+This audit checks whether policy-experiment artifacts separate first-order effects from second-order behavioral, supply, allocation, leakage, quality, welfare, distributional, implementation, and spillover effects.
+
+## Summary
+- **matched_hypotheses**: 1806
+- **hypotheses_with_contract**: 15
+- **control_focused_hypotheses**: 26
+- **matched_policies**: 3175
+- **policies_with_evaluation_design**: 6
+- **policies_with_axis_second_order_requirements**: 3175
+- **policies_missing_explicit_design_but_axis_requirements**: 3169
+- **control_focused_policies**: 79
+- **matched_movements**: 653
+- **movements_with_control_axis**: 5
+- **matched_axes**: 21
+- **axes_with_second_order_measurement**: 21
+
+## Hypotheses missing contracts
+- `None` (None, hypotheses/conditional_taxonomy/agricultural_production_efficiency.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/climate_externality_mitigation.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/german_mittelstand_skilled_manufacturing_model.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/growth_without_broad_participation.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/health_insurance_adverse_selection.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/intergenerational_mobility_institutional_determinants.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/labour_share_decline_institutional_decomposition.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/natural_monopolies.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/nordic_institutional_design.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/pandemic_coordination_externality.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/public_goods_non_excludable.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/resource_rent_capture_via_swf.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/singapore_healthcare_forced_saving_model.yaml)
+- `None` (None, hypotheses/conditional_taxonomy/trade_in_goods_and_services.yaml)
+- `capital_mobility_worker_bargaining_power` (draft, hypotheses/distribution/capital_mobility_worker_bargaining_power.yaml)
+- `chicago_permanent_income_consumption_smoothing_microdata` (candidate, hypotheses/distribution/chicago_permanent_income_consumption_smoothing_microdata.yaml)
+- `chicago_taxes_optimal_ramsey_excess_burden_high_marginal_rate` (candidate, hypotheses/distribution/chicago_taxes_optimal_ramsey_excess_burden_high_marginal_rate.yaml)
+- `child_benefit_expansion_child_poverty_effect` (candidate, hypotheses/distribution/child_benefit_expansion_child_poverty_effect.yaml)
+- `china_1978_price_liberalisation_growth_decomposition` (draft, hypotheses/distribution/china_1978_price_liberalisation_growth_decomposition.yaml)
+- `clinton_welfare_reform_deep_poverty_effect` (draft, hypotheses/distribution/clinton_welfare_reform_deep_poverty_effect.yaml)
+- `consumer_choice_variety_trade_market_reform` (candidate, hypotheses/distribution/consumer_choice_variety_trade_market_reform.yaml)
+- `cross_school_gini_growth_underconsumption_1990_2023` (candidate, hypotheses/distribution/cross_school_gini_growth_underconsumption_1990_2023.yaml)
+- `cross_school_private_credit_gini_financialisation_1990_2023` (candidate, hypotheses/distribution/cross_school_private_credit_gini_financialisation_1990_2023.yaml)
+- `cross_school_tax_revenue_gini_redistribution_1990_2023` (candidate, hypotheses/distribution/cross_school_tax_revenue_gini_redistribution_1990_2023.yaml)
+- `cross_school_tax_revenue_poverty_reduction_1990_2023` (candidate, hypotheses/distribution/cross_school_tax_revenue_poverty_reduction_1990_2023.yaml)
+- `cuba_2021_protests_economic_reform_response` (candidate, hypotheses/distribution/cuba_2021_protests_economic_reform_response.yaml)
+- `demo_brazil_demographic_transition_inequality` (candidate, hypotheses/distribution/demo_brazil_demographic_transition_inequality.yaml)
+- `demo_gender_pay_gap_oecd_evolution` (candidate, hypotheses/distribution/demo_gender_pay_gap_oecd_evolution.yaml)
+- `eurostat_unemployment_gini_stabilizer_panel` (candidate, hypotheses/distribution/eurostat_unemployment_gini_stabilizer_panel.yaml)
+- `growth_vs_distribution_tradeoff` (pre_registered, hypotheses/distribution/growth_vs_distribution_tradeoff.yaml)
+- `heritage_business_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_business_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_business_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_business_freedom_extreme_poverty_income_region_robustness.yaml)
+- `heritage_economic_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_economic_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_economic_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_economic_freedom_extreme_poverty_income_region_robustness.yaml)
+- `heritage_financial_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_financial_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_financial_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_financial_freedom_extreme_poverty_income_region_robustness.yaml)
+- `heritage_government_integrity_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_government_integrity_extreme_poverty_current_gap.yaml)
+- `heritage_government_integrity_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_government_integrity_extreme_poverty_income_region_robustness.yaml)
+- `heritage_government_spending_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_government_spending_extreme_poverty_current_gap.yaml)
+- `heritage_government_spending_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_government_spending_extreme_poverty_income_region_robustness.yaml)
+- `heritage_investment_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_investment_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_investment_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_investment_freedom_extreme_poverty_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_judicial_effectiveness_extreme_poverty_current_gap.yaml)
+- `heritage_judicial_effectiveness_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_judicial_effectiveness_extreme_poverty_income_region_robustness.yaml)
+- `heritage_labor_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_labor_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_labor_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_labor_freedom_extreme_poverty_income_region_robustness.yaml)
+- `heritage_monetary_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_monetary_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_monetary_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_monetary_freedom_extreme_poverty_income_region_robustness.yaml)
+- `heritage_property_rights_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_property_rights_extreme_poverty_current_gap.yaml)
+- `heritage_property_rights_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_property_rights_extreme_poverty_income_region_robustness.yaml)
+- `heritage_tax_burden_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_tax_burden_extreme_poverty_current_gap.yaml)
+- `heritage_tax_burden_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_tax_burden_extreme_poverty_income_region_robustness.yaml)
+- `heritage_trade_freedom_extreme_poverty_current_gap` (candidate, hypotheses/distribution/heritage_trade_freedom_extreme_poverty_current_gap.yaml)
+- `heritage_trade_freedom_extreme_poverty_income_region_robustness` (candidate, hypotheses/distribution/heritage_trade_freedom_extreme_poverty_income_region_robustness.yaml)
+- `housing_cost_driven_real_wage_divergence` (pre_registered, hypotheses/distribution/housing_cost_driven_real_wage_divergence.yaml)
+- `housing_supply_flexibility_real_wage` (candidate, hypotheses/distribution/housing_supply_flexibility_real_wage.yaml)
+- `informality_market_entry_barriers` (candidate, hypotheses/distribution/informality_market_entry_barriers.yaml)
+- `intergenerational_mobility_cross_country` (pre_registered, hypotheses/distribution/intergenerational_mobility_cross_country.yaml)
+- `labor_share_decline_causes` (pre_registered, hypotheses/distribution/labor_share_decline_causes.yaml)
+- `labour_market_reform_institutional_complementarity` (draft, hypotheses/distribution/labour_market_reform_institutional_complementarity.yaml)
+- `labour_share_decline_capital_mobility_panel` (candidate, hypotheses/distribution/labour_share_decline_capital_mobility_panel.yaml)
+- `latam_resource_nationalisation_social_outcome_tradeoff` (draft, hypotheses/distribution/latam_resource_nationalisation_social_outcome_tradeoff.yaml)
+- `life_satisfaction_income_market_institutions` (candidate, hypotheses/distribution/life_satisfaction_income_market_institutions.yaml)
+- `lula_bolsa_familia_poverty_reduction_decomposition_2003_2010` (pre_registered, hypotheses/distribution/lula_bolsa_familia_poverty_reduction_decomposition_2003_2010.yaml)
+- `middle_class_asset_building_market_depth` (candidate, hypotheses/distribution/middle_class_asset_building_market_depth.yaml)
+- `milei_shock_therapy_poverty_and_real_wage_effect` (draft, hypotheses/distribution/milei_shock_therapy_poverty_and_real_wage_effect.yaml)
+- `monopoly_capital_concentration_markup_link` (candidate, hypotheses/distribution/monopoly_capital_concentration_markup_link.yaml)
+- `occupational_licensing_productivity_drag` (draft, hypotheses/distribution/occupational_licensing_productivity_drag.yaml)
+- `oecd_market_to_disposable_gini_compression_panel` (candidate, hypotheses/distribution/oecd_market_to_disposable_gini_compression_panel.yaml)
+- `oecd_public_transfers_poverty_reduction_panel` (candidate, hypotheses/distribution/oecd_public_transfers_poverty_reduction_panel.yaml)
+- `oecd_union_density_disposable_gini_panel` (pre_registered, hypotheses/distribution/oecd_union_density_disposable_gini_panel.yaml)
+- `poverty_exit_durable_jobs_vs_transfer` (candidate, hypotheses/distribution/poverty_exit_durable_jobs_vs_transfer.yaml)
+- `quality_adjusted_consumption_market_liberal_panel` (candidate, hypotheses/distribution/quality_adjusted_consumption_market_liberal_panel.yaml)
+- `r_minus_g_wealth_income_ratio_post_1980` (draft, hypotheses/distribution/r_minus_g_wealth_income_ratio_post_1980.yaml)
+- `redistribution_gini_compression_median_income_growth_oecd` (candidate, hypotheses/distribution/redistribution_gini_compression_median_income_growth_oecd.yaml)
+- `redistribution_market_income_growth_poverty_exit_panel` (candidate, hypotheses/distribution/redistribution_market_income_growth_poverty_exit_panel.yaml)
+- `redistribution_social_spending_bottom40_growth_panel` (candidate, hypotheses/distribution/redistribution_social_spending_bottom40_growth_panel.yaml)
+- `redistribution_tax_transfer_mobility_oecd` (candidate, hypotheses/distribution/redistribution_tax_transfer_mobility_oecd.yaml)
+- `russia_china_transition_comparison` (draft, hypotheses/distribution/russia_china_transition_comparison.yaml)
+- `tax_inequality_argentina_macri_milei_simplification` (draft, hypotheses/distribution/tax_inequality_argentina_macri_milei_simplification.yaml)
+- `tax_inequality_australia_2009_top_rate_response` (draft, hypotheses/distribution/tax_inequality_australia_2009_top_rate_response.yaml)
+- `tax_inequality_biden_ctc_2021_child_poverty` (candidate, hypotheses/distribution/tax_inequality_biden_ctc_2021_child_poverty.yaml)
+- `tax_inequality_brazil_tax_base_evolution` (draft, hypotheses/distribution/tax_inequality_brazil_tax_base_evolution.yaml)
+- `tax_inequality_bush_2003_dividend_capgains_cut` (draft, hypotheses/distribution/tax_inequality_bush_2003_dividend_capgains_cut.yaml)
+- `tax_inequality_canada_2016_top_rate_increase` (draft, hypotheses/distribution/tax_inequality_canada_2016_top_rate_increase.yaml)
+- `tax_inequality_chile_post_pinochet_progressivity` (draft, hypotheses/distribution/tax_inequality_chile_post_pinochet_progressivity.yaml)
+- `tax_inequality_china_vat_reform_2016` (draft, hypotheses/distribution/tax_inequality_china_vat_reform_2016.yaml)
+- `tax_inequality_clinton_1993_obra_top_bracket` (draft, hypotheses/distribution/tax_inequality_clinton_1993_obra_top_bracket.yaml)
+- `tax_inequality_estonia_1994_flat_tax_dividend_reform` (draft, hypotheses/distribution/tax_inequality_estonia_1994_flat_tax_dividend_reform.yaml)
+- `tax_inequality_france_1981_wealth_tax_top_share` (draft, hypotheses/distribution/tax_inequality_france_1981_wealth_tax_top_share.yaml)
+- `tax_inequality_france_2017_isf_to_ifi_abolition` (draft, hypotheses/distribution/tax_inequality_france_2017_isf_to_ifi_abolition.yaml)
+- `tax_inequality_germany_2000_schroder_reform` (draft, hypotheses/distribution/tax_inequality_germany_2000_schroder_reform.yaml)
+- `tax_inequality_greece_troika_tax_hikes_2010_2018` (draft, hypotheses/distribution/tax_inequality_greece_troika_tax_hikes_2010_2018.yaml)
+- `tax_inequality_india_gst_2017_distributional` (draft, hypotheses/distribution/tax_inequality_india_gst_2017_distributional.yaml)
+- `tax_inequality_italy_irpef_flattening_2002_2024` (draft, hypotheses/distribution/tax_inequality_italy_irpef_flattening_2002_2024.yaml)
+- `tax_inequality_japan_consumption_tax_hikes` (draft, hypotheses/distribution/tax_inequality_japan_consumption_tax_hikes.yaml)
+- `tax_inequality_korea_progressive_turn_2017_2020` (draft, hypotheses/distribution/tax_inequality_korea_progressive_turn_2017_2020.yaml)
+- `tax_inequality_mexico_2014_reform_distributional` (draft, hypotheses/distribution/tax_inequality_mexico_2014_reform_distributional.yaml)
+- `tax_inequality_norway_wealth_tax_retention` (draft, hypotheses/distribution/tax_inequality_norway_wealth_tax_retention.yaml)
+- `tax_inequality_nz_2010_gst_rate_swap` (draft, hypotheses/distribution/tax_inequality_nz_2010_gst_rate_swap.yaml)
+- `tax_inequality_reagan_1981_top_share_response` (draft, hypotheses/distribution/tax_inequality_reagan_1981_top_share_response.yaml)
+- `tax_inequality_reagan_1986_base_broadening_neutrality` (draft, hypotheses/distribution/tax_inequality_reagan_1986_base_broadening_neutrality.yaml)
+- `tax_inequality_russia_2001_flat_tax_13pct` (draft, hypotheses/distribution/tax_inequality_russia_2001_flat_tax_13pct.yaml)
+- `tax_inequality_south_africa_property_tax_burden` (draft, hypotheses/distribution/tax_inequality_south_africa_property_tax_burden.yaml)
+- `tax_inequality_spain_top_rate_dynamics` (draft, hypotheses/distribution/tax_inequality_spain_top_rate_dynamics.yaml)
+- `tax_inequality_sweden_1991_dual_income_reform` (draft, hypotheses/distribution/tax_inequality_sweden_1991_dual_income_reform.yaml)
+- `tax_inequality_tcja_2017_decile_incidence` (draft, hypotheses/distribution/tax_inequality_tcja_2017_decile_incidence.yaml)
+- `tax_inequality_thatcher_1988_top_rate_cut` (draft, hypotheses/distribution/tax_inequality_thatcher_1988_top_rate_cut.yaml)
+- `tax_inequality_uk_50pct_rate_2010_2013` (draft, hypotheses/distribution/tax_inequality_uk_50pct_rate_2010_2013.yaml)
+- `top_1_percent_income_share_growth_drivers` (pre_registered, hypotheses/distribution/top_1_percent_income_share_growth_drivers.yaml)
+- `top_1pct_income_share_growth_decoupling` (candidate, hypotheses/distribution/top_1pct_income_share_growth_decoupling.yaml)
+- `uk_real_wage_stagnation_2008_present_decomposition` (candidate, hypotheses/distribution/uk_real_wage_stagnation_2008_present_decomposition.yaml)
+- `uk_thatcher_era_labour_share_decline_1979_1990` (pre_registered, hypotheses/distribution/uk_thatcher_era_labour_share_decline_1979_1990.yaml)
+- `union_density_inequality_growth_oecd` (draft, hypotheses/distribution/union_density_inequality_growth_oecd.yaml)
+- `universal_vs_meanstest_child_poverty` (draft, hypotheses/distribution/universal_vs_meanstest_child_poverty.yaml)
+- `us_median_wage_stagnation_1973_2000_decomposition` (pre_registered, hypotheses/distribution/us_median_wage_stagnation_1973_2000_decomposition.yaml)
+- `wage_led_vs_profit_led_growth_oecd` (candidate, hypotheses/distribution/wage_led_vs_profit_led_growth_oecd.yaml)
+- `welfare_architecture_market_openness_nordic` (candidate, hypotheses/distribution/welfare_architecture_market_openness_nordic.yaml)
+- `wid_top_income_share_trade_openness_panel` (pre_registered, hypotheses/distribution/wid_top_income_share_trade_openness_panel.yaml)
+- `africa_south_africa_load_shedding_manufacturing_2007_2024` (candidate, hypotheses/energy/africa_south_africa_load_shedding_manufacturing_2007_2024.yaml)
+- `capacity_electricity_access_regulatory_quality` (candidate, hypotheses/energy/capacity_electricity_access_regulatory_quality.yaml)
+- `capacity_green_industrial_policy_electricity_price_tradeoff` (candidate, hypotheses/energy/capacity_green_industrial_policy_electricity_price_tradeoff.yaml)
+- `china_renewables_global_learning_curve_spillover` (candidate, hypotheses/energy/china_renewables_global_learning_curve_spillover.yaml)
+- `china_renewables_industrial_policy_learning_curve` (draft, hypotheses/energy/china_renewables_industrial_policy_learning_curve.yaml)
+- `china_soe_vs_cee_privatised_growth` (draft, hypotheses/energy/china_soe_vs_cee_privatised_growth.yaml)
+- `cross_school_electricity_access_child_mortality_1990_2023` (candidate, hypotheses/energy/cross_school_electricity_access_child_mortality_1990_2023.yaml)
+- `cross_school_electricity_access_growth_1990_2023` (candidate, hypotheses/energy/cross_school_electricity_access_growth_1990_2023.yaml)
+- `cross_school_energy_use_growth_degrowth_tradeoff_1990_2023` (candidate, hypotheses/energy/cross_school_energy_use_growth_degrowth_tradeoff_1990_2023.yaml)
+- `cross_school_energy_use_life_expectancy_degrowth_threshold_1990_2023` (candidate, hypotheses/energy/cross_school_energy_use_life_expectancy_degrowth_threshold_1990_2023.yaml)
+- `cross_school_fossil_electricity_child_mortality_ecosocial_1990_2023` (candidate, hypotheses/energy/cross_school_fossil_electricity_child_mortality_ecosocial_1990_2023.yaml)
+- `cross_school_fossil_electricity_growth_development_tradeoff_1990_2023` (candidate, hypotheses/energy/cross_school_fossil_electricity_growth_development_tradeoff_1990_2023.yaml)
+- `cross_school_fossil_electricity_life_expectancy_tradeoff_1990_2023` (candidate, hypotheses/energy/cross_school_fossil_electricity_life_expectancy_tradeoff_1990_2023.yaml)
+- `cross_school_renewables_child_mortality_ecosocial_1990_2023` (candidate, hypotheses/energy/cross_school_renewables_child_mortality_ecosocial_1990_2023.yaml)
+- `cross_school_renewables_growth_cost_tradeoff_1990_2023` (candidate, hypotheses/energy/cross_school_renewables_growth_cost_tradeoff_1990_2023.yaml)
+- `cross_school_renewables_life_expectancy_ecosocial_1990_2023` (candidate, hypotheses/energy/cross_school_renewables_life_expectancy_ecosocial_1990_2023.yaml)
+- `electric_vehicle_mandate_vs_market_adoption_path` (candidate, hypotheses/energy/electric_vehicle_mandate_vs_market_adoption_path.yaml)
+- `electricity_market_unbundling_price_reliability_panel` (candidate, hypotheses/energy/electricity_market_unbundling_price_reliability_panel.yaml)
+- `energiewende_avoided_emissions_value_outweighs_industrial_cost` (candidate, hypotheses/energy/energiewende_avoided_emissions_value_outweighs_industrial_cost.yaml)
+- `energy_crisis_2022_european_industrial_relocation` (candidate, hypotheses/energy/energy_crisis_2022_european_industrial_relocation.yaml)
+- `energy_market_competition_reliability` (candidate, hypotheses/energy/energy_market_competition_reliability.yaml)
+- `energy_market_competition_renewable_capacity_panel` (candidate, hypotheses/energy/energy_market_competition_renewable_capacity_panel.yaml)
+- `energy_qol_market_broad_scope` (candidate, hypotheses/energy/energy_qol_market_broad_scope.yaml)
+- `eu_ets_absolute_decoupling_emissions_gdp` (candidate, hypotheses/energy/eu_ets_absolute_decoupling_emissions_gdp.yaml)
+- `eu_ets_emissions_reduction_vs_1p5c_pathway` (pre_registered, hypotheses/energy/eu_ets_emissions_reduction_vs_1p5c_pathway.yaml)
+- `eu_ets_price_2022_2026_carbon_signal_strength` (candidate, hypotheses/energy/eu_ets_price_2022_2026_carbon_signal_strength.yaml)
+- `eu_gas_storage_winter_2022_2023_demand_destruction_vs_substitution` (candidate, hypotheses/energy/eu_gas_storage_winter_2022_2023_demand_destruction_vs_substitution.yaml)
+- `eu_green_deal_vs_ets_emissions_mechanism` (draft, hypotheses/energy/eu_green_deal_vs_ets_emissions_mechanism.yaml)
+- `eu_post_2021_gas_shock_industrial_output_impact` (pre_registered, hypotheses/energy/eu_post_2021_gas_shock_industrial_output_impact.yaml)
+- `eurostat_electricity_price_inflation_pass_through` (candidate, hypotheses/energy/eurostat_electricity_price_inflation_pass_through.yaml)
+- `eurostat_electricity_price_volatility_industrial_exit` (candidate, hypotheses/energy/eurostat_electricity_price_volatility_industrial_exit.yaml)
+- `eurostat_energy_price_export_competitiveness_panel` (candidate, hypotheses/energy/eurostat_energy_price_export_competitiveness_panel.yaml)
+- `eurostat_energy_price_household_distribution_stress` (candidate, hypotheses/energy/eurostat_energy_price_household_distribution_stress.yaml)
+- `eurostat_energy_price_services_vs_industry_reallocation` (candidate, hypotheses/energy/eurostat_energy_price_services_vs_industry_reallocation.yaml)
+- `eurostat_energy_price_unemployment_regional_panel` (candidate, hypotheses/energy/eurostat_energy_price_unemployment_regional_panel.yaml)
+- `eurostat_household_electricity_price_consumption_panel` (candidate, hypotheses/energy/eurostat_household_electricity_price_consumption_panel.yaml)
+- `eurostat_industrial_electricity_price_manufacturing_va_2007_2025` (candidate, hypotheses/energy/eurostat_industrial_electricity_price_manufacturing_va_2007_2025.yaml)
+- `eurostat_industrial_power_price_manufacturing_share_panel` (candidate, hypotheses/energy/eurostat_industrial_power_price_manufacturing_share_panel.yaml)
+- `eurostat_nuclear_retention_industrial_price_panel` (candidate, hypotheses/energy/eurostat_nuclear_retention_industrial_price_panel.yaml)
+- `eurostat_power_cost_manufacturing_real_gva_panel` (candidate, hypotheses/energy/eurostat_power_cost_manufacturing_real_gva_panel.yaml)
+- `eurostat_renewable_share_electricity_price_transition_cost` (candidate, hypotheses/energy/eurostat_renewable_share_electricity_price_transition_cost.yaml)
+- `forest_loss_agricultural_growth_tradeoff_panel` (candidate, hypotheses/energy/forest_loss_agricultural_growth_tradeoff_panel.yaml)
+- `fossil_subsidy_phaseout_emissions_poverty_tradeoff_panel` (candidate, hypotheses/energy/fossil_subsidy_phaseout_emissions_poverty_tradeoff_panel.yaml)
+- `fuel_subsidy_reform_qol_long_run` (candidate, hypotheses/energy/fuel_subsidy_reform_qol_long_run.yaml)
+- `german_energiewende_industrial_cost_trajectory` (pre_registered, hypotheses/energy/german_energiewende_industrial_cost_trajectory.yaml)
+- `green_transition_cost_trajectory_electricity_prices` (pre_registered, hypotheses/energy/green_transition_cost_trajectory_electricity_prices.yaml)
+- `heritage_business_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_business_freedom_electricity_access_current_gap.yaml)
+- `heritage_business_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_business_freedom_electricity_access_income_region_robustness.yaml)
+- `heritage_economic_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_economic_freedom_electricity_access_current_gap.yaml)
+- `heritage_economic_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_economic_freedom_electricity_access_income_region_robustness.yaml)
+- `heritage_financial_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_financial_freedom_electricity_access_current_gap.yaml)
+- `heritage_financial_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_financial_freedom_electricity_access_income_region_robustness.yaml)
+- `heritage_government_integrity_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_government_integrity_electricity_access_current_gap.yaml)
+- `heritage_government_integrity_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_government_integrity_electricity_access_income_region_robustness.yaml)
+- `heritage_government_spending_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_government_spending_electricity_access_current_gap.yaml)
+- `heritage_government_spending_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_government_spending_electricity_access_income_region_robustness.yaml)
+- `heritage_investment_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_investment_freedom_electricity_access_current_gap.yaml)
+- `heritage_investment_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_investment_freedom_electricity_access_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_judicial_effectiveness_electricity_access_current_gap.yaml)
+- `heritage_judicial_effectiveness_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_judicial_effectiveness_electricity_access_income_region_robustness.yaml)
+- `heritage_labor_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_labor_freedom_electricity_access_current_gap.yaml)
+- `heritage_labor_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_labor_freedom_electricity_access_income_region_robustness.yaml)
+- `heritage_monetary_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_monetary_freedom_electricity_access_current_gap.yaml)
+- `heritage_monetary_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_monetary_freedom_electricity_access_income_region_robustness.yaml)
+- `heritage_property_rights_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_property_rights_electricity_access_current_gap.yaml)
+- `heritage_property_rights_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_property_rights_electricity_access_income_region_robustness.yaml)
+- `heritage_tax_burden_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_tax_burden_electricity_access_current_gap.yaml)
+- `heritage_tax_burden_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_tax_burden_electricity_access_income_region_robustness.yaml)
+- `heritage_trade_freedom_electricity_access_current_gap` (candidate, hypotheses/energy/heritage_trade_freedom_electricity_access_current_gap.yaml)
+- `heritage_trade_freedom_electricity_access_income_region_robustness` (candidate, hypotheses/energy/heritage_trade_freedom_electricity_access_income_region_robustness.yaml)
+- `infrastructure_user_pricing_quality` (candidate, hypotheses/energy/infrastructure_user_pricing_quality.yaml)
+- `major_fossil_firm_reserve_vs_carbon_budget` (draft, hypotheses/energy/major_fossil_firm_reserve_vs_carbon_budget.yaml)
+- `material_footprint_wellbeing_decoupling_high_income_panel` (candidate, hypotheses/energy/material_footprint_wellbeing_decoupling_high_income_panel.yaml)
+- `ml_carbon_pricing_command_control_cost_per_ton` (candidate, hypotheses/energy/ml_carbon_pricing_command_control_cost_per_ton.yaml)
+- `ml_fuel_subsidy_reform_targeted_transfer_qol` (candidate, hypotheses/energy/ml_fuel_subsidy_reform_targeted_transfer_qol.yaml)
+- `ml_network_unbundling_price_quality_telecom_energy` (candidate, hypotheses/energy/ml_network_unbundling_price_quality_telecom_energy.yaml)
+- `nordstream_sabotage_2022_european_energy_security_pivot` (candidate, hypotheses/energy/nordstream_sabotage_2022_european_energy_security_pivot.yaml)
+- `nuclear_phaseout_accident_risk_reduction_value` (candidate, hypotheses/energy/nuclear_phaseout_accident_risk_reduction_value.yaml)
+- `nuclear_phaseout_energy_cost_industry_exit` (candidate, hypotheses/energy/nuclear_phaseout_energy_cost_industry_exit.yaml)
+- `nuclear_phaseout_grid_reliability_cost_tradeoff` (pre_registered, hypotheses/energy/nuclear_phaseout_grid_reliability_cost_tradeoff.yaml)
+- `nuclear_revival_2023_2026_western_construction_starts` (candidate, hypotheses/energy/nuclear_revival_2023_2026_western_construction_starts.yaml)
+- `nuclear_share_fossil_electricity_panel_1985_2024` (pre_registered, hypotheses/energy/nuclear_share_fossil_electricity_panel_1985_2024.yaml)
+- `nuclear_share_power_price_volatility_panel` (candidate, hypotheses/energy/nuclear_share_power_price_volatility_panel.yaml)
+- `onshore_wind_lcoe_2010_2024_learning_curve_continuation` (candidate, hypotheses/energy/onshore_wind_lcoe_2010_2024_learning_curve_continuation.yaml)
+- `owid_electric_renewables_total_energy_followthrough_2000_2023` (pre_registered, hypotheses/energy/owid_electric_renewables_total_energy_followthrough_2000_2023.yaml)
+- `owid_fossil_subsidy_energy_intensity_panel` (candidate, hypotheses/energy/owid_fossil_subsidy_energy_intensity_panel.yaml)
+- `owid_fossil_subsidy_hightech_export_drag_panel` (candidate, hypotheses/energy/owid_fossil_subsidy_hightech_export_drag_panel.yaml)
+- `owid_g20_co2_intensity_decline_1990_2022` (pre_registered, hypotheses/energy/owid_g20_co2_intensity_decline_1990_2022.yaml)
+- `owid_high_income_co2_per_capita_decline_2005_2023` (pre_registered, hypotheses/energy/owid_high_income_co2_per_capita_decline_2005_2023.yaml)
+- `owid_renewable_electricity_fossil_displacement_2000_2024` (pre_registered, hypotheses/energy/owid_renewable_electricity_fossil_displacement_2000_2024.yaml)
+- `owid_wind_solar_coal_displacement_2000_2024` (pre_registered, hypotheses/energy/owid_wind_solar_coal_displacement_2000_2024.yaml)
+- `private_generation_entry_electrification` (candidate, hypotheses/energy/private_generation_entry_electrification.yaml)
+- `protected_land_food_security_emissions_panel` (candidate, hypotheses/energy/protected_land_food_security_emissions_panel.yaml)
+- `public_electricity_generator_carbon_intensity` (candidate, hypotheses/energy/public_electricity_generator_carbon_intensity.yaml)
+- `public_investment_green_capacity_crowding_in_panel` (candidate, hypotheses/energy/public_investment_green_capacity_crowding_in_panel.yaml)
+- `public_transport_investment_emissions_per_capita` (draft, hypotheses/energy/public_transport_investment_emissions_per_capita.yaml)
+- `renewable_capacity_employment_transition_panel` (candidate, hypotheses/energy/renewable_capacity_employment_transition_panel.yaml)
+- `renewable_share_electricity_price_transition_cost_panel` (candidate, hypotheses/energy/renewable_share_electricity_price_transition_cost_panel.yaml)
+- `road_freight_liberalization_logistics_quality` (candidate, hypotheses/energy/road_freight_liberalization_logistics_quality.yaml)
+- `solar_lcoe_2010_2024_learning_curve_continuation` (candidate, hypotheses/energy/solar_lcoe_2010_2024_learning_curve_continuation.yaml)
+- `state_capacity_market_infrastructure_complement` (candidate, hypotheses/energy/state_capacity_market_infrastructure_complement.yaml)
+- `state_monopoly_infrastructure_cost_overrun` (candidate, hypotheses/energy/state_monopoly_infrastructure_cost_overrun.yaml)
+- `uk_electricity_privatisation_price_decarbonisation` (draft, hypotheses/energy/uk_electricity_privatisation_price_decarbonisation.yaml)
+- `voluntary_carbon_markets_real_abatement` (draft, hypotheses/energy/voluntary_carbon_markets_real_abatement.yaml)
+- `water_utility_private_participation_quality` (candidate, hypotheses/energy/water_utility_private_participation_quality.yaml)
+- `working_time_reduction_energy_use_per_capita_panel` (candidate, hypotheses/energy/working_time_reduction_energy_use_per_capita_panel.yaml)
+- `africa_ghana_imf_program_2022_debt_distress` (candidate, hypotheses/fiscal/africa_ghana_imf_program_2022_debt_distress.yaml)
+- `africa_nigeria_fuel_subsidy_removal_2023` (candidate, hypotheses/fiscal/africa_nigeria_fuel_subsidy_removal_2023.yaml)
+- `austerity_after_recession_hysteresis_panel` (candidate, hypotheses/fiscal/austerity_after_recession_hysteresis_panel.yaml)
+- `australia_super_guarantee_saving_effect` (draft, hypotheses/fiscal/australia_super_guarantee_saving_effect.yaml)
+- `australia_tobacco_excise_punitive_vs_harm_reduction_comparators` (candidate, hypotheses/fiscal/australia_tobacco_excise_punitive_vs_harm_reduction_comparators.yaml)
+- `automatic_stabilizers_recession_depth_recovery_panel` (candidate, hypotheses/fiscal/automatic_stabilizers_recession_depth_recovery_panel.yaml)
+- `bismarckian_welfare_fiscal_sustainability` (draft, hypotheses/fiscal/bismarckian_welfare_fiscal_sustainability.yaml)
+- `bukele_fiscal_trajectory_tax_cuts_imf_2019_2024` (candidate, hypotheses/fiscal/bukele_fiscal_trajectory_tax_cuts_imf_2019_2024.yaml)
+- `campaign_favoritism_subsidy_allocation` (candidate, hypotheses/fiscal/campaign_favoritism_subsidy_allocation.yaml)
+- `capacity_corruption_public_investment_leakage` (candidate, hypotheses/fiscal/capacity_corruption_public_investment_leakage.yaml)
+- `capacity_education_spending_learning_threshold` (candidate, hypotheses/fiscal/capacity_education_spending_learning_threshold.yaml)
+- `capacity_fiscal_expansion_slack_inflation_tradeoff` (candidate, hypotheses/fiscal/capacity_fiscal_expansion_slack_inflation_tradeoff.yaml)
+- `capacity_gfc_stimulus_speed_output_recovery` (candidate, hypotheses/fiscal/capacity_gfc_stimulus_speed_output_recovery.yaml)
+- `capacity_government_consumption_vs_investment_composition` (candidate, hypotheses/fiscal/capacity_government_consumption_vs_investment_composition.yaml)
+- `capacity_government_effectiveness_state_size_nonmonotonic` (candidate, hypotheses/fiscal/capacity_government_effectiveness_state_size_nonmonotonic.yaml)
+- `capacity_health_spending_mortality_corruption_interaction` (candidate, hypotheses/fiscal/capacity_health_spending_mortality_corruption_interaction.yaml)
+- `capacity_hightech_exports_government_effectiveness_interaction` (candidate, hypotheses/fiscal/capacity_hightech_exports_government_effectiveness_interaction.yaml)
+- `capacity_public_investment_execution_private_capital_complement` (candidate, hypotheses/fiscal/capacity_public_investment_execution_private_capital_complement.yaml)
+- `capacity_rnd_spending_finance_patent_productivity` (candidate, hypotheses/fiscal/capacity_rnd_spending_finance_patent_productivity.yaml)
+- `capacity_stabilizers_output_loss_threshold_oecd` (candidate, hypotheses/fiscal/capacity_stabilizers_output_loss_threshold_oecd.yaml)
+- `capacity_tax_administration_social_spending_poverty_elasticity` (candidate, hypotheses/fiscal/capacity_tax_administration_social_spending_poverty_elasticity.yaml)
+- `capacity_tax_revenue_public_goods_threshold` (candidate, hypotheses/fiscal/capacity_tax_revenue_public_goods_threshold.yaml)
+- `capital_gains_tax_cut_investment_response_panel` (candidate, hypotheses/fiscal/capital_gains_tax_cut_investment_response_panel.yaml)
+- `capital_gains_tax_entrepreneurship_rate` (draft, hypotheses/fiscal/capital_gains_tax_entrepreneurship_rate.yaml)
+- `carbon_tax_revenue_neutral_double_dividend` (draft, hypotheses/fiscal/carbon_tax_revenue_neutral_double_dividend.yaml)
+- `corporate_tax_rate_investment_elasticity` (draft, hypotheses/fiscal/corporate_tax_rate_investment_elasticity.yaml)
+- `cross_school_fiscal_balance_growth_austerity_1990_2023` (candidate, hypotheses/fiscal/cross_school_fiscal_balance_growth_austerity_1990_2023.yaml)
+- `cross_school_fiscal_balance_private_investment_confidence_1990_2023` (candidate, hypotheses/fiscal/cross_school_fiscal_balance_private_investment_confidence_1990_2023.yaml)
+- `cross_school_fiscal_balance_unemployment_austerity_1990_2023` (candidate, hypotheses/fiscal/cross_school_fiscal_balance_unemployment_austerity_1990_2023.yaml)
+- `cross_school_gov_consumption_growth_multiplier_1990_2023` (candidate, hypotheses/fiscal/cross_school_gov_consumption_growth_multiplier_1990_2023.yaml)
+- `cross_school_gov_consumption_private_investment_crowding_1990_2023` (candidate, hypotheses/fiscal/cross_school_gov_consumption_private_investment_crowding_1990_2023.yaml)
+- `cross_school_gov_consumption_unemployment_stabiliser_1990_2023` (candidate, hypotheses/fiscal/cross_school_gov_consumption_unemployment_stabiliser_1990_2023.yaml)
+- `cross_school_public_debt_growth_drag_1990_2023` (candidate, hypotheses/fiscal/cross_school_public_debt_growth_drag_1990_2023.yaml)
+- `cross_school_public_debt_inflation_mmt_1990_2023` (candidate, hypotheses/fiscal/cross_school_public_debt_inflation_mmt_1990_2023.yaml)
+- `cross_school_public_debt_unemployment_mmt_1990_2023` (candidate, hypotheses/fiscal/cross_school_public_debt_unemployment_mmt_1990_2023.yaml)
+- `cross_school_smaller_government_growth_1990_2023` (candidate, hypotheses/fiscal/cross_school_smaller_government_growth_1990_2023.yaml)
+- `debt_overhang_private_investment_30yr` (candidate, hypotheses/fiscal/debt_overhang_private_investment_30yr.yaml)
+- `decommodified_health_oop_spending_mortality_panel` (candidate, hypotheses/fiscal/decommodified_health_oop_spending_mortality_panel.yaml)
+- `deficits_private_saving_sectoral_balance_panel` (candidate, hypotheses/fiscal/deficits_private_saving_sectoral_balance_panel.yaml)
+- `education_spending_inequality_mobility_panel` (candidate, hypotheses/fiscal/education_spending_inequality_mobility_panel.yaml)
+- `education_spending_low_income_attainment_mobility_panel` (candidate, hypotheses/fiscal/education_spending_low_income_attainment_mobility_panel.yaml)
+- `eurostat_interest_spending_public_investment_tradeoff_panel` (candidate, hypotheses/fiscal/eurostat_interest_spending_public_investment_tradeoff_panel.yaml)
+- `eurozone_austerity_distributional_incidence` (candidate, hypotheses/fiscal/eurozone_austerity_distributional_incidence.yaml)
+- `financial_transaction_tax_market_liquidity_cost` (draft, hypotheses/fiscal/financial_transaction_tax_market_liquidity_cost.yaml)
+- `fiscal_balance_real_rate_growth_interaction_panel` (candidate, hypotheses/fiscal/fiscal_balance_real_rate_growth_interaction_panel.yaml)
+- `fiscal_consolidation_credibility_growth` (candidate, hypotheses/fiscal/fiscal_consolidation_credibility_growth.yaml)
+- `fiscal_dominance_japan_debt_non_crisis` (pre_registered, hypotheses/fiscal/fiscal_dominance_japan_debt_non_crisis.yaml)
+- `fiscal_expansion_slack_unemployment_recovery_panel` (candidate, hypotheses/fiscal/fiscal_expansion_slack_unemployment_recovery_panel.yaml)
+- `fiscal_multipliers_zlb_higher_than_normal_regime` (draft, hypotheses/fiscal/fiscal_multipliers_zlb_higher_than_normal_regime.yaml)
+- `fiscal_rule_departure_credibility_loss_effect` (draft, hypotheses/fiscal/fiscal_rule_departure_credibility_loss_effect.yaml)
+- `fiscal_transparency_bond_yield_spread` (draft, hypotheses/fiscal/fiscal_transparency_bond_yield_spread.yaml)
+- `flat_tax_reform_growth_panel` (pre_registered, hypotheses/fiscal/flat_tax_reform_growth_panel.yaml)
+- `free_community_college_enrolment_completion` (draft, hypotheses/fiscal/free_community_college_enrolment_completion.yaml)
+- `fuel_subsidy_reform_efficiency_redistribution` (draft, hypotheses/fiscal/fuel_subsidy_reform_efficiency_redistribution.yaml)
+- `gfc_balance_sheet_recession_post_2008_household_dual_mandate` (candidate, hypotheses/fiscal/gfc_balance_sheet_recession_post_2008_household_dual_mandate.yaml)
+- `gfc_household_debt_wage_stagnation_link` (draft, hypotheses/fiscal/gfc_household_debt_wage_stagnation_link.yaml)
+- `governance_rnd_hightech_return_panel` (candidate, hypotheses/fiscal/governance_rnd_hightech_return_panel.yaml)
+- `government_consumption_private_investment_drag_panel` (candidate, hypotheses/fiscal/government_consumption_private_investment_drag_panel.yaml)
+- `government_consumption_share_tfp` (candidate, hypotheses/fiscal/government_consumption_share_tfp.yaml)
+- `government_spending_tfp_drag_panel` (pre_registered, hypotheses/fiscal/government_spending_tfp_drag_panel.yaml)
+- `great_depression_fiscal_counterfactual` (draft, hypotheses/fiscal/great_depression_fiscal_counterfactual.yaml)
+- `health_spending_growth_tradeoff_panel` (candidate, hypotheses/fiscal/health_spending_growth_tradeoff_panel.yaml)
+- `indigenous_managed_land_biodiversity_outcomes` (draft, hypotheses/fiscal/indigenous_managed_land_biodiversity_outcomes.yaml)
+- `indigenous_managed_land_carbon_stocks_protected_premium` (candidate, hypotheses/fiscal/indigenous_managed_land_carbon_stocks_protected_premium.yaml)
+- `inheritance_tax_family_business_continuity` (draft, hypotheses/fiscal/inheritance_tax_family_business_continuity.yaml)
+- `interventionist_subsidy_consumption_decay` (candidate, hypotheses/fiscal/interventionist_subsidy_consumption_decay.yaml)
+- `ira_2022_clean_energy_investment_decomposition` (candidate, hypotheses/fiscal/ira_2022_clean_energy_investment_decomposition.yaml)
+- `lula_third_term_fiscal_discipline_commitment_2023_present` (pre_registered, hypotheses/fiscal/lula_third_term_fiscal_discipline_commitment_2023_present.yaml)
+- `mandatory_spending_automatic_stabiliser_quality` (draft, hypotheses/fiscal/mandatory_spending_automatic_stabiliser_quality.yaml)
+- `market_order_fiscal_balance_gdp_pc_growth_panel` (pre_registered, hypotheses/fiscal/market_order_fiscal_balance_gdp_pc_growth_panel.yaml)
+- `market_order_fiscal_balance_gross_savings_share_panel` (pre_registered, hypotheses/fiscal/market_order_fiscal_balance_gross_savings_share_panel.yaml)
+- `market_order_fiscal_balance_private_credit_depth_panel` (pre_registered, hypotheses/fiscal/market_order_fiscal_balance_private_credit_depth_panel.yaml)
+- `market_order_fiscal_balance_private_investment_share_panel` (pre_registered, hypotheses/fiscal/market_order_fiscal_balance_private_investment_share_panel.yaml)
+- `market_order_government_consumption_gdp_pc_growth_panel` (pre_registered, hypotheses/fiscal/market_order_government_consumption_gdp_pc_growth_panel.yaml)
+- `market_order_government_consumption_gross_savings_share_panel` (pre_registered, hypotheses/fiscal/market_order_government_consumption_gross_savings_share_panel.yaml)
+- `market_order_government_consumption_manufacturing_share_panel` (pre_registered, hypotheses/fiscal/market_order_government_consumption_manufacturing_share_panel.yaml)
+- `market_order_government_consumption_private_investment_share_panel` (pre_registered, hypotheses/fiscal/market_order_government_consumption_private_investment_share_panel.yaml)
+- `market_order_government_spending_employment_rate_panel` (pre_registered, hypotheses/fiscal/market_order_government_spending_employment_rate_panel.yaml)
+- `market_order_government_spending_gdp_pc_growth_panel` (pre_registered, hypotheses/fiscal/market_order_government_spending_gdp_pc_growth_panel.yaml)
+- `market_order_government_spending_investment_share_panel` (pre_registered, hypotheses/fiscal/market_order_government_spending_investment_share_panel.yaml)
+- `market_order_government_spending_private_credit_depth_panel` (pre_registered, hypotheses/fiscal/market_order_government_spending_private_credit_depth_panel.yaml)
+- `market_order_public_debt_gdp_pc_growth_panel` (pre_registered, hypotheses/fiscal/market_order_public_debt_gdp_pc_growth_panel.yaml)
+- `market_order_public_debt_gross_savings_share_panel` (pre_registered, hypotheses/fiscal/market_order_public_debt_gross_savings_share_panel.yaml)
+- `market_order_public_debt_private_credit_depth_panel` (pre_registered, hypotheses/fiscal/market_order_public_debt_private_credit_depth_panel.yaml)
+- `market_order_public_debt_private_investment_share_panel` (pre_registered, hypotheses/fiscal/market_order_public_debt_private_investment_share_panel.yaml)
+- `market_order_tax_burden_employment_rate_panel` (pre_registered, hypotheses/fiscal/market_order_tax_burden_employment_rate_panel.yaml)
+- `market_order_tax_burden_gdp_pc_growth_panel` (pre_registered, hypotheses/fiscal/market_order_tax_burden_gdp_pc_growth_panel.yaml)
+- `market_order_tax_burden_investment_share_panel` (pre_registered, hypotheses/fiscal/market_order_tax_burden_investment_share_panel.yaml)
+- `market_order_tax_burden_private_credit_depth_panel` (pre_registered, hypotheses/fiscal/market_order_tax_burden_private_credit_depth_panel.yaml)
+- `mena_egypt_sisi_macro_stabilisation_2014_2024` (candidate, hypotheses/fiscal/mena_egypt_sisi_macro_stabilisation_2014_2024.yaml)
+- `milei_chainsaw_state_capacity_decomposition_2024_2025` (candidate, hypotheses/fiscal/milei_chainsaw_state_capacity_decomposition_2024_2025.yaml)
+- `ml_central_bank_independence_inflation_real_wage_panel` (candidate, hypotheses/fiscal/ml_central_bank_independence_inflation_real_wage_panel.yaml)
+- `ml_consumption_tax_shift_savings_investment_longrun` (candidate, hypotheses/fiscal/ml_consumption_tax_shift_savings_investment_longrun.yaml)
+- `ml_corporate_tax_neutrality_capital_deepening_panel` (candidate, hypotheses/fiscal/ml_corporate_tax_neutrality_capital_deepening_panel.yaml)
+- `ml_expenditure_cap_public_investment_crowd_in` (candidate, hypotheses/fiscal/ml_expenditure_cap_public_investment_crowd_in.yaml)
+- `ml_fiscal_rule_debt_service_growth_resilience` (candidate, hypotheses/fiscal/ml_fiscal_rule_debt_service_growth_resilience.yaml)
+- `ml_tax_broad_base_low_rate_investment_growth_1980_2024` (candidate, hypotheses/fiscal/ml_tax_broad_base_low_rate_investment_growth_1980_2024.yaml)
+- `oecd_education_spending_human_capital_gain_panel` (candidate, hypotheses/fiscal/oecd_education_spending_human_capital_gain_panel.yaml)
+- `oecd_housing_cost_inequality_after_tax_panel` (candidate, hypotheses/fiscal/oecd_housing_cost_inequality_after_tax_panel.yaml)
+- `oecd_socx_poverty_reduction_per_spending_point_panel` (candidate, hypotheses/fiscal/oecd_socx_poverty_reduction_per_spending_point_panel.yaml)
+- `pension_forced_saving_capital_deepening` (candidate, hypotheses/fiscal/pension_forced_saving_capital_deepening.yaml)
+- `procyclical_fiscal_expansion_boom_bust` (pre_registered, hypotheses/fiscal/procyclical_fiscal_expansion_boom_bust.yaml)
+- `progressive_tax_top_income_share_and_growth_oecd` (candidate, hypotheses/fiscal/progressive_tax_top_income_share_and_growth_oecd.yaml)
+- `progressivity_top_rate_income_reporting_response` (draft, hypotheses/fiscal/progressivity_top_rate_income_reporting_response.yaml)
+- `property_tax_local_government_accountability` (draft, hypotheses/fiscal/property_tax_local_government_accountability.yaml)
+- `public_health_spending_avoidable_mortality_panel` (candidate, hypotheses/fiscal/public_health_spending_avoidable_mortality_panel.yaml)
+- `public_health_spending_life_expectancy_resilience_2019_2022` (candidate, hypotheses/fiscal/public_health_spending_life_expectancy_resilience_2019_2022.yaml)
+- `public_pension_generosity_elderly_poverty_fiscal_tradeoff` (candidate, hypotheses/fiscal/public_pension_generosity_elderly_poverty_fiscal_tradeoff.yaml)
+- `public_pension_unfunded_liability_crowd_out` (draft, hypotheses/fiscal/public_pension_unfunded_liability_crowd_out.yaml)
+- `public_spending_composition_growth` (candidate, hypotheses/fiscal/public_spending_composition_growth.yaml)
+- `redistribution_gap_bottom40_real_income_growth_oecd` (candidate, hypotheses/fiscal/redistribution_gap_bottom40_real_income_growth_oecd.yaml)
+- `redistribution_progressive_tax_growth_threshold_oecd` (candidate, hypotheses/fiscal/redistribution_progressive_tax_growth_threshold_oecd.yaml)
+- `redistribution_public_consumption_tfp_drag_pwt_panel` (candidate, hypotheses/fiscal/redistribution_public_consumption_tfp_drag_pwt_panel.yaml)
+- `redistribution_tax_private_investment_drag_panel` (candidate, hypotheses/fiscal/redistribution_tax_private_investment_drag_panel.yaml)
+- `redistribution_transfer_work_incentive_lfpr_oecd` (candidate, hypotheses/fiscal/redistribution_transfer_work_incentive_lfpr_oecd.yaml)
+- `rnd_spending_patent_intensity_panel` (candidate, hypotheses/fiscal/rnd_spending_patent_intensity_panel.yaml)
+- `sector_neutral_tax_vs_exemption_cumulation` (candidate, hypotheses/fiscal/sector_neutral_tax_vs_exemption_cumulation.yaml)
+- `sin_tax_elasticity_revenue_vs_health` (draft, hypotheses/fiscal/sin_tax_elasticity_revenue_vs_health.yaml)
+- `singapore_lky_low_tax_high_savings_market_rules_1970_1990` (pre_registered, hypotheses/fiscal/singapore_lky_low_tax_high_savings_market_rules_1970_1990.yaml)
+- `social_spending_market_poverty_reduction_elasticity_oecd` (candidate, hypotheses/fiscal/social_spending_market_poverty_reduction_elasticity_oecd.yaml)
+- `state_agriculture_controls_malnutrition` (candidate, hypotheses/fiscal/state_agriculture_controls_malnutrition.yaml)
+- `state_size_reduces_household_income_growth` (pre_registered, hypotheses/fiscal/state_size_reduces_household_income_growth.yaml)
+- `tax_automatic_indexation_bracket_creep_prevention` (draft, hypotheses/fiscal/tax_automatic_indexation_bracket_creep_prevention.yaml)
+- `tax_base_broad_rate_low_growth_superior` (draft, hypotheses/fiscal/tax_base_broad_rate_low_growth_superior.yaml)
+- `tax_burden_frontier_growth_non_linear` (candidate, hypotheses/fiscal/tax_burden_frontier_growth_non_linear.yaml)
+- `tax_competition_mobile_capital_flow` (draft, hypotheses/fiscal/tax_competition_mobile_capital_flow.yaml)
+- `tax_complexity_trust_government` (candidate, hypotheses/fiscal/tax_complexity_trust_government.yaml)
+- `tax_exemption_cumulation_compliance_cost` (draft, hypotheses/fiscal/tax_exemption_cumulation_compliance_cost.yaml)
+- `tax_revenue_public_investment_growth_panel` (candidate, hypotheses/fiscal/tax_revenue_public_investment_growth_panel.yaml)
+- `tax_simplicity_disposable_income_growth` (candidate, hypotheses/fiscal/tax_simplicity_disposable_income_growth.yaml)
+- `tax_simplicity_entrepreneurship_panel` (candidate, hypotheses/fiscal/tax_simplicity_entrepreneurship_panel.yaml)
+- `tax_simplification_small_firm_growth` (draft, hypotheses/fiscal/tax_simplification_small_firm_growth.yaml)
+- `tax_treaty_network_fdi_spillover` (draft, hypotheses/fiscal/tax_treaty_network_fdi_spillover.yaml)
+- `tcja_2017_growth_effect` (draft, hypotheses/fiscal/tcja_2017_growth_effect.yaml)
+- `transfer_expansion_work_incentive_long_run` (candidate, hypotheses/fiscal/transfer_expansion_work_incentive_long_run.yaml)
+- `truss_2022_currency_user_ldi_collateral_mechanism` (candidate, hypotheses/fiscal/truss_2022_currency_user_ldi_collateral_mechanism.yaml)
+- `uk_truss_mini_budget_currency_sovereign_mechanism` (draft, hypotheses/fiscal/uk_truss_mini_budget_currency_sovereign_mechanism.yaml)
+- `universal_transfer_programmes_labour_force_participation_decline` (candidate, hypotheses/fiscal/universal_transfer_programmes_labour_force_participation_decline.yaml)
+- `us_household_debt_sustains_demand_1990_2008` (pre_registered, hypotheses/fiscal/us_household_debt_sustains_demand_1990_2008.yaml)
+- `us_wwii_fiscal_expansion_inflation_aftermath` (draft, hypotheses/fiscal/us_wwii_fiscal_expansion_inflation_aftermath.yaml)
+- `vat_efficiency_revenue_growth_link` (draft, hypotheses/fiscal/vat_efficiency_revenue_growth_link.yaml)
+- `wdi_health_spending_life_expectancy_diminishing_returns_panel` (candidate, hypotheses/fiscal/wdi_health_spending_life_expectancy_diminishing_returns_panel.yaml)
+- `wdi_out_of_pocket_health_spending_mortality_panel` (candidate, hypotheses/fiscal/wdi_out_of_pocket_health_spending_mortality_panel.yaml)
+- `wealth_tax_capital_flight_avoidance` (draft, hypotheses/fiscal/wealth_tax_capital_flight_avoidance.yaml)
+- `wealth_tax_capital_flight_revenue_yield_gap` (candidate, hypotheses/fiscal/wealth_tax_capital_flight_revenue_yield_gap.yaml)
+- `welfare_state_market_flexibility_complement` (candidate, hypotheses/fiscal/welfare_state_market_flexibility_complement.yaml)
+- `zlb_state_dependent_multiplier_pk_framing` (candidate, hypotheses/fiscal/zlb_state_dependent_multiplier_pk_framing.yaml)
+- `africa_botswana_diamond_dependency_post_2014` (candidate, hypotheses/growth/africa_botswana_diamond_dependency_post_2014.yaml)
+- `africa_ethiopia_gerd_economic_effect_2011_2024` (candidate, hypotheses/growth/africa_ethiopia_gerd_economic_effect_2011_2024.yaml)
+- `africa_ethiopia_tigray_war_economic_collapse_2020_2022` (candidate, hypotheses/growth/africa_ethiopia_tigray_war_economic_collapse_2020_2022.yaml)
+- `africa_kenya_mpesa_digital_payments_formalisation_2007_2024` (candidate, hypotheses/growth/africa_kenya_mpesa_digital_payments_formalisation_2007_2024.yaml)
+- `africa_rwanda_post_genocide_growth_model_1995_2024` (candidate, hypotheses/growth/africa_rwanda_post_genocide_growth_model_1995_2024.yaml)
+- `africa_ssa_post_covid_recovery_divergence_2020_2024` (candidate, hypotheses/growth/africa_ssa_post_covid_recovery_divergence_2020_2024.yaml)
+- `agricultural_export_ban_price_instability` (draft, hypotheses/growth/agricultural_export_ban_price_instability.yaml)
+- `agricultural_productivity_poverty_reduction_panel` (candidate, hypotheses/growth/agricultural_productivity_poverty_reduction_panel.yaml)
+- `agriculture_employment_transition_productivity_panel` (candidate, hypotheses/growth/agriculture_employment_transition_productivity_panel.yaml)
+- `albania_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/albania_growth_health_services_shift_1990_2023.yaml)
+- `argentina_institutional_instability_decline` (draft, hypotheses/growth/argentina_institutional_instability_decline.yaml)
+- `armenia_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/armenia_growth_health_services_shift_1990_2023.yaml)
+- `asia_bangladesh_apparel_growth_1985_2024` (candidate, hypotheses/growth/asia_bangladesh_apparel_growth_1985_2024.yaml)
+- `asia_japan_abenomics_retrospective_2013_2023` (candidate, hypotheses/growth/asia_japan_abenomics_retrospective_2013_2023.yaml)
+- `asia_korea_chaebol_reform_2017_2024` (candidate, hypotheses/growth/asia_korea_chaebol_reform_2017_2024.yaml)
+- `asia_pakistan_imf_programme_cycle_1988_2024` (candidate, hypotheses/growth/asia_pakistan_imf_programme_cycle_1988_2024.yaml)
+- `asia_sri_lanka_default_2022_imf_2023` (candidate, hypotheses/growth/asia_sri_lanka_default_2022_imf_2023.yaml)
+- `asia_taiwan_tsmc_industrial_policy_1985_2024` (candidate, hypotheses/growth/asia_taiwan_tsmc_industrial_policy_1985_2024.yaml)
+- `asian_convergence_vs_western_stagnation_2000_2023` (pre_registered, hypotheses/growth/asian_convergence_vs_western_stagnation_2000_2023.yaml)
+- `austerity_output_recovery_tradeoff` (pre_registered, hypotheses/growth/austerity_output_recovery_tradeoff.yaml)
+- `australia_hawke_keating_reform_long_run` (candidate, hypotheses/growth/australia_hawke_keating_reform_long_run.yaml)
+- `austrian_savings_rate_investment_quality_link` (candidate, hypotheses/growth/austrian_savings_rate_investment_quality_link.yaml)
+- `automatic_stabiliser_2008_contraction_severity` (draft, hypotheses/growth/automatic_stabiliser_2008_contraction_severity.yaml)
+- `bhutan_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/bhutan_growth_health_services_shift_1990_2023.yaml)
+- `bis_corporate_credit_boom_investment_slowdown_panel_1970_2025` (candidate, hypotheses/growth/bis_corporate_credit_boom_investment_slowdown_panel_1970_2025.yaml)
+- `bis_corporate_dsr_investment_slowdown_panel_1999_2025` (candidate, hypotheses/growth/bis_corporate_dsr_investment_slowdown_panel_1999_2025.yaml)
+- `bis_corporate_dsr_manufacturing_drag_panel` (candidate, hypotheses/growth/bis_corporate_dsr_manufacturing_drag_panel.yaml)
+- `bis_credit_gap_export_growth_drag_panel_1970_2025` (candidate, hypotheses/growth/bis_credit_gap_export_growth_drag_panel_1970_2025.yaml)
+- `bis_credit_gap_manufacturing_share_drag_panel_1970_2025` (candidate, hypotheses/growth/bis_credit_gap_manufacturing_share_drag_panel_1970_2025.yaml)
+- `bis_credit_gap_private_investment_reversal_panel` (candidate, hypotheses/growth/bis_credit_gap_private_investment_reversal_panel.yaml)
+- `bis_credit_gap_private_investment_slowdown_panel_1970_2025` (candidate, hypotheses/growth/bis_credit_gap_private_investment_slowdown_panel_1970_2025.yaml)
+- `bis_long_horizon_credit_cycle_market_discipline_panel` (candidate, hypotheses/growth/bis_long_horizon_credit_cycle_market_discipline_panel.yaml)
+- `bis_reer_appreciation_export_growth_panel_1964_2026` (candidate, hypotheses/growth/bis_reer_appreciation_export_growth_panel_1964_2026.yaml)
+- `bis_reer_appreciation_industrial_share_panel_1964_2026` (candidate, hypotheses/growth/bis_reer_appreciation_industrial_share_panel_1964_2026.yaml)
+- `bis_reer_volatility_export_drag_panel_1964_2026` (candidate, hypotheses/growth/bis_reer_volatility_export_drag_panel_1964_2026.yaml)
+- `bis_reer_volatility_investment_drag_panel_1964_2026` (candidate, hypotheses/growth/bis_reer_volatility_investment_drag_panel_1964_2026.yaml)
+- `bolivia_arce_stabilisation_2020_2024` (candidate, hypotheses/growth/bolivia_arce_stabilisation_2020_2024.yaml)
+- `bolivia_morales_resource_nationalism_2006_2019` (candidate, hypotheses/growth/bolivia_morales_resource_nationalism_2006_2019.yaml)
+- `boric_chile_2022_2026_constitutional_rejection_market_continuity` (candidate, hypotheses/growth/boric_chile_2022_2026_constitutional_rejection_market_continuity.yaml)
+- `bukele_fdi_gdp_investment_climate_2019_2024` (candidate, hypotheses/growth/bukele_fdi_gdp_investment_climate_2019_2024.yaml)
+- `bukele_phase2_post_2024_authoritarian_growth_premium` (candidate, hypotheses/growth/bukele_phase2_post_2024_authoritarian_growth_premium.yaml)
+- `cambodia_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/cambodia_growth_health_services_shift_1990_2023.yaml)
+- `canada_gdp_per_capita_stagnation_post_2015` (pre_registered, hypotheses/growth/canada_gdp_per_capita_stagnation_post_2015.yaml)
+- `canada_market_liberalisation_vs_state_industry_1988_2024` (candidate, hypotheses/growth/canada_market_liberalisation_vs_state_industry_1988_2024.yaml)
+- `capacity_broadband_competition_productivity_diffusion` (candidate, hypotheses/growth/capacity_broadband_competition_productivity_diffusion.yaml)
+- `capacity_transport_infrastructure_market_access_productivity` (candidate, hypotheses/growth/capacity_transport_infrastructure_market_access_productivity.yaml)
+- `capital_account_liberalisation_institutional_threshold` (draft, hypotheses/growth/capital_account_liberalisation_institutional_threshold.yaml)
+- `capital_controls_crisis_volatility_growth_panel` (candidate, hypotheses/growth/capital_controls_crisis_volatility_growth_panel.yaml)
+- `caribbean_climate_resilience_panel_1990_2024` (candidate, hypotheses/growth/caribbean_climate_resilience_panel_1990_2024.yaml)
+- `catch_up_capital_deepening_not_tfp` (candidate, hypotheses/growth/catch_up_capital_deepening_not_tfp.yaml)
+- `catch_up_growth_fades_after_middle_income_threshold` (candidate, hypotheses/growth/catch_up_growth_fades_after_middle_income_threshold.yaml)
+- `catch_up_growth_fades_after_middle_income_threshold_v2` (candidate, hypotheses/growth/catch_up_growth_fades_after_middle_income_threshold_v2.yaml)
+- `chile_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/chile_growth_health_services_shift_1990_2023.yaml)
+- `chile_market_reform_long_horizon_with_democracy` (candidate, hypotheses/growth/chile_market_reform_long_horizon_with_democracy.yaml)
+- `chile_post_1990_institutional_premium` (draft, hypotheses/growth/chile_post_1990_institutional_premium.yaml)
+- `chile_vs_venezuela_divergence_1999_2023` (pre_registered, hypotheses/growth/chile_vs_venezuela_divergence_1999_2023.yaml)
+- `china_deng_reform_growth_acceleration_1978` (pre_registered, hypotheses/growth/china_deng_reform_growth_acceleration_1978.yaml)
+- `china_extra_demographic_cliff_2020_2024` (candidate, hypotheses/growth/china_extra_demographic_cliff_2020_2024.yaml)
+- `china_extra_lgfv_debt_evolution_2015_2024` (candidate, hypotheses/growth/china_extra_lgfv_debt_evolution_2015_2024.yaml)
+- `china_extra_made_in_china_2025_outcomes` (candidate, hypotheses/growth/china_extra_made_in_china_2025_outcomes.yaml)
+- `china_extra_property_bubble_bust_2020_2024` (candidate, hypotheses/growth/china_extra_property_bubble_bust_2020_2024.yaml)
+- `china_extra_zero_covid_exit_recovery_2023` (candidate, hypotheses/growth/china_extra_zero_covid_exit_recovery_2023.yaml)
+- `china_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/china_growth_health_services_shift_1990_2023.yaml)
+- `china_post_wto_market_opening_vs_subsidy_tfp` (candidate, hypotheses/growth/china_post_wto_market_opening_vs_subsidy_tfp.yaml)
+- `china_wto_accession_productivity_growth_effect` (draft, hypotheses/growth/china_wto_accession_productivity_growth_effect.yaml)
+- `china_zero_covid_2022_2023_demand_collapse_recovery` (candidate, hypotheses/growth/china_zero_covid_2022_2023_demand_collapse_recovery.yaml)
+- `colonial_institutions_post_independence_growth` (draft, hypotheses/growth/colonial_institutions_post_independence_growth.yaml)
+- `competition_internet_price_digital_divide` (draft, hypotheses/growth/competition_internet_price_digital_divide.yaml)
+- `corruption_state_ownership_interaction` (draft, hypotheses/growth/corruption_state_ownership_interaction.yaml)
+- `costa_rica_high_wellbeing_low_throughput_path` (candidate, hypotheses/growth/costa_rica_high_wellbeing_low_throughput_path.yaml)
+- `costa_rica_social_democratic_model_1980_2024` (candidate, hypotheses/growth/costa_rica_social_democratic_model_1980_2024.yaml)
+- `cross_school_efw_growth_market_order_1990_2023` (candidate, hypotheses/growth/cross_school_efw_growth_market_order_1990_2023.yaml)
+- `cross_school_efw_private_investment_market_order_1990_2023` (candidate, hypotheses/growth/cross_school_efw_private_investment_market_order_1990_2023.yaml)
+- `cross_school_government_effectiveness_growth_developmental_1996_2023` (candidate, hypotheses/growth/cross_school_government_effectiveness_growth_developmental_1996_2023.yaml)
+- `cross_school_government_effectiveness_hightech_developmental_1996_2023` (candidate, hypotheses/growth/cross_school_government_effectiveness_hightech_developmental_1996_2023.yaml)
+- `cross_school_government_effectiveness_manufacturing_developmental_1996_2023` (candidate, hypotheses/growth/cross_school_government_effectiveness_manufacturing_developmental_1996_2023.yaml)
+- `cross_school_private_credit_growth_financialisation_1990_2023` (candidate, hypotheses/growth/cross_school_private_credit_growth_financialisation_1990_2023.yaml)
+- `cross_school_private_credit_hightech_developmental_1990_2023` (candidate, hypotheses/growth/cross_school_private_credit_hightech_developmental_1990_2023.yaml)
+- `cross_school_private_credit_manufacturing_financialisation_1990_2023` (candidate, hypotheses/growth/cross_school_private_credit_manufacturing_financialisation_1990_2023.yaml)
+- `cross_school_tertiary_hightech_human_capital_1990_2023` (candidate, hypotheses/growth/cross_school_tertiary_hightech_human_capital_1990_2023.yaml)
+- `cuba_socialist_economy_stagnation_1960_2023` (pre_registered, hypotheses/growth/cuba_socialist_economy_stagnation_1960_2023.yaml)
+- `cuba_special_period_degrowth_basic_needs` (draft, hypotheses/growth/cuba_special_period_degrowth_basic_needs.yaml)
+- `cuba_special_period_resilience` (draft, hypotheses/growth/cuba_special_period_resilience.yaml)
+- `czech_slovak_market_transition_comparison` (candidate, hypotheses/growth/czech_slovak_market_transition_comparison.yaml)
+- `dairy_quota_abolition_output_response` (candidate, hypotheses/growth/dairy_quota_abolition_output_response.yaml)
+- `debt_brake_fiscal_discipline_without_output_cost` (draft, hypotheses/growth/debt_brake_fiscal_discipline_without_output_cost.yaml)
+- `demo_china_one_child_long_run_growth` (candidate, hypotheses/growth/demo_china_one_child_long_run_growth.yaml)
+- `demo_higher_ed_expansion_growth` (candidate, hypotheses/growth/demo_higher_ed_expansion_growth.yaml)
+- `demo_india_demographic_transition_realised` (candidate, hypotheses/growth/demo_india_demographic_transition_realised.yaml)
+- `demo_israel_soviet_absorption_1989_1994` (candidate, hypotheses/growth/demo_israel_soviet_absorption_1989_1994.yaml)
+- `demo_japan_ageing_deflation_link` (candidate, hypotheses/growth/demo_japan_ageing_deflation_link.yaml)
+- `demo_japan_refusal_immigration_counterfactual` (candidate, hypotheses/growth/demo_japan_refusal_immigration_counterfactual.yaml)
+- `demo_remittance_corridor_dependency` (candidate, hypotheses/growth/demo_remittance_corridor_dependency.yaml)
+- `demo_ssa_demographic_dividend_window` (candidate, hypotheses/growth/demo_ssa_demographic_dividend_window.yaml)
+- `demo_working_age_share_per_capita_growth` (candidate, hypotheses/growth/demo_working_age_share_per_capita_growth.yaml)
+- `developmental_state_to_market_transition_success` (candidate, hypotheses/growth/developmental_state_to_market_transition_success.yaml)
+- `developmentalist_growth_premium_low_income_only` (candidate, hypotheses/growth/developmentalist_growth_premium_low_income_only.yaml)
+- `dominican_tourism_freezone_model_1980_2024` (candidate, hypotheses/growth/dominican_tourism_freezone_model_1980_2024.yaml)
+- `east_asia_export_discipline_vs_domestic_protection` (candidate, hypotheses/growth/east_asia_export_discipline_vs_domestic_protection.yaml)
+- `economic_freedom_index_income_correlation` (draft, hypotheses/growth/economic_freedom_index_income_correlation.yaml)
+- `ecuador_correa_default_2008` (candidate, hypotheses/growth/ecuador_correa_default_2008.yaml)
+- `ecuador_dollarisation_2000_stabilisation` (candidate, hypotheses/growth/ecuador_dollarisation_2000_stabilisation.yaml)
+- `education_choice_learning_outcomes` (candidate, hypotheses/growth/education_choice_learning_outcomes.yaml)
+- `education_qol_market_broad_sample` (candidate, hypotheses/growth/education_qol_market_broad_sample.yaml)
+- `education_quality_trade_openness` (candidate, hypotheses/growth/education_quality_trade_openness.yaml)
+- `education_spending_vs_school_autonomy` (candidate, hypotheses/growth/education_spending_vs_school_autonomy.yaml)
+- `el_salvador_bukele_gdp_crime_tradeoff_2019_2024` (candidate, hypotheses/growth/el_salvador_bukele_gdp_crime_tradeoff_2019_2024.yaml)
+- `energy_subsidy_reform_efficiency_gain` (draft, hypotheses/growth/energy_subsidy_reform_efficiency_gain.yaml)
+- `esop_firm_survival_productivity` (draft, hypotheses/growth/esop_firm_survival_productivity.yaml)
+- `estonia_market_reform_30yr_income_convergence` (candidate, hypotheses/growth/estonia_market_reform_30yr_income_convergence.yaml)
+- `estonia_market_reform_post_soviet_growth_1991_2007` (pre_registered, hypotheses/growth/estonia_market_reform_post_soviet_growth_1991_2007.yaml)
+- `ethiopia_developmental_state_growth_effect` (draft, hypotheses/growth/ethiopia_developmental_state_growth_effect.yaml)
+- `ethiopia_prewar_growth_human_development_2000_2019` (pre_registered, hypotheses/growth/ethiopia_prewar_growth_human_development_2000_2019.yaml)
+- `eu_green_deal_decoupling_pace_vs_target` (draft, hypotheses/growth/eu_green_deal_decoupling_pace_vs_target.yaml)
+- `eu_single_market_productivity_and_trade_gains` (candidate, hypotheses/growth/eu_single_market_productivity_and_trade_gains.yaml)
+- `exchange_rate_volatility_investment_horizon` (draft, hypotheses/growth/exchange_rate_volatility_investment_horizon.yaml)
+- `farm_size_regulation_inefficiency_panel` (candidate, hypotheses/growth/farm_size_regulation_inefficiency_panel.yaml)
+- `financial_deepening_growth_non_linear` (draft, hypotheses/growth/financial_deepening_growth_non_linear.yaml)
+- `financial_liberalisation_crisis_risk` (candidate, hypotheses/growth/financial_liberalisation_crisis_risk.yaml)
+- `financial_sector_profit_share_rise_1970_2007` (draft, hypotheses/growth/financial_sector_profit_share_rise_1970_2007.yaml)
+- `financialisation_industry_share_decoupling` (candidate, hypotheses/growth/financialisation_industry_share_decoupling.yaml)
+- `freiburg_schuldenbremse_growth_neutral_germany_2009_2024` (candidate, hypotheses/growth/freiburg_schuldenbremse_growth_neutral_germany_2009_2024.yaml)
+- `frontier_income_persistence_market_institutions_1960_2024` (candidate, hypotheses/growth/frontier_income_persistence_market_institutions_1960_2024.yaml)
+- `frontier_income_volatility_state_allocation` (candidate, hypotheses/growth/frontier_income_volatility_state_allocation.yaml)
+- `frontier_real_wage_growth_market_competition_1980_2024` (candidate, hypotheses/growth/frontier_real_wage_growth_market_competition_1980_2024.yaml)
+- `frontier_tfp_market_liberal_panel_1970_2024` (candidate, hypotheses/growth/frontier_tfp_market_liberal_panel_1970_2024.yaml)
+- `gdp_energy_coupling_1945_1973` (pre_registered, hypotheses/growth/gdp_energy_coupling_1945_1973.yaml)
+- `gdp_wellbeing_divergence_income_threshold` (draft, hypotheses/growth/gdp_wellbeing_divergence_income_threshold.yaml)
+- `german_manufacturing_va_decline_2017_2024` (pre_registered, hypotheses/growth/german_manufacturing_va_decline_2017_2024.yaml)
+- `ghana_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/ghana_growth_health_services_shift_1990_2023.yaml)
+- `gm_crop_adoption_yield_convergence` (candidate, hypotheses/growth/gm_crop_adoption_yield_convergence.yaml)
+- `gradualist_vs_shock_therapy_transition_outcomes` (draft, hypotheses/growth/gradualist_vs_shock_therapy_transition_outcomes.yaml)
+- `great_leap_forward_famine_output_collapse_1959_1961` (pre_registered, hypotheses/growth/great_leap_forward_famine_output_collapse_1959_1961.yaml)
+- `guatemala_remittance_dependence_2000_2024` (candidate, hypotheses/growth/guatemala_remittance_dependence_2000_2024.yaml)
+- `guyana_suriname_oil_discovery_2015_2024` (candidate, hypotheses/growth/guyana_suriname_oil_discovery_2015_2024.yaml)
+- `haiti_governance_collapse_economic_effect_2010_2024` (candidate, hypotheses/growth/haiti_governance_collapse_economic_effect_2010_2024.yaml)
+- `hayek_calculation_problem_china_soe_capital_efficiency` (candidate, hypotheses/growth/hayek_calculation_problem_china_soe_capital_efficiency.yaml)
+- `hayek_decentralised_governance_swiss_cantonal_growth` (candidate, hypotheses/growth/hayek_decentralised_governance_swiss_cantonal_growth.yaml)
+- `heritage_business_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_business_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_business_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_business_freedom_investment_share_current_gap.yaml)
+- `heritage_business_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_business_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_business_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_business_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_business_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_business_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_business_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_business_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_business_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_business_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_economic_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_economic_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_economic_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_economic_freedom_investment_share_current_gap.yaml)
+- `heritage_economic_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_economic_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_economic_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_economic_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_economic_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_economic_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_economic_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_economic_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_economic_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_economic_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_financial_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_financial_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_financial_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_financial_freedom_investment_share_current_gap.yaml)
+- `heritage_financial_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_financial_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_financial_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_financial_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_financial_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_financial_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_financial_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_financial_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_financial_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_financial_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_government_integrity_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_government_integrity_gdp_pc_ppp_current_gap.yaml)
+- `heritage_government_integrity_investment_share_current_gap` (candidate, hypotheses/growth/heritage_government_integrity_investment_share_current_gap.yaml)
+- `heritage_government_integrity_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_government_integrity_investment_share_income_region_robustness.yaml)
+- `heritage_government_integrity_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_government_integrity_private_consumption_pc_current_gap.yaml)
+- `heritage_government_integrity_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_government_integrity_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_government_integrity_private_consumption_pc_wgi_panel` (pre_registered, hypotheses/growth/heritage_government_integrity_private_consumption_pc_wgi_panel.yaml)
+- `heritage_government_integrity_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_government_integrity_tertiary_enrollment_current_gap.yaml)
+- `heritage_government_integrity_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_government_integrity_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_government_spending_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_government_spending_gdp_pc_ppp_current_gap.yaml)
+- `heritage_government_spending_investment_share_current_gap` (candidate, hypotheses/growth/heritage_government_spending_investment_share_current_gap.yaml)
+- `heritage_government_spending_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_government_spending_investment_share_income_region_robustness.yaml)
+- `heritage_government_spending_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_government_spending_private_consumption_pc_current_gap.yaml)
+- `heritage_government_spending_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_government_spending_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_government_spending_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_government_spending_tertiary_enrollment_current_gap.yaml)
+- `heritage_government_spending_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_government_spending_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_investment_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_investment_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_investment_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_investment_freedom_investment_share_current_gap.yaml)
+- `heritage_investment_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_investment_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_investment_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_investment_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_investment_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_investment_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_investment_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_investment_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_investment_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_investment_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_judicial_effectiveness_gdp_pc_ppp_current_gap.yaml)
+- `heritage_judicial_effectiveness_investment_share_current_gap` (candidate, hypotheses/growth/heritage_judicial_effectiveness_investment_share_current_gap.yaml)
+- `heritage_judicial_effectiveness_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_judicial_effectiveness_investment_share_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_judicial_effectiveness_private_consumption_pc_current_gap.yaml)
+- `heritage_judicial_effectiveness_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_judicial_effectiveness_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_judicial_effectiveness_tertiary_enrollment_current_gap.yaml)
+- `heritage_judicial_effectiveness_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_judicial_effectiveness_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_labor_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_labor_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_labor_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_labor_freedom_investment_share_current_gap.yaml)
+- `heritage_labor_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_labor_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_labor_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_labor_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_labor_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_labor_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_labor_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_labor_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_labor_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_labor_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_monetary_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_monetary_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_monetary_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_monetary_freedom_investment_share_current_gap.yaml)
+- `heritage_monetary_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_monetary_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_monetary_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_monetary_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_monetary_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_monetary_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_monetary_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_monetary_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_monetary_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_monetary_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_property_rights_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_property_rights_gdp_pc_ppp_current_gap.yaml)
+- `heritage_property_rights_investment_share_current_gap` (candidate, hypotheses/growth/heritage_property_rights_investment_share_current_gap.yaml)
+- `heritage_property_rights_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_property_rights_investment_share_income_region_robustness.yaml)
+- `heritage_property_rights_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_property_rights_private_consumption_pc_current_gap.yaml)
+- `heritage_property_rights_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_property_rights_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_property_rights_private_consumption_pc_wgi_panel` (pre_registered, hypotheses/growth/heritage_property_rights_private_consumption_pc_wgi_panel.yaml)
+- `heritage_property_rights_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_property_rights_tertiary_enrollment_current_gap.yaml)
+- `heritage_property_rights_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_property_rights_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_tax_burden_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_tax_burden_gdp_pc_ppp_current_gap.yaml)
+- `heritage_tax_burden_investment_share_current_gap` (candidate, hypotheses/growth/heritage_tax_burden_investment_share_current_gap.yaml)
+- `heritage_tax_burden_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_tax_burden_investment_share_income_region_robustness.yaml)
+- `heritage_tax_burden_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_tax_burden_private_consumption_pc_current_gap.yaml)
+- `heritage_tax_burden_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_tax_burden_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_tax_burden_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_tax_burden_tertiary_enrollment_current_gap.yaml)
+- `heritage_tax_burden_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_tax_burden_tertiary_enrollment_income_region_robustness.yaml)
+- `heritage_trade_freedom_gdp_pc_ppp_current_gap` (candidate, hypotheses/growth/heritage_trade_freedom_gdp_pc_ppp_current_gap.yaml)
+- `heritage_trade_freedom_investment_share_current_gap` (candidate, hypotheses/growth/heritage_trade_freedom_investment_share_current_gap.yaml)
+- `heritage_trade_freedom_investment_share_income_region_robustness` (candidate, hypotheses/growth/heritage_trade_freedom_investment_share_income_region_robustness.yaml)
+- `heritage_trade_freedom_private_consumption_pc_current_gap` (candidate, hypotheses/growth/heritage_trade_freedom_private_consumption_pc_current_gap.yaml)
+- `heritage_trade_freedom_private_consumption_pc_income_region_robustness` (candidate, hypotheses/growth/heritage_trade_freedom_private_consumption_pc_income_region_robustness.yaml)
+- `heritage_trade_freedom_tertiary_enrollment_current_gap` (candidate, hypotheses/growth/heritage_trade_freedom_tertiary_enrollment_current_gap.yaml)
+- `heritage_trade_freedom_tertiary_enrollment_income_region_robustness` (candidate, hypotheses/growth/heritage_trade_freedom_tertiary_enrollment_income_region_robustness.yaml)
+- `high_income_escape_market_openness_1950_2024` (candidate, hypotheses/growth/high_income_escape_market_openness_1950_2024.yaml)
+- `high_income_material_footprint_unchanged_post_2000` (candidate, hypotheses/growth/high_income_material_footprint_unchanged_post_2000.yaml)
+- `hong_kong_minimal_state_growth_miracle_1960_1997` (pre_registered, hypotheses/growth/hong_kong_minimal_state_growth_miracle_1960_1997.yaml)
+- `hong_kong_no_industrial_policy_frontier_comparison` (candidate, hypotheses/growth/hong_kong_no_industrial_policy_frontier_comparison.yaml)
+- `household_responsibility_system_china_agricultural_surge` (candidate, hypotheses/growth/household_responsibility_system_china_agricultural_surge.yaml)
+- `human_capital_market_reform_lag` (candidate, hypotheses/growth/human_capital_market_reform_lag.yaml)
+- `import_substitution_long_run_export_underperformance` (candidate, hypotheses/growth/import_substitution_long_run_export_underperformance.yaml)
+- `india_1991_liberalisation_growth_acceleration` (pre_registered, hypotheses/growth/india_1991_liberalisation_growth_acceleration.yaml)
+- `india_extra_aadhaar_upi_productivity` (candidate, hypotheses/growth/india_extra_aadhaar_upi_productivity.yaml)
+- `india_extra_demonetisation_2016_economic_effect` (candidate, hypotheses/growth/india_extra_demonetisation_2016_economic_effect.yaml)
+- `india_extra_modi_era_growth_2014_2024` (candidate, hypotheses/growth/india_extra_modi_era_growth_2014_2024.yaml)
+- `india_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/india_growth_health_services_shift_1990_2023.yaml)
+- `indonesia_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/indonesia_growth_health_services_shift_1990_2023.yaml)
+- `industrial_policy_corruption_interaction` (candidate, hypotheses/growth/industrial_policy_corruption_interaction.yaml)
+- `industrial_policy_developmentalist_states_growth` (pre_registered, hypotheses/growth/industrial_policy_developmentalist_states_growth.yaml)
+- `industrial_policy_export_discipline_conditionality` (draft, hypotheses/growth/industrial_policy_export_discipline_conditionality.yaml)
+- `industrial_policy_governance_capacity_conditionality` (draft, hypotheses/growth/industrial_policy_governance_capacity_conditionality.yaml)
+- `industrial_policy_high_governance_success` (candidate, hypotheses/growth/industrial_policy_high_governance_success.yaml)
+- `industrial_policy_without_exit_discipline_failure` (candidate, hypotheses/growth/industrial_policy_without_exit_discipline_failure.yaml)
+- `infrastructure_gap_state_investment_high_return` (candidate, hypotheses/growth/infrastructure_gap_state_investment_high_return.yaml)
+- `infrastructure_privatisation_efficiency_gain` (draft, hypotheses/growth/infrastructure_privatisation_efficiency_gain.yaml)
+- `innovation_qol_market_spillovers` (candidate, hypotheses/growth/innovation_qol_market_spillovers.yaml)
+- `intervention_intensity_qol_volatility_1970_2024` (candidate, hypotheses/growth/intervention_intensity_qol_volatility_1970_2024.yaml)
+- `intervention_reversal_qol_loss_1980_2024` (candidate, hypotheses/growth/intervention_reversal_qol_loss_1980_2024.yaml)
+- `ireland_market_opening_fdi_frontier_1987_2024` (candidate, hypotheses/growth/ireland_market_opening_fdi_frontier_1987_2024.yaml)
+- `italian_stagnation_decomposition_1999_2023` (pre_registered, hypotheses/growth/italian_stagnation_decomposition_1999_2023.yaml)
+- `jamaica_imf_debt_restructuring_2010_2024` (candidate, hypotheses/growth/jamaica_imf_debt_restructuring_2010_2024.yaml)
+- `japan_miti_success_then_stagnation_panel` (candidate, hypotheses/growth/japan_miti_success_then_stagnation_panel.yaml)
+- `japan_zero_growth_basic_wellbeing_intact` (candidate, hypotheses/growth/japan_zero_growth_basic_wellbeing_intact.yaml)
+- `judicial_independence_contract_enforcement_investment` (draft, hypotheses/growth/judicial_independence_contract_enforcement_investment.yaml)
+- `korea_hci_drive_capability_effect` (draft, hypotheses/growth/korea_hci_drive_capability_effect.yaml)
+- `korea_post_chaebol_liberalisation_frontier_growth` (candidate, hypotheses/growth/korea_post_chaebol_liberalisation_frontier_growth.yaml)
+- `korean_institutional_divergence_gdp_gap` (draft, hypotheses/growth/korean_institutional_divergence_gdp_gap.yaml)
+- `labour_flexibility_security_complement` (candidate, hypotheses/growth/labour_flexibility_security_complement.yaml)
+- `land_reform_compensation_investment_recovery` (candidate, hypotheses/growth/land_reform_compensation_investment_recovery.yaml)
+- `latam_extra_capital_account_openness_panel_1990_2024` (candidate, hypotheses/growth/latam_extra_capital_account_openness_panel_1990_2024.yaml)
+- `latam_extra_commodity_cycle_dependence_1990_2024` (candidate, hypotheses/growth/latam_extra_commodity_cycle_dependence_1990_2024.yaml)
+- `latam_extra_fiscal_rule_adoption_panel_1999_2024` (candidate, hypotheses/growth/latam_extra_fiscal_rule_adoption_panel_1999_2024.yaml)
+- `latam_extra_inflation_targeting_diff_in_diff_1999_2024` (candidate, hypotheses/growth/latam_extra_inflation_targeting_diff_in_diff_1999_2024.yaml)
+- `liberal_capital_account_openness_growth_premium_panel` (candidate, hypotheses/growth/liberal_capital_account_openness_growth_premium_panel.yaml)
+- `liberalisation_episodes_growth_trajectory` (draft, hypotheses/growth/liberalisation_episodes_growth_trajectory.yaml)
+- `long_run_consumption_frontier_market_score_1970_2024` (candidate, hypotheses/growth/long_run_consumption_frontier_market_score_1970_2024.yaml)
+- `lula3_industrial_policy_2023_2026_reshoring_outcomes` (candidate, hypotheses/growth/lula3_industrial_policy_2023_2026_reshoring_outcomes.yaml)
+- `maduro_era_venezuelan_collapse_decomposition_2013_2023` (pre_registered, hypotheses/growth/maduro_era_venezuelan_collapse_decomposition_2013_2023.yaml)
+- `malaysia_developmentalist_plateau_1990_2024` (candidate, hypotheses/growth/malaysia_developmentalist_plateau_1990_2024.yaml)
+- `malaysia_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/malaysia_growth_health_services_shift_1990_2023.yaml)
+- `maldives_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/maldives_growth_health_services_shift_1990_2023.yaml)
+- `maoist_precondition_for_deng_reform_growth` (draft, hypotheses/growth/maoist_precondition_for_deng_reform_growth.yaml)
+- `market_based_urbanisation_productivity` (draft, hypotheses/growth/market_based_urbanisation_productivity.yaml)
+- `market_determined_exchange_rate_crisis_recovery` (draft, hypotheses/growth/market_determined_exchange_rate_crisis_recovery.yaml)
+- `market_dynamism_entrepreneurial_entry_income_growth` (candidate, hypotheses/growth/market_dynamism_entrepreneurial_entry_income_growth.yaml)
+- `market_dynamism_export_diversification_growth` (candidate, hypotheses/growth/market_dynamism_export_diversification_growth.yaml)
+- `market_dynamism_government_consumption_investment_drag` (candidate, hypotheses/growth/market_dynamism_government_consumption_investment_drag.yaml)
+- `market_dynamism_investment_freedom_renewables_diffusion` (candidate, hypotheses/growth/market_dynamism_investment_freedom_renewables_diffusion.yaml)
+- `market_dynamism_private_credit_productivity_growth` (candidate, hypotheses/growth/market_dynamism_private_credit_productivity_growth.yaml)
+- `market_dynamism_property_rights_investment_growth` (candidate, hypotheses/growth/market_dynamism_property_rights_investment_growth.yaml)
+- `market_dynamism_regulatory_freedom_hightech_exports` (candidate, hypotheses/growth/market_dynamism_regulatory_freedom_hightech_exports.yaml)
+- `market_dynamism_tariff_reduction_consumption_pc` (candidate, hypotheses/growth/market_dynamism_tariff_reduction_consumption_pc.yaml)
+- `market_entry_deregulation_entrepreneurship_surge` (draft, hypotheses/growth/market_entry_deregulation_entrepreneurship_surge.yaml)
+- `market_exchange_rate_alignment_trade_growth` (draft, hypotheses/growth/market_exchange_rate_alignment_trade_growth.yaml)
+- `market_freedom_consumption_pc_1970_2024` (candidate, hypotheses/growth/market_freedom_consumption_pc_1970_2024.yaml)
+- `market_income_school_completion` (candidate, hypotheses/growth/market_income_school_completion.yaml)
+- `market_institution_duration_qol_persistence` (candidate, hypotheses/growth/market_institution_duration_qol_persistence.yaml)
+- `market_institutions_material_wellbeing_resilience` (candidate, hypotheses/growth/market_institutions_material_wellbeing_resilience.yaml)
+- `market_openness_inequality_backlash_risk` (candidate, hypotheses/growth/market_openness_inequality_backlash_risk.yaml)
+- `market_openness_multidimensional_prosperity_1995_2024` (candidate, hypotheses/growth/market_openness_multidimensional_prosperity_1995_2024.yaml)
+- `market_reform_duration_growth_persistence` (candidate, hypotheses/growth/market_reform_duration_growth_persistence.yaml)
+- `market_reform_episode_gdp_per_capita_persistence` (draft, hypotheses/growth/market_reform_episode_gdp_per_capita_persistence.yaml)
+- `market_reform_female_education` (candidate, hypotheses/growth/market_reform_female_education.yaml)
+- `market_reform_inflation_adjusted_wages` (candidate, hypotheses/growth/market_reform_inflation_adjusted_wages.yaml)
+- `market_reform_poverty_exit_20yr` (candidate, hypotheses/growth/market_reform_poverty_exit_20yr.yaml)
+- `market_reform_qol_event_study_1980_2024` (candidate, hypotheses/growth/market_reform_qol_event_study_1980_2024.yaml)
+- `material_footprint_cap_feasibility` (pre_registered, hypotheses/growth/material_footprint_cap_feasibility.yaml)
+- `mena_gcc_oil_price_decoupling_2014_2024` (candidate, hypotheses/growth/mena_gcc_oil_price_decoupling_2014_2024.yaml)
+- `mena_iran_sanctions_economic_effect_2018_2024` (candidate, hypotheses/growth/mena_iran_sanctions_economic_effect_2018_2024.yaml)
+- `mena_israel_high_tech_economy_2000_2024` (candidate, hypotheses/growth/mena_israel_high_tech_economy_2000_2024.yaml)
+- `mena_saudi_vision_2030_diversification_2016_2024` (candidate, hypotheses/growth/mena_saudi_vision_2030_diversification_2016_2024.yaml)
+- `mena_turkey_akp_two_phase_economic_arc_2003_2024` (candidate, hypotheses/growth/mena_turkey_akp_two_phase_economic_arc_2003_2024.yaml)
+- `mena_uae_diversification_economic_complexity_1990_2024` (candidate, hypotheses/growth/mena_uae_diversification_economic_complexity_1990_2024.yaml)
+- `middle_income_qol_market_transition_1980_2024` (candidate, hypotheses/growth/middle_income_qol_market_transition_1980_2024.yaml)
+- `milei_shock_therapy_output_recovery_trajectory` (pre_registered, hypotheses/growth/milei_shock_therapy_output_recovery_trajectory.yaml)
+- `mittelstand_institutional_productivity_effect` (draft, hypotheses/growth/mittelstand_institutional_productivity_effect.yaml)
+- `mitterrand_nationalisations_productivity_effect` (draft, hypotheses/growth/mitterrand_nationalisations_productivity_effect.yaml)
+- `ml_capital_market_depth_reallocation_productivity` (candidate, hypotheses/growth/ml_capital_market_depth_reallocation_productivity.yaml)
+- `ml_directed_credit_capital_misallocation_growth_drag` (candidate, hypotheses/growth/ml_directed_credit_capital_misallocation_growth_drag.yaml)
+- `ml_ip_protection_moderate_strength_innovation_diffusion` (candidate, hypotheses/growth/ml_ip_protection_moderate_strength_innovation_diffusion.yaml)
+- `ml_product_market_regulation_tfp_growth_oecd` (candidate, hypotheses/growth/ml_product_market_regulation_tfp_growth_oecd.yaml)
+- `ml_rule_bound_regulation_investment_volatility` (candidate, hypotheses/growth/ml_rule_bound_regulation_investment_volatility.yaml)
+- `mondragon_cooperative_resilience` (draft, hypotheses/growth/mondragon_cooperative_resilience.yaml)
+- `mongolia_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/mongolia_growth_health_services_shift_1990_2023.yaml)
+- `national_champions_long_run_productivity_drag` (candidate, hypotheses/growth/national_champions_long_run_productivity_drag.yaml)
+- `nationalisation_investment_productivity_decline_venezuela` (pre_registered, hypotheses/growth/nationalisation_investment_productivity_decline_venezuela.yaml)
+- `nepal_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/nepal_growth_health_services_shift_1990_2023.yaml)
+- `new_zealand_reform_long_run_productivity_recheck` (candidate, hypotheses/growth/new_zealand_reform_long_run_productivity_recheck.yaml)
+- `north_south_korea_development_divergence_1953_present` (pre_registered, hypotheses/growth/north_south_korea_development_divergence_1953_present.yaml)
+- `nz_rogernomics_productivity_effect` (draft, hypotheses/growth/nz_rogernomics_productivity_effect.yaml)
+- `oecd_decoupling_pace_below_15c_joint_test` (candidate, hypotheses/growth/oecd_decoupling_pace_below_15c_joint_test.yaml)
+- `oecd_ict_sector_productivity_spillover_panel` (candidate, hypotheses/growth/oecd_ict_sector_productivity_spillover_panel.yaml)
+- `oecd_pdb_capital_deepening_without_tfp_limit` (candidate, hypotheses/growth/oecd_pdb_capital_deepening_without_tfp_limit.yaml)
+- `oecd_pdb_gdp_hour_frontier_convergence_1950_2025` (candidate, hypotheses/growth/oecd_pdb_gdp_hour_frontier_convergence_1950_2025.yaml)
+- `oecd_pdb_hours_reduction_output_tradeoff_panel` (candidate, hypotheses/growth/oecd_pdb_hours_reduction_output_tradeoff_panel.yaml)
+- `oecd_pdb_market_reform_productivity_compounder` (candidate, hypotheses/growth/oecd_pdb_market_reform_productivity_compounder.yaml)
+- `oecd_pdb_post_2008_productivity_hysteresis_panel` (candidate, hypotheses/growth/oecd_pdb_post_2008_productivity_hysteresis_panel.yaml)
+- `oecd_pdb_public_sector_share_productivity_drag` (candidate, hypotheses/growth/oecd_pdb_public_sector_share_productivity_drag.yaml)
+- `oecd_pdb_small_open_economy_frontier_convergence` (candidate, hypotheses/growth/oecd_pdb_small_open_economy_frontier_convergence.yaml)
+- `oecd_pdb_tfp_growth_frontier_persistence_1970_2025` (candidate, hypotheses/growth/oecd_pdb_tfp_growth_frontier_persistence_1970_2025.yaml)
+- `ordo_anti_cartel_post_war_germany_economic_miracle` (candidate, hypotheses/growth/ordo_anti_cartel_post_war_germany_economic_miracle.yaml)
+- `paraguay_long_stable_growth_2003_2024` (candidate, hypotheses/growth/paraguay_long_stable_growth_2003_2024.yaml)
+- `peru_fujimori_shock_therapy_1990_2000` (candidate, hypotheses/growth/peru_fujimori_shock_therapy_1990_2000.yaml)
+- `peru_post_fujimori_growth_2001_2019` (candidate, hypotheses/growth/peru_post_fujimori_growth_2001_2019.yaml)
+- `petro_reform_package_economic_trajectory_2022_present` (pre_registered, hypotheses/growth/petro_reform_package_economic_trajectory_2022_present.yaml)
+- `pinochet_chile_rapid_liberalisation_growth_collapse` (draft, hypotheses/growth/pinochet_chile_rapid_liberalisation_growth_collapse.yaml)
+- `poland_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/poland_growth_health_services_shift_1990_2023.yaml)
+- `poland_market_transition_30yr_growth` (candidate, hypotheses/growth/poland_market_transition_30yr_growth.yaml)
+- `politicised_credit_election_cycle_growth_drag` (candidate, hypotheses/growth/politicised_credit_election_cycle_growth_drag.yaml)
+- `post_2008_oecd_growth_emissions_path` (draft, hypotheses/growth/post_2008_oecd_growth_emissions_path.yaml)
+- `post_soviet_transition_institutional_variation` (pre_registered, hypotheses/growth/post_soviet_transition_institutional_variation.yaml)
+- `price_liberalisation_agricultural_output_surge` (draft, hypotheses/growth/price_liberalisation_agricultural_output_surge.yaml)
+- `private_school_entry_education_quality` (candidate, hypotheses/growth/private_school_entry_education_quality.yaml)
+- `privatisation_method_mass_voucher_vs_trade_sale` (draft, hypotheses/growth/privatisation_method_mass_voucher_vs_trade_sale.yaml)
+- `privatisation_productivity_effect` (draft, hypotheses/growth/privatisation_productivity_effect.yaml)
+- `productivity_compensation_decoupling_post_1973` (draft, hypotheses/growth/productivity_compensation_decoupling_post_1973.yaml)
+- `profit_rate_secular_decline_us_1948_2023` (candidate, hypotheses/growth/profit_rate_secular_decline_us_1948_2023.yaml)
+- `property_rights_agricultural_investment` (draft, hypotheses/growth/property_rights_agricultural_investment.yaml)
+- `protected_infant_industries_fail_to_mature` (candidate, hypotheses/growth/protected_infant_industries_fail_to_mature.yaml)
+- `public_rd_frontier_innovation_complement` (candidate, hypotheses/growth/public_rd_frontier_innovation_complement.yaml)
+- `pwt_human_capital_tfp_growth_panel` (candidate, hypotheses/growth/pwt_human_capital_tfp_growth_panel.yaml)
+- `qol_anomaly_weight_broad_scope_test` (candidate, hypotheses/growth/qol_anomaly_weight_broad_scope_test.yaml)
+- `reagan_tax_cuts_growth_effect` (draft, hypotheses/growth/reagan_tax_cuts_growth_effect.yaml)
+- `reduced_working_time_output_employment` (draft, hypotheses/growth/reduced_working_time_output_employment.yaml)
+- `regulatory_quality_fdi_spillover` (draft, hypotheses/growth/regulatory_quality_fdi_spillover.yaml)
+- `resource_developmentalism_rent_seeking_trap` (candidate, hypotheses/growth/resource_developmentalism_rent_seeking_trap.yaml)
+- `russia_sanctions_2022_2025_economic_response_decomposition` (candidate, hypotheses/growth/russia_sanctions_2022_2025_economic_response_decomposition.yaml)
+- `rwanda_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/rwanda_growth_health_services_shift_1990_2023.yaml)
+- `sea_indonesia_jokowi_infrastructure_2014_2024` (candidate, hypotheses/growth/sea_indonesia_jokowi_infrastructure_2014_2024.yaml)
+- `sea_malaysia_1mdb_economic_effect_2015_2024` (candidate, hypotheses/growth/sea_malaysia_1mdb_economic_effect_2015_2024.yaml)
+- `sea_philippines_bpo_industrial_policy_2005_2024` (candidate, hypotheses/growth/sea_philippines_bpo_industrial_policy_2005_2024.yaml)
+- `sea_singapore_fta_cascade_post_2014` (candidate, hypotheses/growth/sea_singapore_fta_cascade_post_2014.yaml)
+- `sea_thailand_2014_coup_tourism_shock` (candidate, hypotheses/growth/sea_thailand_2014_coup_tourism_shock.yaml)
+- `sea_vietnam_doi_moi_followon_growth_1995_2024` (candidate, hypotheses/growth/sea_vietnam_doi_moi_followon_growth_1995_2024.yaml)
+- `singapore_cpf_national_savings_effect` (draft, hypotheses/growth/singapore_cpf_national_savings_effect.yaml)
+- `singapore_lky_fdi_manufacturing_upgrade_1970_1990` (pre_registered, hypotheses/growth/singapore_lky_fdi_manufacturing_upgrade_1970_1990.yaml)
+- `singapore_lky_financial_deepening_market_hub_1970_2020` (pre_registered, hypotheses/growth/singapore_lky_financial_deepening_market_hub_1970_2020.yaml)
+- `singapore_lky_growth_takeoff_1965_1990` (pre_registered, hypotheses/growth/singapore_lky_growth_takeoff_1965_1990.yaml)
+- `singapore_lky_high_tech_export_digital_upgrade_1990_2024` (pre_registered, hypotheses/growth/singapore_lky_high_tech_export_digital_upgrade_1990_2024.yaml)
+- `singapore_state_capacity_market_openness_combo` (candidate, hypotheses/growth/singapore_state_capacity_market_openness_combo.yaml)
+- `singapore_temasek_public_ownership_efficiency` (pre_registered, hypotheses/growth/singapore_temasek_public_ownership_efficiency.yaml)
+- `smallholder_vs_plantation_yield_frontier` (candidate, hypotheses/growth/smallholder_vs_plantation_yield_frontier.yaml)
+- `south_korea_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/south_korea_growth_health_services_shift_1990_2023.yaml)
+- `soviet_collectivisation_agricultural_marketings` (draft, hypotheses/growth/soviet_collectivisation_agricultural_marketings.yaml)
+- `soviet_industrial_catch_up_1928_1940` (draft, hypotheses/growth/soviet_industrial_catch_up_1928_1940.yaml)
+- `soviet_union_central_planning_gdp_collapse_1989_1991` (pre_registered, hypotheses/growth/soviet_union_central_planning_gdp_collapse_1989_1991.yaml)
+- `spain_covid_2020_gdp_unemployment_shock` (pre_registered, hypotheses/growth/spain_covid_2020_gdp_unemployment_shock.yaml)
+- `spain_sanchez_economic_trajectory_2018_2023` (pre_registered, hypotheses/growth/spain_sanchez_economic_trajectory_2018_2023.yaml)
+- `sri_lanka_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/sri_lanka_growth_health_services_shift_1990_2023.yaml)
+- `state_allocation_capital_misallocation_living_standards` (candidate, hypotheses/growth/state_allocation_capital_misallocation_living_standards.yaml)
+- `state_bank_credit_allocation_growth_quality` (draft, hypotheses/growth/state_bank_credit_allocation_growth_quality.yaml)
+- `state_credit_allocation_zombie_firm_persistence` (candidate, hypotheses/growth/state_credit_allocation_zombie_firm_persistence.yaml)
+- `state_led_planning_growth_fade_25yr` (draft, hypotheses/growth/state_led_planning_growth_fade_25yr.yaml)
+- `state_monopoly_export_commodity_price_duty` (draft, hypotheses/growth/state_monopoly_export_commodity_price_duty.yaml)
+- `state_owned_enterprise_share_growth_plateau` (candidate, hypotheses/growth/state_owned_enterprise_share_growth_plateau.yaml)
+- `state_ownership_qol_drag_panel_1980_2024` (candidate, hypotheses/growth/state_ownership_qol_drag_panel_1980_2024.yaml)
+- `state_pension_paygo_vs_funded_growth` (draft, hypotheses/growth/state_pension_paygo_vs_funded_growth.yaml)
+- `subsidised_industrial_zone_export_performance` (draft, hypotheses/growth/subsidised_industrial_zone_export_performance.yaml)
+- `subsidy_duration_declining_returns_panel` (candidate, hypotheses/growth/subsidy_duration_declining_returns_panel.yaml)
+- `sweden_1990s_market_reform_recovery` (candidate, hypotheses/growth/sweden_1990s_market_reform_recovery.yaml)
+- `taiwan_itri_frontier_capability_effect` (draft, hypotheses/growth/taiwan_itri_frontier_capability_effect.yaml)
+- `taiwan_sme_competition_vs_state_planning_growth` (candidate, hypotheses/growth/taiwan_sme_competition_vs_state_planning_growth.yaml)
+- `tax_complexity_avoidance_industry_growth` (draft, hypotheses/growth/tax_complexity_avoidance_industry_growth.yaml)
+- `technology_import_openness_productivity` (candidate, hypotheses/growth/technology_import_openness_productivity.yaml)
+- `technology_transfer_requirement_innovation_cost` (draft, hypotheses/growth/technology_transfer_requirement_innovation_cost.yaml)
+- `tertiary_autonomy_research_output` (candidate, hypotheses/growth/tertiary_autonomy_research_output.yaml)
+- `thailand_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/thailand_growth_health_services_shift_1990_2023.yaml)
+- `thailand_middle_income_plateau_state_coordination` (candidate, hypotheses/growth/thailand_middle_income_plateau_state_coordination.yaml)
+- `top_marginal_rate_growth_tradeoff` (draft, hypotheses/growth/top_marginal_rate_growth_tradeoff.yaml)
+- `trade_openness_consumer_welfare_1980_2024` (candidate, hypotheses/growth/trade_openness_consumer_welfare_1980_2024.yaml)
+- `trade_openness_manufacturing_productivity_spillover` (draft, hypotheses/growth/trade_openness_manufacturing_productivity_spillover.yaml)
+- `trinidad_tobago_oil_dependence_2008_2024` (candidate, hypotheses/growth/trinidad_tobago_oil_dependence_2008_2024.yaml)
+- `turkey_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/turkey_growth_health_services_shift_1990_2023.yaml)
+- `uae_dubai_internet_city_digital_adoption_2000_2024` (pre_registered, hypotheses/growth/uae_dubai_internet_city_digital_adoption_2000_2024.yaml)
+- `ubs_material_throughput_efficiency` (draft, hypotheses/growth/ubs_material_throughput_efficiency.yaml)
+- `uk_cameron_osborne_austerity_output_effect` (draft, hypotheses/growth/uk_cameron_osborne_austerity_output_effect.yaml)
+- `uk_economic_decline_multi_movement` (pre_registered, hypotheses/growth/uk_economic_decline_multi_movement.yaml)
+- `uk_erm_exit_1992_output_unemployment_inflation` (pre_registered, hypotheses/growth/uk_erm_exit_1992_output_unemployment_inflation.yaml)
+- `uk_nationalised_industry_investment_rates` (pre_registered, hypotheses/growth/uk_nationalised_industry_investment_rates.yaml)
+- `uk_thatcher_market_reform_40yr_services_frontier` (candidate, hypotheses/growth/uk_thatcher_market_reform_40yr_services_frontier.yaml)
+- `unilateral_tariff_cut_consumption_welfare_gain` (draft, hypotheses/growth/unilateral_tariff_cut_consumption_welfare_gain.yaml)
+- `uruguay_frente_amplio_social_investment_2005_2020` (candidate, hypotheses/growth/uruguay_frente_amplio_social_investment_2005_2020.yaml)
+- `us_1945_1973_labour_compact_productivity_wage_link` (draft, hypotheses/growth/us_1945_1973_labour_compact_productivity_wage_link.yaml)
+- `us_eu_divergence_decomposition` (pre_registered, hypotheses/growth/us_eu_divergence_decomposition.yaml)
+- `us_eu_gdp_per_capita_divergence_policy_causes` (candidate, hypotheses/growth/us_eu_gdp_per_capita_divergence_policy_causes.yaml)
+- `uzbekistan_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/growth/uzbekistan_growth_health_services_shift_1990_2023.yaml)
+- `vietnam_doi_moi_developmental_pattern_growth_effect` (draft, hypotheses/growth/vietnam_doi_moi_developmental_pattern_growth_effect.yaml)
+- `vietnam_doi_moi_growth_human_development_1990_2023` (pre_registered, hypotheses/growth/vietnam_doi_moi_growth_human_development_1990_2023.yaml)
+- `vietnam_doi_moi_private_sector_growth_share` (candidate, hypotheses/growth/vietnam_doi_moi_private_sector_growth_share.yaml)
+- `volcker_disinflation_output_recovery` (pre_registered, hypotheses/growth/volcker_disinflation_output_recovery.yaml)
+- `washington_consensus_vs_developmental_state_performance` (pre_registered, hypotheses/growth/washington_consensus_vs_developmental_state_performance.yaml)
+- `wdi_electrification_growth_nonpenalty_1990_2023` (pre_registered, hypotheses/growth/wdi_electrification_growth_nonpenalty_1990_2023.yaml)
+- `wdi_electrification_life_expectancy_followthrough_1990_2023` (pre_registered, hypotheses/growth/wdi_electrification_life_expectancy_followthrough_1990_2023.yaml)
+- `wdi_electrification_under5_mortality_followthrough_1990_2023` (pre_registered, hypotheses/growth/wdi_electrification_under5_mortality_followthrough_1990_2023.yaml)
+- `wdi_remittance_consumption_resilience_2009_2021` (pre_registered, hypotheses/growth/wdi_remittance_consumption_resilience_2009_2021.yaml)
+- `wdi_remittance_gdp_pc_resilience_2009_2021` (pre_registered, hypotheses/growth/wdi_remittance_gdp_pc_resilience_2009_2021.yaml)
+- `wdi_tertiary_attainment_growth_nonpenalty_2000_2023` (pre_registered, hypotheses/growth/wdi_tertiary_attainment_growth_nonpenalty_2000_2023.yaml)
+- `wdi_tertiary_attainment_labor_productivity_2000_2023` (pre_registered, hypotheses/growth/wdi_tertiary_attainment_labor_productivity_2000_2023.yaml)
+- `wdi_tertiary_attainment_services_shift_2000_2023` (pre_registered, hypotheses/growth/wdi_tertiary_attainment_services_shift_2000_2023.yaml)
+- `west_east_germany_economic_system_divergence_1950_1989` (pre_registered, hypotheses/growth/west_east_germany_economic_system_divergence_1950_1989.yaml)
+- `wipo_resident_patenting_tfp_followthrough_panel` (candidate, hypotheses/growth/wipo_resident_patenting_tfp_followthrough_panel.yaml)
+- `xiomara_castro_honduras_zede_repeal_economic_response_2022_2026` (candidate, hypotheses/growth/xiomara_castro_honduras_zede_repeal_economic_response_2022_2026.yaml)
+- `yugoslav_self_management_productivity` (draft, hypotheses/growth/yugoslav_self_management_productivity.yaml)
+- `capacity_health_insurance_labour_market_complement` (candidate, hypotheses/healthcare/capacity_health_insurance_labour_market_complement.yaml)
+- `capacity_water_sanitation_urbanization_health_dividend` (candidate, hypotheses/healthcare/capacity_water_sanitation_urbanization_health_dividend.yaml)
+- `certificate_of_need_hospital_access_restrictions` (candidate, hypotheses/healthcare/certificate_of_need_hospital_access_restrictions.yaml)
+- `costa_rica_wellbeing_throughput_efficiency` (draft, hypotheses/healthcare/costa_rica_wellbeing_throughput_efficiency.yaml)
+- `cross_school_gov_consumption_child_mortality_social_provision_1990_2023` (candidate, hypotheses/healthcare/cross_school_gov_consumption_child_mortality_social_provision_1990_2023.yaml)
+- `cross_school_gov_consumption_life_expectancy_social_provision_1990_2023` (candidate, hypotheses/healthcare/cross_school_gov_consumption_life_expectancy_social_provision_1990_2023.yaml)
+- `cross_school_tax_revenue_child_mortality_social_capacity_1990_2023` (candidate, hypotheses/healthcare/cross_school_tax_revenue_child_mortality_social_capacity_1990_2023.yaml)
+- `cross_school_tax_revenue_life_expectancy_social_capacity_1990_2023` (candidate, hypotheses/healthcare/cross_school_tax_revenue_life_expectancy_social_capacity_1990_2023.yaml)
+- `cuba_health_outcomes_vs_advanced_market_peers` (candidate, hypotheses/healthcare/cuba_health_outcomes_vs_advanced_market_peers.yaml)
+- `cuba_health_outcomes_vs_latam_peers` (draft, hypotheses/healthcare/cuba_health_outcomes_vs_latam_peers.yaml)
+- `cuba_health_outcomes_vs_non_latam_market_peers` (candidate, hypotheses/healthcare/cuba_health_outcomes_vs_non_latam_market_peers.yaml)
+- `dialysis_market_competition_outcome_quality` (candidate, hypotheses/healthcare/dialysis_market_competition_outcome_quality.yaml)
+- `energy_use_life_expectancy_saturation_threshold_panel` (candidate, hypotheses/healthcare/energy_use_life_expectancy_saturation_threshold_panel.yaml)
+- `generic_substitution_mandate_savings_no_harm` (candidate, hypotheses/healthcare/generic_substitution_mandate_savings_no_harm.yaml)
+- `health_qol_market_broad_scope` (candidate, hypotheses/healthcare/health_qol_market_broad_scope.yaml)
+- `health_savings_account_preventive_spending` (candidate, hypotheses/healthcare/health_savings_account_preventive_spending.yaml)
+- `health_system_entry_barriers_capacity` (candidate, hypotheses/healthcare/health_system_entry_barriers_capacity.yaml)
+- `heritage_business_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_business_freedom_life_expectancy_current_gap.yaml)
+- `heritage_business_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_business_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_business_freedom_life_expectancy_wgi_panel` (pre_registered, hypotheses/healthcare/heritage_business_freedom_life_expectancy_wgi_panel.yaml)
+- `heritage_business_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_business_freedom_physician_density_current_gap.yaml)
+- `heritage_business_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_business_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_business_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_business_freedom_under5_mortality_current_gap.yaml)
+- `heritage_business_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_business_freedom_under5_mortality_income_region_robustness.yaml)
+- `heritage_economic_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_economic_freedom_life_expectancy_current_gap.yaml)
+- `heritage_economic_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_economic_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_economic_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_economic_freedom_physician_density_current_gap.yaml)
+- `heritage_economic_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_economic_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_economic_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_economic_freedom_under5_mortality_current_gap.yaml)
+- `heritage_economic_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_economic_freedom_under5_mortality_income_region_robustness.yaml)
+- `heritage_financial_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_financial_freedom_life_expectancy_current_gap.yaml)
+- `heritage_financial_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_financial_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_financial_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_financial_freedom_physician_density_current_gap.yaml)
+- `heritage_financial_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_financial_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_financial_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_financial_freedom_under5_mortality_current_gap.yaml)
+- `heritage_financial_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_financial_freedom_under5_mortality_income_region_robustness.yaml)
+- `heritage_government_integrity_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_government_integrity_life_expectancy_current_gap.yaml)
+- `heritage_government_integrity_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_government_integrity_life_expectancy_income_region_robustness.yaml)
+- `heritage_government_integrity_life_expectancy_wgi_panel` (pre_registered, hypotheses/healthcare/heritage_government_integrity_life_expectancy_wgi_panel.yaml)
+- `heritage_government_integrity_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_government_integrity_physician_density_current_gap.yaml)
+- `heritage_government_integrity_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_government_integrity_physician_density_income_region_robustness.yaml)
+- `heritage_government_integrity_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_government_integrity_under5_mortality_current_gap.yaml)
+- `heritage_government_integrity_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_government_integrity_under5_mortality_income_region_robustness.yaml)
+- `heritage_government_spending_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_government_spending_life_expectancy_current_gap.yaml)
+- `heritage_government_spending_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_government_spending_life_expectancy_income_region_robustness.yaml)
+- `heritage_government_spending_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_government_spending_physician_density_current_gap.yaml)
+- `heritage_government_spending_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_government_spending_physician_density_income_region_robustness.yaml)
+- `heritage_government_spending_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_government_spending_under5_mortality_current_gap.yaml)
+- `heritage_government_spending_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_government_spending_under5_mortality_income_region_robustness.yaml)
+- `heritage_investment_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_investment_freedom_life_expectancy_current_gap.yaml)
+- `heritage_investment_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_investment_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_investment_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_investment_freedom_physician_density_current_gap.yaml)
+- `heritage_investment_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_investment_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_investment_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_investment_freedom_under5_mortality_current_gap.yaml)
+- `heritage_investment_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_investment_freedom_under5_mortality_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_judicial_effectiveness_life_expectancy_current_gap.yaml)
+- `heritage_judicial_effectiveness_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_judicial_effectiveness_life_expectancy_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_judicial_effectiveness_physician_density_current_gap.yaml)
+- `heritage_judicial_effectiveness_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_judicial_effectiveness_physician_density_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_judicial_effectiveness_under5_mortality_current_gap.yaml)
+- `heritage_judicial_effectiveness_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_judicial_effectiveness_under5_mortality_income_region_robustness.yaml)
+- `heritage_labor_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_labor_freedom_life_expectancy_current_gap.yaml)
+- `heritage_labor_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_labor_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_labor_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_labor_freedom_physician_density_current_gap.yaml)
+- `heritage_labor_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_labor_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_labor_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_labor_freedom_under5_mortality_current_gap.yaml)
+- `heritage_labor_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_labor_freedom_under5_mortality_income_region_robustness.yaml)
+- `heritage_monetary_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_monetary_freedom_life_expectancy_current_gap.yaml)
+- `heritage_monetary_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_monetary_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_monetary_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_monetary_freedom_physician_density_current_gap.yaml)
+- `heritage_monetary_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_monetary_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_monetary_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_monetary_freedom_under5_mortality_current_gap.yaml)
+- `heritage_monetary_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_monetary_freedom_under5_mortality_income_region_robustness.yaml)
+- `heritage_property_rights_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_property_rights_life_expectancy_current_gap.yaml)
+- `heritage_property_rights_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_property_rights_life_expectancy_income_region_robustness.yaml)
+- `heritage_property_rights_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_property_rights_physician_density_current_gap.yaml)
+- `heritage_property_rights_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_property_rights_physician_density_income_region_robustness.yaml)
+- `heritage_property_rights_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_property_rights_under5_mortality_current_gap.yaml)
+- `heritage_property_rights_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_property_rights_under5_mortality_income_region_robustness.yaml)
+- `heritage_tax_burden_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_tax_burden_life_expectancy_current_gap.yaml)
+- `heritage_tax_burden_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_tax_burden_life_expectancy_income_region_robustness.yaml)
+- `heritage_tax_burden_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_tax_burden_physician_density_current_gap.yaml)
+- `heritage_tax_burden_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_tax_burden_physician_density_income_region_robustness.yaml)
+- `heritage_tax_burden_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_tax_burden_under5_mortality_current_gap.yaml)
+- `heritage_tax_burden_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_tax_burden_under5_mortality_income_region_robustness.yaml)
+- `heritage_trade_freedom_life_expectancy_current_gap` (candidate, hypotheses/healthcare/heritage_trade_freedom_life_expectancy_current_gap.yaml)
+- `heritage_trade_freedom_life_expectancy_income_region_robustness` (candidate, hypotheses/healthcare/heritage_trade_freedom_life_expectancy_income_region_robustness.yaml)
+- `heritage_trade_freedom_physician_density_current_gap` (candidate, hypotheses/healthcare/heritage_trade_freedom_physician_density_current_gap.yaml)
+- `heritage_trade_freedom_physician_density_income_region_robustness` (candidate, hypotheses/healthcare/heritage_trade_freedom_physician_density_income_region_robustness.yaml)
+- `heritage_trade_freedom_under5_mortality_current_gap` (candidate, hypotheses/healthcare/heritage_trade_freedom_under5_mortality_current_gap.yaml)
+- `heritage_trade_freedom_under5_mortality_income_region_robustness` (candidate, hypotheses/healthcare/heritage_trade_freedom_under5_mortality_income_region_robustness.yaml)
+- `imaging_equipment_market_entry_wait_times` (candidate, hypotheses/healthcare/imaging_equipment_market_entry_wait_times.yaml)
+- `market_freedom_life_expectancy_1970_2024` (candidate, hypotheses/healthcare/market_freedom_life_expectancy_1970_2024.yaml)
+- `market_healthcare_supply_mortality_amenable_panel` (candidate, hypotheses/healthcare/market_healthcare_supply_mortality_amenable_panel.yaml)
+- `market_income_channel_health_outcomes` (candidate, hypotheses/healthcare/market_income_channel_health_outcomes.yaml)
+- `market_institutions_health_spending_efficiency` (candidate, hypotheses/healthcare/market_institutions_health_spending_efficiency.yaml)
+- `medical_device_trade_openness_outcomes` (candidate, hypotheses/healthcare/medical_device_trade_openness_outcomes.yaml)
+- `medical_migration_market_opportunity` (candidate, hypotheses/healthcare/medical_migration_market_opportunity.yaml)
+- `ml_market_reform_package_qol_long_horizon_synth` (candidate, hypotheses/healthcare/ml_market_reform_package_qol_long_horizon_synth.yaml)
+- `oecd_physician_density_amenable_mortality_panel` (candidate, hypotheses/healthcare/oecd_physician_density_amenable_mortality_panel.yaml)
+- `ophthalmology_laser_surgery_market_price_trajectory` (candidate, hypotheses/healthcare/ophthalmology_laser_surgery_market_price_trajectory.yaml)
+- `physician_supply_cap_residency_constraint_mortality` (candidate, hypotheses/healthcare/physician_supply_cap_residency_constraint_mortality.yaml)
+- `property_rights_child_mortality_decline` (candidate, hypotheses/healthcare/property_rights_child_mortality_decline.yaml)
+- `singapore_lky_public_health_outcomes_1965_1990` (pre_registered, hypotheses/healthcare/singapore_lky_public_health_outcomes_1965_1990.yaml)
+- `single_payer_cost_outcome_comparison` (draft, hypotheses/healthcare/single_payer_cost_outcome_comparison.yaml)
+- `trade_openness_medicine_access` (candidate, hypotheses/healthcare/trade_openness_medicine_access.yaml)
+- `uk_attlee_reforms_output_health_outcomes` (draft, hypotheses/healthcare/uk_attlee_reforms_output_health_outcomes.yaml)
+- `universal_healthcare_cost_outcome_oecd` (draft, hypotheses/healthcare/universal_healthcare_cost_outcome_oecd.yaml)
+- `bis_credit_gap_house_price_reversal_oecd_1970_2025` (candidate, hypotheses/housing/bis_credit_gap_house_price_reversal_oecd_1970_2025.yaml)
+- `bis_credit_gap_house_price_reversal_panel` (candidate, hypotheses/housing/bis_credit_gap_house_price_reversal_panel.yaml)
+- `bis_credit_gap_house_price_unemployment_lag_panel` (candidate, hypotheses/housing/bis_credit_gap_house_price_unemployment_lag_panel.yaml)
+- `bis_credit_gap_property_price_interaction_panel_1970_2025` (candidate, hypotheses/housing/bis_credit_gap_property_price_interaction_panel_1970_2025.yaml)
+- `bis_dsr_house_price_boom_reversal_panel_1999_2025` (candidate, hypotheses/housing/bis_dsr_house_price_boom_reversal_panel_1999_2025.yaml)
+- `bis_house_price_credit_gap_boom_bust_panel` (candidate, hypotheses/housing/bis_house_price_credit_gap_boom_bust_panel.yaml)
+- `bis_house_price_growth_consumption_squeeze_panel` (candidate, hypotheses/housing/bis_house_price_growth_consumption_squeeze_panel.yaml)
+- `bis_household_dsr_property_slowdown_panel` (candidate, hypotheses/housing/bis_household_dsr_property_slowdown_panel.yaml)
+- `bis_policy_rate_house_price_cooling_panel` (candidate, hypotheses/housing/bis_policy_rate_house_price_cooling_panel.yaml)
+- `building_height_limit_downtown_productivity` (candidate, hypotheses/housing/building_height_limit_downtown_productivity.yaml)
+- `capacity_housing_supply_credit_boom_amplifier` (candidate, hypotheses/housing/capacity_housing_supply_credit_boom_amplifier.yaml)
+- `classical_zoning_relaxation_housing_supply_response_us_metros` (candidate, hypotheses/housing/classical_zoning_relaxation_housing_supply_response_us_metros.yaml)
+- `construction_competition_housing_cost` (candidate, hypotheses/housing/construction_competition_housing_cost.yaml)
+- `construction_permit_burden_housing_output_panel` (candidate, hypotheses/housing/construction_permit_burden_housing_output_panel.yaml)
+- `construction_permit_time_gdp_cost` (candidate, hypotheses/housing/construction_permit_time_gdp_cost.yaml)
+- `energy_market_competition_household_cost` (candidate, hypotheses/housing/energy_market_competition_household_cost.yaml)
+- `eurostat_construction_supply_housing_cost_relief_panel` (candidate, hypotheses/housing/eurostat_construction_supply_housing_cost_relief_panel.yaml)
+- `growth_boundary_urban_house_price_inflation` (candidate, hypotheses/housing/growth_boundary_urban_house_price_inflation.yaml)
+- `housing_affordability_broad_scope_market` (candidate, hypotheses/housing/housing_affordability_broad_scope_market.yaml)
+- `housing_supply_freedom_affordability` (candidate, hypotheses/housing/housing_supply_freedom_affordability.yaml)
+- `housing_tax_distortion_mobility` (candidate, hypotheses/housing/housing_tax_distortion_mobility.yaml)
+- `housing_voucher_mobility_vs_project_concentration` (candidate, hypotheses/housing/housing_voucher_mobility_vs_project_concentration.yaml)
+- `land_title_formalization_investment` (candidate, hypotheses/housing/land_title_formalization_investment.yaml)
+- `land_use_regulation_real_wage_drag` (candidate, hypotheses/housing/land_use_regulation_real_wage_drag.yaml)
+- `land_value_tax_vacant_lot_utilisation` (candidate, hypotheses/housing/land_value_tax_vacant_lot_utilisation.yaml)
+- `market_housing_supply_migration_opportunity` (candidate, hypotheses/housing/market_housing_supply_migration_opportunity.yaml)
+- `market_urbanization_slum_reduction` (candidate, hypotheses/housing/market_urbanization_slum_reduction.yaml)
+- `mortgage_interest_deduction_homeownership_rate` (candidate, hypotheses/housing/mortgage_interest_deduction_homeownership_rate.yaml)
+- `mortgage_market_liberalisation_homeownership_panel` (pre_registered, hypotheses/housing/mortgage_market_liberalisation_homeownership_panel.yaml)
+- `oecd_housing_cost_overburden_consumption_drag_panel` (candidate, hypotheses/housing/oecd_housing_cost_overburden_consumption_drag_panel.yaml)
+- `oecd_rent_burden_child_poverty_panel` (candidate, hypotheses/housing/oecd_rent_burden_child_poverty_panel.yaml)
+- `parking_minimum_abolition_housing_cost` (candidate, hypotheses/housing/parking_minimum_abolition_housing_cost.yaml)
+- `property_rights_mortgage_depth_home_access` (candidate, hypotheses/housing/property_rights_mortgage_depth_home_access.yaml)
+- `rent_control_housing_supply_destruction_panel` (candidate, hypotheses/housing/rent_control_housing_supply_destruction_panel.yaml)
+- `restrictive_zoning_housing_supply_elasticity` (draft, hypotheses/housing/restrictive_zoning_housing_supply_elasticity.yaml)
+- `singapore_lky_hdb_homeownership_public_housing_1960_1990` (candidate, hypotheses/housing/singapore_lky_hdb_homeownership_public_housing_1960_1990.yaml)
+- `social_housing_privatisation_tenant_wealth` (candidate, hypotheses/housing/social_housing_privatisation_tenant_wealth.yaml)
+- `transport_market_entry_commute_qol` (candidate, hypotheses/housing/transport_market_entry_commute_qol.yaml)
+- `urban_services_private_entry_quality` (candidate, hypotheses/housing/urban_services_private_entry_quality.yaml)
+- `vienna_social_housing_rent_burden_comparative` (draft, hypotheses/housing/vienna_social_housing_rent_burden_comparative.yaml)
+- `zoning_deregulation_housing_affordability` (candidate, hypotheses/housing/zoning_deregulation_housing_affordability.yaml)
+- `austrian_rent_seeking_concentration_olson_growth_drag` (candidate, hypotheses/institutional_quality/austrian_rent_seeking_concentration_olson_growth_drag.yaml)
+- `botswana_institutional_exceptionalism` (draft, hypotheses/institutional_quality/botswana_institutional_exceptionalism.yaml)
+- `bukele_mass_incarceration_homicide_impact_2019_2024` (candidate, hypotheses/institutional_quality/bukele_mass_incarceration_homicide_impact_2019_2024.yaml)
+- `capacity_capital_market_depth_innovation_vs_volatility` (candidate, hypotheses/institutional_quality/capacity_capital_market_depth_innovation_vs_volatility.yaml)
+- `capacity_regulatory_quality_business_entry_complement` (candidate, hypotheses/institutional_quality/capacity_regulatory_quality_business_entry_complement.yaml)
+- `classical_property_rights_security_fdi_premium_panel` (candidate, hypotheses/institutional_quality/classical_property_rights_security_fdi_premium_panel.yaml)
+- `constitutional_fiscal_rules_growth_stability` (candidate, hypotheses/institutional_quality/constitutional_fiscal_rules_growth_stability.yaml)
+- `contract_enforcement_fdi_productivity_spillovers` (candidate, hypotheses/institutional_quality/contract_enforcement_fdi_productivity_spillovers.yaml)
+- `corruption_state_allocation_growth_interaction` (candidate, hypotheses/institutional_quality/corruption_state_allocation_growth_interaction.yaml)
+- `crony_capitalism_not_market_freedom` (candidate, hypotheses/institutional_quality/crony_capitalism_not_market_freedom.yaml)
+- `cross_school_regulatory_quality_private_investment_1996_2023` (candidate, hypotheses/institutional_quality/cross_school_regulatory_quality_private_investment_1996_2023.yaml)
+- `cross_school_rule_of_law_hightech_institutional_1996_2023` (candidate, hypotheses/institutional_quality/cross_school_rule_of_law_hightech_institutional_1996_2023.yaml)
+- `cross_school_rule_of_law_private_credit_depth_1996_2023` (candidate, hypotheses/institutional_quality/cross_school_rule_of_law_private_credit_depth_1996_2023.yaml)
+- `decentralized_property_rights_agricultural_productivity` (candidate, hypotheses/institutional_quality/decentralized_property_rights_agricultural_productivity.yaml)
+- `discretionary_allocation_corruption_panel` (candidate, hypotheses/institutional_quality/discretionary_allocation_corruption_panel.yaml)
+- `economic_freedom_corruption_decline` (candidate, hypotheses/institutional_quality/economic_freedom_corruption_decline.yaml)
+- `economic_freedom_personal_freedom` (candidate, hypotheses/institutional_quality/economic_freedom_personal_freedom.yaml)
+- `expropriation_risk_investment_horizon` (candidate, hypotheses/institutional_quality/expropriation_risk_investment_horizon.yaml)
+- `federalism_market_experimentation` (candidate, hypotheses/institutional_quality/federalism_market_experimentation.yaml)
+- `fiscal_rule_presence_dampens_statist_drift` (pre_registered, hypotheses/institutional_quality/fiscal_rule_presence_dampens_statist_drift.yaml)
+- `free_market_shock_therapy_social_cost` (candidate, hypotheses/institutional_quality/free_market_shock_therapy_social_cost.yaml)
+- `freiburg_strong_state_independent_central_bank_synergy_panel` (candidate, hypotheses/institutional_quality/freiburg_strong_state_independent_central_bank_synergy_panel.yaml)
+- `frontier_qol_market_institutions_1990_2024` (candidate, hypotheses/institutional_quality/frontier_qol_market_institutions_1990_2024.yaml)
+- `initial_state_share_predicts_drift_reversal` (pre_registered, hypotheses/institutional_quality/initial_state_share_predicts_drift_reversal.yaml)
+- `intervention_qol_corruption_interaction` (candidate, hypotheses/institutional_quality/intervention_qol_corruption_interaction.yaml)
+- `ip_protection_innovation_diffusion` (candidate, hypotheses/institutional_quality/ip_protection_innovation_diffusion.yaml)
+- `judicial_independence_growth_persistence` (candidate, hypotheses/institutional_quality/judicial_independence_growth_persistence.yaml)
+- `judicial_independence_market_qol` (candidate, hypotheses/institutional_quality/judicial_independence_market_qol.yaml)
+- `latam_bukele_imitation_effect_homicide_security_state` (candidate, hypotheses/institutional_quality/latam_bukele_imitation_effect_homicide_security_state.yaml)
+- `liberal_democracy_managerial_flywheel_drift` (pre_registered, hypotheses/institutional_quality/liberal_democracy_managerial_flywheel_drift.yaml)
+- `licensing_discretion_bribery` (candidate, hypotheses/institutional_quality/licensing_discretion_bribery.yaml)
+- `market_freedom_democratic_resilience` (candidate, hypotheses/institutional_quality/market_freedom_democratic_resilience.yaml)
+- `market_governance_qol_broad_scope` (candidate, hypotheses/institutional_quality/market_governance_qol_broad_scope.yaml)
+- `market_institutions_qol_crisis_recovery` (candidate, hypotheses/institutional_quality/market_institutions_qol_crisis_recovery.yaml)
+- `market_order_control_corruption_gdp_pc_growth_panel` (pre_registered, hypotheses/institutional_quality/market_order_control_corruption_gdp_pc_growth_panel.yaml)
+- `market_order_control_corruption_high_tech_exports_panel` (pre_registered, hypotheses/institutional_quality/market_order_control_corruption_high_tech_exports_panel.yaml)
+- `market_order_control_corruption_investment_share_panel` (pre_registered, hypotheses/institutional_quality/market_order_control_corruption_investment_share_panel.yaml)
+- `market_order_control_corruption_private_credit_depth_panel` (pre_registered, hypotheses/institutional_quality/market_order_control_corruption_private_credit_depth_panel.yaml)
+- `market_order_economic_freedom_employment_rate_panel` (pre_registered, hypotheses/institutional_quality/market_order_economic_freedom_employment_rate_panel.yaml)
+- `market_order_economic_freedom_gdp_pc_growth_panel` (pre_registered, hypotheses/institutional_quality/market_order_economic_freedom_gdp_pc_growth_panel.yaml)
+- `market_order_economic_freedom_high_tech_exports_panel` (pre_registered, hypotheses/institutional_quality/market_order_economic_freedom_high_tech_exports_panel.yaml)
+- `market_order_economic_freedom_investment_share_panel` (pre_registered, hypotheses/institutional_quality/market_order_economic_freedom_investment_share_panel.yaml)
+- `market_order_government_effectiveness_gdp_pc_growth_panel` (pre_registered, hypotheses/institutional_quality/market_order_government_effectiveness_gdp_pc_growth_panel.yaml)
+- `market_order_government_effectiveness_gross_savings_share_panel` (pre_registered, hypotheses/institutional_quality/market_order_government_effectiveness_gross_savings_share_panel.yaml)
+- `market_order_government_effectiveness_manufacturing_share_panel` (pre_registered, hypotheses/institutional_quality/market_order_government_effectiveness_manufacturing_share_panel.yaml)
+- `market_order_government_effectiveness_private_investment_share_panel` (pre_registered, hypotheses/institutional_quality/market_order_government_effectiveness_private_investment_share_panel.yaml)
+- `market_order_rule_of_law_gdp_pc_growth_panel` (pre_registered, hypotheses/institutional_quality/market_order_rule_of_law_gdp_pc_growth_panel.yaml)
+- `market_order_rule_of_law_high_tech_exports_panel` (pre_registered, hypotheses/institutional_quality/market_order_rule_of_law_high_tech_exports_panel.yaml)
+- `market_order_rule_of_law_investment_share_panel` (pre_registered, hypotheses/institutional_quality/market_order_rule_of_law_investment_share_panel.yaml)
+- `market_order_rule_of_law_private_credit_depth_panel` (pre_registered, hypotheses/institutional_quality/market_order_rule_of_law_private_credit_depth_panel.yaml)
+- `market_reform_civil_liberties_interaction` (candidate, hypotheses/institutional_quality/market_reform_civil_liberties_interaction.yaml)
+- `market_reform_without_state_capacity_failure` (candidate, hypotheses/institutional_quality/market_reform_without_state_capacity_failure.yaml)
+- `ml_contract_enforcement_firm_scale_productivity` (candidate, hypotheses/institutional_quality/ml_contract_enforcement_firm_scale_productivity.yaml)
+- `ml_entry_barriers_informality_small_firm_productivity` (candidate, hypotheses/institutional_quality/ml_entry_barriers_informality_small_firm_productivity.yaml)
+- `ml_expropriation_risk_private_investment_panel` (candidate, hypotheses/institutional_quality/ml_expropriation_risk_private_investment_panel.yaml)
+- `natural_monopoly_private_failure` (candidate, hypotheses/institutional_quality/natural_monopoly_private_failure.yaml)
+- `nordic_outcome_persistence_decomposition` (pre_registered, hypotheses/institutional_quality/nordic_outcome_persistence_decomposition.yaml)
+- `nordic_outcome_persistence_decomposition_v2` (pre_registered, hypotheses/institutional_quality/nordic_outcome_persistence_decomposition_v2.yaml)
+- `nordic_outcome_persistence_decomposition_v3` (pre_registered, hypotheses/institutional_quality/nordic_outcome_persistence_decomposition_v3.yaml)
+- `owid_internet_schooling_followthrough_2000_2022` (pre_registered, hypotheses/institutional_quality/owid_internet_schooling_followthrough_2000_2022.yaml)
+- `owid_tax_capacity_child_mortality_followthrough_2000_2022` (pre_registered, hypotheses/institutional_quality/owid_tax_capacity_child_mortality_followthrough_2000_2022.yaml)
+- `policy_uncertainty_private_investment` (candidate, hypotheses/institutional_quality/policy_uncertainty_private_investment.yaml)
+- `post_soviet_market_reform_life_expectancy` (pre_registered, hypotheses/institutional_quality/post_soviet_market_reform_life_expectancy.yaml)
+- `price_signal_freedom_inflation_volatility_panel` (candidate, hypotheses/institutional_quality/price_signal_freedom_inflation_volatility_panel.yaml)
+- `privatisation_transition_tfp_panel` (pre_registered, hypotheses/institutional_quality/privatisation_transition_tfp_panel.yaml)
+- `procurement_competition_corruption` (candidate, hypotheses/institutional_quality/procurement_competition_corruption.yaml)
+- `property_rights_long_run_income_frontier` (candidate, hypotheses/institutional_quality/property_rights_long_run_income_frontier.yaml)
+- `property_rights_long_run_income_frontier_v2` (candidate, hypotheses/institutional_quality/property_rights_long_run_income_frontier_v2.yaml)
+- `property_rights_median_income_growth_1980_2024` (candidate, hypotheses/institutional_quality/property_rights_median_income_growth_1980_2024.yaml)
+- `property_rights_social_trust` (candidate, hypotheses/institutional_quality/property_rights_social_trust.yaml)
+- `regulatory_predictability_cross_sector_investment` (candidate, hypotheses/institutional_quality/regulatory_predictability_cross_sector_investment.yaml)
+- `regulatory_predictability_frontier_innovation` (candidate, hypotheses/institutional_quality/regulatory_predictability_frontier_innovation.yaml)
+- `regulatory_transparency_investment` (candidate, hypotheses/institutional_quality/regulatory_transparency_investment.yaml)
+- `resource_rent_capture_outperforms_laissez_faire` (pre_registered, hypotheses/institutional_quality/resource_rent_capture_outperforms_laissez_faire.yaml)
+- `rule_bound_regulation_business_trust` (candidate, hypotheses/institutional_quality/rule_bound_regulation_business_trust.yaml)
+- `rule_of_law_institutional_growth` (pre_registered, hypotheses/institutional_quality/rule_of_law_institutional_growth.yaml)
+- `rule_of_law_market_reform_complementarity` (candidate, hypotheses/institutional_quality/rule_of_law_market_reform_complementarity.yaml)
+- `shock_therapy_institutional_preconditions_conditionality` (draft, hypotheses/institutional_quality/shock_therapy_institutional_preconditions_conditionality.yaml)
+- `singapore_lky_rule_of_law_government_effectiveness_legacy_1996_2024` (pre_registered, hypotheses/institutional_quality/singapore_lky_rule_of_law_government_effectiveness_legacy_1996_2024.yaml)
+- `state_allocation_private_credit_innovation_panel` (candidate, hypotheses/institutional_quality/state_allocation_private_credit_innovation_panel.yaml)
+- `state_capacity_precedes_liberal_market` (candidate, hypotheses/institutional_quality/state_capacity_precedes_liberal_market.yaml)
+- `state_ownership_media_freedom` (candidate, hypotheses/institutional_quality/state_ownership_media_freedom.yaml)
+- `state_planning_information_quality` (candidate, hypotheses/institutional_quality/state_planning_information_quality.yaml)
+- `uae_freezone_institutional_quality_wgi_1996_2024` (pre_registered, hypotheses/institutional_quality/uae_freezone_institutional_quality_wgi_1996_2024.yaml)
+- `venezuela_chavismo_canonical_case_multi_metric` (pre_registered, hypotheses/institutional_quality/venezuela_chavismo_canonical_case_multi_metric.yaml)
+- `venezuela_chavismo_framework_validation` (pre_registered, hypotheses/institutional_quality/venezuela_chavismo_framework_validation.yaml)
+- `wdi_business_entry_rule_of_law_growth_panel` (pre_registered, hypotheses/institutional_quality/wdi_business_entry_rule_of_law_growth_panel.yaml)
+- `wgi_regulatory_quality_fdi_growth_panel` (candidate, hypotheses/institutional_quality/wgi_regulatory_quality_fdi_growth_panel.yaml)
+- `active_labour_market_policy_conditionality_works` (draft, hypotheses/labour/active_labour_market_policy_conditionality_works.yaml)
+- `ai_productivity_diffusion_2023_2026_us_sectors` (candidate, hypotheses/labour/ai_productivity_diffusion_2023_2026_us_sectors.yaml)
+- `apprenticeship_employer_chamber_quality` (draft, hypotheses/labour/apprenticeship_employer_chamber_quality.yaml)
+- `bangladesh_growth_health_services_shift_1990_2023` (pre_registered, hypotheses/labour/bangladesh_growth_health_services_shift_1990_2023.yaml)
+- `bargaining_coverage_low_wage_poverty_employment_panel` (candidate, hypotheses/labour/bargaining_coverage_low_wage_poverty_employment_panel.yaml)
+- `biden_ira_chips_fiscal_inflation_pass_through` (pre_registered, hypotheses/labour/biden_ira_chips_fiscal_inflation_pass_through.yaml)
+- `bis_household_dsr_unemployment_surge_panel` (candidate, hypotheses/labour/bis_household_dsr_unemployment_surge_panel.yaml)
+- `bls_minimum_wage_bite_low_tail_threshold_panel` (candidate, hypotheses/labour/bls_minimum_wage_bite_low_tail_threshold_panel.yaml)
+- `bls_oews_median_bite_food_service_employment_panel` (candidate, hypotheses/labour/bls_oews_median_bite_food_service_employment_panel.yaml)
+- `bls_qcew_county_food_service_minimum_wage_growth` (candidate, hypotheses/labour/bls_qcew_county_food_service_minimum_wage_growth.yaml)
+- `bls_qcew_state_food_service_minimum_wage_growth` (candidate, hypotheses/labour/bls_qcew_state_food_service_minimum_wage_growth.yaml)
+- `brain_drain_state_directed_economies` (candidate, hypotheses/labour/brain_drain_state_directed_economies.yaml)
+- `bretton_woods_fiscal_space_growth` (draft, hypotheses/labour/bretton_woods_fiscal_space_growth.yaml)
+- `business_freedom_employer_entry_employment_panel` (candidate, hypotheses/labour/business_freedom_employer_entry_employment_panel.yaml)
+- `canada_real_disposable_income_post_2015` (pre_registered, hypotheses/labour/canada_real_disposable_income_post_2015.yaml)
+- `capacity_activation_spending_unemployment_duration` (candidate, hypotheses/labour/capacity_activation_spending_unemployment_duration.yaml)
+- `capacity_childcare_spending_female_lfp_housing_cost` (candidate, hypotheses/labour/capacity_childcare_spending_female_lfp_housing_cost.yaml)
+- `capacity_in_work_benefits_cliff_employment` (candidate, hypotheses/labour/capacity_in_work_benefits_cliff_employment.yaml)
+- `capacity_unemployment_benefits_activation_threshold` (candidate, hypotheses/labour/capacity_unemployment_benefits_activation_threshold.yaml)
+- `child_family_benefits_female_lfp_fertility_panel` (candidate, hypotheses/labour/child_family_benefits_female_lfp_fertility_panel.yaml)
+- `classical_occupational_licensing_consumer_loss_us_state_panel` (candidate, hypotheses/labour/classical_occupational_licensing_consumer_loss_us_state_panel.yaml)
+- `clinton_welfare_reform_labour_participation_effect` (draft, hypotheses/labour/clinton_welfare_reform_labour_participation_effect.yaml)
+- `collective_bargaining_extension_non_signatory_cost` (draft, hypotheses/labour/collective_bargaining_extension_non_signatory_cost.yaml)
+- `corbyn_manifesto_capital_flight_prediction` (draft, hypotheses/labour/corbyn_manifesto_capital_flight_prediction.yaml)
+- `cross_school_gini_employment_underconsumption_1990_2023` (candidate, hypotheses/labour/cross_school_gini_employment_underconsumption_1990_2023.yaml)
+- `cross_school_regulation_employment_market_order_1990_2023` (candidate, hypotheses/labour/cross_school_regulation_employment_market_order_1990_2023.yaml)
+- `cross_school_regulatory_quality_employment_institutional_1996_2023` (candidate, hypotheses/labour/cross_school_regulatory_quality_employment_institutional_1996_2023.yaml)
+- `demo_australia_high_skill_migration` (candidate, hypotheses/labour/demo_australia_high_skill_migration.yaml)
+- `demo_canada_points_system_immigration` (candidate, hypotheses/labour/demo_canada_points_system_immigration.yaml)
+- `demo_eastern_europe_outmigration_wages` (candidate, hypotheses/labour/demo_eastern_europe_outmigration_wages.yaml)
+- `demo_education_attainment_wage_premium_panel` (candidate, hypotheses/labour/demo_education_attainment_wage_premium_panel.yaml)
+- `demo_female_lfp_growth_panel` (candidate, hypotheses/labour/demo_female_lfp_growth_panel.yaml)
+- `demo_fertility_decline_growth_slowdown_panel` (candidate, hypotheses/labour/demo_fertility_decline_growth_slowdown_panel.yaml)
+- `demo_france_pied_noir_absorption` (candidate, hypotheses/labour/demo_france_pied_noir_absorption.yaml)
+- `demo_germany_gastarbeiter_long_run` (candidate, hypotheses/labour/demo_germany_gastarbeiter_long_run.yaml)
+- `demo_life_expectancy_lfp_panel` (candidate, hypotheses/labour/demo_life_expectancy_lfp_panel.yaml)
+- `demo_marriage_age_fertility_growth` (candidate, hypotheses/labour/demo_marriage_age_fertility_growth.yaml)
+- `demo_mexico_fertility_decline_wages` (candidate, hypotheses/labour/demo_mexico_fertility_decline_wages.yaml)
+- `demo_migration_inflows_wages_skill_split` (candidate, hypotheses/labour/demo_migration_inflows_wages_skill_split.yaml)
+- `demo_singapore_high_skill_migration_policy` (candidate, hypotheses/labour/demo_singapore_high_skill_migration_policy.yaml)
+- `demo_sweden_2015_refugee_absorption` (candidate, hypotheses/labour/demo_sweden_2015_refugee_absorption.yaml)
+- `demo_uk_post_2004_eu_migration` (candidate, hypotheses/labour/demo_uk_post_2004_eu_migration.yaml)
+- `demo_us_hart_celler_1965_legacy` (candidate, hypotheses/labour/demo_us_hart_celler_1965_legacy.yaml)
+- `diaspora_return_market_reform` (candidate, hypotheses/labour/diaspora_return_market_reform.yaml)
+- `disability_reform_work_incentive_employment` (draft, hypotheses/labour/disability_reform_work_incentive_employment.yaml)
+- `emilia_romagna_coop_employment_resilience` (draft, hypotheses/labour/emilia_romagna_coop_employment_resilience.yaml)
+- `employment_protection_youth_unemployment_long_run` (candidate, hypotheses/labour/employment_protection_youth_unemployment_long_run.yaml)
+- `epl_security_youth_unemployment_dualism_panel` (candidate, hypotheses/labour/epl_security_youth_unemployment_dualism_panel.yaml)
+- `equal_pay_legislation_enforcement_gender_gap_closure` (draft, hypotheses/labour/equal_pay_legislation_enforcement_gender_gap_closure.yaml)
+- `eurostat_power_cost_unemployment_slack_panel` (candidate, hypotheses/labour/eurostat_power_cost_unemployment_slack_panel.yaml)
+- `federal_minimum_wage_employment_meta` (draft, hypotheses/labour/federal_minimum_wage_employment_meta.yaml)
+- `female_lfp_market_opportunity` (candidate, hypotheses/labour/female_lfp_market_opportunity.yaml)
+- `financialization_labor_share_investment_panel` (candidate, hypotheses/labour/financialization_labor_share_investment_panel.yaml)
+- `fiscal_multipliers_state_dependent` (draft, hypotheses/labour/fiscal_multipliers_state_dependent.yaml)
+- `fred_productivity_compensation_gap_us_1973_2025` (candidate, hypotheses/labour/fred_productivity_compensation_gap_us_1973_2025.yaml)
+- `friedman_negative_income_tax_labour_supply_smaller_than_predicted` (candidate, hypotheses/labour/friedman_negative_income_tax_labour_supply_smaller_than_predicted.yaml)
+- `gig_economy_regulation_entrepreneurship_cost` (draft, hypotheses/labour/gig_economy_regulation_entrepreneurship_cost.yaml)
+- `heritage_business_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_business_freedom_employment_rate_current_gap.yaml)
+- `heritage_business_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_business_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_business_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_business_freedom_female_lfp_current_gap.yaml)
+- `heritage_business_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_business_freedom_female_lfp_income_region_robustness.yaml)
+- `heritage_economic_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_economic_freedom_employment_rate_current_gap.yaml)
+- `heritage_economic_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_economic_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_economic_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_economic_freedom_female_lfp_current_gap.yaml)
+- `heritage_economic_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_economic_freedom_female_lfp_income_region_robustness.yaml)
+- `heritage_financial_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_financial_freedom_employment_rate_current_gap.yaml)
+- `heritage_financial_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_financial_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_financial_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_financial_freedom_female_lfp_current_gap.yaml)
+- `heritage_financial_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_financial_freedom_female_lfp_income_region_robustness.yaml)
+- `heritage_government_integrity_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_government_integrity_employment_rate_current_gap.yaml)
+- `heritage_government_integrity_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_government_integrity_employment_rate_income_region_robustness.yaml)
+- `heritage_government_integrity_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_government_integrity_female_lfp_current_gap.yaml)
+- `heritage_government_integrity_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_government_integrity_female_lfp_income_region_robustness.yaml)
+- `heritage_government_spending_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_government_spending_employment_rate_current_gap.yaml)
+- `heritage_government_spending_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_government_spending_employment_rate_income_region_robustness.yaml)
+- `heritage_government_spending_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_government_spending_female_lfp_current_gap.yaml)
+- `heritage_government_spending_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_government_spending_female_lfp_income_region_robustness.yaml)
+- `heritage_investment_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_investment_freedom_employment_rate_current_gap.yaml)
+- `heritage_investment_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_investment_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_investment_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_investment_freedom_female_lfp_current_gap.yaml)
+- `heritage_investment_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_investment_freedom_female_lfp_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_judicial_effectiveness_employment_rate_current_gap.yaml)
+- `heritage_judicial_effectiveness_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_judicial_effectiveness_employment_rate_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_judicial_effectiveness_female_lfp_current_gap.yaml)
+- `heritage_judicial_effectiveness_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_judicial_effectiveness_female_lfp_income_region_robustness.yaml)
+- `heritage_labor_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_labor_freedom_employment_rate_current_gap.yaml)
+- `heritage_labor_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_labor_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_labor_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_labor_freedom_female_lfp_current_gap.yaml)
+- `heritage_labor_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_labor_freedom_female_lfp_income_region_robustness.yaml)
+- `heritage_monetary_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_monetary_freedom_employment_rate_current_gap.yaml)
+- `heritage_monetary_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_monetary_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_monetary_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_monetary_freedom_female_lfp_current_gap.yaml)
+- `heritage_monetary_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_monetary_freedom_female_lfp_income_region_robustness.yaml)
+- `heritage_property_rights_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_property_rights_employment_rate_current_gap.yaml)
+- `heritage_property_rights_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_property_rights_employment_rate_income_region_robustness.yaml)
+- `heritage_property_rights_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_property_rights_female_lfp_current_gap.yaml)
+- `heritage_property_rights_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_property_rights_female_lfp_income_region_robustness.yaml)
+- `heritage_tax_burden_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_tax_burden_employment_rate_current_gap.yaml)
+- `heritage_tax_burden_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_tax_burden_employment_rate_income_region_robustness.yaml)
+- `heritage_tax_burden_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_tax_burden_female_lfp_current_gap.yaml)
+- `heritage_tax_burden_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_tax_burden_female_lfp_income_region_robustness.yaml)
+- `heritage_trade_freedom_employment_rate_current_gap` (candidate, hypotheses/labour/heritage_trade_freedom_employment_rate_current_gap.yaml)
+- `heritage_trade_freedom_employment_rate_income_region_robustness` (candidate, hypotheses/labour/heritage_trade_freedom_employment_rate_income_region_robustness.yaml)
+- `heritage_trade_freedom_female_lfp_current_gap` (candidate, hypotheses/labour/heritage_trade_freedom_female_lfp_current_gap.yaml)
+- `heritage_trade_freedom_female_lfp_income_region_robustness` (candidate, hypotheses/labour/heritage_trade_freedom_female_lfp_income_region_robustness.yaml)
+- `human_capital_mobility_brain_drain_vs_gain` (draft, hypotheses/labour/human_capital_mobility_brain_drain_vs_gain.yaml)
+- `ilostat_services_growth_female_lfp_panel` (candidate, hypotheses/labour/ilostat_services_growth_female_lfp_panel.yaml)
+- `immigration_crime_rate_vs_native_controlled` (pre_registered, hypotheses/labour/immigration_crime_rate_vs_native_controlled.yaml)
+- `immigration_net_fiscal_contribution_by_origin_skill_duration` (pre_registered, hypotheses/labour/immigration_net_fiscal_contribution_by_origin_skill_duration.yaml)
+- `india_services_led_growth_employment_effect` (draft, hypotheses/labour/india_services_led_growth_employment_effect.yaml)
+- `industrial_concentration_labour_share_link` (draft, hypotheses/labour/industrial_concentration_labour_share_link.yaml)
+- `informality_entry_barriers_labor_qol` (candidate, hypotheses/labour/informality_entry_barriers_labor_qol.yaml)
+- `job_guarantee_almp_unemployment_floor_panel` (candidate, hypotheses/labour/job_guarantee_almp_unemployment_floor_panel.yaml)
+- `jolts_openings_wage_pressure_us_2007_2026` (candidate, hypotheses/labour/jolts_openings_wage_pressure_us_2007_2026.yaml)
+- `labor_market_flexibility_employment_qol` (candidate, hypotheses/labour/labor_market_flexibility_employment_qol.yaml)
+- `labor_market_market_qol_broad_scope` (candidate, hypotheses/labour/labor_market_market_qol_broad_scope.yaml)
+- `labor_reform_real_wage_growth` (candidate, hypotheses/labour/labor_reform_real_wage_growth.yaml)
+- `labor_share_demand_growth_wage_led_panel` (candidate, hypotheses/labour/labor_share_demand_growth_wage_led_panel.yaml)
+- `labour_market_flexibility_employment_growth_panel` (candidate, hypotheses/labour/labour_market_flexibility_employment_growth_panel.yaml)
+- `labour_market_flexibility_employment_resilience` (draft, hypotheses/labour/labour_market_flexibility_employment_resilience.yaml)
+- `labour_market_flexibility_unemployment_duration` (pre_registered, hypotheses/labour/labour_market_flexibility_unemployment_duration.yaml)
+- `labour_market_hysteresis_persistent_unemployment` (draft, hypotheses/labour/labour_market_hysteresis_persistent_unemployment.yaml)
+- `labour_market_reform_almp_complementarity_effect` (draft, hypotheses/labour/labour_market_reform_almp_complementarity_effect.yaml)
+- `labour_mobility_barriers_regional_divergence` (draft, hypotheses/labour/labour_mobility_barriers_regional_divergence.yaml)
+- `labour_reform_argentina_macri_2017_blue_collar_employment` (candidate, hypotheses/labour/labour_reform_argentina_macri_2017_blue_collar_employment.yaml)
+- `labour_reform_australia_workchoices_1996_employment` (candidate, hypotheses/labour/labour_reform_australia_workchoices_1996_employment.yaml)
+- `labour_reform_brazil_2017_trabalhista_employment` (candidate, hypotheses/labour/labour_reform_brazil_2017_trabalhista_employment.yaml)
+- `labour_reform_canada_1990s_ui_reform_nairu` (candidate, hypotheses/labour/labour_reform_canada_1990s_ui_reform_nairu.yaml)
+- `labour_reform_chile_2001_lagos_temporal` (candidate, hypotheses/labour/labour_reform_chile_2001_lagos_temporal.yaml)
+- `labour_reform_colombia_2002_uribe_employment` (candidate, hypotheses/labour/labour_reform_colombia_2002_uribe_employment.yaml)
+- `labour_reform_czech_2018_minimum_wage_increase` (candidate, hypotheses/labour/labour_reform_czech_2018_minimum_wage_increase.yaml)
+- `labour_reform_france_35_hour_2000_employment_effect` (candidate, hypotheses/labour/labour_reform_france_35_hour_2000_employment_effect.yaml)
+- `labour_reform_greece_2010_2014_troika_internal_devaluation` (candidate, hypotheses/labour/labour_reform_greece_2010_2014_troika_internal_devaluation.yaml)
+- `labour_reform_hartz_iv_germany_2003_employment_effect` (candidate, hypotheses/labour/labour_reform_hartz_iv_germany_2003_employment_effect.yaml)
+- `labour_reform_hungary_2019_overtime_law` (candidate, hypotheses/labour/labour_reform_hungary_2019_overtime_law.yaml)
+- `labour_reform_india_industrial_codes_2020` (candidate, hypotheses/labour/labour_reform_india_industrial_codes_2020.yaml)
+- `labour_reform_indonesia_omnibus_2020_employment` (candidate, hypotheses/labour/labour_reform_indonesia_omnibus_2020_employment.yaml)
+- `labour_reform_israel_2009_minimum_wage_increase` (candidate, hypotheses/labour/labour_reform_israel_2009_minimum_wage_increase.yaml)
+- `labour_reform_italy_jobs_act_2014_employment_effect` (candidate, hypotheses/labour/labour_reform_italy_jobs_act_2014_employment_effect.yaml)
+- `labour_reform_japan_dispatch_worker_2004_duality` (candidate, hypotheses/labour/labour_reform_japan_dispatch_worker_2004_duality.yaml)
+- `labour_reform_korea_imf_1998_employment` (candidate, hypotheses/labour/labour_reform_korea_imf_1998_employment.yaml)
+- `labour_reform_macron_2017_ordonnances_employment_effect` (candidate, hypotheses/labour/labour_reform_macron_2017_ordonnances_employment_effect.yaml)
+- `labour_reform_mexico_2019_outsourcing_reform` (candidate, hypotheses/labour/labour_reform_mexico_2019_outsourcing_reform.yaml)
+- `labour_reform_nz_employment_contracts_act_1991` (candidate, hypotheses/labour/labour_reform_nz_employment_contracts_act_1991.yaml)
+- `labour_reform_peru_2008_msme_regime` (candidate, hypotheses/labour/labour_reform_peru_2008_msme_regime.yaml)
+- `labour_reform_poland_2017_retirement_age_reversal` (candidate, hypotheses/labour/labour_reform_poland_2017_retirement_age_reversal.yaml)
+- `labour_reform_portugal_2011_troika_employment` (candidate, hypotheses/labour/labour_reform_portugal_2011_troika_employment.yaml)
+- `labour_reform_russia_2002_labour_code_employment` (candidate, hypotheses/labour/labour_reform_russia_2002_labour_code_employment.yaml)
+- `labour_reform_schroeder_agenda_2010_long_run_inequality` (candidate, hypotheses/labour/labour_reform_schroeder_agenda_2010_long_run_inequality.yaml)
+- `labour_reform_south_africa_2018_national_minimum_wage` (candidate, hypotheses/labour/labour_reform_south_africa_2018_national_minimum_wage.yaml)
+- `labour_reform_spain_2012_dismissal_cost_employment` (candidate, hypotheses/labour/labour_reform_spain_2012_dismissal_cost_employment.yaml)
+- `labour_reform_sweden_1990s_employment_recovery` (candidate, hypotheses/labour/labour_reform_sweden_1990s_employment_recovery.yaml)
+- `labour_reform_uk_thatcher_union_law_1980s` (candidate, hypotheses/labour/labour_reform_uk_thatcher_union_law_1980s.yaml)
+- `labour_reform_vietnam_labour_code_2019` (candidate, hypotheses/labour/labour_reform_vietnam_labour_code_2019.yaml)
+- `labour_tax_wedge_single_earner_penalty` (draft, hypotheses/labour/labour_tax_wedge_single_earner_penalty.yaml)
+- `macron_labour_tax_employment_distribution` (draft, hypotheses/labour/macron_labour_tax_employment_distribution.yaml)
+- `market_entry_small_business_jobs` (candidate, hypotheses/labour/market_entry_small_business_jobs.yaml)
+- `market_reform_job_quality_panel` (candidate, hypotheses/labour/market_reform_job_quality_panel.yaml)
+- `meidner_wage_earner_fund_capital_flight` (pre_registered, hypotheses/labour/meidner_wage_earner_fund_capital_flight.yaml)
+- `migration_labor_market_complement_not_substitute` (draft, hypotheses/labour/migration_labor_market_complement_not_substitute.yaml)
+- `migration_labor_market_openness_qol` (candidate, hypotheses/labour/migration_labor_market_openness_qol.yaml)
+- `minimum_wage_above_median_employment_teen_effects` (candidate, hypotheses/labour/minimum_wage_above_median_employment_teen_effects.yaml)
+- `minimum_wage_bite_low_pay_poverty_employment_panel` (candidate, hypotheses/labour/minimum_wage_bite_low_pay_poverty_employment_panel.yaml)
+- `minimum_wage_disemployment_at_high_bite_ratios` (draft, hypotheses/labour/minimum_wage_disemployment_at_high_bite_ratios.yaml)
+- `minimum_wage_employment_effect_us_states` (pre_registered, hypotheses/labour/minimum_wage_employment_effect_us_states.yaml)
+- `minimum_wage_indexation_employment_stability` (draft, hypotheses/labour/minimum_wage_indexation_employment_stability.yaml)
+- `minimum_wage_youth_disemployment_effect` (draft, hypotheses/labour/minimum_wage_youth_disemployment_effect.yaml)
+- `minimum_wage_youth_unemployment_tradeoff` (candidate, hypotheses/labour/minimum_wage_youth_unemployment_tradeoff.yaml)
+- `ml_employment_protection_youth_unemployment_duration` (candidate, hypotheses/labour/ml_employment_protection_youth_unemployment_duration.yaml)
+- `ml_minimum_wage_bite_youth_informality_tradeoff` (candidate, hypotheses/labour/ml_minimum_wage_bite_youth_informality_tradeoff.yaml)
+- `ml_service_sector_entry_female_lfp_panel` (candidate, hypotheses/labour/ml_service_sector_entry_female_lfp_panel.yaml)
+- `ml_tax_wedge_labor_participation_formality_panel` (candidate, hypotheses/labour/ml_tax_wedge_labor_participation_formality_panel.yaml)
+- `mortgage_rate_shock_housing_starts_us_1971_2026` (candidate, hypotheses/labour/mortgage_rate_shock_housing_starts_us_1971_2026.yaml)
+- `natural_rate_hypothesis_long_run_phillips_vertical` (candidate, hypotheses/labour/natural_rate_hypothesis_long_run_phillips_vertical.yaml)
+- `net_migration_revealed_preference_market_institutions` (candidate, hypotheses/labour/net_migration_revealed_preference_market_institutions.yaml)
+- `new_deal_output_employment_counterfactual` (draft, hypotheses/labour/new_deal_output_employment_counterfactual.yaml)
+- `occupational_licensing_income_mobility` (candidate, hypotheses/labour/occupational_licensing_income_mobility.yaml)
+- `occupational_licensing_wage_premium_mobility_cost` (draft, hypotheses/labour/occupational_licensing_wage_premium_mobility_cost.yaml)
+- `oecd_activation_spending_low_education_unemployment` (candidate, hypotheses/labour/oecd_activation_spending_low_education_unemployment.yaml)
+- `oecd_almp_epl_low_education_unemployment_interaction_panel` (candidate, hypotheses/labour/oecd_almp_epl_low_education_unemployment_interaction_panel.yaml)
+- `oecd_almp_spending_unemployment_recovery_panel` (candidate, hypotheses/labour/oecd_almp_spending_unemployment_recovery_panel.yaml)
+- `oecd_bargaining_extension_youth_entry_penalty` (candidate, hypotheses/labour/oecd_bargaining_extension_youth_entry_penalty.yaml)
+- `oecd_collective_bargaining_growth_penalty_kei` (pre_registered, hypotheses/labour/oecd_collective_bargaining_growth_penalty_kei.yaml)
+- `oecd_collective_bargaining_unemployment_nonpenalty` (pre_registered, hypotheses/labour/oecd_collective_bargaining_unemployment_nonpenalty.yaml)
+- `oecd_epl_growth_shock_unemployment_persistence_panel` (candidate, hypotheses/labour/oecd_epl_growth_shock_unemployment_persistence_panel.yaml)
+- `oecd_epl_low_education_unemployment_panel_1985_2019` (candidate, hypotheses/labour/oecd_epl_low_education_unemployment_panel_1985_2019.yaml)
+- `oecd_epl_youth_unemployment_panel` (candidate, hypotheses/labour/oecd_epl_youth_unemployment_panel.yaml)
+- `oecd_low_education_unemployment_minimum_wage_bite` (candidate, hypotheses/labour/oecd_low_education_unemployment_minimum_wage_bite.yaml)
+- `oecd_minimum_wage_bite_low_education_unemployment_panel` (candidate, hypotheses/labour/oecd_minimum_wage_bite_low_education_unemployment_panel.yaml)
+- `oecd_tax_wedge_low_wage_employment_penalty` (candidate, hypotheses/labour/oecd_tax_wedge_low_wage_employment_penalty.yaml)
+- `oecd_union_density_wage_dispersion_employment_tradeoff` (candidate, hypotheses/labour/oecd_union_density_wage_dispersion_employment_tradeoff.yaml)
+- `oecd_vocational_track_youth_unemployment_panel` (candidate, hypotheses/labour/oecd_vocational_track_youth_unemployment_panel.yaml)
+- `oecd_youth_wage_gap_youth_employment` (pre_registered, hypotheses/labour/oecd_youth_wage_gap_youth_employment.yaml)
+- `parental_leave_flexible_design_lfp` (draft, hypotheses/labour/parental_leave_flexible_design_lfp.yaml)
+- `part_time_work_regulation_female_employment` (draft, hypotheses/labour/part_time_work_regulation_female_employment.yaml)
+- `payroll_tax_labor_force_participation` (candidate, hypotheses/labour/payroll_tax_labor_force_participation.yaml)
+- `payroll_tax_labour_cost_employment_elasticity` (draft, hypotheses/labour/payroll_tax_labour_cost_employment_elasticity.yaml)
+- `phillips_curve_flattening_post_1990` (draft, hypotheses/labour/phillips_curve_flattening_post_1990.yaml)
+- `policy_rate_hikes_labor_share_distribution_panel` (candidate, hypotheses/labour/policy_rate_hikes_labor_share_distribution_panel.yaml)
+- `portable_benefits_market_flexibility` (candidate, hypotheses/labour/portable_benefits_market_flexibility.yaml)
+- `post_covid_labour_reallocation_us_2020_2024` (candidate, hypotheses/labour/post_covid_labour_reallocation_us_2020_2024.yaml)
+- `private_sector_job_creation_consumption` (candidate, hypotheses/labour/private_sector_job_creation_consumption.yaml)
+- `public_sector_wage_premium_crowding_out` (draft, hypotheses/labour/public_sector_wage_premium_crowding_out.yaml)
+- `remote_work_regulation_geographic_wage_convergence` (draft, hypotheses/labour/remote_work_regulation_geographic_wage_convergence.yaml)
+- `schroder_agenda_2010_median_wage_inequality` (draft, hypotheses/labour/schroder_agenda_2010_median_wage_inequality.yaml)
+- `second_generation_education_outcomes_by_origin` (pre_registered, hypotheses/labour/second_generation_education_outcomes_by_origin.yaml)
+- `severance_pay_mandate_job_creation_slowdown` (draft, hypotheses/labour/severance_pay_mandate_job_creation_slowdown.yaml)
+- `shorter_hours_productivity_employment_wellbeing_panel` (candidate, hypotheses/labour/shorter_hours_productivity_employment_wellbeing_panel.yaml)
+- `singapore_lky_human_capital_upgrade_1965_2010` (pre_registered, hypotheses/labour/singapore_lky_human_capital_upgrade_1965_2010.yaml)
+- `spain_2021_2023_inflation_unemployment_resilience` (pre_registered, hypotheses/labour/spain_2021_2023_inflation_unemployment_resilience.yaml)
+- `spain_reported_sexual_assault_rate_definition_controlled` (pre_registered, hypotheses/labour/spain_reported_sexual_assault_rate_definition_controlled.yaml)
+- `state_employment_share_productivity_drag` (candidate, hypotheses/labour/state_employment_share_productivity_drag.yaml)
+- `strike_legislation_industrial_peace_productivity` (draft, hypotheses/labour/strike_legislation_industrial_peace_productivity.yaml)
+- `strong_union_labour_law_youth_unemployment_south_europe` (candidate, hypotheses/labour/strong_union_labour_law_youth_unemployment_south_europe.yaml)
+- `temporary_contract_restrictions_youth_hiring_panel` (candidate, hypotheses/labour/temporary_contract_restrictions_youth_hiring_panel.yaml)
+- `training_levies_firm_specific_vs_general` (draft, hypotheses/labour/training_levies_firm_specific_vs_general.yaml)
+- `uae_female_labour_force_participation_1990_2024` (pre_registered, hypotheses/labour/uae_female_labour_force_participation_1990_2024.yaml)
+- `uk_furlough_2020_unemployment_output_shield` (pre_registered, hypotheses/labour/uk_furlough_2020_unemployment_output_shield.yaml)
+- `unemployment_benefit_duration_long_term_unemployment` (draft, hypotheses/labour/unemployment_benefit_duration_long_term_unemployment.yaml)
+- `unemployment_benefit_generosity_stabilizer_vs_duration_panel` (candidate, hypotheses/labour/unemployment_benefit_generosity_stabilizer_vs_duration_panel.yaml)
+- `union_density_labor_share_inequality_growth_panel` (candidate, hypotheses/labour/union_density_labor_share_inequality_growth_panel.yaml)
+- `union_density_wage_compression_employment_tradeoff` (draft, hypotheses/labour/union_density_wage_compression_employment_tradeoff.yaml)
+- `volcker_disinflation_output_cost_magnitude` (draft, hypotheses/labour/volcker_disinflation_output_cost_magnitude.yaml)
+- `wage_inflation_spiral_post_2021_oecd_panel` (candidate, hypotheses/labour/wage_inflation_spiral_post_2021_oecd_panel.yaml)
+- `wfh_productivity_panel_2020_2024` (candidate, hypotheses/labour/wfh_productivity_panel_2020_2024.yaml)
+- `worker_coop_conversion_employment_preservation` (draft, hypotheses/labour/worker_coop_conversion_employment_preservation.yaml)
+- `working_time_reduction_employment_neutral_oecd` (candidate, hypotheses/labour/working_time_reduction_employment_neutral_oecd.yaml)
+- `working_time_regulation_productivity_per_hour` (draft, hypotheses/labour/working_time_regulation_productivity_per_hour.yaml)
+- `cbdc_design_privacy_tradeoff` (candidate, hypotheses/monetary/CBDC_design_privacy_tradeoff.yaml)
+- `abct_credit_boom_predicts_capital_misallocation_oecd` (candidate, hypotheses/monetary/abct_credit_boom_predicts_capital_misallocation_oecd.yaml)
+- `abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007` (candidate, hypotheses/monetary/abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007.yaml)
+- `abenomics_monetary_fiscal_coordination_effect` (draft, hypotheses/monetary/abenomics_monetary_fiscal_coordination_effect.yaml)
+- `abenomics_monetary_policy_demand_effect` (draft, hypotheses/monetary/abenomics_monetary_policy_demand_effect.yaml)
+- `africa_nigeria_naira_redesign_2023_cash_crisis` (candidate, hypotheses/monetary/africa_nigeria_naira_redesign_2023_cash_crisis.yaml)
+- `argentina_cepo_lift_2015_fx_inflation_reserves` (pre_registered, hypotheses/monetary/argentina_cepo_lift_2015_fx_inflation_reserves.yaml)
+- `argentina_default_collapse_output_effects` (draft, hypotheses/monetary/argentina_default_collapse_output_effects.yaml)
+- `argentina_fx_obligation_inflation_mechanism` (pre_registered, hypotheses/monetary/argentina_fx_obligation_inflation_mechanism.yaml)
+- `argentina_paso_2019_fx_reserves_inflation_base_money_lag` (pre_registered, hypotheses/monetary/argentina_paso_2019_fx_reserves_inflation_base_money_lag.yaml)
+- `argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023` (candidate, hypotheses/monetary/argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023.yaml)
+- `australia_2008_fiscal_stimulus_output_effect` (draft, hypotheses/monetary/australia_2008_fiscal_stimulus_output_effect.yaml)
+- `austrian_cantillon_effect_asset_holder_gain_first` (draft, hypotheses/monetary/austrian_cantillon_effect_asset_holder_gain_first.yaml)
+- `austrian_cantillon_sovereign_debt_holders_bailout` (draft, hypotheses/monetary/austrian_cantillon_sovereign_debt_holders_bailout.yaml)
+- `austrian_cantillon_urban_rural_gap` (draft, hypotheses/monetary/austrian_cantillon_urban_rural_gap.yaml)
+- `austrian_central_bank_independence_inflation_bias` (draft, hypotheses/monetary/austrian_central_bank_independence_inflation_bias.yaml)
+- `austrian_crypto_adoption_inflation_hedge_demand` (draft, hypotheses/monetary/austrian_crypto_adoption_inflation_hedge_demand.yaml)
+- `austrian_currency_devaluation_imported_inequality` (draft, hypotheses/monetary/austrian_currency_devaluation_imported_inequality.yaml)
+- `austrian_dollarisation_inflation_stability` (draft, hypotheses/monetary/austrian_dollarisation_inflation_stability.yaml)
+- `austrian_fiat_vs_commodity_money_crisis_amplitude` (draft, hypotheses/monetary/austrian_fiat_vs_commodity_money_crisis_amplitude.yaml)
+- `austrian_gold_standard_price_stability_distribution` (draft, hypotheses/monetary/austrian_gold_standard_price_stability_distribution.yaml)
+- `austrian_helicopter_money_consumption_burst_not_investment` (draft, hypotheses/monetary/austrian_helicopter_money_consumption_burst_not_investment.yaml)
+- `austrian_inflation_expectations_de_anchor_cost` (draft, hypotheses/monetary/austrian_inflation_expectations_de_anchor_cost.yaml)
+- `austrian_inflation_regressive_consumption_basket` (draft, hypotheses/monetary/austrian_inflation_regressive_consumption_basket.yaml)
+- `austrian_inflation_tax_poor_savings_erosion` (draft, hypotheses/monetary/austrian_inflation_tax_poor_savings_erosion.yaml)
+- `austrian_monetary_expansion_asset_bubble_not_cpi_panel` (candidate, hypotheses/monetary/austrian_monetary_expansion_asset_bubble_not_cpi_panel.yaml)
+- `austrian_monetary_expansion_housing_inequality` (draft, hypotheses/monetary/austrian_monetary_expansion_housing_inequality.yaml)
+- `austrian_monetary_neutrality_long_run_non_neutral` (draft, hypotheses/monetary/austrian_monetary_neutrality_long_run_non_neutral.yaml)
+- `austrian_monetary_regime_credibility_duration` (draft, hypotheses/monetary/austrian_monetary_regime_credibility_duration.yaml)
+- `austrian_money_creation_bank_credit_asset_bias` (draft, hypotheses/monetary/austrian_money_creation_bank_credit_asset_bias.yaml)
+- `austrian_seigniorage_development_state_crowding` (draft, hypotheses/monetary/austrian_seigniorage_development_state_crowding.yaml)
+- `austrian_sound_money_gini_stability` (draft, hypotheses/monetary/austrian_sound_money_gini_stability.yaml)
+- `austrian_v_recovery_us_1920_no_fiscal_stim_canonical` (candidate, hypotheses/monetary/austrian_v_recovery_us_1920_no_fiscal_stim_canonical.yaml)
+- `austrian_zlb_duration_pension_fund_squeeze` (draft, hypotheses/monetary/austrian_zlb_duration_pension_fund_squeeze.yaml)
+- `baa_aaa_spread_real_activity_us_1919_2026` (candidate, hypotheses/monetary/baa_aaa_spread_real_activity_us_1919_2026.yaml)
+- `bis_credit_gap_consumption_slowdown_panel_1970_2025` (candidate, hypotheses/monetary/bis_credit_gap_consumption_slowdown_panel_1970_2025.yaml)
+- `bis_credit_gap_current_account_interaction_panel_1970_2025` (candidate, hypotheses/monetary/bis_credit_gap_current_account_interaction_panel_1970_2025.yaml)
+- `bis_credit_gap_current_account_twin_deficit_risk` (candidate, hypotheses/monetary/bis_credit_gap_current_account_twin_deficit_risk.yaml)
+- `bis_credit_gap_dsr_joint_crisis_risk_panel_1999_2025` (candidate, hypotheses/monetary/bis_credit_gap_dsr_joint_crisis_risk_panel_1999_2025.yaml)
+- `bis_credit_gap_dsr_joint_fragility_panel_1999_2025` (candidate, hypotheses/monetary/bis_credit_gap_dsr_joint_fragility_panel_1999_2025.yaml)
+- `bis_credit_gap_governance_crisis_amplifier_panel` (candidate, hypotheses/monetary/bis_credit_gap_governance_crisis_amplifier_panel.yaml)
+- `bis_credit_gap_low_real_rate_amplifier_panel` (candidate, hypotheses/monetary/bis_credit_gap_low_real_rate_amplifier_panel.yaml)
+- `bis_credit_gap_unemployment_lag_panel_1970_2025` (candidate, hypotheses/monetary/bis_credit_gap_unemployment_lag_panel_1970_2025.yaml)
+- `bis_dsr_current_account_deficit_unemployment_panel_1999_2025` (candidate, hypotheses/monetary/bis_dsr_current_account_deficit_unemployment_panel_1999_2025.yaml)
+- `bis_household_dsr_consumption_slowdown_panel` (candidate, hypotheses/monetary/bis_household_dsr_consumption_slowdown_panel.yaml)
+- `bis_household_dsr_consumption_slowdown_panel_1999_2025` (candidate, hypotheses/monetary/bis_household_dsr_consumption_slowdown_panel_1999_2025.yaml)
+- `bis_household_dsr_credit_slowdown_panel` (candidate, hypotheses/monetary/bis_household_dsr_credit_slowdown_panel.yaml)
+- `bis_household_dsr_policy_rate_consumption_slowdown_panel` (candidate, hypotheses/monetary/bis_household_dsr_policy_rate_consumption_slowdown_panel.yaml)
+- `bis_low_policy_rate_credit_gap_asset_cycle_panel` (candidate, hypotheses/monetary/bis_low_policy_rate_credit_gap_asset_cycle_panel.yaml)
+- `bis_policy_rate_credit_gap_compression_panel` (candidate, hypotheses/monetary/bis_policy_rate_credit_gap_compression_panel.yaml)
+- `bis_reer_appreciation_inflation_relief_panel_1964_2026` (candidate, hypotheses/monetary/bis_reer_appreciation_inflation_relief_panel_1964_2026.yaml)
+- `bis_reer_appreciation_reversal_panel` (candidate, hypotheses/monetary/bis_reer_appreciation_reversal_panel.yaml)
+- `bis_reer_appreciation_trade_open_disinflation_panel` (candidate, hypotheses/monetary/bis_reer_appreciation_trade_open_disinflation_panel.yaml)
+- `bis_reer_depreciation_current_account_repair_panel_1964_2026` (candidate, hypotheses/monetary/bis_reer_depreciation_current_account_repair_panel_1964_2026.yaml)
+- `bis_reer_devaluation_inflation_tradeoff_panel_1964_2026` (candidate, hypotheses/monetary/bis_reer_devaluation_inflation_tradeoff_panel_1964_2026.yaml)
+- `bis_reer_misalignment_current_account_repair_panel_1964_2026` (candidate, hypotheses/monetary/bis_reer_misalignment_current_account_repair_panel_1964_2026.yaml)
+- `bitcoin_legal_tender_remittance_adoption_2021_2024` (candidate, hypotheses/monetary/bitcoin_legal_tender_remittance_adoption_2021_2024.yaml)
+- `capacity_bank_capital_buffers_credit_cycle_cost` (candidate, hypotheses/monetary/capacity_bank_capital_buffers_credit_cycle_cost.yaml)
+- `capacity_rule_of_law_financial_depth_productive_allocation` (candidate, hypotheses/monetary/capacity_rule_of_law_financial_depth_productive_allocation.yaml)
+- `cash_transaction_tax_digital_monitoring` (draft, hypotheses/monetary/cash_transaction_tax_digital_monitoring.yaml)
+- `central_bank_asset_purchases_yields_inflation_panel` (candidate, hypotheses/monetary/central_bank_asset_purchases_yields_inflation_panel.yaml)
+- `central_bank_balance_sheet_cpi_decoupling_panel_2008_2020` (candidate, hypotheses/monetary/central_bank_balance_sheet_cpi_decoupling_panel_2008_2020.yaml)
+- `central_bank_balance_sheet_size_exit_risk` (draft, hypotheses/monetary/central_bank_balance_sheet_size_exit_risk.yaml)
+- `central_bank_independence_inflation_discipline` (pre_registered, hypotheses/monetary/central_bank_independence_inflation_discipline.yaml)
+- `chile_chicago_boys_monetary_stabilisation_effect` (draft, hypotheses/monetary/chile_chicago_boys_monetary_stabilisation_effect.yaml)
+- `classical_gold_standard_vs_fiat_long_run_inflation_comparison` (draft, hypotheses/monetary/classical_gold_standard_vs_fiat_long_run_inflation_comparison.yaml)
+- `commodity_price_dollar_dominance_stability` (draft, hypotheses/monetary/commodity_price_dollar_dominance_stability.yaml)
+- `cross_school_sound_money_inflation_reduction_1990_2023` (candidate, hypotheses/monetary/cross_school_sound_money_inflation_reduction_1990_2023.yaml)
+- `cryptocurrency_hedge_capital_control_demand` (draft, hypotheses/monetary/cryptocurrency_hedge_capital_control_demand.yaml)
+- `currency_competition_dollarisation_inflation_anchor` (draft, hypotheses/monetary/currency_competition_dollarisation_inflation_anchor.yaml)
+- `currency_monetisation_consumer_price_effect` (pre_registered, hypotheses/monetary/currency_monetisation_consumer_price_effect.yaml)
+- `currency_union_asymmetric_shock_cost` (draft, hypotheses/monetary/currency_union_asymmetric_shock_cost.yaml)
+- `currency_user_vs_issuer_hyperinflation_classification` (candidate, hypotheses/monetary/currency_user_vs_issuer_hyperinflation_classification.yaml)
+- `erhard_1948_liberalisation_recovery_effect` (draft, hypotheses/monetary/erhard_1948_liberalisation_recovery_effect.yaml)
+- `euro_area_fiscal_constraint_contractionary_effect` (draft, hypotheses/monetary/euro_area_fiscal_constraint_contractionary_effect.yaml)
+- `exchange_rate_flexibility_shock_absorption` (draft, hypotheses/monetary/exchange_rate_flexibility_shock_absorption.yaml)
+- `fed_2022_rate_cycle_inflation_response_lag` (candidate, hypotheses/monetary/fed_2022_rate_cycle_inflation_response_lag.yaml)
+- `fed_qt_balance_sheet_unwind_2022_2025_market_response` (candidate, hypotheses/monetary/fed_qt_balance_sheet_unwind_2022_2025_market_response.yaml)
+- `fiat_expansion_erodes_currency_purchasing_power_long_run` (pre_registered, hypotheses/monetary/fiat_expansion_erodes_currency_purchasing_power_long_run.yaml)
+- `financial_boe_independence_1997_macroprudential_2013` (candidate, hypotheses/monetary/financial_boe_independence_1997_macroprudential_2013.yaml)
+- `financial_fed_dot_plot_realised_path_2012_2024` (candidate, hypotheses/monetary/financial_fed_dot_plot_realised_path_2012_2024.yaml)
+- `financial_fed_reverse_repo_facility_usage_2021_2024` (candidate, hypotheses/monetary/financial_fed_reverse_repo_facility_usage_2021_2024.yaml)
+- `financial_negative_rates_eurozone_2014_2022` (candidate, hypotheses/monetary/financial_negative_rates_eurozone_2014_2022.yaml)
+- `forward_guidance_term_structure_effect` (draft, hypotheses/monetary/forward_guidance_term_structure_effect.yaml)
+- `fossil_subsidy_persistence_private_ownership_link` (draft, hypotheses/monetary/fossil_subsidy_persistence_private_ownership_link.yaml)
+- `fred_m2_asset_price_cpi_divergence_us_panel` (candidate, hypotheses/monetary/fred_m2_asset_price_cpi_divergence_us_panel.yaml)
+- `free_banking_historical_stability` (draft, hypotheses/monetary/free_banking_historical_stability.yaml)
+- `friedman_inflation_always_monetary_long_run_panel` (candidate, hypotheses/monetary/friedman_inflation_always_monetary_long_run_panel.yaml)
+- `friedman_natural_rate_long_run_phillips_vertical_us` (candidate, hypotheses/monetary/friedman_natural_rate_long_run_phillips_vertical_us.yaml)
+- `friedman_schwartz_great_depression_monetary_cause` (draft, hypotheses/monetary/friedman_schwartz_great_depression_monetary_cause.yaml)
+- `gold_standard_price_stability_historical` (draft, hypotheses/monetary/gold_standard_price_stability_historical.yaml)
+- `great_depression_over_accumulation_vs_monetary_cause` (candidate, hypotheses/monetary/great_depression_over_accumulation_vs_monetary_cause.yaml)
+- `greek_fiscal_dominance_currency_user_distinction` (draft, hypotheses/monetary/greek_fiscal_dominance_currency_user_distinction.yaml)
+- `heritage_business_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_business_freedom_inflation_rate_current_gap.yaml)
+- `heritage_business_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_business_freedom_inflation_rate_income_region_robustness.yaml)
+- `heritage_economic_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_economic_freedom_inflation_rate_current_gap.yaml)
+- `heritage_economic_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_economic_freedom_inflation_rate_income_region_robustness.yaml)
+- `heritage_financial_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_financial_freedom_inflation_rate_current_gap.yaml)
+- `heritage_financial_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_financial_freedom_inflation_rate_income_region_robustness.yaml)
+- `heritage_government_integrity_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_government_integrity_inflation_rate_current_gap.yaml)
+- `heritage_government_integrity_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_government_integrity_inflation_rate_income_region_robustness.yaml)
+- `heritage_government_spending_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_government_spending_inflation_rate_current_gap.yaml)
+- `heritage_government_spending_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_government_spending_inflation_rate_income_region_robustness.yaml)
+- `heritage_investment_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_investment_freedom_inflation_rate_current_gap.yaml)
+- `heritage_investment_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_investment_freedom_inflation_rate_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_judicial_effectiveness_inflation_rate_current_gap.yaml)
+- `heritage_judicial_effectiveness_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_judicial_effectiveness_inflation_rate_income_region_robustness.yaml)
+- `heritage_labor_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_labor_freedom_inflation_rate_current_gap.yaml)
+- `heritage_labor_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_labor_freedom_inflation_rate_income_region_robustness.yaml)
+- `heritage_monetary_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_monetary_freedom_inflation_rate_current_gap.yaml)
+- `heritage_monetary_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_monetary_freedom_inflation_rate_income_region_robustness.yaml)
+- `heritage_property_rights_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_property_rights_inflation_rate_current_gap.yaml)
+- `heritage_property_rights_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_property_rights_inflation_rate_income_region_robustness.yaml)
+- `heritage_tax_burden_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_tax_burden_inflation_rate_current_gap.yaml)
+- `heritage_tax_burden_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_tax_burden_inflation_rate_income_region_robustness.yaml)
+- `heritage_trade_freedom_inflation_rate_current_gap` (candidate, hypotheses/monetary/heritage_trade_freedom_inflation_rate_current_gap.yaml)
+- `heritage_trade_freedom_inflation_rate_income_region_robustness` (candidate, hypotheses/monetary/heritage_trade_freedom_inflation_rate_income_region_robustness.yaml)
+- `household_debt_minsky_cycle_2008` (candidate, hypotheses/monetary/household_debt_minsky_cycle_2008.yaml)
+- `hyperinflation_recovery_currency_reform` (draft, hypotheses/monetary/hyperinflation_recovery_currency_reform.yaml)
+- `hyperinflation_requires_fiscal_dominance` (pre_registered, hypotheses/monetary/hyperinflation_requires_fiscal_dominance.yaml)
+- `inflation_cost_push_distributional_conflict_eurozone_2021_2024` (candidate, hypotheses/monetary/inflation_cost_push_distributional_conflict_eurozone_2021_2024.yaml)
+- `inflation_expectations_anchoring_flattens_phillips_curve` (draft, hypotheses/monetary/inflation_expectations_anchoring_flattens_phillips_curve.yaml)
+- `inflation_expectations_de_anchor_cost_output` (draft, hypotheses/monetary/inflation_expectations_de_anchor_cost_output.yaml)
+- `inflation_targeting_adoption_inflation_persistence_drop` (draft, hypotheses/monetary/inflation_targeting_adoption_inflation_persistence_drop.yaml)
+- `inflation_volatility_investment_horizon_shortening` (draft, hypotheses/monetary/inflation_volatility_investment_horizon_shortening.yaml)
+- `interest_rate_hike_distributional_upward_redistribution` (candidate, hypotheses/monetary/interest_rate_hike_distributional_upward_redistribution.yaml)
+- `japan_public_debt_solvency_inflation_independence` (pre_registered, hypotheses/monetary/japan_public_debt_solvency_inflation_independence.yaml)
+- `japan_sargent_wallace_refutation_1990_2024` (candidate, hypotheses/monetary/japan_sargent_wallace_refutation_1990_2024.yaml)
+- `latam_remittance_dependency_2020_2025_dollarisation_pull` (candidate, hypotheses/monetary/latam_remittance_dependency_2020_2025_dollarisation_pull.yaml)
+- `lucas_critique_pre_post_volcker_phillips_curve_shift` (candidate, hypotheses/monetary/lucas_critique_pre_post_volcker_phillips_curve_shift.yaml)
+- `lucas_expectations_anchoring_post_volcker_us_inflation_persistence` (candidate, hypotheses/monetary/lucas_expectations_anchoring_post_volcker_us_inflation_persistence.yaml)
+- `m2_expansion_correlates_with_asset_price_inflation` (pre_registered, hypotheses/monetary/m2_expansion_correlates_with_asset_price_inflation.yaml)
+- `maastricht_convergence_discipline_effect` (draft, hypotheses/monetary/maastricht_convergence_discipline_effect.yaml)
+- `market_order_sound_money_employment_rate_panel` (pre_registered, hypotheses/monetary/market_order_sound_money_employment_rate_panel.yaml)
+- `market_order_sound_money_gdp_pc_growth_panel` (pre_registered, hypotheses/monetary/market_order_sound_money_gdp_pc_growth_panel.yaml)
+- `market_order_sound_money_investment_share_panel` (pre_registered, hypotheses/monetary/market_order_sound_money_investment_share_panel.yaml)
+- `market_order_sound_money_private_credit_depth_panel` (pre_registered, hypotheses/monetary/market_order_sound_money_private_credit_depth_panel.yaml)
+- `mena_egypt_floatation_episodes_2016_2024` (candidate, hypotheses/monetary/mena_egypt_floatation_episodes_2016_2024.yaml)
+- `mena_lebanon_currency_collapse_real_economy_2019_2024` (pre_registered, hypotheses/monetary/mena_lebanon_currency_collapse_real_economy_2019_2024.yaml)
+- `milei_dollarisation_inflation_collapse_2024_2026` (candidate, hypotheses/monetary/milei_dollarisation_inflation_collapse_2024_2026.yaml)
+- `milei_reforms_reduce_argentine_inflation` (pre_registered, hypotheses/monetary/milei_reforms_reduce_argentine_inflation.yaml)
+- `mitterrand_nationalised_firm_efficiency` (pre_registered, hypotheses/monetary/mitterrand_nationalised_firm_efficiency.yaml)
+- `ml_credit_boom_price_signal_bust_severity` (candidate, hypotheses/monetary/ml_credit_boom_price_signal_bust_severity.yaml)
+- `ml_financial_repression_savings_real_rate_investment` (candidate, hypotheses/monetary/ml_financial_repression_savings_real_rate_investment.yaml)
+- `ml_money_growth_nominal_anchor_inflation_1960_2024` (candidate, hypotheses/monetary/ml_money_growth_nominal_anchor_inflation_1960_2024.yaml)
+- `monetarist_fed_2008_great_recession_avoidable_with_constant_m_growth` (candidate, hypotheses/monetary/monetarist_fed_2008_great_recession_avoidable_with_constant_m_growth.yaml)
+- `monetarist_velocity_stability_breaks_post_2008` (candidate, hypotheses/monetary/monetarist_velocity_stability_breaks_post_2008.yaml)
+- `monetary_finance_deficit_currency_collapse_chain` (candidate, hypotheses/monetary/monetary_finance_deficit_currency_collapse_chain.yaml)
+- `monetary_finance_zlb_no_inflation` (candidate, hypotheses/monetary/monetary_finance_zlb_no_inflation.yaml)
+- `monetary_financing_fiscal_deficit_inflation_spike` (draft, hypotheses/monetary/monetary_financing_fiscal_deficit_inflation_spike.yaml)
+- `negative_interest_rate_bank_profitability_squeeze` (draft, hypotheses/monetary/negative_interest_rate_bank_profitability_squeeze.yaml)
+- `ordo_rule_bound_monetary_bundesbank_inflation_track_record_1948_1998` (candidate, hypotheses/monetary/ordo_rule_bound_monetary_bundesbank_inflation_track_record_1948_1998.yaml)
+- `petro_reform_package_capital_flight_response_2022_2026` (candidate, hypotheses/monetary/petro_reform_package_capital_flight_response_2022_2026.yaml)
+- `post_covid_inflation_episode_supply_vs_demand_decomposition` (candidate, hypotheses/monetary/post_covid_inflation_episode_supply_vs_demand_decomposition.yaml)
+- `private_credit_growth_crisis_predictor_oecd` (candidate, hypotheses/monetary/private_credit_growth_crisis_predictor_oecd.yaml)
+- `qe_asset_inflation_vs_cpi_divergence_post_2008` (pre_registered, hypotheses/monetary/qe_asset_inflation_vs_cpi_divergence_post_2008.yaml)
+- `qe_base_money_cpi_transmission_failure` (pre_registered, hypotheses/monetary/qe_base_money_cpi_transmission_failure.yaml)
+- `qe_financialisation_minsky_channel_2008_2021` (candidate, hypotheses/monetary/qe_financialisation_minsky_channel_2008_2021.yaml)
+- `qe_zlb_effectiveness_term_premia` (draft, hypotheses/monetary/qe_zlb_effectiveness_term_premia.yaml)
+- `seigniorage_maximisation_inflation_tax_laffer` (draft, hypotheses/monetary/seigniorage_maximisation_inflation_tax_laffer.yaml)
+- `sound_money_culture_legal_entrenchment` (draft, hypotheses/monetary/sound_money_culture_legal_entrenchment.yaml)
+- `sound_money_low_inflation_growth_stability` (draft, hypotheses/monetary/sound_money_low_inflation_growth_stability.yaml)
+- `sound_money_pension_real_value_preservation` (draft, hypotheses/monetary/sound_money_pension_real_value_preservation.yaml)
+- `sovereign_currency_debt_inflation_threshold_panel` (candidate, hypotheses/monetary/sovereign_currency_debt_inflation_threshold_panel.yaml)
+- `turkey_fx_erdogan_unorthodox_inflation_response_2021_2024` (candidate, hypotheses/monetary/turkey_fx_erdogan_unorthodox_inflation_response_2021_2024.yaml)
+- `uk_1997_institutional_reform_macro_stability` (draft, hypotheses/monetary/uk_1997_institutional_reform_macro_stability.yaml)
+- `uk_brexit_2016_inflation_real_earnings_window` (pre_registered, hypotheses/monetary/uk_brexit_2016_inflation_real_earnings_window.yaml)
+- `uk_energy_cpi_real_earnings_squeeze_2022` (pre_registered, hypotheses/monetary/uk_energy_cpi_real_earnings_squeeze_2022.yaml)
+- `unfunded_fiscal_expansion_above_zlb_bond_market_response` (pre_registered, hypotheses/monetary/unfunded_fiscal_expansion_above_zlb_bond_market_response.yaml)
+- `us_2020_2021_fiscal_inflation_transient_vs_persistent` (pre_registered, hypotheses/monetary/us_2020_2021_fiscal_inflation_transient_vs_persistent.yaml)
+- `us_dollar_issuer_solvency_record` (draft, hypotheses/monetary/us_dollar_issuer_solvency_record.yaml)
+- `usd_issuer_solvency_no_default_post_1971` (candidate, hypotheses/monetary/usd_issuer_solvency_no_default_post_1971.yaml)
+- `yield_curve_inversion_unemployment_us_1976_2026` (pre_registered, hypotheses/monetary/yield_curve_inversion_unemployment_us_1976_2026.yaml)
+- `zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009` (pre_registered, hypotheses/monetary/zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009.yaml)
+- `zimbabwe_land_reform_cause_decomposition` (draft, hypotheses/monetary/zimbabwe_land_reform_cause_decomposition.yaml)
+- `zimbabwe_property_rights_output_link` (draft, hypotheses/monetary/zimbabwe_property_rights_output_link.yaml)
+- `austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020` (candidate, hypotheses/regulatory/austrian_kirzner_entrepreneurship_business_dynamism_decline_us_1980_2020.yaml)
+- `bank_state_ownership_credit_misallocation` (candidate, hypotheses/regulatory/bank_state_ownership_credit_misallocation.yaml)
+- `banking_crisis_2008_gfc_canonical_multimetric` (pre_registered, hypotheses/regulatory/banking_crisis_2008_gfc_canonical_multimetric.yaml)
+- `banking_crisis_argentina_2001_corralito_canonical` (pre_registered, hypotheses/regulatory/banking_crisis_argentina_2001_corralito_canonical.yaml)
+- `banking_crisis_asian_financial_crisis_1997_panel` (pre_registered, hypotheses/regulatory/banking_crisis_asian_financial_crisis_1997_panel.yaml)
+- `banking_crisis_brazil_1999_real_devaluation` (pre_registered, hypotheses/regulatory/banking_crisis_brazil_1999_real_devaluation.yaml)
+- `banking_crisis_brazil_proer_1995_1997` (pre_registered, hypotheses/regulatory/banking_crisis_brazil_proer_1995_1997.yaml)
+- `banking_crisis_china_2015_2020_panel` (pre_registered, hypotheses/regulatory/banking_crisis_china_2015_2020_panel.yaml)
+- `banking_crisis_cyprus_2013_bailin` (pre_registered, hypotheses/regulatory/banking_crisis_cyprus_2013_bailin.yaml)
+- `banking_crisis_greece_2010_2018_doom_loop` (pre_registered, hypotheses/regulatory/banking_crisis_greece_2010_2018_doom_loop.yaml)
+- `banking_crisis_iceland_2008_canonical_multimetric` (pre_registered, hypotheses/regulatory/banking_crisis_iceland_2008_canonical_multimetric.yaml)
+- `banking_crisis_ireland_2008_property_bust` (pre_registered, hypotheses/regulatory/banking_crisis_ireland_2008_property_bust.yaml)
+- `banking_crisis_italy_2016_2017_mps` (pre_registered, hypotheses/regulatory/banking_crisis_italy_2016_2017_mps.yaml)
+- `banking_crisis_japan_1990_lost_decade` (pre_registered, hypotheses/regulatory/banking_crisis_japan_1990_lost_decade.yaml)
+- `banking_crisis_laeven_valencia_predictors_panel` (candidate, hypotheses/regulatory/banking_crisis_laeven_valencia_predictors_panel.yaml)
+- `banking_crisis_latvia_2008_parex` (pre_registered, hypotheses/regulatory/banking_crisis_latvia_2008_parex.yaml)
+- `banking_crisis_lebanon_2019_2024_collapse` (pre_registered, hypotheses/regulatory/banking_crisis_lebanon_2019_2024_collapse.yaml)
+- `banking_crisis_mexico_tequila_1994_canonical` (pre_registered, hypotheses/regulatory/banking_crisis_mexico_tequila_1994_canonical.yaml)
+- `banking_crisis_nordic_1991_1993_panel` (pre_registered, hypotheses/regulatory/banking_crisis_nordic_1991_1993_panel.yaml)
+- `banking_crisis_russia_1998_default_canonical` (pre_registered, hypotheses/regulatory/banking_crisis_russia_1998_default_canonical.yaml)
+- `banking_crisis_schularick_taylor_credit_boom_panel_post1980` (candidate, hypotheses/regulatory/banking_crisis_schularick_taylor_credit_boom_panel_post1980.yaml)
+- `banking_crisis_south_africa_african_bank_2014` (pre_registered, hypotheses/regulatory/banking_crisis_south_africa_african_bank_2014.yaml)
+- `banking_crisis_spain_2012_cajas_restructuring` (pre_registered, hypotheses/regulatory/banking_crisis_spain_2012_cajas_restructuring.yaml)
+- `banking_crisis_turkey_2001_canonical` (pre_registered, hypotheses/regulatory/banking_crisis_turkey_2001_canonical.yaml)
+- `banking_crisis_us_2023_svb_signature` (pre_registered, hypotheses/regulatory/banking_crisis_us_2023_svb_signature.yaml)
+- `banking_crisis_us_sl_crisis_1986_1995` (pre_registered, hypotheses/regulatory/banking_crisis_us_sl_crisis_1986_1995.yaml)
+- `banking_crisis_vietnam_2012_2015_restructuring` (pre_registered, hypotheses/regulatory/banking_crisis_vietnam_2012_2015_restructuring.yaml)
+- `bankruptcy_law_efficiency_capital_reallocation` (candidate, hypotheses/regulatory/bankruptcy_law_efficiency_capital_reallocation.yaml)
+- `business_dynamism_frontier_income_growth` (candidate, hypotheses/regulatory/business_dynamism_frontier_income_growth.yaml)
+- `chicago_school_voucher_choice_test_score_gain_meta` (candidate, hypotheses/regulatory/chicago_school_voucher_choice_test_score_gain_meta.yaml)
+- `competition_ai_adoption_productivity` (candidate, hypotheses/regulatory/competition_ai_adoption_productivity.yaml)
+- `competition_enforcement_consumer_welfare_effect` (draft, hypotheses/regulatory/competition_enforcement_consumer_welfare_effect.yaml)
+- `competition_policy_enforcement_innovation` (candidate, hypotheses/regulatory/competition_policy_enforcement_innovation.yaml)
+- `competition_telecom_prices_quality` (candidate, hypotheses/regulatory/competition_telecom_prices_quality.yaml)
+- `deregulation_productivity_effect` (draft, hypotheses/regulatory/deregulation_productivity_effect.yaml)
+- `digital_education_market_entry` (candidate, hypotheses/regulatory/digital_education_market_entry.yaml)
+- `digital_regulation_startup_creation` (candidate, hypotheses/regulatory/digital_regulation_startup_creation.yaml)
+- `eu_cbam_export_competitiveness_2023_onwards` (pre_registered, hypotheses/regulatory/eu_cbam_export_competitiveness_2023_onwards.yaml)
+- `eu_chemical_reach_regulation_firm_exit_effect` (pre_registered, hypotheses/regulatory/eu_chemical_reach_regulation_firm_exit_effect.yaml)
+- `eu_regulatory_burden_productivity_drag` (pre_registered, hypotheses/regulatory/eu_regulatory_burden_productivity_drag.yaml)
+- `financial_basel_iii_capital_buildup_2013_2019` (candidate, hypotheses/regulatory/financial_basel_iii_capital_buildup_2013_2019.yaml)
+- `financial_deregulation_crisis_vulnerability` (pre_registered, hypotheses/regulatory/financial_deregulation_crisis_vulnerability.yaml)
+- `financial_macroprudential_ltv_dsti_credit_panel` (candidate, hypotheses/regulatory/financial_macroprudential_ltv_dsti_credit_panel.yaml)
+- `financial_market_depth_productivity` (candidate, hypotheses/regulatory/financial_market_depth_productivity.yaml)
+- `firm_entry_rate_long_run_productivity` (candidate, hypotheses/regulatory/firm_entry_rate_long_run_productivity.yaml)
+- `gdpr_digital_sector_firm_scale_effect` (pre_registered, hypotheses/regulatory/gdpr_digital_sector_firm_scale_effect.yaml)
+- `germany_decline_2018_2025_regulatory_not_fiscal` (pre_registered, hypotheses/regulatory/germany_decline_2018_2025_regulatory_not_fiscal.yaml)
+- `gfc_contraction_depth_liberalised_vs_state_managed_systems` (draft, hypotheses/regulatory/gfc_contraction_depth_liberalised_vs_state_managed_systems.yaml)
+- `gfc_endogenous_minsky_leverage_mechanism` (draft, hypotheses/regulatory/gfc_endogenous_minsky_leverage_mechanism.yaml)
+- `hayek_regulatory_uncertainty_investment_chilling` (candidate, hypotheses/regulatory/hayek_regulatory_uncertainty_investment_chilling.yaml)
+- `heritage_business_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_business_freedom_account_ownership_current_gap.yaml)
+- `heritage_business_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_business_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_business_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_business_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_business_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_business_freedom_private_credit_depth_income_region_robustness.yaml)
+- `heritage_business_freedom_private_credit_depth_wgi_panel` (pre_registered, hypotheses/regulatory/heritage_business_freedom_private_credit_depth_wgi_panel.yaml)
+- `heritage_economic_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_economic_freedom_account_ownership_current_gap.yaml)
+- `heritage_economic_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_economic_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_economic_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_economic_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_economic_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_economic_freedom_private_credit_depth_income_region_robustness.yaml)
+- `heritage_financial_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_financial_freedom_account_ownership_current_gap.yaml)
+- `heritage_financial_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_financial_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_financial_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_financial_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_financial_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_financial_freedom_private_credit_depth_income_region_robustness.yaml)
+- `heritage_government_integrity_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_government_integrity_account_ownership_current_gap.yaml)
+- `heritage_government_integrity_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_government_integrity_account_ownership_income_region_robustness.yaml)
+- `heritage_government_integrity_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_government_integrity_private_credit_depth_current_gap.yaml)
+- `heritage_government_integrity_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_government_integrity_private_credit_depth_income_region_robustness.yaml)
+- `heritage_government_integrity_private_credit_depth_wgi_panel` (pre_registered, hypotheses/regulatory/heritage_government_integrity_private_credit_depth_wgi_panel.yaml)
+- `heritage_government_spending_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_government_spending_account_ownership_current_gap.yaml)
+- `heritage_government_spending_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_government_spending_account_ownership_income_region_robustness.yaml)
+- `heritage_government_spending_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_government_spending_private_credit_depth_current_gap.yaml)
+- `heritage_government_spending_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_government_spending_private_credit_depth_income_region_robustness.yaml)
+- `heritage_investment_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_investment_freedom_account_ownership_current_gap.yaml)
+- `heritage_investment_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_investment_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_investment_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_investment_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_investment_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_investment_freedom_private_credit_depth_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_judicial_effectiveness_account_ownership_current_gap.yaml)
+- `heritage_judicial_effectiveness_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_judicial_effectiveness_account_ownership_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_judicial_effectiveness_private_credit_depth_current_gap.yaml)
+- `heritage_judicial_effectiveness_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_judicial_effectiveness_private_credit_depth_income_region_robustness.yaml)
+- `heritage_labor_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_labor_freedom_account_ownership_current_gap.yaml)
+- `heritage_labor_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_labor_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_labor_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_labor_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_labor_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_labor_freedom_private_credit_depth_income_region_robustness.yaml)
+- `heritage_monetary_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_monetary_freedom_account_ownership_current_gap.yaml)
+- `heritage_monetary_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_monetary_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_monetary_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_monetary_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_monetary_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_monetary_freedom_private_credit_depth_income_region_robustness.yaml)
+- `heritage_property_rights_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_property_rights_account_ownership_current_gap.yaml)
+- `heritage_property_rights_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_property_rights_account_ownership_income_region_robustness.yaml)
+- `heritage_property_rights_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_property_rights_private_credit_depth_current_gap.yaml)
+- `heritage_property_rights_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_property_rights_private_credit_depth_income_region_robustness.yaml)
+- `heritage_property_rights_private_credit_depth_wgi_panel` (pre_registered, hypotheses/regulatory/heritage_property_rights_private_credit_depth_wgi_panel.yaml)
+- `heritage_tax_burden_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_tax_burden_account_ownership_current_gap.yaml)
+- `heritage_tax_burden_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_tax_burden_account_ownership_income_region_robustness.yaml)
+- `heritage_tax_burden_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_tax_burden_private_credit_depth_current_gap.yaml)
+- `heritage_tax_burden_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_tax_burden_private_credit_depth_income_region_robustness.yaml)
+- `heritage_trade_freedom_account_ownership_current_gap` (candidate, hypotheses/regulatory/heritage_trade_freedom_account_ownership_current_gap.yaml)
+- `heritage_trade_freedom_account_ownership_income_region_robustness` (candidate, hypotheses/regulatory/heritage_trade_freedom_account_ownership_income_region_robustness.yaml)
+- `heritage_trade_freedom_private_credit_depth_current_gap` (candidate, hypotheses/regulatory/heritage_trade_freedom_private_credit_depth_current_gap.yaml)
+- `heritage_trade_freedom_private_credit_depth_income_region_robustness` (candidate, hypotheses/regulatory/heritage_trade_freedom_private_credit_depth_income_region_robustness.yaml)
+- `incumbent_subsidy_innovation_drag` (candidate, hypotheses/regulatory/incumbent_subsidy_innovation_drag.yaml)
+- `incumbent_subsidy_market_share_persistence` (candidate, hypotheses/regulatory/incumbent_subsidy_market_share_persistence.yaml)
+- `innovation_cluster_market_entry` (candidate, hypotheses/regulatory/innovation_cluster_market_entry.yaml)
+- `licensing_burden_income_mobility` (candidate, hypotheses/regulatory/licensing_burden_income_mobility.yaml)
+- `market_competition_patent_quality` (candidate, hypotheses/regulatory/market_competition_patent_quality.yaml)
+- `market_entry_uniform_code_productivity` (candidate, hypotheses/regulatory/market_entry_uniform_code_productivity.yaml)
+- `market_innovation_broad_scope` (candidate, hypotheses/regulatory/market_innovation_broad_scope.yaml)
+- `market_opening_durable_goods_diffusion` (candidate, hypotheses/regulatory/market_opening_durable_goods_diffusion.yaml)
+- `market_order_regulatory_quality_employment_rate_panel` (pre_registered, hypotheses/regulatory/market_order_regulatory_quality_employment_rate_panel.yaml)
+- `market_order_regulatory_quality_gdp_pc_growth_panel` (pre_registered, hypotheses/regulatory/market_order_regulatory_quality_gdp_pc_growth_panel.yaml)
+- `market_order_regulatory_quality_high_tech_exports_panel` (pre_registered, hypotheses/regulatory/market_order_regulatory_quality_high_tech_exports_panel.yaml)
+- `market_order_regulatory_quality_investment_share_panel` (pre_registered, hypotheses/regulatory/market_order_regulatory_quality_investment_share_panel.yaml)
+- `nz_rogernomics_institutional_complements` (draft, hypotheses/regulatory/nz_rogernomics_institutional_complements.yaml)
+- `oecd_product_market_deregulation_tfp_panel` (pre_registered, hypotheses/regulatory/oecd_product_market_deregulation_tfp_panel.yaml)
+- `ordo_competition_law_enforcement_growth_premium_oecd` (candidate, hypotheses/regulatory/ordo_competition_law_enforcement_growth_premium_oecd.yaml)
+- `patent_thicket_intervention_drag` (candidate, hypotheses/regulatory/patent_thicket_intervention_drag.yaml)
+- `platform_competition_dissipates_monopoly_rent` (candidate, hypotheses/regulatory/platform_competition_dissipates_monopoly_rent.yaml)
+- `precautionary_regulation_innovation_productivity_gap_eu_us` (candidate, hypotheses/regulatory/precautionary_regulation_innovation_productivity_gap_eu_us.yaml)
+- `price_signal_integrity_qol_panel` (candidate, hypotheses/regulatory/price_signal_integrity_qol_panel.yaml)
+- `price_signal_sectoral_reallocation_speed` (candidate, hypotheses/regulatory/price_signal_sectoral_reallocation_speed.yaml)
+- `product_market_regulation_tfp_30yr_panel` (candidate, hypotheses/regulatory/product_market_regulation_tfp_30yr_panel.yaml)
+- `public_procurement_innovation_conditions` (candidate, hypotheses/regulatory/public_procurement_innovation_conditions.yaml)
+- `regulatory_sandbox_entry_innovation` (candidate, hypotheses/regulatory/regulatory_sandbox_entry_innovation.yaml)
+- `sectoral_competition_services_productivity` (candidate, hypotheses/regulatory/sectoral_competition_services_productivity.yaml)
+- `spectrum_auction_vs_administrative_allocation_telecom` (candidate, hypotheses/regulatory/spectrum_auction_vs_administrative_allocation_telecom.yaml)
+- `startup_density_frontier_prosperity` (candidate, hypotheses/regulatory/startup_density_frontier_prosperity.yaml)
+- `state_champion_tech_failure_rate` (candidate, hypotheses/regulatory/state_champion_tech_failure_rate.yaml)
+- `state_rd_vs_private_rd_productivity` (candidate, hypotheses/regulatory/state_rd_vs_private_rd_productivity.yaml)
+- `university_spinout_market_rules` (candidate, hypotheses/regulatory/university_spinout_market_rules.yaml)
+- `venture_capital_market_depth_innovation` (candidate, hypotheses/regulatory/venture_capital_market_depth_innovation.yaml)
+- `norway_gpfg_resource_curse_avoidance` (pre_registered, hypotheses/resource_rents/norway_gpfg_resource_curse_avoidance.yaml)
+- `resource_extractor_nationalisation_reduces_output` (candidate, hypotheses/resource_rents/resource_extractor_nationalisation_reduces_output.yaml)
+- `uae_oil_rent_diversification_services_1990_2024` (pre_registered, hypotheses/resource_rents/uae_oil_rent_diversification_services_1990_2024.yaml)
+- `africa_mauritius_export_zone_model_1980_2024` (candidate, hypotheses/trade/africa_mauritius_export_zone_model_1980_2024.yaml)
+- `agricultural_trade_liberalisation_food_security` (draft, hypotheses/trade/agricultural_trade_liberalisation_food_security.yaml)
+- `bilateral_investment_treaty_fdi_flow` (draft, hypotheses/trade/bilateral_investment_treaty_fdi_flow.yaml)
+- `bilateral_investment_treaty_fdi_panel` (candidate, hypotheses/trade/bilateral_investment_treaty_fdi_panel.yaml)
+- `bis_credit_gap_reer_appreciation_export_squeeze_panel` (candidate, hypotheses/trade/bis_credit_gap_reer_appreciation_export_squeeze_panel.yaml)
+- `bis_reer_appreciation_export_variety_panel` (candidate, hypotheses/trade/bis_reer_appreciation_export_variety_panel.yaml)
+- `capacity_tariff_sunset_infant_industry_upgrade` (candidate, hypotheses/trade/capacity_tariff_sunset_infant_industry_upgrade.yaml)
+- `capacity_trade_liberalization_institutional_variance` (candidate, hypotheses/trade/capacity_trade_liberalization_institutional_variance.yaml)
+- `capital_account_openness_institutional_threshold` (candidate, hypotheses/trade/capital_account_openness_institutional_threshold.yaml)
+- `cbam_2026_implementation_carbon_leakage_test` (candidate, hypotheses/trade/cbam_2026_implementation_carbon_leakage_test.yaml)
+- `chips_act_2022_semiconductor_capacity_2024_2027` (candidate, hypotheses/trade/chips_act_2022_semiconductor_capacity_2024_2027.yaml)
+- `commodity_exporter_diversification_trade_policy` (draft, hypotheses/trade/commodity_exporter_diversification_trade_policy.yaml)
+- `cotton_monopsony_state_board_vs_market` (candidate, hypotheses/trade/cotton_monopsony_state_board_vs_market.yaml)
+- `cross_border_data_flow_digital_trade` (draft, hypotheses/trade/cross_border_data_flow_digital_trade.yaml)
+- `cross_school_capital_openness_fdi_1990_2023` (candidate, hypotheses/trade/cross_school_capital_openness_fdi_1990_2023.yaml)
+- `cross_school_fdi_hightech_developmental_1990_2023` (candidate, hypotheses/trade/cross_school_fdi_hightech_developmental_1990_2023.yaml)
+- `cross_school_government_effectiveness_fdi_developmental_1996_2023` (candidate, hypotheses/trade/cross_school_government_effectiveness_fdi_developmental_1996_2023.yaml)
+- `cross_school_trade_freedom_hightech_exports_1990_2023` (candidate, hypotheses/trade/cross_school_trade_freedom_hightech_exports_1990_2023.yaml)
+- `cross_school_trade_openness_growth_1990_2023` (candidate, hypotheses/trade/cross_school_trade_openness_growth_1990_2023.yaml)
+- `cross_school_trade_openness_manufacturing_developmental_1990_2023` (candidate, hypotheses/trade/cross_school_trade_openness_manufacturing_developmental_1990_2023.yaml)
+- `currency_union_trade_creation` (draft, hypotheses/trade/currency_union_trade_creation.yaml)
+- `export_complexity_market_access_vs_subsidy` (candidate, hypotheses/trade/export_complexity_market_access_vs_subsidy.yaml)
+- `export_openness_agricultural_diversification` (candidate, hypotheses/trade/export_openness_agricultural_diversification.yaml)
+- `export_processing_zone_wage_spillover` (draft, hypotheses/trade/export_processing_zone_wage_spillover.yaml)
+- `export_promotion_without_protection` (candidate, hypotheses/trade/export_promotion_without_protection.yaml)
+- `export_promotion_without_protection_outperforms` (draft, hypotheses/trade/export_promotion_without_protection_outperforms.yaml)
+- `fdi_opening_supplier_productivity` (candidate, hypotheses/trade/fdi_opening_supplier_productivity.yaml)
+- `fdi_openness_supplier_productivity` (draft, hypotheses/trade/fdi_openness_supplier_productivity.yaml)
+- `food_market_liberalization_nutrition` (candidate, hypotheses/trade/food_market_liberalization_nutrition.yaml)
+- `food_production_trade_openness_resilience_panel` (candidate, hypotheses/trade/food_production_trade_openness_resilience_panel.yaml)
+- `german_codetermination_competitiveness` (draft, hypotheses/trade/german_codetermination_competitiveness.yaml)
+- `global_value_chain_participation_upgrade` (candidate, hypotheses/trade/global_value_chain_participation_upgrade.yaml)
+- `green_industrial_policy_global_chip_race_2022_2026` (candidate, hypotheses/trade/green_industrial_policy_global_chip_race_2022_2026.yaml)
+- `heritage_business_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_business_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_business_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_business_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_business_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_business_freedom_trade_openness_current_gap.yaml)
+- `heritage_business_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_business_freedom_trade_openness_income_region_robustness.yaml)
+- `heritage_economic_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_economic_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_economic_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_economic_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_economic_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_economic_freedom_trade_openness_current_gap.yaml)
+- `heritage_economic_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_economic_freedom_trade_openness_income_region_robustness.yaml)
+- `heritage_financial_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_financial_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_financial_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_financial_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_financial_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_financial_freedom_trade_openness_current_gap.yaml)
+- `heritage_financial_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_financial_freedom_trade_openness_income_region_robustness.yaml)
+- `heritage_government_integrity_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_government_integrity_high_tech_exports_current_gap.yaml)
+- `heritage_government_integrity_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_government_integrity_high_tech_exports_income_region_robustness.yaml)
+- `heritage_government_integrity_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_government_integrity_trade_openness_current_gap.yaml)
+- `heritage_government_integrity_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_government_integrity_trade_openness_income_region_robustness.yaml)
+- `heritage_government_spending_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_government_spending_high_tech_exports_current_gap.yaml)
+- `heritage_government_spending_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_government_spending_high_tech_exports_income_region_robustness.yaml)
+- `heritage_government_spending_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_government_spending_trade_openness_current_gap.yaml)
+- `heritage_government_spending_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_government_spending_trade_openness_income_region_robustness.yaml)
+- `heritage_investment_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_investment_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_investment_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_investment_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_investment_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_investment_freedom_trade_openness_current_gap.yaml)
+- `heritage_investment_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_investment_freedom_trade_openness_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_judicial_effectiveness_high_tech_exports_current_gap.yaml)
+- `heritage_judicial_effectiveness_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_judicial_effectiveness_high_tech_exports_income_region_robustness.yaml)
+- `heritage_judicial_effectiveness_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_judicial_effectiveness_trade_openness_current_gap.yaml)
+- `heritage_judicial_effectiveness_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_judicial_effectiveness_trade_openness_income_region_robustness.yaml)
+- `heritage_labor_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_labor_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_labor_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_labor_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_labor_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_labor_freedom_trade_openness_current_gap.yaml)
+- `heritage_labor_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_labor_freedom_trade_openness_income_region_robustness.yaml)
+- `heritage_monetary_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_monetary_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_monetary_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_monetary_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_monetary_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_monetary_freedom_trade_openness_current_gap.yaml)
+- `heritage_monetary_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_monetary_freedom_trade_openness_income_region_robustness.yaml)
+- `heritage_property_rights_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_property_rights_high_tech_exports_current_gap.yaml)
+- `heritage_property_rights_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_property_rights_high_tech_exports_income_region_robustness.yaml)
+- `heritage_property_rights_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_property_rights_trade_openness_current_gap.yaml)
+- `heritage_property_rights_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_property_rights_trade_openness_income_region_robustness.yaml)
+- `heritage_tax_burden_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_tax_burden_high_tech_exports_current_gap.yaml)
+- `heritage_tax_burden_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_tax_burden_high_tech_exports_income_region_robustness.yaml)
+- `heritage_tax_burden_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_tax_burden_trade_openness_current_gap.yaml)
+- `heritage_tax_burden_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_tax_burden_trade_openness_income_region_robustness.yaml)
+- `heritage_trade_freedom_high_tech_exports_current_gap` (candidate, hypotheses/trade/heritage_trade_freedom_high_tech_exports_current_gap.yaml)
+- `heritage_trade_freedom_high_tech_exports_income_region_robustness` (candidate, hypotheses/trade/heritage_trade_freedom_high_tech_exports_income_region_robustness.yaml)
+- `heritage_trade_freedom_trade_openness_current_gap` (candidate, hypotheses/trade/heritage_trade_freedom_trade_openness_current_gap.yaml)
+- `heritage_trade_freedom_trade_openness_income_region_robustness` (candidate, hypotheses/trade/heritage_trade_freedom_trade_openness_income_region_robustness.yaml)
+- `hightech_exports_product_concentration_growth_panel` (candidate, hypotheses/trade/hightech_exports_product_concentration_growth_panel.yaml)
+- `import_competition_domestic_productivity_discipline` (draft, hypotheses/trade/import_competition_domestic_productivity_discipline.yaml)
+- `industrial_policy_hightech_exports_patents_panel` (candidate, hypotheses/trade/industrial_policy_hightech_exports_patents_panel.yaml)
+- `industrial_policy_semiconductor_chips_act_effectiveness` (draft, hypotheses/trade/industrial_policy_semiconductor_chips_act_effectiveness.yaml)
+- `infant_industry_protection_capability_effect` (draft, hypotheses/trade/infant_industry_protection_capability_effect.yaml)
+- `liberal_free_trade_partner_growth_panel_1990_2020` (candidate, hypotheses/trade/liberal_free_trade_partner_growth_panel_1990_2020.yaml)
+- `market_order_capital_account_openness_fdi_inflows_share_panel` (pre_registered, hypotheses/trade/market_order_capital_account_openness_fdi_inflows_share_panel.yaml)
+- `market_order_capital_account_openness_gdp_pc_growth_panel` (pre_registered, hypotheses/trade/market_order_capital_account_openness_gdp_pc_growth_panel.yaml)
+- `market_order_capital_account_openness_high_tech_exports_panel` (pre_registered, hypotheses/trade/market_order_capital_account_openness_high_tech_exports_panel.yaml)
+- `market_order_capital_account_openness_private_investment_share_panel` (pre_registered, hypotheses/trade/market_order_capital_account_openness_private_investment_share_panel.yaml)
+- `market_order_trade_openness_employment_rate_panel` (pre_registered, hypotheses/trade/market_order_trade_openness_employment_rate_panel.yaml)
+- `market_order_trade_openness_gdp_pc_growth_panel` (pre_registered, hypotheses/trade/market_order_trade_openness_gdp_pc_growth_panel.yaml)
+- `market_order_trade_openness_high_tech_exports_panel` (pre_registered, hypotheses/trade/market_order_trade_openness_high_tech_exports_panel.yaml)
+- `market_order_trade_openness_investment_share_panel` (pre_registered, hypotheses/trade/market_order_trade_openness_investment_share_panel.yaml)
+- `ml_customs_simplification_trade_cost_growth` (candidate, hypotheses/trade/ml_customs_simplification_trade_cost_growth.yaml)
+- `ml_fdi_restriction_technology_diffusion_slowdown` (candidate, hypotheses/trade/ml_fdi_restriction_technology_diffusion_slowdown.yaml)
+- `ml_tariff_reduction_consumer_real_income_panel` (candidate, hypotheses/trade/ml_tariff_reduction_consumer_real_income_panel.yaml)
+- `nova_industria_brasil_export_discipline_pattern_effect` (draft, hypotheses/trade/nova_industria_brasil_export_discipline_pattern_effect.yaml)
+- `open_standards_market_diffusion` (candidate, hypotheses/trade/open_standards_market_diffusion.yaml)
+- `openness_military_conflict_risk` (draft, hypotheses/trade/openness_military_conflict_risk.yaml)
+- `port_competition_trade_cost` (candidate, hypotheses/trade/port_competition_trade_cost.yaml)
+- `regional_trade_agreement_regulatory_convergence` (draft, hypotheses/trade/regional_trade_agreement_regulatory_convergence.yaml)
+- `services_trade_liberalisation_frontier_growth` (candidate, hypotheses/trade/services_trade_liberalisation_frontier_growth.yaml)
+- `singapore_lky_changi_air_hub_tourism_1981_2019` (pre_registered, hypotheses/trade/singapore_lky_changi_air_hub_tourism_1981_2019.yaml)
+- `singapore_lky_trade_openness_port_state_1965_1990` (pre_registered, hypotheses/trade/singapore_lky_trade_openness_port_state_1965_1990.yaml)
+- `state_trade_barriers_consumption_variety_panel` (candidate, hypotheses/trade/state_trade_barriers_consumption_variety_panel.yaml)
+- `tariff_protection_duration_growth_drag` (candidate, hypotheses/trade/tariff_protection_duration_growth_drag.yaml)
+- `tech_transfer_restrictions_slow_catch_up` (candidate, hypotheses/trade/tech_transfer_restrictions_slow_catch_up.yaml)
+- `temporary_protection_safeguard_learning_curve` (draft, hypotheses/trade/temporary_protection_safeguard_learning_curve.yaml)
+- `trade_agreement_depth_institutional_spillover` (draft, hypotheses/trade/trade_agreement_depth_institutional_spillover.yaml)
+- `trade_cost_reduction_informality_decline` (draft, hypotheses/trade/trade_cost_reduction_informality_decline.yaml)
+- `trade_credit_access_exporter_entry` (draft, hypotheses/trade/trade_credit_access_exporter_entry.yaml)
+- `trade_embargo_target_cost_asymmetry` (draft, hypotheses/trade/trade_embargo_target_cost_asymmetry.yaml)
+- `trade_facilitation_customs_reform_import_time` (draft, hypotheses/trade/trade_facilitation_customs_reform_import_time.yaml)
+- `trade_lib_acfta_asean_china_2010_export_growth` (candidate, hypotheses/trade/trade_lib_acfta_asean_china_2010_export_growth.yaml)
+- `trade_lib_afcfta_2021_intra_african_trade` (candidate, hypotheses/trade/trade_lib_afcfta_2021_intra_african_trade.yaml)
+- `trade_lib_argentina_mercosur_industrial_effect` (candidate, hypotheses/trade/trade_lib_argentina_mercosur_industrial_effect.yaml)
+- `trade_lib_bangladesh_apparel_eu_eba_2008` (candidate, hypotheses/trade/trade_lib_bangladesh_apparel_eu_eba_2008.yaml)
+- `trade_lib_brazil_mercosur_tariff_schedule` (candidate, hypotheses/trade/trade_lib_brazil_mercosur_tariff_schedule.yaml)
+- `trade_lib_chafta_australia_china_2015` (candidate, hypotheses/trade/trade_lib_chafta_australia_china_2015.yaml)
+- `trade_lib_chile_bilateral_fta_cascade` (candidate, hypotheses/trade/trade_lib_chile_bilateral_fta_cascade.yaml)
+- `trade_lib_china_wto_2001_manufacturing_export_surge` (candidate, hypotheses/trade/trade_lib_china_wto_2001_manufacturing_export_surge.yaml)
+- `trade_lib_colombia_us_fta_2012` (candidate, hypotheses/trade/trade_lib_colombia_us_fta_2012.yaml)
+- `trade_lib_cptpp_2018_pacific_rim_trade` (candidate, hypotheses/trade/trade_lib_cptpp_2018_pacific_rim_trade.yaml)
+- `trade_lib_egypt_fta_cascade` (candidate, hypotheses/trade/trade_lib_egypt_fta_cascade.yaml)
+- `trade_lib_eu_2007_2013_enlargement_balkans` (candidate, hypotheses/trade/trade_lib_eu_2007_2013_enlargement_balkans.yaml)
+- `trade_lib_eu_eastern_enlargement_2004_growth_convergence` (candidate, hypotheses/trade/trade_lib_eu_eastern_enlargement_2004_growth_convergence.yaml)
+- `trade_lib_eurozone_1999_intra_eu_trade` (candidate, hypotheses/trade/trade_lib_eurozone_1999_intra_eu_trade.yaml)
+- `trade_lib_evfta_vietnam_eu_2020` (candidate, hypotheses/trade/trade_lib_evfta_vietnam_eu_2020.yaml)
+- `trade_lib_india_1991_tariff_cut_export_response` (candidate, hypotheses/trade/trade_lib_india_1991_tariff_cut_export_response.yaml)
+- `trade_lib_india_modi_tariff_reversals_2014_2024` (candidate, hypotheses/trade/trade_lib_india_modi_tariff_reversals_2014_2024.yaml)
+- `trade_lib_indonesia_1980s_1990s_unilateral` (candidate, hypotheses/trade/trade_lib_indonesia_1980s_1990s_unilateral.yaml)
+- `trade_lib_japan_cptpp_2018_trade_effect` (candidate, hypotheses/trade/trade_lib_japan_cptpp_2018_trade_effect.yaml)
+- `trade_lib_korus_2012_us_korea_trade` (candidate, hypotheses/trade/trade_lib_korus_2012_us_korea_trade.yaml)
+- `trade_lib_mercosur_1991_intra_bloc_trade` (candidate, hypotheses/trade/trade_lib_mercosur_1991_intra_bloc_trade.yaml)
+- `trade_lib_mexico_eu_fta_2000` (candidate, hypotheses/trade/trade_lib_mexico_eu_fta_2000.yaml)
+- `trade_lib_morocco_eu_us_ftas` (candidate, hypotheses/trade/trade_lib_morocco_eu_us_ftas.yaml)
+- `trade_lib_nafta_1994_mexico_manufacturing_employment` (candidate, hypotheses/trade/trade_lib_nafta_1994_mexico_manufacturing_employment.yaml)
+- `trade_lib_singapore_china_2009_bilateral_fta` (candidate, hypotheses/trade/trade_lib_singapore_china_2009_bilateral_fta.yaml)
+- `trade_lib_smoot_hawley_1930_historical` (candidate, hypotheses/trade/trade_lib_smoot_hawley_1930_historical.yaml)
+- `trade_lib_south_africa_sadc_trade` (candidate, hypotheses/trade/trade_lib_south_africa_sadc_trade.yaml)
+- `trade_lib_trump_china_tariffs_2018_2024` (candidate, hypotheses/trade/trade_lib_trump_china_tariffs_2018_2024.yaml)
+- `trade_lib_uk_brexit_2020_export_response` (candidate, hypotheses/trade/trade_lib_uk_brexit_2020_export_response.yaml)
+- `trade_lib_us_china_phase_one_2020` (candidate, hypotheses/trade/trade_lib_us_china_phase_one_2020.yaml)
+- `trade_liberalisation_growth_effect` (pre_registered, hypotheses/trade/trade_liberalisation_growth_effect.yaml)
+- `trade_openness_governance_discipline` (candidate, hypotheses/trade/trade_openness_governance_discipline.yaml)
+- `trade_openness_income_convergence_panel` (draft, hypotheses/trade/trade_openness_income_convergence_panel.yaml)
+- `trade_openness_inequality_backlash_risk` (draft, hypotheses/trade/trade_openness_inequality_backlash_risk.yaml)
+- `trade_openness_long_run_income_convergence` (candidate, hypotheses/trade/trade_openness_long_run_income_convergence.yaml)
+- `trade_openness_patent_diffusion_panel` (candidate, hypotheses/trade/trade_openness_patent_diffusion_panel.yaml)
+- `trade_openness_unemployment_volatility_panel` (candidate, hypotheses/trade/trade_openness_unemployment_volatility_panel.yaml)
+- `trump_tariff_manufacturing_reshoring_effect` (draft, hypotheses/trade/trump_tariff_manufacturing_reshoring_effect.yaml)
+- `uae_dubai_tourism_aviation_hub_2015_2019` (pre_registered, hypotheses/trade/uae_dubai_tourism_aviation_hub_2015_2019.yaml)
+- `uae_jebel_ali_free_zone_trade_fdi_1985_2024` (pre_registered, hypotheses/trade/uae_jebel_ali_free_zone_trade_fdi_1985_2024.yaml)
+- `unilateral_tariff_liberalisation_growth_20yr` (candidate, hypotheses/trade/unilateral_tariff_liberalisation_growth_20yr.yaml)
+- `wdi_remittance_current_account_cushion_2000_2023` (pre_registered, hypotheses/trade/wdi_remittance_current_account_cushion_2000_2023.yaml)
+- `wdi_tertiary_attainment_hightech_exports_panel` (candidate, hypotheses/trade/wdi_tertiary_attainment_hightech_exports_panel.yaml)
+- `wipo_patent_applications_hightech_export_followthrough_panel` (candidate, hypotheses/trade/wipo_patent_applications_hightech_export_followthrough_panel.yaml)
+- `wits_export_concentration_hightech_drag_panel` (candidate, hypotheses/trade/wits_export_concentration_hightech_drag_panel.yaml)
+- `wits_export_product_diversification_resilience_panel` (candidate, hypotheses/trade/wits_export_product_diversification_resilience_panel.yaml)
+- `wits_food_tariffs_food_price_inflation_panel` (candidate, hypotheses/trade/wits_food_tariffs_food_price_inflation_panel.yaml)
+- `wits_tariff_cuts_import_variety_consumption_panel` (candidate, hypotheses/trade/wits_tariff_cuts_import_variety_consumption_panel.yaml)
+- `wits_tariff_cuts_import_variety_panel` (candidate, hypotheses/trade/wits_tariff_cuts_import_variety_panel.yaml)
+- `wits_tariff_protection_manufacturing_upgrade_panel` (candidate, hypotheses/trade/wits_tariff_protection_manufacturing_upgrade_panel.yaml)
+- `wto_accession_productivity_spillover` (draft, hypotheses/trade/wto_accession_productivity_spillover.yaml)
+- `wto_accession_productivity_spillover_panel` (candidate, hypotheses/trade/wto_accession_productivity_spillover_panel.yaml)
+- `activation_sanctions_reemployment_duration_panel` (candidate, hypotheses/welfare_architecture/activation_sanctions_reemployment_duration_panel.yaml)
+- `degrowth_recession_basic_needs_protection_panel` (candidate, hypotheses/welfare_architecture/degrowth_recession_basic_needs_protection_panel.yaml)
+- `demo_ageing_pension_burden_cross_country` (candidate, hypotheses/welfare_architecture/demo_ageing_pension_burden_cross_country.yaml)
+- `in_work_benefits_low_income_employment_panel` (candidate, hypotheses/welfare_architecture/in_work_benefits_low_income_employment_panel.yaml)
+- `nordic_1990s_reform_welfare_scale_preservation` (draft, hypotheses/welfare_architecture/nordic_1990s_reform_welfare_scale_preservation.yaml)
+- `oecd_socx_open_economy_welfare_compatibility_panel` (candidate, hypotheses/welfare_architecture/oecd_socx_open_economy_welfare_compatibility_panel.yaml)
+- `oecd_socx_public_social_spending_employment_tradeoff` (candidate, hypotheses/welfare_architecture/oecd_socx_public_social_spending_employment_tradeoff.yaml)
+- `oecd_socx_welfare_employment_capacity_interaction_panel` (candidate, hypotheses/welfare_architecture/oecd_socx_welfare_employment_capacity_interaction_panel.yaml)
+- `oecd_taxben_benefit_cliff_lfp_penalty` (candidate, hypotheses/welfare_architecture/oecd_taxben_benefit_cliff_lfp_penalty.yaml)
+- `singapore_cpf_institutional_complementarity` (draft, hypotheses/welfare_architecture/singapore_cpf_institutional_complementarity.yaml)
+- `unconditional_transfer_work_hours_response_panel` (candidate, hypotheses/welfare_architecture/unconditional_transfer_work_hours_response_panel.yaml)
+- `unemployment_benefit_generosity_employment_drag` (pre_registered, hypotheses/welfare_architecture/unemployment_benefit_generosity_employment_drag.yaml)
+- `welfare_architecture_comparative_effectiveness` (pre_registered, hypotheses/welfare_architecture/welfare_architecture_comparative_effectiveness.yaml)
+- `welfare_pension_chile_1981_privatisation_descriptive` (candidate, hypotheses/welfare_architecture/welfare_pension_chile_1981_privatisation_descriptive.yaml)
+- `welfare_pension_japan_2004_reform_sustainability` (candidate, hypotheses/welfare_architecture/welfare_pension_japan_2004_reform_sustainability.yaml)
+- `welfare_pension_mexico_universal_2023_fiscal_effect` (candidate, hypotheses/welfare_architecture/welfare_pension_mexico_universal_2023_fiscal_effect.yaml)
+- `welfare_pension_singapore_cpf_2013_2024_reforms` (candidate, hypotheses/welfare_architecture/welfare_pension_singapore_cpf_2013_2024_reforms.yaml)
+- `welfare_reform_australia_cashless_debit_card_2015` (candidate, hypotheses/welfare_architecture/welfare_reform_australia_cashless_debit_card_2015.yaml)
+- `welfare_reform_germany_hartz_iv_unemployment_consolidation` (candidate, hypotheses/welfare_architecture/welfare_reform_germany_hartz_iv_unemployment_consolidation.yaml)
+- `welfare_reform_new_zealand_1991_benefit_cuts_effect` (candidate, hypotheses/welfare_architecture/welfare_reform_new_zealand_1991_benefit_cuts_effect.yaml)
+- `welfare_reform_prwora_single_mother_employment` (candidate, hypotheses/welfare_architecture/welfare_reform_prwora_single_mother_employment.yaml)
+- `welfare_reform_sweden_1990s_consolidation_outcome` (candidate, hypotheses/welfare_architecture/welfare_reform_sweden_1990s_consolidation_outcome.yaml)
+- `welfare_reform_uk_universal_credit_employment_effect` (candidate, hypotheses/welfare_architecture/welfare_reform_uk_universal_credit_employment_effect.yaml)
+- `welfare_transfer_alaska_permanent_fund_dividend_long_run` (candidate, hypotheses/welfare_architecture/welfare_transfer_alaska_permanent_fund_dividend_long_run.yaml)
+- `welfare_transfer_argentina_auh_2009_child_poverty_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_argentina_auh_2009_child_poverty_effect.yaml)
+- `welfare_transfer_brazil_bolsa_familia_phase2_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_brazil_bolsa_familia_phase2_effect.yaml)
+- `welfare_transfer_china_dibao_rural_pension_2009` (candidate, hypotheses/welfare_architecture/welfare_transfer_china_dibao_rural_pension_2009.yaml)
+- `welfare_transfer_finland_basic_income_experiment_2017` (candidate, hypotheses/welfare_architecture/welfare_transfer_finland_basic_income_experiment_2017.yaml)
+- `welfare_transfer_france_rsa_prime_dactivite_employment_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_france_rsa_prime_dactivite_employment_effect.yaml)
+- `welfare_transfer_hong_kong_cash_payout_2020` (candidate, hypotheses/welfare_architecture/welfare_transfer_hong_kong_cash_payout_2020.yaml)
+- `welfare_transfer_india_mgnrega_pmkisan_combined` (candidate, hypotheses/welfare_architecture/welfare_transfer_india_mgnrega_pmkisan_combined.yaml)
+- `welfare_transfer_indonesia_pkh_blt_2007_2022` (candidate, hypotheses/welfare_architecture/welfare_transfer_indonesia_pkh_blt_2007_2022.yaml)
+- `welfare_transfer_italy_reddito_cittadinanza_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_italy_reddito_cittadinanza_effect.yaml)
+- `welfare_transfer_kenya_hsnp_2015_consumption_smoothing` (candidate, hypotheses/welfare_architecture/welfare_transfer_kenya_hsnp_2015_consumption_smoothing.yaml)
+- `welfare_transfer_korea_eitc_2009_labour_supply_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_korea_eitc_2009_labour_supply_effect.yaml)
+- `welfare_transfer_mexico_prospera_phaseout_2019` (candidate, hypotheses/welfare_architecture/welfare_transfer_mexico_prospera_phaseout_2019.yaml)
+- `welfare_transfer_portugal_rsi_rollback_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_portugal_rsi_rollback_effect.yaml)
+- `welfare_transfer_south_africa_social_grants_long_run` (candidate, hypotheses/welfare_architecture/welfare_transfer_south_africa_social_grants_long_run.yaml)
+- `welfare_transfer_spain_imv_poverty_effect` (candidate, hypotheses/welfare_architecture/welfare_transfer_spain_imv_poverty_effect.yaml)
+- `welfare_transfer_stockton_seed_guaranteed_income_2019` (candidate, hypotheses/welfare_architecture/welfare_transfer_stockton_seed_guaranteed_income_2019.yaml)
+- `welfare_transfer_universal_childcare_quebec_germany_korea` (candidate, hypotheses/welfare_architecture/welfare_transfer_universal_childcare_quebec_germany_korea.yaml)
+- `welfare_transfer_us_arpa_expanded_ctc_2021` (candidate, hypotheses/welfare_architecture/welfare_transfer_us_arpa_expanded_ctc_2021.yaml)
+- `welfare_transfer_us_eitc_cumulative_1975_2020` (candidate, hypotheses/welfare_architecture/welfare_transfer_us_eitc_cumulative_1975_2020.yaml)
+- `workfare_conditionality_employment_effect` (pre_registered, hypotheses/welfare_architecture/workfare_conditionality_employment_effect.yaml)
+
+## Screen-only or non-promotable hypotheses
+- `capacity_energy_shock_transfers_vs_price_controls` -> `screen_only_until_second_order_measured`; required gaps: second_order_supply_response, distributional_incidence, net_welfare
+- `ml_energy_price_controls_shortage_fiscal_burden` -> `screen_only_until_second_order_measured`; required gaps: net_welfare, distributional_incidence
+- `price_control_intensity_electricity_access_growth_panel` -> `screen_only_until_second_order_measured`; required gaps: fiscal_or_enforcement_cost, distributional_incidence, net_welfare
+- `state_energy_price_controls_shortage` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, net_welfare
+- `pharma_price_control_launch_delay` -> `descriptive_only`; required gaps: first_order_price_or_transfer, second_order_supply_response, allocation_distortion, net_welfare
+- `price_controls_food_output_decline_panel` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, leakage_or_substitution, quality_margin, net_welfare
+- `rent_control_housing_supply_elasticity` -> `descriptive_only`; required gaps: first_order_price_or_transfer, second_order_supply_response, allocation_distortion
+- `rent_control_housing_supply_quality_decay_chain` -> `screen_only_until_second_order_measured`; required gaps: second_order_supply_response, net_welfare, distributional_incidence
+- `rent_control_reduces_housing_supply_and_quality` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, second_order_supply_response, allocation_distortion, leakage_or_substitution, quality_margin, net_welfare, distributional_incidence
+- `rent_price_controls_building_permits_eu_panel` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, second_order_supply_response, leakage_or_substitution, quality_margin, distributional_incidence
+- `price_controls_produce_shortages_and_quality_degradation` -> `screen_only_until_second_order_measured`; required gaps: quality_margin, fiscal_or_enforcement_cost, net_welfare, distributional_incidence
+- `price_controls_shortage_black_market_progression` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, leakage_or_substitution, quality_margin, net_welfare, distributional_incidence
+- `price_signal_distortion_capital_misallocation` -> `screen_only_until_second_order_measured`; required gaps: second_order_supply_response, allocation_distortion, distributional_incidence
+- `state_price_controls_real_consumption_shortage` -> `screen_only_until_second_order_measured`; required gaps: first_order_price_or_transfer, second_order_supply_response, leakage_or_substitution, net_welfare
+
+## Policies missing evaluation designs
+- `ae_abraham_accords_2020` (policies/ae_abraham_accords_2020.yaml); explicit control axes: none
+- `ae_abu_dhabi_dubai_bailout_2009` (policies/ae_abu_dhabi_dubai_bailout_2009.yaml); explicit control axes: none
+- `ae_adia_diversification_1980s` (policies/ae_adia_diversification_1980s.yaml); explicit control axes: none
+- `ae_adnoc_upstream_consolidation_1978` (policies/ae_adnoc_upstream_consolidation_1978.yaml); explicit control axes: none
+- `ae_aed_peg_defence_2008_2010` (policies/ae_aed_peg_defence_2008_2010.yaml); explicit control axes: none
+- `ae_alcohol_cohabitation_decrim_2020` (policies/ae_alcohol_cohabitation_decrim_2020.yaml); explicit control axes: none
+- `ae_arab_spring_welfare_package_2011` (policies/ae_arab_spring_welfare_package_2011.yaml); explicit control axes: none
+- `ae_barakah_first_reactor_2021` (policies/ae_barakah_first_reactor_2021.yaml); explicit control axes: none
+- `ae_barakah_full_operations_2024` (policies/ae_barakah_full_operations_2024.yaml); explicit control axes: none
+- `ae_cop28_hosting_2023` (policies/ae_cop28_hosting_2023.yaml); explicit control axes: none
+- `ae_corporate_tax_2023` (policies/ae_corporate_tax_2023.yaml); explicit control axes: none
+- `ae_difc_crisis_regulation_2009` (policies/ae_difc_crisis_regulation_2009.yaml); explicit control axes: none
+- `ae_difc_establishment_law_2004` (policies/ae_difc_establishment_law_2004.yaml); explicit control axes: none
+- `ae_difc_launch_2004` (policies/ae_difc_launch_2004.yaml); explicit control axes: none
+- `ae_dp_world_globalisation_2006` (policies/ae_dp_world_globalisation_2006.yaml); explicit control axes: none
+- `ae_dubai_internet_city_1999` (policies/ae_dubai_internet_city_1999.yaml); explicit control axes: none
+- `ae_dubai_media_city_2000` (policies/ae_dubai_media_city_2000.yaml); explicit control axes: none
+- `ae_emirates_airline_expansion_1995_2004` (policies/ae_emirates_airline_expansion_1995_2004.yaml); explicit control axes: none
+- `ae_emirates_airline_expansion_2004_2014` (policies/ae_emirates_airline_expansion_2004_2014.yaml); explicit control axes: none
+- `ae_emirates_airline_launch_1985` (policies/ae_emirates_airline_launch_1985.yaml); explicit control axes: none
+- `ae_expo_2020_dubai_2021` (policies/ae_expo_2020_dubai_2021.yaml); explicit control axes: none
+- `ae_federal_budget_transfers_mechanism_1976` (policies/ae_federal_budget_transfers_mechanism_1976.yaml); explicit control axes: none
+- `ae_fnc_partial_elections_2006` (policies/ae_fnc_partial_elections_2006.yaml); explicit control axes: none
+- `ae_foreign_ownership_onshore_2020` (policies/ae_foreign_ownership_onshore_2020.yaml); explicit control axes: none
+- `ae_g42_ai_strategy_2022` (policies/ae_g42_ai_strategy_2022.yaml); explicit control axes: none
+- `ae_gcc_founding_1981` (policies/ae_gcc_founding_1981.yaml); explicit control axes: none
+- `ae_gender_labour_market_reforms_2006_2024` (policies/ae_gender_labour_market_reforms_2006_2024.yaml); explicit control axes: none
+- `ae_golden_visa_2019` (policies/ae_golden_visa_2019.yaml); explicit control axes: none
+- `ae_jebel_ali_expansion_1985_1995` (policies/ae_jebel_ali_expansion_1985_1995.yaml); explicit control axes: none
+- `ae_jebel_ali_free_zone_1979` (policies/ae_jebel_ali_free_zone_1979.yaml); explicit control axes: none
+- `ae_nonmuslim_family_law_2022` (policies/ae_nonmuslim_family_law_2022.yaml); explicit control axes: none
+- `ae_post_911_financial_compliance_2001_2004` (policies/ae_post_911_financial_compliance_2001_2004.yaml); explicit control axes: none
+- `ae_vat_introduction_2018` (policies/ae_vat_introduction_2018.yaml); explicit control axes: none
+- `ae_weekend_switch_2022` (policies/ae_weekend_switch_2022.yaml); explicit control axes: none
+- `afg_land_reform_decree_8_1978` (policies/afg_land_reform_decree_8_1978.yaml); explicit control axes: none
+- `afg_literacy_womens_reforms_1978` (policies/afg_literacy_womens_reforms_1978.yaml); explicit control axes: none
+- `afg_soviet_aid_war_planning_1979_1992` (policies/afg_soviet_aid_war_planning_1979_1992.yaml); explicit control axes: none
+- `ao_exchange_rate_liberalisation_2018_2023` (policies/ao_exchange_rate_liberalisation_2018_2023.yaml); explicit control axes: none
+- `ao_fuel_subsidy_phaseout_2023` (policies/ao_fuel_subsidy_phaseout_2023.yaml); explicit control axes: regulatory.price_control_intensity
+- `ao_market_transition_reforms_1987_1991` (policies/ao_market_transition_reforms_1987_1991.yaml); explicit control axes: none
+- `ao_nationalisations_state_economy_1976` (policies/ao_nationalisations_state_economy_1976.yaml); explicit control axes: none
+- `ao_oil_gas_incremental_production_decree_2024` (policies/ao_oil_gas_incremental_production_decree_2024.yaml); explicit control axes: none
+- `ao_sonangol_oil_enclave_1976` (policies/ao_sonangol_oil_enclave_1976.yaml); explicit control axes: none
+- `ar_1998_1999_mercosur_stress` (policies/ar_1998_1999_mercosur_stress.yaml); explicit control axes: none
+- `ar_afjp_nationalisation_2008` (policies/ar_afjp_nationalisation_2008.yaml); explicit control axes: none
+- `ar_afjp_pension_phase_in_completion_1995_1999` (policies/ar_afjp_pension_phase_in_completion_1995_1999.yaml); explicit control axes: none
+- `ar_austral_plan_1985` (policies/ar_austral_plan_1985.yaml); explicit control axes: none
+- `ar_blindaje_imf_2000` (policies/ar_blindaje_imf_2000.yaml); explicit control axes: none
+- `ar_brady_plan_debt_restructuring_1993` (policies/ar_brady_plan_debt_restructuring_1993.yaml); explicit control axes: none
+- `ar_cepo_cambiario_2011_2015` (policies/ar_cepo_cambiario_2011_2015.yaml); explicit control axes: none
+- `ar_corralito_2001` (policies/ar_corralito_2001.yaml); explicit control axes: none
+- `ar_debt_restructuring_2005` (policies/ar_debt_restructuring_2005.yaml); explicit control axes: none
+- `ar_deficit_zero_law_2001` (policies/ar_deficit_zero_law_2001.yaml); explicit control axes: none
+- `ar_emergency_law_25561_convertibility_repeal_2002` (policies/ar_emergency_law_25561_convertibility_repeal_2002.yaml); explicit control axes: none
+- `ar_export_retenciones_2002_2007` (policies/ar_export_retenciones_2002_2007.yaml); explicit control axes: none
+- `ar_fernandez_export_tax_hikes_2020` (policies/ar_fernandez_export_tax_hikes_2020.yaml); explicit control axes: none
+- `ar_fernandez_ife_covid_transfer_2020` (policies/ar_fernandez_ife_covid_transfer_2020.yaml); explicit control axes: none
+- `ar_fernandez_imf_eff_2022` (policies/ar_fernandez_imf_eff_2022.yaml); explicit control axes: none
+- `ar_fernandez_massa_devaluations_2023` (policies/ar_fernandez_massa_devaluations_2023.yaml); explicit control axes: none
+- `ar_fernandez_precios_cuidados_justos_2019` (policies/ar_fernandez_precios_cuidados_justos_2019.yaml); explicit control axes: none
+- `ar_fernandez_sovereign_debt_restructuring_2020` (policies/ar_fernandez_sovereign_debt_restructuring_2020.yaml); explicit control axes: none
+- `ar_griesa_pari_passu_default_2014` (policies/ar_griesa_pari_passu_default_2014.yaml); explicit control axes: none
+- `ar_hyperinflation_1989` (policies/ar_hyperinflation_1989.yaml); explicit control axes: none
+- `ar_imf_early_repayment_2005` (policies/ar_imf_early_repayment_2005.yaml); explicit control axes: none
+- `ar_imf_eff_1996_1998` (policies/ar_imf_eff_1996_1998.yaml); explicit control axes: none
+- `ar_indec_intervention_2007_2014` (policies/ar_indec_intervention_2007_2014.yaml); explicit control axes: none
+- `ar_jefes_y_jefas_workfare_2002` (policies/ar_jefes_y_jefas_workfare_2002.yaml); explicit control axes: none
+- `ar_lavagna_float_stabilisation_2002` (policies/ar_lavagna_float_stabilisation_2002.yaml); explicit control axes: none
+- `ar_machinea_impuestazo_1999` (policies/ar_machinea_impuestazo_1999.yaml); explicit control axes: none
+- `ar_macri_cepo_lift_peso_unification_2015` (policies/ar_macri_cepo_lift_peso_unification_2015.yaml); explicit control axes: none
+- `ar_macri_holdout_settlement_2016` (policies/ar_macri_holdout_settlement_2016.yaml); explicit control axes: none
+- `ar_macri_imf_stand_by_2018` (policies/ar_macri_imf_stand_by_2018.yaml); explicit control axes: none
+- `ar_macri_tax_reform_2017` (policies/ar_macri_tax_reform_2017.yaml); explicit control axes: none
+- `ar_macri_utility_tariff_sincere_pricing_2016` (policies/ar_macri_utility_tariff_sincere_pricing_2016.yaml); explicit control axes: none
+- `ar_malvinas_war_1982` (policies/ar_malvinas_war_1982.yaml); explicit control axes: none
+- `ar_martinez_de_hoz_financial_liberalisation_1977` (policies/ar_martinez_de_hoz_financial_liberalisation_1977.yaml); explicit control axes: none
+- `ar_megacanje_debt_swap_2001` (policies/ar_megacanje_debt_swap_2001.yaml); explicit control axes: none
+- `ar_military_pardons_1989_1990` (policies/ar_military_pardons_1989_1990.yaml); explicit control axes: none
+- `ar_pacto_olivos_constitutional_reform_1994` (policies/ar_pacto_olivos_constitutional_reform_1994.yaml); explicit control axes: none
+- `ar_pesificacion_asymmetric_decreto_214_2002` (policies/ar_pesificacion_asymmetric_decreto_214_2002.yaml); explicit control axes: none
+- `ar_plan_primavera_1988` (policies/ar_plan_primavera_1988.yaml); explicit control axes: none
+- `ar_proceso_state_terror_1976_1983` (policies/ar_proceso_state_terror_1976_1983.yaml); explicit control axes: none
+- `ar_puente_pueyrredon_2002` (policies/ar_puente_pueyrredon_2002.yaml); explicit control axes: none
+- `ar_punto_final_obediencia_debida_1986_1987` (policies/ar_punto_final_obediencia_debida_1986_1987.yaml); explicit control axes: none
+- `ar_punto_final_obediencia_debida_repeal_2003_2005` (policies/ar_punto_final_obediencia_debida_repeal_2003_2005.yaml); explicit control axes: none
+- `ar_reform_of_state_privatisation_law_1989` (policies/ar_reform_of_state_privatisation_law_1989.yaml); explicit control axes: none
+- `ar_seguro_de_cambio_1982` (policies/ar_seguro_de_cambio_1982.yaml); explicit control axes: none
+- `ar_supreme_court_reset_2003_2005` (policies/ar_supreme_court_reset_2003_2005.yaml); explicit control axes: none
+- `ar_tablita_cambiaria_1978_1981` (policies/ar_tablita_cambiaria_1978_1981.yaml); explicit control axes: none
+- `ar_tequila_contagion_1995` (policies/ar_tequila_contagion_1995.yaml); explicit control axes: none
+- `ar_trial_of_juntas_1985` (policies/ar_trial_of_juntas_1985.yaml); explicit control axes: none
+- `ar_ypf_full_privatisation_1999` (policies/ar_ypf_full_privatisation_1999.yaml); explicit control axes: none
+- `ar_ypf_renationalisation_2012` (policies/ar_ypf_renationalisation_2012.yaml); explicit control axes: none
+- `argentina_cepo_cambiario_2011_2015` (policies/argentina_cepo_cambiario_2011_2015.yaml); explicit control axes: none
+- `argentina_convertibility_abandonment_2002` (policies/argentina_convertibility_abandonment_2002.yaml); explicit control axes: none
+- `argentina_convertibility_law_1991` (policies/argentina_convertibility_law_1991.yaml); explicit control axes: none
+- `argentina_convertibility_plan_1991` (policies/argentina_convertibility_plan_1991.yaml); explicit control axes: none
+- `argentina_corralito_2001` (policies/argentina_corralito_2001.yaml); explicit control axes: none
+- `argentina_default_2001` (policies/argentina_default_2001.yaml); explicit control axes: none
+- `argentina_deregulation_omnibus_2024` (policies/argentina_deregulation_omnibus_2024.yaml); explicit control axes: none
+- `argentina_dnu_70_2023` (policies/argentina_dnu_70_2023.yaml); explicit control axes: none
+- `argentina_fiscal_consolidation_2024` (policies/argentina_fiscal_consolidation_2024.yaml); explicit control axes: none
+- `argentina_fuel_subsidies_2003_2015` (policies/argentina_fuel_subsidies_2003_2015.yaml); explicit control axes: none
+- `argentina_milei_shock_therapy_2023` (policies/argentina_milei_shock_therapy_2023.yaml); explicit control axes: none
+- `argentina_pension_renationalisation_2008` (policies/argentina_pension_renationalisation_2008.yaml); explicit control axes: none
+- `argentina_pesification_2002` (policies/argentina_pesification_2002.yaml); explicit control axes: none
+- `argentina_peso_devaluation_2023` (policies/argentina_peso_devaluation_2023.yaml); explicit control axes: none
+- `argentina_privatisations_1991_1999` (policies/argentina_privatisations_1991_1999.yaml); explicit control axes: none
+- `argentina_trade_opening_1991_1995` (policies/argentina_trade_opening_1991_1995.yaml); explicit control axes: none
+- `argentina_ypf_renationalisation_2012` (policies/argentina_ypf_renationalisation_2012.yaml); explicit control axes: none
+- `at_arbeitsverfassungsgesetz_1975` (policies/at_arbeitsverfassungsgesetz_1975.yaml); explicit control axes: none
+- `at_arbeitszeitgesetz_12_stunden_tag_2018` (policies/at_arbeitszeitgesetz_12_stunden_tag_2018.yaml); explicit control axes: none
+- `at_asylgesetz_novellen_2017_2018` (policies/at_asylgesetz_novellen_2017_2018.yaml); explicit control axes: none
+- `at_bank_austria_creditanstalt_merger_1997` (policies/at_bank_austria_creditanstalt_merger_1997.yaml); explicit control axes: none
+- `at_bankenabgabe_verdopplung_2025` (policies/at_bankenabgabe_verdopplung_2025.yaml); explicit control axes: none
+- `at_beschaeftigungsbonus_2017` (policies/at_beschaeftigungsbonus_2017.yaml); explicit control axes: none
+- `at_bildungskarenz_abschaffung_2025` (policies/at_bildungskarenz_abschaffung_2025.yaml); explicit control axes: none
+- `at_bzoe_split_2005` (policies/at_bzoe_split_2005.yaml); explicit control axes: none
+- `at_eu_14_sanctions_2000` (policies/at_eu_14_sanctions_2000.yaml); explicit control axes: none
+- `at_eu_accession_1995` (policies/at_eu_accession_1995.yaml); explicit control axes: none
+- `at_eurofighter_procurement_2002` (policies/at_eurofighter_procurement_2002.yaml); explicit control axes: none
+- `at_familienbeihilfe_indexierung_2019` (policies/at_familienbeihilfe_indexierung_2019.yaml); explicit control axes: none
+- `at_familienbonus_plus_2019` (policies/at_familienbonus_plus_2019.yaml); explicit control axes: none
+- `at_familienpaket_2022` (policies/at_familienpaket_2022.yaml); explicit control axes: none
+- `at_hainburg_cancellation_1984` (policies/at_hainburg_cancellation_1984.yaml); explicit control axes: none
+- `at_hartwaehrungspolitik_1976` (policies/at_hartwaehrungspolitik_1976.yaml); explicit control axes: none
+- `at_heta_bad_bank_2014` (policies/at_heta_bad_bank_2014.yaml); explicit control axes: none
+- `at_hypo_alpe_adria_nationalisation_2009` (policies/at_hypo_alpe_adria_nationalisation_2009.yaml); explicit control axes: none
+- `at_kalte_progression_abschaffung_2023` (policies/at_kalte_progression_abschaffung_2023.yaml); explicit control axes: none
+- `at_klimabonus_2022` (policies/at_klimabonus_2022.yaml); explicit control axes: none
+- `at_klimabonus_reform_2025` (policies/at_klimabonus_reform_2025.yaml); explicit control axes: none
+- `at_koerperschaftsteuer_senkung_2022_2024` (policies/at_koerperschaftsteuer_senkung_2022_2024.yaml); explicit control axes: none
+- `at_koest_25_percent_2005` (policies/at_koest_25_percent_2005.yaml); explicit control axes: none
+- `at_konsolidierungspaket_2025` (policies/at_konsolidierungspaket_2025.yaml); explicit control axes: none
+- `at_kurzarbeit_covid_2020` (policies/at_kurzarbeit_covid_2020.yaml); explicit control axes: none
+- `at_maastricht_consolidation_1995_1996` (policies/at_maastricht_consolidation_1995_1996.yaml); explicit control axes: none
+- `at_mindestsicherung_framework_2008` (policies/at_mindestsicherung_framework_2008.yaml); explicit control axes: none
+- `at_oekosoziale_steuerreform_2022` (policies/at_oekosoziale_steuerreform_2022.yaml); explicit control axes: none
+- `at_oiag_privatisation_programme_1993_2000` (policies/at_oiag_privatisation_programme_1993_2000.yaml); explicit control axes: none
+- `at_pension_age_alignment_women_2010` (policies/at_pension_age_alignment_women_2010.yaml); explicit control axes: none
+- `at_pensionssicherungsgesetz_2003` (policies/at_pensionssicherungsgesetz_2003.yaml); explicit control axes: none
+- `at_plan_a_investment_package_2017` (policies/at_plan_a_investment_package_2017.yaml); explicit control axes: none
+- `at_pv_anlagen_vat_2024` (policies/at_pv_anlagen_vat_2024.yaml); explicit control axes: none
+- `at_refugee_reception_2015_2016` (policies/at_refugee_reception_2015_2016.yaml); explicit control axes: none
+- `at_steuerreform_2009` (policies/at_steuerreform_2009.yaml); explicit control axes: none
+- `at_steuerreform_2016` (policies/at_steuerreform_2016.yaml); explicit control axes: none
+- `at_studiengebuehren_abolition_2008` (policies/at_studiengebuehren_abolition_2008.yaml); explicit control axes: none
+- `at_voest_alpine_restructuring_1985` (policies/at_voest_alpine_restructuring_1985.yaml); explicit control axes: none
+- `at_voest_state_industry_expansion_1970s` (policies/at_voest_state_industry_expansion_1970s.yaml); explicit control axes: none
+- `at_zwentendorf_referendum_1978` (policies/at_zwentendorf_referendum_1978.yaml); explicit control axes: none
+- `au_2014_federal_budget` (policies/au_2014_federal_budget.yaml); explicit control axes: none
+- `au_aukus_2021` (policies/au_aukus_2021.yaml); explicit control axes: none
+- `au_bank_guarantee_2008` (policies/au_bank_guarantee_2008.yaml); explicit control axes: none
+- `au_banking_royal_commission_2017` (policies/au_banking_royal_commission_2017.yaml); explicit control axes: none
+- `au_campbell_committee_financial_inquiry_1979` (policies/au_campbell_committee_financial_inquiry_1979.yaml); explicit control axes: none
+- `au_carbon_tax_repeal_2014` (policies/au_carbon_tax_repeal_2014.yaml); explicit control axes: none
+- `au_cheaper_child_care_subsidy_2022` (policies/au_cheaper_child_care_subsidy_2022.yaml); explicit control axes: none
+- `au_clean_energy_future_carbon_price_2011` (policies/au_clean_energy_future_carbon_price_2011.yaml); explicit control axes: none
+- `au_climate_change_act_2022` (policies/au_climate_change_act_2022.yaml); explicit control axes: none
+- `au_enterprise_tax_plan_2016` (policies/au_enterprise_tax_plan_2016.yaml); explicit control axes: none
+- `au_fair_work_closing_loopholes_2023_2024` (policies/au_fair_work_closing_loopholes_2023_2024.yaml); explicit control axes: none
+- `au_family_allowance_reform_1976` (policies/au_family_allowance_reform_1976.yaml); explicit control axes: none
+- `au_family_tax_benefit_reform_2000` (policies/au_family_tax_benefit_reform_2000.yaml); explicit control axes: none
+- `au_future_made_in_australia_2024` (policies/au_future_made_in_australia_2024.yaml); explicit control axes: none
+- `au_gfc_stimulus_package_2008_2009` (policies/au_gfc_stimulus_package_2008_2009.yaml); explicit control axes: none
+- `au_gonski_school_funding_review_2012` (policies/au_gonski_school_funding_review_2012.yaml); explicit control axes: none
+- `au_gst_introduction_2000` (policies/au_gst_introduction_2000.yaml); explicit control axes: none
+- `au_hawke_keating_reform_package_1983_1996` (policies/au_hawke_keating_reform_package_1983_1996.yaml); explicit control axes: none
+- `au_henry_tax_review_2010` (policies/au_henry_tax_review_2010.yaml); explicit control axes: none
+- `au_home_insulation_programme_2009` (policies/au_home_insulation_programme_2009.yaml); explicit control axes: none
+- `au_homebuilder_2020` (policies/au_homebuilder_2020.yaml); explicit control axes: none
+- `au_housing_australia_future_fund_2023` (policies/au_housing_australia_future_fund_2023.yaml); explicit control axes: none
+- `au_jobkeeper_2020` (policies/au_jobkeeper_2020.yaml); explicit control axes: none
+- `au_kafta_jaepa_chafta_ftas_2014_2015` (policies/au_kafta_jaepa_chafta_ftas_2014_2015.yaml); explicit control axes: none
+- `au_medibank_partial_dismantling_1976` (policies/au_medibank_partial_dismantling_1976.yaml); explicit control axes: none
+- `au_minerals_resource_rent_tax_2012` (policies/au_minerals_resource_rent_tax_2012.yaml); explicit control axes: none
+- `au_mrrt_repeal_2014` (policies/au_mrrt_repeal_2014.yaml); explicit control axes: none
+- `au_national_anti_corruption_commission_2022` (policies/au_national_anti_corruption_commission_2022.yaml); explicit control axes: none
+- `au_national_competition_policy_1995` (policies/au_national_competition_policy_1995.yaml); explicit control axes: none
+- `au_national_firearms_agreement_1996` (policies/au_national_firearms_agreement_1996.yaml); explicit control axes: none
+- `au_national_reconstruction_fund_corporation_2023` (policies/au_national_reconstruction_fund_corporation_2023.yaml); explicit control axes: none
+- `au_native_title_act_1993` (policies/au_native_title_act_1993.yaml); explicit control axes: none
+- `au_ndis_act_2013` (policies/au_ndis_act_2013.yaml); explicit control axes: none
+- `au_operation_sovereign_borders_2013` (policies/au_operation_sovereign_borders_2013.yaml); explicit control axes: none
+- `au_pacific_solution_2001` (policies/au_pacific_solution_2001.yaml); explicit control axes: none
+- `au_personal_income_tax_plan_2018` (policies/au_personal_income_tax_plan_2018.yaml); explicit control axes: none
+- `au_pilbara_iron_ore_export_boom_1970s` (policies/au_pilbara_iron_ore_export_boom_1970s.yaml); explicit control axes: none
+- `au_rba_inflation_target_1993` (policies/au_rba_inflation_target_1993.yaml); explicit control axes: none
+- `au_religious_discrimination_bill_2022` (policies/au_religious_discrimination_bill_2022.yaml); explicit control axes: none
+- `au_resource_super_profits_tax_2010` (policies/au_resource_super_profits_tax_2010.yaml); explicit control axes: none
+- `au_safeguard_mechanism_reform_2023` (policies/au_safeguard_mechanism_reform_2023.yaml); explicit control axes: none
+- `au_same_sex_marriage_postal_survey_2017` (policies/au_same_sex_marriage_postal_survey_2017.yaml); explicit control axes: none
+- `au_secure_jobs_better_pay_2022` (policies/au_secure_jobs_better_pay_2022.yaml); explicit control axes: none
+- `au_snowy_2_0_approval_2017` (policies/au_snowy_2_0_approval_2017.yaml); explicit control axes: none
+- `au_stage_three_tax_cut_redesign_2024` (policies/au_stage_three_tax_cut_redesign_2024.yaml); explicit control axes: none
+- `au_superannuation_guarantee_1992_expansion` (policies/au_superannuation_guarantee_1992_expansion.yaml); explicit control axes: none
+- `au_superannuation_guarantee_act_1992` (policies/au_superannuation_guarantee_act_1992.yaml); explicit control axes: none
+- `au_technology_investment_roadmap_2020` (policies/au_technology_investment_roadmap_2020.yaml); explicit control axes: none
+- `au_telstra_full_privatisation_1997_2006` (policies/au_telstra_full_privatisation_1997_2006.yaml); explicit control axes: none
+- `au_tobacco_plain_packaging_2011` (policies/au_tobacco_plain_packaging_2011.yaml); explicit control axes: none
+- `au_voice_referendum_2023` (policies/au_voice_referendum_2023.yaml); explicit control axes: none
+- `au_workchoices_act_2005` (policies/au_workchoices_act_2005.yaml); explicit control axes: none
+- `au_working_nation_1994` (policies/au_working_nation_1994.yaml); explicit control axes: none
+- `australia_carbon_tax_repeal_2014` (policies/australia_carbon_tax_repeal_2014.yaml); explicit control axes: none
+- `australia_clean_energy_act_2011` (policies/australia_clean_energy_act_2011.yaml); explicit control axes: none
+- `australia_emissions_reduction_fund_2014` (policies/australia_emissions_reduction_fund_2014.yaml); explicit control axes: none
+- `australia_hawke_keating_reforms_1983_1996` (policies/australia_hawke_keating_reforms_1983_1996.yaml); explicit control axes: none
+- `australia_retirement_income_accord_1983` (policies/australia_retirement_income_accord_1983.yaml); explicit control axes: none
+- `australia_safeguard_mechanism_2016` (policies/australia_safeguard_mechanism_2016.yaml); explicit control axes: none
+- `australia_sg_act_1992` (policies/australia_sg_act_1992.yaml); explicit control axes: none
+- `australia_super_choice_2005` (policies/australia_super_choice_2005.yaml); explicit control axes: none
+- `australia_super_self_managed_reforms` (policies/australia_super_self_managed_reforms.yaml); explicit control axes: none
+- `australia_superannuation_guarantee_1992` (policies/australia_superannuation_guarantee_1992.yaml); explicit control axes: none
+- `bahrain_golden_residency_visa_2022` (policies/bahrain_golden_residency_visa_2022.yaml); explicit control axes: none
+- `bahrain_vat_rate_increase_2022` (policies/bahrain_vat_rate_increase_2022.yaml); explicit control axes: none
+- `bahrain_wage_protection_system_2021` (policies/bahrain_wage_protection_system_2021.yaml); explicit control axes: none
+- `bangladesh_bonded_warehouse_back_to_back_lc_regime` (policies/bangladesh_bonded_warehouse_back_to_back_lc_regime.yaml); explicit control axes: none
+- `bangladesh_epz_act_1980` (policies/bangladesh_epz_act_1980.yaml); explicit control axes: none
+- `bangladesh_grameen_bank_ordinance_1983` (policies/bangladesh_grameen_bank_ordinance_1983.yaml); explicit control axes: none
+- `bangladesh_imf_ecf_2023` (policies/bangladesh_imf_ecf_2023.yaml); explicit control axes: none
+- `bangladesh_new_industrial_policy_1982` (policies/bangladesh_new_industrial_policy_1982.yaml); explicit control axes: none
+- `bd_bank_sector_cleanup_2024` (policies/bd_bank_sector_cleanup_2024.yaml); explicit control axes: none
+- `bd_cyber_security_act_2023` (policies/bd_cyber_security_act_2023.yaml); explicit control axes: none
+- `bd_cyber_security_act_repeal_2024` (policies/bd_cyber_security_act_repeal_2024.yaml); explicit control axes: none
+- `bd_dhaka_metro_line6_2022` (policies/bd_dhaka_metro_line6_2022.yaml); explicit control axes: none
+- `bd_digital_security_act_2018` (policies/bd_digital_security_act_2018.yaml); explicit control axes: none
+- `bd_forex_crawling_peg_2024` (policies/bd_forex_crawling_peg_2024.yaml); explicit control axes: none
+- `bd_ict_act_57_2013` (policies/bd_ict_act_57_2013.yaml); explicit control axes: none
+- `bd_imf_ecf_2023` (policies/bd_imf_ecf_2023.yaml); explicit control axes: none
+- `bd_imf_ecf_continuation_2024` (policies/bd_imf_ecf_continuation_2024.yaml); explicit control axes: none
+- `bd_padma_bridge_2022` (policies/bd_padma_bridge_2022.yaml); explicit control axes: none
+- `bd_padma_bridge_self_financing_2012` (policies/bd_padma_bridge_self_financing_2012.yaml); explicit control axes: none
+- `bd_rana_plaza_labour_act_amendment_2013` (policies/bd_rana_plaza_labour_act_amendment_2013.yaml); explicit control axes: none
+- `bd_rental_power_quick_enhancement_2010` (policies/bd_rental_power_quick_enhancement_2010.yaml); explicit control axes: none
+- `bd_rmg_minimum_wage_2013_2018` (policies/bd_rmg_minimum_wage_2013_2018.yaml); explicit control axes: none
+- `bd_rooppur_nuclear_2017` (policies/bd_rooppur_nuclear_2017.yaml); explicit control axes: none
+- `bd_yunus_reform_commissions_2024` (policies/bd_yunus_reform_commissions_2024.yaml); explicit control axes: none
+- `be_belfius_nationalisation_2011` (policies/be_belfius_nationalisation_2011.yaml); explicit control axes: none
+- `be_cd_v_nva_cartel_split_2008` (policies/be_cd_v_nva_cartel_split_2008.yaml); explicit control axes: none
+- `be_coal_mine_closures_1985_1992` (policies/be_coal_mine_closures_1985_1992.yaml); explicit control axes: none
+- `be_copernic_administrative_reform_2000` (policies/be_copernic_administrative_reform_2000.yaml); explicit control axes: none
+- `be_corporate_tax_reform_2017_2020` (policies/be_corporate_tax_reform_2017_2020.yaml); explicit control axes: none
+- `be_dexia_rescue_2008` (policies/be_dexia_rescue_2008.yaml); explicit control axes: none
+- `be_economic_expansion_law_1976` (policies/be_economic_expansion_law_1976.yaml); explicit control axes: none
+- `be_egmont_pact_failure_1977_1978` (policies/be_egmont_pact_failure_1977_1978.yaml); explicit control axes: none
+- `be_energy_crisis_response_1974_1976` (policies/be_energy_crisis_response_1974_1976.yaml); explicit control axes: none
+- `be_euthanasia_law_2002` (policies/be_euthanasia_law_2002.yaml); explicit control axes: none
+- `be_fortis_bnp_paribas_rescue_2008` (policies/be_fortis_bnp_paribas_rescue_2008.yaml); explicit control axes: none
+- `be_franc_devaluation_1982` (policies/be_franc_devaluation_1982.yaml); explicit control axes: none
+- `be_index_jump_2015` (policies/be_index_jump_2015.yaml); explicit control axes: none
+- `be_kbc_capital_injection_2008_2009` (policies/be_kbc_capital_injection_2008_2009.yaml); explicit control axes: none
+- `be_notional_interest_deduction_2005` (policies/be_notional_interest_deduction_2005.yaml); explicit control axes: none
+- `be_nuclear_phaseout_law_2003` (policies/be_nuclear_phaseout_law_2003.yaml); explicit control axes: none
+- `be_nuclear_programme_doel_tihange_1974_1985` (policies/be_nuclear_programme_doel_tihange_1974_1985.yaml); explicit control axes: none
+- `be_pension_age_rise_67_2015` (policies/be_pension_age_rise_67_2015.yaml); explicit control axes: none
+- `be_pension_early_retirement_reform_2012` (policies/be_pension_early_retirement_reform_2012.yaml); explicit control axes: none
+- `be_public_debt_trajectory_1974_1978` (policies/be_public_debt_trajectory_1974_1978.yaml); explicit control axes: none
+- `be_public_debt_trajectory_1979_1992` (policies/be_public_debt_trajectory_1979_1992.yaml); explicit control axes: none
+- `be_regularisation_migrants_2000` (policies/be_regularisation_migrants_2000.yaml); explicit control axes: none
+- `be_reynders_tax_reform_2001` (policies/be_reynders_tax_reform_2001.yaml); explicit control axes: none
+- `be_same_sex_marriage_2003` (policies/be_same_sex_marriage_2003.yaml); explicit control axes: none
+- `be_sauts_dindex_1982_1984` (policies/be_sauts_dindex_1982_1984.yaml); explicit control axes: none
+- `be_sixth_state_reform_2012_2014` (policies/be_sixth_state_reform_2012_2014.yaml); explicit control axes: none
+- `be_special_powers_laws_1982_1985` (policies/be_special_powers_laws_1982_1985.yaml); explicit control axes: none
+- `be_tax_shift_2015_2019` (policies/be_tax_shift_2015_2019.yaml); explicit control axes: none
+- `be_three_stage_federalisation_1980_1993` (policies/be_three_stage_federalisation_1980_1993.yaml); explicit control axes: none
+- `be_unemployment_degressivity_2012` (policies/be_unemployment_degressivity_2012.yaml); explicit control axes: none
+- `belgium_belgacom_partial_privatisation_1996` (policies/belgium_belgacom_partial_privatisation_1996.yaml); explicit control axes: none
+- `belgium_debt_consolidation_trajectory_1992_1999` (policies/belgium_debt_consolidation_trajectory_1992_1999.yaml); explicit control axes: none
+- `belgium_doel4_tihange3_extension_2023` (policies/belgium_doel4_tihange3_extension_2023.yaml); explicit control axes: none
+- `belgium_global_plan_1993` (policies/belgium_global_plan_1993.yaml); explicit control axes: none
+- `belgium_nuclear_phaseout_law_2003` (policies/belgium_nuclear_phaseout_law_2003.yaml); explicit control axes: none
+- `belgium_nuclear_repeal_2025` (policies/belgium_nuclear_repeal_2025.yaml); explicit control axes: none
+- `belgium_saint_michel_federal_reform_1993` (policies/belgium_saint_michel_federal_reform_1993.yaml); explicit control axes: none
+- `belgium_tihange1_extension_2015` (policies/belgium_tihange1_extension_2015.yaml); explicit control axes: none
+- `belgium_wage_norm_law_1996` (policies/belgium_wage_norm_law_1996.yaml); explicit control axes: none
+- `bg_agricultural_collectivisation_1946_1958` (policies/bg_agricultural_collectivisation_1946_1958.yaml); explicit control axes: none
+- `bg_nationalisation_law_1947` (policies/bg_nationalisation_law_1947.yaml); explicit control axes: none
+- `bg_ro_schengen_land_borders_2025` (policies/bg_ro_schengen_land_borders_2025.yaml); explicit control axes: none
+- `bg_soviet_style_planning_1947_1989` (policies/bg_soviet_style_planning_1947_1989.yaml); explicit control axes: none
+- `bj_arch_social_protection_rollout_2019` (policies/bj_arch_social_protection_rollout_2019.yaml); explicit control axes: none
+- `bj_glo_djigbe_industrial_zone_2020` (policies/bj_glo_djigbe_industrial_zone_2020.yaml); explicit control axes: none
+- `bj_party_system_electoral_reforms_2018_2019` (policies/bj_party_system_electoral_reforms_2018_2019.yaml); explicit control axes: none
+- `bo_1994_constitutional_reform` (policies/bo_1994_constitutional_reform.yaml); explicit control axes: none
+- `bo_2019_election_crisis` (policies/bo_2019_election_crisis.yaml); explicit control axes: none
+- `bo_aguas_illimani_la_paz_concession_1997` (policies/bo_aguas_illimani_la_paz_concession_1997.yaml); explicit control axes: none
+- `bo_anez_foreign_policy_realignment_2019` (policies/bo_anez_foreign_policy_realignment_2019.yaml); explicit control axes: none
+- `bo_arce_fuel_subsidy_maintenance_2020` (policies/bo_arce_fuel_subsidy_maintenance_2020.yaml); explicit control axes: none
+- `bo_capitalizacion_law_1544_1994` (policies/bo_capitalizacion_law_1544_1994.yaml); explicit control axes: none
+- `bo_cochabamba_water_war_2000` (policies/bo_cochabamba_water_war_2000.yaml); explicit control axes: none
+- `bo_constitutional_referendum_2016` (policies/bo_constitutional_referendum_2016.yaml); explicit control axes: none
+- `bo_covid_emergency_response_2020` (policies/bo_covid_emergency_response_2020.yaml); explicit control axes: none
+- `bo_dollar_peg_defence_2023_2024` (policies/bo_dollar_peg_defence_2023_2024.yaml); explicit control axes: none
+- `bo_gas_war_2003` (policies/bo_gas_war_2003.yaml); explicit control axes: none
+- `bo_hydrocarbon_concessions_1997_2001` (policies/bo_hydrocarbon_concessions_1997_2001.yaml); explicit control axes: none
+- `bo_hydrocarbon_referendum_2004` (policies/bo_hydrocarbon_referendum_2004.yaml); explicit control axes: none
+- `bo_hydrocarbons_law_3058_2005` (policies/bo_hydrocarbons_law_3058_2005.yaml); explicit control axes: none
+- `bo_imf_rfi_cancellation_2020` (policies/bo_imf_rfi_cancellation_2020.yaml); explicit control axes: none
+- `bo_imf_rfi_loan_2020` (policies/bo_imf_rfi_loan_2020.yaml); explicit control axes: none
+- `bo_impuestazo_february_2003` (policies/bo_impuestazo_february_2003.yaml); explicit control axes: none
+- `bo_ley_2029_water_law_1999` (policies/bo_ley_2029_water_law_1999.yaml); explicit control axes: none
+- `bo_ley_inra_1715_1996` (policies/bo_ley_inra_1715_1996.yaml); explicit control axes: none
+- `bo_litio_industrialisation_ylb` (policies/bo_litio_industrialisation_ylb.yaml); explicit control axes: none
+- `bo_mercosur_full_membership_2024` (policies/bo_mercosur_full_membership_2024.yaml); explicit control axes: none
+- `bo_mesa_resignation_2005` (policies/bo_mesa_resignation_2005.yaml); explicit control axes: none
+- `bo_pacific_lng_chile_route_controversy_2002_2003` (policies/bo_pacific_lng_chile_route_controversy_2002_2003.yaml); explicit control axes: none
+- `bo_participacion_popular_ley_1551_1994` (policies/bo_participacion_popular_ley_1551_1994.yaml); explicit control axes: none
+- `bo_pension_privatisation_ley_1732_1996` (policies/bo_pension_privatisation_ley_1732_1996.yaml); explicit control axes: none
+- `bo_plan_dignidad_coca_eradication_1998_2002` (policies/bo_plan_dignidad_coca_eradication_1998_2002.yaml); explicit control axes: none
+- `bo_rodriguez_veltze_transitional_2005` (policies/bo_rodriguez_veltze_transitional_2005.yaml); explicit control axes: none
+- `bo_sanchez_de_lozada_resignation_2003` (policies/bo_sanchez_de_lozada_resignation_2003.yaml); explicit control axes: none
+- `bo_tcp_ruling_0084_2017` (policies/bo_tcp_ruling_0084_2017.yaml); explicit control axes: none
+- `bolivia_hydrocarbons_nationalisation_2006` (policies/bolivia_hydrocarbons_nationalisation_2006.yaml); explicit control axes: none
+- `bolivia_minimum_wage_increases_2006_2019` (policies/bolivia_minimum_wage_increases_2006_2019.yaml); explicit control axes: none
+- `bolivia_new_constitution_2009` (policies/bolivia_new_constitution_2009.yaml); explicit control axes: none
+- `bolivia_nsa_decree_21060_1985` (policies/bolivia_nsa_decree_21060_1985.yaml); explicit control axes: none
+- `bolivia_renta_dignidad_2008` (policies/bolivia_renta_dignidad_2008.yaml); explicit control axes: none
+- `bolivia_ypfb_industrialisation` (policies/bolivia_ypfb_industrialisation.yaml); explicit control axes: none
+- `botswana_debswana_joint_venture_1969` (policies/botswana_debswana_joint_venture_1969.yaml); explicit control axes: none
+- `botswana_national_development_plans` (policies/botswana_national_development_plans.yaml); explicit control axes: none
+- `botswana_pula_fund` (policies/botswana_pula_fund.yaml); explicit control axes: none
+- `botswana_sacu_membership_1969` (policies/botswana_sacu_membership_1969.yaml); explicit control axes: none
+- `botswana_sustainable_budget_index_1994` (policies/botswana_sustainable_budget_index_1994.yaml); explicit control axes: none
+- `br_abertura_comercial_1990_1993` (policies/br_abertura_comercial_1990_1993.yaml); explicit control axes: none
+- `br_amazon_enforcement_retrenchment_2019` (policies/br_amazon_enforcement_retrenchment_2019.yaml); explicit control axes: none
+- `br_amnesty_law_1979` (policies/br_amnesty_law_1979.yaml); explicit control axes: none
+- `br_auxilio_brasil_2021` (policies/br_auxilio_brasil_2021.yaml); explicit control axes: none
+- `br_auxilio_emergencial_covid_2020` (policies/br_auxilio_emergencial_covid_2020.yaml); explicit control axes: none
+- `br_bcb_independence_lc179_2021` (policies/br_bcb_independence_lc179_2021.yaml); explicit control axes: none
+- `br_bolsa_escola_2001` (policies/br_bolsa_escola_2001.yaml); explicit control axes: none
+- `br_bolsa_familia_expansion_2006_2010` (policies/br_bolsa_familia_expansion_2006_2010.yaml); explicit control axes: none
+- `br_bresser_summer_plans_1987_1989` (policies/br_bresser_summer_plans_1987_1989.yaml); explicit control axes: none
+- `br_collor_impeachment_1992` (policies/br_collor_impeachment_1992.yaml); explicit control axes: none
+- `br_constitution_1988` (policies/br_constitution_1988.yaml); explicit control axes: none
+- `br_cruzado_plan_1986` (policies/br_cruzado_plan_1986.yaml); explicit control axes: none
+- `br_csn_embraer_privatisation_1993_1994` (policies/br_csn_embraer_privatisation_1993_1994.yaml); explicit control axes: none
+- `br_delfim_heterodox_reflation_1979_1980` (policies/br_delfim_heterodox_reflation_1979_1980.yaml); explicit control axes: none
+- `br_direct_state_elections_1982` (policies/br_direct_state_elections_1982.yaml); explicit control axes: none
+- `br_electricity_tariff_forcing_mp579_2012` (policies/br_electricity_tariff_forcing_mp579_2012.yaml); explicit control axes: none
+- `br_eletrobras_privatisation_lei14182_2021` (policies/br_eletrobras_privatisation_lei14182_2021.yaml); explicit control axes: none
+- `br_external_debt_moratorium_1987` (policies/br_external_debt_moratorium_1987.yaml); explicit control axes: none
+- `br_fundo_social_emergencia_1994` (policies/br_fundo_social_emergencia_1994.yaml); explicit control axes: none
+- `br_gfc_bndes_ipi_countercyclical_2008_2010` (policies/br_gfc_bndes_ipi_countercyclical_2008_2010.yaml); explicit control axes: none
+- `br_hyperinflation_escalation_1989_1990` (policies/br_hyperinflation_escalation_1989_1990.yaml); explicit control axes: none
+- `br_ii_pnd_1974` (policies/br_ii_pnd_1974.yaml); explicit control axes: none
+- `br_imf_eff_1983` (policies/br_imf_eff_1983.yaml); explicit control axes: none
+- `br_imf_standby_programs_1998_2002` (policies/br_imf_standby_programs_1998_2002.yaml); explicit control axes: none
+- `br_inflation_targeting_adoption_1999` (policies/br_inflation_targeting_adoption_1999.yaml); explicit control axes: none
+- `br_ipi_auto_tax_holidays_2011_2014` (policies/br_ipi_auto_tax_holidays_2011_2014.yaml); explicit control axes: none
+- `br_labour_reform_lei13467_2017` (policies/br_labour_reform_lei13467_2017.yaml); explicit control axes: none
+- `br_lava_jato_petrobras_2014_2016` (policies/br_lava_jato_petrobras_2014_2016.yaml); explicit control axes: none
+- `br_lrf_fiscal_responsibility_law_2000` (policies/br_lrf_fiscal_responsibility_law_2000.yaml); explicit control axes: none
+- `br_maxi_devaluation_1983` (policies/br_maxi_devaluation_1983.yaml); explicit control axes: none
+- `br_mercosur_treaty_asuncion_1991` (policies/br_mercosur_treaty_asuncion_1991.yaml); explicit control axes: none
+- `br_nova_matriz_economica_2011_2014` (policies/br_nova_matriz_economica_2011_2014.yaml); explicit control axes: none
+- `br_nuclear_accord_germany_1975` (policies/br_nuclear_accord_germany_1975.yaml); explicit control axes: none
+- `br_outsourcing_law_lei13429_2017` (policies/br_outsourcing_law_lei13429_2017.yaml); explicit control axes: none
+- `br_pac_infrastructure_programme_2007` (policies/br_pac_infrastructure_programme_2007.yaml); explicit control axes: none
+- `br_party_reform_1979` (policies/br_party_reform_1979.yaml); explicit control axes: none
+- `br_pedaladas_fiscais_2012_2014` (policies/br_pedaladas_fiscais_2012_2014.yaml); explicit control axes: none
+- `br_pension_reform_ec103_2019` (policies/br_pension_reform_ec103_2019.yaml); explicit control axes: none
+- `br_petrobras_risk_contracts_1975` (policies/br_petrobras_risk_contracts_1975.yaml); explicit control axes: none
+- `br_plano_collor_asset_freeze_1990` (policies/br_plano_collor_asset_freeze_1990.yaml); explicit control axes: none
+- `br_pnd_deepening_1993_1994` (policies/br_pnd_deepening_1993_1994.yaml); explicit control axes: none
+- `br_pnd_privatisation_1990` (policies/br_pnd_privatisation_1990.yaml); explicit control axes: none
+- `br_pre_sal_partition_production_regime_2010` (policies/br_pre_sal_partition_production_regime_2010.yaml); explicit control axes: none
+- `br_pre_salt_discovery_2007` (policies/br_pre_salt_discovery_2007.yaml); explicit control axes: none
+- `br_proalcool_1975` (policies/br_proalcool_1975.yaml); explicit control axes: none
+- `br_real_devaluation_1999` (policies/br_real_devaluation_1999.yaml); explicit control axes: none
+- `br_tcu_investment_divestment_2017` (policies/br_tcu_investment_divestment_2017.yaml); explicit control axes: none
+- `br_teto_de_gastos_pec95_2016` (policies/br_teto_de_gastos_pec95_2016.yaml); explicit control axes: none
+- `br_urv_parallel_indexation_1994` (policies/br_urv_parallel_indexation_1994.yaml); explicit control axes: none
+- `brazil_bndes_credit_expansion_2008_2010` (policies/brazil_bndes_credit_expansion_2008_2010.yaml); explicit control axes: none
+- `brazil_bndes_credit_reexpansion_2023` (policies/brazil_bndes_credit_reexpansion_2023.yaml); explicit control axes: none
+- `brazil_bolsa_familia_2_relaunch_2023` (policies/brazil_bolsa_familia_2_relaunch_2023.yaml); explicit control axes: none
+- `brazil_bolsa_familia_law_10836_2004` (policies/brazil_bolsa_familia_law_10836_2004.yaml); explicit control axes: none
+- `brazil_fiscal_responsibility_law_2000` (policies/brazil_fiscal_responsibility_law_2000.yaml); explicit control axes: none
+- `brazil_inflation_targeting_1999` (policies/brazil_inflation_targeting_1999.yaml); explicit control axes: none
+- `brazil_inflation_targeting_continuity` (policies/brazil_inflation_targeting_continuity.yaml); explicit control axes: none
+- `brazil_inflation_targeting_regime_1999` (policies/brazil_inflation_targeting_regime_1999.yaml); explicit control axes: none
+- `brazil_marco_fiscal_lc200_2023` (policies/brazil_marco_fiscal_lc200_2023.yaml); explicit control axes: none
+- `brazil_mercosur_eu_trade_deal_2024` (policies/brazil_mercosur_eu_trade_deal_2024.yaml); explicit control axes: none
+- `brazil_minimum_wage_policy_2003_2010` (policies/brazil_minimum_wage_policy_2003_2010.yaml); explicit control axes: none
+- `brazil_minimum_wage_valorisation_formula_2023` (policies/brazil_minimum_wage_valorisation_formula_2023.yaml); explicit control axes: none
+- `brazil_mover_green_mobility_law_2024` (policies/brazil_mover_green_mobility_law_2024.yaml); explicit control axes: none
+- `brazil_nova_industria_2024` (policies/brazil_nova_industria_2024.yaml); explicit control axes: none
+- `brazil_plano_real_1994` (policies/brazil_plano_real_1994.yaml); explicit control axes: none
+- `brazil_ppcdam_amazon_deforestation_plan_2023` (policies/brazil_ppcdam_amazon_deforestation_plan_2023.yaml); explicit control axes: none
+- `brazil_pre_salt_oil_framework_2010` (policies/brazil_pre_salt_oil_framework_2010.yaml); explicit control axes: none
+- `brazil_privatisations_1995_2000` (policies/brazil_privatisations_1995_2000.yaml); explicit control axes: none
+- `brazil_privatisations_1995_2002` (policies/brazil_privatisations_1995_2002.yaml); explicit control axes: none
+- `brazil_real_introduction_1994` (policies/brazil_real_introduction_1994.yaml); explicit control axes: none
+- `brazil_real_launch_1994` (policies/brazil_real_launch_1994.yaml); explicit control axes: none
+- `brazil_sbce_carbon_market_law_2024` (policies/brazil_sbce_carbon_market_law_2024.yaml); explicit control axes: none
+- `brazil_tax_reform_ec132_2023` (policies/brazil_tax_reform_ec132_2023.yaml); explicit control axes: none
+- `brazil_telecom_reform_1995_1998` (policies/brazil_telecom_reform_1995_1998.yaml); explicit control axes: none
+- `brazil_urv_1994` (policies/brazil_urv_1994.yaml); explicit control axes: none
+- `brazil_urv_transition_1994` (policies/brazil_urv_transition_1994.yaml); explicit control axes: none
+- `by_1996_presidential_constitution` (policies/by_1996_presidential_constitution.yaml); explicit control axes: none
+- `by_admin_price_credit_controls_1994_2015` (policies/by_admin_price_credit_controls_1994_2015.yaml); explicit control axes: none
+- `by_state_enterprise_retention_1995` (policies/by_state_enterprise_retention_1995.yaml); explicit control axes: none
+- `ca_bill_c51_anti_terrorism_2015` (policies/ca_bill_c51_anti_terrorism_2015.yaml); explicit control axes: none
+- `ca_build_canada_homes_2025` (policies/ca_build_canada_homes_2025.yaml); explicit control axes: none
+- `ca_canadair_dehavilland_privatisation_1986` (policies/ca_canadair_dehavilland_privatisation_1986.yaml); explicit control axes: none
+- `ca_capital_gains_inclusion_cancellation_2025` (policies/ca_capital_gains_inclusion_cancellation_2025.yaml); explicit control axes: none
+- `ca_carbon_tax_consumer_cancellation_2025` (policies/ca_carbon_tax_consumer_cancellation_2025.yaml); explicit control axes: none
+- `ca_ceta_2014` (policies/ca_ceta_2014.yaml); explicit control axes: none
+- `ca_charlottetown_accord_1992` (policies/ca_charlottetown_accord_1992.yaml); explicit control axes: none
+- `ca_charter_rights_freedoms_1982` (policies/ca_charter_rights_freedoms_1982.yaml); explicit control axes: none
+- `ca_chst_block_grant_1996` (policies/ca_chst_block_grant_1996.yaml); explicit control axes: none
+- `ca_civil_marriage_act_2005` (policies/ca_civil_marriage_act_2005.yaml); explicit control axes: none
+- `ca_clarity_act_2000` (policies/ca_clarity_act_2000.yaml); explicit control axes: none
+- `ca_constitution_act_patriation_1982` (policies/ca_constitution_act_patriation_1982.yaml); explicit control axes: none
+- `ca_corporate_tax_cut_22_to_15_2007_2012` (policies/ca_corporate_tax_cut_22_to_15_2007_2012.yaml); explicit control axes: none
+- `ca_cpp_reform_1997` (policies/ca_cpp_reform_1997.yaml); explicit control axes: none
+- `ca_cusfta_1988` (policies/ca_cusfta_1988.yaml); explicit control axes: none
+- `ca_economic_action_plan_2009` (policies/ca_economic_action_plan_2009.yaml); explicit control axes: none
+- `ca_february_2000_tax_cut` (policies/ca_february_2000_tax_cut.yaml); explicit control axes: none
+- `ca_federal_program_review_1994_1996` (policies/ca_federal_program_review_1994_1996.yaml); explicit control axes: none
+- `ca_gomery_commission_2004_2005` (policies/ca_gomery_commission_2004_2005.yaml); explicit control axes: none
+- `ca_gst_cut_7_to_5_2006_2008` (policies/ca_gst_cut_7_to_5_2006_2008.yaml); explicit control axes: none
+- `ca_gst_introduction_1991` (policies/ca_gst_introduction_1991.yaml); explicit control axes: none
+- `ca_health_accord_2004` (policies/ca_health_accord_2004.yaml); explicit control axes: none
+- `ca_immigration_levels_reduction_2025` (policies/ca_immigration_levels_reduction_2025.yaml); explicit control axes: none
+- `ca_inflation_targeting_1991` (policies/ca_inflation_targeting_1991.yaml); explicit control axes: none
+- `ca_investment_canada_firab_replacement_1985` (policies/ca_investment_canada_firab_replacement_1985.yaml); explicit control axes: none
+- `ca_iraq_war_refusal_2003` (policies/ca_iraq_war_refusal_2003.yaml); explicit control axes: none
+- `ca_kelowna_accord_2005` (policies/ca_kelowna_accord_2005.yaml); explicit control axes: none
+- `ca_kyoto_ratification_2002` (policies/ca_kyoto_ratification_2002.yaml); explicit control axes: none
+- `ca_martin_budget_1995` (policies/ca_martin_budget_1995.yaml); explicit control axes: none
+- `ca_meech_lake_failure_1987_1990` (policies/ca_meech_lake_failure_1987_1990.yaml); explicit control axes: none
+- `ca_middle_bracket_tax_cut_2025` (policies/ca_middle_bracket_tax_cut_2025.yaml); explicit control axes: none
+- `ca_nafta_canada_1994` (policies/ca_nafta_canada_1994.yaml); explicit control axes: none
+- `ca_national_energy_program_1980` (policies/ca_national_energy_program_1980.yaml); explicit control axes: none
+- `ca_quebec_referendum_1995` (policies/ca_quebec_referendum_1995.yaml); explicit control axes: none
+- `ca_six_and_five_wage_controls_1982` (policies/ca_six_and_five_wage_controls_1982.yaml); explicit control axes: none
+- `ca_tfsa_2009` (policies/ca_tfsa_2009.yaml); explicit control axes: none
+- `ca_us_retaliatory_tariffs_2025` (policies/ca_us_retaliatory_tariffs_2025.yaml); explicit control axes: none
+- `ca_western_accord_nep_dismantling_1985` (policies/ca_western_accord_nep_dismantling_1985.yaml); explicit control axes: none
+- `ca_wilson_tax_reform_1987` (policies/ca_wilson_tax_reform_1987.yaml); explicit control axes: none
+- `california_ab1279_2022` (policies/california_ab1279_2022.yaml); explicit control axes: none
+- `california_ab32_2006` (policies/california_ab32_2006.yaml); explicit control axes: none
+- `california_advanced_clean_cars_ii_2022` (policies/california_advanced_clean_cars_ii_2022.yaml); explicit control axes: none
+- `california_cap_and_trade_2012` (policies/california_cap_and_trade_2012.yaml); explicit control axes: none
+- `california_sb100_2018` (policies/california_sb100_2018.yaml); explicit control axes: none
+- `california_sb253_sb261_2023` (policies/california_sb253_sb261_2023.yaml); explicit control axes: none
+- `california_sb32_2016` (policies/california_sb32_2016.yaml); explicit control axes: none
+- `canada_boc_inflation_targeting_1991` (policies/canada_boc_inflation_targeting_1991.yaml); explicit control axes: none
+- `canada_capital_gains_inclusion_2024` (policies/canada_capital_gains_inclusion_2024.yaml); explicit control axes: none
+- `canada_carbon_pricing_ghgppa_2018` (policies/canada_carbon_pricing_ghgppa_2018.yaml); explicit control axes: none
+- `canada_cerb_covid_fiscal_response_2020_2022` (policies/canada_cerb_covid_fiscal_response_2020_2022.yaml); explicit control axes: none
+- `canada_child_benefit_2016` (policies/canada_child_benefit_2016.yaml); explicit control axes: none
+- `canada_child_care_10_dollar_day_2021` (policies/canada_child_care_10_dollar_day_2021.yaml); explicit control axes: none
+- `canada_cpp_enhancement_2016` (policies/canada_cpp_enhancement_2016.yaml); explicit control axes: none
+- `canada_cpp_reform_1997` (policies/canada_cpp_reform_1997.yaml); explicit control axes: none
+- `canada_cusfta_1988` (policies/canada_cusfta_1988.yaml); explicit control axes: none
+- `canada_dental_pharmacare_ndp_agreement_2023_2024` (policies/canada_dental_pharmacare_ndp_agreement_2023_2024.yaml); explicit control axes: none
+- `canada_gst_1991` (policies/canada_gst_1991.yaml); explicit control axes: none
+- `canada_immigration_levels_plan_2015_present` (policies/canada_immigration_levels_plan_2015_present.yaml); explicit control axes: none
+- `canada_martin_fiscal_consolidation_1995` (policies/canada_martin_fiscal_consolidation_1995.yaml); explicit control axes: none
+- `canada_nafta_accession_1994` (policies/canada_nafta_accession_1994.yaml); explicit control axes: none
+- `canada_privatisations_1988_1995` (policies/canada_privatisations_1988_1995.yaml); explicit control axes: none
+- `canada_program_review_1995` (policies/canada_program_review_1995.yaml); explicit control axes: none
+- `cd_gecamines_resource_state_1967` (policies/cd_gecamines_resource_state_1967.yaml); explicit control axes: none
+- `cd_monetary_fiscal_instability_1970s_1990s` (policies/cd_monetary_fiscal_instability_1970s_1990s.yaml); explicit control axes: none
+- `cd_zairianisation_1973` (policies/cd_zairianisation_1973.yaml); explicit control axes: none
+- `ch_federal_council_zauberformel_formation_1959` (policies/ch_federal_council_zauberformel_formation_1959.yaml); explicit control axes: none
+- `ch_kvg_health_insurance_act_1994` (policies/ch_kvg_health_insurance_act_1994.yaml); explicit control axes: none
+- `ch_snb_floating_franc_1978` (policies/ch_snb_floating_franc_1978.yaml); explicit control axes: none
+- `ch_unemployment_insurance_law_1984` (policies/ch_unemployment_insurance_law_1984.yaml); explicit control axes: none
+- `ch_vat_referendum_rejection_1977` (policies/ch_vat_referendum_rejection_1977.yaml); explicit control axes: none
+- `chile_afp_1981` (policies/chile_afp_1981.yaml); explicit control axes: none
+- `chile_banking_liberalisation_1977` (policies/chile_banking_liberalisation_1977.yaml); explicit control axes: none
+- `chile_fx_opening_1976` (policies/chile_fx_opening_1976.yaml); explicit control axes: none
+- `chile_pension_reform_proposed_2024` (policies/chile_pension_reform_proposed_2024.yaml); explicit control axes: none
+- `chile_pillar_1_solidarity_2008` (policies/chile_pillar_1_solidarity_2008.yaml); explicit control axes: none
+- `chile_soe_privatisations_1975_1989` (policies/chile_soe_privatisations_1975_1989.yaml); explicit control axes: none
+- `chile_trade_opening_1975_1979` (policies/chile_trade_opening_1975_1979.yaml); explicit control axes: none
+- `china_deng_reform_opening_1978` (policies/china_deng_reform_opening_1978.yaml); explicit control axes: none
+- `china_household_responsibility_1978` (policies/china_household_responsibility_1978.yaml); explicit control axes: none
+- `china_sez_establishment_1980` (policies/china_sez_establishment_1980.yaml); explicit control axes: none
+- `china_soe_reform_2001_2006` (policies/china_soe_reform_2001_2006.yaml); explicit control axes: none
+- `china_soe_restructuring_1990s` (policies/china_soe_restructuring_1990s.yaml); explicit control axes: none
+- `china_trading_rights_liberalisation` (policies/china_trading_rights_liberalisation.yaml); explicit control axes: none
+- `china_wto_accession_2001` (policies/china_wto_accession_2001.yaml); explicit control axes: none
+- `china_wto_tariff_reductions_2001` (policies/china_wto_tariff_reductions_2001.yaml); explicit control axes: none
+- `ci_agricultural_frontier_export_model_1960s` (policies/ci_agricultural_frontier_export_model_1960s.yaml); explicit control axes: none
+- `ci_cocoa_coffee_export_board_caistab_1960` (policies/ci_cocoa_coffee_export_board_caistab_1960.yaml); explicit control axes: none
+- `ci_french_capital_open_door_1960s` (policies/ci_french_capital_open_door_1960s.yaml); explicit control axes: none
+- `cl_40_hour_work_week_2023` (policies/cl_40_hour_work_week_2023.yaml); explicit control axes: none
+- `cl_acuerdo_paz_nueva_constitucion_2019` (policies/cl_acuerdo_paz_nueva_constitucion_2019.yaml); explicit control axes: none
+- `cl_afp_retiros_10_2020_2021` (policies/cl_afp_retiros_10_2020_2021.yaml); explicit control axes: none
+- `cl_asian_crisis_encaje_removal_1998` (policies/cl_asian_crisis_encaje_removal_1998.yaml); explicit control axes: none
+- `cl_bcch_autonomy_activation_1989_1990` (policies/cl_bcch_autonomy_activation_1989_1990.yaml); explicit control axes: none
+- `cl_cae_student_loan_consolidation_2010_2012` (policies/cl_cae_student_loan_consolidation_2010_2012.yaml); explicit control axes: none
+- `cl_canada_mexico_mercosur_fta_1996_1998` (policies/cl_canada_mexico_mercosur_fta_1996_1998.yaml); explicit control axes: none
+- `cl_concessions_law_infrastructure_1996` (policies/cl_concessions_law_infrastructure_1996.yaml); explicit control axes: none
+- `cl_constitutional_reform_2005` (policies/cl_constitutional_reform_2005.yaml); explicit control axes: none
+- `cl_countercyclical_stimulus_2009` (policies/cl_countercyclical_stimulus_2009.yaml); explicit control axes: none
+- `cl_despenalizacion_aborto_3_causales_2017` (policies/cl_despenalizacion_aborto_3_causales_2017.yaml); explicit control axes: none
+- `cl_encaje_capital_controls_1991` (policies/cl_encaje_capital_controls_1991.yaml); explicit control axes: none
+- `cl_fees_stabilisation_fund_2006` (policies/cl_fees_stabilisation_fund_2006.yaml); explicit control axes: none
+- `cl_fiscal_structural_balance_rule_2001` (policies/cl_fiscal_structural_balance_rule_2001.yaml); explicit control axes: none
+- `cl_gratuidad_universitaria_2016` (policies/cl_gratuidad_universitaria_2016.yaml); explicit control axes: none
+- `cl_ife_covid_2020_2021` (policies/cl_ife_covid_2020_2021.yaml); explicit control axes: none
+- `cl_labour_law_restoration_1991` (policies/cl_labour_law_restoration_1991.yaml); explicit control axes: none
+- `cl_ley_corta_isapres_2024` (policies/cl_ley_corta_isapres_2024.yaml); explicit control axes: none
+- `cl_ley_migraciones_2021` (policies/cl_ley_migraciones_2021.yaml); explicit control axes: none
+- `cl_lge_education_law_2009` (policies/cl_lge_education_law_2009.yaml); explicit control axes: none
+- `cl_mining_royalty_reform_2023` (policies/cl_mining_royalty_reform_2023.yaml); explicit control axes: none
+- `cl_modernizacion_tributaria_2020` (policies/cl_modernizacion_tributaria_2020.yaml); explicit control axes: none
+- `cl_pension_reform_ley_21735_2025` (policies/cl_pension_reform_ley_21735_2025.yaml); explicit control axes: none
+- `cl_pension_reform_pilar_solidario_2008` (policies/cl_pension_reform_pilar_solidario_2008.yaml); explicit control axes: none
+- `cl_pinera_i_copper_royalty_reform_2010` (policies/cl_pinera_i_copper_royalty_reform_2010.yaml); explicit control axes: none
+- `cl_pinera_i_corporate_tax_hike_2010` (policies/cl_pinera_i_corporate_tax_hike_2010.yaml); explicit control axes: none
+- `cl_pinera_i_earthquake_reconstruction_2010` (policies/cl_pinera_i_earthquake_reconstruction_2010.yaml); explicit control axes: none
+- `cl_pinera_i_tax_reform_2012` (policies/cl_pinera_i_tax_reform_2012.yaml); explicit control axes: none
+- `cl_pinochet_london_arrest_1998` (policies/cl_pinochet_london_arrest_1998.yaml); explicit control axes: none
+- `cl_plan_auge_ges_2004_2005` (policies/cl_plan_auge_ges_2004_2005.yaml); explicit control axes: none
+- `cl_plebiscito_constitucional_2022_2023` (policies/cl_plebiscito_constitucional_2022_2023.yaml); explicit control axes: none
+- `cl_reforma_educacional_inclusion_2015` (policies/cl_reforma_educacional_inclusion_2015.yaml); explicit control axes: none
+- `cl_reforma_laboral_2016` (policies/cl_reforma_laboral_2016.yaml); explicit control axes: none
+- `cl_reforma_pensional_pilar_solidario_2016` (policies/cl_reforma_pensional_pilar_solidario_2016.yaml); explicit control axes: none
+- `cl_reforma_procesal_penal_initiation_1997` (policies/cl_reforma_procesal_penal_initiation_1997.yaml); explicit control axes: none
+- `cl_reforma_tributaria_2014` (policies/cl_reforma_tributaria_2014.yaml); explicit control axes: none
+- `cl_reforma_tributaria_pacto_fiscal_rechazada_2023` (policies/cl_reforma_tributaria_pacto_fiscal_rechazada_2023.yaml); explicit control axes: none
+- `cl_rettig_commission_1990_1991` (policies/cl_rettig_commission_1990_1991.yaml); explicit control axes: none
+- `cl_tax_reform_1990_growth_with_equity` (policies/cl_tax_reform_1990_growth_with_equity.yaml); explicit control axes: none
+- `cl_transantiago_design_2005` (policies/cl_transantiago_design_2005.yaml); explicit control axes: none
+- `cl_transantiago_launch_crisis_2007` (policies/cl_transantiago_launch_crisis_2007.yaml); explicit control axes: none
+- `cl_us_fta_2003_2004` (policies/cl_us_fta_2003_2004.yaml); explicit control axes: none
+- `cn_12th_five_year_plan_2011` (policies/cn_12th_five_year_plan_2011.yaml); explicit control axes: none
+- `cn_14th_congress_socialist_market_1992` (policies/cn_14th_congress_socialist_market_1992.yaml); explicit control axes: none
+- `cn_agricultural_tax_abolition_2006` (policies/cn_agricultural_tax_abolition_2006.yaml); explicit control axes: none
+- `cn_anti_corruption_campaign_2012` (policies/cn_anti_corruption_campaign_2012.yaml); explicit control axes: none
+- `cn_arrest_gang_of_four_1976` (policies/cn_arrest_gang_of_four_1976.yaml); explicit control axes: none
+- `cn_austerity_rectification_1988_1991` (policies/cn_austerity_rectification_1988_1991.yaml); explicit control axes: none
+- `cn_baoshan_steel_japan_contract_1977` (policies/cn_baoshan_steel_japan_contract_1977.yaml); explicit control axes: none
+- `cn_belt_and_road_2013` (policies/cn_belt_and_road_2013.yaml); explicit control axes: none
+- `cn_common_prosperity_2021` (policies/cn_common_prosperity_2021.yaml); explicit control axes: none
+- `cn_constitution_private_economy_1999` (policies/cn_constitution_private_economy_1999.yaml); explicit control axes: none
+- `cn_deng_southern_tour_1992` (policies/cn_deng_southern_tour_1992.yaml); explicit control axes: none
+- `cn_exchange_rate_unification_1994` (policies/cn_exchange_rate_unification_1994.yaml); explicit control axes: none
+- `cn_four_trillion_stimulus_2008` (policies/cn_four_trillion_stimulus_2008.yaml); explicit control axes: none
+- `cn_housing_commercialisation_1998` (policies/cn_housing_commercialisation_1998.yaml); explicit control axes: none
+- `cn_housing_rescue_measures_2024` (policies/cn_housing_rescue_measures_2024.yaml); explicit control axes: none
+- `cn_labour_contract_law_2008` (policies/cn_labour_contract_law_2008.yaml); explicit control axes: none
+- `cn_made_in_china_2025_2015` (policies/cn_made_in_china_2025_2015.yaml); explicit control axes: none
+- `cn_new_rural_medical_scheme_2003` (policies/cn_new_rural_medical_scheme_2003.yaml); explicit control axes: none
+- `cn_pboc_law_1995` (policies/cn_pboc_law_1995.yaml); explicit control axes: none
+- `cn_platform_crackdown_2020` (policies/cn_platform_crackdown_2020.yaml); explicit control axes: none
+- `cn_private_economy_promotion_law_2025` (policies/cn_private_economy_promotion_law_2025.yaml); explicit control axes: none
+- `cn_property_rights_law_2007` (policies/cn_property_rights_law_2007.yaml); explicit control axes: none
+- `cn_rmb_exchange_rate_reform_2005` (policies/cn_rmb_exchange_rate_reform_2005.yaml); explicit control axes: none
+- `cn_shanghai_pudong_1990` (policies/cn_shanghai_pudong_1990.yaml); explicit control axes: none
+- `cn_soe_grasp_large_let_go_small_1995` (policies/cn_soe_grasp_large_let_go_small_1995.yaml); explicit control axes: none
+- `cn_tax_sharing_reform_1994` (policies/cn_tax_sharing_reform_1994.yaml); explicit control axes: none
+- `cn_ten_year_plan_1978` (policies/cn_ten_year_plan_1978.yaml); explicit control axes: none
+- `cn_three_child_policy_2021` (policies/cn_three_child_policy_2021.yaml); explicit control axes: none
+- `cn_three_red_lines_2020` (policies/cn_three_red_lines_2020.yaml); explicit control axes: none
+- `cn_tiananmen_martial_law_1989` (policies/cn_tiananmen_martial_law_1989.yaml); explicit control axes: none
+- `co_4g_infrastructure_concessions_2014` (policies/co_4g_infrastructure_concessions_2014.yaml); explicit control axes: none
+- `co_amnesty_ley_35_1982` (policies/co_amnesty_ley_35_1982.yaml); explicit control axes: none
+- `co_apertura_economica_1990_1992` (policies/co_apertura_economica_1990_1992.yaml); explicit control axes: none
+- `co_banrep_autonomy_ley_31_1992` (policies/co_banrep_autonomy_ley_31_1992.yaml); explicit control axes: none
+- `co_barco_gradual_tariff_reduction_1989_1990` (policies/co_barco_gradual_tariff_reduction_1989_1990.yaml); explicit control axes: none
+- `co_bonanza_cafetera_management_1975_1977` (policies/co_bonanza_cafetera_management_1975_1977.yaml); explicit control axes: none
+- `co_cali_cartel_dismantling_1995` (policies/co_cali_cartel_dismantling_1995.yaml); explicit control axes: none
+- `co_cerrejon_ferronickel_1981` (policies/co_cerrejon_ferronickel_1981.yaml); explicit control axes: none
+- `co_constitution_1991` (policies/co_constitution_1991.yaml); explicit control axes: none
+- `co_escobar_endgame_1991_1993` (policies/co_escobar_endgame_1991_1993.yaml); explicit control axes: none
+- `co_estatuto_seguridad_1978` (policies/co_estatuto_seguridad_1978.yaml); explicit control axes: none
+- `co_failed_solidaridad_sostenible_tax_reform_2021` (policies/co_failed_solidaridad_sostenible_tax_reform_2021.yaml); explicit control axes: none
+- `co_farc_peace_final_agreement_2016` (policies/co_farc_peace_final_agreement_2016.yaml); explicit control axes: none
+- `co_farc_peace_talks_launch_2012` (policies/co_farc_peace_talks_launch_2012.yaml); explicit control axes: none
+- `co_financial_law_55_1975` (policies/co_financial_law_55_1975.yaml); explicit control axes: none
+- `co_fiscal_rule_ley_1473_2011` (policies/co_fiscal_rule_ley_1473_2011.yaml); explicit control axes: none
+- `co_food_nutrition_plan_pan_1975` (policies/co_food_nutrition_plan_pan_1975.yaml); explicit control axes: none
+- `co_imf_extended_fund_facility_1999` (policies/co_imf_extended_fund_facility_1999.yaml); explicit control axes: none
+- `co_ingreso_solidario_pandemic_transfer_2020` (policies/co_ingreso_solidario_pandemic_transfer_2020.yaml); explicit control axes: none
+- `co_ley_100_pensions_health_1993` (policies/co_ley_100_pensions_health_1993.yaml); explicit control axes: none
+- `co_ley_2010_2019_ley_crecimiento_economico` (policies/co_ley_2010_2019_ley_crecimiento_economico.yaml); explicit control axes: none
+- `co_ley_2155_2021_inversion_social` (policies/co_ley_2155_2021_inversion_social.yaml); explicit control axes: none
+- `co_ley_50_labour_reform_1990` (policies/co_ley_50_labour_reform_1990.yaml); explicit control axes: none
+- `co_ley_617_territorial_fiscal_discipline_2000` (policies/co_ley_617_territorial_fiscal_discipline_2000.yaml); explicit control axes: none
+- `co_m19_demobilisation_accord_1990` (policies/co_m19_demobilisation_accord_1990.yaml); explicit control axes: none
+- `co_minimum_wage_above_inflation_2014_2018` (policies/co_minimum_wage_above_inflation_2014_2018.yaml); explicit control axes: none
+- `co_narco_war_extraditables_1986_1990` (policies/co_narco_war_extraditables_1986_1990.yaml); explicit control axes: none
+- `co_oecd_accession_2020` (policies/co_oecd_accession_2020.yaml); explicit control axes: none
+- `co_oecd_accession_invitation_2018` (policies/co_oecd_accession_invitation_2018.yaml); explicit control axes: none
+- `co_palace_of_justice_siege_1985` (policies/co_palace_of_justice_siege_1985.yaml); explicit control axes: none
+- `co_plan_colombia_2000` (policies/co_plan_colombia_2000.yaml); explicit control axes: none
+- `co_plan_economia_social_1987` (policies/co_plan_economia_social_1987.yaml); explicit control axes: none
+- `co_plan_integracion_nacional_1979` (policies/co_plan_integracion_nacional_1979.yaml); explicit control axes: none
+- `co_proceso_8000_narco_campaign_financing_1995_1996` (policies/co_proceso_8000_narco_campaign_financing_1995_1996.yaml); explicit control axes: none
+- `co_royalties_reform_2011_2012` (policies/co_royalties_reform_2011_2012.yaml); explicit control axes: none
+- `co_salto_social_plan_1995_1998` (policies/co_salto_social_plan_1995_1998.yaml); explicit control axes: none
+- `co_septima_papeleta_constituent_movement_1990` (policies/co_septima_papeleta_constituent_movement_1990.yaml); explicit control axes: none
+- `co_tax_reform_1974` (policies/co_tax_reform_1974.yaml); explicit control axes: none
+- `co_tax_reform_law_1819_2016` (policies/co_tax_reform_law_1819_2016.yaml); explicit control axes: none
+- `co_tax_reform_ley_1607_2012` (policies/co_tax_reform_ley_1607_2012.yaml); explicit control axes: none
+- `co_tequila_contagion_recession_1996_1998` (policies/co_tequila_contagion_recession_1996_1998.yaml); explicit control axes: none
+- `co_upac_to_uvr_mortgage_reform_1999` (policies/co_upac_to_uvr_mortgage_reform_1999.yaml); explicit control axes: none
+- `co_uribe_accord_farc_1984` (policies/co_uribe_accord_farc_1984.yaml); explicit control axes: none
+- `co_us_decertification_1996_1997` (policies/co_us_decertification_1996_1997.yaml); explicit control axes: none
+- `co_us_extradition_treaty_activation_1984` (policies/co_us_extradition_treaty_activation_1984.yaml); explicit control axes: none
+- `co_venezuelan_migrant_temporary_protection_2021` (policies/co_venezuelan_migrant_temporary_protection_2021.yaml); explicit control axes: none
+- `co_ventanilla_siniestra_cocaine_peso_laundering_1980` (policies/co_ventanilla_siniestra_cocaine_peso_laundering_1980.yaml); explicit control axes: none
+- `co_victims_law_ley_1448_2011` (policies/co_victims_law_ley_1448_2011.yaml); explicit control axes: none
+- `co_voluntary_fiscal_adjustment_colombian_exception_1984_1985` (policies/co_voluntary_fiscal_adjustment_colombian_exception_1984_1985.yaml); explicit control axes: none
+- `co_zona_distension_caguan_1998_2002` (policies/co_zona_distension_caguan_1998_2002.yaml); explicit control axes: none
+- `colombia_capital_markets_holding_financiero_2021` (policies/colombia_capital_markets_holding_financiero_2021.yaml); explicit control axes: none
+- `colombia_covid_ingreso_solidario_2020` (policies/colombia_covid_ingreso_solidario_2020.yaml); explicit control axes: none
+- `colombia_democratic_security_2002` (policies/colombia_democratic_security_2002.yaml); explicit control axes: none
+- `colombia_farc_peace_accord_2016` (policies/colombia_farc_peace_accord_2016.yaml); explicit control axes: none
+- `colombia_free_trade_zones_law_1004_2005` (policies/colombia_free_trade_zones_law_1004_2005.yaml); explicit control axes: none
+- `colombia_health_reform_proposal_2023_2024` (policies/colombia_health_reform_proposal_2023_2024.yaml); explicit control axes: none
+- `colombia_labour_reform_2023_2024` (policies/colombia_labour_reform_2023_2024.yaml); explicit control axes: none
+- `colombia_minimum_wage_increases_2023_2024` (policies/colombia_minimum_wage_increases_2023_2024.yaml); explicit control axes: none
+- `colombia_oecd_accession_2018` (policies/colombia_oecd_accession_2018.yaml); explicit control axes: none
+- `colombia_oil_gas_exploration_moratorium_2022` (policies/colombia_oil_gas_exploration_moratorium_2022.yaml); explicit control axes: none
+- `colombia_pacific_alliance_2012` (policies/colombia_pacific_alliance_2012.yaml); explicit control axes: none
+- `colombia_paz_total_2022` (policies/colombia_paz_total_2022.yaml); explicit control axes: none
+- `colombia_pension_reform_law_797_2003` (policies/colombia_pension_reform_law_797_2003.yaml); explicit control axes: none
+- `colombia_pension_reform_ley_2381_2024` (policies/colombia_pension_reform_ley_2381_2024.yaml); explicit control axes: none
+- `colombia_reforma_tributaria_2022` (policies/colombia_reforma_tributaria_2022.yaml); explicit control axes: none
+- `colombia_tax_reforms_2003_2006` (policies/colombia_tax_reforms_2003_2006.yaml); explicit control axes: none
+- `colombia_tax_reforms_2003_2021` (policies/colombia_tax_reforms_2003_2021.yaml); explicit control axes: none
+- `colombia_us_fta_2006` (policies/colombia_us_fta_2006.yaml); explicit control axes: none
+- `cr_army_abolition_1948` (policies/cr_army_abolition_1948.yaml); explicit control axes: none
+- `cr_bank_nationalisation_1948` (policies/cr_bank_nationalisation_1948.yaml); explicit control axes: none
+- `cr_social_security_expansion_1961_1973` (policies/cr_social_security_expansion_1961_1973.yaml); explicit control axes: none
+- `cs_commercial_code_1991` (policies/cs_commercial_code_1991.yaml); explicit control axes: none
+- `cs_large_privatisation_voucher_1991` (policies/cs_large_privatisation_voucher_1991.yaml); explicit control axes: none
+- `cs_normalisation_purge_1969_1971` (policies/cs_normalisation_purge_1969_1971.yaml); explicit control axes: none
+- `cs_prestavba_programme_1987` (policies/cs_prestavba_programme_1987.yaml); explicit control axes: none
+- `cs_price_liberalisation_1991` (policies/cs_price_liberalisation_1991.yaml); explicit control axes: none
+- `cs_restitution_law_1991` (policies/cs_restitution_law_1991.yaml); explicit control axes: none
+- `cs_small_privatisation_law_1990` (policies/cs_small_privatisation_law_1990.yaml); explicit control axes: none
+- `cs_souhrn_opatreni_1980` (policies/cs_souhrn_opatreni_1980.yaml); explicit control axes: none
+- `cuba_central_planning_juceplan` (policies/cuba_central_planning_juceplan.yaml); explicit control axes: none
+- `cuba_cuentapropismo_1993` (policies/cuba_cuentapropismo_1993.yaml); explicit control axes: none
+- `cuba_dual_currency_1994_2021` (policies/cuba_dual_currency_1994_2021.yaml); explicit control axes: none
+- `cuba_expropriations_1960_1968` (policies/cuba_expropriations_1960_1968.yaml); explicit control axes: none
+- `cuba_libreta_rationing_1962` (policies/cuba_libreta_rationing_1962.yaml); explicit control axes: none
+- `cuba_raul_guidelines_2011` (policies/cuba_raul_guidelines_2011.yaml); explicit control axes: none
+- `cuba_tarea_ordenamiento_2021` (policies/cuba_tarea_ordenamiento_2021.yaml); explicit control axes: none
+- `cy_euro_adoption_2008` (policies/cy_euro_adoption_2008.yaml); explicit control axes: none
+- `cz_antivirus_wage_subsidy_2020` (policies/cz_antivirus_wage_subsidy_2020.yaml); explicit control axes: none
+- `cz_austerity_packages_1997` (policies/cz_austerity_packages_1997.yaml); explicit control axes: none
+- `cz_bank_privatisation_2000_2001` (policies/cz_bank_privatisation_2000_2001.yaml); explicit control axes: none
+- `cz_capi_hnizdo_subsidy_case_2017_2021` (policies/cz_capi_hnizdo_subsidy_case_2017_2021.yaml); explicit control axes: none
+- `cz_child_tax_credit_expansion_2015` (policies/cz_child_tax_credit_expansion_2015.yaml); explicit control axes: none
+- `cz_church_restitution_2012` (policies/cz_church_restitution_2012.yaml); explicit control axes: none
+- `cz_consolidation_rollback_2025` (policies/cz_consolidation_rollback_2025.yaml); explicit control axes: none
+- `cz_corporate_tax_cut_2008_2010` (policies/cz_corporate_tax_cut_2008_2010.yaml); explicit control axes: none
+- `cz_eet_electronic_revenue_2016` (policies/cz_eet_electronic_revenue_2016.yaml); explicit control axes: none
+- `cz_energy_price_cap_2025` (policies/cz_energy_price_cap_2025.yaml); explicit control axes: none
+- `cz_eu_accession_2004` (policies/cz_eu_accession_2004.yaml); explicit control axes: none
+- `cz_flat_tax_15_percent_2008` (policies/cz_flat_tax_15_percent_2008.yaml); explicit control axes: none
+- `cz_gross_apartment_scandal_2005` (policies/cz_gross_apartment_scandal_2005.yaml); explicit control axes: none
+- `cz_investment_incentives_act_1998` (policies/cz_investment_incentives_act_1998.yaml); explicit control axes: none
+- `cz_janota_austerity_package_2009` (policies/cz_janota_austerity_package_2009.yaml); explicit control axes: none
+- `cz_klaus_president_election_2003` (policies/cz_klaus_president_election_2003.yaml); explicit control axes: none
+- `cz_koruna_peg_abandonment_1997` (policies/cz_koruna_peg_abandonment_1997.yaml); explicit control axes: none
+- `cz_lisbon_treaty_ratification_2009` (policies/cz_lisbon_treaty_ratification_2009.yaml); explicit control axes: none
+- `cz_minimum_wage_rises_2014_2017` (policies/cz_minimum_wage_rises_2014_2017.yaml); explicit control axes: none
+- `cz_missile_defence_agreement_2008` (policies/cz_missile_defence_agreement_2008.yaml); explicit control axes: none
+- `cz_nato_accession_1999` (policies/cz_nato_accession_1999.yaml); explicit control axes: none
+- `cz_oecd_accession_1995` (policies/cz_oecd_accession_1995.yaml); explicit control axes: none
+- `cz_opposition_agreement_1998` (policies/cz_opposition_agreement_1998.yaml); explicit control axes: none
+- `cz_pension_age_uncap_2011` (policies/cz_pension_age_uncap_2011.yaml); explicit control axes: none
+- `cz_pension_indexation_restore_2025` (policies/cz_pension_indexation_restore_2025.yaml); explicit control axes: none
+- `cz_pension_valorisation_hikes_2018_2020` (policies/cz_pension_valorisation_hikes_2018_2020.yaml); explicit control axes: none
+- `cz_second_pillar_abolition_2016` (policies/cz_second_pillar_abolition_2016.yaml); explicit control axes: none
+- `cz_second_pillar_pensions_2013` (policies/cz_second_pillar_pensions_2013.yaml); explicit control axes: none
+- `cz_second_reduced_vat_2015` (policies/cz_second_reduced_vat_2015.yaml); explicit control axes: none
+- `cz_second_wave_voucher_privatisation_1994` (policies/cz_second_wave_voucher_privatisation_1994.yaml); explicit control axes: none
+- `cz_spidla_public_finance_reform_2003` (policies/cz_spidla_public_finance_reform_2003.yaml); explicit control axes: none
+- `cz_super_gross_wage_abolition_2021` (policies/cz_super_gross_wage_abolition_2021.yaml); explicit control axes: none
+- `cz_super_gross_wage_reform_2013` (policies/cz_super_gross_wage_reform_2013.yaml); explicit control axes: none
+- `cz_vat_unification_2012_2013` (policies/cz_vat_unification_2012_2013.yaml); explicit control axes: none
+- `de_atomausstieg_2011` (policies/de_atomausstieg_2011.yaml); explicit control axes: none
+- `de_beschaeftigungsfoerderungsgesetz_1985` (policies/de_beschaeftigungsfoerderungsgesetz_1985.yaml); explicit control axes: none
+- `de_betriebsrentengesetz_1974` (policies/de_betriebsrentengesetz_1974.yaml); explicit control axes: none
+- `de_bonn_g7_locomotive_1978` (policies/de_bonn_g7_locomotive_1978.yaml); explicit control axes: none
+- `de_buergergeld_reform_2023` (policies/de_buergergeld_reform_2023.yaml); explicit control axes: none
+- `de_buergergeld_verschaerfung_2025` (policies/de_buergergeld_verschaerfung_2025.yaml); explicit control axes: none
+- `de_bundesumweltministerium_1986` (policies/de_bundesumweltministerium_1986.yaml); explicit control axes: none
+- `de_bundeswehr_sondervermoegen_2022` (policies/de_bundeswehr_sondervermoegen_2022.yaml); explicit control axes: none
+- `de_cannabis_legalisation_2024` (policies/de_cannabis_legalisation_2024.yaml); explicit control axes: none
+- `de_citizenship_reform_staag_2024` (policies/de_citizenship_reform_staag_2024.yaml); explicit control axes: none
+- `de_co2_bepreisung_2021` (policies/de_co2_bepreisung_2021.yaml); explicit control axes: none
+- `de_corona_sondervermoegen_2020` (policies/de_corona_sondervermoegen_2020.yaml); explicit control axes: none
+- `de_ems_founding_1979` (policies/de_ems_founding_1979.yaml); explicit control axes: none
+- `de_esm_treaty_ratification_2012` (policies/de_esm_treaty_ratification_2012.yaml); explicit control axes: none
+- `de_eu_turkey_statement_2016` (policies/de_eu_turkey_statement_2016.yaml); explicit control axes: none
+- `de_eurozone_bailout_posture_2010_2015` (policies/de_eurozone_bailout_posture_2010_2015.yaml); explicit control axes: none
+- `de_first_privatisations_veba_1987` (policies/de_first_privatisations_veba_1987.yaml); explicit control axes: none
+- `de_fiscal_compact_ratification_2012` (policies/de_fiscal_compact_ratification_2012.yaml); explicit control axes: none
+- `de_fluechtlingspolitik_wir_schaffen_das_2015` (policies/de_fluechtlingspolitik_wir_schaffen_das_2015.yaml); explicit control axes: none
+- `de_grenzkontrollen_migrationswende_2025` (policies/de_grenzkontrollen_migrationswende_2025.yaml); explicit control axes: none
+- `de_haushaltsbegleitgesetz_1983` (policies/de_haushaltsbegleitgesetz_1983.yaml); explicit control axes: none
+- `de_heizungsgesetz_geg_2023` (policies/de_heizungsgesetz_geg_2023.yaml); explicit control axes: none
+- `de_koerperschaftsteuer_investitionsbooster_2025` (policies/de_koerperschaftsteuer_investitionsbooster_2025.yaml); explicit control axes: none
+- `de_kohleausstieg_2020` (policies/de_kohleausstieg_2020.yaml); explicit control axes: none
+- `de_konjunkturpakete_i_ii_2008_2009` (policies/de_konjunkturpakete_i_ii_2008_2009.yaml); explicit control axes: none
+- `de_kurzarbeit_gfc_expansion_2008_2009` (policies/de_kurzarbeit_gfc_expansion_2008_2009.yaml); explicit control axes: none
+- `de_lambsdorff_papier_1982` (policies/de_lambsdorff_papier_1982.yaml); explicit control axes: none
+- `de_lng_terminal_acceleration_2022` (policies/de_lng_terminal_acceleration_2022.yaml); explicit control axes: none
+- `de_mindestlohn_2014` (policies/de_mindestlohn_2014.yaml); explicit control axes: none
+- `de_mitbestimmungsgesetz_1976` (policies/de_mitbestimmungsgesetz_1976.yaml); explicit control axes: none
+- `de_ngeu_agreement_2020` (policies/de_ngeu_agreement_2020.yaml); explicit control axes: none
+- `de_nord_stream_2_permitting_2015_2021` (policies/de_nord_stream_2_permitting_2015_2021.yaml); explicit control axes: none
+- `de_paris_agreement_ratification_2016` (policies/de_paris_agreement_ratification_2016.yaml); explicit control axes: none
+- `de_schuldenbremse_2009` (policies/de_schuldenbremse_2009.yaml); explicit control axes: none
+- `de_schuldenbremse_reform_verteidigung_2025` (policies/de_schuldenbremse_reform_verteidigung_2025.yaml); explicit control axes: none
+- `de_soffin_bank_stabilisation_2008` (policies/de_soffin_bank_stabilisation_2008.yaml); explicit control axes: none
+- `de_sondervermoegen_infrastruktur_500bn_2025` (policies/de_sondervermoegen_infrastruktur_500bn_2025.yaml); explicit control axes: none
+- `de_sparpaket_2010` (policies/de_sparpaket_2010.yaml); explicit control axes: none
+- `de_steuerreform_1986_1988` (policies/de_steuerreform_1986_1988.yaml); explicit control axes: none
+- `de_vat_cut_covid_2020` (policies/de_vat_cut_covid_2020.yaml); explicit control axes: none
+- `de_vat_rise_19_2007` (policies/de_vat_rise_19_2007.yaml); explicit control axes: none
+- `de_zukunftsinvestitionsprogramm_1975` (policies/de_zukunftsinvestitionsprogramm_1975.yaml); explicit control axes: none
+- `denmark_flexicurity_1994` (policies/denmark_flexicurity_1994.yaml); explicit control axes: none
+- `dk_2025_plan_structural_balance_2017` (policies/dk_2025_plan_structural_balance_2017.yaml); explicit control axes: none
+- `dk_24_year_rule_2002` (policies/dk_24_year_rule_2002.yaml); explicit control axes: none
+- `dk_august_package_1977` (policies/dk_august_package_1977.yaml); explicit control axes: none
+- `dk_budgetlov_2012` (policies/dk_budgetlov_2012.yaml); explicit control axes: none
+- `dk_dagpenge_duration_cut_2010` (policies/dk_dagpenge_duration_cut_2010.yaml); explicit control axes: none
+- `dk_defence_optout_referendum_2022` (policies/dk_defence_optout_referendum_2022.yaml); explicit control axes: none
+- `dk_efterloen_reform_2011_2012` (policies/dk_efterloen_reform_2011_2012.yaml); explicit control axes: none
+- `dk_efterlon_reform_1998` (policies/dk_efterlon_reform_1998.yaml); explicit control axes: none
+- `dk_eu_fiscal_compact_2012` (policies/dk_eu_fiscal_compact_2012.yaml); explicit control axes: none
+- `dk_euro_referendum_no_2000` (policies/dk_euro_referendum_no_2000.yaml); explicit control axes: none
+- `dk_folkeskolereform_2013` (policies/dk_folkeskolereform_2013.yaml); explicit control axes: none
+- `dk_forarspakke_2_0_2009` (policies/dk_forarspakke_2_0_2009.yaml); explicit control axes: none
+- `dk_genopretningspakken_2010` (policies/dk_genopretningspakken_2010.yaml); explicit control axes: none
+- `dk_ghetto_parallelsamfund_2018_2021` (policies/dk_ghetto_parallelsamfund_2018_2021.yaml); explicit control axes: none
+- `dk_integrationsydelse_contanthjaelpsloft_2015_2016` (policies/dk_integrationsydelse_contanthjaelpsloft_2015_2016.yaml); explicit control axes: none
+- `dk_kartoffelkur_october_1982_package` (policies/dk_kartoffelkur_october_1982_package.yaml); explicit control axes: none
+- `dk_klimalov_2020` (policies/dk_klimalov_2020.yaml); explicit control axes: none
+- `dk_kontanthjaelp_reform_2013` (policies/dk_kontanthjaelp_reform_2013.yaml); explicit control axes: none
+- `dk_krone_devaluations_snake_1976_1979` (policies/dk_krone_devaluations_snake_1976_1979.yaml); explicit control axes: none
+- `dk_labour_market_reform_flexicurity_1994` (policies/dk_labour_market_reform_flexicurity_1994.yaml); explicit control axes: none
+- `dk_maastricht_edinburgh_referendum_1993` (policies/dk_maastricht_edinburgh_referendum_1993.yaml); explicit control axes: none
+- `dk_muhammad_cartoons_crisis_2005_2006` (policies/dk_muhammad_cartoons_crisis_2005_2006.yaml); explicit control axes: none
+- `dk_paaskepakke_1986` (policies/dk_paaskepakke_1986.yaml); explicit control axes: none
+- `dk_paradigmeskift_asylum_2019` (policies/dk_paradigmeskift_asylum_2019.yaml); explicit control axes: none
+- `dk_pension_atp_expansion_1976` (policies/dk_pension_atp_expansion_1976.yaml); explicit control axes: none
+- `dk_pso_afgift_phaseout_2017_2022` (policies/dk_pso_afgift_phaseout_2017_2022.yaml); explicit control axes: none
+- `dk_ret_til_tidlig_pension_arne_2021` (policies/dk_ret_til_tidlig_pension_arne_2021.yaml); explicit control axes: none
+- `dk_skattereform_2012` (policies/dk_skattereform_2012.yaml); explicit control axes: none
+- `dk_skattestop_2002` (policies/dk_skattestop_2002.yaml); explicit control axes: none
+- `dk_smykkeloven_asylum_assets_2016` (policies/dk_smykkeloven_asylum_assets_2016.yaml); explicit control axes: none
+- `dk_store_bededag_afskaffelse_2023` (policies/dk_store_bededag_afskaffelse_2023.yaml); explicit control axes: none
+- `dk_strukturreformen_2007` (policies/dk_strukturreformen_2007.yaml); explicit control axes: none
+- `dk_tax_reform_1987` (policies/dk_tax_reform_1987.yaml); explicit control axes: none
+- `dk_wage_indexation_abolition_1982` (policies/dk_wage_indexation_abolition_1982.yaml); explicit control axes: none
+- `dk_whitsun_tax_reform_1993` (policies/dk_whitsun_tax_reform_1993.yaml); explicit control axes: none
+- `dz_autogestion_socialist_land_reform_1963` (policies/dz_autogestion_socialist_land_reform_1963.yaml); explicit control axes: none
+- `dz_hydrocarbons_nationalisation_1971` (policies/dz_hydrocarbons_nationalisation_1971.yaml); explicit control axes: none
+- `dz_industrialising_industries_strategy_1967` (policies/dz_industrialising_industries_strategy_1967.yaml); explicit control axes: none
+- `ec_bilingual_intercultural_education_1988` (policies/ec_bilingual_intercultural_education_1988.yaml); explicit control axes: none
+- `ec_bono_desarrollo_humano_expansion_2007_2013` (policies/ec_bono_desarrollo_humano_expansion_2007_2013.yaml); explicit control axes: none
+- `ec_borja_gradualist_stabilisation_1988_1992` (policies/ec_borja_gradualist_stabilisation_1988_1992.yaml); explicit control axes: none
+- `ec_brady_plan_ecuador_1995` (policies/ec_brady_plan_ecuador_1995.yaml); explicit control axes: none
+- `ec_bucaram_austerity_package_1996` (policies/ec_bucaram_austerity_package_1996.yaml); explicit control axes: none
+- `ec_bucaram_convertibility_proposal_1996` (policies/ec_bucaram_convertibility_proposal_1996.yaml); explicit control axes: none
+- `ec_bucaram_mental_incapacity_removal_1997` (policies/ec_bucaram_mental_incapacity_removal_1997.yaml); explicit control axes: none
+- `ec_cenepa_war_peru_1995` (policies/ec_cenepa_war_peru_1995.yaml); explicit control axes: none
+- `ec_china_ftfa_2023` (policies/ec_china_ftfa_2023.yaml); explicit control axes: none
+- `ec_chinese_oil_backed_loans_2013_2017` (policies/ec_chinese_oil_backed_loans_2013_2017.yaml); explicit control axes: none
+- `ec_communications_law_loc_2013` (policies/ec_communications_law_loc_2013.yaml); explicit control axes: none
+- `ec_conaie_indigenous_uprising_1990` (policies/ec_conaie_indigenous_uprising_1990.yaml); explicit control axes: none
+- `ec_conflicto_armado_interno_2024` (policies/ec_conflicto_armado_interno_2024.yaml); explicit control axes: none
+- `ec_consulta_popular_feb_2023` (policies/ec_consulta_popular_feb_2023.yaml); explicit control axes: none
+- `ec_consulta_popular_november_1995` (policies/ec_consulta_popular_november_1995.yaml); explicit control axes: none
+- `ec_dahik_scandal_1995` (policies/ec_dahik_scandal_1995.yaml); explicit control axes: none
+- `ec_debt_restructuring_2020` (policies/ec_debt_restructuring_2020.yaml); explicit control axes: none
+- `ec_decreto_883_fuel_subsidy_2019` (policies/ec_decreto_883_fuel_subsidy_2019.yaml); explicit control axes: none
+- `ec_decretos_ley_2023` (policies/ec_decretos_ley_2023.yaml); explicit control axes: none
+- `ec_electricity_rationing_2024` (policies/ec_electricity_rationing_2024.yaml); explicit control axes: none
+- `ec_eu_andean_fta_2016` (policies/ec_eu_andean_fta_2016.yaml); explicit control axes: none
+- `ec_imf_eff_2019` (policies/ec_imf_eff_2019.yaml); explicit control axes: none
+- `ec_imf_eff_2020` (policies/ec_imf_eff_2020.yaml); explicit control axes: none
+- `ec_imf_eff_completion_2022` (policies/ec_imf_eff_completion_2022.yaml); explicit control axes: none
+- `ec_imf_stand_by_1988_1991` (policies/ec_imf_stand_by_1988_1991.yaml); explicit control axes: none
+- `ec_ley_desarrollo_economico_2021` (policies/ec_ley_desarrollo_economico_2021.yaml); explicit control axes: none
+- `ec_ley_economia_criminal_2023` (policies/ec_ley_economia_criminal_2023.yaml); explicit control axes: none
+- `ec_ley_modernizacion_estado_1993` (policies/ec_ley_modernizacion_estado_1993.yaml); explicit control axes: none
+- `ec_manabi_earthquake_response_2016` (policies/ec_manabi_earthquake_response_2016.yaml); explicit control axes: none
+- `ec_mining_code_2009` (policies/ec_mining_code_2009.yaml); explicit control axes: none
+- `ec_monetary_financial_code_2014` (policies/ec_monetary_financial_code_2014.yaml); explicit control axes: none
+- `ec_montecristi_constitution_2008` (policies/ec_montecristi_constitution_2008.yaml); explicit control axes: none
+- `ec_muerte_cruzada_may_2023` (policies/ec_muerte_cruzada_may_2023.yaml); explicit control axes: none
+- `ec_oil_service_contract_model_reform_2010` (policies/ec_oil_service_contract_model_reform_2010.yaml); explicit control axes: none
+- `ec_paro_civico_nacional_1997` (policies/ec_paro_civico_nacional_1997.yaml); explicit control axes: none
+- `ec_referendum_abr_2024` (policies/ec_referendum_abr_2024.yaml); explicit control axes: none
+- `ec_referendum_feb_2018` (policies/ec_referendum_feb_2018.yaml); explicit control axes: none
+- `ec_selective_default_global_bonds_2008` (policies/ec_selective_default_global_bonds_2008.yaml); explicit control axes: none
+- `ec_vat_hike_12_to_15_2024` (policies/ec_vat_hike_12_to_15_2024.yaml); explicit control axes: none
+- `ecb_statute_1998` (policies/ecb_statute_1998.yaml); explicit control axes: none
+- `ecuador_banking_resolution_1999_2000` (policies/ecuador_banking_resolution_1999_2000.yaml); explicit control axes: none
+- `ecuador_china_financing_2009_2017` (policies/ecuador_china_financing_2009_2017.yaml); explicit control axes: none
+- `ecuador_debt_audit_default_2008` (policies/ecuador_debt_audit_default_2008.yaml); explicit control axes: none
+- `ecuador_dollarisation_law_2000` (policies/ecuador_dollarisation_law_2000.yaml); explicit control axes: none
+- `ecuador_new_constitution_2008` (policies/ecuador_new_constitution_2008.yaml); explicit control axes: none
+- `ecuador_oil_contract_renegotiation_2010` (policies/ecuador_oil_contract_renegotiation_2010.yaml); explicit control axes: none
+- `ecuador_public_investment_push_2008_2016` (policies/ecuador_public_investment_push_2008_2016.yaml); explicit control axes: none
+- `ecuador_tax_reforms_2007_2014` (policies/ecuador_tax_reforms_2007_2014.yaml); explicit control axes: none
+- `ee_euro_adoption_2011` (policies/ee_euro_adoption_2011.yaml); explicit control axes: none
+- `ee_laar_flat_tax_currency_board_reform_1994` (policies/ee_laar_flat_tax_currency_board_reform_1994.yaml); explicit control axes: none
+- `eg_1977_bread_riots_subsidy_retention` (policies/eg_1977_bread_riots_subsidy_retention.yaml); explicit control axes: none
+- `eg_1987_imf_stand_by_agreement` (policies/eg_1987_imf_stand_by_agreement.yaml); explicit control axes: none
+- `eg_1990_1991_paris_club_debt_relief` (policies/eg_1990_1991_paris_club_debt_relief.yaml); explicit control axes: none
+- `eg_camp_david_treaty_economic_effects_1979` (policies/eg_camp_david_treaty_economic_effects_1979.yaml); explicit control axes: none
+- `eg_constitutional_amendment_2019` (policies/eg_constitutional_amendment_2019.yaml); explicit control axes: none
+- `eg_egp_second_float_2024` (policies/eg_egp_second_float_2024.yaml); explicit control axes: none
+- `eg_emergency_law_continuity_1981` (policies/eg_emergency_law_continuity_1981.yaml); explicit control axes: none
+- `eg_exchange_rate_multiple_tier_reform_1987` (policies/eg_exchange_rate_multiple_tier_reform_1987.yaml); explicit control axes: none
+- `eg_fuel_subsidy_phase_out_path_2024` (policies/eg_fuel_subsidy_phase_out_path_2024.yaml); explicit control axes: none
+- `eg_hayah_karima_2019` (policies/eg_hayah_karima_2019.yaml); explicit control axes: none
+- `eg_imf_eff_3bn_2022` (policies/eg_imf_eff_3bn_2022.yaml); explicit control axes: none
+- `eg_imf_eff_expansion_2024` (policies/eg_imf_eff_expansion_2024.yaml); explicit control axes: none
+- `eg_imf_rfi_stand_by_2020` (policies/eg_imf_rfi_stand_by_2020.yaml); explicit control axes: none
+- `eg_infitah_deepening_1976_1981` (policies/eg_infitah_deepening_1976_1981.yaml); explicit control axes: none
+- `eg_military_owned_enterprise_ipo_plan_2022` (policies/eg_military_owned_enterprise_ipo_plan_2022.yaml); explicit control axes: none
+- `eg_morsi_2012_constitution_referendum` (policies/eg_morsi_2012_constitution_referendum.yaml); explicit control axes: none
+- `eg_morsi_constitutional_declaration_2012` (policies/eg_morsi_constitutional_declaration_2012.yaml); explicit control axes: none
+- `eg_morsi_imf_sba_negotiation_2012_2013` (policies/eg_morsi_imf_sba_negotiation_2012_2013.yaml); explicit control axes: none
+- `eg_morsi_sukuk_law_2013` (policies/eg_morsi_sukuk_law_2013.yaml); explicit control axes: none
+- `eg_new_administrative_capital_2015_ongoing` (policies/eg_new_administrative_capital_2015_ongoing.yaml); explicit control axes: none
+- `eg_ras_el_hekma_uae_deal_2024` (policies/eg_ras_el_hekma_uae_deal_2024.yaml); explicit control axes: none
+- `eg_scaf_imf_standby_decline_2011` (policies/eg_scaf_imf_standby_decline_2011.yaml); explicit control axes: none
+- `eg_scaf_reserve_drawdown_2011_2012` (policies/eg_scaf_reserve_drawdown_2011_2012.yaml); explicit control axes: none
+- `eg_scaf_wheat_subsidy_continuation_2011` (policies/eg_scaf_wheat_subsidy_continuation_2011.yaml); explicit control axes: none
+- `eg_state_ownership_policy_2022` (policies/eg_state_ownership_policy_2022.yaml); explicit control axes: none
+- `eg_state_ownership_policy_divestments_2024` (policies/eg_state_ownership_policy_divestments_2024.yaml); explicit control axes: none
+- `eg_us_aid_package_institutionalisation_1979` (policies/eg_us_aid_package_institutionalisation_1979.yaml); explicit control axes: none
+- `egypt_banking_privatisation_2004_2008` (policies/egypt_banking_privatisation_2004_2008.yaml); explicit control axes: none
+- `egypt_egp_float_2016` (policies/egypt_egp_float_2016.yaml); explicit control axes: none
+- `egypt_egp_second_float_2024` (policies/egypt_egp_second_float_2024.yaml); explicit control axes: none
+- `egypt_energy_subsidy_reform_2014_2019` (policies/egypt_energy_subsidy_reform_2014_2019.yaml); explicit control axes: none
+- `egypt_ersap_1991` (policies/egypt_ersap_1991.yaml); explicit control axes: none
+- `egypt_imf_eff_2016` (policies/egypt_imf_eff_2016.yaml); explicit control axes: none
+- `egypt_military_economy_expansion_2013_present` (policies/egypt_military_economy_expansion_2013_present.yaml); explicit control axes: none
+- `egypt_partial_soe_privatisation_1991_2008` (policies/egypt_partial_soe_privatisation_1991_2008.yaml); explicit control axes: none
+- `egypt_tax_reform_2005` (policies/egypt_tax_reform_2005.yaml); explicit control axes: none
+- `egypt_trade_tariff_reform_2004` (policies/egypt_trade_tariff_reform_2004.yaml); explicit control axes: none
+- `egypt_vat_introduction_2016` (policies/egypt_vat_introduction_2016.yaml); explicit control axes: none
+- `es_article_155_catalonia_2017` (policies/es_article_155_catalonia_2017.yaml); explicit control axes: none
+- `es_bankia_nationalisation_2012` (policies/es_bankia_nationalisation_2012.yaml); explicit control axes: none
+- `es_constitutional_amendment_art_135_2011` (policies/es_constitutional_amendment_art_135_2011.yaml); explicit control axes: none
+- `es_eu_banking_mou_bailout_2012` (policies/es_eu_banking_mou_bailout_2012.yaml); explicit control axes: none
+- `es_frob_cajas_consolidation_2009` (policies/es_frob_cajas_consolidation_2009.yaml); explicit control axes: none
+- `es_labour_reform_2012` (policies/es_labour_reform_2012.yaml); explicit control axes: none
+- `es_labour_reform_rdl_10_2010` (policies/es_labour_reform_rdl_10_2010.yaml); explicit control axes: none
+- `es_no_confidence_motion_sanchez_2018` (policies/es_no_confidence_motion_sanchez_2018.yaml); explicit control axes: none
+- `es_pension_reform_2011` (policies/es_pension_reform_2011.yaml); explicit control axes: none
+- `es_plan_e_2008_2009` (policies/es_plan_e_2008_2009.yaml); explicit control axes: none
+- `es_presupuestos_2018_expansionary` (policies/es_presupuestos_2018_expansionary.yaml); explicit control axes: none
+- `es_rdl_20_2012_austerity` (policies/es_rdl_20_2012_austerity.yaml); explicit control axes: none
+- `es_sareb_bad_bank_2012` (policies/es_sareb_bad_bank_2012.yaml); explicit control axes: none
+- `es_smi_minimum_wage_rises_2017_2018` (policies/es_smi_minimum_wage_rises_2017_2018.yaml); explicit control axes: none
+- `estonia_flat_tax_1994` (policies/estonia_flat_tax_1994.yaml); explicit control axes: none
+- `et_addis_master_plan_oromo_protests_2015` (policies/et_addis_master_plan_oromo_protests_2015.yaml); explicit control axes: none
+- `et_adli_doctrine_consolidation_2005` (policies/et_adli_doctrine_consolidation_2005.yaml); explicit control axes: none
+- `et_anti_terrorism_proclamation_2009` (policies/et_anti_terrorism_proclamation_2009.yaml); explicit control axes: none
+- `et_banking_sector_opening_2024` (policies/et_banking_sector_opening_2024.yaml); explicit control axes: none
+- `et_birr_float_2024` (policies/et_birr_float_2024.yaml); explicit control axes: none
+- `et_charities_societies_proclamation_2009` (policies/et_charities_societies_proclamation_2009.yaml); explicit control axes: none
+- `et_eprdf_to_prosperity_2019` (policies/et_eprdf_to_prosperity_2019.yaml); explicit control axes: none
+- `et_eritrea_peace_2018` (policies/et_eritrea_peace_2018.yaml); explicit control axes: none
+- `et_gerd_launch_2011` (policies/et_gerd_launch_2011.yaml); explicit control axes: none
+- `et_gtp_i_2010` (policies/et_gtp_i_2010.yaml); explicit control axes: none
+- `et_gtp_ii_2015` (policies/et_gtp_ii_2015.yaml); explicit control axes: none
+- `et_hawassa_industrial_park_2016` (policies/et_hawassa_industrial_park_2016.yaml); explicit control axes: none
+- `et_homegrown_economic_reform_2019` (policies/et_homegrown_economic_reform_2019.yaml); explicit control axes: none
+- `et_imf_eff_2024` (policies/et_imf_eff_2024.yaml); explicit control axes: none
+- `et_state_of_emergency_2016` (policies/et_state_of_emergency_2016.yaml); explicit control axes: none
+- `et_telecoms_liberalisation_2021` (policies/et_telecoms_liberalisation_2021.yaml); explicit control axes: none
+- `et_tigray_war_2020` (policies/et_tigray_war_2020.yaml); explicit control axes: none
+- `ethiopia_amc_grain_procurement_1976` (policies/ethiopia_amc_grain_procurement_1976.yaml); explicit control axes: none
+- `ethiopia_bank_industry_nationalisation_1975` (policies/ethiopia_bank_industry_nationalisation_1975.yaml); explicit control axes: none
+- `ethiopia_gerd_project_2011` (policies/ethiopia_gerd_project_2011.yaml); explicit control axes: none
+- `ethiopia_gtp_plan_2010` (policies/ethiopia_gtp_plan_2010.yaml); explicit control axes: none
+- `ethiopia_industrial_parks_2014` (policies/ethiopia_industrial_parks_2014.yaml); explicit control axes: none
+- `ethiopia_land_use_rights_regime_1995` (policies/ethiopia_land_use_rights_regime_1995.yaml); explicit control axes: none
+- `ethiopia_rural_land_nationalisation_1975` (policies/ethiopia_rural_land_nationalisation_1975.yaml); explicit control axes: none
+- `ethiopia_state_owned_banking_regime` (policies/ethiopia_state_owned_banking_regime.yaml); explicit control axes: none
+- `ethiopia_villagisation_programme_1985` (policies/ethiopia_villagisation_programme_1985.yaml); explicit control axes: none
+- `eu_ai_act_2024` (policies/eu_ai_act_2024.yaml); explicit control axes: none
+- `eu_ai_act_2024_policy` (policies/eu_ai_act_2024_policy.yaml); explicit control axes: none
+- `eu_ai_liability_directive_proposal_2022` (policies/eu_ai_liability_directive_proposal_2022.yaml); explicit control axes: none
+- `eu_ai_office_establishment_2024` (policies/eu_ai_office_establishment_2024.yaml); explicit control axes: none
+- `eu_banking_passport_1989` (policies/eu_banking_passport_1989.yaml); explicit control axes: none
+- `eu_cbam_2023` (policies/eu_cbam_2023.yaml); explicit control axes: none
+- `eu_chemicals_strategy_for_sustainability_2020` (policies/eu_chemicals_strategy_for_sustainability_2020.yaml); explicit control axes: none
+- `eu_climate_neutrality_law_2021` (policies/eu_climate_neutrality_law_2021.yaml); explicit control axes: none
+- `eu_clp_regulation_2008` (policies/eu_clp_regulation_2008.yaml); explicit control axes: none
+- `eu_csddd_2024` (policies/eu_csddd_2024.yaml); explicit control axes: none
+- `eu_csrd_2023` (policies/eu_csrd_2023.yaml); explicit control axes: none
+- `eu_data_act_2023` (policies/eu_data_act_2023.yaml); explicit control axes: none
+- `eu_data_governance_act_2022` (policies/eu_data_governance_act_2022.yaml); explicit control axes: none
+- `eu_dma_2022` (policies/eu_dma_2022.yaml); explicit control axes: none
+- `eu_dma_dsa_2022` (policies/eu_dma_dsa_2022.yaml); explicit control axes: none
+- `eu_dsa_2022` (policies/eu_dsa_2022.yaml); explicit control axes: none
+- `eu_electricity_market_design_reform_2024` (policies/eu_electricity_market_design_reform_2024.yaml); explicit control axes: none
+- `eu_eprivacy_directive_2002_amended` (policies/eu_eprivacy_directive_2002_amended.yaml); explicit control axes: none
+- `eu_ets_phase4_2021` (policies/eu_ets_phase4_2021.yaml); explicit control axes: none
+- `eu_gdpr_2018` (policies/eu_gdpr_2018.yaml); explicit control axes: none
+- `eu_net_zero_industry_act_2024` (policies/eu_net_zero_industry_act_2024.yaml); explicit control axes: none
+- `eu_omnibus_simplification_2025` (policies/eu_omnibus_simplification_2025.yaml); explicit control axes: none
+- `eu_p2b_regulation_2019` (policies/eu_p2b_regulation_2019.yaml); explicit control axes: none
+- `eu_pfas_restriction_proposal_2023` (policies/eu_pfas_restriction_proposal_2023.yaml); explicit control axes: none
+- `eu_platform_work_directive_2024` (policies/eu_platform_work_directive_2024.yaml); explicit control axes: none
+- `eu_reach_regulation_2007` (policies/eu_reach_regulation_2007.yaml); explicit control axes: none
+- `eu_red_iii_2023` (policies/eu_red_iii_2023.yaml); explicit control axes: none
+- `eu_services_directive_2006` (policies/eu_services_directive_2006.yaml); explicit control axes: none
+- `eu_sfdr_2019` (policies/eu_sfdr_2019.yaml); explicit control axes: none
+- `eu_single_european_act_1986` (policies/eu_single_european_act_1986.yaml); explicit control axes: none
+- `eu_taxonomy_regulation_2020` (policies/eu_taxonomy_regulation_2020.yaml); explicit control axes: none
+- `eu_vat_harmonisation_1993` (policies/eu_vat_harmonisation_1993.yaml); explicit control axes: none
+- `fi_aktiivimalli_unemployment_2018` (policies/fi_aktiivimalli_unemployment_2018.yaml); explicit control axes: none
+- `fi_banking_crisis_resolution_1991_1993` (policies/fi_banking_crisis_resolution_1991_1993.yaml); explicit control axes: none
+- `fi_basic_income_pilot_2017` (policies/fi_basic_income_pilot_2017.yaml); explicit control axes: none
+- `fi_cit_20_percent_2014` (policies/fi_cit_20_percent_2014.yaml); explicit control axes: none
+- `fi_climate_act_2022` (policies/fi_climate_act_2022.yaml); explicit control axes: none
+- `fi_competitiveness_pact_2016` (policies/fi_competitiveness_pact_2016.yaml); explicit control axes: none
+- `fi_compulsory_education_extension_2021` (policies/fi_compulsory_education_extension_2021.yaml); explicit control axes: none
+- `fi_dual_income_tax_reform_1993` (policies/fi_dual_income_tax_reform_1993.yaml); explicit control axes: none
+- `fi_efsf_finnish_guarantees_2010` (policies/fi_efsf_finnish_guarantees_2010.yaml); explicit control axes: none
+- `fi_emu_membership_1999` (policies/fi_emu_membership_1999.yaml); explicit control axes: none
+- `fi_eu_membership_accession_1995` (policies/fi_eu_membership_accession_1995.yaml); explicit control axes: none
+- `fi_family_leave_reform_2022` (policies/fi_family_leave_reform_2022.yaml); explicit control axes: none
+- `fi_fennovoima_nuclear_vote_2014` (policies/fi_fennovoima_nuclear_vote_2014.yaml); explicit control axes: none
+- `fi_financial_liberalisation_1986` (policies/fi_financial_liberalisation_1986.yaml); explicit control axes: none
+- `fi_fiscal_consolidation_1992_1994` (policies/fi_fiscal_consolidation_1992_1994.yaml); explicit control axes: none
+- `fi_fiscal_surplus_framework_1998` (policies/fi_fiscal_surplus_framework_1998.yaml); explicit control axes: none
+- `fi_greek_collateral_agreement_2011` (policies/fi_greek_collateral_agreement_2011.yaml); explicit control axes: none
+- `fi_immigration_tightening_2024` (policies/fi_immigration_tightening_2024.yaml); explicit control axes: none
+- `fi_innovation_policy_tekes_expansion_1995_2003` (policies/fi_innovation_policy_tekes_expansion_1995_2003.yaml); explicit control axes: none
+- `fi_labour_market_reform_2024` (policies/fi_labour_market_reform_2024.yaml); explicit control axes: none
+- `fi_markka_devaluation_1984` (policies/fi_markka_devaluation_1984.yaml); explicit control axes: none
+- `fi_markka_devaluation_free_float_1991_1992` (policies/fi_markka_devaluation_free_float_1991_1992.yaml); explicit control axes: none
+- `fi_municipal_merger_reform_2012` (policies/fi_municipal_merger_reform_2012.yaml); explicit control axes: none
+- `fi_nato_accession_2023` (policies/fi_nato_accession_2023.yaml); explicit control axes: none
+- `fi_nato_application_2022` (policies/fi_nato_application_2022.yaml); explicit control axes: none
+- `fi_nokia_export_peak_era_2003_2007` (policies/fi_nokia_export_peak_era_2003_2007.yaml); explicit control axes: none
+- `fi_orpo_fiscal_consolidation_2023` (policies/fi_orpo_fiscal_consolidation_2023.yaml); explicit control axes: none
+- `fi_paras_municipal_reform_2007` (policies/fi_paras_municipal_reform_2007.yaml); explicit control axes: none
+- `fi_pension_reform_2005` (policies/fi_pension_reform_2005.yaml); explicit control axes: none
+- `fi_sipila_spending_cuts_2015_2019` (policies/fi_sipila_spending_cuts_2015_2019.yaml); explicit control axes: none
+- `fi_sote_wellbeing_services_2023` (policies/fi_sote_wellbeing_services_2023.yaml); explicit control axes: none
+- `fi_state_enterprise_privatisation_1996_2000` (policies/fi_state_enterprise_privatisation_1996_2000.yaml); explicit control axes: none
+- `fi_stimulus_package_2009` (policies/fi_stimulus_package_2009.yaml); explicit control axes: none
+- `fi_tupo_income_policy_2004` (policies/fi_tupo_income_policy_2004.yaml); explicit control axes: none
+- `fi_tupo_incomes_policy_1977_onwards` (policies/fi_tupo_incomes_policy_1977_onwards.yaml); explicit control axes: none
+- `fi_universities_reform_2009` (policies/fi_universities_reform_2009.yaml); explicit control axes: none
+- `fi_vat_rise_2010` (policies/fi_vat_rise_2010.yaml); explicit control axes: none
+- `fr_35h_rollback_fillon_law_2003` (policies/fr_35h_rollback_fillon_law_2003.yaml); explicit control axes: none
+- `fr_75pc_top_bracket_2013` (policies/fr_75pc_top_bracket_2013.yaml); explicit control axes: none
+- `fr_aubry_35h_week_1998_2000` (policies/fr_aubry_35h_week_1998_2000.yaml); explicit control axes: none
+- `fr_auto_entrepreneur_2009` (policies/fr_auto_entrepreneur_2009.yaml); explicit control axes: none
+- `fr_cice_tax_credit_2013` (policies/fr_cice_tax_credit_2013.yaml); explicit control axes: none
+- `fr_cmu_universal_health_coverage_1999` (policies/fr_cmu_universal_health_coverage_1999.yaml); explicit control axes: none
+- `fr_cne_small_firm_contract_2005` (policies/fr_cne_small_firm_contract_2005.yaml); explicit control axes: none
+- `fr_corporate_tax_cut_2018_2022` (policies/fr_corporate_tax_cut_2018_2022.yaml); explicit control axes: none
+- `fr_cpe_withdrawn_2006` (policies/fr_cpe_withdrawn_2006.yaml); explicit control axes: none
+- `fr_eu_constitution_referendum_2005` (policies/fr_eu_constitution_referendum_2005.yaml); explicit control axes: none
+- `fr_fillon_pension_reform_2003` (policies/fr_fillon_pension_reform_2003.yaml); explicit control axes: none
+- `fr_france_2030_plan_2021` (policies/fr_france_2030_plan_2021.yaml); explicit control axes: none
+- `fr_france_euro_entry_1999_2002` (policies/fr_france_euro_entry_1999_2002.yaml); explicit control axes: none
+- `fr_isf_ifi_2018` (policies/fr_isf_ifi_2018.yaml); explicit control axes: none
+- `fr_jospin_privatisations_1997_2002` (policies/fr_jospin_privatisations_1997_2002.yaml); explicit control axes: none
+- `fr_lme_2008` (policies/fr_lme_2008.yaml); explicit control axes: none
+- `fr_loi_macron_2015` (policies/fr_loi_macron_2015.yaml); explicit control axes: none
+- `fr_loi_travail_el_khomri_2016` (policies/fr_loi_travail_el_khomri_2016.yaml); explicit control axes: none
+- `fr_lru_university_autonomy_2007` (policies/fr_lru_university_autonomy_2007.yaml); explicit control axes: none
+- `fr_macron_labour_tax_reforms_2017_2019` (policies/fr_macron_labour_tax_reforms_2017_2019.yaml); explicit control axes: none
+- `fr_mariage_pour_tous_2013` (policies/fr_mariage_pour_tous_2013.yaml); explicit control axes: none
+- `fr_ordonnances_travail_2017` (policies/fr_ordonnances_travail_2017.yaml); explicit control axes: none
+- `fr_pacs_civil_union_1999` (policies/fr_pacs_civil_union_1999.yaml); explicit control axes: none
+- `fr_pacte_law_2019` (policies/fr_pacte_law_2019.yaml); explicit control axes: none
+- `fr_pacte_responsabilite_2014` (policies/fr_pacte_responsabilite_2014.yaml); explicit control axes: none
+- `fr_pension_reform_2010` (policies/fr_pension_reform_2010.yaml); explicit control axes: none
+- `fr_pension_reform_2023` (policies/fr_pension_reform_2023.yaml); explicit control axes: none
+- `fr_pfu_flat_tax_2018` (policies/fr_pfu_flat_tax_2018.yaml); explicit control axes: none
+- `fr_plan_relance_2008` (policies/fr_plan_relance_2008.yaml); explicit control axes: none
+- `fr_retraites_2014` (policies/fr_retraites_2014.yaml); explicit control axes: none
+- `fr_rgpp_2007` (policies/fr_rgpp_2007.yaml); explicit control axes: none
+- `fr_tepa_2007` (policies/fr_tepa_2007.yaml); explicit control axes: none
+- `france_35_hour_week_2000` (policies/france_35_hour_week_2000.yaml); explicit control axes: none
+- `france_39_hour_week_1982` (policies/france_39_hour_week_1982.yaml); explicit control axes: none
+- `france_40_hour_week_1936` (policies/france_40_hour_week_1936.yaml); explicit control axes: none
+- `france_age_of_majority_1974` (policies/france_age_of_majority_1974.yaml); explicit control axes: none
+- `france_associations_law_1901` (policies/france_associations_law_1901.yaml); explicit control axes: none
+- `france_aubry_35_hour_laws_1998_2000` (policies/france_aubry_35_hour_laws_1998_2000.yaml); explicit control axes: none
+- `france_balladur_privatisations_1993_1995` (policies/france_balladur_privatisations_1993_1995.yaml); explicit control axes: none
+- `france_bdf_independence_law_1993` (policies/france_bdf_independence_law_1993.yaml); explicit control axes: none
+- `france_church_state_separation_1905` (policies/france_church_state_separation_1905.yaml); explicit control axes: none
+- `france_cmu_universal_healthcare_1999` (policies/france_cmu_universal_healthcare_1999.yaml); explicit control axes: none
+- `france_corporate_tax_reduction_2018_2022` (policies/france_corporate_tax_reduction_2018_2022.yaml); explicit control axes: none
+- `france_crds_cades_1996` (policies/france_crds_cades_1996.yaml); explicit control axes: none
+- `france_csg_creation_1991` (policies/france_csg_creation_1991.yaml); explicit control axes: none
+- `france_eec_accession_rome_treaty_1957` (policies/france_eec_accession_rome_treaty_1957.yaml); explicit control axes: none
+- `france_ems_joining_1979` (policies/france_ems_joining_1979.yaml); explicit control axes: none
+- `france_exchange_control_abolition_1987_1990` (policies/france_exchange_control_abolition_1987_1990.yaml); explicit control axes: none
+- `france_indicative_planning_cgp` (policies/france_indicative_planning_cgp.yaml); explicit control axes: none
+- `france_isf_creation_1988` (policies/france_isf_creation_1988.yaml); explicit control axes: none
+- `france_isf_ifi_swap_2017` (policies/france_isf_ifi_swap_2017.yaml); explicit control axes: none
+- `france_jospin_privatisations_1997_2002` (policies/france_jospin_privatisations_1997_2002.yaml); explicit control axes: none
+- `france_juppe_plan_1995` (policies/france_juppe_plan_1995.yaml); explicit control axes: none
+- `france_loi_veil_1975` (policies/france_loi_veil_1975.yaml); explicit control axes: none
+- `france_maastricht_ratification_referendum_1992` (policies/france_maastricht_ratification_referendum_1992.yaml); explicit control axes: none
+- `france_matif_creation_1986` (policies/france_matif_creation_1986.yaml); explicit control axes: none
+- `france_matignon_agreements_1936` (policies/france_matignon_agreements_1936.yaml); explicit control axes: none
+- `france_messmer_nuclear_plan_1974` (policies/france_messmer_nuclear_plan_1974.yaml); explicit control axes: none
+- `france_minimum_wage_rise_1981` (policies/france_minimum_wage_rise_1981.yaml); explicit control axes: none
+- `france_monnet_plan_1947` (policies/france_monnet_plan_1947.yaml); explicit control axes: none
+- `france_nationalisations_1945_1946` (policies/france_nationalisations_1945_1946.yaml); explicit control axes: none
+- `france_nationalisations_1982` (policies/france_nationalisations_1982.yaml); explicit control axes: none
+- `france_ordonnances_travail_2017` (policies/france_ordonnances_travail_2017.yaml); explicit control axes: none
+- `france_paid_vacations_law_1936` (policies/france_paid_vacations_law_1936.yaml); explicit control axes: none
+- `france_pfu_2018` (policies/france_pfu_2018.yaml); explicit control axes: none
+- `france_pinay_rueff_stabilisation_1958` (policies/france_pinay_rueff_stabilisation_1958.yaml); explicit control axes: none
+- `france_plan_barre_1976` (policies/france_plan_barre_1976.yaml); explicit control axes: none
+- `france_price_control_liberalisation_1978_1980` (policies/france_price_control_liberalisation_1978_1980.yaml); explicit control axes: none
+- `france_privatisations_chirac_1986_1988` (policies/france_privatisations_chirac_1986_1988.yaml); explicit control axes: none
+- `france_progressive_income_tax_1914` (policies/france_progressive_income_tax_1914.yaml); explicit control axes: none
+- `france_retirement_60_1981` (policies/france_retirement_60_1981.yaml); explicit control axes: none
+- `france_rmi_creation_1988` (policies/france_rmi_creation_1988.yaml); explicit control axes: none
+- `france_smic_1970` (policies/france_smic_1970.yaml); explicit control axes: none
+- `france_sncf_nationalisation_1937` (policies/france_sncf_nationalisation_1937.yaml); explicit control axes: none
+- `france_tournant_de_la_rigueur_1983` (policies/france_tournant_de_la_rigueur_1983.yaml); explicit control axes: none
+- `france_weekly_rest_law_1906` (policies/france_weekly_rest_law_1906.yaml); explicit control axes: none
+- `france_workers_peasants_pensions_1910` (policies/france_workers_peasants_pensions_1910.yaml); explicit control axes: none
+- `germany_atomgesetz_13th_amendment_2011` (policies/germany_atomgesetz_13th_amendment_2011.yaml); explicit control axes: none
+- `germany_bundesbank_law_1957` (policies/germany_bundesbank_law_1957.yaml); explicit control axes: none
+- `germany_codetermination_montan_1951` (policies/germany_codetermination_montan_1951.yaml); explicit control axes: none
+- `germany_currency_reform_1948` (policies/germany_currency_reform_1948.yaml); explicit control axes: none
+- `germany_eec_accession_1957` (policies/germany_eec_accession_1957.yaml); explicit control axes: none
+- `germany_eeg_renewable_feed_in_2000` (policies/germany_eeg_renewable_feed_in_2000.yaml); explicit control axes: none
+- `germany_employee_insurance_act_1911` (policies/germany_employee_insurance_act_1911.yaml); explicit control axes: none
+- `germany_energiewende_2011` (policies/germany_energiewende_2011.yaml); explicit control axes: none
+- `germany_ethik_kommission_sichere_energieversorgung_2011` (policies/germany_ethik_kommission_sichere_energieversorgung_2011.yaml); explicit control axes: none
+- `germany_gemu_monetary_union_1990` (policies/germany_gemu_monetary_union_1990.yaml); explicit control axes: none
+- `germany_gwb_competition_law_1957` (policies/germany_gwb_competition_law_1957.yaml); explicit control axes: none
+- `germany_hartz_reforms_2003_2005` (policies/germany_hartz_reforms_2003_2005.yaml); explicit control axes: none
+- `germany_iraq_refusal_2002_2003` (policies/germany_iraq_refusal_2002_2003.yaml); explicit control axes: none
+- `germany_nuclear_phaseout_atomkonsens_2000` (policies/germany_nuclear_phaseout_atomkonsens_2000.yaml); explicit control axes: none
+- `germany_pension_reform_riester_2001` (policies/germany_pension_reform_riester_2001.yaml); explicit control axes: none
+- `germany_pflegeversicherung_1994_1995` (policies/germany_pflegeversicherung_1994_1995.yaml); explicit control axes: none
+- `germany_price_liberalisation_1948` (policies/germany_price_liberalisation_1948.yaml); explicit control axes: none
+- `germany_reich_insurance_code_1911` (policies/germany_reich_insurance_code_1911.yaml); explicit control axes: none
+- `germany_renten_riester_pension_2001` (policies/germany_renten_riester_pension_2001.yaml); explicit control axes: none
+- `germany_schroder_tax_reform_2000_2005` (policies/germany_schroder_tax_reform_2000_2005.yaml); explicit control axes: none
+- `germany_solidaritaetszuschlag_1991` (policies/germany_solidaritaetszuschlag_1991.yaml); explicit control axes: none
+- `germany_stabilitaetspakt_amsterdam_1997` (policies/germany_stabilitaetspakt_amsterdam_1997.yaml); explicit control axes: none
+- `germany_tariff_act_1902` (policies/germany_tariff_act_1902.yaml); explicit control axes: none
+- `germany_treuhandanstalt_privatisation_1990_1994` (policies/germany_treuhandanstalt_privatisation_1990_1994.yaml); explicit control axes: none
+- `germany_wehrbeitrag_army_bill_1913` (policies/germany_wehrbeitrag_army_bill_1913.yaml); explicit control axes: none
+- `germany_zuwanderungsgesetz_2004` (policies/germany_zuwanderungsgesetz_2004.yaml); explicit control axes: none
+- `gh_24_hour_economy_2025` (policies/gh_24_hour_economy_2025.yaml); explicit control axes: none
+- `gh_cocoa_sector_reform_2025` (policies/gh_cocoa_sector_reform_2025.yaml); explicit control axes: none
+- `gh_e_levy_repeal_2025` (policies/gh_e_levy_repeal_2025.yaml); explicit control axes: none
+- `gh_imf_ecf_continuation_2025` (policies/gh_imf_ecf_continuation_2025.yaml); explicit control axes: none
+- `ghana_cedi_devaluation_1983` (policies/ghana_cedi_devaluation_1983.yaml); explicit control axes: none
+- `ghana_civil_service_rationalisation_1987` (policies/ghana_civil_service_rationalisation_1987.yaml); explicit control axes: none
+- `ghana_cocobod_reform_1984` (policies/ghana_cocobod_reform_1984.yaml); explicit control axes: none
+- `ghana_soe_divestiture_1987` (policies/ghana_soe_divestiture_1987.yaml); explicit control axes: none
+- `ghana_trade_liberalisation_1986_1991` (policies/ghana_trade_liberalisation_1986_1991.yaml); explicit control axes: none
+- `gr_athens_olympics_2004` (policies/gr_athens_olympics_2004.yaml); explicit control axes: none
+- `gr_bank_recapitalisation_hfsf_2013_2014` (policies/gr_bank_recapitalisation_hfsf_2013_2014.yaml); explicit control axes: none
+- `gr_banking_privatisations_2004_2006` (policies/gr_banking_privatisations_2004_2006.yaml); explicit control axes: none
+- `gr_capital_controls_2015_2019` (policies/gr_capital_controls_2015_2019.yaml); explicit control axes: none
+- `gr_corporate_tax_cut_2005` (policies/gr_corporate_tax_cut_2005.yaml); explicit control axes: none
+- `gr_corporate_tax_cut_2019_2021` (policies/gr_corporate_tax_cut_2019_2021.yaml); explicit control axes: none
+- `gr_cosco_piraeus_concession_2008` (policies/gr_cosco_piraeus_concession_2008.yaml); explicit control axes: none
+- `gr_deficit_revision_2009_2010` (policies/gr_deficit_revision_2009_2010.yaml); explicit control axes: none
+- `gr_enfia_property_tax_introduction_2013` (policies/gr_enfia_property_tax_introduction_2013.yaml); explicit control axes: none
+- `gr_enfia_property_tax_reduction_2019_2024` (policies/gr_enfia_property_tax_reduction_2019_2024.yaml); explicit control axes: none
+- `gr_ert_closure_2013` (policies/gr_ert_closure_2013.yaml); explicit control axes: none
+- `gr_first_memorandum_2010` (policies/gr_first_memorandum_2010.yaml); explicit control axes: none
+- `gr_hfsf_bank_recap_2012` (policies/gr_hfsf_bank_recap_2012.yaml); explicit control axes: none
+- `gr_hradf_privatisation_launch_2011` (policies/gr_hradf_privatisation_launch_2011.yaml); explicit control axes: none
+- `gr_labour_flexibility_law_4808_2021` (policies/gr_labour_flexibility_law_4808_2021.yaml); explicit control axes: none
+- `gr_labour_reform_memorandum_2012_2014` (policies/gr_labour_reform_memorandum_2012_2014.yaml); explicit control axes: none
+- `gr_medium_term_fiscal_strategy_2011` (policies/gr_medium_term_fiscal_strategy_2011.yaml); explicit control axes: none
+- `gr_memorandum_exit_2018` (policies/gr_memorandum_exit_2018.yaml); explicit control axes: none
+- `gr_minimum_wage_hikes_2019_2025` (policies/gr_minimum_wage_hikes_2019_2025.yaml); explicit control axes: none
+- `gr_pension_reform_katrougalos_2016` (policies/gr_pension_reform_katrougalos_2016.yaml); explicit control axes: none
+- `gr_pension_reform_petralia_2008` (policies/gr_pension_reform_petralia_2008.yaml); explicit control axes: none
+- `gr_private_sector_minimum_wage_cut_2012` (policies/gr_private_sector_minimum_wage_cut_2012.yaml); explicit control axes: none
+- `gr_psi_debt_exchange_2012` (policies/gr_psi_debt_exchange_2012.yaml); explicit control axes: none
+- `gr_psi_debt_restructuring_2012` (policies/gr_psi_debt_restructuring_2012.yaml); explicit control axes: none
+- `gr_recovery_resilience_plan_greece_2_0_2021` (policies/gr_recovery_resilience_plan_greece_2_0_2021.yaml); explicit control axes: none
+- `gr_second_memorandum_2011_agreement` (policies/gr_second_memorandum_2011_agreement.yaml); explicit control axes: none
+- `gr_second_memorandum_2012` (policies/gr_second_memorandum_2012.yaml); explicit control axes: none
+- `gr_second_memorandum_implementation_2012_2014` (policies/gr_second_memorandum_implementation_2012_2014.yaml); explicit control axes: none
+- `gr_statistical_revision_deficit_2004` (policies/gr_statistical_revision_deficit_2004.yaml); explicit control axes: none
+- `gr_taiped_privatisation_acceleration_2015_2019` (policies/gr_taiped_privatisation_acceleration_2015_2019.yaml); explicit control axes: none
+- `gr_tempi_rail_disaster_institutional_fallout_2023` (policies/gr_tempi_rail_disaster_institutional_fallout_2023.yaml); explicit control axes: none
+- `gr_third_memorandum_2015` (policies/gr_third_memorandum_2015.yaml); explicit control axes: none
+- `greece_1975_constitution` (policies/greece_1975_constitution.yaml); explicit control axes: none
+- `greece_ata_indexation_1982` (policies/greece_ata_indexation_1982.yaml); explicit control axes: none
+- `greece_athens_2004_olympics_infrastructure` (policies/greece_athens_2004_olympics_infrastructure.yaml); explicit control axes: none
+- `greece_bank_of_greece_independence_1997` (policies/greece_bank_of_greece_independence_1997.yaml); explicit control axes: none
+- `greece_banking_sector_licensing_1992_1993` (policies/greece_banking_sector_licensing_1992_1993.yaml); explicit control axes: none
+- `greece_convergence_programme_1994_1999` (policies/greece_convergence_programme_1994_1999.yaml); explicit control axes: none
+- `greece_csf_ii_1994_1999` (policies/greece_csf_ii_1994_1999.yaml); explicit control axes: none
+- `greece_csf_iii_2000_2006` (policies/greece_csf_iii_2000_2006.yaml); explicit control axes: none
+- `greece_debt_statistic_misreporting_2002_2009` (policies/greece_debt_statistic_misreporting_2002_2009.yaml); explicit control axes: none
+- `greece_debt_trajectory_1981_1989` (policies/greece_debt_trajectory_1981_1989.yaml); explicit control axes: none
+- `greece_drachma_currency_liberalisation_1992` (policies/greece_drachma_currency_liberalisation_1992.yaml); explicit control axes: none
+- `greece_eec_accession_negotiation_1975_1979` (policies/greece_eec_accession_negotiation_1975_1979.yaml); explicit control axes: none
+- `greece_esy_national_health_system_1983` (policies/greece_esy_national_health_system_1983.yaml); explicit control axes: none
+- `greece_euro_entry_2001` (policies/greece_euro_entry_2001.yaml); explicit control axes: none
+- `greece_fiscal_accommodation_2001_2009` (policies/greece_fiscal_accommodation_2001_2009.yaml); explicit control axes: none
+- `greece_kke_legalisation_1974` (policies/greece_kke_legalisation_1974.yaml); explicit control axes: none
+- `greece_macedonia_interim_agreement_1995` (policies/greece_macedonia_interim_agreement_1995.yaml); explicit control axes: none
+- `greece_mitsotakis_stabilisation_programme_1991` (policies/greece_mitsotakis_stabilisation_programme_1991.yaml); explicit control axes: none
+- `greece_nato_reintegration_1974_1980` (policies/greece_nato_reintegration_1974_1980.yaml); explicit control axes: none
+- `greece_oae_problematic_enterprises_1983` (policies/greece_oae_problematic_enterprises_1983.yaml); explicit control axes: none
+- `greece_ote_partial_privatisations_1996_1998` (policies/greece_ote_partial_privatisations_1996_1998.yaml); explicit control axes: none
+- `greece_privatisation_law_2000_1991` (policies/greece_privatisation_law_2000_1991.yaml); explicit control axes: none
+- `greece_public_sector_wage_growth_2001_2009` (policies/greece_public_sector_wage_growth_2001_2009.yaml); explicit control axes: none
+- `greece_simitis_pension_reform_attempts_2001_2002` (policies/greece_simitis_pension_reform_attempts_2001_2002.yaml); explicit control axes: none
+- `greece_simitis_stabilisation_1985_1987` (policies/greece_simitis_stabilisation_1985_1987.yaml); explicit control axes: none
+- `greece_social_security_law_2084_implementation` (policies/greece_social_security_law_2084_implementation.yaml); explicit control axes: none
+- `greece_state_enterprise_consolidation_1975` (policies/greece_state_enterprise_consolidation_1975.yaml); explicit control axes: none
+- `greece_trade_union_law_1264_1982` (policies/greece_trade_union_law_1264_1982.yaml); explicit control axes: none
+- `greece_vat_18_percent_1992` (policies/greece_vat_18_percent_1992.yaml); explicit control axes: none
+- `hr_euro_adoption_2023` (policies/hr_euro_adoption_2023.yaml); explicit control axes: none
+- `hr_schengen_accession_2023` (policies/hr_schengen_accession_2023.yaml); explicit control axes: none
+- `hu_100_day_package_2002` (policies/hu_100_day_package_2002.yaml); explicit control axes: none
+- `hu_100_steps_fiscal_expansion_2005` (policies/hu_100_steps_fiscal_expansion_2005.yaml); explicit control axes: none
+- `hu_13th_month_pension_2003` (policies/hu_13th_month_pension_2003.yaml); explicit control axes: none
+- `hu_bajnai_crisis_package_2009` (policies/hu_bajnai_crisis_package_2009.yaml); explicit control axes: none
+- `hu_balatonoszod_leak_2006` (policies/hu_balatonoszod_leak_2006.yaml); explicit control axes: none
+- `hu_bank_consolidation_programme_1992_1993` (policies/hu_bank_consolidation_programme_1992_1993.yaml); explicit control axes: none
+- `hu_bankruptcy_law_1991` (policies/hu_bankruptcy_law_1991.yaml); explicit control axes: none
+- `hu_bokros_package_1995` (policies/hu_bokros_package_1995.yaml); explicit control axes: none
+- `hu_company_law_vi_1988` (policies/hu_company_law_vi_1988.yaml); explicit control axes: none
+- `hu_compensation_act_karpotlas_1991` (policies/hu_compensation_act_karpotlas_1991.yaml); explicit control axes: none
+- `hu_constitution_amendment_republic_1989` (policies/hu_constitution_amendment_republic_1989.yaml); explicit control axes: none
+- `hu_convergence_programme_vat_hike_2006` (policies/hu_convergence_programme_vat_hike_2006.yaml); explicit control axes: none
+- `hu_corporate_tax_cut_2017` (policies/hu_corporate_tax_cut_2017.yaml); explicit control axes: none
+- `hu_crawling_peg_exchange_regime_1995` (policies/hu_crawling_peg_exchange_regime_1995.yaml); explicit control axes: none
+- `hu_eu_accession_2004` (policies/hu_eu_accession_2004.yaml); explicit control axes: none
+- `hu_europe_agreement_1991` (policies/hu_europe_agreement_1991.yaml); explicit control axes: none
+- `hu_extra_profit_taxes_2022` (policies/hu_extra_profit_taxes_2022.yaml); explicit control axes: none
+- `hu_family_tax_allowance_expansion_2011_2023` (policies/hu_family_tax_allowance_expansion_2011_2023.yaml); explicit control axes: none
+- `hu_flat_pit_2011` (policies/hu_flat_pit_2011.yaml); explicit control axes: none
+- `hu_foreign_investment_law_1988` (policies/hu_foreign_investment_law_1988.yaml); explicit control axes: none
+- `hu_fundamental_law_2011` (policies/hu_fundamental_law_2011.yaml); explicit control axes: none
+- `hu_gradualist_privatisation_avu_1991` (policies/hu_gradualist_privatisation_avu_1991.yaml); explicit control axes: none
+- `hu_health_insurance_reform_1996_1997` (policies/hu_health_insurance_reform_1996_1997.yaml); explicit control axes: none
+- `hu_hospital_visit_fee_referendum_2008` (policies/hu_hospital_visit_fee_referendum_2008.yaml); explicit control axes: none
+- `hu_imf_accession_1982` (policies/hu_imf_accession_1982.yaml); explicit control axes: none
+- `hu_imf_eu_rescue_2008` (policies/hu_imf_eu_rescue_2008.yaml); explicit control axes: none
+- `hu_imf_stand_by_arrangement_2008` (policies/hu_imf_stand_by_arrangement_2008.yaml); explicit control axes: none
+- `hu_lakastamogatas_housing_subsidy_2000` (policies/hu_lakastamogatas_housing_subsidy_2000.yaml); explicit control axes: none
+- `hu_mnb_unorthodox_funding_for_growth_2013_2020` (policies/hu_mnb_unorthodox_funding_for_growth_2013_2020.yaml); explicit control axes: none
+- `hu_nato_accession_1999` (policies/hu_nato_accession_1999.yaml); explicit control axes: none
+- `hu_new_economic_mechanism_1968` (policies/hu_new_economic_mechanism_1968.yaml); explicit control axes: none
+- `hu_pension_nationalisation_2010` (policies/hu_pension_nationalisation_2010.yaml); explicit control axes: none
+- `hu_pension_reform_three_pillar_1997` (policies/hu_pension_reform_three_pillar_1997.yaml); explicit control axes: none
+- `hu_personal_income_tax_vat_1988` (policies/hu_personal_income_tax_vat_1988.yaml); explicit control axes: none
+- `hu_personal_income_tax_vat_reform_1988` (policies/hu_personal_income_tax_vat_reform_1988.yaml); explicit control axes: none
+- `hu_privatisation_acceleration_apv_1995_1997` (policies/hu_privatisation_acceleration_apv_1995_1997.yaml); explicit control axes: none
+- `hu_rezsicsokkentes_utility_price_regime_2013_present` (policies/hu_rezsicsokkentes_utility_price_regime_2013_present.yaml); explicit control axes: none
+- `hu_rrf_judicial_reform_unlock_2023` (policies/hu_rrf_judicial_reform_unlock_2023.yaml); explicit control axes: none
+- `hu_sectoral_bank_telecom_retail_taxes_2010_2014` (policies/hu_sectoral_bank_telecom_retail_taxes_2010_2014.yaml); explicit control axes: none
+- `hu_social_referendum_2008` (policies/hu_social_referendum_2008.yaml); explicit control axes: none
+- `hu_sovereignty_protection_office_2023` (policies/hu_sovereignty_protection_office_2023.yaml); explicit control axes: none
+- `hu_status_law_ethnic_hungarians_2001` (policies/hu_status_law_ethnic_hungarians_2001.yaml); explicit control axes: none
+- `hu_stop_soros_law_2018` (policies/hu_stop_soros_law_2018.yaml); explicit control axes: none
+- `hu_two_tier_banking_1987_1989` (policies/hu_two_tier_banking_1987_1989.yaml); explicit control axes: none
+- `hu_uj_egyensuly_new_balance_2006` (policies/hu_uj_egyensuly_new_balance_2006.yaml); explicit control axes: none
+- `hungary_bokros_package_1995` (policies/hungary_bokros_package_1995.yaml); explicit control axes: none
+- `id_aceh_papua_dialogue_2000` (policies/id_aceh_papua_dialogue_2000.yaml); explicit control axes: none
+- `id_afta_cept_commitment_1992` (policies/id_afta_cept_commitment_1992.yaml); explicit control axes: none
+- `id_anti_terror_perpu_2002` (policies/id_anti_terror_perpu_2002.yaml); explicit control axes: none
+- `id_bank_indonesia_independence_1999` (policies/id_bank_indonesia_independence_1999.yaml); explicit control axes: none
+- `id_chinese_cultural_rehabilitation_2000` (policies/id_chinese_cultural_rehabilitation_2000.yaml); explicit control axes: none
+- `id_constitutional_amendments_iii_iv_2001_2002` (policies/id_constitutional_amendments_iii_iv_2001_2002.yaml); explicit control axes: none
+- `id_constitutional_court_law_2003` (policies/id_constitutional_court_law_2003.yaml); explicit control axes: none
+- `id_corruption_eradication_commission_kpk_2002` (policies/id_corruption_eradication_commission_kpk_2002.yaml); explicit control axes: none
+- `id_east_timor_referendum_1999` (policies/id_east_timor_referendum_1999.yaml); explicit control axes: none
+- `id_fdi_deregulation_1994` (policies/id_fdi_deregulation_1994.yaml); explicit control axes: none
+- `id_ibra_bank_restructuring_1998` (policies/id_ibra_bank_restructuring_1998.yaml); explicit control axes: none
+- `id_ibra_bca_indosat_divestment_2002` (policies/id_ibra_bca_indosat_divestment_2002.yaml); explicit control axes: none
+- `id_imf_programme_exit_2003` (policies/id_imf_programme_exit_2003.yaml); explicit control axes: none
+- `id_imf_renegotiation_2000` (policies/id_imf_renegotiation_2000.yaml); explicit control axes: none
+- `id_jokowi_fuel_subsidy_cut_2014` (policies/id_jokowi_fuel_subsidy_cut_2014.yaml); explicit control axes: none
+- `id_jokowi_kpk_law_revision_2019` (policies/id_jokowi_kpk_law_revision_2019.yaml); explicit control axes: none
+- `id_jokowi_nickel_export_ban_2020` (policies/id_jokowi_nickel_export_ban_2020.yaml); explicit control axes: none
+- `id_jokowi_nusantara_capital_2022` (policies/id_jokowi_nusantara_capital_2022.yaml); explicit control axes: none
+- `id_jokowi_omnibus_job_creation_2020` (policies/id_jokowi_omnibus_job_creation_2020.yaml); explicit control axes: none
+- `id_jokowi_tax_amnesty_2016` (policies/id_jokowi_tax_amnesty_2016.yaml); explicit control axes: none
+- `id_jokowi_vat_hike_2022` (policies/id_jokowi_vat_hike_2022.yaml); explicit control axes: none
+- `id_military_civilian_supremacy_reforms_2000` (policies/id_military_civilian_supremacy_reforms_2000.yaml); explicit control axes: none
+- `id_paket_juni_banking_dereg_1983` (policies/id_paket_juni_banking_dereg_1983.yaml); explicit control axes: none
+- `id_paknov_trade_dereg_1988` (policies/id_paknov_trade_dereg_1988.yaml); explicit control axes: none
+- `id_pakto_banking_deregulation_1988` (policies/id_pakto_banking_deregulation_1988.yaml); explicit control axes: none
+- `id_pertamina_debt_bailout_1976` (policies/id_pertamina_debt_bailout_1976.yaml); explicit control axes: none
+- `id_political_parties_law_1999` (policies/id_political_parties_law_1999.yaml); explicit control axes: none
+- `id_prabowo_danantara_2025` (policies/id_prabowo_danantara_2025.yaml); explicit control axes: none
+- `id_prabowo_free_meals_2025` (policies/id_prabowo_free_meals_2025.yaml); explicit control axes: none
+- `id_prabowo_tni_law_revision_2025` (policies/id_prabowo_tni_law_revision_2025.yaml); explicit control axes: none
+- `id_prabowo_vat_hike_12pct_2025` (policies/id_prabowo_vat_hike_12pct_2025.yaml); explicit control axes: none
+- `id_press_freedom_law_1999` (policies/id_press_freedom_law_1999.yaml); explicit control axes: none
+- `id_regional_autonomy_big_bang_1999` (policies/id_regional_autonomy_big_bang_1999.yaml); explicit control axes: none
+- `id_repelita_iii_iv_1979_1989` (policies/id_repelita_iii_iv_1979_1989.yaml); explicit control axes: none
+- `id_rice_self_sufficiency_1984` (policies/id_rice_self_sufficiency_1984.yaml); explicit control axes: none
+- `id_rupiah_devaluation_1983` (policies/id_rupiah_devaluation_1983.yaml); explicit control axes: none
+- `id_rupiah_devaluation_kenaikan_1978` (policies/id_rupiah_devaluation_kenaikan_1978.yaml); explicit control axes: none
+- `id_sby_blt_cash_transfer_2005` (policies/id_sby_blt_cash_transfer_2005.yaml); explicit control axes: none
+- `id_sby_bpjs_health_law_2011` (policies/id_sby_bpjs_health_law_2011.yaml); explicit control axes: none
+- `id_sby_fuel_subsidy_reform_2005` (policies/id_sby_fuel_subsidy_reform_2005.yaml); explicit control axes: none
+- `id_sby_mining_law_2009` (policies/id_sby_mining_law_2009.yaml); explicit control axes: none
+- `id_sby_raw_mineral_export_ban_2014` (policies/id_sby_raw_mineral_export_ban_2014.yaml); explicit control axes: none
+- `id_tax_reform_vat_1983_1985` (policies/id_tax_reform_vat_1983_1985.yaml); explicit control axes: none
+- `id_uruguay_round_signing_1994` (policies/id_uruguay_round_signing_1994.yaml); explicit control axes: none
+- `id_wahid_impeachment_2001` (policies/id_wahid_impeachment_2001.yaml); explicit control axes: none
+- `ie_anglo_irish_nationalisation_2009` (policies/ie_anglo_irish_nationalisation_2009.yaml); explicit control axes: none
+- `ie_apple_tax_state_aid_compliance_2024` (policies/ie_apple_tax_state_aid_compliance_2024.yaml); explicit control axes: none
+- `ie_austerity_budgets_2008_2010` (policies/ie_austerity_budgets_2008_2010.yaml); explicit control axes: none
+- `ie_bailout_exit_2013` (policies/ie_bailout_exit_2013.yaml); explicit control axes: none
+- `ie_bank_guarantee_2008` (policies/ie_bank_guarantee_2008.yaml); explicit control axes: none
+- `ie_budget_2024_cost_of_living_package` (policies/ie_budget_2024_cost_of_living_package.yaml); explicit control axes: none
+- `ie_budget_2025_giveaway_package` (policies/ie_budget_2025_giveaway_package.yaml); explicit control axes: none
+- `ie_capital_gains_tax_cut_1998` (policies/ie_capital_gains_tax_cut_1998.yaml); explicit control axes: none
+- `ie_climate_act_2021_carbon_budgets` (policies/ie_climate_act_2021_carbon_budgets.yaml); explicit control axes: none
+- `ie_corporate_tax_12_5_standardisation_1999` (policies/ie_corporate_tax_12_5_standardisation_1999.yaml); explicit control axes: none
+- `ie_corporate_tax_beps_defence_2013_2017` (policies/ie_corporate_tax_beps_defence_2013_2017.yaml); explicit control axes: none
+- `ie_eu_imf_ecb_bailout_2010` (policies/ie_eu_imf_ecb_bailout_2010.yaml); explicit control axes: none
+- `ie_ewss_covid_wage_subsidy_2020_2022` (policies/ie_ewss_covid_wage_subsidy_2020_2022.yaml); explicit control axes: none
+- `ie_future_ireland_fund_2024` (policies/ie_future_ireland_fund_2024.yaml); explicit control axes: none
+- `ie_good_friday_agreement_1998` (policies/ie_good_friday_agreement_1998.yaml); explicit control axes: none
+- `ie_housing_for_all_continuation_2024` (policies/ie_housing_for_all_continuation_2024.yaml); explicit control axes: none
+- `ie_housing_for_all_plan_2021` (policies/ie_housing_for_all_plan_2021.yaml); explicit control axes: none
+- `ie_living_wage_target_2024_2026` (policies/ie_living_wage_target_2024_2026.yaml); explicit control axes: none
+- `ie_macroprudential_mortgage_caps_2015` (policies/ie_macroprudential_mortgage_caps_2015.yaml); explicit control axes: none
+- `ie_nama_2009` (policies/ie_nama_2009.yaml); explicit control axes: none
+- `ie_national_childrens_hospital_overrun` (policies/ie_national_childrens_hospital_overrun.yaml); explicit control axes: none
+- `ie_national_development_plan_2000_2013` (policies/ie_national_development_plan_2000_2013.yaml); explicit control axes: none
+- `ie_oecd_pillar2_agreement_2021` (policies/ie_oecd_pillar2_agreement_2021.yaml); explicit control axes: none
+- `ie_oecd_pillar2_corporate_tax_2024` (policies/ie_oecd_pillar2_corporate_tax_2024.yaml); explicit control axes: none
+- `ie_promissory_note_restructuring_2013` (policies/ie_promissory_note_restructuring_2013.yaml); explicit control axes: none
+- `ie_property_incentive_reliefs_1998_2006` (policies/ie_property_incentive_reliefs_1998_2006.yaml); explicit control axes: none
+- `ie_social_partnership_benchmarking_2002_2007` (policies/ie_social_partnership_benchmarking_2002_2007.yaml); explicit control axes: none
+- `ie_ssia_savings_scheme_2001` (policies/ie_ssia_savings_scheme_2001.yaml); explicit control axes: none
+- `ie_statutory_sick_pay_act_2022` (policies/ie_statutory_sick_pay_act_2022.yaml); explicit control axes: none
+- `ie_tbess_energy_subsidy_2022_2023` (policies/ie_tbess_energy_subsidy_2022_2023.yaml); explicit control axes: none
+- `ie_water_charges_introduction_suspension_2014_2016` (policies/ie_water_charges_introduction_suspension_2014_2016.yaml); explicit control axes: none
+- `il_1977_economic_upheaval_fx_liberalisation` (policies/il_1977_economic_upheaval_fx_liberalisation.yaml); explicit control axes: none
+- `il_1983_bank_shares_crisis` (policies/il_1983_bank_shares_crisis.yaml); explicit control axes: none
+- `il_1983_bank_shares_nationalisation` (policies/il_1983_bank_shares_nationalisation.yaml); explicit control axes: none
+- `il_1984_package_deals_wage_price_coord` (policies/il_1984_package_deals_wage_price_coord.yaml); explicit control axes: none
+- `il_1985_indexation_reform` (policies/il_1985_indexation_reform.yaml); explicit control axes: none
+- `il_1985_us_emergency_aid_package` (policies/il_1985_us_emergency_aid_package.yaml); explicit control axes: none
+- `il_abraham_accords_israel_2020` (policies/il_abraham_accords_israel_2020.yaml); explicit control axes: none
+- `il_aridor_consumer_subsidies_1981` (policies/il_aridor_consumer_subsidies_1981.yaml); explicit control axes: none
+- `il_arrangements_law_2021` (policies/il_arrangements_law_2021.yaml); explicit control axes: none
+- `il_bank_of_israel_law_2010` (policies/il_bank_of_israel_law_2010.yaml); explicit control axes: none
+- `il_bank_of_israel_law_2010_draft_2008` (policies/il_bank_of_israel_law_2010_draft_2008.yaml); explicit control axes: none
+- `il_barak_capital_markets_continuation_1999_2001` (policies/il_barak_capital_markets_continuation_1999_2001.yaml); explicit control axes: none
+- `il_bezeq_control_sale_2005` (policies/il_bezeq_control_sale_2005.yaml); explicit control axes: none
+- `il_bezeq_partial_privatisation_1997` (policies/il_bezeq_partial_privatisation_1997.yaml); explicit control axes: none
+- `il_boi_tightening_cycle_2022` (policies/il_boi_tightening_cycle_2022.yaml); explicit control axes: none
+- `il_camp_david_accords_1978` (policies/il_camp_david_accords_1978.yaml); explicit control axes: none
+- `il_camp_david_ii_summit_2000` (policies/il_camp_david_ii_summit_2000.yaml); explicit control axes: none
+- `il_capital_market_liberalisation_1987_1992` (policies/il_capital_market_liberalisation_1987_1992.yaml); explicit control axes: none
+- `il_cast_lead_security_spending_2008` (policies/il_cast_lead_security_spending_2008.yaml); explicit control axes: none
+- `il_cellular_reform_2016` (policies/il_cellular_reform_2016.yaml); explicit control axes: none
+- `il_cottage_cheese_tax_response_2011` (policies/il_cottage_cheese_tax_response_2011.yaml); explicit control axes: none
+- `il_covid_emergency_package_2020` (policies/il_covid_emergency_package_2020.yaml); explicit control axes: none
+- `il_credit_rating_downgrades_2024` (policies/il_credit_rating_downgrades_2024.yaml); explicit control axes: none
+- `il_deficit_reduction_law_1992` (policies/il_deficit_reduction_law_1992.yaml); explicit control axes: none
+- `il_gas_framework_2015` (policies/il_gas_framework_2015.yaml); explicit control axes: none
+- `il_gaza_disengagement_2005` (policies/il_gaza_disengagement_2005.yaml); explicit control axes: none
+- `il_grapes_of_wrath_south_lebanon_1996` (policies/il_grapes_of_wrath_south_lebanon_1996.yaml); explicit control axes: none
+- `il_haredi_draft_crisis_2024` (policies/il_haredi_draft_crisis_2024.yaml); explicit control axes: none
+- `il_hebron_protocol_1997` (policies/il_hebron_protocol_1997.yaml); explicit control axes: none
+- `il_israel_lebanon_maritime_agreement_2022` (policies/il_israel_lebanon_maritime_agreement_2022.yaml); explicit control axes: none
+- `il_jordan_peace_treaty_1994` (policies/il_jordan_peace_treaty_1994.yaml); explicit control axes: none
+- `il_judicial_overhaul_plan_2023` (policies/il_judicial_overhaul_plan_2023.yaml); explicit control axes: none
+- `il_kahlon_housing_vat_zero_2014` (policies/il_kahlon_housing_vat_zero_2014.yaml); explicit control axes: none
+- `il_nation_state_basic_law_2018` (policies/il_nation_state_basic_law_2018.yaml); explicit control axes: none
+- `il_netanyahu_emergency_economic_plan_2003` (policies/il_netanyahu_emergency_economic_plan_2003.yaml); explicit control axes: none
+- `il_netanyahu_i_income_tax_cuts_1997_1999` (policies/il_netanyahu_i_income_tax_cuts_1997_1999.yaml); explicit control axes: none
+- `il_oecd_accession_push_2008` (policies/il_oecd_accession_push_2008.yaml); explicit control axes: none
+- `il_operation_defensive_shield_2002` (policies/il_operation_defensive_shield_2002.yaml); explicit control axes: none
+- `il_operation_swords_of_iron_2023` (policies/il_operation_swords_of_iron_2023.yaml); explicit control axes: none
+- `il_oslo_i_declaration_1993` (policies/il_oslo_i_declaration_1993.yaml); explicit control axes: none
+- `il_oslo_ii_implementation_1995_1996` (policies/il_oslo_ii_implementation_1995_1996.yaml); explicit control axes: none
+- `il_oslo_ii_interim_agreement_1995` (policies/il_oslo_ii_interim_agreement_1995.yaml); explicit control axes: none
+- `il_parallel_imports_reform_2021` (policies/il_parallel_imports_reform_2021.yaml); explicit control axes: none
+- `il_paris_protocol_1994` (policies/il_paris_protocol_1994.yaml); explicit control axes: none
+- `il_pension_age_reform_2021` (policies/il_pension_age_reform_2021.yaml); explicit control axes: none
+- `il_privatisation_continuation_1995_1996` (policies/il_privatisation_continuation_1995_1996.yaml); explicit control axes: none
+- `il_reasonableness_clause_repeal_2023` (policies/il_reasonableness_clause_repeal_2023.yaml); explicit control axes: none
+- `il_second_intifada_response_2000_2001` (policies/il_second_intifada_response_2000_2001.yaml); explicit control axes: none
+- `il_shekel_peg_1985` (policies/il_shekel_peg_1985.yaml); explicit control axes: none
+- `il_sheshinski_gas_royalty_2011` (policies/il_sheshinski_gas_royalty_2011.yaml); explicit control axes: none
+- `il_smotrich_west_bank_administration_2023` (policies/il_smotrich_west_bank_administration_2023.yaml); explicit control axes: none
+- `il_south_lebanon_withdrawal_2000` (policies/il_south_lebanon_withdrawal_2000.yaml); explicit control axes: none
+- `il_soviet_aliyah_absorption_basket_1990` (policies/il_soviet_aliyah_absorption_basket_1990.yaml); explicit control axes: none
+- `il_stabilisation_plan_1985` (policies/il_stabilisation_plan_1985.yaml); explicit control axes: none
+- `il_strum_banking_separation_2018` (policies/il_strum_banking_separation_2018.yaml); explicit control axes: none
+- `il_sugary_drinks_tax_2021` (policies/il_sugary_drinks_tax_2021.yaml); explicit control axes: none
+- `il_trajtenberg_committee_2011` (policies/il_trajtenberg_committee_2011.yaml); explicit control axes: none
+- `il_us_loan_guarantees_dispute_1991_1992` (policies/il_us_loan_guarantees_dispute_1991_1992.yaml); explicit control axes: none
+- `il_vaccine_data_deal_2021` (policies/il_vaccine_data_deal_2021.yaml); explicit control axes: none
+- `il_vat_cut_nonrenewal_2021` (policies/il_vat_cut_nonrenewal_2021.yaml); explicit control axes: none
+- `il_war_supplementary_budget_2024` (policies/il_war_supplementary_budget_2024.yaml); explicit control axes: none
+- `il_west_bank_security_barrier_2002` (policies/il_west_bank_security_barrier_2002.yaml); explicit control axes: none
+- `il_west_bank_settlement_expansion_likud_1977` (policies/il_west_bank_settlement_expansion_likud_1977.yaml); explicit control axes: none
+- `il_wye_river_memorandum_1998` (policies/il_wye_river_memorandum_1998.yaml); explicit control axes: none
+- `in_article_370_abrogation_2019` (policies/in_article_370_abrogation_2019.yaml); explicit control axes: none
+- `in_ayushman_bharat_pmjay_2018` (policies/in_ayushman_bharat_pmjay_2018.yaml); explicit control axes: none
+- `in_bharat_nirman_programme_2005` (policies/in_bharat_nirman_programme_2005.yaml); explicit control axes: none
+- `in_corporate_tax_cut_2019` (policies/in_corporate_tax_cut_2019.yaml); explicit control axes: none
+- `in_current_account_convertibility_1994` (policies/in_current_account_convertibility_1994.yaml); explicit control axes: none
+- `in_farm_loan_waiver_1990` (policies/in_farm_loan_waiver_1990.yaml); explicit control axes: none
+- `in_fiscal_drift_pre_1991_crisis` (policies/in_fiscal_drift_pre_1991_crisis.yaml); explicit control axes: none
+- `in_frbm_act_2003` (policies/in_frbm_act_2003.yaml); explicit control axes: none
+- `in_gold_pledge_forex_crisis_1991` (policies/in_gold_pledge_forex_crisis_1991.yaml); explicit control axes: none
+- `in_golden_quadrilateral_highway_1999` (policies/in_golden_quadrilateral_highway_1999.yaml); explicit control axes: none
+- `in_ibc_2016` (policies/in_ibc_2016.yaml); explicit control axes: none
+- `in_imf_standby_negotiation_initial_1991` (policies/in_imf_standby_negotiation_initial_1991.yaml); explicit control axes: none
+- `in_indo_us_civil_nuclear_deal_2008` (policies/in_indo_us_civil_nuclear_deal_2008.yaml); explicit control axes: none
+- `in_industrial_policy_delicensing_1991` (policies/in_industrial_policy_delicensing_1991.yaml); explicit control axes: none
+- `in_mandal_commission_implementation_1990` (policies/in_mandal_commission_implementation_1990.yaml); explicit control axes: none
+- `in_mgnrega_2005` (policies/in_mgnrega_2005.yaml); explicit control axes: none
+- `in_mrtp_act_amendment_1991` (policies/in_mrtp_act_amendment_1991.yaml); explicit control axes: none
+- `in_nda_disinvestment_programme_1999` (policies/in_nda_disinvestment_programme_1999.yaml); explicit control axes: none
+- `in_new_telecom_policy_1999` (policies/in_new_telecom_policy_1999.yaml); explicit control axes: none
+- `in_nfsa_2013` (policies/in_nfsa_2013.yaml); explicit control axes: none
+- `in_nrega_mgnrega_2005` (policies/in_nrega_mgnrega_2005.yaml); explicit control axes: none
+- `in_pokhran_ii_nuclear_tests_1998` (policies/in_pokhran_ii_nuclear_tests_1998.yaml); explicit control axes: none
+- `in_right_to_information_act_2005` (policies/in_right_to_information_act_2005.yaml); explicit control axes: none
+- `in_rupee_devaluation_1991` (policies/in_rupee_devaluation_1991.yaml); explicit control axes: none
+- `in_sarva_shiksha_abhiyan_2001` (policies/in_sarva_shiksha_abhiyan_2001.yaml); explicit control axes: none
+- `in_sebi_act_1992` (policies/in_sebi_act_1992.yaml); explicit control axes: none
+- `in_sez_act_2005` (policies/in_sez_act_2005.yaml); explicit control axes: none
+- `in_sixth_pay_commission_2008` (policies/in_sixth_pay_commission_2008.yaml); explicit control axes: none
+- `in_tariff_cuts_1991_1996` (policies/in_tariff_cuts_1991_1996.yaml); explicit control axes: none
+- `in_union_budget_2024_25` (policies/in_union_budget_2024_25.yaml); explicit control axes: none
+- `in_union_budget_2026_27` (policies/in_union_budget_2026_27.yaml); explicit control axes: none
+- `in_uruguay_round_signing_1994` (policies/in_uruguay_round_signing_1994.yaml); explicit control axes: none
+- `in_waqf_amendment_act_2025` (policies/in_waqf_amendment_act_2025.yaml); explicit control axes: none
+- `india_44th_constitutional_amendment_1978` (policies/india_44th_constitutional_amendment_1978.yaml); explicit control axes: none
+- `india_aadhaar_rollout_2010_present` (policies/india_aadhaar_rollout_2010_present.yaml); explicit control axes: none
+- `india_anti_defection_10th_schedule_1985` (policies/india_anti_defection_10th_schedule_1985.yaml); explicit control axes: none
+- `india_antyodaya_rural_programme_1977` (policies/india_antyodaya_rural_programme_1977.yaml); explicit control axes: none
+- `india_bank_nationalisation_1969` (policies/india_bank_nationalisation_1969.yaml); explicit control axes: none
+- `india_bank_nationalisation_second_wave_1980` (policies/india_bank_nationalisation_second_wave_1980.yaml); explicit control axes: none
+- `india_cdot_establishment_1984` (policies/india_cdot_establishment_1984.yaml); explicit control axes: none
+- `india_citizenship_amendment_act_2019` (policies/india_citizenship_amendment_act_2019.yaml); explicit control axes: none
+- `india_companies_act_2013` (policies/india_companies_act_2013.yaml); explicit control axes: none
+- `india_constitution_1950` (policies/india_constitution_1950.yaml); explicit control axes: none
+- `india_demonetisation_2016` (policies/india_demonetisation_2016.yaml); explicit control axes: none
+- `india_economic_liberalisation_1991` (policies/india_economic_liberalisation_1991.yaml); explicit control axes: none
+- `india_farm_laws_2020_repealed_2021` (policies/india_farm_laws_2020_repealed_2021.yaml); explicit control axes: none
+- `india_fdi_multibrand_retail_2012` (policies/india_fdi_multibrand_retail_2012.yaml); explicit control axes: none
+- `india_fera_1973` (policies/india_fera_1973.yaml); explicit control axes: none
+- `india_government_of_india_act_1919` (policies/india_government_of_india_act_1919.yaml); explicit control axes: none
+- `india_government_of_india_act_1935` (policies/india_government_of_india_act_1935.yaml); explicit control axes: none
+- `india_gst_2017` (policies/india_gst_2017.yaml); explicit control axes: none
+- `india_ibm_cocacola_expulsion_1977` (policies/india_ibm_cocacola_expulsion_1977.yaml); explicit control axes: none
+- `india_imf_eff_1981` (policies/india_imf_eff_1981.yaml); explicit control axes: none
+- `india_indian_councils_act_1909` (policies/india_indian_councils_act_1909.yaml); explicit control axes: none
+- `india_industrial_policy_resolution_1948` (policies/india_industrial_policy_resolution_1948.yaml); explicit control axes: none
+- `india_industrial_policy_resolution_1956` (policies/india_industrial_policy_resolution_1956.yaml); explicit control axes: none
+- `india_industries_development_regulation_act_1951` (policies/india_industries_development_regulation_act_1951.yaml); explicit control axes: none
+- `india_land_acquisition_act_2013` (policies/india_land_acquisition_act_2013.yaml); explicit control axes: none
+- `india_long_term_fiscal_policy_1985` (policies/india_long_term_fiscal_policy_1985.yaml); explicit control axes: none
+- `india_modvat_1986` (policies/india_modvat_1986.yaml); explicit control axes: none
+- `india_mrtp_act_1969` (policies/india_mrtp_act_1969.yaml); explicit control axes: none
+- `india_muslim_women_act_shahbano_reversal_1986` (policies/india_muslim_women_act_shahbano_reversal_1986.yaml); explicit control axes: none
+- `india_national_education_policy_2020` (policies/india_national_education_policy_2020.yaml); explicit control axes: none
+- `india_new_computer_policy_1984` (policies/india_new_computer_policy_1984.yaml); explicit control axes: none
+- `india_new_income_tax_bill_2025` (policies/india_new_income_tax_bill_2025.yaml); explicit control axes: none
+- `india_new_telecom_policy_1986` (policies/india_new_telecom_policy_1986.yaml); explicit control axes: none
+- `india_new_textile_policy_1985` (policies/india_new_textile_policy_1985.yaml); explicit control axes: none
+- `india_operation_blue_star_1984` (policies/india_operation_blue_star_1984.yaml); explicit control axes: none
+- `india_planning_commission_establishment_1950` (policies/india_planning_commission_establishment_1950.yaml); explicit control axes: none
+- `india_pli_scheme_2020` (policies/india_pli_scheme_2020.yaml); explicit control axes: none
+- `india_pli_scheme_continuation_2024_present` (policies/india_pli_scheme_continuation_2024_present.yaml); explicit control axes: none
+- `india_quantitative_import_restrictions_pre_1991` (policies/india_quantitative_import_restrictions_pre_1991.yaml); explicit control axes: none
+- `india_rera_2016` (policies/india_rera_2016.yaml); explicit control axes: none
+- `india_reserve_bank_of_india_act_1934` (policies/india_reserve_bank_of_india_act_1934.yaml); explicit control axes: none
+- `india_rte_act_2009` (policies/india_rte_act_2009.yaml); explicit control axes: none
+- `india_rti_act_2005` (policies/india_rti_act_2005.yaml); explicit control axes: none
+- `india_semiconductor_mission_2024_present` (policies/india_semiconductor_mission_2024_present.yaml); explicit control axes: none
+- `india_sixth_five_year_plan_1980_1985` (policies/india_sixth_five_year_plan_1980_1985.yaml); explicit control axes: none
+- `india_uniform_civil_code_uttarakhand_2025` (policies/india_uniform_civil_code_uttarakhand_2025.yaml); explicit control axes: none
+- `indonesia_balanced_budget_rule_1967_1997` (policies/indonesia_balanced_budget_rule_1967_1997.yaml); explicit control axes: none
+- `indonesia_bank_indonesia_independence_1999` (policies/indonesia_bank_indonesia_independence_1999.yaml); explicit control axes: none
+- `indonesia_bimas_green_revolution_1970s` (policies/indonesia_bimas_green_revolution_1970s.yaml); explicit control axes: none
+- `indonesia_decentralisation_laws_1999` (policies/indonesia_decentralisation_laws_1999.yaml); explicit control axes: none
+- `indonesia_fuel_subsidy_reform_2005_2015` (policies/indonesia_fuel_subsidy_reform_2005_2015.yaml); explicit control axes: none
+- `indonesia_imf_programme_1997` (policies/indonesia_imf_programme_1997.yaml); explicit control axes: none
+- `indonesia_inpres_rural_development` (policies/indonesia_inpres_rural_development.yaml); explicit control axes: none
+- `indonesia_lps_deposit_insurance_2004` (policies/indonesia_lps_deposit_insurance_2004.yaml); explicit control axes: none
+- `indonesia_omnibus_job_creation_law_2020` (policies/indonesia_omnibus_job_creation_law_2020.yaml); explicit control axes: none
+- `indonesia_pma_foreign_investment_law_1967` (policies/indonesia_pma_foreign_investment_law_1967.yaml); explicit control axes: none
+- `indonesia_trade_liberalisation_packages_1986_1996` (policies/indonesia_trade_liberalisation_packages_1986_1996.yaml); explicit control axes: none
+- `ir_18_tir_student_protests_1999` (policies/ir_18_tir_student_protests_1999.yaml); explicit control axes: none
+- `ir_1979_bank_insurance_nationalisation` (policies/ir_1979_bank_insurance_nationalisation.yaml); explicit control axes: none
+- `ir_1979_islamic_republic_constitution` (policies/ir_1979_islamic_republic_constitution.yaml); explicit control axes: none
+- `ir_1979_large_industry_nationalisation` (policies/ir_1979_large_industry_nationalisation.yaml); explicit control axes: none
+- `ir_amouzegar_anti_inflation_austerity_1977` (policies/ir_amouzegar_anti_inflation_austerity_1977.yaml); explicit control axes: none
+- `ir_bonyad_foundation_system_1979` (policies/ir_bonyad_foundation_system_1979.yaml); explicit control axes: none
+- `ir_bread_smartcard_subsidy_reform_2022` (policies/ir_bread_smartcard_subsidy_reform_2022.yaml); explicit control axes: none
+- `ir_brics_accession_2024` (policies/ir_brics_accession_2024.yaml); explicit control axes: none
+- `ir_buy_back_oil_contracts_1995` (policies/ir_buy_back_oil_contracts_1995.yaml); explicit control axes: none
+- `ir_exchange_rate_unification_2002` (policies/ir_exchange_rate_unification_2002.yaml); explicit control axes: none
+- `ir_exchange_unification_attempt_1993` (policies/ir_exchange_unification_attempt_1993.yaml); explicit control axes: none
+- `ir_fatf_reengagement_signal_2024` (policies/ir_fatf_reengagement_signal_2024.yaml); explicit control axes: none
+- `ir_fifth_plan_doubling_1974_1978` (policies/ir_fifth_plan_doubling_1974_1978.yaml); explicit control axes: none
+- `ir_fippa_foreign_investment_2002` (policies/ir_fippa_foreign_investment_2002.yaml); explicit control axes: none
+- `ir_first_five_year_plan_1989` (policies/ir_first_five_year_plan_1989.yaml); explicit control axes: none
+- `ir_foreign_debt_crisis_1993_1994` (policies/ir_foreign_debt_crisis_1993_1994.yaml); explicit control axes: none
+- `ir_ftz_kish_qeshm_1993` (policies/ir_ftz_kish_qeshm_1993.yaml); explicit control axes: none
+- `ir_fuel_price_reform_2019` (policies/ir_fuel_price_reform_2019.yaml); explicit control axes: none
+- `ir_hemmati_impeachment_2025` (policies/ir_hemmati_impeachment_2025.yaml); explicit control axes: none
+- `ir_hijab_chastity_bill_2023` (policies/ir_hijab_chastity_bill_2023.yaml); explicit control axes: none
+- `ir_iran_iraq_war_economy_1980_1988` (policies/ir_iran_iraq_war_economy_1980_1988.yaml); explicit control axes: none
+- `ir_israel_iran_war_ceasefire_2025` (policies/ir_israel_iran_war_ceasefire_2025.yaml); explicit control axes: none
+- `ir_jcpoa_nuclear_deal_2015` (policies/ir_jcpoa_nuclear_deal_2015.yaml); explicit control axes: none
+- `ir_mehr_housing_programme_2007` (policies/ir_mehr_housing_programme_2007.yaml); explicit control axes: none
+- `ir_natanz_nuclear_disclosure_2002` (policies/ir_natanz_nuclear_disclosure_2002.yaml); explicit control axes: none
+- `ir_nuclear_escalation_sanctions_2006_2012` (policies/ir_nuclear_escalation_sanctions_2006_2012.yaml); explicit control axes: none
+- `ir_nuclear_talks_reopening_oman_2025` (policies/ir_nuclear_talks_reopening_oman_2025.yaml); explicit control axes: none
+- `ir_rastakhiz_one_party_1975` (policies/ir_rastakhiz_one_party_1975.yaml); explicit control axes: none
+- `ir_rial_collapse_2012` (policies/ir_rial_collapse_2012.yaml); explicit control axes: none
+- `ir_rial_unification_attempt_2018` (policies/ir_rial_unification_attempt_2018.yaml); explicit control axes: none
+- `ir_saudi_iran_normalisation_2023` (policies/ir_saudi_iran_normalisation_2023.yaml); explicit control axes: none
+- `ir_subsidy_cash_transfer_continuation_2014` (policies/ir_subsidy_cash_transfer_continuation_2014.yaml); explicit control axes: none
+- `ir_targeted_subsidies_reform_2010` (policies/ir_targeted_subsidies_reform_2010.yaml); explicit control axes: none
+- `ir_tehran_declaration_e3_2003` (policies/ir_tehran_declaration_e3_2003.yaml); explicit control axes: none
+- `ir_uranium_enrichment_60pct_2021` (policies/ir_uranium_enrichment_60pct_2021.yaml); explicit control axes: none
+- `iran_article_44_privatisation_2006` (policies/iran_article_44_privatisation_2006.yaml); explicit control axes: none
+- `iran_bonyad_parastatal_system` (policies/iran_bonyad_parastatal_system.yaml); explicit control axes: none
+- `iran_generalised_consumer_subsidy_regime` (policies/iran_generalised_consumer_subsidy_regime.yaml); explicit control axes: none
+- `iran_nationalisations_1979_1982` (policies/iran_nationalisations_1979_1982.yaml); explicit control axes: none
+- `iran_targeted_subsidies_reform_2010` (policies/iran_targeted_subsidies_reform_2010.yaml); explicit control axes: none
+- `iran_usury_free_banking_law_1983` (policies/iran_usury_free_banking_law_1983.yaml); explicit control axes: none
+- `ireland_1977_manifesto_implementation_1979_1981` (policies/ireland_1977_manifesto_implementation_1979_1981.yaml); explicit control axes: none
+- `ireland_1988_tax_amnesty` (policies/ireland_1988_tax_amnesty.yaml); explicit control axes: none
+- `ireland_anglo_irish_agreement_1985` (policies/ireland_anglo_irish_agreement_1985.yaml); explicit control axes: none
+- `ireland_building_on_reality_1984` (policies/ireland_building_on_reality_1984.yaml); explicit control axes: none
+- `ireland_cgt_reduction_1997` (policies/ireland_cgt_reduction_1997.yaml); explicit control axes: none
+- `ireland_corporate_tax_reduction_1987` (policies/ireland_corporate_tax_reduction_1987.yaml); explicit control axes: none
+- `ireland_debt_spiral_1978_1982` (policies/ireland_debt_spiral_1978_1982.yaml); explicit control axes: none
+- `ireland_divorce_referendum_1986` (policies/ireland_divorce_referendum_1986.yaml); explicit control axes: none
+- `ireland_divorce_referendum_1995` (policies/ireland_divorce_referendum_1995.yaml); explicit control axes: none
+- `ireland_downing_street_declaration_1993` (policies/ireland_downing_street_declaration_1993.yaml); explicit control axes: none
+- `ireland_eighth_amendment_1983` (policies/ireland_eighth_amendment_1983.yaml); explicit control axes: none
+- `ireland_ems_entry_1979` (policies/ireland_ems_entry_1979.yaml); explicit control axes: none
+- `ireland_haughey_1980_broadcast` (policies/ireland_haughey_1980_broadcast.yaml); explicit control axes: none
+- `ireland_ifsc_10_percent_rate_1987` (policies/ireland_ifsc_10_percent_rate_1987.yaml); explicit control axes: none
+- `ireland_ifsc_foundation_1987` (policies/ireland_ifsc_foundation_1987.yaml); explicit control axes: none
+- `ireland_macsharry_fiscal_consolidation_1987_1989` (policies/ireland_macsharry_fiscal_consolidation_1987_1989.yaml); explicit control axes: none
+- `ireland_pay_ve_adjustments_1983_1986` (policies/ireland_pay_ve_adjustments_1983_1986.yaml); explicit control axes: none
+- `ireland_pcw_1994` (policies/ireland_pcw_1994.yaml); explicit control axes: none
+- `ireland_pcw_continuation_ramp_1994_1997` (policies/ireland_pcw_continuation_ramp_1994_1997.yaml); explicit control axes: none
+- `ireland_pesp_1990` (policies/ireland_pesp_1990.yaml); explicit control axes: none
+- `ireland_programme_national_recovery_1987` (policies/ireland_programme_national_recovery_1987.yaml); explicit control axes: none
+- `ireland_public_sector_pay_expansion_1979_1981` (policies/ireland_public_sector_pay_expansion_1979_1981.yaml); explicit control axes: none
+- `ireland_punt_devaluation_1993` (policies/ireland_punt_devaluation_1993.yaml); explicit control axes: none
+- `ireland_rpt_abolition_1997` (policies/ireland_rpt_abolition_1997.yaml); explicit control axes: none
+- `ireland_structural_funds_csf_1994_1999` (policies/ireland_structural_funds_csf_1994_1999.yaml); explicit control axes: none
+- `irq_baath_land_reform_1970` (policies/irq_baath_land_reform_1970.yaml); explicit control axes: none
+- `irq_ipc_nationalisation_1972` (policies/irq_ipc_nationalisation_1972.yaml); explicit control axes: none
+- `irq_oil_boom_development_plan_1976_1980` (policies/irq_oil_boom_development_plan_1976_1980.yaml); explicit control axes: none
+- `israel_1985_stabilization_plan` (policies/israel_1985_stabilization_plan.yaml); explicit control axes: none
+- `israel_bank_of_israel_no_printing_law_1985` (policies/israel_bank_of_israel_no_printing_law_1985.yaml); explicit control axes: none
+- `israel_fiscal_consolidation_1985` (policies/israel_fiscal_consolidation_1985.yaml); explicit control axes: none
+- `israel_shekel_peg_1985` (policies/israel_shekel_peg_1985.yaml); explicit control axes: none
+- `israel_stabilisation_plan_1985` (policies/israel_stabilisation_plan_1985.yaml); explicit control axes: none
+- `israel_wage_price_freeze_1985` (policies/israel_wage_price_freeze_1985.yaml); explicit control axes: none
+- `it_alitalia_cai_restructuring_2009` (policies/it_alitalia_cai_restructuring_2009.yaml); explicit control axes: none
+- `it_bonus_80_euro_2014` (policies/it_bonus_80_euro_2014.yaml); explicit control axes: none
+- `it_constitutional_referendum_2016_rejected` (policies/it_constitutional_referendum_2016_rejected.yaml); explicit control axes: none
+- `it_cresci_italia_liberalisations_2012` (policies/it_cresci_italia_liberalisations_2012.yaml); explicit control axes: none
+- `it_decreto_del_fare_2013` (policies/it_decreto_del_fare_2013.yaml); explicit control axes: none
+- `it_finanziaria_2007_tightening` (policies/it_finanziaria_2007_tightening.yaml); explicit control axes: none
+- `it_fornero_labour_reform_2012` (policies/it_fornero_labour_reform_2012.yaml); explicit control axes: none
+- `it_fornero_pension_reform_2011` (policies/it_fornero_pension_reform_2011.yaml); explicit control axes: none
+- `it_ici_abolition_2008` (policies/it_ici_abolition_2008.yaml); explicit control axes: none
+- `it_imu_abolition_tasi_introduction_2013_2014` (policies/it_imu_abolition_tasi_introduction_2013_2014.yaml); explicit control axes: none
+- `it_jobs_act_2014_2015` (policies/it_jobs_act_2014_2015.yaml); explicit control axes: none
+- `it_lenzuolate_bersani_2006_2007` (policies/it_lenzuolate_bersani_2006_2007.yaml); explicit control axes: none
+- `it_manovra_2011_ecb_letter` (policies/it_manovra_2011_ecb_letter.yaml); explicit control axes: none
+- `it_manovra_estiva_2010` (policies/it_manovra_estiva_2010.yaml); explicit control axes: none
+- `it_minniti_libya_migration_2017` (policies/it_minniti_libya_migration_2017.yaml); explicit control axes: none
+- `it_mps_precautionary_recap_2017` (policies/it_mps_precautionary_recap_2017.yaml); explicit control axes: none
+- `it_padoa_schioppa_tax_compliance_2007` (policies/it_padoa_schioppa_tax_compliance_2007.yaml); explicit control axes: none
+- `it_popolari_banking_reform_2015` (policies/it_popolari_banking_reform_2015.yaml); explicit control axes: none
+- `it_rosatellum_electoral_law_2017` (policies/it_rosatellum_electoral_law_2017.yaml); explicit control axes: none
+- `it_salva_italia_2011` (policies/it_salva_italia_2011.yaml); explicit control axes: none
+- `it_tfr_pension_fund_reform_2007` (policies/it_tfr_pension_fund_reform_2007.yaml); explicit control axes: none
+- `it_tremonti_ter_2009` (policies/it_tremonti_ter_2009.yaml); explicit control axes: none
+- `it_veneto_banks_resolution_2017` (policies/it_veneto_banks_resolution_2017.yaml); explicit control axes: none
+- `it_youth_guarantee_implementation_2013` (policies/it_youth_guarantee_implementation_2013.yaml); explicit control axes: none
+- `italy_accord_scotti_scala_mobile_1983` (policies/italy_accord_scotti_scala_mobile_1983.yaml); explicit control axes: none
+- `italy_acerbo_law_1923` (policies/italy_acerbo_law_1923.yaml); explicit control axes: none
+- `italy_alfa_romeo_sale_to_fiat_1986` (policies/italy_alfa_romeo_sale_to_fiat_1986.yaml); explicit control axes: none
+- `italy_alto_adige_autonomy_1981` (policies/italy_alto_adige_autonomy_1981.yaml); explicit control axes: none
+- `italy_amato_budget_adjustment_1992` (policies/italy_amato_budget_adjustment_1992.yaml); explicit control axes: none
+- `italy_amato_irpef_reform_2000` (policies/italy_amato_irpef_reform_2000.yaml); explicit control axes: none
+- `italy_amato_pension_reform_1992` (policies/italy_amato_pension_reform_1992.yaml); explicit control axes: none
+- `italy_bank_extra_profits_tax_2023` (policies/italy_bank_extra_profits_tax_2023.yaml); explicit control axes: none
+- `italy_bank_privatisations_1993_1994` (policies/italy_bank_privatisations_1993_1994.yaml); explicit control axes: none
+- `italy_banking_law_1936` (policies/italy_banking_law_1936.yaml); explicit control axes: none
+- `italy_bassanini_administrative_reform_1997` (policies/italy_bassanini_administrative_reform_1997.yaml); explicit control axes: none
+- `italy_berlusconi_pension_reform_attempt_1994` (policies/italy_berlusconi_pension_reform_attempt_1994.yaml); explicit control axes: none
+- `italy_biagi_labour_reform_2003` (policies/italy_biagi_labour_reform_2003.yaml); explicit control axes: none
+- `italy_bossi_fini_immigration_2002` (policies/italy_bossi_fini_immigration_2002.yaml); explicit control axes: none
+- `italy_budget_2024_fiscal_compression` (policies/italy_budget_2024_fiscal_compression.yaml); explicit control axes: none
+- `italy_carta_del_lavoro_1927` (policies/italy_carta_del_lavoro_1927.yaml); explicit control axes: none
+- `italy_cartabia_justice_reforms_2021` (policies/italy_cartabia_justice_reforms_2021.yaml); explicit control axes: none
+- `italy_cassa_mezzogiorno_1950` (policies/italy_cassa_mezzogiorno_1950.yaml); explicit control axes: none
+- `italy_covid_emergency_fiscal_2020_2021` (policies/italy_covid_emergency_fiscal_2020_2021.yaml); explicit control axes: none
+- `italy_daneo_credaro_school_law_1911` (policies/italy_daneo_credaro_school_law_1911.yaml); explicit control axes: none
+- `italy_decreto_biondi_1994` (policies/italy_decreto_biondi_1994.yaml); explicit control axes: none
+- `italy_decreto_dignita_2018` (policies/italy_decreto_dignita_2018.yaml); explicit control axes: none
+- `italy_decreto_san_valentino_scala_mobile_1984` (policies/italy_decreto_san_valentino_scala_mobile_1984.yaml); explicit control axes: none
+- `italy_dini_pension_implementation_1996_1998` (policies/italy_dini_pension_implementation_1996_1998.yaml); explicit control axes: none
+- `italy_disinflation_1983_1987` (policies/italy_disinflation_1983_1987.yaml); explicit control axes: none
+- `italy_eec_accession_rome_treaty_1957` (policies/italy_eec_accession_rome_treaty_1957.yaml); explicit control axes: none
+- `italy_einaudi_stabilisation_1947` (policies/italy_einaudi_stabilisation_1947.yaml); explicit control axes: none
+- `italy_ems_entry_1979` (policies/italy_ems_entry_1979.yaml); explicit control axes: none
+- `italy_enel_ipo_1999` (policies/italy_enel_ipo_1999.yaml); explicit control axes: none
+- `italy_eni_founding_1953` (policies/italy_eni_founding_1953.yaml); explicit control axes: none
+- `italy_epu_membership_1950` (policies/italy_epu_membership_1950.yaml); explicit control axes: none
+- `italy_euro_entry_1999` (policies/italy_euro_entry_1999.yaml); explicit control axes: none
+- `italy_euro_entry_qualification_1998` (policies/italy_euro_entry_qualification_1998.yaml); explicit control axes: none
+- `italy_eurotassa_1996` (policies/italy_eurotassa_1996.yaml); explicit control axes: none
+- `italy_flat_tax_forfettario_extension_2023` (policies/italy_flat_tax_forfettario_extension_2023.yaml); explicit control axes: none
+- `italy_ina_imi_privatisations_1994` (policies/italy_ina_imi_privatisations_1994.yaml); explicit control axes: none
+- `italy_ina_life_insurance_monopoly_1912` (policies/italy_ina_life_insurance_monopoly_1912.yaml); explicit control axes: none
+- `italy_iraq_participation_2003` (policies/italy_iraq_participation_2003.yaml); explicit control axes: none
+- `italy_iri_creation_1933` (policies/italy_iri_creation_1933.yaml); explicit control axes: none
+- `italy_iri_state_holding_expansion_1945_1992` (policies/italy_iri_state_holding_expansion_1945_1992.yaml); explicit control axes: none
+- `italy_kosovo_participation_1999` (policies/italy_kosovo_participation_1999.yaml); explicit control axes: none
+- `italy_labour_market_dualism_persistence_1990s_2010s` (policies/italy_labour_market_dualism_persistence_1990s_2010s.yaml); explicit control axes: none
+- `italy_legge_concorrenza_2022` (policies/italy_legge_concorrenza_2022.yaml); explicit control axes: none
+- `italy_lira_erm_exit_1992` (policies/italy_lira_erm_exit_1992.yaml); explicit control axes: none
+- `italy_maroni_pension_reform_2004` (policies/italy_maroni_pension_reform_2004.yaml); explicit control axes: none
+- `italy_mattarellum_electoral_reform_1993` (policies/italy_mattarellum_electoral_reform_1993.yaml); explicit control axes: none
+- `italy_monti_reforms_2011_2012` (policies/italy_monti_reforms_2011_2012.yaml); explicit control axes: none
+- `italy_pacchetto_tremonti_1994` (policies/italy_pacchetto_tremonti_1994.yaml); explicit control axes: none
+- `italy_parental_leave_law_53_2000` (policies/italy_parental_leave_law_53_2000.yaml); explicit control axes: none
+- `italy_pension_indexation_1985` (policies/italy_pension_indexation_1985.yaml); explicit control axes: none
+- `italy_pnrr_2021` (policies/italy_pnrr_2021.yaml); explicit control axes: none
+- `italy_product_market_regulation_persistence` (policies/italy_product_market_regulation_persistence.yaml); explicit control axes: none
+- `italy_protocollo_ciampi_scala_mobile_1993` (policies/italy_protocollo_ciampi_scala_mobile_1993.yaml); explicit control axes: none
+- `italy_public_debt_trajectory_1976_1983` (policies/italy_public_debt_trajectory_1976_1983.yaml); explicit control axes: none
+- `italy_public_sector_pension_expansion_1965_1992` (policies/italy_public_sector_pension_expansion_1965_1992.yaml); explicit control axes: none
+- `italy_quota_100_pensions_2019` (policies/italy_quota_100_pensions_2019.yaml); explicit control axes: none
+- `italy_rdc_abolition_adi_sfl_2023` (policies/italy_rdc_abolition_adi_sfl_2023.yaml); explicit control axes: none
+- `italy_reddito_di_cittadinanza_2019` (policies/italy_reddito_di_cittadinanza_2019.yaml); explicit control axes: none
+- `italy_scala_mobile_indexation_1975` (policies/italy_scala_mobile_indexation_1975.yaml); explicit control axes: none
+- `italy_scala_mobile_referendum_1985` (policies/italy_scala_mobile_referendum_1985.yaml); explicit control axes: none
+- `italy_state_railways_1905` (policies/italy_state_railways_1905.yaml); explicit control axes: none
+- `italy_superbonus_110_2020` (policies/italy_superbonus_110_2020.yaml); explicit control axes: none
+- `italy_superbonus_phaseout_2024` (policies/italy_superbonus_phaseout_2024.yaml); explicit control axes: none
+- `italy_telecom_italia_ownership_defense_1999` (policies/italy_telecom_italia_ownership_defense_1999.yaml); explicit control axes: none
+- `italy_treasury_bankitalia_divorzio_1981` (policies/italy_treasury_bankitalia_divorzio_1981.yaml); explicit control axes: none
+- `italy_tremonti_tax_bonuses_2001_2003` (policies/italy_tremonti_tax_bonuses_2001_2003.yaml); explicit control axes: none
+- `italy_treu_law_labour_flexibility_1997` (policies/italy_treu_law_labour_flexibility_1997.yaml); explicit control axes: none
+- `italy_universal_male_suffrage_1912` (policies/italy_universal_male_suffrage_1912.yaml); explicit control axes: none
+- `italy_windfall_tax_energy_2022` (policies/italy_windfall_tax_energy_2022.yaml); explicit control axes: none
+- `japan_abenomics_2013` (policies/japan_abenomics_2013.yaml); explicit control axes: none
+- `japan_boj_window_guidance_1955_1975` (policies/japan_boj_window_guidance_1955_1975.yaml); explicit control axes: none
+- `japan_bojqqe_2013` (policies/japan_bojqqe_2013.yaml); explicit control axes: none
+- `japan_corporate_governance_code_2015` (policies/japan_corporate_governance_code_2015.yaml); explicit control axes: none
+- `japan_factory_act_1911_1916` (policies/japan_factory_act_1911_1916.yaml); explicit control axes: none
+- `japan_forex_control_law_1949` (policies/japan_forex_control_law_1949.yaml); explicit control axes: none
+- `japan_gatt_accession_1955` (policies/japan_gatt_accession_1955.yaml); explicit control axes: none
+- `japan_gold_standard_restoration_1930` (policies/japan_gold_standard_restoration_1930.yaml); explicit control axes: none
+- `japan_health_insurance_act_1922_1927` (policies/japan_health_insurance_act_1922_1927.yaml); explicit control axes: none
+- `japan_income_doubling_plan_1960` (policies/japan_income_doubling_plan_1960.yaml); explicit control axes: none
+- `japan_oecd_accession_1964` (policies/japan_oecd_accession_1964.yaml); explicit control axes: none
+- `japan_peace_preservation_law_1925` (policies/japan_peace_preservation_law_1925.yaml); explicit control axes: none
+- `japan_railway_nationalisation_act_1906` (policies/japan_railway_nationalisation_act_1906.yaml); explicit control axes: none
+- `japan_womenomics_initiative` (policies/japan_womenomics_initiative.yaml); explicit control axes: none
+- `japan_yield_curve_control_2016` (policies/japan_yield_curve_control_2016.yaml); explicit control axes: none
+- `jordan_economic_modernisation_vision_2022` (policies/jordan_economic_modernisation_vision_2022.yaml); explicit control axes: none
+- `jordan_imf_eff_2024` (policies/jordan_imf_eff_2024.yaml); explicit control axes: none
+- `jordan_investment_environment_law_2022` (policies/jordan_investment_environment_law_2022.yaml); explicit control axes: none
+- `jp_1_03m_wall_basic_deduction_reform_2025` (policies/jp_1_03m_wall_basic_deduction_reform_2025.yaml); explicit control axes: none
+- `jp_2050_carbon_neutral_pledge_2020` (policies/jp_2050_carbon_neutral_pledge_2020.yaml); explicit control axes: none
+- `jp_aso_eco_car_eco_point_subsidy_2009` (policies/jp_aso_eco_car_eco_point_subsidy_2009.yaml); explicit control axes: none
+- `jp_aso_supplementary_budgets_gfc_2008_2009` (policies/jp_aso_supplementary_budgets_gfc_2008_2009.yaml); explicit control axes: none
+- `jp_aso_teigaku_cash_handout_2009` (policies/jp_aso_teigaku_cash_handout_2009.yaml); explicit control axes: none
+- `jp_auto_voluntary_export_restraint_1981` (policies/jp_auto_voluntary_export_restraint_1981.yaml); explicit control axes: none
+- `jp_big_bang_financial_reform_1996` (policies/jp_big_bang_financial_reform_1996.yaml); explicit control axes: none
+- `jp_boj_bubble_easing_tightening_1987_1991` (policies/jp_boj_bubble_easing_tightening_1987_1991.yaml); explicit control axes: none
+- `jp_boj_gfc_rate_cuts_jgb_purchases_2008_2009` (policies/jp_boj_gfc_rate_cuts_jgb_purchases_2008_2009.yaml); explicit control axes: none
+- `jp_boj_quantitative_easing_2001_2006` (policies/jp_boj_quantitative_easing_2001_2006.yaml); explicit control axes: none
+- `jp_boj_rate_hike_0_5_2025` (policies/jp_boj_rate_hike_0_5_2025.yaml); explicit control axes: none
+- `jp_boj_rate_normalisation_2006_2007` (policies/jp_boj_rate_normalisation_2006_2007.yaml); explicit control axes: none
+- `jp_boj_ycc_exit_2024` (policies/jp_boj_ycc_exit_2024.yaml); explicit control axes: none
+- `jp_central_government_reform_2001` (policies/jp_central_government_reform_2001.yaml); explicit control axes: none
+- `jp_consumption_tax_3pct_1989` (policies/jp_consumption_tax_3pct_1989.yaml); explicit control axes: none
+- `jp_consumption_tax_5pct_legislation_1994` (policies/jp_consumption_tax_5pct_legislation_1994.yaml); explicit control axes: none
+- `jp_consumption_tax_hike_1997` (policies/jp_consumption_tax_hike_1997.yaml); explicit control axes: none
+- `jp_defence_build_up_plan_2022` (policies/jp_defence_build_up_plan_2022.yaml); explicit control axes: none
+- `jp_defence_ministry_upgrade_2007` (policies/jp_defence_ministry_upgrade_2007.yaml); explicit control axes: none
+- `jp_digital_agency_2021` (policies/jp_digital_agency_2021.yaml); explicit control axes: none
+- `jp_dpj_child_allowance_2010` (policies/jp_dpj_child_allowance_2010.yaml); explicit control axes: none
+- `jp_dpj_farmer_income_compensation_2010` (policies/jp_dpj_farmer_income_compensation_2010.yaml); explicit control axes: none
+- `jp_dpj_high_school_tuition_free_2010` (policies/jp_dpj_high_school_tuition_free_2010.yaml); explicit control axes: none
+- `jp_dpj_shiwake_budget_screening_2009` (policies/jp_dpj_shiwake_budget_screening_2009.yaml); explicit control axes: none
+- `jp_e_japan_strategy_2001` (policies/jp_e_japan_strategy_2001.yaml); explicit control axes: none
+- `jp_economic_security_act_2022` (policies/jp_economic_security_act_2022.yaml); explicit control axes: none
+- `jp_expressway_privatisation_2005` (policies/jp_expressway_privatisation_2005.yaml); explicit control axes: none
+- `jp_financial_revitalisation_act_1998` (policies/jp_financial_revitalisation_act_1998.yaml); explicit control axes: none
+- `jp_financial_stabilisation_package_1998` (policies/jp_financial_stabilisation_package_1998.yaml); explicit control axes: none
+- `jp_fiscal_structural_reform_act_1997` (policies/jp_fiscal_structural_reform_act_1997.yaml); explicit control axes: none
+- `jp_fukuda_locomotive_stimulus_1977` (policies/jp_fukuda_locomotive_stimulus_1977.yaml); explicit control axes: none
+- `jp_fundamental_education_law_revision_2006` (policies/jp_fundamental_education_law_revision_2006.yaml); explicit control axes: none
+- `jp_fy2025_minority_budget_2025` (policies/jp_fy2025_minority_budget_2025.yaml); explicit control axes: none
+- `jp_green_growth_strategy_2020` (policies/jp_green_growth_strategy_2020.yaml); explicit control axes: none
+- `jp_gulf_war_contribution_1991` (policies/jp_gulf_war_contribution_1991.yaml); explicit control axes: none
+- `jp_gx_green_transformation_2023` (policies/jp_gx_green_transformation_2023.yaml); explicit control axes: none
+- `jp_hosokawa_stimulus_package_1994` (policies/jp_hosokawa_stimulus_package_1994.yaml); explicit control axes: none
+- `jp_iraq_special_measures_law_2003` (policies/jp_iraq_special_measures_law_2003.yaml); explicit control axes: none
+- `jp_japan_indonesia_epa_2007` (policies/jp_japan_indonesia_epa_2007.yaml); explicit control axes: none
+- `jp_jnr_privatisation_1987` (policies/jp_jnr_privatisation_1987.yaml); explicit control axes: none
+- `jp_jt_privatisation_1985` (policies/jp_jt_privatisation_1985.yaml); explicit control axes: none
+- `jp_jusen_bailout_1996` (policies/jp_jusen_bailout_1996.yaml); explicit control axes: none
+- `jp_kan_consumption_tax_10pct_pledge_2010` (policies/jp_kan_consumption_tax_10pct_pledge_2010.yaml); explicit control axes: none
+- `jp_kan_fit_renewable_law_2011` (policies/jp_kan_fit_renewable_law_2011.yaml); explicit control axes: none
+- `jp_kan_new_growth_strategy_2010` (policies/jp_kan_new_growth_strategy_2010.yaml); explicit control axes: none
+- `jp_kan_tohoku_reconstruction_supplementary_budgets_2011` (policies/jp_kan_tohoku_reconstruction_supplementary_budgets_2011.yaml); explicit control axes: none
+- `jp_kan_tpp_interest_declaration_2010` (policies/jp_kan_tpp_interest_declaration_2010.yaml); explicit control axes: none
+- `jp_kobe_reconstruction_budget_1995` (policies/jp_kobe_reconstruction_budget_1995.yaml); explicit control axes: none
+- `jp_ldp_slush_fund_purge_2024` (policies/jp_ldp_slush_fund_purge_2024.yaml); explicit control axes: none
+- `jp_maekawa_report_1986` (policies/jp_maekawa_report_1986.yaml); explicit control axes: none
+- `jp_mobile_carrier_price_reform_2020` (policies/jp_mobile_carrier_price_reform_2020.yaml); explicit control axes: none
+- `jp_murayama_statement_1995` (policies/jp_murayama_statement_1995.yaml); explicit control axes: none
+- `jp_new_boj_law_1998` (policies/jp_new_boj_law_1998.yaml); explicit control axes: none
+- `jp_nisa_reform_2024` (policies/jp_nisa_reform_2024.yaml); explicit control axes: none
+- `jp_noda_consumption_tax_8_10_law_2012` (policies/jp_noda_consumption_tax_8_10_law_2012.yaml); explicit control axes: none
+- `jp_noda_oi_reactor_restart_2012` (policies/jp_noda_oi_reactor_restart_2012.yaml); explicit control axes: none
+- `jp_noda_senkaku_nationalisation_2012` (policies/jp_noda_senkaku_nationalisation_2012.yaml); explicit control axes: none
+- `jp_noda_tpp_negotiation_entry_2011` (policies/jp_noda_tpp_negotiation_entry_2011.yaml); explicit control axes: none
+- `jp_ntt_privatisation_1985` (policies/jp_ntt_privatisation_1985.yaml); explicit control axes: none
+- `jp_obuchi_stimulus_packages_1998_1999` (policies/jp_obuchi_stimulus_packages_1998_1999.yaml); explicit control axes: none
+- `jp_ohira_general_consumption_tax_attempt_1979` (policies/jp_ohira_general_consumption_tax_attempt_1979.yaml); explicit control axes: none
+- `jp_plaza_accord_1985` (policies/jp_plaza_accord_1985.yaml); explicit control axes: none
+- `jp_political_reform_act_1994` (policies/jp_political_reform_act_1994.yaml); explicit control axes: none
+- `jp_postal_privatisation_2005` (policies/jp_postal_privatisation_2005.yaml); explicit control axes: none
+- `jp_regional_revitalisation_2_0_2024` (policies/jp_regional_revitalisation_2_0_2024.yaml); explicit control axes: none
+- `jp_sii_structural_impediments_1990` (policies/jp_sii_structural_impediments_1990.yaml); explicit control axes: none
+- `jp_social_security_tax_integrated_reform_2012` (policies/jp_social_security_tax_integrated_reform_2012.yaml); explicit control axes: none
+- `jp_suzuki_doko_rincho_admin_reform_1981` (policies/jp_suzuki_doko_rincho_admin_reform_1981.yaml); explicit control axes: none
+- `jp_takenaka_plan_2002` (policies/jp_takenaka_plan_2002.yaml); explicit control axes: none
+- `jp_telecom_business_law_1984` (policies/jp_telecom_business_law_1984.yaml); explicit control axes: none
+- `jp_trinity_reform_local_finance_2003` (policies/jp_trinity_reform_local_finance_2003.yaml); explicit control axes: none
+- `jp_uruguay_rice_opening_1993` (policies/jp_uruguay_rice_opening_1993.yaml); explicit control axes: none
+- `jp_us_tariff_response_2025` (policies/jp_us_tariff_response_2025.yaml); explicit control axes: none
+- `jp_zero_interest_rate_policy_1999` (policies/jp_zero_interest_rate_policy_1999.yaml); explicit control axes: none
+- `ke_adani_jkia_cancellation_2024` (policies/ke_adani_jkia_cancellation_2024.yaml); explicit control axes: none
+- `ke_affordable_housing_levy_2023` (policies/ke_affordable_housing_levy_2023.yaml); explicit control axes: none
+- `ke_anglo_leasing_scandal_2004` (policies/ke_anglo_leasing_scandal_2004.yaml); explicit control axes: none
+- `ke_big_four_agenda_2017` (policies/ke_big_four_agenda_2017.yaml); explicit control axes: none
+- `ke_broad_based_government_2024` (policies/ke_broad_based_government_2024.yaml); explicit control axes: none
+- `ke_constitution_of_kenya_2010` (policies/ke_constitution_of_kenya_2010.yaml); explicit control axes: none
+- `ke_constitutional_referendum_2005` (policies/ke_constitutional_referendum_2005.yaml); explicit control axes: none
+- `ke_eac_customs_union_2005` (policies/ke_eac_customs_union_2005.yaml); explicit control axes: none
+- `ke_economic_recovery_strategy_2003` (policies/ke_economic_recovery_strategy_2003.yaml); explicit control axes: none
+- `ke_excise_duty_act_2015` (policies/ke_excise_duty_act_2015.yaml); explicit control axes: none
+- `ke_finance_act_2023` (policies/ke_finance_act_2023.yaml); explicit control axes: none
+- `ke_finance_bill_2024_withdrawal` (policies/ke_finance_bill_2024_withdrawal.yaml); explicit control axes: none
+- `ke_free_primary_education_2003` (policies/ke_free_primary_education_2003.yaml); explicit control axes: none
+- `ke_goldenberg_scandal_1991_1993` (policies/ke_goldenberg_scandal_1991_1993.yaml); explicit control axes: none
+- `ke_handshake_bbi_2018` (policies/ke_handshake_bbi_2018.yaml); explicit control axes: none
+- `ke_imf_eff_ecf_2021` (policies/ke_imf_eff_ecf_2021.yaml); explicit control axes: none
+- `ke_imf_sap_1980s` (policies/ke_imf_sap_1980s.yaml); explicit control axes: none
+- `ke_mpesa_scaling_regulation_2008_2013` (policies/ke_mpesa_scaling_regulation_2008_2013.yaml); explicit control axes: none
+- `ke_multiparty_restoration_1991` (policies/ke_multiparty_restoration_1991.yaml); explicit control axes: none
+- `ke_national_accord_2008` (policies/ke_national_accord_2008.yaml); explicit control axes: none
+- `ke_nyayo_tea_zones_1986` (policies/ke_nyayo_tea_zones_1986.yaml); explicit control axes: none
+- `ke_section_2a_one_party_amendment_1982` (policies/ke_section_2a_one_party_amendment_1982.yaml); explicit control axes: none
+- `ke_sgr_phase1_2017` (policies/ke_sgr_phase1_2017.yaml); explicit control axes: none
+- `ke_vision_2030_launch_2008` (policies/ke_vision_2030_launch_2008.yaml); explicit control axes: none
+- `kenya_2010_constitution_devolution` (policies/kenya_2010_constitution_devolution.yaml); explicit control axes: none
+- `kenya_cbk_price_stability_mandate` (policies/kenya_cbk_price_stability_mandate.yaml); explicit control axes: none
+- `kenya_free_primary_education_2003` (policies/kenya_free_primary_education_2003.yaml); explicit control axes: none
+- `kenya_mpesa_regulatory_accommodation_2007` (policies/kenya_mpesa_regulatory_accommodation_2007.yaml); explicit control axes: none
+- `kenya_vision_2030_plan_2008` (policies/kenya_vision_2030_plan_2008.yaml); explicit control axes: none
+- `khm_collectivisation_communes_1975` (policies/khm_collectivisation_communes_1975.yaml); explicit control axes: none
+- `khm_money_market_abolition_1975` (policies/khm_money_market_abolition_1975.yaml); explicit control axes: none
+- `khm_urban_evacuation_1975` (policies/khm_urban_evacuation_1975.yaml); explicit control axes: none
+- `korea_directed_credit_1962_1979` (policies/korea_directed_credit_1962_1979.yaml); explicit control axes: none
+- `korea_export_subsidy_regime_1965_1979` (policies/korea_export_subsidy_regime_1965_1979.yaml); explicit control axes: none
+- `korea_hcidrive_1973` (policies/korea_hcidrive_1973.yaml); explicit control axes: none
+- `korea_imf_reforms_1998` (policies/korea_imf_reforms_1998.yaml); explicit control axes: none
+- `korea_land_reform_1949_1961` (policies/korea_land_reform_1949_1961.yaml); explicit control axes: none
+- `korea_park_hci_1973` (policies/korea_park_hci_1973.yaml); explicit control axes: none
+- `kr_52_hour_work_week_2018` (policies/kr_52_hour_work_week_2018.yaml); explicit control axes: none
+- `kr_capital_account_liberalisation_1993_1997` (policies/kr_capital_account_liberalisation_1993_1997.yaml); explicit control axes: none
+- `kr_chaebol_reform_five_plus_three_1998` (policies/kr_chaebol_reform_five_plus_three_1998.yaml); explicit control axes: none
+- `kr_chaebol_restructuring_1980` (policies/kr_chaebol_restructuring_1980.yaml); explicit control axes: none
+- `kr_chun_price_stabilisation_1981` (policies/kr_chun_price_stabilisation_1981.yaml); explicit control axes: none
+- `kr_commercial_bank_denationalisation_1981` (policies/kr_commercial_bank_denationalisation_1981.yaml); explicit control axes: none
+- `kr_commercial_code_fiduciary_reform_2025` (policies/kr_commercial_code_fiduciary_reform_2025.yaml); explicit control axes: none
+- `kr_comprehensive_property_tax_2005` (policies/kr_comprehensive_property_tax_2005.yaml); explicit control axes: none
+- `kr_corporate_tax_cut_2023` (policies/kr_corporate_tax_cut_2023.yaml); explicit control axes: none
+- `kr_corporate_tax_restoration_2025` (policies/kr_corporate_tax_restoration_2025.yaml); explicit control axes: none
+- `kr_cyber_korea_21_broadband_1999` (policies/kr_cyber_korea_21_broadband_1999.yaml); explicit control axes: none
+- `kr_fair_trade_law_1980` (policies/kr_fair_trade_law_1980.yaml); explicit control axes: none
+- `kr_four_major_rivers_restoration_2009_2012` (policies/kr_four_major_rivers_restoration_2009_2012.yaml); explicit control axes: none
+- `kr_imf_programme_conditions_1998` (policies/kr_imf_programme_conditions_1998.yaml); explicit control axes: none
+- `kr_imf_standby_1997` (policies/kr_imf_standby_1997.yaml); explicit control axes: none
+- `kr_inheritance_tax_reform_attempt_2024` (policies/kr_inheritance_tax_reform_attempt_2024.yaml); explicit control axes: none
+- `kr_inter_korean_engagement_2018_2019` (policies/kr_inter_korean_engagement_2018_2019.yaml); explicit control axes: none
+- `kr_inter_korean_summit_october_2007` (policies/kr_inter_korean_summit_october_2007.yaml); explicit control axes: none
+- `kr_iraq_zaytun_dispatch_2004` (policies/kr_iraq_zaytun_dispatch_2004.yaml); explicit control axes: none
+- `kr_june_29_declaration_1987` (policies/kr_june_29_declaration_1987.yaml); explicit control axes: none
+- `kr_korean_new_deal_covid_2020` (policies/kr_korean_new_deal_covid_2020.yaml); explicit control axes: none
+- `kr_korus_fta_signing_2007` (policies/kr_korus_fta_signing_2007.yaml); explicit control axes: none
+- `kr_labour_law_reform_1996` (policies/kr_labour_law_reform_1996.yaml); explicit control axes: none
+- `kr_lee_corporate_tax_cut_2008_2009` (policies/kr_lee_corporate_tax_cut_2008_2009.yaml); explicit control axes: none
+- `kr_lee_green_growth_basic_act_2010` (policies/kr_lee_green_growth_basic_act_2010.yaml); explicit control axes: none
+- `kr_lee_korus_fta_ratification_2011` (policies/kr_lee_korus_fta_ratification_2011.yaml); explicit control axes: none
+- `kr_lee_may_24_measures_2010` (policies/kr_lee_may_24_measures_2010.yaml); explicit control axes: none
+- `kr_livelihood_recovery_supplementary_budget_2025` (policies/kr_livelihood_recovery_supplementary_budget_2025.yaml); explicit control axes: none
+- `kr_martial_law_declaration_december_2024` (policies/kr_martial_law_declaration_december_2024.yaml); explicit control axes: none
+- `kr_minimum_wage_hikes_2018_2019` (policies/kr_minimum_wage_hikes_2018_2019.yaml); explicit control axes: none
+- `kr_national_basic_livelihood_security_act_1999` (policies/kr_national_basic_livelihood_security_act_1999.yaml); explicit control axes: none
+- `kr_national_health_insurance_unification_2000` (policies/kr_national_health_insurance_unification_2000.yaml); explicit control axes: none
+- `kr_nordpolitik_1988_1992` (policies/kr_nordpolitik_1988_1992.yaml); explicit control axes: none
+- `kr_nuclear_phaseout_posture_2017_2022` (policies/kr_nuclear_phaseout_posture_2017_2022.yaml); explicit control axes: none
+- `kr_nuclear_restoration_2022_2024` (policies/kr_nuclear_restoration_2022_2024.yaml); explicit control axes: none
+- `kr_oecd_accession_1996` (policies/kr_oecd_accession_1996.yaml); explicit control axes: none
+- `kr_park_choinomics_stimulus_ltv_dti_2014_2015` (policies/kr_park_choinomics_stimulus_ltv_dti_2014_2015.yaml); explicit control axes: none
+- `kr_park_creative_economy_centres_2014` (policies/kr_park_creative_economy_centres_2014.yaml); explicit control axes: none
+- `kr_park_japan_comfort_women_agreement_2015` (policies/kr_park_japan_comfort_women_agreement_2015.yaml); explicit control axes: none
+- `kr_park_public_sector_performance_wage_2016` (policies/kr_park_public_sector_performance_wage_2016.yaml); explicit control axes: none
+- `kr_park_thaad_deployment_2016` (policies/kr_park_thaad_deployment_2016.yaml); explicit control axes: none
+- `kr_property_tightening_packages_2017_2021` (policies/kr_property_tightening_packages_2017_2021.yaml); explicit control axes: none
+- `kr_prosecution_reform_2025` (policies/kr_prosecution_reform_2025.yaml); explicit control axes: none
+- `kr_real_estate_deregulation_2022_2024` (policies/kr_real_estate_deregulation_2022_2024.yaml); explicit control axes: none
+- `kr_real_name_financial_1993` (policies/kr_real_name_financial_1993.yaml); explicit control axes: none
+- `kr_roh_impeachment_and_reinstatement_2004` (policies/kr_roh_impeachment_and_reinstatement_2004.yaml); explicit control axes: none
+- `kr_sejong_relocation_plan_2005` (policies/kr_sejong_relocation_plan_2005.yaml); explicit control axes: none
+- `kr_seoul_olympics_preparation_1981_1988` (policies/kr_seoul_olympics_preparation_1981_1988.yaml); explicit control axes: none
+- `kr_sunshine_policy_inter_korean_summit_2000` (policies/kr_sunshine_policy_inter_korean_summit_2000.yaml); explicit control axes: none
+- `kr_three_party_merger_dlp_1990` (policies/kr_three_party_merger_dlp_1990.yaml); explicit control axes: none
+- `kr_two_million_housing_1988` (policies/kr_two_million_housing_1988.yaml); explicit control axes: none
+- `kr_universal_basic_income_youth_dividend_2025` (policies/kr_universal_basic_income_youth_dividend_2025.yaml); explicit control axes: none
+- `kr_wage_labour_liberalisation_post_1987` (policies/kr_wage_labour_liberalisation_post_1987.yaml); explicit control axes: none
+- `kr_yoon_biden_washington_declaration_2023` (policies/kr_yoon_biden_washington_declaration_2023.yaml); explicit control axes: none
+- `kwt_constitution_parliament_1962` (policies/kwt_constitution_parliament_1962.yaml); explicit control axes: none
+- `kwt_general_reserve_future_generations_funds_1976` (policies/kwt_general_reserve_future_generations_funds_1976.yaml); explicit control axes: none
+- `kwt_public_employment_welfare_distribution_1960s_present` (policies/kwt_public_employment_welfare_distribution_1960s_present.yaml); explicit control axes: none
+- `kz_mass_privatization_1993_1998` (policies/kz_mass_privatization_1993_1998.yaml); explicit control axes: none
+- `kz_national_fund_2000` (policies/kz_national_fund_2000.yaml); explicit control axes: none
+- `kz_tengiz_oil_opening_1993` (policies/kz_tengiz_oil_opening_1993.yaml); explicit control axes: none
+- `lao_agricultural_collectivisation_1978` (policies/lao_agricultural_collectivisation_1978.yaml); explicit control axes: none
+- `lao_bank_trade_nationalisation_1975` (policies/lao_bank_trade_nationalisation_1975.yaml); explicit control axes: none
+- `lao_first_five_year_plan_1981` (policies/lao_first_five_year_plan_1981.yaml); explicit control axes: none
+- `lb_bdl_recapitalisation_2025` (policies/lb_bdl_recapitalisation_2025.yaml); explicit control axes: none
+- `lb_deposit_restitution_framework_2025` (policies/lb_deposit_restitution_framework_2025.yaml); explicit control axes: none
+- `lb_imf_program_2025` (policies/lb_imf_program_2025.yaml); explicit control axes: none
+- `lb_unsc_1701_implementation_2025` (policies/lb_unsc_1701_implementation_2025.yaml); explicit control axes: none
+- `lebanon_bdl_financial_engineering_2016` (policies/lebanon_bdl_financial_engineering_2016.yaml); explicit control axes: none
+- `lebanon_default_march_2020` (policies/lebanon_default_march_2020.yaml); explicit control axes: none
+- `lebanon_edl_subsidy_1992_2020` (policies/lebanon_edl_subsidy_1992_2020.yaml); explicit control axes: none
+- `lebanon_lbp_peg_1997` (policies/lebanon_lbp_peg_1997.yaml); explicit control axes: none
+- `lebanon_solidere_1994` (policies/lebanon_solidere_1994.yaml); explicit control axes: none
+- `lebanon_sovereign_debt_accumulation_1992_2019` (policies/lebanon_sovereign_debt_accumulation_1992_2019.yaml); explicit control axes: none
+- `lk_cbsl_act_2023` (policies/lk_cbsl_act_2023.yaml); explicit control axes: none
+- `lk_imf_eff_2023` (policies/lk_imf_eff_2023.yaml); explicit control axes: none
+- `lk_npp_anti_corruption_platform_2024` (policies/lk_npp_anti_corruption_platform_2024.yaml); explicit control axes: none
+- `lk_organic_farming_mandate_2021` (policies/lk_organic_farming_mandate_2021.yaml); explicit control axes: none
+- `lk_rajapaksa_tax_cuts_2019` (policies/lk_rajapaksa_tax_cuts_2019.yaml); explicit control axes: none
+- `lk_soe_reform_act_2024` (policies/lk_soe_reform_act_2024.yaml); explicit control axes: none
+- `lk_sovereign_default_2022` (policies/lk_sovereign_default_2022.yaml); explicit control axes: none
+- `lt_euro_adoption_2015` (policies/lt_euro_adoption_2015.yaml); explicit control axes: none
+- `lux_climate_law_carbon_tax_2020` (policies/lux_climate_law_carbon_tax_2020.yaml); explicit control axes: none
+- `lux_free_public_transport_2020` (policies/lux_free_public_transport_2020.yaml); explicit control axes: none
+- `lv_euro_adoption_2014` (policies/lv_euro_adoption_2014.yaml); explicit control axes: none
+- `maastricht_treaty_1992` (policies/maastricht_treaty_1992.yaml); explicit control axes: none
+- `malaysia_bumiputera_equity_target_nep` (policies/malaysia_bumiputera_equity_target_nep.yaml); explicit control axes: none
+- `malaysia_capital_controls_1998` (policies/malaysia_capital_controls_1998.yaml); explicit control axes: none
+- `malaysia_hicom_heavy_industry_1981` (policies/malaysia_hicom_heavy_industry_1981.yaml); explicit control axes: none
+- `malaysia_look_east_policy_1981` (policies/malaysia_look_east_policy_1981.yaml); explicit control axes: none
+- `malaysia_privatisation_masterplan_1991` (policies/malaysia_privatisation_masterplan_1991.yaml); explicit control axes: none
+- `mar_administrative_agrarian_consolidation_1956_1969` (policies/mar_administrative_agrarian_consolidation_1956_1969.yaml); explicit control axes: none
+- `mar_irrigation_dam_agriculture_strategy_1967_1990` (policies/mar_irrigation_dam_agriculture_strategy_1967_1990.yaml); explicit control axes: none
+- `mar_moroccanisation_1973` (policies/mar_moroccanisation_1973.yaml); explicit control axes: none
+- `mexico_article_27_ejido_reform_1992` (policies/mexico_article_27_ejido_reform_1992.yaml); explicit control axes: none
+- `mexico_article_27_reform_1992` (policies/mexico_article_27_reform_1992.yaml); explicit control axes: none
+- `mexico_bank_reprivatisation_1991_1992` (policies/mexico_bank_reprivatisation_1991_1992.yaml); explicit control axes: none
+- `mexico_banxico_autonomy_1993` (policies/mexico_banxico_autonomy_1993.yaml); explicit control axes: none
+- `mexico_banxico_autonomy_1994` (policies/mexico_banxico_autonomy_1994.yaml); explicit control axes: none
+- `mexico_brady_plan_1989` (policies/mexico_brady_plan_1989.yaml); explicit control axes: none
+- `mexico_nafta_1994` (policies/mexico_nafta_1994.yaml); explicit control axes: none
+- `mexico_nafta_accession_1994` (policies/mexico_nafta_accession_1994.yaml); explicit control axes: none
+- `mexico_pacto_de_solidaridad` (policies/mexico_pacto_de_solidaridad.yaml); explicit control axes: none
+- `mexico_privatisations_1990_1994` (policies/mexico_privatisations_1990_1994.yaml); explicit control axes: none
+- `mexico_solidaridad_program` (policies/mexico_solidaridad_program.yaml); explicit control axes: none
+- `mexico_telmex_privatisation_1990` (policies/mexico_telmex_privatisation_1990.yaml); explicit control axes: none
+- `mmr_enterprise_nationalisation_1963` (policies/mmr_enterprise_nationalisation_1963.yaml); explicit control axes: none
+- `mmr_socialist_planning_system_1962_1988` (policies/mmr_socialist_planning_system_1962_1988.yaml); explicit control axes: none
+- `mmr_state_trade_monopoly_1964` (policies/mmr_state_trade_monopoly_1964.yaml); explicit control axes: none
+- `mt_euro_adoption_2008` (policies/mt_euro_adoption_2008.yaml); explicit control axes: none
+- `mx_1982_peso_devaluation_moratorium` (policies/mx_1982_peso_devaluation_moratorium.yaml); explicit control axes: none
+- `mx_austerity_decree_2019` (policies/mx_austerity_decree_2019.yaml); explicit control axes: none
+- `mx_autonomous_bodies_abolition_2024` (policies/mx_autonomous_bodies_abolition_2024.yaml); explicit control axes: none
+- `mx_bank_nationalisation_decree_1982` (policies/mx_bank_nationalisation_decree_1982.yaml); explicit control axes: none
+- `mx_banxico_inflation_targeting_1999` (policies/mx_banxico_inflation_targeting_1999.yaml); explicit control axes: none
+- `mx_calderon_drug_war_2006` (policies/mx_calderon_drug_war_2006.yaml); explicit control axes: none
+- `mx_cantarell_pemex_expansion_1976_1981` (policies/mx_cantarell_pemex_expansion_1976_1981.yaml); explicit control axes: none
+- `mx_dos_bocas_refinery_2019` (policies/mx_dos_bocas_refinery_2019.yaml); explicit control axes: none
+- `mx_education_reform_2013` (policies/mx_education_reform_2013.yaml); explicit control axes: none
+- `mx_electoral_reform_ife_1996` (policies/mx_electoral_reform_ife_1996.yaml); explicit control axes: none
+- `mx_electricity_industry_law_reform_2021` (policies/mx_electricity_industry_law_reform_2021.yaml); explicit control axes: none
+- `mx_energy_reform_2013` (policies/mx_energy_reform_2013.yaml); explicit control axes: none
+- `mx_federal_labour_law_reform_2012` (policies/mx_federal_labour_law_reform_2012.yaml); explicit control axes: none
+- `mx_financial_reform_2014` (policies/mx_financial_reform_2014.yaml); explicit control axes: none
+- `mx_fiscal_reform_2001_partial` (policies/mx_fiscal_reform_2001_partial.yaml); explicit control axes: none
+- `mx_fiscal_reform_2014` (policies/mx_fiscal_reform_2014.yaml); explicit control axes: none
+- `mx_fobaproa_ipab_banking_bailout_1995_1998` (policies/mx_fobaproa_ipab_banking_bailout_1995_1998.yaml); explicit control axes: none
+- `mx_gatt_accession_1986` (policies/mx_gatt_accession_1986.yaml); explicit control axes: none
+- `mx_gfc_countercyclical_package_2009` (policies/mx_gfc_countercyclical_package_2009.yaml); explicit control axes: none
+- `mx_global_development_plan_1980` (policies/mx_global_development_plan_1980.yaml); explicit control axes: none
+- `mx_ietu_flat_alt_tax_2007` (policies/mx_ietu_flat_alt_tax_2007.yaml); explicit control axes: none
+- `mx_ifai_transparency_strengthening_2007_2012` (policies/mx_ifai_transparency_strengthening_2007_2012.yaml); explicit control axes: none
+- `mx_ife_autonomy_consolidation_2000_2006` (policies/mx_ife_autonomy_consolidation_2000_2006.yaml); explicit control axes: none
+- `mx_imf_eff_1982_1985` (policies/mx_imf_eff_1982_1985.yaml); explicit control axes: none
+- `mx_judicial_reform_2024` (policies/mx_judicial_reform_2024.yaml); explicit control axes: none
+- `mx_minimum_wage_doubling_2018_2024` (policies/mx_minimum_wage_doubling_2018_2024.yaml); explicit control axes: none
+- `mx_national_guard_sedena_2024` (policies/mx_national_guard_sedena_2024.yaml); explicit control axes: none
+- `mx_oil_boom_external_borrowing_1978_1982` (policies/mx_oil_boom_external_borrowing_1978_1982.yaml); explicit control axes: none
+- `mx_oportunidades_expansion_2002` (policies/mx_oportunidades_expansion_2002.yaml); explicit control axes: none
+- `mx_outsourcing_reform_2021` (policies/mx_outsourcing_reform_2021.yaml); explicit control axes: none
+- `mx_pacto_solidaridad_economica_1987` (policies/mx_pacto_solidaridad_economica_1987.yaml); explicit control axes: none
+- `mx_parastatal_divestment_pronafide_1983_1988` (policies/mx_parastatal_divestment_pronafide_1983_1988.yaml); explicit control axes: none
+- `mx_pemex_reform_failure_2001_2006` (policies/mx_pemex_reform_failure_2001_2006.yaml); explicit control axes: none
+- `mx_plan_mexico_2025` (policies/mx_plan_mexico_2025.yaml); explicit control axes: none
+- `mx_political_electoral_reform_2014` (policies/mx_political_electoral_reform_2014.yaml); explicit control axes: none
+- `mx_seguro_popular_2003` (policies/mx_seguro_popular_2003.yaml); explicit control axes: none
+- `mx_sembrando_vida_2019` (policies/mx_sembrando_vida_2019.yaml); explicit control axes: none
+- `mx_supreme_court_election_2025` (policies/mx_supreme_court_election_2025.yaml); explicit control axes: none
+- `mx_telecoms_reform_2013` (policies/mx_telecoms_reform_2013.yaml); explicit control axes: none
+- `mx_tequila_crisis_rescue_1994_1995` (policies/mx_tequila_crisis_rescue_1994_1995.yaml); explicit control axes: none
+- `mx_texcoco_airport_cancellation_2018` (policies/mx_texcoco_airport_cancellation_2018.yaml); explicit control axes: none
+- `mx_tren_maya_2020_2024` (policies/mx_tren_maya_2020_2024.yaml); explicit control axes: none
+- `mx_universal_pension_2019_2024` (policies/mx_universal_pension_2019_2024.yaml); explicit control axes: none
+- `my_1mdb_scandal_2009_2018` (policies/my_1mdb_scandal_2009_2018.yaml); explicit control axes: none
+- `my_2008_political_tsunami_election` (policies/my_2008_political_tsunami_election.yaml); explicit control axes: none
+- `my_anti_hopping_law_2022` (policies/my_anti_hopping_law_2022.yaml); explicit control axes: none
+- `my_border_reopening_2022` (policies/my_border_reopening_2022.yaml); explicit control axes: none
+- `my_br1m_cash_transfer_2012` (policies/my_br1m_cash_transfer_2012.yaml); explicit control axes: none
+- `my_budget_2022_cukai_makmur` (policies/my_budget_2022_cukai_makmur.yaml); explicit control axes: none
+- `my_capital_gains_tax_2024` (policies/my_capital_gains_tax_2024.yaml); explicit control axes: none
+- `my_corridor_development_plans_2007` (policies/my_corridor_development_plans_2007.yaml); explicit control axes: none
+- `my_diesel_subsidy_rationalisation_2024` (policies/my_diesel_subsidy_rationalisation_2024.yaml); explicit control axes: none
+- `my_einvoicing_mandate_2024` (policies/my_einvoicing_mandate_2024.yaml); explicit control axes: none
+- `my_ekonomi_madani_framework_2023` (policies/my_ekonomi_madani_framework_2023.yaml); explicit control axes: none
+- `my_emergency_proclamation_2021` (policies/my_emergency_proclamation_2021.yaml); explicit control axes: none
+- `my_epf_i_withdrawal_schemes_2020_2021` (policies/my_epf_i_withdrawal_schemes_2020_2021.yaml); explicit control axes: none
+- `my_etp_nem_transformation_2010` (policies/my_etp_nem_transformation_2010.yaml); explicit control axes: none
+- `my_fourth_malaysia_plan_1981_1985` (policies/my_fourth_malaysia_plan_1981_1985.yaml); explicit control axes: none
+- `my_fuel_subsidy_partial_reform_2008` (policies/my_fuel_subsidy_partial_reform_2008.yaml); explicit control axes: none
+- `my_fuel_subsidy_rationalisation_managed_float_2014` (policies/my_fuel_subsidy_rationalisation_managed_float_2014.yaml); explicit control axes: none
+- `my_gst_implementation_2015` (policies/my_gst_implementation_2015.yaml); explicit control axes: none
+- `my_hicom_establishment_1980` (policies/my_hicom_establishment_1980.yaml); explicit control axes: none
+- `my_hindraf_rally_ethnic_indian_grievance_2007` (policies/my_hindraf_rally_ethnic_indian_grievance_2007.yaml); explicit control axes: none
+- `my_industrial_coordination_act_enforcement_1976` (policies/my_industrial_coordination_act_enforcement_1976.yaml); explicit control axes: none
+- `my_iskandar_malaysia_idr_2006` (policies/my_iskandar_malaysia_idr_2006.yaml); explicit control axes: none
+- `my_judicial_crisis_1988` (policies/my_judicial_crisis_1988.yaml); explicit control axes: none
+- `my_keluarga_malaysia_pemulih_2021` (policies/my_keluarga_malaysia_pemulih_2021.yaml); explicit control axes: none
+- `my_look_east_policy_1982` (policies/my_look_east_policy_1982.yaml); explicit control axes: none
+- `my_mco_movement_control_order_2020` (policies/my_mco_movement_control_order_2020.yaml); explicit control axes: none
+- `my_msc_multimedia_corridor_1996` (policies/my_msc_multimedia_corridor_1996.yaml); explicit control axes: none
+- `my_mysejahtera_2020` (policies/my_mysejahtera_2020.yaml); explicit control axes: none
+- `my_ninth_malaysia_plan_2006` (policies/my_ninth_malaysia_plan_2006.yaml); explicit control axes: none
+- `my_operation_lalang_1987` (policies/my_operation_lalang_1987.yaml); explicit control axes: none
+- `my_petronas_expansion_1976_1981` (policies/my_petronas_expansion_1976_1981.yaml); explicit control axes: none
+- `my_prihatin_penjana_pemulih_2020_2021` (policies/my_prihatin_penjana_pemulih_2020_2021.yaml); explicit control axes: none
+- `my_privatisation_master_plan_1983` (policies/my_privatisation_master_plan_1983.yaml); explicit control axes: none
+- `my_privatisation_wave_1991_1997` (policies/my_privatisation_wave_1991_1997.yaml); explicit control axes: none
+- `my_progressive_wage_pilot_2024` (policies/my_progressive_wage_pilot_2024.yaml); explicit control axes: none
+- `my_proton_saga_launch_1985` (policies/my_proton_saga_launch_1985.yaml); explicit control axes: none
+- `my_putrajaya_capital_project_1995` (policies/my_putrajaya_capital_project_1995.yaml); explicit control axes: none
+- `my_ringgit_capital_controls_1998` (policies/my_ringgit_capital_controls_1998.yaml); explicit control axes: none
+- `my_telekom_malaysia_corporatisation_1987` (policies/my_telekom_malaysia_corporatisation_1987.yaml); explicit control axes: none
+- `my_third_malaysia_plan_1976_1980` (policies/my_third_malaysia_plan_1976_1980.yaml); explicit control axes: none
+- `my_tpp_signature_2016` (policies/my_tpp_signature_2016.yaml); explicit control axes: none
+- `my_wawasan_2020_announcement_1991` (policies/my_wawasan_2020_announcement_1991.yaml); explicit control axes: none
+- `netherlands_energy_act_1998` (policies/netherlands_energy_act_1998.yaml); explicit control axes: none
+- `netherlands_flexwet_flexibility_security_1999` (policies/netherlands_flexwet_flexibility_security_1999.yaml); explicit control axes: none
+- `netherlands_kinderopvang_part_time_promotion_1996_2002` (policies/netherlands_kinderopvang_part_time_promotion_1996_2002.yaml); explicit control axes: none
+- `netherlands_kpn_privatisation_1994` (policies/netherlands_kpn_privatisation_1994.yaml); explicit control axes: none
+- `netherlands_nmp_environmental_plan_1989` (policies/netherlands_nmp_environmental_plan_1989.yaml); explicit control axes: none
+- `netherlands_oort_tax_reform_1990` (policies/netherlands_oort_tax_reform_1990.yaml); explicit control axes: none
+- `netherlands_ptt_corporatisation_1989` (policies/netherlands_ptt_corporatisation_1989.yaml); explicit control axes: none
+- `netherlands_wao_disability_reform_tba_1993` (policies/netherlands_wao_disability_reform_tba_1993.yaml); explicit control axes: none
+- `netherlands_wassenaar_continuation_1986_1994` (policies/netherlands_wassenaar_continuation_1986_1994.yaml); explicit control axes: none
+- `netherlands_zalm_norm_fiscal_rule_1994` (policies/netherlands_zalm_norm_fiscal_rule_1994.yaml); explicit control axes: none
+- `netherlands_zorgverzekering_2006` (policies/netherlands_zorgverzekering_2006.yaml); explicit control axes: none
+- `new_zealand_agricultural_methane_levy_design_2022_2024` (policies/new_zealand_agricultural_methane_levy_design_2022_2024.yaml); explicit control axes: none
+- `new_zealand_climate_commission_2019` (policies/new_zealand_climate_commission_2019.yaml); explicit control axes: none
+- `new_zealand_ets_reform_2020` (policies/new_zealand_ets_reform_2020.yaml); explicit control axes: none
+- `new_zealand_rogernomics_1984_1990` (policies/new_zealand_rogernomics_1984_1990.yaml); explicit control axes: none
+- `new_zealand_zero_carbon_act_2019` (policies/new_zealand_zero_carbon_act_2019.yaml); explicit control axes: none
+- `ng_1979_constitution_civilian_transition` (policies/ng_1979_constitution_civilian_transition.yaml); explicit control axes: none
+- `ng_1983_election_crisis` (policies/ng_1983_election_crisis.yaml); explicit control axes: none
+- `ng_agric_transformation_ewallet_2012` (policies/ng_agric_transformation_ewallet_2012.yaml); explicit control axes: none
+- `ng_anchor_borrowers_programme_2015` (policies/ng_anchor_borrowers_programme_2015.yaml); explicit control axes: none
+- `ng_cbn_bank_consolidation_2004` (policies/ng_cbn_bank_consolidation_2004.yaml); explicit control axes: none
+- `ng_cbn_cardoso_orthodoxy_2023` (policies/ng_cbn_cardoso_orthodoxy_2023.yaml); explicit control axes: none
+- `ng_cbn_ways_and_means_financing_2015_2023` (policies/ng_cbn_ways_and_means_financing_2015_2023.yaml); explicit control axes: none
+- `ng_chibok_boko_haram_crisis_2014` (policies/ng_chibok_boko_haram_crisis_2014.yaml); explicit control axes: none
+- `ng_covid_imf_rfi_2020` (policies/ng_covid_imf_rfi_2020.yaml); explicit control axes: none
+- `ng_decree_4_press_restrictions_1984` (policies/ng_decree_4_press_restrictions_1984.yaml); explicit control axes: none
+- `ng_doctrine_of_necessity_2010` (policies/ng_doctrine_of_necessity_2010.yaml); explicit control axes: none
+- `ng_dual_exchange_rate_1994` (policies/ng_dual_exchange_rate_1994.yaml); explicit control axes: none
+- `ng_economic_stabilization_act_1982` (policies/ng_economic_stabilization_act_1982.yaml); explicit control axes: none
+- `ng_efcc_establishment_2003` (policies/ng_efcc_establishment_2003.yaml); explicit control axes: none
+- `ng_electricity_act_2023` (policies/ng_electricity_act_2023.yaml); explicit control axes: none
+- `ng_endbadgovernance_protests_response_2024` (policies/ng_endbadgovernance_protests_response_2024.yaml); explicit control axes: none
+- `ng_endsars_protests_2020` (policies/ng_endsars_protests_2020.yaml); explicit control axes: none
+- `ng_expulsion_of_aliens_1983` (policies/ng_expulsion_of_aliens_1983.yaml); explicit control axes: none
+- `ng_fourth_national_development_plan_1981_1985` (policies/ng_fourth_national_development_plan_1981_1985.yaml); explicit control axes: none
+- `ng_fuel_subsidy_removal_2023` (policies/ng_fuel_subsidy_removal_2023.yaml); explicit control axes: none
+- `ng_fx_43_item_ban_2015` (policies/ng_fx_43_item_ban_2015.yaml); explicit control axes: none
+- `ng_gdp_rebasing_2014` (policies/ng_gdp_rebasing_2014.yaml); explicit control axes: none
+- `ng_gsm_telecom_licensing_2001` (policies/ng_gsm_telecom_licensing_2001.yaml); explicit control axes: none
+- `ng_imf_loan_rejection_1985` (policies/ng_imf_loan_rejection_1985.yaml); explicit control axes: none
+- `ng_june_12_1993_election_annulment` (policies/ng_june_12_1993_election_annulment.yaml); explicit control axes: none
+- `ng_land_border_closure_2019` (policies/ng_land_border_closure_2019.yaml); explicit control axes: none
+- `ng_land_use_act_1978` (policies/ng_land_use_act_1978.yaml); explicit control axes: none
+- `ng_marketing_boards_abolition_1986` (policies/ng_marketing_boards_abolition_1986.yaml); explicit control axes: none
+- `ng_naira_currency_change_1984` (policies/ng_naira_currency_change_1984.yaml); explicit control axes: none
+- `ng_naira_float_unification_2023` (policies/ng_naira_float_unification_2023.yaml); explicit control axes: none
+- `ng_naira_redesign_2022` (policies/ng_naira_redesign_2022.yaml); explicit control axes: none
+- `ng_needs_programme_2004` (policies/ng_needs_programme_2004.yaml); explicit control axes: none
+- `ng_niger_delta_amnesty_2009` (policies/ng_niger_delta_amnesty_2009.yaml); explicit control axes: none
+- `ng_occupy_nigeria_subsidy_protest_2012` (policies/ng_occupy_nigeria_subsidy_protest_2012.yaml); explicit control axes: none
+- `ng_ogoni_nine_execution_1995` (policies/ng_ogoni_nine_execution_1995.yaml); explicit control axes: none
+- `ng_paris_club_debt_relief_2005` (policies/ng_paris_club_debt_relief_2005.yaml); explicit control axes: none
+- `ng_pension_reform_act_2014` (policies/ng_pension_reform_act_2014.yaml); explicit control axes: none
+- `ng_petroleum_industry_act_2021` (policies/ng_petroleum_industry_act_2021.yaml); explicit control axes: none
+- `ng_phcn_power_privatisation_2013` (policies/ng_phcn_power_privatisation_2013.yaml); explicit control axes: none
+- `ng_privatisation_programme_1988_1993` (policies/ng_privatisation_programme_1988_1993.yaml); explicit control axes: none
+- `ng_sanusi_bank_intervention_2009` (policies/ng_sanusi_bank_intervention_2009.yaml); explicit control axes: none
+- `ng_sap2_partial_liberalisation_1995_1997` (policies/ng_sap2_partial_liberalisation_1995_1997.yaml); explicit control axes: none
+- `ng_sap_sfem_1986` (policies/ng_sap_sfem_1986.yaml); explicit control axes: none
+- `ng_second_indigenisation_decree_1977` (policies/ng_second_indigenisation_decree_1977.yaml); explicit control axes: none
+- `ng_seven_point_agenda_2007` (policies/ng_seven_point_agenda_2007.yaml); explicit control axes: none
+- `ng_sovereign_wealth_fund_nsia_2011` (policies/ng_sovereign_wealth_fund_nsia_2011.yaml); explicit control axes: none
+- `ng_student_loan_act_2023` (policies/ng_student_loan_act_2023.yaml); explicit control axes: none
+- `ng_tax_reform_bills_2024` (policies/ng_tax_reform_bills_2024.yaml); explicit control axes: none
+- `ng_third_national_development_plan_1975_1980` (policies/ng_third_national_development_plan_1975_1980.yaml); explicit control axes: none
+- `ng_vision_2010_plan_1996` (policies/ng_vision_2010_plan_1996.yaml); explicit control axes: none
+- `ng_war_against_indiscipline_1984` (policies/ng_war_against_indiscipline_1984.yaml); explicit control axes: none
+- `nicaragua_1988_stabilisation` (policies/nicaragua_1988_stabilisation.yaml); explicit control axes: none
+- `nicaragua_agrarian_reform_1981_1986` (policies/nicaragua_agrarian_reform_1981_1986.yaml); explicit control axes: none
+- `nicaragua_banking_nationalisation_1979` (policies/nicaragua_banking_nationalisation_1979.yaml); explicit control axes: none
+- `nicaragua_foreign_trade_monopoly` (policies/nicaragua_foreign_trade_monopoly.yaml); explicit control axes: none
+- `nicaragua_literacy_health_campaigns` (policies/nicaragua_literacy_health_campaigns.yaml); explicit control axes: none
+- `nicaragua_somoza_expropriations_1979` (policies/nicaragua_somoza_expropriations_1979.yaml); explicit control axes: none
+- `nigeria_banking_licence_liberalisation_1987` (policies/nigeria_banking_licence_liberalisation_1987.yaml); explicit control axes: none
+- `nigeria_commodity_board_abolition_1986` (policies/nigeria_commodity_board_abolition_1986.yaml); explicit control axes: none
+- `nigeria_privatisation_decree_1988` (policies/nigeria_privatisation_decree_1988.yaml); explicit control axes: none
+- `nigeria_sfem_exchange_rate_1986` (policies/nigeria_sfem_exchange_rate_1986.yaml); explicit control axes: none
+- `nigeria_tariff_reform_1988` (policies/nigeria_tariff_reform_1988.yaml); explicit control axes: none
+- `nl_aanvullend_beleidsakkoord_stimulus_2009` (policies/nl_aanvullend_beleidsakkoord_stimulus_2009.yaml); explicit control axes: none
+- `nl_aow_retirement_age_rise_2012` (policies/nl_aow_retirement_age_rise_2012.yaml); explicit control axes: none
+- `nl_aow_retirement_age_rise_proposal_2009` (policies/nl_aow_retirement_age_rise_proposal_2009.yaml); explicit control axes: none
+- `nl_asylum_emergency_law_2024` (policies/nl_asylum_emergency_law_2024.yaml); explicit control axes: none
+- `nl_bestek_81_1978` (policies/nl_bestek_81_1978.yaml); explicit control axes: none
+- `nl_box3_rechtsherstel_overbrugging_2022_2023` (policies/nl_box3_rechtsherstel_overbrugging_2022_2023.yaml); explicit control axes: none
+- `nl_box3_transitional_flat_rate_2024` (policies/nl_box3_transitional_flat_rate_2024.yaml); explicit control axes: none
+- `nl_coalition_austerity_2010_2012` (policies/nl_coalition_austerity_2010_2012.yaml); explicit control axes: none
+- `nl_covid_fiscal_response_now_tvl_2020_2022` (policies/nl_covid_fiscal_response_now_tvl_2020_2022.yaml); explicit control axes: none
+- `nl_dividend_tax_abolition_uturn_2018` (policies/nl_dividend_tax_abolition_uturn_2018.yaml); explicit control axes: none
+- `nl_energieplafond_price_cap_2023` (policies/nl_energieplafond_price_cap_2023.yaml); explicit control axes: none
+- `nl_eu_constitution_referendum_2005` (policies/nl_eu_constitution_referendum_2005.yaml); explicit control axes: none
+- `nl_euthanasia_law_2002` (policies/nl_euthanasia_law_2002.yaml); explicit control axes: none
+- `nl_fortis_abn_amro_nationalisation_2008` (policies/nl_fortis_abn_amro_nationalisation_2008.yaml); explicit control axes: none
+- `nl_groningen_gas_wind_down_2018_2023` (policies/nl_groningen_gas_wind_down_2018_2023.yaml); explicit control axes: none
+- `nl_herfstakkoord_2013` (policies/nl_herfstakkoord_2013.yaml); explicit control axes: none
+- `nl_housing_market_deregulation_2024` (policies/nl_housing_market_deregulation_2024.yaml); explicit control axes: none
+- `nl_housing_market_reform_2013` (policies/nl_housing_market_reform_2013.yaml); explicit control axes: none
+- `nl_immigration_integration_tightening_2010_2012` (policies/nl_immigration_integration_tightening_2010_2012.yaml); explicit control axes: none
+- `nl_income_tax_act_2001` (policies/nl_income_tax_act_2001.yaml); explicit control axes: none
+- `nl_ing_bank_support_2008_2009` (policies/nl_ing_bank_support_2008_2009.yaml); explicit control axes: none
+- `nl_klimaatakkoord_klimaatwet_2019` (policies/nl_klimaatakkoord_klimaatwet_2019.yaml); explicit control axes: none
+- `nl_kok_budget_surplus_1998_2001` (policies/nl_kok_budget_surplus_1998_2001.yaml); explicit control axes: none
+- `nl_lenteakkoord_kunduz_2012` (policies/nl_lenteakkoord_kunduz_2012.yaml); explicit control axes: none
+- `nl_natural_gas_revenue_cycle_1977_1982` (policies/nl_natural_gas_revenue_cycle_1977_1982.yaml); explicit control axes: none
+- `nl_nitrogen_nplg_buyout_programme_2022_2023` (policies/nl_nitrogen_nplg_buyout_programme_2022_2023.yaml); explicit control axes: none
+- `nl_nitrogen_targets_rollback_2024` (policies/nl_nitrogen_targets_rollback_2024.yaml); explicit control axes: none
+- `nl_participatiewet_2015` (policies/nl_participatiewet_2015.yaml); explicit control axes: none
+- `nl_ptt_privatisation_1989` (policies/nl_ptt_privatisation_1989.yaml); explicit control axes: none
+- `nl_public_sector_pay_cut_1984` (policies/nl_public_sector_pay_cut_1984.yaml); explicit control axes: none
+- `nl_same_sex_marriage_2001` (policies/nl_same_sex_marriage_2001.yaml); explicit control axes: none
+- `nl_stikstofcrisis_pas_annulment_response_2019_2021` (policies/nl_stikstofcrisis_pas_annulment_response_2019_2021.yaml); explicit control axes: none
+- `nl_stricter_migration_code_2004_2006` (policies/nl_stricter_migration_code_2004_2006.yaml); explicit control axes: none
+- `nl_toeslagenaffaire_compensation_2022_2024` (policies/nl_toeslagenaffaire_compensation_2022_2024.yaml); explicit control axes: none
+- `nl_toeslagenaffaire_reckoning_2019_2021` (policies/nl_toeslagenaffaire_reckoning_2019_2021.yaml); explicit control axes: none
+- `nl_wao_disability_expansion_1978_1982` (policies/nl_wao_disability_expansion_1978_1982.yaml); explicit control axes: none
+- `nl_wao_ww_eligibility_tightening_1986_1987` (policies/nl_wao_ww_eligibility_tightening_1986_1987.yaml); explicit control axes: none
+- `nl_wassenaar_agreement_1982` (policies/nl_wassenaar_agreement_1982.yaml); explicit control axes: none
+- `nl_wet_betaalbare_huur_2024` (policies/nl_wet_betaalbare_huur_2024.yaml); explicit control axes: none
+- `nl_wet_investeringsrekening_1978` (policies/nl_wet_investeringsrekening_1978.yaml); explicit control axes: none
+- `nl_wet_werk_zekerheid_2015` (policies/nl_wet_werk_zekerheid_2015.yaml); explicit control axes: none
+- `nl_wia_disability_reform_2006` (policies/nl_wia_disability_reform_2006.yaml); explicit control axes: none
+- `nl_wir_abolition_1988` (policies/nl_wir_abolition_1988.yaml); explicit control axes: none
+- `nl_wlz_wmo_decentralisation_2015` (policies/nl_wlz_wmo_decentralisation_2015.yaml); explicit control axes: none
+- `nl_working_time_reduction_1982_1985` (policies/nl_working_time_reduction_1982_1985.yaml); explicit control axes: none
+- `nl_wtp_pension_reform_2023` (policies/nl_wtp_pension_reform_2023.yaml); explicit control axes: none
+- `nl_wwb_work_and_welfare_2004` (policies/nl_wwb_work_and_welfare_2004.yaml); explicit control axes: none
+- `nl_zvw_health_insurance_2006` (policies/nl_zvw_health_insurance_2006.yaml); explicit control axes: none
+- `no_1992_tax_reform` (policies/no_1992_tax_reform.yaml); explicit control axes: none
+- `no_abortion_law_reform_2024` (policies/no_abortion_law_reform_2024.yaml); explicit control axes: none
+- `no_aksjonaermodellen_capital_tax_2006` (policies/no_aksjonaermodellen_capital_tax_2006.yaml); explicit control axes: none
+- `no_banking_crisis_resolution_1991` (policies/no_banking_crisis_resolution_1991.yaml); explicit control axes: none
+- `no_bondevik_i_gas_power_fall_2000` (policies/no_bondevik_i_gas_power_fall_2000.yaml); explicit control axes: none
+- `no_broadcasting_monopoly_end_1984` (policies/no_broadcasting_monopoly_end_1984.yaml); explicit control axes: none
+- `no_co2_tax_escalator_2021` (policies/no_co2_tax_escalator_2021.yaml); explicit control axes: none
+- `no_corporate_tax_cut_2013_2019` (policies/no_corporate_tax_cut_2013_2019.yaml); explicit control axes: none
+- `no_covid_fiscal_response_2020_2021` (policies/no_covid_fiscal_response_2020_2021.yaml); explicit control axes: none
+- `no_eea_agreement_1992` (policies/no_eea_agreement_1992.yaml); explicit control axes: none
+- `no_electricity_price_support_stromstotte_2022` (policies/no_electricity_price_support_stromstotte_2022.yaml); explicit control axes: none
+- `no_eu_referendum_no_1994` (policies/no_eu_referendum_no_1994.yaml); explicit control axes: none
+- `no_gfc_fiscal_stimulus_2009` (policies/no_gfc_fiscal_stimulus_2009.yaml); explicit control axes: none
+- `no_gpfg_ethical_guidelines_2006` (policies/no_gpfg_ethical_guidelines_2006.yaml); explicit control axes: none
+- `no_handlingsregel_3pct_white_paper_2017` (policies/no_handlingsregel_3pct_white_paper_2017.yaml); explicit control axes: none
+- `no_handlingsregelen_fiscal_rule_2001` (policies/no_handlingsregelen_fiscal_rule_2001.yaml); explicit control axes: none
+- `no_housing_credit_liberalisation_1984` (policies/no_housing_credit_liberalisation_1984.yaml); explicit control axes: none
+- `no_immigration_tightening_2015_2016` (policies/no_immigration_tightening_2015_2016.yaml); explicit control axes: none
+- `no_kleppe_packages_counter_cyclical_1975_1978` (policies/no_kleppe_packages_counter_cyclical_1975_1978.yaml); explicit control axes: none
+- `no_klimaforliket_2008` (policies/no_klimaforliket_2008.yaml); explicit control axes: none
+- `no_kontantstoette_cash_for_care_1998` (policies/no_kontantstoette_cash_for_care_1998.yaml); explicit control axes: none
+- `no_krone_devaluation_may_1986` (policies/no_krone_devaluation_may_1986.yaml); explicit control axes: none
+- `no_onshore_wind_resource_rent_tax_2024` (policies/no_onshore_wind_resource_rent_tax_2024.yaml); explicit control axes: none
+- `no_pension_reform_2011` (policies/no_pension_reform_2011.yaml); explicit control axes: none
+- `no_pension_reform_white_paper_2004` (policies/no_pension_reform_white_paper_2004.yaml); explicit control axes: none
+- `no_petroleum_fund_establishment_1990` (policies/no_petroleum_fund_establishment_1990.yaml); explicit control axes: none
+- `no_petroleum_fund_first_deposit_1996` (policies/no_petroleum_fund_first_deposit_1996.yaml); explicit control axes: none
+- `no_petroleum_moderate_pace_doctrine_1977` (policies/no_petroleum_moderate_pace_doctrine_1977.yaml); explicit control axes: none
+- `no_petroleum_tax_white_paper_2016` (policies/no_petroleum_tax_white_paper_2016.yaml); explicit control axes: none
+- `no_salmon_resource_rent_tax_2023` (policies/no_salmon_resource_rent_tax_2023.yaml); explicit control axes: none
+- `no_skatteform_2004_2006` (policies/no_skatteform_2004_2006.yaml); explicit control axes: none
+- `no_wage_price_freeze_1978_1979` (policies/no_wage_price_freeze_1978_1979.yaml); explicit control axes: none
+- `norway_gpfg_investment_mandate` (policies/norway_gpfg_investment_mandate.yaml); explicit control axes: none
+- `norway_handlingsregel_fiscal_rule_2001` (policies/norway_handlingsregel_fiscal_rule_2001.yaml); explicit control axes: none
+- `norway_norges_bank_independence_2001` (policies/norway_norges_bank_independence_2001.yaml); explicit control axes: none
+- `nz_1984_fx_crisis_devaluation` (policies/nz_1984_fx_crisis_devaluation.yaml); explicit control axes: none
+- `nz_acc_renationalisation_1999` (policies/nz_acc_renationalisation_1999.yaml); explicit control axes: none
+- `nz_accident_insurance_act_1998` (policies/nz_accident_insurance_act_1998.yaml); explicit control axes: none
+- `nz_budget_2023_hipkins` (policies/nz_budget_2023_hipkins.yaml); explicit control axes: none
+- `nz_canterbury_earthquake_recovery_2011` (policies/nz_canterbury_earthquake_recovery_2011.yaml); explicit control axes: none
+- `nz_carless_days_1979` (policies/nz_carless_days_1979.yaml); explicit control axes: none
+- `nz_child_poverty_reduction_act_2018` (policies/nz_child_poverty_reduction_act_2018.yaml); explicit control axes: none
+- `nz_china_fta_2008` (policies/nz_china_fta_2008.yaml); explicit control axes: none
+- `nz_civil_union_act_2004` (policies/nz_civil_union_act_2004.yaml); explicit control axes: none
+- `nz_covid_elimination_2020` (policies/nz_covid_elimination_2020.yaml); explicit control axes: none
+- `nz_employment_contracts_act_1991` (policies/nz_employment_contracts_act_1991.yaml); explicit control axes: none
+- `nz_fair_pay_agreements_2022` (policies/nz_fair_pay_agreements_2022.yaml); explicit control axes: none
+- `nz_fair_pay_agreements_repeal_2023` (policies/nz_fair_pay_agreements_repeal_2023.yaml); explicit control axes: none
+- `nz_family_incomes_package_2017` (policies/nz_family_incomes_package_2017.yaml); explicit control axes: none
+- `nz_fast_track_approvals_act_2024` (policies/nz_fast_track_approvals_act_2024.yaml); explicit control axes: none
+- `nz_fiscal_responsibility_act_1994` (policies/nz_fiscal_responsibility_act_1994.yaml); explicit control axes: none
+- `nz_float_1985` (policies/nz_float_1985.yaml); explicit control axes: none
+- `nz_gst_increase_income_tax_cut_2010` (policies/nz_gst_increase_income_tax_cut_2010.yaml); explicit control axes: none
+- `nz_kiwibank_establishment_2002` (policies/nz_kiwibank_establishment_2002.yaml); explicit control axes: none
+- `nz_kiwibuild_2017` (policies/nz_kiwibuild_2017.yaml); explicit control axes: none
+- `nz_luxon_tax_cut_budget_2024` (policies/nz_luxon_tax_cut_budget_2024.yaml); explicit control axes: none
+- `nz_maori_health_authority_2022` (policies/nz_maori_health_authority_2022.yaml); explicit control axes: none
+- `nz_maori_health_authority_repeal_2024` (policies/nz_maori_health_authority_repeal_2024.yaml); explicit control axes: none
+- `nz_mixed_ownership_model_2012` (policies/nz_mixed_ownership_model_2012.yaml); explicit control axes: none
+- `nz_mmp_referendum_1993` (policies/nz_mmp_referendum_1993.yaml); explicit control axes: none
+- `nz_mother_of_all_budgets_1991` (policies/nz_mother_of_all_budgets_1991.yaml); explicit control axes: none
+- `nz_nz_superannuation_fund_2001` (policies/nz_nz_superannuation_fund_2001.yaml); explicit control axes: none
+- `nz_official_cash_rate_introduction_1999` (policies/nz_official_cash_rate_introduction_1999.yaml); explicit control axes: none
+- `nz_policy_bonfire_2023` (policies/nz_policy_bonfire_2023.yaml); explicit control axes: none
+- `nz_public_sector_cuts_2024` (policies/nz_public_sector_cuts_2024.yaml); explicit control axes: none
+- `nz_rba_act_implementation_1990_1997` (policies/nz_rba_act_implementation_1990_1997.yaml); explicit control axes: none
+- `nz_rbnz_inflation_targeting_1989` (policies/nz_rbnz_inflation_targeting_1989.yaml); explicit control axes: none
+- `nz_rbnz_single_mandate_restoration_2023` (policies/nz_rbnz_single_mandate_restoration_2023.yaml); explicit control axes: none
+- `nz_smokefree_generation_2022` (policies/nz_smokefree_generation_2022.yaml); explicit control axes: none
+- `nz_smokefree_generation_repeal_2024` (policies/nz_smokefree_generation_repeal_2024.yaml); explicit control axes: none
+- `nz_soe_act_1986` (policies/nz_soe_act_1986.yaml); explicit control axes: none
+- `nz_supplementary_minimum_prices_farmers_1978` (policies/nz_supplementary_minimum_prices_farmers_1978.yaml); explicit control axes: none
+- `nz_tariff_reduction_1984_1996` (policies/nz_tariff_reduction_1984_1996.yaml); explicit control axes: none
+- `nz_think_big_energy_projects_1977` (policies/nz_think_big_energy_projects_1977.yaml); explicit control axes: none
+- `nz_three_waters_rebrand_2023` (policies/nz_three_waters_rebrand_2023.yaml); explicit control axes: none
+- `nz_three_waters_reform_2022` (policies/nz_three_waters_reform_2022.yaml); explicit control axes: none
+- `nz_three_waters_repeal_2023` (policies/nz_three_waters_repeal_2023.yaml); explicit control axes: none
+- `nz_tpp11_negotiations_2017` (policies/nz_tpp11_negotiations_2017.yaml); explicit control axes: none
+- `nz_tpp_signing_2016` (policies/nz_tpp_signing_2016.yaml); explicit control axes: none
+- `nz_treaty_principles_bill_2024_2025` (policies/nz_treaty_principles_bill_2024_2025.yaml); explicit control axes: none
+- `nz_wage_price_freeze_1982` (policies/nz_wage_price_freeze_1982.yaml); explicit control axes: none
+- `nz_welfare_investment_approach_2012` (policies/nz_welfare_investment_approach_2012.yaml); explicit control axes: none
+- `nz_wellbeing_budget_2019` (policies/nz_wellbeing_budget_2019.yaml); explicit control axes: none
+- `nz_wellington_airport_sale_1998` (policies/nz_wellington_airport_sale_1998.yaml); explicit control axes: none
+- `nz_working_for_families_2004` (policies/nz_working_for_families_2004.yaml); explicit control axes: none
+- `nz_zero_carbon_act_2019` (policies/nz_zero_carbon_act_2019.yaml); explicit control axes: none
+- `oman_labour_law_2023` (policies/oman_labour_law_2023.yaml); explicit control axes: none
+- `oman_social_protection_law_2023` (policies/oman_social_protection_law_2023.yaml); explicit control axes: none
+- `oman_vat_introduction_2021` (policies/oman_vat_introduction_2021.yaml); explicit control axes: none
+- `pakistan_banks_nationalisation_act_1974` (policies/pakistan_banks_nationalisation_act_1974.yaml); explicit control axes: none
+- `pakistan_economic_reforms_order_1972` (policies/pakistan_economic_reforms_order_1972.yaml); explicit control axes: none
+- `pakistan_education_nationalisation_1972` (policies/pakistan_education_nationalisation_1972.yaml); explicit control axes: none
+- `pakistan_land_reforms_1972_1977` (policies/pakistan_land_reforms_1972_1977.yaml); explicit control axes: none
+- `pe_1993_constitution_referendum` (policies/pe_1993_constitution_referendum.yaml); explicit control axes: none
+- `pe_afp_pension_withdrawals_2023_2024` (policies/pe_afp_pension_withdrawals_2023_2024.yaml); explicit control axes: none
+- `pe_afp_sixth_withdrawal_2022` (policies/pe_afp_sixth_withdrawal_2022.yaml); explicit control axes: none
+- `pe_alberto_fujimori_humanitarian_pardon_2017` (policies/pe_alberto_fujimori_humanitarian_pardon_2017.yaml); explicit control axes: none
+- `pe_anti_corruption_referendum_2018` (policies/pe_anti_corruption_referendum_2018.yaml); explicit control axes: none
+- `pe_arcc_reconstruction_authority_2017` (policies/pe_arcc_reconstruction_authority_2017.yaml); explicit control axes: none
+- `pe_autogolpe_5_april_1992` (policies/pe_autogolpe_5_april_1992.yaml); explicit control axes: none
+- `pe_bagua_massacre_legislative_decrees_2009` (policies/pe_bagua_massacre_legislative_decrees_2009.yaml); explicit control axes: none
+- `pe_bank_nationalisation_announcement_1987` (policies/pe_bank_nationalisation_announcement_1987.yaml); explicit control axes: none
+- `pe_bono_universal_covid_2020` (policies/pe_bono_universal_covid_2020.yaml); explicit control axes: none
+- `pe_camisea_gas_project_2004` (policies/pe_camisea_gas_project_2004.yaml); explicit control axes: none
+- `pe_capture_of_guzman_sendero_1992` (policies/pe_capture_of_guzman_sendero_1992.yaml); explicit control axes: none
+- `pe_castillo_autogolpe_dec_2022` (policies/pe_castillo_autogolpe_dec_2022.yaml); explicit control axes: none
+- `pe_castillo_constituent_assembly_process_2021_2022` (policies/pe_castillo_constituent_assembly_process_2021_2022.yaml); explicit control axes: none
+- `pe_ccd_constituyente_elections_1992` (policies/pe_ccd_constituyente_elections_1992.yaml); explicit control axes: none
+- `pe_conga_mining_conflict_2011_2012` (policies/pe_conga_mining_conflict_2011_2012.yaml); explicit control axes: none
+- `pe_congressional_dissolution_2019` (policies/pe_congressional_dissolution_2019.yaml); explicit control axes: none
+- `pe_constitution_1979_implementation_1980` (policies/pe_constitution_1979_implementation_1980.yaml); explicit control axes: none
+- `pe_debt_service_limit_1985` (policies/pe_debt_service_limit_1985.yaml); explicit control axes: none
+- `pe_decreto_ley_25475_terrorism_1992` (policies/pe_decreto_ley_25475_terrorism_1992.yaml); explicit control axes: none
+- `pe_emergency_zones_sendero_1981_1985` (policies/pe_emergency_zones_sendero_1981_1985.yaml); explicit control axes: none
+- `pe_financial_crisis_stimulus_2009` (policies/pe_financial_crisis_stimulus_2009.yaml); explicit control axes: none
+- `pe_fiscal_prudence_law_amendment_2003` (policies/pe_fiscal_prudence_law_amendment_2003.yaml); explicit control axes: none
+- `pe_garcia_ii_perro_del_hortelano_2007` (policies/pe_garcia_ii_perro_del_hortelano_2007.yaml); explicit control axes: none
+- `pe_hyperinflation_1988_1990` (policies/pe_hyperinflation_1988_1990.yaml); explicit control axes: none
+- `pe_imf_eff_1982_1984` (policies/pe_imf_eff_1982_1984.yaml); explicit control axes: none
+- `pe_inflation_targeting_adoption_2002` (policies/pe_inflation_targeting_adoption_2002.yaml); explicit control axes: none
+- `pe_inti_heterodox_plan_1985` (policies/pe_inti_heterodox_plan_1985.yaml); explicit control axes: none
+- `pe_investment_grade_rating_2008` (policies/pe_investment_grade_rating_2008.yaml); explicit control axes: none
+- `pe_judicial_independence_rollback_2023_2025` (policies/pe_judicial_independence_rollback_2023_2025.yaml); explicit control axes: none
+- `pe_ley_apci_ngo_restrictions_2024` (policies/pe_ley_apci_ngo_restrictions_2024.yaml); explicit control axes: none
+- `pe_mining_hydrocarbons_fdi_opening_1981` (policies/pe_mining_hydrocarbons_fdi_opening_1981.yaml); explicit control axes: none
+- `pe_mining_investment_facilitation_2023` (policies/pe_mining_investment_facilitation_2023.yaml); explicit control axes: none
+- `pe_mining_royalty_reform_2011` (policies/pe_mining_royalty_reform_2011.yaml); explicit control axes: none
+- `pe_mining_tax_regime_proposal_2021_2022` (policies/pe_mining_tax_regime_proposal_2021_2022.yaml); explicit control axes: none
+- `pe_pacific_alliance_accession_2012_2014` (policies/pe_pacific_alliance_accession_2012_2014.yaml); explicit control axes: none
+- `pe_paquetazos_stabilisation_1988_1989` (policies/pe_paquetazos_stabilisation_1988_1989.yaml); explicit control axes: none
+- `pe_pension_65_2011` (policies/pe_pension_65_2011.yaml); explicit control axes: none
+- `pe_ppk_legislative_decree_package_2016` (policies/pe_ppk_legislative_decree_package_2016.yaml); explicit control axes: none
+- `pe_ppk_oecd_accession_roadmap_2016_2018` (policies/pe_ppk_oecd_accession_roadmap_2016_2018.yaml); explicit control axes: none
+- `pe_protest_crackdown_2022_2023` (policies/pe_protest_crackdown_2022_2023.yaml); explicit control axes: none
+- `pe_reactiva_peru_covid_response_2020` (policies/pe_reactiva_peru_covid_response_2020.yaml); explicit control axes: none
+- `pe_servir_civil_service_law_2013` (policies/pe_servir_civil_service_law_2013.yaml); explicit control axes: none
+- `pe_tariff_reform_1980_1984` (policies/pe_tariff_reform_1980_1984.yaml); explicit control axes: none
+- `pe_truth_reconciliation_commission_2001_2003` (policies/pe_truth_reconciliation_commission_2001_2003.yaml); explicit control axes: none
+- `pe_us_fta_implementation_2009` (policies/pe_us_fta_implementation_2009.yaml); explicit control axes: none
+- `pe_us_fta_negotiation_2004_2006` (policies/pe_us_fta_negotiation_2004_2006.yaml); explicit control axes: none
+- `pe_vizcarra_vacancy_nov_2020` (policies/pe_vizcarra_vacancy_nov_2020.yaml); explicit control axes: none
+- `peru_1993_constitution_central_bank` (policies/peru_1993_constitution_central_bank.yaml); explicit control axes: none
+- `peru_fujishock_1990` (policies/peru_fujishock_1990.yaml); explicit control axes: none
+- `peru_privatisations_1991_1997` (policies/peru_privatisations_1991_1997.yaml); explicit control axes: none
+- `peru_trade_opening_1991_1993` (policies/peru_trade_opening_1991_1993.yaml); explicit control axes: none
+- `ph_11_major_industrial_projects_1979` (policies/ph_11_major_industrial_projects_1979.yaml); explicit control axes: none
+- `ph_1987_constitution` (policies/ph_1987_constitution.yaml); explicit control axes: none
+- `ph_abs_cbn_franchise_denial_2020` (policies/ph_abs_cbn_franchise_denial_2020.yaml); explicit control axes: none
+- `ph_apt_privatisation_1986` (policies/ph_apt_privatisation_1986.yaml); explicit control axes: none
+- `ph_bangsamoro_organic_law_2018` (policies/ph_bangsamoro_organic_law_2018.yaml); explicit control axes: none
+- `ph_bataan_nuclear_plant_1984` (policies/ph_bataan_nuclear_plant_1984.yaml); explicit control axes: none
+- `ph_bot_law_amendment_1994` (policies/ph_bot_law_amendment_1994.yaml); explicit control axes: none
+- `ph_bsp_charter_1993` (policies/ph_bsp_charter_1993.yaml); explicit control axes: none
+- `ph_build_build_build_2017_2022` (policies/ph_build_build_build_2017_2022.yaml); explicit control axes: none
+- `ph_carp_agrarian_reform_1988` (policies/ph_carp_agrarian_reform_1988.yaml); explicit control axes: none
+- `ph_carper_extension_2009` (policies/ph_carper_extension_2009.yaml); explicit control axes: none
+- `ph_coconut_levy_cojuangco_1973_1986` (policies/ph_coconut_levy_cojuangco_1973_1986.yaml); explicit control axes: none
+- `ph_create_corporate_tax_cut_2021` (policies/ph_create_corporate_tax_cut_2021.yaml); explicit control axes: none
+- `ph_debt_moratorium_1983` (policies/ph_debt_moratorium_1983.yaml); explicit control axes: none
+- `ph_drug_war_2016` (policies/ph_drug_war_2016.yaml); explicit control axes: none
+- `ph_edca_2014` (policies/ph_edca_2014.yaml); explicit control axes: none
+- `ph_edca_expansion_2023` (policies/ph_edca_expansion_2023.yaml); explicit control axes: none
+- `ph_epira_power_sector_reform_2001` (policies/ph_epira_power_sector_reform_2001.yaml); explicit control axes: none
+- `ph_estrada_impeachment_edsa_ii_2001` (policies/ph_estrada_impeachment_edsa_ii_2001.yaml); explicit control axes: none
+- `ph_expanded_vat_law_2005` (policies/ph_expanded_vat_law_2005.yaml); explicit control axes: none
+- `ph_foreign_bank_liberalization_1994` (policies/ph_foreign_bank_liberalization_1994.yaml); explicit control axes: none
+- `ph_general_banking_law_2000` (policies/ph_general_banking_law_2000.yaml); explicit control axes: none
+- `ph_hello_garci_scandal_2005` (policies/ph_hello_garci_scandal_2005.yaml); explicit control axes: none
+- `ph_icc_withdrawal_2019` (policies/ph_icc_withdrawal_2019.yaml); explicit control axes: none
+- `ph_k12_basic_education_2013` (policies/ph_k12_basic_education_2013.yaml); explicit control axes: none
+- `ph_luzon_economic_corridor_2024` (policies/ph_luzon_economic_corridor_2024.yaml); explicit control axes: none
+- `ph_maharlika_sovereign_wealth_fund_2023` (policies/ph_maharlika_sovereign_wealth_fund_2023.yaml); explicit control axes: none
+- `ph_martial_law_lifting_amendment_6_1981` (policies/ph_martial_law_lifting_amendment_6_1981.yaml); explicit control axes: none
+- `ph_mindanao_all_out_war_2000` (policies/ph_mindanao_all_out_war_2000.yaml); explicit control axes: none
+- `ph_mnlf_peace_agreement_1996` (policies/ph_mnlf_peace_agreement_1996.yaml); explicit control axes: none
+- `ph_oil_industry_deregulation_1996_1998` (policies/ph_oil_industry_deregulation_1996_1998.yaml); explicit control axes: none
+- `ph_pantawid_4ps_expansion_2010_2016` (policies/ph_pantawid_4ps_expansion_2010_2016.yaml); explicit control axes: none
+- `ph_pantawid_4ps_launch_2007` (policies/ph_pantawid_4ps_launch_2007.yaml); explicit control axes: none
+- `ph_pcgg_sequestration_1986` (policies/ph_pcgg_sequestration_1986.yaml); explicit control axes: none
+- `ph_pp_1017_emergency_proclamation_2006` (policies/ph_pp_1017_emergency_proclamation_2006.yaml); explicit control axes: none
+- `ph_ppp_infrastructure_program_2010_2016` (policies/ph_ppp_infrastructure_program_2010_2016.yaml); explicit control axes: none
+- `ph_rcep_ratification_2023` (policies/ph_rcep_ratification_2023.yaml); explicit control axes: none
+- `ph_retail_trade_liberalization_act_2000` (policies/ph_retail_trade_liberalization_act_2000.yaml); explicit control axes: none
+- `ph_rice_tariffication_2019` (policies/ph_rice_tariffication_2019.yaml); explicit control axes: none
+- `ph_sin_tax_reform_2012` (policies/ph_sin_tax_reform_2012.yaml); explicit control axes: none
+- `ph_snap_election_edsa_1986` (policies/ph_snap_election_edsa_1986.yaml); explicit control axes: none
+- `ph_sugar_monopoly_philsucom_nasutra_1976` (policies/ph_sugar_monopoly_philsucom_nasutra_1976.yaml); explicit control axes: none
+- `ph_telecom_deregulation_ra7925_1995` (policies/ph_telecom_deregulation_ra7925_1995.yaml); explicit control axes: none
+- `ph_train_tax_reform_2017` (policies/ph_train_tax_reform_2017.yaml); explicit control axes: none
+- `ph_us_bases_rejection_1991` (policies/ph_us_bases_rejection_1991.yaml); explicit control axes: none
+- `ph_vat_ra_eo_273_1987` (policies/ph_vat_ra_eo_273_1987.yaml); explicit control axes: none
+- `ph_vfa_balikatan_continuation_2002_2010` (policies/ph_vfa_balikatan_continuation_2002_2010.yaml); explicit control axes: none
+- `ph_wto_accession_1995` (policies/ph_wto_accession_1995.yaml); explicit control axes: none
+- `philippines_coconut_levy_1973` (policies/philippines_coconut_levy_1973.yaml); explicit control axes: none
+- `philippines_imf_standby_1984` (policies/philippines_imf_standby_1984.yaml); explicit control axes: none
+- `philippines_martial_law_economic_decrees_1972` (policies/philippines_martial_law_economic_decrees_1972.yaml); explicit control axes: none
+- `philippines_peso_devaluations_1983_1984` (policies/philippines_peso_devaluations_1983_1984.yaml); explicit control axes: none
+- `philippines_philsucom_sugar_monopoly_1976` (policies/philippines_philsucom_sugar_monopoly_1976.yaml); explicit control axes: none
+- `pk_13th_14th_amendments_1997` (policies/pk_13th_14th_amendments_1997.yaml); explicit control axes: none
+- `pk_18th_constitutional_amendment_2010` (policies/pk_18th_constitutional_amendment_2010.yaml); explicit control axes: none
+- `pk_1999_military_coup` (policies/pk_1999_military_coup.yaml); explicit control axes: none
+- `pk_26th_amendment_2024` (policies/pk_26th_amendment_2024.yaml); explicit control axes: none
+- `pk_7th_nfc_award_2009` (policies/pk_7th_nfc_award_2009.yaml); explicit control axes: none
+- `pk_8th_amendment_dismissal_precedent_1990` (policies/pk_8th_amendment_dismissal_precedent_1990.yaml); explicit control axes: none
+- `pk_8th_amendment_dismissal_precedent_1996` (policies/pk_8th_amendment_dismissal_precedent_1996.yaml); explicit control axes: none
+- `pk_9_11_pivot_nato_alliance_2001` (policies/pk_9_11_pivot_nato_alliance_2001.yaml); explicit control axes: none
+- `pk_afghan_jihad_support_1979_1988` (policies/pk_afghan_jihad_support_1979_1988.yaml); explicit control axes: none
+- `pk_benazir_income_support_programme_2008` (policies/pk_benazir_income_support_programme_2008.yaml); explicit control axes: none
+- `pk_bhutto_assassination_2007` (policies/pk_bhutto_assassination_2007.yaml); explicit control axes: none
+- `pk_chagai_nuclear_tests_1998` (policies/pk_chagai_nuclear_tests_1998.yaml); explicit control axes: none
+- `pk_circular_debt_energy_crisis_2008_2013` (policies/pk_circular_debt_energy_crisis_2008_2013.yaml); explicit control axes: none
+- `pk_covid_emergency_cash_2020` (policies/pk_covid_emergency_cash_2020.yaml); explicit control axes: none
+- `pk_cpec_launch_2015` (policies/pk_cpec_launch_2015.yaml); explicit control axes: none
+- `pk_denationalisation_partial_1977_1982` (policies/pk_denationalisation_partial_1977_1982.yaml); explicit control axes: none
+- `pk_ehsaas_programme_2019` (policies/pk_ehsaas_programme_2019.yaml); explicit control axes: none
+- `pk_emergency_3_november_2007` (policies/pk_emergency_3_november_2007.yaml); explicit control axes: none
+- `pk_enforcement_of_shariat_act_1991` (policies/pk_enforcement_of_shariat_act_1991.yaml); explicit control axes: none
+- `pk_fbr_track_and_trace_2020` (policies/pk_fbr_track_and_trace_2020.yaml); explicit control axes: none
+- `pk_federal_shariat_court_1980` (policies/pk_federal_shariat_court_1980.yaml); explicit control axes: none
+- `pk_foreign_currency_account_freeze_1998` (policies/pk_foreign_currency_account_freeze_1998.yaml); explicit control axes: none
+- `pk_gidc_cess_2015` (policies/pk_gidc_cess_2015.yaml); explicit control axes: none
+- `pk_gst_widening_2013_2017` (policies/pk_gst_widening_2013_2017.yaml); explicit control axes: none
+- `pk_hudood_ordinances_1979` (policies/pk_hudood_ordinances_1979.yaml); explicit control axes: none
+- `pk_imf_eff_1980_1983` (policies/pk_imf_eff_1980_1983.yaml); explicit control axes: none
+- `pk_imf_eff_1994` (policies/pk_imf_eff_1994.yaml); explicit control axes: none
+- `pk_imf_eff_6bn_2013` (policies/pk_imf_eff_6bn_2013.yaml); explicit control axes: none
+- `pk_imf_eff_6bn_2019` (policies/pk_imf_eff_6bn_2019.yaml); explicit control axes: none
+- `pk_imf_eff_7bn_2024` (policies/pk_imf_eff_7bn_2024.yaml); explicit control axes: none
+- `pk_imf_saf_1988` (policies/pk_imf_saf_1988.yaml); explicit control axes: none
+- `pk_imf_sba_2008_2011` (policies/pk_imf_sba_2008_2011.yaml); explicit control axes: none
+- `pk_imf_sba_3bn_2023` (policies/pk_imf_sba_3bn_2023.yaml); explicit control axes: none
+- `pk_islamic_banking_framework_1981` (policies/pk_islamic_banking_framework_1981.yaml); explicit control axes: none
+- `pk_kargil_war_1999` (policies/pk_kargil_war_1999.yaml); explicit control axes: none
+- `pk_lawyers_movement_2007_2009` (policies/pk_lawyers_movement_2007_2009.yaml); explicit control axes: none
+- `pk_legal_framework_order_17th_amendment_2002` (policies/pk_legal_framework_order_17th_amendment_2002.yaml); explicit control axes: none
+- `pk_motorway_m1_m2_initiation_1992` (policies/pk_motorway_m1_m2_initiation_1992.yaml); explicit control axes: none
+- `pk_motorway_m2_lahore_islamabad_1997` (policies/pk_motorway_m2_lahore_islamabad_1997.yaml); explicit control axes: none
+- `pk_national_action_plan_2014` (policies/pk_national_action_plan_2014.yaml); explicit control axes: none
+- `pk_national_reconciliation_ordinance_2007` (policies/pk_national_reconciliation_ordinance_2007.yaml); explicit control axes: none
+- `pk_naya_pakistan_housing_2019` (policies/pk_naya_pakistan_housing_2019.yaml); explicit control axes: none
+- `pk_no_confidence_vote_2022` (policies/pk_no_confidence_vote_2022.yaml); explicit control axes: none
+- `pk_peca_amendment_2025` (policies/pk_peca_amendment_2025.yaml); explicit control axes: none
+- `pk_pia_privatisation_2024` (policies/pk_pia_privatisation_2024.yaml); explicit control axes: none
+- `pk_power_policy_ipp_1994` (policies/pk_power_policy_ipp_1994.yaml); explicit control axes: none
+- `pk_power_tariff_hikes_2023_2024` (policies/pk_power_tariff_hikes_2023_2024.yaml); explicit control axes: none
+- `pk_privatisation_commission_1991` (policies/pk_privatisation_commission_1991.yaml); explicit control axes: none
+- `pk_protection_of_economic_reforms_1992` (policies/pk_protection_of_economic_reforms_1992.yaml); explicit control axes: none
+- `pk_shaukat_aziz_privatisation_ptcl_2005` (policies/pk_shaukat_aziz_privatisation_ptcl_2005.yaml); explicit control axes: none
+- `pk_sifc_2023` (policies/pk_sifc_2023.yaml); explicit control axes: none
+- `pk_sixth_five_year_plan_1983_1988` (policies/pk_sixth_five_year_plan_1983_1988.yaml); explicit control axes: none
+- `pk_zakat_ushr_ordinance_1980` (policies/pk_zakat_ushr_ordinance_1980.yaml); explicit control axes: none
+- `pk_zarb_e_azb_2014` (policies/pk_zarb_e_azb_2014.yaml); explicit control axes: none
+- `pl_13th_14th_pension_2019_2022` (policies/pl_13th_14th_pension_2019_2022.yaml); explicit control axes: none
+- `pl_500_plus_child_benefit_2016` (policies/pl_500_plus_child_benefit_2016.yaml); explicit control axes: none
+- `pl_800_plus_child_benefit_2024` (policies/pl_800_plus_child_benefit_2024.yaml); explicit control axes: none
+- `pl_balcerowicz_plan_1990` (policies/pl_balcerowicz_plan_1990.yaml); explicit control axes: none
+- `pl_bank_asset_tax_2016` (policies/pl_bank_asset_tax_2016.yaml); explicit control axes: none
+- `pl_becikowe_childbirth_grant_2006` (policies/pl_becikowe_childbirth_grant_2006.yaml); explicit control axes: none
+- `pl_bodnar_judicial_restoration_2024` (policies/pl_bodnar_judicial_restoration_2024.yaml); explicit control axes: none
+- `pl_cba_anticorruption_bureau_2006` (policies/pl_cba_anticorruption_bureau_2006.yaml); explicit control axes: none
+- `pl_coal_energy_transition_stance_2017_2023` (policies/pl_coal_energy_transition_stance_2017_2023.yaml); explicit control axes: none
+- `pl_constitutional_tribunal_crisis_2015_2016` (policies/pl_constitutional_tribunal_crisis_2015_2016.yaml); explicit control axes: none
+- `pl_defence_spending_4pct_gdp_2024` (policies/pl_defence_spending_4pct_gdp_2024.yaml); explicit control axes: none
+- `pl_disability_contribution_cut_2007` (policies/pl_disability_contribution_cut_2007.yaml); explicit control axes: none
+- `pl_eu_accession_2004` (policies/pl_eu_accession_2004.yaml); explicit control axes: none
+- `pl_euro_2012_infrastructure` (policies/pl_euro_2012_infrastructure.yaml); explicit control axes: none
+- `pl_europe_agreement_application_1994` (policies/pl_europe_agreement_application_1994.yaml); explicit control axes: none
+- `pl_gdansk_agreement_1980` (policies/pl_gdansk_agreement_1980.yaml); explicit control axes: none
+- `pl_gierek_western_debt_investment_drive_1971` (policies/pl_gierek_western_debt_investment_drive_1971.yaml); explicit control axes: none
+- `pl_hausner_plan_2003` (policies/pl_hausner_plan_2003.yaml); explicit control axes: none
+- `pl_imf_flexible_credit_line_2009` (policies/pl_imf_flexible_credit_line_2009.yaml); explicit control axes: none
+- `pl_judicial_reforms_supreme_court_krs_2017_2020` (policies/pl_judicial_reforms_supreme_court_krs_2017_2020.yaml); explicit control axes: none
+- `pl_kasy_chorych_health_1999` (policies/pl_kasy_chorych_health_1999.yaml); explicit control axes: none
+- `pl_kolodko_strategy_for_poland_1994` (policies/pl_kolodko_strategy_for_poland_1994.yaml); explicit control axes: none
+- `pl_lustration_law_2006` (policies/pl_lustration_law_2006.yaml); explicit control axes: none
+- `pl_martial_law_december_1981` (policies/pl_martial_law_december_1981.yaml); explicit control axes: none
+- `pl_mass_privatisation_programme_blueprint_1991` (policies/pl_mass_privatisation_programme_blueprint_1991.yaml); explicit control axes: none
+- `pl_nato_accession_1999` (policies/pl_nato_accession_1999.yaml); explicit control axes: none
+- `pl_nbp_rate_cycle_2020_2023` (policies/pl_nbp_rate_cycle_2020_2023.yaml); explicit control axes: none
+- `pl_nif_mass_privatisation_1995` (policies/pl_nif_mass_privatisation_1995.yaml); explicit control axes: none
+- `pl_ofe_transfer_2014` (policies/pl_ofe_transfer_2014.yaml); explicit control axes: none
+- `pl_pact_on_state_enterprise_1993` (policies/pl_pact_on_state_enterprise_1993.yaml); explicit control axes: none
+- `pl_paris_club_agreement_1991` (policies/pl_paris_club_agreement_1991.yaml); explicit control axes: none
+- `pl_pension_reform_1997_1999` (policies/pl_pension_reform_1997_1999.yaml); explicit control axes: none
+- `pl_pension_reform_three_pillar_1999` (policies/pl_pension_reform_three_pillar_1999.yaml); explicit control axes: none
+- `pl_pit_bracket_reduction_2009` (policies/pl_pit_bracket_reduction_2009.yaml); explicit control axes: none
+- `pl_polski_lad_tax_reform_2022` (policies/pl_polski_lad_tax_reform_2022.yaml); explicit control axes: none
+- `pl_popiwek_wage_tax_1990` (policies/pl_popiwek_wage_tax_1990.yaml); explicit control axes: none
+- `pl_price_hikes_1976_radom_ursus` (policies/pl_price_hikes_1976_radom_ursus.yaml); explicit control axes: none
+- `pl_privatisation_law_1990` (policies/pl_privatisation_law_1990.yaml); explicit control axes: none
+- `pl_public_media_restructure_2023_2024` (policies/pl_public_media_restructure_2023_2024.yaml); explicit control axes: none
+- `pl_retail_turnover_tax_2016` (policies/pl_retail_turnover_tax_2016.yaml); explicit control axes: none
+- `pl_retirement_age_67_2012` (policies/pl_retirement_age_67_2012.yaml); explicit control axes: none
+- `pl_retirement_age_reversal_2017` (policies/pl_retirement_age_reversal_2017.yaml); explicit control axes: none
+- `pl_round_table_agreement_1989` (policies/pl_round_table_agreement_1989.yaml); explicit control axes: none
+- `pl_rrf_unblocking_rule_of_law_milestones_2024` (policies/pl_rrf_unblocking_rule_of_law_milestones_2024.yaml); explicit control axes: none
+- `pl_rywin_affair_2003` (policies/pl_rywin_affair_2003.yaml); explicit control axes: none
+- `pl_small_constitution_1992` (policies/pl_small_constitution_1992.yaml); explicit control axes: none
+- `pl_territorial_reform_16_voivodeships_1999` (policies/pl_territorial_reform_16_voivodeships_1999.yaml); explicit control axes: none
+- `pl_three_s_reform_1986` (policies/pl_three_s_reform_1986.yaml); explicit control axes: none
+- `pl_zloty_devaluation_price_reform_1982` (policies/pl_zloty_devaluation_price_reform_1982.yaml); explicit control axes: none
+- `pl_zloty_redenomination_1995` (policies/pl_zloty_redenomination_1995.yaml); explicit control axes: none
+- `png_independence_constitution_1975` (policies/png_independence_constitution_1975.yaml); explicit control axes: none
+- `png_lng_project_agreement_2008` (policies/png_lng_project_agreement_2008.yaml); explicit control axes: none
+- `png_mining_act_1992` (policies/png_mining_act_1992.yaml); explicit control axes: none
+- `poland_balcerowicz_shock_therapy_1990` (policies/poland_balcerowicz_shock_therapy_1990.yaml); explicit control axes: none
+- `portugal_1976_constitution_socialist_clauses` (policies/portugal_1976_constitution_socialist_clauses.yaml); explicit control axes: none
+- `portugal_agrarian_reform_1975` (policies/portugal_agrarian_reform_1975.yaml); explicit control axes: none
+- `portugal_bank_nationalisations_1975` (policies/portugal_bank_nationalisations_1975.yaml); explicit control axes: none
+- `portugal_bdp_independence_1998` (policies/portugal_bdp_independence_1998.yaml); explicit control axes: none
+- `portugal_constitutional_revision_privatisation_1989` (policies/portugal_constitutional_revision_privatisation_1989.yaml); explicit control axes: none
+- `portugal_education_pre_school_network_1997` (policies/portugal_education_pre_school_network_1997.yaml); explicit control axes: none
+- `portugal_eec_accession_1986` (policies/portugal_eec_accession_1986.yaml); explicit control axes: none
+- `portugal_eec_accession_treaty_1985` (policies/portugal_eec_accession_treaty_1985.yaml); explicit control axes: none
+- `portugal_escudo_erm_entry_1992` (policies/portugal_escudo_erm_entry_1992.yaml); explicit control axes: none
+- `portugal_euro_entry_1999` (policies/portugal_euro_entry_1999.yaml); explicit control axes: none
+- `portugal_expo_98_lisbon_infrastructure` (policies/portugal_expo_98_lisbon_infrastructure.yaml); explicit control axes: none
+- `portugal_imf_standby_1977_1978` (policies/portugal_imf_standby_1977_1978.yaml); explicit control axes: none
+- `portugal_imf_standby_1983_1985` (policies/portugal_imf_standby_1983_1985.yaml); explicit control axes: none
+- `portugal_industrial_nationalisations_1975` (policies/portugal_industrial_nationalisations_1975.yaml); explicit control axes: none
+- `portugal_labour_code_revision_1989` (policies/portugal_labour_code_revision_1989.yaml); explicit control axes: none
+- `portugal_privatisations_framework_1990_1995` (policies/portugal_privatisations_framework_1990_1995.yaml); explicit control axes: none
+- `portugal_rmg_minimum_income_1996` (policies/portugal_rmg_minimum_income_1996.yaml); explicit control axes: none
+- `portugal_troika_programme_2011_2014` (policies/portugal_troika_programme_2011_2014.yaml); explicit control axes: none
+- `portugal_vat_introduction_1986` (policies/portugal_vat_introduction_1986.yaml); explicit control axes: none
+- `pry_carbon_credit_market_law_7190_2023` (policies/pry_carbon_credit_market_law_7190_2023.yaml); explicit control axes: none
+- `pry_hambre_cero_school_feeding_2024` (policies/pry_hambre_cero_school_feeding_2024.yaml); explicit control axes: none
+- `pry_integrity_transparency_anticorruption_law_7389_2024` (policies/pry_integrity_transparency_anticorruption_law_7389_2024.yaml); explicit control axes: none
+- `pry_pension_superintendency_law_7235_2023` (policies/pry_pension_superintendency_law_7235_2023.yaml); explicit control axes: none
+- `pt_austerity_programme_2003` (policies/pt_austerity_programme_2003.yaml); explicit control axes: none
+- `pt_codigo_do_trabalho_2003` (policies/pt_codigo_do_trabalho_2003.yaml); explicit control axes: none
+- `pt_construir_portugal_housing_rollback_2024` (policies/pt_construir_portugal_housing_rollback_2024.yaml); explicit control axes: none
+- `pt_defence_spending_nato_2_percent_trajectory_2024` (policies/pt_defence_spending_nato_2_percent_trajectory_2024.yaml); explicit control axes: none
+- `pt_golden_visa_real_estate_rollback_2023` (policies/pt_golden_visa_real_estate_rollback_2023.yaml); explicit control axes: none
+- `pt_iraq_azores_summit_2003` (policies/pt_iraq_azores_summit_2003.yaml); explicit control axes: none
+- `pt_irc_corporate_rate_reduction_2024` (policies/pt_irc_corporate_rate_reduction_2024.yaml); explicit control axes: none
+- `pt_irs_jovem_2023` (policies/pt_irs_jovem_2023.yaml); explicit control axes: none
+- `pt_irs_jovem_expansion_2024` (policies/pt_irs_jovem_expansion_2024.yaml); explicit control axes: none
+- `pt_iva_rise_2002` (policies/pt_iva_rise_2002.yaml); explicit control axes: none
+- `pt_iva_rise_2005` (policies/pt_iva_rise_2005.yaml); explicit control axes: none
+- `pt_iva_vat_hike_2011` (policies/pt_iva_vat_hike_2011.yaml); explicit control axes: none
+- `pt_labour_reform_lei_23_2012` (policies/pt_labour_reform_lei_23_2012.yaml); explicit control axes: none
+- `pt_lisbon_treaty_signing_2007` (policies/pt_lisbon_treaty_signing_2007.yaml); explicit control axes: none
+- `pt_magalhaes_laptop_programme_2008` (policies/pt_magalhaes_laptop_programme_2008.yaml); explicit control axes: none
+- `pt_mais_habitacao_housing_package_2023` (policies/pt_mais_habitacao_housing_package_2023.yaml); explicit control axes: none
+- `pt_migration_regularisation_end_2024` (policies/pt_migration_regularisation_end_2024.yaml); explicit control axes: none
+- `pt_minimum_wage_trajectory_2015_2024` (policies/pt_minimum_wage_trajectory_2015_2024.yaml); explicit control axes: none
+- `pt_novas_oportunidades_adult_ed_2005` (policies/pt_novas_oportunidades_adult_ed_2005.yaml); explicit control axes: none
+- `pt_pension_freeze_cga_convergence_2011_2014` (policies/pt_pension_freeze_cga_convergence_2011_2014.yaml); explicit control axes: none
+- `pt_pension_sustainability_factor_2007` (policies/pt_pension_sustainability_factor_2007.yaml); explicit control axes: none
+- `pt_privatisations_edp_ren_ana_ctt_2011_2014` (policies/pt_privatisations_edp_ren_ana_ctt_2011_2014.yaml); explicit control axes: none
+- `pt_prr_ngeu_implementation_2021_2026` (policies/pt_prr_ngeu_implementation_2021_2026.yaml); explicit control axes: none
+- `pt_public_wage_cuts_2011_2014` (policies/pt_public_wage_cuts_2011_2014.yaml); explicit control axes: none
+- `pt_public_wage_pension_reversal_2016_2018` (policies/pt_public_wage_pension_reversal_2016_2018.yaml); explicit control axes: none
+- `pt_sns_direcao_executiva_2022` (policies/pt_sns_direcao_executiva_2022.yaml); explicit control axes: none
+- `qatar_labour_reforms_minimum_wage_kafala_2020` (policies/qatar_labour_reforms_minimum_wage_kafala_2020.yaml); explicit control axes: none
+- `qatar_north_field_expansion_2021_2030` (policies/qatar_north_field_expansion_2021_2030.yaml); explicit control axes: none
+- `qatar_third_national_development_strategy_2024` (policies/qatar_third_national_development_strategy_2024.yaml); explicit control axes: none
+- `ro_2025_consolidation_package` (policies/ro_2025_consolidation_package.yaml); explicit control axes: none
+- `ro_defence_spending_ramp_2025` (policies/ro_defence_spending_ramp_2025.yaml); explicit control axes: none
+- `ro_judicial_special_pensions_reform_2025` (policies/ro_judicial_special_pensions_reform_2025.yaml); explicit control axes: none
+- `ro_land_restitution_law_18_1991` (policies/ro_land_restitution_law_18_1991.yaml); explicit control axes: none
+- `ro_mineriade_1990_1991` (policies/ro_mineriade_1990_1991.yaml); explicit control axes: none
+- `ro_partial_price_liberalisation_1990_1991` (policies/ro_partial_price_liberalisation_1990_1991.yaml); explicit control axes: none
+- `ro_privatisation_law_58_1991` (policies/ro_privatisation_law_58_1991.yaml); explicit control axes: none
+- `ro_rrf_milestone_recovery_2025` (policies/ro_rrf_milestone_recovery_2025.yaml); explicit control axes: none
+- `ro_vacaroiu_stabilisation_1993_1995` (policies/ro_vacaroiu_stabilisation_1993_1995.yaml); explicit control axes: none
+- `ru_1993_constitution_referendum` (policies/ru_1993_constitution_referendum.yaml); explicit control axes: none
+- `ru_beslan_school_siege_2004` (policies/ru_beslan_school_siege_2004.yaml); explicit control axes: none
+- `ru_capital_controls_war_2022` (policies/ru_capital_controls_war_2022.yaml); explicit control axes: none
+- `ru_cbr_high_rate_regime_2024` (policies/ru_cbr_high_rate_regime_2024.yaml); explicit control axes: none
+- `ru_constitutional_amendments_2020` (policies/ru_constitutional_amendments_2020.yaml); explicit control axes: none
+- `ru_counter_sanctions_food_ban_2014` (policies/ru_counter_sanctions_food_ban_2014.yaml); explicit control axes: none
+- `ru_crimea_annexation_2014` (policies/ru_crimea_annexation_2014.yaml); explicit control axes: none
+- `ru_federal_districts_2000` (policies/ru_federal_districts_2000.yaml); explicit control axes: none
+- `ru_first_chechen_war_1994_1996` (policies/ru_first_chechen_war_1994_1996.yaml); explicit control axes: none
+- `ru_flat_tax_13_percent_2001` (policies/ru_flat_tax_13_percent_2001.yaml); explicit control axes: none
+- `ru_foreign_assets_nationalisation_continuation` (policies/ru_foreign_assets_nationalisation_continuation.yaml); explicit control axes: none
+- `ru_gaidar_price_liberalisation_1992` (policies/ru_gaidar_price_liberalisation_1992.yaml); explicit control axes: none
+- `ru_georgia_war_2008` (policies/ru_georgia_war_2008.yaml); explicit control axes: none
+- `ru_gfc_reserve_fund_drawdown_2008_2009` (policies/ru_gfc_reserve_fund_drawdown_2008_2009.yaml); explicit control axes: none
+- `ru_gko_default_1998` (policies/ru_gko_default_1998.yaml); explicit control axes: none
+- `ru_gubernatorial_election_abolition_2004` (policies/ru_gubernatorial_election_abolition_2004.yaml); explicit control axes: none
+- `ru_kursk_disaster_2000` (policies/ru_kursk_disaster_2000.yaml); explicit control axes: none
+- `ru_loans_for_shares_1995_1996` (policies/ru_loans_for_shares_1995_1996.yaml); explicit control axes: none
+- `ru_loans_for_shares_aftermath_1996` (policies/ru_loans_for_shares_aftermath_1996.yaml); explicit control axes: none
+- `ru_may_decrees_2012` (policies/ru_may_decrees_2012.yaml); explicit control axes: none
+- `ru_medvedev_tandem_prep_2007_2008` (policies/ru_medvedev_tandem_prep_2007_2008.yaml); explicit control axes: none
+- `ru_national_priority_projects_2005` (policies/ru_national_priority_projects_2005.yaml); explicit control axes: none
+- `ru_partial_mobilisation_2022` (policies/ru_partial_mobilisation_2022.yaml); explicit control axes: none
+- `ru_pension_age_reform_2018` (policies/ru_pension_age_reform_2018.yaml); explicit control axes: none
+- `ru_presidential_term_extension_2008` (policies/ru_presidential_term_extension_2008.yaml); explicit control axes: none
+- `ru_prigozhin_mutiny_2023` (policies/ru_prigozhin_mutiny_2023.yaml); explicit control axes: none
+- `ru_primakov_stabilisation_1998_1999` (policies/ru_primakov_stabilisation_1998_1999.yaml); explicit control axes: none
+- `ru_progressive_tax_reform_2025` (policies/ru_progressive_tax_reform_2025.yaml); explicit control axes: none
+- `ru_rosneft_yuganskneftegaz_2004` (policies/ru_rosneft_yuganskneftegaz_2004.yaml); explicit control axes: none
+- `ru_rouble_convertibility_1992` (policies/ru_rouble_convertibility_1992.yaml); explicit control axes: none
+- `ru_rouble_floating_2014` (policies/ru_rouble_floating_2014.yaml); explicit control axes: none
+- `ru_skolkovo_innovation_2010` (policies/ru_skolkovo_innovation_2010.yaml); explicit control axes: none
+- `ru_stabilisation_fund_split_2008` (policies/ru_stabilisation_fund_split_2008.yaml); explicit control axes: none
+- `ru_syria_intervention_2015` (policies/ru_syria_intervention_2015.yaml); explicit control axes: none
+- `ru_ukraine_full_scale_invasion_2022` (policies/ru_ukraine_full_scale_invasion_2022.yaml); explicit control axes: none
+- `ru_vat_rise_2019` (policies/ru_vat_rise_2019.yaml); explicit control axes: none
+- `ru_voucher_privatisation_1992_1994` (policies/ru_voucher_privatisation_1992_1994.yaml); explicit control axes: none
+- `ru_war_economy_normalization_2024` (policies/ru_war_economy_normalization_2024.yaml); explicit control axes: none
+- `ru_wto_accession_2011_2012` (policies/ru_wto_accession_2011_2012.yaml); explicit control axes: none
+- `ru_yeltsin_gaidar_shock_therapy_1992` (policies/ru_yeltsin_gaidar_shock_therapy_1992.yaml); explicit control axes: none
+- `ru_yeltsin_resignation_1999` (policies/ru_yeltsin_resignation_1999.yaml); explicit control axes: none
+- `ru_yukos_affair_2003` (policies/ru_yukos_affair_2003.yaml); explicit control axes: none
+- `russia_gaidar_shock_therapy_1992` (policies/russia_gaidar_shock_therapy_1992.yaml); explicit control axes: none
+- `rwanda_imihigo_performance_contracts_2006` (policies/rwanda_imihigo_performance_contracts_2006.yaml); explicit control axes: none
+- `rwanda_land_tenure_regularisation_2008` (policies/rwanda_land_tenure_regularisation_2008.yaml); explicit control axes: none
+- `rwanda_mutuelles_de_sante_1999` (policies/rwanda_mutuelles_de_sante_1999.yaml); explicit control axes: none
+- `rwanda_rdb_one_stop_shop_2008` (policies/rwanda_rdb_one_stop_shop_2008.yaml); explicit control axes: none
+- `rwanda_vision_2020_plan` (policies/rwanda_vision_2020_plan.yaml); explicit control axes: none
+- `sa_1994_austerity_budget` (policies/sa_1994_austerity_budget.yaml); explicit control axes: none
+- `sa_arab_spring_counter_package_2011` (policies/sa_arab_spring_counter_package_2011.yaml); explicit control axes: none
+- `sa_aramco_ipo_2019` (policies/sa_aramco_ipo_2019.yaml); explicit control axes: none
+- `sa_basic_law_shura_1992` (policies/sa_basic_law_shura_1992.yaml); explicit control axes: none
+- `sa_capital_market_law_2003` (policies/sa_capital_market_law_2003.yaml); explicit control axes: none
+- `sa_driving_ban_lifted_2018` (policies/sa_driving_ban_lifted_2018.yaml); explicit control axes: none
+- `sa_foreign_investment_law_2000` (policies/sa_foreign_investment_law_2000.yaml); explicit control axes: none
+- `sa_government_development_bonds_1988` (policies/sa_government_development_bonds_1988.yaml); explicit control axes: none
+- `sa_grand_mosque_religious_empowerment_1979` (policies/sa_grand_mosque_religious_empowerment_1979.yaml); explicit control axes: none
+- `sa_gulf_war_citizen_bonus_1991` (policies/sa_gulf_war_citizen_bonus_1991.yaml); explicit control axes: none
+- `sa_gulf_war_coalition_contribution_1990_1991` (policies/sa_gulf_war_coalition_contribution_1990_1991.yaml); explicit control axes: none
+- `sa_kaust_founding_2009` (policies/sa_kaust_founding_2009.yaml); explicit control axes: none
+- `sa_khashoggi_killing_2018` (policies/sa_khashoggi_killing_2018.yaml); explicit control axes: none
+- `sa_neom_announcement_2017` (policies/sa_neom_announcement_2017.yaml); explicit control axes: none
+- `sa_nitaqat_saudisation_2011` (policies/sa_nitaqat_saudisation_2011.yaml); explicit control axes: none
+- `sa_opec_plus_strategy_2020_2022` (policies/sa_opec_plus_strategy_2020_2022.yaml); explicit control axes: none
+- `sa_qatar_blockade_2017_2021` (policies/sa_qatar_blockade_2017_2021.yaml); explicit control axes: none
+- `sa_ritz_carlton_detentions_2017` (policies/sa_ritz_carlton_detentions_2017.yaml); explicit control axes: none
+- `sa_riyal_peg_formalisation_1986` (policies/sa_riyal_peg_formalisation_1986.yaml); explicit control axes: none
+- `sa_sabic_founding_1976` (policies/sa_sabic_founding_1976.yaml); explicit control axes: none
+- `sa_sama_reserve_drawdown_1991_1993` (policies/sa_sama_reserve_drawdown_1991_1993.yaml); explicit control axes: none
+- `sa_second_five_year_plan_1975` (policies/sa_second_five_year_plan_1975.yaml); explicit control axes: none
+- `sa_stc_partial_ipo_2002` (policies/sa_stc_partial_ipo_2002.yaml); explicit control axes: none
+- `sa_vat_introduction_2018` (policies/sa_vat_introduction_2018.yaml); explicit control axes: none
+- `sa_vision_2030_launch_2016` (policies/sa_vision_2030_launch_2016.yaml); explicit control axes: none
+- `sa_women_nacb_allowance_2001` (policies/sa_women_nacb_allowance_2001.yaml); explicit control axes: none
+- `sa_women_shura_council_2013` (policies/sa_women_shura_council_2013.yaml); explicit control axes: none
+- `sa_wto_accession_2005` (policies/sa_wto_accession_2005.yaml); explicit control axes: none
+- `sa_yemen_war_intervention_2015` (policies/sa_yemen_war_intervention_2015.yaml); explicit control axes: none
+- `saudi_aramco_partial_ipo_2019` (policies/saudi_aramco_partial_ipo_2019.yaml); explicit control axes: none
+- `saudi_energy_subsidy_reform_2015_2021` (policies/saudi_energy_subsidy_reform_2015_2021.yaml); explicit control axes: none
+- `saudi_labour_market_reforms_2019_2021` (policies/saudi_labour_market_reforms_2019_2021.yaml); explicit control axes: none
+- `saudi_pif_expansion_2016_present` (policies/saudi_pif_expansion_2016_present.yaml); explicit control axes: none
+- `saudi_vat_introduction_2018` (policies/saudi_vat_introduction_2018.yaml); explicit control axes: none
+- `saudi_women_workforce_reforms_2017_2021` (policies/saudi_women_workforce_reforms_2017_2021.yaml); explicit control axes: none
+- `se_bank_crisis_securum_1992` (policies/se_bank_crisis_securum_1992.yaml); explicit control axes: none
+- `se_bolagsskatt_22_percent_2013` (policies/se_bolagsskatt_22_percent_2013.yaml); explicit control axes: none
+- `se_climate_act_2017` (policies/se_climate_act_2017.yaml); explicit control axes: none
+- `se_covid_fiscal_support_extension_2021_2022` (policies/se_covid_fiscal_support_extension_2021_2022.yaml); explicit control axes: none
+- `se_covid_korttidspermittering_2020` (policies/se_covid_korttidspermittering_2020.yaml); explicit control axes: none
+- `se_credit_market_deregulation_november_revolution_1985` (policies/se_credit_market_deregulation_november_revolution_1985.yaml); explicit control axes: none
+- `se_electricity_price_support_2022` (policies/se_electricity_price_support_2022.yaml); explicit control axes: none
+- `se_eu_membership_accession_1995` (policies/se_eu_membership_accession_1995.yaml); explicit control axes: none
+- `se_eu_membership_application_1991` (policies/se_eu_membership_application_1991.yaml); explicit control axes: none
+- `se_euro_referendum_no_2003` (policies/se_euro_referendum_no_2003.yaml); explicit control axes: none
+- `se_expenditure_ceiling_framework_1996` (policies/se_expenditure_ceiling_framework_1996.yaml); explicit control axes: none
+- `se_fastighetsskatt_replacement_2008` (policies/se_fastighetsskatt_replacement_2008.yaml); explicit control axes: none
+- `se_fiscal_consolidation_persson_1995` (policies/se_fiscal_consolidation_persson_1995.yaml); explicit control axes: none
+- `se_fiscal_surplus_target_2000` (policies/se_fiscal_surplus_target_2000.yaml); explicit control axes: none
+- `se_formogenhetsskatt_abolition_2007` (policies/se_formogenhetsskatt_abolition_2007.yaml); explicit control axes: none
+- `se_friskola_school_voucher_1992` (policies/se_friskola_school_voucher_1992.yaml); explicit control axes: none
+- `se_fx_control_abolition_1989` (policies/se_fx_control_abolition_1989.yaml); explicit control axes: none
+- `se_january_agreement_2019` (policies/se_january_agreement_2019.yaml); explicit control axes: none
+- `se_jobskatteavdrag_2007` (policies/se_jobskatteavdrag_2007.yaml); explicit control axes: none
+- `se_krona_devaluation_1977` (policies/se_krona_devaluation_1977.yaml); explicit control axes: none
+- `se_krona_devaluation_1982_sixteen_percent` (policies/se_krona_devaluation_1982_sixteen_percent.yaml); explicit control axes: none
+- `se_krona_free_float_1992` (policies/se_krona_free_float_1992.yaml); explicit control axes: none
+- `se_labour_migration_salary_threshold_2023` (policies/se_labour_migration_salary_threshold_2023.yaml); explicit control axes: none
+- `se_las_employment_protection_reform_2019_2022` (policies/se_las_employment_protection_reform_2019_2022.yaml); explicit control axes: none
+- `se_lontagarfonder_wage_earner_funds_1983` (policies/se_lontagarfonder_wage_earner_funds_1983.yaml); explicit control axes: none
+- `se_maxtaxa_childcare_2002` (policies/se_maxtaxa_childcare_2002.yaml); explicit control axes: none
+- `se_nato_accession_2024` (policies/se_nato_accession_2024.yaml); explicit control axes: none
+- `se_nato_application_2022` (policies/se_nato_application_2022.yaml); explicit control axes: none
+- `se_november_revolution_credit_dereg_1985` (policies/se_november_revolution_credit_dereg_1985.yaml); explicit control axes: none
+- `se_nuclear_new_build_framework_2023` (policies/se_nuclear_new_build_framework_2023.yaml); explicit control axes: none
+- `se_nuclear_referendum_1980` (policies/se_nuclear_referendum_1980.yaml); explicit control axes: none
+- `se_pension_reform_1999` (policies/se_pension_reform_1999.yaml); explicit control axes: none
+- `se_pensioner_tax_relief_2022` (policies/se_pensioner_tax_relief_2022.yaml); explicit control axes: none
+- `se_reduktionsplikt_rollback_2024` (policies/se_reduktionsplikt_rollback_2024.yaml); explicit control axes: none
+- `se_riksbank_independence_1999` (policies/se_riksbank_independence_1999.yaml); explicit control axes: none
+- `se_rut_rot_deductions_2007` (policies/se_rut_rot_deductions_2007.yaml); explicit control axes: none
+- `se_shipbuilding_nationalisation_1977` (policies/se_shipbuilding_nationalisation_1977.yaml); explicit control axes: none
+- `se_tax_reform_of_the_century_1991` (policies/se_tax_reform_of_the_century_1991.yaml); explicit control axes: none
+- `se_temporary_aliens_act_2016` (policies/se_temporary_aliens_act_2016.yaml); explicit control axes: none
+- `se_tido_agreement_2022` (policies/se_tido_agreement_2022.yaml); explicit control axes: none
+- `se_varnskatt_abolition_2020` (policies/se_varnskatt_abolition_2020.yaml); explicit control axes: none
+- `se_wonderful_night_tax_deal_1981` (policies/se_wonderful_night_tax_deal_1981.yaml); explicit control axes: none
+- `si_euro_adoption_2007` (policies/si_euro_adoption_2007.yaml); explicit control axes: none
+- `singapore_bilingual_skills_policy_1966_1979` (policies/singapore_bilingual_skills_policy_1966_1979.yaml); explicit control axes: none
+- `singapore_changi_airport_opening_1981` (policies/singapore_changi_airport_opening_1981.yaml); explicit control axes: none
+- `singapore_container_port_strategy_1972` (policies/singapore_container_port_strategy_1972.yaml); explicit control axes: none
+- `singapore_cpf_1955` (policies/singapore_cpf_1955.yaml); explicit control axes: none
+- `singapore_cpf_establishment_1955` (policies/singapore_cpf_establishment_1955.yaml); explicit control axes: none
+- `singapore_cpf_housing_and_savings_expansion_1968_1984` (policies/singapore_cpf_housing_and_savings_expansion_1968_1984.yaml); explicit control axes: none
+- `singapore_edb_export_industrialisation_1961` (policies/singapore_edb_export_industrialisation_1961.yaml); explicit control axes: none
+- `singapore_hdb_homeownership_program_1960` (policies/singapore_hdb_homeownership_program_1960.yaml); explicit control axes: none
+- `singapore_mas_financial_hub_strategy_1971_1990` (policies/singapore_mas_financial_hub_strategy_1971_1990.yaml); explicit control axes: none
+- `singapore_medifund_1993` (policies/singapore_medifund_1993.yaml); explicit control axes: none
+- `singapore_medisave_1984` (policies/singapore_medisave_1984.yaml); explicit control axes: none
+- `singapore_medishield_1990` (policies/singapore_medishield_1990.yaml); explicit control axes: none
+- `singapore_national_computerisation_plan_1980` (policies/singapore_national_computerisation_plan_1980.yaml); explicit control axes: none
+- `singapore_prevention_corruption_act_cpib_1960` (policies/singapore_prevention_corruption_act_cpib_1960.yaml); explicit control axes: none
+- `sk_bank_fragility_npl_accumulation_1996_1998` (policies/sk_bank_fragility_npl_accumulation_1996_1998.yaml); explicit control axes: none
+- `sk_bank_levy_2012` (policies/sk_bank_levy_2012.yaml); explicit control axes: none
+- `sk_crisis_scrappage_scheme_2009` (policies/sk_crisis_scrappage_scheme_2009.yaml); explicit control axes: none
+- `sk_direct_sale_privatisation_1995` (policies/sk_direct_sale_privatisation_1995.yaml); explicit control axes: none
+- `sk_efsf_vote_collapse_2011` (policies/sk_efsf_vote_collapse_2011.yaml); explicit control axes: none
+- `sk_eu_accession_2004` (policies/sk_eu_accession_2004.yaml); explicit control axes: none
+- `sk_euro_adoption_2009` (policies/sk_euro_adoption_2009.yaml); explicit control axes: none
+- `sk_flat_tax_19_percent_2004` (policies/sk_flat_tax_19_percent_2004.yaml); explicit control axes: none
+- `sk_flat_tax_abolition_2013` (policies/sk_flat_tax_abolition_2013.yaml); explicit control axes: none
+- `sk_foodstuff_vat_reduction_2020` (policies/sk_foodstuff_vat_reduction_2020.yaml); explicit control axes: none
+- `sk_healthcare_user_fee_abolition_2006` (policies/sk_healthcare_user_fee_abolition_2006.yaml); explicit control axes: none
+- `sk_healthcare_user_fees_2003` (policies/sk_healthcare_user_fees_2003.yaml); explicit control axes: none
+- `sk_kuciak_assassination_2018` (policies/sk_kuciak_assassination_2018.yaml); explicit control axes: none
+- `sk_minimum_wage_ramp_2012_2018` (policies/sk_minimum_wage_ramp_2012_2018.yaml); explicit control axes: none
+- `sk_nato_accession_2004` (policies/sk_nato_accession_2004.yaml); explicit control axes: none
+- `sk_open_contracts_transparency_2011` (policies/sk_open_contracts_transparency_2011.yaml); explicit control axes: none
+- `sk_pension_second_pillar_2005` (policies/sk_pension_second_pillar_2005.yaml); explicit control axes: none
+- `sk_second_pillar_voluntarisation_2012` (policies/sk_second_pillar_voluntarisation_2012.yaml); explicit control axes: none
+- `sk_slovak_language_law_1995` (policies/sk_slovak_language_law_1995.yaml); explicit control axes: none
+- `sk_thirteenth_pension_2019` (policies/sk_thirteenth_pension_2019.yaml); explicit control axes: none
+- `sk_vat_20_percent_2011` (policies/sk_vat_20_percent_2011.yaml); explicit control axes: none
+- `sk_voucher_privatisation_cancellation_1995` (policies/sk_voucher_privatisation_cancellation_1995.yaml); explicit control axes: none
+- `sn_four_year_development_plans_1961` (policies/sn_four_year_development_plans_1961.yaml); explicit control axes: none
+- `sn_franc_zone_stability_senghor_1960` (policies/sn_franc_zone_stability_senghor_1960.yaml); explicit control axes: none
+- `sn_groundnut_marketing_board_1960s` (policies/sn_groundnut_marketing_board_1960s.yaml); explicit control axes: none
+- `south_africa_bbbee_codes_2003` (policies/south_africa_bbbee_codes_2003.yaml); explicit control axes: none
+- `south_africa_gear_macro_framework_1996` (policies/south_africa_gear_macro_framework_1996.yaml); explicit control axes: none
+- `south_africa_inflation_targeting_2000` (policies/south_africa_inflation_targeting_2000.yaml); explicit control axes: none
+- `south_africa_labour_relations_act_1995` (policies/south_africa_labour_relations_act_1995.yaml); explicit control axes: none
+- `south_africa_social_grants_expansion_1998` (policies/south_africa_social_grants_expansion_1998.yaml); explicit control axes: none
+- `spain_ave_madrid_seville_1992` (policies/spain_ave_madrid_seville_1992.yaml); explicit control axes: none
+- `spain_aznar_tax_cuts_1998_2002` (policies/spain_aznar_tax_cuts_1998_2002.yaml); explicit control axes: none
+- `spain_bde_independence_law_1994` (policies/spain_bde_independence_law_1994.yaml); explicit control axes: none
+- `spain_dependency_law_saad_2006` (policies/spain_dependency_law_saad_2006.yaml); explicit control axes: none
+- `spain_eec_accession_1986` (policies/spain_eec_accession_1986.yaml); explicit control axes: none
+- `spain_eec_accession_treaty_1985` (policies/spain_eec_accession_treaty_1985.yaml); explicit control axes: none
+- `spain_electricity_law_1997` (policies/spain_electricity_law_1997.yaml); explicit control axes: none
+- `spain_emu_entry_convergence_1998` (policies/spain_emu_entry_convergence_1998.yaml); explicit control axes: none
+- `spain_erte_ngeu_covid_fiscal_2020_2022` (policies/spain_erte_ngeu_covid_fiscal_2020_2022.yaml); explicit control axes: none
+- `spain_estatuto_trabajadores_reform_1984` (policies/spain_estatuto_trabajadores_reform_1984.yaml); explicit control axes: none
+- `spain_gender_violence_law_2004` (policies/spain_gender_violence_law_2004.yaml); explicit control axes: none
+- `spain_historical_memory_law_2007` (policies/spain_historical_memory_law_2007.yaml); explicit control axes: none
+- `spain_housing_law_12_2023` (policies/spain_housing_law_12_2023.yaml); explicit control axes: none
+- `spain_industrial_reconversion_1983_1985` (policies/spain_industrial_reconversion_1983_1985.yaml); explicit control axes: none
+- `spain_industrial_reconversion_1983_1986` (policies/spain_industrial_reconversion_1983_1986.yaml); explicit control axes: none
+- `spain_iraq_participation_2003` (policies/spain_iraq_participation_2003.yaml); explicit control axes: none
+- `spain_iraq_withdrawal_2004` (policies/spain_iraq_withdrawal_2004.yaml); explicit control axes: none
+- `spain_irpf_tax_reform_1978` (policies/spain_irpf_tax_reform_1978.yaml); explicit control axes: none
+- `spain_labour_reform_1994` (policies/spain_labour_reform_1994.yaml); explicit control axes: none
+- `spain_labour_reform_1997` (policies/spain_labour_reform_1997.yaml); explicit control axes: none
+- `spain_labour_reform_2001` (policies/spain_labour_reform_2001.yaml); explicit control axes: none
+- `spain_labour_reform_2012` (policies/spain_labour_reform_2012.yaml); explicit control axes: none
+- `spain_labour_reform_rdl_32_2021` (policies/spain_labour_reform_rdl_32_2021.yaml); explicit control axes: none
+- `spain_land_liberalisation_ley_suelo_1998` (policies/spain_land_liberalisation_ley_suelo_1998.yaml); explicit control axes: none
+- `spain_ley_general_sanidad_1986` (policies/spain_ley_general_sanidad_1986.yaml); explicit control axes: none
+- `spain_ley_organica_10_2022_consent_law` (policies/spain_ley_organica_10_2022_consent_law.yaml); explicit control axes: none
+- `spain_migrant_regularisation_2005` (policies/spain_migrant_regularisation_2005.yaml); explicit control axes: none
+- `spain_minimum_wage_increases_2018_2024` (policies/spain_minimum_wage_increases_2018_2024.yaml); explicit control axes: none
+- `spain_moncloa_pacts_1977` (policies/spain_moncloa_pacts_1977.yaml); explicit control axes: none
+- `spain_nato_referendum_1986` (policies/spain_nato_referendum_1986.yaml); explicit control axes: none
+- `spain_pension_reform_pacto_toledo_1997` (policies/spain_pension_reform_pacto_toledo_1997.yaml); explicit control axes: none
+- `spain_pension_revaluation_cpi_link_2021_2023` (policies/spain_pension_revaluation_cpi_link_2021_2023.yaml); explicit control axes: none
+- `spain_peseta_devaluation_1977` (policies/spain_peseta_devaluation_1977.yaml); explicit control axes: none
+- `spain_peseta_devaluation_1982` (policies/spain_peseta_devaluation_1982.yaml); explicit control axes: none
+- `spain_peseta_erm_devaluations_1992_1995` (policies/spain_peseta_erm_devaluations_1992_1995.yaml); explicit control axes: none
+- `spain_privatisations_ppp_1997_2000` (policies/spain_privatisations_ppp_1997_2000.yaml); explicit control axes: none
+- `spain_repsol_endesa_privatisations_1989_1996` (policies/spain_repsol_endesa_privatisations_1989_1996.yaml); explicit control axes: none
+- `spain_rumasa_expropriation_1983` (policies/spain_rumasa_expropriation_1983.yaml); explicit control axes: none
+- `spain_same_sex_marriage_2005` (policies/spain_same_sex_marriage_2005.yaml); explicit control axes: none
+- `spain_solidarity_wealth_tax_2023` (policies/spain_solidarity_wealth_tax_2023.yaml); explicit control axes: none
+- `spain_windfall_taxes_banks_energy_2022_2023` (policies/spain_windfall_taxes_banks_energy_2022_2023.yaml); explicit control axes: none
+- `spain_workers_statute_1980` (policies/spain_workers_statute_1980.yaml); explicit control axes: none
+- `spain_zapatero_tax_reforms_2006_2008` (policies/spain_zapatero_tax_reforms_2006_2008.yaml); explicit control axes: none
+- `sri_lanka_food_stamp_scheme_1979` (policies/sri_lanka_food_stamp_scheme_1979.yaml); explicit control axes: none
+- `sri_lanka_gcec_epz_act_1978` (policies/sri_lanka_gcec_epz_act_1978.yaml); explicit control axes: none
+- `sri_lanka_open_economy_package_1977` (policies/sri_lanka_open_economy_package_1977.yaml); explicit control axes: none
+- `sri_lanka_peoplisation_privatisation_1989_1994` (policies/sri_lanka_peoplisation_privatisation_1989_1994.yaml); explicit control axes: none
+- `stability_growth_pact_1997` (policies/stability_growth_pact_1997.yaml); explicit control axes: none
+- `su_belovezha_dissolution_1991` (policies/su_belovezha_dissolution_1991.yaml); explicit control axes: none
+- `su_cooperative_law_1988` (policies/su_cooperative_law_1988.yaml); explicit control axes: none
+- `su_individual_labour_activity_law_1986` (policies/su_individual_labour_activity_law_1986.yaml); explicit control axes: none
+- `su_pavlov_price_reform_1991` (policies/su_pavlov_price_reform_1991.yaml); explicit control axes: none
+- `su_state_enterprise_law_1987` (policies/su_state_enterprise_law_1987.yaml); explicit control axes: none
+- `sv_bitcoin_legal_tender_2021` (policies/sv_bitcoin_legal_tender_2021.yaml); explicit control axes: none
+- `sv_bitcoin_removal_imf_2024` (policies/sv_bitcoin_removal_imf_2024.yaml); explicit control axes: none
+- `sv_bond_buyback_2023` (policies/sv_bond_buyback_2023.yaml); explicit control axes: none
+- `sv_cecot_mega_prison_2023` (policies/sv_cecot_mega_prison_2023.yaml); explicit control axes: none
+- `sv_chivo_wallet_2021` (policies/sv_chivo_wallet_2021.yaml); explicit control axes: none
+- `sv_cicies_termination_2021` (policies/sv_cicies_termination_2021.yaml); explicit control axes: none
+- `sv_constitutional_chamber_removal_2021` (policies/sv_constitutional_chamber_removal_2021.yaml); explicit control axes: none
+- `sv_digital_asset_issuance_law_2023` (policies/sv_digital_asset_issuance_law_2023.yaml); explicit control axes: none
+- `sv_fmln_paquete_escolar_2014` (policies/sv_fmln_paquete_escolar_2014.yaml); explicit control axes: none
+- `sv_fmln_pension_reform_arrears_2017` (policies/sv_fmln_pension_reform_arrears_2017.yaml); explicit control axes: none
+- `sv_fmln_sct_crime_plan_2015` (policies/sv_fmln_sct_crime_plan_2015.yaml); explicit control axes: none
+- `sv_fmln_solidarity_pension_2014` (policies/sv_fmln_solidarity_pension_2014.yaml); explicit control axes: none
+- `sv_ley_fomento_tecnologia_2023` (policies/sv_ley_fomento_tecnologia_2023.yaml); explicit control axes: none
+- `sv_municipal_consolidation_262_to_44_2023` (policies/sv_municipal_consolidation_262_to_44_2023.yaml); explicit control axes: none
+- `sv_plan_control_territorial_2019` (policies/sv_plan_control_territorial_2019.yaml); explicit control axes: none
+- `sv_state_of_exception_2022` (policies/sv_state_of_exception_2022.yaml); explicit control axes: none
+- `sv_tax_reform_2023` (policies/sv_tax_reform_2023.yaml); explicit control axes: none
+- `sweden_bildt_market_reforms_1991_1994` (policies/sweden_bildt_market_reforms_1991_1994.yaml); explicit control axes: none
+- `sweden_inkomstpension_ndc_1999` (policies/sweden_inkomstpension_ndc_1999.yaml); explicit control axes: none
+- `sweden_pension_auto_balance_mechanism` (policies/sweden_pension_auto_balance_mechanism.yaml); explicit control axes: none
+- `sweden_premiepension_funded_accounts_1999` (policies/sweden_premiepension_funded_accounts_1999.yaml); explicit control axes: none
+- `sweden_school_voucher_1992` (policies/sweden_school_voucher_1992.yaml); explicit control axes: none
+- `switzerland_energiegesetz_2016` (policies/switzerland_energiegesetz_2016.yaml); explicit control axes: none
+- `switzerland_energy_strategy_2050` (policies/switzerland_energy_strategy_2050.yaml); explicit control axes: none
+- `switzerland_kvg_mandatory_health_1994` (policies/switzerland_kvg_mandatory_health_1994.yaml); explicit control axes: none
+- `switzerland_nuclear_new_build_ban_2017` (policies/switzerland_nuclear_new_build_ban_2017.yaml); explicit control axes: none
+- `syr_agrarian_reform_consolidation_1963_1970` (policies/syr_agrarian_reform_consolidation_1963_1970.yaml); explicit control axes: none
+- `syr_baath_nationalisations_1965` (policies/syr_baath_nationalisations_1965.yaml); explicit control axes: none
+- `syr_public_sector_five_year_planning_1971_1980` (policies/syr_public_sector_five_year_planning_1971_1980.yaml); explicit control axes: none
+- `taiwan_itri_semiconductor_1973` (policies/taiwan_itri_semiconductor_1973.yaml); explicit control axes: none
+- `tanzania_arusha_nationalisations_1967` (policies/tanzania_arusha_nationalisations_1967.yaml); explicit control axes: none
+- `tanzania_national_milling_monopoly_1976` (policies/tanzania_national_milling_monopoly_1976.yaml); explicit control axes: none
+- `tanzania_state_trading_corporation_1967` (policies/tanzania_state_trading_corporation_1967.yaml); explicit control axes: none
+- `tanzania_universal_primary_education_1974` (policies/tanzania_universal_primary_education_1974.yaml); explicit control axes: none
+- `tanzania_villagisation_1973` (policies/tanzania_villagisation_1973.yaml); explicit control axes: none
+- `th_14_august_package_1998` (policies/th_14_august_package_1998.yaml); explicit control axes: none
+- `th_1978_constitution` (policies/th_1978_constitution.yaml); explicit control axes: none
+- `th_2006_military_coup` (policies/th_2006_military_coup.yaml); explicit control axes: none
+- `th_2007_constitution_referendum` (policies/th_2007_constitution_referendum.yaml); explicit control axes: none
+- `th_2014_coup_ncpo_2014` (policies/th_2014_coup_ncpo_2014.yaml); explicit control axes: none
+- `th_2017_constitution` (policies/th_2017_constitution.yaml); explicit control axes: none
+- `th_20_year_national_strategy_2018` (policies/th_20_year_national_strategy_2018.yaml); explicit control axes: none
+- `th_30_baht_universal_healthcare_2001` (policies/th_30_baht_universal_healthcare_2001.yaml); explicit control axes: none
+- `th_abhisit_cheque_2000_baht_2009` (policies/th_abhisit_cheque_2000_baht_2009.yaml); explicit control axes: none
+- `th_abhisit_elderly_universal_allowance_2009` (policies/th_abhisit_elderly_universal_allowance_2009.yaml); explicit control axes: none
+- `th_abhisit_free_15_year_education_2009` (policies/th_abhisit_free_15_year_education_2009.yaml); explicit control axes: none
+- `th_abhisit_red_shirt_crackdown_may_2010` (policies/th_abhisit_red_shirt_crackdown_may_2010.yaml); explicit control axes: none
+- `th_abhisit_thai_khem_khaeng_stimulus_2009` (policies/th_abhisit_thai_khem_khaeng_stimulus_2009.yaml); explicit control axes: none
+- `th_agriculture_debt_moratorium_2000` (policies/th_agriculture_debt_moratorium_2000.yaml); explicit control axes: none
+- `th_baht_devaluation_1984` (policies/th_baht_devaluation_1984.yaml); explicit control axes: none
+- `th_baht_float_july_1997` (policies/th_baht_float_july_1997.yaml); explicit control axes: none
+- `th_bibf_launch_1993` (policies/th_bibf_launch_1993.yaml); explicit control axes: none
+- `th_bibf_planning_1989_1991` (policies/th_bibf_planning_1989_1991.yaml); explicit control axes: none
+- `th_boi_export_tax_holiday_regime_1983` (policies/th_boi_export_tax_holiday_regime_1983.yaml); explicit control axes: none
+- `th_boi_thailand_4_0_investment_push_2015_2023` (policies/th_boi_thailand_4_0_investment_push_2015_2023.yaml); explicit control axes: none
+- `th_bot_reserve_depletion_1996_1997` (policies/th_bot_reserve_depletion_1996_1997.yaml); explicit control axes: none
+- `th_casino_entertainment_complex_bill_2025` (policies/th_casino_entertainment_complex_bill_2025.yaml); explicit control axes: none
+- `th_china_trade_agreement_1978` (policies/th_china_trade_agreement_1978.yaml); explicit control axes: none
+- `th_constitutional_drafting_initiation_1994_1995` (policies/th_constitutional_drafting_initiation_1994_1995.yaml); explicit control axes: none
+- `th_digital_wallet_10k_baht_2024` (policies/th_digital_wallet_10k_baht_2024.yaml); explicit control axes: none
+- `th_eastern_seaboard_programme_1982` (policies/th_eastern_seaboard_programme_1982.yaml); explicit control axes: none
+- `th_eec_act_2018` (policies/th_eec_act_2018.yaml); explicit control axes: none
+- `th_energy_price_caps_2023_2024` (policies/th_energy_price_caps_2023_2024.yaml); explicit control axes: none
+- `th_fidf_bank_recapitalisation_1998` (policies/th_fidf_bank_recapitalisation_1998.yaml); explicit control axes: none
+- `th_fifth_nesdp_1982_1986` (policies/th_fifth_nesdp_1982_1986.yaml); explicit control axes: none
+- `th_finance_company_suspensions_1997` (policies/th_finance_company_suspensions_1997.yaml); explicit control axes: none
+- `th_financial_hub_bill_2025` (policies/th_financial_hub_bill_2025.yaml); explicit control axes: none
+- `th_fourth_nesdp_1977_1981` (policies/th_fourth_nesdp_1977_1981.yaml); explicit control axes: none
+- `th_imf_early_repayment_2003` (policies/th_imf_early_repayment_2003.yaml); explicit control axes: none
+- `th_imf_programme_implementation_1997_2000` (policies/th_imf_programme_implementation_1997_2000.yaml); explicit control axes: none
+- `th_imf_stand_by_arrangement_1997` (policies/th_imf_stand_by_arrangement_1997.yaml); explicit control axes: none
+- `th_indochina_trade_opening_1988_1991` (policies/th_indochina_trade_opening_1988_1991.yaml); explicit control axes: none
+- `th_kriangsak_fuel_price_passthrough_1979` (policies/th_kriangsak_fuel_price_passthrough_1979.yaml); explicit control axes: none
+- `th_land_bridge_project_2023` (policies/th_land_bridge_project_2023.yaml); explicit control axes: none
+- `th_minimum_wage_300_to_354_trajectory_2017_2022` (policies/th_minimum_wage_300_to_354_trajectory_2017_2022.yaml); explicit control axes: none
+- `th_minimum_wage_400_baht_trajectory_2024` (policies/th_minimum_wage_400_baht_trajectory_2024.yaml); explicit control axes: none
+- `th_move_forward_dissolution_2024` (policies/th_move_forward_dissolution_2024.yaml); explicit control axes: none
+- `th_order_66_2523_counterinsurgency_amnesty_1980` (policies/th_order_66_2523_counterinsurgency_amnesty_1980.yaml); explicit control axes: none
+- `th_otop_rural_enterprise_2001` (policies/th_otop_rural_enterprise_2001.yaml); explicit control axes: none
+- `th_peoples_constitution_1997` (policies/th_peoples_constitution_1997.yaml); explicit control axes: none
+- `th_ppp_dissolution_ruling_2008` (policies/th_ppp_dissolution_ruling_2008.yaml); explicit control axes: none
+- `th_ppp_village_fund_rollover_2008` (policies/th_ppp_village_fund_rollover_2008.yaml); explicit control axes: none
+- `th_ptt_partial_privatisation_2001` (policies/th_ptt_partial_privatisation_2001.yaml); explicit control axes: none
+- `th_samak_preah_vihear_unesco_2008` (policies/th_samak_preah_vihear_unesco_2008.yaml); explicit control axes: none
+- `th_samak_somchai_fiscal_stimulus_gfc_precursor_2008` (policies/th_samak_somchai_fiscal_stimulus_gfc_precursor_2008.yaml); explicit control axes: none
+- `th_sec_act_1992` (policies/th_sec_act_1992.yaml); explicit control axes: none
+- `th_shin_corp_temasek_sale_2006` (policies/th_shin_corp_temasek_sale_2006.yaml); explicit control axes: none
+- `th_sixth_5yr_plan_acceleration_1988` (policies/th_sixth_5yr_plan_acceleration_1988.yaml); explicit control axes: none
+- `th_sixth_nesdp_1987_1991` (policies/th_sixth_nesdp_1987_1991.yaml); explicit control axes: none
+- `th_sufficiency_economy_10th_plan_2007` (policies/th_sufficiency_economy_10th_plan_2007.yaml); explicit control axes: none
+- `th_surayud_capital_controls_dec_2006` (policies/th_surayud_capital_controls_dec_2006.yaml); explicit control axes: none
+- `th_tambon_administrative_elections_1999` (policies/th_tambon_administrative_elections_1999.yaml); explicit control axes: none
+- `th_tambon_fund_1994` (policies/th_tambon_fund_1994.yaml); explicit control axes: none
+- `th_telecom_concessions_framework_1991_1992` (policies/th_telecom_concessions_framework_1991_1992.yaml); explicit control axes: none
+- `th_thai_rak_thai_dissolution_2007` (policies/th_thai_rak_thai_dissolution_2007.yaml); explicit control axes: none
+- `th_thaksin_return_royal_pardon_2023` (policies/th_thaksin_return_royal_pardon_2023.yaml); explicit control axes: none
+- `th_vat_introduction_1992` (policies/th_vat_introduction_1992.yaml); explicit control axes: none
+- `th_village_urban_revolving_fund_2001` (policies/th_village_urban_revolving_fund_2001.yaml); explicit control axes: none
+- `th_visa_free_tourism_expansion_2023` (policies/th_visa_free_tourism_expansion_2023.yaml); explicit control axes: none
+- `th_war_on_drugs_2003` (policies/th_war_on_drugs_2003.yaml); explicit control axes: none
+- `th_welfare_card_pracharath_2017` (policies/th_welfare_card_pracharath_2017.yaml); explicit control axes: none
+- `th_yingluck_amnesty_bill_2013` (policies/th_yingluck_amnesty_bill_2013.yaml); explicit control axes: none
+- `th_yingluck_corporate_tax_cut_2012_2013` (policies/th_yingluck_corporate_tax_cut_2012_2013.yaml); explicit control axes: none
+- `th_yingluck_first_car_buyer_rebate_2011_2012` (policies/th_yingluck_first_car_buyer_rebate_2011_2012.yaml); explicit control axes: none
+- `th_yingluck_minimum_wage_300_baht_2012` (policies/th_yingluck_minimum_wage_300_baht_2012.yaml); explicit control axes: none
+- `th_yingluck_rice_pledging_scheme_2011_2014` (policies/th_yingluck_rice_pledging_scheme_2011_2014.yaml); explicit control axes: none
+- `thailand_30_baht_health_2001` (policies/thailand_30_baht_health_2001.yaml); explicit control axes: none
+- `thailand_baht_float_1997` (policies/thailand_baht_float_1997.yaml); explicit control axes: none
+- `thailand_fidf_bank_restructuring_1998` (policies/thailand_fidf_bank_restructuring_1998.yaml); explicit control axes: none
+- `thailand_imf_letter_of_intent_1997` (policies/thailand_imf_letter_of_intent_1997.yaml); explicit control axes: none
+- `thailand_inflation_targeting_2000` (policies/thailand_inflation_targeting_2000.yaml); explicit control axes: none
+- `thailand_village_fund_2001` (policies/thailand_village_fund_2001.yaml); explicit control axes: none
+- `tr_1977_1979_workers_remittance_fx_shortage` (policies/tr_1977_1979_workers_remittance_fx_shortage.yaml); explicit control axes: none
+- `tr_1982_constitution_authoritarian_lock_in` (policies/tr_1982_constitution_authoritarian_lock_in.yaml); explicit control axes: none
+- `tr_1994_stabilisation_package` (policies/tr_1994_stabilisation_package.yaml); explicit control axes: none
+- `tr_2001_banking_currency_crisis` (policies/tr_2001_banking_currency_crisis.yaml); explicit control axes: none
+- `tr_banker_scandal_financial_deregulation_1982` (policies/tr_banker_scandal_financial_deregulation_1982.yaml); explicit control axes: none
+- `tr_bddk_establishment_1999` (policies/tr_bddk_establishment_1999.yaml); explicit control axes: none
+- `tr_cbrt_governor_dismissals_2019_2021` (policies/tr_cbrt_governor_dismissals_2019_2021.yaml); explicit control axes: none
+- `tr_cbrt_rate_hike_cycle_2023_2024` (policies/tr_cbrt_rate_hike_cycle_2023_2024.yaml); explicit control axes: none
+- `tr_central_bank_independence_2001` (policies/tr_central_bank_independence_2001.yaml); explicit control axes: none
+- `tr_constitutional_referendum_executive_presidency_2017` (policies/tr_constitutional_referendum_executive_presidency_2017.yaml); explicit control axes: none
+- `tr_d8_founding_1997` (policies/tr_d8_founding_1997.yaml); explicit control axes: none
+- `tr_dervis_transition_programme_2001` (policies/tr_dervis_transition_programme_2001.yaml); explicit control axes: none
+- `tr_dyp_refah_coalition_1996` (policies/tr_dyp_refah_coalition_1996.yaml); explicit control axes: none
+- `tr_earthquake_reconstruction_programme_2023_2025` (policies/tr_earthquake_reconstruction_programme_2023_2025.yaml); explicit control axes: none
+- `tr_earthquake_response_fiscal_package_2023` (policies/tr_earthquake_response_fiscal_package_2023.yaml); explicit control axes: none
+- `tr_eu_candidate_constitutional_amendments_2001` (policies/tr_eu_candidate_constitutional_amendments_2001.yaml); explicit control axes: none
+- `tr_eu_customs_union_1995` (policies/tr_eu_customs_union_1995.yaml); explicit control axes: none
+- `tr_executive_presidency_inauguration_2018` (policies/tr_executive_presidency_inauguration_2018.yaml); explicit control axes: none
+- `tr_february_28_process_1997` (policies/tr_february_28_process_1997.yaml); explicit control axes: none
+- `tr_gezi_protest_crackdown_2013` (policies/tr_gezi_protest_crackdown_2013.yaml); explicit control axes: none
+- `tr_imamoglu_imprisonment_2025` (policies/tr_imamoglu_imprisonment_2025.yaml); explicit control axes: none
+- `tr_iran_gas_deal_1996` (policies/tr_iran_gas_deal_1996.yaml); explicit control axes: none
+- `tr_isi_model_terminal_crisis_1977_1980` (policies/tr_isi_model_terminal_crisis_1977_1980.yaml); explicit control axes: none
+- `tr_january_24_1980_stabilisation_package` (policies/tr_january_24_1980_stabilisation_package.yaml); explicit control axes: none
+- `tr_kgf_credit_guarantee_expansion_2017` (policies/tr_kgf_credit_guarantee_expansion_2017.yaml); explicit control axes: none
+- `tr_kkm_fx_protected_deposits_2021` (policies/tr_kkm_fx_protected_deposits_2021.yaml); explicit control axes: none
+- `tr_kkm_unwind_2023_2025` (policies/tr_kkm_unwind_2023_2025.yaml); explicit control axes: none
+- `tr_lira_crisis_brunson_2018` (policies/tr_lira_crisis_brunson_2018.yaml); explicit control axes: none
+- `tr_ohal_state_of_emergency_2016_2018` (policies/tr_ohal_state_of_emergency_2016_2018.yaml); explicit control axes: none
+- `tr_ozal_export_subsidies_deepening_1980_1983` (policies/tr_ozal_export_subsidies_deepening_1980_1983.yaml); explicit control axes: none
+- `tr_post_coup_judicial_purge_2016_2018` (policies/tr_post_coup_judicial_purge_2016_2018.yaml); explicit control axes: none
+- `tr_privatisation_programme_1993_1996` (policies/tr_privatisation_programme_1993_1996.yaml); explicit control axes: none
+- `tr_simsek_orthodox_pivot_2023` (policies/tr_simsek_orthodox_pivot_2023.yaml); explicit control axes: none
+- `tr_trade_union_suppression_martial_law_1980` (policies/tr_trade_union_suppression_martial_law_1980.yaml); explicit control axes: none
+- `tun_code_personal_status_1956` (policies/tun_code_personal_status_1956.yaml); explicit control axes: none
+- `tun_education_health_expansion_1958_1970s` (policies/tun_education_health_expansion_1958_1970s.yaml); explicit control axes: none
+- `tun_perspectives_decennales_1962` (policies/tun_perspectives_decennales_1962.yaml); explicit control axes: none
+- `turkey_24_january_1980_programme` (policies/turkey_24_january_1980_programme.yaml); explicit control axes: none
+- `turkey_capital_account_liberalisation_1989` (policies/turkey_capital_account_liberalisation_1989.yaml); explicit control axes: none
+- `turkey_cbrt_political_pressure_2013_2023` (policies/turkey_cbrt_political_pressure_2013_2023.yaml); explicit control axes: none
+- `turkey_erdogan_low_rate_heterodoxy_2021_2023` (policies/turkey_erdogan_low_rate_heterodoxy_2021_2023.yaml); explicit control axes: none
+- `turkey_export_promotion_regime_1980_1988` (policies/turkey_export_promotion_regime_1980_1988.yaml); explicit control axes: none
+- `turkey_imf_stabilisation_continuation_2002_2008` (policies/turkey_imf_stabilisation_continuation_2002_2008.yaml); explicit control axes: none
+- `turkey_islamic_banking_legalisation_1983` (policies/turkey_islamic_banking_legalisation_1983.yaml); explicit control axes: none
+- `turkey_kkm_fx_protected_deposits_2021` (policies/turkey_kkm_fx_protected_deposits_2021.yaml); explicit control axes: none
+- `turkey_post_2016_institutional_consolidation` (policies/turkey_post_2016_institutional_consolidation.yaml); explicit control axes: none
+- `turkey_soe_privatisation_programme_2003_2013` (policies/turkey_soe_privatisation_programme_2003_2013.yaml); explicit control axes: none
+- `turkey_vat_introduction_1985` (policies/turkey_vat_introduction_1985.yaml); explicit control axes: none
+- `ua_hryvnia_stabilisation_1996` (policies/ua_hryvnia_stabilisation_1996.yaml); explicit control axes: none
+- `ua_independence_property_transition_1991` (policies/ua_independence_property_transition_1991.yaml); explicit control axes: none
+- `ua_mass_privatization_certificates_1995` (policies/ua_mass_privatization_certificates_1995.yaml); explicit control axes: none
+- `uae_corporate_tax_introduction_2023` (policies/uae_corporate_tax_introduction_2023.yaml); explicit control axes: none
+- `uae_difc_adgm_financial_zones_2004_2015` (policies/uae_difc_adgm_financial_zones_2004_2015.yaml); explicit control axes: none
+- `uae_dirham_peg_1997` (policies/uae_dirham_peg_1997.yaml); explicit control axes: none
+- `uae_foreign_ownership_reform_2020` (policies/uae_foreign_ownership_reform_2020.yaml); explicit control axes: none
+- `uae_jafza_free_zone_1985` (policies/uae_jafza_free_zone_1985.yaml); explicit control axes: none
+- `uae_vat_introduction_2018` (policies/uae_vat_introduction_2018.yaml); explicit control axes: none
+- `ug_anti_homosexuality_act_2023` (policies/ug_anti_homosexuality_act_2023.yaml); explicit control axes: none
+- `ug_lake_albert_oil_eacop_fid_2022` (policies/ug_lake_albert_oil_eacop_fid_2022.yaml); explicit control axes: none
+- `ug_parish_development_model_2022` (policies/ug_parish_development_model_2022.yaml); explicit control axes: none
+- `uk_article_50_notification_2017` (policies/uk_article_50_notification_2017.yaml); explicit control axes: none
+- `uk_austerity_2010_2015` (policies/uk_austerity_2010_2015.yaml); explicit control axes: none
+- `uk_autumn_budget_2024_tax_package` (policies/uk_autumn_budget_2024_tax_package.yaml); explicit control axes: none
+- `uk_autumn_statement_fiscal_drag_2022` (policies/uk_autumn_statement_fiscal_drag_2022.yaml); explicit control axes: none
+- `uk_bank_of_england_independence_1997` (policies/uk_bank_of_england_independence_1997.yaml); explicit control axes: none
+- `uk_bank_of_england_nationalisation_1946` (policies/uk_bank_of_england_nationalisation_1946.yaml); explicit control axes: none
+- `uk_bank_recapitalisation_2008` (policies/uk_bank_recapitalisation_2008.yaml); explicit control axes: none
+- `uk_big_bang_financial_deregulation_1986` (policies/uk_big_bang_financial_deregulation_1986.yaml); explicit control axes: none
+- `uk_blair_brown_fiscal_expansion_2001_2010` (policies/uk_blair_brown_fiscal_expansion_2001_2010.yaml); explicit control axes: none
+- `uk_brexit_implementation_2020` (policies/uk_brexit_implementation_2020.yaml); explicit control axes: none
+- `uk_british_aerospace_shipbuilding_nationalisation_1977` (policies/uk_british_aerospace_shipbuilding_nationalisation_1977.yaml); explicit control axes: none
+- `uk_british_airways_privatisation_1987` (policies/uk_british_airways_privatisation_1987.yaml); explicit control axes: none
+- `uk_british_coal_privatisation_1994` (policies/uk_british_coal_privatisation_1994.yaml); explicit control axes: none
+- `uk_cameron_osborne_austerity_2010_2015` (policies/uk_cameron_osborne_austerity_2010_2015.yaml); explicit control axes: none
+- `uk_clean_power_2030_action_plan_2024` (policies/uk_clean_power_2030_action_plan_2024.yaml); explicit control axes: none
+- `uk_coal_nationalisation_1946` (policies/uk_coal_nationalisation_1946.yaml); explicit control axes: none
+- `uk_corn_law_repeal_1846` (policies/uk_corn_law_repeal_1846.yaml); explicit control axes: none
+- `uk_corporate_tax_reduction_2010_2015` (policies/uk_corporate_tax_reduction_2010_2015.yaml); explicit control axes: none
+- `uk_corporation_tax_increase_2023` (policies/uk_corporation_tax_increase_2023.yaml); explicit control axes: none
+- `uk_corporation_tax_reform_1984_1986` (policies/uk_corporation_tax_reform_1984_1986.yaml); explicit control axes: none
+- `uk_corporation_tax_rise_announcement_2021` (policies/uk_corporation_tax_rise_announcement_2021.yaml); explicit control axes: none
+- `uk_council_house_right_to_buy_1980` (policies/uk_council_house_right_to_buy_1980.yaml); explicit control axes: none
+- `uk_council_tax_1992` (policies/uk_council_tax_1992.yaml); explicit control axes: none
+- `uk_covid_furlough_scheme_2020` (policies/uk_covid_furlough_scheme_2020.yaml); explicit control axes: none
+- `uk_dce_monetary_targeting_1976` (policies/uk_dce_monetary_targeting_1976.yaml); explicit control axes: none
+- `uk_electricity_privatisation_1989_1990` (policies/uk_electricity_privatisation_1989_1990.yaml); explicit control axes: none
+- `uk_employment_act_1980` (policies/uk_employment_act_1980.yaml); explicit control axes: none
+- `uk_employment_act_1982` (policies/uk_employment_act_1982.yaml); explicit control axes: none
+- `uk_employment_rights_bill_2024` (policies/uk_employment_rights_bill_2024.yaml); explicit control axes: none
+- `uk_end_of_free_movement_2021` (policies/uk_end_of_free_movement_2021.yaml); explicit control axes: none
+- `uk_erm_entry_and_ejection_1990_1992` (policies/uk_erm_entry_and_ejection_1990_1992.yaml); explicit control axes: none
+- `uk_exchange_control_abolition_1979` (policies/uk_exchange_control_abolition_1979.yaml); explicit control axes: none
+- `uk_first_wave_privatisations_1981_1983` (policies/uk_first_wave_privatisations_1981_1983.yaml); explicit control axes: none
+- `uk_full_expensing_capital_allowance_2023` (policies/uk_full_expensing_capital_allowance_2023.yaml); explicit control axes: none
+- `uk_g20_london_summit_2009` (policies/uk_g20_london_summit_2009.yaml); explicit control axes: none
+- `uk_great_british_energy_act_2024` (policies/uk_great_british_energy_act_2024.yaml); explicit control axes: none
+- `uk_greenbelt_protection_sustained` (policies/uk_greenbelt_protection_sustained.yaml); explicit control axes: none
+- `uk_grenfell_cladding_regime_response_2017` (policies/uk_grenfell_cladding_regime_response_2017.yaml); explicit control axes: none
+- `uk_growth_plan_mini_budget_2022` (policies/uk_growth_plan_mini_budget_2022.yaml); explicit control axes: none
+- `uk_health_social_care_levy_2022` (policies/uk_health_social_care_levy_2022.yaml); explicit control axes: none
+- `uk_howe_budget_1979` (policies/uk_howe_budget_1979.yaml); explicit control axes: none
+- `uk_howe_budget_1981_tax_rise_in_recession` (policies/uk_howe_budget_1981_tax_rise_in_recession.yaml); explicit control axes: none
+- `uk_illegal_migration_rwanda_acts_2023_2024` (policies/uk_illegal_migration_rwanda_acts_2023_2024.yaml); explicit control axes: none
+- `uk_imf_standby_1976` (policies/uk_imf_standby_1976.yaml); explicit control axes: none
+- `uk_income_tax_cuts_1988` (policies/uk_income_tax_cuts_1988.yaml); explicit control axes: none
+- `uk_incomes_policy_social_contract_1975_1978` (policies/uk_incomes_policy_social_contract_1975_1978.yaml); explicit control axes: none
+- `uk_industrial_strategy_white_paper_2017` (policies/uk_industrial_strategy_white_paper_2017.yaml); explicit control axes: none
+- `uk_inflation_target_regime_1992` (policies/uk_inflation_target_regime_1992.yaml); explicit control axes: none
+- `uk_iron_steel_nationalisation_1949` (policies/uk_iron_steel_nationalisation_1949.yaml); explicit control axes: none
+- `uk_labour_exchanges_act_1909` (policies/uk_labour_exchanges_act_1909.yaml); explicit control axes: none
+- `uk_lawson_budget_1988` (policies/uk_lawson_budget_1988.yaml); explicit control axes: none
+- `uk_levelling_up_white_paper_2022` (policies/uk_levelling_up_white_paper_2022.yaml); explicit control axes: none
+- `uk_local_authority_planning_discretion` (policies/uk_local_authority_planning_discretion.yaml); explicit control axes: none
+- `uk_maastricht_opt_outs_1993` (policies/uk_maastricht_opt_outs_1993.yaml); explicit control axes: none
+- `uk_medium_term_financial_strategy_1980` (policies/uk_medium_term_financial_strategy_1980.yaml); explicit control axes: none
+- `uk_miners_strike_resolution_1984_1985` (policies/uk_miners_strike_resolution_1984_1985.yaml); explicit control axes: none
+- `uk_national_insurance_act_1911` (policies/uk_national_insurance_act_1911.yaml); explicit control axes: none
+- `uk_national_insurance_act_1946` (policies/uk_national_insurance_act_1946.yaml); explicit control axes: none
+- `uk_national_insurance_cuts_2024` (policies/uk_national_insurance_cuts_2024.yaml); explicit control axes: none
+- `uk_national_minimum_wage_1998` (policies/uk_national_minimum_wage_1998.yaml); explicit control axes: none
+- `uk_national_wealth_fund_2024` (policies/uk_national_wealth_fund_2024.yaml); explicit control axes: none
+- `uk_net_zero_transition_2019_2050` (policies/uk_net_zero_transition_2019_2050.yaml); explicit control axes: none
+- `uk_network_charge_structure` (policies/uk_network_charge_structure.yaml); explicit control axes: none
+- `uk_nhs_act_1946` (policies/uk_nhs_act_1946.yaml); explicit control axes: none
+- `uk_nhs_capacity_expansion_2001_2010` (policies/uk_nhs_capacity_expansion_2001_2010.yaml); explicit control axes: none
+- `uk_nhs_internal_market_1990` (policies/uk_nhs_internal_market_1990.yaml); explicit control axes: none
+- `uk_nhs_spending_ramp_2000` (policies/uk_nhs_spending_ramp_2000.yaml); explicit control axes: none
+- `uk_nimby_public_inquiry_regime` (policies/uk_nimby_public_inquiry_regime.yaml); explicit control axes: none
+- `uk_northern_rock_nationalisation_2008` (policies/uk_northern_rock_nationalisation_2008.yaml); explicit control axes: none
+- `uk_old_age_pensions_act_1908` (policies/uk_old_age_pensions_act_1908.yaml); explicit control axes: none
+- `uk_peoples_budget_1909` (policies/uk_peoples_budget_1909.yaml); explicit control axes: none
+- `uk_pfi_launch_1992` (policies/uk_pfi_launch_1992.yaml); explicit control axes: none
+- `uk_planning_housing_target_revision_2024` (policies/uk_planning_housing_target_revision_2024.yaml); explicit control axes: none
+- `uk_points_based_immigration_2021` (policies/uk_points_based_immigration_2021.yaml); explicit control axes: none
+- `uk_poll_tax_community_charge_1988_1990` (policies/uk_poll_tax_community_charge_1988_1990.yaml); explicit control axes: none
+- `uk_poll_tax_community_charge_1989` (policies/uk_poll_tax_community_charge_1989.yaml); explicit control axes: none
+- `uk_privatisations_british_gas_1986` (policies/uk_privatisations_british_gas_1986.yaml); explicit control axes: none
+- `uk_privatisations_british_telecom_1984` (policies/uk_privatisations_british_telecom_1984.yaml); explicit control axes: none
+- `uk_public_expenditure_white_paper_1976` (policies/uk_public_expenditure_white_paper_1976.yaml); explicit control axes: none
+- `uk_public_sector_employment_growth_2001_2010` (policies/uk_public_sector_employment_growth_2001_2010.yaml); explicit control axes: none
+- `uk_rail_privatisation_1993_1997` (policies/uk_rail_privatisation_1993_1997.yaml); explicit control axes: none
+- `uk_rail_public_ownership_act_2024` (policies/uk_rail_public_ownership_act_2024.yaml); explicit control axes: none
+- `uk_regulatory_divergence_post_brexit` (policies/uk_regulatory_divergence_post_brexit.yaml); explicit control axes: none
+- `uk_renters_rights_act_2025` (policies/uk_renters_rights_act_2025.yaml); explicit control axes: none
+- `uk_social_contract_phase_3_4_1976_1978` (policies/uk_social_contract_phase_3_4_1976_1978.yaml); explicit control axes: none
+- `uk_sterling_m3_targeting_1976` (policies/uk_sterling_m3_targeting_1976.yaml); explicit control axes: none
+- `uk_subsidy_control_act_2022` (policies/uk_subsidy_control_act_2022.yaml); explicit control axes: none
+- `uk_sure_start_1998` (policies/uk_sure_start_1998.yaml); explicit control axes: none
+- `uk_tax_credits_expansion` (policies/uk_tax_credits_expansion.yaml); explicit control axes: none
+- `uk_tax_credits_wftc_ctc_1999_2003` (policies/uk_tax_credits_wftc_ctc_1999_2003.yaml); explicit control axes: none
+- `uk_thatcher_privatisations_1984_1989` (policies/uk_thatcher_privatisations_1984_1989.yaml); explicit control axes: none
+- `uk_tobacco_vapes_act_2026` (policies/uk_tobacco_vapes_act_2026.yaml); explicit control axes: none
+- `uk_town_country_planning_act_1947` (policies/uk_town_country_planning_act_1947.yaml); explicit control axes: none
+- `uk_trade_boards_act_1909` (policies/uk_trade_boards_act_1909.yaml); explicit control axes: none
+- `uk_trade_cooperation_agreement_2020` (policies/uk_trade_cooperation_agreement_2020.yaml); explicit control axes: none
+- `uk_trade_union_act_1984` (policies/uk_trade_union_act_1984.yaml); explicit control axes: none
+- `uk_transport_act_1947` (policies/uk_transport_act_1947.yaml); explicit control axes: none
+- `uk_truss_mini_budget_2022` (policies/uk_truss_mini_budget_2022.yaml); explicit control axes: none
+- `uk_vat_cut_gfc_2008_2009` (policies/uk_vat_cut_gfc_2008_2009.yaml); explicit control axes: none
+- `uk_vat_private_school_fees_2025` (policies/uk_vat_private_school_fees_2025.yaml); explicit control axes: none
+- `uk_wages_act_1986` (policies/uk_wages_act_1986.yaml); explicit control axes: none
+- `uk_water_privatisation_1989` (policies/uk_water_privatisation_1989.yaml); explicit control axes: none
+- `uk_water_special_measures_act_2025` (policies/uk_water_special_measures_act_2025.yaml); explicit control axes: none
+- `uk_wholesale_market_gas_indexation` (policies/uk_wholesale_market_gas_indexation.yaml); explicit control axes: none
+- `uk_windfall_tax_utilities_1997` (policies/uk_windfall_tax_utilities_1997.yaml); explicit control axes: none
+- `uk_windrush_scandal_response_2018` (policies/uk_windrush_scandal_response_2018.yaml); explicit control axes: none
+- `uk_windsor_framework_2023` (policies/uk_windsor_framework_2023.yaml); explicit control axes: none
+- `uk_winter_of_discontent_paynorm_breakdown_1978_1979` (policies/uk_winter_of_discontent_paynorm_breakdown_1978_1979.yaml); explicit control axes: none
+- `uk_withdrawal_agreement_three_defeats_2019` (policies/uk_withdrawal_agreement_three_defeats_2019.yaml); explicit control axes: none
+- `uk_working_age_welfare_reform_2010_2016` (policies/uk_working_age_welfare_reform_2010_2016.yaml); explicit control axes: none
+- `uk_working_time_regulations_1998` (policies/uk_working_time_regulations_1998.yaml); explicit control axes: none
+- `us_16th_amendment_income_tax_1913` (policies/us_16th_amendment_income_tax_1913.yaml); explicit control axes: none
+- `us_aaa_1933` (policies/us_aaa_1933.yaml); explicit control axes: none
+- `us_aca_2010` (policies/us_aca_2010.yaml); explicit control axes: none
+- `us_aca_obamacare_2010` (policies/us_aca_obamacare_2010.yaml); explicit control axes: none
+- `us_affordable_care_act_2010` (policies/us_affordable_care_act_2010.yaml); explicit control axes: none
+- `us_afghanistan_iraq_auth_2001_2002` (policies/us_afghanistan_iraq_auth_2001_2002.yaml); explicit control axes: none
+- `us_airline_deregulation_1978` (policies/us_airline_deregulation_1978.yaml); explicit control axes: none
+- `us_airline_deregulation_act_1978` (policies/us_airline_deregulation_act_1978.yaml); explicit control axes: none
+- `us_americans_with_disabilities_act_1990` (policies/us_americans_with_disabilities_act_1990.yaml); explicit control axes: none
+- `us_arp_american_rescue_plan_2021` (policies/us_arp_american_rescue_plan_2021.yaml); explicit control axes: none
+- `us_arra_2009` (policies/us_arra_2009.yaml); explicit control axes: none
+- `us_assault_weapons_ban_1994` (policies/us_assault_weapons_ban_1994.yaml); explicit control axes: none
+- `us_auto_bailout_gm_chrysler_2009` (policies/us_auto_bailout_gm_chrysler_2009.yaml); explicit control axes: none
+- `us_balanced_budget_act_1997` (policies/us_balanced_budget_act_1997.yaml); explicit control axes: none
+- `us_banking_act_1935_fed_restructuring` (policies/us_banking_act_1935_fed_restructuring.yaml); explicit control axes: none
+- `us_base_broadening_1986` (policies/us_base_broadening_1986.yaml); explicit control axes: none
+- `us_bear_stearns_jpm_rescue_2008` (policies/us_bear_stearns_jpm_rescue_2008.yaml); explicit control axes: none
+- `us_biden_china_export_controls_2022_2023` (policies/us_biden_china_export_controls_2022_2023.yaml); explicit control axes: none
+- `us_biden_student_debt_relief_2022_2024` (policies/us_biden_student_debt_relief_2022_2024.yaml); explicit control axes: none
+- `us_black_monday_1987_response` (policies/us_black_monday_1987_response.yaml); explicit control axes: none
+- `us_bretton_woods_exit_1971` (policies/us_bretton_woods_exit_1971.yaml); explicit control axes: none
+- `us_bush_43_dividend_capgains_cut_2003` (policies/us_bush_43_dividend_capgains_cut_2003.yaml); explicit control axes: none
+- `us_bush_43_tax_cuts_egtrra_jgtrra_2001_2003` (policies/us_bush_43_tax_cuts_egtrra_jgtrra_2001_2003.yaml); explicit control axes: none
+- `us_capital_gains_cut_1997` (policies/us_capital_gains_cut_1997.yaml); explicit control axes: none
+- `us_cares_act_covid_fiscal_response_2020` (policies/us_cares_act_covid_fiscal_response_2020.yaml); explicit control axes: none
+- `us_cfpb_creation_2010` (policies/us_cfpb_creation_2010.yaml); explicit control axes: none
+- `us_chips_act_2022` (policies/us_chips_act_2022.yaml); explicit control axes: none
+- `us_clean_air_act_amendments_1990` (policies/us_clean_air_act_amendments_1990.yaml); explicit control axes: none
+- `us_clean_power_plan_2015` (policies/us_clean_power_plan_2015.yaml); explicit control axes: none
+- `us_clinton_impeachment_1998_1999` (policies/us_clinton_impeachment_1998_1999.yaml); explicit control axes: none
+- `us_clinton_welfare_reform_1996` (policies/us_clinton_welfare_reform_1996.yaml); explicit control axes: none
+- `us_commodity_futures_modernization_2000` (policies/us_commodity_futures_modernization_2000.yaml); explicit control axes: none
+- `us_cuba_reopening_2014_2015` (policies/us_cuba_reopening_2014_2015.yaml); explicit control axes: none
+- `us_daca_executive_action_2012` (policies/us_daca_executive_action_2012.yaml); explicit control axes: none
+- `us_defence_buildup_reagan_1981_1985` (policies/us_defence_buildup_reagan_1981_1985.yaml); explicit control axes: none
+- `us_didmca_1980` (policies/us_didmca_1980.yaml); explicit control axes: none
+- `us_dodd_frank_2010` (policies/us_dodd_frank_2010.yaml); explicit control axes: none
+- `us_doe_creation_1977` (policies/us_doe_creation_1977.yaml); explicit control axes: none
+- `us_egtrra_2001` (policies/us_egtrra_2001.yaml); explicit control axes: none
+- `us_egtrra_tax_cut_2001` (policies/us_egtrra_tax_cut_2001.yaml); explicit control axes: none
+- `us_eitc_expansion_1993_1996` (policies/us_eitc_expansion_1993_1996.yaml); explicit control axes: none
+- `us_eoa_1964` (policies/us_eoa_1964.yaml); explicit control axes: none
+- `us_epa_creation_1970` (policies/us_epa_creation_1970.yaml); explicit control axes: none
+- `us_erta_1981` (policies/us_erta_1981.yaml); explicit control axes: none
+- `us_esea_1965` (policies/us_esea_1965.yaml); explicit control axes: none
+- `us_estate_tax_phaseout_2001` (policies/us_estate_tax_phaseout_2001.yaml); explicit control axes: none
+- `us_fannie_freddie_conservatorship_2008` (policies/us_fannie_freddie_conservatorship_2008.yaml); explicit control axes: none
+- `us_fdic_creation_1933` (policies/us_fdic_creation_1933.yaml); explicit control axes: none
+- `us_fed_funds_rate_spike_1979_1981` (policies/us_fed_funds_rate_spike_1979_1981.yaml); explicit control axes: none
+- `us_federal_reserve_act_1913` (policies/us_federal_reserve_act_1913.yaml); explicit control axes: none
+- `us_firrea_sl_cleanup_1989` (policies/us_firrea_sl_cleanup_1989.yaml); explicit control axes: none
+- `us_flsa_1938` (policies/us_flsa_1938.yaml); explicit control axes: none
+- `us_forward_guidance` (policies/us_forward_guidance.yaml); explicit control axes: none
+- `us_ftc_clayton_competition_package_1914` (policies/us_ftc_clayton_competition_package_1914.yaml); explicit control axes: none
+- `us_ftc_doj_merger_guidelines_2023` (policies/us_ftc_doj_merger_guidelines_2023.yaml); explicit control axes: none
+- `us_ftc_noncompete_ban_2024` (policies/us_ftc_noncompete_ban_2024.yaml); explicit control axes: none
+- `us_glass_steagall_banking_act_1933` (policies/us_glass_steagall_banking_act_1933.yaml); explicit control axes: none
+- `us_glass_steagall_repeal_glba_1999` (policies/us_glass_steagall_repeal_glba_1999.yaml); explicit control axes: none
+- `us_gramm_leach_bliley_1999` (policies/us_gramm_leach_bliley_1999.yaml); explicit control axes: none
+- `us_gulf_war_fiscal_1990_1991` (policies/us_gulf_war_fiscal_1990_1991.yaml); explicit control axes: none
+- `us_health_security_act_failure_1993_1994` (policies/us_health_security_act_failure_1993_1994.yaml); explicit control axes: none
+- `us_hepburn_act_1906` (policies/us_hepburn_act_1906.yaml); explicit control axes: none
+- `us_higher_education_act_1965` (policies/us_higher_education_act_1965.yaml); explicit control axes: none
+- `us_immigration_reform_control_1986` (policies/us_immigration_reform_control_1986.yaml); explicit control axes: none
+- `us_inf_treaty_1987` (policies/us_inf_treaty_1987.yaml); explicit control axes: none
+- `us_infrastructure_act_2021` (policies/us_infrastructure_act_2021.yaml); explicit control axes: none
+- `us_ira_2022` (policies/us_ira_2022.yaml); explicit control axes: none
+- `us_ira_inflation_reduction_act_2022` (policies/us_ira_inflation_reduction_act_2022.yaml); explicit control axes: none
+- `us_iran_jcpoa_2015` (policies/us_iran_jcpoa_2015.yaml); explicit control axes: none
+- `us_iraq_surge_2007` (policies/us_iraq_surge_2007.yaml); explicit control axes: none
+- `us_jgtrra_2003` (policies/us_jgtrra_2003.yaml); explicit control axes: none
+- `us_jgtrra_tax_cut_2003` (policies/us_jgtrra_tax_cut_2003.yaml); explicit control axes: none
+- `us_katrina_response_2005` (policies/us_katrina_response_2005.yaml); explicit control axes: none
+- `us_medicaid_1965` (policies/us_medicaid_1965.yaml); explicit control axes: none
+- `us_medicaid_expansion_2010` (policies/us_medicaid_expansion_2010.yaml); explicit control axes: none
+- `us_medicare_1965` (policies/us_medicare_1965.yaml); explicit control axes: none
+- `us_medicare_part_d_2003` (policies/us_medicare_part_d_2003.yaml); explicit control axes: none
+- `us_monetary_targeting_shift_1979` (policies/us_monetary_targeting_shift_1979.yaml); explicit control axes: none
+- `us_motor_carrier_act_1980` (policies/us_motor_carrier_act_1980.yaml); explicit control axes: none
+- `us_natural_gas_policy_act_1978` (policies/us_natural_gas_policy_act_1978.yaml); explicit control axes: none
+- `us_nlrb_cemex_joint_employer_2022_2024` (policies/us_nlrb_cemex_joint_employer_2022_2024.yaml); explicit control axes: none
+- `us_no_child_left_behind_2002` (policies/us_no_child_left_behind_2002.yaml); explicit control axes: none
+- `us_obama_ara_2009_recovery` (policies/us_obama_ara_2009_recovery.yaml); explicit control axes: none
+- `us_obra_1990_budget_deal` (policies/us_obra_1990_budget_deal.yaml); explicit control axes: none
+- `us_obra_1993_deficit_reduction` (policies/us_obra_1993_deficit_reduction.yaml); explicit control axes: none
+- `us_osha_1970` (policies/us_osha_1970.yaml); explicit control axes: none
+- `us_paris_agreement_signature_2016` (policies/us_paris_agreement_signature_2016.yaml); explicit control axes: none
+- `us_patco_strike_1981` (policies/us_patco_strike_1981.yaml); explicit control axes: none
+- `us_patriot_act_2001` (policies/us_patriot_act_2001.yaml); explicit control axes: none
+- `us_phase_ii_iv_controls_1971_1974` (policies/us_phase_ii_iv_controls_1971_1974.yaml); explicit control axes: none
+- `us_prwora_1996` (policies/us_prwora_1996.yaml); explicit control axes: none
+- `us_prwora_welfare_reform_act_1996` (policies/us_prwora_welfare_reform_act_1996.yaml); explicit control axes: none
+- `us_pure_food_drug_act_1906` (policies/us_pure_food_drug_act_1906.yaml); explicit control axes: none
+- `us_qe1_2008` (policies/us_qe1_2008.yaml); explicit control axes: none
+- `us_qe2_2010` (policies/us_qe2_2010.yaml); explicit control axes: none
+- `us_qe3_2012` (policies/us_qe3_2012.yaml); explicit control axes: none
+- `us_reagan_tax_reform_1981` (policies/us_reagan_tax_reform_1981.yaml); explicit control axes: none
+- `us_reagan_tax_reforms_erta_tra_1981_1986` (policies/us_reagan_tax_reforms_erta_tra_1981_1986.yaml); explicit control axes: none
+- `us_sarbanes_oxley_2002` (policies/us_sarbanes_oxley_2002.yaml); explicit control axes: none
+- `us_sdi_announcement_1983` (policies/us_sdi_announcement_1983.yaml); explicit control axes: none
+- `us_section_232_steel_aluminum_tariffs_2018` (policies/us_section_232_steel_aluminum_tariffs_2018.yaml); explicit control axes: none
+- `us_section_232_tariffs_2018` (policies/us_section_232_tariffs_2018.yaml); explicit control axes: none
+- `us_section_301_china_tariffs_2018` (policies/us_section_301_china_tariffs_2018.yaml); explicit control axes: none
+- `us_section_301_china_tariffs_2018_2019` (policies/us_section_301_china_tariffs_2018_2019.yaml); explicit control axes: none
+- `us_securities_act_1933` (policies/us_securities_act_1933.yaml); explicit control axes: none
+- `us_securities_exchange_act_1934` (policies/us_securities_exchange_act_1934.yaml); explicit control axes: none
+- `us_sl_crisis_onset_1986_1989` (policies/us_sl_crisis_onset_1986_1989.yaml); explicit control axes: none
+- `us_social_security_act_1935` (policies/us_social_security_act_1935.yaml); explicit control axes: none
+- `us_staggers_rail_act_1980` (policies/us_staggers_rail_act_1980.yaml); explicit control axes: none
+- `us_tanf_block_grants` (policies/us_tanf_block_grants.yaml); explicit control axes: none
+- `us_tarp_2008` (policies/us_tarp_2008.yaml); explicit control axes: none
+- `us_tax_reform_act_1986` (policies/us_tax_reform_act_1986.yaml); explicit control axes: none
+- `us_tcja_corporate_tax_cut_2017` (policies/us_tcja_corporate_tax_cut_2017.yaml); explicit control axes: none
+- `us_tcja_individual_cuts_2017` (policies/us_tcja_individual_cuts_2017.yaml); explicit control axes: none
+- `us_tcja_salt_cap_2017` (policies/us_tcja_salt_cap_2017.yaml); explicit control axes: none
+- `us_tcja_tax_cuts_jobs_act_2017` (policies/us_tcja_tax_cuts_jobs_act_2017.yaml); explicit control axes: none
+- `us_tefra_1982` (policies/us_tefra_1982.yaml); explicit control axes: none
+- `us_tpp_signature_2016` (policies/us_tpp_signature_2016.yaml); explicit control axes: none
+- `us_tra_1986` (policies/us_tra_1986.yaml); explicit control axes: none
+- `us_trump2_doge_executive_order_2025` (policies/us_trump2_doge_executive_order_2025.yaml); explicit control axes: none
+- `us_trump2_ieepa_fentanyl_tariffs_2025` (policies/us_trump2_ieepa_fentanyl_tariffs_2025.yaml); explicit control axes: none
+- `us_trump2_immigration_enforcement_eos_2025` (policies/us_trump2_immigration_enforcement_eos_2025.yaml); explicit control axes: none
+- `us_trump2_liberation_day_tariffs_2025` (policies/us_trump2_liberation_day_tariffs_2025.yaml); explicit control axes: none
+- `us_trump2_paris_withdrawal_2025` (policies/us_trump2_paris_withdrawal_2025.yaml); explicit control axes: none
+- `us_trump2_schedule_f_deregulation_2025` (policies/us_trump2_schedule_f_deregulation_2025.yaml); explicit control axes: none
+- `us_trump2_strategic_bitcoin_reserve_2025` (policies/us_trump2_strategic_bitcoin_reserve_2025.yaml); explicit control axes: none
+- `us_trump_deregulation_executive_orders_2017_2021` (policies/us_trump_deregulation_executive_orders_2017_2021.yaml); explicit control axes: none
+- `us_trump_immigration_restriction_eos_2017_2020` (policies/us_trump_immigration_restriction_eos_2017_2020.yaml); explicit control axes: none
+- `us_trump_paris_withdrawal_2017_2020` (policies/us_trump_paris_withdrawal_2017_2020.yaml); explicit control axes: none
+- `us_trump_tariffs_2018_2019` (policies/us_trump_tariffs_2018_2019.yaml); explicit control axes: none
+- `us_tva_1933` (policies/us_tva_1933.yaml); explicit control axes: none
+- `us_usmca_2020` (policies/us_usmca_2020.yaml); explicit control axes: none
+- `us_volcker_appointment_1979` (policies/us_volcker_appointment_1979.yaml); explicit control axes: none
+- `us_volcker_disinflation_1979_1982` (policies/us_volcker_disinflation_1979_1982.yaml); explicit control axes: none
+- `us_voting_rights_act_1965` (policies/us_voting_rights_act_1965.yaml); explicit control axes: none
+- `us_wage_price_freeze_1971` (policies/us_wage_price_freeze_1971.yaml); explicit control axes: none
+- `us_wagner_act_1935` (policies/us_wagner_act_1935.yaml); explicit control axes: none
+- `us_zirp_2008_2015` (policies/us_zirp_2008_2015.yaml); explicit control axes: none
+- `uy_abortion_decriminalisation_2012` (policies/uy_abortion_decriminalisation_2012.yaml); explicit control axes: none
+- `uy_bono_crianza_expansion_2025` (policies/uy_bono_crianza_expansion_2025.yaml); explicit control axes: none
+- `uy_botnia_upm_pulp_mill_2005_2007` (policies/uy_botnia_upm_pulp_mill_2005_2007.yaml); explicit control axes: none
+- `uy_cannabis_legal_market_2013` (policies/uy_cannabis_legal_market_2013.yaml); explicit control axes: none
+- `uy_cannabis_market_rollout_2017` (policies/uy_cannabis_market_rollout_2017.yaml); explicit control axes: none
+- `uy_financial_inclusion_law_2014` (policies/uy_financial_inclusion_law_2014.yaml); explicit control axes: none
+- `uy_fonasa_snis_health_reform_2007` (policies/uy_fonasa_snis_health_reform_2007.yaml); explicit control axes: none
+- `uy_fta_china_exploration_2022_2023` (policies/uy_fta_china_exploration_2022_2023.yaml); explicit control axes: none
+- `uy_irpf_tax_reform_2007` (policies/uy_irpf_tax_reform_2007.yaml); explicit control axes: none
+- `uy_luc_ley_urgente_consideracion_2020` (policies/uy_luc_ley_urgente_consideracion_2020.yaml); explicit control axes: none
+- `uy_mercosur_cet_reduction_push_2021` (policies/uy_mercosur_cet_reduction_push_2021.yaml); explicit control axes: none
+- `uy_montes_del_plata_pulp_mill_2014` (policies/uy_montes_del_plata_pulp_mill_2014.yaml); explicit control axes: none
+- `uy_panes_emergency_plan_2005` (policies/uy_panes_emergency_plan_2005.yaml); explicit control axes: none
+- `uy_pension_flex_reform_2008` (policies/uy_pension_flex_reform_2008.yaml); explicit control axes: none
+- `uy_pension_reform_2023` (policies/uy_pension_reform_2023.yaml); explicit control axes: none
+- `uy_pension_reform_partial_softening_2025` (policies/uy_pension_reform_partial_softening_2025.yaml); explicit control axes: none
+- `uy_same_sex_marriage_law_2013` (policies/uy_same_sex_marriage_law_2013.yaml); explicit control axes: none
+- `uy_tax_reform_2015` (policies/uy_tax_reform_2015.yaml); explicit control axes: none
+- `uy_upm_ii_pulp_mill_contract_2017` (policies/uy_upm_ii_pulp_mill_contract_2017.yaml); explicit control axes: none
+- `ve_agenda_venezuela_imf_1996` (policies/ve_agenda_venezuela_imf_1996.yaml); explicit control axes: none
+- `ve_apertura_petrolera_1992_1997` (policies/ve_apertura_petrolera_1992_1997.yaml); explicit control axes: none
+- `ve_banking_crisis_fogade_1994` (policies/ve_banking_crisis_fogade_1994.yaml); explicit control axes: none
+- `ve_cantv_viasa_privatisation_1991` (policies/ve_cantv_viasa_privatisation_1991.yaml); explicit control axes: none
+- `ve_caracas_metro_commissioning_1983` (policies/ve_caracas_metro_commissioning_1983.yaml); explicit control axes: none
+- `ve_caracazo_february_1989` (policies/ve_caracazo_february_1989.yaml); explicit control axes: none
+- `ve_chavez_coup_attempts_1992` (policies/ve_chavez_coup_attempts_1992.yaml); explicit control axes: none
+- `ve_chavez_pardon_1994` (policies/ve_chavez_pardon_1994.yaml); explicit control axes: none
+- `ve_exchange_controls_1994_1996` (policies/ve_exchange_controls_1994_1996.yaml); explicit control axes: none
+- `ve_external_debt_expansion_1974_1978` (policies/ve_external_debt_expansion_1974_1978.yaml); explicit control axes: none
+- `ve_external_debt_moratorium_1983` (policies/ve_external_debt_moratorium_1983.yaml); explicit control axes: none
+- `ve_gran_viraje_imf_package_1989` (policies/ve_gran_viraje_imf_package_1989.yaml); explicit control axes: none
+- `ve_iron_nationalisation_decree_580_1974` (policies/ve_iron_nationalisation_decree_580_1974.yaml); explicit control axes: none
+- `ve_oil_nationalisation_ley_5_1975` (policies/ve_oil_nationalisation_ley_5_1975.yaml); explicit control axes: none
+- `ve_pdvsa_creation_1976` (policies/ve_pdvsa_creation_1976.yaml); explicit control axes: none
+- `ve_perez_impeachment_1993` (policies/ve_perez_impeachment_1993.yaml); explicit control axes: none
+- `ve_recadi_multiple_exchange_rates_1983` (policies/ve_recadi_multiple_exchange_rates_1983.yaml); explicit control axes: none
+- `ve_v_plan_gran_venezuela_1976` (policies/ve_v_plan_gran_venezuela_1976.yaml); explicit control axes: none
+- `ve_vi_plan_1981_1985` (policies/ve_vi_plan_1981_1985.yaml); explicit control axes: none
+- `ve_viernes_negro_fx_regime_collapse_1983` (policies/ve_viernes_negro_fx_regime_collapse_1983.yaml); explicit control axes: none
+- `venezuela_bolivar_redenomination_2018` (policies/venezuela_bolivar_redenomination_2018.yaml); explicit control axes: none
+- `venezuela_bolivar_redenomination_2021` (policies/venezuela_bolivar_redenomination_2021.yaml); explicit control axes: none
+- `venezuela_central_bank_subordination` (policies/venezuela_central_bank_subordination.yaml); explicit control axes: none
+- `venezuela_de_facto_dollarisation_2019` (policies/venezuela_de_facto_dollarisation_2019.yaml); explicit control axes: none
+- `venezuela_expropriations_2007_2015` (policies/venezuela_expropriations_2007_2015.yaml); explicit control axes: none
+- `venezuela_fiscal_monetary_fusion_2013_2019` (policies/venezuela_fiscal_monetary_fusion_2013_2019.yaml); explicit control axes: none
+- `venezuela_fx_controls_cadivi_2003` (policies/venezuela_fx_controls_cadivi_2003.yaml); explicit control axes: none
+- `venezuela_monetisation_of_deficit_2013_2019` (policies/venezuela_monetisation_of_deficit_2013_2019.yaml); explicit control axes: none
+- `venezuela_oil_sector_pdvsa_collapse_2013_2020` (policies/venezuela_oil_sector_pdvsa_collapse_2013_2020.yaml); explicit control axes: none
+- `venezuela_pdvsa_nationalisation_2003_2007` (policies/venezuela_pdvsa_nationalisation_2003_2007.yaml); explicit control axes: none
+- `venezuela_pdvsa_politicisation_2002` (policies/venezuela_pdvsa_politicisation_2002.yaml); explicit control axes: none
+- `venezuela_petro_cryptocurrency_2018` (policies/venezuela_petro_cryptocurrency_2018.yaml); explicit control axes: none
+- `venezuela_price_fx_control_relaxation_2019` (policies/venezuela_price_fx_control_relaxation_2019.yaml); explicit control axes: none
+- `vietnam_doi_moi_1986` (policies/vietnam_doi_moi_1986.yaml); explicit control axes: none
+- `vietnam_enterprise_law_1999` (policies/vietnam_enterprise_law_1999.yaml); explicit control axes: none
+- `vietnam_resolution_10_1988` (policies/vietnam_resolution_10_1988.yaml); explicit control axes: none
+- `vietnam_soe_equitisation_1992_present` (policies/vietnam_soe_equitisation_1992_present.yaml); explicit control axes: none
+- `vietnam_us_bta_2001` (policies/vietnam_us_bta_2001.yaml); explicit control axes: none
+- `vietnam_wto_accession_2007` (policies/vietnam_wto_accession_2007.yaml); explicit control axes: none
+- `vn_1992_constitution_market_recognition` (policies/vn_1992_constitution_market_recognition.yaml); explicit control axes: none
+- `vn_asean_accession_1995` (policies/vn_asean_accession_1995.yaml); explicit control axes: none
+- `vn_blazing_furnace_anti_corruption_2016_2024` (policies/vn_blazing_furnace_anti_corruption_2016_2024.yaml); explicit control axes: none
+- `vn_blazing_furnace_anti_corruption_escalation_2016_2021` (policies/vn_blazing_furnace_anti_corruption_escalation_2016_2021.yaml); explicit control axes: none
+- `vn_cambodia_invasion_1978_1989` (policies/vn_cambodia_invasion_1978_1989.yaml); explicit control axes: none
+- `vn_chip_semiconductor_strategy_2023_present` (policies/vn_chip_semiconductor_strategy_2023_present.yaml); explicit control axes: none
+- `vn_constitution_revision_2013` (policies/vn_constitution_revision_2013.yaml); explicit control axes: none
+- `vn_covid_early_containment_border_closure_2020` (policies/vn_covid_early_containment_border_closure_2020.yaml); explicit control axes: none
+- `vn_cptpp_entry_2019` (policies/vn_cptpp_entry_2019.yaml); explicit control axes: none
+- `vn_cptpp_ratification_2018` (policies/vn_cptpp_ratification_2018.yaml); explicit control axes: none
+- `vn_currency_reform_hyperinflation_1985` (policies/vn_currency_reform_hyperinflation_1985.yaml); explicit control axes: none
+- `vn_directive_100_khoan_1981` (policies/vn_directive_100_khoan_1981.yaml); explicit control axes: none
+- `vn_enterprise_law_1999` (policies/vn_enterprise_law_1999.yaml); explicit control axes: none
+- `vn_eu_vietnam_fta_ratification_2020` (policies/vn_eu_vietnam_fta_ratification_2020.yaml); explicit control axes: none
+- `vn_evfta_entry_2020` (policies/vn_evfta_entry_2020.yaml); explicit control axes: none
+- `vn_foreign_investment_law_1987` (policies/vn_foreign_investment_law_1987.yaml); explicit control axes: none
+- `vn_gfc_stimulus_package_2009` (policies/vn_gfc_stimulus_package_2009.yaml); explicit control axes: none
+- `vn_khoan_10_agriculture_1988` (policies/vn_khoan_10_agriculture_1988.yaml); explicit control axes: none
+- `vn_land_law_1993` (policies/vn_land_law_1993.yaml); explicit control axes: none
+- `vn_land_law_2003` (policies/vn_land_law_2003.yaml); explicit control axes: none
+- `vn_land_law_revision_2024` (policies/vn_land_law_revision_2024.yaml); explicit control axes: none
+- `vn_price_liberalisation_1989` (policies/vn_price_liberalisation_1989.yaml); explicit control axes: none
+- `vn_private_enterprise_law_1990` (policies/vn_private_enterprise_law_1990.yaml); explicit control axes: none
+- `vn_rcep_signature_2020` (policies/vn_rcep_signature_2020.yaml); explicit control axes: none
+- `vn_resolution_68_private_sector_2025` (policies/vn_resolution_68_private_sector_2025.yaml); explicit control axes: none
+- `vn_reunification_1976` (policies/vn_reunification_1976.yaml); explicit control axes: none
+- `vn_soe_equitisation_programme_2000_2006` (policies/vn_soe_equitisation_programme_2000_2006.yaml); explicit control axes: none
+- `vn_soe_general_corporations_1995` (policies/vn_soe_general_corporations_1995.yaml); explicit control axes: none
+- `vn_state_apparatus_streamlining_2024_2025` (policies/vn_state_apparatus_streamlining_2024_2025.yaml); explicit control axes: none
+- `vn_state_economic_groups_soe_expansion_2006_2012` (policies/vn_state_economic_groups_soe_expansion_2006_2012.yaml); explicit control axes: none
+- `vn_stock_exchange_launch_2000` (policies/vn_stock_exchange_launch_2000.yaml); explicit control axes: none
+- `vn_us_bilateral_trade_agreement_2000` (policies/vn_us_bilateral_trade_agreement_2000.yaml); explicit control axes: none
+- `vn_us_normalisation_1995` (policies/vn_us_normalisation_1995.yaml); explicit control axes: none
+- `vn_ussr_friendship_treaty_cmea_1978` (policies/vn_ussr_friendship_treaty_cmea_1978.yaml); explicit control axes: none
+- `vn_vamc_npl_cleanup_2013` (policies/vn_vamc_npl_cleanup_2013.yaml); explicit control axes: none
+- `vn_wto_accession_2007` (policies/vn_wto_accession_2007.yaml); explicit control axes: none
+- `vn_wto_accession_preparation_2001_2007` (policies/vn_wto_accession_preparation_2001_2007.yaml); explicit control axes: none
+- `vn_x2_campaign_socialist_transformation_south_1978` (policies/vn_x2_campaign_socialist_transformation_south_1978.yaml); explicit control axes: none
+- `yu_1974_constitution` (policies/yu_1974_constitution.yaml); explicit control axes: none
+- `yu_associated_labour_law_1976` (policies/yu_associated_labour_law_1976.yaml); explicit control axes: none
+- `yu_hyperinflation_1988_1989` (policies/yu_hyperinflation_1988_1989.yaml); explicit control axes: none
+- `yu_imf_stabilisation_1982_1988` (policies/yu_imf_stabilisation_1982_1988.yaml); explicit control axes: none
+- `yu_markovic_reforms_1989_1990` (policies/yu_markovic_reforms_1989_1990.yaml); explicit control axes: none
+- `yu_western_debt_accumulation_1973_1980` (policies/yu_western_debt_accumulation_1973_1980.yaml); explicit control axes: none
+- `za_arv_rollout_reversal_2003` (policies/za_arv_rollout_reversal_2003.yaml); explicit control axes: none
+- `za_bbbee_act_2003` (policies/za_bbbee_act_2003.yaml); explicit control axes: none
+- `za_eskom_debt_relief_2023` (policies/za_eskom_debt_relief_2023.yaml); explicit control axes: none
+- `za_exchange_control_relaxation_2003` (policies/za_exchange_control_relaxation_2003.yaml); explicit control axes: none
+- `za_expropriation_act_2025` (policies/za_expropriation_act_2025.yaml); explicit control axes: none
+- `za_fais_act_2002` (policies/za_fais_act_2002.yaml); explicit control axes: none
+- `za_ismo_electricity_reform_2024` (policies/za_ismo_electricity_reform_2024.yaml); explicit control axes: none
+- `za_marikana_platinum_strike_2012` (policies/za_marikana_platinum_strike_2012.yaml); explicit control axes: none
+- `za_minimum_wage_act_2017` (policies/za_minimum_wage_act_2017.yaml); explicit control axes: none
+- `za_mprda_2002` (policies/za_mprda_2002.yaml); explicit control axes: none
+- `za_mprda_amendment_mining_2013` (policies/za_mprda_amendment_mining_2013.yaml); explicit control axes: none
+- `za_nhi_bill_2024` (policies/za_nhi_bill_2024.yaml); explicit control axes: none
+- `za_nuclear_procurement_russia_mou_2014` (policies/za_nuclear_procurement_russia_mou_2014.yaml); explicit control axes: none
+- `za_sarb_inflation_targeting_defence_2016` (policies/za_sarb_inflation_targeting_defence_2016.yaml); explicit control axes: none
+- `za_two_pot_retirement_2024` (policies/za_two_pot_retirement_2024.yaml); explicit control axes: none
+- `zambia_kwacha_liberalisation_1992` (policies/zambia_kwacha_liberalisation_1992.yaml); explicit control axes: none
+- `zambia_namboard_dismantling_1993` (policies/zambia_namboard_dismantling_1993.yaml); explicit control axes: none
+- `zambia_price_control_abolition_1991` (policies/zambia_price_control_abolition_1991.yaml); explicit control axes: none
+- `zambia_privatisation_agency_1992` (policies/zambia_privatisation_agency_1992.yaml); explicit control axes: none
+- `zambia_zccm_privatisation_2000` (policies/zambia_zccm_privatisation_2000.yaml); explicit control axes: none
+- `zimbabwe_fast_track_land_reform_2000` (policies/zimbabwe_fast_track_land_reform_2000.yaml); explicit control axes: none
+- `zimbabwe_multi_currency_2009` (policies/zimbabwe_multi_currency_2009.yaml); explicit control axes: none
+- `zimbabwe_rbz_fiscal_financing_2003_2009` (policies/zimbabwe_rbz_fiscal_financing_2003_2009.yaml); explicit control axes: none
+- `zm_g20_common_framework_debt_restructuring_2023_2024` (policies/zm_g20_common_framework_debt_restructuring_2023_2024.yaml); explicit control axes: none
+- `zm_imf_ecf_2022` (policies/zm_imf_ecf_2022.yaml); explicit control axes: none
+- `zm_mineral_royalty_regime_reform_2022` (policies/zm_mineral_royalty_regime_reform_2022.yaml); explicit control axes: none
+
+## Axis-inherited policy requirements
+
+- Policies with axis-inherited second-order requirements: 3175
+- Policies missing explicit evaluation design despite axis requirements: 3169
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3169, "explicit": 6}`
+- Source readiness across policy-axis requirements: `{"partial_ready": 35929, "proprietary_gap": 6350, "ready": 3165, "reconstruct_needed": 15028, "scrape_needed": 7312}`
+
+### Most common required layers
+- `distributional_incidence` (3145)
+- `first_order_policy_effect` (3015)
+- `behavioral_response` (2870)
+- `net_welfare` (2574)
+- `macro_feedback` (2519)
+- `fiscal_or_enforcement_cost` (2145)
+- `externality_or_spillover` (1943)
+- `market_structure_response` (1786)
+- `implementation_capacity` (1632)
+- `dynamic_investment_response` (1499)
+- `allocation_distortion` (1352)
+- `second_order_supply_response` (1352)
+- `quality_margin` (1351)
+- `leakage_or_substitution` (1184)
+- `first_order_price_or_transfer` (7)
+
+### Top source-family requirements
+- `education_quality_attainment_panel` (3175)
+- `environmental_externality_emissions_air_panel` (3175)
+- `fiscal_tax_admin_compliance_panel` (3175)
+- `healthcare_access_quality_wait_times` (3175)
+- `household_distributional_microdata` (3175)
+- `labour_market_admin_payroll_panel` (3175)
+- `pharmaceutical_launch_price_access_panel` (3175)
+- `rent_registry_cadastral_tenancy_microdata` (3175)
+- `retail_scanner_price_quantity_panel` (3175)
+- `welfare_accounting_case_ledger` (3175)
+- `trade_customs_product_panel` (3165)
+- `public_procurement_contract_microdata` (3158)
+- `energy_reliability_outage_operator_data` (3107)
+- `policy_event_treatment_registry` (3016)
+- `macro_panel_outcome_vintages` (3015)
+- `shelf_availability_stockout_surveys` (2971)
+- `regulatory_enforcement_inspection_records` (2960)
+- `firm_entry_exit_balance_sheet_panel` (2825)
+- `fuel_inventory_station_outage_queue_panel` (2747)
+- `parallel_market_black_market_prices` (2621)
+- `rental_listing_unit_microdata` (2519)
+- `national_building_permits_completions` (2295)
+- `official_price_schedule_control_registry` (1635)
+
+### Missing explicit design queue
+- `ae_abraham_accords_2020` (candidate, policies/ae_abraham_accords_2020.yaml): axes=regulatory.trade_openness; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 1}`
+- `ae_abu_dhabi_dubai_bailout_2009` (candidate, policies/ae_abu_dhabi_dubai_bailout_2009.yaml): axes=fiscal.spending_level, institutional.property_rights; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `ae_adia_diversification_1980s` (candidate, policies/ae_adia_diversification_1980s.yaml): axes=institutional.property_rights; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 2, "scrape_needed": 2}`
+- `ae_adnoc_upstream_consolidation_1978` (candidate, policies/ae_adnoc_upstream_consolidation_1978.yaml): axes=institutional.property_rights, regulatory.product_market_competition; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_aed_peg_defence_2008_2010` (candidate, policies/ae_aed_peg_defence_2008_2010.yaml): axes=monetary.central_bank_independence, regulatory.trade_openness; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 1}`
+- `ae_alcohol_cohabitation_decrim_2020` (candidate, policies/ae_alcohol_cohabitation_decrim_2020.yaml): axes=institutional.rule_of_law, regulatory.immigration_openness; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `ae_arab_spring_welfare_package_2011` (candidate, policies/ae_arab_spring_welfare_package_2011.yaml): axes=fiscal.spending_level, fiscal.transfer_expansion; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_barakah_first_reactor_2021` (candidate, policies/ae_barakah_first_reactor_2021.yaml): axes=fiscal.sectoral_subsidy, regulatory.energy_supply_security; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_barakah_full_operations_2024` (candidate, policies/ae_barakah_full_operations_2024.yaml): axes=fiscal.sectoral_subsidy, regulatory.energy_supply_security; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_cop28_hosting_2023` (candidate, policies/ae_cop28_hosting_2023.yaml): axes=regulatory.environmental_stringency; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 2, "scrape_needed": 1}`
+- `ae_corporate_tax_2023` (candidate, policies/ae_corporate_tax_2023.yaml): axes=fiscal.tax_corporate; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 2, "scrape_needed": 2}`
+- `ae_difc_crisis_regulation_2009` (candidate, policies/ae_difc_crisis_regulation_2009.yaml): axes=regulatory.financial_deregulation; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 2, "scrape_needed": 1}`
+- `ae_difc_establishment_law_2004` (candidate, policies/ae_difc_establishment_law_2004.yaml): axes=institutional.judicial_independence, institutional.property_rights, regulatory.financial_deregulation; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 3}`
+- `ae_difc_launch_2004` (candidate, policies/ae_difc_launch_2004.yaml): axes=institutional.judicial_independence, institutional.property_rights, regulatory.financial_deregulation; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 3}`
+- `ae_dp_world_globalisation_2006` (candidate, policies/ae_dp_world_globalisation_2006.yaml): axes=fiscal.sectoral_subsidy, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_dubai_internet_city_1999` (candidate, policies/ae_dubai_internet_city_1999.yaml): axes=fiscal.tax_corporate, regulatory.sectoral_licensing, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_dubai_media_city_2000` (candidate, policies/ae_dubai_media_city_2000.yaml): axes=fiscal.tax_corporate, regulatory.sectoral_licensing; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_emirates_airline_expansion_1995_2004` (candidate, policies/ae_emirates_airline_expansion_1995_2004.yaml): axes=fiscal.sectoral_subsidy, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_emirates_airline_expansion_2004_2014` (candidate, policies/ae_emirates_airline_expansion_2004_2014.yaml): axes=fiscal.sectoral_subsidy, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_emirates_airline_launch_1985` (candidate, policies/ae_emirates_airline_launch_1985.yaml): axes=regulatory.trade_openness; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 1}`
+- `ae_expo_2020_dubai_2021` (candidate, policies/ae_expo_2020_dubai_2021.yaml): axes=fiscal.sectoral_subsidy, fiscal.spending_level; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 3}`
+- `ae_federal_budget_transfers_mechanism_1976` (candidate, policies/ae_federal_budget_transfers_mechanism_1976.yaml): axes=fiscal.spending_level, fiscal.transfer_expansion; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_fnc_partial_elections_2006` (candidate, policies/ae_fnc_partial_elections_2006.yaml): axes=institutional.rule_of_law; source readiness=`{"partial_ready": 11, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 4, "scrape_needed": 3}`
+- `ae_foreign_ownership_onshore_2020` (candidate, policies/ae_foreign_ownership_onshore_2020.yaml): axes=regulatory.product_market_competition, regulatory.trade_openness; source readiness=`{"partial_ready": 12, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- `ae_g42_ai_strategy_2022` (candidate, policies/ae_g42_ai_strategy_2022.yaml): axes=fiscal.sectoral_subsidy, regulatory.product_market_competition; source readiness=`{"partial_ready": 10, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+
+## Movement axis/design gaps
+- `abenomics_2012_2020` has audited policies ['japan_bojqqe_2013', 'japan_corporate_governance_code_2015', 'japan_womenomics_initiative', 'japan_yield_curve_control_2016'] but no child policy has an evaluation design.
+- `afg_pdpa_saur_socialist_state_1978` has audited policies ['afg_land_reform_decree_8_1978', 'afg_literacy_womens_reforms_1978', 'afg_soviet_aid_war_planning_1979_1992'] but no child policy has an evaluation design.
+- `algeria_fln_socialist_developmental_state_1962_1978` has audited policies ['dz_autogestion_socialist_land_reform_1963', 'dz_hydrocarbons_nationalisation_1971', 'dz_industrialising_industries_strategy_1967'] but no child policy has an evaluation design.
+- `angola_lourenco_mpla_2017_present` has audited policies ['ao_exchange_rate_liberalisation_2018_2023', 'ao_fuel_subsidy_phaseout_2023', 'ao_oil_gas_incremental_production_decree_2024'] but no child policy has an evaluation design.
+- `angola_mpla_socialist_oil_state_1975_1991` has audited policies ['ao_market_transition_reforms_1987_1991', 'ao_nationalisations_state_economy_1976', 'ao_sonangol_oil_enclave_1976'] but no child policy has an evaluation design.
+- `argentina_alberto_fernandez_fdt_2019_2023` has audited policies ['ar_fernandez_export_tax_hikes_2020', 'ar_fernandez_ife_covid_transfer_2020', 'ar_fernandez_imf_eff_2022', 'ar_fernandez_massa_devaluations_2023', 'ar_fernandez_precios_cuidados_justos_2019', 'ar_fernandez_sovereign_debt_restructuring_2020'] but no child policy has an evaluation design.
+- `argentina_alfonsin_ucr_1983_1989` has audited policies ['ar_austral_plan_1985', 'ar_hyperinflation_1989', 'ar_plan_primavera_1988', 'ar_punto_final_obediencia_debida_1986_1987', 'ar_trial_of_juntas_1985'] but no child policy has an evaluation design.
+- `argentina_cfk_pj_2007_2015` has audited policies ['ar_afjp_nationalisation_2008', 'ar_cepo_cambiario_2011_2015', 'ar_griesa_pari_passu_default_2014', 'ar_indec_intervention_2007_2014', 'ar_ypf_renationalisation_2012'] but no child policy has an evaluation design.
+- `argentina_de_la_rua_alianza_1999_2001` has audited policies ['ar_blindaje_imf_2000', 'ar_corralito_2001', 'ar_deficit_zero_law_2001', 'ar_machinea_impuestazo_1999', 'ar_megacanje_debt_swap_2001'] but no child policy has an evaluation design.
+- `argentina_default_collapse_2001_2002` has audited policies ['argentina_convertibility_abandonment_2002', 'argentina_corralito_2001', 'argentina_default_2001', 'argentina_pesification_2002'] but no child policy has an evaluation design.
+- `argentina_duhalde_pj_transition_2002_2003` has audited policies ['ar_emergency_law_25561_convertibility_repeal_2002', 'ar_jefes_y_jefas_workfare_2002', 'ar_lavagna_float_stabilisation_2002', 'ar_pesificacion_asymmetric_decreto_214_2002', 'ar_puente_pueyrredon_2002'] but no child policy has an evaluation design.
+- `argentina_macri_cambiemos_2015_2019` has audited policies ['ar_macri_cepo_lift_peso_unification_2015', 'ar_macri_holdout_settlement_2016', 'ar_macri_imf_stand_by_2018', 'ar_macri_tax_reform_2017', 'ar_macri_utility_tariff_sincere_pricing_2016'] but no child policy has an evaluation design.
+- `argentina_menem_first_term_1989_1995` has audited policies ['ar_brady_plan_debt_restructuring_1993', 'ar_military_pardons_1989_1990', 'ar_pacto_olivos_constitutional_reform_1994', 'ar_reform_of_state_privatisation_law_1989', 'argentina_convertibility_plan_1991'] but no child policy has an evaluation design.
+- `argentina_menem_second_term_1995_1999` has audited policies ['ar_1998_1999_mercosur_stress', 'ar_afjp_pension_phase_in_completion_1995_1999', 'ar_imf_eff_1996_1998', 'ar_tequila_contagion_1995', 'ar_ypf_full_privatisation_1999'] but no child policy has an evaluation design.
+- `argentina_nestor_kirchner_2003_2007` has audited policies ['ar_debt_restructuring_2005', 'ar_export_retenciones_2002_2007', 'ar_imf_early_repayment_2005', 'ar_punto_final_obediencia_debida_repeal_2003_2005', 'ar_supreme_court_reset_2003_2005'] but no child policy has an evaluation design.
+- `argentina_proceso_military_junta_1976_1983` has audited policies ['ar_malvinas_war_1982', 'ar_martinez_de_hoz_financial_liberalisation_1977', 'ar_proceso_state_terror_1976_1983', 'ar_seguro_de_cambio_1982', 'ar_tablita_cambiaria_1978_1981'] but no child policy has an evaluation design.
+- `australia_abbott_lnp_2013_2015` has audited policies ['au_2014_federal_budget', 'au_carbon_tax_repeal_2014', 'au_kafta_jaepa_chafta_ftas_2014_2015', 'au_mrrt_repeal_2014', 'au_operation_sovereign_borders_2013'] but no child policy has an evaluation design.
+- `australia_albanese_alp_2022_present` has audited policies ['au_aukus_2021', 'au_cheaper_child_care_subsidy_2022', 'au_climate_change_act_2022', 'au_fair_work_closing_loopholes_2023_2024', 'au_future_made_in_australia_2024', 'au_housing_australia_future_fund_2023', 'au_national_anti_corruption_commission_2022', 'au_national_reconstruction_fund_corporation_2023', 'au_operation_sovereign_borders_2013', 'au_safeguard_mechanism_reform_2023', 'au_secure_jobs_better_pay_2022', 'au_stage_three_tax_cut_redesign_2024', 'au_voice_referendum_2023'] but no child policy has an evaluation design.
+- `australia_fraser_liberal_1975_1983` has audited policies ['au_campbell_committee_financial_inquiry_1979', 'au_family_allowance_reform_1976', 'au_medibank_partial_dismantling_1976', 'au_pilbara_iron_ore_export_boom_1970s'] but no child policy has an evaluation design.
+- `australia_gillard_alp_2010_2013` has audited policies ['au_clean_energy_future_carbon_price_2011', 'au_gonski_school_funding_review_2012', 'au_minerals_resource_rent_tax_2012', 'au_ndis_act_2013', 'au_tobacco_plain_packaging_2011'] but no child policy has an evaluation design.
+- `australia_howard_coalition_1996_2007` has audited policies ['au_family_tax_benefit_reform_2000', 'au_gst_introduction_2000', 'au_national_firearms_agreement_1996', 'au_pacific_solution_2001', 'au_telstra_full_privatisation_1997_2006', 'au_workchoices_act_2005'] but no child policy has an evaluation design.
+- `australia_keating_alp_1991_1996` has audited policies ['au_national_competition_policy_1995', 'au_native_title_act_1993', 'au_rba_inflation_target_1993', 'au_superannuation_guarantee_1992_expansion', 'au_working_nation_1994'] but no child policy has an evaluation design.
+- `australia_morrison_coalition_2018_2022` has audited policies ['au_aukus_2021', 'au_homebuilder_2020', 'au_jobkeeper_2020', 'au_religious_discrimination_bill_2022', 'au_technology_investment_roadmap_2020'] but no child policy has an evaluation design.
+- `australia_rudd_alp_2007_2010` has audited policies ['au_bank_guarantee_2008', 'au_gfc_stimulus_package_2008_2009', 'au_henry_tax_review_2010', 'au_home_insulation_programme_2009', 'au_resource_super_profits_tax_2010'] but no child policy has an evaluation design.
+- `australia_turnbull_coalition_2015_2018` has audited policies ['au_banking_royal_commission_2017', 'au_enterprise_tax_plan_2016', 'au_personal_income_tax_plan_2018', 'au_same_sex_marriage_postal_survey_2017', 'au_snowy_2_0_approval_2017'] but no child policy has an evaluation design.
+- `austria_faymann_spo_ovp_2008_2016` has audited policies ['at_heta_bad_bank_2014', 'at_hypo_alpe_adria_nationalisation_2009', 'at_pension_age_alignment_women_2010', 'at_refugee_reception_2015_2016', 'at_steuerreform_2009', 'at_steuerreform_2016'] but no child policy has an evaluation design.
+- `austria_gusenbauer_spo_ovp_2007_2008` has audited policies ['at_mindestsicherung_framework_2008', 'at_studiengebuehren_abolition_2008'] but no child policy has an evaluation design.
+- `austria_kern_spo_2016_2017` has audited policies ['at_beschaeftigungsbonus_2017', 'at_plan_a_investment_package_2017'] but no child policy has an evaluation design.
+- `austria_kreisky_spo_1970_1983` has audited policies ['at_arbeitsverfassungsgesetz_1975', 'at_hartwaehrungspolitik_1976', 'at_voest_state_industry_expansion_1970s', 'at_zwentendorf_referendum_1978'] but no child policy has an evaluation design.
+- `austria_kurz_ovp_2017_2021` has audited policies ['at_arbeitszeitgesetz_12_stunden_tag_2018', 'at_asylgesetz_novellen_2017_2018', 'at_familienbeihilfe_indexierung_2019', 'at_familienbonus_plus_2019', 'at_kurzarbeit_covid_2020'] but no child policy has an evaluation design.
+- `austria_nehammer_ovp_greens_2022_2025` has audited policies ['at_familienpaket_2022', 'at_kalte_progression_abschaffung_2023', 'at_klimabonus_2022', 'at_koerperschaftsteuer_senkung_2022_2024', 'at_oekosoziale_steuerreform_2022', 'at_pv_anlagen_vat_2024'] but no child policy has an evaluation design.
+- `austria_schussel_ovp_fpo_2000_2007` has audited policies ['at_bzoe_split_2005', 'at_eu_14_sanctions_2000', 'at_eurofighter_procurement_2002', 'at_koest_25_percent_2005', 'at_pensionssicherungsgesetz_2003'] but no child policy has an evaluation design.
+- `austria_sinowatz_spo_1983_1986` has audited policies ['at_hainburg_cancellation_1984', 'at_voest_alpine_restructuring_1985'] but no child policy has an evaluation design.
+- `austria_stocker_ovp_spo_neos_2025_present` has audited policies ['at_bankenabgabe_verdopplung_2025', 'at_bildungskarenz_abschaffung_2025', 'at_klimabonus_reform_2025', 'at_konsolidierungspaket_2025'] but no child policy has an evaluation design.
+- `austria_vranitzky_grand_coalition_1986_1997` has audited policies ['at_bank_austria_creditanstalt_merger_1997', 'at_eu_accession_1995', 'at_maastricht_consolidation_1995_1996', 'at_oiag_privatisation_programme_1993_2000', 'at_voest_alpine_restructuring_1985'] but no child policy has an evaluation design.
+- `bahrain_hamad_salman_fiscal_diversification_2020_present` has audited policies ['bahrain_golden_residency_visa_2022', 'bahrain_vat_rate_increase_2022', 'bahrain_wage_protection_system_2021'] but no child policy has an evaluation design.
+- `bangladesh_garments_export_industrial_policy_1980s_present` has audited policies ['bangladesh_bonded_warehouse_back_to_back_lc_regime', 'bangladesh_epz_act_1980', 'bangladesh_grameen_bank_ordinance_1983', 'bangladesh_imf_ecf_2023', 'bangladesh_new_industrial_policy_1982'] but no child policy has an evaluation design.
+- `bangladesh_hasina_al_2_3_term_2009_2018` has audited policies ['bd_digital_security_act_2018', 'bd_ict_act_57_2013', 'bd_padma_bridge_self_financing_2012', 'bd_rana_plaza_labour_act_amendment_2013', 'bd_rental_power_quick_enhancement_2010', 'bd_rmg_minimum_wage_2013_2018'] but no child policy has an evaluation design.
+- `bangladesh_hasina_al_fourth_term_2019_2024` has audited policies ['bd_cyber_security_act_2023', 'bd_dhaka_metro_line6_2022', 'bd_forex_crawling_peg_2024', 'bd_imf_ecf_2023', 'bd_padma_bridge_2022', 'bd_rooppur_nuclear_2017'] but no child policy has an evaluation design.
+- `bangladesh_yunus_interim_2024_present` has audited policies ['bd_bank_sector_cleanup_2024', 'bd_cyber_security_act_repeal_2024', 'bd_imf_ecf_continuation_2024', 'bd_yunus_reform_commissions_2024'] but no child policy has an evaluation design.
+- `belarus_lukashenko_state_capitalism_1994_present` has audited policies ['by_1996_presidential_constitution', 'by_admin_price_credit_controls_1994_2015', 'by_state_enterprise_retention_1995'] but no child policy has an evaluation design.
+- `belgium_dehaene_cvp_1992_1999` has audited policies ['belgium_belgacom_partial_privatisation_1996', 'belgium_debt_consolidation_trajectory_1992_1999', 'belgium_global_plan_1993', 'belgium_saint_michel_federal_reform_1993', 'belgium_wage_norm_law_1996'] but no child policy has an evaluation design.
+- `belgium_di_rupo_ps_2011_2014` has audited policies ['be_belfius_nationalisation_2011', 'be_pension_early_retirement_reform_2012', 'be_sixth_state_reform_2012_2014', 'be_unemployment_degressivity_2012'] but no child policy has an evaluation design.
+- `belgium_leterme_van_rompuy_2008_2009` has audited policies ['be_cd_v_nva_cartel_split_2008', 'be_dexia_rescue_2008', 'be_fortis_bnp_paribas_rescue_2008', 'be_kbc_capital_injection_2008_2009'] but no child policy has an evaluation design.
+- `belgium_martens_cvp_1979_1992` has audited policies ['be_coal_mine_closures_1985_1992', 'be_franc_devaluation_1982', 'be_public_debt_trajectory_1979_1992', 'be_sauts_dindex_1982_1984', 'be_special_powers_laws_1982_1985', 'be_three_stage_federalisation_1980_1993'] but no child policy has an evaluation design.
+- `belgium_michel_mr_coalition_2014_2019` has audited policies ['be_corporate_tax_reform_2017_2020', 'be_index_jump_2015', 'be_pension_age_rise_67_2015', 'be_tax_shift_2015_2019'] but no child policy has an evaluation design.
+- `belgium_nuclear_phaseout_2003_2025` has audited policies ['belgium_doel4_tihange3_extension_2023', 'belgium_nuclear_phaseout_law_2003', 'belgium_nuclear_repeal_2025', 'belgium_tihange1_extension_2015'] but no child policy has an evaluation design.
+- `belgium_tindemans_cvp_1974_1978` has audited policies ['be_economic_expansion_law_1976', 'be_egmont_pact_failure_1977_1978', 'be_energy_crisis_response_1974_1976', 'be_nuclear_programme_doel_tihange_1974_1985', 'be_public_debt_trajectory_1974_1978'] but no child policy has an evaluation design.
+- `belgium_verhofstadt_purple_1999_2007` has audited policies ['be_copernic_administrative_reform_2000', 'be_euthanasia_law_2002', 'be_notional_interest_deduction_2005', 'be_nuclear_phaseout_law_2003', 'be_regularisation_migrants_2000', 'be_reynders_tax_reform_2001', 'be_same_sex_marriage_2003'] but no child policy has an evaluation design.
+- `benin_talon_pag_reform_state_2016_2026` has audited policies ['bj_arch_social_protection_rollout_2019', 'bj_glo_djigbe_industrial_zone_2020', 'bj_party_system_electoral_reforms_2018_2019'] but no child policy has an evaluation design.
+- `biden_ira_chips_2022` has audited policies ['us_chips_act_2022', 'us_infrastructure_act_2021', 'us_ira_2022'] but no child policy has an evaluation design.
+- `bolivia_anez_interim_2019_2020` has audited policies ['bo_anez_foreign_policy_realignment_2019', 'bo_covid_emergency_response_2020', 'bo_imf_rfi_loan_2020'] but no child policy has an evaluation design.
+- `bolivia_arce_mas_2020_present` has audited policies ['bo_arce_fuel_subsidy_maintenance_2020', 'bo_dollar_peg_defence_2023_2024', 'bo_imf_rfi_cancellation_2020', 'bo_litio_industrialisation_ylb', 'bo_mercosur_full_membership_2024'] but no child policy has an evaluation design.
+- `bolivia_banzer_adn_1997_2001` has audited policies ['bo_aguas_illimani_la_paz_concession_1997', 'bo_cochabamba_water_war_2000', 'bo_hydrocarbon_concessions_1997_2001', 'bo_ley_2029_water_law_1999', 'bo_plan_dignidad_coca_eradication_1998_2002'] but no child policy has an evaluation design.
+- `bolivia_mas_extractivist_2006_2019` has audited policies ['bolivia_hydrocarbons_nationalisation_2006', 'bolivia_minimum_wage_increases_2006_2019', 'bolivia_new_constitution_2009', 'bolivia_renta_dignidad_2008', 'bolivia_ypfb_industrialisation'] but no child policy has an evaluation design.
+- `bolivia_mesa_2003_2005` has audited policies ['bo_hydrocarbon_referendum_2004', 'bo_hydrocarbons_law_3058_2005', 'bo_mesa_resignation_2005', 'bo_rodriguez_veltze_transitional_2005'] but no child policy has an evaluation design.
+- `bolivia_morales_third_crisis_2014_2019` has audited policies ['bo_2019_election_crisis', 'bo_constitutional_referendum_2016', 'bo_litio_industrialisation_ylb', 'bo_tcp_ruling_0084_2017'] but no child policy has an evaluation design.
+- `bolivia_paz_estenssoro_mnr_1985_1989` has audited policies ['bolivia_nsa_decree_21060_1985'] but no child policy has an evaluation design.
+- `bolivia_sanchez_de_lozada_ii_2002_2003` has audited policies ['bo_gas_war_2003', 'bo_impuestazo_february_2003', 'bo_pacific_lng_chile_route_controversy_2002_2003', 'bo_sanchez_de_lozada_resignation_2003'] but no child policy has an evaluation design.
+- `bolivia_sanchez_de_lozada_mnr_1993_1997` has audited policies ['bo_1994_constitutional_reform', 'bo_capitalizacion_law_1544_1994', 'bo_ley_inra_1715_1996', 'bo_participacion_popular_ley_1551_1994', 'bo_pension_privatisation_ley_1732_1996'] but no child policy has an evaluation design.
+- `botswana_sacu_diamond_institutional_success_1966_present` has audited policies ['botswana_debswana_joint_venture_1969', 'botswana_national_development_plans', 'botswana_pula_fund', 'botswana_sacu_membership_1969', 'botswana_sustainable_budget_index_1994'] but no child policy has an evaluation design.
+- `brazil_bolsonaro_pl_2019_2022` has audited policies ['br_amazon_enforcement_retrenchment_2019', 'br_auxilio_brasil_2021', 'br_auxilio_emergencial_covid_2020', 'br_bcb_independence_lc179_2021', 'br_eletrobras_privatisation_lei14182_2021', 'br_pension_reform_ec103_2019'] but no child policy has an evaluation design.
+- `brazil_cardoso_ii_2nd_term_1999_2002` has audited policies ['br_bolsa_escola_2001', 'br_imf_standby_programs_1998_2002', 'br_inflation_targeting_adoption_1999', 'br_lrf_fiscal_responsibility_law_2000', 'br_real_devaluation_1999'] but no child policy has an evaluation design.
+- `brazil_collor_prn_1990_1992` has audited policies ['br_abertura_comercial_1990_1993', 'br_collor_impeachment_1992', 'br_mercosur_treaty_asuncion_1991', 'br_plano_collor_asset_freeze_1990', 'br_pnd_privatisation_1990'] but no child policy has an evaluation design.
+- `brazil_dilma_rousseff_pt_2011_2016` has audited policies ['br_electricity_tariff_forcing_mp579_2012', 'br_ipi_auto_tax_holidays_2011_2014', 'br_lava_jato_petrobras_2014_2016', 'br_nova_matriz_economica_2011_2014', 'br_pedaladas_fiscais_2012_2014'] but no child policy has an evaluation design.
+- `brazil_figueiredo_final_military_1979_1985` has audited policies ['br_delfim_heterodox_reflation_1979_1980', 'br_direct_state_elections_1982', 'br_imf_eff_1983', 'br_maxi_devaluation_1983', 'br_party_reform_1979'] but no child policy has an evaluation design.
+- `brazil_geisel_abertura_1974_1979` has audited policies ['br_amnesty_law_1979', 'br_ii_pnd_1974', 'br_nuclear_accord_germany_1975', 'br_petrobras_risk_contracts_1975', 'br_proalcool_1975'] but no child policy has an evaluation design.
+- `brazil_itamar_pmdb_1992_1995` has audited policies ['br_csn_embraer_privatisation_1993_1994', 'br_fundo_social_emergencia_1994', 'br_pnd_deepening_1993_1994', 'br_urv_parallel_indexation_1994', 'brazil_plano_real_1994'] but no child policy has an evaluation design.
+- `brazil_lula_da_silva_bolsa_familia_2003_2010` has audited policies ['brazil_bndes_credit_expansion_2008_2010', 'brazil_bolsa_familia_law_10836_2004', 'brazil_inflation_targeting_continuity', 'brazil_minimum_wage_policy_2003_2010', 'brazil_pre_salt_oil_framework_2010'] but no child policy has an evaluation design.
+- `brazil_lula_ii_pt_2007_2011` has audited policies ['br_bolsa_familia_expansion_2006_2010', 'br_gfc_bndes_ipi_countercyclical_2008_2010', 'br_pac_infrastructure_programme_2007', 'br_pre_sal_partition_production_regime_2010', 'br_pre_salt_discovery_2007'] but no child policy has an evaluation design.
+- `brazil_lula_third_term_2023_present` has audited policies ['brazil_bndes_credit_reexpansion_2023', 'brazil_bolsa_familia_2_relaunch_2023', 'brazil_marco_fiscal_lc200_2023', 'brazil_mercosur_eu_trade_deal_2024', 'brazil_minimum_wage_valorisation_formula_2023', 'brazil_mover_green_mobility_law_2024', 'brazil_nova_industria_2024', 'brazil_ppcdam_amazon_deforestation_plan_2023', 'brazil_sbce_carbon_market_law_2024', 'brazil_tax_reform_ec132_2023'] but no child policy has an evaluation design.
+- `brazil_real_plan_1994` has audited policies ['brazil_fiscal_responsibility_law_2000', 'brazil_inflation_targeting_regime_1999', 'brazil_privatisations_1995_2002', 'brazil_real_introduction_1994', 'brazil_telecom_reform_1995_1998', 'brazil_urv_1994'] but no child policy has an evaluation design.
+- `brazil_real_plan_cardoso_1994_2002` has audited policies ['brazil_fiscal_responsibility_law_2000', 'brazil_inflation_targeting_1999', 'brazil_plano_real_1994', 'brazil_privatisations_1995_2000', 'brazil_real_launch_1994', 'brazil_urv_transition_1994'] but no child policy has an evaluation design.
+- `brazil_sarney_pmdb_1985_1990` has audited policies ['br_bresser_summer_plans_1987_1989', 'br_constitution_1988', 'br_cruzado_plan_1986', 'br_external_debt_moratorium_1987', 'br_hyperinflation_escalation_1989_1990'] but no child policy has an evaluation design.
+- `brazil_temer_mdb_2016_2018` has audited policies ['br_labour_reform_lei13467_2017', 'br_outsourcing_law_lei13429_2017', 'br_tcu_investment_divestment_2017', 'br_teto_de_gastos_pec95_2016'] but no child policy has an evaluation design.
+- `bulgaria_communist_state_building_1944_1989` has audited policies ['bg_agricultural_collectivisation_1946_1958', 'bg_nationalisation_law_1947', 'bg_soviet_style_planning_1947_1989'] but no child policy has an evaluation design.
+- `california_climate_regulatory_regime_2006_present` has audited policies ['california_ab1279_2022', 'california_ab32_2006', 'california_advanced_clean_cars_ii_2022', 'california_cap_and_trade_2012', 'california_sb100_2018', 'california_sb253_sb261_2023', 'california_sb32_2016'] but no child policy has an evaluation design.
+- `canada_carney_liberal_2025_present` has audited policies ['ca_build_canada_homes_2025', 'ca_capital_gains_inclusion_cancellation_2025', 'ca_carbon_tax_consumer_cancellation_2025', 'ca_immigration_levels_reduction_2025', 'ca_middle_bracket_tax_cut_2025', 'ca_us_retaliatory_tariffs_2025'] but no child policy has an evaluation design.
+- `canada_chretien_liberal_first_1993_1997` has audited policies ['ca_chst_block_grant_1996', 'ca_federal_program_review_1994_1996', 'ca_martin_budget_1995', 'ca_nafta_canada_1994', 'ca_quebec_referendum_1995', 'canada_martin_fiscal_consolidation_1995'] but no child policy has an evaluation design.
+- `canada_chretien_liberal_second_third_1997_2003` has audited policies ['ca_clarity_act_2000', 'ca_cpp_reform_1997', 'ca_february_2000_tax_cut', 'ca_iraq_war_refusal_2003', 'ca_kyoto_ratification_2002'] but no child policy has an evaluation design.
+- `canada_harper_conservative_2006_2015` has audited policies ['ca_bill_c51_anti_terrorism_2015', 'ca_ceta_2014', 'ca_corporate_tax_cut_22_to_15_2007_2012', 'ca_economic_action_plan_2009', 'ca_gst_cut_7_to_5_2006_2008', 'ca_tfsa_2009'] but no child policy has an evaluation design.
+- `canada_martin_liberal_2003_2006` has audited policies ['ca_civil_marriage_act_2005', 'ca_gomery_commission_2004_2005', 'ca_health_accord_2004', 'ca_kelowna_accord_2005'] but no child policy has an evaluation design.
+- `canada_mulroney_chretien_fiscal_consolidation_1984_2006` has audited policies ['canada_boc_inflation_targeting_1991', 'canada_cpp_reform_1997', 'canada_cusfta_1988', 'canada_gst_1991', 'canada_nafta_accession_1994', 'canada_privatisations_1988_1995', 'canada_program_review_1995'] but no child policy has an evaluation design.
+- `canada_mulroney_pc_first_1984_1988` has audited policies ['ca_canadair_dehavilland_privatisation_1986', 'ca_cusfta_1988', 'ca_investment_canada_firab_replacement_1985', 'ca_western_accord_nep_dismantling_1985', 'ca_wilson_tax_reform_1987'] but no child policy has an evaluation design.
+- `canada_mulroney_pc_second_1988_1993` has audited policies ['ca_charlottetown_accord_1992', 'ca_gst_introduction_1991', 'ca_inflation_targeting_1991', 'ca_meech_lake_failure_1987_1990', 'ca_nafta_canada_1994'] but no child policy has an evaluation design.
+- `canada_trudeau_2015_present` has audited policies ['canada_capital_gains_inclusion_2024', 'canada_carbon_pricing_ghgppa_2018', 'canada_cerb_covid_fiscal_response_2020_2022', 'canada_child_benefit_2016', 'canada_child_care_10_dollar_day_2021', 'canada_cpp_enhancement_2016', 'canada_dental_pharmacare_ndp_agreement_2023_2024', 'canada_immigration_levels_plan_2015_present'] but no child policy has an evaluation design.
+- `canada_trudeau_pet_liberal_1980_1984` has audited policies ['ca_charter_rights_freedoms_1982', 'ca_constitution_act_patriation_1982', 'ca_national_energy_program_1980', 'ca_six_and_five_wage_controls_1982'] but no child policy has an evaluation design.
+- `chile_aylwin_concertacion_1990_1994` has audited policies ['cl_bcch_autonomy_activation_1989_1990', 'cl_encaje_capital_controls_1991', 'cl_labour_law_restoration_1991', 'cl_rettig_commission_1990_1991', 'cl_tax_reform_1990_growth_with_equity'] but no child policy has an evaluation design.
+- `chile_bachelet_i_concertacion_2006_2010` has audited policies ['cl_countercyclical_stimulus_2009', 'cl_fees_stabilisation_fund_2006', 'cl_lge_education_law_2009', 'cl_pension_reform_pilar_solidario_2008', 'cl_transantiago_launch_crisis_2007'] but no child policy has an evaluation design.
+- `chile_bachelet_ii_nm_2014_2018` has audited policies ['cl_despenalizacion_aborto_3_causales_2017', 'cl_gratuidad_universitaria_2016', 'cl_reforma_educacional_inclusion_2015', 'cl_reforma_laboral_2016', 'cl_reforma_pensional_pilar_solidario_2016', 'cl_reforma_tributaria_2014'] but no child policy has an evaluation design.
+- `chile_boric_ad_2022_present` has audited policies ['cl_40_hour_work_week_2023', 'cl_ley_corta_isapres_2024', 'cl_mining_royalty_reform_2023', 'cl_pension_reform_ley_21735_2025', 'cl_plebiscito_constitucional_2022_2023', 'cl_reforma_tributaria_pacto_fiscal_rechazada_2023'] but no child policy has an evaluation design.
+- `chile_frei_concertacion_1994_2000` has audited policies ['cl_asian_crisis_encaje_removal_1998', 'cl_canada_mexico_mercosur_fta_1996_1998', 'cl_concessions_law_infrastructure_1996', 'cl_pinochet_london_arrest_1998', 'cl_reforma_procesal_penal_initiation_1997'] but no child policy has an evaluation design.
+- `chile_lagos_concertacion_2000_2006` has audited policies ['cl_constitutional_reform_2005', 'cl_fiscal_structural_balance_rule_2001', 'cl_plan_auge_ges_2004_2005', 'cl_transantiago_design_2005', 'cl_us_fta_2003_2004'] but no child policy has an evaluation design.
+- `chile_pinera_i_2010_2014` has audited policies ['cl_cae_student_loan_consolidation_2010_2012', 'cl_pinera_i_copper_royalty_reform_2010', 'cl_pinera_i_corporate_tax_hike_2010', 'cl_pinera_i_earthquake_reconstruction_2010', 'cl_pinera_i_tax_reform_2012'] but no child policy has an evaluation design.
+- `chile_pinera_ii_2018_2022` has audited policies ['cl_acuerdo_paz_nueva_constitucion_2019', 'cl_afp_retiros_10_2020_2021', 'cl_ife_covid_2020_2021', 'cl_ley_migraciones_2021', 'cl_modernizacion_tributaria_2020'] but no child policy has an evaluation design.
+- `china_hu_era_2002_2012` has audited policies ['cn_12th_five_year_plan_2011', 'cn_agricultural_tax_abolition_2006', 'cn_four_trillion_stimulus_2008', 'cn_labour_contract_law_2008', 'cn_new_rural_medical_scheme_2003', 'cn_property_rights_law_2007', 'cn_rmb_exchange_rate_reform_2005'] but no child policy has an evaluation design.
+- `china_hua_guofeng_transition_1976_1978` has audited policies ['cn_arrest_gang_of_four_1976', 'cn_baoshan_steel_japan_contract_1977', 'cn_ten_year_plan_1978'] but no child policy has an evaluation design.
+- `china_jiang_era_1989_2002` has audited policies ['china_wto_accession_2001', 'cn_constitution_private_economy_1999', 'cn_exchange_rate_unification_1994', 'cn_housing_commercialisation_1998', 'cn_pboc_law_1995', 'cn_soe_grasp_large_let_go_small_1995', 'cn_tax_sharing_reform_1994'] but no child policy has an evaluation design.
+- `china_tiananmen_austerity_1989_1992` has audited policies ['cn_14th_congress_socialist_market_1992', 'cn_austerity_rectification_1988_1991', 'cn_deng_southern_tour_1992', 'cn_shanghai_pudong_1990', 'cn_tiananmen_martial_law_1989'] but no child policy has an evaluation design.
+- `china_wto_accession_2001` has audited policies ['china_soe_reform_2001_2006', 'china_trading_rights_liberalisation', 'china_wto_tariff_reductions_2001'] but no child policy has an evaluation design.
+- `china_xi_era_2012_present` has audited policies ['cn_anti_corruption_campaign_2012', 'cn_belt_and_road_2013', 'cn_common_prosperity_2021', 'cn_housing_rescue_measures_2024', 'cn_made_in_china_2025_2015', 'cn_platform_crackdown_2020', 'cn_private_economy_promotion_law_2025', 'cn_three_child_policy_2021', 'cn_three_red_lines_2020'] but no child policy has an evaluation design.
+- `colombia_barco_liberal_1986_1990` has audited policies ['co_barco_gradual_tariff_reduction_1989_1990', 'co_m19_demobilisation_accord_1990', 'co_narco_war_extraditables_1986_1990', 'co_plan_economia_social_1987', 'co_septima_papeleta_constituent_movement_1990'] but no child policy has an evaluation design.
+- `colombia_betancur_conservative_1982_1986` has audited policies ['co_amnesty_ley_35_1982', 'co_palace_of_justice_siege_1985', 'co_uribe_accord_farc_1984', 'co_us_extradition_treaty_activation_1984', 'co_voluntary_fiscal_adjustment_colombian_exception_1984_1985'] but no child policy has an evaluation design.
+- `colombia_duque_centro_democratico_2018_2022` has audited policies ['co_failed_solidaridad_sostenible_tax_reform_2021', 'co_ingreso_solidario_pandemic_transfer_2020', 'co_ley_2010_2019_ley_crecimiento_economico', 'co_ley_2155_2021_inversion_social', 'co_oecd_accession_2020', 'co_venezuelan_migrant_temporary_protection_2021'] but no child policy has an evaluation design.
+- `colombia_gaviria_liberal_apertura_1990_1994` has audited policies ['co_apertura_economica_1990_1992', 'co_banrep_autonomy_ley_31_1992', 'co_constitution_1991', 'co_escobar_endgame_1991_1993', 'co_ley_100_pensions_health_1993', 'co_ley_50_labour_reform_1990'] but no child policy has an evaluation design.
+- `colombia_lopez_michelsen_1974_1978` has audited policies ['co_bonanza_cafetera_management_1975_1977', 'co_financial_law_55_1975', 'co_food_nutrition_plan_pan_1975', 'co_tax_reform_1974'] but no child policy has an evaluation design.
+- `colombia_pastrana_conservative_1998_2002` has audited policies ['co_imf_extended_fund_facility_1999', 'co_ley_617_territorial_fiscal_discipline_2000', 'co_plan_colombia_2000', 'co_upac_to_uvr_mortgage_reform_1999', 'co_zona_distension_caguan_1998_2002'] but no child policy has an evaluation design.
+- `colombia_petro_2022_present` has audited policies ['colombia_health_reform_proposal_2023_2024', 'colombia_labour_reform_2023_2024', 'colombia_minimum_wage_increases_2023_2024', 'colombia_oil_gas_exploration_moratorium_2022', 'colombia_paz_total_2022', 'colombia_pension_reform_ley_2381_2024', 'colombia_reforma_tributaria_2022'] but no child policy has an evaluation design.
+- `colombia_samper_liberal_1994_1998` has audited policies ['co_cali_cartel_dismantling_1995', 'co_proceso_8000_narco_campaign_financing_1995_1996', 'co_salto_social_plan_1995_1998', 'co_tequila_contagion_recession_1996_1998', 'co_us_decertification_1996_1997'] but no child policy has an evaluation design.
+- `colombia_santos_i_2010_2014` has audited policies ['co_farc_peace_talks_launch_2012', 'co_fiscal_rule_ley_1473_2011', 'co_royalties_reform_2011_2012', 'co_tax_reform_ley_1607_2012', 'co_victims_law_ley_1448_2011'] but no child policy has an evaluation design.
+- `colombia_santos_ii_2014_2018` has audited policies ['co_4g_infrastructure_concessions_2014', 'co_farc_peace_final_agreement_2016', 'co_minimum_wage_above_inflation_2014_2018', 'co_oecd_accession_invitation_2018', 'co_tax_reform_law_1819_2016'] but no child policy has an evaluation design.
+- `colombia_turbay_ayala_1978_1982` has audited policies ['co_cerrejon_ferronickel_1981', 'co_estatuto_seguridad_1978', 'co_plan_integracion_nacional_1979', 'co_ventanilla_siniestra_cocaine_peso_laundering_1980'] but no child policy has an evaluation design.
+- `colombia_uribe_santos_duque_market_continuity_2002_2022` has audited policies ['colombia_capital_markets_holding_financiero_2021', 'colombia_covid_ingreso_solidario_2020', 'colombia_democratic_security_2002', 'colombia_farc_peace_accord_2016', 'colombia_oecd_accession_2018', 'colombia_pacific_alliance_2012', 'colombia_pension_reform_law_797_2003', 'colombia_tax_reforms_2003_2021', 'colombia_us_fta_2006'] but no child policy has an evaluation design.
+- `colombia_uribe_security_market_reforms_2002_2010` has audited policies ['colombia_democratic_security_2002', 'colombia_free_trade_zones_law_1004_2005', 'colombia_pension_reform_law_797_2003', 'colombia_tax_reforms_2003_2006', 'colombia_us_fta_2006'] but no child policy has an evaluation design.
+- `costa_rica_second_republic_welfare_democracy_1948_1978` has audited policies ['cr_army_abolition_1948', 'cr_bank_nationalisation_1948', 'cr_social_security_expansion_1961_1973'] but no child policy has an evaluation design.
+- `cote_divoire_houphouet_export_developmental_state_1960_1993` has audited policies ['ci_agricultural_frontier_export_model_1960s', 'ci_cocoa_coffee_export_board_caistab_1960', 'ci_french_capital_open_door_1960s'] but no child policy has an evaluation design.
+- `cuba_post_1959_socialist_economy` has audited policies ['cuba_central_planning_juceplan', 'cuba_cuentapropismo_1993', 'cuba_dual_currency_1994_2021', 'cuba_expropriations_1960_1968', 'cuba_libreta_rationing_1962', 'cuba_raul_guidelines_2011', 'cuba_tarea_ordenamiento_2021'] but no child policy has an evaluation design.
+- `czech_republic_babis_ano_first_2017_2021` has audited policies ['cz_antivirus_wage_subsidy_2020', 'cz_capi_hnizdo_subsidy_case_2017_2021', 'cz_eet_electronic_revenue_2016', 'cz_pension_valorisation_hikes_2018_2020', 'cz_super_gross_wage_abolition_2021'] but no child policy has an evaluation design.
+- `czech_republic_babis_ano_second_2025_present` has audited policies ['cz_consolidation_rollback_2025', 'cz_energy_price_cap_2025', 'cz_pension_indexation_restore_2025'] but no child policy has an evaluation design.
+- `czech_republic_cssd_coalition_2002_2006` has audited policies ['cz_eu_accession_2004', 'cz_gross_apartment_scandal_2005', 'cz_klaus_president_election_2003', 'cz_spidla_public_finance_reform_2003'] but no child policy has an evaluation design.
+- `czech_republic_fischer_caretaker_2009_2010` has audited policies ['cz_janota_austerity_package_2009', 'cz_lisbon_treaty_ratification_2009'] but no child policy has an evaluation design.
+- `czech_republic_klaus_ods_first_1993_1997` has audited policies ['cz_austerity_packages_1997', 'cz_koruna_peg_abandonment_1997', 'cz_oecd_accession_1995', 'cz_second_wave_voucher_privatisation_1994'] but no child policy has an evaluation design.
+- `czech_republic_necas_ods_2010_2013` has audited policies ['cz_church_restitution_2012', 'cz_pension_age_uncap_2011', 'cz_second_pillar_pensions_2013', 'cz_super_gross_wage_reform_2013', 'cz_vat_unification_2012_2013'] but no child policy has an evaluation design.
+- `czech_republic_sobotka_cssd_2014_2017` has audited policies ['cz_child_tax_credit_expansion_2015', 'cz_eet_electronic_revenue_2016', 'cz_minimum_wage_rises_2014_2017', 'cz_second_pillar_abolition_2016', 'cz_second_reduced_vat_2015'] but no child policy has an evaluation design.
+- `czech_republic_topolanek_ods_2006_2009` has audited policies ['cz_corporate_tax_cut_2008_2010', 'cz_flat_tax_15_percent_2008', 'cz_lisbon_treaty_ratification_2009', 'cz_missile_defence_agreement_2008'] but no child policy has an evaluation design.
+- `czech_republic_zeman_cssd_1998_2002` has audited policies ['cz_bank_privatisation_2000_2001', 'cz_investment_incentives_act_1998', 'cz_nato_accession_1999', 'cz_opposition_agreement_1998'] but no child policy has an evaluation design.
+- `czechoslovakia_calfa_civic_forum_1989_1992` has audited policies ['cs_commercial_code_1991', 'cs_large_privatisation_voucher_1991', 'cs_price_liberalisation_1991', 'cs_restitution_law_1991', 'cs_small_privatisation_law_1990'] but no child policy has an evaluation design.
+- `czechoslovakia_husak_normalisation_1969_1987` has audited policies ['cs_normalisation_purge_1969_1971', 'cs_prestavba_programme_1987', 'cs_souhrn_opatreni_1980'] but no child policy has an evaluation design.
+- `deng_xiaoping_reforms_1978` has audited policies ['china_deng_reform_opening_1978', 'china_household_responsibility_1978', 'china_sez_establishment_1980', 'china_soe_restructuring_1990s', 'china_wto_accession_2001'] but no child policy has an evaluation design.
+- `denmark_anker_jorgensen_socdem_1975_1982` has audited policies ['dk_august_package_1977', 'dk_krone_devaluations_snake_1976_1979', 'dk_pension_atp_expansion_1976'] but no child policy has an evaluation design.
+- `denmark_fogh_rasmussen_v_2001_2009` has audited policies ['dk_24_year_rule_2002', 'dk_muhammad_cartoons_crisis_2005_2006', 'dk_skattestop_2002', 'dk_strukturreformen_2007'] but no child policy has an evaluation design.
+- `denmark_frederiksen_sap_broad_2019_present` has audited policies ['dk_defence_optout_referendum_2022', 'dk_ghetto_parallelsamfund_2018_2021', 'dk_klimalov_2020', 'dk_paradigmeskift_asylum_2019', 'dk_ret_til_tidlig_pension_arne_2021', 'dk_store_bededag_afskaffelse_2023'] but no child policy has an evaluation design.
+- `denmark_lokke_rasmussen_i_2009_2011` has audited policies ['dk_dagpenge_duration_cut_2010', 'dk_forarspakke_2_0_2009', 'dk_genopretningspakken_2010'] but no child policy has an evaluation design.
+- `denmark_lokke_rasmussen_venstre_2015_2019` has audited policies ['dk_2025_plan_structural_balance_2017', 'dk_ghetto_parallelsamfund_2018_2021', 'dk_integrationsydelse_contanthjaelpsloft_2015_2016', 'dk_pso_afgift_phaseout_2017_2022', 'dk_smykkeloven_asylum_assets_2016'] but no child policy has an evaluation design.
+- `denmark_nyrup_rasmussen_socdem_1993_2001` has audited policies ['denmark_flexicurity_1994', 'dk_efterlon_reform_1998', 'dk_euro_referendum_no_2000', 'dk_labour_market_reform_flexicurity_1994', 'dk_maastricht_edinburgh_referendum_1993', 'dk_whitsun_tax_reform_1993'] but no child policy has an evaluation design.
+- `denmark_schluter_konservative_1982_1988` has audited policies ['dk_kartoffelkur_october_1982_package', 'dk_paaskepakke_1986', 'dk_tax_reform_1987', 'dk_wage_indexation_abolition_1982'] but no child policy has an evaluation design.
+- `denmark_thorning_socdem_2011_2015` has audited policies ['dk_budgetlov_2012', 'dk_efterloen_reform_2011_2012', 'dk_eu_fiscal_compact_2012', 'dk_folkeskolereform_2013', 'dk_kontanthjaelp_reform_2013', 'dk_skattereform_2012'] but no child policy has an evaluation design.
+- `ecuador_borja_id_1988_1992` has audited policies ['ec_bilingual_intercultural_education_1988', 'ec_borja_gradualist_stabilisation_1988_1992', 'ec_conaie_indigenous_uprising_1990', 'ec_imf_stand_by_1988_1991'] but no child policy has an evaluation design.
+- `ecuador_bucaram_pre_1996_1997` has audited policies ['ec_bucaram_austerity_package_1996', 'ec_bucaram_convertibility_proposal_1996', 'ec_bucaram_mental_incapacity_removal_1997', 'ec_paro_civico_nacional_1997'] but no child policy has an evaluation design.
+- `ecuador_correa_21st_century_socialism_2007_2017` has audited policies ['ecuador_china_financing_2009_2017', 'ecuador_debt_audit_default_2008', 'ecuador_new_constitution_2008', 'ecuador_oil_contract_renegotiation_2010', 'ecuador_public_investment_push_2008_2016', 'ecuador_tax_reforms_2007_2014'] but no child policy has an evaluation design.
+- `ecuador_correa_alianza_pais_i_2007_2013` has audited policies ['ec_bono_desarrollo_humano_expansion_2007_2013', 'ec_mining_code_2009', 'ec_montecristi_constitution_2008', 'ec_oil_service_contract_model_reform_2010', 'ec_selective_default_global_bonds_2008'] but no child policy has an evaluation design.
+- `ecuador_correa_alianza_pais_ii_2013_2017` has audited policies ['ec_chinese_oil_backed_loans_2013_2017', 'ec_communications_law_loc_2013', 'ec_eu_andean_fta_2016', 'ec_manabi_earthquake_response_2016', 'ec_monetary_financial_code_2014'] but no child policy has an evaluation design.
+- `ecuador_dollarisation_2000` has audited policies ['ecuador_banking_resolution_1999_2000', 'ecuador_dollarisation_law_2000'] but no child policy has an evaluation design.
+- `ecuador_duran_ballen_pur_1992_1996` has audited policies ['ec_brady_plan_ecuador_1995', 'ec_cenepa_war_peru_1995', 'ec_consulta_popular_november_1995', 'ec_dahik_scandal_1995', 'ec_ley_modernizacion_estado_1993'] but no child policy has an evaluation design.
+- `ecuador_lasso_creo_2021_2023` has audited policies ['ec_china_ftfa_2023', 'ec_consulta_popular_feb_2023', 'ec_decretos_ley_2023', 'ec_imf_eff_completion_2022', 'ec_ley_desarrollo_economico_2021', 'ec_muerte_cruzada_may_2023'] but no child policy has an evaluation design.
+- `ecuador_moreno_2017_2021` has audited policies ['ec_debt_restructuring_2020', 'ec_decreto_883_fuel_subsidy_2019', 'ec_imf_eff_2019', 'ec_imf_eff_2020', 'ec_referendum_feb_2018'] but no child policy has an evaluation design.
+- `ecuador_noboa_adn_2023_present` has audited policies ['ec_conflicto_armado_interno_2024', 'ec_electricity_rationing_2024', 'ec_ley_economia_criminal_2023', 'ec_referendum_abr_2024', 'ec_vat_hike_12_to_15_2024'] but no child policy has an evaluation design.
+- `egypt_morsi_muslim_brotherhood_2012_2013` has audited policies ['eg_morsi_2012_constitution_referendum', 'eg_morsi_constitutional_declaration_2012', 'eg_morsi_imf_sba_negotiation_2012_2013', 'eg_morsi_sukuk_law_2013'] but no child policy has an evaluation design.
+- `egypt_mubarak_early_era_1981_1991` has audited policies ['eg_1987_imf_stand_by_agreement', 'eg_1990_1991_paris_club_debt_relief', 'eg_emergency_law_continuity_1981', 'eg_exchange_rate_multiple_tier_reform_1987'] but no child policy has an evaluation design.
+- `egypt_mubarak_neoliberal_late_era_1991_2011` has audited policies ['egypt_banking_privatisation_2004_2008', 'egypt_ersap_1991', 'egypt_partial_soe_privatisation_1991_2008', 'egypt_tax_reform_2005', 'egypt_trade_tariff_reform_2004'] but no child policy has an evaluation design.
+- `egypt_sadat_infitah_1976_1981` has audited policies ['eg_1977_bread_riots_subsidy_retention', 'eg_camp_david_treaty_economic_effects_1979', 'eg_infitah_deepening_1976_1981', 'eg_us_aid_package_institutionalisation_1979'] but no child policy has an evaluation design.
+- `egypt_scaf_transition_2011_2012` has audited policies ['eg_scaf_imf_standby_decline_2011', 'eg_scaf_reserve_drawdown_2011_2012', 'eg_scaf_wheat_subsidy_continuation_2011'] but no child policy has an evaluation design.
+- `egypt_sisi_austerity_2016_present` has audited policies ['egypt_egp_float_2016', 'egypt_egp_second_float_2024', 'egypt_energy_subsidy_reform_2014_2019', 'egypt_imf_eff_2016', 'egypt_military_economy_expansion_2013_present', 'egypt_vat_introduction_2016'] but no child policy has an evaluation design.
+- `egypt_sisi_second_term_2018_2024` has audited policies ['eg_constitutional_amendment_2019', 'eg_hayah_karima_2019', 'eg_imf_eff_3bn_2022', 'eg_imf_rfi_stand_by_2020', 'eg_military_owned_enterprise_ipo_plan_2022', 'eg_new_administrative_capital_2015_ongoing', 'eg_state_ownership_policy_2022'] but no child policy has an evaluation design.
+- `egypt_sisi_third_term_2024_present` has audited policies ['eg_egp_second_float_2024', 'eg_fuel_subsidy_phase_out_path_2024', 'eg_imf_eff_expansion_2024', 'eg_ras_el_hekma_uae_deal_2024', 'eg_state_ownership_policy_divestments_2024'] but no child policy has an evaluation design.
+- `elsalvador_bukele_first_term_2019_2024` has audited policies ['sv_bitcoin_legal_tender_2021', 'sv_bond_buyback_2023', 'sv_cecot_mega_prison_2023', 'sv_chivo_wallet_2021', 'sv_cicies_termination_2021', 'sv_constitutional_chamber_removal_2021', 'sv_digital_asset_issuance_law_2023', 'sv_municipal_consolidation_262_to_44_2023', 'sv_plan_control_territorial_2019', 'sv_state_of_exception_2022', 'sv_tax_reform_2023'] but no child policy has an evaluation design.
+- `elsalvador_bukele_second_term_2024_present` has audited policies ['sv_bitcoin_legal_tender_2021', 'sv_bitcoin_removal_imf_2024', 'sv_bond_buyback_2023', 'sv_cecot_mega_prison_2023', 'sv_digital_asset_issuance_law_2023', 'sv_ley_fomento_tecnologia_2023', 'sv_municipal_consolidation_262_to_44_2023', 'sv_state_of_exception_2022', 'sv_tax_reform_2023'] but no child policy has an evaluation design.
+- `elsalvador_sanchez_ceren_fmln_2014_2019` has audited policies ['sv_fmln_paquete_escolar_2014', 'sv_fmln_pension_reform_arrears_2017', 'sv_fmln_sct_crime_plan_2015', 'sv_fmln_solidarity_pension_2014'] but no child policy has an evaluation design.
+- `ethiopia_abiy_prosperity_2018_present` has audited policies ['et_banking_sector_opening_2024', 'et_birr_float_2024', 'et_eprdf_to_prosperity_2019', 'et_eritrea_peace_2018', 'et_homegrown_economic_reform_2019', 'et_imf_eff_2024', 'et_telecoms_liberalisation_2021', 'et_tigray_war_2020'] but no child policy has an evaluation design.
+- `ethiopia_derg_1974_1991` has audited policies ['ethiopia_amc_grain_procurement_1976', 'ethiopia_bank_industry_nationalisation_1975', 'ethiopia_rural_land_nationalisation_1975', 'ethiopia_villagisation_programme_1985'] but no child policy has an evaluation design.
+- `ethiopia_eprdf_developmental_state_1991_2018` has audited policies ['ethiopia_gerd_project_2011', 'ethiopia_gtp_plan_2010', 'ethiopia_industrial_parks_2014', 'ethiopia_land_use_rights_regime_1995', 'ethiopia_state_owned_banking_regime'] but no child policy has an evaluation design.
+- `ethiopia_hailemariam_eprdf_2012_2018` has audited policies ['et_addis_master_plan_oromo_protests_2015', 'et_gtp_ii_2015', 'et_hawassa_industrial_park_2016', 'et_state_of_emergency_2016'] but no child policy has an evaluation design.
+- `ethiopia_meles_late_era_2005_2012` has audited policies ['et_adli_doctrine_consolidation_2005', 'et_anti_terrorism_proclamation_2009', 'et_charities_societies_proclamation_2009', 'et_gerd_launch_2011', 'et_gtp_i_2010'] but no child policy has an evaluation design.
+- `eu_csrd_sustainability_reporting_2023` has audited policies ['eu_csddd_2024', 'eu_csrd_2023', 'eu_omnibus_simplification_2025', 'eu_sfdr_2019', 'eu_taxonomy_regulation_2020'] but no child policy has an evaluation design.
+- `eu_gdpr_regulatory_stack_2018` has audited policies ['eu_data_act_2023', 'eu_data_governance_act_2022', 'eu_eprivacy_directive_2002_amended', 'eu_gdpr_2018'] but no child policy has an evaluation design.
+- `eu_green_deal_2020` has audited policies ['eu_cbam_2023', 'eu_climate_neutrality_law_2021', 'eu_csrd_2023', 'eu_ets_phase4_2021', 'eu_net_zero_industry_act_2024', 'eu_red_iii_2023', 'eu_taxonomy_regulation_2020'] but no child policy has an evaluation design.
+- `eu_reach_chemicals_2007` has audited policies ['eu_chemicals_strategy_for_sustainability_2020', 'eu_clp_regulation_2008', 'eu_pfas_restriction_proposal_2023', 'eu_reach_regulation_2007'] but no child policy has an evaluation design.
+- `eu_single_market_1993` has audited policies ['eu_banking_passport_1989', 'eu_services_directive_2006', 'eu_single_european_act_1986', 'eu_vat_harmonisation_1993'] but no child policy has an evaluation design.
+- `finland_aho_centre_1991_1995` has audited policies ['fi_banking_crisis_resolution_1991_1993', 'fi_dual_income_tax_reform_1993', 'fi_eu_membership_accession_1995', 'fi_fiscal_consolidation_1992_1994', 'fi_markka_devaluation_free_float_1991_1992'] but no child policy has an evaluation design.
+- `finland_katainen_six_party_2011_2014` has audited policies ['fi_cit_20_percent_2014', 'fi_greek_collateral_agreement_2011', 'fi_municipal_merger_reform_2012', 'fi_universities_reform_2009'] but no child policy has an evaluation design.
+- `finland_kiviniemi_centre_2010_2011` has audited policies ['fi_efsf_finnish_guarantees_2010', 'fi_vat_rise_2010'] but no child policy has an evaluation design.
+- `finland_koivisto_sdp_1979_1987` has audited policies ['fi_financial_liberalisation_1986', 'fi_markka_devaluation_1984', 'fi_tupo_incomes_policy_1977_onwards'] but no child policy has an evaluation design.
+- `finland_lipponen_rainbow_1995_2003` has audited policies ['fi_emu_membership_1999', 'fi_fiscal_surplus_framework_1998', 'fi_innovation_policy_tekes_expansion_1995_2003', 'fi_state_enterprise_privatisation_1996_2000'] but no child policy has an evaluation design.
+- `finland_marin_rainbow_2019_2023` has audited policies ['fi_climate_act_2022', 'fi_compulsory_education_extension_2021', 'fi_family_leave_reform_2022', 'fi_nato_application_2022', 'fi_sote_wellbeing_services_2023'] but no child policy has an evaluation design.
+- `finland_orpo_rightbloc_2023_present` has audited policies ['fi_immigration_tightening_2024', 'fi_labour_market_reform_2024', 'fi_nato_accession_2023', 'fi_orpo_fiscal_consolidation_2023', 'fi_sote_wellbeing_services_2023'] but no child policy has an evaluation design.
+- `finland_sipila_centrist_2015_2019` has audited policies ['fi_aktiivimalli_unemployment_2018', 'fi_basic_income_pilot_2017', 'fi_competitiveness_pact_2016', 'fi_sipila_spending_cuts_2015_2019'] but no child policy has an evaluation design.
+- `finland_stubb_kok_2014_2015` has audited policies ['fi_cit_20_percent_2014', 'fi_fennovoima_nuclear_vote_2014'] but no child policy has an evaluation design.
+- `finland_vanhanen_centre_first_2003_2007` has audited policies ['fi_nokia_export_peak_era_2003_2007', 'fi_paras_municipal_reform_2007', 'fi_pension_reform_2005', 'fi_tupo_income_policy_2004'] but no child policy has an evaluation design.
+- `finland_vanhanen_ii_centre_2007_2010` has audited policies ['fi_stimulus_package_2009', 'fi_universities_reform_2009', 'fi_vat_rise_2010'] but no child policy has an evaluation design.
+- `france_chirac_ii_presidency_2002_2007` has audited policies ['fr_35h_rollback_fillon_law_2003', 'fr_cne_small_firm_contract_2005', 'fr_cpe_withdrawn_2006', 'fr_eu_constitution_referendum_2005', 'fr_fillon_pension_reform_2003'] but no child policy has an evaluation design.
+- `france_chirac_presidency_first_1995_2002` has audited policies ['france_aubry_35_hour_laws_1998_2000', 'france_cmu_universal_healthcare_1999', 'france_crds_cades_1996', 'france_jospin_privatisations_1997_2002', 'france_juppe_plan_1995'] but no child policy has an evaluation design.
+- `france_giscard_udf_1974_1981` has audited policies ['france_age_of_majority_1974', 'france_ems_joining_1979', 'france_loi_veil_1975', 'france_messmer_nuclear_plan_1974', 'france_plan_barre_1976', 'france_price_control_liberalisation_1978_1980'] but no child policy has an evaluation design.
+- `france_hollande_ps_2012_2017` has audited policies ['fr_75pc_top_bracket_2013', 'fr_cice_tax_credit_2013', 'fr_loi_macron_2015', 'fr_loi_travail_el_khomri_2016', 'fr_mariage_pour_tous_2013', 'fr_pacte_responsabilite_2014', 'fr_retraites_2014'] but no child policy has an evaluation design.
+- `france_jospin_ps_cohabitation_1997_2002` has audited policies ['fr_aubry_35h_week_1998_2000', 'fr_cmu_universal_health_coverage_1999', 'fr_france_euro_entry_1999_2002', 'fr_jospin_privatisations_1997_2002', 'fr_pacs_civil_union_1999', 'france_35_hour_week_2000'] but no child policy has an evaluation design.
+- `france_macron_presidency_2017_present` has audited policies ['fr_corporate_tax_cut_2018_2022', 'fr_france_2030_plan_2021', 'fr_isf_ifi_2018', 'fr_ordonnances_travail_2017', 'fr_pacte_law_2019', 'fr_pension_reform_2023', 'fr_pfu_flat_tax_2018'] but no child policy has an evaluation design.
+- `france_mitterrand_first_term_1981_1988` has audited policies ['france_39_hour_week_1982', 'france_exchange_control_abolition_1987_1990', 'france_isf_creation_1988', 'france_matif_creation_1986', 'france_nationalisations_1982', 'france_privatisations_chirac_1986_1988', 'france_tournant_de_la_rigueur_1983'] but no child policy has an evaluation design.
+- `france_mitterrand_second_term_1988_1995` has audited policies ['france_balladur_privatisations_1993_1995', 'france_bdf_independence_law_1993', 'france_csg_creation_1991', 'france_maastricht_ratification_referendum_1992', 'france_rmi_creation_1988'] but no child policy has an evaluation design.
+- `france_popular_front_1936_1938` has audited policies ['france_40_hour_week_1936', 'france_matignon_agreements_1936', 'france_paid_vacations_law_1936', 'france_sncf_nationalisation_1937'] but no child policy has an evaluation design.
+- `france_radical_republican_reform_1901_1914` has audited policies ['france_associations_law_1901', 'france_church_state_separation_1905', 'france_progressive_income_tax_1914', 'france_weekly_rest_law_1906', 'france_workers_peasants_pensions_1910'] but no child policy has an evaluation design.
+- `france_sarkozy_ump_2007_2012` has audited policies ['fr_auto_entrepreneur_2009', 'fr_lme_2008', 'fr_lru_university_autonomy_2007', 'fr_pension_reform_2010', 'fr_plan_relance_2008', 'fr_rgpp_2007', 'fr_tepa_2007'] but no child policy has an evaluation design.
+- `france_trente_glorieuses_indicative_planning_1945_1975` has audited policies ['france_eec_accession_rome_treaty_1957', 'france_indicative_planning_cgp', 'france_monnet_plan_1947', 'france_nationalisations_1945_1946', 'france_pinay_rueff_stabilisation_1958', 'france_smic_1970'] but no child policy has an evaluation design.
+- `germany_imperial_tariff_social_insurance_state_1902_1914` has audited policies ['germany_employee_insurance_act_1911', 'germany_reich_insurance_code_1911', 'germany_tariff_act_1902', 'germany_wehrbeitrag_army_bill_1913'] but no child policy has an evaluation design.
+- `germany_kohl_early_cdu_1982_1987` has audited policies ['de_beschaeftigungsfoerderungsgesetz_1985', 'de_bundesumweltministerium_1986', 'de_first_privatisations_veba_1987', 'de_haushaltsbegleitgesetz_1983', 'de_steuerreform_1986_1988'] but no child policy has an evaluation design.
+- `germany_kohl_reunification_era_1987_1998` has audited policies ['germany_gemu_monetary_union_1990', 'germany_pflegeversicherung_1994_1995', 'germany_solidaritaetszuschlag_1991', 'germany_stabilitaetspakt_amsterdam_1997', 'germany_treuhandanstalt_privatisation_1990_1994'] but no child policy has an evaluation design.
+- `germany_merkel_broad_2005_2021` has audited policies ['de_corona_sondervermoegen_2020', 'de_eurozone_bailout_posture_2010_2015', 'de_fluechtlingspolitik_wir_schaffen_das_2015', 'de_mindestlohn_2014', 'de_nord_stream_2_permitting_2015_2021', 'de_schuldenbremse_2009'] but no child policy has an evaluation design.
+- `germany_merkel_i_grand_coalition_2005_2009` has audited policies ['de_konjunkturpakete_i_ii_2008_2009', 'de_kurzarbeit_gfc_expansion_2008_2009', 'de_schuldenbremse_2009', 'de_soffin_bank_stabilisation_2008', 'de_vat_rise_19_2007'] but no child policy has an evaluation design.
+- `germany_merkel_ii_cdu_fdp_2009_2013` has audited policies ['de_atomausstieg_2011', 'de_esm_treaty_ratification_2012', 'de_eurozone_bailout_posture_2010_2015', 'de_fiscal_compact_ratification_2012', 'de_sparpaket_2010', 'germany_energiewende_2011'] but no child policy has an evaluation design.
+- `germany_merkel_iv_2017_2021` has audited policies ['de_co2_bepreisung_2021', 'de_corona_sondervermoegen_2020', 'de_kohleausstieg_2020', 'de_ngeu_agreement_2020', 'de_vat_cut_covid_2020'] but no child policy has an evaluation design.
+- `germany_merkel_nuclear_phaseout_2011` has audited policies ['germany_atomgesetz_13th_amendment_2011', 'germany_energiewende_2011', 'germany_ethik_kommission_sichere_energieversorgung_2011'] but no child policy has an evaluation design.
+- `germany_merz_2025_present` has audited policies ['de_buergergeld_verschaerfung_2025', 'de_grenzkontrollen_migrationswende_2025', 'de_koerperschaftsteuer_investitionsbooster_2025', 'de_schuldenbremse_reform_verteidigung_2025', 'de_sondervermoegen_infrastruktur_500bn_2025'] but no child policy has an evaluation design.
+- `germany_schmidt_spd_fdp_1974_1982` has audited policies ['de_betriebsrentengesetz_1974', 'de_bonn_g7_locomotive_1978', 'de_ems_founding_1979', 'de_lambsdorff_papier_1982', 'de_mitbestimmungsgesetz_1976', 'de_zukunftsinvestitionsprogramm_1975'] but no child policy has an evaluation design.
+- `germany_scholz_ampel_2021_2025` has audited policies ['de_buergergeld_reform_2023', 'de_bundeswehr_sondervermoegen_2022', 'de_cannabis_legalisation_2024', 'de_citizenship_reform_staag_2024', 'de_heizungsgesetz_geg_2023', 'de_lng_terminal_acceleration_2022', 'germany_energiewende_2011'] but no child policy has an evaluation design.
+- `germany_schroder_red_green_1998_2005` has audited policies ['germany_eeg_renewable_feed_in_2000', 'germany_hartz_reforms_2003_2005', 'germany_iraq_refusal_2002_2003', 'germany_nuclear_phaseout_atomkonsens_2000', 'germany_pension_reform_riester_2001', 'germany_renten_riester_pension_2001', 'germany_schroder_tax_reform_2000_2005', 'germany_zuwanderungsgesetz_2004'] but no child policy has an evaluation design.
+- `germany_wirtschaftswunder_erhard_1948_1966` has audited policies ['germany_bundesbank_law_1957', 'germany_codetermination_montan_1951', 'germany_currency_reform_1948', 'germany_eec_accession_1957', 'germany_gwb_competition_law_1957', 'germany_price_liberalisation_1948'] but no child policy has an evaluation design.
+- `ghana_erp_stabilisation_1983_1991` has audited policies ['ghana_cedi_devaluation_1983', 'ghana_civil_service_rationalisation_1987', 'ghana_cocobod_reform_1984', 'ghana_soe_divestiture_1987', 'ghana_trade_liberalisation_1986_1991'] but no child policy has an evaluation design.
+- `ghana_mahama_ndc_second_2025_present` has audited policies ['gh_24_hour_economy_2025', 'gh_cocoa_sector_reform_2025', 'gh_e_levy_repeal_2025', 'gh_imf_ecf_continuation_2025'] but no child policy has an evaluation design.
+- `greece_karamanlis_nd_1974_1980` has audited policies ['greece_1975_constitution', 'greece_eec_accession_negotiation_1975_1979', 'greece_kke_legalisation_1974', 'greece_nato_reintegration_1974_1980', 'greece_state_enterprise_consolidation_1975'] but no child policy has an evaluation design.
+- `greece_karamanlis_nephew_nd_2004_2009` has audited policies ['gr_athens_olympics_2004', 'gr_banking_privatisations_2004_2006', 'gr_corporate_tax_cut_2005', 'gr_cosco_piraeus_concession_2008', 'gr_pension_reform_petralia_2008', 'gr_statistical_revision_deficit_2004'] but no child policy has an evaluation design.
+- `greece_mitsotakis_nd_1990_1993` has audited policies ['greece_banking_sector_licensing_1992_1993', 'greece_drachma_currency_liberalisation_1992', 'greece_mitsotakis_stabilisation_programme_1991', 'greece_privatisation_law_2000_1991', 'greece_vat_18_percent_1992'] but no child policy has an evaluation design.
+- `greece_mitsotakis_nd_2019_present` has audited policies ['gr_corporate_tax_cut_2019_2021', 'gr_enfia_property_tax_reduction_2019_2024', 'gr_labour_flexibility_law_4808_2021', 'gr_minimum_wage_hikes_2019_2025', 'gr_recovery_resilience_plan_greece_2_0_2021', 'gr_tempi_rail_disaster_institutional_fallout_2023'] but no child policy has an evaluation design.
+- `greece_papademos_technocratic_2011_2012` has audited policies ['gr_hfsf_bank_recap_2012', 'gr_private_sector_minimum_wage_cut_2012', 'gr_psi_debt_restructuring_2012', 'gr_second_memorandum_2012'] but no child policy has an evaluation design.
+- `greece_papandreou_ii_1993_1996` has audited policies ['greece_convergence_programme_1994_1999', 'greece_csf_ii_1994_1999', 'greece_macedonia_interim_agreement_1995', 'greece_social_security_law_2084_implementation'] but no child policy has an evaluation design.
+- `greece_papandreou_pasok_1981_1989` has audited policies ['greece_ata_indexation_1982', 'greece_debt_trajectory_1981_1989', 'greece_esy_national_health_system_1983', 'greece_oae_problematic_enterprises_1983', 'greece_simitis_stabilisation_1985_1987', 'greece_trade_union_law_1264_1982'] but no child policy has an evaluation design.
+- `greece_papandreou_pasok_iii_2009_2011` has audited policies ['gr_deficit_revision_2009_2010', 'gr_first_memorandum_2010', 'gr_hradf_privatisation_launch_2011', 'gr_medium_term_fiscal_strategy_2011', 'gr_second_memorandum_2011_agreement'] but no child policy has an evaluation design.
+- `greece_samaras_nd_pasok_2012_2015` has audited policies ['gr_bank_recapitalisation_hfsf_2013_2014', 'gr_enfia_property_tax_introduction_2013', 'gr_ert_closure_2013', 'gr_labour_reform_memorandum_2012_2014', 'gr_psi_debt_exchange_2012', 'gr_second_memorandum_implementation_2012_2014'] but no child policy has an evaluation design.
+- `greece_simitis_pasok_1996_2004` has audited policies ['greece_athens_2004_olympics_infrastructure', 'greece_bank_of_greece_independence_1997', 'greece_csf_iii_2000_2006', 'greece_euro_entry_2001', 'greece_ote_partial_privatisations_1996_1998', 'greece_simitis_pension_reform_attempts_2001_2002'] but no child policy has an evaluation design.
+- `greece_tsipras_syriza_2015_2019` has audited policies ['gr_capital_controls_2015_2019', 'gr_memorandum_exit_2018', 'gr_pension_reform_katrougalos_2016', 'gr_taiped_privatisation_acceleration_2015_2019', 'gr_third_memorandum_2015'] but no child policy has an evaluation design.
+- `greek_fiscal_dominance_post_euro_2001` has audited policies ['greece_debt_statistic_misreporting_2002_2009', 'greece_euro_entry_2001', 'greece_fiscal_accommodation_2001_2009', 'greece_public_sector_wage_growth_2001_2009'] but no child policy has an evaluation design.
+- `hungary_antall_mdf_1990_1994` has audited policies ['hu_bank_consolidation_programme_1992_1993', 'hu_bankruptcy_law_1991', 'hu_compensation_act_karpotlas_1991', 'hu_europe_agreement_1991', 'hu_gradualist_privatisation_avu_1991'] but no child policy has an evaluation design.
+- `hungary_gyurcsany_bajnai_mszp_2004_2010` has audited policies ['hu_100_steps_fiscal_expansion_2005', 'hu_bajnai_crisis_package_2009', 'hu_convergence_programme_vat_hike_2006', 'hu_hospital_visit_fee_referendum_2008', 'hu_imf_stand_by_arrangement_2008'] but no child policy has an evaluation design.
+- `hungary_gyurcsany_mszp_2004_2009` has audited policies ['hu_balatonoszod_leak_2006', 'hu_imf_eu_rescue_2008', 'hu_social_referendum_2008', 'hu_uj_egyensuly_new_balance_2006'] but no child policy has an evaluation design.
+- `hungary_horn_mszp_1994_1998` has audited policies ['hu_bokros_package_1995', 'hu_crawling_peg_exchange_regime_1995', 'hu_health_insurance_reform_1996_1997', 'hu_pension_reform_three_pillar_1997', 'hu_privatisation_acceleration_apv_1995_1997', 'hungary_bokros_package_1995'] but no child policy has an evaluation design.
+- `hungary_kadar_goulash_communism_1968_1988` has audited policies ['hu_imf_accession_1982', 'hu_new_economic_mechanism_1968', 'hu_personal_income_tax_vat_1988'] but no child policy has an evaluation design.
+- `hungary_medgyessy_mszp_2002_2004` has audited policies ['hu_100_day_package_2002', 'hu_13th_month_pension_2003', 'hu_eu_accession_2004'] but no child policy has an evaluation design.
+- `hungary_nemeth_transition_1988_1990` has audited policies ['hu_company_law_vi_1988', 'hu_constitution_amendment_republic_1989', 'hu_foreign_investment_law_1988', 'hu_personal_income_tax_vat_reform_1988', 'hu_two_tier_banking_1987_1989'] but no child policy has an evaluation design.
+- `hungary_orban_2010_2022` has audited policies ['hu_corporate_tax_cut_2017', 'hu_flat_pit_2011', 'hu_fundamental_law_2011', 'hu_mnb_unorthodox_funding_for_growth_2013_2020', 'hu_pension_nationalisation_2010', 'hu_rezsicsokkentes_utility_price_regime_2013_present', 'hu_sectoral_bank_telecom_retail_taxes_2010_2014', 'hu_stop_soros_law_2018'] but no child policy has an evaluation design.
+- `hungary_orban_fidesz_first_term_1998_2002` has audited policies ['hu_lakastamogatas_housing_subsidy_2000', 'hu_nato_accession_1999', 'hu_status_law_ethnic_hungarians_2001'] but no child policy has an evaluation design.
+- `india_chandra_shekhar_1990_1991` has audited policies ['in_gold_pledge_forex_crisis_1991', 'in_imf_standby_negotiation_initial_1991'] but no child policy has an evaluation design.
+- `india_constitutional_founding_mixed_economy_1947_1951` has audited policies ['india_constitution_1950', 'india_industrial_policy_resolution_1948', 'india_planning_commission_establishment_1950'] but no child policy has an evaluation design.
+- `india_indira_return_1980_1984` has audited policies ['india_bank_nationalisation_second_wave_1980', 'india_imf_eff_1981', 'india_new_computer_policy_1984', 'india_operation_blue_star_1984', 'india_sixth_five_year_plan_1980_1985'] but no child policy has an evaluation design.
+- `india_janata_desai_1977_1979` has audited policies ['india_44th_constitutional_amendment_1978', 'india_antyodaya_rural_programme_1977', 'india_ibm_cocacola_expulsion_1977'] but no child policy has an evaluation design.
+- `india_late_raj_constitutional_devolution_1909_1947` has audited policies ['india_government_of_india_act_1919', 'india_government_of_india_act_1935', 'india_indian_councils_act_1909', 'india_reserve_bank_of_india_act_1934'] but no child policy has an evaluation design.
+- `india_manmohan_singh_upa_i_2004_2009` has audited policies ['in_bharat_nirman_programme_2005', 'in_indo_us_civil_nuclear_deal_2008', 'in_nrega_mgnrega_2005', 'in_right_to_information_act_2005', 'in_sez_act_2005', 'in_sixth_pay_commission_2008'] but no child policy has an evaluation design.
+- `india_modi_first_second_term_2014_2024` has audited policies ['in_article_370_abrogation_2019', 'in_ayushman_bharat_pmjay_2018', 'in_corporate_tax_cut_2019', 'in_ibc_2016', 'india_citizenship_amendment_act_2019', 'india_demonetisation_2016', 'india_farm_laws_2020_repealed_2021', 'india_gst_2017', 'india_national_education_policy_2020', 'india_pli_scheme_2020', 'india_rera_2016'] but no child policy has an evaluation design.
+- `india_modi_third_term_2024_present` has audited policies ['in_union_budget_2024_25', 'in_union_budget_2026_27', 'in_waqf_amendment_act_2025', 'india_new_income_tax_bill_2025', 'india_pli_scheme_continuation_2024_present', 'india_semiconductor_mission_2024_present', 'india_uniform_civil_code_uttarakhand_2025'] but no child policy has an evaluation design.
+- `india_narasimha_rao_inc_1991_1996` has audited policies ['in_current_account_convertibility_1994', 'in_industrial_policy_delicensing_1991', 'in_mrtp_act_amendment_1991', 'in_rupee_devaluation_1991', 'in_sebi_act_1992', 'in_tariff_cuts_1991_1996', 'in_uruguay_round_signing_1994', 'india_economic_liberalisation_1991'] but no child policy has an evaluation design.
+- `india_rajiv_gandhi_congress_1984_1989` has audited policies ['india_anti_defection_10th_schedule_1985', 'india_cdot_establishment_1984', 'india_long_term_fiscal_policy_1985', 'india_modvat_1986', 'india_muslim_women_act_shahbano_reversal_1986', 'india_new_telecom_policy_1986', 'india_new_textile_policy_1985'] but no child policy has an evaluation design.
+- `india_singh_upa_ii_2009_2014` has audited policies ['in_mgnrega_2005', 'in_nfsa_2013', 'india_aadhaar_rollout_2010_present', 'india_companies_act_2013', 'india_fdi_multibrand_retail_2012', 'india_land_acquisition_act_2013', 'india_rte_act_2009', 'india_rti_act_2005'] but no child policy has an evaluation design.
+- `india_swadeshi_economic_nationalism_pre_1991` has audited policies ['india_bank_nationalisation_1969', 'india_fera_1973', 'india_industrial_policy_resolution_1956', 'india_industries_development_regulation_act_1951', 'india_mrtp_act_1969', 'india_quantitative_import_restrictions_pre_1991'] but no child policy has an evaluation design.
+- `india_vajpayee_nda_1998_2004` has audited policies ['in_frbm_act_2003', 'in_golden_quadrilateral_highway_1999', 'in_nda_disinvestment_programme_1999', 'in_new_telecom_policy_1999', 'in_pokhran_ii_nuclear_tests_1998', 'in_sarva_shiksha_abhiyan_2001'] but no child policy has an evaluation design.
+- `india_vp_singh_jd_1989_1990` has audited policies ['in_farm_loan_waiver_1990', 'in_fiscal_drift_pre_1991_crisis', 'in_mandal_commission_implementation_1990'] but no child policy has an evaluation design.
+- `indonesia_habibie_transition_1998_1999` has audited policies ['id_bank_indonesia_independence_1999', 'id_east_timor_referendum_1999', 'id_ibra_bank_restructuring_1998', 'id_political_parties_law_1999', 'id_press_freedom_law_1999', 'id_regional_autonomy_big_bang_1999'] but no child policy has an evaluation design.
+- `indonesia_jokowi_pdip_2014_2024` has audited policies ['id_jokowi_fuel_subsidy_cut_2014', 'id_jokowi_kpk_law_revision_2019', 'id_jokowi_nickel_export_ban_2020', 'id_jokowi_nusantara_capital_2022', 'id_jokowi_omnibus_job_creation_2020', 'id_jokowi_tax_amnesty_2016', 'id_jokowi_vat_hike_2022'] but no child policy has an evaluation design.
+- `indonesia_megawati_pdip_2001_2004` has audited policies ['id_anti_terror_perpu_2002', 'id_constitutional_amendments_iii_iv_2001_2002', 'id_constitutional_court_law_2003', 'id_corruption_eradication_commission_kpk_2002', 'id_ibra_bca_indosat_divestment_2002', 'id_imf_programme_exit_2003'] but no child policy has an evaluation design.
+- `indonesia_prabowo_2024_present` has audited policies ['id_prabowo_danantara_2025', 'id_prabowo_free_meals_2025', 'id_prabowo_tni_law_revision_2025', 'id_prabowo_vat_hike_12pct_2025'] but no child policy has an evaluation design.
+- `indonesia_reformasi_1998_present` has audited policies ['indonesia_bank_indonesia_independence_1999', 'indonesia_decentralisation_laws_1999', 'indonesia_fuel_subsidy_reform_2005_2015', 'indonesia_imf_programme_1997', 'indonesia_lps_deposit_insurance_2004', 'indonesia_omnibus_job_creation_law_2020'] but no child policy has an evaluation design.
+- `indonesia_sby_demokrat_2004_2014` has audited policies ['id_sby_blt_cash_transfer_2005', 'id_sby_bpjs_health_law_2011', 'id_sby_fuel_subsidy_reform_2005', 'id_sby_mining_law_2009', 'id_sby_raw_mineral_export_ban_2014'] but no child policy has an evaluation design.
+- `indonesia_suharto_deregulation_paket_1988_1996` has audited policies ['id_afta_cept_commitment_1992', 'id_fdi_deregulation_1994', 'id_paknov_trade_dereg_1988', 'id_pakto_banking_deregulation_1988', 'id_uruguay_round_signing_1994'] but no child policy has an evaluation design.
+- `indonesia_suharto_new_order_1965_1998` has audited policies ['indonesia_balanced_budget_rule_1967_1997', 'indonesia_bimas_green_revolution_1970s', 'indonesia_imf_programme_1997', 'indonesia_inpres_rural_development', 'indonesia_pma_foreign_investment_law_1967', 'indonesia_trade_liberalisation_packages_1986_1996'] but no child policy has an evaluation design.
+- `indonesia_suharto_oil_boom_1976_1985` has audited policies ['id_paket_juni_banking_dereg_1983', 'id_pertamina_debt_bailout_1976', 'id_repelita_iii_iv_1979_1989', 'id_rice_self_sufficiency_1984', 'id_rupiah_devaluation_1983', 'id_rupiah_devaluation_kenaikan_1978', 'id_tax_reform_vat_1983_1985'] but no child policy has an evaluation design.
+- `indonesia_wahid_reformasi_1999_2001` has audited policies ['id_aceh_papua_dialogue_2000', 'id_chinese_cultural_rehabilitation_2000', 'id_imf_renegotiation_2000', 'id_military_civilian_supremacy_reforms_2000', 'id_wahid_impeachment_2001'] but no child policy has an evaluation design.
+- `iran_ahmadinejad_principlist_2005_2013` has audited policies ['ir_mehr_housing_programme_2007', 'ir_nuclear_escalation_sanctions_2006_2012', 'ir_rial_collapse_2012', 'ir_targeted_subsidies_reform_2010'] but no child policy has an evaluation design.
+- `iran_khatami_reformist_1997_2005` has audited policies ['ir_18_tir_student_protests_1999', 'ir_exchange_rate_unification_2002', 'ir_fippa_foreign_investment_2002', 'ir_natanz_nuclear_disclosure_2002', 'ir_tehran_declaration_e3_2003'] but no child policy has an evaluation design.
+- `iran_khomeini_revolutionary_consolidation_1979_1989` has audited policies ['ir_1979_bank_insurance_nationalisation', 'ir_1979_islamic_republic_constitution', 'ir_1979_large_industry_nationalisation', 'ir_bonyad_foundation_system_1979', 'ir_iran_iraq_war_economy_1980_1988'] but no child policy has an evaluation design.
+- `iran_pezeshkian_reformist_2024_present` has audited policies ['ir_fatf_reengagement_signal_2024', 'ir_hemmati_impeachment_2025', 'ir_israel_iran_war_ceasefire_2025', 'ir_nuclear_talks_reopening_oman_2025'] but no child policy has an evaluation design.
+- `iran_rafsanjani_pragmatist_1989_1997` has audited policies ['ir_buy_back_oil_contracts_1995', 'ir_exchange_unification_attempt_1993', 'ir_first_five_year_plan_1989', 'ir_foreign_debt_crisis_1993_1994', 'ir_ftz_kish_qeshm_1993'] but no child policy has an evaluation design.
+- `iran_raisi_conservative_2021_2024` has audited policies ['ir_bread_smartcard_subsidy_reform_2022', 'ir_brics_accession_2024', 'ir_hijab_chastity_bill_2023', 'ir_saudi_iran_normalisation_2023', 'ir_uranium_enrichment_60pct_2021'] but no child policy has an evaluation design.
+- `iran_revolution_islamic_economy_1979_present` has audited policies ['iran_article_44_privatisation_2006', 'iran_bonyad_parastatal_system', 'iran_generalised_consumer_subsidy_regime', 'iran_nationalisations_1979_1982', 'iran_targeted_subsidies_reform_2010', 'iran_usury_free_banking_law_1983'] but no child policy has an evaluation design.
+- `iran_rouhani_moderate_2013_2021` has audited policies ['ir_fuel_price_reform_2019', 'ir_jcpoa_nuclear_deal_2015', 'ir_rial_unification_attempt_2018', 'ir_subsidy_cash_transfer_continuation_2014'] but no child policy has an evaluation design.
+- `iran_shah_pahlavi_late_era_1976_1979` has audited policies ['ir_amouzegar_anti_inflation_austerity_1977', 'ir_fifth_plan_doubling_1974_1978', 'ir_rastakhiz_one_party_1975'] but no child policy has an evaluation design.
+- `iraq_baath_oil_statism_1968_1979` has audited policies ['irq_baath_land_reform_1970', 'irq_ipc_nationalisation_1972', 'irq_oil_boom_development_plan_1976_1980'] but no child policy has an evaluation design.
+- `ireland_ahern_ff_1997_2008` has audited policies ['ie_capital_gains_tax_cut_1998', 'ie_corporate_tax_12_5_standardisation_1999', 'ie_good_friday_agreement_1998', 'ie_national_development_plan_2000_2013', 'ie_property_incentive_reliefs_1998_2006', 'ie_social_partnership_benchmarking_2002_2007', 'ie_ssia_savings_scheme_2001'] but no child policy has an evaluation design.
+- `ireland_bruton_rainbow_1994_1997` has audited policies ['ireland_cgt_reduction_1997', 'ireland_divorce_referendum_1995', 'ireland_pcw_continuation_ramp_1994_1997', 'ireland_rpt_abolition_1997'] but no child policy has an evaluation design.
+- `ireland_cowen_ff_2008_2011` has audited policies ['ie_anglo_irish_nationalisation_2009', 'ie_austerity_budgets_2008_2010', 'ie_bank_guarantee_2008', 'ie_eu_imf_ecb_bailout_2010', 'ie_nama_2009'] but no child policy has an evaluation design.
+- `ireland_fitzgerald_fg_1982_1987` has audited policies ['ireland_anglo_irish_agreement_1985', 'ireland_building_on_reality_1984', 'ireland_divorce_referendum_1986', 'ireland_eighth_amendment_1983', 'ireland_ifsc_foundation_1987', 'ireland_pay_ve_adjustments_1983_1986'] but no child policy has an evaluation design.
+- `ireland_harris_fg_2024_present` has audited policies ['ie_apple_tax_state_aid_compliance_2024', 'ie_budget_2025_giveaway_package', 'ie_housing_for_all_continuation_2024', 'ie_living_wage_target_2024_2026', 'ie_national_childrens_hospital_overrun', 'ie_oecd_pillar2_corporate_tax_2024'] but no child policy has an evaluation design.
+- `ireland_haughey_ff_1979_1982` has audited policies ['ireland_1977_manifesto_implementation_1979_1981', 'ireland_debt_spiral_1978_1982', 'ireland_ems_entry_1979', 'ireland_haughey_1980_broadcast', 'ireland_public_sector_pay_expansion_1979_1981'] but no child policy has an evaluation design.
+- `ireland_haughey_return_1987_1992` has audited policies ['ireland_1988_tax_amnesty', 'ireland_corporate_tax_reduction_1987', 'ireland_ifsc_10_percent_rate_1987', 'ireland_macsharry_fiscal_consolidation_1987_1989', 'ireland_pesp_1990', 'ireland_programme_national_recovery_1987'] but no child policy has an evaluation design.
+- `ireland_kenny_fg_labour_2011_2017` has audited policies ['ie_bailout_exit_2013', 'ie_corporate_tax_beps_defence_2013_2017', 'ie_macroprudential_mortgage_caps_2015', 'ie_promissory_note_restructuring_2013', 'ie_water_charges_introduction_suspension_2014_2016'] but no child policy has an evaluation design.
+- `ireland_martin_ff_rotating_2020_2022` has audited policies ['ie_climate_act_2021_carbon_budgets', 'ie_ewss_covid_wage_subsidy_2020_2022', 'ie_housing_for_all_plan_2021', 'ie_oecd_pillar2_agreement_2021', 'ie_statutory_sick_pay_act_2022'] but no child policy has an evaluation design.
+- `ireland_reynolds_ff_1992_1994` has audited policies ['ireland_downing_street_declaration_1993', 'ireland_pcw_1994', 'ireland_punt_devaluation_1993', 'ireland_structural_funds_csf_1994_1999'] but no child policy has an evaluation design.
+- `ireland_varadkar_fg_2022_2024` has audited policies ['ie_budget_2024_cost_of_living_package', 'ie_future_ireland_fund_2024', 'ie_housing_for_all_continuation_2024', 'ie_oecd_pillar2_corporate_tax_2024', 'ie_tbess_energy_subsidy_2022_2023'] but no child policy has an evaluation design.
+- `israel_barak_labor_1999_2001` has audited policies ['il_barak_capital_markets_continuation_1999_2001', 'il_camp_david_ii_summit_2000', 'il_second_intifada_response_2000_2001', 'il_south_lebanon_withdrawal_2000'] but no child policy has an evaluation design.
+- `israel_begin_likud_1977_1983` has audited policies ['il_1977_economic_upheaval_fx_liberalisation', 'il_1983_bank_shares_crisis', 'il_aridor_consumer_subsidies_1981', 'il_camp_david_accords_1978', 'il_west_bank_settlement_expansion_likud_1977'] but no child policy has an evaluation design.
+- `israel_bennett_change_coalition_2021_2022` has audited policies ['il_arrangements_law_2021', 'il_parallel_imports_reform_2021', 'il_pension_age_reform_2021', 'il_sugary_drinks_tax_2021', 'il_vat_cut_nonrenewal_2021'] but no child policy has an evaluation design.
+- `israel_lapid_yesh_atid_2022` has audited policies ['il_boi_tightening_cycle_2022', 'il_israel_lebanon_maritime_agreement_2022'] but no child policy has an evaluation design.
+- `israel_netanyahu_likud_fifth_term_2020_2021` has audited policies ['il_abraham_accords_israel_2020', 'il_covid_emergency_package_2020', 'il_vaccine_data_deal_2021'] but no child policy has an evaluation design.
+- `israel_netanyahu_likud_first_term_1996_1999` has audited policies ['il_bezeq_partial_privatisation_1997', 'il_hebron_protocol_1997', 'il_netanyahu_i_income_tax_cuts_1997_1999', 'il_wye_river_memorandum_1998'] but no child policy has an evaluation design.
+- `israel_netanyahu_likud_second_term_2009_2013` has audited policies ['il_bank_of_israel_law_2010', 'il_cottage_cheese_tax_response_2011', 'il_sheshinski_gas_royalty_2011', 'il_trajtenberg_committee_2011'] but no child policy has an evaluation design.
+- `israel_netanyahu_likud_third_fourth_term_2013_2019` has audited policies ['il_cellular_reform_2016', 'il_gas_framework_2015', 'il_kahlon_housing_vat_zero_2014', 'il_nation_state_basic_law_2018', 'il_strum_banking_separation_2018'] but no child policy has an evaluation design.
+- `israel_netanyahu_vi_2022_present` has audited policies ['il_credit_rating_downgrades_2024', 'il_haredi_draft_crisis_2024', 'il_judicial_overhaul_plan_2023', 'il_operation_swords_of_iron_2023', 'il_reasonableness_clause_repeal_2023', 'il_smotrich_west_bank_administration_2023', 'il_war_supplementary_budget_2024'] but no child policy has an evaluation design.
+- `israel_olmert_kadima_2006_2009` has audited policies ['il_bank_of_israel_law_2010_draft_2008', 'il_cast_lead_security_spending_2008', 'il_oecd_accession_push_2008'] but no child policy has an evaluation design.
+- `israel_peres_labor_transition_1995_1996` has audited policies ['il_grapes_of_wrath_south_lebanon_1996', 'il_oslo_ii_implementation_1995_1996', 'il_privatisation_continuation_1995_1996'] but no child policy has an evaluation design.
+- `israel_peres_national_unity_1984_1986` has audited policies ['il_1985_indexation_reform', 'il_1985_us_emergency_aid_package', 'il_shekel_peg_1985', 'il_stabilisation_plan_1985', 'israel_1985_stabilization_plan'] but no child policy has an evaluation design.
+- `israel_rabin_labor_1992_1995` has audited policies ['il_deficit_reduction_law_1992', 'il_jordan_peace_treaty_1994', 'il_oslo_i_declaration_1993', 'il_oslo_ii_interim_agreement_1995', 'il_paris_protocol_1994'] but no child policy has an evaluation design.
+- `israel_shamir_likud_first_1983_1984` has audited policies ['il_1983_bank_shares_nationalisation', 'il_1984_package_deals_wage_price_coord'] but no child policy has an evaluation design.
+- `israel_shamir_likud_second_1988_1992` has audited policies ['il_capital_market_liberalisation_1987_1992', 'il_soviet_aliyah_absorption_basket_1990', 'il_us_loan_guarantees_dispute_1991_1992'] but no child policy has an evaluation design.
+- `israel_sharon_likud_2001_2006` has audited policies ['il_bezeq_control_sale_2005', 'il_gaza_disengagement_2005', 'il_netanyahu_emergency_economic_plan_2003', 'il_operation_defensive_shield_2002', 'il_west_bank_security_barrier_2002'] but no child policy has an evaluation design.
+- `italian_economic_miracle_1950_1970` has audited policies ['italy_cassa_mezzogiorno_1950', 'italy_eec_accession_rome_treaty_1957', 'italy_einaudi_stabilisation_1947', 'italy_eni_founding_1953', 'italy_epu_membership_1950'] but no child policy has an evaluation design.
+- `italy_andreotti_forlani_dc_1976_1983` has audited policies ['italy_accord_scotti_scala_mobile_1983', 'italy_alto_adige_autonomy_1981', 'italy_ems_entry_1979', 'italy_public_debt_trajectory_1976_1983', 'italy_treasury_bankitalia_divorzio_1981'] but no child policy has an evaluation design.
+- `italy_berlusconi_first_1994_1995` has audited policies ['italy_berlusconi_pension_reform_attempt_1994', 'italy_decreto_biondi_1994', 'italy_ina_imi_privatisations_1994', 'italy_pacchetto_tremonti_1994'] but no child policy has an evaluation design.
+- `italy_berlusconi_ii_iii_2001_2006` has audited policies ['italy_biagi_labour_reform_2003', 'italy_bossi_fini_immigration_2002', 'italy_iraq_participation_2003', 'italy_maroni_pension_reform_2004', 'italy_tremonti_tax_bonuses_2001_2003'] but no child policy has an evaluation design.
+- `italy_berlusconi_iv_pdl_2008_2011` has audited policies ['it_alitalia_cai_restructuring_2009', 'it_ici_abolition_2008', 'it_manovra_2011_ecb_letter', 'it_manovra_estiva_2010', 'it_tremonti_ter_2009'] but no child policy has an evaluation design.
+- `italy_conte_m5s_governments_2018_2021` has audited policies ['italy_covid_emergency_fiscal_2020_2021', 'italy_decreto_dignita_2018', 'italy_quota_100_pensions_2019', 'italy_reddito_di_cittadinanza_2019', 'italy_superbonus_110_2020'] but no child policy has an evaluation design.
+- `italy_craxi_psi_1983_1987` has audited policies ['italy_alfa_romeo_sale_to_fiat_1986', 'italy_decreto_san_valentino_scala_mobile_1984', 'italy_disinflation_1983_1987', 'italy_pension_indexation_1985', 'italy_scala_mobile_referendum_1985'] but no child policy has an evaluation design.
+- `italy_dalema_amato_centre_left_1998_2001` has audited policies ['italy_amato_irpef_reform_2000', 'italy_enel_ipo_1999', 'italy_kosovo_participation_1999', 'italy_parental_leave_law_53_2000', 'italy_telecom_italia_ownership_defense_1999'] but no child policy has an evaluation design.
+- `italy_dc_patronage_state_1945_1992` has audited policies ['italy_cassa_mezzogiorno_1950', 'italy_eni_founding_1953', 'italy_iri_state_holding_expansion_1945_1992', 'italy_public_sector_pension_expansion_1965_1992', 'italy_scala_mobile_indexation_1975'] but no child policy has an evaluation design.
+- `italy_draghi_national_unity_2021_2022` has audited policies ['italy_cartabia_justice_reforms_2021', 'italy_legge_concorrenza_2022', 'italy_pnrr_2021', 'italy_superbonus_110_2020', 'italy_windfall_tax_energy_2022'] but no child policy has an evaluation design.
+- `italy_euro_entry_non_reform_1999` has audited policies ['italy_euro_entry_1999', 'italy_labour_market_dualism_persistence_1990s_2010s', 'italy_product_market_regulation_persistence'] but no child policy has an evaluation design.
+- `italy_fascist_corporatist_state_1922_1943` has audited policies ['italy_acerbo_law_1923', 'italy_banking_law_1936', 'italy_carta_del_lavoro_1927', 'italy_iri_creation_1933'] but no child policy has an evaluation design.
+- `italy_gentiloni_pd_2016_2018` has audited policies ['it_minniti_libya_migration_2017', 'it_mps_precautionary_recap_2017', 'it_rosatellum_electoral_law_2017', 'it_veneto_banks_resolution_2017'] but no child policy has an evaluation design.
+- `italy_giolittian_liberal_reformism_1901_1914` has audited policies ['italy_daneo_credaro_school_law_1911', 'italy_ina_life_insurance_monopoly_1912', 'italy_state_railways_1905', 'italy_universal_male_suffrage_1912'] but no child policy has an evaluation design.
+- `italy_letta_pd_pdl_2013_2014` has audited policies ['it_decreto_del_fare_2013', 'it_imu_abolition_tasi_introduction_2013_2014', 'it_youth_guarantee_implementation_2013'] but no child policy has an evaluation design.
+- `italy_meloni_rightwing_coalition_2022_present` has audited policies ['italy_bank_extra_profits_tax_2023', 'italy_budget_2024_fiscal_compression', 'italy_flat_tax_forfettario_extension_2023', 'italy_pnrr_2021', 'italy_rdc_abolition_adi_sfl_2023', 'italy_superbonus_phaseout_2024'] but no child policy has an evaluation design.
+- `italy_monti_technocratic_2011_2013` has audited policies ['it_cresci_italia_liberalisations_2012', 'it_fornero_labour_reform_2012', 'it_fornero_pension_reform_2011', 'it_salva_italia_2011'] but no child policy has an evaluation design.
+- `italy_prodi_ii_centre_left_2006_2008` has audited policies ['it_finanziaria_2007_tightening', 'it_lenzuolate_bersani_2006_2007', 'it_padoa_schioppa_tax_compliance_2007', 'it_tfr_pension_fund_reform_2007'] but no child policy has an evaluation design.
+- `italy_prodi_ulivo_1996_1998` has audited policies ['italy_bassanini_administrative_reform_1997', 'italy_dini_pension_implementation_1996_1998', 'italy_euro_entry_qualification_1998', 'italy_eurotassa_1996', 'italy_treu_law_labour_flexibility_1997'] but no child policy has an evaluation design.
+- `italy_renzi_pd_2014_2016` has audited policies ['it_bonus_80_euro_2014', 'it_constitutional_referendum_2016_rejected', 'it_jobs_act_2014_2015', 'it_popolari_banking_reform_2015'] but no child policy has an evaluation design.
+- `italy_tangentopoli_transition_1992_1994` has audited policies ['italy_amato_budget_adjustment_1992', 'italy_amato_pension_reform_1992', 'italy_bank_privatisations_1993_1994', 'italy_lira_erm_exit_1992', 'italy_mattarellum_electoral_reform_1993', 'italy_protocollo_ciampi_scala_mobile_1993'] but no child policy has an evaluation design.
+- `japan_abe_i_ldp_2006_2007` has audited policies ['jp_boj_rate_normalisation_2006_2007', 'jp_defence_ministry_upgrade_2007', 'jp_fundamental_education_law_revision_2006', 'jp_japan_indonesia_epa_2007'] but no child policy has an evaluation design.
+- `japan_fukuda_aso_ldp_2007_2009` has audited policies ['jp_aso_eco_car_eco_point_subsidy_2009', 'jp_aso_supplementary_budgets_gfc_2008_2009', 'jp_aso_teigaku_cash_handout_2009', 'jp_boj_gfc_rate_cuts_jgb_purchases_2008_2009'] but no child policy has an evaluation design.
+- `japan_hashimoto_ldp_1996_1998` has audited policies ['jp_big_bang_financial_reform_1996', 'jp_consumption_tax_hike_1997', 'jp_financial_stabilisation_package_1998', 'jp_fiscal_structural_reform_act_1997', 'jp_new_boj_law_1998'] but no child policy has an evaluation design.
+- `japan_hatoyama_dpj_2009_2010` has audited policies ['jp_dpj_child_allowance_2010', 'jp_dpj_farmer_income_compensation_2010', 'jp_dpj_high_school_tuition_free_2010', 'jp_dpj_shiwake_budget_screening_2009'] but no child policy has an evaluation design.
+- `japan_ishiba_ldp_2024_present` has audited policies ['jp_1_03m_wall_basic_deduction_reform_2025', 'jp_boj_rate_hike_0_5_2025', 'jp_fy2025_minority_budget_2025', 'jp_regional_revitalisation_2_0_2024', 'jp_us_tariff_response_2025'] but no child policy has an evaluation design.
+- `japan_kan_dpj_2010_2011` has audited policies ['jp_kan_consumption_tax_10pct_pledge_2010', 'jp_kan_fit_renewable_law_2011', 'jp_kan_new_growth_strategy_2010', 'jp_kan_tohoku_reconstruction_supplementary_budgets_2011', 'jp_kan_tpp_interest_declaration_2010'] but no child policy has an evaluation design.
+- `japan_kishida_ldp_2021_2024` has audited policies ['jp_boj_ycc_exit_2024', 'jp_defence_build_up_plan_2022', 'jp_economic_security_act_2022', 'jp_gx_green_transformation_2023', 'jp_ldp_slush_fund_purge_2024', 'jp_nisa_reform_2024'] but no child policy has an evaluation design.
+- `japan_koizumi_ldp_2001_2006` has audited policies ['jp_boj_quantitative_easing_2001_2006', 'jp_expressway_privatisation_2005', 'jp_iraq_special_measures_law_2003', 'jp_postal_privatisation_2005', 'jp_takenaka_plan_2002', 'jp_trinity_reform_local_finance_2003'] but no child policy has an evaluation design.
+- `japan_ldp_1976_1982_coalitions` has audited policies ['jp_auto_voluntary_export_restraint_1981', 'jp_fukuda_locomotive_stimulus_1977', 'jp_ohira_general_consumption_tax_attempt_1979', 'jp_suzuki_doko_rincho_admin_reform_1981'] but no child policy has an evaluation design.
+- `japan_ldp_bubble_era_1987_1993` has audited policies ['jp_boj_bubble_easing_tightening_1987_1991', 'jp_consumption_tax_3pct_1989', 'jp_gulf_war_contribution_1991', 'jp_sii_structural_impediments_1990'] but no child policy has an evaluation design.
+- `japan_murayama_grand_coalition_1994_1996` has audited policies ['jp_consumption_tax_5pct_legislation_1994', 'jp_jusen_bailout_1996', 'jp_kobe_reconstruction_budget_1995', 'jp_murayama_statement_1995'] but no child policy has an evaluation design.
+- `japan_nakasone_ldp_1982_1987` has audited policies ['jp_jnr_privatisation_1987', 'jp_jt_privatisation_1985', 'jp_maekawa_report_1986', 'jp_ntt_privatisation_1985', 'jp_plaza_accord_1985', 'jp_telecom_business_law_1984'] but no child policy has an evaluation design.
+- `japan_noda_dpj_2011_2012` has audited policies ['jp_noda_consumption_tax_8_10_law_2012', 'jp_noda_oi_reactor_restart_2012', 'jp_noda_senkaku_nationalisation_2012', 'jp_noda_tpp_negotiation_entry_2011', 'jp_social_security_tax_integrated_reform_2012'] but no child policy has an evaluation design.
+- `japan_non_ldp_interlude_1993_1994` has audited policies ['jp_hosokawa_stimulus_package_1994', 'jp_political_reform_act_1994', 'jp_uruguay_rice_opening_1993'] but no child policy has an evaluation design.
+- `japan_obuchi_mori_ldp_1998_2001` has audited policies ['jp_central_government_reform_2001', 'jp_e_japan_strategy_2001', 'jp_financial_revitalisation_act_1998', 'jp_obuchi_stimulus_packages_1998_1999', 'jp_zero_interest_rate_policy_1999'] but no child policy has an evaluation design.
+- `japan_post_war_meti_industrial_policy_1952_1975` has audited policies ['japan_boj_window_guidance_1955_1975', 'japan_forex_control_law_1949', 'japan_gatt_accession_1955', 'japan_income_doubling_plan_1960', 'japan_oecd_accession_1964'] but no child policy has an evaluation design.
+- `japan_prewar_state_building_social_incorporation_1906_1931` has audited policies ['japan_factory_act_1911_1916', 'japan_gold_standard_restoration_1930', 'japan_health_insurance_act_1922_1927', 'japan_peace_preservation_law_1925', 'japan_railway_nationalisation_act_1906'] but no child policy has an evaluation design.
+- `japan_suga_ldp_2020_2021` has audited policies ['jp_2050_carbon_neutral_pledge_2020', 'jp_digital_agency_2021', 'jp_green_growth_strategy_2020', 'jp_mobile_carrier_price_reform_2020'] but no child policy has an evaluation design.
+- `jordan_abdullah_economic_modernisation_2022_present` has audited policies ['jordan_economic_modernisation_vision_2022', 'jordan_imf_eff_2024', 'jordan_investment_environment_law_2022'] but no child policy has an evaluation design.
+- `kazakhstan_nazarbayev_resource_state_1991_2019` has audited policies ['kz_mass_privatization_1993_1998', 'kz_national_fund_2000', 'kz_tengiz_oil_opening_1993'] but no child policy has an evaluation design.
+- `kenya_kenyatta_jubilee_2013_2022` has audited policies ['ke_big_four_agenda_2017', 'ke_excise_duty_act_2015', 'ke_handshake_bbi_2018', 'ke_imf_eff_ecf_2021', 'ke_sgr_phase1_2017'] but no child policy has an evaluation design.
+- `kenya_kibaki_grand_coalition_2008_2013` has audited policies ['ke_constitution_of_kenya_2010', 'ke_mpesa_scaling_regulation_2008_2013', 'ke_national_accord_2008', 'ke_vision_2030_launch_2008'] but no child policy has an evaluation design.
+- `kenya_kibaki_narc_first_2002_2007` has audited policies ['ke_anglo_leasing_scandal_2004', 'ke_constitutional_referendum_2005', 'ke_eac_customs_union_2005', 'ke_economic_recovery_strategy_2003', 'ke_free_primary_education_2003'] but no child policy has an evaluation design.
+- `kenya_kibaki_vision_2030_2002_2013` has audited policies ['kenya_2010_constitution_devolution', 'kenya_cbk_price_stability_mandate', 'kenya_free_primary_education_2003', 'kenya_mpesa_regulatory_accommodation_2007', 'kenya_vision_2030_plan_2008'] but no child policy has an evaluation design.
+- `kenya_moi_kanu_1978_2002` has audited policies ['ke_goldenberg_scandal_1991_1993', 'ke_imf_sap_1980s', 'ke_multiparty_restoration_1991', 'ke_nyayo_tea_zones_1986', 'ke_section_2a_one_party_amendment_1982'] but no child policy has an evaluation design.
+- `kenya_ruto_uda_2022_present` has audited policies ['ke_adani_jkia_cancellation_2024', 'ke_affordable_housing_levy_2023', 'ke_broad_based_government_2024', 'ke_finance_act_2023', 'ke_finance_bill_2024_withdrawal', 'ke_imf_eff_ecf_2021'] but no child policy has an evaluation design.
+- `khm_khmer_rouge_democratic_kampuchea_1975` has audited policies ['khm_collectivisation_communes_1975', 'khm_money_market_abolition_1975', 'khm_urban_evacuation_1975'] but no child policy has an evaluation design.
+- `kirchner_fernandez_expansionary_2003_2015` has audited policies ['argentina_cepo_cambiario_2011_2015', 'argentina_fuel_subsidies_2003_2015', 'argentina_pension_renationalisation_2008', 'argentina_ypf_renationalisation_2012'] but no child policy has an evaluation design.
+- `kuwait_oil_welfare_state_1961_present` has audited policies ['kwt_constitution_parliament_1962', 'kwt_general_reserve_future_generations_funds_1976', 'kwt_public_employment_welfare_distribution_1960s_present'] but no child policy has an evaluation design.
+- `lao_lao_pdr_socialist_planning_1975` has audited policies ['lao_agricultural_collectivisation_1978', 'lao_bank_trade_nationalisation_1975', 'lao_first_five_year_plan_1981'] but no child policy has an evaluation design.
+- `lebanon_aoun_salam_reconstruction_2025_present` has audited policies ['lb_bdl_recapitalisation_2025', 'lb_deposit_restitution_framework_2025', 'lb_imf_program_2025', 'lb_unsc_1701_implementation_2025'] but no child policy has an evaluation design.
+- `lebanon_post_war_reconstruction_collapse_1992_2020` has audited policies ['lebanon_bdl_financial_engineering_2016', 'lebanon_default_march_2020', 'lebanon_edl_subsidy_1992_2020', 'lebanon_lbp_peg_1997', 'lebanon_solidere_1994', 'lebanon_sovereign_debt_accumulation_1992_2019'] but no child policy has an evaluation design.
+- `lky_singapore_founding_1955_1990` has audited policies ['singapore_cpf_establishment_1955'] but no child policy has an evaluation design.
+- `maastricht_convergence_criteria_1992` has audited policies ['ecb_statute_1998', 'maastricht_treaty_1992', 'stability_growth_pact_1997'] but no child policy has an evaluation design.
+- `malaysia_abdullah_badawi_umno_2003_2009` has audited policies ['my_2008_political_tsunami_election', 'my_corridor_development_plans_2007', 'my_fuel_subsidy_partial_reform_2008', 'my_hindraf_rally_ethnic_indian_grievance_2007', 'my_iskandar_malaysia_idr_2006', 'my_ninth_malaysia_plan_2006'] but no child policy has an evaluation design.
+- `malaysia_anwar_unity_2022_present` has audited policies ['my_anti_hopping_law_2022', 'my_capital_gains_tax_2024', 'my_diesel_subsidy_rationalisation_2024', 'my_einvoicing_mandate_2024', 'my_ekonomi_madani_framework_2023', 'my_progressive_wage_pilot_2024'] but no child policy has an evaluation design.
+- `malaysia_hussein_onn_1976_1981` has audited policies ['my_fourth_malaysia_plan_1981_1985', 'my_hicom_establishment_1980', 'my_industrial_coordination_act_enforcement_1976', 'my_petronas_expansion_1976_1981', 'my_third_malaysia_plan_1976_1980'] but no child policy has an evaluation design.
+- `malaysia_ismail_sabri_umno_2021_2022` has audited policies ['my_anti_hopping_law_2022', 'my_border_reopening_2022', 'my_budget_2022_cukai_makmur', 'my_keluarga_malaysia_pemulih_2021'] but no child policy has an evaluation design.
+- `malaysia_mahathir_bumiputera_development_1981_2003` has audited policies ['malaysia_bumiputera_equity_target_nep', 'malaysia_capital_controls_1998', 'malaysia_hicom_heavy_industry_1981', 'malaysia_look_east_policy_1981', 'malaysia_privatisation_masterplan_1991'] but no child policy has an evaluation design.
+- `malaysia_mahathir_first_term_1981_1988` has audited policies ['my_judicial_crisis_1988', 'my_look_east_policy_1982', 'my_operation_lalang_1987', 'my_privatisation_master_plan_1983', 'my_proton_saga_launch_1985', 'my_telekom_malaysia_corporatisation_1987'] but no child policy has an evaluation design.
+- `malaysia_mahathir_wawasan_2020_era_1991_1998` has audited policies ['my_msc_multimedia_corridor_1996', 'my_privatisation_wave_1991_1997', 'my_putrajaya_capital_project_1995', 'my_ringgit_capital_controls_1998', 'my_wawasan_2020_announcement_1991'] but no child policy has an evaluation design.
+- `malaysia_muhyiddin_pn_2020_2021` has audited policies ['my_emergency_proclamation_2021', 'my_epf_i_withdrawal_schemes_2020_2021', 'my_mco_movement_control_order_2020', 'my_mysejahtera_2020', 'my_prihatin_penjana_pemulih_2020_2021'] but no child policy has an evaluation design.
+- `malaysia_najib_bn_2009_2018` has audited policies ['my_1mdb_scandal_2009_2018', 'my_br1m_cash_transfer_2012', 'my_etp_nem_transformation_2010', 'my_fuel_subsidy_rationalisation_managed_float_2014', 'my_gst_implementation_2015', 'my_tpp_signature_2016'] but no child policy has an evaluation design.
+- `menem_convertibility_argentina_1991_2001` has audited policies ['argentina_convertibility_law_1991', 'argentina_convertibility_plan_1991', 'argentina_privatisations_1991_1999', 'argentina_trade_opening_1991_1995'] but no child policy has an evaluation design.
+- `mexico_amlo_morena_2018_2024` has audited policies ['mx_austerity_decree_2019', 'mx_dos_bocas_refinery_2019', 'mx_electricity_industry_law_reform_2021', 'mx_minimum_wage_doubling_2018_2024', 'mx_outsourcing_reform_2021', 'mx_sembrando_vida_2019', 'mx_texcoco_airport_cancellation_2018', 'mx_tren_maya_2020_2024', 'mx_universal_pension_2019_2024'] but no child policy has an evaluation design.
+- `mexico_calderon_pan_2006_2012` has audited policies ['mx_calderon_drug_war_2006', 'mx_federal_labour_law_reform_2012', 'mx_gfc_countercyclical_package_2009', 'mx_ietu_flat_alt_tax_2007', 'mx_ifai_transparency_strengthening_2007_2012'] but no child policy has an evaluation design.
+- `mexico_de_la_madrid_pri_1982_1988` has audited policies ['mx_gatt_accession_1986', 'mx_imf_eff_1982_1985', 'mx_pacto_solidaridad_economica_1987', 'mx_parastatal_divestment_pronafide_1983_1988'] but no child policy has an evaluation design.
+- `mexico_fox_pan_2000_2006` has audited policies ['mx_fiscal_reform_2001_partial', 'mx_ife_autonomy_consolidation_2000_2006', 'mx_oportunidades_expansion_2002', 'mx_pemex_reform_failure_2001_2006', 'mx_seguro_popular_2003'] but no child policy has an evaluation design.
+- `mexico_lopez_portillo_pri_1976_1982` has audited policies ['mx_1982_peso_devaluation_moratorium', 'mx_bank_nationalisation_decree_1982', 'mx_cantarell_pemex_expansion_1976_1981', 'mx_global_development_plan_1980', 'mx_oil_boom_external_borrowing_1978_1982'] but no child policy has an evaluation design.
+- `mexico_pena_nieto_pri_2012_2018` has audited policies ['mx_education_reform_2013', 'mx_energy_reform_2013', 'mx_financial_reform_2014', 'mx_fiscal_reform_2014', 'mx_political_electoral_reform_2014', 'mx_telecoms_reform_2013'] but no child policy has an evaluation design.
+- `mexico_salinas_nafta_neoliberal_1988_1994` has audited policies ['mexico_article_27_ejido_reform_1992', 'mexico_article_27_reform_1992', 'mexico_bank_reprivatisation_1991_1992', 'mexico_banxico_autonomy_1993', 'mexico_banxico_autonomy_1994', 'mexico_brady_plan_1989', 'mexico_nafta_1994', 'mexico_nafta_accession_1994', 'mexico_pacto_de_solidaridad', 'mexico_privatisations_1990_1994', 'mexico_solidaridad_program', 'mexico_telmex_privatisation_1990'] but no child policy has an evaluation design.
+- `mexico_sheinbaum_morena_2024_present` has audited policies ['mx_autonomous_bodies_abolition_2024', 'mx_judicial_reform_2024', 'mx_national_guard_sedena_2024', 'mx_plan_mexico_2025', 'mx_supreme_court_election_2025', 'mx_universal_pension_2019_2024'] but no child policy has an evaluation design.
+- `mexico_zedillo_pri_1994_2000` has audited policies ['mexico_nafta_1994', 'mx_banxico_inflation_targeting_1999', 'mx_electoral_reform_ife_1996', 'mx_fobaproa_ipab_banking_bailout_1995_1998', 'mx_tequila_crisis_rescue_1994_1995'] but no child policy has an evaluation design.
+- `milei_shock_therapy_argentina_2023` has audited policies ['argentina_deregulation_omnibus_2024', 'argentina_dnu_70_2023', 'argentina_fiscal_consolidation_2024', 'argentina_milei_shock_therapy_2023', 'argentina_peso_devaluation_2023'] but no child policy has an evaluation design.
+- `mitterrand_nationalisations_1981_1983` has audited policies ['france_39_hour_week_1982', 'france_minimum_wage_rise_1981', 'france_nationalisations_1982', 'france_retirement_60_1981'] but no child policy has an evaluation design.
+- `mmr_burmese_way_to_socialism_1962` has audited policies ['mmr_enterprise_nationalisation_1963', 'mmr_socialist_planning_system_1962_1988', 'mmr_state_trade_monopoly_1964'] but no child policy has an evaluation design.
+- `modi_demonetisation_gst_2016_2017` has audited policies ['india_demonetisation_2016', 'india_gst_2017'] but no child policy has an evaluation design.
+- `morocco_hassan_ii_monarchy_mixed_economy_1956_1999` has audited policies ['mar_administrative_agrarian_consolidation_1956_1969', 'mar_irrigation_dam_agriculture_strategy_1967_1990', 'mar_moroccanisation_1973'] but no child policy has an evaluation design.
+- `netherlands_balkenende_cda_2002_2006` has audited policies ['netherlands_zorgverzekering_2006', 'nl_eu_constitution_referendum_2005', 'nl_stricter_migration_code_2004_2006', 'nl_wia_disability_reform_2006', 'nl_wwb_work_and_welfare_2004', 'nl_zvw_health_insurance_2006'] but no child policy has an evaluation design.
+- `netherlands_balkenende_iii_iv_2006_2010` has audited policies ['nl_aanvullend_beleidsakkoord_stimulus_2009', 'nl_aow_retirement_age_rise_proposal_2009', 'nl_fortis_abn_amro_nationalisation_2008', 'nl_ing_bank_support_2008_2009'] but no child policy has an evaluation design.
+- `netherlands_kok_ii_purple_1998_2002` has audited policies ['nl_euthanasia_law_2002', 'nl_income_tax_act_2001', 'nl_kok_budget_surplus_1998_2001', 'nl_same_sex_marriage_2001'] but no child policy has an evaluation design.
+- `netherlands_kok_purple_1994_2002` has audited policies ['netherlands_energy_act_1998', 'netherlands_flexwet_flexibility_security_1999', 'netherlands_kinderopvang_part_time_promotion_1996_2002', 'netherlands_kpn_privatisation_1994', 'netherlands_zalm_norm_fiscal_rule_1994'] but no child policy has an evaluation design.
+- `netherlands_lubbers_cda_1982_1989` has audited policies ['nl_ptt_privatisation_1989', 'nl_public_sector_pay_cut_1984', 'nl_wao_ww_eligibility_tightening_1986_1987', 'nl_wassenaar_agreement_1982', 'nl_wir_abolition_1988', 'nl_working_time_reduction_1982_1985'] but no child policy has an evaluation design.
+- `netherlands_lubbers_ii_iii_1986_1994` has audited policies ['netherlands_nmp_environmental_plan_1989', 'netherlands_oort_tax_reform_1990', 'netherlands_ptt_corporatisation_1989', 'netherlands_wao_disability_reform_tba_1993', 'netherlands_wassenaar_continuation_1986_1994'] but no child policy has an evaluation design.
+- `netherlands_rutte_i_vvd_cda_pvv_2010_2012` has audited policies ['nl_aow_retirement_age_rise_2012', 'nl_coalition_austerity_2010_2012', 'nl_immigration_integration_tightening_2010_2012', 'nl_lenteakkoord_kunduz_2012'] but no child policy has an evaluation design.
+- `netherlands_rutte_ii_vvd_pvda_2012_2017` has audited policies ['nl_herfstakkoord_2013', 'nl_housing_market_reform_2013', 'nl_participatiewet_2015', 'nl_wet_werk_zekerheid_2015', 'nl_wlz_wmo_decentralisation_2015'] but no child policy has an evaluation design.
+- `netherlands_rutte_iii_2017_2022` has audited policies ['nl_covid_fiscal_response_now_tvl_2020_2022', 'nl_dividend_tax_abolition_uturn_2018', 'nl_groningen_gas_wind_down_2018_2023', 'nl_klimaatakkoord_klimaatwet_2019', 'nl_stikstofcrisis_pas_annulment_response_2019_2021', 'nl_toeslagenaffaire_reckoning_2019_2021'] but no child policy has an evaluation design.
+- `netherlands_rutte_iv_2022_2024` has audited policies ['nl_box3_rechtsherstel_overbrugging_2022_2023', 'nl_energieplafond_price_cap_2023', 'nl_nitrogen_nplg_buyout_programme_2022_2023', 'nl_toeslagenaffaire_compensation_2022_2024', 'nl_wet_betaalbare_huur_2024', 'nl_wtp_pension_reform_2023'] but no child policy has an evaluation design.
+- `netherlands_schoof_rightwing_2024_present` has audited policies ['nl_asylum_emergency_law_2024', 'nl_box3_transitional_flat_rate_2024', 'nl_housing_market_deregulation_2024', 'nl_nitrogen_targets_rollback_2024'] but no child policy has an evaluation design.
+- `netherlands_van_agt_cda_1977_1982` has audited policies ['nl_bestek_81_1978', 'nl_natural_gas_revenue_cycle_1977_1982', 'nl_wao_disability_expansion_1978_1982', 'nl_wet_investeringsrekening_1978'] but no child policy has an evaluation design.
+- `newzealand_ardern_labour_2017_2023` has audited policies ['nz_child_poverty_reduction_act_2018', 'nz_covid_elimination_2020', 'nz_fair_pay_agreements_2022', 'nz_kiwibuild_2017', 'nz_maori_health_authority_2022', 'nz_smokefree_generation_2022', 'nz_three_waters_reform_2022', 'nz_wellbeing_budget_2019', 'nz_zero_carbon_act_2019'] but no child policy has an evaluation design.
+- `newzealand_bolger_national_1990_1997` has audited policies ['nz_employment_contracts_act_1991', 'nz_fiscal_responsibility_act_1994', 'nz_mmp_referendum_1993', 'nz_mother_of_all_budgets_1991', 'nz_rba_act_implementation_1990_1997'] but no child policy has an evaluation design.
+- `newzealand_clark_labour_1999_2008` has audited policies ['nz_acc_renationalisation_1999', 'nz_china_fta_2008', 'nz_civil_union_act_2004', 'nz_kiwibank_establishment_2002', 'nz_nz_superannuation_fund_2001', 'nz_working_for_families_2004'] but no child policy has an evaluation design.
+- `newzealand_english_national_2016_2017` has audited policies ['nz_family_incomes_package_2017', 'nz_tpp11_negotiations_2017'] but no child policy has an evaluation design.
+- `newzealand_hipkins_labour_2023` has audited policies ['nz_budget_2023_hipkins', 'nz_policy_bonfire_2023', 'nz_three_waters_rebrand_2023'] but no child policy has an evaluation design.
+- `newzealand_key_national_2008_2016` has audited policies ['nz_canterbury_earthquake_recovery_2011', 'nz_gst_increase_income_tax_cut_2010', 'nz_mixed_ownership_model_2012', 'nz_tpp_signing_2016', 'nz_welfare_investment_approach_2012'] but no child policy has an evaluation design.
+- `newzealand_luxon_coalition_2023_present` has audited policies ['nz_fair_pay_agreements_repeal_2023', 'nz_fast_track_approvals_act_2024', 'nz_luxon_tax_cut_budget_2024', 'nz_maori_health_authority_repeal_2024', 'nz_public_sector_cuts_2024', 'nz_rbnz_single_mandate_restoration_2023', 'nz_smokefree_generation_repeal_2024', 'nz_three_waters_repeal_2023', 'nz_treaty_principles_bill_2024_2025'] but no child policy has an evaluation design.
+- `newzealand_muldoon_national_1975_1984` has audited policies ['nz_1984_fx_crisis_devaluation', 'nz_carless_days_1979', 'nz_supplementary_minimum_prices_farmers_1978', 'nz_think_big_energy_projects_1977', 'nz_wage_price_freeze_1982'] but no child policy has an evaluation design.
+- `newzealand_shipley_national_1997_1999` has audited policies ['nz_accident_insurance_act_1998', 'nz_official_cash_rate_introduction_1999', 'nz_wellington_airport_sale_1998'] but no child policy has an evaluation design.
+- `nicaragua_sandinista_1979_1990` has audited policies ['nicaragua_1988_stabilisation', 'nicaragua_agrarian_reform_1981_1986', 'nicaragua_banking_nationalisation_1979', 'nicaragua_foreign_trade_monopoly', 'nicaragua_literacy_health_campaigns', 'nicaragua_somoza_expropriations_1979'] but no child policy has an evaluation design.
+- `nigeria_abacha_military_1993_1998` has audited policies ['ng_dual_exchange_rate_1994', 'ng_ogoni_nine_execution_1995', 'ng_sap2_partial_liberalisation_1995_1997', 'ng_vision_2010_plan_1996'] but no child policy has an evaluation design.
+- `nigeria_babangida_military_1985_1993` has audited policies ['ng_june_12_1993_election_annulment', 'ng_marketing_boards_abolition_1986', 'ng_privatisation_programme_1988_1993', 'ng_sap_sfem_1986'] but no child policy has an evaluation design.
+- `nigeria_buhari_apc_civilian_2015_2023` has audited policies ['ng_anchor_borrowers_programme_2015', 'ng_cbn_ways_and_means_financing_2015_2023', 'ng_covid_imf_rfi_2020', 'ng_endsars_protests_2020', 'ng_fx_43_item_ban_2015', 'ng_land_border_closure_2019', 'ng_naira_redesign_2022', 'ng_petroleum_industry_act_2021'] but no child policy has an evaluation design.
+- `nigeria_buhari_military_1983_1985` has audited policies ['ng_decree_4_press_restrictions_1984', 'ng_imf_loan_rejection_1985', 'ng_naira_currency_change_1984', 'ng_war_against_indiscipline_1984'] but no child policy has an evaluation design.
+- `nigeria_buhari_sap_structural_adjustment_1986` has audited policies ['nigeria_banking_licence_liberalisation_1987', 'nigeria_commodity_board_abolition_1986', 'nigeria_privatisation_decree_1988', 'nigeria_sfem_exchange_rate_1986', 'nigeria_tariff_reform_1988'] but no child policy has an evaluation design.
+- `nigeria_jonathan_pdp_2010_2015` has audited policies ['ng_agric_transformation_ewallet_2012', 'ng_chibok_boko_haram_crisis_2014', 'ng_gdp_rebasing_2014', 'ng_occupy_nigeria_subsidy_protest_2012', 'ng_pension_reform_act_2014', 'ng_phcn_power_privatisation_2013', 'ng_sovereign_wealth_fund_nsia_2011'] but no child policy has an evaluation design.
+- `nigeria_obasanjo_military_first_1976_1979` has audited policies ['ng_1979_constitution_civilian_transition', 'ng_land_use_act_1978', 'ng_second_indigenisation_decree_1977', 'ng_third_national_development_plan_1975_1980'] but no child policy has an evaluation design.
+- `nigeria_obasanjo_pdp_civilian_1999_2007` has audited policies ['ng_cbn_bank_consolidation_2004', 'ng_efcc_establishment_2003', 'ng_gsm_telecom_licensing_2001', 'ng_needs_programme_2004', 'ng_paris_club_debt_relief_2005'] but no child policy has an evaluation design.
+- `nigeria_shagari_second_republic_1979_1983` has audited policies ['ng_1983_election_crisis', 'ng_economic_stabilization_act_1982', 'ng_expulsion_of_aliens_1983', 'ng_fourth_national_development_plan_1981_1985'] but no child policy has an evaluation design.
+- `nigeria_tinubu_apc_2023_present` has audited policies ['ng_cbn_cardoso_orthodoxy_2023', 'ng_electricity_act_2023', 'ng_endbadgovernance_protests_response_2024', 'ng_fuel_subsidy_removal_2023', 'ng_naira_float_unification_2023', 'ng_student_loan_act_2023', 'ng_tax_reform_bills_2024'] but no child policy has an evaluation design.
+- `nigeria_yaradua_pdp_2007_2010` has audited policies ['ng_doctrine_of_necessity_2010', 'ng_niger_delta_amnesty_2009', 'ng_sanusi_bank_intervention_2009', 'ng_seven_point_agenda_2007'] but no child policy has an evaluation design.
+- `norway_bondevik_ii_centre_right_2001_2005` has audited policies ['no_handlingsregelen_fiscal_rule_2001', 'no_pension_reform_white_paper_2004', 'no_skatteform_2004_2006'] but no child policy has an evaluation design.
+- `norway_bondevik_jagland_transition_1996_2000` has audited policies ['no_bondevik_i_gas_power_fall_2000', 'no_kontantstoette_cash_for_care_1998', 'no_petroleum_fund_first_deposit_1996'] but no child policy has an evaluation design.
+- `norway_brundtland_ap_1986_1996` has audited policies ['no_1992_tax_reform', 'no_banking_crisis_resolution_1991', 'no_eea_agreement_1992', 'no_eu_referendum_no_1994', 'no_petroleum_fund_establishment_1990'] but no child policy has an evaluation design.
+- `norway_handlingsregel_2001` has audited policies ['norway_gpfg_investment_mandate', 'norway_handlingsregel_fiscal_rule_2001', 'norway_norges_bank_independence_2001'] but no child policy has an evaluation design.
+- `norway_nordli_ap_1976_1981` has audited policies ['no_kleppe_packages_counter_cyclical_1975_1978', 'no_petroleum_moderate_pace_doctrine_1977', 'no_wage_price_freeze_1978_1979'] but no child policy has an evaluation design.
+- `norway_solberg_rightbloc_2013_2021` has audited policies ['no_corporate_tax_cut_2013_2019', 'no_covid_fiscal_response_2020_2021', 'no_handlingsregel_3pct_white_paper_2017', 'no_immigration_tightening_2015_2016', 'no_petroleum_tax_white_paper_2016'] but no child policy has an evaluation design.
+- `norway_stoltenberg_ii_redgreen_2005_2013` has audited policies ['no_aksjonaermodellen_capital_tax_2006', 'no_gfc_fiscal_stimulus_2009', 'no_gpfg_ethical_guidelines_2006', 'no_klimaforliket_2008', 'no_pension_reform_2011'] but no child policy has an evaluation design.
+- `norway_store_ap_sp_2021_present` has audited policies ['no_abortion_law_reform_2024', 'no_co2_tax_escalator_2021', 'no_electricity_price_support_stromstotte_2022', 'no_onshore_wind_resource_rent_tax_2024', 'no_salmon_resource_rent_tax_2023'] but no child policy has an evaluation design.
+- `norway_willoch_conservative_1981_1986` has audited policies ['no_broadcasting_monopoly_end_1984', 'no_housing_credit_liberalisation_1984', 'no_krone_devaluation_may_1986'] but no child policy has an evaluation design.
+- `nz_rogernomics_1984_1993` has audited policies ['new_zealand_rogernomics_1984_1990', 'nz_employment_contracts_act_1991', 'nz_fiscal_responsibility_act_1994', 'nz_float_1985', 'nz_rbnz_inflation_targeting_1989', 'nz_soe_act_1986', 'nz_tariff_reduction_1984_1996'] but no child policy has an evaluation design.
+- `oman_haitham_fiscal_state_modernisation_2020_present` has audited policies ['oman_labour_law_2023', 'oman_social_protection_law_2023', 'oman_vat_introduction_2021'] but no child policy has an evaluation design.
+- `pakistan_benazir_ppp_first_1988_1990` has audited policies ['pk_8th_amendment_dismissal_precedent_1990', 'pk_imf_saf_1988'] but no child policy has an evaluation design.
+- `pakistan_benazir_ppp_second_1993_1996` has audited policies ['pk_8th_amendment_dismissal_precedent_1996', 'pk_imf_eff_1994', 'pk_power_policy_ipp_1994'] but no child policy has an evaluation design.
+- `pakistan_bhutto_nationalisations_1972_1977` has audited policies ['pakistan_banks_nationalisation_act_1974', 'pakistan_economic_reforms_order_1972', 'pakistan_education_nationalisation_1972', 'pakistan_land_reforms_1972_1977'] but no child policy has an evaluation design.
+- `pakistan_gilani_zardari_ppp_2008_2013` has audited policies ['pk_18th_constitutional_amendment_2010', 'pk_7th_nfc_award_2009', 'pk_benazir_income_support_programme_2008', 'pk_circular_debt_energy_crisis_2008_2013', 'pk_imf_sba_2008_2011'] but no child policy has an evaluation design.
+- `pakistan_khan_pti_2018_2022` has audited policies ['pk_covid_emergency_cash_2020', 'pk_ehsaas_programme_2019', 'pk_fbr_track_and_trace_2020', 'pk_imf_eff_6bn_2019', 'pk_naya_pakistan_housing_2019', 'pk_no_confidence_vote_2022'] but no child policy has an evaluation design.
+- `pakistan_musharraf_military_1999_2008` has audited policies ['pk_9_11_pivot_nato_alliance_2001', 'pk_bhutto_assassination_2007', 'pk_emergency_3_november_2007', 'pk_lawyers_movement_2007_2009', 'pk_legal_framework_order_17th_amendment_2002', 'pk_national_reconciliation_ordinance_2007', 'pk_shaukat_aziz_privatisation_ptcl_2005'] but no child policy has an evaluation design.
+- `pakistan_nawaz_sharif_pmln_first_1990_1993` has audited policies ['pk_enforcement_of_shariat_act_1991', 'pk_motorway_m1_m2_initiation_1992', 'pk_privatisation_commission_1991', 'pk_protection_of_economic_reforms_1992'] but no child policy has an evaluation design.
+- `pakistan_nawaz_sharif_pmln_ii_1997_1999` has audited policies ['pk_13th_14th_amendments_1997', 'pk_1999_military_coup', 'pk_chagai_nuclear_tests_1998', 'pk_foreign_currency_account_freeze_1998', 'pk_kargil_war_1999', 'pk_motorway_m2_lahore_islamabad_1997'] but no child policy has an evaluation design.
+- `pakistan_nawaz_sharif_pmln_iii_2013_2017` has audited policies ['pk_cpec_launch_2015', 'pk_gidc_cess_2015', 'pk_gst_widening_2013_2017', 'pk_imf_eff_6bn_2013', 'pk_national_action_plan_2014', 'pk_zarb_e_azb_2014'] but no child policy has an evaluation design.
+- `pakistan_shehbaz_pmln_coalition_2024_present` has audited policies ['pk_26th_amendment_2024', 'pk_imf_eff_7bn_2024', 'pk_imf_sba_3bn_2023', 'pk_peca_amendment_2025', 'pk_pia_privatisation_2024', 'pk_power_tariff_hikes_2023_2024', 'pk_sifc_2023'] but no child policy has an evaluation design.
+- `pakistan_zia_ul_haq_military_islamisation_1977_1988` has audited policies ['pk_afghan_jihad_support_1979_1988', 'pk_denationalisation_partial_1977_1982', 'pk_federal_shariat_court_1980', 'pk_hudood_ordinances_1979', 'pk_imf_eff_1980_1983', 'pk_islamic_banking_framework_1981', 'pk_sixth_five_year_plan_1983_1988', 'pk_zakat_ushr_ordinance_1980'] but no child policy has an evaluation design.
+- `papua_new_guinea_independence_resource_state_1975_present` has audited policies ['png_independence_constitution_1975', 'png_lng_project_agreement_2008', 'png_mining_act_1992'] but no child policy has an evaluation design.
+- `paraguay_pena_colorado_2023_present` has audited policies ['pry_carbon_credit_market_law_7190_2023', 'pry_hambre_cero_school_feeding_2024', 'pry_integrity_transparency_anticorruption_law_7389_2024', 'pry_pension_superintendency_law_7235_2023'] but no child policy has an evaluation design.
+- `park_chung_hee_industrial_policy_1961_1979` has audited policies ['korea_directed_credit_1962_1979', 'korea_export_subsidy_regime_1965_1979', 'korea_hcidrive_1973', 'korea_land_reform_1949_1961', 'korea_park_hci_1973'] but no child policy has an evaluation design.
+- `peel_conservative_split_1846` has audited policies ['uk_corn_law_repeal_1846'] but no child policy has an evaluation design.
+- `peru_belaunde_ap_1980_1985` has audited policies ['pe_constitution_1979_implementation_1980', 'pe_emergency_zones_sendero_1981_1985', 'pe_imf_eff_1982_1984', 'pe_mining_hydrocarbons_fdi_opening_1981', 'pe_tariff_reform_1980_1984'] but no child policy has an evaluation design.
+- `peru_boluarte_post_castillo_2022_present` has audited policies ['pe_afp_pension_withdrawals_2023_2024', 'pe_judicial_independence_rollback_2023_2025', 'pe_ley_apci_ngo_restrictions_2024', 'pe_mining_investment_facilitation_2023', 'pe_protest_crackdown_2022_2023'] but no child policy has an evaluation design.
+- `peru_castillo_peru_libre_2021_2022` has audited policies ['pe_afp_sixth_withdrawal_2022', 'pe_castillo_autogolpe_dec_2022', 'pe_castillo_constituent_assembly_process_2021_2022', 'pe_mining_tax_regime_proposal_2021_2022'] but no child policy has an evaluation design.
+- `peru_fujimori_autogolpe_1992` has audited policies ['pe_1993_constitution_referendum', 'pe_autogolpe_5_april_1992', 'pe_capture_of_guzman_sendero_1992', 'pe_ccd_constituyente_elections_1992', 'pe_decreto_ley_25475_terrorism_1992'] but no child policy has an evaluation design.
+- `peru_fujimori_stabilisation_1990_2000` has audited policies ['peru_1993_constitution_central_bank', 'peru_fujishock_1990', 'peru_privatisations_1991_1997', 'peru_trade_opening_1991_1993'] but no child policy has an evaluation design.
+- `peru_garcia_apra_first_1985_1990` has audited policies ['pe_bank_nationalisation_announcement_1987', 'pe_debt_service_limit_1985', 'pe_hyperinflation_1988_1990', 'pe_inti_heterodox_plan_1985', 'pe_paquetazos_stabilisation_1988_1989'] but no child policy has an evaluation design.
+- `peru_garcia_apra_second_2006_2011` has audited policies ['pe_bagua_massacre_legislative_decrees_2009', 'pe_financial_crisis_stimulus_2009', 'pe_garcia_ii_perro_del_hortelano_2007', 'pe_investment_grade_rating_2008', 'pe_us_fta_implementation_2009'] but no child policy has an evaluation design.
+- `peru_humala_gana_peru_2011_2016` has audited policies ['pe_conga_mining_conflict_2011_2012', 'pe_mining_royalty_reform_2011', 'pe_pacific_alliance_accession_2012_2014', 'pe_pension_65_2011', 'pe_servir_civil_service_law_2013'] but no child policy has an evaluation design.
+- `peru_ppk_2016_2018` has audited policies ['pe_alberto_fujimori_humanitarian_pardon_2017', 'pe_arcc_reconstruction_authority_2017', 'pe_ppk_legislative_decree_package_2016', 'pe_ppk_oecd_accession_roadmap_2016_2018'] but no child policy has an evaluation design.
+- `peru_toledo_pp_2001_2006` has audited policies ['pe_camisea_gas_project_2004', 'pe_fiscal_prudence_law_amendment_2003', 'pe_inflation_targeting_adoption_2002', 'pe_truth_reconciliation_commission_2001_2003', 'pe_us_fta_negotiation_2004_2006'] but no child policy has an evaluation design.
+- `peru_vizcarra_2018_2020` has audited policies ['pe_anti_corruption_referendum_2018', 'pe_bono_universal_covid_2020', 'pe_congressional_dissolution_2019', 'pe_reactiva_peru_covid_response_2020', 'pe_vizcarra_vacancy_nov_2020'] but no child policy has an evaluation design.
+- `philippines_aquino_iii_2010_2016` has audited policies ['ph_edca_2014', 'ph_k12_basic_education_2013', 'ph_pantawid_4ps_expansion_2010_2016', 'ph_ppp_infrastructure_program_2010_2016', 'ph_sin_tax_reform_2012'] but no child policy has an evaluation design.
+- `philippines_arroyo_lakas_2001_2010` has audited policies ['ph_carper_extension_2009', 'ph_expanded_vat_law_2005', 'ph_hello_garci_scandal_2005', 'ph_pantawid_4ps_launch_2007', 'ph_pp_1017_emergency_proclamation_2006', 'ph_vfa_balikatan_continuation_2002_2010'] but no child policy has an evaluation design.
+- `philippines_cory_aquino_transition_1986_1992` has audited policies ['ph_1987_constitution', 'ph_apt_privatisation_1986', 'ph_carp_agrarian_reform_1988', 'ph_pcgg_sequestration_1986', 'ph_us_bases_rejection_1991', 'ph_vat_ra_eo_273_1987'] but no child policy has an evaluation design.
+- `philippines_duterte_2016_2022` has audited policies ['ph_abs_cbn_franchise_denial_2020', 'ph_bangsamoro_organic_law_2018', 'ph_build_build_build_2017_2022', 'ph_create_corporate_tax_cut_2021', 'ph_drug_war_2016', 'ph_icc_withdrawal_2019', 'ph_rice_tariffication_2019', 'ph_train_tax_reform_2017'] but no child policy has an evaluation design.
+- `philippines_estrada_lammp_1998_2001` has audited policies ['ph_epira_power_sector_reform_2001', 'ph_estrada_impeachment_edsa_ii_2001', 'ph_general_banking_law_2000', 'ph_mindanao_all_out_war_2000', 'ph_retail_trade_liberalization_act_2000'] but no child policy has an evaluation design.
+- `philippines_marcos_authoritarian_economy_1965_1986` has audited policies ['philippines_coconut_levy_1973', 'philippines_imf_standby_1984', 'philippines_martial_law_economic_decrees_1972', 'philippines_peso_devaluations_1983_1984', 'philippines_philsucom_sugar_monopoly_1976'] but no child policy has an evaluation design.
+- `philippines_marcos_crony_capitalism_1976_1986` has audited policies ['ph_11_major_industrial_projects_1979', 'ph_bataan_nuclear_plant_1984', 'ph_coconut_levy_cojuangco_1973_1986', 'ph_debt_moratorium_1983', 'ph_martial_law_lifting_amendment_6_1981', 'ph_snap_election_edsa_1986', 'ph_sugar_monopoly_philsucom_nasutra_1976'] but no child policy has an evaluation design.
+- `philippines_marcos_jr_2022_present` has audited policies ['ph_edca_expansion_2023', 'ph_luzon_economic_corridor_2024', 'ph_maharlika_sovereign_wealth_fund_2023', 'ph_rcep_ratification_2023'] but no child policy has an evaluation design.
+- `philippines_ramos_lakas_nucd_1992_1998` has audited policies ['ph_bot_law_amendment_1994', 'ph_bsp_charter_1993', 'ph_foreign_bank_liberalization_1994', 'ph_mnlf_peace_agreement_1996', 'ph_oil_industry_deregulation_1996_1998', 'ph_telecom_deregulation_ra7925_1995', 'ph_wto_accession_1995'] but no child policy has an evaluation design.
+- `pinochet_chicago_boys_1975_1990` has audited policies ['chile_afp_1981', 'chile_banking_liberalisation_1977', 'chile_fx_opening_1976', 'chile_soe_privatisations_1975_1989', 'chile_trade_opening_1975_1979'] but no child policy has an evaluation design.
+- `poland_buzek_aws_1997_2001` has audited policies ['pl_kasy_chorych_health_1999', 'pl_nato_accession_1999', 'pl_pension_reform_three_pillar_1999', 'pl_territorial_reform_16_voivodeships_1999'] but no child policy has an evaluation design.
+- `poland_gierek_pzpr_1970_1980` has audited policies ['pl_gdansk_agreement_1980', 'pl_gierek_western_debt_investment_drive_1971', 'pl_price_hikes_1976_radom_ursus'] but no child policy has an evaluation design.
+- `poland_jaruzelski_pzpr_martial_law_1981_1989` has audited policies ['pl_martial_law_december_1981', 'pl_round_table_agreement_1989', 'pl_three_s_reform_1986', 'pl_zloty_devaluation_price_reform_1982'] but no child policy has an evaluation design.
+- `poland_mazowiecki_solidarity_shock_therapy_1989_1991` has audited policies ['pl_balcerowicz_plan_1990', 'pl_paris_club_agreement_1991', 'pl_popiwek_wage_tax_1990', 'pl_privatisation_law_1990', 'poland_balcerowicz_shock_therapy_1990'] but no child policy has an evaluation design.
+- `poland_morawiecki_pis_2017_2023` has audited policies ['pl_13th_14th_pension_2019_2022', 'pl_500_plus_child_benefit_2016', 'pl_coal_energy_transition_stance_2017_2023', 'pl_judicial_reforms_supreme_court_krs_2017_2020', 'pl_nbp_rate_cycle_2020_2023', 'pl_polski_lad_tax_reform_2022'] but no child policy has an evaluation design.
+- `poland_pis_kaczynski_first_2005_2007` has audited policies ['pl_becikowe_childbirth_grant_2006', 'pl_cba_anticorruption_bureau_2006', 'pl_disability_contribution_cut_2007', 'pl_lustration_law_2006'] but no child policy has an evaluation design.
+- `poland_sld_government_2001_2005` has audited policies ['pl_eu_accession_2004', 'pl_hausner_plan_2003', 'pl_rywin_affair_2003'] but no child policy has an evaluation design.
+- `poland_sld_psl_coalition_1993_1997` has audited policies ['pl_europe_agreement_application_1994', 'pl_kolodko_strategy_for_poland_1994', 'pl_nif_mass_privatisation_1995', 'pl_pension_reform_1997_1999', 'pl_zloty_redenomination_1995'] but no child policy has an evaluation design.
+- `poland_szydlo_pis_2015_2017` has audited policies ['pl_500_plus_child_benefit_2016', 'pl_bank_asset_tax_2016', 'pl_constitutional_tribunal_crisis_2015_2016', 'pl_retail_turnover_tax_2016', 'pl_retirement_age_reversal_2017'] but no child policy has an evaluation design.
+- `poland_transition_governments_1991_1993` has audited policies ['pl_balcerowicz_plan_1990', 'pl_mass_privatisation_programme_blueprint_1991', 'pl_pact_on_state_enterprise_1993', 'pl_small_constitution_1992'] but no child policy has an evaluation design.
+- `poland_tusk_koalicja_2023_present` has audited policies ['pl_800_plus_child_benefit_2024', 'pl_bodnar_judicial_restoration_2024', 'pl_defence_spending_4pct_gdp_2024', 'pl_public_media_restructure_2023_2024', 'pl_rrf_unblocking_rule_of_law_milestones_2024'] but no child policy has an evaluation design.
+- `poland_tusk_po_first_2007_2014` has audited policies ['pl_euro_2012_infrastructure', 'pl_imf_flexible_credit_line_2009', 'pl_ofe_transfer_2014', 'pl_pit_bracket_reduction_2009', 'pl_retirement_age_67_2012'] but no child policy has an evaluation design.
+- `portugal_barroso_psd_2002_2004` has audited policies ['pt_austerity_programme_2003', 'pt_codigo_do_trabalho_2003', 'pt_iraq_azores_summit_2003', 'pt_iva_rise_2002'] but no child policy has an evaluation design.
+- `portugal_carnation_revolution_1974_1986` has audited policies ['portugal_1976_constitution_socialist_clauses', 'portugal_agrarian_reform_1975', 'portugal_bank_nationalisations_1975', 'portugal_eec_accession_treaty_1985', 'portugal_imf_standby_1977_1978', 'portugal_imf_standby_1983_1985', 'portugal_industrial_nationalisations_1975'] but no child policy has an evaluation design.
+- `portugal_cavaco_silva_psd_1985_1995` has audited policies ['portugal_constitutional_revision_privatisation_1989', 'portugal_eec_accession_1986', 'portugal_escudo_erm_entry_1992', 'portugal_labour_code_revision_1989', 'portugal_privatisations_framework_1990_1995', 'portugal_vat_introduction_1986'] but no child policy has an evaluation design.
+- `portugal_costa_ps_2015_2024` has audited policies ['pt_golden_visa_real_estate_rollback_2023', 'pt_irs_jovem_2023', 'pt_mais_habitacao_housing_package_2023', 'pt_minimum_wage_trajectory_2015_2024', 'pt_prr_ngeu_implementation_2021_2026', 'pt_public_wage_pension_reversal_2016_2018', 'pt_sns_direcao_executiva_2022'] but no child policy has an evaluation design.
+- `portugal_guterres_ps_1995_2002` has audited policies ['portugal_bdp_independence_1998', 'portugal_education_pre_school_network_1997', 'portugal_euro_entry_1999', 'portugal_expo_98_lisbon_infrastructure', 'portugal_rmg_minimum_income_1996'] but no child policy has an evaluation design.
+- `portugal_montenegro_ad_2024_present` has audited policies ['pt_construir_portugal_housing_rollback_2024', 'pt_defence_spending_nato_2_percent_trajectory_2024', 'pt_irc_corporate_rate_reduction_2024', 'pt_irs_jovem_expansion_2024', 'pt_migration_regularisation_end_2024'] but no child policy has an evaluation design.
+- `portugal_passos_coelho_psd_cds_2011_2015` has audited policies ['portugal_troika_programme_2011_2014', 'pt_iva_vat_hike_2011', 'pt_labour_reform_lei_23_2012', 'pt_pension_freeze_cga_convergence_2011_2014', 'pt_privatisations_edp_ren_ana_ctt_2011_2014', 'pt_public_wage_cuts_2011_2014'] but no child policy has an evaluation design.
+- `portugal_socrates_ps_first_2005_2008` has audited policies ['pt_iva_rise_2005', 'pt_lisbon_treaty_signing_2007', 'pt_magalhaes_laptop_programme_2008', 'pt_novas_oportunidades_adult_ed_2005', 'pt_pension_sustainability_factor_2007'] but no child policy has an evaluation design.
+- `qatar_tamim_labour_lng_diversification_2020_present` has audited policies ['qatar_labour_reforms_minimum_wage_kafala_2020', 'qatar_north_field_expansion_2021_2030', 'qatar_third_national_development_strategy_2024'] but no child policy has an evaluation design.
+- `romania_dan_bolojan_reformist_2025_present` has audited policies ['ro_2025_consolidation_package', 'ro_defence_spending_ramp_2025', 'ro_judicial_special_pensions_reform_2025', 'ro_rrf_milestone_recovery_2025'] but no child policy has an evaluation design.
+- `romania_iliescu_fsn_1990_1996` has audited policies ['ro_land_restitution_law_18_1991', 'ro_mineriade_1990_1991', 'ro_partial_price_liberalisation_1990_1991', 'ro_privatisation_law_58_1991', 'ro_vacaroiu_stabilisation_1993_1995'] but no child policy has an evaluation design.
+- `russia_gorbachev_perestroika_glasnost_1985_1991` has audited policies ['su_belovezha_dissolution_1991', 'su_cooperative_law_1988', 'su_individual_labour_activity_law_1986', 'su_pavlov_price_reform_1991', 'su_state_enterprise_law_1987'] but no child policy has an evaluation design.
+- `russia_medvedev_presidency_2008_2012` has audited policies ['ru_georgia_war_2008', 'ru_gfc_reserve_fund_drawdown_2008_2009', 'ru_presidential_term_extension_2008', 'ru_skolkovo_innovation_2010', 'ru_wto_accession_2011_2012'] but no child policy has an evaluation design.
+- `russia_putin_fifth_term_2024_present` has audited policies ['ru_cbr_high_rate_regime_2024', 'ru_foreign_assets_nationalisation_continuation', 'ru_progressive_tax_reform_2025', 'ru_war_economy_normalization_2024'] but no child policy has an evaluation design.
+- `russia_putin_first_term_2000_2004` has audited policies ['ru_beslan_school_siege_2004', 'ru_federal_districts_2000', 'ru_flat_tax_13_percent_2001', 'ru_kursk_disaster_2000', 'ru_yukos_affair_2003'] but no child policy has an evaluation design.
+- `russia_putin_fourth_term_2018_2024` has audited policies ['ru_capital_controls_war_2022', 'ru_constitutional_amendments_2020', 'ru_partial_mobilisation_2022', 'ru_prigozhin_mutiny_2023', 'ru_ukraine_full_scale_invasion_2022', 'ru_vat_rise_2019'] but no child policy has an evaluation design.
+- `russia_putin_second_term_2004_2008` has audited policies ['ru_gubernatorial_election_abolition_2004', 'ru_medvedev_tandem_prep_2007_2008', 'ru_national_priority_projects_2005', 'ru_rosneft_yuganskneftegaz_2004', 'ru_stabilisation_fund_split_2008'] but no child policy has an evaluation design.
+- `russia_putin_third_term_2012_2018` has audited policies ['ru_counter_sanctions_food_ban_2014', 'ru_crimea_annexation_2014', 'ru_may_decrees_2012', 'ru_pension_age_reform_2018', 'ru_rouble_floating_2014', 'ru_syria_intervention_2015'] but no child policy has an evaluation design.
+- `russia_yeltsin_first_term_1991_1996` has audited policies ['ru_1993_constitution_referendum', 'ru_first_chechen_war_1994_1996', 'ru_gaidar_price_liberalisation_1992', 'ru_loans_for_shares_1995_1996', 'ru_rouble_convertibility_1992', 'ru_voucher_privatisation_1992_1994', 'ru_yeltsin_gaidar_shock_therapy_1992'] but no child policy has an evaluation design.
+- `russia_yeltsin_second_term_1996_1999` has audited policies ['ru_gko_default_1998', 'ru_loans_for_shares_aftermath_1996', 'ru_primakov_stabilisation_1998_1999', 'ru_yeltsin_resignation_1999'] but no child policy has an evaluation design.
+- `rwanda_post_genocide_reconstruction_1994_2020` has audited policies ['rwanda_imihigo_performance_contracts_2006', 'rwanda_land_tenure_regularisation_2008', 'rwanda_mutuelles_de_sante_1999', 'rwanda_rdb_one_stop_shop_2008', 'rwanda_vision_2020_plan'] but no child policy has an evaluation design.
+- `saudi_abdullah_de_facto_crown_prince_1995_2005` has audited policies ['sa_capital_market_law_2003', 'sa_foreign_investment_law_2000', 'sa_stc_partial_ipo_2002', 'sa_women_nacb_allowance_2001', 'sa_wto_accession_2005'] but no child policy has an evaluation design.
+- `saudi_abdullah_late_era_2005_2015` has audited policies ['sa_arab_spring_counter_package_2011', 'sa_kaust_founding_2009', 'sa_nitaqat_saudisation_2011', 'sa_women_shura_council_2013'] but no child policy has an evaluation design.
+- `saudi_fahd_early_era_1982_1995` has audited policies ['sa_basic_law_shura_1992', 'sa_government_development_bonds_1988', 'sa_gulf_war_citizen_bonus_1991', 'sa_riyal_peg_formalisation_1986'] but no child policy has an evaluation design.
+- `saudi_fahd_gulf_war_recycling_1990_1995` has audited policies ['sa_1994_austerity_budget', 'sa_gulf_war_coalition_contribution_1990_1991', 'sa_sama_reserve_drawdown_1991_1993'] but no child policy has an evaluation design.
+- `saudi_khalid_1975_1982` has audited policies ['sa_grand_mosque_religious_empowerment_1979', 'sa_sabic_founding_1976', 'sa_second_five_year_plan_1975'] but no child policy has an evaluation design.
+- `saudi_mbs_cp_era_2017_present` has audited policies ['sa_aramco_ipo_2019', 'sa_driving_ban_lifted_2018', 'sa_khashoggi_killing_2018', 'sa_neom_announcement_2017', 'sa_nitaqat_saudisation_2011', 'sa_opec_plus_strategy_2020_2022', 'sa_qatar_blockade_2017_2021', 'sa_ritz_carlton_detentions_2017', 'sa_vat_introduction_2018', 'sa_vision_2030_launch_2016'] but no child policy has an evaluation design.
+- `saudi_salman_transition_2015_2017` has audited policies ['sa_nitaqat_saudisation_2011', 'sa_vision_2030_launch_2016', 'sa_yemen_war_intervention_2015'] but no child policy has an evaluation design.
+- `saudi_vision_2030_2016_present` has audited policies ['saudi_aramco_partial_ipo_2019', 'saudi_energy_subsidy_reform_2015_2021', 'saudi_labour_market_reforms_2019_2021', 'saudi_pif_expansion_2016_present', 'saudi_vat_introduction_2018', 'saudi_women_workforce_reforms_2017_2021'] but no child policy has an evaluation design.
+- `senegal_senghor_socialist_democracy_1960_1980` has audited policies ['sn_four_year_development_plans_1961', 'sn_franc_zone_stability_senghor_1960', 'sn_groundnut_marketing_board_1960s'] but no child policy has an evaluation design.
+- `singapore_cpf_forced_saving_architecture_1955` has audited policies ['singapore_cpf_1955', 'singapore_medifund_1993', 'singapore_medisave_1984', 'singapore_medishield_1990'] but no child policy has an evaluation design.
+- `skorea_chun_doo_hwan_military_1980_1988` has audited policies ['kr_chaebol_restructuring_1980', 'kr_chun_price_stabilisation_1981', 'kr_commercial_bank_denationalisation_1981', 'kr_fair_trade_law_1980', 'kr_june_29_declaration_1987', 'kr_seoul_olympics_preparation_1981_1988'] but no child policy has an evaluation design.
+- `skorea_kim_dae_jung_ds_1998_2003` has audited policies ['korea_imf_reforms_1998', 'kr_chaebol_reform_five_plus_three_1998', 'kr_cyber_korea_21_broadband_1999', 'kr_imf_programme_conditions_1998', 'kr_national_basic_livelihood_security_act_1999', 'kr_national_health_insurance_unification_2000', 'kr_sunshine_policy_inter_korean_summit_2000'] but no child policy has an evaluation design.
+- `skorea_kim_young_sam_ds_1993_1998` has audited policies ['kr_capital_account_liberalisation_1993_1997', 'kr_imf_standby_1997', 'kr_labour_law_reform_1996', 'kr_oecd_accession_1996', 'kr_real_name_financial_1993'] but no child policy has an evaluation design.
+- `skorea_lee_jaemyung_dp_2025_present` has audited policies ['kr_commercial_code_fiduciary_reform_2025', 'kr_corporate_tax_restoration_2025', 'kr_livelihood_recovery_supplementary_budget_2025', 'kr_prosecution_reform_2025', 'kr_universal_basic_income_youth_dividend_2025'] but no child policy has an evaluation design.
+- `skorea_lee_myung_bak_gnp_2008_2013` has audited policies ['kr_four_major_rivers_restoration_2009_2012', 'kr_lee_corporate_tax_cut_2008_2009', 'kr_lee_green_growth_basic_act_2010', 'kr_lee_korus_fta_ratification_2011', 'kr_lee_may_24_measures_2010'] but no child policy has an evaluation design.
+- `skorea_moon_dp_2017_2022` has audited policies ['kr_52_hour_work_week_2018', 'kr_inter_korean_engagement_2018_2019', 'kr_korean_new_deal_covid_2020', 'kr_minimum_wage_hikes_2018_2019', 'kr_nuclear_phaseout_posture_2017_2022', 'kr_property_tightening_packages_2017_2021'] but no child policy has an evaluation design.
+- `skorea_park_geun_hye_saenuri_2013_2017` has audited policies ['kr_park_choinomics_stimulus_ltv_dti_2014_2015', 'kr_park_creative_economy_centres_2014', 'kr_park_japan_comfort_women_agreement_2015', 'kr_park_public_sector_performance_wage_2016', 'kr_park_thaad_deployment_2016'] but no child policy has an evaluation design.
+- `skorea_roh_moo_hyun_uri_2003_2008` has audited policies ['kr_comprehensive_property_tax_2005', 'kr_inter_korean_summit_october_2007', 'kr_iraq_zaytun_dispatch_2004', 'kr_korus_fta_signing_2007', 'kr_roh_impeachment_and_reinstatement_2004', 'kr_sejong_relocation_plan_2005'] but no child policy has an evaluation design.
+- `skorea_roh_tae_woo_djp_1988_1993` has audited policies ['kr_nordpolitik_1988_1992', 'kr_three_party_merger_dlp_1990', 'kr_two_million_housing_1988', 'kr_wage_labour_liberalisation_post_1987'] but no child policy has an evaluation design.
+- `skorea_yoon_ppp_2022_2025` has audited policies ['kr_corporate_tax_cut_2023', 'kr_inheritance_tax_reform_attempt_2024', 'kr_martial_law_declaration_december_2024', 'kr_nuclear_restoration_2022_2024', 'kr_real_estate_deregulation_2022_2024', 'kr_yoon_biden_washington_declaration_2023'] but no child policy has an evaluation design.
+- `slovakia_dzurinda_sdku_1998_2006` has audited policies ['sk_eu_accession_2004', 'sk_flat_tax_19_percent_2004', 'sk_healthcare_user_fees_2003', 'sk_nato_accession_2004', 'sk_pension_second_pillar_2005'] but no child policy has an evaluation design.
+- `slovakia_fico_smer_first_term_2006_2010` has audited policies ['sk_crisis_scrappage_scheme_2009', 'sk_euro_adoption_2009', 'sk_healthcare_user_fee_abolition_2006'] but no child policy has an evaluation design.
+- `slovakia_fico_smer_ii_iii_2012_2018` has audited policies ['sk_bank_levy_2012', 'sk_flat_tax_abolition_2013', 'sk_kuciak_assassination_2018', 'sk_minimum_wage_ramp_2012_2018', 'sk_second_pillar_voluntarisation_2012'] but no child policy has an evaluation design.
+- `slovakia_meciar_hzds_1993_1998` has audited policies ['sk_bank_fragility_npl_accumulation_1996_1998', 'sk_direct_sale_privatisation_1995', 'sk_slovak_language_law_1995', 'sk_voucher_privatisation_cancellation_1995'] but no child policy has an evaluation design.
+- `slovakia_pellegrini_smer_2018_2020` has audited policies ['sk_foodstuff_vat_reduction_2020', 'sk_minimum_wage_ramp_2012_2018', 'sk_thirteenth_pension_2019'] but no child policy has an evaluation design.
+- `slovakia_radicova_sdku_2010_2012` has audited policies ['sk_efsf_vote_collapse_2011', 'sk_open_contracts_transparency_2011', 'sk_vat_20_percent_2011'] but no child policy has an evaluation design.
+- `south_africa_anc_post_apartheid_1994_present` has audited policies ['south_africa_bbbee_codes_2003', 'south_africa_gear_macro_framework_1996', 'south_africa_inflation_targeting_2000', 'south_africa_labour_relations_act_1995', 'south_africa_social_grants_expansion_1998'] but no child policy has an evaluation design.
+- `southafrica_mbeki_anc_second_term_1999_2008` has audited policies ['za_arv_rollout_reversal_2003', 'za_bbbee_act_2003', 'za_exchange_control_relaxation_2003', 'za_fais_act_2002', 'za_mprda_2002'] but no child policy has an evaluation design.
+- `southafrica_ramaphosa_anc_2018_present` has audited policies ['za_eskom_debt_relief_2023', 'za_expropriation_act_2025', 'za_ismo_electricity_reform_2024', 'za_nhi_bill_2024', 'za_two_pot_retirement_2024'] but no child policy has an evaluation design.
+- `southafrica_zuma_anc_2009_2018` has audited policies ['za_marikana_platinum_strike_2012', 'za_minimum_wage_act_2017', 'za_mprda_amendment_mining_2013', 'za_nuclear_procurement_russia_mou_2014', 'za_sarb_inflation_targeting_defence_2016'] but no child policy has an evaluation design.
+- `spain_aznar_pp_1996_2004` has audited policies ['spain_aznar_tax_cuts_1998_2002', 'spain_electricity_law_1997', 'spain_emu_entry_convergence_1998', 'spain_iraq_participation_2003', 'spain_labour_reform_1997', 'spain_labour_reform_2001', 'spain_land_liberalisation_ley_suelo_1998', 'spain_pension_reform_pacto_toledo_1997', 'spain_privatisations_ppp_1997_2000'] but no child policy has an evaluation design.
+- `spain_gonzalez_psoe_first_1982_1989` has audited policies ['spain_eec_accession_1986', 'spain_estatuto_trabajadores_reform_1984', 'spain_industrial_reconversion_1983_1986', 'spain_ley_general_sanidad_1986', 'spain_nato_referendum_1986', 'spain_peseta_devaluation_1982', 'spain_rumasa_expropriation_1983'] but no child policy has an evaluation design.
+- `spain_gonzalez_psoe_later_1989_1996` has audited policies ['spain_ave_madrid_seville_1992', 'spain_bde_independence_law_1994', 'spain_labour_reform_1994', 'spain_peseta_erm_devaluations_1992_1995', 'spain_repsol_endesa_privatisations_1989_1996'] but no child policy has an evaluation design.
+- `spain_rajoy_pp_first_2011_2015` has audited policies ['es_bankia_nationalisation_2012', 'es_eu_banking_mou_bailout_2012', 'es_labour_reform_2012', 'es_rdl_20_2012_austerity', 'es_sareb_bad_bank_2012', 'spain_labour_reform_2012'] but no child policy has an evaluation design.
+- `spain_rajoy_pp_second_2016_2018` has audited policies ['es_article_155_catalonia_2017', 'es_no_confidence_motion_sanchez_2018', 'es_presupuestos_2018_expansionary', 'es_smi_minimum_wage_rises_2017_2018'] but no child policy has an evaluation design.
+- `spain_sanchez_2018_present` has audited policies ['spain_erte_ngeu_covid_fiscal_2020_2022', 'spain_housing_law_12_2023', 'spain_labour_reform_rdl_32_2021', 'spain_ley_organica_10_2022_consent_law', 'spain_minimum_wage_increases_2018_2024', 'spain_pension_revaluation_cpi_link_2021_2023', 'spain_solidarity_wealth_tax_2023', 'spain_windfall_taxes_banks_energy_2022_2023'] but no child policy has an evaluation design.
+- `spain_transition_economic_reforms_1977_1985` has audited policies ['spain_eec_accession_treaty_1985', 'spain_industrial_reconversion_1983_1985', 'spain_irpf_tax_reform_1978', 'spain_moncloa_pacts_1977', 'spain_peseta_devaluation_1977', 'spain_workers_statute_1980'] but no child policy has an evaluation design.
+- `spain_zapatero_ii_psoe_2008_2011` has audited policies ['es_constitutional_amendment_art_135_2011', 'es_frob_cajas_consolidation_2009', 'es_labour_reform_rdl_10_2010', 'es_pension_reform_2011', 'es_plan_e_2008_2009'] but no child policy has an evaluation design.
+- `spain_zapatero_psoe_first_2004_2008` has audited policies ['spain_dependency_law_saad_2006', 'spain_gender_violence_law_2004', 'spain_historical_memory_law_2007', 'spain_iraq_withdrawal_2004', 'spain_migrant_regularisation_2005', 'spain_same_sex_marriage_2005', 'spain_zapatero_tax_reforms_2006_2008'] but no child policy has an evaluation design.
+- `sri_lanka_open_economy_1977` has audited policies ['sri_lanka_food_stamp_scheme_1979', 'sri_lanka_gcec_epz_act_1978', 'sri_lanka_open_economy_package_1977', 'sri_lanka_peoplisation_privatisation_1989_1994'] but no child policy has an evaluation design.
+- `srilanka_dissanayake_npp_2024_present` has audited policies ['lk_imf_eff_2023', 'lk_npp_anti_corruption_platform_2024', 'lk_soe_reform_act_2024'] but no child policy has an evaluation design.
+- `srilanka_gotabaya_rajapaksa_slpp_2019_2022` has audited policies ['lk_organic_farming_mandate_2021', 'lk_rajapaksa_tax_cuts_2019', 'lk_sovereign_default_2022'] but no child policy has an evaluation design.
+- `srilanka_wickremesinghe_unp_2022_2024` has audited policies ['lk_cbsl_act_2023', 'lk_imf_eff_2023', 'lk_soe_reform_act_2024', 'lk_sovereign_default_2022'] but no child policy has an evaluation design.
+- `sweden_andersson_sap_2021_2022` has audited policies ['se_covid_fiscal_support_extension_2021_2022', 'se_electricity_price_support_2022', 'se_nato_application_2022', 'se_pensioner_tax_relief_2022'] but no child policy has an evaluation design.
+- `sweden_bildt_centre_right_1991_1994` has audited policies ['se_bank_crisis_securum_1992', 'se_eu_membership_accession_1995', 'se_friskola_school_voucher_1992', 'se_krona_free_float_1992', 'se_tax_reform_of_the_century_1991', 'sweden_bildt_market_reforms_1991_1994', 'sweden_school_voucher_1992'] but no child policy has an evaluation design.
+- `sweden_carlsson_sap_1986_1991` has audited policies ['se_eu_membership_application_1991', 'se_fx_control_abolition_1989', 'se_november_revolution_credit_dereg_1985', 'se_tax_reform_of_the_century_1991'] but no child policy has an evaluation design.
+- `sweden_carlsson_sap_return_1994_1996` has audited policies ['se_eu_membership_accession_1995', 'se_expenditure_ceiling_framework_1996', 'se_fiscal_consolidation_persson_1995'] but no child policy has an evaluation design.
+- `sweden_falldin_centre_coalition_1976_1982` has audited policies ['se_krona_devaluation_1977', 'se_nuclear_referendum_1980', 'se_shipbuilding_nationalisation_1977', 'se_wonderful_night_tax_deal_1981'] but no child policy has an evaluation design.
+- `sweden_kristersson_rightbloc_2022_present` has audited policies ['se_electricity_price_support_2022', 'se_labour_migration_salary_threshold_2023', 'se_nato_accession_2024', 'se_nuclear_new_build_framework_2023', 'se_reduktionsplikt_rollback_2024', 'se_tido_agreement_2022'] but no child policy has an evaluation design.
+- `sweden_lofven_sap_2014_2021` has audited policies ['se_climate_act_2017', 'se_covid_korttidspermittering_2020', 'se_january_agreement_2019', 'se_las_employment_protection_reform_2019_2022', 'se_temporary_aliens_act_2016', 'se_varnskatt_abolition_2020'] but no child policy has an evaluation design.
+- `sweden_palme_sap_1982_1986` has audited policies ['se_credit_market_deregulation_november_revolution_1985', 'se_krona_devaluation_1982_sixteen_percent', 'se_lontagarfonder_wage_earner_funds_1983'] but no child policy has an evaluation design.
+- `sweden_persson_sap_1996_2006` has audited policies ['se_euro_referendum_no_2003', 'se_fiscal_surplus_target_2000', 'se_maxtaxa_childcare_2002', 'se_riksbank_independence_1999'] but no child policy has an evaluation design.
+- `sweden_reinfeldt_alliance_2006_2014` has audited policies ['se_bolagsskatt_22_percent_2013', 'se_fastighetsskatt_replacement_2008', 'se_formogenhetsskatt_abolition_2007', 'se_jobskatteavdrag_2007', 'se_rut_rot_deductions_2007'] but no child policy has an evaluation design.
+- `swiss_magic_formula_consensus_1959_2003` has audited policies ['ch_federal_council_zauberformel_formation_1959', 'ch_kvg_health_insurance_act_1994', 'ch_snb_floating_franc_1978', 'ch_unemployment_insurance_law_1984', 'ch_vat_referendum_rejection_1977'] but no child policy has an evaluation design.
+- `switzerland_nuclear_phaseout_2017` has audited policies ['switzerland_energiegesetz_2016', 'switzerland_energy_strategy_2050', 'switzerland_nuclear_new_build_ban_2017'] but no child policy has an evaluation design.
+- `syria_baath_assad_statist_regime_1963_2000` has audited policies ['syr_agrarian_reform_consolidation_1963_1970', 'syr_baath_nationalisations_1965', 'syr_public_sector_five_year_planning_1971_1980'] but no child policy has an evaluation design.
+- `taiwan_kmt_developmentalism_1961_2000` has audited policies ['taiwan_itri_semiconductor_1973'] but no child policy has an evaluation design.
+- `tanzania_nyerere_ujamaa_1967_1985` has audited policies ['tanzania_arusha_nationalisations_1967', 'tanzania_national_milling_monopoly_1976', 'tanzania_state_trading_corporation_1967', 'tanzania_universal_primary_education_1974', 'tanzania_villagisation_1973'] but no child policy has an evaluation design.
+- `thailand_abhisit_democrat_2008_2011` has audited policies ['th_abhisit_cheque_2000_baht_2009', 'th_abhisit_elderly_universal_allowance_2009', 'th_abhisit_free_15_year_education_2009', 'th_abhisit_red_shirt_crackdown_may_2010', 'th_abhisit_thai_khem_khaeng_stimulus_2009'] but no child policy has an evaluation design.
+- `thailand_anand_panyarachun_technocrat_1991_1992` has audited policies ['th_sec_act_1992', 'th_telecom_concessions_framework_1991_1992', 'th_vat_introduction_1992'] but no child policy has an evaluation design.
+- `thailand_asian_crisis_and_recovery_1997_2001` has audited policies ['thailand_30_baht_health_2001', 'thailand_baht_float_1997', 'thailand_fidf_bank_restructuring_1998', 'thailand_imf_letter_of_intent_1997', 'thailand_inflation_targeting_2000', 'thailand_village_fund_2001'] but no child policy has an evaluation design.
+- `thailand_chatichai_ct_1988_1991` has audited policies ['th_bibf_planning_1989_1991', 'th_indochina_trade_opening_1988_1991', 'th_sixth_5yr_plan_acceleration_1988'] but no child policy has an evaluation design.
+- `thailand_chavalit_nap_1996_1997` has audited policies ['th_baht_float_july_1997', 'th_bot_reserve_depletion_1996_1997', 'th_finance_company_suspensions_1997', 'th_imf_stand_by_arrangement_1997', 'th_peoples_constitution_1997'] but no child policy has an evaluation design.
+- `thailand_chuan_ii_democrat_1997_2001` has audited policies ['th_14_august_package_1998', 'th_agriculture_debt_moratorium_2000', 'th_fidf_bank_recapitalisation_1998', 'th_imf_programme_implementation_1997_2000', 'th_ptt_partial_privatisation_2001', 'th_tambon_administrative_elections_1999'] but no child policy has an evaluation design.
+- `thailand_chuan_leekpai_democrat_1992_1995` has audited policies ['th_bibf_launch_1993', 'th_constitutional_drafting_initiation_1994_1995', 'th_tambon_fund_1994'] but no child policy has an evaluation design.
+- `thailand_kriangsak_military_1977_1980` has audited policies ['th_1978_constitution', 'th_china_trade_agreement_1978', 'th_fourth_nesdp_1977_1981', 'th_kriangsak_fuel_price_passthrough_1979'] but no child policy has an evaluation design.
+- `thailand_paetongtarn_pheu_thai_2024_present` has audited policies ['th_casino_entertainment_complex_bill_2025', 'th_digital_wallet_10k_baht_2024', 'th_financial_hub_bill_2025', 'th_land_bridge_project_2023', 'th_minimum_wage_400_baht_trajectory_2024', 'th_move_forward_dissolution_2024'] but no child policy has an evaluation design.
+- `thailand_prayut_junta_pprp_2014_2023` has audited policies ['th_2014_coup_ncpo_2014', 'th_2017_constitution', 'th_20_year_national_strategy_2018', 'th_boi_thailand_4_0_investment_push_2015_2023', 'th_eec_act_2018', 'th_minimum_wage_300_to_354_trajectory_2017_2022', 'th_welfare_card_pracharath_2017'] but no child policy has an evaluation design.
+- `thailand_prem_tinsulanonda_semi_democratic_1980_1988` has audited policies ['th_baht_devaluation_1984', 'th_boi_export_tax_holiday_regime_1983', 'th_eastern_seaboard_programme_1982', 'th_fifth_nesdp_1982_1986', 'th_order_66_2523_counterinsurgency_amnesty_1980', 'th_sixth_nesdp_1987_1991'] but no child policy has an evaluation design.
+- `thailand_samak_somchai_ppp_2008` has audited policies ['th_ppp_dissolution_ruling_2008', 'th_ppp_village_fund_rollover_2008', 'th_samak_preah_vihear_unesco_2008', 'th_samak_somchai_fiscal_stimulus_gfc_precursor_2008'] but no child policy has an evaluation design.
+- `thailand_srettha_pheu_thai_2023_2024` has audited policies ['th_digital_wallet_10k_baht_2024', 'th_energy_price_caps_2023_2024', 'th_land_bridge_project_2023', 'th_minimum_wage_400_baht_trajectory_2024', 'th_thaksin_return_royal_pardon_2023', 'th_visa_free_tourism_expansion_2023'] but no child policy has an evaluation design.
+- `thailand_surayud_interim_2006_2008` has audited policies ['th_2007_constitution_referendum', 'th_sufficiency_economy_10th_plan_2007', 'th_surayud_capital_controls_dec_2006', 'th_thai_rak_thai_dissolution_2007'] but no child policy has an evaluation design.
+- `thailand_thaksin_trt_2001_2006` has audited policies ['th_2006_military_coup', 'th_30_baht_universal_healthcare_2001', 'th_imf_early_repayment_2003', 'th_otop_rural_enterprise_2001', 'th_shin_corp_temasek_sale_2006', 'th_village_urban_revolving_fund_2001', 'th_war_on_drugs_2003'] but no child policy has an evaluation design.
+- `thailand_yingluck_pheu_thai_2011_2014` has audited policies ['th_yingluck_amnesty_bill_2013', 'th_yingluck_corporate_tax_cut_2012_2013', 'th_yingluck_first_car_buyer_rebate_2011_2012', 'th_yingluck_minimum_wage_300_baht_2012', 'th_yingluck_rice_pledging_scheme_2011_2014'] but no child policy has an evaluation design.
+- `thatcherism` has audited policies ['uk_big_bang_financial_deregulation_1986', 'uk_council_house_right_to_buy_1980', 'uk_income_tax_cuts_1988', 'uk_miners_strike_resolution_1984_1985', 'uk_poll_tax_community_charge_1989', 'uk_privatisations_british_gas_1986', 'uk_privatisations_british_telecom_1984', 'uk_trade_union_act_1984'] but no child policy has an evaluation design.
+- `tunisia_bourguiba_state_modernisation_1956_1987` has audited policies ['tun_code_personal_status_1956', 'tun_education_health_expansion_1958_1970s', 'tun_perspectives_decennales_1962'] but no child policy has an evaluation design.
+- `turkey_ciller_dyp_1993_1996` has audited policies ['tr_1994_stabilisation_package', 'tr_dyp_refah_coalition_1996', 'tr_eu_customs_union_1995', 'tr_privatisation_programme_1993_1996'] but no child policy has an evaluation design.
+- `turkey_erbakan_refah_1996_1997` has audited policies ['tr_d8_founding_1997', 'tr_february_28_process_1997', 'tr_iran_gas_deal_1996'] but no child policy has an evaluation design.
+- `turkey_erdogan_akp_2002_present` has audited policies ['turkey_cbrt_political_pressure_2013_2023', 'turkey_erdogan_low_rate_heterodoxy_2021_2023', 'turkey_imf_stabilisation_continuation_2002_2008', 'turkey_kkm_fx_protected_deposits_2021', 'turkey_post_2016_institutional_consolidation', 'turkey_soe_privatisation_programme_2003_2013'] but no child policy has an evaluation design.
+- `turkey_erdogan_akp_supermajority_2011_2018` has audited policies ['tr_constitutional_referendum_executive_presidency_2017', 'tr_gezi_protest_crackdown_2013', 'tr_kgf_credit_guarantee_expansion_2017', 'tr_ohal_state_of_emergency_2016_2018', 'tr_post_coup_judicial_purge_2016_2018'] but no child policy has an evaluation design.
+- `turkey_erdogan_presidential_system_2018_2023` has audited policies ['tr_cbrt_governor_dismissals_2019_2021', 'tr_earthquake_response_fiscal_package_2023', 'tr_executive_presidency_inauguration_2018', 'tr_kkm_fx_protected_deposits_2021', 'tr_lira_crisis_brunson_2018', 'turkey_erdogan_low_rate_heterodoxy_2021_2023'] but no child policy has an evaluation design.
+- `turkey_erdogan_third_presidential_2023_present` has audited policies ['tr_cbrt_rate_hike_cycle_2023_2024', 'tr_earthquake_reconstruction_programme_2023_2025', 'tr_imamoglu_imprisonment_2025', 'tr_kkm_unwind_2023_2025', 'tr_simsek_orthodox_pivot_2023'] but no child policy has an evaluation design.
+- `turkey_evren_military_1980_1983` has audited policies ['tr_1982_constitution_authoritarian_lock_in', 'tr_banker_scandal_financial_deregulation_1982', 'tr_ozal_export_subsidies_deepening_1980_1983', 'tr_trade_union_suppression_martial_law_1980'] but no child policy has an evaluation design.
+- `turkey_ozal_market_reforms_1983_1993` has audited policies ['turkey_24_january_1980_programme', 'turkey_capital_account_liberalisation_1989', 'turkey_export_promotion_regime_1980_1988', 'turkey_islamic_banking_legalisation_1983', 'turkey_vat_introduction_1985'] but no child policy has an evaluation design.
+- `turkey_pre_coup_instability_1975_1980` has audited policies ['tr_1977_1979_workers_remittance_fx_shortage', 'tr_isi_model_terminal_crisis_1977_1980', 'tr_january_24_1980_stabilisation_package'] but no child policy has an evaluation design.
+- `turkey_yilmaz_ecevit_coalitions_1997_2002` has audited policies ['tr_2001_banking_currency_crisis', 'tr_bddk_establishment_1999', 'tr_central_bank_independence_2001', 'tr_dervis_transition_programme_2001', 'tr_eu_candidate_constitutional_amendments_2001'] but no child policy has an evaluation design.
+- `uae_emirate_state_capitalism_1971_present` has audited policies ['uae_corporate_tax_introduction_2023', 'uae_difc_adgm_financial_zones_2004_2015', 'uae_dirham_peg_1997', 'uae_foreign_ownership_reform_2020', 'uae_jafza_free_zone_1985', 'uae_vat_introduction_2018'] but no child policy has an evaluation design.
+- `uae_khalifa_early_era_2004_2014` has audited policies ['ae_abu_dhabi_dubai_bailout_2009', 'ae_arab_spring_welfare_package_2011', 'ae_difc_launch_2004', 'ae_dp_world_globalisation_2006', 'ae_emirates_airline_expansion_2004_2014', 'ae_fnc_partial_elections_2006'] but no child policy has an evaluation design.
+- `uae_khalifa_global_financial_crisis_2008_2010` has audited policies ['ae_abu_dhabi_dubai_bailout_2009', 'ae_aed_peg_defence_2008_2010', 'ae_difc_crisis_regulation_2009'] but no child policy has an evaluation design.
+- `uae_mbz_crown_prince_era_2014_2022` has audited policies ['ae_abraham_accords_2020', 'ae_alcohol_cohabitation_decrim_2020', 'ae_barakah_first_reactor_2021', 'ae_expo_2020_dubai_2021', 'ae_foreign_ownership_onshore_2020', 'ae_golden_visa_2019', 'ae_vat_introduction_2018'] but no child policy has an evaluation design.
+- `uae_mbz_presidency_2022_present` has audited policies ['ae_barakah_full_operations_2024', 'ae_cop28_hosting_2023', 'ae_corporate_tax_2023', 'ae_g42_ai_strategy_2022', 'ae_nonmuslim_family_law_2022', 'ae_weekend_switch_2022'] but no child policy has an evaluation design.
+- `uae_zayed_consolidation_1976_1990` has audited policies ['ae_adnoc_upstream_consolidation_1978', 'ae_federal_budget_transfers_mechanism_1976', 'ae_gcc_founding_1981', 'ae_jebel_ali_free_zone_1979'] but no child policy has an evaluation design.
+- `uae_zayed_late_era_1995_2004` has audited policies ['ae_difc_establishment_law_2004', 'ae_dubai_internet_city_1999', 'ae_dubai_media_city_2000', 'ae_emirates_airline_expansion_1995_2004', 'ae_post_911_financial_compliance_2001_2004'] but no child policy has an evaluation design.
+- `uae_zayed_oil_price_collapse_response_1985_1995` has audited policies ['ae_adia_diversification_1980s', 'ae_emirates_airline_launch_1985', 'ae_jebel_ali_expansion_1985_1995'] but no child policy has an evaluation design.
+- `uganda_museveni_nrm_2021_2026` has audited policies ['ug_anti_homosexuality_act_2023', 'ug_lake_albert_oil_eacop_fid_2022', 'ug_parish_development_model_2022'] but no child policy has an evaluation design.
+- `uk_attlee_welfare_state_1945_1951` has audited policies ['uk_bank_of_england_nationalisation_1946', 'uk_coal_nationalisation_1946', 'uk_iron_steel_nationalisation_1949', 'uk_national_insurance_act_1946', 'uk_nhs_act_1946', 'uk_town_country_planning_act_1947', 'uk_transport_act_1947'] but no child policy has an evaluation design.
+- `uk_blair_first_second_term_1997_2005` has audited policies ['uk_bank_of_england_independence_1997', 'uk_national_minimum_wage_1998', 'uk_nhs_capacity_expansion_2001_2010', 'uk_nhs_spending_ramp_2000', 'uk_public_sector_employment_growth_2001_2010', 'uk_sure_start_1998', 'uk_tax_credits_expansion', 'uk_tax_credits_wftc_ctc_1999_2003', 'uk_windfall_tax_utilities_1997', 'uk_working_time_regulations_1998'] but no child policy has an evaluation design.
+- `uk_brexit_2016_2020` has audited policies ['uk_end_of_free_movement_2021', 'uk_regulatory_divergence_post_brexit', 'uk_trade_cooperation_agreement_2020'] but no child policy has an evaluation design.
+- `uk_brown_labour_2007_2010` has audited policies ['uk_bank_recapitalisation_2008', 'uk_g20_london_summit_2009', 'uk_northern_rock_nationalisation_2008', 'uk_vat_cut_gfc_2008_2009'] but no child policy has an evaluation design.
+- `uk_callaghan_imf_1976` has audited policies ['uk_dce_monetary_targeting_1976', 'uk_imf_standby_1976', 'uk_incomes_policy_social_contract_1975_1978', 'uk_public_expenditure_white_paper_1976'] but no child policy has an evaluation design.
+- `uk_callaghan_labour_1976_1979` has audited policies ['uk_british_aerospace_shipbuilding_nationalisation_1977', 'uk_public_expenditure_white_paper_1976', 'uk_social_contract_phase_3_4_1976_1978', 'uk_sterling_m3_targeting_1976', 'uk_winter_of_discontent_paynorm_breakdown_1978_1979'] but no child policy has an evaluation design.
+- `uk_cameron_osborne_austerity_2010_2016` has audited policies ['uk_austerity_2010_2015', 'uk_corporate_tax_reduction_2010_2015', 'uk_working_age_welfare_reform_2010_2016'] but no child policy has an evaluation design.
+- `uk_energy_cost_regime_2021_2024` has audited policies ['uk_net_zero_transition_2019_2050', 'uk_network_charge_structure', 'uk_wholesale_market_gas_indexation'] but no child policy has an evaluation design.
+- `uk_johnson_conservative_2019_2022` has audited policies ['uk_corporation_tax_rise_announcement_2021', 'uk_covid_furlough_scheme_2020', 'uk_health_social_care_levy_2022', 'uk_levelling_up_white_paper_2022', 'uk_points_based_immigration_2021', 'uk_subsidy_control_act_2022'] but no child policy has an evaluation design.
+- `uk_major_post_thatcher_1990_1997` has audited policies ['uk_british_coal_privatisation_1994', 'uk_council_tax_1992', 'uk_erm_entry_and_ejection_1990_1992', 'uk_inflation_target_regime_1992', 'uk_maastricht_opt_outs_1993', 'uk_pfi_launch_1992', 'uk_rail_privatisation_1993_1997'] but no child policy has an evaluation design.
+- `uk_may_conservative_2016_2019` has audited policies ['uk_article_50_notification_2017', 'uk_grenfell_cladding_regime_response_2017', 'uk_industrial_strategy_white_paper_2017', 'uk_windrush_scandal_response_2018', 'uk_withdrawal_agreement_three_defeats_2019'] but no child policy has an evaluation design.
+- `uk_new_liberalism_1906_1914` has audited policies ['uk_labour_exchanges_act_1909', 'uk_national_insurance_act_1911', 'uk_old_age_pensions_act_1908', 'uk_peoples_budget_1909', 'uk_trade_boards_act_1909'] but no child policy has an evaluation design.
+- `uk_planning_restriction_regime` has audited policies ['uk_greenbelt_protection_sustained', 'uk_local_authority_planning_discretion', 'uk_nimby_public_inquiry_regime'] but no child policy has an evaluation design.
+- `uk_starmer_labour_2024_present` has audited policies ['uk_autumn_budget_2024_tax_package', 'uk_clean_power_2030_action_plan_2024', 'uk_employment_rights_bill_2024', 'uk_great_british_energy_act_2024', 'uk_national_wealth_fund_2024', 'uk_planning_housing_target_revision_2024', 'uk_rail_public_ownership_act_2024', 'uk_renters_rights_act_2025', 'uk_tobacco_vapes_act_2026', 'uk_vat_private_school_fees_2025', 'uk_water_special_measures_act_2025'] but no child policy has an evaluation design.
+- `uk_sunak_conservative_2022_2024` has audited policies ['uk_autumn_statement_fiscal_drag_2022', 'uk_corporation_tax_increase_2023', 'uk_full_expensing_capital_allowance_2023', 'uk_illegal_migration_rwanda_acts_2023_2024', 'uk_national_insurance_cuts_2024', 'uk_windsor_framework_2023'] but no child policy has an evaluation design.
+- `uk_thatcher_first_term_1979_1983` has audited policies ['uk_employment_act_1980', 'uk_employment_act_1982', 'uk_exchange_control_abolition_1979', 'uk_first_wave_privatisations_1981_1983', 'uk_howe_budget_1979', 'uk_howe_budget_1981_tax_rise_in_recession', 'uk_medium_term_financial_strategy_1980'] but no child policy has an evaluation design.
+- `uk_thatcher_second_term_1983_1987` has audited policies ['uk_big_bang_financial_deregulation_1986', 'uk_british_airways_privatisation_1987', 'uk_corporation_tax_reform_1984_1986', 'uk_miners_strike_resolution_1984_1985', 'uk_privatisations_british_gas_1986', 'uk_privatisations_british_telecom_1984', 'uk_trade_union_act_1984', 'uk_wages_act_1986'] but no child policy has an evaluation design.
+- `uk_thatcher_third_term_1987_1990` has audited policies ['uk_electricity_privatisation_1989_1990', 'uk_lawson_budget_1988', 'uk_nhs_internal_market_1990', 'uk_poll_tax_community_charge_1988_1990', 'uk_water_privatisation_1989'] but no child policy has an evaluation design.
+- `ukraine_independence_transition_1991_1999` has audited policies ['ua_hryvnia_stabilisation_1996', 'ua_independence_property_transition_1991', 'ua_mass_privatization_certificates_1995'] but no child policy has an evaluation design.
+- `uruguay_lacalle_pou_pn_2020_2025` has audited policies ['uy_fta_china_exploration_2022_2023', 'uy_luc_ley_urgente_consideracion_2020', 'uy_mercosur_cet_reduction_push_2021', 'uy_pension_reform_2023'] but no child policy has an evaluation design.
+- `uruguay_mujica_fa_2010_2015` has audited policies ['uy_abortion_decriminalisation_2012', 'uy_cannabis_legal_market_2013', 'uy_financial_inclusion_law_2014', 'uy_montes_del_plata_pulp_mill_2014', 'uy_same_sex_marriage_law_2013'] but no child policy has an evaluation design.
+- `uruguay_orsi_fa_2025_present` has audited policies ['uy_bono_crianza_expansion_2025', 'uy_pension_reform_partial_softening_2025'] but no child policy has an evaluation design.
+- `uruguay_vazquez_i_fa_2005_2010` has audited policies ['uy_botnia_upm_pulp_mill_2005_2007', 'uy_fonasa_snis_health_reform_2007', 'uy_irpf_tax_reform_2007', 'uy_panes_emergency_plan_2005', 'uy_pension_flex_reform_2008'] but no child policy has an evaluation design.
+- `uruguay_vazquez_ii_fa_2015_2020` has audited policies ['uy_cannabis_market_rollout_2017', 'uy_tax_reform_2015', 'uy_upm_ii_pulp_mill_contract_2017'] but no child policy has an evaluation design.
+- `us_biden_administration_broad_2021_2025` has audited policies ['us_arp_american_rescue_plan_2021', 'us_biden_china_export_controls_2022_2023', 'us_biden_student_debt_relief_2022_2024', 'us_chips_act_2022', 'us_ftc_doj_merger_guidelines_2023', 'us_ftc_noncompete_ban_2024', 'us_infrastructure_act_2021', 'us_ira_inflation_reduction_act_2022', 'us_nlrb_cemex_joint_employer_2022_2024'] but no child policy has an evaluation design.
+- `us_bush_41_republican_1989_1993` has audited policies ['us_americans_with_disabilities_act_1990', 'us_clean_air_act_amendments_1990', 'us_firrea_sl_cleanup_1989', 'us_gulf_war_fiscal_1990_1991', 'us_obra_1990_budget_deal'] but no child policy has an evaluation design.
+- `us_bush_43_first_term_broad_2001_2005` has audited policies ['us_afghanistan_iraq_auth_2001_2002', 'us_egtrra_tax_cut_2001', 'us_jgtrra_tax_cut_2003', 'us_medicare_part_d_2003', 'us_no_child_left_behind_2002', 'us_patriot_act_2001', 'us_sarbanes_oxley_2002'] but no child policy has an evaluation design.
+- `us_bush_43_second_term_2005_2009` has audited policies ['us_bear_stearns_jpm_rescue_2008', 'us_fannie_freddie_conservatorship_2008', 'us_iraq_surge_2007', 'us_katrina_response_2005', 'us_tarp_2008'] but no child policy has an evaluation design.
+- `us_carter_stagflation_era_1977_1981` has audited policies ['us_airline_deregulation_1978', 'us_airline_deregulation_act_1978', 'us_didmca_1980', 'us_doe_creation_1977', 'us_motor_carrier_act_1980', 'us_natural_gas_policy_act_1978', 'us_staggers_rail_act_1980', 'us_volcker_appointment_1979'] but no child policy has an evaluation design.
+- `us_clinton_first_term_1993_1997` has audited policies ['mexico_nafta_1994', 'us_assault_weapons_ban_1994', 'us_clinton_welfare_reform_1996', 'us_health_security_act_failure_1993_1994', 'us_obra_1993_deficit_reduction'] but no child policy has an evaluation design.
+- `us_clinton_second_term_1997_2001` has audited policies ['us_balanced_budget_act_1997', 'us_capital_gains_cut_1997', 'us_clinton_impeachment_1998_1999', 'us_commodity_futures_modernization_2000', 'us_gramm_leach_bliley_1999'] but no child policy has an evaluation design.
+- `us_fdr_new_deal_1933_1939` has audited policies ['us_aaa_1933', 'us_flsa_1938', 'us_glass_steagall_banking_act_1933', 'us_securities_act_1933', 'us_securities_exchange_act_1934', 'us_social_security_act_1935', 'us_tva_1933', 'us_wagner_act_1935'] but no child policy has an evaluation design.
+- `us_fed_qe_2008_2014` has audited policies ['us_forward_guidance', 'us_qe1_2008', 'us_qe2_2010', 'us_qe3_2012', 'us_zirp_2008_2015'] but no child policy has an evaluation design.
+- `us_lbj_great_society_1964_1968` has audited policies ['us_eoa_1964', 'us_esea_1965', 'us_higher_education_act_1965', 'us_medicaid_1965', 'us_medicare_1965', 'us_voting_rights_act_1965'] but no child policy has an evaluation design.
+- `us_obama_ara_2009_recovery` has audited policies ['us_aca_2010', 'us_arra_2009', 'us_cfpb_creation_2010', 'us_dodd_frank_2010', 'us_medicaid_expansion_2010'] but no child policy has an evaluation design.
+- `us_obama_first_term_2009_2013` has audited policies ['us_aca_obamacare_2010', 'us_affordable_care_act_2010', 'us_auto_bailout_gm_chrysler_2009', 'us_daca_executive_action_2012', 'us_dodd_frank_2010', 'us_obama_ara_2009_recovery'] but no child policy has an evaluation design.
+- `us_obama_second_term_2013_2017` has audited policies ['us_clean_power_plan_2015', 'us_cuba_reopening_2014_2015', 'us_iran_jcpoa_2015', 'us_paris_agreement_signature_2016', 'us_tpp_signature_2016'] but no child policy has an evaluation design.
+- `us_progressive_era_reform_consensus_1901_1917` has audited policies ['us_16th_amendment_income_tax_1913', 'us_federal_reserve_act_1913', 'us_ftc_clayton_competition_package_1914', 'us_hepburn_act_1906', 'us_pure_food_drug_act_1906'] but no child policy has an evaluation design.
+- `us_reagan_first_term_broad_1981_1985` has audited policies ['us_defence_buildup_reagan_1981_1985', 'us_erta_1981', 'us_patco_strike_1981', 'us_reagan_tax_reform_1981', 'us_sdi_announcement_1983', 'us_tefra_1982'] but no child policy has an evaluation design.
+- `us_reagan_second_term_1985_1989` has audited policies ['us_black_monday_1987_response', 'us_immigration_reform_control_1986', 'us_inf_treaty_1987', 'us_sl_crisis_onset_1986_1989', 'us_tax_reform_act_1986'] but no child policy has an evaluation design.
+- `us_trump_first_term_broad_2017_2021` has audited policies ['us_cares_act_covid_fiscal_response_2020', 'us_section_232_steel_aluminum_tariffs_2018', 'us_section_301_china_tariffs_2018_2019', 'us_tcja_tax_cuts_jobs_act_2017', 'us_trump_deregulation_executive_orders_2017_2021', 'us_trump_immigration_restriction_eos_2017_2020', 'us_trump_paris_withdrawal_2017_2020', 'us_trump_tariffs_2018_2019', 'us_usmca_2020'] but no child policy has an evaluation design.
+- `us_trump_second_term_2025_present` has audited policies ['us_trump2_doge_executive_order_2025', 'us_trump2_ieepa_fentanyl_tariffs_2025', 'us_trump2_immigration_enforcement_eos_2025', 'us_trump2_liberation_day_tariffs_2025', 'us_trump2_paris_withdrawal_2025', 'us_trump2_schedule_f_deregulation_2025', 'us_trump2_strategic_bitcoin_reserve_2025'] but no child policy has an evaluation design.
+- `us_trump_tariffs_2018_2019` has audited policies ['us_section_232_tariffs_2018', 'us_section_301_china_tariffs_2018', 'us_usmca_2020'] but no child policy has an evaluation design.
+- `us_trump_tcja_2017` has audited policies ['us_tcja_corporate_tax_cut_2017', 'us_tcja_individual_cuts_2017', 'us_tcja_salt_cap_2017'] but no child policy has an evaluation design.
+- `venezuela_caldera_convergencia_1994_1999` has audited policies ['ve_agenda_venezuela_imf_1996', 've_apertura_petrolera_1992_1997', 've_banking_crisis_fogade_1994', 've_chavez_pardon_1994', 've_exchange_controls_1994_1996'] but no child policy has an evaluation design.
+- `venezuela_herrera_copei_1979_1984` has audited policies ['ve_caracas_metro_commissioning_1983', 've_external_debt_moratorium_1983', 've_recadi_multiple_exchange_rates_1983', 've_vi_plan_1981_1985', 've_viernes_negro_fx_regime_collapse_1983'] but no child policy has an evaluation design.
+- `venezuela_maduro_era_distinct_2013_present` has audited policies ['venezuela_bolivar_redenomination_2018', 'venezuela_bolivar_redenomination_2021', 'venezuela_de_facto_dollarisation_2019', 'venezuela_fiscal_monetary_fusion_2013_2019', 'venezuela_oil_sector_pdvsa_collapse_2013_2020', 'venezuela_petro_cryptocurrency_2018', 'venezuela_price_fx_control_relaxation_2019'] but no child policy has an evaluation design.
+- `venezuela_perez_first_term_1974_1979` has audited policies ['ve_external_debt_expansion_1974_1978', 've_iron_nationalisation_decree_580_1974', 've_oil_nationalisation_ley_5_1975', 've_pdvsa_creation_1976', 've_v_plan_gran_venezuela_1976'] but no child policy has an evaluation design.
+- `venezuela_perez_second_term_1989_1993` has audited policies ['ve_cantv_viasa_privatisation_1991', 've_caracazo_february_1989', 've_chavez_coup_attempts_1992', 've_gran_viraje_imf_package_1989', 've_perez_impeachment_1993'] but no child policy has an evaluation design.
+- `vietnam_do_muoi_gs_era_1991_1997` has audited policies ['vn_1992_constitution_market_recognition', 'vn_asean_accession_1995', 'vn_land_law_1993', 'vn_soe_general_corporations_1995', 'vn_us_normalisation_1995'] but no child policy has an evaluation design.
+- `vietnam_doi_moi_1986` has audited policies ['vietnam_doi_moi_1986', 'vietnam_enterprise_law_1999', 'vietnam_resolution_10_1988', 'vietnam_soe_equitisation_1992_present', 'vietnam_us_bta_2001', 'vietnam_wto_accession_2007'] but no child policy has an evaluation design.
+- `vietnam_dung_pm_2006_2016` has audited policies ['vn_constitution_revision_2013', 'vn_gfc_stimulus_package_2009', 'vn_state_economic_groups_soe_expansion_2006_2012', 'vn_vamc_npl_cleanup_2013', 'vn_wto_accession_2007'] but no child policy has an evaluation design.
+- `vietnam_khai_manh_doi_moi_deepening_1997_2006` has audited policies ['vn_enterprise_law_1999', 'vn_land_law_2003', 'vn_soe_equitisation_programme_2000_2006', 'vn_stock_exchange_launch_2000', 'vn_us_bilateral_trade_agreement_2000', 'vn_wto_accession_preparation_2001_2007'] but no child policy has an evaluation design.
+- `vietnam_le_duan_post_reunification_1976_1986` has audited policies ['vn_cambodia_invasion_1978_1989', 'vn_currency_reform_hyperinflation_1985', 'vn_directive_100_khoan_1981', 'vn_reunification_1976', 'vn_ussr_friendship_treaty_cmea_1978', 'vn_x2_campaign_socialist_transformation_south_1978'] but no child policy has an evaluation design.
+- `vietnam_linh_doi_moi_implementation_1986_1991` has audited policies ['vn_foreign_investment_law_1987', 'vn_khoan_10_agriculture_1988', 'vn_price_liberalisation_1989', 'vn_private_enterprise_law_1990'] but no child policy has an evaluation design.
+- `vietnam_phuc_pm_2016_2021` has audited policies ['vn_blazing_furnace_anti_corruption_escalation_2016_2021', 'vn_covid_early_containment_border_closure_2020', 'vn_cptpp_ratification_2018', 'vn_eu_vietnam_fta_ratification_2020', 'vn_rcep_signature_2020'] but no child policy has an evaluation design.
+- `vietnam_to_lam_2024_present` has audited policies ['vn_blazing_furnace_anti_corruption_2016_2024', 'vn_chip_semiconductor_strategy_2023_present', 'vn_land_law_revision_2024', 'vn_resolution_68_private_sector_2025', 'vn_state_apparatus_streamlining_2024_2025'] but no child policy has an evaluation design.
+- `vietnam_trong_era_2011_2024` has audited policies ['vn_blazing_furnace_anti_corruption_2016_2024', 'vn_cptpp_entry_2019', 'vn_evfta_entry_2020', 'vn_land_law_revision_2024', 'vn_resolution_68_private_sector_2025', 'vn_state_economic_groups_soe_expansion_2006_2012'] but no child policy has an evaluation design.
+- `volcker_disinflation_1979_1982` has audited policies ['us_fed_funds_rate_spike_1979_1981', 'us_monetary_targeting_shift_1979', 'us_volcker_disinflation_1979_1982'] but no child policy has an evaluation design.
+- `yugoslavia_post_tito_decline_1980_1989` has audited policies ['yu_hyperinflation_1988_1989', 'yu_imf_stabilisation_1982_1988', 'yu_markovic_reforms_1989_1990'] but no child policy has an evaluation design.
+- `yugoslavia_tito_late_self_management_1976_1980` has audited policies ['yu_1974_constitution', 'yu_associated_labour_law_1976', 'yu_western_debt_accumulation_1973_1980'] but no child policy has an evaluation design.
+- `zaire_mobutu_mpr_1965_1997` has audited policies ['cd_gecamines_resource_state_1967', 'cd_monetary_fiscal_instability_1970s_1990s', 'cd_zairianisation_1973'] but no child policy has an evaluation design.
+- `zambia_hichilema_upnd_2021_present` has audited policies ['zm_g20_common_framework_debt_restructuring_2023_2024', 'zm_imf_ecf_2022', 'zm_mineral_royalty_regime_reform_2022'] but no child policy has an evaluation design.
+- `zambia_msunwe_structural_adjustment_1991_2001` has audited policies ['zambia_kwacha_liberalisation_1992', 'zambia_namboard_dismantling_1993', 'zambia_price_control_abolition_1991', 'zambia_privatisation_agency_1992', 'zambia_zccm_privatisation_2000'] but no child policy has an evaluation design.
+
+## Axes missing second-order guidance
+- None among matched axes.
+
+## Data/fetcher gap candidates
+- household expenditure surveys (5)
+- producer margin surveys (2)
+- product disappearance counts (2)
+- official price schedules (2)
+- enforcement action microdata (2)
+- constructed transfer-vs-price-control welfare ledger (1)
+- electricity outage frequency (1)
+- energy-sector investment (1)
+- fuel inventories and station outages (1)
+- household energy expenditure microdata (1)
+- transfer recipient records (1)
+- constructed energy welfare ledger (1)
+- household energy expenditure surveys (1)
+- utility customer class data (1)
+- budget transfers (1)
+- connection subsidy records (1)
+- constructed access/reliability/fiscal welfare ledger (1)
+- household electricity access and expenditure microdata (1)
+- quasi-fiscal deficit estimates (1)
+- utility arrears (1)
+- IMF energy subsidy database (1)
+- constructed access and reliability welfare ledger (1)
+- household energy CPI components (1)
+- national tariff schedules (1)
+- constructed welfare ledger by episode and category (1)
+- consumer complaints and substitution surveys (1)
+- package-size and quality-adjusted price datasets (1)
+- rationing entitlement records (1)
+- EMA/FDA/national reimbursement approval dates (1)
+- IQVIA launch and price datasets (1)
+- IQVIA launch dates (1)
+- OECD pharmaceutical spending and price indices (1)
+- constructed drug-launch welfare ledger (1)
+- country-drug availability panels (1)
+- formulary restriction data (1)
+- national drug price registries (1)
+- prescription wait-time surveys (1)
+- reimbursement delay records (1)
+- CPI food micro-components (1)
+- FAO producer-price data (1)
+- constructed food-category welfare ledger (1)
+- consumer complaint records (1)
+- food quality inspection records (1)
+- market-arrival data by channel (1)
+- official procurement-price schedules (1)
+- scanner package-size data (1)
+- trade and border seizure records (1)
+- ACS commute and migration microdata (1)
+- building permits (1)
+- city rent microdata by controlled versus uncontrolled status (1)
+- city-level supply elasticity estimates (1)
+- completions (1)
+- lease duration and move records (1)
+- rental listings (1)
+- ACS household microdata (1)
+- ACS migration and tenure records (1)
+- US Census BPS metro permits (1)
+- constructed rent-gap plus quantity, queue, quality, and stock-flow ledger (1)
+- household income and tenure crosswalks (1)
+- municipal completion records (1)
+- rent-board tenancy duration (1)
+- rental listings by regulated/exempt status (1)
+- ACS migration and tenure microdata (1)
+- ACS/Census tenure-income microdata (1)
+- AirDNA or municipal short-term rental registries (1)
+- BLS MSA rent CPI subcomponents (1)
+- Berlin ImmoScout regulated-listing rents (1)
+- Eurostat subnational building-permit series (1)
+- Stockholm Bostadsformedlingen queue years (1)
+- US Census Building Permits Survey metro data (1)
+- Zillow/Apartment List city rent panels (1)
+- assessor condominium conversion records (1)
+- city code violation databases (1)
+- constructed welfare ledger from rent gaps, quantities, wait times, quality, and supply response (1)
+- maintenance complaint portals (1)
+- municipal completions and rental-listing feeds (1)
+- municipal waitlist records (1)
+- property tax class transitions (1)
+- property-condition survey microdata (1)
+- unit-level tenancy-duration records where accessible (1)
+- EU-SILC housing deprivation by tenure (1)
+- EU-SILC tenure-income microdata (1)
+- EU-SILC tenure-specific housing-cost microdata (1)
+- Eurostat tenure-share panels (1)
+- eurostat:bldg_pi_lt (1)
+- eurostat:ilc_lvho07a (1)
+- national building-permit and completion registers (1)
+- national cadastral tenure transitions (1)
+- national maintenance expenditure surveys (1)
+- national rental contract duration panels (1)
+- short-term rental registries (1)
+- budget subsidy lines (1)
+- constructed episode/category welfare ledger (1)
+- consumer complaint surveys (1)
+- enforcement agency records (1)
+- inspection and penalty counts (1)
+- rationing eligibility records (1)
+- scanner package-size microdata (1)
+- Deaton-Muellbauer quantity-rationing welfare ledger (1)
+- border seizure and smuggling reports (1)
+- consumer protection complaints (1)
+- controlled vs parallel quantity and price panels (1)
+- enforcement and inspection records (1)
+- national CPI controlled-basket components (1)
+- package-size archives (1)
+- parallel-market price archives (1)
+- producer and retailer margin data (1)
+- scanner data (1)
+- Hsieh-Klenow style MPK dispersion (1)
+- OECD STAN sector productivity (1)
+- WB Enterprise Surveys (1)
+- firm entry/exit (1)
+- firm-level balance sheet panels (1)
+- national industrial censuses (1)
+- sector employment and wage panels (1)
+- sectoral value-added per worker dispersion (1)
+- subsidy incidence by income or firm age (1)
+- CPI category microdata (1)
+- border seizure records (1)
+- constructed category welfare ledger (1)
+- informal market shares (1)
+- inventories (1)
+- parallel market category prices (1)
+- parallel price premiums (1)
+- retail sales by controlled category (1)
+- stockout surveys (1)
+- unit-level regulated/exempt classification (1)
+- listings linked to exemption status (1)
+- city-level mobility and quality/maintenance measures (1)
+- station-level stockout panel (1)
+- capped vs uncapped category scanner data (1)
+- retailer margin and compensation microdata (1)
+- monthly category shortage indicators beyond petroleum and beef (1)
+- product-quality and substitution measures (1)
+- compliance/enforcement cost data (1)
+- station-level outage and queue panel (1)
+- regional allocation quantity data (1)
+- consumer time-cost estimates (1)
+- consistent monthly controlled-basket shelf availability (1)
+- category-level official vs parallel prices (1)
+- weekly or monthly shelf-availability panel (1)
+- category-level parallel prices (1)
+
+## Data/fetcher readiness
+
+- Registered source families: 23
+- Mentioned source families: 18
+- Mentions by readiness: `{"partial_ready": 8, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 5, "scrape_needed": 2}`
+- Unmatched candidate source labels: 0
+
+### Mentioned source families
+- `household_distributional_microdata` (partial_ready, priority=high): 20 mention(s); fetchers: data.fetchers.eurostat, data.fetchers.oecd, data.fetchers.us_census, data.fetchers.wid, data.fetchers.world_bank_wdi
+- `shelf_availability_stockout_surveys` (reconstruct_needed, priority=high): 14 mention(s); fetchers: none
+- `retail_scanner_price_quantity_panel` (proprietary_gap, priority=high): 12 mention(s); fetchers: none
+- `rent_registry_cadastral_tenancy_microdata` (reconstruct_needed, priority=high): 12 mention(s); fetchers: data.fetchers.eurostat
+- `regulatory_enforcement_inspection_records` (reconstruct_needed, priority=high): 11 mention(s); fetchers: data.fetchers.mercatus, data.fetchers.world_bank_wdi
+- `welfare_accounting_case_ledger` (reconstruct_needed, priority=high): 11 mention(s); fetchers: none
+- `national_building_permits_completions` (partial_ready, priority=high): 10 mention(s); fetchers: data.fetchers.us_census, data.fetchers.eurostat, data.fetchers.destatis, data.fetchers.ons
+- `parallel_market_black_market_prices` (partial_ready, priority=high): 10 mention(s); fetchers: data.fetchers.dolartoday, data.fetchers.bcv, data.fetchers.hanke, data.fetchers.hanke_tc
+- `pharmaceutical_launch_price_access_panel` (proprietary_gap, priority=high): 8 mention(s); fetchers: data.fetchers.oecd, data.fetchers.who_gho
+- `official_price_schedule_control_registry` (scrape_needed, priority=high): 8 mention(s); fetchers: none
+- `firm_entry_exit_balance_sheet_panel` (partial_ready, priority=high): 7 mention(s); fetchers: data.fetchers.oecd, data.fetchers.eurostat, data.fetchers.world_bank_wdi, data.fetchers.bis, data.fetchers.ons, data.fetchers.destatis
+- `fiscal_tax_admin_compliance_panel` (partial_ready, priority=medium): 7 mention(s); fetchers: data.fetchers.imf_weo, data.fetchers.oecd, data.fetchers.world_bank_wdi, data.fetchers.ssb, data.fetchers.ine
+- `rental_listing_unit_microdata` (scrape_needed, priority=high): 7 mention(s); fetchers: none
+- `fuel_inventory_station_outage_queue_panel` (reconstruct_needed, priority=high): 6 mention(s); fetchers: data.fetchers.eia, data.fetchers.iea
+- `energy_reliability_outage_operator_data` (partial_ready, priority=high): 4 mention(s); fetchers: data.fetchers.eia, data.fetchers.iea, data.fetchers.irena, data.fetchers.eea, data.fetchers.world_bank_wdi
+- `healthcare_access_quality_wait_times` (partial_ready, priority=medium): 1 mention(s); fetchers: data.fetchers.oecd, data.fetchers.who_gho, data.fetchers.world_bank_wdi
+- `labour_market_admin_payroll_panel` (partial_ready, priority=medium): 1 mention(s); fetchers: data.fetchers.bls, data.fetchers.ilostat, data.fetchers.oecd, data.fetchers.eurostat, data.fetchers.usdol
+- `trade_customs_product_panel` (ready, priority=medium): 1 mention(s); fetchers: data.fetchers.wits, data.fetchers.un_comtrade, data.fetchers.unctad, data.fetchers.world_bank_wdi
+
+## Scoreboard impact
+
+- Current public claim links: 4739
+- After declared second-order gates: 4660 public, 79 held
+- After strict missing-contract gate: 19 public, 4720 held
+- Declared-gate hold reasons: `{"declared_measurement_hold": 79}`
+- Strict-gate hold reasons: `{"declared_measurement_hold": 79, "missing_contract_hold": 4641}`
+
+### Largest declared-gate scoreboard deltas
+- `degrowth`: q-net -5.6 -> -4.6 (+1.0); tested weight 141.2 -> 137.8
+- `market_socialist`: q-net -6.0 -> -5.0 (+1.0); tested weight 141.5 -> 138.0
+- `marxian`: q-net -2.8 -> -1.8 (+1.0); tested weight 145.0 -> 141.5
+- `mmt`: q-net -4.0 -> -3.0 (+1.0); tested weight 142.2 -> 138.8
+- `social_democratic`: q-net -5.8 -> -4.8 (+1.0); tested weight 156.2 -> 152.8
+- `democratic_socialist`: q-net -6.5 -> -5.5 (+1.0); tested weight 143.2 -> 140.2
+- `eco_socialist`: q-net -5.5 -> -4.5 (+1.0); tested weight 143.8 -> 140.8
+- `marxist_leninist`: q-net 0.0 -> 1.0 (+1.0); tested weight 142.2 -> 139.2
+- `post_keynesian`: q-net -4.4 -> -3.4 (+1.0); tested weight 147.0 -> 144.0
+- `austrian`: q-net 18.9 -> 18.4 (-0.5); tested weight 156.0 -> 152.5
+- `chicago_monetarism`: q-net 25.4 -> 24.9 (-0.5); tested weight 154.8 -> 151.2
+- `classical_liberal`: q-net 22.6 -> 22.1 (-0.5); tested weight 177.8 -> 174.2
+

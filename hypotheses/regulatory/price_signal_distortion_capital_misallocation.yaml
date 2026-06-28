@@ -79,6 +79,91 @@ variables:
       source: "pwt:hc"
       transformation: "level"
 
+mechanism_measurement:
+  mechanism_type: price_signal_distortion
+  design_features:
+    - panel_fe_screen
+    - controlled_vs_uncontrolled_categories
+    - welfare_accounting
+    - distributional_decomposition
+  comparison_structure:
+    treated_units:
+      - country-years with high price-distortion, input-subsidy, or directed-credit exposure
+    control_units:
+      - country-years with lower price-distortion exposure
+    controlled_or_regulated_units:
+      - price-controlled sectors, subsidized inputs, and directed-credit recipients
+    exempt_or_uncontrolled_units:
+      - sectors without controlled prices or directed input subsidies
+    time_frequency: annual
+    notes: >
+      The theory is sector/firm-level. Country-level TFP screens are not
+      dispositive without MPK dispersion or sectoral productivity dispersion.
+  causal_layers:
+    - layer: first_order_price_or_transfer
+      mechanism: Price controls, input subsidies, or directed credit lower private costs for covered sectors.
+      variable_names: [price_distortion_index, fraser_price_controls_subindex, fuel_subsidy_share_gdp]
+      candidate_sources:
+        - Fraser EFW price controls
+        - IMF subsidy data
+        - directed-credit and financial-repression indices
+      measurement_status: proxy_only
+      required_for_dispositive_verdict: true
+    - layer: second_order_supply_response
+      mechanism: Covered sectors attract capital despite lower marginal-product discipline, slowing reallocation.
+      variable_names: [capital_misallocation_sd_log_mpk, sectoral_labour_productivity_dispersion]
+      candidate_sources:
+        - WB Enterprise Surveys
+        - national industrial censuses
+        - OECD STAN sector productivity
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: allocation_distortion
+      mechanism: Dispersion in marginal products rises when relative prices and finance are distorted.
+      variable_names: [capital_misallocation_sd_log_mpk, sectoral_labour_productivity_dispersion]
+      candidate_sources:
+        - Hsieh-Klenow style MPK dispersion
+        - firm-level balance sheet panels
+        - sectoral value-added per worker dispersion
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: net_welfare
+      mechanism: Any protected-sector transfer must be netted against aggregate TFP and reallocation losses.
+      variable_names: [tfp_growth_10yr]
+      candidate_sources:
+        - PWT TFP
+        - sectoral output and capital stocks
+        - subsidy and consumer price incidence
+      measurement_status: proxy_only
+      required_for_dispositive_verdict: true
+    - layer: distributional_incidence
+      mechanism: Incumbent firms, consumers, entrants, taxpayers, and future workers receive different effects.
+      variable_names: []
+      candidate_sources:
+        - firm entry/exit
+        - sector employment and wage panels
+        - subsidy incidence by income or firm age
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+  distributional_groups:
+    - incumbent_beneficiaries
+    - new_entrants
+    - uncovered_consumers
+    - suppliers
+    - taxpayers
+    - future_cohorts
+  welfare_accounting:
+    first_order_transfer: protected-sector price, subsidy, or credit discount
+    deadweight_loss: MPK dispersion and foregone reallocation gains
+    quality_loss: lower quality or variety from protected incumbency where measurable
+    future_supply_loss: lower TFP growth and slower entrant scaling
+    fiscal_or_enforcement_cost: subsidies, directed-credit losses, and enforcement costs
+    net_welfare_formula: protected_transfer - deadweight_loss - quality_loss - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    The existing result has the correct sign but is not significant and lacks
+    the primary MPK-dispersion data. It should remain a triage screen.
+
 intervention_channel: regulatory
 intervention_channel_justification: >
   Price controls and directed input subsidies are direct regulatory

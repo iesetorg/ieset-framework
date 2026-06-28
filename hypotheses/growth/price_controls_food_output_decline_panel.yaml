@@ -61,6 +61,92 @@ variables:
   - name: rule_of_law
     source: wgi:RL.EST
     transformation: level
+mechanism_measurement:
+  mechanism_type: price_control
+  design_features:
+  - panel_fe_screen
+  - controlled_vs_uncontrolled_categories
+  - high_frequency_event_study
+  - welfare_accounting
+  - distributional_decomposition
+  - leakage_substitution
+  comparison_structure:
+    treated_units:
+    - country-years coded as having long-lived food price controls or state procurement
+    control_units:
+    - country-years without the coded treatment
+    controlled_or_regulated_units:
+    - controlled staple-food categories and state-procured commodities
+    exempt_or_uncontrolled_units:
+    - uncapped crops, imported substitutes, informal sellers, and uncontrolled retail channels
+    time_frequency: annual
+    notes: >
+      The current run is a broad annual country-panel screen using
+      agricultural value-added share. It does not identify controlled crops
+      versus uncontrolled crops, official versus informal channels, or
+      producer-margin responses.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Controlled food prices or procurement terms lower official consumer prices or stabilize procurement prices.
+    variable_names: []
+    candidate_sources:
+    - CPI food micro-components
+    - official procurement-price schedules
+    - FAO producer-price data
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Producers reduce official-channel output or shift crops when controlled prices bind.
+    variable_names: [primary_sectoral_outcome]
+    candidate_sources:
+    - FAOSTAT crop-level production
+    - retail stockout surveys
+    - market arrivals and inventory datasets
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: leakage_or_substitution
+    mechanism: Supply moves to informal channels, exports, smuggling, uncapped substitutes, or self-consumption.
+    variable_names: []
+    candidate_sources:
+    - household expenditure surveys
+    - trade and border seizure records
+    - market-arrival data by channel
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: quality_margin
+    mechanism: Controlled staples degrade in quality, package size, freshness, or variety.
+    variable_names: []
+    candidate_sources:
+    - scanner package-size data
+    - consumer complaint records
+    - food quality inspection records
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Any consumer price transfer must be netted against shortages, quality loss, producer exit, and fiscal/enforcement cost.
+    variable_names: []
+    candidate_sources:
+    - constructed food-category welfare ledger
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - low_income_uncovered_households
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: official controlled-food price discount times official-channel quantity
+    deadweight_loss: foregone output, crop switching, and rationed food quantity
+    quality_loss: quality-adjusted or package-size deterioration
+    search_or_queue_cost: stockout search and queue costs
+    future_supply_loss: producer exit and reduced planting or investment
+    fiscal_or_enforcement_cost: procurement losses, subsidies, inspections, and enforcement
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    The current REFUTED result should be treated as a failed broad proxy
+    association, not as evidence that food price controls improve allocation.
 estimator:
   template: panel_fe
   fixed_effects:

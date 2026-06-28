@@ -459,6 +459,13 @@ export interface ScoredClaim {
   screening_weight: number;
   attribution_weight: number;
   integrity_weight: number;
+  second_order_declared_gate_status?: string;
+  second_order_strict_gate_status?: string;
+  second_order_declared_scoreboard_eligible?: boolean;
+  second_order_strict_scoreboard_eligible?: boolean;
+  second_order_failure_credit_kind?: string;
+  second_order_failure_credit_multiplier?: number;
+  second_order_required_data_gaps?: string[];
   verdict?: string;
   outcome: ClaimOutcome;
   outcome_score: number;
@@ -507,6 +514,77 @@ export interface PositionScore {
   integrity_score_signal: "positive_signal" | "negative_signal" | "too_close_to_call" | "untested";
   support_rate: number;
   scored_claims: ScoredClaim[];
+}
+
+export interface ScoreboardSecondOrderGateSummary {
+  generated_at?: string;
+  scope?: string;
+  methodology?: Record<string, string>;
+  summary?: Record<string, unknown>;
+}
+
+export interface ScoreboardSecondOrderClaimGate {
+  position_id: string;
+  claim_index: number;
+  hypothesis_id?: string;
+  declared_gate_status?: string;
+  strict_gate_status?: string;
+  declared_scoreboard_eligible?: boolean;
+  strict_scoreboard_eligible?: boolean;
+  failure_credit_kind?: string;
+  failure_credit_multiplier?: number;
+  required_data_gaps?: string[];
+}
+
+let _scoreboardSecondOrderGateSummaryCache: Promise<ScoreboardSecondOrderGateSummary | null> | null = null;
+let _scoreboardSecondOrderGateIndexCache: Promise<Map<string, ScoreboardSecondOrderClaimGate> | null> | null = null;
+
+async function loadScoreboardSecondOrderGateArtifact(): Promise<{
+  generated_at?: string;
+  scope?: string;
+  methodology?: Record<string, string>;
+  summary?: Record<string, unknown>;
+  claim_links?: ScoreboardSecondOrderClaimGate[];
+} | null> {
+  const path = join(REPO_ROOT, "engine", "scoreboard_second_order_gates.json");
+  if (!existsSync(path)) return null;
+  const raw = await readFile(path, "utf8");
+  return JSON.parse(raw) as {
+    generated_at?: string;
+    scope?: string;
+    methodology?: Record<string, string>;
+    summary?: Record<string, unknown>;
+    claim_links?: ScoreboardSecondOrderClaimGate[];
+  };
+}
+
+export async function loadScoreboardSecondOrderGateSummary(): Promise<ScoreboardSecondOrderGateSummary | null> {
+  if (_scoreboardSecondOrderGateSummaryCache) return _scoreboardSecondOrderGateSummaryCache;
+  _scoreboardSecondOrderGateSummaryCache = (async () => {
+    const parsed = await loadScoreboardSecondOrderGateArtifact();
+    if (!parsed) return null;
+    return {
+      generated_at: parsed.generated_at,
+      scope: parsed.scope,
+      methodology: parsed.methodology,
+      summary: parsed.summary,
+    };
+  })();
+  return _scoreboardSecondOrderGateSummaryCache;
+}
+
+async function loadScoreboardSecondOrderGateIndex(): Promise<Map<string, ScoreboardSecondOrderClaimGate> | null> {
+  if (_scoreboardSecondOrderGateIndexCache) return _scoreboardSecondOrderGateIndexCache;
+  _scoreboardSecondOrderGateIndexCache = (async () => {
+    const parsed = await loadScoreboardSecondOrderGateArtifact();
+    if (!parsed?.claim_links) return null;
+    const index = new Map<string, ScoreboardSecondOrderClaimGate>();
+    for (const row of parsed.claim_links) {
+      index.set(`${row.position_id}#${row.claim_index}`, row);
+    }
+    return index;
+  })();
+  return _scoreboardSecondOrderGateIndexCache;
 }
 
 function evidenceWeight(evidenceType: string | undefined): number {
@@ -799,6 +877,7 @@ function verdictToOutcome(
 export async function scoreAllPositions(): Promise<PositionScore[]> {
   const positions = await loadAllPositions();
   const hypotheses = await loadAllHypotheses();
+  const secondOrderGateIndex = await loadScoreboardSecondOrderGateIndex();
   const hypIds = new Set(hypotheses.map((h) => h.hypothesis_id));
 
   // Phase 3 (April 2026): Build the authoritative hypothesis-side coverage
@@ -882,11 +961,23 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         linkedHyp,
         screeningWeight: screening.weight,
       });
+      const secondOrderGate = secondOrderGateIndex?.get(`${pos.position_id}#${idx}`);
+      const secondOrderStrictEligible =
+        secondOrderGate?.strict_scoreboard_eligible ?? false;
+      const gateFailureMultiplier =
+        secondOrderGate?.failure_credit_kind &&
+        secondOrderGate.failure_credit_kind !== "not_failure_prediction_win"
+          ? secondOrderGate.failure_credit_multiplier ?? 1
+          : 1;
+      const secondOrderMultiplier = secondOrderStrictEligible
+        ? Math.min(1, gateFailureMultiplier)
+        : 0;
       const integrity_weight =
         evidence_weight *
         coverage_confidence_weight *
         screening.weight *
-        attribution.weight;
+        attribution.weight *
+        secondOrderMultiplier;
       const integrity_outcome_score = outcome_score * integrity_weight;
       adjusted_net_score += adjusted_outcome_score;
       integrity_net_score += integrity_outcome_score;
@@ -905,6 +996,13 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         screening_weight: screening.weight,
         attribution_weight: attribution.weight,
         integrity_weight,
+        second_order_declared_gate_status: secondOrderGate?.declared_gate_status,
+        second_order_strict_gate_status: secondOrderGate?.strict_gate_status,
+        second_order_declared_scoreboard_eligible: secondOrderGate?.declared_scoreboard_eligible,
+        second_order_strict_scoreboard_eligible: secondOrderGate?.strict_scoreboard_eligible,
+        second_order_failure_credit_kind: secondOrderGate?.failure_credit_kind,
+        second_order_failure_credit_multiplier: secondOrderGate?.failure_credit_multiplier,
+        second_order_required_data_gaps: secondOrderGate?.required_data_gaps,
         verdict,
         outcome,
         outcome_score,
@@ -974,13 +1072,9 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     if (b.tested === 0) return -1;
     const netDiff = b.integrity_net_score - a.integrity_net_score;
     if (Math.abs(netDiff) > 0.001) return netDiff;
-    const forecastNetDiff = b.adjusted_net_score - a.adjusted_net_score;
-    if (Math.abs(forecastNetDiff) > 0.001) return forecastNetDiff;
-    const rawNetDiff = b.net_score - a.net_score;
-    if (Math.abs(rawNetDiff) > 0.001) return rawNetDiff;
-    const rateDiff = b.support_rate - a.support_rate;
-    if (Math.abs(rateDiff) > 0.001) return rateDiff;
-    return b.tested - a.tested;
+    const integrityWeightDiff = b.integrity_tested_weight - a.integrity_tested_weight;
+    if (Math.abs(integrityWeightDiff) > 0.001) return integrityWeightDiff;
+    return a.position_id.localeCompare(b.position_id);
   });
 
   return scores;

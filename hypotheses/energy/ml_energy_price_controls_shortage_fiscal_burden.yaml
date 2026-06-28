@@ -49,6 +49,88 @@ variables:
   - name: government_effectiveness
     source: wgi:GE.EST
     transformation: level
+mechanism_measurement:
+  mechanism_type: administered_price_subsidy
+  design_features:
+  - panel_fe_screen
+  - controlled_vs_uncontrolled_categories
+  - high_frequency_event_study
+  - welfare_accounting
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - country-years with high fossil-fuel consumption subsidies
+    control_units:
+    - country-years with lower subsidy exposure
+    controlled_or_regulated_units:
+    - household fuel and electricity tariffs with suppressed pass-through
+    exempt_or_uncontrolled_units:
+    - industrial tariffs, market-priced fuels, or unsubsidized imports where available
+    time_frequency: annual
+    notes: >
+      Current treatment is a global subsidy proxy. A policy-grade test needs
+      tariff-cost gaps, stockout/outage data, fiscal arrears, and investment.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Household tariffs or fuel prices are held below cost recovery or import parity.
+    variable_names: [fossil_fuel_consumption_subsidies]
+    candidate_sources:
+    - OWID fossil-fuel consumption subsidies
+    - IMF energy subsidy database
+    - national tariff schedules
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Suppressed pass-through reduces utility cash flow, fuel availability, investment, or reserve margins.
+    variable_names: [electricity_access]
+    candidate_sources:
+    - outage frequency and SAIDI/SAIFI
+    - fuel station stockout data
+    - IEA/World Bank power-sector investment
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Subsidies and price controls create budget costs, arrears, or quasi-fiscal utility losses.
+    variable_names: [fossil_fuel_consumption_subsidies]
+    candidate_sources:
+    - IMF fiscal subsidy estimates
+    - utility arrears and balance-sheet losses
+    - budget transfer lines
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Consumer price relief must be netted against shortages, outages, fiscal cost, and future investment loss.
+    variable_names: []
+    candidate_sources:
+    - constructed energy welfare ledger
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: distributional_incidence
+    mechanism: Household beneficiaries, industrial users, taxpayers, utilities, and future consumers bear different effects.
+    variable_names: []
+    candidate_sources:
+    - household energy expenditure surveys
+    - utility customer class data
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - taxpayers
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: tariff or fuel-price discount times subsidized consumption
+    deadweight_loss: excess demand and rationed energy quantity
+    quality_loss: outages, voltage instability, or service degradation
+    search_or_queue_cost: queue and stockout search costs
+    future_supply_loss: reduced utility investment, reserve margins, and maintenance
+    fiscal_or_enforcement_cost: subsidy outlays, arrears, and quasi-fiscal utility losses
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    The current panel is alias-repair triage; it should not move a public
+    scoreboard as a dispositive energy price-control test.
 estimator:
   template: panel_fe
   fixed_effects:

@@ -1,6 +1,6 @@
 # Throughput Scoreboard Conversion Audit
 
-Generated: 2026-05-19
+Generated: 2026-06-28
 
 ## Methodology Gate
 
@@ -16,7 +16,7 @@ Generated: 2026-05-19
 - hypotheses_reviewed: 129
 - verdict_counts: {'inconclusive': 5, 'partial': 50, 'refuted': 25, 'supported': 48, 'other': 1}
 - conversion_counts: {'repair_data_or_design': 5, 'hold_interpretation_qa': 34, 'scoreboard_ready_existing_mapping': 63, 'needs_position_claim_mapping': 8, 'hold_duplicate_broad_panel_qa': 16, 'repair_missing_verdict': 1, 'hold_broad_panel_upgrade': 2}
-- qa_flag_counts: {'associational_panel': 84, 'direction_inconclusive': 21, 'broad_scope': 18, 'zero_effect_partial': 7, 'duplicate_fingerprint': 16, 'direction_ambiguous': 10}
+- qa_flag_counts: {'associational_panel': 83, 'direction_inconclusive': 21, 'broad_scope': 18, 'zero_effect_partial': 7, 'duplicate_fingerprint': 16, 'direction_ambiguous': 10}
 - duplicate_fingerprint_groups: 6
 
 ## Conversion Buckets
@@ -134,7 +134,7 @@ Generated: 2026-05-19
 | `sea_philippines_bpo_industrial_policy_2005_2024` | supported | associational | 3 | 3 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `venture_capital_market_depth_innovation` | refuted | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | associational_panel |
 | `banking_crisis_laeven_valencia_predictors_panel` | supported | associational | 4 | 4 | `scoreboard_ready_existing_mapping` | associational_panel |
-| `CBDC_design_privacy_tradeoff` | partial | associational | 0 | 0 | `hold_duplicate_broad_panel_qa` | zero_effect_partial, associational_panel, duplicate_fingerprint |
+| `CBDC_design_privacy_tradeoff` | partial | unknown | 0 | 0 | `hold_duplicate_broad_panel_qa` | zero_effect_partial, duplicate_fingerprint |
 | `abenomics_monetary_fiscal_coordination_effect` | supported | associational | 1 | 1 | `scoreboard_ready_existing_mapping` | - |
 | `absolute_decoupling_global_material_throughput` | supported | associational | 2 | 2 | `scoreboard_ready_existing_mapping` | - |
 | `active_labour_market_policy_conditionality_works` | partial | associational | 8 | 8 | `hold_interpretation_qa` | zero_effect_partial, associational_panel |

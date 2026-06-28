@@ -6,17 +6,24 @@
 // are ordered by the attribution-aware integrity score; legacy forecast scores
 // remain in each row for comparison.
 
-import { scoreAllPositions } from "@/lib/content";
+import {
+  loadScoreboardSecondOrderGateSummary,
+  scoreAllPositions,
+} from "@/lib/content";
 
 export const dynamic = "force-static";
 
 export async function GET() {
-  const scores = await scoreAllPositions();
+  const [scores, secondOrderGates] = await Promise.all([
+    scoreAllPositions(),
+    loadScoreboardSecondOrderGateSummary(),
+  ]);
   return Response.json({
     api_version: "2",
     generated_at: new Date().toISOString(),
     canonical_url: "https://framework.ieset.org/scoreboard/",
-    scoring_policy: "attribution_net_v2",
+    scoring_policy: "attribution_net_v3_second_order_gated",
+    second_order_gate_artifact: secondOrderGates,
     rank_basis: "integrity_net_score",
     legacy_forecast_score_field: "adjusted_net_score",
     positions: scores,

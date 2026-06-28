@@ -53,6 +53,128 @@ variables:
   - name: import_restriction_regime
     source: wb:TG.VAL.TOTL.GD.ZS
     notes: Price controls + import licences often co-occur; separate identification required.
+mechanism_measurement:
+  mechanism_type: price_control
+  design_features:
+  - controlled_vs_uncontrolled_categories
+  - adjacent_market_comparison
+  - border_comparison
+  - high_frequency_event_study
+  - triple_difference
+  - welfare_accounting
+  - distributional_decomposition
+  - quality_margin
+  - leakage_substitution
+  comparison_structure:
+    treated_units:
+    - country-episode category cells with binding statutory ceilings
+    control_units:
+    - non-treated country-category cells matched on inflation, institutions, trade openness, and income
+    controlled_or_regulated_units:
+    - statutory controlled goods, fuels, or services
+    exempt_or_uncontrolled_units:
+    - uncapped substitutes
+    - parallel-market transactions
+    - exempt sellers or regions
+    adjacent_or_border_markets:
+    - neighbouring markets exposed to smuggling or arbitrage
+    - same-country categories without controls
+    time_frequency: mixed
+    notes: >
+      The universal claim requires more than country-year donor panels. It
+      needs episode/category cells so availability, quality, and leakage can
+      be observed where the statutory ceiling binds.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: The administered ceiling reduces the observed official price or capped CPI component.
+    variable_names: [price_ceiling_vs_parallel_market_ratio]
+    candidate_sources:
+    - official price schedules
+    - CPI micro-components for capped categories
+    - parallel-market or spot price benchmarks
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Binding ceilings reduce official-channel quantity, inventory, output, or capacity.
+    variable_names: [queue_time_or_shortage_incidence]
+    candidate_sources:
+    - retail stockout surveys
+    - fuel station outage logs
+    - production and inventory series
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: allocation_distortion
+    mechanism: Rationing, queues, privilege allocation, or enforcement discretion replace price allocation.
+    variable_names: [queue_time_or_shortage_incidence]
+    candidate_sources:
+    - queue-time records
+    - ration-card allocation records
+    - enforcement and inspection records
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: leakage_or_substitution
+    mechanism: Scarcity moves activity to black markets, smuggling routes, exempt categories, or informal sellers.
+    variable_names: [price_ceiling_vs_parallel_market_ratio]
+    candidate_sources:
+    - parallel-market premium series
+    - border seizure records
+    - informal-market expenditure shares
+    measurement_status: proxy_only
+    required_for_dispositive_verdict: true
+  - layer: quality_margin
+    mechanism: Sellers degrade quality, package size, variety, service level, or maintenance when nominal prices cannot adjust.
+    variable_names: [quality_degradation_proxy]
+    candidate_sources:
+    - scanner package-size microdata
+    - consumer complaint surveys
+    - product disappearance counts
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Sustained ceilings require inspection, penalties, subsidies, or public inventory management.
+    variable_names: []
+    candidate_sources:
+    - budget subsidy lines
+    - enforcement agency records
+    - inspection and penalty counts
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Consumer transfer must exceed deadweight loss, quality loss, queue/search cost, leakage rents, and enforcement cost to count as net success.
+    variable_names: []
+    candidate_sources:
+    - constructed episode/category welfare ledger
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: distributional_incidence
+    mechanism: Covered buyers, non-covered buyers, producers, informal intermediaries, and future consumers experience different effects.
+    variable_names: []
+    candidate_sources:
+    - household expenditure surveys
+    - producer margin surveys
+    - rationing eligibility records
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - future_cohorts
+  - taxpayers
+  - enforcement_targets
+  welfare_accounting:
+    first_order_transfer: official-price discount times official-channel quantity
+    deadweight_loss: rationed quantity and foregone mutually beneficial transactions
+    quality_loss: quality-adjusted price, package-size, or product-variety deterioration
+    search_or_queue_cost: queue time, repeated shopping trips, and stockout search costs
+    future_supply_loss: output, investment, inventory, and capacity reductions
+    fiscal_or_enforcement_cost: subsidies, inspections, penalties, public procurement, and enforcement costs
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    The existing synthetic-DiD run is data-pending. A future universal claim
+    should be graded only after the episode/category layer can measure supply,
+    quality, leakage, fiscal cost, and incidence rather than only official CPI.
 intervention_channel: regulatory
 intervention_channel_justification: 'Price ceilings are a regulatory price intervention. Per invariant 4 they are measured separately from fiscal transfers (which may accompany them — e.g. Nixon 1971 combined
   wage-price freeze with dollar devaluation and import surcharge, all separately coded).

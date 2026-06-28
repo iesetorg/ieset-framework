@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/city_level_source_inventory.schema.json",
+  "title": "IESET City-Level Source Inventory",
+  "description": "Research and ingestion inventory for city, municipal, metro, and local-jurisdiction datasets used by top-1000-city policy panels.",
+  "type": "object",
+  "required": [
+    "version",
+    "last_seeded_utc",
+    "primary_axis",
+    "canonical_city_universe",
+    "source_records"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "last_seeded_utc": {"type": "string", "minLength": 10},
+    "primary_axis": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*[a-z0-9]$"},
+    "canonical_city_universe": {
+      "type": "object",
+      "required": ["preferred_anchor", "fallback_anchors", "top_1000_rule"],
+      "additionalProperties": false,
+      "properties": {
+        "preferred_anchor": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
+        "fallback_anchors": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "top_1000_rule": {"type": "string", "minLength": 30}
+      }
+    },
+    "source_records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/source_record"}
+    }
+  },
+  "$defs": {
+    "source_record": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "source_name",
+        "publisher",
+        "geography",
+        "spatial_grain",
+        "time_coverage",
+        "policy_or_outcome_fields",
+        "access_format",
+        "source_url",
+        "license_or_terms",
+        "update_frequency",
+        "rent_control_use",
+        "second_order_layers",
+        "top_1000_scalability",
+        "ingestion_difficulty",
+        "immediate_payoff_rank",
+        "verification_status",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
+        "source_name": {"type": "string", "minLength": 3},
+        "publisher": {"type": "string", "minLength": 2},
+        "geography": {"type": "string", "minLength": 2},
+        "spatial_grain": {"type": "string", "minLength": 2},
+        "time_coverage": {"type": "string", "minLength": 2},
+        "policy_or_outcome_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 2}
+        },
+        "access_format": {"type": "string", "minLength": 2},
+        "source_url": {"type": "string", "minLength": 8},
+        "license_or_terms": {"type": "string", "minLength": 2},
+        "update_frequency": {"type": "string", "minLength": 2},
+        "rent_control_use": {"type": "string", "minLength": 10},
+        "second_order_layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "first_order_price_or_transfer",
+              "first_order_policy_effect",
+              "second_order_supply_response",
+              "behavioral_response",
+              "allocation_distortion",
+              "leakage_or_substitution",
+              "quality_margin",
+              "fiscal_or_enforcement_cost",
+              "implementation_capacity",
+              "market_structure_response",
+              "dynamic_investment_response",
+              "macro_feedback",
+              "externality_or_spillover",
+              "net_welfare",
+              "distributional_incidence"
+            ]
+          }
+        },
+        "top_1000_scalability": {"type": "string", "enum": ["high", "medium", "low"]},
+        "ingestion_difficulty": {"type": "string", "enum": ["low", "medium", "high"]},
+        "immediate_payoff_rank": {"type": "integer", "minimum": 1},
+        "verification_status": {
+          "type": "string",
+          "enum": [
+            "seed_verified_official_page",
+            "seed_unverified_url",
+            "scout_reported_unverified",
+            "endpoint_verified",
+            "codebook_verified",
+            "license_verified",
+            "production_ready"
+          ]
+        },
+        "notes": {"type": "string", "minLength": 10}
+      }
+    }
+  }
+}

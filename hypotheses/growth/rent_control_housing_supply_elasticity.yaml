@@ -33,6 +33,60 @@ variables:
   - name: log_gdp_pc
     source: world_bank_wdi:NY.GDP.PCAP.KD
     transformation: log
+mechanism_measurement:
+  mechanism_type: rent_control
+  design_features:
+  - panel_fe_screen
+  - controlled_vs_uncontrolled_units
+  - adjacent_market_comparison
+  - triple_difference
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - placeholder global country-years
+    control_units:
+    - placeholder global country-years
+    controlled_or_regulated_units:
+    - not measured in draft placeholder
+    exempt_or_uncontrolled_units:
+    - not measured in draft placeholder
+    time_frequency: annual
+    notes: Current variables do not measure rent control, supply elasticity, uncontrolled rents, or commute distance.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Covered rents are held below comparable uncontrolled rents.
+    variable_names: []
+    candidate_sources:
+    - city rent microdata by controlled versus uncontrolled status
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Housing supply elasticity, permits, completions, and listings respond to binding controls.
+    variable_names: []
+    candidate_sources:
+    - building permits
+    - completions
+    - rental listings
+    - city-level supply elasticity estimates
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: allocation_distortion
+    mechanism: Commute distance and mobility lock-in rise when tenants keep below-market units.
+    variable_names: []
+    candidate_sources:
+    - ACS commute and migration microdata
+    - lease duration and move records
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - new_entrants
+  - uncovered_consumers
+  - future_cohorts
+  promotion_gate: descriptive_only
+  notes: >
+    The existing result card is a placeholder artifact and should be excluded
+    from scoreboard or mechanism-attribution use until real housing data land.
 estimator:
   template: panel_fe
   fixed_effects:

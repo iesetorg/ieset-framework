@@ -1,0 +1,254 @@
+# City-level data ingestion queue
+#
+# This queue turns the source inventory into bounded implementation waves.
+# It intentionally starts with open anchors and pilot cases before attempting a
+# full top-1000 city policy panel.
+
+version: 1
+created_utc: "2026-06-28T00:00:00Z"
+
+waves:
+  - wave_id: city_spine_v0
+    objective: Build the immutable city identity spine for top-1000 joins.
+    status: in_progress
+    source_ids:
+      - ghsl_urban_centre_database
+      - un_world_urbanization_prospects_city_agglomerations
+      - geonames_gazetteer
+      - oecd_regions_cities_metropolitan
+      - eurostat_cities_urban_audit
+      - geoboundaries_admin_boundaries
+      - overture_maps_global_geoparquet
+      - openstreetmap_planet_geofabrik_extracts
+      - ghsl_built_pop_grids
+      - microsoft_global_ml_building_footprints
+    expected_outputs:
+      - data/derived/city_universe_top1000.parquet
+      - data/derived/city_crosswalks.parquet
+      - data/derived/city_policy_test_readiness_matrix.parquet
+      - data/manifests/fetch_run_<utc>_city_spine.yaml
+    landed_outputs:
+      - data/derived/city_universe_top1000.parquet
+      - data/derived/city_crosswalks.parquet
+      - data/derived/city_policy_test_readiness_matrix.parquet
+      - data/manifests/fetch_run_2026-06-28T160329Z_city_spine.yaml
+      - data/manifests/fetch_run_2026-06-28T191500Z_city_policy_test_readiness.yaml
+    acceptance_checks:
+      - GHSL R2024A urban-centre IDs are preserved.
+      - Top-1000 ranking rule and population year are written into manifest.
+      - Crosswalk records keep match score and manual-review flag.
+      - Legal treatment jurisdictions are not collapsed into morphological city IDs.
+      - Readiness matrix exposes missing city-level policy-test layers rather than hiding gaps.
+
+  - wave_id: us_rent_control_pilot_v0
+    objective: Make St Paul, San Francisco, and NYC runnable beyond country-level proxies.
+    status: in_progress
+    source_ids:
+      - locus_v1_local_ordinance_corpus
+      - national_zoning_atlas
+      - zillow_observed_rent_index
+      - us_census_building_permits_survey
+      - hud_fair_market_rents
+      - us_bls_cpi_area_rent
+      - us_acs_pums_summary
+      - eviction_lab_eviction_tracking
+      - eviction_lab_tracking_system
+      - nyc_rent_guidelines_board_stabilized_lists
+      - nyc_open_data_housing_bundle
+      - nyc_open_data_tax_benefit_regulation_bundle
+      - datasf_housing_bundle
+      - la_rso_open_data
+      - dc_rent_control_registration_open_data
+    target_cases:
+      - st_paul_rent_control_2021
+      - sf_rent_control_1994
+      - nyc_rent_stabilisation
+    expected_outputs:
+      - data/derived/us_city_rent_panel.parquet
+      - data/derived/us_city_permits_panel.parquet
+      - data/derived/us_city_rent_control_quality_leakage_panel.parquet
+      - data/derived/us_sf_rent_control_quality_leakage_panel.parquet
+      - data/derived/nyc_rent_regulation_tax_benefit_panel.parquet
+      - data/derived/us_acs_place_housing_incidence_panel.parquet
+    landed_outputs:
+      - data/derived/us_city_rent_panel.parquet
+      - data/derived/us_city_permits_panel.parquet
+      - data/derived/us_city_rent_control_quality_leakage_panel.parquet
+      - data/derived/us_sf_rent_control_quality_leakage_panel.parquet
+      - data/derived/nyc_rent_regulation_tax_benefit_panel.parquet
+      - data/manifests/fetch_run_2026-06-28T160547Z_zillow_city_rent.yaml
+      - data/manifests/fetch_run_2026-06-28T161430Z_census_bps_city_permits.yaml
+      - data/manifests/fetch_run_2026-06-28T162430Z_nyc_housing_quality_supply.yaml
+      - data/manifests/fetch_run_2026-06-28T171500Z_datasf_housing_quality_supply.yaml
+      - data/manifests/fetch_run_2026-06-28T182500Z_nyc_rent_regulation_tax_benefits.yaml
+    acceptance_checks:
+      - Rent series retain publisher geography codes and city-crosswalk IDs.
+      - Permit series split by structure/unit type where available.
+      - ACS variables include rent burden, tenure, income, housing age, and mobility.
+      - ACS place panel is fetched with an explicit Census API key and keeps unmatched places.
+      - NYC open-data extracts pin Socrata dataset IDs before production.
+      - NYC rent-regulation stock proxies are labeled as proxies, not apartment-level registration.
+      - DataSF open-data extracts pin Socrata dataset IDs before production.
+
+  - wave_id: europe_rent_control_pilot_v0
+    objective: Build donor pools and direct local layers for Berlin, Stockholm, Spain, and UK housing cases.
+    status: scout_reported_needs_verification
+    source_ids:
+      - eurostat_cities_urban_audit
+      - uk_mhclg_house_building_live_tables
+      - uk_ons_voa_private_rents
+      - berlin_mietspiegel
+      - germany_inkar_housing
+      - france_oll_rent_observations
+      - france_reference_rent_control_datasets
+      - france_sitadel_permits
+      - catalonia_housing_open_data_bundle
+      - stockholm_bostadsformedlingen_statistics
+      - nordic_municipal_housing_stats
+      - spain_rental_reference_price_system
+      - italy_omi_quotations
+      - portugal_ine_municipal_rents
+      - ireland_rtb_rent_index_rpz
+      - inside_airbnb
+    target_cases:
+      - berlin_mietendeckel_2020
+      - stockholm_rent_queue
+      - spain_housing_law_12_2023
+      - uk_renters_rights_act_2025
+    expected_outputs:
+      - data/derived/europe_city_housing_supply_panel.parquet
+      - data/derived/berlin_rent_control_case_panel.parquet
+      - data/derived/stockholm_queue_case_panel.parquet
+    acceptance_checks:
+      - Berlin rent benchmark/listing data are separated from treatment-event coding.
+      - Stockholm queue years are modeled as allocation-distortion outcomes.
+      - Spain stressed-market declarations and cap formulas are coded as events.
+
+  - wave_id: lac_municipal_housing_v0
+    objective: Use high-coverage municipal outcome systems to scale LAC city coverage.
+    status: scout_reported_needs_verification
+    source_ids:
+      - mexico_sniiv_sedatu
+      - ibge_munic
+      - ibge_census_sidra_housing
+      - inegi_cpv_scince
+      - dane_elic
+      - dane_ceed
+      - chile_ine_building_permits
+      - peru_inei_renamu
+      - peru_inei_census_redatam
+      - idb_urban_dashboard
+      - ibge_ipca_snicp_residential_rent
+      - dane_cnpv_2018_housing
+      - colombia_ley820_rent_regime
+      - ecuador_cpv_2022_housing
+      - ecuador_esed_building_permits
+      - ecuador_enalqui_2013
+      - uruguay_censo_2023_housing
+      - argentina_infoleg_rent_law_shocks
+    target_cases:
+      - mexico_city_housing_policy_panel
+      - sao_paulo_municipal_housing_policy_panel
+      - bogota_affordability_quality_case
+      - santiago_supply_response_panel
+    expected_outputs:
+      - data/derived/lac_municipal_housing_supply_panel.parquet
+      - data/derived/lac_municipal_policy_instruments_panel.parquet
+      - data/derived/lac_city_housing_baselines.parquet
+    acceptance_checks:
+      - Codebooks confirm rent, tenure, and housing-quality variables before promotion.
+      - Municipal IDs crosswalk to GHSL urban centres with population shares.
+      - Scout-reported current-through dates are rechecked at fetch time.
+
+  - wave_id: apac_city_housing_v0
+    objective: Build city/district rent and supply panels for high-payoff APAC systems.
+    status: scout_reported_needs_verification
+    source_ids:
+      - korea_molit_rtms_rent_api
+      - korea_housing_lease_protection_act
+      - japan_estat_housing_land_survey
+      - nz_tenancy_rental_bond_data
+      - australia_state_rental_bond_panels
+      - abs_building_approvals_census_housing
+      - singapore_hdb_ura_rentals
+      - philippines_psa_openstat_housing_permits
+      - india_cpi_iw_nhb_residex
+      - china_city_housing_price_supply
+      - hong_kong_rvd_private_domestic_rents_supply
+      - taiwan_moi_actual_price_rental_transactions
+      - korea_reb_rone_rent_lease_indices
+      - statsnz_building_consents_ta
+    target_cases:
+      - korea_housing_lease_protection_act_city_panel
+      - japan_city_housing_stock_rent_panel
+      - australia_state_tenancy_law_city_panel
+      - singapore_public_private_rental_split
+    expected_outputs:
+      - data/derived/apac_city_rent_panel.parquet
+      - data/derived/apac_city_supply_panel.parquet
+      - data/derived/apac_housing_policy_events.parquet
+    acceptance_checks:
+      - API-key requirements and redistribution terms are pinned before production.
+      - National policy events are not treated as municipal variation without an exposure design.
+      - Rent proxies such as CPI-IW and price indices are flagged separately from observed rent transactions.
+      - City/district identifiers crosswalk to GHSL urban centres with population or area shares.
+
+  - wave_id: africa_mena_city_housing_v0
+    objective: Use direct Gulf rent datasets plus African municipal/census/building sources to widen non-OECD coverage.
+    status: scout_reported_needs_verification
+    source_ids:
+      - dubai_land_department_rents
+      - saudi_rega_rental_indicators
+      - south_africa_municipal_finance
+      - cape_town_open_data_housing
+      - stats_sa_census_superweb
+      - israel_cbs_housing_local
+      - turkstat_construction_housing
+      - jordan_dos_building_licenses
+      - tunisia_ins_rgph_housing
+      - morocco_hcp_rgph_housing
+      - africapolis
+      - google_open_buildings
+      - world_bank_subnational_construction_permits
+      - un_habitat_urbanlex
+      - qatar_open_data_housing_real_estate_bundle
+      - ghana_phc_statsbank_housing
+      - turkey_cbrt_new_tenant_rent_index
+      - istanbul_open_data_housing_bundle
+      - bahrain_open_data_census_cpi_housing
+      - kenya_knbs_2019_phc_housing
+      - turkey_official_rent_policy_events
+    target_cases:
+      - dubai_rental_index_case
+      - riyadh_jeddah_rent_indicator_panel
+      - cape_town_zoning_permit_case
+      - south_africa_municipal_housing_service_panel
+    expected_outputs:
+      - data/derived/mena_city_rent_panel.parquet
+      - data/derived/africa_city_housing_stock_proxy_panel.parquet
+      - data/derived/africa_mena_housing_policy_events.parquet
+    acceptance_checks:
+      - Arabic/English source names and city IDs are normalized with original labels preserved.
+      - Direct rent contract/indicator sources are separated from CPI or price proxies.
+      - Building-footprint proxies are marked as proxy-only for supply/stock claims.
+      - Legal-policy sources such as UrbanLex are not promoted without source URL and effective-date coding.
+
+  - wave_id: local_policy_event_registry_v0
+    objective: Create an event-dated treatment registry for rent control and adjacent tenant/housing-supply policies.
+    status: schema_design_ready
+    source_ids:
+      - local_housing_solutions_policy_library
+      - furman_land_use_reform_tracker
+      - colombia_ley820_rent_regime
+      - argentina_infoleg_rent_law_shocks
+      - turkey_official_rent_policy_events
+    source_family_ids:
+      - municipal_housing_policy_event_registry
+    expected_outputs:
+      - data/derived/local_housing_policy_events.parquet
+      - data/derived/local_housing_policy_events.yaml
+    acceptance_checks:
+      - Each event has legal text or official policy source URL.
+      - Coverage rules, exemption rules, cap formulas, effective dates, and repeal/suspension dates are explicit.
+      - Treatment jurisdiction is linked to city spine through many-to-many crosswalk.
+      - Event confidence is recorded separately from outcome-data quality.

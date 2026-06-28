@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/second_order_data_ingestion_queue.schema.json",
+  "title": "IESET Second-order Data Ingestion Queue",
+  "description": "Implementation waves for turning second-order source inventory records into vintaged datasets, manifests, and gate-ready measurement layers.",
+  "type": "object",
+  "required": ["version", "created_utc", "waves"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "created_utc": {"type": "string", "minLength": 10},
+    "waves": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/wave"}
+    }
+  },
+  "$defs": {
+    "second_order_layer": {
+      "type": "string",
+      "enum": [
+        "first_order_price_or_transfer",
+        "first_order_policy_effect",
+        "second_order_supply_response",
+        "behavioral_response",
+        "allocation_distortion",
+        "leakage_or_substitution",
+        "quality_margin",
+        "fiscal_or_enforcement_cost",
+        "implementation_capacity",
+        "market_structure_response",
+        "dynamic_investment_response",
+        "macro_feedback",
+        "externality_or_spillover",
+        "net_welfare",
+        "distributional_incidence"
+      ]
+    },
+    "wave": {
+      "type": "object",
+      "required": [
+        "wave_id",
+        "objective",
+        "status",
+        "owner_lane",
+        "loop_type",
+        "cadence",
+        "source_ids",
+        "source_family_ids",
+        "target_gate_layers",
+        "expected_outputs",
+        "acceptance_checks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "wave_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
+        "objective": {"type": "string", "minLength": 15},
+        "status": {
+          "type": "string",
+          "enum": [
+            "research_pending",
+            "scout_reported_needs_verification",
+            "schema_design_ready",
+            "ready_for_fetcher_design",
+            "in_progress",
+            "blocked",
+            "complete"
+          ]
+        },
+        "owner_lane": {"type": "string", "minLength": 3},
+        "loop_type": {
+          "type": "string",
+          "enum": [
+            "scout",
+            "fetcher_design",
+            "manual_drop",
+            "restricted_access",
+            "normalization",
+            "gate_promotion"
+          ]
+        },
+        "cadence": {"type": "string", "minLength": 3},
+        "source_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "source_family_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "target_gate_layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/second_order_layer"}
+        },
+        "target_cases": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "expected_outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 3}
+        },
+        "landed_outputs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 3}
+        },
+        "acceptance_checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 10}
+        }
+      }
+    }
+  }
+}

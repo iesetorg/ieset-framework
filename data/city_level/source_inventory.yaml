@@ -1,0 +1,3099 @@
+# City-level dataset expansion inventory
+#
+# Seeded 2026-06-28 for the rent-control / top-1000-cities data sprint.
+# Records are intentionally source-first, not hypothesis-first: each source can
+# later be promoted into data/fetchers/publishers.yaml or a manual vintage.
+
+version: 1
+last_seeded_utc: "2026-06-28T00:00:00Z"
+primary_axis: regulatory.housing_rent_control
+canonical_city_universe:
+  preferred_anchor: ghsl_urban_centre_database
+  fallback_anchors:
+    - un_world_urbanization_prospects_city_agglomerations
+    - oecd_regions_cities_metropolitan
+    - eurostat_cities_urban_audit
+  top_1000_rule: >
+    Rank GHSL urban centres by latest available population, retain the largest
+    1000, and store crosswalks to country ISO3, admin1/admin2 codes,
+    metropolitan/FUA identifiers, GeoNames/Wikidata IDs, and publisher-specific
+    city IDs. Use UN WUP as a sanity check for large agglomerations whose
+    statistical definition differs from GHSL built-up urban centres.
+
+source_records:
+  - source_id: ghsl_urban_centre_database
+    source_name: GHSL Urban Centre Database R2024A
+    publisher: European Commission Joint Research Centre
+    geography: global
+    spatial_grain: urban centre polygon and urban-centre-year
+    time_coverage: 1975-2030, five-year target epochs
+    policy_or_outcome_fields:
+      - city universe
+      - population
+      - built-up area
+      - density
+      - urban-centre geometry
+    access_format: CSV, XLSX, and GeoPackage bulk download
+    source_url: https://human-settlement.emergency.copernicus.eu/ghs_ucdb_2024.php
+    license_or_terms: CC BY 4.0 per global-anchors scout; verify per release metadata
+    update_frequency: release-based
+    rent_control_use: canonical top-1000-city universe and spatial join anchor
+    second_order_layers:
+      - implementation_capacity
+      - externality_or_spillover
+    top_1000_scalability: high
+    ingestion_difficulty: low
+    immediate_payoff_rank: 1
+    verification_status: seed_verified_official_page
+    notes: >
+      Treat as the default city geometry and ID spine. Official page describes
+      GHS-UCDB R2024A as a 2025 multitemporal, multidimensional urban-centre
+      database with CSV, XLSX, and GeoPackage files.
+
+  - source_id: un_world_urbanization_prospects_city_agglomerations
+    source_name: UN World Urbanization Prospects, urban agglomerations
+    publisher: United Nations DESA Population Division
+    geography: global
+    spatial_grain: urban agglomeration-year
+    time_coverage: historical estimates and projections; release-dependent
+    policy_or_outcome_fields:
+      - urban agglomeration population
+      - country
+      - projected city population
+    access_format: bulk spreadsheets
+    source_url: https://population.un.org/wup/
+    license_or_terms: UN data terms, verify per download
+    update_frequency: multi-year release cycle
+    rent_control_use: population-ranking cross-check for largest cities
+    second_order_layers:
+      - macro_feedback
+    top_1000_scalability: high
+    ingestion_difficulty: low
+    immediate_payoff_rank: 2
+    verification_status: seed_verified_official_page
+    notes: >
+      Best used as a population sanity check because agglomeration definitions
+      can diverge from municipal treatment jurisdictions.
+
+  - source_id: geonames_gazetteer
+    source_name: GeoNames Gazetteer
+    publisher: GeoNames
+    geography: global
+    spatial_grain: populated-place point and administrative hierarchy
+    time_coverage: current dump with daily modifications
+    policy_or_outcome_fields:
+      - place names
+      - alternate names
+      - coordinates
+      - admin codes
+      - population
+      - Wikidata-linked aliases
+    access_format: text dumps and web services
+    source_url: https://download.geonames.org/export/dump/readme.txt
+    license_or_terms: CC BY 4.0
+    update_frequency: daily modifications plus full dumps
+    rent_control_use: city alias matching and stable gazetteer IDs
+    second_order_layers:
+      - implementation_capacity
+    top_1000_scalability: high
+    ingestion_difficulty: low
+    immediate_payoff_rank: 3
+    verification_status: seed_verified_official_page
+    notes: >
+      Use for names and aliases, not as the primary morphology. The readme
+      documents cities500/cities1000/cities5000/cities15000 dumps and the
+      alternateNamesV2 file.
+
+  - source_id: eurostat_cities_urban_audit
+    source_name: Eurostat Cities / Urban Audit
+    publisher: Eurostat
+    geography: Europe
+    spatial_grain: city, greater city, functional urban area
+    time_coverage: varies by indicator, mostly annual
+    policy_or_outcome_fields:
+      - population
+      - housing
+      - labour market
+      - living conditions
+      - city indicators
+    access_format: Eurostat API and bulk downloads
+    source_url: https://ec.europa.eu/eurostat/web/cities
+    license_or_terms: Eurostat reuse policy
+    update_frequency: periodic
+    rent_control_use: comparable European city covariates and housing underlays
+    second_order_layers:
+      - distributional_incidence
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 4
+    verification_status: seed_verified_official_page
+    notes: >
+      Useful for donor pools around Berlin, Barcelona, Paris, Amsterdam,
+      Stockholm, Vienna, and other European cases.
+
+  - source_id: oecd_regions_cities_metropolitan
+    source_name: OECD regions, cities, and metropolitan statistics
+    publisher: OECD
+    geography: OECD and partner economies
+    spatial_grain: metropolitan area, functional urban area, region
+    time_coverage: varies by indicator
+    policy_or_outcome_fields:
+      - population
+      - GDP
+      - jobs
+      - land use
+      - environmental and social indicators
+    access_format: OECD Data Explorer / API
+    source_url: https://www.oecd.org/regional/regional-statistics/
+    license_or_terms: OECD terms
+    update_frequency: periodic
+    rent_control_use: metro/FUA controls for high-income city panels
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 5
+    verification_status: seed_verified_official_page
+    notes: >
+      Pairs well with OECD Affordable Housing Database, but local policy
+      treatment still needs separate city ordinance/event coding.
+
+  - source_id: zillow_observed_rent_index
+    source_name: Zillow Observed Rent Index and Zillow Research data
+    publisher: Zillow Research
+    geography: United States and selected geographies exposed by Zillow
+    spatial_grain: metro, city, ZIP, neighborhood depending on file
+    time_coverage: monthly, series-dependent
+    policy_or_outcome_fields:
+      - observed rent index
+      - geography identifiers
+      - housing market tier cuts
+    access_format: CSV downloads
+    source_url: https://www.zillow.com/research/data/
+    license_or_terms: Zillow research data terms; verify before redistribution
+    update_frequency: monthly
+    rent_control_use: first-order market-rent panel for US city and metro cases
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 6
+    verification_status: seed_verified_official_page
+    notes: >
+      High payoff for St Paul, Minneapolis, San Francisco, New York, and donor
+      metros. Not a controlled-unit rent registry.
+
+  - source_id: us_census_building_permits_survey
+    source_name: Building Permits Survey
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: permit-issuing place, county, metro, state
+    time_coverage: monthly and annual series
+    policy_or_outcome_fields:
+      - residential building permits
+      - units by structure type
+      - permit geography
+    access_format: Census downloads and API
+    source_url: https://www.census.gov/construction/bps/
+    license_or_terms: U.S. public domain, verify table metadata
+    update_frequency: monthly
+    rent_control_use: second-order supply response for US treated and donor cities
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 7
+    verification_status: seed_verified_official_page
+    notes: >
+      Core supply series for St Paul, San Francisco, New York, and U.S. donor
+      pools. Needs crosswalk from permit geography to metro/city panel.
+
+  - source_id: hud_fair_market_rents
+    source_name: HUD Fair Market Rents and Small Area Fair Market Rents
+    publisher: U.S. Department of Housing and Urban Development
+    geography: United States
+    spatial_grain: metro area, county, ZIP code for SAFMR
+    time_coverage: annual
+    policy_or_outcome_fields:
+      - fair market rent
+      - small area fair market rent
+      - bedroom count
+      - geography codes
+    access_format: web tables and downloads
+    source_url: https://www.huduser.gov/portal/datasets/fmr.html
+    license_or_terms: U.S. public data, verify metadata
+    update_frequency: annual
+    rent_control_use: official rent benchmark and affordability control
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 8
+    verification_status: seed_verified_official_page
+    notes: >
+      Useful as an official benchmark, not a market-listing or regulated-unit
+      rent measure.
+
+  - source_id: us_bls_cpi_area_rent
+    source_name: BLS CPI area rent and owners-equivalent-rent series
+    publisher: U.S. Bureau of Labor Statistics
+    geography: United States
+    spatial_grain: CPI area / selected metropolitan areas
+    time_coverage: monthly, series-dependent
+    policy_or_outcome_fields:
+      - rent of primary residence
+      - owners equivalent rent
+      - CPI area identifiers
+    access_format: BLS public data API and downloads
+    source_url: https://www.bls.gov/cpi/data.htm
+    license_or_terms: U.S. public data, verify BLS terms
+    update_frequency: monthly
+    rent_control_use: official rent-inflation proxy for large U.S. metro cases
+    second_order_layers:
+      - first_order_price_or_transfer
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 9
+    verification_status: seed_verified_official_page
+    notes: >
+      CPI geographies do not cover all municipalities and are too coarse for
+      regulated-vs-exempt units, but helpful for robustness.
+
+  - source_id: us_acs_pums_summary
+    source_name: American Community Survey, summary tables and PUMS
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: tract, county, place, PUMA, metro, household microdata
+    time_coverage: annual and five-year rolling products
+    policy_or_outcome_fields:
+      - gross rent
+      - rent burden
+      - tenure
+      - household income
+      - migration and mobility
+      - housing age
+    access_format: Census API, TIGER/Line, PUMS downloads
+    source_url: https://www.census.gov/programs-surveys/acs/data.html
+    license_or_terms: U.S. public domain, disclosure rules apply to microdata
+    update_frequency: annual
+    rent_control_use: distributional incidence, mobility, and housing-quality proxies
+    second_order_layers:
+      - distributional_incidence
+      - allocation_distortion
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 10
+    verification_status: codebook_verified
+    notes: >
+      Essential for separating incumbent, entrant, renter, and income-group
+      exposure in U.S. rent-control cases. First builder targets ACS 5-year
+      place summary tables for rent burden, tenure, income, vacancy, mobility,
+      housing age, and multifamily structure shares. Census data API calls now
+      require CENSUS_API_KEY or --api-key.
+
+  - source_id: eviction_lab_eviction_tracking
+    source_name: Eviction Lab eviction data
+    publisher: Eviction Lab
+    geography: United States
+    spatial_grain: county, tract, city, state depending on extract
+    time_coverage: varies by product
+    policy_or_outcome_fields:
+      - eviction filings
+      - eviction judgments
+      - geography identifiers
+    access_format: downloads and data portal
+    source_url: https://evictionlab.org/get-the-data/
+    license_or_terms: Eviction Lab data terms, verify per dataset
+    update_frequency: release-based
+    rent_control_use: tenant-protection and allocation-distortion outcome layer
+    second_order_layers:
+      - allocation_distortion
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 11
+    verification_status: seed_verified_official_page
+    notes: >
+      Not a rent-control source by itself, but crucial for tenant-protection
+      and eviction-policy mechanisms.
+
+  - source_id: local_housing_solutions_policy_library
+    source_name: Local Housing Solutions Policy Library
+    publisher: NYU Furman Center / Abt Associates Local Housing Solutions
+    geography: United States
+    spatial_grain: policy type and local examples
+    time_coverage: current policy guidance, not a complete event panel
+    policy_or_outcome_fields:
+      - housing policy types
+      - local implementation examples
+      - policy design notes
+    access_format: web pages
+    source_url: https://localhousingsolutions.org/housing-policy-library/
+    license_or_terms: website terms, verify reuse
+    update_frequency: maintained guidance
+    rent_control_use: policy taxonomy and candidate local treatment discovery
+    second_order_layers:
+      - implementation_capacity
+      - first_order_policy_effect
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 12
+    verification_status: seed_unverified_url
+    notes: >
+      Useful as a discovery layer. It should not be treated as a complete,
+      dated city-policy event registry.
+
+  - source_id: furman_land_use_reform_tracker
+    source_name: Land Use Reform Tracker
+    publisher: NYU Furman Center
+    geography: United States
+    spatial_grain: state policy event with local land-use implications
+    time_coverage: recent reforms, exact window to verify
+    policy_or_outcome_fields:
+      - zoning reform
+      - land-use reform
+      - state preemption
+      - effective dates
+      - reform descriptions
+    access_format: web database
+    source_url: https://furmancenter.org/state-local-policy/land-use-reform-tracker
+    license_or_terms: Furman Center terms, verify reuse
+    update_frequency: maintained tracker
+    rent_control_use: treatment leads for housing-supply and land-use policy cases
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 13
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful for adjacent housing-supply policy timing. Not a rent-control
+      dataset and not global.
+
+  - source_id: locus_v1_local_ordinance_corpus
+    source_name: LOCUS-v1 Local Ordinance Corpus
+    publisher: LocalLaws project
+    geography: United States
+    spatial_grain: city/county ordinance section
+    time_coverage: 2026 snapshot per North America scout
+    policy_or_outcome_fields:
+      - ordinance text
+      - rent control references
+      - just-cause eviction references
+      - rental registry references
+      - zoning and licensing text
+    access_format: Hugging Face parquet
+    source_url: https://huggingface.co/datasets/LocalLaws/LOCUS-v1
+    license_or_terms: CC BY-NC 4.0 per North America scout; verify compatibility before production
+    update_frequency: static or unknown
+    rent_control_use: scalable U.S. local-law treatment discovery through NLP
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 14
+    verification_status: scout_reported_unverified
+    notes: >
+      Highest-payoff North America treatment-discovery source, but noncommercial
+      terms and ordinance-date extraction need review before integration.
+
+  - source_id: national_zoning_atlas
+    source_name: National Zoning Atlas
+    publisher: National Zoning Atlas
+    geography: United States
+    spatial_grain: parcel, zoning district, and local jurisdiction depending on state
+    time_coverage: rolling current snapshots per North America scout
+    policy_or_outcome_fields:
+      - allowed housing types
+      - zoning restrictiveness
+      - ADU permission
+      - multifamily permission
+      - zoning geography
+    access_format: web map and state-specific downloads where available
+    source_url: https://www.zoningatlas.org/
+    license_or_terms: varies by state/source, verify per download
+    update_frequency: rolling
+    rent_control_use: zoning and supply-restriction control/treatment layer
+    second_order_layers:
+      - first_order_policy_effect
+      - second_order_supply_response
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 15
+    verification_status: scout_reported_unverified
+    notes: >
+      Direct local housing-supply policy measure. Bulk suitability and state
+      coverage are heterogeneous.
+
+  - source_id: grounded_solutions_inclusionary_housing
+    source_name: Inclusionary Housing Database and Map
+    publisher: Grounded Solutions Network
+    geography: United States
+    spatial_grain: jurisdiction/program
+    time_coverage: current plus program metadata per North America scout
+    policy_or_outcome_fields:
+      - inclusionary housing adoption
+      - set-aside requirements
+      - affordability terms
+      - program metadata
+    access_format: web map/database; bulk access unclear
+    source_url: https://inclusionaryhousing.org/map/
+    license_or_terms: verify/request
+    update_frequency: irregular
+    rent_control_use: adjacent housing-policy event source and local policy controls
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 16
+    verification_status: scout_reported_unverified
+    notes: >
+      High-value for inclusionary zoning, but likely needs permission or bulk
+      export clarification.
+
+  - source_id: wharton_land_use_regulation_index
+    source_name: Wharton Residential Land Use Regulatory Index
+    publisher: Wharton / academic authors
+    geography: United States
+    spatial_grain: local jurisdiction and metropolitan area
+    time_coverage: 2006 and 2018 waves per North America scout
+    policy_or_outcome_fields:
+      - land-use regulatory stringency index
+      - local regulatory process measures
+      - metropolitan summaries
+    access_format: paper supplements or author data, verify access
+    source_url: https://realestate.wharton.upenn.edu/working-papers/the-impact-of-local-residential-land-use-restrictions-on-land-values-across-and-within-single-family-housing-markets/
+    license_or_terms: academic/personal-use terms, verify before redistribution
+    update_frequency: episodic
+    rent_control_use: zoning restrictiveness control for U.S. rent-control donor pools
+    second_order_layers:
+      - implementation_capacity
+      - second_order_supply_response
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 17
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful compact control variable, not a high-frequency policy-event panel.
+
+  - source_id: uk_mhclg_house_building_live_tables
+    source_name: Live tables on housing supply, indicators of new supply
+    publisher: UK Ministry of Housing, Communities and Local Government
+    geography: England and UK tables depending on file
+    spatial_grain: district/local authority, region, country
+    time_coverage: annual and quarterly tables
+    policy_or_outcome_fields:
+      - dwelling starts
+      - dwelling completions
+      - tenure
+      - district
+    access_format: ODS/XLS downloads and linked open data for selected tables
+    source_url: https://www.gov.uk/government/statistical-data-sets/live-tables-on-house-building
+    license_or_terms: Open Government Licence unless stated otherwise
+    update_frequency: quarterly
+    rent_control_use: local supply response and donor controls for UK housing policies
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 18
+    verification_status: seed_verified_official_page
+    notes: >
+      The page exposes district-level tables 253/253a; good early fetcher
+      candidate because files are public and periodically updated.
+
+  - source_id: nyc_open_data_housing_bundle
+    source_name: New York City open-data housing bundle
+    publisher: City of New York
+    geography: New York City
+    spatial_grain: building, parcel, complaint, permit, borough, tract
+    time_coverage: varies by dataset
+    policy_or_outcome_fields:
+      - rent-stabilized buildings
+      - housing maintenance complaints
+      - code violations
+      - building permits
+      - PLUTO parcel attributes
+    access_format: Socrata API and CSV downloads
+    source_url: https://opendata.cityofnewyork.us/
+    license_or_terms: NYC Open Data terms
+    update_frequency: dataset-specific, often daily to monthly
+    rent_control_use: NYC rent-stabilization quality, stock, and leakage layers
+    second_order_layers:
+      - quality_margin
+      - leakage_or_substitution
+      - second_order_supply_response
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 19
+    verification_status: endpoint_verified
+    notes: >
+      Pinned Socrata view IDs for DOB Permit Issuance (ipu4-2q9a), HPD
+      Housing Maintenance Code Complaints and Problems (ygpa-z7cr), and HPD
+      Housing Maintenance Code Violations (wvxf-dwi5). Landed borough-year
+      aggregate quality/supply panel at
+      data/derived/us_city_rent_control_quality_leakage_panel.parquet.
+
+  - source_id: nyc_open_data_tax_benefit_regulation_bundle
+    source_name: New York City rent-regulation tax-benefit proxy bundle
+    publisher: City of New York
+    geography: New York City
+    spatial_grain: parcel, building, borough, tax year, filing year
+    time_coverage: 2007-present for current extracts, 2007-2018 for historical J-51
+    policy_or_outcome_fields:
+      - 421-a exemptions
+      - 421-g exemptions
+      - J-51 exemptions and abatements
+      - 421-a(16) letters of intent
+      - 485-x prospective registrations
+      - multiple dwelling registrations
+      - PLUTO unit denominators
+    access_format: Socrata API and CSV downloads
+    source_url: https://opendata.cityofnewyork.us/
+    license_or_terms: NYC Open Data terms
+    update_frequency: dataset-specific, monthly to semiannual
+    rent_control_use: NYC rent-stabilization treatment-coverage proxy and regulated-stock denominator
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 21
+    verification_status: endpoint_verified
+    notes: >
+      Pinned Socrata view IDs for DOF Property Exemption Detail (muvi-b6kx),
+      Exemption Classification Codes (myn9-hwsy), DOF Property Abatement Detail
+      (rgyu-ii48), historical J-51 (y7az-s7wc), HPD 421-a(16) letters
+      (pq4c-wbq4), HPD 485-x registrations (rrtd-iyd7), PLUTO (64uk-42ks),
+      and HPD Multiple Dwelling Registrations (tesw-yqqr). Landed proxy panel
+      at data/derived/nyc_rent_regulation_tax_benefit_panel.parquet. This is
+      not an apartment-level DHCR/HCR registration file.
+
+  - source_id: datasf_housing_bundle
+    source_name: San Francisco open-data housing bundle
+    publisher: City and County of San Francisco
+    geography: San Francisco
+    spatial_grain: parcel, permit, complaint, license, neighborhood
+    time_coverage: varies by dataset
+    policy_or_outcome_fields:
+      - building permits
+      - DBI complaints
+      - DBI notices of violation
+      - Rent Board housing inventory
+      - Rent Board petitions
+      - eviction notices
+      - buyout agreements
+    access_format: Socrata API and CSV downloads
+    source_url: https://datasf.org/opendata/
+    license_or_terms: DataSF terms
+    update_frequency: dataset-specific
+    rent_control_use: San Francisco 1994 expansion supply, conversion, and quality layers
+    second_order_layers:
+      - quality_margin
+      - leakage_or_substitution
+      - dynamic_investment_response
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 20
+    verification_status: endpoint_verified
+    notes: >
+      Pinned Socrata view IDs for Building Permits (i98e-djp9), DBI
+      Complaints (gm2e-bten), DBI Notices of Violation (nbtm-fbw5), Rent Board
+      Housing Inventory (gdc7-dmcn), Rent Board Petitions (6swy-cmkq),
+      Eviction Notices (5cei-gny5), and Buyout Agreements (wmam-7g8d). Landed
+      annual neighborhood aggregate panel at
+      data/derived/us_sf_rent_control_quality_leakage_panel.parquet.
+
+  - source_id: berlin_mietspiegel
+    source_name: Berlin rent index / Mietspiegel
+    publisher: Berlin Senate Department for Urban Development, Building and Housing
+    geography: Berlin
+    spatial_grain: dwelling characteristics and rent-index cells
+    time_coverage: periodic Mietspiegel releases
+    policy_or_outcome_fields:
+      - local reference rents
+      - dwelling age
+      - amenities
+      - location quality
+      - size classes
+    access_format: web pages, PDFs, and supporting tables where available
+    source_url: https://www.berlin.de/sen/wohnen/service/berliner-mietspiegel/
+    license_or_terms: Berlin portal terms, verify reuse
+    update_frequency: periodic
+    rent_control_use: Berlin regulated-market rent benchmark around Mietendeckel
+    second_order_layers:
+      - first_order_price_or_transfer
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 21
+    verification_status: seed_unverified_url
+    notes: >
+      Pair with listing data, permits/completions, and donor German cities.
+      Mietspiegel is a benchmark, not a complete listing or tenancy registry.
+
+  - source_id: stockholm_bostadsformedlingen_statistics
+    source_name: Stockholm housing queue statistics
+    publisher: Bostadsformedlingen i Stockholm
+    geography: Stockholm region
+    spatial_grain: queue, allocation, dwelling type, municipality where exposed
+    time_coverage: release-dependent
+    policy_or_outcome_fields:
+      - queue time
+      - allocated dwellings
+      - applicants
+      - rent and dwelling attributes where exposed
+    access_format: web statistics and reports
+    source_url: https://bostad.stockholm.se/statistik/
+    license_or_terms: publisher terms, verify reuse
+    update_frequency: periodic
+    rent_control_use: allocation-distortion and queue-cost layer for Stockholm
+    second_order_layers:
+      - allocation_distortion
+      - net_welfare
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 22
+    verification_status: seed_unverified_url
+    notes: >
+      High-value because queue years directly measure non-price rationing.
+
+  - source_id: spain_rental_reference_price_system
+    source_name: Spain state rental reference price system
+    publisher: Spain Ministry of Housing and Urban Agenda
+    geography: Spain
+    spatial_grain: census section / dwelling characteristics where queryable
+    time_coverage: current reference system; historical data access uncertain
+    policy_or_outcome_fields:
+      - rental reference range
+      - stressed-market rent-cap applicability
+      - dwelling characteristics
+      - location
+    access_format: web query; bulk/API access to verify
+    source_url: https://www.mivau.gob.es/vivienda
+    license_or_terms: ministry terms, verify bulk reuse
+    update_frequency: release-based
+    rent_control_use: treatment intensity and first-order cap benchmark for Spain Law 12/2023
+    second_order_layers:
+      - first_order_price_or_transfer
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 23
+    verification_status: seed_unverified_url
+    notes: >
+      Needs a Spain-specific research pass to identify bulk files, official API
+      status, and municipality lists for stressed-market declarations.
+
+  - source_id: apartment_list_rent_estimates
+    source_name: Apartment List rent estimates
+    publisher: Apartment List
+    geography: United States
+    spatial_grain: city, metro, state
+    time_coverage: monthly, series-dependent
+    policy_or_outcome_fields:
+      - rent estimates
+      - rent growth
+      - city and metro identifiers
+    access_format: downloadable files where available; terms to verify
+    source_url: https://www.apartmentlist.com/research/category/data-rent-estimates
+    license_or_terms: Apartment List terms, verify redistribution
+    update_frequency: monthly
+    rent_control_use: alternative first-order rent panel for U.S. cities
+    second_order_layers:
+      - first_order_price_or_transfer
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 24
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful as a check against Zillow, HUD, and BLS; licensing must be reviewed
+      before storing raw files.
+
+  - source_id: eviction_lab_tracking_system
+    source_name: Eviction Lab Eviction Tracking System
+    publisher: Eviction Lab
+    geography: selected United States metros and cities
+    spatial_grain: court, county, or city month depending on source geography
+    time_coverage: 2020-present per North America scout
+    policy_or_outcome_fields:
+      - eviction filings
+      - geography
+      - filing month
+    access_format: downloads and dashboard
+    source_url: https://evictionlab.org/eviction-tracking/
+    license_or_terms: Eviction Lab research terms and citation, verify per download
+    update_frequency: monthly-ish per North America scout
+    rent_control_use: high-frequency tenant-protection outcome around policy changes
+    second_order_layers:
+      - allocation_distortion
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 25
+    verification_status: scout_reported_unverified
+    notes: >
+      Complements the national historical database with post-2020 frequency.
+
+  - source_id: nyc_rent_guidelines_board_stabilized_lists
+    source_name: NYC Rent Guidelines Board stabilized building lists
+    publisher: New York City Rent Guidelines Board
+    geography: New York City
+    spatial_grain: building and city
+    time_coverage: annual/current building lists and historical RGB orders per North America scout
+    policy_or_outcome_fields:
+      - rent-stabilized buildings
+      - rent increase orders
+      - building-level coverage
+    access_format: HTML, PDF, and CSV-like tables, verify files
+    source_url: https://rentguidelinesboard.cityofnewyork.us/resources/rent-stabilized-building-lists/
+    license_or_terms: NYC public terms, verify per file
+    update_frequency: annual
+    rent_control_use: NYC treatment registry exemplar for rent stabilization
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 26
+    verification_status: scout_reported_unverified
+    notes: >
+      Should be paired with NYC Open Data HPD complaints, permits, PLUTO, and
+      ACS outcomes.
+
+  - source_id: la_rso_open_data
+    source_name: Los Angeles rent-stabilization ordinance property/open data
+    publisher: City of Los Angeles
+    geography: Los Angeles
+    spatial_grain: parcel or building
+    time_coverage: current registry; ordinance since 1979 per North America scout
+    policy_or_outcome_fields:
+      - RSO-covered properties
+      - RSO-covered units
+      - parcel/building attributes
+    access_format: city open data/Socrata, dataset IDs to pin
+    source_url: https://data.lacity.org/
+    license_or_terms: LA open data terms, verify per dataset
+    update_frequency: recurring
+    rent_control_use: major-city treatment registry exemplar
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 27
+    verification_status: scout_reported_unverified
+    notes: >
+      Good validation case for building-level rent-control coverage extraction.
+
+  - source_id: dc_rent_control_registration_open_data
+    source_name: Washington DC rent-control and rental-registration open data
+    publisher: District of Columbia Open Data
+    geography: Washington, DC
+    spatial_grain: building or license
+    time_coverage: current/recurring per North America scout
+    policy_or_outcome_fields:
+      - rent-control registration
+      - rental licenses
+      - building attributes
+    access_format: DC open data/API, dataset IDs to pin
+    source_url: https://opendata.dc.gov/
+    license_or_terms: DC open data terms, verify per dataset
+    update_frequency: recurring
+    rent_control_use: U.S. rent-control treatment and registry exemplar
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 28
+    verification_status: scout_reported_unverified
+    notes: >
+      Candidate pilot after NYC/SF/St Paul because registry structure may be
+      cleaner than ordinance text alone.
+
+  - source_id: seattle_rrio_rental_registry
+    source_name: Seattle Rental Registration and Inspection Ordinance data
+    publisher: City of Seattle
+    geography: Seattle
+    spatial_grain: property or unit
+    time_coverage: 2014-present-ish per North America scout
+    policy_or_outcome_fields:
+      - rental registrations
+      - inspection status
+      - property/unit records
+    access_format: Seattle open data/API, dataset IDs to pin
+    source_url: https://data.seattle.gov/
+    license_or_terms: Seattle open data terms, verify per dataset
+    update_frequency: recurring
+    rent_control_use: rental-registry infrastructure control case without rent control
+    second_order_layers:
+      - implementation_capacity
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 29
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful as a tenant-protection/rental-registry comparison market.
+
+  - source_id: cmhc_housing_data_tables
+    source_name: CMHC Housing Data Tables / Housing Market Information Portal
+    publisher: Canada Mortgage and Housing Corporation
+    geography: Canada
+    spatial_grain: CMA, CA, municipality, and neighborhood depending on table
+    time_coverage: varies; many monthly and annual series per North America scout
+    policy_or_outcome_fields:
+      - rents
+      - vacancy
+      - starts
+      - completions
+      - rental universe
+    access_format: tables, portal, and downloads
+    source_url: https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-data/data-tables
+    license_or_terms: CMHC royalty-free licence with attribution per North America scout
+    update_frequency: monthly and annual
+    rent_control_use: Canadian city rent, vacancy, and supply outcome spine
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - allocation_distortion
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 30
+    verification_status: scout_reported_unverified
+    notes: >
+      Best Canadian outcome source for rent-control-adjacent city tests.
+
+  - source_id: statcan_census_housing_tables
+    source_name: Statistics Canada census and housing data tables
+    publisher: Statistics Canada
+    geography: Canada
+    spatial_grain: CSD, CMA, tract, dissemination area
+    time_coverage: census 2001-2021 plus annual tables where available
+    policy_or_outcome_fields:
+      - shelter cost
+      - renters
+      - dwelling stock
+      - vacancy proxies
+      - income
+    access_format: StatCan tables, API, and downloads
+    source_url: https://www.statcan.gc.ca/en/terms-conditions/open-licence
+    license_or_terms: Statistics Canada Open Licence
+    update_frequency: census and annual table releases
+    rent_control_use: Canadian equivalent of ACS for city incidence and baselines
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+      - allocation_distortion
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 31
+    verification_status: scout_reported_unverified
+    notes: >
+      Need specific table IDs before fetcher design.
+
+  - source_id: canadian_rental_housing_index
+    source_name: Canadian Rental Housing Index
+    publisher: Canadian Rental Housing Index partners
+    geography: Canada
+    spatial_grain: municipality and CMA
+    time_coverage: 2011, 2016, 2021 per North America scout
+    policy_or_outcome_fields:
+      - rent burden
+      - renter income
+      - overcrowding
+      - affordability
+    access_format: web/download, bulk unclear
+    source_url: https://rentalhousingindex.ca/
+    license_or_terms: verify reuse
+    update_frequency: census-cycle
+    rent_control_use: ready-made Canadian municipal renter affordability layer
+    second_order_layers:
+      - distributional_incidence
+      - allocation_distortion
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 32
+    verification_status: scout_reported_unverified
+    notes: >
+      Check bulk/export terms before storing raw files.
+
+  - source_id: canada_provincial_rent_guidelines
+    source_name: Canadian provincial rent-guideline and tenant-rule pages
+    publisher: provincial governments of Canada
+    geography: Canada
+    spatial_grain: province-year, assignable to cities
+    time_coverage: annual/current per North America scout
+    policy_or_outcome_fields:
+      - rent increase guidelines
+      - rent caps
+      - tenant rules
+      - exemptions
+    access_format: official pages and manual scrape
+    source_url: https://www.ontario.ca/page/residential-rent-increases
+    license_or_terms: government terms vary by province
+    update_frequency: annual
+    rent_control_use: Canadian rent-control treatment overlay for city panels
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 33
+    verification_status: scout_reported_unverified
+    notes: >
+      Canada rent control is mostly provincial, so city exposure is assigned
+      through province-city crosswalk plus local exemptions.
+    verification_status: seed_unverified_url
+    notes: >
+      Useful as a check against Zillow, HUD, and BLS; licensing must be reviewed
+      before storing raw files.
+
+  - source_id: ibge_munic
+    source_name: IBGE Pesquisa de Informacoes Basicas Municipais (MUNIC)
+    publisher: Instituto Brasileiro de Geografia e Estatistica
+    geography: Brazil
+    spatial_grain: municipality
+    time_coverage: 1999-latest per LAC scout
+    policy_or_outcome_fields:
+      - municipal housing policy
+      - urban instruments
+      - planning
+      - land regularization
+      - municipal administration
+    access_format: XLSX/ODS and SIDRA/API, verify current endpoint
+    source_url: https://www.ibge.gov.br/estatisticas/sociais/administracao-publica-e-participacao-politica/10586-pesquisa-de-informacoes-basicas-municipais.html
+    license_or_terms: public IBGE citation terms, verify per download
+    update_frequency: annual or release-based
+    rent_control_use: municipal policy-treatment backbone for Brazilian cities
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 34
+    verification_status: scout_reported_unverified
+    notes: >
+      LAC scout ranked this as the best Brazilian municipal policy-treatment
+      backbone. Pair with IBGE census/SIDRA housing outcomes.
+
+  - source_id: ibge_census_sidra_housing
+    source_name: IBGE Census, SIDRA, and housing microdata
+    publisher: Instituto Brasileiro de Geografia e Estatistica
+    geography: Brazil
+    spatial_grain: municipality, tract, weighting area, household microdata
+    time_coverage: 2000, 2010, 2022 census rounds per LAC scout
+    policy_or_outcome_fields:
+      - tenure
+      - rent value
+      - rent in minimum wages
+      - housing quality
+      - services
+    access_format: FTP, SIDRA/API, and microdata downloads
+    source_url: https://www.ibge.gov.br/estatisticas/sociais/populacao/22827-censo-demografico-2022.html
+    license_or_terms: public IBGE citation terms, verify per download
+    update_frequency: decennial plus release updates
+    rent_control_use: rent and housing-quality outcomes for Brazilian city panel
+    second_order_layers:
+      - first_order_price_or_transfer
+      - quality_margin
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 35
+    verification_status: scout_reported_unverified
+    notes: >
+      Potentially high payoff because Brazil contributes many top-1000 cities;
+      variable-level codebooks need ingestion review.
+
+  - source_id: mexico_sniiv_sedatu
+    source_name: SNIIV / SEDATU open data
+    publisher: Secretaria de Desarrollo Agrario, Territorial y Urbano
+    geography: Mexico
+    spatial_grain: municipality
+    time_coverage: 2010/2013-latest, many monthly series per LAC scout
+    policy_or_outcome_fields:
+      - housing finance
+      - subsidies
+      - RUV inventory and registrations
+      - housing production
+      - housing deficit
+      - arrendamiento destination
+    access_format: CSV/XLSX and JSON API, verify current schema
+    source_url: https://sniiv.sedatu.gob.mx/Reporte/Datos_abiertos
+    license_or_terms: public SEDATU citation terms, verify per endpoint
+    update_frequency: monthly, quarterly, and decennial series mix
+    rent_control_use: municipal housing supply and program underlay for Mexico
+    second_order_layers:
+      - second_order_supply_response
+      - implementation_capacity
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 36
+    verification_status: scout_reported_unverified
+    notes: >
+      LAC and North America scouts both ranked this as a high-payoff Mexico
+      municipal housing supply, finance, and program source.
+
+  - source_id: inegi_banco_indicadores_api
+    source_name: INEGI Banco de Indicadores API
+    publisher: Instituto Nacional de Estadistica y Geografia
+    geography: Mexico
+    spatial_grain: municipality, state, and national depending on indicator
+    time_coverage: varies by census/API series
+    policy_or_outcome_fields:
+      - rented dwellings
+      - vacancy
+      - housing characteristics
+      - population
+    access_format: JSON/XML API, token required
+    source_url: https://www.inegi.org.mx/servicios/api_indicadores.html
+    license_or_terms: public official terms, verify attribution and token rules
+    update_frequency: varies
+    rent_control_use: API path for Mexican municipal housing baselines
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 37
+    verification_status: scout_reported_unverified
+    notes: >
+      Complements the CPV/SCINCE source record with an API-specific route.
+
+  - source_id: mexico_shf_housing_price_index
+    source_name: SHF Housing Price Index
+    publisher: Sociedad Hipotecaria Federal
+    geography: Mexico
+    spatial_grain: state, metro, or municipality where available
+    time_coverage: quarterly, roughly 2005-present per North America scout
+    policy_or_outcome_fields:
+      - house price index
+      - appreciation
+      - geography
+    access_format: reports and tables, bulk format to verify
+    source_url: https://www.gob.mx/shf
+    license_or_terms: public terms, verify reuse
+    update_frequency: quarterly
+    rent_control_use: Mexican housing-price outcome complement to rental/housing-stock sources
+    second_order_layers:
+      - first_order_price_or_transfer
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 38
+    verification_status: scout_reported_unverified
+    notes: >
+      Not rent-specific, but useful as housing-market control/outcome.
+
+  - source_id: cdmx_housing_rent_policy_sources
+    source_name: Mexico City housing and rent policy sources
+    publisher: Gobierno de la Ciudad de Mexico
+    geography: Mexico City
+    spatial_grain: city and alcaldia
+    time_coverage: current/proposed policies per North America scout
+    policy_or_outcome_fields:
+      - rent-cap proposals
+      - housing programs
+      - permits
+      - open-data housing records
+    access_format: laws, open data, and manual extraction
+    source_url: https://datos.cdmx.gob.mx/
+    license_or_terms: CDMX open government licence where data applies, verify per source
+    update_frequency: irregular
+    rent_control_use: Mexico City tenant-protection and rent-policy exemplar
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+      - second_order_supply_response
+    top_1000_scalability: low
+    ingestion_difficulty: high
+    immediate_payoff_rank: 39
+    verification_status: scout_reported_unverified
+    notes: >
+      High-value local case, but not panel-ready without manual legal and data
+      normalization.
+    verification_status: scout_reported_unverified
+    notes: >
+      LAC scout ranked this as the highest-payoff LAC ingestion candidate.
+
+  - source_id: inegi_cpv_scince
+    source_name: INEGI CPV and SCINCE
+    publisher: Instituto Nacional de Estadistica y Geografia
+    geography: Mexico
+    spatial_grain: municipality, locality, AGEB
+    time_coverage: 2000, 2010, 2020 census rounds per LAC scout
+    policy_or_outcome_fields:
+      - tenure
+      - rented dwellings
+      - housing conditions
+      - services
+    access_format: web tables, API, and downloads
+    source_url: https://www.inegi.org.mx/programas/ccpv/2020/
+    license_or_terms: public INEGI citation terms, verify per endpoint
+    update_frequency: decennial
+    rent_control_use: municipal rent/tenure/housing baseline for Mexican cities
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 40
+    verification_status: scout_reported_unverified
+    notes: >
+      Complements SNIIV monthly supply/program data with census baseline
+      housing conditions.
+
+  - source_id: dane_elic
+    source_name: DANE Estadisticas de Licencias de Construccion (ELIC)
+    publisher: Departamento Administrativo Nacional de Estadistica
+    geography: Colombia
+    spatial_grain: municipality
+    time_coverage: 2005-April 2026 per LAC scout
+    policy_or_outcome_fields:
+      - building licenses
+      - approved area
+      - housing and non-housing destination
+      - socioeconomic strata
+    access_format: XLSX annexes and geovisor, verify bulk layout
+    source_url: https://www.dane.gov.co/index.php/estadisticas-por-tema/construccion/licencias-de-construccion
+    license_or_terms: public DANE citation terms, verify per download
+    update_frequency: monthly
+    rent_control_use: supply-response outcome for Colombian cities
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 41
+    verification_status: scout_reported_unverified
+    notes: >
+      Strong clean supply panel across Colombian municipalities.
+
+  - source_id: dane_ceed
+    source_name: DANE Censo de Edificaciones (CEED)
+    publisher: Departamento Administrativo Nacional de Estadistica
+    geography: Colombia
+    spatial_grain: urban/metropolitan area and municipality depending on file
+    time_coverage: 1997-Q1 2026 per LAC scout
+    policy_or_outcome_fields:
+      - construction area
+      - work status
+      - starts
+      - completions
+      - VIS and non-VIS segments
+    access_format: XLSX, microdata, and geovisor, verify current structure
+    source_url: https://www.dane.gov.co/index.php/estadisticas-por-tema/construccion/censo-de-edificaciones
+    license_or_terms: public DANE citation terms, verify per download
+    update_frequency: quarterly
+    rent_control_use: construction-pipeline outcome for Colombian city panels
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 42
+    verification_status: scout_reported_unverified
+    notes: >
+      Complements permit licenses with realized construction pipeline.
+
+  - source_id: chile_ine_building_permits
+    source_name: Chile INE Permisos de Edificacion
+    publisher: Instituto Nacional de Estadisticas Chile
+    geography: Chile
+    spatial_grain: comuna
+    time_coverage: current monthly series through April 2026 per LAC scout
+    policy_or_outcome_fields:
+      - building permits
+      - new housing
+      - extensions
+      - geodata
+    access_format: databases, INE.Stat, and ArcGIS geodata, verify current files
+    source_url: https://www.ine.gob.cl/estadisticas-por-tema/industria-energia-y-construccion/permisos-de-edificacion
+    license_or_terms: Chile INE open/citation terms, verify per download
+    update_frequency: monthly
+    rent_control_use: supply response for Chilean city and comuna panels
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 43
+    verification_status: scout_reported_unverified
+    notes: >
+      Straightforward low-difficulty supply source for Santiago, Valparaiso,
+      Concepcion, and other Chilean urban systems.
+
+  - source_id: chile_siedu
+    source_name: Sistema de Indicadores y Estandares de Desarrollo Urbano (SIEDU)
+    publisher: Chile INE and urban-development partners
+    geography: Chile
+    spatial_grain: urban comuna
+    time_coverage: baseline plus updates per LAC scout
+    policy_or_outcome_fields:
+      - urban quality indicators
+      - housing and access indicators
+      - planning and service indicators
+    access_format: web/download, verify current files
+    source_url: https://siedu.ine.cl/
+    license_or_terms: official terms, verify reuse
+    update_frequency: irregular
+    rent_control_use: standardized urban covariates for Chilean city panels
+    second_order_layers:
+      - quality_margin
+      - externality_or_spillover
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 44
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful for urban-quality controls rather than direct rent-control
+      treatment.
+
+  - source_id: indec_eph
+    source_name: INDEC Encuesta Permanente de Hogares
+    publisher: Instituto Nacional de Estadistica y Censos
+    geography: Argentina
+    spatial_grain: urban agglomerate
+    time_coverage: 2003-latest per LAC scout
+    policy_or_outcome_fields:
+      - tenure
+      - housing expense variables
+      - rent variables to verify
+      - income
+    access_format: microdata downloads
+    source_url: https://www.indec.gob.ar/indec/web/Institucional-Indec-BasesDeDatos
+    license_or_terms: public INDEC citation terms, verify per download
+    update_frequency: quarterly
+    rent_control_use: rent-affordability outcomes for Argentine metro cases
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 45
+    verification_status: scout_reported_unverified
+    notes: >
+      Variable codebooks must confirm rent/housing-cost fields and city
+      representativeness.
+
+  - source_id: buenos_aires_housing_observatory
+    source_name: Buenos Aires housing reports and IVC observatory data
+    publisher: Gobierno de la Ciudad de Buenos Aires
+    geography: Buenos Aires
+    spatial_grain: city and comuna
+    time_coverage: 2013-latest reports per LAC scout
+    policy_or_outcome_fields:
+      - tenant situation
+      - vacancies
+      - housing deficit
+      - rental-market reports
+    access_format: CKAN, CSV, and PDF, verify dataset-level IDs
+    source_url: https://data.buenosaires.gob.ar/dataset/informes-coyuntura-habitacional
+    license_or_terms: CC-BY-2.5-AR per LAC scout, verify per dataset
+    update_frequency: irregular/report-based
+    rent_control_use: local rental-market and tenant context for Buenos Aires
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+      - allocation_distortion
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 46
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful deep local case, not a broad LAC panel.
+
+  - source_id: bogota_encuesta_multiproposito_cadastre
+    source_name: Bogota Encuesta Multiproposito and cadastral data
+    publisher: Secretaria Distrital de Planeacion / Bogota open-data ecosystem
+    geography: Bogota and Cundinamarca
+    spatial_grain: locality, UPZ, municipality, household, cadastral unit
+    time_coverage: 2011, 2014, 2017, 2021 per LAC scout
+    policy_or_outcome_fields:
+      - rent paid
+      - tenure
+      - housing quality
+      - cadastral values
+      - household characteristics
+    access_format: microdata and open geodata, verify endpoints
+    source_url: https://www.sdp.gov.co/gestion-estudios-estrategicos/estudios-macro/encuesta-multiproposito
+    license_or_terms: open/citation terms, verify per file
+    update_frequency: periodic
+    rent_control_use: rich local affordability and quality case for Bogota
+    second_order_layers:
+      - first_order_price_or_transfer
+      - quality_margin
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 47
+    verification_status: scout_reported_unverified
+    notes: >
+      LAC scout identified this as the best deep local rental case in the
+      region.
+
+  - source_id: peru_inei_renamu
+    source_name: INEI Registro Nacional de Municipalidades (RENAMU)
+    publisher: Instituto Nacional de Estadistica e Informatica
+    geography: Peru
+    spatial_grain: municipality
+    time_coverage: annual per LAC scout
+    policy_or_outcome_fields:
+      - municipal management
+      - plans
+      - licenses
+      - services
+      - local policy instruments to verify
+    access_format: tables and microdata, verify current endpoint
+    source_url: https://www.inei.gob.pe/estadisticas/indice-tematico/registro-nacional-de-municipalidades-10352/
+    license_or_terms: public INEI citation terms, verify per download
+    update_frequency: annual
+    rent_control_use: local policy and implementation-capacity variables for Peru
+    second_order_layers:
+      - implementation_capacity
+      - first_order_policy_effect
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 48
+    verification_status: scout_reported_unverified
+    notes: >
+      Pair with Peruvian census and ENAHO for housing outcomes.
+
+  - source_id: peru_inei_census_redatam
+    source_name: Peru Census 2017 / REDATAM
+    publisher: Instituto Nacional de Estadistica e Informatica
+    geography: Peru
+    spatial_grain: district, block, settlement
+    time_coverage: 2007 and 2017 per LAC scout
+    policy_or_outcome_fields:
+      - tenure
+      - rented dwellings
+      - dwelling quality
+      - overcrowding
+    access_format: REDATAM and downloads
+    source_url: https://censos2017.inei.gob.pe/redatam/
+    license_or_terms: public INEI citation terms, verify per download
+    update_frequency: decennial
+    rent_control_use: district-level housing baseline for Lima, Arequipa, Trujillo, and other cities
+    second_order_layers:
+      - quality_margin
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 49
+    verification_status: scout_reported_unverified
+    notes: >
+      Strong local baseline, but not a high-frequency outcome source.
+
+  - source_id: idb_urban_dashboard
+    source_name: IDB Urban Dashboard / Emerging and Sustainable Cities Initiative
+    publisher: Inter-American Development Bank
+    geography: Latin America and Caribbean
+    spatial_grain: city or metropolitan area
+    time_coverage: mostly 2009-2020 per LAC scout
+    policy_or_outcome_fields:
+      - housing deficit
+      - informality
+      - urban services
+      - planning indicators
+    access_format: web/download, verify current bulk access
+    source_url: https://urbandashboard.iadb.org/
+    license_or_terms: IDB terms, verify reuse
+    update_frequency: irregular
+    rent_control_use: regional cross-city benchmark and covariates
+    second_order_layers:
+      - quality_margin
+      - implementation_capacity
+      - externality_or_spillover
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 50
+    verification_status: scout_reported_unverified
+    notes: >
+      Not a rent-control panel, but useful to scale comparable LAC city
+      covariates.
+
+  - source_id: france_oll_rent_observations
+    source_name: France Observatoires Locaux des Loyers rent observations
+    publisher: Observatoires Locaux des Loyers / data.gouv.fr
+    geography: France
+    spatial_grain: agglomeration and local observatory area
+    time_coverage: 2010s-present per Europe scout
+    policy_or_outcome_fields:
+      - observed private rents
+      - dwelling type
+      - rooms
+      - construction era
+      - tenure length
+    access_format: data.gouv CSV/API
+    source_url: https://www.data.gouv.fr/organizations/observatoires-locaux-des-loyers/datasets
+    license_or_terms: Open Licence 2.0 unless otherwise specified, verify per dataset
+    update_frequency: annual
+    rent_control_use: official multi-city rent outcome layer for French cases
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 101
+    verification_status: scout_reported_unverified
+    notes: >
+      High-specificity official rent outcome source. Join to rent-control
+      reference-rent zones where available.
+
+  - source_id: france_reference_rent_control_datasets
+    source_name: France rent-control reference-rent datasets
+    publisher: Paris and French local/open-data portals
+    geography: Paris, Lille/Lomme/Hellemmes, Plaine Commune, and other enabled zones
+    spatial_grain: neighborhood, zone, and commune
+    time_coverage: 2019-present per Europe scout
+    policy_or_outcome_fields:
+      - reference rent
+      - legal rent ceilings
+      - furnished status
+      - rooms
+      - construction era
+      - legal orders
+    access_format: Opendatasoft/API, CSV, and GeoJSON
+    source_url: https://opendata.paris.fr/explore/dataset/logement-encadrement-des-loyers/
+    license_or_terms: ODbL or Licence Ouverte depending on portal, verify per dataset
+    update_frequency: annual
+    rent_control_use: direct policy variable for French rent caps
+    second_order_layers:
+      - first_order_policy_effect
+      - first_order_price_or_transfer
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 102
+    verification_status: scout_reported_unverified
+    notes: >
+      Patchy but highly policy-specific. Needs multi-city data.gouv search and
+      legal-order normalization.
+
+  - source_id: france_sitadel_permits
+    source_name: Sitadel building permits and authorisations
+    publisher: France official housing/construction statistics via data.gouv/Dido
+    geography: France
+    spatial_grain: parcel and commune
+    time_coverage: 2013-present per Europe scout
+    policy_or_outcome_fields:
+      - permits
+      - starts
+      - completions
+      - dwelling counts
+      - permit lifecycle
+    access_format: data.gouv/Dido API, CSV, and ZIP
+    source_url: https://www.data.gouv.fr/datasets/base-des-permis-de-construire-et-autres-autorisations-durbanisme-sitadel
+    license_or_terms: Licence Ouverte, verify per file
+    update_frequency: monthly
+    rent_control_use: supply response/control layer for French rent-control zones
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 103
+    verification_status: scout_reported_unverified
+    notes: >
+      Key supply panel for France; join commune/parcel geographies to city
+      spine and rent-control zones.
+
+  - source_id: catalonia_housing_open_data_bundle
+    source_name: Catalonia open-data housing bundle
+    publisher: Generalitat de Catalunya
+    geography: Catalonia
+    spatial_grain: municipality, supra-municipal area, and housing zones
+    time_coverage: 1990/2000-present, series-dependent per Europe scout
+    policy_or_outcome_fields:
+      - rent deposits
+      - average rent
+      - starts and completions
+      - protected housing
+      - empty-homes tax
+      - housing-policy areas
+    access_format: Socrata API, CSV, and JSON
+    source_url: https://analisi.transparenciacatalunya.cat/d/qww9-bvhh
+    license_or_terms: Generalitat terms, verify per dataset
+    update_frequency: quarterly, annual, and variable
+    rent_control_use: rich treated-region panel for Catalonia rent controls and housing policy
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - implementation_capacity
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 104
+    verification_status: scout_reported_unverified
+    notes: >
+      Unusually complete regional stack with outcomes and policy-adjacent
+      fields.
+
+  - source_id: italy_omi_quotations
+    source_name: Italy OMI real-estate quotations
+    publisher: Agenzia delle Entrate
+    geography: Italy
+    spatial_grain: OMI zone and municipality
+    time_coverage: 2006-present per Europe scout
+    policy_or_outcome_fields:
+      - rent ranges per square meter
+      - sale price ranges per square meter
+      - property type
+      - property condition
+    access_format: downloads, web services, and semiannual tables
+    source_url: https://www.agenziaentrate.gov.it/portale/web/guest/schede/fabbricatiterreni/omi/banche-dati/quotazioni-immobiliari
+    license_or_terms: Agenzia Entrate terms, verify reuse
+    update_frequency: semiannual
+    rent_control_use: national official local rent-price surface for Italian cities
+    second_order_layers:
+      - first_order_price_or_transfer
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 105
+    verification_status: scout_reported_unverified
+    notes: >
+      Rare official local rent surface. Policy event layer must be coded
+      separately.
+
+  - source_id: portugal_ine_municipal_rents
+    source_name: Portugal INE municipal rents
+    publisher: Instituto Nacional de Estatistica Portugal
+    geography: Portugal
+    spatial_grain: municipality and NUTS areas
+    time_coverage: 2017-present per Europe scout
+    policy_or_outcome_fields:
+      - median rent per square meter for new lease contracts
+      - contract counts
+      - housing supply controls
+    access_format: INE database/API
+    source_url: https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_base_dados
+    license_or_terms: INE Portugal terms, verify per table
+    update_frequency: quarterly
+    rent_control_use: clean official municipal rent outcome series
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 106
+    verification_status: scout_reported_unverified
+    notes: >
+      Good low-noise rent outcome layer for Portuguese housing-policy cases.
+
+  - source_id: uk_ons_voa_private_rents
+    source_name: ONS/VOA private rental market statistics
+    publisher: UK Office for National Statistics / Valuation Office Agency
+    geography: England and UK components depending on series
+    spatial_grain: local authority and region
+    time_coverage: 2011/12-present, series-dependent per Europe scout
+    policy_or_outcome_fields:
+      - private rents
+      - rent distributions
+      - bedroom count
+      - local authority
+    access_format: ONS XLS/CSV/API and GOV.UK tables
+    source_url: https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/privaterentalmarketsummarystatisticsinengland
+    license_or_terms: Open Government Licence v3
+    update_frequency: annual/monthly depending on series
+    rent_control_use: UK local rent outcome layer; pair with MHCLG supply tables
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 107
+    verification_status: scout_reported_unverified
+    notes: >
+      Complements the already-seeded MHCLG house-building tables.
+
+  - source_id: ireland_rtb_rent_index_rpz
+    source_name: Ireland RTB Rent Index and Rent Pressure Zones
+    publisher: Residential Tenancies Board / CSO Ireland
+    geography: Ireland
+    spatial_grain: county and local electoral area
+    time_coverage: 2007-present per Europe scout
+    policy_or_outcome_fields:
+      - rent index
+      - standardised rents
+      - new and existing tenancies
+      - Rent Pressure Zone status
+    access_format: Excel/CSV downloads
+    source_url: https://rtb.ie/about-rtb/data-insights/data-hub/rent-index
+    license_or_terms: RTB/CSO terms, verify per download
+    update_frequency: quarterly
+    rent_control_use: direct rent-stabilization treatment and outcome source
+    second_order_layers:
+      - first_order_policy_effect
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 108
+    verification_status: scout_reported_unverified
+    notes: >
+      Attractive because treatment status and rent outcomes are close together
+      in one national system.
+
+  - source_id: germany_inkar_housing
+    source_name: BBSR INKAR housing and regional indicators
+    publisher: Bundesinstitut fur Bau-, Stadt- und Raumforschung
+    geography: Germany
+    spatial_grain: municipality, district, and region
+    time_coverage: last decades-present per Europe scout
+    policy_or_outcome_fields:
+      - rents
+      - housing stock
+      - completions
+      - vacancy proxies
+      - demographics
+    access_format: ZIP, XLS, and CSV downloads
+    source_url: https://www.inkar.de/
+    license_or_terms: BBSR reuse/citation terms, verify per file
+    update_frequency: annual
+    rent_control_use: German municipal outcomes for Mietpreisbremse and Berlin donor pools
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 109
+    verification_status: scout_reported_unverified
+    notes: >
+      Mietpreisbremse designation still needs separate legal coding.
+
+  - source_id: nordic_municipal_housing_stats
+    source_name: Nordic municipal housing statistics APIs
+    publisher: SCB, Boverket, SSB/KOSTRA, and Statistics Denmark
+    geography: Sweden, Norway, Denmark
+    spatial_grain: municipality and region
+    time_coverage: 1990s/2000s-present, country dependent
+    policy_or_outcome_fields:
+      - rents
+      - dwelling stock
+      - starts and completions
+      - municipal housing shortage surveys
+      - social housing and municipal housing indicators
+    access_format: PXWeb/API, StatBank APIs, Excel, and CSV
+    source_url: https://www.scb.se/en/services/open-data-api/
+    license_or_terms: official open-data terms vary by country
+    update_frequency: annual and quarterly depending on table
+    rent_control_use: Stockholm/Sweden and Nordic donor-pool controls
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - allocation_distortion
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 110
+    verification_status: scout_reported_unverified
+    notes: >
+      Split by country during fetcher design.
+
+  - source_id: inside_airbnb
+    source_name: Inside Airbnb
+    publisher: Inside Airbnb
+    geography: Europe and world selected cities
+    spatial_grain: city, listing, and neighborhood
+    time_coverage: 2010s-present snapshots per Europe scout
+    policy_or_outcome_fields:
+      - short-term rental listings
+      - availability
+      - prices
+      - host concentration
+      - neighborhood
+    access_format: CSV downloads
+    source_url: https://insideairbnb.com/get-the-data/
+    license_or_terms: project terms resemble CC BY-style reuse; verify before production
+    update_frequency: monthly or irregular
+    rent_control_use: leakage/substitution and short-term-rental pressure covariate
+    second_order_layers:
+      - leakage_or_substitution
+      - market_structure_response
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 111
+    verification_status: scout_reported_unverified
+    notes: >
+      Not official, but useful for leakage channels in rent-control and housing
+      supply cases.
+
+  - source_id: korea_molit_rtms_rent_api
+    source_name: Korea MOLIT RTMS apartment rent and lease API
+    publisher: South Korea Ministry of Land, Infrastructure and Transport
+    geography: South Korea
+    spatial_grain: si/gun/gu, legal-dong, parcel, and building
+    time_coverage: monthly/rolling per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - jeonse deposit
+      - monthly rent
+      - area
+      - floor
+      - contract date
+    access_format: OpenAPI, key required
+    source_url: https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent
+    license_or_terms: Public Data Portal terms, verify API rules
+    update_frequency: monthly/rolling
+    rent_control_use: district rent-transaction spine for Korean lease-law shocks
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 112
+    verification_status: scout_reported_unverified
+    notes: >
+      Asia-Pacific scout ranked this as the strongest APAC rent-transaction
+      source.
+
+  - source_id: japan_estat_housing_land_survey
+    source_name: Japan e-Stat Housing and Land Survey
+    publisher: Statistics Bureau of Japan / e-Stat
+    geography: Japan
+    spatial_grain: municipality
+    time_coverage: 2023 plus prior five-year waves per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - rented dwellings
+      - monthly rent
+      - rent per square meter
+      - vacancy
+      - housing stock
+    access_format: e-Stat API, CSV, JSON, XML; app ID required
+    source_url: https://www.e-stat.go.jp/en/stat-search/database?page=1&toukei=00200522
+    license_or_terms: e-Stat/Japan government terms, verify per table
+    update_frequency: five-yearly
+    rent_control_use: municipal rent and stock benchmark for Japanese cities
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - allocation_distortion
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 113
+    verification_status: scout_reported_unverified
+    notes: >
+      Strong benchmark, but not high-frequency.
+
+  - source_id: nz_tenancy_rental_bond_data
+    source_name: New Zealand Tenancy Services rental bond data
+    publisher: New Zealand Tenancy Services
+    geography: New Zealand
+    spatial_grain: territorial authority and suburb
+    time_coverage: monthly historical-present per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - median rent
+      - mean rent
+      - bonds lodged
+      - bedrooms
+      - dwelling type
+    access_format: CSV/XLS downloads
+    source_url: https://www.tenancy.govt.nz/about-tenancy-services/data-and-statistics/rental-bond-data/
+    license_or_terms: New Zealand government terms, verify file terms
+    update_frequency: monthly
+    rent_control_use: clean local rent panel for New Zealand tenancy-law shocks
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 114
+    verification_status: scout_reported_unverified
+    notes: >
+      Scout noted the source page was blocked by Incapsula during its check;
+      verify access before fetcher design.
+
+  - source_id: australia_state_rental_bond_panels
+    source_name: Australia state rental bond median-rent panels
+    publisher: Victoria, Queensland, NSW, and other state housing agencies
+    geography: Australia
+    spatial_grain: LGA, postcode, suburb, and state-dependent geography
+    time_coverage: 1999-present for Victoria; other states vary per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - median weekly rent
+      - bonds lodged
+      - bonds held
+      - dwelling type
+      - local area
+    access_format: CKAN, XLSX, and CSV downloads
+    source_url: https://discover.data.vic.gov.au/dataset/rental-report-quarterly-quarterly-median-rents-by-lga
+    license_or_terms: CC BY 4.0 for Victoria; other state terms vary
+    update_frequency: quarterly
+    rent_control_use: local rent outcomes for Australian tenant-law and housing-policy cases
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 115
+    verification_status: scout_reported_unverified
+    notes: >
+      Start with Victoria and Queensland, then add NSW after current coverage is
+      verified.
+
+  - source_id: abs_building_approvals_census_housing
+    source_name: ABS Building Approvals and Census housing tables
+    publisher: Australian Bureau of Statistics
+    geography: Australia
+    spatial_grain: LGA, SA2, and GCCSA
+    time_coverage: monthly approvals and five-yearly census per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - building approvals
+      - dwelling stock
+      - tenure
+      - rent bands
+    access_format: ABS SDMX API and CSV
+    source_url: https://www.abs.gov.au/statistics/industry/building-and-construction/building-approvals-australia/latest-release
+    license_or_terms: CC BY 4.0
+    update_frequency: monthly and five-yearly
+    rent_control_use: Australian supply and baseline housing outcomes
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 116
+    verification_status: scout_reported_unverified
+    notes: >
+      Pair with state rent-bond panels.
+
+  - source_id: singapore_hdb_ura_rentals
+    source_name: Singapore HDB and URA rental datasets
+    publisher: data.gov.sg / HDB / URA
+    geography: Singapore
+    spatial_grain: HDB town, flat type, project, planning area, district
+    time_coverage: quarterly historical-present per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - HDB approved subletting median rents
+      - private rental contracts
+      - rent
+      - property type
+    access_format: data.gov.sg/API/CSV and URA API
+    source_url: https://data.gov.sg/datasets?query=Median%20Rent%20by%20Town%20and%20Flat%20Type
+    license_or_terms: Singapore Open Data Licence and URA/data.gov terms
+    update_frequency: quarterly
+    rent_control_use: city-state/subcity rent panel and public/private market split
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 117
+    verification_status: scout_reported_unverified
+    notes: >
+      Pair HDB with URA private rentals to avoid public-housing-only inference.
+
+  - source_id: philippines_psa_openstat_housing_permits
+    source_name: Philippines PSA OpenSTAT housing CPI and building permits
+    publisher: Philippine Statistics Authority
+    geography: Philippines
+    spatial_grain: region, province, city, or geolocation depending on table
+    time_coverage: 2006-2024 verified for building permits; CPI monthly per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - CPI housing/utilities groups
+      - approved building permits
+      - floor area
+      - residential/nonresidential value
+    access_format: PXWeb API
+    source_url: https://openstat.psa.gov.ph/PXWeb/api/v1/en/DB/2G/CONS/BGP
+    license_or_terms: PSA OpenSTAT terms, verify per API
+    update_frequency: annual, quarterly, and monthly depending on table
+    rent_control_use: construction supply and affordability proxy for Philippine city panels
+    second_order_layers:
+      - second_order_supply_response
+      - first_order_price_or_transfer
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 118
+    verification_status: scout_reported_unverified
+    notes: >
+      City suitability depends on table geolocation dimensions.
+
+  - source_id: india_cpi_iw_nhb_residex
+    source_name: India CPI-IW and NHB RESIDEX city housing proxies
+    publisher: Labour Bureau and National Housing Bank
+    geography: India
+    spatial_grain: industrial centre/city
+    time_coverage: monthly CPI-IW and quarterly RESIDEX per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - CPI-IW housing/rent proxy
+      - house price indices
+      - market value metrics
+    access_format: PDFs, Excel, portal downloads, API varies
+    source_url: https://labourbureau.gov.in/consumer-price-index-industrial-workers
+    license_or_terms: Government of India and NHB terms, verify reuse
+    update_frequency: monthly and quarterly
+    rent_control_use: rent-cost and price proxies for Indian city panels
+    second_order_layers:
+      - first_order_price_or_transfer
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 119
+    verification_status: scout_reported_unverified
+    notes: >
+      Add NHB RESIDEX URL during fetcher design:
+      https://residex.nhbonline.org.in/.
+
+  - source_id: china_city_housing_price_supply
+    source_name: China NBS 70-city residential price index and MOHURD supply releases
+    publisher: National Bureau of Statistics of China / MOHURD
+    geography: China
+    spatial_grain: 70 cities and city/prefecture where available
+    time_coverage: monthly price index and annual supply releases per Asia-Pacific scout
+    policy_or_outcome_fields:
+      - new residential price indices
+      - second-hand residential price indices
+      - urban construction
+      - housing stock
+      - completions
+    access_format: NBS portal, press releases, HTML, PDF, and XLS
+    source_url: https://data.stats.gov.cn/english/
+    license_or_terms: official terms unclear, verify before production
+    update_frequency: monthly and annual
+    rent_control_use: China city housing outcome and supply controls
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 120
+    verification_status: scout_reported_unverified
+    notes: >
+      Important for scale, but high-friction and not direct rent.
+
+  - source_id: korea_housing_lease_protection_act
+    source_name: Korea Housing Lease Protection Act policy events
+    publisher: Korean Law Information Center
+    geography: South Korea
+    spatial_grain: national law assigned to cities/districts
+    time_coverage: event-based
+    policy_or_outcome_fields:
+      - renewal rights
+      - rent-increase cap
+      - deposit protection
+      - effective dates
+    access_format: law portal HTML
+    source_url: https://www.law.go.kr/LSW/eng/engLsSc.do?menuId=2&query=Housing%20Lease%20Protection%20Act
+    license_or_terms: official terms, verify reuse
+    update_frequency: ad hoc
+    rent_control_use: policy-event layer paired with MOLIT district rents
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 121
+    verification_status: scout_reported_unverified
+    notes: >
+      Key national shock; city variation comes from local exposure and market
+      composition, not statutory timing.
+
+  - source_id: dubai_land_department_rents
+    source_name: Dubai Land Department real estate data and rental index
+    publisher: Dubai Land Department
+    geography: Dubai, United Arab Emirates
+    spatial_grain: area, community, building, and unit depending on extract
+    time_coverage: current-year portal; prior years via Dubai Pulse per Africa/MENA scout
+    policy_or_outcome_fields:
+      - rent contracts
+      - annual rent
+      - area
+      - rooms
+      - units
+      - property type
+      - rental index lookup inputs
+    access_format: CSV web download and Dubai Pulse archive
+    source_url: https://dubailand.gov.ae/en/open-data/real-estate-data/
+    license_or_terms: Dubai/Digital Dubai terms, verify reuse
+    update_frequency: live/rolling, not fully stated
+    rent_control_use: direct rent contracts plus RERA rental-index policy surface
+    second_order_layers:
+      - first_order_price_or_transfer
+      - first_order_policy_effect
+      - distributional_incidence
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 122
+    verification_status: scout_reported_unverified
+    notes: >
+      Africa/MENA scout ranked this as the strongest MENA rent-control test bed.
+      Rental-index page: https://dubailand.gov.ae/en/eservices/rental-index/rental-index/.
+
+  - source_id: saudi_rega_rental_indicators
+    source_name: Saudi REGA open rental indicators
+    publisher: Real Estate General Authority, Saudi Arabia
+    geography: Saudi Arabia
+    spatial_grain: city by region
+    time_coverage: 2019-2024 per Africa/MENA scout
+    policy_or_outcome_fields:
+      - average rent
+      - contract count
+      - property type
+      - city
+      - region
+    access_format: web/download pages, Arabic UI
+    source_url: https://rega.gov.sa/البيانات-المفتوحة/أحدث-البيانات-المفتوحة/
+    license_or_terms: Saudi government open-data terms, verify per file
+    update_frequency: quarterly
+    rent_control_use: official city-level rent panel across Saudi regions
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 123
+    verification_status: scout_reported_unverified
+    notes: >
+      Strong Gulf city panel, especially for Riyadh/Jeddah/Dammam comparisons.
+
+  - source_id: south_africa_municipal_finance
+    source_name: South Africa National Treasury Municipal Finance Data
+    publisher: South Africa National Treasury
+    geography: South Africa
+    spatial_grain: metro, district, and local municipality
+    time_coverage: FY 2008/09-2025/26 per Africa/MENA scout
+    policy_or_outcome_fields:
+      - municipal housing/service expenditure
+      - repairs
+      - grants
+      - income and expenditure
+      - audit data
+      - infrastructure finance
+    access_format: JSON API and bulk downloads
+    source_url: https://municipaldata.treasury.gov.za/api
+    license_or_terms: free commercial/noncommercial use with attribution per scout
+    update_frequency: quarterly/regular
+    rent_control_use: local housing-service policy and implementation-capacity covariates
+    second_order_layers:
+      - fiscal_or_enforcement_cost
+      - implementation_capacity
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 124
+    verification_status: scout_reported_unverified
+    notes: >
+      Clean API and long municipal panel; not direct rent data.
+
+  - source_id: cape_town_open_data_housing
+    source_name: City of Cape Town open data and ArcGIS housing layers
+    publisher: City of Cape Town
+    geography: Cape Town, South Africa
+    spatial_grain: parcel, suburb, zone, and project
+    time_coverage: permits 2014-2025; land-use applications 2004-2022 per Africa/MENA scout
+    policy_or_outcome_fields:
+      - building plan approvals
+      - split zoning
+      - urban development zones
+      - land-use applications
+      - affordable housing projects
+    access_format: ArcGIS REST, CSV, GeoJSON, and shapefile
+    source_url: https://odp-cctegis.opendata.arcgis.com/
+    license_or_terms: City open-data terms, verify per layer
+    update_frequency: mixed live/static
+    rent_control_use: high-resolution permit/zoning/housing-project pilot
+    second_order_layers:
+      - second_order_supply_response
+      - implementation_capacity
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 125
+    verification_status: scout_reported_unverified
+    notes: >
+      Building approvals FeatureServer was reported by scout; pin layer IDs in
+      fetcher design.
+
+  - source_id: stats_sa_census_superweb
+    source_name: Stats SA Census and SuperWEB housing tables
+    publisher: Statistics South Africa
+    geography: South Africa
+    spatial_grain: municipality, ward, and small area
+    time_coverage: census waves including 2011 and 2022 per Africa/MENA scout
+    policy_or_outcome_fields:
+      - tenure
+      - dwelling type
+      - services
+      - rent/payment variables to verify
+    access_format: SuperWEB table generator, registration or guest login
+    source_url: https://superweb.statssa.gov.za/webapi/jsf/login.xhtml
+    license_or_terms: official Stats SA terms, verify export rights
+    update_frequency: census
+    rent_control_use: local housing stock, tenure, and affordability denominators
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 126
+    verification_status: scout_reported_unverified
+    notes: >
+      Variable suitability requires table metadata extraction.
+
+  - source_id: israel_cbs_housing_local
+    source_name: Israel CBS tools and local housing databases
+    publisher: Central Bureau of Statistics Israel
+    geography: Israel
+    spatial_grain: locality, local authority, and census geography
+    time_coverage: annual, monthly, and census products
+    policy_or_outcome_fields:
+      - local authority statistics
+      - census housing
+      - price indices
+      - construction permits
+      - completions
+    access_format: API, Time Series DataBank, and census generator
+    source_url: https://www.cbs.gov.il/en/Statistics/Pages/Tools-and-Databases.aspx
+    license_or_terms: CBS terms, verify per API/table
+    update_frequency: regular/census
+    rent_control_use: MENA comparator with strong local authority identifiers
+    second_order_layers:
+      - second_order_supply_response
+      - distributional_incidence
+      - macro_feedback
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 127
+    verification_status: scout_reported_unverified
+    notes: >
+      Local housing fields were inferred from CBS tools and need table-level
+      validation.
+
+  - source_id: turkstat_construction_housing
+    source_name: TurkStat construction and housing data
+    publisher: Turkish Statistical Institute
+    geography: Turkey
+    spatial_grain: province, district, or municipality where table permits
+    time_coverage: annual/quarterly per Africa/MENA scout
+    policy_or_outcome_fields:
+      - building permits
+      - occupancy permits
+      - housing sales
+      - regional rent/CPI series
+    access_format: TurkStat portal, Excel, CSV, API varies
+    source_url: https://data.tuik.gov.tr/
+    license_or_terms: official terms, verify per table
+    update_frequency: regular
+    rent_control_use: large-city supply and price/rent proxy panel for Turkey
+    second_order_layers:
+      - second_order_supply_response
+      - first_order_price_or_transfer
+    top_1000_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 128
+    verification_status: scout_reported_unverified
+    notes: >
+      Municipality-level availability must be verified table by table.
+
+  - source_id: jordan_dos_building_licenses
+    source_name: Jordan Department of Statistics building licences and DataBank
+    publisher: Jordan Department of Statistics
+    geography: Jordan
+    spatial_grain: governorate or municipality where available
+    time_coverage: monthly/annual per Africa/MENA scout
+    policy_or_outcome_fields:
+      - building licences
+      - licensed areas
+      - population and housing census
+    access_format: Data Bank tables and downloads
+    source_url: https://dosweb.dos.gov.jo/
+    license_or_terms: official terms, verify per table
+    update_frequency: monthly for building licences
+    rent_control_use: official construction-permit outcome for Jordanian cities
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 129
+    verification_status: scout_reported_unverified
+    notes: >
+      Good supply outcome source; direct rent data still unclear.
+
+  - source_id: tunisia_ins_rgph_housing
+    source_name: Tunisia INS data portal and RGPH housing indicators
+    publisher: Institut National de la Statistique Tunisia
+    geography: Tunisia
+    spatial_grain: governorate, delegation, or commune where available
+    time_coverage: census 2024 plus regular series per Africa/MENA scout
+    policy_or_outcome_fields:
+      - census housing
+      - real-estate price indicators
+      - population
+      - services
+    access_format: data portal API, maps, and queries
+    source_url: https://dataportal.ins.tn/
+    license_or_terms: official INS terms, verify per API
+    update_frequency: census/regular
+    rent_control_use: local housing baseline for Tunisian cities
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 130
+    verification_status: scout_reported_unverified
+    notes: >
+      Local suitability is partly inferred from portal/RGPH docs.
+
+  - source_id: morocco_hcp_rgph_housing
+    source_name: Morocco HCP RGPH 2024 housing dashboard
+    publisher: Haut-Commissariat au Plan Morocco
+    geography: Morocco
+    spatial_grain: commune, province, and region dashboard
+    time_coverage: 2014 and 2024 census products per Africa/MENA scout
+    policy_or_outcome_fields:
+      - housing
+      - household indicators
+      - tenure/services indicators
+    access_format: Superset dashboard; export/API to verify
+    source_url: https://resultats2024.rgphapps.ma/
+    license_or_terms: HCP terms, verify export rights
+    update_frequency: census
+    rent_control_use: local housing baseline for Moroccan cities
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 131
+    verification_status: scout_reported_unverified
+    notes: >
+      Export mechanics need verification.
+
+  - source_id: africapolis
+    source_name: Africapolis
+    publisher: OECD/SWAC Africapolis
+    geography: Africa
+    spatial_grain: urban agglomeration
+    time_coverage: 1950-2020 core per Africa/MENA scout
+    policy_or_outcome_fields:
+      - agglomeration ID
+      - boundaries
+      - population
+    access_format: download/GIS
+    source_url: https://africapolis.org/
+    license_or_terms: OECD/SWAC terms, verify per download
+    update_frequency: versioned
+    rent_control_use: Africa-specific urban-system spine to complement GHSL
+    second_order_layers:
+      - macro_feedback
+      - implementation_capacity
+    top_1000_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 132
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful for matching official local data to actual African urban
+      agglomerations.
+
+  - source_id: google_open_buildings
+    source_name: Google Open Buildings
+    publisher: Google Research
+    geography: Africa, South Asia, Southeast Asia, Latin America, and Caribbean
+    spatial_grain: building footprint or point
+    time_coverage: v1 2021, v2 2022, v3 2023 per Africa/MENA scout
+    policy_or_outcome_fields:
+      - building footprint
+      - area
+      - confidence
+      - Plus Code
+    access_format: CSV shards, Earth Engine, and Google Cloud Storage
+    source_url: https://sites.research.google/open-buildings/
+    license_or_terms: CC BY 4.0 or ODbL depending on product, verify per release
+    update_frequency: versioned/ad hoc
+    rent_control_use: housing-stock and density proxy where official cadastre is absent
+    second_order_layers:
+      - second_order_supply_response
+      - quality_margin
+    top_1000_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 133
+    verification_status: scout_reported_unverified
+    notes: >
+      Especially useful for African cities with sparse official local housing
+      data.
+
+  - source_id: world_bank_subnational_construction_permits
+    source_name: World Bank Doing Business / subnational construction-permit indicators
+    publisher: World Bank
+    geography: global subset including MENA and African cities
+    spatial_grain: benchmark city/economy
+    time_coverage: through May 2019, discontinued
+    policy_or_outcome_fields:
+      - permit procedures
+      - permit time
+      - permit cost
+      - building quality control
+    access_format: archive downloads and tables
+    source_url: https://archive.doingbusiness.org/en/data/exploretopics/dealing-with-construction-permits
+    license_or_terms: World Bank terms, verify archive reuse
+    update_frequency: discontinued
+    rent_control_use: historical construction-permitting friction variable
+    second_order_layers:
+      - implementation_capacity
+      - second_order_supply_response
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 134
+    verification_status: scout_reported_unverified
+    notes: >
+      City coverage is limited but directly policy-relevant.
+
+  - source_id: un_habitat_urbanlex
+    source_name: UN-Habitat UrbanLex
+    publisher: UN-Habitat
+    geography: global legal repository
+    spatial_grain: national/local law text
+    time_coverage: rolling
+    policy_or_outcome_fields:
+      - rent and tenant laws
+      - land-use laws
+      - planning laws
+      - building-control laws
+    access_format: JS web app and document links; no clean API found by scout
+    source_url: https://urbanlex.unhabitat.org/
+    license_or_terms: UN-Habitat terms, verify reuse
+    update_frequency: rolling
+    rent_control_use: legal-policy seed for manual/NLP event coding
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: high
+    ingestion_difficulty: high
+    immediate_payoff_rank: 135
+    verification_status: scout_reported_unverified
+    notes: >
+      High-value legal coding source, high manual/NLP lift.
+
+  - source_id: overture_maps_global_geoparquet
+    source_name: Overture Maps global GeoParquet releases
+    publisher: Overture Maps Foundation
+    geography: global
+    spatial_grain: building, address, place, road, land-use, and division feature
+    time_coverage: monthly date-stamped releases
+    policy_or_outcome_fields:
+      - building footprints
+      - land use
+      - places and amenities
+      - addresses
+      - administrative divisions
+      - stable GERS identifiers
+    access_format: GeoParquet on Amazon S3 and Microsoft Azure, STAC catalog, Python and DuckDB access
+    source_url: https://docs.overturemaps.org/getting-data/cloud-sources/
+    license_or_terms: Overture attribution and upstream source terms, verify theme-specific restrictions
+    update_frequency: monthly
+    rent_control_use: global open-map and cadastre-like proxy layer for city matching, building stock, amenities, and legal divisions
+    second_order_layers:
+      - implementation_capacity
+      - second_order_supply_response
+      - leakage_or_substitution
+    top_1000_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 136
+    verification_status: seed_verified_official_page
+    notes: >
+      Official docs describe monthly global GeoParquet releases with buildings,
+      divisions, places, addresses, transportation, STAC metadata, and stable
+      GERS artifacts. Treat as a proxy/crosswalk anchor, not a direct rent
+      outcome or treatment source.
+
+  - source_id: geoboundaries_admin_boundaries
+    source_name: geoBoundaries Global Database of Political Administrative Boundaries
+    publisher: William & Mary geoLab
+    geography: global
+    spatial_grain: administrative boundary polygons
+    time_coverage: current versioned files
+    policy_or_outcome_fields:
+      - administrative boundaries
+      - country files
+      - global composite files
+      - simplified boundaries
+      - API metadata
+    access_format: API and bulk boundary downloads
+    source_url: https://www.geoboundaries.org/
+    license_or_terms: CC BY 4.0 with acknowledgement
+    update_frequency: versioned
+    rent_control_use: administrative crosswalk from legal treatment jurisdictions to GHSL urban centres
+    second_order_layers:
+      - implementation_capacity
+    top_1000_scalability: high
+    ingestion_difficulty: low
+    immediate_payoff_rank: 137
+    verification_status: seed_verified_official_page
+    notes: >
+      Useful for joining municipal, district, county, and other legal
+      jurisdictions to the top-1000 city spine. Not an outcome or treatment
+      source by itself.
+
+  - source_id: openstreetmap_planet_geofabrik_extracts
+    source_name: OpenStreetMap planet and Geofabrik extracts
+    publisher: OpenStreetMap Foundation and Geofabrik
+    geography: global
+    spatial_grain: node, way, relation, building, boundary, road, land-use, and POI
+    time_coverage: current planet plus history files where needed
+    policy_or_outcome_fields:
+      - administrative boundaries
+      - buildings
+      - land use
+      - roads
+      - transit
+      - amenities
+      - addresses where mapped
+    access_format: weekly planet PBF/XML plus daily regional extracts
+    source_url: https://planet.openstreetmap.org/
+    license_or_terms: Open Data Commons Open Database License 1.0 for post-2012 files
+    update_frequency: weekly planet and daily regional extracts
+    rent_control_use: open street, boundary, OSM relation ID, accessibility, and amenity layer for local housing donor pools
+    second_order_layers:
+      - implementation_capacity
+      - externality_or_spillover
+      - market_structure_response
+    top_1000_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 138
+    verification_status: seed_verified_official_page
+    notes: >
+      Official planet page documents regularly updated complete OSM database
+      copies and points to periodic extracts such as Geofabrik. Use as a raw
+      fallback and validation layer for Overture, boundaries, and city joins.
+
+  - source_id: ghsl_built_pop_grids
+    source_name: GHSL population, built-up surface, and building-height grids
+    publisher: European Commission Joint Research Centre
+    geography: global
+    spatial_grain: raster grid cell
+    time_coverage: 1975-2030 for population and built-up surface; building-height coverage release-dependent
+    policy_or_outcome_fields:
+      - population grid
+      - built-up surface
+      - building height
+      - density denominators
+      - built-stock proxy
+    access_format: GeoTIFF and GHSL bulk downloads
+    source_url: https://human-settlement.emergency.copernicus.eu/ghs_buS2023.php
+    license_or_terms: Copernicus and European Commission GHSL terms, verify per package
+    update_frequency: release-based
+    rent_control_use: global denominator and remote-sensed built-stock proxy for top-1000 city supply-response checks
+    second_order_layers:
+      - second_order_supply_response
+      - macro_feedback
+      - externality_or_spillover
+    top_1000_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 139
+    verification_status: seed_verified_official_page
+    notes: >
+      Complements the GHSL Urban Centre Database: this is a gridded stock and
+      denominator layer, not the legal city spine or a permit source.
+
+  - source_id: microsoft_global_ml_building_footprints
+    source_name: Microsoft Global ML Building Footprints
+    publisher: Microsoft and Bing Maps
+    geography: global
+    spatial_grain: building footprint polygon and height estimate where available
+    time_coverage: imagery-derived rolling/versioned releases
+    policy_or_outcome_fields:
+      - building footprint
+      - height estimate
+      - country and tile links
+      - geometry confidence metadata where available
+    access_format: GeoJSONL/CSV.GZ shards and link table
+    source_url: https://github.com/microsoft/GlobalMLBuildingFootprints
+    license_or_terms: CDLA Permissive 2.0 per project repository, verify per release
+    update_frequency: rolling/versioned
+    rent_control_use: building-stock and densification proxy where official cadastre or permits are missing
+    second_order_layers:
+      - second_order_supply_response
+      - quality_margin
+    top_1000_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 140
+    verification_status: seed_verified_official_page
+    notes: >
+      Complements Google Open Buildings with broader global building-footprint
+      coverage. Treat as a proxy outcome anchor, not direct construction,
+      vacancy, rent, or legal-treatment data.
+
+  - source_id: hong_kong_rvd_private_domestic_rents_supply
+    source_name: Hong Kong Rating and Valuation Department private domestic rents and supply series
+    publisher: Hong Kong Rating and Valuation Department
+    geography: Hong Kong
+    spatial_grain: territory, district, and property class depending on series
+    time_coverage: rents and prices from 1982, rental indices from 1979, completions/stock/vacancy series as published
+    policy_or_outcome_fields:
+      - private domestic average rents
+      - rental indices
+      - prices
+      - completions
+      - stock
+      - vacancy
+      - take-up
+    access_format: XLS files and PDF property reviews
+    source_url: https://www.rvd.gov.hk/en/publications/property_market_statistics.html
+    license_or_terms: Hong Kong government terms, verify XLS reuse before redistribution
+    update_frequency: monthly and annual series
+    rent_control_use: direct private-rent outcome plus supply and vacancy controls for Hong Kong housing-policy cases
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - allocation_distortion
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 141
+    verification_status: seed_verified_official_page
+    notes: >
+      Official RVD page lists private domestic average rents, rental indices,
+      and completions/stock/vacancy/take-up XLS files. Strong city-state pilot,
+      limited global scale.
+
+  - source_id: taiwan_moi_actual_price_rental_transactions
+    source_name: Taiwan MOI actual real-estate transaction rental open data
+    publisher: Taiwan Ministry of the Interior Department of Land Administration
+    geography: Taiwan
+    spatial_grain: city, township/district, and transaction record
+    time_coverage: current and historical public batches, release-dependent
+    policy_or_outcome_fields:
+      - rental transaction cases
+      - rent or consideration
+      - transaction date
+      - city and district
+      - building area
+      - property attributes
+    access_format: Open Data batch downloads from official transaction system
+    source_url: https://plvr.land.moi.gov.tw/DownloadOpenData
+    license_or_terms: MOI Open Data authorization terms, verify current download conditions
+    update_frequency: synchronized with public transaction-query releases, generally on the 1st, 11th, or 21st
+    rent_control_use: direct private-rental transaction spine for Taipei, New Taipei, Taichung, Kaohsiung, and donor cities
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 142
+    verification_status: seed_verified_official_page
+    notes: >
+      Official page states real-estate transaction information includes sale,
+      rental, and pre-sale data and provides no-fee Open Data downloads under
+      authorization. Chinese schema and privacy masking need fetcher care.
+
+  - source_id: korea_reb_rone_rent_lease_indices
+    source_name: Korea Real Estate Board R-ONE rent and lease indices
+    publisher: Korea Real Estate Board
+    geography: South Korea
+    spatial_grain: national, city, province, and sigungu where table permits
+    time_coverage: monthly/quarterly series depending on R-ONE table
+    policy_or_outcome_fields:
+      - jeonse indices
+      - monthly rent indices
+      - housing price trends
+      - officetel trends
+      - transaction and supply statistics where exposed
+    access_format: R-ONE statistics portal and table downloads/API paths to verify
+    source_url: https://www.reb.or.kr/r-one/
+    license_or_terms: REB portal/API terms, verify per table before redistribution
+    update_frequency: monthly and quarterly
+    rent_control_use: official repeatable rent and lease indices to complement MOLIT transaction microdata around Korean lease-law shocks
+    second_order_layers:
+      - first_order_price_or_transfer
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 143
+    verification_status: seed_verified_official_page
+    notes: >
+      Good APAC rent-index complement, but table IDs, API mechanics, and reuse
+      terms must be pinned before endpoint or codebook promotion.
+
+  - source_id: statsnz_building_consents_ta
+    source_name: Stats NZ building consents by territorial authority
+    publisher: Stats NZ
+    geography: New Zealand
+    spatial_grain: territorial authority and region
+    time_coverage: monthly long series, table-dependent
+    policy_or_outcome_fields:
+      - new dwellings consented
+      - dwelling type
+      - value
+      - floor area
+      - territorial authority
+      - region
+    access_format: Infoshare export and direct downloads
+    source_url: https://infoshare.stats.govt.nz/
+    license_or_terms: Stats NZ reuse terms, verify table metadata and attribution
+    update_frequency: monthly
+    rent_control_use: supply-response layer paired with New Zealand tenancy-bond rent data
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 144
+    verification_status: seed_verified_official_page
+    notes: >
+      Clean official supply series for Auckland, Wellington, Christchurch, and
+      New Zealand donor cases. Needs table-code discovery in Infoshare before
+      endpoint promotion.
+
+  - source_id: ibge_ipca_snicp_residential_rent
+    source_name: IBGE IPCA/SNIPC residential-rent subitem
+    publisher: Instituto Brasileiro de Geografia e Estatistica
+    geography: Brazil
+    spatial_grain: SNIPC region or metropolitan area-month
+    time_coverage: monthly, 1979-present with regional expansion over time
+    policy_or_outcome_fields:
+      - residential rent inflation
+      - housing CPI
+      - subitem weights
+      - region
+      - month
+    access_format: SIDRA/API and historical tables
+    source_url: https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html
+    license_or_terms: public IBGE citation terms, verify per table
+    update_frequency: monthly
+    rent_control_use: official rent-price outcome for Brazilian metro areas including Sao Paulo, Rio, Brasilia, Recife, Salvador, Fortaleza, Curitiba, Porto Alegre, Belem, Goiania, Vitoria, Campo Grande, Rio Branco, Sao Luis, and Aracaju
+    second_order_layers:
+      - first_order_price_or_transfer
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 145
+    verification_status: seed_verified_official_page
+    notes: >
+      Adds a direct official residential-rent price layer to existing Brazilian
+      municipal and census records. Table IDs and regional historical coverage
+      should be pinned before endpoint promotion.
+
+  - source_id: dane_cnpv_2018_housing
+    source_name: Colombia Censo Nacional de Poblacion y Vivienda 2018 housing tables
+    publisher: Departamento Administrativo Nacional de Estadistica
+    geography: Colombia
+    spatial_grain: department, municipality, cabecera, centro poblado, rural area, household, and dwelling
+    time_coverage: 2018 census
+    policy_or_outcome_fields:
+      - tenure
+      - dwelling type
+      - services
+      - household size
+      - housing conditions
+    access_format: XLSX tables, microdata portal, and geovisors
+    source_url: https://www.dane.gov.co/index.php/estadisticas-por-tema/demografia-y-poblacion/censo-nacional-de-poblacion-y-vivenda-2018
+    license_or_terms: public DANE citation terms, verify per download
+    update_frequency: decennial
+    rent_control_use: municipal housing-stock, tenure, and quality baseline for Colombian top-city crosswalks
+    second_order_layers:
+      - quality_margin
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 146
+    verification_status: seed_verified_official_page
+    notes: >
+      Complements existing DANE construction and permit records with census
+      housing denominators for Bogota, Medellin, Cali, Barranquilla, and donor
+      municipalities.
+
+  - source_id: colombia_ley820_rent_regime
+    source_name: Colombia Ley 820 de 2003 urban residential tenancy regime
+    publisher: Departamento Administrativo de la Funcion Publica
+    geography: Colombia
+    spatial_grain: national law with city exposure by urban rental stock
+    time_coverage: in force from 2003-07-10, current status to verify before coding
+    policy_or_outcome_fields:
+      - urban residential leases
+      - rent adjustment rules
+      - deposits
+      - tenant protections
+      - contract termination
+    access_format: official legal HTML/PDF
+    source_url: https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=8738
+    license_or_terms: Colombian government legal-information terms
+    update_frequency: law/event based
+    rent_control_use: national rent-increase and tenant-protection treatment overlay for Bogota, Medellin, Cali, Barranquilla, and other Colombian cities
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 147
+    verification_status: seed_verified_official_page
+    notes: >
+      Legal treatment source rather than an outcome panel. Effective-date,
+      amendments, cap formula, and exposure design must be coded separately.
+
+  - source_id: ecuador_cpv_2022_housing
+    source_name: Ecuador Censo de Poblacion y Vivienda 2022
+    publisher: Instituto Nacional de Estadistica y Censos Ecuador
+    geography: Ecuador
+    spatial_grain: province, canton, parish, household, and dwelling
+    time_coverage: 2010 and 2022 census products
+    policy_or_outcome_fields:
+      - tenure
+      - dwelling stock
+      - services
+      - overcrowding
+      - household composition
+    access_format: tabulations, database downloads, REDATAM, and provincial result pages
+    source_url: https://www.ecuadorencifras.gob.ec/censo-de-poblacion-y-vivienda/
+    license_or_terms: CC BY 4.0 shown on official page, verify per download
+    update_frequency: decennial with release updates
+    rent_control_use: canton and parish housing baseline for Quito, Guayaquil, Cuenca, and secondary cities
+    second_order_layers:
+      - quality_margin
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 148
+    verification_status: seed_verified_official_page
+    notes: >
+      Useful housing-stock and quality denominator for Ecuadorian city panels.
+      Direct rental-price series still require ENALQUI or household surveys.
+
+  - source_id: ecuador_esed_building_permits
+    source_name: Ecuador Estadisticas de Edificaciones
+    publisher: Instituto Nacional de Estadistica y Censos Ecuador
+    geography: Ecuador
+    spatial_grain: municipal GAD and construction-permit record
+    time_coverage: annual and quarterly series, current page plus historical releases
+    policy_or_outcome_fields:
+      - building permits
+      - buildings to construct
+      - dwellings to construct
+      - floor area
+      - land area
+    access_format: CSV, Excel, SPSS, dictionaries, and methodology files
+    source_url: https://www.ecuadorencifras.gob.ec/edificaciones/
+    license_or_terms: CC BY 4.0 shown on official page, verify per download
+    update_frequency: annual and quarterly
+    rent_control_use: supply-response panel for Ecuadorian city markets
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 149
+    verification_status: seed_verified_official_page
+    notes: >
+      Official construction-permit series issued by municipal GADs; promising
+      supply layer for Quito, Guayaquil, Cuenca, and related donor cities.
+
+  - source_id: ecuador_enalqui_2013
+    source_name: Ecuador Encuesta Nacional de Alquileres ENALQUI 2013
+    publisher: Instituto Nacional de Estadistica y Censos Ecuador
+    geography: Ecuador
+    spatial_grain: rented dwelling survey record, geographic strata to verify
+    time_coverage: "2013"
+    policy_or_outcome_fields:
+      - rent prices
+      - rented-dwelling characteristics
+      - occupancy regime
+      - location
+      - survey weights
+    access_format: database, tabulations, forms, methodology, and syntax
+    source_url: https://www.ecuadorencifras.gob.ec/encuesta-nacional-de-alquileres-enalqui/
+    license_or_terms: CC BY 4.0 shown on official page, verify per download
+    update_frequency: one-off or irregular
+    rent_control_use: direct rental-price benchmark for Ecuador, useful despite age
+    second_order_layers:
+      - first_order_price_or_transfer
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 150
+    verification_status: seed_verified_official_page
+    notes: >
+      High value because it explicitly surveys rentals, but it is not a modern
+      time panel. Use for calibration or historical baseline unless newer
+      rental surveys are found.
+
+  - source_id: uruguay_censo_2023_housing
+    source_name: Uruguay Censo 2023 population, households, and dwellings
+    publisher: Instituto Nacional de Estadistica Uruguay
+    geography: Uruguay
+    spatial_grain: department, municipality, locality, census zone, household, and dwelling
+    time_coverage: 2023, with release updates through 2026 to verify
+    policy_or_outcome_fields:
+      - dwelling stock
+      - household characteristics
+      - tenure variables to verify
+      - census cartography
+      - locality identifiers
+    access_format: visualizer, tabulations, microdata, and GeoPackage cartography
+    source_url: https://www.gub.uy/instituto-nacional-estadistica/censos2023pvh
+    license_or_terms: Uruguay gub.uy terms, verify per download
+    update_frequency: decennial with release updates
+    rent_control_use: local housing baseline for Montevideo, Canelones, Maldonado, Salto, and other cities
+    second_order_layers:
+      - quality_margin
+      - distributional_incidence
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 151
+    verification_status: seed_verified_official_page
+    notes: >
+      Strong local housing denominator and cartography source for Uruguayan
+      city panels; direct rent fields need microdata/codebook verification.
+
+  - source_id: argentina_infoleg_rent_law_shocks
+    source_name: Argentina national rental-law shock records
+    publisher: Infoleg and Ministerio de Justicia Argentina
+    geography: Argentina
+    spatial_grain: national law/event with city exposure by rental stock
+    time_coverage: Ley 27.551 in 2020 and DNU 70/2023 repeal/liberalization shock
+    policy_or_outcome_fields:
+      - lease duration
+      - rent adjustment
+      - indexation
+      - deposits
+      - repeal or liberalization event
+    access_format: official legal HTML
+    source_url: https://servicios.infoleg.gob.ar/infolegInternet/anexos/335000-339999/339378/norma.htm
+    license_or_terms: Argentine government legal-information terms
+    update_frequency: law/event based
+    rent_control_use: treatment timing for Buenos Aires, Cordoba, Rosario, Mendoza, and other Argentine rental markets
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 152
+    verification_status: seed_unverified_url
+    notes: >
+      Treat as treatment-coding candidate until Infoleg encoding, amendments,
+      and DNU 70/2023 repeal text are verified. Pair with INDEC EPH and Buenos
+      Aires housing sources for outcomes.
+
+  - source_id: qatar_open_data_housing_real_estate_bundle
+    source_name: Qatar open-data housing, permits, completions, and real-estate sales bundle
+    publisher: National Planning Council, Ministry of Justice, and Urban Planning and Development Authority Qatar
+    geography: Qatar
+    spatial_grain: municipality, district or zone, transaction, and parcel
+    time_coverage: series-dependent; annual permits/completions, weekly sales, and census 2020
+    policy_or_outcome_fields:
+      - building permits
+      - completion certificates
+      - residential-unit sales
+      - property value
+      - price per square metre
+      - parcel subdivision rules
+      - housing units
+    access_format: Opendatasoft API, CSV, and JSON
+    source_url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets?where=search(%22housing%22)
+    license_or_terms: CC BY on verified National Planning Council datasets; verify Ministry of Justice files
+    update_frequency: annual, weekly, and decennial depending on dataset
+    rent_control_use: Doha and Qatar city-state supply and property-market proxy, not a direct rent-contract panel
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+      - macro_feedback
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 153
+    verification_status: endpoint_verified
+    notes: >
+      Opendatasoft catalog endpoints returned field metadata for housing,
+      building-permit, completion-certificate, and real-estate-sales families.
+      Use as supply/property proxy until direct rental-contract data are found.
+
+  - source_id: ghana_phc_statsbank_housing
+    source_name: Ghana PHC 2021 StatsBank housing, structures, water, and sanitation tables
+    publisher: Ghana Statistical Service
+    geography: Ghana
+    spatial_grain: district, region, and type of locality
+    time_coverage: 2021 plus PHC 2010 backfill where exposed
+    policy_or_outcome_fields:
+      - tenure
+      - dwelling ownership
+      - rooms
+      - wall material
+      - floor material
+      - roof material
+      - residential structures
+      - completion status
+      - water
+      - sanitation
+      - waste disposal
+    access_format: PXWeb API
+    source_url: https://statsbank.statsghana.gov.gh/api/v1/en/PHC%202021%20StatsBank
+    license_or_terms: official Ghana Statistical Service terms, verify reuse
+    update_frequency: census
+    rent_control_use: Accra, Kumasi, and Tamale housing-quality and tenure denominators
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+      - implementation_capacity
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 154
+    verification_status: endpoint_verified
+    notes: >
+      PXWeb categories for housing, structures, and water/sanitation were
+      reported as machine-readable. Strong non-OECD denominator source.
+
+  - source_id: turkey_cbrt_new_tenant_rent_index
+    source_name: CBRT New Tenant Rent Index and Residential Property Price Index
+    publisher: Central Bank of the Republic of Turkiye
+    geography: Turkey
+    spatial_grain: national, large-city, or regional series with EVDS metadata to pin
+    time_coverage: series-dependent monthly and quarterly series
+    policy_or_outcome_fields:
+      - new tenant rent index
+      - residential property price index
+      - Istanbul price proxy
+      - Ankara price proxy
+      - Izmir price proxy
+      - regional price proxy
+    access_format: EVDS web/API, CSV, and XLS
+    source_url: https://www.tcmb.gov.tr/wps/wcm/connect/EN/TCMB%2BEN/Main%2BMenu/Statistics/Real%2BSector%2BStatistics/Residential%2BProperty%2BPrice%2BIndex/
+    license_or_terms: CBRT and EVDS terms, verify per series
+    update_frequency: regular
+    rent_control_use: first-order rent proxy for Turkey rent-cap shocks and city exposure models
+    second_order_layers:
+      - first_order_price_or_transfer
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 155
+    verification_status: seed_verified_official_page
+    notes: >
+      Use with official rent-cap legal events and Istanbul/TurkStat supply
+      layers. EVDS series IDs and geography metadata must be pinned before
+      endpoint promotion.
+
+  - source_id: istanbul_open_data_housing_bundle
+    source_name: Istanbul Metropolitan Municipality housing and permit open-data bundle
+    publisher: Istanbul Metropolitan Municipality
+    geography: Istanbul, Turkey
+    spatial_grain: district, city, and file-dependent
+    time_coverage: mostly 2020s, series-dependent
+    policy_or_outcome_fields:
+      - district housing sales
+      - Istanbul unit prices
+      - housing price indices
+      - building-permit building counts
+      - affordability index
+      - residence duration
+    access_format: CKAN API, CSV, XLS, XLSX, and GeoJSON
+    source_url: https://data.ibb.gov.tr/api/3/action/package_search?q=konut&rows=10
+    license_or_terms: Istanbul Metropolitan Municipality Open Data License, verify per dataset
+    update_frequency: dataset-specific
+    rent_control_use: Istanbul exposure, price-proxy, and supply layer around Turkey rent-cap period
+    second_order_layers:
+      - second_order_supply_response
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 156
+    verification_status: endpoint_verified
+    notes: >
+      CKAN package searches for housing and permits returned machine-readable
+      metadata per scout. Pin exact package/resource IDs before fetcher design.
+
+  - source_id: bahrain_open_data_census_cpi_housing
+    source_name: Bahrain open-data census housing and CPI rent components
+    publisher: Bahrain Information and eGovernment Authority
+    geography: Bahrain
+    spatial_grain: governorate and national
+    time_coverage: Census 2020 plus CPI series, table-dependent
+    policy_or_outcome_fields:
+      - housing units by type
+      - occupancy
+      - households by housing type
+      - CPI actual rent
+      - CPI imputed rent
+      - parcel subdivision regulations
+    access_format: Opendatasoft API
+    source_url: https://www.data.gov.bh/api/explore/v2.1/catalog/datasets?where=search(%22housing%22)
+    license_or_terms: Bahrain open-data terms, verify per dataset
+    update_frequency: census, monthly, or annual depending on table
+    rent_control_use: Manama/Bahrain city-state affordability and rent-component proxy, not direct contracts
+    second_order_layers:
+      - quality_margin
+      - first_order_price_or_transfer
+    top_1000_scalability: low
+    ingestion_difficulty: low
+    immediate_payoff_rank: 157
+    verification_status: endpoint_verified
+    notes: >
+      Catalog searches returned housing/rent families. Use as CPI and census
+      proxy until direct rental contract or register data are discovered.
+
+  - source_id: kenya_knbs_2019_phc_housing
+    source_name: Kenya 2019 Population and Housing Census reports
+    publisher: Kenya National Bureau of Statistics
+    geography: Kenya
+    spatial_grain: county, subcounty, and administrative units depending on report
+    time_coverage: "2019"
+    policy_or_outcome_fields:
+      - housing characteristics
+      - population
+      - household amenities
+      - urban geography
+      - administrative geography
+    access_format: official web page and report downloads
+    source_url: https://www.knbs.or.ke/2019-kenya-population-and-housing-census-reports/
+    license_or_terms: KNBS terms, verify per table
+    update_frequency: census
+    rent_control_use: Nairobi, Mombasa, and Kisumu housing-quality and denominator layer
+    second_order_layers:
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 158
+    verification_status: seed_verified_official_page
+    notes: >
+      Adds East African city denominators to the Africa/MENA wave. Bulk table
+      extraction and subcity geography need report-level verification.
+
+  - source_id: turkey_official_rent_policy_events
+    source_name: Turkey official rent-cap legal event sources
+    publisher: Official Gazette of Turkiye and Mevzuat Bilgi Sistemi
+    geography: Turkey
+    spatial_grain: national law assigned to cities by exposure
+    time_coverage: event-based, especially the 2022-2024 rent-cap window
+    policy_or_outcome_fields:
+      - rent increase cap
+      - effective dates
+      - extensions
+      - expiry or repeal
+      - legal text
+    access_format: official legal HTML
+    source_url: https://www.resmigazete.gov.tr/eskiler/2022/06/20220611-1.htm
+    license_or_terms: Turkish official publication terms
+    update_frequency: ad hoc legal events
+    rent_control_use: treatment-event coding paired with CBRT, Istanbul, and TurkStat outcome sources
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 159
+    verification_status: seed_unverified_url
+    notes: >
+      Scout found official legal URLs but also reported 403 behavior through
+      curl for at least one route. Verify through browser/ZenRows before
+      promoting beyond seed URL.

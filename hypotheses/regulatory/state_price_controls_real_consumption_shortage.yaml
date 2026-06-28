@@ -83,6 +83,80 @@ variables:
   - name: rule_of_law
     source: wgi:RL.EST
     transformation: level
+mechanism_measurement:
+  mechanism_type: price_signal_distortion
+  design_features:
+  - panel_fe_screen
+  - controlled_vs_uncontrolled_categories
+  - high_frequency_event_study
+  - welfare_accounting
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - country-years with lower regulatory-quality proxy
+    control_units:
+    - country-years with higher regulatory-quality proxy
+    controlled_or_regulated_units:
+    - price-controlled categories are not directly observed in this screen
+    exempt_or_uncontrolled_units:
+    - uncontrolled categories are not directly observed in this screen
+    time_frequency: annual
+    notes: >
+      WGI regulatory quality and headline CPI are too broad to identify price
+      controls. This is a screening association, not a mechanism test.
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Official prices of controlled categories are suppressed relative to uncontrolled or market-clearing prices.
+    variable_names: []
+    candidate_sources:
+    - CPI category microdata
+    - official price schedules
+    - parallel market category prices
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Availability, inventories, output, or official-channel quantity fall after controls bind.
+    variable_names: []
+    candidate_sources:
+    - stockout surveys
+    - inventories
+    - retail sales by controlled category
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: leakage_or_substitution
+    mechanism: Black-market, informal, cross-border, or substitute-category activity rises.
+    variable_names: []
+    candidate_sources:
+    - parallel price premiums
+    - informal market shares
+    - border seizure records
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Any CPI relief must be netted against shortages, quality, search, enforcement, and future supply effects.
+    variable_names: []
+    candidate_sources:
+    - constructed category welfare ledger
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - uncovered_consumers
+  - suppliers
+  - taxpayers
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: controlled-category official price discount times official-channel quantity
+    deadweight_loss: rationed quantity and foregone legal trades
+    quality_loss: quality-adjusted or package-size deterioration
+    search_or_queue_cost: queue and stockout search costs
+    future_supply_loss: output, inventory, and investment response
+    fiscal_or_enforcement_cost: enforcement, subsidy, or inspection costs
+    net_welfare_formula: consumer_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss - fiscal_or_enforcement_cost
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    A headline CPI panel cannot adjudicate shortage pressure. The current
+    result should remain neutral triage until category-level evidence is added.
 estimator:
   template: panel_fe
   fixed_effects:

@@ -53,6 +53,88 @@ variables:
     - name: rule_of_law
       source: wgi:RL.EST
       transformation: level
+mechanism_measurement:
+  mechanism_type: rent_control
+  design_features:
+    - panel_fe_screen
+    - controlled_vs_uncontrolled_units
+    - welfare_accounting
+    - distributional_decomposition
+  comparison_structure:
+    treated_units:
+      - European country-years with rent caps, freezes, or renewal restrictions
+    control_units:
+      - European country-years without binding rent controls
+    controlled_or_regulated_units:
+      - rent-regulated incumbent tenancies
+    exempt_or_uncontrolled_units:
+      - new construction exemptions where applicable
+      - market-rate rentals outside regulated segments
+    time_frequency: annual
+    notes: >
+      The current design is an annual country-panel screen. It cannot by
+      itself distinguish regulated units from exempt units or identify city
+      leakage channels.
+  causal_layers:
+    - layer: first_order_price_or_transfer
+      mechanism: Regulated tenants may receive lower rent growth or lower housing-cost burden.
+      variable_names: [housing_cost_overburden_rate]
+      candidate_sources:
+        - eurostat:ilc_lvho07a
+        - EU-SILC tenure-specific housing-cost microdata
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: second_order_supply_response
+      mechanism: Lower expected rental returns reduce permits, completions, and private rental stock growth.
+      variable_names: [residential_building_permits_index_growth]
+      candidate_sources:
+        - eurostat:bldg_pi_lt
+        - national building-permit and completion registers
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: leakage_or_substitution
+      mechanism: Owners substitute into owner-occupation, furnished rentals, tourist rentals, or exempt newbuild.
+      variable_names: []
+      candidate_sources:
+        - Eurostat tenure-share panels
+        - national cadastral tenure transitions
+        - short-term rental registries
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: quality_margin
+      mechanism: Regulated stock may receive less maintenance or investment.
+      variable_names: []
+      candidate_sources:
+        - EU-SILC housing deprivation by tenure
+        - national maintenance expenditure surveys
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+    - layer: distributional_incidence
+      mechanism: Incumbent regulated tenants and new entrants can move in opposite directions.
+      variable_names: []
+      candidate_sources:
+        - EU-SILC tenure-income microdata
+        - national rental contract duration panels
+      measurement_status: data_gap
+      required_for_dispositive_verdict: true
+  distributional_groups:
+    - incumbent_beneficiaries
+    - new_entrants
+    - uncovered_consumers
+    - suppliers
+    - future_cohorts
+  welfare_accounting:
+    first_order_transfer: regulated rent discount times covered rental quantity
+    deadweight_loss: foregone rental supply and moves
+    quality_loss: maintenance or deprivation gap for regulated stock
+    search_or_queue_cost: vacancy, waitlist, and time-to-lease measures where available
+    future_supply_loss: discounted permit and completion shortfall
+    net_welfare_formula: tenant_transfer - deadweight_loss - quality_loss - search_or_queue_cost - future_supply_loss
+  promotion_gate: screen_only_until_second_order_measured
+  notes: >
+    Even if the country-panel coefficient becomes significant, this spec
+    should not be promoted as dispositive until the regulated/exempt and
+    distributional layers are measured.
 intervention_channel: regulatory
 intervention_channel_justification: >
   Rent controls are regulatory price ceilings in the housing market.
