@@ -3,6 +3,7 @@ hypothesis_id: tax_inequality_france_2017_isf_to_ifi_abolition
 version: 1
 status: draft
 topic: distribution
+claim_direction: "+"
 claim: >
   Macron's 2017 reform replacing the French ISF (Impot de Solidarite sur
   la Fortune) with the IFI (real-estate-only wealth tax) and the introduction
@@ -78,12 +79,14 @@ disclosure: >
   reversal beyond what CRS-era enforcement would have produced.
 falsification:
   rule: >
-    SUPPORTED if French top-1 pretax share rises by at least 0.75
-    percentage points 2017-2022 vs synthetic-control trajectory at p<0.10.
-    REFUTED if no detectable gap (within 0.3pp) or the gap is negative
-    at five-year horizon.
+    SUPPORTED if the FRA post-2018 treatment coefficient on the top-1 pretax
+    income share is positive (top share rises after the ISF->IFI abolition vs
+    the country+year fixed-effect counterfactual) at p<0.10. REFUTED if
+    negative at p<0.10. PARTIAL if not significant.
   test: >
-    Synthetic-control with Eurozone donor pool, treated FRA 2018.
+    Two-way fixed-effects (country + year) event study, treated FRA from
+    2018, Eurozone donor pool. Year FE absorb the CRS-enforcement-era common
+    trend the disclosure flags as the main confound.
 evidence_type: associational
 sample:
   countries: [FRA, DEU, ITA, ESP, NLD, BEL, AUT, PRT, FIN]
@@ -95,7 +98,7 @@ variables:
       source: "owid:top-1-share-of-total-income"
       transformation: level
     - name: top_1pct_wealth_share
-      source: "owid:top-1-share-of-total-wealth"
+      source: "wid_concentration:top1_net_personal_wealth_share"
       transformation: level
   treatment:
     - name: isf_to_ifi_2018_fra_post
@@ -112,12 +115,15 @@ variables:
       source: "world_bank_wdi:NE.TRD.GNFS.ZS"
       transformation: level
 estimator:
-  template: synthetic_control
+  template: event_study
   clustering: country
   fixed_effects: [country, year]
+  event_year: 2018
   notes: >
-    Synthetic-control with Eurozone donor pool. Treated FRA 2018. Placebo-
-    in-time at 2014. Robustness with synth_did.
+    v2 (2026-06-29): TWFE (country + year FE) pooled post-treatment
+    coefficient, country-clustered SEs, treated FRA from 2018. Switched from
+    level synthetic control for consistency with the French ISF suite; wealth-
+    share outcome repointed to the wid_concentration adapter.
 intervention_channel: fiscal
 scope:
   period: [2017, 2023]

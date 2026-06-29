@@ -1,46 +1,76 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: inheritance_tax_family_business_continuity
-version: 1
+version: 2
 status: draft
 topic: fiscal
-claim: Higher inheritance taxes predict more frequent sale or liquidation of family businesses at founder death and lower long-run business survival.
+claim_direction: "-"
+claim: >
+  Higher inheritance taxation predicts a smaller small/family-business
+  sector. PROXY TEST: across OECD economies, higher reliance on estate /
+  inheritance / gift taxes (% of GDP) is associated with a lower
+  self-employment share (a coarse proxy for family-business prevalence),
+  via the channel that estates are sold or liquidated rather than passed on.
+notes: >
+  v2 rewrite (2026-06-29). The v1 spec was a degenerate placeholder that
+  regressed GDP-per-capita on the Fraser EFW index (within-R2=1, coef ~0)
+  and did not test inheritance taxes at all — it was emitting a misleading
+  near-zero PARTIAL. IMPORTANT SCOPE CAVEAT: the original claim is about
+  family-business *survival at founder death*, which requires firm-level
+  business-transfer / survival microdata (e.g. Eurostat business demography
+  by ownership, national succession registries) that is NOT in the local
+  data substrate. This rewrite tests a much coarser macro PROXY only —
+  self-employment share vs estate-tax reliance — and should be read as
+  screening evidence, not a test of the survival mechanism. Estate-tax
+  reliance from the data-layer agent's OECD tax-structure panel via the
+  oecd_taxstruct adapter.
+prior_confidence: 0.4
+disclosure: >
+  Author prior is weak: self-employment share is driven far more by sectoral
+  structure and labour-market institutions than by inheritance tax, so even a
+  true survival effect may not show in this proxy. A null here is largely
+  uninformative about the underlying claim.
+falsification:
+  rule: >
+    SUPPORTED if the coefficient on estate/inheritance/gift-tax reliance
+    (% GDP) in a country+year fixed-effects panel on the self-employment
+    share is negative at p<0.10. REFUTED if positive at p<0.10. PARTIAL if
+    not significant.
+  test: >
+    Country+year fixed-effects panel of self-employment share on estate/
+    inheritance/gift-tax reliance (% GDP), country-clustered SEs, OECD
+    economies 1991-2024. PROXY only — see notes on the missing firm-level
+    survival outcome.
 evidence_type: associational
 sample:
-  countries:
-  - GLOBAL
-  period:
-  - 1990
-  - 2023
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, PRT, FIN, SWE, DNK, NOR, IRL, CHE, AUS, NZL, CAN, JPN, KOR, POL, CZE, GRC, MEX, CHL, HUN, ISL, LUX, SVK, SVN, EST]
+  period: [1991, 2024]
   temporal_structure: panel
-scope:
-  period:
-  - 1990
-  - 2023
-  countries:
-  - GLOBAL
-  outcome_dim:
-  - fiscal_policy
-  - taxation
-  policy_family: []
+  exclusion_rules:
+    - "drop country-years missing either series"
 variables:
   outcome:
-  - name: outcome_var
-    source: world_bank_wdi:NY.GDP.PCAP.KD
-    transformation: log
+    - name: self_employment_share
+      source: "world_bank_wdi:SL.EMP.SELF.ZS"
+      transformation: level
   treatment:
-  - name: treatment_var
-    source: fraser_efw:summary_index
-    transformation: level
+    - name: estate_inheritance_tax_reliance
+      source: "oecd_taxstruct:estate_inheritance_gift_pct_gdp"
+      transformation: level
   controls:
-  - name: log_gdp_pc
-    source: world_bank_wdi:NY.GDP.PCAP.KD
-    transformation: log
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
 estimator:
   template: panel_fe
-  fixed_effects:
-  - country
-  - year
   clustering: country
-falsification:
-  rule: SUPPORTED if coefficient > 0 and p < 0.10
-  test: inheritance_tax_family_business_continuity_placeholder_test
-prior_confidence: 0.5
+  fixed_effects: [country, year]
+  notes: >
+    Country + year FE, country-clustered SEs. Coefficient on estate-tax
+    reliance = within-country association with the self-employment share.
+intervention_channel: fiscal
+scope:
+  period: [1991, 2024]
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL]
+  outcome_dim: [taxation, firm_dynamics]
+  policy_family: [tax_policy]
+  treatment_tags: [inheritance_tax, estate_tax, family_business, proxy_test]

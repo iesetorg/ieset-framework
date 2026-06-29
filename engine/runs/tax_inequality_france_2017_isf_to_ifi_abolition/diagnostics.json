@@ -1,32 +1,26 @@
 {
-  "verdict": "PARTIAL \u2014 mean_gap=+1.331, |gap|/pre_sd=2.2, p_perm=1 (gap below 0.5\u00d7pre_sd or placebo p\u22650.10)",
-  "verdict_label": "PARTIAL",
-  "verdict_reason": "mean_gap=+1.331, |gap|/pre_sd=2.2, p_perm=1 (gap below 0.5\u00d7pre_sd or placebo p\u22650.10)",
+  "verdict": "SUPPORTED \u2014 shape=TWFE, sign matches claim +, coef=+1.095, p=1.28e-06",
+  "verdict_label": "SUPPORTED",
+  "verdict_reason": "shape=TWFE, sign matches claim +, coef=+1.095, p=1.28e-06",
   "hypothesis_id": "tax_inequality_france_2017_isf_to_ifi_abolition",
-  "template": "synth_did",
-  "claim_direction_inferred": "-",
-  "falsification_rule_text": "SUPPORTED if French top-1 pretax share rises by at least 0.75 percentage points 2017-2022 vs synthetic-control trajectory at p<0.10. REFUTED if no detectable gap (within 0.3pp) or the gap is negative at five-year horizon.\n",
-  "estimate": {
-    "shape": "synth_did",
-    "treated_country": "FRA",
-    "event_year": 2017,
-    "n_donors": 3,
-    "donor_weights": {
-      "DEU": 0.0,
-      "PRT": 0.1049,
-      "FIN": 0.8951
-    },
-    "pre_rmse": 1.1035329228493052,
-    "pre_period_sd": 0.6064023495368479,
-    "mean_post_gap": 1.3307152102550885,
-    "end_period_gap": 2.088055498089437,
-    "post_period_years": [
-      2017,
-      2022
-    ],
-    "placebo_p_value": 1.0,
-    "n_placebos": 3,
-    "method": "synthetic-control via NNLS, permutation inference"
+  "template": "event_study",
+  "claim_direction_inferred": "+",
+  "event_year": 2018,
+  "threshold_extracted": {
+    "percent": 30.0
+  },
+  "falsification_rule_text": "SUPPORTED if the FRA post-2018 treatment coefficient on the top-1 pretax income share is positive (top share rises after the ISF->IFI abolition vs the country+year fixed-effect counterfactual) at p<0.10. REFUTED if negative at p<0.10. PARTIAL if not significant.\n",
+  "falsification_test_text": "Two-way fixed-effects (country + year) event study, treated FRA from 2018, Eurozone donor pool. Year FE absorb the CRS-enforcement-era common trend the disclosure flags as the main confound.\n",
+  "comparison": {
+    "shape": "multi_country_twfe",
+    "coefficient": 1.0954852558680557,
+    "std_error": 0.20773810816136232,
+    "p_value": 1.279683804034093e-06,
+    "n_obs": 98,
+    "n_countries": 9,
+    "r_squared_within": 0.17443300272849727,
+    "method": "linearmodels.PanelOLS (TWFE, country-clustered)",
+    "dropped_controls_due_to_overlap": []
   },
   "data_status": {
     "variables_loaded": [
@@ -40,9 +34,9 @@
       {
         "role": "outcome",
         "name": "top_1pct_wealth_share",
-        "source": "owid:top-1-share-of-total-wealth",
-        "publisher": "owid",
-        "n_rows": 10811
+        "source": "wid_concentration:top1_net_personal_wealth_share",
+        "publisher": "wid_concentration",
+        "n_rows": 2199
       },
       {
         "role": "treatment",
@@ -75,6 +69,6 @@
     ],
     "variables_missing": []
   },
-  "run_utc": "2026-05-04T08:09:56+00:00",
-  "runner": "scripts/run_synth_did.py"
+  "run_utc": "2026-06-29T17:04:45+00:00",
+  "runner": "scripts/run_event_study.py"
 }

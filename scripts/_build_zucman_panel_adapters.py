@@ -85,6 +85,7 @@ def main() -> None:
     for series_id, out_series in [
         ("oecd_combined_corporate_income_tax_rate", "combined_corporate_income_tax_rate"),
         ("oecd_tax_recurrent_net_wealth_pct_gdp", "recurrent_net_wealth_pct_gdp"),
+        ("oecd_tax_estate_inheritance_gift_pct_gdp", "estate_inheritance_gift_pct_gdp"),
     ]:
         slc = oecd[oecd["series_id"] == series_id][["country_iso3", "year", "value"]]
         write_vintage(slc, "oecd_taxstruct", out_series)
