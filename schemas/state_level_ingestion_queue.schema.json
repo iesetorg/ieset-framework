@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieset.dev/schemas/state_level_ingestion_queue.schema.json",
+  "title": "IESET State-Level Ingestion Queue",
+  "description": "Implementation waves for turning the state-level source inventory into admin1 panels, policy events, and vintaged manifests.",
+  "type": "object",
+  "required": ["version", "created_utc", "waves"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "created_utc": {"type": "string", "minLength": 10},
+    "waves": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/wave"}
+    }
+  },
+  "$defs": {
+    "wave": {
+      "type": "object",
+      "required": [
+        "wave_id",
+        "objective",
+        "status",
+        "source_ids",
+        "expected_outputs",
+        "acceptance_checks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "wave_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"},
+        "objective": {"type": "string", "minLength": 15},
+        "status": {
+          "type": "string",
+          "enum": [
+            "research_pending",
+            "scout_reported_needs_verification",
+            "schema_design_ready",
+            "ready_for_fetcher_design",
+            "in_progress",
+            "blocked",
+            "complete"
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "source_family_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "target_cases": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$"}
+        },
+        "expected_outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 3}
+        },
+        "landed_outputs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 3}
+        },
+        "acceptance_checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 10}
+        }
+      }
+    }
+  }
+}

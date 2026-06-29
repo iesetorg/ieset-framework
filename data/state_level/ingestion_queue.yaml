@@ -1,0 +1,203 @@
+# State-level data ingestion queue
+#
+# This queue mirrors the city-level sprint but targets admin1/state/province
+# panels. It starts with a U.S. spine because local vintages are already on
+# disk, then broadens to global admin1 anchors and federal systems.
+
+version: 1
+created_utc: "2026-06-29T00:00:00Z"
+
+waves:
+  - wave_id: state_spine_v0
+    objective: Build the immutable admin1/state identity spine and initial crosswalks.
+    status: in_progress
+    source_ids:
+      - geoboundaries_admin1
+      - gadm_admin1
+      - iso_3166_2_subdivisions
+      - natural_earth_admin1
+      - us_census_tiger_state_geographies
+      - eurostat_gisco_nuts_boundaries
+      - usdol_state_minimum_wage_history
+      - bls_lau_state_labor_force
+      - bls_oews_state_wage
+      - bls_qcew_state_employment_wages
+    expected_outputs:
+      - data/derived/state_universe_admin1.parquet
+      - data/derived/state_crosswalks.parquet
+      - data/manifests/fetch_run_<utc>_state_spine.yaml
+      - engine/state_level_source_index.json
+      - engine/state_level_source_index.md
+    landed_outputs:
+      - data/derived/state_universe_admin1.parquet
+      - data/derived/state_crosswalks.parquet
+      - data/manifests/fetch_run_2026-06-29T065950Z_state_spine.yaml
+    acceptance_checks:
+      - State IDs use stable ISO-3166-2-style unit IDs where available.
+      - Country ISO3, native state code, state/province name, and publisher IDs are preserved.
+      - Legal treatment jurisdictions are not collapsed into country-year rows.
+      - Boundary/geography sources retain release or vintage notes before global expansion.
+
+  - wave_id: us_state_labor_policy_v0
+    objective: Convert existing U.S. state labor vintages into a state-policy-ready panel stack.
+    status: in_progress
+    source_ids:
+      - usdol_state_minimum_wage_history
+      - bls_lau_state_labor_force
+      - bls_oews_state_wage
+      - bls_qcew_state_employment_wages
+      - derived_minimum_wage_bite_ratio_subnational_panel
+      - us_census_state_population_estimates
+      - us_census_acs_state_profile
+      - us_census_saipe_state_poverty
+      - ncsl_state_policy_database
+    target_cases:
+      - high_bite_minimum_wage_state_did
+      - state_labor_market_deregulation_panel
+      - state_wage_distribution_incidence_panel
+    expected_outputs:
+      - data/derived/us_state_labor_outcome_panel.parquet
+      - data/derived/us_state_minimum_wage_treatment_panel.parquet
+      - data/derived/us_state_policy_test_readiness_matrix.parquet
+    landed_outputs:
+      - data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+      - data/vintages/bls/LAU_state_unemployment_rate_panel@2026-05-05T204700Z.parquet
+      - data/vintages/bls/LAU_state_employment_population_ratio_panel@2026-05-14T110716Z.parquet
+      - data/vintages/bls/OEWS_state_median_hourly_wage_panel@2026-05-12T125636Z.parquet
+      - data/vintages/bls/OEWS_state_p10_hourly_wage_panel@2026-05-12T125547Z.parquet
+      - data/vintages/bls/QCEW_state_total_employment_panel@2026-05-05T204746Z.parquet
+      - data/vintages/bls/QCEW_state_NAICS722_employment_panel@2026-05-12T140559Z.parquet
+      - data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet
+    acceptance_checks:
+      - All panels include `unit_id` or a deterministic mapping to `ieset_state_id`.
+      - Monthly and annual frequencies are not silently mixed.
+      - OEWS/OES break notes and QCEW disclosure flags are preserved.
+      - Minimum-wage treatment intensity is not estimated through the country-year runner.
+
+  - wave_id: us_state_housing_fiscal_v0
+    objective: Add state housing supply, fiscal, population, and macro controls for broad U.S. state panels.
+    status: ready_for_fetcher_design
+    source_ids:
+      - us_census_bps_state_permits
+      - us_census_state_population_estimates
+      - us_census_acs_state_profile
+      - us_census_state_local_gov_finances
+      - us_census_state_tax_collections
+      - us_census_business_formation_state
+      - bea_sagdp_state_accounts
+      - fhfa_house_price_index_state
+      - nasbo_state_expenditure_report
+      - eia_state_energy_data_system
+      - cdc_wonder_state_health
+      - cdc_brfss_state_health
+      - cms_state_health_medicaid_files
+      - nces_state_education_data
+      - nces_ipeds_state_higher_ed
+      - fbi_cde_state_crime
+      - cdc_state_tobacco_policy
+    target_cases:
+      - state_housing_supply_reform_panel
+      - state_tax_spending_growth_panel
+      - state_energy_policy_outcome_panel
+      - state_health_education_spending_incidence_panel
+    expected_outputs:
+      - data/derived/us_state_housing_supply_panel.parquet
+      - data/derived/us_state_fiscal_macro_controls.parquet
+      - data/derived/us_state_demography_incidence_panel.parquet
+    acceptance_checks:
+      - State FIPS and `ieset_state_id` are preserved in every output.
+      - Fiscal-year and calendar-year measures keep separate period fields.
+      - Survey margins, suppressed cells, and reporting coverage flags survive ingestion.
+
+  - wave_id: oecd_europe_regional_v0
+    objective: Build OECD/European regional panels and crosswalk TL/NUTS units to legal admin1 where appropriate.
+    status: scout_reported_needs_verification
+    source_ids:
+      - oecd_regional_statistics
+      - eurostat_nuts_regional_statistics
+      - eurostat_gisco_nuts_boundaries
+      - destatis_regional_lander_data
+      - germany_regionaldatenbank_deutschland
+      - germany_inkar_bbsr
+      - germany_vgrdl_regional_accounts
+      - germany_ba_regional_labor_stats
+      - statcan_provincial_territorial_statistics
+      - canada_cmhc_housing_market_data
+      - swiss_fso_canton_statistics
+      - uk_ons_subnational_indicators
+      - uk_nomis_labour_census_regional
+    target_cases:
+      - germany_lander_policy_panel
+      - swiss_canton_policy_panel
+      - canada_province_policy_panel
+      - eurostat_nuts_policy_controls
+    expected_outputs:
+      - data/derived/oecd_admin1_regional_panel.parquet
+      - data/derived/eurostat_nuts_admin1_crosswalk.parquet
+      - data/derived/europe_state_policy_controls.parquet
+    acceptance_checks:
+      - NUTS/TL levels are marked as statistical, legal admin1, or non-equivalent.
+      - Boundary vintages and unit revisions are kept in crosswalk metadata.
+      - Country-specific legal treatment jurisdictions override statistical regions.
+
+  - wave_id: federal_systems_admin1_v0
+    objective: Scout and verify high-scale admin1 sources for large federal and decentralized systems.
+    status: scout_reported_needs_verification
+    source_ids:
+      - statcan_provincial_territorial_statistics
+      - abs_state_territory_statistics
+      - australia_state_rental_bond_panels
+      - ibge_sidra_uf
+      - brazil_datasus_bulk_downloads
+      - brazil_tesouro_siconfi_api
+      - inegi_state_indicators
+      - india_mospi_state_domestic_product
+      - india_data_gov_in_api
+      - india_mospi_microdata_nada
+      - china_nbs_provincial_statistics
+      - indonesia_bps_web_api
+      - statssa_provincial_data
+      - south_africa_vulekamali_budget_api
+      - philippines_psa_openstat_api
+      - nigeria_nbs_microdata_open_data
+      - argentina_indec_bases_de_datos
+    target_cases:
+      - brazil_uf_policy_panel
+      - mexico_state_policy_panel
+      - india_state_reform_panel
+      - china_provincial_housing_macro_panel
+      - australia_state_tenancy_panel
+    expected_outputs:
+      - data/derived/federal_systems_admin1_source_matrix.parquet
+      - data/derived/federal_systems_admin1_controls_panel.parquet
+      - engine/agent_briefs/state_level_federal_systems_wave_results_2026-06-29.md
+    acceptance_checks:
+      - Official statistical endpoints and codebooks are verified before production.
+      - Native state/province codes are kept alongside ISO/GADM/geoBoundaries joins.
+      - Country-specific fiscal years, state reorganizations, and unit splits are documented.
+
+  - wave_id: state_policy_event_registry_v0
+    objective: Create an event-dated treatment registry for state-level policy changes across high-payoff domains.
+    status: schema_design_ready
+    source_ids:
+      - usdol_state_minimum_wage_history
+      - ncsl_state_policy_database
+      - cdc_state_tobacco_policy
+      - cms_state_health_medicaid_files
+      - brazil_lexml_legislative_metadata
+      - bea_sagdp_state_accounts
+      - eia_state_energy_data_system
+      - australia_state_rental_bond_panels
+      - eurostat_nuts_regional_statistics
+    target_cases:
+      - state_minimum_wage_events
+      - state_rent_control_preemption_events
+      - state_energy_policy_events
+      - state_tax_spending_events
+    expected_outputs:
+      - data/derived/state_policy_event_registry.parquet
+      - data/state_level/policy_event_registry_template.yaml
+    acceptance_checks:
+      - Events store country ISO3, `ieset_state_id`, effective date, repeal/sunset date, and legal citation.
+      - Discovery sources are separated from official legal text.
+      - Treatment intensity, exemptions, enforcement agency, and preemption status are explicit fields.

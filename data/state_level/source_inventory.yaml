@@ -1,0 +1,1665 @@
+# State-level dataset expansion inventory
+#
+# Seeded 2026-06-29 to close the gap between country-level panels and the
+# city-level top-1000 sprint. Records are source-first: each source can later
+# be promoted into fetchers, manual vintages, or derived state-readiness panels.
+
+version: 1
+last_seeded_utc: "2026-06-29T00:00:00Z"
+primary_scope: admin1_subnational_policy_panels
+canonical_state_universe:
+  preferred_anchor: geoboundaries_admin1
+  fallback_anchors:
+    - gadm_admin1
+    - iso_3166_2_subdivisions
+    - natural_earth_admin1
+  admin1_rule: >
+    Treat state-level units as first-order administrative/state-equivalent
+    jurisdictions: U.S. states and DC/territories where relevant, Canadian
+    provinces/territories, German Laender, Indian states/UTs, Brazilian UFs,
+    Mexican states, Australian states/territories, Chinese provinces, and
+    comparable ISO-3166-2/admin1 units. Preserve country ISO3, native codes,
+    ISO-3166-2 where available, and publisher geography IDs. Do not collapse
+    state/province policy events into country-year treatments.
+
+source_records:
+  - source_id: geoboundaries_admin1
+    source_name: geoBoundaries administrative boundaries, ADM1
+    publisher: William and Mary geoLab
+    geography: global
+    spatial_grain: admin1 polygon
+    time_coverage: release-based, current boundary vintages
+    policy_or_outcome_fields:
+      - admin1 geometry
+      - boundary metadata
+      - country ISO codes
+      - native administrative names
+    policy_domains:
+      - admin_spine
+    access_format: API and bulk GeoJSON/TopoJSON downloads
+    source_url: https://www.geoboundaries.org/
+    license_or_terms: CC BY 4.0 for most open boundary products; verify per release
+    update_frequency: release-based
+    state_level_use: canonical global admin1 boundary and crosswalk anchor
+    second_order_layers:
+      - implementation_capacity
+      - externality_or_spillover
+    admin1_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 1
+    verification_status: seed_unverified_url
+    notes: >
+      Use as the preferred global state/province spine once the ADM1 release is
+      dropped or fetched. Keep boundary vintages pinned because admin1 units can
+      split, merge, or change names.
+
+  - source_id: gadm_admin1
+    source_name: GADM administrative areas, level 1
+    publisher: GADM
+    geography: global
+    spatial_grain: admin1 polygon
+    time_coverage: release-based, current boundary vintages
+    policy_or_outcome_fields:
+      - admin1 geometry
+      - names
+      - country codes
+      - GID hierarchy
+    policy_domains:
+      - admin_spine
+    access_format: GeoPackage, shapefile, and R spatial downloads
+    source_url: https://gadm.org/
+    license_or_terms: GADM license; redistribution terms require verification
+    update_frequency: release-based
+    state_level_use: fallback global admin1 geometry and name/code crosswalk
+    second_order_layers:
+      - implementation_capacity
+    admin1_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 2
+    verification_status: seed_unverified_url
+    notes: >
+      Useful as a high-coverage fallback and cross-check against geoBoundaries,
+      but license and redistribution constraints must be pinned before shipping
+      derived geometries.
+
+  - source_id: iso_3166_2_subdivisions
+    source_name: ISO 3166-2 subdivision codes
+    publisher: International Organization for Standardization
+    geography: global
+    spatial_grain: coded country subdivision
+    time_coverage: current code list with periodic updates
+    policy_or_outcome_fields:
+      - subdivision code
+      - subdivision name
+      - subdivision category
+      - country code
+    policy_domains:
+      - admin_spine
+    access_format: online browsing and licensed code lists
+    source_url: https://www.iso.org/iso-3166-country-codes.html
+    license_or_terms: ISO terms; open redistribution of full code list requires verification
+    update_frequency: periodic
+    state_level_use: stable public-facing code namespace for admin1 IDs and crosswalks
+    second_order_layers:
+      - implementation_capacity
+    admin1_scalability: high
+    ingestion_difficulty: high
+    immediate_payoff_rank: 3
+    verification_status: seed_unverified_url
+    notes: >
+      Use ISO-3166-2 codes when already present in publisher data. Avoid copying
+      licensed full code lists until terms are settled.
+
+  - source_id: natural_earth_admin1
+    source_name: Natural Earth admin 1 states and provinces
+    publisher: Natural Earth
+    geography: global
+    spatial_grain: admin1 polygon
+    time_coverage: release-based, generalized current boundaries
+    policy_or_outcome_fields:
+      - admin1 geometry
+      - names
+      - postal and iso-like codes
+      - map labels
+    policy_domains:
+      - admin_spine
+    access_format: shapefile and GeoPackage bulk downloads
+    source_url: https://www.naturalearthdata.com/downloads/10m-cultural-vectors/
+    license_or_terms: public domain per Natural Earth terms; verify release metadata
+    update_frequency: release-based
+    state_level_use: lightweight global admin1 map and coarse crosswalk fallback
+    second_order_layers:
+      - implementation_capacity
+    admin1_scalability: high
+    ingestion_difficulty: low
+    immediate_payoff_rank: 4
+    verification_status: seed_unverified_url
+    notes: >
+      Good for maps and fast joins, not authoritative legal boundary history.
+      Treat as fallback geometry rather than the legal treatment anchor.
+
+  - source_id: usdol_state_minimum_wage_history
+    source_name: State minimum wage laws
+    publisher: U.S. Department of Labor Wage and Hour Division
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: 1968-present in local vintage
+    policy_or_outcome_fields:
+      - statutory minimum wage
+      - federal fallback rate
+      - state name
+      - state abbreviation
+      - state FIPS
+    policy_domains:
+      - labor
+      - policy_events
+      - admin_spine
+    access_format: official table parsed by data.fetchers.usdol
+    source_url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+    license_or_terms: U.S. public domain
+    update_frequency: periodic
+    state_level_use: treatment source and v0 U.S. admin1 spine seed
+    second_order_layers:
+      - first_order_policy_effect
+      - distributional_incidence
+      - implementation_capacity
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 5
+    verification_status: production_ready
+    notes: >
+      Existing local vintage data/vintages/usdol/state_minimum_wage_history
+      includes state names, abbreviations, FIPS, federal fallback, and parsed
+      minimum-wage values.
+
+  - source_id: bls_lau_state_labor_force
+    source_name: Local Area Unemployment Statistics, state labor-force panels
+    publisher: U.S. Bureau of Labor Statistics
+    geography: United States
+    spatial_grain: state-month
+    time_coverage: 1990-2024 in local state vintages
+    policy_or_outcome_fields:
+      - unemployment rate
+      - employment-population ratio
+      - state FIPS
+      - month
+      - year
+    policy_domains:
+      - labor
+      - economic_accounts
+    access_format: BLS public API / local parquet vintages
+    source_url: https://www.bls.gov/lau/
+    license_or_terms: U.S. public domain
+    update_frequency: monthly
+    state_level_use: labor-market outcome layer for U.S. state policy panels
+    second_order_layers:
+      - behavioral_response
+      - macro_feedback
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 6
+    verification_status: production_ready
+    notes: >
+      Existing BLS vintages include LAU state unemployment and all-ages
+      employment-population panels. Teen E/P still needs a CPS or FRED solution.
+
+  - source_id: bls_oews_state_wage
+    source_name: OEWS state occupational wage panels
+    publisher: U.S. Bureau of Labor Statistics
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: 2014-2024 in local all-occupations vintages
+    policy_or_outcome_fields:
+      - median hourly wage
+      - p10 hourly wage
+      - state FIPS
+      - occupation aggregate
+    policy_domains:
+      - labor
+    access_format: BLS time-series API / local parquet vintages
+    source_url: https://www.bls.gov/oes/
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: wage denominator and wage-distribution outcome layer
+    second_order_layers:
+      - distributional_incidence
+      - first_order_price_or_transfer
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 7
+    verification_status: production_ready
+    notes: >
+      Existing local vintages power the derived minimum-wage bite-ratio panels.
+      Series coverage and OES/OEWS break handling should be documented in model
+      specs.
+
+  - source_id: bls_qcew_state_employment_wages
+    source_name: QCEW state employment and wage panels
+    publisher: U.S. Bureau of Labor Statistics
+    geography: United States
+    spatial_grain: state-industry-year
+    time_coverage: 2014-2024 in local annual state vintages
+    policy_or_outcome_fields:
+      - employment
+      - establishments
+      - annual wages
+      - weekly wages
+      - NAICS industry
+      - state FIPS
+    policy_domains:
+      - labor
+      - economic_accounts
+    access_format: BLS QCEW CSV API / local parquet vintages
+    source_url: https://www.bls.gov/cew/downloadable-data-files.htm
+    license_or_terms: U.S. public domain
+    update_frequency: quarterly and annual
+    state_level_use: employment, industry, and wage outcomes for state policy tests
+    second_order_layers:
+      - market_structure_response
+      - macro_feedback
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 8
+    verification_status: production_ready
+    notes: >
+      Local vintages include total employment and NAICS 72/722 panels. Keep
+      disclosure flags and industry codes through any derived panel.
+
+  - source_id: derived_minimum_wage_bite_ratio_subnational_panel
+    source_name: Derived minimum-wage bite-ratio state panel
+    publisher: IESET derived
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: 2014-2024 in local derived vintage
+    policy_or_outcome_fields:
+      - minimum wage
+      - median wage denominator
+      - bite ratio
+      - state FIPS
+      - state abbreviation
+    policy_domains:
+      - labor
+      - policy_events
+    access_format: derived parquet vintage
+    source_url: derived://usdol:state_minimum_wage_history + bls:OEWS_state_median_hourly_wage_panel
+    license_or_terms: derived from U.S. public data
+    update_frequency: rebuilt when upstream vintages refresh
+    state_level_use: treatment intensity layer for high-bite minimum-wage tests
+    second_order_layers:
+      - first_order_policy_effect
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 9
+    verification_status: production_ready
+    notes: >
+      Existing local derived vintage unlocks treatment intensity, but runner
+      support for unit_id/state panels remains the methodological bottleneck.
+
+  - source_id: us_census_state_population_estimates
+    source_name: Annual state population estimates
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: annual estimates, release-dependent
+    policy_or_outcome_fields:
+      - resident population
+      - components of change
+      - state FIPS
+    policy_domains:
+      - demography
+      - economic_accounts
+    access_format: Census API and bulk CSV downloads
+    source_url: https://www.census.gov/programs-surveys/popest.html
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: denominator/control layer for state panels
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 10
+    verification_status: seed_unverified_url
+    notes: >
+      High-priority denominator source for normalizing state labor, fiscal,
+      health, and housing outcomes.
+
+  - source_id: us_census_acs_state_profile
+    source_name: American Community Survey state profile and detailed tables
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-year and state-period estimates
+    time_coverage: 1-year and 5-year ACS releases, release-dependent
+    policy_or_outcome_fields:
+      - income
+      - poverty
+      - rent burden
+      - tenure
+      - migration
+      - education
+      - demographics
+    policy_domains:
+      - demography
+      - housing
+      - education
+      - labor
+    access_format: Census API and bulk downloads
+    source_url: https://www.census.gov/programs-surveys/acs/data.html
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: distributional incidence and control layer for U.S. state policy tests
+    second_order_layers:
+      - distributional_incidence
+      - behavioral_response
+      - macro_feedback
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 11
+    verification_status: seed_unverified_url
+    notes: >
+      Use state-level ACS first; county/place pulls can remain in the city/local
+      program. Keep table IDs and margins of error where possible.
+
+  - source_id: bea_sagdp_state_accounts
+    source_name: State annual GDP and personal income accounts
+    publisher: U.S. Bureau of Economic Analysis
+    geography: United States
+    spatial_grain: state-year and state-industry-year
+    time_coverage: annual and quarterly, release-dependent
+    policy_or_outcome_fields:
+      - GDP
+      - personal income
+      - employment
+      - industry value added
+      - state FIPS
+    policy_domains:
+      - economic_accounts
+      - labor
+      - fiscal
+    access_format: BEA API and bulk downloads
+    source_url: https://www.bea.gov/data/gdp/gdp-state
+    license_or_terms: U.S. public domain
+    update_frequency: quarterly and annual
+    state_level_use: macro outcome and control layer for U.S. state panels
+    second_order_layers:
+      - macro_feedback
+      - market_structure_response
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 12
+    verification_status: seed_unverified_url
+    notes: >
+      Needed for growth, industry, and fiscal-policy state designs. API key and
+      table-specific codebooks should be pinned before production.
+
+  - source_id: us_census_bps_state_permits
+    source_name: Building Permits Survey, state series
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-month and state-year
+    time_coverage: monthly and annual, release-dependent
+    policy_or_outcome_fields:
+      - building permits
+      - housing units
+      - structure type
+      - permit value
+      - state FIPS
+    policy_domains:
+      - housing
+    access_format: Census downloads and API
+    source_url: https://www.census.gov/construction/bps/
+    license_or_terms: U.S. public domain
+    update_frequency: monthly
+    state_level_use: housing-supply response layer for state housing and land-use policies
+    second_order_layers:
+      - second_order_supply_response
+      - dynamic_investment_response
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 13
+    verification_status: seed_unverified_url
+    notes: >
+      Pair with city/place BPS already landed for local cases; state aggregation
+      is useful for statewide zoning, rent, or permitting reforms.
+
+  - source_id: eia_state_energy_data_system
+    source_name: State Energy Data System
+    publisher: U.S. Energy Information Administration
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: annual, long historical series
+    policy_or_outcome_fields:
+      - energy consumption
+      - prices
+      - expenditures
+      - production
+      - emissions-linked energy measures
+    policy_domains:
+      - environment_energy
+      - economic_accounts
+    access_format: EIA API and bulk files
+    source_url: https://www.eia.gov/state/seds/
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: energy-policy outcome layer for state climate, price, and regulation tests
+    second_order_layers:
+      - externality_or_spillover
+      - macro_feedback
+      - first_order_price_or_transfer
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 14
+    verification_status: seed_unverified_url
+    notes: >
+      Strong candidate for state energy price controls, climate policy, and
+      reliability-adjacent outcome panels.
+
+  - source_id: cdc_wonder_state_health
+    source_name: CDC WONDER state health and mortality tables
+    publisher: Centers for Disease Control and Prevention
+    geography: United States
+    spatial_grain: state-year and state-demographic cell
+    time_coverage: dataset-dependent
+    policy_or_outcome_fields:
+      - mortality
+      - natality
+      - causes of death
+      - demographic cells
+      - state
+    policy_domains:
+      - health
+      - demography
+    access_format: CDC WONDER query system and downloadable tables
+    source_url: https://wonder.cdc.gov/
+    license_or_terms: U.S. public domain with CDC data-use caveats; verify per dataset
+    update_frequency: dataset-dependent
+    state_level_use: health outcome layer for Medicaid, public-health, and welfare state tests
+    second_order_layers:
+      - distributional_incidence
+      - macro_feedback
+      - net_welfare
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 15
+    verification_status: seed_unverified_url
+    notes: >
+      High payoff but query constraints and suppression rules need a careful
+      fetcher or manual-vintage pattern.
+
+  - source_id: nces_state_education_data
+    source_name: NCES state education data
+    publisher: National Center for Education Statistics
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: dataset-dependent
+    policy_or_outcome_fields:
+      - enrollment
+      - finance
+      - attainment
+      - staffing
+      - state
+    policy_domains:
+      - education
+      - fiscal
+      - demography
+    access_format: NCES downloads and APIs depending on dataset
+    source_url: https://nces.ed.gov/
+    license_or_terms: U.S. public domain; verify per table
+    update_frequency: annual or release-based
+    state_level_use: education-policy outcome and fiscal-control layer
+    second_order_layers:
+      - distributional_incidence
+      - fiscal_or_enforcement_cost
+      - macro_feedback
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 16
+    verification_status: seed_unverified_url
+    notes: >
+      Good candidate for school-choice, education spending, and state capacity
+      tests once table families are pinned.
+
+  - source_id: fbi_cde_state_crime
+    source_name: FBI Crime Data Explorer state crime tables
+    publisher: Federal Bureau of Investigation
+    geography: United States
+    spatial_grain: state-year and state-agency aggregates
+    time_coverage: dataset-dependent, UCR/NIBRS transition caveats
+    policy_or_outcome_fields:
+      - offense counts
+      - arrests
+      - law-enforcement agency coverage
+      - state
+    policy_domains:
+      - crime_justice
+      - demography
+    access_format: API and downloads
+    source_url: https://cde.ucr.cjis.gov/
+    license_or_terms: U.S. public domain; verify API terms
+    update_frequency: annual and periodic
+    state_level_use: crime and justice outcome layer for state policy panels
+    second_order_layers:
+      - externality_or_spillover
+      - implementation_capacity
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 17
+    verification_status: seed_unverified_url
+    notes: >
+      Requires careful handling of reporting coverage, UCR/NIBRS breaks, and
+      agency participation.
+
+  - source_id: nasbo_state_expenditure_report
+    source_name: State Expenditure Report
+    publisher: National Association of State Budget Officers
+    geography: United States
+    spatial_grain: state-fiscal-year
+    time_coverage: annual reports, release-dependent
+    policy_or_outcome_fields:
+      - state spending
+      - fund type
+      - functional category
+      - federal funds
+    policy_domains:
+      - fiscal
+      - health
+      - education
+    access_format: report tables and downloadable files where available
+    source_url: https://www.nasbo.org/reports-data/state-expenditure-report
+    license_or_terms: NASBO terms; verify before redistribution
+    update_frequency: annual
+    state_level_use: fiscal-treatment and fiscal-control layer for U.S. state panels
+    second_order_layers:
+      - fiscal_or_enforcement_cost
+      - macro_feedback
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 18
+    verification_status: seed_unverified_url
+    notes: >
+      Not a federal source, but often the most structured national state-budget
+      compilation. Terms and table structure must be checked per release.
+
+  - source_id: ncsl_state_policy_database
+    source_name: NCSL state policy and legislation databases
+    publisher: National Conference of State Legislatures
+    geography: United States
+    spatial_grain: state-policy event and bill/topic
+    time_coverage: topic-dependent
+    policy_or_outcome_fields:
+      - bill status
+      - enactment
+      - topic
+      - state
+      - effective dates where available
+    policy_domains:
+      - policy_events
+      - labor
+      - housing
+      - fiscal
+      - health
+      - education
+      - environment_energy
+    access_format: topic pages, tables, and downloadable data where available
+    source_url: https://www.ncsl.org/
+    license_or_terms: NCSL terms; verify before production
+    update_frequency: topic-dependent
+    state_level_use: broad state policy-event discovery layer before official legal-text coding
+    second_order_layers:
+      - first_order_policy_effect
+      - implementation_capacity
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 19
+    verification_status: scout_reported_unverified
+    notes: >
+      Treat as a discovery source. Production treatment registries should cite
+      official statutes, agencies, or ballot materials where possible.
+
+  - source_id: oecd_regional_statistics
+    source_name: OECD regional statistics
+    publisher: OECD
+    geography: OECD and partner economies
+    spatial_grain: TL2/TL3 region-year
+    time_coverage: indicator-dependent
+    policy_or_outcome_fields:
+      - regional GDP
+      - employment
+      - population
+      - innovation
+      - environment
+      - well-being
+    policy_domains:
+      - economic_accounts
+      - labor
+      - demography
+      - environment_energy
+    access_format: OECD Data Explorer and SDMX API
+    source_url: https://www.oecd.org/regional/regional-statistics/
+    license_or_terms: OECD terms
+    update_frequency: periodic
+    state_level_use: high-income regional outcome and control layer
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - externality_or_spillover
+    admin1_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 20
+    verification_status: seed_unverified_url
+    notes: >
+      Crosswalk TL2/TL3 to admin1 carefully. TL2 is state-like in some countries
+      and not in others.
+
+  - source_id: eurostat_nuts_regional_statistics
+    source_name: Eurostat regional statistics by NUTS
+    publisher: Eurostat
+    geography: European Union and associated statistical territories
+    spatial_grain: NUTS region-year
+    time_coverage: indicator-dependent
+    policy_or_outcome_fields:
+      - GDP
+      - employment
+      - unemployment
+      - population
+      - education
+      - health
+      - housing-related indicators
+    policy_domains:
+      - economic_accounts
+      - labor
+      - demography
+      - education
+      - health
+      - housing
+    access_format: Eurostat API and bulk TSV downloads
+    source_url: https://ec.europa.eu/eurostat/web/regions/database
+    license_or_terms: Eurostat reuse policy
+    update_frequency: periodic
+    state_level_use: European regional panel layer and NUTS-to-admin1 bridge
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - implementation_capacity
+    admin1_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 21
+    verification_status: seed_unverified_url
+    notes: >
+      NUTS levels are statistical, not always legal state units. Store NUTS
+      level and boundary vintage before treating a unit as admin1-equivalent.
+
+  - source_id: destatis_regional_lander_data
+    source_name: German regional statistics for Laender and districts
+    publisher: Destatis and regional statistical offices
+    geography: Germany
+    spatial_grain: Land, district, and regional-year depending on table
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - regional GDP
+      - population
+      - labor market
+      - education
+      - housing and construction where available
+    policy_domains:
+      - economic_accounts
+      - labor
+      - demography
+      - housing
+      - education
+    access_format: GENESIS API and bulk table downloads
+    source_url: https://www-genesis.destatis.de/
+    license_or_terms: Data licence Germany attribution; verify table metadata
+    update_frequency: periodic
+    state_level_use: Germany Laender outcome layer for federal/state policy cases
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 22
+    verification_status: seed_unverified_url
+    notes: >
+      Existing Destatis regional GDP vintage is on disk, but a cleaner Laender
+      crosswalk and table-family selection are still needed.
+
+  - source_id: statcan_provincial_territorial_statistics
+    source_name: Statistics Canada provincial and territorial tables
+    publisher: Statistics Canada
+    geography: Canada
+    spatial_grain: province/territory-year and finer geographies by table
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - GDP
+      - employment
+      - wages
+      - CPI
+      - population
+      - housing
+      - income
+    policy_domains:
+      - economic_accounts
+      - labor
+      - demography
+      - housing
+      - fiscal
+    access_format: Web Data Service API and CSV tables
+    source_url: https://www150.statcan.gc.ca/n1/en/type/data
+    license_or_terms: Statistics Canada Open Licence
+    update_frequency: table-dependent
+    state_level_use: Canadian province/territory panels for federal-system comparisons
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - first_order_price_or_transfer
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 23
+    verification_status: seed_unverified_url
+    notes: >
+      Existing StatCan fetcher can likely support table-specific province pulls
+      once vector IDs are pinned.
+
+  - source_id: abs_state_territory_statistics
+    source_name: Australian state and territory statistics
+    publisher: Australian Bureau of Statistics
+    geography: Australia
+    spatial_grain: state/territory-year and finer ASGS geographies
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - population
+      - labor force
+      - construction
+      - rents and housing
+      - state accounts
+    policy_domains:
+      - economic_accounts
+      - labor
+      - housing
+      - demography
+    access_format: ABS Data API and bulk downloads
+    source_url: https://www.abs.gov.au/statistics
+    license_or_terms: ABS terms, generally Creative Commons attribution; verify per table
+    update_frequency: table-dependent
+    state_level_use: Australia state/territory outcomes for tenancy, labor, and housing reforms
+    second_order_layers:
+      - macro_feedback
+      - second_order_supply_response
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 24
+    verification_status: seed_unverified_url
+    notes: >
+      Pair with state rental-bond panels for housing-specific designs.
+
+  - source_id: australia_state_rental_bond_panels
+    source_name: Australia state rental bond median-rent panels
+    publisher: State and territory housing agencies
+    geography: Australia
+    spatial_grain: state, LGA, postcode, suburb, and market cell depending on state
+    time_coverage: state-dependent, often 1999-present for Victoria
+    policy_or_outcome_fields:
+      - median rents
+      - bond lodgements
+      - dwelling type
+      - bedroom count
+      - geography
+    policy_domains:
+      - housing
+      - policy_events
+    access_format: state open-data downloads and dashboards
+    source_url: https://www.housing.vic.gov.au/rental-report
+    license_or_terms: terms vary by state; verify per source
+    update_frequency: quarterly or periodic
+    state_level_use: direct rent outcome layer for Australian state tenancy-law designs
+    second_order_layers:
+      - first_order_price_or_transfer
+      - distributional_incidence
+      - behavioral_response
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 25
+    verification_status: scout_reported_unverified
+    notes: >
+      Start with Victoria as exemplar, then add NSW, Queensland, and other
+      states with explicit license and geography keys.
+
+  - source_id: ibge_sidra_uf
+    source_name: IBGE SIDRA state and municipal statistical tables
+    publisher: Instituto Brasileiro de Geografia e Estatistica
+    geography: Brazil
+    spatial_grain: UF-year, municipality-year, and survey cells
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - population
+      - labor
+      - GDP
+      - housing
+      - census variables
+      - prices
+    policy_domains:
+      - economic_accounts
+      - labor
+      - housing
+      - demography
+      - education
+      - health
+    access_format: SIDRA API and CSV downloads
+    source_url: https://sidra.ibge.gov.br/
+    license_or_terms: IBGE open-data terms; verify per API/table
+    update_frequency: table-dependent
+    state_level_use: Brazil UF outcome/control layer and municipal bridge
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - implementation_capacity
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 26
+    verification_status: seed_unverified_url
+    notes: >
+      High payoff for Brazilian federal and municipal policy cases. Keep UF
+      codes and municipality codes distinct.
+
+  - source_id: inegi_state_indicators
+    source_name: INEGI state statistical indicators
+    publisher: Instituto Nacional de Estadistica y Geografia
+    geography: Mexico
+    spatial_grain: state-year and municipality-year depending on table
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - population
+      - labor
+      - GDP
+      - housing
+      - construction
+      - census variables
+    policy_domains:
+      - economic_accounts
+      - labor
+      - housing
+      - demography
+      - education
+    access_format: INEGI APIs and bulk downloads
+    source_url: https://www.inegi.org.mx/datos/
+    license_or_terms: INEGI terms; verify per endpoint
+    update_frequency: table-dependent
+    state_level_use: Mexico state outcome/control layer and municipality bridge
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - second_order_supply_response
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 27
+    verification_status: seed_unverified_url
+    notes: >
+      Useful for both state-level federal designs and city/municipal crosswalks.
+
+  - source_id: india_mospi_state_domestic_product
+    source_name: Indian state domestic product and socioeconomic tables
+    publisher: Ministry of Statistics and Programme Implementation
+    geography: India
+    spatial_grain: state/UT-year
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - state domestic product
+      - sector value added
+      - population-linked indicators
+      - official state aggregates
+    policy_domains:
+      - economic_accounts
+      - labor
+      - demography
+      - fiscal
+    access_format: ministry tables and reports
+    source_url: https://www.mospi.gov.in/
+    license_or_terms: Government of India terms; verify per release
+    update_frequency: annual and release-based
+    state_level_use: India state/UT macro outcome layer for reform and federal policy cases
+    second_order_layers:
+      - macro_feedback
+      - market_structure_response
+      - distributional_incidence
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 28
+    verification_status: scout_reported_unverified
+    notes: >
+      Needs table-family scouting and state-code normalization before production.
+
+  - source_id: china_nbs_provincial_statistics
+    source_name: China provincial statistical yearbook and NBS regional tables
+    publisher: National Bureau of Statistics of China
+    geography: China
+    spatial_grain: province-year and prefecture/city where available
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - GDP
+      - population
+      - fixed asset investment
+      - housing and real estate indicators
+      - employment
+    policy_domains:
+      - economic_accounts
+      - housing
+      - labor
+      - demography
+    access_format: NBS web tables, yearbooks, and downloads where available
+    source_url: https://data.stats.gov.cn/english/
+    license_or_terms: NBS terms; verify access and reuse
+    update_frequency: annual and periodic
+    state_level_use: China provincial macro and housing outcome layer
+    second_order_layers:
+      - macro_feedback
+      - dynamic_investment_response
+      - second_order_supply_response
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 29
+    verification_status: scout_reported_unverified
+    notes: >
+      High payoff but access, language, and table stability require a separate
+      verification pass before fetcher design.
+
+  - source_id: statssa_provincial_data
+    source_name: South Africa provincial statistical data
+    publisher: Statistics South Africa
+    geography: South Africa
+    spatial_grain: province-year and district/municipality where available
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - population
+      - labor
+      - provincial GDP
+      - housing
+      - census indicators
+    policy_domains:
+      - economic_accounts
+      - labor
+      - housing
+      - demography
+    access_format: PxWeb, SuperWEB, reports, and bulk downloads depending on table
+    source_url: https://www.statssa.gov.za/
+    license_or_terms: Statistics South Africa terms; verify per dataset
+    update_frequency: table-dependent
+    state_level_use: South Africa provincial outcome layer and municipal bridge
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - implementation_capacity
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 30
+    verification_status: scout_reported_unverified
+    notes: >
+      Useful for labor, housing, service-delivery, and decentralization cases.
+
+  - source_id: swiss_fso_canton_statistics
+    source_name: Swiss canton statistical tables
+    publisher: Swiss Federal Statistical Office
+    geography: Switzerland
+    spatial_grain: canton-year and municipality-year depending on table
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - population
+      - employment
+      - income
+      - housing
+      - health
+      - education
+    policy_domains:
+      - economic_accounts
+      - labor
+      - housing
+      - health
+      - education
+    access_format: FSO STAT-TAB, PxWeb, and bulk downloads
+    source_url: https://www.bfs.admin.ch/
+    license_or_terms: Swiss Open Government Data terms; verify per table
+    update_frequency: table-dependent
+    state_level_use: Swiss canton outcome layer for federal-policy comparisons
+    second_order_layers:
+      - distributional_incidence
+      - macro_feedback
+      - implementation_capacity
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 31
+    verification_status: seed_unverified_url
+    notes: >
+      Existing Swiss regional/canton fetcher patterns can likely be reused, but
+      the state-level program should standardize canton ISO codes.
+
+  - source_id: uk_ons_subnational_indicators
+    source_name: UK ONS subnational indicators and local statistics
+    publisher: Office for National Statistics
+    geography: United Kingdom
+    spatial_grain: country, region, local authority, and output area depending on table
+    time_coverage: table-dependent
+    policy_or_outcome_fields:
+      - population
+      - labor
+      - housing
+      - income
+      - productivity
+      - health
+    policy_domains:
+      - economic_accounts
+      - labor
+      - housing
+      - demography
+      - health
+    access_format: ONS API and downloadable tables
+    source_url: https://www.ons.gov.uk/
+    license_or_terms: Open Government Licence unless otherwise stated
+    update_frequency: table-dependent
+    state_level_use: UK nations/regions layer and bridge from city/local authority panels
+    second_order_layers:
+      - macro_feedback
+      - distributional_incidence
+      - second_order_supply_response
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 32
+    verification_status: seed_unverified_url
+    notes: >
+      UK administrative/statistical regions are not all state-equivalent. Store
+      region type and legal/policy jurisdiction explicitly.
+
+  - source_id: us_census_tiger_state_geographies
+    source_name: TIGER/Line state geographies
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state boundary/geocode-year
+    time_coverage: 2007-present for modern TIGER/Line state files, plus older vintages
+    policy_or_outcome_fields: [STATEFP, GEOID, state name, legal boundary, geometry vintage]
+    policy_domains: [admin_spine]
+    access_format: shapefile, geodatabase, and web/FTP downloads
+    source_url: https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: authoritative U.S. FIPS boundary spine and boundary-vintage crosswalk
+    second_order_layers: [implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 33
+    verification_status: seed_verified_official_page
+    notes: >
+      Use to harden the U.S. v0 spine beyond the USDOL-derived state list and
+      to preserve boundary/geocode vintages.
+
+  - source_id: us_census_saipe_state_poverty
+    source_name: Small Area Income and Poverty Estimates
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-year, county-year, and school-district-year
+    time_coverage: annual, release-dependent
+    policy_or_outcome_fields: [poverty, child poverty, median household income, state FIPS]
+    policy_domains: [demography, economic_accounts, education]
+    access_format: downloads and data tools
+    source_url: https://www.census.gov/programs-surveys/saipe.html
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: poverty and income outcome layer for tax, labor, education, and welfare tests
+    second_order_layers: [distributional_incidence, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 34
+    verification_status: seed_verified_official_page
+    notes: >
+      Complements ACS with official model-based income and poverty estimates
+      that can support state and county panels.
+
+  - source_id: us_census_state_local_gov_finances
+    source_name: Annual Survey of State and Local Government Finances
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: annual, release-dependent
+    policy_or_outcome_fields: [revenue, expenditure, debt, assets, fund categories, state]
+    policy_domains: [fiscal, economic_accounts]
+    access_format: datasets, tables, and downloads
+    source_url: https://www.census.gov/programs-surveys/gov-finances.html
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: fiscal stance, spending composition, and debt outcome layer
+    second_order_layers: [fiscal_or_enforcement_cost, macro_feedback, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 35
+    verification_status: seed_verified_official_page
+    notes: >
+      Higher-priority fiscal source than third-party budget summaries when the
+      design only needs broad official state finance categories.
+
+  - source_id: us_census_state_tax_collections
+    source_name: Annual Survey of State Government Tax Collections
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-year
+    time_coverage: annual, release-dependent
+    policy_or_outcome_fields: [tax revenue, tax category, state, year]
+    policy_domains: [fiscal]
+    access_format: XLS, CSV, PDF, and dataset downloads
+    source_url: https://www.census.gov/programs-surveys/stc.html
+    license_or_terms: U.S. public domain
+    update_frequency: annual
+    state_level_use: tax-policy intensity and fiscal-capacity layer
+    second_order_layers: [fiscal_or_enforcement_cost, first_order_policy_effect, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 36
+    verification_status: seed_verified_official_page
+    notes: >
+      Useful for separating tax composition from total state expenditure and
+      income controls.
+
+  - source_id: us_census_business_formation_state
+    source_name: Business Formation Statistics, state series
+    publisher: U.S. Census Bureau
+    geography: United States
+    spatial_grain: state-week, state-month, and state-year
+    time_coverage: high-frequency series, release-dependent
+    policy_or_outcome_fields: [business applications, high-propensity applications, formations, state]
+    policy_domains: [economic_accounts, labor]
+    access_format: Census downloads and charts
+    source_url: https://www.census.gov/econ/bfs/
+    license_or_terms: U.S. public domain
+    update_frequency: weekly and monthly
+    state_level_use: entrepreneurship and firm-entry response layer for tax and regulatory shocks
+    second_order_layers: [market_structure_response, dynamic_investment_response, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 37
+    verification_status: seed_verified_official_page
+    notes: >
+      High-frequency outcome layer that can pick up short-run regulatory or
+      fiscal policy responses better than annual state GDP.
+
+  - source_id: fhfa_house_price_index_state
+    source_name: FHFA House Price Index, state series
+    publisher: Federal Housing Finance Agency
+    geography: United States
+    spatial_grain: state-month and state-quarter depending on file
+    time_coverage: mid-1970s-present, series-dependent
+    policy_or_outcome_fields: [house price index, purchase-only index, all-transactions index, state]
+    policy_domains: [housing, economic_accounts]
+    access_format: public datasets and downloads
+    source_url: https://www.fhfa.gov/data/hpi
+    license_or_terms: U.S. public data; verify dataset terms
+    update_frequency: monthly and quarterly
+    state_level_use: housing price and affordability outcome/control layer
+    second_order_layers: [first_order_price_or_transfer, distributional_incidence, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 38
+    verification_status: seed_verified_official_page
+    notes: >
+      Pairs with Census BPS and rent benchmarks for state housing-policy tests.
+
+  - source_id: cdc_brfss_state_health
+    source_name: Behavioral Risk Factor Surveillance System annual survey data
+    publisher: Centers for Disease Control and Prevention
+    geography: United States
+    spatial_grain: state-year and individual survey microdata
+    time_coverage: annual files visible across 1990-2024, release-dependent
+    policy_or_outcome_fields: [smoking, obesity, insurance, access, behaviors, chronic conditions, state]
+    policy_domains: [health, demography]
+    access_format: annual files, codebooks, and documentation
+    source_url: https://www.cdc.gov/brfss/annual_data/annual_data.htm
+    license_or_terms: U.S. public health data; verify per file and suppression guidance
+    update_frequency: annual
+    state_level_use: behavioral health outcome layer for state health, tax, and regulation tests
+    second_order_layers: [behavioral_response, distributional_incidence, net_welfare]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 39
+    verification_status: seed_verified_official_page
+    notes: >
+      Complements mortality and claims-like health sources with behavior and
+      access measures.
+
+  - source_id: cms_state_health_medicaid_files
+    source_name: CMS state health expenditure, enrollment, and Medicaid SPA files
+    publisher: Centers for Medicare and Medicaid Services
+    geography: United States
+    spatial_grain: state-year, state-month, and state-policy event depending on file
+    time_coverage: dataset-dependent, including health spending and current/historical SPA records
+    policy_or_outcome_fields: [health spending, Medicaid enrollment, CHIP enrollment, SPA approval, effective date, topic]
+    policy_domains: [health, fiscal, policy_events]
+    access_format: ZIP/download/search pages and PDFs
+    source_url: https://www.medicaid.gov/medicaid/medicaid-state-plan-amendments/index.html
+    license_or_terms: U.S. public data; verify table/PDF terms
+    update_frequency: dataset-dependent
+    state_level_use: Medicaid policy-event and health-fiscal outcome layer
+    second_order_layers: [first_order_policy_effect, fiscal_or_enforcement_cost, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 40
+    verification_status: seed_verified_official_page
+    notes: >
+      High payoff for health-policy event coding, but SPA PDFs and topic
+      metadata need a careful extraction workflow.
+
+  - source_id: nces_ipeds_state_higher_ed
+    source_name: Integrated Postsecondary Education Data System
+    publisher: National Center for Education Statistics
+    geography: United States
+    spatial_grain: institution-year, aggregatable to state-year
+    time_coverage: files from 1980-81 onward, series-dependent
+    policy_or_outcome_fields: [enrollment, tuition, completions, aid, finance, staffing, state]
+    policy_domains: [education, fiscal, labor]
+    access_format: CSV, Access, complete data files, custom files
+    source_url: https://nces.ed.gov/ipeds/use-the-data
+    license_or_terms: U.S. public domain; verify per file
+    update_frequency: annual
+    state_level_use: higher-education outcome and exposure layer for state policy designs
+    second_order_layers: [distributional_incidence, dynamic_investment_response, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 41
+    verification_status: seed_verified_official_page
+    notes: >
+      Use institutional data with explicit aggregation rules instead of treating
+      institution-year rows as already state-year comparable.
+
+  - source_id: cdc_state_tobacco_policy
+    source_name: STATE System tobacco policy data
+    publisher: Centers for Disease Control and Prevention
+    geography: United States
+    spatial_grain: state-policy-year and topic cells
+    time_coverage: current and historical policy data, topic-dependent
+    policy_or_outcome_fields: [tobacco taxes, clean-air laws, preemption, minimum legal sale age, cessation coverage, quitline]
+    policy_domains: [health, fiscal, policy_events]
+    access_format: CDC portal and data.cdc.gov tables
+    source_url: https://www.cdc.gov/statesystem/
+    license_or_terms: U.S. public health data; verify endpoint terms
+    update_frequency: periodic
+    state_level_use: official policy-event panel for tobacco and related public-health tests
+    second_order_layers: [first_order_policy_effect, behavioral_response, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 42
+    verification_status: seed_verified_official_page
+    notes: >
+      Rare source that directly codes policy variation, not just outcomes. Use
+      official statute links where available for final event registry entries.
+
+  - source_id: eurostat_gisco_nuts_boundaries
+    source_name: GISCO NUTS geodata
+    publisher: Eurostat
+    geography: Europe
+    spatial_grain: NUTS 0-3 polygons, lines, and points
+    time_coverage: NUTS vintages from 2003 through 2024, with future releases announced
+    policy_or_outcome_fields: [NUTS code, NUTS level, geometry, boundary vintage]
+    policy_domains: [admin_spine]
+    access_format: GeoPackage, SHP, GeoJSON, TopoJSON, PBF, SVG, and API
+    source_url: https://ec.europa.eu/eurostat/web/gisco/geodata/statistical-units/territorial-units-statistics
+    license_or_terms: Eurostat/EU reuse policy; verify geodata notice
+    update_frequency: release-based
+    state_level_use: European regional boundary-vintage and NUTS crosswalk spine
+    second_order_layers: [implementation_capacity]
+    admin1_scalability: high
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 43
+    verification_status: seed_verified_official_page
+    notes: >
+      Essential for tracking NUTS revisions before joining Eurostat outcomes to
+      legal state/province jurisdictions.
+
+  - source_id: germany_regionaldatenbank_deutschland
+    source_name: Regionaldatenbank Deutschland
+    publisher: Statistical Offices of the Federation and Laender
+    geography: Germany
+    spatial_grain: Land, region, Kreis, municipality, and table-specific geographies
+    time_coverage: table-dependent
+    policy_or_outcome_fields: [population, labor, housing, environment, public finance, taxes, regional accounts]
+    policy_domains: [economic_accounts, labor, housing, fiscal, demography, environment_energy]
+    access_format: GENESIS online, REST/JSON, CSV, XLSX, XML
+    source_url: https://www.regionalstatistik.de/genesis/online
+    license_or_terms: Datenlizenz Deutschland BY 2.0; verify table metadata
+    update_frequency: table-dependent
+    state_level_use: broad official German subnational backbone for Laender and Kreis panels
+    second_order_layers: [macro_feedback, distributional_incidence, implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 44
+    verification_status: seed_verified_official_page
+    notes: >
+      Prefer this as the general German source family, with VGRdL and BA used
+      for specialized economic and labor tables.
+
+  - source_id: germany_inkar_bbsr
+    source_name: INKAR indicators and maps
+    publisher: Federal Institute for Research on Building, Urban Affairs and Spatial Development
+    geography: Germany and selected European comparisons
+    spatial_grain: region, district, municipality, and indicator-dependent units
+    time_coverage: recent decades, release-dependent
+    policy_or_outcome_fields: [demography, labor, economy, housing, transport, environment, regional indicators]
+    policy_domains: [economic_accounts, labor, housing, demography, transport, environment_energy]
+    access_format: ZIP database downloads and exports
+    source_url: https://www.inkar.de/
+    license_or_terms: reuse terms require download audit
+    update_frequency: annual or release-based
+    state_level_use: ready-made German regional covariate bundle
+    second_order_layers: [macro_feedback, distributional_incidence, externality_or_spillover]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 45
+    verification_status: seed_verified_official_page
+    notes: >
+      Good scout target for wide covariates, but exact redistribution terms and
+      downloadable schema need verification.
+
+  - source_id: germany_vgrdl_regional_accounts
+    source_name: Volkswirtschaftliche Gesamtrechnungen der Laender
+    publisher: Statistical Offices of the Federation and Laender
+    geography: Germany
+    spatial_grain: Land-year and Kreis-year
+    time_coverage: current releases include recent GDP and income series, table-dependent
+    policy_or_outcome_fields: [GDP, income, fixed assets, household income, regional accounts]
+    policy_domains: [economic_accounts, fiscal, labor]
+    access_format: Statistikportal tables and downloads
+    source_url: https://www.statistikportal.de/en/node/963
+    license_or_terms: Datenlizenz Deutschland BY 2.0; verify table metadata
+    update_frequency: periodic
+    state_level_use: authoritative Germany regional economic outcome layer
+    second_order_layers: [macro_feedback, dynamic_investment_response, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 46
+    verification_status: seed_verified_official_page
+    notes: >
+      Use for Laender macro outcomes and as a better Germany-specific source
+      than generic NUTS GDP where legal state units matter.
+
+  - source_id: germany_ba_regional_labor_stats
+    source_name: Regional labour statistics
+    publisher: Bundesagentur fuer Arbeit
+    geography: Germany
+    spatial_grain: Land, Kreis, municipality, and labor-agency district
+    time_coverage: monthly and annual products, table-dependent
+    policy_or_outcome_fields: [unemployment, vacancies, employment, short-time work, benefits, wages, commuting]
+    policy_domains: [labor, demography]
+    access_format: regional tables, dashboards, and downloads
+    source_url: https://statistik.arbeitsagentur.de/DE/Navigation/Statistiken/Statistiken-nach-Regionen/Statistiken-nach-Regionen-Nav.html
+    license_or_terms: source/citation terms need review
+    update_frequency: monthly and annual
+    state_level_use: high-frequency German labor response layer
+    second_order_layers: [behavioral_response, macro_feedback, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 47
+    verification_status: seed_verified_official_page
+    notes: >
+      Good candidate for state/regional labor designs, with careful treatment of
+      reporting geography and German labels.
+
+  - source_id: uk_nomis_labour_census_regional
+    source_name: Nomis official census and labour market statistics
+    publisher: ONS/Nomis
+    geography: United Kingdom
+    spatial_grain: nations, regions, local authorities, and smaller units
+    time_coverage: dataset-dependent
+    policy_or_outcome_fields: [LFS, APS, claimant count, ASHE, BRES, census, regional accounts]
+    policy_domains: [labor, economic_accounts, demography, education, housing]
+    access_format: REST API, CSV, JSON, SDMX, XLS
+    source_url: https://www.nomisweb.co.uk/api/v01/help
+    license_or_terms: Open Government Licence by ONS terms
+    update_frequency: dataset-dependent
+    state_level_use: UK labor/census backbone for nations, regions, and local authorities
+    second_order_layers: [macro_feedback, distributional_incidence, implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 48
+    verification_status: endpoint_verified
+    notes: >
+      Strong API-first UK source. Store geography type explicitly because UK
+      regions are not always legal state-equivalent units.
+
+  - source_id: canada_cmhc_housing_market_data
+    source_name: CMHC housing market data
+    publisher: Canada Mortgage and Housing Corporation
+    geography: Canada
+    spatial_grain: province, CMA, and market geography depending on table
+    time_coverage: table-dependent
+    policy_or_outcome_fields: [housing starts, completions, rents, vacancy, affordability]
+    policy_domains: [housing, economic_accounts]
+    access_format: CMHC data tables portal and downloads
+    source_url: https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-data
+    license_or_terms: CMHC terms need verification
+    update_frequency: table-dependent
+    state_level_use: Canadian provincial housing supplement to StatCan
+    second_order_layers: [first_order_price_or_transfer, second_order_supply_response, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 49
+    verification_status: scout_reported_unverified
+    notes: >
+      Keep as housing-specific scout source until stable table endpoints and
+      reuse terms are pinned.
+
+  - source_id: brazil_datasus_bulk_downloads
+    source_name: DATASUS Transferencia de Arquivos
+    publisher: Brazilian Ministry of Health
+    geography: Brazil
+    spatial_grain: UF, municipality, and health-system cells depending on file
+    time_coverage: system-dependent, often monthly
+    policy_or_outcome_fields: [mortality, hospitalizations, health events, public health records, UF, municipality]
+    policy_domains: [health, demography]
+    access_format: bulk download interface by source, file type, year, month, and UF
+    source_url: https://datasus.saude.gov.br/transferencia-de-arquivos/
+    license_or_terms: terms need verification
+    update_frequency: system-dependent
+    state_level_use: Brazil UF health outcome layer
+    second_order_layers: [distributional_incidence, net_welfare, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 50
+    verification_status: seed_verified_official_page
+    notes: >
+      High-value health source with a file-oriented ingestion model. Preserve
+      original system/source names and UF codes.
+
+  - source_id: brazil_tesouro_siconfi_api
+    source_name: SICONFI API and Tesouro Data Lake
+    publisher: Tesouro Nacional
+    geography: Brazil
+    spatial_grain: state-year and municipality-year fiscal reports
+    time_coverage: report/vintage-dependent
+    policy_or_outcome_fields: [public accounts, budget execution, fiscal indicators, state, municipality]
+    policy_domains: [fiscal, economic_accounts]
+    access_format: official Data Lake API
+    source_url: https://apidatalake.tesouro.gov.br/docs/siconfi/
+    license_or_terms: terms need verification
+    update_frequency: report-dependent
+    state_level_use: Brazil UF and municipal public-finance layer
+    second_order_layers: [fiscal_or_enforcement_cost, macro_feedback, implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 51
+    verification_status: seed_verified_official_page
+    notes: >
+      Strong fiscal complement to IBGE SIDRA for Brazilian state policy tests.
+
+  - source_id: indonesia_bps_web_api
+    source_name: WEB API BPS
+    publisher: Badan Pusat Statistik
+    geography: Indonesia
+    spatial_grain: province, regency/city, national, and table-dependent cells
+    time_coverage: dynamic and static tables, table-dependent
+    policy_or_outcome_fields: [demographics, labor, poverty, education, health proxies, construction, economic indicators]
+    policy_domains: [economic_accounts, labor, housing, demography, education, health]
+    access_format: tokened JSON API
+    source_url: https://webapi.bps.go.id/documentation/
+    license_or_terms: token required; terms need verification
+    update_frequency: table-dependent
+    state_level_use: Indonesia province outcome/control layer
+    second_order_layers: [macro_feedback, distributional_incidence, implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 52
+    verification_status: seed_verified_official_page
+    notes: >
+      API-first source for a large decentralized system; token and terms should
+      be pinned before production.
+
+  - source_id: india_data_gov_in_api
+    source_name: Open Government Data Platform India APIs
+    publisher: NIC / Government of India
+    geography: India
+    spatial_grain: state/UT, district, and dataset-dependent cells
+    time_coverage: dataset-dependent
+    policy_or_outcome_fields: [health, education, fiscal, demographics, infrastructure, state, district]
+    policy_domains: [health, education, fiscal, demography, transport, economic_accounts]
+    access_format: API-key access and downloads for API-enabled datasets
+    source_url: https://data.gov.in/apis
+    license_or_terms: Government Open Data License - India
+    update_frequency: dataset-dependent
+    state_level_use: broad discovery and ingestion hub for India state/UT panels
+    second_order_layers: [implementation_capacity, distributional_incidence, macro_feedback]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 53
+    verification_status: license_verified
+    notes: >
+      Broad hub with variable dataset quality. Pin individual dataset IDs before
+      promoting any table to production.
+
+  - source_id: india_mospi_microdata_nada
+    source_name: MoSPI Online Microdata Library
+    publisher: NSO / Ministry of Statistics and Programme Implementation
+    geography: India
+    spatial_grain: survey microdata aggregable to state/UT
+    time_coverage: survey-dependent
+    policy_or_outcome_fields: [PLFS labor, ASI, consumption, economic census, state/UT]
+    policy_domains: [labor, economic_accounts, demography]
+    access_format: web catalog, metadata, and API/documentation links
+    source_url: https://microdata.gov.in/nada43/index.php/catalog
+    license_or_terms: open access stated; download/login constraints need verification
+    update_frequency: survey-dependent
+    state_level_use: India state/UT microdata route for labor and economic outcomes
+    second_order_layers: [distributional_incidence, macro_feedback, market_structure_response]
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 54
+    verification_status: seed_verified_official_page
+    notes: >
+      Best official India microdata route but requires aggregation and survey
+      design handling before panel construction.
+
+  - source_id: south_africa_vulekamali_budget_api
+    source_name: Vulekamali Data Portal
+    publisher: National Treasury / IMALI YETHU
+    geography: South Africa
+    spatial_grain: province, department, program, and budget-year
+    time_coverage: budget-year dependent
+    policy_or_outcome_fields: [provincial expenditure, consolidated expenditure, grants, infrastructure, department, program]
+    policy_domains: [fiscal, health, education, transport]
+    access_format: datasets and API link
+    source_url: https://vulekamali.gov.za/datasets
+    license_or_terms: terms linked but need review
+    update_frequency: budget-cycle dependent
+    state_level_use: South Africa provincial fiscal and budget execution layer
+    second_order_layers: [fiscal_or_enforcement_cost, implementation_capacity, distributional_incidence]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 55
+    verification_status: seed_verified_official_page
+    notes: >
+      Strong fiscal supplement to Stats SA socioeconomic panels.
+
+  - source_id: philippines_psa_openstat_api
+    source_name: PSA OpenSTAT
+    publisher: Philippine Statistics Authority
+    geography: Philippines
+    spatial_grain: region, province, and selected local geographies
+    time_coverage: table-dependent
+    policy_or_outcome_fields: [labor, housing, regional GDP, construction, government finance, health accounts]
+    policy_domains: [economic_accounts, labor, housing, fiscal, health]
+    access_format: PC-Axis platform with API and visualization
+    source_url: https://openstat.psa.gov.ph/
+    license_or_terms: open data license with attribution; public domain unless stated
+    update_frequency: table-dependent
+    state_level_use: high-quality admin1-analog source for decentralization and regional policy comparisons
+    second_order_layers: [macro_feedback, distributional_incidence, second_order_supply_response]
+    admin1_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 56
+    verification_status: license_verified
+    notes: >
+      Not federal, but very useful for province/region panels and API-first
+      regional statistics.
+
+  - source_id: nigeria_nbs_microdata_open_data
+    source_name: NBS NADA and Open Data Portal
+    publisher: National Bureau of Statistics Nigeria
+    geography: Nigeria
+    spatial_grain: state, zone, LGA, and survey-dependent cells
+    time_coverage: survey/report-dependent
+    policy_or_outcome_fields: [labor, households, health, prices, demographics, state, LGA]
+    policy_domains: [economic_accounts, labor, health, demography]
+    access_format: NADA microdata catalog and open-data downloads
+    source_url: https://www.nigerianstat.gov.ng/
+    license_or_terms: terms need review
+    update_frequency: dataset-dependent
+    state_level_use: large federal comparator for state-level African panels
+    second_order_layers: [distributional_incidence, macro_feedback, implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 57
+    verification_status: seed_verified_official_page
+    notes: >
+      Keep as scout source until stable APIs/download schemas and terms are
+      probed.
+
+  - source_id: argentina_indec_bases_de_datos
+    source_name: INDEC bases de datos
+    publisher: Instituto Nacional de Estadistica y Censos
+    geography: Argentina
+    spatial_grain: province, region, agglomerate, and survey-dependent cells
+    time_coverage: table/survey-dependent
+    policy_or_outcome_fields: [census, labor, income, construction, public sector, health, education]
+    policy_domains: [economic_accounts, labor, housing, fiscal, demography, health, education]
+    access_format: official database and services pages
+    source_url: https://www.indec.gob.ar/indec/web/Institucional-Indec-BasesDeDatos
+    license_or_terms: terms need verification
+    update_frequency: table-dependent
+    state_level_use: Argentina province/regional outcome layer
+    second_order_layers: [macro_feedback, distributional_incidence, second_order_supply_response]
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 58
+    verification_status: seed_verified_official_page
+    notes: >
+      High named-country priority, but API surface and stable bulk endpoints
+      need more verification.
+
+  - source_id: brazil_lexml_legislative_metadata
+    source_name: LexML Brasil legislative and legal metadata
+    publisher: LexML Brasil
+    geography: Brazil
+    spatial_grain: federal, state, municipal, and legal-document metadata where indexed
+    time_coverage: corpus-dependent
+    policy_or_outcome_fields: [laws, bills, legal metadata, jurisdiction, document date, subject]
+    policy_domains: [policy_events]
+    access_format: legal search, metadata documentation, and schemas
+    source_url: https://www.lexml.gov.br/
+    license_or_terms: terms need verification
+    update_frequency: corpus-dependent
+    state_level_use: Brazil state and municipal policy-event discovery source
+    second_order_layers: [first_order_policy_effect, implementation_capacity]
+    admin1_scalability: medium
+    ingestion_difficulty: high
+    immediate_payoff_rank: 59
+    verification_status: seed_verified_official_page
+    notes: >
+      Discovery source only until official state legal texts and event dates are
+      pinned for each treatment registry entry.
