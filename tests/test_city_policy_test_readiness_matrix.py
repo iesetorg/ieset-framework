@@ -137,6 +137,46 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
                 "area_km2_2025": 972,
                 "density_per_km2_2025": 9966,
             },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2324",
+                "city_rank_2025": 104,
+                "city_name": "Sydney",
+                "country_name": "Australia",
+                "country_iso3": "AUS",
+                "population_2025": 4900000,
+                "area_km2_2025": 1700,
+                "density_per_km2_2025": 2882,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1147",
+                "city_rank_2025": 147,
+                "city_name": "Auckland",
+                "country_name": "New Zealand",
+                "country_iso3": "NZL",
+                "population_2025": 1650000,
+                "area_km2_2025": 1100,
+                "density_per_km2_2025": 1500,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:109",
+                "city_rank_2025": 290,
+                "city_name": "Sofia",
+                "country_name": "Bulgaria",
+                "country_iso3": "BGR",
+                "population_2025": 1300000,
+                "area_km2_2025": 490,
+                "density_per_km2_2025": 2653,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1689",
+                "city_rank_2025": 360,
+                "city_name": "Zurich",
+                "country_name": "Switzerland",
+                "country_iso3": "CHE",
+                "population_2025": 1400000,
+                "area_km2_2025": 870,
+                "density_per_km2_2025": 1609,
+            },
         ]
     ).to_parquet(spine, index=False)
 
@@ -433,6 +473,105 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         ]
     ).to_parquet(taiwan_moi, index=False)
 
+    australia_rental_bond = tmp_path / "australia_rental_bond.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2324",
+                "ghsl_match_flag": True,
+                "period": "2026-05",
+                "geography_id": "greater_sydney",
+                "dwelling_type_label": "flat_unit",
+                "bond_lodgement_count": 5712,
+                "rent_measure": "observed_bond_lodgement_weekly_rent",
+            },
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "period": "2026-05",
+                "geography_id": "rest_of_nsw",
+                "dwelling_type_label": "house",
+                "bond_lodgement_count": 100,
+                "rent_measure": "observed_bond_lodgement_weekly_rent",
+            },
+        ]
+    ).to_parquet(australia_rental_bond, index=False)
+
+    nz_rental_bond = tmp_path / "nz_rental_bond.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1147",
+                "ghsl_match_flag": True,
+                "period": "2026-04",
+                "location": "Auckland",
+                "bedroom_band": "ALL",
+                "lodged_bonds": 4200,
+                "rent_basis": "observed_bond_lodgement_weekly_rent",
+            },
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "period": "2026-04",
+                "location": "Far North District",
+                "bedroom_band": "ALL",
+                "lodged_bonds": 42,
+                "rent_basis": "observed_bond_lodgement_weekly_rent",
+            },
+        ]
+    ).to_parquet(nz_rental_bond, index=False)
+
+    eurostat_urban_audit = tmp_path / "eurostat_urban_audit.parquet"
+    pd.DataFrame(
+        [
+            # Sofia: observed rent per m2 (SA1049V) + dwelling stock -> rent_supply_ready
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:109",
+                "ghsl_match_flag": True,
+                "year": 2022,
+                "indicator": "SA1049V",
+                "value": 42.23,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:109",
+                "ghsl_match_flag": True,
+                "year": 2021,
+                "indicator": "SA1001V",
+                "value": 600000.0,
+            },
+            # Zurich: dwelling stock + tenure + purchase price proxy, NO observed rent -> supply only
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1689",
+                "ghsl_match_flag": True,
+                "year": 2021,
+                "indicator": "SA1001V",
+                "value": 220000.0,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1689",
+                "ghsl_match_flag": True,
+                "year": 2021,
+                "indicator": "SA1013V",
+                "value": 120000.0,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1689",
+                "ghsl_match_flag": True,
+                "year": 2021,
+                "indicator": "SA1051V",
+                "value": 1200000.0,
+            },
+            # unmatched row must be ignored
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "year": 2020,
+                "indicator": "SA1049V",
+                "value": 10.0,
+            },
+        ]
+    ).to_parquet(eurostat_urban_audit, index=False)
+
     inputs = {
         "city_spine": spine,
         "zillow_rent": zillow,
@@ -453,6 +592,9 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         "sweden_scb_municipal_housing": sweden_scb,
         "dubai_data_housing": dubai_data,
         "taiwan_moi_rental_transactions": taiwan_moi,
+        "eurostat_city_urban_audit": eurostat_urban_audit,
+        "australia_rental_bond": australia_rental_bond,
+        "nz_tenancy_rental_bond": nz_rental_bond,
     }
     matrix, stats = readiness_builder.build_matrix(inputs)
 
@@ -547,11 +689,45 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
     assert taipei["first_order_rent_layer"]
     assert taipei["rent_control_readiness_tier"] == "rent_only"
 
+    sydney = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:2324")].iloc[0]
+    assert sydney["australia_rental_bond_rows"] == 1
+    assert sydney["australia_rental_bond_total_lodgements"] == 5712
+    assert sydney["first_order_rent_layer"]
+    assert not sydney["supply_response_layer"]
+    assert sydney["rent_control_readiness_tier"] == "rent_only"
+
+    auckland = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:1147")].iloc[0]
+    assert auckland["nz_rental_bond_rows"] == 1
+    assert auckland["nz_rental_bond_total_lodgements"] == 4200
+    assert auckland["first_order_rent_layer"]
+    assert not auckland["supply_response_layer"]
+    assert auckland["rent_control_readiness_tier"] == "rent_only"
+
+    # Eurostat city carrying observed rent per m2 (SA1049V) + dwelling stock
+    sofia = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:109")].iloc[0]
+    assert sofia["eurostat_urban_audit_rows"] == 2
+    assert sofia["eurostat_rent_per_m2_rows"] == 1
+    assert sofia["eurostat_dwelling_stock_rows"] == 1
+    assert sofia["first_order_rent_layer"]
+    assert sofia["supply_response_layer"]
+    assert sofia["rent_control_readiness_tier"] == "rent_supply_ready"
+
+    # Eurostat city with dwelling stock + tenure + price proxy but NO observed rent
+    zurich = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:1689")].iloc[0]
+    assert zurich["eurostat_dwelling_stock_rows"] == 1
+    assert zurich["eurostat_tenure_rows"] == 1
+    assert zurich["eurostat_price_proxy_rows"] == 1
+    assert zurich["eurostat_rent_per_m2_rows"] == 0
+    assert not zurich["first_order_rent_layer"]
+    assert zurich["supply_response_layer"]
+    assert zurich["rent_control_readiness_tier"] == "partial_local_outcome"
+
     assert stats["tier_counts"]["case_ready_local_panel"] == 2
-    assert stats["tier_counts"]["rent_supply_ready"] == 4
-    assert stats["tier_counts"]["rent_only"] == 5
-    assert stats["layer_counts"]["first_order_rent_layer"] == 11
-    assert stats["layer_counts"]["supply_response_layer"] == 6
+    assert stats["tier_counts"]["rent_supply_ready"] == 5
+    assert stats["tier_counts"]["rent_only"] == 7
+    assert stats["tier_counts"]["partial_local_outcome"] == 2
+    assert stats["layer_counts"]["first_order_rent_layer"] == 14
+    assert stats["layer_counts"]["supply_response_layer"] == 8
     assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 4
     assert stats["missing_optional_inputs"] == ["acs_incidence"]
 

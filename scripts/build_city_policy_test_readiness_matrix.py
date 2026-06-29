@@ -35,6 +35,9 @@ DEFAULT_INPUTS = {
     "sweden_scb_municipal_housing": "data/derived/sweden_scb_municipal_housing_panel.parquet",
     "dubai_data_housing": "data/derived/dubai_data_housing_panel.parquet",
     "taiwan_moi_rental_transactions": "data/derived/taiwan_moi_rental_transactions_panel.parquet",
+    "eurostat_city_urban_audit": "data/derived/eurostat_city_urban_audit_panel.parquet",
+    "australia_rental_bond": "data/derived/australia_rental_bond_panel.parquet",
+    "nz_tenancy_rental_bond": "data/derived/nz_tenancy_rental_bond_panel.parquet",
 }
 
 
@@ -634,6 +637,125 @@ def add_taiwan_moi_rental_transactions(base: pd.DataFrame, frame: pd.DataFrame |
     return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
 
 
+def add_eurostat_city_urban_audit(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "eurostat_urban_audit_rows": 0,
+        "eurostat_urban_audit_years": 0,
+        "eurostat_urban_audit_start_year": None,
+        "eurostat_urban_audit_end_year": None,
+        "eurostat_urban_audit_indicators": 0,
+        # SA1049V: average annual rent per m2 (observed transaction rent)
+        "eurostat_rent_per_m2_rows": 0,
+        # SA1001V / SA1025V: dwelling stock + empty dwellings (supply/covariate)
+        "eurostat_dwelling_stock_rows": 0,
+        # SA1011V / SA1012V / SA1013V: owner / social / private-rented tenure (covariate)
+        "eurostat_tenure_rows": 0,
+        # SA1050V / SA1051V: house/apartment purchase prices (price proxy, NOT observed rent)
+        "eurostat_price_proxy_rows": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "eurostat_city_urban_audit")
+    if frame.empty:
+        return base.assign(**columns)
+    rent_rows = frame["indicator"].eq("SA1049V")
+    dwelling_rows = frame["indicator"].isin(["SA1001V", "SA1025V"])
+    tenure_rows = frame["indicator"].isin(["SA1011V", "SA1012V", "SA1013V"])
+    price_rows = frame["indicator"].isin(["SA1050V", "SA1051V"])
+    frame = frame.assign(
+        _rent_row=rent_rows.astype(int),
+        _dwelling_row=dwelling_rows.astype(int),
+        _tenure_row=tenure_rows.astype(int),
+        _price_row=price_rows.astype(int),
+    )
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            eurostat_urban_audit_rows=("year", "size"),
+            eurostat_urban_audit_years=("year", "nunique"),
+            eurostat_urban_audit_start_year=("year", "min"),
+            eurostat_urban_audit_end_year=("year", "max"),
+            eurostat_urban_audit_indicators=("indicator", "nunique"),
+            eurostat_rent_per_m2_rows=("_rent_row", "sum"),
+            eurostat_dwelling_stock_rows=("_dwelling_row", "sum"),
+            eurostat_tenure_rows=("_tenure_row", "sum"),
+            eurostat_price_proxy_rows=("_price_row", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_australia_rental_bond(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "australia_rental_bond_rows": 0,
+        "australia_rental_bond_months": 0,
+        "australia_rental_bond_start_period": None,
+        "australia_rental_bond_end_period": None,
+        "australia_rental_bond_geographies": 0,
+        "australia_rental_bond_dwelling_types": 0,
+        "australia_rental_bond_total_lodgements": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "australia_rental_bond")
+    if frame.empty:
+        return base.assign(**columns)
+    frame = frame.assign(_lodgements=frame["bond_lodgement_count"].fillna(0))
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            australia_rental_bond_rows=("period", "size"),
+            australia_rental_bond_months=("period", "nunique"),
+            australia_rental_bond_start_period=("period", "min"),
+            australia_rental_bond_end_period=("period", "max"),
+            australia_rental_bond_geographies=("geography_id", "nunique"),
+            australia_rental_bond_dwelling_types=("dwelling_type_label", "nunique"),
+            australia_rental_bond_total_lodgements=("_lodgements", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_nz_tenancy_rental_bond(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "nz_rental_bond_rows": 0,
+        "nz_rental_bond_months": 0,
+        "nz_rental_bond_start_period": None,
+        "nz_rental_bond_end_period": None,
+        "nz_rental_bond_locations": 0,
+        "nz_rental_bond_bedroom_bands": 0,
+        "nz_rental_bond_total_lodgements": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "nz_tenancy_rental_bond")
+    if frame.empty:
+        return base.assign(**columns)
+    frame = frame.assign(_lodgements=frame["lodged_bonds"].fillna(0))
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            nz_rental_bond_rows=("period", "size"),
+            nz_rental_bond_months=("period", "nunique"),
+            nz_rental_bond_start_period=("period", "min"),
+            nz_rental_bond_end_period=("period", "max"),
+            nz_rental_bond_locations=("location", "nunique"),
+            nz_rental_bond_bedroom_bands=("bedroom_band", "nunique"),
+            nz_rental_bond_total_lodgements=("_lodgements", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
 def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
     out = matrix.copy()
     out["first_order_rent_layer"] = (
@@ -648,6 +770,9 @@ def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
         | out["sweden_scb_rent_rows"].gt(0)
         | out["dubai_rent_index_rows"].gt(0)
         | out["taiwan_moi_rental_rows"].gt(0)
+        | out["eurostat_rent_per_m2_rows"].gt(0)
+        | out["australia_rental_bond_rows"].gt(0)
+        | out["nz_rental_bond_rows"].gt(0)
     )
     out["supply_response_layer"] = (
         out["census_permit_rows"].gt(0)
@@ -657,6 +782,7 @@ def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
         | out["hong_kong_rvd_supply_rows"].gt(0)
         | out["sweden_scb_completion_rows"].gt(0)
         | out["dubai_housing_supply_rows"].gt(0)
+        | out["eurostat_dwelling_stock_rows"].gt(0)
     )
     out["quality_or_leakage_layer"] = out["nyc_quality_rows"].gt(0) | out["datasf_quality_rows"].gt(0)
     out["regulated_stock_or_rent_board_layer"] = (
@@ -731,6 +857,9 @@ def build_matrix(inputs: dict[str, Path]) -> tuple[pd.DataFrame, dict[str, Any]]
     matrix = add_sweden_scb_municipal_housing(matrix, read_optional(inputs["sweden_scb_municipal_housing"]))
     matrix = add_dubai_data_housing(matrix, read_optional(inputs["dubai_data_housing"]))
     matrix = add_taiwan_moi_rental_transactions(matrix, read_optional(inputs["taiwan_moi_rental_transactions"]))
+    matrix = add_eurostat_city_urban_audit(matrix, read_optional(inputs["eurostat_city_urban_audit"]))
+    matrix = add_australia_rental_bond(matrix, read_optional(inputs["australia_rental_bond"]))
+    matrix = add_nz_tenancy_rental_bond(matrix, read_optional(inputs["nz_tenancy_rental_bond"]))
     matrix = assign_layers(matrix)
     matrix = matrix.sort_values(
         ["rent_control_core_layer_count", "population_2025", "city_rank_2025"],
