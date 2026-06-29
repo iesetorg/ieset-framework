@@ -1,44 +1,51 @@
 {
-  "verdict": "PARTIAL \u2014 coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+  "verdict": "PARTIAL \u2014 shape=TWFE, coef=+3.073, p=0.33 (above \u03b1=0.10)",
   "verdict_label": "PARTIAL",
-  "verdict_reason": "coef=+9.405e-17, p=1.03e-08; effect magnitude effectively zero",
+  "verdict_reason": "shape=TWFE, coef=+3.073, p=0.33 (above \u03b1=0.10)",
   "hypothesis_id": "wealth_tax_capital_flight_avoidance",
-  "template": "panel_fe",
+  "template": "event_study",
   "claim_direction_inferred": "-",
-  "falsification_rule_text": "SUPPORTED if coefficient > 0 and p < 0.10",
-  "falsification_test_text": null,
-  "estimate": {
-    "coefficient": 9.40476451611852e-17,
-    "std_error": 1.638819249697823e-17,
-    "p_value": 1.0262260818905133e-08,
-    "n_obs": 4097,
-    "n_countries": 164,
-    "r_squared_within": 1.0,
-    "fe_entity": true,
-    "fe_time": true,
-    "cluster": "country",
-    "method": "linearmodels.PanelOLS",
+  "event_year": 2022,
+  "threshold_extracted": {},
+  "falsification_rule_text": "SUPPORTED if the NOR post-2022 treatment coefficient on net FDI inflows (% GDP) is negative (inflows fall vs the country+year fixed-effect counterfactual) at p<0.10. REFUTED if positive at p<0.10. PARTIAL if not significant.\n",
+  "falsification_test_text": "Two-way fixed-effects (country + year) event study, treated NOR from 2022, Nordic/European donor pool, outcome net FDI inflows % GDP (current- account balance % GDP as secondary). Year FE difference out the global FDI cycle and oil-price shocks.\n",
+  "comparison": {
+    "shape": "multi_country_twfe",
+    "coefficient": 3.072829887823484,
+    "std_error": 3.134355872044195,
+    "p_value": 0.3303784804105001,
+    "n_obs": 90,
+    "n_countries": 6,
+    "r_squared_within": -0.01850320035204911,
+    "method": "linearmodels.PanelOLS (TWFE, country-clustered)",
     "dropped_controls_due_to_overlap": []
   },
   "data_status": {
     "variables_loaded": [
       {
         "role": "outcome",
-        "name": "outcome_var",
-        "source": "world_bank_wdi:NY.GDP.PCAP.KD",
+        "name": "fdi_net_inflows_pct_gdp",
+        "source": "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS",
         "publisher": "world_bank_wdi",
-        "n_rows": 14066
+        "n_rows": 11580
+      },
+      {
+        "role": "outcome",
+        "name": "current_account_pct_gdp",
+        "source": "world_bank_wdi:BN.CAB.XOKA.GD.ZS",
+        "publisher": "world_bank_wdi",
+        "n_rows": 7621
       },
       {
         "role": "treatment",
-        "name": "treatment_var",
-        "source": "fraser_efw:summary_index",
-        "publisher": "fraser_efw",
-        "n_rows": 4557
+        "name": "wealth_tax_hike_2022_nor_post",
+        "source": "constructed: indicator = 1 for NOR, year >= 2022",
+        "publisher": "constructed",
+        "n_rows": 90
       },
       {
         "role": "controls",
-        "name": "log_gdp_pc",
+        "name": "log_real_gdp_per_capita",
         "source": "world_bank_wdi:NY.GDP.PCAP.KD",
         "publisher": "world_bank_wdi",
         "n_rows": 14066
@@ -46,6 +53,6 @@
     ],
     "variables_missing": []
   },
-  "run_utc": "2026-05-03T06:10:56+00:00",
-  "runner": "scripts/run_panel_fe.py"
+  "run_utc": "2026-06-29T16:23:23+00:00",
+  "runner": "scripts/run_event_study.py"
 }

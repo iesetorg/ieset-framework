@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_colombia_2022_patrimonio_top_share
+version: 1
+status: draft
+topic: distribution
+claim_direction: "-"
+claim: >
+  Colombia's 2022 tax reform (Law 2277 of 2022), which made the impuesto al
+  patrimonio a permanent recurrent wealth tax and raised top rates, produced
+  a measurable reduction in the Colombian top-1 net personal wealth share
+  after 2022 relative to a country+year fixed-effect counterfactual. The
+  discriminating test pits genuine compression (Zucman) against avoidance.
+notes: >
+  New Zucman-suite test (2026-06-29). TWFE on the canonical wid_concentration
+  adapter. PRELIMINARY: WID ends 2023, so the post-window is only 2022-2023
+  (2 years) — underpowered. Registered to track as the panel extends.
+  Companion revenue evidence (zucman_wealth_tax_yield_2026-06-29): COL
+  patrimonio realized only ~45% of forecast — a clear yield gap consistent
+  with weaker enforcement/valuation.
+prior_confidence: 0.5
+disclosure: >
+  Author prior is uncertain; Colombian wealth-tax enforcement and valuation
+  are weaker than in Western Europe, but the short post-window limits power.
+falsification:
+  rule: >
+    SUPPORTED if the COL post-2022 treatment coefficient on the top-1 net
+    wealth share is negative (compression vs the country+year fixed-effect
+    counterfactual) at p<0.10. REFUTED if positive at p<0.10. PARTIAL /
+    INCONCLUSIVE expected given the short post-window.
+  test: >
+    Two-way fixed-effects (country + year) event study, treated COL from
+    2022, Latin-American donor pool, outcome top-1 net personal wealth share
+    (via the wid_concentration adapter).
+evidence_type: associational
+sample:
+  countries: [COL, CHL, MEX, BRA, PER, ARG]
+  period: [2000, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID top wealth share"
+variables:
+  outcome:
+    - name: top_1pct_wealth_share
+      source: "wid_concentration:top1_net_personal_wealth_share"
+      transformation: level
+    - name: top_10pct_wealth_share
+      source: "wid_concentration:top10_net_personal_wealth_share"
+      transformation: level
+  treatment:
+    - name: patrimonio_2022_col_post
+      source: "constructed: indicator = 1 for COL, year >= 2022"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects: [country, year]
+  event_year: 2022
+  notes: >
+    TWFE (country + year FE) pooled post-treatment coefficient, country-
+    clustered SEs. Treated COL from 2022. Short post-window — preliminary.
+intervention_channel: fiscal
+scope:
+  period: [2022, 2023]
+  countries: [COL]
+  outcome_dim: [poverty_inequality, taxation, capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [colombia_patrimonio_2022, wealth_tax, latam]

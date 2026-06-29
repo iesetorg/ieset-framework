@@ -1,49 +1,53 @@
 # yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: tax_inequality_france_1981_wealth_tax_top_share
-version: 1
+version: 2
 status: draft
 topic: distribution
+claim_direction: "-"
 claim: >
   The 1981 Mitterrand wealth tax (Impot sur les Grandes Fortunes, suspended
   1986, reinstated 1988 as ISF) produced a measurable but modest reduction
-  in the French top-1 wealth share over 1981-1985 relative to the synthetic
-  control of comparable continental European economies, with capital-flight
-  attrition smaller than the Macron-era political narrative implied. The
-  discriminating test is the synth-control gap on top-1 wealth share at
-  five-year horizon.
+  in the French top-1 net personal wealth share after 1982 relative to a
+  country+year fixed-effect counterfactual, with capital-flight attrition
+  smaller than the Macron-era political narrative implied.
 notes: >
-  Tax-inequality candidate, swarm-S6 batch 2. Tests the canonical "wealth
-  tax causes capital flight" narrative against the early French case
-  pre-CRS-era.
+  v2 (2026-06-29). Estimator switched from raw-level synthetic control to
+  TWFE (country + year FE): the level-synth had pre-fit RMSE >> pre-SD and
+  produced spurious gaps because cross-country wealth-share LEVELS differ too
+  much. Outcome points at the canonical data-layer panel via the
+  wid_concentration adapter (their wid_wealth_concentration_panel 1980+,
+  spliced with raw WID pre-1980 — identical at the boundary — so the 1982
+  event has a real pre-period; their panel alone starts 1980). Companion
+  data-layer briefs: zucman_wid_concentration_2026-06-29.
 prior_confidence: 0.5
 disclosure: >
   Author prior is genuinely uncertain — pre-CRS enforcement era plus
-  Mitterrand nationalisation confound make this case hard. Skeptical of
-  both the "huge effect" and "no effect" framings.
+  Mitterrand nationalisation confound make this case hard. Skeptical of both
+  the "huge effect" and "no effect" framings.
 falsification:
   rule: >
-    SUPPORTED if French top-1 wealth share falls by at least 1 percentage
-    point relative to synthetic-control trajectory over 1981-1985 AND the
-    pre-treatment fit RMSPE is below post-treatment by a factor of 2.
-    REFUTED if no detectable gap (within 0.3pp) at five-year horizon or
-    pre/post RMSPE ratio fails the placebo test.
+    SUPPORTED if the FRA post-1982 treatment coefficient on the top-1 net
+    wealth share is negative (share falls vs the country+year fixed-effect
+    counterfactual) at p<0.10. REFUTED if positive at p<0.10. PARTIAL if not
+    significant.
   test: >
-    Synthetic control with continental European donor pool (DEU, ITA,
-    BEL, NLD, AUT, CHE), treated FRA 1982. Outcome top-1 wealth share.
+    Two-way fixed-effects (country + year) event study, treated FRA from
+    1982, outcome top-1 net personal wealth share (WID shwealj992 via the
+    wid_concentration adapter).
 evidence_type: associational
 sample:
-  countries: [FRA, DEU, ITA, BEL, NLD, AUT, CHE]
-  period: [1975, 1990]
+  countries: [FRA, GBR, USA, DEU, ITA, BEL, NLD, SWE]
+  period: [1960, 1990]
   temporal_structure: panel
   exclusion_rules:
     - "drop country-years missing WID top wealth share"
 variables:
   outcome:
     - name: top_1pct_wealth_share
-      source: "owid:top-1-share-of-total-wealth"
+      source: "wid_concentration:top1_net_personal_wealth_share"
       transformation: level
     - name: top_10pct_wealth_share
-      source: "owid:top-10-share-of-total-wealth"
+      source: "wid_concentration:top10_net_personal_wealth_share"
       transformation: level
   treatment:
     - name: igf_1982_fra_post
@@ -53,19 +57,13 @@ variables:
     - name: log_real_gdp_per_capita
       source: "world_bank_wdi:NY.GDP.PCAP.KD"
       transformation: log
-    - name: trade_openness
-      source: "world_bank_wdi:NE.TRD.GNFS.ZS"
-      transformation: level
-    - name: cpi_inflation
-      source: "world_bank_wdi:FP.CPI.TOTL.ZG"
-      transformation: level
 estimator:
-  template: synthetic_control
+  template: event_study
   clustering: country
   fixed_effects: [country, year]
   notes: >
-    Synthetic-control with continental EU donor pool. Treated FRA 1982.
-    Placebo-in-time at 1979 + placebo-in-space across donor pool.
+    TWFE (country + year FE) pooled post-treatment coefficient, country-
+    clustered SEs. Treated FRA from 1982.
 intervention_channel: fiscal
 scope:
   period: [1981, 1990]

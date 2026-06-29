@@ -1,46 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
 hypothesis_id: wealth_tax_capital_flight_avoidance
-version: 1
+version: 2
 status: draft
 topic: fiscal
-claim: Wealth taxes predict capital flight, lower reported domestic wealth, and reduced investment, especially when valuation is subjective and enforcement uneven.
+claim_direction: "-"
+claim: >
+  Wealth taxes predict capital flight and reduced inward investment,
+  especially when valuation is subjective and enforcement uneven. This spec
+  tests the capital-flows limb on the most-cited recent case: the 2022
+  Norwegian wealth-tax hike (the episode behind the widely reported
+  relocation of Norwegian billionaires to Switzerland). If the flight
+  mechanism is real and large, net FDI inflows (% GDP) should fall in Norway
+  after 2022 relative to a country+year fixed-effect counterfactual.
+notes: >
+  v2 rewrite (2026-06-29). The v1 spec was a degenerate placeholder that
+  regressed GDP-per-capita on the Fraser EFW index (within-R2=1, coef ~0) and
+  did not test wealth taxes at all. Rewritten as a TWFE capital-flows test.
+  CAVEAT: WID true-wealth shares (tested in the companion compression specs)
+  are avoidance-robust by construction; net FDI / current-account flows are
+  the best locally available macro proxy and are noisy for an oil-and-
+  sovereign-fund economy. The data-layer agent separately compiled direct
+  headline HNW departures (data/manual/wealth_tax/hnw_migration.csv: ~30 in
+  2022, 34 in 2023) — small in macro terms — and revenue that came in ABOVE
+  forecast (zucman_wealth_tax_yield, ratio 1.12). Read together as a bounded
+  flows signal, not a clean migration estimate.
+prior_confidence: 0.45
+disclosure: >
+  Author prior expects the headline "billionaire exodus" coverage to
+  overstate measurable macro capital flight, consistent with the SUPPORTED
+  nulls already in the corpus (corbyn_manifesto_capital_flight_prediction,
+  meidner_wage_earner_fund_capital_flight).
+falsification:
+  rule: >
+    SUPPORTED if the NOR post-2022 treatment coefficient on net FDI inflows
+    (% GDP) is negative (inflows fall vs the country+year fixed-effect
+    counterfactual) at p<0.10. REFUTED if positive at p<0.10. PARTIAL if not
+    significant.
+  test: >
+    Two-way fixed-effects (country + year) event study, treated NOR from
+    2022, Nordic/European donor pool, outcome net FDI inflows % GDP (current-
+    account balance % GDP as secondary). Year FE difference out the global FDI
+    cycle and oil-price shocks.
 evidence_type: associational
 sample:
-  countries:
-  - GLOBAL
-  period:
-  - 1990
-  - 2023
+  countries: [NOR, SWE, DNK, FIN, DEU, NLD]
+  period: [2010, 2024]
   temporal_structure: panel
-scope:
-  period:
-  - 1990
-  - 2023
-  countries:
-  - GLOBAL
-  outcome_dim:
-  - fiscal_policy
-  - taxation
-  policy_family: []
+  exclusion_rules:
+    - "drop country-years missing the flows series"
 variables:
   outcome:
-  - name: outcome_var
-    source: world_bank_wdi:NY.GDP.PCAP.KD
-    transformation: log
+    - name: fdi_net_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: level
+    - name: current_account_pct_gdp
+      source: "world_bank_wdi:BN.CAB.XOKA.GD.ZS"
+      transformation: level
   treatment:
-  - name: treatment_var
-    source: fraser_efw:summary_index
-    transformation: level
+    - name: wealth_tax_hike_2022_nor_post
+      source: "constructed: indicator = 1 for NOR, year >= 2022"
+      transformation: indicator
   controls:
-  - name: log_gdp_pc
-    source: world_bank_wdi:NY.GDP.PCAP.KD
-    transformation: log
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
 estimator:
-  template: panel_fe
-  fixed_effects:
-  - country
-  - year
+  template: event_study
   clustering: country
-falsification:
-  rule: SUPPORTED if coefficient > 0 and p < 0.10
-  test: wealth_tax_capital_flight_avoidance_placeholder_test
-prior_confidence: 0.5
+  fixed_effects: [country, year]
+  event_year: 2022
+  notes: >
+    TWFE (country + year FE) pooled post-treatment coefficient, country-
+    clustered SEs, treated NOR from 2022. Short post-window — preliminary.
+intervention_channel: fiscal
+scope:
+  period: [2022, 2024]
+  countries: [NOR]
+  outcome_dim: [taxation, capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [norway_wealth_tax_hike_2022, capital_flight, wealth_tax]

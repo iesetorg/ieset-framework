@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_competition_corporate_rate_race_to_bottom
+version: 1
+status: draft
+topic: fiscal
+claim_direction: "-"
+claim: >
+  Capital-tax competition drives a race to the bottom: in the pre-
+  coordination window 2000-2021, statutory corporate income tax rates across
+  OECD economies fell on a downward within-country time trend, consistent
+  with Gabriel Zucman's argument that capital mobility forces governments to
+  cut taxes on the most mobile base until a coordination device (the 2021
+  OECD/G20 Pillar Two 15% global minimum tax) arrests it.
+notes: >
+  New Zucman-suite test (Z6), 2026-06-29. Outcome = combined statutory
+  corporate income tax rate from the data-layer agent's OECD tax-structure
+  panel (oecd_taxstruct adapter, 2000-2024), which covers the race-to-bottom
+  era far better than the Tax Foundation ITCI (2014+). Window restricted to
+  2000-2021 because that is the pre-Pillar-Two competition regime; after the
+  Oct-2021 global-minimum-tax agreement the trend flattens/reverses (document
+  separately rather than masking the inflection in a single slope). The
+  dramatic 1985-2000 phase predates this panel — this is a recent-decades
+  confirmation, not the full history. Companion: zucman_oecd_tax_structure.
+prior_confidence: 0.7
+disclosure: >
+  Author prior strongly expects a negative pre-2021 trend (the race to the
+  bottom is one of the best-documented facts in public finance).
+falsification:
+  rule: >
+    SUPPORTED if the within-country time-trend coefficient on the statutory
+    corporate tax rate is negative over 2000-2021 at p<0.10. REFUTED if
+    positive at p<0.10. PARTIAL if not significant.
+  test: >
+    Country-fixed-effects panel regression of the combined statutory
+    corporate income tax rate on a linear year trend (value = year - 2000),
+    2000-2021, country-clustered SEs.
+evidence_type: associational
+sample:
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL, AUT, PRT, FIN, SWE, DNK, NOR, IRL, CHE, AUS, NZL, CAN, JPN, KOR, POL, CZE, GRC, MEX, CHL, TUR, HUN, ISL, LUX, SVK, SVN, EST]
+  period: [2000, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing the statutory rate"
+variables:
+  outcome:
+    - name: corporate_tax_rate
+      source: "oecd_taxstruct:combined_corporate_income_tax_rate"
+      transformation: level
+  treatment:
+    - name: year_trend
+      source: "derived_trend:year_trend_2000_base"
+      transformation: level
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country]
+  notes: >
+    Country FE only (a year FE would absorb the trend being estimated).
+    Coefficient on year_trend = average annual change in the statutory rate
+    in percentage points.
+intervention_channel: fiscal
+scope:
+  period: [2000, 2021]
+  countries: [USA, GBR, DEU, FRA, ITA, ESP, NLD, BEL]
+  outcome_dim: [taxation, capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [tax_competition, corporate_tax, race_to_the_bottom, pillar_two]

@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_inequality_spain_2011_wealth_tax_reinstatement_top_share
+version: 1
+status: draft
+topic: distribution
+claim_direction: "-"
+claim: >
+  Spain's 2011 reinstatement of the Impuesto sobre el Patrimonio (wealth
+  tax), reintroduced by Royal Decree-Law 13/2011 after the 2008 100% rebate,
+  produced a measurable reduction in the Spanish top-1 net personal wealth
+  share after 2011 relative to a country+year fixed-effect counterfactual.
+  The discriminating test pits the Zucman view (a well-enforced recurrent
+  wealth tax compresses measured top wealth with a modest behavioural
+  response) against the capital-flight view (any fall reflects avoidance).
+notes: >
+  New Zucman-suite test (2026-06-29). TWFE (country + year FE) on the
+  canonical wid_concentration adapter. WID shares are avoidance-robust
+  (capitalisation-based, include estimated offshore wealth), so a detected
+  fall is evidence of genuine compression rather than under-reporting.
+  Companion: data-layer brief zucman_wid_concentration_2026-06-29; revenue-
+  side evidence in zucman_wealth_tax_yield_2026-06-29 (ESP IGF realized only
+  ~42% of forecast — the one clear yield gap, consistent with weak
+  enforcement / the Madrid rebate).
+prior_confidence: 0.5
+disclosure: >
+  Author prior expects a small compression at most; Spain's wealth tax has
+  high exemption thresholds and regional variation (notably the Madrid 100%
+  rebate), which should blunt any aggregate top-share effect.
+falsification:
+  rule: >
+    SUPPORTED if the ESP post-2011 treatment coefficient on the top-1 net
+    wealth share is negative (genuine compression vs the country+year fixed-
+    effect counterfactual) at p<0.10. REFUTED if positive at p<0.10. PARTIAL
+    if not significant.
+  test: >
+    Two-way fixed-effects (country + year) event study, treated ESP from
+    2011, Western-European donor pool, outcome top-1 net personal wealth
+    share (via the wid_concentration adapter).
+evidence_type: associational
+sample:
+  countries: [ESP, DEU, ITA, NLD, BEL, PRT, FIN, GRC, GBR]
+  period: [1995, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing WID top wealth share"
+    - "donor pool excludes recurrent-wealth-tax peers (FRA ISF, CHE, NOR)"
+variables:
+  outcome:
+    - name: top_1pct_wealth_share
+      source: "wid_concentration:top1_net_personal_wealth_share"
+      transformation: level
+    - name: top_10pct_wealth_share
+      source: "wid_concentration:top10_net_personal_wealth_share"
+      transformation: level
+  treatment:
+    - name: patrimonio_2011_esp_post
+      source: "constructed: indicator = 1 for ESP, year >= 2011"
+      transformation: indicator
+  controls:
+    - name: log_real_gdp_per_capita
+      source: "world_bank_wdi:NY.GDP.PCAP.KD"
+      transformation: log
+estimator:
+  template: event_study
+  clustering: country
+  fixed_effects: [country, year]
+  event_year: 2011
+  notes: >
+    TWFE (country + year FE) pooled post-treatment coefficient, country-
+    clustered SEs. Treated ESP from 2011.
+intervention_channel: fiscal
+scope:
+  period: [2011, 2023]
+  countries: [ESP]
+  outcome_dim: [poverty_inequality, taxation, capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [spain_patrimonio_2011, wealth_tax_reinstatement, wealth_tax]
