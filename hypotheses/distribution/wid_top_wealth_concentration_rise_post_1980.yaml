@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wid_top_wealth_concentration_rise_post_1980
+version: 1
+status: draft
+topic: distribution
+
+claim_direction: "+"
+claim: >
+  Across advanced economies the concentration of net personal wealth at the
+  very apex rose materially over the post-1980 era. Operationalised on the
+  WID top-0.1% net-personal-wealth share (capitalisation-based, avoidance-
+  robust), an unconditional within-country time trend over 1980-2024 is
+  positive and significant: the richest one-in-a-thousand households captured
+  a steadily larger share of net wealth. This is the Saez-Zucman / WID
+  "rise of the very top" stylised fact, here graded as a cross-country panel
+  trend rather than a single-country anecdote.
+
+notes: >
+  Zucman-suite test (a), 2026-06-29. Distinct from
+  r_minus_g_wealth_income_ratio_post_1980 (which tests the wealth/income
+  RATIO and the r>g mechanism); this spec tests apex SHARE concentration and
+  takes no position on mechanism. Transparency: this is a confirmatory
+  descriptive trend on already-materialised WID vintages (wid_clean,
+  shwealj992 p99.9p100) — the data was on disk before the spec, so the
+  pre-registration here is the threshold/direction commitment (spec commit
+  precedes the run), not blindness to the series. The treatment regressor is
+  the deterministic derived:calendar_year_trend (value = year - 1980), so the
+  coefficient is the average within-country annual change in the apex share.
+
+prior_confidence: 0.9
+disclosure: >
+  Author holds market-liberal priors but does not contest the apex
+  wealth-concentration rise as a measured fact; the live disputes (which this
+  spec does NOT adjudicate) are mechanism (r>g vs asset-price/housing vs
+  saving-rate composition) and whether capitalisation-method shares overstate
+  the level. A near-certain prior is appropriate for the descriptive fact;
+  it would be miscalibrated for any causal or policy claim.
+
+falsification:
+  rule: >
+    SUPPORTED if the coefficient on the calendar year-trend is positive at
+    p < 0.05 (apex wealth share rises within countries over 1980-2024).
+    REFUTED if the coefficient is negative (sign-flipped) at p < 0.05.
+    PARTIAL if the sign matches but p >= 0.05. INCONCLUSIVE if the outcome
+    panel cannot be loaded.
+  test: >
+    Panel fixed-effects regression of the WID top-0.1% net personal wealth
+    share on a linear calendar year-trend, country fixed effects only (year
+    FE deliberately omitted so the trend is not absorbed), country-clustered
+    SEs, advanced-economy panel 1980-2024.
+
+evidence_type: associational
+
+sample:
+  countries: [USA, GBR, FRA, DEU, ITA, ESP, NLD, SWE, JPN, CAN, AUS, CHE, BEL, AUT, DNK, FIN, NOR, IRL]
+  period: [1980, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing the WID top-0.1% net personal wealth share"
+
+variables:
+  outcome:
+    - name: top_0p1_net_personal_wealth_share
+      source: "wid_clean:top01_wealth_share"
+      transformation: level
+      notes: >
+        WID net personal wealth share, percentile p99.9p100 (shwealj992),
+        rescaled to percent. Avoidance-robust by construction (capitalisation
+        method, includes estimated offshore wealth).
+  treatment:
+    - name: calendar_year_trend
+      source: "derived:calendar_year_trend"
+      transformation: level
+      notes: >
+        Deterministic linear trend, value = year - 1980; built by
+        scripts/_build_year_trend_vintage.py. Positive coefficient == apex
+        share trended up over the panel.
+  controls: []
+
+scope:
+  period: [1980, 2024]
+  countries: [OECD, USA, GBR, FRA, DEU]
+  outcome_dim: [poverty_inequality]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [saez_zucman_top_wealth_share, apex_wealth_concentration]
+
+estimator:
+  template: panel_fe
+  clustering: country
+  fixed_effects: [country]
+  notes: >
+    Country-FE-only panel trend (year FE omitted by design so the calendar
+    trend is identified). Outcome WID top-0.1% net personal wealth share,
+    advanced-economy panel 1980-2024, country-clustered SEs.
+
+covers_claims:
+  - position_id: social_democratic
+    claim_index: 12
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: >-
+      Apex wealth-concentration rise is the wealth-side complement to the
+      social-democratic structural-inequality-drift claim already linked to
+      r_minus_g_wealth_income_ratio_post_1980.
