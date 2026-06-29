@@ -8,7 +8,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 - Ingestion waves: 7
 - Primary axis: `regulatory.housing_rent_control`
 - Preferred city anchor: `ghsl_urban_centre_database`
-- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 23, "scout_reported_unverified": 60, "seed_unverified_url": 6, "seed_verified_official_page": 25}`
+- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 26, "scout_reported_unverified": 58, "seed_unverified_url": 5, "seed_verified_official_page": 25}`
 - Ingestion difficulty: `{"high": 14, "low": 33, "medium": 68}`
 - Top-1000 scalability: `{"high": 11, "low": 59, "medium": 45}`
 
@@ -68,7 +68,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 | 21 | `berlin_mietspiegel` | Berlin | medium | seed_unverified_url | Berlin regulated-market rent benchmark around Mietendeckel |
 | 21 | `nyc_open_data_tax_benefit_regulation_bundle` | New York City | medium | endpoint_verified | NYC rent-stabilization treatment-coverage proxy and regulated-stock denominator |
 | 22 | `stockholm_bostadsformedlingen_statistics` | Stockholm region, with landed Stockholm municipality filter | low | endpoint_verified | first-order rent-band and allocation-distortion queue-cost layer for Stockholm |
-| 23 | `spain_rental_reference_price_system` | Spain | high | seed_unverified_url | treatment intensity and first-order cap benchmark for Spain Law 12/2023 |
+| 23 | `spain_rental_reference_price_system` | Spain | high | endpoint_verified | treatment intensity and first-order cap benchmark for Spain Law 12/2023 |
 | 24 | `apartment_list_rent_estimates` | United States | medium | scout_reported_unverified | alternative first-order rent panel for U.S. cities |
 | 25 | `eviction_lab_tracking_system` | selected United States metros and cities | medium | scout_reported_unverified | high-frequency tenant-protection outcome around policy changes |
 | 26 | `nyc_rent_guidelines_board_stabilized_lists` | New York City | medium | scout_reported_unverified | NYC treatment registry exemplar for rent stabilization |

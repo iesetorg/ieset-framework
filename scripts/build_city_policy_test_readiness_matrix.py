@@ -40,6 +40,9 @@ DEFAULT_INPUTS = {
     "nz_tenancy_rental_bond": "data/derived/nz_tenancy_rental_bond_panel.parquet",
     "ireland_rtb_rent_index": "data/derived/ireland_rtb_rent_index_panel.parquet",
     "portugal_ine_municipal_rents": "data/derived/portugal_ine_municipal_rents_panel.parquet",
+    "italy_omi_rent": "data/derived/italy_omi_rent_panel.parquet",
+    "spain_rental_reference_index": "data/derived/spain_rental_reference_index_panel.parquet",
+    "france_oll_rent": "data/derived/france_oll_rent_panel.parquet",
 }
 
 
@@ -820,6 +823,93 @@ def add_portugal_ine_municipal_rents(base: pd.DataFrame, frame: pd.DataFrame | N
     return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
 
 
+def add_italy_omi_rent(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "italy_omi_rent_rows": 0,
+        "italy_omi_rent_semesters": 0,
+        "italy_omi_rent_start_year": None,
+        "italy_omi_rent_end_year": None,
+        "italy_omi_rent_comuni": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "italy_omi_rent")
+    if frame.empty:
+        return base.assign(**columns)
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            italy_omi_rent_rows=("rent_mid_eur_m2_month", "size"),
+            italy_omi_rent_semesters=("semester_label", "nunique"),
+            italy_omi_rent_start_year=("year", "min"),
+            italy_omi_rent_end_year=("year", "max"),
+            italy_omi_rent_comuni=("comune_istat_code", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_spain_rental_reference_index(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "spain_reference_index_rows": 0,
+        "spain_reference_index_years": 0,
+        "spain_reference_index_start_year": None,
+        "spain_reference_index_end_year": None,
+        "spain_reference_index_municipalities": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "spain_rental_reference_index")
+    if frame.empty:
+        return base.assign(**columns)
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            spain_reference_index_rows=("ref_rent_per_m2_eur_median", "size"),
+            spain_reference_index_years=("year", "nunique"),
+            spain_reference_index_start_year=("year", "min"),
+            spain_reference_index_end_year=("year", "max"),
+            spain_reference_index_municipalities=("municipality_code", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_france_oll_rent(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "france_oll_rent_rows": 0,
+        "france_oll_rent_years": 0,
+        "france_oll_rent_start_year": None,
+        "france_oll_rent_end_year": None,
+        "france_oll_rent_agglomerations": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "france_oll_rent")
+    if frame.empty:
+        return base.assign(**columns)
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            france_oll_rent_rows=("rent_eur_m2_median", "size"),
+            france_oll_rent_years=("data_year", "nunique"),
+            france_oll_rent_start_year=("data_year", "min"),
+            france_oll_rent_end_year=("data_year", "max"),
+            france_oll_rent_agglomerations=("agglomeration", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
 def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
     out = matrix.copy()
     out["first_order_rent_layer"] = (
@@ -839,6 +929,8 @@ def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
         | out["nz_rental_bond_rows"].gt(0)
         | out["ireland_rtb_rent_rows"].gt(0)
         | out["portugal_ine_rent_rows"].gt(0)
+        | out["italy_omi_rent_rows"].gt(0)
+        | out["france_oll_rent_rows"].gt(0)
     )
     out["supply_response_layer"] = (
         out["census_permit_rows"].gt(0)
@@ -856,6 +948,7 @@ def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
         | (out["datasf_quality_rows"].gt(0) & out["ieset_city_id"].eq("ghsl_ucdb_r2024a:1461"))
         | out["france_reference_rent_rows"].gt(0)
         | out["stockholm_queue_time_band_rows"].gt(0)
+        | out["spain_reference_index_rows"].gt(0)
     )
     out["distributional_incidence_layer"] = out["acs_incidence_rows"].gt(0)
     layer_cols = [
@@ -928,6 +1021,9 @@ def build_matrix(inputs: dict[str, Path]) -> tuple[pd.DataFrame, dict[str, Any]]
     matrix = add_nz_tenancy_rental_bond(matrix, read_optional(inputs["nz_tenancy_rental_bond"]))
     matrix = add_ireland_rtb_rent_index(matrix, read_optional(inputs["ireland_rtb_rent_index"]))
     matrix = add_portugal_ine_municipal_rents(matrix, read_optional(inputs["portugal_ine_municipal_rents"]))
+    matrix = add_italy_omi_rent(matrix, read_optional(inputs["italy_omi_rent"]))
+    matrix = add_spain_rental_reference_index(matrix, read_optional(inputs["spain_rental_reference_index"]))
+    matrix = add_france_oll_rent(matrix, read_optional(inputs["france_oll_rent"]))
     matrix = assign_layers(matrix)
     matrix = matrix.sort_values(
         ["rent_control_core_layer_count", "population_2025", "city_rank_2025"],

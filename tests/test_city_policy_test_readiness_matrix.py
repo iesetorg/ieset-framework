@@ -78,6 +78,36 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
                 "density_per_km2_2025": 2900,
             },
             {
+                "ieset_city_id": "ghsl_ucdb_r2024a:8121",
+                "city_rank_2025": 50,
+                "city_name": "Rome",
+                "country_name": "Italy",
+                "country_iso3": "ITA",
+                "population_2025": 3700000,
+                "area_km2_2025": 1200,
+                "density_per_km2_2025": 3083,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:3338",
+                "city_rank_2025": 60,
+                "city_name": "Madrid",
+                "country_name": "Spain",
+                "country_iso3": "ESP",
+                "population_2025": 6600000,
+                "area_km2_2025": 1500,
+                "density_per_km2_2025": 4400,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2879",
+                "city_rank_2025": 130,
+                "city_name": "Lyon",
+                "country_name": "France",
+                "country_iso3": "FRA",
+                "population_2025": 1700000,
+                "area_km2_2025": 900,
+                "density_per_km2_2025": 1889,
+            },
+            {
                 "ieset_city_id": "ghsl_ucdb_r2024a:3881",
                 "city_rank_2025": 33,
                 "city_name": "Bogota",
@@ -659,6 +689,96 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         ]
     ).to_parquet(portugal_ine, index=False)
 
+    italy_omi = tmp_path / "italy_omi.parquet"
+    pd.DataFrame(
+        [
+            # Rome: matched assessor quotation rent band -> first_order rent
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:8121",
+                "ghsl_match_flag": True,
+                "comune_istat_code": "12058091",
+                "semester_label": "2018-S2",
+                "year": 2018,
+                "rent_mid_eur_m2_month": 14.5,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:8121",
+                "ghsl_match_flag": True,
+                "comune_istat_code": "12058091",
+                "semester_label": "2018-S1",
+                "year": 2018,
+                "rent_mid_eur_m2_month": 14.2,
+            },
+            # unmatched comune ignored
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "comune_istat_code": "12999999",
+                "semester_label": "2018-S2",
+                "year": 2018,
+                "rent_mid_eur_m2_month": 5.0,
+            },
+        ]
+    ).to_parquet(italy_omi, index=False)
+
+    spain_reference = tmp_path / "spain_reference.parquet"
+    pd.DataFrame(
+        [
+            # Madrid: matched official reference index (legal cap basis) -> rent-board layer
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:3338",
+                "ghsl_match_flag": True,
+                "municipality_code": "28079",
+                "year": 2024,
+                "ref_rent_per_m2_eur_median": 13.97,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:3338",
+                "ghsl_match_flag": True,
+                "municipality_code": "28079",
+                "year": 2023,
+                "ref_rent_per_m2_eur_median": 13.10,
+            },
+            # unmatched municipality ignored
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "municipality_code": "09999",
+                "year": 2024,
+                "ref_rent_per_m2_eur_median": 6.0,
+            },
+        ]
+    ).to_parquet(spain_reference, index=False)
+
+    france_oll = tmp_path / "france_oll.parquet"
+    pd.DataFrame(
+        [
+            # Lyon: matched observed OLL market rent -> first_order rent
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2879",
+                "ghsl_match_flag": True,
+                "agglomeration": "Lyon",
+                "data_year": 2024,
+                "rent_eur_m2_median": 12.8,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2879",
+                "ghsl_match_flag": True,
+                "agglomeration": "Lyon",
+                "data_year": 2023,
+                "rent_eur_m2_median": 12.4,
+            },
+            # unmatched agglomeration ignored
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "agglomeration": "Nice",
+                "data_year": 2024,
+                "rent_eur_m2_median": 14.0,
+            },
+        ]
+    ).to_parquet(france_oll, index=False)
+
     inputs = {
         "city_spine": spine,
         "zillow_rent": zillow,
@@ -684,6 +804,9 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         "nz_tenancy_rental_bond": nz_rental_bond,
         "ireland_rtb_rent_index": ireland_rtb,
         "portugal_ine_municipal_rents": portugal_ine,
+        "italy_omi_rent": italy_omi,
+        "spain_rental_reference_index": spain_reference,
+        "france_oll_rent": france_oll,
     }
     matrix, stats = readiness_builder.build_matrix(inputs)
 
@@ -828,13 +951,32 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
     assert not lisbon["supply_response_layer"]
     assert lisbon["rent_control_readiness_tier"] == "rent_only"
 
+    # Rome: matched OMI assessor quotation rent band -> first_order rent only
+    rome = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:8121")].iloc[0]
+    assert rome["italy_omi_rent_rows"] == 2  # only matched Rome rows
+    assert rome["first_order_rent_layer"]
+    assert rome["rent_control_readiness_tier"] == "rent_only"
+
+    # Madrid: matched SERPAVI reference index (legal cap basis) -> rent-board layer only
+    madrid = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:3338")].iloc[0]
+    assert madrid["spain_reference_index_rows"] == 2
+    assert not madrid["first_order_rent_layer"]
+    assert madrid["regulated_stock_or_rent_board_layer"]
+    assert madrid["rent_control_readiness_tier"] == "partial_local_outcome"
+
+    # Lyon: matched OLL observed market rent -> first_order rent only
+    lyon = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:2879")].iloc[0]
+    assert lyon["france_oll_rent_rows"] == 2
+    assert lyon["first_order_rent_layer"]
+    assert lyon["rent_control_readiness_tier"] == "rent_only"
+
     assert stats["tier_counts"]["case_ready_local_panel"] == 2
     assert stats["tier_counts"]["rent_supply_ready"] == 5
-    assert stats["tier_counts"]["rent_only"] == 9
-    assert stats["tier_counts"]["partial_local_outcome"] == 2
-    assert stats["layer_counts"]["first_order_rent_layer"] == 16
+    assert stats["tier_counts"]["rent_only"] == 11
+    assert stats["tier_counts"]["partial_local_outcome"] == 3
+    assert stats["layer_counts"]["first_order_rent_layer"] == 18
     assert stats["layer_counts"]["supply_response_layer"] == 8
-    assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 4
+    assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 5
     assert stats["missing_optional_inputs"] == ["acs_incidence"]
 
     output = tmp_path / "readiness.parquet"
