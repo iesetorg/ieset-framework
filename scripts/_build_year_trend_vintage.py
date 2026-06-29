@@ -1,7 +1,9 @@
 """Build a deterministic calendar year-trend vintage for panel trend tests.
 
-Emits `data/vintages/derived/calendar_year_trend@<utc>.parquet` with the
+Emits `data/vintages/trend/calendar_year_trend@<utc>.parquet` with the
 canonical (country_iso3, year, value) layout, where `value = year - 1980`.
+NB: served under the plain `trend` publisher (NOT `derived:`, which is a
+meta-prefix the runner constructs in-code rather than loading from a file).
 Used as the treatment regressor in panel-FE trend specs (e.g. the WID
 top-wealth-share post-1980 rise test), so a positive, significant
 coefficient on this series == "the outcome trended up over the panel".
@@ -50,7 +52,7 @@ def main() -> None:
     df = pd.DataFrame(rows)
 
     utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")
-    out_dir = VINTAGES / "derived"
+    out_dir = VINTAGES / "trend"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"calendar_year_trend@{utc}.parquet"
     df.to_parquet(out_path, index=False)
@@ -58,7 +60,7 @@ def main() -> None:
     sha = hashlib.sha256(out_path.read_bytes()).hexdigest()
     MANIFESTS.mkdir(parents=True, exist_ok=True)
     manifest = {
-        "publisher": "derived",
+        "publisher": "trend",
         "series": "calendar_year_trend",
         "source": "deterministic (value = year - 1980)",
         "vintage_utc": utc,
