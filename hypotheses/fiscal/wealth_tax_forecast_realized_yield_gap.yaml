@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wealth_tax_forecast_realized_yield_gap
+version: 1
+status: candidate
+topic: fiscal
+
+claim_direction: "-"
+claim: >
+  Enacted wealth taxes systematically under-deliver: realised revenue falls
+  materially below the legislator's enactment-year forecast (a "yield gap"),
+  because mobility, portfolio reshuffling, under-reporting and valuation
+  erosion shrink the effective base relative to the static projection. This
+  is the testable third-order leg of the capital-flight narrative. It is
+  graded here on the curated public-finance forecast-vs-realised panel
+  (wealth_tax_manual) for the four recent levyers with documented forecasts:
+  France (ISF final years + IFI 2018-2020), Norway (formuesskatt incl. the
+  2022 hike), Spain (ITSGF 2022), Colombia (impuesto al patrimonio 2022).
+
+notes: >
+  Zucman-suite blocker completion, 2026-06-29. This is the NARROW yield-gap
+  test only; it deliberately does NOT subsume the registered synth_did spec
+  wealth_tax_capital_flight_revenue_yield_gap, which stays INCONCLUSIVE
+  pending its full pre-registered publishers (minefi/dian/aeat + Henley/ICIJ
+  emigration). Transparency: the curated CSV was committed before this spec,
+  so the pre-registration here is the threshold/direction commitment (spec
+  commit precedes the run), not blindness to the eight rows. The companion
+  finding (Jakobsen-Jakobsen-Kleven-Zucman 2020) is that good third-party
+  enforcement keeps behavioural responses small — i.e. a yield gap is NOT
+  inevitable, which is exactly what a non-systematic result would show.
+
+prior_confidence: 0.4
+disclosure: >
+  Author holds market-liberal priors and would, on prior, expect a yield
+  gap. The prior is set below 0.5 deliberately because the most-cited recent
+  enforcement evidence (Denmark, third-party reporting) and the on-disk data
+  both point to gaps being case-specific (optimistic headline forecasts on
+  brand-new taxes) rather than systematic. Staking the claim on a majority-
+  of-countries threshold keeps it falsifiable against the author's prior.
+
+falsification:
+  rule: >
+    SUPPORTED if at least 3 of the 4 countries show a country-level yield gap
+    (median realised/forecast ratio across that country's case-years below
+    0.85, i.e. realised >=15% under forecast). REFUTED if at most 1 of 4
+    countries shows a gap (realised meets or exceeds forecast in the
+    majority). PARTIAL if exactly 2 of 4 show a gap (real but not systematic).
+    INCONCLUSIVE if the wealth_tax_manual panel cannot be loaded or fewer than
+    3 countries resolve.
+  test: >
+    Per-country median of realised/forecast revenue ratios from the curated
+    wealth_tax_manual:revenue_forecast_realized vintage; count countries with
+    median ratio < 0.85; grade against the 3/4 systematic-gap threshold.
+    Executed by engine/runs/wealth_tax_forecast_realized_yield_gap/replication.py.
+
+evidence_type: descriptive
+
+steelman: hypotheses/steelman/wealth_tax_forecast_realized_yield_gap.md
+
+sample:
+  countries: [FRA, NOR, ESP, COL]
+  period: [2015, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - "include only case-years with both an enactment-vintage forecast and an executed realised figure from official sources"
+
+variables:
+  outcome:
+    - name: realised_to_forecast_revenue_ratio
+      source: "wealth_tax_manual:revenue_forecast_realized"
+      transformation: ratio_realised_to_forecast
+      notes: >
+        realized_revenue_local / forecast_revenue_local per case-year, from
+        the curated public-finance panel (each row carries source_url +
+        methodology_url). Ratio < 0.85 == a >=15% yield gap.
+
+  treatment:
+    - name: wealth_tax_enactment
+      source: "wealth_tax_manual:revenue_forecast_realized"
+      transformation: indicator
+      notes: "Each case_id is an enacted wealth tax / rate hike with a legislator forecast."
+
+  controls: []
+
+scope:
+  period: [2015, 2023]
+  countries: [FRA, NOR, ESP, COL]
+  outcome_dim: [taxation, fiscal_policy]
+  policy_family: [tax_policy, fiscal_policy]
+  treatment_tags: [wealth_tax_yield_gap, forecast_vs_realised]
+
+estimator:
+  template: descriptive
+  notes: >
+    Per-country median realised/forecast ratio, counted against a 0.85 gap
+    threshold and a 3/4-country systematic-gap rule. Authoritative run is the
+    per-spec replication.py (not a generic --all runner), which pins the
+    wealth_tax_manual vintage by sha256.
+
+covers_claims:
+  - position_id: classical_liberal
+    claim_index: 22
+    polarity: aligned
+    school_prediction: mixed
+    confidence: medium
+    notes: >-
+      Tests the classical-liberal/market-liberal yield-gap prediction
+      directly; a non-systematic result weakens the strong "wealth taxes
+      always under-collect" framing while leaving the new-tax cases intact.
