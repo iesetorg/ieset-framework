@@ -509,10 +509,13 @@ source_records:
     top_1000_scalability: low
     ingestion_difficulty: low
     immediate_payoff_rank: 18
-    verification_status: seed_verified_official_page
+    verification_status: endpoint_verified
     notes: >
-      The page exposes district-level tables 253/253a; good early fetcher
-      candidate because files are public and periodically updated.
+      Official Live Table 253 ODS endpoint was fetched and parsed into
+      data/derived/uk_mhclg_house_building_panel.parquet by
+      scripts/build_uk_mhclg_house_building_panel.py. This is a new-build
+      starts/completions indicator table rounded to the nearest 10, not the
+      comprehensive net-additional-dwellings measure.
 
   - source_id: nyc_open_data_housing_bundle
     source_name: New York City open-data housing bundle
@@ -648,29 +651,36 @@ source_records:
   - source_id: stockholm_bostadsformedlingen_statistics
     source_name: Stockholm housing queue statistics
     publisher: Bostadsformedlingen i Stockholm
-    geography: Stockholm region
-    spatial_grain: queue, allocation, dwelling type, municipality where exposed
-    time_coverage: release-dependent
+    geography: Stockholm region, with landed Stockholm municipality filter
+    spatial_grain: municipality-year, queue, measure, and rent/queue-time band
+    time_coverage: 2017-2026 as published
     policy_or_outcome_fields:
       - queue time
       - allocated dwellings
+      - monthly rent bands
       - applicants
-      - rent and dwelling attributes where exposed
-    access_format: web statistics and reports
+      - dwelling filters
+    access_format: web statistics backed by JSON endpoints
     source_url: https://bostad.stockholm.se/statistik/
     license_or_terms: publisher terms, verify reuse
-    update_frequency: periodic
-    rent_control_use: allocation-distortion and queue-cost layer for Stockholm
+    update_frequency: annual/current-year as published
+    rent_control_use: first-order rent-band and allocation-distortion queue-cost layer for Stockholm
     second_order_layers:
+      - first_order_price_or_transfer
       - allocation_distortion
       - net_welfare
-      - distributional_incidence
     top_1000_scalability: low
-    ingestion_difficulty: medium
+    ingestion_difficulty: low
     immediate_payoff_rank: 22
-    verification_status: seed_unverified_url
+    verification_status: endpoint_verified
     notes: >
-      High-value because queue years directly measure non-price rationing.
+      Official statistics page exposes JSON chart endpoints
+      /statistik/data/hyra-per-omrade and /statistik/data/kotid-per-omrade.
+      Landed builder filters area=Stockholm and ordinary rental dwellings,
+      retaining Bostadskon, Interna byteskon, and Varmdokon queues. Artifact
+      covers 660 aggregate band rows for 2017-2026, 54,807 rent-band allocated
+      dwellings, rent-band counts, queue-time band counts, endpoint paths, and
+      GHSL top-1000 match ghsl_ucdb_r2024a:1693.
 
   - source_id: spain_rental_reference_price_system
     source_name: Spain state rental reference price system
@@ -1483,10 +1493,13 @@ source_records:
     top_1000_scalability: low
     ingestion_difficulty: medium
     immediate_payoff_rank: 102
-    verification_status: scout_reported_unverified
+    verification_status: endpoint_verified
     notes: >
-      Patchy but highly policy-specific. Needs multi-city data.gouv search and
-      legal-order normalization.
+      Patchy but highly policy-specific. Paris Opendatasoft builder
+      scripts/build_france_reference_rents_panel.py now uses the official JSON
+      export endpoint and lands 2019-2025 Paris rent-control reference-rent
+      cells. Remaining work is multi-city data.gouv search, license/schema
+      verification beyond Paris, and legal-order normalization.
 
   - source_id: france_sitadel_permits
     source_name: Sitadel building permits and authorisations
@@ -1521,7 +1534,7 @@ source_records:
     publisher: Generalitat de Catalunya
     geography: Catalonia
     spatial_grain: municipality, supra-municipal area, and housing zones
-    time_coverage: 1990/2000-present, series-dependent per Europe scout
+    time_coverage: rent-contract Socrata view landed for 2007-2025; other housing views series-dependent
     policy_or_outcome_fields:
       - rent deposits
       - average rent
@@ -1538,14 +1551,17 @@ source_records:
       - first_order_price_or_transfer
       - second_order_supply_response
       - implementation_capacity
-      - distributional_incidence
     top_1000_scalability: low
     ingestion_difficulty: low
     immediate_payoff_rank: 104
-    verification_status: scout_reported_unverified
+    verification_status: endpoint_verified
     notes: >
-      Unusually complete regional stack with outcomes and policy-adjacent
-      fields.
+      Rent-contract Socrata view qww9-bvhh was fetched live and parsed into
+      data/derived/catalonia_rent_contracts_panel.parquet. The landed panel
+      preserves municipality codes, rent price bands, contract counts, average
+      rents, GHSL match flags, and 2007-2025 coverage; Barcelona is the current
+      top-1000 GHSL match. Broader Catalonia supply/protected-housing and
+      policy-area views remain to be pinned and landed.
 
   - source_id: italy_omi_quotations
     source_name: Italy OMI real-estate quotations
@@ -1602,9 +1618,9 @@ source_records:
   - source_id: uk_ons_voa_private_rents
     source_name: ONS/VOA private rental market statistics
     publisher: UK Office for National Statistics / Valuation Office Agency
-    geography: England and UK components depending on series
+    geography: England
     spatial_grain: local authority and region
-    time_coverage: 2011/12-present, series-dependent per Europe scout
+    time_coverage: 2011/12-2022/23 PRMS workbook series; ONS marks this dataset discontinued
     policy_or_outcome_fields:
       - private rents
       - rent distributions
@@ -1613,7 +1629,7 @@ source_records:
     access_format: ONS XLS/CSV/API and GOV.UK tables
     source_url: https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/privaterentalmarketsummarystatisticsinengland
     license_or_terms: Open Government Licence v3
-    update_frequency: annual/monthly depending on series
+    update_frequency: discontinued; latest PRMS workbook released December 2023
     rent_control_use: UK local rent outcome layer; pair with MHCLG supply tables
     second_order_layers:
       - first_order_price_or_transfer
@@ -1621,9 +1637,14 @@ source_records:
     top_1000_scalability: low
     ingestion_difficulty: low
     immediate_payoff_rank: 107
-    verification_status: scout_reported_unverified
+    verification_status: endpoint_verified
     notes: >
-      Complements the already-seeded MHCLG house-building tables.
+      Official ONS workbook endpoint was fetched and parsed into
+      data/derived/uk_ons_voa_private_rents_panel.parquet by
+      scripts/build_uk_ons_voa_private_rents_panel.py. ONS marks this PRMS
+      series as discontinued and warns against using year-to-year movements as
+      a pure price index; keep it as a distribution snapshot and pair with
+      MHCLG supply tables.
 
   - source_id: ireland_rtb_rent_index_rpz
     source_name: Ireland RTB Rent Index and Rent Pressure Zones
@@ -1848,7 +1869,11 @@ source_records:
     verification_status: scout_reported_unverified
     notes: >
       Start with Victoria and Queensland, then add NSW after current coverage is
-      verified.
+      verified. Data Vic CKAN package metadata was reachable on 2026-06-29 and
+      listed 26 XLSX quarterly resources through September quarter 2025, but
+      DFFH workbook landing/download routes stalled from this environment; next
+      builder pass should resolve a stable workbook mirror or retry downloads
+      with a browser/session-backed client.
 
   - source_id: abs_building_approvals_census_housing
     source_name: ABS Building Approvals and Census housing tables
@@ -1882,14 +1907,14 @@ source_records:
     publisher: data.gov.sg / HDB / URA
     geography: Singapore
     spatial_grain: HDB town, flat type, project, planning area, district
-    time_coverage: quarterly historical-present per Asia-Pacific scout
+    time_coverage: HDB median rents 2005-Q2 to 2026-Q1 verified; HDB approvals 2021-01 to 2026-05 verified; URA non-landed quarterly rentals through 2026-Q1 verified
     policy_or_outcome_fields:
       - HDB approved subletting median rents
       - private rental contracts
       - rent
       - property type
-    access_format: data.gov.sg/API/CSV and URA API
-    source_url: https://data.gov.sg/datasets?query=Median%20Rent%20by%20Town%20and%20Flat%20Type
+    access_format: data.gov.sg public Dataset API/CSV and URA API
+    source_url: https://data.gov.sg/datasets/d_23000a00c52996c55106084ed0339566/view
     license_or_terms: Singapore Open Data Licence and URA/data.gov terms
     update_frequency: quarterly
     rent_control_use: city-state/subcity rent panel and public/private market split
@@ -1899,9 +1924,14 @@ source_records:
     top_1000_scalability: low
     ingestion_difficulty: medium
     immediate_payoff_rank: 117
-    verification_status: scout_reported_unverified
+    verification_status: endpoint_verified
     notes: >
-      Pair HDB with URA private rentals to avoid public-housing-only inference.
+      HDB Median Rent By Town And Flat Type has a live
+      `scripts/build_singapore_hdb_median_rent_panel.py` builder and landed
+      artifact. `scripts/build_singapore_hdb_ura_rental_panel.py` now lands
+      HDB approval rents plus URA private non-landed project-quarter rent
+      distributions. Remaining follow-up is a finer planning-area/postal
+      district geometry bridge for subcity exposure designs.
 
   - source_id: philippines_psa_openstat_housing_permits
     source_name: Philippines PSA OpenSTAT housing CPI and building permits
@@ -2011,35 +2041,37 @@ source_records:
       composition, not statutory timing.
 
   - source_id: dubai_land_department_rents
-    source_name: Dubai Land Department real estate data and rental index
-    publisher: Dubai Land Department
+    source_name: Data Dubai residential rent index and building supply statistics
+    publisher: Data Dubai
     geography: Dubai, United Arab Emirates
-    spatial_grain: area, community, building, and unit depending on extract
-    time_coverage: current-year portal; prior years via Dubai Pulse per Africa/MENA scout
+    spatial_grain: city-month by source dataset, segment, building type, and statistic
+    time_coverage: 2010-01 through 2026-05 across landed endpoints
     policy_or_outcome_fields:
-      - rent contracts
-      - annual rent
-      - area
-      - rooms
-      - units
+      - residential rent price index
+      - new and renewed rent index segments
+      - building permits
+      - completed buildings
+      - residential supply area and counts
       - property type
-      - rental index lookup inputs
-    access_format: CSV web download and Dubai Pulse archive
-    source_url: https://dubailand.gov.ae/en/open-data/real-estate-data/
+    access_format: Data Dubai JSON endpoints
+    source_url: https://data.dubai/
     license_or_terms: Dubai/Digital Dubai terms, verify reuse
-    update_frequency: live/rolling, not fully stated
-    rent_control_use: direct rent contracts plus RERA rental-index policy surface
+    update_frequency: monthly/current as published
+    rent_control_use: official Dubai rent-index outcome plus residential permit/completion supply controls
     second_order_layers:
       - first_order_price_or_transfer
-      - first_order_policy_effect
-      - distributional_incidence
+      - second_order_supply_response
     top_1000_scalability: low
-    ingestion_difficulty: medium
+    ingestion_difficulty: low
     immediate_payoff_rank: 122
-    verification_status: scout_reported_unverified
+    verification_status: endpoint_verified
     notes: >
-      Africa/MENA scout ranked this as the strongest MENA rent-control test bed.
-      Rental-index page: https://dubailand.gov.ae/en/eservices/rental-index/rental-index/.
+      Landed official Data Dubai endpoints datasetId=250159075 residential
+      rent price index, datasetId=724747 building permits, and datasetId=725256
+      completed buildings. Artifact covers 8,039 monthly observations, including
+      119 rent-index rows, 2,316 residential-relevant building-permit rows,
+      1,877 residential-relevant completed-building rows, source dataset IDs,
+      supply relevance flags, and GHSL top-1000 match ghsl_ucdb_r2024a:1007.
 
   - source_id: saudi_rega_rental_indicators
     source_name: Saudi REGA open rental indicators
@@ -2563,18 +2595,25 @@ source_records:
     top_1000_scalability: low
     ingestion_difficulty: low
     immediate_payoff_rank: 141
-    verification_status: seed_verified_official_page
+    verification_status: endpoint_verified
     notes: >
       Official RVD page lists private domestic average rents, rental indices,
-      and completions/stock/vacancy/take-up XLS files. Strong city-state pilot,
-      limited global scale.
+      and completions/stock/vacancy/take-up XLS files. Direct official XLS
+      endpoints verified on 2026-06-29:
+      `https://www.rvd.gov.hk/doc/en/statistics/his_data_1.xls`,
+      `https://www.rvd.gov.hk/doc/en/statistics/his_data_3.xls`, and
+      `https://www.rvd.gov.hk/doc/en/statistics/private_domestic.xls`. Strong
+      city-state pilot, limited global scale. Live builder
+      `scripts/build_hong_kong_rvd_private_domestic_panel.py` lands annual
+      rental-index, completions, stock, vacancy, vacancy-rate, and take-up rows;
+      reuse/license terms still need review before broad redistribution.
 
   - source_id: taiwan_moi_actual_price_rental_transactions
     source_name: Taiwan MOI actual real-estate transaction rental open data
     publisher: Taiwan Ministry of the Interior Department of Land Administration
     geography: Taiwan
     spatial_grain: city, township/district, and transaction record
-    time_coverage: current and historical public batches, release-dependent
+    time_coverage: current public ZIP batch verified on 2026-06-29; landed batch covers 2026-05 rental contracts
     policy_or_outcome_fields:
       - rental transaction cases
       - rent or consideration
@@ -2582,22 +2621,29 @@ source_records:
       - city and district
       - building area
       - property attributes
-    access_format: Open Data batch downloads from official transaction system
-    source_url: https://plvr.land.moi.gov.tw/DownloadOpenData
+    access_format: Official current ZIP endpoint with CSV files, manifest, and schema-main-rent.csv files
+    source_url: https://plvr.land.moi.gov.tw/Download?type=zip&fileName=lvr_landcsv.zip
     license_or_terms: MOI Open Data authorization terms, verify current download conditions
     update_frequency: synchronized with public transaction-query releases, generally on the 1st, 11th, or 21st
-    rent_control_use: direct private-rental transaction spine for Taipei, New Taipei, Taichung, Kaohsiung, and donor cities
+    rent_control_use: direct private-rental transaction spine for Taipei, Taichung, Tainan, Kaohsiung, Hsinchu, and donor cities
     second_order_layers:
       - first_order_price_or_transfer
       - distributional_incidence
     top_1000_scalability: medium
     ingestion_difficulty: medium
     immediate_payoff_rank: 142
-    verification_status: seed_verified_official_page
+    verification_status: endpoint_verified
     notes: >
-      Official page states real-estate transaction information includes sale,
-      rental, and pre-sale data and provides no-fee Open Data downloads under
-      authorization. Chinese schema and privacy masking need fetcher care.
+      Official Open Data page states real-estate transaction information
+      includes sale, rental, and pre-sale data and provides no-fee downloads
+      under authorization. Current ZIP endpoint verified on 2026-06-29 and
+      landed through `scripts/build_taiwan_moi_rental_transactions_panel.py`:
+      4,621 rental transaction rows across 20 municipality files, including
+      2,056 rows matched to five top-1000 GHSL cities. The derived panel keeps
+      municipality, district, rent, area, attributes, source file, and official
+      serial number but intentionally omits publisher street-address fields.
+      Methodology/download landing page:
+      `https://plvr.land.moi.gov.tw/DownloadOpenData`.
 
   - source_id: korea_reb_rone_rent_lease_indices
     source_name: Korea Real Estate Board R-ONE rent and lease indices
@@ -3097,3 +3143,156 @@ source_records:
       Scout found official legal URLs but also reported 403 behavior through
       curl for at least one route. Verify through browser/ZenRows before
       promoting beyond seed URL.
+
+  - source_id: japan_mlit_national_land_numerical_info
+    source_name: Japan MLIT National Land Numerical Information
+    publisher: Ministry of Land, Infrastructure, Transport and Tourism
+    geography: Japan
+    spatial_grain: municipality, mesh, zoning polygon, and land-use layer depending on file
+    time_coverage: release-dependent
+    policy_or_outcome_fields:
+      - land use
+      - zoning
+      - administrative boundaries
+      - land prices
+      - urban planning areas
+    access_format: Shape, XML, GeoJSON, and downloads
+    source_url: https://nlftp.mlit.go.jp/ksj/index.html
+    license_or_terms: MLIT National Land Numerical Information terms, verify per dataset
+    update_frequency: dataset-specific
+    rent_control_use: Japan municipal land-use, zoning, and price-control covariates for rent and housing-stock panels
+    second_order_layers:
+      - implementation_capacity
+      - quality_margin
+      - second_order_supply_response
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 160
+    verification_status: scout_reported_unverified
+    notes: >
+      APAC scout recommended this as the land-use/zoning companion to Japan
+      e-Stat Housing and Land Survey and MLIT building-starts tables.
+
+  - source_id: china_nbs_70city_housing_price_supply
+    source_name: China NBS 70-city housing price and real-estate development series
+    publisher: National Bureau of Statistics of China
+    geography: China
+    spatial_grain: 70-city, province, and national depending on table
+    time_coverage: monthly and annual series, table-dependent
+    policy_or_outcome_fields:
+      - residential price indices
+      - new and second-hand housing prices
+      - real-estate development investment
+      - floor space started
+      - floor space completed
+      - floor space sold
+    access_format: National Data portal tables, downloads/API to verify
+    source_url: https://data.stats.gov.cn/english/
+    license_or_terms: NBS terms, verify reuse and redistribution
+    update_frequency: monthly and annual
+    rent_control_use: official city housing-market proxy for Chinese top-1000 cities where rent data are not public
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 161
+    verification_status: scout_reported_unverified
+    notes: >
+      APAC scout flagged this as a price/supply proxy, not observed rent. Keep
+      it separate from rent-transaction layers in readiness scoring.
+
+  - source_id: india_nhb_residex_city_hpi
+    source_name: India NHB RESIDEX city housing price indices
+    publisher: National Housing Bank
+    geography: India
+    spatial_grain: city and assessment/market-price series
+    time_coverage: quarterly, table-dependent
+    policy_or_outcome_fields:
+      - housing price index
+      - assessment price index
+      - market price index
+      - city geography
+    access_format: web tables and exportable Excel, verify current bulk URL
+    source_url: https://residex.nhbonline.org.in/
+    license_or_terms: National Housing Bank terms, verify reuse
+    update_frequency: quarterly
+    rent_control_use: official Indian city housing-price proxy for rent-control donor pools and affordability controls
+    second_order_layers:
+      - first_order_price_or_transfer
+      - macro_feedback
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 162
+    verification_status: scout_reported_unverified
+    notes: >
+      APAC scout ranked this ahead of CPI-IW housing/rent parsing because
+      RESIDEX is cleaner and city-grained, though it is not observed rent.
+
+  - source_id: dane_ipc_city_rent_items
+    source_name: DANE IPC city rent and housing items
+    publisher: Departamento Administrativo Nacional de Estadistica
+    geography: Colombia
+    spatial_grain: CPI city, month, COICOP division/group/item
+    time_coverage: monthly annexes, 2019-01 through 2026-05 landed
+    policy_or_outcome_fields:
+      - rent index
+      - housing CPI items
+      - item weights
+      - monthly variation
+      - city
+    access_format: DANE historical IPC page with monthly Excel annex downloads
+    source_url: https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/ipc-historico
+    license_or_terms: public DANE citation terms, verify per download
+    update_frequency: monthly
+    rent_control_use: official Colombian city rent-index layer paired with ELIC/CEED supply and Ley 820 treatment overlay
+    second_order_layers:
+      - first_order_price_or_transfer
+    top_1000_scalability: medium
+    ingestion_difficulty: medium
+    immediate_payoff_rank: 163
+    verification_status: endpoint_verified
+    notes: >
+      Official DANE IPC historical page exposes monthly annex workbooks.
+      The landed builder parses sheets 4, 5, and 6 where available for the
+      city-by-division housing/rent-adjacent CPI layer, retaining workbook URL,
+      workbook sha256, monthly/year-to-date/annual variations, unmatched city
+      flags, and GHSL top-1000 matches. Landed artifact covers 2,047 rows,
+      24 DANE city labels, and 9 matched Colombian top-1000 cities for
+      2019-01 through 2026-05.
+
+  - source_id: sweden_scb_municipal_housing_pxweb
+    source_name: Statistics Sweden municipal housing PXWeb tables
+    publisher: Statistics Sweden
+    geography: Sweden, landed Stockholm and Gothenburg top-1000 cities
+    spatial_grain: municipality-year by table, building type, tenure, and rent statistic
+    time_coverage: 1990-2025 across landed tables
+    policy_or_outcome_fields:
+      - dwelling stock
+      - dwelling type
+      - tenure
+      - completed new dwellings
+      - annual/average rent per square metre
+    access_format: PXWeb Open Data API
+    source_url: https://www.scb.se/en/services/open-data-api/
+    license_or_terms: Statistics Sweden open data terms, CC0 where applicable, verify per table
+    update_frequency: annual
+    rent_control_use: Stockholm and Swedish donor-city rent, stock, and supply layer paired with queue statistics
+    second_order_layers:
+      - first_order_price_or_transfer
+      - second_order_supply_response
+      - distributional_incidence
+      - quality_margin
+    top_1000_scalability: medium
+    ingestion_difficulty: low
+    immediate_payoff_rank: 164
+    verification_status: endpoint_verified
+    notes: >
+      Official SCB PXWeb endpoints landed from tables
+      BO/BO0101/BO0101A/LghReHtypUfAr, BO/BO0104/BO0104D/BO0104T04, and
+      BO/BO0406/BO0406E/BO0406Tab01. Artifact covers 1,652 rows for
+      Stockholm SCB code 0180 and Gothenburg/Goteborg code 1480, including
+      420 completed-dwelling rows, 1,152 dwelling-stock rows, 80 municipal
+      rent-per-square-metre rows, table update timestamps, and GHSL top-1000
+      matches.

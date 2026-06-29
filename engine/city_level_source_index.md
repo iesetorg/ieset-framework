@@ -4,24 +4,24 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 
 ## Summary
 
-- Sources indexed: 110
+- Sources indexed: 115
 - Ingestion waves: 7
 - Primary axis: `regulatory.housing_rent_control`
 - Preferred city anchor: `ghsl_urban_centre_database`
-- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 7, "scout_reported_unverified": 66, "seed_unverified_url": 7, "seed_verified_official_page": 29}`
-- Ingestion difficulty: `{"high": 14, "low": 30, "medium": 66}`
-- Top-1000 scalability: `{"high": 11, "low": 59, "medium": 40}`
+- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 18, "scout_reported_unverified": 64, "seed_unverified_url": 6, "seed_verified_official_page": 26}`
+- Ingestion difficulty: `{"high": 14, "low": 33, "medium": 68}`
+- Top-1000 scalability: `{"high": 11, "low": 59, "medium": 45}`
 
 ## Most Covered Layers
 
-- `distributional_incidence` (44)
-- `first_order_price_or_transfer` (39)
-- `implementation_capacity` (36)
-- `second_order_supply_response` (33)
-- `quality_margin` (29)
-- `first_order_policy_effect` (21)
+- `first_order_price_or_transfer` (44)
+- `distributional_incidence` (42)
+- `implementation_capacity` (37)
+- `second_order_supply_response` (37)
+- `quality_margin` (31)
+- `first_order_policy_effect` (20)
+- `macro_feedback` (14)
 - `dynamic_investment_response` (13)
-- `macro_feedback` (12)
 - `allocation_distortion` (11)
 - `externality_or_spillover` (5)
 - `leakage_or_substitution` (4)
@@ -35,10 +35,10 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 | --- | --- | ---: | --- |
 | `city_spine_v0` | in_progress | 10 | - |
 | `us_rent_control_pilot_v0` | in_progress | 15 | st_paul_rent_control_2021, sf_rent_control_1994, nyc_rent_stabilisation |
-| `europe_rent_control_pilot_v0` | scout_reported_needs_verification | 16 | berlin_mietendeckel_2020, stockholm_rent_queue, spain_housing_law_12_2023, uk_renters_rights_act_2025 |
-| `lac_municipal_housing_v0` | scout_reported_needs_verification | 18 | mexico_city_housing_policy_panel, sao_paulo_municipal_housing_policy_panel, bogota_affordability_quality_case, santiago_supply_response_panel |
-| `apac_city_housing_v0` | scout_reported_needs_verification | 14 | korea_housing_lease_protection_act_city_panel, japan_city_housing_stock_rent_panel, australia_state_tenancy_law_city_panel, singapore_public_private_rental_split |
-| `africa_mena_city_housing_v0` | scout_reported_needs_verification | 21 | dubai_rental_index_case, riyadh_jeddah_rent_indicator_panel, cape_town_zoning_permit_case, south_africa_municipal_housing_service_panel |
+| `europe_rent_control_pilot_v0` | in_progress | 17 | berlin_mietendeckel_2020, stockholm_rent_queue, spain_housing_law_12_2023, uk_renters_rights_act_2025 |
+| `lac_municipal_housing_v0` | in_progress | 19 | mexico_city_housing_policy_panel, sao_paulo_municipal_housing_policy_panel, bogota_affordability_quality_case, santiago_supply_response_panel |
+| `apac_city_housing_v0` | in_progress | 17 | korea_housing_lease_protection_act_city_panel, japan_city_housing_stock_rent_panel, australia_state_tenancy_law_city_panel, singapore_public_private_rental_split |
+| `africa_mena_city_housing_v0` | in_progress | 21 | dubai_rental_index_case, riyadh_jeddah_rent_indicator_panel, cape_town_zoning_permit_case, south_africa_municipal_housing_service_panel |
 | `local_policy_event_registry_v0` | schema_design_ready | 5 | - |
 
 ## Top Ingestion Candidates
@@ -62,12 +62,12 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 | 15 | `national_zoning_atlas` | United States | high | scout_reported_unverified | zoning and supply-restriction control/treatment layer |
 | 16 | `grounded_solutions_inclusionary_housing` | United States | high | scout_reported_unverified | adjacent housing-policy event source and local policy controls |
 | 17 | `wharton_land_use_regulation_index` | United States | high | scout_reported_unverified | zoning restrictiveness control for U.S. rent-control donor pools |
-| 18 | `uk_mhclg_house_building_live_tables` | England and UK tables depending on file | low | seed_verified_official_page | local supply response and donor controls for UK housing policies |
+| 18 | `uk_mhclg_house_building_live_tables` | England and UK tables depending on file | low | endpoint_verified | local supply response and donor controls for UK housing policies |
 | 19 | `nyc_open_data_housing_bundle` | New York City | medium | endpoint_verified | NYC rent-stabilization quality, stock, and leakage layers |
 | 20 | `datasf_housing_bundle` | San Francisco | medium | endpoint_verified | San Francisco 1994 expansion supply, conversion, and quality layers |
 | 21 | `berlin_mietspiegel` | Berlin | medium | seed_unverified_url | Berlin regulated-market rent benchmark around Mietendeckel |
 | 21 | `nyc_open_data_tax_benefit_regulation_bundle` | New York City | medium | endpoint_verified | NYC rent-stabilization treatment-coverage proxy and regulated-stock denominator |
-| 22 | `stockholm_bostadsformedlingen_statistics` | Stockholm region | medium | seed_unverified_url | allocation-distortion and queue-cost layer for Stockholm |
+| 22 | `stockholm_bostadsformedlingen_statistics` | Stockholm region, with landed Stockholm municipality filter | low | endpoint_verified | first-order rent-band and allocation-distortion queue-cost layer for Stockholm |
 | 23 | `spain_rental_reference_price_system` | Spain | high | seed_unverified_url | treatment intensity and first-order cap benchmark for Spain Law 12/2023 |
 | 24 | `apartment_list_rent_estimates` | United States | medium | scout_reported_unverified | alternative first-order rent panel for U.S. cities |
 | 25 | `eviction_lab_tracking_system` | selected United States metros and cities | medium | scout_reported_unverified | high-frequency tenant-protection outcome around policy changes |

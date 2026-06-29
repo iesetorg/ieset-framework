@@ -47,6 +47,96 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
                 "area_km2_2025": 1800,
                 "density_per_km2_2025": 6500,
             },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2878",
+                "city_rank_2025": 40,
+                "city_name": "Paris",
+                "country_name": "France",
+                "country_iso3": "FRA",
+                "population_2025": 11000000,
+                "area_km2_2025": 2800,
+                "density_per_km2_2025": 3900,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5071",
+                "city_rank_2025": 118,
+                "city_name": "Barcelona",
+                "country_name": "Spain",
+                "country_iso3": "ESP",
+                "population_2025": 5600000,
+                "area_km2_2025": 1100,
+                "density_per_km2_2025": 5091,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:3881",
+                "city_rank_2025": 33,
+                "city_name": "Bogota",
+                "country_name": "Colombia",
+                "country_iso3": "COL",
+                "population_2025": 10419361,
+                "area_km2_2025": 793,
+                "density_per_km2_2025": 13139,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:178",
+                "city_rank_2025": 85,
+                "city_name": "Singapore",
+                "country_name": "Singapore",
+                "country_iso3": "SGP",
+                "population_2025": 5117759,
+                "area_km2_2025": 683,
+                "density_per_km2_2025": 7493,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:345",
+                "city_rank_2025": 547,
+                "city_name": "Sembawang",
+                "country_name": "Singapore",
+                "country_iso3": "SGP",
+                "population_2025": 960308,
+                "area_km2_2025": 119,
+                "density_per_km2_2025": 8070,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:11185",
+                "city_rank_2025": 93,
+                "city_name": "Hong Kong",
+                "country_name": "China",
+                "country_iso3": None,
+                "population_2025": 4807599,
+                "area_km2_2025": 280,
+                "density_per_km2_2025": 17170,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1693",
+                "city_rank_2025": 334,
+                "city_name": "Stockholm",
+                "country_name": "Sweden",
+                "country_iso3": None,
+                "population_2025": 1543892,
+                "area_km2_2025": 240,
+                "density_per_km2_2025": 6433,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1007",
+                "city_rank_2025": 100,
+                "city_name": "Dubai",
+                "country_name": "United Arab Emirates",
+                "country_iso3": None,
+                "population_2025": 4565478,
+                "area_km2_2025": 854,
+                "density_per_km2_2025": 5346,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1142",
+                "city_rank_2025": 37,
+                "city_name": "Taipei",
+                "country_name": "Taiwan",
+                "country_iso3": None,
+                "population_2025": 9686521,
+                "area_km2_2025": 972,
+                "density_per_km2_2025": 9966,
+            },
         ]
     ).to_parquet(spine, index=False)
 
@@ -125,6 +215,224 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         ]
     ).to_parquet(nyc_reg, index=False)
 
+    catalonia_rent_contracts = tmp_path / "catalonia.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5071",
+                "year": 2025,
+                "municipality_code": "08019",
+                "avg_monthly_rent_eur": 1230.5,
+                "contracts": 1000,
+            }
+        ]
+    ).to_parquet(catalonia_rent_contracts, index=False)
+
+    france_reference = tmp_path / "france_reference.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:2878",
+                "year": 2024,
+                "zone_id": "1",
+                "reference_rent_eur_m2": 28.3,
+                "ceiling_rent_eur_m2": 34.0,
+            }
+        ]
+    ).to_parquet(france_reference, index=False)
+
+    uk_private_rents = tmp_path / "uk_private_rents.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5816",
+                "period_end_year": 2023,
+                "local_authority_code": "E09000001",
+                "bedroom_category": "all_categories",
+                "median_monthly_rent_gbp": 2159,
+            }
+        ]
+    ).to_parquet(uk_private_rents, index=False)
+
+    uk_house_building = tmp_path / "uk_house_building.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5816",
+                "fiscal_year": "2023-24",
+                "fiscal_year_start": 2023,
+                "fiscal_year_end": 2024,
+                "local_authority_code": "E09000001",
+                "all_starts": 30,
+                "all_completions": 40,
+            }
+        ]
+    ).to_parquet(uk_house_building, index=False)
+
+    colombia_dane_ipc = tmp_path / "colombia_dane_ipc.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:3881",
+                "period": "2024-05",
+                "item_name_norm": "ARRIENDO EFECTIVO",
+                "index_value": 123.4,
+            }
+        ]
+    ).to_parquet(colombia_dane_ipc, index=False)
+
+    singapore_hdb = tmp_path / "singapore_hdb.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:178",
+                "quarter": "2026-Q1",
+                "town_norm": "ANG MO KIO",
+                "flat_type": "3-RM",
+                "median_monthly_rent_sgd": 2800,
+            }
+        ]
+    ).to_parquet(singapore_hdb, index=False)
+
+    singapore_hdb_ura = tmp_path / "singapore_hdb_ura.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:345",
+                "period": "2026-05",
+                "period_start": "2026-05-01",
+                "period_end": "2026-05-31",
+                "source_dataset_key": "hdb_approval",
+                "town_norm": "SEMBAWANG",
+                "flat_type": "4-ROOM",
+                "project_name_norm": None,
+                "postal_district": None,
+                "monthly_rent_sgd": 3200,
+                "rental_contracts": None,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:178",
+                "period": "2026-Q1",
+                "period_start": "2026-01-01",
+                "period_end": "2026-03-31",
+                "source_dataset_key": "ura_private_non_landed",
+                "town_norm": None,
+                "flat_type": None,
+                "project_name_norm": "AMBER PARK",
+                "postal_district": 15,
+                "monthly_rent_sgd": None,
+                "rental_contracts": 28,
+            },
+        ]
+    ).to_parquet(singapore_hdb_ura, index=False)
+
+    hong_kong_rvd = tmp_path / "hong_kong_rvd.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:11185",
+                "year": 2025,
+                "measure": "rental_index",
+                "value": 196.7,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:11185",
+                "year": 2025,
+                "measure": "completions",
+                "value": 25000,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:11185",
+                "year": 2025,
+                "measure": "vacancy_rate",
+                "value": 0.043,
+            },
+        ]
+    ).to_parquet(hong_kong_rvd, index=False)
+
+    stockholm_queue = tmp_path / "stockholm_queue.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1693",
+                "year": 2025,
+                "queue_name": "Bostadskön",
+                "measure": "rent_band_count",
+                "allocated_dwellings": 1455,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1693",
+                "year": 2025,
+                "queue_name": "Bostadskön",
+                "measure": "queue_time_band_count",
+                "allocated_dwellings": 722,
+            },
+        ]
+    ).to_parquet(stockholm_queue, index=False)
+
+    sweden_scb = tmp_path / "sweden_scb.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1693",
+                "year": 2025,
+                "measure": "municipal_rent_per_sqm",
+                "value": 1734,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1693",
+                "year": 2025,
+                "measure": "completed_new_dwellings",
+                "value": 1200,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1693",
+                "year": 2025,
+                "measure": "dwelling_stock",
+                "value": 500000,
+            },
+        ]
+    ).to_parquet(sweden_scb, index=False)
+
+    dubai_data = tmp_path / "dubai_data.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1007",
+                "period": "2026-01",
+                "source_dataset_key": "residential_rent_price_index",
+                "segment_norm": "RRPI GENERAL INDEX",
+                "housing_supply_relevant": False,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1007",
+                "period": "2026-01",
+                "source_dataset_key": "building_permits",
+                "segment_norm": "NUMBER",
+                "housing_supply_relevant": True,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1007",
+                "period": "2026-01",
+                "source_dataset_key": "completed_buildings",
+                "segment_norm": "NUMBER",
+                "housing_supply_relevant": True,
+            },
+        ]
+    ).to_parquet(dubai_data, index=False)
+
+    taiwan_moi = tmp_path / "taiwan_moi.parquet"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1142",
+                "period": "2026-05",
+                "municipality_name_en": "Taipei",
+                "total_rent_ntd": 9300,
+            }
+        ]
+    ).to_parquet(taiwan_moi, index=False)
+
     inputs = {
         "city_spine": spine,
         "zillow_rent": zillow,
@@ -133,6 +441,18 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         "datasf_quality": sf_quality,
         "nyc_regulation_proxy": nyc_reg,
         "acs_incidence": tmp_path / "missing_acs.parquet",
+        "catalonia_rent_contracts": catalonia_rent_contracts,
+        "france_reference_rents": france_reference,
+        "uk_private_rents": uk_private_rents,
+        "uk_house_building": uk_house_building,
+        "colombia_dane_ipc_city_rent": colombia_dane_ipc,
+        "singapore_hdb_median_rent": singapore_hdb,
+        "singapore_hdb_ura_rentals": singapore_hdb_ura,
+        "hong_kong_rvd_private_domestic": hong_kong_rvd,
+        "stockholm_bostadsformedlingen_queue": stockholm_queue,
+        "sweden_scb_municipal_housing": sweden_scb,
+        "dubai_data_housing": dubai_data,
+        "taiwan_moi_rental_transactions": taiwan_moi,
     }
     matrix, stats = readiness_builder.build_matrix(inputs)
 
@@ -147,8 +467,92 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
     assert sf["census_permit_total_units"] == 100
 
     london = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:5816")].iloc[0]
-    assert london["rent_control_readiness_tier"] == "spine_only"
+    assert london["uk_private_rent_rows"] == 1
+    assert london["uk_house_building_rows"] == 1
+    assert london["first_order_rent_layer"]
+    assert london["supply_response_layer"]
+    assert london["rent_control_readiness_tier"] == "rent_supply_ready"
+
+    paris = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:2878")].iloc[0]
+    assert paris["france_reference_rent_rows"] == 1
+    assert not paris["first_order_rent_layer"]
+    assert paris["regulated_stock_or_rent_board_layer"]
+    assert paris["rent_control_readiness_tier"] == "partial_local_outcome"
+
+    barcelona = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:5071")].iloc[0]
+    assert barcelona["catalonia_rent_contract_rows"] == 1
+    assert barcelona["catalonia_rent_contract_years"] == 1
+    assert barcelona["catalonia_rent_contract_total_contracts"] == 1000
+    assert barcelona["first_order_rent_layer"]
+    assert barcelona["rent_control_readiness_tier"] == "rent_only"
+
+    bogota = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:3881")].iloc[0]
+    assert bogota["colombia_dane_ipc_rent_rows"] == 1
+    assert bogota["colombia_dane_ipc_rent_months"] == 1
+    assert bogota["first_order_rent_layer"]
+    assert bogota["rent_control_readiness_tier"] == "rent_only"
+
+    singapore = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:178")].iloc[0]
+    assert singapore["singapore_hdb_median_rent_rows"] == 1
+    assert singapore["singapore_hdb_median_rent_quarters"] == 1
+    assert singapore["singapore_hdb_ura_rental_rows"] == 1
+    assert singapore["singapore_ura_private_rent_projects"] == 1
+    assert singapore["singapore_ura_private_rental_contracts"] == 28
+    assert singapore["first_order_rent_layer"]
+    assert singapore["rent_control_readiness_tier"] == "rent_only"
+
+    sembawang = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:345")].iloc[0]
+    assert sembawang["singapore_hdb_ura_rental_rows"] == 1
+    assert sembawang["singapore_hdb_approval_rows"] == 1
+    assert sembawang["singapore_hdb_approval_towns"] == 1
+    assert sembawang["first_order_rent_layer"]
+    assert sembawang["rent_control_readiness_tier"] == "rent_only"
+
+    hong_kong = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:11185")].iloc[0]
+    assert hong_kong["hong_kong_rvd_rental_index_rows"] == 1
+    assert hong_kong["hong_kong_rvd_supply_rows"] == 2
+    assert hong_kong["first_order_rent_layer"]
+    assert hong_kong["supply_response_layer"]
+    assert hong_kong["rent_control_readiness_tier"] == "rent_supply_ready"
+
+    stockholm = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:1693")].iloc[0]
+    assert stockholm["stockholm_queue_rent_band_rows"] == 1
+    assert stockholm["stockholm_queue_time_band_rows"] == 1
+    assert stockholm["stockholm_queue_allocated_dwellings"] == 1455
+    assert stockholm["sweden_scb_rent_rows"] == 1
+    assert stockholm["sweden_scb_completion_rows"] == 1
+    assert stockholm["sweden_scb_stock_rows"] == 1
+    assert stockholm["sweden_scb_completed_new_dwellings"] == 1200
+    assert stockholm["first_order_rent_layer"]
+    assert stockholm["supply_response_layer"]
+    assert stockholm["regulated_stock_or_rent_board_layer"]
+    assert stockholm["rent_control_core_layer_count"] == 3
+    assert stockholm["rent_control_readiness_tier"] == "rent_supply_ready"
+
+    dubai = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:1007")].iloc[0]
+    assert dubai["dubai_rent_index_rows"] == 1
+    assert dubai["dubai_rent_index_segments"] == 1
+    assert dubai["dubai_housing_supply_rows"] == 2
+    assert dubai["dubai_building_permit_rows"] == 1
+    assert dubai["dubai_completed_building_rows"] == 1
+    assert dubai["first_order_rent_layer"]
+    assert dubai["supply_response_layer"]
+    assert dubai["rent_control_readiness_tier"] == "rent_supply_ready"
+
+    taipei = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:1142")].iloc[0]
+    assert taipei["taiwan_moi_rental_rows"] == 1
+    assert taipei["taiwan_moi_rental_months"] == 1
+    assert taipei["taiwan_moi_rental_municipalities"] == 1
+    assert taipei["taiwan_moi_rental_total_rent_ntd"] == 9300
+    assert taipei["first_order_rent_layer"]
+    assert taipei["rent_control_readiness_tier"] == "rent_only"
+
     assert stats["tier_counts"]["case_ready_local_panel"] == 2
+    assert stats["tier_counts"]["rent_supply_ready"] == 4
+    assert stats["tier_counts"]["rent_only"] == 5
+    assert stats["layer_counts"]["first_order_rent_layer"] == 11
+    assert stats["layer_counts"]["supply_response_layer"] == 6
+    assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 4
     assert stats["missing_optional_inputs"] == ["acs_incidence"]
 
     output = tmp_path / "readiness.parquet"
@@ -158,6 +562,8 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         output,
         tmp_path / "manifests",
         datetime(2026, 6, 28, tzinfo=timezone.utc),
+        tmp_path / "summary.json",
+        tmp_path / "summary.md",
     )
     assert output.exists()
     assert output.with_suffix(".csv").exists()

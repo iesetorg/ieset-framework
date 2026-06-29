@@ -33,6 +33,16 @@ waves:
       - data/derived/city_policy_test_readiness_matrix.parquet
       - data/manifests/fetch_run_2026-06-28T160329Z_city_spine.yaml
       - data/manifests/fetch_run_2026-06-28T191500Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T000000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T010000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T030000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T040000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T060000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T080000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T100000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T120000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T140000Z_city_policy_test_readiness.yaml
+      - data/manifests/fetch_run_2026-06-29T160000Z_city_policy_test_readiness.yaml
     acceptance_checks:
       - GHSL R2024A urban-centre IDs are preserved.
       - Top-1000 ranking rule and population year are written into manifest.
@@ -92,7 +102,7 @@ waves:
 
   - wave_id: europe_rent_control_pilot_v0
     objective: Build donor pools and direct local layers for Berlin, Stockholm, Spain, and UK housing cases.
-    status: scout_reported_needs_verification
+    status: in_progress
     source_ids:
       - eurostat_cities_urban_audit
       - uk_mhclg_house_building_live_tables
@@ -105,6 +115,7 @@ waves:
       - catalonia_housing_open_data_bundle
       - stockholm_bostadsformedlingen_statistics
       - nordic_municipal_housing_stats
+      - sweden_scb_municipal_housing_pxweb
       - spain_rental_reference_price_system
       - italy_omi_quotations
       - portugal_ine_municipal_rents
@@ -117,16 +128,39 @@ waves:
       - uk_renters_rights_act_2025
     expected_outputs:
       - data/derived/europe_city_housing_supply_panel.parquet
+      - data/derived/uk_ons_voa_private_rents_panel.parquet
+      - data/derived/uk_mhclg_house_building_panel.parquet
+      - data/derived/france_reference_rents_panel.parquet
+      - data/derived/catalonia_rent_contracts_panel.parquet
       - data/derived/berlin_rent_control_case_panel.parquet
-      - data/derived/stockholm_queue_case_panel.parquet
+      - data/derived/stockholm_bostadsformedlingen_queue_panel.parquet
+    landed_outputs:
+      - data/derived/uk_ons_voa_private_rents_panel.parquet
+      - data/derived/uk_mhclg_house_building_panel.parquet
+      - data/derived/france_reference_rents_panel.parquet
+      - data/derived/catalonia_rent_contracts_panel.parquet
+      - data/derived/stockholm_bostadsformedlingen_queue_panel.parquet
+      - data/derived/sweden_scb_municipal_housing_panel.parquet
+      - data/manifests/fetch_run_2026-06-29T000000Z_uk_ons_voa_private_rents.yaml
+      - data/manifests/fetch_run_2026-06-29T020000Z_uk_mhclg_house_building.yaml
+      - data/manifests/fetch_run_2026-06-29T110000Z_france_reference_rents.yaml
+      - data/manifests/fetch_run_2026-06-29T150000Z_catalonia_rent_contracts.yaml
+      - data/manifests/fetch_run_2026-06-29T170000Z_stockholm_bostadsformedlingen_queue.yaml
+      - data/manifests/fetch_run_2026-06-29T190000Z_sweden_scb_municipal_housing.yaml
     acceptance_checks:
       - Berlin rent benchmark/listing data are separated from treatment-event coding.
+      - UK PRMS rows retain ONS local-authority codes, bedroom categories, rent-count distributions, and the ONS comparability caveat.
+      - UK MHCLG supply rows retain current ONS local-authority codes, starts/completions by tenure, rounded-table caveat, and GHSL match flags.
+      - France reference-rent rows retain legal rent floors, reference rents, ceilings, dwelling cells, zones, and GHSL match flags.
+      - Stockholm queue rows retain rent bands, queue-time bands, queue names, endpoint paths, filters, and GHSL match flags.
+      - Sweden SCB rows retain municipality codes, table paths, building type, tenure, rent statistic, source timestamps, and GHSL match flags.
+      - Catalonia rent-contract rows retain municipality codes and GHSL match flags.
       - Stockholm queue years are modeled as allocation-distortion outcomes.
       - Spain stressed-market declarations and cap formulas are coded as events.
 
   - wave_id: lac_municipal_housing_v0
     objective: Use high-coverage municipal outcome systems to scale LAC city coverage.
-    status: scout_reported_needs_verification
+    status: in_progress
     source_ids:
       - mexico_sniiv_sedatu
       - ibge_munic
@@ -134,6 +168,7 @@ waves:
       - inegi_cpv_scince
       - dane_elic
       - dane_ceed
+      - dane_ipc_city_rent_items
       - chile_ine_building_permits
       - peru_inei_renamu
       - peru_inei_census_redatam
@@ -155,14 +190,20 @@ waves:
       - data/derived/lac_municipal_housing_supply_panel.parquet
       - data/derived/lac_municipal_policy_instruments_panel.parquet
       - data/derived/lac_city_housing_baselines.parquet
+      - data/derived/colombia_dane_ipc_city_rent_panel.parquet
+    landed_outputs:
+      - data/raw/city_level/dane_ipc_annexes/manifest_2026-06-29.json
+      - data/derived/colombia_dane_ipc_city_rent_panel.parquet
+      - data/manifests/fetch_run_2026-06-29T130000Z_colombia_dane_ipc_city_rent.yaml
     acceptance_checks:
       - Codebooks confirm rent, tenure, and housing-quality variables before promotion.
       - Municipal IDs crosswalk to GHSL urban centres with population shares.
+      - DANE IPC city housing/rent rows retain city, item code/name, monthly/year-to-date/annual variations, workbook provenance, and GHSL match flags.
       - Scout-reported current-through dates are rechecked at fetch time.
 
   - wave_id: apac_city_housing_v0
     objective: Build city/district rent and supply panels for high-payoff APAC systems.
-    status: scout_reported_needs_verification
+    status: in_progress
     source_ids:
       - korea_molit_rtms_rent_api
       - korea_housing_lease_protection_act
@@ -173,10 +214,13 @@ waves:
       - singapore_hdb_ura_rentals
       - philippines_psa_openstat_housing_permits
       - india_cpi_iw_nhb_residex
+      - india_nhb_residex_city_hpi
       - china_city_housing_price_supply
+      - china_nbs_70city_housing_price_supply
       - hong_kong_rvd_private_domestic_rents_supply
       - taiwan_moi_actual_price_rental_transactions
       - korea_reb_rone_rent_lease_indices
+      - japan_mlit_national_land_numerical_info
       - statsnz_building_consents_ta
     target_cases:
       - korea_housing_lease_protection_act_city_panel
@@ -187,15 +231,31 @@ waves:
       - data/derived/apac_city_rent_panel.parquet
       - data/derived/apac_city_supply_panel.parquet
       - data/derived/apac_housing_policy_events.parquet
+      - data/derived/singapore_hdb_median_rent_panel.parquet
+      - data/derived/singapore_hdb_ura_rental_panel.parquet
+      - data/derived/hong_kong_rvd_private_domestic_panel.parquet
+      - data/derived/taiwan_moi_rental_transactions_panel.parquet
+    landed_outputs:
+      - data/derived/singapore_hdb_median_rent_panel.parquet
+      - data/derived/singapore_hdb_ura_rental_panel.parquet
+      - data/derived/hong_kong_rvd_private_domestic_panel.parquet
+      - data/derived/taiwan_moi_rental_transactions_panel.parquet
+      - data/manifests/fetch_run_2026-06-29T050000Z_singapore_hdb_median_rent.yaml
+      - data/manifests/fetch_run_2026-06-29T070000Z_singapore_hdb_ura_rentals.yaml
+      - data/manifests/fetch_run_2026-06-29T090000Z_hong_kong_rvd_private_domestic.yaml
+      - data/manifests/fetch_run_2026-06-29T230000Z_taiwan_moi_rental_transactions.yaml
     acceptance_checks:
       - API-key requirements and redistribution terms are pinned before production.
       - National policy events are not treated as municipal variation without an exposure design.
       - Rent proxies such as CPI-IW and price indices are flagged separately from observed rent transactions.
+      - Singapore HDB rows are labeled as public-housing rents and not treated as the full private-rental market.
+      - Hong Kong RVD annual rows preserve rent-index versus supply/vacancy units/rates and RVD class labels.
+      - Taiwan MOI rows retain municipality, district, official serial number, rent, area, source file, and GHSL match flags while omitting street-address fields.
       - City/district identifiers crosswalk to GHSL urban centres with population or area shares.
 
   - wave_id: africa_mena_city_housing_v0
     objective: Use direct Gulf rent datasets plus African municipal/census/building sources to widen non-OECD coverage.
-    status: scout_reported_needs_verification
+    status: in_progress
     source_ids:
       - dubai_land_department_rents
       - saudi_rega_rental_indicators
@@ -227,11 +287,15 @@ waves:
       - data/derived/mena_city_rent_panel.parquet
       - data/derived/africa_city_housing_stock_proxy_panel.parquet
       - data/derived/africa_mena_housing_policy_events.parquet
+    landed_outputs:
+      - data/derived/dubai_data_housing_panel.parquet
+      - data/manifests/fetch_run_2026-06-29T210000Z_dubai_data_housing.yaml
     acceptance_checks:
       - Arabic/English source names and city IDs are normalized with original labels preserved.
       - Direct rent contract/indicator sources are separated from CPI or price proxies.
       - Building-footprint proxies are marked as proxy-only for supply/stock claims.
       - Legal-policy sources such as UrbanLex are not promoted without source URL and effective-date coding.
+      - Dubai rows retain source dataset IDs, segment labels, residential supply flags, and GHSL match flags.
 
   - wave_id: local_policy_event_registry_v0
     objective: Create an event-dated treatment registry for rent control and adjacent tenant/housing-supply policies.

@@ -120,6 +120,78 @@ U.S. ACS place housing incidence:
 CENSUS_API_KEY=<key> python3 scripts/build_us_acs_place_housing_incidence_panel.py --years 2024 --states all
 ```
 
+Catalonia rent contracts:
+
+```bash
+python3 scripts/build_catalonia_rent_contracts_panel.py
+```
+
+France reference rents:
+
+```bash
+python3 scripts/build_france_reference_rents_panel.py
+```
+
+Stockholm Bostadsformedlingen queue and rent-band statistics:
+
+```bash
+python3 scripts/build_stockholm_bostadsformedlingen_queue_panel.py
+```
+
+Sweden SCB municipal housing:
+
+```bash
+python3 scripts/build_sweden_scb_municipal_housing_panel.py
+```
+
+Dubai Data Dubai rent index and building supply:
+
+```bash
+python3 scripts/build_dubai_data_housing_panel.py
+```
+
+Colombia DANE IPC city housing/rent variation annexes:
+
+```bash
+python3 scripts/build_colombia_dane_ipc_city_rent_panel.py --input data/raw/city_level/dane_ipc_annexes
+```
+
+Singapore HDB median rents:
+
+```bash
+python3 scripts/build_singapore_hdb_median_rent_panel.py
+```
+
+Singapore HDB approvals and URA private rents:
+
+```bash
+python3 scripts/build_singapore_hdb_ura_rental_panel.py
+```
+
+Hong Kong RVD private domestic rents and supply:
+
+```bash
+python3 scripts/build_hong_kong_rvd_private_domestic_panel.py
+```
+
+Taiwan MOI rental transactions:
+
+```bash
+python3 scripts/build_taiwan_moi_rental_transactions_panel.py
+```
+
+UK ONS/VOA private rents:
+
+```bash
+python3 scripts/build_uk_ons_voa_private_rents_panel.py --input data/raw/city_level/privaterentalmarketstatistics231220.xls
+```
+
+UK MHCLG house building starts/completions:
+
+```bash
+python3 scripts/build_uk_mhclg_house_building_panel.py --input data/raw/city_level/LiveTable253.ods
+```
+
 Top-1000 rent-control readiness matrix:
 
 ```bash
@@ -136,14 +208,52 @@ Generated outputs:
 - `data/derived/us_city_rent_control_quality_leakage_panel.parquet`
 - `data/derived/us_sf_rent_control_quality_leakage_panel.parquet`
 - `data/derived/nyc_rent_regulation_tax_benefit_panel.parquet`
+- `data/derived/uk_ons_voa_private_rents_panel.parquet`
+- `data/derived/uk_mhclg_house_building_panel.parquet`
+- `data/derived/singapore_hdb_median_rent_panel.parquet`
+- `data/derived/singapore_hdb_ura_rental_panel.parquet`
+- `data/derived/hong_kong_rvd_private_domestic_panel.parquet`
+- `data/derived/taiwan_moi_rental_transactions_panel.parquet`
+- `data/derived/france_reference_rents_panel.parquet`
+- `data/derived/stockholm_bostadsformedlingen_queue_panel.parquet`
+- `data/derived/sweden_scb_municipal_housing_panel.parquet`
+- `data/derived/dubai_data_housing_panel.parquet`
+- `data/derived/colombia_dane_ipc_city_rent_panel.parquet`
+- `data/derived/catalonia_rent_contracts_panel.parquet`
 - `engine/city_policy_test_readiness_summary.json`
 - `engine/city_policy_test_readiness_summary.md`
 - `data/manifests/fetch_run_2026-06-28T191500Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T000000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T010000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T030000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T040000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T060000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T080000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T100000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T120000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T140000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T160000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T180000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T200000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T220000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T233000Z_city_policy_test_readiness.yaml`
 - `data/manifests/fetch_run_2026-06-28T160547Z_zillow_city_rent.yaml`
 - `data/manifests/fetch_run_2026-06-28T161430Z_census_bps_city_permits.yaml`
 - `data/manifests/fetch_run_2026-06-28T162430Z_nyc_housing_quality_supply.yaml`
 - `data/manifests/fetch_run_2026-06-28T171500Z_datasf_housing_quality_supply.yaml`
 - `data/manifests/fetch_run_2026-06-28T182500Z_nyc_rent_regulation_tax_benefits.yaml`
+- `data/manifests/fetch_run_2026-06-29T000000Z_uk_ons_voa_private_rents.yaml`
+- `data/manifests/fetch_run_2026-06-29T020000Z_uk_mhclg_house_building.yaml`
+- `data/manifests/fetch_run_2026-06-29T050000Z_singapore_hdb_median_rent.yaml`
+- `data/manifests/fetch_run_2026-06-29T070000Z_singapore_hdb_ura_rentals.yaml`
+- `data/manifests/fetch_run_2026-06-29T090000Z_hong_kong_rvd_private_domestic.yaml`
+- `data/manifests/fetch_run_2026-06-29T230000Z_taiwan_moi_rental_transactions.yaml`
+- `data/manifests/fetch_run_2026-06-29T110000Z_france_reference_rents.yaml`
+- `data/manifests/fetch_run_2026-06-29T170000Z_stockholm_bostadsformedlingen_queue.yaml`
+- `data/manifests/fetch_run_2026-06-29T190000Z_sweden_scb_municipal_housing.yaml`
+- `data/manifests/fetch_run_2026-06-29T210000Z_dubai_data_housing.yaml`
+- `data/manifests/fetch_run_2026-06-29T130000Z_colombia_dane_ipc_city_rent.yaml`
+- `data/manifests/fetch_run_2026-06-29T150000Z_catalonia_rent_contracts.yaml`
 
 Expected after a Census API key-backed run:
 
@@ -180,7 +290,7 @@ Run these after editing the catalog or queue:
 ```bash
 python3 scripts/validate_city_level_sources.py
 python3 scripts/generate_city_level_source_index.py
-python3 -m pytest tests/test_city_level_sources.py tests/test_city_spine_builder.py tests/test_city_policy_test_readiness_matrix.py tests/test_us_zillow_city_rent_panel.py tests/test_us_census_bps_city_permits_panel.py tests/test_nyc_open_data_housing_quality_panel.py tests/test_nyc_rent_regulation_tax_benefit_panel.py tests/test_datasf_housing_quality_panel.py tests/test_us_acs_place_housing_incidence_panel.py
+python3 -m pytest tests/test_city_level_sources.py tests/test_city_spine_builder.py tests/test_city_policy_test_readiness_matrix.py tests/test_catalonia_rent_contracts_panel.py tests/test_france_reference_rents_panel.py tests/test_stockholm_bostadsformedlingen_queue_panel.py tests/test_sweden_scb_municipal_housing_panel.py tests/test_dubai_data_housing_panel.py tests/test_colombia_dane_ipc_city_rent_panel.py tests/test_singapore_hdb_median_rent_panel.py tests/test_singapore_hdb_ura_rental_panel.py tests/test_hong_kong_rvd_private_domestic_panel.py tests/test_taiwan_moi_rental_transactions_panel.py tests/test_uk_ons_voa_private_rents_panel.py tests/test_uk_mhclg_house_building_panel.py tests/test_us_zillow_city_rent_panel.py tests/test_us_census_bps_city_permits_panel.py tests/test_nyc_open_data_housing_quality_panel.py tests/test_nyc_rent_regulation_tax_benefit_panel.py tests/test_datasf_housing_quality_panel.py tests/test_us_acs_place_housing_incidence_panel.py
 ```
 
 Generated outputs:

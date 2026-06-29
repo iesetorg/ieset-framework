@@ -93,12 +93,31 @@ Start with cases that already appear in IESET hypotheses and positions:
 9. `uk_mhclg_house_building_live_tables`: district-level supply.
 10. `nyc_open_data_housing_bundle`: NYC quality/supply/leakage.
 11. `datasf_housing_bundle`: San Francisco quality/supply/leakage.
-12. `stockholm_bostadsformedlingen_statistics`: queue costs.
+12. `stockholm_bostadsformedlingen_statistics`: Stockholm queue costs and rent-band counts landed from official JSON endpoints.
+13. `dane_ipc_city_rent_items`: Colombia city housing/rent CPI variation layer landed from official DANE annexes.
+14. `singapore_hdb_ura_rentals`: HDB median rents, HDB approval rents, and URA private non-landed rent distributions landed.
+15. `hong_kong_rvd_private_domestic_rents_supply`: RVD private domestic rent-index and supply/vacancy annual panel landed.
+16. `france_reference_rent_control_datasets`: Paris reference-rent legal floor/reference/ceiling cells landed from Opendatasoft export.
+17. `sweden_scb_municipal_housing_pxweb`: Stockholm and Gothenburg municipal rents, completions, and dwelling stock landed from SCB PXWeb.
+18. `dubai_land_department_rents`: Dubai residential rent-index, building permits, and completed-building supply rows landed from Data Dubai JSON endpoints.
+19. `taiwan_moi_actual_price_rental_transactions`: Taiwan current rental transaction ZIP landed for Taipei, Taichung, Kaohsiung, Tainan, and Hsinchu top-1000 matches.
 
 ## Landed artifacts
 
 - `scripts/build_city_spine_top1000.py`
 - `scripts/build_city_policy_test_readiness_matrix.py`
+- `scripts/build_catalonia_rent_contracts_panel.py`
+- `scripts/build_france_reference_rents_panel.py`
+- `scripts/build_stockholm_bostadsformedlingen_queue_panel.py`
+- `scripts/build_sweden_scb_municipal_housing_panel.py`
+- `scripts/build_dubai_data_housing_panel.py`
+- `scripts/build_colombia_dane_ipc_city_rent_panel.py`
+- `scripts/build_singapore_hdb_median_rent_panel.py`
+- `scripts/build_singapore_hdb_ura_rental_panel.py`
+- `scripts/build_hong_kong_rvd_private_domestic_panel.py`
+- `scripts/build_taiwan_moi_rental_transactions_panel.py`
+- `scripts/build_uk_ons_voa_private_rents_panel.py`
+- `scripts/build_uk_mhclg_house_building_panel.py`
 - `scripts/build_us_zillow_city_rent_panel.py`
 - `scripts/build_us_census_bps_city_permits_panel.py`
 - `scripts/build_nyc_open_data_housing_quality_panel.py`
@@ -106,9 +125,19 @@ Start with cases that already appear in IESET hypotheses and positions:
 - `scripts/build_datasf_housing_quality_panel.py`
 - `scripts/build_us_acs_place_housing_incidence_panel.py`
 - `engine/city_level_research_scout_notes_2026-06-28.md`
+- `engine/city_level_research_scout_notes_2026-06-29.md`
 - `engine/city_policy_test_readiness_summary.md`
 - `tests/test_city_spine_builder.py`
 - `tests/test_city_policy_test_readiness_matrix.py`
+- `tests/test_catalonia_rent_contracts_panel.py`
+- `tests/test_france_reference_rents_panel.py`
+- `tests/test_colombia_dane_ipc_city_rent_panel.py`
+- `tests/test_singapore_hdb_median_rent_panel.py`
+- `tests/test_singapore_hdb_ura_rental_panel.py`
+- `tests/test_hong_kong_rvd_private_domestic_panel.py`
+- `tests/test_taiwan_moi_rental_transactions_panel.py`
+- `tests/test_uk_ons_voa_private_rents_panel.py`
+- `tests/test_uk_mhclg_house_building_panel.py`
 - `tests/test_us_zillow_city_rent_panel.py`
 - `tests/test_us_census_bps_city_permits_panel.py`
 - `tests/test_nyc_open_data_housing_quality_panel.py`
@@ -118,11 +147,41 @@ Start with cases that already appear in IESET hypotheses and positions:
 - `data/derived/city_universe_top1000.parquet`
 - `data/derived/city_crosswalks.parquet`
 - `data/derived/city_policy_test_readiness_matrix.parquet`
+- `data/manifests/fetch_run_2026-06-29T000000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T010000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T030000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T040000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T060000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T080000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T100000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T120000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T140000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T160000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T233000Z_city_policy_test_readiness.yaml`
 - `data/derived/us_city_rent_panel.parquet`
 - `data/derived/us_city_permits_panel.parquet`
 - `data/derived/us_city_rent_control_quality_leakage_panel.parquet`
 - `data/derived/nyc_rent_regulation_tax_benefit_panel.parquet`
 - `data/derived/us_sf_rent_control_quality_leakage_panel.parquet`
+- `data/derived/uk_ons_voa_private_rents_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T000000Z_uk_ons_voa_private_rents.yaml`
+- `data/derived/uk_mhclg_house_building_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T020000Z_uk_mhclg_house_building.yaml`
+- `data/derived/singapore_hdb_median_rent_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T050000Z_singapore_hdb_median_rent.yaml`
+- `data/derived/singapore_hdb_ura_rental_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T070000Z_singapore_hdb_ura_rentals.yaml`
+- `data/derived/hong_kong_rvd_private_domestic_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T090000Z_hong_kong_rvd_private_domestic.yaml`
+- `data/derived/taiwan_moi_rental_transactions_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T230000Z_taiwan_moi_rental_transactions.yaml`
+- `data/derived/france_reference_rents_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T110000Z_france_reference_rents.yaml`
+- `data/raw/city_level/dane_ipc_annexes/manifest_2026-06-29.json`
+- `data/derived/colombia_dane_ipc_city_rent_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T130000Z_colombia_dane_ipc_city_rent.yaml`
+- `data/derived/catalonia_rent_contracts_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T150000Z_catalonia_rent_contracts.yaml`
 
 Expected after keyed ACS fetch:
 

@@ -23,6 +23,18 @@ DEFAULT_INPUTS = {
     "datasf_quality": "data/derived/us_sf_rent_control_quality_leakage_panel.parquet",
     "nyc_regulation_proxy": "data/derived/nyc_rent_regulation_tax_benefit_panel.parquet",
     "acs_incidence": "data/derived/us_acs_place_housing_incidence_panel.parquet",
+    "catalonia_rent_contracts": "data/derived/catalonia_rent_contracts_panel.parquet",
+    "france_reference_rents": "data/derived/france_reference_rents_panel.parquet",
+    "uk_private_rents": "data/derived/uk_ons_voa_private_rents_panel.parquet",
+    "uk_house_building": "data/derived/uk_mhclg_house_building_panel.parquet",
+    "colombia_dane_ipc_city_rent": "data/derived/colombia_dane_ipc_city_rent_panel.parquet",
+    "singapore_hdb_median_rent": "data/derived/singapore_hdb_median_rent_panel.parquet",
+    "singapore_hdb_ura_rentals": "data/derived/singapore_hdb_ura_rental_panel.parquet",
+    "hong_kong_rvd_private_domestic": "data/derived/hong_kong_rvd_private_domestic_panel.parquet",
+    "stockholm_bostadsformedlingen_queue": "data/derived/stockholm_bostadsformedlingen_queue_panel.parquet",
+    "sweden_scb_municipal_housing": "data/derived/sweden_scb_municipal_housing_panel.parquet",
+    "dubai_data_housing": "data/derived/dubai_data_housing_panel.parquet",
+    "taiwan_moi_rental_transactions": "data/derived/taiwan_moi_rental_transactions_panel.parquet",
 }
 
 
@@ -226,19 +238,432 @@ def add_acs(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
     return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
 
 
+def add_catalonia_rent_contracts(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "catalonia_rent_contract_rows": 0,
+        "catalonia_rent_contract_years": 0,
+        "catalonia_rent_contract_start_year": None,
+        "catalonia_rent_contract_end_year": None,
+        "catalonia_rent_contract_municipalities": 0,
+        "catalonia_rent_contract_total_contracts": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "catalonia_rent_contracts")
+    frame = frame.assign(_contracts=frame["contracts"].fillna(0))
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            catalonia_rent_contract_rows=("avg_monthly_rent_eur", "size"),
+            catalonia_rent_contract_years=("year", "nunique"),
+            catalonia_rent_contract_start_year=("year", "min"),
+            catalonia_rent_contract_end_year=("year", "max"),
+            catalonia_rent_contract_municipalities=("municipality_code", "nunique"),
+            catalonia_rent_contract_total_contracts=("_contracts", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_france_reference_rents(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "france_reference_rent_rows": 0,
+        "france_reference_rent_years": 0,
+        "france_reference_rent_start_year": None,
+        "france_reference_rent_end_year": None,
+        "france_reference_rent_zones": 0,
+        "france_reference_rent_cells": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "france_reference_rents")
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            france_reference_rent_rows=("year", "size"),
+            france_reference_rent_years=("year", "nunique"),
+            france_reference_rent_start_year=("year", "min"),
+            france_reference_rent_end_year=("year", "max"),
+            france_reference_rent_zones=("zone_id", "nunique"),
+            france_reference_rent_cells=("reference_rent_eur_m2", "size"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_uk_private_rents(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "uk_private_rent_rows": 0,
+        "uk_private_rent_years": 0,
+        "uk_private_rent_start_year": None,
+        "uk_private_rent_end_year": None,
+        "uk_private_rent_local_authorities": 0,
+        "uk_private_rent_bedroom_categories": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "uk_private_rents")
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            uk_private_rent_rows=("period_end_year", "size"),
+            uk_private_rent_years=("period_end_year", "nunique"),
+            uk_private_rent_start_year=("period_end_year", "min"),
+            uk_private_rent_end_year=("period_end_year", "max"),
+            uk_private_rent_local_authorities=("local_authority_code", "nunique"),
+            uk_private_rent_bedroom_categories=("bedroom_category", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_uk_house_building(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "uk_house_building_rows": 0,
+        "uk_house_building_years": 0,
+        "uk_house_building_start_year": None,
+        "uk_house_building_end_year": None,
+        "uk_house_building_local_authorities": 0,
+        "uk_house_building_total_starts": 0,
+        "uk_house_building_total_completions": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "uk_house_building")
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            uk_house_building_rows=("fiscal_year_start", "size"),
+            uk_house_building_years=("fiscal_year", "nunique"),
+            uk_house_building_start_year=("fiscal_year_start", "min"),
+            uk_house_building_end_year=("fiscal_year_end", "max"),
+            uk_house_building_local_authorities=("local_authority_code", "nunique"),
+            uk_house_building_total_starts=("all_starts", "sum"),
+            uk_house_building_total_completions=("all_completions", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_colombia_dane_ipc_city_rent(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "colombia_dane_ipc_rent_rows": 0,
+        "colombia_dane_ipc_rent_months": 0,
+        "colombia_dane_ipc_rent_start_period": None,
+        "colombia_dane_ipc_rent_end_period": None,
+        "colombia_dane_ipc_rent_items": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "colombia_dane_ipc_city_rent")
+    item_col = "item_name_norm" if "item_name_norm" in frame.columns else "item_name"
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            colombia_dane_ipc_rent_rows=("index_value", "size"),
+            colombia_dane_ipc_rent_months=("period", "nunique"),
+            colombia_dane_ipc_rent_start_period=("period", "min"),
+            colombia_dane_ipc_rent_end_period=("period", "max"),
+            colombia_dane_ipc_rent_items=(item_col, "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_singapore_hdb_median_rent(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "singapore_hdb_median_rent_rows": 0,
+        "singapore_hdb_median_rent_quarters": 0,
+        "singapore_hdb_median_rent_start_quarter": None,
+        "singapore_hdb_median_rent_end_quarter": None,
+        "singapore_hdb_median_rent_towns": 0,
+        "singapore_hdb_median_rent_flat_types": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "singapore_hdb_median_rent")
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            singapore_hdb_median_rent_rows=("median_monthly_rent_sgd", "size"),
+            singapore_hdb_median_rent_quarters=("quarter", "nunique"),
+            singapore_hdb_median_rent_start_quarter=("quarter", "min"),
+            singapore_hdb_median_rent_end_quarter=("quarter", "max"),
+            singapore_hdb_median_rent_towns=("town_norm", "nunique"),
+            singapore_hdb_median_rent_flat_types=("flat_type", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_singapore_hdb_ura_rentals(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "singapore_hdb_ura_rental_rows": 0,
+        "singapore_hdb_ura_rental_periods": 0,
+        "singapore_hdb_ura_rental_start_date": None,
+        "singapore_hdb_ura_rental_end_date": None,
+        "singapore_hdb_approval_rows": 0,
+        "singapore_hdb_approval_towns": 0,
+        "singapore_hdb_approval_flat_types": 0,
+        "singapore_ura_private_rent_rows": 0,
+        "singapore_ura_private_rent_projects": 0,
+        "singapore_ura_private_rent_postal_districts": 0,
+        "singapore_ura_private_rental_contracts": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "singapore_hdb_ura_rentals")
+    hdb_rows = frame["source_dataset_key"].eq("hdb_approval")
+    ura_rows = frame["source_dataset_key"].eq("ura_private_non_landed")
+    frame = frame.assign(_hdb_row=hdb_rows.astype(int), _ura_row=ura_rows.astype(int))
+    frame["_hdb_town"] = frame["town_norm"].where(hdb_rows)
+    frame["_hdb_flat_type"] = frame["flat_type"].where(hdb_rows)
+    frame["_ura_project"] = frame["project_name_norm"].where(ura_rows)
+    frame["_ura_postal_district"] = frame["postal_district"].where(ura_rows)
+    frame["_ura_contracts"] = frame["rental_contracts"].where(ura_rows).fillna(0)
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            singapore_hdb_ura_rental_rows=("period", "size"),
+            singapore_hdb_ura_rental_periods=("period", "nunique"),
+            singapore_hdb_ura_rental_start_date=("period_start", "min"),
+            singapore_hdb_ura_rental_end_date=("period_end", "max"),
+            singapore_hdb_approval_rows=("_hdb_row", "sum"),
+            singapore_hdb_approval_towns=("_hdb_town", "nunique"),
+            singapore_hdb_approval_flat_types=("_hdb_flat_type", "nunique"),
+            singapore_ura_private_rent_rows=("_ura_row", "sum"),
+            singapore_ura_private_rent_projects=("_ura_project", "nunique"),
+            singapore_ura_private_rent_postal_districts=("_ura_postal_district", "nunique"),
+            singapore_ura_private_rental_contracts=("_ura_contracts", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_hong_kong_rvd_private_domestic(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "hong_kong_rvd_rows": 0,
+        "hong_kong_rvd_years": 0,
+        "hong_kong_rvd_start_year": None,
+        "hong_kong_rvd_end_year": None,
+        "hong_kong_rvd_rental_index_rows": 0,
+        "hong_kong_rvd_supply_rows": 0,
+        "hong_kong_rvd_measures": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "hong_kong_rvd_private_domestic")
+    rent_rows = frame["measure"].eq("rental_index")
+    supply_rows = frame["measure"].isin(["completions", "stock", "take_up", "vacancy_units", "vacancy_rate"])
+    frame = frame.assign(_rental_index_row=rent_rows.astype(int), _supply_row=supply_rows.astype(int))
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            hong_kong_rvd_rows=("year", "size"),
+            hong_kong_rvd_years=("year", "nunique"),
+            hong_kong_rvd_start_year=("year", "min"),
+            hong_kong_rvd_end_year=("year", "max"),
+            hong_kong_rvd_rental_index_rows=("_rental_index_row", "sum"),
+            hong_kong_rvd_supply_rows=("_supply_row", "sum"),
+            hong_kong_rvd_measures=("measure", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_stockholm_bostadsformedlingen_queue(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "stockholm_queue_rows": 0,
+        "stockholm_queue_years": 0,
+        "stockholm_queue_start_year": None,
+        "stockholm_queue_end_year": None,
+        "stockholm_queue_queues": 0,
+        "stockholm_queue_rent_band_rows": 0,
+        "stockholm_queue_time_band_rows": 0,
+        "stockholm_queue_allocated_dwellings": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "stockholm_bostadsformedlingen_queue")
+    positive = frame["allocated_dwellings"].fillna(0).gt(0)
+    rent_rows = frame["measure"].eq("rent_band_count") & positive
+    queue_time_rows = frame["measure"].eq("queue_time_band_count") & positive
+    frame = frame.assign(
+        _rent_band_row=rent_rows.astype(int),
+        _queue_time_band_row=queue_time_rows.astype(int),
+        _rent_allocations=frame["allocated_dwellings"].where(rent_rows).fillna(0),
+    )
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            stockholm_queue_rows=("year", "size"),
+            stockholm_queue_years=("year", "nunique"),
+            stockholm_queue_start_year=("year", "min"),
+            stockholm_queue_end_year=("year", "max"),
+            stockholm_queue_queues=("queue_name", "nunique"),
+            stockholm_queue_rent_band_rows=("_rent_band_row", "sum"),
+            stockholm_queue_time_band_rows=("_queue_time_band_row", "sum"),
+            stockholm_queue_allocated_dwellings=("_rent_allocations", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_sweden_scb_municipal_housing(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "sweden_scb_rows": 0,
+        "sweden_scb_years": 0,
+        "sweden_scb_start_year": None,
+        "sweden_scb_end_year": None,
+        "sweden_scb_rent_rows": 0,
+        "sweden_scb_completion_rows": 0,
+        "sweden_scb_stock_rows": 0,
+        "sweden_scb_completed_new_dwellings": 0,
+        "sweden_scb_dwelling_stock_observations": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "sweden_scb_municipal_housing")
+    rent_rows = frame["measure"].eq("municipal_rent_per_sqm")
+    completion_rows = frame["measure"].eq("completed_new_dwellings")
+    stock_rows = frame["measure"].eq("dwelling_stock")
+    frame = frame.assign(
+        _rent_row=rent_rows.astype(int),
+        _completion_row=completion_rows.astype(int),
+        _stock_row=stock_rows.astype(int),
+        _completed_new_dwellings=frame["value"].where(completion_rows).fillna(0),
+        _dwelling_stock_observation=frame["value"].where(stock_rows).fillna(0),
+    )
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            sweden_scb_rows=("year", "size"),
+            sweden_scb_years=("year", "nunique"),
+            sweden_scb_start_year=("year", "min"),
+            sweden_scb_end_year=("year", "max"),
+            sweden_scb_rent_rows=("_rent_row", "sum"),
+            sweden_scb_completion_rows=("_completion_row", "sum"),
+            sweden_scb_stock_rows=("_stock_row", "sum"),
+            sweden_scb_completed_new_dwellings=("_completed_new_dwellings", "sum"),
+            sweden_scb_dwelling_stock_observations=("_dwelling_stock_observation", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_dubai_data_housing(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "dubai_data_rows": 0,
+        "dubai_data_periods": 0,
+        "dubai_data_start_period": None,
+        "dubai_data_end_period": None,
+        "dubai_rent_index_rows": 0,
+        "dubai_rent_index_segments": 0,
+        "dubai_housing_supply_rows": 0,
+        "dubai_building_permit_rows": 0,
+        "dubai_completed_building_rows": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "dubai_data_housing")
+    rent_rows = frame["source_dataset_key"].eq("residential_rent_price_index")
+    supply_relevant = frame["housing_supply_relevant"].fillna(False).astype(bool)
+    permit_rows = frame["source_dataset_key"].eq("building_permits") & supply_relevant
+    completed_rows = frame["source_dataset_key"].eq("completed_buildings") & supply_relevant
+    frame = frame.assign(
+        _rent_row=rent_rows.astype(int),
+        _rent_segment=frame["segment_norm"].where(rent_rows),
+        _supply_row=(permit_rows | completed_rows).astype(int),
+        _permit_row=permit_rows.astype(int),
+        _completed_row=completed_rows.astype(int),
+    )
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            dubai_data_rows=("period", "size"),
+            dubai_data_periods=("period", "nunique"),
+            dubai_data_start_period=("period", "min"),
+            dubai_data_end_period=("period", "max"),
+            dubai_rent_index_rows=("_rent_row", "sum"),
+            dubai_rent_index_segments=("_rent_segment", "nunique"),
+            dubai_housing_supply_rows=("_supply_row", "sum"),
+            dubai_building_permit_rows=("_permit_row", "sum"),
+            dubai_completed_building_rows=("_completed_row", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_taiwan_moi_rental_transactions(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "taiwan_moi_rental_rows": 0,
+        "taiwan_moi_rental_months": 0,
+        "taiwan_moi_rental_start_period": None,
+        "taiwan_moi_rental_end_period": None,
+        "taiwan_moi_rental_municipalities": 0,
+        "taiwan_moi_rental_total_rent_ntd": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "taiwan_moi_rental_transactions")
+    municipality_col = "municipality_name_en" if "municipality_name_en" in frame.columns else "municipality_code"
+    frame = frame.assign(_total_rent_ntd=frame["total_rent_ntd"].fillna(0))
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            taiwan_moi_rental_rows=("period", "size"),
+            taiwan_moi_rental_months=("period", "nunique"),
+            taiwan_moi_rental_start_period=("period", "min"),
+            taiwan_moi_rental_end_period=("period", "max"),
+            taiwan_moi_rental_municipalities=(municipality_col, "nunique"),
+            taiwan_moi_rental_total_rent_ntd=("_total_rent_ntd", "sum"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
 def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
     out = matrix.copy()
-    out["first_order_rent_layer"] = out["zori_rows"].gt(0)
+    out["first_order_rent_layer"] = (
+        out["zori_rows"].gt(0)
+        | out["catalonia_rent_contract_rows"].gt(0)
+        | out["uk_private_rent_rows"].gt(0)
+        | out["colombia_dane_ipc_rent_rows"].gt(0)
+        | out["singapore_hdb_median_rent_rows"].gt(0)
+        | out["singapore_hdb_ura_rental_rows"].gt(0)
+        | out["hong_kong_rvd_rental_index_rows"].gt(0)
+        | out["stockholm_queue_rent_band_rows"].gt(0)
+        | out["sweden_scb_rent_rows"].gt(0)
+        | out["dubai_rent_index_rows"].gt(0)
+        | out["taiwan_moi_rental_rows"].gt(0)
+    )
     out["supply_response_layer"] = (
         out["census_permit_rows"].gt(0)
         | out["nyc_quality_supply_rows"].gt(0)
         | out["datasf_quality_supply_rows"].gt(0)
+        | out["uk_house_building_rows"].gt(0)
+        | out["hong_kong_rvd_supply_rows"].gt(0)
+        | out["sweden_scb_completion_rows"].gt(0)
+        | out["dubai_housing_supply_rows"].gt(0)
     )
     out["quality_or_leakage_layer"] = out["nyc_quality_rows"].gt(0) | out["datasf_quality_rows"].gt(0)
     out["regulated_stock_or_rent_board_layer"] = (
         out["nyc_regulation_proxy_rows"].gt(0)
-        | out["datasf_quality_rows"].gt(0)
-        & out["ieset_city_id"].eq("ghsl_ucdb_r2024a:1461")
+        | (out["datasf_quality_rows"].gt(0) & out["ieset_city_id"].eq("ghsl_ucdb_r2024a:1461"))
+        | out["france_reference_rent_rows"].gt(0)
+        | out["stockholm_queue_time_band_rows"].gt(0)
     )
     out["distributional_incidence_layer"] = out["acs_incidence_rows"].gt(0)
     layer_cols = [
@@ -294,6 +719,18 @@ def build_matrix(inputs: dict[str, Path]) -> tuple[pd.DataFrame, dict[str, Any]]
     matrix = add_local_quality(matrix, read_optional(inputs["datasf_quality"]), "datasf_quality", "building_permit")
     matrix = add_nyc_regulation(matrix, read_optional(inputs["nyc_regulation_proxy"]))
     matrix = add_acs(matrix, read_optional(inputs["acs_incidence"]))
+    matrix = add_catalonia_rent_contracts(matrix, read_optional(inputs["catalonia_rent_contracts"]))
+    matrix = add_france_reference_rents(matrix, read_optional(inputs["france_reference_rents"]))
+    matrix = add_uk_private_rents(matrix, read_optional(inputs["uk_private_rents"]))
+    matrix = add_uk_house_building(matrix, read_optional(inputs["uk_house_building"]))
+    matrix = add_colombia_dane_ipc_city_rent(matrix, read_optional(inputs["colombia_dane_ipc_city_rent"]))
+    matrix = add_singapore_hdb_median_rent(matrix, read_optional(inputs["singapore_hdb_median_rent"]))
+    matrix = add_singapore_hdb_ura_rentals(matrix, read_optional(inputs["singapore_hdb_ura_rentals"]))
+    matrix = add_hong_kong_rvd_private_domestic(matrix, read_optional(inputs["hong_kong_rvd_private_domestic"]))
+    matrix = add_stockholm_bostadsformedlingen_queue(matrix, read_optional(inputs["stockholm_bostadsformedlingen_queue"]))
+    matrix = add_sweden_scb_municipal_housing(matrix, read_optional(inputs["sweden_scb_municipal_housing"]))
+    matrix = add_dubai_data_housing(matrix, read_optional(inputs["dubai_data_housing"]))
+    matrix = add_taiwan_moi_rental_transactions(matrix, read_optional(inputs["taiwan_moi_rental_transactions"]))
     matrix = assign_layers(matrix)
     matrix = matrix.sort_values(
         ["rent_control_core_layer_count", "population_2025", "city_rank_2025"],
@@ -321,16 +758,26 @@ def build_matrix(inputs: dict[str, Path]) -> tuple[pd.DataFrame, dict[str, Any]]
     return matrix, stats
 
 
-def write_outputs(matrix: pd.DataFrame, stats: dict[str, Any], output_path: Path, manifest_dir: Path, fetch_ts: datetime) -> dict[str, Path | str]:
+def write_outputs(
+    matrix: pd.DataFrame,
+    stats: dict[str, Any],
+    output_path: Path,
+    manifest_dir: Path,
+    fetch_ts: datetime,
+    summary_path: Path | None = None,
+    summary_md_path: Path | None = None,
+) -> dict[str, Path | str]:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     csv_path = output_path.with_suffix(".csv")
     json_path = output_path.with_suffix(".json")
-    summary_path = ROOT / "engine" / "city_policy_test_readiness_summary.json"
-    summary_md_path = ROOT / "engine" / "city_policy_test_readiness_summary.md"
+    summary_path = summary_path or ROOT / "engine" / "city_policy_test_readiness_summary.json"
+    summary_md_path = summary_md_path or ROOT / "engine" / "city_policy_test_readiness_summary.md"
 
     matrix.to_parquet(output_path, engine="pyarrow", index=False)
     matrix.to_csv(csv_path, index=False)
     json_path.write_text(json.dumps(matrix.to_dict("records"), indent=2))
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_md_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(json.dumps(stats, indent=2))
     summary_md_path.write_text(render_summary_md(stats))
 
