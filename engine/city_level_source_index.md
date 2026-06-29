@@ -8,7 +8,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 - Ingestion waves: 7
 - Primary axis: `regulatory.housing_rent_control`
 - Preferred city anchor: `ghsl_urban_centre_database`
-- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 26, "scout_reported_unverified": 58, "seed_unverified_url": 5, "seed_verified_official_page": 25}`
+- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 27, "scout_reported_unverified": 58, "seed_unverified_url": 4, "seed_verified_official_page": 25}`
 - Ingestion difficulty: `{"high": 14, "low": 33, "medium": 68}`
 - Top-1000 scalability: `{"high": 11, "low": 59, "medium": 45}`
 
@@ -65,7 +65,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 | 18 | `uk_mhclg_house_building_live_tables` | England and UK tables depending on file | low | endpoint_verified | local supply response and donor controls for UK housing policies |
 | 19 | `nyc_open_data_housing_bundle` | New York City | medium | endpoint_verified | NYC rent-stabilization quality, stock, and leakage layers |
 | 20 | `datasf_housing_bundle` | San Francisco | medium | endpoint_verified | San Francisco 1994 expansion supply, conversion, and quality layers |
-| 21 | `berlin_mietspiegel` | Berlin | medium | seed_unverified_url | Berlin regulated-market rent benchmark around Mietendeckel |
+| 21 | `berlin_mietspiegel` | Berlin | medium | endpoint_verified | Berlin regulated-market rent benchmark around Mietendeckel |
 | 21 | `nyc_open_data_tax_benefit_regulation_bundle` | New York City | medium | endpoint_verified | NYC rent-stabilization treatment-coverage proxy and regulated-stock denominator |
 | 22 | `stockholm_bostadsformedlingen_statistics` | Stockholm region, with landed Stockholm municipality filter | low | endpoint_verified | first-order rent-band and allocation-distortion queue-cost layer for Stockholm |
 | 23 | `spain_rental_reference_price_system` | Spain | high | endpoint_verified | treatment intensity and first-order cap benchmark for Spain Law 12/2023 |

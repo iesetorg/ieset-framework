@@ -17,7 +17,7 @@
 - `first_order_rent_layer`: 94
 - `supply_response_layer`: 72
 - `quality_or_leakage_layer`: 2
-- `regulated_stock_or_rent_board_layer`: 8
+- `regulated_stock_or_rent_board_layer`: 9
 - `distributional_incidence_layer`: 0
 
 ## Case-Ready Cities

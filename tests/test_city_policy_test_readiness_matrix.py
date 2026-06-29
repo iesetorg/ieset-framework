@@ -108,6 +108,16 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
                 "density_per_km2_2025": 1889,
             },
             {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5483",
+                "city_rank_2025": 140,
+                "city_name": "Berlin",
+                "country_name": "Germany",
+                "country_iso3": "DEU",
+                "population_2025": 4400000,
+                "area_km2_2025": 1300,
+                "density_per_km2_2025": 3385,
+            },
+            {
                 "ieset_city_id": "ghsl_ucdb_r2024a:3881",
                 "city_rank_2025": 33,
                 "city_name": "Bogota",
@@ -779,6 +789,25 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         ]
     ).to_parquet(france_oll, index=False)
 
+    berlin_mietspiegel = tmp_path / "berlin_mietspiegel.parquet"
+    pd.DataFrame(
+        [
+            # Berlin: qualified rent index (legal reference) -> rent-board layer only
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5483",
+                "ghsl_match_flag": True,
+                "edition_year": 2026,
+                "net_cold_rent_mean_eur_m2": 9.4,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:5483",
+                "ghsl_match_flag": True,
+                "edition_year": 2026,
+                "net_cold_rent_mean_eur_m2": 12.1,
+            },
+        ]
+    ).to_parquet(berlin_mietspiegel, index=False)
+
     inputs = {
         "city_spine": spine,
         "zillow_rent": zillow,
@@ -807,6 +836,7 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         "italy_omi_rent": italy_omi,
         "spain_rental_reference_index": spain_reference,
         "france_oll_rent": france_oll,
+        "berlin_mietspiegel": berlin_mietspiegel,
     }
     matrix, stats = readiness_builder.build_matrix(inputs)
 
@@ -970,13 +1000,20 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
     assert lyon["first_order_rent_layer"]
     assert lyon["rent_control_readiness_tier"] == "rent_only"
 
+    # Berlin: Mietspiegel qualified rent index (legal reference) -> rent-board layer only
+    berlin = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:5483")].iloc[0]
+    assert berlin["berlin_mietspiegel_rows"] == 2
+    assert not berlin["first_order_rent_layer"]
+    assert berlin["regulated_stock_or_rent_board_layer"]
+    assert berlin["rent_control_readiness_tier"] == "partial_local_outcome"
+
     assert stats["tier_counts"]["case_ready_local_panel"] == 2
     assert stats["tier_counts"]["rent_supply_ready"] == 5
     assert stats["tier_counts"]["rent_only"] == 11
-    assert stats["tier_counts"]["partial_local_outcome"] == 3
+    assert stats["tier_counts"]["partial_local_outcome"] == 4
     assert stats["layer_counts"]["first_order_rent_layer"] == 18
     assert stats["layer_counts"]["supply_response_layer"] == 8
-    assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 5
+    assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 6
     assert stats["missing_optional_inputs"] == ["acs_incidence"]
 
     output = tmp_path / "readiness.parquet"
