@@ -8,7 +8,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 - Ingestion waves: 7
 - Primary axis: `regulatory.housing_rent_control`
 - Preferred city anchor: `ghsl_urban_centre_database`
-- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 18, "scout_reported_unverified": 64, "seed_unverified_url": 6, "seed_verified_official_page": 26}`
+- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 23, "scout_reported_unverified": 60, "seed_unverified_url": 6, "seed_verified_official_page": 25}`
 - Ingestion difficulty: `{"high": 14, "low": 33, "medium": 68}`
 - Top-1000 scalability: `{"high": 11, "low": 59, "medium": 45}`
 
@@ -48,7 +48,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 | 1 | `ghsl_urban_centre_database` | global | low | seed_verified_official_page | canonical top-1000-city universe and spatial join anchor |
 | 2 | `un_world_urbanization_prospects_city_agglomerations` | global | low | seed_verified_official_page | population-ranking cross-check for largest cities |
 | 3 | `geonames_gazetteer` | global | low | seed_verified_official_page | city alias matching and stable gazetteer IDs |
-| 4 | `eurostat_cities_urban_audit` | Europe | medium | seed_verified_official_page | comparable European city covariates and housing underlays |
+| 4 | `eurostat_cities_urban_audit` | Europe | medium | endpoint_verified | comparable European city covariates and housing underlays |
 | 5 | `oecd_regions_cities_metropolitan` | OECD and partner economies | medium | seed_verified_official_page | metro/FUA controls for high-income city panels |
 | 6 | `zillow_observed_rent_index` | United States and selected geographies exposed by Zillow | low | seed_verified_official_page | first-order market-rent panel for US city and metro cases |
 | 7 | `us_census_building_permits_survey` | United States | low | seed_verified_official_page | second-order supply response for US treated and donor cities |

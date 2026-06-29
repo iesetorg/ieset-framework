@@ -6,15 +6,15 @@
 
 ## Tiers
 
-- `spine_only`: 895
-- `rent_supply_ready`: 45
-- `rent_only`: 33
-- `partial_local_outcome`: 25
+- `spine_only`: 894
+- `rent_supply_ready`: 46
+- `rent_only`: 34
+- `partial_local_outcome`: 24
 - `case_ready_local_panel`: 2
 
 ## Layers
 
-- `first_order_rent_layer`: 80
+- `first_order_rent_layer`: 82
 - `supply_response_layer`: 72
 - `quality_or_leakage_layer`: 2
 - `regulated_stock_or_rent_board_layer`: 4

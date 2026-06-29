@@ -38,6 +38,8 @@ DEFAULT_INPUTS = {
     "eurostat_city_urban_audit": "data/derived/eurostat_city_urban_audit_panel.parquet",
     "australia_rental_bond": "data/derived/australia_rental_bond_panel.parquet",
     "nz_tenancy_rental_bond": "data/derived/nz_tenancy_rental_bond_panel.parquet",
+    "ireland_rtb_rent_index": "data/derived/ireland_rtb_rent_index_panel.parquet",
+    "portugal_ine_municipal_rents": "data/derived/portugal_ine_municipal_rents_panel.parquet",
 }
 
 
@@ -756,6 +758,68 @@ def add_nz_tenancy_rental_bond(base: pd.DataFrame, frame: pd.DataFrame | None) -
     return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
 
 
+def add_ireland_rtb_rent_index(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "ireland_rtb_rent_rows": 0,
+        "ireland_rtb_rent_years": 0,
+        "ireland_rtb_rent_start_year": None,
+        "ireland_rtb_rent_end_year": None,
+        "ireland_rtb_rent_locations": 0,
+        "ireland_rtb_rent_property_types": 0,
+        "ireland_rtb_rent_bedroom_categories": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "ireland_rtb_rent_index")
+    if frame.empty:
+        return base.assign(**columns)
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            ireland_rtb_rent_rows=("standardised_avg_rent_eur", "size"),
+            ireland_rtb_rent_years=("year", "nunique"),
+            ireland_rtb_rent_start_year=("year", "min"),
+            ireland_rtb_rent_end_year=("year", "max"),
+            ireland_rtb_rent_locations=("location_name", "nunique"),
+            ireland_rtb_rent_property_types=("property_type_label", "nunique"),
+            ireland_rtb_rent_bedroom_categories=("bedrooms_label", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
+def add_portugal_ine_municipal_rents(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "portugal_ine_rent_rows": 0,
+        "portugal_ine_rent_periods": 0,
+        "portugal_ine_rent_start_year": None,
+        "portugal_ine_rent_end_year": None,
+        "portugal_ine_rent_municipalities": 0,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    if "ghsl_match_flag" in frame.columns:
+        frame = frame[frame["ghsl_match_flag"].fillna(False).astype(bool)].copy()
+    frame = ensure_city_id(frame, "portugal_ine_municipal_rents")
+    if frame.empty:
+        return base.assign(**columns)
+    agg = (
+        frame.groupby("ieset_city_id")
+        .agg(
+            portugal_ine_rent_rows=("median_rent_eur_per_m2", "size"),
+            portugal_ine_rent_periods=("period", "nunique"),
+            portugal_ine_rent_start_year=("year", "min"),
+            portugal_ine_rent_end_year=("year", "max"),
+            portugal_ine_rent_municipalities=("municipality_name", "nunique"),
+        )
+        .reset_index()
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
 def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
     out = matrix.copy()
     out["first_order_rent_layer"] = (
@@ -773,6 +837,8 @@ def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
         | out["eurostat_rent_per_m2_rows"].gt(0)
         | out["australia_rental_bond_rows"].gt(0)
         | out["nz_rental_bond_rows"].gt(0)
+        | out["ireland_rtb_rent_rows"].gt(0)
+        | out["portugal_ine_rent_rows"].gt(0)
     )
     out["supply_response_layer"] = (
         out["census_permit_rows"].gt(0)
@@ -860,6 +926,8 @@ def build_matrix(inputs: dict[str, Path]) -> tuple[pd.DataFrame, dict[str, Any]]
     matrix = add_eurostat_city_urban_audit(matrix, read_optional(inputs["eurostat_city_urban_audit"]))
     matrix = add_australia_rental_bond(matrix, read_optional(inputs["australia_rental_bond"]))
     matrix = add_nz_tenancy_rental_bond(matrix, read_optional(inputs["nz_tenancy_rental_bond"]))
+    matrix = add_ireland_rtb_rent_index(matrix, read_optional(inputs["ireland_rtb_rent_index"]))
+    matrix = add_portugal_ine_municipal_rents(matrix, read_optional(inputs["portugal_ine_municipal_rents"]))
     matrix = assign_layers(matrix)
     matrix = matrix.sort_values(
         ["rent_control_core_layer_count", "population_2025", "city_rank_2025"],

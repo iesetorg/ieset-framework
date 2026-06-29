@@ -68,6 +68,16 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
                 "density_per_km2_2025": 5091,
             },
             {
+                "ieset_city_id": "ghsl_ucdb_r2024a:231",
+                "city_rank_2025": 215,
+                "city_name": "Lisbon",
+                "country_name": "Portugal",
+                "country_iso3": "PRT",
+                "population_2025": 2900000,
+                "area_km2_2025": 1000,
+                "density_per_km2_2025": 2900,
+            },
+            {
                 "ieset_city_id": "ghsl_ucdb_r2024a:3881",
                 "city_rank_2025": 33,
                 "city_name": "Bogota",
@@ -176,6 +186,16 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
                 "population_2025": 1400000,
                 "area_km2_2025": 870,
                 "density_per_km2_2025": 1609,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:394",
+                "city_rank_2025": 220,
+                "city_name": "Dublin",
+                "country_name": "Ireland",
+                "country_iso3": "IRL",
+                "population_2025": 1270000,
+                "area_km2_2025": 318,
+                "density_per_km2_2025": 3994,
             },
         ]
     ).to_parquet(spine, index=False)
@@ -572,6 +592,73 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         ]
     ).to_parquet(eurostat_urban_audit, index=False)
 
+    ireland_rtb = tmp_path / "ireland_rtb.parquet"
+    pd.DataFrame(
+        [
+            # Dublin: matched GHSL 394 observed RTB standardised rent -> first_order rent
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:394",
+                "ghsl_match_flag": True,
+                "location_name": "Dublin",
+                "year": 2025,
+                "property_type_label": "All property types",
+                "bedrooms_label": "All bedrooms",
+                "standardised_avg_rent_eur": 2100.5,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:394",
+                "ghsl_match_flag": True,
+                "location_name": "Dublin",
+                "year": 2024,
+                "property_type_label": "Apartment",
+                "bedrooms_label": "Two bed",
+                "standardised_avg_rent_eur": 1980.0,
+            },
+            # unmatched RTB location must be ignored
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "location_name": "Carlow",
+                "year": 2025,
+                "property_type_label": "All property types",
+                "bedrooms_label": "All bedrooms",
+                "standardised_avg_rent_eur": 1100.0,
+            },
+        ]
+    ).to_parquet(ireland_rtb, index=False)
+
+    portugal_ine = tmp_path / "portugal_ine.parquet"
+    pd.DataFrame(
+        [
+            # Lisbon: matched GHSL 231 observed new-lease median rent -> first_order rent
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:231",
+                "ghsl_match_flag": True,
+                "municipality_name": "Lisboa",
+                "period": "2023Q4",
+                "year": 2023,
+                "median_rent_eur_per_m2": 12.4,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:231",
+                "ghsl_match_flag": True,
+                "municipality_name": "Lisboa",
+                "period": "2023Q3",
+                "year": 2023,
+                "median_rent_eur_per_m2": 12.1,
+            },
+            # unmatched municipality must be ignored
+            {
+                "ieset_city_id": None,
+                "ghsl_match_flag": False,
+                "municipality_name": "Evora",
+                "period": "2023Q4",
+                "year": 2023,
+                "median_rent_eur_per_m2": 6.0,
+            },
+        ]
+    ).to_parquet(portugal_ine, index=False)
+
     inputs = {
         "city_spine": spine,
         "zillow_rent": zillow,
@@ -595,6 +682,8 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         "eurostat_city_urban_audit": eurostat_urban_audit,
         "australia_rental_bond": australia_rental_bond,
         "nz_tenancy_rental_bond": nz_rental_bond,
+        "ireland_rtb_rent_index": ireland_rtb,
+        "portugal_ine_municipal_rents": portugal_ine,
     }
     matrix, stats = readiness_builder.build_matrix(inputs)
 
@@ -722,11 +811,28 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
     assert zurich["supply_response_layer"]
     assert zurich["rent_control_readiness_tier"] == "partial_local_outcome"
 
+    # Dublin: matched RTB observed standardised rent -> first_order rent only
+    dublin = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:394")].iloc[0]
+    assert dublin["ireland_rtb_rent_rows"] == 2  # only the 2 matched Dublin rows
+    assert dublin["ireland_rtb_rent_years"] == 2
+    assert dublin["ireland_rtb_rent_locations"] == 1
+    assert dublin["first_order_rent_layer"]
+    assert not dublin["supply_response_layer"]
+    assert dublin["rent_control_readiness_tier"] == "rent_only"
+
+    # Lisbon: matched INE observed new-lease median rent -> first_order rent only
+    lisbon = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:231")].iloc[0]
+    assert lisbon["portugal_ine_rent_rows"] == 2  # only the 2 matched Lisboa rows
+    assert lisbon["portugal_ine_rent_municipalities"] == 1
+    assert lisbon["first_order_rent_layer"]
+    assert not lisbon["supply_response_layer"]
+    assert lisbon["rent_control_readiness_tier"] == "rent_only"
+
     assert stats["tier_counts"]["case_ready_local_panel"] == 2
     assert stats["tier_counts"]["rent_supply_ready"] == 5
-    assert stats["tier_counts"]["rent_only"] == 7
+    assert stats["tier_counts"]["rent_only"] == 9
     assert stats["tier_counts"]["partial_local_outcome"] == 2
-    assert stats["layer_counts"]["first_order_rent_layer"] == 14
+    assert stats["layer_counts"]["first_order_rent_layer"] == 16
     assert stats["layer_counts"]["supply_response_layer"] == 8
     assert stats["layer_counts"]["regulated_stock_or_rent_board_layer"] == 4
     assert stats["missing_optional_inputs"] == ["acs_incidence"]
