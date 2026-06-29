@@ -2,8 +2,8 @@
 
 - State rows: 54
 - Countries: 1
-- Missing optional inputs: fiscal, distributional_incidence
-- Documented gap layers (zero coverage): distributional_incidence_layer, fiscal_layer
+- Missing optional inputs: none
+- Documented gap layers (zero coverage): none
 
 ## Tiers
 
@@ -15,8 +15,8 @@
 - `minimum_wage_treatment_layer`: 54
 - `labor_outcome_layer`: 54
 - `housing_supply_price_layer`: 53
-- `fiscal_layer`: 0
-- `distributional_incidence_layer`: 0
+- `fiscal_layer`: 51
+- `distributional_incidence_layer`: 52
 
 ## Case-Ready States
 
@@ -50,9 +50,7 @@
 - `US-MD`: Maryland, United States
 - `US-NE`: Nebraska, United States
 - `US-SD`: South Dakota, United States
-- `US-VI`: U.S. Virgin Islands, United States
 - `US-IA`: Iowa, United States
-- `US-PR`: Puerto Rico, United States
 - `US-NH`: New Hampshire, United States
 - `US-VA`: Virginia, United States
 - `US-PA`: Pennsylvania, United States
@@ -73,21 +71,23 @@
 - `US-TX`: Texas, United States
 - `US-UT`: Utah, United States
 - `US-WY`: Wyoming, United States
+- `US-PR`: Puerto Rico, United States
+- `US-VI`: U.S. Virgin Islands, United States
 
 ## Closest To Case-Ready
 
-- `US-AK`: Alaska (case_ready_state_panel, binds_above_federal_years=39); missing: fiscal_layer;distributional_incidence_layer
-- `US-CT`: Connecticut (case_ready_state_panel, binds_above_federal_years=37); missing: fiscal_layer;distributional_incidence_layer
-- `US-DC`: District of Columbia (case_ready_state_panel, binds_above_federal_years=37); missing: fiscal_layer;distributional_incidence_layer
-- `US-OR`: Oregon (case_ready_state_panel, binds_above_federal_years=31); missing: fiscal_layer;distributional_incidence_layer
-- `US-RI`: Rhode Island (case_ready_state_panel, binds_above_federal_years=31); missing: fiscal_layer;distributional_incidence_layer
-- `US-MA`: Massachusetts (case_ready_state_panel, binds_above_federal_years=30); missing: fiscal_layer;distributional_incidence_layer
-- `US-VT`: Vermont (case_ready_state_panel, binds_above_federal_years=30); missing: fiscal_layer;distributional_incidence_layer
-- `US-CA`: California (case_ready_state_panel, binds_above_federal_years=29); missing: fiscal_layer;distributional_incidence_layer
-- `US-WA`: Washington (case_ready_state_panel, binds_above_federal_years=28); missing: fiscal_layer;distributional_incidence_layer
-- `US-HI`: Hawaii (case_ready_state_panel, binds_above_federal_years=27); missing: fiscal_layer;distributional_incidence_layer
-- `US-ME`: Maine (case_ready_state_panel, binds_above_federal_years=26); missing: fiscal_layer;distributional_incidence_layer
-- `US-DE`: Delaware (case_ready_state_panel, binds_above_federal_years=23); missing: fiscal_layer;distributional_incidence_layer
-- `US-IL`: Illinois (case_ready_state_panel, binds_above_federal_years=21); missing: fiscal_layer;distributional_incidence_layer
-- `US-FL`: Florida (case_ready_state_panel, binds_above_federal_years=18); missing: fiscal_layer;distributional_incidence_layer
-- `US-MI`: Michigan (case_ready_state_panel, binds_above_federal_years=18); missing: fiscal_layer;distributional_incidence_layer
+- `US-AK`: Alaska (case_ready_state_panel, binds_above_federal_years=39); missing: none
+- `US-CT`: Connecticut (case_ready_state_panel, binds_above_federal_years=37); missing: none
+- `US-DC`: District of Columbia (case_ready_state_panel, binds_above_federal_years=37); missing: none
+- `US-OR`: Oregon (case_ready_state_panel, binds_above_federal_years=31); missing: none
+- `US-RI`: Rhode Island (case_ready_state_panel, binds_above_federal_years=31); missing: none
+- `US-MA`: Massachusetts (case_ready_state_panel, binds_above_federal_years=30); missing: none
+- `US-VT`: Vermont (case_ready_state_panel, binds_above_federal_years=30); missing: none
+- `US-CA`: California (case_ready_state_panel, binds_above_federal_years=29); missing: none
+- `US-WA`: Washington (case_ready_state_panel, binds_above_federal_years=28); missing: none
+- `US-HI`: Hawaii (case_ready_state_panel, binds_above_federal_years=27); missing: none
+- `US-ME`: Maine (case_ready_state_panel, binds_above_federal_years=26); missing: none
+- `US-DE`: Delaware (case_ready_state_panel, binds_above_federal_years=23); missing: none
+- `US-IL`: Illinois (case_ready_state_panel, binds_above_federal_years=21); missing: none
+- `US-FL`: Florida (case_ready_state_panel, binds_above_federal_years=18); missing: none
+- `US-MI`: Michigan (case_ready_state_panel, binds_above_federal_years=18); missing: none

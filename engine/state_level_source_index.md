@@ -8,7 +8,7 @@ Generated from `data/state_level/source_inventory.yaml` and `data/state_level/in
 - Ingestion waves: 6
 - Primary scope: `admin1_subnational_policy_panels`
 - Preferred state anchor: `geoboundaries_admin1`
-- Verification statuses: `{"endpoint_verified": 1, "license_verified": 2, "production_ready": 5, "scout_reported_unverified": 6, "seed_unverified_url": 22, "seed_verified_official_page": 23}`
+- Verification statuses: `{"endpoint_verified": 4, "license_verified": 2, "production_ready": 5, "scout_reported_unverified": 6, "seed_unverified_url": 21, "seed_verified_official_page": 21}`
 - Ingestion difficulty: `{"high": 12, "low": 13, "medium": 34}`
 - Admin1 scalability: `{"high": 7, "medium": 52}`
 
@@ -33,7 +33,7 @@ Generated from `data/state_level/source_inventory.yaml` and `data/state_level/in
 | --- | --- | ---: | --- |
 | `state_spine_v0` | in_progress | 10 | - |
 | `us_state_labor_policy_v0` | in_progress | 9 | high_bite_minimum_wage_state_did, state_labor_market_deregulation_panel, state_wage_distribution_incidence_panel |
-| `us_state_housing_fiscal_v0` | ready_for_fetcher_design | 17 | state_housing_supply_reform_panel, state_tax_spending_growth_panel, state_energy_policy_outcome_panel, state_health_education_spending_incidence_panel |
+| `us_state_housing_fiscal_v0` | in_progress | 17 | state_housing_supply_reform_panel, state_tax_spending_growth_panel, state_energy_policy_outcome_panel, state_health_education_spending_incidence_panel |
 | `oecd_europe_regional_v0` | scout_reported_needs_verification | 13 | germany_lander_policy_panel, swiss_canton_policy_panel, canada_province_policy_panel, eurostat_nuts_policy_controls |
 | `federal_systems_admin1_v0` | scout_reported_needs_verification | 17 | brazil_uf_policy_panel, mexico_state_policy_panel, india_state_reform_panel, china_provincial_housing_macro_panel, ... |
 | `state_policy_event_registry_v0` | schema_design_ready | 9 | state_minimum_wage_events, state_rent_control_preemption_events, state_energy_policy_events, state_tax_spending_events |
@@ -54,7 +54,7 @@ Generated from `data/state_level/source_inventory.yaml` and `data/state_level/in
 | 10 | `us_census_state_population_estimates` | United States | low | seed_unverified_url | denominator/control layer for state panels |
 | 11 | `us_census_acs_state_profile` | United States | medium | seed_unverified_url | distributional incidence and control layer for U.S. state policy tests |
 | 12 | `bea_sagdp_state_accounts` | United States | medium | seed_unverified_url | macro outcome and control layer for U.S. state panels |
-| 13 | `us_census_bps_state_permits` | United States | low | seed_unverified_url | housing-supply response layer for state housing and land-use policies |
+| 13 | `us_census_bps_state_permits` | United States | low | endpoint_verified | housing-supply response layer for state housing and land-use policies |
 | 14 | `eia_state_energy_data_system` | United States | medium | seed_unverified_url | energy-policy outcome layer for state climate, price, and regulation tests |
 | 15 | `cdc_wonder_state_health` | United States | high | seed_unverified_url | health outcome layer for Medicaid, public-health, and welfare state tests |
 | 16 | `nces_state_education_data` | United States | medium | seed_unverified_url | education-policy outcome and fiscal-control layer |
