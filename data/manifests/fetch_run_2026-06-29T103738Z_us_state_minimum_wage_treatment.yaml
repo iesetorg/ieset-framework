@@ -1,0 +1,90 @@
+run_utc: 2026-06-29T103738Z
+pipeline: us_state_minimum_wage_treatment_panel
+entries:
+- publisher: usdol_wage_and_hour_division
+  series_id: us_state_minimum_wage_treatment_panel
+  source_url: https://www.dol.gov/agencies/whd/state/minimum-wage/history
+  methodology_url: https://www.dol.gov/agencies/whd/minimum-wage/history
+  license: U.S. Department of Labor public domain (federal government work)
+  fetch_utc: '2026-06-29T10:37:38+00:00'
+  rows: 2106
+  frequency: annual
+  units: USD per hour (nominal) and treatment event flags
+  currency: USD
+  start_date: '1968'
+  end_date: '2024'
+  sha256: 3e2c602b4eafcc922f0166d9cee2be33fc2882a6e5bb80858e55564d36dc2e44
+  parquet_path: data/derived/us_state_minimum_wage_treatment_panel.parquet
+  extra:
+    artifacts:
+      parquet_path: data/derived/us_state_minimum_wage_treatment_panel.parquet
+      parquet_sha256: 3e2c602b4eafcc922f0166d9cee2be33fc2882a6e5bb80858e55564d36dc2e44
+    stats:
+      panel_rows: 2106
+      start_year: 1968
+      end_year: 2024
+      state_count: 54
+      year_count: 39
+      rows_with_statutory_rate: 1834
+      rows_binding_above_federal: 701
+      states_ever_binding_above_federal: 40
+      first_bind_events: 40
+      rows_with_bite_ratio: 474
+      bite_year_min: 2014
+      bite_year_max: 2024
+      source_mw_history: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+      source_mw_history_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      source_bite_panel: data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet
+      source_bite_panel_sha256: 22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f
+      source_state_spine: data/derived/state_universe_admin1.parquet
+      source_state_spine_sha256: 2d353eff30c0661abfc09cbe8d711f2ac1f23022e3ec49f7ed9b064c18ed93ac
+      event_type_counts:
+        no_change: 1133
+        increase: 877
+        baseline: 52
+        first_bind: 40
+        decrease: 4
+    columns:
+    - ieset_state_id
+    - unit_id
+    - state_fips
+    - state_abbr
+    - state_name
+    - year
+    - effective_minimum_wage
+    - state_statutory_minimum_wage
+    - federal_minimum_wage
+    - binds_above_federal
+    - bite_ratio
+    - bite_denominator_wage
+    - bite_denominator
+    - minimum_wage_increase
+    - statutory_minimum_wage_increase
+    - event_type
+    - is_first_bind_event
+    - first_year_binds_above_federal
+    - effective_minimum_wage_published
+    - state_rate_low
+    - state_rate_high
+    - raw_value
+    - parse_note
+    - nominal_real_note
+    inputs:
+      minimum_wage_history:
+        path: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+        sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+      bite_ratio_panel:
+        path: data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet
+        sha256: 22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f
+      state_spine:
+        path: data/derived/state_universe_admin1.parquet
+        sha256: 2d353eff30c0661abfc09cbe8d711f2ac1f23022e3ec49f7ed9b064c18ed93ac
+    construction: USDOL state minimum-wage history joined to the canonical state spine
+      for ieset_state_id, then to the derived subnational minimum-wage bite-ratio
+      panel on state_fips+year. state_statutory_minimum_wage is the genuine own-law
+      rate (state_rate_high; NaN when parse_note in {no_state_rate, non_hourly_cell,
+      missing}); effective_minimum_wage is max(statutory, federal); binds_above_federal
+      is statutory>federal. Treatment events code the first observed year a state
+      binds above federal (first_bind) plus year-over-year increases. Federal and
+      state floors are kept separate; intensity is not routed through any country-year
+      runner. Levels are nominal current USD.
