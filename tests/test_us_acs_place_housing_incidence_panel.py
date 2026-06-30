@@ -133,6 +133,92 @@ def test_acs_place_housing_incidence_panel_derives_metrics_and_matches_spine(tmp
     assert payload["entries"][0]["series_id"] == "us_acs_place_housing_incidence_panel"
 
 
+def test_acs_builder_auto_mode_uses_bulk_without_api_key(tmp_path: Path):
+    spine_csv = tmp_path / "city_universe_top1000.csv"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:1461",
+                "city_rank_2025": 96,
+                "city_name": "San Francisco",
+                "country_name": "United States",
+            }
+        ]
+    ).to_csv(spine_csv, index=False)
+
+    def fake_bulk_fetcher(year: int, variables: list[str]) -> pd.DataFrame:
+        assert year == 2024
+        assert variables == acs_builder.ACS_VARIABLES
+        values = {variable: "0" for variable in variables}
+        values.update(
+            {
+                "B25003_001E": "400",
+                "B25003_003E": "240",
+                "B25070_001E": "240",
+                "B25070_010E": "60",
+                "B25002_001E": "500",
+                "B25002_003E": "50",
+            }
+        )
+        return pd.DataFrame(
+            [
+                {
+                    "NAME": "San Francisco city, California",
+                    **values,
+                    "state": "06",
+                    "place": "67000",
+                    "acs_year": year,
+                }
+            ]
+        )
+
+    panel, stats = acs_builder.build_panel(
+        city_spine_path=spine_csv,
+        years=[2024],
+        states=["06"],
+        api_key="",
+        source_mode="auto",
+        bulk_fetcher=fake_bulk_fetcher,
+    )
+
+    assert len(panel) == 1
+    assert stats["source_mode"] == "bulk_table_based_summary_file"
+    assert not stats["api_key_used"]
+    assert stats["bulk_table_files"] == len({acs_builder.bulk_column_for_variable(v)[0] for v in acs_builder.ACS_VARIABLES})
+    row = panel.iloc[0]
+    assert row["ieset_city_id"] == "ghsl_ucdb_r2024a:1461"
+    assert row["renter_share_occupied_housing_units"] == pytest.approx(0.6)
+    assert row["source_url"] == acs_builder.BULK_DATA_URL.format(year=2024)
+
+
+def test_acs_matching_uses_state_guard_for_common_city_names(tmp_path: Path):
+    spine_csv = tmp_path / "city_universe_top1000.csv"
+    pd.DataFrame(
+        [
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:7833",
+                "city_rank_2025": 759,
+                "city_name": "Cleveland",
+                "country_name": "United States",
+            }
+        ]
+    ).to_csv(spine_csv, index=False)
+
+    raw = pd.DataFrame(
+        [
+            {"NAME": "Cleveland town, Alabama", "state": "01", "place": "15472"},
+            {"NAME": "Cleveland city, Ohio", "state": "39", "place": "16000"},
+        ]
+    )
+
+    matched = acs_builder.attach_matches(raw, spine_csv).sort_values("state")
+    alabama = matched[matched["state"].eq("01")].iloc[0]
+    ohio = matched[matched["state"].eq("39")].iloc[0]
+    assert pd.isna(alabama["ieset_city_id"])
+    assert alabama["match_type"] == "unmatched_or_ambiguous_name"
+    assert ohio["ieset_city_id"] == "ghsl_ucdb_r2024a:7833"
+
+
 def test_acs_builder_requires_api_key(tmp_path: Path):
     spine_csv = tmp_path / "city_universe_top1000.csv"
     pd.DataFrame(
@@ -147,4 +233,4 @@ def test_acs_builder_requires_api_key(tmp_path: Path):
     ).to_csv(spine_csv, index=False)
 
     with pytest.raises(ValueError, match="API key required"):
-        acs_builder.build_panel(city_spine_path=spine_csv, years=[2024], states=["06"], api_key="")
+        acs_builder.build_panel(city_spine_path=spine_csv, years=[2024], states=["06"], api_key="", source_mode="api")

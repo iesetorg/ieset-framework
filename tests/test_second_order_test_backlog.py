@@ -25,6 +25,56 @@ def test_inferred_layers_for_price_control_include_welfare_and_quality():
     assert "distributional_incidence" in layers
 
 
+def test_energy_policy_includes_environmental_externality_layer():
+    doc = {
+        "hypothesis_id": "energy_emissions_probe",
+        "claim": "Electricity market reform lowers household costs but may raise carbon emissions.",
+        "scope": {"policy_family": ["energy_policy"]},
+    }
+
+    layers = backlog.inferred_layers_for_hypothesis(doc)
+
+    assert "externality_or_spillover" in layers
+    assert "net_welfare" in layers
+    assert "distributional_incidence" in layers
+
+
+def test_environmental_cost_keywords_add_layer_domain_and_source_family():
+    doc = {
+        "hypothesis_id": "forest_water_probe",
+        "claim": "Forest loss raises carbon emissions, water stress, and local pollution costs.",
+        "scope": {"policy_family": ["industrial_policy"]},
+    }
+    families = {
+        "environmental_externality_emissions_air_panel": {
+            "name": "Environmental externalities",
+            "layers": ["externality_or_spillover"],
+            "policy_domains": ["environmental_policy"],
+            "readiness": "partial_ready",
+        },
+        "trade_customs_product_panel": {
+            "name": "Trade products",
+            "layers": ["externality_or_spillover"],
+            "policy_domains": ["trade_policy"],
+            "readiness": "ready",
+        },
+    }
+
+    layers = backlog.inferred_layers_for_hypothesis(doc)
+    domains = backlog.policy_domains_for_hypothesis(doc)
+    details = backlog.source_family_details(
+        ["externality_or_spillover"],
+        families,
+        domains,
+    )
+
+    assert "externality_or_spillover" in layers
+    assert "environmental_policy" in domains
+    assert [row["family_id"] for row in details] == [
+        "environmental_externality_emissions_air_panel"
+    ]
+
+
 def test_missing_layers_prefer_declared_gate_gaps_over_inference():
     doc = {
         "hypothesis_id": "rent_control_probe",
