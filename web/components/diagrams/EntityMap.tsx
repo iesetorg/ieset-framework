@@ -143,7 +143,7 @@ export function EntityMap({ className = "" }: { className?: string }) {
         x={650}
         y={70}
         title="Hypothesis /h"
-        sub1="pre-registered test"
+        sub1="registered test"
         sub2="with falsification rule"
       />
 
@@ -348,7 +348,7 @@ export function EntityMap({ className = "" }: { className?: string }) {
           fontSize="10.5"
           fill={MUTED}
         >
-          a pre-registered test
+          a registered test
         </text>
       </g>
 

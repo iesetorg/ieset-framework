@@ -15,7 +15,7 @@ import {
 export const metadata = {
   title: "Hypotheses",
   description:
-    "Every hypothesis in the IESET framework, pre-registered in git before the data is examined.",
+    "IESET hypotheses with per-record registration and method-validity status.",
 };
 
 /**
@@ -104,10 +104,10 @@ export default async function HypothesesIndex() {
         Hypotheses
       </h1>
       <p className="mb-2 max-w-[780px] text-[17px] text-muted">
-        Every entry is pre-registered in git before any data is examined.
-        Falsification criteria are committed alongside the spec. {verdictCount}{" "}
-        of {all.length} are public verdicts; the rest are searchable as
-        pre-registered, pending, or not-yet-public specs.
+        Each entry records whether its spec strictly preceded its first run in
+        git. Legacy same-commit records remain inspectable but are not verified
+        pre-registrations. {verdictCount} of {all.length} currently pass the
+        registration, method-validity, and public-visibility gates.
       </p>
 
       {/* COMBINED LEGEND */}

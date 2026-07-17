@@ -22,15 +22,14 @@ export default async function HomePage() {
   // runs stay in the repo as drafts but don't surface here — see
   // isHypothesisPubliclyVisible() for the full criteria.
   const withResults = runs.filter((r) => isHypothesisPubliclyVisible(r.h, r.run));
-  const preRegOnly = runs.filter((r) => !isHypothesisPubliclyVisible(r.h, r.run));
+  const pendingRegistrations = runs.filter(
+    ({ h, run }) =>
+      !run.exists && h._registration_status === "registered_no_run"
+  );
 
   // Curated featured-six. Picked deliberately to (a) feature recent runs from
-  // the wave-4-through-integrity-sweep era, (b) headline a clean Austrian-school
-  // win (UK Truss FX repricing) and a clean Marxist/Bolivarian-narrative loss
-  // (Venezuela GDP collapse), (c) show the framework grades both directions —
-  // including a heterodox-Minsky win and a degrowth-narrative loss — so it
-  // doesn't read as one-sided, and (d) showcase the canonical-basket integrity
-  // gate via the Costa Rica refutation.
+  // the wave-4-through-integrity-sweep era, span competing schools and verdict
+  // directions, and showcase the canonical-basket integrity gate.
   const FEATURED_IDS: readonly string[] = [
     "unfunded_fiscal_expansion_above_zlb_bond_market_response", // Austrian win — UK Truss
     "venezuela_chavismo_framework_validation",                  // Marxist/Bolivarian loss — VEN -79% gap
@@ -40,9 +39,11 @@ export default async function HomePage() {
     "gfc_endogenous_minsky_leverage_mechanism",                 // Heterodox-Minsky win — 3 of 4 indicators
   ];
   const byId = new Map(withResults.map((r) => [r.h.hypothesis_id, r] as const));
-  const featured = FEATURED_IDS
+  const curatedFeatured = FEATURED_IDS
     .map((id) => byId.get(id))
     .filter((r): r is (typeof withResults)[number] => r !== undefined);
+  const featured =
+    curatedFeatured.length > 0 ? curatedFeatured : withResults.slice(0, 6);
 
   return (
     <div className="mx-auto max-w-content px-8">
@@ -50,7 +51,7 @@ export default async function HomePage() {
       <section className="border-b border-rule py-14">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-accent">
           <span className="inline-block h-[6px] w-[6px] rounded-full bg-accent" />
-          pre-registration-first economic framework
+          explicit registration status
         </div>
         <h1 className="m-0 mb-4 max-w-[940px] text-[42px] font-semibold leading-[1.1] tracking-[-0.02em] md:text-[52px]">
           Economic politics should be settled by testable claims.
@@ -59,8 +60,9 @@ export default async function HomePage() {
           IESET is a public evidence map for economic policy. Instead of
           asking which tribe sounds most confident, it asks every school to
           make claims that can lose: what should happen, where, over what
-          period, and what data would change our mind. Those claims are
-          registered before analysis and scored against reproducible runs.
+          period, and what data would change our mind. New prospective tests
+          lock the rule before the first run; every record shows whether that
+          ordering is verified or merely legacy.
         </p>
         <p className="mb-6 max-w-[720px] text-[15px] leading-[1.6] text-muted">
           Start with a claim, a school of thought, a policy, or a country. The
@@ -69,12 +71,10 @@ export default async function HomePage() {
           scoreboard impact.
         </p>
         <p className="mb-6 max-w-[720px] text-[15px] leading-[1.6] text-muted">
-          One pattern already visible in the scoreboard: market institutions
-          tend to turn conflict into positive-sum coordination, while many
-          Marxian or heavily interventionist claims look, at best, like
-          redistribution without durable surplus creation. The point is not to
-          settle the argument by label; it is to ask whether the surplus grows,
-          merely moves, or shrinks.
+          The scoreboard exposes raw forecast scores alongside stricter
+          evidence-quality and attribution gates. When every school remains
+          inside the strict no-call band, the honest conclusion is that the
+          current corpus has not separated them at high integrity.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -164,26 +164,25 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Pre-registered, awaiting data/run — sample cards only; counts live in /h. */}
-      {preRegOnly.length > 0 && (
+      {/* Registered, awaiting a first run — sample cards only; counts live in /h. */}
+      {pendingRegistrations.length > 0 && (
         <section className="border-b border-rule py-12">
           <div className="mb-5 flex items-baseline justify-between">
             <div>
               <h2 className="m-0 text-xs font-semibold uppercase tracking-wider text-muted">
-                Pre-registered — awaiting data or run
+                Registered — awaiting first run
               </h2>
               <p className="mt-2 text-[14px] text-muted">
-                Specs are committed to git with their falsification criteria.
-                The locked library is the source of truth; runs fire when the
-                data substrate is ready.
+                These specs have a repository registration and no run artifact.
+                Their status becomes verified only after a later run commit.
               </p>
             </div>
             <Link href="/h" className="text-sm text-muted hover:text-ink">
-              Browse locked specs →
+              Browse registered specs →
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            {preRegOnly.slice(0, 6).map(({ h }) => (
+            {pendingRegistrations.slice(0, 6).map(({ h }) => (
               <Link
                 key={h.hypothesis_id}
                 href={`/h/${h.hypothesis_id}`}
@@ -233,9 +232,9 @@ export default async function HomePage() {
 
 const INVARIANTS = [
   {
-    title: "Pre-registration precedes estimation",
+    title: "Verified ordering is explicit",
     body:
-      "Every hypothesis is committed to git before any data is examined. The git history is the proof-of-work: commit timestamps show the spec existed before the run.",
+      "New prospective tests require a strict spec-before-run commit order. Historical same-commit records stay visible but are labelled unverified.",
   },
   {
     title: "Provenance to publisher",
@@ -265,6 +264,6 @@ const INVARIANTS = [
   {
     title: "Authored, reproducible, correctable",
     body:
-      "IESET is authored, but the claims are pre-registered, reproducible, and open to specific correction.",
+      "IESET is authored, but registration status is explicit, runs are reproducible, and claims are open to specific correction.",
   },
 ];

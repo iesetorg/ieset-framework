@@ -27,7 +27,9 @@ export function ResultBanner({ run }: { run: RunArtifacts }) {
             run pending
           </span>
           <span className="text-muted">
-            The hypothesis is pre-registered in git. The model has not yet run; no coefficients to display. Chart shows the outcome variables' raw trajectories.
+            The hypothesis is registered in git and has no run artifact. No
+            coefficients are available; the chart shows raw outcome-variable
+            trajectories.
           </span>
         </div>
       </div>

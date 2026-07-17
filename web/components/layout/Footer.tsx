@@ -5,10 +5,10 @@ export function Footer() {
     <footer className="mt-20 border-t border-rule bg-panel px-8 py-8 text-xs text-muted">
       <div className="mx-auto flex max-w-content flex-wrap justify-between gap-4">
         <div className="max-w-xl">
-          <span className="font-semibold text-ink">IESET</span> — an
-          empirically-grounded, adversarially-reviewed framework for contemporary
-          economic policy questions. Every hypothesis pre-registered in git
-          before the data is examined.
+          <span className="font-semibold text-ink">IESET</span> — an open
+          empirical framework for contemporary economic policy questions.
+          Results are not peer-reviewed by default; strict pre-registration
+          status is shown per hypothesis.
         </div>
         <div className="space-x-4">
           <Link href="/methodology" className="text-muted hover:text-ink hover:no-underline">Methodology</Link>

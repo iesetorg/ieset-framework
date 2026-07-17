@@ -3,12 +3,12 @@ import Link from "next/link";
 /**
  * Plain-English explainer for the testing pipeline. Sits on the homepage
  * directly under the hero, where readers naturally ask "OK but HOW are
- * these scored?" after the hero promises pre-registered predictions.
+ * these scored?" after the hero promises explicit registration status.
  *
  * The visual steps mirror what actually happens in the codebase:
- *   - hypothesis YAML committed to git BEFORE any data is touched
+ *   - new prospective hypothesis YAML committed before its first run
  *   - fetcher pulls series from a primary publisher, freezes a vintage
- *   - estimator runs on the pinned vintage; pre-registered threshold decides
+ *   - estimator runs on the pinned vintage; the recorded threshold decides
  *
  * The publisher ribbon below the steps is a credibility signal — the names
  * are pulled from the actual list of fetchers in `data/fetchers/`. The
@@ -24,10 +24,10 @@ export function TestingExplainer() {
         </span>
       </div>
       <p className="m-0 mb-3 max-w-[760px] text-[14.5px] leading-[1.55] text-ink">
-        The loop is locked down so arguments have to leave a paper trail.
-        The pass/fail rule is written first, then the data is fetched, then
-        the rule runs against the data. Nothing about the rule moves once the
-        data is touched — that&apos;s the whole point.
+        New prospective tests have to leave a paper trail: the pass/fail rule
+        is committed before the first run, then the recorded rule runs against
+        a pinned data vintage. Historical records that entered git alongside
+        their result remain visible but are labelled unverified.
       </p>
 
       <div className="grid grid-cols-1 gap-2.5 text-[13px] sm:grid-cols-3">
@@ -36,9 +36,10 @@ export function TestingExplainer() {
           body={
             <>
               The hypothesis YAML names the metrics, the threshold, and the
-              estimator. It&apos;s committed to git <strong>before</strong>{" "}
-              any data is fetched. The commit timestamp is the proof the rule
-              didn&apos;t bend to the result.
+              estimator. For a verified prospective test, it&apos;s committed
+              to git <strong>before</strong> the first run artifact. Git
+              topology verifies that ordering; it is not an independent
+              timestamping service.
             </>
           }
         />
@@ -58,7 +59,7 @@ export function TestingExplainer() {
           body={
             <>
               The estimator runs against the pinned vintage. The
-              pre-registered threshold mechanically decides{" "}
+              recorded threshold mechanically decides{" "}
               <span className="text-green font-semibold">supported</span>,{" "}
               <span className="text-amber font-semibold">partial</span>, or{" "}
               <span className="text-red font-semibold">refuted</span>. Every

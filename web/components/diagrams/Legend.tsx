@@ -36,7 +36,7 @@ export function Legend({ className = "" }: { className?: string }) {
         { y: 72, color: "#2c7a4f", bg: "#dff1e4", label: "supported", note: "data ran as predicted, cleared threshold" },
         { y: 124, color: "#b7791f", bg: "#fdf1da", label: "partial / mixed", note: "some predictions held, others didn't" },
         { y: 176, color: "#9e2f2f", bg: "#f3d9d9", label: "refuted / weakened", note: "data ran opposite or failed threshold" },
-        { y: 228, color: "#8a8a8a", bg: "#f3f3f1", label: "run pending", note: "pre-registered, model not yet fired" },
+        { y: 228, color: "#8a8a8a", bg: "#f3f3f1", label: "run pending", note: "registered, model not yet fired" },
       ].map((v, i) => (
         <g key={i}>
           <rect x="30" y={v.y} width="320" height="44" rx="4" fill="#ffffff" stroke="#d9d9d9" />

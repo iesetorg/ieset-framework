@@ -1,5 +1,5 @@
 import { readFile, readdir, stat } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, dirname, basename } from "node:path";
 import { execSync } from "node:child_process";
 import yaml from "js-yaml";
@@ -76,9 +76,16 @@ const _STUB_RULE_MARKER = "when this stub is promoted from draft";
 
 export function isHypothesisPubliclyVisible(
   h: Hypothesis,
-  run: { exists?: boolean; verdict?: string }
+  run: {
+    exists?: boolean;
+    verdict?: string;
+    diagnostics?: Record<string, unknown>;
+  }
 ): boolean {
   if (!run.exists) return false;
+  // Only strict spec-before-run history receives public-index or scoreboard
+  // credit. Legacy same-commit records remain directly inspectable.
+  if (h._registration_status !== "verified") return false;
   const v = (run.verdict ?? "").toLowerCase().trim();
   if (!v) return false;
   if (
@@ -86,6 +93,12 @@ export function isHypothesisPubliclyVisible(
     v.startsWith("blocked") ||
     v.startsWith("error") ||
     v.startsWith("no verdict")
+  )
+    return false;
+  const method = String(run.diagnostics?.method ?? "");
+  if (
+    method.toLowerCase().includes("linearmodels failed") &&
+    method.toLowerCase().includes("full column rank")
   )
     return false;
   // Must have a replication.py — pure auto-grader stubs don't count.
@@ -143,6 +156,7 @@ async function parseHypothesis(absPath: string): Promise<Hypothesis | null> {
   }
   doc._file = absPath.replace(REPO_ROOT + "/", "");
   doc._first_commit = firstCommit(doc._file);
+  doc._registration_status = _registrationStatusCache.get(doc._file);
   // Normalise: wave-3 specs use `title` + `description` instead of `claim`.
   // Synthesize a claim so the rest of the app can treat hypotheses uniformly.
   if (!doc.claim) {
@@ -263,9 +277,41 @@ export async function parseSourceString(source: string | undefined): Promise<Sou
 // -----------------------------------------------------------------------------
 
 let _firstCommitCache: Map<string, { hash: string; iso: string }> | null = null;
+let _registrationStatusCache: Map<string, Hypothesis["_registration_status"]> =
+  new Map();
 
 function buildFirstCommitCache(): Map<string, { hash: string; iso: string }> {
   const map = new Map<string, { hash: string; iso: string }>();
+  const registrationIndexPath = join(
+    REPO_ROOT,
+    "engine",
+    "preregistration_index.json"
+  );
+  if (existsSync(registrationIndexPath)) {
+    try {
+      const index = JSON.parse(readFileSync(registrationIndexPath, "utf8")) as {
+        registrations?: Record<
+          string,
+          {
+            path: string;
+            spec_commit: string;
+            spec_committed_at: string;
+            status: Hypothesis["_registration_status"];
+          }
+        >;
+      };
+      for (const row of Object.values(index.registrations ?? {})) {
+        map.set(row.path, {
+          hash: row.spec_commit.slice(0, 7),
+          iso: row.spec_committed_at,
+        });
+        _registrationStatusCache.set(row.path, row.status);
+      }
+      if (map.size > 0) return map;
+    } catch {
+      /* fall through to git for local development */
+    }
+  }
   try {
     // Walk every commit, oldest first, and record the first time each path appears.
     // --diff-filter=A means "only show commits that ADDED that path".

@@ -6,7 +6,7 @@ const LIBRARY: NavDropdownItem[] = [
   {
     href: "/h",
     label: "Hypotheses",
-    blurb: "Pre-registered tests with falsification rules",
+    blurb: "Registered tests with explicit verification status",
   },
   {
     href: "/p",

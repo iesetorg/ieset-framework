@@ -33,7 +33,8 @@ export default async function PositionsIndex() {
         pragmatist, and others — each pinned to the specific, falsifiable
         predictions it makes. The framework cites these positions; it does not
         endorse any. Each school&apos;s predictions are tested independently
-        against the registry&apos;s pre-registered hypotheses.
+        against the registry&apos;s hypotheses, with registration status shown
+        per record.
       </p>
 
       {/* CHANNEL LEGEND */}

@@ -17,7 +17,7 @@ const ITEMS: { dot: string; label: string; help: string }[] = [
   {
     dot: "bg-faint",
     label: "run pending",
-    help: "pre-registered, model not yet fired",
+    help: "registered, model not yet fired",
   },
 ];
 

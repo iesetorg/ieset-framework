@@ -6,14 +6,14 @@ export const metadata = {
     "Terms for using the IESET public research framework, data pages, and contribution channels.",
 };
 
-const UPDATED = "May 5, 2026";
+const UPDATED = "July 17, 2026";
 
 const sections = [
   {
     title: "What IESET is",
     body: [
-      "IESET is a public research framework, policy lab, and think tank for turning economic-policy claims into testable hypotheses. It publishes pre-registered specifications, reproducible evidence packets, policy links, movement histories, and scoreboard views.",
-      "The framework is designed to make arguments auditable. It does not promise ideological neutrality; it promises explicit priors, transparent methods, public provenance, and openness to adversarial correction.",
+      "IESET is an open research project and policy-analysis framework for turning economic-policy claims into testable hypotheses. It publishes registration status, reproducible evidence packets, policy links, movement histories, and scoreboard views.",
+      "The framework is designed to make arguments auditable. It does not promise ideological neutrality; it promises explicit priors, transparent methods, public provenance, and openness to specific correction.",
     ],
   },
   {
@@ -42,7 +42,7 @@ const sections = [
   {
     title: "Evidence and limitations",
     body: [
-      "IESET results are provisional research artifacts. A verdict can change when data vintages improve, specifications are corrected, better causal identification becomes available, or adversarial review finds an error.",
+      "IESET results are provisional research artifacts. A verdict can change when data vintages improve, specifications are corrected, better causal identification becomes available, or external review finds an error.",
       "The scoreboard and related pages summarize the current corpus. They should be read together with each hypothesis page, evidence packet, diagnostics, steelman, and falsification rule.",
       "IESET may contain errors, stale links, incomplete coverage, or contested interpretations. The correction process is part of the product, not an exception to it.",
     ],

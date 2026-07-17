@@ -32,26 +32,35 @@ repository.
 
 ## Bounties
 
-Successful challenges that change a coefficient, overturn a falsification, or identify a methodological error are paid in USD. Bounty amounts, criteria, and payout history are maintained in `review/bounties/README.md`. Contributions that materially change a published conclusion are weighted higher.
+No bounty programme is currently active, and no payout has been recorded.
+`review/bounties/README.md` is the status and ledger page. If a funded bounty
+round opens, its amount, eligibility rules, decision process, and payout history
+will be published there before submissions are accepted.
 
 ## Public review log
 
-Every contribution — accepted, rejected, or partially-accepted — is logged in `review/log/` with reasoning. Transparency is the mechanism. A contribution that is rejected gets a logged reason, and the reason is inspectable.
+External review is a pilot. No external submission had been logged as of
+2026-07-17. New review submissions and their outcomes are logged in
+`review/log/` with reasoning; rejected submissions receive a public reason
+unless publication would expose private or unsafe material.
 
 ## What is out of scope
 
 - Rhetorical reframings without data or specification substance.
 - Ideological assertions unsupported by citation.
 - Demands that specific conclusions be reached regardless of evidence.
-- Identity-based objections; assess the evidence, specification, and
-  reproducibility of the work itself.
+- Attempts to identify or harass private contributors or maintainers. Relevant
+  expertise and conflicts may still be raised when they bear directly on a
+  claim, method, or disclosure.
 
 ## Process
 
 1. Open an issue first, even for small things. This keeps the public review log coherent.
 2. For PRs: fork, branch, submit. Include `review/submissions/<date>_<short-name>.md` describing the submission and the evidence or reasoning behind it.
-3. An IESET maintainer reviews; outcomes are logged in `review/log/`.
-4. Bounty-eligible successful contributions get paid and publicly credited (unless the contributor requests anonymity, which is honoured).
+3. The author reviews; outcomes are logged in `review/log/`.
+4. Accepted contributions are publicly credited unless the contributor requests
+   anonymity. Payment applies only when a separately published bounty round was
+   open before submission.
 
 ## Reviewer Context
 

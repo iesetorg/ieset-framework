@@ -90,6 +90,11 @@ export interface Hypothesis {
   // Populated at load time — not part of the YAML schema
   _file?: string;
   _first_commit?: { hash: string; iso: string } | null;
+  _registration_status?:
+    | "verified"
+    | "legacy_same_commit"
+    | "registered_no_run"
+    | "invalid_history";
   _steelman_html?: string;
 }
 

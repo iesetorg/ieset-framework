@@ -2398,6 +2398,16 @@ def run_panel_ols(
             "dropped_controls_due_to_overlap": dropped_controls,
         }
     except Exception as exc:
+        if "full column rank" in str(exc).lower():
+            return {
+                "error": (
+                    "method invalid: linearmodels rejected a rank-deficient "
+                    f"design ({exc})"
+                ),
+                "method": "PanelOLS rejected rank-deficient design",
+                "method_valid": False,
+                "dropped_controls_due_to_overlap": dropped_controls,
+            }
         fallback = fit_fe_ols_fallback(
             sub_plain,
             outcome_name,

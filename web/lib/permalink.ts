@@ -11,13 +11,19 @@ export function hypothesisBibTex(h: Hypothesis): string {
   const year = h._first_commit?.iso?.slice(0, 4) ?? new Date().getFullYear();
   const month = h._first_commit?.iso?.slice(5, 7) ?? "";
   const commit = h._first_commit?.hash ?? "unregistered";
+  const registration =
+    h._registration_status === "verified"
+      ? "Verified pre-registration"
+      : h._registration_status === "legacy_same_commit"
+        ? "Legacy same-commit registration (not verified)"
+        : "Repository registration";
   return [
     `@misc{ieset_${key},`,
     `  title        = {${h.claim.trim().split("\n").join(" ").slice(0, 180)}},`,
     `  author       = {IESET Framework},`,
     `  year         = {${year}},`,
     `  month        = {${month}},`,
-    `  howpublished = {Pre-registered hypothesis, git commit ${commit}},`,
+    `  howpublished = {${registration}, git commit ${commit}},`,
     `  url          = {https://ieset.dev/h/${h.hypothesis_id}},`,
     `  version      = {${h.version}}`,
     `}`,

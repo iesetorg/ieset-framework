@@ -4,7 +4,7 @@ import { scoreAllPositions } from "@/lib/content";
 import { VerdictLegend } from "@/components/badges/VerdictLegend";
 
 export const metadata = {
-  title: "Scoreboard — which schools of thought the data actually supports",
+  title: "Scoreboard — evidence coverage by school of thought",
   description:
     "Every position makes specific predictions linked to specific hypotheses. This page separates forecast accuracy from attribution-aware evidence about school-level mechanisms.",
 };
@@ -71,7 +71,8 @@ export default async function ScoreboardPage() {
         each linked to a hypothesis in the library. When a hypothesis runs, its
         verdict feeds back into the schools that predicted an outcome on it,
         while discounting broad failure calls that do not identify why a policy
-        failed. This page aggregates the track record so far.
+        failed. This page is a diagnostic of the current authored corpus, not an
+        independent ranking of economic truth.
       </p>
 
       <div className="my-6 flex flex-wrap gap-6 text-[14px]">
@@ -113,13 +114,10 @@ export default async function ScoreboardPage() {
           <em>is</em> the framework updating on evidence in public.
         </p>
         <p className="mt-3 mb-0">
-          A central pattern to watch is whether a school predicts{" "}
-          <strong>positive-sum coordination</strong> or mostly{" "}
-          <strong>zero-sum allocation</strong>. Many Marxian or heavily
-          interventionist claims can look defensible on distributional intent,
-          but the scoreboard asks the harder empirical question: did the policy
-          expand the surplus being shared, simply move it around, or reduce it
-          through weaker investment, productivity, supply, or fiscal capacity?
+          The strict attribution layer is deliberately conservative. If every
+          school remains inside the displayed no-call band, the correct reading
+          is that the corpus has not separated them at high integrity — not that
+          the numerically highest row has won.
         </p>
         <p className="mt-3 mb-0">
           <strong>Raw net</strong> is the simple forecast scoreboard: a clear win counts

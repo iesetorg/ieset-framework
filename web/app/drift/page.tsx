@@ -620,7 +620,7 @@ export default async function DriftPage() {
           appear above — neither view wins by inspection alone.
         </p>
         <p className="m-0 text-muted">
-          That next layer lives in the hypothesis library as pre-registered
+          That next layer lives in the hypothesis library as registered
           tests: the managerial-flywheel claim, the fiscal-rule dampening claim,
           and the initial-state reversion claim. Keeping them separate is
           deliberate: this page describes the coded policy trajectory, while the

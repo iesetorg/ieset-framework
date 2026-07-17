@@ -10,9 +10,25 @@ Changes to this document are themselves tracked in git history. An invariant can
 
 ### 1. Pre-registration precedes estimation
 
-Every hypothesis YAML (`hypotheses/<topic>/<id>.yaml`) is committed to git **before** any run artifact for that hypothesis is created. The first git commit of a spec is its pre-registration timestamp. That timestamp is the authoritative record that the hypothesis, its variables, its sample, its estimator, and its falsification criterion existed before the data was examined.
+For every new prospective test, the hypothesis YAML
+(`hypotheses/<topic>/<id>.yaml`) must be committed to git **before** any run
+artifact for that hypothesis is created. The first git commit of a spec is the
+repository registration timestamp. A verified label means that commit is a
+strict ancestor of the first run commit; it does not independently prove that
+the analyst had never inspected the underlying data.
 
-**Enforced by:** `scripts/check_preregistration.py` (CI), which fails if any file under `engine/runs/<id>/` has a filesystem mtime earlier than the first git commit of `hypotheses/**/<id>.yaml`.
+**Enforced by:** `scripts/check_preregistration.py` (CI), which compares git
+history rather than checkout filesystem mtimes. The first commit adding a run
+artifact must be a strict descendant of the first commit adding the matching
+spec. The generated `engine/preregistration_index.json` records the commit and
+committer timestamp displayed by the site.
+
+**Legacy limitation:** an audit on 2026-07-17 found historical pairs whose spec
+and first run artifact entered git in the same commit. They are listed in the
+frozen `engine/preregistration_legacy_exceptions.json`, labelled
+`legacy_same_commit`, and are not verified pre-registrations. CI rejects any new
+same-commit pair. A legacy result may remain inspectable, but it must not receive
+high-integrity pre-registration credit.
 
 **If a spec must change after the first run:** do not edit the v1 spec. Create a `v2` version in the same file under a `version: 2` block, commit it separately, and leave v1 immutable in history. Changing sample, variables, estimator, or falsification criterion of a v1 spec post-run is forbidden.
 
@@ -46,16 +62,16 @@ Policy experiments do not earn high-integrity public promotion from headline out
 
 **Enforced by:** schema and audit. Policy specs may declare `evaluation_design`; axes declare `second_order_measurement`; `scripts/audit_second_order_measurement.py` and `engine/policy_second_order_requirements_index.*` expand every policy into required layers, preferred designs, and source-family gaps. Claims that lack the required mechanism contract remain candidate, descriptive, or screen-only until the missing layers are measured.
 
-### 7. Reproducible and open to correction
+### 7. Authored, reproducible, open to correction
 
-IESET does not ask readers to rely on biographical or institutional authority.
-[DISCLOSURE.md](DISCLOSURE.md) records the framework's methodological
-commitments and known limitations. Every hypothesis YAML includes a pre-run
-`prior_confidence`, not as a badge of truth, but as an audit marker for how
-surprising the result was expected to be. The framework's defence is
-reproducibility and correction: pre-registration commits, public replication
-code, challengeable mappings, and visible updates when a test changes the
-record.
+IESET is an independently maintained framework, not a consensus document.
+[DISCLOSURE.md](DISCLOSURE.md) records its priors, conflict model, and use of
+automated tooling without publishing personal identity or private operational
+details. Every hypothesis YAML includes a pre-run `prior_confidence`, not as a
+badge of truth, but as an audit marker for how surprising the result was
+expected to be. The framework's defence is reproducibility and correction:
+pre-registration commits, public replication code, challengeable mappings, and
+visible updates when a test changes the record.
 
 **Enforced by:** every hypothesis YAML must include a `disclosure` field and a non-null `prior_confidence` in `[0, 1]`.
 
@@ -112,8 +128,7 @@ Edits to `METHODOLOGY.md` require:
 
 - A commit message that explicitly names which invariant changed and why.
 - A line in the commit body naming any existing hypotheses the change affects.
-- Review sign-off from at least one opposing-prior reviewer when the change can
-  affect published verdicts.
+- Review sign-off from at least one opposing-prior reviewer once the review infrastructure is live (Phase 6).
 
-All material methodology changes are logged in
-`review/log/methodology_changes.md`.
+Before Phase 6, changes are sole-author and tracked in repository history; they
+must not be represented as external review.

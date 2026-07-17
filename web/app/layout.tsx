@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s · IESET",
   },
   description:
-    "An adversarially-reviewed framework for contemporary economic policy questions. Every hypothesis pre-registered in git before the data is examined.",
+    "An open empirical framework for contemporary economic policy questions. Results are reproducible research artifacts, not peer-reviewed findings by default.",
 };
 
 export default function RootLayout({

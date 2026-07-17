@@ -107,7 +107,7 @@ export default async function HypothesisPage({
       <section className="mb-10">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="m-0 text-xs font-semibold uppercase tracking-wider text-muted">
-            {run.exists ? "Results" : "Pre-registered outcome variables"}
+            {run.exists ? "Results" : "Registered outcome variables"}
           </h2>
           {run.run_dir_rel && (
             <span className="font-mono text-[11px] text-faint">
@@ -214,7 +214,7 @@ export default async function HypothesisPage({
                   {sp.polarity === "inverted" && (
                     <span
                       className="inline-flex items-center rounded-sm bg-white/60 px-1 font-mono text-[9.5px]"
-                      title="School's narrative claim is opposite-signed to the hypothesis's pre-registered claim — verdict has been flipped accordingly"
+                      title="School's narrative claim is opposite-signed to the hypothesis's recorded claim — verdict has been flipped accordingly"
                     >
                       ⇄
                     </span>
@@ -442,7 +442,9 @@ export default async function HypothesisPage({
           <div className="mb-3 rounded border border-rule bg-white p-4">
             <h3 className="sc mb-3 text-[10px]">Found an issue?</h3>
             <p className="mb-3 text-[12px] text-muted">
-              Challenges that change the result or identify a methodological error are paid and credited.
+              No bounty programme is currently active. Accepted challenges are
+              credited unless the contributor requests anonymity; payment
+              applies only to a separately published, pre-funded bounty round.
             </p>
             <a
               href="/contribute"

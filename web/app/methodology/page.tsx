@@ -3,7 +3,7 @@ import { loadRepoMarkdown } from "@/lib/content";
 export const metadata = {
   title: "Methodology",
   description:
-    "The six invariants every hypothesis, dataset, and model in the IESET framework must satisfy.",
+    "The registration, provenance, measurement, and correction commitments used by the IESET framework.",
 };
 
 export default async function MethodologyPage() {

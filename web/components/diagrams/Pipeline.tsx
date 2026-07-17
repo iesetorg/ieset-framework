@@ -1,5 +1,5 @@
 // Diagram C — Pre-registration → run → verdict pipeline.
-// Horizontal left-to-right with a loop back from adversarial review.
+// Horizontal left-to-right with a loop back from open correction.
 
 const stages: {
   x: number;
@@ -193,7 +193,7 @@ export function Pipeline({ className = "" }: { className?: string }) {
         </text>
       </g>
 
-      {/* Adversarial review loop */}
+      {/* Open correction loop */}
       <g>
         <rect
           x="330"
@@ -214,7 +214,7 @@ export function Pipeline({ className = "" }: { className?: string }) {
           fontWeight="700"
           fill="#b7791f"
         >
-          Adversarial review
+          Open correction pilot
         </text>
         <text
           x="450"
@@ -224,7 +224,7 @@ export function Pipeline({ className = "" }: { className?: string }) {
           fontSize="11"
           fill="#b7791f"
         >
-          challenges paid + credited;
+          no active bounty programme;
         </text>
         <text
           x="450"
@@ -274,7 +274,7 @@ export function Pipeline({ className = "" }: { className?: string }) {
         fill="#636363"
       >
         <tspan fontWeight="600" fill="#1f1f1f">Every step is git-tracked.</tspan>{" "}
-        Commit timestamps are the proof-of-work; any reader can verify pre-registration precedes estimation.
+        Strict spec-before-run ancestry earns a verified badge; same-commit legacy records do not.
       </text>
     </svg>
   );

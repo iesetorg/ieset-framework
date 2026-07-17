@@ -59,11 +59,10 @@ export async function WorkedExamples() {
         </Link>
       </div>
       <p className="mb-5 max-w-[780px] text-[14.5px] leading-[1.6] text-muted">
-        Every hypothesis is committed to git with its claim, its data sources,
-        and its falsification rule <em>before</em> the data is examined. The
-        rule is what determines the verdict — never an after-the-fact judgement
-        call. Below: one hypothesis the data supported, one the data refuted.
-        Same rule shape, opposite outcomes.
+        Each example exposes its claim, data sources, falsification rule, and
+        registration status. Verified prospective tests commit the rule before
+        the first run; legacy same-commit records are labelled unverified.
+        Below: one result the recorded rule supported and one it refuted.
       </p>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -87,6 +86,12 @@ export async function WorkedExamples() {
               : "#aaa";
           const preRegIso =
             (hyp?._first_commit?.iso ?? "").slice(0, 10) || "—";
+          const registrationLabel =
+            hyp?._registration_status === "verified"
+              ? `verified ${preRegIso}`
+              : hyp?._registration_status === "legacy_same_commit"
+                ? `legacy / unverified ${preRegIso}`
+                : `registered ${preRegIso}`;
 
           return (
             <Link
@@ -104,7 +109,7 @@ export async function WorkedExamples() {
                     {tonePill.label}
                   </span>
                   <span className="text-[10.5px] uppercase tracking-wider text-muted">
-                    pre-registered {preRegIso}
+                    {registrationLabel}
                   </span>
                 </div>
 
@@ -115,7 +120,7 @@ export async function WorkedExamples() {
                 <dl className="m-0 space-y-2.5 text-[12.5px] leading-[1.5]">
                   <div>
                     <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-                      Falsification rule (pre-committed)
+                      Recorded falsification rule
                     </dt>
                     <dd className="m-0 mt-0.5 text-ink">{entry.falsification}</dd>
                   </div>

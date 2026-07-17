@@ -9,7 +9,7 @@ import { Legend } from "@/components/diagrams/Legend";
 export const metadata = {
   title: "How it works",
   description:
-    "How IESET turns economic-policy claims into pre-registered tests, reproducible data runs, linked evidence pages, and scoreboard updates.",
+    "How IESET turns economic-policy claims into registered tests, reproducible data runs, linked evidence pages, and scoreboard updates.",
 };
 
 interface TabCard {
@@ -31,7 +31,7 @@ const LOOP_STEPS = [
     kicker: "02",
     title: "Lock the rule",
     body:
-      "The hypothesis and falsification rule are committed before estimation, so the target cannot move after the data arrives.",
+      "For new prospective tests, the hypothesis and falsification rule are committed before the first run. Historical same-commit records are labelled unverified.",
   },
   {
     kicker: "03",
@@ -52,7 +52,7 @@ const tabs: TabCard[] = [
     href: "/h",
     name: "/h — Hypotheses",
     plainEnglish:
-      "A specific, testable economic question written down before we look at the data — together with exactly what result would make us admit we were wrong.",
+      "A specific, testable economic question with a recorded rule, explicit registration status, and exactly what result would count against it.",
     example:
       'Example: "Did Chávez-era Venezuela collapse economically compared with its Latin American neighbours?" The question is written down, the data sources are named, and the test that would disprove it is spelled out. When the analysis runs, the page shows the verdict (supported / partial / refuted) and lets you re-run the code yourself.',
     howItFits:
@@ -102,11 +102,11 @@ const tabs: TabCard[] = [
     href: "/scoreboard",
     name: "/scoreboard",
     plainEnglish:
-      "A leaderboard showing how each school of thought is doing against the evidence — what fraction of its predictions held up once tested, and whether those wins look positive-sum or merely redistributive.",
+      "A diagnostic summary of how each school of thought's linked predictions compare with the current corpus, shown at raw, evidence-quality, and attribution-gated levels.",
     example:
-      "Example: a school with 3 of 5 tested predictions supported ranks differently from one with 1 of 1. Both the rate and the sample size matter. If a Marxian or interventionist claim shows a short-run distributional gain, the next question is whether it created durable surplus or shifted costs into investment, productivity, supply, inflation, or fiscal capacity. The scoreboard updates automatically when a hypothesis finishes running.",
+      "Example: a school with 3 of 5 tested predictions supported is not automatically stronger than one with 1 of 1. Sample size, identification quality, claim-link quality, and unresolved mechanism layers all matter. Scores inside the no-call band are not evidence that one school has beaten another.",
     howItFits:
-      "The scoreboard is what you get when you roll up all positions × their predictions × their hypotheses' verdicts. It's the public summary of 'which schools the data supports so far'.",
+      "The scoreboard rolls up positions × predictions × linked hypothesis verdicts. It is a coverage and evidence-quality diagnostic, not an authority ranking.",
   },
   {
     href: "/methodology",
@@ -114,9 +114,9 @@ const tabs: TabCard[] = [
     plainEnglish:
       "The six rules the whole framework commits to — so you can check that the site is actually playing by its own rules.",
     example:
-      'Example: "the claim must be committed to git before the data is examined" is rule #1. The git history is public; anyone can verify it. These rules are the reason every other page is shaped the way it is.',
+      'Example: "a prospective spec commit must be a strict ancestor of its first run commit" is rule #1. The git history is public, and each page shows whether that ordering is verified or legacy. These rules are the reason every other page is shaped the way it is.',
     howItFits:
-      "Methodology is the spec. If a page on the site violates a rule, that's a bug — and contributors get paid for catching it.",
+      "Methodology is the spec. If a page violates a rule, that is a reportable bug. Payment applies only when a separately published bounty round is active.",
   },
 ];
 
@@ -274,7 +274,7 @@ export default function HowItWorksPage() {
         id="pipeline"
         label="Diagram C"
         title="How a question becomes a published verdict"
-        blurb="Every hypothesis walks this path: someone writes the question down (committed to a public git history), the system checks it's well-formed, the exact data sources get frozen in time, the analysis code runs and produces a result, the verdict gets published. The git commit timestamp is the proof that the question was written before the data was examined — nobody can silently reshape the question to fit the answer. Critics get paid to find holes; if a critique lands, the whole path runs again with a new question."
+        blurb="This is the required path for new prospective tests: someone writes the question down, the system checks it, the data sources are frozen, the analysis runs, and the verdict is published. Strict spec-before-run ancestry earns a verified badge; historical same-commit records remain visible as unverified. Accepted challenges restart the path with a versioned specification."
         drawio="/diagrams/C_pipeline.drawio"
       >
         <Pipeline />
