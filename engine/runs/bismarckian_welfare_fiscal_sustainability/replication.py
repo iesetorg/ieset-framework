@@ -41,7 +41,7 @@ DATA-GAP PROTOCOL:
   oecd:SocialContributionRate) is in the current data vintage —
   data/vintages/oecd/ contains the OECD SDMX bulk parquets but no
   per-indicator pension expenditure / replacement rate / contribution
-  rate fetcher has been built. Per HANDOFF_TO_RUN_AGENT.md "What to do
+  rate fetcher has been built. Per research documentation "What to do
   when your spec needs data that isn't on disk", the verdict is
   inconclusive (data gap on oecd:PensionExpenditure,
   oecd:ImplicitPensionDebt, oecd:NetReplacementRate,

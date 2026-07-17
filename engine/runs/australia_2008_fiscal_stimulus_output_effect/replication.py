@@ -7,7 +7,7 @@ Position-claim: mmt #7 (school predicts: supported)
 Original spec called for synthetic-control of Australia 2008-2010 vs an OECD
 donor pool that did not deploy a comparable cash-handout fiscal package. No
 synthetic-control library is installed in the local venv, so per the
-HANDOFF_TO_RUN_AGENT.md downgrade allowance this run uses a peer-mean
+research documentation downgrade allowance this run uses a peer-mean
 DIFFERENCE-IN-DIFFERENCES comparison: AUS 2010 - 2007 change minus the
 unweighted mean change of an OECD donor pool over the same window.
 

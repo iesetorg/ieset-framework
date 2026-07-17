@@ -10,7 +10,7 @@ No data were fetched and no existing source, manifest, run, or hypothesis files 
 
 ## Inputs Read
 
-- `engine/agent_briefs/graduation_repair_swarm_2026-05-16.md`
+- `internal research notes`
 - `engine/audits/broad_hypothesis_graduation_plan_2026-05-16.md`
 - `data/fetchers/publishers.yaml`
 - `data/fetchers/oecd.py`

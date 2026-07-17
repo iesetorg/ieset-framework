@@ -4,7 +4,7 @@ Worker lane: Historical case-map. Write scope limited to this audit file.
 
 ## Inputs Read
 
-- Plan anchor: `engine/agent_briefs/resource_developmentalism_hardening_swarm_plan_2026-05-16.md`
+- Plan anchor: `internal research notes`
 - Queue freeze: `engine/audits/resource_developmentalism_queue_freeze_2026-05-16.md`
 - Treatment audit: `engine/audits/resource_developmentalism_treatment_audit_2026-05-16.md`
 - Treatment inventory: `engine/audits/resource_developmentalism_treatment_inventory_2026-05-16.csv`

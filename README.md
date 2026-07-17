@@ -17,7 +17,8 @@ The framework combines a versioned data substrate, a registry of pre-registered 
 | weakened | 6 | identification flawed; one-way refutation signal |
 | inconclusive | 118 | data gap or method failure (NOT a refutation) |
 
-> See `data/SOCIAL_FETCHER_BACKLOG.md` for the data gaps that hold many `inconclusive` and `supported_subset` verdicts. Each gap is a fetcher waiting to land; verdicts will tighten as the backlog clears.
+Documented data gaps keep affected verdicts at `inconclusive` or
+`supported_subset` until the missing evidence is available.
 
 ---
 
@@ -62,7 +63,7 @@ The verdict isn't the end — it's the latest reading. Anyone can submit:
 - A **data challenge** — show that a different vintage, publisher, or series yields a different result
 - A **scope challenge** — argue the spec answers a narrower question than the claim implies
 
-Submit via PR with `review/` template. The author writes a steelman of the challenge; either the original verdict survives with a public note of the unsuccessful challenge, OR the spec is bumped to v2 with the challenge integrated and the old run archived.
+Submit via PR with the `review/` template. A maintainer writes a steelman of the challenge; either the original verdict survives with a public note of the unsuccessful challenge, or the spec is bumped to v2 with the challenge integrated and the old run archived.
 
 The framework treats successful challenges as wins, not failures. The integrity audit on Cuba × 2 + Japan + Costa Rica + single-payer that produced the `supported_subset` tier and the canonical-basket gate started exactly this way — a reader pointing out that the tested indicators were a favourable subset of the canonical-literature basket.
 
@@ -72,7 +73,7 @@ The framework treats successful challenges as wins, not failures. The integrity 
 
 The on-disk data publishers (WDI, FRED, IMF, OECD-macro, PWT, BIS, ECB, BoE, FAO partial, WHO-GHO partial) cover **economic** outcomes well — growth, inflation, productivity, fiscal multipliers. They are thin on **social-policy** outcomes — food security at sub-annual resolution, mental health, subjective wellbeing, time poverty, housing affordability, amenable mortality, healthcare quality.
 
-This asymmetry biased early social-outcome specs toward `SUPPORTED-on-favourable-subset` gaming. The canonical-basket gate (invariant 6 above) catches it: a spec that omits a literature-canonical dimension lands `supported_subset` (amber, not green) until the missing fetcher lands. `data/SOCIAL_FETCHER_BACKLOG.md` inventories the queue.
+This asymmetry biased early social-outcome specs toward `SUPPORTED-on-favourable-subset` gaming. The canonical-basket gate (invariant 6 above) catches it: a spec that omits a literature-canonical dimension lands `supported_subset` (amber, not green) until the missing evidence lands.
 
 Concrete: claims like *"Costa Rica achieves high wellbeing at low throughput"* that look SUPPORTED on life expectancy + CO2 alone come back **refuted** when the canonical safety leg (homicide rate) is added — Costa Rica's homicide rate is 2.19× the US in 2010-2020. That's the gate working.
 
@@ -101,7 +102,6 @@ positions/     17 schools of thought (market_liberal, social_democratic, post_ke
 
 axes.yaml      the policy-content taxonomy (fiscal, regulatory, monetary, openness, distribution)
 
-debate/        private debate engine (CLI; not deployed publicly)
 web/           public Next.js platform + API
 review/        adversarial review protocol + submitted challenges
 schemas/       JSON schemas for every YAML kind
@@ -109,8 +109,6 @@ schemas/       JSON schemas for every YAML kind
 scripts/       CI and maintenance (validate_specs, derive_coverage, etc.)
 tests/         pytest suite
 
-HANDOFF_TO_RUN_AGENT.md     spec-to-runnable-replication briefing
-HANDOFF_TO_DATA_AGENT.md    fetcher-development briefing
 HYPOTHESIS_FRAMEWORK_AUDIT.md   lineage of methodological refinements
 ```
 
@@ -176,7 +174,7 @@ The pre-registration invariant is enforced: spec commit timestamp must predate r
 This is **v1.0** of the public platform. Substance is the same as the development beta; the surface is debugged and the indicator-integrity gate is enforced framework-wide.
 
 Open work:
-- Closing the social-policy fetcher backlog (`data/SOCIAL_FETCHER_BACKLOG.md`)
+- Closing documented social-policy data gaps
 - Expanding the engine's estimator templates beyond the current panel-FE / event-study / synth-DiD / local-projections set
 - Building out the adversarial-review submission flow on the public site
 
@@ -198,7 +196,7 @@ The split is deliberate. Code wants maximum reuse (Apache-2.0). The spec library
   title = {IESET — An empirically-grounded, adversarially-reviewed economic policy framework},
   author = {{IESET Institute}},
   year = {2026},
-  url = {https://github.com/<institute-org>/ieset},
+  url = {https://github.com/iesetorg/ieset-framework1},
   note = {Verdict-tier audit trail and indicator-integrity gate.}
 }
 ```
@@ -207,8 +205,10 @@ A machine-readable `CITATION.cff` is in the repo root.
 
 ---
 
-## Author disclosure
+## Transparency
 
-Per `DISCLOSURE.md`: the framework is built by a single author with documented market-liberal priors, position holdings in real estate (Latin America, East Asia) and cryptocurrency, and explicit conflicts on hypotheses where those positions could bias the result. Every spec carries a `disclosure:` field flagging this where applicable.
-
-The disclosure model is *the framework's integrity model in action* — author bias is acknowledged, the adversarial-review channel is built specifically so external readers can challenge any verdict, and the `supported_subset` verdict tier exists precisely to prevent author-favourable indicator selection.
+`DISCLOSURE.md` records IESET's methodological commitments and the framework's
+known limitations. Every spec carries a `disclosure:` field where a claim has a
+specific, research-relevant conflict or scope constraint. The framework relies
+on pre-registration, reproducible runs, explicit uncertainty, and adversarial
+review rather than biographical authority.

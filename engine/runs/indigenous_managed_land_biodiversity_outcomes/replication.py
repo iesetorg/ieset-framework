@@ -30,7 +30,7 @@ spec requires is not on disk:
     the spec as "manual compilation flagged as TODO" and is not in
     the repo.
 
-Per HANDOFF_TO_RUN_AGENT.md §"What to do when your spec needs data
+Per research documentation §"What to do when your spec needs data
 that isn't on disk", this run emits an `inconclusive` verdict with a
 concrete data-gap label, writes the four standard artifacts, and does
 NOT silently substitute a different series. The script is ready to
@@ -272,7 +272,7 @@ def main() -> None:
         "sample countries (`faostat:forest_area` is registered in the baseline",
         "manifest but no parquet has been fetched).",
         "",
-        "Per HANDOFF_TO_RUN_AGENT.md, the correct response to a data gap is to",
+        "Per research documentation, the correct response to a data gap is to",
         "emit `inconclusive (data gap on <publisher>:<series>)`, not to",
         "fabricate or substitute a different series. This run does that.",
         "",

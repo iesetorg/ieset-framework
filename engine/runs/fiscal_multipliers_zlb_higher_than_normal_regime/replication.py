@@ -31,7 +31,7 @@ Inventory of data on disk (`data/vintages/`):
 
 So the spec's identification (state-dependent LP-IV, OECD panel,
 narrative IV) cannot be supported with the data the framework holds.
-Per HANDOFF_TO_RUN_AGENT.md "What to do when your spec needs data
+Per research documentation "What to do when your spec needs data
 that isn't on disk" → emit `inconclusive (data gap on …)` and stop.
 
 To keep the run ARTEFACT-COMPLETE and informative, this script also

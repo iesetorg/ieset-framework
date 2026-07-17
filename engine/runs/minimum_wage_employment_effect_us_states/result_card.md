@@ -41,4 +41,4 @@ Required (per spec):
 - `bls:LAU_state_unemployment_rate_panel` — **missing**
 - `fred:state_real_gdp_panel` — **missing**
 
-Promotion verdict: inconclusive (method-validity gate fails on data availability — state-level BLS series are not on disk; the BLS fetcher currently exposes only national LNS/CES/CUUR series). Per HANDOFF_TO_RUN_AGENT.md a data gap is NOT a refutation — the scoreboard treats this as neutral. Re-run when the BLS state fan-out (LAU state teen E/P, SMS state CES, ENU county QCEW) and USDOL state minimum-wage history fetchers are wired and the Vaghul-Zipperer county-minimum dataset is dropped into data/manual/.
+Promotion verdict: inconclusive (method-validity gate fails on data availability — state-level BLS series are not on disk; the BLS fetcher currently exposes only national LNS/CES/CUUR series). Per research documentation a data gap is NOT a refutation — the scoreboard treats this as neutral. Re-run when the BLS state fan-out (LAU state teen E/P, SMS state CES, ENU county QCEW) and USDOL state minimum-wage history fetchers are wired and the Vaghul-Zipperer county-minimum dataset is dropped into data/manual/.

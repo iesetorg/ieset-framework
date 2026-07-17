@@ -47,7 +47,7 @@ DEVIATIONS from spec:
     (state-quarter LP with state and quarter FE, state-clustered SEs).
     The state-level BEA PCE series (post-1997 only) and state-level NY
     Fed Consumer Credit Panel are NOT on disk in `data/vintages/`. Per
-    HANDOFF_TO_RUN_AGENT.md ("Don't fabricate data ... emit
+    research documentation ("Don't fabricate data ... emit
     `inconclusive (data gap on <publisher>:<series>)` and stop") we
     cannot run the spec's state-quarter LP.
   - Instead v1 promotes the spec to a NATIONAL-LEVEL DESCRIPTIVE
@@ -565,7 +565,7 @@ def main() -> None:
         "with state and quarter fixed effects, state-clustered SEs. State-level BEA "
         "PCE (post-1997) and NY Fed Consumer Credit Panel data are NOT on disk in "
         "`data/vintages/`; only national FRED series are available. Per "
-        "HANDOFF_TO_RUN_AGENT.md (no fabrication), v1 promotes the spec to a "
+        "research documentation (no fabrication), v1 promotes the spec to a "
         "national-level descriptive co-movement test. The state-LP design is "
         "preserved as v2 once a state-panel fetcher (BEA SAPCE + NY-Fed CCP) is wired.",
         "- 1990-2007 anchor years used (skipping 2008 entirely) since MEHOINUSA672N "

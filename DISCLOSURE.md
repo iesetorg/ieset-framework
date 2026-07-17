@@ -1,79 +1,37 @@
 # Transparency
 
-IESET is not an anonymous oracle. It is an authored research framework with
-published methods, public code, pre-registered tests, and reproducible results.
-This page records the commitments that matter for interpreting the work.
+IESET is a public research framework with published methods, pre-registered
+tests, reproducible runs, and inspectable source provenance. Its claims should
+be evaluated from those records rather than from personal or institutional
+authority.
 
-The core integrity claim is methodological: hypotheses are written before
-estimation, data vintages are pinned, result cards expose the rule used to score
-the run, and contrary findings remain visible.
+The core integrity commitments are:
 
----
+1. hypotheses and falsification thresholds are registered before estimation;
+2. data vintages and source manifests remain attached to each run;
+3. contrary, partial, weakened, and inconclusive results remain public;
+4. result cards expose the rule used to assign the verdict;
+5. important claims include a charitable opposing argument;
+6. specific corrections are accepted when evidence, code, or interpretation is
+   shown to be wrong.
 
-## Author Perspective
+IESET does not claim ideological neutrality. The policy-axis design and the
+choice of hypotheses necessarily reflect research judgment. The controls on
+that judgment are explicit priors, symmetrical scoring rules, reproducible
+analysis, canonical indicator baskets, second-order measurement requirements,
+and adversarial review.
 
-The framework is maintained under the IESET banner by an author whose working
-background includes public markets, venture capital, real-estate development,
-digital assets, and geopolitical analysis. That experience influences the kinds
-of questions IESET asks, especially around capital allocation, institutional
-quality, fiscal and regulatory channels, and policy-regime change over time.
+Every hypothesis may include a research-specific `disclosure` field for a
+material conflict, scope constraint, or known limitation. Generic biographical
+information is not treated as evidence for or against a result.
 
-The framework therefore puts unusual weight on:
+Readers should judge the framework by whether:
 
-- separating fiscal footprint from regulatory constraint;
-- measuring policy trajectories rather than one-year country labels;
-- asking whether an intervention creates durable surplus, redistributes a fixed
-  surplus, or reduces the base being redistributed;
-- preserving enough provenance that a critic can reproduce or challenge a run.
+- the specification predates the result;
+- the evidence resolves to a documented publisher and vintage;
+- the analysis can be reproduced;
+- uncertainty and identification failures affect the verdict honestly; and
+- the public record changes when a valid challenge succeeds.
 
-Those are starting points for inquiry, not protected conclusions.
-
----
-
-## Economic Exposure
-
-The author has active economic exposure in broad asset categories including
-venture capital, real estate, digital assets, public markets, and advisory or
-analytical work. Specific holdings, counterparties, addresses, and position
-sizes are not public because line-item disclosure would compromise third parties
-without materially improving the auditability of the research.
-
-If a hypothesis bears directly on a specific disclosed category, the spec may
-carry a short conflict note. General market, fiscal, monetary, or institutional
-claims are covered by this framework-level transparency note.
-
----
-
-## Operating Commitments
-
-IESET commits to:
-
-1. pre-registering hypotheses before estimation;
-2. keeping falsification rules attached to the result after the run;
-3. publishing contrary, partial, and inconclusive results rather than filtering
-   them out;
-4. preserving data provenance and code paths for replication;
-5. keeping charitable opposing arguments attached to important claims;
-6. accepting specific corrections when a critic finds a coding, data, or
-   interpretation error.
-
-This is a transparency model, not a neutrality claim. Readers should judge the
-framework by whether the methods are inspectable, the evidence is reproducible,
-and the scoreboard updates when the record moves.
-
----
-
-## Updates
-
-Material changes to this transparency note appear here as dated entries.
-
-- **Initial publication** — Established framework-level transparency for author
-  perspective, broad economic exposure, and pre-registration commitments.
-- **Indicator-set integrity** — Added the canonical-basket gate after an audit
-  found that several social-outcome specs could overstate support by selecting
-  favourable indicators. The gate now caps such verdicts at
-  `supported_subset`.
-- **Tone revision** — Condensed the disclosure model from exhaustive author
-  narrative into a shorter transparency note. The framework keeps the same
-  methodological commitments without foregrounding biography or conflict
-  language on every reader path.
+Material changes to these commitments are tracked in repository history and the
+public review log.

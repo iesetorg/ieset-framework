@@ -92,7 +92,7 @@ def load_fred_quarterly(path: Path) -> pd.DataFrame:
 def emit_inconclusive(missing: list[str], manifest: dict) -> None:
     """Write all six artifacts with an inconclusive verdict for a data gap.
     The script must still run end-to-end and produce real artifacts so
-    downstream tooling sees a real run, per HANDOFF_TO_RUN_AGENT.md
+    downstream tooling sees a real run, per research documentation
     'What to do when your spec needs data that isn't on disk'."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     gap_str = ", ".join(missing)

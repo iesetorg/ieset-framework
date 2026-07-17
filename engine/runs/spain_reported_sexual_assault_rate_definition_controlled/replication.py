@@ -48,7 +48,7 @@ neutral colour. The chart shows the available CONTROLS panel
 8 sample countries) so the surface area of what *was* loadable is
 visible to a reader.
 
-Per HANDOFF_TO_RUN_AGENT.md and DISCLOSURE.md: data-gap inconclusive is
+Per research documentation and DISCLOSURE.md: data-gap inconclusive is
 the honest output rather than substituting a different series. v2
 unblocks when (i) the Eurostat `crim_off_cat` fetcher is added and
 (ii) the Ministerio del Interior category-preserved tables land in

@@ -24,7 +24,7 @@ METHOD-VALID: requires both world_bank_wdi:NY.GDP.MKTP.KD and a US
 equivalent GCP/Eora MRIO vintage) on disk. If the consumption-based
 series is missing, the run emits 'inconclusive (data gap on
 owid:consumption_co2)' and reports the territorial-only descriptive
-numbers as informative — per HANDOFF_TO_RUN_AGENT.md §"What to do when
+numbers as informative — per research documentation §"What to do when
 your spec needs data that isn't on disk".
 
 DATA-GAP STATUS at first run (2026-04-27): the consumption-based CO2
@@ -444,7 +444,7 @@ def main() -> None:
             f"<= {CONSUMPTION_CO2_REFUTED_DECLINE_FLOOR*100:+.0f}% → REFUTED.",
             "",
             "PRIMARY-B cannot be evaluated until the consumption-based CO2 "
-            "fetcher lands. Per HANDOFF_TO_RUN_AGENT.md (\"What to do when "
+            "fetcher lands. Per research documentation (\"What to do when "
             "your spec needs data that isn't on disk\"), the run emits "
             "inconclusive rather than substituting a different series.",
             "",

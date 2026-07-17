@@ -6,7 +6,7 @@ Rules followed: planning and audit only. No data fetched. No files edited except
 
 ## Inputs Read
 
-- `engine/agent_briefs/graduation_repair_swarm_2026-05-16.md`
+- `internal research notes`
 - `engine/audits/broad_hypothesis_graduation_plan_2026-05-16.md`
 - `engine/audits/resource_developmentalism_trade_data_acquisition_2026-05-16.md`
 - `engine/audits/wits_comtrade_data_spine_plan_2026-05-12.md`

@@ -7,7 +7,7 @@ files. Per-year ZIPs (no API key):
     https://www2.census.gov/programs-surveys/gov-finances/tables/{year}/{year}_Individual_Unit_File.zip
 
 Confirmed live 2026-06-29 (STATE-AGENT-6) per
-engine/agent_briefs/state_level_housing_fiscal_verification_2026-06-29.md sec 5a.
+internal research notes sec 5a.
 
 Each year ZIP ships (for vintages that publish it) a public-use
 "State by level of estimate" file `YYstatetypepu.txt` (35-char fixed length).

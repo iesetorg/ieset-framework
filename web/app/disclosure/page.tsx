@@ -3,7 +3,7 @@ import { loadRepoMarkdown } from "@/lib/content";
 export const metadata = {
   title: "Transparency",
   description:
-    "Author perspective, broad economic exposure, and the methodological commitments that keep IESET auditable.",
+    "The methodological commitments and known limitations that keep IESET auditable.",
 };
 
 export default async function DisclosurePage() {

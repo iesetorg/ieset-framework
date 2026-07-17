@@ -5,7 +5,7 @@ plan for graduating additional hypotheses from the current inconclusive pool.
 
 Inputs:
 
-- `engine/agent_briefs/graduation_repair_swarm_2026-05-16.md`
+- `internal research notes`
 - `engine/audits/broad_hypothesis_graduation_plan_2026-05-16.md`
 - `engine/audits/graduation_batch_A_sample_ladder_repair_2026-05-16.md`
 - `engine/audits/graduation_batch_B_absorbed_treatment_repair_2026-05-16.md`

@@ -17,7 +17,7 @@ sample) AND must yield:
 If any of those LHS or institutional-channel series is not in the
 on-disk vintages, this replication emits `inconclusive — data gap`
 with a complete listing of which publisher:series are missing, per
-HANDOFF_TO_RUN_AGENT.md ("Don't fabricate data. If the publisher's
+research documentation ("Don't fabricate data. If the publisher's
 vintage doesn't contain a series the spec needs, emit `inconclusive
 (data gap on <publisher>:<series>)` and stop.").
 
@@ -432,7 +432,7 @@ def main() -> None:
         card.append("")
         card.append(
             "Promotion verdict: inconclusive (method-validity gate fails on data "
-            "availability). Per HANDOFF_TO_RUN_AGENT.md a data gap is NOT a "
+            "availability). Per research documentation a data gap is NOT a "
             "refutation - the scoreboard treats this as neutral. Re-run when "
             "the remaining OECD subnational fetchers are wired."
         )

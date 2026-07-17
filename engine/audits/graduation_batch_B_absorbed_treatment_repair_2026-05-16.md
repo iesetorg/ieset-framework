@@ -4,7 +4,7 @@ Scope: the 10 Batch B candidates from `engine/audits/broad_hypothesis_graduation
 
 Inputs read:
 
-- `engine/agent_briefs/graduation_repair_swarm_2026-05-16.md`
+- `internal research notes`
 - `engine/audits/broad_hypothesis_graduation_plan_2026-05-16.md`
 - Batch B hypothesis YAMLs under `hypotheses/**`
 - Current `engine/runs/<hypothesis_id>/diagnostics.json` and `result_card.md`

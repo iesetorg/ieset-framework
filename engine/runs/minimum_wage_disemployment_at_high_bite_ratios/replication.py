@@ -35,7 +35,7 @@ METHOD_VALID gates (per spec.falsification.threshold):
     >= 20 years of coverage.
 
 If any METHOD_VALID gate fails, the verdict is `inconclusive — data
-gap on <publisher>:<series>` per HANDOFF_TO_RUN_AGENT.md ("Don't
+gap on <publisher>:<series>` per research documentation ("Don't
 fabricate data. If the publisher's vintage doesn't contain a series
 the spec needs, emit `inconclusive` and stop."). A data gap is NOT
 a refutation — the scoreboard treats inconclusive as neutral.
@@ -422,7 +422,7 @@ def main() -> None:
             "data availability — the primary state-level BLS outcome and "
             "median-wage bite-ratio inputs are not on disk; OECD contextual "
             "panels are present but cannot replace the preregistered US "
-            "state cohort design). Per HANDOFF_TO_RUN_AGENT.md a "
+            "state cohort design). Per research documentation a "
             "data gap is NOT a refutation — the scoreboard treats this as "
             "neutral. Re-run when (a) the BLS state fan-out lands "
             "(LAU state teen E/P panel, OES state median hourly wage), "

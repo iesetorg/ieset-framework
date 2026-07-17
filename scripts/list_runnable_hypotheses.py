@@ -18,7 +18,7 @@ Usage:
   python3 scripts/list_runnable_hypotheses.py --format json
   python3 scripts/list_runnable_hypotheses.py --only-runnable
 
-The intended consumer is HANDOFF_TO_RUN_AGENT.md. Each agent claims one
+The intended consumer is research documentation. Each agent claims one
 row, writes engine/runs/<id>/replication.py end-to-end, tightens the
 YAML's falsification rule, and commits.
 """

@@ -33,7 +33,7 @@ Annual aggregation = simple mean of within-year observations on each series. All
 
 ## Deviations from pre-registration
 
-- The spec's preferred design is a Mian-Sufi state-panel local projections with state and quarter fixed effects, state-clustered SEs. State-level BEA PCE (post-1997) and NY Fed Consumer Credit Panel data are NOT on disk in `data/vintages/`; only national FRED series are available. Per HANDOFF_TO_RUN_AGENT.md (no fabrication), v1 promotes the spec to a national-level descriptive co-movement test. The state-LP design is preserved as v2 once a state-panel fetcher (BEA SAPCE + NY-Fed CCP) is wired.
+- The spec's preferred design is a Mian-Sufi state-panel local projections with state and quarter fixed effects, state-clustered SEs. State-level BEA PCE (post-1997) and NY Fed Consumer Credit Panel data are NOT on disk in `data/vintages/`; only national FRED series are available. Per research documentation (no fabrication), v1 promotes the spec to a national-level descriptive co-movement test. The state-LP design is preserved as v2 once a state-panel fetcher (BEA SAPCE + NY-Fed CCP) is wired.
 - 1990-2007 anchor years used (skipping 2008 entirely) since MEHOINUSA672N is annual; the spec's '1990-2008Q2' window collapses to the same end-anchor for an annual series.
 
 ## Data

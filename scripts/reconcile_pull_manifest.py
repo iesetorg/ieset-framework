@@ -135,7 +135,7 @@ def main() -> int:
               "Run the fetcher or drop a manual file. These are the cheapest unlocks.")
     if n_pending:
         print(f"- **PENDING ({n_pending})**: publisher registered but no fetcher_module. "
-              "These need a fetcher implementation (see HANDOFF_TO_DATA_AGENT.md priority list).")
+              "These need a fetcher implementation (see research documentation priority list).")
     if n_unreg:
         print(f"- **UNREGISTERED ({n_unreg})**: token in manifest but publisher not in publishers.yaml. "
               "Either register the publisher or remove the stale token from baseline_pull.yaml.")

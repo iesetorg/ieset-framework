@@ -26,7 +26,7 @@ Outcomes:
 
 **Spec downgrade.** Original spec called for synthetic-DID; the donor-
 weight optimisation step is non-trivial and `synth_did` is not in the 
-project venv. Per HANDOFF_TO_RUN_AGENT.md allowance, downgraded to a 
+project venv. Per research documentation allowance, downgraded to a
 transparent before/after comparison with an explicit pre-trend 
 diagnostic. A real synth-DID would weight donors to match the pre-
 period; this comparison instead reports the unweighted donor mean 

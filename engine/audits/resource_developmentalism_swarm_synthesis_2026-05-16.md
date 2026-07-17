@@ -2,7 +2,7 @@
 
 Target: `resource_developmentalism_rent_seeking_trap`
 
-Plan anchor: `engine/agent_briefs/resource_developmentalism_hardening_swarm_plan_2026-05-16.md`
+Plan anchor: `internal research notes`
 
 Current result card: `engine/runs/resource_developmentalism_rent_seeking_trap/result_card.md`
 

@@ -36,7 +36,7 @@ the others miss by a small margin.
 
 Data-gap protocol: OECD SOCX is not currently fetched into
 data/vintages/oecd/. Per the framework's invariant on provenance
-(HANDOFF_TO_RUN_AGENT.md §"What to do when your spec needs data that
+(research documentation §"What to do when your spec needs data that
 isn't on disk"), we emit verdict = "inconclusive (data gap on oecd:SOCX)"
 when the spending-share leg cannot be evaluated, and report the remaining
 legs as informative. The script becomes immediately re-runnable once the

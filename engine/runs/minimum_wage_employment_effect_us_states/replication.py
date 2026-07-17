@@ -32,7 +32,7 @@ METHOD_VALID gates:
 
 If any of those required state-level series is not in the on-disk
 vintages, this replication emits `inconclusive — data gap` with a full
-listing of which publisher:series are missing, per HANDOFF_TO_RUN_AGENT.md
+listing of which publisher:series are missing, per research documentation
 ("Don't fabricate data. If the publisher's vintage doesn't contain a
 series the spec needs, emit `inconclusive (data gap on
 <publisher>:<series>)` and stop.").
@@ -381,7 +381,7 @@ def main() -> None:
             "Promotion verdict: inconclusive (method-validity gate fails on "
             "data availability — state-level BLS series are not on disk; "
             "the BLS fetcher currently exposes only national LNS/CES/CUUR "
-            "series). Per HANDOFF_TO_RUN_AGENT.md a data gap is NOT a "
+            "series). Per research documentation a data gap is NOT a "
             "refutation — the scoreboard treats this as neutral. Re-run "
             "when the BLS state fan-out (LAU state teen E/P, SMS state CES, "
             "ENU county QCEW) and USDOL state minimum-wage history fetchers "

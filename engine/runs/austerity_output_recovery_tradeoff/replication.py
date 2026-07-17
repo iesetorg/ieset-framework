@@ -8,7 +8,7 @@ instrument (April 2010 WEO forecast minus realised CAPB change). The
 forecast-vintage data is not on disk, and IMF cyclically-adjusted primary
 balance series GGCBP is also not in the local vintage tree.
 
-Per HANDOFF_TO_RUN_AGENT.md allowance for missing instrument data, the primary
+Per research documentation allowance for missing instrument data, the primary
 specification is downgraded to a cross-sectional OLS:
 
     Δlog(GDP)_{2010→2019, i} = α + β · ΔFB_{2010→2013, i}

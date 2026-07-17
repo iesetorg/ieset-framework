@@ -2,7 +2,7 @@
 
 Target hypothesis: `resource_developmentalism_rent_seeking_trap`
 
-Plan anchor: `engine/agent_briefs/resource_developmentalism_hardening_swarm_plan_2026-05-16.md`
+Plan anchor: `internal research notes`
 
 ## Freeze State
 
@@ -15,7 +15,7 @@ This wave begins from a dirty worktree. Existing relevant dirty files include:
 - `scripts/run_panel_fe.py`
 - `scripts/build_export_diversification_vintage.py`
 - `scripts/build_movement_vintages.py`
-- `engine/agent_briefs/resource_developmentalism_hardening_swarm_plan_2026-05-16.md`
+- `internal research notes`
 - `engine/audits/corpus_dataset_review_2026-05-16.md`
 
 The current swarm is an audit and fast-pass design wave. No worker may edit movement YAML, hypothesis YAML, shared runner code, scoreboard mappings, or existing run artifacts unless explicitly reassigned in a later implementation wave.

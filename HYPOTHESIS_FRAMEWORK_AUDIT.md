@@ -1,8 +1,7 @@
-# Hypothesis framework audit — agent brief
+# Hypothesis framework audit
 
-**Written:** 2026-04-24
-**Status:** open backlog — supersedes ad-hoc polarity audits; expected to run until the hypothesis library is trusted end-to-end.
-**Scope:** systematic audit of `hypotheses/**/*.yaml`, `positions/*.yaml`, and `engine/runs/*/` for the error classes documented below. Not an infrastructure task — the publisher/fetcher side is handled separately in `HANDOFF_TO_DATA_AGENT.md`.
+**Scope:** systematic audit of `hypotheses/**/*.yaml`, `positions/*.yaml`, and
+`engine/runs/*/` for the error classes documented below.
 
 ---
 
@@ -15,8 +14,6 @@ The framework produces a scoreboard that ranks schools of thought by how their p
 3. **Coverage has to be broad enough that the pattern of evidence is visible.** At 15/254 hypotheses run, any claim about "what the evidence shows" is overconfident.
 
 As of today, **each of these is broken in different places**. The bugs are not random — they fall into a small number of recurring error classes, most of which are authorial bias baked into pre-registered specs. This document catalogues the error classes so they can be fixed systematically.
-
-The working user phrasing: "*if you don't get these dialed the whole thing is laughably uncredible.*" That's accurate.
 
 ---
 
@@ -188,7 +185,7 @@ Any compound threshold with 3+ AND-joined conditions deserves scrutiny. The usua
 
 **Symptom:** 7 of 15 runs returned `inconclusive (data gaps)`. These aren't framework errors; they're missing data.
 
-**Audit procedure (for data agent, cross-reference with `HANDOFF_TO_DATA_AGENT.md`):**
+**Audit procedure (for data agent, cross-reference with `research documentation`):**
 1. List inconclusive runs: `cuba_socialist_economy_stagnation_1960_2023`, `great_leap_forward_famine_output_collapse_1959_1961`, `north_south_korea_development_divergence_1953_present`, `soviet_union_central_planning_gdp_collapse_1989_1991`, `venezuela_chavismo_canonical_case_multi_metric`, `west_east_germany_economic_system_divergence_1950_1989`, `zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009`.
 2. For each, read the hypothesis YAML and identify the unresolved publisher(s).
 3. Cross-reference `data/fetchers/publishers.yaml` to see which are `status: pending`.
@@ -290,7 +287,7 @@ Work in this order — each priority produces a deliverable TSV or YAML patch th
 
 ---
 
-## Interface with `HANDOFF_TO_DATA_AGENT.md`
+## Interface with `research documentation`
 
 This brief is about hypothesis *quality* (framing, polarity, falsification rules, coverage gaps in the hypothesis library). That brief is about hypothesis *runnability* (publishers, fetchers, data availability). They're complementary:
 

@@ -5,7 +5,7 @@ Scope: 20 listwise-deletion / sample-collapse candidates from
 
 Read basis:
 
-- `engine/agent_briefs/graduation_repair_swarm_2026-05-16.md`
+- `internal research notes`
 - `engine/audits/broad_hypothesis_graduation_plan_2026-05-16.md`
 - candidate `hypotheses/**/*.yaml`
 - candidate `engine/runs/*/diagnostics.json`

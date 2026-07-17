@@ -4,7 +4,7 @@ Worker lane: Treatment coding. Write scope limited to this audit and the compani
 
 ## Inputs Read
 
-- Plan anchor: `engine/agent_briefs/resource_developmentalism_hardening_swarm_plan_2026-05-16.md`
+- Plan anchor: `internal research notes`
 - Queue freeze: `engine/audits/resource_developmentalism_queue_freeze_2026-05-16.md`
 - Builder: `scripts/build_movement_vintages.py`
 - Movement YAML source: `movements/*.yaml`

@@ -46,9 +46,16 @@ Policy experiments do not earn high-integrity public promotion from headline out
 
 **Enforced by:** schema and audit. Policy specs may declare `evaluation_design`; axes declare `second_order_measurement`; `scripts/audit_second_order_measurement.py` and `engine/policy_second_order_requirements_index.*` expand every policy into required layers, preferred designs, and source-family gaps. Claims that lack the required mechanism contract remain candidate, descriptive, or screen-only until the missing layers are measured.
 
-### 7. Authored, reproducible, open to correction
+### 7. Reproducible and open to correction
 
-IESET is an authored framework, not an anonymous consensus document. [DISCLOSURE.md](DISCLOSURE.md) records the author's perspective and broad economic exposure. Every hypothesis YAML includes a pre-run `prior_confidence`, not as a badge of truth, but as an audit marker for how surprising the result was expected to be. The framework's defence is reproducibility and correction: pre-registration commits, public replication code, challengeable mappings, and visible updates when a test changes the record.
+IESET does not ask readers to rely on biographical or institutional authority.
+[DISCLOSURE.md](DISCLOSURE.md) records the framework's methodological
+commitments and known limitations. Every hypothesis YAML includes a pre-run
+`prior_confidence`, not as a badge of truth, but as an audit marker for how
+surprising the result was expected to be. The framework's defence is
+reproducibility and correction: pre-registration commits, public replication
+code, challengeable mappings, and visible updates when a test changes the
+record.
 
 **Enforced by:** every hypothesis YAML must include a `disclosure` field and a non-null `prior_confidence` in `[0, 1]`.
 
@@ -105,6 +112,8 @@ Edits to `METHODOLOGY.md` require:
 
 - A commit message that explicitly names which invariant changed and why.
 - A line in the commit body naming any existing hypotheses the change affects.
-- Review sign-off from at least one opposing-prior reviewer once the review infrastructure is live (Phase 6).
+- Review sign-off from at least one opposing-prior reviewer when the change can
+  affect published verdicts.
 
-Before Phase 6, changes are sole-author but are logged in `review/log/methodology_changes.md` for future retroactive review.
+All material methodology changes are logged in
+`review/log/methodology_changes.md`.

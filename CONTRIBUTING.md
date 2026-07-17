@@ -2,6 +2,14 @@
 
 This framework depends on specific, evidence-backed contributions. The most valuable submissions identify a data problem, specification weakness, mapping error, or stronger opposing argument that changes what the framework should publish.
 
+## Public repository scope
+
+The public repository contains research specifications, source provenance,
+replication code and results, methodology, validation, and the public site.
+Credentials, local paths, operator notes, private automation, outreach,
+administrative plans, and unrelated applications belong outside this
+repository.
+
 ## Kinds of contribution
 
 ### 1. Data challenges
@@ -35,13 +43,14 @@ Every contribution — accepted, rejected, or partially-accepted — is logged i
 - Rhetorical reframings without data or specification substance.
 - Ideological assertions unsupported by citation.
 - Demands that specific conclusions be reached regardless of evidence.
-- Identity-based objections ("you're not a credentialed economist"); the methodology is the methodology regardless of who applies it.
+- Identity-based objections; assess the evidence, specification, and
+  reproducibility of the work itself.
 
 ## Process
 
 1. Open an issue first, even for small things. This keeps the public review log coherent.
 2. For PRs: fork, branch, submit. Include `review/submissions/<date>_<short-name>.md` describing the submission and the evidence or reasoning behind it.
-3. The author reviews; outcomes are logged in `review/log/`.
+3. An IESET maintainer reviews; outcomes are logged in `review/log/`.
 4. Bounty-eligible successful contributions get paid and publicly credited (unless the contributor requests anonymity, which is honoured).
 
 ## Reviewer Context
