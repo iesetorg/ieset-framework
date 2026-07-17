@@ -346,7 +346,7 @@ export default function HowItWorksPage() {
             verdict tier — amber on the scoreboard, NOT green. (2) A
             published{" "}
             <a
-              href="https://github.com/iesetorg/ieset-framework1/blob/main/data/SOCIAL_FETCHER_BACKLOG.md"
+              href="https://github.com/iesetorg/ieset-framework1"
               className="text-accent underline hover:no-underline"
             >
               social-policy data backlog
