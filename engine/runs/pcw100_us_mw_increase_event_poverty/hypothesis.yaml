@@ -1,0 +1,72 @@
+hypothesis_id: pcw100_us_mw_increase_event_poverty
+version: 1
+status: pre_registered
+topic: distribution
+claim_direction: '-'
+claim: Across the 50 US states and District of Columbia during 2006-2024, higher a state minimum-wage increase event
+  predicts a lower all-ages poverty rate in a two-way state and year fixed-effects screen with state-clustered standard
+  errors.
+methodology_note: Registered as part of the 100-test policy-contrast wave. The design uses new state-level treatment
+  and outcome panels, keeps null and contrary results, and is explicitly associational.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period: &id001
+  - 2006
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - retain the 50 states and District of Columbia; exclude US territories
+  - drop state-years missing the registered treatment or outcome
+  - do not impute treatment or outcome values
+scope:
+  period: *id001
+  countries:
+  - USA
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - state_minimum_wage
+  - minimum_wage_increase
+  - policy_event
+variables:
+  outcome:
+  - name: poverty
+    source: ieset_derived:saipe_poverty_rate_all_ages
+    transformation: annual rate in percentage points
+    notes: SAIPE all-ages poverty rate
+  treatment:
+  - name: increase_event
+    source: ieset_derived:increase_event
+    transformation: indicator equal to one when the effective minimum wage rises from the prior year
+    notes: a state minimum-wage increase event
+intervention_channel: regulatory
+intervention_channel_justification: State statutory wage floors are regulatory interventions; the design measures
+  policy intensity rather than assigning ideological labels.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - state
+  - year
+  clustering: state
+  notes: OLS with state and year indicators and state-clustered covariance. No coefficient is inspected before the
+    specification commit.
+falsification:
+  rule: SUPPORTED if the treatment coefficient is negative with two-sided p<0.10. REFUTED if it is significantly
+    opposite-signed at p<0.10. Otherwise PARTIAL. A verdict requires at least 100 observations, 30 states, and a
+    registered contrast gap of at least 1.0; a failed data gate is INCONCLUSIVE rather than PARTIAL.
+  test: twoway_state_year_fe_pcw100_us_mw_increase_event_poverty
+  threshold:
+    expected_sign: '-'
+    p_max: 0.1
+    min_observations: 100
+    min_units: 30
+    min_contrast_gap: 1.0
+prior_confidence: 0.52
+disclosure: Minimum-wage policy may respond to local labor conditions and may proxy for unmeasured state trends.
+  The screen does not establish causality.
+steelman: hypotheses/steelman/pcw100_us_mw_increase_event_poverty.md
+notes: Hypothesis-only research wave; no school-scoreboard linkage is asserted.

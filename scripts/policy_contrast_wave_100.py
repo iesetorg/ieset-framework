@@ -1364,7 +1364,7 @@ def estimate(config: dict[str, Any], frame: pd.DataFrame) -> dict[str, Any]:
         "coefficient": coefficient,
         "std_error": standard_error,
         "p_value": p_value,
-        "conf_int_90": [float(conf_int.iloc[0]), float(conf_int.iloc[1])],
+        "conf_int_95": [float(conf_int.iloc[0]), float(conf_int.iloc[1])],
         "n_observations": int(model.nobs),
         "r_squared": r_squared,
         "method": method,

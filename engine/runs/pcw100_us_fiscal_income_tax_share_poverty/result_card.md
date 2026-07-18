@@ -1,0 +1,31 @@
+# Result card — pcw100_us_fiscal_income_tax_share_poverty
+
+- Verdict: **PARTIAL**
+- Cohort: `us_fiscal_policy`
+- Expected sign: `-`
+- Reason: coefficient=+0.00180612, SE=0.0205548, p=0.929981, expected_sign=-
+- Observations: 220
+- Units: 44
+- Contrast: bottom treatment quartile versus top treatment quartile
+- Contrast gap: 6.97798
+
+## Extreme policy groups
+
+- Low-policy units: AL, AR, AZ, IA, KS, KY, LA, MS, ND, NH, NM, OH, OK, PA, RI, TN, VT, WV
+- High-policy units: CA, CO, CT, GA, IL, MA, MD, MN, NC, NE, NJ, NY, OR, UT, VA, WI
+
+## Registered decision rule
+
+Expected-sign coefficient with two-sided p<0.10 is SUPPORTED; significant opposite sign is REFUTED; all other estimable results are PARTIAL. A failed data gate is INCONCLUSIVE.
+
+## Interpretation
+
+This result is an associational screen. Fixed effects, temporal ordering, or baseline controls narrow some rival explanations but do not establish causality.
+
+## Estimate
+
+- Coefficient: +0.0018061165
+- Standard error: 0.020554759
+- p-value: 0.92998117
+- R-squared: 0.983322
+- Method: statsmodels OLS with state/year indicators and state-clustered covariance
