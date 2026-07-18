@@ -188,7 +188,15 @@ def build_record(
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     doc = raw if isinstance(raw, dict) else {}
     hypothesis_id = str(doc.get("hypothesis_id") or path.stem)
-    registration = registrations.get(hypothesis_id) or {}
+    # The legacy pre-registration index is keyed by spec filename. One early
+    # filename uses uppercase initials while its declared hypothesis_id is
+    # lowercase. Resolve both forms so the ledger is stable on case-sensitive
+    # Linux CI and case-insensitive macOS worktrees.
+    registration = (
+        registrations.get(hypothesis_id)
+        or registrations.get(path.stem)
+        or {}
+    )
     registration_status = str(registration.get("status") or "invalid_history")
 
     run_dir = ROOT / "engine" / "runs" / hypothesis_id
