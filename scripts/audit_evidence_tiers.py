@@ -200,6 +200,13 @@ def build_record(
     registration_status = str(registration.get("status") or "invalid_history")
 
     run_dir = ROOT / "engine" / "runs" / hypothesis_id
+    if not run_dir.is_dir():
+        # Match the legacy uppercase filename/run-directory spelling used by
+        # one early record. Do not let filesystem case-sensitivity change the
+        # published ledger.
+        legacy_run_dir = ROOT / "engine" / "runs" / path.stem
+        if legacy_run_dir.is_dir():
+            run_dir = legacy_run_dir
     diagnostics = load_json(run_dir / "diagnostics.json")
     verdict = str(diagnostics.get("verdict") or "").strip()
     card_path = run_dir / "result_card.md"

@@ -1,5 +1,5 @@
 import { readFile, readdir, stat } from "node:fs/promises";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve, dirname, basename } from "node:path";
 import { execSync } from "node:child_process";
 import yaml from "js-yaml";
@@ -18,6 +18,21 @@ import type {
 
 // Repo root is one level up from /web
 export const REPO_ROOT = resolve(process.cwd(), "..");
+const RUNS_ROOT = join(REPO_ROOT, "engine", "runs");
+
+let _runDirectoryIndex: Map<string, string> | null = null;
+
+function runDirectoryName(hypothesisId: string): string {
+  if (existsSync(join(RUNS_ROOT, hypothesisId))) return hypothesisId;
+  if (!_runDirectoryIndex) {
+    _runDirectoryIndex = new Map(
+      readdirSync(RUNS_ROOT, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => [entry.name.toLowerCase(), entry.name])
+    );
+  }
+  return _runDirectoryIndex.get(hypothesisId.toLowerCase()) ?? hypothesisId;
+}
 
 export interface EvidenceAuditRecord {
   hypothesis_id: string;
@@ -455,7 +470,7 @@ function firstCommit(repoRelPath: string): { hash: string; iso: string } | null 
 // -----------------------------------------------------------------------------
 
 export async function loadChartData(hypothesisId: string): Promise<unknown | null> {
-  const path = join(REPO_ROOT, "engine", "runs", hypothesisId, "chart_data.json");
+  const path = join(RUNS_ROOT, runDirectoryName(hypothesisId), "chart_data.json");
   if (!existsSync(path)) return null;
   const raw = await readFile(path, "utf8");
   const parsed = parseJsonArtifact(raw, path);
@@ -530,12 +545,13 @@ export async function loadRunArtifacts(hypothesisId: string): Promise<RunArtifac
   const cached = _runArtifactsCache.get(hypothesisId);
   if (cached) return cached;
   const promise = (async (): Promise<RunArtifacts> => {
-    const runDir = join(REPO_ROOT, "engine", "runs", hypothesisId);
+    const resolvedRunDirectory = runDirectoryName(hypothesisId);
+    const runDir = join(RUNS_ROOT, resolvedRunDirectory);
     if (!existsSync(runDir)) return { exists: false };
 
     const out: RunArtifacts = {
       exists: true,
-      run_dir_rel: `engine/runs/${hypothesisId}`,
+      run_dir_rel: `engine/runs/${resolvedRunDirectory}`,
     };
 
     const diagPath = join(runDir, "diagnostics.json");
@@ -597,7 +613,9 @@ export async function loadRunArtifacts(hypothesisId: string): Promise<RunArtifac
             }
           >;
         };
-        const row = index.registrations?.[hypothesisId];
+        const row =
+          index.registrations?.[hypothesisId] ??
+          index.registrations?.[resolvedRunDirectory];
         if (row?.run_first_commit) {
           out.run_first_commit = {
             hash: row.run_first_commit,
