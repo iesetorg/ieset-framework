@@ -18,12 +18,19 @@ const COVERAGE_TESTED_FLOOR = 60;
 
 export default async function ScoreboardPage() {
   const scores = await scoreAllPositions();
-  const tested = scores.filter((s) => s.tested > 0);
-  const untestedOnly = scores.filter((s) => s.tested === 0);
-  const totalRun = scores.reduce((a, s) => a + s.tested, 0);
-  const totalClaims = scores.reduce((a, s) => a + s.total_claims, 0);
-  const totalIntegrityWeight = scores.reduce((a, s) => a + s.integrity_tested_weight, 0);
-  const coverageRows = scores
+  const rankedSchools = scores.filter((s) => s.scoreboard_role === "school");
+  const benchmarkControls = scores.filter(
+    (s) => s.scoreboard_role === "benchmark_control"
+  );
+  const tested = rankedSchools.filter((s) => s.tested > 0);
+  const untestedOnly = rankedSchools.filter((s) => s.tested === 0);
+  const totalRun = rankedSchools.reduce((a, s) => a + s.tested, 0);
+  const totalClaims = rankedSchools.reduce((a, s) => a + s.total_claims, 0);
+  const totalIntegrityWeight = rankedSchools.reduce(
+    (a, s) => a + s.integrity_tested_weight,
+    0
+  );
+  const coverageRows = rankedSchools
     .map((s) => {
       const linked = new Set(
         s.scored_claims
@@ -78,7 +85,7 @@ export default async function ScoreboardPage() {
       <div className="my-6 flex flex-wrap gap-6 text-[14px]">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Schools tracked</div>
-          <div className="text-[22px] font-semibold">{scores.length}</div>
+          <div className="text-[22px] font-semibold">{rankedSchools.length}</div>
         </div>
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Total predictions</div>
@@ -89,12 +96,16 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{totalRun}</div>
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">High-integrity tested weight</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Ranked high-integrity weight</div>
           <div className="text-[22px] font-semibold">{totalIntegrityWeight.toFixed(1)}</div>
         </div>
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">V1 coverage balanced</div>
-          <div className="text-[22px] font-semibold">{balancedCoverage}/{scores.length}</div>
+          <div className="text-[22px] font-semibold">{balancedCoverage}/{rankedSchools.length}</div>
+        </div>
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Benchmark controls</div>
+          <div className="text-[22px] font-semibold">{benchmarkControls.length}</div>
         </div>
       </div>
 
@@ -169,15 +180,18 @@ export default async function ScoreboardPage() {
           </div>
         </div>
         <p className="mt-3 mb-0">
-          Schools are ranked by <strong>Attribution net</strong>, now the
-          strict second-order-gated score. The forecast Q-net and original raw
-          score stay visible for transparency, while tiny margins are muted as
-          too close to call.
+          Schools are ranked first by <strong>Attribution net</strong>, now the
+          strict second-order-gated score. Exact ties use high-integrity tested
+          weight, forecast Q-net, forecast tested weight, raw net, then school
+          ID. The forecast Q-net and original raw score stay visible for
+          transparency, while tiny margins are muted as too close to call.
+          Benchmark controls are reported separately and never compete in the
+          school ranking.
         </p>
       </div>
 
       <h2 className="mt-10 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-        Schools with tested predictions — ranked by attribution-adjusted net
+        Schools with tested predictions — A-net first, Q-net breaks strict ties
       </h2>
       <div className="overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full border-collapse text-sm">
@@ -286,6 +300,34 @@ export default async function ScoreboardPage() {
         </>
       )}
 
+      {benchmarkControls.length > 0 && (
+        <>
+          <h2 className="mt-12 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
+            Benchmark controls — reported, never ranked
+          </h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            {benchmarkControls.map((s) => (
+              <div key={s.position_id} className="rounded border border-rule bg-white p-4">
+                <Link
+                  href={`/pos/${s.position_id}`}
+                  className="font-medium text-ink hover:underline"
+                >
+                  {s.school}
+                </Link>
+                <div className="mt-1 text-[12.5px] leading-relaxed text-muted">
+                  Calibration row only · A-net {s.integrity_net_score.toFixed(1)}
+                  {" · "}Q-net {s.adjusted_net_score > 0 ? "+" : ""}
+                  {s.adjusted_net_score.toFixed(1)}
+                  {" · "}raw {s.net_score > 0 ? "+" : ""}
+                  {s.net_score.toFixed(1)}
+                  {" · "}{s.tested} tested of {s.total_claims}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
       <section className="mt-14 rounded border border-rule bg-panel p-6">
         <h3 className="m-0 text-[16px] font-semibold">Notes on interpretation</h3>
         <ul className="mt-3 list-disc pl-5 text-[14px] leading-[1.6] text-muted">
@@ -321,6 +363,11 @@ export default async function ScoreboardPage() {
           <li>
             The score updates automatically when hypothesis runs land. This page
             is a live read of the git state.
+          </li>
+          <li>
+            House or calibration positions are benchmark controls. They remain
+            visible for auditability but are excluded from school counts,
+            ranking, and aggregate ranked-school totals.
           </li>
         </ul>
       </section>

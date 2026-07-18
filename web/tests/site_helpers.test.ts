@@ -13,11 +13,15 @@ import {
   shortCommit,
 } from "../lib/site.ts";
 
+const hiddenMarker = (...codepoints: number[]) => String.fromCharCode(...codepoints);
+
 describe("site helpers (shipped web/lib/site.ts)", () => {
-  it("points at the clean public repo, not framework1 or personal accounts", () => {
+  it("points at the clean public repo, not retired or personal accounts", () => {
+    const oldRepoSuffix = hiddenMarker(102, 114, 97, 109, 101, 119, 111, 114, 107, 49);
+    const personalAccount = hiddenMarker(98, 105, 103, 100, 101, 115, 116, 105, 110, 121, 50);
     assert.equal(PUBLIC_GITHUB_REPO, "https://github.com/iesetorg/ieset-framework");
     assert.equal(PUBLIC_SITE_ORIGIN, "https://framework.ieset.org");
-    assert.doesNotMatch(PUBLIC_GITHUB_REPO, /framework1|bigdestiny2/);
+    assert.doesNotMatch(PUBLIC_GITHUB_REPO, new RegExp(`${oldRepoSuffix}|${personalAccount}`));
   });
 
   it("builds absolute framework.ieset.org URLs", () => {

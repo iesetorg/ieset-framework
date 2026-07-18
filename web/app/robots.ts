@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { PUBLIC_SITE_ORIGIN } from "@/lib/site";
 
+export const dynamic = "force-static";
+
 /**
  * Explicit crawler policy for an open-science evidence site.
  * Retrieval and answer-engine bots are welcome; training is allowed on

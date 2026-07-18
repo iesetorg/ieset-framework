@@ -18,6 +18,10 @@ export async function GET() {
     scoreAllPositions(),
     loadScoreboardSecondOrderGateSummary(),
   ]);
+  const rankedSchools = scores.filter((score) => score.scoreboard_role === "school");
+  const benchmarkControls = scores.filter(
+    (score) => score.scoreboard_role === "benchmark_control"
+  );
   return Response.json({
     api_version: "2",
     generated_at: new Date().toISOString(),
@@ -25,7 +29,17 @@ export async function GET() {
     scoring_policy: "attribution_net_v3_second_order_gated",
     second_order_gate_artifact: secondOrderGates,
     rank_basis: "integrity_net_score",
+    rank_tie_breakers: [
+      "integrity_tested_weight",
+      "adjusted_net_score",
+      "adjusted_tested_weight",
+      "net_score",
+      "position_id",
+    ],
     legacy_forecast_score_field: "adjusted_net_score",
-    positions: scores,
+    ranked_school_count: rankedSchools.length,
+    benchmark_control_count: benchmarkControls.length,
+    positions: rankedSchools,
+    benchmark_controls: benchmarkControls,
   });
 }

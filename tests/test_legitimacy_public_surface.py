@@ -13,9 +13,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Personal-path leak token, assembled so this test file never contains the
-# continuous forbidden string that `git grep` would otherwise self-match.
-_PATH_LEAK_TOKEN = "duncan" + "campbell"
+
+def hidden_marker(*codepoints: int) -> str:
+    """Build private audit markers without publishing them as source text."""
+    return "".join(chr(codepoint) for codepoint in codepoints)
 
 
 def test_stats_json_is_authoritative_census_copy():
@@ -33,8 +34,12 @@ def test_citation_and_site_point_at_ieset_framework():
     site = (ROOT / "web" / "lib" / "site.ts").read_text(encoding="utf-8")
     assert 'repository-code: "https://github.com/iesetorg/ieset-framework"' in citation
     assert "https://github.com/iesetorg/ieset-framework" in site
-    assert "ieset-framework1" not in citation
-    assert "bigdestiny2" not in site
+    retired_repo = hidden_marker(
+        105, 101, 115, 101, 116, 45, 102, 114, 97, 109, 101, 119, 111, 114, 107, 49
+    )
+    assert retired_repo not in citation
+    personal_account = hidden_marker(98, 105, 103, 100, 101, 115, 116, 105, 110, 121, 50)
+    assert personal_account not in site
 
 
 def test_prereg_strip_deep_links_first_spec_commit_not_head():
@@ -68,55 +73,39 @@ def test_prereg_index_verified_spec_is_not_repository_head():
     )
 
 
-def test_production_disclosure_without_private_brain():
+def test_production_disclosure_without_private_control_plane():
     prod = (ROOT / "web" / "app" / "production" / "page.tsx").read_text(encoding="utf-8")
     assert "large-language-model assistance under human direction" in prod
     assert "Models are workers, not authorities" in prod
     assert "not" in prod.lower() and "peer review" in prod.lower()
-    # Must not embed private control-plane paths or personal home-path tokens
-    assert "engine/brain" not in prod
-    assert _PATH_LEAK_TOKEN not in prod
+    # Must not embed private control-plane paths
+    control_plane_path = hidden_marker(101, 110, 103, 105, 110, 101, 47, 98, 114, 97, 105, 110)
+    private_name = hidden_marker(100, 117, 110, 99, 97, 110, 99, 97, 109, 112, 98, 101, 108, 108)
+    assert control_plane_path not in prod
+    assert private_name not in prod
     assert "budget_state" not in prod
 
 
-def test_public_tree_has_no_name_leak_or_tracked_brain():
-    # Scope to the public product surface (site, docs, citation) — not tests/.
+def test_public_tree_has_no_name_leak_or_tracked_control_plane():
+    private_name = hidden_marker(100, 117, 110, 99, 97, 110, 99, 97, 109, 112, 98, 101, 108, 108)
     leaked = subprocess.run(
-        [
-            "git",
-            "grep",
-            "-n",
-            _PATH_LEAK_TOKEN,
-            "HEAD",
-            "--",
-            "web/",
-            "CONTRIBUTING.md",
-            "README.md",
-            "CITATION.cff",
-            "DISCLOSURE.md",
-            "METHODOLOGY.md",
-            "review/",
-            "engine/public_corpus_census.json",
-            "engine/preregistration_index.json",
-        ],
+        ["git", "grep", "-n", private_name, "HEAD"],
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
     assert leaked.returncode != 0, leaked.stdout
 
-    # This test file must not re-introduce the continuous token for git grep.
-    raw = Path(__file__).read_bytes()
-    continuous = b"duncan" + b"campbell"
-    assert continuous not in raw, "test source must not embed the continuous leak token"
-
     tracked = subprocess.check_output(
         ["git", "ls-tree", "-r", "HEAD", "--name-only"],
         cwd=ROOT,
         text=True,
     )
-    brain_paths = [p for p in tracked.splitlines() if p.startswith("engine/brain")]
-    assert brain_paths == []
+    control_plane_path = hidden_marker(101, 110, 103, 105, 110, 101, 47, 98, 114, 97, 105, 110)
+    private_control_paths = [
+        path for path in tracked.splitlines() if path.startswith(control_plane_path)
+    ]
+    assert private_control_paths == []
 
 
 def test_discovery_artifacts_exist_and_use_canonical_host():

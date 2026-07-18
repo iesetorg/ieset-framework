@@ -569,6 +569,7 @@ export interface ScoredClaim {
 export interface PositionScore {
   position_id: string;
   school: string;
+  scoreboard_role: "school" | "benchmark_control";
   total_claims: number;
   supports: number;
   refutes: number;
@@ -1129,6 +1130,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     scores.push({
       position_id: pos.position_id,
       school: pos.school,
+      scoreboard_role: pos.scoreboard_role ?? "school",
       total_claims: claims.length,
       supports,
       refutes,
@@ -1158,6 +1160,9 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
   }
 
   scores.sort((a, b) => {
+    if (a.scoreboard_role !== b.scoreboard_role) {
+      return a.scoreboard_role === "benchmark_control" ? 1 : -1;
+    }
     if (a.tested === 0 && b.tested === 0) return 0;
     if (a.tested === 0) return 1;
     if (b.tested === 0) return -1;
@@ -1165,6 +1170,12 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
     if (Math.abs(netDiff) > 0.001) return netDiff;
     const integrityWeightDiff = b.integrity_tested_weight - a.integrity_tested_weight;
     if (Math.abs(integrityWeightDiff) > 0.001) return integrityWeightDiff;
+    const adjustedNetDiff = b.adjusted_net_score - a.adjusted_net_score;
+    if (Math.abs(adjustedNetDiff) > 0.001) return adjustedNetDiff;
+    const adjustedWeightDiff = b.adjusted_tested_weight - a.adjusted_tested_weight;
+    if (Math.abs(adjustedWeightDiff) > 0.001) return adjustedWeightDiff;
+    const rawNetDiff = b.net_score - a.net_score;
+    if (Math.abs(rawNetDiff) > 0.001) return rawNetDiff;
     return a.position_id.localeCompare(b.position_id);
   });
 

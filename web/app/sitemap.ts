@@ -12,6 +12,8 @@ import { PUBLIC_SITE_ORIGIN } from "@/lib/site";
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
+export const dynamic = "force-static";
+
 function abs(path: string): string {
   return `${PUBLIC_SITE_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;
 }

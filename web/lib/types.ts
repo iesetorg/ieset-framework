@@ -190,6 +190,7 @@ export interface Position {
   school: string;
   short_name?: string;
   status: PositionStatus;
+  scoreboard_role?: "school" | "benchmark_control";
   proponents?: string[];
   key_texts?: string[];
   steelman: string;
