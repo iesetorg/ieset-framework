@@ -201,7 +201,7 @@ The split is deliberate. Code wants maximum reuse (Apache-2.0). The spec library
   title = {IESET — An empirical economic-policy research framework},
   author = {{IESET}},
   year = {2026},
-  url = {https://github.com/iesetorg/ieset-framework1},
+  url = {https://github.com/iesetorg/ieset-framework},
   note = {Verdict-tier audit trail and indicator-integrity gate.}
 }
 ```
