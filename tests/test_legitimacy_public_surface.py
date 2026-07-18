@@ -27,6 +27,18 @@ def test_stats_json_is_authoritative_census_copy():
     assert "counts" in data
     assert data["counts"]["hypothesis_specs"] > 0
     assert data["counts"]["review_submissions"] == 0
+    assert data["schema_version"] == 2
+    assert data["counts"]["positions"] == (
+        data["counts"]["ranked_schools"]
+        + data["counts"]["benchmark_controls"]
+    )
+    assert data["counts"]["ranked_schools"] == 16
+    assert data["counts"]["benchmark_controls"] == 1
+    assert data["counts"]["featured_evidence"] > 0
+    assert data["counts"]["public_visible_results"] == (
+        data["counts"]["featured_evidence"]
+        + data["counts"]["calibration_evidence"]
+    )
 
 
 def test_citation_and_site_point_at_ieset_framework():
@@ -110,10 +122,16 @@ def test_public_tree_has_no_name_leak_or_tracked_control_plane():
 
 def test_discovery_artifacts_exist_and_use_canonical_host():
     paths = [
-        ROOT / "web" / "app" / "robots.ts",
+        ROOT / "web" / "public" / "robots.txt",
         ROOT / "web" / "app" / "sitemap.ts",
         ROOT / "web" / "public" / "llms.txt",
+        ROOT / "web" / "public" / "llms-full.txt",
         ROOT / "web" / "public" / "feed.xml",
+        ROOT / "web" / "public" / "evidence-tiers.json",
+        ROOT / "web" / "app" / "evidence" / "page.tsx",
+        ROOT / "METHODS_PAPER.md",
+        ROOT / "web" / "app" / "methods-paper" / "page.tsx",
+        ROOT / "web" / "app" / "api" / "catalog" / "route.ts",
         ROOT / "web" / "app" / "updates" / "page.tsx",
         ROOT / "web" / "public" / "stats.json",
     ]
@@ -123,9 +141,44 @@ def test_discovery_artifacts_exist_and_use_canonical_host():
     assert host in (ROOT / "web" / "lib" / "site.ts").read_text(encoding="utf-8")
     assert host in (ROOT / "web" / "public" / "llms.txt").read_text(encoding="utf-8")
     assert host in (ROOT / "web" / "public" / "feed.xml").read_text(encoding="utf-8")
-    robots = (ROOT / "web" / "app" / "robots.ts").read_text(encoding="utf-8")
-    assert "OAI-SearchBot" in robots or "allow" in robots.lower()
+    robots = (ROOT / "web" / "public" / "robots.txt").read_text(encoding="utf-8")
+    assert "OAI-SearchBot" in robots
+    assert "ai-input=yes" in robots
+    assert "ai-train=no" in robots
     assert "sitemap" in robots.lower()
+
+
+def test_evidence_tier_ledger_is_balanced_and_definition_bearing():
+    engine = json.loads(
+        (ROOT / "engine" / "evidence_tier_audit.json").read_text(encoding="utf-8")
+    )
+    public = json.loads(
+        (ROOT / "web" / "public" / "evidence-tiers.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert engine == public
+    summary = engine["summary"]
+    tiers = summary["tier_counts"]
+    assert sum(tiers.values()) == summary["hypotheses"]
+    assert summary["public_visible"] == tiers["featured"] + tiers["calibration"]
+    assert tiers["featured"] > 0
+    assert tiers["archive"] > tiers["featured"]
+    assert summary["reference_set"] == 6
+    assert summary["registration_counts"]["legacy_same_commit"] > 0
+    assert sum(summary["estimator_floor_failures"].values()) > 0
+    assert "estimator_floor" in engine["definitions"]
+    for record in engine["reference_set"]:
+        assert record["tier"] == "featured"
+
+
+def test_sitemap_only_submits_public_evidence_pages():
+    source = (ROOT / "web" / "app" / "sitemap.ts").read_text(encoding="utf-8")
+    assert "_evidence_public_visible" in source
+    assert '"/evidence/"' in source
+    assert '"/methods-paper/"' in source
+    assert ".slice(0, 2500)" not in source
+    assert ".slice(0, 800)" not in source
 
 
 def test_contribute_and_review_are_honest_pilot_not_live_bounty():

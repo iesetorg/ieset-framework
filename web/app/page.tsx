@@ -21,6 +21,16 @@ import { VerdictLegend } from "@/components/badges/VerdictLegend";
 import { AxesExplainer } from "@/components/explainers/AxesExplainer";
 import { TestingExplainer } from "@/components/explainers/TestingExplainer";
 
+export const metadata = {
+  alternates: { canonical: "https://framework.ieset.org/" },
+  openGraph: {
+    title: "IESET — empirically-grounded economic policy framework",
+    description:
+      "Pre-registered economic claims scored against pinned public data, with explicit evidence tiers and estimator-floor exclusions.",
+    url: "https://framework.ieset.org/",
+  },
+};
+
 interface HomeMovement {
   movement_id: string;
   countries?: string[];
@@ -134,16 +144,15 @@ export default async function HomePage() {
     },
   ];
 
-  // Curated featured-six. Picked deliberately to (a) feature recent runs from
-  // the wave-4-through-integrity-sweep era, span competing schools and verdict
-  // directions, and showcase the canonical-basket integrity gate.
+  // The same small, balanced reference set published in the evidence ledger.
+  // Every row must survive the generated public and estimator-floor gates.
   const FEATURED_IDS: readonly string[] = [
-    "unfunded_fiscal_expansion_above_zlb_bond_market_response", // Austrian win — UK Truss
-    "venezuela_chavismo_framework_validation",                  // Marxist/Bolivarian loss — VEN -79% gap
-    "volcker_disinflation_output_recovery",                     // Monetarist credibility win
-    "costa_rica_wellbeing_throughput_efficiency",               // Canonical-basket gate — degrowth refuted
-    "washington_consensus_vs_developmental_state_performance",  // Developmentalist win — KOR vs ARG +69pp
-    "gfc_endogenous_minsky_leverage_mechanism",                 // Heterodox-Minsky win — 3 of 4 indicators
+    "debt_overhang_private_investment_30yr",
+    "fiscal_consolidation_credibility_growth",
+    "poland_market_transition_30yr_growth",
+    "sweden_1990s_market_reform_recovery",
+    "trade_lib_nafta_1994_mexico_manufacturing_employment",
+    "welfare_transfer_argentina_auh_2009_child_poverty_effect",
   ];
   const byId = new Map(withResults.map((r) => [r.h.hypothesis_id, r] as const));
   const curatedFeatured = FEATURED_IDS
@@ -201,6 +210,12 @@ export default async function HomePage() {
             className="inline-block rounded border border-rule-strong bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-panel hover:no-underline"
           >
             How it works
+          </Link>
+          <Link
+            href="/evidence"
+            className="inline-block rounded border border-rule-strong bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-panel hover:no-underline"
+          >
+            Evidence quality
           </Link>
           <Link
             href="/production"

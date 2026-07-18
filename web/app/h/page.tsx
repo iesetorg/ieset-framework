@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   loadAllHypotheses,
   loadAxes,
@@ -16,6 +18,7 @@ export const metadata = {
   title: "Hypotheses",
   description:
     "IESET hypotheses with per-record registration and method-validity status.",
+  alternates: { canonical: "https://framework.ieset.org/h/" },
 };
 
 /**
@@ -85,6 +88,7 @@ export default async function HypothesesIndex() {
       topic: h.topic,
       status: h.status,
       evidence_type: h.evidence_type,
+      evidence_tier: h._evidence_tier ?? "archive",
       is_public: isPublic,
       verdict: isPublic ? run.verdict : undefined,
       verdict_label: isPublic ? verdictShort(run.verdict) : "run pending",
@@ -108,6 +112,14 @@ export default async function HypothesesIndex() {
         git. Legacy same-commit records remain inspectable but are not verified
         pre-registrations. {verdictCount} of {all.length} currently pass the
         registration, method-validity, and public-visibility gates.
+      </p>
+      <p className="mb-6 max-w-[780px] text-[13.5px] leading-[1.55] text-muted">
+        Public results are separated into{" "}
+        <Link href="/evidence/" className="text-accent underline">
+          featured, calibration, and archive tiers
+        </Link>
+        . Tiering is mechanical and publishes every exclusion reason, including
+        estimator failures and legacy registration.
       </p>
 
       {/* COMBINED LEGEND */}

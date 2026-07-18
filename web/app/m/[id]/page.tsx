@@ -82,7 +82,13 @@ export async function generateMetadata({
   const { id } = await params;
   const m = await loadMovement(id);
   if (!m) return { title: id };
-  return { title: m.name, description: m.doctrine?.slice(0, 200) };
+  return {
+    title: m.name,
+    description: m.doctrine?.slice(0, 200),
+    alternates: {
+      canonical: `https://framework.ieset.org/m/${encodeURIComponent(id)}/`,
+    },
+  };
 }
 
 export default async function MovementPage({

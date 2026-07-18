@@ -133,12 +133,47 @@ export default function ProductionPage() {
         </p>
       </section>
 
+      <section className="mt-10">
+        <h2 className="m-0 text-[18px] font-semibold">
+          Institutional accountability and change control
+        </h2>
+        <p className="mt-3 text-[15px] leading-[1.65] text-ink">
+          Public repository administration and authorship use the IESET
+          institutional account. CI gates the research schemas, registration
+          topology, evidence tiers, estimator floor, public counters, static
+          export, and OPSEC boundary. Ordinary public history is append-only;
+          an exposure response may rewrite history only after the replacement
+          tip passes the complete gate.
+        </p>
+        <p className="mt-3 text-[15px] leading-[1.65] text-ink">
+          IESET does not claim cryptographic release signing, a DOI, or an
+          independent archive timestamp until verifiable proof is linked. The{" "}
+          <a
+            href={`${PUBLIC_GITHUB_REPO}/blob/main/PUBLICATION_POLICY.md`}
+            className="text-accent underline"
+          >
+            publication policy
+          </a>{" "}
+          records the exact standard.
+        </p>
+      </section>
+
       <section className="mt-10 rounded border border-rule bg-panel p-5">
         <h2 className="m-0 text-[15px] font-semibold">Related</h2>
         <ul className="mt-3 m-0 list-none space-y-2 p-0 text-[14px]">
           <li>
+            <Link href="/evidence/" className="text-accent underline">
+              Evidence quality ledger
+            </Link>
+          </li>
+          <li>
             <Link href="/methodology/" className="text-accent underline">
               Methodology invariants
+            </Link>
+          </li>
+          <li>
+            <Link href="/methods-paper/" className="text-accent underline">
+              Methods and limitations working paper
             </Link>
           </li>
           <li>

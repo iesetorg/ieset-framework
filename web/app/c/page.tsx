@@ -9,6 +9,7 @@ export const metadata = {
   title: "Conditions",
   description:
     "The IESET conditional taxonomy — when markets work, when intervention works, when distributional considerations change the verdict, and specific institutional models.",
+  alternates: { canonical: "https://framework.ieset.org/c/" },
 };
 
 const CATEGORY_ORDER: Condition["category"][] = [

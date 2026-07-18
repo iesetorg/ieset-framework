@@ -4,6 +4,7 @@ export const metadata = {
   title: "Contribute",
   description:
     "How to challenge, repair, or extend IESET with specific evidence, code, and mapping corrections.",
+  alternates: { canonical: "https://framework.ieset.org/contribute/" },
 };
 
 export default async function ContributePage() {

@@ -8,6 +8,7 @@ export const metadata = {
   title: "Positional drift — how country policy mixes shift across decades",
   description:
     "Statist drift index per country. The framework codes every government's axes_summary; cumulating across the corpus shows how each country has drifted toward more state or more market, year by year.",
+  alternates: { canonical: "https://framework.ieset.org/drift/" },
 };
 
 interface RegionSpec {

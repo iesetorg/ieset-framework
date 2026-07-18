@@ -7,6 +7,7 @@ export type EvidenceType =
   | "associational"
   | "descriptive"
   | "canonical_case_multi_metric";
+export type EvidenceTier = "featured" | "calibration" | "archive";
 export type TemporalStructure = "panel" | "time_series" | "cross_section_with_justification";
 
 export interface Variable {
@@ -95,6 +96,12 @@ export interface Hypothesis {
     | "legacy_same_commit"
     | "registered_no_run"
     | "invalid_history";
+  _evidence_tier?: EvidenceTier;
+  _evidence_public_visible?: boolean;
+  _estimator_floor?: "pass" | "fail";
+  _evidence_exclusion_reasons?: string[];
+  _reference_set?: boolean;
+  _reference_note?: string | null;
   _steelman_html?: string;
 }
 

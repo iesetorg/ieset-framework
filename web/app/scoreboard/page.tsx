@@ -7,6 +7,7 @@ export const metadata = {
   title: "Scoreboard — evidence coverage by school of thought",
   description:
     "Every position makes specific predictions linked to specific hypotheses. This page separates forecast accuracy from attribution-aware evidence about school-level mechanisms.",
+  alternates: { canonical: "https://framework.ieset.org/scoreboard/" },
 };
 
 function formatPct(n: number): string {
@@ -128,7 +129,13 @@ export default async function ScoreboardPage() {
           The strict attribution layer is deliberately conservative. If every
           school remains inside the displayed no-call band, the correct reading
           is that the corpus has not separated them at high integrity — not that
-          the numerically highest row has won.
+          the numerically highest row has won. Only records admitted by the
+          generated public-evidence gate can move this board; the tier rules,
+          exclusions, and current audit counts are published on the{" "}
+          <Link href="/evidence/" className="font-medium text-accent hover:underline">
+            evidence quality page
+          </Link>
+          .
         </p>
         <p className="mt-3 mb-0">
           <strong>Raw net</strong> is the simple forecast scoreboard: a clear win counts

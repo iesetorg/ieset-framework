@@ -10,8 +10,12 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "engine" / "public_corpus_census.json"
+PUBLIC_OUTPUT = ROOT / "web" / "public" / "stats.json"
+EVIDENCE_AUDIT = ROOT / "engine" / "evidence_tier_audit.json"
 SPEC_RE = re.compile(r"^hypotheses/([^/]+)/[^/]+\.yaml$")
 VERDICT_RE = re.compile(
     r"^(?:\*\*)?verdict:?(?:\*\*)?:?\s*(.+)$",
@@ -76,8 +80,44 @@ def build() -> dict[str, object]:
         regex = re.compile(pattern)
         return sum(1 for path in paths if regex.match(path))
 
+    position_paths = [
+        path
+        for path in paths
+        if re.match(r"^positions/(?!_)[^/]+\.yaml$", path)
+    ]
+    position_roles = Counter()
+    for path in position_paths:
+        try:
+            doc = yaml.safe_load((ROOT / path).read_text(encoding="utf-8")) or {}
+        except (OSError, yaml.YAMLError):
+            doc = {}
+        role = (
+            str(doc.get("scoreboard_role") or "school")
+            if isinstance(doc, dict)
+            else "school"
+        )
+        position_roles[role] += 1
+
+    evidence_audit: dict[str, object] = {}
+    if EVIDENCE_AUDIT.exists():
+        try:
+            value = json.loads(EVIDENCE_AUDIT.read_text(encoding="utf-8"))
+            if isinstance(value, dict):
+                evidence_audit = value
+        except (OSError, json.JSONDecodeError):
+            pass
+    evidence_summary = evidence_audit.get("summary")
+    if not isinstance(evidence_summary, dict):
+        evidence_summary = {}
+    tier_counts = evidence_summary.get("tier_counts")
+    registration_counts = evidence_summary.get("registration_counts")
+    estimator_failures = evidence_summary.get("estimator_floor_failures")
+    exclusion_counts = evidence_summary.get("exclusion_counts")
+
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "canonical_url": "https://framework.ieset.org/stats.json",
+        "repository": "https://github.com/iesetorg/ieset-framework",
         "definitions": {
             "hypothesis_specs": (
                 "Tracked hypotheses/<topic>/<id>.yaml files, excluding "
@@ -91,6 +131,38 @@ def build() -> dict[str, object]:
             "review_submissions": (
                 "Tracked review/submissions/*.md excluding TEMPLATE.md."
             ),
+            "completed_review_logs": (
+                "Tracked review/log/*.md excluding README.md. Internal audit "
+                "notes are not counted as external peer review."
+            ),
+            "positions": (
+                "Tracked positions/*.yaml school or benchmark records, "
+                "excluding underscore-prefixed derived indexes."
+            ),
+            "ranked_schools": (
+                "Position records with scoreboard_role=school."
+            ),
+            "benchmark_controls": (
+                "Position records with scoreboard_role=benchmark_control; "
+                "reported separately and excluded from school rankings."
+            ),
+            "public_visible_results": (
+                "Hypotheses passing strict registration, replication, "
+                "falsification-rule, verdict, and estimator-floor gates."
+            ),
+            "featured_evidence": (
+                "Public-visible causal records without screening markers."
+            ),
+            "calibration_evidence": (
+                "Public-visible lower-identification or screening-grade records."
+            ),
+            "archive_records": (
+                "Inspectable records that do not clear all public evidence gates."
+            ),
+            "reference_set": (
+                "Hand-audited exemplars; not peer review and not a substitute "
+                "for the evidence tier."
+            ),
         },
         "counts": {
             "hypothesis_specs": len(hypothesis_specs),
@@ -99,15 +171,51 @@ def build() -> dict[str, object]:
             "result_card_files": len(result_cards),
             "policies": count(r"^policies/[^/]+\.yaml$"),
             "movements": count(r"^movements/[^/]+\.yaml$"),
-            "positions": count(r"^positions/[^/]+\.yaml$"),
+            "positions": len(position_paths),
+            "ranked_schools": position_roles.get("school", 0),
+            "benchmark_controls": position_roles.get("benchmark_control", 0),
             "review_submissions": count(
                 r"^review/submissions/(?!TEMPLATE\.md$)[^/]+\.md$"
             ),
             "completed_review_logs": count(
                 r"^review/log/(?!README\.md$)[^/]+\.md$"
             ),
+            "public_visible_results": int(
+                evidence_summary.get("public_visible") or 0
+            ),
+            "featured_evidence": int(
+                tier_counts.get("featured", 0)
+                if isinstance(tier_counts, dict)
+                else 0
+            ),
+            "calibration_evidence": int(
+                tier_counts.get("calibration", 0)
+                if isinstance(tier_counts, dict)
+                else 0
+            ),
+            "archive_records": int(
+                tier_counts.get("archive", 0)
+                if isinstance(tier_counts, dict)
+                else 0
+            ),
+            "reference_set": int(evidence_summary.get("reference_set") or 0),
         },
         "verdict_counts": dict(sorted(verdicts.items())),
+        "registration_counts": (
+            dict(sorted(registration_counts.items()))
+            if isinstance(registration_counts, dict)
+            else {}
+        ),
+        "estimator_floor_failure_counts": (
+            dict(sorted(estimator_failures.items()))
+            if isinstance(estimator_failures, dict)
+            else {}
+        ),
+        "evidence_exclusion_counts": (
+            dict(sorted(exclusion_counts.items()))
+            if isinstance(exclusion_counts, dict)
+            else {}
+        ),
     }
 
 
@@ -123,18 +231,35 @@ def main() -> int:
     output = args.output if args.output.is_absolute() else ROOT / args.output
     expected = encoded(build())
     if args.check:
-        actual = output.read_text() if output.exists() else ""
-        if actual != expected:
-            print(
-                f"FAIL: {output.relative_to(ROOT)} is stale; run "
-                "python scripts/report_public_census.py",
-                file=sys.stderr,
-            )
+        targets = [output]
+        if output.resolve() == DEFAULT_OUTPUT.resolve():
+            targets.append(PUBLIC_OUTPUT)
+        stale = [
+            target
+            for target in targets
+            if not target.exists()
+            or target.read_text(encoding="utf-8") != expected
+        ]
+        if stale:
+            for target in stale:
+                print(
+                    f"FAIL: {target.relative_to(ROOT)} is stale; run "
+                    "python scripts/report_public_census.py",
+                    file=sys.stderr,
+                )
             return 1
     else:
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(expected)
-    print(f"OK ({output.relative_to(ROOT)})")
+        targets = [output]
+        if output.resolve() == DEFAULT_OUTPUT.resolve():
+            targets.append(PUBLIC_OUTPUT)
+        for target in targets:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(expected, encoding="utf-8")
+    print(
+        "OK ("
+        + ", ".join(str(target.relative_to(ROOT)) for target in targets)
+        + ")"
+    )
     return 0
 
 

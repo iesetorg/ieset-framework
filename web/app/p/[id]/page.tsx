@@ -31,6 +31,9 @@ export async function generateMetadata({
   return {
     title: p.title,
     description: p.description?.slice(0, 200),
+    alternates: {
+      canonical: `https://framework.ieset.org/p/${encodeURIComponent(id)}/`,
+    },
   };
 }
 

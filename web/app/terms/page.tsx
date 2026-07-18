@@ -4,6 +4,7 @@ export const metadata = {
   title: "Terms of Service",
   description:
     "Terms for using the IESET public research framework, data pages, and contribution channels.",
+  alternates: { canonical: "https://framework.ieset.org/terms/" },
 };
 
 const UPDATED = "July 17, 2026";
@@ -76,7 +77,7 @@ const sections = [
   {
     title: "Contact",
     body: [
-      "Questions about these terms can be raised through the contribution channels linked from the contribute page.",
+      "Questions about these terms can be sent to info@ieset.org or raised through the contribution channels linked from the contribute page.",
     ],
   },
 ];

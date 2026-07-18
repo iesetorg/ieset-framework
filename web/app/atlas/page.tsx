@@ -101,6 +101,7 @@ export const metadata = {
   title: "Atlas — movements over time",
   description:
     "Interactive world map of every governing movement in the library, with a year slider. Hover a country to see active movements at that point in time.",
+  alternates: { canonical: "https://framework.ieset.org/atlas/" },
 };
 
 export default async function AtlasPage() {

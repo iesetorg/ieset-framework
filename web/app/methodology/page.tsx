@@ -4,6 +4,7 @@ export const metadata = {
   title: "Methodology",
   description:
     "The registration, provenance, measurement, and correction commitments used by the IESET framework.",
+  alternates: { canonical: "https://framework.ieset.org/methodology/" },
 };
 
 export default async function MethodologyPage() {

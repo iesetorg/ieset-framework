@@ -32,6 +32,7 @@ export const metadata = {
   title: "Movements",
   description:
     "Political movements and governing coalitions scored on policy content, linked to outcome hypotheses.",
+  alternates: { canonical: "https://framework.ieset.org/m/" },
 };
 
 export default async function MovementsIndex() {

@@ -37,6 +37,11 @@ const EXPLORE: NavDropdownItem[] = [
     blurb: "Schools of thought scored against tested predictions",
   },
   {
+    href: "/evidence",
+    label: "Evidence quality",
+    blurb: "Tiers, estimator exclusions, reference set, and review status",
+  },
+  {
     href: "/atlas",
     label: "Atlas",
     blurb: "Movements and policy trajectories across countries",
@@ -57,7 +62,12 @@ const ABOUT: NavDropdownItem[] = [
   {
     href: "/methodology",
     label: "Methodology",
-    blurb: "The six invariants the framework commits to",
+    blurb: "The integrity invariants the framework commits to",
+  },
+  {
+    href: "/methods-paper",
+    label: "Methods paper",
+    blurb: "Working paper on design, failure modes, and limitations",
   },
   {
     href: "/production",

@@ -10,6 +10,7 @@ export const metadata = {
   title: "How it works",
   description:
     "How IESET turns economic-policy claims into registered tests, reproducible data runs, linked evidence pages, and scoreboard updates.",
+  alternates: { canonical: "https://framework.ieset.org/how-it-works/" },
 };
 
 interface TabCard {

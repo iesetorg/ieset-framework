@@ -8,6 +8,7 @@ export const metadata = {
   title: "Axes",
   description:
     "Channel-separated policy-content axes. Every policy and movement is coded on these axes; the axis browser is the entry point for finding historical policy analogues.",
+  alternates: { canonical: "https://framework.ieset.org/a/" },
 };
 
 const CHANNEL_ORDER = ["fiscal", "regulatory", "monetary", "institutional"];

@@ -4,6 +4,7 @@ export const metadata = {
   title: "Privacy Policy",
   description:
     "How IESET handles visitor, contribution, analytics, and provenance data.",
+  alternates: { canonical: "https://framework.ieset.org/privacy/" },
 };
 
 const UPDATED = "May 5, 2026";
@@ -65,7 +66,7 @@ const sections = [
   {
     title: "Contact",
     body: [
-      "Questions, correction requests, and privacy concerns can be raised through the public contribution channels linked from the contribute page. Please do not include sensitive personal information in public issues or pull requests.",
+      "Questions, correction requests, and privacy concerns can be sent to info@ieset.org or raised through the public contribution channels linked from the contribute page. Please do not include sensitive personal information in public issues or pull requests.",
     ],
   },
 ];

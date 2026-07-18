@@ -4,6 +4,7 @@ export const metadata = {
   title: "Transparency",
   description:
     "Author perspective, broad economic exposure, and the methodological commitments that keep IESET auditable.",
+  alternates: { canonical: "https://framework.ieset.org/disclosure/" },
 };
 
 export default async function DisclosurePage() {

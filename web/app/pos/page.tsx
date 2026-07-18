@@ -10,6 +10,7 @@ export const metadata = {
   title: "Positions",
   description:
     "Schools of economic thought whose specific, falsifiable predictions are pinned to registry hypotheses. Cited, not endorsed.",
+  alternates: { canonical: "https://framework.ieset.org/pos/" },
 };
 
 export default async function PositionsIndex() {

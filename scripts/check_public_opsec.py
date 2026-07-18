@@ -9,8 +9,16 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def hidden_marker(*codepoints: int) -> str:
+    """Construct retired private labels without republishing them as text."""
+    return "".join(chr(codepoint) for codepoint in codepoints)
+
+
+RETIRED_CONTROL_LABEL = hidden_marker(98, 114, 97, 105, 110)
 PRIVATE_PATHS = (
-    "engine/brain/",
+    f"engine/{RETIRED_CONTROL_LABEL}/",
     "engine/agent_briefs/",
     "debate/",
 )
@@ -21,9 +29,9 @@ PRIVATE_BASENAMES = {
 }
 PRIVATE_PATH_PATTERNS = (
     re.compile(r"^HANDOFF_TO_.*\.md$"),
-    re.compile(r"^schemas/brain_.*\.schema\.json$"),
-    re.compile(r"^scripts/.*brain.*$"),
-    re.compile(r"^tests/test_brain.*\.py$"),
+    re.compile(rf"^schemas/{RETIRED_CONTROL_LABEL}_.*\.schema\.json$"),
+    re.compile(rf"^scripts/.*{RETIRED_CONTROL_LABEL}.*$"),
+    re.compile(rf"^tests/test_{RETIRED_CONTROL_LABEL}.*\.py$"),
 )
 PRIVATE_IDENTITY_MARKERS = (
     "duncan" + "campbell",

@@ -28,6 +28,9 @@ jobs:
       - name: check pre-registration invariant
         run: python scripts/check_preregistration.py --check-index
 
+      - name: check evidence tiers and estimator floor
+        run: python scripts/audit_evidence_tiers.py --check
+
       - name: check public corpus census
         run: python scripts/report_public_census.py --check
 
@@ -51,7 +54,12 @@ jobs:
         run: pip install pytest pyyaml jsonschema
 
       - name: test public integrity tooling
-        run: python -m pytest tests/test_public_integrity_tools.py -v
+        run: >-
+          python -m pytest
+          tests/test_public_integrity_tools.py
+          tests/test_legitimacy_public_surface.py
+          tests/test_evidence_tier_audit.py
+          -v
 
   web-build:
     name: web platform build
@@ -71,4 +79,4 @@ jobs:
 
       - name: typecheck + build
         working-directory: web
-        run: npm run build
+        run: npm run test:site && npm run build

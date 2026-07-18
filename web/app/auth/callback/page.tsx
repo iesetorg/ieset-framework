@@ -4,6 +4,7 @@ export const metadata = {
   title: "Integration Callback",
   description:
     "Reserved callback URL for IESET third-party app and OAuth configuration.",
+  robots: { index: false, follow: false },
 };
 
 export default function AuthCallbackPage() {

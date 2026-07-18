@@ -23,6 +23,11 @@ export async function generateMetadata({
   return {
     title: `${name} — positional drift`,
     description: `Per-axis cumulative drift trajectory for ${name}, computed from movement axes_summaries.`,
+    alternates: {
+      canonical: `https://framework.ieset.org/country/${encodeURIComponent(
+        iso3
+      )}/`,
+    },
   };
 }
 

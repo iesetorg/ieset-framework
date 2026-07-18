@@ -100,7 +100,14 @@ if (existsSync(censusSrc)) {
 
 // Ensure llms.txt / feed.xml made it into out/ (Next copies public/ automatically;
 // log for operators when they are present).
-for (const name of ["llms.txt", "feed.xml", "robots.txt", "sitemap.xml"]) {
+for (const name of [
+  "llms.txt",
+  "llms-full.txt",
+  "evidence-tiers.json",
+  "feed.xml",
+  "robots.txt",
+  "sitemap.xml",
+]) {
   const p = join(OUT, name);
   console.log(
     existsSync(p)

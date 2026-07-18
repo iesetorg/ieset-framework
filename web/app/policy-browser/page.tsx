@@ -5,6 +5,7 @@ export const metadata = {
   title: "Policy Browser",
   description:
     "Search policy reforms by evidence, verdict mix, countries, axes, and schools of thought.",
+  alternates: { canonical: "https://framework.ieset.org/policy-browser/" },
 };
 
 export default async function PolicyBrowserPage() {

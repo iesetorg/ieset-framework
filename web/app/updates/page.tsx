@@ -16,6 +16,16 @@ const UPDATES: Array<{
 }> = [
   {
     date: "2026-07-18",
+    title: "Evidence tiers, estimator floor, and machine catalog",
+    body: "Added a record-level featured/calibration/archive ledger, a balanced six-record reference set, explicit estimator-floor and exclusion counts, canonical metadata across every page family, Dataset/DataCatalog structured data, and expanded LLM retrieval guidance. The strict school-level conclusion remains no high-integrity separation.",
+    hrefs: [
+      { label: "Evidence quality", href: "/evidence/" },
+      { label: "Machine catalog", href: "/api/catalog.json" },
+      { label: "Expanded LLM guide", href: "/llms-full.txt" },
+    ],
+  },
+  {
+    date: "2026-07-18",
     title: "Public surface scrub + legitimacy plumbing",
     body: "Private operator automation removed from the public repository. Hypothesis pages now deep-link the first spec commit (not HEAD), expose run timing, and ship OG/JSON-LD metadata. Added /production disclosure, robots/sitemap/llms.txt, and a single stats.json census endpoint.",
     hrefs: [

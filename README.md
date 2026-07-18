@@ -13,10 +13,11 @@ Corpus counts change frequently. The machine-readable census at
 stale census. Treat that file—not marketing copy or an older deployment—as the
 authoritative corpus count.
 
-An integrity audit on 2026-07-17 found that 1,320 historical spec/run pairs
-first entered git in the same commit. Those records are labelled
-`legacy_same_commit`, not verified pre-registrations. The frozen exception list
-prevents new same-commit pairs from being accepted by CI.
+The machine-readable evidence ledger at
+`engine/evidence_tier_audit.json` separately publishes strict-registration
+status, estimator-floor findings, public-credit exclusions, and the
+`featured` / `calibration` / `archive` tier for every hypothesis. The public
+site explains those rules at <https://framework.ieset.org/evidence/>.
 
 ---
 
@@ -52,6 +53,19 @@ Every hypothesis page on the public site shows:
 The registration record is visible. A green verified badge requires the spec
 commit to be a strict ancestor of the first run commit; legacy same-commit
 records carry an amber, unverified label.
+
+Evidence standing is also explicit:
+
+- **Featured** — strict registration, public method gate, estimator floor, and
+  causal-design label passed, with no screening markers.
+- **Calibration** — public and method-valid, but associational, descriptive,
+  canonical-case, or screening-grade.
+- **Archive** — inspectable history that receives no headline or scoreboard
+  evidence credit.
+
+The six-record reference set is a balanced external-review queue, not a claim
+of peer review. Current inclusion counts and every exclusion reason live in the
+evidence ledger rather than in prose.
 
 ---
 
@@ -102,7 +116,7 @@ hypotheses/    registered hypotheses + registration status (YAML schemas)
 
 policies/      individual policies (interventions) coded by axes
 movements/     political movements with timeframe + policy_ids + axis trajectory
-positions/     17 schools of thought (market_liberal, social_democratic, post_keynesian, ...)
+positions/     16 ranked schools plus one separately reported benchmark control
 
 axes.yaml      the policy-content taxonomy (fiscal, regulatory, monetary, openness, distribution)
 
@@ -133,7 +147,7 @@ npm run dev
 
 ```bash
 .venv/bin/python scripts/validate_specs.py
-# → OK (3892 spec file(s) validated + cross-references clean)
+# → validates schemas and cross-references
 ```
 
 ### Run a hypothesis
@@ -176,7 +190,10 @@ ancestor of the first run commit.
 
 ## Status
 
-This is **v1.0** of the public platform. Substance is the same as the development beta; the surface is debugged and the indicator-integrity gate is enforced framework-wide.
+This is **v1.2** of the public platform. The public repository is restricted to
+the research substrate and its verification tooling. Publication,
+institutional-authorship, release, and history-rewrite rules are documented in
+`PUBLICATION_POLICY.md`.
 
 Open work:
 - Closing documented social-policy data gaps

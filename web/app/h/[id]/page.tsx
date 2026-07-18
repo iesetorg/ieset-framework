@@ -19,6 +19,7 @@ import { CiteBlock } from "@/components/cards/CiteBlock";
 import { ResultBanner } from "@/components/cards/ResultBanner";
 import { PolicyBriefCard } from "@/components/cards/PolicyBriefCard";
 import { HypothesisChart } from "@/components/charts/HypothesisChart";
+import type { EvidenceTier } from "@/lib/types";
 
 export async function generateStaticParams() {
   const all = await loadAllHypotheses();
@@ -38,6 +39,7 @@ export async function generateMetadata({
   const verdictWord = (run.verdict ?? "pending").split(/[\s—–-]/)[0];
   const title = `${claimShort} — ${verdictWord}`;
   const description = [
+    `Evidence tier: ${h._evidence_tier ?? "archive"}.`,
     run.verdict ? `Verdict: ${run.verdict.split("\n")[0].slice(0, 120)}.` : null,
     h.claim.slice(0, 160),
   ]
@@ -59,6 +61,10 @@ export async function generateMetadata({
       card: "summary",
       title,
       description,
+    },
+    robots: {
+      index: h._evidence_tier !== "archive",
+      follow: true,
     },
   };
 }
@@ -109,6 +115,40 @@ export default async function HypothesisPage({
     dateModified: run.generated_at?.slice(0, 10) ?? h._first_commit?.iso?.slice(0, 10),
     author: { "@type": "Organization", name: "IESET" },
     license: "https://creativecommons.org/licenses/by/4.0/",
+    isAccessibleForFree: true,
+    keywords: [
+      "economic policy",
+      "pre-registration",
+      h.topic.replace(/_/g, " "),
+      h.evidence_type ?? "evidence",
+      `${h._evidence_tier ?? "archive"} evidence`,
+    ],
+    creativeWorkStatus:
+      h._evidence_tier === "archive"
+        ? "Archive record — not eligible for headline evidence credit"
+        : "Public research artifact — not peer-reviewed by default",
+    additionalProperty: [
+      {
+        "@type": "PropertyValue",
+        name: "Evidence tier",
+        value: h._evidence_tier ?? "archive",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "Registration status",
+        value: h._registration_status ?? "unknown",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "Estimator floor",
+        value: h._estimator_floor ?? "unknown",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "Peer review status",
+        value: "Not peer-reviewed by default",
+      },
+    ],
     url: permalinkAbsolute,
     identifier: h._first_commit?.hash
       ? {
@@ -156,6 +196,31 @@ export default async function HypothesisPage({
           </p>
         )}
       </header>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded border border-rule bg-panel px-4 py-3 text-[12.5px] text-muted">
+        <span className="font-semibold text-ink">Evidence standing</span>
+        <Badge variant={evidenceTierVariant(h._evidence_tier ?? "archive")} dot>
+          {h._evidence_tier ?? "archive"}
+        </Badge>
+        {h._reference_set && (
+          <Badge variant="green">reference set</Badge>
+        )}
+        <span>
+          {h._evidence_tier === "featured"
+            ? "Strict registration, method gate, estimator floor, and causal-design label passed."
+            : h._evidence_tier === "calibration"
+            ? "Public and method-valid, but lower-identification or screening-grade evidence."
+            : "Inspectable record; excluded from headline evidence credit."}
+        </span>
+        {(h._evidence_exclusion_reasons?.length ?? 0) > 0 && (
+          <span className="font-mono text-[11px] text-faint">
+            Exclusions: {h._evidence_exclusion_reasons?.join(", ")}
+          </span>
+        )}
+        <Link href="/evidence/" className="ml-auto text-accent underline">
+          tier rules
+        </Link>
+      </div>
 
       {/* ---------- RESULT BANNER: verdict first, above the fold ---------- */}
       <ResultBanner run={run} />
@@ -443,6 +508,25 @@ export default async function HypothesisPage({
                   <dd className="capitalize">{h.evidence_type}</dd>
                 </>
               )}
+              <dt className="text-muted">Tier</dt>
+              <dd>
+                <Badge
+                  variant={evidenceTierVariant(h._evidence_tier ?? "archive")}
+                >
+                  {h._evidence_tier ?? "archive"}
+                </Badge>
+              </dd>
+              <dt className="text-muted">Estimator</dt>
+              <dd>
+                <Badge
+                  variant={
+                    h._estimator_floor === "fail" ? "red" : "green"
+                  }
+                  dot
+                >
+                  {h._estimator_floor ?? "unknown"}
+                </Badge>
+              </dd>
               {h.sample && (
                 <>
                   <dt className="text-muted">Sample</dt>
@@ -532,6 +616,14 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
       {children}
     </h2>
   );
+}
+
+function evidenceTierVariant(
+  tier: EvidenceTier
+): "green" | "amber" | "muted" {
+  if (tier === "featured") return "green";
+  if (tier === "calibration") return "amber";
+  return "muted";
 }
 
 function SourceTokenBadge({ token }: { token: Awaited<ReturnType<typeof parseSourceString>>[number] }) {

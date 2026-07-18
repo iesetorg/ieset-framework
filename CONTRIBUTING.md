@@ -44,6 +44,11 @@ External review is a pilot. No external submission had been logged as of
 `review/log/` with reasoning; rejected submissions receive a public reason
 unless publication would expose private or unsafe material.
 
+Reviewers who want a bounded first assignment can use
+`review/REFERENCE_SET_REVIEW_PROTOCOL.md`, which freezes the six-record
+reference set and defines registration, provenance, reproduction,
+identification, verdict, and attribution checks.
+
 ## What is out of scope
 
 - Rhetorical reframings without data or specification substance.

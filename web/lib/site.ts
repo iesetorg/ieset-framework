@@ -4,6 +4,7 @@ export const PUBLIC_SITE_ORIGIN = "https://framework.ieset.org";
 export const PUBLIC_GITHUB_REPO = "https://github.com/iesetorg/ieset-framework";
 export const PUBLIC_GITHUB_TREE = `${PUBLIC_GITHUB_REPO}/tree/main`;
 export const PUBLIC_X_PROFILE = "https://x.com/IESETorg";
+export const PUBLIC_CONTACT_EMAIL = "info@ieset.org";
 
 export function absoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;

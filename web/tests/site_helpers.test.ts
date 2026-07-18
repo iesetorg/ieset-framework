@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 
 import {
   PUBLIC_GITHUB_REPO,
+  PUBLIC_CONTACT_EMAIL,
   PUBLIC_SITE_ORIGIN,
   absoluteUrl,
   githubCommitUrl,
@@ -21,6 +22,7 @@ describe("site helpers (shipped web/lib/site.ts)", () => {
     const personalAccount = hiddenMarker(98, 105, 103, 100, 101, 115, 116, 105, 110, 121, 50);
     assert.equal(PUBLIC_GITHUB_REPO, "https://github.com/iesetorg/ieset-framework");
     assert.equal(PUBLIC_SITE_ORIGIN, "https://framework.ieset.org");
+    assert.equal(PUBLIC_CONTACT_EMAIL, "info@ieset.org");
     assert.doesNotMatch(PUBLIC_GITHUB_REPO, new RegExp(`${oldRepoSuffix}|${personalAccount}`));
   });
 

@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { AxisChip } from "@/components/badges/AxisChip";
 import { Badge } from "@/components/badges/Badge";
 import type { Axis } from "@/lib/content";
+import type { EvidenceTier } from "@/lib/types";
 import type { VerdictTone } from "@/lib/verdict";
 
 type SchoolOutcome = "aligned" | "partial" | "opposed" | "untested";
@@ -16,6 +17,7 @@ export interface HypothesisFilterRow {
   topic: string;
   status: string;
   evidence_type?: string;
+  evidence_tier: EvidenceTier;
   is_public: boolean;
   verdict?: string;
   verdict_label: string;
@@ -88,6 +90,14 @@ function evidenceLabel(evidence: string | undefined): string {
   return evidence ? evidence.replace(/_/g, " ") : "unspecified";
 }
 
+function evidenceTierVariant(
+  tier: EvidenceTier
+): "green" | "amber" | "muted" {
+  if (tier === "featured") return "green";
+  if (tier === "calibration") return "amber";
+  return "muted";
+}
+
 function normalize(text: string): string {
   return text.toLowerCase().replace(/[_-]/g, " ");
 }
@@ -119,6 +129,7 @@ export function HypothesisFilterTable({
   const [country, setCountry] = useState("");
   const [channel, setChannel] = useState("");
   const [evidence, setEvidence] = useState("");
+  const [tier, setTier] = useState("");
   const [linkage, setLinkage] = useState("");
   const [visibility, setVisibility] = useState("");
   const [yearFrom, setYearFrom] = useState("");
@@ -179,6 +190,7 @@ export function HypothesisFilterTable({
       if (channel && !row.axes.some((a) => channelFor(a.axis, axesMap) === channel))
         return false;
       if (evidence && row.evidence_type !== evidence) return false;
+      if (tier && row.evidence_tier !== tier) return false;
       if (visibility === "public" && !row.is_public) return false;
       if (visibility === "pending" && row.is_public) return false;
       if (linkage === "school-linked" && row.schools.length === 0) return false;
@@ -195,6 +207,7 @@ export function HypothesisFilterTable({
           row.topic,
           row.status,
           row.evidence_type ?? "",
+          row.evidence_tier,
           row.verdict_label,
           row.verdict ?? "",
           row.sample?.countries.join(" ") ?? "",
@@ -210,6 +223,7 @@ export function HypothesisFilterTable({
     channel,
     country,
     evidence,
+    tier,
     linkage,
     query,
     rows,
@@ -235,6 +249,7 @@ export function HypothesisFilterTable({
     country ||
     channel ||
     evidence ||
+    tier ||
     linkage ||
     visibility ||
     yearFrom ||
@@ -248,6 +263,7 @@ export function HypothesisFilterTable({
     setCountry("");
     setChannel("");
     setEvidence("");
+    setTier("");
     setLinkage("");
     setVisibility("");
     setYearFrom("");
@@ -385,6 +401,21 @@ export function HypothesisFilterTable({
               <option value="">all</option>
               <option value="public">public verdicts</option>
               <option value="pending">pending / not public</option>
+            </select>
+          </label>
+
+          <label className="flex items-center gap-2 text-[12px] text-muted">
+            <span className="sc text-[10px]">tier</span>
+            <select
+              aria-label="Filter by evidence tier"
+              value={tier}
+              onChange={(e) => setTier(e.target.value)}
+              className="rounded border border-rule-strong bg-white px-2 py-1.5 text-[12px] text-ink focus:border-accent focus:outline-none"
+            >
+              <option value="">all</option>
+              <option value="featured">featured</option>
+              <option value="calibration">calibration</option>
+              <option value="archive">archive</option>
             </select>
           </label>
 
@@ -529,6 +560,9 @@ export function HypothesisFilterTable({
                     >
                       {evidenceLabel(row.evidence_type)}
                     </button>
+                    <Badge variant={evidenceTierVariant(row.evidence_tier)}>
+                      {row.evidence_tier}
+                    </Badge>
                   </div>
                 </td>
                 <td className="p-3 align-top">

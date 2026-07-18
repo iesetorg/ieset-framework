@@ -13,3 +13,7 @@ As of 2026-07-17:
 New submissions should use `review/submissions/TEMPLATE.md`. Outcomes are
 recorded in `review/log/`. A result remains unrefereed unless its page links to
 a completed review entry.
+
+The first bounded review packet is defined in
+`review/REFERENCE_SET_REVIEW_PROTOCOL.md`. Publishing the protocol does not
+constitute a submission, completed review, bounty, or payment promise.

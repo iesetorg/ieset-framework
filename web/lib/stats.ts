@@ -13,12 +13,22 @@ export interface PublicCorpusCensus {
     policies: number;
     movements: number;
     positions: number;
+    ranked_schools?: number;
+    benchmark_controls?: number;
     conditional_entries: number;
     review_submissions: number;
     completed_review_logs: number;
+    public_visible_results?: number;
+    featured_evidence?: number;
+    calibration_evidence?: number;
+    archive_records?: number;
+    reference_set?: number;
   };
   definitions?: Record<string, string>;
   verdict_counts?: Record<string, number>;
+  registration_counts?: Record<string, number>;
+  estimator_floor_failure_counts?: Record<string, number>;
+  evidence_exclusion_counts?: Record<string, number>;
 }
 
 /**

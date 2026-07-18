@@ -29,6 +29,7 @@ export const metadata = {
   title: "Policies",
   description:
     "Specific policy reforms coded on channel-separated axes. Each policy links to the empirical hypotheses that test its outcomes.",
+  alternates: { canonical: "https://framework.ieset.org/p/" },
 };
 
 export default async function PoliciesIndex() {

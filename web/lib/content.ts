@@ -8,6 +8,7 @@ import remarkHtml from "remark-html";
 
 import type {
   Condition,
+  EvidenceTier,
   Hypothesis,
   Position,
   Publisher,
@@ -17,6 +18,80 @@ import type {
 
 // Repo root is one level up from /web
 export const REPO_ROOT = resolve(process.cwd(), "..");
+
+export interface EvidenceAuditRecord {
+  hypothesis_id: string;
+  tier: EvidenceTier;
+  public_visible: boolean;
+  reference_set: boolean;
+  reference_note?: string | null;
+  registration_status: string;
+  evidence_type: string;
+  verdict_bucket: string;
+  estimator_floor: "pass" | "fail";
+  estimator_floor_failures: string[];
+  screening_flags: string[];
+  exclusion_reasons: string[];
+  canonical_url: string;
+}
+
+export interface EvidenceTierAudit {
+  schema: string;
+  canonical_url: string;
+  definitions: Record<string, string>;
+  summary: {
+    hypotheses: number;
+    public_visible: number;
+    reference_set: number;
+    tier_counts: Record<string, number>;
+    registration_counts: Record<string, number>;
+    verdict_counts: Record<string, number>;
+    estimator_floor_failures: Record<string, number>;
+    exclusion_counts: Record<string, number>;
+  };
+  reference_set: Array<{
+    hypothesis_id: string;
+    tier: EvidenceTier;
+    note: string;
+    canonical_url: string;
+  }>;
+  records: EvidenceAuditRecord[];
+}
+
+let _evidenceTierAuditCache: EvidenceTierAudit | null | undefined;
+let _evidenceTierIndexCache: Map<string, EvidenceAuditRecord> | null = null;
+
+export function loadEvidenceTierAudit(): EvidenceTierAudit | null {
+  if (_evidenceTierAuditCache !== undefined) return _evidenceTierAuditCache;
+  const auditPath = join(REPO_ROOT, "engine", "evidence_tier_audit.json");
+  if (!existsSync(auditPath)) {
+    _evidenceTierAuditCache = null;
+    return null;
+  }
+  try {
+    _evidenceTierAuditCache = JSON.parse(
+      readFileSync(auditPath, "utf8")
+    ) as EvidenceTierAudit;
+  } catch {
+    _evidenceTierAuditCache = null;
+  }
+  return _evidenceTierAuditCache;
+}
+
+export function evidenceAuditForHypothesis(
+  hypothesisId: string
+): EvidenceAuditRecord | null {
+  if (!_evidenceTierIndexCache) {
+    const audit = loadEvidenceTierAudit();
+    _evidenceTierIndexCache = new Map(
+      (audit?.records ?? []).map((record) => [
+        record.hypothesis_id,
+        record,
+      ])
+    );
+  }
+  return _evidenceTierIndexCache.get(hypothesisId) ?? null;
+}
 
 // -----------------------------------------------------------------------------
 // Hypothesis loader
@@ -82,6 +157,12 @@ export function isHypothesisPubliclyVisible(
     diagnostics?: Record<string, unknown>;
   }
 ): boolean {
+  // The versioned public ledger is the authoritative gate. Keeping the UI,
+  // APIs, census, and scoreboard on one record prevents silent definition
+  // drift between TypeScript and Python audit implementations.
+  const evidenceAudit = evidenceAuditForHypothesis(h.hypothesis_id);
+  if (evidenceAudit) return evidenceAudit.public_visible;
+
   if (!run.exists) return false;
   // Only strict spec-before-run history receives public-index or scoreboard
   // credit. Legacy same-commit records remain directly inspectable.
@@ -157,6 +238,15 @@ async function parseHypothesis(absPath: string): Promise<Hypothesis | null> {
   doc._file = absPath.replace(REPO_ROOT + "/", "");
   doc._first_commit = firstCommit(doc._file);
   doc._registration_status = _registrationStatusCache.get(doc._file);
+  const evidenceAudit = evidenceAuditForHypothesis(doc.hypothesis_id);
+  if (evidenceAudit) {
+    doc._evidence_tier = evidenceAudit.tier;
+    doc._evidence_public_visible = evidenceAudit.public_visible;
+    doc._estimator_floor = evidenceAudit.estimator_floor;
+    doc._evidence_exclusion_reasons = evidenceAudit.exclusion_reasons;
+    doc._reference_set = evidenceAudit.reference_set;
+    doc._reference_note = evidenceAudit.reference_note;
+  }
   // Normalise: wave-3 specs use `title` + `description` instead of `claim`.
   // Synthesize a claim so the rest of the app can treat hypotheses uniformly.
   if (!doc.claim) {

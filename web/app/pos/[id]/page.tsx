@@ -35,6 +35,9 @@ export async function generateMetadata({
   return {
     title: p.school,
     description: p.steelman?.slice(0, 200),
+    alternates: {
+      canonical: `https://framework.ieset.org/pos/${encodeURIComponent(id)}/`,
+    },
   };
 }
 
