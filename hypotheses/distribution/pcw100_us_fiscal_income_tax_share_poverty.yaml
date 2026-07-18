@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: pcw100_us_fiscal_income_tax_share_poverty
+version: 1
+status: pre_registered
+topic: distribution
+claim_direction: '-'
+claim: Across the 50 US states and District of Columbia, higher individual-income-tax revenue as a share of total
+  state revenue in fiscal years 2017-2021 predicts a lower next-year poverty rate one year later in a state and
+  policy-year fixed-effects screen.
+methodology_note: Registered as part of the 100-test policy-contrast wave. The one-year ordering is fixed before
+  estimation, all usable states are retained, and the claim remains associational because fiscal composition is
+  endogenous.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period: &id001
+  - 2017
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - retain the 50 states and District of Columbia
+  - pair fiscal-year treatment t with outcome t+1
+  - drop rows with missing treatment denominator or registered outcome
+  - do not impute fiscal or outcome values
+scope:
+  period: *id001
+  countries:
+  - USA
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - state_income_tax
+  - income_tax
+  - tax_mix
+variables:
+  outcome:
+  - name: poverty
+    source: ieset_derived:saipe_poverty_rate_all_ages
+    transformation: next-year rate in percentage points
+    notes: next-year SAIPE all-ages poverty rate
+  treatment:
+  - name: income_tax_share
+    source: ieset_derived:individual_income_tax
+    transformation: 100 times individual_income_tax divided by total_revenue
+    notes: individual-income-tax revenue as a share of total state revenue
+intervention_channel: fiscal
+intervention_channel_justification: The treatment is a state fiscal-revenue or debt composition measure.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - state
+  - policy_year
+  clustering: state
+  notes: OLS of next-year outcome on current fiscal composition with state and policy-year indicators and state-clustered
+    covariance.
+falsification:
+  rule: SUPPORTED if the treatment coefficient is negative with two-sided p<0.10. REFUTED if it is significantly
+    opposite-signed at p<0.10. Otherwise PARTIAL. A verdict requires at least 120 observations, 40 states, and a
+    top-versus-bottom-quartile gap of at least 0.5 ratio points; a failed data gate is INCONCLUSIVE.
+  test: lagged_state_policy_year_fe_pcw100_us_fiscal_income_tax_share_poverty
+  threshold:
+    expected_sign: '-'
+    p_max: 0.1
+    min_observations: 120
+    min_units: 40
+    min_contrast_gap: 0.5
+prior_confidence: 0.5
+disclosure: State fiscal mixes reflect income, institutions, demographics, and policy needs. Favorable signs are
+  screening evidence, not causal estimates.
+steelman: hypotheses/steelman/pcw100_us_fiscal_income_tax_share_poverty.md
+notes: Hypothesis-only research wave; no school-scoreboard linkage is asserted.

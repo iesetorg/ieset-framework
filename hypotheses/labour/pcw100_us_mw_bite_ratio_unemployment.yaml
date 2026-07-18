@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: pcw100_us_mw_bite_ratio_unemployment
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Across the 50 US states and District of Columbia during 2006-2024, higher state minimum-wage bite relative
+  to the state wage denominator predicts higher unemployment in a two-way state and year fixed-effects screen with
+  state-clustered standard errors.
+methodology_note: Registered as part of the 100-test policy-contrast wave. The design uses new state-level treatment
+  and outcome panels, keeps null and contrary results, and is explicitly associational.
+evidence_type: associational
+sample:
+  countries:
+  - USA
+  period: &id001
+  - 2006
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - retain the 50 states and District of Columbia; exclude US territories
+  - drop state-years missing the registered treatment or outcome
+  - do not impute treatment or outcome values
+scope:
+  period: *id001
+  countries:
+  - USA
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - state_minimum_wage
+  - minimum_wage_bite
+  - wage_floor
+variables:
+  outcome:
+  - name: unemployment
+    source: ieset_derived:unemployment_rate
+    transformation: annual rate in percentage points
+    notes: state unemployment rate
+  treatment:
+  - name: bite_ratio
+    source: ieset_derived:bite_ratio
+    transformation: effective minimum wage divided by the published state wage denominator
+    notes: state minimum-wage bite relative to the state wage denominator
+intervention_channel: regulatory
+intervention_channel_justification: State statutory wage floors are regulatory interventions; the design measures
+  policy intensity rather than assigning ideological labels.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - state
+  - year
+  clustering: state
+  notes: OLS with state and year indicators and state-clustered covariance. No coefficient is inspected before the
+    specification commit.
+falsification:
+  rule: SUPPORTED if the treatment coefficient is positive with two-sided p<0.10. REFUTED if it is significantly
+    opposite-signed at p<0.10. Otherwise PARTIAL. A verdict requires at least 100 observations, 30 states, and a
+    registered contrast gap of at least 0.02; a failed data gate is INCONCLUSIVE rather than PARTIAL.
+  test: twoway_state_year_fe_pcw100_us_mw_bite_ratio_unemployment
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 100
+    min_units: 30
+    min_contrast_gap: 0.02
+prior_confidence: 0.55
+disclosure: Minimum-wage policy may respond to local labor conditions and may proxy for unmeasured state trends.
+  The screen does not establish causality.
+steelman: hypotheses/steelman/pcw100_us_mw_bite_ratio_unemployment.md
+notes: Hypothesis-only research wave; no school-scoreboard linkage is asserted.

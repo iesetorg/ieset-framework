@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: pcw100_global_efw_trade_freedom_hightech_exports
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: Across countries covered by the pinned Fraser and World Bank panels during 2006-2023, a higher average Fraser
+  freedom-to-trade-internationally score predicts a larger increase in high-technology exports as a manufacturing
+  share after conditioning on the baseline outcome and initial real GDP per capita.
+methodology_note: Registered as part of the 100-test policy-contrast wave. The design compares top and bottom policy-regime
+  quartiles over the past 18 years, uses HC3 covariance, retains null and contrary results, and is not causal.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 2006
+  - 2023
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: 'The estimand is a long-run policy-regime contrast: the 2006-2023 average treatment
+    is related to a predeclared long-run outcome mean or endpoint-minus-baseline change.'
+  exclusion_rules:
+  - retain country codes present in Fraser EFW and all registered WDI inputs
+  - require a finite baseline outcome and initial real GDP per capita
+  - do not impute treatment, outcome, or control values
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - industrial_capability
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  - competition_policy
+  treatment_tags:
+  - trade_freedom
+  - market_access
+  - trade_policy
+variables:
+  outcome:
+  - name: hightech_exports
+    source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+    transformation: 2021-2023 mean minus 2006-2008 mean
+    notes: high-technology-export-share change
+  treatment:
+  - name: trade_freedom
+    source: fraser_efw:freedom_to_trade_internationally
+    transformation: country mean over 2006-2023
+    notes: Fraser freedom-to-trade-internationally score
+  controls:
+  - name: baseline_outcome
+    source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+    transformation: country mean over 2006-2008
+  - name: log_initial_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log of 2006-2008 country mean
+intervention_channel: regulatory
+intervention_channel_justification: The Fraser freedom-to-trade-internationally score is treated as a broad policy-regime
+  proxy.
+estimator:
+  template: descriptive
+  clustering: HC3 heteroskedasticity-robust covariance
+  notes: Cross-country OLS of the registered long-run outcome on the average policy score, baseline outcome, and
+    log initial real GDP per capita. The top/bottom quartile lists establish the substantive contrast.
+falsification:
+  rule: SUPPORTED if the treatment coefficient is positive with two-sided HC3 p<0.10. REFUTED if it is significantly
+    opposite-signed at p<0.10. Otherwise PARTIAL. A verdict requires at least 35 countries and a top-versus-bottom
+    quartile policy gap of at least 0.5 EFW points; a failed data gate is INCONCLUSIVE.
+  test: long_run_policy_contrast_hc3_pcw100_global_efw_trade_freedom_hightech_exports
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 35
+    min_units: 35
+    min_contrast_gap: 0.5
+prior_confidence: 0.55
+disclosure: Policy scores are endogenous to development, measurement quality varies, and omitted regional or historical
+  factors may drive the association.
+steelman: hypotheses/steelman/pcw100_global_efw_trade_freedom_hightech_exports.md
+notes: Hypothesis-only research wave; no school-scoreboard linkage is asserted.
