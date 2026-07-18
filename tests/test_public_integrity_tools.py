@@ -28,9 +28,8 @@ def test_census_verdict_bucket_normalises_public_tiers():
     )
 
 
-def test_opsec_private_path_contract():
+def test_opsec_non_research_path_contract():
     opsec = load_script("check_public_opsec")
-    assert opsec.private_path("engine/agent_briefs/internal.md")
-    assert opsec.private_path("scripts/report_brain_budget_state.py")
-    assert opsec.private_path("HANDOFF_TO_RESEARCH_AGENT.md")
-    assert not opsec.private_path("engine/runs/brain_drain/result_card.md")
+    assert opsec.non_research_path("STRATEGY.md")
+    assert opsec.non_research_path("HANDOFF_TO_RESEARCH.md")
+    assert not opsec.non_research_path("engine/runs/example/result_card.md")
