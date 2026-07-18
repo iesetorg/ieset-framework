@@ -32,6 +32,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 import yaml
+from statsmodels.stats.multitest import multipletests
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1680,6 +1681,33 @@ def write_audit() -> None:
         "failures": failures,
         "hypotheses": rows,
     }
+    estimable_indices = [
+        index
+        for index, row in enumerate(rows)
+        if isinstance(row.get("estimate"), dict)
+        and isinstance(row["estimate"].get("p_value"), (int, float))
+    ]
+    q_values = multipletests(
+        [rows[index]["estimate"]["p_value"] for index in estimable_indices],
+        alpha=0.10,
+        method="fdr_bh",
+    )[1]
+    for index, q_value in zip(estimable_indices, q_values):
+        rows[index]["fdr_bh_q_value"] = float(q_value)
+        rows[index]["fdr_bh_10"] = bool(q_value < 0.10)
+    fdr_rows = [row for row in rows if row.get("fdr_bh_10")]
+    payload["multiplicity"] = {
+        "method": "Benjamini-Hochberg across all 100 registered p-values",
+        "q_max": 0.10,
+        "signals": len(fdr_rows),
+        "supported": sum(row["verdict"] == "SUPPORTED" for row in fdr_rows),
+        "refuted": sum(row["verdict"] == "REFUTED" for row in fdr_rows),
+        "partial": sum(row["verdict"] == "PARTIAL" for row in fdr_rows),
+        "decision_role": (
+            "supplementary family-level robustness check; does not rewrite the "
+            "pre-registered individual verdicts"
+        ),
+    }
     AUDIT_JSON.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -1691,6 +1719,12 @@ def write_audit() -> None:
         f"- All graduated: **{payload['all_graduated']}**",
         f"- Verdicts: {json.dumps(verdict_counts, sort_keys=True)}",
         f"- Cohorts: {json.dumps(cohort_counts, sort_keys=True)}",
+        (
+            "- Benjamini-Hochberg q<0.10 signals: "
+            f"{payload['multiplicity']['signals']} "
+            f"({payload['multiplicity']['supported']} supported, "
+            f"{payload['multiplicity']['refuted']} refuted)"
+        ),
         "",
         "A hypothesis graduates only when its schema-valid preregistration and steelman "
         "exist, git history verifies strict preregistration, its registered data gate "
@@ -1699,13 +1733,15 @@ def write_audit() -> None:
         "",
         "## Results",
         "",
-        "| hypothesis | cohort | verdict | graduated |",
-        "| --- | --- | --- | :---: |",
+        "| hypothesis | cohort | verdict | BH q-value | graduated |",
+        "| --- | --- | --- | ---: | :---: |",
     ]
     for row in rows:
+        q_value = row.get("fdr_bh_q_value")
+        q_text = f"{q_value:.4g}" if isinstance(q_value, float) else "n/a"
         lines.append(
             f"| `{row['hypothesis_id']}` | {row['cohort']} | {row['verdict']} | "
-            f"{'yes' if row['graduated'] else 'no'} |"
+            f"{q_text} | {'yes' if row['graduated'] else 'no'} |"
         )
     if failures:
         lines.extend(["", "## Failures", ""])
