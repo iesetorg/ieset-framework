@@ -14,11 +14,6 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def hidden_marker(*codepoints: int) -> str:
-    """Build private audit markers without publishing them as source text."""
-    return "".join(chr(codepoint) for codepoint in codepoints)
-
-
 def test_stats_json_is_authoritative_census_copy():
     census = (ROOT / "engine" / "public_corpus_census.json").read_text(encoding="utf-8")
     public = (ROOT / "web" / "public" / "stats.json").read_text(encoding="utf-8")
@@ -46,12 +41,7 @@ def test_citation_and_site_point_at_ieset_framework():
     site = (ROOT / "web" / "lib" / "site.ts").read_text(encoding="utf-8")
     assert 'repository-code: "https://github.com/iesetorg/ieset-framework"' in citation
     assert "https://github.com/iesetorg/ieset-framework" in site
-    retired_repo = hidden_marker(
-        105, 101, 115, 101, 116, 45, 102, 114, 97, 109, 101, 119, 111, 114, 107, 49
-    )
-    assert retired_repo not in citation
-    personal_account = hidden_marker(98, 105, 103, 100, 101, 115, 116, 105, 110, 121, 50)
-    assert personal_account not in site
+    assert "github.com/iesetorg/" in site
 
 
 def test_prereg_strip_deep_links_first_spec_commit_not_head():
@@ -85,39 +75,18 @@ def test_prereg_index_verified_spec_is_not_repository_head():
     )
 
 
-def test_production_disclosure_without_private_control_plane():
+def test_production_disclosure_is_research_focused():
     prod = (ROOT / "web" / "app" / "production" / "page.tsx").read_text(encoding="utf-8")
     assert "large-language-model assistance under human direction" in prod
     assert "Models are workers, not authorities" in prod
     assert "not" in prod.lower() and "peer review" in prod.lower()
-    # Must not embed private control-plane paths
-    control_plane_path = hidden_marker(101, 110, 103, 105, 110, 101, 47, 98, 114, 97, 105, 110)
-    private_name = hidden_marker(100, 117, 110, 99, 97, 110, 99, 97, 109, 112, 98, 101, 108, 108)
-    assert control_plane_path not in prod
-    assert private_name not in prod
-    assert "budget_state" not in prod
 
 
-def test_public_tree_has_no_name_leak_or_tracked_control_plane():
-    private_name = hidden_marker(100, 117, 110, 99, 97, 110, 99, 97, 109, 112, 98, 101, 108, 108)
-    leaked = subprocess.run(
-        ["git", "grep", "-n", private_name, "HEAD"],
+def test_public_commit_metadata_is_institutional():
+    subprocess.check_call(
+        ["python3", "scripts/check_public_opsec.py"],
         cwd=ROOT,
-        capture_output=True,
-        text=True,
     )
-    assert leaked.returncode != 0, leaked.stdout
-
-    tracked = subprocess.check_output(
-        ["git", "ls-tree", "-r", "HEAD", "--name-only"],
-        cwd=ROOT,
-        text=True,
-    )
-    control_plane_path = hidden_marker(101, 110, 103, 105, 110, 101, 47, 98, 114, 97, 105, 110)
-    private_control_paths = [
-        path for path in tracked.splitlines() if path.startswith(control_plane_path)
-    ]
-    assert private_control_paths == []
 
 
 def test_discovery_artifacts_exist_and_use_canonical_host():

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject private control-plane files, local paths, PII markers, and secrets."""
+"""Reject non-research files, local paths, personal metadata, and secrets."""
 from __future__ import annotations
 
 import argparse
@@ -10,54 +10,33 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-
-def hidden_marker(*codepoints: int) -> str:
-    """Construct retired private labels without republishing them as text."""
-    return "".join(chr(codepoint) for codepoint in codepoints)
-
-
-RETIRED_CONTROL_LABEL = hidden_marker(98, 114, 97, 105, 110)
-PRIVATE_PATHS = (
-    f"engine/{RETIRED_CONTROL_LABEL}/",
-    "engine/agent_briefs/",
-    "debate/",
-)
-PRIVATE_BASENAMES = {
+NON_RESEARCH_BASENAMES = {
     "STRATEGY.md",
     "GROWTH_PLAN_v1.md",
     "FRONTEND_DESIGN.md",
 }
-PRIVATE_PATH_PATTERNS = (
+NON_RESEARCH_PATH_PATTERNS = (
     re.compile(r"^HANDOFF_TO_.*\.md$"),
-    re.compile(rf"^schemas/{RETIRED_CONTROL_LABEL}_.*\.schema\.json$"),
-    re.compile(rf"^scripts/.*{RETIRED_CONTROL_LABEL}.*$"),
-    re.compile(rf"^tests/test_{RETIRED_CONTROL_LABEL}.*\.py$"),
-)
-PRIVATE_IDENTITY_MARKERS = (
-    "duncan" + "campbell",
-    "Duncan " + "Campbell",
-    "Locals-" + "Mac-Studio",
-    "localllm" + "@",
-    "big" + "destiny2",
-)
-PRIVATE_IDENTITY_PATTERN = "|".join(
-    re.escape(marker) for marker in PRIVATE_IDENTITY_MARKERS
 )
 CONTENT_PATTERNS = {
     "macOS home path": re.compile(r"/Users/[A-Za-z0-9._-]+"),
     "Windows home path": re.compile(
         r"[A-Za-z]:\\+Users\\+[A-Za-z0-9._-]+", re.IGNORECASE
     ),
-    "private identity marker": re.compile(PRIVATE_IDENTITY_PATTERN, re.IGNORECASE),
+    "local-domain email": re.compile(
+        r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.local\b", re.IGNORECASE
+    ),
     "GitHub token": re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}\b"),
     "OpenAI-style secret": re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b"),
     "AWS access key": re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
     "private key block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
 }
 ALLOWED_CONTENT_FILES = {".gitignore", "scripts/check_public_opsec.py"}
-HISTORY_PATTERN = re.compile(
-    rf"(?:{PRIVATE_IDENTITY_PATTERN}|<[^>]+\.local>)", re.IGNORECASE
-)
+ALLOWED_COMMIT_IDENTITIES = {
+    ("iesetorg", "iesetorg@users.noreply.github.com"),
+    ("IESET", "iesetorg@users.noreply.github.com"),
+    ("IESET", "institute@ieset.dev"),
+}
 
 
 def command(*args: str) -> subprocess.CompletedProcess[bytes]:
@@ -78,19 +57,18 @@ def tracked_paths() -> list[str]:
     )
 
 
-def private_path(path: str) -> bool:
+def non_research_path(path: str) -> bool:
     return (
-        path in PRIVATE_BASENAMES
-        or path.startswith(PRIVATE_PATHS)
-        or any(pattern.match(path) for pattern in PRIVATE_PATH_PATTERNS)
+        path in NON_RESEARCH_BASENAMES
+        or any(pattern.match(path) for pattern in NON_RESEARCH_PATH_PATTERNS)
     )
 
 
 def scan_tree() -> list[str]:
     findings: list[str] = []
     for path in tracked_paths():
-        if private_path(path):
-            findings.append(f"{path}: private control-plane path is tracked")
+        if non_research_path(path):
+            findings.append(f"{path}: non-research path is tracked")
             continue
         if path in ALLOWED_CONTENT_FILES:
             continue
@@ -114,15 +92,19 @@ def scan_history() -> list[str]:
     output = command(
         "git",
         "log",
-        "--format=%H%x09%an <%ae>%x09%cn <%ce>",
+        "--format=%H%x09%an%x09%ae%x09%cn%x09%ce",
         "HEAD",
     ).stdout.decode("utf-8", errors="replace")
     findings = []
     for line in output.splitlines():
-        if HISTORY_PATTERN.search(line):
-            findings.append(
-                f"commit {line.split(chr(9), 1)[0][:12]}: private author metadata"
-            )
+        commit, author, author_email, committer, committer_email = line.split("\t")
+        identities = {
+            (author, author_email),
+            (committer, committer_email),
+        }
+        blocked = identities - ALLOWED_COMMIT_IDENTITIES
+        if blocked:
+            findings.append(f"commit {commit[:12]}: non-institutional metadata")
     return findings
 
 

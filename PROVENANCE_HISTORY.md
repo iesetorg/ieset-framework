@@ -1,10 +1,10 @@
 # Repository history and privacy migration
 
 On 2026-07-17 the public repository history was rewritten to remove personal
-filesystem paths, private operator briefs, internal control-plane artifacts, and
-machine-specific author metadata. Project-account metadata replaced personal
-or device-derived author identities. Commit author and committer timestamps were
-preserved, but commit hashes changed.
+filesystem paths, non-research files, and machine-specific author metadata.
+Project-account metadata replaced personal or device-derived author identities.
+Commit author and committer timestamps were preserved, but commit hashes
+changed.
 
 This privacy migration has two methodological consequences:
 

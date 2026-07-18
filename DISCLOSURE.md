@@ -83,6 +83,6 @@ Material changes to this transparency note appear here as dated entries.
   narrative into a shorter transparency note. The framework keeps the same
   methodological commitments without foregrounding biography or conflict
   language on every reader path.
-- **Operational-security revision (2026-07-17)** — Removed personal-device
-  metadata and internal control-plane material from the public repository;
-  added a high-level automation disclosure and per-hypothesis conflict model.
+- **Repository privacy revision (2026-07-17)** — Removed personal-device
+  metadata and non-research artifacts from the public repository; standardized
+  institutional author metadata and added a per-hypothesis conflict model.

@@ -121,20 +121,6 @@ export default function ProductionPage() {
 
       <section className="mt-10">
         <h2 className="m-0 text-[18px] font-semibold">
-          What stays out of the public repository
-        </h2>
-        <p className="mt-3 text-[15px] leading-[1.65] text-ink">
-          Operator automation (token budgets, private agent control planes,
-          credentials, local paths, and internal dispatch state) is{" "}
-          <strong>not</strong> published. That is an operational boundary, not
-          a claim that production is magic. The evidence anyone should argue
-          with is still public: specs, vintages, replication code, and
-          results.
-        </p>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="m-0 text-[18px] font-semibold">
           Institutional accountability and change control
         </h2>
         <p className="mt-3 text-[15px] leading-[1.65] text-ink">
