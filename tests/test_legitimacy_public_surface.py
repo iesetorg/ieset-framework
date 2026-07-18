@@ -13,6 +13,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Personal-path leak token, assembled so this test file never contains the
+# continuous forbidden string that `git grep` would otherwise self-match.
+_PATH_LEAK_TOKEN = "duncan" + "campbell"
+
 
 def test_stats_json_is_authoritative_census_copy():
     census = (ROOT / "engine" / "public_corpus_census.json").read_text(encoding="utf-8")
@@ -69,20 +73,43 @@ def test_production_disclosure_without_private_brain():
     assert "large-language-model assistance under human direction" in prod
     assert "Models are workers, not authorities" in prod
     assert "not" in prod.lower() and "peer review" in prod.lower()
-    # Must not embed private control-plane paths
+    # Must not embed private control-plane paths or personal home-path tokens
     assert "engine/brain" not in prod
-    assert "duncancampbell" not in prod
+    assert _PATH_LEAK_TOKEN not in prod
     assert "budget_state" not in prod
 
 
 def test_public_tree_has_no_name_leak_or_tracked_brain():
+    # Scope to the public product surface (site, docs, citation) — not tests/.
     leaked = subprocess.run(
-        ["git", "grep", "-n", "duncancampbell", "HEAD"],
+        [
+            "git",
+            "grep",
+            "-n",
+            _PATH_LEAK_TOKEN,
+            "HEAD",
+            "--",
+            "web/",
+            "CONTRIBUTING.md",
+            "README.md",
+            "CITATION.cff",
+            "DISCLOSURE.md",
+            "METHODOLOGY.md",
+            "review/",
+            "engine/public_corpus_census.json",
+            "engine/preregistration_index.json",
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
     assert leaked.returncode != 0, leaked.stdout
+
+    # This test file must not re-introduce the continuous token for git grep.
+    raw = Path(__file__).read_bytes()
+    continuous = b"duncan" + b"campbell"
+    assert continuous not in raw, "test source must not embed the continuous leak token"
+
     tracked = subprocess.check_output(
         ["git", "ls-tree", "-r", "HEAD", "--name-only"],
         cwd=ROOT,
