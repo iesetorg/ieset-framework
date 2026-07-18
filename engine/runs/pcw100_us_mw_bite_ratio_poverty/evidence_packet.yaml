@@ -1,0 +1,464 @@
+packet_version: 1
+generated_utc: '2026-07-18T21:26:03+00:00'
+repository:
+  root: /Users/localllm/IESET
+  git_commit: e60b5da195ada9af4bcad82d43053047ec1c5739
+hypothesis:
+  id: pcw100_us_mw_bite_ratio_poverty
+  legacy_id: null
+  path: hypotheses/distribution/pcw100_us_mw_bite_ratio_poverty.yaml
+  school: null
+  topic: distribution
+  claim: Across the 50 US states and District of Columbia during 2006-2024, higher
+    state minimum-wage bite relative to the state wage denominator predicts a lower
+    all-ages poverty rate in a two-way state and year fixed-effects screen with state-clustered
+    standard errors.
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: coefficient=+1.39907, SE=2.12192, p=0.509676, expected_sign=-
+  status: PARTIAL
+preregistration:
+  claim: Across the 50 US states and District of Columbia during 2006-2024, higher
+    state minimum-wage bite relative to the state wage denominator predicts a lower
+    all-ages poverty rate in a two-way state and year fixed-effects screen with state-clustered
+    standard errors.
+  falsification_rule: SUPPORTED if the treatment coefficient is negative with two-sided
+    p<0.10. REFUTED if it is significantly opposite-signed at p<0.10. Otherwise PARTIAL.
+    A verdict requires at least 100 observations, 30 states, and a registered contrast
+    gap of at least 0.02; a failed data gate is INCONCLUSIVE rather than PARTIAL.
+  threshold:
+    expected_sign: '-'
+    p_max: 0.1
+    min_observations: 100
+    min_units: 30
+    min_contrast_gap: 0.02
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - state
+    - year
+    clustering: state
+    notes: OLS with state and year indicators and state-clustered covariance. No coefficient
+      is inspected before the specification commit.
+  steelman: hypotheses/steelman/pcw100_us_mw_bite_ratio_poverty.md
+reproduction:
+  run_dir: engine/runs/pcw100_us_mw_bite_ratio_poverty
+  runner: scripts/policy_contrast_wave_100.py
+  replication_script: engine/runs/pcw100_us_mw_bite_ratio_poverty/replication.py
+  suggested_command: python engine/runs/pcw100_us_mw_bite_ratio_poverty/replication.py
+data:
+  inputs:
+  - name: us_state_minimum_wage_treatment_panel
+    publisher: ieset_derived
+    series_id: us_state_minimum_wage_treatment_panel
+    vintage_file: data/derived/us_state_minimum_wage_treatment_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 3e2c602b4eafcc922f0166d9cee2be33fc2882a6e5bb80858e55564d36dc2e44
+      computed_sha256: 3e2c602b4eafcc922f0166d9cee2be33fc2882a6e5bb80858e55564d36dc2e44
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_minimum_wage_treatment_panel.parquet
+      methodology_url: https://www.dol.gov/agencies/whd/minimum-wage/history
+      license: U.S. Department of Labor public domain (federal government work)
+      fetch_utc: '2026-06-29T10:37:38+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T103738Z_us_state_minimum_wage_treatment.yaml
+    coverage:
+      start_date: '1968'
+      end_date: '2024'
+      frequency: annual
+      rows: 2106
+      units: USD per hour (nominal) and treatment event flags
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_minimum_wage_treatment_panel.parquet
+        parquet_sha256: 3e2c602b4eafcc922f0166d9cee2be33fc2882a6e5bb80858e55564d36dc2e44
+      stats:
+        panel_rows: 2106
+        start_year: 1968
+        end_year: 2024
+        state_count: 54
+        year_count: 39
+        rows_with_statutory_rate: 1834
+        rows_binding_above_federal: 701
+        states_ever_binding_above_federal: 40
+        first_bind_events: 40
+        rows_with_bite_ratio: 474
+        bite_year_min: 2014
+        bite_year_max: 2024
+        source_mw_history: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+        source_mw_history_sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+        source_bite_panel: data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet
+        source_bite_panel_sha256: 22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f
+        source_state_spine: data/derived/state_universe_admin1.parquet
+        source_state_spine_sha256: 2d353eff30c0661abfc09cbe8d711f2ac1f23022e3ec49f7ed9b064c18ed93ac
+        event_type_counts:
+          no_change: 1133
+          increase: 877
+          baseline: 52
+          first_bind: 40
+          decrease: 4
+      columns:
+      - ieset_state_id
+      - unit_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - year
+      - effective_minimum_wage
+      - state_statutory_minimum_wage
+      - federal_minimum_wage
+      - binds_above_federal
+      - bite_ratio
+      - bite_denominator_wage
+      - bite_denominator
+      - minimum_wage_increase
+      - statutory_minimum_wage_increase
+      - event_type
+      - is_first_bind_event
+      - first_year_binds_above_federal
+      - effective_minimum_wage_published
+      - state_rate_low
+      - state_rate_high
+      - raw_value
+      - parse_note
+      - nominal_real_note
+      inputs:
+        minimum_wage_history:
+          path: data/vintages/usdol/state_minimum_wage_history@2026-05-04T145319Z.parquet
+          sha256: f6c2458f563dba860f2cde0d4728ebd615345e278275abf2f559a6d1c0c24eeb
+        bite_ratio_panel:
+          path: data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@2026-05-14T111058Z.parquet
+          sha256: 22fa09d9065aae74da3bfeb0d25bbf314f0c46e4e0c01bed22a4a9adb4df397f
+        state_spine:
+          path: data/derived/state_universe_admin1.parquet
+          sha256: 2d353eff30c0661abfc09cbe8d711f2ac1f23022e3ec49f7ed9b064c18ed93ac
+      construction: USDOL state minimum-wage history joined to the canonical state
+        spine for ieset_state_id, then to the derived subnational minimum-wage bite-ratio
+        panel on state_fips+year. state_statutory_minimum_wage is the genuine own-law
+        rate (state_rate_high; NaN when parse_note in {no_state_rate, non_hourly_cell,
+        missing}); effective_minimum_wage is max(statutory, federal); binds_above_federal
+        is statutory>federal. Treatment events code the first observed year a state
+        binds above federal (first_bind) plus year-over-year increases. Federal and
+        state floors are kept separate; intensity is not routed through any country-year
+        runner. Levels are nominal current USD.
+  - name: us_state_labor_outcome_panel
+    publisher: ieset_derived
+    series_id: us_state_labor_outcome_panel
+    vintage_file: data/derived/us_state_labor_outcome_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 2631b4d7d9cf84b55b2c0b53c91f5a6cbac7181591a27b0f266bcce22e0a0cf3
+      computed_sha256: 2631b4d7d9cf84b55b2c0b53c91f5a6cbac7181591a27b0f266bcce22e0a0cf3
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_labor_outcome_panel.parquet
+      methodology_url: https://www.bls.gov/lau/ https://www.bls.gov/oes/ https://www.bls.gov/cew/
+      license: U.S. Bureau of Labor Statistics public domain data
+      fetch_utc: '2026-06-29T10:37:16+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T103716Z_us_state_labor_outcome.yaml
+    coverage:
+      start_date: '1990'
+      end_date: '2024'
+      frequency: annual (state-year)
+      rows: 1800
+      units: percent, US dollars per hour, employment counts, US dollars per week
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_labor_outcome_panel.parquet
+        parquet_sha256: 2631b4d7d9cf84b55b2c0b53c91f5a6cbac7181591a27b0f266bcce22e0a0cf3
+      stats:
+        panel_rows: 1800
+        unique_states: 54
+        year_min: 1990
+        year_max: 2024
+        states_with_data_most_recent_year: 51
+        outcome_columns:
+        - unemployment_rate
+        - employment_population_ratio
+        - median_hourly_wage
+        - p10_hourly_wage
+        - qcew_total_employment
+        - qcew_avg_weekly_wage
+        - qcew_food_service_employment
+        - qcew_food_service_avg_weekly_wage
+        frequency_note: LAU unemployment_rate (measure 03) and employment_population_ratio
+          (measure 07) are collapsed from monthly M01-M12 observations to an annual
+          12-month mean; *_months_observed records the count averaged. OEWS and QCEW
+          inputs are already annual (A01 / qtr='A'). Monthly and annual frequencies
+          are never mixed.
+        qcew_disclosure_note: qcew_*_disclosure_code carries the BLS QCEW disclosure
+          flag verbatim (null when not suppressed).
+      columns:
+      - ieset_state_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - is_state_equivalent
+      - year
+      - unemployment_rate
+      - unemployment_rate_months_observed
+      - employment_population_ratio
+      - employment_population_ratio_months_observed
+      - median_hourly_wage
+      - median_hourly_wage_obs
+      - p10_hourly_wage
+      - p10_hourly_wage_obs
+      - qcew_total_employment
+      - qcew_avg_weekly_wage
+      - qcew_total_establishments
+      - qcew_total_disclosure_code
+      - qcew_food_service_employment
+      - qcew_food_service_avg_weekly_wage
+      - qcew_food_service_establishments
+      - qcew_food_service_disclosure_code
+      - outcomes_present
+      inputs:
+      - input: lau_unemployment_rate
+        path: data/vintages/bls/LAU_state_unemployment_rate_panel@2026-05-05T204700Z.parquet
+        sha256: edebdd51662f5ca950a1090f0129ade6aecf011458f2d0fe3ddcc201a10a56f9
+      - input: lau_emp_pop_ratio
+        path: data/vintages/bls/LAU_state_employment_population_ratio_panel@2026-05-14T110716Z.parquet
+        sha256: b952791251e90cd431c111ded122e5b1930fd8783b6e0ab37327f8c04387597b
+      - input: oews_median_hourly_wage
+        path: data/vintages/bls/OEWS_state_median_hourly_wage_panel@2026-05-12T125636Z.parquet
+        sha256: 141cbd6792a4dd1b3c82f263939b0c05b5d21ff56e7862c3f171993cc2c2f4a6
+      - input: oews_p10_hourly_wage
+        path: data/vintages/bls/OEWS_state_p10_hourly_wage_panel@2026-05-12T125547Z.parquet
+        sha256: a96801296ff21f13d04c87e3956542153302b4684535ae664b3b0604f1946d02
+      - input: qcew_total_employment
+        path: data/vintages/bls/QCEW_state_total_employment_panel@2026-05-14T110759Z.parquet
+        sha256: 0952e32a5ef92ecc6bb1000bb5946314b32e77120e194819333f4171039a30c2
+      - input: qcew_naics722_employment
+        path: data/vintages/bls/QCEW_state_NAICS722_employment_panel@2026-05-12T140559Z.parquet
+        sha256: 96ae2dfd1ec1f356c0bd6cffb2d06555824cc367a58778fc1e56f4c701d65358
+      construction: Tidy U.S. state-year labor-outcome panel merging the newest BLS
+        LAU/OEWS/QCEW state vintages on disk. LAU monthly series are averaged to annual
+        means; OEWS and QCEW are already annual. Every row is joined to ieset_state_id
+        via state_fips from state_universe_admin1; state_fips is preserved and QCEW
+        disclosure flags plus OEWS observation counts are carried as note columns.
+  - name: us_state_acs_saipe_incidence_panel
+    publisher: ieset_derived
+    series_id: us_state_acs_saipe_incidence_panel
+    vintage_file: data/derived/us_state_acs_saipe_incidence_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 642aff92c21fc463c0529850e4c5d4f3405b1678dcc7beebb250957ab6644557
+      computed_sha256: 642aff92c21fc463c0529850e4c5d4f3405b1678dcc7beebb250957ab6644557
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_acs_saipe_incidence_panel.parquet
+      methodology_url: https://www.census.gov/programs-surveys/acs/ https://www.census.gov/programs-surveys/saipe.html
+      license: U.S. Census Bureau public domain data
+      fetch_utc: '2026-06-29T11:11:01.894879+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T111101Z_us_state_acs_saipe_incidence.yaml
+    coverage:
+      start_date: '2018'
+      end_date: '2022'
+      frequency: annual (state-year)
+      rows: 256
+      units: percent, US dollars, population counts
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_acs_saipe_incidence_panel.parquet
+        parquet_sha256: 642aff92c21fc463c0529850e4c5d4f3405b1678dcc7beebb250957ab6644557
+      stats:
+        panel_rows: 256
+        unique_states: 52
+        year_min: 2018
+        year_max: 2022
+        states_with_data_most_recent_year: 52
+        incidence_columns:
+        - saipe_poverty_rate_all_ages
+        - saipe_median_household_income
+        - acs_median_household_income
+        - acs_bachelors_or_higher_share
+        - acs_school_enrolled_share
+        covered_dimensions:
+        - median_household_income (SAIPE SAEMHI_PT + ACS B19013_001E)
+        - poverty_rate_all_ages (SAIPE SAEPOVRTALL_PT)
+        - educational_attainment_bachelors_or_higher_share (ACS B15003)
+        - school_enrolled_share (ACS B14001)
+        derivation_note: acs_bachelors_or_higher_share = (B15003_022E+023E+024E+025E)/B15003_001E*100.
+          acs_school_enrolled_share = B14001_002E/B14001_001E*100. saipe_poverty_rate_all_ages
+          and median household incomes are pulled verbatim from the source estimate
+          columns.
+        coverage_note: '*_obs flags are 1 when the named source supplied a value for
+          the state-year, else 0. ACS profile/education/enrollment vintages cover
+          ACS 1-year 2022 only; SAIPE covers 2018-2022, so SAIPE-only measures populate
+          earlier years.'
+      columns:
+      - ieset_state_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - is_state_equivalent
+      - year
+      - saipe_poverty_rate_all_ages
+      - saipe_median_household_income
+      - saipe_obs
+      - acs_median_household_income
+      - acs_total_population
+      - acs_profile_obs
+      - acs_bachelors_or_higher_share
+      - acs_population_25_plus
+      - acs_education_obs
+      - acs_school_enrolled_share
+      - acs_enrollment_universe_3_plus
+      - acs_enrollment_obs
+      - incidence_measures_present
+      inputs:
+      - input: acs_state_profile
+        path: data/vintages/us_census/ACS@2026-05-05T212323Z.parquet
+        sha256: 42c2afc665521a48c7308aca31258d45f0c1cc4ec018141b332021f417d29e6a
+        rows: 52
+        columns:
+        - NAME
+        - B01003_001E
+        - B19013_001E
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      - input: saipe_state
+        path: data/vintages/us_census/saipe@2026-05-05T212330Z.parquet
+        sha256: bd509cbda33edec57f09621687f837520380a01b9788b76dffd387ac6b2eb691
+        rows: 255
+        columns:
+        - NAME
+        - SAEPOVRTALL_PT
+        - SAEMHI_PT
+        - YEAR
+        - time
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      - input: acs_education_attainment
+        path: data/vintages/us_census/acs_education_attainment@2026-05-05T212325Z.parquet
+        sha256: 51324083f650bb067a163601cdb31af4b5cde8da7ef88ad283a144370bae58f5
+        rows: 52
+        columns:
+        - NAME
+        - B15003_001E
+        - B15003_022E
+        - B15003_023E
+        - B15003_024E
+        - B15003_025E
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      - input: acs_school_enrollment
+        path: data/vintages/us_census/acs_school_enrollment@2026-05-05T212326Z.parquet
+        sha256: 8e7f3c0b8658af65a62afe41cebeb12a6bc9aebb470b00a3c8641cb04a726a34
+        rows: 52
+        columns:
+        - NAME
+        - B14001_001E
+        - B14001_002E
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      documented_gaps:
+      - dimension: homeownership_tenure_rate
+        reason: The ACS state-profile vintage carries only total population (B01003)
+          and median household income (B19013); no owner/renter tenure table (B25003)
+          is present.
+      - dimension: median_gross_rent
+        reason: No ACS gross-rent table (B25064) present in the on-disk ACS vintage.
+      - dimension: median_housing_cost
+        reason: No ACS selected-monthly-owner-cost / housing-cost table (B25088/B25105)
+          present in the on-disk ACS vintage.
+      - dimension: rent_burden_cost_burdened_share
+        reason: No ACS gross-rent-as-percentage-of-income table (B25070) or selected-monthly-owner-costs-as-percentage-of-income
+          table (B25091) present; cost-burdened share cannot be derived without fabrication.
+      - dimension: income_distribution_gini
+        reason: No ACS Gini index (B19083) or household-income-quintile table (B19080)
+          present in the on-disk ACS vintage; only median household income is available.
+      - dimension: spm_child_poverty_rate_state_grain
+        reason: The spm_child_poverty_rate vintage is national-only (geo_area='USA');
+          it carries no state-level rows and cannot populate a state-year panel.
+      construction: U.S. state-year distributional-incidence panel merging the newest
+        Census ACS state-profile, SAIPE, ACS education-attainment, and ACS school-enrollment
+        vintages on disk. Every row is joined to ieset_state_id via state_fips from
+        state_universe_admin1; state_fips is preserved. Bachelor's-or-higher and enrolled
+        shares are derived from counts present in the vintages; no incidence dimension
+        absent from the vintages is fabricated -- gaps are listed under documented_gaps.
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 3
+    official_source_count: 0
+    manual_source_count: 0
+    hash_status_counts:
+      match: 3
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/distribution/pcw100_us_mw_bite_ratio_poverty.yaml
+  sha256: cf7b16977c8b368ff76af106881f36c16a4c000cb25e7a4a44d8c0868e89296d
+  bytes: 2900
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/hypothesis.yaml
+  sha256: fd55e9109d2c65e20b50dbf68ff92e54ac411f50daed7c60d3ab39f0f8e46499
+  bytes: 2831
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/manifest.yaml
+  sha256: bf1a2fd17918c9d9a0c856e8f8b23bbf1bfd083a9ee02b6851043e99f2b7fcab
+  bytes: 1388
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/diagnostics.json
+  sha256: 5a9a31bd3dca923b6061b2142532f56d70a76fcc7491bb1228bebaa7bf986cec
+  bytes: 4332
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/result_card.md
+  sha256: a8099c1a18d45ffc5b3c96a0ccd5ec01622a004fbdfed5202cb7f8bf286ba303
+  bytes: 1118
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/replication.py
+  sha256: 254e39a2a406674e7eb952c71a8288d79073911e192fa6a35b0d4a3e6bb52fc3
+  bytes: 338
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/coefficients.parquet
+  sha256: 4c0ae887be1666126df770148d715a840d391fb430cbdda24b86095003465fc0
+  bytes: 7921
+- path: engine/runs/pcw100_us_mw_bite_ratio_poverty/chart_data.json
+  sha256: 372f4b95e44f74e07be571d7fb563e4e15c0958d0e7c3134aedc551882896197
+  bytes: 1190
+- path: hypotheses/steelman/pcw100_us_mw_bite_ratio_poverty.md
+  sha256: 969153699d0f4b4cc0e4486f78ca4ef7df6e9f492b17a5d1d0d176da446fbd9e
+  bytes: 1318
+references:
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_minimum_wage_treatment_panel
+  url: derived://data/derived/us_state_minimum_wage_treatment_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_minimum_wage_treatment_panel
+  url: https://www.dol.gov/agencies/whd/minimum-wage/history
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_labor_outcome_panel
+  url: derived://data/derived/us_state_labor_outcome_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_labor_outcome_panel
+  url: https://www.bls.gov/lau/ https://www.bls.gov/oes/ https://www.bls.gov/cew/
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_acs_saipe_incidence_panel
+  url: derived://data/derived/us_state_acs_saipe_incidence_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_acs_saipe_incidence_panel
+  url: https://www.census.gov/programs-surveys/acs/ https://www.census.gov/programs-surveys/saipe.html
+caveats:
+- Associational design; the estimate is not a causal policy effect.
+- The registered model does not eliminate all time-varying or cross-country confounding.

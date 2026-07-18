@@ -1622,21 +1622,30 @@ def write_audit() -> None:
             "spec_exists": spec_path.exists(),
             "steelman_exists": steelman_path.exists(),
             "status_pre_registered": False,
+            "frozen_hypothesis_matches": False,
             "strict_preregistration": registrations.get(hid, {}).get("status") == "verified",
             "definitive_verdict": label in {"SUPPORTED", "REFUTED", "PARTIAL"},
             "data_gate_passed": bool(diagnostics.get("preflight", {}).get("passed")),
             "all_run_artifacts": all(path.exists() for path in required),
             "replication_command": (run_dir / "replication.py").exists(),
             "provenance_hashes": False,
+            "packet_verdict_matches": False,
         }
         if spec_path.exists():
             spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
             checks["status_pre_registered"] = spec.get("status") == "pre_registered"
+            frozen_path = run_dir / "hypothesis.yaml"
+            if frozen_path.exists():
+                frozen = yaml.safe_load(frozen_path.read_text(encoding="utf-8"))
+                checks["frozen_hypothesis_matches"] = frozen == spec
         if packet_path.exists():
             packet = yaml.safe_load(packet_path.read_text(encoding="utf-8")) or {}
             inputs = packet.get("data", {}).get("inputs", [])
             checks["provenance_hashes"] = bool(inputs) and all(
                 item.get("hash", {}).get("status") == "match" for item in inputs
+            )
+            checks["packet_verdict_matches"] = (
+                packet.get("verdict", {}).get("bucket") == str(label).lower()
             )
         passed = all(checks.values())
         if not passed:

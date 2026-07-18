@@ -1,0 +1,425 @@
+packet_version: 1
+generated_utc: '2026-07-18T21:26:02+00:00'
+repository:
+  root: /Users/localllm/IESET
+  git_commit: e60b5da195ada9af4bcad82d43053047ec1c5739
+hypothesis:
+  id: pcw100_us_fiscal_sales_tax_share_poverty
+  legacy_id: null
+  path: hypotheses/distribution/pcw100_us_fiscal_sales_tax_share_poverty.yaml
+  school: null
+  topic: distribution
+  claim: Across the 50 US states and District of Columbia, higher sales and gross-receipts
+    tax revenue as a share of total state revenue in fiscal years 2017-2021 predicts
+    a higher next-year poverty rate one year later in a state and policy-year fixed-effects
+    screen.
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: coefficient=-0.0146239, SE=0.0226211, p=0.517973, expected_sign=+
+  status: PARTIAL
+preregistration:
+  claim: Across the 50 US states and District of Columbia, higher sales and gross-receipts
+    tax revenue as a share of total state revenue in fiscal years 2017-2021 predicts
+    a higher next-year poverty rate one year later in a state and policy-year fixed-effects
+    screen.
+  falsification_rule: SUPPORTED if the treatment coefficient is positive with two-sided
+    p<0.10. REFUTED if it is significantly opposite-signed at p<0.10. Otherwise PARTIAL.
+    A verdict requires at least 120 observations, 40 states, and a top-versus-bottom-quartile
+    gap of at least 0.5 ratio points; a failed data gate is INCONCLUSIVE.
+  threshold:
+    expected_sign: +
+    p_max: 0.1
+    min_observations: 120
+    min_units: 40
+    min_contrast_gap: 0.5
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - state
+    - policy_year
+    clustering: state
+    notes: OLS of next-year outcome on current fiscal composition with state and policy-year
+      indicators and state-clustered covariance.
+  steelman: hypotheses/steelman/pcw100_us_fiscal_sales_tax_share_poverty.md
+reproduction:
+  run_dir: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty
+  runner: scripts/policy_contrast_wave_100.py
+  replication_script: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/replication.py
+  suggested_command: python engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/replication.py
+data:
+  inputs:
+  - name: us_state_gov_finances_panel
+    publisher: ieset_derived
+    series_id: us_state_gov_finances_panel
+    vintage_file: data/derived/us_state_gov_finances_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4dce3eb9f5cc4a9a7513f2c9d02ec2901d054571c0b75e20ca5e7471c8e39b1c
+      computed_sha256: 4dce3eb9f5cc4a9a7513f2c9d02ec2901d054571c0b75e20ca5e7471c8e39b1c
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_gov_finances_panel.parquet
+      methodology_url: https://www.census.gov/programs-surveys/gov-finances.html ;
+        https://www2.census.gov/govs/pubs/classification/2006_classification_manual.pdf
+      license: U.S. Census Bureau public domain
+      fetch_utc: '2026-06-29T11:15:38+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T111538Z_us_state_gov_finances.yaml
+    coverage:
+      start_date: '2017'
+      end_date: '2021'
+      frequency: annual (state-year, fiscal-year survey)
+      rows: 255
+      units: USD thousands (Census native unit)
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_gov_finances_panel.parquet
+        parquet_sha256: 4dce3eb9f5cc4a9a7513f2c9d02ec2901d054571c0b75e20ca5e7471c8e39b1c
+      stats:
+        panel_rows: 255
+        unique_states: 51
+        year_min: 2017
+        year_max: 2021
+        most_recent_year: 2021
+        states_with_revenue_most_recent_year: 51
+        measure_columns:
+        - total_revenue
+        - intergovernmental_revenue
+        - general_revenue_own_sources
+        - total_tax_revenue
+        - property_tax
+        - sales_gross_receipts_tax
+        - individual_income_tax
+        - corporate_income_tax
+        - total_expenditure
+        - intergovernmental_expenditure
+        - direct_expenditure
+        - total_debt_outstanding
+        cv_flag_columns:
+        - total_revenue_max_cv
+        - total_tax_revenue_max_cv
+        - total_expenditure_max_cv
+        - total_debt_outstanding_max_cv
+        - intergovernmental_revenue_max_cv
+        gaps: []
+        amount_unit_note: 'All fiscal amounts are in thousands of U.S. dollars (Census
+          native unit): a value of 1027008 represents $1,027,008,000.'
+        aggregate_method_note: Headline aggregates are sums of their constituent Census
+          finance item codes at level-of-estimate 2 (State government total) from
+          YYstatetypepu.txt, per the survey's Finance_Aggregate_Lines 'State' sheet.
+          These reproduce the published Census aggregate lines (the weighted/imputed
+          survey estimates), not unweighted micro-data sums.
+        fiscal_year_note: 'The Annual Survey of State & Local Government Finances
+          is a FISCAL-YEAR survey. period_type=''fiscal_year'' on every row; fiscal_year
+          mirrors the survey reference year. Most states use a June-30 FY end (exceptions:
+          AL/MI Sep-30, NY Mar-31, TX Aug-31). These are not calendar-year figures.'
+        cv_note: '*_max_cv columns carry the maximum coefficient of variation across
+          a measure''s constituent item codes (a conservative sampling-reliability
+          bound; lower is more reliable). These are the survey''s own disclosure/reliability
+          flags.'
+        vintage_gap_note: Only survey years whose ZIP ships the published YYstatetypepu.txt
+          state-government-total file are emitted. A vintage whose ZIP exists but
+          lacks that file (e.g. 2022 at build time) is recorded in gaps and NOT fabricated.
+        level_of_estimate_note: level_of_estimate_used = '2' (State government total)
+          for all 50 states. The District of Columbia is a consolidated city-state
+          with no level-2 records, so it uses level '1' (State and local government
+          total) as its state-equivalent fiscal aggregate.
+        dc_level_used: 1 (state+local total; DC has no level-2 state-government records)
+      columns:
+      - ieset_state_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - admin1_kind
+      - is_state_equivalent
+      - year
+      - period_type
+      - fiscal_year
+      - level_of_estimate_used
+      - total_revenue
+      - intergovernmental_revenue
+      - general_revenue_own_sources
+      - total_tax_revenue
+      - property_tax
+      - sales_gross_receipts_tax
+      - individual_income_tax
+      - corporate_income_tax
+      - total_expenditure
+      - intergovernmental_expenditure
+      - direct_expenditure
+      - total_debt_outstanding
+      - total_revenue_max_cv
+      - total_tax_revenue_max_cv
+      - total_expenditure_max_cv
+      - total_debt_outstanding_max_cv
+      - intergovernmental_revenue_max_cv
+      - measures_present
+      inputs:
+        gov_finances_years:
+        - source: us_census_state_local_gov_finances
+          year: 2017
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2017/2017_Individual_Unit_File.zip
+          zip_sha256: 5466020129763fdbac2e6106c387e7bc2a78213e05d9ea326157708a1ff159f6
+          zip_bytes: 11513949
+          statetype_member: 17statetypepu.txt
+          statetype_sha256: 9c91faa7ccf5114bcf4a0e33571cad952f1e6e6143e9acc9aab96202b16f38ff
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2018
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2018/2018_Individual_Unit_File.zip
+          zip_sha256: 6a710fc8c55b8e06090bfbe43208c213ac2b3940936f850a6e563705175d3de3
+          zip_bytes: 4975205
+          statetype_member: 18statetypepu.txt
+          statetype_sha256: c16338aae01251368afe600e7ba039743bada5548e1c7146791b5c2a78b631a4
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2019
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2019/2019_Individual_Unit_File.zip
+          zip_sha256: cceced1d67c66ca4c9f67f2d6a64f568e7d8f2a17c731f607c8da23fcdbf88da
+          zip_bytes: 4907770
+          statetype_member: 19statetypepu.txt
+          statetype_sha256: 90d84a009211a6c1016d1ae80ade14ee8052db7f703b864c5c19ea3d31a2ba06
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2020
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2020/2020_Individual_Unit_File.zip
+          zip_sha256: 0f6f1511dffbf62419f64426ac6284a5186699affbc2201a3ff7ddd3b3f428f3
+          zip_bytes: 4923104
+          statetype_member: 20statetypepu.txt
+          statetype_sha256: add9d6955909416fcc781fe02ac2b564c64c56a2753e9dd86cd8150c24b409b0
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2021
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2021/2021_Individual_Unit_File.zip
+          zip_sha256: dae63fdb3917de5195eb793c5401594c4c6dafb55ee099ca7075efcee96a7caa
+          zip_bytes: 4915294
+          statetype_member: 21statetypepu.txt
+          statetype_sha256: c1e6016a65acb1b013eade7f574191f7081b42e6df5fc6f7db1671184a65c15d
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+      construction: 'Annual U.S. state-government fiscal panel from the Census Annual
+        Survey of State & Local Government Finances public-use ZIPs. Per-year YYstatetypepu.txt
+        level-of-estimate 2 (State government total) item-code amounts are summed
+        into headline aggregates (revenue, tax revenue, intergovernmental revenue,
+        expenditure, debt outstanding, plus major own-source tax categories) per the
+        survey''s Finance_Aggregate_Lines definitions. Amounts in USD thousands. Fiscal-year
+        survey: period_type=''fiscal_year''. One row per (ieset_state_id, year); state_fips
+        preserved.'
+  - name: us_state_acs_saipe_incidence_panel
+    publisher: ieset_derived
+    series_id: us_state_acs_saipe_incidence_panel
+    vintage_file: data/derived/us_state_acs_saipe_incidence_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 642aff92c21fc463c0529850e4c5d4f3405b1678dcc7beebb250957ab6644557
+      computed_sha256: 642aff92c21fc463c0529850e4c5d4f3405b1678dcc7beebb250957ab6644557
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_acs_saipe_incidence_panel.parquet
+      methodology_url: https://www.census.gov/programs-surveys/acs/ https://www.census.gov/programs-surveys/saipe.html
+      license: U.S. Census Bureau public domain data
+      fetch_utc: '2026-06-29T11:11:01.894879+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T111101Z_us_state_acs_saipe_incidence.yaml
+    coverage:
+      start_date: '2018'
+      end_date: '2022'
+      frequency: annual (state-year)
+      rows: 256
+      units: percent, US dollars, population counts
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_acs_saipe_incidence_panel.parquet
+        parquet_sha256: 642aff92c21fc463c0529850e4c5d4f3405b1678dcc7beebb250957ab6644557
+      stats:
+        panel_rows: 256
+        unique_states: 52
+        year_min: 2018
+        year_max: 2022
+        states_with_data_most_recent_year: 52
+        incidence_columns:
+        - saipe_poverty_rate_all_ages
+        - saipe_median_household_income
+        - acs_median_household_income
+        - acs_bachelors_or_higher_share
+        - acs_school_enrolled_share
+        covered_dimensions:
+        - median_household_income (SAIPE SAEMHI_PT + ACS B19013_001E)
+        - poverty_rate_all_ages (SAIPE SAEPOVRTALL_PT)
+        - educational_attainment_bachelors_or_higher_share (ACS B15003)
+        - school_enrolled_share (ACS B14001)
+        derivation_note: acs_bachelors_or_higher_share = (B15003_022E+023E+024E+025E)/B15003_001E*100.
+          acs_school_enrolled_share = B14001_002E/B14001_001E*100. saipe_poverty_rate_all_ages
+          and median household incomes are pulled verbatim from the source estimate
+          columns.
+        coverage_note: '*_obs flags are 1 when the named source supplied a value for
+          the state-year, else 0. ACS profile/education/enrollment vintages cover
+          ACS 1-year 2022 only; SAIPE covers 2018-2022, so SAIPE-only measures populate
+          earlier years.'
+      columns:
+      - ieset_state_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - is_state_equivalent
+      - year
+      - saipe_poverty_rate_all_ages
+      - saipe_median_household_income
+      - saipe_obs
+      - acs_median_household_income
+      - acs_total_population
+      - acs_profile_obs
+      - acs_bachelors_or_higher_share
+      - acs_population_25_plus
+      - acs_education_obs
+      - acs_school_enrolled_share
+      - acs_enrollment_universe_3_plus
+      - acs_enrollment_obs
+      - incidence_measures_present
+      inputs:
+      - input: acs_state_profile
+        path: data/vintages/us_census/ACS@2026-05-05T212323Z.parquet
+        sha256: 42c2afc665521a48c7308aca31258d45f0c1cc4ec018141b332021f417d29e6a
+        rows: 52
+        columns:
+        - NAME
+        - B01003_001E
+        - B19013_001E
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      - input: saipe_state
+        path: data/vintages/us_census/saipe@2026-05-05T212330Z.parquet
+        sha256: bd509cbda33edec57f09621687f837520380a01b9788b76dffd387ac6b2eb691
+        rows: 255
+        columns:
+        - NAME
+        - SAEPOVRTALL_PT
+        - SAEMHI_PT
+        - YEAR
+        - time
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      - input: acs_education_attainment
+        path: data/vintages/us_census/acs_education_attainment@2026-05-05T212325Z.parquet
+        sha256: 51324083f650bb067a163601cdb31af4b5cde8da7ef88ad283a144370bae58f5
+        rows: 52
+        columns:
+        - NAME
+        - B15003_001E
+        - B15003_022E
+        - B15003_023E
+        - B15003_024E
+        - B15003_025E
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      - input: acs_school_enrollment
+        path: data/vintages/us_census/acs_school_enrollment@2026-05-05T212326Z.parquet
+        sha256: 8e7f3c0b8658af65a62afe41cebeb12a6bc9aebb470b00a3c8641cb04a726a34
+        rows: 52
+        columns:
+        - NAME
+        - B14001_001E
+        - B14001_002E
+        - state
+        - country_iso3
+        - geo_area
+        - year
+        - value
+      documented_gaps:
+      - dimension: homeownership_tenure_rate
+        reason: The ACS state-profile vintage carries only total population (B01003)
+          and median household income (B19013); no owner/renter tenure table (B25003)
+          is present.
+      - dimension: median_gross_rent
+        reason: No ACS gross-rent table (B25064) present in the on-disk ACS vintage.
+      - dimension: median_housing_cost
+        reason: No ACS selected-monthly-owner-cost / housing-cost table (B25088/B25105)
+          present in the on-disk ACS vintage.
+      - dimension: rent_burden_cost_burdened_share
+        reason: No ACS gross-rent-as-percentage-of-income table (B25070) or selected-monthly-owner-costs-as-percentage-of-income
+          table (B25091) present; cost-burdened share cannot be derived without fabrication.
+      - dimension: income_distribution_gini
+        reason: No ACS Gini index (B19083) or household-income-quintile table (B19080)
+          present in the on-disk ACS vintage; only median household income is available.
+      - dimension: spm_child_poverty_rate_state_grain
+        reason: The spm_child_poverty_rate vintage is national-only (geo_area='USA');
+          it carries no state-level rows and cannot populate a state-year panel.
+      construction: U.S. state-year distributional-incidence panel merging the newest
+        Census ACS state-profile, SAIPE, ACS education-attainment, and ACS school-enrollment
+        vintages on disk. Every row is joined to ieset_state_id via state_fips from
+        state_universe_admin1; state_fips is preserved. Bachelor's-or-higher and enrolled
+        shares are derived from counts present in the vintages; no incidence dimension
+        absent from the vintages is fabricated -- gaps are listed under documented_gaps.
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 2
+    official_source_count: 0
+    manual_source_count: 0
+    hash_status_counts:
+      match: 2
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/distribution/pcw100_us_fiscal_sales_tax_share_poverty.yaml
+  sha256: d9a8458a90f6a5c94a5e5d68b7d7b5525c689f5d48d091296dffdbc305d7b402
+  bytes: 2953
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/hypothesis.yaml
+  sha256: 3adcf76d5e0918e7a39d0d188cf72252dadb3425703c855766076ab00ae18874
+  bytes: 2884
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/manifest.yaml
+  sha256: 7910fcd4e4ff80d465185fea5f33feeffcbacfe3cafd7ec764d9c228b525b2ae
+  bytes: 1035
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/diagnostics.json
+  sha256: eeb4f73a4dbf3cae70c5d32aebc0c902adb010eb454c4d14c274f7597e2192ae
+  bytes: 4151
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/result_card.md
+  sha256: 076cf06ba7761a1ca3c0726b2f26ec9a257fbc505b1b5ba47d83150811afca01
+  bytes: 1170
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/replication.py
+  sha256: 5acf13024e5b71b7d357af4e4ba7501cfc4743cae8c7e8f742203f4e1a83f2c5
+  bytes: 347
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/coefficients.parquet
+  sha256: bf499905014377cdda2ab952eb53a3ef1227353bcb20a3a681549767813b3e22
+  bytes: 7967
+- path: engine/runs/pcw100_us_fiscal_sales_tax_share_poverty/chart_data.json
+  sha256: 195078313a76a6fdf19bdc719825fd91bb0946b9d8754d966fea1ea78e88aaad
+  bytes: 1315
+- path: hypotheses/steelman/pcw100_us_fiscal_sales_tax_share_poverty.md
+  sha256: 86863c641ed75f302442ce9fd095f7717c609198da174939d66c035e712a7a5d
+  bytes: 1325
+references:
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_gov_finances_panel
+  url: derived://data/derived/us_state_gov_finances_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_gov_finances_panel
+  url: https://www.census.gov/programs-surveys/gov-finances.html ; https://www2.census.gov/govs/pubs/classification/2006_classification_manual.pdf
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_acs_saipe_incidence_panel
+  url: derived://data/derived/us_state_acs_saipe_incidence_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_acs_saipe_incidence_panel
+  url: https://www.census.gov/programs-surveys/acs/ https://www.census.gov/programs-surveys/saipe.html
+caveats:
+- Associational design; the estimate is not a causal policy effect.
+- The registered model does not eliminate all time-varying or cross-country confounding.

@@ -1,0 +1,367 @@
+packet_version: 1
+generated_utc: '2026-07-18T21:26:02+00:00'
+repository:
+  root: /Users/localllm/IESET
+  git_commit: e60b5da195ada9af4bcad82d43053047ec1c5739
+hypothesis:
+  id: pcw100_us_fiscal_debt_revenue_ratio_employment_ratio
+  legacy_id: null
+  path: hypotheses/labour/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio.yaml
+  school: null
+  topic: labour
+  claim: Across the 50 US states and District of Columbia, higher outstanding state
+    debt relative to total state revenue in fiscal years 2017-2021 predicts a lower
+    next-year employment-to-population ratio one year later in a state and policy-year
+    fixed-effects screen.
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: coefficient=+0.00776919, SE=0.0139187, p=0.57672, expected_sign=-
+  status: PARTIAL
+preregistration:
+  claim: Across the 50 US states and District of Columbia, higher outstanding state
+    debt relative to total state revenue in fiscal years 2017-2021 predicts a lower
+    next-year employment-to-population ratio one year later in a state and policy-year
+    fixed-effects screen.
+  falsification_rule: SUPPORTED if the treatment coefficient is negative with two-sided
+    p<0.10. REFUTED if it is significantly opposite-signed at p<0.10. Otherwise PARTIAL.
+    A verdict requires at least 120 observations, 40 states, and a top-versus-bottom-quartile
+    gap of at least 5.0 ratio points; a failed data gate is INCONCLUSIVE.
+  threshold:
+    expected_sign: '-'
+    p_max: 0.1
+    min_observations: 120
+    min_units: 40
+    min_contrast_gap: 5.0
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - state
+    - policy_year
+    clustering: state
+    notes: OLS of next-year outcome on current fiscal composition with state and policy-year
+      indicators and state-clustered covariance.
+  steelman: hypotheses/steelman/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio.md
+reproduction:
+  run_dir: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio
+  runner: scripts/policy_contrast_wave_100.py
+  replication_script: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/replication.py
+  suggested_command: python engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/replication.py
+data:
+  inputs:
+  - name: us_state_gov_finances_panel
+    publisher: ieset_derived
+    series_id: us_state_gov_finances_panel
+    vintage_file: data/derived/us_state_gov_finances_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 4dce3eb9f5cc4a9a7513f2c9d02ec2901d054571c0b75e20ca5e7471c8e39b1c
+      computed_sha256: 4dce3eb9f5cc4a9a7513f2c9d02ec2901d054571c0b75e20ca5e7471c8e39b1c
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_gov_finances_panel.parquet
+      methodology_url: https://www.census.gov/programs-surveys/gov-finances.html ;
+        https://www2.census.gov/govs/pubs/classification/2006_classification_manual.pdf
+      license: U.S. Census Bureau public domain
+      fetch_utc: '2026-06-29T11:15:38+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T111538Z_us_state_gov_finances.yaml
+    coverage:
+      start_date: '2017'
+      end_date: '2021'
+      frequency: annual (state-year, fiscal-year survey)
+      rows: 255
+      units: USD thousands (Census native unit)
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_gov_finances_panel.parquet
+        parquet_sha256: 4dce3eb9f5cc4a9a7513f2c9d02ec2901d054571c0b75e20ca5e7471c8e39b1c
+      stats:
+        panel_rows: 255
+        unique_states: 51
+        year_min: 2017
+        year_max: 2021
+        most_recent_year: 2021
+        states_with_revenue_most_recent_year: 51
+        measure_columns:
+        - total_revenue
+        - intergovernmental_revenue
+        - general_revenue_own_sources
+        - total_tax_revenue
+        - property_tax
+        - sales_gross_receipts_tax
+        - individual_income_tax
+        - corporate_income_tax
+        - total_expenditure
+        - intergovernmental_expenditure
+        - direct_expenditure
+        - total_debt_outstanding
+        cv_flag_columns:
+        - total_revenue_max_cv
+        - total_tax_revenue_max_cv
+        - total_expenditure_max_cv
+        - total_debt_outstanding_max_cv
+        - intergovernmental_revenue_max_cv
+        gaps: []
+        amount_unit_note: 'All fiscal amounts are in thousands of U.S. dollars (Census
+          native unit): a value of 1027008 represents $1,027,008,000.'
+        aggregate_method_note: Headline aggregates are sums of their constituent Census
+          finance item codes at level-of-estimate 2 (State government total) from
+          YYstatetypepu.txt, per the survey's Finance_Aggregate_Lines 'State' sheet.
+          These reproduce the published Census aggregate lines (the weighted/imputed
+          survey estimates), not unweighted micro-data sums.
+        fiscal_year_note: 'The Annual Survey of State & Local Government Finances
+          is a FISCAL-YEAR survey. period_type=''fiscal_year'' on every row; fiscal_year
+          mirrors the survey reference year. Most states use a June-30 FY end (exceptions:
+          AL/MI Sep-30, NY Mar-31, TX Aug-31). These are not calendar-year figures.'
+        cv_note: '*_max_cv columns carry the maximum coefficient of variation across
+          a measure''s constituent item codes (a conservative sampling-reliability
+          bound; lower is more reliable). These are the survey''s own disclosure/reliability
+          flags.'
+        vintage_gap_note: Only survey years whose ZIP ships the published YYstatetypepu.txt
+          state-government-total file are emitted. A vintage whose ZIP exists but
+          lacks that file (e.g. 2022 at build time) is recorded in gaps and NOT fabricated.
+        level_of_estimate_note: level_of_estimate_used = '2' (State government total)
+          for all 50 states. The District of Columbia is a consolidated city-state
+          with no level-2 records, so it uses level '1' (State and local government
+          total) as its state-equivalent fiscal aggregate.
+        dc_level_used: 1 (state+local total; DC has no level-2 state-government records)
+      columns:
+      - ieset_state_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - admin1_kind
+      - is_state_equivalent
+      - year
+      - period_type
+      - fiscal_year
+      - level_of_estimate_used
+      - total_revenue
+      - intergovernmental_revenue
+      - general_revenue_own_sources
+      - total_tax_revenue
+      - property_tax
+      - sales_gross_receipts_tax
+      - individual_income_tax
+      - corporate_income_tax
+      - total_expenditure
+      - intergovernmental_expenditure
+      - direct_expenditure
+      - total_debt_outstanding
+      - total_revenue_max_cv
+      - total_tax_revenue_max_cv
+      - total_expenditure_max_cv
+      - total_debt_outstanding_max_cv
+      - intergovernmental_revenue_max_cv
+      - measures_present
+      inputs:
+        gov_finances_years:
+        - source: us_census_state_local_gov_finances
+          year: 2017
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2017/2017_Individual_Unit_File.zip
+          zip_sha256: 5466020129763fdbac2e6106c387e7bc2a78213e05d9ea326157708a1ff159f6
+          zip_bytes: 11513949
+          statetype_member: 17statetypepu.txt
+          statetype_sha256: 9c91faa7ccf5114bcf4a0e33571cad952f1e6e6143e9acc9aab96202b16f38ff
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2018
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2018/2018_Individual_Unit_File.zip
+          zip_sha256: 6a710fc8c55b8e06090bfbe43208c213ac2b3940936f850a6e563705175d3de3
+          zip_bytes: 4975205
+          statetype_member: 18statetypepu.txt
+          statetype_sha256: c16338aae01251368afe600e7ba039743bada5548e1c7146791b5c2a78b631a4
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2019
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2019/2019_Individual_Unit_File.zip
+          zip_sha256: cceced1d67c66ca4c9f67f2d6a64f568e7d8f2a17c731f607c8da23fcdbf88da
+          zip_bytes: 4907770
+          statetype_member: 19statetypepu.txt
+          statetype_sha256: 90d84a009211a6c1016d1ae80ade14ee8052db7f703b864c5c19ea3d31a2ba06
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2020
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2020/2020_Individual_Unit_File.zip
+          zip_sha256: 0f6f1511dffbf62419f64426ac6284a5186699affbc2201a3ff7ddd3b3f428f3
+          zip_bytes: 4923104
+          statetype_member: 20statetypepu.txt
+          statetype_sha256: add9d6955909416fcc781fe02ac2b564c64c56a2753e9dd86cd8150c24b409b0
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+        - source: us_census_state_local_gov_finances
+          year: 2021
+          url: https://www2.census.gov/programs-surveys/gov-finances/tables/2021/2021_Individual_Unit_File.zip
+          zip_sha256: dae63fdb3917de5195eb793c5401594c4c6dafb55ee099ca7075efcee96a7caa
+          zip_bytes: 4915294
+          statetype_member: 21statetypepu.txt
+          statetype_sha256: c1e6016a65acb1b013eade7f574191f7081b42e6df5fc6f7db1671184a65c15d
+          level_of_estimate: 2 (State government total)
+          rows_parsed: 52
+      construction: 'Annual U.S. state-government fiscal panel from the Census Annual
+        Survey of State & Local Government Finances public-use ZIPs. Per-year YYstatetypepu.txt
+        level-of-estimate 2 (State government total) item-code amounts are summed
+        into headline aggregates (revenue, tax revenue, intergovernmental revenue,
+        expenditure, debt outstanding, plus major own-source tax categories) per the
+        survey''s Finance_Aggregate_Lines definitions. Amounts in USD thousands. Fiscal-year
+        survey: period_type=''fiscal_year''. One row per (ieset_state_id, year); state_fips
+        preserved.'
+  - name: us_state_labor_outcome_panel
+    publisher: ieset_derived
+    series_id: us_state_labor_outcome_panel
+    vintage_file: data/derived/us_state_labor_outcome_panel.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 2631b4d7d9cf84b55b2c0b53c91f5a6cbac7181591a27b0f266bcce22e0a0cf3
+      computed_sha256: 2631b4d7d9cf84b55b2c0b53c91f5a6cbac7181591a27b0f266bcce22e0a0cf3
+      status: match
+    source:
+      type: derived
+      url: derived://data/derived/us_state_labor_outcome_panel.parquet
+      methodology_url: https://www.bls.gov/lau/ https://www.bls.gov/oes/ https://www.bls.gov/cew/
+      license: U.S. Bureau of Labor Statistics public domain data
+      fetch_utc: '2026-06-29T10:37:16+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-06-29T103716Z_us_state_labor_outcome.yaml
+    coverage:
+      start_date: '1990'
+      end_date: '2024'
+      frequency: annual (state-year)
+      rows: 1800
+      units: percent, US dollars per hour, employment counts, US dollars per week
+      currency: USD
+    extra:
+      artifacts:
+        parquet_path: data/derived/us_state_labor_outcome_panel.parquet
+        parquet_sha256: 2631b4d7d9cf84b55b2c0b53c91f5a6cbac7181591a27b0f266bcce22e0a0cf3
+      stats:
+        panel_rows: 1800
+        unique_states: 54
+        year_min: 1990
+        year_max: 2024
+        states_with_data_most_recent_year: 51
+        outcome_columns:
+        - unemployment_rate
+        - employment_population_ratio
+        - median_hourly_wage
+        - p10_hourly_wage
+        - qcew_total_employment
+        - qcew_avg_weekly_wage
+        - qcew_food_service_employment
+        - qcew_food_service_avg_weekly_wage
+        frequency_note: LAU unemployment_rate (measure 03) and employment_population_ratio
+          (measure 07) are collapsed from monthly M01-M12 observations to an annual
+          12-month mean; *_months_observed records the count averaged. OEWS and QCEW
+          inputs are already annual (A01 / qtr='A'). Monthly and annual frequencies
+          are never mixed.
+        qcew_disclosure_note: qcew_*_disclosure_code carries the BLS QCEW disclosure
+          flag verbatim (null when not suppressed).
+      columns:
+      - ieset_state_id
+      - state_fips
+      - state_abbr
+      - state_name
+      - is_state_equivalent
+      - year
+      - unemployment_rate
+      - unemployment_rate_months_observed
+      - employment_population_ratio
+      - employment_population_ratio_months_observed
+      - median_hourly_wage
+      - median_hourly_wage_obs
+      - p10_hourly_wage
+      - p10_hourly_wage_obs
+      - qcew_total_employment
+      - qcew_avg_weekly_wage
+      - qcew_total_establishments
+      - qcew_total_disclosure_code
+      - qcew_food_service_employment
+      - qcew_food_service_avg_weekly_wage
+      - qcew_food_service_establishments
+      - qcew_food_service_disclosure_code
+      - outcomes_present
+      inputs:
+      - input: lau_unemployment_rate
+        path: data/vintages/bls/LAU_state_unemployment_rate_panel@2026-05-05T204700Z.parquet
+        sha256: edebdd51662f5ca950a1090f0129ade6aecf011458f2d0fe3ddcc201a10a56f9
+      - input: lau_emp_pop_ratio
+        path: data/vintages/bls/LAU_state_employment_population_ratio_panel@2026-05-14T110716Z.parquet
+        sha256: b952791251e90cd431c111ded122e5b1930fd8783b6e0ab37327f8c04387597b
+      - input: oews_median_hourly_wage
+        path: data/vintages/bls/OEWS_state_median_hourly_wage_panel@2026-05-12T125636Z.parquet
+        sha256: 141cbd6792a4dd1b3c82f263939b0c05b5d21ff56e7862c3f171993cc2c2f4a6
+      - input: oews_p10_hourly_wage
+        path: data/vintages/bls/OEWS_state_p10_hourly_wage_panel@2026-05-12T125547Z.parquet
+        sha256: a96801296ff21f13d04c87e3956542153302b4684535ae664b3b0604f1946d02
+      - input: qcew_total_employment
+        path: data/vintages/bls/QCEW_state_total_employment_panel@2026-05-14T110759Z.parquet
+        sha256: 0952e32a5ef92ecc6bb1000bb5946314b32e77120e194819333f4171039a30c2
+      - input: qcew_naics722_employment
+        path: data/vintages/bls/QCEW_state_NAICS722_employment_panel@2026-05-12T140559Z.parquet
+        sha256: 96ae2dfd1ec1f356c0bd6cffb2d06555824cc367a58778fc1e56f4c701d65358
+      construction: Tidy U.S. state-year labor-outcome panel merging the newest BLS
+        LAU/OEWS/QCEW state vintages on disk. LAU monthly series are averaged to annual
+        means; OEWS and QCEW are already annual. Every row is joined to ieset_state_id
+        via state_fips from state_universe_admin1; state_fips is preserved and QCEW
+        disclosure flags plus OEWS observation counts are carried as note columns.
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 2
+    official_source_count: 0
+    manual_source_count: 0
+    hash_status_counts:
+      match: 2
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/labour/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio.yaml
+  sha256: 4e98d480ca0d99293a8f9679a7c89bf197f825380c4b07d14bb0d4d801b33eee
+  bytes: 2980
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/hypothesis.yaml
+  sha256: 39f29e85e8ae0291b09fa4666f4fd2a15d79d745a6bc5310873b91b7c509870a
+  bytes: 2911
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/manifest.yaml
+  sha256: b07d648119866386654209aeaac471572300dbbde488e90432bdcb6455072a7e
+  bytes: 1025
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/diagnostics.json
+  sha256: e74952ef6f239c84c02705d055a47b5435b75aa3f2d1de7dc5b8c0aa76618ebf
+  bytes: 4048
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/result_card.md
+  sha256: a73c6dad593c916d1276f77fb5e1250ea1e0fcf3740469c5916bb71b75936ebd
+  bytes: 1169
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/replication.py
+  sha256: 720f058d5e381bdb3cba68698e225af3a493318de0ff40eaeca9c2c5fb1a557e
+  bytes: 359
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/coefficients.parquet
+  sha256: 24619e61d3a16b51171b4e6b3cdf7b4c28be627be2d951d508b55667203a0ec4
+  bytes: 8027
+- path: engine/runs/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio/chart_data.json
+  sha256: 92d7035893f4e14720be909c0f2bcbf8dbcfd00d650b29f110f2c164cea329ac
+  bytes: 1280
+- path: hypotheses/steelman/pcw100_us_fiscal_debt_revenue_ratio_employment_ratio.md
+  sha256: 915e6436af294a315f1491fccd44dabcdcf385f61f9a023bec5f015c5f18e970
+  bytes: 1324
+references:
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_gov_finances_panel
+  url: derived://data/derived/us_state_gov_finances_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_gov_finances_panel
+  url: https://www.census.gov/programs-surveys/gov-finances.html ; https://www2.census.gov/govs/pubs/classification/2006_classification_manual.pdf
+- kind: source
+  publisher: ieset_derived
+  series_id: us_state_labor_outcome_panel
+  url: derived://data/derived/us_state_labor_outcome_panel.parquet
+- kind: methodology
+  publisher: ieset_derived
+  series_id: us_state_labor_outcome_panel
+  url: https://www.bls.gov/lau/ https://www.bls.gov/oes/ https://www.bls.gov/cew/
+caveats:
+- Associational design; the estimate is not a causal policy effect.
+- The registered model does not eliminate all time-varying or cross-country confounding.
