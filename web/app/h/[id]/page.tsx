@@ -10,6 +10,7 @@ import {
   schoolPredictionsForHypothesis,
 } from "@/lib/content";
 import { hypothesisBibTex, hypothesisPermalink } from "@/lib/permalink";
+import { absoluteUrl, githubCommitUrl } from "@/lib/site";
 import { Badge } from "@/components/badges/Badge";
 import { PreRegStrip } from "@/components/cards/PreRegStrip";
 import { FalsificationCard } from "@/components/cards/FalsificationCard";
@@ -32,9 +33,33 @@ export async function generateMetadata({
   const { id } = await params;
   const h = await loadHypothesis(id);
   if (!h) return { title: id };
+  const run = await loadRunArtifacts(id);
+  const claimShort = h.claim.split(/(?<=[.!?])\s+/)[0].slice(0, 72);
+  const verdictWord = (run.verdict ?? "pending").split(/[\s—–-]/)[0];
+  const title = `${claimShort} — ${verdictWord}`;
+  const description = [
+    run.verdict ? `Verdict: ${run.verdict.split("\n")[0].slice(0, 120)}.` : null,
+    h.claim.slice(0, 160),
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const url = absoluteUrl(hypothesisPermalink(h));
   return {
-    title: h.claim.slice(0, 80),
-    description: h.claim.slice(0, 200),
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "article",
+      siteName: "IESET",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 
@@ -66,8 +91,39 @@ export default async function HypothesisPage({
     varRows.map(async (v) => ({ ...v, tokens: await parseSourceString(v.source) }))
   );
 
-  const permalinkAbsolute = `https://ieset.dev${hypothesisPermalink(h)}`;
+  const permalinkAbsolute = absoluteUrl(hypothesisPermalink(h));
   const bibtex = hypothesisBibTex(h);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    headline: h.claim.split(/(?<=[.!?])\s+/)[0],
+    abstract: [
+      run.verdict ? `Verdict: ${String(run.verdict).split("\n")[0]}.` : null,
+      "Pre-registered falsification rule with pinned public-data vintages.",
+      "Research artifact — not peer-reviewed by default.",
+    ]
+      .filter(Boolean)
+      .join(" "),
+    datePublished: h._first_commit?.iso?.slice(0, 10),
+    dateModified: run.generated_at?.slice(0, 10) ?? h._first_commit?.iso?.slice(0, 10),
+    author: { "@type": "Organization", name: "IESET" },
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    url: permalinkAbsolute,
+    identifier: h._first_commit?.hash
+      ? {
+          "@type": "PropertyValue",
+          propertyID: "git-commit",
+          value: h._first_commit.hash,
+          url: githubCommitUrl(h._first_commit.hash),
+        }
+      : undefined,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "IESET",
+      url: absoluteUrl("/"),
+    },
+  };
 
   // Plain-English first line — the one-sentence version of the claim
   const claimSentences = h.claim.split(/(?<=[.!?])\s+/);
@@ -76,6 +132,10 @@ export default async function HypothesisPage({
 
   return (
     <div className="mx-auto max-w-content px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ---------- HEADER: minimal, just the claim + topic crumb ---------- */}
       <header className="pt-8 pb-4">
         <div className="mb-3 flex items-center gap-3 text-[13px] text-muted">
@@ -232,7 +292,7 @@ export default async function HypothesisPage({
           {/* Pre-registration */}
           <section className="mb-10">
             <SectionHeader>Pre-registration</SectionHeader>
-            <PreRegStrip hypothesis={h} />
+            <PreRegStrip hypothesis={h} run={run} />
             <p className="text-[15px] leading-[1.65] text-ink">{h.claim.trim()}</p>
           </section>
 

@@ -1,16 +1,23 @@
 import type { Hypothesis } from "./types";
+import { PUBLIC_SITE_ORIGIN, shortCommit } from "./site";
+
+export { PUBLIC_SITE_ORIGIN };
 
 // Canonical permalink shape. In production this resolves against the domain; for
 // local/preview it's a relative path.
 export function hypothesisPermalink(h: Hypothesis): string {
-  return `/h/${h.hypothesis_id}`;
+  return `/h/${h.hypothesis_id}/`;
+}
+
+export function absoluteHypothesisPermalink(h: Hypothesis): string {
+  return `${PUBLIC_SITE_ORIGIN}${hypothesisPermalink(h)}`;
 }
 
 export function hypothesisBibTex(h: Hypothesis): string {
   const key = h.hypothesis_id.replace(/_/g, "");
   const year = h._first_commit?.iso?.slice(0, 4) ?? new Date().getFullYear();
   const month = h._first_commit?.iso?.slice(5, 7) ?? "";
-  const commit = h._first_commit?.hash ?? "unregistered";
+  const commit = shortCommit(h._first_commit?.hash ?? "unregistered");
   const registration =
     h._registration_status === "verified"
       ? "Verified pre-registration"
@@ -24,7 +31,7 @@ export function hypothesisBibTex(h: Hypothesis): string {
     `  year         = {${year}},`,
     `  month        = {${month}},`,
     `  howpublished = {${registration}, git commit ${commit}},`,
-    `  url          = {https://ieset.dev/h/${h.hypothesis_id}},`,
+    `  url          = {${absoluteHypothesisPermalink(h)}},`,
     `  version      = {${h.version}}`,
     `}`,
   ].join("\n");

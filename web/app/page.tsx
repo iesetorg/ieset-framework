@@ -1,18 +1,71 @@
+import { readFile, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
+import yaml from "js-yaml";
 
 import {
+  REPO_ROOT,
   loadAllHypotheses,
+  loadAllAxes,
+  loadAllConditions,
+  loadAllPositions,
   loadRunArtifacts,
   isHypothesisPubliclyVisible,
 } from "@/lib/content";
+import { loadDrift } from "@/lib/drift";
+import { loadAllPolicies } from "@/lib/policies";
 import { verdictTone } from "@/lib/verdict";
 import { Badge } from "@/components/badges/Badge";
 import { VerdictLegend } from "@/components/badges/VerdictLegend";
 import { AxesExplainer } from "@/components/explainers/AxesExplainer";
 import { TestingExplainer } from "@/components/explainers/TestingExplainer";
 
+interface HomeMovement {
+  movement_id: string;
+  countries?: string[];
+}
+
+let _homeMovementsCache: Promise<HomeMovement[]> | null = null;
+async function loadHomeMovements(): Promise<HomeMovement[]> {
+  if (_homeMovementsCache) return _homeMovementsCache;
+  _homeMovementsCache = (async () => {
+    const dir = join(REPO_ROOT, "movements");
+    if (!existsSync(dir)) return [];
+    const entries = await readdir(dir);
+    const out: HomeMovement[] = [];
+    for (const entry of entries) {
+      if (!entry.endsWith(".yaml")) continue;
+      try {
+        const raw = await readFile(join(dir, entry), "utf8");
+        const doc = yaml.load(raw) as HomeMovement | null;
+        if (doc?.movement_id) out.push(doc);
+      } catch {
+        // Keep the homepage available; validate_specs.py reports malformed rows.
+      }
+    }
+    return out;
+  })();
+  return _homeMovementsCache;
+}
+
+const COUNT_FORMATTER = new Intl.NumberFormat("en-US");
+
+function formatCount(n: number): string {
+  return COUNT_FORMATTER.format(n);
+}
+
 export default async function HomePage() {
-  const all = await loadAllHypotheses();
+  const [all, policies, movements, positions, axes, conditions, drift] =
+    await Promise.all([
+      loadAllHypotheses(),
+      loadAllPolicies(),
+      loadHomeMovements(),
+      loadAllPositions(),
+      loadAllAxes(),
+      loadAllConditions(),
+      loadDrift(),
+    ]);
   const runs = await Promise.all(
     all.map(async (h) => ({ h, run: await loadRunArtifacts(h.hypothesis_id) }))
   );
@@ -26,6 +79,60 @@ export default async function HomePage() {
     ({ h, run }) =>
       !run.exists && h._registration_status === "registered_no_run"
   );
+  const policyCountries = new Set(policies.flatMap((p) => p.countries ?? []));
+  const movementCountries = new Set(movements.flatMap((m) => m.countries ?? []));
+  const countryTrajectoryCount =
+    drift ? Object.keys(drift.countries).length : movementCountries.size;
+  const stats = [
+    {
+      label: "Hypotheses",
+      value: all.length,
+      note: "registered specs",
+      href: "/h",
+    },
+    {
+      label: "Scored results",
+      value: withResults.length,
+      note: "public verdicts",
+      href: "/scoreboard",
+    },
+    {
+      label: "Policies",
+      value: policies.length,
+      note: `${formatCount(policyCountries.size)} countries`,
+      href: "/p",
+    },
+    {
+      label: "Movements",
+      value: movements.length,
+      note: "governments coded",
+      href: "/m",
+    },
+    {
+      label: "Countries",
+      value: countryTrajectoryCount,
+      note: "drift trajectories",
+      href: "/atlas",
+    },
+    {
+      label: "Positions",
+      value: positions.length,
+      note: "schools of thought",
+      href: "/pos",
+    },
+    {
+      label: "Axes",
+      value: axes.length,
+      note: "policy levers",
+      href: "/a",
+    },
+    {
+      label: "Conditions",
+      value: conditions.length,
+      note: "scope rules",
+      href: "/c",
+    },
+  ];
 
   // Curated featured-six. Picked deliberately to (a) feature recent runs from
   // the wave-4-through-integrity-sweep era, span competing schools and verdict
@@ -95,6 +202,31 @@ export default async function HomePage() {
           >
             How it works
           </Link>
+          <Link
+            href="/production"
+            className="inline-block rounded border border-rule-strong bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-panel hover:no-underline"
+          >
+            How it is produced
+          </Link>
+        </div>
+        <div className="mt-8 grid grid-cols-2 overflow-hidden rounded border border-rule bg-rule md:grid-cols-4">
+          {stats.map((stat) => (
+            <Link
+              key={stat.label}
+              href={stat.href}
+              className="group bg-white p-4 hover:bg-panel hover:no-underline"
+            >
+              <div className="font-mono text-[24px] font-semibold leading-none tracking-normal text-ink group-hover:text-accent">
+                {formatCount(stat.value)}
+              </div>
+              <div className="mt-2 text-[11px] font-semibold uppercase text-muted">
+                {stat.label}
+              </div>
+              <div className="mt-1 text-[12px] leading-snug text-faint">
+                {stat.note}
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

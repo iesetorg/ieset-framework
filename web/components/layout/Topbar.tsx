@@ -60,9 +60,19 @@ const ABOUT: NavDropdownItem[] = [
     blurb: "The six invariants the framework commits to",
   },
   {
+    href: "/production",
+    label: "Production",
+    blurb: "How the corpus is built — LLM-assisted, human-directed",
+  },
+  {
     href: "/disclosure",
     label: "Transparency",
     blurb: "Author perspective and audit commitments",
+  },
+  {
+    href: "/updates",
+    label: "Updates",
+    blurb: "Public changelog and integrity notes",
   },
   {
     href: "/contribute",

@@ -12,10 +12,20 @@ export function Footer() {
         </div>
         <div className="space-x-4">
           <Link href="/methodology" className="text-muted hover:text-ink hover:no-underline">Methodology</Link>
+          <Link href="/production" className="text-muted hover:text-ink hover:no-underline">Production</Link>
           <Link href="/disclosure" className="text-muted hover:text-ink hover:no-underline">Transparency</Link>
+          <Link href="/updates" className="text-muted hover:text-ink hover:no-underline">Updates</Link>
           <Link href="/contribute" className="text-muted hover:text-ink hover:no-underline">Contribute</Link>
           <Link href="/terms" className="text-muted hover:text-ink hover:no-underline">Terms</Link>
           <Link href="/privacy" className="text-muted hover:text-ink hover:no-underline">Privacy</Link>
+          <a
+            href="https://github.com/iesetorg/ieset-framework"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted hover:text-ink hover:no-underline"
+          >
+            GitHub
+          </a>
           <a
             href="https://twitter.com/IESETorg"
             target="_blank"

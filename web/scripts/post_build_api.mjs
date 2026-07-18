@@ -86,5 +86,28 @@ if (existing.includes(marker)) {
 }
 await writeFile(headersPath, nextHeaders);
 
+// Publish the single-source corpus census as /stats.json for sites, LLMs, and
+// journalists that need one consistent counter surface.
+const censusSrc = resolve(__dirname, "..", "..", "engine", "public_corpus_census.json");
+const statsDest = join(OUT, "stats.json");
+if (existsSync(censusSrc)) {
+  const census = await readFile(censusSrc, "utf8");
+  await writeFile(statsDest, census);
+  console.log(`post_build_api: wrote ${statsDest}`);
+} else {
+  console.warn(`post_build_api: census missing at ${censusSrc} — stats.json not written`);
+}
+
+// Ensure llms.txt / feed.xml made it into out/ (Next copies public/ automatically;
+// log for operators when they are present).
+for (const name of ["llms.txt", "feed.xml", "robots.txt", "sitemap.xml"]) {
+  const p = join(OUT, name);
+  console.log(
+    existsSync(p)
+      ? `post_build_api: present ${name}`
+      : `post_build_api: missing ${name}`
+  );
+}
+
 console.log(`post_build_api: renamed ${renamed} files to .json`);
 console.log(`post_build_api: updated ${headersPath}`);
