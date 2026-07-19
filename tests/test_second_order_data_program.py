@@ -52,7 +52,7 @@ def test_second_order_data_index_builds_expected_summary():
 
     assert payload["summary"]["source_count"] >= 20
     assert payload["summary"]["wave_count"] >= 8
-    assert payload["summary"]["backlog_snapshot"]["strict_held_public_claim_links"] == 4720
+    assert payload["summary"]["backlog_snapshot"]["strict_held_public_claim_links"] == 4847
     assert payload["top_ingestion_candidates"][0]["source_id"] == "ieset_policy_event_treatment_contracts"
     assert any(wave["wave_id"] == "treatment_contracts_backfill_v0" for wave in payload["waves"])
     assert "distributional_incidence" in payload["summary"]["second_order_layer_counts"]

@@ -196,7 +196,10 @@ institutional-authorship, release, and history-rewrite rules are documented in
 `PUBLICATION_POLICY.md`.
 
 Open work:
-- Closing documented social-policy data gaps
+- Executing the generated
+  [next-200 strict-scoreboard upgrade queue](engine/audits/next_200_scoreboard_data_gap_roadmap_2026-07-19.md),
+  regenerated after each 50-candidate wave
+- Closing documented source-family and social-policy data gaps
 - Expanding the engine's estimator templates beyond the current panel-FE / event-study / synth-DiD / local-projections set
 - Building out and independently exercising the external-review pilot
 

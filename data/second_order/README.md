@@ -19,6 +19,8 @@ Generated outputs:
 
 - `engine/second_order_data_source_index.json`
 - `engine/second_order_data_source_index.md`
+- `engine/audits/next_200_scoreboard_data_gap_roadmap_2026-07-19.json`
+- `engine/audits/next_200_scoreboard_data_gap_roadmap_2026-07-19.md`
 
 ## Current Program Shape
 
@@ -82,4 +84,5 @@ second-order generators:
 python3 scripts/generate_policy_event_treatment_registry.py
 python3 scripts/generate_second_order_test_backlog.py
 python3 scripts/generate_scoreboard_second_order_gates.py
+python3 scripts/plan_next_200_scoreboard_upgrades.py
 ```

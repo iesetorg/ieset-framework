@@ -4,9 +4,9 @@ Generated from `data/second_order/source_inventory.yaml` and `data/second_order/
 
 ## Gate Backlog Snapshot
 
-- Strict held public claim links: 4720
+- Strict held public claim links: 4847
 - Strict eligible public claim links: 19
-- Held hypotheses: 620
+- Held hypotheses: 634
 - Policies missing explicit designs: 3169
 - Policies needing treated/comparison unit coding: 3169
 - Policies needing exact event dates: 1208
