@@ -23,14 +23,21 @@ export default async function ScoreboardPage() {
   const benchmarkControls = scores.filter(
     (s) => s.scoreboard_role === "benchmark_control"
   );
-  const tested = rankedSchools.filter((s) => s.tested > 0);
+  const tested = rankedSchools
+    .filter((s) => s.tested > 0)
+    .sort((a, b) => {
+      const adjustedNetDiff = b.adjusted_net_score - a.adjusted_net_score;
+      if (Math.abs(adjustedNetDiff) > 0.001) return adjustedNetDiff;
+      const adjustedWeightDiff =
+        b.adjusted_tested_weight - a.adjusted_tested_weight;
+      if (Math.abs(adjustedWeightDiff) > 0.001) return adjustedWeightDiff;
+      const rawNetDiff = b.net_score - a.net_score;
+      if (Math.abs(rawNetDiff) > 0.001) return rawNetDiff;
+      return a.position_id.localeCompare(b.position_id);
+    });
   const untestedOnly = rankedSchools.filter((s) => s.tested === 0);
   const totalRun = rankedSchools.reduce((a, s) => a + s.tested, 0);
   const totalClaims = rankedSchools.reduce((a, s) => a + s.total_claims, 0);
-  const totalIntegrityWeight = rankedSchools.reduce(
-    (a, s) => a + s.integrity_tested_weight,
-    0
-  );
   const coverageRows = rankedSchools
     .map((s) => {
       const linked = new Set(
@@ -97,10 +104,6 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{totalRun}</div>
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Ranked high-integrity weight</div>
-          <div className="text-[22px] font-semibold">{totalIntegrityWeight.toFixed(1)}</div>
-        </div>
-        <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">V1 coverage balanced</div>
           <div className="text-[22px] font-semibold">{balancedCoverage}/{rankedSchools.length}</div>
         </div>
@@ -126,12 +129,11 @@ export default async function ScoreboardPage() {
           <em>is</em> the framework updating on evidence in public.
         </p>
         <p className="mt-3 mb-0">
-          The strict attribution layer is deliberately conservative. If every
-          school remains inside the displayed no-call band, the correct reading
-          is that the corpus has not separated them at high integrity — not that
-          the numerically highest row has won. Only records admitted by the
-          generated public-evidence gate can move this board; the tier rules,
-          exclusions, and current audit counts are published on the{" "}
+          The strict integrity layer is deliberately conservative. It currently
+          separates no school from the no-call band, so this table is presented
+          as a forecast-quality view rather than a high-integrity ranking. The
+          stricter gate remains active and published; its tier rules, exclusions,
+          and current audit counts are on the{" "}
           <Link href="/evidence/" className="font-medium text-accent hover:underline">
             evidence quality page
           </Link>
@@ -146,13 +148,11 @@ export default async function ScoreboardPage() {
           &quot;this country got richer and healthier.&quot;
         </p>
         <p className="mt-3 mb-0">
-          <strong>Attribution net</strong> is stricter. It keeps the evidence
-          quality discount, then also applies claim-link confidence, first-pass
-          screening cautions, and a causal-attribution discount when a school
-          gets credit merely because it predicted a failure. A failed policy is
-          not treated as proof that every opponent&apos;s mechanism was right. It
-          now also applies the strict second-order gate: policy-experiment
-          evidence does not move A-net until required mechanism, incidence,
+          The <strong>strict integrity gate</strong> goes further than Q-net. It
+          also checks claim-link confidence, first-pass screening cautions, and
+          whether a school actually identified the causal mechanism behind a
+          failed policy. Policy-experiment evidence cannot establish a
+          high-integrity school ranking until required mechanism, incidence,
           supply, quality, leakage, fiscal, and welfare layers are measured or
           explicitly cleared.
         </p>
@@ -187,25 +187,23 @@ export default async function ScoreboardPage() {
           </div>
         </div>
         <p className="mt-3 mb-0">
-          Schools are ranked first by <strong>Attribution net</strong>, now the
-          strict second-order-gated score. Exact ties use high-integrity tested
-          weight, forecast Q-net, forecast tested weight, raw net, then school
-          ID. The forecast Q-net and original raw score stay visible for
-          transparency, while tiny margins are muted as too close to call.
+          Rows are ordered by <strong>Forecast Q-net</strong>, then forecast
+          tested weight, raw net, and school ID. Q-net and the original raw score
+          stay visible for transparency, while tiny margins are muted as too
+          close to call. This ordering is not a high-integrity winner call.
           Benchmark controls are reported separately and never compete in the
-          school ranking.
+          school table.
         </p>
       </div>
 
       <h2 className="mt-10 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-        Schools with tested predictions — A-net first, Q-net breaks strict ties
+        Schools with tested predictions — Forecast Q-net view
       </h2>
       <div className="overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-rule bg-panel">
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">School</th>
-              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Attribution-adjusted net: evidence type × link confidence × screening caution × failure-attribution discount">A-net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Forecast quality net: raw outcome score discounted by evidence type">Forecast Q-net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Raw weighted net: full wins + 0.5·partial-wins − 0.5·partial-losses − full losses">Raw net</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Weighted support rate: partial directional verdicts count at half-weight">Rate</th>
@@ -220,7 +218,6 @@ export default async function ScoreboardPage() {
           </thead>
           <tbody>
             {tested.map((s) => {
-              const scoreColor = scoreTone(s.integrity_score_signal);
               return (
                 <tr
                   key={s.position_id}
@@ -236,13 +233,6 @@ export default async function ScoreboardPage() {
                     <div className="mt-0.5 font-mono text-[10.5px] text-faint">
                       {s.position_id}
                     </div>
-                  </td>
-                  <td
-                    className="p-3 text-right align-top font-mono text-[13px] font-semibold"
-                    style={{ color: scoreColor }}
-                    title={`Attribution-adjusted no-call band: ±${s.integrity_signal_threshold.toFixed(1)} points. Decisive-only raw net: ${s.decisive_net > 0 ? "+" : ""}${s.decisive_net}.`}
-                  >
-                    {s.integrity_net_score > 0 ? "+" : ""}{s.integrity_net_score.toFixed(1)}
                   </td>
                   <td
                     className="p-3 text-right align-top font-mono text-[13px]"
@@ -322,8 +312,7 @@ export default async function ScoreboardPage() {
                   {s.school}
                 </Link>
                 <div className="mt-1 text-[12.5px] leading-relaxed text-muted">
-                  Calibration row only · A-net {s.integrity_net_score.toFixed(1)}
-                  {" · "}Q-net {s.adjusted_net_score > 0 ? "+" : ""}
+                  Calibration row only · Q-net {s.adjusted_net_score > 0 ? "+" : ""}
                   {s.adjusted_net_score.toFixed(1)}
                   {" · "}raw {s.net_score > 0 ? "+" : ""}
                   {s.net_score.toFixed(1)}
@@ -346,8 +335,8 @@ export default async function ScoreboardPage() {
           </li>
           <li>
             A failed policy can count as a correct forecast without proving
-            the opponent&apos;s causal story. Attribution net discounts those
-            wins unless the underlying hypothesis is causal or mechanism
+            the opponent&apos;s causal story. The strict integrity gate holds
+            those wins unless the underlying hypothesis is causal or mechanism
             discriminating.
           </li>
           <li>

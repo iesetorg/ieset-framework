@@ -4,6 +4,7 @@
  */
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   PUBLIC_GITHUB_REPO,
@@ -50,5 +51,21 @@ describe("site helpers (shipped web/lib/site.ts)", () => {
     assert.equal(shortCommit(null), "pending");
     // display short form is never what githubCommitUrl embeds alone
     assert.match(githubCommitUrl(sha), new RegExp(sha));
+  });
+});
+
+describe("scoreboard presentation", () => {
+  const scoreboardSource = readFileSync(
+    new URL("../app/scoreboard/page.tsx", import.meta.url),
+    "utf8"
+  );
+
+  it("omits the empty A-net display and presents the Q-net view clearly", () => {
+    assert.doesNotMatch(scoreboardSource, /\bA-net\b/);
+    assert.match(scoreboardSource, /Forecast Q-net view/);
+    assert.match(
+      scoreboardSource,
+      /Rows are ordered by <strong>Forecast Q-net<\/strong>/
+    );
   });
 });
