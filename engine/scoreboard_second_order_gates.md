@@ -4,15 +4,15 @@ This generated artifact separates hypothesis verdicts, school forecast scoring, 
 
 ## Summary
 
-- Claim links: 4938
-- Public claim links: 4739
-- Declared-gate eligible public links: 4660
+- Claim links: 5065
+- Public claim links: 4866
+- Declared-gate eligible public links: 4787
 - Declared-gate held public links: 79
 - Strict-gate eligible public links: 19
-- Strict-gate held public links: 4720
-- Declared gate statuses: `{"declared_measurement_hold": 79, "missing_contract_flag": 4641, "out_of_scope": 15, "public_with_documented_gaps": 4}`
-- Strict gate statuses: `{"declared_measurement_hold": 79, "missing_contract_hold": 4641, "out_of_scope": 15, "public_with_documented_gaps": 4}`
-- Failure-credit classes: `{"not_failure_prediction_win": 4705, "second_order_gate_hold": 233}`
+- Strict-gate held public links: 4847
+- Declared gate statuses: `{"declared_measurement_hold": 79, "missing_contract_flag": 4768, "out_of_scope": 15, "public_with_documented_gaps": 4}`
+- Strict gate statuses: `{"declared_measurement_hold": 79, "missing_contract_hold": 4768, "out_of_scope": 15, "public_with_documented_gaps": 4}`
+- Failure-credit classes: `{"not_failure_prediction_win": 4832, "second_order_gate_hold": 233}`
 
 ## Held Public Links
 

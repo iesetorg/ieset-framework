@@ -370,7 +370,7 @@ def build_packet(
         "packet_version": PACKET_VERSION,
         "generated_utc": utc_now(),
         "repository": {
-            "root": str(ROOT),
+            "root": ".",
             "git_commit": commit,
         },
         "hypothesis": {
