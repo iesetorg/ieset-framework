@@ -2,9 +2,25 @@
 
 **Verdict:** supported
 
+> **CAPPED at partial pending v2 — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: The core banking metric `bank_npl_ratio_peak` is PENDING_DATA (no JPN observations 1998-2003); support for a banking-crisis hypothesis rests on zero bank-balance-sheet data.
+
+
 **Reason:** 4 of 5 metrics met threshold (support threshold 4)
 
 Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 1 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** CAPPED at partial pending v2 · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 12) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- The core banking metric `bank_npl_ratio_peak` is PENDING_DATA (no JPN observations 1998-2003); support for a banking-crisis hypothesis rests on zero bank-balance-sheet data.
+- Basket sized so the missing definitional metric cannot block the 4/5 threshold (X6 family).
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `equity_index_decline`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `real_house_price_decline`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 4 MET · 0 NOT_MET · 1 PENDING_DATA · 0 PENDING_EVAL
 

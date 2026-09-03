@@ -2,9 +2,20 @@
 
 **Verdict:** supported
 
+> **RE-SCOPED to supported (descriptive) tier — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: All four thresholds are one-sided trend descriptions most successful developing economies meet.
+
+
 **Reason:** 4 of 4 metrics met threshold (support threshold 3)
 
 Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** RE-SCOPED to supported (descriptive) tier · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 13) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- All four thresholds are one-sided trend descriptions most successful developing economies meet — no counterfactual, comparator, or pre-Đổi-Mới baseline; prior ≈ 1.0 undisclosed.
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 4 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 

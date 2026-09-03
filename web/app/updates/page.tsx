@@ -15,6 +15,15 @@ const UPDATES: Array<{
   hrefs?: Array<{ label: string; href: string }>;
 }> = [
   {
+    date: "2026-09-03",
+    title: "Adversarial audit: 20 SUPPORTED runs quarantined or re-scoped",
+    body: "An adversarial audit of 20 high-confidence SUPPORTED runs found data-integrity defects: sentinel values scored as MET (including an impossible 99.9999% output 'contraction'), unit-mismatched thresholds mechanically manufacturing verdicts, byte-identical files cited as independent sources, world-panel counts evaluated against pre-registered country samples, and seven verdict migrations from inconclusive with no record. Every affected card now carries a visible correction — quarantined verdicts are suspended pending a corrected re-score and must not be cited as standing evidence. Machine detectors and tests now block these defect classes going forward.",
+    hrefs: [
+      { label: "Transparency note", href: "/disclosure/" },
+      { label: "Methodology", href: "/methodology/" },
+    ],
+  },
+  {
     date: "2026-07-18",
     title: "Evidence tiers, estimator floor, and machine catalog",
     body: "Added a record-level featured/calibration/archive ledger, a balanced six-record reference set, explicit estimator-floor and exclusion counts, canonical metadata across every page family, Dataset/DataCatalog structured data, and expanded LLM retrieval guidance. The strict school-level conclusion remains no high-integrity separation.",

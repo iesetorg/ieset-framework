@@ -2,9 +2,29 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: Metric 3 MET on observed = 100 (1993) sentinel (X2); removing it flips the exactly-at-threshold 7/10 support.
+
+
 **Reason:** 7 of 10 metrics met threshold (support threshold 7)
 
 Pre-registered rule: SUPPORT if >= 7 of 10 metrics met; REFUTE if <= 3 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 3) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- Metric 3 MET on observed = 100 (1993) sentinel (X2); removing it flips the exactly-at-threshold 7/10 support.
+- Endpoint substitution (2018/1960 used where the threshold says 2023); the comparator benchmark itself failed (LatAm median 2.916 vs required >3.0).
+- Metric 2 global rank 73 fed into a ~20-country regional top-5 test — wrong universe.
+
+**Verdict-migration note (X5):** prior verdict was `inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md §E7)`; the migration to `supported` was undocumented — now recorded in this remediation's ledger.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `special_period_contraction_1989_1993` [sentinel_value]: percent-change stat at 100.0000 >= 99.99 — fallback/sentinel artefact, not a real observation
+- metric `gdp_per_capita_rank_reversal_latam`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `special_period_contraction_1989_1993`: 3 declared publishers share 2 vintage file(s) — fewer files than publishers
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 7 MET · 3 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 

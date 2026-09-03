@@ -2,7 +2,7 @@
 
 - City rows: 1000
 - Countries: 141
-- Missing optional inputs: acs_incidence
+- Missing optional inputs: none
 
 ## Tiers
 
@@ -18,7 +18,7 @@
 - `supply_response_layer`: 72
 - `quality_or_leakage_layer`: 2
 - `regulated_stock_or_rent_board_layer`: 9
-- `distributional_incidence_layer`: 0
+- `distributional_incidence_layer`: 38
 
 ## Case-Ready Cities
 

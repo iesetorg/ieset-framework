@@ -86,3 +86,16 @@ Material changes to this transparency note appear here as dated entries.
 - **Repository privacy revision (2026-07-17)** — Removed personal-device
   metadata and non-research artifacts from the public repository; standardized
   institutional author metadata and added a per-hypothesis conflict model.
+- **Verdict quarantine and correction (2026-09-03)** — An adversarial audit of
+  20 high-confidence SUPPORTED runs (`engine/audits/ieset_adversarial_supported_claims_2026-07-31.md`)
+  found data-integrity defects: sentinel values scored as MET (e.g. an
+  impossible 99.9999% "contraction"), unit-mismatched thresholds mechanically
+  manufacturing verdicts, byte-identical files cited as independent sources,
+  world-panel counts against pre-registered country samples, and seven verdict
+  flips from `inconclusive` with no migration record. All 20 affected cards now
+  carry visible quarantine or evidentiary-tier corrections (nothing deleted);
+  machine detectors and tests block these defect classes going forward
+  (`scripts/audit_integrity_detectors.py`, remediation:
+  `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md`). Quarantined
+  verdicts are suspended pending a corrected v2 re-score and must not be cited
+  as standing evidence.

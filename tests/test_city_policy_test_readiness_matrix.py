@@ -808,6 +808,40 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         ]
     ).to_parquet(berlin_mietspiegel, index=False)
 
+    nyc_rgb_stabilized = tmp_path / "nyc_rgb_stabilized.parquet"
+    pd.DataFrame(
+        [
+            # NYC: RGB stabilized building registry (borough + zip grain)
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:8099",
+                "borough": "staten-island",
+                "zip_code": "10301",
+                "list_year": 2024,
+                "stabilized_buildings": 437,
+                "zips_covered": 11,
+                "zip_stabilized_buildings": 120,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:8099",
+                "borough": "staten-island",
+                "zip_code": "10304",
+                "list_year": 2024,
+                "stabilized_buildings": 437,
+                "zips_covered": 11,
+                "zip_stabilized_buildings": 80,
+            },
+            {
+                "ieset_city_id": "ghsl_ucdb_r2024a:8099",
+                "borough": "manhattan",
+                "zip_code": "10001",
+                "list_year": 2024,
+                "stabilized_buildings": 14436,
+                "zips_covered": 46,
+                "zip_stabilized_buildings": 300,
+            },
+        ]
+    ).to_parquet(nyc_rgb_stabilized, index=False)
+
     inputs = {
         "city_spine": spine,
         "zillow_rent": zillow,
@@ -815,6 +849,7 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
         "nyc_quality": nyc_quality,
         "datasf_quality": sf_quality,
         "nyc_regulation_proxy": nyc_reg,
+        "nyc_rgb_stabilized": nyc_rgb_stabilized,
         "acs_incidence": tmp_path / "missing_acs.parquet",
         "catalonia_rent_contracts": catalonia_rent_contracts,
         "france_reference_rents": france_reference,
@@ -845,6 +880,9 @@ def test_city_policy_test_readiness_matrix_marks_ready_and_partial_cities(tmp_pa
     assert nyc["rent_control_core_layer_count"] == 4
     assert nyc["supply_response_layer"]
     assert nyc["regulated_stock_or_rent_board_layer"]
+    assert nyc["nyc_rgb_stabilized_buildings"] == 437 + 14436
+    assert nyc["nyc_rgb_stabilized_boroughs"] == 2
+    assert nyc["nyc_rgb_stabilized_zips"] == 3
 
     sf = matrix[matrix["ieset_city_id"].eq("ghsl_ucdb_r2024a:1461")].iloc[0]
     assert sf["rent_control_readiness_tier"] == "case_ready_local_panel"

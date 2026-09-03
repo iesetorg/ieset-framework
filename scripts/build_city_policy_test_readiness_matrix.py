@@ -44,6 +44,7 @@ DEFAULT_INPUTS = {
     "spain_rental_reference_index": "data/derived/spain_rental_reference_index_panel.parquet",
     "france_oll_rent": "data/derived/france_oll_rent_panel.parquet",
     "berlin_mietspiegel": "data/derived/berlin_mietspiegel_panel.parquet",
+    "nyc_rgb_stabilized": "data/derived/nyc_rgb_stabilized_buildings_panel.parquet",
 }
 
 
@@ -938,6 +939,38 @@ def add_france_oll_rent(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.Da
     return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
 
 
+def add_nyc_rgb_stabilized(base: pd.DataFrame, frame: pd.DataFrame | None) -> pd.DataFrame:
+    columns = {
+        "nyc_rgb_stabilized_rows": 0,
+        "nyc_rgb_stabilized_buildings": 0,
+        "nyc_rgb_stabilized_boroughs": 0,
+        "nyc_rgb_stabilized_zips": 0,
+        "nyc_rgb_stabilized_list_year": None,
+    }
+    if frame is None:
+        return base.assign(**columns)
+    frame = ensure_city_id(frame, "nyc_rgb_stabilized")
+    borough_totals = (
+        frame.groupby(["ieset_city_id", "borough"], as_index=False)
+        .agg(borough_buildings=("stabilized_buildings", "first"), list_year=("list_year", "first"))
+    )
+    agg = (
+        borough_totals.groupby("ieset_city_id")
+        .agg(
+            nyc_rgb_stabilized_rows=("borough_buildings", "size"),
+            nyc_rgb_stabilized_buildings=("borough_buildings", "sum"),
+            nyc_rgb_stabilized_boroughs=("borough", "nunique"),
+            nyc_rgb_stabilized_list_year=("list_year", "first"),
+        )
+        .reset_index()
+    )
+    agg = agg.merge(
+        frame.groupby("ieset_city_id").agg(nyc_rgb_stabilized_zips=("zip_code", "nunique")).reset_index(),
+        on="ieset_city_id",
+    )
+    return merge_agg(base.assign(**{k: v for k, v in columns.items() if k not in base.columns}), agg, columns)
+
+
 def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
     out = matrix.copy()
     out["first_order_rent_layer"] = (
@@ -978,6 +1011,7 @@ def assign_layers(matrix: pd.DataFrame) -> pd.DataFrame:
         | out["stockholm_queue_time_band_rows"].gt(0)
         | out["spain_reference_index_rows"].gt(0)
         | out["berlin_mietspiegel_rows"].gt(0)
+        | out["nyc_rgb_stabilized_rows"].gt(0)
     )
     out["distributional_incidence_layer"] = out["acs_incidence_rows"].gt(0)
     layer_cols = [
@@ -1032,6 +1066,7 @@ def build_matrix(inputs: dict[str, Path]) -> tuple[pd.DataFrame, dict[str, Any]]
     matrix = add_local_quality(matrix, read_optional(inputs["nyc_quality"]), "nyc_quality", "dob_permit_issuance")
     matrix = add_local_quality(matrix, read_optional(inputs["datasf_quality"]), "datasf_quality", "building_permit")
     matrix = add_nyc_regulation(matrix, read_optional(inputs["nyc_regulation_proxy"]))
+    matrix = add_nyc_rgb_stabilized(matrix, read_optional(inputs["nyc_rgb_stabilized"]))
     matrix = add_acs(matrix, read_optional(inputs["acs_incidence"]))
     matrix = add_catalonia_rent_contracts(matrix, read_optional(inputs["catalonia_rent_contracts"]))
     matrix = add_france_reference_rents(matrix, read_optional(inputs["france_reference_rents"]))

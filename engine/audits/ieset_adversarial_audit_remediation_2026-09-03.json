@@ -1,0 +1,349 @@
+{
+ "remediation_id": "ieset_adversarial_audit_remediation_2026-09-03",
+ "remediated_utc": "2026-09-03T17:44:02Z",
+ "source_audit": "engine/audits/ieset_adversarial_supported_claims_2026-07-31.md",
+ "source_run": "~/harbour-ieset/runs/run_ieset_20260731_225132_adversary_kimi_cli/response.md",
+ "audit_deliverable_landed_verbatim": true,
+ "cross_cutting": {
+  "X1": {
+   "title": "Unit-mismatched metric evaluation",
+   "disposition": "fixed_going_forward",
+   "mechanism": "Detector A implemented: scripts/audit_integrity_detectors.py::detect_unit_typetag_mismatch flags absolute-unit thresholds (years, TFR, Gini, millions, pp) evaluated against percent-change stats; covered by tests/test_audit_integrity_detectors.py.",
+   "deferred": "v2 evaluator must store threshold_unit/stat_unit per metric and hard-fail on mismatch before re-scoring affected runs."
+  },
+  "X2": {
+   "title": "Sentinel ~100 observed values scored MET",
+   "disposition": "fixed_going_forward",
+   "mechanism": "Detector B implemented: detect_sentinel_values flags percent-family stats >= 99.99 and 1e4-scale values on percent/ratio-family stats.",
+   "deferred": "Affected METs are marked not-counting in card annotations; verdicts quarantined until the v2 evaluator refuses sentinel stats."
+  },
+  "X3": {
+   "title": "Byte-identical 'independent' sources",
+   "disposition": "fixed_going_forward",
+   "mechanism": "Detector C implemented: detect_duplicate_source_hash flags metrics whose declared publishers outnumber their distinct vintage files (all-publishers-one-file is the strongest case).",
+   "deferred": "v2 diagnostics require per-publisher hash attestation; the 'independent data sources' interpretation line is corrected on affected cards."
+  },
+  "X4": {
+   "title": "Sample-scope explosion in panel canonical runs",
+   "disposition": "fixed_going_forward",
+   "mechanism": "Detector D implemented: detect_sample_explosion + count_exceeds_declared_sample assert countries_meeting_threshold counts never exceed the declared 'of n' sample.",
+   "deferred": "v2 evaluator must restrict counting to the pre-registered sample list; GFC/Asia runs quarantined until re-scored."
+  },
+  "X5": {
+   "title": "Undocumented verdict migration",
+   "disposition": "fixed",
+   "mechanism": "Verdict-migration ledger created in this remediation (see verdict_migration_ledger); all seven \u00a7E7 runs now carry explicit prior-verdict notes on their cards. Convention adopted: any verdict flip requires an ARCHIVED_v1 directory plus a ledger entry (argentina_institutional_instability_decline/ARCHIVED_v1_false_refuted precedent)."
+  },
+  "X6": {
+   "title": "PENDING_EVAL definitional metrics do not gate verdicts",
+   "disposition": "deferred_with_reason",
+   "mechanism": "Evaluator change (definitional-metric gating at partial) is v2 spec F; not implementable without re-scoring the evaluator, which would silently change verdicts mid-audit.",
+   "deferred": "Affected cards annotated so the ungated PENDING_EVAL definitional metrics are disclosed on the verdict line; runs quarantined/capped accordingly."
+  },
+  "X7": {
+   "title": "Mechanical / unfalsifiable pcw100 specifications",
+   "disposition": "rescoped",
+   "mechanism": "pcw100 screens and descriptive growth templates re-labelled to screen_positive / supported (descriptive) tiers via card annotations; quarantined where specifications are mechanically invalid (mw_bite_ratio).",
+   "deferred": "Scoreboard tier weighting (screens <= 0.25) is a scoreboard regeneration change scheduled with the v2 family."
+  }
+ },
+ "claims": [
+  {
+   "order": 1,
+   "run_id": "west_east_germany_economic_system_divergence_1950_1989",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "Metric 2 `consumer_goods_availability_wait_time` observed = 100 (1985) \u2014 round-number sentinel (X2), not a documented wait-time series.",
+    "Basket circularity: `stasi_surveillance_intensity` is regime-defining, not an outcome; the pattern match is partly tautological.",
+    "Per-metric publisher independence unverified; X3 duplicate hashes confirmed in the sister Soviet run."
+   ]
+  },
+  {
+   "order": 2,
+   "run_id": "north_south_korea_development_divergence_1953_present",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "Metric 6 `famine_episode_count` = 40 (2020) \u2014 event-log row count scored as MET; data-glitch signature.",
+    "Metric 1's 40.25\u00d7 GDP ratio rests on DPRK estimates \u00a7E7 flagged as pending `bank_of_korea_dprk_estimates` provenance.",
+    "Metric 9 PENDING_DATA does not gate the verdict (X6-adjacent)."
+   ]
+  },
+  {
+   "order": 3,
+   "run_id": "cuba_socialist_economy_stagnation_1960_2023",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "Metric 3 MET on observed = 100 (1993) sentinel (X2); removing it flips the exactly-at-threshold 7/10 support.",
+    "Endpoint substitution (2018/1960 used where the threshold says 2023); the comparator benchmark itself failed (LatAm median 2.916 vs required >3.0).",
+    "Metric 2 global rank 73 fed into a ~20-country regional top-5 test \u2014 wrong universe."
+   ]
+  },
+  {
+   "order": 4,
+   "run_id": "soviet_union_central_planning_gdp_collapse_1989_1991",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "X2: `gdp_contraction_peak_to_trough` observed 99.99999929185707 (diagnostics.json:28) \u2014 physically impossible value scored MET.",
+    "X1 unit mismatches: life expectancy '>5 year decline' vs 11.56 percent; fertility '>0.5 TFR decline' vs 98.2 percent; poverty '>20 pp' vs 6.98 percent (spurious NOT_MET).",
+    "X3: every metric has fewer distinct vintage files than declared publishers (e.g. da0c27\u2026 shared by rosstat:demographic_yearbook, human_mortality_database:RUS, who_gho) \u2014 the card's 'independent data sources' interpretation line is void.",
+    "Window stretch: claim is 1989\u20131991 collapse; metrics run to 1996\u20131999 (the transition depression \u2014 a distinct causal event)."
+   ]
+  },
+  {
+   "order": 5,
+   "run_id": "great_leap_forward_famine_output_collapse_1959_1961",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "Metric 10 PENDING_EVAL \u2014 the harness could not parse its own pre-registered threshold (X6).",
+    "Metric 1 uses max-of-range fallback (36M of a contested 15\u201345M scholarly range) \u2014 disclosed-prior-shaped convenience.",
+    "Metric 7 provincial dispersion scored NOT_MET on absent data \u2014 absence of data is not absence of dispersion."
+   ]
+  },
+  {
+   "order": 6,
+   "run_id": "zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "The definitional Cagan hyperinflation metric is PENDING_EVAL and does not gate the verdict (X6) \u2014 a hyperinflation-titled hypothesis supported without it.",
+    "X1: metric 3 event-count 81829 (raw tonnes) compared against a '>50% decline' threshold.",
+    "Metric 8 PENDING_DATA on manual commission reports (utete/buka) that never landed."
+   ]
+  },
+  {
+   "order": 7,
+   "run_id": "venezuela_chavismo_canonical_case_multi_metric",
+   "disposition": "quarantined_pending_v2",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "findings": [
+    "Cagan hyperinflation metric PENDING_EVAL, not gating (X6).",
+    "X1: emigration '>15% of 2013 population' scored against pct_increase_from_baseline = 120; blackouts '>=3 documented' against pct_increase = 50.",
+    "The descriptive pattern-match card outranks the identified DiD sibling (`venezuela_chavismo_framework_validation`, weakened) on the scoreboard."
+   ]
+  },
+  {
+   "order": 8,
+   "run_id": "banking_crisis_2008_gfc_canonical_multimetric",
+   "disposition": "quarantined_pending_v2",
+   "findings": [
+    "X4: 254 entities counted against the pre-registered 'at least 5 of 9 countries' (list includes WLD, EUU, OED aggregates and an empty leading code).",
+    "With the world panel scanned, the rule is unfalsifiable as implemented; region aggregates double-count members."
+   ]
+  },
+  {
+   "order": 9,
+   "run_id": "pcw100_global_efw_trade_freedom_gdp_growth",
+   "disposition": "rescoped_screen_positive",
+   "findings": [
+    "Associational cross-sectional screen (p=0.0015) emitted at full evidentiary weight (X7); reverse causality and state-failure composition of the low quartile unaddressed.",
+    "v2 tier: screens emit `screen_positive`; scoreboard weight \u2264 0.25."
+   ]
+  },
+  {
+   "order": 10,
+   "run_id": "pcw100_us_mw_bite_ratio_p10_wage",
+   "disposition": "quarantined_pending_v2",
+   "findings": [
+    "Mechanical identity: in high-bite states the p10 wage *is* the minimum wage (R\u00b2=0.975) \u2014 unfalsifiable as constructed (X7).",
+    "Contrast groups overlap: HI, MA, MD, MS, NY appear in both low- and high-policy quartiles \u2014 pipeline bug invalidating the contrast."
+   ]
+  },
+  {
+   "order": 11,
+   "run_id": "oecd_pdb_gdp_hour_frontier_convergence_1950_2025",
+   "disposition": "rescoped_descriptive",
+   "findings": [
+    "frontier_gap_lag \u03b2=3.099 on a lagged level gap \u2014 units/normalization red flag (likely 100\u00d7 misread on the card).",
+    "The identical econometric structure was declared a tooling artefact in the archived `asian_convergence_vs_western_stagnation_2000_2023` run \u2014 asymmetric treatment."
+   ]
+  },
+  {
+   "order": 12,
+   "run_id": "banking_crisis_japan_1990_lost_decade",
+   "disposition": "capped_partial_pending_v2",
+   "findings": [
+    "The core banking metric `bank_npl_ratio_peak` is PENDING_DATA (no JPN observations 1998-2003); support for a banking-crisis hypothesis rests on zero bank-balance-sheet data.",
+    "Basket sized so the missing definitional metric cannot block the 4/5 threshold (X6 family)."
+   ]
+  },
+  {
+   "order": 13,
+   "run_id": "vietnam_doi_moi_growth_human_development_1990_2023",
+   "disposition": "rescoped_descriptive",
+   "findings": [
+    "All four thresholds are one-sided trend descriptions most successful developing economies meet \u2014 no counterfactual, comparator, or pre-\u0110\u1ed5i-M\u1edbi baseline; prior \u2248 1.0 undisclosed."
+   ]
+  },
+  {
+   "order": 14,
+   "run_id": "ethiopia_prewar_growth_human_development_2000_2019",
+   "disposition": "rescoped_descriptive",
+   "findings": [
+    "Post-hoc window ending 2019 excludes the Tigray-war collapse \u2014 the strongest contrary observation; break-rule disclosed nowhere.",
+    "Official national accounts contested; no dual-source robustness metric."
+   ]
+  },
+  {
+   "order": 15,
+   "run_id": "banking_crisis_greece_2010_2018_doom_loop",
+   "disposition": "quarantined_pending_v2",
+   "findings": [
+    "X1/X2: unemployment '>=19 pp rise' scored against pct_increase_from_baseline = 1.43e+03; government debt '>=175% of GDP' against max_in_window_fallback = 4.94e+04 \u2014 sentinel/wrong-series artefacts scored MET.",
+    "The doom-loop propagation mechanism is untested: six co-occurring state variables, no exposure or sequencing metric."
+   ]
+  },
+  {
+   "order": 16,
+   "run_id": "south_korea_growth_health_services_shift_1990_2023",
+   "disposition": "rescoped_descriptive",
+   "findings": [
+    "Template basket with no metric on which schools' predictions diverge (household debt, old-age poverty unmeasured) \u2014 support guaranteed ex ante."
+   ]
+  },
+  {
+   "order": 17,
+   "run_id": "oecd_pdb_post_2008_productivity_hysteresis_panel",
+   "disposition": "rescoped_descriptive",
+   "findings": [
+    "Level-shift dummy with no pre-2008 trend control and no COVID-window handling \u2014 documented deceleration misattributed to crisis hysteresis."
+   ]
+  },
+  {
+   "order": 18,
+   "run_id": "banking_crisis_asian_financial_crisis_1997_panel",
+   "disposition": "quarantined_pending_v2",
+   "findings": [
+    "X4: 62 countries with >=30% depreciation (incl. AUT, BEL, CAN, DEU \u2014 no such depreciations occurred) and 167 with >=5% GDP declines, against the pre-registered 'at least 4 of 5 countries'.",
+    "The IMF-programme metric (correctly restricted to the named five) shows what all metrics should have been."
+   ]
+  },
+  {
+   "order": 19,
+   "run_id": "pcw100_global_efw_sound_money_gdp_growth",
+   "disposition": "rescoped_screen_positive",
+   "findings": [
+    "SOM (Somalia) in the top sound-money quartile \u2014 index/coding or imputation integrity problem in the input.",
+    "Reverse causality by construction: growth collapses cause inflation (fiscal monetization), the screen's dominant signal (X7)."
+   ]
+  },
+  {
+   "order": 20,
+   "run_id": "india_growth_health_services_shift_1990_2023",
+   "disposition": "rescoped_descriptive",
+   "findings": [
+    "Per-country threshold drift across the template family (3.5% KOR / 4.0% IND / 5.0% ETH) each set just below the realized value (4.28 / 4.47 / 5.87) \u2014 post-hoc calibration signature.",
+    "2011-12 base-year revision controversy unaddressed; no dual-vintage robustness."
+   ]
+  }
+ ],
+ "verdict_migration_ledger": [
+  {
+   "run_id": "west_east_germany_economic_system_divergence_1950_1989",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  },
+  {
+   "run_id": "north_south_korea_development_divergence_1953_present",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  },
+  {
+   "run_id": "cuba_socialist_economy_stagnation_1960_2023",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  },
+  {
+   "run_id": "soviet_union_central_planning_gdp_collapse_1989_1991",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  },
+  {
+   "run_id": "great_leap_forward_famine_output_collapse_1959_1961",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  },
+  {
+   "run_id": "zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  },
+  {
+   "run_id": "venezuela_chavismo_canonical_case_multi_metric",
+   "prior_verdict": "inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7)",
+   "current_verdict": "supported",
+   "evidence": "HYPOTHESIS_FRAMEWORK_AUDIT.md \u00a7E7",
+   "disposition": "quarantined_pending_v2"
+  }
+ ],
+ "detector_census": {
+  "scanned_with_metrics": 93,
+  "total_findings": 149,
+  "audited_and_flagged": [
+   "banking_crisis_2008_gfc_canonical_multimetric",
+   "banking_crisis_asian_financial_crisis_1997_panel",
+   "banking_crisis_greece_2010_2018_doom_loop",
+   "banking_crisis_japan_1990_lost_decade",
+   "cuba_socialist_economy_stagnation_1960_2023",
+   "great_leap_forward_famine_output_collapse_1959_1961",
+   "north_south_korea_development_divergence_1953_present",
+   "soviet_union_central_planning_gdp_collapse_1989_1991",
+   "venezuela_chavismo_canonical_case_multi_metric",
+   "west_east_germany_economic_system_divergence_1950_1989",
+   "zimbabwe_hyperinflation_land_reform_output_collapse_2000_2009"
+  ],
+  "flagged_unaudited": [
+   "abct_fed_funds_below_taylor_rule_capital_misallocation_2002_2007",
+   "argentina_paso_2019_fx_reserves_inflation_base_money_lag",
+   "banking_crisis_argentina_2001_corralito_canonical",
+   "banking_crisis_brazil_1999_real_devaluation",
+   "banking_crisis_china_2015_2020_panel",
+   "banking_crisis_cyprus_2013_bailin",
+   "banking_crisis_iceland_2008_canonical_multimetric",
+   "banking_crisis_ireland_2008_property_bust",
+   "banking_crisis_italy_2016_2017_mps",
+   "banking_crisis_latvia_2008_parex",
+   "banking_crisis_lebanon_2019_2024_collapse",
+   "banking_crisis_nordic_1991_1993_panel",
+   "banking_crisis_russia_1998_default_canonical",
+   "banking_crisis_spain_2012_cajas_restructuring",
+   "banking_crisis_us_2023_svb_signature",
+   "banking_crisis_us_sl_crisis_1986_1995",
+   "china_zero_covid_2022_2023_demand_collapse_recovery",
+   "cuba_2021_protests_economic_reform_response",
+   "fiscal_dominance_japan_debt_non_crisis",
+   "mena_lebanon_currency_collapse_real_economy_2019_2024",
+   "milei_dollarisation_inflation_collapse_2024_2026",
+   "post_covid_labour_reallocation_us_2020_2024",
+   "turkey_fx_erdogan_unorthodox_inflation_response_2021_2024",
+   "uk_brexit_2016_inflation_real_earnings_window",
+   "uk_energy_cpi_real_earnings_squeeze_2022"
+  ],
+  "flagged_unaudited_disposition": "deferred: detector-flagged but outside the audited 20; queued for adversarial audit round 2 and v2 re-score (predominantly the banking_crisis_* family the audit predicted shares the sample-explosion harness)"
+ },
+ "standing_proposals": {
+  "A_unit_typetag": "implemented as detector; evaluator hard-fail deferred to v2",
+  "B_sentinel_scan": "implemented as detector",
+  "C_provenance_diversity": "implemented as detector; per-publisher hash attestation deferred to v2",
+  "D_sample_restriction": "implemented as detector assertion; evaluator restriction deferred to v2",
+  "E_verdict_migration_ledger": "implemented (this file)",
+  "F_definitional_gating": "deferred to v2 evaluator (X6)",
+  "v2_evidentiary_tiers": "card annotations applied; scoreboard weighting deferred to v2"
+ }
+}

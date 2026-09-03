@@ -2,9 +2,21 @@
 
 **Verdict:** supported
 
+> **RE-SCOPED to supported (descriptive) tier — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: Per-country threshold drift across the template family (3.5% KOR / 4.0% IND / 5.0% ETH) each set just below the realized value (4.28 / 4.47 / 5.87).
+
+
 **Reason:** 4 of 4 metrics met threshold (support threshold 3)
 
 Pre-registered rule: SUPPORT if >= 3 of 4 metrics met; REFUTE if <= 1 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** RE-SCOPED to supported (descriptive) tier · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 20) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- Per-country threshold drift across the template family (3.5% KOR / 4.0% IND / 5.0% ETH) each set just below the realized value (4.28 / 4.47 / 5.87) — post-hoc calibration signature.
+- 2011-12 base-year revision controversy unaddressed; no dual-vintage robustness.
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 4 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 

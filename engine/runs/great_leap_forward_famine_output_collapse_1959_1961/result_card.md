@@ -2,9 +2,38 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: Metric 10 PENDING_EVAL.
+
+
 **Reason:** 8 of 10 metrics met threshold (support threshold 7)
 
 Pre-registered rule: SUPPORT if >= 7 of 10 metrics met; REFUTE if <= 3 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 5) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- Metric 10 PENDING_EVAL — the harness could not parse its own pre-registered threshold (X6).
+- Metric 1 uses max-of-range fallback (36M of a contested 15–45M scholarly range) — disclosed-prior-shaped convenience.
+- Metric 7 provincial dispersion scored NOT_MET on absent data — absence of data is not absence of dispersion.
+
+**Verdict-migration note (X5):** prior verdict was `inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md §E7)`; the migration to `supported` was undocumented — now recorded in this remediation's ledger.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `life_expectancy_collapse` [unit_typetag_mismatch]: threshold in years_absolute evaluated against percent-change stat 'peak_to_trough_pct_decline' — MET/NOT_MET mechanically manufactured
+- metric `post_readjustment_recovery_speed` [unit_typetag_mismatch]: threshold in years_absolute evaluated against percent-change stat 'peak_to_trough_pct_decline' — MET/NOT_MET mechanically manufactured
+- metric `excess_mortality_1958_1962`: 5 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `grain_output_collapse`: 4 declared publishers share 2 vintage file(s) — fewer files than publishers
+- metric `gdp_per_capita_contraction`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `commune_coverage_rate`: 4 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `crude_birth_rate_collapse`: 4 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `life_expectancy_collapse`: 4 declared publishers share 2 vintage file(s) — fewer files than publishers
+- metric `provincial_famine_severity_dispersion`: 5 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `net_grain_export_during_famine`: 4 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `backyard_steel_campaign_capital_waste`: 4 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `post_readjustment_recovery_speed`: 4 declared publishers share 1 vintage file(s) — all publishers byte-identical
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 8 MET · 1 NOT_MET · 0 PENDING_DATA · 1 PENDING_EVAL
 

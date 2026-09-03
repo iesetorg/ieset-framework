@@ -2,9 +2,33 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: Metric 6 `famine_episode_count` = 40 (2020).
+
+
 **Reason:** 11 of 12 metrics met threshold (support threshold 7)
 
 Pre-registered rule: SUPPORT if >= 7 of 12 metrics met; REFUTE if <= 3 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 2) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- Metric 6 `famine_episode_count` = 40 (2020) — event-log row count scored as MET; data-glitch signature.
+- Metric 1's 40.25× GDP ratio rests on DPRK estimates §E7 flagged as pending `bank_of_korea_dprk_estimates` provenance.
+- Metric 9 PENDING_DATA does not gate the verdict (X6-adjacent).
+
+**Verdict-migration note (X5):** prior verdict was `inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md §E7)`; the migration to `supported` was undocumented — now recorded in this remediation's ledger.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `height_gap_centimetres`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `famine_episode_count`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `manufacturing_export_share_world`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `emigration_refugee_asymmetry`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `patent_filings_ratio`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `nightlights_gdp_proxy`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `infant_mortality_gap`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 11 MET · 0 NOT_MET · 1 PENDING_DATA · 0 PENDING_EVAL
 

@@ -2,9 +2,27 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: X4: 62 countries with >=30% depreciation (incl. AUT, BEL, CAN, DEU.
+
+
 **Reason:** 5 of 5 metrics met threshold (support threshold 4)
 
 Pre-registered rule: SUPPORT if >= 4 of 5 metrics met; REFUTE if <= 1 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 18) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- X4: 62 countries with >=30% depreciation (incl. AUT, BEL, CAN, DEU — no such depreciations occurred) and 167 with >=5% GDP declines, against the pre-registered 'at least 4 of 5 countries'.
+- The IMF-programme metric (correctly restricted to the named five) shows what all metrics should have been.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `nominal_currency_depreciation_peak` [sample_scope_explosion]: counted 62 units against a declared sample of 5 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `real_gdp_decline_1998` [sample_scope_explosion]: counted 167 units against a declared sample of 5 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `laeven_valencia_systemic_banking_crisis` [sample_scope_explosion]: counted 8 units against a declared sample of 5 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `current_account_reversal` [sample_scope_explosion]: counted 42 units against a declared sample of 5 — evaluator scanned the wrong universe (aggregates double-counted)
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 5 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 

@@ -2,9 +2,30 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: X4: 254 entities counted against the pre-registered 'at least 5 of 9 countries' (list includes WLD, EUU, OED aggregates and an empty leading code).
+
+
 **Reason:** 7 of 7 metrics met threshold (support threshold 5)
 
 Pre-registered rule: SUPPORT if >= 5 of 7 metrics met; REFUTE if <= 2 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 8) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- X4: 254 entities counted against the pre-registered 'at least 5 of 9 countries' (list includes WLD, EUU, OED aggregates and an empty leading code).
+- With the world panel scanned, the rule is unfalsifiable as implemented; region aggregates double-count members.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `peak_to_trough_real_gdp_decline` [sample_scope_explosion]: counted 254 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `unemployment_rate_peak_above_baseline` [sample_scope_explosion]: counted 22 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `real_house_price_peak_to_trough` [sample_scope_explosion]: counted 47 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `gross_government_debt_run_up` [sample_scope_explosion]: counted 68 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `current_account_swing` [sample_scope_explosion]: counted 155 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `bank_credit_to_gdp_decline` [sample_scope_explosion]: counted 82 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+- metric `laeven_valencia_systemic_banking_crisis` [sample_scope_explosion]: counted 13 units against a declared sample of 9 — evaluator scanned the wrong universe (aggregates double-counted)
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 7 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 

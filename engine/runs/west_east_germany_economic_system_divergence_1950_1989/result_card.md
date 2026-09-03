@@ -2,9 +2,40 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: Metric 2 `consumer_goods_availability_wait_time` observed = 100 (1985).
+
+
 **Reason:** 11 of 11 metrics met threshold (support threshold 7)
 
 Pre-registered rule: SUPPORT if >= 7 of 11 metrics met; REFUTE if <= 3 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 1) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- Metric 2 `consumer_goods_availability_wait_time` observed = 100 (1985) — round-number sentinel (X2), not a documented wait-time series.
+- Basket circularity: `stasi_surveillance_intensity` is regime-defining, not an outcome; the pattern match is partly tautological.
+- Per-metric publisher independence unverified; X3 duplicate hashes confirmed in the sister Soviet run.
+
+**Verdict-migration note (X5):** prior verdict was `inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md §E7)`; the migration to `supported` was undocumented — now recorded in this remediation's ledger.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `consumer_electronics_trade_balance` [unit_typetag_mismatch]: threshold in years_absolute evaluated against percent-change stat 'peak_to_trough_pct_decline' — MET/NOT_MET mechanically manufactured
+- metric `post_1989_revealed_productivity_gap` [unit_typetag_mismatch]: threshold in years_absolute evaluated against percent-change stat 'peak_to_trough_pct_decline' — MET/NOT_MET mechanically manufactured
+- metric `post_reunification_transfer_scale` [unit_typetag_mismatch]: threshold in years_absolute evaluated against percent-change stat 'peak_to_trough_pct_decline' — MET/NOT_MET mechanically manufactured
+- metric `gdp_per_capita_ppp_ratio_1989`: 4 declared publishers share 3 vintage file(s) — fewer files than publishers
+- metric `consumer_goods_availability_wait_time`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `emigration_flow_pre_wall`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `telephone_penetration_gap`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `car_ownership_ratio`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `innovation_patent_filings`: 4 declared publishers share 2 vintage file(s) — fewer files than publishers
+- metric `consumer_electronics_trade_balance`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `environmental_pollution_load`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `stasi_surveillance_intensity`: 4 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `post_1989_revealed_productivity_gap`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `post_reunification_transfer_scale`: 3 declared publishers share 1 vintage file(s) — all publishers byte-identical
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 11 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 

@@ -2,9 +2,37 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: Cagan hyperinflation metric PENDING_EVAL, not gating (X6).
+
+
 **Reason:** 9 of 10 metrics met threshold (support threshold 7)
 
 Pre-registered rule: SUPPORT if >= 7 of 10 metrics met; REFUTE if <= 3 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 7) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- Cagan hyperinflation metric PENDING_EVAL, not gating (X6).
+- X1: emigration '>15% of 2013 population' scored against pct_increase_from_baseline = 120; blackouts '>=3 documented' against pct_increase = 50.
+- The descriptive pattern-match card outranks the identified DiD sibling (`venezuela_chavismo_framework_validation`, weakened) on the scoreboard.
+
+**Verdict-migration note (X5):** prior verdict was `inconclusive (data gaps, HYPOTHESIS_FRAMEWORK_AUDIT.md §E7)`; the migration to `supported` was undocumented — now recorded in this remediation's ledger.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `emigration_outflow_share_population` [sentinel_value]: percent-change stat at 119.9442 >= 99.99 — fallback/sentinel artefact, not a real observation
+- metric `real_minimum_wage_collapse_usd` [sentinel_value]: percent-change stat at 100.0000 >= 99.99 — fallback/sentinel artefact, not a real observation
+- metric `currency_par_value_collapse` [sentinel_value]: percent-change stat at 100.0000 >= 99.99 — fallback/sentinel artefact, not a real observation
+- metric `hyperinflation_cagan_threshold`: 3 declared publishers share 2 vintage file(s) — fewer files than publishers
+- metric `crude_oil_production_collapse`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `extreme_poverty_rate`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `under5_mortality_reversal`: 3 declared publishers share 2 vintage file(s) — fewer files than publishers
+- metric `real_minimum_wage_collapse_usd`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `electrical_grid_collapse`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `food_insecurity_ipc_phase`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+- metric `currency_par_value_collapse`: 2 declared publishers share 1 vintage file(s) — all publishers byte-identical
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 9 MET · 0 NOT_MET · 0 PENDING_DATA · 1 PENDING_EVAL
 

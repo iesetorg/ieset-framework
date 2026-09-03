@@ -2,9 +2,26 @@
 
 **Verdict:** supported
 
+> **QUARANTINED pending v2 re-score — adversarial audit remediation 2026-09-03.** See the Correction section below before citing this card. Primary finding: X1/X2: unemployment '>=19 pp rise' scored against pct_increase_from_baseline = 1.43e+03; government debt '>=175% of GDP' against max_in_window_fallback = 4.94e+04.
+
+
 **Reason:** 6 of 6 metrics met threshold (support threshold 5)
 
 Pre-registered rule: SUPPORT if >= 5 of 6 metrics met; REFUTE if <= 2 met (impossible to hit support).
+
+## Correction 2026-09-03 — adversarial audit remediation
+
+**Disposition:** QUARANTINED pending v2 re-score · **Audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (claim 15) · **Remediation:** `engine/audits/ieset_adversarial_audit_remediation_2026-09-03.md` · **Detectors:** `scripts/audit_integrity_detectors.py`
+
+- X1/X2: unemployment '>=19 pp rise' scored against pct_increase_from_baseline = 1.43e+03; government debt '>=175% of GDP' against max_in_window_fallback = 4.94e+04 — sentinel/wrong-series artefacts scored MET.
+- The doom-loop propagation mechanism is untested: six co-occurring state variables, no exposure or sequencing metric.
+
+**Machine-detector confirmations in diagnostics.json (not counted toward the verdict pending v2):**
+- metric `unemployment_peak` [sentinel_value]: percent-change stat at 1427.2739 >= 99.99 — fallback/sentinel artefact, not a real observation
+- metric `government_debt_peak` [sentinel_value]: value 4.942e+04 at >=1e4 scale for percent/ratio-family stat 'max_in_window_fallback' — wrong series or sentinel scored as MET
+- metric `unemployment_peak` [unit_typetag_mismatch]: threshold in percentage_points evaluated against percent-change stat 'pct_increase_from_baseline' — MET/NOT_MET mechanically manufactured
+
+No original content has been deleted; this correction is additive.
 
 **Counts:** 6 MET · 0 NOT_MET · 0 PENDING_DATA · 0 PENDING_EVAL
 
