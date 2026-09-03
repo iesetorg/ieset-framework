@@ -22,5 +22,5 @@
 
 ## Failed / Still Blocked
 
-- `kleiner_krueger:kk_state_licensing_share_workforce` - ManualDropError: No manual-drop dir for 'kleiner_krueger'. See module docstring for steps; expected directory: /Users/localllm/IESET/data/manual/kleiner_krueger
-- `kleiner_krueger:kk_state_2015_share_pct` - ManualDropError: No manual-drop dir for 'kleiner_krueger'. See module docstring for steps; expected directory: /Users/localllm/IESET/data/manual/kleiner_krueger
+- `kleiner_krueger:kk_state_licensing_share_workforce` - ManualDropError: No manual-drop dir for 'kleiner_krueger'. See module docstring for steps; expected directory: data/manual/kleiner_krueger
+- `kleiner_krueger:kk_state_2015_share_pct` - ManualDropError: No manual-drop dir for 'kleiner_krueger'. See module docstring for steps; expected directory: data/manual/kleiner_krueger
