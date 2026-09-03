@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: france_reference_rents_paris_lille_phase_in
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  The French encadrement des loyers rent-reference systems bind on new-lease
+  rents in the treated cities: Paris (2015-2017, annulled, reinstated 2019)
+  and Lille (2020) show lower new-lease rent growth relative to the
+  Lyon/Villeurbanne control window and untreated inner suburbs during
+  active years, with the effect absent during the 2017-2019 Paris annulment
+  window, and a composition shift toward exempt categories during binding
+  years.
+
+evidence_type: causal
+
+sample:
+  countries: [FRA]
+  period: [2013, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop leases missing the observatoire des loyers coverage flag (outside OLL panel reach)"
+    - "drop the 2017-2019 Paris annulment window from pooled treated years; it enters only as the off leg"
+    - "Lyon/Villeurbanne never treated; drops if it ever adopts a reference system pre-2024"
+
+scope:
+  period: [2013, 2024]
+  countries: [FRA]
+  outcome_dim: [housing, poverty_inequality]
+  policy_family: [regulation, housing_policy]
+  treatment_tags: [rent_control, encadrement_des_loyers, reference_rents, paris_lille, phase_in]
+
+variables:
+  outcome:
+    - name: new_lease_rent_level
+      source: "data/derived/france_reference_rents_panel.parquet (OLL observations)"
+      transformation: "euros per square meter, new leases"
+    - name: new_lease_count
+      source: "data/derived/france_reference_rents_panel.parquet"
+      transformation: "annual count by city"
+    - name: complement_de_loyer_share
+      source: "data/derived/france_reference_rents_panel.parquet"
+      transformation: "share of leases with a rent supplement"
+    - name: exempt_category_share
+      source: "data/derived/france_reference_rents_panel.parquet"
+      transformation: "share of leases in exempt categories"
+  treatment:
+    - name: encadrement_active
+      source: "constructed: Paris 2015-2017 and 2019-2024; Lille 2020-2024 (statutory dates)"
+      transformation: "city-year indicator"
+  controls:
+    - name: lyon_villeurbanne_control_path
+      source: "data/derived/france_reference_rents_panel.parquet"
+      transformation: "city-year rent level"
+    - name: sitadel_permit_flow
+      source: "Sitadel permits (europe pilot ingestion queue)"
+      transformation: "annual permits"
+    - name: lease_duration_composition
+      source: "data/derived/france_reference_rents_panel.parquet"
+      transformation: "share by duration band"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  A statutory reference-rent cap on new leases switched on, off, and on
+  again in Paris and on in Lille, with statutory effective dates.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: city
+  notes: >
+    Phase-in/threshold comparison exploiting the 2017 annulment and 2019
+    reinstatement as off-on-off variation; difference-in-differences on
+    new-lease rents and volumes against the Lyon/Villeurbanne window and
+    untreated inner suburbs.
+
+falsification:
+  rule: >
+    REJECTED if reinstated years show no rent-level effect on new leases
+    AND no composition shift toward exempt categories; either null alone is
+    insufficient for rejection. SUPPORTED requires a negative new-lease
+    rent effect in active years AND the annulment window showing the effect
+    absent AND a nonzero exempt-composition shift; PARTIAL if the rent
+    effect clears but composition does not.
+  test: france_encadrement_phase_in_did
+  threshold: >
+    Active-year treated-minus-control new-lease rent growth lower at
+    p<=0.05; annulment-window coefficient indistinguishable from zero;
+    exempt-category share rises at p<=0.10 in binding years.
+
+prior_confidence: 0.6
+
+disclosure: >
+  Prior is 0.6: the annulment/reinstatement sequence is a strong design but
+  OLL coverage gaps may limit power; if off years show rents staying at
+  controlled levels, the controls-bind premise itself weakens for this
+  case, and the spec is written so that outcome is visible rather than
+  absorbed.
+
+steelman: hypotheses/steelman/france_reference_rents_paris_lille_phase_in.md
+
+linked_hypotheses:
+  - rent_control_housing_supply_quality_decay_chain
+
+notes: >
+  Candidate brief ieset_hypothesis_candidates_2026-08-01.md (the_pre_registrar, run_ieset_20260801_020005, rank 5), grounded in landed panel france_reference_rents_panel.

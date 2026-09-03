@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: catalonia_reference_rent_contract_supply_response_2020
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  Catalonia's 2020 reference-price law (September 2020, applying rent
+  caps to municipalities designated as stressed housing-market areas)
+  reduced new rental-contract volume and listings in designated
+  municipalities relative to non-designated Catalan and bordering
+  autonomous-community municipalities within 18 months of designation,
+  with a measurable shift of formal contracts toward exempt or
+  shorter-duration categories and no offsetting rise in non-designated
+  neighbor rents.
+
+evidence_type: causal
+
+sample:
+  countries: [ESP]
+  period: [2017, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop municipalities never designated and outside Catalonia's bordering autonomous communities (no common trend support)"
+    - "drop municipality-quarters with contract counts below the panel's disclosure threshold"
+    - "Spain Law 12/2023 national wave enters only as the second treatment phase, never pooled with the 2020 designation"
+
+scope:
+  period: [2017, 2024]
+  countries: [ESP]
+  outcome_dim: [housing, poverty_inequality]
+  policy_family: [regulation, housing_policy]
+  treatment_tags: [rent_control, reference_price_system, stressed_area_designation, catalonia_2020, contract_supply]
+
+variables:
+  outcome:
+    - name: new_rental_contract_count
+      source: "data/derived/catalonia_rent_contracts_panel.parquet"
+      transformation: "quarterly count by municipality"
+    - name: reference_vs_realized_rent_gap
+      source: "data/derived/catalonia_rent_contracts_panel.parquet"
+      transformation: "realized minus reference rent"
+    - name: listing_count
+      source: "Spain rental reference price system (europe pilot ingestion queue)"
+      transformation: "quarterly count"
+    - name: contract_duration_mix
+      source: "data/derived/catalonia_rent_contracts_panel.parquet"
+      transformation: "share of contracts by duration band"
+  treatment:
+    - name: stressed_area_designation_2020
+      source: "constructed: municipality designated under Catalonia reference-price law, post 2020-09"
+      transformation: "indicator"
+  controls:
+    - name: municipality_population_path
+      source: "data/derived/city_universe_top1000.parquet spine crosswalks"
+      transformation: "annual level"
+    - name: provincial_labor_market
+      source: "constructed from landed national vintages"
+      transformation: "province-year unemployment"
+    - name: spain_law_12_2023_wave
+      source: "constructed: national reference-price wave indicator"
+      transformation: "indicator"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  A statutory rent-cap system applied by administrative designation of
+  stressed areas, creating a designation boundary between otherwise similar
+  municipalities.
+
+estimator:
+  template: did_callaway_santanna
+  clustering: municipality
+  notes: >
+    Eligible-vs-ineligible difference-in-differences at the stressed-area
+    designation boundary with Callaway-Sant'Anna staggered-adoption
+    estimates; Spain Law 12/2023 used as a second treatment wave for
+    phase-in comparison rather than pooled treatment.
+
+falsification:
+  rule: >
+    REJECTED if designated municipalities show no significant drop in
+    new-contract volume or listings relative to non-designated neighbors
+    within 18 months of designation. SUPPORTED requires both the
+    contract-volume and listing declines with pre-designation trends
+    parallel; PARTIAL if only contract volume declines.
+  test: catalonia_stressed_area_boundary_did
+  threshold: >
+    Treated-minus-control new-contract count decline significant at p<=0.05
+    within 18 months AND listing decline same sign and significance; parallel
+    pre-trends (joint pre-period coefficients insignificant) required for
+    SUPPORTED, else capped at INFORMATIVE.
+
+prior_confidence: 0.65
+
+disclosure: >
+  Prior is 0.65 on the contract-volume decline and 0.5 on a measurable price
+  effect given documented enforcement gaps; contract-level administrative
+  data means the transfer and supply margins are observed in the same panel,
+  which is why this case anchors the European rent-control leg.
+
+steelman: hypotheses/steelman/catalonia_reference_rent_contract_supply_response_2020.md
+
+linked_hypotheses:
+  - rent_control_housing_supply_quality_decay_chain
+  - price_controls_shortage_black_market_progression
+
+notes: >
+  Candidate brief ieset_hypothesis_candidates_2026-08-01.md (the_pre_registrar, run_ieset_20260801_020005, rank 3), grounded in landed panel catalonia_rent_contracts_panel and the city spine crosswalks.

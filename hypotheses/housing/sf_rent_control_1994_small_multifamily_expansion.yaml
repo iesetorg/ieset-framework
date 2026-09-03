@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sf_rent_control_1994_small_multifamily_expansion
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  San Francisco's 1994 rent-control expansion (Proposition I, bringing
+  small multifamily buildings of 2-4 units built before 1980 under the
+  1979 Rent Stabilization and Arbitration Ordinance) reduced the rental
+  supply, maintenance, and tenant mobility of the treated building class
+  relative to exempt stock and donor cities over the following decade:
+  treated small-multifamily buildings show higher rental-to-owner
+  conversion and condo-conversion rates, weaker maintenance and code-
+  violation outcomes, and lower tenant turnover than comparable exempt
+  single-family and post-1980 stock, while incumbent tenants receive a
+  measurable rent discount relative to entrants.
+
+evidence_type: causal
+
+sample:
+  countries: [USA]
+  period: [1985, 2005]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop buildings constructed 1980 or later (never eligible for the 1994 expansion)"
+    - "drop years with missing Assessor-Recorder classification or blank permit history"
+    - "drop owner-occupied condos from the rental-supply outcome legs (not at risk of rental conversion)"
+
+scope:
+  period: [1985, 2005]
+  countries: [USA]
+  outcome_dim: [housing, poverty_inequality, financialisation]
+  policy_family: [regulation, housing_policy]
+  treatment_tags: [rent_control, rent_stabilization, small_multifamily, prop_i_1994, housing_supply, maintenance_quality]
+
+variables:
+  outcome:
+    - name: rental_supply_share
+      source: "constructed from data/derived/us_sf_rent_control_quality_leakage_panel.parquet (building-class rental counts)"
+      transformation: "share of building-class stock in rental use"
+    - name: condo_conversion_count
+      source: "constructed from SF open-data bundle (condo conversion records, pinned Socrata IDs per ingestion queue)"
+      transformation: "annual count by building class"
+    - name: maintenance_code_violation_rate
+      source: "constructed from data/derived/us_sf_rent_control_quality_leakage_panel.parquet"
+      transformation: "violations per building by class"
+    - name: tenant_tenure_length
+      source: "constructed from ACS place housing incidence panel"
+      transformation: "median tenure years by building class"
+  treatment:
+    - name: prop_i_small_multifamily_treated
+      source: "constructed: building class 2-4 units, built pre-1980, San Francisco, post-Nov-1994"
+      transformation: "treated x post indicator"
+  controls:
+    - name: building_age_band
+      source: "SF Assessor-Recorder via open-data bundle"
+      transformation: "categorical"
+    - name: neighborhood_fixed_effects
+      source: "constructed from panel geography"
+      transformation: "categorical"
+    - name: donor_city_rent_path
+      source: "data/derived/us_city_rent_panel.parquet (Oakland, San Jose)"
+      transformation: "city-year rent index"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  The 1994 ballot expansion is a regulatory-channel intervention that changed
+  the legal status of a sharply delineated building class, creating
+  treatment-exemption variation within the same city and vintage band.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [building_class, neighborhood, year]
+  clustering: neighborhood
+  notes: >
+    Triple difference: treated small-multifamily class x post-1994 x San
+    Francisco versus exempt stock and Oakland/San Jose donor cities.
+    Event-study trace 1985-2005 for pre-trend disclosure; Callaway-Sant'Anna
+    heterogeneity check by building-size cohort as robustness.
+
+falsification:
+  rule: >
+    The supply/quality-decay chain is REJECTED if (a) treated buildings show
+    no statistically significant reduction in rental supply, conversion, or
+    maintenance versus exempt stock at the 5 percent level over 10 years, AND
+    (b) entrant-cohort rents do not rise relative to incumbent rents. Both
+    legs must fail to clear for rejection; SUPPORTED requires both legs to
+    clear with the pre-declared signs; PARTIAL otherwise.
+  test: sf_rent_control_1994_small_multifamily_triple_diff
+  threshold: >
+    (a) treated-vs-exempt rental-supply decline significant at p<=0.05 over
+    10 years AND (b) entrant-minus-incumbent rent gap positive and significant
+    at p<=0.05. Pre-1994 event-study coefficients jointly indistinguishable
+    from zero required for either verdict; visible pre-trend caps the verdict
+    at INFORMATIVE.
+
+prior_confidence: 0.75
+
+disclosure: >
+  Prior leans toward the incumbent-transfer-plus-entrant-cost pattern that
+  the axis contract (regulatory.housing_rent_control) predicts; 0.75 because
+  the treatment-exemption boundary here is about as clean as the class gets.
+  A well-identified null on the supply leg would still price the incumbent
+  transfer honestly, which is what the second-order gate needs.
+
+steelman: hypotheses/steelman/sf_rent_control_1994_small_multifamily_expansion.md
+
+linked_hypotheses:
+  - rent_control_housing_supply_quality_decay_chain
+  - price_controls_shortage_black_market_progression
+
+notes: >
+  Candidate brief ieset_hypothesis_candidates_2026-08-01.md (the_pre_registrar, run_ieset_20260801_020005, rank 1), grounded in landed derived panels us_sf_rent_control_quality_leakage_panel, us_city_rent_panel, us_city_permits_panel, and us_acs_place_housing_incidence_panel.

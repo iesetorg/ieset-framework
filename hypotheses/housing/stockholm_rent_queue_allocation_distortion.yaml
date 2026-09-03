@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: stockholm_rent_queue_allocation_distortion
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  Stockholm's rent-controlled allocation queue (Bostadsförmedlingen)
+  creates measurable allocation distortion rather than clearing by
+  preference: median queue time rises across cohorts and districts,
+  insider tenants stay longer and move less than tenants in comparison
+  Swedish municipalities, and the insider discount shows up as a widening
+  gap between queue-wait valuation and realized rents, while municipal
+  completions do not offset queue growth.
+
+evidence_type: causal
+
+sample:
+  countries: [SWE]
+  period: [2010, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop municipalities without continuous Bostadsförmedlingen or SCB housing coverage"
+    - "drop queue records with missing dwelling-size or district fields"
+    - "student-specific queues excluded (different allocation rule)"
+
+scope:
+  period: [2010, 2024]
+  countries: [SWE]
+  outcome_dim: [housing, poverty_inequality]
+  policy_family: [regulation, housing_policy]
+  treatment_tags: [rent_control, allocation_queue, rationing, insider_outsider, tenant_mobility]
+
+variables:
+  outcome:
+    - name: median_queue_time
+      source: "data/derived/stockholm_bostadsformedlingen_queue_panel.parquet"
+      transformation: "median years by dwelling size and district"
+    - name: tenant_mobility_rate
+      source: "constructed from SCB municipal panel"
+      transformation: "annual moves per tenant"
+    - name: municipal_completions
+      source: "data/derived/sweden_scb_municipal_housing_panel.parquet"
+      transformation: "annual completions"
+    - name: queue_turnover_rate
+      source: "data/derived/stockholm_bostadsformedlingen_queue_panel.parquet"
+      transformation: "annual share of queue advancing to contract"
+  treatment:
+    - name: stockholm_queue_allocation
+      source: "constructed: Stockholm municipality under Bostadsförmedlingen first-hand contract allocation"
+      transformation: "treated municipality indicator"
+  controls:
+    - name: municipal_population_growth
+      source: "data/derived/sweden_scb_municipal_housing_panel.parquet"
+      transformation: "annual growth"
+    - name: comparison_municipality_pool
+      source: "constructed: Swedish municipalities outside the Stockholm queue system"
+      transformation: "municipality-year outcomes"
+    - name: national_rent_index_path
+      source: "constructed from landed vintages"
+      transformation: "annual level"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  First-hand rental contracts in the Stockholm system are allocated by queue
+  seniority at regulated rents, a regulatory-channel rationing rule absent
+  in comparison municipalities.
+
+estimator:
+  template: panel_fe_decomposition
+  clustering: municipality
+  notes: >
+    Distributional decomposition of queue time across cohorts and districts
+    plus treated-versus-untreated municipal comparison for mobility and
+    completions; the queue register observes rationing directly rather
+    than inferring it.
+
+falsification:
+  rule: >
+    The allocation-distortion claim is REJECTED if queue times are flat
+    across cohorts and districts while tenant mobility matches comparison
+    municipalities (queue length administrative, not binding). SUPPORTED
+    requires rising cohort/district queue dispersion AND below-comparison
+    Stockholm mobility; PARTIAL if only one margin clears.
+  test: stockholm_queue_allocation_decomposition
+  threshold: >
+    Cohort-district queue-time dispersion grows significantly (p<=0.05)
+    over the sample AND Stockholm mobility at least 15 percent below the
+    comparison-municipality mean; completions failing to offset queue
+    growth required for SUPPORTED.
+
+prior_confidence: 0.8
+
+disclosure: >
+  Prior is 0.8 that queue and insider/outsider incidence are measurable and
+  0.55 on a clean causal mobility effect; queue evidence is often dismissed
+  as preference-driven, which is why the municipal comparison leg carries
+  the causal weight rather than the queue descriptive alone.
+
+steelman: hypotheses/steelman/stockholm_rent_queue_allocation_distortion.md
+
+linked_hypotheses:
+  - rent_control_housing_supply_quality_decay_chain
+
+notes: >
+  Candidate brief ieset_hypothesis_candidates_2026-08-01.md (the_pre_registrar, run_ieset_20260801_020005, rank 4), grounded in landed panels stockholm_bostadsformedlingen_queue_panel and sweden_scb_municipal_housing_panel.

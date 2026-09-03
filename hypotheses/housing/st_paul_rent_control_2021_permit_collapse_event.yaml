@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: st_paul_rent_control_2021_permit_collapse_event
+version: 1
+status: pre_registered
+topic: housing
+
+claim: >
+  St Paul Minnesota's November 2021 rent-stabilization ordinance (3 percent
+  annual cap, no new-construction exemption at passage) caused a decline in
+  building-permit activity beyond what rate-cycle and macro conditions
+  explain: post-ordinance permits in St Paul fall at least 50 percent below
+  the synthetic-control gap within 24 months, the decline concentrates in
+  previously-exempt new construction, and the September 2022 amendment
+  (new-construction exemption) partially reverses it, while Minneapolis
+  shows no comparable decline over the same window.
+
+evidence_type: causal
+
+sample:
+  countries: [USA]
+  period: [2017, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop permit records with missing structure type or zero units"
+    - "drop months with citywide data-collection outages flagged by the Census BPS panel"
+    - "Minneapolis enters only as control; never treated"
+
+scope:
+  period: [2017, 2025]
+  countries: [USA]
+  outcome_dim: [housing, poverty_inequality]
+  policy_family: [regulation, housing_policy]
+  treatment_tags: [rent_control, rent_stabilization, st_paul_2021_ordinance, building_permits, housing_supply]
+
+variables:
+  outcome:
+    - name: building_permits_by_structure_type
+      source: "data/derived/us_city_permits_panel.parquet (Census BPS city permits)"
+      transformation: "annual units by structure type"
+    - name: housing_starts
+      source: "data/derived/us_city_permits_panel.parquet"
+      transformation: "annual count"
+    - name: rent_index_zori
+      source: "data/derived/us_city_rent_panel.parquet (Zillow ZORI)"
+      transformation: "monthly index"
+    - name: eviction_filings
+      source: "Eviction Lab tracking system (city ingestion queue)"
+      transformation: "monthly count"
+  treatment:
+    - name: st_paul_ordinance_nov2021
+      source: "constructed: St Paul MN, post 2021-11 ordinance effective"
+      transformation: "indicator"
+  controls:
+    - name: mortgage_rate_path
+      source: "constructed from national series in landed vintages"
+      transformation: "monthly level"
+    - name: minneapolis_parallel_permits
+      source: "data/derived/us_city_permits_panel.parquet"
+      transformation: "annual units"
+    - name: midwest_metro_donor_pool
+      source: "constructed synthetic donor of Midwest metros from permits panel"
+      transformation: "synthetic control weights"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  A ballot-measure ordinance changing the legal cap on rent increases for
+  nearly all rental stock, with an unambiguous effective date and a 2022
+  amendment creating within-case dose variation.
+
+estimator:
+  template: event_study
+  event_year: 2021
+  clustering: city
+  notes: >
+    High-frequency event study on permits around November 2021 plus synthetic
+    control against a Midwest donor pool; the September 2022 amendment is a
+    second within-case event used as a dose-response reversal leg.
+
+falsification:
+  rule: >
+    REJECTED if the post-ordinance permit decline in St Paul does not exceed
+    the synthetic-control gap by at least 50 percent within 24 months, or if
+    Minneapolis shows a comparable decline over the same window (macro shock,
+    not policy). SUPPORTED requires the permit gap AND the amendment-reversal
+    leg both clearing; PARTIAL if only the permit gap clears.
+  test: st_paul_2021_permit_event_study
+  threshold: >
+    St Paul-minus-synthetic permit gap <= -50 percent within 24 months at
+    p<=0.05 AND Minneapolis gap statistically zero over the same window;
+    amendment-reversal leg requires post-2022-09 new-construction permits to
+    recover at least 30 percent of the decline within 12 months.
+
+prior_confidence: 0.7
+
+disclosure: >
+  Prior is 0.7 that the permit response is large and fast and 0.5 that it
+  persists past the 2022 amendment; critics argue the 2022 permit collapse
+  was rate-driven, and the Minneapolis control plus amendment-reversal legs
+  exist precisely to test that confound rather than assume it away.
+
+steelman: hypotheses/steelman/st_paul_rent_control_2021_permit_collapse_event.md
+
+linked_hypotheses:
+  - rent_control_housing_supply_quality_decay_chain
+
+notes: >
+  Candidate brief ieset_hypothesis_candidates_2026-08-01.md (the_pre_registrar, run_ieset_20260801_020005, rank 2), grounded in landed panels us_city_rent_control_quality_leakage_panel, us_city_permits_panel, us_city_rent_panel.
