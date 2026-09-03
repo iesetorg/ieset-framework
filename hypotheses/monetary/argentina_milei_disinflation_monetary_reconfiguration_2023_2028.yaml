@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: argentina_milei_disinflation_monetary_reconfiguration_2023_2028
+version: 1
+status: pre_registered
+topic: monetary
+
+claim: >
+  Argentina's December 2023 stabilization turn (fiscal anchor, monetary base
+  discipline, cepo relaxation under the Milei government) produces a durable
+  monetary reconfiguration rather than a repeat of past disinflation
+  reversals: consumer inflation falls by at least half from its late-2023
+  peak, monthly inflation stabilizes below 3 percent, monetary base and
+  private M2 growth collapse to below 30 percent year-over-year, the
+  retail-wholesale FX gap closes below 10 percent, and international
+  reserves rebuild by at least 25 percent — with at least four of the six
+  metrics met by end-2026 and none of the reversal markers firing.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [ARG]
+  period: [2023, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "drop months where the CPI index is forward-filled rather than observed (cpi_observed=false in the panel)"
+    - "2007-2015 INDEC falsification window excluded from any pre-trend leg"
+
+scope:
+  period: [2023, 2026]
+  countries: [ARG]
+  outcome_dim: [inflation, monetary_policy, poverty_inequality]
+  policy_family: [monetary_policy, fiscal_policy, privatisation_nationalisation]
+  treatment_tags: [milei_stabilisation, monetary_base_discipline, fiscal_anchor, cepo_relaxation, disinflation]
+
+variables:
+  outcome:
+    - name: cpi_yoy_pct
+      source: "indec:148.3_INIVELNAL_DICI_M_26"
+      transformation: "year-over-year percent from monthly national CPI index"
+    - name: cpi_mom_pct
+      source: "indec:148.3_INIVELNAL_DICI_M_26"
+      transformation: "month-over-month percent"
+    - name: monetary_base_yoy_pct
+      source: "bcra:15"
+      transformation: "year-over-year percent"
+    - name: m2_private_yoy_pct
+      source: "bcra:25"
+      transformation: "level as published (30-day moving-average year-over-year)"
+    - name: fx_gap_pct
+      source: "bcra:4; bcra:5"
+      transformation: "retail FX over wholesale FX minus one, percent"
+    - name: reserves_usd
+      source: "bcra:1"
+      transformation: "level, USD millions"
+  treatment:
+    - name: milei_stabilisation_regime
+      source: "constructed: Argentina from 2023-12-10 (sworn-in) onward"
+      transformation: "indicator"
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  A regime change combining a hard fiscal anchor with central-bank monetary
+  base control and exchange-control relaxation — the monetary-policy channel
+  is the binding constraint being tested.
+
+canonical_metrics:
+  - metric_id: disinflation_half_from_peak
+    description: CPI year-over-year falls to at most half its December-2023-region peak and stays there.
+    threshold: "cpi_yoy_pct <= 0.5 x max(cpi_yoy_pct over 2023-10..2024-04) for every observed month of 2026"
+    window: 2023-10 to 2026-07
+    source: "indec:148.3_INIVELNAL_DICI_M_26"
+    independence_justification: Price level outcome; distinct layer from money, FX, and reserves.
+  - metric_id: monthly_cpi_stabilised
+    description: Monthly inflation runs below 3 percent m/m in the large majority of recent months.
+    threshold: "at least 12 of the last 18 observed months have cpi_mom_pct < 3.0"
+    window: 2025-01 to 2026-07
+    source: "indec:148.3_INIVELNAL_DICI_M_26"
+    independence_justification: High-frequency price dynamics; same publisher, different frequency layer from the y/y path metric.
+  - metric_id: monetary_base_growth_collapse
+    description: Monetary base growth collapses from triple digits to below 30 percent.
+    threshold: "monetary_base_yoy_pct < 30 for 12 consecutive observed months by 2026-12"
+    window: 2025-01 to 2026-12
+    source: "bcra:15"
+    independence_justification: Central-bank balance-sheet outcome; mechanically upstream of prices and independent of the CPI series.
+  - metric_id: private_money_normalisation
+    description: Private M2 growth normalises below 40 percent.
+    threshold: "m2_private_yoy_pct < 40 for 12 consecutive observed months by 2026-12"
+    window: 2025-01 to 2026-12
+    source: "bcra:25"
+    independence_justification: Banking-system liability outcome; distinct from base money and from prices.
+  - metric_id: fx_gap_closure
+    description: The retail-wholesale FX gap (cepo wedge) closes.
+    threshold: "median fx_gap_pct < 10.0 over observed 2025 months"
+    window: 2025-01 to 2025-12
+    source: "bcra:4; bcra:5"
+    independence_justification: Parallel-market pricing outcome; different market microstructure from money and CPI.
+  - metric_id: reserves_rebuilt
+    description: International reserves rebuild materially from the December-2023 trough region.
+    threshold: "reserves_usd >= 1.25 x min(reserves_usd over 2023-10..2024-02) by 2026-12"
+    window: 2023-10 to 2026-12
+    source: "bcra:1"
+    independence_justification: External balance-sheet stock; a level outcome not a flow derived from any other metric.
+
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 4
+  refute_threshold: 2
+
+prior_confidence: 0.6
+
+disclosure: >
+  Prior leans toward the Austrian-axis reading that fiscal-anchored monetary
+  discipline beats exchange-rate-based stabilizations; 0.6 not higher because
+  Argentina's prior stabilizations (1991-2001 convertibility, 2016-2018
+  gradualism) both reversed, and the 2025-26 CPI plateau near 30 percent may
+  be the fiscal-anchoring limit. The claim is about the monetary
+  reconfiguration, not about welfare outcomes (covered by the separate
+  milei_shock_therapy_poverty_and_real_wage_effect hypothesis).
+
+steelman: hypotheses/steelman/argentina_milei_disinflation_monetary_reconfiguration_2023_2028.md
+
+linked_hypotheses:
+  - milei_shock_therapy_output_recovery_trajectory
+  - milei_chainsaw_state_capacity_decomposition_2024_2025
+  - hyperinflation_requires_fiscal_dominance
+  - argentina_peronism_recurring_fiscal_inflation_cycle_1945_2023
+
+notes: >
+  Backing panel: data/derived/argentina_milei_stabilisation_panel.parquet
+  (scripts/build_argentina_milei_stabilisation_panel.py; live BCRA v4 API and
+  INDEC datos.gob.ar series; manifest under data/manifests/). CPI-observed
+  months only; forward-filled INDEC months are nulled in the panel.

@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: welfare_anglo_transfer_ratchet_private_stagnation_2019_2024
+version: 1
+status: pre_registered
+topic: welfare_architecture
+
+claim: >
+  In the welfare-state Anglo economies (GBR, CAN, AUS, NZL), the government
+  consumption and expense shares ratchet upward through the 2019-2024
+  stagnation — the post-2019 peak in the public-spending share is never
+  given back by more than one percentage point by 2024 — while private
+  consumption and per-capita growth stagnate, and at least one of the four
+  experiences a bond-market stress event (the UK's September 2022
+  gilt/LDI episode) without subsequent transfer retrenchment. The claim is
+  that the transfer-public spending level is politically irreversible
+  downward even under stagnation and bond stress, in contrast to the USA
+  where the public-consumption share falls back toward its pre-2019 level.
+
+evidence_type: associational
+
+sample:
+  countries: [GBR, CAN, AUS, NZL, USA]
+  period: [2019, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing both government spending series"
+    - "2024 missing values (publication lag) allowed; ratchet evaluated on latest observed year per country"
+    - "USA enters only as the contrast unit for the give-back comparison"
+
+scope:
+  period: [2019, 2024]
+  countries: [OECD]
+  outcome_dim: [welfare_state, fiscal_policy, gdp_growth]
+  policy_family: [welfare_architecture, fiscal_policy]
+  treatment_tags: [transfer_ratchet, public_spending_share, fiscal_paralysis, bond_stress, private_stagnation]
+
+variables:
+  outcome:
+    - name: gov_consumption_pct_gdp
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "level; peak-to-latest give-back in percentage points"
+    - name: gov_expense_pct_gdp
+      source: "world_bank_wdi:GC.XPN.TOTL.GD.ZS"
+      transformation: "level; same peak-to-latest give-back"
+    - name: private_consumption_growth_pct
+      source: "world_bank_wdi:NE.CON.PRVT.KD.ZG"
+      transformation: "cumulative 2019-2024"
+  treatment:
+    - name: stagnation_with_bond_stress
+      source: "constructed: welfare-Anglo units 2019-2024; GBR bond-stress event 2022-09-28 (BoE gilt intervention)"
+      transformation: "indicator"
+  controls:
+    - name: gdp_pc_real_growth_pct
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "cumulative 2019-2024"
+
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The welfare-state transfer architecture is the policy channel: the test is
+  whether its fiscal footprint is downward-rigid under stagnation and bond
+  stress.
+
+estimator:
+  template: descriptive
+  notes: >
+    Ratchet accounting per country: peak of each public-spending share after
+    2019Q1 minus the latest observed level (percentage points); USA
+    contrast leg computes the same quantity. No causal estimator claimed at
+    five units; the falsification is the pattern count plus the coded
+    bond-stress event.
+
+falsification:
+  rule: >
+    SUPPORTED if at least 3 of 4 welfare-Anglo countries show peak-to-latest
+    give-back <= 1.0 percentage point on the government consumption share
+    (or expense share where consumption is missing) AND USA shows a
+    give-back > 1.0 point; REFUTED if at least 2 welfare-Anglo countries
+    give back more than 1.0 point or the USA fails to give any back;
+    PARTIAL otherwise. The bond-stress event is a disclosed marker and does
+    not by itself move the verdict.
+  test: welfare_anglo_ratchet_giveback_count
+  threshold: ">= 3 of 4 welfare-Anglo with give-back <= 1.0pp AND USA give-back > 1.0pp for SUPPORTED"
+
+prior_confidence: 0.6
+
+disclosure: >
+  The voter-lockin framing (welfare states paralyzed by electoral
+  arithmetic) is a mechanism interpretation the data here cannot test; the
+  spec measures only the observed downward rigidity of public-spending
+  shares. Prior 0.6 because Canada and Australia plausibly ran cyclical
+  rather than structural expansions; a genuine give-back in either would
+    move this to PARTIAL rather than breaking the family.
+
+steelman: hypotheses/steelman/welfare_anglo_transfer_ratchet_private_stagnation_2019_2024.md
+
+linked_hypotheses:
+  - uk_truss_mini_budget_currency_sovereign_mechanism
+  - universal_transfer_programmes_labour_force_participation_decline
+  - state_size_reduces_household_income_growth
+
+notes: >
+  Backing panel: data/derived/anglo_public_private_stagnation_panel.parquet
+  (scripts/build_anglo_public_private_stagnation_panel.py). UK gilt/LDI
+  event coding: Bank of England gilt-market intervention announced
+  2022-09-28 following the 2022-09-23 mini-budget; treated as a marker
+  consistent with the repo's legal-event coding convention.

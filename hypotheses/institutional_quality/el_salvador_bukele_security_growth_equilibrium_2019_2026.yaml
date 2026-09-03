@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: el_salvador_bukele_security_growth_equilibrium_2019_2026
+version: 1
+status: pre_registered
+topic: institutional_quality
+
+claim: >
+  El Salvador's post-2019 security-state equilibrium (mass incarceration
+  campaign and gang crackdown from the March 2022 state of exception)
+  produced a durable growth-security equilibrium rather than a repression
+  tax on the economy: homicides collapse below 10 per 100,000 and stay
+  there, real GDP growth matches or beats the Latin American peer mean,
+  FDI recovers above its 2010-2018 mean, credit depth holds within five
+  points of its pre-era level, remittance dependence does not worsen, and
+  GDP-per-capita growth is nonnegative — at least four of six metrics met
+  through 2024, with none of the reversal markers firing.
+
+evidence_type: canonical_case_multi_metric
+
+sample:
+  countries: [SLV]
+  period: [2019, 2024]
+  temporal_structure: time_series
+  exclusion_rules:
+    - "peer set fixed at MEX GTM HND NIC CRI PAN COL PER; aggregates and world rows excluded"
+    - "2020 pandemic year enters both era means symmetrically (no asymmetric drop)"
+
+scope:
+  period: [2019, 2024]
+  countries: [SLV]
+  outcome_dim: [institutional_quality, gdp_growth, employment_labour]
+  policy_family: [regulation, fiscal_policy]
+  treatment_tags: [bukele_security_state, state_of_exception, mass_incarceration, homicide_collapse, investment_climate]
+
+variables:
+  outcome:
+    - name: homicide_rate_per_100k
+      source: "world_bank_wdi:VC.IHR.PSRC.P5"
+      transformation: "level per 100,000"
+    - name: gdp_real_growth_pct
+      source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+      transformation: "annual percent"
+    - name: fdi_net_inflows_pct_gdp
+      source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+      transformation: "annual percent of GDP"
+    - name: credit_to_private_pct_gdp
+      source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+      transformation: "annual percent of GDP"
+    - name: remittances_pct_gdp
+      source: "world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS"
+      transformation: "annual percent of GDP"
+    - name: gdp_pc_real_growth_pct
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "annual percent"
+  treatment:
+    - name: bukele_regime_post_2019
+      source: "constructed: El Salvador from 2019-06-01; state of exception from 2022-03-27"
+      transformation: "indicator"
+
+intervention_channel: regulatory
+intervention_channel_justification: >
+  The security-state campaign is a regulatory/enforcement-channel
+  intervention that changed the effective rule of law and property-security
+  environment, the proximate determinant of the investment and credit
+  margins measured here.
+
+canonical_metrics:
+  - metric_id: homicide_collapse_durable
+    description: Homicide rate collapses below 10 per 100k and does not rebound.
+    threshold: "homicide_rate_per_100k < 10 in 2022 and every later observed year"
+    window: 2022 to 2024
+    source: "world_bank_wdi:VC.IHR.PSRC.P5"
+    independence_justification: Security outcome; upstream institutional layer distinct from all economic series.
+  - metric_id: growth_matches_peers
+    description: SLV real GDP growth matches or beats the peer mean in the era.
+    threshold: "mean gdp_real_growth_pct (2019-2024) >= peer mean over same years"
+    window: 2019 to 2024
+    source: "world_bank_wdi:NY.GDP.MKTP.KD.ZG"
+    independence_justification: National accounts outcome; different measurement system from crime statistics.
+  - metric_id: fdi_recovers
+    description: FDI inflows recover to at least the pre-era mean.
+    threshold: "mean fdi_net_inflows_pct_gdp (2019-2024) >= mean (2010-2018)"
+    window: 2010 to 2024
+    source: "world_bank_wdi:BX.KLT.DINV.WD.GD.ZS"
+    independence_justification: Cross-border investment flow; distinct from domestic output and credit.
+  - metric_id: credit_depth_holds
+    description: Banking depth does not collapse relative to the pre-era level.
+    threshold: "mean credit_to_private_pct_gdp (2019-2024) >= mean (2010-2018) minus 5 percentage points"
+    window: 2010 to 2024
+    source: "world_bank_wdi:FS.AST.PRVT.GD.ZS"
+    independence_justification: Financial-system depth; distinct from FDI and from output.
+  - metric_id: remittance_dependence_not_worsening
+    description: Remittance dependence does not rise materially.
+    threshold: "mean remittances_pct_gdp (2019-2024) <= mean (2010-2018) + 5 percentage points"
+    window: 2010 to 2024
+    source: "world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS"
+    independence_justification: External income source; tests that growth is not just remittance substitution.
+  - metric_id: pc_growth_nonnegative
+    description: GDP per capita does not stagnate in the era.
+    threshold: "mean gdp_pc_real_growth_pct (2019-2024) >= 0"
+    window: 2019 to 2024
+    source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+    independence_justification: Per-capita living-standard outcome; distinct series from aggregate growth.
+
+multi_metric_falsification:
+  total_metrics: 6
+  support_threshold: 4
+  refute_threshold: 2
+
+prior_confidence: 0.55
+
+disclosure: >
+  The security-first growth claim is contested on civil-liberties and
+  sustainability grounds; prior 0.55 because the growth premium in the data
+  so far rides heavily on the 2021 rebound year and FDI remains volatile.
+  The hypothesis deliberately excludes the fiscal-cost leg (covered by
+  bukele_fiscal_trajectory_tax_cuts_imf_2019_2024) so that the security-growth
+  equilibrium is judged on its own margins.
+
+steelman: hypotheses/steelman/el_salvador_bukele_security_growth_equilibrium_2019_2026.md
+
+linked_hypotheses:
+  - bukele_mass_incarceration_homicide_impact_2019_2024
+  - bukele_fiscal_trajectory_tax_cuts_imf_2019_2024
+  - bukele_fdi_gdp_investment_climate_2019_2024
+  - latam_bukele_imitation_effect_homicide_security_state
+
+notes: >
+  Backing panel: data/derived/el_salvador_bukele_growth_panel.parquet
+  (scripts/build_el_salvador_bukele_growth_panel.py; pinned world_bank_wdi
+  vintages; peer contrast columns included). WDI homicide coverage ends
+  2022; later years rely on the national series queued for the manual
+  BCR drop and stay PENDING until landed.

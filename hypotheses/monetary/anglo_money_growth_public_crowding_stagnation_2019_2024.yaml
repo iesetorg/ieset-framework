@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: anglo_money_growth_public_crowding_stagnation_2019_2024
+version: 1
+status: pre_registered
+topic: monetary
+
+claim: >
+  Across the welfare-state Anglo economies (United Kingdom, Canada,
+  Australia, New Zealand) in 2019-2024, broad money expansion of 20 percent
+  or more cumulatively coincides with real stagnation rather than real
+  growth: countries with money growth in the top of the distribution show
+  lower cumulative GDP-per-capita growth, lower cumulative private
+  consumption growth, and government consumption shares at least one point
+  above their pre-2019 level, while the United States — with comparable
+  money growth — shows the private-consumption and per-capita recovery the
+  welfare-Anglo set lacks. At least three of the four welfare-Anglo
+  countries display the money-growth-without-private-recovery pattern.
+
+evidence_type: associational
+
+sample:
+  countries: [GBR, CAN, AUS, NZL, USA]
+  period: [2019, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - "drop country-years missing the broad money series (money leg is definitional)"
+    - "USA enters as the contrast unit; it is never counted toward the welfare-Anglo pattern count"
+
+scope:
+  period: [2019, 2024]
+  countries: [OECD]
+  outcome_dim: [inflation, monetary_policy, gdp_growth, welfare_state]
+  policy_family: [monetary_policy, fiscal_policy, welfare_architecture]
+  treatment_tags: [broad_money_expansion, public_consumption_crowding, real_income_stagnation, bond_stress]
+
+variables:
+  outcome:
+    - name: gdp_pc_real_growth_pct
+      source: "world_bank_wdi:NY.GDP.PCAP.KD.ZG"
+      transformation: "cumulative sum 2019-2024 (percent-points of growth)"
+    - name: private_consumption_growth_pct
+      source: "world_bank_wdi:NE.CON.PRVT.KD.ZG"
+      transformation: "cumulative sum 2019-2024"
+    - name: gov_consumption_pct_gdp
+      source: "world_bank_wdi:NE.CON.GOVT.ZS"
+      transformation: "2024 (or latest) minus 2019 level, percentage points"
+    - name: gross_savings_pct_gdp
+      source: "world_bank_wdi:NY.GNS.ICTR.ZS"
+      transformation: "era mean change vs 2010-2018 mean"
+  treatment:
+    - name: cumulative_broad_money_growth
+      source: "world_bank_wdi:FM.LBL.BMNY.ZG"
+      transformation: "compound 2019-2024 growth from annual percents"
+  controls:
+    - name: industry_employment_share_pct
+      source: "world_bank_wdi:SL.IND.EMPL.ZS"
+      transformation: "era mean change"
+
+intervention_channel: monetary
+intervention_channel_justification: >
+  QE-era balance-sheet expansion and deficit monetization pressure are the
+  monetary-policy channel; the public-consumption share carries the fiscal
+  crowding leg.
+
+estimator:
+  template: panel_fe
+  fixed_effects: [country]
+  clustering: country
+  notes: >
+    Small-N descriptive panel: rank countries by cumulative money growth;
+    compare cumulative per-capita and private-consumption growth across the
+    money-growth distribution with the USA contrast leg. Event note: the
+    September 2022 UK gilt/LDI crisis (Bank of England intervention,
+    28 Sep 2022) is coded as the bond-stress marker for GBR; no other
+    welfare-Anglo unit had a comparable 2019-2024 bond-stress event.
+
+falsification:
+  rule: >
+    SUPPORTED if at least 3 of 4 welfare-Anglo countries show (money
+    growth >= 20 percent cumulative AND cumulative per-capita growth <=
+    USA minus 2 points AND private consumption growth below USA) while the
+    public-consumption share stays >= 1 point above 2019 in at least 3 of
+    4; REFUTED if fewer than 2 display the joint pattern or if the
+    high-money-growth countries show per-capita growth at or above the USA
+    contrast; PARTIAL otherwise.
+  test: anglo_money_public_crowding_pattern_count
+  threshold: ">= 3 of 4 welfare-Anglo countries meeting the joint pattern for SUPPORTED; <= 1 for REFUTED"
+
+prior_confidence: 0.5
+
+disclosure: >
+  The claim is associational and small-N; it cannot separate money-supply
+  causation from the common shock and policy-response bundle. The prior is
+  deliberately 0.5: the stagnation pattern is visible in the raw series,
+  but five units cannot carry causal weight, and the USA contrast (money
+  growth without stagnation) is exactly the observation that breaks
+  simple monetarist readings. Bond-crisis evidence is one coded event and
+  enters as a marker, not a test.
+
+steelman: hypotheses/steelman/anglo_money_growth_public_crowding_stagnation_2019_2024.md
+
+linked_hypotheses:
+  - uk_truss_mini_budget_currency_sovereign_mechanism
+  - uk_real_wage_stagnation_2008_present_decomposition
+  - qe_asset_inflation_vs_cpi_divergence_post_2008
+
+notes: >
+  Backing panel: data/derived/anglo_public_private_stagnation_panel.parquet
+  (scripts/build_anglo_public_private_stagnation_panel.py; pinned
+  world_bank_wdi vintages; manifest under data/manifests/).
