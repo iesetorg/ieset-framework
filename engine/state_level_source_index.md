@@ -46,7 +46,8 @@ Generated from `data/state_level/source_inventory.yaml` and `data/state_level/in
 | 2 | `gadm_admin1` | global | medium | seed_unverified_url | fallback global admin1 geometry and name/code crosswalk |
 | 3 | `iso_3166_2_subdivisions` | global | high | seed_unverified_url | stable public-facing code namespace for admin1 IDs and crosswalks |
 | 4 | `natural_earth_admin1` | global | low | seed_unverified_url | lightweight global admin1 map and coarse crosswalk fallback |
-| 5 | `usdol_state_minimum_wage_history` | United States | low | production_ready | treatment source and v0 U.S. admin1 spine seed |
+| 5 | `us_census_tiger_state_geographies` | United States | low | seed_verified_official_page | authoritative U.S. FIPS boundary spine and boundary-vintage crosswalk |
+| 5 | `usdol_state_minimum_wage_history` | United States | low | production_ready | minimum-wage treatment source keyed to the U.S. admin1 spine |
 | 6 | `bls_lau_state_labor_force` | United States | low | production_ready | labor-market outcome layer for U.S. state policy panels |
 | 7 | `bls_oews_state_wage` | United States | low | production_ready | wage denominator and wage-distribution outcome layer |
 | 8 | `bls_qcew_state_employment_wages` | United States | low | production_ready | employment, industry, and wage outcomes for state policy tests |
@@ -71,4 +72,3 @@ Generated from `data/state_level/source_inventory.yaml` and `data/state_level/in
 | 27 | `inegi_state_indicators` | Mexico | medium | seed_unverified_url | Mexico state outcome/control layer and municipality bridge |
 | 28 | `india_mospi_state_domestic_product` | India | high | scout_reported_unverified | India state/UT macro outcome layer for reform and federal policy cases |
 | 29 | `china_nbs_provincial_statistics` | China | high | scout_reported_unverified | China provincial macro and housing outcome layer |
-| 30 | `statssa_provincial_data` | South Africa | medium | scout_reported_unverified | South Africa provincial outcome layer and municipal bridge |

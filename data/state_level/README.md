@@ -39,7 +39,7 @@ python3 scripts/build_state_spine_admin1.py
 ```
 
 That v0 is intentionally conservative: it mints U.S. state-equivalent IDs from
-the existing USDOL state minimum-wage vintage, then crosswalks them to
+the Census TIGER/Line state geography vintage, then crosswalks them to
 ISO-3166-2-style IDs, state abbreviations, and FIPS codes. Global ADM1
 expansion should extend the builder with geoBoundaries/GADM/ISO inputs.
 

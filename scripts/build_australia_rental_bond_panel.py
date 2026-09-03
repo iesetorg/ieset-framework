@@ -28,10 +28,12 @@ from typing import Any
 
 import openpyxl
 import pandas as pd
-import requests
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from data.fetchers._http import get as robust_http_get  # noqa: E402
 
 
 def load_fetcher_base():
@@ -141,9 +143,7 @@ def path_arg(value: str | Path) -> Path:
 
 
 def fetch_bytes(url: str, timeout: int = 180) -> bytes:
-    response = requests.get(url, timeout=timeout, headers=HEADERS)
-    response.raise_for_status()
-    return response.content
+    return robust_http_get(url, timeout=timeout, headers=HEADERS).content
 
 
 def parse_int(value: object) -> int | None:

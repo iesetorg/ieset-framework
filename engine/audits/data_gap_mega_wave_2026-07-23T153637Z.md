@@ -1,0 +1,27 @@
+# Data-Gap Mega Wave
+
+- generated_utc: `2026-07-23T153637Z`
+- manifest: ``
+- jobs: 5
+- ok: 0
+- failed: 5
+- rows landed: 0
+
+## Cluster Summary
+
+| cluster | ok | failed | rows |
+| --- | ---: | ---: | ---: |
+| `oecd_macro` | 0 | 2 | 0 |
+| `oecd_pensions` | 0 | 1 | 0 |
+| `oecd_social` | 0 | 2 | 0 |
+
+## Landed
+
+
+## Failed / Still Blocked
+
+- `oecd:DSD_SOCX@DF_SOCX_AGG` - OecdError: OECD returned empty CSV for DSD_SOCX@DF_SOCX_AGG
+- `oecd:DSD_SOCX@DF_SOCX_ALMP` - OecdError: OECD 404 for DSD_SOCX@DF_SOCX_ALMP (resolved='OECD.ELS.SOC,DSD_SOCX@DF_SOCX_ALMP,1.0') key='' — check dataflow id
+- `oecd:DSD_PENSIONS@DF_PENSIONS_REPL_RATE` - OecdError: OECD 404 for DSD_PENSIONS@DF_PENSIONS_REPL_RATE (resolved='OECD.ELS.SAE,DSD_PENSIONS@DF_PENSIONS_REPL_RATE,1.0') key='' — check dataflow id
+- `oecd:HFCE` - OecdError: OECD 404 for HFCE (resolved='OECD.SDD.NAD,DSD_NAMAIN1@DF_HFCE,1.0') key='' — check dataflow id
+- `oecd:GGEXP` - OecdError: OECD 404 for GGEXP (resolved='OECD.SDD.NAD,DSD_NAMAIN1@DF_NAMAIN1_GFS,1.0') key='' — check dataflow id

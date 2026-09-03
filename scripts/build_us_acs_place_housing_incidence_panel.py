@@ -8,13 +8,17 @@ import importlib.util
 import json
 import os
 import re
+import socket
 import sys
 import time
 import unicodedata
+import urllib.error
 import urllib.parse
 import urllib.request
+import zipfile
 from dataclasses import asdict
 from datetime import datetime, timezone
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Callable
 
@@ -40,9 +44,14 @@ utc_now = _FETCHER_BASE.utc_now
 utc_stamp = _FETCHER_BASE.utc_stamp
 
 SOURCE_URL = "https://api.census.gov/data/{year}/acs/acs5"
+BULK_DATA_URL = "https://www2.census.gov/programs-surveys/acs/summary_file/{year}/table-based-SF/data/5YRData/"
+BULK_TABLE_URL = BULK_DATA_URL + "acsdt5y{year}-{table}.dat"
+GAZETTEER_URL = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/{year}_Gazetteer/{year}_Gaz_place_national.zip"
 METHODOLOGY_URL = "https://www.census.gov/data/developers/data-sets/acs-5year.html"
-LICENSE = "U.S. Census Bureau public data; API key required for data calls"
+LICENSE = "U.S. Census Bureau public data; API calls require a key, table-based summary files are public downloads"
 SOURCE_DATASET = "American Community Survey 5-year summary tables, place geography"
+HTTP_TIMEOUT_SECONDS = 300
+HTTP_RETRIES = 3
 
 STATE_ABBR = {
     "01": "AL",
@@ -233,6 +242,48 @@ PILOT_ALIAS_OVERRIDES = {
     ("WASHINGTON", "11"): "WASHINGTON",
 }
 
+US_CITY_STATE_GUARD = {
+    "NEW YORK": {"36"},
+    "LOS ANGELES": {"06"},
+    "MIAMI": {"12"},
+    "CHICAGO": {"17"},
+    "SAN FRANCISCO": {"06"},
+    "HOUSTON": {"48"},
+    "WASHINGTON": {"11"},
+    "PHOENIX": {"04"},
+    "DALLAS": {"48"},
+    "DENVER": {"08"},
+    "LAS VEGAS": {"32"},
+    "PHILADELPHIA": {"42"},
+    "SEATTLE": {"53"},
+    "SAN DIEGO": {"06"},
+    "DETROIT": {"26"},
+    "PORTLAND": {"41"},
+    "MESA": {"04"},
+    "SACRAMENTO": {"06"},
+    "BOSTON": {"25"},
+    "AUSTIN": {"48"},
+    "SAN ANTONIO": {"48"},
+    "ORLANDO": {"12"},
+    "MINNEAPOLIS": {"27"},
+    "SAINT PAUL": {"27"},
+    "BALTIMORE": {"24"},
+    "SALT LAKE": {"49"},
+    "SAINT PETERSBURG": {"12"},
+    "COLUMBUS": {"39"},
+    "MILWAUKEE": {"55"},
+    "NEW ORLEANS": {"22"},
+    "SAINT LOUIS": {"29"},
+    "FRESNO": {"06"},
+    "CLEVELAND": {"39"},
+    "TAMPA": {"12"},
+    "ARLINGTON": {"48"},
+    "BAKERSFIELD": {"06"},
+    "EL PASO": {"48"},
+    "NORFOLK": {"51"},
+    "ATLANTA": {"13"},
+}
+
 
 def rel(path: Path) -> str:
     resolved = path.resolve()
@@ -306,6 +357,9 @@ def build_spine_alias_map(city_spine: pd.DataFrame) -> dict[str, dict[str, Any]]
     for row in us_spine.to_dict("records"):
         canonical_alias = normalise_name(row["city_name"])
         for alias in city_aliases(row["city_name"]):
+            state_guard = US_CITY_STATE_GUARD.get(alias)
+            if not state_guard:
+                continue
             candidates.setdefault(alias, []).append(
                 {
                     "ieset_city_id": row["ieset_city_id"],
@@ -313,6 +367,7 @@ def build_spine_alias_map(city_spine: pd.DataFrame) -> dict[str, dict[str, Any]]
                     "ghsl_city_rank_2025": row["city_rank_2025"],
                     "match_type": "normalized_name" if alias == canonical_alias else "ghsl_alias",
                     "manual_review_required": bool(alias != canonical_alias or "[" in str(row["city_name"])),
+                    "allowed_state_codes": state_guard,
                 }
             )
 
@@ -361,6 +416,96 @@ def fetch_census_state(year: int, state_code: str, variables: list[str], api_key
     return payload
 
 
+def bulk_column_for_variable(variable: str) -> tuple[str, str]:
+    match = re.fullmatch(r"([A-Z]\d{5})_(\d{3})E", variable)
+    if not match:
+        raise ValueError(f"unsupported ACS variable for table-based summary file: {variable}")
+    table, line = match.groups()
+    return table.lower(), f"{table}_E{line}"
+
+
+def read_census_bulk_table(year: int, table: str, variables: list[str]) -> pd.DataFrame:
+    url = BULK_TABLE_URL.format(year=year, table=table.lower())
+    usecols = ["GEO_ID"]
+    rename = {}
+    for variable in variables:
+        _, bulk_column = bulk_column_for_variable(variable)
+        usecols.append(bulk_column)
+        rename[bulk_column] = variable
+
+    req = urllib.request.Request(url, headers={"User-Agent": "IESET city-level ACS bulk builder"})
+    last_error: BaseException | None = None
+    for attempt in range(1, HTTP_RETRIES + 1):
+        frames = []
+        try:
+            print(f"fetching ACS bulk table {year} {table} (attempt {attempt}/{HTTP_RETRIES})", file=sys.stderr)
+            with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as response:
+                chunks = pd.read_csv(response, sep="|", dtype=str, usecols=usecols, chunksize=100_000)
+                for chunk in chunks:
+                    place_rows = chunk["GEO_ID"].astype(str).str.startswith("1600000US", na=False)
+                    if place_rows.any():
+                        frames.append(chunk.loc[place_rows].rename(columns=rename))
+            if not frames:
+                raise ValueError(f"Census ACS bulk table {table} for {year} had no place rows")
+            return pd.concat(frames, ignore_index=True)
+        except (socket.timeout, TimeoutError, urllib.error.URLError) as exc:
+            last_error = exc
+            if attempt == HTTP_RETRIES:
+                break
+            time.sleep(2 * attempt)
+    raise RuntimeError(f"failed to fetch Census ACS bulk table {table} for {year}") from last_error
+
+
+def read_census_gazetteer_places(year: int) -> pd.DataFrame:
+    url = GAZETTEER_URL.format(year=year)
+    req = urllib.request.Request(url, headers={"User-Agent": "IESET city-level ACS bulk builder"})
+    with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECONDS) as response:
+        raw = response.read()
+    with zipfile.ZipFile(BytesIO(raw)) as archive:
+        names = [name for name in archive.namelist() if name.lower().endswith(".txt")]
+        if not names:
+            raise ValueError(f"Census Gazetteer archive for {year} did not contain a text file")
+        with archive.open(names[0]) as handle:
+            frame = pd.read_csv(handle, sep="\t", dtype=str)
+    frame.columns = [column.strip() for column in frame.columns]
+    required = {"GEOID", "NAME", "USPS"}
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"Census Gazetteer {year} missing columns: {sorted(missing)}")
+    out = frame[["GEOID", "NAME", "USPS"]].copy()
+    out["GEOID"] = out["GEOID"].astype(str).str.zfill(7)
+    out["state"] = out["GEOID"].str[:2]
+    out["place"] = out["GEOID"].str[2:]
+    out["state_name"] = out["state"].map(STATE_NAMES)
+    out["NAME"] = out["NAME"].astype(str).str.strip() + ", " + out["state_name"].fillna(out["USPS"])
+    return out[["state", "place", "NAME"]]
+
+
+def fetch_census_bulk_year(year: int, variables: list[str]) -> pd.DataFrame:
+    variables_by_table: dict[str, list[str]] = {}
+    for variable in variables:
+        table, _ = bulk_column_for_variable(variable)
+        variables_by_table.setdefault(table, []).append(variable)
+
+    merged: pd.DataFrame | None = None
+    for table, table_variables in sorted(variables_by_table.items()):
+        table_frame = read_census_bulk_table(year, table, table_variables)
+        merged = table_frame if merged is None else merged.merge(table_frame, on="GEO_ID", how="outer")
+    if merged is None or merged.empty:
+        raise ValueError(f"no ACS table-based summary file rows fetched for {year}")
+
+    geoid = merged["GEO_ID"].astype(str).str.extract(r"1600000US(\d{7})", expand=False)
+    merged["state"] = geoid.str[:2]
+    merged["place"] = geoid.str[2:]
+    names = read_census_gazetteer_places(year)
+    merged = merged.merge(names, on=["state", "place"], how="left")
+    missing_names = int(merged["NAME"].isna().sum())
+    if missing_names:
+        raise ValueError(f"Census Gazetteer did not name {missing_names} ACS place rows for {year}")
+    merged["acs_year"] = int(year)
+    return merged[["NAME", *variables, "state", "place", "acs_year"]]
+
+
 def payload_to_frame(payload: list[list[str]], year: int) -> pd.DataFrame:
     header = payload[0]
     rows = payload[1:]
@@ -381,12 +526,14 @@ def attach_matches(frame: pd.DataFrame, city_spine_path: Path) -> pd.DataFrame:
         place_norm = normalise_name(place_name)
         alias = PILOT_ALIAS_OVERRIDES.get((place_norm, state_code), place_norm)
         match = aliases.get(alias)
+        if match and state_code not in match["allowed_state_codes"]:
+            match = None
         if match:
             match_rows.append(
                 {
                     "state": row["state"],
                     "place": row["place"],
-                    **match,
+                    **{key: value for key, value in match.items() if key != "allowed_state_codes"},
                     "acs_place_name": place_name,
                     "acs_place_name_norm": place_norm,
                     "acs_match_name": alias,
@@ -467,25 +614,41 @@ def build_panel(
     years: list[int],
     states: list[str],
     api_key: str,
+    source_mode: str = "api",
     fetcher: Callable[[int, str, list[str], str], list[list[str]]] = fetch_census_state,
+    bulk_fetcher: Callable[[int, list[str]], pd.DataFrame] = fetch_census_bulk_year,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
-    if not api_key:
-        raise ValueError("Census ACS API key required. Pass --api-key or set CENSUS_API_KEY.")
+    mode = source_mode.lower()
+    if mode not in {"api", "bulk", "auto"}:
+        raise ValueError("source_mode must be one of: api, bulk, auto")
+    if mode == "auto":
+        mode = "api" if api_key else "bulk"
+    if mode == "api" and not api_key:
+        raise ValueError("Census ACS API key required. Pass --api-key or set CENSUS_API_KEY, or use --source-mode bulk.")
 
     frames = []
     query_count = 0
-    for year in years:
-        for state_code in states:
-            payload = fetcher(year, state_code.zfill(2), ACS_VARIABLES, api_key)
-            frames.append(payload_to_frame(payload, year))
-            query_count += 1
-            time.sleep(0.05)
+    bulk_table_files = 0
+    if mode == "api":
+        for year in years:
+            for state_code in states:
+                payload = fetcher(year, state_code.zfill(2), ACS_VARIABLES, api_key)
+                frames.append(payload_to_frame(payload, year))
+                query_count += 1
+                time.sleep(0.05)
+    else:
+        bulk_table_files = len({bulk_column_for_variable(variable)[0] for variable in ACS_VARIABLES}) * len(years)
+        for year in years:
+            frames.append(bulk_fetcher(year, ACS_VARIABLES))
     if not frames:
         raise ValueError("no ACS frames fetched")
 
     raw = pd.concat(frames, ignore_index=True)
     raw["state"] = raw["state"].astype(str).str.zfill(2)
     raw["place"] = raw["place"].astype(str).str.zfill(5)
+    raw = raw[raw["state"].isin({state.zfill(2) for state in states})].copy()
+    if raw.empty:
+        raise ValueError("no ACS place rows remained after state filtering")
     raw["acs_place_geoid"] = raw["state"] + raw["place"]
     raw["state_abbr"] = raw["state"].map(STATE_ABBR)
     raw["state_name"] = raw["state"].map(STATE_NAMES)
@@ -493,7 +656,8 @@ def build_panel(
     panel = derive_metrics(matched)
     panel["country_name"] = "United States"
     panel["source_dataset"] = SOURCE_DATASET
-    panel["source_url"] = panel["acs_year"].map(lambda year: SOURCE_URL.format(year=year))
+    source_url_template = SOURCE_URL if mode == "api" else BULK_DATA_URL
+    panel["source_url"] = panel["acs_year"].map(lambda year: source_url_template.format(year=year))
 
     ordered = [
         "acs_year",
@@ -548,6 +712,10 @@ def build_panel(
         "matched_places": int(panel[["acs_place_geoid", "ieset_city_id"]].drop_duplicates()["ieset_city_id"].notna().sum()),
         "unique_ieset_city_ids": int(panel["ieset_city_id"].nunique(dropna=True)),
         "query_count": query_count,
+        "bulk_table_files": bulk_table_files,
+        "source_mode": "api_keyed" if mode == "api" else "bulk_table_based_summary_file",
+        "api_key_used": bool(api_key and mode == "api"),
+        "source_url": source_url_template,
         "variables": ACS_VARIABLES,
     }
     return panel, stats
@@ -575,7 +743,7 @@ def emit(panel: pd.DataFrame, stats: dict[str, Any], output_path: Path, fetch_ts
     return FetchResult(
         publisher="us_census_acs",
         series_id="us_acs_place_housing_incidence_panel",
-        source_url="https://api.census.gov/data/{year}/acs/acs5",
+        source_url=stats.get("source_url", "https://api.census.gov/data/{year}/acs/acs5"),
         methodology_url=METHODOLOGY_URL,
         license=LICENSE,
         fetch_utc=fetch_ts,
@@ -625,6 +793,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--years", type=parse_years, default=[2024], help="Comma-separated ACS 5-year vintages.")
     parser.add_argument("--states", type=parse_states, default=sorted(STATE_ABBR), help="Comma-separated Census state FIPS or 'all'.")
     parser.add_argument("--api-key", default=os.environ.get("CENSUS_API_KEY"), help="Census API key; defaults to CENSUS_API_KEY.")
+    parser.add_argument(
+        "--source-mode",
+        choices=["auto", "api", "bulk"],
+        default="auto",
+        help="Fetch via keyed Census API, public table-based ACS summary files, or auto-select keyed API when a key is present.",
+    )
     parser.add_argument("--fetch-utc", help="Optional UTC timestamp for deterministic builds/tests.")
     return parser.parse_args(argv)
 
@@ -637,6 +811,7 @@ def main(argv: list[str] | None = None) -> int:
         years=args.years,
         states=args.states,
         api_key=args.api_key or "",
+        source_mode=args.source_mode,
     )
     output_path = path_arg(args.output).resolve()
     result = emit(panel, stats, output_path, fetch_ts)

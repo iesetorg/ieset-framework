@@ -117,8 +117,12 @@ python3 scripts/build_datasf_housing_quality_panel.py --start-year 1997 --end-ye
 U.S. ACS place housing incidence:
 
 ```bash
-CENSUS_API_KEY=<key> python3 scripts/build_us_acs_place_housing_incidence_panel.py --years 2024 --states all
+python3 scripts/build_us_acs_place_housing_incidence_panel.py --years 2024 --states all
 ```
+
+The builder uses the keyed Census ACS API when `CENSUS_API_KEY` or `--api-key`
+is present; otherwise it falls back to official Census table-based ACS summary
+files plus Gazetteer place names.
 
 Catalonia rent contracts:
 
@@ -237,6 +241,7 @@ Generated outputs:
 - `data/manifests/fetch_run_2026-06-29T200000Z_city_policy_test_readiness.yaml`
 - `data/manifests/fetch_run_2026-06-29T220000Z_city_policy_test_readiness.yaml`
 - `data/manifests/fetch_run_2026-06-29T233000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T235000Z_city_policy_test_readiness.yaml`
 - `data/manifests/fetch_run_2026-06-28T160547Z_zillow_city_rent.yaml`
 - `data/manifests/fetch_run_2026-06-28T161430Z_census_bps_city_permits.yaml`
 - `data/manifests/fetch_run_2026-06-28T162430Z_nyc_housing_quality_supply.yaml`
@@ -254,11 +259,8 @@ Generated outputs:
 - `data/manifests/fetch_run_2026-06-29T210000Z_dubai_data_housing.yaml`
 - `data/manifests/fetch_run_2026-06-29T130000Z_colombia_dane_ipc_city_rent.yaml`
 - `data/manifests/fetch_run_2026-06-29T150000Z_catalonia_rent_contracts.yaml`
-
-Expected after a Census API key-backed run:
-
 - `data/derived/us_acs_place_housing_incidence_panel.parquet`
-- `data/manifests/fetch_run_<utc>_us_acs_place_housing_incidence.yaml`
+- `data/manifests/fetch_run_2026-06-29T234500Z_us_acs_place_housing_incidence.yaml`
 
 ## Minimum source record
 

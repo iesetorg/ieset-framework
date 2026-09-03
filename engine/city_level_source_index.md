@@ -4,27 +4,27 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 
 ## Summary
 
-- Sources indexed: 115
-- Ingestion waves: 7
+- Sources indexed: 118
+- Ingestion waves: 8
 - Primary axis: `regulatory.housing_rent_control`
 - Preferred city anchor: `ghsl_urban_centre_database`
-- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 27, "scout_reported_unverified": 58, "seed_unverified_url": 4, "seed_verified_official_page": 25}`
-- Ingestion difficulty: `{"high": 14, "low": 33, "medium": 68}`
-- Top-1000 scalability: `{"high": 11, "low": 59, "medium": 45}`
+- Verification statuses: `{"codebook_verified": 1, "endpoint_verified": 27, "scout_reported_unverified": 58, "seed_unverified_url": 4, "seed_verified_official_page": 28}`
+- Ingestion difficulty: `{"high": 14, "low": 34, "medium": 70}`
+- Top-1000 scalability: `{"high": 11, "low": 60, "medium": 47}`
 
 ## Most Covered Layers
 
 - `first_order_price_or_transfer` (44)
-- `distributional_incidence` (42)
+- `distributional_incidence` (43)
+- `second_order_supply_response` (38)
 - `implementation_capacity` (37)
-- `second_order_supply_response` (37)
-- `quality_margin` (31)
+- `quality_margin` (32)
 - `first_order_policy_effect` (20)
 - `macro_feedback` (14)
 - `dynamic_investment_response` (13)
-- `allocation_distortion` (11)
+- `allocation_distortion` (12)
 - `externality_or_spillover` (5)
-- `leakage_or_substitution` (4)
+- `leakage_or_substitution` (5)
 - `market_structure_response` (2)
 - `fiscal_or_enforcement_cost` (1)
 - `net_welfare` (1)
@@ -40,6 +40,7 @@ Generated from `data/city_level/source_inventory.yaml` and `data/city_level/inge
 | `apac_city_housing_v0` | in_progress | 17 | korea_housing_lease_protection_act_city_panel, japan_city_housing_stock_rent_panel, australia_state_tenancy_law_city_panel, singapore_public_private_rental_split |
 | `africa_mena_city_housing_v0` | in_progress | 21 | dubai_rental_index_case, riyadh_jeddah_rent_indicator_panel, cape_town_zoning_permit_case, south_africa_municipal_housing_service_panel |
 | `local_policy_event_registry_v0` | schema_design_ready | 5 | - |
+| `europe_eviction_quality_supply_v0` | scout_reported_needs_verification | 3 | - |
 
 ## Top Ingestion Candidates
 

@@ -27,7 +27,6 @@ import io
 import re
 import sys
 import unicodedata
-import urllib.request
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,6 +37,9 @@ import pdfplumber
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from data.fetchers._http import get as robust_http_get  # noqa: E402
 
 
 def load_fetcher_base():
@@ -133,9 +135,7 @@ def parse_eur(value: object) -> float | None:
 
 
 def fetch_pdf_bytes(url: str = DEFAULT_TABLE_URL) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=120) as response:
-        return response.read()
+    return robust_http_get(url, timeout=120, headers={"User-Agent": USER_AGENT}).content
 
 
 def assemble_size_class(c2: object, c3: object, c4: object) -> str:

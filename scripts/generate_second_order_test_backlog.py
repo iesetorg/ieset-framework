@@ -46,6 +46,7 @@ POLICY_FAMILY_LAYERS = {
     ],
     "energy_policy": [
         "second_order_supply_response",
+        "externality_or_spillover",
         "quality_margin",
         "fiscal_or_enforcement_cost",
         "distributional_incidence",
@@ -171,6 +172,29 @@ LAYER_DESIGNS = {
     "second_order_supply_response": ["triple_difference", "treated_vs_untreated_units", "dynamic_investment_followup"],
 }
 
+ENVIRONMENTAL_COST_TERMS = (
+    "air quality",
+    "biodiversity",
+    "carbon",
+    "co2",
+    "deforestation",
+    "emission",
+    "emissions",
+    "environmental cost",
+    "externality",
+    "forest",
+    "ghg",
+    "greenhouse",
+    "land use",
+    "land-use",
+    "material footprint",
+    "material throughput",
+    "pm2.5",
+    "pollution",
+    "waste",
+    "water",
+)
+
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text())
@@ -225,6 +249,8 @@ def policy_domains_for_hypothesis(doc: dict[str, Any]) -> set[str]:
         domains.update({"price_control", "administered_price_subsidy", "competition_policy"})
     if "fuel" in text or "electricity" in text or "energy" in text:
         domains.add("energy_policy")
+    if any(term in text for term in ENVIRONMENTAL_COST_TERMS):
+        domains.add("environmental_policy")
     if "tariff" in text or "customs" in text or "trade" in text:
         domains.add("trade_policy")
     if "minimum wage" in text or "employment" in text or "unemployment" in text:
@@ -253,6 +279,9 @@ def inferred_layers_for_hypothesis(doc: dict[str, Any]) -> list[str]:
 
     for family in policy_families(doc):
         layers.update(POLICY_FAMILY_LAYERS.get(family, []))
+
+    if any(term in text for term in ENVIRONMENTAL_COST_TERMS):
+        layers.update(["externality_or_spillover", "distributional_incidence", "net_welfare"])
 
     channel = str(doc.get("intervention_channel") or "").lower()
     if channel == "fiscal":

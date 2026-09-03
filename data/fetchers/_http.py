@@ -65,7 +65,13 @@ def _load_env() -> None:
         load_dotenv()
 
 
-def _zenrows_url(url: str, *, js_render: bool = False, premium_proxy: bool = True) -> str:
+def _zenrows_url(
+    url: str,
+    *,
+    js_render: bool = False,
+    premium_proxy: bool = True,
+    proxy_country: str | None = None,
+) -> str:
     _load_env()
     key = os.environ.get("ZENROWS_API_KEY")
     if not key:
@@ -77,6 +83,8 @@ def _zenrows_url(url: str, *, js_render: bool = False, premium_proxy: bool = Tru
     }
     if js_render:
         params["js_render"] = "true"
+    if proxy_country:
+        params["proxy_country"] = proxy_country
     return "https://api.zenrows.com/v1/?" + urlencode(params)
 
 
@@ -105,6 +113,11 @@ def _looks_blocked(status_code: int, body: bytes) -> bool:
     )
 
 
+def _looks_like_json(body: bytes) -> bool:
+    sample = body.lstrip()[:1]
+    return sample in {b"{", b"["}
+
+
 def get(
     url: str,
     *,
@@ -113,7 +126,9 @@ def get(
     timeout: int = 120,
     allow_zenrows: bool = True,
     zenrows_js_render: bool = False,
+    zenrows_proxy_country: str | None = None,
     return_http_errors: bool = False,
+    expect_json: bool = False,
 ) -> HttpPayload:
     """GET ``url`` with explicit fallbacks for public-but-blocked sources.
 
@@ -129,7 +144,9 @@ def get(
     except Exception as exc:  # noqa: BLE001
         errors.append(f"requests:{type(exc).__name__}:{_err(exc)}")
     else:
-        if not _looks_blocked(r.status_code, r.content):
+        blocked = _looks_blocked(r.status_code, r.content)
+        unexpected_body = expect_json and not _looks_like_json(r.content)
+        if not blocked and not unexpected_body:
             if r.status_code >= 400 and not return_http_errors:
                 r.raise_for_status()
             return HttpPayload(
@@ -139,7 +156,8 @@ def get(
                 transport="requests",
                 content_type=r.headers.get("Content-Type"),
             )
-        errors.append(f"requests:{r.status_code}")
+        reason = "non_json_body" if unexpected_body and not blocked else str(r.status_code)
+        errors.append(f"requests:{reason}")
 
     if cffi_requests is not None:
         try:
@@ -153,7 +171,9 @@ def get(
         except Exception as exc:  # noqa: BLE001
             errors.append(f"curl_cffi:{type(exc).__name__}:{_err(exc)}")
         else:
-            if not _looks_blocked(r.status_code, r.content):
+            blocked = _looks_blocked(r.status_code, r.content)
+            unexpected_body = expect_json and not _looks_like_json(r.content)
+            if not blocked and not unexpected_body:
                 if r.status_code >= 400 and not return_http_errors:
                     r.raise_for_status()
                 return HttpPayload(
@@ -163,19 +183,26 @@ def get(
                     transport="curl_cffi.chrome",
                     content_type=r.headers.get("Content-Type"),
                 )
-            errors.append(f"curl_cffi:{r.status_code}")
+            reason = "non_json_body" if unexpected_body and not blocked else str(r.status_code)
+            errors.append(f"curl_cffi:{reason}")
 
     if allow_zenrows:
         try:
             target = requests.Request("GET", url, params=params).prepare().url or url
             zr = requests.get(
-                _zenrows_url(target, js_render=zenrows_js_render),
+                _zenrows_url(
+                    target,
+                    js_render=zenrows_js_render,
+                    proxy_country=zenrows_proxy_country,
+                ),
                 timeout=max(timeout, 180),
             )
         except Exception as exc:  # noqa: BLE001
             errors.append(f"zenrows:{type(exc).__name__}:{_err(exc)}")
         else:
-            if not _looks_blocked(zr.status_code, zr.content):
+            blocked = _looks_blocked(zr.status_code, zr.content)
+            unexpected_body = expect_json and not _looks_like_json(zr.content)
+            if not blocked and not unexpected_body:
                 if zr.status_code >= 400 and not return_http_errors:
                     errors.append(f"zenrows:{zr.status_code}:{zr.text[:240]}")
                     raise BlockedSourceError(
@@ -188,6 +215,7 @@ def get(
                     transport="zenrows.js" if zenrows_js_render else "zenrows",
                     content_type=zr.headers.get("Content-Type"),
                 )
-            errors.append(f"zenrows:{zr.status_code}")
+            reason = "non_json_body" if unexpected_body and not blocked else str(zr.status_code)
+            errors.append(f"zenrows:{reason}")
 
     raise BlockedSourceError(f"blocked or failed GET for {url}: {', '.join(errors)}")

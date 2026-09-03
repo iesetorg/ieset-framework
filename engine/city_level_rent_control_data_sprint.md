@@ -158,6 +158,7 @@ Start with cases that already appear in IESET hypotheses and positions:
 - `data/manifests/fetch_run_2026-06-29T140000Z_city_policy_test_readiness.yaml`
 - `data/manifests/fetch_run_2026-06-29T160000Z_city_policy_test_readiness.yaml`
 - `data/manifests/fetch_run_2026-06-29T233000Z_city_policy_test_readiness.yaml`
+- `data/manifests/fetch_run_2026-06-29T235000Z_city_policy_test_readiness.yaml`
 - `data/derived/us_city_rent_panel.parquet`
 - `data/derived/us_city_permits_panel.parquet`
 - `data/derived/us_city_rent_control_quality_leakage_panel.parquet`
@@ -182,10 +183,8 @@ Start with cases that already appear in IESET hypotheses and positions:
 - `data/manifests/fetch_run_2026-06-29T130000Z_colombia_dane_ipc_city_rent.yaml`
 - `data/derived/catalonia_rent_contracts_panel.parquet`
 - `data/manifests/fetch_run_2026-06-29T150000Z_catalonia_rent_contracts.yaml`
-
-Expected after keyed ACS fetch:
-
 - `data/derived/us_acs_place_housing_incidence_panel.parquet`
+- `data/manifests/fetch_run_2026-06-29T234500Z_us_acs_place_housing_incidence.yaml`
 
 ## Treatment registry fields
 

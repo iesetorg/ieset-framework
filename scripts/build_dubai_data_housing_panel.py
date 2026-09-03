@@ -15,10 +15,12 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import requests
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from data.fetchers._http import get as robust_http_get  # noqa: E402
 
 
 def load_fetcher_base():
@@ -130,9 +132,14 @@ def dataset_url(dataset_key: str) -> str:
 
 
 def fetch_dataset(dataset_key: str, timeout: int = 120) -> list[dict[str, Any]]:
-    response = requests.get(dataset_url(dataset_key), timeout=timeout, headers={"User-Agent": "IESET city-level data builder"})
-    response.raise_for_status()
-    payload = response.json()
+    response = robust_http_get(
+        dataset_url(dataset_key),
+        timeout=timeout,
+        expect_json=True,
+        zenrows_js_render=True,
+        zenrows_proxy_country="ae",
+    )
+    payload = json.loads(response.text)
     if not payload.get("success"):
         raise ValueError(f"Data Dubai returned unsuccessful payload for {dataset_key}: {payload.get('message')}")
     rows = payload.get("data") or []

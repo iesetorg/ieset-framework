@@ -42,7 +42,7 @@ def test_city_level_index_builds_expected_summary():
     payload = city_index.build_index()
 
     assert payload["summary"]["source_count"] >= 80
-    assert payload["summary"]["wave_count"] == 7
+    assert payload["summary"]["wave_count"] == 8
     assert payload["summary"]["preferred_city_anchor"] == "ghsl_urban_centre_database"
     assert payload["top_ingestion_candidates"][0]["source_id"] == "ghsl_urban_centre_database"
     assert any(wave["wave_id"] == "us_rent_control_pilot_v0" for wave in payload["waves"])

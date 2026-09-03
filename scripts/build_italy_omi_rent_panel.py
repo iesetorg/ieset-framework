@@ -29,10 +29,12 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import requests
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from data.fetchers._http import get as robust_http_get  # noqa: E402
 
 
 def load_fetcher_base():
@@ -165,9 +167,7 @@ def semester_from_filename(file_name: str) -> tuple[str, int, int]:
 
 def fetch_csv_bytes(file_name: str, timeout: int = 180) -> bytes:
     url = f"{RAW_BASE}/{file_name}"
-    response = requests.get(url, timeout=timeout, headers={"User-Agent": "IESET city-level data builder"})
-    response.raise_for_status()
-    return response.content
+    return robust_http_get(url, timeout=timeout).content
 
 
 def read_csv_bytes(file_name: str, input_dir: Path | None) -> bytes:

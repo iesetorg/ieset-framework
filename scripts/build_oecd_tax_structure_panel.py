@@ -35,7 +35,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -47,6 +46,7 @@ from data.fetchers._base import (  # noqa: E402
     write_manifest,
     write_vintage,
 )
+from data.fetchers._http import get as robust_http_get  # noqa: E402
 
 OECD_BASE = "https://sdmx.oecd.org/public/rest/data"
 LICENSE = "OECD standard permissions (attribution required)"
@@ -108,7 +108,7 @@ def pull_csv(flow: str, key: str) -> tuple[pd.DataFrame, str]:
         "startPeriod": START_PERIOD,
         "endPeriod": END_PERIOD,
     }
-    resp = requests.get(url, params=params, timeout=240, headers=HEADERS)
+    resp = robust_http_get(url, params=params, timeout=240, headers=HEADERS)
     if resp.status_code >= 400:
         raise BuildError(
             f"OECD HTTP {resp.status_code} for {flow} key='{key}': {resp.text[:200]}"
