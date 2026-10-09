@@ -41,7 +41,8 @@ def verdict_bucket(text: str) -> str:
     match = VERDICT_RE.search(text)
     if not match:
         return "missing"
-    value = match.group(1).strip().lower()
+    # Result cards may bold the verdict token, e.g. ``**SUPPORTED**``.
+    value = match.group(1).strip().lower().lstrip("*_`")
     if value.startswith("supported_subset"):
         return "supported_subset"
     if value.startswith("inconclusive_data_pending"):

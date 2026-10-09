@@ -18,6 +18,8 @@ def load_script(name: str):
 def test_census_verdict_bucket_normalises_public_tiers():
     census = load_script("report_public_census")
     assert census.verdict_bucket("**Verdict:** SUPPORTED — pass") == "supported"
+    assert census.verdict_bucket("Verdict: **SUPPORTED**. pass") == "supported"
+    assert census.verdict_bucket("Verdict: **PARTIAL**. p=0.16") == "partial"
     assert (
         census.verdict_bucket("Verdict: supported_subset — basket gap")
         == "supported_subset"

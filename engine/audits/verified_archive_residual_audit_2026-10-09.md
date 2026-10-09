@@ -6,7 +6,7 @@ This is a read-only review of the live source specs, runs, and public evidence g
 
 **No additional verified archived hypothesis has a complete, honest conversion under its current frozen specification and the local corpus.** This is a current-evidence finding, not a claim that a later exact rerun with newly available declared data can never succeed.
 
-The live conversion-funnel `--check` passed: 1,930 hypotheses, 396 public visible, 214 verified archived. The 214 split into 155 estimator repair/rerun, 45 data or design rerun, 3 integrity reconcile/rerun, 8 missing result rerun, 2 prospective rule version, and 1 replication path review. These are first-action buckets, not disjoint reasons. Across the 214, the public gate finds 155 estimator-floor failures, 46 non-result verdicts, 31 missing replication paths, 9 missing canonical verdicts, 4 unsharpened rules, and 3 audit quarantines. Each of the 214 has at least one current exclusion.
+The live conversion-funnel `--check` passed: 1,934 hypotheses, 400 public visible, 214 verified archived. The four newly registered 2024–25 Spain and country-panel follow-ups are separate public calibrations; none converts an old archived ID. The 214 split into 155 estimator repair/rerun, 45 data or design rerun, 3 integrity reconcile/rerun, 8 missing result rerun, 2 prospective rule version, and 1 replication path review. These are first-action buckets, not disjoint reasons. Across the 214, the public gate finds 155 estimator-floor failures, 46 non-result verdicts, 31 missing replication paths, 9 missing canonical verdicts, 4 unsharpened rules, and 3 audit quarantines. Each of the 214 has at least one current exclusion.
 
 ## Apparent quick conversions reviewed
 
@@ -40,6 +40,6 @@ The 155 estimator-blocked records include 135 `effectively_zero`, 22 `primary_es
 
 ## Verification scope
 
-- `venv/bin/python scripts/report_hypothesis_conversion_funnel.py --as-of 2026-10-09 --check` passed and reported `396 visible / 1930 hypotheses; 214 verified archived`.
+- `venv/bin/python scripts/report_hypothesis_conversion_funnel.py --as-of 2026-10-09 --check` passed and reported `400 visible / 1934 hypotheses; 214 verified archived`.
 - `venv/bin/python scripts/rerun_preflight_ready_inconclusive.py` was run without `--apply`; it reported 98 blocked, 43 unknown template, 7 missing spec variables, 6 initially ready, and 3 stub rule. It did not change run artifacts.
 - The targeted cases above were compared with their current YAML, diagnostics, result cards, replication paths, frozen source-lock runners where present, and local derived panels. No status, verdict, run, or source spec was changed for this audit.
