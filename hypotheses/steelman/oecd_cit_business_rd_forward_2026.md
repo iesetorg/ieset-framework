@@ -1,0 +1,9 @@
+# Steelman: statutory corporate tax changes and business-performed R&D
+
+A lower combined statutory corporate income tax rate may leave firms more after-tax returns from long-lived R&D projects and attract mobile R&D activity. The frozen question is narrower: does an annual rate reduction predict a higher **two-year forward change** in Eurostat business-performed R&D expenditure as a share of GDP? The claim is an association, not a policy effect.
+
+The treatment is the OECD combined statutory rate, which includes central and subcentral taxes but does not measure effective tax burdens, allowances, R&D credits, or enforcement. The outcome is R&D **performed** in the business-enterprise sector, including activity funded by government or abroad; it is not purely privately financed research. Source definitions: [OECD corporate income tax rates](https://www.oecd.org/en/data/datasets/corporate-income-tax-rates-database.html), [Eurostat R&D metadata](https://ec.europa.eu/eurostat/cache/metadata/EN/rd_simsbe2_mk.htm).
+
+The strongest alternative is that fiscal reform, technology demand, growth, public R&D grants, and GDP movements jointly affect both the tax rate and the R&D/GDP denominator. Country and year effects do not remove time-varying confounding. The five-year tax-change sample and a two-year forward outcome cannot establish that a tax change caused the R&D movement.
+
+The exact sample, 0.02 GDP-share percentage-point per CIT percentage-point meaningful effect, country/year FE, minimum sample and material-rate-change floors, two-sided p <= 0.005, and three-way verdict rule are fixed in the linked specification and family registration before outcome access. Negative, null, positive, missing, and inconclusive results must be retained. There is no school, policy, causal, or featured credit.
