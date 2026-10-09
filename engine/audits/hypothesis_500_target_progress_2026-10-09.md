@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **424 public records** (51 featured, 373 calibration) among 1,958
-hypotheses. That is **52 additional** relative to the 372 starting point and
-**448 short** of the requested increment. No result was made featured by
+ledger has **429 public records** (51 featured, 378 calibration) among 1,963
+hypotheses. That is **57 additional** relative to the 372 starting point and
+**443 short** of the requested increment. No result was made featured by
 loosening its gate.
 
 An earlier four-case new-ID batch illustrates the decision boundary:
@@ -56,6 +56,16 @@ regulatory quality versus poverty and net migration were **PARTIAL** (932/83,
 associations with zero school credit; the tariff result is not a causal claim
 about tariff policy or welfare.
 
+A fifth five-case country-disjoint measured panel batch was also registered
+before values and exactly replayed. Government consumption versus next-year
+private-credit depth (2,460 pairs/125 countries) and resident patent filings
+per million (1,405/82), trade share versus resident patent filings per million
+(1,422/82), WGI regulatory quality versus renewable installed-capacity growth
+per million (3,501/158), and private-credit depth versus real income-per-person
+growth (3,040/144) all returned **PARTIAL** under the fixed five-test
+p<=0.02 family rule. Their source labels, measurement limits, old-country
+exclusions, and zero school credit are frozen in the specs and result cards.
+
 A separate legacy sign audit found 64 current generic-rule panel records and
 57 historical-to-stored inferred-direction changes. The old text parser could
 mistake `p<0.10` for a negative coefficient condition; future runs now fail
@@ -72,8 +82,8 @@ count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
 There are **214 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 638 public
-records, still **234 below** 872. The archive repair review found 131
+unrealistic upper bound of converting every one would yield 643 public
+records, still **229 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
