@@ -1,0 +1,51 @@
+hypothesis_id: alabama_residential_electricity_prices_rising_faster_than_us
+version: 1
+status: pre_registered
+topic: energy
+claim: Alabamians face high and rising electricity prices (attributed to the data-centre build-out).
+claim_direction: +
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 2024
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: al_residential_price
+    source: eia_v2:electricity/retail-sales
+    transformation: AL, RES, cents/kWh, monthly
+  - name: us_residential_price
+    source: eia_v2:electricity/retail-sales
+    transformation: US, RES, cents/kWh, monthly
+  - name: cpi
+    source: fred:CPIAUCSL
+    transformation: y/y
+estimator:
+  template: descriptive
+falsification:
+  rule: gAL, gUS = percent change in mean residential price over the latest 12 months vs the prior 12 months. SUPPORTED if gAL >= gUS AND gAL > CPI inflation over the same window. REFUTED if gAL < gUS AND
+    the AL 12-month mean level is below the US level. PARTIAL otherwise. Data-centre attribution not tested.
+  test: relative_growth
+  threshold: gAL>=gUS & gAL>cpi
+prior_confidence: 0.4
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/alabama_residential_electricity_prices_rising_faster_than_us.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - energy
+  policy_family:
+  - energy_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/DougJones/status/2107196564414636099
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'

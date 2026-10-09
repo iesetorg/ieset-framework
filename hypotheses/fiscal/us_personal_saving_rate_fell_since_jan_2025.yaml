@@ -1,0 +1,50 @@
+hypothesis_id: us_personal_saving_rate_fell_since_jan_2025
+version: 1
+status: pre_registered
+topic: fiscal
+claim: 'Since January 2025 the US personal saving rate has fallen from about 5.7% to about 4.1%, the lowest since 2022, while real wages have been falling: households are drawing down savings to keep up
+  with prices.'
+claim_direction: '-'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 2022
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: personal_saving_rate
+    source: fred:PSAVERT
+    transformation: percent, SAAR, monthly
+  - name: avg_hourly_earnings
+    source: fred:CES0500000003
+    transformation: deflated by fred:CPIAUCSL
+estimator:
+  template: descriptive
+falsification:
+  rule: Let d = PSAVERT(latest) - PSAVERT(2025-01). Let low = PSAVERT(latest) < min(PSAVERT 2023-01..2024-12). Let rw = real AHE (CES0500000003/CPIAUCSL) latest common month vs 6 months earlier. SUPPORTED
+    if d <= -1.0pp AND low AND rw < 0. REFUTED if d >= 0. PARTIAL otherwise. Current vintage as fetched on run date.
+  test: endpoint_change_checklist
+  threshold: d<=-1.0 & latest<min(2023-24) & real_AHE_6m<0
+prior_confidence: 0.6
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/us_personal_saving_rate_fell_since_jan_2025.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - fiscal_policy
+  - trade_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/SteveRattner/status/2107916376459579534
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'

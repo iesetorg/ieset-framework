@@ -1,0 +1,78 @@
+hypothesis_id: germany_eu_industrial_electricity_price_vs_wind_solar_share
+version: 1
+status: pre_registered
+topic: energy
+claim: 'Higher wind+solar shares raise industrial (not wholesale) electricity prices: across EU countries, years with a higher wind+solar share of generation have higher non-household electricity prices,
+  with Germany the headline case.'
+claim_direction: +
+evidence_type: associational
+sample:
+  countries: &id002
+  - AUT
+  - BEL
+  - BGR
+  - HRV
+  - CYP
+  - CZE
+  - DNK
+  - EST
+  - FIN
+  - FRA
+  - DEU
+  - GRC
+  - HUN
+  - IRL
+  - ITA
+  - LVA
+  - LTU
+  - LUX
+  - MLT
+  - NLD
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - ESP
+  - SWE
+  period: &id001
+  - 2008
+  - 2024
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: industrial_electricity_price
+    source: eurostat:nrg_pc_205
+    transformation: EUR/kWh, band MWH2000-19999, excl. VAT and recoverable taxes, annual mean of semesters, log
+  - name: wind_solar_share
+    source: eurostat:nrg_bal_peh
+    transformation: (wind + solar PV + solar thermal) / total gross electricity production, percent
+estimator:
+  template: panel_fe
+falsification:
+  rule: 'OLS log(price) ~ wind_solar_share + country FE + year FE, SE clustered by country, EU27 2008-2024 annual. SUPPORTED (renewables raise industrial prices) if beta > 0 AND p < 0.05. REFUTED if beta
+    < 0 AND p < 0.05. INCONCLUSIVE otherwise. Secondary (reported, not decisive): same model for prices incl. all taxes (I_TAX) and excl. all taxes (X_TAX); Germany-only time series (n~17) descriptive correlation
+    and 2010->2024 change in price vs share.'
+  test: panel_fe_beta_sign
+  threshold: beta>0 & p<0.05
+prior_confidence: 0.45
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/germany_eu_industrial_electricity_price_vs_wind_solar_share.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - energy
+  - industrial_capability
+  policy_family:
+  - energy_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/dlacalle_IA/status/2106401506521907314
+  - https://x.com/s8mb/status/2106485478820028524
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'User-requested test (industrial, not wholesale). dlacalle_IA post has ~108 likes (below the 200-like bar; included on user request); s8mb post is context. Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'

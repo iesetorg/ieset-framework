@@ -1,0 +1,47 @@
+hypothesis_id: germany_vs_switzerland_industrial_production_since_2018
+version: 1
+status: pre_registered
+topic: growth
+claim: 'Swiss industry thrives while German industrial production implodes: since 2018 Swiss manufacturing output has grown while Germany''s has fallen sharply.'
+claim_direction: '?'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - DEU
+  - CHE
+  period: &id001
+  - 2018
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: manufacturing_production_index
+    source: eurostat:sts_inpr_q
+    transformation: NACE C, volume index 2021=100, seasonally and calendar adjusted, quarterly
+estimator:
+  template: descriptive
+falsification:
+  rule: 'Change = mean of latest 4 common quarters vs 2018 mean. SUPPORTED if DEU change <= -8% AND CHE change >= +5%. REFUTED if DEU change >= CHE change. PARTIAL otherwise. Fallback if CHE missing from
+    Eurostat: oecd production index (same rule, disclosed).'
+  test: two_country_change
+  threshold: deu<=-0.08 & che>=0.05
+prior_confidence: 0.7
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/germany_vs_switzerland_industrial_production_since_2018.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - industrial_policy
+  - energy_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/MichaelAArouet/status/2107798442399449514
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'

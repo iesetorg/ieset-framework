@@ -1,0 +1,46 @@
+hypothesis_id: us_real_disposable_income_growth_by_presidential_term
+version: 1
+status: pre_registered
+topic: distribution
+claim: Real after-tax (disposable) household income per person grew about 3.9%/yr in Trump's first term, fell about 1.2%/yr under Biden, and has grown about 3.1%/yr in Trump's second term.
+claim_direction: '?'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 2016
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_dpi_per_capita
+    source: fred:A229RX0
+    transformation: chained 2017 USD, monthly SAAR
+estimator:
+  template: descriptive
+falsification:
+  rule: 'Primary (annual averages, less sensitive to stimulus-month endpoints): T45 = CAGR 2016avg->2020avg; Biden = CAGR 2020avg->2024avg; T47 = growth from 2024avg to mean of latest 12 months, annualised
+    over the gap between period midpoints. SUPPORTED if Biden < 0 AND T45 > Biden AND T47 > Biden AND each of T45, Biden, T47 is within +/-1.0pp of the claimed 3.9, -1.2, 3.1. PARTIAL if T45 > Biden AND
+    T47 > Biden but another condition fails. REFUTED if T47 <= Biden. Secondary (reported, not decisive): point-to-point Jan-to-Jan annualised growth (Jan17->Jan21, Jan21->Jan25, Jan25->latest).'
+  test: term_cagr_comparison
+  threshold: biden<0 & t45>biden & t47>biden & |each-claimed|<=1.0
+prior_confidence: 0.4
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/us_real_disposable_income_growth_by_presidential_term.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - fiscal_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/KanekoaTheGreat/status/2106462742848967105
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'
