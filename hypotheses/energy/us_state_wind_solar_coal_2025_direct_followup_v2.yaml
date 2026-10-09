@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_state_wind_solar_coal_2025_direct_followup_v2
+version: 1
+status: pre_registered
+topic: energy
+claim: >-
+  Among the 39 fixed US states with complete EIA all-sector fuel-generation
+  keys in 2024 and 2025, states with an increase in combined wind and solar
+  generation will usually also have a decline in coal generation in the same
+  interval. This is a descriptive within-state sign comparison.
+claim_direction: "-"
+methodology_note: >-
+  This new-ID follow-up was fixed after seeing the REFUTED result of
+  owid_wind_solar_coal_displacement_2000_2024. The old test used 2000-2024
+  OWID country electricity shares; its result remains REFUTED. The new test
+  uses EIA state all-sector generation in thousand MWh and a 2025 endpoint.
+  The 2024 baseline overlaps the old calendar window, so this is not a wholly
+  out-of-time sample. The EIA state source and its selected 2024-2025
+  generation values were not used in the old run. The fixed state roster was
+  selected from source dimension keys only; no selected generation magnitudes
+  were read before this registration. The source vintage predates registration,
+  so this is pre-analysis registration of a retrospective follow-up, not a
+  prospective collection of future observations. Source manifest and parquet
+  hashes, selectors, roster, and exact verdict thresholds are frozen below.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2024, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      The 39 two-letter states in falsification.threshold.states are the
+      complete analysis roster.
+      Never add, drop, substitute, or weight a state after reading values.
+      Exclude EIA regional and nationwide aggregate locations.
+    - >-
+      Require exactly one selected row for every state, year, and fuel code
+      in {ALL, SUN, WND, NG, COW}, with sectorid=99. All 390 selected cells
+      must be finite. ALL must be strictly positive and each selected fuel
+      category must be nonnegative. If any cell fails, the test is INCONCLUSIVE;
+      do not impute or replace the source.
+    - >-
+      After full-cell validity, qualify a state only if (SUN+WND) in 2025
+      minus (SUN+WND) in 2024 is strictly positive. At least 20 of the fixed
+      39 states must qualify, or the verdict is INCONCLUSIVE. A zero renewable
+      change does not qualify.
+variables:
+  outcome:
+    - name: annual_coal_generation_change_thousand_mwh
+      source: eia_v2:electric-power-operational-data
+      transformation: COW generation in 2025 minus COW generation in 2024
+      notes: >-
+        EIA all-sector annual electricity generation, thousand MWh. The
+        selected COW fuel code is labeled "all coal products" in the pinned
+        parquet's fuelTypeDescription dimension.
+  treatment:
+    - name: annual_wind_plus_solar_generation_change_thousand_mwh
+      source: eia_v2:electric-power-operational-data
+      transformation: (SUN+WND) generation in 2025 minus (SUN+WND) in 2024
+      notes: Strictly positive change is a predeclared qualification rule, not a policy treatment.
+  controls:
+    - name: annual_all_fuels_and_natural_gas_generation
+      source: eia_v2:electric-power-operational-data
+      transformation: ALL and NG endpoint changes, reported as context only
+      notes: These do not enter qualification or verdict.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    For each qualified state, a coal pass is a strictly negative COW endpoint
+    change. The unweighted pass fraction across qualified states is compared
+    to the frozen 60% and 40% bands. No regression, uncertainty interval,
+    source substitution, policy treatment, or causal displacement model is
+    used. ALL and NG changes are secondary context with no verdict effect.
+falsification:
+  test: fixed_39_state_eia_wind_solar_coal_2024_2025_v2
+  rule: >-
+    METHOD_VALID requires the exact manifest and parquet hashes, unchanged
+    first-addition registration, exactly 390 selected keys, valid selected
+    values, and at least 20 qualifying states. SUPPORTED if at least 60% of
+    qualified states have a strictly negative coal-generation change.
+    REFUTED if fewer than 40% do. PARTIAL for every valid fraction from 40%
+    inclusive to 60% exclusive. INCONCLUSIVE if METHOD_VALID fails. A
+    supported sign pattern does not establish that new wind or solar displaced
+    coal, nor does it change the old OWID verdict or earn school-score credit.
+  threshold:
+    old_hypothesis_id: owid_wind_solar_coal_displacement_2000_2024
+    old_result_seen: REFUTED
+    period: [2024, 2025]
+    states: [AK, AZ, CA, CO, CT, DE, IA, ID, IL, IN, KS, MA, MD, ME, MI, MN, MO, MS, MT, NC, NE, NH, NJ, NM, NV, NY, OH, OK, PA, RI, SD, TN, TX, UT, VA, WA, WI, WV, WY]
+    sectorid: '99'
+    fueltypeids: [ALL, SUN, WND, NG, COW]
+    coal_fuel_code_label: all coal products
+    required_selected_keys: 390
+    minimum_positive_wind_solar_change_states: 20
+    coal_decline_pass_change_max_exclusive: 0.0
+    support_pass_fraction_min_inclusive: 0.60
+    refute_pass_fraction_max_exclusive: 0.40
+    source_manifest:
+      path: data/manifests/fetch_run_2026-10-09T122012Z.yaml
+      sha256: 7631d7e49eaf6cf6d2f9296392f9af1b913a2a8996f83337eb3bba9ac67c8274
+    source_parquet:
+      path: data/vintages/eia_v2/electricity_electric-power-operational-data_annual_fueltypeid-ALL-SUN-WND-NG-COW-NUC_sectorid-99@2026-10-09T122006Z.parquet
+      sha256: 010a1293474b6197950230ff6e61ee2683d9c18c47657042686b7c82f21ce8c7
+prior_confidence: 0.50
+disclosure: >-
+  The old OWID country-share result is already known and remains REFUTED.
+  This EIA state-generation follow-up has a 2025 endpoint but a 2024 baseline
+  inside the old calendar window. State MWh signs and country share changes
+  answer different questions. Electricity demand, gas generation, imports,
+  other fuels, weather, storage, and interconnection can produce the same
+  signs without coal displacement by wind or solar. EIA data can be revised.
+  Only the complete source manifest and source dimension keys were examined
+  before the selected generation values; no 2024-2025 selected magnitudes
+  informed thresholds. This test has no causal or school-score credit and
+  must not be represented as repairing or graduating the old hypothesis.
+steelman: hypotheses/steelman/us_state_wind_solar_coal_2025_direct_followup_v2.md
+scope:
+  period: [2024, 2025]
+  countries: [USA]
+  outcome_dim: [energy]
+  policy_family: [none]
+  treatment_tags: [temporal_followup, descriptive_generation]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
