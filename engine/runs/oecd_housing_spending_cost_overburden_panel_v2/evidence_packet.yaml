@@ -1,0 +1,72 @@
+packet_version: 1
+generated_utc: '2026-10-09T20:12:57.585285+00:00'
+hypothesis:
+  id: oecd_housing_spending_cost_overburden_panel_v2
+  path: hypotheses/housing/oecd_housing_spending_cost_overburden_panel_v2.yaml
+  topic: housing
+preregistration:
+  spec_commit: d8176f0a5d2359fc1cb67bf3560addf6691a2fba
+  steelman: hypotheses/steelman/oecd_housing_spending_cost_overburden_panel_v2.md
+  family_id: oecd_programme_matched_outcomes_v2_2026_10_09
+  family_p_max: 0.025
+reproduction:
+  runner: scripts/run_oecd_programme_matched_outcomes_v2.py
+  run_dir: engine/runs/oecd_housing_spending_cost_overburden_panel_v2
+  command: python3 scripts/run_oecd_programme_matched_outcomes_v2.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear the frozen four-test directional rule
+data:
+  inputs:
+  - role: socx
+    source: oecd:DSD_SOCX@DF_SOCX_AGG
+    vintage_file: data/vintages/oecd/DSD_SOCX_DF_SOCX_AGG@2026-05-05T210247Z.parquet
+    sha256: 93e7e29b24dc791baf22833ae5596b4a381a366ddd0d78499bf59f7b80786124
+    source_manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    series_id: DSD_SOCX@DF_SOCX_AGG
+  - role: housing
+    source: oecd:OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0
+    vintage_file: data/vintages/oecd/OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0@2026-07-23T150432Z.parquet
+    sha256: ac7581cb015748d97a21d4feadd08a3afb16cb1d5912af9e0997913ce4db65db
+    source_manifest: data/manifests/fetch_run_2026-07-23T150922Z.yaml
+    series_id: OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0
+  - role: income
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: NY.GDP.PCAP.KD
+  - role: unemployment
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    vintage_file: data/vintages/world_bank_wdi/SL.UEM.TOTL.ZS@2026-05-05T200521Z.parquet
+    sha256: dfb2bae82f8ae7d95de21605e2d8c57f835cc7be4eeb53d58f8362da0b9e41c9
+    source_manifest: data/manifests/fetch_run_2026-05-05T200618Z.yaml
+    series_id: SL.UEM.TOTL.ZS
+  source_slice: data/derived/oecd_programme_matched_outcomes_v2_source_slice.json
+  source_slice_sha256: 8683ec4ea88ad09279bd66c9bd2eb7cb5cbaf659f288ec70f30e4fbd0e03c744
+results:
+  coefficient: 2.4098914842638166
+  std_error: 2.9434068588195728
+  p_value: 0.41898925732421155
+  ci95:
+  - -3.585632089834929
+  - 8.405415058362562
+  n_obs: 276
+  n_countries: 33
+  r_squared: 0.9118376163431973
+  method: country/year FE OLS, country-clustered t inference
+limitations:
+- Measured association only; no causal, programme-effect, or policy-effect inference.
+- The related historical proxy result was visible before this new registration; sample
+  countries can overlap it.
+- Preflight inspected source dimension keys and numeric availability masks, not magnitudes,
+  signs, or estimates.
+- All four tests remain in the family correction even if a member is inconclusive.
+- No school claim or position receives score credit.
+- Housing programme outlays may respond to housing stress; the OECD overburden series
+  is a survey-based share, not a rent or supply measure.
+correction:
+  disposition: descriptive_calibration_only
+  school_score_eligible: false
+  school_score_credit: 0

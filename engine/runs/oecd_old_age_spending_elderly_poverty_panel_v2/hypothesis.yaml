@@ -1,0 +1,222 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_old_age_spending_elderly_poverty_panel_v2
+version: 1
+status: pre_registered
+topic: welfare_architecture
+claim_direction: '-'
+claim: Among the 42 fixed country codes, a higher OECD public old-age-programme spending
+  share of GDP in year t is associated with a lower over-65 relative-poverty rate
+  at exact year t+1, conditional on real income per person, unemployment, and country
+  and year effects.
+methodology_note: New exact-measure descriptive follow-up. The related old same-commit
+  PARTIAL proxy result for public_pension_generosity_elderly_poverty_fiscal_tradeoff
+  was visible before registration but used a different treatment/outcome pair. The
+  fixed 2000-2018 pre-pandemic window, four-test family, exact t+1 join, controls
+  and thresholds were chosen before outcome magnitudes or fits. A feasibility screen
+  read categorical country/year keys and finite/missing masks only; this limits prospective
+  strength. No country holdout against old fits is claimed.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BGR
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period:
+  - 2000
+  - 2018
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the frozen 42 country codes; exclude the OECD aggregate and all other
+    geographic codes.
+  - Treatment years 2000 through 2018 inclusive, with outcome observed at exact calendar
+    year t+1; exclude 2019+ treatment years to avoid pandemic-period outcomes.
+  - Require the specified OECD category, outcome dimensions and status A where provided;
+    no alternate category, age, household, unit, or observation-status substitution.
+  - Use finite complete cases for treatment, outcome, income, and unemployment; require
+    positive income for logging; no interpolation, imputation, nearest-year joins,
+    or replacement sources.
+  - Require at least four paired treatment years per retained country, then at least
+    150 country-years and 20 countries for an estimable verdict.
+variables:
+  treatment:
+  - name: public_old_age_spending_pct_gdp
+    source: oecd:DSD_SOCX@DF_SOCX_AGG
+    transformation: OECD SOCX annual public expenditure source ES10, total spending
+      _T, programme TP11 Old age, unit PT_B1GQ (% GDP), price base _Z, observed status
+      A; level at t.
+  outcome:
+  - name: next_year_elderly_relative_poverty_pct
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: OECD IDD disposable-income relative poverty PR_INC_DISP, age Y_GT65,
+      PL_50 of national median, METH2012 and D_CUR, percent population, observed status
+      A; exact t+1.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive WDI constant-price GDP per person at treatment
+      year t.
+  - name: unemployment_pct_at_t
+    source: world_bank_wdi:SL.UEM.TOTL.ZS
+    transformation: WDI modeled unemployment share of total labor force at treatment
+      year t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One prespecified OLS treatment coefficient per case, country and treatment-year
+    fixed effects, log income and unemployment controls, country-clustered t inference.
+    Fixed complete-case sample; no control dropping, model search, or post-result
+    sign switch.
+falsification:
+  rule: Return INCONCLUSIVE if fewer than 150 complete country-year pairs or 20 countries
+    survive the four-treatment-year-per-country rule, or if the frozen primary country/year
+    fixed-effects estimator or country-clustered t uncertainty is unidentified/nonfinite.
+    Otherwise SUPPORT requires a negative coefficient at two-sided p<=0.025; REFUTATION
+    requires a positive coefficient at the same cutoff. Every other estimable result
+    is PARTIAL. All four registered tests remain in the Bonferroni family even if
+    one is inconclusive.
+  test: oecd_programme_matched_outcomes_v2
+  threshold:
+    family_id: oecd_programme_matched_outcomes_v2_2026_10_09
+    family_size: 4
+    family_alpha: 0.1
+    family_p_max: 0.025
+    expected_sign: '-'
+    min_observations: 150
+    min_countries: 20
+    min_pairs_per_country: 4
+    programme_type: TP11
+    outcome_filter: Y_GT65
+    old_hypothesis_id: public_pension_generosity_elderly_poverty_fiscal_tradeoff
+    old_result_bucket: PARTIAL
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: oecd:DSD_SOCX@DF_SOCX_AGG
+        path: data/vintages/oecd/DSD_SOCX_DF_SOCX_AGG@2026-05-05T210247Z.parquet
+        sha256: 93e7e29b24dc791baf22833ae5596b4a381a366ddd0d78499bf59f7b80786124
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: DSD_SOCX@DF_SOCX_AGG
+      outcome:
+        source: oecd:DSD_IDD@DF_IDD
+        path: data/vintages/oecd/DSD_IDD@2026-05-05T200556Z.parquet
+        sha256: 869fa437691bda1a322f7b5463944ebbbb9066d689d5b76ed3d1a32620beb60e
+        manifest: data/manifests/fetch_run_2026-05-05T200618Z.yaml
+        series_id: DSD_IDD
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+      unemployment:
+        source: world_bank_wdi:SL.UEM.TOTL.ZS
+        path: data/vintages/world_bank_wdi/SL.UEM.TOTL.ZS@2026-05-05T200521Z.parquet
+        sha256: dfb2bae82f8ae7d95de21605e2d8c57f835cc7be4eeb53d58f8362da0b9e41c9
+        manifest: data/manifests/fetch_run_2026-05-05T200618Z.yaml
+        series_id: SL.UEM.TOTL.ZS
+prior_confidence: 0.4
+disclosure: Old-age spending includes services and pensions; it does not measure individual
+  benefit generosity or long-run fiscal sustainability. This test is a narrow measured
+  association, not a causal intervention estimate or a validation of the old broader
+  claim. The old result and its countries/time are not independent holdouts; no school,
+  position, or policy score credit is sought. The prior availability screen inspected
+  finite masks without outcome magnitudes, signs, or estimates.
+steelman: hypotheses/steelman/oecd_old_age_spending_elderly_poverty_panel_v2.md
+scope:
+  period:
+  - 2000
+  - 2019
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - BGR
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
