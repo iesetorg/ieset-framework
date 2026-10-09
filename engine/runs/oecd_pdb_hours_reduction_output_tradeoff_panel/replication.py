@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from promote_oecd_pdb_batch03_2026_05_12 import run_one
+from promote_oecd_pdb_batch03_2026_05_12 import reproduce_one
 
 if __name__ == '__main__':
-    print(run_one('oecd_pdb_hours_reduction_output_tradeoff_panel'))
+    print(reproduce_one('oecd_pdb_hours_reduction_output_tradeoff_panel'))

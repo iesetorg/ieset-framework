@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import sys
 import textwrap
 from dataclasses import dataclass
@@ -178,8 +179,9 @@ def latest(pattern: str, base: Path) -> Path | None:
     return files[-1] if files else None
 
 
-def load_pdb() -> tuple[pd.DataFrame, Path]:
-    p = latest("DSD_PDB@*.parquet", ROOT / "data" / "vintages" / "oecd")
+def load_pdb(p: Path | None = None) -> tuple[pd.DataFrame, Path]:
+    if p is None:
+        p = latest("DSD_PDB@*.parquet", ROOT / "data" / "vintages" / "oecd")
     if p is None:
         p = latest("OECD.SDD.TPS_DSD_PDB_DF_PDB_2.0@*.parquet", ROOT / "data" / "vintages" / "oecd")
     if p is None:
@@ -250,8 +252,9 @@ def load_panel(pdb: pd.DataFrame) -> pd.DataFrame:
     return panel
 
 
-def load_pmr_cross_section(panel: pd.DataFrame) -> tuple[pd.DataFrame, Path | None]:
-    p = latest("OECD.ECO.GCRD_DSD_PMR_DF_PMR_1.2@*.parquet", ROOT / "data" / "vintages" / "oecd_pmr")
+def load_pmr_cross_section(panel: pd.DataFrame, p: Path | None = None) -> tuple[pd.DataFrame, Path | None]:
+    if p is None:
+        p = latest("OECD.ECO.GCRD_DSD_PMR_DF_PMR_1.2@*.parquet", ROOT / "data" / "vintages" / "oecd_pmr")
     if p is None:
         p = latest("PMR@*.parquet", ROOT / "data" / "vintages" / "oecd_pmr")
     if p is None:
@@ -441,8 +444,8 @@ def write_run(spec: ReadySpec, result: dict, pdb_path: Path, pmr_path: Path | No
         "from pathlib import Path\nimport sys\n"
         "ROOT = Path(__file__).resolve().parents[3]\n"
         "sys.path.insert(0, str(ROOT / 'scripts'))\n"
-        "from promote_oecd_pdb_batch03_2026_05_12 import run_one\n\n"
-        f"if __name__ == '__main__':\n    print(run_one('{spec.run_id}'))\n",
+        "from promote_oecd_pdb_batch03_2026_05_12 import reproduce_one\n\n"
+        f"if __name__ == '__main__':\n    print(reproduce_one('{spec.run_id}'))\n",
         encoding="utf-8",
     )
     coef_text = "\n".join(
@@ -476,6 +479,76 @@ def run_one(run_id: str) -> dict:
     result = fit(spec, panel, pmr_panel)
     write_run(spec, result, pdb_path, pmr_path)
     return result
+
+
+def reproduce_one(run_id: str) -> dict:
+    """Verify a historical run against its pinned vintages without editing it.
+
+    The original batch runner uses the newest local vintage and writes the
+    version-1 hypothesis.  That is useful for creating a run, but unsafe as a
+    historical replication path once newer vintages have landed.
+    """
+    spec = {s.run_id: s for s in READY_SPECS}[run_id]
+    run_dir = RUNS / run_id
+    manifest = yaml.safe_load((run_dir / "manifest.yaml").read_text(encoding="utf-8"))
+    stored = json.loads((run_dir / "diagnostics.json").read_text(encoding="utf-8"))
+    hypothesis = yaml.safe_load((HYP / f"{run_id}.yaml").read_text(encoding="utf-8"))
+    rule = str(hypothesis.get("falsification", {}).get("rule") or "")
+    if (
+        manifest.get("hypothesis_id") != run_id
+        or hypothesis.get("hypothesis_id") != run_id
+        or hypothesis.get("version") != 1
+        or spec.formula not in rule
+        or f"expected sign: {spec.expected_sign}" not in rule
+        or manifest.get("formula") != spec.formula
+        or manifest.get("verdict_label") != stored.get("status")
+    ):
+        raise ValueError(f"{run_id}: frozen specification, manifest, or verdict disagrees")
+
+    vintages = manifest.get("vintages")
+    if not isinstance(vintages, list) or len(vintages) != (2 if spec.data_filter == "cross_section_pmr" else 1):
+        raise ValueError(f"{run_id}: unexpected pinned vintage set")
+    pinned: dict[str, Path] = {}
+    vintage_root = (ROOT / "data" / "vintages").resolve()
+    for entry in vintages:
+        publisher = entry.get("publisher")
+        if publisher in pinned or publisher not in {"oecd", "oecd_pmr"}:
+            raise ValueError(f"{run_id}: unexpected vintage publisher")
+        path = (ROOT / str(entry.get("file") or "")).resolve()
+        try:
+            path.relative_to(vintage_root)
+        except ValueError as exc:
+            raise ValueError(f"{run_id}: vintage escapes data/vintages") from exc
+        if not path.is_file() or sha256(path) != entry.get("sha256"):
+            raise ValueError(f"{run_id}: pinned vintage hash mismatch: {path}")
+        pinned[publisher] = path
+    if "oecd" not in pinned or (spec.data_filter == "cross_section_pmr") != ("oecd_pmr" in pinned):
+        raise ValueError(f"{run_id}: pinned vintage roles disagree with specification")
+
+    pdb, _ = load_pdb(pinned["oecd"])
+    panel = load_panel(pdb)
+    pmr_panel = pd.DataFrame()
+    if "oecd_pmr" in pinned:
+        pmr_panel, _ = load_pmr_cross_section(panel, pinned["oecd_pmr"])
+    reproduced = fit(spec, panel, pmr_panel)
+    for key in ("status", "n_obs", "n_countries", "formula", "sample_min_year", "sample_max_year"):
+        if reproduced.get(key) != stored.get(key):
+            raise ValueError(f"{run_id}: replicated {key} differs from stored result")
+    if stored.get("verdict") not in (None, reproduced["status"]):
+        raise ValueError(f"{run_id}: canonical verdict disagrees with reproduced result")
+    for key in ("r2",):
+        if not math.isclose(reproduced[key], stored[key], rel_tol=1e-9, abs_tol=1e-9):
+            raise ValueError(f"{run_id}: replicated {key} differs from stored result")
+    if reproduced["coefficients"].keys() != stored.get("coefficients", {}).keys():
+        raise ValueError(f"{run_id}: replicated coefficient terms differ from stored result")
+    for term, values in reproduced["coefficients"].items():
+        for key, value in values.items():
+            previous = stored["coefficients"][term].get(key)
+            if not isinstance(previous, (float, int)) or not math.isclose(
+                value, previous, rel_tol=1e-9, abs_tol=1e-9
+            ):
+                raise ValueError(f"{run_id}: replicated {term}.{key} differs from stored result")
+    return reproduced
 
 
 def write_audit(results: list[dict], pdb_path: Path, pmr_path: Path | None) -> None:
