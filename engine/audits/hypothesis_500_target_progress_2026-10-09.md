@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **440 public records** (51 featured, 389 calibration) among 1,974
-hypotheses. That is **68 additional** relative to the 372 starting point and
-**432 short** of the requested increment. No result was made featured by
+ledger has **444 public records** (51 featured, 393 calibration) among 1,979
+hypotheses. That is **72 additional** relative to the 372 starting point and
+**428 short** of the requested increment. No result was made featured by
 loosening its gate.
 
 An earlier four-case new-ID batch illustrates the decision boundary:
@@ -79,11 +79,38 @@ coefficient +0.254676, p=3.07e-12). Both measures are GDP ratios, so this is
 a narrow descriptive association, not a tax-policy or welfare effect. The
 entire family is calibration only with zero school-score credit.
 
+Four further direct or country-disjoint tests were registered before values,
+run, and replayed. The EIA state electricity-generation test was **REFUTED**:
+5 of 37 qualifying states with rising wind/solar generation had a lower coal
+output on the frozen annual comparison, below its registered success floor. The
+national BLS food-services/manufacturing payroll comparison was **PARTIAL**:
+its +0.898499 percentage-point gap remained inside the fixed +/-1 point band.
+The BIS nominal effective-exchange-rate/trade-share to next-year CPI panel was
+**PARTIAL** (428 country-years, 20 countries; coefficient -0.84706,
+p=0.01808 above the frozen 0.01 cutoff). All are measured calibration only,
+with no causal, school, or policy-score credit. Their source vintages, meanings,
+limits, and replay results are in the source-pinned specs and result cards.
+
+The Peru-US 2009 treaty trade-flow design was **INCONCLUSIVE** because its
+fixed-donor pretrend gap was 0.031993, exceeding the preregistered 0.03 cap.
+Its policy record now links that test explicitly and excludes eight unrelated
+automatic axis-overlap links; the browser and evidence indexes show zero tested
+hypotheses and no treaty-effect credit. A separate fossil-subsidy/high-tech
+export-share follow-up passed its fixed 247-pair/22-country sample floor and
+returned **PARTIAL** (coefficient +0.074796, p=0.790246 against the frozen
+negative 0.01 rule). Its first execution stopped before fitting because of a
+nullable-year data-type error. The failed attempt was committed untouched;
+a separately committed, byte-pinned erratum cast the same year keys to int64,
+then the unchanged model was run and replayed. Both attempts remain inspectable.
+This result is country-disjoint from the old fit but shares the World Bank/WITS
+export measurement family, so it is not independent source replication. It is
+calibration only with zero school or policy-score credit.
+
 A separate Argentina core-CPI follow-up was registered and run locally, but
 its full pinned fetch manifest contained unrelated local home paths. The
 public-integrity gate rejected that source packet. Its spec, source, runner,
 and result were removed from this review tree and **are not counted** in the
-440 public records. The original local run remains available for a separate
+444 public records. The original local run remains available for a separate
 administrative-redaction audit; post-result redaction cannot be presented as
 an untouched prospective registration. No causal or school-score credit was
 assigned. The local Git history still contains the rejected manifest in
@@ -105,9 +132,9 @@ second-order, and link audits were refreshed after the combined results. The
 count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
-There are **214 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 654 public
-records, still **218 below** 872. The archive repair review found 131
+There are **215 verified archived** records in the current funnel. Even the
+unrealistic upper bound of converting every one would yield 659 public
+records, still **213 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
@@ -116,12 +143,21 @@ individually specified, source-custodied strict registrations and successful
 replays; current evidence does not justify claiming it has happened.
 
 A current frozen-repair audit found **no immediately runnable** same-ID case
-among the 214 verified archives. A separate metadata-only screen of the 820
+among the 215 verified archives. A separate metadata-only screen of the 820
 legacy cases beyond the first 500 review rows found 67 distinct source-pair
 groups as an upper bound for design review, including the five earlier
 measured holdouts and the ten new follow-ups run in this sprint. Pair
 membership creates no credit; the remaining groups still need claim-specific
-source, holdout, and method checks. Alias-aware review also rejected apparent
+source, holdout, and method checks. A wider metadata-only screen of all 1,320
+legacy same-commit rows found at most 84 distinct, unregistered source-pair
+groups passing a basic panel eligibility screen. Fifty-two still carry proxy
+warnings, 17 use constructed or trend treatments, and only eight are simple
+measured pairs without those or Fraser/Heritage flags. The 372 Heritage
+cross-section rows reuse just 16 outcome-source pairs. These are design-review
+ceilings, not conversions. Even converting all 215 archives and all 84 groups
+would add only 299, leaving 129 of the requested 428 additions; in reality
+neither full conversion is justified. A future batch must deduplicate semantic
+aliases and use one family-wide multiplicity budget before reading outcomes. Alias-aware review also rejected apparent
 new groups already represented by strict registrations, and sign-history
 review rejected several legacy verdicts as design inputs.
 
