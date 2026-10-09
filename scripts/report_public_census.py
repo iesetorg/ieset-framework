@@ -24,8 +24,10 @@ VERDICT_RE = re.compile(
 
 
 def tracked_paths() -> list[str]:
+    # Count committed blobs, not intent-to-add paths in a developer's index.
+    # Otherwise a local census can pass --check while a clean checkout fails.
     output = subprocess.run(
-        ["git", "ls-files", "-z"],
+        ["git", "ls-tree", "-r", "-z", "--name-only", "HEAD"],
         cwd=ROOT,
         capture_output=True,
         check=True,
