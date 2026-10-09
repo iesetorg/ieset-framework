@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_business_entry_rule_of_law_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim: >
+  Among countries omitted from the original 60-country business-entry study,
+  higher formal business-entry intensity predicts stronger three-year forward
+  real GDP-per-capita growth when rule of law is stronger. The positive
+  business-entry by rule-of-law interaction should replicate in a disjoint
+  country sample using the same 2006-2019 treatment years and fixed thresholds.
+methodology_note: >
+  This is a new-ID geographic holdout of
+  wdi_business_entry_rule_of_law_growth_panel, whose old positive result is
+  known to the analyst but whose spec and first run entered git together. The
+  60 old study countries are excluded before fitting. The old result is not
+  counted as a strict preregistration or independent confirmation. This follow-up
+  keeps the original interaction and effect-size thresholds; it also requires
+  literal calendar years t+1, t+2, and t+3 for the forward outcome, avoiding
+  a shift-over-missing-years ambiguity in the old runner. No held-out
+  coefficient was inspected before this registration.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [2006, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - >
+      Exclude the original study's complete 60-country set: ALB ARG AUS AUT
+      BEL BGD BRA CAN CHE CHL CHN COL CZE DEU DNK EGY ESP EST ETH FIN FRA GBR
+      GHA GRC HUN IDN IND IRL ISR ITA JPN KAZ KEN KOR LTU LVA MAR MEX MYS
+      NGA NLD NOR NZL PAK PER PHL POL PRT ROU RUS SGP SVK SVN SWE THA TUR
+      UKR USA VNM ZAF. No country can enter both the old and holdout samples.
+    - >
+      Use only ISO3 country codes and treatment years 2006-2019. Require
+      nonmissing annual business registrations, population, WGI rule of law,
+      and current-year real GDP-per-capita growth, plus growth in each exact
+      calendar year t+1, t+2, and t+3. Require population > 0 and business
+      registrations >= 0. Drop no country based on its outcome level or sign.
+variables:
+  outcome:
+    - name: fwd_gdp_pc_growth_3y_avg
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: Arithmetic mean of growth in exact calendar years t+1, t+2, t+3.
+  treatment:
+    - name: log_business_entry_per_million
+      source: world_bank_wdi:IC.BUS.NREG; world_bank_wdi:SP.POP.TOTL
+      transformation: log(1 + registrations / population * 1000000).
+    - name: rule_of_law
+      source: wgi:RuleOfLaw
+      transformation: WGI point estimate; interact with log business entry.
+  controls:
+    - name: gdp_pc_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD.ZG
+      transformation: Same-year real GDP-per-capita growth.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    OLS of forward three-year average growth on log entry intensity, WGI rule
+    of law, their interaction, and same-year GDP-per-capita growth, with country
+    and calendar-year fixed effects and country-clustered standard errors.
+    Primary coefficient is the interaction. No covariate or country selection
+    follows inspection of held-out coefficients.
+falsification:
+  rule: >
+    Coverage must reach at least 700 country-years and 50 distinct countries;
+    otherwise the run is INCONCLUSIVE. SUPPORT requires an interaction
+    coefficient of at least +0.25 GDP-growth points per log-entry-by-one-unit
+    rule-of-law change, a two-sided clustered p-value no greater than 0.10,
+    and a model-implied entry-slope gap of at least +0.40 points between the
+    sample rule-of-law 75th and 25th percentiles. REFUTATION requires an
+    interaction no greater than -0.25 with p no greater than 0.10 and a
+    model-implied gap no greater than -0.40. Every other estimable outcome is
+    PARTIAL. Nonfinite uncertainty or failed estimation is INCONCLUSIVE.
+  test: geographic_holdout_business_entry_rule_of_law_interaction
+  threshold:
+    interaction_support_min: 0.25
+    interaction_refute_max: -0.25
+    interaction_p_max: 0.10
+    marginal_support_min: 0.40
+    marginal_refute_max: -0.40
+    min_observations: 700
+    min_countries: 50
+prior_confidence: 0.60
+disclosure: >
+  The original 60-country study reported a positive interaction, so this
+  follow-up has a higher prior than a blind first test. Formal business
+  registrations may reflect filing reforms, tax rules, or administrative
+  activity rather than productive entrepreneurship; rule of law and growth
+  can both reflect omitted institutions. Only a disjoint-sample association is
+  tested. A supported result does not establish causal growth effects.
+steelman: hypotheses/steelman/wdi_business_entry_rule_of_law_geographic_holdout_v2.md
+scope:
+  period: [2006, 2019]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, institutional_quality]
+  policy_family: [institutional_reform]
+  treatment_tags: [wdi_business_entry, rule_of_law, geographic_holdout]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
