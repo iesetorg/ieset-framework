@@ -4,8 +4,8 @@ Joined policy, hypothesis, run-verdict, and position-claim evidence for the poli
 
 ## Summary
 
-- Policies indexed: 3358
-- no_hypothesis_link: 103
+- Policies indexed: 3369
+- no_hypothesis_link: 114
 - tested: 3255
 
 ## Highest-Coverage Policies

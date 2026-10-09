@@ -4,15 +4,15 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 
 ## Summary
 
-- Policies indexed: 3175
-- Policies with explicit evaluation_design: 6
-- Policies with exact event or enacted dates: 1967
+- Policies indexed: 3369
+- Policies with explicit evaluation_design: 10
+- Policies with exact event or enacted dates: 2049
 - Policies ready for comparative event design: 4
 - Policies ready for triple-difference structure: 1
-- Timing status counts: `{"enacted_date_only": 1964, "event_dated": 3, "event_month_dated": 2, "year_period_only": 1206}`
-- Comparison structure counts: `{"axis_only_no_unit_split": 3169, "declared_treated_comparison_design": 6}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 6, "needs_exact_event_dates": 1208, "needs_treated_and_comparison_unit_coding": 3169}`
-- Axis source readiness: `{"partial_ready": 35929, "proprietary_gap": 6350, "ready": 3165, "reconstruct_needed": 15028, "scrape_needed": 7312}`
+- Timing status counts: `{"enacted_date_only": 2043, "event_dated": 6, "event_month_dated": 3, "year_period_only": 1317}`
+- Comparison structure counts: `{"axis_only_no_unit_split": 3363, "declared_treated_comparison_design": 6}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 7, "needs_comparison_unit_detail": 4, "needs_exact_event_dates": 1320, "needs_treated_and_comparison_unit_coding": 3359}`
+- Axis source readiness: `{"partial_ready": 44914, "proprietary_gap": 6738, "ready": 3359, "reconstruct_needed": 19152, "scrape_needed": 14172}`
 
 ## Ready Design Seeds
 
@@ -30,7 +30,9 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `argentina_fuel_subsidies_2003_2015` | candidate | fiscal.spending_level, fiscal.transfer_expansion, monetary.central_bank_independence, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `be_energy_crisis_response_1974_1976` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `be_sauts_dindex_1982_1984` | candidate | monetary.monetary_expansion_direction, regulatory.labour_market_flexibility | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `cmr_fuel_subsidy_price_adjustments_2023_2024` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.price_control_intensity | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `cn_austerity_rectification_1988_1991` | candidate | monetary.monetary_expansion_direction, regulatory.financial_deregulation, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `cog_fuel_price_adjustment_2023_2024` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.price_control_intensity | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `cz_energy_price_cap_2025` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `ec_borja_gradualist_stabilisation_1988_1992` | candidate | monetary.monetary_expansion_direction, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `egypt_ersap_1991` | candidate | fiscal.tax_corporate, fiscal.tax_progressivity, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -45,7 +47,11 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `israel_bank_of_israel_no_printing_law_1985` | candidate | fiscal.spending_level, monetary.central_bank_independence, monetary.monetary_expansion_direction, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `israel_stabilisation_plan_1985` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, monetary.central_bank_independence, monetary.monetary_expansion_direction | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `israel_wage_price_freeze_1985` | candidate | fiscal.spending_level, monetary.central_bank_independence, monetary.monetary_expansion_direction, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `lv_energy_price_support_law_2022` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.price_control_intensity | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `mdg_automatic_fuel_price_adjustment_2024` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.price_control_intensity | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `mexico_pacto_de_solidaridad` | candidate | institutional.property_rights, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `mt_private_residential_leases_act_2020` | candidate | institutional.property_rights, institutional.rule_of_law, regulatory.housing_rent_control | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `mwi_automatic_fuel_pricing_mechanism_2012` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.price_control_intensity | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `nicaragua_1988_stabilisation` | candidate | fiscal.spending_level, fiscal.transfer_expansion, institutional.property_rights, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `nl_housing_market_deregulation_2024` | candidate | regulatory.environmental_stringency, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `no_kleppe_packages_counter_cyclical_1975_1978` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -134,6 +140,9 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `bangladesh_new_industrial_policy_1982` | candidate | fiscal.sectoral_subsidy, fiscal.transfer_expansion, regulatory.labour_market_flexibility, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bd_imf_ecf_continuation_2024` | candidate | fiscal.sectoral_subsidy, monetary.central_bank_independence, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bd_rmg_minimum_wage_2013_2018` | candidate | regulatory.labour_market_flexibility | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bdi_imf_ecf_fx_fiscal_reforms_2023` | candidate | fiscal.spending_level, institutional.rule_of_law, monetary.central_bank_independence | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bdi_mining_code_revision_2023` | candidate | fiscal.tax_corporate, institutional.property_rights, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bdi_vision_2040_2060_2023` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `be_coal_mine_closures_1985_1992` | candidate | fiscal.sectoral_subsidy, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `be_copernic_administrative_reform_2000` | candidate | fiscal.spending_level, fiscal.tax_corporate, fiscal.tax_progressivity, regulatory.immigration_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `be_nuclear_phaseout_law_2003` | candidate | fiscal.spending_level, fiscal.tax_corporate, fiscal.tax_progressivity, regulatory.immigration_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -148,9 +157,13 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `belgium_nuclear_phaseout_law_2003` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `belgium_nuclear_repeal_2025` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `belgium_tihange1_extension_2015` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bfa_mining_code_resource_sovereignty_2024` | candidate | fiscal.spending_level, institutional.property_rights, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bfa_patriotic_support_fund_2023` | candidate | fiscal.spending_level, fiscal.tax_progressivity, institutional.rule_of_law | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bg_agricultural_collectivisation_1946_1958` | candidate | fiscal.sectoral_subsidy, institutional.property_rights, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bg_anticorruption_commission_reform_2023` | candidate | institutional.judicial_independence, institutional.rule_of_law | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bg_nationalisation_law_1947` | candidate | institutional.property_rights, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bg_soviet_style_planning_1947_1989` | candidate | fiscal.transfer_expansion, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `bg_whistleblower_protection_act_2023` | candidate | institutional.judicial_independence, institutional.rule_of_law, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bj_arch_social_protection_rollout_2019` | candidate | fiscal.transfer_expansion, institutional.rule_of_law | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bj_glo_djigbe_industrial_zone_2020` | candidate | fiscal.sectoral_subsidy, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `bj_party_system_electoral_reforms_2018_2019` | candidate | institutional.judicial_independence, institutional.rule_of_law | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -214,16 +227,3 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `canada_cusfta_1988` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_dental_pharmacare_ndp_agreement_2023_2024` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_gst_1991` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `canada_immigration_levels_plan_2015_present` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `canada_nafta_accession_1994` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `canada_privatisations_1988_1995` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `canada_program_review_1995` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `cd_gecamines_resource_state_1967` | candidate | fiscal.spending_level, institutional.property_rights, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `cd_monetary_fiscal_instability_1970s_1990s` | candidate | institutional.rule_of_law, monetary.central_bank_independence, monetary.monetary_expansion_direction | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `cd_zairianisation_1973` | candidate | institutional.property_rights, institutional.rule_of_law, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `ch_federal_council_zauberformel_formation_1959` | candidate | institutional.rule_of_law | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `ch_kvg_health_insurance_act_1994` | candidate | regulatory.product_market_competition, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `chile_afp_1981` | candidate | fiscal.tax_capital, fiscal.transfer_expansion, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `chile_banking_liberalisation_1977` | candidate | institutional.rule_of_law, regulatory.financial_deregulation, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `chile_fx_opening_1976` | candidate | institutional.rule_of_law, regulatory.financial_deregulation, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `chile_pension_reform_proposed_2024` | candidate | fiscal.tax_capital, fiscal.transfer_expansion, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
