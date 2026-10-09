@@ -46,3 +46,32 @@ def test_fiscal_fallback_and_regulatory_quality_remain_separate():
     assert built["countries"]["BBB"]["market_institutions"]["relation_to_first_coded_year"] == "later_only"
     assert built["countries"]["CCC"]["fiscal"]["observed_year"] == 2001
     assert built["countries"]["CCC"]["fiscal"]["metric_id"] == "government_final_consumption_pct_gdp"
+
+
+def test_new_country_without_a_pinned_extraction_is_explicitly_unavailable():
+    drift = {"countries": {"AAA": {"first_coded_year": 2000}, "TLS": {"first_coded_year": 2002}}}
+    extraction = {
+        "schema": "ieset-country-drift-observation-extraction-v1",
+        "pinned_sources": {
+            key: {
+                "vintage_file": spec["path"],
+                "vintage_sha256": spec["sha256"],
+                "source_url": spec["source_url"],
+            }
+            for key, spec in CONTEXT.SOURCES.items()
+        },
+        "countries": {
+            "AAA": {
+                "first_coded_year": 2000,
+                "sources": {key: None for key in CONTEXT.SOURCES},
+            }
+        },
+    }
+
+    rows = CONTEXT.rows_from_extraction(extraction, drift)
+    built = CONTEXT.build_context(drift, rows)
+
+    assert built["countries"]["TLS"]["fiscal"] is None
+    assert "lacks a source row" in built["countries"]["TLS"]["fiscal_note"]
+    assert built["countries"]["TLS"]["market_institutions"] is None
+    assert "lacks a source row" in built["countries"]["TLS"]["market_institutions_note"]

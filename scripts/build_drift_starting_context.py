@@ -182,7 +182,12 @@ def rows_from_extraction(extraction: dict, drift: dict) -> dict[str, dict]:
         iso3: country["first_coded_year"]
         for iso3, country in extraction.get("countries", {}).items()
     }
-    if current_years != extraction_years:
+    unexpected = set(extraction_years) - set(current_years)
+    changed = {
+        iso3 for iso3 in set(extraction_years) & set(current_years)
+        if extraction_years[iso3] != current_years[iso3]
+    }
+    if unexpected or changed:
         raise ValueError("first coded years changed; refresh the source extraction")
     rows: dict[str, dict[str, list[tuple[int, float]]]] = {key: {} for key in SOURCES}
     for iso3, country in extraction["countries"].items():
@@ -223,8 +228,18 @@ def build_context(drift: dict, source_rows: dict[str, dict]) -> dict:
         countries[iso3] = {
             "first_coded_year": first_year,
             "fiscal": public_observation(fiscal_spec, fiscal_selected),
+            "fiscal_note": (
+                "The pinned extraction lacks a source row for this country; refresh from the full source vintage when available."
+                if iso3 not in source_rows["expense"] and iso3 not in source_rows["consumption"]
+                else ""
+            ),
             "market_institutions": public_observation(SOURCES["wgi_regulatory_quality"], market),
-            "market_institutions_note": "No observation in the pinned World Bank Regulatory Quality series." if market is None else "",
+            "market_institutions_note": (
+                "The pinned extraction lacks a source row for this country; refresh from the full source vintage when available."
+                if market is None and iso3 not in source_rows["wgi_regulatory_quality"]
+                else "No observation in the pinned World Bank Regulatory Quality series."
+                if market is None else ""
+            ),
             "market_institutions_source_url": SOURCES["wgi_regulatory_quality"]["source_url"],
             "historical_context": USA_1862_CONTEXT if iso3 == "USA" and first_year == 1862 else None,
         }
