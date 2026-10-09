@@ -1,0 +1,64 @@
+packet_version: 1
+generated_utc: '2026-10-09T11:52:29+00:00'
+hypothesis:
+  id: heritage_government_integrity_private_consumption_pc_wgi_panel_geographic_holdout_v2
+  path: hypotheses/growth/heritage_government_integrity_private_consumption_pc_wgi_panel_geographic_holdout_v2.yaml
+  topic: growth
+preregistration:
+  spec_commit: d6e7fa171aa1b951e46bcd4d061cc0ce21e40668
+  steelman: hypotheses/steelman/heritage_government_integrity_private_consumption_pc_wgi_panel_geographic_holdout_v2.md
+  gate:
+    min_observations: 1000
+    min_countries: 50
+    family_p_max: 0.014285714285714287
+reproduction:
+  runner: scripts/run_heritage_wgi_geographic_holdouts_v2.py
+  run_dir: engine/runs/heritage_government_integrity_private_consumption_pc_wgi_panel_geographic_holdout_v2
+  command: python3 scripts/run_heritage_wgi_geographic_holdouts_v2.py --run heritage_government_integrity_private_consumption_pc_wgi_panel_geographic_holdout_v2
+    --force
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear the seven-test family threshold
+data:
+  inputs:
+  - role: private_consumption_pc
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+    sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+  - role: control_corruption_wgi
+    source: wgi:CC.EST
+    vintage_file: data/vintages/wgi/CC.EST@2026-04-30T114239Z.parquet
+    sha256: 192e9da5c623e2894758bd6cc3fa69f49485edbc06e2150f894bf95666d9d79e
+  - role: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+    sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+  - role: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    vintage_file: data/vintages/world_bank_wdi/SP.POP.GROW@2026-05-05T194839Z.parquet
+    sha256: 5a185bf4e21062c792856bca9176b6dfc9d6a70c6eca22736904ce14e6d10964
+  - role: trade_openness_control
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+  - role: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.GOVT.ZS@2026-05-05T194701Z.parquet
+    sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+  old_country_overlap: 0
+results:
+  coefficient: 22.888514887550926
+  std_error: 356.4251201037302
+  p_value: 0.9487975240594105
+  ci95:
+  - -675.6918837011234
+  - 721.4689134762253
+  n_obs: 2425
+  n_countries: 117
+  r_squared: 0.9716842879010662
+  method: OLS country/year FE with country-clustered standard errors
+limitations:
+- Associational geographic holdout; it does not identify a causal policy effect.
+- The old 53-country PARTIAL result was known at registration.
+- The seven holdout tests share sources and countries; results are correlated.
