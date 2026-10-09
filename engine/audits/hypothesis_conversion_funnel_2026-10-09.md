@@ -2,8 +2,8 @@
 
 This is a local source-and-run audit, not a graduation decision. A previous scoreboard claim-link total is not a count of independently graduated hypotheses.
 
-- Hypotheses: **2,007**
-- Public visible: **462** (51 featured; 411 calibration)
+- Hypotheses: **2,012**
+- Public visible: **467** (51 featured; 416 calibration)
 - Archived with verified registration: **225**
 
 | First action | Records |

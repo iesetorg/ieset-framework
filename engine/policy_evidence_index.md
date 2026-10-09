@@ -4,9 +4,9 @@ This index joins policies to linked hypotheses. Only curated links with a live p
 
 ## Summary
 
-- Policies indexed: 3368
-- archive_only: 2968
-- no_hypothesis_link: 126
+- Policies indexed: 3372
+- archive_only: 2957
+- no_hypothesis_link: 141
 - related_public_only: 266
 - tested: 8
 

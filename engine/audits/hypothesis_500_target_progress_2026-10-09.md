@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **462 public records** (51 featured, 411 calibration) among 2,007
-hypotheses. That is **90 additional** relative to the 372 starting point and
-**410 short** of the requested increment. Here public includes calibration;
+ledger has **467 public records** (51 featured, 416 calibration) among 2,012
+hypotheses. That is **95 additional** relative to the 372 starting point and
+**405 short** of the requested increment. Here public includes calibration;
 featured remains 51, so the featured-only increment is zero. No result was
 made featured by loosening its gate.
 
@@ -175,7 +175,7 @@ by relabeling.
 
 There are **225 verified archived** records in the current funnel, including
 the new inconclusive Vietnam WTO flow case. Even the unrealistic upper bound
-of converting every one would yield 687 public records, still **185 below**
+of converting every one would yield 692 public records, still **180 below**
 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
@@ -283,6 +283,20 @@ cross-check found that its version-specific archive label file supports the
 existing builder's category mapping, despite contradictory prose documentation;
 no result depends on that RTA count and no source value was changed.
 
+Five further measured hypotheses used three additional preregistration,
+source-lock, and result commit sequences, each followed by an exact independent
+replay. Two asked about WIPO patents, OECD manufacturing productivity, and
+WDI high-tech exports; two paired OECD manufacturing unit labour costs and
+Eurostat foreign-country/stateless arrivals with separate export-share and
+income-inequality outcomes; one paired Eurostat business R&D intensity with
+the future employment rate of tertiary-educated adults. All five passed
+sample and estimator floors but returned **PARTIAL** under their frozen
+family or single-test thresholds. The immigration variable is citizenship
+based, not foreign-born; the Gini outcome has a survey/income reference lag.
+All five are descriptive public calibration with no causal, policy-effect,
+featured, or school-score credit. The registration audit now finds 692 strict
+pairs, 1,320 legacy same-commit pairs, and no unpaired specs.
+
 The drift map now uses the full authored 1846–2026 movement span and 145
 country series. Its national totals exclude California's subnational movement
 and five EU-wide programmes whose member applicability is not yet coded.
@@ -294,11 +308,21 @@ overlaps were also corrected; the duplicated US Inflation Reduction Act policy
 was consolidated under one dated record. The EU-wide source movements remain
 in the corpus and atlas; a separate drift layer needs a member, date, and
 overlap rule before those steps can enter national comparisons. These map
-and policy repairs do not confer empirical support on linked hypotheses. Three
-source-verified Swiss candidate records were added for the 1992 EEA vote,
+and policy repairs do not confer empirical support on linked hypotheses. A
+second source-reviewed wave corrected overlapping or backdated steps in
+Canada, China, Czechia, Ecuador, El Salvador, France, Germany, India,
+Ireland, the Netherlands, New Zealand, the UAE, the UK, and Vietnam. National
+umbrella and successor records no longer duplicate the reviewed policy
+decisions; uncertain credit rescues, political tax commitments, savings-fund
+asset transfers, and unsupported omnibus tax claims retain contextual records
+without scored drift. A mechanical overlap screen still has unresolved
+candidates, so the displayed historical totals remain reviewable estimates,
+not a claim that every national attribution has been exhaustively adjudicated.
+Three source-verified Swiss candidate records were added for the 1992 EEA vote,
 the 2001/2003 debt brake, and the 2011–2015 SNB euro floor; the policy registry
-now has 3,368 records and 50 permitted candidate forward references. Dodd-Frank,
-ARRA, and USMCA policy axes and dates were also narrowed to source-supported
+now has 3,372 records and 47 permitted candidate forward references after
+three source-checked Czech records and one El Salvador budget record.
+Dodd-Frank, ARRA, and USMCA policy axes and dates were also narrowed to source-supported
 provisions. The three Swiss date-only candidates have no coded axis movement;
 the policy quality audit flags them as thin rather than inferring effects.
 
@@ -307,14 +331,16 @@ up to three distinct nonoverlapping-period associations, but the large ignored
 FAO parquet files lack tracked source-vintage pins and the annual-looking PoU
 and FIES data are regional aggregates. They were not registered or counted.
 
-Final source validation accepted 6,132 specs with 50 permitted candidate
+Final source validation accepted 6,141 specs with 47 permitted candidate
 forward references; link reciprocity had zero errors/warnings, scope validation
 zero errors and seven existing warnings, drift artifact freshness passed, and
-the local web build rendered 8,333 static pages. Standard pytest collection
-now resolves IESET's own scripts after adding a package marker. The full
+the local web build rendered 8,347 static pages. Standard pytest collection
+now resolves IESET's own scripts after adding a package marker. An earlier full
 isolated-checkout run had 475 passed, 48 skipped, and 17 failures in older test
 areas; several expect an absent checkout virtualenv, ignored raw vintages, or
 release assets. Those failures need separate investigation and fixture/artifact
-restoration before a full-green claim; focused drift and detector tests passed.
+restoration before a full-green claim. All 30 focused drift and attribution
+tests passed after the current wave; the full suite has not been re-run on
+this snapshot.
 
 No push, merge, or deployment is part of this status.
