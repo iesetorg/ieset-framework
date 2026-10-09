@@ -1,0 +1,7 @@
+# Steelman — australia_korea_kafta_bilateral_exports_2014
+
+Korea-Australia Free Trade Agreement (KAFTA) entered into force on 2014-12-12 according to [Australia's responsible trade authority](https://www.dfat.gov.au/trade/agreements/in-force/kafta/korea-australia-fta). Preferential market access can raise the directed AUS→KOR merchandise flow, but exporters may anticipate the agreement and implementation can be gradual. An export change need not be caused by the treaty.
+
+The fixed comparator origins (RUS, BRA, ARG, ZAF, SAU, MEX) export to KOR without a CEPII-recorded FTA in this exact nine-year grid. They offer a same-destination demand benchmark, yet differ from Australia in product mix, distance, exchange rates and commodity exposure. Korean import demand and commodity-price cycles; Korea also had other trade agreements during the period. Nominal BACI amounts mix prices with quantities.
+
+The earlier five-case BACI screen included AUS→CHN ChAFTA, which was INCONCLUSIVE because its pretrend gate failed. The older ChAFTA WDI country-level case was PARTIAL. Both were known before this registration. This is the separate Korea-Australia Free Trade Agreement (KAFTA) legal event and directed endpoint, but shares the Australian exporter, source and nearby calendar years. It is a correlated descriptive calibration, not independent replication of a treaty effect. A failed source or pretrend gate is INCONCLUSIVE. No school, policy or causal credit follows, even if the directional gate passes.

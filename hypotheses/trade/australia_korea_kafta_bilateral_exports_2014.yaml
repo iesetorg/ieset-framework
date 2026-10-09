@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: australia_korea_kafta_bilateral_exports_2014
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: After Korea-Australia Free Trade Agreement (KAFTA) became effective on 2014-12-12, AUS-origin merchandise
+  exports to KOR grew at least 15 percent more in log terms between the four fixed pre years and four
+  fixed post years than the median change in fixed same-destination donor origins, conditional on an aligned
+  pretrend. This is a descriptive directed-flow claim, not a causal treaty effect.
+evidence_type: descriptive
+methodology_note: 'This two-case follow-up was chosen after the separate five-case BACI screen: the AUS>CHN
+  ChAFTA direct-flow test was INCONCLUSIVE on its pretrend gate, and the older country-level ChAFTA WDI
+  test was PARTIAL. These known results do not count as evidence for this distinct Korea-Australia Free
+  Trade Agreement (KAFTA) endpoint. Both cases share AUS as origin, source vintage, nearby years, and
+  a policy bundle record, so they are correlated descriptive tests and not independent replication. Korean
+  import demand and commodity-price cycles; Korea also had other trade agreements during the period. No
+  causal, featured, school or policy-score credit is available; any source/pretrend failure remains INCONCLUSIVE.
+  This registration freezes directed dyad, same-destination donors, exact ZIP hash, complete row keys,
+  fixed four-year windows, pretrend gate and contrast threshold before any selected flow magnitude is
+  read.'
+sample:
+  countries:
+  - AUS
+  - KOR
+  - RUS
+  - BRA
+  - ARG
+  - ZAF
+  - SAU
+  - MEX
+  period:
+  - 2010
+  - 2018
+  temporal_structure: panel
+  exclusion_rules:
+  - Only directed AUS>KOR and donor origins RUS, BRA, ARG, ZAF, SAU, MEX to KOR; no reverse direction
+    or donor substitution.
+  - Pre 2010-2013; post 2015-2018; event year 2014 excluded from means but required as an intact source
+    cell.
+  - Require one unique existing-country source row, finite nonnegative BACI flow and exact frozen FTA-status
+    schedule for every dyad-year.
+  - No interpolation, winsorisation, source replacement, post hoc endpoint or comparator changes.
+variables:
+  outcome:
+  - name: directed_aus_goods_exports_to_kor
+    source: cepii:Gravity_V202211.tradeflow_baci
+    transformation: natural log of 1 plus nominal thousands of current US dollars
+    notes: Direct BACI merchandise flow; no real-volume, tariff-intensity, sectoral, welfare or causal
+      interpretation.
+  treatment:
+  - name: australia_korea_kafta_bilateral_exports_2014_agreement_status
+    source: cepii:Gravity_V202211.fta_wto
+    transformation: AUS>KOR off in pre 2010-2013, 0 in event year 2014, on in post 2015-2018; all fixed
+      donor dyads off throughout the nine-year grid
+    notes: Status cross-check against official effective date 2014-12-12; agreement status is not tariff
+      intensity.
+intervention_channel: regulatory
+intervention_channel_justification: The treaty changes a bilateral trade-policy regime; the measured endpoint
+  is a flow.
+estimator:
+  template: descriptive
+  event_year: 2014
+  clustering: none
+  notes: 'For every origin to KOR, calculate mean log1p(BACI) in 2015-2018 less the mean in 2010-2013.
+    Primary contrast: AUS change minus median of RUS, BRA, ARG, ZAF, SAU, MEX donor changes. Pretrend:
+    absolute difference between treated OLS pre-year log-flow slope and median fixed-donor OLS slope at
+    most 0.03 log units/year. No p-value or causal interpretation.'
+falsification:
+  test: australia_korea_kafta_bilateral_exports_2014_fixed_destination_baci_prepost
+  rule: First require byte-pinned official source and immutable first-addition registration followed by
+    a separate committed source slice. Missing/duplicate key, country-existence, FTA-status, finite-nonnegative-flow,
+    or pretrend failure yields INCONCLUSIVE. With gates passed, SUPPORTED if primary log contrast >= ln(1.15),
+    REFUTED if <= -ln(1.15), PARTIAL otherwise. The two cases are one closed family; no p-value, causal,
+    school or policy-score credit follows.
+  threshold: absolute pretrend slope gap <=0.03 log units/year; directional contrast thresholds +/-ln(1.15);
+    family size 2
+prior_confidence: 0.5
+disclosure: 'This two-case follow-up was chosen after the separate five-case BACI screen: the AUS>CHN
+  ChAFTA direct-flow test was INCONCLUSIVE on its pretrend gate, and the older country-level ChAFTA WDI
+  test was PARTIAL. These known results do not count as evidence for this distinct Korea-Australia Free
+  Trade Agreement (KAFTA) endpoint. Both cases share AUS as origin, source vintage, nearby years, and
+  a policy bundle record, so they are correlated descriptive tests and not independent replication. Korean
+  import demand and commodity-price cycles; Korea also had other trade agreements during the period. No
+  causal, featured, school or policy-score credit is available; any source/pretrend failure remains INCONCLUSIVE.'
+scope:
+  period:
+  - 2010
+  - 2018
+  countries:
+  - AUS
+  - KOR
+  outcome_dim:
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  treatment_tags:
+  - australia_korea_kafta_bilateral_exports_2014
+  - australia_north_asia_ftas_2014_2015
+steelman: hypotheses/steelman/australia_korea_kafta_bilateral_exports_2014.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Policy bundle au_kafta_jaepa_chafta_ftas_2014_2015 contains distinct Korea-Australia Free Trade
+  Agreement (KAFTA) effective date 2014-12-12; official source https://www.dfat.gov.au/trade/agreements/in-force/kafta/korea-australia-fta.
+  Source and extraction contract: engine/audits/fta_baci_two_north_asia_event_family_2026_source_plan.md.
+  No reverse-flow, sector, window, or donor variants count as separate hypotheses.'
