@@ -1,0 +1,95 @@
+packet_version: 1
+generated_utc: '2026-10-09T18:00:18+00:00'
+hypothesis:
+  id: remittance_share_male_prime_age_lfp_country_holdout_v2
+  path: hypotheses/growth/remittance_share_male_prime_age_lfp_country_holdout_v2.yaml
+  topic: growth
+preregistration:
+  spec_commit: 3b5ae40d3554ea4d61835c35efb174229263c2e0
+  steelman: hypotheses/steelman/remittance_share_male_prime_age_lfp_country_holdout_v2.md
+  family_id: simple_measured_legacy_pair_screen_2026_10_09
+  family_size: 8
+  family_p_max: 0.00625
+reproduction:
+  runner: scripts/run_remittance_share_male_prime_age_lfp_country_holdout_v2.py
+  run_dir: engine/runs/remittance_share_male_prime_age_lfp_country_holdout_v2
+  command: python3 scripts/run_remittance_share_male_prime_age_lfp_country_holdout_v2.py
+    --check
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: registered directional or precision rule did not resolve the claim
+data:
+  inputs:
+  - role: remittances
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    path: data/vintages/world_bank_wdi/BX.TRF.PWKR.DT.GD.ZS@2026-04-30T114721Z.parquet
+    sha256: 9139bffa26cd6f78bf8a963400e703398b9d59919bb92ab0b2ec2b7e04885b1d
+    manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    publisher: world_bank_wdi
+    series_id: BX.TRF.PWKR.DT.GD.ZS
+    indicator_id: BX.TRF.PWKR.DT.GD.ZS
+    source_url: https://api.worldbank.org/v2/country/all/indicator/BX.TRF.PWKR.DT.GD.ZS?format=json
+  - role: lfp
+    source: ilostat:EAP_2WAP_SEX_AGE_RT_A
+    path: data/vintages/ilostat/EAP_2WAP_SEX_AGE_RT_A@2026-07-23T152621Z.parquet
+    sha256: 17e1ed07bf963364d866304ff6384dbbfb8bc06d5ba30b42a474098c2c54e395
+    manifest: data/manifests/fetch_run_2026-07-23T152624Z.yaml
+    manifest_sha256: 367fc796f8738908e3be217054f798e7684d29acee3d7304107136aecd05cdb6
+    publisher: ilostat
+    series_id: EAP_2WAP_SEX_AGE_RT_A
+    physical_indicator: EAP_2WAP_SEX_AGE_RT
+    source_url: https://rplumber.ilo.org/data/indicator/?id=EAP_2WAP_SEX_AGE_RT_A&format=.csv
+  - role: gdp_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    path: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+    sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.PP.KD
+    indicator_id: NY.GDP.PCAP.PP.KD
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+  - role: fertility
+    source: world_bank_wdi:SP.DYN.TFRT.IN
+    path: data/vintages/world_bank_wdi/SP.DYN.TFRT.IN@2026-04-30T130516Z.parquet
+    sha256: ff1eb90d4033e42ca63bb0de72c27f21044e55b69e44568d65321dd81cd8cfd1
+    manifest: data/manifests/fetch_run_2026-04-30T130536Z.yaml
+    manifest_sha256: ab56887949d3a51f3e3001ac1065c62538af1db4d4a722e39e29a774447f511b
+    publisher: world_bank_wdi
+    series_id: SP.DYN.TFRT.IN
+    indicator_id: SP.DYN.TFRT.IN
+    source_url: https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json
+  old_country_overlap: 0
+  outcome_measurement: ILO modelled estimates
+results:
+  coefficient: -0.08658940294359675
+  std_error: 0.05377451802434702
+  p_value: 0.10949269639135333
+  ci_family:
+  - -0.23577732595389161
+  - 0.0625985200666981
+  n_obs: 3220
+  n_countries: 148
+  r_squared: 0.9395523980406539
+  method: country/year FE OLS; country-clustered t(147) inference
+limitations:
+- The archived old PARTIAL fit averaged ILO sex/age rows; it is not a male 25-54 endpoint
+  result.
+- This outcome is an ILO modelled estimate, not direct survey evidence; blank and
+  R status codes are counted but not interpreted.
+- ILO modelling may use World Bank/IMF macro inputs, so the modelled outcome is not
+  independent of WDI predictors or controls.
+- Reverse causation, GDP-ratio denominator changes, migration selection and country-specific
+  trends remain.
+- A lagged level with country/year effects is descriptive and does not identify a
+  policy or mechanism.
+- The eight-slot cutoff does not cure selection and multiple testing across the full
+  IESET archive.
+- No school, welfare, causal, or policy-score credit.
+correction:
+  disposition: descriptive_calibration_only
+  school_score_eligible: false
+  school_score_credit: 0
+  causal_credit: 0

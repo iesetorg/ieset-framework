@@ -1,0 +1,205 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: remittance_share_male_prime_age_lfp_country_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: '-'
+claim: >-
+  Across the fixed 148 country/economy holdouts outside the old 13-area fit,
+  a higher World Bank personal-remittances-received share of GDP in year t
+  predicts a lower ILO-modelled male age-25-to-54 labour-force participation
+  rate in exact year t+1, conditional on real PPP GDP per capita and total
+  fertility at t and country/economy and treatment-year effects.
+methodology_note: >-
+  This is a new-ID, country-disjoint endpoint repair and descriptive follow-up
+  to demo_remittance_corridor_dependency. The archived old result is PARTIAL
+  (312 observations, 13 countries, coefficient +0.079581, p=0.380169), but
+  its generic runner averaged all ILO sex/age rows into country-years; the
+  saved coefficient was not a male-25-to-54 estimate and is not adopted as
+  evidence for that endpoint. The physical ILO `_A` annual file stores
+  indicator EAP_2WAP_SEX_AGE_RT; this test selects exactly SEX_M and
+  AGE_AGGREGATE_Y25-54. ILO classifies the series as modelled estimates,
+  not direct survey observations. The old 13 fitted areas are excluded.
+  Selection inspected source keys, categorical metadata, and Arrow value
+  null masks only; no held-out magnitude, sign, or fit was inspected. The
+  sole primary outcome is the t+1 level through 2023; there is no alternate
+  credited outcome. This test consumes one of eight fixed simple-pair
+  screening slots at family two-sided alpha 0.05/8 = 0.00625, which does
+  not repair multiplicity in the wider IESET archive. No school or causal
+  credit.
+evidence_type: associational
+sample:
+  countries: &heldout
+    [AFG, AGO, ALB, ARG, ARM, AUS, AUT, AZE, BDI, BEL, BEN, BFA, BGR, BIH,
+     BLR, BLZ, BOL, BRA, BRB, BTN, BWA, CAN, CHE, CHL, CHN, CIV, CMR, COD,
+     COG, COL, COM, CPV, CRI, CYP, CZE, DEU, DJI, DNK, DOM, DZA, ECU, ESP,
+     EST, ETH, FIN, FJI, FRA, GAB, GBR, GEO, GHA, GIN, GMB, GNB, GRC, GUY,
+     HKG, HRV, HTI, HUN, IDN, IRL, IRQ, ISL, ISR, ITA, JOR, JPN, KAZ, KEN,
+     KGZ, KHM, KOR, KWT, LAO, LBN, LBR, LCA, LSO, LTU, LUX, LVA, MAC, MDA,
+     MDG, MDV, MKD, MLI, MLT, MMR, MNE, MNG, MOZ, MUS, MWI, MYS, NAM, NER,
+     NGA, NIC, NLD, NOR, NZL, OMN, PAN, PER, PNG, POL, PRT, PRY, PSE, QAT,
+     ROU, RUS, RWA, SAU, SDN, SEN, SLB, SLE, SRB, STP, SUR, SVK, SVN, SWE,
+     SWZ, SYR, TGO, THA, TJK, TLS, TON, TTO, TUN, TUR, TZA, UGA, UKR, URY,
+     USA, UZB, VCT, VUT, WSM, ZAF, ZMB, ZWE]
+  period: [2000, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Exclude all 13 old fitted countries: BGD EGY GTM HND IND JAM LKA MAR
+      MEX NPL PAK PHL SLV. Use only the exact 148-area roster; no replacement
+      countries, regional aggregates, or dynamic roster expansion.
+    - >-
+      Treatment and controls must be at exact t in 2000-2022. Outcome must
+      be ILO modelled annual percentage at exact t+1 in 2001-2023. The ILO
+      physical slice must have indicator EAP_2WAP_SEX_AGE_RT, sex SEX_M,
+      classif1 AGE_AGGREGATE_Y25-54, source code beginning XA:, and
+      obs_status blank or R. Preserve counts of blank and R; neither code
+      proves survey observation or a particular imputation status.
+    - >-
+      Require finite remittance share at least zero, ILO participation rate
+      within 0 to 100 inclusive, positive PPP GDP per capita, finite
+      nonnegative fertility, and at least eight complete treatment years
+      per retained area. Exclude invalid rows without clipping. No interpolation,
+      imputation, nearest-year substitution, forecast-year extension, source
+      switching, or outcome-based winsorization.
+variables:
+  outcome:
+    - name: male_prime_age_lfp_pct_at_t_plus_1
+      source: ilostat:EAP_2WAP_SEX_AGE_RT_A
+      transformation: >-
+        Exact next-year annual ILO-modelled participation percentage for
+        SEX_M and AGE_AGGREGATE_Y25-54; physical indicator is
+        EAP_2WAP_SEX_AGE_RT. Level in percentage points, not annual change.
+  treatment:
+    - name: personal_remittances_received_pct_gdp_at_t
+      source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+      transformation: Exact-year percentage of GDP in raw percentage-point units.
+  controls:
+    - name: real_gdp_per_capita_ppp_at_t
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: Natural log of positive exact-year real PPP GDP per capita.
+    - name: total_fertility_rate_at_t
+      source: world_bank_wdi:SP.DYN.TFRT.IN
+      transformation: Exact-year births per woman, level.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One complete-case OLS fit of exact t+1 male prime-age LFP level on raw
+    remittances received as percent of GDP at t, log real PPP GDP per capita
+    at t, total fertility at t, area fixed effects, and treatment-year fixed
+    effects. Use country-clustered small-sample covariance and two-sided
+    Student t inference with retained area count minus one degrees of freedom.
+    Never search lags, controls, subgroups, estimator, or endpoint after a fit.
+falsification:
+  rule: >-
+    INCONCLUSIVE if fewer than 500 complete area-year pairs, fewer than 40
+    retained areas, fewer than eight complete treatment years in any retained
+    area, or primary coefficient/clustered uncertainty is unidentified or
+    nonfinite. Otherwise SUPPORTED only if the remittance coefficient is at
+    most -0.2 percentage points of LFP per one percentage point of GDP and
+    its two-sided p is at most 0.00625. REFUTED if the lower endpoint of the
+    99.375% country-clustered interval is greater than -0.2, excluding the
+    registered meaningful-negative effect. Every other estimable result is
+    PARTIAL. No other outcome can replace this primary test.
+  test: fixed_country_holdout_remittance_share_next_year_male_prime_age_lfp_level_fe
+  threshold:
+    family_id: simple_measured_legacy_pair_screen_2026_10_09
+    family_size: 8
+    family_alpha: 0.05
+    family_p_max: 0.00625
+    meaningful_negative_pp_per_pp: -0.2
+    expected_sign: '-'
+    min_observations: 500
+    min_countries: 40
+    min_pairs_per_country: 8
+    old_hypothesis_id: demo_remittance_corridor_dependency
+    old_result_bucket: PARTIAL
+    old_primary_coefficient: 0.07958104882532327
+    old_primary_p_value: 0.38016852784282396
+    old_n_obs: 312
+    old_n_countries: 13
+    old_spec_commit: 0265cebb33d0ef5e98fd44b09a59717a89003522
+    old_run_commit: 0265cebb33d0ef5e98fd44b09a59717a89003522
+    old_endpoint_limitation: >-
+      Old normalise_panel dropped ILO sex and age dimensions and averaged
+      rows by country/year before the old 13-country fit. Its saved PARTIAL
+      result is not a male-25-to-54 endpoint result.
+    old_country_ids: [BGD, EGY, GTM, HND, IND, JAM, LKA, MAR, MEX, NPL, PAK, PHL, SLV]
+    heldout_country_count: 148
+    null_mask_pairs_upper_bound: 3220
+    null_mask_screen: >-
+      Four pinned source files, exact treatment 2000-2022/outcome 2001-2023
+      keys and Arrow value validity bits only; each frozen area has at least
+      eight such pairs. Numeric magnitudes, signs, and fits were not read.
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      remittances:
+        source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+        path: data/vintages/world_bank_wdi/BX.TRF.PWKR.DT.GD.ZS@2026-04-30T114721Z.parquet
+        sha256: 9139bffa26cd6f78bf8a963400e703398b9d59919bb92ab0b2ec2b7e04885b1d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+        publisher: world_bank_wdi
+        series_id: BX.TRF.PWKR.DT.GD.ZS
+        indicator_id: BX.TRF.PWKR.DT.GD.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/BX.TRF.PWKR.DT.GD.ZS?format=json
+      lfp:
+        source: ilostat:EAP_2WAP_SEX_AGE_RT_A
+        path: data/vintages/ilostat/EAP_2WAP_SEX_AGE_RT_A@2026-07-23T152621Z.parquet
+        sha256: 17e1ed07bf963364d866304ff6384dbbfb8bc06d5ba30b42a474098c2c54e395
+        manifest: data/manifests/fetch_run_2026-07-23T152624Z.yaml
+        manifest_sha256: 367fc796f8738908e3be217054f798e7684d29acee3d7304107136aecd05cdb6
+        publisher: ilostat
+        series_id: EAP_2WAP_SEX_AGE_RT_A
+        physical_indicator: EAP_2WAP_SEX_AGE_RT
+        source_url: https://rplumber.ilo.org/data/indicator/?id=EAP_2WAP_SEX_AGE_RT_A&format=.csv
+      gdp_ppp:
+        source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+        sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+        publisher: world_bank_wdi
+        series_id: NY.GDP.PCAP.PP.KD
+        indicator_id: NY.GDP.PCAP.PP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.PP.KD?format=json
+      fertility:
+        source: world_bank_wdi:SP.DYN.TFRT.IN
+        path: data/vintages/world_bank_wdi/SP.DYN.TFRT.IN@2026-04-30T130516Z.parquet
+        sha256: ff1eb90d4033e42ca63bb0de72c27f21044e55b69e44568d65321dd81cd8cfd1
+        manifest: data/manifests/fetch_run_2026-04-30T130536Z.yaml
+        manifest_sha256: ab56887949d3a51f3e3001ac1065c62538af1db4d4a722e39e29a774447f511b
+        publisher: world_bank_wdi
+        series_id: SP.DYN.TFRT.IN
+        indicator_id: SP.DYN.TFRT.IN
+        source_url: https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json
+prior_confidence: 0.25
+disclosure: >-
+  This is a descriptive association across broad country/economy holdouts,
+  not a migrant-corridor test, causal effect, migration mechanism, reservation
+  wage estimate, household-consumption test, or remittance policy evaluation.
+  Reverse causation, GDP-denominator movements, country-specific time trends,
+  structural change, migration selection, and modelled ILO measurement can
+  account for an association despite country/year effects and two controls.
+  ILO modelled estimates can use World Bank/IMF macroeconomic inputs, so
+  the outcome is not an independent survey validation of WDI predictors.
+  The old archived PARTIAL result mixed ILO sex and age dimensions; it is not
+  a valid male-25-to-54 comparator. ILO obs_status blank and R are reported
+  as supplied with no unsupported interpretation; the whole series is
+  modelled, and the outcome ends in 2023 before the file's 2026-2027
+  projections. This test reserves one of eight screening slots at 0.00625,
+  but cannot erase the larger archive's selection/multiple-testing history.
+  No school, causal, welfare, or policy-score credit.
+steelman: hypotheses/steelman/remittance_share_male_prime_age_lfp_country_holdout_v2.md
+scope:
+  period: [2000, 2023]
+  countries: *heldout
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
