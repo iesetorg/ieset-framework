@@ -1,0 +1,104 @@
+hypothesis_id: wits_tariff_import_product_variety_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "-"
+claim: >
+  Among countries excluded from the old 39-country fit, a higher applied
+  weighted-mean merchandise tariff at year t predicts slower growth in the
+  number of imported HS6 product lines from exact t to t+1, conditional on
+  country and treatment-year effects.
+methodology_note: >
+  New-ID country-disjoint measured-association follow-up to
+  wits_tariff_cuts_import_variety_panel. Its same-commit PARTIAL old result was
+  known before this registration. The historical runner filtered its panel to
+  the old specification's explicit 39-country roster before fitting; every
+  listed country is excluded here, even if it had no fitted old row. The WITS
+  tariff alias is the World Bank WDI mirror of TM.TAX.MRCH.WM.AR.ZS, while the
+  imported-line count is WITS NMBR-MPRT-HS6-PRDCT. This is one of two tests in
+  a fixed Bonferroni family. The data sufficiency gate follows a country/year
+  key-only envelope; held-out values and null masks were not inspected before
+  registration. No causal, welfare, or school-score credit is requested.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1996, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - "Exclude all 39 countries in the historical old specification: ARG AUS AUT BEL BRA CAN CHE CHL CHN COL DEU DNK ESP FIN FRA GBR HUN IDN IND IRL ITA JPN KOR MEX MYS NLD NOR NZL PER PHL POL PRT SGP SWE THA TUR USA VNM ZAF."
+    - Retain ISO 3166-1 alpha-3 countries only; exclude aggregates and every old-country row.
+    - Require exact t and t+1 imported-line counts, a tariff at t, finite values, positive counts, and at least five usable treatment years per country.
+    - Do not impute, interpolate, substitute a nearest year, or switch pinned vintages.
+variables:
+  outcome:
+    - name: next_year_log_imported_hs6_line_growth
+      source: wits:product_lines
+      transformation: natural log of exact t+1 count minus natural log of exact t count; both positive
+  treatment:
+    - name: applied_weighted_mean_tariff_pct
+      source: wits:tariff_average
+      transformation: level at treatment year t
+  controls: []
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One fixed primary coefficient with country and treatment-year effects,
+    country-clustered uncertainty, no covariate search, and a two-test
+    Bonferroni rule.
+falsification:
+  rule: >
+    If fewer than 500 complete country-year pairs or 40 countries survive the
+    five-year rule, or the primary estimate or clustered uncertainty is
+    unidentified or nonfinite, return INCONCLUSIVE. Otherwise SUPPORT requires
+    a negative coefficient at two-sided p<=0.10/2; REFUTATION requires a
+    positive coefficient at the same threshold. Every other estimable result
+    is PARTIAL. Apply the same sample and significance rule to adverse results.
+  test: country_disjoint_exact_next_year_wits_panel_fe
+  threshold:
+    family_id: second_legacy_wits_geographic_holdouts_2026_10_09
+    family_size: 2
+    family_alpha: 0.10
+    family_p_max: 0.05
+    expected_sign: "-"
+    min_observations: 500
+    min_countries: 40
+    min_pairs_per_country: 5
+    old_hypothesis_id: wits_tariff_cuts_import_variety_panel
+    old_result_bucket: PARTIAL
+    old_country_count: 39
+    old_country_ids: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    source_files:
+      treatment:
+        source: wits:tariff_average
+        path: data/vintages/wits/tariff_average@2026-07-23T151542Z.parquet
+        sha256: 5eb706954c8197b5108dddae749ae1aed9d3faa3404c02f48eef9c4390bfd398
+        manifest: data/manifests/fetch_run_2026-07-23T151550Z.yaml
+        series_id: tariff_average
+        source_url: https://api.worldbank.org/v2/country/all/indicator/TM.TAX.MRCH.WM.AR.ZS?format=json
+      outcome:
+        source: wits:product_lines
+        path: data/vintages/wits/product_lines@2026-07-23T153655Z.parquet
+        sha256: 085606c8406c963618bf34d141f4dd34b845b3af0493ebd759347acc3ca6441b
+        manifest: data/manifests/fetch_run_2026-07-23T153659Z.yaml
+        series_id: product_lines
+        source_url: https://wits.worldbank.org/API/V1/SDMX/V21/datasource/tradestats-trade/reporter/all/year/1988-2023/indicator/NMBR-MPRT-HS6-PRDCT
+prior_confidence: 0.40
+disclosure: >
+  The old PARTIAL result was seen before this registration. A tariff and
+  imported-line association cannot establish consumer welfare, firm entry, or
+  a causal trade policy effect. Customs reporting and HS classification can
+  change the count. Other IESET tests may share sources or eligible countries.
+  Any result is descriptive calibration with zero school credit.
+steelman: hypotheses/steelman/wits_tariff_import_product_variety_geographic_holdout_v2.md
+scope:
+  period: [1996, 2021]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

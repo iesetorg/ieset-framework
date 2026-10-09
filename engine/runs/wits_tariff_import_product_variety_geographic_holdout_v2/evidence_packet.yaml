@@ -1,0 +1,57 @@
+packet_version: 1
+generated_utc: '2026-10-09T15:26:55+00:00'
+hypothesis:
+  id: wits_tariff_import_product_variety_geographic_holdout_v2
+  path: hypotheses/trade/wits_tariff_import_product_variety_geographic_holdout_v2.yaml
+  topic: trade
+preregistration:
+  spec_commit: 7359a98c411c0a6b1c2862ec85a30ea928679094
+  steelman: hypotheses/steelman/wits_tariff_import_product_variety_geographic_holdout_v2.md
+  family_id: second_legacy_wits_geographic_holdouts_2026_10_09
+  family_p_max: 0.05
+reproduction:
+  runner: scripts/run_second_legacy_wits_geographic_holdouts_v2.py
+  run_dir: engine/runs/wits_tariff_import_product_variety_geographic_holdout_v2
+  command: python3 scripts/run_second_legacy_wits_geographic_holdouts_v2.py --check
+    wits_tariff_import_product_variety_geographic_holdout_v2
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable coefficient does not clear the directional family rule
+data:
+  inputs:
+  - role: treatment
+    source: wits:tariff_average
+    vintage_file: data/vintages/wits/tariff_average@2026-07-23T151542Z.parquet
+    sha256: 5eb706954c8197b5108dddae749ae1aed9d3faa3404c02f48eef9c4390bfd398
+    source_manifest: data/manifests/fetch_run_2026-07-23T151550Z.yaml
+    source_url: https://api.worldbank.org/v2/country/all/indicator/TM.TAX.MRCH.WM.AR.ZS?format=json
+    series_id: tariff_average
+  - role: outcome
+    source: wits:product_lines
+    vintage_file: data/vintages/wits/product_lines@2026-07-23T153655Z.parquet
+    sha256: 085606c8406c963618bf34d141f4dd34b845b3af0493ebd759347acc3ca6441b
+    source_manifest: data/manifests/fetch_run_2026-07-23T153659Z.yaml
+    source_url: https://wits.worldbank.org/API/V1/SDMX/V21/datasource/tradestats-trade/reporter/all/year/1988-2023/indicator/NMBR-MPRT-HS6-PRDCT
+    series_id: product_lines
+  old_country_overlap: 0
+results:
+  coefficient: -0.0006427885691434139
+  std_error: 0.003229353913142516
+  p_value: 0.8422271031552355
+  ci95:
+  - -0.006972205932236235
+  - 0.005686628793949407
+  n_obs: 2098
+  n_countries: 123
+  r_squared: 0.050551079421080725
+  method: country/year FE OLS, country-clustered standard errors
+limitations:
+- Country-disjoint measured association, not a causal policy effect.
+- Old same-commit PARTIAL result was seen before this registration.
+- Two tests share trade source families and use a fixed within-family correction.
+- No linked school or position receives score credit from this calibration test.
+- Source vintages and eligible countries may overlap other IESET v2 studies.
+- Applied weighted-mean merchandise tariffs are not every trade barrier; HS6 line
+  counts can move with customs reporting and classification. This association does
+  not establish consumer welfare or a policy effect.
