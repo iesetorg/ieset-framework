@@ -314,7 +314,7 @@ def build_registry() -> dict[str, Any]:
             "policies_with_full_event_timing": sum(
                 1
                 for row in rows
-                if row["timing_status"] in {"event_dated", "enacted_date_only"}
+                if row["timing_status"] in {"event_dated", "enacted_date_only", "effective_date_only"}
             ),
             "policies_ready_for_comparative_event_design": sum(
                 1 for row in rows if "ready_for_comparative_event_design" in row["readiness_flags"]
@@ -349,7 +349,7 @@ def write_outputs(payload: dict[str, Any]) -> None:
         "",
         f"- Policies indexed: {summary['policy_count']}",
         f"- Policies with explicit evaluation_design: {summary['policies_with_evaluation_design']}",
-        f"- Policies with exact event or enacted dates: {summary['policies_with_full_event_timing']}",
+        f"- Policies with exact event, enacted, or first-application dates: {summary['policies_with_full_event_timing']}",
         f"- Policies ready for comparative event design: {summary['policies_ready_for_comparative_event_design']}",
         f"- Policies ready for triple-difference structure: {summary['policies_ready_for_triple_difference_structure']}",
         f"- Timing status counts: `{json.dumps(summary['timing_status_counts'], sort_keys=True)}`",

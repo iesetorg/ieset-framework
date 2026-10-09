@@ -6,12 +6,12 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 
 - Policies indexed: 3369
 - Policies with explicit evaluation_design: 10
-- Policies with exact event or enacted dates: 2049
+- Policies with exact event, enacted, or first-application dates: 2050
 - Policies ready for comparative event design: 4
 - Policies ready for triple-difference structure: 1
-- Timing status counts: `{"enacted_date_only": 2043, "event_dated": 6, "event_month_dated": 3, "year_period_only": 1317}`
+- Timing status counts: `{"effective_date_only": 7, "enacted_date_only": 2037, "event_dated": 6, "event_month_dated": 3, "year_period_only": 1316}`
 - Comparison structure counts: `{"axis_only_no_unit_split": 3363, "declared_treated_comparison_design": 6}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 7, "needs_comparison_unit_detail": 4, "needs_exact_event_dates": 1320, "needs_treated_and_comparison_unit_coding": 3359}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 7, "needs_comparison_unit_detail": 4, "needs_exact_event_dates": 1319, "needs_treated_and_comparison_unit_coding": 3359}`
 - Axis source readiness: `{"partial_ready": 44914, "proprietary_gap": 6738, "ready": 3359, "reconstruct_needed": 19152, "scrape_needed": 14172}`
 
 ## Ready Design Seeds

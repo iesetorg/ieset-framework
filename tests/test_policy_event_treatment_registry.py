@@ -51,6 +51,32 @@ def test_treaty_timing_uses_entry_into_force_not_signature():
     )
 
 
+def test_registry_summary_counts_first_application_as_full_timing(monkeypatch):
+    policy_dir = REPO_ROOT / "policies"
+    docs = [
+        (
+            policy_dir / "effective_treaty.yaml",
+            {"policy_id": "effective_treaty", "status": "candidate", "timeframe": {
+                "start": 2016, "signed_date": "2016-11-11", "effective_date": "2017-01-01"}},
+        ),
+        (
+            policy_dir / "signature_only_treaty.yaml",
+            {"policy_id": "signature_only_treaty", "status": "candidate", "timeframe": {
+                "start": 2016, "signed_date": "2016-11-11"}},
+        ),
+    ]
+    monkeypatch.setattr(registry, "iter_policy_specs", lambda: docs)
+    monkeypatch.setattr(registry.second_order, "load_axis_second_order_index", lambda: {})
+    monkeypatch.setattr(registry.second_order, "load_second_order_source_families", lambda: {})
+
+    summary = registry.build_registry()["summary"]
+    assert summary["policies_with_full_event_timing"] == 1
+    assert summary["timing_status_counts"] == {
+        "effective_date_only": 1,
+        "year_period_only": 1,
+    }
+
+
 def test_comparison_structure_requires_units_and_design_feature():
     design = {
         "design_features": ["controlled_vs_uncontrolled_categories"],
