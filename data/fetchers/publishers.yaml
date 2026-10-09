@@ -971,7 +971,7 @@ publishers:
     status: pending
     catalogue_url: https://www.insee.fr/fr/accueil
     vintage_behaviour: revisable
-    notes: French national statistics. BDM SDMX API; free API key. Fetcher TBD.
+    notes: French national statistics. BDM SDMX API; free API key. Keyless BDM SDMX route served by the insee_bdm publisher.
   destatis:
     name: Statistisches Bundesamt (Germany)
     endpoint: https://www-genesis.destatis.de/genesisWS/rest
@@ -1157,7 +1157,7 @@ publishers:
     status: pending
     catalogue_url: https://www.tesourotransparente.gov.br/
     vintage_behaviour: revisable
-    notes: Brazilian National Treasury fiscal statistics. Monthly fiscal accounts, gross/net debt. Fetcher TBD.
+    notes: Brazilian National Treasury fiscal statistics. Monthly fiscal accounts, gross/net debt. Resultado do Tesouro Nacional is served by the tesouro_br publisher.
   banrep:
     name: Banco de la Republica (Colombia)
     endpoint: https://www.banrep.gov.co/
@@ -1184,10 +1184,11 @@ publishers:
     auth_required: false
     license: cc_by_4_0
     credibility_tier: 2
-    status: pending
+    status: ready
+    fetcher_module: data.fetchers.indec_ipc
     catalogue_url: https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31
     vintage_behaviour: revisable
-    notes: INDEC consumer price index — separate token from generic indec because hyperinflation hypotheses cite the IPC series specifically. 2007-2015 vintage tier-2 (falsified). Fetcher TBD; may be served
+    notes: INDEC consumer price index — separate token from generic indec because hyperinflation hypotheses cite the IPC series specifically. 2007-2015 vintage tier-2 (falsified). Served by data.fetchers.indec_ipc (datos.gob.ar series API; headline, core, regulated, seasonal, goods, services; Dec-2016 base).; may be served
       via existing argentina.py.
   pdvsa:
     name: Petroleos de Venezuela (PDVSA)
@@ -1238,7 +1239,7 @@ publishers:
     status: pending
     catalogue_url: https://statistics.cepal.org/portal/cepalstat/
     vintage_behaviour: revisable
-    notes: CEPAL/ECLAC statistics portal. LatAm-wide harmonised macro and social indicators. Fetcher TBD.
+    notes: CEPAL/ECLAC statistics portal. LatAm-wide harmonised macro and social indicators. Served by the cepalstat publisher.
   mef:
     name: Ministerio de Economia y Finanzas (regional finance ministry)
     endpoint: ''
@@ -1856,10 +1857,11 @@ publishers:
     auth_required: false
     license: public_domain
     credibility_tier: 1
-    status: pending
+    status: ready
+    fetcher_module: data.fetchers.uscbp
     catalogue_url: https://www.cbp.gov/newsroom/stats
     vintage_behaviour: append_only
-    notes: US CBP encounter and apprehension statistics. Used in migration hypotheses. Fetcher TBD.
+    notes: US CBP encounter and apprehension statistics. Used in migration hypotheses. Served by data.fetchers.uscbp (scrapes the nationwide-encounters page for the latest state or AOR CSV).
   uscis:
     name: US Citizenship and Immigration Services
     endpoint: https://www.uscis.gov/
@@ -1954,3 +1956,75 @@ publishers:
       Hamilton Project).
 
       '
+  imf_weo_sdmx:
+    name: IMF World Economic Outlook (SDMX 3.0, vintage-aware)
+    endpoint: https://api.imf.org/external/sdmx/3.0/
+    auth_required: false
+    license: imf_terms
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.imf_weo_sdmx
+    vintage_behaviour: revisable
+  smard:
+    name: SMARD (Bundesnetzagentur) German power market data
+    endpoint: https://www.smard.de/app/chart_data/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.smard
+  zillow:
+    name: Zillow Research (ZORI / ZHVI)
+    endpoint: https://files.zillowstatic.com/research/public_csvs/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.zillow
+  atlanta_fed_wgt:
+    name: Atlanta Fed Wage Growth Tracker
+    endpoint: https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/datafiles/chcs/wage-growth-tracker/wage-growth-data.xlsx
+    auth_required: false
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.atlanta_fed_wgt
+  eia_v2:
+    name: US EIA Open Data API v2
+    endpoint: https://api.eia.gov/v2/
+    auth_required: true
+    auth_env_var: EIA_API_KEY
+    license: public_domain
+    credibility_tier: 1
+    status: ready
+    fetcher_module: data.fetchers.eia_v2
+  tesouro_br:
+    name: Tesouro Nacional (Brazil) - Resultado do Tesouro Nacional
+    endpoint: https://www.tesourotransparente.gov.br/ckan/
+    auth_required: false
+    license: unknown
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.tesouro_br
+    vintage_behaviour: revisable
+    notes: Latest monthly RTN XLSX via CKAN; series_id is the sheet code (e.g. 1.1, 1.1-A, 1.2-B). See also brazil_stn.
+  insee_bdm:
+    name: INSEE BDM (keyless SDMX)
+    endpoint: https://bdm.insee.fr/series/sdmx/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.insee_bdm
+    vintage_behaviour: revisable
+    notes: series_id is an INSEE idbank. Keyless alternative to insee.
+  cepalstat:
+    name: CEPALSTAT API (ECLAC)
+    endpoint: https://api-cepalstat.cepal.org/cepalstat/api/v1/
+    auth_required: false
+    license: cc_by_4_0
+    credibility_tier: 2
+    status: ready
+    fetcher_module: data.fetchers.cepalstat
+    vintage_behaviour: revisable
+    notes: series_id is a CEPALSTAT indicator id; dimension codes mapped to names. See also cepal.
