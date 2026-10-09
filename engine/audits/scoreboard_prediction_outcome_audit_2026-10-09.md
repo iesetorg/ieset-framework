@@ -12,6 +12,7 @@ Generated: 2026-10-09
 - The audit keeps a separate signed lean so no-call rows still show whether the net is positive, negative, or flat.
 - Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical=0.25.
 - Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.
+- Public calibration links with `school_score_eligible=false` remain listed but are untested for all schools.
 
 ## Ranked School Outcomes
 
