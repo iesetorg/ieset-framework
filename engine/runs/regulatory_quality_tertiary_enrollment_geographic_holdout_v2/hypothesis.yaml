@@ -1,0 +1,162 @@
+hypothesis_id: regulatory_quality_tertiary_enrollment_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim: Among countries excluded from the old 40-country fit, a higher World Governance Indicators regulatory-quality
+  estimate at year t predicts higher measured tertiary gross-enrolment percentage in exact t+1, conditional
+  on log real income, rule of law, and country and year effects.
+claim_direction: +
+methodology_note: New-ID country-disjoint follow-up to human_capital_market_reform_lag; its old same-commit
+  PARTIAL result and the broader old claim were seen. The old broad market-reform and human-capital-accumulation
+  language exceeded the tertiary-enrolment measure. This new test credits only the measured WGI-enrolment
+  association. The historical runner at e786a95e676c9d6283c123682d43bf54dbacd73b filtered to the old 40-country
+  specification before fitting. All 40 are excluded, including any without old fitted rows. This is a
+  five-test measured-association family with shared sources and a fixed Bonferroni decision rule. Key-only
+  preflight did not inspect held-out values or null masks. Source vintages and eligible countries can
+  overlap other IESET v2 tests; only the named old fit is disjoint. No causal, policy-mechanism, or school-score
+  credit is requested.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all 40 countries in the historical old specification: ARG AUS BGD BRA CAN CHL CHN COL DEU
+    DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL
+    SWE THA TUR USA VNM ZAF.'
+  - Retain ISO 3166-1 alpha-3 country codes only; no WDI aggregates or old-country rows.
+  - Join treatment and controls at exact t to outcome at exact t+1; require complete finite values and
+    at least five usable treatment years per country.
+  - For natural-log measures require positive source values; do not impute, interpolate, or substitute
+    a nearest year.
+variables:
+  outcome:
+  - name: next_year_tertiary_enrollment_pct
+    source: world_bank_wdi:SE.TER.ENRR
+    transformation: level at exact calendar t+1
+  treatment:
+  - name: regulatory_quality_estimate
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: level at treatment year t
+  controls:
+  - name: log_income
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive level at t
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level at t
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One fixed primary coefficient with country and treatment-year effects, country-clustered uncertainty,
+    no automatic covariate dropping, and a five-test Bonferroni rule.
+falsification:
+  rule: If fewer than 800 complete country-year pairs or 50 countries survive the five-year rule, or if
+    the country-clustered estimate or uncertainty is unidentified or nonfinite, return INCONCLUSIVE. Otherwise
+    SUPPORT requires a positive coefficient at two-sided p <= 0.10/5; REFUTATION requires an negative
+    coefficient at the same threshold. Every other estimable result is PARTIAL. Apply this rule equally
+    to adverse and favorable results.
+  test: country_disjoint_exact_next_year_panel_fe
+  threshold:
+    family_id: second_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 5
+    family_alpha: 0.1
+    family_p_max: 0.02
+    expected_sign: +
+    min_observations: 800
+    min_countries: 50
+    min_pairs_per_country: 5
+    old_hypothesis_id: human_capital_market_reform_lag
+    old_result_bucket: PARTIAL
+    old_country_count: 40
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    source_files:
+      treatment:
+        source: wgi:GOV_WGI_RQ.EST
+        path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+        sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_RQ.EST
+      outcome:
+        source: world_bank_wdi:SE.TER.ENRR
+        path: data/vintages/world_bank_wdi/SE.TER.ENRR@2026-05-05T195043Z.parquet
+        sha256: 0459b48b5625f54872c4708f4a6107e66c8c44087b18d798c99e91e83511cede
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: SE.TER.ENRR
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+      rule_of_law:
+        source: wgi:RL.EST
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: RL.EST
+prior_confidence: 0.4
+disclosure: The analyst saw the old PARTIAL result before choosing this measured follow-up. Country and
+  year effects plus exact next-year ordering do not remove confounding or reverse causation. The source
+  files and some new countries overlap other IESET tests. A supported association earns descriptive calibration
+  only, with no position or school-score link.
+steelman: hypotheses/steelman/regulatory_quality_tertiary_enrollment_geographic_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
