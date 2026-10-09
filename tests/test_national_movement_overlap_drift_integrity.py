@@ -243,3 +243,73 @@ def test_czech_windfall_and_general_corporate_tax_are_distinct_dated_steps() -> 
     axes = subset["countries"]["CZE"]["axes"]
     assert "regulatory.trade_openness" not in axes
     assert "monetary.central_bank_independence" not in axes
+
+
+def test_unlegislated_canadian_capital_gains_proposal_has_no_opposite_steps() -> None:
+    ids = ["canada_trudeau_2015_present", "canada_carney_liberal_2025_present"]
+    axes = DRIFT.build_drift([MOVEMENTS[id] for id in ids])["countries"]["CAN"]["axes"]
+    assert "fiscal.tax_capital" not in axes
+    for policy_id in (
+        "canada_capital_gains_inclusion_2024",
+        "ca_capital_gains_inclusion_cancellation_2025",
+    ):
+        policy = yaml.safe_load((ROOT / "policies" / f"{policy_id}.yaml").read_text())
+        assert policy["status"] == "draft"
+        assert "axes_moved" not in policy
+        assert "enacted_by" not in policy
+
+
+def test_colonial_cpf_has_one_non_fiscal_1955_step() -> None:
+    ids = ["singapore_cpf_forced_saving_architecture_1955", "lky_singapore_founding_1955_1990"]
+    axes = DRIFT.build_drift([MOVEMENTS[id] for id in ids])["countries"]["SGP"]["axes"]
+    assert "fiscal.transfer_expansion" not in axes
+    assert "fiscal.spending_level" not in axes
+    assert trajectory(ids, "SGP", "institutional.property_rights", 1955) == 1.0
+    assert MOVEMENTS[ids[1]]["timeframe"]["start"] == 1959
+    legacy = yaml.safe_load((ROOT / "policies" / "singapore_cpf_establishment_1955.yaml").read_text())
+    assert legacy["status"] == "draft"
+    assert legacy["timeframe"]["effective_date"] == "1955-07-01"
+    assert "enacted_date" not in legacy["timeframe"]
+    assert "axes_moved" not in legacy
+
+
+def test_bank_indonesia_law_is_scored_once_in_1999() -> None:
+    ids = ["indonesia_reformasi_1998_present", "indonesia_habibie_transition_1998_1999"]
+    assert MOVEMENTS[ids[0]]["axes_summary"] == []
+    assert trajectory(ids, "IDN", "monetary.central_bank_independence", 1998) == 0.0
+    assert trajectory(ids, "IDN", "monetary.central_bank_independence", 1999) == 3.0
+    legacy = yaml.safe_load((ROOT / "policies" / "indonesia_bank_indonesia_independence_1999.yaml").read_text())
+    assert legacy["status"] == "draft"
+    assert "axes_moved" not in legacy
+
+
+def test_japan_budget_and_jfic_are_dated_to_operative_2026_decisions() -> None:
+    ids = ["japan_takaichi_ldp_2025_present"]
+    axes = DRIFT.build_drift([MOVEMENTS[id] for id in ids])["countries"]["JPN"]["axes"]
+    assert trajectory(ids, "JPN", "fiscal.spending_level", 2025) == 0.0
+    assert trajectory(ids, "JPN", "fiscal.spending_level", 2026) == 2.0
+    assert trajectory(ids, "JPN", "fiscal.sectoral_subsidy", 2026) == 3.0
+    assert trajectory(ids, "JPN", "regulatory.sectoral_licensing", 2025) == 0.0
+    assert trajectory(ids, "JPN", "regulatory.sectoral_licensing", 2026) == 1.0
+    assert "regulatory.trade_openness" not in axes
+    screening = yaml.safe_load((ROOT / "policies" / "jp_takaichi_economic_security_screening_2026.yaml").read_text())
+    assert screening["status"] == "candidate"
+    assert screening["timeframe"]["enacted_date"] == "2026-06-29"
+    assert [axis["axis"] for axis in screening["axes_moved"]] == ["regulatory.sectoral_licensing"]
+    for policy_id in (
+        "jp_fy2026_initial_budget_strategic_investment_2026",
+        "jp_fy2026_free_education_lunch_expansion_2026",
+        "jp_takaichi_social_security_cost_sharing_2026",
+    ):
+        policy = yaml.safe_load((ROOT / "policies" / f"{policy_id}.yaml").read_text())
+        assert policy["timeframe"]["enacted_date"] == "2026-04-07"
+
+
+def test_moreno_does_not_recredit_correa_eu_treaty_in_2017() -> None:
+    ids = ["ecuador_correa_alianza_pais_ii_2013_2017", "ecuador_moreno_2017_2021"]
+    assert trajectory(ids, "ECU", "regulatory.trade_openness", 2016) == 0.0
+    assert trajectory(ids, "ECU", "regulatory.trade_openness", 2017) == 1.0
+    assert not any(
+        axis["axis"] == "regulatory.trade_openness"
+        for axis in MOVEMENTS[ids[1]]["axes_summary"]
+    )
