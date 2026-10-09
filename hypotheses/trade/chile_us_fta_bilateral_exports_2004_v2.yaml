@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: chile_us_fta_bilateral_exports_2004_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: After the CHL-USA trade agreement became effective on 2004-01-01, CHL-origin merchandise exports
+  to USA grew at least 15 percent more in log terms between the four fixed pre years and the four fixed
+  post years than the median change in the fixed same-destination donor origins, conditional on an aligned
+  pretrend. This is a descriptive bilateral-flow claim, not a treaty causal effect.
+evidence_type: descriptive
+methodology_note: The old trade_lib_chile_bilateral_fta_cascade run returned REFUTED on WDI country-level
+  outcomes; that result is known, and this direct dyad outcome overlaps calendar years but was not fitted
+  in that old run. It grants no independent temporal or source replication claim. The new design freezes
+  the direct directed-dyad endpoint, source ZIP hash, complete country/year key grid, donor origins and
+  four-year windows before reading candidate trade magnitudes. The five treaty cases share one family
+  and one source. A complete-case or pretrend failure produces INCONCLUSIVE, not a tuned replacement.
+sample:
+  countries:
+  - CHL
+  - USA
+  - ARG
+  - BOL
+  - BRA
+  - ECU
+  - PRY
+  - URY
+  - VEN
+  period:
+  - 2000
+  - 2008
+  temporal_structure: panel
+  exclusion_rules:
+  - Only directed CHL>USA and donor origins ARG, BOL, BRA, ECU, PRY, URY, VEN to USA; no reverse direction
+    or donor substitution.
+  - Pre 2000-2003, post 2005-2008; event year 2004 excluded from means but required as an intact source
+    cell.
+  - Require one unique source row with both country-existence flags equal to one, a finite nonnegative
+    BACI flow, and exact registered FTA-status schedule for every fixed dyad-year.
+  - No interpolation, winsorisation, source replacement, post hoc endpoint or comparator changes.
+variables:
+  outcome:
+  - name: directed_chl_goods_exports_to_usa
+    source: cepii:Gravity_V202211.tradeflow_baci
+    transformation: natural log of 1 plus nominal thousands of current US dollars
+    notes: Direct BACI merchandise flow; no real-volume, tariff-intensity, sectoral, welfare, or causal
+      interpretation.
+  treatment:
+  - name: chile_us_fta_bilateral_exports_2004_v2_agreement_status
+    source: cepii:Gravity_V202211.fta_wto
+    transformation: CHL>USA off in pre 2000-2003, 1 in event year, on in post 2005-2008; all fixed donor
+      dyads off throughout the nine-year grid
+    notes: Status cross-check against official effective date 2004-01-01; agreement status is not tariff
+      intensity.
+intervention_channel: regulatory
+intervention_channel_justification: The treaty changes a bilateral trade-policy regime; the measured endpoint
+  is a flow.
+estimator:
+  template: descriptive
+  event_year: 2004
+  clustering: none
+  notes: 'For every origin to USA, calculate mean log1p(BACI) in 2005-2008 less the mean in 2000-2003.
+    Primary contrast: CHL change minus median of ARG, BOL, BRA, ECU, PRY, URY, VEN donor changes. Pretrend:
+    absolute difference between treated OLS pre-year log-flow slope and median fixed-donor OLS slope at
+    most 0.03 log units/year. No p-value or causal interpretation.'
+falsification:
+  test: chile_us_fta_bilateral_exports_2004_v2_fixed_destination_baci_prepost
+  rule: First require byte-pinned official source and immutable two-commit registration/source custody.
+    Missing/duplicate key, country-existence, FTA-status, finite-nonnegative-flow, or pretrend failure
+    yields INCONCLUSIVE. With gates passed, SUPPORTED if primary log contrast >= ln(1.15), REFUTED if
+    <= -ln(1.15), PARTIAL otherwise. The five cases are a closed family; no p-value, causal, school, or
+    policy-score credit follows.
+  threshold: absolute pretrend slope gap <=0.03 log units/year; directional contrast thresholds +/-ln(1.15);
+    family size 5
+prior_confidence: 0.5
+disclosure: The old trade_lib_chile_bilateral_fta_cascade run returned REFUTED on WDI country-level outcomes;
+  that result is known, and this direct dyad outcome overlaps calendar years but was not fitted in that
+  old run. It grants no independent temporal or source replication claim. Chile signed several other FTAs
+  around 2004, and copper prices and export composition can change nominal flow. The same-destination
+  donors control a subset of destination-wide shocks but cannot identify a causal treaty effect. CEPII
+  nominal BACI values mix prices and quantities. One treaty is one test, and all five cases are registered
+  together before any selected trade-flow magnitude is read. Public ceiling is descriptive calibration
+  only with zero featured, school, or policy-score credit.
+scope:
+  period:
+  - 2000
+  - 2008
+  countries:
+  - CHL
+  - USA
+  outcome_dim:
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  treatment_tags:
+  - chile_us_fta_2004_v2
+steelman: hypotheses/steelman/chile_us_fta_bilateral_exports_2004_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Policy record cl_us_fta_2003_2004; official effective-date source https://ustr.gov/issue-areas/industry-manufacturing/industrial-tariffs/free-trade-agreements.
+  Source and extraction contract: engine/audits/fta_baci_five_event_family_2026_source_plan.md. No reverse-flow,
+  sector, window, or donor variants count as separate hypotheses in this family.'

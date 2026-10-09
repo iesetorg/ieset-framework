@@ -1,0 +1,7 @@
+# Steelman — chile_us_fta_bilateral_exports_2004_v2
+
+The agreement entered into force on 2004-01-01 according to the [responsible trade authority](https://ustr.gov/issue-areas/industry-manufacturing/industrial-tariffs/free-trade-agreements). Expanded preferential access can lower barriers and raise bilateral merchandise trade, but firms may have anticipated tariff schedules before the legal date and implementation can be gradual. A growing bilateral flow can reflect conditions other than the agreement.
+
+The fixed comparator origins (ARG, BOL, BRA, ECU, PRY, URY, VEN) export to USA without a CEPII-recorded FTA in this nine-year source grid. They provide a same-destination demand benchmark, but differ in distance, product mix, exchange rates, and industrial structure. Chile signed several other FTAs around 2004, and copper prices and export composition can change nominal flow.
+
+The old trade_lib_chile_bilateral_fta_cascade run returned REFUTED on WDI country-level outcomes; that result is known, and this direct dyad outcome overlaps calendar years but was not fitted in that old run. It grants no independent temporal or source replication claim. The strongest contrary interpretation is that a passing descriptive contrast is not a policy effect and a failing contrast does not prove the treaty had no product-specific benefits. The pretrend and complete-source gates are prerequisites. Any case that fails them is reported as INCONCLUSIVE with its frozen files intact. No school or policy score follows from this result.

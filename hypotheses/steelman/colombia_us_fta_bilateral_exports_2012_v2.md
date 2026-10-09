@@ -1,0 +1,7 @@
+# Steelman — colombia_us_fta_bilateral_exports_2012_v2
+
+The agreement entered into force on 2012-05-15 according to the [responsible trade authority](https://ustr.gov/trade-agreements/free-trade-agreements/colombia-tpa). Expanded preferential access can lower barriers and raise bilateral merchandise trade, but firms may have anticipated tariff schedules before the legal date and implementation can be gradual. A growing bilateral flow can reflect conditions other than the agreement.
+
+The fixed comparator origins (ARG, BOL, BRA, ECU, PRY, URY, VEN) export to USA without a CEPII-recorded FTA in this nine-year source grid. They provide a same-destination demand benchmark, but differ in distance, product mix, exchange rates, and industrial structure. Earlier ATPDEA access limits the marginal policy change; commodity prices, security and domestic demand may affect flows.
+
+The old trade_lib_colombia_us_fta_2012 run returned SUPPORTED on WDI country-level outcomes; that result is known, and this direct dyad outcome overlaps calendar years but was not fitted in that old run. It grants no independent temporal or source replication claim. The strongest contrary interpretation is that a passing descriptive contrast is not a policy effect and a failing contrast does not prove the treaty had no product-specific benefits. The pretrend and complete-source gates are prerequisites. Any case that fails them is reported as INCONCLUSIVE with its frozen files intact. No school or policy score follows from this result.

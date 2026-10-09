@@ -1,0 +1,7 @@
+# Steelman — new_zealand_china_fta_bilateral_exports_2008_v2
+
+The agreement entered into force on 2008-10-01 according to the [responsible trade authority](https://www.mfat.govt.nz/assets/Trade-agreements/China-NZ-FTA-Upgrade/China-FTA-Upgrade-NIA.pdf). Expanded preferential access can lower barriers and raise bilateral merchandise trade, but firms may have anticipated tariff schedules before the legal date and implementation can be gradual. A growing bilateral flow can reflect conditions other than the agreement.
+
+The fixed comparator origins (AUS, USA, CAN, JPN, KOR, IND, DEU) export to CHN without a CEPII-recorded FTA in this nine-year source grid. They provide a same-destination demand benchmark, but differ in distance, product mix, exchange rates, and industrial structure. The 2009 global crisis and dairy or timber demand can move New Zealand-China trade; the agreement began late in 2008.
+
+No direct old case was found; the same CEPII publisher family has been used elsewhere in IESET, so global source blindness is not asserted. The strongest contrary interpretation is that a passing descriptive contrast is not a policy effect and a failing contrast does not prove the treaty had no product-specific benefits. The pretrend and complete-source gates are prerequisites. Any case that fails them is reported as INCONCLUSIVE with its frozen files intact. No school or policy score follows from this result.
