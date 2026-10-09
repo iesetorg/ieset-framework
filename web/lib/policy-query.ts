@@ -723,11 +723,12 @@ function rowOwnText(row: PolicyBrowserClientRow): string {
 function rowEvidenceText(row: PolicyBrowserClientRow): string {
   return normalizeText(
     [
-      row.schools.join(" "),
-      row.search_terms.join(" "),
-      row.top_hypotheses.map((h) => h.hypothesis_id).join(" "),
-      row.top_hypotheses.map((h) => h.topic).join(" "),
-      row.top_hypotheses.map((h) => h.claim ?? "").join(" "),
+      row.top_hypotheses.filter((h) => h.policy_evidence_status === "curated_public_result")
+        .map((h) => h.hypothesis_id).join(" "),
+      row.top_hypotheses.filter((h) => h.policy_evidence_status === "curated_public_result")
+        .map((h) => h.topic).join(" "),
+      row.top_hypotheses.filter((h) => h.policy_evidence_status === "curated_public_result")
+        .map((h) => h.claim ?? "").join(" "),
     ].join(" ")
   );
 }

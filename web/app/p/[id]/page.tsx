@@ -86,6 +86,8 @@ export default async function PolicyPage({
     claim?: string;
     verdict?: string;
     tone: "green" | "amber" | "red" | "muted";
+    tier: "featured" | "calibration" | "archive";
+    publicVisible: boolean;
     inferred?: boolean;
     shared_axes?: string[];
   }[] = [];
@@ -98,7 +100,9 @@ export default async function PolicyPage({
       id: hid,
       claim: h?.claim.split(/(?<=[.!?])\s+/)[0],
       verdict: run.verdict,
-      tone: verdictTone(run.verdict),
+      tone: h?._evidence_public_visible ? verdictTone(run.verdict) : "muted",
+      tier: h?._evidence_tier ?? "archive",
+      publicVisible: h?._evidence_public_visible === true,
     });
   }
 
@@ -113,7 +117,9 @@ export default async function PolicyPage({
       id: m.hypothesis_id,
       claim: h.claim.split(/(?<=[.!?])\s+/)[0],
       verdict: run.verdict,
-      tone: verdictTone(run.verdict),
+      tone: h._evidence_public_visible ? verdictTone(run.verdict) : "muted",
+      tier: h._evidence_tier ?? "archive",
+      publicVisible: h._evidence_public_visible === true,
       inferred: true,
       shared_axes: m.shared_axes,
     });
@@ -173,7 +179,7 @@ export default async function PolicyPage({
         {policy.timeframe.effective_date && (
           <>
             <span>·</span>
-            <span>effective {policy.timeframe.effective_date}</span>
+            <span>first applied {policy.timeframe.effective_date}</span>
           </>
         )}
         {policy.coalition_label_at_enactment && (
@@ -274,13 +280,12 @@ export default async function PolicyPage({
       {linkedHyps.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-2 border-b border-rule pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-            Empirical evidence — linked hypotheses
+            Linked research
           </h2>
           <p className="mb-4 text-[13px] text-muted">
-            Explicit links are curated by the author. Inferred links are
-            hypotheses in the library that test the same axes this policy
-            moved — the framework&apos;s answer to &quot;what does the data
-            say about a policy like this?&quot;.
+            Curated links connect this policy to research; they do not alone
+            establish its effect. Inferred links share policy axes. Archived
+            runs remain inspectable here but do not count as public evidence.
           </p>
           <div className="space-y-3">
             {linkedHyps.map((lh) => {
@@ -329,11 +334,17 @@ export default async function PolicyPage({
                       )}
                       {lh.verdict && (
                         <div className="mt-2 text-[12.5px] leading-[1.5] text-muted">
+                          {!lh.publicVisible && "Archived run: "}
                           {lh.verdict.length > 160
                             ? lh.verdict.slice(0, 160) + "…"
                             : lh.verdict}
                         </div>
                       )}
+                    </div>
+                    <div>
+                      <Badge variant={lh.tier === "featured" ? "green" : lh.tier === "calibration" ? "amber" : "muted"}>
+                        {lh.tier}
+                      </Badge>
                     </div>
                     <div>
                       {lh.tone === "green" && (
@@ -346,7 +357,7 @@ export default async function PolicyPage({
                         <Badge variant="red" dot>refuted</Badge>
                       )}
                       {lh.tone === "muted" && (
-                        <Badge variant="muted">run pending</Badge>
+                        <Badge variant="muted">{lh.verdict ? "saved verdict" : "run pending"}</Badge>
                       )}
                     </div>
                   </div>

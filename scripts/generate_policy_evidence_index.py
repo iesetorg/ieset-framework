@@ -9,6 +9,8 @@ from pathlib import Path
 
 import yaml
 
+from policy_evidence_gate import coverage_status, link_status, policy_links, tier_records
+
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICIES = ROOT / "policies"
@@ -48,7 +50,13 @@ def load_diagnostic(hypothesis_id: str) -> dict | None:
     try:
         data = json.loads(path.read_text())
     except json.JSONDecodeError as exc:
-        return {"hypothesis_id": hypothesis_id, "verdict": "", "error": str(exc)}
+        return {
+            "hypothesis_id": hypothesis_id,
+            "verdict": "",
+            "bucket": "missing",
+            "run_dir": str((RUNS / hypothesis_id).relative_to(ROOT)),
+            "error": str(exc),
+        }
     raw = data.get("verdict_label") or data.get("verdict") or data.get("status") or ""
     return {
         "hypothesis_id": hypothesis_id,
@@ -66,37 +74,35 @@ def policy_axes(policy: dict) -> list[str]:
     return axes
 
 
-def linked_hypotheses(policy: dict) -> list[str]:
-    ids = []
-    for key in ("linked_hypotheses_inferred", "linked_hypotheses", "hypotheses"):
-        value = policy.get(key)
-        if isinstance(value, list):
-            ids.extend(str(item) for item in value if isinstance(item, (str, int)))
-    return sorted(dict.fromkeys(ids))
-
-
 def main() -> int:
     rows = []
     summary = Counter()
     policy_files = sorted(POLICIES.glob("*.yaml"))
+    tiers = tier_records()
 
     for path in policy_files:
         policy = load_yaml(path)
-        hypothesis_ids = linked_hypotheses(policy)
-        evidence = [load_diagnostic(hid) for hid in hypothesis_ids]
-        evidence = [item for item in evidence if item is not None]
-        buckets = Counter(item["bucket"] for item in evidence)
+        links = policy_links(policy)
+        evidence = []
+        buckets = Counter()
+        context = Counter()
+        for link in links:
+            hid = link["hypothesis_id"]
+            run = load_diagnostic(hid)
+            tier = tiers.get(hid)
+            bucket = run["bucket"] if run else "missing"
+            status = link_status(link["link_type"], tier, bucket, run is not None)
+            context[status] += 1
+            if status.startswith("curated_public"):
+                buckets[bucket] += 1
+            evidence.append({
+                **link,
+                **(run or {"verdict": "", "bucket": "missing", "run_dir": ""}),
+                "tier": tier["tier"] if tier else "archive",
+                "policy_evidence_status": status,
+            })
         tested_count = sum(buckets[b] for b in ("supported", "partial", "refuted"))
-        inconclusive_count = buckets["inconclusive"] + buckets["blocked"]
-
-        if tested_count:
-            coverage = "tested"
-        elif inconclusive_count:
-            coverage = "blocked_or_inconclusive"
-        elif hypothesis_ids:
-            coverage = "linked_unrun"
-        else:
-            coverage = "no_hypothesis_link"
+        coverage = coverage_status(list(context.elements()))
         summary[coverage] += 1
 
         rows.append(
@@ -107,9 +113,10 @@ def main() -> int:
                 "countries": policy.get("countries") or [],
                 "timeframe": policy.get("timeframe") or {},
                 "axes": policy_axes(policy),
-                "linked_hypothesis_count": len(hypothesis_ids),
+                "linked_hypothesis_count": len(links),
                 "tested_hypothesis_count": tested_count,
                 "verdict_counts": dict(buckets),
+                "context_counts": dict(context),
                 "coverage": coverage,
                 "evidence": evidence,
                 "path": str(path.relative_to(ROOT)),
@@ -118,13 +125,28 @@ def main() -> int:
 
     rows.sort(
         key=lambda row: (
-            row["coverage"] != "tested",
+            {
+                "tested": 0,
+                "blocked_or_inconclusive": 1,
+                "related_public_only": 2,
+                "archive_only": 3,
+                "linked_unrun": 4,
+                "no_hypothesis_link": 5,
+            }.get(row["coverage"], 6),
             -row["tested_hypothesis_count"],
+            -row["context_counts"].get("related_public", 0),
             row["policy_id"],
         )
     )
 
     payload = {
+        "schema_version": 2,
+        "evidence_scope": (
+            "Tested counts and verdict mix use only curated links to current "
+            "public-tier hypothesis results. Inferred public and archived "
+            "links are navigation context. A curated link does not attribute "
+            "a causal effect to the named policy."
+        ),
         "summary": {
             "policy_count": len(rows),
             "coverage_counts": dict(summary),
@@ -136,7 +158,7 @@ def main() -> int:
     lines = [
         "# Policy Evidence Index",
         "",
-        "This index joins policy files to linked hypotheses and local run verdicts.",
+        "This index joins policies to linked hypotheses. Only curated links with a live public evidence tier contribute to tested counts. Inferred and archived links are navigation context; a curated link alone does not establish this policy's causal effect.",
         "",
         "## Summary",
         "",
@@ -149,7 +171,7 @@ def main() -> int:
             "",
             "## Top Tested Policies",
             "",
-            "| policy_id | title | axes | verdicts | tested / linked |",
+            "| policy_id | title | axes | public curated verdicts | public curated results / all links |",
             "| --- | --- | --- | --- | ---: |",
         ]
     )

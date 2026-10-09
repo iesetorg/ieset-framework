@@ -94,7 +94,7 @@ function compareRows(sort: string, a: PolicyBrowserClientRow, b: PolicyBrowserCl
   }
   return (
     b.tested_hypothesis_count - a.tested_hypothesis_count ||
-    b.linked_hypothesis_count - a.linked_hypothesis_count ||
+    (b.context_counts.related_public ?? 0) - (a.context_counts.related_public ?? 0) ||
     a.policy_id.localeCompare(b.policy_id)
   );
 }
@@ -283,7 +283,7 @@ export function PolicyEvidenceBrowser() {
               <option value="">all coverage</option>
               {coverageOptions.map((value) => (
                 <option key={value} value={value}>
-                  {value.replace(/_/g, " ")}
+                  {value === "tested" ? "curated public result" : value.replace(/_/g, " ")}
                 </option>
               ))}
             </select>
@@ -344,9 +344,9 @@ export function PolicyEvidenceBrowser() {
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2 text-[11px] text-muted">
-            <span className="rounded border border-rule bg-white px-2 py-1">direct links are curated policy-hypothesis joins</span>
-            <span className="rounded border border-rule bg-white px-2 py-1">inferred analogues are axis-level neighbors</span>
-            <span className="rounded border border-rule bg-white px-2 py-1">open a hypothesis before treating a card as causal evidence</span>
+            <span className="rounded border border-rule bg-white px-2 py-1">curated links connect a policy to research; they do not prove its effect</span>
+            <span className="rounded border border-rule bg-white px-2 py-1">axis matches and archives are navigation context</span>
+            <span className="rounded border border-rule bg-white px-2 py-1">open the hypothesis for its test and limits</span>
           </div>
           <select
             value={sort}
@@ -354,7 +354,7 @@ export function PolicyEvidenceBrowser() {
             className="rounded border border-rule-strong bg-white px-2 py-2 text-[12px] text-ink focus:border-accent focus:outline-none"
             aria-label="Sort policy evidence cards"
           >
-            <option value="tested">sort: most tested</option>
+            <option value="tested">sort: most curated public results</option>
             <option value="strongest">sort: strongest design</option>
             <option value="most_promising">sort: most supported</option>
             <option value="most_caution">sort: most refuted</option>
@@ -447,8 +447,18 @@ export function PolicyEvidenceBrowser() {
                   );
                 })}
                 <span className="rounded bg-panel px-2 py-1 text-[11px] text-muted">
-                  tested {row.tested_hypothesis_count}/{row.linked_hypothesis_count}
+                  curated public results {row.tested_hypothesis_count}/{row.linked_hypothesis_count} links
                 </span>
+                {(row.context_counts.related_public ?? 0) > 0 && (
+                  <span className="rounded bg-panel px-2 py-1 text-[11px] text-muted">
+                    related public {row.context_counts.related_public}
+                  </span>
+                )}
+                {(row.context_counts.archive ?? 0) > 0 && (
+                  <span className="rounded bg-panel px-2 py-1 text-[11px] text-muted">
+                    archived context {row.context_counts.archive}
+                  </span>
+                )}
                 {unresolvedCount > 0 && (
                   <span className="rounded bg-panel px-2 py-1 text-[11px] text-muted">
                     unresolved {unresolvedCount}
@@ -462,7 +472,7 @@ export function PolicyEvidenceBrowser() {
                 </span>
                 {(explicitLinks > 0 || inferredLinks > 0) && (
                   <span className="rounded bg-panel px-2 py-1 text-[11px] text-muted">
-                    links: {explicitLinks} direct / {inferredLinks} inferred
+                    links: {explicitLinks} curated / {inferredLinks} axis matches
                   </span>
                 )}
               </div>
@@ -533,13 +543,28 @@ export function PolicyEvidenceBrowser() {
                           <span className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${linkTypeTone(h.link_type)}`}>
                             {linkTypeLabel(h.link_type)}
                           </span>
-                          {h.evidence_strength && (
+                          {h.policy_evidence_status === "curated_public_result" && h.evidence_strength && (
                             <span className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${evidenceTone(h.evidence_strength)}`}>
                               {evidenceStrengthLabel(h.evidence_strength)}
                             </span>
                           )}
-                          <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${verdictTone(h.bucket)}`}>
-                            {h.bucket}
+                          <span className="rounded bg-[#ece9e2] px-1.5 py-0.5 text-[10px] font-semibold text-[#57554e]">
+                            {h.policy_evidence_status === "archive"
+                              ? "archive"
+                              : h.policy_evidence_status === "unrun"
+                                ? "unrun"
+                              : h.policy_evidence_status === "related_public"
+                                ? "related public"
+                                : h.policy_evidence_status === "curated_public_unresolved"
+                                  ? "public unresolved"
+                                  : "public curated"}
+                          </span>
+                          <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${h.policy_evidence_status === "curated_public_result" ? verdictTone(h.bucket) : "bg-[#ece9e2] text-[#57554e]"}`}>
+                            {h.policy_evidence_status === "unrun" || h.bucket === "missing"
+                              ? "run pending"
+                              : h.policy_evidence_status === "curated_public_result"
+                                ? h.bucket
+                                : `saved ${h.bucket}`}
                           </span>
                         </span>
                       </Link>

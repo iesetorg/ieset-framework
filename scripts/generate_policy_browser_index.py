@@ -16,6 +16,8 @@ from typing import Any
 
 import yaml
 
+from policy_evidence_gate import coverage_status, link_status, tier_records
+
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICIES = ROOT / "policies"
@@ -69,14 +71,14 @@ def verdict_bucket(raw: object) -> str:
     return "other"
 
 
-def evidence_strength(bucket: str, diagnostics: dict[str, Any] | None, hypothesis: dict[str, Any] | None) -> str:
+def evidence_strength(bucket: str, diagnostics: dict[str, Any] | None, hypothesis: dict[str, Any] | None, tier: str) -> str:
     if bucket in {"missing", "blocked", "inconclusive", "other"}:
         return "unresolved"
     if not diagnostics:
         return "unresolved"
     evidence_type = str((hypothesis or {}).get("evidence_type") or "").lower()
     template = str((diagnostics or {}).get("template") or ((hypothesis or {}).get("estimator") or {}).get("template") or "").lower()
-    if evidence_type == "causal" or template in {"synthetic_control", "synth_did", "did_callaway_santanna", "did_chaisemartin", "event_study", "local_projections"}:
+    if tier == "featured" and (evidence_type == "causal" or template in {"synthetic_control", "synth_did", "did_callaway_santanna", "did_chaisemartin", "event_study", "local_projections"}):
         return "strong"
     if template in {"panel_fe", "panel_fe_decomposition", "multi_metric_checklist"}:
         return "moderate"
@@ -229,9 +231,9 @@ def search_terms(policy: dict[str, Any], axes: list[dict[str, Any]], evidence: l
     return sorted({part.lower() for text in tokens for part in str(text).replace("_", " ").replace(".", " ").split() if len(part) >= 3})
 
 
-def decision_lens(verdicts: Counter, strengths: Counter, axes: list[dict[str, Any]]) -> dict[str, Any]:
+def decision_lens(verdicts: Counter, strengths: Counter, axes: list[dict[str, Any]], context: Counter) -> dict[str, Any]:
     tested = sum(verdicts[b] for b in ("supported", "partial", "refuted"))
-    unresolved = sum(verdicts[b] for b in ("inconclusive", "blocked", "missing", "other"))
+    unresolved = context["curated_public_unresolved"]
     if tested == 0:
         posture = "evidence_gap"
     elif verdicts["supported"] > verdicts["refuted"] and verdicts["supported"] >= verdicts["partial"]:
@@ -250,12 +252,15 @@ def decision_lens(verdicts: Counter, strengths: Counter, axes: list[dict[str, An
         watch_points.extend(["inflation expectations", "credit and asset-price channels"])
     if "institutional" in channels:
         watch_points.extend(["rule of law and corruption indicators", "implementation capacity"])
-    if unresolved:
-        watch_points.append("missing-data or inconclusive evidence blockers")
+    if unresolved or context["archive"] or context["unrun"]:
+        watch_points.append("public evidence gaps or inconclusive tests")
     return {
         "posture": posture,
         "tested_hypotheses": tested,
         "unresolved_hypotheses": unresolved,
+        "related_public_links": context["related_public"],
+        "archived_links": context["archive"],
+        "unrun_links": context["unrun"],
         "best_available_evidence": strengths.most_common(1)[0][0] if strengths else "unresolved",
         "watch_points": sorted(dict.fromkeys(watch_points)),
     }
@@ -263,9 +268,11 @@ def decision_lens(verdicts: Counter, strengths: Counter, axes: list[dict[str, An
 
 def main() -> int:
     hypotheses = load_hypotheses()
+    tiers = tier_records()
     _positions, claims_by_hypothesis = load_positions()
     rows: list[dict[str, Any]] = []
     global_verdicts = Counter()
+    global_context = Counter()
     coverage = Counter()
     axis_counts = Counter()
     country_counts = Counter()
@@ -279,6 +286,7 @@ def main() -> int:
         evidence: list[dict[str, Any]] = []
         verdicts = Counter()
         strengths = Counter()
+        context = Counter()
         link_types = Counter()
 
         for link in links:
@@ -286,10 +294,20 @@ def main() -> int:
             hyp = hypotheses.get(hid)
             run = load_run(hid)
             bucket = run["bucket"] if run else "missing"
-            verdicts[bucket] += 1
-            global_verdicts[bucket] += 1
-            strength = evidence_strength(bucket, run["diagnostics"] if run else None, hyp)
-            strengths[strength] += 1
+            tier_record = tiers.get(hid)
+            tier = str(tier_record.get("tier") or "archive") if tier_record else "archive"
+            status = link_status(link["link_type"], tier_record, bucket, run is not None)
+            context[status] += 1
+            global_context[status] += 1
+            if status.startswith("curated_public"):
+                verdicts[bucket] += 1
+                global_verdicts[bucket] += 1
+            strength = (
+                evidence_strength(bucket, run["diagnostics"] if run else None, hyp, tier)
+                if status == "curated_public_result" else "unresolved"
+            )
+            if status == "curated_public_result":
+                strengths[strength] += 1
             link_types[link["link_type"]] += 1
             claims = claims_by_hypothesis.get(hid, [])
             for claim in claims:
@@ -302,6 +320,8 @@ def main() -> int:
                     "evidence_type": (hyp or {}).get("evidence_type") or "",
                     "verdict": run["verdict"] if run else "",
                     "bucket": bucket,
+                    "tier": tier,
+                    "policy_evidence_status": status,
                     "evidence_strength": strength,
                     "template": run["template"] if run else (((hyp or {}).get("estimator") or {}).get("template") or ""),
                     "run_dir": run["run_dir"] if run else "",
@@ -313,14 +333,7 @@ def main() -> int:
             )
 
         tested = sum(verdicts[b] for b in ("supported", "partial", "refuted"))
-        if tested:
-            cov = "tested"
-        elif verdicts["inconclusive"] or verdicts["blocked"]:
-            cov = "blocked_or_inconclusive"
-        elif links:
-            cov = "linked_unrun"
-        else:
-            cov = "no_hypothesis_link"
+        cov = coverage_status(list(context.elements()))
         coverage[cov] += 1
         for axis in axes:
             axis_counts[axis["axis"]] += 1
@@ -340,9 +353,10 @@ def main() -> int:
             "linked_hypothesis_count": len(links),
             "tested_hypothesis_count": tested,
             "verdict_counts": dict(verdicts),
+            "context_counts": dict(context),
             "evidence_strength_counts": dict(strengths),
             "link_type_counts": dict(link_types),
-            "decision_lens": decision_lens(verdicts, strengths, axes),
+            "decision_lens": decision_lens(verdicts, strengths, axes, context),
             "evidence": evidence,
         }
         row["search_terms"] = search_terms(policy, axes, evidence)
@@ -350,19 +364,34 @@ def main() -> int:
 
     rows.sort(
         key=lambda row: (
-            row["coverage"] != "tested",
+            {
+                "tested": 0,
+                "blocked_or_inconclusive": 1,
+                "related_public_only": 2,
+                "archive_only": 3,
+                "linked_unrun": 4,
+                "no_hypothesis_link": 5,
+            }.get(row["coverage"], 6),
             -row["tested_hypothesis_count"],
+            -row["context_counts"].get("related_public", 0),
             row["policy_id"],
         )
     )
 
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_by": "scripts/generate_policy_browser_index.py",
+        "evidence_scope": (
+            "Tested counts, verdict mix, posture, and design strength use only "
+            "curated links to current public-tier hypothesis results. Related "
+            "public and archived links are navigation context. A curated link "
+            "does not attribute a causal effect to the named policy."
+        ),
         "summary": {
             "policy_count": len(rows),
             "coverage_counts": dict(coverage),
             "verdict_counts": dict(global_verdicts),
+            "context_status_counts": dict(global_context),
             "top_axes": axis_counts.most_common(25),
             "top_countries": country_counts.most_common(25),
             "position_claim_link_counts": dict(school_counts),
@@ -374,7 +403,7 @@ def main() -> int:
     lines = [
         "# Policy Browser Index",
         "",
-        "Joined policy, hypothesis, run-verdict, and position-claim evidence for the policy browser.",
+        "Only curated links to current public-tier results contribute to verdicts, posture, strength, and tested coverage. Inferred public and archived runs remain navigation context; linked results do not establish a policy's causal effect.",
         "",
         "## Summary",
         "",
@@ -382,7 +411,7 @@ def main() -> int:
     ]
     for key, value in sorted(coverage.items()):
         lines.append(f"- {key}: {value}")
-    lines.extend(["", "## Highest-Coverage Policies", "", "| policy | title | verdicts | tested / linked | posture |", "| --- | --- | --- | ---: | --- |"])
+    lines.extend(["", "## Policies With Curated Public Results", "", "| policy | title | public curated verdicts | public curated results / all links | linked-result posture |", "| --- | --- | --- | ---: | --- |"])
     for row in [r for r in rows if r["coverage"] == "tested"][:50]:
         verdict_text = ", ".join(f"{k}:{v}" for k, v in sorted(row["verdict_counts"].items()) if v)
         lines.append(

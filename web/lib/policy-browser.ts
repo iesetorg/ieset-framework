@@ -20,6 +20,8 @@ export interface PolicyBrowserEvidence {
   verdict: string;
   bucket: string;
   evidence_strength: string;
+  tier: "featured" | "calibration" | "archive";
+  policy_evidence_status: string;
   template: string;
   run_dir: string;
   position_ids: string[];
@@ -46,12 +48,16 @@ export interface PolicyBrowserRow {
   linked_hypothesis_count: number;
   tested_hypothesis_count: number;
   verdict_counts: Record<string, number>;
+  context_counts: Record<string, number>;
   evidence_strength_counts: Record<string, number>;
   link_type_counts?: Record<string, number>;
   decision_lens: {
     posture: string;
     tested_hypotheses: number;
     unresolved_hypotheses: number;
+    related_public_links: number;
+    archived_links: number;
+    unrun_links: number;
     best_available_evidence: string;
     watch_points: string[];
   };
@@ -62,10 +68,12 @@ export interface PolicyBrowserRow {
 export interface PolicyBrowserIndex {
   schema_version: number;
   generated_by: string;
+  evidence_scope: string;
   summary: {
     policy_count: number;
     coverage_counts: Record<string, number>;
     verdict_counts: Record<string, number>;
+    context_status_counts: Record<string, number>;
     top_axes: [string, number][];
     top_countries: [string, number][];
     position_claim_link_counts: Record<string, number>;
@@ -84,6 +92,7 @@ export interface PolicyBrowserClientRow {
   linked_hypothesis_count: number;
   tested_hypothesis_count: number;
   verdict_counts: Record<string, number>;
+  context_counts: Record<string, number>;
   evidence_strength_counts?: Record<string, number>;
   link_type_counts?: Record<string, number>;
   posture: string;
@@ -95,6 +104,8 @@ export interface PolicyBrowserClientRow {
     topic: string;
     claim?: string;
     evidence_strength?: string;
+    tier: "featured" | "calibration" | "archive";
+    policy_evidence_status: string;
     link_type?: string;
     position_count?: number;
   }[];
@@ -105,7 +116,16 @@ export interface PolicyBrowserClientRow {
 let cache: Promise<PolicyBrowserIndex> | null = null;
 
 function evidenceRank(evidence: PolicyBrowserEvidence): number {
-  const linkRank = evidence.link_type === "explicit" ? 100 : evidence.link_type === "legacy" ? 60 : 20;
+  const statusRank = evidence.policy_evidence_status === "curated_public_result"
+    ? 1000
+    : evidence.policy_evidence_status === "curated_public_unresolved"
+      ? 750
+      : evidence.policy_evidence_status === "related_public"
+        ? 500
+        : evidence.policy_evidence_status === "archive"
+          ? 100
+          : 0;
+  const linkRank = evidence.link_type === "explicit" ? 30 : evidence.link_type === "legacy" ? 20 : 10;
   const strengthRank =
     evidence.evidence_strength === "strong"
       ? 30
@@ -122,7 +142,7 @@ function evidenceRank(evidence: PolicyBrowserEvidence): number {
         : evidence.bucket === "inconclusive"
           ? 1
           : 0;
-  return linkRank + strengthRank + verdictRank;
+  return statusRank + linkRank + strengthRank + verdictRank;
 }
 
 export async function loadPolicyBrowserIndex(): Promise<PolicyBrowserIndex> {
@@ -143,10 +163,16 @@ export async function loadPolicyBrowserIndex(): Promise<PolicyBrowserIndex> {
 export function toPolicyBrowserClientRows(index: PolicyBrowserIndex): PolicyBrowserClientRow[] {
   return index.policies.map((row) => {
     const schoolSet = new Set<string>();
-    const topHypotheses = [...row.evidence]
-      .filter((e) => e.bucket !== "missing")
-      .sort((a, b) => evidenceRank(b) - evidenceRank(a) || a.hypothesis_id.localeCompare(b.hypothesis_id))
-      .slice(0, 3)
+    const rankedEvidence = [...row.evidence]
+      .sort((a, b) => evidenceRank(b) - evidenceRank(a) || a.hypothesis_id.localeCompare(b.hypothesis_id));
+    // Keep a curated but archived link inspectable even when axis matches
+    // outrank it; its saved verdict still receives no policy evidence credit.
+    const explicitContext = rankedEvidence.find((e) => e.link_type === "explicit");
+    const selectedEvidence = [
+      ...(explicitContext ? [explicitContext] : []),
+      ...rankedEvidence.filter((e) => e !== explicitContext),
+    ].slice(0, 3);
+    const topHypotheses = selectedEvidence
       .map((e) => {
         for (const positionId of e.position_ids ?? []) schoolSet.add(positionId);
         return {
@@ -155,6 +181,8 @@ export function toPolicyBrowserClientRows(index: PolicyBrowserIndex): PolicyBrow
           topic: e.topic,
           claim: e.claim,
           evidence_strength: e.evidence_strength,
+          tier: e.tier,
+          policy_evidence_status: e.policy_evidence_status,
           link_type: e.link_type,
           position_count: e.position_ids?.length ?? 0,
         };
@@ -181,6 +209,7 @@ export function toPolicyBrowserClientRows(index: PolicyBrowserIndex): PolicyBrow
       linked_hypothesis_count: row.linked_hypothesis_count,
       tested_hypothesis_count: row.tested_hypothesis_count,
       verdict_counts: row.verdict_counts,
+      context_counts: row.context_counts,
       evidence_strength_counts: row.evidence_strength_counts,
       link_type_counts: row.link_type_counts,
       posture: row.decision_lens.posture,

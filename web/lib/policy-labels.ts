@@ -133,10 +133,10 @@ export const COUNTRY_LABELS: Record<string, string> = {
 };
 
 export const POSTURE_LABELS: Record<string, string> = {
-  promising: "Promising evidence",
-  mixed: "Mixed / context-dependent",
-  caution: "Caution signal",
-  evidence_gap: "Evidence gap",
+  promising: "More supported linked results",
+  mixed: "Mixed linked results",
+  caution: "More refuted linked results",
+  evidence_gap: "No curated public result",
 };
 
 export const EVIDENCE_STRENGTH_LABELS: Record<string, string> = {
@@ -147,10 +147,10 @@ export const EVIDENCE_STRENGTH_LABELS: Record<string, string> = {
 };
 
 export const EVIDENCE_STRENGTH_HINTS: Record<string, string> = {
-  strong: "Causal or quasi-causal design, such as synthetic control, DiD, event study, or local projections.",
+  strong: "Featured causal or quasi-causal design for the linked hypothesis. This does not attribute an effect to the policy on this card.",
   moderate: "Panel, decomposition, or multi-metric design useful for triangulation but less dispositive.",
   screening: "Descriptive or cross-sectional screen. Useful for triage, not enough alone for strong causal claims.",
-  unresolved: "Missing, inconclusive, blocked, or not yet interpretable evidence.",
+  unresolved: "No decisive result on a curated link that clears the public evidence gates.",
 };
 
 export function axisLabel(axis: string): string {
@@ -199,8 +199,8 @@ export function directionGlyph(direction: string): string {
 }
 
 export function linkTypeLabel(linkType?: string): string {
-  if (linkType === "explicit") return "direct link";
-  if (linkType === "inferred") return "inferred analogue";
+  if (linkType === "explicit") return "curated link";
+  if (linkType === "inferred") return "axis match";
   if (linkType === "legacy") return "legacy link";
   return "unclassified link";
 }
