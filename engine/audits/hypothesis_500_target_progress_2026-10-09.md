@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **442 public records** (51 featured, 391 calibration) among 1,980
-hypotheses. That is **70 additional** relative to the 372 starting point and
-**430 short** of the requested increment. Here public includes calibration;
+ledger has **446 public records** (51 featured, 395 calibration) among 1,990
+hypotheses. That is **74 additional** relative to the 372 starting point and
+**426 short** of the requested increment. Here public includes calibration;
 featured remains 51, so the featured-only increment is zero. No result was
 made featured by loosening its gate.
 
@@ -132,7 +132,7 @@ A separate Argentina core-CPI follow-up was registered and run locally, but
 its full pinned fetch manifest contained unrelated local home paths. The
 public-integrity gate rejected that source packet. Its spec, source, runner,
 and result were removed from this review tree and **are not counted** in the
-442 public records. The original local run remains available for a separate
+446 public records. The original local run remains available for a separate
 administrative-redaction audit; post-result redaction cannot be presented as
 an untouched prospective registration. No causal or school-score credit was
 assigned. The local Git history still contains the rejected manifest in
@@ -148,6 +148,22 @@ claim-by-claim adjudication. Five earlier calibration-only geographic holdouts
 now have an explicit external school-score exclusion so later links cannot
 silently award credit; their frozen runs remain untouched.
 
+The latest source-custodied wave added ten prospective tests, each registered
+before outcome values were run. Four entered public **calibration** after exact
+source and result replay: BIS real residential property-price change versus
+next-year real GDP-per-person growth (**PARTIAL**, 542 pairs/25 held-out
+countries); Korea–US 2012 directed trade flow (**SUPPORTED** under its fixed
+pretrend and contrast floors); OECD youth median minimum wage versus next-year
+unemployment (**PARTIAL**, 160 country-years/32 countries); and WGI regulatory
+quality versus next-year electricity access (**PARTIAL**, 3,595 pairs/161
+countries). The BIS p=0.00246 misses its 84-screen family cutoff 0.00119;
+the youth and electricity estimates also miss their frozen cutoffs. None
+establishes a causal effect, state-law treatment, or school-score credit.
+Chile–US, Colombia–US, New Zealand–China, Australia–China, Australia–Korea,
+and Australia–Japan treaty-flow cases remain **INCONCLUSIVE** after their
+registered pretrend checks and stay archived. Their archived results are not
+counted as public conversions.
+
 The registration, evidence-tier, funnel, census, school outcome,
 second-order, and link audits were refreshed after the combined results.
 The three integrity holds removed 18 links from public tested coverage while
@@ -157,9 +173,9 @@ override an external evidence hold. The
 count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
-There are **218 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 660 public
-records, still **212 below** 872. The archive repair review found 131
+There are **224 verified archived** records in the current funnel. Even the
+unrealistic upper bound of converting every one would yield 670 public
+records, still **202 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
@@ -168,7 +184,7 @@ individually specified, source-custodied strict registrations and successful
 replays; current evidence does not justify claiming it has happened.
 
 A current frozen-repair audit found **no immediately runnable** same-ID case
-among the 218 verified archives. A separate metadata-only screen of the 820
+among the 224 verified archives. A separate metadata-only screen of the 820
 legacy cases beyond the first 500 review rows found 67 distinct source-pair
 groups as an upper bound for design review, including the five earlier
 measured holdouts and the ten new follow-ups run in this sprint. Pair
@@ -179,12 +195,25 @@ groups passing a basic panel eligibility screen. Fifty-two still carry proxy
 warnings, 17 use constructed or trend treatments, and only eight are simple
 measured pairs without those or Fraser/Heritage flags. The 372 Heritage
 cross-section rows reuse just 16 outcome-source pairs. These are design-review
-ceilings, not conversions. The fossil and remittance follow-ups have now consumed two of those eight
-simple-pair leads. Even converting all 218 archives and all 82 remaining
-source-pair groups would add only 300, leaving 130 of the requested 430
-additions; in reality neither full conversion is justified. A future batch must deduplicate semantic
+ceilings, not conversions. The fossil and remittance follow-ups consumed two
+of those eight simple-pair leads; subsequent source-pinned tests consumed more
+of the plausible measured frontier. The remaining source-pair screen does not
+supply hundreds of independent, registration-ready designs. A future batch must deduplicate semantic
 aliases and use one family-wide multiplicity budget before reading outcomes. Alias-aware review also rejected apparent
 new groups already represented by strict registrations, and sign-history
 review rejected several legacy verdicts as design inputs.
+
+A fresh read-only source inventory found 35 local raw parquet vintages and 45
+derived panels in this isolated checkout. The straightforward measured
+WDI/WGI, BIS, OECD, ILO, and EIA pairs have already been used in strict v2
+families. No additional distinct test cleared a key-only registration review
+without new source custody or policy timing work. The WID wealth-share panel
+could support a Sweden 2007 wealth-tax design, but its pinned raw vintage is
+absent here and the legal treatment date/donor set need review. The derived
+profit-shifting panel also lacks its pinned raw vintage; its named TWZ and CbCR
+windows are short. Six of seven source-custodied treaty-flow candidates failed
+their frozen pretrend gate. These are acquisition/design leads, not public
+conversions or permission to reuse a failed event family without a new
+prospective registration and multiplicity rule.
 
 No push, merge, or deployment is part of this status.
