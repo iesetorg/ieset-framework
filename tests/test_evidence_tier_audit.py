@@ -7,6 +7,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+import audit_evidence_tiers as evidence_tiers  # noqa: E402
 
 
 def test_evidence_tier_audit_is_fresh():
@@ -53,3 +56,40 @@ def test_featured_is_stricter_than_public_visibility():
     assert all(record["public_visible"] for record in featured)
     assert all(record["evidence_type"] == "causal" for record in featured)
     assert all(record["screening_flags"] == [] for record in featured)
+
+
+def test_quarantined_run_cannot_receive_public_credit():
+    path = ROOT / "hypotheses" / "distribution" / "pcw100_us_mw_bite_ratio_p10_wage.yaml"
+    assert path.exists()
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["audit_disposition"] == "quarantined_pending_v2"
+    assert record["public_visible"] is False
+    assert record["tier"] == "archive"
+    assert "audit_quarantined_pending_v2" in record["exclusion_reasons"]
+
+
+def test_rescoped_screen_stays_inspectable_with_score_cap():
+    path = ROOT / "hypotheses" / "trade" / "pcw100_global_efw_trade_freedom_gdp_growth.yaml"
+    assert path.exists()
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["audit_disposition"] == "rescoped_screen_positive"
+    assert record["public_visible"] is True
+    assert record["tier"] == "calibration"
+    assert record["scoreboard_weight_cap"] == 0.25
+
+
+def test_live_detector_finding_holds_record():
+    path = ROOT / "hypotheses" / "growth" / "soviet_union_central_planning_gdp_collapse_1989_1991.yaml"
+    assert path.exists()
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert "integrity_detector_flagged" in record["exclusion_reasons"]
+    assert record["public_visible"] is False
+
+
+def test_incomplete_secondary_endpoint_caps_causal_run_at_calibration():
+    path = ROOT / "hypotheses" / "growth" / "latam_extra_inflation_targeting_diff_in_diff_1999_2024.yaml"
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["registration_status"] == "verified"
+    assert record["public_visible"] is True
+    assert record["run_tier_recommendation"] == "calibration"
+    assert record["tier"] == "calibration"

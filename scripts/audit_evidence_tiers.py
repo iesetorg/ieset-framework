@@ -22,6 +22,8 @@ from typing import Any
 
 import yaml
 
+import audit_integrity_detectors
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "engine" / "evidence_tier_audit.json"
 PUBLIC_OUTPUT = ROOT / "web" / "public" / "evidence-tiers.json"
@@ -209,6 +211,13 @@ def build_record(
             run_dir = legacy_run_dir
     diagnostics = load_json(run_dir / "diagnostics.json")
     verdict = str(diagnostics.get("verdict") or "").strip()
+    correction = diagnostics.get("correction") or {}
+    disposition = (
+        str(correction.get("disposition") or "").strip()
+        if isinstance(correction, dict)
+        else ""
+    )
+    detector_findings = audit_integrity_detectors.scan_diagnostics(diagnostics).get("findings") or []
     card_path = run_dir / "result_card.md"
     card_text = (
         card_path.read_text(encoding="utf-8", errors="replace")
@@ -239,11 +248,35 @@ def build_record(
         exclusion_reasons.append("falsification_rule_unsharpened")
     if estimator_failures:
         exclusion_reasons.append("estimator_floor_failed")
+    if detector_findings:
+        exclusion_reasons.append("integrity_detector_flagged")
+    if disposition == "quarantined_pending_v2":
+        exclusion_reasons.append("audit_quarantined_pending_v2")
+    elif disposition == "capped_partial_pending_v2":
+        # The stored directional verdict has not yet been rescored as partial.
+        exclusion_reasons.append("audit_verdict_rescore_pending_v2")
 
     public_visible = not exclusion_reasons
     evidence_type = str(doc.get("evidence_type") or "unspecified")
+    screen_or_descriptive_rescope = disposition in {
+        "rescoped_screen_positive",
+        "rescoped_descriptive",
+    }
+    # A run can document a conservative design-completeness cap. This field
+    # only downgrades causal records; it can never grant public visibility or
+    # elevate an archive/calibration record to featured.
+    run_tier_recommendation = str(
+        diagnostics.get("evidence_tier_recommendation") or ""
+    ).strip().lower()
+    scoreboard_weight_cap = 0.25 if screen_or_descriptive_rescope else None
 
-    if public_visible and evidence_type == "causal" and not screening:
+    if (
+        public_visible
+        and evidence_type == "causal"
+        and not screening
+        and not screen_or_descriptive_rescope
+        and run_tier_recommendation != "calibration"
+    ):
         tier = "featured"
     elif public_visible:
         tier = "calibration"
@@ -265,6 +298,12 @@ def build_record(
         "verdict_bucket": verdict_bucket(verdict) if verdict else "missing",
         "estimator_floor": "fail" if estimator_failures else "pass",
         "estimator_floor_failures": estimator_failures,
+        "audit_disposition": disposition or None,
+        "run_tier_recommendation": run_tier_recommendation or None,
+        "integrity_detector_findings": sorted(
+            {str(finding.get("detector")) for finding in detector_findings}
+        ),
+        "scoreboard_weight_cap": scoreboard_weight_cap,
         "screening_flags": screening,
         "exclusion_reasons": sorted(set(exclusion_reasons)),
         "canonical_url": (
@@ -305,11 +344,13 @@ def build() -> dict[str, Any]:
         "definitions": {
             "featured": (
                 "Strict spec-before-run registration; public method gate; "
-                "estimator floor passed; causal evidence type; no screening markers."
+                "estimator floor passed; causal evidence type; no screening "
+                "markers or documented calibration cap."
             ),
             "calibration": (
                 "Strict registration and public method gate passed, but the design "
-                "is associational, descriptive, canonical-case, or screening-grade."
+                "is associational, descriptive, canonical-case, screening-grade, "
+                "or has a documented causal-design completeness cap."
             ),
             "archive": (
                 "Directly inspectable research record that does not currently clear "
@@ -323,6 +364,11 @@ def build() -> dict[str, Any]:
                 "Directional verdicts cannot receive public evidence credit when the "
                 "primary estimator failed, was rank-deficient, fell back, produced an "
                 "effectively-zero coefficient, or could not estimate uncertainty."
+            ),
+            "integrity_disposition": (
+                "Live detector findings, explicit quarantine, and unresolved verdict "
+                "rescores withhold public credit. Rescoped screens stay inspectable "
+                "as calibration evidence with a 0.25 scoreboard weight cap."
             ),
         },
         "summary": {

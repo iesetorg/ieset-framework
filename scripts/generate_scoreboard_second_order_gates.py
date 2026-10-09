@@ -153,6 +153,7 @@ def build_claim_gate_row(
     is_public: bool,
     verdict: str | None,
     scope: str,
+    scoreboard_weight_cap: float | None = None,
 ) -> dict[str, Any]:
     hypothesis_id = claim.get("linked_hypothesis_id")
     prediction = coverage.get("school_prediction") or claim.get("school_prediction")
@@ -182,6 +183,8 @@ def build_claim_gate_row(
         strict_gate=strict_gate,
     )
     evidence_weight = scoreboard.evidence_weight(evidence_type)
+    if scoreboard_weight_cap is not None:
+        evidence_weight = min(evidence_weight, scoreboard_weight_cap)
     raw_outcome_score = scoreboard.outcome_score(outcome) * evidence_weight
     recommended_score = raw_outcome_score
     if failure_credit["kind"] != "not_failure_prediction_win":
@@ -201,6 +204,7 @@ def build_claim_gate_row(
         "polarity": polarity,
         "evidence_type": evidence_type,
         "evidence_weight": evidence_weight,
+        "scoreboard_weight_cap": scoreboard_weight_cap,
         "raw_school_outcome": outcome,
         "raw_weighted_score": raw_outcome_score,
         "declared_scoreboard_eligible": bool(is_public and declared_gate["scoreboard_eligible"]),
@@ -222,6 +226,7 @@ def build_claim_gate_row(
 
 def build_gate_index(scope: str = "all") -> dict[str, Any]:
     hypotheses, coverage_index = scoreboard.build_hypothesis_index()
+    evidence_index = scoreboard.live_evidence_index()
     claim_rows: list[dict[str, Any]] = []
     hypothesis_rows: dict[str, dict[str, Any]] = {}
 
@@ -236,7 +241,10 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
                 continue
             hypothesis = hypotheses.get(hypothesis_id) or {}
             coverage = coverage_index.get((position_id, claim_index)) or {}
-            is_public, verdict = scoreboard.hypothesis_public_verdict(hypothesis_id, hypotheses)
+            is_public, verdict = scoreboard.hypothesis_public_verdict(
+                hypothesis_id, hypotheses, evidence_index
+            )
+            cap = (evidence_index.get(hypothesis_id) or {}).get("scoreboard_weight_cap")
             row = build_claim_gate_row(
                 position_id=position_id,
                 claim_index=claim_index,
@@ -246,6 +254,7 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
                 is_public=is_public,
                 verdict=verdict,
                 scope=scope,
+                scoreboard_weight_cap=cap,
             )
             claim_rows.append(row)
 

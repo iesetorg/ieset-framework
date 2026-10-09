@@ -532,6 +532,7 @@ def _score_positions_with_second_order_gate(
     import audit_scoreboard_outcomes as scoreboard
 
     hypotheses, coverage_index = scoreboard.build_hypothesis_index()
+    evidence_index = scoreboard.live_evidence_index()
     positions: dict[str, dict[str, Any]] = {}
     public_claim_links = 0
     held_claims = 0
@@ -557,10 +558,15 @@ def _score_positions_with_second_order_gate(
                 counts["untested"] += 1
                 continue
 
-            is_public, verdict = scoreboard.hypothesis_public_verdict(hypothesis_id, hypotheses)
+            is_public, verdict = scoreboard.hypothesis_public_verdict(
+                hypothesis_id, hypotheses, evidence_index
+            )
             hyp = hypotheses.get(hypothesis_id) or {}
             evidence_type = hyp.get("evidence_type")
             weight = scoreboard.evidence_weight(evidence_type)
+            cap = (evidence_index.get(hypothesis_id) or {}).get("scoreboard_weight_cap")
+            if cap is not None:
+                weight = min(weight, float(cap))
             gate = second_order_gate_for_hypothesis(
                 hyp,
                 scope,

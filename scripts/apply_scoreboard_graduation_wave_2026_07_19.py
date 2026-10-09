@@ -29,6 +29,7 @@ from apply_market_order_opposition_coverage_wave import insert_covers_yaml
 from audit_scoreboard_outcomes import (
     BENCHMARK_CONTROL_POSITION_IDS,
     hypothesis_public_verdict,
+    live_evidence_index,
     score_positions,
     score_signal,
     verdict_class,
@@ -161,6 +162,7 @@ def repo_inventory(
         "registrations", {}
     )
     hypotheses = {hid: load_yaml(path) for hid, path in paths.items()}
+    evidence_index = live_evidence_index()
     inbound = inbound_links(positions)
     totals: Counter[str] = Counter()
     topic_counts: Counter[str] = Counter()
@@ -175,7 +177,9 @@ def repo_inventory(
         replication = (run_dir / "replication.py").exists()
         packet = (run_dir / "evidence_packet.yaml").exists()
         steelman = steelman_exists(hypothesis, hypothesis_id)
-        public, verdict = hypothesis_public_verdict(hypothesis_id, hypotheses)
+        public, verdict = hypothesis_public_verdict(
+            hypothesis_id, hypotheses, evidence_index
+        )
         mapped = bool(hypothesis.get("covers_claims")) or hypothesis_id in inbound
 
         totals["strict_prereg_verified"] += int(verified)

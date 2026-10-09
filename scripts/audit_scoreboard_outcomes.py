@@ -18,9 +18,10 @@ from typing import Any
 
 import yaml
 
+import audit_evidence_tiers
+
 
 ROOT = Path(__file__).resolve().parents[1]
-STUB_RULE_MARKER = "when this stub is promoted from draft"
 BENCHMARK_CONTROL_POSITION_IDS = {"empirical_pragmatist"}
 
 
@@ -159,12 +160,26 @@ def outcome_score(outcome: str) -> float:
     }.get(outcome, 0.0)
 
 
-def hypothesis_public_verdict(hypothesis_id: str, hypotheses: dict[str, dict[str, Any]]) -> tuple[bool, str | None]:
-    hyp = hypotheses.get(hypothesis_id) or {}
+def live_evidence_index() -> dict[str, dict[str, Any]]:
+    """Use the current source files, not a possibly stale generated ledger."""
+    return {
+        row["hypothesis_id"]: row
+        for row in audit_evidence_tiers.build()["records"]
+    }
+
+
+def hypothesis_public_verdict(
+    hypothesis_id: str,
+    hypotheses: dict[str, dict[str, Any]],
+    evidence_index: dict[str, dict[str, Any]] | None = None,
+) -> tuple[bool, str | None]:
+    if hypothesis_id not in hypotheses:
+        return False, None
+    if evidence_index is None:
+        evidence_index = live_evidence_index()
     run_dir = ROOT / "engine" / "runs" / hypothesis_id
     diagnostics_path = run_dir / "diagnostics.json"
-    replication_path = run_dir / "replication.py"
-    if not diagnostics_path.exists() or not replication_path.exists():
+    if not diagnostics_path.exists():
         return False, None
 
     try:
@@ -173,19 +188,8 @@ def hypothesis_public_verdict(hypothesis_id: str, hypotheses: dict[str, dict[str
         return False, None
 
     verdict = diagnostics.get("verdict") or diagnostics.get("verdict_label")
-    if verdict_class(verdict) == "untested":
-        return False, verdict
-
-    falsification = hyp.get("falsification") or {}
-    rule = (falsification.get("rule") or "").lower()
-    if STUB_RULE_MARKER not in rule:
-        return True, verdict
-
-    note_text = f"{hyp.get('notes') or ''} {hyp.get('methodology_note') or ''}".lower()
-    if any(marker in note_text for marker in ("dispositive", "sharpened", "primary (dispositive")):
-        return True, verdict
-
-    return False, verdict
+    record = evidence_index.get(hypothesis_id) or {}
+    return bool(record.get("public_visible")), verdict
 
 
 def build_hypothesis_index() -> tuple[dict[str, dict[str, Any]], dict[tuple[str, int], dict[str, Any]]]:
@@ -210,6 +214,7 @@ def build_hypothesis_index() -> tuple[dict[str, dict[str, Any]], dict[tuple[str,
 
 def score_positions() -> dict[str, Any]:
     hypotheses, coverage_index = build_hypothesis_index()
+    evidence_index = live_evidence_index()
 
     positions: dict[str, dict[str, Any]] = {}
     raw_status_misread_risks: list[dict[str, Any]] = []
@@ -234,9 +239,14 @@ def score_positions() -> dict[str, Any]:
                 counts["untested"] += 1
                 continue
 
-            is_public, verdict = hypothesis_public_verdict(hypothesis_id, hypotheses)
+            is_public, verdict = hypothesis_public_verdict(
+                hypothesis_id, hypotheses, evidence_index
+            )
             evidence_type = (hypotheses.get(hypothesis_id) or {}).get("evidence_type")
             weight = evidence_weight(evidence_type)
+            cap = (evidence_index.get(hypothesis_id) or {}).get("scoreboard_weight_cap")
+            if cap is not None:
+                weight = min(weight, float(cap))
             if not is_public:
                 outcome = "untested"
                 prediction = claim.get("school_prediction")
@@ -261,6 +271,7 @@ def score_positions() -> dict[str, Any]:
                         "polarity": polarity,
                         "evidence_type": evidence_type,
                         "evidence_weight": weight,
+                        "scoreboard_weight_cap": cap,
                         "verdict": verdict,
                         "outcome": outcome,
                         "claim": str(claim.get("claim") or "")[:240],
@@ -338,7 +349,7 @@ def score_positions() -> dict[str, Any]:
     return {
         "generated_at": date.today().isoformat(),
         "methodology": {
-            "principle": "Score school outcomes from verdict + school_prediction + polarity; never from raw empirical_status alone.",
+            "principle": "Score strict public evidence from verdict + school_prediction + polarity; never from raw empirical_status alone.",
             "win_rule": "SUPPORTED hypothesis verdict supports schools that predicted supported and refutes schools that predicted falsified; REFUTED reverses that.",
             "partial_rule": "Directional partials count half-weight in the predicted direction; neutral partials do not affect net score.",
             "signal_rule": "Rows with |weighted net| <= max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",

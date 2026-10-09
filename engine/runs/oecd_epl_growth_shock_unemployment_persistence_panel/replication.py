@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from pathlib import Path
-import subprocess, sys
+"""Guard the historical run until its raw-contrast design is re-registered."""
 
-ROOT = Path(__file__).resolve().parents[3]
-raise SystemExit(subprocess.call([sys.executable, str(ROOT / 'scripts' / 'promote_welfare_labour_minwage_batches_07_09_a4_2026_05_12.py'), 'oecd_epl_growth_shock_unemployment_persistence_panel']))
+raise SystemExit(
+    "Quarantined: the frozen raw top-quartile contrast has no low-treatment "
+    "group. A fresh prospective design and run are required."
+)

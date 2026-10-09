@@ -16,7 +16,12 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from audit_scoreboard_outcomes import build_hypothesis_index, hypothesis_public_verdict, load_yaml
+from audit_scoreboard_outcomes import (
+    build_hypothesis_index,
+    hypothesis_public_verdict,
+    live_evidence_index,
+    load_yaml,
+)
 from plan_public_visibility_repair_queue import primary_axis, visibility_status
 
 
@@ -49,6 +54,7 @@ def reason_effort(reason: str) -> int:
 
 def build_plan(target: int) -> dict[str, Any]:
     hypotheses, _coverage_index = build_hypothesis_index()
+    evidence_index = live_evidence_index()
     axis_index = load_axis_index()
 
     school_rows: list[dict[str, Any]] = []
@@ -83,7 +89,9 @@ def build_plan(target: int) -> dict[str, Any]:
 
             linked_ids.append(hypothesis_id)
             hypothesis = hypotheses.get(hypothesis_id) or {}
-            is_public, verdict = hypothesis_public_verdict(hypothesis_id, hypotheses)
+            is_public, verdict = hypothesis_public_verdict(
+                hypothesis_id, hypotheses, evidence_index
+            )
             if is_public:
                 tested += 1
                 continue
