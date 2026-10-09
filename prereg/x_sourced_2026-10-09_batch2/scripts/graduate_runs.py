@@ -28,7 +28,9 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--batch", required=True, choices=["1", "2"]); a = ap.parse_args(); B = BATCH[a.batch]
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     for rp in sorted(glob.glob(str(ROOT / B["dir"] / "runs/*/results.json"))):
-        r = json.loads(pathlib.Path(rp).read_text()); hid = r["hypothesis_id"]
+        r = json.loads(pathlib.Path(rp).read_text())
+        if "hypothesis_id" not in r: continue  # e.g. non-preregistered fact-checks
+        hid = r["hypothesis_id"]
         spec_p = next(ROOT.glob(f"hypotheses/*/{hid}.yaml")); spec = yaml.safe_load(spec_p.read_text())
         label = r["verdict"].split(",")[0].strip().upper(); verdict = f"{label} — {r['headline']}"
         urls = [] if hid in OWN else spec.get("source_provenance", {}).get("archive_refs", [])
