@@ -26,6 +26,8 @@ OLD_COMMIT = "aaf546211593c42dc91f81d0bca349bf9f8c876e"
 SPEC_REL = f"hypotheses/labour/{ID}.yaml"
 STEELMAN_REL = f"hypotheses/steelman/{ID}.md"
 RUNNER_REL = f"scripts/run_{ID}.py"
+ERRATUM_REL = f"engine/audits/{ID}_source_field_erratum.json"
+REGISTERED_RUNNER_SHA = "78bfb002c2e5618bed70ae01fd57fda35ca6a3c65f9bd493dc00dc90f2c006af"
 SLICE_REL = f"data/derived/{ID}_source_slice.json"
 RUN_REL = f"engine/runs/{ID}"
 MANIFEST_REL = "data/manifests/fetch_run_2026-05-05T200056Z.yaml"
@@ -222,9 +224,29 @@ def registration_commit() -> str:
     if len(set(additions)) != 1:
         raise RuntimeError("spec, steelman, and runner must first appear in one commit")
     commit = additions[0]
-    for relative in REGISTRATION_FILES:
+    for relative in (SPEC_REL, STEELMAN_REL):
         if git_show(commit, relative) != (ROOT / relative).read_bytes():
             raise RuntimeError(f"registered bytes changed after first addition: {relative}")
+    if hashlib.sha256(git_show(commit, RUNNER_REL)).hexdigest() != REGISTERED_RUNNER_SHA:
+        raise RuntimeError("first-addition runner bytes changed")
+    erratum_path = ROOT / ERRATUM_REL
+    erratum_bytes = erratum_path.read_bytes()
+    if git_show("HEAD", ERRATUM_REL) != erratum_bytes:
+        raise RuntimeError("technical erratum must be committed before source access")
+    erratum = json.loads(erratum_bytes)
+    if (erratum.get("preregistration_commit") != commit
+            or erratum.get("registered_runner_sha256") != REGISTERED_RUNNER_SHA
+            or erratum.get("amended_runner_sha256") != sha256(ROOT / RUNNER_REL)
+            or erratum.get("selection_estimator_threshold_rules_changed") is not False):
+        raise RuntimeError("technical erratum pin differs")
+    amendment = first_addition(ERRATUM_REL)
+    if (subprocess.run(["git", "merge-base", "--is-ancestor", commit, amendment],
+                       cwd=ROOT).returncode or git_show(amendment, RUNNER_REL) != (ROOT / RUNNER_REL).read_bytes()):
+        raise RuntimeError("runner amendment is not the committed technical erratum")
+    amended_tree = subprocess.run(["git", "ls-tree", "-r", "--name-only", amendment, "--", SLICE_REL, RUN_REL],
+                                  cwd=ROOT, capture_output=True, text=True)
+    if amended_tree.returncode or amended_tree.stdout.strip():
+        raise RuntimeError("technical erratum must precede selected values and results")
     if git_show(commit, MANIFEST_REL) != (ROOT / MANIFEST_REL).read_bytes():
         raise RuntimeError("publisher manifest changed after preregistration")
     for role, pin in SOURCE_FILES.items():
@@ -289,7 +311,10 @@ def selected_slice(commit: str) -> dict[str, Any]:
             # Named tuples sanitize the spaced OECD column; access the series by key.
             mw_original = finite_or_none(mw.loc[(mw["REF_AREA"] == area) & (mw["year"] == year), "Observation value"].iloc[0])
             ilo_value, ilo_original = finite_or_none(i.value), finite_or_none(i.obs_value)
-            if (mw_value is None) != (mw_original is None) or (mw_value is not None and not math.isclose(mw_value, mw_original, rel_tol=0, abs_tol=1e-9)):
+            # OECD's "Observation value" label column is blank in all fixed rows;
+            # the numeric publisher observation is stored in "value". Where the
+            # label field is populated, it must agree with that numeric field.
+            if mw_original is not None and (mw_value is None or not math.isclose(mw_value, mw_original, rel_tol=0, abs_tol=1e-9)):
                 raise ValueError(f"OECD normalized/source value mismatch: {key}")
             if (ilo_value is None) != (ilo_original is None) or (ilo_value is not None and not math.isclose(ilo_value, ilo_original, rel_tol=0, abs_tol=1e-9)):
                 raise ValueError(f"ILO normalized/source value mismatch: {key}")
