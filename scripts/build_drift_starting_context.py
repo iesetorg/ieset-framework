@@ -164,6 +164,68 @@ HISTORICAL_CONTEXTS = {
             {"label": "National Archives of Japan (domain abolition)", "url": "https://www.archives.go.jp/exhibition/digital/modean_state/contents/return/index.html"},
         ],
     },
+    ("ZAF", 1948): {
+        "as_of_year": 1948,
+        "summary": (
+            "The opening point is the National Party's 1948 victory and the "
+            "formal turn to apartheid. South Africa had a capitalist economy "
+            "with private firms, but the state used law and administration to "
+            "allocate political rights, residence, land access, and work along "
+            "racial lines. This is a coercive racial-capitalist order, not a "
+            "simple free-market or state-ownership starting point."
+        ),
+        "sources": [
+            {"label": "South African Government (history)", "url": "https://www.gov.za/about-sa/history"},
+            {"label": "South African Department of Basic Education (apartheid timeline)", "url": "https://www.education.gov.za/LinkClick.aspx?fileticket=oRjFfXEp1Ak%3D&mid=2502&portalid=0&tabid=670"},
+        ],
+    },
+    ("BGD", 1972): {
+        "as_of_year": 1972,
+        "summary": (
+            "At independence, the new government adopted a socialist "
+            "development orientation and nationalised scheduled industrial "
+            "enterprises through President's Order No. 27. The order also "
+            "created public corporations to coordinate those firms and "
+            "develop new industry. This shows a strong public-sector role in "
+            "industry, not a measured claim that the whole economy was "
+            "state-owned."
+        ),
+        "sources": [
+            {"label": "Bangladesh Industrial Enterprises (Nationalisation) Order, 1972", "url": "https://bdlaws.minlaw.gov.bd/act-print-378.html"},
+            {"label": "World Bank (1980), Bangladesh: Strategy for Sustained Growth", "url": "https://documents1.worldbank.org/curated/en/375571468152966660/pdf/527080PUB0lead101Official0Use0Only1.pdf"},
+        ],
+    },
+    ("NAM", 1990): {
+        "as_of_year": 1990,
+        "summary": (
+            "Namibia became independent under a multiparty constitution that "
+            "protected private property while allowing compensated public-"
+            "interest expropriation. The new government expanded access to "
+            "services previously restricted to a minority and pursued gradual "
+            "land reform. The opening point is a mixed market economy with an "
+            "active developmental state, not a nationalisation programme."
+        ),
+        "sources": [
+            {"label": "Constitution of the Republic of Namibia, 1990", "url": "https://namiblii.org/akn/na/act/1990/constitution/eng%402014-10-13"},
+            {"label": "World Bank (2013), Namibia Poverty and Inequality Assessment", "url": "https://documents1.worldbank.org/curated/en/193361468058501795/pdf/715150ESW0P1120370077B00PUBLIC00ACS.pdf"},
+        ],
+    },
+    ("PRY", 1954): {
+        "as_of_year": 1954,
+        "summary": (
+            "The opening point is Alfredo Stroessner's coup and the beginning "
+            "of a long dictatorship dominated by the Colorado Party and armed "
+            "forces. Economic policy still relied substantially on private "
+            "enterprise and foreign investment, alongside stabilisation and "
+            "state-supported infrastructure. Political authoritarianism here "
+            "does not mean comprehensive state ownership or a single "
+            "market/state direction."
+        ),
+        "sources": [
+            {"label": "OECD Public Governance Review: Paraguay", "url": "https://www.oecd.org/en/publications/oecd-public-governance-reviews-paraguay_9789264301856-en/full-report/component-5.html"},
+            {"label": "World Bank, Paraguay: The Role of the State (Report No. 15044-PA)", "url": "https://documents1.worldbank.org/curated/en/348711468757777070/pdf/multi_page.pdf"},
+        ],
+    },
 }
 
 

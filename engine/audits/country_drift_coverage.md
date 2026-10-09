@@ -6,15 +6,15 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 
 | Measure | Count |
 | --- | ---: |
-| Authored movement records | 810 |
-| Movement records included in drift | 806 |
+| Authored movement records | 815 |
+| Movement records included in drift | 811 |
 | Countries with a plotted movement | 147 |
-| Countries with one plotted movement | 55 |
-| Countries with at most 2 plotted movements | 75 |
-| Countries first coded after 2000 | 51 |
+| Countries with one plotted movement | 53 |
+| Countries with at most 2 plotted movements | 74 |
+| Countries first coded after 2000 | 49 |
 | Countries with internal uncovered intervals | 33 |
 | Countries lacking 2026 coverage, including policy-only countries | 0 |
-| Existing policy records flagged for research | 75 |
+| Existing policy records flagged for research | 74 |
 | Overlapping authored movement pairs sharing policy IDs | 65 |
 | EU supranational geographic scope records to review | 4 |
 
@@ -36,7 +36,6 @@ These are coverage observations. No movement is inferred from a date gap.
 | MDG | 2024 | 1 | 2024 |
 | GAB | 2023 | 1 | 2023 |
 | NER | 2023 | 1 | 2023 |
-| PRY | 2023 | 1 | 2023 |
 | BFA | 2022 | 1 | 2022 |
 | CYP | 2022 | 1 | 2022 |
 | JOR | 2022 | 1 | 2022 |
@@ -54,7 +53,6 @@ These are coverage observations. No movement is inferred from a date gap.
 | COG | 2020 | 1 | 2020 |
 | MLI | 2020 | 1 | 2020 |
 | MLT | 2020 | 1 | 2020 |
-| NAM | 2020 | 1 | 2020 |
 | OMN | 2020 | 1 | 2020 |
 | QAT | 2020 | 1 | 2020 |
 | TGO | 2020 | 1 | 2020 |
@@ -92,6 +90,7 @@ These are coverage observations. No movement is inferred from a date gap.
 | ESH | 1991 | 1 | 1991 |
 | KAZ | 1991 | 2 | 2019 |
 | ZMB | 1991 | 2 | 2021 |
+| NAM | 1990 | 2 | 2020 |
 | ROU | 1990 | 2 | 2025 |
 | SUN | 1985 | 1 | 1985 |
 | NIC | 1979 | 2 | 2007 |
@@ -162,7 +161,7 @@ These policy records may help locate missing movements or repair existing links.
 
 | Reason | Policy-country records |
 | --- | ---: |
-| `before_first_coded_year` | 25 |
+| `before_first_coded_year` | 24 |
 | `enactor_timeframe_mismatch` | 47 |
 | `internal_uncovered_year` | 9 |
 | `linked_only_to_nonplotted_movement` | 9 |
@@ -216,15 +215,15 @@ These policy records may help locate missing movements or repair existing links.
 | PHL | 1973 | enacted_date | national | [ph_coconut_levy_cojuangco_1973_1986](../../policies/ph_coconut_levy_cojuangco_1973_1986.yaml) | enactor_timeframe_mismatch |
 | POL | 1998 | enacted_date | national | [pl_pension_reform_1997_1999](../../policies/pl_pension_reform_1997_1999.yaml) | enactor_timeframe_mismatch |
 | PRK | 2018 | enacted_date | national | [kr_inter_korean_engagement_2018_2019](../../policies/kr_inter_korean_engagement_2018_2019.yaml) | before_first_coded_year |
-| PRY | 1991 | enacted_date | national | [br_mercosur_treaty_asuncion_1991](../../policies/br_mercosur_treaty_asuncion_1991.yaml) | before_first_coded_year |
 | QAT | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | before_first_coded_year |
 | ROU | 2024 | enacted_date | supranational | [eu_electricity_market_design_reform_2024](../../policies/eu_electricity_market_design_reform_2024.yaml) | internal_uncovered_year |
+| ROU | 2024 | enacted_date | supranational | [eu_platform_work_directive_2024](../../policies/eu_platform_work_directive_2024.yaml) | internal_uncovered_year |
 
-Showing 50 of 75 policy-country leads; the JSON report contains all of them.
+Showing 50 of 74 policy-country leads; the JSON report contains all of them.
 
 ## Overlap and shared-policy review
 
-There are 950 overlapping same-country authored movement pairs; 940 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
+There are 952 overlapping same-country authored movement pairs; 942 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
 
 | ISO3 | Overlap | Both plotted? | Movement pair | Shared policy IDs |
 | --- | --- | --- | --- | --- |
