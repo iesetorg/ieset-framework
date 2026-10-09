@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurozone_distribution_2008_2014_direct_measures_v2
+version: 1
+status: pre_registered
+topic: distribution
+claim: >-
+  Comparing observations labelled as the 2008 and 2014 EU-SILC survey waves,
+  the fixed five-country euro-area periphery had a mean bottom-quintile
+  income-share change at least 0.5 percentage points lower than the fixed
+  six-country core, together with a mean relative-poverty-rate change at
+  least 2.0 percentage points higher than the core.
+claim_direction: "?"
+methodology_note: >-
+  New-ID direct-measurement calibration following
+  eurozone_austerity_distributional_incidence. That old same-commit run was
+  INCONCLUSIVE (data gap): its chosen ilc_peps01n input was absent, its Gini
+  vintage cannot give a change between the 2008 and 2014 observations, and
+  the narrative consolidation shock panel was absent. The old 2008 and 2014
+  survey-wave comparison, fixed five periphery and six core countries, and
+  old inconclusive verdict were known
+  before this registration. This is neither an out-of-time nor an independent
+  prospective holdout. The replacement outcomes are Eurostat ilc_di01
+  quantile=QU1, indic_il=SHARE, currency=EUR (income share, percentage
+  points) and ilc_li02 unit=PC, indic_il=LI_R_M60, sex=T, age=TOTAL
+  (relative at-risk-of-poverty rate, percentage points). Dimension-only
+  preflight found exactly 22 selected country-wave keys in each pinned file;
+  no endpoint values, signs, or null masks were inspected. The 2008 and 2014
+  labels identify EU-SILC survey waves, not literal calendar-year income.
+  For most countries their income reference years are 2007 and 2013;
+  Ireland used a rolling 12 months before interview in these waves. Five and six
+  country groups remain fixed; they are not identified treatment/control
+  groups. All 44 exact finite values are required after registration.
+  The local Eurostat fetcher saved observations but not JSON-stat status
+  flags. No selected flags were inspected. Finite values and source hashes
+  cannot establish flag-clean or break-free cross-wave comparability.
+evidence_type: descriptive
+sample:
+  countries: [GRC, ESP, PRT, IRL, ITA, AUT, BEL, DEU, FRA, FIN, NLD]
+  period: [2008, 2014]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Periphery is exactly GRC, ESP, PRT, IRL, ITA; core is exactly AUT, BEL,
+      DEU, FRA, FIN, NLD. Eurostat geo_code EL maps only to GRC. Each country
+      has equal weight within its group; no country may be dropped or replaced.
+    - >-
+      Use only exact 2008 and 2014 survey-wave rows matching every registered Eurostat
+      dimension. Require one finite value between 0 and 100 inclusive for each
+      of 22 country-wave keys in each series. Missing, duplicated, nonfinite,
+      or out-of-range cells make the result INCONCLUSIVE. No interpolation,
+      nearest-year substitution, source switch, or partial-country analysis.
+variables:
+  outcome:
+    - name: bottom_quintile_income_share
+      source: eurostat:ilc_di01
+      transformation: 2014-wave minus 2008-wave share, percentage points, per country
+      notes: >-
+        QU1/SHARE/EUR, annual. Share of each country's equivalised disposable
+        income received by its bottom income quintile; not bottom-quintile
+        mean income or a measure of real purchasing power. The wave labels
+        do not identify literal 2008 and 2014 calendar-year income.
+    - name: relative_at_risk_of_poverty_rate
+      source: eurostat:ilc_li02
+      transformation: 2014-wave minus 2008-wave rate, percentage points, per country
+      notes: >-
+        PC/LI_R_M60/T/TOTAL, annual. The rate below 60 percent of the
+        contemporary national median equivalised disposable income; this is
+        relative low income and not an absolute poverty measure. The income
+        reference period usually precedes each survey wave; Ireland used a
+        rolling 12 months before interview in these waves.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    For each series, compute the difference between each country's 2014 and
+    2008 survey-wave observations. This is a comparison of survey labels;
+    the income reference period usually precedes the survey year and was
+    rolling for Ireland.
+    Average the five periphery changes and the six core changes separately,
+    without population or income weights. The reported contrast is periphery
+    mean change minus core mean change in percentage points. Apply the two
+    registered directional thresholds jointly. No regression, p-value,
+    shock proxy, policy treatment, or causal language is permitted.
+falsification:
+  test: eurozone_fixed_groups_bottom_quintile_share_and_relative_poverty_2008_2014_v2
+  rule: >-
+    METHOD_VALID requires exact source SHA-256 and fetch-manifest custody,
+    unchanged first-addition committed registration, unique complete keys,
+    and all 44 finite outcome values within 0 to 100. SUPPORTED only if the
+    periphery-minus-core bottom-quintile-share change is <= -0.5 percentage
+    points AND the corresponding relative-poverty-rate change is >= +2.0
+    percentage points. REFUTED only if the share gap is >= +0.5 and the
+    poverty-rate gap is <= -2.0. A complete result clearing neither joint
+    directional gate is PARTIAL. Failed custody, key, or value gates are
+    INCONCLUSIVE, never REFUTED or PARTIAL. No threshold or roster changes
+    after value access.
+  threshold:
+    old_hypothesis_id: eurozone_austerity_distributional_incidence
+    old_result_seen: INCONCLUSIVE
+    old_window_known: [2008, 2014]
+    periphery_countries: [GRC, ESP, PRT, IRL, ITA]
+    core_countries: [AUT, BEL, DEU, FRA, FIN, NLD]
+    eurostat_geo_alias: {GRC: EL}
+    years: [2008, 2014]
+    required_country_years_per_indicator: 22
+    required_total_values: 44
+    valid_value_min: 0.0
+    valid_value_max: 100.0
+    support_max_share_gap_pp: -0.5
+    support_min_poverty_gap_pp: 2.0
+    refute_min_share_gap_pp: 0.5
+    refute_max_poverty_gap_pp: -2.0
+    source_files:
+      income_share:
+        source: eurostat:ilc_di01
+        path: data/vintages/eurostat/ilc_di01@2026-04-30T115754Z.parquet
+        sha256: 6dc9948f57c6dc32e967628f541bbb19c894680ae7304b9de59fd50e641c29b5
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        dimensions: {freq: A, quantile: QU1, indic_il: SHARE, currency: EUR}
+      poverty_rate:
+        source: eurostat:ilc_li02
+        path: data/vintages/eurostat/ilc_li02@2026-05-05T205827Z.parquet
+        sha256: f49a93b5183acddb13c89b07bba923693eee92a31cf7f065bd0e652e52ea4648
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        dimensions: {freq: A, unit: PC, indic_il: LI_R_M60, sex: T, age: TOTAL}
+prior_confidence: 0.45
+disclosure: >-
+  The old inconclusive result, country grouping, and 2008-to-2014 survey-wave
+  comparison were known when this new study was designed, so selection and
+  framing may reflect the old claim. Outcome magnitudes, signs, and null
+  masks of these exact direct measures were not read before registration.
+  Selected Eurostat status flags were not inspected and are absent from the
+  pinned Parquets, so estimated, provisional, break, or reliability flags
+  cannot be ruled out for the chosen observations.
+  The relative decision rule can clear even if both groups improve or both
+  deteriorate in absolute terms. The groups differ in many ways besides
+  fiscal policy; both series are
+  based on EU-SILC and may share survey errors or revisions. A favorable
+  descriptive gap cannot attribute change to austerity, establish that
+  distributional costs were unnecessary, or substitute for the missing
+  narrative shocks. It has calibration credit only and no automatic claim or
+  scoreboard credit.
+steelman: hypotheses/steelman/eurozone_distribution_2008_2014_direct_measures_v2.md
+scope:
+  period: [2008, 2014]
+  countries: [GRC, ESP, PRT, IRL, ITA, AUT, BEL, DEU, FRA, FIN, NLD]
+  outcome_dim: [poverty_inequality]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
