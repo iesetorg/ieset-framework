@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cepal_imf_inflation_next_year_national_poverty_panel
+version: 1
+status: pre_registered
+topic: distribution
+claim: >-
+  Across a fixed set of 14 Latin American countries, higher annual consumer-price
+  inflation is associated with a higher national poverty share in the following
+  year, conditional on same-year real GDP growth and country and outcome-year
+  effects.
+claim_direction: "+"
+methodology_note: >-
+  Pre-analysis registration for a retrospective validation using an already
+  collected October 2026 source vintage. The source values and their null masks
+  were not read before this registration; source schemas, country-year keys,
+  source hashes, prior result labels, and the IMF actual-year appendix were
+  reviewed. This is a new descriptive association, not a prospective data
+  collection or an independent replication of a previous poverty result.
+evidence_type: descriptive
+sample:
+  countries: [BOL, BRA, CHL, COL, CRI, DOM, ECU, HND, MEX, PAN, PER, PRY, SLV, URY]
+  period: [2000, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Treatment and real-GDP-growth control use calendar year t=2000..2023;
+      the poverty outcome uses t+1=2001..2024. Join exact ISO3 and year keys
+      only; no nearest-year substitution or interpolation.
+    - >-
+      Keep CEPALSTAT indicator 3328 only when
+      poverty_and_extreme_poverty=Poverty and geographical_area__(hs)=National.
+      Extreme poverty, rural, urban, and regional aggregates are not substitutes.
+    - >-
+      The 14 countries are fixed from structural keys before reading values.
+      ARG lacks National keys; VEN has no actual WEO national-accounts data
+      after 2018 in the April 2026 appendix; GTM and NIC have fewer than eight
+      structurally matched annual pairs. Do not add, replace, or drop countries
+      in response to observed outcomes.
+    - >-
+      Require exact pinned IMF WEO flow WEO for both indicators. The April
+      2026 WEO appendix reports latest actual annual national-accounts data
+      of at least 2024 and CPI data of at least 2025 for every fixed country.
+      The primary t<=2023 window is therefore on the documented actual side
+      for both IMF measures. If that source-status assertion fails, return
+      INCONCLUSIVE rather than use a projected observation.
+variables:
+  outcome:
+    - name: national_poverty_share_t_plus_1
+      source: cepalstat:indicator_3328
+      transformation: level in percentage points at calendar year t+1
+      notes: National share living in poverty, distinct from extreme poverty.
+  treatment:
+    - name: annual_average_cpi_inflation_t
+      source: imf_weo_sdmx:WEO__PCPIPCH
+      transformation: asinh(annual percent change / 10)
+      notes: The asinh scale compresses hyperinflation without country exclusions.
+  controls:
+    - name: real_gdp_growth_t
+      source: imf_weo_sdmx:WEO__NGDP_RPCH
+      transformation: annual percent change divided by 10
+estimator:
+  template: descriptive
+  fixed_effects: [country_iso3, outcome_year]
+  clustering: country_iso3
+  notes: >-
+    Complete-case OLS with country and outcome-year dummies. Compute CR1
+    country-clustered standard error and a two-sided Student-t p-value with
+    G-1 degrees of freedom, where G is the number of retained countries.
+    Keep every finite CPI and GDP observation, with no trimming or winsorizing.
+    A poverty value must be finite and in [0,100]. Drop a triplet only for
+    missing or invalid selected values and report its source-specific count.
+    Refit the same model leaving out each country once for sign stability.
+falsification:
+  test: cepal_imf_inflation_next_year_national_poverty_fixed_panel
+  rule: >-
+    METHOD_VALID requires the exact three source hashes and narrow source lock,
+    the unchanged first-addition registration, the IMF actual-year status rule,
+    281 expected structural country-t keys, at least 200 complete triplets,
+    all 14 fixed countries with at least eight complete triplets each,
+    at least 18 distinct outcome years, full-rank fitted design, and finite
+    coefficient and CR1 standard error. SUPPORTED as a descriptive association
+    only if beta>=0.5 poverty percentage points per one unit of
+    asinh(inflation/10), two-sided country-cluster t p<0.025, and at least 80%
+    of leave-one-country-out beta estimates are positive. REFUTED if beta<=-0.5,
+    p<0.025, and at least 80% of leave-one-out estimates are negative. Every
+    other method-valid estimate is PARTIAL. Any failed method or data gate is
+    INCONCLUSIVE. One result has zero school or policy-score credit.
+  threshold:
+    country_roster: [BOL, BRA, CHL, COL, CRI, DOM, ECU, HND, MEX, PAN, PER, PRY, SLV, URY]
+    exposure_years: [2000, 2023]
+    outcome_years: [2001, 2024]
+    poverty_dimension: {poverty_and_extreme_poverty: Poverty, geographical_area__(hs): National}
+    imf_flow: WEO
+    minimum_imf_actual_year: {national_accounts: 2024, prices_cpi: 2025}
+    structural_key_count: 281
+    structural_key_sha256: d0c1d057a04c63a1a771a2fb64ebe532a5646f7270fd57945847abb3c858cc32
+    minimum_complete_triplets: 200
+    minimum_countries: 14
+    minimum_triplets_per_country: 8
+    minimum_outcome_years: 18
+    treatment_transform: asinh(inflation_percent/10)
+    control_transform: real_gdp_growth_percent/10
+    effect_size_threshold_pp: 0.5
+    two_sided_p_max_exclusive: 0.025
+    leave_one_country_out_sign_share_min: 0.8
+    source_manifest:
+      path: data/manifests/fetch_run_2026-10-09T121824Z.yaml
+      sha256: befe6a588f0e2c0de0fd42566f34e76226ce161151432e0373bf3dced401d960
+    source_files:
+      poverty:
+        path: data/vintages/cepalstat/indicator_3328@2026-10-09T121816Z.parquet
+        sha256: 8d6d5303adf4a0dd92fe5262779398962f00652bf5a63481326865a69c39cc9a
+      inflation:
+        path: data/vintages/imf_weo_sdmx/WEO__PCPIPCH@2026-10-09T121600Z.parquet
+        sha256: 89564e357988848ac8801d946f958c4dcef37881bf35ca77d4c03c225caa0568
+      real_gdp_growth:
+        path: data/vintages/imf_weo_sdmx/WEO__NGDP_RPCH@2026-10-09T121556Z.parquet
+        sha256: 6ec4c363b7d191f454840fc10abec6598aa28e7b17f934527dea17484addaf00
+prior_confidence: 0.50
+disclosure: >-
+  Earlier IESET poverty and inflation claims and a separate IMF-inflation run
+  were visible before source-pair selection. No prior run used this exact
+  CEPALSTAT national-poverty / IMF WEO inflation pair. Choosing among several
+  source families creates multiplicity; the p<0.025 rule reserves a second
+  independent primary design in this wave. The already collected files are
+  historical and publicly available, so this is retrospective validation.
+  Annual national poverty estimates and IMF inflation can share economic
+  shocks; the one-year lag and controls do not identify a causal effect.
+  CEPAL source notes and survey comparability are not fully adjudicated here.
+  The broad tracked fetch manifest contains unrelated absolute local paths;
+  a later narrow source lock will copy only these three source entries and
+  disclose that custody boundary. No school, ideology, or policy-score credit.
+steelman: hypotheses/steelman/cepal_imf_inflation_next_year_national_poverty_panel.md
+scope:
+  period: [2000, 2024]
+  countries: [BOL, BRA, CHL, COL, CRI, DOM, ECU, HND, MEX, PAN, PER, PRY, SLV, URY]
+  outcome_dim: [poverty_inequality]
+  policy_family: [none]
+  treatment_tags: [observed_inflation]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

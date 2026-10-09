@@ -1,0 +1,102 @@
+packet_version: 1
+generated_utc: '2026-10-09T22:08:14+00:00'
+hypothesis:
+  id: cepal_imf_inflation_next_year_national_poverty_panel
+  path: hypotheses/distribution/cepal_imf_inflation_next_year_national_poverty_panel.yaml
+  topic: distribution
+preregistration:
+  spec_commit: 37bf99cad9a1e84dcc59c234a2fefb4fc583a45f
+  source_lock_commit: 2599d302f25bcb71ed017844aacabd7e9cef290d
+  registration_files:
+  - path: hypotheses/distribution/cepal_imf_inflation_next_year_national_poverty_panel.yaml
+    sha256: 0507a7a266d2890e280564a370ee7fd1fd8369116cd0b0f3a96edbcd439bc85c
+  - path: hypotheses/steelman/cepal_imf_inflation_next_year_national_poverty_panel.md
+    sha256: 63720678fa9f9d6601c583661d5629157733230c76a876f9e8e314c4096715a0
+  - path: scripts/run_cepal_imf_inflation_next_year_national_poverty_panel.py
+    sha256: ae8228917ceb4d3cf958c5e0c697b306090e01ed517f49a83094ea886e19b939
+reproduction:
+  runner: scripts/run_cepal_imf_inflation_next_year_national_poverty_panel.py
+  run_dir: engine/runs/cepal_imf_inflation_next_year_national_poverty_panel
+  command: python3 engine/runs/cepal_imf_inflation_next_year_national_poverty_panel/replication.py
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: valid panel does not cross the registered materiality, precision, and stability
+    gates
+data:
+  source_lock: data/source_locks/cepal_imf_inflation_next_year_national_poverty_panel.yaml
+  inputs:
+    poverty:
+      path: data/vintages/cepalstat/indicator_3328@2026-10-09T121816Z.parquet
+      sha256: 8d6d5303adf4a0dd92fe5262779398962f00652bf5a63481326865a69c39cc9a
+    inflation:
+      path: data/vintages/imf_weo_sdmx/WEO__PCPIPCH@2026-10-09T121600Z.parquet
+      sha256: 89564e357988848ac8801d946f958c4dcef37881bf35ca77d4c03c225caa0568
+    real_gdp_growth:
+      path: data/vintages/imf_weo_sdmx/WEO__NGDP_RPCH@2026-10-09T121556Z.parquet
+      sha256: 6ec4c363b7d191f454840fc10abec6598aa28e7b17f934527dea17484addaf00
+  actual_year_rule: April 2026 WEO appendix; t<=2023; fixed 14 countries
+coverage:
+  structural_keys: 281
+  complete_triplets: 281
+  country_complete_counts:
+    BOL: 21
+    BRA: 23
+    CHL: 9
+    COL: 21
+    CRI: 24
+    DOM: 24
+    ECU: 22
+    HND: 17
+    MEX: 12
+    PAN: 21
+    PER: 24
+    PRY: 24
+    SLV: 21
+    URY: 18
+  distinct_outcome_years: 24
+  invalid_or_missing_value_cells_by_role:
+    poverty: 0
+    inflation: 0
+    real_gdp_growth: 0
+  minimum_complete_triplets: 200
+  minimum_per_fixed_country: 8
+  minimum_outcome_years: 18
+  passed: true
+results:
+  formula: poverty_pp ~ inflation_asinh + gdp_growth_div10 + C(country_iso3) + C(outcome_year)
+  treatment_coefficient_pp: -0.958606900031719
+  country_cluster_cr1_standard_error: 2.686545430402032
+  two_sided_t_p_value: 0.72695335787006
+  cluster_degrees_of_freedom: 13
+  n_obs: 281
+  n_countries: 14
+  leave_one_country_out_coefficients_pp:
+    BOL: 0.1822780939476406
+    BRA: -1.2461113201297551
+    CHL: -0.7515519077107387
+    COL: -1.2523977044909316
+    CRI: 0.25521623422681433
+    DOM: -1.68324895949308
+    ECU: -3.7486252432538967
+    HND: -0.9506654727811368
+    MEX: -1.0773884584873867
+    PAN: -1.306749354379714
+    PER: 0.09792515358097391
+    PRY: -1.2371681640393797
+    SLV: -0.8822802610245736
+    URY: -0.9061804964312312
+  leave_one_out_positive_share: 0.21428571428571427
+  leave_one_out_negative_share: 0.7857142857142857
+limitations:
+- Pre-analysis registered retrospective validation of files already collected on 2026-10-09.
+- The one-year lag, country effects, year effects, and GDP-growth control do not identify
+  a causal effect.
+- CEPAL poverty survey timing, definitions, and note codes are not fully harmonized
+  in the pinned local table.
+- The broad tracked fetch manifest contains unrelated absolute local paths; the narrow
+  source lock does not copy them.
+- Earlier IESET inflation/poverty work was visible before this source pair was selected;
+  p<0.025 reserves a second primary design.
+- This measured association has no policy, ideology, or school-score credit.
+credit_ceiling: descriptive calibration only; zero school score
