@@ -71,18 +71,93 @@ SOURCES = {
     },
 }
 
-USA_1862_CONTEXT = {
-    "as_of_year": 1862,
-    "summary": (
-        "Civil War taxes and the federal internal-revenue office were being "
-        "established. Currency included state-bank notes and newly authorized "
-        "federal greenbacks; nationwide bank-charter rules followed in 1863–64. "
-        "This describes selected institutions, not an economy-wide market/state score."
-    ),
-    "sources": [
-        {"label": "IRS history (1862 revenue law)", "url": "https://www.irs.gov/irs-history-timeline"},
-        {"label": "Federal Reserve history (banking before national acts)", "url": "https://www.federalreservehistory.org/essays/national-banking-acts"},
-    ],
+HISTORICAL_CONTEXTS = {
+    ("USA", 1789): {
+        "as_of_year": 1789,
+        "summary": (
+            "The Constitution's federal government began operating in 1789, "
+            "replacing an Articles-era center that could request state funds "
+            "but lacked enforcement and interstate-commerce powers. The "
+            "opening point is a shift from a weak confederation toward a "
+            "stronger federal market and fiscal authority, not an economy-wide "
+            "market/state score."
+        ),
+        "sources": [
+            {"label": "National Archives (Articles and Constitution)", "url": "https://www.archives.gov/founding-docs/constitution/how-did-it-happen"},
+            {"label": "National Archives (government begins in 1789)", "url": "https://www.archives.gov/founding-docs/constitution-q-and-a"},
+        ],
+    },
+    ("FRA", 1789): {
+        "as_of_year": 1789,
+        "summary": (
+            "At the opening of the coded movement, France's Ancien Régime had "
+            "estate and provincial privileges, feudal obligations, and "
+            "different regional legal traditions. This is a documented "
+            "institutional starting point before the Assembly's 1789 legal "
+            "reordering, not a numeric market/state score."
+        ),
+        "sources": [
+            {"label": "French National Assembly (abolition of privileges)", "url": "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/revolution-francaise/nuit-du-4-aout-abolition-des-privileges"},
+            {"label": "French National Assembly (unified code and prior legal diversity)", "url": "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/consulat-et-premier-empire/la-codification-juridique"},
+        ],
+    },
+    ("DEU", 1871): {
+        "as_of_year": 1871,
+        "summary": (
+            "Germany's opening point is the Prussian-led federal Empire: the "
+            "Bundesrat represented 25 states and the Reichstag legislated and "
+            "approved budgets, while the Kaiser-appointed Chancellor and "
+            "monarchic executive retained extensive power. This is federal "
+            "state formation under a dominant monarchy, not parliamentary "
+            "democracy or a numeric market/state score."
+        ),
+        "sources": [
+            {"label": "German Bundestag (Empire and Reichstag powers)", "url": "https://www.bundestag.de/en/parliament/history/parliamentarism/empire"},
+            {"label": "German Bundestag (1871 Constitution)", "url": "https://www.bundestag.de/besuche/ausstellungen/verfassung/tafel12"},
+        ],
+    },
+    ("CAN", 1867): {
+        "as_of_year": 1867,
+        "summary": (
+            "Canada's opening coded point is Confederation: several British "
+            "North American colonies formed a federal Dominion with powers "
+            "divided between Parliament and provinces, still within the British "
+            "Empire. This is institutional context, not a numeric market/state "
+            "score; Indigenous peoples were excluded from the constitutional "
+            "bargain and faced later federal expansion."
+        ),
+        "sources": [
+            {"label": "Library of Parliament (Confederation and federal powers)", "url": "https://lop.parl.ca/staticfiles/Learn/Documents/ParliamentaryPrimer/LOP_TimelineBrochEN.pdf"},
+        ],
+    },
+    ("ITA", 1861): {
+        "as_of_year": 1861,
+        "summary": (
+            "Italy's opening coded point is national unification under a "
+            "constitutional monarchy and Parliament. The electorate was "
+            "narrowly restricted by wealth and status, and national integration "
+            "was uneven. This is state-formation context, not a numeric "
+            "market/state score."
+        ),
+        "sources": [
+            {"label": "Italian Chamber of Deputies (Parliament and unification)", "url": "https://www.camera.it/application/xmanager/projects/leg17/attachments/pubblicazione/pdfs/000/000/778/Montecitorio_ingl_def.pdf"},
+        ],
+    },
+    ("JPN", 1868): {
+        "as_of_year": 1868,
+        "summary": (
+            "Japan's opening coded point is the Meiji government's Charter "
+            "Oath and emerging central administration. Domain governments "
+            "were abolished and replaced by prefectures in 1871; the new state "
+            "promised deliberative government but remained politically "
+            "concentrated. This is institutional context, not a numeric "
+            "market/state score."
+        ),
+        "sources": [
+            {"label": "National Diet Library (Meiji constitutional state)", "url": "https://www.ndl.go.jp/modern/e/cha1/"},
+            {"label": "National Archives of Japan (domain abolition)", "url": "https://www.archives.go.jp/exhibition/digital/modean_state/contents/return/index.html"},
+        ],
+    },
 }
 
 
@@ -241,7 +316,7 @@ def build_context(drift: dict, source_rows: dict[str, dict]) -> dict:
                 if market is None else ""
             ),
             "market_institutions_source_url": SOURCES["wgi_regulatory_quality"]["source_url"],
-            "historical_context": USA_1862_CONTEXT if iso3 == "USA" and first_year == 1862 else None,
+            "historical_context": HISTORICAL_CONTEXTS.get((iso3, first_year)),
         }
     return {
         "schema": "ieset-country-drift-starting-context-v1",

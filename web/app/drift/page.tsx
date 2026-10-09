@@ -297,6 +297,8 @@ export default async function DriftPage() {
           contextDataset?.countries[iso3]?.market_institutions ?? null,
         market_context_note:
           contextDataset?.countries[iso3]?.market_institutions_note ?? null,
+        historical_context:
+          contextDataset?.countries[iso3]?.historical_context ?? null,
       };
     })
     .sort((a, b) => b.final - a.final);
@@ -339,7 +341,7 @@ export default async function DriftPage() {
         records may be candidates rather than confirmed enacted policies.
         The three existing registered drift result cards used earlier
         1976–2025 snapshots; their verdicts await a rerun against this
-        refreshed 1846–2026 map.
+        refreshed {data.year_min}–{data.year_max} map.
       </div>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
@@ -405,17 +407,21 @@ export default async function DriftPage() {
       <div className="mb-5 max-w-[860px] rounded border border-rule bg-panel p-4 text-[13px] leading-[1.55] text-muted">
         <strong className="text-ink">Why these can disagree:</strong> older coded
         shifts remain in the cumulative total even when the last decade moves
-        in the other direction. The UK line begins with its 1846 Corn Law
-        repeal coding; countries first coded later begin at later dates.
+        in the other direction. The earliest coded lines now begin with the
+        U.S. constitutional government and the French Constituent Assembly in
+        1789, Germany in 1871, Japan in 1868, Italy in 1861, and Canada in 1867. The UK line
+        begins with its 1846 Corn Law repeal coding. These are the earliest
+        coded anchors, not complete annual histories back to those dates.
       </div>
       <p className="mb-6 max-w-[900px] text-[13px] leading-[1.55] text-muted">
         <strong className="text-ink">Market/state starting context:</strong>{" "}
-        The country rows also show the nearest sourced fiscal footprint and
-        World Bank Regulatory Quality estimate available for each first coded
-        year. Values within five years before or at that year are marked
-        opening; later observations are dated and labelled. These are separate
-        reference measures, not a combined market/state score or part of the
-        drift line.
+        Where a country has a researched historical anchor, its row describes
+        the institutions at that starting point. The rows also show the nearest
+        sourced fiscal footprint and World Bank Regulatory Quality estimate
+        available for the first coded year. Values within five years before or
+        at that year are marked opening; later observations are dated and
+        labelled. These are separate reference measures, not a combined
+        market/state score or part of the drift line.
       </p>
       <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
         {(() => {
@@ -505,6 +511,24 @@ export default async function DriftPage() {
                                       Regulatory quality unavailable
                                     </div>
                                   )}
+                                  {row.historical_context ? (
+                                    <div className="mt-1 max-w-[540px] text-[10.5px] leading-[1.5] text-muted">
+                                      <span className="font-medium text-ink">
+                                        {row.historical_context.as_of_year} starting institutions:
+                                      </span>
+                                      {row.historical_context.summary}{" "}
+                                      {row.historical_context.sources[0] ? (
+                                        <a
+                                          href={row.historical_context.sources[0].url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="underline underline-offset-2"
+                                        >
+                                          Source
+                                        </a>
+                                      ) : null}
+                                    </div>
+                                  ) : null}
                                 </div>
                               </td>
                               <td
