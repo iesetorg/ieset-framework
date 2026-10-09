@@ -329,7 +329,10 @@ export default async function DriftPage() {
         and EU-wide movements are excluded from country totals. EU-wide
         records remain in the movement corpus and the atlas; their member
         applicability, decision dates, and overlapping policy stacks need
-        review before they can be shown as a separate EU layer here.
+        review before they can be shown as a separate EU layer here. Some
+        national umbrella and term records also have overlapping policy links
+        under source review; their country totals may change as duplicated
+        steps are resolved.
       </div>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
