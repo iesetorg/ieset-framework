@@ -19,9 +19,9 @@ interface RegionSpec {
 }
 
 /**
- * Region panels — every country in the drift dataset belongs to exactly one
- * panel. Within each panel we show the top-N most-coded countries to keep the
- * chart legible.
+ * Curated region panels and picker presets. The picker adds any countries
+ * absent from these panels to an automatic "Other countries" group.
+ * Within each panel we show the top-N most-coded countries for legibility.
  */
 const REGIONS: RegionSpec[] = [
   {
@@ -203,6 +203,30 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+
+  // Keep every country selectable even as the movement corpus grows. A code
+  // listed in more than one curated region appears only in the first picker
+  // group; countries outside the curated regions go into a sorted final group.
+  const pickerSeen = new Set<string>();
+  const pickerGroups = REGIONS.map(({ id, label, countries }) => ({
+    id,
+    label,
+    iso3s: countries.filter((iso3) => {
+      if (!(iso3 in driftData.countries) || pickerSeen.has(iso3)) return false;
+      pickerSeen.add(iso3);
+      return true;
+    }),
+  }));
+  const otherCountries = Object.keys(driftData.countries)
+    .filter((iso3) => !pickerSeen.has(iso3))
+    .sort();
+  if (otherCountries.length > 0) {
+    pickerGroups.push({
+      id: "other_countries",
+      label: "Other countries",
+      iso3s: otherCountries,
+    });
+  }
 
   // For each region, work out which countries are in the corpus + sort by
   // movement_count desc + slice to the per-panel limit.
@@ -527,11 +551,7 @@ export default async function DriftPage() {
           initialSelection={["DEU", "USA", "GBR", "FRA", "ITA", "CAN", "AUS", "NZL"]}
           height={460}
           zeroLineLabel="cumulative statist drift"
-          groups={REGIONS.map((r) => ({
-            id: r.id,
-            label: r.label,
-            iso3s: r.countries.filter((c) => c in driftData.countries),
-          }))}
+          groups={pickerGroups}
         />
       </div>
 
