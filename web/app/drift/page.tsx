@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-import { loadDrift, countryName } from "@/lib/drift";
+import {
+  loadDrift,
+  loadDriftStartingContext,
+  countryName,
+} from "@/lib/drift";
 import { DriftChart } from "@/components/charts/DriftChartLoader";
 import { InteractiveDriftChart } from "@/components/charts/InteractiveDriftChartLoader";
 
@@ -202,6 +206,7 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+  const contextDataset = await loadDriftStartingContext();
   const startYears = Object.fromEntries(
     Object.entries(data.countries).map(([iso3, c]) => [
       iso3,
@@ -286,6 +291,12 @@ export default async function DriftPage() {
         firstYear,
         final,
         recent_slope,
+        fiscal_context: contextDataset?.countries[iso3]?.fiscal ?? null,
+        fiscal_context_note: contextDataset?.countries[iso3]?.fiscal_note ?? null,
+        market_context:
+          contextDataset?.countries[iso3]?.market_institutions ?? null,
+        market_context_note:
+          contextDataset?.countries[iso3]?.market_institutions_note ?? null,
       };
     })
     .sort((a, b) => b.final - a.final);
@@ -397,6 +408,15 @@ export default async function DriftPage() {
         in the other direction. The UK line begins with its 1846 Corn Law
         repeal coding; countries first coded later begin at later dates.
       </div>
+      <p className="mb-6 max-w-[900px] text-[13px] leading-[1.55] text-muted">
+        <strong className="text-ink">Market/state starting context:</strong>{" "}
+        The country rows also show the nearest sourced fiscal footprint and
+        World Bank Regulatory Quality estimate available for each first coded
+        year. Values within five years before or at that year are marked
+        opening; later observations are dated and labelled. These are separate
+        reference measures, not a combined market/state score or part of the
+        drift line.
+      </p>
       <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
         {(() => {
           const statist = fullLeaderboard.filter((r) => r.final > 0);
@@ -459,6 +479,32 @@ export default async function DriftPage() {
                                 </span>
                                 <div className="text-[11px] text-muted">
                                   {row.movements} moves since {row.firstYear}
+                                </div>
+                                <div className="mt-1 space-y-0.5 text-[10.5px] leading-[1.45] text-faint">
+                                  {row.fiscal_context ? (
+                                    <div
+                                      title={`${row.fiscal_context.label}. ${row.fiscal_context.caveat} Source: ${row.fiscal_context.publisher}.`}
+                                    >
+                                      Fiscal: {row.fiscal_context.value.toFixed(1)} {row.fiscal_context.unit} · {row.fiscal_context.observed_year}
+                                      {row.fiscal_context.relation_to_first_coded_year === "opening" ? " opening" : " later"}
+                                    </div>
+                                  ) : (
+                                    <div title={row.fiscal_context_note ?? undefined}>
+                                      Fiscal context unavailable
+                                    </div>
+                                  )}
+                                  {row.market_context ? (
+                                    <div
+                                      title={`${row.market_context.caveat} Source: ${row.market_context.publisher}.`}
+                                    >
+                                      Regulatory quality: {row.market_context.value.toFixed(2)} · {row.market_context.observed_year}
+                                      {row.market_context.relation_to_first_coded_year === "opening" ? " opening" : " later"}
+                                    </div>
+                                  ) : (
+                                    <div title={row.market_context_note ?? undefined}>
+                                      Regulatory quality unavailable
+                                    </div>
+                                  )}
                                 </div>
                               </td>
                               <td

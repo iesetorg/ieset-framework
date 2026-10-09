@@ -34,8 +34,10 @@ CONTENT_PATTERNS = {
 ALLOWED_CONTENT_FILES = {".gitignore", "scripts/check_public_opsec.py"}
 ALLOWED_COMMIT_IDENTITIES = {
     ("iesetorg", "iesetorg@users.noreply.github.com"),
+    ("iesetorg", "info@ieset.org"),
     ("IESET", "iesetorg@users.noreply.github.com"),
     ("IESET", "institute@ieset.dev"),
+    ("GitHub", "noreply@github.com"),
 }
 
 

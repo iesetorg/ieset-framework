@@ -6,15 +6,15 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 
 | Measure | Count |
 | --- | ---: |
-| Authored movement records | 719 |
-| Movement records included in drift | 715 |
-| Countries with a plotted movement | 145 |
-| Countries with one plotted movement | 69 |
-| Countries with at most 2 plotted movements | 86 |
-| Countries first coded after 2000 | 49 |
-| Countries with internal uncovered intervals | 33 |
-| Countries lacking 2026 coverage, including policy-only countries | 18 |
-| Existing policy records flagged for research | 76 |
+| Authored movement records | 787 |
+| Movement records included in drift | 783 |
+| Countries with a plotted movement | 147 |
+| Countries with one plotted movement | 55 |
+| Countries with at most 2 plotted movements | 75 |
+| Countries first coded after 2000 | 51 |
+| Countries with internal uncovered intervals | 32 |
+| Countries lacking 2026 coverage, including policy-only countries | 0 |
+| Existing policy records flagged for research | 75 |
 | Overlapping authored movement pairs sharing policy IDs | 65 |
 | EU supranational geographic scope records to review | 4 |
 
@@ -24,24 +24,6 @@ A broad movement marked ongoing counts as covered here; this does not confirm ev
 
 | ISO3 | Plotted movements | Last coded event | Last covered year |
 | --- | ---: | ---: | ---: |
-| AFG | 1 | 1978 | 1992 |
-| CIV | 1 | 1960 | 1993 |
-| COD | 1 | 1965 | 1997 |
-| DZA | 1 | 1962 | 1978 |
-| GNB | 1 | 2020 | 2025 |
-| IRQ | 1 | 1968 | 1979 |
-| KAZ | 1 | 1991 | 2019 |
-| KHM | 1 | 1975 | 1979 |
-| LAO | 1 | 1975 | 1986 |
-| MAR | 1 | 1956 | 1999 |
-| MMR | 1 | 1962 | 1988 |
-| PRK | 0 | — | — |
-| SEN | 1 | 1960 | 1980 |
-| SYR | 1 | 1963 | 2000 |
-| TLS | 0 | — | — |
-| TUN | 1 | 1956 | 1987 |
-| UKR | 1 | 1991 | 1999 |
-| YEM | 1 | 1990 | 2011 |
 
 ## Late starts and sparse coding
 
@@ -64,18 +46,19 @@ These are coverage observations. No movement is inferred from a date gap.
 | STP | 2022 | 1 | 2022 |
 | SVN | 2022 | 1 | 2022 |
 | GIN | 2021 | 1 | 2021 |
+| PRK | 2021 | 1 | 2021 |
 | TCD | 2021 | 1 | 2021 |
 | UGA | 2021 | 2 | 2026 |
 | BDI | 2020 | 1 | 2020 |
 | BHR | 2020 | 1 | 2020 |
 | COG | 2020 | 1 | 2020 |
-| GNB | 2020 | 1 | 2020 |
 | MLI | 2020 | 1 | 2020 |
 | MLT | 2020 | 1 | 2020 |
 | NAM | 2020 | 1 | 2020 |
 | OMN | 2020 | 1 | 2020 |
 | QAT | 2020 | 1 | 2020 |
 | TGO | 2020 | 1 | 2020 |
+| GNB | 2020 | 2 | 2025 |
 | CAF | 2019 | 1 | 2019 |
 | GNQ | 2019 | 1 | 2019 |
 | MRT | 2019 | 1 | 2019 |
@@ -98,6 +81,7 @@ These are coverage observations. No movement is inferred from a date gap.
 | LUX | 2008 | 1 | 2008 |
 | SYC | 2008 | 1 | 2008 |
 | URY | 2005 | 5 | 2025 |
+| TLS | 2002 | 1 | 2002 |
 | ZWE | 2000 | 2 | 2017 |
 | BLR | 1994 | 1 | 1994 |
 | ERI | 1994 | 1 | 1994 |
@@ -106,37 +90,24 @@ These are coverage observations. No movement is inferred from a date gap.
 | RWA | 1994 | 2 | 2024 |
 | LBN | 1992 | 2 | 2025 |
 | ESH | 1991 | 1 | 1991 |
-| KAZ | 1991 | 1 | 1991 |
-| UKR | 1991 | 1 | 1991 |
+| KAZ | 1991 | 2 | 2019 |
 | ZMB | 1991 | 2 | 2021 |
-| YEM | 1990 | 1 | 1990 |
 | ROU | 1990 | 2 | 2025 |
 | SUN | 1985 | 1 | 1985 |
-| GHA | 1983 | 2 | 2025 |
 | NIC | 1979 | 2 | 2007 |
-| AFG | 1978 | 1 | 1978 |
+| AFG | 1978 | 2 | 2021 |
 | YUG | 1976 | 2 | 1980 |
-| KHM | 1975 | 1 | 1975 |
-| LAO | 1975 | 1 | 1975 |
 | PNG | 1975 | 1 | 1975 |
 | AGO | 1975 | 2 | 2017 |
-| TWN | 1973 | 2 | 2024 |
 | CSK | 1969 | 2 | 1989 |
-| IRQ | 1968 | 1 | 1968 |
-| TZA | 1967 | 2 | 2021 |
 | BWA | 1966 | 1 | 1966 |
-| COD | 1965 | 1 | 1965 |
-| SYR | 1963 | 1 | 1963 |
-| DZA | 1962 | 1 | 1962 |
-| MMR | 1962 | 1 | 1962 |
+| COD | 1965 | 2 | 2024 |
+| SYR | 1963 | 2 | 2024 |
 | KWT | 1961 | 1 | 1961 |
-| CIV | 1960 | 1 | 1960 |
-| SEN | 1960 | 1 | 1960 |
+| CIV | 1960 | 2 | 2011 |
 | CUB | 1959 | 1 | 1959 |
-| MAR | 1956 | 1 | 1956 |
-| TUN | 1956 | 1 | 1956 |
+| MAR | 1956 | 2 | 2021 |
 | SGP | 1955 | 2 | 1955 |
-| CRI | 1948 | 2 | 2026 |
 
 ## Longest internal uncovered intervals
 
@@ -144,28 +115,21 @@ Intervals between authored movement timeframes, after excluding context-only and
 
 | ISO3 | From | Through | Years |
 | --- | ---: | ---: | ---: |
-| GBR | 1850 | 1905 | 56 |
-| CRI | 1979 | 2025 | 47 |
-| SWE | 1936 | 1975 | 40 |
-| TWN | 1988 | 2023 | 36 |
-| TZA | 1986 | 2020 | 35 |
-| BGR | 1990 | 2022 | 33 |
-| DEU | 1915 | 1947 | 33 |
-| GHA | 1992 | 2024 | 33 |
-| GBR | 1915 | 1944 | 30 |
+| AFG | 1993 | 2020 | 28 |
 | ROU | 1997 | 2024 | 28 |
+| COD | 1998 | 2023 | 26 |
 | AGO | 1992 | 2016 | 25 |
 | EST | 1996 | 2020 | 25 |
-| GBR | 1952 | 1975 | 24 |
 | LKA | 1995 | 2018 | 24 |
+| SYR | 2001 | 2023 | 23 |
 | FRA | 1915 | 1935 | 21 |
+| MAR | 2000 | 2020 | 21 |
 | JPN | 1932 | 1951 | 20 |
+| UKR | 2000 | 2018 | 19 |
 | ZMB | 2002 | 2020 | 19 |
+| CIV | 1994 | 2010 | 17 |
 | NIC | 1991 | 2006 | 16 |
-| USA | 1918 | 1932 | 15 |
-| USA | 1891 | 1900 | 10 |
-| USA | 1878 | 1886 | 9 |
-| DEU | 1967 | 1973 | 7 |
+| GHA | 2017 | 2024 | 8 |
 | ITA | 1915 | 1921 | 7 |
 | ZWE | 2010 | 2016 | 7 |
 | FRA | 1939 | 1944 | 6 |
@@ -184,8 +148,9 @@ Intervals between authored movement timeframes, after excluding context-only and
 | ISR | 1987 | 1987 | 1 |
 | ITA | 1944 | 1944 | 1 |
 | MYS | 2019 | 2019 | 1 |
+| PAK | 2023 | 2023 | 1 |
 
-The full list of 41 internal intervals is in the JSON report.
+The full list of 34 internal intervals is in the JSON report.
 
 ## Existing dated policy leads
 
@@ -193,12 +158,10 @@ These policy records may help locate missing movements or repair existing links.
 
 | Reason | Policy-country records |
 | --- | ---: |
-| `after_last_covered_year` | 4 |
-| `before_first_coded_year` | 23 |
-| `enactor_timeframe_mismatch` | 43 |
-| `internal_uncovered_year` | 10 |
+| `before_first_coded_year` | 25 |
+| `enactor_timeframe_mismatch` | 47 |
+| `internal_uncovered_year` | 9 |
 | `linked_only_to_nonplotted_movement` | 9 |
-| `no_plotted_movement` | 2 |
 
 | ISO3 | Year | Date basis | Scope | Existing policy | Review reason |
 | --- | ---: | --- | --- | --- | --- |
@@ -212,8 +175,8 @@ These policy records may help locate missing movements or repair existing links.
 | CAN | 1987 | enacted_date | national | [ca_meech_lake_failure_1987_1990](../../policies/ca_meech_lake_failure_1987_1990.yaml) | enactor_timeframe_mismatch |
 | CHL | 1989 | enacted_date | national | [cl_bcch_autonomy_activation_1989_1990](../../policies/cl_bcch_autonomy_activation_1989_1990.yaml) | enactor_timeframe_mismatch |
 | CHN | 1988 | timeframe.start_proxy | national | [cn_austerity_rectification_1988_1991](../../policies/cn_austerity_rectification_1988_1991.yaml) | enactor_timeframe_mismatch |
-| COD | 2024 | timeframe.start_proxy | national | [rw_drc_m23_external_intervention_2024](../../policies/rw_drc_m23_external_intervention_2024.yaml) | after_last_covered_year |
 | CYP | 2008 | enacted_date | national | [cy_euro_adoption_2008](../../policies/cy_euro_adoption_2008.yaml) | before_first_coded_year |
+| DZA | 1986 | timeframe.start_proxy | national | [dz_market_transition_and_stabilization_1989](../../policies/dz_market_transition_and_stabilization_1989.yaml) | enactor_timeframe_mismatch |
 | EGY | 2015 | timeframe.start_proxy | national | [eg_new_administrative_capital_2015_ongoing](../../policies/eg_new_administrative_capital_2015_ongoing.yaml) | internal_uncovered_year, enactor_timeframe_mismatch |
 | EST | 2011 | enacted_date | national | [ee_euro_adoption_2011](../../policies/ee_euro_adoption_2011.yaml) | internal_uncovered_year |
 | FIN | 1977 | timeframe.start_proxy | national | [fi_tupo_incomes_policy_1977_onwards](../../policies/fi_tupo_incomes_policy_1977_onwards.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
@@ -228,17 +191,17 @@ These policy records may help locate missing movements or repair existing links.
 | IRL | 1978 | timeframe.start_proxy | national | [ireland_debt_spiral_1978_1982](../../policies/ireland_debt_spiral_1978_1982.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
 | IRN | 1974 | timeframe.start_proxy | national | [ir_fifth_plan_doubling_1974_1978](../../policies/ir_fifth_plan_doubling_1974_1978.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
 | IRN | 1975 | timeframe.start_proxy | national | [ir_rastakhiz_one_party_1975](../../policies/ir_rastakhiz_one_party_1975.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
-| IRQ | 2023 | timeframe.start_proxy | national | [irq_iraq_development_fund_2023](../../policies/irq_iraq_development_fund_2023.yaml) | after_last_covered_year |
 | ISR | 1987 | timeframe.start_proxy | national | [il_capital_market_liberalisation_1987_1992](../../policies/il_capital_market_liberalisation_1987_1992.yaml) | internal_uncovered_year, enactor_timeframe_mismatch |
 | ITA | 1972 | timeframe.start_proxy | national | [italy_alto_adige_autonomy_1981](../../policies/italy_alto_adige_autonomy_1981.yaml) | enactor_timeframe_mismatch |
 | KOR | 1987 | timeframe.start_proxy | national | [kr_wage_labour_liberalisation_post_1987](../../policies/kr_wage_labour_liberalisation_post_1987.yaml) | enactor_timeframe_mismatch |
 | KOR | 1997 | enacted_date | national | [korea_imf_reforms_1998](../../policies/korea_imf_reforms_1998.yaml) | enactor_timeframe_mismatch |
 | KOR | 1997 | enacted_date | national | [kr_imf_programme_conditions_1998](../../policies/kr_imf_programme_conditions_1998.yaml) | enactor_timeframe_mismatch |
+| LAO | 1986 | enacted_date | national | [lao_new_economic_mechanism_1986](../../policies/lao_new_economic_mechanism_1986.yaml) | enactor_timeframe_mismatch |
 | LBN | 2022 | enacted_date | national | [il_israel_lebanon_maritime_agreement_2022](../../policies/il_israel_lebanon_maritime_agreement_2022.yaml) | internal_uncovered_year |
 | LTU | 2015 | enacted_date | national | [lt_euro_adoption_2015](../../policies/lt_euro_adoption_2015.yaml) | before_first_coded_year |
 | LVA | 2014 | enacted_date | national | [lv_euro_adoption_2014](../../policies/lv_euro_adoption_2014.yaml) | before_first_coded_year |
-| MAR | 2021 | timeframe.start_proxy | national | [mar_social_protection_generalisation_framework_2021](../../policies/mar_social_protection_generalisation_framework_2021.yaml) | after_last_covered_year |
 | MLT | 2008 | enacted_date | national | [mt_euro_adoption_2008](../../policies/mt_euro_adoption_2008.yaml) | before_first_coded_year |
+| MMR | 1988 | enacted_date | national | [mmr_partial_market_opening_1988](../../policies/mmr_partial_market_opening_1988.yaml) | enactor_timeframe_mismatch |
 | NGA | 1975 | timeframe.start_proxy | national | [ng_third_national_development_plan_1975_1980](../../policies/ng_third_national_development_plan_1975_1980.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
 | NOR | 1974 | timeframe.start_proxy | national | [no_petroleum_moderate_pace_doctrine_1977](../../policies/no_petroleum_moderate_pace_doctrine_1977.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
 | NOR | 1975 | timeframe.start_proxy | national | [no_kleppe_packages_counter_cyclical_1975_1978](../../policies/no_kleppe_packages_counter_cyclical_1975_1978.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
@@ -248,16 +211,16 @@ These policy records may help locate missing movements or repair existing links.
 | PAK | 2023 | enacted_date | national | [pk_sifc_2023](../../policies/pk_sifc_2023.yaml) | internal_uncovered_year, enactor_timeframe_mismatch |
 | PHL | 1973 | enacted_date | national | [ph_coconut_levy_cojuangco_1973_1986](../../policies/ph_coconut_levy_cojuangco_1973_1986.yaml) | enactor_timeframe_mismatch |
 | POL | 1998 | enacted_date | national | [pl_pension_reform_1997_1999](../../policies/pl_pension_reform_1997_1999.yaml) | enactor_timeframe_mismatch |
-| PRK | 2018 | enacted_date | national | [kr_inter_korean_engagement_2018_2019](../../policies/kr_inter_korean_engagement_2018_2019.yaml) | no_plotted_movement |
+| PRK | 2018 | enacted_date | national | [kr_inter_korean_engagement_2018_2019](../../policies/kr_inter_korean_engagement_2018_2019.yaml) | before_first_coded_year |
 | PRY | 1991 | enacted_date | national | [br_mercosur_treaty_asuncion_1991](../../policies/br_mercosur_treaty_asuncion_1991.yaml) | before_first_coded_year |
 | QAT | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | before_first_coded_year |
 | ROU | 2024 | enacted_date | supranational | [eu_electricity_market_design_reform_2024](../../policies/eu_electricity_market_design_reform_2024.yaml) | internal_uncovered_year |
 
-Showing 50 of 76 policy-country leads; the JSON report contains all of them.
+Showing 50 of 75 policy-country leads; the JSON report contains all of them.
 
 ## Overlap and shared-policy review
 
-There are 916 overlapping same-country authored movement pairs; 906 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
+There are 941 overlapping same-country authored movement pairs; 931 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
 
 | ISO3 | Overlap | Both plotted? | Movement pair | Shared policy IDs |
 | --- | --- | --- | --- | --- |
