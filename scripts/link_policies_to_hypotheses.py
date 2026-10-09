@@ -101,6 +101,8 @@ def update_policy_yaml(
         return False, "yaml-parse-error"
     if not data:
         return False, "empty"
+    if data.get("suppress_inferred_axis_links") is True:
+        return False, "reviewed-no-inferred-links"
     existing = data.get("linked_hypotheses_inferred") or []
     if list(existing) == list(top_hids):
         return False, "unchanged"
@@ -151,6 +153,9 @@ def main() -> int:
             continue
         if not policy:
             stats["empty"] += 1
+            continue
+        if policy.get("suppress_inferred_axis_links") is True:
+            stats["reviewed-no-inferred-links"] += 1
             continue
         ranked = score_policy(policy, hyp_idx)
         if not ranked:

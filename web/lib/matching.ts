@@ -85,6 +85,7 @@ export async function hypothesesForPolicy(
   policy: Policy,
   limit = 8
 ): Promise<InferredHypothesisMatch[]> {
+  if (policy.suppress_inferred_axis_links === true) return [];
   const idx = await loadHypothesisAxisIndex();
   const policyAxes = new Set(
     (policy.axes_moved ?? []).map((m) => m.axis)

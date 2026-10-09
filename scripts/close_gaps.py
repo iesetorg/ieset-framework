@@ -310,6 +310,8 @@ def close_orphans(dry_run: bool = False, top_k: int = 5) -> dict:
         total += 1
         if doc.get("linked_hypotheses"):
             already_linked += 1
+        if doc.get("suppress_inferred_axis_links") is True:
+            continue
         pax = {
             m.get("axis")
             for m in (doc.get("axes_moved") or [])

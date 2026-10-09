@@ -113,6 +113,10 @@
       "items": {"type": "string"},
       "description": "Top hypothesis_ids matched to this policy by axis-overlap. Derived by scripts/close_gaps.py; distinct from the human-authored linked_hypotheses."
     },
+    "suppress_inferred_axis_links": {
+      "type": "boolean",
+      "description": "Human-reviewed exclusion of generic axis-overlap hypothesis links for this policy. Automatic linkers and the policy page must preserve an empty inferred list when true; explicit links remain available."
+    },
     "linked_conditions": {
       "type": "array",
       "items": {"type": "string"},
@@ -205,5 +209,17 @@
       "description": "External citations — primary legislation, reputable analyses."
     },
     "notes": {"type": "string"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"suppress_inferred_axis_links": {"const": true}},
+        "required": ["suppress_inferred_axis_links"]
+      },
+      "then": {
+        "properties": {"linked_hypotheses_inferred": {"maxItems": 0}},
+        "required": ["linked_hypotheses_inferred"]
+      }
+    }
+  ]
 }

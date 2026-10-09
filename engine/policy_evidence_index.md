@@ -5,8 +5,9 @@ This index joins policy files to linked hypotheses and local run verdicts.
 ## Summary
 
 - Policies indexed: 3369
+- blocked_or_inconclusive: 1
 - no_hypothesis_link: 114
-- tested: 3255
+- tested: 3254
 
 ## Top Tested Policies
 

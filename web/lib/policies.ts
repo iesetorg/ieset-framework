@@ -27,6 +27,7 @@ export interface Policy {
   axes_moved?: PolicyAxisMove[];
   linked_hypotheses?: string[];
   linked_hypotheses_inferred?: string[];
+  suppress_inferred_axis_links?: boolean;
   references?: unknown[];
   steelman?: string;
   notes?: string;
