@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from contextvars import ContextVar
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 VINTAGES = ROOT / "data" / "vintages"
+_REPLAY_PINS: ContextVar[dict | None] = ContextVar("eurostat_batch06_replay_pins", default=None)
 HYPOTHESES = ROOT / "hypotheses" / "energy"
 STEELMEN = ROOT / "hypotheses" / "steelman"
 RUNS = ROOT / "engine" / "runs"
@@ -55,6 +57,22 @@ def iso2_to_iso3(code: str) -> str | None:
 
 
 def latest(pub: str, stem: str) -> Path:
+    pins = _REPLAY_PINS.get()
+    if pins is not None:
+        for item in pins.values():
+            if item.get("publisher") != pub or item.get("series") != stem:
+                continue
+            raw_path, expected_hash = item.get("vintage_file"), item.get("sha256")
+            if not raw_path or not expected_hash:
+                raise ValueError(f"incomplete pinned vintage for {pub}:{stem}")
+            path = (ROOT / raw_path).resolve()
+            source = (VINTAGES / pub).resolve()
+            if path.parent != source or not path.name.startswith(f"{stem}@") or path.suffix != ".parquet":
+                raise ValueError(f"pinned vintage path is outside the registered source for {pub}:{stem}")
+            if not path.is_file() or sha256(path) != expected_hash:
+                raise ValueError(f"pinned vintage hash mismatch for {pub}:{stem}")
+            return path
+        raise FileNotFoundError(f"no pinned vintage for {pub}:{stem}")
     files = sorted((VINTAGES / pub).glob(f"{stem}@*.parquet"))
     if not files:
         raise FileNotFoundError(f"missing local vintage {pub}:{stem}")
@@ -207,17 +225,19 @@ CASES = [
 ]
 
 
-def build_sources() -> tuple[dict[str, pd.DataFrame], dict[str, dict]]:
+def build_sources(required: set[str] | None = None) -> tuple[dict[str, pd.DataFrame], dict[str, dict]]:
     frames: dict[str, pd.DataFrame] = {}
     metas: dict[str, dict] = {}
+    def needed(*keys: str) -> bool:
+        return required is None or bool(required.intersection(keys))
 
-    price, price_meta = eurostat_industrial_price()
-    frames["industrial_electricity_price"] = price[["country", "year", "industrial_electricity_price"]]
-    frames["electricity_price_yoy"] = price[["country", "year", "electricity_price_yoy"]]
-    frames["electricity_price_volatility"] = price[["country", "year", "electricity_price_volatility"]]
-    metas["industrial_electricity_price"] = price_meta
-    metas["electricity_price_yoy"] = price_meta
-    metas["electricity_price_volatility"] = price_meta
+    price_keys = ("industrial_electricity_price", "electricity_price_yoy", "electricity_price_volatility")
+    if needed(*price_keys):
+        price, price_meta = eurostat_industrial_price()
+        for key in price_keys:
+            if needed(key):
+                frames[key] = price[["country", "year", key]]
+                metas[key] = price_meta
 
     for stem, col in [
         ("NV.IND.MANF.ZS", "manufacturing_va_share"),
@@ -226,20 +246,27 @@ def build_sources() -> tuple[dict[str, pd.DataFrame], dict[str, dict]]:
         ("NY.GDP.PCAP.KD.ZG", "gdp_pc_growth"),
         ("SP.POP.TOTL", "population"),
     ]:
-        frames[col], metas[col] = wdi(stem, col)
+        if needed(col):
+            frames[col], metas[col] = wdi(stem, col)
 
-    frames["nuclear_share"], metas["nuclear_share"] = owid("share-electricity-nuclear", "Nuclear", "nuclear_share")
-    frames["renewable_share"], metas["renewable_share"] = owid("share-electricity-renewables", "Renewables", "renewable_share")
-    frames["unemployment_rate"], metas["unemployment_rate"] = eurostat_unemployment()
-    sector, sector_meta = eurostat_sector_employment()
-    frames["industry_employment_share"] = sector[["country", "year", "industry_employment_share"]]
-    frames["services_minus_industry_employment_share"] = sector[["country", "year", "services_minus_industry_employment_share"]]
-    metas["industry_employment_share"] = sector_meta
-    metas["services_minus_industry_employment_share"] = sector_meta
+    if needed("nuclear_share"):
+        frames["nuclear_share"], metas["nuclear_share"] = owid("share-electricity-nuclear", "Nuclear", "nuclear_share")
+    if needed("renewable_share"):
+        frames["renewable_share"], metas["renewable_share"] = owid("share-electricity-renewables", "Renewables", "renewable_share")
+    if needed("unemployment_rate"):
+        frames["unemployment_rate"], metas["unemployment_rate"] = eurostat_unemployment()
+    sector_keys = ("industry_employment_share", "services_minus_industry_employment_share")
+    if needed(*sector_keys):
+        sector, sector_meta = eurostat_sector_employment()
+        for key in sector_keys:
+            if needed(key):
+                frames[key] = sector[["country", "year", key]]
+                metas[key] = sector_meta
 
-    renew_cap, renew_meta = irena_capacity("installed_capacity_renewable", "renewable_capacity_mw")
-    frames["renewable_capacity_mw"] = renew_cap
-    metas["renewable_capacity_mw"] = renew_meta
+    if needed("renewable_capacity_mw"):
+        renew_cap, renew_meta = irena_capacity("installed_capacity_renewable", "renewable_capacity_mw")
+        frames["renewable_capacity_mw"] = renew_cap
+        metas["renewable_capacity_mw"] = renew_meta
     return frames, metas
 
 
@@ -262,7 +289,7 @@ def verdict(coef: float, pval: float, direction: str) -> tuple[str, str]:
     return "PARTIAL", "coefficient is not statistically decisive at p<0.10"
 
 
-def run_case(case: Case, frames: dict[str, pd.DataFrame], metas: dict[str, dict], run_utc: str) -> dict:
+def fit_case(case: Case, frames: dict[str, pd.DataFrame], run_utc: str) -> tuple[pd.DataFrame, dict, list[str]]:
     controls = [c for c in case.controls if c not in {case.treatment, case.outcome}]
     keys = [case.treatment, case.outcome] + controls
     panel = merge_panel(keys, frames)
@@ -284,8 +311,6 @@ def run_case(case: Case, frames: dict[str, pd.DataFrame], metas: dict[str, dict]
     ci = [float(x) for x in model.conf_int().loc[f"Q('{case.treatment}')"].tolist()]
     label, reason = verdict(coef, pval, case.direction)
 
-    run_dir = RUNS / case.hid
-    run_dir.mkdir(parents=True, exist_ok=True)
     diagnostics = {
         "hypothesis_id": case.hid,
         "verdict_label": label,
@@ -308,6 +333,21 @@ def run_case(case: Case, frames: dict[str, pd.DataFrame], metas: dict[str, dict]
         "school_focus": list(case.schools),
         "batch": "06_eurostat_energy_prices_nuclear_transition",
     }
+    return d, diagnostics, keys
+
+
+def run_case(case: Case, frames: dict[str, pd.DataFrame], metas: dict[str, dict], run_utc: str) -> dict:
+    d, diagnostics, keys = fit_case(case, frames, run_utc)
+    controls = diagnostics["controls"]
+    formula = diagnostics["formula"]
+    coef = diagnostics["coefficient"]
+    se = diagnostics["standard_error_cluster_country"]
+    pval = diagnostics["p_value"]
+    ci = diagnostics["ci95"]
+    label = diagnostics["verdict_label"]
+    reason = diagnostics["verdict_reason"]
+    run_dir = RUNS / case.hid
+    run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "diagnostics.json").write_text(json.dumps(diagnostics, indent=2) + "\n")
     manifest = {
         "hypothesis_id": case.hid,
@@ -349,11 +389,91 @@ def run_case(case: Case, frames: dict[str, pd.DataFrame], metas: dict[str, dict]
         "from pathlib import Path\nimport sys\n"
         "ROOT = Path(__file__).resolve().parents[3]\n"
         "sys.path.insert(0, str(ROOT / 'scripts'))\n"
-        "from promote_eurostat_energy_batch06_2026_05_12 import main\n\n"
-        "if __name__ == '__main__':\n    main()\n",
+        "from promote_eurostat_energy_batch06_2026_05_12 import reproduce_one\n\n"
+        f"if __name__ == '__main__':\n    reproduce_one('{case.hid}')\n",
         encoding="utf-8",
     )
     return diagnostics
+
+
+def reproduce_one(hid: str, run_dir: Path | None = None) -> dict:
+    """Verify a recorded result against hash-pinned inputs without writing files."""
+    case = next((item for item in CASES if item.hid == hid and item.runnable), None)
+    if case is None:
+        raise KeyError(hid)
+    run_dir = run_dir or RUNS / hid
+    pinned = yaml.safe_load((run_dir / "manifest.yaml").read_text(encoding="utf-8")) or {}
+    stored = json.loads((run_dir / "diagnostics.json").read_text(encoding="utf-8"))
+    if pinned.get("hypothesis_id") != hid or stored.get("hypothesis_id") != hid:
+        raise ValueError("run identity differs from pinned replay")
+    vintages = pinned.get("vintages")
+    if not isinstance(vintages, dict) or not vintages:
+        raise ValueError("run manifest has no pinned vintages")
+    controls = [c for c in case.controls if c not in {case.treatment, case.outcome}]
+    needed_keys = [case.treatment, case.outcome] + controls
+    if set(vintages) != set(needed_keys):
+        raise ValueError("run manifest does not pin exactly the registered inputs")
+
+    token = _REPLAY_PINS.set(vintages)
+    try:
+        frames, metas = build_sources(set(needed_keys))
+        d, replayed, keys = fit_case(case, frames, stored.get("run_utc"))
+    finally:
+        _REPLAY_PINS.reset(token)
+    if keys != needed_keys or {key: metas[key] for key in keys} != vintages:
+        raise ValueError("replayed vintages differ from run manifest")
+    for key, expected in {
+        "formula": replayed["formula"], "run_utc": replayed["run_utc"],
+        "verdict_label": replayed["verdict_label"],
+    }.items():
+        if pinned.get(key) != expected:
+            raise ValueError(f"run manifest {key} differs from pinned replay")
+    for key, expected in replayed.items():
+        actual = stored.get(key)
+        if key in {"coefficient", "standard_error_cluster_country", "p_value"}:
+            if not math.isclose(float(actual), expected, rel_tol=1e-9, abs_tol=1e-10):
+                raise ValueError(f"stored {key} differs from pinned replay")
+        elif key == "ci95":
+            if len(actual or []) != 2 or any(
+                not math.isclose(float(a), b, rel_tol=1e-9, abs_tol=1e-10)
+                for a, b in zip(actual, expected)
+            ):
+                raise ValueError("stored ci95 differs from pinned replay")
+        elif actual != expected:
+            raise ValueError(f"stored {key} differs from pinned replay")
+    if stored.get("verdict") != replayed["verdict_label"]:
+        raise ValueError("stored canonical verdict differs from pinned replay")
+
+    coefficients = pd.read_parquet(run_dir / "coefficients.parquet")
+    if len(coefficients) != 1 or coefficients.iloc[0]["term"] != case.treatment:
+        raise ValueError("stored coefficient table has an unexpected term")
+    row = coefficients.iloc[0]
+    for key, expected in {
+        "coefficient": replayed["coefficient"],
+        "std_error": replayed["standard_error_cluster_country"],
+        "p_value": replayed["p_value"],
+        "ci95_low": replayed["ci95"][0], "ci95_high": replayed["ci95"][1],
+    }.items():
+        if not math.isclose(float(row[key]), expected, rel_tol=1e-9, abs_tol=1e-10):
+            raise ValueError(f"stored coefficient table {key} differs from pinned replay")
+    chart = d[["country", "year", case.treatment, case.outcome]].sort_values(["country", "year"])
+    actual_chart = json.loads((run_dir / "chart_data.json").read_text(encoding="utf-8"))
+    expected_chart = chart.to_dict(orient="records")[:2000]
+    if len(actual_chart) != len(expected_chart) or any(
+        actual.keys() != expected.keys() or any(
+            not math.isclose(float(actual[key]), float(expected[key]), rel_tol=1e-9, abs_tol=1e-10)
+            if isinstance(expected[key], (int, float))
+            else actual[key] != expected[key]
+            for key in expected
+        )
+        for actual, expected in zip(actual_chart, expected_chart)
+    ):
+        raise ValueError("stored chart data differs from pinned replay")
+    card = (run_dir / "result_card.md").read_text(encoding="utf-8")
+    if f"**Verdict:** {replayed['verdict_label']} - {replayed['verdict_reason']}." not in card:
+        raise ValueError("stored result card verdict differs from pinned replay")
+    print(f"Verified pinned {hid}: {replayed['verdict_label']}; no artifacts written")
+    return replayed
 
 
 def write_hypotheses() -> None:

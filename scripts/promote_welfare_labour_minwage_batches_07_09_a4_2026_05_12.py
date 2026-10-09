@@ -12,7 +12,9 @@ import json
 import math
 import shutil
 import sys
+from contextvars import ContextVar
 from datetime import datetime, timezone
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 import numpy as np
@@ -29,6 +31,7 @@ OECD = ROOT / "data" / "vintages" / "oecd"
 BLS = ROOT / "data" / "vintages" / "bls"
 DERIVED = ROOT / "data" / "vintages" / "derived"
 WDI = ROOT / "data" / "vintages" / "world_bank_wdi"
+_REPLAY_PINS: ContextVar[dict | None] = ContextVar("welfare_replay_pins", default=None)
 
 COUNTRY_NAME_TO_ISO3 = {
     "Australia": "AUS", "Austria": "AUT", "Belgium": "BEL", "Canada": "CAN",
@@ -232,7 +235,18 @@ def sha256(path: Path) -> str:
 
 
 def read_vintage(root: Path, pattern: str, manifest: dict, key: str, columns: list[str] | None = None) -> pd.DataFrame:
-    path = latest(root, pattern)
+    pins = _REPLAY_PINS.get()
+    if pins is None:
+        path = latest(root, pattern)
+    else:
+        pin = pins.get(key)
+        if not isinstance(pin, dict) or not pin.get("vintage_file") or not pin.get("sha256"):
+            raise ValueError(f"missing pinned vintage for {key}")
+        path = (ROOT / pin["vintage_file"]).resolve()
+        if path.parent != root.resolve() or not fnmatchcase(path.name, pattern):
+            raise ValueError(f"pinned vintage path is outside the registered source for {key}")
+        if not path.is_file() or sha256(path) != pin["sha256"]:
+            raise ValueError(f"pinned vintage hash mismatch for {key}")
     manifest[key] = {"vintage_file": str(path.relative_to(ROOT)), "sha256": sha256(path)}
     return pd.read_parquet(path, columns=columns)
 
@@ -548,9 +562,11 @@ def write_run(hid: str, cfg: dict, d: pd.DataFrame, diag: dict, manifest: dict) 
     wrapper = (
         "#!/usr/bin/env python3\n"
         "from pathlib import Path\n"
-        "import subprocess, sys\n\n"
+        "import sys\n\n"
         "ROOT = Path(__file__).resolve().parents[3]\n"
-        f"raise SystemExit(subprocess.call([sys.executable, str(ROOT / 'scripts' / 'promote_welfare_labour_minwage_batches_07_09_a4_2026_05_12.py'), '{hid}']))\n"
+        "sys.path.insert(0, str(ROOT / 'scripts'))\n"
+        "from promote_welfare_labour_minwage_batches_07_09_a4_2026_05_12 import reproduce_one\n\n"
+        f"if __name__ == '__main__':\n    reproduce_one('{hid}')\n"
     )
     (out_dir / "replication.py").write_text(wrapper)
     (out_dir / "result_card.md").write_text(f"""# Result card - {hid}
@@ -600,6 +616,97 @@ def run_one(hid: str) -> dict:
     write_hypothesis(hid, cfg, d)
     write_run(hid, cfg, d, diag, manifest)
     return diag
+
+
+def reproduce_one(hid: str, run_dir: Path | None = None) -> dict:
+    """Verify one historical run against only its hash-pinned local vintages.
+
+    This deliberately does not call run_one(), which rewrites the hypothesis,
+    result packet, and dated audit.
+    """
+    if hid not in CASES:
+        raise KeyError(hid)
+    run_dir = run_dir or RUNS / hid
+    pinned = yaml.safe_load((run_dir / "manifest.yaml").read_text(encoding="utf-8")) or {}
+    stored = json.loads((run_dir / "diagnostics.json").read_text(encoding="utf-8"))
+    cfg = CASES[hid]
+    if pinned.get("hypothesis_id") != hid or stored.get("hypothesis_id") != hid:
+        raise ValueError("run identity differs from pinned replay")
+    vintages = pinned.get("vintages")
+    if not isinstance(vintages, dict) or not vintages:
+        raise ValueError("run manifest has no pinned vintages")
+
+    token = _REPLAY_PINS.set(vintages)
+    try:
+        if cfg["panel"] == "oecd":
+            panel, observed_vintages = build_oecd_panel()
+        else:
+            observed_vintages = {}
+            panel = build_bls_panel(cfg["panel"], observed_vintages, cfg.get("bite"))
+        d, replayed = fit_case(hid, cfg, panel)
+    finally:
+        _REPLAY_PINS.reset(token)
+
+    if observed_vintages != vintages:
+        raise ValueError("replayed vintages differ from run manifest")
+    for key, expected in {
+        "formula": cfg["formula"], "runner": replayed["runner"],
+        "verdict_label": replayed["verdict_label"], "run_utc": stored.get("run_utc"),
+    }.items():
+        if pinned.get(key) != expected:
+            raise ValueError(f"run manifest {key} differs from pinned replay")
+
+    for key, expected in replayed.items():
+        if key == "run_utc":
+            continue
+        actual = stored.get(key)
+        if key in {"coefficient", "standard_error_cluster_unit", "p_value", "raw_top_quartile_minus_rest"}:
+            if not math.isclose(float(actual), expected, rel_tol=1e-9, abs_tol=1e-10):
+                raise ValueError(f"stored {key} differs from pinned replay")
+        elif key == "ci95":
+            if len(actual or []) != 2 or any(
+                not math.isclose(float(a), b, rel_tol=1e-9, abs_tol=1e-10)
+                for a, b in zip(actual, expected)
+            ):
+                raise ValueError("stored ci95 differs from pinned replay")
+        elif actual != expected:
+            raise ValueError(f"stored {key} differs from pinned replay")
+    if stored.get("verdict") != replayed["verdict_label"]:
+        raise ValueError("stored canonical verdict differs from pinned replay")
+
+    coefficients = pd.read_parquet(run_dir / "coefficients.parquet")
+    if len(coefficients) != 1:
+        raise ValueError("stored coefficient table has an unexpected row count")
+    row = coefficients.iloc[0]
+    for key, expected in {
+        "hypothesis_id": hid, "term": cfg["treatment"],
+        "n_observations": replayed["n_observations"], "n_units": replayed["n_units"],
+    }.items():
+        if row[key] != expected:
+            raise ValueError(f"stored coefficient table {key} differs from pinned replay")
+    for key, expected in {
+        "estimate": replayed["coefficient"],
+        "std_error": replayed["standard_error_cluster_unit"],
+        "p_value": replayed["p_value"],
+        "ci95_low": replayed["ci95"][0], "ci95_high": replayed["ci95"][1],
+    }.items():
+        if not math.isclose(float(row[key]), expected, rel_tol=1e-9, abs_tol=1e-10):
+            raise ValueError(f"stored coefficient table {key} differs from pinned replay")
+
+    chart = d.groupby(["year", "_high_treatment"], as_index=False)[cfg["outcome"]].mean()
+    chart = chart.rename(columns={cfg["outcome"]: "mean_outcome"})
+    expected_chart = {"series": chart.to_dict("records")}
+    actual_chart = json.loads((run_dir / "chart_data.json").read_text(encoding="utf-8"))
+    if actual_chart != expected_chart:
+        raise ValueError("stored chart data differs from pinned replay")
+    card = (run_dir / "result_card.md").read_text(encoding="utf-8")
+    if f"**Verdict:** {replayed['verdict_label']} - {replayed['verdict_reason']}." not in card:
+        raise ValueError("stored result card verdict differs from pinned replay")
+    packet = yaml.safe_load((run_dir / "evidence_packet.yaml").read_text(encoding="utf-8")) or {}
+    if packet.get("hypothesis_id") != hid or packet.get("verdict") != replayed["verdict_label"]:
+        raise ValueError("stored evidence packet differs from pinned replay")
+    print(f"Verified pinned {hid}: {replayed['verdict_label']}; no artifacts written")
+    return replayed
 
 
 def write_audit(results: list[dict], readiness: list[dict]) -> Path:
