@@ -24,6 +24,11 @@ SPEC_REL = f"hypotheses/energy/{ID}.yaml"
 STEELMAN_REL = f"hypotheses/steelman/{ID}.md"
 RUNNER_REL = f"scripts/run_{ID}.py"
 RUN_REL = f"engine/runs/{ID}"
+ERRATUM_REL = f"engine/audits/{ID}_dtype_erratum_2026-10-09.json"
+FAILED_ATTEMPT_REL = f"{RUN_REL}/attempts/initial_inconclusive"
+FAILED_RUN_FILES = ("chart_data.json", "coefficients.parquet", "diagnostics.json",
+                    "evidence_packet.yaml", "hypothesis.yaml", "manifest.yaml",
+                    "replication.py", "result_card.md")
 OLD_ID = "owid_fossil_subsidy_hightech_export_drag_panel"
 OLD_COMMIT = "441b76cba266e45285ffc1e4bdc81dc303a88e29"
 FAMILY_ID = "fossil_consumption_subsidy_hightech_share_change_2026_10_09"
@@ -266,25 +271,87 @@ def registration_commit() -> str:
     additions = []
     for relative in first_add:
         current = (ROOT / relative).read_bytes()
-        if git_show("HEAD", relative) != current:
+        if relative != RUNNER_REL and git_show("HEAD", relative) != current:
             raise RuntimeError(f"commit unchanged preregistration before reading values: {relative}")
-        result = subprocess.run(["git", "log", "--diff-filter=A", "--reverse", "--format=%H", "--", relative],
-                                cwd=ROOT, capture_output=True, text=True)
-        commits = result.stdout.strip().splitlines()
-        if result.returncode or not commits:
-            raise RuntimeError(f"no first-addition commit: {relative}")
-        additions.append(commits[0])
+        additions.append(first_addition(relative))
     if len(set(additions)) != 1:
         raise RuntimeError("spec, steelman, runner, and three new source slices must first appear in one commit")
     commit = additions[0]
     for relative in first_add:
-        if git_show(commit, relative) != (ROOT / relative).read_bytes():
+        if relative != RUNNER_REL and git_show(commit, relative) != (ROOT / relative).read_bytes():
             raise RuntimeError(f"registration bytes changed after first addition: {relative}")
+    if git_show(commit, RUNNER_REL) != (ROOT / RUNNER_REL).read_bytes():
+        verify_dtype_erratum(commit)
     result = subprocess.run(["git", "ls-tree", "-r", "--name-only", commit, "--", RUN_REL],
                             cwd=ROOT, capture_output=True, text=True)
     if result.returncode or result.stdout.strip():
         raise RuntimeError("result artifacts existed in registration commit")
     return commit
+
+
+def first_addition(relative: str) -> str:
+    result = subprocess.run(["git", "log", "--diff-filter=A", "--reverse", "--format=%H", "--", relative],
+                            cwd=ROOT, capture_output=True, text=True)
+    commits = result.stdout.strip().splitlines()
+    if result.returncode or len(commits) != 1:
+        raise RuntimeError(f"expected exactly one first-addition commit: {relative}")
+    return commits[0]
+
+
+def strict_ancestor(older: str, newer: str) -> bool:
+    return older != newer and subprocess.run(
+        ["git", "merge-base", "--is-ancestor", older, newer], cwd=ROOT, capture_output=True
+    ).returncode == 0
+
+
+def verify_dtype_erratum(registration: str) -> dict[str, Any]:
+    """Pin the one post-failure runner version and the untouched failed attempt."""
+    record_path = ROOT / ERRATUM_REL
+    if not record_path.is_file():
+        raise RuntimeError("dtype erratum must be committed before any corrected value read")
+    record_bytes = record_path.read_bytes()
+    erratum_commit = first_addition(ERRATUM_REL)
+    if git_show(erratum_commit, ERRATUM_REL) != record_bytes:
+        raise RuntimeError("dtype erratum record changed after first addition")
+    runner_bytes = (ROOT / RUNNER_REL).read_bytes()
+    if git_show(erratum_commit, RUNNER_REL) != runner_bytes:
+        raise RuntimeError("corrected runner changed after dtype erratum commit")
+    record = json.loads(record_bytes)
+    failed_commit = record.get("failed_run_commit")
+    if (record.get("schema") != "ieset-dtype-erratum-v1"
+            or record.get("registration_commit") != registration
+            or not isinstance(failed_commit, str)
+            or record.get("corrected_runner_sha256") != hashlib.sha256(runner_bytes).hexdigest()
+            or set(record.get("failed_artifact_sha256", {})) != set(FAILED_RUN_FILES)
+            or not strict_ancestor(registration, failed_commit)
+            or not strict_ancestor(failed_commit, erratum_commit)):
+        raise RuntimeError("dtype erratum provenance or runner hash invalid")
+    if git_show(erratum_commit, f"{RUN_REL}/diagnostics.json") != git_show(
+            failed_commit, f"{RUN_REL}/diagnostics.json"):
+        raise RuntimeError("failed canonical diagnostic changed before erratum commit")
+    first_diagnostics = json.loads(git_show(failed_commit, f"{RUN_REL}/diagnostics.json"))
+    if (first_diagnostics.get("verdict_label") != "INCONCLUSIVE"
+            or first_diagnostics.get("estimate") is not None
+            or first_diagnostics.get("preflight", {}).get("observations") != 247
+            or first_diagnostics.get("preflight", {}).get("countries") != 22
+            or "Int64Dtype" not in first_diagnostics.get("verdict_reason", "")):
+        raise RuntimeError("first attempt was not the documented pre-estimate dtype failure")
+    for name in FAILED_RUN_FILES:
+        original = git_show(failed_commit, f"{RUN_REL}/{name}")
+        archived = (ROOT / FAILED_ATTEMPT_REL / name).read_bytes()
+        if (archived != original
+                or git_show(erratum_commit, f"{FAILED_ATTEMPT_REL}/{name}") != archived
+                or hashlib.sha256(original).hexdigest() != record["failed_artifact_sha256"][name]):
+            raise RuntimeError(f"failed attempt archive changed: {name}")
+    return record
+
+
+def assert_initial_canonical(record: dict[str, Any]) -> None:
+    """Allow one replacement only while the top-level files are the first failure."""
+    failed_commit = record["failed_run_commit"]
+    for name in FAILED_RUN_FILES:
+        if (ROOT / RUN_REL / name).read_bytes() != git_show(failed_commit, f"{RUN_REL}/{name}"):
+            raise RuntimeError(f"canonical run is not the recorded first attempt: {name}")
 
 
 def annual(role: str):
@@ -353,6 +420,9 @@ def estimate():
                       and gate["min_country_years"] >= MIN_YEARS)
     if not gate["passed"]:
         return gate, "INCONCLUSIVE", "frozen complete-case sample gate failed", None
+    # Pandas' nullable Int64 is an integer key but Patsy cannot build C(year) from it.
+    # This changes representation only: no rows, year keys, or measured values change.
+    panel["year"] = panel["year"].astype("int64")
     formula = ("next_year_change_hightech_manufactured_export_share_pp ~ " + PRIMARY
                + " + log_real_gdp_per_capita_at_t + C(country_iso3) + C(year)")
     try:
@@ -402,11 +472,13 @@ def expected_artifacts(commit: str, gate: dict[str, Any], verdict: str, reason: 
         "OWID/IEA measures explicit fossil-fuel consumption subsidies by price-gap estimates; commodity prices can alter the measure without policy change.",
         "The outcome denominator may change; observational association does not identify a subsidy policy or causal effect.",
         "No school, welfare, causal, or policy-score credit.",
+        "The first registered execution hit a pandas nullable-year dtype exception before fitting; a committed technical erratum casts the same year keys to int64 and retains the first attempt byte-exact.",
     ]
     diagnostics = {
         "hypothesis_id": ID, "verdict": verdict, "verdict_label": verdict,
         "verdict_reason": reason, "run_utc": stamp, "runner": RUNNER_REL,
         "preregistration_commit": commit, "template": "panel_fe", "preflight": gate,
+        "technical_erratum": {"record": ERRATUM_REL, "failed_attempt": FAILED_ATTEMPT_REL},
         "estimate": row, "family_id": FAMILY_ID, "family_size": 1,
         "family_p_max": P_MAX, "data_status": {"variables_missing": [], "input_vintages": inputs},
         "limitations": limits, "correction": correction,
@@ -414,6 +486,7 @@ def expected_artifacts(commit: str, gate: dict[str, Any], verdict: str, reason: 
     manifest = {
         "hypothesis_id": ID, "run_utc": stamp, "runner": RUNNER_REL,
         "preregistration_commit": commit, "status": verdict,
+        "technical_erratum": {"record": ERRATUM_REL, "failed_attempt": FAILED_ATTEMPT_REL},
         "old_hypothesis_id": OLD_ID, "old_verdict": "PARTIAL", "old_run_commit": OLD_COMMIT,
         "vintages": inputs, "derived_panel": gate, "correction": correction,
     }
@@ -425,6 +498,7 @@ def expected_artifacts(commit: str, gate: dict[str, Any], verdict: str, reason: 
         "reproduction": {"runner": RUNNER_REL, "run_dir": RUN_REL,
                          "command": f"python3 {RUNNER_REL} --check"},
         "verdict": {"raw": verdict, "bucket": verdict.lower(), "reason": reason},
+        "technical_erratum": {"record": ERRATUM_REL, "failed_attempt": FAILED_ATTEMPT_REL},
         "data": {"inputs": inputs, "old_country_overlap": 0},
         "results": row, "limitations": limits, "correction": correction,
     }
@@ -436,7 +510,10 @@ def expected_artifacts(commit: str, gate: dict[str, Any], verdict: str, reason: 
     if row:
         card += (f"Primary subsidy-per-resident coefficient: {row['coefficient']:+.6g}; "
                  f"clustered SE {row['std_error']:.6g}; p={row['p_value']:.6g}.\n")
-    card += "\nMeasured association only; no causal, school, welfare, or policy-score credit.\n"
+    card += ("\nTechnical erratum: the first attempt hit a nullable-year dtype exception before "
+             "any coefficient was estimated; its artifacts are preserved byte-exact under "
+             f"{FAILED_ATTEMPT_REL}. The same year keys are cast to int64 for this replay.\n"
+             "Measured association only; no causal, school, welfare, or policy-score credit.\n")
     wrapper = ("#!/usr/bin/env python3\nfrom pathlib import Path\nimport subprocess\nimport sys\n"
                "root = Path(__file__).resolve().parents[3]\n"
                f"raise SystemExit(subprocess.call([sys.executable, str(root / {RUNNER_REL!r}), '--check'], cwd=root))\n")
@@ -448,12 +525,12 @@ def expected_artifacts(commit: str, gate: dict[str, Any], verdict: str, reason: 
 
 
 def write_run(commit: str, gate: dict[str, Any], verdict: str, reason: str,
-              row: dict[str, Any] | None) -> None:
+              row: dict[str, Any] | None, *, replace_initial: bool = False) -> None:
     import pandas as pd
     stamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     expected = expected_artifacts(commit, gate, verdict, reason, row, stamp)
     path = ROOT / RUN_REL
-    path.mkdir(parents=True, exist_ok=False)
+    path.mkdir(parents=True, exist_ok=replace_initial)
     (path / "hypothesis.yaml").write_bytes((ROOT / SPEC_REL).read_bytes())
     (path / "diagnostics.json").write_text(json.dumps(expected[0], indent=2) + "\n", encoding="utf-8")
     (path / "manifest.yaml").write_text(yaml.safe_dump(expected[1], sort_keys=False), encoding="utf-8")
@@ -509,6 +586,7 @@ def main() -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--preflight", action="store_true")
     mode.add_argument("--run", action="store_true")
+    mode.add_argument("--rerun-erratum", action="store_true")
     mode.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if args.preflight:
@@ -521,10 +599,12 @@ def main() -> int:
     if args.check:
         result = check_run(commit)
     else:
-        if (ROOT / RUN_REL).exists():
+        if args.rerun_erratum:
+            assert_initial_canonical(verify_dtype_erratum(commit))
+        elif (ROOT / RUN_REL).exists():
             raise FileExistsError(f"run already exists: {RUN_REL}")
         gate, verdict, reason, row = estimate()
-        write_run(commit, gate, verdict, reason, row)
+        write_run(commit, gate, verdict, reason, row, replace_initial=args.rerun_erratum)
         result = {"hypothesis_id": ID, "verdict": verdict, "run_dir": RUN_REL}
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
