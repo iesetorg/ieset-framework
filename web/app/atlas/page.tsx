@@ -15,7 +15,7 @@ interface MovementYaml {
   movement_id: string;
   name: string;
   countries: string[];
-  timeframe: { start: number; end: number | string };
+  timeframe: { start: number | string; end: number | string };
   position_alignments?: { position_id: string; alignment: string }[];
   scope?: "national" | "subnational" | "supranational";
 }
@@ -67,12 +67,14 @@ async function loadMovements(): Promise<AtlasMovement[]> {
     const raw = await readFile(join(dir, e), "utf8");
     const doc = yaml.load(raw) as MovementYaml | null;
     if (!doc?.movement_id) continue;
+    const startRaw = doc.timeframe?.start;
     const start =
-      typeof doc.timeframe?.start === "number"
-        ? doc.timeframe.start
-        : Number.isFinite(parseInt(String(doc.timeframe?.start), 10))
-        ? parseInt(String(doc.timeframe.start), 10)
-        : 1900;
+      typeof startRaw === "number" && Number.isInteger(startRaw)
+        ? startRaw
+        : typeof startRaw === "string" && /^\d{4}$/.test(startRaw)
+        ? Number(startRaw)
+        : null;
+    if (start === null) continue;
     const endRaw = doc.timeframe?.end;
     const end =
       typeof endRaw === "number"
@@ -110,8 +112,8 @@ export default async function AtlasPage() {
     loadCountryPaths(),
   ]);
   const yearMin = movements.length
-    ? Math.max(1900, Math.min(...movements.map((m) => m.start)))
-    : 1900;
+    ? Math.min(...movements.map((m) => m.start))
+    : NOW;
   const yearMax = NOW;
 
   return (
@@ -124,6 +126,11 @@ export default async function AtlasPage() {
         movement in the library that was governing at that moment. Hover for
         the names; click through on the movement page itself for the policy
         fingerprint.
+      </p>
+      <p className="mb-6 max-w-[780px] text-[13px] leading-[1.55] text-muted">
+        The timeline begins with the earliest authored movement ({yearMin}).
+        Historical years use present-day country outlines; defunct states
+        without a current outline may not appear on the map.
       </p>
 
       <WorldMap

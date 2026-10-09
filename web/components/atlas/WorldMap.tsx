@@ -123,7 +123,7 @@ export function WorldMap({
     >();
     for (const [iso3, list] of activeByCountry) {
       // dominantCluster applies per-scope weights:
-      //   national=1.0, supranational=0.25, subnational=0.0
+      //   national=1.0, supranational=0.10, subnational=0.0
       // EU regs still tilt member-state colour; they just don't drown out
       // the national government signal. Subnational policies are skipped.
       out.set(iso3, dominantCluster(list));
