@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **429 public records** (51 featured, 378 calibration) among 1,963
-hypotheses. That is **57 additional** relative to the 372 starting point and
-**443 short** of the requested increment. No result was made featured by
+ledger has **440 public records** (51 featured, 389 calibration) among 1,974
+hypotheses. That is **68 additional** relative to the 372 starting point and
+**432 short** of the requested increment. No result was made featured by
 loosening its gate.
 
 An earlier four-case new-ID batch illustrates the decision boundary:
@@ -66,6 +66,30 @@ growth (3,040/144) all returned **PARTIAL** under the fixed five-test
 p<=0.02 family rule. Their source labels, measurement limits, old-country
 exclusions, and zero school credit are frozen in the specs and result cards.
 
+A sixth eleven-case country-disjoint measured panel family was registered
+with its 15 pinned WDI/WGI source slices committed before value access. Its
+preflight read country/year keys only; a feasibility screen had inspected null
+masks but no candidate magnitudes, signs, or estimates, and this limitation is
+disclosed in every spec. All eleven complete-case fits passed the registered
+400-pair/35-country/five-year floor and exactly replayed from the clean branch.
+Ten returned **PARTIAL** under the family-wise two-sided p<=0.10/11 rule. The
+negative tax-revenue-share to next-year fixed-investment-share association was
+**REFUTED** by a positive coefficient (1,903 country-years/110 countries;
+coefficient +0.254676, p=3.07e-12). Both measures are GDP ratios, so this is
+a narrow descriptive association, not a tax-policy or welfare effect. The
+entire family is calibration only with zero school-score credit.
+
+A separate Argentina core-CPI follow-up was registered and run locally, but
+its full pinned fetch manifest contained unrelated local home paths. The
+public-integrity gate rejected that source packet. Its spec, source, runner,
+and result were removed from this review tree and **are not counted** in the
+440 public records. The original local run remains available for a separate
+administrative-redaction audit; post-result redaction cannot be presented as
+an untouched prospective registration. No causal or school-score credit was
+assigned. The local Git history still contains the rejected manifest in
+its original commit; this branch must not be pushed or published before a
+separate history cleanup and independent integrity review.
+
 A separate legacy sign audit found 64 current generic-rule panel records and
 57 historical-to-stored inferred-direction changes. The old text parser could
 mistake `p<0.10` for a negative coefficient condition; future runs now fail
@@ -82,8 +106,8 @@ count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
 There are **214 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 643 public
-records, still **229 below** 872. The archive repair review found 131
+unrealistic upper bound of converting every one would yield 654 public
+records, still **218 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
