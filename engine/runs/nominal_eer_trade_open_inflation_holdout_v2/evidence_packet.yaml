@@ -1,0 +1,83 @@
+packet_version: 1
+generated_utc: '2026-10-09T17:17:25+00:00'
+hypothesis:
+  id: nominal_eer_trade_open_inflation_holdout_v2
+  path: hypotheses/monetary/nominal_eer_trade_open_inflation_holdout_v2.yaml
+  topic: monetary
+preregistration:
+  spec_commit: 2e4b81bd442689b841bfaedb3b54be8b43db7a32
+  steelman: hypotheses/steelman/nominal_eer_trade_open_inflation_holdout_v2.md
+  family_id: nominal_eer_trade_open_inflation_holdout_2026_10_09
+  family_p_max: 0.01
+reproduction:
+  runner: scripts/run_nominal_eer_trade_open_inflation_holdout_v2.py
+  run_dir: engine/runs/nominal_eer_trade_open_inflation_holdout_v2
+  command: python3 scripts/run_nominal_eer_trade_open_inflation_holdout_v2.py --check
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: interaction did not clear the frozen directional rule
+data:
+  inputs:
+  - role: eer
+    source: bis:WS_EER
+    path: data/vintages/bis/WS_EER@2026-07-23T151604Z.parquet
+    sha256: 57bbce3e22fc428c8cd8ddee8a998d273b5240a816af89e532b81d41ade35170
+    manifest: data/manifests/fetch_run_2026-07-23T151632Z.yaml
+    series_id: WS_EER
+    source_url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_EER/1.0/?format=csv
+    dimensions:
+      FREQ: M
+      EER_TYPE: N
+      EER_BASKET: B
+      UNIT_MEASURE: 882
+      COLLECTION: A
+  - role: open
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: NE.TRD.GNFS.ZS
+    indicator_id: NE.TRD.GNFS.ZS
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+  - role: cpi
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    path: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+    sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: FP.CPI.TOTL.ZG
+    indicator_id: FP.CPI.TOTL.ZG
+    source_url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+  - role: gdp
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+    sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: NY.GDP.MKTP.KD.ZG
+    indicator_id: NY.GDP.MKTP.KD.ZG
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json
+  old_country_overlap: 0
+results:
+  coefficient: -0.8470595210346837
+  std_error: 0.3274431367243439
+  p_value: 0.01808370554312938
+  ci95:
+  - -1.5324058826496292
+  - -0.1617131594197383
+  n_obs: 428
+  n_countries: 20
+  r_squared: 0.8770743638070864
+  method: country/year FE OLS; country-clustered small-sample t(19) inference
+limitations:
+- The known old REER interaction result was PARTIAL; it was seen before this registration.
+- The nominal EER follow-up is country-disjoint from the old 42-country fit but may
+  share data with other IESET studies.
+- WDI trade share includes exports as well as imports; euro-area countries share exchange-rate
+  shocks.
+- Lagged observational association does not identify exchange-rate policy or causal
+  import-price pass-through.
+- No school, welfare, or policy-score credit.
+correction:
+  disposition: descriptive_calibration_only
+  school_score_eligible: false
+  school_score_credit: 0

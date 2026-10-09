@@ -1,0 +1,210 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nominal_eer_trade_open_inflation_holdout_v2
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: '-'
+claim: In the fixed 20-country sample excluded from the old real-EER screen, a larger annual appreciation of the BIS nominal broad effective exchange-rate index at year t predicts lower consumer-price inflation at exact year t+1 more strongly where trade (exports plus imports) is a larger share of GDP at t, conditional on inflation and real GDP growth at t and country and treatment-year effects.
+methodology_note: New-ID, country-disjoint measured-association follow-up to bis_reer_appreciation_trade_open_disinflation_panel. The historical REER interaction result was PARTIAL (coefficient -0.0009935, p=0.257, 1230 observations, 41 countries) and was known before this design. The historical fitted-country roster is fully excluded. BIS nominal EER is chosen to avoid placing CPI in the predictor through real-EER construction. This single-test family fixes the two-sided cutoff at 0.01 before any held-out magnitudes are examined. Screening inspected country/year keys and earlier null masks, but not held-out magnitudes, signs, or fits. No school score credit.
+evidence_type: associational
+sample:
+  countries: &id001
+  - ARE
+  - ARG
+  - BGR
+  - BIH
+  - CYP
+  - DZA
+  - EST
+  - HRV
+  - ISL
+  - LTU
+  - LVA
+  - MAR
+  - MKD
+  - MLT
+  - PER
+  - PHL
+  - ROU
+  - SRB
+  - SVK
+  - SVN
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude every country in the historical old specification: AUS AUT BEL BRA CAN CHE CHL CHN COL CZE DEU DNK ESP FIN FRA GBR GRC HKG HUN IDN IND IRL ISR ITA JPN KOR LUX MEX MYS NLD NOR NZL POL PRT RUS SAU SGP SWE THA TUR USA ZAF.'
+  - Use only the frozen 20-country roster above; no replacement countries or aggregate areas.
+  - For each year t, require at least 10 finite positive monthly BIS nominal broad EER observations in t and t-1; compute each annual arithmetic mean before the 100 x log ratio.
+  - Join WDI trade share, CPI inflation, and real GDP growth in exact year t to CPI inflation in exact year t+1. Require at least five complete treatment years per country; no interpolation, imputation, nearest-year substitution, or vintage switch.
+  - Retain all finite CPI inflation values in the primary fit, including high-inflation years; no outcome-based trimming.
+variables:
+  outcome:
+  - name: next_year_cpi_inflation_pct
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: Observed WDI consumer-price inflation at exact calendar year t+1, in percentage points.
+  treatment:
+  - name: nominal_broad_eer_appreciation_pct
+    source: bis:WS_EER
+    transformation: 100 x log(annual mean monthly nominal broad EER index at t / annual mean at t-1); BIS M.N.B country series, at least 10 finite positive months in each year.
+  - name: trade_share_pct_gdp_at_t
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: Observed WDI exports plus imports as percent of GDP at t; in the interaction scale as (share - 100)/100.
+  controls:
+  - name: cpi_inflation_at_t
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: Observed WDI consumer-price inflation at exact year t.
+  - name: real_gdp_growth_at_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Observed WDI real GDP annual growth percent at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Primary coefficient is nominal_broad_eer_appreciation_pct x ((trade_share_pct_gdp_at_t - 100)/100). OLS includes both main effects, contemporaneous CPI and real GDP growth, country and treatment-year fixed effects, and country-clustered standard errors. One predeclared complete-case fit; no automatic control dropping, model search, post-result sign change, or alternate source selection.
+falsification:
+  rule: INCONCLUSIVE if fewer than 400 complete treatment-year pairs, fewer than 20 countries, fewer than five complete years for any retained country, or the primary coefficient or country-clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORTED if the interaction coefficient is negative at two-sided p<=0.01; REFUTED if positive at the same cutoff; every other estimable result is PARTIAL. The single primary test is the full family and no additional tested variants earn a verdict.
+  test: country_disjoint_nominal_eer_trade_interaction_panel_fe
+  threshold:
+    family_id: nominal_eer_trade_open_inflation_holdout_2026_10_09
+    family_size: 1
+    family_alpha: 0.01
+    family_p_max: 0.01
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 20
+    min_pairs_per_country: 5
+    min_nonnull_months_per_eer_year: 10
+    old_hypothesis_id: bis_reer_appreciation_trade_open_disinflation_panel
+    old_result_bucket: PARTIAL
+    old_primary_coefficient: -0.0009935236582254237
+    old_primary_p_value: 0.25712889335581957
+    old_n_obs: 1230
+    old_n_countries: 41
+    old_spec_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to spec.sample.countries before run_panel_ols. Every country in that old roster is excluded.
+    old_country_count: 42
+    old_country_ids:
+    - AUS
+    - AUT
+    - BEL
+    - BRA
+    - CAN
+    - CHE
+    - CHL
+    - CHN
+    - COL
+    - CZE
+    - DEU
+    - DNK
+    - ESP
+    - FIN
+    - FRA
+    - GBR
+    - GRC
+    - HKG
+    - HUN
+    - IDN
+    - IND
+    - IRL
+    - ISR
+    - ITA
+    - JPN
+    - KOR
+    - LUX
+    - MEX
+    - MYS
+    - NLD
+    - NOR
+    - NZL
+    - POL
+    - PRT
+    - RUS
+    - SAU
+    - SGP
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - ZAF
+    heldout_country_ids: *id001
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      eer:
+        source: bis:WS_EER
+        path: data/vintages/bis/WS_EER@2026-07-23T151604Z.parquet
+        sha256: 57bbce3e22fc428c8cd8ddee8a998d273b5240a816af89e532b81d41ade35170
+        manifest: data/manifests/fetch_run_2026-07-23T151632Z.yaml
+        series_id: WS_EER
+        source_url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_EER/1.0/?format=csv
+        dimensions:
+          FREQ: M
+          EER_TYPE: N
+          EER_BASKET: B
+          UNIT_MEASURE: 882
+          COLLECTION: A
+      open:
+        source: world_bank_wdi:NE.TRD.GNFS.ZS
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NE.TRD.GNFS.ZS
+        indicator_id: NE.TRD.GNFS.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+      cpi:
+        source: world_bank_wdi:FP.CPI.TOTL.ZG
+        path: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+        sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: FP.CPI.TOTL.ZG
+        indicator_id: FP.CPI.TOTL.ZG
+        source_url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+      gdp:
+        source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.MKTP.KD.ZG
+        indicator_id: NY.GDP.MKTP.KD.ZG
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json
+prior_confidence: 0.35
+disclosure: This tests a measured lagged association, not exchange-rate policy, import-price pass-through, or causality. The old real-EER result was known and PARTIAL; this design changes the measure to nominal EER and excludes the whole old 42-country roster. BIS nominal broad EER is a trade-weighted currency index; WDI trade share is total exports plus imports relative to GDP and is an imperfect measure of import exposure. Euro-area members share a currency, reducing independent shock variation; monetary responses, energy prices, and prior inflation may confound the association. Source vintages can overlap IESET studies other than the named old fit. Selection inspected key coverage and null masks only for held-out data; old result magnitudes were known. The test is descriptive calibration only, with no welfare, school, or policy-score credit.
+steelman: hypotheses/steelman/nominal_eer_trade_open_inflation_holdout_v2.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - ARE
+  - ARG
+  - BGR
+  - BIH
+  - CYP
+  - DZA
+  - EST
+  - HRV
+  - ISL
+  - LTU
+  - LVA
+  - MAR
+  - MKD
+  - MLT
+  - PER
+  - PHL
+  - ROU
+  - SRB
+  - SVK
+  - SVN
+  outcome_dim:
+  - inflation
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
