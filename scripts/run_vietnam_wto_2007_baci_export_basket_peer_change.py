@@ -29,6 +29,8 @@ RUNNER_REL = f"scripts/run_{HID}.py"
 SPEC_REL = f"hypotheses/trade/{HID}.yaml"
 STEELMAN_REL = f"hypotheses/steelman/{HID}.md"
 PLAN_REL = "engine/audits/vietnam_wto_2007_baci_export_basket_source_plan.md"
+ERRATUM_NOTE_REL = "engine/audits/vietnam_wto_2007_baci_export_basket_source_census_erratum.md"
+PATH_ERRATUM_COMMIT = "bebb591ff7cec043a054b0c3df65bfec55e14e82"
 SLICE_REL = f"data/pinned_evidence/{HID}.csv"
 SLICE_MANIFEST_REL = f"data/pinned_evidence/{HID}.manifest.json"
 RUN_REL = f"engine/runs/{HID}"
@@ -47,7 +49,8 @@ OMITTED = (2006, 2007)
 PRETREND_MAX = 0.03
 EFFECT_THRESHOLD = math.log(1.15)
 EXPECTED_KEYS = {(o, d, y) for o in ORIGINS for d in DESTINATIONS for y in YEARS}
-EXPECTED_RAW_MATCHES = len(EXPECTED_KEYS) + len(ORIGINS) * len(YEARS)
+EXPECTED_EXCLUDED_NONEXISTING = 385
+EXPECTED_RAW_MATCHES = len(EXPECTED_KEYS) + EXPECTED_EXCLUDED_NONEXISTING
 SOURCE_FIELDS = (
     "source_row_number", "year", "iso3_o", "iso3_d", "country_exists_o",
     "country_exists_d", "wto_o", "fta_wto", "tradeflow_baci",
@@ -91,28 +94,31 @@ def registration_commit() -> str:
     for relative in (SPEC_REL, STEELMAN_REL, PLAN_REL):
         if git_bytes(commit, relative) != (ROOT / relative).read_bytes():
             raise RuntimeError(f"registration changed since first addition: {relative}")
-    amendment = runner_amendment_commit(commit)
-    if not is_strict_ancestor(commit, amendment):
-        raise RuntimeError("runner correction must be committed after registration")
+    path_erratum, census_erratum = runner_amendment_commits(commit)
     if git("ls-tree", "-r", "--name-only", commit, "--", SLICE_REL,
            SLICE_MANIFEST_REL, RUN_REL).stdout.strip():
         raise RuntimeError("registration commit already contained a source slice or result")
-    if git("ls-tree", "-r", "--name-only", amendment, "--", SLICE_REL,
-           SLICE_MANIFEST_REL, RUN_REL).stdout.strip():
-        raise RuntimeError("runner correction already contained source slice or result")
+    for amendment in (path_erratum, census_erratum):
+        if git("ls-tree", "-r", "--name-only", amendment, "--", SLICE_REL,
+               SLICE_MANIFEST_REL, RUN_REL).stdout.strip():
+            raise RuntimeError("runner correction already contained source slice or result")
     return commit
 
 
-def runner_amendment_commit(registration: str) -> str:
-    amendment = git("log", "-1", "--format=%H", "HEAD", "--", RUNNER_REL).stdout.decode().strip()
-    if not amendment or not is_strict_ancestor(registration, amendment):
-        raise RuntimeError("commit runner correction before value access")
-    if git_bytes(amendment, RUNNER_REL) != (ROOT / RUNNER_REL).read_bytes():
-        raise RuntimeError("runner changed since correction commit")
-    changes = git("log", "--format=%H", f"{registration}..{amendment}", "--", RUNNER_REL).stdout.decode().splitlines()
-    if changes != [amendment]:
-        raise RuntimeError("runner must have exactly one prospective correction")
-    return amendment
+def runner_amendment_commits(registration: str) -> tuple[str, str]:
+    changes = git("log", "--reverse", "--format=%H", f"{registration}..HEAD", "--",
+                  RUNNER_REL).stdout.decode().splitlines()
+    if (len(changes) != 2 or changes[0] != PATH_ERRATUM_COMMIT
+            or not is_strict_ancestor(registration, changes[0])
+            or not is_strict_ancestor(changes[0], changes[1])):
+        raise RuntimeError("commit exactly two prospective runner corrections before value access")
+    if git_bytes(changes[1], RUNNER_REL) != (ROOT / RUNNER_REL).read_bytes():
+        raise RuntimeError("runner changed since source-census correction")
+    note = ROOT / ERRATUM_NOTE_REL
+    if (not note.is_file() or first_addition(ERRATUM_NOTE_REL) != changes[1]
+            or git_bytes(changes[1], ERRATUM_NOTE_REL) != note.read_bytes()):
+        raise RuntimeError("commit unchanged source-census erratum note with correction")
+    return changes[0], changes[1]
 
 
 def sha256_file(path: Path) -> str:
@@ -169,7 +175,7 @@ def source_rows(source_zip: Path) -> tuple[list[dict[str, str]], int, int]:
     keys = [(row["iso3_o"], row["iso3_d"], int(row["year"])) for row in selected]
     if (len(keys) != len(EXPECTED_KEYS) or set(keys) != EXPECTED_KEYS
             or raw_matches != EXPECTED_RAW_MATCHES
-            or excluded_nonexisting != len(ORIGINS) * len(YEARS)):
+            or excluded_nonexisting != EXPECTED_EXCLUDED_NONEXISTING):
         raise RuntimeError("CEPII frozen key/country-existence census changed")
     if len(set(keys)) != len(keys):
         raise RuntimeError("duplicate valid source key")
@@ -186,7 +192,7 @@ def slice_bytes(rows: list[dict[str, str]]) -> bytes:
 
 def extract(source_zip: Path, verify: bool) -> None:
     registration = registration_commit()
-    amendment = runner_amendment_commit(registration)
+    path_erratum, census_erratum = runner_amendment_commits(registration)
     if sha256_file(source_zip) != SOURCE_SHA256:
         raise RuntimeError("CEPII source ZIP does not match registered SHA-256")
     selected, raw_matches, excluded = source_rows(source_zip)
@@ -198,7 +204,9 @@ def extract(source_zip: Path, verify: bool) -> None:
         "source_zip_sha256": SOURCE_SHA256,
         "license": "CEPII Gravity, Etalab Open Licence 2.0; attribution required",
         "registration_commit": registration,
-        "runner_amendment_commit": amendment,
+        "runner_amendment_commit": path_erratum,
+        "source_census_erratum_commit": census_erratum,
+        "source_census_erratum_note": ERRATUM_NOTE_REL,
         "slice_path": SLICE_REL,
         "slice_sha256": hashlib.sha256(content).hexdigest(),
         "row_count": len(selected),
@@ -223,14 +231,14 @@ def extract(source_zip: Path, verify: bool) -> None:
 
 
 def committed_slice(registration: str) -> tuple[list[dict[str, str]], dict[str, Any], str]:
-    amendment = runner_amendment_commit(registration)
+    path_erratum, census_erratum = runner_amendment_commits(registration)
     additions = []
     for relative in (SLICE_REL, SLICE_MANIFEST_REL):
         path = ROOT / relative
         if not path.is_file() or git_bytes("HEAD", relative) != path.read_bytes():
             raise RuntimeError(f"commit unchanged source slice before run: {relative}")
         additions.append(first_addition(relative))
-    if len(set(additions)) != 1 or not is_strict_ancestor(amendment, additions[0]):
+    if len(set(additions)) != 1 or not is_strict_ancestor(census_erratum, additions[0]):
         raise RuntimeError("source slice must first appear together in a later commit")
     slice_commit = additions[0]
     for relative in (SLICE_REL, SLICE_MANIFEST_REL):
@@ -240,11 +248,13 @@ def committed_slice(registration: str) -> tuple[list[dict[str, str]], dict[str, 
         raise RuntimeError("source slice commit already contained result artifacts")
     manifest = json.loads((ROOT / SLICE_MANIFEST_REL).read_text())
     if (manifest.get("registration_commit") != registration
-            or manifest.get("runner_amendment_commit") != amendment
+            or manifest.get("runner_amendment_commit") != path_erratum
+            or manifest.get("source_census_erratum_commit") != census_erratum
+            or manifest.get("source_census_erratum_note") != ERRATUM_NOTE_REL
             or manifest.get("source_zip_sha256") != SOURCE_SHA256
             or manifest.get("row_count") != len(EXPECTED_KEYS)
             or manifest.get("raw_matches") != EXPECTED_RAW_MATCHES
-            or manifest.get("excluded_nonexisting") != len(ORIGINS) * len(YEARS)
+            or manifest.get("excluded_nonexisting") != EXPECTED_EXCLUDED_NONEXISTING
             or manifest.get("slice_sha256") != sha256_file(ROOT / SLICE_REL)):
         raise RuntimeError("committed source manifest mismatch")
     with (ROOT / SLICE_REL).open(newline="", encoding="utf-8") as stream:
@@ -395,6 +405,8 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "license": source_manifest["license"],
         "registration_commit": registration,
         "runner_amendment_commit": source_manifest["runner_amendment_commit"],
+        "source_census_erratum_commit": source_manifest["source_census_erratum_commit"],
+        "source_census_erratum_note": ERRATUM_NOTE_REL,
         "slice_path": SLICE_REL, "slice_sha256": source_manifest["slice_sha256"],
         "slice_commit": slice_commit, "row_count": len(EXPECTED_KEYS),
     }
@@ -403,6 +415,7 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "method": "descriptive fixed-basket, fixed-donor log pre/post comparison",
         "run_utc": stamp, "preregistration_commit": registration,
         "runner_amendment_commit": source_manifest["runner_amendment_commit"],
+        "source_census_erratum_commit": source_manifest["source_census_erratum_commit"],
         "slice_commit": slice_commit, "slice_sha256": source_manifest["slice_sha256"],
         "source_zip_sha256": SOURCE_SHA256, "runner": RUNNER_REL,
         "selected_rows_total": len(EXPECTED_KEYS), "selection_truncated": False,
@@ -415,6 +428,7 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "runner": RUNNER_REL, "hypothesis_snapshot": f"{RUN_REL}/hypothesis.yaml",
         "preregistration_commit": registration, "source": source, "correction": correction,
         "runner_amendment_commit": source_manifest["runner_amendment_commit"],
+        "source_census_erratum_commit": source_manifest["source_census_erratum_commit"],
     }
     packet = {
         "packet_version": 1, "generated_utc": stamp,
@@ -422,6 +436,7 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "preregistration": {
             "commit": registration, "steelman": STEELMAN_REL,
             "runner_amendment_commit": source_manifest["runner_amendment_commit"],
+            "source_census_erratum_commit": source_manifest["source_census_erratum_commit"],
             "source_plan": PLAN_REL, "frozen_hypothesis_snapshot": f"{RUN_REL}/hypothesis.yaml",
         },
         "source": source,
@@ -503,7 +518,8 @@ def plan() -> None:
         "hypothesis_id": HID, "value_access": False,
         "source_zip_sha256": SOURCE_SHA256,
         "source_manifest": "data/manifests/fetch_run_2026-05-15T175027Z.yaml",
-        "expected_unique_keys": len(EXPECTED_KEYS), "raw_matches_including_extinct_deu": EXPECTED_RAW_MATCHES,
+        "expected_unique_keys": len(EXPECTED_KEYS), "raw_matches_including_nonexisting": EXPECTED_RAW_MATCHES,
+        "excluded_nonexisting": EXPECTED_EXCLUDED_NONEXISTING,
         "origins": list(ORIGINS), "destinations": list(DESTINATIONS),
         "pre": list(PRE), "omitted": list(OMITTED), "post": list(POST),
         "pretrend_max_abs_log_slope_gap": PRETREND_MAX,
