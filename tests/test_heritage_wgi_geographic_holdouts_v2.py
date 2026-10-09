@@ -1,6 +1,7 @@
 """Guard the country-disjoint, seven-test registration contract."""
 
 import yaml
+import pytest
 
 from scripts import run_heritage_wgi_geographic_holdouts_v2 as holdouts
 
@@ -18,6 +19,9 @@ def test_complete_cohort_and_original_country_exclusion() -> None:
 
 
 def test_preflight_is_disjoint_and_does_not_estimate() -> None:
+    required = {source[1] for source in holdouts.VINTAGES.values()}
+    if not all((holdouts.ROOT / path).exists() for path in required):
+        pytest.skip("raw pinned vintages are local data, not committed to Git")
     for hypothesis_id in holdouts.COHORT:
         coverage, panel, sources = holdouts.preflight(hypothesis_id)
         assert coverage["passed"]
