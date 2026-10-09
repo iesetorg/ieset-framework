@@ -122,12 +122,18 @@ HISTORICAL_CONTEXTS = {
             "Canada's opening coded point is Confederation: several British "
             "North American colonies formed a federal Dominion with powers "
             "divided between Parliament and provinces, still within the British "
-            "Empire. This is institutional context, not a numeric market/state "
-            "score; Indigenous peoples were excluded from the constitutional "
-            "bargain and faced later federal expansion."
+            "Empire. Its fiscal base relied primarily on customs and excise; "
+            "the federal government's assigned role included expensive "
+            "infrastructure, while provinces held responsibilities such as "
+            "health, education, and welfare. This describes a market-based "
+            "colonial economy with a comparatively limited social-program "
+            "state, not a measured market/state score. Indigenous peoples were "
+            "excluded from the constitutional bargain and faced later federal "
+            "expansion."
         ),
         "sources": [
             {"label": "Library of Parliament (Confederation and federal powers)", "url": "https://lop.parl.ca/staticfiles/Learn/Documents/ParliamentaryPrimer/LOP_TimelineBrochEN.pdf"},
+            {"label": "Canada Revenue Agency (federal customs and excise before income tax)", "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/educational-programs/purpose-taxes.html"},
         ],
     },
     ("ITA", 1861): {
