@@ -325,7 +325,11 @@ export default async function DriftPage() {
         blank space is missing corpus coverage, not a zero policy level.
         A flat segment means no further <em>coded</em> shift in that interval.
         The index measures direction, not absolute policy levels, and countries
-        do not share a measured {data.year_min} baseline.
+        do not share a measured {data.year_min} baseline. State and municipal
+        movements are excluded from country totals. Four EU-wide movement
+        records currently apply full coded steps to their ten listed member
+        countries; comparisons involving those steps remain provisional until
+        member applicability and weighting are reviewed.
       </div>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">

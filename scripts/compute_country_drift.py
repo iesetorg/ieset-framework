@@ -164,6 +164,11 @@ def load_movements():
 
 
 def build_drift(movements):
+    # A state or municipal movement may name its parent country for linking,
+    # but it is not a country-wide decision. Keep it in the source corpus and
+    # out of both the national trajectory and its movement event log.
+    movements = [m for m in movements if m.get("scope", "national") != "subnational"]
+
     # Collect every (country, axis, year) shift event with signed magnitude.
     # `events[country][axis] = list[(year, signed_step, movement_id)]`
     events = defaultdict(lambda: defaultdict(list))

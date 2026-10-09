@@ -63,3 +63,31 @@ def test_trajectories_begin_at_earliest_authored_movement() -> None:
     can = result["countries"]["CAN"]["statist_drift"]
     assert can[result["years"].index(1976)] == 0
     assert can[result["years"].index(1980)] == -1
+
+
+def test_subnational_movement_does_not_change_country_total_or_event_log() -> None:
+    national = {
+        "movement_id": "federal",
+        "countries": ["USA"],
+        "_start": 2006,
+        "_end": None,
+        "axes_summary": [
+            {"axis": "regulatory.environmental_stringency", "direction": "+", "magnitude": "weak"}
+        ],
+    }
+    state = {
+        "movement_id": "california",
+        "countries": ["USA"],
+        "scope": "subnational",
+        "_start": 2006,
+        "_end": None,
+        "axes_summary": [
+            {"axis": "regulatory.environmental_stringency", "direction": "+", "magnitude": "strong"}
+        ],
+    }
+
+    result = DRIFT.build_drift([national, state])
+    usa = result["countries"]["USA"]
+    assert usa["statist_drift"] == [1.0]
+    assert usa["movement_count"] == 1
+    assert [m["movement_id"] for m in usa["movements"]] == ["federal"]
