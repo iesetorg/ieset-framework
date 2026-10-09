@@ -175,9 +175,9 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def normalise_source(key: str) -> tuple[pd.DataFrame, dict]:
+def normalise_source(key: str, pinned: dict[str, Path] | None = None) -> tuple[pd.DataFrame, dict]:
     pub, stem, label = SOURCES[key]
-    path = latest(pub, stem)
+    path = pinned[key] if pinned is not None else latest(pub, stem)
     df = pd.read_parquet(path)
     cols = {c.lower(): c for c in df.columns}
     country_col = cols.get("country_iso3") or cols.get("ccode") or cols.get("country")
@@ -197,21 +197,21 @@ def normalise_source(key: str) -> tuple[pd.DataFrame, dict]:
     return out, meta
 
 
-def load_panel(keys: list[str]) -> tuple[pd.DataFrame, dict]:
+def load_panel(keys: list[str], pinned: dict[str, Path] | None = None) -> tuple[pd.DataFrame, dict]:
     panel = None
     manifest = {}
     for key in keys:
-        frame, meta = normalise_source(key)
+        frame, meta = normalise_source(key, pinned)
         manifest[key] = meta
         panel = frame if panel is None else panel.merge(frame, on=["country", "year"], how="outer")
     assert panel is not None
     return panel, manifest
 
 
-def fit_case(case: dict) -> tuple[pd.DataFrame, dict, dict]:
+def fit_case(case: dict, pinned: dict[str, Path] | None = None) -> tuple[pd.DataFrame, dict, dict]:
     controls = [col for col in case["controls"] if col not in {case["treatment"], case["outcome"]}]
     keys = [case["treatment"], case["outcome"]] + controls
-    panel, manifest = load_panel(sorted(set(keys)))
+    panel, manifest = load_panel(sorted(set(keys)), pinned)
     start, end = case["period"]
     panel = panel[(panel["year"] >= start) & (panel["year"] <= end)].copy()
     cols = ["country", "year", case["treatment"], case["outcome"]] + controls
@@ -275,6 +275,160 @@ def fit_case(case: dict) -> tuple[pd.DataFrame, dict, dict]:
     }, manifest
 
 
+def pinned_packet(hid: str) -> tuple[dict, dict, dict, dict[str, Path]]:
+    """Validate the frozen plan and source locks without requiring local raw data."""
+    case = next((item for item in CASES if item["hid"] == hid), None)
+    if case is None:
+        raise ValueError(f"unknown cross-school hypothesis: {hid}")
+    run_dir = RUNS / hid
+    stored = json.loads((run_dir / "diagnostics.json").read_text())
+    manifest = yaml.safe_load((run_dir / "manifest.yaml").read_text())
+    spec = yaml.safe_load((HYPOTHESES / case["topic"] / f"{hid}.yaml").read_text())
+    controls = [key for key in case["controls"] if key not in {case["treatment"], case["outcome"]}]
+    keys = sorted(set([case["treatment"], case["outcome"], *controls]))
+
+    expected_variables = {
+        role: [
+            {"name": key, "source": f"{SOURCES[key][0]}:{SOURCES[key][1]}", "transformation": "level"}
+            for key in values
+        ]
+        for role, values in {
+            "treatment": [case["treatment"]], "outcome": [case["outcome"]], "controls": controls
+        }.items()
+    }
+    expected_rule = (
+        f"Supported if the coefficient on {case['treatment']} has sign {case['direction']} "
+        "and p <= 0.10; refuted if significant in the opposite direction."
+    )
+    frozen_fields = {
+        "hypothesis_id": hid,
+        "version": 1,
+        "claim": case["claim"],
+        "evidence_type": "associational",
+        "variables": expected_variables,
+        "estimator": {"template": "panel_fe", "fixed_effects": ["country", "year"], "clustering": "country"},
+        "falsification": {
+            "rule": expected_rule,
+            "test": hid,
+            "threshold": f"sign({case['treatment']})={case['direction']} and p<=0.10",
+        },
+    }
+    for field, expected in frozen_fields.items():
+        if spec.get(field) != expected:
+            raise ValueError(f"{hid}: frozen spec {field} differs from the original plan")
+    expected_sample = {
+        "period": list(case["period"]),
+        "temporal_structure": "panel",
+        "exclusion_rules": [
+            "drop rows missing treatment, outcome, or controls",
+            "require at least 250 observations and 20 countries",
+        ],
+    }
+    if any(spec.get("sample", {}).get(key) != value for key, value in expected_sample.items()):
+        raise ValueError(f"{hid}: frozen sample rule differs from the original plan")
+    if not isinstance(spec["sample"].get("countries"), list) or not spec["sample"]["countries"]:
+        raise ValueError(f"{hid}: frozen country set is missing")
+    if manifest.get("hypothesis_id") != hid or stored.get("hypothesis_id") != hid:
+        raise ValueError(f"{hid}: packet identity differs from the frozen plan")
+    if manifest.get("run_utc") != stored.get("run_utc"):
+        raise ValueError(f"{hid}: packet timestamps differ")
+    if manifest.get("verdict_label") != stored.get("verdict_label") or stored.get("verdict") != stored.get("verdict_label"):
+        raise ValueError(f"{hid}: canonical verdict differs from the stored verdict label")
+    if set(manifest.get("vintages", {})) != set(keys):
+        raise ValueError(f"{hid}: source keys differ from the frozen model")
+    expected_formula = (
+        f"Q('{case['outcome']}') ~ "
+        + " + ".join(f"Q('{key}')" for key in [case["treatment"], *controls])
+        + " + C(country) + C(year)"
+    )
+    if manifest.get("formula") != expected_formula or stored.get("formula") != expected_formula:
+        raise ValueError(f"{hid}: packet formula differs from the frozen model")
+
+    pinned = {}
+    for key in keys:
+        source = manifest["vintages"][key]
+        pub, stem, label = SOURCES[key]
+        if {k: source.get(k) for k in ("publisher", "series", "label")} != {
+            "publisher": pub, "series": stem, "label": label
+        }:
+            raise ValueError(f"{hid}: source metadata differs for {key}")
+        relative = Path(source.get("vintage_file", ""))
+        path = (ROOT / relative).resolve()
+        if relative.is_absolute() or path.parent != (VINTAGES / pub).resolve() or not path.name.startswith(stem + "@") or path.suffix != ".parquet":
+            raise ValueError(f"{hid}: invalid pinned vintage path for {key}")
+        digest = source.get("sha256", "")
+        if not isinstance(digest, str) or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+            raise ValueError(f"{hid}: invalid source SHA-256 for {key}")
+        pinned[key] = path
+    return case, stored, manifest, pinned
+
+
+def reproduce_one(hid: str) -> dict:
+    """Read-only exact replay of one historical packet from its pinned vintages."""
+    case, stored, manifest, pinned = pinned_packet(hid)
+    for key, path in pinned.items():
+        if not path.is_file():
+            raise FileNotFoundError(f"{hid}: pinned vintage missing for {key}: {path}")
+        if sha256(path) != manifest["vintages"][key]["sha256"]:
+            raise ValueError(f"{hid}: pinned vintage hash mismatch for {key}")
+
+    d, result, replay_sources = fit_case(case, pinned)
+    if replay_sources != manifest["vintages"]:
+        raise ValueError(f"{hid}: replay source provenance mismatch")
+    if sorted(d["country"].dropna().unique().tolist()) != yaml.safe_load(
+        (HYPOTHESES / case["topic"] / f"{hid}.yaml").read_text()
+    )["sample"]["countries"]:
+        raise ValueError(f"{hid}: replay complete-case country set differs")
+    if manifest.get("formula") != result.get("formula"):
+        raise ValueError(f"{hid}: replay formula differs from the frozen packet")
+    if set(stored) != set(result) | {"verdict"}:
+        raise ValueError(f"{hid}: stored diagnostic fields differ from the original packet")
+    for field, expected in result.items():
+        if field == "run_utc":
+            continue
+        observed = stored[field]
+        if isinstance(expected, float):
+            matches = math.isclose(observed, expected, rel_tol=1e-9, abs_tol=1e-10)
+        elif isinstance(expected, list) and expected and all(isinstance(x, float) for x in expected):
+            matches = len(observed) == len(expected) and all(
+                math.isclose(x, y, rel_tol=1e-9, abs_tol=1e-10) for x, y in zip(observed, expected)
+            )
+        else:
+            matches = observed == expected
+        if not matches:
+            raise ValueError(f"{hid}: replay {field} differs from the stored result")
+
+    run_dir = RUNS / hid
+    card = (run_dir / "result_card.md").read_text()
+    if f"**Verdict:** {result['verdict_label']} - {result['verdict_reason']}." not in card:
+        raise ValueError(f"{hid}: result card differs from the replay verdict")
+    coefficients = pd.read_parquet(run_dir / "coefficients.parquet").iloc[0].to_dict()
+    for column, value in {
+        "estimate": result["coefficient"],
+        "std_error": result["standard_error_cluster_country"],
+        "p_value": result["p_value"],
+        "ci95_low": result["ci95"][0],
+        "ci95_high": result["ci95"][1],
+        "n_observations": result["n_observations"],
+        "n_countries": result["n_countries"],
+    }.items():
+        if not math.isclose(float(coefficients[column]), float(value), rel_tol=1e-9, abs_tol=1e-10):
+            raise ValueError(f"{hid}: stored coefficient {column} differs from replay")
+    if coefficients["hypothesis_id"] != hid or coefficients["term"] != case["treatment"]:
+        raise ValueError(f"{hid}: stored coefficient identity differs from replay")
+    chart = json.loads((run_dir / "chart_data.json").read_text())["series"]
+    replay_chart = d.groupby("year", as_index=False)[case["outcome"]].mean().rename(
+        columns={case["outcome"]: "mean_outcome"}
+    ).to_dict("records") if not d.empty else []
+    if len(chart) != len(replay_chart) or any(
+        left["year"] != right["year"] or not math.isclose(
+            left["mean_outcome"], right["mean_outcome"], rel_tol=1e-9, abs_tol=1e-10
+        ) for left, right in zip(chart, replay_chart)
+    ):
+        raise ValueError(f"{hid}: chart data differs from replay")
+    return {"hypothesis_id": hid, "verdict": result["verdict_label"], "verified": True, "artifacts_written": False}
+
+
 def write_outputs(case: dict, d: pd.DataFrame, diag: dict, manifest: dict) -> None:
     controls = [col for col in case["controls"] if col not in {case["treatment"], case["outcome"]}]
     topic_dir = HYPOTHESES / case["topic"]
@@ -334,8 +488,10 @@ def write_outputs(case: dict, d: pd.DataFrame, diag: dict, manifest: dict) -> No
     chart = d.groupby("year", as_index=False)[case["outcome"]].mean().rename(columns={case["outcome"]: "mean_outcome"}).to_dict("records") if not d.empty else []
     (run_dir / "chart_data.json").write_text(json.dumps({"series": chart}, indent=2))
     (run_dir / "replication.py").write_text(
-        "#!/usr/bin/env python3\nfrom pathlib import Path\nimport subprocess, sys\nROOT = Path(__file__).resolve().parents[3]\n"
-        f"raise SystemExit(subprocess.call([sys.executable, str(ROOT / 'scripts' / 'promote_cross_school_next50_2026_05_12.py'), '{case['hid']}']))\n"
+        "#!/usr/bin/env python3\nimport json, sys\nfrom pathlib import Path\n"
+        "ROOT = Path(__file__).resolve().parents[3]\nsys.path.insert(0, str(ROOT / 'scripts'))\n"
+        "from promote_cross_school_next50_2026_05_12 import reproduce_one\n"
+        f"print(json.dumps(reproduce_one('{case['hid']}'), sort_keys=True))\n"
     )
     card = f"""# Result card - {case['hid']}
 
