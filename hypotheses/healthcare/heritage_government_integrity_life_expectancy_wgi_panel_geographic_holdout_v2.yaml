@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: heritage_government_integrity_life_expectancy_wgi_panel_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: healthcare
+claim: Among countries excluded from the original 53-country study, stronger control of corruption is
+  associated with higher life expectancy in a 1996-2023 panel after country and year fixed effects and
+  the four frozen macro controls.
+claim_direction: +
+methodology_note: New-ID geographic holdout of heritage_government_integrity_life_expectancy_wgi_panel.
+  Its old PARTIAL result and same-commit legacy registration are known, but do not count as prospective
+  evidence. The entire seven-claim WGI/WDI cohort is registered together. The old 53 countries are excluded
+  before fitting, the original outcome/treatment/control series and transformations are retained, and
+  two-sided p decisions use 0.10/7 Bonferroni family control. Only pinned original-vintage files may be
+  used. Coverage and source hashes were checked before registration; no holdout coefficient was inspected.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude the complete original 53-country sample: ARG AUS AUT BEL BRA CAN CHE CHL CHN COL CRI CZE
+    DEU DNK EGY ESP EST FIN FRA GBR GHA GRC HUN IDN IND IRL ISR ITA JPN KEN KOR LTU LVA MAR MEX MYS NGA
+    NLD NOR NZL PER PHL POL PRT SGP SVK SVN SWE THA TUR URY USA ZAF.'
+  - Use only three-letter country codes and complete 1996-2023 country-years for the outcome, treatment,
+    and all four retained controls; never impute or select countries by outcome or coefficient.
+  - Require positive GDP per capita before its natural-log transformation.
+variables:
+  outcome:
+  - name: life_expectancy
+    source: world_bank_wdi:SP.DYN.LE00.IN
+    transformation: level
+    notes: Life expectancy at birth, total years.
+  treatment:
+  - name: control_corruption_wgi
+    source: wgi:CC.EST
+    transformation: level
+    notes: WGI control of corruption point estimate.
+  controls:
+  - name: log_gdp_pc_ppp
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: log
+    notes: Income-level control.
+  - name: population_growth
+    source: world_bank_wdi:SP.POP.GROW
+    transformation: level
+    notes: Demographic pressure control.
+  - name: trade_openness_control
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level
+    notes: Openness control.
+  - name: government_consumption_share
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: level
+    notes: Fiscal-demand control.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS of life_expectancy on control_corruption_wgi, log PPP GDP per capita, population growth,
+    trade openness, and government consumption share, with country and calendar-year fixed effects and
+    country-clustered standard errors. The sole primary coefficient is control_corruption_wgi. Each of
+    seven claim tests is included regardless of sign.
+falsification:
+  rule: If fewer than 1,000 complete country-years or 50 distinct countries remain, or the primary coefficient/clustered
+    uncertainty is nonfinite or unidentified, INCONCLUSIVE. Otherwise SUPPORTED if the control_corruption_wgi
+    coefficient is positive and its two-sided country-clustered p-value is at most 0.10/7; REFUTED if
+    negative and p is at most 0.10/7; every other estimable result is PARTIAL. Apply the same family threshold
+    to all seven registered outcomes, including adverse results.
+  test: geographic_holdout_heritage_government_integrity_life_expectancy_wgi_panel
+  threshold:
+    expected_sign: +
+    family_size: 7
+    family_alpha: 0.1
+    family_p_max: 0.014285714285714287
+    min_observations: 1000
+    min_countries: 50
+prior_confidence: 0.45
+disclosure: The analyst knew the original PARTIAL verdict when choosing this country-disjoint follow-up.
+  The seven claims share countries and WGI/WDI sources, so they are correlated and receive a family-adjusted
+  threshold. None is causal; changes in governance measurement, income, demographics, or omitted institutions
+  could explain an association.
+steelman: hypotheses/steelman/heritage_government_integrity_life_expectancy_wgi_panel_geographic_holdout_v2.md
+scope:
+  period:
+  - 1996
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - institutional_reform
+  - regulation
+  treatment_tags:
+  - government_integrity
+  - control_corruption
+  - life_expectancy
+  - heritage_graduation_wgi_panel
+  - geographic_holdout
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+intervention_channel: institutional
+intervention_channel_justification: WGI control of corruption is a time-varying institutional proxy for
+  the government-integrity mechanism.
