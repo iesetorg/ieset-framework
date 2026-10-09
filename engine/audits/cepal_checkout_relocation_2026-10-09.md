@@ -26,5 +26,20 @@ main-checkout packet exactly; `--check` replay passed. The fitted coefficient
 is -0.958607 poverty percentage points per one unit of asinh(inflation/10),
 with two-sided country-cluster t p=0.726953 over 281 complete country-years
 in 14 countries. This is a retrospective descriptive calibration only, with
-no causal, school, or policy-score credit. The main checkout's unrelated
-working changes were not staged, copied, or modified during relocation.
+no causal, school, or policy-score credit. The main branch was restored to
+its pre-mistake `8d80165c0a54cc71c466973eeab09299ffbadcc3` commit. The original preregistration and source
+lock commits remain reachable through the local
+`codex/cepal-prereg-original-main` backup branch; the original result packet
+was saved separately before removing only the five accidental main-checkout
+files and its untracked run directory. The main checkout's unrelated working
+changes and index entries were preserved.
+
+After the result, a narrow-lock replay adapter was added to let a clean
+checkout verify the same frozen runner and packet without copying the broad
+manifest. It checks the committed lock's original-manifest identity, selected
+entry fields, and all three raw SHA-256 hashes, then invokes the unchanged
+runner's chronology, estimator, and exact-packet checks. This repair changes
+source lookup for replay only. The original runner remains frozen and can
+still be run with the exact broad manifest supplied locally; the selected
+source entries cannot be independently compared with that broad manifest
+using the isolated branch alone.
