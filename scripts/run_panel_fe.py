@@ -2495,6 +2495,14 @@ def infer_claim_direction(spec: dict, outcome_name: str | None = None) -> str:
         if expected_sign in ("minus", "negative", "decrease", "refuted"):
             return "-"
 
+    # The generic legacy rule names a "predicted sign" without pinning which
+    # sign was intended. A claim-sentence heuristic can misread contrasts such
+    # as "higher taxes predict lower participation". Require a machine-readable
+    # sign before a future rerun may award SUPPORT or REFUTATION.
+    generic_rule = str((spec.get("falsification") or {}).get("rule") or "").lower()
+    if "the treatment coefficient has the predicted sign at p<0.10" in generic_rule:
+        return "?"
+
     import re as _re
 
     # Free-form legacy rules often say the decisive sign directly, even when

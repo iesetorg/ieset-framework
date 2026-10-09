@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from run_panel_fe import infer_claim_direction
+from run_panel_fe import infer_claim_direction, verdict_from_estimate
 
 
 GENERIC_RULE = (
@@ -14,22 +14,22 @@ GENERIC_RULE = (
 )
 
 
-def test_generic_rule_uses_positive_claim_not_p_cutoff():
+def test_generic_rule_requires_an_explicit_direction_for_positive_claim():
     spec = {
         "hypothesis_id": "unambiguous_claim_without_slug_shortcut",
         "claim": "Higher measured income increases adult survival.",
         "falsification": {"rule": GENERIC_RULE},
     }
-    assert infer_claim_direction(spec) == "+"
+    assert infer_claim_direction(spec) == "?"
 
 
-def test_generic_rule_uses_negative_claim_not_p_cutoff():
+def test_generic_rule_requires_an_explicit_direction_for_negative_claim():
     spec = {
         "hypothesis_id": "unambiguous_claim_without_slug_shortcut",
         "claim": "Measured exposure reduces adult survival.",
         "falsification": {"rule": GENERIC_RULE},
     }
-    assert infer_claim_direction(spec) == "-"
+    assert infer_claim_direction(spec) == "?"
 
 
 def test_explicit_coefficient_inequalities_still_take_precedence():
@@ -51,3 +51,16 @@ def test_machine_readable_direction_still_wins():
         "falsification": {"rule": GENERIC_RULE},
     }
     assert infer_claim_direction(spec) == "+"
+
+
+def test_generic_unpinned_rule_cannot_award_a_significant_verdict():
+    spec = {
+        "hypothesis_id": "unambiguous_claim_without_slug_shortcut",
+        "claim": "Measured exposure reduces adult survival.",
+        "falsification": {"rule": GENERIC_RULE},
+    }
+    verdict, reason = verdict_from_estimate(
+        {"coefficient": -1.2, "p_value": 0.001}, infer_claim_direction(spec)
+    )
+    assert verdict == "PARTIAL"
+    assert "not auto-inferred" in reason

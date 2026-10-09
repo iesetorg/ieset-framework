@@ -2,8 +2,8 @@
 """Audit stale legacy panel sign labels without rerunning or promoting results.
 
 This reads specifications, diagnostics, and a fixed historical Git snapshot.
-It never opens data vintages or estimates a coefficient. Recomputed text
-directions are review clues, not adjudicated claim directions.
+It never opens data vintages or estimates a coefficient. The current runner
+fails closed on an unpinned generic sign; this audit does not adjudicate claims.
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ def build() -> dict:
         outcome = (spec.get("variables") or {}).get("outcome") or []
         outcome_name = outcome[0].get("name") if outcome and isinstance(outcome[0], dict) else None
         stored = diagnostics.get("claim_direction_inferred")
-        current_text_direction = infer_claim_direction(spec, outcome_name)
+        current_runner_direction = infer_claim_direction(spec, outcome_name)
         historical_direction = old.get("claim_direction_inferred") if old else None
         historical_verdict = old.get("verdict_label") if old else None
         current_verdict = diagnostics.get("verdict_label")
@@ -66,11 +66,11 @@ def build() -> dict:
             "historical_run_commit": OLD_RUN_COMMIT if old else None,
             "historical_direction": historical_direction,
             "stored_direction": stored,
-            "text_direction_after_parser_repair": current_text_direction,
+            "direction_under_repaired_runner": current_runner_direction,
             "historical_verdict": historical_verdict,
             "stored_verdict": current_verdict,
             "historical_to_stored_direction_changed": historical_direction is not None and historical_direction != stored,
-            "stored_vs_repaired_text_direction_changed": stored != current_text_direction,
+            "stored_vs_repaired_runner_direction_changed": stored != current_runner_direction,
             "historical_to_stored_verdict_changed": historical_verdict is not None and historical_verdict != current_verdict,
             "stored_estimate_coefficient": estimate.get("coefficient"),
             "stored_estimate_p_value": estimate.get("p_value"),
@@ -85,15 +85,15 @@ def build() -> dict:
         "selection_rule": "Exact generic predicted-sign rule and current run_panel_fe diagnostics; no data values opened.",
         "interpretation": (
             "A p-value cutoff in the generic rule was previously parsed as a negative coefficient sign. "
-            "The repaired text parser is still heuristic; neither it nor a historical label adjudicates "
-            "a claim. Review each original claim and frozen rule before any result correction. "
+            "The repaired runner fails closed for this unpinned generic rule. Review and explicitly "
+            "pin each original claim direction before any new run or result correction. "
             "Legacy same-commit records remain outside the public evidence ledger."
         ),
         "summary": {
             "current_generic_records": len(records),
             "also_present_in_historical_snapshot": len(historical),
             "historical_to_stored_direction_changed": sum(row["historical_to_stored_direction_changed"] for row in historical),
-            "stored_vs_repaired_text_direction_changed": sum(row["stored_vs_repaired_text_direction_changed"] for row in records),
+            "stored_vs_repaired_runner_direction_changed": sum(row["stored_vs_repaired_runner_direction_changed"] for row in records),
             "historical_to_stored_verdict_changed": sum(row["historical_to_stored_verdict_changed"] for row in historical),
             "current_stored_verdicts": dict(sorted(Counter(str(row["stored_verdict"]) for row in records).items())),
         },
@@ -109,21 +109,24 @@ def markdown(report: dict) -> str:
         "This is a metadata-only review queue, **not a corrected verdict set or graduation**. "
         "The generic legacy rule mentioned a treatment coefficient and then `p<0.10`. "
         "The former parser could read that p-value inequality as a negative coefficient sign. "
-        "The parser now requires an inequality directly attached to the coefficient token.",
+        "The parser now requires an inequality directly attached to the coefficient token "
+        "and fails closed on this unpinned generic rule.",
         "",
         f"- Current generic-rule panel records: **{summary['current_generic_records']}**",
         f"- Also in historical snapshot `{OLD_RUN_COMMIT[:12]}`: **{summary['also_present_in_historical_snapshot']}**",
         f"- Historical-to-stored inferred direction changes: **{summary['historical_to_stored_direction_changed']}**",
-        f"- Stored directions differing from the repaired text heuristic: **{summary['stored_vs_repaired_text_direction_changed']}**",
+        f"- Stored directions differing from the fail-closed runner: **{summary['stored_vs_repaired_runner_direction_changed']}**",
         f"- Historical-to-stored verdict label changes: **{summary['historical_to_stored_verdict_changed']}**",
         "",
-        "The repaired text heuristic can still misread a sentence such as ‘higher tax burden predicts lower participation.’ "
-        "A human must pin the intended sign and review the original claim and frozen rule before changing any verdict. "
+        "A claim sentence such as ‘higher tax burden predicts lower participation’ needs a manually pinned sign. "
+        "The current runner returns an unknown direction for these generic rules, so a future rerun cannot "
+        "award SUPPORT or REFUTATION by text inference. A human must review the original claim and frozen rule "
+        "before changing any old verdict. "
         "The legacy runs remain same-commit and archived; this audit adds no school credit.",
         "",
         "## Highest-risk examples",
         "",
-        "| Hypothesis | Historical sign/verdict | Stored sign/verdict | Repaired text clue |",
+        "| Hypothesis | Historical sign/verdict | Stored sign/verdict | Current runner sign |",
         "| --- | --- | --- | --- |",
     ]
     examples = [
@@ -140,7 +143,7 @@ def markdown(report: dict) -> str:
         lines.append(
             f"| `{hypothesis_id}` | {row['historical_direction'] or '—'}/{row['historical_verdict'] or '—'} "
             f"| {row['stored_direction'] or '—'}/{row['stored_verdict'] or '—'} "
-            f"| {row['text_direction_after_parser_repair'] or '—'} |"
+            f"| {row['direction_under_repaired_runner'] or '—'} |"
         )
     lines += ["", "All selected IDs and their paths, stored estimates, and label changes are in the JSON report.", ""]
     return "\n".join(lines)
@@ -161,7 +164,7 @@ def main() -> None:
             path.write_text(content, encoding="utf-8")
     print(
         f"legacy sign audit: {report['summary']['current_generic_records']} generic records, "
-        f"{report['summary']['stored_vs_repaired_text_direction_changed']} stored/text direction differences"
+        f"{report['summary']['stored_vs_repaired_runner_direction_changed']} stored/current-runner direction differences"
     )
 
 

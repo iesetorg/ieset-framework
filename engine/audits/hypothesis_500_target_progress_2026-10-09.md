@@ -46,8 +46,9 @@ with p=0.0181 did **not** meet its eight-test p<=0.0125 refutation cutoff.
 
 A separate legacy sign audit found 64 current generic-rule panel records and
 57 historical-to-stored inferred-direction changes. The old text parser could
-mistake `p<0.10` for a negative coefficient condition; it is repaired for
-future runs, while old result artifacts remain unchanged pending manual
+mistake `p<0.10` for a negative coefficient condition; future runs now fail
+closed on that generic unpinned sign until a direction is explicitly supplied,
+while old result artifacts remain unchanged pending manual
 claim-by-claim adjudication. Five earlier calibration-only geographic holdouts
 now have an explicit external school-score exclusion so later links cannot
 silently award credit; their frozen runs remain untouched.
