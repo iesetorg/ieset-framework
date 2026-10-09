@@ -21,7 +21,7 @@ from datetime import datetime
 import pandas as pd
 import requests
 
-from ._base import FetchResult, utc_now, write_vintage
+from ._base import ROOT, FetchResult, utc_now, write_vintage
 from ._rawstore import BROWSER_UA, save_raw
 
 CKAN = "https://www.tesourotransparente.gov.br/ckan/api/3/action/package_show"
@@ -81,7 +81,7 @@ def fetch(series_id: str = "1.1", *, vintage_utc: datetime | None = None) -> Fet
         end_date=str(df["date"].max().date()),
         sha256=sha,
         parquet_path=path,
-        extra={"table_title": title, "ckan_last_modified": modified, "raw_path": str(raw_path), "raw_sha256": raw_sha,
+        extra={"table_title": title, "ckan_last_modified": modified, "raw_path": str(raw_path.relative_to(ROOT)), "raw_sha256": raw_sha,
                "n_line_items": int(df["line_item"].nunique()),
                "vintage_utc": vintage_utc.isoformat() if vintage_utc else None},
     )

@@ -40,9 +40,9 @@ import pyarrow.parquet as pq
 
 warnings.filterwarnings("ignore")
 
-REPO_ROOT = Path("/Users/localllm/IESET")
+REPO_ROOT = Path(__file__).resolve().parents[4]
 HID = "milei_reforms_reduce_argentine_inflation"
-OUT_DIR = Path("/Users/localllm/IESET-x-build/runs/_rerun_milei_reforms_reduce_argentine_inflation")
+OUT_DIR = Path(__file__).resolve().parent
 
 # Event date — Milei inauguration. t=0 is the Dec-2023 m/m print.
 EVENT_YEAR = 2023

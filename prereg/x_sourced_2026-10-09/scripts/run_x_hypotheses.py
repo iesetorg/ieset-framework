@@ -1,5 +1,5 @@
 import glob, json, pathlib, datetime, numpy as np, pandas as pd, statsmodels.formula.api as smf
-REPO=pathlib.Path.home()/"IESET"; OUT=pathlib.Path.home()/"IESET-x-build"/"runs"
+REPO=pathlib.Path(__file__).resolve().parents[3]; OUT=pathlib.Path(__file__).resolve().parents[1]/"runs"  # repo-relative (was ~/IESET + ~/IESET-x-build at original run)
 def vint(pat): return sorted(glob.glob(str(REPO/"data/vintages"/pat)))[-1]
 RES={}
 def rec(hid, verdict, headline, metrics, inputs):

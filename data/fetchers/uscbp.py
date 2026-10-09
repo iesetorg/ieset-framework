@@ -21,7 +21,7 @@ from datetime import datetime
 import pandas as pd
 import requests
 
-from ._base import FetchResult, utc_now, write_vintage
+from ._base import ROOT, FetchResult, utc_now, write_vintage
 from ._rawstore import BROWSER_UA, save_raw
 
 PAGE = "https://www.cbp.gov/document/stats/nationwide-encounters"
@@ -59,6 +59,6 @@ def fetch(series_id: str = "state", *, vintage_utc: datetime | None = None) -> F
         units="encounters (count)", currency=None,
         start_date=str(df["date"].min().date()), end_date=str(df["date"].max().date()),
         sha256=sha, parquet_path=path,
-        extra={"raw_path": str(raw_path), "raw_sha256": raw_sha,
+        extra={"raw_path": str(raw_path.relative_to(ROOT)), "raw_sha256": raw_sha,
                "vintage_utc": vintage_utc.isoformat() if vintage_utc else None},
     )
