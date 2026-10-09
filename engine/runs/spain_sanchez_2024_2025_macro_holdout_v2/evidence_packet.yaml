@@ -1,0 +1,113 @@
+packet_version: 1
+generated_utc: '2026-10-09T13:30:21+00:00'
+hypothesis:
+  id: spain_sanchez_2024_2025_macro_holdout_v2
+  path: hypotheses/growth/spain_sanchez_2024_2025_macro_holdout_v2.yaml
+  topic: growth
+preregistration:
+  spec_commit: b2ee9e6b5f9cdfb076b6c3d38f197f029f94fc70
+  steelman: hypotheses/steelman/spain_sanchez_2024_2025_macro_holdout_v2.md
+  registration_files:
+  - path: hypotheses/growth/spain_sanchez_2024_2025_macro_holdout_v2.yaml
+    sha256: 5efb0bb3f713f5c4dea75af3c3aae1747daa34852dcb07c243581418f0aad551
+  - path: hypotheses/steelman/spain_sanchez_2024_2025_macro_holdout_v2.md
+    sha256: 86cc8bb03adbf3b94a2c9b0b58a963523727f143f5cbd0f248ea09dac2540c2a
+  - path: scripts/run_spain_sanchez_2024_2025_macro_holdout_v2.py
+    sha256: 9bb44ce9e0ad98c61977c5ed2a6d1c89ec84471d3d71e64eba69147b07e59700
+  gate:
+    old_hypothesis_id: spain_sanchez_economic_trajectory_2018_2023
+    old_result_seen: PARTIAL
+    focal_country: ESP
+    peer_countries:
+    - FRA
+    - ITA
+    - PRT
+    - GRC
+    - DEU
+    - NLD
+    - BEL
+    holdout_years:
+    - 2024
+    - 2025
+    minimum_countries: 8
+    minimum_country_years_per_source: 16
+    gdp_growth_gap_support_min: 0.0
+    employment_change_gap_support_min_pp: 0.0
+    source_files:
+      real_gdp:
+        path: data/vintages/eurostat/nama_10_gdp@2026-07-23T154118Z.parquet
+        sha256: c02fd991a250c967cd6bd4350cf3bf6cde186bd38acc50a3dd984866415c9824
+        selector: &id001
+          na_item: B1GQ
+          unit: CLV20_MEUR
+      population:
+        path: data/vintages/eurostat/demo_pjan@2026-05-05T205848Z.parquet
+        sha256: c0910d085947e1c95da781ea3679f79909f41cab5c2cf5731db4e8fcf415f3e3
+        selector: &id002
+          unit: NR
+          age: TOTAL
+          sex: T
+      employment:
+        path: data/vintages/eurostat/lfsi_emp_a@2026-04-30T115837Z.parquet
+        sha256: 974340d9c78f8def6f7dca019bad810e31c5ca595552451bcc58361b57d22ec0
+        selector: &id003
+          indic_em: EMP_LFS
+          age: Y15-64
+          sex: T
+          unit: PC_POP
+reproduction:
+  runner: scripts/run_spain_sanchez_2024_2025_macro_holdout_v2.py
+  run_dir: engine/runs/spain_sanchez_2024_2025_macro_holdout_v2
+  command: python3 engine/runs/spain_sanchez_2024_2025_macro_holdout_v2/replication.py
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: both registered descriptive gaps are nonnegative
+data:
+  inputs:
+  - role: real_gdp
+    publisher: eurostat
+    series_id: nama_10_gdp
+    path: data/vintages/eurostat/nama_10_gdp@2026-07-23T154118Z.parquet
+    sha256: c02fd991a250c967cd6bd4350cf3bf6cde186bd38acc50a3dd984866415c9824
+    selector: *id001
+    manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+    manifest_sha256: c2215e0e796c4697d0596848a7498c7a369e5fb2e9baed660e25a8791ffa580d
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_gdp?format=JSON
+  - role: population
+    publisher: eurostat
+    series_id: demo_pjan
+    path: data/vintages/eurostat/demo_pjan@2026-05-05T205848Z.parquet
+    sha256: c0910d085947e1c95da781ea3679f79909f41cab5c2cf5731db4e8fcf415f3e3
+    selector: *id002
+    manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON
+  - role: employment
+    publisher: eurostat
+    series_id: lfsi_emp_a
+    path: data/vintages/eurostat/lfsi_emp_a@2026-04-30T115837Z.parquet
+    sha256: 974340d9c78f8def6f7dca019bad810e31c5ca595552451bcc58361b57d22ec0
+    selector: *id003
+    manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsi_emp_a?format=JSON
+  heldout_years:
+  - 2024
+  - 2025
+results:
+  method: fixed seven-peer median of 2024-to-2025 changes, descriptive
+  n_countries: 8
+  n_country_years: 16
+  gdp_pc_log_growth_spain: 0.017451394111045394
+  gdp_pc_log_growth_peer_median: 0.005852281641977934
+  gdp_pc_log_growth_gap: 0.01159911246906746
+  employment_change_spain_pp: 0.9000000000000057
+  employment_change_peer_median_pp: 0.4000000000000057
+  employment_change_gap_pp: 0.5
+limitations:
+- Descriptive 2024-25 peer comparison; no causal credit to the 2018 government or
+  any later policy.
+- The old same-commit PARTIAL result was known before this new registration.
+- Tourism, migration, labour composition, and country shocks can change these gaps.
+- This narrow test does not measure the older housing or real-wage claim.
