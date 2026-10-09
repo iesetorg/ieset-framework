@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_household_dsr_housing_affordability_forward_2026
+version: 1
+status: pre_registered
+topic: housing
+claim_direction: +
+claim: Within the frozen 17-country panel, a larger annual increase in household debt-service burden
+  predicts a subsequent decline in the percentage of household gross adjusted disposable income remaining
+  after housing rents and maintenance.
+methodology_note: Prospective descriptive four-endpoint family registered before any selected OECD HSL
+  outcome value or outcome missingness was opened. Only categorical dimensions, country/year keys, BIS
+  exposure values, raw hashes, source manifests, and archived hypothesis text were inspected. Exact
+  contract in engine/audits/bis_dsr_oecd_hsl_family_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUS
+  - BEL
+  - CAN
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - ITA
+  - JPN
+  - KOR
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 2004
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the exact endpoint-specific committed country-year key roster; no country or time-window
+    substitutions.
+  - BIS FREQ=Q and DSR_BORROWERS=H only; require all four quarters in each annual mean at t-1 and t.
+    No interpolation or nearest-year join.
+  - OECD HSL MEASURE=3_2, UNIT_MEASURE=PT_B7G_S14, AGE=_T, SEX=_T, EDUCATION_LEV=_T only; require exact
+    t and t+1 keys.
+  - After the separate source-lock commit, keep only finite BIS and HSL values in [0,100]; drop countries
+    with fewer than three complete pairs. No outcome-status substitution or alternate source.
+variables:
+  treatment:
+  - name: annual_household_dsr_change_pp
+    source: bis:WS_DSR
+    transformation: Mean of four quarterly H-sector debt-service ratios at t minus mean of four quarterly
+      ratios at t-1; percentage points.
+    notes: Household and NPISH interest plus principal payments relative to income; not a policy intervention.
+  outcome:
+  - name: next_year_adverse_housing_affordability_change_pp
+    source: oecd:OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,1.1
+    transformation: -1 times (3_2 at t+1 minus 3_2 at t); adverse-oriented percentage points.
+    notes: 'Pinned parquet label: Housing affordability; unit PT_B7G_S14 (Percentage of household gross
+      adjusted disposable income). This is income remaining after rents and maintenance, not the separate
+      housing-cost-overburden rate; housing accounting and macro income shifts can dominate.'
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One OLS coefficient for prior annual DSR change versus next-year adverse outcome change, with
+    country and treatment-year fixed effects; country-cluster CR1 and two-sided Student t(G-1). No covariate
+    search, alternate lag, or post-result endpoint change.
+falsification:
+  test: bis_dsr_oecd_hsl_family_2026
+  rule: INCONCLUSIVE if frozen complete-case, three-year-country, meaningful-exposure, full-rank, or
+    clustered-uncertainty floor fails. Otherwise SUPPORTED only for adverse-oriented beta >= +0.25 outcome
+    percentage point per 1 DSR percentage point and two-sided p <= 0.0025. REFUTED only for beta <=
+    -0.25 at the same cutoff. All other estimable results are PARTIAL. All four tests remain in one
+    Bonferroni family, even if another is inconclusive.
+  threshold:
+    family_id: bis_dsr_oecd_hsl_wellbeing_forward_2026_10_10
+    family_size: 4
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0025
+    adverse_beta_min_pp_per_dsr_pp: 0.25
+    min_valid_rows: 260
+    min_valid_countries: 14
+    min_material_change_rows: 170
+    min_material_change_countries: 14
+    material_dsr_change_min_pp: 0.1
+    min_years_per_country: 3
+    expected_key_rows: 340
+    expected_key_countries: 17
+    roster_sha256: ecd0847a9dc555cc4272e4771b33db3b435f5b5e7a87c3a0383d19747b11a997
+    source_files:
+      treatment:
+        path: data/vintages/bis/WS_DSR@2026-07-22T141212Z.parquet
+        sha256: 59cb6b2f260d3132f826a15ccf585a3016af8516c4d0c2197a5fda2c2916b3fd
+        manifest: data/manifests/fetch_run_2026-07-22T141212Z.yaml
+        manifest_sha256: 895761a2da3bd2554da4466becd7fa85837258ce80442c519362bb9d4c5eaea2
+      outcome:
+        path: data/vintages/oecd/OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0@2026-07-23T150432Z.parquet
+        sha256: ac7581cb015748d97a21d4feadd08a3afb16cb1d5912af9e0997913ce4db65db
+        manifest: data/manifests/fetch_run_2026-07-23T150922Z.yaml
+        manifest_sha256: f8d2a682717c02832a2cf323fb5ea777139502e14987348859f3114042bece51
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.3
+disclosure: This is income remaining after rents and maintenance, not the separate housing-cost-overburden
+  rate; housing accounting and macro income shifts can dominate. BIS DSR can respond to interest rates,
+  income and credit changes; FE and timing do not identify a causal effect. Related BIS DSR macro outcomes
+  and OECD HSL housing tests were visible. This is descriptive calibration, not an independent archive-wide
+  correction; zero school, policy, causal, or featured credit.
+steelman: hypotheses/steelman/bis_household_dsr_housing_affordability_forward_2026.md
+scope:
+  period:
+  - 2004
+  - 2025
+  countries: *id001
+  outcome_dim:
+  - housing
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
