@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: foreign_arrivals_disposable_gini_bracket_2026
+version: 1
+status: pre_registered
+topic: distribution
+claim_direction: "+"
+claim: >
+  Across the fixed 31-country European panel, more foreign-country and
+  stateless immigration arrivals per 1,000 residents at calendar year t
+  predict a higher change in disposable-income Gini from income year t-1 to
+  income year t+1, measured by Eurostat survey years t and t+2.
+methodology_note: >
+  New-ID measured association in a fixed two-test cross-domain family.
+  Existing Eurostat unemployment/Gini country-years were visible before this
+  registration; this immigration/Gini source pair is new but is not an
+  independent Gini-data replication. Candidate numeric values and null masks
+  were not opened for design selection. Ireland is excluded for its earlier
+  rolling income reference and the UK for insufficient joined key years.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, ISL, ITA, LTU, LUX, LVA, MKD, MLT, MNE, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+  period: [2014, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the 31 named ISO3 countries and exact immigration/population year t, Gini survey year t, and Gini survey year t+2 joins.
+    - Require at least five complete treatment years per country; no imputation, country substitution, or vintage switch.
+    - Require finite nonnegative arrival counts, positive 1-January population, and finite Gini in [0,100] at both survey endpoints.
+variables:
+  outcome:
+    - name: bracketed_disposable_income_gini_change
+      source: eurostat:ilc_di12
+      transformation: Gini at survey year t+2 minus Gini at survey year t; generally income-year t+1 minus income-year t-1.
+  treatment:
+    - name: foreign_country_and_stateless_arrivals_per_1000
+      source: eurostat:migr_imm1ctz
+      transformation: 1000 times annual FOR_STLS arrival count divided by Eurostat 1-January total population in year t.
+  controls:
+    - name: baseline_disposable_income_gini
+      source: eurostat:ilc_di12
+      transformation: Gini at survey year t, generally income-year t-1.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One primary coefficient; pre-arrival baseline Gini, country, and arrival
+    calendar-year effects are fixed controls. Country-clustered normal-Wald
+    standard errors. No model or covariate search.
+falsification:
+  rule: >
+    INCONCLUSIVE if fewer than 180 complete country-years, 25 countries, five
+    years per retained country, or 15 within-country exposure-varying
+    countries survive; also if the model is rank deficient or clustered
+    uncertainty is nonfinite. A positive coefficient at two-sided p<=0.025
+    SUPPORTS this measured claim; a negative coefficient at that cutoff
+    REFUTES it; every other estimable result is PARTIAL. Both tests remain in
+    the family denominator.
+  test: cross_domain_measured_followups_2026_10_09
+  threshold:
+    family_id: cross_domain_measured_followups_2026_10_09
+    family_size: 2
+    family_alpha: 0.05
+    family_p_max: 0.025
+    expected_sign: "+"
+    min_observations: 180
+    min_countries: 25
+    min_pairs_per_country: 5
+    min_varying_countries: 15
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_credit: 0
+    source_files:
+      pdb:
+        source: oecd:DSD_PDB
+        path: data/vintages/oecd/DSD_PDB@2026-05-19T094612Z.parquet
+        sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        series_id: DSD_PDB
+      manufactured_share:
+        source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+        path: data/vintages/world_bank_wdi/TX.VAL.MANF.ZS.UN@2026-04-30T115209Z.parquet
+        sha256: c5077c18a1ba1b953bc1cd66ac980f36b5cda7568fc3749126b91587cf17c98b
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: TX.VAL.MANF.ZS.UN
+      immigration:
+        source: eurostat:migr_imm1ctz
+        path: data/vintages/eurostat/migr_imm1ctz@2026-05-05T205902Z.parquet
+        sha256: b0b178278dd7d1ef68d4a03188e496b580d3e30b61f9fa21c7db13ed547bfeb1
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: migr_imm1ctz
+      population:
+        source: eurostat:demo_pjan
+        path: data/vintages/eurostat/demo_pjan@2026-05-05T205848Z.parquet
+        sha256: c0910d085947e1c95da781ea3679f79909f41cab5c2cf5731db4e8fcf415f3e3
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: demo_pjan
+      gini:
+        source: eurostat:ilc_di12
+        path: data/vintages/eurostat/ilc_di12@2026-07-23T154401Z.parquet
+        sha256: 9b1b03caebf74bf79ad77d5373b04841002ea80c017ff6e3cca884485a8adfa6
+        manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+        series_id: ilc_di12
+prior_confidence: 0.4
+disclosure: >
+  Descriptive calibration only. FOR_STLS includes stateless people and is not
+  foreign-born or net migration. Eurostat Gini is all-resident equivalised
+  disposable income, and survey timing is an income-reference approximation.
+  Immigration responds to economic conditions; this is not a migration,
+  welfare-policy, or immigrant-specific causal effect. No position, featured,
+  or school-score credit.
+steelman: hypotheses/steelman/foreign_arrivals_disposable_gini_bracket_2026.md
+scope:
+  period: [2014, 2023]
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, ISL, ITA, LTU, LUX, LVA, MKD, MLT, MNE, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+  outcome_dim: [poverty_inequality]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

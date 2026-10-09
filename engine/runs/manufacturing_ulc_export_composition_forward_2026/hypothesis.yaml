@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: manufacturing_ulc_export_composition_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "-"
+claim: >
+  Across the fixed 37-country panel, faster manufacturing hour-based unit
+  labour cost growth at year t predicts a lower manufactures share of
+  merchandise exports at t+3 relative to t.
+methodology_note: >
+  New-ID measured association in a fixed two-test cross-domain family. Prior
+  PDB productivity and WDI high-tech-export-share results were visible before
+  this registration; this PDB cost measure and manufactures-export endpoint
+  are distinct, but neither old verdict is inherited. Candidate numeric
+  values and null masks were not opened for design selection.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BGR, CAN, CHE, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, ROU, SVK, SVN, SWE, USA]
+  period: [1995, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the 37 named ISO3 countries and exact t and t+3 calendar-year joins.
+    - Require at least five complete treatment years per country; no imputation, country substitution, or vintage switch.
+    - Require finite hour-based manufacturing unit-labour-cost growth and export shares in [0,100] at both endpoints.
+variables:
+  outcome:
+    - name: forward_manufactures_export_share_change_t3
+      source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+      transformation: Exact t+3 minus t manufactures share of merchandise exports in percentage points.
+  treatment:
+    - name: manufacturing_hour_based_unit_labour_cost_growth
+      source: oecd:DSD_PDB
+      transformation: Exact annual OECD PDB manufacturing hour-based unit labour cost growth at t in percentage points; FREQ=A, MEASURE=ULCH, ACTIVITY=C, UNIT_MEASURE=XDC, PRICE_BASE=V, TRANSFORMATION=GY, ASSET_CODE=_Z, CONVERSION_TYPE=_Z.
+  controls:
+    - name: baseline_manufactures_export_share
+      source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+      transformation: Exact t manufactures share of merchandise exports.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One primary coefficient; baseline manufactures-export share, country,
+    and treatment-year effects are fixed controls. Country-clustered
+    normal-Wald standard errors. No model or covariate search.
+falsification:
+  rule: >
+    INCONCLUSIVE if fewer than 400 complete country-years, 20 countries, five
+    years per retained country, or 15 within-country exposure-varying
+    countries survive; also if the model is rank deficient or clustered
+    uncertainty is nonfinite. A negative coefficient at two-sided p<=0.025
+    SUPPORTS this measured claim; a positive coefficient at that cutoff
+    REFUTES it; every other estimable result is PARTIAL. Both tests remain in
+    the family denominator.
+  test: cross_domain_measured_followups_2026_10_09
+  threshold:
+    family_id: cross_domain_measured_followups_2026_10_09
+    family_size: 2
+    family_alpha: 0.05
+    family_p_max: 0.025
+    expected_sign: "-"
+    min_observations: 400
+    min_countries: 20
+    min_pairs_per_country: 5
+    min_varying_countries: 15
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_credit: 0
+    source_files:
+      pdb:
+        source: oecd:DSD_PDB
+        path: data/vintages/oecd/DSD_PDB@2026-05-19T094612Z.parquet
+        sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        series_id: DSD_PDB
+      manufactured_share:
+        source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+        path: data/vintages/world_bank_wdi/TX.VAL.MANF.ZS.UN@2026-04-30T115209Z.parquet
+        sha256: c5077c18a1ba1b953bc1cd66ac980f36b5cda7568fc3749126b91587cf17c98b
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: TX.VAL.MANF.ZS.UN
+      immigration:
+        source: eurostat:migr_imm1ctz
+        path: data/vintages/eurostat/migr_imm1ctz@2026-05-05T205902Z.parquet
+        sha256: b0b178278dd7d1ef68d4a03188e496b580d3e30b61f9fa21c7db13ed547bfeb1
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: migr_imm1ctz
+      population:
+        source: eurostat:demo_pjan
+        path: data/vintages/eurostat/demo_pjan@2026-05-05T205848Z.parquet
+        sha256: c0910d085947e1c95da781ea3679f79909f41cab5c2cf5731db4e8fcf415f3e3
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: demo_pjan
+      gini:
+        source: eurostat:ilc_di12
+        path: data/vintages/eurostat/ilc_di12@2026-07-23T154401Z.parquet
+        sha256: 9b1b03caebf74bf79ad77d5373b04841002ea80c017ff6e3cca884485a8adfa6
+        manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+        series_id: ilc_di12
+prior_confidence: 0.4
+disclosure: >
+  Descriptive calibration only. The export share can move when nonmanufactures
+  exports or commodity prices move, and exchange rates, demand, and sector mix
+  can confound the association. No causal, policy-effect, position, featured,
+  or school-score credit.
+steelman: hypotheses/steelman/manufacturing_ulc_export_composition_forward_2026.md
+scope:
+  period: [1995, 2021]
+  countries: [AUS, AUT, BEL, BGR, CAN, CHE, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, ROU, SVK, SVN, SWE, USA]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
