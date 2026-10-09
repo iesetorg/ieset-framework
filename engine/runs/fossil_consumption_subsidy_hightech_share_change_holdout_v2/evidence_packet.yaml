@@ -1,5 +1,5 @@
 packet_version: 1
-generated_utc: '2026-10-09T17:37:37+00:00'
+generated_utc: '2026-10-09T17:44:47+00:00'
 hypothesis:
   id: fossil_consumption_subsidy_hightech_share_change_holdout_v2
   path: hypotheses/energy/fossil_consumption_subsidy_hightech_share_change_holdout_v2.yaml
@@ -15,10 +15,12 @@ reproduction:
   command: python3 scripts/run_fossil_consumption_subsidy_hightech_share_change_holdout_v2.py
     --check
 verdict:
-  raw: INCONCLUSIVE
-  bucket: inconclusive
-  reason: 'primary estimator failed: TypeError: Cannot interpret ''Int64Dtype()''
-    as a data type'
+  raw: PARTIAL
+  bucket: partial
+  reason: coefficient did not clear the frozen directional rule
+technical_erratum:
+  record: engine/audits/fossil_consumption_subsidy_hightech_share_change_holdout_v2_dtype_erratum_2026-10-09.json
+  failed_attempt: engine/runs/fossil_consumption_subsidy_hightech_share_change_holdout_v2/attempts/initial_inconclusive
 data:
   inputs:
   - role: subsidy
@@ -53,7 +55,17 @@ data:
     indicator_id: NY.GDP.PCAP.KD
     source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
   old_country_overlap: 0
-results: null
+results:
+  coefficient: 0.07479636986219262
+  std_error: 0.2776330916797009
+  p_value: 0.7902457004302803
+  ci95:
+  - -0.5025732513494577
+  - 0.652165991073843
+  n_obs: 247
+  n_countries: 22
+  r_squared: 0.11683702798118545
+  method: country/year FE OLS; country-clustered t(21) inference
 limitations:
 - The known old export-value result was PARTIAL, positive and nonsignificant; it was
   seen before this registration.
@@ -70,6 +82,9 @@ limitations:
 - The outcome denominator may change; observational association does not identify
   a subsidy policy or causal effect.
 - No school, welfare, causal, or policy-score credit.
+- The first registered execution hit a pandas nullable-year dtype exception before
+  fitting; a committed technical erratum casts the same year keys to int64 and retains
+  the first attempt byte-exact.
 correction:
   disposition: descriptive_calibration_only
   school_score_eligible: false
