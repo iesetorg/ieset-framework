@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: working_time_employment_oecd_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: labour
+claim: >-
+  Among OECD countries excluded from the earlier working-time panel, the
+  within-country association between average annual hours worked per employed
+  person and the employment-to-population ratio is near neutral over 1990-2019:
+  the absolute log-log elasticity is smaller than 0.5 after common year effects
+  and the four frozen macro controls.
+claim_direction: "?"
+methodology_note: >-
+  New-ID country holdout following the known PARTIAL legacy result for
+  working_time_reduction_employment_neutral_oecd. The historical 23-country
+  sample is entirely excluded. This tests only the measured hours/employment
+  association. It neither reruns nor receives credit for the old France
+  35-hour-week event study or for the causal claim that a shorter-hours policy
+  preserves jobs. The earlier ILOSTAT outcome identifier has no exact local
+  vintage, so the registered outcome is WDI's modeled total employment-to-
+  population ratio (ages 15+). The PWT full vintage supplies its avh column.
+  Both sources and all controls have tracked fetch-manifest SHA-256 pins.
+evidence_type: associational
+sample:
+  countries: [CHL, COL, CRI, CZE, EST, HUN, ISR, LTU, LUX, LVA, MEX, POL, SVK, SVN, TUR]
+  period: [1990, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Exclude every historical old-spec country: AUS AUT BEL CAN CHE DEU DNK
+      ESP FIN FRA GBR GRC IRL ISL ITA JPN KOR NLD NOR NZL PRT SWE USA.
+    - Require both rates to be finite and positive before logs; require the
+      four controls and at least eight complete years per country.
+    - No country, year, or control selection based on coefficient, sign,
+      outcome magnitude, or result status.
+variables:
+  outcome:
+    - name: log_employment_to_population_ratio
+      source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+      transformation: natural_log_of_percent
+      notes: WDI modeled total employment-to-population ratio, population ages 15+.
+  treatment:
+    - name: log_annual_hours_worked
+      source: pwt:pwt_full.avh
+      transformation: natural_log_of_annual_hours_per_employed_person
+      notes: Annual hours worked per employed person from the pinned PWT full table.
+  controls:
+    - name: log_real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural_log
+    - name: log_population
+      source: world_bank_wdi:SP.POP.TOTL
+      transformation: natural_log
+    - name: trade_openness
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level_percent_of_gdp
+    - name: services_share
+      source: world_bank_wdi:NV.SRV.TOTL.ZS
+      transformation: level_percent_of_gdp
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    OLS of log employment-to-population ratio on log annual hours and the
+    four controls, with country and calendar-year fixed effects. Use country-
+    clustered CR1 standard errors and a Student t critical value with
+    fitted-country-count minus one degrees of freedom for the primary 90%
+    confidence interval. No policy treatment or causal effect is identified.
+    A fixed sensitivity repeats the same equation after excluding 2008-2010;
+    it has no separate verdict and cannot rescue a failed primary result.
+falsification:
+  test: country_disjoint_oecd_hours_employment_equivalence
+  rule: >-
+    The old |elasticity|<0.5 margin is retained before held-out fit. First
+    require at least 150 complete country-years, ten countries, eight years
+    per included country, full-rank estimation, finite clustered uncertainty,
+    and a 90% interval half-width no greater than 0.5. If any gate fails,
+    INCONCLUSIVE. With adequate precision, SUPPORTED only if the entire 90%
+    country-clustered interval lies strictly inside (-0.5, +0.5), the two
+    one-sided equivalence test at alpha 0.05. REFUTED only if that interval
+    lies wholly at or beyond either boundary. Every overlapping interval is
+    PARTIAL. A nonsignificant coefficient alone never supports neutrality.
+  threshold:
+    old_hypothesis_id: working_time_reduction_employment_neutral_oecd
+    old_result_bucket: PARTIAL
+    old_run_commit: 9db22f489a1709911fca79175efeb14dd1a70646
+    old_country_ids: [AUS, AUT, BEL, CAN, CHE, DEU, DNK, ESP, FIN, FRA, GBR, GRC, IRL, ISL, ITA, JPN, KOR, NLD, NOR, NZL, PRT, SWE, USA]
+    holdout_country_ids: [CHL, COL, CRI, CZE, EST, HUN, ISR, LTU, LUX, LVA, MEX, POL, SVK, SVN, TUR]
+    years: [1990, 2019]
+    margin_absolute_elasticity: 0.5
+    equivalence_alpha: 0.05
+    confidence_level: 0.90
+    min_observations: 150
+    min_countries: 10
+    min_years_per_country: 8
+    max_ci_half_width: 0.5
+    source_files:
+      hours:
+        source: pwt:pwt_full.avh
+        path: data/vintages/pwt/pwt_full@2026-05-05T195237Z.parquet
+        sha256: a125939373ac2662c8c9b5031bba3b62b3fc50d069fa140e81da551ebef3c844
+        source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      employment:
+        source: world_bank_wdi:SL.EMP.TOTL.SP.ZS
+        path: data/vintages/world_bank_wdi/SL.EMP.TOTL.SP.ZS@2026-05-05T194751Z.parquet
+        sha256: 13dd1ff36a27d38b5398196789130886c158c0d48ff0d8327567c9673bdbaeef
+        source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      population:
+        source: world_bank_wdi:SP.POP.TOTL
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      trade:
+        source: world_bank_wdi:NE.TRD.GNFS.ZS
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+        source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      services:
+        source: world_bank_wdi:NV.SRV.TOTL.ZS
+        path: data/vintages/world_bank_wdi/NV.SRV.TOTL.ZS@2026-05-05T195011Z.parquet
+        sha256: 3e4ecdf108553bd3449986ab0603ac062873ebc42bf40d2fa2c16dc52fc11fed
+        source_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+prior_confidence: 0.40
+disclosure: >-
+  The old PARTIAL verdict and the selected 15-country roster were known before
+  this registration. An earlier 146-case inventory counted finite/nonmissing
+  records in candidate source series before these follow-up designs were
+  chosen; no held-out magnitudes, signs, or coefficients were reported from
+  that screen. This design is therefore prospectively frozen before its fit,
+  but not blind to all earlier availability screening. The old sample excluded
+  these countries, but these same
+  PWT/WDI vintages may have appeared in unrelated IESET studies. The 0.5
+  margin is the old claim's permissive margin; it does not establish zero
+  employment effect. Working hours can respond to employment composition,
+  recessions, and part-time work, so even a supported result is only an
+  association. WDI employment is a revised source from the old ILOSTAT
+  identifier. No original school/scoreboard or named-policy claim is covered.
+steelman: hypotheses/steelman/working_time_employment_oecd_geographic_holdout_v2.md
+scope:
+  period: [1990, 2019]
+  countries: [OECD]
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [working_hours, employment_rate, geographic_holdout]
+covers_claims: []
+linked_hypotheses: []
