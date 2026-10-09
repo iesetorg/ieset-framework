@@ -1,0 +1,76 @@
+packet_version: 1
+generated_utc: '2026-10-09T21:58:55+00:00'
+hypothesis:
+  id: business_rd_resident_patenting_forward_2026
+  path: hypotheses/growth/business_rd_resident_patenting_forward_2026.yaml
+  topic: growth
+preregistration:
+  spec_commit: 409fa5d6b7c96bee55ac57d51e4dbe538a1029b0
+  steelman: hypotheses/steelman/business_rd_resident_patenting_forward_2026.md
+  family_id: business_rd_selected_two_outcome_screen_2026_10_09
+  family_size: 2
+  family_alpha: 0.01
+  family_p_max: 0.005
+reproduction:
+  runner: scripts/run_business_rd_resident_patenting_2026.py
+  run_dir: engine/runs/business_rd_resident_patenting_forward_2026
+  command: python3 scripts/verify_business_rd_resident_patenting_2026.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear frozen directional screen rule
+data:
+  inputs:
+  - role: business_rd
+    source: eurostat:rd_e_gerdtot
+    path: data/vintages/eurostat/rd_e_gerdtot@2026-05-05T210242Z.parquet
+    sha256: fea284d7b17e31a3803749fca052f6a110ed1b8e703a9151964d1d15f58df152
+    manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+    series_id: rd_e_gerdtot
+  - role: resident_patents
+    source: wipo:patent_applications_resident
+    path: data/vintages/wipo/patent_applications_resident@2026-05-19T094854Z.parquet
+    sha256: 8affaee11a397d965f73eda762d0b3416bc341b7485e6197745700a1dd3bf24e
+    manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+    series_id: patent_applications_resident
+  - role: population
+    source: world_bank_wdi:SP.POP.TOTL
+    path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+    sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: SP.POP.TOTL
+  n_observations: 655
+  n_countries: 32
+results:
+  coefficient: -0.1436703047922629
+  std_error: 0.07009124458971625
+  p_value: 0.0403877518800535
+  ci95:
+  - -0.28104661981969464
+  - -0.006293989764831143
+  n_obs: 655
+  n_countries: 32
+  r_squared: 0.40515801443893096
+  method: country/year fixed-effect OLS; country-clustered normal-Wald standard errors
+limitations:
+- Descriptive country-panel association only; no causal or policy effect identified.
+- The prior business-R&D to tertiary-employment screen was already visible as PARTIAL
+  (p=0.507052); this selected second R&D outcome uses 0.01/2=0.005. This is no global
+  corpus-wide multiplicity correction.
+- Older WDI-total-R&D to patent candidate claims and WIPO-outcome studies exist; this
+  business-sector source and forward patent-intensity change are a narrower new estimand,
+  not an independent replication.
+- Raw source files are hash-pinned to tracked manifests but ignored by Git; replay
+  needs identical bytes.
+- Resident patent applications per million are filing counts, not invention quality,
+  commercial value, or domestic innovation output; population and GDP denominators,
+  filing practices, and R&D sector mix can move the series.
+- Eurostat raw R&D Parquet has no retained observation-status flags; nonblank WDI-mirror
+  status codes are excluded for patent and population levels.
+- No school, position, policy, or featured score credit.
+correction:
+  disposition: descriptive_calibration_only
+  school_score_eligible: false
+  school_score_credit: 0
+  policy_score_credit: 0
+  featured_eligible: false
