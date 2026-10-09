@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: manufacturing_productivity_hightech_export_mix_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "+"
+claim: >
+  Across the fixed 38-country panel, faster manufacturing real GVA per hour
+  growth at year t predicts a higher high-technology share of manufactured
+  exports in t+3 than in t.
+methodology_note: >
+  New-ID measured three-year forward association in a fixed two-test family.
+  Prior patent/export and productivity results were visible before registration;
+  no old verdict is inherited. Candidate numeric values and null masks were not
+  opened for design selection.
+evidence_type: associational
+sample:
+  countries: [AUS, AUT, BEL, BGR, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, ROU, SVK, SVN, SWE, USA]
+  period: [1995, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the 38 listed ISO3 countries and exact calendar-year joins from t to t+3.
+    - Require at least five complete treatment years per country; no imputation, country substitution, or vintage switch.
+    - Require finite manufacturing growth and high-tech shares between 0 and 100 at both endpoints.
+variables:
+  outcome:
+    - name: forward_hightech_manufactured_export_share_change_t3
+      source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+      transformation: Exact t+3 minus t high-technology share of manufactured exports, in percentage points.
+  treatment:
+    - name: manufacturing_gva_per_hour_growth
+      source: oecd:DSD_PDB
+      transformation: Exact t annual manufacturing real GVA per hour growth, in percentage points.
+  controls:
+    - name: baseline_hightech_manufactured_export_share
+      source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+      transformation: Exact t high-technology share of manufactured exports.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One primary coefficient; baseline export share, country, and treatment-year
+    effects are fixed controls. Country-clustered normal-Wald standard errors.
+    No model or covariate search.
+falsification:
+  rule: >
+    INCONCLUSIVE if fewer than 400 complete country-years, 20 countries, five
+    years per retained country, or 15 within-country exposure-varying countries
+    survive; also if the model is rank deficient or clustered uncertainty is
+    nonfinite. A positive coefficient at two-sided p<=0.025 SUPPORTS this measured
+    claim; a negative coefficient at that cutoff REFUTES it; every other
+    estimable result is PARTIAL. Both tests remain in the family denominator.
+  test: innovation_productivity_measured_family_2026_10_09
+  threshold:
+    family_id: innovation_productivity_measured_family_2026_10_09
+    family_size: 2
+    family_alpha: 0.05
+    family_p_max: 0.025
+    expected_sign: "+"
+    min_observations: 400
+    min_countries: 20
+    min_pairs_per_country: 5
+    min_varying_countries: 15
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_credit: 0
+    source_files:
+      pdb:
+        source: oecd:DSD_PDB
+        path: data/vintages/oecd/DSD_PDB@2026-05-19T094612Z.parquet
+        sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        series_id: DSD_PDB
+      patents:
+        source: wipo:patent_applications_resident
+        path: data/vintages/wipo/patent_applications_resident@2026-05-19T094854Z.parquet
+        sha256: 8affaee11a397d965f73eda762d0b3416bc341b7485e6197745700a1dd3bf24e
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        series_id: patent_applications_resident
+      population:
+        source: world_bank_wdi:SP.POP.TOTL
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: SP.POP.TOTL
+      hightech:
+        source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+        path: data/vintages/world_bank_wdi/TX.VAL.TECH.MF.ZS@2026-05-05T195027Z.parquet
+        sha256: b99e36dfce6c0ccbebed61124508f11dd2aac6e6d635bacca7955eacf20a1994
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: TX.VAL.TECH.MF.ZS
+prior_confidence: 0.4
+disclosure: >
+  Descriptive calibration only. High-tech share can rise when other manufactured
+  exports fall and is not domestic industrial value added. This study and its
+  family partner share the OECD PDB productivity measure and many countries;
+  they are not independent replications. No causal, policy-effect, position,
+  featured, or school-score credit.
+steelman: hypotheses/steelman/manufacturing_productivity_hightech_export_mix_forward_2026.md
+scope:
+  period: [1995, 2021]
+  countries: [AUS, AUT, BEL, BGR, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, ROU, SVK, SVN, SWE, USA]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
