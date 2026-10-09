@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_food_service_manufacturing_payroll_growth_2025_2026_v2
+version: 1
+status: pre_registered
+topic: labour
+claim: >-
+  From August 2025 to August 2026, US food-services-and-drinking-places
+  payroll employment grew at least one percentage point faster than US
+  manufacturing payroll employment, in the pinned seasonally adjusted BLS
+  Current Employment Statistics series.
+claim_direction: "+"
+methodology_note: >-
+  This is a new-ID, narrow descriptive follow-up to
+  post_covid_labour_reallocation_us_2020_2024. Its saved five-metric run is
+  INCONCLUSIVE_PENDING_DATA, and the original wage, retail, information-sector,
+  and work-from-home metrics are not resolved here. Food services is a subset
+  of the old leisure/hospitality theme; manufacturing is a new fixed comparator,
+  not the original professional/information counterfactual. Both selected
+  payroll series are national, seasonally adjusted, and measured in thousands
+  of employees. The complete August 2025-August 2026 window lies after the
+  old 2024 endpoint. The October 2026 source vintage predates this
+  pre-analysis registration, but neither selected employment-value column was
+  read while fixing the window, one-percentage-point materiality band, or
+  verdict rule. Source hashes and month keys alone were checked.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2025, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - >-
+      Require exactly one monthly key for every August 2025-August 2026
+      month in each of the two pinned national CES series (13 per series;
+      26 total). Do not move the endpoints, substitute a different industry,
+      use a state series, or switch seasonal-adjustment status.
+    - >-
+      All 26 selected employment levels must be numeric, finite, and strictly
+      positive. Any missing, duplicate, or invalid selected month makes the
+      result INCONCLUSIVE; do not interpolate or consult another vintage.
+variables:
+  outcome:
+    - name: food_services_payroll_growth_aug2025_aug2026_pct
+      source: bls:CES7072200001
+      transformation: 100 * (Aug 2026 level / Aug 2025 level - 1)
+      notes: >-
+        National all employees in food services and drinking places,
+        seasonally adjusted, thousands of persons.
+    - name: manufacturing_payroll_growth_aug2025_aug2026_pct
+      source: bls:CES3000000001
+      transformation: 100 * (Aug 2026 level / Aug 2025 level - 1)
+      notes: National all employees in manufacturing, seasonally adjusted, thousands of persons.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Calculate the two endpoint percentage changes from identical August
+    months in a single October 2026 BLS fetch vintage. Subtract manufacturing
+    growth from food-services growth in percentage points. The intervening
+    11 monthly levels establish complete source-window coverage and are
+    reported as indexed context; they do not alter the fixed endpoint verdict.
+    The plus/minus one-percentage-point band is a predeclared descriptive
+    materiality threshold, not a confidence interval or empirical calibration.
+falsification:
+  test: us_food_services_minus_manufacturing_payroll_growth_2025_2026
+  rule: >-
+    METHOD_VALID requires the exact manifest and both parquet hashes, the
+    unchanged first-addition registration including those source bytes,
+    all 26 unique monthly keys, and finite positive selected values.
+    Let gap = food-services Aug-to-Aug payroll percent growth minus
+    manufacturing Aug-to-Aug payroll percent growth. SUPPORTED if gap is
+    at least +1.0 percentage point. REFUTED if gap is at most -1.0
+    percentage point. PARTIAL if gap lies strictly between -1.0 and +1.0.
+    INCONCLUSIVE if METHOD_VALID fails. No verdict repairs or graduates the
+    old five-metric case, identifies a post-COVID mechanism, or earns
+    school-score credit.
+  threshold:
+    old_hypothesis_id: post_covid_labour_reallocation_us_2020_2024
+    old_result_seen: INCONCLUSIVE_PENDING_DATA
+    first_month: 2025-08
+    last_month: 2026-08
+    required_months_per_series: 13
+    required_selected_cells: 26
+    food_services_series_id: CES7072200001
+    manufacturing_series_id: CES3000000001
+    support_growth_gap_pp_min_inclusive: 1.0
+    refute_growth_gap_pp_max_inclusive: -1.0
+    source_manifest:
+      path: data/manifests/fetch_run_2026-10-09T122001Z.yaml
+      sha256: 39fa95739201945c380129e318ad6f24afc55ed694fccd92641fe6eb7093e01b
+    source_parquets:
+      food_services:
+        path: data/vintages/bls/CES7072200001@2026-10-09T121959Z.parquet
+        sha256: 4f6b230f9bc04186f8f14fa9ac29d6c5bd3478eeb512eef7451dc21c2be5438c
+      manufacturing:
+        path: data/vintages/bls/CES3000000001@2026-10-09T121958Z.parquet
+        sha256: 5d131d12d7616d7f538b9e7cc334988cda1efac303ea5606d3d8b2581d23052b
+prior_confidence: 0.50
+disclosure: >-
+  Choosing food services as an improving service sector and manufacturing as
+  comparator could favor a reallocation narrative. The two series share
+  national demand and labor-market shocks, and their difference cannot
+  identify a COVID, wage, trade, automation, or policy effect. BLS payroll
+  estimates are revisable; this result is tied only to the exact pinned
+  October 2026 vintage. The old case remains INCONCLUSIVE_PENDING_DATA,
+  whatever this narrow result. The series do not test its wage over-recovery,
+  remote-work persistence, retail shortfall, or information-sector metric.
+  The registration receives no causal or school-score credit and has no
+  automatic policy evidence link.
+steelman: hypotheses/steelman/us_food_service_manufacturing_payroll_growth_2025_2026_v2.md
+scope:
+  period: [2025, 2026]
+  countries: [USA]
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: [descriptive_payroll_followup]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
