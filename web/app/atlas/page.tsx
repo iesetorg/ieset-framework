@@ -11,6 +11,8 @@ import { WorldMap, type AtlasMovement, type CountryPath } from "@/components/atl
 import { ISO_NUMERIC_TO_ALPHA3 } from "@/lib/iso-numeric-to-alpha3";
 import { dominantClusterFor } from "@/lib/position-clusters";
 import { parseElectionReviews } from "@/lib/atlas-elections";
+import { buildAtlasCoverage, earliestNationalYear, validHistoricalYear,
+  type AtlasCountry, type AtlasPolicyRecord, type ConstitutionalHistory, type CountryHistoricalContext } from "@/lib/atlas-history";
 
 interface MovementYaml {
   movement_id: string;
@@ -20,6 +22,7 @@ interface MovementYaml {
   position_alignments?: { position_id: string; alignment: string }[];
   policies?: string[];
   scope?: "national" | "subnational" | "supranational";
+  country_drift_role?: "primary" | "context_only";
 }
 
 const REPO_ROOT = resolve(process.cwd(), "..");
@@ -53,23 +56,37 @@ async function loadCountryPaths(): Promise<CountryPath[]> {
       `feature-${idx}`;
     return {
       id: stableId,
-      iso3: ISO_NUMERIC_TO_ALPHA3[numeric] ?? null,
+      iso3: ISO_NUMERIC_TO_ALPHA3[numeric] ?? (f.properties?.name === "Kosovo" ? "XKX" : null),
       name: f.properties?.name ?? numeric,
       d: path(f) ?? "",
     };
   });
 }
 
-async function loadMovements(): Promise<AtlasMovement[]> {
+async function loadMovements(): Promise<{ movements: AtlasMovement[]; policies: AtlasPolicyRecord[] }> {
   const dir = join(REPO_ROOT, "movements");
-  if (!existsSync(dir)) return [];
+  if (!existsSync(dir)) return { movements: [], policies: [] };
+  const policies: AtlasPolicyRecord[] = [];
   const policyIds = new Set<string>();
   const policyDir = join(REPO_ROOT, "policies");
   if (existsSync(policyDir)) {
     for (const file of await readdir(policyDir)) {
       if (!file.endsWith(".yaml") || file.startsWith("_")) continue;
-      const policy = yaml.load(await readFile(join(policyDir, file), "utf8")) as { policy_id?: string } | null;
-      if (typeof policy?.policy_id === "string") policyIds.add(policy.policy_id);
+      const policy = yaml.load(await readFile(join(policyDir, file), "utf8")) as {
+        policy_id?: string; title?: string; countries?: string[]; status?: string;
+        timeframe?: { start?: number; enacted_date?: string | Date };
+        scope?: "national" | "subnational" | "supranational";
+      } | null;
+      if (typeof policy?.policy_id !== "string") continue;
+      policyIds.add(policy.policy_id);
+      const enacted = policy.timeframe?.enacted_date;
+      const enactedYear = enacted instanceof Date ? enacted.getUTCFullYear()
+        : typeof enacted === "string" && /^\d{4}-\d{2}-\d{2}$/.test(enacted) ? Number(enacted.slice(0, 4)) : undefined;
+      const year = enactedYear ?? policy.timeframe?.start;
+      if (validHistoricalYear(year)) policies.push({ policy_id: policy.policy_id,
+        title: policy.title ?? policy.policy_id, countries: policy.countries ?? [], year,
+        date_basis: enactedYear !== undefined ? "enacted_date" : "timeframe_start",
+        status: policy.status ?? "candidate", scope: policy.scope });
     }
   }
   const entries = await readdir(dir);
@@ -79,21 +96,12 @@ async function loadMovements(): Promise<AtlasMovement[]> {
     const raw = await readFile(join(dir, e), "utf8");
     const doc = yaml.load(raw) as MovementYaml | null;
     if (!doc?.movement_id) continue;
-    const start =
-      typeof doc.timeframe?.start === "number"
-        ? doc.timeframe.start
-        : Number.isFinite(parseInt(String(doc.timeframe?.start), 10))
-        ? parseInt(String(doc.timeframe.start), 10)
-        : 1900;
+    const start = doc.timeframe?.start;
+    if (!validHistoricalYear(start)) throw new Error(`Atlas movement ${doc.movement_id} has no valid start year`);
     const endRaw = doc.timeframe?.end;
-    const end =
-      typeof endRaw === "number"
-        ? endRaw
-        : endRaw === "ongoing" || endRaw === "present"
-        ? ONGOING_SENTINEL
-        : Number.isFinite(parseInt(String(endRaw), 10))
-        ? parseInt(String(endRaw), 10)
-        : ONGOING_SENTINEL;
+    const end = typeof endRaw === "number" ? endRaw
+      : endRaw === "ongoing" || endRaw === "present" || endRaw === undefined ? ONGOING_SENTINEL : NaN;
+    if (!validHistoricalYear(end) || end < start) throw new Error(`Atlas movement ${doc.movement_id} has an invalid end year`);
     const dom = dominantClusterFor(doc.position_alignments);
     out.push({
       movement_id: doc.movement_id,
@@ -104,11 +112,12 @@ async function loadMovements(): Promise<AtlasMovement[]> {
       cluster: dom.cluster,
       cluster_score: dom.score,
       scope: doc.scope,
+      country_drift_role: doc.country_drift_role,
       policy_coding_ready: Array.isArray(doc.policies) && doc.policies.length > 0
         && doc.policies.every(id => policyIds.has(id)),
     });
   }
-  return out;
+  return { movements: out, policies };
 }
 
 async function loadElectionReviews() {
@@ -126,6 +135,37 @@ async function loadElectionReviews() {
   return reviews.sort((a, b) => a.country.localeCompare(b.country));
 }
 
+async function loadCountryRegistry(): Promise<AtlasCountry[]> {
+  const path = join(REPO_ROOT, "data", "atlas", "countries.json");
+  if (!existsSync(path)) return [];
+  const rows = JSON.parse(await readFile(path, "utf8")) as AtlasCountry[];
+  if (!Array.isArray(rows) || rows.some(row => !/^[A-Z]{3}$/.test(row.iso3) || !row.name)) {
+    throw new Error("Invalid atlas country registry");
+  }
+  return rows;
+}
+
+async function loadConstitutionalHistory(): Promise<ConstitutionalHistory | null> {
+  const path = join(REPO_ROOT, "data", "atlas", "constitutional_history.json");
+  if (!existsSync(path)) return null;
+  const data = JSON.parse(await readFile(path, "utf8")) as ConstitutionalHistory;
+  if (!Array.isArray(data.countries) || !validHistoricalYear(data.dataset?.coverage_start)
+    || !validHistoricalYear(data.dataset?.coverage_end) || data.dataset.coverage_start > data.dataset.coverage_end) {
+    throw new Error("Invalid atlas constitutional history dataset");
+  }
+  return data;
+}
+
+async function loadHistoricalSupplements(): Promise<CountryHistoricalContext[]> {
+  const path = join(REPO_ROOT, "data", "atlas", "historical_context_supplements.json");
+  if (!existsSync(path)) return [];
+  const rows = JSON.parse(await readFile(path, "utf8")) as CountryHistoricalContext[];
+  if (!Array.isArray(rows) || rows.some(row => !/^[A-Z]{3}$/.test(row.iso3) || !Array.isArray(row.events))) {
+    throw new Error("Invalid atlas historical supplements");
+  }
+  return rows;
+}
+
 export const metadata = {
   title: "Atlas — movements over time",
   description:
@@ -134,14 +174,15 @@ export const metadata = {
 };
 
 export default async function AtlasPage() {
-  const [movements, paths, electionReviews] = await Promise.all([
-    loadMovements(),
-    loadCountryPaths(),
-    loadElectionReviews(),
+  const [corpus, paths, electionReviews, registry, constitutionalHistory, historicalSupplements] = await Promise.all([
+    loadMovements(), loadCountryPaths(), loadElectionReviews(), loadCountryRegistry(), loadConstitutionalHistory(), loadHistoricalSupplements(),
   ]);
-  const yearMin = movements.length
-    ? Math.max(1900, Math.min(...movements.map((m) => m.start)))
-    : 1900;
+  const { movements, policies } = corpus;
+  const countryRegistry = new Map<string, AtlasCountry>();
+  for (const path of paths) if (path.iso3) countryRegistry.set(path.iso3, { iso3: path.iso3, name: path.name });
+  for (const country of registry) countryRegistry.set(country.iso3, country);
+  const coverage = buildAtlasCoverage([...countryRegistry.values()], movements, policies, NOW);
+  const yearMin = earliestNationalYear(movements, NOW);
   const yearMax = NOW;
 
   return (
@@ -164,6 +205,10 @@ export default async function AtlasPage() {
         yearMax={yearMax}
         electionReviews={electionReviews}
         asOf={AS_OF}
+        coverage={coverage}
+        policies={policies}
+        constitutionalHistory={constitutionalHistory}
+        historicalSupplements={historicalSupplements}
       />
     </div>
   );

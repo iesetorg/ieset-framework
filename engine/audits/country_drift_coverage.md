@@ -6,15 +6,15 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 
 | Measure | Count |
 | --- | ---: |
-| Authored movement records | 914 |
-| Movement records included in drift | 908 |
+| Authored movement records | 917 |
+| Movement records included in drift | 911 |
 | Countries with a plotted movement | 147 |
-| Countries with one plotted movement | 39 |
+| Countries with one plotted movement | 37 |
 | Countries with at most 2 plotted movements | 49 |
-| Countries first coded after 2000 | 38 |
-| Countries with internal uncovered intervals | 0 |
+| Countries first coded after 2000 | 35 |
+| Countries with internal uncovered intervals | 3 |
 | Countries lacking 2026 coverage, including policy-only countries | 1 |
-| Existing policy records flagged for research | 53 |
+| Existing policy records flagged for research | 66 |
 | Overlapping authored movement pairs sharing policy IDs | 67 |
 | EU supranational geographic scope records to review | 4 |
 
@@ -36,7 +36,6 @@ These are coverage observations. No movement is inferred from a date gap.
 | NER | 2023 | 1 | 2023 |
 | BFA | 2022 | 1 | 2022 |
 | JOR | 2022 | 1 | 2022 |
-| LSO | 2022 | 1 | 2022 |
 | SOM | 2022 | 1 | 2022 |
 | STP | 2022 | 1 | 2022 |
 | GIN | 2021 | 1 | 2021 |
@@ -65,11 +64,10 @@ These are coverage observations. No movement is inferred from a date gap.
 | SLV | 2014 | 3 | 2024 |
 | GAB | 2009 | 2 | 2023 |
 | LUX | 2008 | 1 | 2008 |
-| SYC | 2008 | 1 | 2008 |
-| URY | 2005 | 5 | 2025 |
 | CYP | 2004 | 2 | 2022 |
 | MLT | 2004 | 2 | 2020 |
 | TLS | 2002 | 1 | 2002 |
+| LSO | 2000 | 2 | 2022 |
 | BLR | 1994 | 1 | 1994 |
 | ERI | 1994 | 1 | 1994 |
 | PSE | 1994 | 1 | 1994 |
@@ -78,6 +76,7 @@ These are coverage observations. No movement is inferred from a date gap.
 | KAZ | 1991 | 2 | 2019 |
 | NAM | 1990 | 2 | 2020 |
 | SUN | 1985 | 1 | 1985 |
+| SYC | 1978 | 2 | 2008 |
 | PNG | 1975 | 1 | 1975 |
 | OMN | 1970 | 2 | 2020 |
 | BWA | 1966 | 1 | 1966 |
@@ -90,8 +89,11 @@ Intervals between authored movement timeframes, after excluding context-only and
 
 | ISO3 | From | Through | Years |
 | --- | ---: | ---: | ---: |
+| URY | 1916 | 2004 | 89 |
+| SYC | 1979 | 2007 | 29 |
+| LSO | 2001 | 2021 | 21 |
 
-The full list of 0 internal intervals is in the JSON report.
+The full list of 3 internal intervals is in the JSON report.
 
 ## Existing dated policy leads
 
@@ -99,8 +101,9 @@ These policy records may help locate missing movements or repair existing links.
 
 | Reason | Policy-country records |
 | --- | ---: |
-| `before_first_coded_year` | 7 |
+| `before_first_coded_year` | 19 |
 | `enactor_timeframe_mismatch` | 37 |
+| `internal_uncovered_year` | 1 |
 | `linked_only_to_nonplotted_movement` | 11 |
 
 | ISO3 | Year | Date basis | Scope | Existing policy | Review reason |
@@ -110,11 +113,15 @@ These policy records may help locate missing movements or repair existing links.
 | AUS | 2011 | timeframe.start_proxy | national | [australia_clean_energy_act_2011](../../policies/australia_clean_energy_act_2011.yaml) | enactor_timeframe_mismatch |
 | AUS | 2011 | timeframe.start_proxy | national | [australia_emissions_reduction_fund_2014](../../policies/australia_emissions_reduction_fund_2014.yaml) | enactor_timeframe_mismatch |
 | AUS | 2011 | timeframe.start_proxy | national | [australia_safeguard_mechanism_2016](../../policies/australia_safeguard_mechanism_2016.yaml) | enactor_timeframe_mismatch |
+| BDI | 1964 | enacted_date | national | [bdi_national_central_bank_law_1964](../../policies/bdi_national_central_bank_law_1964.yaml) | before_first_coded_year |
+| BHR | 1973 | timeframe.start_proxy | national | [bhr_monetary_agency_establishment_1973](../../policies/bhr_monetary_agency_establishment_1973.yaml) | before_first_coded_year |
 | BHR | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | before_first_coded_year |
 | BRA | 1998 | enacted_date | national | [br_imf_standby_programs_1998_2002](../../policies/br_imf_standby_programs_1998_2002.yaml) | enactor_timeframe_mismatch |
 | CAN | 1987 | enacted_date | national | [ca_meech_lake_failure_1987_1990](../../policies/ca_meech_lake_failure_1987_1990.yaml) | enactor_timeframe_mismatch |
 | CHL | 1989 | enacted_date | national | [cl_bcch_autonomy_activation_1989_1990](../../policies/cl_bcch_autonomy_activation_1989_1990.yaml) | enactor_timeframe_mismatch |
 | CHN | 1988 | timeframe.start_proxy | national | [cn_austerity_rectification_1988_1991](../../policies/cn_austerity_rectification_1988_1991.yaml) | enactor_timeframe_mismatch |
+| CPV | 1975 | enacted_date | national | [cpv_central_bank_establishment_1975](../../policies/cpv_central_bank_establishment_1975.yaml) | before_first_coded_year |
+| CYP | 1963 | timeframe.start_proxy | national | [cyp_central_bank_law_1963](../../policies/cyp_central_bank_law_1963.yaml) | before_first_coded_year |
 | DZA | 1986 | timeframe.start_proxy | national | [dz_market_transition_and_stabilization_1989](../../policies/dz_market_transition_and_stabilization_1989.yaml) | enactor_timeframe_mismatch |
 | EGY | 2015 | timeframe.start_proxy | national | [eg_new_administrative_capital_2015_ongoing](../../policies/eg_new_administrative_capital_2015_ongoing.yaml) | enactor_timeframe_mismatch |
 | GRC | 1992 | enacted_date | national | [greece_social_security_law_2084_implementation](../../policies/greece_social_security_law_2084_implementation.yaml) | enactor_timeframe_mismatch |
@@ -125,16 +132,22 @@ These policy records may help locate missing movements or repair existing links.
 | IND | 2005 | enacted_date | national | [in_mgnrega_2005](../../policies/in_mgnrega_2005.yaml) | enactor_timeframe_mismatch |
 | ISR | 1987 | timeframe.start_proxy | national | [il_capital_market_liberalisation_1987_1992](../../policies/il_capital_market_liberalisation_1987_1992.yaml) | enactor_timeframe_mismatch |
 | ITA | 1972 | timeframe.start_proxy | national | [italy_alto_adige_autonomy_1981](../../policies/italy_alto_adige_autonomy_1981.yaml) | enactor_timeframe_mismatch |
+| JOR | 1959 | timeframe.start_proxy | national | [jor_central_bank_law_1959](../../policies/jor_central_bank_law_1959.yaml) | before_first_coded_year |
 | KOR | 1987 | timeframe.start_proxy | national | [kr_wage_labour_liberalisation_post_1987](../../policies/kr_wage_labour_liberalisation_post_1987.yaml) | enactor_timeframe_mismatch |
 | KOR | 1997 | enacted_date | national | [korea_imf_reforms_1998](../../policies/korea_imf_reforms_1998.yaml) | enactor_timeframe_mismatch |
 | KOR | 1997 | enacted_date | national | [kr_imf_programme_conditions_1998](../../policies/kr_imf_programme_conditions_1998.yaml) | enactor_timeframe_mismatch |
 | LAO | 1986 | enacted_date | national | [lao_new_economic_mechanism_1986](../../policies/lao_new_economic_mechanism_1986.yaml) | enactor_timeframe_mismatch |
+| LSO | 1978 | timeframe.start_proxy | national | [lso_monetary_authority_act_1978](../../policies/lso_monetary_authority_act_1978.yaml) | before_first_coded_year |
+| LUX | 1842 | timeframe.start_proxy | national | [lux_zollverein_accession_1842](../../policies/lux_zollverein_accession_1842.yaml) | before_first_coded_year |
+| LUX | 1983 | timeframe.start_proxy | national | [lux_monetary_institute_supervision_1983](../../policies/lux_monetary_institute_supervision_1983.yaml) | before_first_coded_year |
+| MLT | 1967 | enacted_date | national | [mlt_central_bank_act_1967](../../policies/mlt_central_bank_act_1967.yaml) | before_first_coded_year |
 | MMR | 1988 | enacted_date | national | [mmr_partial_market_opening_1988](../../policies/mmr_partial_market_opening_1988.yaml) | enactor_timeframe_mismatch |
 | PAK | 2023 | enacted_date | national | [pk_imf_sba_3bn_2023](../../policies/pk_imf_sba_3bn_2023.yaml) | enactor_timeframe_mismatch |
 | PAK | 2023 | enacted_date | national | [pk_power_tariff_hikes_2023_2024](../../policies/pk_power_tariff_hikes_2023_2024.yaml) | enactor_timeframe_mismatch |
 | PAK | 2023 | enacted_date | national | [pk_sifc_2023](../../policies/pk_sifc_2023.yaml) | enactor_timeframe_mismatch |
 | PHL | 1973 | enacted_date | national | [ph_coconut_levy_cojuangco_1973_1986](../../policies/ph_coconut_levy_cojuangco_1973_1986.yaml) | enactor_timeframe_mismatch |
 | POL | 1998 | enacted_date | national | [pl_pension_reform_1997_1999](../../policies/pl_pension_reform_1997_1999.yaml) | enactor_timeframe_mismatch |
+| QAT | 1973 | timeframe.start_proxy | national | [qat_monetary_agency_law_1973](../../policies/qat_monetary_agency_law_1973.yaml) | before_first_coded_year |
 | QAT | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | before_first_coded_year |
 | RWA | 2020 | timeframe.start_proxy | national | [rw_kigali_financial_centre_buildout](../../policies/rw_kigali_financial_centre_buildout.yaml) | enactor_timeframe_mismatch |
 | SAU | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | enactor_timeframe_mismatch |
@@ -142,21 +155,11 @@ These policy records may help locate missing movements or repair existing links.
 | SGP | 1955 | enacted_date | national | [singapore_cpf_establishment_1955](../../policies/singapore_cpf_establishment_1955.yaml) | before_first_coded_year, linked_only_to_nonplotted_movement |
 | SWE | 1985 | enacted_date | national | [se_november_revolution_credit_dereg_1985](../../policies/se_november_revolution_credit_dereg_1985.yaml) | enactor_timeframe_mismatch |
 | SWE | 2022 | enacted_date | national | [se_las_employment_protection_reform_2019_2022](../../policies/se_las_employment_protection_reform_2019_2022.yaml) | enactor_timeframe_mismatch |
+| SWZ | 1974 | enacted_date | national | [swz_monetary_authority_order_1974](../../policies/swz_monetary_authority_order_1974.yaml) | before_first_coded_year |
 | THA | 1987 | timeframe.start_proxy | national | [th_sixth_5yr_plan_acceleration_1988](../../policies/th_sixth_5yr_plan_acceleration_1988.yaml) | enactor_timeframe_mismatch |
 | TLS | 1999 | enacted_date | national | [id_east_timor_referendum_1999](../../policies/id_east_timor_referendum_1999.yaml) | before_first_coded_year |
-| TUN | 1987 | enacted_date | national | [tun_structural_adjustment_and_privatization_1987](../../policies/tun_structural_adjustment_and_privatization_1987.yaml) | enactor_timeframe_mismatch |
-| UGA | 2005 | enacted_date | national | [ke_eac_customs_union_2005](../../policies/ke_eac_customs_union_2005.yaml) | before_first_coded_year |
-| URY | 1991 | enacted_date | national | [br_mercosur_treaty_asuncion_1991](../../policies/br_mercosur_treaty_asuncion_1991.yaml) | before_first_coded_year |
-| USA | 2009 | timeframe.start_proxy | national | [us_aca_2010](../../policies/us_aca_2010.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2009 | timeframe.start_proxy | national | [us_arra_2009](../../policies/us_arra_2009.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2009 | timeframe.start_proxy | national | [us_cfpb_creation_2010](../../policies/us_cfpb_creation_2010.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2009 | timeframe.start_proxy | national | [us_medicaid_expansion_2010](../../policies/us_medicaid_expansion_2010.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2017 | timeframe.start_proxy | national | [us_tcja_corporate_tax_cut_2017](../../policies/us_tcja_corporate_tax_cut_2017.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2017 | timeframe.start_proxy | national | [us_tcja_individual_cuts_2017](../../policies/us_tcja_individual_cuts_2017.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2017 | timeframe.start_proxy | national | [us_tcja_salt_cap_2017](../../policies/us_tcja_salt_cap_2017.yaml) | linked_only_to_nonplotted_movement |
-| USA | 2018 | timeframe.start_proxy | national | [us_section_232_tariffs_2018](../../policies/us_section_232_tariffs_2018.yaml) | linked_only_to_nonplotted_movement |
 
-Showing 50 of 53 policy-country leads; the JSON report contains all of them.
+Showing 50 of 66 policy-country leads; the JSON report contains all of them.
 
 ## Overlap and shared-policy review
 
