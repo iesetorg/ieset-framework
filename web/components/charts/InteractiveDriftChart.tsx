@@ -19,6 +19,8 @@ interface InteractiveDriftChartProps {
   allSeries: Record<string, number[]>;
   /** Years aligned to each series. */
   years: number[];
+  /** Earliest coded movement year for each country. */
+  startYears?: Record<string, number>;
   /** Map ISO3 → display name. */
   labels: Record<string, string>;
   /** ISO3 codes selected by default. */
@@ -37,6 +39,7 @@ interface InteractiveDriftChartProps {
 export function InteractiveDriftChart({
   allSeries,
   years,
+  startYears,
   labels,
   initialSelection,
   height = 420,
@@ -161,6 +164,7 @@ export function InteractiveDriftChart({
         <DriftChart
           series={filteredSeries}
           years={years}
+          startYears={startYears}
           labels={labels}
           height={height}
           zeroLineLabel={zeroLineLabel}

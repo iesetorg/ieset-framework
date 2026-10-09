@@ -60,6 +60,16 @@
       "enum": ["national", "subnational", "supranational"],
       "description": "Default 'national' — federal / national government. 'subnational' for state, province, or municipal regimes that should not roll up into country-level cluster computation on the atlas. 'supranational' for EU, regional unions, etc. Optional; absence implies national."
     },
+    "country_drift_role": {
+      "type": "string",
+      "enum": ["primary", "context_only"],
+      "description": "Default 'primary'. A context_only movement remains browsable but is omitted from the country drift line when its policy episode is already counted under a broader primary movement."
+    },
+    "country_drift_primary_movement": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$",
+      "description": "Primary movement that already carries a context_only movement's country-level drift contribution."
+    },
     "leaders": {
       "type": "array",
       "items": {"type": "string"}
@@ -82,6 +92,10 @@
         "type": "object",
         "required": ["axis", "direction"],
         "additionalProperties": false,
+        "dependentRequired": {
+          "drift_attribution_year": ["drift_attribution_basis"],
+          "drift_attribution_basis": ["drift_attribution_year"]
+        },
         "properties": {
           "axis": {
             "type": "string",
@@ -89,7 +103,22 @@
           },
           "direction": {"type": "string", "enum": ["+", "-", "0", "mixed"]},
           "magnitude": {"type": "string", "enum": ["weak", "moderate", "strong"]},
-          "rationale": {"type": "string"}
+          "rationale": {"type": "string"},
+          "drift_attribution_year": {
+            "type": "integer",
+            "minimum": 1800,
+            "description": "Reviewed year to attribute this axis direction in the drift map, used only when a discrete decision or policy event is documented. This is not an outcome year."
+          },
+          "drift_attribution_basis": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Why the explicit drift attribution year is warranted and what event it represents."
+          },
+          "drift_timing_review_note": {
+            "type": "string",
+            "minLength": 1,
+            "description": "A known timing ambiguity that requires source review before moving this axis step."
+          }
         }
       }
     },
@@ -133,6 +162,10 @@
     "notes": {"type": "string"}
   },
   "allOf": [
+    {
+      "if": {"properties": {"country_drift_role": {"const": "context_only"}}, "required": ["country_drift_role"]},
+      "then": {"required": ["country_drift_primary_movement"]}
+    },
     {
       "if": {"properties": {"status": {"const": "canonical"}}, "required": ["status"]},
       "then": {"required": ["movement_id", "status", "name", "countries", "timeframe", "doctrine", "policies", "steelman", "axes_summary"]}

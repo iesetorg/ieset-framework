@@ -9,11 +9,12 @@ import { REPO_ROOT } from "./content";
  *
  * The framework codes every movement on directional axes (fiscal.spending_level
  * +/-/0, regulatory.labour_market_flexibility +/-/0, etc.). When you cumulate
- * those moves over time for a country, you get a trajectory of how the policy
- * mix has drifted relative to where it was. The composite "statist drift"
+ * those tags over time for a country, you get a trajectory of coded movement
+ * direction. Most tags are attributed to a movement's start as a period proxy;
+ * reviewed axis years are exceptions. The composite "statist drift"
  * index sums the pro-state axes minus the pro-market axes so you can see in
  * a single number whether a country has moved toward or away from a
- * larger/more-redistributive state since the corpus's start year.
+ * larger/more-redistributive state. It is not an annual enactment timeline.
  *
  * Data is computed by `scripts/compute_country_drift.py` from the movements
  * corpus and emitted as `data/derived/country_drift.json`. We load it once
@@ -32,6 +33,15 @@ export interface CountryDrift {
     tone?: "left" | "right" | "centrist" | "auth" | "neutral";
   }>;
   movement_count: number;
+  /** Earlier array zeros are unobserved placeholders, not stable policy. */
+  first_coded_year: number;
+  explicit_axis_timing: Array<{
+    movement_id: string;
+    axis: string;
+    movement_start: number;
+    attribution_year: number;
+    basis: string;
+  }>;
 }
 
 export interface DriftDataset {
@@ -42,6 +52,54 @@ export interface DriftDataset {
   countries: Record<string, CountryDrift>;
   pro_state_axes: string[];
   pro_market_axes: string[];
+  timing_model: string;
+  timing_summary: {
+    explicit_axis_year_entries: number;
+    movement_start_proxy_entries: number;
+    unresolved_later_year_rationale_entries: number;
+    manual_review_note_entries: number;
+    review_queue_entries: number;
+    unresolved_movements: number;
+  };
+}
+
+/** Observed level data, kept separate from the constructed drift score. */
+export interface DriftContextObservation {
+  metric_id: string;
+  label: string;
+  value: number;
+  unit: string;
+  transformation: string;
+  observed_year: number;
+  relation_to_first_coded_year: "opening" | "later_only";
+  source_url: string;
+  definition_url: string;
+  publisher: string;
+  license: string;
+  license_url: string;
+  vintage_file: string;
+  vintage_sha256: string;
+  caveat: string;
+}
+
+export interface DriftStartingContext {
+  first_coded_year: number;
+  fiscal: DriftContextObservation | null;
+  market_institutions: DriftContextObservation | null;
+  market_institutions_note: string;
+  market_institutions_source_url: string;
+  historical_context: {
+    as_of_year: number;
+    summary: string;
+    sources: Array<{ label: string; url: string }>;
+  } | null;
+}
+
+export interface DriftStartingContextDataset {
+  schema: "ieset-country-drift-starting-context-v1";
+  opening_window_years: number;
+  method: string;
+  countries: Record<string, DriftStartingContext>;
 }
 
 let _cache: Promise<DriftDataset | null> | null = null;
@@ -54,6 +112,18 @@ export function loadDrift(): Promise<DriftDataset | null> {
     return JSON.parse(await readFile(path, "utf8")) as DriftDataset;
   })();
   return _cache;
+}
+
+let _startingContextCache: Promise<DriftStartingContextDataset | null> | null = null;
+
+export function loadDriftStartingContext(): Promise<DriftStartingContextDataset | null> {
+  if (_startingContextCache) return _startingContextCache;
+  _startingContextCache = (async () => {
+    const path = join(REPO_ROOT, "data", "derived", "country_drift_starting_context.json");
+    if (!existsSync(path)) return null;
+    return JSON.parse(await readFile(path, "utf8")) as DriftStartingContextDataset;
+  })();
+  return _startingContextCache;
 }
 
 /**
@@ -168,6 +238,58 @@ export const COUNTRY_NAME: Record<string, string> = {
   TUN: "Tunisia",
   TWN: "Taiwan",
   UKR: "Ukraine",
+  BDI: "Burundi",
+  BEN: "Benin",
+  BFA: "Burkina Faso",
+  BHR: "Bahrain",
+  CAF: "Central African Republic",
+  CMR: "Cameroon",
+  COG: "Republic of the Congo",
+  COM: "Comoros",
+  CPV: "Cabo Verde",
+  CYP: "Cyprus",
+  DJI: "Djibouti",
+  ERI: "Eritrea",
+  ESH: "Western Sahara",
+  EST: "Estonia",
+  GAB: "Gabon",
+  GIN: "Guinea",
+  GMB: "Gambia",
+  GNB: "Guinea-Bissau",
+  GNQ: "Equatorial Guinea",
+  HRV: "Croatia",
+  JOR: "Jordan",
+  LBR: "Liberia",
+  LBY: "Libya",
+  LSO: "Lesotho",
+  LTU: "Lithuania",
+  LUX: "Luxembourg",
+  LVA: "Latvia",
+  MDG: "Madagascar",
+  MLI: "Mali",
+  MLT: "Malta",
+  MOZ: "Mozambique",
+  MRT: "Mauritania",
+  MUS: "Mauritius",
+  MWI: "Malawi",
+  NAM: "Namibia",
+  NER: "Niger",
+  OMN: "Oman",
+  PRY: "Paraguay",
+  PSE: "Palestine",
+  QAT: "Qatar",
+  SDN: "Sudan",
+  SLE: "Sierra Leone",
+  SOM: "Somalia",
+  SSD: "South Sudan",
+  STP: "São Tomé and Príncipe",
+  SVN: "Slovenia",
+  SWZ: "Eswatini",
+  SYC: "Seychelles",
+  TCD: "Chad",
+  TGO: "Togo",
+  UGA: "Uganda",
+  YEM: "Yemen",
 };
 
 export function countryName(iso3: string): string {
