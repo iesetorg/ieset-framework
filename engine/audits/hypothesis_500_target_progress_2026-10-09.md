@@ -12,7 +12,7 @@ The latest four new-ID tests illustrate the decision boundary:
 
 | New test | Frozen result | Public disposition |
 | --- | --- | --- |
-| Canada 2024–25 GDP per capita peer holdout | INCONCLUSIVE; a required endpoint cell is null | Archive; no supportive credit |
+| Canada 2024–25 GDP per capita peer holdout | INCONCLUSIVE; all seven required 2025 cells are null in the pinned vintage | Archive; no supportive credit |
 | Fed 2025 overnight reverse-repo durability | SUPPORTED under four fixed quarter medians | Descriptive calibration only; missing fetch-time receipt explicitly accepted for that ceiling |
 | OECD working-hours/employment country holdout | PARTIAL; 90% interval crosses the equivalence boundary | Associational calibration; no neutrality or policy-effect credit |
 | Eurozone 2008/2014 direct distribution measures | PARTIAL; income-share gap clears, relative-poverty gap misses | Descriptive calibration of pinned published observations; quality flags unknown |
@@ -48,5 +48,12 @@ frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
 was rejected. Reaching the 500 increment requires a substantial new wave of
 individually specified, source-custodied strict registrations and successful
 replays; current evidence does not justify claiming it has happened.
+
+A current frozen-repair audit found **no immediately runnable** same-ID case
+among the 214 verified archives. A separate metadata-only screen of the 820
+legacy cases beyond the first 500 review rows found 67 distinct source-pair
+groups as an upper bound for design review, including the five measured
+holdouts run in this sprint. Pair membership creates no credit; the other
+groups still need claim-specific source, holdout, and method checks.
 
 No push, merge, or deployment is part of this status.
