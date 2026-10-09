@@ -6,8 +6,8 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 
 | Measure | Count |
 | --- | ---: |
-| Authored movement records | 716 |
-| Movement records included in drift | 712 |
+| Authored movement records | 719 |
+| Movement records included in drift | 715 |
 | Countries with a plotted movement | 145 |
 | Countries with one plotted movement | 69 |
 | Countries with at most 2 plotted movements | 86 |
@@ -158,14 +158,13 @@ Intervals between authored movement timeframes, after excluding context-only and
 | EST | 1996 | 2020 | 25 |
 | GBR | 1952 | 1975 | 24 |
 | LKA | 1995 | 2018 | 24 |
-| USA | 1940 | 1963 | 24 |
-| USA | 1865 | 1886 | 22 |
 | FRA | 1915 | 1935 | 21 |
 | JPN | 1932 | 1951 | 20 |
 | ZMB | 2002 | 2020 | 19 |
 | NIC | 1991 | 2006 | 16 |
 | USA | 1918 | 1932 | 15 |
 | USA | 1891 | 1900 | 10 |
+| USA | 1878 | 1886 | 9 |
 | DEU | 1967 | 1973 | 7 |
 | ITA | 1915 | 1921 | 7 |
 | ZWE | 2010 | 2016 | 7 |
@@ -184,8 +183,9 @@ Intervals between authored movement timeframes, after excluding context-only and
 | IND | 1997 | 1997 | 1 |
 | ISR | 1987 | 1987 | 1 |
 | ITA | 1944 | 1944 | 1 |
+| MYS | 2019 | 2019 | 1 |
 
-The full list of 42 internal intervals is in the JSON report.
+The full list of 41 internal intervals is in the JSON report.
 
 ## Existing dated policy leads
 
@@ -257,7 +257,7 @@ Showing 50 of 76 policy-country leads; the JSON report contains all of them.
 
 ## Overlap and shared-policy review
 
-There are 915 overlapping same-country authored movement pairs; 905 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
+There are 916 overlapping same-country authored movement pairs; 906 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
 
 | ISO3 | Overlap | Both plotted? | Movement pair | Shared policy IDs |
 | --- | --- | --- | --- | --- |

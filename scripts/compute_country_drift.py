@@ -51,18 +51,32 @@ MAG_DEFAULT = 1.5
 # Coalition / doctrine keywords that flag an authoritarian era. These get
 # tagged separately because their direction-of-drift signal is overshadowed
 # by the institutional-takeover signal.
-AUTH_KEYWORDS = (
-    "junta", "military rule", "military government", "military regime",
-    "military transition", "military council", "dictatorship", "authoritarian",
-    "single-party", "one-party", "coup", "martial law", "kleptocra",
-)
+AUTH_PATTERNS = tuple(
+    re.compile(rf"\b{re.escape(term)}\b")
+    for term in (
+        "junta", "military rule", "military government", "military regime",
+        "military transition", "military council", "dictatorship", "authoritarian",
+        "single-party", "one-party", "coup", "martial law",
+    )
+) + (re.compile(r"\bkleptocra\w*"),)
+
+
+def has_authoritarian_marker(text: str) -> bool:
+    """Ignore a marker when the nearby clause explicitly negates it."""
+    for pattern in AUTH_PATTERNS:
+        for match in pattern.finditer(text):
+            prefix = text[max(0, match.start() - 32) : match.start()]
+            if re.search(r"\b(?:not|no|never|without)\s+(?:a|an|the)?\s*$", prefix):
+                continue
+            return True
+    return False
 
 
 def classify_movement_tone(m: dict) -> str:
     """Return one of: left / right / centrist / auth / neutral."""
     coalition = (m.get("coalition") or "").lower()
     doctrine = (m.get("doctrine") or "").lower()
-    if any(kw in coalition or kw in doctrine for kw in AUTH_KEYWORDS):
+    if has_authoritarian_marker(coalition) or has_authoritarian_marker(doctrine):
         return "auth"
 
     score = 0.0

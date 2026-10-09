@@ -134,6 +134,28 @@ def test_military_mentions_do_not_mark_civilian_movements_authoritarian():
     assert DRIFT.classify_movement_tone(military_regime) == "auth"
 
 
+def test_coup_keyword_does_not_match_coupled_in_civilian_movement_text():
+    civilian = {
+        "coalition": "Bipartisan congressional coalition",
+        "doctrine": "The movement coupled competition policy with a new federal commission.",
+        "axes_summary": [],
+    }
+
+    assert DRIFT.classify_movement_tone(civilian) == "neutral"
+
+
+def test_negated_single_party_label_does_not_mark_a_bipartisan_movement_auth():
+    civilian = {
+        "coalition": "Bipartisan congressional reform majorities",
+        "doctrine": "This was not a single-party governing program.",
+        "axes_summary": [
+            {"axis": "regulatory.product_market_competition", "direction": "+", "magnitude": "weak"}
+        ],
+    }
+
+    assert DRIFT.classify_movement_tone(civilian) == "centrist"
+
+
 def test_direct_price_controls_contribute_to_the_composite():
     movement = {
         "movement_id": "direct_price_controls",
