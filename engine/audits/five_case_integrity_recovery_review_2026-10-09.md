@@ -21,7 +21,8 @@ The existing registered analysis frame has 459 unique state-year rows. Its
 stored bottom and top quartile cutoffs are 0.409143 and 0.505079, with 115
 rows in each group. The state-year intersection is **zero**. Five state names
 occur in both display lists because their observations belong to different
-years. A read-only join to the two SHA-pinned derived panels found only **2 of
+years. Both derived-panel file hashes match their run-manifest SHA-256 entries.
+A read-only join to the two SHA-pinned derived panels found only **2 of
 115** top-quartile rows with p10 hourly wage within 1% of the effective
 minimum wage, and **24 of 115** within 5%; none had a p10 wage below the
 floor. The median-wage denominator was within 1% of p10 in **0 of 115** rows.
