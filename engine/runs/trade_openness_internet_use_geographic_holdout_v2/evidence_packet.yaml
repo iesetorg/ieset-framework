@@ -1,0 +1,59 @@
+packet_version: 1
+generated_utc: '2026-10-09T12:08:46+00:00'
+hypothesis:
+  id: trade_openness_internet_use_geographic_holdout_v2
+  path: hypotheses/regulatory/trade_openness_internet_use_geographic_holdout_v2.yaml
+  topic: regulatory
+preregistration:
+  spec_commit: 937d359c699df37fcb94ae6a1424cc9be9449e2d
+  steelman: hypotheses/steelman/trade_openness_internet_use_geographic_holdout_v2.md
+  gate:
+    min_observations: 1500
+    min_countries: 80
+    family_size: 9
+    family_p_max: 0.01
+reproduction:
+  runner: scripts/run_trade_openness_measured_endpoint_holdouts_v2.py
+  run_dir: engine/runs/trade_openness_internet_use_geographic_holdout_v2
+  command: python3 engine/runs/trade_openness_internet_use_geographic_holdout_v2/replication.py
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear the nine-test directional decision
+    rule
+data:
+  inputs:
+  - role: outcome
+    source: world_bank_wdi:IT.NET.USER.ZS
+    vintage_file: data/vintages/world_bank_wdi/IT.NET.USER.ZS@2026-05-05T203400Z.parquet
+    sha256: c17944e3e8ef15a5c5663e281389ad5bcc1398ae3769258c75f545f37b216cb8
+  - role: treatment
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+  - role: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+  - role: rule_of_law
+    source: wgi:RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+  old_country_overlap: 0
+results:
+  coefficient: -0.006339344952528789
+  std_error: 0.01524071525442794
+  p_value: 0.6774480581679198
+  ci95:
+  - -0.03621059794983776
+  - 0.02353190804478018
+  n_obs: 2985
+  n_countries: 142
+  r_squared: 0.8935926699237222
+  method: OLS country/year fixed effects with country-clustered covariance
+limitations:
+- Associational geographic holdout; no causal trade-policy effect is identified.
+- The old market_opening_durable_goods_diffusion PARTIAL result was known when the
+  new test was registered.
+- The nine family tests share trade data and countries; no independent-replication
+  claim is made.

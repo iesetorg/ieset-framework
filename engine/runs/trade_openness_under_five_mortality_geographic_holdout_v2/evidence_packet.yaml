@@ -1,0 +1,59 @@
+packet_version: 1
+generated_utc: '2026-10-09T12:08:45+00:00'
+hypothesis:
+  id: trade_openness_under_five_mortality_geographic_holdout_v2
+  path: hypotheses/healthcare/trade_openness_under_five_mortality_geographic_holdout_v2.yaml
+  topic: healthcare
+preregistration:
+  spec_commit: 937d359c699df37fcb94ae6a1424cc9be9449e2d
+  steelman: hypotheses/steelman/trade_openness_under_five_mortality_geographic_holdout_v2.md
+  gate:
+    min_observations: 1500
+    min_countries: 80
+    family_size: 9
+    family_p_max: 0.01
+reproduction:
+  runner: scripts/run_trade_openness_measured_endpoint_holdouts_v2.py
+  run_dir: engine/runs/trade_openness_under_five_mortality_geographic_holdout_v2
+  command: python3 engine/runs/trade_openness_under_five_mortality_geographic_holdout_v2/replication.py
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear the nine-test directional decision
+    rule
+data:
+  inputs:
+  - role: outcome
+    source: world_bank_wdi:SH.DYN.MORT
+    vintage_file: data/vintages/world_bank_wdi/SH.DYN.MORT@2026-05-05T194907Z.parquet
+    sha256: ad63729ccd5d1d4be6f3da5bbcac45b8a2c87d48c063cefeba8f0ddbe4b88f55
+  - role: treatment
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+  - role: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+  - role: rule_of_law
+    source: wgi:RL.EST
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+  old_country_overlap: 0
+results:
+  coefficient: 0.08302453978182125
+  std_error: 0.03380600586111641
+  p_value: 0.01405279775615182
+  ci95:
+  - 0.01676598583288312
+  - 0.14928309373075938
+  n_obs: 3001
+  n_countries: 136
+  r_squared: 0.8900348468887636
+  method: OLS country/year fixed effects with country-clustered covariance
+limitations:
+- Associational geographic holdout; no causal trade-policy effect is identified.
+- The old food_market_liberalization_nutrition PARTIAL result was known when the new
+  test was registered.
+- The nine family tests share trade data and countries; no independent-replication
+  claim is made.

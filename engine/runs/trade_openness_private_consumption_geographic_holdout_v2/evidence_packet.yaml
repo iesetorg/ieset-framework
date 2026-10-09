@@ -1,0 +1,87 @@
+packet_version: 1
+generated_utc: '2026-10-09T12:08:44+00:00'
+hypothesis:
+  id: trade_openness_private_consumption_geographic_holdout_v2
+  path: hypotheses/growth/trade_openness_private_consumption_geographic_holdout_v2.yaml
+  topic: growth
+preregistration:
+  spec_commit: 937d359c699df37fcb94ae6a1424cc9be9449e2d
+  steelman: hypotheses/steelman/trade_openness_private_consumption_geographic_holdout_v2.md
+  gate:
+    expected_sign: +
+    family_id: trade_openness_geographic_holdouts_2026_10_09
+    family_size: 9
+    family_alpha_max: 0.1
+    p_max: 0.01
+    min_observations: 2000
+    min_countries: 80
+    source_files:
+      treatment:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      outcome:
+        path: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+        sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+      log_gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      rule_of_law:
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+reproduction:
+  runner: scripts/run_trade_openness_private_consumption_geographic_holdout_v2.py
+  run_dir: engine/runs/trade_openness_private_consumption_geographic_holdout_v2
+  command: python3 scripts/run_trade_openness_private_consumption_geographic_holdout_v2.py
+    --check
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable holdout result clears neither directional threshold
+data:
+  inputs:
+  - publisher: world_bank_wdi
+    series_id: NE.CON.PRVT.PC.KD
+    sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.PRVT.PC.KD?format=json
+    methodology_url: https://data.worldbank.org/indicator/NE.CON.PRVT.PC.KD
+    vintage_file: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+    license: CC-BY-4.0
+  - publisher: world_bank_wdi
+    series_id: NE.TRD.GNFS.ZS
+    sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NE.TRD.GNFS.ZS?format=json
+    methodology_url: https://data.worldbank.org/indicator/NE.TRD.GNFS.ZS
+    vintage_file: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+    license: CC-BY-4.0
+  - publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+    methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    license: CC-BY-4.0
+  - publisher: wgi
+    series_id: RL.EST
+    sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+    source_url: https://api.worldbank.org/v2/country/all/indicator/RuleOfLaw?format=json&source=3
+    methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+    vintage_file: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    license: CC-BY-4.0
+results:
+  coefficient: 2.062798433683477
+  std_error: 3.4899426361301447
+  p_value: 0.5544738961144132
+  ci95:
+  - -4.777363441242381
+  - 8.902960308609336
+  n_obs: 2839
+  n_countries: 134
+  r_squared: 0.9790469377369732
+  method: OLS country/year FE with country-clustered standard errors
+limitations:
+- Associational geographic holdout; no causal trade-policy claim.
+- The original 40-country PARTIAL result was known before this registration.
+- GDP per capita and private consumption share income and price drivers; controls
+  do not remove all confounding.
+- This is one of nine related trade-openness tests with a shared country pool and
+  family-wise threshold.
