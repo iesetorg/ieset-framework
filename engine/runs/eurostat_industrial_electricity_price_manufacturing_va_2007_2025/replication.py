@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -15,6 +14,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[3]
 RUN_DIR = Path(__file__).resolve().parent
 VINTAGES = ROOT / "data" / "vintages"
+PINNED_MANIFEST = Path(__file__).with_name("manifest.yaml")
 HYPOTHESIS_ID = "eurostat_industrial_electricity_price_manufacturing_va_2007_2025"
 
 ISO2_TO_ISO3 = {
@@ -31,10 +31,21 @@ SCHOOLS = ("classical_liberal", "ordoliberal", "developmentalism")
 
 
 def latest(pub: str, stem: str) -> Path:
-    files = sorted((VINTAGES / pub).glob(f"{stem}@*.parquet"))
-    if not files:
-        raise FileNotFoundError(f"missing local vintage {pub}:{stem}")
-    return files[-1]
+    if not PINNED_MANIFEST.is_file():
+        raise FileNotFoundError(f"missing run manifest: {PINNED_MANIFEST}")
+    manifest = yaml.safe_load(PINNED_MANIFEST.read_text(encoding="utf-8")) or {}
+    for item in (manifest.get("vintages") or {}).values():
+        if item.get("publisher") != pub or item.get("series") != stem:
+            continue
+        raw_path, expected_hash = item.get("vintage_file"), item.get("sha256")
+        if not raw_path or not expected_hash:
+            raise ValueError(f"incomplete pinned vintage for {pub}:{stem}")
+        path = (ROOT / raw_path).resolve()
+        path.relative_to(VINTAGES.resolve())
+        if not path.is_file() or sha256(path) != expected_hash:
+            raise ValueError(f"pinned vintage mismatch for {pub}:{stem}")
+        return path
+    raise FileNotFoundError(f"no pinned vintage for {pub}:{stem}")
 
 
 def sha256(path: Path) -> str:
@@ -98,7 +109,6 @@ def verdict(coef: float, pval: float) -> tuple[str, str]:
 
 
 def main() -> int:
-    run_utc = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     price, price_meta = industrial_price()
     manufacturing, manufacturing_meta = wdi("NV.IND.MANF.ZS", "manufacturing_va_share")
     gdp, gdp_meta = wdi("NY.GDP.PCAP.KD.ZG", "gdp_pc_growth")
@@ -122,66 +132,64 @@ def main() -> int:
     ci = [float(x) for x in model.conf_int().loc[term].tolist()]
     label, reason = verdict(coef, pval)
 
-    diagnostics = {
+    manifest = yaml.safe_load(PINNED_MANIFEST.read_text(encoding="utf-8")) or {}
+    expected_vintages = {
+        "industrial_electricity_price": price_meta,
+        "manufacturing_va_share": manufacturing_meta,
+        "gdp_pc_growth": gdp_meta,
+    }
+    if (
+        manifest.get("hypothesis_id") != HYPOTHESIS_ID
+        or manifest.get("vintages") != expected_vintages
+        or manifest.get("formula") != formula
+        or manifest.get("verdict_label") != label
+    ):
+        raise ValueError("pinned manifest differs from the reproduced run")
+
+    stored = json.loads((RUN_DIR / "diagnostics.json").read_text(encoding="utf-8"))
+    exact = {
         "hypothesis_id": HYPOTHESIS_ID,
+        "verdict": label,
         "verdict_label": label,
         "verdict_reason": reason,
-        "n_observations": int(len(d)),
-        "n_countries": int(d["country"].nunique()),
+        "n_observations": len(d),
+        "n_countries": d["country"].nunique(),
         "period_min": int(d["year"].min()),
         "period_max": int(d["year"].max()),
         "formula": formula,
-        "coefficient": coef,
-        "standard_error_cluster_country": se,
-        "p_value": pval,
-        "ci95": ci,
         "direction": "-",
         "treatment": "industrial_electricity_price",
         "outcome": "manufacturing_va_share",
         "controls": ["gdp_pc_growth"],
-        "run_utc": run_utc,
-        "runner": f"engine/runs/{HYPOTHESIS_ID}/replication.py",
-        "school_focus": list(SCHOOLS),
-        "batch": "06_eurostat_energy_prices_nuclear_transition",
     }
-    (RUN_DIR / "diagnostics.json").write_text(json.dumps(diagnostics, indent=2) + "\n", encoding="utf-8")
-    manifest = {
-        "hypothesis_id": HYPOTHESIS_ID,
-        "run_utc": run_utc,
-        "verdict_label": label,
-        "vintages": {
-            "industrial_electricity_price": price_meta,
-            "manufacturing_va_share": manufacturing_meta,
-            "gdp_pc_growth": gdp_meta,
-        },
-        "formula": formula,
-    }
-    (RUN_DIR / "manifest.yaml").write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    pd.DataFrame(
-        [{"term": "industrial_electricity_price", "coefficient": coef, "std_error": se, "p_value": pval, "ci95_low": ci[0], "ci95_high": ci[1]}]
-    ).to_parquet(RUN_DIR / "coefficients.parquet", index=False)
-    chart = d[["country", "year", "industrial_electricity_price", "manufacturing_va_share"]].sort_values(["country", "year"]).to_dict(orient="records")
-    (RUN_DIR / "chart_data.json").write_text(json.dumps(chart[:2000], indent=2) + "\n", encoding="utf-8")
-    (RUN_DIR / "result_card.md").write_text(
-        f"# Result card - {HYPOTHESIS_ID}\n\n"
-        f"**Verdict:** {label} - {reason}.\n\n"
-        "## Plain-English Claim\n\n"
-        f"{CLAIM}\n\n"
-        "## School Coverage\n\n"
-        f"{', '.join(SCHOOLS)}\n\n"
-        "## What Was Measured\n\n"
-        "- Outcome: `manufacturing_va_share`.\n"
-        "- Treatment: `industrial_electricity_price`.\n"
-        "- Controls: `gdp_pc_growth`.\n\n"
-        "## Results\n\n"
-        f"- Usable panel: **{len(d):,} observations**, **{d['country'].nunique()} countries**, {int(d['year'].min())}-{int(d['year'].max())}.\n"
-        f"- Coefficient on treatment: **{coef:.4f}** (SE {se:.4f}, p={pval:.4f}).\n\n"
-        "## Specification\n\n"
-        f"`{formula}`\n\n"
-        "This is a short European panel screen using local landed vintages. Treat it as throughput evidence, not final causal proof.\n",
-        encoding="utf-8",
-    )
-    print(f"{HYPOTHESIS_ID}: {label} - {reason}")
+    for key, expected in exact.items():
+        if stored.get(key) != expected:
+            raise ValueError(f"stored {key} differs from pinned replay")
+    for key, observed in {
+        "coefficient": coef,
+        "standard_error_cluster_country": se,
+        "p_value": pval,
+    }.items():
+        if not math.isclose(observed, stored[key], rel_tol=1e-9, abs_tol=1e-10):
+            raise ValueError(f"stored {key} differs from pinned replay")
+    if len(stored.get("ci95", [])) != 2 or any(
+        not math.isclose(observed, previous, rel_tol=1e-9, abs_tol=1e-10)
+        for observed, previous in zip(ci, stored["ci95"])
+    ):
+        raise ValueError("stored confidence interval differs from pinned replay")
+    coefficients = pd.read_parquet(RUN_DIR / "coefficients.parquet")
+    if len(coefficients) != 1 or coefficients.iloc[0]["term"] != "industrial_electricity_price":
+        raise ValueError("stored coefficient table has an unexpected term")
+    for key, observed in {
+        "coefficient": coef,
+        "std_error": se,
+        "p_value": pval,
+        "ci95_low": ci[0],
+        "ci95_high": ci[1],
+    }.items():
+        if not math.isclose(observed, float(coefficients.iloc[0][key]), rel_tol=1e-9, abs_tol=1e-10):
+            raise ValueError(f"stored coefficient table {key} differs from pinned replay")
+    print(f"Verified pinned {HYPOTHESIS_ID}: {label}; no artifacts written")
     return 0
 
 
