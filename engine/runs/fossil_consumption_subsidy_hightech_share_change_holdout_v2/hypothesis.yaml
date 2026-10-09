@@ -1,0 +1,237 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fossil_consumption_subsidy_hightech_share_change_holdout_v2
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: '-'
+claim: In the fixed 22-country sample excluded from the old export-value fit, a higher OWID/IEA explicit fossil-fuel
+  consumption subsidy amount per resident in year t predicts a smaller change from t to t+1 in WDI high-technology
+  exports as a percentage of manufactured exports, conditional on real GDP per person at t and country and
+  treatment-year effects.
+methodology_note: New-ID, country-disjoint descriptive follow-up to owid_fossil_subsidy_hightech_export_drag_panel.
+  The old test used high-technology export value, not export share; its PARTIAL positive coefficient +0.030319
+  and p=0.224323 (169 observations, 21 countries) were known before this design. All old fit countries are
+  excluded. This single-test family fixes a two-sided p<=0.01 before any held-out magnitudes are inspected.
+  Feasibility selection inspected country/year keys and source value null masks only, without held-out magnitudes,
+  signs, or fits. No school or policy-score credit.
+evidence_type: associational
+sample:
+  countries:
+  - AGO
+  - ARE
+  - AZE
+  - BGD
+  - BHR
+  - BOL
+  - BRN
+  - DZA
+  - ECU
+  - GAB
+  - HRV
+  - IRN
+  - KAZ
+  - KWT
+  - LKA
+  - OMN
+  - QAT
+  - SLV
+  - SVK
+  - TTO
+  - UKR
+  - UZB
+  period:
+  - 2010
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all 21 countries in the historical old specification: ARG AUT CHN COL EGY FRA GBR GHA HUN IDN
+    IND MEX MYS NGA PAK POL RUS SAU THA VNM ZAF.'
+  - Use only the frozen 22-country roster above; no replacement countries or aggregate areas.
+  - Use explicit OWID/IEA fossil-fuel consumption subsidies at exact year t, WDI population and real GDP per
+    capita at t, and WDI high-technology exports as percent of manufactured exports at both t and exact t+1.
+  - Require finite source values, nonnegative explicit subsidy amount, high-tech export shares at both t and
+    t+1 in the inclusive 0 to 100 percent range, positive population and real GDP per capita, and at least five
+    complete treatment years per retained country. Exclude invalid rows without clipping. No interpolation,
+    nearest-year substitution, imputation, outcome-based trimming, or vintage switch.
+variables:
+  outcome:
+  - name: next_year_change_hightech_manufactured_export_share_pp
+    source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+    transformation: WDI TX.VAL.TECH.MF.ZS at exact t+1 minus at exact t, in percentage points; this is a share
+      of manufactured exports, not high-tech export value.
+  treatment:
+  - name: fossil_consumption_subsidy_usd_per_resident_at_t
+    source: owid:consumption-subsidies-for-fossil-fuels
+    transformation: OWID/IEA explicit fossil-fuel consumption subsidies in constant 2023 USD at t divided by
+      WDI total population at t; use asinh of the quotient in the regression.
+  - name: population_at_t
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: WDI SP.POP.TOTL at t, exact-year positive denominator for subsidy per resident; no independent
+      coefficient.
+  controls:
+  - name: real_gdp_per_capita_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Log of positive WDI NY.GDP.PCAP.KD at exact t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One complete-case OLS fit of the t-to-t+1 export-share change on asinh(subsidy USD per resident at
+    t), log real GDP per capita at t, country fixed effects, and treatment-year fixed effects. Country-clustered
+    small-sample covariance; two-sided Student t inference with number of retained countries minus one degrees
+    of freedom. No model search, automatic control dropping, alternate source, or post-result sign change.
+falsification:
+  rule: INCONCLUSIVE if fewer than 200 complete country-year pairs, fewer than 20 retained countries, fewer
+    than five complete treatment years in any retained country, or the primary coefficient or country-clustered
+    uncertainty is unidentified or nonfinite. Otherwise SUPPORTED if the subsidy-per-resident coefficient is
+    negative at two-sided p<=0.01; REFUTED if positive at the same cutoff; every other estimable result is
+    PARTIAL. This is the one primary test in the family.
+  test: country_disjoint_fossil_consumption_subsidy_hightech_export_share_change_panel_fe
+  threshold:
+    family_id: fossil_consumption_subsidy_hightech_share_change_2026_10_09
+    family_size: 1
+    family_alpha: 0.01
+    family_p_max: 0.01
+    expected_sign: '-'
+    min_observations: 200
+    min_countries: 20
+    min_pairs_per_country: 5
+    old_hypothesis_id: owid_fossil_subsidy_hightech_export_drag_panel
+    old_result_bucket: PARTIAL
+    old_primary_coefficient: 0.03031904065818789
+    old_primary_p_value: 0.22432307920771932
+    old_n_obs: 169
+    old_n_countries: 21
+    old_spec_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3
+      to spec.sample.countries before run_panel_ols; every old fitted country is excluded.
+    old_country_count: 21
+    old_country_ids:
+    - ARG
+    - AUT
+    - CHN
+    - COL
+    - EGY
+    - FRA
+    - GBR
+    - GHA
+    - HUN
+    - IDN
+    - IND
+    - MEX
+    - MYS
+    - NGA
+    - PAK
+    - POL
+    - RUS
+    - SAU
+    - THA
+    - VNM
+    - ZAF
+    heldout_country_ids:
+    - AGO
+    - ARE
+    - AZE
+    - BGD
+    - BHR
+    - BOL
+    - BRN
+    - DZA
+    - ECU
+    - GAB
+    - HRV
+    - IRN
+    - KAZ
+    - KWT
+    - LKA
+    - OMN
+    - QAT
+    - SLV
+    - SVK
+    - TTO
+    - UKR
+    - UZB
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      subsidy:
+        source: owid:consumption-subsidies-for-fossil-fuels
+        path: data/vintages/owid/consumption-subsidies-for-fossil-fuels@2026-05-21T132141Z.parquet
+        sha256: b159daf19924d05bec517bcda656f83f92f580de0f51a890b6e2abf83211c3c3
+        manifest: data/manifests/fetch_run_2026-05-21T132148Z.yaml
+        series_id: consumption-subsidies-for-fossil-fuels
+        source_url: https://ourworldindata.org/grapher/consumption-subsidies-for-fossil-fuels.csv
+      population:
+        source: world_bank_wdi:SP.POP.TOTL
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: SP.POP.TOTL
+        indicator_id: SP.POP.TOTL
+        source_url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+      hightech:
+        source: world_bank_wdi:TX.VAL.TECH.MF.ZS
+        path: data/vintages/world_bank_wdi/TX.VAL.TECH.MF.ZS@2026-05-05T195027Z.parquet
+        sha256: b99e36dfce6c0ccbebed61124508f11dd2aac6e6d635bacca7955eacf20a1994
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: TX.VAL.TECH.MF.ZS
+        indicator_id: TX.VAL.TECH.MF.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.MF.ZS?format=json
+      gdp_pc:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        indicator_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+prior_confidence: 0.25
+disclosure: This is a measured lagged association, not a fossil-subsidy reform, industrial-upgrading mechanism,
+  innovation, or causal effect. The old export-value result was known and PARTIAL with the opposite, nonsignificant
+  sign; changing to a share outcome and excluding its whole 21-country roster does not erase that prior evidence.
+  The share can move because its manufactured-export denominator changes. The old WITS export-value and new
+  WDI export-share measures share the World Bank/WITS trade-data family; this is country-disjoint, not independent
+  source replication. OWID/IEA explicit price-gap estimates cover selected countries and can change with world
+  fuel prices without a domestic policy change; the held-out roster is largely resource-exporting. Around 20
+  country clusters limit precision, and source vintages can overlap other IESET studies. A reported 95 percent
+  interval is descriptive; the frozen verdict uses the two-sided p<=0.01 rule. Feasibility used keys and null
+  masks but not held-out magnitudes or fits. No school, welfare, or policy-score credit.
+steelman: hypotheses/steelman/fossil_consumption_subsidy_hightech_share_change_holdout_v2.md
+scope:
+  period:
+  - 2010
+  - 2023
+  countries:
+  - AGO
+  - ARE
+  - AZE
+  - BGD
+  - BHR
+  - BOL
+  - BRN
+  - DZA
+  - ECU
+  - GAB
+  - HRV
+  - IRN
+  - KAZ
+  - KWT
+  - LKA
+  - OMN
+  - QAT
+  - SLV
+  - SVK
+  - TTO
+  - UKR
+  - UZB
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
