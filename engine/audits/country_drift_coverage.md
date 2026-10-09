@@ -6,14 +6,14 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 
 | Measure | Count |
 | --- | ---: |
-| Authored movement records | 782 |
-| Movement records included in drift | 778 |
+| Authored movement records | 787 |
+| Movement records included in drift | 783 |
 | Countries with a plotted movement | 147 |
-| Countries with one plotted movement | 56 |
-| Countries with at most 2 plotted movements | 76 |
+| Countries with one plotted movement | 55 |
+| Countries with at most 2 plotted movements | 75 |
 | Countries first coded after 2000 | 51 |
-| Countries with internal uncovered intervals | 33 |
-| Countries lacking 2026 coverage, including policy-only countries | 1 |
+| Countries with internal uncovered intervals | 32 |
+| Countries lacking 2026 coverage, including policy-only countries | 0 |
 | Existing policy records flagged for research | 75 |
 | Overlapping authored movement pairs sharing policy IDs | 65 |
 | EU supranational geographic scope records to review | 4 |
@@ -24,7 +24,6 @@ A broad movement marked ongoing counts as covered here; this does not confirm ev
 
 | ISO3 | Plotted movements | Last coded event | Last covered year |
 | --- | ---: | ---: | ---: |
-| YEM | 1 | 1990 | 2011 |
 
 ## Late starts and sparse coding
 
@@ -93,7 +92,6 @@ These are coverage observations. No movement is inferred from a date gap.
 | ESH | 1991 | 1 | 1991 |
 | KAZ | 1991 | 2 | 2019 |
 | ZMB | 1991 | 2 | 2021 |
-| YEM | 1990 | 1 | 1990 |
 | ROU | 1990 | 2 | 2025 |
 | SUN | 1985 | 1 | 1985 |
 | NIC | 1979 | 2 | 2007 |
@@ -132,14 +130,12 @@ Intervals between authored movement timeframes, after excluding context-only and
 | CIV | 1994 | 2010 | 17 |
 | NIC | 1991 | 2006 | 16 |
 | GHA | 2017 | 2024 | 8 |
-| DEU | 1967 | 1973 | 7 |
 | ITA | 1915 | 1921 | 7 |
 | ZWE | 2010 | 2016 | 7 |
 | FRA | 1939 | 1944 | 6 |
 | LBN | 2021 | 2024 | 4 |
 | VEN | 1985 | 1988 | 4 |
 | BOL | 1990 | 1992 | 3 |
-| DEU | 1915 | 1917 | 3 |
 | FIN | 1988 | 1990 | 3 |
 | RWA | 2021 | 2023 | 3 |
 | ECU | 1998 | 1999 | 2 |
@@ -154,7 +150,7 @@ Intervals between authored movement timeframes, after excluding context-only and
 | MYS | 2019 | 2019 | 1 |
 | PAK | 2023 | 2023 | 1 |
 
-The full list of 36 internal intervals is in the JSON report.
+The full list of 34 internal intervals is in the JSON report.
 
 ## Existing dated policy leads
 
