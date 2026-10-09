@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: business_rd_tertiary_employment_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: "+"
+claim: >
+  Across the fixed 35-country European panel, higher business-enterprise R&D
+  expenditure as a share of GDP at year t predicts a higher change in the
+  employment rate of tertiary-educated adults aged 25-64 from t to t+3.
+methodology_note: >
+  New-ID direct measured association. The treatment source is absent from
+  prior hypothesis specs by exact source-string search. Two older
+  welfare-transfer specs use the labour outcome source; neither result is
+  inherited. No candidate numeric values or null masks were opened before
+  design registration.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, MKD, MLT, MNE, NLD, NOR, POL, PRT, ROU, SRB, SVK, SVN, SWE, TUR]
+  period: [1995, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the 35 named ISO3 countries and exact t and t+3 calendar-year joins.
+    - Require at least five complete treatment years per country; no imputation, country substitution, or vintage switch.
+    - Require finite business R&D-to-GDP percentage and tertiary-educated employment rates in [0,100] at both endpoints.
+variables:
+  outcome:
+    - name: tertiary_educated_employment_rate_change_t3
+      source: eurostat:lfsa_ergaedn
+      transformation: Employment rate at t+3 minus t for age 25-64, tertiary education ED5-8, all citizenship and sexes, in percentage points.
+  treatment:
+    - name: business_enterprise_rd_expenditure_gdp_share
+      source: eurostat:rd_e_gerdtot
+      transformation: Eurostat annual business-enterprise sector-of-performance R&D expenditure as percent of GDP at t; sectperf=BES, unit=PC_GDP.
+  controls:
+    - name: baseline_tertiary_educated_employment_rate
+      source: eurostat:lfsa_ergaedn
+      transformation: Exact t level of the same employment rate.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One primary coefficient; baseline tertiary employment rate, country, and
+    treatment-year effects are fixed controls. Country-clustered normal-Wald
+    standard errors. No model or covariate search.
+falsification:
+  rule: >
+    INCONCLUSIVE if fewer than 400 complete country-years, 25 countries,
+    five years per retained country, or 15 within-country exposure-varying
+    countries survive; also if the model is rank deficient or clustered
+    uncertainty is nonfinite. A positive coefficient at two-sided p<=0.01
+    SUPPORTS this measured claim; a negative coefficient at that cutoff
+    REFUTES it; every other estimable result is PARTIAL.
+  test: business_rd_tertiary_employment_screen_2026_10_09
+  threshold:
+    family_id: business_rd_tertiary_employment_screen_2026_10_09
+    family_size: 1
+    family_alpha: 0.01
+    family_p_max: 0.01
+    expected_sign: "+"
+    min_observations: 400
+    min_countries: 25
+    min_pairs_per_country: 5
+    min_varying_countries: 15
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_credit: 0
+    source_files:
+      business_rd:
+        source: eurostat:rd_e_gerdtot
+        path: data/vintages/eurostat/rd_e_gerdtot@2026-05-05T210242Z.parquet
+        sha256: fea284d7b17e31a3803749fca052f6a110ed1b8e703a9151964d1d15f58df152
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: rd_e_gerdtot
+      tertiary_employment:
+        source: eurostat:lfsa_ergaedn
+        path: data/vintages/eurostat/lfsa_ergaedn@2026-04-30T125100Z.parquet
+        sha256: 6bdae02133c40b7498922a0a1fa2b28d3e63fcde3fff3915353e87275c78edc3
+        manifest: data/manifests/fetch_run_2026-04-30T125203Z.yaml
+        series_id: lfsa_ergaedn
+prior_confidence: 0.4
+disclosure: >
+  Descriptive calibration only. A tertiary-educated employment rate is not
+  job creation, R&D-sector employment, wages, or education quality. R&D
+  intensity can follow skilled labour demand, and GDP denominators, sector
+  mix, and macro shocks can confound both measures. No causal, policy-effect,
+  position, featured, or school-score credit.
+steelman: hypotheses/steelman/business_rd_tertiary_employment_forward_2026.md
+scope:
+  period: [1995, 2021]
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, MKD, MLT, MNE, NLD, NOR, POL, PRT, ROU, SRB, SVK, SVN, SWE, TUR]
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
