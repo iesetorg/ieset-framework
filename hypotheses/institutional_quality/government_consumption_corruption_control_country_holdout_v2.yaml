@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: government_consumption_corruption_control_country_holdout_v2
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim_direction: '-'
+claim: Across countries excluded from the old state-allocation panel, a higher government final-consumption share
+  of GDP at year t predicts a lower WGI control-of-corruption estimate at exact year t+1, conditional on real GDP
+  per person and country and year fixed effects.
+methodology_note: New-ID country-disjoint, measured-association follow-up to discretionary_allocation_corruption_panel.
+  The old same-commit PARTIAL result was known before this design and supplies no prospective evidence. One five-case
+  family uses a two-sided Bonferroni p<=0.10/5 rule fixed before outcome magnitudes, signs, or fits. Pre-registration
+  feasibility examined country/year keys and null masks only. All old-roster countries are excluded; this is descriptive
+  calibration with zero school-score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP
+    EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM
+    ZAF.'
+  - Retain ISO alpha-3 countries and XKX only; drop geographic aggregates and exclude the whole old roster before
+    fitting.
+  - Join treatment year t to exact calendar year t+1; require at least five complete treatment years per country
+    and do not interpolate, impute, swap countries, or switch vintages.
+  - Require finite treatment, outcome, and control measures, with positive real income for the log control.
+variables:
+  outcome:
+  - name: next_year_corruption_control_estimate
+    source: wgi:GOV_WGI_CC.EST
+    transformation: Observed level at exact calendar year t+1.
+  treatment:
+  - name: government_consumption_pct_gdp
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: Observed level at treatment year t.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One fixed OLS coefficient with country and treatment-year effects, country-clustered standard errors, and
+    no model search or automatic control dropping.
+falsification:
+  rule: INCONCLUSIVE if fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule,
+    or if the primary coefficient or country-clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORTED
+    for the expected sign at two-sided p<=0.02; REFUTED for the opposite sign at p<=0.02; PARTIAL for every other
+    estimable result. All five registered tests remain in the correction family, including inconclusive tests.
+  test: country_disjoint_seventh_legacy_panel_fe
+  threshold:
+    family_id: seventh_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 5
+    family_alpha: 0.1
+    family_p_max: 0.02
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: discretionary_allocation_corruption_panel
+    old_result_bucket: PARTIAL
+    old_n_obs: 967
+    old_n_countries: 39
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to
+      spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries
+      without fitted rows.
+    old_country_count: 40
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: world_bank_wdi:NE.CON.GOVT.ZS
+        path: data/vintages/world_bank_wdi/NE.CON.GOVT.ZS@2026-05-05T194701Z.parquet
+        sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NE.CON.GOVT.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS?format=json
+        indicator_id: NE.CON.GOVT.ZS
+      outcome:
+        source: wgi:GOV_WGI_CC.EST
+        path: data/vintages/wgi/GOV_WGI_CC.EST@2026-05-05T195223Z.parquet
+        sha256: 192e9da5c623e2894758bd6cc3fa69f49485edbc06e2150f894bf95666d9d79e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_CC.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_CC.EST?format=json&source=3
+        indicator_id: GOV_WGI_CC.EST
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The old PARTIAL result was seen before this new design. Feasibility checked null masks and country/year
+  keys only, never candidate magnitudes, signs, or estimates. Government final consumption as a share of GDP is
+  not discretionary allocation or an anti-corruption policy. WGI control of corruption is a perception composite,
+  not observed bribery. This is descriptive calibration, not causal validation of the old mechanism, and grants
+  no policy or school-score credit.
+steelman: hypotheses/steelman/government_consumption_corruption_control_country_holdout_v2.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - institutional_quality
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

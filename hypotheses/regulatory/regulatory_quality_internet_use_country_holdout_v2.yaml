@@ -1,0 +1,165 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: regulatory_quality_internet_use_country_holdout_v2
+version: 1
+status: pre_registered
+topic: regulatory
+claim_direction: +
+claim: Across countries excluded from the old telecom-competition panel, a higher WGI regulatory-quality estimate
+  at year t predicts a higher WDI share of individuals using the Internet at exact year t+1, conditional on real
+  GDP per person and country and year fixed effects.
+methodology_note: New-ID country-disjoint, measured-association follow-up to competition_telecom_prices_quality and digital_education_market_entry, which share the same source pair and 40-country roster.
+  Both old same-commit first runs were INCONCLUSIVE_DATA_PENDING; both later old-ID reruns were PARTIAL. They are one reused source-pair family, not two independent prior tests. All histories were known before this design and supply no prospective evidence. One five-case
+  family uses a two-sided Bonferroni p<=0.10/5 rule fixed before outcome magnitudes, signs, or fits. Pre-registration
+  feasibility examined country/year keys and null masks only. All old-roster countries are excluded; this is descriptive
+  calibration with zero school-score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP
+    EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM
+    ZAF.'
+  - Retain ISO alpha-3 countries and XKX only; drop geographic aggregates and exclude the whole old roster before
+    fitting.
+  - Join treatment year t to exact calendar year t+1; require at least five complete treatment years per country
+    and do not interpolate, impute, swap countries, or switch vintages.
+  - Require finite treatment, outcome, and control measures, with positive real income for the log control.
+variables:
+  outcome:
+  - name: next_year_internet_users_pct
+    source: world_bank_wdi:IT.NET.USER.ZS
+    transformation: Observed level at exact calendar year t+1.
+  treatment:
+  - name: regulatory_quality_estimate
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: Observed level at treatment year t.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One fixed OLS coefficient with country and treatment-year effects, country-clustered standard errors, and
+    no model search or automatic control dropping.
+falsification:
+  rule: INCONCLUSIVE if fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule,
+    or if the primary coefficient or country-clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORTED
+    for the expected sign at two-sided p<=0.02; REFUTED for the opposite sign at p<=0.02; PARTIAL for every other
+    estimable result. All five registered tests remain in the correction family, including inconclusive tests.
+  test: country_disjoint_seventh_legacy_panel_fe
+  threshold:
+    family_id: seventh_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 5
+    family_alpha: 0.1
+    family_p_max: 0.02
+    expected_sign: +
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: competition_telecom_prices_quality
+    old_result_bucket: INCONCLUSIVE_DATA_PENDING
+    old_n_obs: null
+    old_n_countries: null
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to
+      spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries
+      without fitted rows.
+    old_country_count: 40
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: wgi:GOV_WGI_RQ.EST
+        path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+        sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_RQ.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+        indicator_id: GOV_WGI_RQ.EST
+      outcome:
+        source: world_bank_wdi:IT.NET.USER.ZS
+        path: data/vintages/world_bank_wdi/IT.NET.USER.ZS@2026-05-05T203400Z.parquet
+        sha256: c17944e3e8ef15a5c5663e281389ad5bcc1398ae3769258c75f545f37b216cb8
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: IT.NET.USER.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/IT.NET.USER.ZS?format=json
+        indicator_id: IT.NET.USER.ZS
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The initial INCONCLUSIVE_DATA_PENDING and later PARTIAL histories of both competition_telecom_prices_quality and digital_education_market_entry were seen before this design. These old IDs reuse one source pair and the same roster, not two independent tests. Feasibility checked null masks and country/year
+  keys only, never candidate magnitudes, signs, or estimates. WGI regulatory quality is not telecom competition;
+  internet-user share measures adoption, not telecom price, quality, or platform market power. This is descriptive
+  calibration, not causal validation of the old mechanism, and grants no policy or school-score credit.
+steelman: hypotheses/steelman/regulatory_quality_internet_use_country_holdout_v2.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - digital_access
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
