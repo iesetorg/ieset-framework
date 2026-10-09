@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_real_residential_price_growth_income_growth_country_holdout_v2
+version: 1
+status: pre_registered
+topic: housing
+claim_direction: '-'
+claim: >-
+  In the fixed 25-country sample excluded from the old land-use proxy screen,
+  a larger BIS real residential-property-price year-on-year change in Q4 of
+  year t predicts slower real GDP-per-capita growth from t to t+1, conditional
+  on current income, current income growth, WGI rule of law, country effects,
+  and treatment-year effects.
+methodology_note: >-
+  New-ID descriptive country-disjoint test of the measured BIS-house-price and
+  WDI-income pair in land_use_regulation_real_wage_drag. That old same-commit
+  candidate was PARTIAL (757 rows, 32 fitted countries) and was visible before
+  this design. It called BIS residential prices a land-use-regulation proxy and
+  WDI GDP per capita a real-wage outcome; neither interpretation is retained.
+  All 40 old-specification countries are excluded. The fixed country/year-key
+  screen found an upper envelope of 581 BIS Q4 rows across the 25 held-out
+  countries, without reading held-out value magnitudes or null masks. The
+  complete-case floor, exact dimensions, sources, and 84-screen Bonferroni
+  correction are frozen before any held-out fit. No causal, land-use, wage,
+  policy, or school-score credit is claimed.
+evidence_type: associational
+sample:
+  countries: &heldout
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - GRC
+  - HKG
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - LTU
+  - LUX
+  - LVA
+  - MKD
+  - MLT
+  - PRT
+  - ROU
+  - RUS
+  - SGP
+  - SRB
+  - SVK
+  - SVN
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude every old-specification country: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.'
+  - Use only the fixed 25-country roster above; exclude BIS aggregate codes and make no replacement.
+  - Select only BIS WS_SPP FREQ Q, VALUE R, UNIT_MEASURE 771, OBS_STATUS A, and Q4 at exact year t; 771 is the publisher's year-on-year percent-change unit, not an index level.
+  - Join positive WDI real GDP per capita at exact t-1, t, and t+1 and finite WGI rule-of-law estimate at exact t. No nearest-year substitution, interpolation, source switch, or outcome-based trimming.
+  - Require at least five complete treatment years per retained country and the fixed 400-pair, 20-country estimation floor.
+variables:
+  outcome:
+  - name: next_year_real_gdp_pc_log_growth_pct
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log of the positive real GDP-per-capita level at exact t+1 divided by its level at t.
+  treatment:
+  - name: real_residential_price_yoy_pct_q4_t
+    source: bis:WS_SPP
+    transformation: BIS Q4 year-on-year percent change, real selected residential property prices; Q.country.R.771, OBS_STATUS A.
+  controls:
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per capita at t.
+  - name: current_real_gdp_pc_log_growth_pct
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log of positive real GDP per capita at t divided by its level at t-1.
+  - name: rule_of_law_t
+    source: wgi:RL.EST
+    transformation: WGI rule-of-law point estimate at exact t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One primary OLS coefficient for BIS real residential-price year-on-year
+    change with country and treatment-year fixed effects, three fixed controls,
+    and country-clustered small-sample t(G-1) uncertainty. No model search,
+    alternate property-price unit, automatic control dropping, or other verdict.
+falsification:
+  rule: >-
+    INCONCLUSIVE if fewer than 400 complete pairs, fewer than 20 countries,
+    fewer than five complete years for any retained country, or if the primary
+    estimate or country-clustered uncertainty is unidentified or nonfinite.
+    Otherwise SUPPORTED only for a negative coefficient at two-sided
+    p<=0.1/84; REFUTED for a positive coefficient at the same threshold;
+    every other estimable result is PARTIAL. This Bonferroni family covers the
+    84 metadata-screened legacy source-pair opportunities, even if fewer run.
+  test: country_disjoint_real_house_price_growth_to_next_year_income_growth_twfe
+  threshold:
+    family_id: legacy_source_pair_frontier_2026_10_09
+    family_size: 84
+    family_alpha: 0.1
+    family_p_max: 0.0011904761904761906
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 20
+    min_pairs_per_country: 5
+    old_hypothesis_id: land_use_regulation_real_wage_drag
+    old_result_bucket: PARTIAL
+    old_n_obs: 757
+    old_n_countries: 32
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_country_count: 40
+    old_country_ids: [ARG, AUS, BGD, BRA, CAN, CHL, CHN, COL, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, IDN, IND, ITA, JPN, KEN, KOR, LKA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PAK, PER, PHL, POL, SWE, THA, TUR, USA, VNM, ZAF]
+    heldout_country_ids: *heldout
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      property:
+        source: bis:WS_SPP
+        path: data/vintages/bis/WS_SPP@2026-07-23T151601Z.parquet
+        sha256: 2d21f842356c92d9d8698e350e693add58505c67569a932cd735843ec085c583
+        manifest: data/manifests/fetch_run_2026-07-23T151632Z.yaml
+        series_id: WS_SPP
+        source_url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/?format=csv
+        dimensions: {FREQ: Q, VALUE: R, UNIT_MEASURE: 771, OBS_STATUS: A, quarter: Q4}
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+      rule:
+        source: wgi:RL.EST
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: RL.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+        indicator_id: GOV_WGI_RL.EST
+prior_confidence: 0.50
+disclosure: >-
+  Residential property prices and income respond jointly to credit, policy,
+  migration, and demand. The lag and fixed effects do not identify a housing
+  policy effect. The original candidate's mislabeled proxy and same-commit
+  result provide no prospective support for this narrow test.
+steelman: hypotheses/steelman/bis_real_residential_price_growth_income_growth_country_holdout_v2.md
+scope:
+  period: [1996, 2023]
+  countries: *heldout
+  outcome_dim: [housing, gdp_growth]
+  policy_family: [housing_policy]
+  treatment_tags: [real_residential_property_price_growth]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

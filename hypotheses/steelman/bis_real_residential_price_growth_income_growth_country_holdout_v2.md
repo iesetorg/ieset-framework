@@ -1,0 +1,7 @@
+# Real residential prices and next-year income growth
+
+The strongest negative case is a household-balance-sheet channel: faster real home-price growth can raise entry costs and rents, reduce mobility, and divert saving from productive investment. If that pressure dominates the local demand cycle, higher BIS real residential-price growth in Q4 should precede slower real GDP-per-capita growth in the next calendar year.
+
+The strongest contrary case is that property prices react to expected income, credit availability, supply constraints, and population inflows. A price rise may therefore lead rather than drag measured income growth. Common shocks, the 2008 crisis, and later inflation can also move both series. A country/year fixed-effects association with current income, current income growth, and rule of law cannot separate these mechanisms or identify a housing-policy effect.
+
+The old land_use_regulation_real_wage_drag candidate used BIS residential prices for land-use regulation and WDI GDP per capita for real wages. Its same-commit PARTIAL run was known before this registration and earns no prospective credit. This follow-up excludes every country in its 40-country specification and uses only directly measured prices and income. A valid negative, positive, or null estimate must be reported under the frozen 84-opportunity correction. It does not test wages, zoning, affordability, or causal effects, and it does not change school scores.
