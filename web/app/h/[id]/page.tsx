@@ -41,6 +41,7 @@ export async function generateMetadata({
   const description = [
     `Evidence tier: ${h._evidence_tier ?? "archive"}.`,
     run.verdict ? `Verdict: ${run.verdict.split("\n")[0].slice(0, 120)}.` : null,
+    h._evidence_scope_note ?? null,
     h.claim.slice(0, 160),
   ]
     .filter(Boolean)
@@ -107,6 +108,7 @@ export default async function HypothesisPage({
     headline: h.claim.split(/(?<=[.!?])\s+/)[0],
     abstract: [
       run.verdict ? `Verdict: ${String(run.verdict).split("\n")[0]}.` : null,
+      h._evidence_scope_note ?? null,
       "Pre-registered falsification rule with pinned public-data vintages.",
       "Research artifact — not peer-reviewed by default.",
     ]
@@ -224,6 +226,12 @@ export default async function HypothesisPage({
           tier rules
         </Link>
       </div>
+
+      {h._evidence_scope_note && (
+        <p className="mb-8 rounded border-l-[3px] border-amber bg-[#fff8e8] px-4 py-3 text-[13px] leading-[1.55] text-ink">
+          {h._evidence_scope_note}
+        </p>
+      )}
 
       {/* ---------- RESULT BANNER: verdict first, above the fold ---------- */}
       <ResultBanner run={run} />

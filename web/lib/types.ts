@@ -103,6 +103,7 @@ export interface Hypothesis {
   _evidence_exclusion_reasons?: string[];
   _reference_set?: boolean;
   _reference_note?: string | null;
+  _evidence_scope_note?: string;
   _steelman_html?: string;
 }
 

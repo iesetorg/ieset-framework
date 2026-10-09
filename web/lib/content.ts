@@ -20,6 +20,32 @@ import type {
 export const REPO_ROOT = resolve(process.cwd(), "..");
 const RUNS_ROOT = join(REPO_ROOT, "engine", "runs");
 
+// External corrections keep immutable preregistrations and run packets intact.
+// Fail the static build if this public warning registry is missing or malformed.
+const scopeNotesPath = join(REPO_ROOT, "engine", "public_evidence_scope_notes.json");
+const publicScopeNotes = (() => {
+  const registry = JSON.parse(readFileSync(scopeNotesPath, "utf8")) as {
+    schema?: string;
+    notes?: Array<{ hypothesis_ids?: string[]; note?: string }>;
+  };
+  if (registry.schema !== "ieset-public-evidence-scope-notes-v1" || !Array.isArray(registry.notes)) {
+    throw new Error("Invalid public evidence scope-note registry");
+  }
+  const notes = new Map<string, string>();
+  for (const row of registry.notes) {
+    if (!Array.isArray(row.hypothesis_ids) || typeof row.note !== "string" || !row.note.trim()) {
+      throw new Error("Invalid public evidence scope-note row");
+    }
+    for (const id of row.hypothesis_ids) {
+      if (typeof id !== "string" || !id || notes.has(id)) {
+        throw new Error(`Duplicate or invalid public evidence scope-note ID: ${id}`);
+      }
+      notes.set(id, row.note);
+    }
+  }
+  return notes;
+})();
+
 let _runDirectoryIndex: Map<string, string> | null = null;
 
 function runDirectoryName(hypothesisId: string): string {
@@ -254,6 +280,7 @@ async function parseHypothesis(absPath: string): Promise<Hypothesis | null> {
   doc._file = absPath.replace(REPO_ROOT + "/", "");
   doc._first_commit = firstCommit(doc._file);
   doc._registration_status = _registrationStatusCache.get(doc._file);
+  doc._evidence_scope_note = publicScopeNotes.get(doc.hypothesis_id);
   const evidenceAudit = evidenceAuditForHypothesis(doc.hypothesis_id);
   if (evidenceAudit) {
     doc._evidence_tier = evidenceAudit.tier;

@@ -3,8 +3,12 @@
 
 Combines the USDOL state minimum-wage history vintage (statutory state rate vs
 federal rate) with the derived subnational minimum-wage bite-ratio panel, and
-codes minimum-wage treatment events (first year a state's statutory rate rises
-above the federal floor, plus per-year year-over-year increases).
+codes minimum-wage treatment events only where consecutive January-1 snapshots
+establish a one-year change. Earlier USDOL history has selected years, so a
+change across a gap is interval-censored rather than an annual event.
+
+This builder emits v2 separately. The original derived panel is retained for
+byte-exact replay of registered analyses that used its 2006-2024 rows.
 
 Grain: one row per (ieset_state_id, year).
 
@@ -34,6 +38,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MW_HISTORY_GLOB = "data/vintages/usdol/state_minimum_wage_history@*.parquet"
 BITE_GLOB = "data/vintages/derived/minimum_wage_bite_ratio_subnational_panel@*.parquet"
 SPINE_PATH = "data/derived/state_universe_admin1.parquet"
+FROZEN_V1_PATH = "data/derived/us_state_minimum_wage_treatment_panel.parquet"
 
 # parse_note values in the USDOL vintage that indicate there is NO genuine state
 # statutory rate (the `value`/`state_rate_*` cells were federal fallbacks).
@@ -201,10 +206,20 @@ def build_panel(
     panel = panel.sort_values(["ieset_state_id", "year"]).reset_index(drop=True)
     grp = panel.groupby("ieset_state_id", sort=False)
 
-    # Year-over-year change in the effective minimum (treatment intensity per year).
-    panel["minimum_wage_increase"] = grp["effective_minimum_wage"].diff()
-    # Year-over-year change in the statutory state rate (NaN until a statute exists).
-    panel["statutory_minimum_wage_increase"] = grp["state_statutory_minimum_wage"].diff()
+    panel["previous_observed_year"] = grp["year"].shift()
+    panel["has_prior_consecutive_year"] = (
+        panel["year"] - panel["previous_observed_year"] == 1
+    )
+    # A selected-year gap cannot establish the year of an intervening change.
+    # Preserve levels while leaving annual changes unknown for those rows.
+    panel["minimum_wage_increase"] = (
+        grp["effective_minimum_wage"].diff()
+        .where(panel["has_prior_consecutive_year"])
+    )
+    panel["statutory_minimum_wage_increase"] = (
+        grp["state_statutory_minimum_wage"].diff()
+        .where(panel["has_prior_consecutive_year"])
+    )
 
     # First observed year a state's statutory rate binds above federal.
     first_bind_year = (
@@ -215,15 +230,20 @@ def build_panel(
     panel["first_year_binds_above_federal"] = panel["ieset_state_id"].map(first_bind_year)
     panel["is_first_bind_event"] = (
         panel["year"] == panel["first_year_binds_above_federal"]
-    ) & panel["binds_above_federal"]
+    ) & panel["binds_above_federal"] & panel["has_prior_consecutive_year"]
 
     # event_type per (state, year):
-    #   first_bind   -> first observed year statutory rises above federal
-    #   increase     -> effective minimum rose vs prior observed year (not first bind)
-    #   decrease     -> effective minimum fell vs prior observed year
-    #   no_change    -> effective minimum unchanged vs prior observed year
-    #   baseline     -> first observed year for the state (no prior to diff)
+    #   first_bind        -> first observed year binding, following an adjacent year
+    #   increase         -> effective minimum rose since the previous January 1
+    #   decrease         -> effective minimum fell since the previous January 1
+    #   no_change        -> effective minimum unchanged since previous January 1
+    #   interval_censored -> prior snapshot exists but is more than one year earlier
+    #   baseline         -> first observed year for the state
     def classify(row: pd.Series) -> str:
+        if pd.isna(row["previous_observed_year"]):
+            return "baseline"
+        if not bool(row["has_prior_consecutive_year"]):
+            return "interval_censored"
         if bool(row["is_first_bind_event"]):
             return "first_bind"
         delta = row["minimum_wage_increase"]
@@ -247,6 +267,8 @@ def build_panel(
         "state_abbr",
         "state_name",
         "year",
+        "previous_observed_year",
+        "has_prior_consecutive_year",
         "effective_minimum_wage",
         "state_statutory_minimum_wage",
         "federal_minimum_wage",
@@ -285,6 +307,8 @@ def build_panel(
         "rows_binding_above_federal": int(panel["binds_above_federal"].sum()),
         "states_ever_binding_above_federal": int(first_bind_year.size),
         "first_bind_events": int(panel["is_first_bind_event"].sum()),
+        "interval_censored_rows": int((panel["event_type"] == "interval_censored").sum()),
+        "consecutive_comparison_rows": int(panel["has_prior_consecutive_year"].sum()),
         "rows_with_bite_ratio": int(matched_bite.sum()),
         "bite_year_min": int(bite["year"].min()),
         "bite_year_max": int(bite["year"].max()),
@@ -308,10 +332,10 @@ def manifest_entry(result: FetchResult) -> dict[str, Any]:
 
 def write_manifest(result: FetchResult, manifest_dir: Path, run_stamp: str) -> Path:
     manifest_dir.mkdir(parents=True, exist_ok=True)
-    path = manifest_dir / f"fetch_run_{run_stamp}_us_state_minimum_wage_treatment.yaml"
+    path = manifest_dir / f"fetch_run_{run_stamp}_us_state_minimum_wage_treatment_v2.yaml"
     payload = {
         "run_utc": run_stamp,
-        "pipeline": "us_state_minimum_wage_treatment_panel",
+        "pipeline": "us_state_minimum_wage_treatment_panel_v2",
         "entries": [manifest_entry(result)],
     }
     path.write_text(yaml.safe_dump(payload, sort_keys=False, allow_unicode=True))
@@ -326,7 +350,7 @@ def emit(
     parquet_sha = sha256_path(output_path)
     return FetchResult(
         publisher="usdol_wage_and_hour_division",
-        series_id="us_state_minimum_wage_treatment_panel",
+        series_id="us_state_minimum_wage_treatment_panel_v2",
         source_url=SOURCE_URL,
         methodology_url=METHODOLOGY_URL,
         license=LICENSE,
@@ -364,7 +388,9 @@ def emit(
                 "(state_rate_high; NaN when parse_note in {no_state_rate, non_hourly_cell, "
                 "missing}); effective_minimum_wage is max(statutory, federal); binds_above_federal "
                 "is statutory>federal. Treatment events code the first observed year a state binds "
-                "above federal (first_bind) plus year-over-year increases. Federal and state floors "
+                "above federal (first_bind) only after an adjacent prior year, plus annual "
+                "increases only between consecutive January-1 snapshots. Selected-year gaps "
+                "are interval-censored, not assigned to one year. Federal and state floors "
                 "are kept separate; intensity is not routed through any country-year runner. Levels "
                 "are nominal current USD."
             ),
@@ -377,7 +403,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--mw-history", default=None, help="Override USDOL min-wage history vintage path.")
     parser.add_argument("--bite-panel", default=None, help="Override bite-ratio panel vintage path.")
     parser.add_argument("--spine", default=SPINE_PATH)
-    parser.add_argument("--output", default="data/derived/us_state_minimum_wage_treatment_panel.parquet")
+    parser.add_argument("--output", default="data/derived/us_state_minimum_wage_treatment_panel_v2.parquet")
     parser.add_argument("--manifest-dir", default="data/manifests")
     parser.add_argument("--fetch-utc", help="Optional UTC timestamp for deterministic builds/tests.")
     return parser.parse_args(argv)
@@ -397,10 +423,12 @@ def main(argv: list[str] | None = None) -> int:
         spine_path=spine_path,
     )
     output_path = path_arg(args.output).resolve()
+    if output_path == path_arg(FROZEN_V1_PATH).resolve():
+        raise ValueError("v1 panel is frozen for historical replay; write a versioned output")
     result = emit(panel, stats, output_path, fetch_ts)
     manifest = write_manifest(result, path_arg(args.manifest_dir).resolve(), utc_stamp(fetch_ts))
     print(
-        "OK usdol_wage_and_hour_division:us_state_minimum_wage_treatment_panel "
+        "OK usdol_wage_and_hour_division:us_state_minimum_wage_treatment_panel_v2 "
         f"rows={result.rows} years={stats['start_year']}->{stats['end_year']} "
         f"states={stats['state_count']} first_bind_events={stats['first_bind_events']} "
         f"bite_rows={stats['rows_with_bite_ratio']}"
