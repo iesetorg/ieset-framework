@@ -227,11 +227,13 @@ def markdown(report: dict[str, Any]) -> str:
         "Every selected case already has an old run whose result may have been seen. "
         "The old same-commit history cannot be repaired by rerunning that ID.",
         "",
+        "This design-review queue does not track subsequent v2 results. For live "
+        "graduation totals, use the refreshed evidence-tier audit and hypothesis "
+        "conversion funnel.",
+        "",
         f"- Legacy pool: **{summary['legacy_pool']:,}**",
         f"- Selected for design review: **{summary['selected']:,}**",
-        "- New strict registrations: **0**",
-        "- New run results: **0**",
-        "- New graduations from this queue: **0**",
+        "- Registrations or graduations created by this queue script: **0**",
         "",
         "## Selected old-spec status",
         "",
@@ -313,7 +315,7 @@ def main() -> int:
     for path, content in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
-    print(f"{len(report['cases'])} legacy cases audited; {args.target} selected for review; 0 new graduations")
+    print(f"{len(report['cases'])} legacy cases inspected; {args.target} selected for review; queue script creates no graduations")
     return 0
 
 

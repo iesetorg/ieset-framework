@@ -2,11 +2,11 @@
 
 This is a prioritized audit queue, not 500 preregistrations or graduations. Every selected case already has an old run whose result may have been seen. The old same-commit history cannot be repaired by rerunning that ID.
 
+This design-review queue does not track subsequent v2 results. For live graduation totals, use the refreshed evidence-tier audit and hypothesis conversion funnel.
+
 - Legacy pool: **1,320**
 - Selected for design review: **500**
-- New strict registrations: **0**
-- New run results: **0**
-- New graduations from this queue: **0**
+- Registrations or graduations created by this queue script: **0**
 
 ## Selected old-spec status
 
