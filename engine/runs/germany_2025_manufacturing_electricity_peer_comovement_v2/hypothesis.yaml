@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: germany_2025_manufacturing_electricity_peer_comovement_v2
+version: 1
+status: pre_registered
+topic: energy
+claim: >-
+  From 2024 to 2025, Germany's real manufacturing gross-value-added volume
+  index grew less than the median change of ten fixed European peers, while
+  the price paid by medium-band non-household electricity consumers rose more
+  than the median peer price change. This is a joint descriptive comparison,
+  not an estimate of an energy-policy effect.
+claim_direction: "+"
+methodology_note: >-
+  Pre-analysis registered retrospective validation on Eurostat vintages
+  collected in July 2026, before this registration. Selected outcome values
+  were not read while fixing the design. This is a new-ID descriptive follow-up
+  to germany_decline_2018_2025_regulatory_not_fiscal.
+  The old same-commit run was PARTIAL and its dispositive five-year industrial
+  GVA statistic ended in 2022. Its saved WDI synthetic-control arrays nonetheless
+  contain non-null 2024 industrial-GVA values and a null 2025 endpoint. Thus the
+  2024 baseline is not calendar-disjoint from all old fitted data. This test's
+  2025 follow-up, selected Eurostat manufacturing index, and selected Eurostat
+  non-household electricity-price series were absent from that old run. The old
+  verdict and source overlap risk were known before this registration. Exact
+  source hashes and dimension keys were checked, but no selected 2024-2025
+  outcome magnitudes were read while fixing the design.
+evidence_type: descriptive
+sample:
+  countries: [DEU, FRA, NLD, BEL, ITA, ESP, POL, CZE, AUT, SWE, FIN]
+  period: [2024, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Germany is the sole focal country. The ten peers are fixed before
+      estimation: FRA, NLD, BEL, ITA, ESP, POL, CZE, AUT, SWE, FIN.
+      Never drop, substitute, or reweight a peer after observing values.
+    - >-
+      Require both annual manufacturing cells and all four semiannual
+      electricity-price cells for every country in the exact pinned vintages.
+      Do not interpolate, use national-price substitutes, or change the
+      electricity consumption band or tax definition.
+variables:
+  outcome:
+    - name: manufacturing_gva_volume_log_change_2024_2025
+      source: eurostat:nama_10_a10
+      transformation: log(2025 CLV_I20 / 2024 CLV_I20), NACE C, B1G
+      notes: >-
+        Annual chain-linked-volume manufacturing GVA index, 2020=100.
+        Changes are computed within country before peer comparison.
+    - name: medium_band_nonhousehold_electricity_price_log_change_2024_2025
+      source: eurostat:nrg_pc_205
+      transformation: >-
+        log(mean(2025-S1,2025-S2) / mean(2024-S1,2024-S2))
+      notes: >-
+        Nominal EUR/kWh invoiced price for non-household consumption band
+        500-1,999 MWh, tax=X_VAT. X_VAT excludes VAT and other recoverable
+        taxes or levies; it does not exclude every tax.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Compute each country's two log changes from the exact selected cells.
+    For each measure subtract the unweighted median change of the ten fixed
+    peers from Germany's change. Apply one joint sign rule to the two gaps.
+    No regression, p-value, synthetic control, policy treatment, donor search,
+    or causal decomposition is part of this test.
+falsification:
+  test: germany_2025_manufacturing_electricity_fixed_peer_comovement_v2
+  rule: >-
+    METHOD_VALID requires exactly 22 country-year manufacturing keys and 44
+    country-semester electricity keys for the 11 fixed countries; every
+    selected value must be finite and strictly positive; all source and old-run
+    hashes and the unchanged first-addition registration must match. SUPPORTED
+    descriptive co-movement if Germany's manufacturing growth gap is strictly
+    negative and its electricity-price growth gap strictly positive. REFUTED
+    descriptive co-movement if manufacturing gap is strictly positive and
+    price gap strictly negative. PARTIAL for every other valid combination,
+    including a zero gap. INCONCLUSIVE when METHOD_VALID fails. A supported
+    result is no evidence that nuclear closure, regulation, or fiscal policy
+    caused either change.
+  threshold:
+    old_hypothesis_id: germany_decline_2018_2025_regulatory_not_fiscal
+    old_result_seen: PARTIAL
+    old_run_2024_wdi_industrial_values_present: true
+    old_run_2025_wdi_industrial_values_present: false
+    focal_country: DEU
+    peer_countries: [FRA, NLD, BEL, ITA, ESP, POL, CZE, AUT, SWE, FIN]
+    holdout_years: [2024, 2025]
+    minimum_countries: 11
+    minimum_manufacturing_country_years: 22
+    minimum_electricity_country_semesters: 44
+    manufacturing_gap_support_max_exclusive: 0.0
+    electricity_gap_support_min_exclusive: 0.0
+    quality_flag_status: unavailable_in_pinned_parquet
+    source_files:
+      manufacturing:
+        path: data/vintages/eurostat/nama_10_a10@2026-07-23T154308Z.parquet
+        sha256: 33d3a3a8023d474185c1dfdaad4975ad6c81afc5e95bc92fe49bb6490dcc463c
+        selector: {freq: A, unit: CLV_I20, nace_r2: C, na_item: B1G}
+      electricity:
+        path: data/vintages/eurostat/nrg_pc_205@2026-07-23T154402Z.parquet
+        sha256: ca3c2e524ba47c219f2e1dff0927f2d366d8e11d2c0418681f66891de51b00f4
+        selector: {freq: S, siec: E7000, nrg_cons: MWH500-1999, unit: KWH, tax: X_VAT, currency: EUR}
+prior_confidence: 0.50
+disclosure: >-
+  The old Germany result and its 2024 WDI industrial-GVA values were already
+  visible when this new design was fixed. The selected Eurostat manufacturing
+  and electricity magnitudes for 2024-2025 were not inspected before this
+  pre-analysis registration. The July 2026 source vintages predate the
+  registration, so this is not a fully independent prospective replication.
+  The pinned parquet files omit Eurostat observation-status flags, so
+  those flags cannot be validated from this local vintage; any valid result
+  has a descriptive calibration ceiling. Demand, gas costs, industrial mix,
+  exchange rates, and country-specific changes can explain either gap. This
+  result must not validate the old regulatory-versus-fiscal claim, establish
+  a nuclear-closure effect, or receive school-score credit.
+steelman: hypotheses/steelman/germany_2025_manufacturing_electricity_peer_comovement_v2.md
+scope:
+  period: [2024, 2025]
+  countries: [DEU, FRA, NLD, BEL, ITA, ESP, POL, CZE, AUT, SWE, FIN]
+  outcome_dim: [industrial_capability, energy]
+  policy_family: [none]
+  treatment_tags: [temporal_holdout, descriptive_peer_comparison]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

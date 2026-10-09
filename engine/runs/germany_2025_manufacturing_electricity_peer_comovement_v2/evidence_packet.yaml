@@ -1,0 +1,128 @@
+packet_version: 1
+generated_utc: '2026-10-09T14:42:11+00:00'
+hypothesis:
+  id: germany_2025_manufacturing_electricity_peer_comovement_v2
+  path: hypotheses/energy/germany_2025_manufacturing_electricity_peer_comovement_v2.yaml
+  topic: energy
+preregistration:
+  spec_commit: 8fc2a497c5dabbbcc1c822ea6abcb29a1fd8507a
+  steelman: hypotheses/steelman/germany_2025_manufacturing_electricity_peer_comovement_v2.md
+  registration_files:
+  - path: hypotheses/energy/germany_2025_manufacturing_electricity_peer_comovement_v2.yaml
+    sha256: fe6e331fcc5a49b5d5e605ff6fc5c4d03d9bde3e5ace996ee8e4cee5596244c5
+  - path: hypotheses/steelman/germany_2025_manufacturing_electricity_peer_comovement_v2.md
+    sha256: 15ae560af730be8f3671b042774fa2277371fca22ba14f5b1a5516d754deff94
+  - path: scripts/run_germany_2025_manufacturing_electricity_peer_comovement_v2.py
+    sha256: aa5b29182a395781a6650fdb0c1ee4b8234494d361b11451ee1ecae14ceaf616
+  gate:
+    old_hypothesis_id: germany_decline_2018_2025_regulatory_not_fiscal
+    old_result_seen: PARTIAL
+    old_run_2024_wdi_industrial_values_present: true
+    old_run_2025_wdi_industrial_values_present: false
+    focal_country: DEU
+    peer_countries:
+    - FRA
+    - NLD
+    - BEL
+    - ITA
+    - ESP
+    - POL
+    - CZE
+    - AUT
+    - SWE
+    - FIN
+    holdout_years:
+    - 2024
+    - 2025
+    minimum_countries: 11
+    minimum_manufacturing_country_years: 22
+    minimum_electricity_country_semesters: 44
+    manufacturing_gap_support_max_exclusive: 0.0
+    electricity_gap_support_min_exclusive: 0.0
+    quality_flag_status: unavailable_in_pinned_parquet
+    source_files:
+      manufacturing:
+        path: data/vintages/eurostat/nama_10_a10@2026-07-23T154308Z.parquet
+        sha256: 33d3a3a8023d474185c1dfdaad4975ad6c81afc5e95bc92fe49bb6490dcc463c
+        selector: &id001
+          freq: A
+          unit: CLV_I20
+          nace_r2: C
+          na_item: B1G
+      electricity:
+        path: data/vintages/eurostat/nrg_pc_205@2026-07-23T154402Z.parquet
+        sha256: ca3c2e524ba47c219f2e1dff0927f2d366d8e11d2c0418681f66891de51b00f4
+        selector: &id002
+          freq: S
+          siec: E7000
+          nrg_cons: MWH500-1999
+          unit: KWH
+          tax: X_VAT
+          currency: EUR
+reproduction:
+  runner: scripts/run_germany_2025_manufacturing_electricity_peer_comovement_v2.py
+  run_dir: engine/runs/germany_2025_manufacturing_electricity_peer_comovement_v2
+  command: python3 engine/runs/germany_2025_manufacturing_electricity_peer_comovement_v2/replication.py
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: registered gaps are mixed or touch a zero boundary
+data:
+  inputs:
+  - role: manufacturing
+    publisher: eurostat
+    series_id: nama_10_a10
+    path: data/vintages/eurostat/nama_10_a10@2026-07-23T154308Z.parquet
+    sha256: 33d3a3a8023d474185c1dfdaad4975ad6c81afc5e95bc92fe49bb6490dcc463c
+    selector: *id001
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_a10?format=JSON
+    manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+    manifest_sha256: c2215e0e796c4697d0596848a7498c7a369e5fb2e9baed660e25a8791ffa580d
+    observation_flags: not_preserved_in_local_parquet
+  - role: electricity
+    publisher: eurostat
+    series_id: nrg_pc_205
+    path: data/vintages/eurostat/nrg_pc_205@2026-07-23T154402Z.parquet
+    sha256: ca3c2e524ba47c219f2e1dff0927f2d366d8e11d2c0418681f66891de51b00f4
+    selector: *id002
+    source_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_pc_205?format=JSON
+    manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+    manifest_sha256: c2215e0e796c4697d0596848a7498c7a369e5fb2e9baed660e25a8791ffa580d
+    observation_flags: not_preserved_in_local_parquet
+  holdout_years:
+  - 2024
+  - 2025
+  old_run_boundary:
+    old_id: germany_decline_2018_2025_regulatory_not_fiscal
+    old_diagnostics_sha256: 6465851fd86e9b9c8afad875c3954cf0025d5a025a3e34a8c7b37a4f5fd0a17d
+    old_manifest_sha256: 1ad033b58c91428159a089a87d0c89e1dc384e563c88567270005feb17608718
+    old_2024_wdi_industrial_values_present: true
+    old_2025_wdi_industrial_values_present: false
+    old_source_family: world_bank_wdi
+    new_source_family: eurostat
+    calendar_disjoint_2024_2025: false
+results:
+  method: fixed ten-peer median of two 2024-to-2025 log changes, descriptive
+  n_countries: 11
+  n_manufacturing_cells: 22
+  n_electricity_cells: 44
+  manufacturing_log_change_germany: -0.007467722593048153
+  manufacturing_log_change_peer_median: 0.010901541123675867
+  manufacturing_growth_gap: -0.01836926371672402
+  electricity_log_change_germany: -0.030764991311126894
+  electricity_log_change_peer_median: -0.026444960248049005
+  electricity_price_growth_gap: -0.004320031063077889
+limitations:
+- 'Pre-analysis registered retrospective validation: July 2026 source vintages predate
+  the registration.'
+- 2024 WDI industrial GVA was present in the old fit; only 2025 is a new calendar
+  endpoint.
+- Manufacturing GVA and the selected non-household price band are different measures
+  from the old WDI industrial GVA.
+- The local Eurostat parquet files omit observation-status flags; this limits a valid
+  result to descriptive calibration.
+- Nominal EUR/kWh X_VAT excludes VAT and recoverable taxes or levies, not all taxes.
+- No nuclear-closure, regulatory, fiscal-channel, or other causal effect follows from
+  these two changes.
+- This test has no school-score credit or automatic policy evidence link.
+credit_ceiling: descriptive calibration only; zero school score
