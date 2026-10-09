@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: business_rd_resident_patenting_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: "+"
+claim: >
+  Across the fixed 35-country European panel, higher business-enterprise R&D
+  expenditure as a share of GDP at year t predicts a higher change from t to
+  t+3 in log(1 + WIPO resident patent applications per million residents).
+methodology_note: >
+  New-ID direct measured calibration, selected after the same R&D vintage's
+  tertiary-employment screen was visible as PARTIAL (p=0.507052). Older
+  candidates use WDI total R&D intensity and patent levels or institutional
+  interactions; this is a narrower business-sector forward-change estimand.
+  No candidate patent or R&D numeric values or null masks were opened before
+  this design was committed. The 0.005 second-screen cutoff is a conservative
+  local multiplicity guard, not a global or fully selection-adjusted claim.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, MKD, MLT, MNE, NLD, NOR, POL, PRT, ROU, SRB, SVK, SVN, SWE, TUR]
+  period: [1995, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the 35 named ISO3 countries and exact treatment t and patent/population t and t+3 calendar-year joins.
+    - Require at least five complete treatment years per country; no imputation, country substitution, or vintage switch.
+    - Require finite business R&D-to-GDP percentage in [0,100], nonnegative resident patent applications at both endpoints, and positive WDI de facto population at both endpoints.
+    - Exclude WIPO patent and WDI population rows with a nonblank observation-status code at either endpoint; the Eurostat R&D raw slice does not retain status flags.
+variables:
+  outcome:
+    - name: resident_patent_applications_per_million_log_change_t3
+      source: wipo:patent_applications_resident
+      transformation: log(1 + 1000000 * resident applications / WDI population) at t+3 minus the same at t; exact calendar years.
+  treatment:
+    - name: business_enterprise_rd_expenditure_gdp_share
+      source: eurostat:rd_e_gerdtot
+      transformation: Eurostat annual business-enterprise sector-of-performance R&D expenditure as percent of GDP at t; freq=A, sectperf=BES, unit=PC_GDP.
+  controls:
+    - name: baseline_resident_patent_applications_per_million_log
+      source: wipo:patent_applications_resident
+      transformation: log(1 + 1000000 * resident applications / WDI population) at t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One primary coefficient on percentage-point business R&D share; baseline
+    log patent intensity, country, and treatment-year effects are fixed
+    controls. Country-clustered normal-Wald standard errors. No model or
+    covariate search. WDI SP.POP.TOTL supplies both denominators.
+falsification:
+  rule: >
+    INCONCLUSIVE if fewer than 400 complete country-years, 25 countries,
+    five years per retained country, or 15 within-country exposure-varying
+    countries survive; also if the model is rank deficient or clustered
+    uncertainty is nonfinite. A positive coefficient at two-sided p<=0.005
+    SUPPORTS this measured claim; a negative coefficient at that cutoff
+    REFUTES it; every other estimable result is PARTIAL.
+  test: business_rd_selected_two_outcome_screen_2026_10_09
+  threshold:
+    family_id: business_rd_selected_two_outcome_screen_2026_10_09
+    family_size: 2
+    family_alpha: 0.01
+    family_p_max: 0.005
+    expected_sign: "+"
+    min_observations: 400
+    min_countries: 25
+    min_pairs_per_country: 5
+    min_varying_countries: 15
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_credit: 0
+    source_files:
+      business_rd:
+        source: eurostat:rd_e_gerdtot
+        path: data/vintages/eurostat/rd_e_gerdtot@2026-05-05T210242Z.parquet
+        sha256: fea284d7b17e31a3803749fca052f6a110ed1b8e703a9151964d1d15f58df152
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        series_id: rd_e_gerdtot
+      resident_patents:
+        source: wipo:patent_applications_resident
+        path: data/vintages/wipo/patent_applications_resident@2026-05-19T094854Z.parquet
+        sha256: 8affaee11a397d965f73eda762d0b3416bc341b7485e6197745700a1dd3bf24e
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        series_id: patent_applications_resident
+      population:
+        source: world_bank_wdi:SP.POP.TOTL
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: SP.POP.TOTL
+prior_confidence: 0.4
+disclosure: >
+  Descriptive calibration only. Resident patent applications are filing
+  counts, not invention quality, welfare, or domestic innovation output.
+  Business R&D intensity may follow patent demand, and GDP denominators,
+  population estimates, filing practices, sector mix, and common shocks can
+  confound the association. Prior R&D employment screen was PARTIAL and
+  visible before this registration; older WDI R&D/patent claims and WIPO
+  outcome studies exist. No independent replication, causal or policy-effect
+  inference, position, featured, or school-score credit.
+steelman: hypotheses/steelman/business_rd_resident_patenting_forward_2026.md
+scope:
+  period: [1995, 2021]
+  countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, MKD, MLT, MNE, NLD, NOR, POL, PRT, ROU, SRB, SVK, SVN, SWE, TUR]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
