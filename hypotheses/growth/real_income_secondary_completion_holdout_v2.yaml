@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: real_income_secondary_completion_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Among countries excluded from the old school-completion screen, higher real GDP per person at year t predicts higher attainment of at least upper-secondary education among adults age 25 and older at exact year t+1, with country and treatment-year effects.
+methodology_note: New-ID country-disjoint measured-association follow-up to market_income_school_completion. The old same-commit REFUTED result was known before this design and is not prospective evidence. The old runner filtered fitted rows to the explicit old country roster, all excluded here. This eleven-test family fixes the two-sided Bonferroni cutoff at 0.10/11 before outcome magnitudes are inspected. Feasibility selection inspected candidate null masks but no outcome magnitudes, signs, or fits; this limits prospective strength. The claim is narrowed to measured variables, with no school score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.'
+  - Retain ISO 3166-1 alpha-3 countries and XKX only; exclude aggregates and the full old roster before fitting.
+  - Join treatment year t to exact calendar year t+1; require at least five usable treatment years per country; no interpolation, imputation, nearest-year substitution, country replacement, or vintage switch.
+  - Require positive real income wherever logged and finite treatment, outcome, and control inputs.
+variables:
+  outcome:
+  - name: next_year_adult_upper_secondary_attainment_pct
+    source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+    transformation: Observed level at exact calendar year t+1.
+  treatment:
+  - name: log_real_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at treatment year t.
+  controls: []
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One prespecified OLS coefficient with country and treatment-year effects and country-clustered uncertainty. Fixed complete-case sample; no automatic control dropping, model search, or post-result sign change.
+falsification:
+  rule: Return INCONCLUSIVE if fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule, or if the coefficient or country-clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORT requires the expected-sign coefficient at two-sided p<=0.10/11; REFUTATION requires the opposite-sign coefficient at that same cutoff. Every other estimable result is PARTIAL. All eleven registered tests remain in the correction family even if a test is inconclusive.
+  test: country_disjoint_sixth_legacy_panel_fe
+  threshold:
+    family_id: sixth_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 11
+    family_alpha: 0.1
+    family_p_max: 0.009090909090909092
+    expected_sign: +
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: market_income_school_completion
+    old_result_bucket: REFUTED
+    old_n_obs: 662
+    old_n_countries: 40
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries without fitted rows.
+    old_country_count: 40
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+      outcome:
+        source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+        path: data/vintages/world_bank_wdi/SE.SEC.CUAT.UP.ZS@2026-04-30T115107Z.parquet
+        sha256: ab2ebef019f3a4e19b64c8730f337609e2d3990d2a727ad3cc92c17eeea31dbb
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: SE.SEC.CUAT.UP.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/SE.SEC.CUAT.UP.ZS?format=json
+        indicator_id: SE.SEC.CUAT.UP.ZS
+prior_confidence: 0.4
+disclosure: The old REFUTED label was seen before this new design. Feasibility screening saw null masks but no outcome magnitudes, signs, or fitted statistics. Attainment of at least upper-secondary education among adults age 25 and older is a slowly changing stock; income is not a market-policy intervention and schooling can also raise income. Country disjointness is relative to the named old run; these source vintages can overlap other IESET fits. This is descriptive calibration only, with no causal, welfare, or school-score credit.
+steelman: hypotheses/steelman/real_income_secondary_completion_holdout_v2.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

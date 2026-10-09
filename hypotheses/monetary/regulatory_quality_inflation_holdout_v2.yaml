@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: regulatory_quality_inflation_holdout_v2
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: '-'
+claim: Among countries excluded from the old price-control screen, a higher World Governance Indicators regulatory-quality estimate at year t predicts lower transformed consumer-price inflation at exact year t+1, conditional on real income per person and country and treatment-year effects.
+methodology_note: New-ID country-disjoint measured-association follow-up to state_price_controls_real_consumption_shortage. The old same-commit PARTIAL result was known before this design and is not prospective evidence. The old runner filtered fitted rows to the explicit old country roster, all excluded here. This eleven-test family fixes the two-sided Bonferroni cutoff at 0.10/11 before outcome magnitudes are inspected. Feasibility selection inspected candidate null masks but no outcome magnitudes, signs, or fits; this limits prospective strength. The claim is narrowed to measured variables, with no school score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.'
+  - Retain ISO 3166-1 alpha-3 countries and XKX only; exclude aggregates and the full old roster before fitting.
+  - Join treatment year t to exact calendar year t+1; require at least five usable treatment years per country; no interpolation, imputation, nearest-year substitution, country replacement, or vintage switch.
+  - Require positive real income wherever logged and finite treatment, outcome, and control inputs.
+variables:
+  outcome:
+  - name: next_year_asinh_cpi_inflation_pct
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: Inverse hyperbolic sine of observed CPI inflation percentage at exact t+1.
+  treatment:
+  - name: regulatory_quality_estimate
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: Observed level at treatment year t.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One prespecified OLS coefficient with country and treatment-year effects and country-clustered uncertainty. Fixed complete-case sample; no automatic control dropping, model search, or post-result sign change.
+falsification:
+  rule: Return INCONCLUSIVE if fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule, or if the coefficient or country-clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORT requires the expected-sign coefficient at two-sided p<=0.10/11; REFUTATION requires the opposite-sign coefficient at that same cutoff. Every other estimable result is PARTIAL. All eleven registered tests remain in the correction family even if a test is inconclusive.
+  test: country_disjoint_sixth_legacy_panel_fe
+  threshold:
+    family_id: sixth_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 11
+    family_alpha: 0.1
+    family_p_max: 0.009090909090909092
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: state_price_controls_real_consumption_shortage
+    old_result_bucket: PARTIAL
+    old_n_obs: 981
+    old_n_countries: 40
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries without fitted rows.
+    old_country_count: 40
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: wgi:GOV_WGI_RQ.EST
+        path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+        sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_RQ.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+        indicator_id: GOV_WGI_RQ.EST
+      outcome:
+        source: world_bank_wdi:FP.CPI.TOTL.ZG
+        path: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+        sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: FP.CPI.TOTL.ZG
+        source_url: https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json
+        indicator_id: FP.CPI.TOTL.ZG
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The old PARTIAL label was seen before this new design. Feasibility screening saw null masks but no outcome magnitudes, signs, or fitted statistics. Regulatory quality is not a price-control law, inflation is not a direct shortage measure, and the asinh transform limits extreme-inflation influence without discarding observations. Country disjointness is relative to the named old run; these source vintages can overlap other IESET fits. This is descriptive calibration only, with no causal, welfare, or school-score credit.
+steelman: hypotheses/steelman/regulatory_quality_inflation_holdout_v2.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - inflation
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

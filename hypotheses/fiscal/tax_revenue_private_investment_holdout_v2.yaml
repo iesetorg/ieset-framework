@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tax_revenue_private_investment_holdout_v2
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: '-'
+claim: Among countries excluded from the old redistribution-tax screen, higher total tax revenue as a share of GDP at year t predicts lower private gross capital formation as a share of GDP at exact year t+1, conditional on real income per person and country and treatment-year effects.
+methodology_note: New-ID country-disjoint measured-association follow-up to redistribution_tax_private_investment_drag_panel. The old same-commit REFUTED result was known before this design and is not prospective evidence. The old runner filtered fitted rows to the explicit old country roster, all excluded here. This eleven-test family fixes the two-sided Bonferroni cutoff at 0.10/11 before outcome magnitudes are inspected. Feasibility selection inspected candidate null masks but no outcome magnitudes, signs, or fits; this limits prospective strength. The claim is narrowed to measured variables, with no school score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS AUT BEL BRA CAN CHE CHL CHN COL CRI CZE DEU DNK EGY ESP EST FIN FRA GBR GHA GRC HUN IDN IND IRL ISR ITA JPN KEN KOR LTU LVA MAR MEX MYS NGA NLD NOR NZL PER PHL POL PRT SGP SVK SVN SWE THA TUR URY USA ZAF.'
+  - Retain ISO 3166-1 alpha-3 countries and XKX only; exclude aggregates and the full old roster before fitting.
+  - Join treatment year t to exact calendar year t+1; require at least five usable treatment years per country; no interpolation, imputation, nearest-year substitution, country replacement, or vintage switch.
+  - Require positive real income wherever logged and finite treatment, outcome, and control inputs.
+variables:
+  outcome:
+  - name: next_year_private_gross_capital_formation_pct_gdp
+    source: world_bank_wdi:NE.GDI.FPRV.ZS
+    transformation: Observed level at exact calendar year t+1.
+  treatment:
+  - name: tax_revenue_pct_gdp
+    source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+    transformation: Observed level at treatment year t.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One prespecified OLS coefficient with country and treatment-year effects and country-clustered uncertainty. Fixed complete-case sample; no automatic control dropping, model search, or post-result sign change.
+falsification:
+  rule: Return INCONCLUSIVE if fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule, or if the coefficient or country-clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORT requires the expected-sign coefficient at two-sided p<=0.10/11; REFUTATION requires the opposite-sign coefficient at that same cutoff. Every other estimable result is PARTIAL. All eleven registered tests remain in the correction family even if a test is inconclusive.
+  test: country_disjoint_sixth_legacy_panel_fe
+  threshold:
+    family_id: sixth_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 11
+    family_alpha: 0.1
+    family_p_max: 0.009090909090909092
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: redistribution_tax_private_investment_drag_panel
+    old_result_bucket: REFUTED
+    old_n_obs: 284
+    old_n_countries: 15
+    old_spec_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries without fitted rows.
+    old_country_count: 53
+    old_country_ids:
+    - ARG
+    - AUS
+    - AUT
+    - BEL
+    - BRA
+    - CAN
+    - CHE
+    - CHL
+    - CHN
+    - COL
+    - CRI
+    - CZE
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - GHA
+    - GRC
+    - HUN
+    - IDN
+    - IND
+    - IRL
+    - ISR
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LTU
+    - LVA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PER
+    - PHL
+    - POL
+    - PRT
+    - SGP
+    - SVK
+    - SVN
+    - SWE
+    - THA
+    - TUR
+    - URY
+    - USA
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: world_bank_wdi:GC.TAX.TOTL.GD.ZS
+        path: data/vintages/world_bank_wdi/GC.TAX.TOTL.GD.ZS@2026-05-05T203244Z.parquet
+        sha256: c9dd7511687ff3d40ee997b8896cd479e9c767c21d999fa013f4748e068a4cfc
+        manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+        series_id: GC.TAX.TOTL.GD.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GC.TAX.TOTL.GD.ZS?format=json
+        indicator_id: GC.TAX.TOTL.GD.ZS
+      outcome:
+        source: world_bank_wdi:NE.GDI.FPRV.ZS
+        path: data/vintages/world_bank_wdi/NE.GDI.FPRV.ZS@2026-04-30T115003Z.parquet
+        sha256: 84294f869d513ae4c70154630b31388a53b41c42bf849a006740c9324ebeba14
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: NE.GDI.FPRV.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NE.GDI.FPRV.ZS?format=json
+        indicator_id: NE.GDI.FPRV.ZS
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The old REFUTED label was seen before this new design. Feasibility screening saw null masks but no outcome magnitudes, signs, or fitted statistics. Total tax revenue does not measure redistribution or marginal tax rates; private gross capital formation and tax receipts both have GDP in the denominator. Country disjointness is relative to the named old run; these source vintages can overlap other IESET fits. This is descriptive calibration only, with no causal, welfare, or school-score credit.
+steelman: hypotheses/steelman/tax_revenue_private_investment_holdout_v2.md
+scope:
+  period:
+  - 2000
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - fiscal_policy
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
