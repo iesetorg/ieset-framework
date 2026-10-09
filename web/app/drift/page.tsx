@@ -326,10 +326,10 @@ export default async function DriftPage() {
         A flat segment means no further <em>coded</em> shift in that interval.
         The index measures direction, not absolute policy levels, and countries
         do not share a measured {data.year_min} baseline. State and municipal
-        movements are excluded from country totals. Four EU-wide movement
-        records currently apply full coded steps to their ten listed member
-        countries; comparisons involving those steps remain provisional until
-        member applicability and weighting are reviewed.
+        and EU-wide movements are excluded from country totals. EU-wide
+        records remain in the movement corpus and the atlas; their member
+        applicability, decision dates, and overlapping policy stacks need
+        review before they can be shown as a separate EU layer here.
       </div>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">

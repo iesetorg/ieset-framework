@@ -91,3 +91,41 @@ def test_subnational_movement_does_not_change_country_total_or_event_log() -> No
     assert usa["statist_drift"] == [1.0]
     assert usa["movement_count"] == 1
     assert [m["movement_id"] for m in usa["movements"]] == ["federal"]
+
+
+def test_supranational_movement_does_not_change_national_series_or_coverage() -> None:
+    national = {
+        "movement_id": "national",
+        "countries": ["GBR"],
+        "_start": 1846,
+        "_end": None,
+        "axes_summary": [
+            {"axis": "regulatory.trade_openness", "direction": "+", "magnitude": "weak"}
+        ],
+    }
+    eu_wide = {
+        "movement_id": "eu_wide",
+        "scope": "supranational",
+        "countries": ["GBR", "LUX"],
+        "_start": 1840,
+        "_end": None,
+        "axes_summary": [
+            {"axis": "regulatory.trade_openness", "direction": "+", "magnitude": "strong"}
+        ],
+    }
+
+    result = DRIFT.build_drift([national, eu_wide])
+    assert (result["year_min"], result["year_max"]) == (1846, 1846)
+    assert list(result["countries"]) == ["GBR"]
+    assert result["countries"]["GBR"]["statist_drift"] == [-1.0]
+    assert result["countries"]["GBR"]["movement_count"] == 1
+    assert [m["movement_id"] for m in result["countries"]["GBR"]["movements"]] == ["national"]
+
+
+def test_single_market_is_not_classified_as_a_national_movement() -> None:
+    single_market = next(
+        m for m in DRIFT.load_movements()
+        if m["movement_id"] == "eu_single_market_1993"
+    )
+    assert single_market["scope"] == "supranational"
+    assert "eu_single_european_act_1986" in single_market["policies"]
