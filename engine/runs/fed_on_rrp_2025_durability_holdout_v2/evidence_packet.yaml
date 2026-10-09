@@ -1,0 +1,80 @@
+packet_version: 1
+generated_utc: '2026-10-09T13:54:40+00:00'
+hypothesis:
+  id: fed_on_rrp_2025_durability_holdout_v2
+  path: hypotheses/monetary/fed_on_rrp_2025_durability_holdout_v2.yaml
+  topic: monetary
+preregistration:
+  spec_commit: 35ddec8e5fce9261ad7e8cac30b2d917c5b1b5f7
+  steelman: hypotheses/steelman/fed_on_rrp_2025_durability_holdout_v2.md
+  registration_files:
+  - path: hypotheses/growth/canada_gdp_pc_2024_2025_peer_holdout_v2.yaml
+    sha256: 4f5caf68eb64d422c43d14faad38e0b0fd78752cc8ad681ea7c497d666f6856a
+  - path: hypotheses/steelman/canada_gdp_pc_2024_2025_peer_holdout_v2.md
+    sha256: 69ab0fe71a4597f6f74fb7b892aef219c7f597f3b88f5893ff6a1b01c6a00717
+  - path: hypotheses/monetary/fed_on_rrp_2025_durability_holdout_v2.yaml
+    sha256: b2232e551b0b52b81057d368cef580405d600c7d38cdae029a9fb389f6a6782f
+  - path: hypotheses/steelman/fed_on_rrp_2025_durability_holdout_v2.md
+    sha256: dc86ef6953476c248bfd2a748cf322b5a9195998f9f284aad247276437192929
+  - path: scripts/run_temporal_calibration_holdouts_v2.py
+    sha256: 9cf3ec3e74713ae549af3c16a433399b967fb9da49e62f33463492f72ff7c171
+  gate:
+    old_hypothesis_id: financial_fed_reverse_repo_facility_usage_2021_2024
+    old_result_seen: SUPPORTED
+    holdout_year: 2025
+    quarters:
+    - 2025Q1
+    - 2025Q2
+    - 2025Q3
+    - 2025Q4
+    minimum_unique_days_per_quarter: 55
+    support_quarter_median_usd_bn_exclusive_max: 500.0
+    refute_quarter_median_usd_bn_min: 1000.0
+    refute_min_quarters: 2
+    source_file:
+      path: data/vintages/fred/RRPONTSYD@2026-04-30T115134Z.parquet
+      sha256: 4ed716e07b2843a319510dc5074231a33e3afe08706ebc9f6546b62624093335
+      custody_manifest: engine/runs/financial_fed_reverse_repo_facility_usage_2021_2024/manifest.yaml
+      source_url: https://fred.stlouisfed.org/series/RRPONTSYD
+      fetch_time_manifest: null
+reproduction:
+  runner: scripts/run_temporal_calibration_holdouts_v2.py
+  run_dir: engine/runs/fed_on_rrp_2025_durability_holdout_v2
+  command: python3 engine/runs/fed_on_rrp_2025_durability_holdout_v2/replication.py
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: all four 2025 quarter medians are below USD 500 billion
+data:
+  inputs:
+  - publisher: fred
+    series_id: RRPONTSYD
+    path: data/vintages/fred/RRPONTSYD@2026-04-30T115134Z.parquet
+    sha256: 4ed716e07b2843a319510dc5074231a33e3afe08706ebc9f6546b62624093335
+    custody_manifest: engine/runs/financial_fed_reverse_repo_facility_usage_2021_2024/manifest.yaml
+    source_url: https://fred.stlouisfed.org/series/RRPONTSYD
+    fetch_time_manifest: null
+    custody_scope: old run's SHA-pinned local file plus official FRED series metadata;
+      original fetch transaction unverified
+    custody_file: engine/runs/financial_fed_reverse_repo_facility_usage_2021_2024/manifest.yaml
+    custody_file_sha256: da16a984ae304ba94e7b39beb213843438628bd618a82058eab23930308572df
+  heldout_window:
+  - 2025
+results:
+  method: four fixed 2025 calendar-quarter daily medians, USD billions
+  n_daily_observations: 249
+  n_days_by_quarter:
+    2025Q1: 61
+    2025Q2: 62
+    2025Q3: 64
+    2025Q4: 62
+  quarter_medians_usd_bn:
+    2025Q1: 126.234
+    2025Q2: 155.885
+    2025Q3: 56.711
+    2025Q4: 4.974
+limitations:
+- The old same-commit SUPPORTED result was known before this new registration.
+- This later measured endpoint is descriptive calibration only; no causal or automatic
+  scoreboard credit.
+- RRP amounts do not identify the Treasury-bill absorption mechanism.

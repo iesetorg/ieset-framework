@@ -1,0 +1,102 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: canada_gdp_pc_2024_2025_peer_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim: >-
+  Canada's 2024-to-2025 real PPP GDP-per-capita growth is nonpositive and at
+  least one log percentage point below the median growth of the six countries
+  named in the earlier Canada study. This is a single-year description of
+  measured national accounts, without attribution to any government or policy.
+claim_direction: "-"
+methodology_note: >-
+  New-ID temporal follow-up to canada_gdp_per_capita_stagnation_post_2015.
+  Its same-commit run was SUPPORTED (post-2015 coefficient -0.03861,
+  p=0.00752); its replication code fixed the old estimation window at
+  2000-2023. That result was known while designing this follow-up and receives
+  no prospective credit. The new endpoint is exclusively the 2024-to-2025
+  within-country log change. All seven countries are fixed before the values
+  are read; equal-country peer median avoids a donor choice after outcomes.
+  The source is the exact pinned WDI real PPP GDP-per-capita vintage. Country
+  and year key presence was checked without reading held-out values or their
+  missingness. Source rows can exist with null values, so only the guarded
+  post-registration run can establish measurement completeness. This is out
+  of time relative to the old run's endpoint, not a claim of global IESET
+  blindness. The comparison cannot identify productivity or policy effects.
+evidence_type: descriptive
+sample:
+  countries: [CAN, USA, AUS, NZL, GBR, NOR, CHE]
+  period: [2024, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      CAN is the sole focal country. USA, AUS, NZL, GBR, NOR, CHE are the
+      complete fixed old-country peer set. Never substitute, drop, or reweight
+      peers after inspecting values.
+    - >-
+      Require the exact 2024 and 2025 finite, positive value for every one
+      of the seven countries in the pinned source. No imputation, WDI vintage
+      switch, nearest-year substitution, or 2015-2023 endpoint enters the
+      comparison. If any of the 14 cells fails, return INCONCLUSIVE.
+variables:
+  outcome:
+    - name: real_ppp_gdp_per_capita_growth_2024_2025
+      source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+      transformation: natural log of 2025 value minus natural log of 2024 value
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Compute each country's natural-log 2025-to-2024 change. Subtract the
+    unweighted median of the six fixed peer changes from Canada's change.
+    Report both the absolute Canadian growth and the peer-median gap. No
+    regression, p-value, synthetic-control fit, productivity decomposition,
+    or causal policy interpretation is permitted.
+falsification:
+  test: canada_2024_2025_fixed_peer_real_gdp_pc_change_v2
+  rule: >-
+    METHOD_VALID requires exact source-hash custody, unchanged first-addition
+    committed registration, and all 14 finite positive country-year values.
+    SUPPORTED if Canada's log growth is <=0 and its gap from the six-peer
+    median is <=-0.01. REFUTED if Canada's log growth is >0 and its peer gap
+    is >=+0.01. All other complete outcomes are PARTIAL. A failed method gate
+    is INCONCLUSIVE; no peer substitution, endpoint change, or threshold
+    adjustment is allowed.
+  threshold:
+    old_hypothesis_id: canada_gdp_per_capita_stagnation_post_2015
+    old_result_seen: SUPPORTED
+    focal_country: CAN
+    peer_countries: [USA, AUS, NZL, GBR, NOR, CHE]
+    holdout_years: [2024, 2025]
+    minimum_countries: 7
+    minimum_country_years: 14
+    support_max_canada_log_growth: 0.0
+    support_max_peer_gap: -0.01
+    refute_min_canada_log_growth_exclusive: 0.0
+    refute_min_peer_gap: 0.01
+    source_file:
+      path: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+      sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+prior_confidence: 0.50
+disclosure: >-
+  The old same-commit SUPPORTED result was known before this new registration.
+  This is one later interval on the same WDI indicator and country roster,
+  with a new measured endpoint rather than an independent data publisher or
+  causal replication. The proposed 2024-2025 values and null masks were not
+  inspected during design. GDP per capita can change with labour input,
+  population, terms of trade, statistical revisions, and other factors; it
+  does not isolate productivity or assign credit to Canadian policy. A
+  favorable result is calibration evidence only and gives no automatic
+  claim-level or scoreboard credit.
+steelman: hypotheses/steelman/canada_gdp_pc_2024_2025_peer_holdout_v2.md
+scope:
+  period: [2024, 2025]
+  countries: [CAN, USA, AUS, NZL, GBR, NOR, CHE]
+  outcome_dim: [gdp_growth]
+  policy_family: [none]
+  treatment_tags: [temporal_holdout]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
