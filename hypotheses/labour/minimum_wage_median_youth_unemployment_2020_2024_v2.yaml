@@ -1,0 +1,172 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: minimum_wage_median_youth_unemployment_2020_2024_v2
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: "+"
+claim: >-
+  Across the fixed 32-country OECD MWUSD MEDIAN-aggregation roster in
+  2020-2024, a higher statutory-minimum-wage-to-median-full-time-wage ratio
+  is positively associated with the ILO-modelled total-sex age-15-to-24
+  unemployment rate within countries, conditional on same-year real GDP growth
+  and country and year effects.
+methodology_note: >-
+  This new-ID descriptive temporal follow-up does not repair or reuse the
+  quarantined minimum_wage_youth_unemployment_tradeoff result. Its saved
+  1990-2019 fit has 246 observations in 18 countries, but did not preserve
+  fitted country/year keys; the old generic loader averaged both OECD MEAN
+  and MEDIAN aggregation rows and all nine ILO sex/age rows by country-year.
+  The 2020-2024 years are disjoint from the old registered and enforced
+  1990-2019 period, but country independence is not claimed. The exact
+  32-country roster and 160 possible country-years were fixed from source
+  country/year/dimension keys only, before reading any selected magnitude or
+  null mask. The OECD file's generic measure/unit labels mention average
+  wages even on rows marked AGGREGATION_OPERATION=MEDIAN; this test fixes the
+  MEDIAN dimension and reports that metadata caveat. The ILO series is
+  modelled, not an independent administrative count. One primary youth-only
+  outcome is tested; no youth-versus-total differential is claimed.
+evidence_type: associational
+sample:
+  countries: &roster
+    [AUS, BEL, BGR, CAN, CHL, COL, CRI, CZE, DEU, ESP, EST, FRA, GBR, GRC,
+     HRV, HUN, IRL, ISR, JPN, KOR, LTU, LVA, MEX, NLD, NZL, POL, PRT, ROU,
+     SVK, SVN, TUR, USA]
+  period: [2020, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Fix the listed 32-country roster and five exact years; do not add or
+      replace countries, move endpoints, switch vintages, or borrow years from
+      the old fit. OECD selection requires MEASURE=MR_WG_FT,
+      UNIT_MEASURE=PT_WG_A_SAL_FT, AGGREGATION_OPERATION=MEDIAN, and
+      PAY_PERIOD=PRICE_BASE=SEX=_Z. The source row must be unique per
+      country/year after selection.
+    - >-
+      ILO selection requires physical indicator UNE_2EAP_SEX_AGE_RT,
+      sex=SEX_T, classif1=AGE_YTHADULT_Y15-24, and source beginning XA:.
+      The source row must be unique per country/year after selection; do not
+      average sex, age, source, or status dimensions. Compare normalized value
+      to source obs_value; reject a mismatch.
+    - >-
+      WDI control requires indicator_id=NY.GDP.MKTP.KD.ZG and one row per
+      country/year. Keep only finite complete-case rows with minimum-wage
+      ratio and youth-unemployment rate each within [0,100] and finite real
+      GDP growth within [-100,100]. Drop invalid rows without imputation,
+      interpolation, clipping, or winsorization. Require at least three
+      complete years per retained country, 100 complete pairs, and 24
+      countries; do not relax these floors after seeing outcomes.
+variables:
+  outcome:
+    - name: youth_unemployment_rate_pct
+      source: ilostat:UNE_2EAP_SEX_AGE_RT_A
+      transformation: >-
+        Exact-year modelled unemployment percentage, physical indicator
+        UNE_2EAP_SEX_AGE_RT, SEX_T, AGE_YTHADULT_Y15-24; level in
+        percentage points, not total-age or sex-averaged unemployment.
+  treatment:
+    - name: minimum_wage_median_aggregation_pct
+      source: oecd:MWUSD
+      transformation: >-
+        Exact-year OECD minimum relative to full-time wage in raw
+        percentage-point units, selecting AGGREGATION_OPERATION=MEDIAN only.
+        No average across MEAN and MEDIAN rows.
+  controls:
+    - name: real_gdp_growth_pct
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: Exact-year annual real GDP growth percentage.
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  The statutory minimum wage is a regulatory wage floor; this design tests
+  a contemporaneous association, not the effect of a regulatory change.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Fit one complete-case OLS regression of youth unemployment percentage on
+    the raw OECD MEDIAN-row minimum-wage percentage and same-year WDI real GDP
+    growth, plus country and year fixed effects. Use country-clustered
+    small-sample covariance and a two-sided Student t test with retained
+    country count minus one degrees of freedom. Reject rank-deficient or
+    nonfinite fits; never switch estimators or drop the control. Fit the same
+    formula on 2021-2024 only as a predeclared COVID-year sensitivity, requiring
+    at least 72 complete pairs and 18 countries. Its coefficient sign can
+    qualify a directional verdict but is not a second significance test.
+falsification:
+  test: fixed_temporal_holdout_oecd_median_youth_unemployment_fe
+  rule: >-
+    INCONCLUSIVE if the frozen source/registration, unique selected keys,
+    complete-case sample, primary estimator, or 2021-2024 sensitivity gates
+    fail. Otherwise SUPPORTED only when the primary minimum-wage coefficient
+    is positive with two-sided country-clustered p <= 0.01 and the sensitivity
+    coefficient is nonnegative. REFUTED only when the primary coefficient is
+    negative with p <= 0.01 and the sensitivity coefficient is nonpositive.
+    Every other estimable result is PARTIAL. A nonsignificant coefficient is
+    not a refutation. This one test uses one reserved slot in a five-test
+    direct-labour family (0.05/5=0.01); it does not repair wider IESET
+    selection. No result earns causal, policy, or school-score credit.
+  threshold:
+    family_id: direct_labour_temporal_followups_2026_10_09
+    family_size: 5
+    family_alpha: 0.05
+    family_p_max: 0.01
+    min_observations: 100
+    min_countries: 24
+    min_years_per_country: 3
+    sensitivity_years: [2021, 2024]
+    sensitivity_min_observations: 72
+    sensitivity_min_countries: 18
+    old_hypothesis_id: minimum_wage_youth_unemployment_tradeoff
+    old_run_commit: aaf546211593c42dc91f81d0bca349bf9f8c876e
+    old_registered_period: [1990, 2019]
+    old_n_obs: 246
+    old_n_countries: 18
+    old_fitted_keys_saved: false
+    fixed_key_upper_bound: 160
+    fixed_roster_size: 32
+    school_score_eligible: false
+    school_score_credit: 0
+    source_manifest:
+      path: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    source_files:
+      minimum_wage:
+        path: data/vintages/oecd/MWUSD@2026-05-05T195455Z.parquet
+        sha256: d4da2c942e3a714a6392a0a6f3ff831a4431caff0b965b8f93f6544f5c223ddc
+        publisher: oecd
+        series_id: MWUSD
+      youth_unemployment:
+        path: data/vintages/ilostat/UNE_2EAP_SEX_AGE_RT_A@2026-05-05T195424Z.parquet
+        sha256: dcc17617c0ef8f037fc414944d01aeab7a0a71370576b29ff416de18c5348990
+        publisher: ilostat
+        series_id: UNE_2EAP_SEX_AGE_RT_A
+      real_gdp_growth:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        publisher: world_bank_wdi
+        series_id: NY.GDP.MKTP.KD.ZG
+prior_confidence: 0.50
+disclosure: >-
+  Author priors may favor finding a positive wage-floor association and risk
+  overstating a descriptive coefficient as a policy effect. The old quarantined fit is not a valid youth or OECD median-ratio result.
+  This period follows that fit but uses countries that may overlap with it;
+  the old exact country identities were not saved. The source vintages were
+  fetched before registration, so unused years do not establish researcher
+  blindness. ILO unemployment is modelled and may share macro inputs with the
+  WDI control. Minimum-wage policy may respond to unemployment; short-window
+  composition, pandemic effects, denominator movements, and country-specific
+  trends remain. The OECD MEDIAN dimension and generic average-wage labels
+  need careful source attribution. This descriptive association is not an
+  employment effect, a youth-versus-total differential, or a causal policy
+  evaluation. The five-slot cutoff does not cure selection across the full
+  IESET archive. No school, welfare, policy, or causal credit.
+steelman: hypotheses/steelman/minimum_wage_median_youth_unemployment_2020_2024_v2.md
+scope:
+  period: [2020, 2024]
+  countries: *roster
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
