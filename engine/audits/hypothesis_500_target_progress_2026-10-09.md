@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **410 public records** (51 featured, 359 calibration) among 1,944
-hypotheses. That is **38 additional** relative to the 372 starting point and
-**462 short** of the requested increment. No result was made featured by
+ledger has **420 public records** (51 featured, 369 calibration) among 1,954
+hypotheses. That is **48 additional** relative to the 372 starting point and
+**452 short** of the requested increment. No result was made featured by
 loosening its gate.
 
 The latest four new-ID tests illustrate the decision boundary:
@@ -33,6 +33,25 @@ audit corrected literal errors in its earlier quarantine rationale. Its 17
 post-result school links remain visible but untested and unscored; every school
 aggregate is unchanged.
 
+Two new country-disjoint WITS trade tests and eight new WDI/WGI panel tests
+were registered in separate earlier commits, then run and exactly replayed.
+All ten returned **PARTIAL** under their fixed family thresholds. The WITS
+tests had 2,098/123 and 1,414/118 complete country-year/country samples;
+the eight panel tests had 1,674–3,862 pairs and 116–163 countries. Each is
+only a narrow measured association in public calibration, with zero school
+credit. The known old results, old-country exclusions, source hashes, and
+measurement limits are in their preregistrations and result cards. In
+particular, a government-effectiveness/electricity-access negative estimate
+with p=0.0181 did **not** meet its eight-test p<=0.0125 refutation cutoff.
+
+A separate legacy sign audit found 64 current generic-rule panel records and
+57 historical-to-stored inferred-direction changes. The old text parser could
+mistake `p<0.10` for a negative coefficient condition; it is repaired for
+future runs, while old result artifacts remain unchanged pending manual
+claim-by-claim adjudication. Five earlier calibration-only geographic holdouts
+now have an explicit external school-score exclusion so later links cannot
+silently award credit; their frozen runs remain untouched.
+
 The regular registration, evidence-tier, funnel, census, school outcome,
 second-order, and link audits were refreshed after the combined results. The
 500-case prospective queue is a **design-review selection**, not a graduation
@@ -40,8 +59,8 @@ count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
 There are **214 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 624 public
-records, still **248 below** 872. The archive repair review found 131
+unrealistic upper bound of converting every one would yield 634 public
+records, still **238 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
@@ -52,8 +71,11 @@ replays; current evidence does not justify claiming it has happened.
 A current frozen-repair audit found **no immediately runnable** same-ID case
 among the 214 verified archives. A separate metadata-only screen of the 820
 legacy cases beyond the first 500 review rows found 67 distinct source-pair
-groups as an upper bound for design review, including the five measured
-holdouts run in this sprint. Pair membership creates no credit; the other
-groups still need claim-specific source, holdout, and method checks.
+groups as an upper bound for design review, including the five earlier
+measured holdouts and the ten new follow-ups run in this sprint. Pair
+membership creates no credit; the remaining groups still need claim-specific
+source, holdout, and method checks. Alias-aware review also rejected apparent
+new groups already represented by strict registrations, and sign-history
+review rejected several legacy verdicts as design inputs.
 
 No push, merge, or deployment is part of this status.
