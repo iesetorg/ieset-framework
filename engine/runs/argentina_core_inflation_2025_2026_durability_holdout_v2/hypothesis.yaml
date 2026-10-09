@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: argentina_core_inflation_2025_2026_durability_holdout_v2
+version: 1
+status: pre_registered
+topic: monetary
+claim: >-
+  Argentina's observed national core CPI inflation remained broadly at or below
+  3.0 percent month on month from September 2025 through August 2026: the
+  twelve-month median is at most 3.0 percent and at least nine of the twelve
+  monthly rates are at most 3.0 percent. This is a description of persistence
+  in a CPI component, not an estimate of the effect of any government policy.
+claim_direction: "+"
+methodology_note: >-
+  New-ID, pre-analysis temporal and component follow-up to
+  milei_reforms_reduce_argentine_inflation. That earlier ID registered
+  headline-CPI windows ending in August 2025; its May 2026 saved run was
+  INCONCLUSIVE_DATA_PENDING because the required INDEC vintage was absent and
+  contained no fitted result. The old result card refers to a prior supported
+  result that this repository lane could not reproduce; it is neither adopted
+  nor treated as an unseen result. This test uses core rather than headline CPI,
+  starts the month after the old primary endpoint, and pins an INDEC vintage
+  fetched on 2026-10-09. The source predates this registration, so the claim
+  is that the selected candidate values were not inspected in this design
+  lane before its first Git commit, not that the data were unavailable to the
+  world or other IESET work. Only source metadata and dimension keys were
+  checked before registration. The pinned raw JSON, parquet, manifest, spec,
+  steelman, and runner must enter the same first-addition commit before the
+  candidate index values can be read.
+evidence_type: descriptive
+sample:
+  countries: [ARG]
+  period: [2025, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - >-
+      Use exactly the twelve consecutive calendar months 2025-09 through
+      2026-08. Use the 2025-08 index solely as the denominator for the first
+      month-on-month rate. No month, component, vintage, source, or threshold
+      may be substituted after registration.
+    - >-
+      Require unique monthly keys and positive finite index values for core,
+      headline, and services for every month 2025-08 through 2026-08. Do not
+      impute, forward-fill, winsorize, seasonally adjust, or drop an outlier.
+variables:
+  outcome:
+    - name: core_cpi_mom_pct
+      source: indec_ipc:148.3_INUCLEONAL_DICI_M_19
+      transformation: "100 * (national core index in month t / index in t-1 - 1)"
+      notes: Dispositive core CPI component; twelve months 2025-09 to 2026-08.
+    - name: headline_cpi_mom_pct
+      source: indec_ipc:148.3_INIVELNAL_DICI_M_26
+      transformation: "100 * (national headline index in month t / index in t-1 - 1)"
+      notes: Secondary description only; cannot change the core verdict.
+    - name: services_cpi_mom_pct
+      source: indec_ipc:147.3_ISERVICNAL_DICI_T_22
+      transformation: "100 * (national services index in month t / index in t-1 - 1)"
+      notes: Secondary description only; cannot change the core verdict.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Compute twelve unrounded monthly percent changes from the pinned index
+    values using decimal arithmetic on each stored index's printed value.
+    Compute the ordinary median of the twelve core rates and count core
+    months whose unrounded rate is <= 3.0. Report the twelve-month
+    headline and services rate paths, medians, and <= 3.0 counts as labelled
+    secondary context. No regression, counterfactual, p-value, or policy
+    attribution is part of this registered test.
+falsification:
+  test: argentina_core_cpi_twelve_month_durability_v2
+  rule: >-
+    METHOD_VALID requires the unchanged first-addition Git registration and
+    pinned source custody, one unique ARG core/headline/services index for
+    each of the thirteen months 2025-08 through 2026-08, and positive finite
+    index values for all 39 cells. The endpoint is the twelve unrounded core
+    month-on-month rates for 2025-09 through 2026-08. SUPPORTED if their
+    median is <= 3.0 percent AND at least 9 of 12 rates are <= 3.0 percent.
+    REFUTED if the median is > 3.0 percent. PARTIAL if the median is <= 3.0
+    percent but fewer than 9 of 12 rates are <= 3.0 percent. An exact 3.0
+    rate counts toward the nine months; an exact 3.0 median qualifies for
+    support if the count also qualifies. METHOD_VALID failure is INCONCLUSIVE,
+    never refutation. Headline and services cannot modify this rule.
+  threshold:
+    old_hypothesis_id: milei_reforms_reduce_argentine_inflation
+    old_result_seen: INCONCLUSIVE_DATA_PENDING
+    country_iso3: ARG
+    baseline_month: "2025-08"
+    endpoint_months:
+      - "2025-09"
+      - "2025-10"
+      - "2025-11"
+      - "2025-12"
+      - "2026-01"
+      - "2026-02"
+      - "2026-03"
+      - "2026-04"
+      - "2026-05"
+      - "2026-06"
+      - "2026-07"
+      - "2026-08"
+    required_components: [core, headline, services]
+    required_index_cells: 39
+    core_median_support_max_pct: 3.0
+    core_months_at_or_below_3_support_min: 9
+    source_file:
+      path: data/vintages/indec_ipc/all@2026-10-09T121609Z.parquet
+      sha256: f093e71a89254c3c51d265bc45f1b4ef58e7e59a47113dd4e59416620b03bd98
+      manifest: data/manifests/fetch_run_2026-10-09T121824Z.yaml
+      manifest_sha256: befe6a588f0e2c0de0fd42566f34e76226ce161151432e0373bf3dced401d960
+      raw_path: data/raw/indec_ipc/all@2026-10-09T121609Z.json
+      raw_sha256: 5bc83847b0fe5f673ae0f7887b1337abdd1373eb183b757d439eb7216aa83c96
+      publisher: indec_ipc
+      series_id: all
+prior_confidence: 0.50
+disclosure: >-
+  The analyst knew the earlier headline-inflation run was
+  INCONCLUSIVE_DATA_PENDING and that its primary endpoint ended in August
+  2025. The old result card refers to a prior supported result that this
+  repository lane could not reproduce; it is neither adopted nor treated as an
+  unseen result. The official October 2026 source vintage already existed when this
+  specification was written, and only metadata and selected dimension keys
+  were examined in this design lane. The core, headline, and services values
+  for the proposed endpoint were not read before this registration. A pass
+  means observed core disinflation persisted within the stated window only;
+  it does not prove that Milei's reforms caused it, resolve the old claim's
+  Latin American comparison, or give any school-score credit.
+steelman: hypotheses/steelman/argentina_core_inflation_2025_2026_durability_holdout_v2.md
+scope:
+  period: [2025, 2026]
+  countries: [ARG]
+  outcome_dim: [inflation]
+  policy_family: [none]
+  treatment_tags: [temporal_holdout, direct_core_cpi_measurement]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
