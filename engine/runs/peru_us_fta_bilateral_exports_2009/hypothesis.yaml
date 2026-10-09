@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: peru_us_fta_bilateral_exports_2009
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "+"
+claim: >
+  After the US-Peru Trade Promotion Agreement entered into force on 1 February
+  2009, US-origin merchandise exports to Peru grew at least 15 percent more in
+  log terms from 2004-2008 to 2010-2014 than the median change in US-origin
+  exports to the six fixed South American comparator destinations, conditional
+  on an aligned 2004-2008 pretrend. This is a descriptive bilateral-flow claim,
+  not an estimate of the agreement's causal effect or of welfare gains.
+evidence_type: descriptive
+sample:
+  countries: [USA, PER, ARG, BOL, BRA, ECU, PRY, URY]
+  period: [2004, 2014]
+  temporal_structure: panel
+  exclusion_rules:
+    - "Directed CEPII dyads only: USA to PER, ARG, BOL, BRA, ECU, PRY, URY. Do not substitute other exporters or destinations after viewing outcomes."
+    - "Use 2004-2008 as pre and 2010-2014 as post; omit 2009 from both means because implementation began 1 February."
+    - "Require one unique country-existing directed dyad-year row and a finite nonnegative BACI value for all seven destinations and all eleven years. No imputation or winsorisation."
+    - "Require CEPII fta_wto=0 for all seven dyads in 2004-2008; USA-PER=1 in 2009-2014; all six comparator dyads=0 through 2014. Any failed treatment or coverage gate is inconclusive."
+variables:
+  outcome:
+    - name: directed_us_merchandise_exports_to_destination
+      source: "cepii:Gravity_V202211.tradeflow_baci"
+      transformation: "natural log of 1 plus the reported value in thousands of current US dollars"
+      notes: "BACI merchandise trade flow; current USD, not inflation-adjusted, tariff-adjusted, manufacturing-only, or a welfare measure. Origin USA, destination named in sample."
+  treatment:
+    - name: peru_us_tpa_entry_into_force
+      source: "cepii:Gravity_V202211.fta_wto"
+      transformation: "USA-PER indicator, off through 2008 and on from 2009; cross-check against USTR effective date 2009-02-01"
+      notes: "CEPII fta_wto is an agreement-status flag, not tariff-line coverage or measured tariff reduction. Policy record pe_us_fta_implementation_2009."
+intervention_channel: regulatory
+intervention_channel_justification: >
+  The named agreement changed the bilateral trade-policy regime. The measured
+  outcome is a flow, while CEPII fta_wto only verifies agreement status.
+estimator:
+  template: descriptive
+  event_year: 2009
+  notes: >
+    For each destination d, compute the mean of log1p(tradeflow_baci) over
+    2010-2014 minus its mean over 2004-2008. Primary contrast is that change
+    for Peru minus the median of the six changes for ARG, BOL, BRA, ECU, PRY,
+    and URY. Pretrend gate: the absolute difference between the 2004-2008 OLS
+    year slope for Peru and the median of six donor slopes must be <=0.03 log
+    units per year. No significance test or post hoc donor selection. The
+    directional verdict is descriptive and receives zero school score credit.
+falsification:
+  test: peru_us_tpa_directed_baci_prepost_fixed_donors
+  rule: >
+    First require immutable source custody; a source-hash or commit mismatch
+    stops the run. Then require exact structural, treatment, outcome-
+    completeness, and pretrend gates. A failed analysis gate yields
+    INCONCLUSIVE with its reason, never a directional verdict. If all pass,
+    SUPPORTED when the primary
+    contrast is at least ln(1.15), REFUTED when it is at most -ln(1.15), and
+    PARTIAL otherwise. No p-value, causal interpretation, multiplicity claim,
+    or school score credit follows from any verdict.
+  threshold: "absolute pretrend slope gap <=0.03 log units/year; directional contrast thresholds +/-ln(1.15)"
+prior_confidence: 0.45
+disclosure: >
+  Author expects possible export growth after the agreement, but Peru had
+  already enjoyed substantial US-side ATPA/ATPDEA preferences. This test uses
+  US exports to Peru because the TPA newly expanded their access, yet Peru's
+  domestic-demand cycle, commodity exposure, exchange rates, other reforms,
+  and the 2008-2009 crisis may explain a descriptive contrast. The fixed donor
+  set and pretrend gate prevent outcome-driven comparator choice, not residual
+  confounding. No school receives score credit from this single treaty case.
+scope:
+  period: [2004, 2014]
+  countries: [USA, PER]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [peru_us_tpa_2009]
+steelman: hypotheses/steelman/peru_us_fta_bilateral_exports_2009.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >
+  Treaty-level unit: one USA-PER agreement, counted once regardless of
+  direction or the six comparator dyads. Source and extraction contract:
+  engine/audits/peru_us_fta_bilateral_exports_2009_source_plan.md. USTR says
+  the TPA entered into force on 2009-02-01 and made extensive US exports to
+  Peru duty-free; CEPII Gravity V202211 supplies annual directed BACI flows.
