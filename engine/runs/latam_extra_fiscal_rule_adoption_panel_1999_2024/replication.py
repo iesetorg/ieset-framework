@@ -7,18 +7,16 @@ directly reproducible from engine/runs/latam_extra_fiscal_rule_adoption_panel_19
 """
 from __future__ import annotations
 
+import subprocess
 import sys
 from pathlib import Path
 
-RUNS_ROOT = Path(__file__).resolve().parents[1]
-if str(RUNS_ROOT) not in sys.path:
-    sys.path.insert(0, str(RUNS_ROOT))
-
-from _replication_runner import rerun
-
 HYPOTHESIS_ID = 'latam_extra_fiscal_rule_adoption_panel_1999_2024'
-RUNNER = 'scripts/run_did_callaway_santanna.py'
+RUNNER = 'scripts/rerun_latam_group_time_frozen.py'
 
 
 if __name__ == "__main__":
-    raise SystemExit(rerun(__file__, HYPOTHESIS_ID, RUNNER))
+    root = Path(__file__).resolve().parents[3]
+    raise SystemExit(subprocess.call(
+        [sys.executable, str(root / RUNNER), HYPOTHESIS_ID, "--check"], cwd=root,
+    ))
