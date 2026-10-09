@@ -160,10 +160,11 @@ def preflight() -> tuple[dict[str, Any], pd.DataFrame, dict[str, dict[str, Any]]
     panel = build_panel()
     n_obs = int(len(panel))
     n_countries = int(panel["country"].nunique())
+    years = [int(panel["year"].min()), int(panel["year"].max())] if n_obs else [None, None]
     result = {
         "observations": n_obs,
         "countries": n_countries,
-        "treatment_years": [int(panel["year"].min()), int(panel["year"].max())],
+        "treatment_years": years,
         "old_countries_excluded": len(ORIGINAL_COUNTRIES),
         "country_overlap_with_old": 0,
         "passed": n_obs >= GATE["min_observations"] and n_countries >= GATE["min_countries"],
@@ -199,25 +200,135 @@ def verdict(coefficient: float, p_value: float, gap: float) -> tuple[str, str]:
     return "PARTIAL", "estimable holdout result does not clear support or refutation gates"
 
 
+def replication_wrapper() -> str:
+    return f"""#!/usr/bin/env python3
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path(__file__).resolve().parents[3]
+raise SystemExit(subprocess.call(
+    [sys.executable, str(root / {RUNNER_REL!r}), '--run', '--force'], cwd=root
+))
+"""
+
+
+def record_inconclusive(
+    prereg_commit: str,
+    reason: str,
+    gate: dict[str, Any],
+    sources: dict[str, dict[str, Any]],
+    error: Exception | None = None,
+) -> dict[str, Any]:
+    """Persist an honest non-result without implying a coefficient was estimated."""
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    diagnostics = {
+        "hypothesis_id": HYPOTHESIS_ID,
+        "verdict": "INCONCLUSIVE",
+        "verdict_label": "INCONCLUSIVE",
+        "verdict_reason": reason,
+        "run_utc": timestamp,
+        "runner": RUNNER_REL,
+        "preregistration_commit": prereg_commit,
+        "template": "panel_fe",
+        "preflight": gate,
+        "estimate": None,
+        "data_status": {
+            "variables_missing": [],
+            "input_vintages": [source["vintage_file"] for source in sources.values()],
+        },
+        "error_type": type(error).__name__ if error is not None else None,
+        "error_message": str(error) if error is not None else None,
+        "limitations": ["No primary coefficient was accepted; this run receives no evidence credit."],
+    }
+    manifest = {
+        "hypothesis_id": HYPOTHESIS_ID,
+        "run_utc": timestamp,
+        "runner": RUNNER_REL,
+        "preregistration_commit": prereg_commit,
+        "status": "INCONCLUSIVE",
+        "vintages": list(sources.values()),
+        "derived_panel": {
+            "rows_after_join": gate.get("observations"),
+            "countries_after_join": gate.get("countries"),
+            "treatment_years": gate.get("treatment_years"),
+            "excluded_old_country_count": len(ORIGINAL_COUNTRIES),
+        },
+    }
+    packet = {
+        "packet_version": 1,
+        "generated_utc": timestamp,
+        "hypothesis": {"id": HYPOTHESIS_ID, "path": SPEC_REL, "topic": "institutional_quality"},
+        "preregistration": {"spec_commit": prereg_commit, "steelman": STEELMAN_REL, "gate": GATE},
+        "reproduction": {"runner": RUNNER_REL, "run_dir": RUN_REL, "command": f"python3 {RUNNER_REL} --run --force"},
+        "verdict": {"raw": "INCONCLUSIVE", "bucket": "inconclusive", "reason": reason},
+        "data": {"inputs": list(sources.values())},
+        "results": None,
+        "limitations": diagnostics["limitations"],
+    }
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
+    (RUN_DIR / "hypothesis.yaml").write_bytes((ROOT / SPEC_REL).read_bytes())
+    (RUN_DIR / "manifest.yaml").write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    (RUN_DIR / "diagnostics.json").write_text(json.dumps(diagnostics, indent=2) + "\n", encoding="utf-8")
+    (RUN_DIR / "evidence_packet.yaml").write_text(yaml.safe_dump(packet, sort_keys=False), encoding="utf-8")
+    (RUN_DIR / "result_card.md").write_text(
+        f"# Result card: {HYPOTHESIS_ID}\n\nVerdict: **INCONCLUSIVE**. {reason}.\n\n"
+        "No primary coefficient was accepted or given public evidence credit.\n",
+        encoding="utf-8",
+    )
+    (RUN_DIR / "replication.py").write_text(replication_wrapper(), encoding="utf-8")
+    (RUN_DIR / "chart_data.json").write_text(
+        json.dumps({"hypothesis_id": HYPOTHESIS_ID, "verdict": "INCONCLUSIVE", "reason": reason}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    pd.DataFrame(columns=["term", "coefficient", "std_error", "p_value"]).to_parquet(
+        RUN_DIR / "coefficients.parquet", index=False
+    )
+    return {"verdict": "INCONCLUSIVE", "reason": reason, "run_dir": RUN_REL}
+
+
 def run(force: bool = False) -> dict[str, Any]:
     prereg_commit = registered_spec_commit()
     if RUN_DIR.exists() and not force:
         raise FileExistsError(f"run already exists: {RUN_DIR}; use --force only for explicit replication")
-    gate, panel, sources = preflight()
+    try:
+        gate, panel, sources = preflight()
+    except Exception as error:
+        return record_inconclusive(
+            prereg_commit,
+            f"pinned input or coverage preflight failed: {type(error).__name__}: {error}",
+            {"passed": False, "coefficient_estimated": False},
+            {},
+            error,
+        )
     if not gate["passed"]:
-        raise RuntimeError(f"registered data gate failed: {gate['observations']} observations, {gate['countries']} countries")
-    fit = smf.ols(FORMULA, data=panel).fit(
-        cov_type="cluster", cov_kwds={"groups": panel["country"], "use_correction": True}
-    )
-    coefficient = float(fit.params[TERM])
-    std_error = float(fit.bse[TERM])
-    p_value = float(fit.pvalues[TERM])
-    ci = [float(value) for value in fit.conf_int().loc[TERM].tolist()]
-    if not all(math.isfinite(value) for value in (coefficient, std_error, p_value, *ci)) or std_error <= 0:
-        raise RuntimeError("primary estimator returned nonfinite or zero uncertainty")
-    p25_rule = float(panel["rule_of_law"].quantile(0.25))
-    p75_rule = float(panel["rule_of_law"].quantile(0.75))
-    marginal_gap = coefficient * (p75_rule - p25_rule)
+        return record_inconclusive(
+            prereg_commit,
+            f"registered data gate failed: {gate['observations']} observations, {gate['countries']} countries",
+            gate,
+            sources,
+        )
+    try:
+        fit = smf.ols(FORMULA, data=panel).fit(
+            cov_type="cluster", cov_kwds={"groups": panel["country"], "use_correction": True}
+        )
+        coefficient = float(fit.params[TERM])
+        std_error = float(fit.bse[TERM])
+        p_value = float(fit.pvalues[TERM])
+        ci = [float(value) for value in fit.conf_int().loc[TERM].tolist()]
+        if not all(math.isfinite(value) for value in (coefficient, std_error, p_value, *ci)) or std_error <= 0:
+            raise ValueError("primary estimator returned nonfinite or zero uncertainty")
+        p25_rule = float(panel["rule_of_law"].quantile(0.25))
+        p75_rule = float(panel["rule_of_law"].quantile(0.75))
+        marginal_gap = coefficient * (p75_rule - p25_rule)
+    except Exception as error:
+        return record_inconclusive(
+            prereg_commit,
+            f"primary estimation failed: {type(error).__name__}: {error}",
+            gate,
+            sources,
+            error,
+        )
     label, reason = verdict(coefficient, p_value, marginal_gap)
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     estimate = {
@@ -313,16 +424,7 @@ may reflect filing reforms or formalization rather than productive entry.
 Rule of law and growth share potential time-varying confounders. No school
 score or public claim is changed by this run alone.
 """
-    wrapper = f"""#!/usr/bin/env python3
-from pathlib import Path
-import subprocess
-import sys
-
-root = Path(__file__).resolve().parents[3]
-raise SystemExit(subprocess.call(
-    [sys.executable, str(root / {RUNNER_REL!r}), '--run', '--force'], cwd=root
-))
-"""
+    wrapper = replication_wrapper()
     chart = {
         "hypothesis_id": HYPOTHESIS_ID,
         "annual_country_counts": [
@@ -354,7 +456,16 @@ def main() -> int:
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     if args.preflight:
-        result, _, _ = preflight()
+        try:
+            result, _, _ = preflight()
+        except Exception as error:
+            result = {
+                "passed": False,
+                "coefficient_estimated": False,
+                "reason": f"pinned input or coverage preflight failed: {type(error).__name__}: {error}",
+            }
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0 if result["passed"] else 1
     else:
         result = run(force=args.force)
     print(json.dumps(result, indent=2, sort_keys=True))
