@@ -154,6 +154,7 @@ def build_claim_gate_row(
     verdict: str | None,
     scope: str,
     scoreboard_weight_cap: float | None = None,
+    school_score_eligible: bool = True,
 ) -> dict[str, Any]:
     hypothesis_id = claim.get("linked_hypothesis_id")
     prediction = coverage.get("school_prediction") or claim.get("school_prediction")
@@ -161,7 +162,7 @@ def build_claim_gate_row(
     evidence_type = hypothesis.get("evidence_type")
     outcome = "untested"
     verdict_kind = scoreboard.verdict_class(verdict)
-    if is_public:
+    if is_public and school_score_eligible:
         outcome = scoreboard.position_outcome(verdict_kind, prediction, polarity)
 
     declared_gate = second_order.second_order_gate_for_hypothesis(
@@ -189,7 +190,7 @@ def build_claim_gate_row(
     recommended_score = raw_outcome_score
     if failure_credit["kind"] != "not_failure_prediction_win":
         recommended_score *= failure_credit["recommended_multiplier"]
-    if not declared_gate["scoreboard_eligible"]:
+    if not declared_gate["scoreboard_eligible"] or not school_score_eligible:
         recommended_score = 0.0
 
     return {
@@ -205,13 +206,17 @@ def build_claim_gate_row(
         "evidence_type": evidence_type,
         "evidence_weight": evidence_weight,
         "scoreboard_weight_cap": scoreboard_weight_cap,
+        **({"school_score_eligible": False} if is_public and not school_score_eligible else {}),
         "raw_school_outcome": outcome,
         "raw_weighted_score": raw_outcome_score,
-        "declared_scoreboard_eligible": bool(is_public and declared_gate["scoreboard_eligible"]),
-        "strict_scoreboard_eligible": bool(is_public and strict_gate["scoreboard_eligible"]),
-        "declared_gate_status": declared_gate["gate_status"],
-        "strict_gate_status": strict_gate["gate_status"],
-        "promotion_gate": declared_gate.get("promotion_gate") or strict_gate.get("promotion_gate"),
+        "declared_scoreboard_eligible": bool(is_public and school_score_eligible and declared_gate["scoreboard_eligible"]),
+        "strict_scoreboard_eligible": bool(is_public and school_score_eligible and strict_gate["scoreboard_eligible"]),
+        "declared_gate_status": "school_score_hold" if is_public and not school_score_eligible else declared_gate["gate_status"],
+        "strict_gate_status": "school_score_hold" if is_public and not school_score_eligible else strict_gate["gate_status"],
+        "promotion_gate": (
+            "school_score_ineligible_post_result_links" if is_public and not school_score_eligible
+            else declared_gate.get("promotion_gate") or strict_gate.get("promotion_gate")
+        ),
         "required_data_gaps": sorted(
             set(declared_gate.get("required_data_gaps") or [])
             | set(strict_gate.get("required_data_gaps") or [])
@@ -244,7 +249,9 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
             is_public, verdict = scoreboard.hypothesis_public_verdict(
                 hypothesis_id, hypotheses, evidence_index
             )
-            cap = (evidence_index.get(hypothesis_id) or {}).get("scoreboard_weight_cap")
+            evidence_record = evidence_index.get(hypothesis_id) or {}
+            cap = evidence_record.get("scoreboard_weight_cap")
+            school_score_eligible = bool(evidence_record.get("school_score_eligible", True))
             row = build_claim_gate_row(
                 position_id=position_id,
                 claim_index=claim_index,
@@ -255,6 +262,7 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
                 verdict=verdict,
                 scope=scope,
                 scoreboard_weight_cap=cap,
+                school_score_eligible=school_score_eligible,
             )
             claim_rows.append(row)
 
@@ -265,6 +273,7 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
                     "evidence_type": hypothesis.get("evidence_type"),
                     "verdict_public": bool(is_public),
                     "verdict": verdict,
+                    **({"school_score_eligible": False} if is_public and not school_score_eligible else {}),
                     "declared_gate_status": row["declared_gate_status"],
                     "strict_gate_status": row["strict_gate_status"],
                     "declared_scoreboard_eligible_claim_links": 0,
@@ -311,6 +320,8 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
         "summary": {
             "claim_links": len(claim_rows),
             "public_claim_links": len(public_rows),
+            "school_scored_public_links": sum(1 for row in public_rows if row.get("school_score_eligible", True)),
+            "unscored_public_links": sum(1 for row in public_rows if not row.get("school_score_eligible", True)),
             "declared_scoreboard_eligible_public_links": sum(
                 1 for row in public_rows if row["declared_scoreboard_eligible"]
             ),
@@ -354,6 +365,8 @@ def write_outputs(payload: dict[str, Any]) -> None:
         "",
         f"- Claim links: {summary['claim_links']}",
         f"- Public claim links: {summary['public_claim_links']}",
+        f"- School-scored public links: {summary['school_scored_public_links']}",
+        f"- Public links retained without school score: {summary['unscored_public_links']}",
         f"- Declared-gate eligible public links: {summary['declared_scoreboard_eligible_public_links']}",
         f"- Declared-gate held public links: {summary['declared_held_public_links']}",
         f"- Strict-gate eligible public links: {summary['strict_scoreboard_eligible_public_links']}",

@@ -183,6 +183,17 @@ def screening_flags(doc: dict[str, Any]) -> list[str]:
     return sorted(marker.replace(" ", "_") for marker in SCREENING_MARKERS if marker in text)
 
 
+def school_score_eligible_for_public_run(public_visible: bool, correction: Any) -> bool:
+    if not public_visible:
+        return False
+    if not isinstance(correction, dict):
+        return True
+    return (
+        correction.get("school_score_eligible") is not False
+        and correction.get("school_score_credit") != 0
+    )
+
+
 def build_record(
     path: Path,
     registrations: dict[str, dict[str, Any]],
@@ -257,10 +268,14 @@ def build_record(
         exclusion_reasons.append("audit_verdict_rescore_pending_v2")
 
     public_visible = not exclusion_reasons
+    # Public calibration can remain inspectable without scoring later-attached
+    # school links. A zero weight alone would leave raw wins and tested counts.
+    school_score_eligible = school_score_eligible_for_public_run(public_visible, correction)
     evidence_type = str(doc.get("evidence_type") or "unspecified")
     screen_or_descriptive_rescope = disposition in {
         "rescoped_screen_positive",
         "rescoped_descriptive",
+        "descriptive_calibration_only",
     }
     # A run can document a conservative design-completeness cap. This field
     # only downgrades causal records; it can never grant public visibility or
@@ -268,13 +283,17 @@ def build_record(
     run_tier_recommendation = str(
         diagnostics.get("evidence_tier_recommendation") or ""
     ).strip().lower()
-    scoreboard_weight_cap = 0.25 if screen_or_descriptive_rescope else None
+    scoreboard_weight_cap = (
+        0.0 if public_visible and not school_score_eligible
+        else 0.25 if screen_or_descriptive_rescope else None
+    )
 
     if (
         public_visible
         and evidence_type == "causal"
         and not screening
         and not screen_or_descriptive_rescope
+        and school_score_eligible
         and run_tier_recommendation != "calibration"
     ):
         tier = "featured"
@@ -291,6 +310,8 @@ def build_record(
         "topic": str(doc.get("topic") or path.parent.name),
         "tier": tier,
         "public_visible": public_visible,
+        # Publish the explicit exception; absence retains the normal public rule.
+        **({"school_score_eligible": False} if public_visible and not school_score_eligible else {}),
         "reference_set": reference_set,
         "reference_note": reference_note if reference_set else None,
         "registration_status": registration_status,
@@ -368,7 +389,9 @@ def build() -> dict[str, Any]:
             "integrity_disposition": (
                 "Live detector findings, explicit quarantine, and unresolved verdict "
                 "rescores withhold public credit. Rescoped screens stay inspectable "
-                "as calibration evidence with a 0.25 scoreboard weight cap."
+                "as calibration evidence with at most a 0.25 scoreboard weight cap; "
+                "an explicit school_score_eligible=false or school_score_credit=0 "
+                "keeps links visible but excludes school wins, losses, tested counts, and scores."
             ),
         },
         "summary": {

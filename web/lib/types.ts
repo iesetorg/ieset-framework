@@ -98,6 +98,7 @@ export interface Hypothesis {
     | "invalid_history";
   _evidence_tier?: EvidenceTier;
   _evidence_public_visible?: boolean;
+  _school_score_eligible?: boolean;
   _estimator_floor?: "pass" | "fail";
   _evidence_exclusion_reasons?: string[];
   _reference_set?: boolean;

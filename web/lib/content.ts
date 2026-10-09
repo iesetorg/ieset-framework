@@ -38,6 +38,7 @@ export interface EvidenceAuditRecord {
   hypothesis_id: string;
   tier: EvidenceTier;
   public_visible: boolean;
+  school_score_eligible?: boolean;
   reference_set: boolean;
   reference_note?: string | null;
   registration_status: string;
@@ -257,6 +258,7 @@ async function parseHypothesis(absPath: string): Promise<Hypothesis | null> {
   if (evidenceAudit) {
     doc._evidence_tier = evidenceAudit.tier;
     doc._evidence_public_visible = evidenceAudit.public_visible;
+    doc._school_score_eligible = evidenceAudit.school_score_eligible;
     doc._estimator_floor = evidenceAudit.estimator_floor;
     doc._evidence_exclusion_reasons = evidenceAudit.exclusion_reasons;
     doc._reference_set = evidenceAudit.reference_set;
@@ -652,6 +654,7 @@ export interface ScoredClaim {
   claim_polarity: "aligned" | "inverted";
   evidence_type?: string;
   evidence_weight: number;
+  school_score_eligible: boolean;
   coverage_confidence?: string;
   coverage_confidence_weight: number;
   hypothesis_prior_confidence?: number;
@@ -731,6 +734,7 @@ export interface ScoreboardSecondOrderClaimGate {
   strict_gate_status?: string;
   declared_scoreboard_eligible?: boolean;
   strict_scoreboard_eligible?: boolean;
+  school_score_eligible?: boolean;
   failure_credit_kind?: string;
   failure_credit_multiplier?: number;
   required_data_gaps?: string[];
@@ -1123,6 +1127,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       const exists = hypIds.has(c.linked_hypothesis_id);
       let verdict: string | undefined;
       const linkedHyp = hypById.get(c.linked_hypothesis_id);
+      const schoolScoreEligible = linkedHyp?._school_score_eligible !== false;
       if (exists) {
         const run = await loadRunArtifacts(c.linked_hypothesis_id);
         // Public-visibility gate: only count verdicts from hypotheses that
@@ -1130,7 +1135,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         // verdict). Verdicts auto-graded against the generic falsification
         // boilerplate are excluded from school net-scores — they're not
         // dispositive enough to update a position's standing.
-        if (linkedHyp && isHypothesisPubliclyVisible(linkedHyp, run)) {
+        if (linkedHyp && schoolScoreEligible && isHypothesisPubliclyVisible(linkedHyp, run)) {
           verdict = run.verdict;
         }
       }
@@ -1163,7 +1168,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       });
       const secondOrderGate = secondOrderGateIndex?.get(`${pos.position_id}#${idx}`);
       const secondOrderStrictEligible =
-        secondOrderGate?.strict_scoreboard_eligible ?? false;
+        schoolScoreEligible && (secondOrderGate?.strict_scoreboard_eligible ?? false);
       const gateFailureMultiplier =
         secondOrderGate?.failure_credit_kind &&
         secondOrderGate.failure_credit_kind !== "not_failure_prediction_win"
@@ -1173,7 +1178,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         ? Math.min(1, gateFailureMultiplier)
         : 0;
       const integrity_weight =
-        evidence_weight *
+        (schoolScoreEligible ? evidence_weight : 0) *
         coverage_confidence_weight *
         screening.weight *
         attribution.weight *
@@ -1190,6 +1195,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         claim_polarity: polarity,
         evidence_type,
         evidence_weight,
+        school_score_eligible: schoolScoreEligible,
         coverage_confidence,
         coverage_confidence_weight,
         hypothesis_prior_confidence: linkedHyp?.prior_confidence,

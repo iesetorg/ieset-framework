@@ -80,6 +80,7 @@ export default async function HypothesisPage({
 
   const run = await loadRunArtifacts(id);
   const schoolPredictions = await schoolPredictionsForHypothesis(id);
+  const schoolLinksUnscored = h._school_score_eligible === false;
 
   const outcomeVars = h.variables?.outcome ?? [];
   const treatmentVars = h.variables?.treatment ?? [];
@@ -206,7 +207,9 @@ export default async function HypothesisPage({
           <Badge variant="green">reference set</Badge>
         )}
         <span>
-          {h._evidence_tier === "featured"
+          {schoolLinksUnscored
+            ? "Public calibration of the registered association only. Historical school links receive no school score or tested count."
+            : h._evidence_tier === "featured"
             ? "Strict registration, method gate, estimator floor, and causal-design label passed."
             : h._evidence_tier === "calibration"
             ? "Public and method-valid, but lower-identification or screening-grade evidence."
@@ -224,6 +227,12 @@ export default async function HypothesisPage({
 
       {/* ---------- RESULT BANNER: verdict first, above the fold ---------- */}
       <ResultBanner run={run} />
+      {schoolLinksUnscored && (
+        <p className="mb-8 rounded border-l-[3px] border-amber bg-[#fff8e8] px-4 py-3 text-[13px] leading-[1.55] text-ink">
+          This registered SUPPORT verdict is a same-year descriptive association across nine observed years.
+          It is not a causal wage effect. The school links below were attached after this result and are unscored.
+        </p>
+      )}
 
       {/* ---------- PLAIN-ENGLISH POLICY BRIEF ---------- */}
       <PolicyBriefCard hypothesis={h} run={run} variables={varRows} />
@@ -254,9 +263,9 @@ export default async function HypothesisPage({
               {schoolPredictions.length === 1
                 ? "1 school"
                 : `${schoolPredictions.length} schools`}{" "}
-              list this hypothesis as a test of their position. The chips below
-              are school-level scoreboard outcomes, not a second hypothesis
-              verdict.
+              list this hypothesis as a test of their position. {schoolLinksUnscored
+                ? "These historical links were attached after the result and count as untested for each school."
+                : "The chips below show school-level scoreboard outcomes, not a second hypothesis verdict."}
             </p>
           </div>
           <div className="mb-3 rounded border-l-[3px] border-amber bg-[#fff8e8] px-4 py-3 text-[13px] leading-[1.55] text-ink">
@@ -264,20 +273,26 @@ export default async function HypothesisPage({
               hypothesis verdict vs scoreboard outcome
             </div>
             <p className="m-0">
-              The banner verdict judges this hypothesis as written. The
-              scoreboard asks whether each school&apos;s polarity-corrected
-              prediction was right. Raw status is not a school win:{" "}
-              <code className="font-mono text-[12px]">SUPPORTED</code> supports
-              schools that needed <code className="font-mono text-[12px]">SUPPORTED</code>,
-              but refutes schools that needed{" "}
-              <code className="font-mono text-[12px]">REFUTED</code>.
+              {schoolLinksUnscored ? (
+                "The registered result is visible for calibration, while every linked school remains untested and receives zero score credit."
+              ) : (
+                <>
+                  The banner verdict judges this hypothesis as written. The
+                  scoreboard asks whether each school&apos;s polarity-corrected
+                  prediction was right. Raw status is not a school win:{" "}
+                  <code className="font-mono text-[12px]">SUPPORTED</code> supports
+                  schools that needed <code className="font-mono text-[12px]">SUPPORTED</code>,
+                  but refutes schools that needed{" "}
+                  <code className="font-mono text-[12px]">REFUTED</code>.
+                </>
+              )}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {schoolPredictions.map((sp) => {
               const v = (run.verdict ?? "").toLowerCase();
               let tone: "green" | "red" | "amber" | "muted" = "muted";
-              if (run.exists && run.verdict) {
+              if (!schoolLinksUnscored && run.exists && run.verdict) {
                 const supported = v.startsWith("supported");
                 const refuted =
                   v.startsWith("refuted") ||
@@ -313,7 +328,9 @@ export default async function HypothesisPage({
                   ? "REFUTED"
                   : "MIXED";
               const schoolOutcomeLabel =
-                !run.exists || !run.verdict
+                schoolLinksUnscored
+                  ? "unscored"
+                  : !run.exists || !run.verdict
                   ? "scoreboard pending"
                   : tone === "green"
                   ? "school supported"
@@ -327,11 +344,13 @@ export default async function HypothesisPage({
                   key={sp.position_id}
                   href={`/pos/${sp.position_id}`}
                   className={`group inline-flex items-center gap-2 rounded border px-3 py-1.5 text-[13px] hover:no-underline ${toneClass}`}
-                  title={`School wins if this hypothesis is ${expectedVerdictLabel}; current school-level outcome: ${schoolOutcomeLabel}${sp.polarity === "inverted" ? " (polarity-inverted)" : ""}`}
+                  title={schoolLinksUnscored
+                    ? "Historical school link added after the result; no school win, loss, or tested count."
+                    : `School wins if this hypothesis is ${expectedVerdictLabel}; current school-level outcome: ${schoolOutcomeLabel}${sp.polarity === "inverted" ? " (polarity-inverted)" : ""}`}
                 >
                   <span className="font-medium">{sp.school}</span>
                   <span className="text-[10.5px] uppercase tracking-wider opacity-75">
-                    wins if {expectedVerdictLabel}
+                    {schoolLinksUnscored ? "historical call " : "wins if "}{expectedVerdictLabel}
                   </span>
                   <span className="inline-flex items-center rounded-sm bg-white/60 px-1.5 py-[2px] text-[9.5px] font-semibold uppercase tracking-wider opacity-90">
                     {schoolOutcomeLabel}

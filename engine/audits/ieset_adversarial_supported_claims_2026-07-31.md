@@ -99,6 +99,7 @@ No content edits; fence indentation removed only.
 **Proposed v2 spec:** pcw100 screens emit `screen_positive`/`screen_negative`, converted to SUPPORTED/REFUTED only after a follow-on identified run; scoreboard weights screens at ≤0.25.
 
 ### 10. `pcw100_us_mw_bite_ratio_p10_wage` — SUPPORTED
+**Superseded 2026-10-09:** Exact replay found no state-year overlap or literal p10/minimum-wage identity. The registered association is public calibration with zero school score credit; see `pcw100_us_mw_bite_ratio_p10_wage_calibration_rescope_2026-10-09.md`. The following text is retained as the dated original audit.
 **Citation:** `engine/runs/pcw100_us_mw_bite_ratio_p10_wage/result_card.md`.
 - Mechanical identity: bite ratio = MW/median wage; in high-bite states the p10 wage *is* the minimum wage. R²=0.975 with state/year indicators confirms near-identity, not an estimated effect. The hypothesis is unfalsifiable as constructed — a violation of the framework's own falsification-first standard.
 - Quartile lists overlap: HI, MA, MD, MS, NY appear in *both* low-policy and high-policy groups. A unit in both extreme quartiles is a pipeline bug that invalidates the contrast.

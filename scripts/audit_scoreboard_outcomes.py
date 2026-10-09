@@ -219,6 +219,8 @@ def score_positions() -> dict[str, Any]:
     positions: dict[str, dict[str, Any]] = {}
     raw_status_misread_risks: list[dict[str, Any]] = []
     public_claim_links = 0
+    school_scored_public_links = 0
+    unscored_public_links: list[dict[str, Any]] = []
 
     for path in sorted((ROOT / "positions").glob("*.yaml")):
         if path.name.startswith("_"):
@@ -247,16 +249,27 @@ def score_positions() -> dict[str, Any]:
             cap = (evidence_index.get(hypothesis_id) or {}).get("scoreboard_weight_cap")
             if cap is not None:
                 weight = min(weight, float(cap))
-            if not is_public:
-                outcome = "untested"
-                prediction = claim.get("school_prediction")
-                polarity = claim.get("claim_polarity") or "aligned"
-            else:
-                coverage = coverage_index.get((position_id, claim_index)) or {}
-                prediction = coverage.get("school_prediction") or claim.get("school_prediction")
-                polarity = coverage.get("polarity") or claim.get("claim_polarity") or "aligned"
-                outcome = position_outcome(verdict_class(verdict), prediction, polarity)
+            school_score_eligible = bool(
+                is_public
+                and (evidence_index.get(hypothesis_id) or {}).get("school_score_eligible", True)
+            )
+            coverage = coverage_index.get((position_id, claim_index)) or {}
+            prediction = coverage.get("school_prediction") or claim.get("school_prediction")
+            polarity = coverage.get("polarity") or claim.get("claim_polarity") or "aligned"
+            if is_public:
                 public_claim_links += 1
+            if school_score_eligible:
+                outcome = position_outcome(verdict_class(verdict), prediction, polarity)
+                school_scored_public_links += 1
+            else:
+                outcome = "untested"
+                if is_public:
+                    unscored_public_links.append({
+                        "position_id": position_id,
+                        "claim_index": claim_index,
+                        "hypothesis_id": hypothesis_id,
+                        "reason": "school_score_eligible_false",
+                    })
 
             counts[outcome] += 1
             adjusted_counts["net_score"] += outcome_score(outcome) * weight
@@ -355,8 +368,11 @@ def score_positions() -> dict[str, Any]:
             "signal_rule": "Rows with |weighted net| <= max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",
             "quality_adjustment_rule": "Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical_case_multi_metric=0.25.",
             "benchmark_control_rule": "Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.",
+            "school_score_gate": "Public calibration records with school_score_eligible=false keep their links visible but count as untested for every school.",
         },
         "public_claim_links": public_claim_links,
+        "school_scored_public_links": school_scored_public_links,
+        "unscored_public_links": unscored_public_links,
         "positions": positions,
         "raw_status_misread_risks": raw_status_misread_risks,
     }
@@ -392,6 +408,7 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "- The audit keeps a separate signed lean so no-call rows still show whether the net is positive, negative, or flat.",
         "- Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical=0.25.",
         "- Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.",
+        "- Public calibration links with `school_score_eligible=false` remain listed but are untested for all schools.",
         "",
         "## Ranked School Outcomes",
         "",

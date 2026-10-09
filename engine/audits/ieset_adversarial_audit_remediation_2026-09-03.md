@@ -5,6 +5,8 @@
 **Source audit:** `engine/audits/ieset_adversarial_supported_claims_2026-07-31.md` (adversarial audit of 20 high-confidence SUPPORTED claims, 2026-07-31, landed verbatim from run `run_ieset_20260731_225132_adversary_kimi_cli`)  
 **Remediation gate:** human (this file records dispositions; it is not a silent patch). All corrections are additive — no run content was deleted or overwritten.
 
+**2026-10-09 supersession for claim 10:** An exact replay disproved the asserted row-overlap bug and literal p10/minimum-wage identity. The PCW100 bite-ratio result is now public descriptive calibration, with all 17 post-result school links unscored. See `engine/audits/pcw100_us_mw_bite_ratio_p10_wage_calibration_rescope_2026-10-09.md`; the September table remains a historical snapshot.
+
 ## Summary
 
 - Every cross-cutting finding (X1–X7) has an explicit disposition; every audited claim (20/20) has an explicit disposition.

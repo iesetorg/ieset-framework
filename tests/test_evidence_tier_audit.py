@@ -58,14 +58,16 @@ def test_featured_is_stricter_than_public_visibility():
     assert all(record["screening_flags"] == [] for record in featured)
 
 
-def test_quarantined_run_cannot_receive_public_credit():
+def test_pcw100_public_calibration_has_explicit_zero_school_credit():
     path = ROOT / "hypotheses" / "distribution" / "pcw100_us_mw_bite_ratio_p10_wage.yaml"
     assert path.exists()
     record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
-    assert record["audit_disposition"] == "quarantined_pending_v2"
-    assert record["public_visible"] is False
-    assert record["tier"] == "archive"
-    assert "audit_quarantined_pending_v2" in record["exclusion_reasons"]
+    assert record["audit_disposition"] == "rescoped_descriptive"
+    assert record["public_visible"] is True
+    assert record["tier"] == "calibration"
+    assert record["school_score_eligible"] is False
+    assert record["scoreboard_weight_cap"] == 0.0
+    assert record["exclusion_reasons"] == []
 
 
 def test_rescoped_screen_stays_inspectable_with_score_cap():
@@ -93,3 +95,10 @@ def test_incomplete_secondary_endpoint_caps_causal_run_at_calibration():
     assert record["public_visible"] is True
     assert record["run_tier_recommendation"] == "calibration"
     assert record["tier"] == "calibration"
+
+
+def test_explicit_zero_credit_signal_holds_public_school_scoring():
+    assert evidence_tiers.school_score_eligible_for_public_run(True, {"school_score_credit": 0}) is False
+    assert evidence_tiers.school_score_eligible_for_public_run(True, {"school_score_eligible": False}) is False
+    assert evidence_tiers.school_score_eligible_for_public_run(True, {}) is True
+    assert evidence_tiers.school_score_eligible_for_public_run(False, {}) is False
