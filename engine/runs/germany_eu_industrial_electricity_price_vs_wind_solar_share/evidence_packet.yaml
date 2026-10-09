@@ -1,0 +1,261 @@
+packet_version: 1
+generated_utc: '2026-10-09T17:47:40+00:00'
+repository:
+  root: .
+  git_commit: e26c1cfc3c0ce31ef95a5e18ca8e50fe55d21b73
+hypothesis:
+  id: germany_eu_industrial_electricity_price_vs_wind_solar_share
+  legacy_id: null
+  path: hypotheses/energy/germany_eu_industrial_electricity_price_vs_wind_solar_share.yaml
+  school: null
+  topic: energy
+  claim: 'Higher wind+solar shares raise industrial (not wholesale) electricity prices:
+    across EU countries, years with a higher wind+solar share of generation have higher
+    non-household electricity prices, with Germany the headline case.'
+verdict:
+  raw: INCONCLUSIVE
+  bucket: inconclusive
+  reason: 'EU27 2008-24, country+year FE: +10pp wind+solar share -> -0.5% industrial
+    price excl. VAT (p=0.87, n=458); incl. all taxes -0.1% (p=0.97); excl. all taxes
+    +1.4% (p=0.63). Germany 2010->2024: share 8%->42%, price EUR0.103->0.205/kWh (rank
+    3/27 in 2024)'
+  status: null
+preregistration:
+  claim: 'Higher wind+solar shares raise industrial (not wholesale) electricity prices:
+    across EU countries, years with a higher wind+solar share of generation have higher
+    non-household electricity prices, with Germany the headline case.'
+  falsification_rule: 'OLS log(price) ~ wind_solar_share + country FE + year FE, SE
+    clustered by country, EU27 2008-2024 annual. SUPPORTED (renewables raise industrial
+    prices) if beta > 0 AND p < 0.05. REFUTED if beta < 0 AND p < 0.05. INCONCLUSIVE
+    otherwise. Secondary (reported, not decisive): same model for prices incl. all
+    taxes (I_TAX) and excl. all taxes (X_TAX); Germany-only time series (n~17) descriptive
+    correlation and 2010->2024 change in price vs share.'
+  threshold: beta>0 & p<0.05
+  estimator:
+    template: panel_fe
+  steelman: hypotheses/steelman/germany_eu_industrial_electricity_price_vs_wind_solar_share.md
+reproduction:
+  run_dir: engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share
+  runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py
+  replication_script: engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share/replication.py
+  suggested_command: python engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share/replication.py
+data:
+  inputs:
+  - name: input_1
+    publisher: eurostat
+    series_id: nrg_bal_peh
+    vintage_file: data/vintages/eurostat/nrg_bal_peh@2026-10-09T174124Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 85bce1bcfe3eb3d5e67d5cda72ad5969902156578c7964be5de4a4113c8bd4ee
+      computed_sha256: 85bce1bcfe3eb3d5e67d5cda72ad5969902156578c7964be5de4a4113c8bd4ee
+      status: match
+    source:
+      type: official
+      url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_bal_peh?format=JSON
+      methodology_url: https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh
+      license: cc_by_4_0
+      fetch_utc: '2026-10-09T17:41:24.742956+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-10-09T174146Z.yaml
+    coverage:
+      start_date: '1990'
+      end_date: '2024'
+      frequency: annual
+      rows: 5336
+      units: per dataset metadata
+      currency: null
+    extra:
+      label: Electricity and derived heat production by type of fuel
+      updated: 2026-06-02T23:00:00+0200
+      filter_params:
+        nrg_bal: GEP
+        unit: GWH
+        siec:
+        - TOTAL
+        - RA300
+        - RA410
+        - RA420
+      columns:
+      - freq
+      - nrg_bal
+      - siec
+      - unit
+      - geo_code
+      - period
+      - value
+      vintage_utc: null
+  - name: input_2
+    publisher: eurostat
+    series_id: nrg_pc_205
+    vintage_file: data/vintages/eurostat/nrg_pc_205@2026-10-09T174119Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: e30153269010042f0194ffa0890153ef4d21cfe1b4ad8085e8f974ac66fb0882
+      computed_sha256: e30153269010042f0194ffa0890153ef4d21cfe1b4ad8085e8f974ac66fb0882
+      status: match
+    source:
+      type: official
+      url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_pc_205?format=JSON
+      methodology_url: https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205
+      license: cc_by_4_0
+      fetch_utc: '2026-10-09T17:41:19.475679+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-10-09T174146Z.yaml
+    coverage:
+      start_date: 2007-S1
+      end_date: 2026-S1
+      frequency: S
+      rows: 1423
+      units: per dataset metadata
+      currency: null
+    extra:
+      label: Electricity prices for non-household consumers - bi-annual data
+      updated: 2026-10-09T11:00:00+0200
+      filter_params:
+        nrg_cons: MWH2000-19999
+        tax: X_VAT
+        currency: EUR
+        unit: KWH
+        siec: E7000
+      columns:
+      - freq
+      - siec
+      - nrg_cons
+      - unit
+      - tax
+      - currency
+      - geo_code
+      - period
+      - value
+      vintage_utc: null
+  - name: input_3
+    publisher: eurostat
+    series_id: nrg_pc_205
+    vintage_file: data/vintages/eurostat/nrg_pc_205@2026-10-09T174120Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: 7a93bdcaa72f47bbd09359faacc53fd44be8ee8fd68fae7a807ab6ffd5317845
+      computed_sha256: 7a93bdcaa72f47bbd09359faacc53fd44be8ee8fd68fae7a807ab6ffd5317845
+      status: match
+    source:
+      type: official
+      url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_pc_205?format=JSON
+      methodology_url: https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205
+      license: cc_by_4_0
+      fetch_utc: '2026-10-09T17:41:20.249802+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-10-09T174146Z.yaml
+    coverage:
+      start_date: 2007-S1
+      end_date: 2026-S1
+      frequency: S
+      rows: 1423
+      units: per dataset metadata
+      currency: null
+    extra:
+      label: Electricity prices for non-household consumers - bi-annual data
+      updated: 2026-10-09T11:00:00+0200
+      filter_params:
+        nrg_cons: MWH2000-19999
+        tax: I_TAX
+        currency: EUR
+        unit: KWH
+        siec: E7000
+      columns:
+      - freq
+      - siec
+      - nrg_cons
+      - unit
+      - tax
+      - currency
+      - geo_code
+      - period
+      - value
+      vintage_utc: null
+  - name: input_4
+    publisher: eurostat
+    series_id: nrg_pc_205
+    vintage_file: data/vintages/eurostat/nrg_pc_205@2026-10-09T174121Z.parquet
+    exists_locally: true
+    hash:
+      declared_sha256: e857d852b874d29ca7f17e6083362091870f607f1cd2ee3862d18c721b9c8bd9
+      computed_sha256: e857d852b874d29ca7f17e6083362091870f607f1cd2ee3862d18c721b9c8bd9
+      status: match
+    source:
+      type: official
+      url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_pc_205?format=JSON
+      methodology_url: https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205
+      license: cc_by_4_0
+      fetch_utc: '2026-10-09T17:41:21.818842+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-10-09T174146Z.yaml
+    coverage:
+      start_date: 2007-S1
+      end_date: 2026-S1
+      frequency: S
+      rows: 1418
+      units: per dataset metadata
+      currency: null
+    extra:
+      label: Electricity prices for non-household consumers - bi-annual data
+      updated: 2026-10-09T11:00:00+0200
+      filter_params:
+        nrg_cons: MWH2000-19999
+        tax: X_TAX
+        currency: EUR
+        unit: KWH
+        siec: E7000
+      columns:
+      - freq
+      - siec
+      - nrg_cons
+      - unit
+      - tax
+      - currency
+      - geo_code
+      - period
+      - value
+      vintage_utc: null
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified
+    input_count: 4
+    official_source_count: 4
+    manual_source_count: 0
+    hash_status_counts:
+      match: 4
+    missing_series_count: 0
+artifacts:
+- path: hypotheses/energy/germany_eu_industrial_electricity_price_vs_wind_solar_share.yaml
+  sha256: cf1191382811886df04675552ba2bdce87ff83a1bf24c472d56ef9f970ab2762
+  bytes: 2902
+- path: engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share/manifest.yaml
+  sha256: 001474d9164713f80eb44c2780e647b1ec55f31a6a9f939c93ab4598f371e5f7
+  bytes: 1203
+- path: engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share/diagnostics.json
+  sha256: 8b884f032b5f9b022bc0bb87243650096c2ea638c30eefcc950bfe9d1e409148
+  bytes: 3614
+- path: engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share/result_card.md
+  sha256: 4bb6acb2780f4cb3d8dc7cebccd7a57f6cddb8953d422e58621a817b5a2e27a5
+  bytes: 3987
+- path: engine/runs/germany_eu_industrial_electricity_price_vs_wind_solar_share/replication.py
+  sha256: 72b40bd98aed00561d78641aacba6427e049b6361178681a366f509c1c5657e7
+  bytes: 601
+- path: hypotheses/steelman/germany_eu_industrial_electricity_price_vs_wind_solar_share.md
+  sha256: ddd09fcec6ffb54ccf2f4bd91e2c4c65f266ee202813d852dd505ec048b7054b
+  bytes: 1295
+references:
+- kind: source
+  publisher: eurostat
+  series_id: nrg_bal_peh
+  url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_bal_peh?format=JSON
+- kind: methodology
+  publisher: eurostat
+  series_id: nrg_bal_peh
+  url: https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh
+- kind: source
+  publisher: eurostat
+  series_id: nrg_pc_205
+  url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nrg_pc_205?format=JSON
+- kind: methodology
+  publisher: eurostat
+  series_id: nrg_pc_205
+  url: https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205
+caveats: []

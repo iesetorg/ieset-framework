@@ -94,7 +94,7 @@ if __name__ == "__main__":
 ''')
         man = dict(hypothesis_id=hid, spec=str(spec_p.relative_to(ROOT)), spec_sha256=sha(spec_p), spec_commit=B["spec_commit"],
                    ledger=f"{B['dir']}/PREREG_LEDGER.json", runner=B["runner"], results=rel_results, run_utc=r["run_utc"],
-                   inputs=[dict(path=i, sha256=(sha(ROOT / i) if (ROOT / i).exists() else None)) for i in r["inputs"]], generated_utc=now)
+                   vintages=[dict(vintage_file=i, sha256=(sha(ROOT / i) if (ROOT / i).exists() else None)) for i in r["inputs"]], generated_utc=now)
         (out / "manifest.yaml").write_text(yaml.safe_dump(man, sort_keys=False))
         print(label, hid)
 main()
