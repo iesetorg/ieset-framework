@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_almp_epl_low_education_unemployment_temporal_holdout_v2
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: "+"
+claim: >-
+  Within the fixed OECD candidate roster, the 2020-to-2021 change in public
+  active-labour-market-programme spending as a share of GDP has a less negative
+  association with the 2021-to-2022 change in low-education unemployment where
+  2019 employment protection was stricter. The discriminating descriptive
+  coefficient is positive for change in ALMP spending times baseline EPL.
+methodology_note: >-
+  New-ID, out-of-time descriptive calibration of
+  oecd_almp_epl_low_education_unemployment_interaction_panel. The old
+  1996-2019 fitted outcome period is disjoint from this test's 2021-2022
+  outcomes. The earlier PARTIAL run and 446-observation/24-country summary were
+  known before registration; old fitted country-year keys and source manifest
+  were not preserved. The key-only feasibility scan found 73 four-source
+  country-year keys in 37 countries, including 36 countries with both exposure
+  years; no selected magnitudes, null masks, signs, or fits were read. This
+  short COVID-era contrast does not replicate the old model, identify an ALMP
+  policy effect, or test the original Danish/German reform mechanism.
+evidence_type: associational
+sample:
+  countries: &roster [AUS, AUT, BEL, BGR, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK,
+    ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ISR, ITA, JPN, KOR,
+    LTU, LUX, LVA, MEX, NLD, NOR, NZL, PER, POL, PRT, ROU, SVK, SVN, SWE,
+    TUR, USA]
+  period: [2020, 2022]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Fix all 42 old-spec countries before reading values. Exposure years are
+      exactly 2020 and 2021; outcomes are the same country's exact next
+      calendar year, 2021 and 2022. Use only countries with both complete
+      exposure/outcome pairs. Do not substitute later years or countries.
+    - >-
+      OECD low-education unemployment must select SEX=_T, AGE=Y25T64,
+      ATTAINMENT_LEV=ISCED11A_0T2 and one unique row per country/year. OECD
+      SOCX must select UNIT_MEASURE=PT_B1GQ, EXPEND_SOURCE=ES10,
+      SPENDING_TYPE=_T, PROGRAMME_TYPE=TP60, PRICE_BASE=_Z and one unique row
+      per country/year. OECD EPL must select EPR_V1 in 2019 and one unique
+      country/year; map published country names with the frozen runner map.
+      WDI GDP growth must have indicator_id=NY.GDP.MKTP.KD.ZG and one unique
+      country/year.
+    - >-
+      Keep only finite complete pairs with unemployment within [0,100],
+      ALMP spending within [0,10] percent GDP, baseline EPL within [0,6],
+      and real GDP growth within [-100,100] percent. Drop invalid countries
+      without interpolation, imputation, clipping, or winsorization. Require
+      30 countries and 60 country-year pairs or return INCONCLUSIVE.
+variables:
+  outcome:
+    - name: next_year_low_education_unemployment_pct
+      source: oecd:DSD_LMS_low_education_unemployment_rate
+      transformation: >-
+        Exact-year OECD unemployment rate among all-sex 25-64-year-olds with
+        below-upper-secondary education, at exposure year plus one.
+  treatment:
+    - name: almp_spending_pct_gdp
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: >-
+        Public active-labour-market programme spending, SOCX TP60, as percent
+        of GDP, in exposure year 2020 or 2021.
+    - name: baseline_epl_2019
+      source: oecd:EPL_OV
+      transformation: >-
+        Official OECD EPR Version 1, 0-6 index for 2019; fixed before the
+        COVID-period ALMP/outcome contrast.
+  controls:
+    - name: real_gdp_growth_pct
+      source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+      transformation: Exposure-year annual real GDP growth percentage.
+intervention_channel: fiscal
+intervention_channel_justification: >-
+  The measured exposure is public ALMP spending, but the design tests a
+  spending/unemployment association, not an intervention effect.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    Use balanced two-year country first differences, algebraically equivalent
+    to country and exposure-year fixed effects here. Regress change in
+    next-year low-education unemployment (2022 minus 2021) on change in
+    exposure-year ALMP spending (2021 minus 2020), that spending change
+    multiplied by (2019 EPR_V1 minus 1.0), and change in exposure-year WDI
+    real GDP growth (2021 minus 2020), plus an intercept. Do not include a
+    separate baseline EPL main effect because country effects absorb it.
+    Fit OLS with country-clustered CR1 uncertainty on the one-difference-per-
+    country sample and two-sided Student t p values with countries minus one
+    degrees of freedom. No other specification or outcome is a verdict test.
+falsification:
+  test: fixed_oecd_almp_epl_next_year_two_period_difference
+  rule: >-
+    Return INCONCLUSIVE if exact sources or registration are unverified, if
+    selected source keys duplicate, if fewer than 30 complete countries and
+    60 country-year pairs remain, or if the design is rank deficient or
+    clustered uncertainty is nonfinite. Otherwise SUPPORTED only if the
+    interaction coefficient is positive with two-sided p<=0.01 and the ALMP
+    main coefficient evaluated at EPL=1.0 is negative. REFUTED only if the
+    interaction is negative with two-sided p<=0.01. Every other estimable
+    result is PARTIAL. The sole primary test is allocated alpha 0.01 as a
+    conservative single-test calibration family; this does not control the
+    error rate over all IESET searches. No verdict grants causal, policy, or
+    school-score credit.
+  threshold:
+    family_id: oecd_almp_epl_temporal_calibration_2026_10_09
+    family_size: 1
+    family_alpha: 0.01
+    family_p_max: 0.01
+    min_countries: 30
+    min_observations: 60
+    exposure_years: [2020, 2021]
+    outcome_years: [2021, 2022]
+    baseline_epl_year: 2019
+    baseline_epl_center: 1.0
+    fixed_key_upper_bound: 73
+    both_year_key_countries: 36
+    old_hypothesis_id: oecd_almp_epl_low_education_unemployment_interaction_panel
+    old_registered_period: [1996, 2019]
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    school_score_eligible: false
+    school_score_credit: 0
+    source_files:
+      outcome:
+        path: data/vintages/oecd/DSD_LMS_low_education_unemployment_rate@2026-05-05T120348Z.parquet
+        sha256: 779a47fde8e13ecd4fae28b0cb51cb475fd484edf0c83de07f4d70d5edd8f6ee
+        manifest: data/manifests/fetch_run_2026-05-05T120357Z.yaml
+        manifest_sha256: ce1c010dad126c65218a8ca087ecd2a6220b806e553c1dc7611db0d40b35fc84
+      almp:
+        path: data/vintages/oecd/DSD_SOCX_DF_SOCX_AGG@2026-05-05T210247Z.parquet
+        sha256: 93e7e29b24dc791baf22833ae5596b4a381a366ddd0d78499bf59f7b80786124
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      epl:
+        path: data/vintages/oecd/OECD.ELS.EMP_DSD_EPL_OV_DF_EPL_OV_1.0@2026-07-23T154113Z.parquet
+        sha256: 8a25f91e01153564e8db18723e69ed41298c339255a6ac41b67942dc86022fcd
+        manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+        manifest_sha256: c2215e0e796c4697d0596848a7498c7a369e5fb2e9baed660e25a8791ffa580d
+      gdp:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+prior_confidence: 0.50
+disclosure: >-
+  The old PARTIAL result and source-key availability are known. Country-year
+  holdout observations are disjoint, but countries and data publishers overlap.
+  Pandemic shutdowns, job-retention programmes, shifts out of the labour
+  force, and GDP-denominator changes can jointly move ALMP spending and
+  measured unemployment. OECD describes low-education workers as unusually
+  exposed and unemployment as incomplete labour slack during COVID-19. The
+  2019 EPL index is a legal-rules proxy, not a full flexicurity measure. A
+  two-year descriptive association cannot validate the old policy mechanism.
+steelman: hypotheses/steelman/oecd_almp_epl_low_education_unemployment_temporal_holdout_v2.md
+scope:
+  period: [2020, 2022]
+  countries: *roster
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market, welfare_architecture]
+  treatment_tags: [active_labour_market_policy, employment_protection, temporal_holdout]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
