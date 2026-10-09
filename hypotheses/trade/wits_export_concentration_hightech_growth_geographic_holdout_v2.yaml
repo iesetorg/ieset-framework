@@ -1,0 +1,109 @@
+hypothesis_id: wits_export_concentration_hightech_growth_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "-"
+claim: >
+  Among countries excluded from the old 39-country fit, a more concentrated
+  export-product basket at year t predicts slower growth of high-technology
+  export value in current US dollars from exact t to t+1, conditional on
+  country and treatment-year effects.
+methodology_note: >
+  New-ID country-disjoint measured-association follow-up to
+  wits_export_concentration_hightech_drag_panel. Its same-commit SUPPORTED old
+  result was known before this registration. The historical runner filtered
+  its panel to the old specification's explicit 39-country roster before
+  fitting; every listed country is excluded here, even if it had no fitted
+  old row. The concentration index is a WITS export-product HHI derived from
+  mirrored trade reports; the high-technology export value is a World Bank
+  WDI mirror of TX.VAL.TECH.CD, whose inputs may overlap the trade records
+  underlying HHI. The exact t-to-t+1 growth outcome narrows the old level
+  association and does not identify an innovation or policy mechanism. This
+  is one of two tests in a fixed Bonferroni family. The data sufficiency gate
+  follows a country/year key-only envelope; held-out values and null masks
+  were not inspected before registration. No causal or school-score credit.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1996, 2021]
+  temporal_structure: panel
+  exclusion_rules:
+    - "Exclude all 39 countries in the historical old specification: ARG AUS AUT BEL BRA CAN CHE CHL CHN COL DEU DNK ESP FIN FRA GBR HUN IDN IND IRL ITA JPN KOR MEX MYS NLD NOR NZL PER PHL POL PRT SGP SWE THA TUR USA VNM ZAF."
+    - Retain ISO 3166-1 alpha-3 countries only; exclude aggregates and every old-country row.
+    - Require exact t and t+1 high-technology export values, export-product HHI at t, finite values, positive export values, and at least five usable treatment years per country.
+    - Do not impute, interpolate, substitute a nearest year, or switch pinned vintages.
+variables:
+  outcome:
+    - name: next_year_log_hightech_export_value_growth
+      source: wits:high_tech_exports
+      transformation: natural log of exact t+1 current-US-dollar value minus natural log of exact t value; both positive
+  treatment:
+    - name: export_product_hhi
+      source: wits:export_product_hhi_wits
+      transformation: level at treatment year t; higher means more concentrated
+  controls: []
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    One fixed primary coefficient with country and treatment-year effects,
+    country-clustered uncertainty, no covariate search, and a two-test
+    Bonferroni rule.
+falsification:
+  rule: >
+    If fewer than 500 complete country-year pairs or 40 countries survive the
+    five-year rule, or the primary estimate or clustered uncertainty is
+    unidentified or nonfinite, return INCONCLUSIVE. Otherwise SUPPORT requires
+    a negative coefficient at two-sided p<=0.10/2; REFUTATION requires a
+    positive coefficient at the same threshold. Every other estimable result
+    is PARTIAL. Apply the same sample and significance rule to adverse results.
+  test: country_disjoint_exact_next_year_wits_panel_fe
+  threshold:
+    family_id: second_legacy_wits_geographic_holdouts_2026_10_09
+    family_size: 2
+    family_alpha: 0.10
+    family_p_max: 0.05
+    expected_sign: "-"
+    min_observations: 500
+    min_countries: 40
+    min_pairs_per_country: 5
+    old_hypothesis_id: wits_export_concentration_hightech_drag_panel
+    old_result_bucket: SUPPORTED
+    old_country_count: 39
+    old_country_ids: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, DEU, DNK, ESP, FIN, FRA, GBR, HUN, IDN, IND, IRL, ITA, JPN, KOR, MEX, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, SGP, SWE, THA, TUR, USA, VNM, ZAF]
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    source_files:
+      treatment:
+        source: wits:export_product_hhi_wits
+        path: data/vintages/wits/export_product_hhi_wits@2026-05-16T094546Z.parquet
+        sha256: 88528dd4d46c0efebc928f2c4c3ac63d2b60bee5505d313184342b8e071b7d47
+        manifest: data/manifests/fetch_run_wits_export_product_hhi_2026-05-16T094546Z.json
+        series_id: export_product_hhi_wits
+        source_url: https://datacatalog.worldbank.org/search/dataset/0064718/herfindahl-hirschman-product-concentration-index-export
+      outcome:
+        source: wits:high_tech_exports
+        path: data/vintages/wits/high_tech_exports@2026-07-23T153650Z.parquet
+        sha256: 812e79d58bb1a18c4e6725639d7faec21e8302d87201cd58e1a6027bb8d30cb1
+        manifest: data/manifests/fetch_run_2026-07-23T153659Z.yaml
+        series_id: high_tech_exports
+        source_url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.CD?format=json
+prior_confidence: 0.40
+disclosure: >
+  The old SUPPORTED result was seen before this registration. WITS product HHI
+  and the high-technology export value can share underlying trade records;
+  forward timing does not remove all source coupling. Dollar values can change
+  with prices and exchange rates. An association is not evidence of innovation,
+  policy effects, or consumer welfare. Other IESET tests may share sources or
+  eligible countries. Any result is descriptive calibration with zero school
+  credit.
+steelman: hypotheses/steelman/wits_export_concentration_hightech_growth_geographic_holdout_v2.md
+scope:
+  period: [1996, 2021]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
