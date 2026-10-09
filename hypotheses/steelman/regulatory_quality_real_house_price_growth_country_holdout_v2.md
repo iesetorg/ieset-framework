@@ -1,0 +1,7 @@
+# Regulatory quality and real residential price growth
+
+The strongest negative case is that clear, predictable rules can ease construction and market entry, making housing supply more responsive. If that channel dominates, a higher national WGI regulatory-quality estimate in year t could precede lower real residential-property-price growth in the following year.
+
+The strongest contrary case is that the WGI score is a broad perception composite, not a measure of zoning or housing approvals. Better governance can coincide with stronger income expectations, credit supply, inward migration, or urban demand. Those forces can increase prices even when supply rules improve. A country/year fixed-effects association with current price growth, income, and rule of law cannot separate them or identify a housing-policy effect.
+
+The old `housing_affordability_broad_scope_market` and `housing_supply_freedom_affordability` candidates both used this measured pair as a proxy, were same-commit **PARTIAL**, and had known results before this registration. The 40 countries in their identical old rosters are excluded. The remaining 25 countries and BIS source were used in a separate price-to-income follow-up, so the observations are not globally unseen. Any negative, positive, or null estimate must be reported under the fixed 84-opportunity correction. This test does not measure affordability, zoning, construction, or household welfare and cannot change school scores.
