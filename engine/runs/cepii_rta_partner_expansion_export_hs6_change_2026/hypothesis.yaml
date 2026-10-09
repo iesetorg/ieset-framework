@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cepii_rta_partner_expansion_export_hs6_change_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "+"
+claim: >-
+  In country-years with no other nearby CEPII regional-trade-agreement partner
+  expansion, a year-t net increase in RTA-covered partner count predicts higher
+  growth in the number of exported HS6 products from t-1 to t+1, conditional
+  on the preceding t-3 to t-1 product-count trend and the t-1 count level.
+methodology_note: >-
+  Prospective conditional descriptive calibration. The first CEPII FTA-growth
+  result and related WITS variety screens were visible before this design.
+  This is a new outcome and estimand, not an independent confirmation or a
+  treaty-effect test. Full frozen contract is in
+  engine/audits/cepii_rta_hs6_prereg_2026-10-09.md.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1993, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+    - Use the exact committed key roster; its registration-time country selection used the frozen pycountry 24.6.1 current-country ISO3 allowlist.
+    - Require exactly one WITS WLD/999999 exported-HS6-count row for every year t-3 through t+1; no interpolation.
+    - Event windows have a CEPII indicator equal to one at t and no other one in the closed t-3 through t+1 window.
+    - Control windows have no CEPII indicator equal to one anywhere in the closed t-3 through t+1 window.
+    - If any frozen roster count is missing, negative, noninteger, or nonfinite, retain an INCONCLUSIVE source-contract result; do not drop selected rows.
+variables:
+  outcome:
+    - name: exported_hs6_product_count_forward_log_change
+      source: wits:unique_hs6_products
+      transformation: log1p(count_t+1) minus log1p(count_t-1)
+      notes: Direct number of exported HS6 product categories to world partner, not export complexity or domestic product availability.
+  treatment:
+    - name: isolated_net_rta_partner_coverage_expansion
+      source: cepii:fta_accession_indicator
+      transformation: binary event at t with no other event from t-3 through t+1
+      notes: Constructed from a net annual increase in CEPII fta_wto-covered partner count; not a statutory tariff cut or first treaty accession.
+  controls:
+    - name: pre_event_exported_product_count_log_change
+      source: wits:unique_hs6_products
+      transformation: log1p(count_t-1) minus log1p(count_t-3)
+    - name: baseline_exported_product_count_log_level
+      source: wits:unique_hs6_products
+      transformation: log1p(count_t-1)
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    OLS on the frozen event/control key roster with both controls specified
+    above. Country-cluster CR1 finite correction; two-sided Student t with
+    number of country clusters minus one degrees of freedom. Separate pretrend
+    imbalance regression is diagnostic, not a visibility gate. No automatic
+    covariate dropping or outcome-dependent sample tuning.
+falsification:
+  test: cepii_rta_partner_expansion_wits_hs6_conditional_panel_fe
+  rule: >-
+    INCONCLUSIVE if a source hash or key roster differs, any selected WITS
+    value fails the finite nonnegative integer contract, fewer than 100 event
+    rows in 50 countries, 800 control rows in 80 countries, or 15 event cohorts
+    survive, or if the fixed-effect design is rank deficient or clustered
+    uncertainty is invalid. Otherwise SUPPORTED only if the adjusted event
+    coefficient is at least ln(1.05) with two-sided country-cluster t p<=0.005;
+    REFUTED only if it is at most -ln(1.05) at the same cutoff. All other
+    estimable results are PARTIAL. The pre-event trend imbalance is reported
+    without an equivalence or significance promotion gate.
+  threshold:
+    p_max_two_sided: 0.005
+    absolute_log_effect_min: 0.04879016416943205
+    min_event_rows: 100
+    min_event_countries: 50
+    min_control_rows: 800
+    min_control_countries: 80
+    min_event_cohorts: 15
+    expected_event_rows_from_keys: 169
+    expected_control_rows_from_keys: 1376
+    roster_sha256: 57aebe9d5cc9012777b93ed2bd5331313b853857c3913bfaf0850ba963f10ebe
+    roster_path: data/pinned_evidence/cepii_rta_hs6_key_roster_2026.csv
+    iso3_allowlist_sha256: cc306b7deb4ff39f16097111f5a48412bc49e268a7fa5dfc42a9c9427adf0e6b
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    source_files:
+      treatment:
+        path: data/vintages/cepii/fta_accession_indicator@2026-05-15T172455Z.parquet
+        sha256: 3125c268836d9e1e66d018d4b7d0acf3a7c918bd9f7fd77c3814109f65c09645
+        manifest: data/manifests/fetch_run_2026-05-15T172455Z_cepii_fta_accession.yaml
+      outcome:
+        path: data/vintages/wits/unique_hs6_products@2026-07-23T153652Z.parquet
+        sha256: 29db44b85d263bfc92307182b19f3baf4073dae446e5c3af37d82a284bfb2934
+        manifest: data/manifests/fetch_run_2026-07-23T153659Z.yaml
+prior_confidence: 0.4
+disclosure: >-
+  The old CEPII FTA-growth/openness test was PARTIAL; CEPII FTA exposure to
+  private investment was PARTIAL; an earlier consumer-choice variety proxy
+  screen was REFUTED, while related WITS export-count-control and import-variety
+  questions were registered. This source reuse and endpoint selection rule out
+  independent-confirmation language. The p<=0.005 rule is a conservative local
+  screen, not global family-wise correction. RTA-partner coverage can reflect
+  agreement composition or data coverage and is selected by trade prospects.
+  Controls can retain older RTA coverage. Product count can shift with
+  classification and reporting; it does not measure complexity. No policy,
+  school, causal, or featured credit follows from this association.
+steelman: hypotheses/steelman/cepii_rta_partner_expansion_export_hs6_change_2026.md
+scope:
+  period: [1993, 2019]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
