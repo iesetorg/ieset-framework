@@ -2525,9 +2525,17 @@ def infer_claim_direction(spec: dict, outcome_name: str | None = None) -> str:
             return "-"
         if _re.search(r"(?:β|beta|coefficient|coef)[^.;:]{0,120}\bpositive\b", supported_clause):
             return "+"
-        if _re.search(r"(?:β|beta|coefficient|coef|gap)[^.;:]{0,80}<\s*0", supported_clause):
+        # Keep the inequality attached to the coefficient itself. The old
+        # broad scan could cross into the significance cutoff in phrases like
+        # "coefficient has the predicted sign at p<0.10" and mistake p<0.10
+        # for a negative treatment coefficient.
+        coefficient_inequality = (
+            r"(?:β|beta|coefficient|coef|gap)\s*"
+            r"(?:(?:is|must be|should be|of)\s*)?"
+        )
+        if _re.search(coefficient_inequality + r"<\s*0\b", supported_clause):
             return "-"
-        if _re.search(r"(?:β|beta|coefficient|coef|gap)[^.;:]{0,80}>\s*0", supported_clause):
+        if _re.search(coefficient_inequality + r">\s*0\b", supported_clause):
             return "+"
 
     # 1. Slug-suffix shortcut. Many hypothesis_ids encode direction.

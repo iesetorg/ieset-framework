@@ -6,6 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
@@ -102,3 +105,43 @@ def test_explicit_zero_credit_signal_holds_public_school_scoring():
     assert evidence_tiers.school_score_eligible_for_public_run(True, {"school_score_eligible": False}) is False
     assert evidence_tiers.school_score_eligible_for_public_run(True, {}) is True
     assert evidence_tiers.school_score_eligible_for_public_run(False, {}) is False
+
+
+def test_frozen_geographic_holdouts_have_external_zero_school_credit():
+    exclusions = evidence_tiers.load_school_score_exclusions()
+    expected = {
+        "government_consumption_private_consumption_geographic_holdout_v2",
+        "hightech_export_share_income_growth_geographic_holdout_v2",
+        "real_income_life_expectancy_geographic_holdout_v2",
+        "regulatory_quality_private_consumption_geographic_holdout_v2",
+        "regulatory_quality_tertiary_enrollment_geographic_holdout_v2",
+    }
+    assert expected <= set(exclusions)
+    audit = evidence_tiers.build()
+    records = {row["hypothesis_id"]: row for row in audit["records"]}
+    for hypothesis_id in expected:
+        record = records[hypothesis_id]
+        assert record["public_visible"] is True
+        assert record["tier"] == "calibration"
+        assert record["school_score_eligible"] is False
+        assert record["scoreboard_weight_cap"] == 0.0
+        assert record["school_score_exclusion_reason"] == exclusions[hypothesis_id]
+        spec_path = ROOT / evidence_tiers.registration_rows()[hypothesis_id]["path"]
+        spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
+        assert spec["covers_claims"] == []
+        assert spec["linked_hypotheses"] == []
+
+
+def test_school_score_exclusion_registry_fails_closed(tmp_path):
+    path = tmp_path / "exclusions.json"
+    with pytest.raises(FileNotFoundError):
+        evidence_tiers.load_school_score_exclusions(path)
+    path.write_text(json.dumps({
+        "schema": "ieset-school-score-exclusions-v1",
+        "exclusions": [
+            {"hypothesis_id": "same_id", "reason": "calibration only"},
+            {"hypothesis_id": "same_id", "reason": "calibration only"},
+        ],
+    }), encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate"):
+        evidence_tiers.load_school_score_exclusions(path)

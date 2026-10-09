@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "engine" / "evidence_tier_audit.json"
 PUBLIC_OUTPUT = ROOT / "web" / "public" / "evidence-tiers.json"
 PREREG_INDEX = ROOT / "engine" / "preregistration_index.json"
+SCHOOL_SCORE_EXCLUSIONS = ROOT / "engine" / "school_score_exclusions.json"
 
 SKIP_TOPICS = {"conditional_taxonomy", "steelman"}
 NON_RESULT_PREFIXES = ("inconclusive", "blocked", "error", "no verdict")
@@ -110,6 +111,30 @@ def load_json(path: Path) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         return {}
     return value if isinstance(value, dict) else {}
+
+
+def load_school_score_exclusions(path: Path = SCHOOL_SCORE_EXCLUSIONS) -> dict[str, str]:
+    """Read explicit scoring holds without changing frozen run artifacts.
+
+    A missing or malformed registry is an audit failure: silently dropping a
+    hold would turn later-attached school links into scored claims.
+    """
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or payload.get("schema") != "ieset-school-score-exclusions-v1":
+        raise ValueError(f"invalid school-score exclusion schema: {path}")
+    rows = payload.get("exclusions")
+    if not isinstance(rows, list):
+        raise ValueError(f"invalid school-score exclusions: {path}")
+    exclusions: dict[str, str] = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"hypothesis_id", "reason"}:
+            raise ValueError(f"invalid school-score exclusion row: {path}")
+        hypothesis_id, reason = row["hypothesis_id"], row["reason"]
+        if not isinstance(hypothesis_id, str) or not hypothesis_id.strip() or \
+                not isinstance(reason, str) or not reason.strip() or hypothesis_id in exclusions:
+            raise ValueError(f"duplicate or incomplete school-score exclusion: {path}")
+        exclusions[hypothesis_id] = reason
+    return exclusions
 
 
 def hypothesis_files() -> list[Path]:
@@ -197,10 +222,16 @@ def school_score_eligible_for_public_run(public_visible: bool, correction: Any) 
 def build_record(
     path: Path,
     registrations: dict[str, dict[str, Any]],
+    school_score_exclusions: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     doc = raw if isinstance(raw, dict) else {}
     hypothesis_id = str(doc.get("hypothesis_id") or path.stem)
+    school_score_exclusions = (
+        load_school_score_exclusions()
+        if school_score_exclusions is None else school_score_exclusions
+    )
+    school_score_exclusion_reason = school_score_exclusions.get(hypothesis_id)
     # The legacy pre-registration index is keyed by spec filename. One early
     # filename uses uppercase initials while its declared hypothesis_id is
     # lowercase. Resolve both forms so the ledger is stable on case-sensitive
@@ -270,7 +301,10 @@ def build_record(
     public_visible = not exclusion_reasons
     # Public calibration can remain inspectable without scoring later-attached
     # school links. A zero weight alone would leave raw wins and tested counts.
-    school_score_eligible = school_score_eligible_for_public_run(public_visible, correction)
+    school_score_eligible = (
+        school_score_eligible_for_public_run(public_visible, correction)
+        and school_score_exclusion_reason is None
+    )
     evidence_type = str(doc.get("evidence_type") or "unspecified")
     screen_or_descriptive_rescope = disposition in {
         "rescoped_screen_positive",
@@ -312,6 +346,8 @@ def build_record(
         "public_visible": public_visible,
         # Publish the explicit exception; absence retains the normal public rule.
         **({"school_score_eligible": False} if public_visible and not school_score_eligible else {}),
+        **({"school_score_exclusion_reason": school_score_exclusion_reason}
+           if school_score_exclusion_reason is not None else {}),
         "reference_set": reference_set,
         "reference_note": reference_note if reference_set else None,
         "registration_status": registration_status,
@@ -335,10 +371,19 @@ def build_record(
 
 def build() -> dict[str, Any]:
     registrations = registration_rows()
+    school_score_exclusions = load_school_score_exclusions()
     records = [
-        build_record(path, registrations)
+        build_record(path, registrations, school_score_exclusions)
         for path in hypothesis_files()
     ]
+    unknown_exclusions = set(school_score_exclusions) - {
+        str(row["hypothesis_id"]) for row in records
+    }
+    if unknown_exclusions:
+        raise ValueError(
+            "school-score exclusions reference unknown hypothesis IDs: "
+            + ", ".join(sorted(unknown_exclusions))
+        )
     records.sort(key=lambda row: str(row["hypothesis_id"]))
 
     tier_counts = Counter(str(row["tier"]) for row in records)
@@ -392,6 +437,11 @@ def build() -> dict[str, Any]:
                 "as calibration evidence with at most a 0.25 scoreboard weight cap; "
                 "an explicit school_score_eligible=false or school_score_credit=0 "
                 "keeps links visible but excludes school wins, losses, tested counts, and scores."
+            ),
+            "school_score_exclusions": (
+                "A separate explicit registry can hold school score credit for immutable "
+                "calibration runs. It changes scoring only; the original preregistered "
+                "analysis and result artifacts remain unchanged."
             ),
         },
         "summary": {
