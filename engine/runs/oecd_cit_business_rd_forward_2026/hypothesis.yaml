@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_cit_business_rd_forward_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: '-'
+claim: Across the fixed pre-pandemic panel, a larger reduction in the OECD combined statutory corporate
+  income tax rate from t-1 to t predicts a larger increase in Eurostat business-performed R&D expenditure
+  as a share of GDP from t to t+2.
+methodology_note: 'Prospective descriptive two-outcome family committed before Eurostat BERD or WDI
+  FDI outcome values, null masks, or FDI status were opened. Only source dimensions/keys, hashes/manifests,
+  OECD CIT exposure values, and visible earlier hypothesis text informed this registration. Frozen
+  contract: engine/audits/oecd_cit_berd_fdi_family_prereg_2026-10-10.md.'
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - BGR
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - MNE
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period:
+  - 2001
+  - 2017
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed key roster, which requires tax rates at t-1 and t and the exact outcome
+    series at t and t+2; no nearest-year join, imputation, country substitution, or window extension.
+  - Retain countries with at least five key-only candidate years, then at least five complete measured
+    pairs; keep zero-change tax years in the regression.
+  - OECD treatment is combined statutory CIT_C/ST from DSD_TAX_CIT@DF_CIT with key .A.CIT_C.ST......;
+    finite tax percentages in [0,100].
+  - Eurostat outcome requires freq=A, sectperf=BES, unit=PC_GDP; map EL to GRC and UK to GBR, map
+    other named ISO2 geos to ISO3, and exclude EA20, EA21, EU27_2020, CN_X_HK.
+  - After the separate source-lock commit, keep only finite BERD values in [0,100] at both endpoints.
+variables:
+  treatment:
+  - name: combined_statutory_cit_annual_change_pp
+    source: oecd_taxstruct:combined_corporate_income_tax_rate
+    transformation: OECD combined statutory CIT rate at t minus rate at t-1, in percentage points.
+    notes: Headline central-plus-subcentral statutory rate, not effective tax burden or an R&D tax
+      incentive.
+  outcome:
+  - name: business_performed_rd_share_two_year_forward_change_pp
+    source: eurostat:rd_e_gerdtot
+    transformation: Selected annual freq=A, sectperf=BES, unit=PC_GDP value at t+2 minus its value
+      at t, in GDP-share percentage points.
+    notes: BERD is R&D performed by business enterprises regardless of funder; Eurostat raw slice
+      retains no observation-status flags.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One OLS coefficient for tax-rate change against two-year forward outcome change; country
+    and treatment-year fixed effects, country-cluster CR1, two-sided Student t(G-1). No covariate,
+    lag, window, source, or exclusion search.
+falsification:
+  test: oecd_cit_berd_fdi_forward_2026_10_10
+  rule: INCONCLUSIVE if source/roster, complete-case, five-year-country, material-tax-change, full-rank,
+    or cluster-uncertainty gate fails. SUPPORTED only if beta <= -0.02 BERD/GDP percentage point per
+    +1 statutory CIT percentage point and two-sided p <= 0.005; REFUTED only if beta >= +0.02 at the
+    same cutoff; otherwise PARTIAL when all estimator floors pass. Both cases remain in one Bonferroni
+    family even if the other is inconclusive.
+  threshold:
+    family_id: oecd_cit_berd_fdi_forward_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.02
+    min_valid_rows: 400
+    min_valid_countries: 25
+    min_material_change_rows: 60
+    min_material_change_countries: 20
+    material_cit_change_min_pp: 1.0
+    min_years_per_country: 5
+    expected_key_rows: 565
+    expected_key_countries: 35
+    roster_sha256: 2f0318e4d42002772babd3eb1967f90561d1c02ecc1dd7666422745b1900cd01
+    source_files:
+      treatment:
+        path: data/vintages/oecd/oecd_combined_corporate_income_tax_rate@2026-07-23T153857Z.parquet
+        sha256: 3e9c5987717087d04d5f82461fc1a3fb5e406ba646fb9f333f8c542e5f3f5ee1
+        manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+        manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+      outcome:
+        path: data/vintages/eurostat/rd_e_gerdtot@2026-05-05T210242Z.parquet
+        sha256: fea284d7b17e31a3803749fca052f6a110ed1b8e703a9151964d1d15f58df152
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.3
+disclosure: Descriptive calibration only. The prior archive includes a CIT-as-outcome tax competition
+  test, FDI studies with other treatments, an R&D-as-treatment screen, a corporate-tax investment
+  placeholder and proxy. Exact CIT-to-these-outcome pairings were absent, but this is not an independent
+  archive-wide holdout. BERD can include publicly funded business-sector R&D, and GDP denominator
+  changes can move BERD intensity without a change in R&D volume. Tax changes and outcomes may respond
+  to shared macro shocks. No causal, policy, school, or featured credit.
+steelman: hypotheses/steelman/oecd_cit_business_rd_forward_2026.md
+scope:
+  period:
+  - 2001
+  - 2017
+  countries: *id001
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - tax_policy
+  treatment_tags:
+  - corporate_tax
+  - statutory_cit_change
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

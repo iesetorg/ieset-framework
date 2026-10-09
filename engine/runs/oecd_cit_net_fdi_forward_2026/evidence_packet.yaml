@@ -1,0 +1,88 @@
+packet_version: 1
+generated_utc: '2026-10-09T23:53:02+00:00'
+hypothesis:
+  id: oecd_cit_net_fdi_forward_2026
+  path: hypotheses/fiscal/oecd_cit_net_fdi_forward_2026.yaml
+  topic: fiscal
+preregistration:
+  spec_commit: 3e3a79065d82ee6413c844cde117cba2eb13a2d2
+  source_lock_commit: 29fc9e578d9603ffa0c9b7d7ab75aff710949f5a
+  family_id: oecd_cit_berd_fdi_forward_2026_10_10
+  family_size: 2
+  key_roster: data/pinned_evidence/oecd_cit_berd_fdi_family_2026_key_roster.csv
+  key_roster_sha256: 2f0318e4d42002772babd3eb1967f90561d1c02ecc1dd7666422745b1900cd01
+  steelman: hypotheses/steelman/oecd_cit_net_fdi_forward_2026.md
+reproduction:
+  runner: scripts/run_oecd_cit_berd_fdi_2026.py
+  run_dir: engine/runs/oecd_cit_net_fdi_forward_2026
+  command: python3 scripts/run_oecd_cit_berd_fdi_2026.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear both frozen directional gates
+data:
+  inputs:
+    treatment:
+      publisher: oecd
+      series_id: oecd_combined_corporate_income_tax_rate
+      path: data/vintages/oecd/oecd_combined_corporate_income_tax_rate@2026-07-23T153857Z.parquet
+      sha256: 3e9c5987717087d04d5f82461fc1a3fb5e406ba646fb9f333f8c542e5f3f5ee1
+      manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+      manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+    fdi:
+      publisher: world_bank_wdi
+      series_id: BX.KLT.DINV.WD.GD.ZS
+      path: data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet
+      sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+      manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+  sample:
+    roster_rows: 2387
+    dropped_invalid_or_missing_endpoint_pairs: 172
+    dropped_nonblank_wdi_status_pairs: 0
+    complete_pairs_before_five_year_country_floor: 2215
+    valid_rows: 2211
+    valid_countries: 132
+    material_cit_change_rows: 369
+    material_cit_change_countries: 114
+    outcome_values_read_after_lock: true
+results:
+  primary:
+    coefficient: 0.13015238212711303
+    std_error: 0.261167218943545
+    p_value_two_sided: 0.6190738550737842
+    confidence_level: 0.95
+    confidence_interval:
+    - -0.38649867556563233
+    - 0.6468034398198583
+    n_rows: 2211
+    n_countries: 132
+    df_inference: 131
+    model_rank: 149
+    method: country/year FE OLS, country-cluster CR1, Student t(G-1)
+limitations:
+- The OECD combined statutory CIT rate is a headline central-plus-subcentral rate,
+  not an effective marginal/average tax burden or an R&D tax incentive.
+- Eurostat BERD is R&D performed in the business-enterprise sector regardless of who
+  funds it; the selected raw series has no observation-status flags.
+- WDI FDI net inflows as a share of GDP are balance-of-payments flows, may be negative
+  or volatile, and do not isolate greenfield investment.
+- Both outcomes are GDP shares, so denominator changes can create common movement
+  unrelated to investment or R&D decisions.
+- Country/year effects and temporal ordering do not identify a causal tax or policy
+  effect; tax reforms and investment may respond to shared shocks.
+- The two-test Bonferroni correction is local to this prospectively registered batch,
+  not to the visible IESET archive.
+- No result receives school, policy, causal, or featured credit.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: oecd_cit_berd_fdi_forward_2026_10_10
+  family_size: 2
+  family_alpha: 0.01
+  bonferroni_p_max: 0.005
+  school_score_eligible: false
+  school_score_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  causal_credit: 0
+  featured_eligible: false

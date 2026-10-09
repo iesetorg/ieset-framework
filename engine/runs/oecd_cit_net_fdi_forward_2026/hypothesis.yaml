@@ -1,0 +1,257 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_cit_net_fdi_forward_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: '-'
+claim: Across the fixed pre-pandemic panel, a larger reduction in the OECD combined statutory corporate
+  income tax rate from t-1 to t predicts a larger increase in WDI foreign direct investment net inflows
+  as a share of GDP from t to t+2.
+methodology_note: 'Prospective descriptive two-outcome family committed before Eurostat BERD or WDI
+  FDI outcome values, null masks, or FDI status were opened. Only source dimensions/keys, hashes/manifests,
+  OECD CIT exposure values, and visible earlier hypothesis text informed this registration. Frozen
+  contract: engine/audits/oecd_cit_berd_fdi_family_prereg_2026-10-10.md.'
+evidence_type: associational
+sample:
+  countries: &id001
+  - ABW
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BEN
+  - BFA
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLZ
+  - BMU
+  - BRA
+  - BRB
+  - BRN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - CPV
+  - CRI
+  - CUW
+  - CYM
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - EGY
+  - ESP
+  - EST
+  - FIN
+  - FJI
+  - FRA
+  - FRO
+  - GAB
+  - GBR
+  - GEO
+  - GIB
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IMN
+  - IND
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KNA
+  - KOR
+  - KWT
+  - LBR
+  - LCA
+  - LIE
+  - LKA
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAR
+  - MCO
+  - MDA
+  - MDV
+  - MEX
+  - MKD
+  - MLT
+  - MNE
+  - MNG
+  - MRT
+  - MUS
+  - MYS
+  - NAM
+  - NGA
+  - NLD
+  - NOR
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - QAT
+  - ROU
+  - SAU
+  - SEN
+  - SGP
+  - SLE
+  - SMR
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - TCA
+  - TGO
+  - THA
+  - TTO
+  - TUN
+  - TUR
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VGB
+  - VNM
+  - WSM
+  - ZAF
+  - ZMB
+  period:
+  - 2001
+  - 2017
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed key roster, which requires tax rates at t-1 and t and the exact outcome
+    series at t and t+2; no nearest-year join, imputation, country substitution, or window extension.
+  - Retain countries with at least five key-only candidate years, then at least five complete measured
+    pairs; keep zero-change tax years in the regression.
+  - OECD treatment is combined statutory CIT_C/ST from DSD_TAX_CIT@DF_CIT with key .A.CIT_C.ST......;
+    finite tax percentages in [0,100].
+  - WDI outcome requires indicator BX.KLT.DINV.WD.GD.ZS and nonempty three-letter country ISO3; exclude
+    blank-code income aggregates; require blank obs_status at both endpoints.
+  - After the separate source-lock commit, keep only finite FDI net inflow percentages at both endpoints;
+    negative values remain valid, with no winsorization.
+variables:
+  treatment:
+  - name: combined_statutory_cit_annual_change_pp
+    source: oecd_taxstruct:combined_corporate_income_tax_rate
+    transformation: OECD combined statutory CIT rate at t minus rate at t-1, in percentage points.
+    notes: Headline central-plus-subcentral statutory rate, not effective tax burden or an R&D tax
+      incentive.
+  outcome:
+  - name: net_fdi_inflows_share_two_year_forward_change_pp
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: Annual WDI net FDI inflows (% of GDP) at t+2 minus its value at t, in GDP-share
+      percentage points.
+    notes: Balance-of-payments net FDI flows may be negative and are not greenfield investment. Require
+      blank observation-status at both endpoints.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One OLS coefficient for tax-rate change against two-year forward outcome change; country
+    and treatment-year fixed effects, country-cluster CR1, two-sided Student t(G-1). No covariate,
+    lag, window, source, or exclusion search.
+falsification:
+  test: oecd_cit_berd_fdi_forward_2026_10_10
+  rule: INCONCLUSIVE if source/roster, complete-case, five-year-country, material-tax-change, full-rank,
+    or cluster-uncertainty gate fails. SUPPORTED only if beta <= -0.2 net-FDI/GDP percentage point
+    per +1 statutory CIT percentage point and two-sided p <= 0.005; REFUTED only if beta >= +0.2 at
+    the same cutoff; otherwise PARTIAL when all estimator floors pass. Both cases remain in one Bonferroni
+    family even if the other is inconclusive.
+  threshold:
+    family_id: oecd_cit_berd_fdi_forward_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.2
+    min_valid_rows: 1500
+    min_valid_countries: 80
+    min_material_change_rows: 180
+    min_material_change_countries: 60
+    material_cit_change_min_pp: 1.0
+    min_years_per_country: 5
+    expected_key_rows: 2387
+    expected_key_countries: 141
+    roster_sha256: 2f0318e4d42002772babd3eb1967f90561d1c02ecc1dd7666422745b1900cd01
+    source_files:
+      treatment:
+        path: data/vintages/oecd/oecd_combined_corporate_income_tax_rate@2026-07-23T153857Z.parquet
+        sha256: 3e9c5987717087d04d5f82461fc1a3fb5e406ba646fb9f333f8c542e5f3f5ee1
+        manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+        manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+      outcome:
+        path: data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet
+        sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.3
+disclosure: Descriptive calibration only. The prior archive includes a CIT-as-outcome tax competition
+  test, FDI studies with other treatments, an R&D-as-treatment screen, a corporate-tax investment
+  placeholder and proxy. Exact CIT-to-these-outcome pairings were absent, but this is not an independent
+  archive-wide holdout. FDI net inflows may be negative or volatile, including financial-centre conduit
+  flows; GDP denominator changes can move the share without a change in investment decisions. Tax
+  changes and outcomes may respond to shared macro shocks. No causal, policy, school, or featured
+  credit.
+steelman: hypotheses/steelman/oecd_cit_net_fdi_forward_2026.md
+scope:
+  period:
+  - 2001
+  - 2017
+  countries: *id001
+  outcome_dim:
+  - capital_flows
+  policy_family:
+  - tax_policy
+  treatment_tags:
+  - corporate_tax
+  - statutory_cit_change
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
