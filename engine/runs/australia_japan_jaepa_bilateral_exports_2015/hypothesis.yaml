@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: australia_japan_jaepa_bilateral_exports_2015
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: After Japan-Australia Economic Partnership Agreement (JAEPA) became effective on 2015-01-15, AUS-origin
+  merchandise exports to JPN grew at least 15 percent more in log terms between the four fixed pre years
+  and four fixed post years than the median change in fixed same-destination donor origins, conditional
+  on an aligned pretrend. This is a descriptive directed-flow claim, not a causal treaty effect.
+evidence_type: descriptive
+methodology_note: 'This two-case follow-up was chosen after the separate five-case BACI screen: the AUS>CHN
+  ChAFTA direct-flow test was INCONCLUSIVE on its pretrend gate, and the older country-level ChAFTA WDI
+  test was PARTIAL. These known results do not count as evidence for this distinct Japan-Australia Economic
+  Partnership Agreement (JAEPA) endpoint. Both cases share AUS as origin, source vintage, nearby years,
+  and a policy bundle record, so they are correlated descriptive tests and not independent replication.
+  Japanese demand and commodity-price cycles; Japan changed monetary policy during the period. No causal,
+  featured, school or policy-score credit is available; any source/pretrend failure remains INCONCLUSIVE.
+  This registration freezes directed dyad, same-destination donors, exact ZIP hash, complete row keys,
+  fixed four-year windows, pretrend gate and contrast threshold before any selected flow magnitude is
+  read.'
+sample:
+  countries:
+  - AUS
+  - JPN
+  - USA
+  - RUS
+  - BRA
+  - ARG
+  - ZAF
+  - SAU
+  period:
+  - 2011
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Only directed AUS>JPN and donor origins USA, RUS, BRA, ARG, ZAF, SAU to JPN; no reverse direction
+    or donor substitution.
+  - Pre 2011-2014; post 2016-2019; event year 2015 excluded from means but required as an intact source
+    cell.
+  - Require one unique existing-country source row, finite nonnegative BACI flow and exact frozen FTA-status
+    schedule for every dyad-year.
+  - No interpolation, winsorisation, source replacement, post hoc endpoint or comparator changes.
+variables:
+  outcome:
+  - name: directed_aus_goods_exports_to_jpn
+    source: cepii:Gravity_V202211.tradeflow_baci
+    transformation: natural log of 1 plus nominal thousands of current US dollars
+    notes: Direct BACI merchandise flow; no real-volume, tariff-intensity, sectoral, welfare or causal
+      interpretation.
+  treatment:
+  - name: australia_japan_jaepa_bilateral_exports_2015_agreement_status
+    source: cepii:Gravity_V202211.fta_wto
+    transformation: AUS>JPN off in pre 2011-2014, 1 in event year 2015, on in post 2016-2019; all fixed
+      donor dyads off throughout the nine-year grid
+    notes: Status cross-check against official effective date 2015-01-15; agreement status is not tariff
+      intensity.
+intervention_channel: regulatory
+intervention_channel_justification: The treaty changes a bilateral trade-policy regime; the measured endpoint
+  is a flow.
+estimator:
+  template: descriptive
+  event_year: 2015
+  clustering: none
+  notes: 'For every origin to JPN, calculate mean log1p(BACI) in 2016-2019 less the mean in 2011-2014.
+    Primary contrast: AUS change minus median of USA, RUS, BRA, ARG, ZAF, SAU donor changes. Pretrend:
+    absolute difference between treated OLS pre-year log-flow slope and median fixed-donor OLS slope at
+    most 0.03 log units/year. No p-value or causal interpretation.'
+falsification:
+  test: australia_japan_jaepa_bilateral_exports_2015_fixed_destination_baci_prepost
+  rule: First require byte-pinned official source and immutable first-addition registration followed by
+    a separate committed source slice. Missing/duplicate key, country-existence, FTA-status, finite-nonnegative-flow,
+    or pretrend failure yields INCONCLUSIVE. With gates passed, SUPPORTED if primary log contrast >= ln(1.15),
+    REFUTED if <= -ln(1.15), PARTIAL otherwise. The two cases are one closed family; no p-value, causal,
+    school or policy-score credit follows.
+  threshold: absolute pretrend slope gap <=0.03 log units/year; directional contrast thresholds +/-ln(1.15);
+    family size 2
+prior_confidence: 0.5
+disclosure: 'This two-case follow-up was chosen after the separate five-case BACI screen: the AUS>CHN
+  ChAFTA direct-flow test was INCONCLUSIVE on its pretrend gate, and the older country-level ChAFTA WDI
+  test was PARTIAL. These known results do not count as evidence for this distinct Japan-Australia Economic
+  Partnership Agreement (JAEPA) endpoint. Both cases share AUS as origin, source vintage, nearby years,
+  and a policy bundle record, so they are correlated descriptive tests and not independent replication.
+  Japanese demand and commodity-price cycles; Japan changed monetary policy during the period. No causal,
+  featured, school or policy-score credit is available; any source/pretrend failure remains INCONCLUSIVE.'
+scope:
+  period:
+  - 2011
+  - 2019
+  countries:
+  - AUS
+  - JPN
+  outcome_dim:
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  treatment_tags:
+  - australia_japan_jaepa_bilateral_exports_2015
+  - australia_north_asia_ftas_2014_2015
+steelman: hypotheses/steelman/australia_japan_jaepa_bilateral_exports_2015.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Policy bundle au_kafta_jaepa_chafta_ftas_2014_2015 contains distinct Japan-Australia Economic
+  Partnership Agreement (JAEPA) effective date 2015-01-15; official source https://www.dfat.gov.au/trade/agreements/in-force/jaepa/japan-australia-economic-partnership-agreement.
+  Source and extraction contract: engine/audits/fta_baci_two_north_asia_event_family_2026_source_plan.md.
+  No reverse-flow, sector, window, or donor variants count as separate hypotheses.'
