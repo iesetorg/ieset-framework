@@ -15,7 +15,7 @@ interface MovementAnnotation {
   year: number;
   /** Display name shown next to the marker. */
   label: string;
-  /** Optional ideological tone — drives marker fill colour.
+  /** Optional coded movement direction — drives marker fill colour.
    *  "left" = state-expansion (red), "right" = market (green),
    *  "centrist" = amber, "auth" = grey, default = neutral. */
   tone?: "left" | "right" | "centrist" | "auth" | "neutral";
@@ -26,6 +26,8 @@ interface DriftChartProps {
   series: Record<string, number[]>;
   /** Years aligned to each series. */
   years: number[];
+  /** Earliest coded movement year for each country; earlier zeros are unobserved. */
+  startYears?: Record<string, number>;
   /** Map ISO3 → display name (must be serialisable; passed across the
    * server-component / client-component boundary). */
   labels?: Record<string, string>;
@@ -73,6 +75,7 @@ function compactLeaderLabel(label: string) {
 export function DriftChart({
   series,
   years,
+  startYears,
   labels,
   caption,
   height = 380,
@@ -95,7 +98,10 @@ export function DriftChart({
       const points: SeriesPoint[] = [];
       for (const [country, traj] of Object.entries(series)) {
         for (let i = 0; i < traj.length; i++) {
-          points.push({ year: years[i], value: traj[i], country });
+          const year = years[i];
+          if (year >= (startYears?.[country] ?? years[0])) {
+            points.push({ year, value: traj[i], country });
+          }
         }
       }
 
@@ -113,7 +119,9 @@ export function DriftChart({
       const yMax = values.length ? Math.max(...values) : 1;
       const yExtent: [number, number] = [yMin, yMax];
       const yPad = Math.max(2, (yExtent[1] - yExtent[0]) * 0.08);
-      const xMin = Math.min(...years);
+      const xMin = points.length
+        ? Math.min(...points.map((point) => point.year))
+        : Math.min(...years);
       const xMax = Math.max(...years);
 
       const hasMovementLabels = Boolean(movements && movements.length > 0);
@@ -267,7 +275,7 @@ export function DriftChart({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [series, years, labels, height, zeroLineLabel, highlight, movements]);
+  }, [series, years, startYears, labels, height, zeroLineLabel, highlight, movements]);
 
   return (
     <div>
