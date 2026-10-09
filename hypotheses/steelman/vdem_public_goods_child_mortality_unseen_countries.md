@@ -1,0 +1,3 @@
+# Public-goods spending composition and child mortality
+
+The strongest alternative is baseline development and state capacity: countries with capable health systems may both provide broad public services and reduce child mortality. V-Dem expert coders may observe visible service outcomes when judging spending composition, creating measurement dependence. Mortality can improve through vaccines, sanitation, nutrition, private services, and international assistance without any shift in public spending allocation. A precise negative association would not identify a causal fiscal-policy effect. A null or positive association would challenge the proposed broad-public-goods channel. This test has no position or school-score link.

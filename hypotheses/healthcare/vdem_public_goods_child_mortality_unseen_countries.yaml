@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vdem_public_goods_child_mortality_unseen_countries
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: Among countries not used in earlier verified V-Dem-source IESET tests, a higher public-goods rather than particularistic share of social and infrastructure spending in 2000-2004 predicts a larger proportional fall in under-five mortality between 2000-2004 and 2019-2023, conditional on initial mortality and income.
+evidence_type: associational
+sample:
+  countries: &holdout_countries [AFG, ALB, ARM, AZE, BHR, BIH, BLR, BRB, BTN, CAF, COD, COG, COM, CUB, CYP, DJI, ECU, ERI, FJI, GEO, GIN, GMB, GNB, GNQ, GUY, HTI, ISL, JOR, KGZ, KWT, LBN, LBY, LSO, LUX, MDA, MDV, MKD, MLT, MNE, MRT, OMN, PNG, PRK, PSE, QAT, SDN, SLB, SOM, SSD, STP, SUR, SWZ, SYC, SYR, TJK, TKM, TLS, TTO, VUT, XKX, YEM]
+  period: [2000, 2023]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: Country means for a fixed early spending-composition window are compared with a later change in log mortality; each country contributes one observation.
+  exclusion_rules:
+    - The 61 listed ISO3 codes are frozen from the key-only V-Dem/WDI join after excluding every country explicitly sampled by earlier verified hypotheses mentioning a V-Dem source.
+    - Require at least three finite V-Dem exposure years, WDI mortality years, and WDI GDP-per-capita years in 2000-2004, plus at least three finite mortality years in 2019-2023.
+    - Require positive baseline and endpoint mortality means and positive baseline GDP-per-capita mean; do not impute or replace a source variable after registration.
+scope:
+  period: [2000, 2023]
+  countries: *holdout_countries
+  outcome_dim: [life_expectancy_health]
+  policy_family: [none]
+  treatment_tags: [public_goods_spending_composition]
+variables:
+  outcome:
+    - name: under_five_mortality_log_change
+      source: world_bank_wdi:SH.DYN.MORT
+      transformation: log_mean_2019_2023_minus_log_mean_2000_2004
+      notes: Mortality probability per 1,000 live births; a negative change denotes improvement.
+  treatment:
+    - name: public_goods_spending_composition_early
+      source: vdem:v2dlencmps
+      transformation: mean_2000_2004_standardized_across_complete_countries
+      notes: Higher V-Dem latent interval values mean more social and infrastructure spending is public-goods rather than particularistic.
+  controls:
+    - name: log_baseline_under_five_mortality
+      source: world_bank_wdi:SH.DYN.MORT
+      transformation: log_mean_2000_2004
+    - name: log_baseline_real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log_mean_2000_2004
+estimator:
+  template: descriptive
+  clustering: HC3 heteroskedasticity-robust covariance at country level
+  notes: One observation per country. OLS of the predeclared log mortality change on an intercept, standardized early V-Dem exposure, log baseline mortality, and log baseline GDP per capita. No fit is used to choose the sample, windows, measure, controls, or direction. The paired family has two tests and a two-sided Bonferroni threshold of p<=0.025 for each.
+falsification:
+  test: vdem_wdi_distinct_mechanisms_two_test_family_hc3
+  rule: A result requires at least 35 complete countries and at least five distinct country-level exposure means. SUPPORTED if the exposure coefficient is negative with two-sided HC3 p<=0.025; REFUTED if positive with p<=0.025; otherwise PARTIAL. A failed data gate is INCONCLUSIVE. Family-wide alpha is 0.05 across two tests.
+  threshold: {expected_sign: '-', p_max_two_sided: 0.025, min_countries: 35, min_distinct_exposure_means: 5, family_size: 2}
+prior_confidence: 0.55
+disclosure: Experts may code spending composition using the same health and infrastructure information that predicts mortality. Baseline mortality and income are incomplete controls for state capacity, conflict, and health-system changes. This is descriptive calibration only, not a causal policy effect or school-score credit.
+steelman: hypotheses/steelman/vdem_public_goods_child_mortality_unseen_countries.md
+notes: Part of the two-test V-Dem/WDI distinct-mechanisms family; no covers_claims or position links are asserted.

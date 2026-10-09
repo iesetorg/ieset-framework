@@ -1,0 +1,3 @@
+# Women’s domestic movement and female labor participation
+
+The strongest alternative is that changes in education, household income, safety, norms, or the demand for women’s work both increase freedom of movement and raise participation. The V-Dem item includes informal restrictions, while WDI uses modeled ILO participation estimates; their country coverage and measurement errors may differ. A high score does not show that a government reform caused work opportunities. Even a precise positive association is only a country-level descriptive calibration. A null or opposite association would be informative because women can legally move yet still face care, wage, and job barriers. This test has no position or school-score link.

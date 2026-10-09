@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vdem_women_mobility_female_lfp_unseen_countries
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '+'
+claim: Among countries not used in earlier verified V-Dem-source IESET tests, higher women's freedom of domestic movement in 2000-2004 predicts a larger rise in female labor-force participation between 2000-2004 and 2019-2023, conditional on the initial participation rate and income.
+evidence_type: associational
+sample:
+  countries: &holdout_countries [AFG, ALB, ARM, AZE, BHR, BIH, BLR, BRB, BTN, CAF, COD, COG, COM, CUB, CYP, DJI, ECU, ERI, FJI, GEO, GIN, GMB, GNB, GNQ, GUY, HTI, ISL, JOR, KGZ, KWT, LBN, LBY, LSO, LUX, MDA, MDV, MKD, MLT, MNE, MRT, OMN, PNG, PRK, PSE, QAT, SDN, SLB, SOM, SSD, STP, SUR, SWZ, SYC, SYR, TJK, TKM, TLS, TTO, VUT, XKX, YEM]
+  period: [2000, 2023]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: Country means for a fixed early exposure window are compared with a later outcome change; each country contributes one observation, avoiding serial pseudo-replication.
+  exclusion_rules:
+    - The 61 listed ISO3 codes are frozen from the key-only V-Dem/WDI join after excluding every country explicitly sampled by earlier verified hypotheses mentioning a V-Dem source.
+    - Require at least three finite V-Dem exposure years, WDI outcome years, and WDI GDP-per-capita years in 2000-2004, plus at least three finite outcome years in 2019-2023.
+    - Require a positive baseline GDP-per-capita mean; do not impute or replace a source variable after registration.
+scope:
+  period: [2000, 2023]
+  countries: *holdout_countries
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: [women_domestic_movement]
+variables:
+  outcome:
+    - name: female_labor_force_participation_change_pp
+      source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+      transformation: mean_2019_2023_minus_mean_2000_2004_in_percentage_points
+      notes: WDI modeled ILO estimate, women ages 15 and over; participation includes employed and unemployed persons.
+  treatment:
+    - name: women_domestic_movement_early
+      source: vdem:v2cldmovew
+      transformation: mean_2000_2004_standardized_across_complete_countries
+      notes: Higher V-Dem latent interval values mean more women can move freely within the country.
+  controls:
+    - name: baseline_female_lfp
+      source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+      transformation: mean_2000_2004
+    - name: log_baseline_real_gdp_per_capita
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log_mean_2000_2004
+estimator:
+  template: descriptive
+  clustering: HC3 heteroskedasticity-robust covariance at country level
+  notes: One observation per country. OLS of the predeclared outcome change on an intercept, standardized early V-Dem exposure, baseline outcome, and log baseline GDP per capita. No fit is used to choose the sample, windows, measure, controls, or direction. The paired family has two tests and a two-sided Bonferroni threshold of p<=0.025 for each.
+falsification:
+  test: vdem_wdi_distinct_mechanisms_two_test_family_hc3
+  rule: A result requires at least 35 complete countries and at least five distinct country-level exposure means. SUPPORTED if the exposure coefficient is positive with two-sided HC3 p<=0.025; REFUTED if negative with p<=0.025; otherwise PARTIAL. A failed data gate is INCONCLUSIVE. Family-wide alpha is 0.05 across two tests.
+  threshold: {expected_sign: '+', p_max_two_sided: 0.025, min_countries: 35, min_distinct_exposure_means: 5, family_size: 2}
+prior_confidence: 0.52
+disclosure: Domestic-movement rights can reflect unmeasured education, safety, culture, and labor demand. The female participation series is modeled by ILO. Cross-country change associations are not causal policy effects. This result is descriptive calibration only and carries no school-score credit.
+steelman: hypotheses/steelman/vdem_women_mobility_female_lfp_unseen_countries.md
+notes: Part of the two-test V-Dem/WDI distinct-mechanisms family; no covers_claims or position links are asserted.
