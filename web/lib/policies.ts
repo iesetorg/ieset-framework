@@ -20,7 +20,13 @@ export interface Policy {
   status: string;
   title: string;
   countries: string[];
-  timeframe: { start: number; end: number | string; enacted_date?: string };
+  timeframe: {
+    start: number;
+    end: number | string;
+    enacted_date?: string;
+    signed_date?: string;
+    effective_date?: string;
+  };
   description?: string;
   enacted_by?: string[];
   coalition_label_at_enactment?: string;

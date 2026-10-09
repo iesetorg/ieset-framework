@@ -21,8 +21,8 @@ export interface PolicyRow {
   policy_id: string;
   title: string;
   countries: string[];
-  start_year: number; // timeframe.start — the canonical year for filtering
-  enacted_label: string; // "2020-09" or "2023" — what we display in the Enacted col
+  start_year: number; // year displayed in the Date column, used for filtering
+  event_label: string; // effective date when available, then enacted date or start year
   axes_moved: { axis: string; direction: string }[];
 }
 
@@ -207,7 +207,7 @@ export function PolicyFilterTable({
                 Country
               </th>
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">
-                Enacted
+                Date
               </th>
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">
                 Shape
@@ -259,7 +259,7 @@ export function PolicyFilterTable({
                     </div>
                   </td>
                   <td className="p-3 align-top text-[13px] text-muted">
-                    {p.enacted_label}
+                    {p.event_label}
                   </td>
                   <td className="p-3 align-top">
                     <div className="flex flex-wrap gap-[3px]">
@@ -346,4 +346,3 @@ export function PolicyFilterTable({
     </div>
   );
 }
-

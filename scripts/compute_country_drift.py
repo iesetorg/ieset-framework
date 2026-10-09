@@ -20,6 +20,7 @@ Re-run on every `make build`. Static (deterministic) given the corpus.
 """
 from __future__ import annotations
 
+import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -272,7 +273,7 @@ def build_drift(movements):
     }
 
 
-def write_csv(out, path: Path):
+def render_csv(out) -> str:
     """Long-form CSV: country, axis, year, value (cumulative drift).
 
     Includes statist_drift as a pseudo-axis so spreadsheet users can pivot.
@@ -286,16 +287,31 @@ def write_csv(out, path: Path):
         for y, v in zip(out["years"], data["statist_drift"]):
             if v != 0.0:
                 rows.append(f"{country},statist_drift,{y},{v}")
-    path.write_text("\n".join(rows) + "\n")
+    return "\n".join(rows) + "\n"
+
+
+def write_csv(out, path: Path):
+    path.write_text(render_csv(out))
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="verify both generated outputs without writing them")
+    args = parser.parse_args()
     movements = load_movements()
     out = build_drift(movements)
 
-    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
-    OUT_JSON.write_text(json.dumps(out, indent=2))
-    write_csv(out, OUT_CSV)
+    json_text = json.dumps(out, indent=2)
+    csv_text = render_csv(out)
+    if args.check:
+        if not OUT_JSON.exists() or OUT_JSON.read_text() != json_text:
+            raise SystemExit(f"stale or missing {OUT_JSON.relative_to(REPO)}")
+        if not OUT_CSV.exists() or OUT_CSV.read_text() != csv_text:
+            raise SystemExit(f"stale or missing {OUT_CSV.relative_to(REPO)}")
+    else:
+        OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+        OUT_JSON.write_text(json_text)
+        write_csv(out, OUT_CSV)
 
     print(f"countries:   {len(out['countries'])}")
     print(f"axes:        {len(out['axes'])}")

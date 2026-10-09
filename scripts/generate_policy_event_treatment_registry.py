@@ -74,7 +74,10 @@ def date_tokens(values: list[Any]) -> dict[str, list[str]]:
 
 
 def timeframe_tokens(timeframe: dict[str, Any]) -> dict[str, list[str]]:
-    values = [timeframe.get("start"), timeframe.get("end"), timeframe.get("enacted_date")]
+    # Signature alone does not start treatment. Keep it in the record below,
+    # but use enacted or effective dates for event-study timing readiness.
+    values = [timeframe.get("start"), timeframe.get("end"),
+              timeframe.get("enacted_date"), timeframe.get("effective_date")]
     return date_tokens(values)
 
 
@@ -87,6 +90,8 @@ def timing_status(timeframe: dict[str, Any], design: dict[str, Any]) -> str:
     frame_tokens = timeframe_tokens(timeframe)
     if event_tokens["full_dates"]:
         return "event_dated"
+    if timeframe.get("effective_date"):
+        return "effective_date_only"
     if frame_tokens["full_dates"]:
         return "enacted_date_only"
     if event_tokens["year_months"]:
@@ -127,7 +132,7 @@ def readiness_flags(
 ) -> list[str]:
     comparison_status = comparison_structure_status(design)
     features = set(design.get("design_features") or [])
-    has_full_timing = status in {"event_dated", "enacted_date_only"}
+    has_full_timing = status in {"event_dated", "effective_date_only", "enacted_date_only"}
     has_any_design = bool(design)
     has_units = comparison_status in {
         "declared_treated_comparison_design",
@@ -228,6 +233,8 @@ def compact_policy_row(
             "start": timeframe.get("start"),
             "end": timeframe.get("end"),
             "enacted_date": timeframe.get("enacted_date"),
+            "signed_date": timeframe.get("signed_date"),
+            "effective_date": timeframe.get("effective_date"),
         },
         "timeframe_date_tokens": timeframe_tokens(timeframe),
         "event_date_tokens": event_date_tokens(design),

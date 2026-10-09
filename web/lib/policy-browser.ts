@@ -32,7 +32,13 @@ export interface PolicyBrowserRow {
   title: string;
   status: string;
   countries: string[];
-  timeframe: { start?: number; end?: number | string; enacted_date?: string };
+  timeframe: {
+    start?: number;
+    end?: number | string;
+    enacted_date?: string;
+    signed_date?: string;
+    effective_date?: string;
+  };
   description?: string;
   path: string;
   axes: PolicyBrowserAxis[];

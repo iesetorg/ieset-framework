@@ -164,6 +164,18 @@ export default async function PolicyPage({
             <span>enacted {policy.timeframe.enacted_date}</span>
           </>
         )}
+        {policy.timeframe.signed_date && (
+          <>
+            <span>·</span>
+            <span>signed {policy.timeframe.signed_date}</span>
+          </>
+        )}
+        {policy.timeframe.effective_date && (
+          <>
+            <span>·</span>
+            <span>effective {policy.timeframe.effective_date}</span>
+          </>
+        )}
         {policy.coalition_label_at_enactment && (
           <>
             <span>·</span>

@@ -37,6 +37,20 @@ def test_timing_status_identifies_year_only_backlog():
     assert registry.timing_status(timeframe, {}) == "year_period_only"
 
 
+def test_treaty_timing_uses_entry_into_force_not_signature():
+    timeframe = {
+        "start": 2008,
+        "signed_date": "2008-04-07",
+        "effective_date": "2008-10-01",
+    }
+    assert registry.timing_status(timeframe, {}) == "effective_date_only"
+    assert registry.timeframe_tokens(timeframe)["full_dates"] == ["2008-10-01"]
+    assert "ready_for_event_study_timing" in registry.readiness_flags(
+        status=registry.timing_status(timeframe, {}),
+        design={}, axes=[], inherited={},
+    )
+
+
 def test_comparison_structure_requires_units_and_design_feature():
     design = {
         "design_features": ["controlled_vs_uncontrolled_categories"],

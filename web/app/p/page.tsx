@@ -9,15 +9,16 @@ import {
 // Slim each Policy down to just the fields the client filter table renders,
 // so we don't ship description / references / steelman HTML over the wire.
 function policyToRow(p: Policy): PolicyRow {
-  const enactedLabel = p.timeframe.enacted_date
-    ? p.timeframe.enacted_date.slice(0, 7)
+  const eventDate = p.timeframe.effective_date ?? p.timeframe.enacted_date;
+  const eventLabel = eventDate
+    ? eventDate.slice(0, 7)
     : String(p.timeframe.start);
   return {
     policy_id: p.policy_id,
     title: p.title,
     countries: p.countries,
-    start_year: p.timeframe.start,
-    enacted_label: enactedLabel,
+    start_year: eventDate ? Number(eventDate.slice(0, 4)) : p.timeframe.start,
+    event_label: eventLabel,
     axes_moved: (p.axes_moved ?? []).map((a) => ({
       axis: a.axis,
       direction: a.direction,
