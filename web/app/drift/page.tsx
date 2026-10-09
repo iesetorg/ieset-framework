@@ -285,8 +285,9 @@ export default async function DriftPage() {
       </h1>
       <p className="mb-6 max-w-[820px] text-[17px] leading-[1.55] text-muted">
         Authored movements are coded on directional framework axes. Each
-        movement contributes a step at its start year; cumulative lines show
-        the net direction of those coded steps within each country. The
+        axis step is placed at the movement start unless a documented policy
+        decision year is coded; cumulative lines show the net direction of
+        those steps within each country. The
         composite sums pro-state axes and subtracts pro-market axes. Higher
         values indicate more stateward coded movement; lower values indicate
         more marketward coded movement. These are constructed scores, not

@@ -1,9 +1,10 @@
 """Compute per-country positional drift trajectories from the movements corpus.
 
 Each movement has an `axes_summary` (axis × direction × magnitude) plus a
-country list and a timeframe. Treating each movement as a discrete shift event
-at its timeframe.start year, we build a year-by-year cumulative position for
-every (country, axis) pair.
+country list and a timeframe. Each axis step is placed at the movement's
+start year unless a source-reviewed drift_attribution_year identifies a
+different decision year. We build a year-by-year cumulative position for
+every (country, axis) pair. These are coded decisions, not observed outcomes.
 
 We also compute a composite *statist drift index* that captures the user's
 working hypothesis: liberal democracies experience monotonic drift toward more
@@ -119,6 +120,25 @@ PRO_MARKET_AXES = {
 DIRECTION_SIGN = {"+": 1.0, "-": -1.0, "0": 0.0, "mixed": 0.0}
 
 
+def axis_attribution_year(movement: dict, entry: dict) -> int:
+    """Use a documented axis year; never infer an event date from prose."""
+    start = movement["_start"]
+    override = entry.get("drift_attribution_year")
+    if override is None:
+        return start
+    if isinstance(override, bool) or not isinstance(override, int):
+        raise ValueError(f"{movement['movement_id']}: invalid drift_attribution_year {override!r}")
+    end = movement.get("_end")
+    if override < start or (end is not None and override > end):
+        raise ValueError(
+            f"{movement['movement_id']}: drift_attribution_year {override} "
+            f"outside movement {start}–{end or 'ongoing'}"
+        )
+    if not str(entry.get("drift_attribution_basis") or "").strip():
+        raise ValueError(f"{movement['movement_id']}: explicit axis year needs a basis")
+    return override
+
+
 def load_movements():
     out = []
     for f in sorted(MOV_DIR.glob("*.yaml")):
@@ -155,8 +175,7 @@ def build_drift(movements):
     for m in movements:
         countries = m.get("countries") or []
         all_countries.update(countries)
-        year = m["_start"]
-        all_years.add(year)
+        all_years.add(m["_start"])
         for entry in m.get("axes_summary") or []:
             axis = entry.get("axis")
             direction = entry.get("direction")
@@ -166,6 +185,8 @@ def build_drift(movements):
             sign = DIRECTION_SIGN.get(direction, 0.0)
             step = sign * mag
             all_axes.add(axis)
+            year = axis_attribution_year(m, entry)
+            all_years.add(year)
 
             for c in countries:
                 events[c][axis].append((year, step, m["movement_id"]))
