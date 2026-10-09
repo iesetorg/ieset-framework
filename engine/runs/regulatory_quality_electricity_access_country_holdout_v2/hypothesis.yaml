@@ -1,0 +1,307 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: regulatory_quality_electricity_access_country_holdout_v2
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: '+'
+claim: >-
+  Among the fixed 167 country and territory codes excluded from the old
+  infrastructure-pricing proxy screen, a higher WGI regulatory-quality point
+  estimate at year t predicts a higher WDI population electricity-access
+  percentage at exact t+1, conditional on real income per person, WGI rule of
+  law, country effects, and treatment-year effects.
+methodology_note: >-
+  New-ID descriptive country-disjoint test of the measured WGI regulatory-quality
+  and WDI electricity-access pair in infrastructure_user_pricing_quality. Its old
+  same-commit PARTIAL result (988 pairs, 40 fitted countries) was visible before
+  design. Regulatory quality is not a measure of user pricing or infrastructure
+  maintenance; electricity access is not a maintenance-quality measure. All 40
+  old-specification countries are excluded. A source-key-only screen found an
+  upper envelope of 4175 exact-year pairs in the fixed 167-code roster without
+  reading held-out values or null masks. The complete-case floor, source pins,
+  estimator, and 84-screen Bonferroni rule are frozen before held-out fitting.
+  The separate government-effectiveness/access registration shares this outcome,
+  and the older natural-monopoly packet included these variables among several
+  inputs; neither registered this primary RQ-to-next-year-access coefficient.
+  No user-pricing, maintenance, causal, policy, or school-score credit is claimed.
+evidence_type: associational
+sample:
+  countries: &heldout
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARM
+  - ASM
+  - ATG
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CHE
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYM
+  - CYP
+  - CZE
+  - DJI
+  - DMA
+  - DOM
+  - DZA
+  - ECU
+  - ERI
+  - ETH
+  - FJI
+  - FSM
+  - GAB
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - GUM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - JAM
+  - JOR
+  - KAZ
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LIE
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NCL
+  - NER
+  - NIC
+  - NPL
+  - NRU
+  - OMN
+  - PAN
+  - PLW
+  - PNG
+  - PRI
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - PYF
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - UZB
+  - VCT
+  - VEN
+  - VIR
+  - VUT
+  - WSM
+  - XKX
+  - YEM
+  - ZMB
+  - ZWE
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude every old-specification country: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.'
+  - Use only the fixed 167-code roster above, including explicitly listed territories; exclude aggregates and make no replacement.
+  - Join WGI regulatory quality, positive WDI real GDP per capita, and WGI rule of law at exact t to WDI access at exact t+1.
+  - Require finite values, outcome in [0,100], at least five complete treatment years per country or territory, 800 pairs, and 50 codes; no interpolation, nearest-year substitution, or covariate dropping.
+variables:
+  outcome:
+  - name: next_year_electricity_access_pct
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: population share with electricity access, percentage at exact t+1
+  treatment:
+  - name: regulatory_quality_estimate_t
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: WGI regulatory-quality point estimate at exact t
+  controls:
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per person at exact t
+  - name: rule_of_law_t
+    source: wgi:RL.EST
+    transformation: WGI rule-of-law point estimate at exact t
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One primary OLS coefficient for regulatory quality with country and treatment-year
+    fixed effects, the two fixed controls, and country-clustered small-sample
+    t(G-1) inference. No model search, automatic control dropping, or alternate verdict.
+falsification:
+  rule: >-
+    INCONCLUSIVE if fewer than 800 complete pairs, fewer than 50 codes, fewer than
+    five complete years for any retained code, or if the primary estimate or
+    clustered uncertainty is unidentified or nonfinite. Otherwise SUPPORTED
+    only for a positive coefficient at two-sided p<=0.1/84; REFUTED for a negative
+    coefficient at that threshold; every other estimable result is PARTIAL.
+    The Bonferroni family covers all 84 metadata-screened legacy source-pair
+    opportunities, even if fewer run.
+  test: country_disjoint_regulatory_quality_to_next_year_electricity_access_twfe
+  threshold:
+    family_id: legacy_source_pair_frontier_2026_10_09
+    family_size: 84
+    family_alpha: 0.1
+    family_p_max: 0.0011904761904761906
+    expected_sign: '+'
+    min_observations: 800
+    min_countries: 50
+    min_pairs_per_country: 5
+    old_hypothesis_id: infrastructure_user_pricing_quality
+    old_result_bucket: PARTIAL
+    old_n_obs: 988
+    old_n_countries: 40
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_country_count: 40
+    old_country_ids: [ARG, AUS, BGD, BRA, CAN, CHL, CHN, COL, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, IDN, IND, ITA, JPN, KEN, KOR, LKA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PAK, PER, PHL, POL, SWE, THA, TUR, USA, VNM, ZAF]
+    heldout_country_ids: *heldout
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: wgi:GOV_WGI_RQ.EST
+        path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+        sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_RQ.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+        indicator_id: GOV_WGI_RQ.EST
+      outcome:
+        source: world_bank_wdi:EG.ELC.ACCS.ZS
+        path: data/vintages/world_bank_wdi/EG.ELC.ACCS.ZS@2026-05-05T195057Z.parquet
+        sha256: aa564cbe2947b3d1c3499d7ecb9b2c38c6aa5de073d2cc1a797cfe2fe42f2931
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: EG.ELC.ACCS.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/EG.ELC.ACCS.ZS?format=json
+        indicator_id: EG.ELC.ACCS.ZS
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+      rule:
+        source: wgi:RL.EST
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: RL.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+        indicator_id: GOV_WGI_RL.EST
+prior_confidence: 0.45
+disclosure: >-
+  Electricity access is bounded and often near 100%, so ceiling effects may
+  limit informative variation. The regulatory-quality estimate and access can
+  respond jointly to development, geography, and institutions. A one-year lag
+  and fixed effects do not identify a regulatory reform effect. The old
+  user-pricing proxy result is retrospective and provides no prospective support.
+steelman: hypotheses/steelman/regulatory_quality_electricity_access_country_holdout_v2.md
+scope:
+  period: [1996, 2023]
+  countries: *heldout
+  outcome_dim: [energy]
+  policy_family: [energy_policy]
+  treatment_tags: [regulatory_quality]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

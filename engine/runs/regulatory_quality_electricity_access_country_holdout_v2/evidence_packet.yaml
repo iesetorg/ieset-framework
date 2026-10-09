@@ -1,0 +1,79 @@
+packet_version: 1
+generated_utc: '2026-10-09T18:36:05+00:00'
+hypothesis:
+  id: regulatory_quality_electricity_access_country_holdout_v2
+  path: hypotheses/energy/regulatory_quality_electricity_access_country_holdout_v2.yaml
+  topic: energy
+preregistration:
+  spec_commit: b23b974abac419387a238122a49084c6a6341a24
+  steelman: hypotheses/steelman/regulatory_quality_electricity_access_country_holdout_v2.md
+  family_id: legacy_source_pair_frontier_2026_10_09
+  family_size: 84
+  family_p_max: 0.0011904761904761906
+reproduction:
+  runner: scripts/run_regulatory_quality_electricity_access_country_holdout_v2.py
+  run_dir: engine/runs/regulatory_quality_electricity_access_country_holdout_v2
+  command: python3 scripts/run_regulatory_quality_electricity_access_country_holdout_v2.py
+    --check
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: method-valid coefficient did not clear the frozen directional cutoff
+data:
+  inputs:
+  - role: treatment
+    source: wgi:GOV_WGI_RQ.EST
+    path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+    sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: GOV_WGI_RQ.EST
+    source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+    indicator_id: GOV_WGI_RQ.EST
+  - role: outcome
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    path: data/vintages/world_bank_wdi/EG.ELC.ACCS.ZS@2026-05-05T195057Z.parquet
+    sha256: aa564cbe2947b3d1c3499d7ecb9b2c38c6aa5de073d2cc1a797cfe2fe42f2931
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: EG.ELC.ACCS.ZS
+    source_url: https://api.worldbank.org/v2/country/all/indicator/EG.ELC.ACCS.ZS?format=json
+    indicator_id: EG.ELC.ACCS.ZS
+  - role: income
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    series_id: NY.GDP.PCAP.KD
+    source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+    indicator_id: NY.GDP.PCAP.KD
+  - role: rule
+    source: wgi:RL.EST
+    path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+    sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+    manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    series_id: RL.EST
+    source_url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+    indicator_id: GOV_WGI_RL.EST
+  old_country_overlap: 0
+results:
+  coefficient: -1.4511804445461909
+  std_error: 1.8702123854538848
+  p_value: 0.43892738650508445
+  ci95:
+  - -5.144665802098741
+  - 2.2423049130063597
+  n_obs: 3595
+  n_countries: 161
+  r_squared: 0.9530656719023166
+  method: country/year FE OLS; country-clustered small-sample t(160) inference
+limitations:
+- Old same-commit user-pricing/maintenance proxy result was PARTIAL and seen before
+  this registration.
+- The country-disjoint sample can share source years or units with other IESET studies.
+- WGI regulatory quality does not measure user pricing or maintenance quality.
+- Lagged association does not identify a regulatory policy effect or causal direction.
+- Access ceiling effects can limit within-country variation; no school, policy, or
+  causal credit.
+correction:
+  disposition: descriptive_calibration_only
+  school_score_eligible: false
+  school_score_credit: 0
