@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fed_on_rrp_2025_durability_holdout_v2
+version: 1
+status: pre_registered
+topic: monetary
+claim: >-
+  The decline in US overnight reverse-repo usage observed by 2024 persisted
+  through 2025: each calendar quarter's median daily RRPONTSYD amount was
+  below USD 500 billion. This is a descriptive durability check, not a test
+  of which instrument or policy caused the decline.
+claim_direction: "-"
+methodology_note: >-
+  New-ID temporal follow-up to
+  financial_fed_reverse_repo_facility_usage_2021_2024. Its same-commit
+  SUPPORTED run used the 2021-2023 peak and 2024-Q3 decline; the old runner's
+  dispositive date filters stopped at 2024-09-30. That known result receives
+  no prospective credit here. The entire 2025 calendar year is the new
+  endpoint. The exact pinned FRED daily vintage, whose SHA-256 is recorded in
+  the old run's manifest, has 261 structural 2025 date keys. A separate
+  fetch-time manifest for this FRED slice was not found, so the older run
+  manifest and official FRED series metadata are the available custody chain.
+  Date keys were inspected before registration without reading held-out
+  amounts or their missingness. The old code loaded a full vintage before
+  filtering its 2024 endpoint, so this is out of time relative to the old
+  published result, not a claim that the raw file was never opened.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2025, 2025]
+  temporal_structure: time_series
+  exclusion_rules:
+    - >-
+      Use only dates 2025-01-01 through 2025-12-31 in the exact pinned
+      RRPONTSYD daily vintage, with no other source, date substitution,
+      smoothing, or later revision.
+    - >-
+      Require at least 55 unique, finite, nonnegative observed daily amounts
+      in each 2025 calendar quarter. If any quarter misses the gate, return
+      INCONCLUSIVE rather than dropping it.
+variables:
+  outcome:
+    - name: fed_on_rrp_daily_amount_usd_billions_2025
+      source: fred:RRPONTSYD
+      transformation: unweighted median of daily amounts in each 2025 calendar quarter
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Calculate the four separate 2025 calendar-quarter medians from the
+    Federal Reserve Bank of New York temporary open-market-operations series
+    distributed by FRED, measured in USD billions. Apply one joint rule to
+    the four medians. No Treasury-bill, balance-sheet, interest-rate, or
+    policy-causal attribution is inferred.
+falsification:
+  test: fed_on_rrp_2025_four_quarter_durability_v2
+  rule: >-
+    METHOD_VALID requires exact source-hash custody, unchanged first-addition
+    committed registration, and at least 55 unique finite nonnegative daily
+    observations in each 2025 calendar quarter. SUPPORTED if every quarter's
+    median is <500 USD billion. REFUTED if at least two quarter medians are
+    >=1000 USD billion. Otherwise PARTIAL. A failed method gate is
+    INCONCLUSIVE; no day, quarter, or threshold may be selected after viewing
+    amounts.
+  threshold:
+    old_hypothesis_id: financial_fed_reverse_repo_facility_usage_2021_2024
+    old_result_seen: SUPPORTED
+    holdout_year: 2025
+    quarters: [2025Q1, 2025Q2, 2025Q3, 2025Q4]
+    minimum_unique_days_per_quarter: 55
+    support_quarter_median_usd_bn_exclusive_max: 500.0
+    refute_quarter_median_usd_bn_min: 1000.0
+    refute_min_quarters: 2
+    source_file:
+      path: data/vintages/fred/RRPONTSYD@2026-04-30T115134Z.parquet
+      sha256: 4ed716e07b2843a319510dc5074231a33e3afe08706ebc9f6546b62624093335
+      custody_manifest: engine/runs/financial_fed_reverse_repo_facility_usage_2021_2024/manifest.yaml
+      source_url: https://fred.stlouisfed.org/series/RRPONTSYD
+      fetch_time_manifest: null
+prior_confidence: 0.50
+disclosure: >-
+  The old same-commit SUPPORTED result was known before this new registration.
+  The 2025 endpoint is outside the old result window, but it uses the same
+  source vintage and FRED series; global blindness and independent-source
+  replication are not claimed. The proposed 2025 amounts and null masks were
+  not inspected during design. The old run's named Treasury-bill absorption
+  mechanism is not tested here. This packet can supply calibration evidence
+  only, with no causal or automatic scoreboard credit.
+steelman: hypotheses/steelman/fed_on_rrp_2025_durability_holdout_v2.md
+scope:
+  period: [2025, 2025]
+  countries: [USA]
+  outcome_dim: [monetary_policy]
+  policy_family: [none]
+  treatment_tags: [temporal_holdout]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
