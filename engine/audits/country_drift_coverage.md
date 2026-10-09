@@ -13,7 +13,7 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 | Countries with at most 2 plotted movements | 49 |
 | Countries first coded after 2000 | 38 |
 | Countries with internal uncovered intervals | 0 |
-| Countries lacking 2026 coverage, including policy-only countries | 0 |
+| Countries lacking 2026 coverage, including policy-only countries | 1 |
 | Existing policy records flagged for research | 53 |
 | Overlapping authored movement pairs sharing policy IDs | 67 |
 | EU supranational geographic scope records to review | 4 |
@@ -24,6 +24,7 @@ A broad movement marked ongoing counts as covered here; this does not confirm ev
 
 | ISO3 | Plotted movements | Last coded event | Last covered year |
 | --- | ---: | ---: | ---: |
+| STP | 1 | 2022 | 2025 |
 
 ## Late starts and sparse coding
 
@@ -159,7 +160,7 @@ Showing 50 of 53 policy-country leads; the JSON report contains all of them.
 
 ## Overlap and shared-policy review
 
-There are 965 overlapping same-country authored movement pairs; 948 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
+There are 964 overlapping same-country authored movement pairs; 947 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
 
 | ISO3 | Overlap | Both plotted? | Movement pair | Shared policy IDs |
 | --- | --- | --- | --- | --- |

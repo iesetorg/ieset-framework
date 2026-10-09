@@ -10,6 +10,7 @@ import type { FeatureCollection, Geometry } from "geojson";
 import { WorldMap, type AtlasMovement, type CountryPath } from "@/components/atlas/WorldMap";
 import { ISO_NUMERIC_TO_ALPHA3 } from "@/lib/iso-numeric-to-alpha3";
 import { dominantClusterFor } from "@/lib/position-clusters";
+import { parseElectionReviews } from "@/lib/atlas-elections";
 
 interface MovementYaml {
   movement_id: string;
@@ -17,11 +18,13 @@ interface MovementYaml {
   countries: string[];
   timeframe: { start: number; end: number | string };
   position_alignments?: { position_id: string; alignment: string }[];
+  policies?: string[];
   scope?: "national" | "subnational" | "supranational";
 }
 
 const REPO_ROOT = resolve(process.cwd(), "..");
 const NOW = new Date().getUTCFullYear();
+const AS_OF = new Date().toISOString().slice(0, 10);
 // Encode "ongoing" as a sentinel that's bigger than any current year so the
 // slider treats them as active through the present.
 const ONGOING_SENTINEL = NOW;
@@ -60,6 +63,15 @@ async function loadCountryPaths(): Promise<CountryPath[]> {
 async function loadMovements(): Promise<AtlasMovement[]> {
   const dir = join(REPO_ROOT, "movements");
   if (!existsSync(dir)) return [];
+  const policyIds = new Set<string>();
+  const policyDir = join(REPO_ROOT, "policies");
+  if (existsSync(policyDir)) {
+    for (const file of await readdir(policyDir)) {
+      if (!file.endsWith(".yaml") || file.startsWith("_")) continue;
+      const policy = yaml.load(await readFile(join(policyDir, file), "utf8")) as { policy_id?: string } | null;
+      if (typeof policy?.policy_id === "string") policyIds.add(policy.policy_id);
+    }
+  }
   const entries = await readdir(dir);
   const out: AtlasMovement[] = [];
   for (const e of entries) {
@@ -92,22 +104,40 @@ async function loadMovements(): Promise<AtlasMovement[]> {
       cluster: dom.cluster,
       cluster_score: dom.score,
       scope: doc.scope,
+      policy_coding_ready: Array.isArray(doc.policies) && doc.policies.length > 0
+        && doc.policies.every(id => policyIds.has(id)),
     });
   }
   return out;
 }
 
+async function loadElectionReviews() {
+  const dir = join(REPO_ROOT, "data", "atlas");
+  if (!existsSync(dir)) return [];
+  const files = (await readdir(dir)).filter(name => /^election_reviews_[a-z]+\.json$/.test(name)).sort();
+  const rows = await Promise.all(files.map(async name =>
+    parseElectionReviews(JSON.parse(await readFile(join(dir, name), "utf8")), name)
+  ));
+  // Validate across files too: two regions must not silently disagree about one country.
+  const reviews = parseElectionReviews(rows.flat());
+  if (reviews.some(review => review.checked_on > AS_OF)) {
+    throw new Error("Atlas election review is dated after the current build date");
+  }
+  return reviews.sort((a, b) => a.country.localeCompare(b.country));
+}
+
 export const metadata = {
   title: "Atlas — movements over time",
   description:
-    "Interactive world map of every governing movement in the library, with a year slider. Hover a country to see active movements at that point in time.",
+    "Explore authored policy movements by year, with dated election results, government-formation checks, and sources for selected countries.",
   alternates: { canonical: "https://framework.ieset.org/atlas/" },
 };
 
 export default async function AtlasPage() {
-  const [movements, paths] = await Promise.all([
+  const [movements, paths, electionReviews] = await Promise.all([
     loadMovements(),
     loadCountryPaths(),
+    loadElectionReviews(),
   ]);
   const yearMin = movements.length
     ? Math.max(1900, Math.min(...movements.map((m) => m.start)))
@@ -120,10 +150,11 @@ export default async function AtlasPage() {
         Atlas
       </h1>
       <p className="mb-6 max-w-[780px] text-[16px] leading-[1.55] text-muted">
-        Drag the slider to a year. Each shaded country has at least one
-        movement in the library that was governing at that moment. Hover for
-        the names; click through on the movement page itself for the policy
-        fingerprint.
+        Explore authored policy movements by year. Colours reflect the library’s
+        policy coding; they do not classify an election winner by party name.
+        Recent election and government checks appear below the map. Coverage is
+        selective, and an ongoing movement is not proof that its government is
+        still in office.
       </p>
 
       <WorldMap
@@ -131,6 +162,8 @@ export default async function AtlasPage() {
         paths={paths}
         yearMin={yearMin}
         yearMax={yearMax}
+        electionReviews={electionReviews}
+        asOf={AS_OF}
       />
     </div>
   );
