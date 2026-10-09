@@ -11,8 +11,10 @@ engine/runs/*/diagnostics.json:
   B (X2) detect_sentinel_values — percent-decline stats near 100 and
       percent/ratio-family values at 1e4 scale are fallback/sentinel artefacts,
       never real observations.
-  C (X3) detect_duplicate_source_hashes — a single vintage sha256 referenced by
-      two or more distinct publisher keys voids "independent sources" claims.
+  C (X3) detect_duplicate_source_hashes — fewer distinct vintage hashes than
+      declared publishers cannot establish "independent sources" claims.
+      Multiple series from one publisher count as one publisher; absent hashes
+      are a missing-custody finding, not evidence of byte-identical files.
   D (X4) count_exceeds_declared_sample — `countries_meeting_threshold` counts
       above the sample size declared in the threshold ("at least k of n") mean
       the evaluator scanned the wrong universe.
@@ -57,9 +59,13 @@ COUNT_THRESHOLD_STATS = {"countries_meeting_threshold"}
 SAMPLE_SIZE_RE = re.compile(r"\bof\s+(\d+)\b")
 
 
-def _publishers(metric: dict) -> list[str]:
+def _source_keys(metric: dict) -> list[str]:
     raw = metric.get("source") or ""
     return [p.strip() for p in raw.split(";") if p.strip()]
+
+
+def _publishers(metric: dict) -> list[str]:
+    return sorted({source.split(":", 1)[0].strip() for source in _source_keys(metric)})
 
 
 def detect_sentinel_values(metrics: list[dict]) -> list[dict]:
@@ -118,26 +124,39 @@ def detect_unit_typetag_mismatch(metric: dict) -> dict | None:
 
 
 def detect_duplicate_source_hashes(diagnostics: dict) -> list[dict]:
-    """Flag metrics whose declared independent publishers outnumber their
-    distinct vintage files (audit record C): when N publishers are served by
-    M < N files, at least two nominally independent publishers are the same
-    bytes. M == 1 with N >= 2 is the strongest case: every publisher shares
-    one file."""
+    """Flag missing custody separately from fewer hashes than publishers.
+
+    The per-metric hashes do not map a particular file to a publisher. Fewer
+    distinct hashes than publisher namespaces cannot establish that each has
+    an independent pinned file; zero hashes proves only that source custody
+    was not recorded for a multi-source metric.
+    """
     findings = []
     for m in diagnostics.get("metrics") or []:
         if not isinstance(m, dict):
             continue
-        pubs = sorted(set(_publishers(m)))
+        source_keys = sorted(set(_source_keys(m)))
+        pubs = _publishers(m)
         hashes = sorted(set(m.get("vintage_sha256") or []))
-        if len(pubs) >= 2 and len(hashes) < len(pubs):
+        if not hashes and len(source_keys) >= 2:
+            findings.append({
+                "detector": "missing_source_hash",
+                "metric_id": m.get("metric_id"),
+                "publishers": pubs,
+                "source_keys": source_keys,
+                "sha256": [],
+                "detail": "multiple declared source series have no per-metric vintage hashes — source custody missing; byte identity unassessed",
+            })
+        elif len(pubs) >= 2 and len(hashes) < len(pubs):
             findings.append({
                 "detector": "duplicate_source_hash",
                 "metric_id": m.get("metric_id"),
                 "publishers": pubs,
+                "source_keys": source_keys,
                 "sha256": hashes,
                 "detail": (
-                    f"{len(pubs)} declared publishers share {len(hashes)} vintage file(s)"
-                    + (" — all publishers byte-identical" if len(hashes) == 1 else " — fewer files than publishers")
+                    f"{len(pubs)} declared publishers have only {len(hashes)} distinct per-metric vintage hash(es)"
+                    " — independent source custody unverified"
                 ),
             })
     return findings

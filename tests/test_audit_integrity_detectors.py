@@ -97,14 +97,12 @@ def test_duplicate_hash_detector_flags_soviet_shared_vintages():
     findings = DET.detect_duplicate_source_hashes(diag)
     assert findings, "expected shared-hash findings in the Soviet run diagnostics"
     by_metric = {f["metric_id"]: f for f in findings}
-    # audit X3: rosstat:demographic_yearbook and human_mortality_database:RUS
-    # share sha256 da0c27… — the life-expectancy metric's 3 publishers are
-    # served by that single file
+    # audit X3: three distinct publisher namespaces are served by one hash.
     life_exp = by_metric["life_expectancy_male_collapse"]
     assert life_exp["publishers"] == [
-        "human_mortality_database:RUS",
-        "rosstat:demographic_yearbook",
-        "who_gho:life_expectancy",
+        "human_mortality_database",
+        "rosstat",
+        "who_gho",
     ]
     assert life_exp["sha256"] == [
         h for h in life_exp["sha256"] if h.startswith("da0c27")
@@ -123,6 +121,45 @@ def test_duplicate_hash_detector_clean_when_publishers_match_files():
         ]
     }
     assert DET.detect_duplicate_source_hashes(diag) == []
+
+
+def test_same_publisher_series_are_not_independent_sources():
+    diag = {
+        "metrics": [{
+            "metric_id": "two_series_one_publisher",
+            "source": "ons:KAB9; ons:D7BT",
+            "vintage_sha256": ["1" * 64],
+        }],
+    }
+    assert DET.detect_duplicate_source_hashes(diag) == []
+
+
+def test_distinct_publishers_sharing_one_hash_still_flagged():
+    diag = {
+        "metrics": [{
+            "metric_id": "shared_file",
+            "source": "ons:KAB9; oecd:PRIC",
+            "vintage_sha256": ["1" * 64],
+        }],
+    }
+    findings = DET.detect_duplicate_source_hashes(diag)
+    assert len(findings) == 1
+    assert findings[0]["detector"] == "duplicate_source_hash"
+    assert findings[0]["publishers"] == ["oecd", "ons"]
+    assert findings[0]["sha256"] == ["1" * 64]
+
+
+def test_multiple_series_without_hashes_are_missing_custody_not_duplicates():
+    diag = {
+        "metrics": [
+            {"metric_id": "distinct_publishers", "source": "ons:KAB9; oecd:PRIC", "vintage_sha256": []},
+            {"metric_id": "same_publisher", "source": "ons:KAB9; ons:D7BT"},
+        ],
+    }
+    findings = DET.detect_duplicate_source_hashes(diag)
+    assert {f["metric_id"] for f in findings} == {"distinct_publishers", "same_publisher"}
+    assert {f["detector"] for f in findings} == {"missing_source_hash"}
+    assert all(f["sha256"] == [] and "byte identity unassessed" in f["detail"] for f in findings)
 
 
 # --- X4: sample-scope explosion (audit record D) ---------------------------- #
