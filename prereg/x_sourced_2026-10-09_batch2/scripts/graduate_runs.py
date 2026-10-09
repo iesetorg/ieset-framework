@@ -15,7 +15,8 @@ BATCH = {
            "(first fetch 17:41 UTC); results committed afterwards in 3659330be. Thresholds were written by the drafting agent after "
            "reading the source post, so the claimed figures were known; the data were not.")),
 }
-OWN = {"california_fast_food_20_wage_restaurant_employment"}
+OWN = {"california_fast_food_20_wage_restaurant_employment": "Our own addition — no source post. (The batch-1 spec lists a Seattle post as context only.)",
+       "us_southwest_border_encounters_collapse_fy2026": "Our own addition — no qualifying source post. The post listed in the spec (WhiteHouse, 2026-10-08) is about H-1B visas, not border encounters; it was mis-matched during mining and is not a source for this claim."}
 def sha(p): return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
 def fmt(v):
     if isinstance(v, float): return f"{v:,.3f}".rstrip("0").rstrip(".")
@@ -34,7 +35,7 @@ def main():
         spec_p = next(ROOT.glob(f"hypotheses/*/{hid}.yaml")); spec = yaml.safe_load(spec_p.read_text())
         label = r["verdict"].split(",")[0].strip().upper(); verdict = f"{label} — {r['headline']}"
         urls = [] if hid in OWN else spec.get("source_provenance", {}).get("archive_refs", [])
-        src = ("Our own addition — no source post. (The batch-1 spec lists a Seattle post as context only.)" if hid in OWN else "; ".join(urls))
+        src = OWN[hid] if hid in OWN else "; ".join(urls)
         out = ROOT / "engine/runs" / hid; out.mkdir(parents=True, exist_ok=True)
         rel_results = str(pathlib.Path(rp).relative_to(ROOT))
         diag = dict(hypothesis_id=hid, evidence_type=spec.get("evidence_type"), template=spec.get("estimator", {}).get("template"),
