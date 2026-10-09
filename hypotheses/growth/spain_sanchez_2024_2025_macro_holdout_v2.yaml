@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: spain_sanchez_2024_2025_macro_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim: >-
+  From 2024 to 2025, Spain's real GDP per resident and employment rate both
+  changed at least as favorably as the median changes of seven fixed euro-area
+  peers. This is an out-of-time description of two measured macro outcomes,
+  without attributing either change to the Spanish government.
+claim_direction: "+"
+methodology_note: >-
+  New-ID temporal follow-up to spain_sanchez_economic_trajectory_2018_2023.
+  The old same-commit run was PARTIAL (GDP-per-capita panel coefficient
+  -0.01640669, p=0.66575323, 171 country-years through 2023) and lacked the
+  registered housing and real-wage outcomes. That known result receives no
+  prospective credit. The present design uses only 2024 and 2025 endpoints,
+  direct pinned Eurostat sources, a fixed seven-country peer median, and a
+  narrower two-outcome descriptive rule. These years are out of time relative
+  to the old Spain run, not a claim of global IESET blindness. Source hashes
+  and key coverage were checked before registration without reading this
+  proposed endpoint's held-out outcome values.
+evidence_type: descriptive
+sample:
+  countries: [ESP, FRA, ITA, PRT, GRC, DEU, NLD, BEL]
+  period: [2024, 2025]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Spain is the sole focal country. Fixed peers are FRA, ITA, PRT, GRC,
+      DEU, NLD, BEL; omit Ireland for the GDP distortion flagged in the old
+      design. Never substitute, drop, or reweight a country after observing values.
+    - >-
+      Require exact 2024 and 2025 cells for each pinned series and each of the
+      eight countries. Do not interpolate, revise source versions, use WDI
+      fallbacks, or use 2018-2023 outcomes in the endpoint.
+variables:
+  outcome:
+    - name: real_gdp_per_resident_growth_2024_2025
+      source: eurostat:nama_10_gdp; eurostat:demo_pjan
+      transformation: >-
+        log[(2025 B1GQ CLV20_MEUR / 2025 population NR TOTAL T) /
+        (2024 B1GQ CLV20_MEUR / 2024 population NR TOTAL T)]
+      notes: >-
+        Eurostat annual chain-linked GDP volume divided by the pinned
+        1-January population estimate. The same denominator convention
+        applies to all eight countries.
+    - name: employment_rate_change_2024_2025_pp
+      source: eurostat:lfsi_emp_a
+      transformation: 2025 minus 2024 percentage-point level, EMP_LFS Y15-64 T PC_POP
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Compute each country's exact 2024-to-2025 change. Subtract the unweighted
+    median of the seven fixed peer changes from Spain's change, separately
+    for log real GDP per resident and employment rate in percentage points.
+    The two metrics are co-primary and one joint directional rule is applied.
+    No regression, p-value, synthetic control, donor selection, 2018 treatment
+    indicator, or causal interpretation is permitted.
+falsification:
+  test: spain_2024_2025_fixed_peer_macro_change_v2
+  rule: >-
+    METHOD_VALID requires all eight named countries with exact 2024 and 2025
+    finite selected values in all three pinned sources, positive GDP and
+    population, matching source hashes, and an unchanged committed first-addition
+    preregistration. SUPPORTED if Spain's real-GDP-per-resident log-change minus
+    the peer median is >=0 AND its employment-rate percentage-point change minus
+    the peer median is >=0. REFUTED if both differences are <0. PARTIAL if one
+    is nonnegative and the other negative. If METHOD_VALID fails, INCONCLUSIVE;
+    no country substitution, fallback, or adjusted threshold is allowed.
+  threshold:
+    old_hypothesis_id: spain_sanchez_economic_trajectory_2018_2023
+    old_result_seen: PARTIAL
+    focal_country: ESP
+    peer_countries: [FRA, ITA, PRT, GRC, DEU, NLD, BEL]
+    holdout_years: [2024, 2025]
+    minimum_countries: 8
+    minimum_country_years_per_source: 16
+    gdp_growth_gap_support_min: 0.0
+    employment_change_gap_support_min_pp: 0.0
+    source_files:
+      real_gdp:
+        path: data/vintages/eurostat/nama_10_gdp@2026-07-23T154118Z.parquet
+        sha256: c02fd991a250c967cd6bd4350cf3bf6cde186bd38acc50a3dd984866415c9824
+        selector: {na_item: B1GQ, unit: CLV20_MEUR}
+      population:
+        path: data/vintages/eurostat/demo_pjan@2026-05-05T205848Z.parquet
+        sha256: c0910d085947e1c95da781ea3679f79909f41cab5c2cf5731db4e8fcf415f3e3
+        selector: {unit: NR, age: TOTAL, sex: T}
+      employment:
+        path: data/vintages/eurostat/lfsi_emp_a@2026-04-30T115837Z.parquet
+        sha256: 974340d9c78f8def6f7dca019bad810e31c5ca595552451bcc58361b57d22ec0
+        selector: {indic_em: EMP_LFS, age: Y15-64, sex: T, unit: PC_POP}
+prior_confidence: 0.50
+disclosure: >-
+  The analyst knew that the old Spain test was PARTIAL and that its housing
+  and real-wage outcomes were missing. This follow-up deliberately narrows the
+  claim and uses a later window and direct national statistics. The specific
+  2024-2025 GDP and employment values were not examined in this design lane
+  while selecting the endpoint, peers, or thresholds; broader IESET work has
+  used Eurostat vintages, including the same population vintage for an older
+  Poland study, so global blindness is not asserted. A favorable result cannot
+  be credited to Sánchez-era policy, treated as validation of the older
+  multi-outcome claim, or used for scoreboard promotion without separate
+  evidence review.
+steelman: hypotheses/steelman/spain_sanchez_2024_2025_macro_holdout_v2.md
+scope:
+  period: [2024, 2025]
+  countries: [ESP, FRA, ITA, PRT, GRC, DEU, NLD, BEL]
+  outcome_dim: [gdp_growth, employment_labour]
+  policy_family: [none]
+  treatment_tags: [temporal_holdout]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
