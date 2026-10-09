@@ -4,25 +4,25 @@ This generated index expands each policy's axis coding into second-order measure
 
 ## Summary
 
-- Policies indexed: 3355
+- Policies indexed: 3353
 - Movements indexed: 714
-- Policies with axis-inherited requirements: 3355
+- Policies with axis-inherited requirements: 3353
 - Policies with explicit evaluation_design: 10
-- Policies missing explicit design despite axis requirements: 3345
-- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3345, "explicit": 10}`
-- Source readiness mentions: `{"partial_ready": 44697, "proprietary_gap": 6710, "ready": 3344, "reconstruct_needed": 19051, "scrape_needed": 14096}`
+- Policies missing explicit design despite axis requirements: 3343
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3343, "explicit": 10}`
+- Source readiness mentions: `{"partial_ready": 44672, "proprietary_gap": 6706, "ready": 3342, "reconstruct_needed": 19039, "scrape_needed": 14090}`
 
 ## Most Common Required Layers
 
-- `distributional_incidence` (3323)
-- `first_order_policy_effect` (3187)
-- `behavioral_response` (3027)
-- `net_welfare` (2700)
-- `macro_feedback` (2663)
-- `fiscal_or_enforcement_cost` (2251)
-- `externality_or_spillover` (2081)
-- `market_structure_response` (1842)
-- `implementation_capacity` (1771)
+- `distributional_incidence` (3321)
+- `first_order_policy_effect` (3185)
+- `behavioral_response` (3025)
+- `net_welfare` (2698)
+- `macro_feedback` (2661)
+- `fiscal_or_enforcement_cost` (2249)
+- `externality_or_spillover` (2080)
+- `market_structure_response` (1841)
+- `implementation_capacity` (1770)
 - `dynamic_investment_response` (1627)
 - `allocation_distortion` (1409)
 - `second_order_supply_response` (1409)

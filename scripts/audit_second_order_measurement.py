@@ -943,7 +943,7 @@ def main() -> int:
         if args.scope != "all":
             stem = f"{stem}_{args.scope}"
         (out_dir / f"{stem}.json").write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
-        (out_dir / f"{stem}.md").write_text(build_report(data) + "\n")
+        (out_dir / f"{stem}.md").write_text(build_report(data).rstrip("\n") + "\n")
     else:
         print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
