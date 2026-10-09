@@ -4,30 +4,30 @@ This generated index expands each policy's axis coding into second-order measure
 
 ## Summary
 
-- Policies indexed: 3369
+- Policies indexed: 3365
 - Movements indexed: 714
-- Policies with axis-inherited requirements: 3369
+- Policies with axis-inherited requirements: 3365
 - Policies with explicit evaluation_design: 10
-- Policies missing explicit design despite axis requirements: 3359
-- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3359, "explicit": 10}`
-- Source readiness mentions: `{"partial_ready": 44914, "proprietary_gap": 6738, "ready": 3359, "reconstruct_needed": 19152, "scrape_needed": 14172}`
+- Policies missing explicit design despite axis requirements: 3355
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3355, "explicit": 10}`
+- Source readiness mentions: `{"partial_ready": 44848, "proprietary_gap": 6730, "ready": 3355, "reconstruct_needed": 19122, "scrape_needed": 14148}`
 
 ## Most Common Required Layers
 
-- `distributional_incidence` (3337)
-- `first_order_policy_effect` (3203)
-- `behavioral_response` (3044)
-- `net_welfare` (2720)
-- `macro_feedback` (2680)
-- `fiscal_or_enforcement_cost` (2272)
-- `externality_or_spillover` (2093)
-- `market_structure_response` (1859)
-- `implementation_capacity` (1780)
-- `dynamic_investment_response` (1644)
-- `allocation_distortion` (1422)
-- `second_order_supply_response` (1422)
-- `quality_margin` (1400)
-- `leakage_or_substitution` (1242)
+- `distributional_incidence` (3333)
+- `first_order_policy_effect` (3198)
+- `behavioral_response` (3039)
+- `net_welfare` (2715)
+- `macro_feedback` (2674)
+- `fiscal_or_enforcement_cost` (2266)
+- `externality_or_spillover` (2086)
+- `market_structure_response` (1852)
+- `implementation_capacity` (1778)
+- `dynamic_investment_response` (1636)
+- `allocation_distortion` (1416)
+- `second_order_supply_response` (1416)
+- `quality_margin` (1394)
+- `leakage_or_substitution` (1237)
 - `first_order_price_or_transfer` (13)
 
 ## Explicit Design Backlog

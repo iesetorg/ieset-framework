@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **446 public records** (51 featured, 395 calibration) among 1,990
-hypotheses. That is **74 additional** relative to the 372 starting point and
-**426 short** of the requested increment. Here public includes calibration;
+ledger has **462 public records** (51 featured, 411 calibration) among 2,007
+hypotheses. That is **90 additional** relative to the 372 starting point and
+**410 short** of the requested increment. Here public includes calibration;
 featured remains 51, so the featured-only increment is zero. No result was
 made featured by loosening its gate.
 
@@ -132,7 +132,7 @@ A separate Argentina core-CPI follow-up was registered and run locally, but
 its full pinned fetch manifest contained unrelated local home paths. The
 public-integrity gate rejected that source packet. Its spec, source, runner,
 and result were removed from this review tree and **are not counted** in the
-446 public records. The original local run remains available for a separate
+public records. The original local run remains available for a separate
 administrative-redaction audit; post-result redaction cannot be presented as
 an untouched prospective registration. No causal or school-score credit was
 assigned. The local Git history still contains the rejected manifest in
@@ -173,9 +173,10 @@ override an external evidence hold. The
 count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
-There are **224 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 670 public
-records, still **202 below** 872. The archive repair review found 131
+There are **225 verified archived** records in the current funnel, including
+the new inconclusive Vietnam WTO flow case. Even the unrealistic upper bound
+of converting every one would yield 687 public records, still **185 below**
+872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
@@ -184,7 +185,8 @@ individually specified, source-custodied strict registrations and successful
 replays; current evidence does not justify claiming it has happened.
 
 A current frozen-repair audit found **no immediately runnable** same-ID case
-among the 224 verified archives. A separate metadata-only screen of the 820
+among the 224 archives it inspected before the Vietnam case was added. A
+separate metadata-only screen of the 820
 legacy cases beyond the first 500 review rows found 67 distinct source-pair
 groups as an upper bound for design review, including the five earlier
 measured holdouts and the ten new follow-ups run in this sprint. Pair
@@ -203,17 +205,116 @@ aliases and use one family-wide multiplicity budget before reading outcomes. Ali
 new groups already represented by strict registrations, and sign-history
 review rejected several legacy verdicts as design inputs.
 
-A fresh read-only source inventory found 35 local raw parquet vintages and 45
-derived panels in this isolated checkout. The straightforward measured
-WDI/WGI, BIS, OECD, ILO, and EIA pairs have already been used in strict v2
-families. No additional distinct test cleared a key-only registration review
-without new source custody or policy timing work. The WID wealth-share panel
-could support a Sweden 2007 wealth-tax design, but its pinned raw vintage is
-absent here and the legal treatment date/donor set need review. The derived
-profit-shifting panel also lacks its pinned raw vintage; its named TWZ and CbCR
-windows are short. Six of seven source-custodied treaty-flow candidates failed
-their frozen pretrend gate. These are acquisition/design leads, not public
-conversions or permission to reuse a failed event family without a new
-prospective registration and multiplicity rule.
+An earlier read-only source inventory found 35 raw parquet vintages and 45
+derived panels **in this isolated checkout**. That was a checkout-scope limit,
+not an IESET corpus limit: the untouched main checkout holds 1,926 ignored raw
+parquet vintages. Exact-SHA-pinned copies of the WID wealth file, a
+profit-shifting vintage, the CEPII Gravity raw source, and twelve CEPII exposure
+series were recovered into this isolated checkout without changing the main
+checkout; it now has 67 raw parquet vintages after additional pinned WDI/WGI,
+OECD, and V-Dem sources were restored. A committed single-vintage
+recovery tool checks HEAD manifest pins and defaults to a dry run. These files
+open source and key-only design review, but do not make any frozen archive
+automatically runnable or public. The straightforward measured WDI/WGI, BIS,
+OECD, ILO, and EIA pairs have already been used in strict v2 families. A WID
+Sweden wealth-tax design was rejected before registration because the 2007
+repeal also ended individual wealth-statistics collection, making a break in
+the top-share series inseparable from a measurement change. The existing policy
+record now distinguishes the December 2007 legislative decision, January 2008
+commencement, and retroactive 2007 tax-year application. The profit-shifting
+panel's named TWZ and CbCR windows remain short. Six of seven earlier
+source-custodied treaty-flow candidates failed their frozen pretrend gate.
+
+A seventh five-case country-disjoint WDI/WGI family was registered with exact
+source pins, old-fit country exclusions, and a five-test p<=0.02 rule before
+outcome fits. The five measured pairs were government consumption versus
+next-year WGI corruption control, central-government tax-revenue share versus
+next-year real household consumption growth, WGI regulatory quality versus
+next-year internet use, WGI government effectiveness versus next-year gross
+secondary enrollment, and WGI regulatory quality versus next-year physician
+density. All five passed their complete-case floors and exact replay, but all
+were **PARTIAL** under the frozen family rule. They enter public calibration
+only, with no causal or school-score credit; the old proxy claims were not
+validated. A separate Vietnam 2007 WTO directed-flow registration cleared
+source and replay checks but was **INCONCLUSIVE** because its pretrend slope gap
+was 0.083339 log units/year against the fixed 0.03 cap. It remains archived,
+with no policy-effect credit. Its custody addendum records that a failed
+pre-result extraction materialized flow text in process memory before a
+key-census correction, although no magnitude was parsed, printed, used to
+choose the correction, or evaluated before the frozen result run.
+
+An additional WGI regulatory-quality to BIS real residential-price-growth
+country holdout was independently registered and source-locked before its
+value run. It had 542 complete pairs in 25 countries with no overlap against
+the old 40-country fit rosters, and its exact replay passed. Its country-clustered
+coefficient was -1.385916 with p=0.628738 against the frozen 84-screen
+p<=0.001190476 cutoff. It is **PARTIAL** and enters public calibration only;
+it does not validate a causal housing, affordability, policy, or school claim.
+The OECD ALMP/EPL 2020–21 temporal holdout was then registered, source-locked,
+run, and independently replayed. Its 34-country, 68-pair interaction was
+negative (p=0.00731 against the frozen 0.01 cutoff), so the narrow measured
+association was **REFUTED**. Pandemic confounding precludes a policy-effect
+claim; it enters calibration with no school credit. A four-test OECD SOCX
+programme family used measured health, family, old-age, and housing spending
+against matched next-year outcomes with a family p<=0.025 rule. All four passed
+their floors and exact replay. Health, family, and housing were **PARTIAL**;
+the old-age spending to elderly relative-poverty association was **SUPPORTED**
+(459 observations in 37 countries, p=0.0202), still descriptive calibration
+only. Two distinct V-Dem/WDI country holdouts also passed registration,
+source pins, data floors, and exact replay: women's movement freedom to female
+labour-force participation (56 countries, p=0.197) and public-goods spending
+composition to under-five mortality (57 countries, p=0.750). Both are
+**PARTIAL** descriptive calibration, with no school or policy-effect credit.
+Three CEPII Gravity exposure to WDI outcome tests were separately registered,
+source-locked, and replayed with an old 61-country roster excluded and a
+three-test p<=1/60 rule. All passed their complete-case/variation floors:
+foreign market potential to next-year trade-openness change (4,674 pairs/122
+countries, p=0.367), FTA gravity market share to private-investment change
+(1,310/69, p=0.344), and FTA partner-GDP share to high-tech export share
+(1,145/104, p=0.581). All three are **PARTIAL** descriptive calibration, not
+independent treaty-event replications and not policy-effect evidence.
+
+The integrity-detector scan found 36 flagged runs; all are legacy same-commit
+registrations, so correcting a detector classification cannot graduate them.
+A narrow detector repair now distinguishes missing source hashes from repeated
+hashes and collapses multiple series from one publisher. The flags remain
+excluded by their independent registration gate. A CEPII Gravity RTA label
+cross-check found that its version-specific archive label file supports the
+existing builder's category mapping, despite contradictory prose documentation;
+no result depends on that RTA count and no source value was changed.
+
+The drift map now uses the full authored 1846–2026 movement span and 145
+country series. Its national totals exclude California's subnational movement
+and five EU-wide programmes whose member applicability is not yet coded.
+The atlas slider reaches 1846, and all 145 countries can be picked individually.
+Source-reviewed duplicate coding was removed from the UK 1976, US Biden, and
+Colombia 2002 umbrellas, then from overlapping Obama, Trump, Thatcher,
+Doi Moi, and Mulroney/Chrétien movements. Brazil's Plano Real and Mexico's Banxico/Article 27
+overlaps were also corrected; the duplicated US Inflation Reduction Act policy
+was consolidated under one dated record. The EU-wide source movements remain
+in the corpus and atlas; a separate drift layer needs a member, date, and
+overlap rule before those steps can enter national comparisons. These map
+and policy repairs do not confer empirical support on linked hypotheses. Three
+source-verified Swiss candidate records were added for the 1992 EEA vote,
+the 2001/2003 debt brake, and the 2011–2015 SNB euro floor; the policy registry
+now has 3,368 records and 50 permitted candidate forward references. Dodd-Frank,
+ARRA, and USMCA policy axes and dates were also narrowed to source-supported
+provisions. The three Swiss date-only candidates have no coded axis movement;
+the policy quality audit flags them as thin rather than inferring effects.
+
+FAO food-security designs remain a source-custody queue. Key-only screens found
+up to three distinct nonoverlapping-period associations, but the large ignored
+FAO parquet files lack tracked source-vintage pins and the annual-looking PoU
+and FIES data are regional aggregates. They were not registered or counted.
+
+Final source validation accepted 6,132 specs with 50 permitted candidate
+forward references; link reciprocity had zero errors/warnings, scope validation
+zero errors and seven existing warnings, drift artifact freshness passed, and
+the local web build rendered 8,333 static pages. Standard pytest collection
+now resolves IESET's own scripts after adding a package marker. The full
+isolated-checkout run had 475 passed, 48 skipped, and 17 failures in older test
+areas; several expect an absent checkout virtualenv, ignored raw vintages, or
+release assets. Those failures need separate investigation and fixture/artifact
+restoration before a full-green claim; focused drift and detector tests passed.
 
 No push, merge, or deployment is part of this status.
