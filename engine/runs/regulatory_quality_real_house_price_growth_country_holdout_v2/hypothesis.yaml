@@ -1,0 +1,172 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: regulatory_quality_real_house_price_growth_country_holdout_v2
+version: 1
+status: pre_registered
+topic: housing
+claim_direction: '-'
+claim: >-
+  Among the fixed 25 countries excluded from both old housing proxy screens,
+  a higher WGI regulatory-quality estimate at year t predicts a lower BIS
+  real residential-property-price year-on-year change in Q4 of t+1, after
+  conditioning on Q4 price growth at t, current real income and its growth,
+  WGI rule of law, country effects, and treatment-year effects.
+methodology_note: >-
+  New-ID measured-association follow-up to housing_affordability_broad_scope_market
+  and housing_supply_freedom_affordability. Both old same-commit results were
+  PARTIAL (757 rows, 32 fitted countries) and were known before this design.
+  They treated broad regulatory quality as housing-market freedom and BIS prices
+  as affordability; neither interpretation is retained. Every country in their
+  identical 40-country old rosters is excluded. A dimension and country/year-key
+  screen found an upper envelope of 542 pairs in 25 countries; it read no
+  outcome values, null masks, coefficients, or candidate fit. The same BIS
+  25-country source was previously used as a treatment in a separate income
+  follow-up, so these observations are not globally unseen evidence. The
+  84-screen Bonferroni rule and calibration-only ceiling are fixed before fit.
+evidence_type: associational
+sample:
+  countries: &heldout
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - GRC
+  - HKG
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - LTU
+  - LUX
+  - LVA
+  - MKD
+  - MLT
+  - PRT
+  - ROU
+  - RUS
+  - SGP
+  - SRB
+  - SVK
+  - SVN
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude every old-specification country: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.'
+  - Use only the fixed 25-country roster above; exclude BIS aggregate codes and make no replacement.
+  - Select BIS WS_SPP FREQ Q, VALUE R, UNIT_MEASURE 771, OBS_STATUS A, and Q4 in exact years t and t+1; 771 is the publisher's year-on-year percent-change unit.
+  - Join WGI regulatory quality and rule of law at exact t, and positive WDI real GDP per capita at t-1 and t. No interpolation, source switch, or outcome-based trimming.
+  - Require at least five complete treatment years per retained country, 400 pairs, and 20 countries before estimating.
+variables:
+  outcome:
+  - name: next_year_real_residential_price_yoy_pct_q4
+    source: bis:WS_SPP
+    transformation: BIS real residential-property-price year-on-year percent change in Q4 of exact t+1.
+  treatment:
+  - name: regulatory_quality_t
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: WGI regulatory-quality point estimate at exact t.
+  controls:
+  - name: current_real_residential_price_yoy_pct_q4
+    source: bis:WS_SPP
+    transformation: BIS real residential-property-price year-on-year percent change in Q4 of exact t.
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per capita at exact t.
+  - name: current_real_gdp_pc_log_growth_pct
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log of positive real GDP per capita at t divided by its level at t-1.
+  - name: rule_of_law_t
+    source: wgi:RL.EST
+    transformation: WGI rule-of-law point estimate at exact t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One primary OLS coefficient for regulatory quality at t with country and
+    treatment-year fixed effects, the four fixed controls above, and
+    country-clustered small-sample t(G-1) uncertainty. No model search,
+    alternate BIS unit, automatic control dropping, or other verdict.
+falsification:
+  rule: >-
+    INCONCLUSIVE if fewer than 400 complete pairs, fewer than 20 countries,
+    fewer than five complete years for any retained country, or if the primary
+    estimate or country-clustered uncertainty is unidentified or nonfinite.
+    Otherwise SUPPORTED only for a negative coefficient at two-sided
+    p<=0.1/84; REFUTED for a positive coefficient at the same threshold;
+    every other estimable result is PARTIAL. The conservative 84-screen budget
+    covers the metadata-screened legacy source-pair opportunities.
+  test: country_disjoint_regulatory_quality_to_next_year_real_house_price_growth_twfe
+  threshold:
+    family_id: legacy_source_pair_frontier_2026_10_09
+    family_size: 84
+    family_alpha: 0.1
+    family_p_max: 0.0011904761904761906
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 20
+    min_pairs_per_country: 5
+    old_hypothesis_ids: [housing_affordability_broad_scope_market, housing_supply_freedom_affordability]
+    old_result_buckets: [PARTIAL, PARTIAL]
+    old_n_obs: 757
+    old_n_countries: 32
+    old_spec_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_country_count: 40
+    old_country_ids: [ARG, AUS, BGD, BRA, CAN, CHL, CHN, COL, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, IDN, IND, ITA, JPN, KEN, KOR, LKA, MAR, MEX, MYS, NGA, NLD, NOR, NZL, PAK, PER, PHL, POL, SWE, THA, TUR, USA, VNM, ZAF]
+    heldout_country_ids: *heldout
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      property:
+        source: bis:WS_SPP
+        path: data/vintages/bis/WS_SPP@2026-07-23T151601Z.parquet
+        sha256: 2d21f842356c92d9d8698e350e693add58505c67569a932cd735843ec085c583
+        manifest: data/manifests/fetch_run_2026-07-23T151632Z.yaml
+        series_id: WS_SPP
+        source_url: https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/?format=csv
+        dimensions: {FREQ: Q, VALUE: R, UNIT_MEASURE: 771, OBS_STATUS: A, quarter: Q4}
+      quality:
+        source: wgi:GOV_WGI_RQ.EST
+        path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+        sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_RQ.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+        indicator_id: GOV_WGI_RQ.EST
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+      rule:
+        source: wgi:RL.EST
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: RL.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/RL.EST?format=json&source=3
+        indicator_id: GOV_WGI_RL.EST
+prior_confidence: 0.50
+disclosure: >-
+  WGI regulatory quality is a broad perception-based governance composite,
+  not a housing-regulation measure. Real house-price growth can reflect
+  income, credit, migration, and demand. This lagged panel association cannot
+  identify zoning, affordability, a policy effect, or causal direction. The
+  prior same-commit proxy results and reused BIS observations confer no
+  independent support or school-score credit.
+steelman: hypotheses/steelman/regulatory_quality_real_house_price_growth_country_holdout_v2.md
+scope:
+  period: [1996, 2023]
+  countries: *heldout
+  outcome_dim: [housing]
+  policy_family: [institutional_reform, housing_policy]
+  treatment_tags: [regulatory_quality, real_residential_property_price_growth]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
