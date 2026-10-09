@@ -1,0 +1,163 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: private_credit_tfp_growth_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: regulatory
+claim: Among countries excluded from the old financial-depth study, greater private credit relative to
+  GDP is associated with higher exact next-year total-factor-productivity growth, conditional on country
+  and year effects and two fixed controls.
+claim_direction: +
+methodology_note: New-ID country-disjoint follow-up to financial_market_depth_productivity (SUPPORTED
+  old result known). The old candidate was a proxy screen with WDI GDP-per-capita growth as outcome. This
+  new primary endpoint is the directly measured PWT TFP log change; it does not claim credit reallocation
+  or causality. The old country roster is excluded before any t/t+1 pair is created. The analyst saw the
+  old same-commit result before designing this new-ID holdout; that old run receives no prospective credit.
+  The three tests share international macro data and use a Bonferroni family threshold. No held-out coefficient
+  was inspected before registration. A provisional pre-registration screen counted finite/nonmissing
+  candidate-series records without reviewing magnitudes; those counts were withdrawn and replaced by
+  country/year-key upper bounds. Candidate selection and the 1000-pair/50-country minimum gate were
+  therefore calibrated after seeing availability patterns.
+  Some WDI/WGI vintages and eligible countries overlap the already
+  fitted 16 WGI/trade v2 holdouts. "Held-out" means country-disjoint from this design's named old ID,
+  not unseen across the entire IESET programme; the three-test correction applies only to this registered
+  family.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 1996
+  - 2018
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all 40 countries in the historical old specification, including any without fitted rows:
+    ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX
+    MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.'
+  - Retain only ISO 3166-1 alpha-3 countries with nonmissing finite input series, exact t and t+1 calendar-year
+    pairing, and at least five complete treatment years per country. Do not choose countries or covariates
+    by the held-out outcome level, sign, or coefficient.
+  - Require positive values before natural-log transformations; do not impute, interpolate, or use a nearest-year
+    substitute.
+variables:
+  outcome:
+  - name: next_year_log_tfp_change
+    source: pwt:rtfpna
+    transformation: log index at exact t+1 minus log index at t; both values must be positive
+  treatment:
+  - name: private_credit_pct_gdp
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: level at t
+  controls:
+  - name: log_gdp_pc
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log at t
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level at t
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One primary OLS coefficient on the t treatment with country and treatment-year fixed effects
+    and country-clustered standard errors. Treatment year t is the year-effect key. Use the fixed complete-case
+    sample; no automatic control dropping. The three registered primary tests use the same two-sided Bonferroni
+    threshold.
+falsification:
+  rule: If fewer than 1000 complete t/t+1 country-year pairs or 50 countries remain after the five-year
+    screen, or if the primary coefficient or its clustered uncertainty is unidentified/nonfinite, return
+    INCONCLUSIVE. Otherwise SUPPORT requires a positive primary coefficient and two-sided country-clustered
+    p <= 0.10/3. REFUTATION requires a negative coefficient and the same p threshold. Every other estimable
+    result is PARTIAL. Apply the same family rule to all three tests, including adverse results.
+  test: country_disjoint_exact_next_year_panel_fe
+  threshold:
+    family_id: legacy_wdi_wgi_owid_panel_holdouts_2026_10_09
+    family_size: 3
+    family_alpha: 0.1
+    family_p_max: 0.03333333333333333
+    expected_sign: +
+    min_observations: 1000
+    min_countries: 50
+    min_pairs_per_country: 5
+    old_hypothesis_id: financial_market_depth_productivity
+    old_result_bucket: SUPPORTED
+    old_country_count: 40
+    source_files:
+      outcome:
+        path: data/vintages/pwt/rtfpna@2026-05-05T195242Z.parquet
+        sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+      treatment:
+        path: data/vintages/world_bank_wdi/FS.AST.PRVT.GD.ZS@2026-05-05T194720Z.parquet
+        sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      rule_of_law:
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+prior_confidence: 0.4
+disclosure: The analyst knew the old SUPPORTED verdict when selecting this disjoint follow-up. Country
+  and year effects plus lagged outcome timing do not identify a causal effect; omitted institutions, reverse
+  causation, and shared international measurement may explain the association. An old proxy result cannot
+  be promoted by this registration alone. Some WDI/WGI vintages and eligible countries overlap the already
+  fitted 16 WGI/trade v2 holdouts. "Held-out" means country-disjoint from this design's named old ID,
+  not unseen across the entire IESET programme; the three-test correction applies only to this registered
+  family.
+steelman: hypotheses/steelman/private_credit_tfp_growth_geographic_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - productivity
+  policy_family:
+  - regulation
+  treatment_tags:
+  - private_credit_depth
+  - tfp_growth
+  - geographic_holdout
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
