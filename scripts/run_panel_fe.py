@@ -810,6 +810,20 @@ def normalise_panel(
     if publisher == "eurostat":
         df = _filter_eurostat_slice(df, series=series, variable_name=variable_name)
 
+    # ILO labour series can contain several sex and age measurements for the
+    # same country-year. Averaging them changes the outcome's meaning. Generic
+    # specs have no dimension selector, so leave such sources unresolved until
+    # a dedicated, explicitly sliced runner is registered.
+    if publisher == "ilostat" and {"country_iso3", "year"}.issubset(df.columns):
+        if df.duplicated(["country_iso3", "year"]).any():
+            return None
+
+    # The OECD minimum-wage dataflow has both mean- and median-wage ratios.
+    # A country-year average of those rows is neither published measure.
+    if publisher == "oecd" and str(series or "").upper() == "MWUSD":
+        if "AGGREGATION_OPERATION" in df.columns and df["AGGREGATION_OPERATION"].nunique(dropna=True) > 1:
+            return None
+
     cols = {c.lower(): c for c in df.columns}
     # Discover the country column.
     country_col = None
