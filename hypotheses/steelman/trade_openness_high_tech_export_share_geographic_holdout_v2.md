@@ -1,0 +1,7 @@
+# Steelman: trade openness and high-technology exports as a share of manufactured exports holdout
+
+The strongest version of this narrow claim is that cross-border exchange may help countries gain inputs, ideas, and competitive pressure that coincide with a higher high-technology export share of manufactured exports in the following year. This test asks whether the within-country association appears in a country pool completely omitted from the older study, after common calendar shocks, income, and rule of law are accounted for. The old 40-country result was PARTIAL and is disclosed in the new specification.
+
+The strongest rival explanation is: Industrial policy, multinational assembly, and product-mix changes can move this ratio without open technical standards or domestic technology diffusion. Changes in a trade-to-GDP ratio can also reflect GDP denominator movements, commodity prices, exchange rates, and global demand. Country and year effects do not resolve these problems.
+
+The frozen endpoint is **world_bank_wdi:TX.VAL.TECH.MF.ZS**, read as percent of manufactured exports, at exact calendar t+1. It does not operationalise the old named mechanism. The original 40 countries are excluded; the sample, source hashes, threshold, and nine-test family are fixed before estimation. A favorable result would support a measured association only; an adverse significant result would refute its stated direction, and a weak estimate would remain PARTIAL.

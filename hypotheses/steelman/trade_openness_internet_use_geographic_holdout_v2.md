@@ -1,0 +1,7 @@
+# Steelman: trade openness and individual internet-use share holdout
+
+The strongest version of this narrow claim is that cross-border exchange may help countries gain inputs, ideas, and competitive pressure that coincide with a higher individual internet-use share in the following year. This test asks whether the within-country association appears in a country pool completely omitted from the older study, after common calendar shocks, income, and rule of law are accounted for. The old 40-country result was PARTIAL and is disclosed in the new specification.
+
+The strongest rival explanation is: Telecom infrastructure, income, and regulation can drive internet uptake alongside trade. The series does not measure durable-goods imports or market opening. Changes in a trade-to-GDP ratio can also reflect GDP denominator movements, commodity prices, exchange rates, and global demand. Country and year effects do not resolve these problems.
+
+The frozen endpoint is **world_bank_wdi:IT.NET.USER.ZS**, read as percent of population, at exact calendar t+1. It does not operationalise the old named mechanism. The original 40 countries are excluded; the sample, source hashes, threshold, and nine-test family are fixed before estimation. A favorable result would support a measured association only; an adverse significant result would refute its stated direction, and a weak estimate would remain PARTIAL.

@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_openness_hospital_beds_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: healthcare
+claim: Among countries excluded from the original 40-country study, a higher trade-to-GDP share in
+  year t is associated with greater hospital-bed density in year t+1, conditional on year-t
+  log real GDP per capita, year-t rule of law, country effects, and calendar-year effects.
+claim_direction: +
+methodology_note: New-ID prospective geographic holdout of medical_device_trade_openness_outcomes.
+  That same-commit legacy run was PARTIAL (trade coefficient +0.000661948, two-sided p=0.908137);
+  it receives no prospective credit. The original 40 countries are excluded. This test narrows the
+  outcome to the actual raw world_bank_wdi:SH.MED.BEDS.ZS level series and does not test the old mechanism.
+  Source vintages, 1996-2022 predictor years, 1997-2023 outcome years, and the nine-test family are
+  frozen before held-out estimation. Coverage was checked without held-out outcome association or
+  coefficient inspection.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude every country in the old 40-country roster: ARG AUS BGD BRA CAN CHL CHN COL DEU DNK EGY
+    ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE
+    THA TUR USA VNM ZAF.'
+  - Predictor and controls are measured at calendar year t in 1996-2022; outcome is the exact following
+    calendar year t+1 in 1997-2023. No gap-filling or interpolation.
+  - Keep finite complete-case values for all four pinned series, positive real GDP per capita for
+    the natural-log control, and only countries with at least five complete lagged pairs. No post-result
+    sample changes.
+variables:
+  outcome:
+  - name: hospital_beds_t_plus_1
+    source: world_bank_wdi:SH.MED.BEDS.ZS
+    transformation: raw level measured in the following calendar year; no differencing or standardisation
+    notes: beds per 1,000 population
+  treatment:
+  - name: trade_openness_pct_gdp_t
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: raw level in percentage points at year t
+  controls:
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive raw level at year t
+  - name: rule_of_law_t
+    source: wgi:RL.EST
+    transformation: raw WGI estimate at year t
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS two-way fixed effects on lagged-pair sample, with country-clustered covariance. Year
+    effect is treatment year t. The sole primary coefficient is trade_openness_pct_gdp_t. No interactions,
+    alternate outcomes, or covariate selection.
+falsification:
+  rule: INCONCLUSIVE if fewer than 1,500 complete lagged pairs or 80 countries survive the fixed exclusions,
+    or if the coefficient or clustered uncertainty is nonfinite or unidentified. Otherwise SUPPORTED
+    only for the expected + sign with a two-sided country-clustered p-value at most 0.01; REFUTED
+    for the opposite sign with p at most 0.01; otherwise PARTIAL. One family contains eight measured-endpoint
+    holdouts plus trade_openness_private_consumption_geographic_holdout_v2. Nine tests at p<=0.01
+    bound family-wise error by 0.09 via Bonferroni. A significant result supports only the measured
+    association.
+  test: geographic_holdout_trade_openness_hospital_beds
+  threshold:
+    expected_sign: +
+    family_id: trade_openness_geographic_holdouts_2026_10_09
+    family_size: 9
+    family_alpha_max: 0.1
+    p_max: 0.01
+    min_observations: 1500
+    min_countries: 80
+    min_pairs_per_country: 5
+    source_files:
+      treatment:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      outcome:
+        path: data/vintages/world_bank_wdi/SH.MED.BEDS.ZS@2026-04-30T114635Z.parquet
+        sha256: 314f060add784ee0f788e4e891d1547618cb8069e77946ff6887ea5ba867c046
+      log_gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      rule_of_law:
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+prior_confidence: 0.45
+disclosure: The old study's PARTIAL result was known before this new registration and may influence
+  endpoint selection. Public health budgets and hospital policy determine bed capacity; bed counts
+  do not identify medical-device imports or care quality. Trade share is not a measured trade-policy
+  reform; even a significant holdout association would not identify causality. The nine related tests
+  share a treatment and country pool and count as one multiplicity family.
+steelman: hypotheses/steelman/trade_openness_hospital_beds_geographic_holdout_v2.md
+scope:
+  period:
+  - 1996
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - trade_policy
+  treatment_tags:
+  - trade_openness
+  - geographic_holdout
+  - hospital_beds
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

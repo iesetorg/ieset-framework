@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: trade_openness_private_consumption_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim: >
+  Among countries omitted from the original 40-country trade-openness study,
+  higher trade as a share of GDP is associated with higher real household
+  consumption per capita over 1996-2023, conditional on income, rule of law,
+  country fixed effects, and calendar-year fixed effects.
+claim_direction: "+"
+methodology_note: >
+  This new-ID geographic holdout follows trade_openness_consumer_welfare_1980_2024.
+  Its old PARTIAL result and same-commit legacy registration are known and
+  receive no prospective credit. The original 40 countries are excluded before
+  fitting. The old generic outcome label is replaced by the exact WDI real
+  household-consumption-per-capita series already used in the old run. The
+  tested period begins in 1996 because the frozen rule-of-law control has no
+  earlier observations. Pinned original-vintage hashes and complete-case
+  coverage were checked before registration; no held-out coefficient was
+  inspected. This is one of nine related trade-openness holdout tests fixed
+  together, each using a two-sided p threshold of 0.01.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1996, 2023]
+  temporal_structure: panel
+  exclusion_rules:
+    - >
+      Exclude the original complete 40-country sample: ARG AUS BGD BRA CAN CHL
+      CHN COL DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR
+      MEX MYS NGA NLD NOR NZL PAK PER PHL POL SWE THA TUR USA VNM ZAF.
+    - >
+      Use complete country-years for all four pinned series; no interpolation,
+      country replacement, or post-result exclusions. Require positive GDP
+      per capita for its natural-log transformation.
+variables:
+  outcome:
+    - name: real_household_consumption_pc
+      source: world_bank_wdi:NE.CON.PRVT.PC.KD
+      transformation: level
+      notes: Household final consumption expenditure per capita, constant currency.
+  treatment:
+    - name: trade_openness_pct_gdp
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level
+      notes: Imports plus exports as a share of GDP, percentage points.
+  controls:
+    - name: log_gdp_pc_constant
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural_log
+    - name: rule_of_law_wgi
+      source: wgi:RL.EST
+      transformation: level
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    OLS of real household consumption per capita on trade openness, log real
+    GDP per capita, and WGI rule of law, with country and calendar-year fixed
+    effects and country-clustered standard errors. The sole primary coefficient
+    is trade_openness_pct_gdp. The source paths and hashes are frozen in the
+    committed runner.
+falsification:
+  rule: >
+    If fewer than 2,000 complete country-years or 80 distinct countries remain,
+    or the primary coefficient or country-clustered uncertainty is nonfinite
+    or unidentified, INCONCLUSIVE. Otherwise SUPPORTED if the trade-openness
+    coefficient is positive with a two-sided clustered p-value at most 0.01;
+    REFUTED if it is negative with p at most 0.01; every other estimable result
+    is PARTIAL. Nine related trade-openness holdout tests use the same p<=0.01
+    rule, controlling their family-wise decision error below 0.10 by Bonferroni.
+    The same fixed test counts null and adverse outcomes.
+  test: geographic_holdout_trade_openness_private_consumption
+  threshold:
+    expected_sign: "+"
+    family_id: trade_openness_geographic_holdouts_2026_10_09
+    family_size: 9
+    family_alpha_max: 0.10
+    p_max: 0.01
+    min_observations: 2000
+    min_countries: 80
+    source_files:
+      treatment:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      outcome:
+        path: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+        sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+      log_gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      rule_of_law:
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+prior_confidence: 0.45
+disclosure: >
+  The analyst knew the old 40-country PARTIAL result. Trade openness and
+  household consumption are jointly determined by development, prices, and
+  policy, while GDP per capita is strongly related to the outcome. Even a
+  significant holdout association would not identify a causal effect of trade
+  liberalisation or prove consumer welfare broadly. The nine tests share a
+  treatment and country pool and are evaluated as one multiplicity family.
+steelman: hypotheses/steelman/trade_openness_private_consumption_geographic_holdout_v2.md
+scope:
+  period: [1996, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [trade_openness, private_consumption, geographic_holdout]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
