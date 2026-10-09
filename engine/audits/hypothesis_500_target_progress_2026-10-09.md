@@ -3,10 +3,11 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **444 public records** (51 featured, 393 calibration) among 1,979
-hypotheses. That is **72 additional** relative to the 372 starting point and
-**428 short** of the requested increment. No result was made featured by
-loosening its gate.
+ledger has **442 public records** (51 featured, 391 calibration) among 1,980
+hypotheses. That is **70 additional** relative to the 372 starting point and
+**430 short** of the requested increment. Here public includes calibration;
+featured remains 51, so the featured-only increment is zero. No result was
+made featured by loosening its gate.
 
 An earlier four-case new-ID batch illustrates the decision boundary:
 
@@ -79,7 +80,7 @@ coefficient +0.254676, p=3.07e-12). Both measures are GDP ratios, so this is
 a narrow descriptive association, not a tax-policy or welfare effect. The
 entire family is calibration only with zero school-score credit.
 
-Four further direct or country-disjoint tests were registered before values,
+Three further direct or country-disjoint tests were registered before values,
 run, and replayed. The EIA state electricity-generation test was **REFUTED**:
 5 of 37 qualifying states with rising wind/solar generation had a lower coal
 output on the frozen annual comparison, below its registered success floor. The
@@ -106,11 +107,32 @@ This result is country-disjoint from the old fit but shares the World Bank/WITS
 export measurement family, so it is not independent source replication. It is
 calibration only with zero school or policy-score credit.
 
+A new male age-25-to-54 remittance/LFP follow-up repaired the endpoint of an
+archived old run that had averaged ILO sex and age cells despite naming that
+subgroup. Its fixed 148-area, 3,220-pair holdout passed the preregistered
+sample floor and returned **PARTIAL** (coefficient -0.086589, p=0.109493;
+99.375% family interval [-0.235777, 0.062599]). The series is an ILO
+modelled estimate and can use World Bank/IMF macro inputs, so it is not
+independent survey validation of its WDI predictors. This is descriptive
+calibration only, with no causal, policy, or school credit.
+
+A wider ILO source-dimension audit found three public calibration cards whose
+saved results did not justify their stated endpoint or full decision rule:
+`minimum_wage_youth_unemployment_tradeoff`,
+`unemployment_benefit_generosity_employment_drag`, and
+`workfare_conditionality_employment_effect`. An external integrity hold now
+withdraws their public visibility and school-score eligibility without
+rewriting historical specs or runs. The first two have invalid named primary
+outcomes; workfare has a narrower measured primary but untested secondary,
+age, timing, and robustness requirements. The source-key proof, eight already
+archived ILO outcome cases, and prospective repair gate are documented in
+`engine/audits/ilostat_dimension_integrity_2026-10-09.md`.
+
 A separate Argentina core-CPI follow-up was registered and run locally, but
 its full pinned fetch manifest contained unrelated local home paths. The
 public-integrity gate rejected that source packet. Its spec, source, runner,
 and result were removed from this review tree and **are not counted** in the
-444 public records. The original local run remains available for a separate
+442 public records. The original local run remains available for a separate
 administrative-redaction audit; post-result redaction cannot be presented as
 an untouched prospective registration. No causal or school-score credit was
 assigned. The local Git history still contains the rejected manifest in
@@ -126,15 +148,18 @@ claim-by-claim adjudication. Five earlier calibration-only geographic holdouts
 now have an explicit external school-score exclusion so later links cannot
 silently award credit; their frozen runs remain untouched.
 
-The regular registration, evidence-tier, funnel, census, school outcome,
-second-order, and link audits were refreshed after the combined results. The
+The registration, evidence-tier, funnel, census, school outcome,
+second-order, and link audits were refreshed after the combined results.
+The three integrity holds removed 18 links from public tested coverage while
+leaving every school net score unchanged; structural claim links do not
+override an external evidence hold. The
 500-case prospective queue is a **design-review selection**, not a graduation
 count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
-There are **215 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 659 public
-records, still **213 below** 872. The archive repair review found 131
+There are **218 verified archived** records in the current funnel. Even the
+unrealistic upper bound of converting every one would yield 660 public
+records, still **212 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
@@ -143,7 +168,7 @@ individually specified, source-custodied strict registrations and successful
 replays; current evidence does not justify claiming it has happened.
 
 A current frozen-repair audit found **no immediately runnable** same-ID case
-among the 215 verified archives. A separate metadata-only screen of the 820
+among the 218 verified archives. A separate metadata-only screen of the 820
 legacy cases beyond the first 500 review rows found 67 distinct source-pair
 groups as an upper bound for design review, including the five earlier
 measured holdouts and the ten new follow-ups run in this sprint. Pair
@@ -154,9 +179,10 @@ groups passing a basic panel eligibility screen. Fifty-two still carry proxy
 warnings, 17 use constructed or trend treatments, and only eight are simple
 measured pairs without those or Fraser/Heritage flags. The 372 Heritage
 cross-section rows reuse just 16 outcome-source pairs. These are design-review
-ceilings, not conversions. Even converting all 215 archives and all 84 groups
-would add only 299, leaving 129 of the requested 428 additions; in reality
-neither full conversion is justified. A future batch must deduplicate semantic
+ceilings, not conversions. The fossil and remittance follow-ups have now consumed two of those eight
+simple-pair leads. Even converting all 218 archives and all 82 remaining
+source-pair groups would add only 300, leaving 130 of the requested 430
+additions; in reality neither full conversion is justified. A future batch must deduplicate semantic
 aliases and use one family-wide multiplicity budget before reading outcomes. Alias-aware review also rejected apparent
 new groups already represented by strict registrations, and sign-history
 review rejected several legacy verdicts as design inputs.
