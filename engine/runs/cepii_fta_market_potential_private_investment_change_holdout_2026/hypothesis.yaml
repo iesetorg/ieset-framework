@@ -1,0 +1,103 @@
+hypothesis_id: cepii_fta_market_potential_private_investment_change_holdout_2026
+version: 1
+status: pre_registered
+topic: trade
+claim: >-
+  Among countries absent from the old CEPII FTA-growth sample, a higher
+  year-t FTA-covered share of distance-weighted foreign GDP market potential
+  is associated with a larger exact t-to-t+1 change in private fixed capital
+  formation as a share of GDP.
+claim_direction: "+"
+methodology_note: >-
+  Prospective descriptive macro calibration using a continuous source-coded
+  partner exposure, not a treaty-event causal estimate. Full design and
+  61-country exclusion are frozen in
+  engine/audits/cepii_wdi_exposure_family_prereg_2026-10-09.md.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude all 61 countries listed in the family preregistration plan and frozen runner.
+    - Keep CEPII existing-country ISO3 rows only; exclude WDI aggregate codes.
+    - Require exact t-1 and t exposure, exact t and t+1 outcome, and income at t.
+    - Require finite complete values, share in [0,1], positive income, and at least five paired years per country; no interpolation.
+variables:
+  treatment:
+    - name: fta_covered_distance_weighted_foreign_gdp_share
+      source: cepii:gravity_fta_market_potential_share
+      transformation: observed share at t
+  outcome:
+    - name: next_year_change_private_fixed_investment_gdp_percentage_points
+      source: world_bank_wdi:NE.GDI.FPRV.ZS
+      transformation: value_t+1 minus value_t
+  controls:
+    - name: baseline_private_fixed_investment_gdp
+      source: world_bank_wdi:NE.GDI.FPRV.ZS
+      transformation: level at t
+    - name: log_real_gdp_per_person
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural log of positive value at t
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One primary coefficient with country and treatment-year effects and
+    country-clustered standard errors. No automatic covariate dropping.
+falsification:
+  test: cepii_wdi_three_exposure_panel_fe_exact_year
+  rule: >-
+    INCONCLUSIVE if fewer than 400 complete pairs, 35 countries, 25 countries
+    with within-country treatment range >= 0.01, 200 positive-share rows,
+    or if full rank and finite clustered uncertainty fail. Otherwise a
+    positive coefficient with two-sided p <= 1/60 is SUPPORTED, a negative
+    coefficient at the same threshold is REFUTED, and every other estimable
+    result is PARTIAL.
+  threshold:
+    family_id: cepii_wdi_exposure_family_2026_10_09
+    family_size: 3
+    family_alpha: 0.05
+    family_p_max: 0.016666666666666666
+    expected_sign: "+"
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    min_varying_countries: 25
+    min_within_country_range: 0.01
+    min_positive_share_rows: 200
+    old_hypothesis_id: liberal_free_trade_partner_growth_panel_1990_2020
+    old_country_count: 61
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        path: data/vintages/cepii/gravity_fta_market_potential_share@2026-05-15T175027Z.parquet
+        sha256: 64cfa88dfa7a60e78206ca8ee7d35a5e25e4d1677d40aef67fa7637971f82d05
+        manifest: data/manifests/fetch_run_2026-05-15T175027Z.yaml
+      outcome:
+        path: data/vintages/world_bank_wdi/NE.GDI.FPRV.ZS@2026-04-30T115003Z.parquet
+        sha256: 84294f869d513ae4c70154630b31388a53b41c42bf849a006740c9324ebeba14
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+prior_confidence: 0.4
+disclosure: >-
+  CEPII fta_wto is agreement status, not tariff intensity or enforcement.
+  FTA coverage may be selected by investment trends, and WDI private capital
+  formation can be missing or revised. This shares source and FTA mechanism
+  with the high-tech card, so it is not an independent replication. No policy
+  effect or school claim follows from a panel association.
+steelman: hypotheses/steelman/cepii_fta_market_potential_private_investment_change_holdout_2026.md
+scope:
+  period: [1990, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

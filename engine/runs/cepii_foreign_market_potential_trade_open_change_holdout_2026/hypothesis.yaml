@@ -1,0 +1,101 @@
+hypothesis_id: cepii_foreign_market_potential_trade_open_change_holdout_2026
+version: 1
+status: pre_registered
+topic: trade
+claim: >-
+  Among countries absent from the old CEPII FTA-growth sample, a larger
+  year-t increase in gravity-weighted foreign GDP market potential is
+  associated with a larger exact t-to-t+1 change in trade as a share of GDP.
+claim_direction: "+"
+methodology_note: >-
+  Prospective country-disjoint descriptive calibration. The old FTA-accession
+  versus WDI trade/GDP card is archived with a rank-deficient estimator;
+  this exposure is foreign partner GDP divided by distance, not FTA status.
+  Full design and 61-country exclusion are frozen in
+  engine/audits/cepii_wdi_exposure_family_prereg_2026-10-09.md.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1961, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Exclude all 61 countries listed in the family preregistration plan and frozen runner.
+    - Keep CEPII existing-country ISO3 rows only; exclude WDI aggregate codes.
+    - Require exact t-1 and t exposure, exact t and t+1 outcome, and income at t.
+    - Require finite complete values, positive market potential and income, and at least five paired years per country; no interpolation.
+variables:
+  treatment:
+    - name: growth_in_gravity_weighted_foreign_market_potential
+      source: cepii:gravity_foreign_market_potential
+      transformation: log(value_t) minus log(value_t-1)
+  outcome:
+    - name: next_year_change_trade_share_gdp_percentage_points
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: value_t+1 minus value_t
+  controls:
+    - name: baseline_trade_share_gdp
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: level at t
+    - name: log_real_gdp_per_person
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural log of positive value at t
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One primary coefficient with country and treatment-year effects and
+    country-clustered standard errors. No automatic covariate dropping.
+falsification:
+  test: cepii_wdi_three_exposure_panel_fe_exact_year
+  rule: >-
+    INCONCLUSIVE if fewer than 800 complete pairs, 50 countries, 35 countries
+    with within-country treatment range above 0.0001, or if full rank and
+    finite clustered uncertainty fail. Otherwise a positive coefficient
+    with two-sided p <= 1/60 is SUPPORTED, a negative coefficient at the same
+    threshold is REFUTED, and every other estimable result is PARTIAL.
+  threshold:
+    family_id: cepii_wdi_exposure_family_2026_10_09
+    family_size: 3
+    family_alpha: 0.05
+    family_p_max: 0.016666666666666666
+    expected_sign: "+"
+    min_observations: 800
+    min_countries: 50
+    min_pairs_per_country: 5
+    min_varying_countries: 35
+    min_within_country_range: 0.0001
+    old_hypothesis_id: liberal_free_trade_partner_growth_panel_1990_2020
+    old_country_count: 61
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        path: data/vintages/cepii/gravity_foreign_market_potential@2026-05-15T175027Z.parquet
+        sha256: 4fc1accd300115d9169bcfe6b7018045d8839d3e866bffe3240be46f524eaa3e
+        manifest: data/manifests/fetch_run_2026-05-15T175027Z.yaml
+      outcome:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+prior_confidence: 0.5
+disclosure: >-
+  Partner GDP and distance measure available market mass, not a policy change
+  or realized external demand. Nominal partner GDP, source coverage shifts,
+  domestic cycles and simultaneous trade changes confound interpretation.
+  The old FTA-growth result was visible before this design. This card cannot
+  validate treaty effects, causes, welfare, or any school claim.
+steelman: hypotheses/steelman/cepii_foreign_market_potential_trade_open_change_holdout_2026.md
+scope:
+  period: [1961, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
