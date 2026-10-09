@@ -28,7 +28,7 @@ HID = "vietnam_wto_2007_baci_export_basket_peer_change"
 RUNNER_REL = f"scripts/run_{HID}.py"
 SPEC_REL = f"hypotheses/trade/{HID}.yaml"
 STEELMAN_REL = f"hypotheses/steelman/{HID}.md"
-PLAN_REL = f"engine/audits/{HID}_source_plan.md"
+PLAN_REL = "engine/audits/vietnam_wto_2007_baci_export_basket_source_plan.md"
 SLICE_REL = f"data/pinned_evidence/{HID}.csv"
 SLICE_MANIFEST_REL = f"data/pinned_evidence/{HID}.manifest.json"
 RUN_REL = f"engine/runs/{HID}"
@@ -88,13 +88,31 @@ def registration_commit() -> str:
     if len(set(additions)) != 1:
         raise RuntimeError("spec, steelman, plan and runner must first appear together")
     commit = additions[0]
-    for relative in REGISTRATION_FILES:
+    for relative in (SPEC_REL, STEELMAN_REL, PLAN_REL):
         if git_bytes(commit, relative) != (ROOT / relative).read_bytes():
             raise RuntimeError(f"registration changed since first addition: {relative}")
+    amendment = runner_amendment_commit(commit)
+    if not is_strict_ancestor(commit, amendment):
+        raise RuntimeError("runner correction must be committed after registration")
     if git("ls-tree", "-r", "--name-only", commit, "--", SLICE_REL,
            SLICE_MANIFEST_REL, RUN_REL).stdout.strip():
         raise RuntimeError("registration commit already contained a source slice or result")
+    if git("ls-tree", "-r", "--name-only", amendment, "--", SLICE_REL,
+           SLICE_MANIFEST_REL, RUN_REL).stdout.strip():
+        raise RuntimeError("runner correction already contained source slice or result")
     return commit
+
+
+def runner_amendment_commit(registration: str) -> str:
+    amendment = git("log", "-1", "--format=%H", "HEAD", "--", RUNNER_REL).stdout.decode().strip()
+    if not amendment or not is_strict_ancestor(registration, amendment):
+        raise RuntimeError("commit runner correction before value access")
+    if git_bytes(amendment, RUNNER_REL) != (ROOT / RUNNER_REL).read_bytes():
+        raise RuntimeError("runner changed since correction commit")
+    changes = git("log", "--format=%H", f"{registration}..{amendment}", "--", RUNNER_REL).stdout.decode().splitlines()
+    if changes != [amendment]:
+        raise RuntimeError("runner must have exactly one prospective correction")
+    return amendment
 
 
 def sha256_file(path: Path) -> str:
@@ -168,6 +186,7 @@ def slice_bytes(rows: list[dict[str, str]]) -> bytes:
 
 def extract(source_zip: Path, verify: bool) -> None:
     registration = registration_commit()
+    amendment = runner_amendment_commit(registration)
     if sha256_file(source_zip) != SOURCE_SHA256:
         raise RuntimeError("CEPII source ZIP does not match registered SHA-256")
     selected, raw_matches, excluded = source_rows(source_zip)
@@ -179,6 +198,7 @@ def extract(source_zip: Path, verify: bool) -> None:
         "source_zip_sha256": SOURCE_SHA256,
         "license": "CEPII Gravity, Etalab Open Licence 2.0; attribution required",
         "registration_commit": registration,
+        "runner_amendment_commit": amendment,
         "slice_path": SLICE_REL,
         "slice_sha256": hashlib.sha256(content).hexdigest(),
         "row_count": len(selected),
@@ -203,13 +223,14 @@ def extract(source_zip: Path, verify: bool) -> None:
 
 
 def committed_slice(registration: str) -> tuple[list[dict[str, str]], dict[str, Any], str]:
+    amendment = runner_amendment_commit(registration)
     additions = []
     for relative in (SLICE_REL, SLICE_MANIFEST_REL):
         path = ROOT / relative
         if not path.is_file() or git_bytes("HEAD", relative) != path.read_bytes():
             raise RuntimeError(f"commit unchanged source slice before run: {relative}")
         additions.append(first_addition(relative))
-    if len(set(additions)) != 1 or not is_strict_ancestor(registration, additions[0]):
+    if len(set(additions)) != 1 or not is_strict_ancestor(amendment, additions[0]):
         raise RuntimeError("source slice must first appear together in a later commit")
     slice_commit = additions[0]
     for relative in (SLICE_REL, SLICE_MANIFEST_REL):
@@ -219,6 +240,7 @@ def committed_slice(registration: str) -> tuple[list[dict[str, str]], dict[str, 
         raise RuntimeError("source slice commit already contained result artifacts")
     manifest = json.loads((ROOT / SLICE_MANIFEST_REL).read_text())
     if (manifest.get("registration_commit") != registration
+            or manifest.get("runner_amendment_commit") != amendment
             or manifest.get("source_zip_sha256") != SOURCE_SHA256
             or manifest.get("row_count") != len(EXPECTED_KEYS)
             or manifest.get("raw_matches") != EXPECTED_RAW_MATCHES
@@ -371,6 +393,8 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "publisher": "cepii", "dataset": "Gravity V202211", "source_url": SOURCE_URL,
         "source_zip_sha256": SOURCE_SHA256, "source_member": SOURCE_MEMBER,
         "license": source_manifest["license"],
+        "registration_commit": registration,
+        "runner_amendment_commit": source_manifest["runner_amendment_commit"],
         "slice_path": SLICE_REL, "slice_sha256": source_manifest["slice_sha256"],
         "slice_commit": slice_commit, "row_count": len(EXPECTED_KEYS),
     }
@@ -378,6 +402,7 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "hypothesis_id": HID, "verdict": analysis["verdict"],
         "method": "descriptive fixed-basket, fixed-donor log pre/post comparison",
         "run_utc": stamp, "preregistration_commit": registration,
+        "runner_amendment_commit": source_manifest["runner_amendment_commit"],
         "slice_commit": slice_commit, "slice_sha256": source_manifest["slice_sha256"],
         "source_zip_sha256": SOURCE_SHA256, "runner": RUNNER_REL,
         "selected_rows_total": len(EXPECTED_KEYS), "selection_truncated": False,
@@ -389,12 +414,14 @@ def artifacts(registration: str, slice_commit: str, source_manifest: dict[str, A
         "hypothesis_id": HID, "run_utc": stamp, "status": analysis["verdict"],
         "runner": RUNNER_REL, "hypothesis_snapshot": f"{RUN_REL}/hypothesis.yaml",
         "preregistration_commit": registration, "source": source, "correction": correction,
+        "runner_amendment_commit": source_manifest["runner_amendment_commit"],
     }
     packet = {
         "packet_version": 1, "generated_utc": stamp,
         "hypothesis": {"id": HID, "path": SPEC_REL, "policy_id": "vn_wto_accession_2007"},
         "preregistration": {
             "commit": registration, "steelman": STEELMAN_REL,
+            "runner_amendment_commit": source_manifest["runner_amendment_commit"],
             "source_plan": PLAN_REL, "frozen_hypothesis_snapshot": f"{RUN_REL}/hypothesis.yaml",
         },
         "source": source,
