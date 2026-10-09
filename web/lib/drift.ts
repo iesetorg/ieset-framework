@@ -85,6 +85,7 @@ export interface DriftContextObservation {
 export interface DriftStartingContext {
   first_coded_year: number;
   fiscal: DriftContextObservation | null;
+  fiscal_note: string;
   market_institutions: DriftContextObservation | null;
   market_institutions_note: string;
   market_institutions_source_url: string;

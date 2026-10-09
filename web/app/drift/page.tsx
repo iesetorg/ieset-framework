@@ -292,8 +292,11 @@ export default async function DriftPage() {
         final,
         recent_slope,
         fiscal_context: contextDataset?.countries[iso3]?.fiscal ?? null,
+        fiscal_context_note: contextDataset?.countries[iso3]?.fiscal_note ?? null,
         market_context:
           contextDataset?.countries[iso3]?.market_institutions ?? null,
+        market_context_note:
+          contextDataset?.countries[iso3]?.market_institutions_note ?? null,
       };
     })
     .sort((a, b) => b.final - a.final);
@@ -486,7 +489,9 @@ export default async function DriftPage() {
                                       {row.fiscal_context.relation_to_first_coded_year === "opening" ? " opening" : " later"}
                                     </div>
                                   ) : (
-                                    <div>Fiscal context unavailable</div>
+                                    <div title={row.fiscal_context_note ?? undefined}>
+                                      Fiscal context unavailable
+                                    </div>
                                   )}
                                   {row.market_context ? (
                                     <div
@@ -496,7 +501,9 @@ export default async function DriftPage() {
                                       {row.market_context.relation_to_first_coded_year === "opening" ? " opening" : " later"}
                                     </div>
                                   ) : (
-                                    <div>Regulatory quality unavailable</div>
+                                    <div title={row.market_context_note ?? undefined}>
+                                      Regulatory quality unavailable
+                                    </div>
                                   )}
                                 </div>
                               </td>
