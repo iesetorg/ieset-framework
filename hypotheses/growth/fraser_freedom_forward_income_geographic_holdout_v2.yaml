@@ -1,0 +1,186 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fraser_freedom_forward_income_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim: Among countries excluded from the old economic-freedom study, higher Fraser aggregate economic-freedom
+  scores are associated with faster real PPP GDP-per-capita growth from treatment year t to exact calendar
+  year t+1, conditional on country and year effects and three fixed controls.
+claim_direction: +
+methodology_note: New-ID country-disjoint follow-up to economic_freedom_index_income_correlation (PARTIAL
+  old result known). The old draft included Heritage and component-index language, but its generic runner
+  used only the first treatment. This follow-up narrows the primary verdict to the Fraser aggregate and
+  next-year real income growth. Legal-system and sound-money scores are fixed separate descriptive
+  regressions on available subsets of the primary panel, each requiring at least five paired years per
+  country and reporting its own observation and country count. Once all pinned files pass hash custody,
+  component-row availability cannot alter the primary sample or verdict; a missing or mismatched pinned
+  component file aborts the run before fit. Neither component receives separate verdict or scoreboard credit.
+  The three local Fraser
+  slices are pinned by SHA-256, but no fetch or derivation manifest for those slices was found; upstream
+  acquisition and component transformation remain unverified. The analyst saw the old same-commit result before
+  designing this new-ID holdout; that old run receives no prospective credit. The three tests share international
+  macro data and use a Bonferroni family threshold. No held-out coefficient was inspected before registration.
+  A provisional pre-registration screen counted finite/nonmissing candidate-series records without reviewing
+  magnitudes; those counts were withdrawn and replaced by country/year-key upper bounds. Candidate selection
+  and the 1500-pair/70-country minimum gate were therefore calibrated after seeing availability patterns.
+  Some WDI/WGI vintages and eligible countries overlap the already fitted 16 WGI/trade v2 holdouts. "Held-out"
+  means country-disjoint from this design's named old ID, not unseen across the entire IESET programme;
+  the three-test correction applies only to this registered family.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 2000
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all 44 countries in the historical old specification, including any without fitted rows:
+    ARG AUS AUT BEL BRA CAN CHL CHN CZE DEU DNK EGY ESP EST FIN FRA GBR GHA HKG HUN IDN IND IRL ITA JPN
+    KEN KOR MEX MYS NGA NLD NOR NZL PHL POL RUS SGP SWE THA TUR USA VEN VNM ZAF.'
+  - Retain only ISO 3166-1 alpha-3 countries with nonmissing finite primary treatment, outcome, and control
+    series, exact t and t+1 calendar-year pairing, and at least five complete treatment years per country.
+    Component-score row availability does not filter the primary sample after source hashes verify. Do not
+    choose countries or covariates
+    by the held-out outcome level, sign, or coefficient.
+  - Require positive values before natural-log transformations; do not impute, interpolate, or use a nearest-year
+    substitute.
+variables:
+  outcome:
+  - name: next_year_log_real_gdp_pc_ppp_growth
+    source: world_bank_wdi:NY.GDP.PCAP.PP.KD
+    transformation: natural log of exact t+1 value minus natural log of t value; both positive
+  treatment:
+  - name: fraser_aggregate_score
+    source: fraser_efw:aggregate_score
+    transformation: level at t
+  controls:
+  - name: log_population
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: natural log at t
+  - name: trade_openness
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: level at t
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level at t
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One primary OLS coefficient on the t treatment with country and treatment-year fixed effects
+    and country-clustered standard errors. Treatment year t is the year-effect key. Use the fixed complete-case
+    sample; no automatic control dropping. The three registered primary tests use the same two-sided Bonferroni
+    threshold.
+falsification:
+  rule: If fewer than 1500 complete t/t+1 country-year pairs or 70 countries remain after the five-year
+    screen, or if the primary coefficient or its clustered uncertainty is unidentified/nonfinite, return
+    INCONCLUSIVE. Otherwise SUPPORT requires a positive primary coefficient and two-sided country-clustered
+    p <= 0.10/3. REFUTATION requires a negative coefficient and the same p threshold. Every other estimable
+    result is PARTIAL. Apply the same family rule to all three tests, including adverse results.
+  test: country_disjoint_exact_next_year_panel_fe
+  threshold:
+    family_id: legacy_wdi_wgi_owid_panel_holdouts_2026_10_09
+    family_size: 3
+    family_alpha: 0.1
+    family_p_max: 0.03333333333333333
+    expected_sign: +
+    min_observations: 1500
+    min_countries: 70
+    min_pairs_per_country: 5
+    old_hypothesis_id: economic_freedom_index_income_correlation
+    old_result_bucket: PARTIAL
+    old_country_count: 44
+    source_files:
+      outcome:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.PP.KD@2026-05-05T194648Z.parquet
+        sha256: 6432d570bd5e7d94d659d310c48454caedb7b105db0bfeebbe1e44189c63ecfb
+      treatment:
+        path: data/vintages/fraser_efw/aggregate_score@2026-05-02T220000Z.parquet
+        sha256: 9b9550678cf7dd6c17d1744a045512d74ee4d6f7c88a4c65aa389761d22cf76a
+      population:
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      trade:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      rule_of_law:
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      legal_sensitivity:
+        path: data/vintages/fraser_efw/legal_system_property_rights@2026-05-02T220000Z.parquet
+        sha256: 014580e715bac818d409ce8b88b7ad75684aaac5ae8a187a344ce1f721f39477
+      sound_money_sensitivity:
+        path: data/vintages/fraser_efw/sound_money@2026-05-02T220000Z.parquet
+        sha256: ee48d086a9bb8d6d332d6df79eea95bed439d408b6f0a0e193a345212d93eb4d
+    old_country_ids:
+    - ARG
+    - AUS
+    - AUT
+    - BEL
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - CZE
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - GHA
+    - HKG
+    - HUN
+    - IDN
+    - IND
+    - IRL
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PHL
+    - POL
+    - RUS
+    - SGP
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VEN
+    - VNM
+    - ZAF
+prior_confidence: 0.45
+disclosure: The analyst knew the old PARTIAL verdict when selecting this disjoint follow-up. Country and
+  year effects plus lagged outcome timing do not identify a causal effect; omitted institutions, reverse
+  causation, and shared international measurement may explain the association. An old proxy result cannot
+  be promoted by this registration alone. Some WDI/WGI vintages and eligible countries overlap the already
+  fitted 16 WGI/trade v2 holdouts. "Held-out" means country-disjoint from this design's named old ID,
+  not unseen across the entire IESET programme; the three-test correction applies only to this registered
+  family.
+steelman: hypotheses/steelman/fraser_freedom_forward_income_geographic_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - fraser_economic_freedom
+  - geographic_holdout
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
