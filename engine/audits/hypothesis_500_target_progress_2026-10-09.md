@@ -3,12 +3,12 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **420 public records** (51 featured, 369 calibration) among 1,954
-hypotheses. That is **48 additional** relative to the 372 starting point and
-**452 short** of the requested increment. No result was made featured by
+ledger has **424 public records** (51 featured, 373 calibration) among 1,958
+hypotheses. That is **52 additional** relative to the 372 starting point and
+**448 short** of the requested increment. No result was made featured by
 loosening its gate.
 
-The latest four new-ID tests illustrate the decision boundary:
+An earlier four-case new-ID batch illustrates the decision boundary:
 
 | New test | Frozen result | Public disposition |
 | --- | --- | --- |
@@ -44,6 +44,18 @@ measurement limits are in their preregistrations and result cards. In
 particular, a government-effectiveness/electricity-access negative estimate
 with p=0.0181 did **not** meet its eight-test p<=0.0125 refutation cutoff.
 
+A fourth four-case country-disjoint panel batch used tariff, patent, WGI,
+poverty, migration, and population vintages pinned to tracked manifests. All
+four specs and steelmen were committed before value runs; the exact read-only
+replay passed. Tariff level versus next-year real private-consumption-per-person
+growth was **REFUTED** under the fixed four-test threshold (1,930 pairs, 114
+countries, positive coefficient 0.0001383, p=0.00366 against the expected
+negative sign). Patent applications versus high-tech export-value growth and
+regulatory quality versus poverty and net migration were **PARTIAL** (932/83,
+954/60, and 3,546/163 pairs/countries). All are narrow descriptive
+associations with zero school credit; the tariff result is not a causal claim
+about tariff policy or welfare.
+
 A separate legacy sign audit found 64 current generic-rule panel records and
 57 historical-to-stored inferred-direction changes. The old text parser could
 mistake `p<0.10` for a negative coefficient condition; future runs now fail
@@ -60,8 +72,8 @@ count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
 There are **214 verified archived** records in the current funnel. Even the
-unrealistic upper bound of converting every one would yield 634 public
-records, still **238 below** 872. The archive repair review found 131
+unrealistic upper bound of converting every one would yield 638 public
+records, still **234 below** 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
 frozen estimator and Paraguay's rule remain ambiguous, so direct promotion
