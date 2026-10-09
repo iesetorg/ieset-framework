@@ -9,10 +9,10 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 - Policies with exact event, enacted, or first-application dates: 2062
 - Policies ready for comparative event design: 4
 - Policies ready for triple-difference structure: 1
-- Timing status counts: `{"effective_date_only": 19, "enacted_date_only": 2034, "event_dated": 9, "event_month_dated": 3, "year_period_only": 1307}`
+- Timing status counts: `{"effective_date_only": 21, "enacted_date_only": 2032, "event_dated": 9, "event_month_dated": 3, "year_period_only": 1307}`
 - Comparison structure counts: `{"axis_only_no_unit_split": 3366, "declared_treated_comparison_design": 6}`
 - Measurement blockers: `{"known_microdata_gaps_declared": 7, "needs_comparison_unit_detail": 7, "needs_exact_event_dates": 1310, "needs_treated_and_comparison_unit_coding": 3359}`
-- Axis source readiness: `{"partial_ready": 44770, "proprietary_gap": 6720, "ready": 3350, "reconstruct_needed": 19085, "scrape_needed": 14119}`
+- Axis source readiness: `{"partial_ready": 44697, "proprietary_gap": 6710, "ready": 3344, "reconstruct_needed": 19051, "scrape_needed": 14096}`
 
 ## Ready Design Seeds
 
@@ -209,6 +209,7 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `by_1996_presidential_constitution` | candidate | institutional.judicial_independence, institutional.rule_of_law | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `by_admin_price_credit_controls_1994_2015` | candidate | monetary.central_bank_independence, monetary.monetary_expansion_direction, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `by_state_enterprise_retention_1995` | candidate | fiscal.sectoral_subsidy, institutional.property_rights, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `ca_capital_gains_inclusion_cancellation_2025` | draft |  | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `california_ab1279_2022` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `california_ab32_2006` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `california_advanced_clean_cars_ii_2022` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -217,7 +218,7 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `california_sb253_sb261_2023` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `california_sb32_2016` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.environmental_stringency, regulatory.sectoral_licensing | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_boc_inflation_targeting_1991` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `canada_capital_gains_inclusion_2024` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `canada_capital_gains_inclusion_2024` | draft |  | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_carbon_pricing_ghgppa_2018` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_cerb_covid_fiscal_response_2020_2022` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_child_benefit_2016` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -226,4 +227,3 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `canada_cpp_reform_1997` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_cusfta_1988` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_dental_pharmacare_ndp_agreement_2023_2024` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `canada_gst_1991` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |

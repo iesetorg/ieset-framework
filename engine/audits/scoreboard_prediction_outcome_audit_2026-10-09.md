@@ -1,6 +1,6 @@
 # Scoreboard Prediction-Outcome Audit
 
-Generated: 2026-10-09
+Generated: 2026-10-10
 
 ## Methodology Gate
 

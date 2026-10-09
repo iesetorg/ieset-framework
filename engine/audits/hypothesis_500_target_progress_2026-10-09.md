@@ -3,9 +3,9 @@
 The user's latest target was **500 additional public hypothesis records**.
 The public evidence ledger had 372 at that point, making the target 872.
 After the bounded repair and prospective batches in this sprint, the audited
-ledger has **467 public records** (51 featured, 416 calibration) among 2,012
-hypotheses. That is **95 additional** relative to the 372 starting point and
-**405 short** of the requested increment. Here public includes calibration;
+ledger has **472 public records** (51 featured, 421 calibration) among 2,018
+hypotheses. That is **100 additional** relative to the 372 starting point and
+**400 short** of the requested increment. Here public includes calibration;
 featured remains 51, so the featured-only increment is zero. No result was
 made featured by loosening its gate.
 
@@ -173,9 +173,9 @@ override an external evidence hold. The
 count. Its old same-commit results cannot be turned into strict registrations
 by relabeling.
 
-There are **225 verified archived** records in the current funnel, including
+There are **226 verified archived** records in the current funnel, including
 the new inconclusive Vietnam WTO flow case. Even the unrealistic upper bound
-of converting every one would yield 692 public records, still **180 below**
+of converting every one would yield 698 public records, still **174 below**
 872. The archive repair review found 131
 near-zero placeholder cases using an outcome as its own control and a proxy
 treatment; those need materially new designs, not cosmetic fixes. Peru's
@@ -294,8 +294,44 @@ sample and estimator floors but returned **PARTIAL** under their frozen
 family or single-test thresholds. The immigration variable is citizenship
 based, not foreign-born; the Gini outcome has a survey/income reference lag.
 All five are descriptive public calibration with no causal, policy-effect,
-featured, or school-score credit. The registration audit now finds 692 strict
+featured, or school-score credit. The registration audit now finds 698 strict
 pairs, 1,320 legacy same-commit pairs, and no unpaired specs.
+
+Five more source-custodied tests entered public **calibration**, each after a
+separate registration and source lock and an independent measured replay:
+Eurostat business R&D versus next-year WIPO resident patenting (PARTIAL;
+655 country-years/32 countries, p=0.0404 against a 0.005 cutoff); CEPAL
+national poverty versus next-year IMF inflation (PARTIAL; 281/14, p=0.727);
+Atlanta Fed low-minus-high wage-growth quartiles (PARTIAL; mean -0.30
+percentage point over 32 fixed months); OECD top statutory personal income
+tax versus next-year WID all-ages top-0.1% income share (PARTIAL; 688/30,
+p=0.656); and CEPII RTA-covered partner expansion versus WITS exported HS6
+product-count growth (PARTIAL; 169 event windows and 1,376 comparison
+windows, p=0.830). These are measured or conditional associations, not
+independent causal replications. None received policy, school, featured, or
+causal credit. The CEPII/WITS frozen verifier has a Parquet array/list
+comparison defect; its adjacent, separately committed erratum replays the
+unchanged estimator and result exactly. The CEPAL result was relocated from
+the dirty main checkout to this isolated branch with original commits and
+source hashes retained in a custody audit; its narrow-lock replay adapter
+passes without the unrelated path-bearing full fetch manifest. Three newly
+used publisher namespaces were registered conservatively as pending reusable
+fetchers; the exact raw/vintage pins, not a ready-fetcher claim, support
+these local replays.
+
+One further OECD migrant/native tertiary employment-gap versus employment-
+protection test was registered, source-locked, and replayed, then remained
+**INCONCLUSIVE**. All 265 selected country-years had valid values, but only
+15 had the frozen minimum 0.05-point within-country protection-index change,
+below the preregistered 20-row variation floor. No coefficient or public
+credit was produced. A wider archive review found no immediately runnable
+same-ID promotion among 225 checked records. The next ILO/OECD bargaining
+candidate was stopped before outcome access because the OECD ERB field's
+label conflicts with the coverage codebook and its stable sample is thin;
+all six existing records citing that feed are already archive. BIS/WHO and
+JST historical crisis leads were also left unregistered because of endpoint
+or episode-comparability limits. These are design-review findings, not a
+claim that every possible future corpus question has been exhausted.
 
 The drift map now uses the full authored 1846–2026 movement span and 145
 country series. Its national totals exclude California's subnational movement
@@ -325,16 +361,29 @@ three source-checked Czech records and one El Salvador budget record.
 Dodd-Frank, ARRA, and USMCA policy axes and dates were also narrowed to source-supported
 provisions. The three Swiss date-only candidates have no coded axis movement;
 the policy quality audit flags them as thin rather than inferring effects.
+An additional five-country overlap pass removed Canada's unenacted capital-
+gains increase and withdrawal as opposite tax steps, stopped double scoring
+Singapore's 1955 colonial CPF scheme as a PAP-era transfer/spending cut,
+assigned Indonesia's Bank Indonesia independence to its May 1999 law once,
+kept Ecuador's January 2017 EU trade step while withholding an unsupported
+second 2017 Pacific Alliance step, and moved Japan's FY2026 budget axes from
+the 2025 draft to 2026 enactment. Japan's interagency foreign-investment
+review began operating in June 2026, so only a weak 2026 review step remains;
+broader screening rules take effect in 2027 and no trade-openness change is
+inferred. The source and record-level dispositions are in
+`engine/audits/national_drift_overlap_corrections_2026-10-09.md`. The
+regenerated map still has 145 countries, 21 axes, and a verified 1846–2026
+range. Its scores remain authored decision coding, not measured effects.
 
 FAO food-security designs remain a source-custody queue. Key-only screens found
 up to three distinct nonoverlapping-period associations, but the large ignored
 FAO parquet files lack tracked source-vintage pins and the annual-looking PoU
 and FIES data are regional aggregates. They were not registered or counted.
 
-Final source validation accepted 6,141 specs with 47 permitted candidate
+Final source validation accepted 6,147 specs with 47 permitted candidate
 forward references; link reciprocity had zero errors/warnings, scope validation
 zero errors and seven existing warnings, drift artifact freshness passed, and
-the local web build rendered 8,347 static pages. Standard pytest collection
+the current local web build rendered 8,359 static pages. Standard pytest collection
 now resolves IESET's own scripts after adding a package marker. An earlier full
 isolated-checkout run had 475 passed, 48 skipped, and 17 failures in older test
 areas; several expect an absent checkout virtualenv, ignored raw vintages, or
