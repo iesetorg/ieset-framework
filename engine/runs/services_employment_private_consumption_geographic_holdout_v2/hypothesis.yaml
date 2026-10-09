@@ -1,0 +1,165 @@
+hypothesis_id: services_employment_private_consumption_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim: Among countries excluded from the old 40-country fit, a higher services share of total employment
+  at year t predicts faster real private consumption per person growth from t to exact t+1, conditional
+  on starting income, rule of law, and country and year effects.
+claim_direction: +
+methodology_note: New-ID measured-association follow-up to private_sector_job_creation_consumption.
+  Its old same-commit PARTIAL result and broad mechanism claim were visible before design. The old
+  runner at e786a95e676c9d6283c123682d43bf54dbacd73b restricted estimation to the fixed 40-country
+  specification; all 40 are excluded here, including any with no old fitted rows. The new claim uses
+  only the directly measured indicators. This fixed eight-test family uses source-pinned exact next-year
+  outcomes and a Bonferroni decision rule. A country/year-key-only screen found an upper envelope
+  of 4175 pairs and 167 countries for this design, without opening held-out values or null masks;
+  complete-case coverage remains unknown. Vintages and eligible countries can overlap other IESET
+  studies. No policy mechanism, causal effect, or school-score credit is claimed.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all 40 countries in the historical old specification: ARG AUS BGD BRA CAN CHL CHN COL
+    DEU DNK EGY ESP EST FIN FRA GBR IDN IND ITA JPN KEN KOR LKA MAR MEX MYS NGA NLD NOR NZL PAK PER
+    PHL POL SWE THA TUR USA VNM ZAF.'
+  - Retain ISO 3166-1 alpha-3 country codes only; no WDI aggregates or old-country rows.
+  - Join treatment and controls at exact t to outcome at exact t+1; require complete finite values
+    and at least five usable treatment years per country.
+  - For natural-log measures require positive source values; do not impute, interpolate, or substitute
+    a nearest year.
+variables:
+  outcome:
+  - name: next_year_log_private_consumption_pc_growth
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: natural log of exact t+1 value minus natural log of t value; both positive
+  treatment:
+  - name: services_employment_share_pct
+    source: world_bank_wdi:SL.SRV.EMPL.ZS
+    transformation: level at treatment year t
+  controls:
+  - name: log_income
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per person at t
+  - name: rule_of_law
+    source: wgi:RL.EST
+    transformation: level at t
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One fixed primary coefficient with country and treatment-year effects, country-clustered
+    uncertainty, no automatic covariate dropping, and an eight-test Bonferroni rule.
+falsification:
+  rule: If fewer than 800 complete country-year pairs or 50 countries survive the five-year rule,
+    or if the country-clustered estimate or uncertainty is unidentified or nonfinite, return INCONCLUSIVE.
+    Otherwise SUPPORT requires a positive coefficient at two-sided p <= 0.10/8; REFUTATION requires
+    an negative coefficient at the same threshold. Every other estimable result is PARTIAL. Apply
+    this rule equally to adverse and favorable results.
+  test: country_disjoint_exact_next_year_panel_fe
+  threshold:
+    family_id: third_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 8
+    family_alpha: 0.1
+    family_p_max: 0.0125
+    expected_sign: +
+    min_observations: 800
+    min_countries: 50
+    min_pairs_per_country: 5
+    old_hypothesis_id: private_sector_job_creation_consumption
+    old_result_bucket: PARTIAL
+    old_country_count: 40
+    old_country_ids:
+    - ARG
+    - AUS
+    - BGD
+    - BRA
+    - CAN
+    - CHL
+    - CHN
+    - COL
+    - DEU
+    - DNK
+    - EGY
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - IDN
+    - IND
+    - ITA
+    - JPN
+    - KEN
+    - KOR
+    - LKA
+    - MAR
+    - MEX
+    - MYS
+    - NGA
+    - NLD
+    - NOR
+    - NZL
+    - PAK
+    - PER
+    - PHL
+    - POL
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    old_run_commit: e786a95e676c9d6283c123682d43bf54dbacd73b
+    old_claim_direction: +
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: world_bank_wdi:SL.SRV.EMPL.ZS
+        path: data/vintages/world_bank_wdi/SL.SRV.EMPL.ZS@2026-04-30T115129Z.parquet
+        sha256: 5cc0fcababebe90b69eae253466a6a81beaf0f52f9c0ef5d59b8a2fa34f400c6
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: SL.SRV.EMPL.ZS
+      outcome:
+        source: world_bank_wdi:NE.CON.PRVT.PC.KD
+        path: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+        sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NE.CON.PRVT.PC.KD
+      rule_of_law:
+        source: wgi:RL.EST
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        series_id: RL.EST
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The analyst saw the old PARTIAL result and earlier related studies before selecting this
+  test. The exact source series are direct but cannot identify the old policy mechanism. Country and
+  year effects plus next-year ordering do not remove confounding or reverse causation. This is a descriptive
+  calibration with zero position or school-score credit.
+steelman: hypotheses/steelman/services_employment_private_consumption_geographic_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
