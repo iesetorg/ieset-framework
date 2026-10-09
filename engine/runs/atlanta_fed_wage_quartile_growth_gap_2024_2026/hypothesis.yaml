@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: atlanta_fed_wage_quartile_growth_gap_2024_2026
+version: 1
+status: pre_registered
+topic: labour
+claim: >-
+  In the Atlanta Fed Wage Growth Tracker, the mean January 2024–September 2026
+  monthly gap between the lowest and highest average-wage quartiles exceeds
+  +0.5 percentage point of nominal 12-month individual hourly-wage
+  growth. This is a descriptive low-wage catch-up claim for matched CPS wage
+  earners, not a claim about wage levels, real wages, inequality, or policy.
+claim_direction: "+"
+methodology_note: >-
+  New-ID value-blind preregistration on an already published October 9, 2026
+  Atlanta Fed source vintage. The positive direction was chosen from a
+  contingent low-wage catch-up theory before selected quartile magnitudes
+  were inspected. No old hypothesis is repaired or credited by this study.
+  The publisher groups workers by their average hourly wage across the
+  current and year-earlier observations; its outcome is median individual
+  12-month nominal hourly-wage growth, smoothed over three months. The exact
+  month keys were checked before registration; selected numeric values and
+  their finite masks were not opened.
+evidence_type: descriptive
+sample:
+  countries: [USA]
+  period: [2024, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - >-
+      The exact roster is every month from 2024-01 through 2026-09 except
+      2025-10, which is absent from the publisher's release. Require exactly
+      one lowest-quartile and one highest-quartile key for each of these 32
+      months and no additional selected month in the window.
+    - >-
+      Every selected value must be numeric and finite. Missing or duplicate
+      pairs make the result INCONCLUSIVE_DATA_PENDING. Never interpolate,
+      choose another quartile definition, shift the window, or switch vintage.
+variables:
+  outcome:
+    - name: lowest_minus_highest_average_wage_quartile_growth_gap_pp
+      source: atlanta_fed_wgt:wgt_Average Wage Quartile
+      transformation: >-
+        median_wage_growth_pct[Lowest quartile of wage distribution] minus
+        median_wage_growth_pct[Highest quartile of wage distribution], month
+        by month; unweighted arithmetic mean over the 32 fixed months
+      notes: >-
+        Percentage-point gap in the three-month-moving-average median of
+        matched workers' nominal 12-month hourly-wage growth. Average wage
+        level determines quartile membership; the statistic is not a wage
+        level gap or a quantile of individual wage-growth rates.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    Compute the fixed monthly gap series and its arithmetic mean. Estimate
+    an intercept-only Newey–West/Bartlett HAC standard error with 12 lags,
+    n/(n-1) small-sample correction, and Student-t 31 degrees of freedom.
+    The one-sided support null is mean gap <= +0.5 pp; the mirrored refutation
+    null is mean gap >= -0.5 pp. Each tail uses alpha=0.025; no lag, sample,
+    quartile, or threshold selection follows inspection of values. Report
+    calendar-year mean gaps separately and require their signs to agree
+    with a decisive verdict. The HAC inference describes serial variation
+    in a short smoothed aggregate series, not CPS worker-level uncertainty.
+falsification:
+  test: atlanta_fed_low_minus_high_average_wage_quartile_gap_2024_2026
+  rule: >-
+    METHOD_VALID requires pinned source hashes and source-custody lock,
+    unmodified first-addition design and source commits before numeric access,
+    exactly 32 fixed paired monthly keys, and 64 finite selected values.
+    SUPPORTED if the one-sided HAC(12) p-value for mean gap > +0.5 pp is
+    <=0.025 and each 2024, 2025, and 2026 calendar-year mean gap is positive.
+    REFUTED if the mirrored one-sided HAC(12) p-value for mean gap < -0.5 pp
+    is <=0.025 and each calendar-year mean gap is negative. PARTIAL for
+    every other method-valid result. INCONCLUSIVE_DATA_PENDING if the method
+    cannot be evaluated. There is no old-ID graduation, causal interpretation,
+    policy-evidence link, or school-score credit.
+  threshold:
+    first_month: 2024-01
+    last_month: 2026-09
+    excluded_month: 2025-10
+    required_paired_months: 32
+    required_selected_values: 64
+    low_group: Lowest quartile of wage distribution
+    high_group: Highest quartile of wage distribution
+    support_mean_gap_pp_min_exclusive: 0.5
+    refute_mean_gap_pp_max_exclusive: -0.5
+    hac_maxlags: 12
+    one_sided_alpha: 0.025
+    year_sign_consistency: [2024, 2025, 2026]
+    source_custody: data/manifests/atlanta_fed_wage_quartile_2026-10-09_source_lock.yaml
+    source_parquet_sha256: 1c3af8b31b40224c44c9530130dce74244737fb01c872a26ad3be8f7ad167eca
+    raw_workbook_sha256: 6e1201f3ab2bfe026a4013995314e96a733f64919b1165c90d1a980d6823c2a5
+prior_confidence: 0.50
+disclosure: >-
+  This registration precedes local access to selected quartile magnitudes,
+  but all months were already published. The source's three-month smoothing
+  and matched 12-month observations induce serial dependence; 32 months are
+  a small basis for HAC tail probabilities. The October 2025 CPS observation
+  is unavailable; the Atlanta Fed used alternate months for the November and
+  December 2025 moving averages and reported a smaller CPS sample then.
+  The Fed also adjusted some 2023–2025 historical methodology and changed
+  topcoding handling in 2024. Selection into continued employment, wage
+  quartiles, survey nonresponse, inflation, and composition can explain a
+  gap. This does not measure changing wage inequality or identify a minimum-
+  wage, labour-market, or school mechanism. No policy or school-score credit.
+steelman: hypotheses/steelman/atlanta_fed_wage_quartile_growth_gap_2024_2026.md
+scope:
+  period: [2024, 2026]
+  countries: [USA]
+  outcome_dim: [wage_stagnation]
+  policy_family: [none]
+  treatment_tags: [descriptive_wage_growth_gap]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
