@@ -2,6 +2,9 @@
 
 **Verdict:** PARTIAL — gap is in the predicted direction (rule-bound -4.07 vs rule-free -1.10, gap -2.97) but Mann-Whitney one-sided p = 0.2357 fails to reject 0.10.
 
+> **Coverage update (2026-10-09): NEEDS RERUN.** This is the preserved historical 1976–2025 result. The movement-derived drift file now spans the full authored corpus (1846–2026), so its input range and cumulative scores have changed. This verdict and its figures have not been recomputed for the extended series. Retest under a registered rule before interpreting the new range as support or refutation.
+
+
 ## Group statistics
 
 | Group | n | Median slope/decade | Mean slope/decade |

@@ -7,7 +7,7 @@ import { InteractiveDriftChart } from "@/components/charts/InteractiveDriftChart
 export const metadata = {
   title: "Positional drift — how country policy mixes shift across decades",
   description:
-    "Statist drift index per country. The framework codes every government's axes_summary; cumulating across the corpus shows how each country has drifted toward more state or more market, year by year.",
+    "Movement-coded policy direction by country across the full authored corpus. A constructed cumulative index, with country-specific coverage starts and no measured annual policy level.",
   alternates: { canonical: "https://framework.ieset.org/drift/" },
 };
 
@@ -218,12 +218,17 @@ export default async function DriftPage() {
 
   function compositeSeriesFor(spec: RegionSpec): {
     series: Record<string, number[]>;
+    starts: Record<string, number>;
     countries: string[];
   } {
     const entries = regionEntries(spec).slice(0, PER_PANEL_LIMIT);
     const series: Record<string, number[]> = {};
-    for (const { iso3, c } of entries) series[iso3] = c.statist_drift;
-    return { series, countries: entries.map((e) => e.iso3) };
+    const starts: Record<string, number> = {};
+    for (const { iso3, c } of entries) {
+      series[iso3] = c.statist_drift;
+      starts[iso3] = c.movements[0]?.year ?? driftData.year_max;
+    }
+    return { series, starts, countries: entries.map((e) => e.iso3) };
   }
 
   // Per-axis charts use the liberal-democracy panel only (74 lines on one
@@ -234,31 +239,32 @@ export default async function DriftPage() {
     .map((e) => e.iso3);
 
   function seriesForAxis(axis: string, invert: boolean = false) {
-    const out: Record<string, number[]> = {};
+    const series: Record<string, number[]> = {};
+    const starts: Record<string, number> = {};
     for (const iso3 of liberalCountries) {
-      const traj = driftData.countries[iso3]?.axes[axis];
-      if (!traj) continue;
-      out[iso3] = invert ? traj.map((v) => -v) : traj;
+      const country = driftData.countries[iso3];
+      const traj = country?.axes[axis];
+      const firstYear = country?.axis_first_year[axis];
+      if (!traj || firstYear === undefined) continue;
+      series[iso3] = invert ? traj.map((v) => -v) : traj;
+      starts[iso3] = firstYear;
     }
-    return out;
+    return { series, starts };
   }
 
-  // Full leaderboard — every country in the corpus, with cumulative drift
-  // since corpus start AND the slope over the most recent decade. Without
-  // the recent-decade column the table is misleading: countries like Canada
-  // look like 'market drift' purely because Mulroney + Chretien's 1984-2006
-  // deficit slaying dwarfs Trudeau Jr's recent statist moves in the cumulative
-  // sum. The recent-slope column shows the direction the country is *currently*
-  // moving, which often tells the opposite story.
+  // The leaderboard separates the full coded sum from the slope over the
+  // latest decade. A country that enters the corpus during that decade uses
+  // only years after its first coded movement; a one-year series has no slope.
   const RECENT_WINDOW_YEARS = 10;
   const fullLeaderboard = Object.entries(data.countries)
     .map(([iso3, c]) => {
       const traj = c.statist_drift;
       const final = traj[traj.length - 1] ?? 0;
-      // Slope over the last RECENT_WINDOW_YEARS years (≈ per-year rate).
-      const window = Math.min(RECENT_WINDOW_YEARS, traj.length - 1);
-      const recent_slope =
-        window > 0 ? (traj[traj.length - 1] - traj[traj.length - 1 - window]) / window : 0;
+      const firstCodedYear = c.movements[0]?.year ?? data.year_max;
+      const recentStartYear = Math.max(data.year_max - RECENT_WINDOW_YEARS, firstCodedYear);
+      const recentStartIndex = recentStartYear - data.year_min;
+      const span = data.year_max - recentStartYear;
+      const recent_slope = span > 0 ? (final - traj[recentStartIndex]) / span : null;
       return {
         iso3,
         name: countryName(iso3),
@@ -275,33 +281,34 @@ export default async function DriftPage() {
         method note
       </div>
       <h1 className="m-0 mb-3 text-[34px] font-semibold tracking-[-0.02em] md:text-[40px]">
-        Positional drift — has the policy mix moved toward more state, year by year?
+        Positional drift across the movement corpus
       </h1>
       <p className="mb-6 max-w-[820px] text-[17px] leading-[1.55] text-muted">
-        Every government in the corpus is coded on the framework axes
-        (fiscal/regulatory/monetary/institutional, ±/0/mixed × magnitude).
-        Cumulating those moves over time inside each country produces a drift
-        trajectory — whether the policy mix has expanded the state or pulled
-        back from it. The composite statist-drift index sums the pro-state axes
-        (spending, transfers, tax progressivity, sectoral subsidy, regulation,
-        monetary expansion) minus the pro-market axes (labour-market
-        flexibility, product-market competition, trade openness, central-bank
-        independence). A higher line means the country has shifted toward a
-        larger or more redistributive state since the corpus&apos;s start; a lower
-        line means it has shifted away.
+        Authored movements are coded on directional framework axes. Each
+        movement contributes a step at its start year; cumulative lines show
+        the net direction of those coded steps within each country. The
+        composite sums pro-state axes and subtracts pro-market axes. Higher
+        values indicate more stateward coded movement; lower values indicate
+        more marketward coded movement. These are constructed scores, not
+        annual observations of legislation, spending, or regulation.
       </p>
 
       <div className="mb-8 rounded border border-rule bg-panel p-5 text-[14px] leading-[1.6] text-muted">
-        <strong className="text-ink">Important:</strong> this measures the{" "}
-        <em>direction</em> of policy moves over time, not the absolute level.
-        Greece and Italy show negative drift partly because the EU memoranda
-        forced sustained austerity and privatisations — they moved toward
-        market-orthodox policy from a much higher starting level. Conversely,
-        Germany&apos;s strongly positive drift reflects Energiewende, Bürgergeld,
-        Sondervermögen, and the post-2019 spending wave — choices made from a
-        relatively constrained baseline. Read each line as &quot;net direction
-        of legislated policy since {data.year_min}.&quot;
+        <strong className="text-ink">Coverage:</strong> the timeline spans the
+        earliest to latest authored movement ({data.year_min}–{data.year_max}).
+        Each country&apos;s line begins at its own first coded movement; earlier
+        blank space is missing corpus coverage, not a zero policy level.
+        A flat segment means no further <em>coded</em> shift in that interval.
+        The index measures direction, not absolute policy levels, and countries
+        do not share a measured {data.year_min} baseline.
       </div>
+
+      <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
+        The three registered drift verdicts used the previous 1976–2025
+        constructed series. Their historical result cards are marked
+        <strong className="text-ink"> needs rerun</strong> against this longer
+        corpus; the extended chart does not update those verdicts.
+      </p>
 
       <div className="mb-10 grid grid-cols-2 gap-6 rounded border border-rule bg-white p-5 text-[13.5px] md:grid-cols-4">
         <div>
@@ -314,7 +321,7 @@ export default async function DriftPage() {
         </div>
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Year range
+            Movement years
           </div>
           <div className="mt-0.5 text-[24px] font-semibold tabular-nums">
             {data.year_min}–{data.year_max}
@@ -344,28 +351,21 @@ export default async function DriftPage() {
       </h2>
       <p className="mb-3 max-w-[860px] text-[14px] text-muted">
         Two numbers per country. <strong className="text-ink">Cumulative</strong>{" "}
-        is the legislated drift since {data.year_min} — the sum of every
-        movement&apos;s axes_summary moves up to today. <strong className="text-ink">
-        Recent ({RECENT_WINDOW_YEARS}y)
+        is the sum of coded movement steps since each country&apos;s first
+        recorded movement. <strong className="text-ink">
+        Recent (up to {RECENT_WINDOW_YEARS}y)
         </strong>{" "}
-        is the slope over the last {RECENT_WINDOW_YEARS} years — what direction
-        the country is moving <em>now</em>.
+        is the average annual change in that constructed score over at most
+        the last {RECENT_WINDOW_YEARS} years. A blank means fewer than two
+        covered years.
       </p>
       <div className="mb-5 max-w-[860px] rounded border border-rule bg-panel p-4 text-[13px] leading-[1.55] text-muted">
-        <strong className="text-ink">Why these can disagree:</strong> Canada
-        sits near the top of the &quot;cumulative market drift&quot; column at
-        −39, but its <em>recent</em> slope is +0.10/yr — i.e., mildly statist.
-        That&apos;s because Mulroney + Chrétien-Martin&apos;s 1984–2006 deficit
-        slaying (GST 1991, NAFTA 1994, the canonical Paul Martin 1995 budget)
-        was the largest fiscal consolidation in modern OECD history; Trudeau
-        Jr&apos;s 2015–2025 statist moves haven&apos;t been large enough to
-        offset it cumulatively. Same pattern for the UK (cumulative −2,
-        recent +3.2/yr — Brexit-era fiscal expansion + Truss + Starmer all
-        statist), Australia (cumulative −15, recent +1.9/yr — Albanese), and
-        New Zealand (cumulative −28, recent +0.4/yr — Ardern net statist
-        before Luxon partial reversal). The cumulative column tells you{" "}
-        <em>where the country sits</em> relative to its {data.year_min} baseline; the
-        recent column tells you <em>where it&apos;s headed</em>.
+        <strong className="text-ink">Reading the columns:</strong> an older
+        coded step remains in the cumulative sum, while newer coded steps can
+        change its recent direction. A flat recent score means no net new
+        coded shift in the window; it does not establish policy stasis.
+        Scores depend on which movements have been authored and their axis
+        weights, so compare coverage before comparing countries.
       </div>
       <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
         {(() => {
@@ -402,7 +402,7 @@ export default async function DriftPage() {
                             Cumulative
                           </th>
                           <th className="px-3 py-1 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">
-                            Recent ({RECENT_WINDOW_YEARS}y)
+                            Recent (up to {RECENT_WINDOW_YEARS}y)
                           </th>
                         </tr>
                       </thead>
@@ -410,9 +410,9 @@ export default async function DriftPage() {
                         {rows.map((row) => {
                           const recent = row.recent_slope;
                           const recentColor =
-                            recent > 0.5
+                            recent !== null && recent > 0.5
                               ? "text-red"
-                              : recent < -0.5
+                              : recent !== null && recent < -0.5
                               ? "text-green"
                               : "text-muted";
                           return (
@@ -442,11 +442,17 @@ export default async function DriftPage() {
                               <td
                                 className={`px-3 py-2 text-right align-top tabular-nums text-[13px] font-medium ${recentColor}`}
                               >
-                                {recent >= 0 ? "+" : ""}
-                                {recent.toFixed(2)}
-                                <span className="ml-0.5 text-[10px] text-faint">
-                                  /yr
-                                </span>
+                                {recent === null ? (
+                                  "—"
+                                ) : (
+                                  <>
+                                    {recent >= 0 ? "+" : ""}
+                                    {recent.toFixed(2)}
+                                    <span className="ml-0.5 text-[10px] text-faint">
+                                      /yr
+                                    </span>
+                                  </>
+                                )}
                               </td>
                             </tr>
                           );
@@ -476,8 +482,8 @@ export default async function DriftPage() {
                       {stable.length > 0 && (
                         <div className="mt-2 rounded border border-rule bg-panel p-2 text-[12px] text-muted">
                           {stable.length} country
-                          {stable.length === 1 ? "" : "ies"} at 0 (no axes_summary
-                          moves coded yet):{" "}
+                          {stable.length === 1 ? "" : "ies"} with net zero
+                          valenced axis score (possibly offsetting steps):{" "}
                           {stable.map((s) => s.iso3).join(", ")}
                         </div>
                       )}
@@ -497,7 +503,7 @@ export default async function DriftPage() {
       <p className="mb-4 max-w-[820px] text-[14px] text-muted">
         Click ISO3 codes to toggle countries on the chart. Region buttons
         swap to a fixed regional set in one click. Each line is the country&apos;s
-        cumulative composite drift from {data.year_min}.
+        cumulative coded drift from each country&apos;s first authored movement.
       </p>
       <div className="mb-12 rounded border border-rule bg-white p-5">
         <InteractiveDriftChart
@@ -508,6 +514,12 @@ export default async function DriftPage() {
             ])
           )}
           years={data.years}
+          seriesStarts={Object.fromEntries(
+            Object.entries(driftData.countries).map(([iso3, c]) => [
+              iso3,
+              c.movements[0]?.year ?? data.year_max,
+            ])
+          )}
           labels={Object.fromEntries(
             Object.keys(driftData.countries).map((iso3) => [iso3, iso3])
           )}
@@ -533,7 +545,7 @@ export default async function DriftPage() {
       </p>
       <div className="space-y-8">
         {REGIONS.map((spec) => {
-          const { series, countries } = compositeSeriesFor(spec);
+          const { series, starts, countries } = compositeSeriesFor(spec);
           if (countries.length === 0) return null;
           return (
             <section
@@ -554,6 +566,7 @@ export default async function DriftPage() {
               <DriftChart
                 series={series}
                 years={data.years}
+                seriesStarts={starts}
                 labels={Object.fromEntries(countries.map((c) => [c, c]))}
                 height={spec.id === "liberal_democracies" ? 420 : 320}
                 zeroLineLabel="cumulative statist drift"
@@ -575,7 +588,7 @@ export default async function DriftPage() {
       <div className="space-y-8">
         {KEY_AXES_FOR_DRIFT.map((spec) => {
           const invert = spec.axis === "regulatory.labour_market_flexibility";
-          const series = seriesForAxis(spec.axis, invert);
+          const { series, starts } = seriesForAxis(spec.axis, invert);
           return (
             <section
               key={spec.axis}
@@ -593,6 +606,7 @@ export default async function DriftPage() {
               <DriftChart
                 series={series}
                 years={data.years}
+                seriesStarts={starts}
                 labels={Object.fromEntries(liberalCountries.map((c) => [c, c]))}
                 caption={spec.caption}
                 height={320}

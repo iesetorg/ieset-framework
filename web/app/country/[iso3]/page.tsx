@@ -22,7 +22,7 @@ export async function generateMetadata({
   const name = countryName(iso3);
   return {
     title: `${name} — positional drift`,
-    description: `Per-axis cumulative drift trajectory for ${name}, computed from movement axes_summaries.`,
+    description: `Cumulative movement-coded policy direction for ${name}, beginning at its first authored movement.`,
     alternates: {
       canonical: `https://framework.ieset.org/country/${encodeURIComponent(
         iso3
@@ -75,16 +75,19 @@ export default async function CountryPage({
 
   // For per-channel charts, build a series-of-axes (one line per axis).
   function seriesForChannel(channel: string) {
-    const out: Record<string, number[]> = {};
+    const series: Record<string, number[]> = {};
+    const starts: Record<string, number> = {};
     for (const axis of movedAxes[channel] ?? []) {
       const traj = country.axes[axis];
-      if (!traj) continue;
+      const firstYear = country.axis_first_year[axis];
+      if (!traj || firstYear === undefined) continue;
       // Use short label as the series key so the chart legend shows
       // human-readable axis names.
       const short = axis.split(".").slice(-1)[0].replace(/_/g, " ");
-      out[short] = traj;
+      series[short] = traj;
+      starts[short] = firstYear;
     }
-    return out;
+    return { series, starts };
   }
 
   // Composite series, just the country alone.
@@ -156,6 +159,7 @@ export default async function CountryPage({
         <DriftChart
           series={compositeSeries}
           years={data.years}
+          seriesStarts={{ [iso3]: country.movements[0]?.year ?? data.year_max }}
           labels={{ [iso3]: countryName(iso3) }}
           movements={country.movements
             .filter((m) => m.year >= data.year_min)
@@ -167,13 +171,13 @@ export default async function CountryPage({
             }))}
           height={300}
           zeroLineLabel="cumulative statist drift"
-          caption="Cumulative net direction across all 14 valenced axes. Above 0 = state-expansion direction since corpus start; below 0 = state-retreat direction. Steps occur at movement start years."
+          caption="Constructed net direction across 14 valenced axes, starting with this country's first coded movement. Steps occur at movement start years; flat years indicate no further coded shift. Zero is not a measured policy level."
         />
       </div>
 
       {/* Per-channel breakdown — one chart per channel */}
       {orderedChannels.map((channel) => {
-        const series = seriesForChannel(channel);
+        const { series, starts } = seriesForChannel(channel);
         if (Object.keys(series).length === 0) return null;
         return (
           <section key={channel} className="mb-10">
@@ -189,6 +193,7 @@ export default async function CountryPage({
               <DriftChart
                 series={series}
                 years={data.years}
+                seriesStarts={starts}
                 labels={Object.fromEntries(Object.keys(series).map((s) => [s, s]))}
                 height={280}
               />

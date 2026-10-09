@@ -31,15 +31,9 @@ AXES_FILE = REPO / "axes.yaml"
 OUT_JSON = REPO / "data" / "derived" / "country_drift.json"
 OUT_CSV = REPO / "data" / "derived" / "country_drift.csv"
 
-# Clip chart range — the underlying empirical series the framework scrapes
-# (WDI, OWID, Maddison, BIS, FRED, etc.) reliably cover only the last ~50
-# years. The drift index sums policy moves over time, so showing trajectories
-# starting earlier than the comparison data we can ground them in is
-# misleading. Earlier movements (India Swadeshi pre-1991, 19th-century
-# banking acts) still seed the cumulative index; we just don't emit the
-# pre-floor years on the chart.
-import datetime as _dt
-CHART_FLOOR_YEAR = _dt.date.today().year - 50
+# This is a constructed movement-coding series, not an empirical outcome panel.
+# Its range follows the authored movement corpus, independently of the shorter
+# windows used by particular registered empirical tests.
 
 # Magnitude weights — translates the qualitative tag into a numeric step.
 MAG_WEIGHT = {"weak": 1.0, "moderate": 2.0, "strong": 3.0}
@@ -186,15 +180,12 @@ def build_drift(movements):
                 if contrib != 0.0:
                     composite_events[c].append((year, contrib, m["movement_id"]))
 
-    # Build year-by-year cumulative trajectories from year_min to year_max.
-    # Pre-CHART_FLOOR_YEAR shifts still accumulate into each country's
-    # opening cumulative position; we just don't emit the early years to the
-    # output (they'd show as a long flat tail on most countries' charts).
+    # Build the complete authored movement span. Countries first coded later
+    # retain zeroes in the raw aligned arrays for downstream calculations; the
+    # chart masks their pre-coverage years using movement/axis start metadata.
     if not all_years:
         return {"countries": {}, "axes": sorted(all_axes), "year_min": None, "year_max": None}
-    raw_min, raw_max = min(all_years), max(all_years)
-    year_min = max(raw_min, CHART_FLOOR_YEAR)
-    year_max = raw_max
+    year_min, year_max = min(all_years), max(all_years)
     years = list(range(year_min, year_max + 1))
 
     countries_out = {}
@@ -239,6 +230,11 @@ def build_drift(movements):
 
         countries_out[country] = {
             "axes": per_axis,
+            "axis_first_year": {
+                axis: min(year for year, _step, _id in axis_events)
+                for axis, axis_events in events[country].items()
+                if axis_events
+            },
             "statist_drift": composite_traj,
             "movements": m_events,
             "movement_count": len(m_events),

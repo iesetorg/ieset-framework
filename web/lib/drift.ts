@@ -10,10 +10,10 @@ import { REPO_ROOT } from "./content";
  * The framework codes every movement on directional axes (fiscal.spending_level
  * +/-/0, regulatory.labour_market_flexibility +/-/0, etc.). When you cumulate
  * those moves over time for a country, you get a trajectory of how the policy
- * mix has drifted relative to where it was. The composite "statist drift"
- * index sums the pro-state axes minus the pro-market axes so you can see in
- * a single number whether a country has moved toward or away from a
- * larger/more-redistributive state since the corpus's start year.
+ * mix has drifted within the authored movement corpus. The composite
+ * "statist drift" index sums pro-state axes minus pro-market axes. Its zero
+ * is a constructed pre-coding reference, not a measured policy level or a
+ * common country baseline; countries enter at different movement years.
  *
  * Data is computed by `scripts/compute_country_drift.py` from the movements
  * corpus and emitted as `data/derived/country_drift.json`. We load it once
@@ -22,6 +22,7 @@ import { REPO_ROOT } from "./content";
 
 export interface CountryDrift {
   axes: Record<string, number[]>;
+  axis_first_year: Record<string, number>;
   statist_drift: number[];
   movements: Array<{
     movement_id: string;

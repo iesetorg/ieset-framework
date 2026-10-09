@@ -26,6 +26,9 @@ interface DriftChartProps {
   series: Record<string, number[]>;
   /** Years aligned to each series. */
   years: number[];
+  /** First year with movement or axis coding per series. Earlier raw zeroes
+   * align the data arrays but are not observations and must not be drawn. */
+  seriesStarts?: Record<string, number>;
   /** Map ISO3 → display name (must be serialisable; passed across the
    * server-component / client-component boundary). */
   labels?: Record<string, string>;
@@ -73,6 +76,7 @@ function compactLeaderLabel(label: string) {
 export function DriftChart({
   series,
   years,
+  seriesStarts,
   labels,
   caption,
   height = 380,
@@ -94,7 +98,9 @@ export function DriftChart({
       // Flatten to long form.
       const points: SeriesPoint[] = [];
       for (const [country, traj] of Object.entries(series)) {
+        const firstCodedYear = seriesStarts?.[country] ?? years[0];
         for (let i = 0; i < traj.length; i++) {
+          if (years[i] < firstCodedYear) continue;
           points.push({ year: years[i], value: traj[i], country });
         }
       }
@@ -183,7 +189,7 @@ export function DriftChart({
                     const traj = series[m.country];
                     if (!traj) return null;
                     const yi = years.indexOf(m.year);
-                    if (yi < 0) return null;
+                    if (yi < 0 || m.year < (seriesStarts?.[m.country] ?? years[0])) return null;
                     return {
                       year: m.year,
                       value: traj[yi],
@@ -267,7 +273,7 @@ export function DriftChart({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [series, years, labels, height, zeroLineLabel, highlight, movements]);
+  }, [series, years, seriesStarts, labels, height, zeroLineLabel, highlight, movements]);
 
   return (
     <div>
