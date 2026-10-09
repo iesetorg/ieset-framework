@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vietnam_wto_2007_baci_export_basket_peer_change
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: >-
+  Around Viet Nam's WTO membership on 11 January 2007, its equal-destination
+  mean log BACI merchandise export flow to nine fixed North American and
+  European destinations rose by at least log(1.15) more from 2002-2005 to
+  2008-2012 than the median corresponding change among four fixed ASEAN WTO
+  member origins, conditional on a close preperiod trend and a donor-placebo
+  extremeness check. This is a descriptive flow comparison, not an estimate
+  of the accession's causal effect or of real export volume.
+evidence_type: descriptive
+methodology_note: >-
+  First-added registration precedes access to any selected BACI flow magnitude.
+  The source ZIP, exact keys, event timing, peer origins, destinations, years,
+  pretrend limit, contrast threshold, placebo rule and family size are frozen
+  in scripts/run_vietnam_wto_2007_baci_export_basket_peer_change.py and
+  engine/audits/vietnam_wto_2007_baci_export_basket_source_plan.md. The
+  key-only screen found 495 unique existing-country cells with observed flow
+  fields, a Viet Nam WTO-status transition in 2007, constant donor WTO status,
+  and no CEPII-coded FTA in this grid. A blank/non-finite/negative flow, status
+  mismatch, source-hash mismatch or failed pretrend gives INCONCLUSIVE.
+sample:
+  countries: [VNM, THA, MYS, IDN, PHL, USA, CAN, FRA, DEU, GBR, ITA, ESP, NLD, SWE]
+  period: [2002, 2012]
+  temporal_structure: panel
+  exclusion_rules:
+    - Only directed exports from VNM and fixed donor origins THA, MYS, IDN, PHL to fixed destinations USA, CAN, FRA, DEU, GBR, ITA, ESP, NLD, SWE.
+    - Preperiod 2002-2005; postperiod 2008-2012; the 2006 approval/acceptance and 2007 membership years are required for source/status integrity but excluded from both means.
+    - Require one existing-country CEPII row and finite nonnegative BACI flow for each of 495 frozen keys; exclude extinct DEU.1 duplicate rows using country_exists_d.
+    - No interpolation, winsorisation, partner or donor substitution, alternative windows, or reverse flows.
+variables:
+  outcome:
+    - name: directed_merchandise_exports_to_fixed_basket
+      source: cepii:Gravity_V202211.tradeflow_baci
+      transformation: equal-weight mean across nine destinations of natural log of 1 plus each directed BACI nominal merchandise flow
+      notes: CEPII Gravity V202211 embeds BACI; nominal source units, not real volume or welfare.
+  treatment:
+    - name: vietnam_wto_membership_status
+      source: cepii:Gravity_V202211.wto_o
+      transformation: VNM 0 through 2006 and 1 from 2007; four donor origins 1 in every year
+      notes: Cross-check against WTO official membership date 2007-01-11; annual status is membership, not tariff intensity.
+intervention_channel: regulatory
+intervention_channel_justification: WTO membership changes a trade-policy regime; the measured endpoint is directed merchandise flow.
+estimator:
+  template: descriptive
+  event_year: 2007
+  clustering: none
+  notes: >-
+    Let L(origin,year) be the arithmetic mean of log1p(BACI flow) across the
+    nine fixed destinations. For each origin, delta is mean L in 2008-2012
+    minus mean L in 2002-2005. Primary contrast is delta(VNM) minus median
+    delta across THA, MYS, IDN, PHL. Pretrend is absolute difference between
+    the 2002-2005 OLS slope of L(VNM) and median of four donor OLS slopes.
+    Donor placebo contrasts apply the same delta-minus-median-of-other-donors
+    calculation to each donor origin. No p-value or causal identification.
+falsification:
+  test: vietnam_wto_2007_fixed_basket_baci_peer_change
+  rule: >-
+    First require exact source and first-addition registration followed by a
+    separately committed, byte-pinned source slice. Missing/duplicate key,
+    country-existence, WTO or FTA status, nonfinite/negative flow, or absolute
+    pretrend slope gap above 0.03 log units/year yields INCONCLUSIVE. With
+    gates passed, SUPPORTED if primary contrast >= ln(1.15) and strictly above
+    all four donor-placebo contrasts; REFUTED if primary contrast <= -ln(1.15)
+    and strictly below all four donor-placebo contrasts; PARTIAL otherwise.
+    The placebo is a descriptive extremeness check with only five origins,
+    not a significant p-value. The one-case family grants no causal, featured,
+    school or policy-score credit.
+  threshold: absolute pretrend slope gap <=0.03 log units/year; contrast +/-ln(1.15); strict donor-placebo extremeness; family size 1
+prior_confidence: 0.5
+disclosure: >-
+  Viet Nam was selected among a small WTO-accession lead set after a key-only
+  source and confound screen: China's export-surge claim is already in the
+  corpus, Saudi Arabian nominal flows are heavily oil-price exposed and early
+  BACI coverage changes rapidly, and Russia's 2014 sanctions leave too little
+  clean post-accession time. No selected tradeflow magnitude or sign informed
+  this registration. This case is distinct from existing WTO productivity and
+  Chinese export claims. WTO approval in November 2006 and acceptance in
+  December 2006 motivate excluding both 2006 and 2007 from the contrast. The
+  2001 US-Viet Nam bilateral trade agreement, global
+  2008-2009 crisis, FDI, exchange rates, other reforms and measurement error
+  can affect the contrast. Four ASEAN donors are peers, not a counterfactual.
+  Prior recent CEPII FTA event calibrations had six pretrend failures in seven
+  tested events; this WTO case is not an independent replication of those
+  treaty cases. No direct policy-outcome or causation claim follows.
+scope:
+  period: [2002, 2012]
+  countries: [VNM]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [vn_wto_accession_2007]
+steelman: hypotheses/steelman/vietnam_wto_2007_baci_export_basket_peer_change.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  WTO membership source: https://www.wto.org/english/thewto_e/acc_e/a1_vietnam_e.htm.
+  CEPII Gravity V202211 and source hash are recorded in the source plan.
+  The policy event is `vn_wto_accession_2007`; any explicit policy evidence link
+  requires a separately reviewed, temporally valid result.
