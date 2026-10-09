@@ -29,6 +29,7 @@ OUTPUT = ROOT / "engine" / "evidence_tier_audit.json"
 PUBLIC_OUTPUT = ROOT / "web" / "public" / "evidence-tiers.json"
 PREREG_INDEX = ROOT / "engine" / "preregistration_index.json"
 SCHOOL_SCORE_EXCLUSIONS = ROOT / "engine" / "school_score_exclusions.json"
+PUBLIC_EVIDENCE_QUARANTINES = ROOT / "engine" / "public_evidence_quarantines.json"
 
 SKIP_TOPICS = {"conditional_taxonomy", "steelman"}
 NON_RESULT_PREFIXES = ("inconclusive", "blocked", "error", "no verdict")
@@ -137,6 +138,29 @@ def load_school_score_exclusions(path: Path = SCHOOL_SCORE_EXCLUSIONS) -> dict[s
     return exclusions
 
 
+def load_public_evidence_quarantines(
+    path: Path = PUBLIC_EVIDENCE_QUARANTINES,
+) -> dict[str, str]:
+    """Read source-semantic holds without altering frozen specs or run artifacts."""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or payload.get("schema") != "ieset-public-evidence-quarantines-v1":
+        raise ValueError(f"invalid public-evidence quarantine schema: {path}")
+    rows = payload.get("quarantines")
+    if not isinstance(rows, list):
+        raise ValueError(f"invalid public-evidence quarantines: {path}")
+    quarantines: dict[str, str] = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"hypothesis_id", "reason"}:
+            raise ValueError(f"invalid public-evidence quarantine row: {path}")
+        hypothesis_id, reason = row["hypothesis_id"], row["reason"]
+        if (not isinstance(hypothesis_id, str) or not hypothesis_id.strip()
+                or not isinstance(reason, str) or not reason.strip()
+                or hypothesis_id in quarantines):
+            raise ValueError(f"duplicate or incomplete public-evidence quarantine: {path}")
+        quarantines[hypothesis_id] = reason
+    return quarantines
+
+
 def hypothesis_files() -> list[Path]:
     root = ROOT / "hypotheses"
     return sorted(
@@ -223,6 +247,7 @@ def build_record(
     path: Path,
     registrations: dict[str, dict[str, Any]],
     school_score_exclusions: dict[str, str] | None = None,
+    public_evidence_quarantines: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     doc = raw if isinstance(raw, dict) else {}
@@ -232,6 +257,11 @@ def build_record(
         if school_score_exclusions is None else school_score_exclusions
     )
     school_score_exclusion_reason = school_score_exclusions.get(hypothesis_id)
+    public_evidence_quarantines = (
+        load_public_evidence_quarantines()
+        if public_evidence_quarantines is None else public_evidence_quarantines
+    )
+    public_evidence_quarantine_reason = public_evidence_quarantines.get(hypothesis_id)
     # The legacy pre-registration index is keyed by spec filename. One early
     # filename uses uppercase initials while its declared hypothesis_id is
     # lowercase. Resolve both forms so the ledger is stable on case-sensitive
@@ -292,6 +322,8 @@ def build_record(
         exclusion_reasons.append("estimator_floor_failed")
     if detector_findings:
         exclusion_reasons.append("integrity_detector_flagged")
+    if public_evidence_quarantine_reason is not None:
+        exclusion_reasons.append("external_integrity_quarantine")
     if disposition == "quarantined_pending_v2":
         exclusion_reasons.append("audit_quarantined_pending_v2")
     elif disposition == "capped_partial_pending_v2":
@@ -318,7 +350,8 @@ def build_record(
         diagnostics.get("evidence_tier_recommendation") or ""
     ).strip().lower()
     scoreboard_weight_cap = (
-        0.0 if public_visible and not school_score_eligible
+        0.0 if public_evidence_quarantine_reason is not None
+        else 0.0 if public_visible and not school_score_eligible
         else 0.25 if screen_or_descriptive_rescope else None
     )
 
@@ -345,9 +378,13 @@ def build_record(
         "tier": tier,
         "public_visible": public_visible,
         # Publish the explicit exception; absence retains the normal public rule.
-        **({"school_score_eligible": False} if public_visible and not school_score_eligible else {}),
+        **({"school_score_eligible": False}
+           if (public_visible and not school_score_eligible)
+           or public_evidence_quarantine_reason is not None else {}),
         **({"school_score_exclusion_reason": school_score_exclusion_reason}
            if school_score_exclusion_reason is not None else {}),
+        **({"public_evidence_quarantine_reason": public_evidence_quarantine_reason}
+           if public_evidence_quarantine_reason is not None else {}),
         "reference_set": reference_set,
         "reference_note": reference_note if reference_set else None,
         "registration_status": registration_status,
@@ -372,8 +409,9 @@ def build_record(
 def build() -> dict[str, Any]:
     registrations = registration_rows()
     school_score_exclusions = load_school_score_exclusions()
+    public_evidence_quarantines = load_public_evidence_quarantines()
     records = [
-        build_record(path, registrations, school_score_exclusions)
+        build_record(path, registrations, school_score_exclusions, public_evidence_quarantines)
         for path in hypothesis_files()
     ]
     unknown_exclusions = set(school_score_exclusions) - {
@@ -383,6 +421,14 @@ def build() -> dict[str, Any]:
         raise ValueError(
             "school-score exclusions reference unknown hypothesis IDs: "
             + ", ".join(sorted(unknown_exclusions))
+        )
+    unknown_quarantines = set(public_evidence_quarantines) - {
+        str(row["hypothesis_id"]) for row in records
+    }
+    if unknown_quarantines:
+        raise ValueError(
+            "public-evidence quarantines reference unknown hypothesis IDs: "
+            + ", ".join(sorted(unknown_quarantines))
         )
     records.sort(key=lambda row: str(row["hypothesis_id"]))
 
@@ -442,6 +488,11 @@ def build() -> dict[str, Any]:
                 "A separate explicit registry can hold school score credit for immutable "
                 "calibration runs. It changes scoring only; the original preregistered "
                 "analysis and result artifacts remain unchanged."
+            ),
+            "public_evidence_quarantines": (
+                "A separate explicit registry withholds public visibility and school "
+                "credit when a saved result does not measure its named outcome. "
+                "Frozen specifications and run artifacts remain unchanged."
             ),
         },
         "summary": {
