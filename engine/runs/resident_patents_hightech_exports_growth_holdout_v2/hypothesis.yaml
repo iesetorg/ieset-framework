@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: resident_patents_hightech_exports_growth_holdout_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: Among countries excluded from the old patents study, more resident patent applications at
+  year t predict faster high-technology export-value growth in current US dollars from t to t+1,
+  conditional on country and treatment-year effects.
+methodology_note: New-ID country-disjoint measured-association follow-up to wipo_patent_applications_hightech_export_followthrough_panel.
+  Its same-commit SUPPORTED old result was known before this registration. The historical runner
+  restricted its fit to the explicit old country roster, all of which is excluded here. This design
+  tests only the stated measured pair, not the old policy mechanism. Four tests share a two-sided
+  Bonferroni cutoff of 0.025. No school score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 1996
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS AUT BRA CAN CHE CHL CHN DEU
+    DNK ESP FIN FRA GBR IND ISR ITA JPN KOR MEX MYS NLD NOR POL RUS SGP SWE TUR USA ZAF.'
+  - Retain ISO 3166-1 alpha-3 countries and XKX only; exclude aggregates and every old-roster row
+    before fitting.
+  - Use exact treatment-year and next-year observations, at least five usable treatment years per
+    country, and no interpolation, imputation, nearest-year substitution, country replacement, or
+    vintage switch.
+  - Require nonnegative tariffs or patent applications where used, positive log-growth endpoints
+    and income where used, positive population denominator where used, and poverty percentages within
+    0 to 100.
+variables:
+  outcome:
+  - name: next_year_log_hightech_export_value_growth
+    source: wits:high_tech_exports
+    transformation: Natural log of positive high-technology export value in current USD at exact
+      t+1 minus natural log at exact t.
+  treatment:
+  - name: log_one_plus_resident_patent_applications
+    source: wipo:patent_applications_resident
+    transformation: Natural log of one plus nonnegative resident patent applications at treatment
+      year t.
+  controls: []
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One fixed primary coefficient with country and treatment-year effects and country-clustered
+    uncertainty. No model or covariate search.
+falsification:
+  rule: If fewer than 300 complete treatment-year pairs or 25 countries survive the five-year rule,
+    or the primary estimate or clustered uncertainty is unidentified or nonfinite, return INCONCLUSIVE.
+    Otherwise SUPPORT requires the expected-sign coefficient at two-sided p<=0.10/4=0.025; REFUTATION
+    requires the opposite-sign coefficient at the same cutoff. Every other estimable result is PARTIAL.
+    All four fixed tests count in this Bonferroni family even if a test is inconclusive.
+  test: country_disjoint_fourth_legacy_panel_fe
+  threshold:
+    family_id: fourth_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 4
+    family_alpha: 0.1
+    family_p_max: 0.025
+    expected_sign: +
+    min_observations: 300
+    min_countries: 25
+    min_pairs_per_country: 5
+    old_hypothesis_id: wipo_patent_applications_hightech_export_followthrough_panel
+    old_result_bucket: SUPPORTED
+    old_claim_direction: +
+    old_n_obs: 444
+    old_n_countries: 30
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_country_count: 30
+    old_country_ids:
+    - ARG
+    - AUS
+    - AUT
+    - BRA
+    - CAN
+    - CHE
+    - CHL
+    - CHN
+    - DEU
+    - DNK
+    - ESP
+    - FIN
+    - FRA
+    - GBR
+    - IND
+    - ISR
+    - ITA
+    - JPN
+    - KOR
+    - MEX
+    - MYS
+    - NLD
+    - NOR
+    - POL
+    - RUS
+    - SGP
+    - SWE
+    - TUR
+    - USA
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: wipo:patent_applications_resident
+        path: data/vintages/wipo/patent_applications_resident@2026-05-19T094854Z.parquet
+        sha256: 8affaee11a397d965f73eda762d0b3416bc341b7485e6197745700a1dd3bf24e
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        series_id: patent_applications_resident
+        indicator_id: IP.PAT.RESD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/IP.PAT.RESD?format=json
+      outcome:
+        source: wits:high_tech_exports
+        path: data/vintages/wits/high_tech_exports@2026-07-23T153650Z.parquet
+        sha256: 812e79d58bb1a18c4e6725639d7faec21e8302d87201cd58e1a6027bb8d30cb1
+        manifest: data/manifests/fetch_run_2026-07-23T153659Z.yaml
+        series_id: high_tech_exports
+        indicator_id: TX.VAL.TECH.CD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/TX.VAL.TECH.CD?format=json
+prior_confidence: 0.4
+disclosure: The old SUPPORTED result was seen before registration. Both labeled WIPO and WITS files
+  are World Bank API mirrors of different indicators; patent applications vary in quality, and current-USD
+  export growth includes prices and exchange rates. This is descriptive calibration with zero school
+  credit.
+steelman: hypotheses/steelman/resident_patents_hightech_exports_growth_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
