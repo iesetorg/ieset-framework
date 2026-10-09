@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: regulatory_quality_renewable_capacity_holdout_v2
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: +
+claim: Among countries excluded from the old renewable-capacity study, a higher WGI regulatory-quality estimate at year t predicts faster growth in total installed renewable electric capacity per million people from t to exact year t+1, conditional on baseline real income per person and country and treatment-year effects.
+methodology_note: New-ID country-disjoint measured-association follow-up to energy_market_competition_renewable_capacity_panel. Its archived same-commit PARTIAL result was known before this registration and is not prospective evidence. The historical old runner restricted fitted rows to the explicit old country roster, all excluded here. Five fixed tests share a two-sided Bonferroni cutoff of 0.02. The expected sign is set from this new measured claim, not the old parser. Descriptive calibration only, with zero school score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 2000
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS AUT BEL BRA CAN CHE CHL CHN COL CZE DEU DNK ESP FIN FRA GBR HUN IDN IND IRL ISR ITA JPN KOR MEX MYS NLD NOR NZL PER PHL POL PRT SGP SWE THA TUR USA VNM ZAF.'
+  - Retain ISO 3166-1 alpha-3 countries and XKX only; exclude aggregates and every old-roster row before fitting.
+  - Use exact treatment-year and next-year records, at least five usable treatment years per country, and no interpolation, imputation, nearest-year substitution, country replacement, or vintage switch.
+  - Require nonnegative patent counts or installed capacity where used, positive population and real-income values where logged, and finite primary inputs.
+variables:
+  outcome:
+  - name: next_year_log_one_plus_renewable_capacity_mw_per_million_growth
+    source: irena:installed_capacity_renewable
+    transformation: Natural log of 1 plus nonnegative installed renewable capacity MW per million positive residents at exact t+1, minus the same log quantity at exact t.
+  - name: population_denominator
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: Positive total population at exact outcome year t+1 and baseline t.
+  treatment:
+  - name: regulatory_quality_estimate
+    source: wgi:GOV_WGI_RQ.EST
+    transformation: Level at treatment year t.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One prespecified primary OLS coefficient with country and treatment-year effects and country-clustered uncertainty; baseline log real income is the only covariate. Fixed complete-case sample, no automatic control dropping, model search, or post-result sign change.
+falsification:
+  rule: If fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule, or the primary estimate or clustered uncertainty is unidentified or nonfinite, return INCONCLUSIVE. Otherwise SUPPORT requires the expected-sign coefficient at two-sided p<=0.10/5=0.02; REFUTATION requires the opposite-sign coefficient at the same cutoff. Every other estimable result is PARTIAL. All five fixed tests count in this Bonferroni family even if a test is inconclusive.
+  test: country_disjoint_fifth_legacy_panel_fe
+  threshold:
+    family_id: fifth_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 5
+    family_alpha: 0.1
+    family_p_max: 0.02
+    expected_sign: +
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: energy_market_competition_renewable_capacity_panel
+    old_result_bucket: PARTIAL
+    old_n_obs: 902
+    old_n_countries: 41
+    old_spec_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries without fitted rows.
+    old_country_count: 41
+    old_country_ids:
+    - ARG
+    - AUS
+    - AUT
+    - BEL
+    - BRA
+    - CAN
+    - CHE
+    - CHL
+    - CHN
+    - COL
+    - CZE
+    - DEU
+    - DNK
+    - ESP
+    - FIN
+    - FRA
+    - GBR
+    - HUN
+    - IDN
+    - IND
+    - IRL
+    - ISR
+    - ITA
+    - JPN
+    - KOR
+    - MEX
+    - MYS
+    - NLD
+    - NOR
+    - NZL
+    - PER
+    - PHL
+    - POL
+    - PRT
+    - SGP
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: wgi:GOV_WGI_RQ.EST
+        path: data/vintages/wgi/GOV_WGI_RQ.EST@2026-05-05T195213Z.parquet
+        sha256: 4d8084d77990bc1d10f5630cdf8100c9ce2e1b610ade3aa7b46340fb658c8e2e
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: GOV_WGI_RQ.EST
+        source_url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_RQ.EST?format=json&source=3
+        indicator_id: GOV_WGI_RQ.EST
+      outcome:
+        source: irena:installed_capacity_renewable
+        path: data/vintages/irena/installed_capacity_renewable@2026-05-05T212311Z.parquet
+        sha256: 12d11cd77fad18a9d2e2bbdeafdfc4f149d720aac688469e0b9a1dcd3d96c556
+        manifest: data/manifests/fetch_run_2026-05-05T212957Z.yaml
+        series_id: installed_capacity_renewable
+        source_url: https://pxweb.irena.org/api/v1/en/IRENASTAT/Power Capacity and Generation/Country_ELECCAP_2026_H1_v-PX 1.px
+      denominator:
+        source: world_bank_wdi:SP.POP.TOTL
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: SP.POP.TOTL
+        source_url: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json
+        indicator_id: SP.POP.TOTL
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The old PARTIAL label is archived metadata from a same-commit run whose result was known before this design. WGI regulatory quality is a perceptions composite, not an electricity-entry rule; installed MW is not renewable generation, investment cost, or emissions avoided. This country-disjoint panel is descriptive and receives no causal, welfare, or school-score credit.
+steelman: hypotheses/steelman/regulatory_quality_renewable_capacity_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - energy
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

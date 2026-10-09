@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: government_consumption_private_credit_depth_holdout_v2
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim_direction: '-'
+claim: Among countries excluded from the old state-allocation study, a higher general-government final-consumption share of GDP at year t predicts a lower private-sector bank-credit share of GDP at exact year t+1, conditional on baseline real income per person and country and treatment-year effects.
+methodology_note: New-ID country-disjoint measured-association follow-up to state_allocation_private_credit_innovation_panel. Its archived same-commit REFUTED result was known before this registration and is not prospective evidence. The historical old runner restricted fitted rows to the explicit old country roster, all excluded here. Five fixed tests share a two-sided Bonferroni cutoff of 0.02. The expected sign is set from this new measured claim, not the old parser. Descriptive calibration only, with zero school score credit.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period: &id001
+  - 1996
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - 'Exclude all countries in the historical old specification: ARG AUS AUT BEL BRA CAN CHE CHL CHN COL CZE DEU DNK ESP FIN FRA GBR HUN IDN IND IRL ISR ITA JPN KOR MEX MYS NLD NOR NZL PER PHL POL PRT SGP SWE THA TUR USA VNM ZAF.'
+  - Retain ISO 3166-1 alpha-3 countries and XKX only; exclude aggregates and every old-roster row before fitting.
+  - Use exact treatment-year and next-year records, at least five usable treatment years per country, and no interpolation, imputation, nearest-year substitution, country replacement, or vintage switch.
+  - Require nonnegative patent counts or installed capacity where used, positive population and real-income values where logged, and finite primary inputs.
+variables:
+  outcome:
+  - name: next_year_private_credit_pct_gdp
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: Level at exact t+1 in percent of GDP.
+  treatment:
+  - name: government_final_consumption_pct_gdp
+    source: world_bank_wdi:NE.CON.GOVT.ZS
+    transformation: Level at treatment year t.
+  controls:
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One prespecified primary OLS coefficient with country and treatment-year effects and country-clustered uncertainty; baseline log real income is the only covariate. Fixed complete-case sample, no automatic control dropping, model search, or post-result sign change.
+falsification:
+  rule: If fewer than 400 complete treatment-year pairs or 35 countries survive the five-year rule, or the primary estimate or clustered uncertainty is unidentified or nonfinite, return INCONCLUSIVE. Otherwise SUPPORT requires the expected-sign coefficient at two-sided p<=0.10/5=0.02; REFUTATION requires the opposite-sign coefficient at the same cutoff. Every other estimable result is PARTIAL. All five fixed tests count in this Bonferroni family even if a test is inconclusive.
+  test: country_disjoint_fifth_legacy_panel_fe
+  threshold:
+    family_id: fifth_legacy_panel_geographic_holdouts_2026_10_09
+    family_size: 5
+    family_alpha: 0.1
+    family_p_max: 0.02
+    expected_sign: '-'
+    min_observations: 400
+    min_countries: 35
+    min_pairs_per_country: 5
+    old_hypothesis_id: state_allocation_private_credit_innovation_panel
+    old_result_bucket: REFUTED
+    old_n_obs: 897
+    old_n_countries: 41
+    old_spec_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_run_commit: 441b76cba266e45285ffc1e4bdc81dc303a88e29
+    old_runner_filter_proof: At old_run_commit, scripts/run_panel_fe.py filter_sample restricts country_iso3 to spec.sample.countries before run_panel_ols. The entire old roster below is excluded, including any old countries without fitted rows.
+    old_country_count: 41
+    old_country_ids:
+    - ARG
+    - AUS
+    - AUT
+    - BEL
+    - BRA
+    - CAN
+    - CHE
+    - CHL
+    - CHN
+    - COL
+    - CZE
+    - DEU
+    - DNK
+    - ESP
+    - FIN
+    - FRA
+    - GBR
+    - HUN
+    - IDN
+    - IND
+    - IRL
+    - ISR
+    - ITA
+    - JPN
+    - KOR
+    - MEX
+    - MYS
+    - NLD
+    - NOR
+    - NZL
+    - PER
+    - PHL
+    - POL
+    - PRT
+    - SGP
+    - SWE
+    - THA
+    - TUR
+    - USA
+    - VNM
+    - ZAF
+    school_score_credit: 0
+    school_score_eligible: false
+    source_files:
+      treatment:
+        source: world_bank_wdi:NE.CON.GOVT.ZS
+        path: data/vintages/world_bank_wdi/NE.CON.GOVT.ZS@2026-05-05T194701Z.parquet
+        sha256: a6605c618d3dd91b061c4dae7960c4c0baad66c037125aec44cb6b71ccb6a79d
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NE.CON.GOVT.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NE.CON.GOVT.ZS?format=json
+        indicator_id: NE.CON.GOVT.ZS
+      outcome:
+        source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+        path: data/vintages/world_bank_wdi/FS.AST.PRVT.GD.ZS@2026-05-05T194720Z.parquet
+        sha256: 57d2717d9097b3142f9b116242218621e4560a6bf4e29ddc22081dd66b2a1b19
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: FS.AST.PRVT.GD.ZS
+        source_url: https://api.worldbank.org/v2/country/all/indicator/FS.AST.PRVT.GD.ZS?format=json
+        indicator_id: FS.AST.PRVT.GD.ZS
+      income:
+        source: world_bank_wdi:NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        series_id: NY.GDP.PCAP.KD
+        source_url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+        indicator_id: NY.GDP.PCAP.KD
+prior_confidence: 0.4
+disclosure: The old REFUTED label is archived metadata from a same-commit run whose result was known before this design. Government final consumption is not total state allocation, and bank credit is not the quality of private investment. Both are GDP ratios and may share denominator shocks. This country-disjoint panel is descriptive and receives no causal, welfare, or school-score credit.
+steelman: hypotheses/steelman/government_consumption_private_credit_depth_holdout_v2.md
+scope:
+  period: *id001
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - capital_flows
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
