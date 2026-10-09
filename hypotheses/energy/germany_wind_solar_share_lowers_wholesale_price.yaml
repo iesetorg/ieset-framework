@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../../IESET/schemas/hypothesis.schema.json
+hypothesis_id: germany_wind_solar_share_lowers_wholesale_price
+version: 1
+status: draft
+topic: energy
+claim: Higher wind+solar share lowers German day-ahead wholesale prices (merit-order effect), contrary to claims renewables raised German power prices.
+claim_direction: '-'
+evidence_type: associational
+sample:
+  countries: &id002
+  - DEU
+  period: &id001
+  - 2018
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: de_lu_day_ahead_price
+    source: smard:price_de_lu
+    transformation: monthly mean EUR/MWh
+  - name: vre_share_of_load
+    source: smard:wind_onshore+wind_offshore+solar / load
+    transformation: share
+estimator:
+  template: panel_fe
+falsification:
+  rule: OLS price ~ vre_share + year FE + calendar-month FE, HC3. SUPPORTED if beta<0 and p<0.05; REFUTED (renewables raise wholesale price) if beta>0 and p<0.05; INCONCLUSIVE otherwise. Wholesale only;
+    retail levies/network fees out of scope.
+  test: ols_fe_beta_sign
+  threshold: beta_vre<0 & p<0.05
+prior_confidence: 0.75
+disclosure: Drafted 2026-10-09 by agent from a high-engagement X claim. The headline value quoted in the tweet was seen before drafting; the falsification threshold was fixed before the analysis script
+  was run and is frozen in PREREG_LEDGER.json (SHA256 + UTC). Not git-pre-registered (needs user-approved commit).
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/germany_wind_solar_share_lowers_wholesale_price.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - energy
+  policy_family:
+  - energy_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/dlacalle_IA/status/2106401506521907314
+  mined_at: '2026-10-09'
+  mined_by_model: Grok Bot (X search)
+notes: X-sourced draft; build dir ~/IESET-x-build; runner scripts/run_x_hypotheses.py

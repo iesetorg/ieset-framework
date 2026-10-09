@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../../IESET/schemas/hypothesis.schema.json
+hypothesis_id: seattle_minimum_wage_restaurant_employment_2025_2026
+version: 1
+status: draft
+topic: labour
+claim: 'Seattle''s high minimum wage (~$21-22/hr) is costing restaurant jobs: Seattle-metro food-service employment underperforms the US in 2025-2026.'
+claim_direction: '-'
+evidence_type: associational
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 2024
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: seattle_msa_food_services_emp
+    source: bls:SMU53426607072200001
+    transformation: yoy_pct
+  - name: us_food_services_emp_nsa
+    source: bls:CEU7072200001
+    transformation: yoy_pct
+estimator:
+  template: descriptive
+falsification:
+  rule: Mean y/y growth Jan-2025..latest. SUPPORTED if Seattle MSA mean y/y <= US mean y/y - 1.0pp AND Seattle mean y/y < 0; REFUTED if Seattle mean y/y >= US mean y/y; PARTIAL otherwise. MSA includes lower-wage
+    suburbs (dilution caveat).
+  test: yoy_gap_vs_us
+  threshold: seattle_yoy - us_yoy <= -1.0 & seattle_yoy < 0
+prior_confidence: 0.4
+disclosure: Drafted 2026-10-09 by agent from a high-engagement X claim. The headline value quoted in the tweet was seen before drafting; the falsification threshold was fixed before the analysis script
+  was run and is frozen in PREREG_LEDGER.json (SHA256 + UTC). Not git-pre-registered (needs user-approved commit).
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/seattle_minimum_wage_restaurant_employment_2025_2026.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+source_provenance:
+  archive_refs:
+  - https://x.com/LeadingReport/status/2106846970304192891
+  - https://x.com/amuse/status/2106036734106685869
+  mined_at: '2026-10-09'
+  mined_by_model: Grok Bot (X search)
+notes: X-sourced draft; build dir ~/IESET-x-build; runner scripts/run_x_hypotheses.py

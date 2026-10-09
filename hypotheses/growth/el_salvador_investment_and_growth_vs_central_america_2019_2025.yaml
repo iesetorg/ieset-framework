@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../../IESET/schemas/hypothesis.schema.json
+hypothesis_id: el_salvador_investment_and_growth_vs_central_america_2019_2025
+version: 1
+status: draft
+topic: growth
+claim: Despite the security turnaround, El Salvador has the lowest investment rate in Central America and has not out-grown its peers under Bukele.
+claim_direction: '-'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - SLV
+  - GTM
+  - HND
+  - NIC
+  - CRI
+  - PAN
+  - DOM
+  period: &id001
+  - 2019
+  - 2025
+  temporal_structure: panel
+variables:
+  outcome:
+  - name: investment_gdp
+    source: imf_weo_sdmx:NID_NGDP
+    transformation: mean 2019-2025
+  - name: real_gdp_growth
+    source: imf_weo_sdmx:NGDP_RPCH
+    transformation: mean 2019-2025
+estimator:
+  template: descriptive
+falsification:
+  rule: SUPPORTED if SLV mean NID_NGDP 2019-2025 ranks lowest of 7 AND SLV mean growth is below peer median; REFUTED if SLV investment rank is in top half (1-3) AND growth above peer median; PARTIAL otherwise.
+  test: peer_rank
+  threshold: slv_invest_rank==7 & slv_growth<median
+prior_confidence: 0.55
+disclosure: Drafted 2026-10-09 by agent from a high-engagement X claim. The headline value quoted in the tweet was seen before drafting; the falsification threshold was fixed before the analysis script
+  was run and is frozen in PREREG_LEDGER.json (SHA256 + UTC). Not git-pre-registered (needs user-approved commit).
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/el_salvador_investment_and_growth_vs_central_america_2019_2025.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - gdp_growth
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+source_provenance:
+  archive_refs:
+  - https://x.com/wander_investor/status/2108080210197299275
+  - https://x.com/nayibbukele/status/2104018288057401510
+  mined_at: '2026-10-09'
+  mined_by_model: Grok Bot (X search)
+notes: X-sourced draft; build dir ~/IESET-x-build; runner scripts/run_x_hypotheses.py

@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../../IESET/schemas/hypothesis.schema.json
+hypothesis_id: us_manufacturing_jobs_change_since_jan_2025
+version: 1
+status: draft
+topic: trade
+claim: US manufacturing employment has fallen since January 2025 despite tariffs (vs White House claim of manufacturing job gains).
+claim_direction: '-'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 2025
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: us_manufacturing_emp
+    source: bls:CES3000000001
+    transformation: level, thousands SA
+estimator:
+  template: descriptive
+falsification:
+  rule: SUPPORTED (jobs down) if CES manufacturing latest - Jan-2025 <= -20k; REFUTED if >= +20k; PARTIAL (flat) otherwise.
+  test: level_change
+  threshold: latest - 2025-01 <= -20
+prior_confidence: 0.6
+disclosure: Drafted 2026-10-09 by agent from a high-engagement X claim. The headline value quoted in the tweet was seen before drafting; the falsification threshold was fixed before the analysis script
+  was run and is frozen in PREREG_LEDGER.json (SHA256 + UTC). Not git-pre-registered (needs user-approved commit).
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/us_manufacturing_jobs_change_since_jan_2025.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - industrial_capability
+  - employment_labour
+  policy_family:
+  - trade_policy
+  - industrial_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/RMConservative/status/2105347801118855340
+  - https://x.com/RapidResponse47/status/2105782019036754014
+  mined_at: '2026-10-09'
+  mined_by_model: Grok Bot (X search)
+notes: X-sourced draft; build dir ~/IESET-x-build; runner scripts/run_x_hypotheses.py
