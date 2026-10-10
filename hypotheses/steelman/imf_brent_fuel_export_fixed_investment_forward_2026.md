@@ -1,0 +1,5 @@
+# Steelman: Brent shock, fixed fuel-export orientation and later gross fixed capital formation, percent of gdp
+
+A country that exported a greater fraction of merchandise as fuel before the shock period could receive larger export receipts after Brent rises. That might raise subsequent gross fixed capital formation, percent of gdp over the following two years. The registered target is a positive descriptive slope of at least 0.4 percentage points per +1 pooled SD of the interaction, after own baseline and prior trend, baseline income, and country/year effects.
+
+The strong alternative is that Brent is a global demand signal and fuel-export shares omit import bills, extraction quantity, contract pricing and services trade. A higher price can appreciate currencies, suppress non-oil sectors, or trigger countercyclical saving rather than spending. Two-year forward changes may reverse an immediate boom. Measurement revisions, simultaneous commodity shocks, and shared source errors remain. An opposite material association refutes this specific predictive direction; weak, fragile or sparse results remain partial or inconclusive. No causal or policy claim follows.
