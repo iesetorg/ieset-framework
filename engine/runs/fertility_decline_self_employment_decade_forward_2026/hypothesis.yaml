@@ -1,0 +1,294 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fertility_decline_self_employment_decade_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '-'
+claim: In the fixed country/anchor sample, a one-birth-per-woman larger fertility decline in the preceding
+  decade predicts at least a 1.0 percentage points decrease in self-employment share of total employment
+  during the following decade, conditional on earlier real income and country/anchor effects.
+methodology_note: Six-outcome demographic-transition descriptive family. Source keys, treatment/income
+  preflight, complete-case, influence, and multiplicity rules were fixed in engine/audits/demographic_transition_followthrough_prereg_2026-10-10.md
+  before selected outcome values or null masks were opened.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ATG
+  - AUS
+  - AUT
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - DEU
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - GUY
+  - HKG
+  - HND
+  - HTI
+  - HUN
+  - IDN
+  - IMN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KEN
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LUX
+  - MAC
+  - MAR
+  - MCO
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MLI
+  - MLT
+  - MMR
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - PRI
+  - PRT
+  - PRY
+  - PYF
+  - QAT
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - STP
+  - SUR
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - URY
+  - USA
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 1985
+  - 2015
+  temporal_structure: panel
+  exclusion_rules:
+  - Only frozen 1995 and 2005 anchor country keys; require both complete windows per country.
+  - Treat missing, nonfinite, flagged, out-of-range or nonpositive log-input endpoints as absent; no interpolation,
+    winsorization, replacement source, or country substitution.
+  - Only two-window complete countries enter country/anchor fixed-effects fits; no post-outcome threshold
+    changes.
+variables:
+  treatment:
+  - name: preceding_decade_fertility_decline
+    source: world_bank_wdi:SP.DYN.TFRT.IN
+    transformation: Fertility at t-10 minus fertility at t, births per woman; positive means declining
+      fertility.
+    notes: Observed national demographic transition, not a policy intervention.
+  outcome:
+  - name: self_employment
+    source: world_bank_wdi:SL.EMP.SELF.ZS
+    transformation: self-employment share of total employment at t+10 minus t; percentage-point difference.
+    notes: Distinct aggregate response margin; no individual-level effect is identified.
+  controls:
+  - name: baseline_log_real_income_per_person
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log real GDP per resident at t.
+  - name: preceding_decade_log_income_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log real GDP per resident at t divided by t-10.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor_year
+  clustering: country
+  notes: OLS of next-decade outcome change on prior-decade fertility decline, baseline log income, prior
+    log income growth, country and anchor effects. Country-cluster CR1 small-sample correction; two-sided
+    Student t(G-1).
+falsification:
+  test: demographic_transition_followthrough_2026_10_10
+  rule: INCONCLUSIVE if a frozen source, chronology, complete-case, material-exposure, rank, influence,
+    or finite-uncertainty gate fails. Otherwise SUPPORTED for a - oriented beta of at least 1.0 percentage
+    points and two-sided p<=0.0016666666666666668; REFUTED for equally large opposite beta at the same
+    p; all other estimable results PARTIAL. Six tests share one family denominator.
+  threshold:
+    family_id: demographic_transition_followthrough_2026_10_10
+    family_size: 6
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0016666666666666668
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 1.0
+    meaningful_beta_unit: percentage points
+    min_complete_rows: 250
+    min_complete_countries: 120
+    min_material_rows: 100
+    min_material_countries: 65
+    material_fertility_decline_births_per_woman: 0.5
+    min_complete_anchors_per_country: 2
+    max_top_one_percent_partialled_x_share: 0.3
+    max_country_partialled_x_share: 0.15
+    max_anchor_partialled_x_share: 0.65
+    key_roster_sha256: fb3590fa3cd5c8557b793962f14cb3badfddbeddbaaf9551938ac56fbceacb50
+    source_lock_path: data/pinned_evidence/demographic_transition_followthrough_2026.manifest.json
+    source_files:
+      fertility:
+        publisher: world_bank_wdi
+        series_id: SP.DYN.TFRT.IN
+        path: data/vintages/world_bank_wdi/SP.DYN.TFRT.IN@2026-04-30T130516Z.parquet
+        sha256: ff1eb90d4033e42ca63bb0de72c27f21044e55b69e44568d65321dd81cd8cfd1
+        manifest: data/manifests/fetch_run_2026-04-30T130536Z.yaml
+        manifest_sha256: ab56887949d3a51f3e3001ac1065c62538af1db4d4a722e39e29a774447f511b
+        url: https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json
+      income:
+        publisher: world_bank_wdi
+        series_id: NY.GDP.PCAP.KD
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+        url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      self_employment:
+        publisher: world_bank_wdi
+        series_id: SL.EMP.SELF.ZS
+        path: data/vintages/world_bank_wdi/SL.EMP.SELF.ZS@2026-04-30T115122Z.parquet
+        sha256: 67abd9aef0cc6ba29de9fc1bea7bbbf6686a310a49fc7b38f782211a22dd330c
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+        url: https://api.worldbank.org/v2/country/all/indicator/SL.EMP.SELF.ZS?format=json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: This is a correlated descriptive follow-through; migration, development, labour modelling,
+  and reverse timing remain. The family was selected from a previously explored corpus and is not an independent
+  holdout. Zero causal, policy, school, position, and featured credit.
+steelman: hypotheses/steelman/fertility_decline_self_employment_decade_forward_2026.md
+scope:
+  period:
+  - 1985
+  - 2015
+  countries: *id001
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
