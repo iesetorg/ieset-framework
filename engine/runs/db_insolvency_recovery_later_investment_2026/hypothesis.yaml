@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: db_insolvency_recovery_later_investment_2026
+version: 1
+status: pre_registered
+topic: regulatory
+claim_direction: +
+claim: Among economies outside the old 40-country bankruptcy sample, higher modeled secured-creditor
+  recovery in the Doing Business standardized insolvency case in DB2015-18 is associated with a higher
+  gross fixed capital formation share of GDP in calendar DB year + 1, after economy and DB-year fixed
+  effects.
+methodology_note: Three predeclared, correlated insolvency-mechanism cells share one fixed 512-key
+  country holdout. Only workbook and outcome identifier keys, schemas and treatment type/null masks
+  were inspected before registration; selected magnitudes remain unopened. The DB21 sheet is a retrospective
+  corrected publisher release, so this is a temporal descriptive association, not a real-time forecast.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2015
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the committed 512 country/DB-year keys are eligible. Exclude Afghanistan because its three
+    selected rows were previewed, plus every country in the archived 40-country bankruptcy claim.
+    No country substitution, interpolation, nearest-year match or aggregate economy.
+  - Use DB2015-18 publisher data only, measured as of June of the preceding calendar year. Require
+    exact workbook row and numeric finite exposure. Drop nonnumeric/no-practice entries; never convert
+    no-practice to a measured resolution time or recovery.
+  - 'Match WDI/PWT by exact ISO3 and calendar year: DB year minus two is baseline and DB year plus
+    one is later endpoint. Require complete finite values and declared bounds; no imputation or winsorizing.'
+  - Require at least 300 complete country-years, 85 countries, three years per retained country,
+    all four DB years, material exposure variation, estimable full and DB2015-17 sensitivity fits,
+    residual-exposure concentration caps and clustered uncertainty.
+variables:
+  treatment:
+  - name: recovery_cents
+    source: world_bank_doing_business:insolvency_recovery_rate
+    transformation: Published modeled cents recovered per dollar by secured creditors in the standardized
+      case; one model unit is 10 cents.
+  outcome:
+  - name: fixed_investment_share_next_year
+    source: world_bank_wdi:NE.GDI.FTOT.ZS
+    transformation: Gross fixed capital formation, percent of GDP, calendar year DB year + 1. This
+      includes public and private investment.
+  controls: []
+intervention_channel: institutional
+intervention_channel_justification: Insolvency procedures and legal frameworks are institutional
+  conditions; this ecological regression does not identify effects of a particular reform.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - db_year
+  clustering: country
+  notes: OLS with country and DB-year dummies; CR1 country-cluster standard error and two-sided Student
+    t(G-1). Refit the same formula on DB2015-17 for directional sensitivity. No post-result covariates
+    or cohort changes.
+falsification:
+  test: doing_business_insolvency_later_outcomes_holdout_2026_10_10_recovery_cents_fixed_investment_share_next_year
+  rule: INCONCLUSIVE when any frozen custody, coverage, variation, model-rank, concentration, sensitivity
+    or uncertainty gate fails. Otherwise SUPPORTED only for the registered predicted coefficient
+    sign, absolute practical magnitude and two-sided p<=0.01/3, with matching DB2015-17 sensitivity
+    sign; REFUTED only for the symmetric opposite result and sensitivity sign. Every other estimable
+    fit is PARTIAL. No causal, policy, school or featured credit.
+  threshold:
+    family_id: doing_business_insolvency_later_outcomes_holdout_2026_10_10
+    family_size: 3
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0033333333333333335
+    db_years:
+    - 2015
+    - 2016
+    - 2017
+    - 2018
+    baseline_offset_years: -2
+    endpoint_offset_years: 1
+    fixed_key_roster: data/pinned_evidence/doing_business_insolvency_followup_2026_key_roster.csv
+    fixed_key_roster_sha256: 528960e23fa54a820482c23ea3707f77fe433faea9a677c90a6225a0b8014482
+    expected_key_rows: 512
+    expected_key_countries: 128
+    excluded_prior_sample_countries: 40
+    excluded_preview_country: AFG
+    min_complete_rows: 300
+    min_complete_countries: 85
+    min_rows_per_country: 3
+    min_distinct_db_years: 4
+    min_material_countries: 20
+    max_one_country_residualized_exposure_share: 0.2
+    max_one_year_residualized_exposure_share: 0.45
+    sensitivity_db_years:
+    - 2015
+    - 2016
+    - 2017
+    sensitivity_min_rows: 200
+    sensitivity_min_countries: 70
+    source_workbook_sha256: 95bce841cd858fcf32f74fda67bc786881de4e91e1db522c78fc93f15abb265e
+    wdi_vintage_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+    pwt_vintage_sha256: c919c4e3f1e766651cdf4ef3e252b99164fd2dacd234be830d98879df1cf800a
+    source_lock_path: data/pinned_evidence/db_insolvency_recovery_later_investment_2026.source.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.5
+    material_within_country_range_raw_units: 5.0
+    min_p90_p10_exposure_gap_raw_units: 15.0
+    exposure_bounds_raw_units:
+    - 0
+    - 100
+    outcome_bounds:
+    - 0
+    - 100
+    exposure_name: recovery_cents
+    outcome_name: fixed_investment_share_next_year
+    source_key_roster_sha256: 528960e23fa54a820482c23ea3707f77fe433faea9a677c90a6225a0b8014482
+prior_confidence: 0.4
+disclosure: Recovery is modeled from time, cost, case outcome and discount rates; it is not an observed
+  creditor payment or a pure legal-policy measure. Later investment includes public and private projects,
+  and macro financing conditions can influence both series. Doing Business was discontinued after
+  integrity concerns; this corrected historical workbook is retrospectively revised. These three
+  tests are correlated, use a previously examined source family and carry zero causal, policy, school,
+  position or featured credit.
+steelman: hypotheses/steelman/db_insolvency_recovery_later_investment_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+scope:
+  period:
+  - 2015
+  - 2019
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - capital_flows
+  policy_family: []
+  treatment_tags: []
