@@ -1,0 +1,173 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: findex_distance_account_forward_2026
+version: 1
+status: pre_registered
+topic: regulatory
+claim_direction: '-'
+claim: Across the fixed 2017→2021 and 2021→2024 lower/middle-income Findex survey waves, economies where
+  a larger share of unbanked adults cite distant financial institutions will show smaller next-wave gains
+  in all-adult account ownership, conditional on baseline ownership and economy and transition effects.
+methodology_note: One of six correlated direct-survey descriptive calibrations. The fixed Findex source-key
+  roster and indicator labels were screened without selected indicator values or null masks. The original
+  frozen contract is engine/audits/findex_financial_pathways_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: &id001
+  - ALB
+  - ARG
+  - ARM
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BIH
+  - BOL
+  - BRA
+  - CHN
+  - CIV
+  - CMR
+  - COG
+  - COL
+  - CRI
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - GAB
+  - GEO
+  - GHA
+  - GIN
+  - HND
+  - IDN
+  - IND
+  - IRN
+  - IRQ
+  - JOR
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - LAO
+  - LBN
+  - LBR
+  - LKA
+  - MAR
+  - MDA
+  - MKD
+  - MLI
+  - MNG
+  - MOZ
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NGA
+  - NIC
+  - NPL
+  - PAK
+  - PER
+  - PHL
+  - PRY
+  - PSE
+  - RUS
+  - SEN
+  - SLE
+  - SLV
+  - SRB
+  - TGO
+  - THA
+  - TJK
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - UZB
+  - VEN
+  - XKX
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2017
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the fixed 75 lower/middle-income economy IDs and two 2017→2021, 2021→2024 transitions in the
+    frozen key roster; require both complete transitions per economy.
+  - Only exact Findex indicator codes and demographic groups; proportion cells must be finite in [0,1].
+    No interpolation, imputation, alternate wave, winsorization, geography substitution, or 2022 observations.
+variables:
+  treatment:
+  - name: fin11a.s
+    source: world_bank_global_findex_2025:fin11a.s
+    transformation: Baseline fin11a.s for demographic group all/all; workbook proportion ×100, then divide
+      percentage points by 10 for the regression coefficient.
+  outcome:
+  - name: account.t.d_next_wave_change
+    source: world_bank_global_findex_2025:account.t.d
+    transformation: Next-wave minus baseline percentage points for exact subgroup all/all.
+  controls:
+  - name: baseline_outcome
+    source: world_bank_global_findex_2025:account.t.d
+    transformation: Same outcome at exposure wave in percentage points, divided by 10.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - transition
+  clustering: country
+  notes: OLS Δoutcome on exposure/10, baseline outcome/10, economy and transition effects; country-cluster
+    CR1 standard errors; two-sided Student t(G−1). Only complete two-transition economies enter.
+falsification:
+  test: findex_financial_pathways_2026_10_10
+  rule: INCONCLUSIVE if source/roster/registration chronology, 100-pair/50-economy/two-transition sample,
+    20-economy 5-point exposure-change, full-rank, cluster-SE, or frozen exposure-concentration gate fails.
+    Otherwise SUPPORTED for a coefficient in the expected sign with absolute size ≥0.5 outcome point per
+    10 exposure points and two-sided p≤0.0016666666666666668; REFUTED for an equally strong opposite sign;
+    all other estimable results PARTIAL. The six cells share one Bonferroni denominator.
+  threshold:
+    family_id: findex_financial_pathways_2026_10_10
+    family_size: 6
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0016666666666666668
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.5
+    min_complete_pairs: 100
+    min_complete_countries: 50
+    min_material_exposure_countries: 20
+    material_exposure_change_pp: 5.0
+    max_country_residualized_exposure_share: 0.2
+    max_top_one_percent_residualized_exposure_share: 0.2
+    max_transition_residualized_exposure_share: 0.6
+    expected_key_pairs: 150
+    expected_key_countries: 75
+    source_key_roster_sha256: 767cdc617b9d210a4ddaa088ece47bbb22a1f73a573a5fb748485554314ad777
+    source_lock_path: data/pinned_evidence/findex_distance_account_forward_2026.source.json
+    source_path: data/vintages/world_bank_findex/global_findex_2025@2026-10-10.xlsx
+    source_sha256: b6c991f8e46bcbd4b6423cc962d5b2fa030e3db99832b9016bb4f400f57c772f
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.3
+disclosure: Repeated national surveys are ecological, not the same individual adults over time. Findex
+  COVID interview-mode and questionnaire changes, common development, reverse feedback, and shared respondents
+  can confound estimates. The six family members are not independent replications and have zero school,
+  position, policy, causal, and featured credit.
+steelman: hypotheses/steelman/findex_distance_account_forward_2026.md
+scope:
+  period:
+  - 2017
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - digital_access
+  policy_family:
+  - none
+  treatment_tags:
+  - findex
+  - descriptive_forward
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
