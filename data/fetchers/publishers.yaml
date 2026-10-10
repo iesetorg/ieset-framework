@@ -157,6 +157,7 @@ publishers:
     - oecd_fdi
     - oecd_fdi_reg
     - oecd_stri
+    - oecd_taxstruct
     catalogue_url: https://data-explorer.oecd.org/
     vintage_behaviour: revisable
     notes: 'SDMX 2.1 API via the new Data Explorer. Client passes full dataflow identifier (''AGENCY,DATAFLOW_ID,VERSION'') as series_id, with optional SDMX key filter. Covers CPI (DSD_PRICES), KEI, IDD
@@ -678,6 +679,8 @@ publishers:
     credibility_tier: 3
     status: ready
     fetcher_module: data.fetchers.wid
+    aliases:
+    - wid_concentration
     catalogue_url: https://wid.world/data/
     vintage_behaviour: append_only
     notes: Manual-drop (bulk download URLs 403/404 on automated; browser flow required). Top income + wealth shares, labor share, per-country bulk CSVs.
@@ -1996,3 +1999,20 @@ publishers:
       Hamilton Project).
 
       '
+  profit_shifting:
+    name: Local derived OECD CbCR and profit-shifting panel
+    endpoint: manual://data/raw/profit_shifting/
+    auth_required: false
+    license: oecd_terms
+    credibility_tier: 3
+    status: pending
+    catalogue_url: https://www.oecd.org/en/data/datasets/corporate-tax-statistics-database.html
+    vintage_behaviour: revisable
+    notes: >-
+      scripts/build_profit_shifting_panel.py creates a local composite vintage
+      from OECD CbCR aggregates and other inputs. The preserved 2019 derived
+      parquet and build code are byte pinned for a rank-only descriptive
+      calibration, but the raw OECD HTTP response and source-native currency
+      multiplier were not retained. This derived namespace is registered for
+      coverage; pending status prevents it being treated as a ready reusable
+      publisher fetcher or independently verified raw source.

@@ -2,11 +2,11 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current local evidence
-gate reports **544 public of 2,104 hypotheses**: 50 featured and 494 calibration.
-This is **172 additional records** and leaves **328** to the record-level target. These
+gate reports **547 public of 2,108 hypotheses**: 50 featured and 497 calibration.
+This is **175 additional records** and leaves **325** to the record-level target. These
 records are not independent research questions: one age-by-sex employment family
 contributes 20 visible records. The family accounting below keeps that distinction
-explicit. Another 240 records
+explicit. Another 241 records
 have verified registration but remain archived. A public calibration is a
 completed, reviewable test, not a supported, causal, policy-effect, or
 school-score finding.
@@ -300,8 +300,48 @@ saved run, reports a different coefficient, and has no matching input
 vintages. Their historical PARTIAL results remain inspectable, but both
 are now archived through the external integrity registry, with zero
 school credit. This withdraws one featured and one calibration record;
-it is why the net count is 544 despite the new JST calibration. See
+it is why the earlier net count was 544 despite the new JST calibration. See
 `engine/audits/movement_vintage_hypothesis_integrity_2026-10-10.md`.
+
+## Latest separately locked calibrations and treaty records
+
+Three additional new-ID tests cleared the public **descriptive-calibration**
+gate after strict registration, separately committed source locks, frozen
+sample/method gates, and exact result replay:
+
+| Question | Complete sample and frozen outcome | Result | Credit |
+| --- | --- | --- | --- |
+| 2005–2015 out-of-pocket health-financing change versus 2015–2023 under-five-mortality change | 185 of 216 key-roster economies | **PARTIAL**; beta +0.06533 annual log-change points per 10-point financing-share rise, HC3 SE 0.16445, p=0.69166 | Descriptive only |
+| 2022 private-credit level versus 2022–2024 manufacturing-share change | 130 of 181 countries | **PARTIAL**; beta +0.10016 manufacturing-share points per 10 credit/GDP points; 95% CI [−0.00317,+0.20350] | Descriptive only |
+| 2019 statutory corporate-tax rate versus OECD CbCR booked profit per employee | 143 of 143 tax jurisdictions | **PARTIAL**; Spearman rho −0.12784, 10,000-permutation p=0.13239 | Descriptive only |
+
+The financing test measures the actual out-of-pocket share, correcting the
+older generic total-spending-treatment mismatch without regrading the old
+claims. The private-credit question is a later-window continuation, not a
+replication of the archived generic result. The OECD CbCR local derived
+vintage is byte pinned, but its original HTTP response and source-native
+currency multiplier were not retained; only the rank association is
+interpreted. All three receive zero causal, policy, school, position, and
+featured credit. See their individual dated result audits and run packets.
+
+The separately locked Korea–EU FTA five-destination flow test stayed
+**INCONCLUSIVE**: its 2007–2010 pretrend slope gap was −0.063726, outside
+the frozen ±0.03 bound, so no post-2011 contrast was estimated. Its source
+re-extraction and six run artifacts matched exactly. Three legal-metadata
+policy records now mark Korean EU-FTA provisional application in 2011,
+Japanese CPTPP entry in 2018, and the EU–Japan EPA in 2019. They code
+intended trade openness only, not measured effects. A path-only redaction
+in the Korea source-plan command example needed a narrow replay adapter;
+that adapter proves the analytic registration and six run artifacts are
+unchanged. The original path remains in local Git history, so this branch
+must not be published as-is.
+
+An additional EIA state electricity-price candidate was registered and
+run in a separate isolated checkout but **not integrated**. One required
+Indiana solar-generation cell was null; the frozen all-cells gate made
+the case INCONCLUSIVE. Its source manifest also had an unrelated local
+path, so importing it would add a public OPSEC defect without a graduation.
+No threshold, state roster, or outcome was changed after that result.
 
 ## Corpus and drift corrections
 
@@ -369,12 +409,12 @@ not ready conversions. See
 `engine/audits/legacy_archive_v2_readiness_2026-10-10.md`. In particular,
 the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
 candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
-multiplication is also unsupported: the current registry has **3,382**
-policies, but only **7** have a comparative structure declared, **3,359**
-need treated/comparison unit coding, and **1,309** need exact event dates.
-Six of those seven declare known measurement gaps; the seventh lacks an
-outcome measurement plan. None is a verified causal estimate. The second-order
-index now retains **3,366** policies,
+multiplication is also unsupported: the current registry has **3,385**
+policies, but only **8** are marked tested through curated public result
+links. Most still need treated/comparison units, exact event timing, and
+measured outcomes before a policy-effect test. None of the three newly
+added treaty-date records supplies a verified causal estimate. The second-order
+index now retains **3,369** policies,
 including all **23** explicit evaluation designs even when a policy has no
 scored drift axis. A WHO particulate-matter/chronic-outcome lead was rejected
 before registration because its short modeled window and concentrated
@@ -385,7 +425,7 @@ changes at the required country-years. The 1,320 legacy same-commit
 registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
-The requested +500 remains unmet: **328 more public records** would be
+The requested +500 remains unmet: **325 more public records** would be
 needed, and the record count itself overstates independent research questions.
 A separate feasibility audit found no defensible hundreds-sized family in the
 preserved corpus. Priorities for genuinely new source acquisition are matched
@@ -404,16 +444,18 @@ authored national movement. The 108 old May-16 source-pinned vintages were
 not silently overwritten; any refreshed vintage needs a new version and
 dependent-run review.
 
-Generated preregistration, evidence-tier, census, and conversion-funnel
-indexes were refreshed after the latest frozen runs. Current local checks
-passed: **6,246** specs and cross-references, 784 strict and 1,320 legacy
-registration pairs, the 544/2,104 evidence and census checks, drift
-consistency, 11 focused Python tests, eight web tests, TypeScript checking,
-the **8,544-route** static site build, exact replay of the JST, tariff,
-Ecuador, OECD, and Mexico packets, and public-tree OPSEC scanning. The
-static drift and JST result pages were present in the build. The JST
-post-result local-path redaction passed exact replay without changing
-analytic rules; it does not erase path-bearing Git history. Publication
-remains on hold because this local branch history also contains an older
-rejected, path-bearing source manifest followed by a revert. No push,
-merge, or deployment follows from these local audits.
+Generated preregistration, evidence-tier, census, conversion-funnel, and
+policy browser/evidence/measurement indexes were refreshed after the latest
+frozen runs. Current local checks passed: **6,253** specs and cross-references,
+788 strict and 1,320 legacy registration pairs, the 547/2,108 evidence and
+census checks, 1789–2026 drift consistency, strict publisher coverage,
+33 focused Python tests, eight web tests, TypeScript checking, the
+**8,555-route** static site build, exact replay of the three new public
+calibrations and the inconclusive Korea packet (through its path-redaction
+adapter), CEPII source re-extraction, and public-tree OPSEC scanning. The
+static drift, new hypothesis, policy, and policy-browser pages were present
+in the build. Publication remains on hold: an older reverted local-path
+manifest and the initial Korea source-plan example survive in this local
+branch history. The local derived OECD CbCR source also lacks its raw HTTP
+response, and CEPII slice redistribution terms need review. No push, merge,
+or deployment follows from these local audits.
