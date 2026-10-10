@@ -1,0 +1,7 @@
+# Real unemployment cash spending across the business cycle
+
+An unemployment benefit system should spend more when fewer people have jobs. A real GDP contraction is an imperfect but broadly available marker of the adverse macroeconomic conditions that raise unemployment and benefit claims. Holding country and calendar-year differences fixed, one might therefore expect public unemployment compensation per person to rise relative to public family spending during slower-growth years.
+
+The strongest alternative explanation is simultaneous demand and labor-market shocks: GDP and benefit claims are jointly determined, while governments may amend eligibility or benefits during a recession. A relative increase could also result from reduced family spending rather than increased unemployment benefits. The registered OECD measure includes severance pay and is not a direct count of claimants or a legal benefit entitlement. The test is descriptive; even a supported result would not establish that automatic stabilizers caused a smaller recession or better welfare outcome.
+
+The frozen test uses the OECD SOCX real-dollar-per-person public unemployment cash-benefit category and public family spending as its comparator, WDI real GDP growth, exact annual country-year joins, a source-key roster, and fixed effects. Every estimable verdict, including a refutation or partial result, remains visible without policy or school score credit.

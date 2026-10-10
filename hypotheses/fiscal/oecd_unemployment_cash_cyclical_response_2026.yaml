@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_unemployment_cash_cyclical_response_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: '-'
+claim: >
+  Across the fixed 1991–2018 OECD country-year roster, lower real GDP growth in
+  year t is associated with a larger same-year increase in real public
+  unemployment-compensation spending per person relative to real public family
+  spending per person, after country and year effects.
+evidence_type: associational
+methodology_note: >
+  One new direct-measure descriptive test. The old automatic-stabilizers
+  recession-depth candidate instead asks whether welfare-state size moderates
+  later economic harm; the OECD programme-to-poverty family tests later poverty
+  endpoints. This registration follows a screen of source schemas, categorical
+  keys, status flags, raw-file hashes, and only the WDI GDP-growth finite mask.
+  Selected OECD expenditure values, transformations, signs, and estimates were
+  not read before registration. The frozen key grid is not the final value-valid
+  sample and the chosen family is not an archive-wide independent discovery.
+sample:
+  countries: &countries
+  - AUS
+  - AUT
+  - BEL
+  - BGR
+  - CAN
+  - CHE
+  - CHL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period: [1990, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - >
+    Use only the pinned country/year key roster at t=1991..2018; require the
+    exact OECD SOCX selections for both programmes at t-1 and t and WDI real
+    GDP growth at t. Exclude aggregate OECD and all other country codes.
+  - >
+    OECD observations must have status A and finite nonnegative dollar-per-person
+    values. WDI GDP growth must have blank or A status and be finite in [-20,20]
+    percentage points. No interpolation, imputation, substitute programme,
+    source, unit, year, or post-result sample repair.
+  - >
+    Retain countries with at least ten complete treatment years. The key roster
+    was formed from categorical OECD keys/status and the WDI finite mask only;
+    selected OECD spending values were not screened before the source lock.
+variables:
+  treatment:
+  - name: real_gdp_growth_pct
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Annual constant-price real GDP growth in percentage points at t.
+  outcome:
+  - name: unemployment_cash_relative_family_spending_growth
+    source: oecd:DSD_SOCX@DF_SOCX_AGG
+    transformation: >
+      [ln(1+U_t)-ln(1+U_t-1)] minus [ln(1+F_t)-ln(1+F_t-1)], where U is
+      public ES10 cash C unemployment-compensation/severance-pay TP711 and F is
+      public ES10 total _T family-programme TP51 expenditure. Both use annual
+      SOCX USD_PPP_PS real dollars per person, price base Q, status A.
+    notes: >
+      This is a relative spending response; the sign alone does not establish
+      that unemployment benefits rose in absolute terms.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Equal-weight country-year OLS of the outcome differential on WDI real GDP
+    growth, country and treatment-year dummies. Country-cluster CR1 covariance
+    and two-sided Student t with G-1 country degrees of freedom. Five frozen
+    country hash-fold omissions check directional stability. Individual spending
+    components are reported as diagnostics, not extra hypothesis tests.
+falsification:
+  test: oecd_unemployment_cash_cyclical_response_2026_10_10
+  rule: >
+    INCONCLUSIVE if source, complete-case, downturn-exposure, rank, finite
+    country-cluster uncertainty, residualized-exposure concentration, or fold
+    gates fail. With gates clear, SUPPORTED requires a differential coefficient
+    <= -0.02 log points per +1 GDP-growth percentage point, two-sided p<=0.01,
+    and at least four of five negative hash-fold coefficients. REFUTED requires
+    beta>=+0.02, p<=0.01 and at least four of five positive folds. All other
+    estimable results are PARTIAL. The opposite sign is not suppressed.
+  threshold:
+    family_id: oecd_unemployment_cash_cyclical_response_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.02
+    min_complete_rows: 800
+    min_complete_countries: 30
+    min_complete_years_per_country: 10
+    min_downturn_rows: 60
+    min_downturn_countries: 20
+    max_top_country_residualized_exposure_share: 0.2
+    max_top_one_percent_residualized_exposure_share: 0.3
+    min_fold_rows: 600
+    min_fold_countries: 24
+    gdp_growth_range: [-20, 20]
+    spending_min: 0
+    source_key_roster_path: data/pinned_evidence/oecd_socx_unemployment_response_2026_key_roster.csv
+    source_key_roster_sha256: e67b06ba296a038f805d848841fdca977cc3d92e2c86e3b68437ae23c72e8549
+    source_lock_path: data/pinned_evidence/oecd_socx_unemployment_response_2026.source.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: >
+  GDP contractions, unemployment, eligibility changes, benefit rules, severance
+  payments, exchange-rate/PPP adjustments, and source revisions can move the
+  spending ratio together. Family spending is a contextual comparator rather
+  than a randomized counterfactual. Same-year timing and fixed effects identify
+  neither an automatic statutory mechanism nor a causal GDP effect. The
+  p=0.01 threshold corrects this one-test family only, not the larger IESET
+  archive from which this question was selected. No policy, school, position,
+  causal, or featured credit is permitted.
+steelman: hypotheses/steelman/oecd_unemployment_cash_cyclical_response_2026.md
+scope:
+  period: [1990, 2018]
+  countries: *countries
+  outcome_dim: [fiscal_policy]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
