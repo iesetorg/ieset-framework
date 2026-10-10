@@ -232,7 +232,7 @@ export default async function DriftPage() {
   const historicalPolicies = (await loadAllPolicies())
     .filter(
       (policy) =>
-        policy.scope === "national" &&
+        (policy.scope ?? "national") === "national" &&
         Number.isInteger(policy.timeframe.start) &&
         policy.timeframe.start < EARLY_POLICY_CONTEXT_END_YEAR &&
         (policy.references?.length ?? 0) > 0
