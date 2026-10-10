@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_current_account_deficit_1975_1995_cpi_inflation_2026
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: +
+claim: Within the fixed 18 advanced JST R6 economies during 1975–1995, a larger nominal current-account
+  deficit as a share of GDP at four fixed anchors predicts higher annualized consumer-price inflation
+  over the next five-year window after country and anchor effects. This is a descriptive predictive
+  association, not a causal financing effect.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 1975
+  - 1995
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only anchors [1975, 1980, 1985, 1990] and their fixed t+1 through t+5 windows in the 18 named
+    countries. Require all 1134 family source keys in the exact JST R6 vintage; no substitute years,
+    countries, or source.
+  - At t require finite JST nominal current account and strictly positive nominal GDP, then compute
+    deficit=-100*ca/gdp. Require finite cpi at t and t+5; Both CPI endpoints must be strictly positive.
+    Remove invalid country-anchors without replacement; other outcome fields do not determine this cell
+    sample.
+  - Retain only countries with at least three of four complete anchors. Require 12 countries, 48 country-anchors,
+    and 10 countries at each anchor. No trimming, winsorization, imputation, or data-dependent era changes.
+variables:
+  treatment:
+  - name: current_account_deficit_pct_gdp
+    source: jst:R6.ca_gdp
+    transformation: -100*ca[t]/gdp[t]
+    notes: Both source fields are nominal local-currency measures. Positive means a deficit; this is
+      an observed external balance, not an intervention.
+  outcome:
+  - name: cpi_inflation
+    source: jst:R6.cpi
+    transformation: 20*log(cpi[t+5]/cpi[t])
+    notes: The fixed future window gives annualized log percentage points; this outcome is distinct
+      from the other family fields.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor
+  clustering: country
+  notes: Estimate one OLS slope for the specified five-year response, on anchor-year current-account-deficit
+    percentage points with country and anchor intercepts. Use CR1 finite-sample country-cluster standard
+    error and two-sided t(G-1). Report every country-deletion slope. No controls, weights, alternative
+    anchors, horizons, sample selection, or model choice. Fixed fourteen-test Holm adjustment includes
+    gated cells as p=1.
+falsification:
+  test: jst_external_deficit_1975_1995_cpi_inflation_frozen_family
+  rule: Require unchanged first-commit registration valid against its own schema, then fourteen later
+    separately committed metadata-only source locks and the exact source/key roster. INCONCLUSIVE if
+    this cell fails completeness, rank, finite variance, residualized deficit SD >=0.5 pp, residualized
+    outcome SD >=0.1 pp, maximum country share of residualized deficit sum of squares <=25%, or any
+    country-deletion fit. The crisis cell additionally requires six incident intervals and twenty nonincident
+    intervals. Once valid, SUPPORTED requires a slope in the predicted direction of at least 0.25 outcome
+    pp per one pp deficit, Holm-adjusted two-sided p<=0.05 over all fourteen cells, and every country-deletion
+    slope in the predicted direction. REFUTED requires the same magnitude and Holm threshold in the
+    opposite direction and all deletion slopes opposite. Other valid cells are PARTIAL. No causal, policy,
+    school, position, or featured credit.
+  threshold:
+    family_id: jst_current_account_deficit_external_adjustment_three_eras_2026_10_10
+    family_size: 14
+    holm_alpha: 0.05
+    minimum_abs_beta_outcome_pp_per_deficit_pp: 0.25
+    minimum_countries: 12
+    minimum_country_anchors: 48
+    minimum_anchors_per_country: 3
+    minimum_countries_per_anchor: 10
+    minimum_residual_deficit_sd_pp: 0.5
+    minimum_residual_outcome_sd_pp: 0.1
+    maximum_country_deficit_ss_share: 0.25
+    minimum_crisis_event_intervals: 6
+    minimum_crisis_nonevent_intervals: 20
+    era: '1975_1995'
+    anchors:
+    - 1975
+    - 1980
+    - 1985
+    - 1990
+    outcome: cpi_inflation
+    predicted_sign: 1
+prior_confidence: 0.3
+disclosure: Current-account balances are endogenous to investment, saving, trade, and growth; the predictor
+  cannot identify an external-financing shock. Country/anchor effects do not remove changing global
+  or domestic conditions. The same advanced-economy source, countries, and correlated outcomes form
+  one fourteen-test family, not independent replications. Adjacent five-year response windows share
+  endpoints, while crisis-onset years do not overlap. Post-1999 shared euro exchange rates make a separate
+  2000–2020 USD-exchange-rate cell unsuitable, so none was registered.
+methodology_note: The source, schema chronology, fixed fourteen-cell family, Holm denominator, source
+  keys, statistical gates, and replay are frozen in engine/audits/jst_external_balance_source_plan_2026.md.
+  No selected JST current-account, GDP, outcome, or missingness data were opened before first registration.
+scope:
+  period:
+  - 1975
+  - 1995
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  outcome_dim:
+  - inflation
+  policy_family:
+  - none
+  treatment_tags:
+  - historical_current_account_deficit
+steelman: hypotheses/steelman/jst_current_account_deficit_1975_1995_cpi_inflation_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: One fixed cell in a fourteen-test descriptive external-balance family; do not count cells as
+  independent replications.
