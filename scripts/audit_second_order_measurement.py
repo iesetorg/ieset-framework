@@ -400,7 +400,10 @@ def include_doc(doc: dict[str, Any], scope: str, *, kind: str) -> bool:
     if kind == "hypothesis":
         return is_policy_experiment_hypothesis(doc)
     if kind == "policy":
-        return bool(doc.get("axes_moved")) or is_price_or_rent_control(doc)
+        # An explicit treatment design remains useful even when a conservative
+        # source review withholds every axis score. Keep its design and data gaps
+        # in the audit without inventing axis-inherited requirements.
+        return bool(doc.get("axes_moved")) or bool(doc.get("evaluation_design")) or is_price_or_rent_control(doc)
     if kind == "movement":
         return bool(doc.get("policies") or doc.get("axes_summary"))
     return True

@@ -1,9 +1,9 @@
 # Hypothesis conversion target status — 2026-10-10
 
 The requested increment is **500 additional public hypotheses** above the
-audited starting count of 372, so the target is 872. The current live evidence
-gate reports **484 public of 2,030 hypotheses**: 51 featured and 433 calibration.
-This is **112 additional** and leaves **388** to target. The 226 verified
+audited starting count of 372, so the target is 872. The current local evidence
+gate reports **490 public of 2,036 hypotheses**: 51 featured and 439 calibration.
+This is **118 additional** and leaves **382** to target. The 226 verified
 archives remain archived. A public calibration is a completed, reviewable test,
 not a supported, causal, policy-effect, or school-score finding.
 
@@ -82,6 +82,38 @@ United Kingdom were excluded for income-reference-period exceptions. Neither
 supports a GDP-policy effect, and both have zero causal, policy, school, and
 featured credit.
 
+The two-test WDI electricity-exposure family against Eurostat public
+electricity/heat CO2 was registered in `5fbe97627cf272d545ae4c8aa526bde18aa7f6dc`, source-locked in
+`16bf872b330c9a00bc29dd1bdc0dfae1bbfdf624`, and measured in `e5cc790bcd5142c2a9d8dd0b79097f93af4bc6b3`. Both complete-case and material
+exposure floors passed. Renewable-generation-share change returned **PARTIAL**
+(beta +0.00273547 log CO2 per share point, p=0.11884; 873 pairs/29 countries),
+as did electric-use-per-person change (beta −0.0486344 per log use change,
+p=0.72400; 926/29). The prespecified pre-2019 diagnostics also failed the
+directional family rule. Exact replay passed; neither is an energy-policy
+effect, and both have zero causal, policy, school, and featured credit.
+
+The two-test Internet-uptake and publicly performed R&D family against WIPO-
+origin resident patenting was registered in `54632a7f60b7a5781f6048d59582829e137bf279`, source-locked in
+`38fc024b233ed4565c292bf84927bae44f238c31`, and measured in `b0aac02e059951205cf93b9adaae7f54e6495bf2`. Internet uptake returned
+**PARTIAL** (beta −0.0008447 log patent units per percentage point,
+p=0.753589; 619 pairs/34 countries). Government-plus-higher-education
+performed R&D/GDP also returned **PARTIAL** (beta +0.153955 per GDP point,
+p=0.400313; 561/32). Both passed their frozen sample, material, and
+concentration gates and exactly replayed; neither supports a causal
+innovation or policy claim. All school, policy, causal, and featured credit
+is zero.
+
+The two-test OECD corporate-rate and top-PIT tax-cut family against next-year
+WDI new limited-liability registrations was registered in `a18fccd902d89960144f909ad02f7b854748a754`,
+source-locked in `dcdf4c7e959f99b890aaaa547f4586c809474de3`, and measured in `c630a102fe04e17e83983a8757e10f16a6f29eb3`. Both retained
+all valid large tax changes using prespecified cut/hike categories. Corporate
+rate cuts returned **PARTIAL** (beta −0.0212048 log registrations,
+p=0.335424; 1,282 pairs/114 countries, 154 cut years); top-PIT cuts returned
+**PARTIAL** (beta −0.0197594, p=0.450230; 391/35, 40 cut years). Both passed
+the frozen sample, event, and concentration gates and independently replayed.
+They are descriptive calibrations, not tax-policy effects, with zero causal,
+policy, school, and featured credit.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -115,6 +147,13 @@ unsupported axes and a permanent 2019 fiscal-spending step based on a
 temporary pandemic spike. All 30 changed derived country-year rows belong
 to Finland; see
 `engine/audits/finland_policy_drift_source_correction_2026-10-10.md`.
+The composite map now starts each country line at its first scored valenced
+axis step; 141 of 145 movement countries have such coding, while four retain
+movement timelines without fabricated zero lines. A reviewed tone pass
+corrected 66 text-triggered false authoritarian labels without changing any
+numeric drift trajectory. Eight borderline labels retain their prior tag
+pending a separate regime review. See
+`engine/audits/drift_composite_coverage_tone_review_2026-10-10.md`.
 
 ## Remaining work and source boundary
 
@@ -127,10 +166,13 @@ not ready conversions. See
 the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
 candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
 multiplication is also unsupported: the current registry has **3,373**
-policies, but only **7** have a comparative-design-ready structure, **3,350**
+policies, but only **7** have an exact-date comparative structure declared, **3,350**
 need treated/comparison unit coding, and **1,308** need exact event dates.
-Those seven still require outcome data and design verification before any
-causal estimate. A WHO particulate-matter/chronic-outcome lead was rejected
+Six of those seven declare known measurement gaps; the seventh lacks an
+outcome measurement plan. None is a verified causal estimate. The second-order
+index now retains **3,359** policies,
+including all **23** explicit evaluation designs even when a policy has no
+scored drift axis. A WHO particulate-matter/chronic-outcome lead was rejected
 before registration because its short modeled window and concentrated
 exposure leave a weak test. WHO/JMP annual urban-sanitation and UNDP annual
 expected-schooling change designs were also rejected before registration
@@ -140,7 +182,12 @@ registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
 Generated preregistration, evidence, census, conversion-funnel, school,
-second-order, and policy indexes were refreshed after the twelve new results
-and policy corrections. Publication remains on hold: this local branch history
-contains an older rejected, path-bearing source manifest followed by a
-revert. No push, merge, or deployment is authorized by these local audits.
+second-order, and policy indexes were refreshed after the eighteen new results
+and policy corrections. Final local checks passed: 6,166 specs and cross-
+references, 29 focused Python tests, eight web tests, TypeScript type checking,
+the static site build, generated drift and evidence checks, and public-tree
+OPSEC scanning. Link reciprocity had zero errors or warnings; scope alignment
+had zero errors and seven warnings. Publication remains on hold: this local
+branch history contains an older rejected, path-bearing source manifest
+followed by a revert. No push, merge, or deployment is authorized by these
+local audits.

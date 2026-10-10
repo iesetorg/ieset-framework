@@ -13,7 +13,8 @@ import { REPO_ROOT } from "./content";
  * mix has drifted within the authored movement corpus. The composite
  * "statist drift" index sums pro-state axes minus pro-market axes. Its zero
  * is a constructed pre-coding reference, not a measured policy level or a
- * common country baseline; countries enter at different movement years.
+ * common country baseline; composite lines enter at their first valenced
+ * axis step, which may follow the first authored movement.
  *
  * Data is computed by `scripts/compute_country_drift.py` from the movements
  * corpus and emitted as `data/derived/country_drift.json`. We load it once
@@ -24,6 +25,8 @@ export interface CountryDrift {
   axes: Record<string, number[]>;
   axis_first_year: Record<string, number>;
   statist_drift: number[];
+  /** First nonzero valenced axis step, or null when no composite is coded. */
+  composite_first_year: number | null;
   movements: Array<{
     movement_id: string;
     name: string;
@@ -67,7 +70,9 @@ export function topCoveredCountries(
   filter?: (iso3: string) => boolean
 ): string[] {
   const entries = Object.entries(d.countries)
-    .filter(([iso3]) => (filter ? filter(iso3) : true))
+    .filter(([iso3, country]) =>
+      country.composite_first_year !== null && (filter ? filter(iso3) : true)
+    )
     .sort(([, a], [, b]) => b.movement_count - a.movement_count)
     .slice(0, n)
     .map(([iso3]) => iso3);

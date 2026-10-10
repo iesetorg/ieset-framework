@@ -9,6 +9,24 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 import audit_second_order_measurement as audit  # noqa: E402
 
 
+def test_axisless_explicit_design_keeps_its_gaps_without_inventing_axes(monkeypatch):
+    path = REPO_ROOT / "policies" / "fi_compulsory_education_extension_2021.yaml"
+    doc = audit.load_yaml(path)
+    assert doc.get("axes_moved") is None
+    monkeypatch.setattr(audit, "iter_specs", lambda base: [(path, doc)] if base == "policies" else [])
+
+    rows = audit.audit_policies("all", axis_index={}, families={})
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["axes"] == []
+    assert row["has_evaluation_design"] is True
+    assert row["evaluation_design_status"] == "explicit"
+    assert row["axis_inherited_requirements"]["required_layers"] == []
+    assert row["axis_inherited_requirements"]["has_axis_requirements"] is False
+    assert row["known_data_gaps"]
+    assert audit.audit_policies("controls", axis_index={}, families={}) == []
+
+
 def test_summarize_layers_collects_required_gaps_and_sources():
     summary = audit.summarize_layers(
         {

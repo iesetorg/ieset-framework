@@ -1,15 +1,15 @@
 # Policy Second-order Requirements Index
 
-This generated index expands each policy's axis coding into second-order measurement requirements.
+This generated index expands coded policy axes into second-order measurement requirements and retains explicit evaluation designs even when no axis is scored. An axisless design has no inherited requirements.
 
 ## Summary
 
-- Policies indexed: 3350
+- Policies indexed: 3359
 - Movements indexed: 714
 - Policies with axis-inherited requirements: 3350
-- Policies with explicit evaluation_design: 14
+- Policies with explicit evaluation_design: 23
 - Policies missing explicit design despite axis requirements: 3336
-- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3336, "explicit": 14}`
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3336, "explicit": 23}`
 - Source readiness mentions: `{"partial_ready": 44630, "proprietary_gap": 6700, "ready": 3339, "reconstruct_needed": 19019, "scrape_needed": 14076}`
 
 ## Most Common Required Layers

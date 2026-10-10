@@ -149,7 +149,7 @@ def write_outputs(payload: dict[str, Any]) -> None:
     lines = [
         "# Policy Second-order Requirements Index",
         "",
-        "This generated index expands each policy's axis coding into second-order measurement requirements.",
+        "This generated index expands coded policy axes into second-order measurement requirements and retains explicit evaluation designs even when no axis is scored. An axisless design has no inherited requirements.",
         "",
         "## Summary",
         "",

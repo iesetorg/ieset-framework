@@ -203,6 +203,9 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+  const compositeCountryCount = Object.values(driftData.countries).filter(
+    (country) => country.composite_first_year !== null
+  ).length;
 
   // Keep every country selectable even as the movement corpus grows. A code
   // listed in more than one curated region appears only in the first picker
@@ -212,13 +215,20 @@ export default async function DriftPage() {
     id,
     label,
     iso3s: countries.filter((iso3) => {
-      if (!(iso3 in driftData.countries) || pickerSeen.has(iso3)) return false;
+      if (
+        driftData.countries[iso3]?.composite_first_year == null ||
+        pickerSeen.has(iso3)
+      ) return false;
       pickerSeen.add(iso3);
       return true;
     }),
   }));
   const otherCountries = Object.keys(driftData.countries)
-    .filter((iso3) => !pickerSeen.has(iso3))
+    .filter(
+      (iso3) =>
+        !pickerSeen.has(iso3) &&
+        driftData.countries[iso3].composite_first_year !== null
+    )
     .sort();
   if (otherCountries.length > 0) {
     pickerGroups.push({
@@ -245,12 +255,14 @@ export default async function DriftPage() {
     starts: Record<string, number>;
     countries: string[];
   } {
-    const entries = regionEntries(spec).slice(0, PER_PANEL_LIMIT);
+    const entries = regionEntries(spec)
+      .filter(({ c }) => c.composite_first_year !== null)
+      .slice(0, PER_PANEL_LIMIT);
     const series: Record<string, number[]> = {};
     const starts: Record<string, number> = {};
     for (const { iso3, c } of entries) {
       series[iso3] = c.statist_drift;
-      starts[iso3] = c.movements[0]?.year ?? driftData.year_max;
+      starts[iso3] = c.composite_first_year!;
     }
     return { series, starts, countries: entries.map((e) => e.iso3) };
   }
@@ -278,13 +290,14 @@ export default async function DriftPage() {
 
   // The leaderboard separates the full coded sum from the slope over the
   // latest decade. A country that enters the corpus during that decade uses
-  // only years after its first coded movement; a one-year series has no slope.
+  // only years after its first valenced axis step; a one-year series has no slope.
   const RECENT_WINDOW_YEARS = 10;
   const fullLeaderboard = Object.entries(data.countries)
+    .filter(([, c]) => c.composite_first_year !== null)
     .map(([iso3, c]) => {
       const traj = c.statist_drift;
       const final = traj[traj.length - 1] ?? 0;
-      const firstCodedYear = c.movements[0]?.year ?? data.year_max;
+      const firstCodedYear = c.composite_first_year!;
       const recentStartYear = Math.max(data.year_max - RECENT_WINDOW_YEARS, firstCodedYear);
       const recentStartIndex = recentStartYear - data.year_min;
       const span = data.year_max - recentStartYear;
@@ -321,8 +334,9 @@ export default async function DriftPage() {
       <div className="mb-8 rounded border border-rule bg-panel p-5 text-[14px] leading-[1.6] text-muted">
         <strong className="text-ink">Coverage:</strong> the timeline spans the
         earliest to latest authored movement ({data.year_min}–{data.year_max}).
-        Each country&apos;s line begins at its own first coded movement; earlier
-        blank space is missing corpus coverage, not a zero policy level.
+        Each composite line begins at its first valenced axis step; earlier
+        movements without one do not establish a composite score. Earlier
+        blank space is missing coding coverage, not a zero policy level.
         A flat segment means no further <em>coded</em> shift in that interval.
         The index measures direction, not absolute policy levels, and countries
         do not share a measured {data.year_min} baseline. State and municipal
@@ -345,7 +359,7 @@ export default async function DriftPage() {
       <div className="mb-10 grid grid-cols-2 gap-6 rounded border border-rule bg-white p-5 text-[13.5px] md:grid-cols-4">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Countries
+            Countries with movements
           </div>
           <div className="mt-0.5 text-[24px] font-semibold tabular-nums">
             {Object.keys(data.countries).length}
@@ -369,22 +383,22 @@ export default async function DriftPage() {
         </div>
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Regional panels
+            Composite-coded countries
           </div>
           <div className="mt-0.5 text-[24px] font-semibold tabular-nums">
-            {REGIONS.length}
+            {compositeCountryCount}
           </div>
         </div>
       </div>
 
       {/* Headline two-column leaderboard — every country, statist vs market */}
       <h2 className="mt-8 mb-3 text-[22px] font-semibold tracking-[-0.01em]">
-        All {fullLeaderboard.length} countries — cumulative direction & recent slope
+        All {fullLeaderboard.length} composite-coded countries — cumulative direction & recent slope
       </h2>
       <p className="mb-3 max-w-[860px] text-[14px] text-muted">
         Two numbers per country. <strong className="text-ink">Cumulative</strong>{" "}
-        is the sum of coded movement steps since each country&apos;s first
-        recorded movement. <strong className="text-ink">
+        is the sum of valenced axis steps since each country&apos;s first
+        such step. <strong className="text-ink">
         Recent (up to {RECENT_WINDOW_YEARS}y)
         </strong>{" "}
         is the average annual change in that constructed score over at most
@@ -533,27 +547,28 @@ export default async function DriftPage() {
         Pick countries — overlay any combination
       </h2>
       <p className="mb-4 max-w-[820px] text-[14px] text-muted">
-        Click ISO3 codes to toggle countries on the chart. Region buttons
-        swap to a fixed regional set in one click. Each line is the country&apos;s
-        cumulative coded drift from each country&apos;s first authored movement.
+        Click ISO3 codes to toggle countries with a scored composite. Region
+        buttons swap to a fixed regional set in one click. Each line begins
+        with that country&apos;s first valenced axis step; countries with only
+        unscored movement records remain in the country atlas.
       </p>
       <div className="mb-12 rounded border border-rule bg-white p-5">
         <InteractiveDriftChart
           allSeries={Object.fromEntries(
-            Object.entries(driftData.countries).map(([iso3, c]) => [
-              iso3,
-              c.statist_drift,
-            ])
+            Object.entries(driftData.countries)
+              .filter(([, c]) => c.composite_first_year !== null)
+              .map(([iso3, c]) => [iso3, c.statist_drift])
           )}
           years={data.years}
           seriesStarts={Object.fromEntries(
-            Object.entries(driftData.countries).map(([iso3, c]) => [
-              iso3,
-              c.movements[0]?.year ?? data.year_max,
-            ])
+            Object.entries(driftData.countries)
+              .filter(([, c]) => c.composite_first_year !== null)
+              .map(([iso3, c]) => [iso3, c.composite_first_year!])
           )}
           labels={Object.fromEntries(
-            Object.keys(driftData.countries).map((iso3) => [iso3, iso3])
+            Object.keys(driftData.countries)
+              .filter((iso3) => driftData.countries[iso3].composite_first_year !== null)
+              .map((iso3) => [iso3, iso3])
           )}
           initialSelection={["DEU", "USA", "GBR", "FRA", "ITA", "CAN", "AUS", "NZL"]}
           height={460}
@@ -567,9 +582,9 @@ export default async function DriftPage() {
         Composite statist-drift by region
       </h2>
       <p className="mb-6 max-w-[780px] text-[14px] text-muted">
-        One chart per region; up to {PER_PANEL_LIMIT} most-coded countries per
-        panel for legibility. The full {Object.keys(data.countries).length}-country
-        leaderboard sits below.
+        One chart per region; up to {PER_PANEL_LIMIT} countries with a coded
+        composite per panel for legibility. The full {fullLeaderboard.length}-country
+        composite leaderboard appears above.
       </p>
       <div className="space-y-8">
         {REGIONS.map((spec) => {

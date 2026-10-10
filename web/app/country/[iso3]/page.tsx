@@ -22,7 +22,7 @@ export async function generateMetadata({
   const name = countryName(iso3);
   return {
     title: `${name} — positional drift`,
-    description: `Cumulative movement-coded policy direction for ${name}, beginning at its first authored movement.`,
+    description: `Movement history and coded policy direction for ${name}, with composite coverage shown where valenced axes are coded.`,
     alternates: {
       canonical: `https://framework.ieset.org/country/${encodeURIComponent(
         iso3
@@ -52,9 +52,14 @@ export default async function CountryPage({
 
   const axesMap = await loadAxes();
 
-  const finalDrift = country.statist_drift[country.statist_drift.length - 1] ?? 0;
+  const hasComposite = country.composite_first_year !== null;
+  const finalDrift = hasComposite
+    ? country.statist_drift[country.statist_drift.length - 1] ?? 0
+    : null;
   const tone =
-    finalDrift > 8
+    finalDrift === null
+      ? { bg: "#ededeb", fg: "#636363", label: "composite not coded" }
+      : finalDrift > 8
       ? { bg: "#f3d9d9", fg: "#9e2f2f", label: "net statist drift" }
       : finalDrift < -8
       ? { bg: "#dff1e4", fg: "#2c7a4f", label: "net market drift" }
@@ -90,11 +95,6 @@ export default async function CountryPage({
     return { series, starts };
   }
 
-  // Composite series, just the country alone.
-  const compositeSeries: Record<string, number[]> = {
-    [iso3]: country.statist_drift,
-  };
-
   return (
     <div className="mx-auto max-w-content px-8 py-10">
       <div className="mb-3 flex items-center gap-3 text-[13px] text-muted">
@@ -126,14 +126,15 @@ export default async function CountryPage({
         <span className="text-ink">
           final composite drift:{" "}
           <strong className="tabular-nums">
-            {finalDrift >= 0 ? "+" : ""}
-            {finalDrift.toFixed(1)}
+            {finalDrift === null
+              ? "—"
+              : `${finalDrift >= 0 ? "+" : ""}${finalDrift.toFixed(1)}`}
           </strong>
         </span>
       </div>
 
       {/* Composite trajectory with movement annotations */}
-      <div className="mb-3 flex flex-wrap items-center gap-3 text-[11.5px] text-muted">
+      {hasComposite && <div className="mb-3 flex flex-wrap items-center gap-3 text-[11.5px] text-muted">
         <span className="font-semibold uppercase tracking-wider">tone legend</span>
         <span className="inline-flex items-center gap-1">
           <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#9e2f2f" }} />
@@ -151,15 +152,15 @@ export default async function CountryPage({
           <span className="inline-block h-2 w-2 rounded-full" style={{ background: "#636363" }} />
           authoritarian
         </span>
-      </div>
+      </div>}
       <div className="mb-10 rounded border border-rule bg-white p-5">
         <h2 className="m-0 mb-3 text-[16px] font-semibold">
           Composite statist-drift trajectory with movements
         </h2>
-        <DriftChart
-          series={compositeSeries}
+        {hasComposite ? <DriftChart
+          series={{ [iso3]: country.statist_drift }}
           years={data.years}
-          seriesStarts={{ [iso3]: country.movements[0]?.year ?? data.year_max }}
+          seriesStarts={{ [iso3]: country.composite_first_year ?? data.year_max }}
           labels={{ [iso3]: countryName(iso3) }}
           movements={country.movements
             .filter((m) => m.year >= data.year_min)
@@ -171,8 +172,12 @@ export default async function CountryPage({
             }))}
           height={300}
           zeroLineLabel="cumulative statist drift"
-          caption="Constructed net direction across 14 valenced axes, starting with this country's first coded movement. Steps occur at movement start years; flat years indicate no further coded shift. Zero is not a measured policy level."
-        />
+          caption="Constructed net direction across 14 valenced axes, starting with this country's first valenced axis step. Steps occur at documented attribution years; flat years indicate no further coded shift. Zero is not a measured policy level."
+        /> : <p className="m-0 text-[13px] leading-[1.55] text-muted">
+          This country has authored movement records but no nonzero valenced
+          axis step in the composite. No zero trajectory or recent slope is
+          inferred from those records.
+        </p>}
       </div>
 
       {/* Per-channel breakdown — one chart per channel */}

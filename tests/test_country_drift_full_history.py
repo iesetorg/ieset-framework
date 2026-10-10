@@ -58,11 +58,73 @@ def test_trajectories_begin_at_earliest_authored_movement() -> None:
         "regulatory.trade_openness": 1980
     }
     assert result["countries"]["CAN"]["movements"][0]["year"] == 1980
+    assert result["countries"]["GBR"]["composite_first_year"] == 1846
+    assert result["countries"]["CAN"]["composite_first_year"] == 1980
     # Raw zeroes remain aligned for replication, but the chart hides them
     # using the first-coded-year metadata.
     can = result["countries"]["CAN"]["statist_drift"]
     assert can[result["years"].index(1976)] == 0
     assert can[result["years"].index(1980)] == -1
+
+
+def test_composite_coverage_waits_for_valenced_axis_coding() -> None:
+    movements = [
+        {
+            "movement_id": "umbrella",
+            "countries": ["AAA"],
+            "_start": 2000,
+            "_end": None,
+            "axes_summary": [],
+        },
+        {
+            "movement_id": "unvalenced",
+            "countries": ["AAA"],
+            "_start": 2002,
+            "_end": None,
+            "axes_summary": [
+                {"axis": "regulatory.immigration_openness", "direction": "+", "magnitude": "weak"},
+                {"axis": "fiscal.spending_level", "direction": "mixed", "magnitude": "weak"},
+            ],
+        },
+        {
+            "movement_id": "later",
+            "countries": ["AAA"],
+            "_start": 2010,
+            "_end": None,
+            "axes_summary": [
+                {"axis": "fiscal.spending_level", "direction": "+", "magnitude": "weak"},
+            ],
+        },
+        {
+            "movement_id": "only_umbrella",
+            "countries": ["BBB"],
+            "_start": 2000,
+            "_end": None,
+            "axes_summary": [],
+        },
+    ]
+    result = DRIFT.build_drift(movements)
+    assert result["countries"]["AAA"]["composite_first_year"] == 2010
+    assert result["countries"]["BBB"]["composite_first_year"] is None
+    assert result["countries"]["AAA"]["axis_first_year"]["fiscal.spending_level"] == 2002
+
+
+def test_opposing_same_year_steps_still_establish_composite_coverage() -> None:
+    movements = [
+        {
+            "movement_id": "offsetting",
+            "countries": ["AAA"],
+            "_start": 2010,
+            "_end": None,
+            "axes_summary": [
+                {"axis": "fiscal.spending_level", "direction": "+", "magnitude": "weak"},
+                {"axis": "regulatory.trade_openness", "direction": "+", "magnitude": "weak"},
+            ],
+        }
+    ]
+    result = DRIFT.build_drift(movements)
+    assert result["countries"]["AAA"]["statist_drift"] == [0.0]
+    assert result["countries"]["AAA"]["composite_first_year"] == 2010
 
 
 def test_subnational_movement_does_not_change_country_total_or_event_log() -> None:

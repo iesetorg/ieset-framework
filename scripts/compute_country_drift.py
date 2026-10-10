@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -41,20 +42,108 @@ OUT_CSV = REPO / "data" / "derived" / "country_drift.csv"
 MAG_WEIGHT = {"weak": 1.0, "moderate": 2.0, "strong": 3.0}
 MAG_DEFAULT = 1.5
 
-# Coalition / doctrine keywords that flag an authoritarian era. These get
-# tagged separately because their direction-of-drift signal is overshadowed
-# by the institutional-takeover signal.
-AUTH_KEYWORDS = (
-    "junta", "military", "dictatorship", "authoritarian", "single-party",
+# Keep the existing strong terms, but a bare mention of "military" in doctrine
+# often describes defence policy or a prior junta rather than the government.
+# Keep these rules and the reviewed IDs in web/lib/movement_tone.ts in sync.
+AUTH_STRONG_KEYWORDS = (
+    "junta", "dictatorship", "authoritarian", "single-party",
     "one-party", "coup", "martial law", "kleptocra",
 )
+MILITARY_RULE_COALITION_MARKERS = (
+    "military regime", "military government", "military council",
+    "military administrative council", "military transition",
+    "military-appointed", "military-civilian regime",
+    "military-security state", "military-backed",
+    "military/palace-backed", "civilian-military authorities",
+)
+AUTH_MOVEMENT_IDS = {
+    # Reviewed governing-regime evidence is stronger than a text substring.
+    "guinea_cnrd_transition_resource_state_2021_present",
+    "mmr_burmese_way_to_socialism_1962",
+    "peru_fujimori_autogolpe_1992",
+    "thailand_surayud_interim_2006_2008",
+    # Authored current-regime evidence is stronger than a bare military mention.
+    "eritrea_pfdj_national_service_state_1994_present",
+    "ethiopia_abiy_prosperity_2018_present",
+    "iran_pezeshkian_reformist_2024_present",
+    "iran_raisi_conservative_2021_2024",
+    "malaysia_mahathir_first_term_1981_1988",
+    "vietnam_phuc_pm_2016_2021",
+    "yemen_saleh_gpc_unification_adjustment_1990_2011",
+    "zimbabwe_mnangagwa_zanu_pf_2017_present",
+}
+AUTH_REVIEW_HOLD_IDS = {
+    # Preserve the prior tone pending a regime criterion and source review;
+    # a single multi-year label is especially coarse for transitions.
+    "bolivia_morales_third_crisis_2014_2019",
+    "egypt_morsi_muslim_brotherhood_2012_2013",
+    "malaysia_najib_bn_2009_2018",
+    "pakistan_nawaz_sharif_pmln_ii_1997_1999",
+    "pakistan_shehbaz_pmln_coalition_2024_present",
+    "russia_gorbachev_perestroika_glasnost_1985_1991",
+    "slovakia_fico_fourth_2023_present",
+    "srilanka_gotabaya_rajapaksa_slpp_2019_2022",
+}
+NON_AUTH_TRIGGER_IDS = {
+    # The term describes an elected parliamentary majority/minority, an
+    # opposition, or a negated one-party claim; it is not regime evidence.
+    "bulgaria_radev_progressive_bulgaria_2026_present",
+    "colombia_barco_liberal_1986_1990",
+    "czech_republic_zeman_cssd_1998_2002",
+    "denmark_frederiksen_sap_broad_2019_present",
+    "denmark_lokke_rasmussen_venstre_2015_2019",
+    "greece_mitsotakis_nd_2019_present",
+    "japan_hashimoto_ldp_1996_1998",
+    "japan_ldp_1976_1982_coalitions",
+    "japan_ldp_bubble_era_1987_1993",
+    "japan_nakasone_ldp_1982_1987",
+    "newzealand_ardern_labour_2017_2023",
+    "newzealand_hipkins_labour_2023",
+    "norway_bondevik_jagland_transition_1996_2000",
+    "norway_store_ap_sp_2021_present",
+    "peru_keiko_fujimori_2026_present",
+    "srilanka_dissanayake_npp_2024_present",
+    "sweden_andersson_sap_2021_2022",
+    "sweden_carlsson_sap_return_1994_1996",
+    "sweden_persson_sap_1996_2006",
+    "us_gilded_age_federal_market_rules_1887_1890",
+    # These doctrines describe a predecessor's junta/dictatorship, a coup
+    # against the government, or restoration after one-party rule.
+    "argentina_alfonsin_ucr_1983_1989",
+    "argentina_nestor_kirchner_2003_2007",
+    "chile_aylwin_concertacion_1990_1994",
+    "greece_karamanlis_nd_1974_1980",
+    "india_janata_desai_1977_1979",
+    "nigeria_shagari_second_republic_1979_1983",
+    "philippines_cory_aquino_transition_1986_1992",
+    "thailand_yingluck_pheu_thai_2011_2014",
+    "zambia_msunwe_structural_adjustment_1991_2001",
+}
+
+
+def has_auth_strong_term(text: str) -> bool:
+    """Match whole terms, so `coup` does not match coupled or coupons."""
+    return any(
+        re.search(r"(?<![a-z])" + re.escape(term) + r"(?![a-z])", text)
+        for term in AUTH_STRONG_KEYWORDS
+    )
 
 
 def classify_movement_tone(m: dict) -> str:
     """Return one of: left / right / centrist / auth / neutral."""
     coalition = (m.get("coalition") or "").lower()
     doctrine = (m.get("doctrine") or "").lower()
-    if any(kw in coalition or kw in doctrine for kw in AUTH_KEYWORDS):
+    if (
+        m.get("movement_id") in AUTH_MOVEMENT_IDS | AUTH_REVIEW_HOLD_IDS
+        or (
+            m.get("movement_id") not in NON_AUTH_TRIGGER_IDS
+            and (
+                any(marker in coalition for marker in MILITARY_RULE_COALITION_MARKERS)
+                or has_auth_strong_term(coalition)
+                or has_auth_strong_term(doctrine)
+            )
+        )
+    ):
         return "auth"
 
     score = 0.0
@@ -209,7 +298,8 @@ def build_drift(movements):
 
     # Build the complete authored movement span. Countries first coded later
     # retain zeroes in the raw aligned arrays for downstream calculations; the
-    # chart masks their pre-coverage years using movement/axis start metadata.
+    # chart masks their pre-coverage years using the first actually coded
+    # composite or axis step, not merely the first authored movement.
     if not all_years:
         return {"countries": {}, "axes": sorted(all_axes), "year_min": None, "year_max": None}
     year_min, year_max = min(all_years), max(all_years)
@@ -263,6 +353,10 @@ def build_drift(movements):
                 if axis_events
             },
             "statist_drift": composite_traj,
+            # A country may have national movement prose but no valenced axis
+            # step. Equal and opposite steps still establish coding coverage,
+            # even when the net composite remains at zero.
+            "composite_first_year": min((year for year, _step, _id in ev), default=None),
             "movements": m_events,
             "movement_count": len(m_events),
         }

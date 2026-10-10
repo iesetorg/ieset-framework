@@ -105,6 +105,22 @@ def test_readiness_flags_separate_timing_from_unit_coding():
     ]
 
 
+def test_comparative_structure_without_outcome_plan_remains_blocked():
+    flags = registry.readiness_flags(
+        status="event_dated",
+        design={
+            "regulated_units": ["standard-rated supplies"],
+            "exempt_or_uncontrolled_units": ["zero-rated supplies"],
+        },
+        axes=[],
+        inherited={},
+    )
+
+    assert "comparative_structure_declared" in flags
+    assert "needs_outcome_measurement_plan" in flags
+    assert registry.measurement_blockers(flags) == ["needs_outcome_measurement_plan"]
+
+
 def test_compact_policy_row_preserves_design_and_source_requirements():
     doc = {
         "policy_id": "hu_price_caps_fuel_food_2021_2023",
@@ -167,9 +183,10 @@ def test_compact_policy_row_preserves_design_and_source_requirements():
     assert row["timing_status"] == "event_dated"
     assert row["comparison_structure_status"] == "declared_treated_comparison_design"
     assert row["event_date_tokens"]["full_dates"] == ["2021-11-15"]
-    assert "ready_for_comparative_event_design" in row["readiness_flags"]
+    assert "comparative_structure_declared" in row["readiness_flags"]
     assert "known_microdata_gaps_declared" in row["readiness_flags"]
     assert row["measurement_blockers"] == ["known_microdata_gaps_declared"]
+    assert row["registry_readiness"] == "needs_coding_or_data"
     assert row["source_readiness_counts"] == {
         "partial_ready": 1,
         "reconstruct_needed": 1,

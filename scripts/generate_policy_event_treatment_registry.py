@@ -153,15 +153,17 @@ def readiness_flags(
     else:
         flags.append("needs_treated_and_comparison_unit_coding")
     if "triple_difference" in features and has_full_timing and has_units:
-        flags.append("ready_for_triple_difference_structure")
+        flags.append("triple_difference_structure_declared")
     elif "triple_difference" in (inherited.get("preferred_designs") or []):
         flags.append("candidate_for_triple_difference_after_unit_coding")
     if inherited.get("has_axis_requirements"):
         flags.append("has_axis_inherited_second_order_requirements")
     if design.get("known_data_gaps"):
         flags.append("known_microdata_gaps_declared")
+    if has_units and not (design.get("second_order_outcomes") or inherited.get("canonical_outcomes")):
+        flags.append("needs_outcome_measurement_plan")
     if has_full_timing and has_units:
-        flags.append("ready_for_comparative_event_design")
+        flags.append("comparative_structure_declared")
     return flags
 
 
@@ -175,6 +177,8 @@ def measurement_blockers(flags: list[str]) -> list[str]:
         blockers.append("needs_comparison_unit_detail")
     if "known_microdata_gaps_declared" in flags:
         blockers.append("known_microdata_gaps_declared")
+    if "needs_outcome_measurement_plan" in flags:
+        blockers.append("needs_outcome_measurement_plan")
     return blockers
 
 
@@ -316,11 +320,11 @@ def build_registry() -> dict[str, Any]:
                 for row in rows
                 if row["timing_status"] in {"event_dated", "enacted_date_only", "effective_date_only"}
             ),
-            "policies_ready_for_comparative_event_design": sum(
-                1 for row in rows if "ready_for_comparative_event_design" in row["readiness_flags"]
+            "policies_with_comparative_structure_declared": sum(
+                1 for row in rows if "comparative_structure_declared" in row["readiness_flags"]
             ),
-            "policies_ready_for_triple_difference_structure": sum(
-                1 for row in rows if "ready_for_triple_difference_structure" in row["readiness_flags"]
+            "policies_with_triple_difference_structure_declared": sum(
+                1 for row in rows if "triple_difference_structure_declared" in row["readiness_flags"]
             ),
             "policies_needing_exact_event_dates": blocker_counts.get("needs_exact_event_dates", 0),
             "timing_status_counts": dict(timing_counts),
@@ -350,14 +354,14 @@ def write_outputs(payload: dict[str, Any]) -> None:
         f"- Policies indexed: {summary['policy_count']}",
         f"- Policies with explicit evaluation_design: {summary['policies_with_evaluation_design']}",
         f"- Policies with exact event, enacted, or first-application dates: {summary['policies_with_full_event_timing']}",
-        f"- Policies ready for comparative event design: {summary['policies_ready_for_comparative_event_design']}",
-        f"- Policies ready for triple-difference structure: {summary['policies_ready_for_triple_difference_structure']}",
+        f"- Policies with exact-date comparative structure declared: {summary['policies_with_comparative_structure_declared']}",
+        f"- Policies with triple-difference structure declared: {summary['policies_with_triple_difference_structure_declared']}",
         f"- Timing status counts: `{json.dumps(summary['timing_status_counts'], sort_keys=True)}`",
         f"- Comparison structure counts: `{json.dumps(summary['comparison_structure_status_counts'], sort_keys=True)}`",
         f"- Measurement blockers: `{json.dumps(summary['measurement_blocker_counts'], sort_keys=True)}`",
         f"- Axis source readiness: `{json.dumps(summary['axis_source_readiness_counts'], sort_keys=True)}`",
         "",
-        "## Ready Design Seeds",
+        "## Comparative Structure Seeds (Measurement Gaps Shown)",
         "",
         "| policy | status | timing | comparison structure | designs | blockers |",
         "| --- | --- | --- | --- | --- | --- |",
@@ -365,7 +369,7 @@ def write_outputs(payload: dict[str, Any]) -> None:
     ready_rows = [
         row
         for row in payload["policies"]
-        if "ready_for_comparative_event_design" in row["readiness_flags"]
+        if "comparative_structure_declared" in row["readiness_flags"]
     ]
     for row in ready_rows[:100]:
         designs = ", ".join(row["design_features"][:5])

@@ -7,22 +7,22 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 - Policies indexed: 3373
 - Policies with explicit evaluation_design: 23
 - Policies with exact event, enacted, or first-application dates: 2065
-- Policies ready for comparative event design: 7
-- Policies ready for triple-difference structure: 1
+- Policies with exact-date comparative structure declared: 7
+- Policies with triple-difference structure declared: 1
 - Timing status counts: `{"effective_date_only": 22, "enacted_date_only": 2024, "event_dated": 19, "event_month_dated": 3, "year_period_only": 1305}`
 - Comparison structure counts: `{"axis_only_no_unit_split": 3364, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 9, "needs_comparison_unit_detail": 14, "needs_exact_event_dates": 1308, "needs_treated_and_comparison_unit_coding": 3350}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 9, "needs_comparison_unit_detail": 14, "needs_exact_event_dates": 1308, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3350}`
 - Axis source readiness: `{"partial_ready": 44630, "proprietary_gap": 6700, "ready": 3339, "reconstruct_needed": 19019, "scrape_needed": 14076}`
 
-## Ready Design Seeds
+## Comparative Structure Seeds (Measurement Gaps Shown)
 
 | policy | status | timing | comparison structure | designs | blockers |
 | --- | --- | --- | --- | --- | --- |
-| `bahrain_vat_rate_increase_2022` | candidate | event_dated | declared_treated_and_comparison_units |  | none |
 | `de_mietpreisbremse_2015` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_units, adjacent_market_comparison, high_frequency_event_study, triple_difference, welfare_accounting, ... | known_microdata_gaps_declared |
 | `hu_price_caps_fuel_food_2021_2023` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, border_comparison, high_frequency_event_study, welfare_accounting, distributional_decomposition, ... | known_microdata_gaps_declared |
 | `us_nixon_wage_price_controls_1971` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, high_frequency_event_study, welfare_accounting, distributional_decomposition, quality_margin, ... | known_microdata_gaps_declared |
 | `us_oil_price_controls_1973_1981` | candidate | enacted_date_only | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, adjacent_market_comparison, high_frequency_event_study, welfare_accounting, distributional_decomposition, ... | known_microdata_gaps_declared |
+| `bahrain_vat_rate_increase_2022` | candidate | event_dated | declared_treated_and_comparison_units |  | needs_outcome_measurement_plan |
 | `fi_compulsory_education_extension_2021` | candidate | event_dated | declared_treated_comparison_design | eligible_vs_ineligible_groups, phase_in_or_threshold_comparison | known_microdata_gaps_declared |
 | `fi_family_leave_reform_2022` | candidate | event_dated | declared_treated_comparison_design | eligible_vs_ineligible_groups, phase_in_or_threshold_comparison | known_microdata_gaps_declared |
 
