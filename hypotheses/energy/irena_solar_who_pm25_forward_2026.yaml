@@ -1,0 +1,408 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: irena_solar_who_pm25_forward_2026
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: '-'
+claim: Across the fixed national-area key roster, greater growth in solar-PV installed capacity per resident
+  from 2010 to 2015 predicts a larger fall in population-weighted all-area ambient PM2.5 concentration
+  from 2015 to 2019.
+methodology_note: New-ID prospective descriptive calibration using an IRENA capacity measure and a WHO
+  modelled ambient-exposure measure. It is not a test of renewable electricity generated or a decarbonization
+  policy. Related renewable-deployment and WHO PM2.5 cases exist in the archive; this is a selected distinct
+  outcome, not replication. No selected numeric values or null masks were opened before registration.
+evidence_type: descriptive
+sample:
+  countries:
+  - AFG
+  - ALB
+  - ARE
+  - ARG
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BFA
+  - BGD
+  - BGR
+  - BHS
+  - BIH
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CMR
+  - COL
+  - CPV
+  - CRI
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GMB
+  - GNB
+  - GRC
+  - GRD
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KEN
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - LAO
+  - LBN
+  - LBY
+  - LCA
+  - LKA
+  - LTU
+  - LUX
+  - MAR
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MLI
+  - MLT
+  - MMR
+  - MNG
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - PAK
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TCD
+  - THA
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZWE
+  period: &id001
+  - 2010
+  - 2019
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One predeclared earlier exposure and one later outcome change per national
+    area; annual source rows are not treated as independent observations.
+  exclusion_rules:
+  - Use only the fixed 140 national areas with exact 2010 and 2015 IRENA solar-PV capacity and WDI population
+    keys and WHO SDGPM25 country, RESIDENCEAREATYPE_TOTL keys in 2010, 2015, and 2019.
+  - Require finite nonnegative IRENA capacity, strictly positive finite WDI population, and WHO all-area
+    PM2.5 in [0,500] micrograms per cubic metre at every required endpoint.
+  - Exclude non-country WHO rows and all other residence categories; no imputation, interpolation, nearest-year
+    join, winsorization, geography replacement, or vintage switch.
+  - Key presence does not imply a non-null measurement; all complete-value exclusions and frozen gates
+    are reported.
+variables:
+  outcome:
+  - name: later_all_area_pm25_change_2015_2019
+    source: who_gho:SDGPM25
+    transformation: 2019 minus 2015 country RESIDENCEAREATYPE_TOTL population-weighted ambient PM2.5,
+      micrograms per cubic metre.
+  treatment:
+  - name: prior_solar_pv_capacity_per_resident_log_change
+    source: irena:installed_capacity_solar_pv
+    transformation: log1p(2015 installed MW per million WDI residents) minus log1p(2010 installed MW per
+      million WDI residents).
+  controls:
+  - name: solar_capacity_per_resident_log_2010
+    source: irena:installed_capacity_solar_pv
+    transformation: log1p(2010 installed MW per million WDI residents).
+  - name: baseline_pm25_2015
+    source: who_gho:SDGPM25
+    transformation: 2015 all-area country PM2.5 level.
+  - name: prior_pm25_change_2010_2015
+    source: who_gho:SDGPM25
+    transformation: 2015 minus 2010 all-area country PM2.5.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-country OLS of later PM2.5 change on prior log1p solar-capacity-per-resident change, with
+    intercept and three fixed controls. HC3 robust SE and two-sided Student t reference with N−5 df. No
+    model, subgroup, weighting, or covariate search.
+falsification:
+  rule: Any sample, material-exposure, IQR, rank, residual-variation, HC3, single-area concentration,
+    or leave-one-out fit gate failure is INCONCLUSIVE with no published coefficient. Otherwise SUPPORTED
+    requires beta <= -0.5 micrograms per cubic metre per +1 log1p solar-intensity change, two-sided p
+    <= 0.01/3, and negative beta in >=80% of successful leave-one-out fits. REFUTED requires beta >= +0.5,
+    the same p cutoff, and positive beta in >=80% of successful fits; all other estimable outcomes are
+    PARTIAL.
+  test: ieset_three_distinct_measurements_2026_10_10
+  threshold:
+    family_id: ieset_three_distinct_measurements_2026_10_10
+    family_size: 3
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0033333333333333335
+    expected_sign: '-'
+    min_complete_national_areas: 85
+    min_material_exposure_areas: 30
+    material_exposure_min: 0.7
+    min_exposure_iqr: 0.5
+    max_single_area_residualized_exposure_share: 0.15
+    max_single_area_residualized_outcome_share: 0.2
+    max_loo_fit_failures: 2
+    min_loo_same_sign_share: 0.8
+    meaningful_abs_beta: 0.5
+    roster_sha256: ec601ededde0590ad2603dcdbb824626aab1ab0c81d005ba2668a7267a961107
+    source_files:
+      solar:
+        path: data/vintages/irena/installed_capacity_solar_pv@2026-05-05T212314Z.parquet
+        sha256: 5473eb1f2a057b831796c2c9394394c145c8ac14f74511841e8d4aeb74ddd205
+        manifest: data/manifests/fetch_run_2026-05-05T212957Z.yaml
+        manifest_sha256: d09b3816f3aee52ff2dfd7849289cde9b027ac9b72669c741423b3d7db209718
+        selector: {}
+      population:
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+        selector: {}
+      pm25:
+        path: data/vintages/who_gho/SDGPM25@2026-04-30T114744Z.parquet
+        sha256: c2cf89f4ab41dc8c4b6b251e7b47651edcd07d826cb45a7d5e1d8ab0ee4c6e34
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+        selector:
+          SpatialDimType: COUNTRY
+          Dim1: RESIDENCEAREATYPE_TOTL
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    position_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: Capacity is not generation or fossil displacement; WHO PM2.5 is modelled all-residence ambient
+  exposure, not urban-only SDG 11.6.2. Meteorology, transport, industry, transboundary pollution, denominators,
+  and common development shocks can confound the association. No causal, policy, school, position, or
+  featured credit.
+steelman: hypotheses/steelman/irena_solar_who_pm25_forward_2026.md
+scope:
+  period: *id001
+  countries:
+  - AFG
+  - ALB
+  - ARE
+  - ARG
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BFA
+  - BGD
+  - BGR
+  - BHS
+  - BIH
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CMR
+  - COL
+  - CPV
+  - CRI
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GMB
+  - GNB
+  - GRC
+  - GRD
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KEN
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - LAO
+  - LBN
+  - LBY
+  - LCA
+  - LKA
+  - LTU
+  - LUX
+  - MAR
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MLI
+  - MLT
+  - MMR
+  - MNG
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - PAK
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TCD
+  - THA
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZWE
+  outcome_dim:
+  - energy
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

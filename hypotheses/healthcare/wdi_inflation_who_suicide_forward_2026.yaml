@@ -1,0 +1,488 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_inflation_who_suicide_forward_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: +
+claim: Across the fixed national-area key roster, greater 2005-to-2013 consumer-price inflation volatility
+  predicts a larger 2014-to-2021 increase in the WHO all-age, both-sex suicide mortality rate.
+methodology_note: New-ID prospective descriptive calibration joining an IMF-sourced WDI annual CPI inflation
+  series to a WHO all-age, both-sex suicide-mortality series. Related inflation and mortality cases exist
+  in the archive but do not constitute replication. No selected numeric values or null masks were opened
+  before registration.
+evidence_type: descriptive
+sample:
+  countries:
+  - AFG
+  - AGO
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRI
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period: &id001
+  - 2005
+  - 2021
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One predeclared earlier exposure and one later outcome change per national
+    area; annual source rows are not treated as independent observations.
+  exclusion_rules:
+  - Use only the fixed 185 national areas with all nine annual 2005–2013 WDI FP.CPI.TOTL.ZG keys and exact
+    WHO SDGSUICIDE COUNTRY, SEX_BTSX, AGEGROUP_YEARSALL keys in 2014 and 2021.
+  - Require all nine CPI inflation rates finite in [-100,10000] percent and both all-age suicide rates
+    finite in [0,200] per 100,000; the exposure uses the sample standard deviation with denominator eight.
+  - No imputation, interpolation, nearest-year join, annual-row dropping, geography replacement, winsorization,
+    or vintage switch.
+  - Key presence does not imply a non-null measurement; all complete-value exclusions and frozen gates
+    are reported.
+variables:
+  outcome:
+  - name: all_age_both_sex_suicide_mortality_change_2014_2021
+    source: who_gho:SDGSUICIDE
+    transformation: 2021 minus 2014 all-age, both-sex crude suicide deaths per 100,000 people.
+  treatment:
+  - name: prior_cpi_inflation_volatility_asinh
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: asinh(sample standard deviation of nine exact annual 2005–2013 CPI inflation rates
+      in percentage points divided by 5).
+  controls:
+  - name: baseline_suicide_mortality_2014
+    source: who_gho:SDGSUICIDE
+    transformation: 2014 all-age, both-sex crude suicide deaths per 100,000 people.
+  - name: prior_mean_inflation_asinh
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: asinh(arithmetic mean of exact 2005–2013 CPI inflation percentages divided by 5).
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-country OLS of later suicide-rate change on earlier asinh inflation volatility, with intercept
+    and two fixed controls. HC3 robust SE and two-sided Student t reference with N−4 df. No model, subgroup,
+    weighting, or covariate search.
+falsification:
+  rule: Any sample, material-exposure, IQR, rank, residual-variation, HC3, single-area concentration,
+    or leave-one-out fit gate failure is INCONCLUSIVE with no published coefficient. Otherwise SUPPORTED
+    requires beta >= +0.5 suicide death per 100,000 per +1 transformed volatility unit, two-sided p <=
+    0.01/3, and positive beta in >=80% of successful leave-one-out fits. REFUTED requires beta <= -0.5,
+    the same p cutoff, and negative beta in >=80% of successful fits; all other estimable outcomes are
+    PARTIAL.
+  test: ieset_three_distinct_measurements_2026_10_10
+  threshold:
+    family_id: ieset_three_distinct_measurements_2026_10_10
+    family_size: 3
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0033333333333333335
+    expected_sign: +
+    min_complete_national_areas: 110
+    min_material_exposure_areas: 30
+    material_exposure_min: 5.0
+    min_exposure_iqr: 0.25
+    max_single_area_residualized_exposure_share: 0.15
+    max_single_area_residualized_outcome_share: 0.2
+    max_loo_fit_failures: 2
+    min_loo_same_sign_share: 0.8
+    meaningful_abs_beta: 0.5
+    roster_sha256: 153a79fc73ea16c106bc669723e5d74ac60051f02748e8ccbfcec8ec2b556bc6
+    source_files:
+      inflation:
+        path: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+        sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+        selector: {}
+      suicide:
+        path: data/vintages/who_gho/SDGSUICIDE@2026-04-30T114842Z.parquet
+        sha256: 72bf65650b553ac47df60cd624f21ad5d12c062694b3564ebbe300275ccec937
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+        selector:
+          SpatialDimType: COUNTRY
+          Dim1: SEX_BTSX
+          Dim2: AGEGROUP_YEARSALL
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    position_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: CPI inflation is not a household hardship or mental-health intervention. WHO suicide mortality
+  involves registration and modelling and can change with cause-of-death coding, age structure, services,
+  conflict, and the pandemic. Cross-country timing and controls do not establish an effect. No causal,
+  policy, school, position, or featured credit.
+steelman: hypotheses/steelman/wdi_inflation_who_suicide_forward_2026.md
+scope:
+  period: *id001
+  countries:
+  - AFG
+  - AGO
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRI
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
