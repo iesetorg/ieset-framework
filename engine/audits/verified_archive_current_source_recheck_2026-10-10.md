@@ -2,7 +2,7 @@
 
 Date: 2026-10-10. Read-only case review on the clean integration checkpoint
 `cc84016f6d11de3d305937353030690de2cf49ae`. The ignored source files
-mentioned below were inspected in `<LOCAL_HOME>/IESET` without changing that
+mentioned below were inspected in `<local-source-checkout>` without changing that
 checkout. This review changes no hypothesis specification, runner, result,
 verdict, evidence tier, or frozen threshold. **Public delta: zero.**
 
