@@ -1,0 +1,268 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: who_smoking_decline_premature_ncd_mortality_forward_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: +
+claim: Across the frozen WHO country-key roster, a one-unit decline in age-standardized current tobacco-smoking
+  prevalence decline from 2000 to 2010 predicts at least 0.05 percentage points more decline in premature NCD
+  mortality probability from 2010 to 2021, conditional on baseline exposure, baseline mortality, and WHO region.
+  This is a descriptive association.
+evidence_type: descriptive
+methodology_note: One member of the frozen two-test WHO exposure–mortality family who_exposure_premature_ncd_mortality_2026_10_10.
+  The family was selected after existing visible IESET health/environment archive work; its Bonferroni correction
+  does not erase archive-wide selection. Registered source-key roster and runner precede selected value access.
+sample:
+  countries: &id001
+  - AFG
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRN
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GMB
+  - GNB
+  - GRC
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NER
+  - NGA
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SRB
+  - STP
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - TCD
+  - TGO
+  - THA
+  - TKM
+  - TLS
+  - TON
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VNM
+  - VUT
+  - WSM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2000
+  - 2021
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One fixed exposure-change and later mortality-change observation per country;
+    WHO region and baseline levels condition cross-country comparison.
+  exclusion_rules:
+  - Use only the frozen 161-country source-key roster; key presence is not measurement availability.
+  - Require finite exact 2000 and 2010 exposure, exact 2010 and 2021 both-sex age-30–69 NCD mortality; no imputation
+    or nearest-year join.
+  - Exposure endpoints in [0.0,100.0], mortality endpoints in [0,100]; aggregates and nonmatching dimensions
+    excluded.
+  - All remaining coverage, variation, concentration, estimator and regional holdout gates are frozen in falsification.threshold.
+variables:
+  outcome:
+  - name: later_premature_ncd_mortality_probability_improvement_pp
+    source: who_gho:NCDMORT3070
+    transformation: exact 2010 probability minus exact 2021 probability, percentage points
+    notes: Both sexes, ages 30–69, four WHO target NCD groups.
+  treatment:
+  - name: prior_exposure_improvement
+    source: who_gho:M_Est_smk_curr_std
+    transformation: exact 2000 exposure minus exact 2010 exposure
+    notes: Smoking prevalence is a modelled age-standardized current-smoking proportion among people at least
+      15 years old. Changes in product mix or uptake may affect interpretation.
+  controls:
+  - name: baseline_ncd_mortality
+    source: who_gho:NCDMORT3070
+    transformation: exact 2010 probability, percentage points
+  - name: baseline_exposure
+    source: who_gho:M_Est_smk_curr_std
+    transformation: exact 2000 exposure level
+  - name: who_region
+    source: who_gho:ParentLocationCode
+    transformation: five indicators for six frozen WHO regions
+estimator:
+  template: descriptive
+  fixed_effects:
+  - WHO region
+  notes: Equal-country cross-sectional OLS of mortality improvement on exposure improvement, baseline mortality,
+    baseline exposure, and WHO region. HC3 robust two-sided Student t with residual degrees of freedom; six
+    leave-one-WHO-region-out fits; two-test Bonferroni 0.01/2.
+falsification:
+  test: fixed_who_smoking_decline_premature_ncd_mortality_forward_2026
+  rule: INCONCLUSIVE if any frozen sample, variation, rank, uncertainty, concentration, or holdout-estimability
+    gate fails. Otherwise SUPPORTED requires beta at least +0.05 and two-sided p <=0.005 with at least five
+    of six positive regional holdout slopes; REFUTED requires beta at most -0.05 and p <=0.005 with at least
+    five negative holdout slopes; otherwise PARTIAL. Zero causal, policy, school, position, and featured credit.
+  threshold:
+    family_id: who_exposure_premature_ncd_mortality_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    meaningful_beta_min_abs: 0.05
+    min_complete_countries: 100
+    min_countries_each_who_region: 8
+    min_material_countries: 30
+    material_abs_exposure_change: 1.0
+    min_exposure_p90_p10_spread: 2.0
+    max_top_country_residualized_exposure_share: 0.2
+    max_top_region_residualized_exposure_share: 0.45
+    min_leave_one_region_out_countries: 80
+    min_concordant_holdouts_for_directional_verdict: 5
+    roster_sha256: bb5f8791537b2c6682429f0f65eadfb221fccf03da48a9b391d767ce21542985
+    source_lock_path: data/pinned_evidence/who_exposure_ncd_2026.manifest.json
+    causal_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: Healthier countries may improve both exposure and mortality, and WHO modelled sources may share
+  measurement biases. Family selection followed visible archive work; no causal or policy effect is identified.
+scope:
+  period:
+  - 2000
+  - 2021
+  countries: *id001
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags:
+  - tobacco_smoking_prevalence
+steelman: hypotheses/steelman/who_smoking_decline_premature_ncd_mortality_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Frozen registration: engine/audits/who_exposure_ncd_prereg_2026-10-10.md. Runner: scripts/run_who_exposure_ncd_2026.py.
+  Source lock is committed later at data/pinned_evidence/who_exposure_ncd_2026.manifest.json.'
