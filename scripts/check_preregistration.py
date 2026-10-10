@@ -41,6 +41,7 @@ def first_additions() -> tuple[dict[str, Addition], dict[str, Addition]]:
     """Return first-addition records for tracked paths and run directories."""
     output = git(
         "log",
+        "--no-renames",
         "--diff-filter=A",
         "--reverse",
         "--topo-order",

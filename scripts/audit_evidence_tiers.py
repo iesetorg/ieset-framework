@@ -190,6 +190,18 @@ def registration_rows() -> dict[str, dict[str, Any]]:
     return rows if isinstance(rows, dict) else {}
 
 
+def git_bytes(*args: str) -> bytes | None:
+    proc = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=False)
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def first_addition_commits(path: str) -> list[str]:
+    """Find births of this exact path, even when Git detects a rename."""
+    added = git_bytes("log", "--no-renames", "--diff-filter=A", "--reverse",
+                      "--format=%H", "HEAD", "--", path)
+    return added.decode().splitlines() if added is not None else []
+
+
 def estimator_floor_failures(text: str) -> list[str]:
     lower = text.lower()
     return sorted(
@@ -314,10 +326,6 @@ def immutable_source_locked_nested_verdict(
                    for sha in (source_sha, key_sha))):
         return ""
 
-    def git_bytes(*args: str) -> bytes | None:
-        proc = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=False)
-        return proc.stdout if proc.returncode == 0 else None
-
     if (git_bytes("merge-base", "--is-ancestor", spec_commit, lock_commit) is None
             or spec_commit == lock_commit
             or git_bytes("merge-base", "--is-ancestor", lock_commit, run_commit) is None
@@ -369,9 +377,7 @@ def immutable_source_locked_nested_verdict(
     if shared_family_lock:
         if diagnostics != load_json(run_dir / "diagnostics.json"):
             return ""
-        added = git_bytes("log", "--diff-filter=A", "--reverse", "--format=%H",
-                          "HEAD", "--", lock_rel)
-        if added is None or added.decode().splitlines() != [lock_commit]:
+        if first_addition_commits(lock_rel) != [lock_commit]:
             return ""
         source_files = lock.get("source_files")
         if (not isinstance(source_files, dict) or len(source_files) < 2
@@ -518,9 +524,7 @@ def immutable_source_locked_nested_verdict(
             if len(matches) != 1:
                 return ""
             member_spec_rel = matches[0].relative_to(ROOT).as_posix()
-            member_add = git_bytes("log", "--diff-filter=A", "--reverse",
-                                   "--format=%H", "HEAD", "--", member_spec_rel)
-            if member_add is None or member_add.decode().splitlines() != [spec_commit]:
+            if first_addition_commits(member_spec_rel) != [spec_commit]:
                 return ""
             try:
                 member_spec = yaml.safe_load(matches[0].read_text()) or {}
@@ -538,9 +542,7 @@ def immutable_source_locked_nested_verdict(
                 return ""
             member_dir = ROOT / "engine" / "runs" / member
             member_diag_rel = (member_dir / "diagnostics.json").relative_to(ROOT).as_posix()
-            member_diag_add = git_bytes("log", "--diff-filter=A", "--reverse",
-                                        "--format=%H", "HEAD", "--", member_diag_rel)
-            if member_diag_add is None or member_diag_add.decode().splitlines() != [run_commit]:
+            if first_addition_commits(member_diag_rel) != [run_commit]:
                 return ""
             member_diag = load_json(member_dir / "diagnostics.json")
             if (member_diag.get("hypothesis_id") != member
