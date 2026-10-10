@@ -60,3 +60,31 @@ def test_attribution_year_requires_a_source_basis_and_within_period_date() -> No
     entry["drift_attribution_year"] = 1891
     with pytest.raises(ValueError, match="outside movement"):
         DRIFT.axis_attribution_year(movement, entry)
+
+
+def test_progressive_era_steps_wait_for_cited_1906_1913_1914_laws() -> None:
+    movement = next(
+        m for m in DRIFT.load_movements()
+        if m["movement_id"] == "us_progressive_era_reform_consensus_1901_1917"
+    )
+    assert {
+        entry["axis"]: entry["drift_attribution_year"]
+        for entry in movement["axes_summary"]
+    } == {
+        "regulatory.sectoral_licensing": 1906,
+        "regulatory.product_market_competition": 1914,
+        "regulatory.financial_deregulation": 1913,
+        "monetary.central_bank_independence": 1913,
+        "fiscal.tax_progressivity": 1913,
+    }
+    result = DRIFT.build_drift([movement])
+    usa = result["countries"]["USA"]
+    at = {year: index for index, year in enumerate(result["years"])}
+    # Movement period starts in 1901, but its cited federal laws did not.
+    for year in range(1901, 1906):
+        assert usa["statist_drift"][at[year]] == 0.0
+        assert all(series[at[year]] == 0.0 for series in usa["axes"].values())
+    assert usa["statist_drift"][at[1906]] == 2.0
+    assert usa["statist_drift"][at[1912]] == 2.0
+    assert usa["statist_drift"][at[1913]] == 5.0
+    assert usa["statist_drift"][at[1914]] == 3.0
