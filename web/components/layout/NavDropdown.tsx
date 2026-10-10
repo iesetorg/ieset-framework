@@ -57,8 +57,10 @@ export function NavDropdown({
   }, [clicked]);
 
   const panelClasses = [
-    "absolute top-full z-20 w-[300px] overflow-hidden rounded border border-rule bg-white shadow-lg",
-    align === "right" ? "right-0" : "left-0",
+    // On small screens the parent nav is the positioning boundary, keeping
+    // even hidden panels inside the viewport. Desktop panels follow buttons.
+    "absolute left-0 top-full z-20 w-full max-w-[300px] overflow-hidden rounded border border-rule bg-white shadow-lg lg:w-[300px]",
+    align === "right" ? "lg:left-auto lg:right-0" : "lg:left-0",
     // Hidden by default; revealed by parent's group-hover OR by clicked state.
     "invisible opacity-0 transition-opacity",
     "group-hover:visible group-hover:opacity-100",
@@ -68,13 +70,13 @@ export function NavDropdown({
     .join(" ");
 
   return (
-    <div ref={ref} className="group relative inline-block pb-4">
+    <div ref={ref} className="group static inline-block pb-4 lg:relative">
       <button
         type="button"
         onClick={() => setClicked((v) => !v)}
         aria-expanded={clicked}
         aria-haspopup="true"
-        className="ml-6 inline-flex items-center gap-1 font-medium text-muted hover:text-ink group-hover:text-ink"
+        className="inline-flex items-center gap-1 font-medium text-muted hover:text-ink group-hover:text-ink"
       >
         {label}
         <svg

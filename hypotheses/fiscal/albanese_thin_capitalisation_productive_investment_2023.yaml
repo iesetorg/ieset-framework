@@ -1,0 +1,402 @@
+hypothesis_id: albanese_thin_capitalisation_productive_investment_2023
+version: 1
+topic: fiscal
+status: candidate
+evidence_type: causal
+claim_direction: '-'
+claim: The Albanese-government thin-capitalisation reform reduced the annual Australian productive fixed-investment
+  rate of high-predicted-exposure non-financial business groups (simulated incremental denied deductions of at least
+  1% of fixed 2020-21 Australian tangible assets) by at least 1 percentage point, averaged across 2023-24 and 2024-25,
+  relative to retaining the preceding interest-deduction tests under the same macroeconomic conditions.
+sample:
+  countries:
+  - AUS
+  period:
+  - 2016
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - Primary unit is the Australian consolidated tax/business group of a non-financial general-class investor potentially
+    subject to Division 820, using a 30 June year end.
+  - Freeze baseline accounts in 2020-21, preceding the October 2022-23 Budget announcement and the 2022 election
+    campaign; obtain earlier accounts for trajectory diagnostics.
+  - 'High predicted exposure: additional denied net debt deductions under the new versus old legal rules at frozen
+    2020-21 accounts >=1% of fixed baseline Australian tangible assets. Controls have zero predicted incremental
+    denial. This is not classification from realised post-reform deductions.'
+  - Apply the AUD 2 million debt-deduction exemption at the associated-entity/group level and other legally applicable
+    exemptions before coding exposure. Do not automatically treat all multinationals or all domestic firms as exposed.
+  - Exclude ADIs, financial entities and entities continuing under distinct tests or exemptions from the primary
+    population; code plantation forestry and special-purpose treatments explicitly.
+  - Allow legally available group-ratio and third-party-debt elections in simulation using pre-policy information;
+    if test choice or eligibility cannot be determined, mark unclassifiable instead of assuming the default 30%
+    rule binds.
+  - Exclude groups without positive measurable fixed baseline Australian tangible assets or a reliable Australian
+    productive-investment allocation. Report exclusion composition and separately disclose entrants after baseline.
+  - Keep disappeared/merged groups in the outcome accounting through a prespecified successor linkage; do not analyse
+    only surviving reporters. Remove unresolved duplicate groups under an outcome-blind rule.
+variables:
+  outcome:
+  - name: australian_productive_investment_rate
+    source: manual:abs_business_investment_accounts_linkage_not_acquired
+    transformation: Real gross additions to productive fixed assets divided by fixed 2020-21 Australian tangible
+      assets, multiplied by 100; primary effect is the average 2023-24 and 2024-25 rate difference in percentage
+      points.
+    notes: Use investment/accounting acquisitions, exclude purely financial asset transfers and domestic M&A reclassification,
+      document asset price deflators. Tax depreciation deductions are not a valid outcome when tax rules are changing.
+  - name: australian_payroll_output
+    source: manual:abs_ato_payroll_value_added_not_acquired
+    transformation: Secondary employment, hours and real value added in Australian operations, including successor
+      activity.
+    notes: Investment effects need not imply proportional employment or output losses; outcome definitions and disclosure
+      restrictions must be frozen.
+  treatment:
+  - name: predicted_incremental_denied_deductions
+    source: manual:ato_division820_baseline_accounts_not_acquired
+    transformation: Run old and new law against frozen 2020-21 accounts, including applicable exemptions, tax EBITDA
+      definition, alternative tests and carryforward timing; scale incremental denial by fixed baseline tangible
+      assets.
+    notes: Planned legal/accounting simulation, not an available derived dataset. It must distinguish gross denial
+      from the present value of eventual deductions and test-election options.
+  - name: thin_capitalisation_legal_events
+    source: manual:federal_thin_capitalisation_legal_chronology
+    transformation: Announcement in October 2022-23 Budget; first affected income year 2023-07-01 to 2024-06-30;
+      enactment 2024-04-08; debt-deduction-creation rules from income years commencing 2024-07-01.
+    notes: Do not use enactment alone as the only treatment date or interpret retrospective application as an unanticipated
+      natural experiment. Verify anticipation from 2022 campaign commitments in a legal chronology before preregistration.
+  decomposition_channels:
+  - name: cash_tax_denial_and_carryforwards
+    source: manual:ato_thin_cap_deductions_tax_payments_not_acquired
+    transformation: Measure extra cash tax, denied deductions and future deduction use separately.
+    notes: A mechanical denial is not necessarily an immediate or permanent cash-tax cost.
+  - name: financing_profit_shifting_and_test_choice
+    source: manual:ato_group_finance_and_international_schedules_not_acquired
+    transformation: Measure debt/equity substitution, related-party interest, tax-EBITDA response, test choice,
+      ownership/location and profit shifting.
+    notes: Changed financial arrangements can preserve real investment while increasing Australian taxable profit.
+  - name: market_entry_exit_and_concentration
+    source: manual:abs_asic_group_market_structure_not_acquired
+    transformation: Measure domestic entry, divestment, group restructuring, local market shares and successor investment.
+    notes: Country tax entities and economically independent businesses differ; no entity-count shortcut.
+  - name: workers_owners_consumers_incidence
+    source: manual:abs_ato_group_incidence_not_acquired
+    transformation: Separate payroll, owner returns, supplier/customer prices and taxpayer receipts.
+    notes: Cross-border owners and Australian workers may bear different incidence.
+  - name: fiscal_enforcement_resource_cost
+    source: manual:ato_reform_revenue_admin_compliance_not_acquired
+    transformation: Additional receipts net of enforcement, compliance and financing-adjustment resource costs.
+    notes: Do not equate higher tax with social loss or assume compliance cost is zero.
+  - name: macro_and_welfare_feedback
+    source: manual:abs_treasury_linked_tax_welfare_inputs_not_acquired
+    transformation: Trace general-equilibrium investment substitution, aggregate capital formation and net welfare
+      beyond treated groups.
+    notes: Untreated local firms may gain capital or market share; direct treated-firm investment decline is not
+      national destruction.
+  controls:
+  - name: baseline_group_trajectory
+    source: manual:abs_ato_prepolicy_group_accounts_not_acquired
+    transformation: Freeze 2016-2021 industry, size, investment, profitability, tax losses, leverage, asset tangibility,
+      multinational footprint and demand trends.
+    notes: Eligibility and exposure depend on balance sheets; conditional exchangeability remains an unproven identifying
+      assumption.
+  - name: macro_financing_sector_shocks
+    source: manual:rba_abs_group_macro_exposure_not_ingested
+    transformation: Industry-by-year effects plus predetermined foreign demand, commodity, bank-rate and exchange-rate
+      exposure.
+    notes: Global tightening differentially affects highly indebted firms, independently of this reform.
+  - name: concurrent_policy_exposure
+    source: manual:official_tax_and_state_policy_chronology_not_ingested
+    transformation: Predetermined exposure to expensing expiry, July 2024 debt-creation rules, global minimum taxes,
+      sector support and state taxes.
+    notes: The 2022 extension of temporary full expensing already scheduled expiry on 2023-06-30. Do not count inherited
+      sunset as the new thin-cap reform. Post-policy election/financing changes are mediators rather than ordinary
+      controls.
+intervention_channel: fiscal
+intervention_channel_justification: Limits on corporate income-tax interest deductions alter the tax base and effective
+  cost of finance. Regulatory constraints, monetary rates and state taxes remain separate; no party dummy substitutes
+  for legal content.
+scope:
+  period:
+  - 2023
+  - 2025
+  countries:
+  - AUS
+  outcome_dim:
+  - industrial_capability
+  - capital_flows
+  - taxation
+  policy_family:
+  - tax_policy
+  treatment_tags:
+  - albanese_government
+  - thin_capitalisation_reform_2023
+estimator:
+  template: event_study
+  event_year: 2023
+  random_seed: 20261009
+  clustering: Ultimate business group; industry/financing-shock clustering sensitivity with effective cluster counts.
+  fixed_effects:
+  - australian_business_group
+  - industry_by_year
+  notes: 'CAUSAL ROUTE: two independently motivated specifications with a common high-predicted-exposure versus
+    zero-predicted-exposure estimand and common fixed-denominator investment-rate scale. Specification A is a reweighted
+    group-panel event study: match on pre-policy investment, profitability, leverage and international footprint,
+    then estimate dynamic group effects in the first two affected fiscal years. Baseline exposure is a legal simulation
+    from frozen 2020-21 data, not realised debt/EBITDA after reform.
+
+    Specification B is augmented synthetic control/synthetic DiD for prespecified treated industry-by-baseline-risk
+    cohorts, with zero-predicted-incremental-denial donors selected by long pre-reform investment trajectories and
+    constrained to comparable industries/financing exposure. Unlike A''s covariate and fixed-effect adjustment,
+    B''s counterfactual is chosen through pretreatment outcome fit. Define donor-cell minimum size and weights during
+    an outcome-blind access/power feasibility review; do not tune to the 2023-25 effect.
+
+    Pre-2022 common trends, covariate balance, overlap and synthetic pretreatment fit are mandatory. The October
+    2022 announcement, earlier campaign anticipation and the 2024 enactment/retroactivity mean that a national reform
+    date is not an exogenous natural experiment. Highly indebted firms also face differential rate shocks. If those
+    trends cannot be separated or bounded, causal inference is blocked regardless of significance.
+
+    The 2024-25 primary year overlaps new debt-deduction-creation rules. Explicitly classify their exposure from
+    pre-policy arrangements and estimate that separate interaction, with a sensitivity restricted to groups not
+    affected. If independent variation cannot separate the reforms, report the broader reform-package effect with
+    a new, preregistered claim; do not label it the isolated 2023 test change.
+
+    For nonzero causal support, both estimates must have the claimed sign, lie within a factor of two in absolute
+    magnitude, and satisfy the same confidence-bound materiality rule. Report all results and uncertainty. Estimator
+    disagreement, invalid donor fit or inadequate power is inconclusive rather than licence to choose a specification.
+
+    Robustness: pre-policy event-placebos; leave-industry-out donors; an alternative freeze at 2019-20 accounts;
+    exclude resource-sector windfalls; debt/equity substitution decomposition; within-multinational overseas-operation
+    comparison only where local tax changes and capital-allocation spillovers are explicitly documented. A naive
+    regression discontinuity at 30% tax EBITDA or AUD 2 million is not admissible without manipulation, eligibility
+    and sorting tests. The primary exposure definition never depends on post-policy choice.
+
+    Require at least 80% simulated outcome-blind probability of clearing the -1 pp materiality boundary when the
+    true effect is -2 pp, with clustered dependence, missingness and donor attrition. Separately assess equivalence
+    power under a true zero effect. Power at the exact materiality boundary cannot be 80% under the declared confidence-bound
+    rule. Preserve zeros/exits and trace successor investment. Annual 2024-25 tax and confidential accounts may
+    not yet be complete or accessible as of this draft; estimation must wait for the frozen usable vintage.
+
+    PRIMARY WEIGHTING: baseline-asset-weighted average effect across the same high-predicted-exposure Australian
+    groups. Fix each target weight as its 2020-21 Australian tangible assets divided by total baseline tangible
+    assets of the eligible treated sample. Both specifications must target exactly these groups and weights; aggregate
+    cohort outcomes using those fixed weights. Equal-group weighting is a separately reported sensitivity, not an
+    alternative primary estimand. Keep the asset price basis common to the numerator and fixed denominator.
+
+    '
+falsification:
+  rule: Define effect as treated minus counterfactual productive-investment rate. Falsify the stated decline of
+    at least 1 pp only if both valid designs have lower 95% confidence bounds above -1 pp. Support material decline
+    only when both upper 95% bounds are below -1 pp and the two-spec agreement gate passes. Equivalence requires
+    independently satisfying its prespecified narrower interval; failed identification or insufficient power is
+    inconclusive.
+  test: Two-spec average 2023-24/2024-25 investment-rate confidence-bound test, with TOST practical equivalence
+    and group-clustered uncertainty. No selection between single years, alternate capex definitions or the payroll
+    secondary outcome.
+  threshold:
+    outcome_unit: percentage_points_of_fixed_baseline_tangible_assets
+    material_harm_boundary: -1.0
+    equivalence_band:
+    - -0.5
+    - 0.5
+    effect_ci: 0.95
+    equivalence_ci: 0.9
+    minimum_power: 0.8
+    two_spec_max_absolute_magnitude_ratio: 2.0
+    equivalence_rule: Both 90% intervals wholly within [-0.5, 0.5] pp; use equivalence, not an unstable magnitude
+      ratio near zero.
+    planning_note: A proposed substantively meaningful annual investment-rate difference; not a result inferred
+      from national investment data. Review before prospective registration, preserving the draft history.
+    power_planning_true_effect_pp: -2.0
+prior_confidence: 0.4
+disclosure: Prepared in response to an initial concern that Albanese-government tax policies harmed business. That
+  concern can bias selection toward adverse outcomes. The causal claim, opposing account and meaningful-effect boundaries
+  are specified before any estimation in this work, but public aggregate outcomes have already been inspected. The
+  subjective prior is an authoring aid, not evidence, and should be reviewed by the human curator. This candidate
+  is a research design, not a verified preregistration or an executed test.
+conflict_disclosure: No private tax records or personal conflicts were supplied. Automated assistance wrote the
+  proposal; specialist tax-law and opposing-prior review remain outstanding.
+steelman: hypotheses/steelman/albanese_thin_capitalisation_productive_investment_2023.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'STATUS: UNTESTED CANDIDATE; prepared 2026-10-09. No outcome microdata have been acquired, no estimator has
+  run, and no causal result, local dataset, fetch manifest, access permission or ingestion adapter is claimed.
+
+  PROVENANCE: manual is a registered pending provenance marker in data/fetchers/publishers.yaml. Each manual series
+  below is a planned extraction/linkage, not an existing IESET dataset. Before estimation, preserve publisher URL,
+  exact table/field, unit, coverage, extraction UTC, release vintage, license/access restrictions, SHA256 and linkage
+  recipe in an immutable manifest. The 2026-10-09 website consultation date is not a dataset fetch timestamp. No
+  derived/computed series is represented as materialized.
+
+  REGISTRATION: resolve access, legal coding, estimand and power review; independently review the steelman; obtain
+  a prospective preregistration commit that is a strict ancestor of the first run commit. Do not create run artifacts
+  from this draft. Changes after any first run require an explicitly versioned alternative; no retroactive preregistration
+  claim.
+
+  ATTRIBUTION: fiscal tax-base treatment only. State payroll and land taxes, RBA monetary policy, pandemic support
+  expiry, commodity prices and ATO enforcement must not be silently attributed to a federal tax-rate increase. Party
+  identity is not a treatment. Effects apply to the stated treated population and window, not to all Australian
+  business or net national welfare.
+
+  LEGAL PROVENANCE: Treasury Laws Amendment (Making Multinationals Pay Their Fair Share-Integrity and Transparency)
+  Act 2024, assented 2024-04-08, https://www.legislation.gov.au/C2024A00023/asmade/2024-04-08/text/original/epub/OEBPS/document_1/document_1.html
+  . This is the operative primary law, rather than a consultation draft. ATO chronology and test description: https://www.ato.gov.au/law/view/document?LocID=%22TXR%2FTR20107%2FNAT%2FATO%2Fft57%22&PiT=20240214000001
+  . Verify the applicable version, schedules and group definitions during legal coding.
+
+  ANNOUNCEMENT PROVENANCE: Treasury Multinational Tax Integrity Package, https://treasury.gov.au/policy-topics/taxation/multinational-tax
+  identifies the October 2022-23 Budget announcement. Campaign expectation/earlier consultation timing is an unresolved
+  anticipation item, so 2022 is not assumed clean pretreatment.
+
+  EXEMPTION PROVENANCE: Treasury 2025-26 Tax Expenditures and Insights Statement, published December 2025, B13,
+  https://treasury.gov.au/sites/default/files/2025-12/p2025-721342.pdf explains the AUD 2 million group debt-deduction
+  threshold, Australian-assets test, special entities and differences between the thin-cap tests and later debt-creation
+  rules. Legal definitions govern if summary wording differs.
+
+  DATA PROVENANCE: ATO business/international dealings schedules and tax-EBITDA fields, combined with ABS business
+  microdata and investment accounts, are proposed confidential sources. The ABS business microdata entry point is
+  https://www.abs.gov.au/statistics/microdata-tablebuilder . This citation does not establish that requested tax
+  fields, crosswalks or access pathways are available. Confirm the actual data dictionary and permitted linkage
+  before treating the design as runnable.
+
+  POLICY REVIEW PROVENANCE: Board of Taxation statutory review, https://taxboard.gov.au/review/thin-capitalisation-reforms
+  ; Treasury announcement 2026-01-30, https://ministers.treasury.gov.au/ministers/jim-chalmers-2022/media-releases/review-thin-capitalisation-reforms
+  . The review and submissions are sources for design issues, not a completed causal result.
+
+  ACCESS/IDENTIFICATION BLOCKERS: confidential group tax returns, usable tax-EBITDA construction, associated-entity
+  and ultimate-parent crosswalk, baseline alternative-test eligibility, deduction carryforwards, domestic productive-capex
+  allocation, financing shock separation, debt-creation co-treatment classification, sufficient common support,
+  power and complete 2024-25 vintage. Public corporate accounts can provide a descriptive screen but do not by themselves
+  identify the declared causal effect.
+
+
+  PUBLICATION STATUS (2026-10-10): imported as an untested candidate. Any earlier no-registration/no-import statements
+  describe the initial 2026-10-09 draft. Git tracking alone does not establish a verified spec-before-run pair,
+  completed data ingestion, an empirical verdict or evidence-score eligibility. Missing data and protocol gates
+  remain binding.
+
+  '
+mechanism_measurement:
+  mechanism_type: tax_policy
+  design_features:
+  - eligible_vs_ineligible_groups
+  - phase_in_or_threshold_comparison
+  - synthetic_control
+  - dynamic_investment_followup
+  - leakage_substitution
+  - distributional_decomposition
+  - welfare_accounting
+  - mechanism_channel_decomposition
+  comparison_structure:
+    treated_units:
+    - Legally eligible non-financial groups with newly binding simulated deductions from frozen pre-policy accounts.
+    control_units:
+    - Eligible non-financial groups with zero incremental simulated denial and comparable baseline trajectories;
+      independent synthetic donor cohort weighting.
+    exempt_or_uncontrolled_units:
+    - Legally exempt groups are descriptive/robustness populations; they are not presumed exchangeable merely because
+      they lie below a threshold.
+    adjacent_or_border_markets:
+    - Comparable overseas operations only as a documented secondary check, with local tax changes and spillovers
+      audited.
+    time_frequency: annual
+    notes: Post-window 2023-24 and 2024-25; baseline legal exposure 2020-21. Named threshold comparison feature
+      refers to eligibility/exposure coding, not an asserted valid regression discontinuity.
+  causal_layers:
+  - layer: first_order_policy_effect
+    mechanism: New tests alter permitted deductions and cash taxes, subject to exemptions, alternative tests and
+      carryforwards.
+    variable_names:
+    - cash_tax_denial_and_carryforwards
+    - predicted_incremental_denied_deductions
+    candidate_sources:
+    - manual:ato_thin_cap_deductions_tax_payments_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Statutory coding alone is not an observed tax-burden measure.
+  - layer: behavioral_response
+    mechanism: Groups may replace related-party debt with equity, change test choice or reduce profit shifting while
+      retaining operations.
+    variable_names:
+    - financing_profit_shifting_and_test_choice
+    candidate_sources:
+    - manual:ato_group_finance_and_international_schedules_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Required corporate-tax layer; financing adaptations must not be mistaken for real capital changes.
+  - layer: dynamic_investment_response
+    mechanism: Higher effective financing costs may alter productive acquisitions and their timing or location.
+    variable_names:
+    - australian_productive_investment_rate
+    candidate_sources:
+    - manual:abs_business_investment_accounts_linkage_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Primary outcome remains wholly unmeasured; a nominal tax-deduction decline cannot substitute.
+  - layer: market_structure_response
+    mechanism: Tax equalisation may improve domestic competitors positions or induce entry, consolidation and relocation.
+    variable_names:
+    - market_entry_exit_and_concentration
+    candidate_sources:
+    - manual:abs_asic_group_market_structure_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Required corporate-tax layer, including gains outside the treated groups.
+  - layer: macro_feedback
+    mechanism: Capital displaced from treated groups can flow to other Australian producers, abroad or into nonproductive
+      assets.
+    variable_names:
+    - macro_and_welfare_feedback
+    - australian_payroll_output
+    candidate_sources:
+    - manual:abs_treasury_linked_tax_welfare_inputs_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: No unsupported extrapolation of treated-group investment to national growth.
+  - layer: distributional_incidence
+    mechanism: Investment, wages, prices and receipts distribute costs and gains among owners, workers, consumers
+      and taxpayers.
+    variable_names:
+    - workers_owners_consumers_incidence
+    candidate_sources:
+    - manual:abs_ato_group_incidence_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Required corporate-tax layer with cross-border ownership explicitly separated.
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Revenue integrity gains must be considered alongside compliance and enforcement resources.
+    variable_names:
+    - fiscal_enforcement_resource_cost
+    candidate_sources:
+    - manual:ato_reform_revenue_admin_compliance_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: A tax transfer is not automatically deadweight loss.
+  - layer: net_welfare
+    mechanism: Evaluate productive-capital losses against reduced avoidance, competitive neutrality and public-revenue
+      benefits.
+    variable_names:
+    - macro_and_welfare_feedback
+    - fiscal_enforcement_resource_cost
+    candidate_sources:
+    - manual:abs_treasury_linked_tax_welfare_inputs_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: A measured investment coefficient would still not settle total policy desirability.
+  distributional_groups:
+  - incumbent_beneficiaries
+  - new_entrants
+  - taxpayers
+  - suppliers
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: 'data_gap: incremental Australian receipts net of deferred/carryforward deductions and
+      incidence on foreign/domestic owners.'
+    deadweight_loss: 'data_gap: real investment misallocation and compliance resource use, separated from financial
+      tax planning.'
+    future_supply_loss: 'data_gap: capital-stock, productivity and wage changes.'
+    fiscal_or_enforcement_cost: 'data_gap: private compliance and public enforcement resources.'
+    net_welfare_formula: 'data_gap: fiscal/competitive-neutrality benefits plus domestic reallocation gains minus
+      real capital-allocation, compliance and adjustment losses; report foreign versus Australian incidence and
+      avoid transfer double-counting.'
+  promotion_gate: screen_only_until_second_order_measured
+  notes: All six fiscal.tax_corporate required layers are data_gap; additional enforcement and net-welfare checks
+    are also required. No school, position or existing-hypothesis link has been invented.

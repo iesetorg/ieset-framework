@@ -27,9 +27,9 @@ export function ResultBanner({ run }: { run: RunArtifacts }) {
             run pending
           </span>
           <span className="text-muted">
-            The hypothesis is registered in git and has no run artifact. No
-            coefficients are available; the chart shows raw outcome-variable
-            trajectories.
+            No empirical run is available. No coefficients or verdict have been
+            produced. See the registration record for the specification&apos;s
+            current status.
           </span>
         </div>
       </div>

@@ -106,7 +106,11 @@ export default async function HypothesisPage({
     headline: h.claim.split(/(?<=[.!?])\s+/)[0],
     abstract: [
       run.verdict ? `Verdict: ${String(run.verdict).split("\n")[0]}.` : null,
-      "Pre-registered falsification rule with pinned public-data vintages.",
+      !run.exists
+        ? "Untested research specification; no empirical run or verdict is available."
+        : h._registration_status === "verified"
+          ? "The specification strictly preceded its first run in git. See the replication artifacts for data provenance."
+          : "Research record with unverified pre-registration; inspect its registration and replication artifacts.",
       "Research artifact — not peer-reviewed by default.",
     ]
       .filter(Boolean)
@@ -118,7 +122,7 @@ export default async function HypothesisPage({
     isAccessibleForFree: true,
     keywords: [
       "economic policy",
-      "pre-registration",
+      h._registration_status === "verified" ? "pre-registration" : "research specification",
       h.topic.replace(/_/g, " "),
       h.evidence_type ?? "evidence",
       `${h._evidence_tier ?? "archive"} evidence`,
@@ -141,7 +145,7 @@ export default async function HypothesisPage({
       {
         "@type": "PropertyValue",
         name: "Estimator floor",
-        value: h._estimator_floor ?? "unknown",
+        value: run.exists ? h._estimator_floor ?? "unknown" : "not assessed",
       },
       {
         "@type": "PropertyValue",
@@ -232,7 +236,7 @@ export default async function HypothesisPage({
       <section className="mb-10">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="m-0 text-xs font-semibold uppercase tracking-wider text-muted">
-            {run.exists ? "Results" : "Registered outcome variables"}
+            {run.exists ? "Results" : "Planned outcome variables"}
           </h2>
           {run.run_dir_rel && (
             <span className="font-mono text-[11px] text-faint">
@@ -240,7 +244,14 @@ export default async function HypothesisPage({
             </span>
           )}
         </div>
-        <HypothesisChart hypothesis={h} />
+        {run.exists ? (
+          <HypothesisChart hypothesis={h} />
+        ) : (
+          <p className="text-[14px] leading-[1.65] text-muted">
+            The variables below describe the proposed test. No empirical run is
+            available, so no result chart is shown.
+          </p>
+        )}
       </section>
 
       {/* ---------- SCHOOLS PREDICTING ON THIS HYPOTHESIS ---------- */}
@@ -356,7 +367,7 @@ export default async function HypothesisPage({
         <main className="min-w-0">
           {/* Pre-registration */}
           <section className="mb-10">
-            <SectionHeader>Pre-registration</SectionHeader>
+            <SectionHeader>Registration record</SectionHeader>
             <PreRegStrip hypothesis={h} run={run} />
             <p className="text-[15px] leading-[1.65] text-ink">{h.claim.trim()}</p>
           </section>
@@ -504,7 +515,7 @@ export default async function HypothesisPage({
               <dd className="capitalize">{h.topic.replace(/_/g, " ")}</dd>
               {h.evidence_type && (
                 <>
-                  <dt className="text-muted">Evidence</dt>
+                  <dt className="text-muted">{run.exists ? "Evidence" : "Design"}</dt>
                   <dd className="capitalize">{h.evidence_type}</dd>
                 </>
               )}
@@ -520,11 +531,11 @@ export default async function HypothesisPage({
               <dd>
                 <Badge
                   variant={
-                    h._estimator_floor === "fail" ? "red" : "green"
+                    !run.exists ? "muted" : h._estimator_floor === "fail" ? "red" : "green"
                   }
                   dot
                 >
-                  {h._estimator_floor ?? "unknown"}
+                  {run.exists ? h._estimator_floor ?? "unknown" : "not assessed"}
                 </Badge>
               </dd>
               {h.sample && (

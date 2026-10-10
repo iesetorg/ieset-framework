@@ -104,30 +104,30 @@ const ABOUT: NavDropdownItem[] = [
 export function Topbar() {
   return (
     <header className="sticky top-0 z-10 border-b border-rule bg-white px-8 py-4">
-      <div className="mx-auto flex max-w-content items-baseline justify-between">
+      <div className="mx-auto flex max-w-content flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
         <Link
           href="/"
           className="text-[17px] font-bold tracking-tight text-ink hover:no-underline"
         >
           IESET<span className="text-accent">.</span>
         </Link>
-        <nav className="text-sm">
+        <nav aria-label="Main navigation" className="relative flex w-full min-w-0 flex-wrap items-baseline gap-x-6 gap-y-2 text-sm lg:w-auto">
           {/* Flagship dashboards first — these are the things to look at */}
           <Link
             href="/how-it-works"
-            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
+            className="font-medium text-muted hover:text-ink hover:no-underline"
           >
             How it works
           </Link>
           <Link
             href="/policy-browser"
-            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
+            className="font-medium text-muted hover:text-ink hover:no-underline"
           >
             Policy Browser
           </Link>
           <Link
             href="/h"
-            className="ml-6 font-medium text-muted hover:text-ink hover:no-underline"
+            className="font-medium text-muted hover:text-ink hover:no-underline"
           >
             Hypotheses
           </Link>

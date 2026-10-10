@@ -1,0 +1,179 @@
+hypothesis_id: aus_albanese_budget_repair_bracket_creep_2026_2037
+version: 1
+status: candidate
+topic: fiscal
+claim: Under the fixed policy and economic assumptions of the PBO 2026-27 Medium-Term Budget Outlook, indexing personal
+  income-tax thresholds to wages from 2027-28 removes more than half of the projected improvement in the Commonwealth
+  primary underlying cash balance between 2026-27 and 2036-37. This tests the projection's reliance on non-indexation;
+  it does not claim these future outcomes have occurred.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  period: &id001
+  - 2026
+  - 2037
+  temporal_structure: time_series
+  exclusion_rules:
+  - Freeze the July 2026 PBO projection vintage. Later budget measures or outturns belong in a separately versioned
+    sensitivity exercise.
+  - Apply all personal-tax changes announced in that baseline in both scenarios. Do not remove tax cuts to manufacture
+    bracket creep.
+  - Indexation is a hypothetical alternative, not a claim that the Albanese government introduced non-indexation.
+    CPI indexation is a separately labelled sensitivity and does not eliminate real-wage bracket creep.
+  - 'Do not equate all personal-income-tax growth with bracket creep: separately retain employment, income-distribution,
+    capital-income and specific tax-policy effects.'
+scope:
+  period: *id001
+  countries:
+  - AUS
+  outcome_dim:
+  - fiscal_policy
+  - taxation
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - albanese_government_2022
+  - income_tax_threshold_non_indexation
+  - pbo_mtbo_2026_27_vintage
+prior_confidence: 0.65
+disclosure: AI-assisted candidate drafted 9 October 2026 following a research framing critical of the Albanese government.
+  Public headline results and official commentary were inspected before drafting. The prior is a subjective design
+  aid, not evidence or the user's declared probability. Numerical materiality thresholds are proposed research choices,
+  not measured findings. No estimation or prospective preregistration has occurred; historical testing must disclose
+  this prior exposure.
+conflict_disclosure: No additional conflicts were assessed. Do not infer that conflicts are absent.
+steelman: hypotheses/steelman/aus_albanese_budget_repair_bracket_creep_2026_2037.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+intervention_channel: fiscal
+intervention_channel_justification: Commonwealth tax and spending decisions only; state budgets, RBA interest-rate
+  decisions and regulatory interventions are separate.
+notes: 'Candidate import specification only. Not run, not registered, not a scoreboard result. The registered manual
+  and derived prefixes are provenance markers: no downloaded panel, access permission, operational adapter, immutable
+  source manifest or executable estimator is supplied. Freeze source vintages and establish per-cell source URL,
+  table/cell, fetch UTC, license and payload hash before any run. Existing movement australia_albanese_alp_2022_present
+  is context only; no automatic policy, position or movement linkage is declared. DATA BLOCKERS: reproducible WPI-threshold scenario output or tax microsimulation; complete announced-policy
+  schedule and cash timing; annual baseline reconciliation. The official July 2026 report data workbook was
+  acquired on 2026-10-10 (182549 bytes; SHA256 8853f6e18b1edd223c34a2ad57e1b7a3258e0b8e39cec70ff81e5ff732ded068).
+  Sheet 1-4, G5:Q5 provides the primary-UCB baseline for 2026-27 through 2036-37. Structural inspection found static
+  tables only; the published CPI scenario in sheet 2-1 is not the required WPI counterfactual. No primary estimate
+  or verdict was calculated. Adjacent generic draft tax_automatic_indexation_bracket_creep_prevention is not treated
+  as evidence. Prior public exposure: PBO discussion of projected reliance on income-tax growth informed selection,
+  so this is an independent reconstruction, not a discovery claim.
+
+  PUBLICATION STATUS (2026-10-10): imported as an untested candidate. Any earlier no-registration/no-import statements
+  describe the initial 2026-10-09 draft. Git tracking alone does not establish a verified spec-before-run pair,
+  completed data ingestion, an empirical verdict or evidence-score eligibility. Missing data and protocol gates
+  remain binding.
+
+  '
+claim_direction: +
+variables:
+  outcome:
+  - name: bracket_creep_repair_share
+    source: derived:aus_wage_indexation_primary_balance_repair_share
+    transformation: C / R, where R = baseline_primary_UCB_pct_GDP[2036-37] - baseline_primary_UCB_pct_GDP[2026-27];
+      C = R - (indexed_primary_UCB_pct_GDP[2036-37] - indexed_primary_UCB_pct_GDP[2026-27]).
+    notes: Primary balance excludes net interest, avoiding debt-service compounding in the primary estimand. Define
+      share only if R > 0. Report R and C alongside the ratio; ratios above one are possible.
+  treatment:
+  - name: wage_indexed_threshold_schedule
+    source: manual:aus_pbo_wpi_tax_indexation_counterfactual
+    transformation: Beginning 1 July 2027, multiply the baseline income-tax thresholds by cumulative forecast WPI
+      growth since 2026-27; preserve contemporaneous announced rate, offset and base reforms in both scenarios.
+    notes: https://www.pbo.gov.au/publications-and-data/publications/2026-27-medium-term-budget-outlook; exact threshold
+      and offset treatment must match a documented PBO model export. Preserve offsets as in baseline for the primary
+      threshold-only comparison; test indexation of monetary offset/phase-out parameters separately.
+  decomposition_channels:
+  - name: baseline_primary_ucb_pct_gdp
+    source: manual:aus_pbo_2026_27_primary_ucb
+    transformation: Primary underlying cash balance / nominal GDP, in percentage points.
+    notes: https://www.pbo.gov.au/publications-and-data/publications/2026-27-medium-term-budget-outlook; use report
+      data pack and model inputs, not numbers read approximately from charts.
+  - name: indexed_primary_ucb_pct_gdp
+    source: derived:aus_pbo_wpi_indexed_primary_ucb
+    transformation: Baseline primary UCB minus modelled personal-income-tax revenue forgone under threshold indexation,
+      holding other primary receipts/payments and nominal GDP fixed.
+    notes: Use a fixed-population microsimulation reweighted to the same income/employment projections or a reproducible
+      PBO scenario export. This is a static fiscal projection.
+  - name: labour_supply_and_tax_base_response
+    source: microdata:aus_indexation_behavioural_response
+    transformation: Labour supply, taxable income, avoidance and incorporation responses by income group.
+    notes: Unmeasured. A separate sensitivity, not an assumed zero welfare effect.
+  - name: after_tax_income_by_income_decile
+    source: derived:aus_indexation_disposable_income_decile
+    transformation: Weighted change in after-tax income by fixed pre-policy income decile.
+    notes: Distributional output required for a wider burden/welfare claim; not measured.
+  controls:
+  - name: frozen_macro_and_policy_inputs
+    source: manual:aus_pbo_2026_27_inputs
+    transformation: Identical WPI, employment, prices, GDP, spending and announced tax policies across scenarios.
+    notes: https://www.pbo.gov.au/publications-and-data/publications/2026-27-medium-term-budget-outlook; https://budget.gov.au/content/bp1/.
+      Do not mix forward estimates with later actuals.
+estimator:
+  template: descriptive
+  notes: 'Projection decomposition. Export and checksum baseline and WPI-indexation scenarios; independently rebuild
+    the tax-receipt difference from the tax schedule and projected income distribution. Reconcile baseline tax receipts
+    and primary balance to the published PBO vintage within 0.05 percentage points of GDP in every year. Report
+    a complete ledger and numerical residual. Primary outcome is share of primary-balance repair removed; report
+    headline UCB including interest separately. Sensitivities: CPI indexation, all monetary income-tax parameters
+    indexed, and documented alternative wage/distribution assumptions. These are conditional scenarios, not estimates
+    of realised causal effects or forecasts of a future government''s choices.'
+falsification:
+  rule: 'Apply data/reconciliation and denominator-uncertainty gates first: unresolved inputs or a primary-balance-repair
+    interval that includes zero are INCONCLUSIVE, never automatic falsification. If these gates pass, SUPPORTED
+    for the conditional projection claim when R is positive and the full documented modelling/rounding interval
+    for C/R exceeds 0.50. FALSIFIED if the reconciled interval for R is wholly below zero, or if R is unambiguously
+    positive and the interval for C/R is wholly at or below 0.50. Threshold overlap, unreplicable scenario exports,
+    missing tax-schedule inputs or residuals above 0.05 percentage points of GDP mean INCONCLUSIVE. A future policy
+    change does not falsify a projection explicitly conditional on the frozen 2026 baseline.'
+  test: frozen_vintage_primary_balance_indexation_decomposition
+  threshold:
+    minimum_repair_share_removed: 0.5
+    maximum_annual_reconciliation_error_percentage_points_gdp: 0.05
+    uncertainty: Model-input and reconstruction bounds, not a sampling p-value.
+mechanism_measurement:
+  mechanism_type: tax_policy
+  design_features:
+  - mechanism_channel_decomposition
+  - distributional_decomposition
+  - welfare_accounting
+  comparison_structure:
+    treated_units:
+    - Fixed-threshold 2026 PBO policy projection
+    control_units:
+    - Same projection with WPI-indexed thresholds from 2027-28
+    time_frequency: annual
+  causal_layers:
+  - layer: first_order_price_or_transfer
+    mechanism: Threshold indexation changes projected personal-income-tax liabilities.
+    variable_names:
+    - wage_indexed_threshold_schedule
+    - indexed_primary_ucb_pct_gdp
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Less income-tax revenue changes the projected primary balance.
+    variable_names:
+    - bracket_creep_repair_share
+    - baseline_primary_ucb_pct_gdp
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: behavioral_response
+    mechanism: Tax changes may alter labour supply, tax planning and incorporation.
+    variable_names:
+    - labour_supply_and_tax_base_response
+    measurement_status: data_gap
+    required_for_dispositive_verdict: false
+  - layer: distributional_incidence
+    mechanism: Benefits of indexation differ across earners and income sources.
+    variable_names:
+    - after_tax_income_by_income_decile
+    measurement_status: data_gap
+    required_for_dispositive_verdict: false
+  promotion_gate: descriptive_only
+  notes: A conditional dependence finding does not prove that fixed thresholds are inefficient or that public spending
+    should be cut. Wider welfare claims require the missing behavioural and distributional layers.

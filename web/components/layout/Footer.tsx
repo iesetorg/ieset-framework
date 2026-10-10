@@ -10,7 +10,7 @@ export function Footer() {
           Results are not peer-reviewed by default; strict pre-registration
           status is shown per hypothesis.
         </div>
-        <div className="space-x-4">
+        <div className="flex min-w-0 max-w-full flex-wrap gap-x-4 gap-y-2">
           <Link href="/methodology" className="text-muted hover:text-ink hover:no-underline">Methodology</Link>
           <Link href="/methods-paper" className="text-muted hover:text-ink hover:no-underline">Methods paper</Link>
           <Link href="/evidence" className="text-muted hover:text-ink hover:no-underline">Evidence</Link>
