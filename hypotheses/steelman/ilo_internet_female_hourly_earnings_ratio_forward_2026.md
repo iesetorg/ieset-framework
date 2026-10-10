@@ -1,0 +1,5 @@
+# Steelman: earlier Internet adoption and later female-to-male mean hourly earnings ratio
+
+Expanded Internet access could change search, matching, information and economic opportunity. The registered descriptive direction is a later increase in female-to-male mean hourly earnings ratio of at least 0.015 log points per preceding +10 percentage-point Internet increase. The comparison controls its own prior change and level, real GDP per person, country and year effects.
+
+The alternative is that schooling, structural change, income growth, institutions and labour demand drive both adoption and later labour data. ILO modelled estimates may share extrapolation structure; national wage surveys have uneven coverage and unadjusted composition. Internet access could also displace jobs, increase search-based measured unemployment, or leave poverty and gender gaps unchanged. Opposite material association refutes this registered prediction; weak, sparse or unstable evidence remains partial or inconclusive. No causal or policy inference follows.

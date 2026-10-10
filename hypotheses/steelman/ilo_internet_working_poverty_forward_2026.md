@@ -1,0 +1,5 @@
+# Steelman: earlier Internet adoption and later working poverty rate among employed people, age 15+
+
+Expanded Internet access could change search, matching, information and economic opportunity. The registered descriptive direction is a later decrease in working poverty rate among employed people, age 15+ of at least 0.35 percentage points per preceding +10 percentage-point Internet increase. The comparison controls its own prior change and level, real GDP per person, country and year effects.
+
+The alternative is that schooling, structural change, income growth, institutions and labour demand drive both adoption and later labour data. ILO modelled estimates may share extrapolation structure; national wage surveys have uneven coverage and unadjusted composition. Internet access could also displace jobs, increase search-based measured unemployment, or leave poverty and gender gaps unchanged. Opposite material association refutes this registered prediction; weak, sparse or unstable evidence remains partial or inconclusive. No causal or policy inference follows.
