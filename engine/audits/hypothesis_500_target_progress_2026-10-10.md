@@ -500,9 +500,8 @@ cross-references; 805 strict and 1,320 legacy registration pairs; the
 564/2,125 evidence and census checks; 1789–2026 drift consistency; zero link-
 reciprocity errors or warnings; 15 focused Python tests; eight web tests;
 TypeScript checking; exact tourism and tariff replay; tariff raw-source
-re-extraction; and public-tree OPSEC scanning. The latest static site build
-remains pending after these additions; an earlier 8,555-route build verified
-its then-current drift and policy pages. Publication remains on hold: an
+re-extraction; and public-tree OPSEC scanning. The latest static site build passed across 8,593 routes; the built drift,
+new hypothesis, Swiss policy, and policy-browser pages are present. Publication remains on hold: an
 older reverted local-path manifest and the initial Korea source-plan example
 survive in this local branch history. The local derived OECD CbCR source also
 lacks its raw HTTP response, and CEPII slice redistribution terms need review.
