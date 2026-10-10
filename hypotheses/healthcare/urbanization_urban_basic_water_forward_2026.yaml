@@ -1,0 +1,315 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: urbanization_urban_basic_water_forward_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: Across five fixed four-year windows, countries with faster observed urban-population-share growth
+  over the prior four years will have slower subsequent improvement in urban at-least-basic drinking water
+  coverage, conditional on baseline coverage, its preceding trend, urban share, real income per person,
+  and country and anchor effects.
+methodology_note: Retrospective descriptive three-outcome family using WDI urban share and real-income
+  values plus WHO urban-service country/year/dimension keys only. No selected WHO value or null mask was
+  read before first-addition registration and a later source-lock commit. The local three-test correction
+  does not cover selection from the wider IESET archive.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GRC
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - JAM
+  - JOR
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KWT
+  - LAO
+  - LBR
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - PSE
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SWE
+  - SWZ
+  - SYR
+  - TCA
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2004
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the 850 exact basic country/anchor slots in the frozen key roster; WHO urban outcome keys at
+    t-4, t and t+4, not outcome values, set the upper bound.
+  - Use WDI national ISO3/XKX country rows only, valid urban-share percentages [0,100] and positive real
+    income at t-4/t with blank/null observation status; exclude absolute four-year urban-share jumps above
+    10 points.
+  - Require finite WHO country-level urban service coverage in [0,100] at t-4, t, t+4. Exclude regional/global
+    and rural/total records, never impute or replace a missing value.
+  - Retain only countries with at least three complete anchor rows. No post-result covariate, outcome,
+    anchor, country or vintage switch.
+variables:
+  outcome:
+  - name: urban_basic_coverage_change_next_four_years
+    source: who_gho:WSH_WATER_BASIC
+    transformation: Urban-residence coverage percentage at t+4 minus t; WHO/JMP estimate.
+  treatment:
+  - name: national_urban_share_change_prior_four_years
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: Urban share percentage at t minus t-4; one unit is one percentage point of observed
+      urbanization, not a policy treatment.
+  controls:
+  - name: prior_urban_share
+    source: world_bank_wdi:SP.URB.TOTL.IN.ZS
+    transformation: Urban share at t-4.
+  - name: baseline_urban_service
+    source: who_gho:WSH_WATER_BASIC
+    transformation: Urban service coverage at t.
+  - name: prior_urban_service_change
+    source: who_gho:WSH_WATER_BASIC
+    transformation: Urban service coverage at t minus t-4.
+  - name: log_real_income_per_person
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive GDP per person at t.
+  - name: prior_log_real_income_change
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Log income per person at t minus t-4.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One country and anchor fixed-effects OLS slope per outcome. Country-cluster CR1 with small-sample
+    correction; two-sided Student t on G-1 degrees of freedom. Outcome windows are adjacent but nonoverlapping.
+    No model search.
+falsification:
+  rule: INCONCLUSIVE if any frozen source, chronology, sample, exposure-support, rank, concentration,
+    or clustered-uncertainty gate fails. Otherwise negative beta at most -0.2 service percentage points
+    per +1 prior urban-share point with two-sided p<=0.01/3 SUPPORTS only the narrow descriptive strain
+    association; comparably positive beta REFUTES it. Every other estimable result is PARTIAL. All three
+    tests remain in the family, including any archived failure. Gate-cleared SUPPORTED, REFUTED and PARTIAL
+    receive descriptive calibration only; INCONCLUSIVE is archived. Zero causal, policy, school, position
+    and featured credit.
+  test: urbanization_urban_wash_forward_2026_10_10
+  threshold:
+    family_id: urbanization_urban_wash_forward_2026_10_10
+    family_size: 3
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0033333333333333335
+    expected_beta_sign: '-'
+    meaningful_abs_beta: 0.2
+    min_complete_rows: 600
+    min_complete_countries: 120
+    min_complete_anchors: 4
+    min_anchors_per_country: 3
+    material_rise_min_raw_pp: 1.0
+    min_material_rise_rows: 80
+    min_material_rise_countries: 30
+    flat_change_max_abs_raw_pp: 0.2
+    min_flat_rows: 20
+    min_flat_countries: 10
+    max_abs_raw_urban_share_change: 10.0
+    max_top_one_percent_residual_x_share: 0.25
+    max_top_country_residual_x_share: 0.15
+    max_top_anchor_residual_x_share: 0.35
+    expected_key_rows: 850
+    expected_key_countries: 174
+    roster_sha256: 5d573db8488c6649d85b84e45276e5c05f50ac1b3b63863064f0f57f6d14eef8
+    source_files:
+      urban:
+        path: data/vintages/world_bank_wdi/SP.URB.TOTL.IN.ZS@2026-05-05T203650Z.parquet
+        sha256: d3545e1c27b14eabafd3cbe7bbbc5edb5f21c7b97954ab76fc70392599c675f6
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      basic:
+        path: data/vintages/who_gho/WSH_WATER_BASIC@2026-04-30T114843Z.parquet
+        sha256: 3ac26b7c74273cb93ae7e0bf6a87e6ce6bf02617f5df703ad07668fcb176e162
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.4
+disclosure: WHO/JMP service shares are estimated, not observed investment in infrastructure. WDI urban
+  definitions vary by country and are smoothed. Urban reclassification, migration composition, shared
+  development trends, income shocks, and measurement revisions can explain any association. This is not
+  causal or independent replication. WHO manifest records CC-BY-NC-SA-3.0 IGO and rights review is needed
+  before publishing derivative displays.
+steelman: hypotheses/steelman/urbanization_urban_basic_water_forward_2026.md
+scope:
+  period:
+  - 2004
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - healthcare_capacity
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
