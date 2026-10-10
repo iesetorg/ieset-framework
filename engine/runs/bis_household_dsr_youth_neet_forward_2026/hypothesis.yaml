@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_household_dsr_youth_neet_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Within the fixed 16-country annual panel, a larger increase in estimated household debt-service
+  burden from t-1 to t predicts a rise in the OECD youth not in employment, education or training
+  measure from t to t+1.
+methodology_note: 'Prospective ten-endpoint descriptive family, registered before selected OECD HSL
+  outcomes or statuses were opened. Exact key-only roster, source custody and decision rule: engine/audits/bis_dsr_oecd_hsl_extended_prereg_2026-10-10.md.'
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUS
+  - BEL
+  - CAN
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 2004
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only exact committed country/year pairs and one-year forward endpoints; no interpolation,
+    source or period substitutions.
+  - BIS FREQ=Q, DSR_BORROWERS=H, UNIT_MEASURE=367, OBS_STATUS=A; all four quarters at t-1 and t must
+    be finite in [0,100].
+  - OECD HSL MEASURE=2_4, UNIT_MEASURE=PT_POP_Y15T24, AGE=_T, SEX=_T, EDUCATION_LEV=_T only.
+  - After separate committed source lock, selected OECD values must be finite in [0,100] with OBS_STATUS
+    A or blank at t and t+1; keep countries with at least three complete pairs.
+variables:
+  treatment:
+  - name: annual_household_dsr_change_pp
+    source: bis:WS_DSR
+    transformation: Arithmetic mean of four household-sector quarterly debt-service ratios at t minus
+      the corresponding mean at t-1, in percentage points.
+    notes: Aggregate principal and interest payments relative to income; not a policy intervention.
+  outcome:
+  - name: next_year_adverse_youth_neet_change
+    source: oecd:OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,1.1
+    transformation: +1 times OECD HSL 2_4 value at t+1 minus its value at t; adverse-oriented percentage
+      points.
+    notes: Youth not in employment, education or training; PT_POP_Y15T24. Youth NEET can change with
+      schooling policy, demographics, and the business cycle.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One country/year fixed-effects OLS coefficient with country-cluster CR1 and two-sided Student
+    t(G-1). No covariate, lag, outcome, source, or window search.
+falsification:
+  test: bis_dsr_oecd_hsl_extended_family_2026
+  rule: INCONCLUSIVE if frozen source, chronology, complete-case, exposure, influence, full-rank,
+    or uncertainty gate fails. Otherwise SUPPORTED only for adverse-oriented beta at least +0.25
+    outcome units per DSR percentage point and two-sided p<=0.001; REFUTED for beta at most -0.25
+    at the same p. Other estimable results are PARTIAL. All ten tests remain in the denominator.
+  threshold:
+    family_id: bis_dsr_oecd_hsl_extended_wellbeing_2026_10_10
+    family_size: 10
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.001
+    adverse_beta_min_per_dsr_pp: 0.25
+    min_valid_rows: 230
+    min_valid_countries: 13
+    min_material_change_rows: 160
+    min_material_change_countries: 12
+    material_dsr_change_min_pp: 0.1
+    min_years_per_country: 3
+    max_top_1pct_residual_variance: 0.3
+    max_country_residual_variance: 0.3
+    max_year_residual_variance: 0.3
+    outcome_valid_max: 100
+    expected_key_rows: 311
+    expected_key_countries: 16
+    roster_sha256: a1a9a2df5bc58ae9d1d14a88d4527ea8c39a520dfce079e6c6aa6cbb12f553dd
+    source_files:
+      treatment:
+        path: data/vintages/bis/WS_DSR@2026-07-22T141212Z.parquet
+        sha256: 59cb6b2f260d3132f826a15ccf585a3016af8516c4d0c2197a5fda2c2916b3fd
+        manifest: data/manifests/fetch_run_2026-07-22T141212Z.yaml
+        manifest_sha256: 895761a2da3bd2554da4466becd7fa85837258ce80442c519362bb9d4c5eaea2
+      outcome:
+        path: data/vintages/oecd/OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0@2026-07-23T150432Z.parquet
+        sha256: ac7581cb015748d97a21d4feadd08a3afb16cb1d5912af9e0997913ce4db65db
+        manifest: data/manifests/fetch_run_2026-07-23T150922Z.yaml
+        manifest_sha256: f8d2a682717c02832a2cf323fb5ea777139502e14987348859f3114042bece51
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.25
+disclosure: Youth NEET can change with schooling policy, demographics, and the business cycle. DSR
+  also responds to rates, income, and credit cycles; a country panel cannot identify whether affected
+  people are borrowers. This adds a distinct measure to four earlier HSL tests and is not an independent
+  data holdout or archive-wide multiplicity correction. Zero causal, policy, school, position, and
+  featured credit.
+steelman: hypotheses/steelman/bis_household_dsr_youth_neet_forward_2026.md
+scope:
+  period:
+  - 2004
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
