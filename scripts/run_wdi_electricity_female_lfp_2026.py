@@ -30,6 +30,7 @@ STEELMAN = f'hypotheses/steelman/{ID}.md'
 ROSTER = 'data/pinned_evidence/wdi_electricity_female_lfp_key_roster.csv'
 ROSTER_SHA = 'a7b8e33e420cd1c0ce8160ad4e03e1102440d184842dd450027a446df26e8638'
 LOCK = 'data/pinned_evidence/wdi_electricity_female_lfp_2026.manifest.json'
+ERRATUM = 'engine/audits/wdi_electricity_female_lfp_source_custody_erratum_2026-10-10.md'
 SUMMARY = 'engine/audits/wdi_electricity_female_lfp_results_2026-10-10.md'
 RUN_DIR = f'engine/runs/{ID}'
 FETCH_MANIFEST = 'data/manifests/fetch_run_2026-05-05T200056Z.yaml'
@@ -142,7 +143,21 @@ def registration_commit() -> str:
         raise RuntimeError('registration files do not have one first-addition commit')
     rev = revisions.pop()
     for p in paths:
-        frozen(p, rev)
+        if p != RUNNER:
+            frozen(p, rev)
+    corrections = git('log', '--format=%H', f'{rev}..HEAD', '--', RUNNER).decode().splitlines()
+    if len(corrections) != 1:
+        raise RuntimeError('runner requires exactly one documented pre-value custody correction')
+    correction = corrections[0]
+    if first_added(ERRATUM) != correction:
+        raise RuntimeError('custody correction lacks contemporaneous erratum')
+    changed = set(git('diff', '--name-only', f'{correction}^', correction).decode().splitlines())
+    if changed != {RUNNER, ERRATUM}:
+        raise RuntimeError('custody correction commit changed unrelated files')
+    if not ancestor(first_added(LOCK), correction):
+        raise RuntimeError('custody correction must follow source lock and precede results')
+    frozen(RUNNER, correction)
+    frozen(ERRATUM, correction)
     spec = yaml.safe_load((ROOT / SPEC).read_text())
     codes = roster()
     if (spec.get('hypothesis_id') != ID
@@ -184,22 +199,28 @@ def lock_data(reg: str) -> dict:
     return {
         'schema': 'ieset-wdi-electricity-female-lfp-source-lock-v1',
         'registration_commit': reg, 'roster_sha256': ROSTER_SHA,
-        'runner_sha256': sha(ROOT / RUNNER),
+        'runner_sha256': hashlib.sha256(git('show', f'{reg}:{RUNNER}')).hexdigest(),
         'fetch_manifest': FETCH_MANIFEST, 'fetch_manifest_sha256': FETCH_SHA,
         'sources': manifest_sources(),
     }
 
 
 def source_lock_commit(reg: str) -> str:
-    paths = [LOCK] + [s['path'] for s in SOURCES.values()]
-    revisions = {first_added(p) for p in paths}
+    previously_tracked = [s['path'] for s in SOURCES.values()
+                          if git('ls-tree', '-r', '--name-only', reg, '--', s['path']).strip()]
+    newly_pinned = [s['path'] for s in SOURCES.values() if s['path'] not in previously_tracked]
+    revisions = {first_added(p) for p in [LOCK] + newly_pinned}
     if len(revisions) != 1:
-        raise RuntimeError('source lock and raw files lack one first-addition commit')
+        raise RuntimeError('source lock and newly pinned raw files lack one first-addition commit')
     rev = revisions.pop()
     if not ancestor(reg, rev):
         raise RuntimeError('source lock must strictly follow registration')
-    for p in paths:
+    for p in [LOCK] + newly_pinned:
         frozen(p, rev)
+    for p in previously_tracked:
+        frozen(p, reg)
+        if git('log', '--format=%H', f'{reg}..HEAD', '--', p).strip():
+            raise RuntimeError(f'previously tracked raw source changed after registration: {p}')
     if json.loads((ROOT / LOCK).read_text()) != lock_data(reg):
         raise RuntimeError('source lock metadata mismatch')
     for role, src in SOURCES.items():
@@ -372,11 +393,12 @@ def artifacts(result: dict, data: pd.DataFrame, reg: str, lock: str) -> dict[str
         f"Five fixed country-hash holdouts: {result['positive_holdout_signs']} positive, {result['negative_holdout_signs']} negative.", '',
         'Electricity access is population coverage rather than supply reliability. Female labour-force participation is an ILO-modelled 15+ rate including employed and unemployed women, not employment quality or unpaid work. Global development, schooling, fertility, industrial structure, income, and policy changes can shift both series.',
         'Earlier electricity-to-growth and electricity-to-child-mortality tests were visible before this distinct outcome was chosen. A single-test p cutoff does not correct archive-wide selection.',
-        f'Frozen registration `{reg}`; later source lock `{lock}`. Exact replay: `python3 -B {RUNNER} --verify`.',
+        f'Frozen registration `{reg}`; later source lock `{lock}`; documented pre-value custody erratum `{first_added(ERRATUM)}`. Exact replay: `python3 -B {RUNNER} --verify`.',
     ])+'\n'
     manifest = {
         'design_id': ID, 'evidence_type': 'descriptive', 'verdict': result['verdict'],
         'spec_commit': reg, 'lock_commit': lock, 'runner_sha256': sha(ROOT/RUNNER),
+        'runner_custody_correction_commit': first_added(ERRATUM),
         'source_custody': manifest_sources(),
         'credit': {'causal': 0, 'policy': 0, 'school': 0, 'position': 0, 'featured': 0},
         'artifacts': ['hypothesis.yaml','manifest.yaml','diagnostics.json','coefficients.parquet','metric_results.parquet','chart_data.json','result_card.md','replication.py','evidence_packet.yaml'],
@@ -396,7 +418,7 @@ def artifacts(result: dict, data: pd.DataFrame, reg: str, lock: str) -> dict[str
     replication = f"#!/usr/bin/env python3\nimport subprocess\nimport sys\nfrom pathlib import Path\nroot = Path(__file__).resolve().parents[3]\nraise SystemExit(subprocess.call([sys.executable, '-B', str(root / '{RUNNER}'), '--verify']))\n"
     summary = '\n'.join([
         '# Electricity access and later female labour-force participation — locked result', '',
-        f'Registration `{reg}` strictly preceded source lock `{lock}` and the measured run.',
+        f'Registration `{reg}` strictly preceded source lock `{lock}` and the measured run. A later pre-value custody erratum `{first_added(ERRATUM)}` records the electricity file already tracked in the base; the analysis rule was unchanged.',
         'The two exact WDI raw files were SHA-256 checked against the tracked fetch manifest; WDI metadata lists CC-BY-4.0 and attributes the labour series to ILO modelled estimates.', '',
         f"**Verdict: {result['verdict']}**. Complete countries: {result['complete_countries']}/216; material gain countries: {result['material_access_gain_countries']}; access gain p90−p10 spread: {result['access_gain_p90_p10_spread_pp']} points.",
         f"HC3 slope: {beta} female LFP percentage points per +1 electricity point; two-sided p: {p}; threshold: {P_MAX}; failed gates: {', '.join(result['failed_gates']) or 'none'}.",
