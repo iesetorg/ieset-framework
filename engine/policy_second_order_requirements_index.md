@@ -4,12 +4,12 @@ This generated index expands coded policy axes into second-order measurement req
 
 ## Summary
 
-- Policies indexed: 3369
+- Policies indexed: 3373
 - Movements indexed: 717
 - Policies with axis-inherited requirements: 3360
-- Policies with explicit evaluation_design: 23
+- Policies with explicit evaluation_design: 27
 - Policies missing explicit design despite axis requirements: 3346
-- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3346, "explicit": 23}`
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3346, "explicit": 27}`
 - Source readiness mentions: `{"partial_ready": 44760, "proprietary_gap": 6720, "ready": 3349, "reconstruct_needed": 19072, "scrape_needed": 14115}`
 
 ## Most Common Required Layers
