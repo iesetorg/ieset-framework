@@ -1,5 +1,7 @@
 # Large-family feasibility and data-acquisition audit — 2026-10-10
 
+**Scope correction:** This audit inventoried the isolated checkout's local vintages. The dirty main IESET checkout retains many additional Git-ignored, manifest-pinned files, including IRENA, WITS tariffs, JST history, and an OWID mobility series. See [main-local vintage reconciliation](main_local_vintage_reconciliation_2026-10-10.md). The specific hundreds-sized family conclusion still requires claim-fit review of those bytes; file presence alone does not make a test ready. The absence statements below refer to the isolated checkout at the time of this audit, not to every local copy of the corpus.
+
 ## Decision
 
 **No current, source-backed family of hundreds of independent claim tests is ready for prospective registration.** Do not turn a product, age, sex, pollutant, jurisdiction, or correlated indicator matrix into hundreds of nominal hypotheses merely to raise the public calibration count. These are useful subgroup or robustness analyses when tied to a substantive claim, but do not by themselves create independent policy questions.
