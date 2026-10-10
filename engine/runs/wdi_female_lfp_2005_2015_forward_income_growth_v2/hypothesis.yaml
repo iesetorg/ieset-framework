@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_female_lfp_2005_2015_forward_income_growth_v2
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Across source-key eligible national areas, a larger 2005–2015 increase in female labour-force participation
+  predicts faster annualized real GDP-per-person growth in 2015–2023, conditional on 2005 female participation,
+  2015 real income, and 2005–2015 real income growth. This is a descriptive forward association, not an identified
+  labour-policy effect.
+methodology_note: New-ID prospective forward test of the direct female-participation/growth direction in archived
+  demo_female_lfp_growth_panel. Its 1980–2023 same-year panel estimate is known (PARTIAL, negative and imprecise);
+  it does not grade this later outcome. This v2 does not test the original income-group heterogeneity, gender-gap
+  magnitude, or causal mechanism, and does not change the old verdict.
+evidence_type: descriptive
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2005
+  - 2023
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One 2005–2015 female-participation change and one subsequent 2015–2023 income-growth
+    interval per eligible national area.
+  exclusion_rules:
+  - Candidate roster is every ISO 3166 alpha-3 country or territory in pycountry, plus XKX, with every selected
+    country/year key in the two pinned local source files. The exact key-only roster is committed in a separate
+    source lock before selected values or null masks are opened.
+  - Require finite female participation percentages in [0,100] at 2005 and 2015, and strictly positive finite
+    real GDP per person at 2005, 2015, and 2023. Missing or invalid endpoints are excluded and counted, not
+    replaced.
+  - No interpolation, imputation, nearest-year join, country substitution, winsorization, post-result country
+    split, or source-vintage switch.
+variables:
+  treatment:
+  - name: female_lfp_gain_per_ten_pp
+    source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+    transformation: (2015 female labour-force participation rate minus 2005 rate) divided by 10
+  outcome:
+  - name: future_real_gdp_pc_annual_log_growth_pp
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log(2023 real GDP per person / 2015 real GDP per person) divided by 8
+  controls:
+  - name: female_lfp_2005
+    source: world_bank_wdi:SL.TLF.CACT.FE.ZS
+    transformation: 2005 percentage level
+  - name: log_real_income_2015
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of 2015 level
+  - name: prior_real_income_annual_log_growth_pp
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log(2015 / 2005 real GDP per person) divided by 10
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-economy cross-sectional OLS with intercept and frozen controls. HC3 uncertainty; two-sided Student
+    t reference with N minus parameter-count degrees of freedom. One test, no model search.
+falsification:
+  test: fixed_wdi_female_lfp_forward_income_growth_2026
+  rule: Require at least 80 complete economies, at least 20 with a 2005–2015 female-LFP gain >=5 percentage
+    points, female-LFP-gain interquartile range >=3 points, full-rank design, finite positive HC3 uncertainty,
+    no economy contributing over 20% of squared residualized exposure, and successful leave-one-economy-out
+    fits for all but at most two economies. Failure is INCONCLUSIVE. SUPPORTED if beta >=+0.3 annualized log-growth
+    percentage point per 10-point LFP gain, two-sided p<=0.05, and at least 75% of successful leave-one-out
+    betas positive. REFUTED if beta <=-0.3, p<=0.05, and at least 75% of leave-one-out betas negative. Otherwise
+    an estimable result is PARTIAL. Zero causal, policy, school, position, or featured credit.
+  threshold:
+    family_id: wdi_female_lfp_forward_income_growth_2026
+    family_size: 1
+    treatment_years:
+    - 2005
+    - 2015
+    outcome_years:
+    - 2015
+    - 2023
+    min_complete_economies: 80
+    min_lfp_gain_5pp_economies: 20
+    min_lfp_gain_iqr_pp: 3
+    max_single_economy_residualized_exposure_share: 0.2
+    max_loo_failures: 2
+    min_loo_sign_share: 0.75
+    min_abs_beta_annual_log_pp_per_10pp: 0.3
+    two_sided_p_max: 0.05
+    source_files:
+      lfp:
+        path: data/vintages/world_bank_wdi/SL.TLF.CACT.FE.ZS@2026-05-05T194807Z.parquet
+        sha256: c3b8ecd5c8a7ac7c1ab2fbf61675494c2f6a88093d3b64dfd808c542e96d1186
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    policy_score_credit: 0
+    school_score_credit: 0
+    legacy_hypothesis_id: demo_female_lfp_growth_panel
+prior_confidence: 0.42
+disclosure: Participation and income can share causes, and the old same-period estimate is known. This baseline-adjusted
+  later-outcome regression tests prediction only. The primary direct direction is narrower than the old gender-gap
+  magnitude and heterogeneity claims. No selected 2005, 2015, or 2023 values or null masks were opened before
+  registration.
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+scope:
+  period:
+  - 2005
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - none
+  treatment_tags:
+  - female_lfp_change
+steelman: hypotheses/steelman/wdi_female_lfp_2005_2015_forward_income_growth_v2.md
+notes: 'Pre-registration plan: engine/audits/wdi_female_lfp_forward_income_growth_2026_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_wdi_female_lfp_forward_income_growth_2026.py.'
