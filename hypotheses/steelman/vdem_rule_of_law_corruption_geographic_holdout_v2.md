@@ -1,0 +1,5 @@
+# Steelman: V-Dem rule of law and political corruption geographic holdout
+
+The strongest measured version of the archived claim is a narrow within-country association: stronger rule-of-law coding may precede lower political-corruption coding even in countries absent from the old 40-country screen. A full country and year fixed-effects panel, an exact one-year lag, a large disjoint roster, and a precommitted concentration cap make this a check on geographic transport of the old association.
+
+The strongest rival interpretation is common expert-coding error. V-Dem rule of law, political corruption, public-sector corruption, executive corruption and clientelism can move together because coders see the same political changes. Reform may also follow a fall in corruption, while omitted administrative capacity affects both. The WDI income control and panel effects cannot eliminate these explanations. A positive result would be descriptive calibration, not proof that economic-freedom policy caused lower corruption.
