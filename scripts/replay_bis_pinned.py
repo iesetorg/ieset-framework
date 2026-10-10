@@ -199,7 +199,10 @@ def replay_one(hypothesis_id: str, batch: str, run_dir: Path | None = None) -> d
     if stored.get("run_utc") != manifest["run_utc"]:
         raise ValueError("stored diagnostics.run_utc differs from pinned manifest")
     actual["run_utc"] = manifest["run_utc"]
-    actual["verdict"] = actual["verdict_label"]
+    # Older packets preserve the computed verdict_label but never recorded the
+    # canonical verdict field. Verify their frozen bytes without inventing it.
+    if "verdict" in stored:
+        actual["verdict"] = actual["verdict_label"]
     _compare(actual, stored, "diagnostics")
 
     coefficients = pd.read_parquet(run_dir / "coefficients.parquet")

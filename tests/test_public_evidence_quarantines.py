@@ -16,6 +16,7 @@ QUARANTINED = {
     "minimum_wage_youth_unemployment_tradeoff",
     "unemployment_benefit_generosity_employment_drag",
     "workfare_conditionality_employment_effect",
+    "tariff_protection_duration_growth_drag",
 }
 
 

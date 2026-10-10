@@ -1,4 +1,4 @@
-"""The 23 promoted BIS packets replay from recorded vintages without writes."""
+"""The 28 promoted BIS packets replay from recorded vintages without writes."""
 from __future__ import annotations
 
 import hashlib
@@ -12,6 +12,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_IDS = (
+    # These historical packets retain a frozen verdict_label but no canonical
+    # verdict field. Their replay path must remain read-only and archived.
+    "bis_corporate_credit_boom_investment_slowdown_panel_1970_2025",
+    "bis_corporate_dsr_investment_slowdown_panel_1999_2025",
+    "bis_credit_gap_private_investment_reversal_panel",
+    "bis_credit_gap_private_investment_slowdown_panel_1970_2025",
+    "bis_reer_volatility_investment_drag_panel_1964_2026",
     "bis_credit_gap_consumption_slowdown_panel_1970_2025",
     "bis_credit_gap_current_account_interaction_panel_1970_2025",
     "bis_credit_gap_current_account_twin_deficit_risk",
@@ -101,4 +108,23 @@ def test_bis_replay_rejects_packet_and_source_drift(run_id: str, tmp_path: Path)
     first["sha256"] = "0" * 64
     (scratch / "manifest.yaml").write_text(yaml.safe_dump(manifest))
     with pytest.raises(ValueError, match="pinned vintage mismatch"):
+        wrapper.main()
+
+
+def test_legacy_packet_without_canonical_verdict_still_rejects_label_drift(tmp_path: Path) -> None:
+    run_id = "bis_credit_gap_private_investment_reversal_panel"
+    _require_archived_sources(run_id)
+    wrapper = _wrapper(run_id)
+    archived = ROOT / "engine" / "runs" / run_id
+    scratch = tmp_path / run_id
+    scratch.mkdir()
+    for name in PACKET_FILES:
+        shutil.copy2(archived / name, scratch / name)
+    assert "verdict" not in json.loads((scratch / "diagnostics.json").read_text())
+    wrapper.RUN_DIR = scratch
+
+    diagnostics = json.loads((scratch / "diagnostics.json").read_text())
+    diagnostics["verdict_label"] = "SUPPORTED"
+    (scratch / "diagnostics.json").write_text(json.dumps(diagnostics))
+    with pytest.raises(ValueError, match="diagnostics.verdict_label"):
         wrapper.main()
