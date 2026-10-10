@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_growth_eurostat_immigration_citizenship_ru_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Across frozen European destinations, larger prior 2013–2016 real GDP per capita
+  growth predicts greater 2017–2019 immigration-count growth among people with RU
+  citizenship.
+methodology_note: One of 30 predeclared citizenship streams; exact contract in engine/audits/wdi_eurostat_citizenship_migration_prereg_2026-10-10.md.
+  Eurostat outcome values and null masks unopened before registration and source lock.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - HRV
+  - HUN
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MDA
+  - MKD
+  - MNE
+  - NLD
+  - NOR
+  - SVK
+  - SVN
+  - SWE
+  period:
+  - 2013
+  - 2019
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One preregistered prior GDP growth episode and subsequent
+    two-point immigration-flow change, across destinations only.
+  exclusion_rules:
+  - Only committed destination/citizenship key roster and fixed annual Eurostat dimensions.
+  - Exclude same-country citizenship; require finite positive WDI endpoints and finite
+    nonnegative Eurostat endpoints.
+  - Retain low and zero counts in log1p; no imputation, winsorisation, value-based
+    replacement or alternate window.
+variables:
+  treatment:
+  - name: prior_destination_real_gdp_per_capita_growth_logpp
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100*log(constant-2015-USD GDP per capita 2016 / 2013).
+  outcome:
+  - name: immigration_count_change_citizenship_ru_logpp
+    source: eurostat:migr_imm1ctz
+    transformation: 100*(log1p(2019 immigrant count)-log1p(2017 immigrant count));
+      citizen=RU, freq=A, unit=NR, sex=T, age=TOTAL, agedef=COMPLET.
+    notes: Citizenship is legal nationality, not prior residence, origin or birthplace.
+      Count includes zero via log1p.
+estimator:
+  template: descriptive
+  notes: Cross-destination OLS with intercept, HC3 robust SE, two-sided t(n-2); no
+    adjusted covariates or substitute periods.
+falsification:
+  test: wdi_growth_eurostat_citizenship_immigration_forward_2026_10_10
+  rule: INCONCLUSIVE on frozen sample, material-flow, exposure, rank or uncertainty
+    gate failure. Otherwise SUPPORTED for beta >= 0.5 and Bonferroni two-sided p <=
+    0.01/30; REFUTED for beta <= -0.5 at that p; otherwise PARTIAL. All 30 cells remain
+    in denominator.
+  threshold:
+    family_id: wdi_growth_eurostat_citizenship_immigration_forward_2026_10_10
+    family_size: 30
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0003333333333333333
+    minimum_positive_beta: 0.5
+    min_valid_destinations: 20
+    min_material_destinations: 15
+    material_flow_count_each_year: 50
+    min_exposure_p90_p10_logpp: 3.0
+    max_top_destination_exposure_share: 0.35
+    expected_key_destinations: 25
+    roster_sha256: ae7e1a1cf15e1521f2c6557db743183fec73a032160db2e00cba2b388e33178b
+    wdi_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    eurostat_sha256: b0b178278dd7d1ef68d4a03188e496b580d3e30b61f9fa21c7db13ed547bfeb1
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.2
+disclosure: Observational destination growth proxy; citizenship does not denote prior
+  residence. Small flows, heterogeneous reporting, shared destinations and historical
+  shocks limit inference. No policy, causal, school or featured credit.
+steelman: hypotheses/steelman/wdi_growth_eurostat_immigration_citizenship_ru_forward_2026.md
+scope:
+  period:
+  - 2013
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - demographics_migration
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
