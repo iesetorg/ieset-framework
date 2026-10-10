@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: korea_eu_fta_eu5_baci_exports_2011_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: >-
+  After provisional application of the EU–Republic of Korea FTA on 1 July
+  2011, Korean-origin merchandise exports to five fixed EU destination
+  countries grew at least 15 percent more in log terms from the four fixed
+  pre years to four fixed post years than the median change among eight fixed
+  Asian origin comparators to the same destinations, conditional on an aligned
+  pretrend. This is a descriptive flow comparison, not a causal treaty effect.
+evidence_type: descriptive
+methodology_note: >-
+  This is a distinct Korea–EU treaty and directed-flow endpoint. The older
+  KOR–USA country-level and bilateral-flow cards and other CEPII treaty
+  screens are known, overlapping research context, not prior evidence for
+  this treaty or independent replication. The design and source keys were
+  fixed before any selected BACI flow magnitude was read. The outcome is
+  nominal goods trade and the source's annual FTA indicator first turns on
+  in 2012, the first full year after July 2011 provisional application.
+sample:
+  countries: [KOR, DEU, FRA, ITA, ESP, NLD, JPN, TWN, CHN, MYS, THA, IDN, VNM, IND]
+  period: [2007, 2015]
+  temporal_structure: panel
+  exclusion_rules:
+  - Only directed flows from KOR and the eight fixed donor origins JPN, TWN, CHN, MYS, THA, IDN, VNM, IND to DEU, FRA, ITA, ESP, NLD.
+  - Require the full 405-row origin-destination-year grid for 2007–2015; no reverse direction, destination or donor substitution, interpolation, winsorisation, or endpoint changes.
+  - Pre years are 2007–2010; post years 2012–2015; 2011 is required for source completeness but omitted from the means.
+  - Require one existing-country source row and a finite nonnegative BACI value per fixed cell. All donor dyad FTA flags must remain zero; every KOR dyad is zero through 2011 and one from 2012.
+variables:
+  outcome:
+  - name: korean_nominal_goods_exports_to_fixed_eu5
+    source: cepii:Gravity_V202211.tradeflow_baci
+    transformation: For each origin-year, sum directed flow in thousands of current US dollars across DEU, FRA, ITA, ESP, NLD, then take natural log of one plus that sum.
+    notes: Direct BACI merchandise value; no real-volume, tariff-intensity, welfare, or causal interpretation.
+  treatment:
+  - name: eu_korea_fta_annual_agreement_status
+    source: cepii:Gravity_V202211.fta_wto
+    transformation: KOR to each EU5 destination 0 in 2007–2011 and 1 in 2012–2015; donor dyads 0 throughout.
+    notes: Annual agreement-status cross-check; legal provisional application began 1 July 2011.
+intervention_channel: regulatory
+intervention_channel_justification: The treaty changes a bilateral trade-policy regime; the measured endpoint is directed goods flow.
+estimator:
+  template: descriptive
+  event_year: 2011
+  clustering: none
+  notes: >-
+    For each origin, calculate the mean log1p(EU5-summed flow) in 2012–2015
+    less its mean in 2007–2010. Subtract the median of the eight fixed donor
+    changes from KOR's change. Before this contrast, require absolute KOR
+    minus median-donor OLS pretrend slope gap at most 0.03 log units/year.
+    There is no p-value or causal identification.
+falsification:
+  test: korea_eu_fta_eu5_baci_fixed_grid_prepost
+  rule: >-
+    First require the byte-pinned CEPII source, unchanged first-addition
+    registration, and separate committed source slice. Missing or duplicate
+    key, failed existence/FTA-status/finite-nonnegative-flow gate, or pretrend
+    slope gap above 0.03 yields INCONCLUSIVE. With all gates passed, SUPPORTED
+    requires KOR minus median donor log change >= ln(1.15); REFUTED requires
+    <= -ln(1.15); otherwise PARTIAL. This is one treaty-level exploratory
+    descriptive test with zero causal, featured, school, or policy-score credit.
+  threshold: absolute pretrend slope gap <=0.03 log units/year; contrast thresholds +/-ln(1.15); one treaty-level test
+prior_confidence: 0.5
+disclosure: >-
+  Multiple other FTA cases in this corpus have already been screened, and
+  the overlapping KOR–USA treaty timing and 2008 crisis can influence this
+  result. This candidate was chosen from a policy gap using metadata-only
+  feasibility, so any passing result is exploratory descriptive calibration
+  rather than independent replication or treaty causation. Currency changes,
+  sector mix, Korean domestic reforms, destination demand, and other trade
+  agreements remain uncontrolled. A failed gate will not be relaxed.
+scope:
+  period: [2007, 2015]
+  countries: [KOR, DEU, FRA, ITA, ESP, NLD]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [korea_eu_fta_2011_v2]
+steelman: hypotheses/steelman/korea_eu_fta_eu5_baci_exports_2011_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Policy record kr_eu_fta_provisional_application_2011; source and custody contract engine/audits/korea_eu_fta_eu5_baci_2026_source_plan.md.'
