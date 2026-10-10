@@ -1,0 +1,5 @@
+# Pre-value source-custody correction
+
+The frozen preregistration incorrectly states that all four raw vintages were present only in the read-only main checkout at registration. The fertility file `data/vintages/world_bank_wdi/SP.DYN.TFRT.IN@2026-04-30T130516Z.parquet` was **already tracked** at the registration commit `bcc016a2c40fdbedc55da1a5afba2b9d005c76f1`. Git history shows it first entered in `3b5ae40d3554ea4d61835c35efb174229263c2e0`; the source-lock commit `690d87ad54e44ebca4cdb895062cdd06b77ee3fd` added the other three raw files and the lock manifest. The runner's frozen custody check already distinguishes earlier tracked sources from newly pinned sources, compares the fertility bytes at registration, requires no subsequent edits, and verifies SHA-256 `ff1eb90d4033e42ca63bb0de72c27f21044e55b69e44568d65321dd81cd8cfd1`.
+
+This correction changes no source, roster, year, estimator, gate, multiplicity denominator or verdict rule. It was recorded **before** the selected value fields or null masks were opened. No result artifact had yet been generated.
