@@ -1,0 +1,7 @@
+# Steelman: import-weighted tariff declines and later goods HICP
+
+A reduction in applied merchandise tariffs can lower the landed cost of imported consumer goods and imported inputs. In principle, competition can pass some savings to clothing, footwear, household textiles, appliances, vehicles and electronic equipment. A negative association between three-year tariff declines and next-year annual-average HICP inflation across multiple disjoint goods groups would be consistent with that channel.
+
+The observed WITS rate is **all-merchandise import weighted**, not a tariff for any selected COICOP group. National import shares may change even when statutory rates do not. Euro-area members often share tariff policy. The HICP groups contain domestic output and retail margins, and their actual import content is unmeasured. VAT, exchange rates, commodity prices, demand, EU accession, measurement changes and monetary responses can dominate the relation. Annual average inflation may register price changes before the chosen next-year window. Group results share shocks and count as one descriptive omnibus, never six independent confirmations or a causal estimate.
+
+A complete, frozen null or opposite result is informative as calibration. It does not automatically falsify a tariff policy claim, because the exposure and timing are imperfect. No policy, causal, school or featured score is assigned.
