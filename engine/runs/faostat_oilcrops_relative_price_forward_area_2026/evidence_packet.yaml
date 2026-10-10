@@ -1,0 +1,107 @@
+packet_version: 1
+generated_utc: '2026-10-10T12:23:03+00:00'
+hypothesis:
+  id: faostat_oilcrops_relative_price_forward_area_2026
+  path: hypotheses/growth/faostat_oilcrops_relative_price_forward_area_2026.yaml
+  topic: growth
+preregistration:
+  spec_commit: aabcd76a57da07d02aeb95fd8c02b5a3dad0ce25
+  source_lock_commit: 5d3acb1db8bf38fc12f2028af00cfe811e00d9dc
+  family_id: faostat_relative_price_crop_supply_family_2026_10_10
+  family_size: 8
+  key_roster: data/pinned_evidence/faostat_relative_price_crop_supply_2026_key_roster.csv
+  key_roster_sha256: 8cc8933d4c40092016b25358c25609311681b1eab589c4d77ece1cc6979a0b18
+  steelman: hypotheses/steelman/faostat_oilcrops_relative_price_forward_area_2026.md
+reproduction:
+  runner: scripts/run_faostat_relative_price_supply_2026.py
+  run_dir: engine/runs/faostat_oilcrops_relative_price_forward_area_2026
+  command: python3 scripts/run_faostat_relative_price_supply_2026.py --source-root
+    <local raw cache> --verify
+verdict:
+  raw: SUPPORTED
+  bucket: supported
+  reason: positive magnitude and eight-test multiplicity gates pass
+data:
+  inputs:
+    price_archive:
+      path: data/vintages/faostat/prices@2026-05-02T212150Z.zip
+      sha256: 0eaff92014d4af5fc2f477dbd436a792bfed1a408645e9ed18d8e45ab14fdc6b
+    price_panel:
+      path: data/vintages/faostat/faostat_prices_main@2026-05-02T212150Z.parquet
+      sha256: c59917daee0645066ee5730cf24b9d8058900c81d8510f3892cb7819d1e5a05c
+    crop_archive:
+      path: data/vintages/faostat/Production_Crops_Livestock_E_All_Data_(Normalized)@2026-05-02T211649Z.zip
+      sha256: c5835418c18f9322e7decbd6800f93a216eaae3cdfa31acb08f0518c0c6d6853
+    crop_panel:
+      path: data/vintages/faostat/faostat_prod_All_Data_(Normalized)@2026-05-02T212007Z.parquet
+      sha256: 02d93061467ca6e9a6cc738ba72702271d26abbaa21480c51d04d29b1017734a
+    crop_flag_legend:
+      path: data/vintages/faostat/faostat_prod_Flags@2026-05-02T212007Z.parquet
+      sha256: c9c44507c716b6fe7bd22d68febe1752c3cb4d08c11d62e2311092a8bacc2a6d
+  sample:
+    key_rows: 4237
+    key_countries: 151
+    complete_rows_before_country_floor: 3931
+    valid_rows: 3929
+    valid_countries: 150
+    material_exposure_rows: 2390
+    material_exposure_countries: 149
+    dropped:
+      outcome_growth_bound: 214
+      price_growth_bound: 86
+      price_value_or_flag: 1
+      outcome_value_flag_or_unit: 5
+    admitted_flag_counts_before_country_floor:
+      group_price_t_minus_1:E: 3931
+      group_price_t:E: 3931
+      agriculture_price_t_minus_1:E: 3931
+      agriculture_price_t:E: 3931
+      outcome_t_minus_1:E: 3931
+      outcome_t:E: 3931
+      outcome_t_plus_1:E: 3931
+    selected_values_read_after_committed_source_lock: true
+    top_country_residualized_exposure_share: 0.020746168041524186
+results:
+  primary:
+    coefficient: 0.08717437161742649
+    std_error: 0.020548750533265218
+    p_value_two_sided: 3.869660509181716e-05
+    confidence_level: 0.99875
+    confidence_interval:
+    - 0.0195665063865217
+    - 0.15478223684833126
+    n_rows: 3929
+    n_countries: 150
+    df_inference: 149
+    model_rank: 183
+    top_country_residualized_exposure_share: 0.020746168041524186
+    method: country/year FE OLS plus prior outcome growth; country-cluster CR1; Student
+      t(G-1)
+limitations:
+- The predictor is a relative producer-price change, not a randomized price incentive
+  or policy treatment.
+- Harvests can change prices and farmers may anticipate shocks; a one-year lead does
+  not identify a causal response.
+- FAOSTAT's crop-group indices and aggregate yields can change when the crop mix changes;
+  harvested area may count multiple harvests of a parcel.
+- Official, estimated, and external-organization observations are admitted and reported
+  separately; imputed and break flags are excluded.
+- Country/year effects and prior outcome growth do not remove weather, trade, input-cost,
+  exchange-rate, or subsidy confounding.
+- Eight correlated tests use one Bonferroni family; this does not adjust the wider
+  IESET archive search and they are not independent replications.
+- Raw FAOSTAT archives and derived parquets are hash-pinned in a local source cache,
+  not copied into Git; the derived-parquet transformation lacks a tracked fetch manifest.
+- No causal, policy, school, position, or featured credit is assigned.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: faostat_relative_price_crop_supply_family_2026_10_10
+  family_size: 8
+  family_alpha: 0.01
+  bonferroni_p_max: 0.00125
+  causal_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  featured_eligible: false
