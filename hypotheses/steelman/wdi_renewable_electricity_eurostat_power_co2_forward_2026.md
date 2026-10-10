@@ -1,0 +1,7 @@
+# Renewable electricity and forward power/heat CO2: strongest case and limits
+
+More renewable generation can displace fuel combustion in public power plants. The WDI share counts generation from hydropower, wind, solar, biomass, geothermal, and ocean energy as a portion of total electricity output. A country whose renewable share rises may therefore emit less CO2 from public electricity and heat production in the following year. This is a plausible physical channel, and the specified outcome is much closer to it than total national emissions.
+
+The strongest objection is that a share can rise because electricity output falls or hydro conditions change. Nuclear generation, electricity imports and exports, fuel switching, heat production, weather, ETS incentives, and demand can move emissions without a renewable-share change. WDI's IEA-origin series and the EEA inventory may be revised on different schedules. The pinned WDI status is blank and the selected Eurostat Parquet retains no inventory observation flags, so the study cannot screen individual source breaks. The exact t−1 to t exposure preceding the t to t+1 outcome does not remove common trends or anticipation.
+
+The registered country and year fixed effects, treatment-change cap, material-variation floor, residual-concentration gate, and pre-2019 disruption diagnostic make the association reviewable. A directional result still has zero policy, causal, school-score, and featured credit. It cannot show that any specific renewable mandate, subsidy, plant, or grid rule reduced emissions.
