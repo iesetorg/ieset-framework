@@ -9,8 +9,8 @@ const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 const ts = require("typescript");
 
-// Render the shipped TSX with fixture data, without a Next build or repository
-// reads. This exercises the candidate and tested branches, including JSON-LD.
+// Render the shipped TSX with fixture data, without a Next build or content
+// loader. This exercises the candidate and tested branches, including JSON-LD.
 function loadTsx(path: string, mocks: Record<string, unknown>) {
   const source = readFileSync(new URL(path, import.meta.url), "utf8");
   const compiled = ts.transpileModule(source, {
@@ -23,6 +23,9 @@ function loadTsx(path: string, mocks: Record<string, unknown>) {
 }
 
 const banner = loadTsx("../components/cards/ResultBanner.tsx", {
+  "@/lib/verdict": verdict,
+});
+const brief = loadTsx("../components/cards/PolicyBriefCard.tsx", {
   "@/lib/verdict": verdict,
 });
 let fixture: { hypothesis: Record<string, any>; run: Record<string, any> };
@@ -53,7 +56,7 @@ const page = loadTsx("../app/h/[id]/page.tsx", {
   "@/components/cards/SteelmanBlock": { SteelmanBlock: emptyComponent },
   "@/components/cards/CiteBlock": { CiteBlock: emptyComponent },
   "@/components/cards/ResultBanner": banner,
-  "@/components/cards/PolicyBriefCard": { PolicyBriefCard: emptyComponent },
+  "@/components/cards/PolicyBriefCard": brief,
   "@/components/charts/HypothesisChart": {
     HypothesisChart: () => React.createElement("svg", { "data-result-chart": "true" }),
   },
@@ -101,9 +104,42 @@ describe("hypothesis evidence standing before a run", () => {
     const { html, metadata, seo } = await renderFixture();
     assert.match(html, /SUPPORTED/);
     assert.match(html, /data-result-chart="true"/);
+    assert.match(html, /what was measured/);
+    assert.match(html, /What we checked/);
     assert.match(metadata.abstract, /strictly preceded its first run in git/);
     assert.equal(metadata.additionalProperty.find((p: any) => p.name === "Estimator floor").value, "pass");
     assert.doesNotMatch(html, /No empirical run is available/);
     assert.equal(seo.robots.index, true);
+  });
+
+  it("renders the pending bracket-creep claim and planned inputs without an unrelated institutional summary", async () => {
+    const candidate = require("js-yaml").load(readFileSync(new URL(
+      "../../hypotheses/fiscal/aus_albanese_budget_repair_bracket_creep_2026_2037.yaml", import.meta.url
+    ), "utf8"));
+    fixture = { hypothesis: hypothesis(candidate), run: { exists: false } };
+    const { html } = await renderFixture();
+    const variables = Object.entries(candidate.variables).flatMap(([role, entries]) =>
+      (entries as Record<string, unknown>[]).map((entry) => ({
+        ...entry, role: role === "decomposition_channels" ? "channel" : role,
+      }))
+    );
+    const briefHtml = renderToStaticMarkup(React.createElement(brief.PolicyBriefCard, {
+      hypothesis: fixture.hypothesis, run: fixture.run, variables,
+    }));
+    const claimMarkup = renderToStaticMarkup(React.createElement("p", null,
+      candidate.claim.replace(/\s+/g, " ").trim()
+    )).slice(3, -4);
+
+    assert.ok(briefHtml.includes(claimMarkup), "pending brief preserves the actual conditional projection claim");
+    for (const output of [html, briefHtml]) {
+      assert.match(output, /Proposed claim/);
+      assert.match(output, /planned measurements/);
+      assert.match(output, /Proposed exposure or scenario/);
+      assert.match(output, /Planned outcomes/);
+      assert.match(output, /Baseline primary UCB pct GDP/);
+      assert.match(output, /No empirical run or verdict is available/);
+      assert.match(output, /plan, not a completed analysis/);
+      assert.doesNotMatch(output, /market-oriented institutions|what was measured|What we checked|What changed|question has been registered|It compares 1 country|primary ucb pct income|It narrows the claim/i);
+    }
   });
 });

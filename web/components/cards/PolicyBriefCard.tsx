@@ -82,7 +82,7 @@ function confidenceLabel(run: RunArtifacts): string {
 
 function plainAnswer(run: RunArtifacts): string {
   if (!run.exists) {
-    return "This question has been registered, but the data test has not run yet.";
+    return "This is an untested research specification. No empirical run or verdict is available.";
   }
   const verdict = run.verdict ?? "Result available.";
   const bucket = verdictBucket(run);
@@ -157,9 +157,16 @@ function plainQuestion(hypothesis: Hypothesis, variables: VariableWithRole[]): s
   return `In plain terms, this asks whether the policy story survives a real-world data check${periodText}.`;
 }
 
-function plainMethod(hypothesis: Hypothesis): string {
+function plainMethod(hypothesis: Hypothesis, planned = false): string {
   const sample = hypothesis.sample;
   const estimator = hypothesis.estimator?.template;
+  if (planned) {
+    const scope = sample
+      ? ` covers ${sample.countries.join(", ")} from ${sample.period[0]} to ${sample.period[1]}`
+      : " describes the intended sample and measures";
+    const design = estimator ? `, using a ${humanize(estimator)} design` : "";
+    return `The proposed specification${scope}${design}. This describes a plan, not a completed analysis.`;
+  }
   const parts = [];
   if (sample) {
     parts.push(
@@ -192,27 +199,30 @@ function whyItMatters(hypothesis: Hypothesis): string {
   return `This matters because ${topic || "policy"} claims should change belief only when they survive a pre-declared empirical test.`;
 }
 
-function measureGroups(variables: VariableWithRole[]): Array<{ title: string; items: string[] }> {
-  const outcomes = variables.filter((v) => v.role === "outcome").slice(0, 3).map((v) => friendlyName(v.name));
-  const treatments = variables.filter((v) => v.role === "treatment").slice(0, 2).map((v) => friendlyName(v.name));
-  const channels = variables.filter((v) => v.role === "channel").slice(0, 2).map((v) => friendlyName(v.name));
+function measureGroups(variables: VariableWithRole[], planned = false): Array<{ title: string; items: string[] }> {
+  const displayName = (variable: VariableWithRole) => planned
+    ? humanize(variable.name).replace(/\b(?:gdp|ucb|wpi|cpi|ato)\b/gi, (word) => word.toUpperCase())
+    : friendlyName(variable.name);
+  const outcomes = variables.filter((v) => v.role === "outcome").slice(0, 3).map(displayName);
+  const treatments = variables.filter((v) => v.role === "treatment").slice(0, 2).map(displayName);
+  const channels = variables.filter((v) => v.role === "channel").slice(0, 2).map(displayName);
 
   const groups = [];
   if (treatments.length) {
     groups.push({
-      title: "What changed",
+      title: planned ? "Proposed exposure or scenario" : "What changed",
       items: treatments,
     });
   }
   if (channels.length) {
     groups.push({
-      title: "Possible pathway",
+      title: planned ? "Proposed pathways" : "Possible pathway",
       items: channels,
     });
   }
   if (outcomes.length) {
     groups.push({
-      title: "What we checked",
+      title: planned ? "Planned outcomes" : "What we checked",
       items: outcomes,
     });
   }
@@ -237,8 +247,11 @@ export function PolicyBriefCard({
   run: RunArtifacts;
   variables: VariableWithRole[];
 }) {
-  const question = plainQuestion(hypothesis, variables);
-  const measured = measureGroups(variables);
+  const planned = !run.exists;
+  const question = planned
+    ? hypothesis.claim.replace(/\s+/g, " ").trim()
+    : plainQuestion(hypothesis, variables);
+  const measured = measureGroups(variables, planned);
   const confidence = confidenceLabel(run);
 
   return (
@@ -251,7 +264,7 @@ export function PolicyBriefCard({
           </span>
         </div>
         <h2 className="m-0 max-w-[900px] text-[22px] font-semibold leading-[1.25] text-ink">
-          In ordinary language
+          {planned ? "Proposed claim" : "In ordinary language"}
         </h2>
         <p className="mb-0 mt-2 max-w-[860px] text-[16px] leading-[1.55] text-ink">
           {question}
@@ -261,22 +274,26 @@ export function PolicyBriefCard({
       <div className="grid gap-0 md:grid-cols-[1.15fr_0.85fr]">
         <div className="border-b border-rule p-5 md:border-b-0 md:border-r">
           <div className="mb-5">
-            <div className="sc mb-1.5 text-[10px] font-semibold text-muted">plain answer</div>
+            <div className="sc mb-1.5 text-[10px] font-semibold text-muted">{planned ? "current status" : "plain answer"}</div>
             <p className="m-0 text-[15px] leading-[1.65] text-ink">{plainAnswer(run)}</p>
           </div>
           <div className="mb-5">
             <div className="sc mb-1.5 text-[10px] font-semibold text-muted">why it matters</div>
-            <p className="m-0 text-[14px] leading-[1.6] text-muted">{whyItMatters(hypothesis)}</p>
+            <p className="m-0 text-[14px] leading-[1.6] text-muted">
+              {planned
+                ? "This proposed claim must be tested against its stated evidence and falsification rules before it can support a policy conclusion."
+                : whyItMatters(hypothesis)}
+            </p>
           </div>
           <div>
-            <div className="sc mb-1.5 text-[10px] font-semibold text-muted">how the test works</div>
-            <p className="m-0 text-[14px] leading-[1.6] text-muted">{plainMethod(hypothesis)}</p>
+            <div className="sc mb-1.5 text-[10px] font-semibold text-muted">{planned ? "proposed design" : "how the test works"}</div>
+            <p className="m-0 text-[14px] leading-[1.6] text-muted">{plainMethod(hypothesis, planned)}</p>
           </div>
         </div>
 
         <div className="p-5">
           <div className="mb-5">
-            <div className="sc mb-2 text-[10px] font-semibold text-muted">what was measured</div>
+            <div className="sc mb-2 text-[10px] font-semibold text-muted">{planned ? "planned measurements" : "what was measured"}</div>
             {measured.length > 0 ? (
               <div className="space-y-3">
                 {measured.map((group) => (
@@ -293,15 +310,17 @@ export function PolicyBriefCard({
                 ))}
               </div>
             ) : (
-              <p className="m-0 text-[13px] text-muted">The run artifacts define the measured variables.</p>
+              <p className="m-0 text-[13px] text-muted">
+                {planned ? "The specification must define the planned variables before a test can run." : "The run artifacts define the measured variables."}
+              </p>
             )}
           </div>
           <div className="mb-5">
             <div className="sc mb-1.5 text-[10px] font-semibold text-muted">what this does not prove</div>
             <p className="m-0 text-[13px] leading-[1.55] text-muted">
-              A single test is not the whole truth. It narrows the claim under a specific sample,
-              time period, and method. Strong policy conclusions need the pattern to survive nearby
-              tests, alternative data, and serious objections.
+              {planned
+                ? "A proposed specification is not evidence for or against the claim. A completed analysis must satisfy the declared data, method and assessment gates."
+                : "A single test is not the whole truth. It narrows the claim under a specific sample, time period, and method. Strong policy conclusions need the pattern to survive nearby tests, alternative data, and serious objections."}
             </p>
           </div>
           <div>
