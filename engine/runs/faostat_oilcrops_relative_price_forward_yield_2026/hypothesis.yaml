@@ -1,0 +1,261 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: faostat_oilcrops_relative_price_forward_yield_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: In the frozen 1992–2023 country-year source-key roster, stronger annual growth
+  in the oilcrops, oil equivalent producer-price index relative to the agriculture
+  producer-price index from t-1 to t predicts higher oilcrops, oil equivalent yield
+  growth from t to t+1, after prior outcome growth and country/year effects.
+methodology_note: Prospective eight-cell FAOSTAT descriptive family. Only schemas,
+  codebooks, source hashes and item/country/year keys were read before registration.
+  Price and crop measurements, flags and null masks remain unopened until the separate
+  source lock is committed. Four food-crop groups cross two distinct supply margins;
+  the eight cells overlap and are not independent replications.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AFG
+  - AGO
+  - ALB
+  - ARG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COG
+  - COK
+  - COL
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNQ
+  - GRC
+  - GRD
+  - HND
+  - HRV
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LCA
+  - LKA
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MOZ
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NCL
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - POL
+  - PRI
+  - PRT
+  - PRY
+  - PSE
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLV
+  - SRB
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UKR
+  - URY
+  - USA
+  - VCT
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 1991
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only fixed key-roster treatment years, exact t-1/t producer price indices
+    and exact t-1/t/t+1 crop outcome; no interpolation or nearest-year join.
+  - Map FAOSTAT M49 country keys to current ISO3 with pycountry; exclude non-ISO3
+    aggregates.
+  - Admit finite positive index/outcome values with A, E or X flags; exclude I, B,
+    M, blank and unknown flags, and report admitted flag counts.
+  - Exclude absolute log relative-price growth or either outcome growth above 0.50.
+    Keep countries with at least five complete treatment years.
+  - Do not change codes, years, flags, transformations, sample floors, multiplicity,
+    estimator or gate thresholds after selected measurements are opened.
+variables:
+  outcome:
+  - name: forward_yield_log_growth
+    source: faostat:crop_and_livestock_products
+    transformation: log(yield at t+1) minus log(yield at t), exact item 1732, element
+      5412, unit kg/ha
+    notes: Aggregate group outcome; yield can change with crop composition.
+  treatment:
+  - name: relative_crop_producer_price_log_growth
+    source: faostat:producer_prices
+    transformation: '[log(index item 1732/agriculture index item 2051) at t] minus
+      same at t-1; element 5539, annual 7021'
+    notes: Relative nominal farm-gate price index; not an exogenous price shock.
+  controls:
+  - name: prior_outcome_log_growth
+    source: faostat:crop_and_livestock_products
+    transformation: log(outcome at t) minus log(outcome at t-1)
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS of next-year log outcome growth on current relative-price log growth
+    and prior outcome log growth, with country and treatment-year effects. Country-cluster
+    CR1 uncertainty, two-sided Student t(G-1), full-rank and residualized-exposure
+    concentration gates.
+falsification:
+  test: faostat_relative_price_crop_supply_family_2026_10_10_oilcrops_yield
+  rule: INCONCLUSIVE if any committed-source, sample (500/30), material-exposure (100/20),
+    five-year-country, rank, concentration or finite-cluster-uncertainty gate fails.
+    SUPPORTED iff beta >= +0.05 and two-sided p <= 0.01/8. REFUTED iff beta <= -0.05
+    and the same cutoff. Otherwise PARTIAL if estimable. All eight cells remain in
+    the family denominator.
+  threshold:
+    family_id: faostat_relative_price_crop_supply_family_2026_10_10
+    family_size: 8
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00125
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.05
+    meaningful_beta_unit: log growth per log relative-price change
+    min_complete_rows: 500
+    min_complete_countries: 30
+    min_material_rows: 100
+    min_material_countries: 20
+    material_abs_relative_price_log_change: 0.05
+    max_abs_price_and_outcome_log_change: 0.5
+    min_complete_years_per_country: 5
+    max_top_country_residualized_exposure_share: 0.2
+    roster_sha256: 8cc8933d4c40092016b25358c25609311681b1eab589c4d77ece1cc6979a0b18
+    source_lock_path: data/pinned_evidence/faostat_relative_price_crop_supply_2026.manifest.json
+    causal_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: Predictive, descriptive calibration only. Prices can respond to harvest
+  shocks and common drivers; country/year effects and prior growth do not identify
+  a causal farm response. No causal, policy, school, position or featured credit.
+steelman: hypotheses/steelman/faostat_oilcrops_relative_price_forward_yield_2026.md
+scope:
+  period:
+  - 1991
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - productivity
+  policy_family: []
+  treatment_tags:
+  - oilcrops
+  - farm_supply
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
