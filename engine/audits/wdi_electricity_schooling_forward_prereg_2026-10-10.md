@@ -37,8 +37,8 @@ National electricity access is an estimated population share, not school electri
 ## Required chronology
 
 1. Commit this plan, runner, 216-key roster, five YAMLs and five steelmen together, with no source slice, lock, or results.
-2. Run `--lock --source-root <LOCAL_HOME>/IESET` only after that commit; commit the source slice and narrow lock in a second descendant commit. This lock contains no estimate.
+2. Run `--lock --source-root <local-source-checkout>` only after that commit; commit the source slice and narrow lock in a second descendant commit. This lock contains no estimate.
 3. Run `--run` only after the lock commit; retain all five outcomes including failed gates in a third result commit.
-4. Run `--verify-source --source-root <LOCAL_HOME>/IESET` and `--verify` for byte-identical source extraction and exact result replay. Refresh shared indexes only after integration.
+4. Run `--verify-source --source-root <local-source-checkout>` and `--verify` for byte-identical source extraction and exact result replay. Refresh shared indexes only after integration.
 
 Official indicator definitions: [electricity access](https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS), [primary completion](https://data.worldbank.org/indicator/SE.PRM.CMPT.ZS), [secondary net enrolment](https://data.worldbank.org/indicator/SE.SEC.NENR), [tertiary enrolment](https://data.worldbank.org/indicator/SE.TER.ENRR), [adult literacy](https://data.worldbank.org/indicator/SE.ADT.LITR.ZS), [upper-secondary attainment](https://data.worldbank.org/indicator/SE.SEC.CUAT.UP.ZS).
