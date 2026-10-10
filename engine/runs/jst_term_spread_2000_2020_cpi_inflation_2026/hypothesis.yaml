@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_term_spread_2000_2020_cpi_inflation_2026
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: +
+claim: Within the 18 advanced economies in JST R6 during 2000–2020, a higher long-minus-short nominal
+  interest-rate spread at four fixed anchors predicts higher annualized consumer-price inflation over
+  the next fixed five-year interval after country and anchor effects. This is a descriptive
+  predictive association, not a monetary-policy effect.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 2000
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only anchors [2000, 2005, 2010, 2015] and their t+5 endpoints for the 18 named countries. Require
+    the complete 270-key family roster in the exact JST R6 source; no replacements, interpolation, or
+    alternate vintage.
+  - For this cell, require finite JST stir and ltrate at anchor t and finite cpi at t and t+5. Both
+    CPI endpoints must be strictly positive. Remove invalid country-anchors without replacement; other
+    outcome fields do not determine this cell sample.
+  - Retain only countries with at least three of four complete anchors. Require 12 countries, 48 country-anchors,
+    and 10 countries at each anchor after this rule. No trimming, winsorization, or data-dependent era
+    changes.
+variables:
+  treatment:
+  - name: long_minus_short_nominal_rate_pp
+    source: jst:R6.ltrate_stir
+    transformation: ltrate[t]-stir[t]
+    notes: Both source fields are nominal percent per year; this is an observed yield-curve spread,
+      not an instrument or intervention.
+  outcome:
+  - name: cpi_inflation
+    source: jst:R6.cpi
+    transformation: 20*log(cpi[t+5]/cpi[t])
+    notes: The fixed t to t+5 interval gives annualized log percentage points; this is one of four distinct
+      outcome variables.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor
+  clustering: country
+  notes: OLS of the fixed five-year outcome on the anchor-year term spread with country and anchor intercepts.
+    Use CR1 finite-sample country-cluster standard error and a two-sided t test with G-1 degrees of
+    freedom. Report all leave-one-country-out slopes. No controls, weights, alternative anchors, horizons,
+    exclusions, or model selection. Fixed twelve-test Holm adjustment includes gate-failed cells as
+    p=1.
+falsification:
+  test: jst_term_spread_2000_2020_cpi_inflation_frozen_family
+  rule: First require unchanged first-commit registration valid against its own committed schema, then
+    12 later separately committed metadata-only source locks and the exact source/key roster. INCONCLUSIVE
+    if a cell fails any frozen completeness, rank, finite variance, within-effect spread SD >=0.5 pp,
+    within-effect outcome SD >=0.1 pp, maximum country share of spread sum of squares <=25%, or leave-one-country-out
+    fit gate. Once valid, SUPPORTED requires a slope in the predicted direction of at least 0.25 outcome
+    pp per one pp spread, Holm-adjusted two-sided p<=0.05 across all 12 cells, and every country-deletion
+    slope in the predicted direction. REFUTED requires the same magnitude and Holm threshold in the
+    opposite direction and all deletion slopes opposite. Otherwise PARTIAL. This family grants no causal,
+    policy, school, position, or featured credit.
+  threshold:
+    family_id: jst_term_spread_future_macro_four_outcomes_three_eras_2026_10_10
+    family_size: 12
+    holm_alpha: 0.05
+    minimum_abs_beta_outcome_pp_per_spread_pp: 0.25
+    minimum_countries: 12
+    minimum_country_anchors: 48
+    minimum_anchors_per_country: 3
+    minimum_countries_per_anchor: 10
+    minimum_residual_spread_sd_pp: 0.5
+    minimum_residual_outcome_sd_pp: 0.1
+    maximum_country_spread_ss_share: 0.25
+    era: '2000_2020'
+    anchors:
+    - 2000
+    - 2005
+    - 2010
+    - 2015
+    outcome: cpi_inflation
+    predicted_sign: 1
+prior_confidence: 0.35
+disclosure: Yield-curve slopes combine expected rates, expected inflation, and term/risk premia. Country
+  and anchor effects cannot remove country-specific shocks. The source covers advanced economies only,
+  and adjacent intervals share endpoints. The four outcome variables and three eras are correlated within
+  one source, so twelve records are one substantive family, not independent replications. Prior term-spread
+  literature makes the sign plausible but does not establish this exact five-year historical specification.
+methodology_note: Prospective source custody, exact roster, all twelve cells, Holm denominator, gates,
+  and replay are frozen in engine/audits/jst_term_spread_macro_source_plan_2026.md. No selected JST
+  measurement or null mask was opened before registration.
+scope:
+  period:
+  - 2000
+  - 2020
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  outcome_dim:
+  - inflation
+  policy_family:
+  - none
+  treatment_tags:
+  - historical_term_spread
+steelman: hypotheses/steelman/jst_term_spread_2000_2020_cpi_inflation_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: One fixed descriptive cell of a twelve-test, three-era family; do not count the cells as independent
+  replications.
