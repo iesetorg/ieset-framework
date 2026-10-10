@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_mortgage_share_1975_1995_crisis_onset_2026
+version: 1
+status: pre_registered
+topic: regulatory
+claim_direction: +
+claim: Within the fixed 18 advanced JST R6 economies during 1975–1995, a larger mortgage-loan share of
+  all private loans at four fixed anchors predicts higher incident systemic financial crisis over the
+  next five years after country and anchor effects. This is a descriptive predictive association, not
+  a causal mortgage-lending or policy effect.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 1975
+  - 1995
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only anchors [1975, 1980, 1985, 1990] and fixed t through t+5 windows in the 18 named countries.
+    Require all 1512 family source keys in exact JST R6; no replacement years, countries, or vintage.
+  - At t require finite JST tmort and positive finite tloans; mortgage share=100*tmort[t]/tloans[t] must
+    be in [0,100]. Require five incident-year crisisJST codes all exactly 0 or 1; define onset from t+1
+    through t+5 inclusive. Remove invalid country-anchors without replacement; other outcome fields do
+    not determine this cell sample.
+  - Retain only countries with at least three of four complete anchors. Require 12 countries, 48 country-anchors,
+    and 10 countries at each anchor. Crisis onset additionally requires six incident and twenty nonincident
+    intervals. No trimming, winsorization, imputation, or data-dependent era changes.
+variables:
+  treatment:
+  - name: mortgage_share_private_loans_pp
+    source: jst:R6.tmort_tloans
+    transformation: 100*tmort[t]/tloans[t]
+    notes: Observed mortgage share of private-sector lending at the anchor, in percentage points; not
+      an intervention. Both nominal fields use local currency.
+  outcome:
+  - name: crisis_onset
+    source: jst:R6.crisisjst
+    transformation: 100*I(any crisisjst[t+1:t+5]==1)
+    notes: The fixed future five-year response is measured in percentage-point onset probability. Crisis
+      is first-year onset; the house-price series is CPI-deflated.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor
+  clustering: country
+  notes: Estimate one OLS slope for the specified five-year response on anchor-year mortgage-share percentage
+    points with country and anchor intercepts. Crisis onset uses an explicitly labeled linear probability
+    model in percentage-point units. Use CR1 finite-sample country-cluster standard error and two-sided
+    t(G-1). Report every country-deletion slope. No controls, weights, alternative anchors, horizons,
+    sample selection, or model choice. Fixed eight-test Holm adjustment includes gated cells as p=1.
+falsification:
+  test: jst_mortgage_share_1975_1995_crisis_onset_frozen_family
+  rule: Require unchanged first-commit registration valid against its own schema, then eight later separately
+    committed metadata-only source locks and the exact source/key roster. INCONCLUSIVE if this cell fails
+    completeness, rank, finite variance, residualized mortgage-share SD >=1.0 pp, residualized outcome
+    SD >=0.1 pp, maximum country share of residualized mortgage exposure sum of squares <=25%, or any
+    country-deletion fit. Crisis onset also needs six event and twenty nonevent intervals. Once valid,
+    SUPPORTED requires a slope in the predicted direction of at least 0.25 outcome pp per one pp mortgage
+    share, Holm-adjusted two-sided p<=0.05 over all eight cells, and every country-deletion slope in the
+    predicted direction. REFUTED uses equal magnitude and Holm threshold in the opposite direction and
+    all deletion slopes opposite. Other valid cells are PARTIAL. No causal, policy, school, position,
+    or featured credit.
+  threshold:
+    family_id: jst_mortgage_share_future_housing_crisis_four_eras_2026_10_10
+    family_size: 8
+    holm_alpha: 0.05
+    minimum_abs_beta_outcome_pp_per_mortgage_pp: 0.25
+    minimum_countries: 12
+    minimum_country_anchors: 48
+    minimum_anchors_per_country: 3
+    minimum_countries_per_anchor: 10
+    minimum_residual_mortgage_sd_pp: 1.0
+    minimum_residual_outcome_sd_pp: 0.1
+    maximum_country_mortgage_ss_share: 0.25
+    minimum_crisis_event_intervals: 6
+    minimum_crisis_nonevent_intervals: 20
+    era: '1975_1995'
+    anchors:
+    - 1975
+    - 1980
+    - 1985
+    - 1990
+    outcome: crisis_onset
+    predicted_sign: 1
+prior_confidence: 0.3
+disclosure: Mortgage-loan composition may respond to prior housing prices, regulation, and bank balance
+  sheets. Nominal loan stocks can include different institutions and historical source definitions across
+  countries. Country and anchor effects do not eliminate time-varying confounding. The real-house-price
+  and incident-crisis outcomes are distinct measures but share countries, source, and macro shocks; eight
+  cells are one family, not independent replications. Adjacent price response windows share endpoints;
+  crisis windows are disjoint. Pre-1914 data may fail coverage; gate failure stays archived. No selected
+  tmort, tloans, hpnom, CPI, crisis values or null masks were read before first registration.
+methodology_note: The source, registration-schema chronology, fixed eight-cell family, Holm denominator,
+  keys, statistical gates, and replay are frozen in engine/audits/jst_mortgage_share_source_plan_2026.md.
+  Only publisher documentation and local Parquet schema types, not selected measurements or their missingness,
+  were checked before first registration.
+scope:
+  period:
+  - 1975
+  - 1995
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  outcome_dim:
+  - financial_crisis
+  policy_family:
+  - none
+  treatment_tags:
+  - historical_mortgage_loan_share
+steelman: hypotheses/steelman/jst_mortgage_share_1975_1995_crisis_onset_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: One fixed cell in an eight-test descriptive mortgage-share family; do not count cells as independent
+  replications.
