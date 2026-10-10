@@ -6,7 +6,7 @@ Separate companion verifiers now recompute the selected results with the immutab
 
 | Family | Integrated replay | Recorded verdicts |
 | --- | --- | --- |
-| GFDD bank resilience / future crisis onset | `python3 scripts/verify_gfdd_bank_resilience_crisis_2026.py --source-root <LOCAL_HOME>/IESET` passed | 2 PARTIAL, 6 INCONCLUSIVE |
-| WDI resource rents / later sector growth | `python3 scripts/verify_wdi_resource_rents_sector_growth_2026.py --source-root <LOCAL_HOME>/IESET` passed | 8 INCONCLUSIVE |
+| GFDD bank resilience / future crisis onset | `python3 scripts/verify_gfdd_bank_resilience_crisis_2026.py --source-root '<matching local raw cache>'` passed | 2 PARTIAL, 6 INCONCLUSIVE |
+| WDI resource rents / later sector growth | `python3 scripts/verify_wdi_resource_rents_sector_growth_2026.py --source-root '<matching local raw cache>'` passed | 8 INCONCLUSIVE |
 
 These are tolerance-based numerical replays with exact saved-byte checksum checks, **not byte-identical recomputations of floating-point diagnostics**. They do not turn any frozen failure into a public result or repair GFDD's missing original fetch manifest. The FAOSTAT eight-test family independently passed its original `--verify` exact replay in this checkout.
