@@ -1,0 +1,215 @@
+hypothesis_id: wgi_rule_of_law_homicide_forward_2026
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim_direction: +
+claim: Larger 2000-to-2010 rule-of-law gains predict greater 2010-to-2020 homicide-rate
+  reductions across the frozen country roster.
+evidence_type: descriptive
+methodology_note: One of a closed three-test descriptive family, fixed before selected
+  values. Family alpha 0.01 with Bonferroni denominator three; source-key rows do
+  not establish non-null values.
+sample:
+  countries: &id001
+  - AFG
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLZ
+  - BMU
+  - BRA
+  - BRB
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CMR
+  - COL
+  - CRI
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - ESP
+  - EST
+  - FIN
+  - FJI
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IND
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KNA
+  - KOR
+  - KWT
+  - LBN
+  - LCA
+  - LIE
+  - LTU
+  - LUX
+  - MAC
+  - MAR
+  - MDA
+  - MEX
+  - MKD
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MUS
+  - MYS
+  - NAM
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - POL
+  - PRI
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SGP
+  - SLE
+  - SLV
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - SYC
+  - TJK
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - VCT
+  - VEN
+  - ZAF
+  - ZWE
+  period:
+  - 2000
+  - 2020
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One fixed prior exposure change and one subsequent
+    outcome change per country.
+  exclusion_rules:
+  - Only the frozen 119-country source-key intersection; complete values, admissible
+    statuses and ranges required.
+  - No aggregate geography, duplicate key, alternate endpoint, interpolation, imputation,
+    post-result covariate or country replacement.
+scope:
+  period:
+  - 2000
+  - 2020
+  countries: *id001
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags: []
+variables:
+  treatment:
+  - name: prior_exposure_gain
+    source: wgi:GOV_WGI_RL.EST
+    transformation: WGI rule-of-law estimate in 2010 minus 2000
+  outcome:
+  - name: later_outcome_improvement
+    source: owid:intentional-homicides-per-100000-people
+    transformation: log(homicide rate in 2010) minus log(rate in 2020)
+  controls:
+  - name: baseline_exposure
+    source: wgi:GOV_WGI_RL.EST
+    transformation: fixed first exposure endpoint
+  - name: baseline_outcome
+    source: owid:intentional-homicides-per-100000-people
+    transformation: fixed first outcome endpoint, logged where positive
+estimator:
+  template: descriptive
+  notes: Equal-country OLS with intercept, prior exposure change, baseline exposure
+    and baseline outcome; HC3 two-sided Student t. Five fixed SHA256(ISO3) hash-fold
+    omissions. No post-result controls.
+falsification:
+  test: fixed_wgi_rule_of_law_homicide_forward_2026
+  rule: Any failed frozen complete-case, material-gain, variation, rank, positive
+    finite HC3 uncertainty, residualized-exposure concentration or holdout gate means
+    INCONCLUSIVE. Otherwise SUPPORTED requires positive meaningful slope, two-sided
+    Bonferroni p<=0.01/3 and >=4 positive holdout signs; REFUTED symmetrically requires
+    a negative meaningful slope and >=4 negative holdout signs. Other estimable cases
+    PARTIAL. All three remain in the denominator. Zero causal, policy, school, position
+    and featured credit.
+  threshold:
+    family_id: three_domain_forward_calibration_2026
+    family_size: 3
+    family_alpha: 0.01
+    bonferroni_p_max_two_sided: 0.0033333333333333335
+    meaningful_beta_min_abs: 0.2
+    min_complete_countries: 90
+    min_material_exposure_gain_countries: 20
+    material_exposure_gain: 0.15
+    min_exposure_p90_p10_spread: 0.3
+    max_top_country_residualized_exposure_share: 0.15
+    max_top_10_residualized_exposure_share: 0.6
+    min_leave_one_hash_fold_out_countries: 70
+    min_concordant_holdouts_for_directional_verdict: 4
+    roster_sha256: 8e1b06016aec18f323571785edbe91c228f931744c234e6822a6e2f52cbf62cc
+    source_lock_path: data/pinned_evidence/three_domain_family_2026.manifest.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: WGI rule of law is a perception-based composite that may itself incorporate
+  crime and enforcement. Homicide reporting and social conditions also vary. This
+  test is a descriptive association and provides no identified policy or causal effect.
+steelman: hypotheses/steelman/wgi_rule_of_law_homicide_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Frozen family preregistration: engine/audits/three_domain_family_prereg_2026-10-10.md.
+  Exact runner: scripts/run_three_domain_family_2026.py. Later source lock: data/pinned_evidence/three_domain_family_2026.manifest.json.'
