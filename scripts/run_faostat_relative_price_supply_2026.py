@@ -32,6 +32,8 @@ FAMILY = "faostat_relative_price_crop_supply_family_2026_10_10"
 RUNNER = "scripts/run_faostat_relative_price_supply_2026.py"
 TEST = "tests/test_faostat_relative_price_supply_2026.py"
 PREREG = "engine/audits/faostat_relative_price_crop_supply_prereg_2026-10-10.md"
+FLAG_AMENDMENT = "engine/audits/faostat_relative_price_crop_supply_flag_disclosure_amendment_2026-10-10.md"
+FLAG_AMENDMENT_TEST = "tests/test_faostat_relative_price_supply_flag_disclosure_2026.py"
 SUMMARY = "engine/audits/faostat_relative_price_crop_supply_results_2026-10-10.md"
 ROSTER = "data/pinned_evidence/faostat_relative_price_crop_supply_2026_key_roster.csv"
 LOCK = "data/pinned_evidence/faostat_relative_price_crop_supply_2026.manifest.json"
@@ -290,7 +292,20 @@ def registration_commit() -> tuple[str, str, list[tuple[str, str, int]]]:
         raise RuntimeError("registration paths lack one first-addition commit")
     revision = additions.pop()
     for path in paths:
-        frozen(path, revision)
+        if path != RUNNER:
+            frozen(path, revision)
+    corrections = git("log", "--format=%H", f"{revision}..HEAD", "--", RUNNER).decode().splitlines()
+    if len(corrections) != 1:
+        raise RuntimeError("runner must have exactly one documented flag-disclosure amendment")
+    correction = corrections[0]
+    if (first_addition(FLAG_AMENDMENT) != correction or
+            first_addition(FLAG_AMENDMENT_TEST) != correction):
+        raise RuntimeError("runner amendment lacks contemporaneous note and synthetic test")
+    amended = set(git("diff", "--name-only", f"{correction}^", correction).decode().splitlines())
+    if amended != {RUNNER, FLAG_AMENDMENT, FLAG_AMENDMENT_TEST}:
+        raise RuntimeError("flag-disclosure amendment contains unrelated changes")
+    for path in (RUNNER, FLAG_AMENDMENT, FLAG_AMENDMENT_TEST):
+        frozen(path, correction)
     if git("ls-tree", "-r", "--name-only", revision, "--", LOCK).strip():
         raise RuntimeError("source lock was present in registration commit")
     rows = roster_rows()
@@ -480,6 +495,24 @@ def fit_case(frame: pd.DataFrame, sample: dict) -> tuple[str, str, dict]:
     return "PARTIAL", "estimable association does not clear directional magnitude and multiplicity gates", result
 
 
+def flag_disclosure(sample: dict) -> str:
+    """Public-card provenance, added after measurement without changing gates."""
+    counts = sample["admitted_flag_counts_before_country_floor"]
+    complete = sample["complete_rows_before_country_floor"]
+    price_roles = ("group_price_t_minus_1", "group_price_t",
+                   "agriculture_price_t_minus_1", "agriculture_price_t")
+    if all(counts.get(f"{role}:E", 0) == complete for role in price_roles):
+        price_note = "Every complete-case producer-price index input is FAO E-coded (estimated)."
+    else:
+        price_note = "Producer-price index inputs include FAO estimated observations; see diagnostics for exact flag counts."
+    outcome_roles = ("outcome_t_minus_1", "outcome_t", "outcome_t_plus_1")
+    if all(counts.get(f"{role}:E", 0) == complete for role in outcome_roles):
+        outcome_note = "Every crop-outcome input is also FAO E-coded (estimated)."
+    else:
+        outcome_note = "Crop-outcome inputs mix official, estimated or external figures; see diagnostics for exact flag counts."
+    return f"**Data provenance:** {price_note} {outcome_note}"
+
+
 def artifacts(key: str, frame: pd.DataFrame, sample: dict, verdict: str, reason: str,
               result: dict, reg: str, lock_rev: str, roster_hash: str, run_utc: str) -> dict[str, bytes]:
     case = CASES[key]
@@ -516,6 +549,7 @@ def artifacts(key: str, frame: pd.DataFrame, sample: dict, verdict: str, reason:
                    f"two-sided p={result['p_value_two_sided']:.5g}; {result['n_rows']} country-years; "
                    f"{result['n_countries']} countries). {reason}.")
     card = (f"# {group['label']} relative producer price and next-year {margin['label']}\n\n{finding}\n\n"
+            f"{flag_disclosure(sample)}\n\n"
             "One of eight correlated FAOSTAT crop supply-response cells, with a shared 0.01/8 family cutoff. "
             "A relative producer-price association does not identify a causal farm response. "
             "Raw source hashes require the matching local cache for exact replay. "
