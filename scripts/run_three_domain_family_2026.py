@@ -25,6 +25,7 @@ SUMMARY = "engine/audits/three_domain_family_results_2026-10-10.md"
 ROSTER = "data/pinned_evidence/three_domain_family_key_roster.csv"
 ROSTER_SHA = "8e1b06016aec18f323571785edbe91c228f931744c234e6822a6e2f52cbf62cc"
 LOCK = "data/pinned_evidence/three_domain_family_2026.manifest.json"
+ERRATUM = "engine/audits/three_domain_family_range_order_erratum_2026-10-10.md"
 ALPHA = 0.01
 FAMILY_SIZE = 3
 P_MAX = ALPHA / FAMILY_SIZE
@@ -281,7 +282,29 @@ def registration_commit() -> str:
         raise RuntimeError("preregistration files must first appear in one commit")
     registration = revisions.pop()
     for path in paths:
-        frozen(path, registration)
+        if path != RUNNER:
+            frozen(path, registration)
+    correction = first_added(ERRATUM)
+    if not strict_ancestor(first_added(LOCK), correction):
+        raise RuntimeError("range-order implementation correction must follow source lock")
+    changed = set(git("diff", "--name-only", f"{correction}^", correction).decode().splitlines())
+    if changed != {RUNNER, ERRATUM}:
+        raise RuntimeError("range-order correction changed unrelated files")
+    frozen(RUNNER, correction)
+    frozen(ERRATUM, correction)
+    import ast
+    def protected_ast(source: bytes):
+        tree = ast.parse(source)
+        kept = []
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef) and node.name in ("registration_commit", "frame"):
+                continue
+            if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "ERRATUM" for target in node.targets):
+                continue
+            kept.append(node)
+        return ast.dump(ast.Module(body=kept, type_ignores=[]), include_attributes=False)
+    if protected_ast(git("show", f"{registration}:{RUNNER}")) != protected_ast((ROOT / RUNNER).read_bytes()):
+        raise RuntimeError("frozen design, estimator, gates or outputs changed in implementation correction")
     if git("ls-tree", "-r", "--name-only", registration, "--", LOCK, *[run_dir(k) for k in STUDIES]).strip():
         raise RuntimeError("source lock or results entered registration commit")
     codes = roster()
@@ -445,22 +468,25 @@ def frame(study: str, values: dict, countries: list[str]):
             continue
         if study == "law_homicide":
             okay = -3 <= x0 <= 3 and -3 <= x1 <= 3 and 0 < y0 <= 300 and 0 < y1 <= 300
-            change = x1 - x0
-            response = math.log(y0) - math.log(y1)
-            baseline_x = x0
-            baseline_y = math.log(y0)
+            if okay:
+                change = x1 - x0
+                response = math.log(y0) - math.log(y1)
+                baseline_x = x0
+                baseline_y = math.log(y0)
         elif study == "tractor_food":
             okay = 0 <= x0 <= 10_000_000 and 0 <= x1 <= 10_000_000 and 0 < y0 <= 1000 and 0 < y1 <= 1000
-            change = math.log1p(x1) - math.log1p(x0)
-            response = math.log(y1) - math.log(y0)
-            baseline_x = math.log1p(x0)
-            baseline_y = math.log(y0)
+            if okay:
+                change = math.log1p(x1) - math.log1p(x0)
+                response = math.log(y1) - math.log(y0)
+                baseline_x = math.log1p(x0)
+                baseline_y = math.log(y0)
         else:
             okay = 0 <= x0 <= 100 and 0 <= x1 <= 100 and 0 < y0 <= 1_000_000 and 0 < y1 <= 1_000_000
-            change = x0 - x1
-            response = math.log(y1) - math.log(y0)
-            baseline_x = x0
-            baseline_y = math.log(y0)
+            if okay:
+                change = x0 - x1
+                response = math.log(y1) - math.log(y0)
+                baseline_x = x0
+                baseline_y = math.log(y0)
         if not okay:
             excluded["out_of_range"] += 1
             continue
