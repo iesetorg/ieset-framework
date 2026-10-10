@@ -1,0 +1,209 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_secondary_enrolment_fertility_decade_followthrough_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '-'
+claim: Across three nonoverlapping ten-year windows, countries with a larger preceding five-year increase
+  in gross secondary school enrolment predict a larger proportional decline in total fertility over the
+  following decade, conditional on baseline fertility and real income per person.
+methodology_note: Prospective one-test descriptive calibration selected from WDI schooling and real-income
+  values plus fertility country-year keys only. Fertility values, null masks, model estimates, and coefficient
+  signs were not opened before registration. The 168-row key roster is an upper bound, not a completed
+  panel.
+evidence_type: associational
+sample:
+  countries: &id001
+  - ALB
+  - ARG
+  - BDI
+  - BFA
+  - BGD
+  - BHR
+  - BHS
+  - BLZ
+  - BRB
+  - BWA
+  - CHN
+  - CMR
+  - CUB
+  - DOM
+  - DZA
+  - EGY
+  - ERI
+  - ETH
+  - GHA
+  - GRD
+  - GTM
+  - IDN
+  - IND
+  - IRN
+  - ISL
+  - JOR
+  - KGZ
+  - KIR
+  - KWT
+  - LAO
+  - LBN
+  - LCA
+  - LSO
+  - MAR
+  - MKD
+  - MLI
+  - MMR
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NGA
+  - NIC
+  - NPL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PRY
+  - PSE
+  - QAT
+  - RWA
+  - SEN
+  - SUR
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TUN
+  - TUR
+  - UKR
+  - URY
+  - UZB
+  - VEN
+  - WSM
+  - ZWE
+  period:
+  - 1990
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the immutable key-only roster at anchor years 1990, 2000, and 2010. Exclude non-ISO aggregate
+    rows. Require exact schooling values at t−5 and t, exact real-GDP-per-person value at t, and fertility
+    country-year keys at t and t+10.
+  - Before fertility-value access, schooling endpoints must be finite in [0,150] percent, their five-year
+    difference at most 40 points in absolute value, real GDP per person finite and positive, and each
+    country must appear in at least two anchor windows.
+  - Only after the separate source-lock commit, require both fertility endpoints finite and in [0.5,10]
+    births per woman. Drop invalid pairs and then countries with fewer than two complete windows. No trimming
+    on the observed fertility change.
+  - Do not interpolate, substitute nearby years, change caps, add controls, choose windows based on fertility
+    values, or recode any country after outcome access. Source files have blank observation-status cells,
+    so no cell-level break-screening claim is made.
+variables:
+  treatment:
+  - name: secondary_gross_enrolment_five_year_change_pp
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: Gross both-sex secondary school enrolment percent in t minus t−5, percentage points;
+      levels 0–150 and absolute change at most 40.
+    notes: Education exposure proxy, not an education policy treatment, female enrolment, or completion
+      measure.
+  outcome:
+  - name: total_fertility_ten_year_log_change
+    source: world_bank_wdi:SP.DYN.TFRT.IN
+    transformation: Natural log of total births per woman at t+10 divided by the level at t.
+    notes: National total fertility estimate; selected values and missingness remain sealed until the
+      separate source lock is committed.
+  controls:
+  - name: baseline_log_total_fertility
+    source: world_bank_wdi:SP.DYN.TFRT.IN
+    transformation: Natural log of total fertility at t.
+  - name: baseline_log_real_gdp_per_person
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of constant-price real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor_year
+  clustering: country
+  notes: OLS of ten-year log fertility change on prior five-year gross-secondary-enrolment change, baseline
+    log fertility, baseline log real GDP per person, country effects, and anchor-year effects. Country-cluster
+    CR1 covariance; two-sided Student t with G−1 country degrees of freedom; 99% confidence interval.
+    The three outcome decades do not overlap.
+falsification:
+  test: wdi_secondary_enrolment_fertility_2026_10_10
+  rule: INCONCLUSIVE if exact-source, chronology, complete-case (140 rows/60 countries), material-schooling-change
+    (65 rows/45 countries), two-complete-window, residual-treatment concentration (top 1% <=30%, largest
+    country <=20%), full-rank, or finite-positive country-cluster uncertainty gates fail. SUPPORTED iff
+    beta <= -0.003 ten-year log fertility point per +1 gross enrolment point and two-sided p <= 0.01.
+    REFUTED iff beta >= +0.003 with the same p cutoff. Otherwise PARTIAL if estimable. This is one fixed
+    descriptive test and has no score credit.
+  threshold:
+    family_id: wdi_secondary_enrolment_fertility_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.003
+    min_valid_rows: 140
+    min_valid_countries: 60
+    min_material_change_rows: 65
+    min_material_change_countries: 45
+    material_enrolment_change_min_abs: 5.0
+    max_enrolment_level: 150.0
+    max_abs_enrolment_change: 40.0
+    fertility_value_range:
+    - 0.5
+    - 10.0
+    min_complete_anchors_per_country: 2
+    max_top_one_percent_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.2
+    expected_key_rows: 168
+    expected_key_countries: 72
+    roster_sha256: ceefc2f69f90551e07fa336260778c11f75ff2a6e7bb1a46725fba8529b45e2c
+    source_files:
+      schooling:
+        path: data/vintages/world_bank_wdi/SE.SEC.ENRR@2026-05-05T204008Z.parquet
+        sha256: 787f29eb93204dbf11dd408449910c28b523376c054734f1fc68d4215b7b2044
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      fertility:
+        path: data/vintages/world_bank_wdi/SP.DYN.TFRT.IN@2026-04-30T130516Z.parquet
+        sha256: ff1eb90d4033e42ca63bb0de72c27f21044e55b69e44568d65321dd81cd8cfd1
+        manifest: data/manifests/fetch_run_2026-04-30T130536Z.yaml
+        manifest_sha256: ab56887949d3a51f3e3001ac1065c62538af1db4d4a722e39e29a774447f511b
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: Schooling can precede family-size decisions, but gross both-sex enrolment is an imperfect
+  proxy and fertility, income, and schooling can all trend with broader development. Earlier IESET education,
+  fertility, labour, and development studies make this choice archive-selected. The local p<=0.01 rule
+  does not correct the archive-wide search. No causal, policy, school-score, position, or featured credit.
+steelman: hypotheses/steelman/wdi_secondary_enrolment_fertility_decade_followthrough_2026.md
+scope:
+  period:
+  - 1990
+  - 2020
+  countries: *id001
+  outcome_dim:
+  - demographics_migration
+  policy_family: []
+  treatment_tags:
+  - secondary_school_enrolment
+  - fertility_transition
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

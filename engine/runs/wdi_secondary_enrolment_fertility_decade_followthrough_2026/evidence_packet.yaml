@@ -1,0 +1,99 @@
+packet_version: 1
+generated_utc: '2026-10-10T03:32:03+00:00'
+hypothesis:
+  id: wdi_secondary_enrolment_fertility_decade_followthrough_2026
+  path: hypotheses/labour/wdi_secondary_enrolment_fertility_decade_followthrough_2026.yaml
+  topic: labour
+preregistration:
+  spec_commit: a480a7942af078eb03fa5cf8d94798363787ee23
+  source_lock_commit: 5273d592bd4cbb50346668b5ca632f301b5439ae
+  family_id: wdi_secondary_enrolment_fertility_2026_10_10
+  family_size: 1
+  key_roster: data/pinned_evidence/wdi_secondary_enrolment_fertility_2026_key_roster.csv
+  key_roster_sha256: ceefc2f69f90551e07fa336260778c11f75ff2a6e7bb1a46725fba8529b45e2c
+  steelman: hypotheses/steelman/wdi_secondary_enrolment_fertility_decade_followthrough_2026.md
+reproduction:
+  runner: scripts/run_wdi_secondary_enrolment_fertility_2026.py
+  run_dir: engine/runs/wdi_secondary_enrolment_fertility_decade_followthrough_2026
+  command: python3 scripts/run_wdi_secondary_enrolment_fertility_2026.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear both frozen directional gates
+data:
+  inputs:
+    schooling:
+      publisher: world_bank_wdi
+      series_id: SE.SEC.ENRR
+      path: data/vintages/world_bank_wdi/SE.SEC.ENRR@2026-05-05T204008Z.parquet
+      sha256: 787f29eb93204dbf11dd408449910c28b523376c054734f1fc68d4215b7b2044
+      manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+      manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    fertility:
+      publisher: world_bank_wdi
+      series_id: SP.DYN.TFRT.IN
+      path: data/vintages/world_bank_wdi/SP.DYN.TFRT.IN@2026-04-30T130516Z.parquet
+      sha256: ff1eb90d4033e42ca63bb0de72c27f21044e55b69e44568d65321dd81cd8cfd1
+      manifest: data/manifests/fetch_run_2026-04-30T130536Z.yaml
+      manifest_sha256: ab56887949d3a51f3e3001ac1065c62538af1db4d4a722e39e29a774447f511b
+    income:
+      publisher: world_bank_wdi
+      series_id: NY.GDP.PCAP.KD
+      path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+      sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+  sample:
+    key_only_rows: 168
+    invalid_or_missing_fertility_pairs: 0
+    valid_rows: 168
+    valid_countries: 72
+    material_change_rows: 85
+    material_change_countries: 57
+    min_complete_anchors_per_country: 2
+    outcome_values_read_after_lock: true
+    top_one_percent_residual_x_share: 0.09567958185293268
+    top_country_residual_x_share: 0.07900228308299094
+results:
+  primary:
+    coefficient: -0.00039118062257992433
+    std_error: 0.0019683270638290833
+    p_value_two_sided: 0.8430359993216134
+    confidence_level: 0.99
+    confidence_interval:
+    - -0.005601073574134212
+    - 0.004818712328974363
+    n_rows: 168
+    n_countries: 72
+    df_inference: 71
+    model_rank: 77
+    method: country/anchor FE OLS with baseline log fertility and log real GDP per
+      person; country-cluster CR1; Student t(G-1)
+limitations:
+- Gross secondary enrolment includes both sexes, counts over-age and under-age pupils,
+  and can exceed 100%; it is not female completion or a policy treatment.
+- WDI total fertility is a national births-per-woman estimate from multiple demographic
+  sources; within-country method continuity cannot be certified by this pinned file.
+- The pinned WDI files carry blank observation-status cells, so there is no source-provided
+  break flag for country-year exclusions.
+- Schooling and fertility both follow development transitions. Baseline fertility,
+  real income, country and anchor fixed effects do not resolve confounding, migration,
+  family-policy changes, or reverse timing.
+- Three disjoint ten-year outcome windows use 1985-2010 schooling exposure years and
+  1990-2020 fertility endpoints. The key roster is an upper bound; fertility values
+  and nulls were sealed during selection.
+- Prior IESET education, fertility, labour, and development cases make archive-wide
+  selection relevant; this single-test 0.01 rule is only local.
+- No causal, policy, school-score, position, or featured credit is permitted.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: wdi_secondary_enrolment_fertility_2026_10_10
+  family_size: 1
+  family_alpha: 0.01
+  family_p_max: 0.01
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
