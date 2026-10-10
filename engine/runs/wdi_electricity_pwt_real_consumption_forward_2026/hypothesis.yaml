@@ -1,0 +1,304 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_electricity_pwt_real_consumption_forward_2026
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: +
+claim: Across the fixed national-area roster, a larger 2000–2010 rise in electricity access predicts
+  faster 2010–2019 growth in real household-plus-government consumption per resident at constant 2017
+  national prices.
+methodology_note: Prospective descriptive WDI/PWT calibration. Original pwt100.dta defines rconna as
+  real consumption at constant 2017 national prices, in millions of 2017 US dollars; PWT documentation
+  says household-plus-government consumption. The derived manifest has an inconsistent generic PPP currency
+  tag; the original variable label governs within-country growth. Only source metadata and geography/year
+  keys were opened before registration.
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - ABW
+  - AGO
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUW
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - POL
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLE
+  - SLV
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SXM
+  - SYC
+  - SYR
+  - TCA
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VGB
+  - VNM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period: &id001
+  - 2000
+  - 2019
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One earlier exposure change and one later outcome change per national
+    area; annual source rows are not independent observations.
+  exclusion_rules:
+  - Fixed 180-area ISO3 key roster; exact access years 2000/2010 and PWT rconna plus WDI population
+    years 2000/2010/2019.
+  - Access must be finite in [0,100] percent; PWT rconna positive and at most 1000000000 million 2017
+    US dollars; WDI population positive at every endpoint.
+  - No imputation, interpolation, nearest-year join, geography replacement, status-based reselection,
+    winsorization, or vintage switch; key presence is not numeric completeness.
+variables:
+  outcome:
+  - name: real_consumption_per_resident_log_change_2010_2019
+    source: pwt:rconna
+    transformation: log(rconna_2019 times 1000000 divided by WDI population_2019) minus 2010 value;
+      combined household-plus-government consumption at constant 2017 national prices.
+  treatment:
+  - name: electricity_access_change_2000_2010_pp
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: 2010 minus 2000 share with electricity access, percentage points.
+  controls:
+  - name: electricity_access_2000
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: 2000 electricity-access share.
+  - name: real_consumption_per_resident_log_2010
+    source: pwt:rconna
+    transformation: 2010 log real household-plus-government consumption per WDI resident.
+  - name: prior_real_consumption_log_change_2000_2010
+    source: pwt:rconna
+    transformation: 2010 minus 2000 log real household-plus-government consumption per WDI resident.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-country OLS with intercept and three fixed controls, HC3 robust standard error, and two-sided
+    Student t reference with N minus 5 degrees of freedom. No model, subgroup, weighting, or covariate
+    search.
+falsification:
+  rule: Any sample, material-change, IQR, rank, residual-variation, HC3, single-area concentration,
+    or leave-one-out gate failure is INCONCLUSIVE with no public coefficient. Otherwise SUPPORTED requires
+    beta at least +0.002 log units per access point, two-sided p at most 0.005, and positive sign in
+    at least 80% of successful leave-one-out fits. REFUTED uses beta at most -0.002 and corresponding
+    significance and negative sign stability. Other estimable results are PARTIAL.
+  test: ieset_credit_access_economic_2026_10_10
+  threshold:
+    family_id: ieset_credit_access_economic_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_sign: +
+    min_complete_national_areas: 120
+    min_material_exposure_areas: 30
+    material_exposure_min: 10.0
+    min_exposure_iqr: 5.0
+    max_single_area_residualized_exposure_share: 0.15
+    max_single_area_residualized_outcome_share: 0.2
+    max_loo_fit_failures: 2
+    min_loo_same_sign_share: 0.8
+    meaningful_abs_beta: 0.002
+    roster_sha256: b56b04d9b2c1593cbdeadec2eddf3d068a2c5633adf6bd38a12c0e1d1fa3d665
+    source_files:
+      electricity:
+        path: data/vintages/world_bank_wdi/EG.ELC.ACCS.ZS@2026-05-05T195057Z.parquet
+        sha256: aa564cbe2947b3d1c3499d7ecb9b2c38c6aa5de073d2cc1a797cfe2fe42f2931
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+        selector: {}
+      consumption:
+        path: data/vintages/pwt/rconna@2026-05-16T114235Z.parquet
+        sha256: 79dc9f16f710217ee1cf12d1f10110c90a8f343f48bad113cb972e1d5182fd32
+        manifest: data/manifests/fetch_run_2026-05-16T114237Z.yaml
+        manifest_sha256: 489358e15d0f9ab38a824f5f87a4dfe86cbfb2df9009d430589163dd44702b41
+        selector: {}
+      population_access:
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+        selector: {}
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    position_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: Electricity access does not measure reliable or affordable supply. PWT rconna includes households
+  and government, is at constant national prices, and is not private-only consumption or a comparable
+  cross-country welfare level. WDI population is a separate denominator. Development, urbanization,
+  income, public spending, technology, and common shocks confound this association. Zero causal, policy,
+  school, position, or featured credit.
+steelman: hypotheses/steelman/wdi_electricity_pwt_real_consumption_forward_2026.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - private_consumption
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
