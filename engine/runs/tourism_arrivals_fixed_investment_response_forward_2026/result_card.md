@@ -1,0 +1,5 @@
+# Tourism arrival growth and gross fixed capital formation share
+
+**PARTIAL.** The frozen descriptive coefficient is +0.41508 percentage points per one log-point annual arrival growth (country-cluster SE 1.21291, two-sided p=0.73267, 1636 country-years, 152 countries). estimable association does not clear both directional gates.
+
+This is one of six pre-registered, economically distinct but data-overlapping response margins. The family was selected after a visible SUPPORTED OECD youth-employment tourism-arrivals result. Trips are not visitor spending; country/year controls and forward timing do not identify causality. Zero causal, policy, school, position, or featured credit.

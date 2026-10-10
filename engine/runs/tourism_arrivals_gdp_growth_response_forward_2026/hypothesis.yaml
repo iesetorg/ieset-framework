@@ -1,0 +1,324 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: tourism_arrivals_gdp_growth_response_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: In the frozen 2007–2018 country-year roster, stronger annual growth in inbound international arrival
+  trips from t-1 to t predicts a larger one-year-forward increase in real GDP growth rate from t to t+1,
+  after country and year effects, baseline outcome, and income control.
+methodology_note: Prospective six-test descriptive response family. Registration uses only country/year
+  source keys, schema, and fetch-manifest hashes; the WDI grid includes missing-value rows. Raw numeric
+  source files are copied into the isolated checkout and committed after registration, then their selected
+  values are opened for one locked run. The six endpoints are distinct response margins but share exposure,
+  countries, and archive context.
+evidence_type: associational
+sample:
+  countries: &id001
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ASM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CUW
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FRO
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIB
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - GUM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IMN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LIE
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAF
+  - MAR
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MNP
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NCL
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRI
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - PYF
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SXM
+  - SYC
+  - SYR
+  - TCA
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VGB
+  - VIR
+  - VNM
+  - VUT
+  - WSM
+  - XKX
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2006
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the fixed treatment-year roster t=2007..2018, exact year t-1 and t arrivals, and exact outcome
+    t and t+1. No interpolation or nearest-year joins.
+  - Exclude non-ISO3 WDI aggregates; require positive arrival counts and real GDP per person, and absolute
+    log arrivals growth no more than 0.30.
+  - Require finite endpoint values and blank or A WDI observation status. Apply the registered outcome-specific
+    plausibility bounds. Keep only countries with at least five complete treatment years.
+  - Do not change countries, dates, controls, endpoint definitions, outcome bounds, sample floors, or
+    estimator after selected values are read.
+variables:
+  outcome:
+  - name: gdp_growth_one_year_forward_change
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: t+1 value minus t value in percentage points
+    notes: GDP growth acceleration includes all sectors and may itself influence tourism arrivals.
+  treatment:
+  - name: annual_log_inbound_arrival_change
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: log(inbound trips at t) minus log(inbound trips at t-1)
+    notes: Trips, not distinct visitors, visitor nights, receipts, or domestic tourism.
+  controls:
+  - name: gdp_growth_baseline_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: t-year outcome level in the same endpoint units
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive t-year real GDP per person
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS of next-year outcome change on annual log arrival change, baseline outcome and log GDP per
+    person, plus country and treatment-year effects. Country-cluster CR1 covariance and two-sided Student
+    t(G-1). Full-rank, finite uncertainty, and residualized-exposure concentration gates apply.
+falsification:
+  test: wdi_tourism_response_six_outcome_family_2026_10_10_gdp_growth
+  rule: INCONCLUSIVE if any source, complete-case (300/25), material-exposure (60/20), five-year-country,
+    full-rank, concentration, or finite-cluster-uncertainty gate fails. SUPPORTED iff beta >= +0.5 percentage
+    points per one log-point arrivals growth and two-sided p <= 0.01/6. REFUTED iff beta <= -0.5 at the
+    same cutoff. Otherwise PARTIAL if estimable. All six tests remain in the Bonferroni denominator.
+  threshold:
+    family_id: wdi_tourism_response_six_outcome_family_2026_10_10
+    family_size: 6
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0016666666666666668
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.5
+    meaningful_beta_unit: percentage points
+    min_complete_rows: 300
+    min_complete_countries: 25
+    min_material_rows: 60
+    min_material_countries: 20
+    material_abs_log_change: 0.1
+    max_abs_treatment_log_change: 0.3
+    min_complete_years_per_country: 5
+    max_top_country_residualized_exposure_share: 0.2
+    roster_sha256: 018d735c2c6be4687db392b07e1872f6e5cb5fb6c8f50354f7a54f4dad09ff61
+    source_lock_path: data/pinned_evidence/wdi_tourism_response_six_outcome_2026.manifest.json
+    causal_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: The prior WDI-arrivals to OECD youth employment test is a separate directed pair; its verdict
+  is not inherited. GDP growth acceleration includes all sectors and may itself influence tourism arrivals.
+  Reverse timing, exchange rates, global demand, air capacity, national measurement changes and coincident
+  policies can confound the response. This is descriptive calibration only, with zero causal, policy,
+  school, position, or featured credit.
+steelman: hypotheses/steelman/tourism_arrivals_gdp_growth_response_forward_2026.md
+scope:
+  period:
+  - 2006
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - gdp_growth
+  policy_family: []
+  treatment_tags:
+  - tourism_arrivals
+  - visitor_demand
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
