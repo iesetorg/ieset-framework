@@ -7,14 +7,14 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 - Policies indexed: 3427
 - Policies with explicit evaluation_design: 46
 - Policies with raw exact event, enacted, or first-application dates: 2137
-- Of those, policies with references present (date support not independently verified): 1842
-- Of those, policies with no references (timing readiness withheld): 295
+- Of those, policies with references present (date support not independently verified): 1857
+- Of those, policies with no references (timing readiness withheld): 280
 - Policies with exact-date comparative structure declared: 6
 - Policies with triple-difference structure declared: 1
-- Timing status counts: `{"effective_date_only": 69, "enacted_date_only": 2026, "event_dated": 42, "event_month_dated": 3, "year_period_only": 1287}`
+- Timing status counts: `{"effective_date_only": 76, "enacted_date_only": 2019, "event_dated": 42, "event_month_dated": 3, "year_period_only": 1287}`
 - Comparison structure counts: `{"axis_only_no_unit_split": 3418, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 20, "needs_comparison_unit_detail": 37, "needs_exact_date_source": 295, "needs_exact_event_dates": 1290, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3381, "needs_treatment_onset_definition": 14}`
-- Axis source readiness: `{"partial_ready": 44817, "proprietary_gap": 6734, "ready": 3354, "reconstruct_needed": 19085, "scrape_needed": 14110}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 20, "needs_comparison_unit_detail": 37, "needs_exact_date_source": 280, "needs_exact_event_dates": 1290, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3381, "needs_treatment_onset_definition": 26}`
+- Axis source readiness: `{"partial_ready": 44755, "proprietary_gap": 6726, "ready": 3350, "reconstruct_needed": 19059, "scrape_needed": 14087}`
 
 ## Comparative Structure Seeds (Measurement Gaps Shown)
 
