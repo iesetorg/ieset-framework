@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_almp_low_education_employment_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '+'
+claim: Across the frozen 30-country panel, calendar-year increases of at least 0.05 GDP percentage point in public active labour market programme spending predict a larger next-year rise in the employment rate of adults aged 25–64 with low educational attainment than equally sized spending decreases.
+methodology_note: One prospective descriptive calibration selected from OECD SOCX treatment values, a WDI GDP-per-person control, and Eurostat selector/country-year keys only. No selected Eurostat employment values, null masks, or statuses were opened. The exact SOCX-to-Eurostat source pairing was absent from existing authored hypotheses; related ALMP and employment screens are disclosed in the preregistration.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, BGR, CHE, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HRV, HUN, IRL, ISL, ITA, LTU, LUX, LVA, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE, TUR]
+  period: [2005, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the exact committed country-year key roster and countries with at least five candidate years before outcome access.
+    - Require unique annual public SOCX TP60 percent-GDP rows with normal A status and finite values in [0,10] at t-1 and t; the increase event is change >=0.05, decrease is <=-0.05, and stable is between them.
+    - Require finite positive WDI real GDP per person at t with blank observation status; its natural logarithm is a fixed control.
+    - Require exact Eurostat lfsa_ergaedn selector freq=A, citizen=TOTAL, isced11=ED0-2, sex=T, age=Y25-64, unit=PC, national geography at t and t+1, with no duplicate selected keys.
+    - Only after a separate committed source lock, require both Eurostat rates finite and in [0,100]; keep countries with at least five complete pairs. The vintage has no cell status or method-break flag, so no flag-based or visual exclusions are allowed.
+    - No interpolation, trimming, substitute endpoint, event threshold, geographic change, or alternative model may alter the primary verdict after outcome access.
+variables:
+  treatment:
+    - name: public_almp_spending_increase_event
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: '1 if public TP60 percent-GDP spending at t minus t-1 is >=0.05; otherwise 0'
+      notes: Public active labour market programme expenditure is a budget share, not participation, treatment assignment, or programme quality.
+    - name: public_almp_spending_decrease_event
+      source: oecd:DSD_SOCX@DF_SOCX_AGG
+      transformation: '1 if public TP60 percent-GDP spending at t minus t-1 is <=-0.05; otherwise 0'
+      notes: Mutually exclusive with increase; stable changes are the reference category.
+  outcome:
+    - name: low_education_employment_rate_change_pp
+      source: eurostat:lfsa_ergaedn
+      transformation: 'Employment-rate percentage at t+1 minus t for total citizenship, ED0-2, both sexes, ages 25-64.'
+      notes: Direct Eurostat labour-force-survey rate; not earnings, job quality, programme participation, or a poverty measure.
+  controls:
+    - name: baseline_low_education_employment_rate
+      source: eurostat:lfsa_ergaedn
+      transformation: 'Selected rate at t, included in the fixed primary model only after the source lock.'
+    - name: log_real_gdp_per_person
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 'Natural log of positive constant-price GDP per person at t.'
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: OLS of t-to-t+1 employment-rate change on increase and decrease event indicators, baseline rate at t, log real GDP per person at t, and country/treatment-year fixed effects. Primary estimand is beta_increase minus beta_decrease. Country-cluster CR1 covariance; two-sided Student t with G-1 degrees of freedom; 99% confidence interval. Stable years are a reference, not an additional hypothesis. No lag or control search.
+falsification:
+  test: run_oecd_almp_low_education_employment_2026
+  rule: INCONCLUSIVE if source/chronology, complete-case, event-count, five-year-country, residual-event concentration, rank, or clustered-uncertainty gates fail. SUPPORTED only when the increase-minus-decrease contrast is >=0.5 employment-rate percentage point and its two-sided country-cluster p <=0.01. REFUTED only when the contrast is <=-0.5 with p <=0.01. Any other estimable result is PARTIAL. Neither event coefficient alone can create a verdict.
+  threshold:
+    family_id: oecd_almp_low_education_employment_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    meaningful_contrast_pp: 0.5
+    event_change_gdp_pp: 0.05
+    min_valid_rows: 300
+    min_valid_countries: 25
+    min_years_per_country: 5
+    min_increase_rows: 50
+    min_increase_countries: 15
+    min_decrease_rows: 50
+    min_decrease_countries: 15
+    max_top_one_percent_residual_event_share: 0.3
+    max_top_country_residual_event_share: 0.3
+    expected_key_rows: 410
+    expected_key_countries: 30
+    expected_increase_rows: 78
+    expected_decrease_rows: 82
+    roster_sha256: 0b6d3f7c6758641c29ba8e03006f08a0be44d60023ffc08c3710582eecf84445
+    source_files:
+      almp:
+        path: data/vintages/oecd/DSD_SOCX_DF_SOCX_AGG@2026-05-05T210247Z.parquet
+        sha256: 93e7e29b24dc791baf22833ae5596b4a381a366ddd0d78499bf59f7b80786124
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      gdp_per_person:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      outcome:
+        path: data/vintages/eurostat/lfsa_ergaedn@2026-04-30T125100Z.parquet
+        sha256: 6bdae02133c40b7498922a0a1fa2b28d3e63fcde3fff3915353e87275c78edc3
+        manifest: data/manifests/fetch_run_2026-04-30T125203Z.yaml
+        manifest_sha256: 9fb01a47d0598eb7d91de7765aea54a25f100c490d88b9414c6e8453a90d1df6
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: Annual ALMP spending can rise in response to poor labour markets, and its GDP denominator moves with recessions. Low-education employment is not a programme-participant measure. The Eurostat vintage lacks cell-level status and break flags. Baseline employment adjustment can reflect regression to the mean. This is one descriptive calibration with no causal, programme-effect, policy-score, school-score, position, or featured credit.
+steelman: hypotheses/steelman/oecd_almp_low_education_employment_forward_2026.md
+scope:
+  period: [2005, 2018]
+  countries: [OECD]
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
