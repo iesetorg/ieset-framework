@@ -1,0 +1,198 @@
+hypothesis_id: faostat_tractor_stock_food_production_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Larger 1990-to-2000 increases in agricultural tractors in use predict greater
+  2000-to-2010 growth in the food-production index across the frozen country roster.
+evidence_type: descriptive
+methodology_note: One of a closed three-test descriptive family, fixed before selected
+  values. Family alpha 0.01 with Bonferroni denominator three; source-key rows do
+  not establish non-null values.
+sample:
+  countries: &id001
+  - AFG
+  - ALB
+  - ARE
+  - ARG
+  - ASM
+  - AUT
+  - BGD
+  - BGR
+  - BHR
+  - BOL
+  - BRA
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CPV
+  - CUB
+  - CYP
+  - DEU
+  - DJI
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - FIN
+  - FJI
+  - FRA
+  - GHA
+  - GIN
+  - GRC
+  - HND
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JOR
+  - JPN
+  - KEN
+  - KHM
+  - KNA
+  - KOR
+  - KWT
+  - LBY
+  - LCA
+  - MDG
+  - MEX
+  - MLI
+  - MLT
+  - MMR
+  - MNG
+  - MRT
+  - NCL
+  - NGA
+  - NLD
+  - NOR
+  - NPL
+  - OMN
+  - PAK
+  - PAN
+  - PHL
+  - POL
+  - PRI
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RWA
+  - SEN
+  - SOM
+  - SUR
+  - SWE
+  - SWZ
+  - SYR
+  - TGO
+  - THA
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - URY
+  - USA
+  - VCT
+  - VIR
+  - VNM
+  - WSM
+  - YEM
+  - ZAF
+  period:
+  - 1990
+  - 2010
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One fixed prior exposure change and one subsequent
+    outcome change per country.
+  exclusion_rules:
+  - Only the frozen 100-country source-key intersection; complete values, admissible
+    statuses and ranges required.
+  - No aggregate geography, duplicate key, alternate endpoint, interpolation, imputation,
+    post-result covariate or country replacement.
+scope:
+  period:
+  - 1990
+  - 2010
+  countries: *id001
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - none
+  treatment_tags: []
+variables:
+  treatment:
+  - name: prior_exposure_gain
+    source: faostat:Investment_Machinery
+    transformation: log(1+tractors in use in 2000) minus log(1+tractors in use in
+      1990)
+  outcome:
+  - name: later_outcome_improvement
+    source: world_bank_wdi:AG.PRD.FOOD.XD
+    transformation: log(food-production index in 2010) minus log(index in 2000)
+  controls:
+  - name: baseline_exposure
+    source: faostat:Investment_Machinery
+    transformation: fixed first exposure endpoint
+  - name: baseline_outcome
+    source: world_bank_wdi:AG.PRD.FOOD.XD
+    transformation: fixed first outcome endpoint, logged where positive
+estimator:
+  template: descriptive
+  notes: Equal-country OLS with intercept, prior exposure change, baseline exposure
+    and baseline outcome; HC3 two-sided Student t. Five fixed SHA256(ISO3) hash-fold
+    omissions. No post-result controls.
+falsification:
+  test: fixed_faostat_tractor_stock_food_production_forward_2026
+  rule: Any failed frozen complete-case, material-gain, variation, rank, positive
+    finite HC3 uncertainty, residualized-exposure concentration or holdout gate means
+    INCONCLUSIVE. Otherwise SUPPORTED requires positive meaningful slope, two-sided
+    Bonferroni p<=0.01/3 and >=4 positive holdout signs; REFUTED symmetrically requires
+    a negative meaningful slope and >=4 negative holdout signs. Other estimable cases
+    PARTIAL. All three remain in the denominator. Zero causal, policy, school, position
+    and featured credit.
+  threshold:
+    family_id: three_domain_forward_calibration_2026
+    family_size: 3
+    family_alpha: 0.01
+    bonferroni_p_max_two_sided: 0.0033333333333333335
+    meaningful_beta_min_abs: 0.05
+    min_complete_countries: 70
+    min_material_exposure_gain_countries: 15
+    material_exposure_gain: 0.1
+    min_exposure_p90_p10_spread: 0.25
+    max_top_country_residualized_exposure_share: 0.2
+    max_top_5_residualized_exposure_share: 0.65
+    min_leave_one_hash_fold_out_countries: 55
+    min_concordant_holdouts_for_directional_verdict: 4
+    roster_sha256: 8e1b06016aec18f323571785edbe91c228f931744c234e6822a6e2f52cbf62cc
+    source_lock_path: data/pinned_evidence/three_domain_family_2026.manifest.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: Tractor stock is unscaled by cultivated area and may reflect country size,
+  farm consolidation, or record changes. Rainfall, input use, land and trade can move
+  food output. This test is a descriptive association and provides no identified policy
+  or causal effect.
+steelman: hypotheses/steelman/faostat_tractor_stock_food_production_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Frozen family preregistration: engine/audits/three_domain_family_prereg_2026-10-10.md.
+  Exact runner: scripts/run_three_domain_family_2026.py. Later source lock: data/pinned_evidence/three_domain_family_2026.manifest.json.'

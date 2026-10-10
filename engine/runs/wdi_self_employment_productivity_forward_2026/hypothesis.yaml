@@ -1,0 +1,312 @@
+hypothesis_id: wdi_self_employment_productivity_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Larger 2000-to-2010 declines in the self-employment share predict greater 2010-to-2020
+  growth in GDP per person employed across the frozen country roster.
+evidence_type: descriptive
+methodology_note: One of a closed three-test descriptive family, fixed before selected
+  values. Family alpha 0.01 with Bonferroni denominator three; source-key rows do
+  not establish non-null values.
+sample:
+  countries: &id001
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ASM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CUW
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FRO
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIB
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - GUM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IMN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LIE
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAF
+  - MAR
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MNP
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NCL
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRI
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - PYF
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SXM
+  - SYC
+  - SYR
+  - TCA
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VGB
+  - VIR
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2000
+  - 2020
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One fixed prior exposure change and one subsequent
+    outcome change per country.
+  exclusion_rules:
+  - Only the frozen 215-country source-key intersection; complete values, admissible
+    statuses and ranges required.
+  - No aggregate geography, duplicate key, alternate endpoint, interpolation, imputation,
+    post-result covariate or country replacement.
+scope:
+  period:
+  - 2000
+  - 2020
+  countries: *id001
+  outcome_dim:
+  - productivity
+  policy_family:
+  - none
+  treatment_tags: []
+variables:
+  treatment:
+  - name: prior_exposure_gain
+    source: world_bank_wdi:SL.EMP.SELF.ZS
+    transformation: self-employed share in 2000 minus 2010 percentage points
+  outcome:
+  - name: later_outcome_improvement
+    source: world_bank_wdi:SL.GDP.PCAP.EM.KD
+    transformation: log(GDP per employed person in 2020) minus log(level in 2010)
+  controls:
+  - name: baseline_exposure
+    source: world_bank_wdi:SL.EMP.SELF.ZS
+    transformation: fixed first exposure endpoint
+  - name: baseline_outcome
+    source: world_bank_wdi:SL.GDP.PCAP.EM.KD
+    transformation: fixed first outcome endpoint, logged where positive
+estimator:
+  template: descriptive
+  notes: Equal-country OLS with intercept, prior exposure change, baseline exposure
+    and baseline outcome; HC3 two-sided Student t. Five fixed SHA256(ISO3) hash-fold
+    omissions. No post-result controls.
+falsification:
+  test: fixed_wdi_self_employment_productivity_forward_2026
+  rule: Any failed frozen complete-case, material-gain, variation, rank, positive
+    finite HC3 uncertainty, residualized-exposure concentration or holdout gate means
+    INCONCLUSIVE. Otherwise SUPPORTED requires positive meaningful slope, two-sided
+    Bonferroni p<=0.01/3 and >=4 positive holdout signs; REFUTED symmetrically requires
+    a negative meaningful slope and >=4 negative holdout signs. Other estimable cases
+    PARTIAL. All three remain in the denominator. Zero causal, policy, school, position
+    and featured credit.
+  threshold:
+    family_id: three_domain_forward_calibration_2026
+    family_size: 3
+    family_alpha: 0.01
+    bonferroni_p_max_two_sided: 0.0033333333333333335
+    meaningful_beta_min_abs: 0.005
+    min_complete_countries: 150
+    min_material_exposure_gain_countries: 35
+    material_exposure_gain: 3.0
+    min_exposure_p90_p10_spread: 8.0
+    max_top_country_residualized_exposure_share: 0.12
+    max_top_10_residualized_exposure_share: 0.5
+    min_leave_one_hash_fold_out_countries: 120
+    min_concordant_holdouts_for_directional_verdict: 4
+    roster_sha256: 8e1b06016aec18f323571785edbe91c228f931744c234e6822a6e2f52cbf62cc
+    source_lock_path: data/pinned_evidence/three_domain_family_2026.manifest.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: The modeled self-employment share includes employers and own-account work
+  and does not measure formal employment. Sector mix, capital deepening and GDP accounting
+  can drive both series. This test is a descriptive association and provides no identified
+  policy or causal effect.
+steelman: hypotheses/steelman/wdi_self_employment_productivity_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Frozen family preregistration: engine/audits/three_domain_family_prereg_2026-10-10.md.
+  Exact runner: scripts/run_three_domain_family_2026.py. Later source lock: data/pinned_evidence/three_domain_family_2026.manifest.json.'
