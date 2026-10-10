@@ -1,0 +1,243 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: vdem_rule_of_law_corruption_geographic_holdout_v2
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim: In the 132 fixed countries absent from the old 40-country screen, stronger
+  V-Dem rule of law in year t predicts lower V-Dem political corruption in year t+1,
+  conditional on initial real income, country effects and year effects.
+claim_direction: +
+methodology_note: Prospective new-ID, geography-disjoint holdout of economic_freedom_corruption_decline.
+  The old same-commit result was labelled SUPPORTED and is known before this registration;
+  its 40 countries are excluded. This test uses a following-year outcome and pre-frozen
+  source files. It tests only a descriptive within-country association, not economic
+  freedom as a whole or institutional causality. The country roster was selected using
+  only country/year keys in the two source files, without inspecting selected outcome
+  values or null masks. No school, policy, causal, position or featured credit is
+  requested.
+evidence_type: associational
+sample:
+  countries:
+  - AFG
+  - AGO
+  - ALB
+  - ARE
+  - ARM
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGR
+  - BHR
+  - BIH
+  - BLR
+  - BOL
+  - BRB
+  - BTN
+  - BWA
+  - CAF
+  - CHE
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DJI
+  - DOM
+  - DZA
+  - ECU
+  - ERI
+  - ETH
+  - FJI
+  - GAB
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - JAM
+  - JOR
+  - KAZ
+  - KGZ
+  - KHM
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MDA
+  - MDG
+  - MDV
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NIC
+  - NPL
+  - OMN
+  - PAN
+  - PNG
+  - PRK
+  - PRT
+  - PRY
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - TJK
+  - TKM
+  - TLS
+  - TTO
+  - TUN
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - UZB
+  - VEN
+  - VUT
+  - YEM
+  - ZMB
+  - ZWE
+  period:
+  - 1996
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - Predictor and control are measured in year t=1996..2022; political-corruption
+    outcome is at exact year t+1=1997..2023. No interpolation, substitution or gap
+    filling.
+  - Only the 132 explicitly listed countries qualify. The previous 40-country study
+    cohort and HKG, PSE, XKX are excluded before outcome inspection.
+  - Keep rows with finite V-Dem rule of law, finite V-Dem political corruption at
+    t+1, positive finite WDI real GDP per capita at t; require at least 15 complete
+    lagged pairs per country. Other selection is forbidden.
+variables:
+  outcome:
+  - name: political_integrity_t_plus_1
+    source: vdem:v2x_corr
+    transformation: 1 minus political-corruption index at exact next calendar year;
+      higher means lower corruption
+  treatment:
+  - name: rule_of_law_t
+    source: vdem:v2xcl_rol
+    transformation: published level in treatment year t; higher means stronger rule
+      of law
+  controls:
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of strictly positive published real GDP per capita
+      in year t
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS two-way fixed effects with year effect on predictor year t and country-clustered
+    covariance. Primary coefficient is rule_of_law_t. No covariate selection, interactions,
+    alternate source releases, or threshold changes. Report all three independent
+    V-Dem robustness outcomes as diagnostics, not substitute primary tests.
+falsification:
+  rule: INCONCLUSIVE if fewer than 1,500 complete lagged pairs or 80 countries with
+    at least 15 pairs survive, if the primary term or clustered uncertainty is nonfinite/unidentified,
+    or if one country contributes over 12 percent of residualized within-country/year
+    treatment sum of squares. Otherwise SUPPORTED only if the primary coefficient
+    is positive with two-sided country-clustered p<=0.005 and at least two of three
+    separately measured robustness outcomes have positive coefficients. REFUTED only
+    if the primary coefficient is negative with p<=0.005. Otherwise PARTIAL. The robustness
+    outcomes are public-sector corruption, executive corruption and clientelism at
+    t+1, each inverted so higher means less corruption/clientelism. A result earns
+    at most public calibration credit.
+  test: vdem_rule_of_law_corruption_geographic_holdout_v2
+  threshold:
+    expected_sign: +
+    p_max: 0.005
+    min_observations: 1500
+    min_countries: 80
+    min_pairs_per_country: 15
+    max_country_residualized_treatment_share: 0.12
+    min_positive_robustness_outcomes: 2
+    source_files:
+      vdem:
+        path: data/vintages/vdem/vdem_cy_full@2026-05-05T200021Z.parquet
+        sha256: 89afa79fba1ec71f06e60cc01d66d186b028636af63506f6bf7a1de36a7370ff
+      gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+prior_confidence: 0.55
+disclosure: The previous 40-country old run reported support; this pre-existing result
+  motivates the new test and could bias choice of construct. V-Dem rule of law and
+  corruption measures are expert-coded within the same source family and may share
+  source-method error. Rule of law may follow lower corruption or a common reform.
+  Fixed effects, lagging and a disjoint country holdout do not establish a causal
+  effect. The tight p threshold is chosen before looking at the selected holdout outcomes.
+steelman: hypotheses/steelman/vdem_rule_of_law_corruption_geographic_holdout_v2.md
+scope:
+  period:
+  - 1996
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - institutional_quality
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - rule_of_law
+  - geographic_holdout
+  - corruption
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
