@@ -25,9 +25,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_JSON = ROOT / "engine" / "policy_event_treatment_registry.json"
 OUT_MD = ROOT / "engine" / "policy_event_treatment_registry.md"
 
-FULL_DATE_RE = re.compile(r"\b(18|19|20|21)\d{2}-\d{2}-\d{2}\b")
-YEAR_MONTH_RE = re.compile(r"\b(18|19|20|21)\d{2}-\d{2}\b")
-YEAR_RE = re.compile(r"\b(18|19|20|21)\d{2}\b")
+FULL_DATE_RE = re.compile(r"\b(17|18|19|20|21)\d{2}-\d{2}-\d{2}\b")
+YEAR_MONTH_RE = re.compile(r"\b(17|18|19|20|21)\d{2}-\d{2}\b")
+YEAR_RE = re.compile(r"\b(17|18|19|20|21)\d{2}\b")
 
 COMPARATIVE_DESIGNS = {
     "controlled_vs_uncontrolled_units",
@@ -90,9 +90,9 @@ def timing_status(timeframe: dict[str, Any], design: dict[str, Any]) -> str:
     frame_tokens = timeframe_tokens(timeframe)
     if event_tokens["full_dates"]:
         return "event_dated"
-    if timeframe.get("effective_date"):
+    if date_tokens([timeframe.get("effective_date")])["full_dates"]:
         return "effective_date_only"
-    if frame_tokens["full_dates"]:
+    if date_tokens([timeframe.get("enacted_date")])["full_dates"]:
         return "enacted_date_only"
     if event_tokens["year_months"]:
         return "event_month_dated"
@@ -129,6 +129,7 @@ def readiness_flags(
     design: dict[str, Any],
     axes: list[str],
     inherited: dict[str, Any],
+    has_source_references: bool,
 ) -> list[str]:
     comparison_status = comparison_structure_status(design)
     features = set(design.get("design_features") or [])
@@ -142,8 +143,10 @@ def readiness_flags(
     flags: list[str] = []
     if axes:
         flags.append("axis_coded_treatment")
-    if has_full_timing:
+    if has_full_timing and has_source_references:
         flags.append("ready_for_event_study_timing")
+    elif has_full_timing:
+        flags.append("needs_exact_date_source")
     else:
         flags.append("needs_exact_event_dates")
     if has_units:
@@ -152,7 +155,7 @@ def readiness_flags(
         flags.append("needs_comparison_unit_detail")
     else:
         flags.append("needs_treated_and_comparison_unit_coding")
-    if "triple_difference" in features and has_full_timing and has_units:
+    if "triple_difference" in features and has_full_timing and has_source_references and has_units:
         flags.append("triple_difference_structure_declared")
     elif "triple_difference" in (inherited.get("preferred_designs") or []):
         flags.append("candidate_for_triple_difference_after_unit_coding")
@@ -162,7 +165,7 @@ def readiness_flags(
         flags.append("known_microdata_gaps_declared")
     if has_units and not (design.get("second_order_outcomes") or inherited.get("canonical_outcomes")):
         flags.append("needs_outcome_measurement_plan")
-    if has_full_timing and has_units:
+    if has_full_timing and has_source_references and has_units:
         flags.append("comparative_structure_declared")
     return flags
 
@@ -171,6 +174,8 @@ def measurement_blockers(flags: list[str]) -> list[str]:
     blockers: list[str] = []
     if "needs_exact_event_dates" in flags:
         blockers.append("needs_exact_event_dates")
+    if "needs_exact_date_source" in flags:
+        blockers.append("needs_exact_date_source")
     if "needs_treated_and_comparison_unit_coding" in flags:
         blockers.append("needs_treated_and_comparison_unit_coding")
     if "needs_comparison_unit_detail" in flags:
@@ -218,11 +223,19 @@ def compact_policy_row(
     )
     inherited = second_order.inherited_axis_requirements(axes, axis_index, families)
     timing = timing_status(timeframe, design)
+    has_source_references = any(str(ref).strip() for ref in (doc.get("references") or []))
+    has_full_timing = timing in {"event_dated", "effective_date_only", "enacted_date_only"}
+    exact_date_reference_status = (
+        "no_exact_date" if not has_full_timing else
+        "references_present_date_unverified" if has_source_references else
+        "uncited_exact_date"
+    )
     flags = readiness_flags(
         status=timing,
         design=design,
         axes=axes,
         inherited=inherited,
+        has_source_references=has_source_references,
     )
     blockers = measurement_blockers(flags)
 
@@ -243,6 +256,8 @@ def compact_policy_row(
         "timeframe_date_tokens": timeframe_tokens(timeframe),
         "event_date_tokens": event_date_tokens(design),
         "timing_status": timing,
+        "has_source_references": has_source_references,
+        "exact_date_reference_status": exact_date_reference_status,
         "axes": axes,
         "axis_movements": [
             {
@@ -320,6 +335,12 @@ def build_registry() -> dict[str, Any]:
                 for row in rows
                 if row["timing_status"] in {"event_dated", "enacted_date_only", "effective_date_only"}
             ),
+            "policies_with_referenced_full_event_timing": sum(
+                1 for row in rows if row["exact_date_reference_status"] == "references_present_date_unverified"
+            ),
+            "policies_with_uncited_full_event_timing": sum(
+                1 for row in rows if row["exact_date_reference_status"] == "uncited_exact_date"
+            ),
             "policies_with_comparative_structure_declared": sum(
                 1 for row in rows if "comparative_structure_declared" in row["readiness_flags"]
             ),
@@ -353,7 +374,9 @@ def write_outputs(payload: dict[str, Any]) -> None:
         "",
         f"- Policies indexed: {summary['policy_count']}",
         f"- Policies with explicit evaluation_design: {summary['policies_with_evaluation_design']}",
-        f"- Policies with exact event, enacted, or first-application dates: {summary['policies_with_full_event_timing']}",
+        f"- Policies with raw exact event, enacted, or first-application dates: {summary['policies_with_full_event_timing']}",
+        f"- Of those, policies with references present (date support not independently verified): {summary['policies_with_referenced_full_event_timing']}",
+        f"- Of those, policies with no references (timing readiness withheld): {summary['policies_with_uncited_full_event_timing']}",
         f"- Policies with exact-date comparative structure declared: {summary['policies_with_comparative_structure_declared']}",
         f"- Policies with triple-difference structure declared: {summary['policies_with_triple_difference_structure_declared']}",
         f"- Timing status counts: `{json.dumps(summary['timing_status_counts'], sort_keys=True)}`",

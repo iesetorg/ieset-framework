@@ -47,7 +47,7 @@ def test_treaty_timing_uses_entry_into_force_not_signature():
     assert registry.timeframe_tokens(timeframe)["full_dates"] == ["2008-10-01"]
     assert "ready_for_event_study_timing" in registry.readiness_flags(
         status=registry.timing_status(timeframe, {}),
-        design={}, axes=[], inherited={},
+        design={}, axes=[], inherited={}, has_source_references=True,
     )
 
 
@@ -71,6 +71,9 @@ def test_registry_summary_counts_first_application_as_full_timing(monkeypatch):
 
     summary = registry.build_registry()["summary"]
     assert summary["policies_with_full_event_timing"] == 1
+    assert summary["policies_with_referenced_full_event_timing"] == 0
+    assert summary["policies_with_uncited_full_event_timing"] == 1
+    assert summary["measurement_blocker_counts"]["needs_exact_date_source"] == 1
     assert summary["timing_status_counts"] == {
         "effective_date_only": 1,
         "year_period_only": 1,
@@ -93,6 +96,7 @@ def test_readiness_flags_separate_timing_from_unit_coding():
         design={},
         axes=["regulatory.price_control_intensity"],
         inherited={"has_axis_requirements": True, "preferred_designs": ["triple_difference"]},
+        has_source_references=False,
     )
 
     assert "axis_coded_treatment" in flags
@@ -114,6 +118,7 @@ def test_comparative_structure_without_outcome_plan_remains_blocked():
         },
         axes=[],
         inherited={},
+        has_source_references=True,
     )
 
     assert "comparative_structure_declared" in flags
@@ -129,6 +134,7 @@ def test_compact_policy_row_preserves_design_and_source_requirements():
         "countries": ["HUN"],
         "timeframe": {"start": 2021, "end": 2023, "enacted_date": "2021-11-11"},
         "description": "Administrative cap on fuel and staple foods.",
+        "references": ["https://official.example/measure"],
         "axes_moved": [
             {
                 "axis": "regulatory.price_control_intensity",
@@ -181,6 +187,8 @@ def test_compact_policy_row_preserves_design_and_source_requirements():
     )
 
     assert row["timing_status"] == "event_dated"
+    assert row["exact_date_reference_status"] == "references_present_date_unverified"
+    assert row["has_source_references"] is True
     assert row["comparison_structure_status"] == "declared_treated_comparison_design"
     assert row["event_date_tokens"]["full_dates"] == ["2021-11-15"]
     assert "comparative_structure_declared" in row["readiness_flags"]
@@ -192,3 +200,41 @@ def test_compact_policy_row_preserves_design_and_source_requirements():
         "reconstruct_needed": 1,
     }
     assert row["source_families"][0]["family_id"] == "policy_event_treatment_registry"
+
+
+def test_uncited_exact_date_keeps_raw_timing_but_blocks_readiness():
+    doc = {
+        "policy_id": "uncited_measure_1788",
+        "status": "candidate",
+        "timeframe": {"start": 1788, "effective_date": "1788-01-01"},
+        "evaluation_design": {
+            "design_features": ["triple_difference"],
+            "regulated_units": ["treated group"],
+            "exempt_or_uncontrolled_units": ["comparison group"],
+            "event_dates": ["1788-01-01 first application"],
+            "second_order_outcomes": ["outcome"],
+        },
+    }
+    row = registry.compact_policy_row(
+        REPO_ROOT / "policies" / "uncited_measure_1788.yaml", doc, {}, {},
+    )
+    assert row["timing_status"] == "event_dated"
+    assert row["timeframe"]["effective_date"] == "1788-01-01"
+    assert row["event_date_tokens"]["full_dates"] == ["1788-01-01"]
+    assert row["exact_date_reference_status"] == "uncited_exact_date"
+    assert row["has_source_references"] is False
+    assert "needs_exact_date_source" in row["readiness_flags"]
+    assert "ready_for_event_study_timing" not in row["readiness_flags"]
+    assert "comparative_structure_declared" not in row["readiness_flags"]
+    assert "triple_difference_structure_declared" not in row["readiness_flags"]
+    assert row["measurement_blockers"] == ["needs_exact_date_source"]
+    assert row["registry_readiness"] == "needs_coding_or_data"
+
+
+def test_partial_date_does_not_pass_as_full_event_timing():
+    assert registry.timing_status(
+        {"start": 1969, "effective_date": "1969-07"}, {},
+    ) == "timeframe_month_dated"
+    assert registry.timing_status(
+        {"start": 1969, "enacted_date": "1969"}, {},
+    ) == "year_period_only"
