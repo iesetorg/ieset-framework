@@ -352,11 +352,33 @@ def immutable_source_locked_nested_verdict(
         lock = json.loads(committed_lock)
     except (TypeError, ValueError):
         return ""
-    if (lock.get("hypothesis_id") != hypothesis_id
-            or lock.get("registration_commit") != spec_commit
-            or lock.get("source_sha256") != source_sha
+    if not isinstance(lock, dict):
+        return ""
+    shared_family_lock = (
+        family_size > 1 and lock.get("hypothesis_id") is None
+        and isinstance(lock.get("members"), list)
+    )
+    # The shared-lock route is deliberately archival: it can recognize a
+    # frozen INCONCLUSIVE family without granting any directional public claim.
+    if shared_family_lock and verdict != "INCONCLUSIVE":
+        return ""
+    if (lock.get("registration_commit") != spec_commit
             or lock.get("key_roster_sha256") != key_sha
             or lock.get("family_size") != family_size):
+        return ""
+    if shared_family_lock:
+        if diagnostics != load_json(run_dir / "diagnostics.json"):
+            return ""
+        added = git_bytes("log", "--diff-filter=A", "--reverse", "--format=%H",
+                          "HEAD", "--", lock_rel)
+        if added is None or added.decode().splitlines() != [lock_commit]:
+            return ""
+        source_files = lock.get("source_files")
+        if (not isinstance(source_files, dict) or len(source_files) < 2
+                or not isinstance(source_files.get("military"), dict)
+                or source_files["military"].get("sha256") != source_sha):
+            return ""
+    elif lock.get("hypothesis_id") != hypothesis_id or lock.get("source_sha256") != source_sha:
         return ""
     packet_files = ("result_card.md", "replication.py", "hypothesis.yaml",
                     "manifest.yaml", "evidence_packet.yaml")
@@ -386,6 +408,80 @@ def immutable_source_locked_nested_verdict(
             or reproduction.get("result_sha256")
                 != hashlib.sha256((run_dir / "diagnostics.json").read_bytes()).hexdigest()):
         return ""
+    if shared_family_lock:
+        # A family lock must bind the complete roster and all source identities,
+        # not merely the primary SIPRI hash repeated in each diagnostic.
+        roster_rel = lock.get("key_roster_path")
+        sources = lock["source_files"]
+        vintages = packet_source.get("input_vintages")
+        prereg = packet.get("preregistration")
+        if (not isinstance(roster_rel, str)
+                or not roster_rel.startswith("data/pinned_evidence/")
+                or not (ROOT / roster_rel).is_file()
+                or not isinstance(vintages, list)
+                or len(vintages) != len(sources)
+                or packet_source.get("source_lock_manifest") != lock_rel
+                or packet_source.get("key_roster_sha256") != key_sha
+                or not isinstance(prereg, dict)
+                or prereg.get("key_roster") != roster_rel
+                or any(not isinstance(source, dict) for source in sources.values())):
+            return ""
+        if ".." in Path(roster_rel).parts:
+            return ""
+        for source in sources.values():
+            source_path = source.get("path")
+            manifest_rel = source.get("manifest")
+            manifest_sha = source.get("manifest_sha256")
+            if (not isinstance(source_path, str)
+                    or not source_path.startswith("data/vintages/")
+                    or ".." in Path(source_path).parts
+                    or not isinstance(manifest_rel, str)
+                    or not manifest_rel.startswith("data/manifests/")
+                    or ".." in Path(manifest_rel).parts
+                    or not isinstance(source.get("url"), str)
+                    or not isinstance(manifest_sha, str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", manifest_sha)
+                    or not (ROOT / manifest_rel).is_file()):
+                return ""
+            original_manifest = git_bytes("show", f"{lock_commit}:{manifest_rel}")
+            if (original_manifest is None
+                    or original_manifest != (ROOT / manifest_rel).read_bytes()
+                    or hashlib.sha256(original_manifest).hexdigest() != manifest_sha):
+                return ""
+            try:
+                entries = yaml.safe_load(original_manifest).get("entries", [])
+            except (AttributeError, yaml.YAMLError):
+                return ""
+            if not isinstance(entries, list):
+                return ""
+            if sum(1 for row in entries if isinstance(row, dict)
+                   and row.get("publisher") == source.get("publisher")
+                   and row.get("series_id") == source.get("series_id")
+                   and row.get("parquet_path") == source_path
+                   and row.get("sha256") == source.get("sha256")) != 1:
+                return ""
+        source_hash_list = [source.get("sha256") for source in sources.values()]
+        if (any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value)
+                for value in source_hash_list)):
+            return ""
+        source_hashes = set(source_hash_list)
+        if (len(source_hashes) != len(sources)
+                or packet_source.get("secondary_source_sha256") not in source_hashes):
+            return ""
+        roster_bytes = git_bytes("show", f"{spec_commit}:{roster_rel}")
+        if (roster_bytes is None or roster_bytes != (ROOT / roster_rel).read_bytes()
+                or hashlib.sha256(roster_bytes).hexdigest() != key_sha):
+            return ""
+        expected_vintages = [
+            {field: source.get(field) for field in ("path", "sha256", "manifest", "url")}
+            for source in sources.values()
+        ]
+        if (any(not isinstance(row, dict) or not isinstance(row.get("path"), str)
+                for row in vintages)
+                or len({row["path"] for row in vintages}) != len(vintages)
+                or sorted(vintages, key=lambda row: row["path"])
+                    != sorted(expected_vintages, key=lambda row: row["path"])):
+            return ""
     if family_size > 1:
         # Multi-outcome families must be registered, locked, and measured as
         # the whole declared family. A single valid packet cannot claim a
@@ -412,6 +508,11 @@ def immutable_source_locked_nested_verdict(
                 or len(set(members)) != family_size
                 or hypothesis_id not in members):
             return ""
+        if shared_family_lock and lock.get("members") != members:
+            return ""
+        if shared_family_lock and any(not re.fullmatch(r"[A-Za-z0-9_]+", member)
+                                      for member in members):
+            return ""
         for member in members:
             matches = list((ROOT / "hypotheses").glob(f"*/{member}.yaml"))
             if len(matches) != 1:
@@ -430,6 +531,11 @@ def immutable_source_locked_nested_verdict(
                     or member_threshold.get("family_id") != family_id
                     or member_threshold.get("family_size") != family_size):
                 return ""
+            if shared_family_lock and (
+                    member_threshold.get("source_lock_path") != lock_rel
+                    or member_threshold.get("source_key_roster_sha256") != key_sha
+                    or member_threshold.get("source_sha256") != source_sha):
+                return ""
             member_dir = ROOT / "engine" / "runs" / member
             member_diag_rel = (member_dir / "diagnostics.json").relative_to(ROOT).as_posix()
             member_diag_add = git_bytes("log", "--diff-filter=A", "--reverse",
@@ -444,6 +550,49 @@ def immutable_source_locked_nested_verdict(
                     or member_diag.get("source_sha256") != source_sha
                     or member_diag.get("source_key_roster_sha256") != key_sha):
                 return ""
+            if shared_family_lock:
+                # Every sibling packet must still be the exact first measured
+                # blob. The family-level lock never makes INCONCLUSIVE public.
+                member_result = member_diag.get("result")
+                if (member_diag.get("source_lock_commit") != lock_commit
+                        or not isinstance(member_result, dict)
+                        or member_result.get("verdict") != "INCONCLUSIVE"
+                        or not member_result.get("gate_failures")):
+                    return ""
+                for filename in ("diagnostics.json", "manifest.yaml", "evidence_packet.yaml",
+                                 "hypothesis.yaml", "result_card.md", "replication.py", "chart_data.json"):
+                    relative = (member_dir / filename).relative_to(ROOT).as_posix()
+                    if (not (member_dir / filename).is_file()
+                            or git_bytes("show", f"{run_commit}:{relative}")
+                                != (member_dir / filename).read_bytes()):
+                        return ""
+                try:
+                    member_packet = yaml.safe_load((member_dir / "evidence_packet.yaml").read_text())
+                    member_manifest = yaml.safe_load((member_dir / "manifest.yaml").read_text())
+                except (OSError, yaml.YAMLError):
+                    return ""
+                if not isinstance(member_packet, dict) or not isinstance(member_manifest, dict):
+                    return ""
+                member_family = member_packet.get("family")
+                member_source = member_packet.get("source")
+                member_vintages = (member_source.get("input_vintages")
+                                   if isinstance(member_source, dict) else None)
+                if (not isinstance(member_family, dict) or not isinstance(member_source, dict)
+                        or not isinstance(member_vintages, list)
+                        or any(not isinstance(row, dict) or not isinstance(row.get("path"), str)
+                               for row in member_vintages)
+                        or member_family.get("members") != members
+                        or member_packet.get("result") != member_diag.get("result")
+                        or sorted(member_vintages, key=lambda row: row["path"])
+                            != sorted(expected_vintages, key=lambda row: row["path"])
+                        or member_source.get("source_lock_manifest") != lock_rel
+                        or member_source.get("source_lock_commit") != lock_commit
+                        or member_source.get("source_sha256") != source_sha
+                        or member_source.get("secondary_source_sha256") not in source_hashes
+                        or member_manifest.get("status") != "INCONCLUSIVE"
+                        or member_manifest.get("preregistration_commit") != spec_commit):
+                    return ""
+                continue
             member_lock_commit = str(member_diag.get("source_lock_commit") or "")
             member_lock_rel = f"data/pinned_evidence/{member}.source.json"
             member_lock_bytes = git_bytes("show", f"{member_lock_commit}:{member_lock_rel}")
