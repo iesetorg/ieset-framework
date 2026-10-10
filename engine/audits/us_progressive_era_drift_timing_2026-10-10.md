@@ -1,5 +1,7 @@
 # U.S. Progressive Era drift timing audit — 2026-10-10
 
+**Follow-up:** The separate [1906 axis-content audit](us_progressive_era_1906_axis_content_correction_2026-10-10.md) removes the 1906 sectoral-licensing step after checking what that axis actually measures. The five-axis counts, 1906 score, and post-1906 equality stated below describe this earlier timing-only commit, not the final corrected map.
+
 This is a bounded correction to the constructed national policy-decision map. It does not measure effects, add a hypothesis result, or claim that reform activity was absent before a coded statute. The movement remains a 1901–1917 historical umbrella; its five scored decisions now enter in the years supported by the cited laws.
 
 ## Earlier national steps checked

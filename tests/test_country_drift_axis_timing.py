@@ -5,6 +5,7 @@ import importlib.util
 from pathlib import Path
 
 import pytest
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -62,7 +63,7 @@ def test_attribution_year_requires_a_source_basis_and_within_period_date() -> No
         DRIFT.axis_attribution_year(movement, entry)
 
 
-def test_progressive_era_steps_wait_for_cited_1906_1913_1914_laws() -> None:
+def test_progressive_era_steps_wait_for_cited_1913_1914_laws() -> None:
     movement = next(
         m for m in DRIFT.load_movements()
         if m["movement_id"] == "us_progressive_era_reform_consensus_1901_1917"
@@ -71,7 +72,6 @@ def test_progressive_era_steps_wait_for_cited_1906_1913_1914_laws() -> None:
         entry["axis"]: entry["drift_attribution_year"]
         for entry in movement["axes_summary"]
     } == {
-        "regulatory.sectoral_licensing": 1906,
         "regulatory.product_market_competition": 1914,
         "regulatory.financial_deregulation": 1913,
         "monetary.central_bank_independence": 1913,
@@ -80,11 +80,23 @@ def test_progressive_era_steps_wait_for_cited_1906_1913_1914_laws() -> None:
     result = DRIFT.build_drift([movement])
     usa = result["countries"]["USA"]
     at = {year: index for index, year in enumerate(result["years"])}
-    # Movement period starts in 1901, but its cited federal laws did not.
-    for year in range(1901, 1906):
+    # The 1906 statutes remain linked but have no supported signed movement axis.
+    for year in range(1901, 1913):
         assert usa["statist_drift"][at[year]] == 0.0
         assert all(series[at[year]] == 0.0 for series in usa["axes"].values())
-    assert usa["statist_drift"][at[1906]] == 2.0
-    assert usa["statist_drift"][at[1912]] == 2.0
-    assert usa["statist_drift"][at[1913]] == 5.0
-    assert usa["statist_drift"][at[1914]] == 3.0
+    assert usa["statist_drift"][at[1913]] == 3.0
+    assert usa["statist_drift"][at[1914]] == 1.0
+
+
+def test_1906_policy_axes_do_not_conflate_oversight_with_entry_licensing() -> None:
+    food = yaml.safe_load((ROOT / "policies/us_pure_food_drug_act_1906.yaml").read_text())
+    rail = yaml.safe_load((ROOT / "policies/us_hepburn_act_1906.yaml").read_text())
+
+    assert not food.get("axes_moved")
+    assert all(axis["axis"] != "regulatory.sectoral_licensing" for axis in food.get("axes_moved", []))
+    assert all(axis["axis"] != "regulatory.sectoral_licensing" for axis in rail["axes_moved"])
+    # Rate oversight alone cannot decide the act's net competitive effect.
+    competition = next(axis for axis in rail["axes_moved"]
+                       if axis["axis"] == "regulatory.product_market_competition")
+    assert competition["direction"] == "mixed"
+    assert "magnitude" not in competition
