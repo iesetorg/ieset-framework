@@ -16,7 +16,7 @@ The [Judiciary Act signed 24 September 1789](https://www.archives.gov/milestone-
 
 ## Display follow-up
 
-The current drift page filters source-backed historical policy cards with `policy.timeframe.start < data.year_min`. With `year_min` now 1789, that rule hides all five unscored 1789–1844 cards, including the U.S. constitutional commencement. A display change should select policy-only records before the first composite step (currently 1846), keep their dashed markers, and describe them as unscored policy context even when their dates fall inside the axis-only drift grid. It must not label the U.S. 1789 policy as scored.
+The initial drift page filtered source-backed historical policy cards with `policy.timeframe.start < data.year_min`. Once `year_min` became 1789, that rule would have hidden all five unscored 1789–1844 cards, including the U.S. constitutional commencement. The page now selects the pre-1850 policy-context window independently of `year_min`, retains those dashed policy-only markers, and labels them as unscored context. The U.S. 1789 policy remains unscored.
 
 ## Data effect and checks
 
