@@ -1,0 +1,7 @@
+# SIPRI Share-of-GDP future-fetch unit metadata repair
+
+`data/fetchers/sipri.py` selected the correct `Share of GDP` Excel sheet but previously labelled every fetched sheet with the same generic units string, including `% GDP`. The exact pinned Share-of-GDP Parquet SHA-256 `5ccce854cc3127eb0510b2f9f0e99741fb4a037a5950c745137970e7c618d3be` has numeric cells stored as **fractions of GDP**. The SIPRI–UNDP no-fit diagnostic and the earlier fixed-investment unit adapter independently exposed this interpretation mismatch.
+
+Future fetch manifests now identify the stored Share-of-GDP numeric scale as `fraction of GDP in stored numeric cells; multiply by 100 for percentage points`. The fetcher still reads and writes the same source values. Other sheet handling is unchanged. This does not rewrite historical manifests, source files, immutable source locks, preregistration commitments, or result packets. The four SIPRI–UNDP verdicts remain descriptive PARTIAL.
+
+The historical `data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml` entry retains its original generic units text and pinned hash. Consumers of that exact vintage must continue to apply an explicit unit conversion when interpreting a one-point change. SIPRI's [sources and methods](https://www.sipri.org/databases/milex/sources-and-methods) define military burden as the ratio of military expenditure to GDP and describe its public presentation as a percentage.

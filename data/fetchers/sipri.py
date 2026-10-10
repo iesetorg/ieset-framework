@@ -25,6 +25,13 @@ SHEETS_TO_PARSE = [
 ]
 
 
+def stored_units(sheet_name: str) -> str:
+    """Describe the numeric Parquet cell scale, not Excel's displayed format."""
+    if "share" in sheet_name.lower() and "gdp" in sheet_name.lower():
+        return "fraction of GDP in stored numeric cells; multiply by 100 for percentage points"
+    return "depends on sheet: constant 2022 USD / current USD / % GDP / per capita real"
+
+
 def fetch(series_id: str = "milex_constant_usd", *, vintage_utc: datetime | None = None) -> FetchResult:
     """series_id picks which sheet: 'constant_usd' | 'current_usd' | 'share_gdp' | 'per_capita'."""
     fetch_ts = utc_now()
@@ -78,7 +85,7 @@ def fetch(series_id: str = "milex_constant_usd", *, vintage_utc: datetime | None
         fetch_utc=fetch_ts,
         rows=len(df),
         frequency="annual",
-        units="depends on sheet: constant 2022 USD / current USD / % GDP / per capita real",
+        units=stored_units(target_sheet),
         currency="USD" if "usd" in alias else None,
         start_date=str(int(df["year"].min())) if "year" in df.columns and len(df) else None,
         end_date=str(int(df["year"].max())) if "year" in df.columns and len(df) else None,
