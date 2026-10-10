@@ -129,11 +129,19 @@ export function DriftChart({
       const xMax = Math.max(...years);
 
       const hasMovementLabels = Boolean(movements && movements.length > 0);
+      const longestEndLabel = Math.max(
+        0,
+        ...countries.map((country) => labelFor(country).length)
+      );
+      const endLabelMargin = Math.max(
+        hasMovementLabels ? 64 : 34,
+        Math.min(150, Math.ceil(longestEndLabel * 6.5) + 18)
+      );
       const node = Plot.plot({
         width: chartWidth,
         height,
         marginLeft: 56,
-        marginRight: hasMovementLabels ? 64 : 34,
+        marginRight: endLabelMargin,
         marginBottom: 36,
         marginTop: hasMovementLabels ? 28 : 12,
         x: {

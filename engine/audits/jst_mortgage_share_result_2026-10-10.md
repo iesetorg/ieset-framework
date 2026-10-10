@@ -2,7 +2,7 @@
 
 ## Frozen custody and verdicts
 
-The first registration commit is `f718e1e7a3d36e84ca2562ea7dd7f55b567dabd1`. Eight metadata-only source locks were separately committed in runner order; the final lock is `9bad101ce8ca829ee9d54b33c8d7b9b5046b10f0`. Only then were selected source measurements opened. The exact pinned JST R6 SHA-256 and 1,512 country-year key roster were checked before measurement. Packets contain aggregate diagnostics only; raw or country-level source values were not committed.
+The first registration commit is `f718e1e7a3d36e84ca2562ea7dd7f55b567dabd1`. Eight metadata-only source locks were separately committed in runner order; the final lock is `288e7688d3b30f891cd304df8f988acd0346994f`. Only then were selected source measurements opened. The exact pinned JST R6 SHA-256 and 1,512 country-year key roster were checked before measurement. Packets contain aggregate diagnostics only; raw or country-level source values were not committed.
 
 Frozen verdicts: **2 PARTIAL, 6 INCONCLUSIVE, 0 SUPPORTED, 0 REFUTED**. The two complete, ungated cells are eligible only for descriptive public calibration after independent evidence-tier review; the six gate failures remain archived. This is one correlated eight-cell family, not eight independent replications. No result receives causal, policy, school, position, or featured credit.
 
