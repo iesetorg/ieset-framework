@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_bargaining_unemployment_2025_temporal_holdout_v2
+version: 1
+status: pre_registered
+topic: labour
+claim: Across the 26 prespecified OECD reporting countries, ten percentage points
+  more collective-bargaining coverage in 2023 predicts no more than 0.2 percentage
+  point additional increase in working-age unemployment from 2023 to 2025,
+  conditional on the 2023 working-age unemployment rate.
+methodology_note: A temporal descriptive follow-up to archived
+  oecd_collective_bargaining_unemployment_nonpenalty. Its same-commit run is
+  unverified; the old manifest labels it SUPPORTED while the diagnostics and
+  result card label it PARTIAL. The old registered estimator ends in 2022.
+  This v2 uses a genuinely later 2025 unemployment observation, a frozen
+  2023 exposure, and a distinct cross-sectional estimator. No old result,
+  causal interpretation, or score credit is transferred.
+evidence_type: associational
+sample:
+  countries: &countries
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - FRA
+  - GBR
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - MEX
+  - NLD
+  - NZL
+  - POL
+  - PRT
+  - SWE
+  - TUR
+  - USA
+  period: &period [2023, 2025]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: Only one new annual outcome year, 2025, exists
+    beyond the old source vintage. A country-and-year FE panel on this
+    independent endpoint is impossible; the fixed 26-country cross-section
+    tests a narrow forward descriptive association without policy attribution.
+  exclusion_rules:
+  - Use exactly the pinned country roster; OECD aggregates and extra countries
+    never enter the fit. Do not substitute ages, sexes, coverage measures,
+    years, or later source releases.
+  - Require 2023 OECD bargaining-coverage measure ERB with actual status A,
+    finite percentage in [0,100].
+  - After the separately committed source lock, require OECD LFS UNE_RATE,
+    SEX=_T, AGE=Y15T64, LABOUR_FORCE_STATUS=UNE, actual status A, and finite
+    percentages in [0,100] in both 2023 and 2025.
+  - Drop a country only for a frozen completeness rule; report every dropped
+    country and reason. Never modify the roster or minimum floor after outcome
+    access.
+variables:
+  treatment:
+  - name: collective_bargaining_coverage_2023_per_ten_pp
+    source: oecd:OECD.ELS.SAE_DSD_TUD_CBC_DF_CBC_1.0
+    transformation: 2023 MEASURE=ERB coverage percentage divided by ten.
+  outcome:
+  - name: working_age_unemployment_change_2023_to_2025_pp
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: 2025 minus 2023 OECD unemployment rate in percentage points;
+      MEASURE=UNE_RATE, SEX=_T, AGE=Y15T64, LABOUR_FORCE_STATUS=UNE.
+  controls:
+  - name: working_age_unemployment_2023_pp
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: Identically selected 2023 unemployment rate.
+estimator:
+  template: descriptive
+  clustering: none; one observation per country
+  fixed_effects: []
+  notes: OLS of two-year unemployment change on an intercept, 2023 bargaining
+    coverage per ten percentage points, and 2023 unemployment. Use HC3
+    heteroskedasticity-robust standard error and one-sided Student t reference
+    with n-3 degrees of freedom for the 95 percent non-inferiority bounds.
+    No causal or country/year FE claim.
+falsification:
+  rule: SUPPORTED only if the one-sided 95 percent upper confidence bound on
+    the coverage coefficient is at most +0.2 unemployment-rate percentage point
+    per ten points of bargaining coverage. REFUTED only if the one-sided 95
+    percent lower bound is greater than +0.2. Otherwise PARTIAL if all method
+    gates pass. A missing source, fewer than 24 valid countries, exposure IQR
+    below 20 percentage points, singular design, non-finite HC3 uncertainty,
+    maximum diagonal leverage above 0.35, or maximum partialled-out exposure
+    square share above 0.20 is INCONCLUSIVE with no coefficient or public
+    verdict. The one-test family alpha is 0.05.
+  test: oecd_bargaining_unemployment_2025_temporal_noninferiority_v2
+  threshold:
+    family_id: oecd_bargaining_unemployment_2025_temporal_holdout_v2_2026_10_10
+    family_size: 1
+    family_alpha_one_sided: 0.05
+    noninferiority_margin_pp_per_ten_coverage_pp: 0.2
+    min_valid_countries: 24
+    min_exposure_iqr_pp: 20.0
+    max_hat_diagonal: 0.35
+    max_top_partialled_exposure_square_share: 0.20
+    key_roster_sha256: 0160f69e5ff5a0995ba95da2d1dec1ace90aa251a07e1084414653591c81eebd
+    source_files:
+      coverage:
+        path: data/vintages/oecd/OECD.ELS.SAE_DSD_TUD_CBC_DF_CBC_1.0@2026-05-01T071721Z.parquet
+        sha256: 45010f706f77803e30cb98d9383e2f19ec54a23c119f693c875e124aa7441086
+        manifest: data/manifests/fetch_run_2026-05-01T071724Z.yaml
+        manifest_sha256: 74d74d5cdc766624023d26fc3eec0eadf8f56efed52cfb30ff57c57b344db4d6
+      unemployment:
+        path: data/vintages/oecd/DSD_LFS_DF_LFS_INDIC@2026-07-23T151216Z.parquet
+        sha256: ac58f9ea05eb07e0d4696a81334021120cd679f58847a2fb32dc70e06074e6ae
+        manifest: data/manifests/fetch_run_2026-07-23T151302Z.yaml
+        manifest_sha256: 4952688fa8fbf62df91c20409bf4180b75977bc638bb33e2a00a267b3053b601
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    causal_credit: 0
+    featured_eligible: false
+prior_confidence: 0.45
+disclosure: Coverage is an institution measure, not a randomized intervention.
+  One 26-country endpoint is vulnerable to economic shocks, structural labour
+  differences, institutional endogeneity, and revisions. The 2025 LFS source
+  may overlap other IESET research; independence here is relative to the named
+  archived fit and no archive-wide multiplicity correction is claimed.
+steelman: hypotheses/steelman/oecd_bargaining_unemployment_2025_temporal_holdout_v2.md
+scope:
+  period: *period
+  countries: *countries
+  outcome_dim: [employment_labour]
+  policy_family: [labour_market]
+  treatment_tags: [collective_bargaining_institutions]
+linked_hypotheses: []
+covers_claims: []
+notes: Prospective descriptive calibration only. The old same-commit ID remains
+  archived and receives no verdict or credit transfer.
