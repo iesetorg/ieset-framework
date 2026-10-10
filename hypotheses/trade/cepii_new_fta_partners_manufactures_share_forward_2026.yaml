@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cepii_new_fta_partners_manufactures_share_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: '+'
+claim: Across the fixed 1995–2018 country-year roster, a positive year-t increase in CEPII FTA-covered foreign partner count predicts a higher exact t-1-to-t+2 change in WDI manufactures exports as a share of merchandise exports than a year with no positive increase, conditional on the t-1 share and country/year effects.
+methodology_note: Prospective descriptive one-test calibration. Only CEPII treatment values, WDI manufactures-export-share schema and country/year keys, source hashes/manifests, and prior hypothesis text informed registration. Selected WDI outcome values, null masks, and statuses remain closed until a separately committed source lock. Frozen contract is engine/audits/cepii_new_fta_partners_manufactures_share_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: [GLOBAL]
+  period: [1995, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed key-only country/year roster, selected from the fixed current-country ISO3 allowlist. Require exact CEPII year t and WDI indicator keys at t-1 and t+2; key presence alone does not establish a measured outcome.
+  - CEPII new partner count must be a finite nonnegative integer. Code event if count at t is at least one, and control if it is zero; retain events of every positive size without outcome-dependent tuning.
+  - After a separate committed source lock, require unique selected WDI rows and finite manufactures-export shares in [0,100] at both exact endpoints. Read only the selected `value` field, never `obs_status`; there is no status filter, imputation, nearest-year match, alternate series, or winsorization.
+  - Retain countries with at least five complete measured pairs after outcome access.
+variables:
+  treatment:
+  - name: positive_increase_in_fta_covered_partner_count
+    source: cepii:gravity_new_fta_partner_count
+    transformation: Indicator that positive year-over-year increase in active CEPII fta_wto-covered foreign partner count at t is at least one.
+    notes: Derived as max(year-over-year change in covered partner count, 0). It measures net expansion in CEPII partner coverage, not first treaty accession, treaty depth, tariff reductions, or an exogenous policy shock.
+  outcome:
+  - name: forward_manufactures_export_share_change_percentage_points
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: Exact manufactures exports as percent of merchandise exports at t+2 minus t-1, in percentage points.
+    notes: This is an export-composition share with a merchandise-export denominator, not manufacturing productivity, export volume, or value added.
+  controls:
+  - name: baseline_manufactures_export_share
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: Exact manufactures exports as percent of merchandise exports at t-1.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: One OLS event coefficient versus zero-increase years, with the fixed t-1 baseline share and country and treatment-year fixed effects. Country-cluster CR1 standard errors and two-sided Student t(G-1) inference. The same t-1 share appears in the change outcome and as a covariate; this mechanical coupling and regression to the mean remain interpretation risks. No additional controls, lags, subgroups, or source search.
+falsification:
+  test: run_cepii_new_fta_partners_manufactures_share_forward_2026
+  rule: INCONCLUSIVE if exact source/registration/lock custody, complete-case, event/control, full-rank, partialled-event concentration, or finite cluster-uncertainty gate fails. SUPPORTED only if event beta is at least +0.5 percentage points with two-sided p at most 0.005. REFUTED only if event beta is at most -0.5 percentage points at the same cutoff. Otherwise PARTIAL. This local cutoff does not correct archive-wide selection.
+  threshold:
+    family_id: cepii_new_fta_partners_manufactures_share_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.005
+    p_max_two_sided: 0.005
+    expected_beta_sign: '+'
+    meaningful_beta_min_abs: 0.5
+    min_valid_rows: 1000
+    min_valid_countries: 70
+    min_pairs_per_country: 5
+    min_event_rows: 150
+    min_event_countries: 50
+    min_event_years: 15
+    min_control_rows: 500
+    min_control_countries: 70
+    max_top_one_percent_partialled_event_share: 0.15
+    max_top_country_partialled_event_share: 0.05
+    max_top_year_partialled_event_share: 0.15
+    expected_key_rows: 5028
+    expected_key_countries: 212
+    expected_key_event_rows: 1013
+    expected_key_event_countries: 166
+    expected_key_event_years: 24
+    roster_sha256: 1f8d1b6c7a92ffcb3ffcdf226b3cf98fbf44f1bd8c5d6d3ee0f5027325ff82cf
+    iso3_allowlist_sha256: cc306b7deb4ff39f16097111f5a48412bc49e268a7fa5dfc42a9c9427adf0e6b
+    source_files:
+      treatment:
+        path: data/vintages/cepii/gravity_new_fta_partner_count@2026-05-15T175027Z.parquet
+        sha256: 1120bf0082c64bd79b4bce2b011e7fe524b814ce821eff5bea5e976af379a53b
+        manifest: data/manifests/fetch_run_2026-05-15T175027Z.yaml
+        manifest_sha256: 5922b10683ebf977d4f45b994cd4196cde4e0845540a6e69adb727be91229a46
+      outcome:
+        path: data/vintages/world_bank_wdi/TX.VAL.MANF.ZS.UN@2026-04-30T115209Z.parquet
+        sha256: c5077c18a1ba1b953bc1cd66ac980f36b5cda7568fc3749126b91587cf17c98b
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+      raw_zip:
+        path: data/raw/cepii/Gravity_csv_V202211.zip
+        sha256: 7ffea0510a536587f2f9295bbafef4a312a36b366acc256eb6d9770fe35e44b1
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: The CEPII event is a positive net increase in recorded FTA-covered partners, not an identified treaty effect. Country selection into agreements, simultaneous reforms, partner composition, CEPII coverage changes, prior export trends, commodity prices, and the merchandise-export denominator can move the WDI share. Including the t-1 share in a t-1-to-t+2 change equation creates mathematical coupling and does not remove regression to the mean. Earlier CEPII FTA-growth, FTA-covered-partner-GDP/high-tech-export, and RTA-partner-expansion/HS6-product tests, plus WDI manufactures-share work with other exposures, were visible before registration. This is neither an independent holdout nor archive-wide multiplicity control. Descriptive calibration only; no causal, policy, school, position, or featured credit.
+steelman: hypotheses/steelman/cepii_new_fta_partners_manufactures_share_forward_2026.md
+scope:
+  period: [1994, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
