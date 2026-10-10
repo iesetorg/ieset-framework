@@ -2287,6 +2287,25 @@ def run_panel_ols(
     )
     if sub.empty or len(sub) < min_obs:
         return {"error": f"insufficient observations after listwise deletion ({len(sub)})"}
+    # An outcome duplicated as a control gives a perfect fit and a meaningless
+    # treatment coefficient.  Do not silently remove a preregistered control:
+    # that would change the frozen model after seeing its data.  The case needs
+    # a separately registered, claim-matched design instead.
+    self_controls = [
+        control for control in usable_controls
+        if sub[outcome_name].equals(sub[control])
+    ]
+    if self_controls:
+        return {
+            "error": (
+                "method invalid: outcome is identical to control(s) "
+                f"{', '.join(self_controls)} on the estimation sample"
+            ),
+            "method": "invalid exact outcome-as-control design",
+            "method_valid": False,
+            "self_controls": self_controls,
+            "dropped_controls_due_to_overlap": dropped_controls,
+        }
     rhs = [treatment_name] + usable_controls
     sub_plain = sub.copy()
     entity = "country" in [str(x).lower() for x in fe_spec]
