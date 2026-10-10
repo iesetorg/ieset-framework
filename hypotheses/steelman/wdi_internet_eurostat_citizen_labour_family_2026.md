@@ -1,0 +1,9 @@
+# Steelman — prior Internet uptake and citizenship-specific labour rates
+
+Internet diffusion can lower information and search costs, expand remote matching, and make formal job opportunities easier to discover. A positive association with subsequent participation and employment among both national and foreign citizens is plausible, especially in working-age cells. This is the strongest descriptive version of the claim.
+
+The counter-case is substantial. National Internet uptake follows income, education, telecom investment and policy, while employment responds to the same forces. Foreign-citizen cell composition changes through migration and naturalisation, so a rate change is not a transition for a fixed group. Small foreign-citizen survey cells may have high sampling error or quality flags, and the pinned Eurostat Parquet retained no cell flags. No country/year adjustment alone removes these problems. The detailed annual LFS series is unadjusted; its 2021 redesign is avoided by the 2005–2019 endpoint window, but earlier country-specific breaks may remain.
+
+Activity (labour-force participation/population) and employment (employed/population) ask different questions and can move differently when unemployment changes. They share many people and macro shocks; the full 64-case denominator is fixed before opening outcomes. An opposite association at the frozen family cutoff counts as a refutation, while weak/ambiguous estimates remain PARTIAL and sparse or influenced estimates remain INCONCLUSIVE. Neither activity nor employment result estimates a policy effect or school credit.
+
+Source meanings: [Eurostat detailed annual LFS metadata](https://ec.europa.eu/eurostat/cache/metadata/en/lfsa_esms.htm); [World Bank Internet-use metadata](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/IT.NET.USER.ZS). The latter identifies ITU as underlying source; public data rights require separate review.

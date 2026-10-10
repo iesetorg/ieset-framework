@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_internet_eurostat_employment_for_m_20_24_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Among foreign citizens men ages 20–24 in the frozen European country-year roster, larger national
+  Internet-use gains before year t predict larger next-year changes in the employment rate. The registered
+  meaningful slope is at least +0.02 percentage point of rate change per one percentage point of prior
+  Internet-use gain.
+methodology_note: Prospective member of a single 64-cell citizenship × sex × five-year-age × activity/employment
+  family. Registration, key-only sample, source pins, chronology, and all failure gates are frozen in
+  engine/audits/wdi_internet_eurostat_citizen_labour_prereg_2026-10-10.md before any selected Eurostat
+  outcome values or null masks are opened. Activity and employment are distinct but correlated labour
+  margins, not independent replications.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FRA
+  - GBR
+  - GRC
+  - IRL
+  - ITA
+  - LUX
+  - LVA
+  - NLD
+  - NOR
+  - PRT
+  - SVN
+  - SWE
+  period:
+  - 2005
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Use exactly the committed case/country/anchor-year key roster. Anchor t runs 2005–2018; outcome change
+    uses t to t+1 and never crosses the 2021 LFS redesign.
+  - WDI Internet use at t−2 and t−1 must be finite within 0–100 with blank/A observation status; absolute
+    change must not exceed 20 percentage points. No post-outcome replacement, winsorization, or proxy
+    substitution.
+  - 'Eurostat exact selector: freq=A, unit=PC, chosen sex/age/citizenship. After separate committed source
+    lock, both annual rate endpoints must be finite in [0,100]. The pinned Parquet omitted source cell
+    flags, so flags cannot be screened; this limits inference.'
+  - Retain only exact-roster complete pairs; require five complete years/country and all frozen sample,
+    material-exposure, influence, full-rank, and uncertainty gates.
+variables:
+  treatment:
+  - name: prior_internet_use_gain_pp
+    source: world_bank_wdi:IT.NET.USER.ZS
+    transformation: Internet users (% population) at t−1 minus t−2; one unit is one percentage point.
+    notes: National uptake is an associational exposure, not exogenous access or policy.
+  outcome:
+  - name: next_year_employment_rate_change_for_m_20_24
+    source: eurostat:lfsa_ergan
+    transformation: Annual employment rate among foreign citizens men ages 20–24 at t+1 minus t, in percentage
+      points.
+    notes: Repeated cross-sectional rates, not within-person transitions. Citizenship is current nationality,
+      not birthplace.
+  controls:
+  - name: baseline_internet_use_t_minus_2
+    source: world_bank_wdi:IT.NET.USER.ZS
+    transformation: Internet users (% population) at t−2, linear covariate fixed before outcome access.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Country and year fixed-effects OLS of next-year annual rate change on prior Internet-use gain
+    and baseline Internet use. Country-cluster CR1, two-sided Student t(G−1). One primary fit per cell;
+    no second fit can upgrade its verdict.
+falsification:
+  test: wdi_internet_eurostat_citizen_labour_2026_10_10
+  rule: INCONCLUSIVE if any exact source, chronology, complete-case, material-exposure, partialled-treatment
+    concentration, full-rank, or uncertainty gate fails. Otherwise SUPPORTED only for beta≥+0.02 rate
+    percentage point per Internet percentage point and two-sided p≤0.00015625; REFUTED for beta≤−0.02
+    at the same p. All other estimable outcomes are PARTIAL. All 64 cells remain in one Bonferroni denominator.
+  threshold:
+    family_id: wdi_internet_eurostat_citizen_labour_2026_10_10
+    family_size: 64
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00015625
+    positive_beta_min_rate_pp_per_internet_pp: 0.02
+    material_internet_change_min_abs_pp: 2.0
+    max_abs_internet_change_pp: 20.0
+    anchor_years:
+    - 2005
+    - 2018
+    expected_key_rows: 268
+    expected_key_countries: 21
+    expected_key_years: 14
+    expected_material_key_rows: 158
+    expected_material_key_countries: 21
+    roster_sha256: ed255398f42704075825c4e76db3dab2003ef2cfe6c12a8c24086c380b368758
+    min_valid_rows: 200
+    min_valid_countries: 16
+    min_material_rows: 100
+    min_material_countries: 15
+    min_distinct_years: 12
+    min_complete_years_per_country: 5
+    max_top_1pct_partialled_internet_share: 0.3
+    max_country_partialled_internet_share: 0.2
+    max_year_partialled_internet_share: 0.2
+    source_files:
+      internet:
+        path: data/vintages/world_bank_wdi/IT.NET.USER.ZS@2026-05-05T203400Z.parquet
+        sha256: c17944e3e8ef15a5c5663e281389ad5bcc1398ae3769258c75f545f37b216cb8
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      activity:
+        path: data/vintages/eurostat/lfsa_argan@2026-04-30T130700Z.parquet
+        sha256: 0ed2c40356794d48779dff7fc951e022cfb7994b1d7be5249f16fed12627dec9
+        manifest: data/manifests/fetch_run_2026-04-30T130723Z.yaml
+        manifest_sha256: cdb19507131f6659ca87ec4aa96784f031627a8bab939dc9ec9390752778aa16
+      employment:
+        path: data/vintages/eurostat/lfsa_ergan@2026-04-30T130634Z.parquet
+        sha256: e0129dac7799748fad79571d6b736cf9afb55d290fe4c6b8f95457af8e1eee68
+        manifest: data/manifests/fetch_run_2026-04-30T130700Z.yaml
+        manifest_sha256: 63fb4149706f480f087beeab88cfd049b870d26ca689edbdd2f227c039a158dd
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: Digital diffusion may affect job search and business matching, but Internet use is a national
+  proxy for development and economic change. Eurostat LFS cells lack retained flags, foreign-citizen estimates
+  may be imprecise, and historical national breaks remain possible. The 64 cells share shocks and two
+  related labour margins; family correction is local, not archive-wide. No causal, policy, school, position,
+  or featured credit.
+steelman: hypotheses/steelman/wdi_internet_eurostat_citizen_labour_family_2026.md
+scope:
+  period:
+  - 2005
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags:
+  - internet_use_diffusion
+  - digital_adoption
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
