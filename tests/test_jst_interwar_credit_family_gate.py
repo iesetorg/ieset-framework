@@ -68,3 +68,12 @@ def test_original_invalid_spec_cannot_be_public() -> None:
 def test_valid_single_source_locked_result_remains_public() -> None:
     hid = "jst_1929_1933_advanced_trade_openness_drop_v2"
     assert nested_verdict(hid, "trade") == "SUPPORTED"
+
+
+def test_frozen_runner_rejects_post_result_spec_change() -> None:
+    proc = subprocess.run(
+        ["python3", "scripts/run_jst_interwar_credit_severity_2026.py", "verify"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert proc.returncode != 0
+    assert "frozen registration changed after first commit" in proc.stderr
