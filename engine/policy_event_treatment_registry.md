@@ -4,15 +4,15 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 
 ## Summary
 
-- Policies indexed: 3420
+- Policies indexed: 3423
 - Policies with explicit evaluation_design: 42
-- Policies with exact event, enacted, or first-application dates: 2125
+- Policies with exact event, enacted, or first-application dates: 2129
 - Policies with exact-date comparative structure declared: 7
 - Policies with triple-difference structure declared: 1
-- Timing status counts: `{"effective_date_only": 59, "enacted_date_only": 2028, "event_dated": 38, "event_month_dated": 3, "year_period_only": 1292}`
-- Comparison structure counts: `{"axis_only_no_unit_split": 3411, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 16, "needs_comparison_unit_detail": 33, "needs_exact_event_dates": 1295, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3378}`
-- Axis source readiness: `{"partial_ready": 44836, "proprietary_gap": 6736, "ready": 3356, "reconstruct_needed": 19102, "scrape_needed": 14118}`
+- Timing status counts: `{"effective_date_only": 61, "enacted_date_only": 2030, "event_dated": 38, "event_month_dated": 3, "year_period_only": 1291}`
+- Comparison structure counts: `{"axis_only_no_unit_split": 3414, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 16, "needs_comparison_unit_detail": 33, "needs_exact_event_dates": 1294, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3381}`
+- Axis source readiness: `{"partial_ready": 44874, "proprietary_gap": 6742, "ready": 3359, "reconstruct_needed": 19116, "scrape_needed": 14133}`
 
 ## Comparative Structure Seeds (Measurement Gaps Shown)
 
