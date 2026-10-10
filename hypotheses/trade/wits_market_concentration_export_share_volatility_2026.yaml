@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wits_market_concentration_export_share_volatility_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: >-
+  Across the fixed country-key roster, a 0.1-point rise in the WITS export
+  destination-market concentration index from 2000 to 2010 predicts at least
+  one additional percentage point of volatility in annual export/GDP-share
+  changes during 2011–2020, conditional on the 2000 market index, 2010
+  export/GDP share, and 2001–2010 export-share-change volatility.
+  This is a descriptive forward association, not a policy effect.
+evidence_type: descriptive
+methodology_note: >-
+  One prospectively registered, source-locked calibration. The local WITS
+  series id product_concentration actually contains HH-MKT-CNCNTRTN-NDX,
+  the export market concentration index across destination partners.
+  An older wits_export_product_diversification_resilience_panel generic
+  screen was PARTIAL and mislabeled this source as product concentration.
+  This new result neither repairs nor regrades that archived screen.
+  Only source hashes, metadata, keys, and prior archive artifacts were
+  inspected before registration; no selected values or fits were opened.
+sample:
+  countries: [GLOBAL]
+  period: [2000, 2020]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    One market-HHI change in 2000–2010 and one later ten-year volatility
+    summary of annual export-share changes are constructed per economy.
+  exclusion_rules:
+    - >-
+      Candidate economies are ISO 3166 alpha-3 countries and territories
+      plus XKX with exact WITS market-index keys for 2000 and 2010 and
+      annual WDI export/GDP-share keys for all 2000–2020 years. The
+      key-only roster is frozen before selected values are read.
+    - >-
+      Require finite WITS market HHI in [0,1] at both endpoints and finite
+      WDI exports-of-goods-and-services/GDP share in [0,300] for every
+      year 2000–2020. A missing or invalid cell excludes that economy.
+      Do not interpolate, impute, replace, winsorise, or select country
+      subsets after reading values.
+variables:
+  outcome:
+    - name: export_gdp_share_annual_change_volatility_2011_2020
+      source: world_bank_wdi:NE.EXP.GNFS.ZS
+      transformation: >-
+        sample standard deviation with denominator 9 of the ten
+        year-on-year percentage-point changes from 2010→2011 through
+        2019→2020 in exports of goods and services as a share of GDP
+      notes: >-
+        This is volatility of a GDP ratio, not merchandise export values,
+        partner-specific demand, or real export growth.
+  treatment:
+    - name: export_market_hhi_change_per_0_1_2000_2010
+      source: wits:product_concentration
+      transformation: >-
+        (2010 HH-MKT-CNCNTRTN-NDX minus 2000 index) divided by 0.1;
+        a higher index means greater concentration across destination partners
+      notes: >-
+        The archived series id says product_concentration, but the actual
+        indicator is market concentration, not product concentration.
+  controls:
+    - name: export_market_hhi_2000
+      source: wits:product_concentration
+      transformation: 2000 HH-MKT-CNCNTRTN-NDX index level
+    - name: export_gdp_share_2010
+      source: world_bank_wdi:NE.EXP.GNFS.ZS
+      transformation: 2010 exports-of-goods-and-services share of GDP
+    - name: prior_export_gdp_share_change_volatility_2001_2010
+      source: world_bank_wdi:NE.EXP.GNFS.ZS
+      transformation: >-
+        sample standard deviation with denominator 9 of the ten
+        year-on-year percentage-point changes from 2000→2001 through
+        2009→2010
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  Market concentration is observed; no tariff, trade agreement, or other
+  enacted regulatory intervention is identified.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: >-
+    Equal-economy cross-sectional OLS with intercept, prior market-HHI
+    change, and the three listed controls. HC3 robust standard error and
+    two-sided Student t reference with N−5 degrees of freedom. One
+    prespecified model and no country or endpoint search.
+falsification:
+  test: fixed_wits_market_hhi_export_share_volatility_2000_2020
+  rule: >-
+    INCONCLUSIVE if fewer than 80 complete economies, fewer than 20 with
+    absolute HHI change of at least 0.05, HHI-change interquartile range
+    under 0.03, rank deficiency, non-finite or non-positive HC3
+    uncertainty, any one economy over 20% of residualized exposure
+    squared variation or over 25% of residualized outcome squared
+    variation after controls, or more than two failed leave-one-economy-out
+    fits. Otherwise SUPPORTED requires beta at least +1 volatility point
+    per +0.1 HHI change, two-sided p at most 0.01, and positive beta in
+    at least 75% of successful leave-one-out fits. REFUTED requires beta
+    at most −1, the same p cutoff, and negative beta in at least 75% of
+    successful leave-one-out fits. Every other estimable result is
+    PARTIAL. Zero causal, policy, school, position, or featured credit.
+  threshold:
+    family_size: 1
+    min_complete_economies: 80
+    min_abs_hhi_change_0_05_economies: 20
+    min_hhi_change_iqr: 0.03
+    max_single_economy_residualized_exposure_share: 0.2
+    max_single_economy_residualized_outcome_share: 0.25
+    max_loo_failures: 2
+    min_loo_sign_share: 0.75
+    meaningful_abs_beta_export_share_volatility_pp_per_0_1_hhi: 1.0
+    two_sided_p_max: 0.01
+    roster_sha256: 28254b72c7a9ec09fa6d2b8d12989f4d5d0c4809eecdd7deff3426e6dbe5bd02
+    source_files:
+      market:
+        path: data/vintages/wits/product_concentration@2026-07-23T151543Z.parquet
+        sha256: c59b180e07f484546e131fa6a4f47a725ecc790effbb3d395e5d2c4e36381949
+        manifest: data/manifests/fetch_run_2026-07-23T151550Z.yaml
+        manifest_sha256: 96243db0b85df0b1d5ccd10631b356618a9372d62c4741b692129658a49e05a5
+      export_share:
+        path: data/vintages/world_bank_wdi/NE.EXP.GNFS.ZS@2026-05-05T203013Z.parquet
+        sha256: a53b48aa292a8b461a32c19943ad7bbca52f3625899a79d7c92e640724cfb121
+        manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+        manifest_sha256: 53db8ac480229d4bc8a22d509f4f9b267ad2bed0faa725728ad56822219222e0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+prior_confidence: 0.35
+disclosure: >-
+  The WITS market index summarizes merchandise export concentration
+  across destination partners, whereas the WDI outcome includes goods
+  and services exports divided by GDP. GDP movements, service exports,
+  product mix, common global shocks, reporting revisions, and the 2020
+  pandemic can drive the outcome. The index is not a policy event and
+  the association does not identify a causal channel. This one-test
+  nominal threshold does not correct selection across the wider archive.
+  The WITS fetch manifest lists WITS terms; tracked outputs do not
+  redistribute row-level WITS values.
+scope:
+  period: [2000, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [none]
+  treatment_tags: [export_destination_market_concentration]
+steelman: hypotheses/steelman/wits_market_concentration_export_share_volatility_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  Registration plan:
+  engine/audits/wits_market_concentration_export_share_volatility_2026_prereg_2026-10-10.md.
+  Frozen runner:
+  scripts/run_wits_market_concentration_export_share_volatility_2026.py.
