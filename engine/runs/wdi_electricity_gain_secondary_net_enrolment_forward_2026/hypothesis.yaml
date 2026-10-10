@@ -1,0 +1,136 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_electricity_gain_secondary_net_enrolment_forward_2026
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: +
+claim: Across WDI national country-year observations anchored 2000–2018, a ten-percentage-point larger electricity-access
+  gain over the prior five years predicts at least 0.5 percentage point more secondary net enrolment rate gain
+  over the next exact three years, conditional on baseline outcome and access, prior real-income growth, real
+  income, and country/year effects. This is a descriptive association, not a policy or causal effect.
+evidence_type: descriptive
+methodology_note: One member of the fixed five-test wdi_electricity_schooling_forward_2026_10_10 family. Earlier
+  IESET electricity-access/child-survival and education-spending/milestone results were visible; this new pairing
+  is an analysis registration within existing data, not an untouched independent holdout. Registration and
+  source lock precede the selected outcome join and fit.
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 1995
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the frozen 216-country ISO3-plus-XKX source-key roster; keys do not imply non-null measurements.
+  - For anchor t=2000–2018 require exact t−5/t electricity and real-income values and exact t/t+3 outcome values.
+    No neighboring-year joins, interpolation, or imputation.
+  - 'Require WDI observation status blank or A and finite values: electricity [0,100], positive real income,
+    and the prespecified outcome range.'
+  - Retain countries with at least three complete pairs; apply every frozen sample, variation, rank, and influence
+    gate before any directional verdict.
+variables:
+  outcome:
+  - name: secondary_net_enrolment_three_year_change_pp
+    source: world_bank_wdi:SE.SEC.NENR
+    transformation: exact t+3 level minus t level, percentage points
+    notes: Net secondary enrolment measures attendance of the official secondary-school age group; it can miss
+      attendance at other ages and says little about learning.
+  treatment:
+  - name: earlier_electricity_access_gain_10pp
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: electricity access at t minus t−5, divided by 10 percentage points
+    notes: National access percentage is a modelled share and is not school electrification or an enacted policy.
+  controls:
+  - name: baseline_outcome_t
+    source: world_bank_wdi:SE.SEC.NENR
+    transformation: unmodified outcome percentage at t
+  - name: baseline_access_t_minus_5
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: unmodified national electricity-access percentage at t−5
+  - name: log_real_gdp_per_person_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per person at t
+  - name: prior_five_year_log_income_growth
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: log real GDP per person(t) minus log real GDP per person(t−5)
+estimator:
+  template: descriptive
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Equal country-year-pair OLS of exact three-year milestone change on prior five-year electricity gain
+    per 10 points, baseline milestone, baseline access, real income and prior income growth, plus country and
+    anchor-year effects. CR1 country-cluster standard errors, two-sided Student t with G−1 degrees of freedom;
+    fixed Bonferroni p≤0.01/5.
+falsification:
+  test: fixed_wdi_electricity_gain_secondary_net_enrolment_forward_2026
+  rule: INCONCLUSIVE on any prespecified custody, sample, material/low-change, rank, influence or uncertainty
+    failure. Otherwise SUPPORTED requires beta ≥+0.5 outcome points per +10 earlier electricity points and
+    two-sided p≤0.01/5; REFUTED requires beta ≤−0.5 and the same p cutoff; other estimable results are PARTIAL.
+    All five cases remain in the denominator. Zero causal, policy, school, position and featured credit.
+  threshold:
+    family_id: wdi_electricity_schooling_forward_2026_10_10
+    family_size: 5
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.002
+    meaningful_beta_min_pp_per_10pp_access_gain: 0.5
+    min_complete_pairs: 400
+    min_countries: 50
+    min_pairs_per_country: 3
+    min_years: 10
+    min_material_gain_rows: 50
+    min_material_gain_countries: 20
+    material_gain_pp: 10.0
+    min_low_change_rows: 100
+    min_low_change_countries: 30
+    low_change_pp: 2.0
+    max_top_one_percent_residualized_exposure_share: 0.2
+    max_country_residualized_exposure_share: 0.15
+    max_year_residualized_exposure_share: 0.2
+    outcome_valid_max: 100.0
+    roster_sha256: a7b8e33e420cd1c0ce8160ad4e03e1102440d184842dd450027a446df26e8638
+    source_files:
+      electricity:
+        path: data/vintages/world_bank_wdi/EG.ELC.ACCS.ZS@2026-05-05T195057Z.parquet
+        sha256: aa564cbe2947b3d1c3499d7ecb9b2c38c6aa5de073d2cc1a797cfe2fe42f2931
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      secondary_net_enrolment:
+        path: data/vintages/world_bank_wdi/SE.SEC.NENR@2026-04-30T141354Z.parquet
+        sha256: f794ef6192174e0251cb58f3b72e502c93b0cd360c87c9527e86af3520ffed3a
+        manifest: data/manifests/fetch_run_2026-04-30T141425Z.yaml
+        manifest_sha256: 45e429b7b0d8b2a0a07b31eb853a4910e84d34670622fd92a64666e0ece7019d
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.35
+disclosure: Electricity access may proxy broad development, urbanization, incomes and state capacity; school
+  reporting varies. Net secondary enrolment measures attendance of the official secondary-school age group;
+  it can miss attendance at other ages and says little about learning. Earlier related IESET results informed
+  choice, so the local correction does not cover archive-wide selection. No coefficient identifies an electricity-policy
+  or education-policy effect.
+scope:
+  period:
+  - 1995
+  - 2021
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - education_access
+  policy_family:
+  - none
+  treatment_tags:
+  - electricity_access_gain
+steelman: hypotheses/steelman/wdi_electricity_gain_secondary_net_enrolment_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Source-key and chronology plan: engine/audits/wdi_electricity_schooling_forward_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_wdi_electricity_schooling_forward_2026.py.'
