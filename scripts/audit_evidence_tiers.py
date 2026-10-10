@@ -265,7 +265,12 @@ def immutable_source_locked_nested_verdict(
         return ""
     if verdict != "INCONCLUSIVE" and nested.get("gate_failures") != []:
         return ""
-    if diagnostics.get("hypothesis_id") != hypothesis_id or diagnostics.get("family_size") != 1:
+    family_size = diagnostics.get("family_size")
+    if (diagnostics.get("hypothesis_id") != hypothesis_id
+            or not isinstance(family_size, int)
+            or isinstance(family_size, bool)
+            or family_size < 1
+            or family_size > 20):
         return ""
     spec_commit = str(registration.get("spec_commit") or "")
     run_commit = str(registration.get("run_first_commit") or "")
@@ -316,7 +321,7 @@ def immutable_source_locked_nested_verdict(
             or lock.get("registration_commit") != spec_commit
             or lock.get("source_sha256") != source_sha
             or lock.get("key_roster_sha256") != key_sha
-            or lock.get("family_size") != 1):
+            or lock.get("family_size") != family_size):
         return ""
     packet_files = ("result_card.md", "replication.py", "hypothesis.yaml",
                     "manifest.yaml", "evidence_packet.yaml")
@@ -346,6 +351,86 @@ def immutable_source_locked_nested_verdict(
             or reproduction.get("result_sha256")
                 != hashlib.sha256((run_dir / "diagnostics.json").read_bytes()).hexdigest()):
         return ""
+    if family_size > 1:
+        # Multi-outcome families must be registered, locked, and measured as
+        # the whole declared family. A single valid packet cannot claim a
+        # family-adjusted result while its sibling remains absent or mutable.
+        try:
+            spec = yaml.safe_load((ROOT / spec_rel).read_text()) or {}
+            threshold = (spec.get("falsification") or {}).get("threshold") or {}
+        except (OSError, yaml.YAMLError, AttributeError):
+            return ""
+        family_id = diagnostics.get("family_id")
+        family = packet.get("family")
+        if (not isinstance(family_id, str)
+                or threshold.get("family_id") != family_id
+                or threshold.get("family_size") != family_size
+                or lock.get("family_id") != family_id
+                or not isinstance(family, dict)
+                or family.get("id") != family_id
+                or family.get("size") != family_size):
+            return ""
+        members = family.get("members")
+        if (not isinstance(members, list)
+                or len(members) != family_size
+                or len(set(members)) != family_size
+                or hypothesis_id not in members
+                or any(not isinstance(member, str) for member in members)):
+            return ""
+        for member in members:
+            matches = list((ROOT / "hypotheses").glob(f"*/{member}.yaml"))
+            if len(matches) != 1:
+                return ""
+            member_spec_rel = matches[0].relative_to(ROOT).as_posix()
+            member_add = git_bytes("log", "--diff-filter=A", "--reverse",
+                                   "--format=%H", "HEAD", "--", member_spec_rel)
+            if member_add is None or member_add.decode().splitlines() != [spec_commit]:
+                return ""
+            try:
+                member_spec = yaml.safe_load(matches[0].read_text()) or {}
+                member_threshold = (member_spec.get("falsification") or {}).get("threshold") or {}
+            except (OSError, yaml.YAMLError, AttributeError):
+                return ""
+            if (member_spec.get("hypothesis_id") != member
+                    or member_threshold.get("family_id") != family_id
+                    or member_threshold.get("family_size") != family_size):
+                return ""
+            member_dir = ROOT / "engine" / "runs" / member
+            member_diag_rel = (member_dir / "diagnostics.json").relative_to(ROOT).as_posix()
+            member_diag_add = git_bytes("log", "--diff-filter=A", "--reverse",
+                                        "--format=%H", "HEAD", "--", member_diag_rel)
+            if member_diag_add is None or member_diag_add.decode().splitlines() != [run_commit]:
+                return ""
+            member_diag = load_json(member_dir / "diagnostics.json")
+            if (member_diag.get("hypothesis_id") != member
+                    or member_diag.get("family_id") != family_id
+                    or member_diag.get("family_size") != family_size
+                    or member_diag.get("registration_commit") != spec_commit
+                    or member_diag.get("source_sha256") != source_sha
+                    or member_diag.get("source_key_roster_sha256") != key_sha):
+                return ""
+            member_lock_commit = str(member_diag.get("source_lock_commit") or "")
+            member_lock_rel = f"data/pinned_evidence/{member}.source.json"
+            member_lock_bytes = git_bytes("show", f"{member_lock_commit}:{member_lock_rel}")
+            member_lock_path = ROOT / member_lock_rel
+            if (not re.fullmatch(r"[0-9a-f]{40}", member_lock_commit)
+                    or git_bytes("merge-base", "--is-ancestor", spec_commit, member_lock_commit) is None
+                    or git_bytes("merge-base", "--is-ancestor", member_lock_commit, run_commit) is None
+                    or member_lock_bytes is None
+                    or not member_lock_path.is_file()
+                    or member_lock_bytes != member_lock_path.read_bytes()):
+                return ""
+            try:
+                member_lock = json.loads(member_lock_bytes)
+            except (TypeError, ValueError):
+                return ""
+            if (member_lock.get("hypothesis_id") != member
+                    or member_lock.get("family_id") != family_id
+                    or member_lock.get("family_size") != family_size
+                    or member_lock.get("registration_commit") != spec_commit
+                    or member_lock.get("source_sha256") != source_sha
+                    or member_lock.get("key_roster_sha256") != key_sha):
+                return ""
     return verdict
 
 
