@@ -52,3 +52,17 @@ def test_public_evidence_quarantine_registry_fails_closed(tmp_path):
     }), encoding="utf-8")
     with pytest.raises(ValueError, match="duplicate"):
         evidence_tiers.load_public_evidence_quarantines(path)
+
+
+def test_legacy_duration_source_mismatch_stays_quarantined():
+    hypothesis_id = "labour_market_flexibility_unemployment_duration"
+    quarantines = evidence_tiers.load_public_evidence_quarantines()
+    assert hypothesis_id in quarantines
+    record = next(row for row in evidence_tiers.build()["records"] if row["hypothesis_id"] == hypothesis_id)
+    assert record["registration_status"] == "legacy_same_commit"
+    assert record["tier"] == "archive"
+    assert record["public_visible"] is False
+    assert record["school_score_eligible"] is False
+    assert record["scoreboard_weight_cap"] == 0.0
+    assert "external_integrity_quarantine" in record["exclusion_reasons"]
+    assert record["public_evidence_quarantine_reason"] == quarantines[hypothesis_id]
