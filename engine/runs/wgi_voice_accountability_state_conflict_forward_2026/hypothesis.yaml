@@ -1,0 +1,333 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wgi_voice_accountability_state_conflict_forward_2026
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim_direction: '-'
+claim: Across five fixed four-year windows, a larger prior increase in WGI Voice and Accountability estimates
+  predicts a lower probability of any OWID/UCDP-recorded state-based conflict in the following four years,
+  conditional on prior conflict, baseline voice, real income, and country and anchor effects.
+methodology_note: Retrospective one-test descriptive registration. WGI voice exposure and WDI income values
+  were inspected; only OWID conflict country/year keys, not conflict counts or null masks, were read before
+  first-addition registration and later committed source lock. The local p<=.01 threshold does not adjust
+  archive-wide question selection.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2004
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the 939 country/anchor rows in the frozen key roster; OWID conflict keys must be present
+    for each year t-3 through t+4, but key presence does not reveal valid counts.
+  - Keep ISO3/XKX countries with WGI Voice and Accountability estimate in [-3,3] and positive WDI real
+    GDP per person at t-4 and t, blank/null WDI observation status, and absolute four-year WGI change
+    no more than 2 points.
+  - After the separately committed source lock, require each of four OWID state-based conflict count categories
+    to be a finite nonnegative integer <=100 at every selected year; do not impute missing counts as zero.
+  - Retain countries with at least four complete anchor rows; no post-result category, control, country,
+    anchor, threshold or vintage switch.
+variables:
+  outcome:
+  - name: any_state_based_conflict_next_four_years
+    source: owid:number-of-state-based-conflicts
+    transformation: Indicator equal to one if the sum across the four named OWID state-based conflict
+      count categories and years t+1 through t+4 is positive, else zero; invalid annual categories exclude
+      the window.
+  treatment:
+  - name: prior_four_year_voice_accountability_gain
+    source: wgi:GOV_WGI_VA.EST
+    transformation: WGI Voice and Accountability estimate at t minus t-4, in standard-estimate points;
+      not a policy reform or assigned intervention.
+  controls:
+  - name: prior_voice_accountability_estimate
+    source: wgi:GOV_WGI_VA.EST
+    transformation: WGI estimate at t-4.
+  - name: prior_any_state_based_conflict
+    source: owid:number-of-state-based-conflicts
+    transformation: Indicator of any state-based conflict in years t-3 through t.
+  - name: prior_log_state_based_conflict_burden
+    source: owid:number-of-state-based-conflicts
+    transformation: Natural log of one plus the sum of named category counts over t-3 through t.
+  - name: log_real_income_per_person
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+  - name: prior_log_real_income_change
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Log real GDP per person at t minus t-4.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Country/anchor fixed-effects linear probability projection, country-cluster CR1 with small-sample
+    correction and two-sided Student t on G-1 degrees of freedom. Five outcome windows are adjacent and
+    do not overlap; fitted probabilities can be outside [0,1]. No model search.
+falsification:
+  rule: INCONCLUSIVE if any frozen source, chronology, complete-case, exposure/outcome support, rank,
+    concentration, or clustered-uncertainty gate fails. Otherwise beta <= -0.15 conflict-incidence probability
+    point per +1 WGI estimate point and two-sided p<=0.01 SUPPORTS only a narrow descriptive association;
+    comparably positive beta REFUTES it. Other estimable results are PARTIAL. Gate-cleared records are
+    public descriptive calibrations only; INCONCLUSIVE is archived. Zero causal, policy, school, position
+    and featured credit.
+  test: voice_accountability_conflict_forward_2026_10_10
+  threshold:
+    family_id: voice_accountability_conflict_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.01
+    expected_beta_sign: '-'
+    meaningful_abs_beta: 0.15
+    min_complete_rows: 750
+    min_complete_countries: 150
+    min_complete_anchors: 5
+    min_anchors_per_country: 4
+    material_voice_rise_min_points: 0.3
+    min_material_rise_rows: 60
+    min_material_rise_countries: 45
+    flat_voice_change_max_abs_points: 0.05
+    min_flat_rows: 100
+    min_flat_countries: 60
+    min_future_conflict_rows: 100
+    min_future_conflict_countries: 25
+    min_future_no_conflict_rows: 100
+    min_future_no_conflict_countries: 25
+    max_abs_raw_voice_change: 2.0
+    max_top_one_percent_residual_x_share: 0.25
+    max_top_country_residual_x_share: 0.15
+    max_top_anchor_residual_x_share: 0.35
+    expected_key_rows: 939
+    expected_key_countries: 188
+    roster_sha256: 8be7467188c3beb3753053031308d12163e3418a87670d8c60f9234ab2c8d663
+    source_files:
+      voice:
+        path: data/vintages/wgi/GOV_WGI_VA.EST@2026-05-05T195227Z.parquet
+        sha256: c52d36e90b8b99eaf9d1d5992f4e35d3c145b1c3ef8afb74c060c96097d4f979
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      conflict:
+        path: data/vintages/owid/number-of-state-based-conflicts@2026-04-30T114446Z.parquet
+        sha256: f79099534287e0b42d93b9ab622eec5e0d8d47c02eebd5dbf79f40138f8f3885
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: WGI voice and accountability is a perception-based composite, not a measured constitutional
+  change. OWID/UCDP counts only state-based conflicts meeting source definitions. Conflict may itself
+  alter perceived voice; transitions, conflict settlement, repression, neighboring wars, income and outside
+  intervention confound the lagged association. The fit is not causal or independent replication; cite
+  WGI, OWID and UCDP/PRIO provenance.
+steelman: hypotheses/steelman/wgi_voice_accountability_state_conflict_forward_2026.md
+scope:
+  period:
+  - 2004
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - institutional_quality
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
