@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wbes_electricity_obstacle_employment_growth_next_wave_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '-'
+claim: Across eligible repeated national Enterprise Surveys, a 10 percentage-point higher baseline percent
+  of firms identifying electricity as a major or very severe constraint is associated with at least
+  0.5 percentage points lower annual employment growth (%) at the next survey wave, conditional on the
+  baseline growth measure, country effects, later-wave period effects, and the survey gap.
+methodology_note: One of eight fixed public-aggregate descriptive contrasts. The 114-pair national survey-wave
+  roster and all eight cells were frozen using indicator keys and official codebook definitions before
+  this registrant opened any selected numeric value, null mask, sample count, coefficient, or verdict.
+  A separate scout saw isolated official search snippets after proposing a shortlist and supplied only
+  source hashes, codebook labels, and key-only counts to the blind registrant; this is not an independent
+  external holdout.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2006
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed 114 country/exposure-year/outcome-year key pairs, each composed of adjacent
+    observed survey waves 4–10 calendar years apart in countries with at least two such key-eligible
+    intervals; XKX is retained explicitly as Kosovo.
+  - Only public country aggregates with cut=All, subcut=All, method=Global, and blank sector_MS are
+    eligible; exactly one row per indicator/country/wave is required.
+  - For this cell, constraint at exposure wave and the same growth outcome at both waves must have finite
+    numeric values and finite N >= 30 firms on all three selected rows. Constraint is restricted to
+    [0,100] percent and growth to [-100,500] annual percentage points. No imputation, interpolation,
+    winsorization, source switching, or alternate subpopulation.
+  - Retain only countries with at least two complete intervals for the cell. Apply the identical frozen
+    sample, within-country exposure-variation, model-rank, influence, and clustered-uncertainty gates
+    to every cell.
+variables:
+  treatment:
+  - name: electricity_obstacle_baseline_share_per_10pp
+    source: world_bank_enterprise:in12
+    transformation: Country aggregate percent at first survey wave divided by 10. A 1-unit coefficient
+      is the association per +10 percentage points of the baseline constraint.
+  outcome:
+  - name: employment_growth_later_wave_pct
+    source: world_bank_enterprise:perf2
+    transformation: Official country aggregate annual growth percent at the adjacent later survey wave;
+      source measure retrospectively compares firm fiscal-year values.
+  controls:
+  - name: baseline_employment_growth_pct
+    source: world_bank_enterprise:perf2
+    transformation: The same official annual growth indicator at the baseline survey wave, in percentage
+      points.
+  - name: survey_gap_years
+    source: world_bank_enterprise:survey_year
+    transformation: Integer later-wave year minus baseline-wave year, restricted to 4–10.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - later_wave_period
+  clustering: country
+  notes: Unweighted OLS of later aggregate growth on baseline constraint per 10pp, baseline aggregate
+    growth, gap years, country fixed effects, and four fixed later-wave calendar periods (2010–13, 2014–17,
+    2018–21, 2022–24). Country-cluster CR1 uncertainty, two-sided Student t(G-1), one estimate per cell.
+    No causal or firm-level inference.
+falsification:
+  rule: INCONCLUSIVE if any frozen completeness, within-country variation, rank, influence, or uncertainty
+    gate fails. Otherwise a negative coefficient of at least 0.5 growth percentage points per +10pp
+    constraint with two-sided p<=0.00125 SUPPORTS; a positive coefficient of at least 0.5 and the same
+    p REFUTES; every other estimable result is PARTIAL. All eight cells remain in the family denominator.
+  test: wbes_constraints_next_wave_growth_2026_10_10
+  threshold:
+    family_id: wbes_constraints_next_wave_growth_2026_10_10
+    family_size: 8
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00125
+    min_complete_pairs: 70
+    min_complete_countries: 30
+    min_later_wave_periods: 3
+    min_complete_pairs_per_country: 2
+    min_within_country_exposure_changers_5pp: 20
+    max_top_one_percent_residual_x_share: 0.25
+    max_one_country_residual_x_share: 0.15
+    max_one_later_period_residual_x_share: 0.5
+    min_n_per_selected_indicator_wave: 30
+    valid_constraint_pct:
+    - 0
+    - 100
+    valid_growth_pct:
+    - -100
+    - 500
+    meaningful_beta_min_abs_per_10pp: 0.5
+    expected_beta_sign: '-'
+    key_roster_sha256: 1376c8b28f3e6541f42239b21dc3a62d93f2b8adccc55238027181a599b1df78
+    expected_key_rows: 114
+    expected_key_countries: 49
+    source_files:
+      aggregate:
+        path: data/vintages/world_bank_enterprise/indicators_long_view_November_11_2024.csv
+        sha256: bb3155ee0093c2833878b16e5f3587afa97b536ab3db0a893a8b870113d2b920
+        source_url: https://datacatalogfiles.worldbank.org/ddh-published-v2/0037947/5/DR0094302/indicators_long_view_November_11_2024.csv
+        manifest: data/pinned_evidence/wbes_aggregate_2024_source_manifest.yaml
+        manifest_sha256: 350236e2e73e0560ece000b871962bc5f79bc06383eaf4e04e43b846a388887f
+      codebook:
+        path: data/vintages/world_bank_enterprise/Indicator_and_Topic_Names_2024.xls
+        sha256: 6a7eab2649b80283960778194d053ad32b90685a710f91080c72de34c1d10bef
+        source_url: https://datacatalogfiles.worldbank.org/ddh-published-v2/0037947/5/DR0094304/Indicator%20and%20Topic%20Names.xls
+        manifest: data/pinned_evidence/wbes_aggregate_2024_source_manifest.yaml
+        manifest_sha256: 350236e2e73e0560ece000b871962bc5f79bc06383eaf4e04e43b846a388887f
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.5
+disclosure: The exposure and growth measures are changing national survey aggregates from changing samples
+  of formal firms with at least five workers, not linked firms. Constraint reporting, omitted country
+  shocks, endogenous policy and firm composition, survey methodology changes, and retrospectively measured
+  growth prevent a causal reading. The August 2022 eligibility expansion may alter comparability. Eight
+  correlated tests receive a local Bonferroni correction only; they confer zero causal, policy, school,
+  position, or featured credit.
+steelman: hypotheses/steelman/wbes_electricity_obstacle_employment_growth_next_wave_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+scope:
+  period:
+  - 2006
+  - 2024
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags: []
