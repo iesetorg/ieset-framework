@@ -106,7 +106,50 @@ def test_composite_coverage_waits_for_valenced_axis_coding() -> None:
     result = DRIFT.build_drift(movements)
     assert result["countries"]["AAA"]["composite_first_year"] == 2010
     assert result["countries"]["BBB"]["composite_first_year"] is None
-    assert result["countries"]["AAA"]["axis_first_year"]["fiscal.spending_level"] == 2002
+    assert result["countries"]["AAA"]["axis_first_year"]["regulatory.immigration_openness"] == 2002
+    assert result["countries"]["AAA"]["axis_first_year"]["fiscal.spending_level"] == 2010
+
+
+def test_axis_coverage_ignores_neutral_steps_but_keeps_offsetting_signed_steps() -> None:
+    movements = [
+        {
+            "movement_id": "neutral",
+            "countries": ["AAA"],
+            "_start": 1900,
+            "_end": None,
+            "axes_summary": [
+                {"axis": "fiscal.spending_level", "direction": "0", "magnitude": "weak"},
+                {"axis": "regulatory.sectoral_licensing", "direction": "mixed", "magnitude": "weak"},
+            ],
+        },
+        {
+            "movement_id": "offsetting",
+            "countries": ["AAA"],
+            "_start": 1904,
+            "_end": None,
+            "axes_summary": [
+                {"axis": "regulatory.trade_openness", "direction": "+", "magnitude": "weak"},
+                {"axis": "regulatory.trade_openness", "direction": "-", "magnitude": "weak"},
+            ],
+        },
+        {
+            "movement_id": "signed",
+            "countries": ["AAA"],
+            "_start": 1905,
+            "_end": None,
+            "axes_summary": [
+                {"axis": "fiscal.spending_level", "direction": "+", "magnitude": "weak"},
+            ],
+        },
+    ]
+    result = DRIFT.build_drift(movements)
+    aaa = result["countries"]["AAA"]
+    assert aaa["axis_first_year"] == {
+        "fiscal.spending_level": 1905,
+        "regulatory.trade_openness": 1904,
+    }
+    assert aaa["composite_first_year"] == 1904
+    assert aaa["axes"]["regulatory.trade_openness"] == [0.0] * 6
 
 
 def test_opposing_same_year_steps_still_establish_composite_coverage() -> None:

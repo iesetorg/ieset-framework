@@ -28,7 +28,7 @@ interface DriftChartProps {
   years: number[];
   /** Cited pre-series policies; dashed markers only, never scored points. */
   historicalPolicyYears?: number[];
-  /** First year with movement or axis coding per series. Earlier raw zeroes
+  /** First year with a signed axis or composite step per series. Earlier raw zeroes
    * align the data arrays but are not observations and must not be drawn. */
   seriesStarts?: Record<string, number>;
   /** Map ISO3 → display name (must be serialisable; passed across the
@@ -153,6 +153,7 @@ export function DriftChart({
           Plot.line(points, {
             x: "year",
             y: "value",
+            z: "country",
             stroke: (d: SeriesPoint) => palette[d.country],
             strokeWidth: (d: SeriesPoint) => (d.country === highlight ? 2.6 : 1.5),
             curve: "step-after",

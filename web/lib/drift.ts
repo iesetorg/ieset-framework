@@ -23,6 +23,7 @@ import { REPO_ROOT } from "./content";
 
 export interface CountryDrift {
   axes: Record<string, number[]>;
+  /** First nonzero signed step for each axis; neutral-only axes have no start. */
   axis_first_year: Record<string, number>;
   statist_drift: number[];
   /** First nonzero valenced axis step, or null when no composite is coded. */

@@ -298,8 +298,8 @@ def build_drift(movements):
 
     # Build the complete authored movement span. Countries first coded later
     # retain zeroes in the raw aligned arrays for downstream calculations; the
-    # chart masks their pre-coverage years using the first actually coded
-    # composite or axis step, not merely the first authored movement.
+    # chart masks their pre-coverage years using the first signed composite
+    # or axis step, not merely the first authored movement or neutral entry.
     if not all_years:
         return {"countries": {}, "axes": sorted(all_axes), "year_min": None, "year_max": None}
     year_min, year_max = min(all_years), max(all_years)
@@ -348,9 +348,9 @@ def build_drift(movements):
         countries_out[country] = {
             "axes": per_axis,
             "axis_first_year": {
-                axis: min(year for year, _step, _id in axis_events)
+                axis: min(year for year, step, _id in axis_events if step != 0.0)
                 for axis, axis_events in events[country].items()
-                if axis_events
+                if any(step != 0.0 for _year, step, _id in axis_events)
             },
             "statist_drift": composite_traj,
             # A country may have national movement prose but no valenced axis
