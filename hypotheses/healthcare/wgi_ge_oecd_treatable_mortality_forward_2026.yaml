@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wgi_ge_oecd_treatable_mortality_forward_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: >-
+  In the frozen 45-country panel before the pandemic, higher World Bank
+  government-effectiveness estimates in year t predict lower OECD treatable
+  mortality rates in year t+1 within countries, conditional on real income per
+  person and common year shocks.
+methodology_note: >-
+  New, source-distinct descriptive calibration selected from WGI treatment,
+  WDI control, and only OECD outcome schema and exact country/year/dimension
+  keys. No selected OECD outcome value, missingness mask, status, or public
+  numeric snippet was examined before this registration. It is not a
+  data-disjoint replication of older studies using this OECD mortality source.
+evidence_type: associational
+sample:
+  countries: &roster [ARG, AUS, AUT, BEL, BGR, BRA, CAN, CHE, CHL, COL, CRI, CZE, DEU,
+    DNK, ESP, EST, FIN, FRA, GBR, HRV, HUN, IRL, ISL, ISR, ITA, JPN, KOR,
+    LTU, LUX, LVA, MEX, NLD, NOR, NZL, PER, POL, PRT, ROU, SVK, SVN, SWE,
+    THA, TUR, USA, ZAF]
+  period: [2000, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Use only frozen country/year pairs in the key roster, with WGI
+      GOV_WGI_GE.EST at t finite in [-3,3] and WDI NY.GDP.PCAP.KD at t
+      finite and strictly positive. Treatment years are 2000 and 2002-2018;
+      2001 has no WGI key. The first screen used no mortality values or flags.
+    - >-
+      At exact t+1, select OECD FREQ=A, MEASURE=TRTM,
+      UNIT_MEASURE=DT_10P5HB, AGE=_T, SEX=_T,
+      CALC_METHODOLOGY=STANDARD and all other demographic/cause dimensions
+      equal _Z. Reject duplicate selected country/year keys.
+    - >-
+      Only after a separate committed source lock, require the selected
+      mortality value to be finite and strictly positive, the normalized and
+      source values to agree, OBS_STATUS blank or A, and OBS_STATUS2 and
+      OBS_STATUS3 blank or A. Drop invalid cells without imputation, nearest
+      year matches, outcome-dependent trimming, or revised vintages.
+    - >-
+      Retain countries with at least eight complete pairs. Require at least
+      450 complete pairs in at least 30 countries. Never relax the gates,
+      add controls, change the lag, or select a subgroup after outcome access.
+scope:
+  period: [2000, 2019]
+  countries: *roster
+  outcome_dim: [life_expectancy_health]
+  policy_family: [none]
+variables:
+  treatment:
+    - name: government_effectiveness_estimate_t
+      source: wgi:GOV_WGI_GE.EST
+      transformation: Unscaled WGI point estimate in year t.
+      notes: Perceptions-based aggregate with methodological revisions; not a measured health-policy intervention.
+  controls:
+    - name: log_real_gdp_per_capita_t
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: Natural log of positive constant-2015-USD GDP per capita in year t.
+  outcome:
+    - name: log_treatable_deaths_per_100k_t_plus_1
+      source: oecd:OECD.ELS.HD_DSD_HEALTH_STAT_DF_AMENABLE_MORT_1.0
+      transformation: >-
+        Natural log of the selected TRTM age- and sex-total rate of deaths
+        per 100,000 inhabitants at exact calendar year t+1.
+      notes: The outcome is an OECD harmonized rate, not a direct observation of government effectiveness.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One fixed OLS model: log(treatable mortality at t+1) on WGI GE at t,
+    log real GDP per capita at t, country fixed effects and treatment-year
+    fixed effects. Country-cluster CR1 uncertainty, two-sided Student t with
+    G-1 degrees of freedom and a matching 99% confidence interval. Require
+    full rank and finite positive standard error. No alternate lag or control
+    specification determines the verdict.
+falsification:
+  test: wgi_ge_oecd_treatable_mortality_forward_2026
+  rule: >-
+    INCONCLUSIVE if custody, registration/source-lock chronology, complete-case
+    sample, residual-treatment concentration, full rank, or uncertainty gates
+    fail. SUPPORTED iff the government-effectiveness coefficient is at most
+    -0.05 log points per index point and its two-sided country-cluster p-value
+    is at most 0.01. REFUTED iff the coefficient is at least +0.05 at the same
+    p cutoff. Every other estimable result is PARTIAL. This is descriptive
+    calibration only and carries no causal or scoreboard credit.
+  threshold:
+    p_max_two_sided: 0.01
+    meaningful_beta_min_abs: 0.05
+    min_complete_pairs: 450
+    min_complete_countries: 30
+    min_years_per_country: 8
+    max_top_one_percent_partialled_treatment_share: 0.2
+    max_top_country_partialled_treatment_share: 0.15
+    max_top_year_partialled_treatment_share: 0.2
+    expected_key_pairs: 781
+    expected_key_countries: 45
+    key_roster_sha256: 15f38fe6043ad1a2c45224ee7424824699201ffd0c45754a559043d68b90e608
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.45
+disclosure: >-
+  WGI government effectiveness is a broad perceptions-based composite and can
+  itself reflect health-system performance. Health spending, disease patterns,
+  age composition, coding, and institutional reforms can move with WGI and
+  mortality; country and year effects plus income do not remove those
+  confounders. The t+1 association cannot identify a policy effect. The same
+  OECD mortality vintage appears in prior health studies, so this is neither
+  an independent archive holdout nor validation of their results. No policy,
+  school, position, or featured credit is sought.
+steelman: hypotheses/steelman/wgi_ge_oecd_treatable_mortality_forward_2026.md
+linked_hypotheses: []
+linked_conditions: []
+covers_claims: []
