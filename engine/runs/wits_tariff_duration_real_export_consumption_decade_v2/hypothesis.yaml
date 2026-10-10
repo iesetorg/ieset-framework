@@ -1,0 +1,169 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wits_tariff_duration_real_export_consumption_decade_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "-"
+claim: >-
+  Among the 65 old-study economies with every required source key, an
+  additional full decade of observed 2001–2010 weighted-mean applied
+  merchandise tariffs above 15 percent predicts at least 0.20 percentage
+  point lower annual real goods-and-services export growth and at least
+  0.10 percentage point lower annual real private-consumption-per-person
+  growth over 2011–2020, conditional on the frozen 2010 covariates and
+  each outcome's 2001–2010 trend. This is a descriptive association,
+  not a tariff-policy effect or an export-complexity test.
+evidence_type: descriptive
+methodology_note: >-
+  New-ID repair of the measurable two-outcome core of archived
+  tariff_protection_duration_growth_drag. Its historical generic regression
+  tested current tariff level and private-consumption share, not protection
+  duration and real consumption per person; its PARTIAL label is known but
+  cannot grade this question. The 65-country roster is the original
+  66-country roster minus TWN, which lacks source country/year keys. Only
+  schemas and country/year keys were opened before first-addition
+  registration; no selected tariff values, outcome values, null masks,
+  coefficients, or fit were inspected. The source lock must be committed
+  separately before any value load. See the source plan and frozen runner.
+sample:
+  countries: [ARG, AUS, AUT, BEL, BGD, BOL, BRA, CAN, CHE, CHL, CHN, COL, CRI, CZE, DEU, DNK, DOM, ECU, EGY, ESP, EST, FIN, FRA, GBR, GRC, GTM, HND, HUN, IDN, IND, IRL, ISR, ITA, JAM, JOR, JPN, KOR, LTU, LVA, MAR, MEX, MYS, NIC, NLD, NOR, NZL, PAK, PAN, PER, PHL, POL, PRT, ROU, SGP, SLV, SVK, SVN, SWE, THA, TUR, URY, USA, VNM, ZAF, ZMB]
+  period: [2000, 2020]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    Exposure and pretrends are collapsed from 2001–2010 into one observation
+    per country; both future outcomes are fixed 2011–2020 decade summaries.
+  exclusion_rules:
+    - >-
+      All 65 named countries stay in the key roster. A country enters both
+      outcome regressions only if every exact registered source cell has a
+      finite value; no replacement country, year, vintage, or measure.
+    - >-
+      Ten consecutive tariff observations in 2001–2010 are required.
+      Weighted-mean tariffs must be within 0–100 percent. A missing or
+      invalid tariff year excludes the country; never interpolate a spell.
+    - >-
+      Require 20 finite annual real-export-growth observations in
+      2001–2020; positive real private-consumption-per-person levels in
+      2000, 2010, and 2020; positive real GDP per person and merchandise
+      terms-of-trade index in 2010; finite 2010 rule of law and gross
+      investment share. No trimming, winsorisation, imputation, or
+      outcome-dependent sample split.
+    - >-
+      The identical complete-country sample is used for both co-primary
+      outcomes. All source or sample floor failures are INCONCLUSIVE.
+variables:
+  outcome:
+    - name: following_decade_real_goods_services_export_growth
+      source: world_bank_wdi:NE.EXP.GNFS.KD.ZG
+      transformation: arithmetic mean of 2011–2020 annual real growth rates, percentage points per year
+      notes: Includes goods and services; this is not export complexity or merchandise volume.
+    - name: following_decade_real_private_consumption_per_person_growth
+      source: world_bank_wdi:NE.CON.PRVT.PC.KD
+      transformation: 100 times log(2020 level / 2010 level) divided by 10, percentage points per year
+  treatment:
+    - name: protection_duration_decades_2001_2010
+      source: wits:TM.TAX.MRCH.WM.AR.ZS
+      transformation: count of 2001–2010 tariff values strictly greater than 15 percent divided by 10
+      notes: Ten fully observed annual tariff values required; 0–1 decades. Merchandise weighted applied tariff, not statutory schedule or policy event.
+  controls:
+    - name: terminal_tariff_2010
+      source: wits:TM.TAX.MRCH.WM.AR.ZS
+      transformation: percent level in 2010
+    - name: log_real_gdp_per_person_2010
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural log of 2010 constant-dollar level
+    - name: rule_of_law_2010
+      source: wgi:GOV_WGI_RL.EST
+      transformation: 2010 estimate
+    - name: log_merchandise_terms_of_trade_2010
+      source: world_bank_wdi:TT.PRI.MRCH.XD.WD
+      transformation: natural log of positive 2010 index
+    - name: gross_investment_share_2010
+      source: world_bank_wdi:NE.GDI.TOTL.ZS
+      transformation: 2010 percent-of-GDP level
+    - name: matched_outcome_pretrend_2001_2010
+      source: world_bank_wdi:NE.EXP.GNFS.KD.ZG; world_bank_wdi:NE.CON.PRVT.PC.KD
+      transformation: export mean annual growth in 2001–2010 for export model; 100 times log(consumption level 2010 / 2000) divided by 10 for consumption model
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  Tariff duration describes a trade-policy environment; the estimate is
+  observational and cannot assign effects to any enacted policy.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: >-
+    Two cross-country OLS regressions on the identical 65-country
+    complete-case intersection, each with intercept, duration_decades,
+    terminal_tariff_2010, log_real_gdp_per_person_2010,
+    rule_of_law_2010, log_merchandise_terms_of_trade_2010,
+    gross_investment_share_2010, and that outcome's own 2001–2010
+    pretrend. Equal country weight; HC3 heteroskedasticity-robust standard
+    error; two-sided Student t reference at N−8 degrees of freedom.
+    Duration coefficient units are annual growth percentage points per
+    full decade of above-15-percent tariff years. No model search.
+falsification:
+  test: fixed_roster_tariff_duration_two_real_outcomes_2011_2020
+  rule: >-
+    First require at least 40 complete countries, at least 10 with zero
+    above-threshold years, at least 10 with two or more above-threshold
+    years, full-rank design in both models, finite HC3 uncertainty, and
+    no single country contributing more than 20 percent of the
+    squared duration residual after partialling all registered controls.
+    Require at least 35 successful leave-one-country-out fits per model
+    and no more than two failures out of the complete-country sample.
+    A failure is INCONCLUSIVE. This is one omnibus family with two
+    co-primary endpoints and two-sided Bonferroni p<=0.025 for each.
+    REFUTED if either duration coefficient is significantly positive
+    and at least +0.20 pp/year for exports or +0.10 pp/year for
+    consumption, with at least 75 percent of successful leave-one-country-out
+    coefficients of that endpoint positive. Otherwise SUPPORTED only if
+    both coefficients are significantly negative, exports <=−0.20
+    pp/year and consumption <=−0.10 pp/year, with at least 75 percent
+    of successful leave-one-country-out coefficients negative for each.
+    Any other estimable result is PARTIAL. REFUTED takes precedence
+    if opposite-sign evidence appears in either endpoint. All labels
+    are descriptive and grant zero policy, causal, school, position,
+    or featured credit.
+  threshold:
+    family_size: 1
+    co_primary_endpoints: 2
+    bonferroni_p_max_two_sided: 0.025
+    min_complete_countries: 40
+    min_zero_duration_countries: 10
+    min_two_year_duration_countries: 10
+    max_single_country_residualized_duration_share: 0.20
+    min_loo_successes_per_endpoint: 35
+    max_loo_failures_per_endpoint: 2
+    min_loo_sign_share: 0.75
+    export_beta_min_abs_pp_per_year: 0.20
+    consumption_beta_min_abs_pp_per_year: 0.10
+    policy_score_credit: 0
+    school_score_credit: 0
+prior_confidence: 0.45
+disclosure: >-
+  The old tariff-level coefficient was already seen, but the constructed
+  duration exposure and these two future real outcomes were never fitted
+  together. All windows and 65 source-key countries are frozen before
+  selected values or null masks are opened. The WITS weighted tariff is
+  a World Bank indicator mirror and may be missing or revised; ten
+  observed years are mandatory. The 2011–2020 decade includes commodity,
+  financial and pandemic shocks. Country covariates do not identify a
+  tariff effect; tariff exposure can be endogenous to development,
+  import composition, or export performance. No export-complexity,
+  trade-policy, welfare, school, position or featured inference follows.
+scope:
+  period: [2000, 2020]
+  countries: [GLOBAL]
+  outcome_dim: [trade_liberalisation, gdp_growth]
+  policy_family: [none]
+  treatment_tags: [tariff_duration]
+steelman: hypotheses/steelman/wits_tariff_duration_real_export_consumption_decade_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  Source and key plan: engine/audits/wits_tariff_duration_real_export_consumption_decade_v2_prereg_2026-10-10.md.
+  Local export source custody: engine/audits/wits_tariff_duration_real_export_consumption_decade_v2_source_provenance_2026-10-10.md.
+  Frozen runner: scripts/run_wits_tariff_duration_real_export_consumption_decade_v2.py.
+  Original hypothesis tariff_protection_duration_growth_drag remains archived.
