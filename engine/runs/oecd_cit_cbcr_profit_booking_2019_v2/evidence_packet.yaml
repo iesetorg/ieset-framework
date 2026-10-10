@@ -1,0 +1,86 @@
+packet_version: 1
+generated_utc: '2026-10-10T05:24:23+00:00'
+hypothesis:
+  id: oecd_cit_cbcr_profit_booking_2019_v2
+  path: hypotheses/fiscal/oecd_cit_cbcr_profit_booking_2019_v2.yaml
+  topic: fiscal
+preregistration:
+  spec_commit: 7ebb65c216cb807ee0639576356de99006ee84d7
+  source_lock_commit: cec73b78b477eb6b7ccdf697942d7b7a69c30872
+  family_id: oecd_cit_cbcr_profit_booking_2019_v2
+  family_size: 1
+  key_roster: data/pinned_evidence/oecd_cit_cbcr_profit_booking_2019_v2_key_roster.csv
+  key_roster_sha256: 617e3febe5a7566e2a52669679b996e4f0b93f0bf3b2b3805e5c338f9bed9d86
+  steelman: hypotheses/steelman/oecd_cit_cbcr_profit_booking_2019_v2.md
+reproduction:
+  runner: scripts/run_oecd_cit_cbcr_profit_booking_2019_v2.py
+  run_dir: engine/runs/oecd_cit_cbcr_profit_booking_2019_v2
+  command: python3 scripts/run_oecd_cit_cbcr_profit_booking_2019_v2.py --verify --source-root
+    <local IESET source checkout>
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association misses at least one frozen directional gate
+data:
+  inputs:
+    cbcr_composite:
+      publisher: profit_shifting
+      series_id: profit_shifting_panel
+      path: data/vintages/profit_shifting/profit_shifting_panel@2026-06-29T160050Z.parquet
+      sha256: 96bad604e38151689d4d31a28f5c86cdec0e0941c7bac310fb8d2cac4472f733
+      manifest: data/manifests/fetch_run_2026-06-29T160050Z_profit_shifting.yaml
+      manifest_sha256: 1108d0451cf57ae95de814e159f72e69356edf4d795d87ed3333b41662fb98fc
+    statutory_cit:
+      publisher: oecd
+      series_id: oecd_combined_corporate_income_tax_rate
+      path: data/vintages/oecd/oecd_combined_corporate_income_tax_rate@2026-07-23T153857Z.parquet
+      sha256: 3e9c5987717087d04d5f82461fc1a3fb5e406ba646fb9f333f8c542e5f3f5ee1
+      manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+      manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+  sample:
+    key_only_jurisdictions: 143
+    complete_jurisdictions: 143
+    excluded_missing_invalid_or_out_of_range: 0
+    ratio_inconsistent_jurisdictions: 0
+    distinct_tax_rates: 45
+    tax_rate_iqr_pp: 13.409999999999997
+    distinct_cbcr_ratios: 143
+    year: 2019
+    selected_values_read_after_committed_lock: true
+results:
+  primary:
+    rho: -0.1278384204235942
+    p_value_two_sided_permutation: 0.13238676132386762
+    permutation_extreme_count: 1323
+    permutations: 10000
+    n_jurisdictions: 143
+    loo_negative_share: 1.0
+    loo_positive_share: 0.0
+    loo_min_rho: -0.1480081414691431
+    loo_max_rho: -0.11019878896657108
+    method: 2019 cross-jurisdiction Spearman with average ties and 10000 fixed-seed
+      outcome-rank permutations
+limitations:
+- The pinned CbCR extract includes only reporting parents represented in a local OECD
+  aggregate; it is not a global MNE total.
+- The raw OECD HTTP payload was not preserved, so exact publisher-byte replay and
+  the source-native currency multiplier cannot be checked. The analysis interprets
+  only ranks.
+- Statutory rates differ from effective rates and may coexist with tax rulings, treaty
+  networks, capital intensity, sector mix, and resource rents.
+- One pre-pandemic cross-section avoids changes in reporting-parent coverage across
+  years but cannot identify a tax reform effect or actual shifted profit.
+- This archive-selected test has only a local one-test p cutoff, not an archive-wide
+  multiple-testing correction.
+- No causal, policy, school, position, or featured credit is permitted.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: oecd_cit_cbcr_profit_booking_2019_v2
+  family_size: 1
+  family_alpha: 0.01
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
