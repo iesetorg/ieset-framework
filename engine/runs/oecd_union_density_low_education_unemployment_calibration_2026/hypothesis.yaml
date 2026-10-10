@@ -1,0 +1,164 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_union_density_low_education_unemployment_calibration_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '+'
+claim: Among 39 OECD-source reporter economies on the frozen nonoverlapping 2007,
+  2010, 2013, 2016, 2019, and 2022 anchor years, a ten-percentage-point higher
+  actual OECD trade-union density rate at year t predicts a larger t-to-t+2
+  percentage-point change in the unemployment rate of low-education adults aged
+  25–64, conditional on baseline low-education unemployment, log real GDP per
+  capita at t, country effects, and anchor-year effects.
+methodology_note: Prospective descriptive calibration of only the low-education
+  unemployment component of archived union_density_wage_compression_employment_tradeoff.
+  The original Fraser-EFW/GDP-per-capita placeholder failed its estimator floor.
+  The exposure and GDP-per-capita control values and selected outcome keys/dimensions
+  were read to freeze the roster. Selected outcome values, null masks, and status
+  fields remain unopened until after separate registration and source-lock commits.
+  The archived verdict and school/policy scores are not inherited.
+evidence_type: associational
+sample:
+  countries: &countries
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - IDN
+  - IND
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period: &period
+  - 2007
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only frozen anchor years 2007, 2010, 2013, 2016, 2019, and 2022;
+    t-to-t+2 windows cannot overlap within an economy.
+  - Use actual-status A OECD TUD exposure values in [0,100], positive finite
+    WDI real GDP per capita at t with blank status, and the frozen selected
+    OECD unemployment keys at t and t+2. No age, education, or status substitution.
+  - After source lock, both selected OECD unemployment endpoints must have
+    actual status A and finite values in [0,100].
+  - Enforce complete-case, design, rank, uncertainty, and exposure-concentration
+    floors before publishing a coefficient or verdict.
+scope:
+  period: *period
+  countries: *countries
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+  treatment_tags:
+  - union_density
+variables:
+  treatment:
+  - name: actual_trade_union_density_per_ten_percentage_points
+    source: oecd:TUD
+    transformation: Actual-status A trade-union density, percentage of employees
+      at anchor year t, divided by ten.
+  outcome:
+  - name: two_year_low_education_adult_unemployment_change
+    source: oecd:DSD_LMS_low_education_unemployment_rate
+    transformation: OECD annual unemployment, both sexes, ages 25–64, ISCED11A_0T2,
+      observed statistic; value at t+2 minus t in percentage points.
+  controls:
+  - name: baseline_low_education_adult_unemployment
+    source: oecd:DSD_LMS_low_education_unemployment_rate
+    transformation: Selected unemployment rate at t.
+  - name: log_real_gdp_per_capita_at_anchor
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural logarithm of positive constant-2015-USD GDP per capita at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor_year
+  clustering: country
+  notes: Complete-case OLS on nonoverlapping anchor windows, with country and
+    anchor-year fixed effects. Country-cluster CR1 standard errors and two-sided
+    Student t(G−1) inference. This is descriptive association, not causal effect.
+falsification:
+  rule: SUPPORTED if the union-density coefficient is at least +0.25 percentage
+    point of two-year low-education unemployment change per 10 percentage points
+    of density with two-sided country-cluster p≤0.01. REFUTED if at most −0.25
+    with p≤0.01. Otherwise PARTIAL. Any frozen complete-case, design, rank,
+    uncertainty, or concentration gate failure is INCONCLUSIVE with no coefficient.
+  test: oecd_union_density_low_education_unemployment_one_test_2026
+  threshold:
+    family_id: union_density_low_education_unemployment_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: '+'
+    meaningful_beta_min_abs: 0.25
+    min_valid_rows: 120
+    min_valid_countries: 25
+    min_countries_with_three_windows: 20
+    min_distinct_anchors: 5
+    min_rows_each_present_anchor: 15
+    max_one_anchor_share: 0.3
+    min_union_density_iqr_pp: 10.0
+    min_countries_with_union_range_3pp: 20
+    max_top_one_percent_partialled_x_share: 0.2
+    max_top_country_partialled_x_share: 0.15
+    roster_sha256: c8b551df75f431ab1450ecc7663f2b16d30b04dbd1c31c2a3d8151cf6b6c64cf
+    source_files:
+      union:
+        path: data/vintages/oecd/TUD@2026-05-05T195705Z.parquet
+        sha256: 01ac4f0e100915330f53f4be310e9b26bfe33e7bcbd05f22cfa894447438a417
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      unemployment:
+        path: data/vintages/oecd/DSD_LMS_low_education_unemployment_rate@2026-05-05T195457Z.parquet
+        sha256: e4977582ffe0de5526e75d1d473d07fb293a2fb55f73bd41b1e17cb89fd4c4a8
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.5
+disclosure: Union density is not union coverage or a policy intervention. This
+  design does not test youth unemployment or wage compression, and cannot identify
+  causal effects or inherit the old placeholder's credit.
+steelman: hypotheses/steelman/oecd_union_density_low_education_unemployment_calibration_2026.md
+linked_hypotheses: []
+covers_claims: []
+notes: Prospective descriptive component only; the original multi-part ID remains archived.
