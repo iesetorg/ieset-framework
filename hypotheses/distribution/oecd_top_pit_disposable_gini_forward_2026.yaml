@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_top_pit_disposable_gini_forward_2026
+version: 1
+status: pre_registered
+topic: distribution
+claim_direction: '-'
+claim: Across the fixed 2007–2018 OECD panel, a rise of at least one percentage point in the top statutory personal income-tax rate from t-1 to t predicts a lower exact t-to-t+1 change in the all-age disposable-income Gini than a tax-stable year, conditional on a separate tax-cut indicator and country/year effects.
+methodology_note: Prospective descriptive one-test calibration. Only selected tax-rate values, selected OECD IDD Gini schema and country/year keys, source hashes and manifests, and earlier hypothesis text informed registration. The IDD Gini value, null mask, and observation status are closed until a separately committed source lock. Frozen contract is engine/audits/oecd_top_pit_disposable_gini_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: &countries
+  - AUT
+  - CAN
+  - CHE
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - KOR
+  - LTU
+  - LVA
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period: [2007, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed key-only country/year roster; require exact tax years t-1 and t and exact Gini keys at t and t+1, with at least five candidate years per country.
+  - Both statutory-rate endpoints must be finite and in [0,100] percent. The out-of-range France 2013 endpoint and adjacent annual changes are excluded before outcome access; do not cap or repair that value.
+  - Code hike if rate(t)-rate(t-1) >= 1 percentage point, cut if <= -1, and stable otherwise. Retain all otherwise valid large changes.
+  - After the separate source-lock commit, require unique OECD IDD selectors and finite Gini values in [0,1] at both endpoints with OBS_STATUS A at both endpoints. No imputation, nearest-year matching, substitution, or outcome winsorization.
+  - Retain countries with at least five complete measured pairs after outcome access.
+variables:
+  treatment:
+  - name: top_statutory_pit_hike_at_least_one_pp
+    source: oecd:oecd_top_statutory_pit_rate
+    transformation: Indicator that top statutory personal income-tax rate at t minus t-1 is at least +1 percentage point.
+    notes: OECD TS_PIT rate on gross wage earnings at the top bracket; not an effective tax rate or a measure of capital-income taxation.
+  - name: top_statutory_pit_cut_at_least_one_pp
+    source: oecd:oecd_top_statutory_pit_rate
+    transformation: Indicator that the same annual change is at most -1 percentage point; prespecified nuisance covariate.
+  outcome:
+  - name: next_year_disposable_income_gini_change
+    source: oecd:DSD_IDD@DF_IDD
+    transformation: Exact OECD IDD all-age disposable-income Gini at t+1 minus t, on its 0-to-1 scale; INC_DISP_GINI, FREQ A, STATISTICAL_OPERATION _Z, UNIT_MEASURE 0_TO_1, AGE _T, METH2012, D_CUR, POVERTY_LINE _Z.
+    notes: Relative income dispersion in the OECD IDD, not the WID pretax top-income share or an absolute-poverty measure.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: One OLS coefficient for the hike indicator versus stable years, with cut indicator, country and treatment-year fixed effects. Country-cluster CR1 standard errors and two-sided Student t(G-1) inference. Gini at t is already the subtraction endpoint and may be affected by the year-t tax change, so it is not added as a separate covariate. This choice leaves regression-to-mean and starting-inequality confounding risks. No control, lag, subgroup, or source search; the cut coefficient is nuisance only.
+falsification:
+  test: run_oecd_top_pit_disposable_gini_forward_2026
+  rule: INCONCLUSIVE if exact source/registration/lock custody, complete-case, hike/cut event, full-rank, partialled-hike concentration, or finite cluster-uncertainty gate fails. SUPPORTED only if hike beta <= -0.005 Gini units with two-sided p <= 0.005. REFUTED only if beta >= +0.005 at the same cutoff. Otherwise PARTIAL. The threshold is local to this test and does not correct the visible archive-wide search.
+  threshold:
+    family_id: oecd_top_pit_disposable_gini_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.005
+    p_max_two_sided: 0.005
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.005
+    min_valid_rows: 220
+    min_valid_countries: 25
+    min_years_per_country: 5
+    min_hike_rows: 20
+    min_hike_countries: 12
+    min_cut_rows: 15
+    min_cut_countries: 10
+    max_top_one_percent_partialled_hike_share: 0.2
+    max_top_country_partialled_hike_share: 0.2
+    max_top_year_partialled_hike_share: 0.3
+    expected_key_rows: 312
+    expected_key_countries: 30
+    expected_key_hike_rows: 31
+    expected_key_hike_countries: 16
+    expected_key_cut_rows: 29
+    expected_key_cut_countries: 17
+    roster_sha256: 169effde75deb7226ff45b4d00d0e438a2b39b9d4bd79a38814be35438983caf
+    source_files:
+      treatment:
+        path: data/vintages/oecd/oecd_top_statutory_pit_rate@2026-07-23T153857Z.parquet
+        sha256: b500bdc808385c17ace3eb6d78b5698a02dadd28943daf5e7d198d9093f19151
+        manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+        manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+      outcome:
+        path: data/vintages/oecd/DSD_IDD@2026-05-05T200556Z.parquet
+        sha256: 869fa437691bda1a322f7b5463944ebbbb9066d689d5b76ed3d1a32620beb60e
+        manifest: data/manifests/fetch_run_2026-05-05T200618Z.yaml
+        manifest_sha256: 6399c99e282dab5753bfa0e14f154429967f04a449d6762251067dce0fc84dba
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: The top rate is a statutory rate for high wage earners and may not represent taxes actually paid; tax-base changes, bracket thresholds, other taxes and transfers, income shifting, macro shocks, and survey revisions can move the Gini. The model omits a separate Gini_t covariate because t is already the subtraction endpoint and may follow the tax change, but the change outcome remains vulnerable to regression to the mean and starting-inequality confounding. Related prior top-PIT-to-WID pretax-top-share, top-PIT-to-registrations, and union-density-to-IDD-Gini tests are visible, so this is neither an independent holdout nor archive-wide multiplicity control. Descriptive calibration only; no causal, policy, school, position, or featured credit.
+steelman: hypotheses/steelman/oecd_top_pit_disposable_gini_forward_2026.md
+intervention_channel: fiscal
+intervention_channel_justification: OECD top statutory personal income-tax rate is a recorded tax-schedule exposure.
+scope:
+  period: [2007, 2019]
+  countries: *countries
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [tax_policy]
+  treatment_tags: [top_statutory_personal_income_tax_rate]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
