@@ -1,0 +1,40 @@
+# Large-family feasibility and data-acquisition audit — 2026-10-10
+
+## Decision
+
+**No current, source-backed family of hundreds of independent claim tests is ready for prospective registration.** Do not turn a product, age, sex, pollutant, jurisdiction, or correlated indicator matrix into hundreds of nominal hypotheses merely to raise the public calibration count. These are useful subgroup or robustness analyses when tied to a substantive claim, but do not by themselves create independent policy questions.
+
+This is a source-key and claim-fit screen. It did not inspect selected outcome values or null masks, run a model, change an old verdict, or grant public visibility. Counts below describe the consolidated local checkout at the time of review; they are not claims about production publication.
+
+## Measured ceiling and binding gates
+
+| Source-backed observation | Current count | Implication |
+| --- | ---: | --- |
+| Total hypothesis records / public visible | 2,078 / 524 | The 500-additional target from the 372-record baseline still needs 348 public conversions in this snapshot. |
+| Archived records with verified registration | 234 | Every record has at least one current exclusion; the prior same-ID frozen-repair review found zero that can be promoted from metadata alone. |
+| Archived legacy same-commit hypothesis/run pairs | 1,320 | The run cannot be treated as prospective by editing the registration metadata. |
+| Legacy pairs with complete old source-vintage path and SHA-256 pins | 203 | This is an upper bound on cases that can even be source-compared. |
+| Legacy pairs with any later preserved raw calendar year | 22 | This is an upper bound on fresh-year opportunities, not 22 valid holdouts or conversions. |
+| Verified archives requiring estimator repair and rerun | 155 | Of these, 131 share a Fraser-index/GDP-per-person placeholder that does not measure their varied claims; the outcome also appears as a control. |
+| Policies / tested policies | 3,381 / 8 | A policy entry is not a measured policy effect. |
+| Policies with declared comparative structures | 7 | The event registry flags 3,358 policies needing treated/comparison unit coding and 1,308 needing exact dates. |
+
+Sources: `engine/audits/hypothesis_conversion_funnel_2026-10-10.json`, `engine/audits/legacy_archive_v2_readiness_2026-10-10.md`, `engine/audits/verified_archive_residual_audit_2026-10-09.md`, `engine/audits/archived_macro_frozen_repair_review_2026-10-09.md`, `engine/policy_event_treatment_registry.json`, and `engine/policy_evidence_index.json` in the consolidated checkout.
+
+The local high-dimensional files cannot close this gap by multiplication. `eurostat/migr_imm1ctz` includes hierarchical nationality groups, total sexes, and nested age bands; `eurostat/env_air_gge` includes hierarchical CRF source categories and gas-equivalent derivatives; V-Dem stores substantive items alongside their code intervals, uncertainty, ordinal, and aggregate variants. A treatment crossed with each stored slice would share source observations and often measure the same underlying construct. The 12 recently tested non-nested CRF sectors already form a declared family and remain descriptive calibrations. Independent public hypotheses require a distinct, policy-relevant mechanism or outcome, a defensible estimand, and a family-wide error rule fixed before outcome access.
+
+## Data acquisitions with genuine claim value
+
+The link numbers below count school-position claim links to an archived hypothesis, **not** additional independent hypotheses. Each bundle needs a fresh claim-fit and identification review. The current queue places all listed IDs in `new_prospective_v2_run_required`; their legacy runs must remain archived.
+
+1. **Regional minimum-wage bite and outcomes.** `minimum_wage_above_median_employment_teen_effects` (17 links) and `minimum_wage_disemployment_at_high_bite_ratios` (9) ask about local employment and wage distribution, not national GDP. Pin jurisdiction-year teen employment/population, age-specific median and p10 wages, statutory floors, regional low-skill immigrant employment, NEET, hours, and relevant donor-unit histories. Preserve US state/city, UK region, and German district IDs. The existing USDOL state minimum-wage vintage is only one input; the stated BLS LAU/OEWS/QCEW, ONS, Destatis, and youth outcomes are not present as a complete matched bundle. The multi-stage causal chain cannot be graded from a single national wage/employment correlation.
+2. **Nuclear phase-out prices and reliability.** `nuclear_phaseout_grid_reliability_cost_tradeoff` and `nuclear_phaseout_energy_cost_industry_exit` each have 17 links but are distinct claims. Pin comparable industrial electricity prices, day-ahead price volatility, fossil backup and adequacy/reliability data, generation mix, energy-intensive industry output, and gas/interconnection controls at the registered geography and event dates. The current local vintages do not include the required IEA/ENTSO-E/Eurostat energy-price outcome bundle. Cohort comparability, gas shocks, and Japan/Belgium coding must be settled before measuring outcomes.
+3. **Intergenerational mobility and institutional channels.** `intergenerational_mobility_cross_country` has 17 links. Obtain a citable country/cohort parent-child earnings-mobility outcome plus education-spending dispersion, residential segregation, and housing affordability measures at matching geographies and windows. The current pinned `data/vintages/owid` directory has only a fossil-subsidy file; the specified mobility outcome and full channel bundle are absent. A Gini or GDP proxy cannot replace the registered cohort statistic. A prospective v2 may need a smaller outcome-matched sample.
+4. **Wealth-tax behavioural chain.** `wealth_tax_capital_flight_revenue_yield_gap` has 17 links and requires matched enactment-vintage forecasts, realized revenue, high-net-worth emigration, taxable-base composition, and exemption reshuffling for the four named countries. A curated forecast/realization vintage now exists for the narrower `wealth_tax_forecast_realized_yield_gap`; it does not establish the broader migration or behavioural mechanism. Pin those missing official tax-register and mobility series before a new design.
+5. **China renewables learning curves.** `china_renewables_industrial_policy_learning_curve` has 7 links. Obtain technology-specific, country-year IRENA solar and onshore-wind levelized-cost and cumulative-capacity vintages; the current corpus has an IRENA fetcher but no pinned IRENA vintage. Even with complete costs, a China-versus-OECD learning-rate contrast alone cannot attribute the gap to state planning over demand pull, supply-chain learning, tariffs, and technology transfer. Keep a descriptive cap unless identification improves.
+
+Other high-value but smaller leads include Taiwan semiconductor foundry share/value-added for `asia_taiwan_tsmc_industrial_policy_1985_2024` (7 links) and matched subsidy estimates plus reserve-ownership data for `fossil_subsidy_persistence_private_ownership_link` (4). The broad WDI high-tech-export proxy is not a foundry-share outcome; the current OWID fossil-consumption subsidy series is not the registered IMF/IEA/Rystad bundle.
+
+## Admission rule for any future batch
+
+For each substantively distinct question: pin authoritative raw source and fetch manifest; document exact geography, date, units, and non-overlap; commit the new specification, estimator, sample floors, sign/magnitude rule, source-key roster, and full family denominator before selected outcome values; lock source hashes in a later commit; then run and verify exact replay. Keep failed floors inconclusive. Keep associational calibrations out of causal, policy, school, position, and featured credit unless the registered design independently clears those gates. Count successful *public evidence records* separately from school links or policy-record coverage.
