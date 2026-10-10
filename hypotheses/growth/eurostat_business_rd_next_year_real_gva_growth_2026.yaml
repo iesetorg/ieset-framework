@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eurostat_business_rd_next_year_real_gva_growth_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Among frozen European NUTS2 region-years in 2001–2023, a larger annual change in business-performed
+  R&D expenditure as a share of regional GDP at year t predicts higher next-year real total gross-value-added
+  growth, conditional on the preceding outcome and R&D level, region and country-by-year effects.
+evidence_type: associational
+methodology_note: Value-blind registration in a four-cell Eurostat regional R&D family. Only raw identity,
+  hashes, schemas, categorical selectors and region-year keys inspected; no selected values or missingness
+  masks read. The four claims are correlated and not four independent interventions.
+sample:
+  countries: &id001
+  - BEL
+  - BGR
+  - CYP
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - HRV
+  - HUN
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  period:
+  - 2000
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use the frozen case-specific region-year roster, keeping only codes with at least eight exact candidate
+    years; source keys do not establish measurement.
+  - Require finite selected values; R&D PC_GDP in [0,10] and absolute annual change <=2 percentage points;
+    GVA CP/PYP strictly positive and prior/forward volume growth within +/-50%; total unemployment in
+    [0,50] and prior/forward changes within +/-15 percentage points.
+  - Require at least eight complete exposure years per region after all exclusions; no imputation, interpolation,
+    winsorization, source switch, subregion-to-country relabeling or post-result sample-window change.
+  - Treat unchanged region codes across NUTS revisions as provisional geography; a code-reassignment or
+    boundary break requires a pre-result documented source audit, otherwise exclude the affected code
+    or mark the cell inconclusive.
+variables:
+  outcome:
+  - name: next_year_real_total_gva_growth
+    source: eurostat:nama_10r_3gva
+    transformation: 100*(PYP_MEUR_TOTAL[t+1]/CP_MEUR_TOTAL[t]-1); prior growth similarly PYP[t]/CP[t-1].
+  treatment:
+  - name: annual_business_rd_share_change_pp
+    source: eurostat:rd_e_gerdreg
+    transformation: BES/PC_GDP[t] - BES/PC_GDP[t-1], percentage points.
+  controls:
+  - name: prior_real_total_gva_growth
+    source: eurostat:nama_10r_3gva
+    transformation: 100*(PYP_MEUR_TOTAL[t]/CP_MEUR_TOTAL[t-1]-1).
+  - name: prior_rd_share
+    source: eurostat:rd_e_gerdreg
+    transformation: BES/PC_GDP[t-1] percent of regional GDP.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - region
+  - country_by_exposure_year
+  clustering: region
+  notes: Equal region-year OLS with region and country-by-year effects, region-cluster covariance and
+    two-sided t inference. No causal identification. Residual exposure concentration and leave-largest-three-country-out
+    fits are frozen design checks.
+falsification:
+  rule: SUPPORT requires registered positive slope and at least 0.5 percentage point next-year real GVA
+    growth per +1 percentage point R&D-share change. All sample, variation, influence and estimator gates
+    must pass. Bonferroni two-sided p<=0.0025 across all four registered cells and same direction in three
+    leave-one-country-out fits are required for SUPPORT; equally qualified opposite direction is REFUTED.
+    Other valid estimates are PARTIAL; any failed gate is INCONCLUSIVE.
+  test: Four-cell Eurostat regional R&D forward descriptive panel with region/country-year effects and
+    family correction.
+  threshold:
+    family_id: eurostat_regional_rd_forward_2026_10_10
+    family_size: 4
+    source_key_roster_path: data/pinned_evidence/eurostat_regional_rd_forward_2026_key_roster.csv
+    source_key_roster_sha256: 789ec757b0a0fecb3043716af387c0cf571fe1c09bd2f02d1566452fcf031f59
+    source_lock_path: prereg/locks/eurostat_regional_rd_forward_2026_10_10.json
+    source_files:
+      rd:
+        path: data/vintages/eurostat/rd_e_gerdreg@2026-04-30T115929Z.parquet
+        sha256: f0602b04f2eb4a610f8d986097ccbab59d0b07cab709826dc8f89dffbd97b51f
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+      gva:
+        path: data/vintages/eurostat/nama_10r_3gva@2026-04-30T115907Z.parquet
+        sha256: d10b38100e344d4eb486d8380e51f645ce4fc3b425c0235f05af3a731495358f
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+      unemployment:
+        path: data/vintages/eurostat/lfst_r_lfu3rt@2026-04-30T115837Z.parquet
+        sha256: 8244ec97ea2f8e5117e81433299d2dfc855f4f0343824f6c572b129007ef86b7
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    exposure_years:
+    - 2001
+    - 2023
+    min_key_years_per_region: 8
+    min_complete_rows: 500
+    min_regions: 80
+    min_countries: 15
+    min_complete_years_per_region: 8
+    min_material_exposure_rows: 100
+    min_material_exposure_regions: 30
+    material_abs_rd_change_pp: 0.05
+    min_exposure_p90_p10_pp: 0.15
+    min_residual_exposure_sd_pp: 0.02
+    max_region_exposure_ss_share: 0.1
+    max_country_exposure_ss_share: 0.25
+    max_top_five_region_exposure_ss_share: 0.35
+    min_country_holdout_rows: 400
+    min_country_holdout_regions: 65
+    bonferroni_alpha: 0.0025
+    max_rd_share_pct_gdp: 10.0
+    max_abs_rd_change_pp: 2.0
+    max_abs_real_gva_growth_pp: 50.0
+    max_unemployment_rate_pct: 50.0
+    max_abs_unemployment_change_pp: 15.0
+    min_abs_beta_gva_growth_pp_per_rd_pp: 0.5
+    min_abs_beta_unemployment_change_pp_per_rd_pp: 0.25
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    position_score_credit: 0
+    featured_eligible: false
+    case_id: eurostat_business_rd_next_year_real_gva_growth_2026
+    sector: BES
+    outcome: gva
+    registered_direction: 1
+    source_key_count: 1869
+    source_region_count: 99
+    source_country_count: 20
+prior_confidence: 0.4
+disclosure: R&D performance is not an exogenous policy treatment. Regional income, industrial composition,
+  EU funds, migration, measurement revisions and spillovers can jointly affect exposure and outcome. Four-cell
+  correction does not cover prior IESET search. No causal, policy, school, position or featured credit.
+steelman: hypotheses/steelman/eurostat_business_rd_next_year_real_gva_growth_2026.md
+scope:
+  period:
+  - 2000
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - none
+  treatment_tags:
+  - business_performed_rd
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
