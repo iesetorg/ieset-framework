@@ -1,0 +1,136 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_cit_cbcr_profit_booking_2019_v2
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: "-"
+claim: >-
+  Across the 143 tax jurisdictions with 2019 source keys in both pinned OECD
+  panels, lower combined statutory corporate tax rates predict higher ranks
+  of multinational profit booked per employee. This is a descriptive
+  cross-jurisdiction association in partially covered CbCR aggregates, not
+  an estimate of shifted profit or a tax-policy effect.
+evidence_type: descriptive
+methodology_note: >-
+  A new direct-measure question selected before inspecting the 2019 tax-rate
+  or CbCR values and their finite masks. The source-key roster, source
+  hashes, estimator, gate, and full family denominator are frozen here.
+  Older tax-rate/FDI and tax-rate/R&D questions measure different outcomes.
+sample:
+  countries: [GLOBAL]
+  period: [2019, 2019]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    One pre-pandemic reporting year avoids interpreting changes in the
+    incomplete CbCR reporting-parent population as within-jurisdiction
+    profit changes. Each of the 143 tax jurisdictions contributes at most
+    one 2019 observation.
+  exclusion_rules:
+    - >-
+      Freeze the exact 143 jurisdiction keys in the key-only roster. Include
+      both sovereign states and tax-reporting territories; do not treat
+      them as country-map observations.
+    - >-
+      Require exactly one value for each of CbCR profit booked, employees,
+      profit per employee, and combined statutory CIT rate in 2019.
+      Exclude nonfinite cells, employees at most zero, or tax rates outside
+      0-60 percent. No nearby-year, alternative vintage, imputation,
+      winsorisation, or post-result jurisdiction selection.
+    - >-
+      If a retained CbCR profit-per-employee value does not equal its
+      same-file booked-profit divided by employees within 1e-8 relative
+      or 1e-10 absolute tolerance, classify the whole test INCONCLUSIVE.
+variables:
+  outcome:
+    - name: cbcr_profit_booked_per_employee_rank_2019
+      source: profit_shifting:cbcr_profit_per_employee_usd
+      transformation: >-
+        Average-rank of the source-native 2019 ratio across complete
+        jurisdictions; no dollar magnitude is interpreted because the
+        derived vintage's raw CbCR unit multiplier is not independently
+        recoverable.
+      notes: >-
+        OECD aggregate profit booked divided by employees over the
+        reporting-parent subset represented in the pinned local extract.
+  treatment:
+    - name: combined_statutory_corporate_tax_rate_rank_2019
+      source: oecd:oecd_combined_corporate_income_tax_rate
+      transformation: average-rank of the 2019 percent rate
+      notes: >-
+        Statutory combined rate, not an effective tax rate, tax ruling,
+        treaty network, or enacted treatment assignment.
+intervention_channel: fiscal
+intervention_channel_justification: >-
+  A statutory corporate-income-tax rate describes a fiscal policy
+  environment, but this cross-section does not identify a policy effect.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  random_seed: 21019
+  notes: >-
+    Compute the two-sided Spearman rank correlation across the same
+    complete 2019 jurisdictions. Use average ranks for ties and 10,000
+    fixed-seed random permutations of the outcome ranks, with
+    p=(1+number of absolute permuted correlations at least as large as
+    observed)/10001. Report every leave-one-jurisdiction-out Spearman
+    coefficient as a fixed influence diagnostic. No adjustment or model
+    search follows outcome access.
+falsification:
+  test: oecd_2019_statutory_cit_cbcr_profit_per_employee_rank
+  rule: >-
+    First require an unchanged registration commit, a separate committed
+    source lock, exact pinned source and manifest hashes, the fixed 143-key
+    roster, at least 120 valid jurisdictions, at least ten distinct tax-rate
+    values, tax-rate interquartile range at least five percentage points,
+    at least 30 distinct profit-per-employee values, and a consistent
+    source ratio. Any failure is INCONCLUSIVE. The family contains one
+    question and uses a two-sided permutation p<=0.01. SUPPORTED requires
+    rho<=-0.20, p<=0.01, and negative rho in at least 95 percent of
+    successful leave-one-jurisdiction-out fits. REFUTED requires the
+    mirrored rho>=+0.20, p<=0.01, and positive rho in at least 95 percent
+    of fits. Any other estimable result is PARTIAL. No causal, policy,
+    school, position, or featured credit is awarded.
+  threshold:
+    family_id: oecd_cit_cbcr_profit_booking_2019_v2
+    family_size: 1
+    min_key_jurisdictions: 143
+    min_complete_jurisdictions: 120
+    min_distinct_tax_rates: 10
+    min_tax_rate_iqr_pp: 5.0
+    min_distinct_cbcr_ratios: 30
+    permutations: 10000
+    permutation_seed: 21019
+    two_sided_p_max: 0.01
+    min_abs_rho: 0.20
+    min_loo_sign_share: 0.95
+    max_tax_rate_pct: 60
+    causal_credit: 0
+    policy_score_credit: 0
+    school_score_credit: 0
+prior_confidence: 0.50
+disclosure: >-
+  Low statutory rates may coexist with high booked profit for reasons
+  besides profit shifting: capital intensity, sector mix, resource rents,
+  firm composition, tax treaties, and investment-hub status. The CbCR
+  extract omits some reporting parents; the publisher warns that the
+  covered MNE population varies by year, and the local builder did not
+  preserve the raw OECD CSV. A single-year rank screen cannot validate
+  the original source-native dollar multiplier or estimate global
+  shifted profits. This question was selected within a large archive, so
+  its local p cutoff does not correct archive-wide selection. The
+  sign was fixed before selected values or their finite masks were read.
+steelman: hypotheses/steelman/oecd_cit_cbcr_profit_booking_2019_v2.md
+scope:
+  period: [2019, 2019]
+  countries: [GLOBAL]
+  outcome_dim: [capital_flows]
+  policy_family: [tax_policy]
+  treatment_tags: [statutory_corporate_tax_rate, multinational_profit_booking]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  Blind key and source plan:
+  engine/audits/oecd_cit_cbcr_profit_booking_2019_v2_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_oecd_cit_cbcr_profit_booking_2019_v2.py.
