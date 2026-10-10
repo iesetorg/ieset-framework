@@ -79,6 +79,8 @@ POSITION_ALIASES = {
 
 RESOURCE_RENT_SERIES = "NY.GDP.TOTL.RT.ZS"
 RESOURCE_RENT_THRESHOLD = 5.0
+# A lower bound for otherwise uncoded countries; authored national movements
+# can extend the grid earlier (the first current movement is France in 1789).
 DEFAULT_START_YEAR = 1800
 
 
@@ -112,12 +114,23 @@ def canonical_position_id(position_id: object, valid_ids: set[str]) -> str | Non
     return None
 
 
+def is_national_movement(movement: dict) -> bool:
+    return movement.get("scope", "national") == "national"
+
+
 def load_movements(valid_ids: set[str]) -> list[dict]:
+    """Load only national records for country-year movement vintages.
+
+    State and supranational movements remain in the authored corpus, but a
+    listed parent or member country does not inherit their policy direction.
+    """
     movements: list[dict] = []
     skipped: dict[str, int] = {}
     for path in sorted(MOVEMENTS.glob("*.yaml")):
         doc = read_yaml(path)
         if not doc.get("movement_id"):
+            continue
+        if not is_national_movement(doc):
             continue
         normalised: list[dict] = []
         for rec in doc.get("position_alignments") or []:
@@ -202,10 +215,20 @@ def build_base_grid(
     countries, vintage_min, vintage_max = load_vintage_country_years()
     countries.update(load_hypothesis_countries())
     for movement in movements:
+        if not is_national_movement(movement):
+            continue
         countries.update(str(c) for c in movement.get("countries") or [])
     countries = {c for c in countries if len(c) == 3 and c.isupper()}
 
-    grid_start = min(start_year, vintage_min or start_year)
+    # Do not lose early authored decisions because the old dense-panel default
+    # predates neither their source nor their policy year. `movements` has
+    # already been restricted to national scope by load_movements().
+    movement_starts = [
+        (m.get("timeframe") or {}).get("start") for m in movements
+        if is_national_movement(m)
+        and isinstance((m.get("timeframe") or {}).get("start"), int)
+    ]
+    grid_start = min(start_year, vintage_min or start_year, *movement_starts)
     grid_end = max(end_year, vintage_max or end_year)
     index = pd.MultiIndex.from_product(
         [sorted(countries), range(grid_start, grid_end + 1)],
@@ -221,6 +244,8 @@ def active_position_rows(
 ) -> pd.DataFrame:
     rows: list[dict] = []
     for movement in movements:
+        if not is_national_movement(movement):
+            continue
         years = movement_years(movement, end_year)
         if not years:
             continue
@@ -255,6 +280,8 @@ def active_axis_rows(
 ) -> pd.DataFrame:
     rows: list[dict] = []
     for movement in movements:
+        if not is_national_movement(movement):
+            continue
         years = movement_years(movement, end_year)
         if not years:
             continue
