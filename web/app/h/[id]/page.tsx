@@ -28,7 +28,7 @@ const HISTORICAL_DRIFT_RESULT_IDS = new Set([
 ]);
 
 const HISTORICAL_DRIFT_SUMMARY =
-  "Historical 1976–2025 result; needs rerun for the 1846–2026 movement-coded drift series. Legacy same-commit archive record.";
+  "Historical 1976–2025 result; needs rerun for the 1789–2026 country/axis drift grid (statist composite starts in 1846). Legacy same-commit archive record.";
 
 export async function generateStaticParams() {
   const all = await loadAllHypotheses();
@@ -229,7 +229,8 @@ export default async function HypothesisPage({
           <strong className="block text-[14px]">NEEDS RERUN · Historical 1976–2025 result</strong>
           <p className="m-0 mt-1">
             This legacy same-commit archive result has not been recalculated on
-            the extended 1846–2026 movement-coded drift series. The verdict
+            the expanded 1789–2026 country/axis drift grid. Its statist composite
+            begins in 1846; the verdict
             below describes the old series only.
           </p>
         </div>

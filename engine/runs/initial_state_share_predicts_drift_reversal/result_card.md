@@ -2,7 +2,7 @@
 
 **Verdict:** partial — Direction is correct (β = -0.0233) but neither the significance threshold (p = 0.8246) nor the explanatory threshold (R² = 0.002) is met. Suggestive only.
 
-> **Coverage update (2026-10-09): NEEDS RERUN.** This is the preserved historical 1976–2025 result. The movement-derived drift file now spans the full authored corpus (1846–2026), so its input range and cumulative scores have changed. This verdict and its figures have not been recomputed for the extended series. Retest under a registered rule before interpreting the new range as support or refutation.
+> **Coverage update (2026-10-10): NEEDS RERUN.** This is the preserved historical 1976–2025 result. The movement-derived country/axis grid now spans 1789–2026, while the statist composite's first scored step remains 1846. The input range and cumulative scores have changed. This verdict and its figures have not been recomputed for the extended series. Retest under a registered rule before interpreting the new range as support or refutation.
 
 
 ## Primary specification (ISR excluded)
