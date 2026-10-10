@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu_tax_receipts_bottom_quintile_forward_2026
+version: 1
+status: pre_registered
+topic: distribution
+claim_direction: +
+claim: Among the fixed European countries, a higher 2023 oecd total tax revenue as
+  percent of gdp predicts a larger change from the 2022 to 2025 survey in eurostat
+  bottom-quintile share of equivalised disposable income, conditional on the 2022
+  level.
+methodology_note: One of four corrected, descriptive OECD-tax / EU-SILC later-outcome
+  calibrations. Source dimension keys and hashes were screened without selected values
+  or null masks. The old cross_school_tax_revenue_gini_redistribution_1990_2023 result
+  was seen. The bottom-quintile income share is a distinct lower-tail endpoint and
+  does not convert the old ID. The frozen family contract is engine/audits/eu_tax_social_holdout_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - BGR
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  period:
+  - 2022
+  - 2025
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One post-exposure survey endpoint per country; a fixed
+    2022 pre-exposure survey baseline and 2023 tax measure order the contrast without
+    identifying a tax effect.
+  exclusion_rules:
+  - Only the fixed 28-country source-key roster; the PIT-rate member has 24 source-key
+    countries. Require exact source dimensions and years.
+  - Require finite exposure and both outcome cells in [0,100]. No imputation, interpolation,
+    alternate income reference year, winsorization, substitution, or country re-selection.
+variables:
+  treatment:
+  - name: oecd_tax_total_pct_gdp_2023
+    source: oecd:oecd_tax_total_pct_gdp
+    transformation: Exact 2023 annual percent exposure, divided by 10 in OLS.
+  outcome:
+  - name: ilc_di01:QU1:SHARE:EUR_2025_minus_2022
+    source: eurostat:ilc_di01:QU1:SHARE:EUR
+    transformation: 2025 survey minus 2022 survey in percentage points or 0-100 Gini
+      index points; the 2025 income indicator refers to 2024 income.
+  controls:
+  - name: ilc_di01:QU1:SHARE:EUR_2022
+    source: eurostat:ilc_di01:QU1:SHARE:EUR
+    transformation: Exact 2022 survey baseline, divided by 10 in OLS.
+estimator:
+  template: descriptive
+  notes: Cross-country OLS of the 2025-2022 change on 2023 tax exposure/10 and 2022
+    outcome/10; HC3 uncertainty, two-sided Student t(n-3). Frozen sample, variation,
+    residual-exposure, leverage and inference gates precede any directional label.
+falsification:
+  test: eu_tax_social_holdout_2026_10_10
+  rule: INCONCLUSIVE when source, chronology, complete-country, exposure-IQR, full-rank,
+    residual-exposure influence, hat leverage, or HC3 uncertainty gate fails. Otherwise
+    SUPPORTED for a coefficient in expected sign + of at least 0.5 outcome point per
+    10 exposure points with two-sided p<=0.0025; REFUTED for equally strong opposite
+    coefficient at that p; otherwise PARTIAL. All four members remain in one Bonferroni
+    denominator.
+  threshold:
+    family_id: eu_tax_social_holdout_2026_10_10
+    family_size: 4
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0025
+    expected_beta_sign: +
+    meaningful_beta_min_abs_per_10pp: 0.5
+    min_complete_countries: 20
+    min_exposure_iqr_pp: 2.0
+    max_country_residualized_exposure_share: 0.2
+    max_hat_leverage: 0.3
+    baseline_survey_year: 2022
+    exposure_tax_year: 2023
+    outcome_survey_year: 2025
+    expected_key_countries: 28
+    source_key_roster_sha256: 44cf4948ee9ab46d90f462329a3e14be5e24dcc7cedb17a67fff315b29f4586c
+    source_lock_path: data/pinned_evidence/eu_tax_receipts_bottom_quintile_forward_2026.source.json
+    source_sha256:
+      tax: 4b07558c8bc42192bff94a0f57dfcc412c56385b1ccb2061bcdd7743e51d11cd
+      bottom: 6dc9948f57c6dc32e967628f541bbb19c894680ae7304b9de59fd50e641c29b5
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.25
+disclosure: Ecological, observational comparison. Tax receipts do not measure transfers;
+  statutory PIT does not measure effective tax. EU-SILC income survey year 2025 represents
+  2024 income. Survey sampling error, income structure, labour-market composition,
+  policy mix and common shocks may dominate. The four correlated cases have no causal,
+  policy, school, position or featured credit.
+steelman: hypotheses/steelman/eu_tax_receipts_bottom_quintile_forward_2026.md
+scope:
+  period:
+  - 2022
+  - 2025
+  countries: *id001
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - none
+  treatment_tags:
+  - oecd_tax_structure
+  - eu_silc
+  - descriptive_forward
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
