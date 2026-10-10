@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_growth_oecd_employment_f_50_54_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Within the frozen country-year panel, one percentage point higher real GDP growth in year t predicts
+  at least 0.10 percentage-point larger change from t to t+1 in the OECD employment-to-population ratio
+  for women ages 50–54, conditional on prior-year GDP growth and country/year effects.
+methodology_note: Prospective 20-cell descriptive family registered before selected OECD LFS employment
+  values, null masks, or observation statuses were opened. Exact key roster, source pins, chronology,
+  and all gates are fixed in engine/audits/wdi_growth_oecd_lfs_age_sex_prereg_2026-10-10.md. Earlier aggregate
+  employment and EPL/recession work is related but does not provide independent confirmation of these
+  disjoint age-sex cells.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUS
+  - AUT
+  - BEL
+  - BGR
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IDN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - MKD
+  - MLT
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - ROU
+  - RUS
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period:
+  - 1995
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the exact committed country/year roster, treatment year t from 1995–2018, and the same OECD
+    cell at t and t+1; no country, age, sex, source, or window substitution.
+  - WDI real GDP growth must be finite within [-100,100] with blank or A obs_status at t and t-1; no exposure
+    winsorization or shock exclusion.
+  - 'OECD LFS exact selector: MEASURE=EMP_RATIO, UNIT_MEASURE=PT_POP_SUB, LABOUR_FORCE_STATUS=EMP, SEX=F,
+    AGE=Y50T54. After separate committed source lock, value at both years must be finite in [0,100] and
+    OBS_STATUS A or blank.'
+  - Drop invalid exact-roster pairs only; retain countries with at least eight complete pairs, and enforce
+    all frozen sample, material-growth, influence, rank, and uncertainty gates.
+variables:
+  treatment:
+  - name: real_gdp_growth_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Real GDP annual growth percentage in year t; one unit is one percentage point. No
+      transformation or winsorization.
+    notes: Economy-wide output growth is not a policy intervention.
+  outcome:
+  - name: next_year_employment_ratio_change_f_50_54
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: OECD employment-to-population ratio for women ages 50–54 at t+1 minus t, in percentage
+      points. Exact MEASURE=EMP_RATIO, UNIT_MEASURE=PT_POP_SUB, LABOUR_FORCE_STATUS=EMP, SEX=F, AGE=Y50T54.
+    notes: Repeated cross-sectional age-band rate; this is not within-person employment change.
+  controls:
+  - name: prior_year_real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: WDI real GDP growth percentage in t-1; linear covariate fixed before outcome access.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One country/year fixed-effects OLS of t-to-t+1 employment-ratio change on GDP growth at t and
+    t-1. Country-cluster CR1 small-sample correction, two-sided Student t(G-1). No secondary fit can upgrade
+    the verdict.
+falsification:
+  test: wdi_growth_oecd_lfs_age_sex_20_cell_family_2026
+  rule: INCONCLUSIVE if any source, chronology, complete-case, material-growth, partialled-treatment concentration,
+    full-rank, or uncertainty gate fails. Otherwise SUPPORTED only for beta at least +0.10 employment
+    percentage point per GDP-growth percentage point and two-sided p<=0.0005; REFUTED for beta at most
+    -0.10 at the same p. All other estimable results are PARTIAL. All 20 cells stay in one Bonferroni
+    denominator.
+  threshold:
+    family_id: wdi_growth_oecd_lfs_age_sex_2026_10_10
+    family_size: 20
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0005
+    positive_beta_min_employment_pp_per_growth_pp: 0.1
+    material_growth_min_abs_pp: 2.0
+    expected_key_rows: 1094
+    expected_key_countries: 50
+    expected_key_years:
+    - 1995
+    - 2018
+    roster_sha256: 5323ed232b5f2a70b331259f290053c40869524eb701f0a1f06db63c79558aa7
+    min_valid_rows: 750
+    min_valid_countries: 40
+    min_material_growth_rows: 500
+    min_material_growth_countries: 35
+    min_distinct_years: 20
+    min_complete_years_per_country: 8
+    max_top_1pct_partialled_growth_share: 0.35
+    max_country_partialled_growth_share: 0.2
+    max_year_partialled_growth_share: 0.2
+    source_files:
+      exposure:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      outcome:
+        path: data/vintages/oecd/DSD_LFS_DF_LFS_INDIC@2026-07-23T151216Z.parquet
+        sha256: ac58f9ea05eb07e0d4696a81334021120cd679f58847a2fb32dc70e06074e6ae
+        manifest: data/manifests/fetch_run_2026-07-23T151302Z.yaml
+        manifest_sha256: 4952688fa8fbf62df91c20409bf4180b75977bc638bb33e2a00a267b3053b601
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.3
+disclosure: The positive Okun-type expectation is conventional, but age/sex-specific response sizes and
+  a strict 20-test cutoff are uncertain. The 20 cells share the same exposure and shocks; their results
+  are correlated and cannot be presented as independent replications. No causal, policy, school, position,
+  or featured credit.
+steelman: hypotheses/steelman/wdi_growth_oecd_employment_f_50_54_forward_2026.md
+scope:
+  period:
+  - 1995
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
