@@ -1,0 +1,114 @@
+packet_version: 1
+hypothesis:
+  id: oecd_pdb_ict_productivity_next_year_real_compensation_2026
+  path: hypotheses/labour/oecd_pdb_ict_productivity_next_year_real_compensation_2026.yaml
+preregistration:
+  commit: bfe1c4cd1e40c44a76ae2ed668844e9f69e90435
+  steelman: hypotheses/steelman/oecd_pdb_ict_productivity_next_year_real_compensation_2026.md
+  source_plan: engine/audits/oecd_pdb_sector_real_compensation_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/oecd_pdb_sector_real_compensation_2026_key_roster.csv
+source:
+  publisher: OECD Productivity Database plus World Bank WDI CPI
+  source_sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+  secondary_source_sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+  source_lock_commit: e6e0801388167120c196d81984bcbc01db23b10c
+  source_lock_manifest: data/pinned_evidence/oecd_pdb_ict_productivity_next_year_real_compensation_2026.source.json
+  key_roster_sha256: d3e0e611f9f3407efbc646a5b2d00b3a1a3ccd685d15fd37136d215082cea18b
+  input_vintages:
+  - path: data/vintages/oecd/DSD_PDB@2026-05-19T094612Z.parquet
+    sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+    manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+  - path: data/vintages/world_bank_wdi/FP.CPI.TOTL.ZG@2026-05-05T194737Z.parquet
+    sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+  license: OECD standard permissions and World Bank CC BY 4.0; attribution required
+  contains_source_values: false
+family:
+  id: oecd_pdb_sector_productivity_forward_real_compensation_2026_10_10
+  size: 3
+  members:
+  - oecd_pdb_manufacturing_productivity_next_year_real_compensation_2026
+  - oecd_pdb_wholesale_retail_productivity_next_year_real_compensation_2026
+  - oecd_pdb_ict_productivity_next_year_real_compensation_2026
+  holm_alpha: 0.05
+  interpretation: Three correlated sectors, common sources and model; not independent replication
+reproduction:
+  runner: scripts/run_oecd_pdb_sector_real_compensation_2026_metadata_fix.py
+  command: python3 scripts/run_oecd_pdb_sector_real_compensation_2026_metadata_fix.py verify --source-root
+    /path/to/IESET
+  result_sha256: de900bb7896b656cd8a4172d5dd26f6d0ea301d7ee7cd166d34721dea756e3d9
+result:
+  sample:
+    key_roster_rows: 732
+    key_roster_countries: 28
+    complete_rows_before_country_floor: 732
+    valid_rows: 724
+    valid_countries: 27
+    years_with_twelve_countries: 28
+    treatment_year_min: 1996
+    treatment_year_max: 2023
+    dropped:
+      country_below_ten_year_floor: 8
+    selected_values_read_after_committed_locks: true
+  primary:
+    beta: 0.03304809020614474
+    n_rows: 724
+    n_countries: 27
+    model_rank: 56
+    model_columns: 56
+    country_cluster_se: 0.02356067266262578
+    p_two_sided: 0.17254085777245742
+    df_inference: 26
+    residual_productivity_sd_pp: 5.146191229709329
+    maximum_country_productivity_ss_share: 0.1246515846056995
+    top_one_percent_productivity_ss_share: 0.15974722152495782
+    method: equal-row country/year FE OLS with prior real compensation growth; country CR1 cluster t(G-1)
+    residual_real_pay_sd_log_pp: 4.1404117988653
+  hash_folds:
+  - omitted_hash_fold: 0
+    rows: 595
+    countries: 22
+    beta: 0.03795087373890271
+  - omitted_hash_fold: 1
+    rows: 530
+    countries: 20
+    beta: 0.042786210785785594
+  - omitted_hash_fold: 2
+    rows: 613
+    countries: 23
+    beta: 0.025561921045010427
+  - omitted_hash_fold: 3
+    rows: 640
+    countries: 24
+    beta: 0.03194469658184018
+  - omitted_hash_fold: 4
+    rows: 518
+    countries: 19
+    beta: 0.03016438430941082
+  gate_failures: []
+  holm_adjusted_p: 0.5176225733173723
+  same_direction_folds: 5
+  opposite_direction_folds: 0
+  verdict: PARTIAL
+limitations:
+- Three sectors share the same productivity source, CPI deflator, countries, years and model; this is
+  one correlated family, not three replications.
+- OECD PDB LCEMP is nominal labour compensation per employee; national WDI CPI is a broad consumer basket,
+  not each sector's output deflator or a measure of median wages.
+- Compensation per employee can change with worker composition and hours; employment and wage bargaining
+  can respond jointly to demand and productivity.
+- Country/year effects, prior real-pay growth and a one-year lead do not identify causal productivity
+  pass-through or a policy effect.
+- The frozen OECD core and moderate-growth/inflation bounds limit generalization; no post-result source
+  or threshold change is permitted.
+- Sectors and signs were selected after related archive visibility. Holm controls this three-cell family
+  only, not archive-wide selection.
+- No causal, policy, school, position or featured credit is assigned.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false

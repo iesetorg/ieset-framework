@@ -44,7 +44,7 @@ MEGA3: list[Job] = [
     Job("hanke", "hyperinflation_table", "Hanke-Krus hyperinflation episode table"),
 
     # Migration, displacement, crime, and state capacity.
-    Job("unhcr", "population", "UNHCR population by country of asylum"),
+    Job("unhcr", "population", "UNHCR population (verify host-country keys)"),
     Job("unhcr", "population_origin", "UNHCR displacement by country of origin"),
     Job("unhcr", "asylum_decisions", "UNHCR asylum decisions"),
     Job("unhcr", "solutions", "UNHCR durable solutions"),

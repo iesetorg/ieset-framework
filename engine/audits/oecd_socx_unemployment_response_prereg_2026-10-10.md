@@ -1,0 +1,30 @@
+# GDP growth and relative unemployment cash spending — prospective registration
+
+## Question and scope
+
+For the fixed 39-country, 1,030-country-year categorical key roster over treatment years 1991–2018, is lower WDI real GDP growth in year `t` associated with a larger same-year change in constant-price public unemployment compensation per person **relative to** public family spending per person? This is a descriptive business-cycle response, not a recession-depth, poverty, or causal-policy test. The old `automatic_stabilizers_recession_depth_recovery_panel` and four OECD programme-to-outcome tests measure different claims and are not confirmations of this one.
+
+The OECD [Social Expenditure Database manual](https://www.oecd.org/social/soc/socx_manuel_2019.pdf) places unemployment compensation and severance pay in the unemployment cash-benefit area; the [OECD indicator definition](https://www.oecd.org/en/data/indicators/public-unemployment-spending.html) identifies public unemployment spending as expenditure on cash benefits compensating unemployment. The exact landed SOCX selection is annual `FREQ=A`, `MEASURE=SOCX`, `REF_AREA` among the frozen 39 countries, `EXPEND_SOURCE=ES10` (Public), `SPENDING_TYPE=C`, `PROGRAMME_TYPE=TP711` (Unemployment compensation / severance pay), `UNIT_MEASURE=USD_PPP_PS` (US dollars per person, PPP converted), `PRICE_BASE=Q` (constant prices), `OBS_STATUS=A`. The comparator differs only in `SPENDING_TYPE=_T`, `PROGRAMME_TYPE=TP51` (Family). These labels are present in the pinned Parquet; they do not assert that statutory rules are unchanged or that all countries use identical claiming procedures.
+
+The outcome at each exact country-year `t` is `ln(1+U_t)-ln(1+U_t-1)-ln(1+F_t)+ln(1+F_t-1)`, with U and F measured in real USD PPP per person. The `+1` is precommitted so a reported zero can be retained. The treatment is WDI `NY.GDP.MKTP.KD.ZG` real GDP growth percentage points in the same year. A negative slope means the unemployment category grows faster **relative to** family spending in a slower-growth year; it does not by itself imply that either programme rose in absolute terms.
+
+## Value-blind source-key screen
+
+The registration screen read SOCX schemas, categorical source keys, selector labels, status flags, hashes, and WDI GDP finite/not-finite masks. It did **not** read selected SOCX spending values, spending changes, correlations, signs, or estimates. The roster is `data/pinned_evidence/oecd_socx_unemployment_response_2026_key_roster.csv`, SHA-256 `e67b06ba296a038f805d848841fdca977cc3d92e2c86e3b68437ae23c72e8549`, with 1,030 unique `country_iso3,year` keys across 39 national country codes in 1991–2018. It requires categorical selected programme keys at `t-1,t` and a finite WDI GDP-growth value at `t`; it is **not** the result sample. Selected spending values, including nulls and invalid negatives, will be evaluated only after the registration commit and separate source lock.
+
+| Role | Frozen raw path | SHA-256 | Fetch manifest / SHA-256 |
+|---|---|---|---|
+| OECD SOCX outcome and family comparator | `data/vintages/oecd/DSD_SOCX_DF_SOCX_AGG@2026-05-05T210247Z.parquet` | `93e7e29b24dc791baf22833ae5596b4a381a366ddd0d78499bf59f7b80786124` | `data/manifests/fetch_run_2026-05-05T210519Z.yaml` / `5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112` |
+| WDI real GDP growth | `data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet` | `db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58` | `data/manifests/fetch_run_2026-05-05T200056Z.yaml` / `a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945` |
+
+These are local source vintages, not a live OECD or World Bank update. The narrow lock will record these exact source/manifest bytes and the registration commit before measurement. OECD permission and attribution requirements must be checked before raw redistribution; generated results do not include raw SOCX rows.
+
+## Frozen estimator and gates
+
+Admit only source status A SOCX observations with finite nonnegative per-person amounts at all four endpoints and blank/A WDI status with real GDP growth in `[-20,20]` percentage points. Do not replace sources, impute, interpolate, winsorize, change the window, or omit an unpopular country after a result. Retain countries with at least ten valid treatment years. Require at least 800 complete country-years in at least 30 countries and at least 60 GDP-contraction rows in 20 countries.
+
+Fit equal-country-year OLS of the spending-growth differential on GDP growth with country and calendar-year effects. Use country-cluster CR1 standard errors and a two-sided Student `t(G-1)` p-value. Reject rank deficiency or nonfinite/nonpositive cluster SE. Residualize GDP growth on country/year effects; the largest country's share of squared residual exposure must be ≤0.20 and the largest 1% of rows' share ≤0.30. Five prespecified country folds use `SHA256(ISO3)[:8] mod 5`; each leave-one-fold-out fit must retain ≥600 rows and ≥24 countries with an identified estimate.
+
+This one-test family has two-sided alpha 0.01. **SUPPORTED** needs `beta≤-0.02` log points per +1 GDP-growth percentage point, `p≤0.01`, and at least four of five negative fold slopes. **REFUTED** needs `beta≥+0.02`, `p≤0.01`, and four positive folds. A valid estimate missing a directional gate is **PARTIAL**. Any required sample, exposure, source, estimator, or fold failure is **INCONCLUSIVE**. Component coefficients for unemployment and family spending will be reported for interpretation only; they are not additional headline hypotheses.
+
+GDP shocks, unemployment claims, eligibility, severance payments, governments' discretionary responses, demographic changes, and source revisions can confound this contemporaneous association. Relative spending can move through either programme. Country/year effects do not identify a statutory automatic mechanism or a causal effect. The one-family alpha does not correct archive-wide selection. All outcomes receive zero policy, school, position, causal, and featured credit.

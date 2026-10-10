@@ -13,7 +13,7 @@
 - `irr:unified_market_analysis_1946_2021` — 6,976 rows, None to None — IRR unified exchange-rate market analysis
 - `irr:anchor_currency_monthly_1946_2019` — 7,190 rows, None to None — IRR anchor currency classifications
 - `hanke:hyperinflation_table` — 53 rows, Apr. 1984 to Sep. 1994 — Hanke-Krus hyperinflation episode table
-- `unhcr:population` — 50 rows, 1975 to 2024 — UNHCR population by country of asylum
+- `unhcr:population` — 50 rows, 1975 to 2024 — UNHCR global displacement totals; all country-of-asylum keys are `-` in the saved vintage
 - `unhcr:population_origin` — 1,500 rows, 1975 to 2024 — UNHCR displacement by country of origin
 - `unhcr:asylum_decisions` — 0 rows, 1975 to 2024 — UNHCR asylum decisions
 - `unhcr:solutions` — 50 rows, 1975 to 2024 — UNHCR durable solutions

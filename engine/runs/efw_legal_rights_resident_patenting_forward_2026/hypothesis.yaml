@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: efw_legal_rights_resident_patenting_forward_2026
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim_direction: '+'
+claim: >
+  Across the fixed 2003–2016 treatment-year roster, a larger three-year gain in
+  Fraser Economic Freedom of the World Area 2 (legal system and property rights)
+  from t-3 to t is associated with a larger subsequent three-year change in
+  log(1 + WIPO resident patent applications per million residents) from t to t+3,
+  conditional on baseline filing intensity and real income per person, country
+  effects, and treatment-year effects.
+evidence_type: associational
+methodology_note: >
+  One direct-measure descriptive test. Earlier IESET legal-rights families use
+  investment, FDI, credit, employment and other outcomes; earlier WIPO families
+  use R&D, Internet, trade, FDI or patent exposure. This exact measured
+  legal-rights-change to forward resident-patenting question was absent from
+  canonical specifications at registration. Source schemas, categorical keys,
+  hashes and finite/missing masks were inspected first: 2,296 source-key
+  country-years in 164 countries and approximately 1,272 finite-mask overlaps
+  in 121 countries before value bounds and country floor. The registered roster
+  uses categorical keys alone. Selected magnitudes, signs and estimates were
+  not inspected before registration; the mask peek is disclosed. This new
+  family is selected within a larger visible archive, so its alpha is not an
+  archive-wide correction or independent replication.
+sample:
+  countries: &countries [GLOBAL]
+  period: [2000, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+  - >
+    Use only pinned source-key roster treatment years t=2003..2016 and exact
+    calendar-year endpoints: Fraser Area 2 at t-3 and t; WIPO resident patent
+    applications and WDI population at t and t+3; WDI constant-2015-dollar GDP
+    per capita at t. Exclude non-ISO3 aggregates and duplicate exact source keys.
+  - >
+    Require finite Fraser Area 2 endpoints in [0,10]; nonnegative finite,
+    integer-like WIPO resident applications; positive WDI population of at
+    least one million at both endpoints; and positive finite WDI real GDP per
+    capita. WIPO and WDI observation status must be blank or A. No imputation,
+    interpolation, source substitution, shifted calendar year or value-driven
+    country selection.
+  - >
+    Retain countries with at least six complete treatment years. This floor,
+    all source bounds, and every verdict gate were fixed before selected values.
+variables:
+  treatment:
+  - name: efw_area2_three_year_change
+    source: fraser_efw:efw_panel
+    transformation: Area 2 legal-system/property-rights score at t minus t-3, in index points.
+  outcome:
+  - name: resident_patent_applications_per_million_log_change_t3
+    source: wipo:patent_applications_resident
+    transformation: >
+      log(1 + 1000000 * resident applications / WDI de facto population) at
+      t+3 minus the same log rate at t; exact years and no rounding.
+  controls:
+  - name: baseline_log_resident_patents_per_million
+    source: wipo:patent_applications_resident
+    transformation: log(1 + 1000000 * resident applications / WDI population) at t.
+  - name: log_real_gdp_per_capita_baseline
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive GDP per capita in constant 2015 US dollars at t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >
+    Equal-weight country-year OLS of the forward log-rate change on Area 2
+    change, baseline log patent rate, baseline log real GDP per capita, country
+    and treatment-year dummies. Country-cluster CR1 covariance, two-sided
+    Student t with G-1 country degrees of freedom. Five frozen country hash-fold
+    omissions assess sign stability; one primary hypothesis coefficient.
+falsification:
+  test: efw_legal_rights_resident_patenting_forward_2026_10_10
+  rule: >
+    INCONCLUSIVE if source hashes, complete-case counts, material-exposure
+    counts, model rank, finite clustered uncertainty, residualized-exposure
+    concentration or any hash-fold floor fails. With gates clear, SUPPORTED
+    requires beta >= +0.10 log points per +1 Area 2 point, two-sided p<=0.01,
+    and at least four of five positive omitted-fold coefficients. REFUTED
+    requires beta <= -0.10, p<=0.01 and at least four negative folds. All other
+    estimable results are PARTIAL. Opposite signs remain visible.
+  threshold:
+    family_id: efw_legal_rights_resident_patenting_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: '+'
+    meaningful_beta_min_abs: 0.1
+    min_complete_rows: 700
+    min_complete_countries: 65
+    min_complete_years_per_country: 6
+    material_area2_change_min_abs: 0.25
+    min_material_change_rows: 150
+    min_material_change_countries: 40
+    max_top_country_residualized_exposure_share: 0.15
+    max_top_one_percent_residualized_exposure_share: 0.25
+    min_fold_rows: 500
+    min_fold_countries: 50
+    population_min: 1000000
+    area2_range: [0, 10]
+    source_key_roster_path: data/pinned_evidence/efw_legal_wipo_resident_patent_2026_key_roster.csv
+    source_key_roster_sha256: 602cfb19cb1108c92f7395d3e2e26c7e6bfcade20ade356384393a74df66a95b
+    source_lock_path: data/pinned_evidence/efw_legal_wipo_resident_patent_2026.source.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: >
+  Area 2 is a broad institutional composite, not patent-law text or proof of
+  enforcement. Resident patent applications are filings, not grants, invention
+  quality or welfare. Reform timing, income, industrial mix, filing practice,
+  legal capacity, measurement changes and common shocks can move both series.
+  Differenced timing and fixed effects do not identify causality. The p=0.01
+  threshold covers this one-test family, not archive-wide selection. No policy,
+  school, causal, position or featured credit.
+steelman: hypotheses/steelman/efw_legal_rights_resident_patenting_forward_2026.md
+scope:
+  period: [2000, 2019]
+  countries: *countries
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

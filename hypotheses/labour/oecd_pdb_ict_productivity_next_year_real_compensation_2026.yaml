@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_pdb_ict_productivity_next_year_real_compensation_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Across the frozen OECD core country-sector roster in 1996–2023, higher real information and communication
+  value-added-per-hour growth in year t predicts higher CPI-deflated information and communication labour compensation
+  per employee growth in year t+1, conditional on real compensation growth in t and country and treatment-year
+  effects.
+evidence_type: associational
+methodology_note: One prospective cell of a three-sector OECD PDB and WDI CPI family. Before this registration,
+  source schemas, hashes, fetch manifests, categorical series identities, and country/sector/year keys were
+  inspected only; selected values or observation-status missingness masks were not read. Three source locks
+  must be separately committed after registration and before measurement.
+sample:
+  countries:
+  - OECD
+  period:
+  - 1995
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the frozen sector-specific country/treatment-year key roster for t=1996..2023 with PDB GVAHRS
+    GY at t, PDB LCEMP GY at t and t+1, and WDI CPI inflation at t and t+1. Keys do not imply measured coverage.
+  - Admit finite values with blank or A observation status. PDB GY unit multiplier must be zero. GVAHRS growth
+    is within +/-50 percentage points; nominal LCEMP growth is within [-50,100] percent; WDI CPI is within
+    [-20,50] percent.
+  - Real compensation growth in log percentage points is 100[ln(1+LCEMP_GY/100)-ln(1+CPI_inflation/100)] for
+    each year t and t+1. Require both within +/-50 log percentage points.
+  - Keep only countries with at least ten complete treatment years. No imputation, interpolation, winsorization,
+    replacement source or post-result model/window change.
+variables:
+  outcome:
+  - name: next_year_real_sector_compensation_growth
+    source: oecd_pdb:DSD_PDB:LCEMP + world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: At t+1, 100[ln(1+OECD nominal Information and communication labour-compensation-per-employee
+      GY/100)-ln(1+WDI CPI inflation/100)].
+    notes: National broad CPI deflator; this is sector mean compensation per employee, not median wages or
+      hourly pay.
+  treatment:
+  - name: same_year_real_sector_value_added_per_hour_growth
+    source: oecd_pdb:DSD_PDB:GVAHRS
+    transformation: OECD annual GY percentage growth in chain-linked real gross value added per hour, ACTIVITY=J,
+      XDC_H/LR.
+    notes: Observed productivity growth is not an intervention or isolated technology shock.
+  controls:
+  - name: prior_real_sector_compensation_growth
+    source: oecd_pdb:DSD_PDB:LCEMP + world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: The same real-compensation log-growth formula evaluated at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - treatment_year
+  clustering: country
+  notes: Equal-country-year OLS of t+1 real compensation log growth on t real sector productivity percentage
+    growth and t real compensation log growth, with country and treatment-year effects. CR1 country-cluster
+    covariance; two-sided Student t(G-1); Holm adjustment across three sectors; five country hash-fold omissions
+    are sensitivity gates.
+falsification:
+  rule: After every frozen coverage, variation, concentration and estimator gate passes, SUPPORT requires a
+    positive coefficient at least +0.05 next-year real compensation log percentage points per one productivity
+    percentage point, Holm-adjusted p<=0.05 across all three sectors, and positive coefficients in at least
+    four of five fixed country hash-fold omissions. A qualifying coefficient at or below -0.05 with four opposite
+    folds is REFUTED. An estimable weaker result is PARTIAL; failed design gates are INCONCLUSIVE.
+  test: Frozen three-sector forward predictive panel with country/year fixed effects, prior real compensation,
+    country-cluster t inference, Holm correction and hash-fold sign gates.
+  threshold:
+    family_id: oecd_pdb_sector_productivity_forward_real_compensation_2026_10_10
+    family_size: 3
+    source_key_roster_path: data/pinned_evidence/oecd_pdb_sector_real_compensation_2026_key_roster.csv
+    source_key_roster_sha256: d3e0e611f9f3407efbc646a5b2d00b3a1a3ccd685d15fd37136d215082cea18b
+    source_lock_path: data/pinned_evidence/oecd_pdb_ict_productivity_next_year_real_compensation_2026.source.json
+    source_sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+    secondary_source_sha256: dd4c747352eb0ceab2600a6b6ffeeda048c6080f0097bb6927d9966e5a3242a0
+    registered_direction: 1
+    holm_alpha: 0.05
+    meaningful_beta_abs_real_pay_log_pp_per_productivity_pp: 0.05
+    minimum_rows: 450
+    minimum_countries: 22
+    minimum_years_with_twelve_countries: 20
+    minimum_complete_years_per_country: 10
+    minimum_residual_productivity_sd_pp: 1.0
+    minimum_residual_real_pay_sd_log_pp: 0.5
+    maximum_country_productivity_ss_share: 0.2
+    maximum_top_one_percent_productivity_ss_share: 0.3
+    minimum_same_sign_hash_folds: 4
+    minimum_fold_rows: 320
+    minimum_fold_countries: 17
+    maximum_abs_productivity_growth_pp: 50.0
+    nominal_comp_growth_min_pp: -50.0
+    nominal_comp_growth_max_pp: 100.0
+    cpi_inflation_min_pp: -20.0
+    cpi_inflation_max_pp: 50.0
+    maximum_abs_real_pay_growth_log_pp: 50.0
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.5
+disclosure: The sector choices and positive productivity-to-pay prior follow visible older aggregate IESET
+  work. Holm corrects only these three cells, not archive-wide selection. National CPI is an imperfect sector
+  cost-of-living measure; sector demand, hours, worker composition, bargaining and simultaneous shocks can
+  confound. No causal, policy, school, position or featured credit.
+steelman: hypotheses/steelman/oecd_pdb_ict_productivity_next_year_real_compensation_2026.md
+scope:
+  period:
+  - 1995
+  - 2024
+  countries:
+  - OECD
+  outcome_dim:
+  - wage_stagnation
+  policy_family:
+  - none
+  treatment_tags:
+  - ict_productivity_growth
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
