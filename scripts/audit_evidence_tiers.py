@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from jsonschema import Draft202012Validator
 
 import audit_integrity_detectors
 
@@ -245,6 +246,29 @@ def school_score_eligible_for_public_run(public_visible: bool, correction: Any) 
     )
 
 
+def original_registration_schema_valid(registration: dict[str, Any]) -> bool:
+    """Validate the first committed spec, never a later corrected version."""
+    spec_commit = registration.get("spec_commit")
+    spec_rel = registration.get("path")
+    if (not isinstance(spec_commit, str)
+            or not re.fullmatch(r"[0-9a-f]{40}", spec_commit)
+            or not isinstance(spec_rel, str)
+            or not spec_rel.startswith("hypotheses/")):
+        return False
+    frozen = subprocess.run(
+        ["git", "show", f"{spec_commit}:{spec_rel}"],
+        cwd=ROOT, capture_output=True, check=False,
+    )
+    if frozen.returncode:
+        return False
+    try:
+        doc = yaml.safe_load(frozen.stdout)
+        schema = json.loads((ROOT / "schemas/hypothesis.schema.json").read_text())
+        return isinstance(doc, dict) and Draft202012Validator(schema).is_valid(doc)
+    except (TypeError, ValueError, OSError, yaml.YAMLError):
+        return False
+
+
 def immutable_source_locked_nested_verdict(
     diagnostics: dict[str, Any],
     hypothesis_id: str,
@@ -296,7 +320,12 @@ def immutable_source_locked_nested_verdict(
     spec_rel = registration.get("path")
     if not isinstance(spec_rel, str) or not spec_rel.startswith("hypotheses/"):
         return ""
-    if git_bytes("show", f"{spec_commit}:{spec_rel}") != (ROOT / spec_rel).read_bytes():
+    frozen_spec_bytes = git_bytes("show", f"{spec_commit}:{spec_rel}")
+    if frozen_spec_bytes != (ROOT / spec_rel).read_bytes():
+        return ""
+    # Chronology alone is not a valid registration. A post-result spec
+    # correction cannot retroactively make the first committed blob valid.
+    if not original_registration_schema_valid(registration):
         return ""
     result_rel = (run_dir / "diagnostics.json").relative_to(ROOT).as_posix()
     if git_bytes("show", f"{run_commit}:{result_rel}") != (run_dir / "diagnostics.json").read_bytes():
@@ -373,9 +402,9 @@ def immutable_source_locked_nested_verdict(
         members = family.get("members")
         if (not isinstance(members, list)
                 or len(members) != family_size
+                or any(not isinstance(member, str) for member in members)
                 or len(set(members)) != family_size
-                or hypothesis_id not in members
-                or any(not isinstance(member, str) for member in members)):
+                or hypothesis_id not in members):
             return ""
         for member in members:
             matches = list((ROOT / "hypotheses").glob(f"*/{member}.yaml"))
@@ -474,7 +503,9 @@ def build_record(
             run_dir = legacy_run_dir
     diagnostics = load_json(run_dir / "diagnostics.json")
     verdict = str(diagnostics.get("verdict") or "").strip()
-    if not verdict and isinstance(diagnostics.get("result"), dict):
+    nested_result = isinstance(diagnostics.get("result"), dict)
+    original_schema_invalid = nested_result and not original_registration_schema_valid(registration)
+    if not verdict and nested_result:
         verdict = immutable_source_locked_nested_verdict(
             diagnostics, hypothesis_id, run_dir, registration
         )
@@ -503,6 +534,8 @@ def build_record(
     exclusion_reasons: list[str] = []
     if registration_status != "verified":
         exclusion_reasons.append(f"registration_{registration_status}")
+    if original_schema_invalid:
+        exclusion_reasons.append("original_registration_schema_invalid")
     if not run_dir.is_dir():
         exclusion_reasons.append("run_missing")
     if not verdict:

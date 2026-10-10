@@ -1,7 +1,10 @@
 # jst_1929_credit_intensity_cpi_deflation_v2
 
-**Verdict: PARTIAL.** Valid descriptive test; the registered positive
-association was not supported or refuted at the two-test family threshold.
+**Measured verdict: PARTIAL; public tier: ARCHIVE.** The aggregate result
+passed its frozen sample and variation gates, but the original preregistration
+used an invalid schema token. The later metadata correction cannot establish
+blind public credit. The predicted positive association was neither supported
+nor refuted at the two-test family threshold.
 
 The 1929 private-loans/GDP entry measure and 1929–1933 consumer price level
 loss were measured in **17** complete JST R6
@@ -30,5 +33,10 @@ Jordà, Schularick and Taylor (2017), *Macrofinancial History and the
 New Business Cycle Facts*. Licensed CC BY-NC-SA 4.0. Raw and
 country-level values are not committed.
 
-Exact replay: `python3 scripts/run_jst_interwar_credit_severity_2026.py
-verify --source-parquet <local-JST-R6-parquet>`.
+Exact replay of both diagnostics passed at measured result commit
+`96d6cacd8472f4c78215411c3d58ed58691c9b7a` against the pinned local
+JST source. At this later checkout, the verifier deliberately rejects the
+post-result spec edit under its immutable-registration guard. To reproduce
+the original computation, check out that measured commit in an isolated
+worktree and run the frozen verifier with the same SHA-256-matched local
+JST parquet. The result is inspectable but remains archived.
