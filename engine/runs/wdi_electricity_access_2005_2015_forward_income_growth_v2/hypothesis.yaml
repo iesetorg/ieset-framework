@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+version: 1
+status: pre_registered
+claim_direction: +
+evidence_type: descriptive
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2005
+  - 2023
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One 2005–2015 electricity-access change and one subsequent 2015–2023
+    outcome growth or mortality-improvement interval per eligible economy.
+  exclusion_rules:
+  - Candidate roster is every ISO 3166 alpha-3 country or territory in pycountry, plus XKX, with
+    every selected country/year key in the three pinned local source files. The exact key-only roster
+    is committed in a separate source lock before selected values or null masks are opened.
+  - Require finite electricity-access percentages in [0,100] at 2005 and 2015, strictly positive
+    finite real GDP per person in 2005, 2015, and 2023, and strictly positive finite under-five mortality
+    at 2005, 2015, and 2023 for the mortality endpoint. Each outcome has its own complete-case sample.
+    No interpolation, imputation, country substitution, winsorization, or outcome-based geography
+    split.
+variables:
+  treatment:
+  - name: electricity_access_gain_per_ten_pp
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: (2015 access minus 2005 access) divided by 10
+  outcome:
+  - name: future_real_gdp_pc_annual_log_growth_pp
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log(2023 real GDP per person / 2015 real GDP per person) divided by
+      8
+  controls:
+  - name: electricity_access_2005
+    source: world_bank_wdi:EG.ELC.ACCS.ZS
+    transformation: 2005 percentage level
+  - name: log_real_income_2015
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of 2015 level
+  - name: prior_real_income_annual_log_growth_pp
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100 times log(2015 / 2005 real GDP per person) divided by 10
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-economy cross-sectional OLS with intercept and prespecified endpoint-specific controls.
+    HC3 uncertainty; two-sided Student t reference with N minus parameter-count degrees of freedom.
+    A shared two-outcome family uses Bonferroni p<=0.025 per test. No model search.
+falsification:
+  test: fixed_wdi_electricity_access_forward_income_under5_family
+  rule: Require at least 80 complete economies, at least 25 with a 2005–2015 access gain >=10 percentage
+    points, access-gain interquartile range >=5 points, full-rank design, finite positive HC3 uncertainty,
+    no economy contributing over 20% of squared residualized exposure, and successful leave-one-economy-out
+    fits for all but at most two economies. Failure is INCONCLUSIVE. SUPPORTED if beta >=+0.5 annualized
+    log-improvement percentage point per 10-point access gain, two-sided p<=0.025, and at least 75%
+    of successful leave-one-out betas positive. REFUTED if beta <=-0.5, p<=0.025, and at least 75%
+    of leave-one-out betas negative. Otherwise an estimable result is PARTIAL. The two endpoints
+    are one family; zero causal, policy, school, position, or featured credit.
+  threshold:
+    family_id: wdi_electricity_access_forward_income_under5_2026_family
+    family_size: 2
+    treatment_years:
+    - 2005
+    - 2015
+    outcome_years:
+    - 2015
+    - 2023
+    min_complete_economies: 80
+    min_access_gain_10pp_economies: 25
+    min_access_gain_iqr_pp: 5
+    max_single_economy_residualized_exposure_share: 0.2
+    max_loo_failures: 2
+    min_loo_sign_share: 0.75
+    min_abs_beta_annual_log_pp_per_10pp: 0.5
+    two_sided_p_max: 0.025
+    source_files:
+      access:
+        path: data/vintages/world_bank_wdi/EG.ELC.ACCS.ZS@2026-05-05T195057Z.parquet
+        sha256: aa564cbe2947b3d1c3499d7ecb9b2c38c6aa5de073d2cc1a797cfe2fe42f2931
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      mortality:
+        path: data/vintages/world_bank_wdi/SH.DYN.MORT@2026-05-05T194907Z.parquet
+        sha256: ad63729ccd5d1d4be6f3da5bbcac45b8a2c87d48c063cefeba8f0ddbe4b88f55
+    policy_score_credit: 0
+    school_score_credit: 0
+    outcome_role: income
+    legacy_hypothesis_id: wdi_electrification_growth_nonpenalty_1990_2023
+prior_confidence: 0.46
+disclosure: Electricity access, income, child survival, sanitation, education, health care, and state
+  capacity can move together. Historical whole-window outcomes from the old archive are known. This
+  later-outcome conditional forecast does not identify a grid-investment or policy effect. The family
+  and floors were frozen before selected values or null masks.
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+hypothesis_id: wdi_electricity_access_2005_2015_forward_income_growth_v2
+topic: growth
+claim: Across source-key eligible economies, larger 2005–2015 gains in electricity access predict
+  faster annualized real GDP-per-person growth in 2015–2023, conditional on 2005 access, 2015 income,
+  and 2005–2015 income growth. This is a descriptive forward association, not an identified electrification
+  policy effect.
+methodology_note: New-ID prospective, baseline-adjusted forward estimand for archived wdi_electrification_growth_nonpenalty_1990_2023.
+  The old result selected countries by whole-window 1990–2023 access gains and graded a same-window
+  outcome pattern. It does not grade this 2005–2015 treatment followed by 2015–2023 outcome across
+  all source-key eligible economies. The income-growth and under-five outcomes are distinct but share
+  one evidence family.
+scope:
+  period:
+  - 2005
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - none
+  treatment_tags:
+  - electricity_access_expansion
+steelman: hypotheses/steelman/wdi_electricity_access_2005_2015_forward_income_growth_v2.md
+notes: 'Pre-registration plan: engine/audits/wdi_electricity_access_forward_income_under5_2026_family_prereg_2026-10-10.md.
+  Frozen family runner: scripts/run_wdi_electricity_access_forward_income_under5_2026_family.py.'
