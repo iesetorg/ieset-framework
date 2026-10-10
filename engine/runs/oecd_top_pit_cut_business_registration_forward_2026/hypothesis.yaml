@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_top_pit_cut_business_registration_forward_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: +
+claim: Across the fixed 2007–2018 tax-year panel, a cut of at least one percentage point in the OECD top statutory personal income-tax rate from t−1 to t predicts a higher log change in World Bank new limited-liability business registrations from t to t+1 than a tax-stable year, conditional on a separate tax-hike indicator and country/year effects.
+methodology_note: 'Prospective two-test descriptive family; treatment values and outcome country/year keys alone informed registration. No WDI registration values, null masks, or status fields were opened. Frozen contract: engine/audits/oecd_tax_registration_family_prereg_2026-10-10.md.'
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period:
+  - 2007
+  - 2018
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the fixed key-only roster with exact OECD tax keys at t−1,t and WDI registration keys at t,t+1; no nearest-year join, imputation, country substitution, or window extension.
+  - OECD rate at both tax endpoints must be finite and in [0,100]; this excludes the impossible France 2013 top PIT value and adjacent annual changes in the PIT case.
+  - Use countries with at least five key-only candidate years and, after the separate source-lock commit, at least five complete measured pairs.
+  - WDI new registrations at both endpoints must be finite, strictly positive and have blank observation status; drop aggregate blank-country-code rows. No outcome winsorization or cap.
+  - Retain every otherwise valid tax change, including large reforms. Code cut as Δrate≤−1 pp, hike as Δrate≥+1 pp, stable as |Δrate|<1 pp.
+variables:
+  treatment:
+  - name: pit_cut_at_least_one_pp
+    source: oecd:oecd_top_statutory_pit_rate
+    transformation: Indicator of statutory rate at t minus t−1 ≤ −1 percentage point.
+    notes: A lower top wage-income tax rate could alter returns to entrepreneurship, but it is a weak proxy for the taxes paid by a new limited-liability corporation or its owner.
+  - name: pit_hike_at_least_one_pp
+    source: oecd:oecd_top_statutory_pit_rate
+    transformation: Indicator of statutory rate at t minus t−1 ≥ +1 percentage point, included as a prespecified nuisance covariate.
+  outcome:
+  - name: next_year_log_new_business_registration_change
+    source: world_bank_wdi:IC.BUS.NREG
+    transformation: ln(new limited-liability registrations at t+1) minus ln(registrations at t).
+    notes: Raw counts, not registrations per person, active firms, sole proprietorships, jobs or a causal response.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One OLS cut coefficient versus tax-stable years, with hike indicator, country and tax-year fixed effects; country-cluster CR1 and two-sided Student t(G−1). No outcome-conditioned search, controls, alternate lags or country substitutions.
+falsification:
+  test: oecd_tax_registration_family_forward_2026_10_10
+  rule: INCONCLUSIVE if any frozen source/roster, complete-case, cut/hike event, full-rank, partialled-cut concentration, or cluster-uncertainty gate fails. SUPPORTED only if cut beta ≥ +0.05 log point and two-sided p≤0.005; REFUTED only if cut beta ≤ −0.05 at the same cutoff; otherwise PARTIAL when all gates pass. Both cases remain in one Bonferroni family even if one is inconclusive.
+  threshold:
+    family_id: oecd_tax_registration_family_forward_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.05
+    min_valid_rows: 250
+    min_valid_countries: 25
+    min_cut_rows: 20
+    min_cut_countries: 12
+    min_hike_rows: 15
+    min_hike_countries: 10
+    min_years_per_country: 5
+    max_top_one_percent_partialled_cut_share: 0.3
+    max_top_country_partialled_cut_share: 0.2
+    expected_key_rows: 454
+    expected_key_countries: 38
+    expected_key_cut_rows: 43
+    expected_key_cut_countries: 23
+    expected_key_hike_rows: 43
+    expected_key_hike_countries: 23
+    roster_sha256: 7f52d0b7316e08e79693ded46fc47d1006f614fd515e5147fb4f5f0509a9cc92
+    source_files:
+      treatment:
+        path: data/vintages/oecd/oecd_top_statutory_pit_rate@2026-07-23T153857Z.parquet
+        sha256: b500bdc808385c17ace3eb6d78b5698a02dadd28943daf5e7d198d9093f19151
+        manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+        manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+      outcome:
+        path: data/vintages/world_bank_wdi/IC.BUS.NREG@2026-05-05T203439Z.parquet
+        sha256: 213a70ca7b1b8259d58f3a3b9e90b9fb84cce3f77b881667f8811a71d25e75ae
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.18
+disclosure: Descriptive calibration only. The local two-test Bonferroni correction does not account for visible older tax and business-entry hypotheses. WDI registrations reflect limited-liability registry counts and may shift with administrative coverage, population, or macroeconomic conditions. Tax reforms are endogenous; top statutory rates do not measure effective tax burden. No causal, policy, school, or featured credit.
+steelman: hypotheses/steelman/oecd_top_pit_cut_business_registration_forward_2026.md
+scope:
+  period:
+  - 2007
+  - 2018
+  countries: *id001
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - tax_policy
+  treatment_tags:
+  - pit_statutory_rate_cut
+  - firm_registration
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
