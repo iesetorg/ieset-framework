@@ -1,0 +1,99 @@
+packet_version: 1
+hypothesis:
+  id: gfdd_liquid_assets_future_banking_crisis_2026
+  path: hypotheses/regulatory/gfdd_liquid_assets_future_banking_crisis_2026.yaml
+preregistration:
+  commit: 46fa6022ad5dd9d0c1128b70e73f8612f98aa628
+  steelman: hypotheses/steelman/gfdd_liquid_assets_future_banking_crisis_2026.md
+  source_plan: engine/audits/gfdd_bank_resilience_crisis_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/gfdd_bank_resilience_crisis_2026_key_roster.csv
+source:
+  publisher: World Bank Global Financial Development Database plus WDI GDP per capita
+  source_sha256: 9afa3262a7de79ded1325797ef96153f56d5a842bd47d9d32979f7e45065d283
+  metadata_sha256: 3bc9958c85b97f9299f19587570f5bc6e474028a31285a3c38194d3eab424746
+  secondary_source_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+  source_lock_commit: 85a4a329e9e7c5b7565e450c8c0e3712051bf148
+  source_lock_manifest: data/pinned_evidence/gfdd_liquid_assets_future_banking_crisis_2026.source.json
+  key_roster_sha256: d303224ca61e58debe69378870d7879d0e24df2777747cba004fb01990d0194e
+  input_vintages:
+  - path: data/vintages/gfdd/GFDDData@2026-05-02T201137Z.parquet
+    sha256: 9afa3262a7de79ded1325797ef96153f56d5a842bd47d9d32979f7e45065d283
+  - path: data/vintages/gfdd/GFDDSeries@2026-05-02T201137Z.parquet
+    sha256: 3bc9958c85b97f9299f19587570f5bc6e474028a31285a3c38194d3eab424746
+  - path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+  gfdd_fetch_manifest: not available in tracked corpus
+  license: GFDD public World Bank download; underlying source rights vary; only derived summary published
+  contains_source_values: false
+family:
+  id: gfdd_bank_resilience_future_crisis_2026_10_10
+  size: 8
+  members:
+  - gfdd_z_score_future_banking_crisis_2026
+  - gfdd_nonperforming_loans_future_banking_crisis_2026
+  - gfdd_capital_assets_future_banking_crisis_2026
+  - gfdd_credit_deposits_future_banking_crisis_2026
+  - gfdd_regulatory_capital_future_banking_crisis_2026
+  - gfdd_liquid_assets_future_banking_crisis_2026
+  - gfdd_loan_loss_provisions_future_banking_crisis_2026
+  - gfdd_cost_income_future_banking_crisis_2026
+  holm_alpha: 0.05
+  interpretation: Eight correlated bank signals with one future-crisis outcome
+reproduction:
+  runner: scripts/run_gfdd_bank_resilience_crisis_2026.py
+  command: python3 scripts/run_gfdd_bank_resilience_crisis_2026.py verify --source-root /path/to/IESET
+  result_sha256: ed9fe010f322e32d3e9549d85e4cad4bda13fadb72adbad9b905d5bdffd12bd9
+result:
+  sample:
+    key_roster_rows: 636
+    key_roster_countries: 212
+    complete_rows_before_country_floor: 266
+    valid_rows: 233
+    valid_countries: 86
+    rows_per_anchor:
+      '2000': 71
+      '2005': 84
+      '2010': 78
+    future_crisis_windows: 10
+    future_crisis_countries: 10
+    noncrisis_windows: 223
+    dropped:
+      country_below_two_anchors: 33
+      missing_or_nonfinite: 353
+      not_at_risk_or_nonbinary_crisis: 17
+    selected_values_read_after_committed_locks: true
+    indicator_pooled_mean: 39.569369424892706
+    indicator_pooled_sd: 22.606183992169793
+    residual_standardized_indicator_sd: 0.49168036652777236
+    residual_crisis_sd: 0.1493597046246401
+    top_one_percent_indicator_ss_share: 0.2658402607767141
+    top_country_indicator_ss_share: 0.22338503327257575
+  primary: null
+  hash_folds: []
+  gate_failures:
+  - top_country_indicator_concentration
+  holm_adjusted_p: 1.0
+  verdict: INCONCLUSIVE
+limitations:
+- The GFDD crisis dummy records years of Laeven–Valencia systemic banking crises; requiring five complete
+  future years avoids treating missing years as non-events.
+- Bank ratios are observational signals, not randomized prudential interventions; crisis risk, deleveraging
+  and policy responses can affect measured ratios before the recorded onset.
+- Seven indicators come from the GFDD Stability topic and cost-to-income from Efficiency; they share banking
+  systems, countries and outcome, so eight cells form one correlated Holm family.
+- The frozen 2000, 2005 and 2010 anchors end in 2015 and avoid the 2015 Bankscope-to-Orbis switch for
+  some baseline predictors; source methods can still differ across countries.
+- Country and anchor effects, baseline private-credit level/change and baseline real income do not isolate
+  causal bank resilience or policy effects.
+- The local GFDD parquet hashes and official World Bank metadata are pinned, but this older corpus has
+  no tracked fetch manifest; raw source custody cannot be independently reconstructed from a manifest.
+- Holm corrects this eight-cell family, not the entire previously visible IESET banking-crisis literature.
+- No causal, policy, school, position or featured credit is assigned.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
