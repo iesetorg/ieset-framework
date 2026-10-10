@@ -1,0 +1,7 @@
+# Food-production volume and next-year consumer inflation
+
+The strongest descriptive case is that a rise in domestic food-production volume eases food supply pressure after harvest and reduces broad consumer-price inflation the following year. The FAO/WDI index measures price-weighted production volume, while CPI inflation measures the average consumer basket. A negative country-year association after prior inflation, GDP growth, and country/year effects would be consistent with the proposed timing but would not identify an effect of production or policy.
+
+The strongest challenge is that food can be exported, imported, stored, wasted, or consumed outside recorded markets. Broad CPI includes housing, energy and services; exchange rates, weather, global food prices, monetary responses and demand can move both national food production and inflation. The fixed sample excludes hyperinflation and extreme food-output changes, and some FAO and national CPI series may contain measurement breaks. The preregistered null or positive result must remain visible. This family grants no causal, policy, position, school, or featured credit.
+
+Definitions: [World Bank/FAO food-production index](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/AG.PRD.FOOD.XD), [World Bank/IMF CPI inflation](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/FP.CPI.TOTL.ZG), [World Bank real GDP growth](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/NY.GDP.MKTP.KD.ZG).

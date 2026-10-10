@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_food_production_growth_cpi_forward_2026
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: '-'
+claim: >
+  Across the frozen national country-year roster in 2001–2018, stronger annual
+  growth in the FAO/WDI food-production volume index at year t predicts lower
+  broad consumer-price inflation in year t+1, conditional on inflation and
+  real GDP growth at t and on country and treatment-year effects.
+evidence_type: associational
+methodology_note: >
+  One new prospective descriptive family selected after an archive scan found
+  no exact food-production-volume-to-next-year-CPI test. Earlier tractor-to-food,
+  exchange-rate-to-CPI, and tourism-to-CPI results remain separate and visible.
+  Registration uses source schemas, hashes, official definitions, fetch manifests,
+  and country/year/indicator keys only. The fixed key grid is not a complete-case
+  sample. The source lock is committed before any selected values or null/status
+  masks are read.
+sample:
+  countries: [GLOBAL]
+  period: [2000, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only fixed ISO3-plus-XKX source-key roster at t=2001..2018; require exact food index at t-1 and t, CPI at t and t+1, and GDP growth at t.
+  - Admit blank or A WDI observation status. Food index endpoints must be finite and in (0,1000]; CPI at t and t+1 must be finite in [-20,50] percent; GDP growth at t must be finite in [-30,30] percent.
+  - Food index growth is 100 times ln(F_t/F_t-1), with absolute value no greater than 30 log-percentage points. Do not impute, interpolate, winsorize, or switch endpoints.
+  - Keep only countries with at least five complete treatment years. No post-result source, subgroup, window, threshold, control, or estimator change.
+variables:
+  outcome:
+  - name: next_year_headline_cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: Exact calendar-year t+1 CPI inflation rate in percentage points.
+    notes: Broad national consumer basket; it is not a food-price subindex.
+  treatment:
+  - name: annual_food_production_volume_growth
+    source: world_bank_wdi:AG.PRD.FOOD.XD
+    transformation: 100 times natural log of food-production index at t divided by t-1.
+    notes: FAO price-weighted production volume; not domestic food availability or retail supply.
+  controls:
+  - name: baseline_cpi_inflation
+    source: world_bank_wdi:FP.CPI.TOTL.ZG
+    transformation: Exact t-year CPI inflation percentage points.
+  - name: baseline_real_gdp_growth
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Exact t-year real GDP growth percentage points.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, treatment_year]
+  clustering: country
+  notes: >
+    Equal-country-year OLS of CPI inflation at t+1 on food-production log growth
+    at t, CPI and GDP growth at t, country and treatment-year dummies. Country
+    CR1 cluster covariance, two-sided Student t with G-1 country degrees of
+    freedom. Five pre-fixed country hash-fold omissions are sensitivity checks.
+falsification:
+  test: wdi_food_production_cpi_forward_2026_10_10
+  rule: >
+    INCONCLUSIVE if any source-lock, sample, material-variation, rank, residual
+    concentration, finite cluster-SE, or fold gate fails. With all gates clear,
+    SUPPORTED requires beta <= -0.05 CPI percentage points per +1 log-percentage
+    point food-production growth, two-sided p <= 0.01 and at least 4/5 negative
+    fold slopes. REFUTED requires beta >= +0.05, p <= 0.01 and at least 4/5
+    positive fold slopes. Other estimable outcomes are PARTIAL.
+  threshold:
+    family_id: wdi_food_production_cpi_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.05
+    min_complete_rows: 1000
+    min_complete_countries: 100
+    min_material_rows: 250
+    min_material_countries: 60
+    material_abs_food_growth_log_points: 5.0
+    min_complete_years_per_country: 5
+    min_fold_rows: 800
+    min_fold_countries: 80
+    max_top_country_residualized_exposure_share: 0.15
+    max_top_one_percent_residualized_exposure_share: 0.25
+    food_index_range: [0.0, 1000.0]
+    cpi_inflation_range: [-20.0, 50.0]
+    real_gdp_growth_range: [-30.0, 30.0]
+    max_abs_food_growth_log_points: 30.0
+    source_key_roster_path: data/pinned_evidence/wdi_food_production_cpi_2026_key_roster.csv
+    source_key_roster_sha256: 52f4a4f8b333ad6fecb6e41fffa6f3217a32ab98a309a47eecd2ebb551619823
+    source_lock_path: data/pinned_evidence/wdi_food_production_cpi_2026.source.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: >
+  The global food-index/CPI pair was chosen after other IESET result families
+  were visible, so p=0.01 is only a within-family test and does not correct
+  archive-wide selection. Food output need not enter domestic retail supply;
+  trade, climate, energy costs, currency moves, policy responses, demand,
+  measurement changes and broad CPI composition can confound the association.
+  The moderate-inflation bounds exclude crisis observations. Time ordering and
+  fixed effects do not establish causality. No policy, school, position, causal,
+  or featured credit is permitted.
+steelman: hypotheses/steelman/wdi_food_production_growth_cpi_forward_2026.md
+scope:
+  period: [2000, 2019]
+  countries: [GLOBAL]
+  outcome_dim: [inflation]
+  policy_family: [none]
+  treatment_tags: [food_production_volume]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
