@@ -1,0 +1,339 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_oil_rent_services_growth_2026
+version: 1
+status: pre_registered
+topic: resource_rents
+claim_direction: +
+claim: Across fixed country windows in 1995, 2000, 2005 and 2010, higher baseline oil rents (% GDP) predicts
+  higher cumulative real services value-added growth in the next five years, conditional on prior five-year
+  sector growth, baseline sector scale and real income, and country/anchor effects.
+evidence_type: associational
+methodology_note: One of eight prospective World Bank WDI resource-rent/sector cells. Only source hashes,
+  official series definitions, country/year keys and schemas were inspected before registration. Selected
+  values, null masks and estimates remain sealed until eight separate source-lock commits.
+sample:
+  countries: &id001
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ASM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUB
+  - CUW
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FRO
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIB
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - GUM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IMN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LIE
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAF
+  - MAR
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MNP
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NCL
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRI
+  - PRK
+  - PRT
+  - PRY
+  - PSE
+  - PYF
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SXM
+  - SYC
+  - SYR
+  - TCA
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VGB
+  - VIR
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 1990
+  - 2015
+  temporal_structure: panel
+  exclusion_rules:
+  - Use the frozen key-only roster of ISO3 national country/indicator/anchor identities. At each anchor
+    t, require exact rent series at t, WDI GDP per person at t, and both real sector value-added series
+    at t−5, t and t+5; this paired-sector requirement is identical across the two outcome cells for each
+    rent.
+  - After all source locks, retain complete finite rows with rent in [0,100.0] percent GDP, real income
+    and both real sector levels strictly positive. Require countries to have at least 2 complete anchors.
+    No interpolation or missing-as-zero recoding.
+  - The outcome is log real sector value added at t+5 minus log level at t; controls include the same
+    sector’s prior t−5 to t log growth, log real sector level at t, log real GDP per person at t, country
+    and anchor fixed effects. All anchor follow-ups are nonoverlapping and end by 2015.
+  - No outcome-driven country selection, winsorization, source substitution, post-result model/window/threshold
+    change or policy interpretation.
+variables:
+  treatment:
+  - name: baseline_oil_rent_standardized
+    source: world_bank_wdi:NY.GDP.PETR.RT.ZS
+    transformation: Level in percent GDP at anchor t, standardized using the pooled complete-case population
+      SD; +1 unit is +1 SD.
+    notes: Modeled natural-resource rent, not fiscal revenue or a policy intervention.
+  outcome:
+  - name: future_five_year_real_services_value_added_growth
+    source: world_bank_wdi:NV.SRV.TOTL.KD
+    transformation: Natural log of positive real sector value added at t+5 divided by positive real sector
+      value added at t.
+    notes: Constant 2015 US-dollar national-accounts sector value added.
+  controls:
+  - name: prior_sector_growth
+    source: world_bank_wdi:NV.SRV.TOTL.KD
+    transformation: Log sector value added at t divided by t−5.
+  - name: baseline_log_sector_scale
+    source: world_bank_wdi:NV.SRV.TOTL.KD
+    transformation: Natural log positive real sector value added at t.
+  - name: baseline_log_real_income
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log positive real GDP per person at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor_year
+  clustering: country
+  notes: Equal country-window OLS of five-year log sector growth on standardized rent, prior sector growth,
+    baseline log sector scale and log income, country and anchor fixed effects. Country CR1 clustered
+    uncertainty, two-sided Student t(G−1), Holm correction across all eight cells. Five fixed country
+    hash-fold omissions assess sign stability. Descriptive only.
+falsification:
+  test: wdi_resource_rents_sector_growth_2026_10_10
+  rule: INCONCLUSIVE if source chronology or complete-case row, country, anchor, variation, influence,
+    rank, cluster-uncertainty or fold-coverage gate fails. SUPPORTED iff beta has registered positive
+    sign, absolute beta >=0.03 log points of five-year growth per +1 rent SD, Holm-adjusted two-sided
+    p<=0.05 across all eight cells (inconclusive p=1), and at least four of five omission folds share
+    that sign. REFUTED iff these same criteria hold in the opposite direction. Otherwise PARTIAL.
+  threshold:
+    family_id: wdi_resource_rents_future_sector_growth_2026_10_10
+    family_size: 8
+    family_alpha: 0.05
+    holm_alpha: 0.05
+    registered_beta_sign: +
+    meaningful_abs_beta_log_points_per_sd: 0.03
+    source_key_roster_path: data/pinned_evidence/wdi_resource_rents_sector_growth_2026_key_roster.csv
+    source_key_roster_sha256: 2e82530b40d9383e8444eed52e57b7143841a0766471bf8352b0a8ad54738309
+    source_lock_path: data/pinned_evidence/wdi_oil_rent_services_growth_2026.source.json
+    family_source_sha256: f4233e7ab8cf6e41e175850cdbf22652208b709658422612d57aeae070de2519
+    min_valid_rows: 160
+    min_valid_countries: 60
+    min_rows_per_anchor: 30
+    min_complete_anchors_per_country: 2
+    rent_percent_gdp_min: 0
+    rent_percent_gdp_max: 100.0
+    min_residual_standardized_rent_sd: 0.15
+    min_residual_sector_growth_sd: 0.04
+    max_top_one_percent_rent_ss_share: 0.35
+    max_top_country_rent_ss_share: 0.25
+    max_top_one_percent_growth_ss_share: 0.35
+    max_top_country_growth_ss_share: 0.25
+    min_fold_rows: 110
+    min_fold_countries: 40
+    min_same_sign_hash_folds: 4
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.5
+disclosure: Four correlated rent measures and two sector outcomes form one eight-cell Holm family. Resource
+  rents are modeled and expressed as GDP shares, so commodity prices and a common GDP denominator may
+  confound levels. The services source lacks a tracked fetch manifest but has an exact local SHA pin.
+  This is observational and receives no causal, policy, school, position or featured credit.
+steelman: hypotheses/steelman/wdi_oil_rent_services_growth_2026.md
+scope:
+  period:
+  - 1990
+  - 2015
+  countries: *id001
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - none
+  treatment_tags:
+  - wdi_oil_resource_rent
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
