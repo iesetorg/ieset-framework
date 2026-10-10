@@ -1712,6 +1712,33 @@ def transform_panel_values(df: pd.DataFrame, value_col: str, kind: str) -> pd.Da
 
     out = df.sort_values(["country_iso3", "year"]).copy()
 
+    annual_log_kinds = {
+        "annual_log_change", "annual_log_growth", "log_diff",
+        "log_diff_annual", "log_yoy", "yoy_log_diff", "log_diff_yoy",
+    }
+    lag_years = 1 if kind_l in annual_log_kinds else None
+    multi_year_log = re.fullmatch(r"log_diff_(\d+)(?:y|yr)", kind_l)
+    if multi_year_log:
+        lag_years = int(multi_year_log.group(1))
+    if lag_years is not None:
+        # Match the exact previous calendar year.  A row shift silently turns
+        # missing source years into a longer and unregistered exposure window.
+        prior = out[["country_iso3", "year", value_col]].copy()
+        prior["year"] = prior["year"] + lag_years
+        prior = prior.rename(columns={value_col: "_prior_transform_value"})
+        out = out.merge(
+            prior, on=["country_iso3", "year"], how="left",
+            validate="one_to_one",
+        )
+        current = out[value_col].where(out[value_col] > 0)
+        earlier = out["_prior_transform_value"].where(
+            out["_prior_transform_value"] > 0
+        )
+        out[value_col] = np.log(current) - np.log(earlier)
+        return out.drop(columns=["_prior_transform_value"])
+    if any(marker in kind_l for marker in ("log_diff", "annual_log_change", "annual_log_growth")):
+        raise ValueError(f"unsupported country-year log transformation: {kind}")
+
     if (
         "five" in kind_l
         and "year" in kind_l
@@ -1749,13 +1776,16 @@ def transform(s: pd.Series, kind: str) -> pd.Series:
     kind = (kind or "level").lower()
     if kind in ("level", "raw"):
         return s
+    if any(marker in kind for marker in ("log_diff", "annual_log_change", "annual_log_growth")) \
+            or kind in {"log_yoy", "yoy_log_diff"}:
+        raise ValueError(f"country-year keys are required for transformation: {kind}")
     if "log" in kind:
         return np.log(s.where(s > 0))
     if kind in ("inverted_scale", "reverse_scale"):
         return -s
     if kind in ("diff", "first_diff"):
         return s.diff()
-    if kind in ("yoy", "log_diff"):
+    if kind == "yoy":
         return np.log(s.where(s > 0)).diff()
     return s
 
