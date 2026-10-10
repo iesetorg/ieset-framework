@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wgi_ge_exported_hs6_breadth_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: '+'
+claim: Across the fixed 153-reporter pre-pandemic panel, a larger three-year improvement in the World Bank government-effectiveness estimate predicts a larger subsequent three-year increase in the WITS count of exported HS6 product categories.
+methodology_note: A new descriptive WGI-to-WITS directed source pair. The roster was fixed from WGI treatment and WDI control values and WITS dimension/reporter/year keys only. No selected WITS outcome value, value-null pattern, coefficient, or existing WITS result card was inspected for this design. A prior CEPII-to-WITS preregistration was read for source selectors and overlap; it mentions broad verdict labels from other studies. No archive-wide independent holdout is claimed.
+evidence_type: associational
+sample:
+  countries: [ABW, AFG, AGO, ALB, AND, ARE, ARG, ARM, ATG, AUS, AUT, AZE, BDI, BEL, BEN, BFA, BGD, BGR, BHR, BHS, BIH, BLR, BLZ, BOL, BRA, BRB, BRN, BWA, CAF, CAN, CHE, CHL, CHN, CIV, CMR, COG, COL, COM, CPV, CRI, CYP, CZE, DEU, DMA, DNK, DOM, DZA, ECU, EGY, ESP, EST, ETH, FIN, FJI, FRA, GAB, GBR, GEO, GHA, GMB, GRC, GRD, GTM, GUY, HKG, HND, HRV, HUN, IDN, IND, IRL, ISL, ISR, ITA, JAM, JOR, JPN, KAZ, KEN, KGZ, KHM, KIR, KNA, KOR, KWT, LBN, LCA, LKA, LSO, LTU, LUX, LVA, MAC, MAR, MDA, MDG, MDV, MEX, MKD, MLT, MOZ, MRT, MUS, MWI, MYS, NAM, NER, NGA, NIC, NLD, NOR, NZL, OMN, PAK, PAN, PER, PHL, POL, PRT, PRY, PSE, QAT, RUS, RWA, SAU, SEN, SGP, SLB, SLV, STP, SUR, SVK, SVN, SWE, SWZ, SYC, TGO, THA, TTO, TUN, TUR, TZA, UGA, UKR, URY, USA, VCT, VNM, WSM, YEM, ZAF, ZMB, ZWE]
+  period: [2003, 2016]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain only the exact committed reporter-year key roster and reporters with at least six candidate years before outcome access; current ISO3 codes used to make the roster are frozen in that CSV.
+    - Require unique annual WGI government-effectiveness keys with finite point estimates in [-2.5,2.5] at t-3 and t. Exposure is the difference t minus t-3; small and zero changes stay in the regression.
+    - Require unique WDI real GDP-per-person keys with positive finite values and blank WDI observation status at t-3 and t. Controls are log GDP per person at t and its prior three-year log change.
+    - Require unique WITS keys at t-3, t, and t+3 with freq_id=A, partner_iso3=WLD, product_code=999999, indicator_id=NMBR-XPRT-HS6-PRDCT, and series_id=unique_hs6_products.
+    - Use treatment years 2003 through 2016 only; t+3 ends no later than 2019.
+    - Only after a separate committed source lock, require all three selected WITS counts to be finite nonnegative integers. Drop invalid selected triples only, then reporters with fewer than six complete triples. The pinned WITS schema has no observation-status or method-break field; do not infer normal status.
+    - No interpolation, outcome-based trimming, new vintage, alternate lag, geography substitution, model change, or threshold change after outcome access.
+variables:
+  treatment:
+    - name: wgi_government_effectiveness_three_year_change
+      source: wgi:GOV_WGI_GE.EST
+      transformation: WGI government-effectiveness point estimate at t minus its estimate at t-3.
+      notes: Composite governance estimate, not a policy treatment or direct customs measure.
+  outcome:
+    - name: forward_exported_hs6_count_log1p_change
+      source: wits:unique_hs6_products
+      transformation: log1p of the selected exported-HS6 product count at t+3 minus log1p of that count at t.
+      notes: Count of reported export product categories, not export value, complexity, domestic content, or welfare.
+  controls:
+    - name: baseline_exported_hs6_log1p_count
+      source: wits:unique_hs6_products
+      transformation: log1p of the selected count at t, read only after source lock.
+    - name: prior_exported_hs6_log1p_change
+      source: wits:unique_hs6_products
+      transformation: log1p count at t minus log1p count at t-3, read only after source lock.
+    - name: log_real_gdp_per_person_at_t
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: Natural log of positive constant-price GDP per person at t.
+    - name: prior_three_year_log_gdp_per_person_change
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: Natural log GDP per person at t minus its log at t-3.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: OLS of t-to-t+3 log1p exported-HS6-count change on t-3-to-t WGI government-effectiveness change, baseline log1p count, prior log1p-count change, baseline log real GDP per person, prior log real GDP-per-person change, and reporter and treatment-year fixed effects. Reporter-cluster CR1 covariance, two-sided Student t with G-1 degrees of freedom, and 99% confidence interval. No model search.
+falsification:
+  test: run_wgi_ge_wits_exported_hs6_breadth_2026
+  rule: INCONCLUSIVE if registration/source-lock chronology, source custody, roster, complete-case or material-treatment floors, residualized-treatment concentration, rank, or cluster uncertainty fail. SUPPORTED only when beta is at least +0.10 log1p count point per WGI point and two-sided p is at most 0.01. REFUTED only when beta is at most -0.10 and p at most 0.01. Every other estimable result is PARTIAL. No fallback endpoint or estimator is allowed.
+  threshold:
+    family_id: wgi_ge_wits_exported_hs6_breadth_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    meaningful_abs_beta_log_per_point: 0.1
+    material_abs_change_wgi_points: 0.15
+    min_valid_rows: 1200
+    min_valid_countries: 100
+    min_years_per_country: 6
+    min_improvement_rows: 200
+    min_improvement_countries: 75
+    min_deterioration_rows: 100
+    min_deterioration_countries: 50
+    max_top_one_percent_residual_treatment_share: 0.3
+    max_top_country_residual_treatment_share: 0.2
+    expected_key_rows: 1862
+    expected_key_countries: 153
+    expected_improvement_rows: 508
+    expected_deterioration_rows: 252
+    roster_sha256: 459f554e2fca7cda99b83a4281fd45a112b38c88878f176f3d2c98fecffd0bb2
+    source_files:
+      treatment:
+        path: data/vintages/wgi/GOV_WGI_GE.EST@2026-05-05T195208Z.parquet
+        sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      control:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      outcome:
+        path: data/vintages/wits/unique_hs6_products@2026-07-23T153652Z.parquet
+        sha256: 29db44b85d263bfc92307182b19f3baf4073dae446e5c3af37d82a284bfb2934
+        manifest: data/manifests/fetch_run_2026-07-23T153659Z.yaml
+        manifest_sha256: 542aacbcc80b1856262eda14f37d0532c7a14611c8b9d698ab516529942d0b73
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.3
+disclosure: WGI governance estimates and exported-HS6 counts can co-move because of development, trade demand, treaties, reporting, classification, and reverse feedback. The WITS count source has been used elsewhere in IESET; this is a new directed source pair, not an archive-wide independent holdout. Any verdict receives zero causal, policy, position, school-score, and featured credit.
+steelman: hypotheses/steelman/wgi_ge_exported_hs6_breadth_forward_2026.md
+scope:
+  period: [2003, 2016]
+  countries: [GLOBAL]
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
