@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: fao_food_supply_protein_low_birthweight_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: Greater national total protein supply predicts lower later low-birthweight prevalence. In four
+  fixed country panels, the food-supply window precedes the health endpoint; this is an ecological
+  descriptive forecast association, not an individual diet or causal effect.
+methodology_note: Eight predeclared nutrition-pathway cells, not a Cartesian product. The roster uses
+  only FAOSTAT item, element, M49 and year keys; selected Value and row Flag fields and missingness
+  were unopened. The family shares correlated exposures and modelled outcomes. Registration and a
+  separate exact source lock precede measurement.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2020
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the committed ISO3/anchor key roster is eligible. Exclude non-ISO M49 areas and the eight
+    explicitly listed separately reported non-national economies in the preregistration.
+  - Exposure is the exact three-year FAOSTAT food-supply average centered at anchor 2001, 2006, 2011
+    or 2016; outcome is exact anchor+4 annual prevalence. No nearest-year matching, interpolation
+    or substitutions.
+  - Require FAOSTAT Element=Value, exact item code and unit, A/E/X flag, finite numeric Value and
+    registered bounds; O/Q/unknown flags and absent or nonnumeric Values fail complete-case status.
+  - Retain only countries with at least two complete anchors; apply frozen rows, countries, three-anchor,
+    material-variation, rank, influence and cluster-uncertainty gates before a directional verdict.
+variables:
+  treatment:
+  - name: protein
+    source: faostat:FS:21013
+    transformation: Exact 3-year average at anchor; divide raw g/cap/d by 10 so one model unit equals
+      10 g/cap/d.
+  outcome:
+  - name: low_birthweight
+    source: faostat:FS:21049
+    transformation: Annual prevalence in percentage points at exact anchor+4.
+  controls: []
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor
+  clustering: country
+  notes: OLS with country and anchor fixed effects, CR1 country-cluster standard error and two-sided
+    Student t(G-1). Predetermined lag but no causal identification or time-varying confounder adjustment.
+falsification:
+  test: fao_food_supply_nutrition_2026_10_10_protein_low_birthweight
+  rule: INCONCLUSIVE if any frozen source, key, complete-case, material-variation, rank, influence,
+    or uncertainty gate fails. Otherwise predicted-sign beta of at least 0.25 prevalence point per
+    registered exposure unit and two-sided p<=0.00125 SUPPORTS; opposite-sign beta of at least that
+    magnitude and p cutoff REFUTES; all other estimable cases are PARTIAL. All eight cells stay in
+    the denominator.
+  threshold:
+    family_id: fao_food_supply_nutrition_2026_10_10
+    family_size: 8
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00125
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.25
+    min_complete_rows: 300
+    min_complete_countries: 80
+    min_complete_anchors: 3
+    min_rows_per_country: 2
+    min_material_countries: 20
+    material_within_country_range_raw_units: 5
+    max_one_country_residualized_exposure_share: 0.2
+    max_one_anchor_residualized_exposure_share: 0.45
+    exposure_unit_scale: 10
+    exposure_raw_bounds:
+    - 0
+    - 250
+    outcome_bounds:
+    - 0
+    - 100
+    anchors:
+    - 2001
+    - 2006
+    - 2011
+    - 2016
+    outcome_lag_years: 4
+    key_roster_sha256: 5c631d0c187d7f714c179c5fe8d81bee745947f800e2df7515168a50f2cc8963
+    m49_crosswalk_sha256: a7761fc28d856b7af94eca2aace8cec1fa26d42f23e56cf25b77b621d1f29dda
+    expected_key_rows: 566
+    expected_key_countries: 145
+    source_lock_path: data/pinned_evidence/fao_food_supply_nutrition_2026.source.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.4
+disclosure: FAOSTAT supply is national availability rather than observed individual intake. The child
+  outcomes are modelled UNICEF/WHO/World Bank estimates and anemia is a WHO estimate embedded by FAO.
+  Poverty, water, sanitation, care, health services, survey/model revisions and reverse trends confound
+  ecological associations. These eight correlated cases carry zero causal, policy, position, school
+  and featured credit.
+steelman: hypotheses/steelman/fao_food_supply_protein_low_birthweight_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+scope:
+  period:
+  - 2000
+  - 2020
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - life_expectancy_health
+  policy_family: []
+  treatment_tags:
+  - food_supply
+  - protein
