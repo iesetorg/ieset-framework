@@ -50,4 +50,4 @@ def test_plano_real_narratives_preserve_distinct_decision_years() -> None:
     }
 
     full = DRIFT.build_drift(movements)
-    assert (full["year_min"], full["year_max"]) == (1804, 2026)
+    assert (full["year_min"], full["year_max"]) == (1789, 2026)

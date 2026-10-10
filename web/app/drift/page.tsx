@@ -189,6 +189,7 @@ const KEY_AXES_FOR_DRIFT: Array<{ axis: string; label: string; caption: string }
 // This is a deliberate early-policy context window. It stays independent of
 // the first authored movement and the first signed drift step as coverage grows.
 const EARLY_POLICY_CONTEXT_END_YEAR = 1850;
+const EARLY_FRENCH_RULE_OF_LAW_END_YEAR = 1820;
 
 type HistoricalTimelineItem =
   | { kind: "policy"; year: number; policy: Policy }
@@ -303,7 +304,7 @@ export default async function DriftPage() {
       ? data.years.filter(
           (year) =>
             year >= franceRuleOfLawStart &&
-            year <= franceRuleOfLawStart + 20
+            year <= EARLY_FRENCH_RULE_OF_LAW_END_YEAR
         )
       : [];
   const earlyFranceRuleOfLaw = franceRuleOfLaw
@@ -450,8 +451,9 @@ export default async function DriftPage() {
             These cited national policies and movement milestones are shown in
             date order. Dashed chart markers denote policy-only context records;
             a policy record never adds a numeric drift step by itself. French
-            movement records linked to the 1804 and 1814 policies supply the
-            signed rule-of-law steps shown below. Policy cards distinguish
+            movements linked to the 1789, 1804, and 1814 policies supply the
+            signed rule-of-law steps shown below. The separate 1789 U.S.
+            policy-only marker adds no French score. Policy cards distinguish
             enactment from later effective dates and show review status.{" "}
             <Link href="/policy-browser/" className="text-accent hover:underline">
               Browse the policy database
@@ -501,11 +503,13 @@ export default async function DriftPage() {
             France: early rule-of-law coding
           </h2>
           <p className="mb-4 max-w-[820px] text-[13.5px] leading-[1.55] text-muted">
-            The 1804 Civil Code and 1814 Constitutional Charter each have a
-            weak positive signed step on the institutional rule-of-law axis.
-            This is a coded direction for formal legal rules, not a measured
-            rule-of-law level or enforcement outcome. This axis is outside the
-            14-axis statist composite.
+            The legally operative 1789 abolition of provincial privileges
+            under Article 10 of the August decrees, the 1804 Civil Code, and
+            the 1814 Constitutional Charter each have a weak positive signed
+            step on the institutional rule-of-law axis. These are narrow
+            codings of formal legal rules, not measured enforcement or equal
+            treatment for everyone. This axis is outside the 14-axis statist
+            composite.
           </p>
           <DriftChart
             series={{ FRA: earlyFranceRuleOfLaw }}
