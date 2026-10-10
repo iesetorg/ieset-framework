@@ -4,6 +4,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
     "compute_country_drift", ROOT / "scripts" / "compute_country_drift.py"
@@ -84,6 +86,53 @@ def test_french_1789_1804_1814_steps_extend_the_signed_axis_history() -> None:
     ) == 1846
     # These early institutional steps are outside the composite's axis set.
     assert france["composite_first_year"] > 1846
+
+
+def test_hawke_and_laar_steps_are_dated_and_country_specific() -> None:
+    movements = DRIFT.load_movements()
+    added = {
+        "australia_hawke_alp_reform_1983_1991",
+        "estonia_laar_market_tax_reform_1994_1995",
+    }
+    baseline = DRIFT.build_drift(
+        [m for m in movements if m["movement_id"] not in added]
+    )
+    repaired = DRIFT.build_drift(movements)
+    assert repaired["year_min"] == baseline["year_min"] == 1789
+    changed = [
+        iso3 for iso3 in repaired["countries"]
+        if repaired["countries"][iso3] != baseline["countries"][iso3]
+    ]
+    assert changed == ["AUS", "EST"]
+
+    aus = repaired["countries"]["AUS"]
+    est = repaired["countries"]["EST"]
+    assert aus["axis_first_year"]["regulatory.financial_deregulation"] == 1983
+    year_1983 = repaired["years"].index(1983)
+    year_1988 = repaired["years"].index(1988)
+    assert aus["axes"]["regulatory.financial_deregulation"][year_1983] == -3.0
+    assert (
+        aus["axes"]["regulatory.trade_openness"][year_1988]
+        - baseline["countries"]["AUS"]["axes"]["regulatory.trade_openness"][year_1988]
+    ) == 3.0
+    assert est["axis_first_year"]["fiscal.tax_progressivity"] == 1994
+    assert est["axes"]["fiscal.tax_progressivity"][repaired["years"].index(1994)] == -3.0
+
+    tax = yaml.safe_load((ROOT / "policies" / "estonia_flat_tax_1994.yaml").read_text())
+    assert tax["timeframe"]["enacted_date"] == "1993-12-08"
+    assert tax["timeframe"]["effective_date"] == "1994-01-01"
+    assert tax["enacted_by"] == ["estonia_laar_market_tax_reform_1994_1995"]
+    for policy_id in (
+        "australia_hawke_keating_reforms_1983_1996",
+        "au_hawke_keating_reform_package_1983_1996",
+    ):
+        policy = yaml.safe_load((ROOT / "policies" / f"{policy_id}.yaml").read_text())
+        financial = [
+            a for a in policy["axes_moved"]
+            if a["axis"] == "regulatory.financial_deregulation"
+        ]
+        assert [a["direction"] for a in financial] == ["-"]
+        assert "australia_hawke_alp_reform_1983_1991" in policy["enacted_by"]
 
 
 def test_composite_coverage_waits_for_valenced_axis_coding() -> None:
