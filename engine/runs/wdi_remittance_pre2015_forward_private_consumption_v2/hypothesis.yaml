@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+version: 1
+status: pre_registered
+claim_direction: +
+evidence_type: descriptive
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2010
+  - 2023
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One pre-outcome 2010–2014 remittance-share exposure and one 2020–2023
+    mean outcome per eligible economy.
+  exclusion_rules:
+  - Candidate roster is every ISO 3166 alpha-3 country or territory in pycountry, plus XKX, with
+    all selected country/year keys in the four exact pinned source files; source-key roster is committed
+    separately before selected values are read.
+  - Require every 2010–2014 remittance value to be finite and in [0,100], every relevant 2010–2014
+    and 2020–2023 outcome value finite, and 2014 real GDP per person finite and strictly positive.
+    No interpolation, imputation, country substitution, winsorization, or outcome-based geographic
+    slicing.
+variables:
+  treatment:
+  - name: pre_2015_remittance_share_per_ten_pp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: mean 2010–2014 receipts as percentage of GDP divided by 10
+  controls:
+  - name: baseline_outcome_mean
+    source: world_bank_wdi:NE.CON.PRVT.KD.ZG
+    transformation: mean 2010–2014 annual percentage values
+  - name: log_real_income_2014
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of 2014 real GDP per person
+  outcome:
+  - name: future_outcome_mean
+    source: world_bank_wdi:NE.CON.PRVT.KD.ZG
+    transformation: mean 2020–2023 annual percentage values
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-economy OLS with intercept, pre-2015 remittance share per 10 percentage points, 2010–2014
+    baseline mean of the same outcome, and 2014 log real GDP per person. HC3 uncertainty, two-sided
+    Student t reference with N−4 degrees of freedom. One locked family with two outcomes and Bonferroni
+    p<=0.025 per test. No model search.
+falsification:
+  test: wdi_remittance_pre2015_forward_two_outcome_family
+  rule: First require at least 80 complete economies, at least 20 with pre-2015 mean remittances
+    >=5% of GDP, remittance-share interquartile range >=2 percentage points, full-rank design, finite
+    positive HC3 uncertainty, no one economy contributing over 20% of squared residualized exposure,
+    and successful leave-one-economy-out fits for all but at most two economies. Any failure is INCONCLUSIVE.
+    SUPPORTED if beta >=+0.5 future-outcome percentage point per 10-point remittance rise, two-sided
+    p<=0.025, and at least 75% of successful leave-one-out betas positive. REFUTED if beta <=-0.5,
+    p<=0.025, and at least 75% of leave-one-out betas negative. Otherwise an estimable result is
+    PARTIAL. Both endpoints belong to one evidence family. Zero causal, policy, school, position,
+    or featured credit.
+  threshold:
+    family_id: wdi_remittance_pre2015_forward_2020_2023_family
+    family_size: 2
+    pre_years:
+    - 2010
+    - 2011
+    - 2012
+    - 2013
+    - 2014
+    future_years:
+    - 2020
+    - 2021
+    - 2022
+    - 2023
+    min_complete_economies: 80
+    min_remit_5pct_economies: 20
+    min_remit_iqr_pp: 2
+    max_single_economy_residualized_exposure_share: 0.2
+    max_loo_failures: 2
+    min_loo_sign_share: 0.75
+    min_abs_beta_outcome_pp_per_10pp: 0.5
+    two_sided_p_max: 0.025
+    source_files:
+      remittance:
+        path: data/vintages/world_bank_wdi/BX.TRF.PWKR.DT.GD.ZS@2026-04-30T140202Z.parquet
+        sha256: 9139bffa26cd6f78bf8a963400e703398b9d59919bb92ab0b2ec2b7e04885b1d
+      current_account:
+        path: data/vintages/world_bank_wdi/BN.CAB.XOKA.GD.ZS@2026-05-05T195123Z.parquet
+        sha256: 977f10a40e15becc1f1f7abdee7e3f8a99ab7c39ffdc6e3994d5a993efa4f168
+      consumption:
+        path: data/vintages/world_bank_wdi/NE.CON.PRVT.KD.ZG@2026-04-30T114957Z.parquet
+        sha256: 4ed47e5b56cd181ff3943be83e41c41d2bd6a23a857efa658c6cd9f41e5f4d56
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    policy_score_credit: 0
+    school_score_credit: 0
+    outcome_role: consumption
+    legacy_hypothesis_id: wdi_remittance_consumption_resilience_2009_2021
+prior_confidence: 0.45
+disclosure: Remittance receipts, current accounts, and household consumption can move together with
+  migration, crises, aid, income, and measurement choices. The old outcomes are known; this forward,
+  baseline-adjusted estimand is frozen before any selected values or null masks. Descriptive calibration
+  only, with no identified intervention.
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+hypothesis_id: wdi_remittance_pre2015_forward_private_consumption_v2
+topic: growth
+claim: Higher 2010–2014 remittance receipts as a share of GDP predict faster average real private-consumption
+  growth in 2020–2023 across economies, after 2010–2014 consumption growth and 2014 real income are
+  controlled. This is a descriptive forecast association, not a remittance-policy effect.
+methodology_note: New-ID prospective forward estimand for archived wdi_remittance_consumption_resilience_2009_2021.
+  The old descriptive run selected high-remittance economies using a whole-period mean and graded
+  outcome levels in partly overlapping years. This test measures remittance share only in 2010–2014
+  and predicts the later 2020–2023 outcome conditional on its earlier baseline, across the full source-key
+  economy roster. The two endpoints are distinct economic quantities but one shared evidence family.
+scope:
+  period:
+  - 2010
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - private_consumption
+  policy_family:
+  - none
+  treatment_tags:
+  - remittance_receipts
+steelman: hypotheses/steelman/wdi_remittance_pre2015_forward_private_consumption_v2.md
+notes: 'Pre-registration plan: engine/audits/wdi_remittance_pre2015_forward_2020_2023_family_prereg_2026-10-10.md.
+  Frozen family runner: scripts/run_wdi_remittance_pre2015_forward_2020_2023_family.py.'
