@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_pre1980_credit_boom_crisis_onset_v2
+version: 1
+status: pre_registered
+topic: regulatory
+claim_direction: +
+claim: >
+  In the original Jordà-Schularick-Taylor R6 macrohistory panel before 1980,
+  country-periods with unusually rapid five-year growth in loans to the
+  non-financial private sector relative to GDP have at least twice the
+  subsequent five-year systemic financial-crisis onset risk of other
+  country-periods. This is a historical descriptive prediction, not an
+  identified effect of credit or any regulation.
+methodology_note: >
+  The archived post-1980 Schularick-Taylor claim was screened with BIS credit
+  and an OWID crisis mirror, and its generic old result did not fit the
+  registered forward hazard. This fresh original-JST pre-1980 contrast is
+  time-disjoint and uses exactly one source's documented loan, nominal GDP,
+  and crisis indicator. Its 13 anchors, 18-country roster, ratio, threshold,
+  incident-onset coding, risk-set rule, verdict gates, and source bytes were
+  frozen before the selected loan or crisis values or null masks were opened.
+evidence_type: descriptive
+sample:
+  countries: [AUS, BEL, CAN, CHE, DEU, DNK, ESP, FIN, FRA, GBR, IRL, ITA, JPN, NLD, NOR, PRT, SWE, USA]
+  period: [1870, 1975]
+  temporal_structure: panel
+  exclusion_rules:
+    - >
+      Use only anchors 1875, 1880, 1885, 1890, 1895, 1900, 1905,
+      1925, 1930, 1955, 1960, 1965, 1970. Each requires every annual
+      source key from t-5 through t+5 in its uninterrupted era: 1870-1913,
+      1920-1939, or 1946-1979. No wartime-crossing window.
+    - >
+      Require finite, nonnegative tloans and strictly positive finite nominal
+      GDP in both t-5 and t. No interpolation, winsorisation, source/version
+      substitution, or country replacements.
+    - >
+      For risk-set entry require explicit binary crisisjst observations for
+      every year t-4 through t+5, and zero crisis-onset flags in t-4
+      through t. Forward onset is any coded first-year crisis in t+1
+      through t+5.
+variables:
+  outcome:
+    - name: forward_five_year_systemic_crisis_onset
+      source: jst:R6.crisisjst
+      transformation: >
+        One if any crisisjst year in t+1 through t+5 is 1; zero otherwise,
+        within at-risk anchors. JST codes 1 only in an episode's first year.
+      notes: >
+        The original JST systemic-financial-crisis onset dummy is used.
+        A preceding five-year crisis-onset flag removes an anchor from the
+        risk set; contiguous 1 years, if present, are never recoded.
+  treatment:
+    - name: five_year_loan_to_gdp_acceleration_top_era_quintile
+      source: jst:R6.tloans_and_gdp
+      transformation: >
+        Compute 100 * [(tloans/gdp at t) - (tloans/gdp at t-5)] in percentage
+        points. Within each of the three frozen eras, define high exposure
+        as delta >= the linearly interpolated 80th percentile among all
+        source-key-complete, loan/GDP-valid anchors, before crisis filtering.
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    Primary statistic is risk(high)/risk(other) across at-risk anchors;
+    also report the percentage-point risk difference and raw 2x2 counts.
+    The anchor's forward five-year windows do not overlap within a country.
+    The era-specific exposure cutoff is computed without crisis information.
+    No p-value, causal interpretation, or adjusted model is registered.
+falsification:
+  test: jst_pre1980_credit_boom_crisis_onset_v2_fixed_era_anchor_risk_ratio
+  rule: >
+    Require immutable registration and a separately committed metadata-only
+    source-lock manifest. INCONCLUSIVE if source/key/field checks fail, an era has
+    fewer than 15 loan-valid anchors or a nonpositive 80th-percentile delta,
+    a cutoff tie makes high exposure exceed 35% of that era's loan-valid
+    anchors, or the analysis has fewer than 12 countries, 100 at-risk
+    anchors, 25 high anchors, 70 other anchors, 10 incident events, five
+    event countries, event onsets in fewer than two eras, or fewer than
+    three comparison-group incident events. After all gates, SUPPORTED when
+    raw risk ratio >=2, risk difference >=0.02, and high-exposure group has
+    at least four events. REFUTED when raw risk ratio <=1 and risk difference
+    <=0. Otherwise PARTIAL. One closed descriptive family; no alpha, school,
+    position, featured, or policy-grade score credit follows.
+  threshold:
+    family_id: jst_pre1980_credit_crisis_one_historical_family_2026
+    family_size: 1
+    inferential_alpha: none_descriptive
+    historical_country_roster: 18
+    candidate_anchors: 234
+    source_rows: 1494
+    high_exposure_quantile: 0.8
+    minimum_loan_valid_per_era: 15
+    maximum_high_share_per_era: 0.35
+    minimum_countries: 12
+    minimum_at_risk_anchors: 100
+    minimum_high_anchors: 25
+    minimum_other_anchors: 70
+    minimum_incident_events: 10
+    minimum_event_countries: 5
+    minimum_event_eras: 2
+    minimum_other_incident_events: 3
+    support_risk_ratio: 2.0
+    support_risk_difference: 0.02
+    support_minimum_high_events: 4
+    refute_risk_ratio: 1.0
+prior_confidence: 0.5
+disclosure: >
+  JST authors assembled long historical series by splicing archival and
+  official sources, and the 18 economies are advanced-country cases rather
+  than a global sample. Crises cluster by era and country; this pooled raw
+  comparison does not isolate credit from war aftermath, monetary regimes,
+  financial reform, or global shocks. A visually large risk ratio in a small
+  event set is only descriptive. The 234 candidate anchors may leave fewer
+  than ten qualifying incident events, in which case the result is
+  INCONCLUSIVE. The older post-1980 claim and result remain separate and
+  unchanged. This registered single-case calibration cannot be multiplied
+  into school claims or causal policy evidence.
+intervention_channel: regulatory
+intervention_channel_justification: >
+  Private-credit booms interact with prudential regulation, but this
+  descriptive panel measures credit growth rather than a policy change.
+scope:
+  period: [1870, 1975]
+  countries: [AUS, BEL, CAN, CHE, DEU, DNK, ESP, FIN, FRA, GBR, IRL, ITA, JPN, NLD, NOR, PRT, SWE, USA]
+  outcome_dim: [financial_crisis, financialisation]
+  policy_family: [regulation, monetary_policy]
+  treatment_tags: [historical_credit_boom, systemic_financial_crisis]
+steelman: hypotheses/steelman/jst_pre1980_credit_boom_crisis_onset_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >
+  Frozen source and custody contract:
+  engine/audits/jst_pre1980_credit_crisis_2026_source_plan.md.

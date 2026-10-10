@@ -1,0 +1,7 @@
+# JST pre-1980 credit and banking-crisis test — 2026-10-10
+
+The corrected onset rule was frozen in `55bf6b5e5afd864073d3910ae76b9493b09a4764`, the JST R6 source metadata was locked in `690eef717413bfe367c831ccfd9f2c8e088e08bc`, and the selected loan, GDP, and crisis values were opened only afterward. The fixed 18-country, 13-anchor historical design passed its source, sample, and incident-event floors and returned **PARTIAL**. Exact replay of all six aggregate artifacts passed. No licensed source-value rows are committed.
+
+Across 166 at-risk country anchors, 35 were in the era-specific top quintile of five-year loan/GDP acceleration. A forward crisis onset occurred in **7/35 (20.0%)** high-exposure anchors and **24/131 (18.32%)** comparison anchors: risk ratio **1.092**, risk difference **1.68 percentage points**. This misses the frozen support rule of risk ratio at least 2 and risk difference at least 2 points; it also does not meet the opposite-direction refutation rule. It is one public **descriptive calibration**, not evidence that credit caused a banking crisis or that a regulation worked. School, position, policy, causal, and featured credit are zero.
+
+The older post-1980 claim remains archived and unchanged. The [JST R6 database](https://www.macrohistory.net/database/) supplies the 18-economy series and its [crisis chronology](https://www.macrohistory.net/app/download/9844625569/JSTcrisis_chronology.pdf) defines the first-year onset flag. The source is CC BY-NC-SA 4.0; replay requires a lawfully held local copy matching the locked SHA-256.
