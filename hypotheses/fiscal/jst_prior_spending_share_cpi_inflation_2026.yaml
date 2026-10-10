@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_prior_spending_share_cpi_inflation_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: +
+claim: In the fixed 18 JST R6 advanced economies and 18 non-war five-year anchors from 1900 through 2010,
+  a higher nominal government-expenditure share of GDP in t-1 predicts higher annualized CPI inflation
+  over the next five years from t to t+5, conditional on the prior government-revenue share and country
+  and anchor effects. This is a descriptive predictive association, not a fiscal policy or causal effect.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 1900
+  - 2015
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the 18 fixed anchors [1900, 1905, 1920, 1925, 1930, 1950, 1955, 1960, 1965, 1970, 1975, 1980,
+    1985, 1990, 1995, 2000, 2005, 2010] and their t−1, t, t+5 source years. Excluded 1910–15 and 1935–45
+    anchor windows cross the World Wars. No replacement country, anchor, window, or vintage.
+  - At t−1 require finite nominal government expenditure, revenue, and GDP; GDP>0 and their ratios in
+    [-10,100] percent. At t and t+5 require the outcome-specific finite endpoints and positivity/range
+    rules in the frozen runner. No imputation, winsorization, or outcome-based endpoint replacement.
+  - Retain only countries with at least eight complete anchors for this cell. Require at least 180 complete
+    country-anchor pairs, 14 countries, 14 anchors, and 12 anchors each with at least ten countries. All
+    eight outcomes are in one Bonferroni family even when a cell is gated inconclusive.
+variables:
+  treatment:
+  - name: prior_government_expenditure_share_gdp_pp
+    source: jst:R6.expenditure; jst:R6.gdp
+    transformation: 100*expenditure[t-1]/gdp[t-1]
+    notes: Historical nominal government expenditure/GDP ratio, not a policy assignment or discretionary
+      spending shock.
+  controls:
+  - name: prior_government_revenue_share_gdp_pp
+    source: jst:R6.revenue; jst:R6.gdp
+    transformation: 100*revenue[t-1]/gdp[t-1]
+  outcome:
+  - name: consumer_price_index
+    source: jst:R6.cpi
+    transformation: 20*log(cpi[t+5]/cpi[t])
+    notes: 'Fixed five-year response; units: annualized log percentage points.'
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor
+  clustering: country
+  notes: Unweighted OLS of the exact five-year response on prior expenditure/GDP percentage points, prior
+    revenue/GDP percentage points, country and anchor intercepts. CR1 finite-sample country-cluster variance
+    and two-sided t(G-1) p-value. Report all leave-one-country-out slopes. No covariate, sample, horizon,
+    or model search.
+falsification:
+  test: jst_prior_spending_share_cpi_inflation_2026_frozen_family
+  rule: Source and first-registration bytes must match their original commits, followed by eight separate
+    metadata source-lock commits before selected outcome values are read. INCONCLUSIVE if any exact source,
+    complete-sample, full-rank, finite positive cluster-SE, residualized exposure/outcome variation, country/top-1%-row
+    concentration, or country-deletion-fit gate fails. Once estimable, SUPPORTED requires the coefficient
+    in the predicted direction, absolute magnitude at least 0.05 annualized log percentage points per
+    1 percentage point prior spending share, Bonferroni-adjusted two-sided p<=0.01 across all eight fixed
+    outcomes, and every country-deletion slope in the predicted direction. REFUTED requires the same magnitude
+    and adjusted p in the opposite direction with all country-deletion slopes opposite. Other estimable
+    cells are PARTIAL. Descriptive calibrations earn no causal, policy, position, featured, or school-score
+    credit.
+  threshold:
+    family_size: 8
+    bonferroni_family_alpha: 0.01
+    minimum_complete_pairs: 180
+    minimum_countries: 14
+    minimum_anchors: 14
+    minimum_anchors_per_country: 8
+    minimum_anchors_with_10_countries: 12
+    minimum_residual_spending_sd_pp: 1.0
+    maximum_country_residual_spending_ss_share: 0.25
+    maximum_top_one_pct_residual_spending_ss_share: 0.3
+    minimum_residual_outcome_sd: 0.2
+    minimum_abs_beta_outcome_unit_per_spending_pp: 0.05
+    predicted_sign: 1
+    outcome: cpi_inflation
+    anchor_years:
+    - 1900
+    - 1905
+    - 1920
+    - 1925
+    - 1930
+    - 1950
+    - 1955
+    - 1960
+    - 1965
+    - 1970
+    - 1975
+    - 1980
+    - 1985
+    - 1990
+    - 1995
+    - 2000
+    - 2005
+    - 2010
+prior_confidence: 0.3
+disclosure: The fiscal share is endogenous to crises, growth, demographics, revenue and fiscal institutions.
+  Country and anchor effects do not remove changing national conditions or common shocks. Revenue and
+  expenditure share a GDP denominator; price, rates and external-balance responses also depend on monetary
+  and exchange-rate regimes. The eight outcomes are distinct measured series but share source, countries
+  and fiscal exposure, so they are one correlated family rather than independent replications. Historical
+  JST series splice different underlying sources. No governmental intervention, enactment date, or policy
+  effect is identified. The JST R6 source is licensed CC BY-NC-SA 4.0 and public reuse needs rights review;
+  raw and country-level values are kept local.
+methodology_note: The pinned source, fixed 18-country x 18-anchor design, eight-outcome multiplicity denominator,
+  source-key roster, sample and influence floors, original-schema chronology, output packet, and exact
+  replay are fixed in engine/audits/jst_prior_fiscal_share_forward_source_plan_2026.md. Only source keys
+  and prior-year expenditure/revenue/GDP treatment/control values were opened before first registration;
+  no selected outcome values or null masks were opened.
+scope:
+  period:
+  - 1900
+  - 2015
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  outcome_dim:
+  - inflation
+  policy_family:
+  - none
+  treatment_tags:
+  - historical_government_expenditure_share
+steelman: hypotheses/steelman/jst_prior_spending_share_cpi_inflation_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'One fixed outcome in the eight-test prior fiscal-share family; do not count cells as independent
+  replications. Source: jst_r6@2026-04-30T114353Z.parquet SHA-256 4219d53e595e50b05430b5e4edd91f5f9ebff3987e3d0b6f21d2f2f50bc03a6f.'
