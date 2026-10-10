@@ -1,0 +1,195 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wits_tariff_decline_goods_hicp_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: '-'
+claim: Across six fixed non-nested Eurostat HICP goods-spending groups, a larger three-year decline in the
+  World Bank/WITS all-merchandise import-weighted applied tariff through year t predicts lower annual-average
+  group inflation in t+1 in at least two distinct groups, each clearing frozen effect-size, country-deletion,
+  and six-test corrected uncertainty gates, with no qualified opposite group.
+methodology_note: One prospective descriptive omnibus with six planned component estimates. WITS treatment
+  values and Eurostat categorical keys alone were screened before registration. The 3,084-row roster is a key-only
+  upper bound; no selected HICP values, null masks, or exact-pair fits were opened. Components do not create
+  separate public hypotheses.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LVA
+  - MKD
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  period:
+  - 1998
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Use the frozen six-group COICOP/country/treatment-year roster, exact HICP freq=A/unit=RCH_A_AVG and outcome
+    year t+1. No parent aggregate, category replacement, nearby-year substitution, or national aggregate.
+  - WITS tariff must be exact indicator TM.TAX.MRCH.WM.AR.ZS, series weighted_mean_applied_tariff, blank obs_status
+    and finite nonnegative values in t-3 and t. Define x=tariff(t-3)-tariff(t), positive for a decline, and
+    require absolute x <= 6 percentage points. Material absolute tariff change is >=1 point.
+  - After the separately committed source lock, require finite exact HICP outcome values; no outcome-magnitude
+    trim, imputation, or cell-flag continuity claim. Keep countries with >=5 complete treatment years.
+  - Each component requires >=400 complete cells/28 countries and >=50 material-change cells/25 countries.
+    At least 5/6 components must be estimable for an omnibus verdict. No adaptive controls, outcome-driven
+    exclusion, or post-result category replacement.
+variables:
+  treatment:
+  - name: three_year_weighted_applied_merchandise_tariff_decline
+    source: wits:weighted_mean_applied_tariff
+    transformation: Tariff percentage points at t-3 minus tariff percentage points at t. Positive means a decline
+      in the import-weighted all-merchandise rate.
+    notes: The rate is not category-specific and may change with import weights; it is not a policy treatment.
+  outcome:
+  - name: six_coicop_goods_hicp_annual_average_rates_t_plus_1
+    source: eurostat:prc_hicp_aind
+    transformation: Published annual-average rate of change in t+1, exact RCH_A_AVG unit and percentage points,
+      separately for the six fixed groups.
+    notes: Goods-heavy groups were chosen conceptually before price values were opened; actual import content
+      was not measured.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country_and_treatment_year
+  notes: For each of six groups separately, country and treatment-year fixed-effects OLS of HICP group inflation
+    in t+1 on three-year tariff decline through t; two-way country/year CR1 and two-sided Student t with min(G,T)-1
+    degrees of freedom. Frozen complete-case, residual-x influence, rank, size, and country-deletion gates.
+    Six components form one omnibus verdict.
+falsification:
+  test: wits_tariff_eurostat_goods_hicp_2026_10_10
+  rule: Component INCONCLUSIVE if source chronology, coverage, material exposure, >=5 years per country, residual-treatment
+    concentration (top 1% <=30%, top country <=25%), model rank or clustered uncertainty fails. SUPPORTED iff
+    beta <= -0.10 HICP points per +1 tariff-decline point, two-sided p <= 0.01/6, and every leave-one-country-out
+    beta <= -0.05. REFUTED iff beta >= +0.10 with the same p gate and every country deletion beta >= +0.05.
+    Other estimable components PARTIAL. Omnibus INCONCLUSIVE if fewer than five components estimable; SUPPORTED
+    if at least two support and none refutes; REFUTED if at least two refute and none supports; otherwise PARTIAL.
+    All six remain in correction denominator and count as one public hypothesis.
+  threshold:
+    family_id: wits_tariff_eurostat_goods_hicp_2026_10_10
+    family_size: 6
+    family_alpha: 0.01
+    public_hypothesis_count: 1
+    component_estimates: 6
+    p_max_two_sided_bonferroni: 0.0016666666666666668
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.1
+    min_loo_beta_abs: 0.05
+    min_estimable_categories: 5
+    min_directional_categories: 2
+    min_valid_rows_per_category: 400
+    min_valid_countries_per_category: 28
+    min_material_change_rows_per_category: 50
+    min_material_change_countries_per_category: 25
+    material_tariff_change_min_abs: 1.0
+    max_abs_three_year_tariff_change: 6.0
+    min_complete_years_per_country: 5
+    max_top_one_percent_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.25
+    selected_coicop:
+    - CP031
+    - CP032
+    - CP052
+    - CP053
+    - CP071
+    - CP091
+    selected_hicp_unit: RCH_A_AVG
+    expected_key_rows_by_code:
+      CP031: 514
+      CP032: 514
+      CP052: 514
+      CP053: 514
+      CP071: 514
+      CP091: 514
+    expected_key_countries_by_code:
+      CP031: 33
+      CP032: 33
+      CP052: 33
+      CP053: 33
+      CP071: 33
+      CP091: 33
+    expected_material_key_rows_by_code:
+      CP031: 71
+      CP032: 71
+      CP052: 71
+      CP053: 71
+      CP071: 71
+      CP091: 71
+    expected_material_key_countries_by_code:
+      CP031: 30
+      CP032: 30
+      CP052: 30
+      CP053: 30
+      CP071: 30
+      CP091: 30
+    roster_sha256: 0c10404ea09b28c5017430c9232eda81dc7713f175fde54708493f124609fbe8
+    source_files:
+      tariff:
+        path: data/vintages/wits/weighted_mean_applied_tariff@2026-07-23T151540Z.parquet
+        sha256: 73520e0da6a44048e51a64671c97369aadf160130937f351f90375fb86b0e010
+        manifest: data/manifests/fetch_run_2026-07-23T151550Z.yaml
+        manifest_sha256: 96243db0b85df0b1d5ccd10631b356618a9372d62c4741b692129658a49e05a5
+      hicp:
+        path: data/vintages/eurostat/prc_hicp_aind@2026-04-30T115920Z.parquet
+        sha256: be97a646f95e04c481c583bcde08817aaf6fc315cb7b5f1b628c735cf6a2aec4
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: All-merchandise import-weighted tariffs are an imperfect exposure for selected consumer categories
+  and can shift through import composition. Shared EU external tariffs, exchange rates, VAT, commodity costs,
+  demand, distribution margins, accession and price methodology confound interpretation. Earlier tariff and
+  HICP studies mean archive-wide selection is not corrected by the six-test Bonferroni rule. Six correlated
+  components are one descriptive calibration, never six graduations. No causal, policy-effect, school-score,
+  position or featured credit.
+steelman: hypotheses/steelman/wits_tariff_decline_goods_hicp_forward_2026.md
+scope:
+  period:
+  - 1998
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - inflation
+  policy_family: []
+  treatment_tags:
+  - applied_weighted_merchandise_tariff
+  - coicop_goods_prices
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
