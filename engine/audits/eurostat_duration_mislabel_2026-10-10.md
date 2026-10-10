@@ -1,0 +1,13 @@
+# Labour duration source-integrity audit — 2026-10-10
+
+## Disposition
+
+`labour_market_flexibility_unemployment_duration` stays an archived historical run and now has an explicit public-evidence quarantine. Its saved `refuted` label is retained as an artifact of the old calculation, **not** as a test of unemployment duration. The change adds no public graduation or school-score credit and does not rewrite the frozen hypothesis, coefficient, packet, or result card. A separate prospective ID must use an actual duration measure.
+
+## Reproducible mismatch
+
+The old source manifest pins `data/vintages/eurostat/lfst_r_lfu3rt@2026-04-30T115837Z.parquet` (SHA-256 `8244ec97ea2f8e5117e81433299d2dfc855f4f0343824f6c572b129007ef86b7`). Its original fetch entry in `data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml` calls this dataset **“Unemployment rates by educational attainment level and NUTS 2 region.”** [Eurostat's source page](https://ec.europa.eu/eurostat/databrowser/product/view/TGS00010) defines `lfst_r_lfu3rt` as unemployed people divided by the labour force, by region and education. It has no duration measure. The saved runner `engine/runs/labour_market_flexibility_unemployment_duration/replication.py` filters `sex=T`, `age=Y15-74`, `unit=PC`, `isced11=TOTAL`, then renames `value` to `long_term_unemp_share`; no duration indicator is selected. The fitted 566-observation primary coefficient is therefore an overall unemployment-rate association, regardless of its field name.
+
+The same result card discloses that the registered OECD median-duration series and unemployment-benefit replacement-rate robustness input were unavailable, while its secondary fit used another general unemployment rate. These deviations already made the full frozen conjunction untested. The source-label error establishes that even the purported primary duration leg was not measured. The result is associational and has no causal policy interpretation. This quarantine also prevents the 17 historical school links from acquiring credit if registration metadata changes later.
+
+[Eurostat's actual long-term unemployment series](https://ec.europa.eu/eurostat/databrowser/view/tesem130/default/table?category=es.tesem&lang=en) is `une_ltu_a`, with `indic_em=LTU` and a 12-month duration definition. The old fetch bootstrap manifest refers to `une_ltu_a@2026-04-24T111302Z.parquet`, but those raw bytes are absent from the current main local store. The correct series must be fetched and source-locked anew before a replacement result can be measured. The current old files alone do not support a duration graduation.

@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_epl_2023_eurostat_longterm_unemployment_2025_v2
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: "+"
+claim: >-
+  Among the fixed 25 European OECD economies, stricter 2023 protection of
+  regular workers predicts a higher 2025 fraction of unemployed people who
+  have been unemployed for at least 12 months, after adjusting for that
+  fraction in 2023. This is a later-outcome associational calibration of one
+  duration channel, not a causal claim or a retest of the old multi-outcome
+  conjunction.
+methodology_note: >-
+  Prospectively registered before fetching or inspecting the selected
+  Eurostat une_ltu_a long-term-unemployment value column. Exact roster and
+  source-key audit are in engine/audits/epl_duration_2025_holdout_prereg_2026-10-10.md.
+  The old labour_market_flexibility_unemployment_duration result used a
+  mislabelled general unemployment series and confers no prior result credit.
+evidence_type: associational
+sample:
+  countries: [AUT, BEL, CHE, CZE, DEU, DNK, EST, ESP, FIN, FRA, GRC, HUN, IRL, ITA, LTU, LUX, LVA, NLD, NOR, POL, PRT, SVK, SVN, SWE, TUR]
+  period: [2023, 2025]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    The sole outcome is the later 2025 long-term unemployment fraction with
+    a 2023 baseline; only 25 source-key countries are available, so country
+    and year fixed effects cannot identify the frozen 2023 exposure.
+  exclusion_rules:
+    - Use only the 25-country CSV roster frozen before duration-value access; national Eurostat geographies only, no region or aggregate.
+    - OECD EPR_V1 must be from 2023, finite and between 0 and 6 inclusive, with one row per country; higher means stricter employment protection.
+    - Eurostat une_ltu_a must select freq=A, sex=T, age=Y15-74, unit=PC_ACT, indic_em=LTU and years 2023 and 2025; no other unemployment indicator or education-rate fallback.
+    - Eurostat une_rt_a must select freq=A, sex=T, age=Y15-74, unit=PC_ACT and years 2023 and 2025; each rate must be positive and at most 100.
+    - Require one exact row per selected country-year, finite long-term rate 0-100, and long-term rate at most total unemployment rate plus 0.15 percentage point for published rounding.
+    - Drop a roster country only for a missing, duplicate, invalid, or mismatched selected cell; no outcome-dependent trimming, interpolation, country substitution, or nearby-year fill.
+variables:
+  treatment:
+    - name: epr_v1_2023
+      source: oecd:OECD.ELS.EMP,DSD_EPL_OV@DF_EPL_OV,1.0
+      transformation: 2023 EPR Version 1 level on 0-to-6 scale
+      notes: Official OECD regular-worker individual-dismissal protection; not a policy shock or isolated causal intervention.
+  outcome:
+    - name: longterm_unemployed_share_2025
+      source: eurostat:une_ltu_a; eurostat:une_rt_a
+      transformation: 100 times 2025 long-term unemployment rate divided by 2025 total unemployment rate
+      notes: Both rates use the same national 15-to-74 labour-force denominator; the ratio is the share of unemployed people with spells of at least 12 months, in percentage points.
+  controls:
+    - name: longterm_unemployed_share_2023
+      source: eurostat:une_ltu_a; eurostat:une_rt_a
+      transformation: 100 times 2023 long-term unemployment rate divided by 2023 total unemployment rate
+      notes: Pre-outcome baseline of the same duration fraction.
+estimator:
+  template: descriptive
+  clustering: none
+  fixed_effects: []
+  notes: >-
+    One cross-country OLS fit with an intercept, 2023 EPR_V1, and the 2023
+    long-term-unemployed fraction. Report HC3 heteroskedasticity-robust
+    standard error, two-sided normal-approximation p-value and confidence
+    interval for the EPR coefficient. No alternate controls, interaction,
+    subgroup, or outcome window can change the verdict.
+falsification:
+  test: oecd_epl_eurostat_duration_2025_cross_section_v2
+  rule: >-
+    INCONCLUSIVE and no directional coefficient if source or roster custody
+    fails, fewer than 24 complete countries remain, 2023 EPR IQR is under
+    0.5 index point, the largest country contributes more than 0.25 of
+    centered EPR variation, the design is rank-deficient, HC3 uncertainty
+    is nonfinite, maximum OLS leverage exceeds 0.35, or one country accounts
+    for more than 0.30 of squared OLS residuals. Otherwise SUPPORTED only if
+    the 2023 EPR coefficient is at least +1.0 percentage point of 2025
+    long-term share per index point with two-sided p<=0.01; REFUTED only if
+    at most -1.0 and p<=0.01. Every other method-valid result is PARTIAL.
+    Do not transfer the old same-commit verdict or claim-link scores.
+  threshold:
+    family_size: 1
+    p_max_two_sided: 0.01
+    absolute_pp_effect_min: 1.0
+    min_valid_countries: 24
+    min_epr_iqr: 0.5
+    max_country_centered_epr_share: 0.25
+    max_ols_leverage: 0.35
+    max_country_residual_variance_share: 0.30
+    expected_key_countries: 25
+    roster_sha256: e4b076ff78f74eb7fad80de1a58172d86370be6c9872f1fea9ba23de50dd5120
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.4
+disclosure: >-
+  The old labour result and related OECD EPL studies were visible before this
+  registration, but no selected une_ltu_a values have been inspected. EPL
+  can respond to labour-market institutions and shocks, and a 25-country
+  cross-section can retain confounding despite the baseline control. The
+  2025 outcome may be revised; source flags are not retained by the local
+  Eurostat fetcher, so no flag-screened continuity claim is made. The
+  comparator is a narrow later-year descriptive calibration, with zero
+  causal, policy, featured, school, or position credit. It does not establish
+  median duration, job-finding flows, or benefit-generosity robustness.
+steelman: hypotheses/steelman/oecd_epl_2023_eurostat_longterm_unemployment_2025_v2.md
+scope:
+  period: [2023, 2025]
+  countries: [OECD]
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
