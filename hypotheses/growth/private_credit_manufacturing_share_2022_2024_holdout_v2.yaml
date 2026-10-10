@@ -1,0 +1,277 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: private_credit_manufacturing_share_2022_2024_holdout_v2
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: '-'
+claim: Among the fixed 181-country legacy roster, higher 2022 domestic credit to the private sector as a share
+  of GDP predicts a decline in manufacturing value-added share between 2022 and 2024, conditional on 2022 manufacturing
+  share and real GDP per capita. This is a descriptive cross-country association, not evidence that credit
+  caused deindustrialisation.
+evidence_type: descriptive
+methodology_note: The legacy 1990-2023 same-commit result is known and archived. This new-ID continuation uses
+  a 2024 outcome outside its fitted years but the same May 2026 WDI vintage; the source predates registration,
+  so this is not a newly collected holdout. The exact 2024 selected values and null masks were not inspected
+  before this registration. The 181-country roster, one endpoint, model, floors, thresholds, and no-score ceiling
+  are frozen before the source lock and run.
+sample:
+  countries:
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - CPV
+  - CRI
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - XKX
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2022
+  - 2024
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One exposure-year country cross section is matched to a later outcome change;
+    the test does not claim a country-year panel or time-series identification.
+  exclusion_rules:
+  - Only the exact 181 ISO3 country codes inherited from the old hypothesis; no donor or country substitution.
+  - Read credit, manufacturing share, and real GDP per capita in 2022, and manufacturing share in 2024. Require
+    exactly one country-year-indicator row for each selected cell.
+  - Require finite values, positive GDP per capita, 0<=credit<=300 percent of GDP, 0<=manufacturing share<=100
+    percent of GDP, and blank WDI obs_status for all selected cells.
+  - Complete case only; no interpolation, winsorisation, weighting, geographic restriction, alternate endpoint,
+    or alternate source.
+variables:
+  outcome:
+  - name: manufacturing_share_change_2022_2024
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: 2024 value minus 2022 value, percentage points of GDP
+    notes: Manufacturing value-added share, not manufacturing real volume or employment.
+  treatment:
+  - name: private_credit_depth_2022
+    source: world_bank_wdi:FS.AST.PRVT.GD.ZS
+    transformation: 2022 percent of GDP divided by 10
+    notes: Exposure, not exogenous credit or a policy intervention; coefficient scale is per 10 GDP-percentage-point
+      difference.
+  controls:
+  - name: manufacturing_share_2022
+    source: world_bank_wdi:NV.IND.MANF.ZS
+    transformation: 2022 level, percent of GDP
+  - name: log_real_gdp_per_capita_2022
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive 2022 constant-dollar GDP per capita
+estimator:
+  template: descriptive
+  clustering: none
+  notes: 'OLS with intercept and HC3 robust covariance: delta manufacturing share = alpha + beta*(2022 private
+    credit/GDP divided by 10) + gamma*(2022 manufacturing share) + delta*log(2022 real GDP per capita) + residual.
+    At least 80 complete countries, credit IQR at least 10 GDP percentage points, full four-column rank, finite
+    HC3 standard error and confidence interval. One predeclared coefficient and no secondary tests.'
+falsification:
+  test: private_credit_manufacturing_share_2022_2024_holdout_v2_ols_hc3_fixed_2024
+  rule: First require unchanged preregistration bytes, a separately committed source-key lock, exact WDI SHA-256
+    and fetch-manifest hashes, unique selected keys, stated completeness/range/status gates, at least 80 complete
+    countries, credit IQR at least 10 GDP percentage points, full-rank design, and finite HC3 uncertainty.
+    Failure is INCONCLUSIVE. With all gates passed, SUPPORTED if beta <= -0.10 manufacturing-share points per
+    ten credit/GDP points and its two-sided 95 percent HC3 confidence interval is wholly below zero; REFUTED
+    if beta >= +0.10 and its interval wholly above zero; PARTIAL otherwise. One test; no causal, school, policy,
+    or featured credit.
+  threshold: N>=80; credit IQR>=10 GDP percentage points; beta <= -0.10 and CI upper <0 for support; beta >=+0.10
+    and CI lower >0 for refutation
+prior_confidence: 0.5
+disclosure: The old same-commit 1990-2023 fit reported a negative coefficient and is already known, which could
+  influence expectations. This design adds a distinct lagged two-year change endpoint, not independent source
+  replication. Credit depth and manufacturing composition share common development and financial-cycle determinants;
+  conditioning on two 2022 levels does not identify a causal effect. WDI values may be revised. Even a directional
+  result is capped to one descriptive calibration with zero school, policy, causal, and featured credit.
+scope:
+  period:
+  - 2022
+  - 2024
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - financialisation
+  - industrial_capability
+  policy_family:
+  - monetary_policy
+  - regulation
+  treatment_tags:
+  - private_credit_depth
+steelman: hypotheses/steelman/private_credit_manufacturing_share_2022_2024_holdout_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Frozen source plan: engine/audits/private_credit_manufacturing_2024_v2_source_plan.md. WDI source files
+  and May 2026 fetch manifest have exact SHA-256 pins in the runner. This calibration does not change the archived
+  original.'
