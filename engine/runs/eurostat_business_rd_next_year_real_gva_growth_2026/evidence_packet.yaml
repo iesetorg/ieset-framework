@@ -1,0 +1,102 @@
+packet_version: 1
+hypothesis:
+  id: eurostat_business_rd_next_year_real_gva_growth_2026
+  path: hypotheses/growth/eurostat_business_rd_next_year_real_gva_growth_2026.yaml
+preregistration:
+  commit: 37cbc6d5339e8a9ac888c2c17213c4147608c7d4
+  steelman: hypotheses/steelman/eurostat_business_rd_next_year_real_gva_growth_2026.md
+  source_plan: engine/audits/eurostat_regional_rd_forward_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/eurostat_regional_rd_forward_2026_key_roster.csv
+source:
+  publisher: Eurostat
+  dataflows:
+  - rd_e_gerdreg
+  - nama_10r_3gva
+  - lfst_r_lfu3rt
+  source_lock_commit: 393f291faa3881b5dc98225c80a839d0f3d8d9d4
+  source_lock_manifest: prereg/locks/eurostat_regional_rd_forward_2026_10_10.json
+  fetch_manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+  source_hashes:
+    gva: d10b38100e344d4eb486d8380e51f645ce4fc3b425c0235f05af3a731495358f
+    rd: f0602b04f2eb4a610f8d986097ccbab59d0b07cab709826dc8f89dffbd97b51f
+    unemployment: 8244ec97ea2f8e5117e81433299d2dfc855f4f0343824f6c572b129007ef86b7
+  key_roster_sha256: 789ec757b0a0fecb3043716af387c0cf571fe1c09bd2f02d1566452fcf031f59
+  contains_source_values: false
+family:
+  id: eurostat_regional_rd_forward_2026_10_10
+  size: 4
+  members:
+  - eurostat_business_rd_next_year_real_gva_growth_2026
+  - eurostat_business_rd_next_year_unemployment_change_2026
+  - eurostat_government_rd_next_year_real_gva_growth_2026
+  - eurostat_government_rd_next_year_unemployment_change_2026
+  bonferroni_alpha: 0.0025
+  interpretation: Four correlated region-year tests; no independent replication or
+    policy-effect credit.
+reproduction:
+  runner: scripts/run_eurostat_regional_rd_forward_2026.py
+  command: python3 scripts/run_eurostat_regional_rd_forward_2026.py --verify --source-root
+    <retained IESET source checkout>
+  result_sha256: 583ec146caa2b9169da0b085ea1e95dc17a85fb47413a4623849adeb1d9e3fb4
+result:
+  sample:
+    source_key_rows: 1869
+    complete_before_region_floor: 1869
+    complete_rows: 1869
+    regions: 99
+    countries: 20
+    dropped:
+      region_below_complete_year_floor: 0
+    material_abs_exposure_rows: 672
+    material_abs_exposure_regions: 95
+    exposure_p90_p10_pp: 0.16999999999999985
+    gate_failures: &id001
+    - max_region_exposure_ss_share
+  primary:
+    beta: 0.5382338536536558
+    cluster_region_se: 0.521433228521888
+    p_two_sided: 0.3021484583732754
+    df_resid: 1391
+    model_rows: 1869
+    residual_exposure_sd_pp: 0.06689076558594026
+    max_region_exposure_ss_share: 0.11831949558539294
+    max_country_exposure_ss_share: 0.19469185339210374
+    top_five_region_exposure_ss_share: 0.31225327969185773
+    top_three_exposure_countries:
+    - PL
+    - HU
+    - IT
+    method: region and country-by-year FE; region-cluster covariance
+    country_holdouts:
+    - omitted_country: PL
+      rows: 1700
+      regions: 90
+      beta: 0.6393801590042921
+    - omitted_country: HU
+      rows: 1731
+      regions: 93
+      beta: 0.781620689420061
+    - omitted_country: IT
+      rows: 1491
+      regions: 78
+      beta: 0.26586862756396396
+  gate_failures: *id001
+  verdict: INCONCLUSIVE
+limitations:
+- Eurostat NUTS codes can cross boundary revisions; code continuity alone is not proof
+  of unchanged territory.
+- Business and government R&D shares have a regional-GDP denominator; reverse causality,
+  firm selection, EU funds and spillovers remain.
+- Region-years are dependent within regions and national years; fixed effects and
+  region clustering do not identify a causal or policy effect.
+- Four-cell Bonferroni adjustment covers only this frozen family, not all IESET exploration.
+- Zero causal, policy, school, position and featured credit.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  position_score_credit: 0
+  featured_eligible: false

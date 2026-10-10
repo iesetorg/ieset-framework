@@ -1,0 +1,5 @@
+# Eurostat regional R&D runner key erratum — 2026-10-10
+
+Registration `37cbc6d5339e8a9ac888c2c17213c4147608c7d4` and source lock `393f291faa3881b5dc98225c80a839d0f3d8d9d4` preceded selected-value access. The initial runner implementation was committed in `633c2922db02cb1ff33170a6eece55519cf38216`. Its first measured invocation stopped before creating any `engine/runs/` result directory because it tried to look up the diagnostic name `top_five_region_exposure_ss_share` directly in the frozen threshold map. The registered threshold is named `max_top_five_region_exposure_ss_share`.
+
+The first attempt had already formed and fit the first case in memory. No coefficient, verdict, diagnostic, chart, packet, or other result artifact was written. This repair changes only the lookup of the **same frozen 0.35 maximum**; it does not change source, roster, sample, exposure, outcome, estimator, influence calculation, multiplicity, or a gate value. All four cases retain the original family denominator. A new measured invocation and exact replay are required after the repair commit.
