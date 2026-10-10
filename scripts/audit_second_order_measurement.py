@@ -439,7 +439,7 @@ def audit_policies(
     for path, doc in iter_specs("policies"):
         if not include_doc(doc, scope, kind="policy"):
             continue
-        axes = [a.get("axis") for a in doc.get("axes_moved") or [] if isinstance(a, dict)]
+        axes = sorted({a["axis"] for a in doc.get("axes_moved") or [] if isinstance(a, dict) and a.get("axis")})
         design = doc.get("evaluation_design") or {}
         inherited = inherited_axis_requirements(axes, axis_index, families)
         if design:
@@ -488,7 +488,7 @@ def audit_movements(
             continue
         if scope == "controls" and not policies.intersection(control_policy_ids) and not is_price_or_rent_control(doc):
             continue
-        axes = [a.get("axis") for a in doc.get("axes_summary") or [] if isinstance(a, dict)]
+        axes = sorted({a["axis"] for a in doc.get("axes_summary") or [] if isinstance(a, dict) and a.get("axis")})
         inherited = inherited_axis_requirements(axes, axis_index, families)
         rows.append({
             "kind": "movement",
