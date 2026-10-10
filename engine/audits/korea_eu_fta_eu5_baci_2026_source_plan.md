@@ -56,7 +56,7 @@ disclosed. No p-value, causal, featured, school, or policy-score credit is
 available. Price/quantity mix, exchange rates, product composition, and
 concurrent reforms remain limitations.
 
-To reproduce: commit registration; `python3 scripts/run_korea_eu_fta_eu5_baci_2026.py extract --source-zip <LOCAL_HOME>/IESET/data/raw/cepii/Gravity_csv_V202211.zip`;
+To reproduce: commit registration; `python3 scripts/run_korea_eu_fta_eu5_baci_2026.py extract --source-zip <local-corpus>/data/raw/cepii/Gravity_csv_V202211.zip`;
 commit only the slice and manifest; then use `run`, `verify`, and
 `verify-source` with the unchanged runner. Keep the ZIP and broad derived
 parquet outside Git.

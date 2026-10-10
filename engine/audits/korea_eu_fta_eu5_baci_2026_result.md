@@ -25,8 +25,7 @@ direction only; this failed flow test gives it no measured effect.
 Reproduce locally with the legally held official CEPII ZIP:
 
 ```text
-python3 scripts/run_korea_eu_fta_eu5_baci_2026.py verify
-python3 scripts/run_korea_eu_fta_eu5_baci_2026.py verify-source --source-zip <LOCAL_HOME>/IESET/data/raw/cepii/Gravity_csv_V202211.zip
+python3 scripts/verify_korea_eu_fta_opsec_redaction.py --source-zip <local-corpus>/data/raw/cepii/Gravity_csv_V202211.zip
 ```
 
 The 405-row extracted CEPII subset is retained for local custody and exact
