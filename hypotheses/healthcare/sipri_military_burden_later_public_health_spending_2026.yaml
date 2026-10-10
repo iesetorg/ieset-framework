@@ -1,0 +1,289 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sipri_military_burden_later_public_health_spending_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: Across frozen annual country anchors 2003–2016, larger rises in SIPRI military expenditure as a
+  GDP share from t−3 to t predict smaller subsequent t to t+3 changes in WDI domestic general government
+  health expenditure as a GDP share, conditional on prior outcome change, baseline outcome and fiscal/income
+  levels, with country and anchor-year fixed effects.
+evidence_type: associational
+methodology_note: One of two correlated SIPRI public-spending-intensity extension tests. The shared 2310-row
+  physical key roster and five official source hashes were assembled without reading selected values or
+  null masks. Measurement follows separate commits for registration and exact source lock.
+sample:
+  countries: &id001
+  - AFG
+  - AGO
+  - ALB
+  - ARE
+  - ARG
+  - ARM
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - CPV
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MDG
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLE
+  - SLV
+  - SOM
+  - SRB
+  - SSD
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TTO
+  - TUN
+  - TUR
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VEN
+  - VNM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2000
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the frozen national country/anchor roster, t=2003–2016, with physical SIPRI keys at t−3/t, both
+    WDI spending series at t−3/t/t+3, and WDI general expense and income keys at t.
+  - After source lock, retain finite military shares in [0,20] at t−3/t with |change|≤5 points; finite
+    outcome shares in [0,20] at t−3/t/t+3 with both three-year changes ≤5 points; fiscal expense in [0,100]
+    and positive real GDP per capita at t.
+  - Retain countries with at least three complete anchors. No imputation, interpolation, winsorization,
+    status substitution, alternative lag or post-result gate changes. Admit blank/A WDI statuses only;
+    neither certifies accounting comparability.
+variables:
+  treatment:
+  - name: prior_three_year_military_burden_change_pp
+    source: sipri:milex_share_gdp
+    transformation: Military expenditure percent GDP at t minus t−3; [0,20] endpoints and |change|≤5 points.
+    notes: Prior descriptive spending-share movement; not an exogenous policy shock.
+  outcome:
+  - name: later_three_year_fiscal_policy_change_pp
+    source: world_bank_wdi:SH.XPD.GHED.GD.ZS
+    transformation: Domestic general government health expenditure percent GDP at t+3 minus t.
+    notes: Public spending intensity with a shared GDP denominator, not a budget appropriation.
+  controls:
+  - name: prior_outcome_share_change
+    source: world_bank_wdi:SH.XPD.GHED.GD.ZS
+    transformation: Percent GDP at t minus t−3.
+  - name: baseline_outcome_share
+    source: world_bank_wdi:SH.XPD.GHED.GD.ZS
+    transformation: Percent GDP at t.
+  - name: baseline_government_expense_share
+    source: world_bank_wdi:GC.XPN.TOTL.GD.ZS
+    transformation: General government expense percent GDP at t.
+  - name: baseline_log_real_income
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log real GDP per capita at t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor_year
+  clustering: country
+  notes: Equal country-anchor OLS with four frozen controls, country and year FE; country CR1 cluster
+    SE and two-sided Student t(G−1), 99.5% interval. Five fixed SHA256 country-fold omissions assess coefficient
+    sign stability. Both cells remain in the 0.01/2 denominator even if one is inconclusive.
+falsification:
+  test: sipri_wdi_public_budget_health_2026_10_10
+  rule: INCONCLUSIVE if exact source/chronology, complete-row/country/year, material change, residual
+    variation, concentration, full-rank, uncertainty or five-fold coverage gates fail. SUPPORTED iff beta≤−0.30
+    percentage points per +1 military point with two-sided p≤0.005 and at least four of five fold signs
+    negative. REFUTED iff beta≥+0.30, p≤0.005 and at least four signs positive. Otherwise PARTIAL.
+  threshold:
+    family_id: sipri_military_burden_public_spending_intensity_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided: 0.005
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.3
+    source_key_roster_path: data/pinned_evidence/sipri_wdi_public_budget_2026_key_roster.csv
+    source_key_roster_sha256: 5e911aebf7d38ba3d7bd16c588b6df0a1880d5d4ad2ac37aa2e4d6a4ee3cd9e0
+    source_lock_path: data/pinned_evidence/sipri_wdi_public_budget_2026.source.json
+    source_sha256: 5ccce854cc3127eb0510b2f9f0e99741fb4a037a5950c745137970e7c618d3be
+    min_valid_rows: 300
+    min_valid_countries: 50
+    min_distinct_anchors: 10
+    min_complete_anchors_per_country: 3
+    min_material_change_rows: 60
+    min_material_change_countries: 20
+    material_change_pp: 0.25
+    max_military_share_pct_gdp: 20.0
+    max_abs_three_year_military_change_pp: 5.0
+    max_outcome_share_pct_gdp: 20.0
+    max_abs_three_year_outcome_change_pp: 5.0
+    max_government_expense_pct_gdp: 100.0
+    min_residual_treatment_sd_pp: 0.15
+    min_residual_outcome_sd_pp: 0.1
+    max_top_one_percent_treatment_ss_share: 0.25
+    max_top_country_treatment_ss_share: 0.2
+    min_fold_rows: 200
+    min_fold_countries: 35
+    min_same_sign_hash_folds: 4
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.5
+disclosure: A negative prior follows visible fiscal crowding-out debates. Both outcomes share a GDP denominator
+  with SIPRI and national accounting can shift. Controls and fixed effects do not identify causation or
+  a defense-to-civilian substitution. This correlated two-cell extension is not independent archive replication;
+  zero causal/policy/school/featured credit.
+steelman: hypotheses/steelman/sipri_military_burden_later_public_health_spending_2026.md
+scope:
+  period:
+  - 2000
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - fiscal_policy
+  policy_family:
+  - none
+  treatment_tags:
+  - military_expenditure_gdp_share_change
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
