@@ -1,0 +1,88 @@
+packet_version: 1
+generated_utc: '2026-10-10T19:05:04+00:00'
+hypothesis:
+  id: wdi_energy_import_household_electricity_price_forward_2026
+  path: hypotheses/energy/wdi_energy_import_household_electricity_price_forward_2026.yaml
+  topic: energy
+preregistration:
+  spec_commit: 2a928e4e49d53e63550378793b385b20e0a364e7
+  source_lock_commit: 5a531e8313bd6009748cbb56726703cbc7d44eb7
+  family_id: wdi_energy_import_household_price_forward_2026_10_10
+  family_size: 1
+  key_roster: data/pinned_evidence/wdi_energy_import_household_price_2026_key_roster.csv
+  key_roster_sha256: 87c467a91a398bfee49dba662d410e8e4f774705f30e3c4a76f06a56aaf7f658
+  steelman: hypotheses/steelman/wdi_energy_import_household_electricity_price_forward_2026.md
+reproduction:
+  runner: scripts/run_wdi_energy_import_household_price_forward_2026.py
+  run_dir: engine/runs/wdi_energy_import_household_electricity_price_forward_2026
+  command: python3 scripts/run_wdi_energy_import_household_price_forward_2026.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable but misses frozen magnitude or family p cutoff
+data:
+  inputs:
+    treatment:
+      publisher: world_bank_wdi
+      series_id: EG.IMP.CONS.ZS
+      path: data/vintages/world_bank_wdi/EG.IMP.CONS.ZS@2026-04-30T114922Z.parquet
+      sha256: 73bd820bd30f36db3efe49a8ec79a0ff8ce39893bb6d3e22631e31468eb316e6
+      manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+      manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    outcome:
+      publisher: eurostat
+      series_id: nrg_pc_204
+      path: data/vintages/eurostat/nrg_pc_204@2026-05-15T170020Z.parquet
+      sha256: f49495b93f06637ac78106f3630005eef7bea6a5a0cd12d431c505f902a7bd2e
+      manifest: data/manifests/fetch_run_2026-05-15T170025Z.yaml
+      manifest_sha256: f5fbe09f71bafd5bdb83a48cfff2f700f58ff60d0c07388d93ef80a4826df009
+  sample:
+    roster_rows: 219
+    dropped_missing_nonpositive_or_invalid_outcome_pairs: 0
+    valid_rows: 219
+    valid_countries: 25
+    anchor_years: 9
+    material_change_rows: 125
+    material_change_countries: 24
+    outcome_values_read_after_lock: true
+    top_one_percent_residual_x_share: 0.10881958237463028
+    top_country_residual_x_share: 0.11044441295105646
+results:
+  primary:
+    coefficient: -6.011367030820095e-05
+    std_error: 0.0015769278355075847
+    p_value_two_sided: 0.9699067330578925
+    confidence_level: 0.99
+    confidence_interval:
+    - -0.004470685429615234
+    - 0.004350458088998832
+    n_rows: 219
+    n_countries: 25
+    df_inference: 24
+    model_rank: 35
+    method: country/year FE OLS plus lagged import-share level, country-cluster CR1,
+      Student t(G-1)
+limitations:
+- WDI net energy imports are primary energy imports minus exports as a percent of
+  energy use; negative values can represent net exports. This is not a tariff or enacted
+  energy policy.
+- Eurostat nrg_pc_204 is the second-semester tax-inclusive EUR/kWh end-user price
+  for medium household consumers (2500-4999 kWh), not an industrial or wholesale price.
+- Gas prices, hydro and weather, taxes, subsidies, network charges, exchange rates,
+  retail market rules, and demand may confound the association.
+- The pinned Eurostat Parquet has no provisional or break flags. A blank source status
+  is not inferred.
+- Country/year fixed effects do not identify a causal energy-import effect. No policy,
+  causal, school-score, position, or featured credit.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: wdi_energy_import_household_price_forward_2026_10_10
+  family_size: 1
+  family_alpha: 0.01
+  p_max: 0.01
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false

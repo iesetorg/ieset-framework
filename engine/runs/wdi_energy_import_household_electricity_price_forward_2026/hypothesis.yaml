@@ -1,0 +1,147 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_energy_import_household_electricity_price_forward_2026
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: +
+claim: Across the fixed 2008–2016 European country-year panel, a larger prior one-year rise in net
+  primary-energy imports as a share of energy use predicts a higher forward medium-household electricity-price
+  change.
+methodology_note: Prospective one-test associational family. Registration used only WDI treatment
+  values and exact Eurostat outcome keys and dimensions. Selected Eurostat numeric prices, null masks,
+  signs and fits remain unopened until a separate committed source lock.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - BGR
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - NLD
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  period:
+  - 2008
+  - 2016
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed 219-row national country-year key roster. Treatment is WDI EG.IMP.CONS.ZS
+    at t-1 minus t-2; baseline WDI import share at t-2 is a fixed model covariate. Outcome is the
+    exact Eurostat second-semester household price at t and t+1. No interpolation, nearest-year joins,
+    or source substitution.
+  - Use only the 25 selected national ISO3 countries and fixed Eurostat dimensions freq=S, siec=E7000,
+    nrg_cons=KWH2500-4999, unit=KWH, tax=I_TAX, currency=EUR, period suffix S2. Exclude aggregates
+    and other consumer bands.
+  - Require finite WDI net energy import shares, blank WDI obs_status, and absolute annual share change
+    at most 15 percentage points before outcome access. Require at least five key-eligible years per
+    country and keep zero and small changes.
+  - After the separately committed source lock, require positive finite Eurostat prices at t and t+1,
+    then require at least five complete years per country. The pinned price Parquet carries no provisional
+    or break flags; do not infer ordinary status.
+  - Do not change countries, years, dimensions, timing, covariates, thresholds, or sample using selected
+    price values or missingness.
+variables:
+  treatment:
+  - name: net_primary_energy_import_share_prior_annual_change_pp
+    source: world_bank_wdi:EG.IMP.CONS.ZS
+    transformation: percentage-point change t-2 to t-1
+    notes: Net primary-energy imports, not a tariff, import policy, or directly observed household
+      fuel bill.
+  outcome:
+  - name: household_electricity_price_forward_log_change
+    source: eurostat:nrg_pc_204
+    transformation: log(positive tax-inclusive EUR/kWh price at t+1 S2) minus log(positive price at
+      t S2), medium household band KWH2500-4999
+    notes: End-user household electricity price, not wholesale, industrial, or generation cost.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Equal country-year OLS of one-year forward log household price change on prior one-year net-import-share
+    change, controlling for the t-2 import-share level and country and anchor-year fixed effects.
+    Country-cluster CR1 standard errors; two-sided Student t with G-1 degrees. One primary test, no
+    alternative lag, transform, or control.
+falsification:
+  test: wdi_energy_import_household_price_forward_2026_10_10
+  rule: INCONCLUSIVE if source hashes, registration chronology, sample/material exposure, anchor years,
+    residual-exposure concentration, rank, or country-cluster inference gates fail. SUPPORTED iff
+    beta is positive and at least 0.001 log price per import-share percentage point with two-sided
+    p<=0.01. REFUTED iff beta is at most -0.001 with p<=0.01. Other estimable evidence is PARTIAL.
+    These labels are descriptive calibration only.
+  threshold:
+    family_id: wdi_energy_import_household_price_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.001
+    min_valid_rows: 180
+    min_valid_countries: 22
+    min_anchor_years: 8
+    min_material_change_rows: 100
+    min_material_change_countries: 20
+    material_treatment_change_min_abs: 2.0
+    max_abs_treatment_change: 15.0
+    min_years_per_country: 5
+    max_top_one_percent_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.2
+    expected_key_rows: 219
+    expected_key_countries: 25
+    roster_sha256: 87c467a91a398bfee49dba662d410e8e4f774705f30e3c4a76f06a56aaf7f658
+    source_files:
+      treatment:
+        path: data/vintages/world_bank_wdi/EG.IMP.CONS.ZS@2026-04-30T114922Z.parquet
+        sha256: 73bd820bd30f36db3efe49a8ec79a0ff8ce39893bb6d3e22631e31468eb316e6
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+      outcome:
+        path: data/vintages/eurostat/nrg_pc_204@2026-05-15T170020Z.parquet
+        sha256: f49495b93f06637ac78106f3630005eef7bea6a5a0cd12d431c505f902a7bd2e
+        manifest: data/manifests/fetch_run_2026-05-15T170025Z.yaml
+        manifest_sha256: f5fbe09f71bafd5bdb83a48cfff2f700f58ff60d0c07388d93ef80a4826df009
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.4
+disclosure: Net primary-energy import reliance is not a policy intervention. Electricity prices also
+  respond to fuel markets, weather, taxes, subsidies, retail rules, currency conversion, and demand.
+  This record cannot support a causal energy-security claim or repair old energy-policy hypotheses.
+  It receives zero causal, policy, school-score, position, and featured credit.
+steelman: hypotheses/steelman/wdi_energy_import_household_electricity_price_forward_2026.md
+scope:
+  period:
+  - 2008
+  - 2016
+  countries: *id001
+  outcome_dim:
+  - energy
+  policy_family: []
+  treatment_tags:
+  - net_energy_imports
+  - household_electricity_price
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
