@@ -1,0 +1,106 @@
+packet_version: 1
+hypothesis:
+  id: wdi_gas_rent_services_growth_2026
+  path: hypotheses/resource_rents/wdi_gas_rent_services_growth_2026.yaml
+preregistration:
+  commit: 157e1225b6868a5228d9dee3571a56aea9fb9be5
+  steelman: hypotheses/steelman/wdi_gas_rent_services_growth_2026.md
+  source_plan: engine/audits/wdi_resource_rents_sector_growth_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/wdi_resource_rents_sector_growth_2026_key_roster.csv
+source:
+  publisher: World Bank World Development Indicators
+  source_sha256: f4233e7ab8cf6e41e175850cdbf22652208b709658422612d57aeae070de2519
+  source_lock_commit: c065774f9b61f9e66e490d2251a9b741a5dac8df
+  source_lock_manifest: data/pinned_evidence/wdi_gas_rent_services_growth_2026.source.json
+  key_roster_sha256: 2e82530b40d9383e8444eed52e57b7143841a0766471bf8352b0a8ad54738309
+  input_vintages:
+  - path: data/vintages/world_bank_wdi/NY.GDP.TOTL.RT.ZS@2026-04-30T115056Z.parquet
+    sha256: db6778300a832f2f90f3855b5583293007ca9b5c7760e52904ba0da493b7ccd2
+  - path: data/vintages/world_bank_wdi/NY.GDP.PETR.RT.ZS@2026-04-30T115050Z.parquet
+    sha256: 15d64d3d8c333989208fd524b13ce58103d0a79ba38aa83a36e030014d2aaa3e
+  - path: data/vintages/world_bank_wdi/NY.GDP.NGAS.RT.ZS@2026-04-30T143734Z.parquet
+    sha256: 7518375757dbc58355e3fff0026216d4ad471a48782a5cdef13c2402bdc0d2e6
+  - path: data/vintages/world_bank_wdi/NY.GDP.MINR.RT.ZS@2026-04-30T115036Z.parquet
+    sha256: db8a50980b94565820a21e955d3ddb2c26e0e54f6eef74467e06ba0c3e4a0b64
+  - path: data/vintages/world_bank_wdi/NV.IND.MANF.KD@2026-04-30T115022Z.parquet
+    sha256: fc4f4fcf319edbb0fba84ee91ec3e7780b84328a72abd36330feda40dbfad0b9
+  - path: data/vintages/world_bank_wdi/NV.SRV.TOTL.KD@2026-04-30T151128Z.parquet
+    sha256: d6209478a5f209eecd9cb6ea8440f34ec6cfcc8efa4f4846e8f7fa69e2fa9330
+  - path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+  services_fetch_manifest: not available in tracked corpus
+  license: CC BY 4.0; World Bank attribution; derived summaries only
+  contains_source_values: false
+family:
+  id: wdi_resource_rents_future_sector_growth_2026_10_10
+  size: 8
+  members:
+  - wdi_total_rent_manufacturing_growth_2026
+  - wdi_total_rent_services_growth_2026
+  - wdi_oil_rent_manufacturing_growth_2026
+  - wdi_oil_rent_services_growth_2026
+  - wdi_gas_rent_manufacturing_growth_2026
+  - wdi_gas_rent_services_growth_2026
+  - wdi_mineral_rent_manufacturing_growth_2026
+  - wdi_mineral_rent_services_growth_2026
+  holm_alpha: 0.05
+  interpretation: Four correlated natural-resource rent predictors with two future real-sector growth
+    outcomes
+reproduction:
+  runner: scripts/run_wdi_resource_rents_sector_growth_2026.py
+  command: python3 scripts/run_wdi_resource_rents_sector_growth_2026.py verify --source-root /path/to/IESET
+  result_sha256: 7be68a365c476b9f1c391dee350dbb6f5a38de74a9770de09c3611c00f4c0e31
+result:
+  sample:
+    key_roster_rows: 860
+    key_roster_countries: 215
+    complete_rows_before_country_floor: 508
+    valid_rows: 498
+    valid_countries: 141
+    rows_per_anchor:
+      '1995': 91
+      '2000': 125
+      '2005': 141
+      '2010': 141
+    dropped:
+      country_below_two_anchors: 10
+      missing_or_nonfinite: 352
+    selected_values_read_after_committed_locks: true
+    rent_pooled_mean: 0.30471173528192147
+    rent_pooled_sd: 1.0525221448933832
+    residual_standardized_rent_sd: 0.29291106057903954
+    residual_sector_growth_sd: 0.09130123466072192
+    top_one_percent_rent_ss_share: 0.5095108711944298
+    top_country_rent_ss_share: 0.2702433574807391
+    top_one_percent_growth_ss_share: 0.20051209137707798
+    top_country_growth_ss_share: 0.10711394194100647
+  primary: null
+  hash_folds: []
+  gate_failures:
+  - top_one_percent_rent_concentration
+  - top_country_rent_concentration
+  holm_adjusted_p: 1.0
+  verdict: INCONCLUSIVE
+limitations:
+- Resource rents are modeled World Bank estimates of commodity value less extraction cost divided by current
+  GDP; they are not randomized treatment or a fiscal-revenue measure.
+- Total rent includes oil, gas, minerals, coal and forest rents; the four predictors are correlated and
+  belong to one eight-cell Holm family.
+- Real sector value added is a national-accounts series in constant 2015 US dollars; cross-country level
+  comparability and methodological breaks can affect growth measures.
+- Country/anchor effects, baseline income, sector scale and prior sector growth cannot remove commodity-price,
+  investment, exchange-rate or institutional confounding.
+- The local services-value-added parquet has an exact SHA pin but no tracked fetch manifest; its original
+  download transaction is not independently reconstructed.
+- The frozen 1995–2010 anchors yield nonoverlapping 1995–2000, 2000–2005, 2005–2010 and 2010–2015 follow-up
+  intervals; no pandemic period is included.
+- No causal, school, policy, position or featured credit is assigned; Holm corrects this family, not every
+  earlier IESET resource question.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
