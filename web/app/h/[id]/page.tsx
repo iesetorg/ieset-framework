@@ -21,6 +21,15 @@ import { PolicyBriefCard } from "@/components/cards/PolicyBriefCard";
 import { HypothesisChart } from "@/components/charts/HypothesisChart";
 import type { EvidenceTier } from "@/lib/types";
 
+const HISTORICAL_DRIFT_RESULT_IDS = new Set([
+  "fiscal_rule_presence_dampens_statist_drift",
+  "initial_state_share_predicts_drift_reversal",
+  "liberal_democracy_managerial_flywheel_drift",
+]);
+
+const HISTORICAL_DRIFT_SUMMARY =
+  "Historical 1976–2025 result; needs rerun for the 1846–2026 movement-coded drift series. Legacy same-commit archive record.";
+
 export async function generateStaticParams() {
   const all = await loadAllHypotheses();
   return all.map((h) => ({ id: h.hypothesis_id }));
@@ -37,10 +46,16 @@ export async function generateMetadata({
   const run = await loadRunArtifacts(id);
   const claimShort = h.claim.split(/(?<=[.!?])\s+/)[0].slice(0, 72);
   const verdictWord = (run.verdict ?? "pending").split(/[\s—–-]/)[0];
-  const title = `${claimShort} — ${verdictWord}`;
+  const historicalDrift = HISTORICAL_DRIFT_RESULT_IDS.has(id);
+  const title = historicalDrift
+    ? `${claimShort} — historical result needs rerun`
+    : `${claimShort} — ${verdictWord}`;
   const description = [
     `Evidence tier: ${h._evidence_tier ?? "archive"}.`,
-    run.verdict ? `Verdict: ${run.verdict.split("\n")[0].slice(0, 120)}.` : null,
+    historicalDrift ? HISTORICAL_DRIFT_SUMMARY : null,
+    !historicalDrift && run.verdict
+      ? `Verdict: ${run.verdict.split("\n")[0].slice(0, 120)}.`
+      : null,
     h._evidence_scope_note ?? null,
     h.claim.slice(0, 160),
   ]
@@ -80,6 +95,7 @@ export default async function HypothesisPage({
   if (!h) return notFound();
 
   const run = await loadRunArtifacts(id);
+  const historicalDrift = HISTORICAL_DRIFT_RESULT_IDS.has(id);
   const schoolPredictions = await schoolPredictionsForHypothesis(id);
   const schoolLinksUnscored = h._school_score_eligible === false;
 
@@ -107,9 +123,14 @@ export default async function HypothesisPage({
     "@type": "ScholarlyArticle",
     headline: h.claim.split(/(?<=[.!?])\s+/)[0],
     abstract: [
-      run.verdict ? `Verdict: ${String(run.verdict).split("\n")[0]}.` : null,
+      historicalDrift ? HISTORICAL_DRIFT_SUMMARY : null,
+      !historicalDrift && run.verdict
+        ? `Verdict: ${String(run.verdict).split("\n")[0]}.`
+        : null,
       h._evidence_scope_note ?? null,
-      "Pre-registered falsification rule with pinned public-data vintages.",
+      historicalDrift
+        ? "Historical same-commit registration; the old result is archived."
+        : "Pre-registered falsification rule with pinned public-data vintages.",
       "Research artifact — not peer-reviewed by default.",
     ]
       .filter(Boolean)
@@ -199,6 +220,20 @@ export default async function HypothesisPage({
           </p>
         )}
       </header>
+
+      {historicalDrift && (
+        <div
+          role="note"
+          className="mb-6 rounded border-l-[4px] border-amber bg-[#fff8e8] px-5 py-4 text-[13.5px] leading-[1.55] text-ink"
+        >
+          <strong className="block text-[14px]">NEEDS RERUN · Historical 1976–2025 result</strong>
+          <p className="m-0 mt-1">
+            This legacy same-commit archive result has not been recalculated on
+            the extended 1846–2026 movement-coded drift series. The verdict
+            below describes the old series only.
+          </p>
+        </div>
+      )}
 
       <div className="mb-4 flex flex-wrap items-center gap-2 rounded border border-rule bg-panel px-4 py-3 text-[12.5px] text-muted">
         <span className="font-semibold text-ink">Evidence standing</span>

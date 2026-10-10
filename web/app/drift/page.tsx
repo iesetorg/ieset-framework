@@ -350,10 +350,10 @@ export default async function DriftPage() {
       </div>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
-        The three registered drift verdicts used the previous 1976–2025
-        constructed series. Their historical result cards are marked
+        The three historical drift result cards are legacy same-commit records
+        from the previous 1976–2025 constructed series. They are marked
         <strong className="text-ink"> needs rerun</strong> against this longer
-        corpus; the extended chart does not update those verdicts.
+        corpus; the extended chart does not update their verdicts.
       </p>
 
       <div className="mb-10 grid grid-cols-2 gap-6 rounded border border-rule bg-white p-5 text-[13.5px] md:grid-cols-4">
