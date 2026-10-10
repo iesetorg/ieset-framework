@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_housing_overburden_fertility_forward_2026
+version: 1
+status: pre_registered
+topic: housing
+claim_direction: '-'
+claim: Within the fixed OECD–Eurostat country panel, a larger prior three-year increase
+  in low-income housing cost overburden predicts a larger fall in the total fertility
+  rate during the following three years.
+methodology_note: One-test prospective descriptive calibration registered from housing
+  exposure values and Eurostat fertility country-year keys only; no selected fertility
+  value, null mask, or fitted result was opened before the separate source lock. Exact
+  design in engine/audits/oecd_housing_eurostat_fertility_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - CHE
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  period:
+  - 2010
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the exact 118-row committed key roster with 2013–2019 anchors; no countries,
+    windows, or alternate outcome vintages may be substituted.
+  - OECD How's Life 3_3, PT_POP, all ages/sex/education total, housing domain only.
+    Require normal OBS_STATUS=A, finite [0,100] values in all four years t−3 through
+    t and at least two eligible anchors per country.
+  - Eurostat demo_find annual TOTFERRT exact year t and t+3 keys only; after the source-lock
+    commit retain finite values [0.5,10] births per woman and at least two complete
+    anchors per country. No nearest-year join or interpolation.
+  - The completed sample and every gate are fixed independently of observed fertility
+    values; exclude no observation based on outcome sign or fitted effect.
+variables:
+  treatment:
+  - name: three_year_low_income_housing_overburden_change_pp
+    source: oecd:OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,1.1
+    transformation: HSL 3_3 PT_POP at t minus t−3, percentage points.
+    notes: Population in the bottom 40% of income above the 40% housing-cost-to-disposable-income
+      threshold; not a policy treatment.
+  outcome:
+  - name: next_three_year_total_fertility_change
+    source: eurostat:demo_find
+    transformation: TOTFERRT at t+3 minus TOTFERRT at t, births per woman.
+    notes: Period synthetic total fertility for all women; not completed family size
+      or fertility among low-income households.
+  controls:
+  - name: baseline_housing_overburden
+    source: oecd:OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,1.1
+    transformation: HSL 3_3 level at t−3, percentage of the bottom-40 population.
+  - name: baseline_total_fertility
+    source: eurostat:demo_find
+    transformation: TOTFERRT level at t, births per woman.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor_year
+  clustering: country
+  notes: OLS of later three-year total-fertility change on prior three-year housing-overburden
+    change, baseline housing burden and fertility, country and anchor-year effects.
+    Country-cluster CR1 and two-sided Student t(G−1). Overlapping annual windows are
+    retained as fixed; a 2013–2016 pre-pandemic subset is a sign-sensitivity check.
+falsification:
+  test: oecd_housing_eurostat_fertility_forward_2026_10_10
+  rule: INCONCLUSIVE if source/chronology, complete-case (95 rows/20 countries), material-change
+    (50 rows/18 countries), two-complete-anchor, residualized-treatment concentration
+    (largest two rows ≤30%; largest country ≤25%), full-rank, or finite-positive clustered-uncertainty
+    gates fail. Otherwise SUPPORTED only if beta ≤−0.003 births per woman per +1 burden
+    point, two-sided p≤0.01, and the 2013–2016 sensitivity beta is also negative with
+    at least 45 rows/14 countries. REFUTED symmetrically for beta ≥+0.003 and positive
+    sensitivity. All other estimable results are PARTIAL. Every verdict has only descriptive
+    calibration status.
+  threshold:
+    family_id: oecd_housing_eurostat_fertility_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.003
+    min_valid_rows: 95
+    min_valid_countries: 20
+    min_material_change_rows: 50
+    min_material_change_countries: 18
+    material_housing_change_min_abs: 2.0
+    min_complete_anchors_per_country: 2
+    max_top_two_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.25
+    prepandemic_sensitivity_through_anchor: 2016
+    min_sensitivity_rows: 45
+    min_sensitivity_countries: 14
+    expected_key_rows: 118
+    expected_key_countries: 24
+    roster_sha256: 22e167449e554362a42d4126c6346d69a54cd833819d029696e7645e5bdef9b1
+    source_files:
+      housing:
+        path: data/vintages/oecd/OECD.ELS.HD_DSD_HH_DASH_DF_HSG_INEQ_1.0@2026-07-23T150432Z.parquet
+        sha256: ac7581cb015748d97a21d4feadd08a3afb16cb1d5912af9e0997913ce4db65db
+        manifest: data/manifests/fetch_run_2026-07-23T150922Z.yaml
+        manifest_sha256: f8d2a682717c02832a2cf323fb5ea777139502e14987348859f3114042bece51
+      fertility:
+        path: data/vintages/eurostat/demo_find@2026-04-30T115530Z.parquet
+        sha256: 4db9d291092c0c146aebaa9f3e143b9f9a7a8741f7fc41886e31941aa412c039
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    disposition: descriptive_calibration_only
+    family_p_max: 0.01
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: National low-income housing burden and national fertility can co-move
+  under income, migration, family-policy and housing-market shocks. These ecological
+  lags and controls cannot identify causation. Earlier IESET housing/fertility cases
+  make this archive-selected; the local p≤0.01 rule is not an archive-wide multiplicity
+  correction. Zero causal, policy, school-score, position, or featured credit.
+steelman: hypotheses/steelman/oecd_housing_overburden_fertility_forward_2026.md
+scope:
+  period:
+  - 2010
+  - 2022
+  countries: *id001
+  outcome_dim:
+  - demographics_migration
+  policy_family: []
+  treatment_tags:
+  - housing_cost_overburden
+  - fertility_transition
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
