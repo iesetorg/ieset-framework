@@ -4,30 +4,30 @@ This generated index expands coded policy axes into second-order measurement req
 
 ## Summary
 
-- Policies indexed: 3401
+- Policies indexed: 3400
 - Movements indexed: 718
-- Policies with axis-inherited requirements: 3372
+- Policies with axis-inherited requirements: 3371
 - Policies with explicit evaluation_design: 46
-- Policies missing explicit design despite axis requirements: 3355
-- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3355, "explicit": 46}`
-- Source readiness mentions: `{"partial_ready": 44882, "proprietary_gap": 6744, "ready": 3359, "reconstruct_needed": 19118, "scrape_needed": 14131}`
+- Policies missing explicit design despite axis requirements: 3354
+- Evaluation-design status counts: `{"axis_inherited_missing_explicit_design": 3354, "explicit": 46}`
+- Source readiness mentions: `{"partial_ready": 44866, "proprietary_gap": 6742, "ready": 3358, "reconstruct_needed": 19108, "scrape_needed": 14122}`
 
 ## Most Common Required Layers
 
-- `distributional_incidence` (3338)
-- `first_order_policy_effect` (3201)
-- `behavioral_response` (3040)
-- `net_welfare` (2702)
-- `macro_feedback` (2648)
-- `fiscal_or_enforcement_cost` (2235)
-- `externality_or_spillover` (2072)
-- `market_structure_response` (1844)
-- `implementation_capacity` (1763)
+- `distributional_incidence` (3337)
+- `first_order_policy_effect` (3200)
+- `behavioral_response` (3039)
+- `net_welfare` (2700)
+- `macro_feedback` (2646)
+- `fiscal_or_enforcement_cost` (2232)
+- `externality_or_spillover` (2071)
+- `market_structure_response` (1843)
+- `implementation_capacity` (1760)
 - `dynamic_investment_response` (1626)
-- `allocation_distortion` (1401)
-- `second_order_supply_response` (1401)
-- `quality_margin` (1385)
-- `leakage_or_substitution` (1221)
+- `allocation_distortion` (1399)
+- `second_order_supply_response` (1399)
+- `quality_margin` (1382)
+- `leakage_or_substitution` (1220)
 - `first_order_price_or_transfer` (13)
 
 ## Explicit Design Backlog
@@ -38,7 +38,6 @@ This generated index expands coded policy axes into second-order measurement req
 | `mt_private_residential_leases_act_2020` | candidate | institutional.property_rights, institutional.rule_of_law, regulatory.housing_rent_control | allocation_distortion, behavioral_response, distributional_incidence, dynamic_investment_response, externality_or_spillover, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `zimbabwe_rbz_fiscal_financing_2003_2009` | candidate | institutional.property_rights, institutional.rule_of_law, monetary.central_bank_independence, regulatory.product_market_competition | allocation_distortion, behavioral_response, distributional_incidence, dynamic_investment_response, externality_or_spillover, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `egypt_ersap_1991` | candidate | fiscal.tax_corporate, fiscal.tax_progressivity, regulatory.product_market_competition, regulatory.trade_openness | allocation_distortion, behavioral_response, distributional_incidence, dynamic_investment_response, externality_or_spillover, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 4}` |
-| `france_pinay_rueff_stabilisation_1958` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.sectoral_licensing, regulatory.trade_openness | allocation_distortion, behavioral_response, distributional_incidence, externality_or_spillover, first_order_policy_effect, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `il_stabilisation_plan_1985` | candidate | fiscal.spending_level, monetary.central_bank_independence, monetary.monetary_expansion_direction, regulatory.product_market_competition | allocation_distortion, behavioral_response, distributional_incidence, externality_or_spillover, first_order_policy_effect, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `ir_iran_iraq_war_economy_1980_1988` | candidate | fiscal.spending_level, regulatory.product_market_competition, regulatory.trade_openness | allocation_distortion, behavioral_response, distributional_incidence, externality_or_spillover, first_order_policy_effect, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `iran_targeted_subsidies_reform_2010` | candidate | fiscal.transfer_expansion, institutional.property_rights, regulatory.product_market_competition, regulatory.trade_openness | allocation_distortion, behavioral_response, distributional_incidence, dynamic_investment_response, externality_or_spillover, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 4}` |
@@ -234,3 +233,4 @@ This generated index expands coded policy axes into second-order measurement req
 | `israel_fiscal_consolidation_1985` | candidate | fiscal.spending_level, monetary.central_bank_independence, monetary.monetary_expansion_direction, regulatory.product_market_competition | allocation_distortion, behavioral_response, distributional_incidence, externality_or_spillover, first_order_policy_effect, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `israel_shekel_peg_1985` | candidate | fiscal.spending_level, monetary.central_bank_independence, monetary.monetary_expansion_direction, regulatory.product_market_competition | allocation_distortion, behavioral_response, distributional_incidence, externality_or_spillover, first_order_policy_effect, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
 | `italy_pnrr_2021` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, institutional.rule_of_law, regulatory.environmental_stringency, ... | allocation_distortion, behavioral_response, distributional_incidence, dynamic_investment_response, externality_or_spillover, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |
+| `jp_ntt_privatisation_1985` | candidate | fiscal.spending_level, institutional.property_rights, regulatory.product_market_competition | allocation_distortion, behavioral_response, distributional_incidence, dynamic_investment_response, first_order_policy_effect, ... | `{"partial_ready": 14, "proprietary_gap": 2, "ready": 1, "reconstruct_needed": 6, "scrape_needed": 5}` |

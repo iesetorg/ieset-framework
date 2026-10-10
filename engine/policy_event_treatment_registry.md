@@ -4,15 +4,17 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 
 ## Summary
 
-- Policies indexed: 3425
+- Policies indexed: 3427
 - Policies with explicit evaluation_design: 46
-- Policies with exact event, enacted, or first-application dates: 2133
-- Policies with exact-date comparative structure declared: 7
+- Policies with raw exact event, enacted, or first-application dates: 2138
+- Of those, policies with references present (date support not independently verified): 1825
+- Of those, policies with no references (timing readiness withheld): 313
+- Policies with exact-date comparative structure declared: 5
 - Policies with triple-difference structure declared: 1
-- Timing status counts: `{"effective_date_only": 61, "enacted_date_only": 2030, "event_dated": 42, "event_month_dated": 3, "year_period_only": 1289}`
-- Comparison structure counts: `{"axis_only_no_unit_split": 3416, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 20, "needs_comparison_unit_detail": 37, "needs_exact_event_dates": 1292, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3379}`
-- Axis source readiness: `{"partial_ready": 44882, "proprietary_gap": 6744, "ready": 3359, "reconstruct_needed": 19118, "scrape_needed": 14131}`
+- Timing status counts: `{"effective_date_only": 64, "enacted_date_only": 2032, "event_dated": 42, "event_month_dated": 3, "year_period_only": 1286}`
+- Comparison structure counts: `{"axis_only_no_unit_split": 3418, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 20, "needs_comparison_unit_detail": 37, "needs_exact_date_source": 313, "needs_exact_event_dates": 1289, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3381}`
+- Axis source readiness: `{"partial_ready": 44866, "proprietary_gap": 6742, "ready": 3358, "reconstruct_needed": 19108, "scrape_needed": 14122}`
 
 ## Comparative Structure Seeds (Measurement Gaps Shown)
 
@@ -20,8 +22,6 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | --- | --- | --- | --- | --- | --- |
 | `de_mietpreisbremse_2015` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_units, adjacent_market_comparison, high_frequency_event_study, triple_difference, welfare_accounting, ... | known_microdata_gaps_declared |
 | `hu_price_caps_fuel_food_2021_2023` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, border_comparison, high_frequency_event_study, welfare_accounting, distributional_decomposition, ... | known_microdata_gaps_declared |
-| `us_nixon_wage_price_controls_1971` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, high_frequency_event_study, welfare_accounting, distributional_decomposition, quality_margin, ... | known_microdata_gaps_declared |
-| `us_oil_price_controls_1973_1981` | candidate | enacted_date_only | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, adjacent_market_comparison, high_frequency_event_study, welfare_accounting, distributional_decomposition, ... | known_microdata_gaps_declared |
 | `bahrain_vat_rate_increase_2022` | candidate | event_dated | declared_treated_and_comparison_units |  | needs_outcome_measurement_plan |
 | `fi_compulsory_education_extension_2021` | candidate | event_dated | declared_treated_comparison_design | eligible_vs_ineligible_groups, phase_in_or_threshold_comparison | known_microdata_gaps_declared |
 | `fi_family_leave_reform_2022` | candidate | event_dated | declared_treated_comparison_design | eligible_vs_ineligible_groups, phase_in_or_threshold_comparison | known_microdata_gaps_declared |
@@ -39,7 +39,6 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `cz_energy_price_cap_2025` | candidate | fiscal.sectoral_subsidy, regulatory.energy_supply_security, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `ec_borja_gradualist_stabilisation_1988_1992` | candidate | monetary.monetary_expansion_direction, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `egypt_ersap_1991` | candidate | fiscal.tax_corporate, fiscal.tax_progressivity, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `france_pinay_rueff_stabilisation_1958` | candidate | fiscal.sectoral_subsidy, fiscal.spending_level, regulatory.sectoral_licensing, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `france_price_control_liberalisation_1978_1980` | candidate | regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `germany_currency_reform_1948` | candidate | monetary.central_bank_independence, regulatory.labour_market_flexibility, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `germany_price_liberalisation_1948` | candidate | monetary.central_bank_independence, regulatory.labour_market_flexibility, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
@@ -230,3 +229,4 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `canada_cpp_reform_1997` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_cusfta_1988` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `canada_dental_pharmacare_ndp_agreement_2023_2024` | candidate | fiscal.spending_level, fiscal.tax_capital, fiscal.tax_progressivity, fiscal.transfer_expansion | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `canada_gst_1991` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |

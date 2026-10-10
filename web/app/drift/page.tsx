@@ -448,13 +448,15 @@ export default async function DriftPage() {
             {firstCompositeYear ?? "not yet coded"}
           </h2>
           <p className="mb-4 max-w-[850px] text-[13.5px] leading-[1.55] text-muted">
-            These cited national policies and movement milestones are shown in
-            date order. Dashed chart markers denote policy-only context records;
-            a policy record never adds a numeric drift step by itself. French
-            movements linked to the 1789, 1804, and 1814 policies supply the
-            signed rule-of-law steps shown below. The separate 1789 U.S.
-            policy-only marker adds no French score. Policy cards distinguish
-            enactment from later effective dates and show review status.{" "}
+            These cited policy records and movement milestones are shown in
+            date order. The 1781 U.S. Confederation record covers its thirteen
+            founding states; the 1788 French edict marks a documented court
+            registration, not one established kingdom-wide effective day.
+            Dashed chart markers denote policy-only context records; a policy
+            record never adds a numeric drift step by itself. French movements
+            linked to the 1789, 1804, and 1814 policies supply the signed
+            rule-of-law steps shown below. Policy cards distinguish enactment
+            from later effective dates and show review status.{" "}
             <Link href="/policy-browser/" className="text-accent hover:underline">
               Browse the policy database
             </Link>.
