@@ -1,0 +1,189 @@
+packet_version: 1
+repository:
+  root: .
+  git_commit: 317da4a8e32ff06258a3ccba56a2bf2f4ab1b8f1
+  registration_commit: 8a5b1ddb7eb2fecbe56f15f5f9655382a66facb2
+  source_lock_commit: 317da4a8e32ff06258a3ccba56a2bf2f4ab1b8f1
+hypothesis:
+  id: wgi_ge_oecd_treatable_mortality_forward_2026
+  path: hypotheses/healthcare/wgi_ge_oecd_treatable_mortality_forward_2026.yaml
+  topic: healthcare
+  claim: In the frozen 45-country panel before the pandemic, higher World Bank government-effectiveness
+    estimates in year t predict lower OECD treatable mortality rates in year t+1 within
+    countries, conditional on real income per person and common year shocks.
+  school: null
+verdict:
+  raw: INCONCLUSIVE
+  bucket: inconclusive
+  reason: complete_pair_floor, complete_country_floor
+  status: measured_descriptive_calibration
+preregistration:
+  path: engine/audits/wgi_ge_oecd_treatable_mortality_prereg_2026-10-10.md
+  claim: In the frozen 45-country panel before the pandemic, higher World Bank government-effectiveness
+    estimates in year t predict lower OECD treatable mortality rates in year t+1 within
+    countries, conditional on real income per person and common year shocks.
+  falsification_rule: INCONCLUSIVE if custody, registration/source-lock chronology,
+    complete-case sample, residual-treatment concentration, full rank, or uncertainty
+    gates fail. SUPPORTED iff the government-effectiveness coefficient is at most
+    -0.05 log points per index point and its two-sided country-cluster p-value is
+    at most 0.01. REFUTED iff the coefficient is at least +0.05 at the same p cutoff.
+    Every other estimable result is PARTIAL. This is descriptive calibration only
+    and carries no causal or scoreboard credit.
+  threshold:
+    p_max_two_sided: 0.01
+    meaningful_beta_min_abs: 0.05
+    min_complete_pairs: 450
+    min_complete_countries: 30
+    min_years_per_country: 8
+    max_top_one_percent_partialled_treatment_share: 0.2
+    max_top_country_partialled_treatment_share: 0.15
+    max_top_year_partialled_treatment_share: 0.2
+    expected_key_pairs: 781
+    expected_key_countries: 45
+    key_roster_sha256: 15f38fe6043ad1a2c45224ee7424824699201ffd0c45754a559043d68b90e608
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+  estimator:
+    template: panel_fe
+    fixed_effects:
+    - country
+    - year
+    clustering: country
+    notes: 'One fixed OLS model: log(treatable mortality at t+1) on WGI GE at t, log
+      real GDP per capita at t, country fixed effects and treatment-year fixed effects.
+      Country-cluster CR1 uncertainty, two-sided Student t with G-1 degrees of freedom
+      and a matching 99% confidence interval. Require full rank and finite positive
+      standard error. No alternate lag or control specification determines the verdict.'
+  steelman: hypotheses/steelman/wgi_ge_oecd_treatable_mortality_forward_2026.md
+reproduction:
+  run_dir: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026
+  runner: scripts/run_wgi_ge_oecd_treatable_mortality_2026.py
+  replication_script: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/replication.py
+  suggested_command: python engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/replication.py
+    --source-root <pinned-source-checkout>
+data:
+  inputs:
+  - name: ge
+    publisher: wgi
+    series_id: GOV_WGI_GE.EST
+    vintage_file: data/vintages/wgi/GOV_WGI_GE.EST@2026-05-05T195208Z.parquet
+    hash:
+      declared_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      computed_sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+      methodology_url: https://www.worldbank.org/en/publication/worldwide-governance-indicators
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:52:08.858159+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1996'
+      end_date: '2024'
+      frequency: annual
+      units: WGI point estimate (approx. -2.5 to 2.5; std.err. available)
+  - name: income
+    publisher: world_bank_wdi
+    series_id: NY.GDP.PCAP.KD
+    vintage_file: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    hash:
+      declared_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      computed_sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      status: match
+    source:
+      type: official
+      url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+      methodology_url: https://data.worldbank.org/indicator/NY.GDP.PCAP.KD
+      license: CC-BY-4.0
+      fetch_utc: '2026-05-05T19:46:45.908191+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+    coverage:
+      start_date: '1960'
+      end_date: '2025'
+      frequency: annual
+      units: per indicator definition
+  - name: mortality
+    publisher: oecd
+    series_id: OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0
+    vintage_file: data/vintages/oecd/OECD.ELS.HD_DSD_HEALTH_STAT_DF_AMENABLE_MORT_1.0@2026-05-01T071213Z.parquet
+    hash:
+      declared_sha256: e00d243302893fb2bcf455a6d75ab8e5467a208186683d52d291f235a4279f94
+      computed_sha256: e00d243302893fb2bcf455a6d75ab8e5467a208186683d52d291f235a4279f94
+      status: match
+    source:
+      type: official
+      url: https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_HEALTH_STAT@DF_AM,1.1/all?format=csvfilewithlabels
+      methodology_url: https://data-explorer.oecd.org/vis?fs[0]=Topic&df[ds]=dsDisseminateFinalDMZ&df[id]=OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0
+      license: OECD standard permissions (attribution required)
+      fetch_utc: '2026-05-01T07:12:13.068282+00:00'
+      fetch_manifest: data/manifests/fetch_run_2026-05-01T071226Z.yaml
+    coverage:
+      start_date: '2000'
+      end_date: '2023'
+      frequency: annual
+      units: per dataflow metadata
+  missing_series: []
+  data_quality:
+    grade: reproducible_hash_verified_at_run
+    input_count: 3
+    hash_status_counts:
+      match: 3
+artifacts:
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/result.json
+  sha256: 2875ac4b695ff22c3e8af99f5428cfbcff43443a4af65e4b6240b68b5a75c48b
+  bytes: 2023
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/diagnostics.json
+  sha256: 37b6e18dc7162266fb7751db6c0eb0e3d73c7670f248cb5f3d0b079ca26f6e70
+  bytes: 1220
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/manifest.yaml
+  sha256: 41f19446ec6cbd916153eed3f9a4966760fefa778554eeebf9e7aee878e872e5
+  bytes: 3046
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/hypothesis.yaml
+  sha256: 8b78eb55a29125472b3040bc424c47548261922bafa126da404094a2090ef854
+  bytes: 5904
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/replication.py
+  sha256: 65cf0aa97273042f05bfe430d05e90d1fed66411ca0c082cf3b06aab3ccdecb1
+  bytes: 618
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/coefficients.parquet
+  sha256: 1a818302a82296525d4d1df7f2e8909afa2ed923da132ee7a337cee263032efa
+  bytes: 2703
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/chart_data.json
+  sha256: dd42c6a409fa2e116fa97f668be37fced4d853393a6542eb734b2bfa02dd3342
+  bytes: 216
+- path: engine/runs/wgi_ge_oecd_treatable_mortality_forward_2026/result_card.md
+  sha256: 5c02e9233291d500ba1dc1a1175fa1dba6c5460d5500c5f47c2dfa760a24fae4
+  bytes: 367
+references:
+- kind: source
+  publisher: wgi
+  series_id: GOV_WGI_GE.EST
+  url: https://api.worldbank.org/v2/country/all/indicator/GOV_WGI_GE.EST?format=json&source=3
+- kind: source
+  publisher: world_bank_wdi
+  series_id: NY.GDP.PCAP.KD
+  url: https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.KD?format=json
+- kind: source
+  publisher: oecd
+  series_id: OECD.ELS.HD,DSD_HEALTH_STAT@DF_AMENABLE_MORT,1.0
+  url: https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_HEALTH_STAT@DF_AM,1.1/all?format=csvfilewithlabels
+caveats:
+- WGI is a perceptions-based governance composite, not a health-policy intervention.
+- The one-year lead and fixed effects do not identify a causal effect or remove country-specific
+  time-varying confounding.
+- OECD mortality cause coding and WGI methods may change despite the selected status
+  screen.
+- The same OECD mortality vintage appears in earlier IESET studies; this is not an
+  independent archive holdout.
+- No causal, policy, school, position, or featured credit is permitted.
+credit:
+  causal: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
