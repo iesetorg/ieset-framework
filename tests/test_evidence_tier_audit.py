@@ -145,3 +145,39 @@ def test_school_score_exclusion_registry_fails_closed(tmp_path):
     }), encoding="utf-8")
     with pytest.raises(ValueError, match="duplicate"):
         evidence_tiers.load_school_score_exclusions(path)
+
+
+def test_source_locked_nested_result_needs_immutable_ordered_custody():
+    hypothesis_id = "jst_1929_1933_advanced_trade_openness_drop_v2"
+    run_dir = ROOT / "engine" / "runs" / hypothesis_id
+    diagnostics = json.loads((run_dir / "diagnostics.json").read_text())
+    registration = evidence_tiers.registration_rows()[hypothesis_id]
+    assert evidence_tiers.immutable_source_locked_nested_verdict(
+        diagnostics, hypothesis_id, run_dir, registration
+    ) == "SUPPORTED"
+    assert evidence_tiers.immutable_source_locked_nested_verdict(
+        diagnostics, hypothesis_id, run_dir, {**registration, "status": "legacy_same_commit"}
+    ) == ""
+    assert evidence_tiers.immutable_source_locked_nested_verdict(
+        {**diagnostics, "source_sha256": "0" * 64}, hypothesis_id, run_dir, registration
+    ) == ""
+    assert evidence_tiers.immutable_source_locked_nested_verdict(
+        {**diagnostics, "source_lock_commit": "0" * 40}, hypothesis_id, run_dir, registration
+    ) == ""
+
+
+def test_jst_trade_is_public_descriptive_calibration_with_zero_school_credit():
+    hypothesis_id = "jst_1929_1933_advanced_trade_openness_drop_v2"
+    path = ROOT / "hypotheses" / "trade" / f"{hypothesis_id}.yaml"
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["registration_status"] == "verified"
+    assert record["verdict_bucket"] == "supported"
+    assert record["public_visible"] is True
+    assert record["tier"] == "calibration"
+    assert record["school_score_eligible"] is False
+    assert record["scoreboard_weight_cap"] == 0.0
+    assert record["exclusion_reasons"] == []
+    old_path = ROOT / "hypotheses" / "trade" / "trade_lib_smoot_hawley_1930_historical.yaml"
+    old_record = evidence_tiers.build_record(old_path, evidence_tiers.registration_rows())
+    assert old_record["public_visible"] is False
+    assert old_record["tier"] == "archive"

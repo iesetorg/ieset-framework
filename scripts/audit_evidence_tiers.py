@@ -13,8 +13,10 @@ silently inherit the standing of strict, method-valid causal work.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -243,6 +245,110 @@ def school_score_eligible_for_public_run(public_visible: bool, correction: Any) 
     )
 
 
+def immutable_source_locked_nested_verdict(
+    diagnostics: dict[str, Any],
+    hypothesis_id: str,
+    run_dir: Path,
+    registration: dict[str, Any],
+) -> str:
+    """Accept a nested result only with an unchanged pre-result source lock.
+
+    Legacy nested payloads cannot become public merely by adding a wrapper:
+    the spec, lock, and first run must be distinct ordered Git commits, and
+    the current source lock and aggregate result must match their first blobs.
+    """
+    nested = diagnostics.get("result")
+    if not isinstance(nested, dict) or registration.get("status") != "verified":
+        return ""
+    verdict = str(nested.get("verdict") or "").strip().upper()
+    if verdict not in {"SUPPORTED", "PARTIAL", "REFUTED", "INCONCLUSIVE"}:
+        return ""
+    if verdict != "INCONCLUSIVE" and nested.get("gate_failures") != []:
+        return ""
+    if diagnostics.get("hypothesis_id") != hypothesis_id or diagnostics.get("family_size") != 1:
+        return ""
+    spec_commit = str(registration.get("spec_commit") or "")
+    run_commit = str(registration.get("run_first_commit") or "")
+    lock_commit = str(diagnostics.get("source_lock_commit") or "")
+    source_sha = str(diagnostics.get("source_sha256") or "")
+    key_sha = str(diagnostics.get("source_key_roster_sha256") or "")
+    if (diagnostics.get("registration_commit") != spec_commit
+            or any(not re.fullmatch(r"[0-9a-f]{40}", sha)
+                   for sha in (spec_commit, lock_commit, run_commit))
+            or any(not re.fullmatch(r"[0-9a-f]{64}", sha)
+                   for sha in (source_sha, key_sha))):
+        return ""
+
+    def git_bytes(*args: str) -> bytes | None:
+        proc = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=False)
+        return proc.stdout if proc.returncode == 0 else None
+
+    if (git_bytes("merge-base", "--is-ancestor", spec_commit, lock_commit) is None
+            or spec_commit == lock_commit
+            or git_bytes("merge-base", "--is-ancestor", lock_commit, run_commit) is None
+            or lock_commit == run_commit):
+        return ""
+    spec_rel = registration.get("path")
+    if not isinstance(spec_rel, str) or not spec_rel.startswith("hypotheses/"):
+        return ""
+    if git_bytes("show", f"{spec_commit}:{spec_rel}") != (ROOT / spec_rel).read_bytes():
+        return ""
+    result_rel = (run_dir / "diagnostics.json").relative_to(ROOT).as_posix()
+    if git_bytes("show", f"{run_commit}:{result_rel}") != (run_dir / "diagnostics.json").read_bytes():
+        return ""
+    names = git_bytes("diff-tree", "--no-commit-id", "--name-only", "-r", lock_commit)
+    if names is None:
+        return ""
+    lock_paths = [name for name in names.decode().splitlines()
+                  if name.startswith("data/pinned_evidence/") and name.endswith(".source.json")]
+    if len(lock_paths) != 1:
+        return ""
+    lock_rel = lock_paths[0]
+    committed_lock = git_bytes("show", f"{lock_commit}:{lock_rel}")
+    lock_path = ROOT / lock_rel
+    if committed_lock is None or not lock_path.is_file() or committed_lock != lock_path.read_bytes():
+        return ""
+    try:
+        lock = json.loads(committed_lock)
+    except (TypeError, ValueError):
+        return ""
+    if (lock.get("hypothesis_id") != hypothesis_id
+            or lock.get("registration_commit") != spec_commit
+            or lock.get("source_sha256") != source_sha
+            or lock.get("key_roster_sha256") != key_sha
+            or lock.get("family_size") != 1):
+        return ""
+    packet_files = ("result_card.md", "replication.py", "hypothesis.yaml",
+                    "manifest.yaml", "evidence_packet.yaml")
+    if any(not (run_dir / name).is_file() for name in packet_files):
+        return ""
+    if (run_dir / "hypothesis.yaml").read_bytes() != (ROOT / spec_rel).read_bytes():
+        return ""
+    try:
+        manifest = yaml.safe_load((run_dir / "manifest.yaml").read_text())
+        packet = yaml.safe_load((run_dir / "evidence_packet.yaml").read_text())
+    except (OSError, yaml.YAMLError):
+        return ""
+    if not isinstance(manifest, dict) or not isinstance(packet, dict):
+        return ""
+    packet_source = packet.get("source")
+    reproduction = packet.get("reproduction")
+    if (manifest.get("hypothesis_id") != hypothesis_id
+            or manifest.get("status") != verdict
+            or manifest.get("preregistration_commit") != spec_commit
+            or not isinstance(manifest.get("source"), dict)
+            or manifest["source"].get("source_sha256") != source_sha
+            or manifest["source"].get("source_lock_commit") != lock_commit
+            or packet.get("result") != nested
+            or not isinstance(packet_source, dict)
+            or packet_source.get("source_sha256") != source_sha
+            or not isinstance(reproduction, dict)
+            or reproduction.get("result_sha256")
+                != hashlib.sha256((run_dir / "diagnostics.json").read_bytes()).hexdigest()):
+        return ""
+    return verdict
+
+
 def build_record(
     path: Path,
     registrations: dict[str, dict[str, Any]],
@@ -283,6 +389,10 @@ def build_record(
             run_dir = legacy_run_dir
     diagnostics = load_json(run_dir / "diagnostics.json")
     verdict = str(diagnostics.get("verdict") or "").strip()
+    if not verdict and isinstance(diagnostics.get("result"), dict):
+        verdict = immutable_source_locked_nested_verdict(
+            diagnostics, hypothesis_id, run_dir, registration
+        )
     correction = diagnostics.get("correction") or {}
     disposition = (
         str(correction.get("disposition") or "").strip()
@@ -297,7 +407,7 @@ def build_record(
         else ""
     )
     diagnostic_text = " ".join(
-        str(diagnostics.get(key) or "")
+        str(verdict if key == "verdict" else diagnostics.get(key) or "")
         for key in ("verdict", "method", "notes", "warning", "warnings")
     )
     estimator_failures = estimator_floor_failures(
