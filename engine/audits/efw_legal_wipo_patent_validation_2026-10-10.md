@@ -1,0 +1,14 @@
+# Fraser legal rights to resident patent filings — independent validation
+
+The frozen result is **PARTIAL**, not a graduation or a directional refutation. Registration `f904aa4fd9b3b0ae9ceb3b839594056a1aa0184d` preceded source lock `2708a9d3f7f8f6748d24e773c104dcec8e3b36fa`, which preceded result `8b08720be84b5be08fc6ea76e48cb03cd55b6e43`. No selected values or estimates were opened until after the first two commits. The source-key roster was categorical-only; the preregistration separately disclosed a finite/missing-mask look.
+
+The locked fit retains 1,157 country-years in 92 countries after the six-year country floor. Material Area 2 changes appear in 252 rows across 74 countries. Every frozen complete-case, variation, concentration, rank and fold feasibility gate clears. The country-clustered Area 2 coefficient is **−0.1362313683506746** (SE 0.05844254978649693; two-sided Student t p=0.021960886448977986). All five omitted-country-hash folds have negative coefficients, but the primary p exceeds the frozen 0.01 directional cutoff. The 99% confidence interval spans zero. The weak opposite direction is visible, and the original positive claim is not supported.
+
+## Checks performed
+
+- `scripts/validate_specs.py` passed with 6,402 spec files and clean cross-references. The 28 existing candidate policy forward-reference warnings were permitted by the validator. Syntax, roster SHA-256, manifest identities and all six pinned source byte hashes passed.
+- `python3 scripts/run_efw_legal_wipo_patenting_2026.py --verify` reproduced all eight run artifacts and the result audit byte for byte.
+- An independent pandas join from the raw Fraser panel, WIPO and WDI files reproduced exactly 1,157 rows/92 countries, 252 material-change rows/74 countries and the country/year fixed-effects fit: beta −0.13623136835067126, cluster SE 0.05844254978649638, two-sided Student t p=0.02196088644897991. Differences from the packet are floating-point rounding at approximately 1e-15.
+- The 2025 Fraser workbook's `EFW Panel Dataset` `Area 2` column and the pinned Parquet panel have the same 4,950 keys, identical missingness, and zero numeric disagreements across 4,806 observed pairs. This checks the panel's claim-source mapping without replacing the locked panel.
+
+This result is a descriptive calibration at most. Fraser Area 2 is a broad legal-system/property-rights composite, not patent-law enforcement; WIPO resident applications count filings, not grants or invention quality. The visible IESET archive informed family selection, and one-family alpha does not correct that selection. The source lock and stored result assign zero causal, policy, school, position and featured credit. Public visibility must be assessed from a regenerated registration index and evidence-tier ledger on the integrated branch; this validation memo does not grant it.
