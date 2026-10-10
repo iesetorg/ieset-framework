@@ -1,0 +1,248 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_neer_hicp_multicategory_pass_through_2026
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: +
+claim: Across twenty fixed, mutually non-nested Eurostat HICP consumer-spending groups, annual BIS nominal
+  broad effective-exchange-rate depreciation at year t is followed by higher annual-average group inflation
+  in t+1 in at least five distinct groups, each clearing the frozen effect-size, country-deletion, and
+  family-adjusted uncertainty gates, with no qualified opposite-direction group.
+methodology_note: One prospective omnibus descriptive hypothesis with twenty planned component estimates.
+  BIS nominal EER exposure values and exact Eurostat categorical COICOP/country/year keys were screened
+  before registration; no selected HICP values, null masks, or fits were opened. The 9,741-row category
+  roster is a key-only upper bound. All twenty fixed groups stay in the family denominator; no component
+  is a separate public hypothesis or graduation.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - BGR
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MLT
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SVK
+  - SVN
+  - SWE
+  period:
+  - 2002
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the immutable category-country-treatment-year key roster, exact Eurostat freq=A/unit=RCH_A_AVG,
+    the twenty frozen three-digit COICOP groups, and the 29-country crosswalk. Require the exact HICP
+    category/country/year t+1 key; no parent aggregate, alternate source, or nearby-year substitution.
+  - BIS exposure must be monthly nominal broad EER, FREQ=M/EER_TYPE=N/EER_BASKET=B, OBS_STATUS=A, with
+    twelve finite positive months in both t−1 and t. Set x=100 log(annual-mean EER at t−1 / annual-mean
+    EER at t), positive for nominal depreciation; require |x|≤15. Material exposure has |x|≥2.
+  - After the separately committed source lock, require each selected HICP outcome cell in t+1 to be finite.
+    Do not trim on outcome magnitude or assume cell-flag continuity absent from the pinned Parquet.
+  - For each component retain only countries with ten complete years and require at least 400 complete
+    cells/24 countries and 150 material-depreciation cells/22 countries. Require at least sixteen of twenty
+    components estimable for the omnibus; no interpolation, adaptive controls, category replacement, or
+    post-result country exclusion.
+variables:
+  treatment:
+  - name: bis_neer_depreciation_log_percent_t
+    source: bis:WS_EER
+    transformation: 100 times natural log of mean monthly nominal broad EER in t−1 divided by that in
+      t; positive for nominal depreciation. Each mean requires twelve positive status-A months.
+    notes: Manufacturing-trade weights do not equal the import share of each HICP group. This is not a
+      policy treatment.
+  outcome:
+  - name: twenty_coicop_hicp_annual_average_rates_t_plus_1
+    source: eurostat:prc_hicp_aind
+    transformation: Published annual-average rate of change in t+1, unit RCH_A_AVG and percentage points,
+      separately for the twenty exact COICOP groups fixed in the threshold and roster.
+    notes: Each group is a distinct three-digit household-spending category. Component estimates are planned
+      evidence for one omnibus verdict, not separate public hypotheses. Some groups include services or
+      regulated prices.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country_and_treatment_year
+  notes: For each of twenty groups separately, OLS of t+1 HICP annual-average inflation on BIS nominal
+    depreciation at t, country and treatment-year fixed effects; two-way country/year CR1 uncertainty
+    and two-sided Student t with min(G,T)−1 degrees of freedom. Frozen complete-case, exposure-concentration,
+    rank, effect-size and leave-one-country-out gates. The omnibus aggregates the twenty component classifications
+    by the prespecified five-group rule; there is one public verdict.
+falsification:
+  test: bis_neer_eurostat_goods_hicp_2026_10_10
+  rule: A component is INCONCLUSIVE if source/chronology, complete-case, material-exposure, ten-year-per-country,
+    residual-exposure concentration (top 1%≤30%, top country≤25%), rank, or two-way cluster uncertainty
+    gates fail. Component SUPPORTED iff beta≥0.04 HICP percentage points per +1 log-percentage-point depreciation,
+    two-sided p≤0.01/20, and every leave-one-country-out beta≥0.02; component REFUTED iff beta≤−0.04 with
+    the same p cutoff and every country-deletion beta≤−0.02. Otherwise component PARTIAL. Omnibus INCONCLUSIVE
+    if fewer than sixteen components are estimable; SUPPORTED if at least five components support and
+    none refutes; REFUTED if at least five refute and none supports; otherwise PARTIAL. All twenty components
+    remain in the correction denominator; only the omnibus is a public hypothesis.
+  threshold:
+    family_id: bis_neer_eurostat_goods_hicp_2026_10_10
+    family_size: 20
+    family_alpha: 0.01
+    public_hypothesis_count: 1
+    component_estimates: 20
+    p_max_two_sided_bonferroni: 0.0005
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.04
+    min_loo_beta_abs: 0.02
+    min_estimable_categories: 16
+    min_directional_categories: 5
+    min_valid_rows_per_category: 400
+    min_valid_countries_per_category: 24
+    min_material_change_rows_per_category: 150
+    min_material_change_countries_per_category: 22
+    material_depreciation_min_abs: 2.0
+    max_abs_depreciation: 15.0
+    min_complete_years_per_country: 10
+    max_top_one_percent_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.25
+    selected_coicop:
+    - CP011
+    - CP012
+    - CP021
+    - CP022
+    - CP031
+    - CP032
+    - CP045
+    - CP051
+    - CP052
+    - CP053
+    - CP054
+    - CP055
+    - CP061
+    - CP071
+    - CP072
+    - CP091
+    - CP092
+    - CP093
+    - CP095
+    - CP123
+    selected_hicp_unit: RCH_A_AVG
+    expected_key_rows_by_code:
+      CP011: 489
+      CP012: 489
+      CP021: 489
+      CP022: 489
+      CP031: 489
+      CP032: 489
+      CP045: 489
+      CP051: 489
+      CP052: 489
+      CP053: 489
+      CP054: 489
+      CP055: 489
+      CP061: 489
+      CP071: 489
+      CP072: 489
+      CP091: 489
+      CP092: 450
+      CP093: 489
+      CP095: 489
+      CP123: 489
+    expected_key_countries_by_code:
+      CP011: 29
+      CP012: 29
+      CP021: 29
+      CP022: 29
+      CP031: 29
+      CP032: 29
+      CP045: 29
+      CP051: 29
+      CP052: 29
+      CP053: 29
+      CP054: 29
+      CP055: 29
+      CP061: 29
+      CP071: 29
+      CP072: 29
+      CP091: 29
+      CP092: 27
+      CP093: 29
+      CP095: 29
+      CP123: 29
+    expected_material_key_rows_by_code:
+      CP011: 206
+      CP012: 206
+      CP021: 206
+      CP022: 206
+      CP031: 206
+      CP032: 206
+      CP045: 206
+      CP051: 206
+      CP052: 206
+      CP053: 206
+      CP054: 206
+      CP055: 206
+      CP061: 206
+      CP071: 206
+      CP072: 206
+      CP091: 206
+      CP092: 193
+      CP093: 206
+      CP095: 206
+      CP123: 206
+    roster_sha256: 9548cf5bedc596a978c471ef3b1d69c6338b4a2caffe255507def0ed26e8faa6
+    source_files:
+      neer:
+        path: data/vintages/bis/WS_EER@2026-07-23T151604Z.parquet
+        sha256: 57bbce3e22fc428c8cd8ddee8a998d273b5240a816af89e532b81d41ade35170
+        manifest: data/manifests/fetch_run_2026-07-23T151632Z.yaml
+        manifest_sha256: 1768f0d7c38c93f1ad4df591b0b1634b3460faa964f6267874b8798b7b8dbb81
+      hicp:
+        path: data/vintages/eurostat/prc_hicp_aind@2026-04-30T115920Z.parquet
+        sha256: be97a646f95e04c481c583bcde08817aaf6fc315cb7b5f1b628c735cf6a2aec4
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: This is one archive-selected, multi-endpoint descriptive question; the twenty COICOP estimates
+  share currency, commodity, tax and pricing shocks, and are not independent replications or twenty graduation
+  opportunities. Existing BIS EER to headline inflation studies are prior context. Manufacturing-trade
+  EER weights, euro-area common-currency movements, energy and food prices, excise taxes, domestic demand,
+  monetary response and quality adjustment can confound or mute group prices. The local Bonferroni rule
+  does not correct archive-wide selection. No causal, policy, school-score, position or featured credit.
+steelman: hypotheses/steelman/bis_neer_hicp_multicategory_pass_through_2026.md
+scope:
+  period:
+  - 2002
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - inflation
+  policy_family: []
+  treatment_tags:
+  - nominal_effective_exchange_rate
+  - currency_depreciation
+  - coicop_goods_groups
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
