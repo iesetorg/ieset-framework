@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: owid_conflict_life_expectancy_four_year_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: Across fixed nonoverlapping four-year country windows, recorded state-based conflict during the
+  window coincides with a smaller change in life expectancy at birth from its start to its end, conditional
+  on baseline outcome, prior recorded conflict, country effects, and window effects.
+methodology_note: Eight-cell retrospective descriptive family. The source-key roster and full family denominator
+  were fixed before any selected outcome values or null masks were opened for this family. Existing IESET
+  conflict and some outcome analyses were visible; the local family correction does not adjust corpus-wide
+  selection. Registration, then a separate exact source lock, must precede measurement.
+evidence_type: associational
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 1995
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the committed case-specific ISO3 and anchor roster is eligible; anchors are 1995, 1999, 2003,
+    2007, 2011, 2015, and 2019.
+  - For every row, all eight recorded annual conflict-count category vectors from t-3 through t+4 must
+    be complete, finite, nonnegative integers no greater than 100 per category. Missing counts never become
+    zero.
+  - Outcome endpoints at exact t and t+4 must be finite and pass the predeclared bounds or positivity
+    and status rules. No interpolation, winsorization, country replacement, or vintage switching.
+  - UNDP life expectancy must be finite within [20,100] years at both endpoints.
+  - Retain only countries with at least four complete windows, and apply all frozen sample, switching,
+    influence, rank, and uncertainty gates before verdict.
+variables:
+  treatment:
+  - name: any_state_based_conflict_window
+    source: owid:number-of-state-based-conflicts
+    transformation: Binary one if the sum of the four recorded state-based conflict categories in t+1
+      through t+4 is positive; otherwise zero. This is a contemporaneous descriptive exposure, not a policy
+      treatment.
+  outcome:
+  - name: life_expectancy_four_year_change
+    source: undp_hdi:life_expectancy
+    transformation: Exact t+4 minus t life expectancy, in years.
+  controls:
+  - name: baseline_outcome_transformed
+    source: undp_hdi:life_expectancy
+    transformation: Outcome transformed value at t, using the same fixed transform as the change.
+  - name: prior_conflict_log1p_count
+    source: owid:number-of-state-based-conflicts
+    transformation: Log(1 + sum of all four conflict categories during t-3 through t).
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - four_year_anchor
+  clustering: country
+  notes: One OLS conflict coefficient per endpoint with baseline transformed outcome and prior log conflict
+    count, country and anchor fixed effects. CR1 country-cluster standard error and two-sided Student
+    t(G-1). No causal interpretation.
+falsification:
+  rule: INCONCLUSIVE if any frozen completeness, country, window, exposure, switching, influence, rank,
+    or uncertainty gate fails. Otherwise a coefficient in the predicted direction with absolute magnitude
+    at least the case threshold and two-sided p at most 0.00125 SUPPORTS; a coefficient of the opposite
+    sign meeting the same magnitude and p REFUTES; all other estimable results are PARTIAL. All eight
+    cells remain in the denominator even if archived.
+  test: owid_conflict_multidomain_four_year_2026_10_10
+  threshold:
+    family_id: owid_conflict_multidomain_four_year_2026_10_10
+    family_size: 8
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00125
+    min_complete_rows: 450
+    min_complete_countries: 70
+    min_anchors: 5
+    min_rows_per_country: 4
+    min_conflict_rows: 70
+    min_conflict_countries: 20
+    min_no_conflict_rows: 150
+    min_no_conflict_countries: 60
+    min_within_country_switchers: 25
+    max_top_one_percent_residual_x_share: 0.25
+    max_one_country_residual_x_share: 0.15
+    max_one_anchor_residual_x_share: 0.25
+    key_roster_sha256: 8046e224ad39cb787ff95416ab5d3c3ab0714ce02e3e4a7b79bae6df485d831d
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+    meaningful_beta_min_abs: 0.2
+    expected_beta_sign: '-'
+    expected_key_rows: 1351
+    expected_key_countries: 193
+    source_files:
+      conflict:
+        publisher: owid
+        series_id: number-of-state-based-conflicts
+        path: data/vintages/owid/number-of-state-based-conflicts@2026-04-30T114446Z.parquet
+        sha256: f79099534287e0b42d93b9ab622eec5e0d8d47c02eebd5dbf79f40138f8f3885
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+      life:
+        publisher: undp_hdi
+        series_id: life_expectancy
+        path: data/vintages/undp_hdi/life_expectancy@2026-05-05T204045Z.parquet
+        sha256: 13b99319b8b1a2be96f0774dfd67104e2b7a41b4ca176bf43486b65ff99f43cb
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+prior_confidence: 0.55
+disclosure: Conflict timing, reporting, displacement, co-occurring economic shocks, reconstruction, and
+  baseline trends can confound every association. Some source series were previously analyzed in IESET.
+  These eight locally corrected records are descriptive calibrations only, with zero causal, policy, school,
+  position, or featured credit. Output correlations are not eight independent intervention tests.
+steelman: hypotheses/steelman/owid_conflict_life_expectancy_four_year_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+scope:
+  period:
+  - 1995
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags: []
