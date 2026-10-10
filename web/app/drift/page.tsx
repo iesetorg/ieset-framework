@@ -358,10 +358,11 @@ export default async function DriftPage() {
           </h2>
           <p className="mb-4 max-w-[850px] text-[13.5px] leading-[1.55] text-muted">
             These national policy records extend the map&apos;s historical context.
-            They are linked below and marked on the main chart as policy-only years.
-            The drift score starts with authored movements in {data.year_min};
-            no value is assigned to the earlier interval. Each card shows
-            its review status. <Link href="/policy-browser/" className="text-accent hover:underline">Browse the policy database</Link>.
+            Dashed markers use each record&apos;s start year; enactment and effective
+            dates appear on the cards because some rules began later. The drift
+            score starts with authored movements in {data.year_min}; no value is
+            assigned to the earlier interval. Each card shows its review status.
+            <Link href="/policy-browser/" className="text-accent hover:underline">Browse the policy database</Link>.
           </p>
           <ol className="grid gap-3 md:grid-cols-3">
             {historicalPolicies.map((policy) => (
@@ -375,6 +376,13 @@ export default async function DriftPage() {
                 <div className="mt-1 text-[11px] text-muted">
                   policy only · {policy.status} · {policy.countries.map(countryName).join(", ")}
                 </div>
+                {(policy.timeframe.enacted_date || policy.timeframe.effective_date) && (
+                  <div className="mt-1 text-[11px] text-muted">
+                    {policy.timeframe.enacted_date && `Enacted ${policy.timeframe.enacted_date}`}
+                    {policy.timeframe.enacted_date && policy.timeframe.effective_date && " · "}
+                    {policy.timeframe.effective_date && `Effective ${policy.timeframe.effective_date}`}
+                  </div>
+                )}
               </li>
             ))}
             <li className="border-l-2 border-accent bg-panel p-3">
@@ -619,7 +627,7 @@ export default async function DriftPage() {
           years={data.years}
           historicalPolicyYears={historicalPolicyYears}
           caption={historicalPolicyYears.length > 0
-            ? `Dashed markers show cited policy-only years before ${data.year_min}. No country line or drift value is plotted for those years.`
+            ? `Dashed markers show cited policy start years before ${data.year_min}. Cards distinguish enactment from effective dates. No country line or drift value is plotted for those years.`
             : undefined}
           seriesStarts={Object.fromEntries(
             Object.entries(driftData.countries)
