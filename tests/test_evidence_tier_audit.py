@@ -132,6 +132,19 @@ def test_frozen_geographic_holdouts_have_external_zero_school_credit():
         assert spec["linked_hypotheses"] == []
 
 
+def test_epl_duration_holdout_is_public_calibration_with_zero_school_credit():
+    hypothesis_id = "oecd_epl_2023_eurostat_longterm_unemployment_2025_v2"
+    path = ROOT / "hypotheses" / "labour" / f"{hypothesis_id}.yaml"
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["registration_status"] == "verified"
+    assert record["verdict_bucket"] == "partial"
+    assert record["public_visible"] is True
+    assert record["tier"] == "calibration"
+    assert record["school_score_eligible"] is False
+    assert record["scoreboard_weight_cap"] == 0.0
+    assert record["exclusion_reasons"] == []
+
+
 def test_school_score_exclusion_registry_fails_closed(tmp_path):
     path = tmp_path / "exclusions.json"
     with pytest.raises(FileNotFoundError):
