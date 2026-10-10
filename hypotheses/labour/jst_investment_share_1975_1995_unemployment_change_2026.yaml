@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_investment_share_1975_1995_unemployment_change_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '-'
+claim: Within the fixed 18 advanced JST R6 economies during 1975–1995, a larger investment-to-GDP share
+  at four fixed anchors predicts lower unemployment-rate change over the next five-year window after country
+  and anchor effects. This is a descriptive predictive association, not a causal investment or policy
+  effect.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  period:
+  - 1975
+  - 1995
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only anchors [1975, 1980, 1985, 1990] and fixed t through t+5 windows in the 18 named countries.
+    Require all 450 family source keys in exact JST R6; no replacement years, countries, or vintage.
+  - At t require finite JST iy in [0,1], then compute investment share=100*iy[t]. Require finite unemployment
+    rates in [0,100] at both endpoints. Remove invalid country-anchors without replacement; other outcome
+    fields do not determine this cell sample.
+  - Retain only countries with at least three of four complete anchors. Require 12 countries, 48 country-anchors,
+    and 10 countries at each anchor. No trimming, winsorization, imputation, or data-dependent era changes.
+variables:
+  treatment:
+  - name: investment_share_pct_gdp
+    source: jst:R6.iy
+    transformation: 100*iy[t]
+    notes: Observed investment-to-GDP ratio at the fixed anchor, measured in percentage points of GDP;
+      this is not an intervention.
+  outcome:
+  - name: unemployment_change
+    source: jst:R6.unemp
+    transformation: unemp[t+5]-unemp[t]
+    notes: The fixed future five-year response is measured in percentage points. This is a separate series
+      from the other family outcomes.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - anchor
+  clustering: country
+  notes: Estimate one OLS slope for the specified five-year response on anchor-year investment-share percentage
+    points, with country and anchor intercepts. Use CR1 finite-sample country-cluster standard error and
+    two-sided t(G-1). Report every country-deletion slope. No controls, weights, alternative anchors,
+    horizons, sample selection, or model choice. Fixed twenty-test Holm adjustment includes gated cells
+    as p=1.
+falsification:
+  test: jst_investment_share_1975_1995_unemployment_change_frozen_family
+  rule: Require unchanged first-commit registration valid against its own schema, then twenty later separately
+    committed metadata-only source locks and the exact source/key roster. INCONCLUSIVE if this cell fails
+    completeness, rank, finite variance, residualized investment-share SD >=0.5 pp, residualized outcome
+    SD >=0.1 pp, maximum country share of residualized investment exposure sum of squares <=25%, or any
+    country-deletion fit. Once valid, SUPPORTED requires a slope in the predicted direction of at least
+    0.25 outcome pp per one pp investment share, Holm-adjusted two-sided p<=0.05 over all twenty cells,
+    and every country-deletion slope in the predicted direction. REFUTED requires the same magnitude and
+    Holm threshold in the opposite direction and all deletion slopes opposite. Other valid cells are PARTIAL.
+    No causal, policy, school, position, or featured credit.
+  threshold:
+    family_id: jst_investment_share_future_living_standards_five_eras_2026_10_10
+    family_size: 20
+    holm_alpha: 0.05
+    minimum_abs_beta_outcome_pp_per_investment_pp: 0.25
+    minimum_countries: 12
+    minimum_country_anchors: 48
+    minimum_anchors_per_country: 3
+    minimum_countries_per_anchor: 10
+    minimum_residual_investment_sd_pp: 0.5
+    minimum_residual_outcome_sd_pp: 0.1
+    maximum_country_investment_ss_share: 0.25
+    era: '1975_1995'
+    anchors:
+    - 1975
+    - 1980
+    - 1985
+    - 1990
+    outcome: unemployment_change
+    predicted_sign: -1
+prior_confidence: 0.3
+disclosure: Investment share may respond to anticipated growth, finance, and policy; dividing by GDP also
+  creates denominator effects. Country and anchor effects do not remove changing domestic or global conditions.
+  GDP and consumption measures correlate but use distinct source series; all four outcomes share countries
+  and macro shocks. These twenty cells form one family, not independent replications. Five-year response
+  intervals share endpoints within eras. Pre-1914 and interwar measurement/war disruption can fail the
+  frozen gates. Earlier term-spread work used iy as an outcome, not this exposure; its aggregate outcome
+  results were previously seen, but no selected values or null masks for this exposure test were opened
+  before registration.
+methodology_note: The source, registration-schema chronology, fixed twenty-cell family, Holm denominator,
+  keys, statistical gates, and replay are frozen in engine/audits/jst_investment_share_source_plan_2026.md.
+  No selected JST investment-share exposure values, outcome values, or their missingness were opened before
+  first registration.
+scope:
+  period:
+  - 1975
+  - 1995
+  countries:
+  - AUS
+  - BEL
+  - CAN
+  - CHE
+  - DEU
+  - DNK
+  - ESP
+  - FIN
+  - FRA
+  - GBR
+  - IRL
+  - ITA
+  - JPN
+  - NLD
+  - NOR
+  - PRT
+  - SWE
+  - USA
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags:
+  - historical_investment_share
+steelman: hypotheses/steelman/jst_investment_share_1975_1995_unemployment_change_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: One fixed cell in a twenty-test descriptive investment-share family; do not count cells as independent
+  replications.
