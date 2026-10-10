@@ -194,3 +194,28 @@ def test_jst_trade_is_public_descriptive_calibration_with_zero_school_credit():
     old_record = evidence_tiers.build_record(old_path, evidence_tiers.registration_rows())
     assert old_record["public_visible"] is False
     assert old_record["tier"] == "archive"
+
+
+def test_acs_teen_non_alabama_v2_is_partial_zero_school_calibration():
+    hypothesis_id = "us_state_minimum_wage_bite_teen_employment_non_alabama_2026_v2"
+    path = ROOT / "hypotheses" / "labour" / f"{hypothesis_id}.yaml"
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["registration_status"] == "verified"
+    assert record["verdict_bucket"] == "partial"
+    assert record["public_visible"] is True
+    assert record["tier"] == "calibration"
+    assert record["school_score_eligible"] is False
+    assert record["scoreboard_weight_cap"] == 0.0
+    assert record["exclusion_reasons"] == []
+
+
+def test_original_acs_teen_roster_stays_archived_after_prelock_peek():
+    hypothesis_id = "us_state_minimum_wage_bite_teen_employment_2026"
+    path = ROOT / "hypotheses" / "labour" / f"{hypothesis_id}.yaml"
+    record = evidence_tiers.build_record(path, evidence_tiers.registration_rows())
+    assert record["registration_status"] == "registered_no_run"
+    assert record["public_visible"] is False
+    assert record["tier"] == "archive"
+    assert record["school_score_eligible"] is False
+    assert record["scoreboard_weight_cap"] == 0.0
+    assert "external_integrity_quarantine" in record["exclusion_reasons"]
