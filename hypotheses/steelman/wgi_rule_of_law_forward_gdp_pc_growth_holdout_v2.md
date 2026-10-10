@@ -1,0 +1,5 @@
+# Steelman: Five-year real GDP per person growth in the disjoint rule-of-law cohort
+
+The strongest narrow prediction is that a higher WGI rule-of-law rating at the start of a fixed five-year window precedes better five-year real gdp per person growth within a country, after common block shocks and pre-existing income, capital formation, trade and demographics. The old 60-country study and a second market-order panel cannot supply independent evidence for this new geography; their countries are excluded.
+
+The strongest rival explanation is that WGI ratings react to economic prospects and broad administrative capacity, while investment and growth share common shocks. Government effectiveness is correlated with rule of law and is reported as a fixed sensitivity, but it cannot identify an institutional treatment. Weak within-country variation, missing data, or a few influential countries can invalidate the test. A passing result is descriptive calibration, never a causal policy or school verdict.

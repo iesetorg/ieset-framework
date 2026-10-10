@@ -1,0 +1,282 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wgi_rule_of_law_forward_gdp_pc_growth_holdout_v2
+version: 1
+status: pre_registered
+topic: institutional_quality
+claim: In 131 countries excluded from both prior rule-of-law growth panels, stronger
+  WGI rule of law at the start of a five-year block predicts faster subsequent annualized
+  real GDP-per-person growth, conditional on starting income, investment share, trade
+  share, dependency ratio, country effects, and block-year effects.
+claim_direction: +
+methodology_note: Prospective new-ID geographic holdout of the distinct five-year
+  real gdp per person growth endpoint in archived rule_of_law_institutional_growth.
+  Its old same-commit run was PARTIAL with an effectively zero generic coefficient;
+  the separate market_order_rule_of_law_gdp_pc_growth_panel was also PARTIAL. Both
+  country rosters are entirely excluded. A single two-outcome family is registered
+  before selected outcome magnitudes or null masks are read; shared treatment, period
+  and countries do not create two independent institutional replications. Only descriptive
+  calibration is possible.
+evidence_type: associational
+sample:
+  countries:
+  - AFG
+  - AGO
+  - AND
+  - ARE
+  - ARM
+  - ATG
+  - AZE
+  - BDI
+  - BEN
+  - BFA
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COM
+  - CPV
+  - CUB
+  - CYP
+  - DJI
+  - DMA
+  - DOM
+  - DZA
+  - ECU
+  - ERI
+  - FJI
+  - FSM
+  - GAB
+  - GEO
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRD
+  - GTM
+  - GUY
+  - HND
+  - HRV
+  - HTI
+  - IRN
+  - IRQ
+  - ISL
+  - JAM
+  - JOR
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LIE
+  - LKA
+  - LSO
+  - LUX
+  - MCO
+  - MDA
+  - MDG
+  - MDV
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - NAM
+  - NER
+  - NIC
+  - NPL
+  - NRU
+  - OMN
+  - PAN
+  - PLW
+  - PNG
+  - PRK
+  - PRY
+  - QAT
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - SSD
+  - STP
+  - SUR
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUV
+  - TZA
+  - UGA
+  - UZB
+  - VCT
+  - VEN
+  - VUT
+  - WSM
+  - YEM
+  - ZMB
+  - ZWE
+  period:
+  - 2002
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - Only the 131 listed country codes qualify. All 60 countries from rule_of_law_institutional_growth
+    and all 53 from market_order_rule_of_law_gdp_pc_growth_panel are excluded; their
+    union is 62. Fourteen territorial or nonuniform geographies are also excluded
+    before selected values are read.
+  - Use only non-overlapping treatment years t=2002, 2007, 2012, 2017 and exact five-year
+    windows t+1 through t+5. Do not interpolate, forward-fill, alter block endpoints,
+    or select alternate vintages.
+  - Require finite treatment and controls at t; positive finite real GDP per person
+    at t; at least three complete blocks per country for the specified outcome. No
+    post-result sample changes.
+variables:
+  outcome:
+  - name: annualized_real_gdp_pc_log_growth_next_five_years
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: 100*(ln(real GDP per person at t+5)-ln(real GDP per person at
+      t))/5, percentage points per year; both endpoints required
+  treatment:
+  - name: rule_of_law_t
+    source: wgi:RL.EST
+    transformation: published WGI rule-of-law estimate at block start t; higher means
+      stronger rule of law
+  controls:
+  - name: log_real_gdp_pc_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per person at t
+  - name: investment_share_t
+    source: world_bank_wdi:NE.GDI.TOTL.ZS
+    transformation: published gross capital formation share of GDP at t
+  - name: trade_share_t
+    source: world_bank_wdi:NE.TRD.GNFS.ZS
+    transformation: published trade share of GDP at t
+  - name: dependency_ratio_t
+    source: world_bank_wdi:SP.POP.DPND
+    transformation: published age-dependency ratio at t
+  - name: government_effectiveness_sensitivity_t
+    source: wgi:GE.EST
+    transformation: published WGI government effectiveness at t; sensitivity estimator
+      only, not a primary-model control
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS with country and block-start-year fixed effects and country-clustered
+    uncertainty. Sole primary term is rule_of_law_t. Fit one sensitivity with WGI
+    government effectiveness added to the same primary sample, reporting attenuation,
+    but do not use it to select a verdict. Do not replace a failed primary fit with
+    a pooled model.
+falsification:
+  rule: INCONCLUSIVE if fewer than 280 complete non-overlapping blocks or 80 countries
+    with at least three blocks survive, if the primary coefficient/clustered uncertainty
+    is nonfinite or unidentified, if fewer than 50 countries have a within-sample
+    rule-of-law range of at least 0.05 WGI units, or if any one country supplies over
+    15 percent of residualized within-country/year treatment variation. Otherwise
+    SUPPORTED only for a positive primary coefficient with two-sided country-clustered
+    p<=0.025; REFUTED only for a negative coefficient with p<=0.025; otherwise PARTIAL.
+    The two registered endpoints form one Bonferroni family (family-wise alpha<=0.05).
+    Only measured associational calibration can receive public visibility.
+  test: wgi_rule_of_law_forward_gdp_pc_growth_holdout_v2
+  threshold:
+    expected_sign: +
+    family_id: wgi_rule_of_law_five_year_geographic_holdout_2026_10_10
+    family_size: 2
+    family_alpha_max: 0.05
+    p_max: 0.025
+    min_blocks: 280
+    min_countries: 80
+    min_blocks_per_country: 3
+    min_countries_with_treatment_range_0_05: 50
+    max_country_residualized_treatment_share: 0.15
+    treatment_years:
+    - 2002
+    - 2007
+    - 2012
+    - 2017
+    horizon_years: 5
+    source_files:
+      rule_of_law:
+        path: data/vintages/wgi/RL.EST@2026-04-30T114245Z.parquet
+        sha256: 63d71d06668ef8e8cff186d11bb9ca948e8ae82b857bf31e1cbb122ae847c91d
+      government_effectiveness:
+        path: data/vintages/wgi/GE.EST@2026-04-30T114242Z.parquet
+        sha256: 607d47979340b803fec2fefc1e57c94a7a167432317451ea0b1ade3ee0503edc
+      gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      fixed_capital_growth:
+        path: data/vintages/world_bank_wdi/NE.GDI.FTOT.KD.ZG@2026-04-30T115006Z.parquet
+        sha256: f1663f73b7b672e2f7d7c2b0fd3d1c69a3d6d47374b45790431f3d318f30193c
+      investment_share:
+        path: data/vintages/world_bank_wdi/NE.GDI.TOTL.ZS@2026-05-05T194659Z.parquet
+        sha256: 5af7e3925e0397c25f5d449d957cece92e0e01b1aaf0056377e4bea24fd8742c
+      trade_share:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+      dependency_ratio:
+        path: data/vintages/world_bank_wdi/SP.POP.DPND@2026-04-30T115149Z.parquet
+        sha256: 55e8f700801c26542bc91239571687d0a8219db7cdc2e93c4cf38ad136d1953d
+prior_confidence: 0.4
+disclosure: Earlier rule-of-law/growth results were known before this registration.
+  WGI rule of law is a governance perception index, not a randomized reform; faster
+  growth can improve WGI ratings, and shared determinants may affect both. Non-overlapping
+  blocks, a disjoint country roster, controls and fixed effects do not establish causality.
+  The capital-formation endpoint is total rather than private investment. Two endpoints
+  share one family and cannot be counted as independent evidence for the broad old
+  claim.
+steelman: hypotheses/steelman/wgi_rule_of_law_forward_gdp_pc_growth_holdout_v2.md
+scope:
+  period:
+  - 2002
+  - 2022
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - gdp_growth
+  policy_family:
+  - institutional_reform
+  treatment_tags:
+  - rule_of_law
+  - five_year_forward
+  - geographic_holdout
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
