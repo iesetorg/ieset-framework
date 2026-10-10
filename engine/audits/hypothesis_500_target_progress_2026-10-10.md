@@ -2,8 +2,8 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current live evidence
-gate reports **480 public of 2,026 hypotheses**: 51 featured and 429 calibration.
-This is **108 additional** and leaves **392** to target. The 226 verified
+gate reports **484 public of 2,030 hypotheses**: 51 featured and 433 calibration.
+This is **112 additional** and leaves **388** to target. The 226 verified
 archives remain archived. A public calibration is a completed, reviewable test,
 not a supported, causal, policy-effect, or school-score finding.
 
@@ -58,6 +58,30 @@ directional result. Neither is a programme or immigration-policy effect;
 school, policy, causal, and featured credit remain zero. See
 `engine/audits/labour_gap_family_result_2026-10-10.md`.
 
+The two-test WDI business-registration/tourism family against OECD youth
+employment was registered in `6a44ffa419e9f894bbecadfff2f8620ab9ef46d7`, source-locked in `208634557af960bc2675dd03fa9ef746e378ad8b`, and
+measured in `57315d3b79f358c3b7189a4723851776309c7214`. Business registrations returned **PARTIAL**
+(beta +3.03155 youth-employment points per log change, p=0.005935; 489
+pairs/45 countries), missing the two-test p≤0.005 cutoff. Tourism arrivals
+returned a descriptive **SUPPORTED** association (beta +3.38566, p=0.003253;
+564 pairs/50 countries) under the frozen sample, practical-magnitude, and
+family-significance gates. Both are public calibrations with zero causal,
+policy, school, and featured credit. A post-result leave-one-country check
+kept the tourism coefficient positive in all 50 refits, while four omissions
+crossed the primary p≤0.005 cutoff; it does not alter the frozen verdict. See
+`engine/audits/tourism_youth_employment_leave_one_country_2026-10-10.md`.
+
+The two-test WDI real-GDP-growth family against Eurostat EU-SILC employed and
+employee in-work-poverty-rate changes was registered in `bc1c7b551e2860e0ddae2c55eb75b3ee4b8841c7`,
+source-locked in `297098acf9fb974cf13d3e7a6e046a75c09dad95`, and measured in `1845d7c2ac76b45d3ec1f4b58bdf14e255b080d1`. Both passed their
+sample and material-exposure floors but returned **PARTIAL**: all employed
+beta +0.0299563 poverty points per GDP-growth point (p=0.259448; 383
+pairs/30 countries), and employees beta +0.0416935 (p=0.170615; 298
+pairs/30 countries). The selected vintage lacks break flags; Ireland and the
+United Kingdom were excluded for income-reference-period exceptions. Neither
+supports a GDP-policy effect, and both have zero causal, policy, school, and
+featured credit.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -84,27 +108,39 @@ do not confer empirical support. See
 `engine/audits/euro_schengen_axis_timing_corrections_2026-10-10.md`, and
 `engine/audits/uk_revenue_act_1869_policy_gap_2026-10-10.md`.
 
+Finland correction `0811718366e3d5227347072564e1c724aff3113f` put the principal compulsory-education
+extension in August 2021, the family-leave entitlement in August 2022, and
+the climate and gas-supply steps at their documented 2022 dates. It removed
+unsupported axes and a permanent 2019 fiscal-spending step based on a
+temporary pandemic spike. All 30 changed derived country-year rows belong
+to Finland; see
+`engine/audits/finland_policy_drift_source_correction_2026-10-10.md`.
+
 ## Remaining work and source boundary
 
 A fresh archive review found **no same-ID conversion** that clears its current
-frozen specification with local data. In particular, the pinned Canada 2025
-GDP-per-person holdout has no 2025 values, and a candidate Anglo money series
-has no Canadian 2019–2024 values. Bulk event multiplication is also unsupported:
-the current registry has **3,373** policies, but only **5** are ready for a
-comparative event design, **3,352** need treated/comparison unit coding, and
-**1,309** need exact event dates. A WHO particulate-matter/chronic-outcome lead
-was rejected before registration because its short modeled window and
-concentrated exposure leave a weak test. WHO/JMP annual urban-sanitation and
-UNDP annual expected-schooling change designs were also rejected before
-registration because the selected vintages cannot identify independently
-measured annual changes at the required country-years. A WDI business-
-registration/tourism to OECD youth-employment pair is under key-only design
-review and **not counted**. The 1,320 legacy same-commit registrations cannot
-become strict by renaming old results; new source-pinned holdouts would need
-separate v2 registrations and measured runs.
+frozen specification with local data. Among 1,320 legacy same-commit pairs,
+only 203 have complete old source pins, and just 22 have any confirmed added
+raw calendar year in a later preserved vintage; those counts are upper bounds,
+not ready conversions. See
+`engine/audits/legacy_archive_v2_readiness_2026-10-10.md`. In particular,
+the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
+candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
+multiplication is also unsupported: the current registry has **3,373**
+policies, but only **7** have a comparative-design-ready structure, **3,350**
+need treated/comparison unit coding, and **1,308** need exact event dates.
+Those seven still require outcome data and design verification before any
+causal estimate. A WHO particulate-matter/chronic-outcome lead was rejected
+before registration because its short modeled window and concentrated
+exposure leave a weak test. WHO/JMP annual urban-sanitation and UNDP annual
+expected-schooling change designs were also rejected before registration
+because the selected vintages cannot identify independently measured annual
+changes at the required country-years. The 1,320 legacy same-commit
+registrations cannot become strict by renaming old results; new source-pinned
+holdouts would need separate v2 registrations and measured runs.
 
 Generated preregistration, evidence, census, conversion-funnel, school,
-second-order, and policy indexes were refreshed after the eight new results
+second-order, and policy indexes were refreshed after the twelve new results
 and policy corrections. Publication remains on hold: this local branch history
 contains an older rejected, path-bearing source manifest followed by a
 revert. No push, merge, or deployment is authorized by these local audits.

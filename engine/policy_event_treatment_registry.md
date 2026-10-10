@@ -5,14 +5,14 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 ## Summary
 
 - Policies indexed: 3373
-- Policies with explicit evaluation_design: 21
-- Policies with exact event, enacted, or first-application dates: 2064
-- Policies ready for comparative event design: 5
+- Policies with explicit evaluation_design: 23
+- Policies with exact event, enacted, or first-application dates: 2065
+- Policies ready for comparative event design: 7
 - Policies ready for triple-difference structure: 1
-- Timing status counts: `{"effective_date_only": 22, "enacted_date_only": 2025, "event_dated": 17, "event_month_dated": 3, "year_period_only": 1306}`
-- Comparison structure counts: `{"axis_only_no_unit_split": 3366, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 6}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 7, "needs_comparison_unit_detail": 14, "needs_exact_event_dates": 1309, "needs_treated_and_comparison_unit_coding": 3352}`
-- Axis source readiness: `{"partial_ready": 44644, "proprietary_gap": 6702, "ready": 3340, "reconstruct_needed": 19025, "scrape_needed": 14081}`
+- Timing status counts: `{"effective_date_only": 22, "enacted_date_only": 2024, "event_dated": 19, "event_month_dated": 3, "year_period_only": 1305}`
+- Comparison structure counts: `{"axis_only_no_unit_split": 3364, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 9, "needs_comparison_unit_detail": 14, "needs_exact_event_dates": 1308, "needs_treated_and_comparison_unit_coding": 3350}`
+- Axis source readiness: `{"partial_ready": 44630, "proprietary_gap": 6700, "ready": 3339, "reconstruct_needed": 19019, "scrape_needed": 14076}`
 
 ## Ready Design Seeds
 
@@ -23,6 +23,8 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `hu_price_caps_fuel_food_2021_2023` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, border_comparison, high_frequency_event_study, welfare_accounting, distributional_decomposition, ... | known_microdata_gaps_declared |
 | `us_nixon_wage_price_controls_1971` | candidate | event_dated | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, high_frequency_event_study, welfare_accounting, distributional_decomposition, quality_margin, ... | known_microdata_gaps_declared |
 | `us_oil_price_controls_1973_1981` | candidate | enacted_date_only | declared_treated_comparison_design | controlled_vs_uncontrolled_categories, adjacent_market_comparison, high_frequency_event_study, welfare_accounting, distributional_decomposition, ... | known_microdata_gaps_declared |
+| `fi_compulsory_education_extension_2021` | candidate | event_dated | declared_treated_comparison_design | eligible_vs_ineligible_groups, phase_in_or_threshold_comparison | known_microdata_gaps_declared |
+| `fi_family_leave_reform_2022` | candidate | event_dated | declared_treated_comparison_design | eligible_vs_ineligible_groups, phase_in_or_threshold_comparison | known_microdata_gaps_declared |
 
 ## Treatment Coding Queue
 
