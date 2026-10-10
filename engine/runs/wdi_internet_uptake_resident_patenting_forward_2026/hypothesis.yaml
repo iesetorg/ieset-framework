@@ -1,0 +1,208 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_internet_uptake_resident_patenting_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Across the fixed 35-country European panel, faster internet-use uptake over
+  t-2 to t predicts a higher change from t to t+2 in log(1 + WIPO-origin resident
+  patent applications per million residents).
+methodology_note: New-ID prospective descriptive calibration in a selected two-test
+  family. The earlier business-enterprise R&D/resident-patent result and older related
+  candidates were visible before this family was designed. High-tech export share
+  was rejected after treatment-only concentration screening; no patent values or null
+  masks guided selection. A committed registration, then separate hash-checked source
+  lock, must precede outcome access. Two-sided family p<=0.005 is local and does not
+  correct archive-wide adaptive search.
+evidence_type: associational
+sample:
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MKD
+  - MLT
+  - MNE
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  period:
+  - 1998
+  - 2017
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the 35 listed ISO3 countries and exact treatment t, patent/population
+    t and t+2, and real-income t calendar-year keys in the frozen key roster.
+  - Require at least five complete t years per retained country; no imputation, country
+    replacement, outcome-dependent roster changes, or vintage switch.
+  - Retain only finite nonnegative resident patent counts, positive finite population
+    and real income, and blank/null WDI observation-status codes at required endpoints.
+  - Require IT.NET.USER.ZS to be finite within [0,100] and blank/null status at t-2
+    and t.
+  - Outcome ends in 2019, before the COVID-19 disruption; the 2008-09 financial crisis
+    remains a potential common shock.
+variables:
+  outcome:
+  - name: resident_patent_applications_per_million_log_change_t2
+    source: wipo:patent_applications_resident
+    transformation: log(1 + 1,000,000 * resident application count / WDI de facto
+      population) at exact t+2 minus the same at t.
+  treatment:
+  - name: internet_users_share_two_year_percentage_point_change
+    source: world_bank_wdi:IT.NET.USER.ZS
+    transformation: WDI IT.NET.USER.ZS percentage-point change from exact t-2 to t,
+      both endpoints normal-status and within [0,100].
+  controls:
+  - name: baseline_log_resident_patents_per_million
+    source: wipo:patent_applications_resident
+    transformation: log(1 + resident applications per million) at t, using WDI population.
+  - name: log_real_gdp_per_capita_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive constant-2015-dollar GDP per capita at
+      t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One predeclared OLS coefficient on this case exposure, adjusting for baseline
+    log patent intensity and log real income at t, plus country and treatment-year
+    effects. Country-cluster CR1 uncertainty uses Student t with G-1 degrees of freedom.
+    No model search or post-result covariate dropping.
+falsification:
+  rule: INCONCLUSIVE if fewer than 400 complete rows, 25 countries, five complete
+    years per retained country, 150 material rows or varying countries, or 20 material
+    countries survive; also if post-complete-case residual exposure concentration
+    exceeds 30% for the top 1% of rows or one country, the model is rank deficient,
+    or clustered uncertainty is nonfinite. Otherwise a positive beta of at least 0.005
+    at two-sided p<=0.005 SUPPORTS the narrow descriptive association; an opposite
+    beta of at least that magnitude REFUTES; every other estimable result is PARTIAL.
+    Both tests count even if one is inconclusive.
+  test: internet_public_rd_resident_patenting_2026_10_10
+  threshold:
+    family_id: internet_public_rd_resident_patenting_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.005
+    min_complete_rows: 400
+    min_complete_countries: 25
+    min_years_per_country: 5
+    material_exposure_min: 5.0
+    min_material_rows_or_varying_countries: 150
+    min_material_countries: 20
+    max_top_one_percent_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.3
+    expected_key_rows: 684
+    expected_key_countries: 35
+    roster_sha256: 4b548bc4e78a5221a0b8079656eb8f61d152e404d97eaf385033f2bdb817d18f
+    source_files:
+      internet:
+        path: data/vintages/world_bank_wdi/IT.NET.USER.ZS@2026-05-05T203400Z.parquet
+        sha256: c17944e3e8ef15a5c5663e281389ad5bcc1398ae3769258c75f545f37b216cb8
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      patents:
+        path: data/vintages/wipo/patent_applications_resident@2026-05-19T094854Z.parquet
+        sha256: 8affaee11a397d965f73eda762d0b3416bc341b7485e6197745700a1dd3bf24e
+        manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+        manifest_sha256: cf2f7e75af5612b302af7fbb0479c196598aa060c20f858723108a8c95455de4
+      population:
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.4
+disclosure: Descriptive calibration only. Patent applications are filings, not invention
+  quality, domestic value, or welfare. The temporal ordering, fixed effects, and controls
+  do not establish effects of internet access, R&D programmes, or any policy. The
+  local family correction does not cover prior corpus-wide selection or provide independent
+  replication. Zero causal, policy, position, featured, and school-score credit.
+steelman: hypotheses/steelman/wdi_internet_uptake_resident_patenting_forward_2026.md
+scope:
+  period:
+  - 1998
+  - 2017
+  countries:
+  - AUT
+  - BEL
+  - BGR
+  - CHE
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IRL
+  - ISL
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MKD
+  - MLT
+  - MNE
+  - NLD
+  - NOR
+  - POL
+  - PRT
+  - ROU
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []

@@ -1,0 +1,108 @@
+packet_version: 1
+generated_utc: '2026-10-10T00:56:12+00:00'
+hypothesis:
+  id: eurostat_public_rd_resident_patenting_forward_2026
+  path: hypotheses/growth/eurostat_public_rd_resident_patenting_forward_2026.yaml
+  topic: growth
+preregistration:
+  spec_commit: 54632a7f60b7a5781f6048d59582829e137bf279
+  source_lock_commit: 38fc024b233ed4565c292bf84927bae44f238c31
+  family_id: internet_public_rd_resident_patenting_2026_10_10
+  family_size: 2
+  key_roster: data/pinned_evidence/internet_public_rd_patenting_2026_key_roster.csv
+  key_roster_sha256: 4b548bc4e78a5221a0b8079656eb8f61d152e404d97eaf385033f2bdb817d18f
+  steelman: hypotheses/steelman/eurostat_public_rd_resident_patenting_forward_2026.md
+reproduction:
+  runner: scripts/run_internet_public_rd_patenting_2026.py
+  run_dir: engine/runs/eurostat_public_rd_resident_patenting_forward_2026
+  command: python3 scripts/run_internet_public_rd_patenting_2026.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: estimable association does not clear both directional gates
+data:
+  inputs:
+    public_rd:
+      publisher: eurostat
+      series_id: rd_e_gerdtot
+      path: data/vintages/eurostat/rd_e_gerdtot@2026-05-05T210242Z.parquet
+      sha256: fea284d7b17e31a3803749fca052f6a110ed1b8e703a9151964d1d15f58df152
+      manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+      manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    patents:
+      publisher: wipo
+      series_id: patent_applications_resident
+      path: data/vintages/wipo/patent_applications_resident@2026-05-19T094854Z.parquet
+      sha256: 8affaee11a397d965f73eda762d0b3416bc341b7485e6197745700a1dd3bf24e
+      manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+      manifest_sha256: cf2f7e75af5612b302af7fbb0479c196598aa060c20f858723108a8c95455de4
+    population:
+      publisher: world_bank_wdi
+      series_id: SP.POP.TOTL
+      path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+      sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    income:
+      publisher: world_bank_wdi
+      series_id: NY.GDP.PCAP.KD
+      path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+      sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+      manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+  sample:
+    key_roster_rows: 620
+    complete_pairs_before_five_year_floor: 567
+    complete_rows: 561
+    complete_countries: 32
+    material_rows_or_varying_countries: 32
+    material_countries: 32
+    outcome_values_read_after_lock: true
+    top_one_percent_residual_x_share: 0.1924885317148562
+    top_country_residual_x_share: 0.2348400925059478
+results:
+  primary:
+    coefficient: 0.15395504978019092
+    std_error: 0.18052947072668343
+    p_value_two_sided: 0.4003128446388806
+    confidence_level: 0.995
+    confidence_interval:
+    - -0.39162628332123606
+    - 0.6995363828816179
+    n_rows: 561
+    n_countries: 32
+    df_inference: 31
+    model_rank: 54
+    method: country/year FE OLS with baseline patent and income controls; country-cluster
+      CR1, Student t(G-1)
+limitations:
+- WDI internet use measures people using the Internet, not broadband quality or productive
+  digital use; estimates, survey modes, and mobile access change over time.
+- Eurostat GOV+HES is R&D performed in government and higher-education sectors, not
+  funding by government; the selected raw slice lacks observation-status or break
+  flags.
+- Resident patent applications are WIPO-origin counts delivered by the WDI API, not
+  independent WIPO records or patent quality; filing law, office practices, and population
+  denominators vary.
+- Temporal ordering, country/year fixed effects, baseline patent intensity and income
+  controls do not identify causal or policy effects. Reverse timing, anticipation,
+  industrial composition, and common technology shocks remain.
+- A prior IESET business-enterprise R&D to resident-patent study and older patent
+  candidates were visible before selection of this family. The two-test Bonferroni
+  gate is local, not corpus-wide selection control or independent replication.
+- High-tech export share was screened from treatment values only and rejected for
+  concentrated residual variation; no patent outcome values or null masks were used
+  to choose this family.
+- No causal, policy, school-score, position, or featured credit is permitted.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: internet_public_rd_resident_patenting_2026_10_10
+  family_size: 2
+  family_alpha: 0.01
+  bonferroni_p_max: 0.005
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
