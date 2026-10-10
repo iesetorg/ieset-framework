@@ -1,0 +1,7 @@
+# Mexico–EU4 BACI flow test — frozen result, 2026-10-10
+
+The direct-flow follow-up `mexico_eu_fta_eu4_baci_exports_2000_v2` was registered in `d2cafd48c687ab54b54b228835e1d8b94260cb69`, its exact CEPII source rows were locked in `f2b39bee60ec2e46545c8f5288b114a77aad5921`, and only then was the selected outcome opened. The result is **INCONCLUSIVE**, so it adds **zero** public evidence records and does not alter the archived `trade_lib_mexico_eu_fta_2000` result.
+
+All 252 required existing-country origin–destination–year rows were present and retained. The frozen pretrend gate required Mexico's 1996–1999 log-flow slope to differ from the median fixed donor slope by at most **0.03 log units/year**. The measured slopes were **0.112052** and **0.023302**, respectively; the absolute gap was **0.088750**. Estimation stopped at this gate. The post-period contrast was not used to assign a direction, and no donor, destination, date, or threshold was changed after outcome access.
+
+The six run artifacts replayed exactly with `scripts/run_mexico_eu4_baci_2026.py verify`. `verify-source` reproduced all 252 retained records byte-for-byte from the SHA-pinned CEPII Gravity V202211 ZIP. This is a nominal-goods-flow screen for four EU destinations; it cannot establish an FTA effect, a whole-EU export result, or school/policy/causal credit. Any redesigned comparison requires a new registration and should disclose this failed pretrend.
