@@ -1,0 +1,226 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cckp_faostat_crop401_precipitation_forward_ppi_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Larger absolute annual country precipitation departure at year t is associated
+  with higher next-year Chillies and peppers, green (Capsicum spp. and Pimenta spp.)
+  single-item producer price index log growth after prior PPI growth, the other weather
+  departure, and country/year effects.
+methodology_note: Value-blind named CPC 01 crop family (118 correlated tests), all
+  eligible items by key coverage; FAO item 401, CPC 01231, annual single-item producer
+  price index 2014–2016=100. No measurements, flags or null masks opened at registration.
+evidence_type: associational
+sample:
+  countries: &id001
+  - ALB
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BFA
+  - BGD
+  - BGR
+  - BIH
+  - BLZ
+  - BOL
+  - BRB
+  - BRN
+  - BTN
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COK
+  - COL
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GBR
+  - GHA
+  - GRC
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LKA
+  - LTU
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MKD
+  - MLI
+  - MUS
+  - MYS
+  - NER
+  - NGA
+  - NLD
+  - NPL
+  - NZL
+  - OMN
+  - PAN
+  - PER
+  - PHL
+  - PRI
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RWA
+  - SLV
+  - SRB
+  - SUR
+  - SVK
+  - SVN
+  - SYC
+  - SYR
+  - TGO
+  - THA
+  - TTO
+  - TUN
+  - TUR
+  - UKR
+  - URY
+  - USA
+  - VCT
+  - YEM
+  - ZAF
+  - ZWE
+  period:
+  - 1994
+  - 2023
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only committed item/country/exposure-year roster keys; no interpolation or
+    substitutes.
+  - Require exact annual single-item PPI at t-1,t,t+1, finite and positive, A/E/X
+    flags at all three years; exclude I/B/M/blank/unknown.
+  - Require finite tas/pr at t and all 1961–1990 baseline years and positive pr baseline
+    sample SD.
+  - Exclude absolute prior/future PPI log growth >1.0 and countries with fewer than
+    five complete years.
+  - No post-value changes to item, years, flags, estimator, gates, sign or family
+    size.
+variables:
+  outcome:
+  - name: subsequent_single_item_ppi_log_growth
+    source: faostat:producer_prices
+    transformation: log(item 401 annual PPI at t+1) minus log(PPI at t); 2014–2016=100
+  treatment:
+  - name: absolute_precipitation_departure
+    source: world_bank_cckp:cru_ts4_10_tas_pr_annual_global
+    transformation: absolute country annual precipitation departure from 1961–1990
+      normal, baseline sample SD
+  controls:
+  - name: prior_single_item_ppi_log_growth
+    source: faostat:producer_prices
+    transformation: log(PPI at t) minus log(PPI at t-1)
+  - name: other_temperature_departure
+    source: world_bank_cckp:cru_ts4_10_tas_pr_annual_global
+    transformation: absolute country annual temperature departure
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Country/exposure-year FE OLS, prior PPI growth and other-weather control;
+    country CR1, two-sided Student t(G-1), full-rank and residual concentration gates.
+falsification:
+  test: cckp_faostat_weather_named_crop_ppi_family_2026_10_10_401_precipitation
+  rule: INCONCLUSIVE if source, complete-case (500/30), material-exposure (100/20),
+    five-year-country, full-rank, positive finite SE or 20% top-country residualized
+    exposure gate fails. SUPPORTED iff beta >= +0.02 and p <= 0.01/118; REFUTED iff
+    beta <= -0.02 at same cutoff; otherwise PARTIAL when estimable. All 118 cells
+    remain in denominator.
+  threshold:
+    family_id: cckp_faostat_weather_named_crop_ppi_family_2026_10_10
+    family_size: 118
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 8.474576271186441e-05
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.02
+    min_complete_rows: 500
+    min_complete_countries: 30
+    min_material_rows: 100
+    min_material_countries: 20
+    min_complete_years_per_country: 5
+    material_abs_temperature_departure_deg_c: 1.0
+    material_abs_precipitation_departure_baseline_sd: 1.0
+    max_abs_ppi_log_growth: 1.0
+    max_top_country_residualized_exposure_share: 0.2
+    baseline_years:
+    - 1961
+    - 1990
+    exposure_years:
+    - 1995
+    - 2022
+    item_code: 401
+    index_element: 5539
+    annual_month_code: 7021
+    roster_sha256: 1653dab95b99fdd7f409811619b135af4622c90c731a72207b6c59025a167610
+    source_lock_path: data/pinned_evidence/cckp_faostat_weather_named_crop_ppi_2026.manifest.json
+    causal_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.2
+disclosure: Descriptive calibration only. Annual country weather and nominal local-currency
+  farm-gate PPI are confounded and do not identify a causal weather or policy effect.
+  Zero causal, policy, school, position and featured credit.
+steelman: hypotheses/steelman/cckp_faostat_crop401_precipitation_forward_ppi_2026.md
+scope:
+  period:
+  - 1994
+  - 2023
+  countries: *id001
+  outcome_dim:
+  - inflation
+  policy_family: []
+  treatment_tags:
+  - faostat_item_401
+  - precipitation
+  - climate_weather
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
