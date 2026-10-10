@@ -16,6 +16,7 @@ SUMMARY='engine/audits/physician_education_family_results_2026-10-10.md'
 ROSTER='data/pinned_evidence/physician_education_family_key_roster.csv'
 ROSTER_SHA='8befd15bbffd25608f71ac534f5ccffcff876d1bc3aae0fc92ba2e2425756dc0'
 LOCK='data/pinned_evidence/physician_education_family_2026.manifest.json'
+ERRATUM='engine/audits/physician_education_family_blank_iso_runner_erratum_2026-10-10.md'
 MANIFESTS={
  'data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml':'e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e',
  'data/manifests/fetch_run_2026-05-05T210519Z.yaml':'5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112',
@@ -71,7 +72,23 @@ def registration_commit():
  revs={first_added(p) for p in paths}
  if len(revs)!=1:raise RuntimeError('family registration files must first appear in one commit')
  reg=revs.pop()
- for p in paths:frozen(p,reg)
+ for p in paths:
+  if p!=RUNNER:frozen(p,reg)
+ correction=first_added(ERRATUM)
+ if not ancestor(first_added(LOCK),correction):raise RuntimeError('blank-ISO runner correction must follow source lock')
+ changed=set(git('diff','--name-only',f'{correction}^',correction).decode().splitlines())
+ if changed!={RUNNER,ERRATUM}:raise RuntimeError('runner correction changed unrelated files')
+ frozen(RUNNER,correction);frozen(ERRATUM,correction)
+ import ast
+ def protected_ast(blob):
+  tree=ast.parse(blob)
+  keep=[]
+  for node in tree.body:
+   if isinstance(node,ast.FunctionDef) and node.name in ('registration_commit','read_values'):continue
+   if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='ERRATUM' for t in node.targets):continue
+   keep.append(node)
+  return ast.dump(ast.Module(body=keep,type_ignores=[]),include_attributes=False)
+ if protected_ast(git('show',f'{reg}:{RUNNER}'))!=protected_ast((ROOT/RUNNER).read_bytes()):raise RuntimeError('frozen design, gates or outputs changed in implementation correction')
  if git('ls-tree','-r','--name-only',reg,'--',LOCK,*[run_dir(k) for k in STUDIES]).strip():raise RuntimeError('source lock or run entered registration commit')
  codes=roster()
  for k in STUDIES:
@@ -133,10 +150,10 @@ def read_values(role):
  d=pd.read_parquet(ROOT/s['path'],columns=['country_iso3','indicator_id','year','value','obs_status'])
  if len(d)!=s['rows'] or set(d.indicator_id.dropna().unique())!={s['series_id']}:raise RuntimeError(f'WDI source identity/row count changed: {role}')
  years=[2000,2010] if role=='education' else [2011,2019]
- d=d[d.year.isin(years)]
- if d.duplicated(['country_iso3','year']).any():
-  d=d[d.country_iso3.notna()]
-  if d.duplicated(['country_iso3','year']).any():raise RuntimeError(f'duplicate WDI source key: {role}')
+ # The preregistered ISO3 roster excludes blank aggregate-code rows in WDI.
+ eligible=set().union(*roster().values())
+ d=d[d.year.isin(years)&d.country_iso3.isin(eligible)]
+ if d.duplicated(['country_iso3','year']).any():raise RuntimeError(f'duplicate WDI source key: {role}')
  return {(r.country_iso3,int(r.year)):(valid_num(r.value) if pd.isna(r.obs_status) or str(r.obs_status).strip() in ('','A') else None) for r in d.itertuples(index=False)}
 
 def frame(k,values,codes):
