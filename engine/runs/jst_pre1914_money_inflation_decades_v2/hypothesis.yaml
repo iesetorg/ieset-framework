@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_pre1914_money_inflation_decades_v2
+version: 1
+status: pre_registered
+topic: monetary
+claim_direction: +
+claim: >
+  Across the 18 advanced economies in the original JST R6 panel, within-country
+  differences among four nonoverlapping 1870–1910 decades in annualized broad
+  money growth less real-output growth are positively associated with
+  annualized consumer-price inflation. This is a narrow historical descriptive
+  calibration of the archived long-run monetary-regularity question, not a
+  causal or universal statement about inflation.
+methodology_note: >
+  The archived Friedman long-run panel used 1960–2023 sources and its old result
+  was available before this follow-up. This v2 uses a disjoint pre-1914 period,
+  one original JST source, an exact 18-country roster, four fixed decade
+  windows, and one frozen estimator. The old result and ID remain archived.
+  Registration, source-key roster, gates, code, and source hash were committed
+  before selected money, CPI, real-output, or population values or null masks.
+evidence_type: descriptive
+sample:
+  countries: [AUS, BEL, CAN, CHE, DEU, DNK, ESP, FIN, FRA, GBR, IRL, ITA, JPN, NLD, NOR, PRT, SWE, USA]
+  period: [1870, 1910]
+  temporal_structure: panel
+  exclusion_rules:
+    - Use exactly the endpoint pairs 1870–1880, 1880–1890, 1890–1900, and 1900–1910 for every roster country; no substitute years, countries, interpolation, or source version.
+    - At both endpoints require finite, strictly positive JST broad money, CPI, real GDP per capita, and population; an invalid endpoint removes that country-decade.
+    - Retain no country with fewer than three complete decades; require at least 12 countries, 48 complete country-decades, and 10 countries in each decade.
+variables:
+  outcome:
+    - name: cpi_inflation_annualized_log_pp
+      source: jst:R6.cpi
+      transformation: 10 * log(CPI_end / CPI_start)
+      notes: Ten times the decade log change expresses annualized percentage points.
+  treatment:
+    - name: excess_broad_money_growth_annualized_log_pp
+      source: jst:R6.money_rgdpmad_pop
+      transformation: 10 * (log(money_end / money_start) - log(rgdpmad_end / rgdpmad_start) - log(pop_end / pop_start))
+      notes: JST money is broad nominal money; rgdpmad is real GDP per capita and pop is population. This is nominal money growth less real total-output growth.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, decade]
+  clustering: country
+  notes: >
+    Estimate one OLS slope of annualized CPI log inflation on annualized
+    excess-money growth with country and fixed-decade intercepts. Use the
+    finite-sample corrected country-cluster sandwich variance and a two-sided
+    t test with G−1 degrees of freedom, G being the retained country count.
+    No controls, alternative endpoints, weighting, winsorization, or pooled
+    specification are permitted. Report all country-deletion slopes as
+    prespecified influence diagnostics; only their minimum sign enters the
+    support rule. This contemporaneous slope is descriptive.
+falsification:
+  test: jst_pre1914_four_decades_excess_money_inflation_twoway_fe
+  rule: >
+    INCONCLUSIVE if the source identity or key roster fails, fewer than 12
+    countries with at least three complete decades remain, fewer than 48
+    country-decades remain, any decade has fewer than 10 countries, the
+    within-FE treatment standard deviation is under 0.5 percentage points,
+    one country's share of residualized-treatment sum of squares exceeds
+    20%, the design is rank deficient, the cluster variance is nonpositive
+    or nonfinite, or any country-deletion slope cannot be estimated. After
+    those gates, SUPPORTED when the coefficient is in [0.5, 1.5], two-sided
+    country-cluster p<=0.05, and every country-deletion coefficient is
+    positive. REFUTED when the coefficient is nonpositive at p<=0.05.
+    Otherwise PARTIAL. One descriptive test, no school or policy credit.
+  threshold:
+    family_id: jst_pre1914_money_inflation_one_historical_family_2026
+    family_size: 1
+    candidate_country_decades: 72
+    source_key_count: 90
+    minimum_countries: 12
+    minimum_country_decades: 48
+    minimum_decades_per_country: 3
+    minimum_countries_per_decade: 10
+    minimum_within_treatment_sd_pp: 0.5
+    maximum_country_treatment_share: 0.20
+    support_beta_min: 0.5
+    support_beta_max: 1.5
+    p_value_max: 0.05
+    refute_beta_max: 0.0
+prior_confidence: 0.5
+disclosure: >
+  JST historical series were assembled and spliced from archival sources.
+  The panel contains only advanced economies, and four decades in one
+  pre-1914 monetary regime cannot establish a global or cross-regime law.
+  Money is endogenous to income and prices; the regression cannot identify
+  a monetary-policy effect. Country and decade fixed effects leave limited
+  within-country variation and the test may be inconclusive. Its period is
+  outside the archived 1960–2023 analysis, but the older result was seen.
+intervention_channel: monetary
+intervention_channel_justification: Broad-money growth is a monetary variable; no intervention is identified.
+scope:
+  period: [1870, 1910]
+  countries: [AUS, BEL, CAN, CHE, DEU, DNK, ESP, FIN, FRA, GBR, IRL, ITA, JPN, NLD, NOR, PRT, SWE, USA]
+  outcome_dim: [inflation, monetary_policy, currency_purchasing_power]
+  policy_family: [monetary_policy]
+  treatment_tags: [historical_broad_money_growth, historical_inflation]
+steelman: hypotheses/steelman/jst_pre1914_money_inflation_decades_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: Frozen custody and analysis contract is engine/audits/jst_pre1914_money_inflation_2026_source_plan.md.

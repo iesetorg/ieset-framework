@@ -1,0 +1,7 @@
+# JST pre-1914 money and inflation — result audit
+
+The single historical follow-up to archived `friedman_inflation_always_monetary_long_run_panel` was registered in `20523810a5bd27853ea26025f8ddf19fc2f15102`, and its JST R6 metadata source lock was committed separately in `f2790bcfe15ea1abd1b04cb4196ace374494f242`. The exact 18-country, four-decade design and all floors were frozen before selected money, CPI, real-output, or population values or null masks were read. The 1960–2023 legacy result and ID remain unchanged.
+
+**Verdict: INCONCLUSIVE.** The selected JST file supplied 60 of 72 complete country-decades, retaining 16 countries. Each decade retained at least 12 countries. The within-fixed-effects excess-money-growth standard deviation was 1.7831 percentage points, above the frozen 0.5-point floor. One country's share of residualized treatment variation was **25.4344%**, above the frozen **20%** concentration ceiling. The runner therefore stopped before fitting the registered coefficient. The concentration rule was not relaxed, and no alternative country set, endpoint, vintage, or estimator was tried.
+
+System `python3` exactly replayed all six aggregate run artifacts against the original SHA-256-locked local JST R6 parquet. The runner committed no JST value rows. The source is licensed CC BY-NC-SA 4.0 and requires the attribution in the source plan. This is an archived non-result with **zero public conversion, causal, policy, school, position, or featured credit**. It does not establish or refute the archived monetary claim.
