@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { loadDrift, countryName } from "@/lib/drift";
-import { loadAllPolicies } from "@/lib/policies";
+import { loadAllPolicies, type Policy } from "@/lib/policies";
 import { DriftChart } from "@/components/charts/DriftChartLoader";
 import { InteractiveDriftChart } from "@/components/charts/InteractiveDriftChartLoader";
 
@@ -186,6 +186,14 @@ const KEY_AXES_FOR_DRIFT: Array<{ axis: string; label: string; caption: string }
   },
 ];
 
+// This is a deliberate early-policy context window. It stays independent of
+// the first authored movement and the first signed drift step as coverage grows.
+const EARLY_POLICY_CONTEXT_END_YEAR = 1850;
+
+type HistoricalTimelineItem =
+  | { kind: "policy"; year: number; policy: Policy }
+  | { kind: "milestone"; year: number; title: string; detail: string };
+
 // Cap the number of trajectories drawn in any one composite chart so the
 // chart stays legible. Within a region we pick the top-N by movement_count
 // (the most-coded — and therefore best-anchored — entries).
@@ -204,12 +212,28 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+  const countries = Object.values(driftData.countries);
+  const axisStartYears = countries.flatMap((country) =>
+    Object.values(country.axis_first_year)
+  );
+  const compositeStartYears = countries
+    .map((country) => country.composite_first_year)
+    .filter((year): year is number => year !== null);
+  const firstSignedAxisYear =
+    axisStartYears.length > 0 ? Math.min(...axisStartYears) : null;
+  const firstCompositeYear =
+    compositeStartYears.length > 0 ? Math.min(...compositeStartYears) : null;
+  const codedMovementIds = new Set(
+    countries.flatMap((country) =>
+      country.movements.map((movement) => movement.movement_id)
+    )
+  );
   const historicalPolicies = (await loadAllPolicies())
     .filter(
       (policy) =>
         policy.scope === "national" &&
         Number.isInteger(policy.timeframe.start) &&
-        policy.timeframe.start < data.year_min &&
+        policy.timeframe.start < EARLY_POLICY_CONTEXT_END_YEAR &&
         (policy.references?.length ?? 0) > 0
     )
     .sort(
@@ -217,12 +241,76 @@ export default async function DriftPage() {
         a.timeframe.start - b.timeframe.start ||
         a.policy_id.localeCompare(b.policy_id)
     );
-  const historicalPolicyYears = Array.from(
-    new Set(historicalPolicies.map((policy) => policy.timeframe.start))
+  const isPolicyOnlyContext = (policy: Policy) =>
+    !(policy.enacted_by ?? []).some((movementId) =>
+      codedMovementIds.has(movementId)
+    );
+  const policyOnlyYears = Array.from(
+    new Set(
+      historicalPolicies
+        .filter(isPolicyOnlyContext)
+        .map((policy) => policy.timeframe.start)
+    )
   );
-  const compositeCountryCount = Object.values(driftData.countries).filter(
-    (country) => country.composite_first_year !== null
-  ).length;
+  const milestones: HistoricalTimelineItem[] = [
+    {
+      kind: "milestone",
+      year: data.year_min,
+      title:
+        firstSignedAxisYear === data.year_min
+          ? "Movement corpus and signed axis coding begin"
+          : "Movement corpus begins",
+      detail:
+        firstSignedAxisYear === data.year_min
+          ? "Earliest national movement and first signed axis step"
+          : "Earliest national movement; its year alone does not establish a score",
+    },
+  ];
+  if (firstSignedAxisYear !== null && firstSignedAxisYear !== data.year_min) {
+    milestones.push({
+      kind: "milestone",
+      year: firstSignedAxisYear,
+      title: "Signed axis coding begins",
+      detail: "First nonzero direction on an authored movement axis",
+    });
+  }
+  if (firstCompositeYear !== null && firstCompositeYear !== firstSignedAxisYear) {
+    milestones.push({
+      kind: "milestone",
+      year: firstCompositeYear,
+      title: "Statist composite coding begins",
+      detail: "First signed step on an axis included in the 14-axis composite",
+    });
+  }
+  const historicalTimeline: HistoricalTimelineItem[] = [
+    ...historicalPolicies.map(
+      (policy): HistoricalTimelineItem => ({
+        kind: "policy",
+        year: policy.timeframe.start,
+        policy,
+      })
+    ),
+    ...milestones,
+  ].sort((a, b) => a.year - b.year);
+  const compositeCountryCount = compositeStartYears.length;
+
+  const franceRuleOfLaw = driftData.countries.FRA?.axes["institutional.rule_of_law"];
+  const franceRuleOfLawStart =
+    driftData.countries.FRA?.axis_first_year["institutional.rule_of_law"];
+  const earlyFranceYears =
+    franceRuleOfLawStart !== undefined &&
+    franceRuleOfLawStart < EARLY_POLICY_CONTEXT_END_YEAR
+      ? data.years.filter(
+          (year) =>
+            year >= franceRuleOfLawStart &&
+            year <= franceRuleOfLawStart + 20
+        )
+      : [];
+  const earlyFranceRuleOfLaw = franceRuleOfLaw
+    ? earlyFranceYears.map((year) => franceRuleOfLaw[year - data.year_min])
+    : [];
+  const hasEarlyFranceSeries =
+    earlyFranceYears.length > 0 && earlyFranceRuleOfLaw.every(Number.isFinite);
 
   // Keep every country selectable even as the movement corpus grows. A code
   // listed in more than one curated region appears only in the first picker
@@ -354,64 +442,99 @@ export default async function DriftPage() {
             Earliest cited policy context
           </div>
           <h2 className="m-0 mb-2 text-[20px] font-semibold">
-            Policy context begins in {historicalPolicies[0].timeframe.start}; scored drift begins in {data.year_min}
+            Policy context from {historicalPolicies[0].timeframe.start}; signed axes from{" "}
+            {firstSignedAxisYear ?? "not yet coded"}; statist composite from{" "}
+            {firstCompositeYear ?? "not yet coded"}
           </h2>
           <p className="mb-4 max-w-[850px] text-[13.5px] leading-[1.55] text-muted">
-            These national policy records extend the map&apos;s historical context.
-            Dashed markers use each record&apos;s start year; enactment and effective
-            dates appear on the cards because some rules began later. The drift
-            score starts with authored movements in {data.year_min}; no value is
-            assigned to the earlier interval. Each card shows its review status.
-            <Link href="/policy-browser/" className="text-accent hover:underline">Browse the policy database</Link>.
+            These cited national policies and movement milestones are shown in
+            date order. Dashed chart markers denote policy-only context records;
+            a policy record never adds a numeric drift step by itself. French
+            movement records linked to the 1804 and 1814 policies supply the
+            signed rule-of-law steps shown below. Policy cards distinguish
+            enactment from later effective dates and show review status.{" "}
+            <Link href="/policy-browser/" className="text-accent hover:underline">
+              Browse the policy database
+            </Link>.
           </p>
           <ol className="grid gap-3 md:grid-cols-3">
-            {historicalPolicies.map((policy) => (
-              <li key={policy.policy_id} className="border-l-2 border-amber-600 bg-panel p-3">
-                <div className="font-mono text-[15px] font-semibold tabular-nums">
-                  {policy.timeframe.start}
-                </div>
-                <Link href={`/p/${policy.policy_id}`} className="text-[13px] font-semibold text-accent hover:underline">
-                  {policy.title}
-                </Link>
-                <div className="mt-1 text-[11px] text-muted">
-                  policy only · {policy.status} · {policy.countries.map(countryName).join(", ")}
-                </div>
-                {(policy.timeframe.enacted_date || policy.timeframe.effective_date) && (
-                  <div className="mt-1 text-[11px] text-muted">
-                    {policy.timeframe.enacted_date && `Enacted ${policy.timeframe.enacted_date}`}
-                    {policy.timeframe.enacted_date && policy.timeframe.effective_date && " · "}
-                    {policy.timeframe.effective_date && `Effective ${policy.timeframe.effective_date}`}
+            {historicalTimeline.map((item) =>
+              item.kind === "policy" ? (
+                <li key={item.policy.policy_id} className="border-l-2 border-amber-600 bg-panel p-3">
+                  <div className="font-mono text-[15px] font-semibold tabular-nums">
+                    {item.year}
                   </div>
-                )}
-              </li>
-            ))}
-            <li className="border-l-2 border-accent bg-panel p-3">
-              <div className="font-mono text-[15px] font-semibold tabular-nums">
-                {data.year_min}
-              </div>
-              <div className="text-[13px] font-semibold">Movement-coded drift begins</div>
-              <div className="mt-1 text-[11px] text-muted">First year in the scored movement series</div>
-            </li>
+                  <Link href={`/p/${item.policy.policy_id}`} className="text-[13px] font-semibold text-accent hover:underline">
+                    {item.policy.title}
+                  </Link>
+                  <div className="mt-1 text-[11px] text-muted">
+                    {isPolicyOnlyContext(item.policy)
+                      ? "policy context only"
+                      : "linked movement source"}{" "}
+                    · {item.policy.status} · {item.policy.countries.map(countryName).join(", ")}
+                  </div>
+                  {(item.policy.timeframe.enacted_date || item.policy.timeframe.effective_date) && (
+                    <div className="mt-1 text-[11px] text-muted">
+                      {item.policy.timeframe.enacted_date && `Enacted ${item.policy.timeframe.enacted_date}`}
+                      {item.policy.timeframe.enacted_date && item.policy.timeframe.effective_date && " · "}
+                      {item.policy.timeframe.effective_date && `Effective ${item.policy.timeframe.effective_date}`}
+                    </div>
+                  )}
+                </li>
+              ) : (
+                <li key={`milestone-${item.year}-${item.title}`} className="border-l-2 border-accent bg-panel p-3">
+                  <div className="font-mono text-[15px] font-semibold tabular-nums">
+                    {item.year}
+                  </div>
+                  <div className="text-[13px] font-semibold">{item.title}</div>
+                  <div className="mt-1 text-[11px] text-muted">{item.detail}</div>
+                </li>
+              )
+            )}
           </ol>
         </section>
       )}
 
+      {hasEarlyFranceSeries && franceRuleOfLawStart !== undefined && (
+        <section className="mb-8 rounded border border-rule bg-white p-5">
+          <h2 className="m-0 mb-2 text-[20px] font-semibold">
+            France: early rule-of-law coding
+          </h2>
+          <p className="mb-4 max-w-[820px] text-[13.5px] leading-[1.55] text-muted">
+            The 1804 Civil Code and 1814 Constitutional Charter each have a
+            weak positive signed step on the institutional rule-of-law axis.
+            This is a coded direction for formal legal rules, not a measured
+            rule-of-law level or enforcement outcome. This axis is outside the
+            14-axis statist composite.
+          </p>
+          <DriftChart
+            series={{ FRA: earlyFranceRuleOfLaw }}
+            years={earlyFranceYears}
+            seriesStarts={{ FRA: franceRuleOfLawStart }}
+            labels={{ FRA: "France" }}
+            height={290}
+            zeroLineLabel="cumulative rule-of-law axis coding"
+            caption="The flat segments mean no further authored step in this displayed interval; they do not establish legal or institutional stasis."
+          />
+        </section>
+      )}
+
       <div className="mb-8 rounded border border-rule bg-panel p-5 text-[14px] leading-[1.6] text-muted">
-        <strong className="text-ink">Coverage:</strong> scored movement years span the
-        earliest to latest authored movement ({data.year_min}–{data.year_max}).
-        Each composite line begins at its first valenced axis step; earlier
-        movements without one do not establish a composite score. Earlier
-        blank space is missing coding coverage, not a zero policy level.
-        A flat segment means no further <em>coded</em> shift in that interval.
-        The index measures direction, not absolute policy levels, and countries
-        do not share a measured {data.year_min} baseline. State and municipal
-        and EU-wide movements are excluded from country totals. EU-wide
-        records remain in the movement corpus and the atlas; their member
-        applicability, decision dates, and overlapping policy stacks need
-        review before they can be shown as a separate EU layer here. Some
-        national umbrella and term records also have overlapping policy links
-        under source review; their country totals may change as duplicated
-        steps are resolved.
+        <strong className="text-ink">Coverage:</strong> authored national movements span{" "}
+        {data.year_min}–{data.year_max}. The first signed axis step is in{" "}
+        {firstSignedAxisYear ?? "no year yet"}; the first signed step in the
+        statist composite is in {firstCompositeYear ?? "no year yet"}. Each
+        line begins at its own first signed step. Earlier blank space is
+        missing coding coverage, not a zero policy level. A flat segment means
+        no further <em>coded</em> shift in that interval. The index measures
+        direction, not absolute policy levels, and countries do not share a
+        measured baseline. State, municipal, and EU-wide movements are excluded
+        from country totals. EU-wide records remain in the movement corpus and
+        the atlas; their member applicability, decision dates, and overlapping
+        policy stacks need review before they can be shown as a separate EU
+        layer here. Some national umbrella and term records also have
+        overlapping policy links under source review; their country totals may
+        change as duplicated steps are resolved.
       </div>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
@@ -625,9 +748,9 @@ export default async function DriftPage() {
               .map(([iso3, c]) => [iso3, c.statist_drift])
           )}
           years={data.years}
-          historicalPolicyYears={historicalPolicyYears}
-          caption={historicalPolicyYears.length > 0
-            ? `Dashed markers show cited policy start years before ${data.year_min}. Cards distinguish enactment from effective dates. No country line or drift value is plotted for those years.`
+          policyOnlyYears={policyOnlyYears}
+          caption={policyOnlyYears.length > 0
+            ? "Dashed markers show cited policy-only start years; they add no numeric step. Movement-coded country lines may pass through later marker years. Cards distinguish enactment from effective dates."
             : undefined}
           seriesStarts={Object.fromEntries(
             Object.entries(driftData.countries)

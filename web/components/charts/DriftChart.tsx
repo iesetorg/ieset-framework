@@ -26,8 +26,8 @@ interface DriftChartProps {
   series: Record<string, number[]>;
   /** Years aligned to each series. */
   years: number[];
-  /** Cited pre-series policies; dashed markers only, never scored points. */
-  historicalPolicyYears?: number[];
+  /** Cited policy-only years; dashed markers without numeric contributions. */
+  policyOnlyYears?: number[];
   /** First year with a signed axis or composite step per series. Earlier raw zeroes
    * align the data arrays but are not observations and must not be drawn. */
   seriesStarts?: Record<string, number>;
@@ -78,7 +78,7 @@ function compactLeaderLabel(label: string) {
 export function DriftChart({
   series,
   years,
-  historicalPolicyYears,
+  policyOnlyYears,
   seriesStarts,
   labels,
   caption,
@@ -122,7 +122,10 @@ export function DriftChart({
       const yMax = values.length ? Math.max(...values) : 1;
       const yExtent: [number, number] = [yMin, yMax];
       const yPad = Math.max(2, (yExtent[1] - yExtent[0]) * 0.08);
-      const xMin = Math.min(...years, ...(historicalPolicyYears ?? []));
+      const firstPlottedYear = points.length > 0
+        ? points.reduce((earliest, point) => Math.min(earliest, point.year), Number.POSITIVE_INFINITY)
+        : null;
+      const xMin = Math.min(...years, ...(policyOnlyYears ?? []));
       const xMax = Math.max(...years);
 
       const hasMovementLabels = Boolean(movements && movements.length > 0);
@@ -141,14 +144,25 @@ export function DriftChart({
         y: {
           label: zeroLineLabel ?? "cumulative drift index",
           domain: [yExtent[0] - yPad, yExtent[1] + yPad],
-          grid: true,
+          // Gridlines would otherwise extend a visual zero through years
+          // before the first plotted signed step.
+          grid: firstPlottedYear !== null && firstPlottedYear <= xMin,
         },
         marks: [
-          ...(historicalPolicyYears?.length
-            ? [Plot.ruleX(historicalPolicyYears, { stroke: "#ad9270", strokeDasharray: "3,3", strokeWidth: 1 })]
+          ...(policyOnlyYears?.length
+            ? [Plot.ruleX(policyOnlyYears, { stroke: "#ad9270", strokeDasharray: "3,3", strokeWidth: 1 })]
             : []),
-          // zero reference line
-          Plot.ruleY([0], { stroke: "#9b9b95", strokeDasharray: "3,3" }),
+          // The zero reference starts at actual plotted coverage, not in the
+          // policy-only or pre-coding interval.
+          ...(firstPlottedYear !== null
+            ? [Plot.ruleY([{ value: 0, from: firstPlottedYear, to: xMax }], {
+                y: "value",
+                x1: "from",
+                x2: "to",
+                stroke: "#9b9b95",
+                strokeDasharray: "3,3",
+              })]
+            : []),
           // each country's trajectory
           Plot.line(points, {
             x: "year",
@@ -280,7 +294,7 @@ export function DriftChart({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [series, years, historicalPolicyYears, seriesStarts, labels, height, zeroLineLabel, highlight, movements]);
+  }, [series, years, policyOnlyYears, seriesStarts, labels, height, zeroLineLabel, highlight, movements]);
 
   return (
     <div>

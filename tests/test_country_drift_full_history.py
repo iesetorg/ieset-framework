@@ -67,6 +67,24 @@ def test_trajectories_begin_at_earliest_authored_movement() -> None:
     assert can[result["years"].index(1980)] == -1
 
 
+def test_french_1804_1814_steps_extend_the_signed_axis_history() -> None:
+    result = DRIFT.build_drift(DRIFT.load_movements())
+    france = result["countries"]["FRA"]
+    rule_of_law = france["axes"]["institutional.rule_of_law"]
+
+    assert result["year_min"] == 1804
+    assert france["axis_first_year"]["institutional.rule_of_law"] == 1804
+    assert rule_of_law[result["years"].index(1804)] == 1.0
+    assert rule_of_law[result["years"].index(1814)] == 2.0
+    assert min(
+        country["composite_first_year"]
+        for country in result["countries"].values()
+        if country["composite_first_year"] is not None
+    ) == 1846
+    # These early institutional steps are outside the composite's axis set.
+    assert france["composite_first_year"] > 1846
+
+
 def test_composite_coverage_waits_for_valenced_axis_coding() -> None:
     movements = [
         {
