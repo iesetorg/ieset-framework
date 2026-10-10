@@ -1,0 +1,278 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wash_safe_sanitation_under5_mortality_forward_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: '-'
+claim: Across five fixed four-year windows, a larger preceding increase in national safely managed sanitation
+  coverage is associated with a larger subsequent decline in under-five mortality, conditional on mortality
+  baseline and prior mortality trend, prior service share, real income per person, and country and anchor
+  effects.
+methodology_note: Retrospective descriptive two-exposure family. WHO national exposure and WDI income
+  values were inspected before registration; only WDI under-five mortality country/year/indicator keys,
+  not values or null masks, were read. First-addition registration, source lock, and measurement are separate
+  commits. Local two-test correction does not account for selection in the wider archive.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AFG
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ASM
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BIH
+  - BLR
+  - BRA
+  - BTN
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - COD
+  - COL
+  - COM
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - GBR
+  - GEO
+  - GHA
+  - GMB
+  - GNB
+  - GRC
+  - GUY
+  - HRV
+  - HUN
+  - IMN
+  - IND
+  - IRL
+  - IRQ
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBY
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MCO
+  - MDG
+  - MEX
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MWI
+  - MYS
+  - NER
+  - NGA
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRI
+  - PRT
+  - PRY
+  - PSE
+  - QAT
+  - ROU
+  - RUS
+  - SEN
+  - SGP
+  - SLE
+  - SLV
+  - SMR
+  - SOM
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - TCD
+  - TGO
+  - THA
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - USA
+  - UZB
+  - VEN
+  - VNM
+  - WSM
+  - YEM
+  - ZAF
+  - ZWE
+  period:
+  - 2004
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Only 683 exact country/anchor slots in the frozen key roster, selected using WDI mortality keys at
+    t-4, t and t+4 without reading mortality values or null masks.
+  - Keep ISO3/XKX country rows only, WHO country-total residential category, finite safe-service percentages
+    [0,100] and positive real income at t-4/t with blank/null status; exclude absolute four-year service
+    jumps above 30 points.
+  - After separate committed source lock, require finite WDI under-five mortality values in (0,500] per
+    1,000 births and blank/null status at t-4, t, t+4; never impute or switch indicator.
+  - Retain countries with at least three complete anchor rows; no post-result covariate, anchor, country,
+    outcome or vintage switch.
+variables:
+  outcome:
+  - name: next_four_year_log_under5_mortality_change
+    source: world_bank_wdi:SH.DYN.MORT
+    transformation: Natural log of under-five mortality per 1,000 live births at t+4 divided by the level
+      at t. Negative means decline.
+  treatment:
+  - name: prior_four_year_safe_service_coverage_change
+    source: who_gho:WSH_SANITATION_SAFELY_MANAGED
+    transformation: National safely managed sanitation percentage at t minus t-4; one unit is one coverage
+      percentage point, not an assigned intervention.
+  controls:
+  - name: prior_safe_service_share
+    source: who_gho:WSH_SANITATION_SAFELY_MANAGED
+    transformation: National safe-service percentage at t-4.
+  - name: baseline_log_under5_mortality
+    source: world_bank_wdi:SH.DYN.MORT
+    transformation: Natural log of under-five mortality per 1,000 births at t.
+  - name: prior_log_under5_mortality_change
+    source: world_bank_wdi:SH.DYN.MORT
+    transformation: Log under-five mortality at t minus log level at t-4.
+  - name: log_real_income_per_person
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive real GDP per person at t.
+  - name: prior_log_real_income_change
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Log real income per person at t minus t-4.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Country and anchor fixed-effects OLS, country-cluster CR1 with small-sample correction and two-sided
+    Student t on G-1 degrees of freedom. Outcome windows are adjacent but nonoverlapping. No model search.
+falsification:
+  rule: INCONCLUSIVE if any frozen source, chronology, complete-case, support, rank, concentration or
+    clustered-uncertainty gate fails. Otherwise negative beta at most -0.002 next-four-year log under-five
+    mortality change per +1 prior service percentage point with two-sided p<=0.005 SUPPORTS only a narrow
+    descriptive association; comparably positive beta REFUTES it. Every other estimable result is PARTIAL.
+    Gate-cleared results are public descriptive calibrations only; INCONCLUSIVE is archived. Zero causal,
+    policy, school, position and featured credit.
+  test: wash_service_child_mortality_forward_2026_10_10
+  threshold:
+    family_id: wash_service_child_mortality_forward_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: '-'
+    meaningful_abs_beta: 0.002
+    min_complete_rows: 500
+    min_complete_countries: 100
+    min_complete_anchors: 4
+    min_anchors_per_country: 3
+    material_rise_min_raw_pp: 2.0
+    min_material_rise_rows: 80
+    min_material_rise_countries: 25
+    flat_change_max_abs_raw_pp: 0.2
+    min_flat_rows: 20
+    min_flat_countries: 10
+    max_abs_raw_service_change: 30.0
+    max_top_one_percent_residual_x_share: 0.25
+    max_top_country_residual_x_share: 0.15
+    max_top_anchor_residual_x_share: 0.35
+    expected_key_rows: 683
+    expected_key_countries: 139
+    roster_sha256: ad59eb9f838b41eb3e1f30babd35dc05370a684b30a4403f240792505e076af9
+    source_files:
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      mortality:
+        path: data/vintages/world_bank_wdi/SH.DYN.MORT@2026-05-05T194907Z.parquet
+        sha256: ad63729ccd5d1d4be6f3da5bbcac45b8a2c87d48c063cefeba8f0ddbe4b88f55
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      sanitation:
+        path: data/vintages/who_gho/WSH_SANITATION_SAFELY_MANAGED@2026-04-30T114745Z.parquet
+        sha256: c55eb958ce8409eafc335fb20eb74a0562d8650d6a3372e141f2e64243d4b077
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.4
+disclosure: WHO/JMP service coverage and UN IGME under-five mortality are both estimated series. Improvements
+  may reflect shared development trends, health care, vaccination, income, demography or reporting. This
+  is neither a causal intervention estimate nor independent replication. WHO source manifest records CC-BY-NC-SA-3.0
+  IGO; public derived-display rights need review.
+steelman: hypotheses/steelman/wash_safe_sanitation_under5_mortality_forward_2026.md
+scope:
+  period:
+  - 2004
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - healthcare_capacity
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
