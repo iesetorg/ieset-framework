@@ -1,5 +1,14 @@
 # Blind source and decision plan: JST historical credit and crisis
 
+**Pre-source correction:** The first registration commit treated `crisisJST`
+as an active-year flag and required a 0-to-1 transition. The publisher's crisis
+chronology says it is already a first-year onset flag. A second commit corrects
+the specification, steelman, plan, and runner together before any source lock
+or selected loan/GDP/crisis value or null mask was opened. The runner requires
+exactly these two registration commits, checks their unchanged bytes, and
+requires the metadata source lock to descend from the correction. The first
+version is retained in Git for audit; the corrected rule is the one measured.
+
 ## Custody and evidence boundary
 
 Registration files are this plan, the v2 hypothesis, its steelman, and
@@ -18,7 +27,10 @@ The 2026-05-05 IESET fetch manifest identifies the original publisher URL as
 the official documentation as `https://www.macrohistory.net/database/`.
 The official documentation defines `tloans` as total nominal loans to the
 non-financial private sector, `gdp` as nominal GDP in local currency, and the
-crisis variable as a systemic financial-crisis 0/1 dummy. This is the 18
+crisis variable as a systemic financial-crisis 0/1 dummy. The publisher's
+[crisis chronology](https://www.macrohistory.net/app/download/9844625569/JSTcrisis_chronology.pdf)
+states that `crisisJST` equals 1 only in the first year of a crisis and 0
+otherwise; this is already an incident-onset code. This is the 18
 advanced-economy R6 panel, not a world sample. Cite Jordà, Schularick and
 Taylor (2017) and retain the source's CC BY-NC-SA 4.0 conditions. No raw
 or derived source data should be redistributed outside those conditions.
@@ -41,8 +53,9 @@ over all exposure-valid candidates, before any crisis-history or forward
 outcome filtering; linear interpolation of sorted observations defines the
 percentile. High exposure includes ties at the cutoff, but if ties make its
 share exceed 35%, the family is INCONCLUSIVE. The at-risk set requires exact
-binary crisis values in t−4:t+5 and no crisis in t−4:t. Incident onset is
-`crisisjst[y]==1` and `crisisjst[y−1]==0` in any of t+1:t+5. The primary
+binary crisis values in t−4:t+5 and no crisis onset in t−4:t. Forward
+incident onset is any `crisisjst[y]==1` in t+1:t+5, exactly as coded by JST;
+even adjacent first-year flags are not merged. The primary
 endpoint is risk(high)/risk(other), with raw counts and risk difference.
 The source grid alone contains no information about measured completeness or
 incident-event counts; those floors are assessed only after custody lock.

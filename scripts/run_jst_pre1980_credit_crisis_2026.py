@@ -93,20 +93,32 @@ def strict_ancestor(older: str, newer: str) -> bool:
 
 
 def registration_commit() -> str:
-    commits = []
+    additions = []
+    histories = []
     for relative in REGISTRATION_FILES:
         path = ROOT / relative
         if not path.is_file() or git_bytes("HEAD", relative) != path.read_bytes():
             raise RuntimeError(f"commit unchanged registration before value access: {relative}")
-        commits.append(first_addition(relative))
-    if len(set(commits)) != 1:
+        additions.append(first_addition(relative))
+        histories.append(git("log", "--format=%H", "HEAD", "--", relative).stdout.decode().splitlines())
+    if len(set(additions)) != 1:
         raise RuntimeError("hypothesis, steelman, plan, runner first additions differ")
-    commit = commits[0]
+    first = additions[0]
+    # A publisher-definition correction was committed before source lock or
+    # outcome access. All four files changed together and no other edits are
+    # allowed, preserving both the original and corrected blind versions.
+    if len({tuple(history) for history in histories}) != 1:
+        raise RuntimeError("registration files have different edit histories")
+    history = histories[0]
+    if len(history) != 2 or history[1] != first or not strict_ancestor(first, history[0]):
+        raise RuntimeError("expected original registration plus one pre-source correction")
+    commit = history[0]
     for relative in REGISTRATION_FILES:
         if git_bytes(commit, relative) != (ROOT / relative).read_bytes():
-            raise RuntimeError(f"registered bytes changed after first addition: {relative}")
-    if git("ls-tree", "-r", "--name-only", commit, "--", LOCK_REL, RUN_REL).stdout.strip():
-        raise RuntimeError("source lock or result appeared in registration commit")
+            raise RuntimeError(f"registered bytes changed after pre-source correction: {relative}")
+    for revision in (first, commit):
+        if git("ls-tree", "-r", "--name-only", revision, "--", LOCK_REL, RUN_REL).stdout.strip():
+            raise RuntimeError("source lock or result appeared before corrected registration")
     return commit
 
 
@@ -310,8 +322,8 @@ def analyze(rows: dict[tuple[str, int], dict[str, Any]]) -> dict[str, Any]:
             excluded_recent += 1
             continue
         high = delta >= era_cutoffs[era]
-        incident = int(any(statuses[year] == 1 and statuses[year - 1] == 0
-                           for year in range(t + 1, t + 6)))
+        # JST crisisjst is itself an onset-year dummy, not an active-year flag.
+        incident = int(any(statuses[year] == 1 for year in range(t + 1, t + 6)))
         at_risk.append((era, country, t, high, incident))
     n_high = sum(row[3] for row in at_risk)
     e_high = sum(row[4] for row in at_risk if row[3])

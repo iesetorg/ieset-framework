@@ -16,9 +16,9 @@ ratio does not distinguish these pathways or assign a regulatory cause.
 
 The design freezes thirteen nonoverlapping forecast windows per country,
 excludes windows touching the two world wars, and calibrates a top quintile
-within each of three eras before reading crisis outcomes. An at-risk window
-has no coded crisis in the preceding five years, so a continuing episode
-cannot count as a new onset. The historical claim would be weakened if the
+within each of three eras before reading crisis outcomes. JST codes 1 only
+in the first year of each crisis. An at-risk window has no coded onset in
+the preceding five years. The historical claim would be weakened if the
 high-credit group has no elevated forward onset risk, and supported only by
 a risk ratio at least two with a minimum absolute difference and event floors.
 Missing or thin evidence yields INCONCLUSIVE. This is descriptive evidence,
