@@ -1,0 +1,3 @@
+# Steelman — wbes_finance_obstacle_sales_growth_next_wave_2026
+
+The strongest objection is that a national Enterprise Surveys constraint percentage may be a symptom of weak sales or hiring prospects, or of an unobserved country shock, rather than a cause of the next survey’s growth. Firms and survey strata are not a tracked cohort; the later-wave growth measure looks back over prior fiscal years, and the August 2022 sample-eligibility change can alter composition. Country and period effects, the baseline growth measure, and a four-year minimum gap do not remove these problems. A null, opposite, or gate-failed result remains visible or archived under the registered rule; none justifies a policy-effect claim.
