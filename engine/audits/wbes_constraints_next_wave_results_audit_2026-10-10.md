@@ -35,7 +35,7 @@ contains **0 SUPPORTED, 0 REFUTED, 4 PARTIAL, and 4 INCONCLUSIVE** results.
 
 ## Verification
 
-- `python3 scripts/run_wbes_constraints_next_wave_encoding_adapter_2026.py --verify --source-root <LOCAL_HOME>/.codex/worktrees/ieset-cckp-source/IESET` passed byte-exact replay for all eight packets after the result commit.
+- `python3 scripts/run_wbes_constraints_next_wave_encoding_adapter_2026.py --verify --source-root <local-source-root>` passed byte-exact replay for all eight packets after the result commit. `<local-source-root>` denotes the ignored local cache whose two source files match the frozen SHA-256 hashes.
 - A packet's own `replication.py` invoked the same adapter and passed the eight-case exact replay.
 - The strict preregistration index reported 962 strict registration pairs, 1,320 legacy same-commit pairs, and one unrelated unrun specification. All eight WBES records were `verified` in the evidence-tier audit.
 - A read-only evidence-tier build using that fresh index classified the four PARTIAL cells as `calibration`, `public_visible=true`, and the four INCONCLUSIVE cells as `archive`, `public_visible=false` with `non_result_verdict`. The isolated branch had 661 public records among 2,283 hypotheses, four above its pre-result 657 count.
