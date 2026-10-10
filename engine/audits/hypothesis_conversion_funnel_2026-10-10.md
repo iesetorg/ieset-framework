@@ -2,13 +2,13 @@
 
 This is a local source-and-run audit, not a graduation decision. A previous scoreboard claim-link total is not a count of independently graduated hypotheses.
 
-- Hypotheses: **2,126**
-- Public visible: **565** (50 featured; 515 calibration)
-- Archived with verified registration: **241**
+- Hypotheses: **2,128**
+- Public visible: **566** (50 featured; 516 calibration)
+- Archived with verified registration: **242**
 
 | First action | Records |
 | --- | ---: |
-| `data_or_design_rerun` | 68 |
+| `data_or_design_rerun` | 69 |
 | `estimator_repair_and_rerun` | 155 |
 | `integrity_reconcile_and_rerun` | 2 |
 | `missing_result_rerun` | 8 |
