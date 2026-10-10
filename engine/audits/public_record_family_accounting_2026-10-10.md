@@ -14,10 +14,37 @@ This local audit separates public **hypothesis records** from correlated researc
 | Twenty employment result packets in `d39121ad74022bfcb58070d749f1322a65a5b427` | 544 | +20 | One age-by-sex employment family |
 | One HICP omnibus result in `60884324cffb20343eee88c87818166f56f6bac4` | 545 | +1 | One currency/consumer-price family with 20 planned component estimates |
 | Latest consolidated evidence gate | 573 | +28 net since 545 | 30 later public packets, two earlier integrity withdrawals; see current progress audit |
+| Integrated source-locked wave | 619 | +46 since 573 | Twelve public-contributing families/tests, plus archived no-go results; see table below |
 
-**Current local evidence gate: 573 public of 2,141 records, +201 above the reported 372 baseline and 299 short of the 872 target.** The 50 featured records are unchanged; 523 are calibrations. The later 30 gross public packets include correlated education, tourism, tariff, and cross-domain families; two older movement-vintage records were withdrawn after integrity review. This remains a record count, not 201 independent research questions or supported policy effects. See engine/audits/hypothesis_500_target_progress_2026-10-10.md for the later family results and source boundaries.
+**Current local evidence gate: 619 public of 2,211 records, +247 above the reported 372 baseline and 253 short of the 872 target.** The 50 featured records are unchanged; 569 are calibrations. The earlier 30 gross public packets include correlated education, tourism, tariff, and cross-domain families; two older movement-vintage records were withdrawn after integrity review. The subsequent 46 public records occupy the family rows below. This remains a record count, not 247 independent research questions or supported policy effects. See engine/audits/hypothesis_500_target_progress_2026-10-10.md for the result and source boundaries.
 
-**Historical checkpoints:** The 524 ledger represented +152 and a 348-record gap. The subsequent 545/2,099 ledger represented +173 and a 327-record gap, with 51 featured at that time. The current 573/2,141 figures above supersede those checkpoints. The 20 employment cells and one HICP omnibus record are correlated components, not independent findings.
+**Historical checkpoints:** The 524 ledger represented +152 and a 348-record gap. The subsequent 545/2,099 ledger represented +173 and a 327-record gap, with 51 featured at that time. The current 619/2,211 figures above supersede those checkpoints. The 20 employment cells and one HICP omnibus record are correlated components, not independent findings.
+
+### 573 to 619: 46 public records, with failed cells retained
+
+| Registered family or test | Public records | Archived or other limit |
+| --- | ---: | --- |
+| JST interwar advanced-country trade openness | 1 | Descriptive only |
+| V-Dem rule-of-law/corruption geographic holdout | 1 | Descriptive only |
+| WGI rule-of-law forward growth | 1 | One second-outcome no-go |
+| WDI remittance forward family | 1 | One second-outcome no-go |
+| WDI electricity-access forward family | 2 | One family, post-observation implementation correction to original frozen exclusion |
+| JST term-spread macro | 8 | Four frozen influence failures |
+| JST current-account-deficit macro | 13 | One crisis-event failure |
+| WDI female-participation forward income | 1 | PARTIAL |
+| WDI agriculture transition/services productivity | 1 | PARTIAL |
+| JST investment-share/living-standards | 14 | Six frozen failures; one descriptive REFUTED among public records |
+| JST mortgage share/housing/crisis | 2 | Six frozen failures |
+| WDI food-production volume to next-year CPI | 1 | PARTIAL; post-access parser erratum documented separately |
+| WDI protected-land forward family | 0 | Two complete-case failures; zero public |
+| JST interwar credit-severity family | 0 | Two original-registration schema failures; zero public |
+
+The matching dated `engine/audits/` files record source plans, first
+registrations, source locks, measured diagnostics, exact replay, and evidence
+decisions. These 46 records are not 46 independent replications. The
+573-record baseline lacks an ID-level snapshot; source commit `1407cf256f97e85c90a3a3dfcc97e0d9cbd6e312`
+does preserve a 574-record ID set, and the integrated audit shows 45 additions
+and zero withdrawals after it.
 
 The older `b474810e0` evidence audit counted 307 public records. Comparing it directly with 396 mixes earlier visibility repair with the user’s 372 baseline: 17 new IDs, 73 old-ID visibility upgrades, and one withdrawal appear across that wider history. There is no preserved 372-ID set that identifies which old-ID upgrades belong to the first +24. The `+7 net` is arithmetic only, not seven proven independent questions.
 

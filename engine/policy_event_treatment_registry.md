@@ -4,15 +4,15 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 
 ## Summary
 
-- Policies indexed: 3403
+- Policies indexed: 3420
 - Policies with explicit evaluation_design: 42
-- Policies with exact event, enacted, or first-application dates: 2107
+- Policies with exact event, enacted, or first-application dates: 2125
 - Policies with exact-date comparative structure declared: 7
 - Policies with triple-difference structure declared: 1
-- Timing status counts: `{"effective_date_only": 42, "enacted_date_only": 2027, "event_dated": 38, "event_month_dated": 3, "year_period_only": 1293}`
-- Comparison structure counts: `{"axis_only_no_unit_split": 3394, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
-- Measurement blockers: `{"known_microdata_gaps_declared": 16, "needs_comparison_unit_detail": 33, "needs_exact_event_dates": 1296, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3361}`
-- Axis source readiness: `{"partial_ready": 44705, "proprietary_gap": 6714, "ready": 3345, "reconstruct_needed": 19048, "scrape_needed": 14086}`
+- Timing status counts: `{"effective_date_only": 59, "enacted_date_only": 2028, "event_dated": 38, "event_month_dated": 3, "year_period_only": 1292}`
+- Comparison structure counts: `{"axis_only_no_unit_split": 3411, "declared_treated_and_comparison_units": 1, "declared_treated_comparison_design": 8}`
+- Measurement blockers: `{"known_microdata_gaps_declared": 16, "needs_comparison_unit_detail": 33, "needs_exact_event_dates": 1295, "needs_outcome_measurement_plan": 1, "needs_treated_and_comparison_unit_coding": 3378}`
+- Axis source readiness: `{"partial_ready": 44836, "proprietary_gap": 6736, "ready": 3356, "reconstruct_needed": 19102, "scrape_needed": 14118}`
 
 ## Comparative Structure Seeds (Measurement Gaps Shown)
 
@@ -111,7 +111,7 @@ This generated registry turns policy YAMLs into a treatment map for second-order
 | `argentina_privatisations_1991_1999` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `argentina_trade_opening_1991_1995` | candidate | fiscal.spending_level, monetary.central_bank_independence, regulatory.product_market_competition, regulatory.trade_openness | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `argentina_ypf_renationalisation_2012` | candidate | fiscal.spending_level, fiscal.transfer_expansion, monetary.central_bank_independence, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
-| `at_hartwaehrungspolitik_1976` | candidate | monetary.central_bank_independence, monetary.monetary_expansion_direction | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
+| `at_hartwaehrungspolitik_1976` | candidate | monetary.monetary_expansion_direction | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `at_voest_alpine_restructuring_1985` | candidate | fiscal.sectoral_subsidy, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `at_voest_state_industry_expansion_1970s` | candidate | fiscal.sectoral_subsidy, regulatory.product_market_competition | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
 | `au_campbell_committee_financial_inquiry_1979` | candidate | regulatory.financial_deregulation | year_period_only | needs_exact_event_dates, needs_treated_and_comparison_unit_coding |
