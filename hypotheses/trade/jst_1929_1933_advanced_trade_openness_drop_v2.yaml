@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: jst_1929_1933_advanced_trade_openness_drop_v2
+version: 1
+status: pre_registered
+topic: trade
+claim: >
+  In a fixed panel of twelve advanced economies covered by the Jordà-Schularick-Taylor
+  R6 macrohistory source, equal-country mean nominal trade-to-GDP
+  (imports plus exports divided by nominal GDP) fell by at least eight
+  percentage points between the 1925–1929 annual average and the 1932–1933
+  annual average. This describes an interwar trade contraction relative to
+  output; it does not identify any effect of the Smoot-Hawley tariff.
+evidence_type: descriptive
+sample:
+  countries: [AUS, BEL, CAN, DEU, ESP, FRA, GBR, ITA, JPN, NLD, SWE, USA]
+  period: [1925, 1933]
+  temporal_structure: panel
+  exclusion_rules:
+    - >
+      Use exactly annual source keys 1925–1933 for the twelve named countries.
+      Each country must have all nine annual imports, exports, and GDP fields
+      finite, with imports and exports strictly positive and GDP strictly
+      positive; otherwise exclude the entire country. No imputation,
+      country replacement, source substitution, winsorisation, or post-result
+      window changes.
+    - >
+      The 1925–1929 five-year average is the baseline and the 1932–1933
+      two-year average is the endpoint. Years 1930–1931 are retained for
+      completeness and within-country variation checks, not fitted as a
+      separate result.
+variables:
+  outcome:
+    - name: trade_to_gdp_percentage_points
+      source: jst:R6.imports_exports_gdp
+      transformation: >
+        For each country-year compute 100*(imports+exports)/gdp, using JST's
+        nominal local-currency columns. For each complete country subtract
+        its 1932–1933 average from its 1925–1929 average; average those
+        country-specific declines with equal country weights.
+estimator:
+  template: descriptive
+  clustering: none
+  notes: >
+    One fixed descriptive contrast and one twelve-country family. No tariff
+    treatment, causal coefficient, p-value, or country-level hypothesis is
+    estimated. Country-specific changes and leave-one-country-out means are
+    internal diagnostics; the public aggregate reports only the mean decline,
+    counts, and influence range. The source's advanced-economy panel cannot
+    establish a world-trade total, retaliation, or historical peacetime rank.
+falsification:
+  test: jst_1929_1933_advanced_trade_openness_fixed_panel_v2
+  rule: >
+    First require a committed, unchanged registration and a later separately
+    committed metadata-only JST source lock. Require all 108 country-year
+    keys, at least ten of twelve complete nine-year countries, and at least
+    eight of the complete countries to have within-country 1925–1933 annual
+    trade-to-GDP range of at least one percentage point. The mean decline
+    must retain its sign under every leave-one-country-out calculation, and
+    the largest absolute leave-one-out change from the full mean may not
+    exceed three percentage points. Any failed source, sample, variation, or
+    influence gate is INCONCLUSIVE. Once valid, SUPPORTED requires a mean
+    decline of at least eight percentage points and declines in at least
+    eight complete countries. REFUTED requires a mean decline below five
+    percentage points. Other valid outcomes are PARTIAL. One closed
+    descriptive family with no inferential alpha; this test grants no
+    causal, policy, school, position, or featured credit.
+  threshold:
+    family_id: jst_1929_1933_advanced_trade_openness_one_family_2026
+    family_size: 1
+    inferential_alpha: none_descriptive
+    expected_source_keys: 108
+    minimum_complete_countries: 10
+    minimum_countries_with_one_pp_annual_range: 8
+    maximum_leave_one_out_shift_pp: 3.0
+    support_decline_pp: 8.0
+    support_country_declines: 8
+    refute_decline_below_pp: 5.0
+prior_confidence: 0.7
+disclosure: >
+  The historical collapse of trade is well documented, but the magnitude of
+  a ratio with GDP as denominator can differ from nominal trade-level loss.
+  JST's 18 advanced economies are not the globe, and historical series are
+  spliced from multiple archival sources. The selected twelve countries are
+  all members of the archived Smoot-Hawley specification present in JST R6;
+  Argentina and Brazil are absent. Shared Depression shocks, monetary
+  contraction, protectionism, and exchange regimes cannot be separately
+  attributed by this descriptive contrast.
+methodology_note: >
+  The archived `trade_lib_smoot_hawley_1930_historical` same-commit legacy run
+  lacked its named JST trade fields and a source manifest, while its narrative
+  also asserted global collapse and retaliation. This new-ID validation
+  freezes the narrower twelve-advanced-economy trade-to-GDP contrast before
+  opening any selected imports, exports, or GDP values or null masks. Its
+  result cannot revive or upgrade that archived causal/historical narrative.
+steelman: hypotheses/steelman/jst_1929_1933_advanced_trade_openness_drop_v2.md
+scope:
+  period: [1925, 1933]
+  countries: [AUS, BEL, CAN, DEU, ESP, FRA, GBR, ITA, JPN, NLD, SWE, USA]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [interwar_trade_contraction, great_depression]
