@@ -1,0 +1,108 @@
+packet_version: 1
+hypothesis:
+  id: oecd_pdb_ict_productivity_next_year_employment_2026
+  path: hypotheses/labour/oecd_pdb_ict_productivity_next_year_employment_2026.yaml
+preregistration:
+  commit: a400392669a9219a79ea94c875eb9aabd1ee309b
+  steelman: hypotheses/steelman/oecd_pdb_ict_productivity_next_year_employment_2026.md
+  source_plan: engine/audits/oecd_pdb_sector_productivity_employment_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/oecd_pdb_sector_productivity_employment_2026_key_roster.csv
+source:
+  publisher: OECD Productivity Database
+  dataflow: OECD.SDD.TPS,DSD_PDB@DF_PDB,2.0
+  source_url: https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PDB@DF_PDB,2.0/all?format=csvfilewithlabels
+  documentation_url: https://data-explorer.oecd.org/vis?fs[0]=Topic&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_PDB
+  source_sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+  source_lock_commit: 7b991caf271e8bc2cc96e377b3d33617c0ca111e
+  source_lock_manifest: data/pinned_evidence/oecd_pdb_ict_productivity_next_year_employment_2026.source.json
+  fetch_manifest: data/manifests/fetch_run_2026-05-19T095056Z.yaml
+  key_roster_sha256: d3de10283b9e5f666aae16d407800afbd65d2a7c2f094ee825de0847bcbc3f9d
+  license: OECD standard permissions; attribution required
+  contains_source_values: false
+family:
+  id: oecd_pdb_sector_productivity_employment_forward_2026_10_10
+  size: 3
+  members:
+  - oecd_pdb_manufacturing_productivity_next_year_employment_2026
+  - oecd_pdb_retail_productivity_next_year_employment_2026
+  - oecd_pdb_ict_productivity_next_year_employment_2026
+  holm_alpha: 0.05
+  interpretation: Three correlated OECD sector cells, one vintage and one design; not independent replication
+reproduction:
+  runner: scripts/run_oecd_pdb_sector_productivity_employment_2026.py
+  command: python3 scripts/run_oecd_pdb_sector_productivity_employment_2026.py verify --source-root /path/to/IESET
+  result_sha256: 49e89f08ceab6fda352d33262791b411f4c7b6ce5fb286d79d9f9ebaa186823e
+result:
+  sample:
+    key_roster_rows: 749
+    key_roster_countries: 28
+    complete_rows_before_country_floor: 746
+    valid_rows: 737
+    valid_countries: 27
+    years_with_twelve_countries: 28
+    treatment_year_min: 1996
+    treatment_year_max: 2023
+    dropped:
+      country_below_ten_year_floor: 9
+      missing_or_invalid_employment_level: 3
+    selected_values_read_after_committed_locks: true
+  primary:
+    beta: 0.049110922981977057
+    n_rows: 737
+    n_countries: 27
+    model_rank: 56
+    model_columns: 56
+    country_cluster_se: 0.026198753219091656
+    p_two_sided: 0.07213176923876276
+    df_inference: 26
+    residual_productivity_sd_pp: 4.88269308297338
+    residual_employment_sd_pp: 2.9750996574104454
+    maximum_country_productivity_ss_share: 0.13613296765454658
+    top_one_percent_productivity_ss_share: 0.17153686724809267
+    method: equal-row country/year FE OLS with prior employment growth; country CR1 cluster t(G-1)
+  hash_folds:
+  - omitted_hash_fold: 0
+    rows: 597
+    countries: 22
+    beta: 0.04066669174980386
+  - omitted_hash_fold: 1
+    rows: 542
+    countries: 20
+    beta: 0.04994632379732411
+  - omitted_hash_fold: 2
+    rows: 625
+    countries: 23
+    beta: 0.054018094013913553
+  - omitted_hash_fold: 3
+    rows: 653
+    countries: 24
+    beta: 0.04723663376835896
+  - omitted_hash_fold: 4
+    rows: 531
+    countries: 19
+    beta: 0.05109406141789469
+  gate_failures: []
+  verdict: PARTIAL
+  holm_adjusted_p: 0.07213176923876276
+  same_direction_folds: 5
+  opposite_direction_folds: 0
+limitations:
+- Three sector cells share one OECD PDB vintage, country roster and design; they are one correlated family,
+  not independent replications.
+- Productivity growth uses real sector value added per hour; subsequent employment growth uses persons.
+  Higher productivity can reflect demand, hours or measurement changes rather than labor-saving technology.
+- The prior employment growth control and country/year effects do not identify a causal productivity effect,
+  automation effect or policy intervention.
+- The frozen OECD core and finite +/-50 growth bounds exclude some countries and extreme sector changes;
+  no interpolation or source substitution is permitted.
+- Sector choices and directional priors followed visibility of the older IESET archive; Holm adjustment
+  covers only these three frozen tests, not archive-wide selection.
+- No causal, policy, school, position or featured credit is assigned.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
