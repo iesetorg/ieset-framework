@@ -74,7 +74,7 @@ school claim is reinterpreted or credited by this test.
 
 1. Commit the four registration files without source values or result files.
 2. Run `python3 scripts/run_jst_pre1980_credit_crisis_2026.py plan
-   --source-parquet <LOCAL_HOME>/IESET/data/vintages/jst/jst_macrohistory@2026-05-05T195309Z.parquet`
+   --source-parquet <local-source-root>/data/vintages/jst/jst_macrohistory@2026-05-05T195309Z.parquet`
    to check the 1,494 fixed source keys only.
 3. Run the same command with `source-lock` instead of `plan`. It writes only
    `data/pinned_evidence/jst_pre1980_credit_crisis_2026.source.json`, which

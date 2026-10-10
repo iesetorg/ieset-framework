@@ -1,0 +1,7 @@
+# JST local-path redaction after result
+
+The JST historical test was blindly registered, corrected before source access, source-locked, and measured in separate commits. Its PARTIAL numerical verdict and all frozen analytic thresholds remain unchanged. After the result, a public-tree scan found a local machine path in the source-plan example and frozen runner's default source location. This commit replaces those defaults with a repository-relative path and a source-root placeholder; it also removes a local checkout path from the separate main-vintage inventory note.
+
+This is a **post-result provenance edit**, not a new registration or evidence upgrade. The runner now checks the Git order: original registration, pre-source publisher correction, metadata lock, result, then this redaction. It requires the hypothesis and steelman to match the pre-source correction, the plan to differ only by the local-path substitution, and the runner's analytic syntax tree to remain unchanged outside the default source path and chronology guard. Replay still needs the exact licensed JST R6 parquet supplied with `--source-parquet`.
+
+The path-bearing originals remain in local Git history. This current-tree redaction does not make that history fit for publication. The JST result may count as one descriptive calibration only while the exact source and result replay checks pass; it earns no causal, policy, school, position, or featured credit.

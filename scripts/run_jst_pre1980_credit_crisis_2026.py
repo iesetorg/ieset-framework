@@ -9,9 +9,11 @@ written into the repository; replay requires the licensed local JST R6 file.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import math
+import re
 import subprocess
 import sys
 from collections import Counter
@@ -32,10 +34,7 @@ STEELMAN_REL = f"hypotheses/steelman/{HID}.md"
 LOCK_REL = "data/pinned_evidence/jst_pre1980_credit_crisis_2026.source.json"
 RUN_REL = f"engine/runs/{HID}"
 REGISTRATION_FILES = (SPEC_REL, STEELMAN_REL, PLAN_REL, RUNNER_REL)
-SOURCE_DEFAULT = Path(
-    "<LOCAL_HOME>/IESET/data/vintages/jst/"
-    "jst_macrohistory@2026-05-05T195309Z.parquet"
-)
+SOURCE_DEFAULT = ROOT / "data/vintages/jst/jst_macrohistory@2026-05-05T195309Z.parquet"
 SOURCE_SHA256 = "4219d53e595e50b05430b5e4edd91f5f9ebff3987e3d0b6f21d2f2f50bc03a6f"
 SOURCE_URL = "https://www.macrohistory.net/app/download/9834512569/JSTdatasetR6.xlsx"
 DOC_URL = "https://www.macrohistory.net/database/"
@@ -92,28 +91,61 @@ def strict_ancestor(older: str, newer: str) -> bool:
     return older != newer and git("merge-base", "--is-ancestor", older, newer, check=False).returncode == 0
 
 
+def analysis_ast(raw: bytes) -> str:
+    """Compare all frozen analysis code while allowing a path-only replay erratum."""
+    tree = ast.parse(raw)
+    tree.body = [
+        node for node in tree.body
+        if not (
+            isinstance(node, ast.FunctionDef) and node.name in {"registration_commit", "analysis_ast"}
+        )
+        and not (
+            isinstance(node, ast.Assign)
+            and any(isinstance(target, ast.Name) and target.id == "SOURCE_DEFAULT"
+                    for target in node.targets)
+        )
+        and not (
+            isinstance(node, ast.Import)
+            and all(alias.name in {"ast", "re"} for alias in node.names)
+        )
+    ]
+    return ast.dump(tree, include_attributes=False)
+
+
 def registration_commit() -> str:
-    additions = []
-    histories = []
+    histories = {}
     for relative in REGISTRATION_FILES:
         path = ROOT / relative
         if not path.is_file() or git_bytes("HEAD", relative) != path.read_bytes():
             raise RuntimeError(f"commit unchanged registration before value access: {relative}")
-        additions.append(first_addition(relative))
-        histories.append(git("log", "--format=%H", "HEAD", "--", relative).stdout.decode().splitlines())
-    if len(set(additions)) != 1:
+        histories[relative] = git("log", "--format=%H", "HEAD", "--", relative).stdout.decode().splitlines()
+    additions = {history[-1] for history in histories.values()}
+    if len(additions) != 1:
         raise RuntimeError("hypothesis, steelman, plan, runner first additions differ")
-    first = additions[0]
-    # A publisher-definition correction was committed before source lock or
-    # outcome access. All four files changed together and no other edits are
-    # allowed, preserving both the original and corrected blind versions.
-    if len({tuple(history) for history in histories}) != 1:
-        raise RuntimeError("registration files have different edit histories")
-    history = histories[0]
-    if len(history) != 2 or history[1] != first or not strict_ancestor(first, history[0]):
+    first = additions.pop()
+    spec_history = histories[SPEC_REL]
+    if (histories[STEELMAN_REL] != spec_history or len(spec_history) != 2
+            or spec_history[1] != first or not strict_ancestor(first, spec_history[0])):
         raise RuntimeError("expected original registration plus one pre-source correction")
-    commit = history[0]
-    for relative in REGISTRATION_FILES:
+    commit = spec_history[0]
+    plan_history = histories[PLAN_REL]
+    runner_history = histories[RUNNER_REL]
+    if (plan_history != runner_history or len(plan_history) != 3
+            or plan_history[1:] != spec_history
+            or not strict_ancestor(
+                first_addition(f"{RUN_REL}/diagnostics.json"), plan_history[0]
+            )):
+        raise RuntimeError("expected one disclosed post-result path redaction")
+    redacted_plan = re.sub(
+        rb"/Users/[A-Za-z0-9._-]+/IESET/",
+        b"<local-source-root>/",
+        git_bytes(commit, PLAN_REL),
+    )
+    if (ROOT / PLAN_REL).read_bytes() != redacted_plan:
+        raise RuntimeError("source plan changed beyond local path redaction")
+    if analysis_ast(git_bytes(commit, RUNNER_REL)) != analysis_ast((ROOT / RUNNER_REL).read_bytes()):
+        raise RuntimeError("frozen analytic runner changed beyond replay path guard")
+    for relative in (SPEC_REL, STEELMAN_REL):
         if git_bytes(commit, relative) != (ROOT / relative).read_bytes():
             raise RuntimeError(f"registered bytes changed after pre-source correction: {relative}")
     for revision in (first, commit):
