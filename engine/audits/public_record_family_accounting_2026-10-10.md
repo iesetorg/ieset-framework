@@ -13,8 +13,11 @@ This local audit separates public **hypothesis records** from correlated researc
 | Regenerated primary ledger before employment | 524 | +26 | 26 additions in 5 families |
 | Twenty employment result packets in `d39121ad74022bfcb58070d749f1322a65a5b427` | 544 | +20 | One age-by-sex employment family |
 | One HICP omnibus result in `60884324cffb20343eee88c87818166f56f6bac4` | 545 | +1 | One currency/consumer-price family with 20 planned component estimates |
+| Latest consolidated evidence gate | 573 | +28 net since 545 | 30 later public packets, two earlier integrity withdrawals; see current progress audit |
 
-**Audited total through the 524 ledger: +152 public records, 348 short of the requested +500 (target 872).** The refreshed evidence ledger confirms **545 public of 2,099 hypothesis records**: +173 from the 372 baseline and 327 short of 872. Featured remains 51. This record-level count includes 20 correlated employment cells and one HICP omnibus record; it is not a count of independent findings.
+**Current local evidence gate: 573 public of 2,141 records, +201 above the reported 372 baseline and 299 short of the 872 target.** The 50 featured records are unchanged; 523 are calibrations. The later 30 gross public packets include correlated education, tourism, tariff, and cross-domain families; two older movement-vintage records were withdrawn after integrity review. This remains a record count, not 201 independent research questions or supported policy effects. See engine/audits/hypothesis_500_target_progress_2026-10-10.md for the later family results and source boundaries.
+
+**Historical checkpoints:** The 524 ledger represented +152 and a 348-record gap. The subsequent 545/2,099 ledger represented +173 and a 327-record gap, with 51 featured at that time. The current 573/2,141 figures above supersede those checkpoints. The 20 employment cells and one HICP omnibus record are correlated components, not independent findings.
 
 The older `b474810e0` evidence audit counted 307 public records. Comparing it directly with 396 mixes earlier visibility repair with the user’s 372 baseline: 17 new IDs, 73 old-ID visibility upgrades, and one withdrawal appear across that wider history. There is no preserved 372-ID set that identifies which old-ID upgrades belong to the first +24. The `+7 net` is arithmetic only, not seven proven independent questions.
 
