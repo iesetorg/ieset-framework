@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_agriculture_transition_services_productivity_forward_v2
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: >-
+  Across source-key eligible national areas, a larger 2005–2015 decline in the
+  agricultural employment share predicts faster 2015–2023 annualized real GDP-per-person
+  growth when real services value added per services worker also rose in 2005–2015,
+  compared with areas where it did not rise. This is a descriptive forward test of one
+  branch of the archived conditional structural-transition claim, not an identified
+  labour-reallocation policy effect.
+methodology_note: >-
+  New-ID direct-measure v2 for archived agriculture_employment_transition_productivity_panel.
+  Its old generic screen substituted services value-added share as treatment and total
+  employment rate as outcome; those are not agricultural employment decline, sector labour
+  productivity, or GDP-per-person growth. This v2 tests only the services-productivity
+  branch with a later growth endpoint. It does not test the manufacturing branch or the
+  archived same-period conditional effect, and it does not relabel the old result.
+evidence_type: descriptive
+sample:
+  countries: [GLOBAL]
+  period: [2005, 2023]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    One agricultural employment-share change, one concurrent services productivity
+    condition, and one later income-growth endpoint per eligible national area.
+  exclusion_rules:
+    - >-
+      Candidate roster is every ISO 3166 alpha-3 country or territory in pycountry,
+      plus XKX, with exact 2005/2015 keys in the four pinned preperiod sources and
+      2005/2015/2023 keys in pinned real GDP per person. ILOSTAT employment uses
+      SEX_T and AGE_YTHADULT_YGE15. The exact key-only roster is committed in a
+      separate source lock before selected values or null masks are opened.
+    - >-
+      Require finite agricultural and services employment shares in [0,100] at
+      both preperiod endpoints; services share must be strictly positive. Require
+      strictly positive finite real services value added, ILOSTAT total employment,
+      and real GDP per person at every required endpoint. Every invalid or missing
+      value is excluded and counted.
+    - >-
+      No interpolation, imputation, nearest-year join, geography substitution,
+      winsorization, outcome-based subgroup, alternative employment series, or
+      source-vintage switch.
+variables:
+  treatment:
+    - name: agricultural_employment_share_decline_per_10pp
+      source: world_bank_wdi:SL.AGR.EMPL.ZS
+      transformation: (2005 agricultural employment share minus 2015 share) / 10
+    - name: real_services_productivity_rose_2005_2015
+      source: world_bank_wdi:NV.SRV.TOTL.KD; world_bank_wdi:SL.SRV.EMPL.ZS; ilostat:EMP_2EMP_SEX_AGE_NB
+      transformation: >-
+        One if 2005–2015 annual log change in real services value added divided by
+        (total employed persons times services employment share / 100) is positive;
+        otherwise zero. ILOSTAT unit cancels in the growth ratio.
+  outcome:
+    - name: future_real_gdp_pc_annual_log_growth_pp
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 100 * log(2023 real GDP per person / 2015 real GDP per person) / 8
+  controls:
+    - name: agricultural_employment_share_2005
+      source: world_bank_wdi:SL.AGR.EMPL.ZS
+      transformation: 2005 percentage level
+    - name: log_real_income_2015
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural log of 2015 level
+    - name: prior_real_income_annual_log_growth_pp
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 100 * log(2015 real GDP per person / 2005 real GDP per person) / 10
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: >-
+    Equal-economy OLS with intercept, agricultural-share decline D, preperiod
+    services-productivity-rise indicator R, D*R, and the three fixed controls.
+    HC3 covariance; two-sided Student-t reference with N minus parameter-count
+    degrees of freedom for D, D*R, and the rising-group slope D+D*R. No search
+    over cutoffs, controls, source vintages, or outcome windows.
+falsification:
+  test: fixed_agriculture_transition_services_productivity_forward_v2
+  rule: >-
+    INCONCLUSIVE if the complete sample, group sizes, exposure variation, rank,
+    HC3, residualized-interaction concentration, or leave-one-area-out gates
+    fail. SUPPORTED requires interaction beta >=+0.3 annual log-growth percentage
+    point per 10-point agricultural-share decline with two-sided p<=0.05, a
+    productivity-rising slope >=+0.3 with p<=0.05, a non-rising-slope 95%
+    two-sided upper bound below +0.3, and at least 75% of successful
+    leave-one-out fits retaining a positive interaction and rising slope.
+    REFUTED requires either interaction beta <=-0.3 with p<=0.05 or rising
+    slope <=-0.3 with p<=0.05, with at least 75% leave-one-out agreement in
+    that adverse direction. Other estimable results are PARTIAL. This one
+    outcome is one family, with zero causal, policy, school, position, or
+    featured credit.
+  threshold:
+    family_id: wdi_agriculture_transition_services_productivity_forward_2026
+    family_size: 1
+    treatment_years: [2005, 2015]
+    outcome_years: [2015, 2023]
+    min_complete_economies: 80
+    min_each_services_productivity_group: 25
+    min_agricultural_decline_5pp_economies: 20
+    min_agricultural_decline_iqr_pp_each_group: 2
+    max_single_economy_residualized_interaction_share: 0.2
+    max_loo_failures: 2
+    min_loo_direction_share: 0.75
+    min_abs_interaction_annual_log_pp_per_10pp: 0.3
+    min_abs_rising_slope_annual_log_pp_per_10pp: 0.3
+    max_non_rising_slope_upper_95: 0.3
+    two_sided_p_max: 0.05
+    source_files:
+      agriculture_employment:
+        path: data/vintages/world_bank_wdi/SL.AGR.EMPL.ZS@2026-05-05T203707Z.parquet
+        sha256: 5c93658478663cf30d1deb2e29fb8cafe22c9f28c98c1aafed62135259e655f1
+      services_employment_share:
+        path: data/vintages/world_bank_wdi/SL.SRV.EMPL.ZS@2026-05-05T203741Z.parquet
+        sha256: 5cc0fcababebe90b69eae253466a6a81beaf0f52f9c0ef5d59b8a2fa34f400c6
+      services_real_value_added:
+        path: data/vintages/world_bank_wdi/NV.SRV.TOTL.KD@2026-04-30T151128Z.parquet
+        sha256: d6209478a5f209eecd9cb6ea8440f34ec6cfcc8efa4f4846e8f7fa69e2fa9330
+      total_employed:
+        path: data/vintages/ilostat/EMP_2EMP_SEX_AGE_NB@2026-04-30T115257Z.parquet
+        sha256: 1c7d873d1444da34ebb68781ea8bc9d62e401efe46c64a7685a32fcb814bf378
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    policy_score_credit: 0
+    school_score_credit: 0
+    legacy_hypothesis_id: agriculture_employment_transition_productivity_panel
+prior_confidence: 0.35
+disclosure: >-
+  The old proxy estimate is known and does not test this estimand. A real
+  sector-value-added-per-worker construction combines WDI and ILOSTAT source
+  conventions; sector classification and revisions can differ. Reallocation,
+  productivity, income, institutions, and demography are jointly determined,
+  and the preperiod productivity indicator is not a random moderator. The
+  forward association cannot identify a structural-transition policy effect.
+  No selected numeric values or null masks were opened before registration.
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+scope:
+  period: [2005, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, productivity]
+  policy_family: [none]
+  treatment_tags: [agricultural_employment_transition, services_labor_productivity]
+steelman: hypotheses/steelman/wdi_agriculture_transition_services_productivity_forward_v2.md
+notes: >-
+  Blind plan: engine/audits/wdi_agriculture_transition_services_productivity_forward_2026_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_wdi_agriculture_transition_services_productivity_forward_2026.py.
