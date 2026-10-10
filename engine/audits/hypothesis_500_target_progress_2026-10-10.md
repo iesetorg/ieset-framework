@@ -2,11 +2,11 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current local evidence
-gate reports **546 public of 2,104 hypotheses**: 51 featured and 495 calibration.
-This is **174 additional records** and leaves **326** to the record-level target. These
+gate reports **544 public of 2,104 hypotheses**: 50 featured and 494 calibration.
+This is **172 additional records** and leaves **328** to the record-level target. These
 records are not independent research questions: one age-by-sex employment family
 contributes 20 visible records. The family accounting below keeps that distinction
-explicit. Another 238 records
+explicit. Another 240 records
 have verified registration but remain archived. A public calibration is a
 completed, reviewable test, not a supported, causal, policy-effect, or
 school-score finding.
@@ -292,6 +292,17 @@ redacted without changing the frozen custody lock after outcome access. It
 remains excluded from the public count; see
 `engine/audits/argentina_core_cpi_provenance_review_2026-10-10.md`.
 
+An independent movement-vintage dependency audit held two older public
+records. The resource-developmentalism result's broad scalar cannot
+identify its registered clean subtype contrast and had been shown as
+featured causal evidence. The developmentalist-growth packet predates its
+saved run, reports a different coefficient, and has no matching input
+vintages. Their historical PARTIAL results remain inspectable, but both
+are now archived through the external integrity registry, with zero
+school credit. This withdraws one featured and one calibration record;
+it is why the net count is 544 despite the new JST calibration. See
+`engine/audits/movement_vintage_hypothesis_integrity_2026-10-10.md`.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -374,7 +385,7 @@ changes at the required country-years. The 1,320 legacy same-commit
 registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
-The requested +500 remains unmet: **326 more public records** would be
+The requested +500 remains unmet: **328 more public records** would be
 needed, and the record count itself overstates independent research questions.
 A separate feasibility audit found no defensible hundreds-sized family in the
 preserved corpus. Priorities for genuinely new source acquisition are matched
@@ -396,7 +407,7 @@ dependent-run review.
 Generated preregistration, evidence-tier, census, and conversion-funnel
 indexes were refreshed after the latest frozen runs. Current local checks
 passed: **6,246** specs and cross-references, 784 strict and 1,320 legacy
-registration pairs, the 546/2,104 evidence and census checks, drift
+registration pairs, the 544/2,104 evidence and census checks, drift
 consistency, 11 focused Python tests, eight web tests, TypeScript checking,
 the **8,544-route** static site build, exact replay of the JST, tariff,
 Ecuador, OECD, and Mexico packets, and public-tree OPSEC scanning. The

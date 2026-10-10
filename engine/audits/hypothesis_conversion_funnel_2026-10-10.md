@@ -3,8 +3,8 @@
 This is a local source-and-run audit, not a graduation decision. A previous scoreboard claim-link total is not a count of independently graduated hypotheses.
 
 - Hypotheses: **2,104**
-- Public visible: **546** (51 featured; 495 calibration)
-- Archived with verified registration: **238**
+- Public visible: **544** (50 featured; 494 calibration)
+- Archived with verified registration: **240**
 
 | First action | Records |
 | --- | ---: |
@@ -13,7 +13,7 @@ This is a local source-and-run audit, not a graduation decision. A previous scor
 | `integrity_reconcile_and_rerun` | 2 |
 | `missing_result_rerun` | 8 |
 | `new_prospective_v2_run_required` | 1,320 |
-| `other_manual_review` | 3 |
+| `other_manual_review` | 5 |
 | `prospective_rule_version_required` | 2 |
 | `replication_path_review` | 1 |
 
