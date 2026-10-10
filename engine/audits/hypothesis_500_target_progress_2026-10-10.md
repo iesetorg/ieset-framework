@@ -2,11 +2,11 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current local evidence
-gate reports **545 public of 2,099 hypotheses**: 51 featured and 494 calibration.
-This is **173 additional records** and leaves **327** to the record-level target. These
+gate reports **546 public of 2,104 hypotheses**: 51 featured and 495 calibration.
+This is **174 additional records** and leaves **326** to the record-level target. These
 records are not independent research questions: one age-by-sex employment family
 contributes 20 visible records. The family accounting below keeps that distinction
-explicit. Another 234 records
+explicit. Another 238 records
 have verified registration but remain archived. A public calibration is a
 completed, reviewable test, not a supported, causal, policy-effect, or
 school-score finding.
@@ -260,6 +260,38 @@ must not be represented as independent replications. See
 `engine/audits/public_record_family_accounting_2026-10-10.md` and
 `engine/audits/large_family_feasibility_and_acquisition_2026-10-10.md`.
 
+## Latest historical and policy-event screens
+
+Five new-ID, source-pinned tests were registered before their selected outcomes
+were read. The pre-1980 JST credit-boom to crisis-onset test passed its source,
+sample, and incident-event floors and returned **PARTIAL**: forward crisis
+onset was 7/35 (20.0%) among high-credit anchors and 24/131 (18.32%) among
+other at-risk anchors. Its risk ratio 1.092 and risk difference 1.68 percentage
+points fell short of the frozen support thresholds of 2 and 2 percentage
+points. This is **one** public descriptive calibration, with no causal,
+policy, school, position, or featured credit. The licensed local JST R6 value
+rows were not committed; the metadata lock and six aggregate run artifacts
+replayed exactly. See `engine/audits/jst_pre1980_credit_crisis_2026_result.md`.
+
+Four other preregistered tests stopped at frozen gates and add **zero**
+public records. The Mexico–EU4 BACI comparison missed its pretrend gate
+(absolute slope 0.088750 versus 0.03); the Ecuador–EU five-destination
+comparison likewise missed its pretrend gate (0.075364 versus 0.03). The
+2025 OECD bargaining/unemployment holdout had 22 actual-status complete
+countries against its minimum of 24. The WITS tariff-duration two-real-outcome
+test had 51 complete countries but only five with at least two high-tariff
+years against a minimum of ten. No frozen gate was relaxed or alternate
+post-result sample chosen. The direct treaty tests are descriptive only and
+do not award policy-effect credit. See their individual result audits under
+`engine/audits/`.
+
+The reverted Argentina core-CPI holdout was audited retrospectively. Its
+historical arithmetic reproduced, but its first registration had pinned a
+full fetch manifest containing unrelated local paths. Those bytes cannot be
+redacted without changing the frozen custody lock after outcome access. It
+remains excluded from the public count; see
+`engine/audits/argentina_core_cpi_provenance_review_2026-10-10.md`.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -342,7 +374,7 @@ changes at the required country-years. The 1,320 legacy same-commit
 registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
-The requested +500 remains unmet: **327 more public records** would be
+The requested +500 remains unmet: **326 more public records** would be
 needed, and the record count itself overstates independent research questions.
 A separate feasibility audit found no defensible hundreds-sized family in the
 preserved corpus. Priorities for genuinely new source acquisition are matched
@@ -351,15 +383,26 @@ cohort mobility outcomes, wealth-tax behaviour, and technology-specific
 renewables costs. Existing failed gates cannot be repaired by relabeling
 old runs or multiplying outcome slices.
 
-Generated preregistration, evidence, census, conversion-funnel, school,
-second-order, and policy indexes were refreshed after all current result and
-policy commits. Local checks passed: **6,241** specs and cross-references,
-three current focused Python tests, eight web tests, TypeScript type checking
-and the **8,534-route** static site build, generated drift consistency, exact
-replay of the employment and HICP packets, and public-tree OPSEC scanning.
-The static drift page, French 1789, U.S. Judiciary Act, and HICP result pages
-were present in the build. Link reciprocity had zero errors or warnings;
-scope alignment had zero errors and seven warnings. Publication remains on
-hold: this local branch history contains an older rejected, path-bearing
-source manifest followed by a revert. No push, merge, or deployment is
-authorized by these local audits.
+An independent drift check confirmed the current map spans 1789–2026, 145
+national country keys, and 21 axes, with the first French weak rule-of-law step
+in 1789 and the first statist composite step in 1846. A separate movement
+vintage builder could previously encode California and EU-wide movements as
+national country values and started its dense grid at 1800. Its loader and
+builders now filter to national scope and begin no later than the earliest
+authored national movement. The 108 old May-16 source-pinned vintages were
+not silently overwritten; any refreshed vintage needs a new version and
+dependent-run review.
+
+Generated preregistration, evidence-tier, census, and conversion-funnel
+indexes were refreshed after the latest frozen runs. Current local checks
+passed: **6,246** specs and cross-references, 784 strict and 1,320 legacy
+registration pairs, the 546/2,104 evidence and census checks, drift
+consistency, 11 focused Python tests, eight web tests, TypeScript checking,
+the **8,544-route** static site build, exact replay of the JST, tariff,
+Ecuador, OECD, and Mexico packets, and public-tree OPSEC scanning. The
+static drift and JST result pages were present in the build. The JST
+post-result local-path redaction passed exact replay without changing
+analytic rules; it does not erase path-bearing Git history. Publication
+remains on hold because this local branch history also contains an older
+rejected, path-bearing source manifest followed by a revert. No push,
+merge, or deployment follows from these local audits.
