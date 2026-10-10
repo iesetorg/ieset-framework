@@ -11,4 +11,10 @@ The registered treatment, range and meaningful-effect units are **percentage poi
 
 Exact replay of these two **inconclusive first-pass packets** succeeds with `python3 scripts/run_sipri_wdi_public_budget_2026.py verify --source-root <local-source-root>` where `<local-source-root>` contains the ignored, hash-matched SIPRI and WDI Parquets. Raw source values remain ignored; only aggregate diagnostics are committed. These packets have zero causal, policy, school, position and featured credit. A later percentage-point repair, if pursued, needs a separately documented post-gate implementation and must retain these initial failures as audit evidence.
 
+The source lock was committed once for the two-member family. The central
+evidence reader now checks that shared lock, every original sibling packet,
+and the registration→lock→run order before recognizing its **INCONCLUSIVE**
+verdicts. This path accepts only inconclusive families and keeps both records
+in the archive; it grants no public or school-score credit.
+
 The related fixed-investment study has an already-committed post-lock unit adapter, `scripts/run_sipri_military_fixed_investment_2026_unit_fix.py`. Its saved PARTIAL packet replays through that adapter. Calling its original preregistration runner's `verify` directly compares unscaled first-pass calculations against the corrected packet and therefore fails; this is not by itself an integrity breach. The current public evidence ledger labels that older record `calibration` and `public_visible=true` with no school-score credit. Its post-gate repair and related limitations remain material to that interpretation.
