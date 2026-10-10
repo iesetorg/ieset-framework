@@ -31,6 +31,8 @@ FAMILY = "wdi_tourism_response_six_outcome_family_2026_10_10"
 RUNNER = "scripts/run_wdi_tourism_response_six_outcome_2026.py"
 TEST = "tests/test_wdi_tourism_response_six_outcome_2026.py"
 PREREG = "engine/audits/wdi_tourism_response_six_outcome_prereg_2026-10-10.md"
+PARSER_ERRATUM = "engine/audits/wdi_tourism_response_parser_erratum_2026-10-10.md"
+PARSER_ERRATUM_TEST = "tests/test_wdi_tourism_response_parser_erratum_2026.py"
 ROSTER = "data/pinned_evidence/wdi_tourism_response_2026_key_roster.csv"
 ROSTER_SHA = "018d735c2c6be4687db392b07e1872f6e5cb5fb6c8f50354f7a54f4dad09ff61"
 LOCK = "data/pinned_evidence/wdi_tourism_response_six_outcome_2026.manifest.json"
@@ -174,7 +176,20 @@ def registration_commit() -> str:
         raise RuntimeError("registration files lack one first-addition commit")
     revision = revisions.pop()
     for path in paths:
-        frozen(path, revision)
+        if path != RUNNER:
+            frozen(path, revision)
+    corrections = git("log", "--format=%H", f"{revision}..HEAD", "--", RUNNER).decode().splitlines()
+    if len(corrections) != 1:
+        raise RuntimeError("runner must have exactly one documented parser correction")
+    correction = corrections[0]
+    if (first_addition(PARSER_ERRATUM) != correction
+            or first_addition(PARSER_ERRATUM_TEST) != correction):
+        raise RuntimeError("parser correction lacks contemporaneous erratum and synthetic test")
+    corrected_paths = set(git("diff", "--name-only", f"{correction}^", correction).decode().splitlines())
+    if corrected_paths != {RUNNER, PARSER_ERRATUM, PARSER_ERRATUM_TEST}:
+        raise RuntimeError("parser correction commit contains unrelated changes")
+    for path in (RUNNER, PARSER_ERRATUM, PARSER_ERRATUM_TEST):
+        frozen(path, correction)
     country_list = sorted({c for c, _ in roster()})
     for key, case in CASES.items():
         spec = yaml.safe_load((ROOT / spec_rel(case)).read_text())
@@ -255,6 +270,7 @@ def finite(value: object) -> float | None:
 def load_sources() -> dict[str, dict[tuple[str, int], tuple[float | None, object]]]:
     """Read selected values only after registration and source lock checks."""
     out = {}
+    allowed_countries = {country for country, _ in roster()}
     for role, src in SOURCES.items():
         frame = pd.read_parquet(ROOT / src["path"], columns=["country_iso3", "indicator_id", "year", "value", "obs_status"])
         series_ids = set(frame["indicator_id"].dropna().astype(str))
@@ -263,6 +279,8 @@ def load_sources() -> dict[str, dict[tuple[str, int], tuple[float | None, object
         records = {}
         for row in frame.itertuples(index=False):
             country, _, year, value, status = row
+            if country not in allowed_countries or not (T_START - 1 <= int(year) <= T_END + 1):
+                continue
             key = (country, int(year))
             if key in records:
                 raise RuntimeError(f"duplicate WDI country-year: {role}/{key}")
