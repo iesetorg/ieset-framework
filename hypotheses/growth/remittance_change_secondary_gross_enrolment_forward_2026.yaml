@@ -1,0 +1,318 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: remittance_change_secondary_gross_enrolment_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: +
+claim: Across the fixed 2006-2021 country/economy panel, a larger annual increase in personal remittances
+  received as a share of GDP from t-1 to t predicts a higher secondary gross-enrolment ratio change from
+  t to t+2, conditional on the year-t enrolment baseline, log real GDP per capita, real GDP growth, and
+  country and treatment-year effects.
+methodology_note: Prospective two-test descriptive calibration. Before registration, remittance and GDP-control
+  values and selected outcome country/year/indicator keys were inspected; no enrolment or registration
+  values, null masks, or status fields were opened. The two outcomes share one fixed roster and one Bonferroni
+  family. The frozen contract is engine/audits/remittance_schooling_entry_family_prereg_2026-10-10.md.
+evidence_type: associational
+sample:
+  countries: &id001
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BIH
+  - BLR
+  - BLZ
+  - BMU
+  - BOL
+  - BRA
+  - BRB
+  - BTN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CUW
+  - CYM
+  - CYP
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - PSE
+  - PYF
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SLB
+  - SLE
+  - SLV
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SXM
+  - SYC
+  - SYR
+  - TGO
+  - THA
+  - TJK
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 2006
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the fixed 2,744-row key roster and its 180 named country/economy codes. Exclude all other
+    areas and World Bank regional/income aggregates; no roster expansion after registration.
+  - Require exact remittance years t-1 and t, exact outcome years t and t+2, and exact GDP controls at
+    t. No nearest-year matching, interpolation, imputation, source substitution, or horizon change.
+  - The preregistered treatment/control screen requires finite nonnegative remittance shares at t-1 and
+    t, strictly positive real GDP per capita at t, finite real GDP growth at t, and at least five candidate
+    years per country. Do not trim, winsorize, or cap valid remittance changes.
+  - After the separately committed source lock, keep only finite nonnegative gross-enrolment ratios at
+    both endpoints with blank WDI observation status. Do not cap gross enrolment at 100.
+  - After measured-case filtering, require at least five complete pairs per retained country. No outcome-based
+    country substitution or school/policy link.
+variables:
+  treatment:
+  - name: annual_change_personal_remittances_received_pct_gdp
+    source: world_bank_wdi:BX.TRF.PWKR.DT.GD.ZS
+    transformation: Exact year-t percentage of GDP minus year-(t-1) percentage of GDP, in untrimmed percentage-point
+      units.
+  outcome:
+  - name: secondary_gross_enrolment_change_pp
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: Exact secondary gross-enrolment ratio in year t+2 minus its year-t ratio, in percentage
+      points; gross ratios may exceed 100.
+  controls:
+  - name: baseline_outcome_at_t
+    source: world_bank_wdi:SE.SEC.ENRR
+    transformation: Gross-enrolment ratio at exact t in percentage points.
+  - name: log_real_gdp_per_capita_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of strictly positive constant-2015-US-dollar GDP per capita at exact t.
+  - name: real_gdp_growth_at_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Exact year-t annual real GDP growth in percentage points.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: One full-rank OLS coefficient for continuous remittance-share change, controlling for the year-t
+    baseline outcome, log real GDP per capita, real GDP growth, country effects, and treatment-year effects.
+    Country-cluster CR1 covariance with two-sided Student t(G-1) inference. Residualize exposure against
+    all other model columns for the frozen concentration gate. No alternate model or subgroup search.
+falsification:
+  test: wdi_remittance_schooling_entry_family_2026_10_10
+  rule: INCONCLUSIVE if source/roster chronology, 300-row/30-country/5-year sample, 20-country material-exposure,
+    30% maximum-country residualized-exposure share, full-rank design, or cluster-uncertainty gate fails.
+    Otherwise SUPPORTED only for beta >= +0.2 percentage points per +1 remittance GDP percentage point
+    and two-sided p <= 0.005; REFUTED only for beta <= -0.2 at the same p cutoff; all other estimable
+    results PARTIAL. Both fixed tests remain in the family if one is inconclusive.
+  threshold:
+    family_id: wdi_remittance_schooling_entry_family_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.2
+    min_valid_rows: 300
+    min_valid_countries: 30
+    min_years_per_country: 5
+    min_material_exposure_countries: 20
+    material_exposure_pp: 1.0
+    max_country_residualized_exposure_share: 0.3
+    expected_key_rows: 2744
+    expected_key_countries: 180
+    expected_treatment_increase_rows: 215
+    expected_treatment_decrease_rows: 169
+    roster_sha256: f7358d7c138542807b3ff8789c3e95f31a1efb9b82d8d3033e68a7c64467cc58
+    source_files:
+      remittances:
+        path: data/vintages/world_bank_wdi/BX.TRF.PWKR.DT.GD.ZS@2026-04-30T114721Z.parquet
+        sha256: 9139bffa26cd6f78bf8a963400e703398b9d59919bb92ab0b2ec2b7e04885b1d
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+      gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      gdp_growth:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      enrolment:
+        path: data/vintages/world_bank_wdi/SE.SEC.ENRR@2026-05-05T204008Z.parquet
+        sha256: 787f29eb93204dbf11dd408449910c28b523376c054734f1fc68d4215b7b2044
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.3
+disclosure: The expected positive sign may reflect a prior that household transfers help pay for schooling
+  or formal enterprise. Remittance/GDP can rise because GDP falls; country migration selection, education
+  or registry reforms, and reverse timing can confound both outcomes. School enrolment is a gross ratio,
+  not attainment; registrations cover formal limited-liability entities only, not all enterprises. This
+  is a descriptive association, not a remittance mechanism, causal effect, or policy evaluation. Shared
+  WDI transport and country-years mean the two tests are not independent replications. The local two-test
+  correction does not erase wider IESET selection. Zero school, policy, causal, and featured credit.
+steelman: hypotheses/steelman/remittance_change_secondary_gross_enrolment_forward_2026.md
+scope:
+  period:
+  - 2006
+  - 2023
+  countries: *id001
+  outcome_dim:
+  - education_access
+  policy_family:
+  - none
+  treatment_tags:
+  - remittances
+  - descriptive_forward
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
