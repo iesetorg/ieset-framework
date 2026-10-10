@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_estate_gift_tax_wid_top1_change5_calibration
+version: 1
+status: pre_registered
+topic: distribution
+evidence_type: descriptive
+claim_direction: "-"
+claim: >
+  In the fixed 38-country OECD/WID panel, a higher signed share of total tax
+  receipts from estate, inheritance and gift taxes in year t is associated
+  with a lower change in the top 1% share of net personal wealth from t to
+  t+5, after country and tax-year fixed effects. This is a descriptive
+  revenue-mix calibration, not a tax-policy effect.
+methodology_note: >
+  This is a new treatment and outcome contrast, not a rerun of the older
+  recurrent net-wealth-tax receipts versus t+3 WID share-level design. The
+  prior case was INCONCLUSIVE under its frozen 0-100 range rule and remains
+  unchanged. The new five-year change, sample, finite-value rule and gates
+  were fixed after source-schema, country/year-key and treatment-only
+  feasibility review, before reading selected WID outcome values or fitting.
+  OECD Revenue Statistics category 4300 covers estate, inheritance and gift
+  taxes; its net receipts can be slightly negative after corrective refunds.
+  WID shwealj992 p99p100 is an equal-split adult share of net personal wealth;
+  because other groups can have negative net wealth, 100 is not an automatic
+  upper validity bound. Source definitions: https://www.oecd.org/en/publications/revenue-statistics-2025_3a264267-en/full-report/the-oecd-classification-of-taxes-and-interpretative-guide_c852c459.html
+  and https://wid.world/methodology/ .
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GRC, IDN, IRL, ISR, ITA, JPN, KOR, MEX, NLD, NOR, NZL, PER, POL, PRT, SGP, SWE, TUR, USA, ZAF]
+  period: [1990, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain all pinned country/year treatment keys in 1990-2018 with WID keys at both t and t+5; no value-dependent country or year selection.
+    - Exclude only missing or nonfinite measurements after source lock, counting each exclusion. Do not trim, winsorize, impute, rescale, cap, or replace vintages.
+    - Retain finite negative OECD net receipts and finite WID net-wealth shares outside 0-100; report their counts. Neither is an automatic error or a discretionary exclusion.
+variables:
+  outcome:
+    - name: top1_net_personal_wealth_share_change_t_to_t_plus_5
+      source: wid_concentration:top1_net_personal_wealth_share
+      transformation: five_calendar_year_percentage_point_change
+      notes: Pinned WID shwealj992 p99p100 at t+5 minus its share at t, in percentage points.
+  treatment:
+    - name: estate_inheritance_gift_receipts_pct_total_tax_t
+      source: oecd:oecd_tax_estate_inheritance_gift_pct_total_tax
+      transformation: level
+      notes: OECD Revenue Statistics category 4300 net receipts divided by total tax receipts, in percentage points; not a statutory tax rate or policy-intensity measure.
+  controls: []
+intervention_channel: fiscal
+intervention_channel_justification: >
+  Tax receipts are a fiscal measurement, not an exogenous intervention. This
+  descriptive design cannot award policy-effect credit.
+scope:
+  period: [1990, 2023]
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GRC, IDN, IRL, ISR, ITA, JPN, KOR, MEX, NLD, NOR, NZL, PER, POL, PRT, SGP, SWE, TUR, USA, ZAF]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [none]
+  treatment_tags: [estate_inheritance_gift_tax_receipts, top1_wealth_share]
+estimator:
+  template: panel_fe
+  fixed_effects: [country, tax_year]
+  clustering: country
+  notes: >
+    OLS of the five-year WID share change on signed OECD 4300 receipts as a
+    percent of total tax, with country and tax-year indicators. Country-cluster
+    CR1 covariance uses G/(G-1) times (N-1)/(N-K), with two-sided Student
+    t(G-1) reference. Consecutive five-year outcomes overlap; country
+    clustering covers serial dependence only approximately. No controls or
+    weights. Require full model rank and leave-one-country-out sign stability.
+falsification:
+  test: oecd_estate_gift_tax_wid_top1_change5_calibration
+  rule: >
+    Require at least 700 complete pairs, 25 countries, 20 tax years, 20
+    countries with within-country treatment variation, full rank, and 30
+    successful leave-one-country-out fits. On the complete-case sample,
+    residualize treatment against the country and tax-year effects; the top
+    ceiling(1% of rows) may supply no more than 25% of squared residualized
+    treatment, the largest country no more than 20%, and the largest tax year
+    no more than 20%. A failed gate yields INCONCLUSIVE before interpreting
+    the coefficient. SUPPORTED requires a coefficient at most -0.2 WID-share
+    percentage point per percentage point of 4300 tax-receipt share, two-sided
+    country-cluster CR1 p<=0.01, and at least 80% negative leave-one-country-out
+    coefficients. REFUTED is symmetric for +0.2, p<=0.01 and 80% positive
+    leave-one-country-out coefficients. Otherwise PARTIAL. Labels are
+    descriptive; no causal, policy, school or featured credit follows.
+  threshold:
+    expected_sign: "-"
+    p_max: 0.01
+    absolute_coefficient_min: 0.2
+    min_observations: 700
+    min_countries: 25
+    min_tax_years: 20
+    min_varying_countries: 20
+    min_loo_successes: 30
+    loo_sign_share_min: 0.8
+    top_one_percent_residualized_treatment_share_max: 0.25
+    top_country_residualized_treatment_share_max: 0.20
+    top_tax_year_residualized_treatment_share_max: 0.20
+prior_confidence: 0.35
+disclosure: >
+  A negative association is plausible if inheritance taxation restrains
+  intergenerational concentration, but receipts also rise with taxable
+  bequests, asset prices, deaths, enforcement and the size of the tax base.
+  We used treatment-only feasibility before registration and disclose the
+  prior WID range-gate failure; the new selected outcome values were unseen.
+  Zero or contrary evidence counts under the frozen rule. No causal, policy,
+  school or featured-publication credit follows from this calibration.
+steelman: hypotheses/steelman/oecd_estate_gift_tax_wid_top1_change5_calibration.md
+covers_claims: []
+notes: >
+  Exact source hashes and 1,037 candidate key triples are frozen in
+  engine/audits/prospective_estate_wealth_change5/source_roster.json. The
+  registration, source lock and first result must be three separate commits.
