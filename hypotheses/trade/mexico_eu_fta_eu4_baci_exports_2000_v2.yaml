@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: mexico_eu_fta_eu4_baci_exports_2000_v2
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: After the EU-Mexico goods provisions entered into force in October 2000,
+  Mexican-origin merchandise exports to Germany, France, Spain, and Italy together
+  grew at least 15 percent more in log terms from four fixed pre years to four
+  fixed post years than the median change of six fixed non-EU donor origins
+  shipping to those same four destinations, conditional on an aligned pretrend.
+  This is a descriptive EU4 flow contrast, not an identified treaty effect or
+  a test of all EU destinations.
+methodology_note: The old trade_lib_mexico_eu_fta_2000 result was REFUTED on a
+  country-level WDI trade-openness design and gave the goods date as July 2000.
+  The European Commission states the goods provisions took effect in October
+  2000. This fresh direct CEPII BACI endpoint overlaps calendar years but was
+  not fitted by the old run. No independent temporal or source replication is
+  claimed. All four destinations, six donors, years, row keys, estimator, and
+  gates were fixed before candidate BACI trade-flow values or null masks were
+  opened. The old result remains archived.
+evidence_type: descriptive
+sample:
+  countries: [MEX, DEU, FRA, ESP, ITA, USA, CAN, JPN, KOR, AUS, NZL]
+  period: [1996, 2004]
+  temporal_structure: panel
+  exclusion_rules:
+  - Only directed goods flows from MEX and donor origins USA, CAN, JPN, KOR,
+    AUS, NZL to DEU, FRA, ESP, ITA. No reverse flows, destination, donor,
+    or product substitutions.
+  - Pre 1996-1999 and post 2001-2004. The late-2000 event year is required
+    as an intact source cell but excluded from both means.
+  - Require exactly one eligible existing-country source row, finite nonnegative
+    BACI flow, and the exact registered FTA-status schedule for every one of
+    the 252 fixed origin-destination-year keys. No interpolation or winsorisation.
+variables:
+  outcome:
+  - name: mexico_eu4_nominal_goods_exports
+    source: cepii:Gravity_V202211.tradeflow_baci
+    transformation: For each origin-year, sum the four directed destination
+      flows in thousands of current US dollars, then take ln(1+sum).
+    notes: Germany, France, Spain, and Italy form a fixed EU4 basket, not all EU
+      merchandise exports, real volumes, tariff incidence, or welfare.
+  treatment:
+  - name: eu_mexico_goods_agreement_status
+    source: cepii:Gravity_V202211.fta_wto
+    transformation: MEX to each EU4 destination 0 in 1996-2000 and 1 in
+      2001-2004; each donor to each destination 0 throughout.
+    notes: CEPII status cross-checks the October 2000 goods effective date;
+      it is not a tariff-intensity measure.
+intervention_channel: regulatory
+intervention_channel_justification: A bilateral trade agreement changes the
+  regulatory trade regime; the measured endpoint is a directed goods flow.
+estimator:
+  template: descriptive
+  event_year: 2000
+  clustering: none
+  notes: For each origin take the 2001-2004 mean of ln(1+sum of four EU4
+    directed flows) less the 1996-1999 mean. Primary contrast is Mexico's
+    change less the median donor-origin change. Require absolute difference
+    between Mexico's four-year pretrend OLS slope and the median donor pretrend
+    slope at most 0.03 log units/year. No p-value or causal interpretation.
+falsification:
+  test: mexico_eu_fta_eu4_baci_exports_2000_v2_fixed_basket_prepost
+  rule: Require byte-pinned official source and immutable separate registration
+    and source-custody commits. A missing or duplicate eligible key, ineligible
+    country flags, wrong FTA status, nonfinite or negative flow, or pretrend
+    failure yields INCONCLUSIVE. With every gate passed, SUPPORTED if the
+    fixed contrast is at least ln(1.15), REFUTED if at most -ln(1.15), and
+    PARTIAL otherwise. One treaty case is one closed family; no p-value,
+    causal, school, position, featured, or policy-score credit follows.
+  threshold:
+    family_id: mexico_eu4_baci_2000_one_treaty_2026
+    family_size: 1
+    inferential_alpha: none_descriptive
+    pretrend_max_abs_log_slope_gap: 0.03
+    contrast_min_log: ln(1.15)
+    contrast_max_opposite_log: -ln(1.15)
+    required_directed_key_count: 252
+prior_confidence: 0.5
+disclosure: The old WDI country-openness result was REFUTED and is known. This
+  direct EU4 outcome is distinct but temporally overlapping, and its selection
+  cannot validate the older broad trade-openness claim. Mexico's 1990s NAFTA
+  integration, exchange-rate history, industrial mix, and changing EU demand
+  confound the comparison. BACI values are nominal goods trade and mix prices
+  and quantities. The fixed same-destination donor basket and pretrend screen
+  limit, but cannot remove, confounding. This is descriptive calibration only
+  with zero score credit. The full EU and service-trade effects remain untested.
+scope:
+  period: [1996, 2004]
+  countries: [MEX, DEU, FRA, ESP, ITA]
+  outcome_dim: [trade_liberalisation]
+  policy_family: [trade_policy]
+  treatment_tags: [eu_mexico_goods_agreement_2000]
+steelman: hypotheses/steelman/mexico_eu_fta_eu4_baci_exports_2000_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Official goods date https://policy.trade.ec.europa.eu/eu-trade-relationships-country-and-region/countries-and-regions/mexico_en . Frozen source and extraction contract engine/audits/mexico_eu4_baci_2026_source_plan.md .'
