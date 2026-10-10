@@ -1,0 +1,108 @@
+packet_version: 1
+generated_utc: '2026-10-10T00:44:15+00:00'
+hypothesis:
+  id: wdi_electric_use_eurostat_power_co2_forward_2026
+  path: hypotheses/energy/wdi_electric_use_eurostat_power_co2_forward_2026.yaml
+  topic: energy
+preregistration:
+  spec_commit: 5fbe97627cf272d545ae4c8aa526bde18aa7f6dc
+  source_lock_commit: 16bf872b330c9a00bc29dd1bdc0dfae1bbfdf624
+  family_id: wdi_energy_eurostat_power_co2_2026_10_10
+  family_size: 2
+  key_roster: data/pinned_evidence/wdi_energy_eurostat_power_co2_2026_key_roster.csv
+  key_roster_sha256: 6bfeb62c5fa7bd02db3a3259708d9f24ccad4ab8559e60f80d79c0c778af0f8d
+  steelman: hypotheses/steelman/wdi_electric_use_eurostat_power_co2_forward_2026.md
+reproduction:
+  runner: scripts/run_wdi_energy_eurostat_power_co2_2026.py
+  run_dir: engine/runs/wdi_electric_use_eurostat_power_co2_forward_2026
+  command: python3 scripts/run_wdi_energy_eurostat_power_co2_2026.py --verify
+verdict:
+  raw: PARTIAL
+  bucket: partial
+  reason: primary estimate misses magnitude or family p cutoff
+data:
+  inputs:
+    electric_use:
+      publisher: world_bank_wdi
+      series_id: EG.USE.ELEC.KH.PC
+      path: data/vintages/world_bank_wdi/EG.USE.ELEC.KH.PC@2026-05-05T203903Z.parquet
+      sha256: 336a90a5d14417931359257729d9080de14f074085df19b4bb57b0e88e795b68
+      manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+      manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+    outcome:
+      publisher: eurostat
+      series_id: env_air_gge
+      path: data/vintages/eurostat/env_air_gge@2026-04-30T115534Z.parquet
+      sha256: 5597d4f1a75c8c9a91306723772bc8ce4e3df3cfa9af65ce137bc6a3e52d8ba2
+      manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+      manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+  sample:
+    valid_rows: 926
+    valid_countries: 29
+    material_change_rows: 168
+    material_change_countries: 29
+    top_one_percent_residual_x_share: 0.2892786185685513
+    top_country_residual_x_share: 0.12378276850650749
+results:
+  primary:
+    coefficient: -0.04863438514388909
+    std_error: 0.13635167964362171
+    p_value_two_sided: 0.7240027991774034
+    confidence_level: 0.995
+    confidence_interval:
+    - -0.4640882413765099
+    - 0.36681947108873175
+    n_rows: 926
+    n_countries: 29
+    df_inference: 28
+    model_rank: 61
+    method: country/year FE OLS, country-cluster CR1, Student t(G-1)
+  pre2019:
+    gate:
+      valid_rows: 810
+      valid_countries: 29
+      material_change_rows: 140
+      material_change_countries: 27
+      top_one_percent_residual_x_share: 0.29406576149421526
+      top_country_residual_x_share: 0.12903009994563963
+    reason: estimable
+    fit:
+      coefficient: -0.041118953367742586
+      std_error: 0.12775617061140074
+      p_value_two_sided: 0.7499532119956271
+      confidence_level: 0.995
+      confidence_interval:
+      - -0.43038290579388266
+      - 0.3481449990583975
+      n_rows: 810
+      n_countries: 29
+      df_inference: 28
+      model_rank: 57
+      method: country/year FE OLS, country-cluster CR1, Student t(G-1)
+limitations:
+- WDI renewable output share and electric-power consumption are IEA-origin energy
+  series; electricity generated, used, traded, and lost are different quantities.
+- Eurostat env_air_gge republishes EEA/UNFCCC territorial inventories. CRF1A1A includes
+  public electricity and heat production; it is not all electricity generation or
+  all territorial emissions.
+- The pinned Eurostat Parquet retains no observation flags, so provisional, revised,
+  or break annotations cannot be screened from this vintage. The WDI status columns
+  are blank; method breaks are likewise not identified.
+- Coal-to-gas switching, nuclear dispatch, weather, imports, heat production, ETS,
+  fuel prices, demand, and early-1990s transition can confound these forward associations.
+- Pre-2019 sensitivity excludes 2019-2022 treatment years and 2020-2023 forward endpoints;
+  it cannot remove earlier shocks or identify a causal effect.
+- These are two source-overlapping local tests, not independent replications or renewable-policy
+  interventions. No causal, policy, school-score, or featured credit is permitted.
+correction:
+  disposition: descriptive_calibration_only
+  family_id: wdi_energy_eurostat_power_co2_2026_10_10
+  family_size: 2
+  family_alpha: 0.01
+  bonferroni_p_max: 0.005
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
