@@ -18,6 +18,7 @@ export interface PolicyAxisMove {
 export interface Policy {
   policy_id: string;
   status: string;
+  scope?: string;
   title: string;
   countries: string[];
   timeframe: {

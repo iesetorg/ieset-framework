@@ -19,6 +19,8 @@ interface InteractiveDriftChartProps {
   allSeries: Record<string, number[]>;
   /** Years aligned to each series. */
   years: number[];
+  /** Cited policy-only years before the scored movement series. */
+  historicalPolicyYears?: number[];
   /** First movement year for each country; suppresses pre-coverage zeroes. */
   seriesStarts?: Record<string, number>;
   /** Map ISO3 → display name. */
@@ -39,6 +41,7 @@ interface InteractiveDriftChartProps {
 export function InteractiveDriftChart({
   allSeries,
   years,
+  historicalPolicyYears,
   seriesStarts,
   labels,
   initialSelection,
@@ -164,6 +167,7 @@ export function InteractiveDriftChart({
         <DriftChart
           series={filteredSeries}
           years={years}
+          historicalPolicyYears={historicalPolicyYears}
           seriesStarts={seriesStarts}
           labels={labels}
           height={height}

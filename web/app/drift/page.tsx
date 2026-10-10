@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { loadDrift, countryName } from "@/lib/drift";
+import { loadAllPolicies } from "@/lib/policies";
 import { DriftChart } from "@/components/charts/DriftChartLoader";
 import { InteractiveDriftChart } from "@/components/charts/InteractiveDriftChartLoader";
 
@@ -203,6 +204,22 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+  const historicalPolicies = (await loadAllPolicies())
+    .filter(
+      (policy) =>
+        policy.scope === "national" &&
+        Number.isInteger(policy.timeframe.start) &&
+        policy.timeframe.start < data.year_min &&
+        (policy.references?.length ?? 0) > 0
+    )
+    .sort(
+      (a, b) =>
+        a.timeframe.start - b.timeframe.start ||
+        a.policy_id.localeCompare(b.policy_id)
+    );
+  const historicalPolicyYears = Array.from(
+    new Set(historicalPolicies.map((policy) => policy.timeframe.start))
+  );
   const compositeCountryCount = Object.values(driftData.countries).filter(
     (country) => country.composite_first_year !== null
   ).length;
@@ -331,8 +348,48 @@ export default async function DriftPage() {
         annual observations of legislation, spending, or regulation.
       </p>
 
+      {historicalPolicies.length > 0 && (
+        <section className="mb-8 rounded border border-rule bg-white p-5" aria-label="Historical policy context">
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-accent">
+            Earliest cited policy context
+          </div>
+          <h2 className="m-0 mb-2 text-[20px] font-semibold">
+            Policy context begins in {historicalPolicies[0].timeframe.start}; scored drift begins in {data.year_min}
+          </h2>
+          <p className="mb-4 max-w-[850px] text-[13.5px] leading-[1.55] text-muted">
+            These national policy records extend the map&apos;s historical context.
+            They are linked below and marked on the main chart as policy-only years.
+            The drift score starts with authored movements in {data.year_min};
+            no value is assigned to the earlier interval. Each card shows
+            its review status. <Link href="/policy-browser/" className="text-accent hover:underline">Browse the policy database</Link>.
+          </p>
+          <ol className="grid gap-3 md:grid-cols-3">
+            {historicalPolicies.map((policy) => (
+              <li key={policy.policy_id} className="border-l-2 border-amber-600 bg-panel p-3">
+                <div className="font-mono text-[15px] font-semibold tabular-nums">
+                  {policy.timeframe.start}
+                </div>
+                <Link href={`/p/${policy.policy_id}`} className="text-[13px] font-semibold text-accent hover:underline">
+                  {policy.title}
+                </Link>
+                <div className="mt-1 text-[11px] text-muted">
+                  policy only · {policy.status} · {policy.countries.map(countryName).join(", ")}
+                </div>
+              </li>
+            ))}
+            <li className="border-l-2 border-accent bg-panel p-3">
+              <div className="font-mono text-[15px] font-semibold tabular-nums">
+                {data.year_min}
+              </div>
+              <div className="text-[13px] font-semibold">Movement-coded drift begins</div>
+              <div className="mt-1 text-[11px] text-muted">First year in the scored movement series</div>
+            </li>
+          </ol>
+        </section>
+      )}
+
       <div className="mb-8 rounded border border-rule bg-panel p-5 text-[14px] leading-[1.6] text-muted">
-        <strong className="text-ink">Coverage:</strong> the timeline spans the
+        <strong className="text-ink">Coverage:</strong> scored movement years span the
         earliest to latest authored movement ({data.year_min}–{data.year_max}).
         Each composite line begins at its first valenced axis step; earlier
         movements without one do not establish a composite score. Earlier
@@ -560,6 +617,10 @@ export default async function DriftPage() {
               .map(([iso3, c]) => [iso3, c.statist_drift])
           )}
           years={data.years}
+          historicalPolicyYears={historicalPolicyYears}
+          caption={historicalPolicyYears.length > 0
+            ? `Dashed markers show cited policy-only years before ${data.year_min}. No country line or drift value is plotted for those years.`
+            : undefined}
           seriesStarts={Object.fromEntries(
             Object.entries(driftData.countries)
               .filter(([, c]) => c.composite_first_year !== null)

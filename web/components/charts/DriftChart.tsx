@@ -26,6 +26,8 @@ interface DriftChartProps {
   series: Record<string, number[]>;
   /** Years aligned to each series. */
   years: number[];
+  /** Cited pre-series policies; dashed markers only, never scored points. */
+  historicalPolicyYears?: number[];
   /** First year with movement or axis coding per series. Earlier raw zeroes
    * align the data arrays but are not observations and must not be drawn. */
   seriesStarts?: Record<string, number>;
@@ -76,6 +78,7 @@ function compactLeaderLabel(label: string) {
 export function DriftChart({
   series,
   years,
+  historicalPolicyYears,
   seriesStarts,
   labels,
   caption,
@@ -119,7 +122,7 @@ export function DriftChart({
       const yMax = values.length ? Math.max(...values) : 1;
       const yExtent: [number, number] = [yMin, yMax];
       const yPad = Math.max(2, (yExtent[1] - yExtent[0]) * 0.08);
-      const xMin = Math.min(...years);
+      const xMin = Math.min(...years, ...(historicalPolicyYears ?? []));
       const xMax = Math.max(...years);
 
       const hasMovementLabels = Boolean(movements && movements.length > 0);
@@ -141,6 +144,9 @@ export function DriftChart({
           grid: true,
         },
         marks: [
+          ...(historicalPolicyYears?.length
+            ? [Plot.ruleX(historicalPolicyYears, { stroke: "#ad9270", strokeDasharray: "3,3", strokeWidth: 1 })]
+            : []),
           // zero reference line
           Plot.ruleY([0], { stroke: "#9b9b95", strokeDasharray: "3,3" }),
           // each country's trajectory
@@ -273,7 +279,7 @@ export function DriftChart({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [series, years, seriesStarts, labels, height, zeroLineLabel, highlight, movements]);
+  }, [series, years, historicalPolicyYears, seriesStarts, labels, height, zeroLineLabel, highlight, movements]);
 
   return (
     <div>
