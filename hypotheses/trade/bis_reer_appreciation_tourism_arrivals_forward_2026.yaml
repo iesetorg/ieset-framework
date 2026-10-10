@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_reer_appreciation_tourism_arrivals_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "-"
+claim: In the fixed 62-economy 2004-2018 panel, a year with at least five log
+  points of BIS broad real effective exchange-rate appreciation predicts lower
+  international tourist-arrival growth from that year to the next.
+methodology_note: One-test prospective descriptive calibration. Treatment values,
+  GDP-control values, and tourism country/year keys alone were screened before
+  registration; no tourism values, null masks, or observation-status fields were
+  opened. Earlier IESET REER/export results, country-specific tourism cases, and
+  a tourism-as-exposure/youth-employment test were visible. The exact BIS REER to
+  WDI tourist-arrivals pair was absent. Registration and a separate source-lock
+  commit must precede outcome access. The local two-sided alpha 0.01 is not
+  archive-wide selection control or independent replication.
+evidence_type: associational
+sample:
+  countries: &countries [ARE, ARG, AUS, AUT, BEL, BGR, BIH, BRA, CAN, CHE, CHL,
+    CHN, COL, CYP, CZE, DEU, DNK, DZA, ESP, EST, FIN, FRA, GBR, GRC, HKG, HRV,
+    HUN, IDN, IND, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MAR, MEX, MKD,
+    MLT, MYS, NLD, NOR, NZL, PER, PHL, POL, PRT, ROU, RUS, SAU, SGP, SRB, SVK,
+    SVN, SWE, THA, TUR, USA, ZAF]
+  period: [2004, 2018]
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the 62 listed country IDs and exact treatment years 2004-2018 in the
+    frozen country/year key roster; the arrival endpoint is exact t+1, ending in
+    2019 before the COVID-19 disruption.
+  - Exclude the BIS euro-area aggregate XM, WDI aggregate codes, and countries
+    outside the fixed roster. Use BIS monthly FREQ=M, EER_TYPE=R, EER_BASKET=B,
+    COLLECTION=A, UNIT_MEASURE=882; require twelve distinct finite positive
+    monthly index values in each t-1 and t calendar year.
+  - Require positive finite WDI tourist-arrival counts at t and t+1 and finite
+    WDI real GDP growth at t; WDI observation status must be blank/null at each
+    selected country/year. Drop countries with fewer than five complete pairs.
+  - No country substitution, outcome-based roster revision, imputation, trimming,
+    alternative vintage, or post-result model selection.
+variables:
+  outcome:
+  - name: next_year_international_tourist_arrival_log_growth
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: Natural log of positive arrivals at exact t+1 minus natural
+      log of positive arrivals at t.
+    notes: WDI counts inbound arrival trips, not unique persons, receipts, or
+      domestic tourism; national reporting methods may differ.
+  treatment:
+  - name: broad_real_eer_appreciation_event
+    source: bis:WS_EER
+    transformation: Indicator that 100 times log of the arithmetic mean of
+      twelve monthly broad real EER indices at t divided by the same at t-1
+      is at least five log points; zero otherwise.
+    notes: A higher BIS REER index means appreciation. Its basket weights
+      manufacturing trade rather than tourist origins.
+  controls:
+  - name: baseline_log_international_tourist_arrivals
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: Natural log of positive arrival count at t.
+  - name: real_gdp_growth_at_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Annual real GDP growth percentage at t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: One predeclared OLS coefficient for the appreciation indicator with
+    baseline log arrivals, GDP growth, country fixed effects, and treatment-year
+    fixed effects. Country-cluster CR1 standard errors use Student t with G-1
+    degrees of freedom. No search or post-result covariate dropping.
+falsification:
+  test: bis_reer_tourism_arrivals_forward_2026_10_10
+  rule: INCONCLUSIVE if fewer than 400 complete pairs, 25 countries, five
+    complete years per retained country, 30 appreciation events, or 15 event
+    countries survive; also if one country accounts for over 15% or the top 1%
+    of rows for over 20% of residualized treatment sum of squares after all
+    controls, the model is rank deficient, or clustered uncertainty is nonfinite.
+    Otherwise a coefficient at most -0.03 log points with two-sided p<=0.01
+    SUPPORTS the narrow negative association; a coefficient at least +0.03
+    with p<=0.01 REFUTES it. Every other estimable result is PARTIAL.
+  threshold:
+    family_id: bis_reer_tourism_arrivals_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: "-"
+    meaningful_beta_min_abs: 0.03
+    min_complete_rows: 400
+    min_complete_countries: 25
+    min_years_per_country: 5
+    event_min_log_points: 5.0
+    min_event_rows: 30
+    min_event_countries: 15
+    max_top_country_residual_x_share: 0.15
+    max_top_one_percent_residual_x_share: 0.20
+    expected_key_rows: 930
+    expected_key_countries: 62
+    expected_treatment_and_gdp_control_rows: 930
+    expected_treatment_events: 118
+    expected_treatment_event_countries: 40
+    roster_sha256: 0dc4d0162c1dcdc289f904c9331da8e08f4f2a98e8e57b3163c2a396771146eb
+    source_files:
+      reer:
+        path: data/vintages/bis/WS_EER@2026-07-23T151604Z.parquet
+        sha256: 57bbce3e22fc428c8cd8ddee8a998d273b5240a816af89e532b81d41ade35170
+        manifest: data/manifests/fetch_run_2026-07-23T151632Z.yaml
+        manifest_sha256: 1768f0d7c38c93f1ad4df591b0b1634b3460faa964f6267874b8798b7b8dbb81
+      arrivals:
+        path: data/vintages/world_bank_wdi/ST.INT.ARVL@2026-05-05T203952Z.parquet
+        sha256: 1336df1cce2b3a2e784f917caa9487753d4cf53ad4ec65e5ea2fb045b0d41da5
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      gdp_growth:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: This is a selected descriptive association, not a policy experiment
+  or a causal price elasticity. BIS weights manufacturing trade partners, not
+  tourism source markets; its CPI-adjusted index may miss tourist prices. WDI
+  arrivals can reflect different border, survey, air, or accommodation methods
+  and are trips rather than unique visitors. Exchange-rate changes can follow
+  growth, inflation, crises, and safety shocks. Earlier adjacent IESET tests
+  were visible; local p<=0.01 does not correct corpus-wide selection. No causal,
+  policy, position, school-score, or featured credit.
+steelman: hypotheses/steelman/bis_reer_appreciation_tourism_arrivals_forward_2026.md
+scope:
+  period: [2004, 2019]
+  countries: *countries
+  outcome_dim: [tourism_activity]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: The tourism_activity scope tag records inbound visitor-arrival volume,
+  without treating the exchange-rate association as a tourism-policy effect.
