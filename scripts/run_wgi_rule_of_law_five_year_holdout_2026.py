@@ -39,13 +39,14 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def read_series(ref: dict, value_name: str) -> pd.DataFrame:
+def read_series(ref: dict, value_name: str, roster: set[str]) -> pd.DataFrame:
     path = ROOT / ref["path"]
     if not path.is_file() or sha256(path) != ref["sha256"]:
         raise ValueError(f"source unavailable or SHA mismatch: {ref['path']}")
     frame = pq.read_table(path, columns=["country_iso3", "year", "value"]).to_pandas()
     frame = frame.rename(columns={"country_iso3": "country", "value": value_name})
     frame["year"] = pd.to_numeric(frame["year"], errors="raise").astype(int)
+    frame = frame[frame["country"].isin(roster)].copy()
     frame[value_name] = pd.to_numeric(frame[value_name], errors="coerce")
     if frame.duplicated(["country", "year"]).any():
         raise ValueError(f"duplicate country-year in {ref['path']}")
@@ -74,7 +75,7 @@ def load_family() -> tuple[dict, dict, pd.DataFrame]:
             if ref["path"] != locked["path"] or ref["sha256"] != locked["sha256"]:
                 raise ValueError("source lock differs from registration")
     refs = specs[IDS[0]]["falsification"]["threshold"]["source_files"]
-    series = {key: read_series(ref, key) for key, ref in refs.items()}
+    series = {key: read_series(ref, key, set(rosters[0])) for key, ref in refs.items()}
     base = pd.MultiIndex.from_product([rosters[0], YEARS], names=["country", "year"]).to_frame(index=False)
     for key in ("rule_of_law", "government_effectiveness", "gdp_pc", "investment_share", "trade_share", "dependency_ratio"):
         base = base.merge(series[key], on=["country", "year"], how="left", validate="one_to_one")
