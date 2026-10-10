@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: smard_german_vre_share_day_ahead_price_2018_2026
+version: 1
+status: pre_registered
+topic: energy
+claim_direction: "-"
+claim: >-
+  Within months of the 2018–2026 Germany/Luxembourg bidding-zone era,
+  a higher German wind-plus-solar generation share of German electricity
+  load predicts a lower average Germany/Luxembourg day-ahead wholesale
+  electricity price, after calendar-month, calendar-year, and German
+  electricity-load adjustment. This is descriptive co-movement, not a
+  renewable-energy policy or consumer-price effect.
+evidence_type: descriptive
+methodology_note: >-
+  This direct monthly question uses a newly fetched SMARD vintage and does
+  not regrade existing country-panel claims about retail or industrial
+  prices. The source-key roster, selected file hashes, estimator and gates
+  were fixed before selected values or their missingness were opened.
+sample:
+  countries: [DEU]
+  period: [2018, 2026]
+  temporal_structure: time_series
+  exclusion_rules:
+    - >-
+      Use exactly the 96 monthly dates from 2018-10-01 to 2026-09-01 in
+      the separately committed key-only roster. No switch to the earlier
+      Germany/Austria/Luxembourg price zone or another resolution.
+    - >-
+      Require one finite value per date in each of the five pinned SMARD
+      files. Generation must be nonnegative, load strictly positive,
+      renewable generation no more than 1.5 times load, and the monthly
+      wholesale price between -500 and 1000 EUR/MWh. Drop a month with an
+      invalid cell; no interpolation, winsorisation, or replacement.
+variables:
+  outcome:
+    - name: germany_luxembourg_day_ahead_price_eur_per_mwh
+      source: smard:price_de_lu_DE_month
+      transformation: unmodified monthly price
+      notes: Wholesale bidding-zone price, not a German household or industrial tariff.
+  treatment:
+    - name: german_wind_solar_generation_per_load_10pp
+      source: smard:solar_DE_month+wind_onshore_DE_month+wind_offshore_DE_month+load_DE_month
+      transformation: 10 times (solar + onshore wind + offshore wind) / load
+      notes: One unit is a 10-percentage-point change in observed generation/load.
+  controls:
+    - name: log_german_load
+      source: smard:load_DE_month
+      transformation: natural log of monthly German load in MWh
+estimator:
+  template: descriptive
+  fixed_effects: [calendar_month, calendar_year]
+  clustering: none
+  notes: >-
+    Equal-month OLS of wholesale price on an intercept, wind-plus-solar
+    generation/load in ten-point units, log load, eleven calendar-month
+    indicators and eight calendar-year indicators (2019–2026, base 2018).
+    HAC/Newey-West covariance with maximum lag three; two-sided normal
+    p value. Calendar years are exactly those in the frozen sample.
+    Report leave-one-full-year-out slopes for 2019–2025 as diagnostics.
+falsification:
+  test: smard_monthly_wind_solar_share_wholesale_price
+  rule: >-
+    Require strict committed registration and separate committed source
+    lock, matching exact source hashes and 96-date key roster, at least 84
+    complete months, at least six full twelve-month years, share IQR at
+    least five percentage points, full-rank model, and finite positive HAC
+    standard error. A failed method or source gate is INCONCLUSIVE.
+    SUPPORTED requires beta <= -1 EUR/MWh per 10 share points, two-sided
+    p <= 0.01, and negative slopes in at least five of seven fixed
+    leave-one-full-year-out fits. REFUTED requires mirrored beta >= +1,
+    p <= 0.01, and positive slopes in at least five of seven fits.
+    Otherwise an estimable association is PARTIAL. One question; zero
+    causal, policy, school, position, and featured credit.
+  threshold:
+    family_id: smard_german_vre_share_day_ahead_price_2018_2026
+    family_size: 1
+    min_key_months: 96
+    min_complete_months: 84
+    min_full_years: 6
+    min_share_iqr_pp: 5.0
+    max_price_eur_per_mwh: 1000.0
+    min_price_eur_per_mwh: -500.0
+    max_vre_generation_per_load: 1.5
+    hac_max_lag: 3
+    min_abs_beta_eur_per_mwh_per_10pp: 1.0
+    two_sided_p_max: 0.01
+    min_loo_same_sign_years: 5
+    causal_credit: 0
+    policy_score_credit: 0
+    school_score_credit: 0
+prior_confidence: 0.55
+disclosure: >-
+  German generation and load do not exactly match the Germany/Luxembourg
+  price bidding-zone footprint. German net generation excludes some
+  behind-the-meter, industrial and network output; SMARD may revise
+  historical data. Fuel costs, imports, weather, outages, demand and
+  market rules can jointly move generation and price. Monthly aggregation
+  hides hourly merit-order effects. The local cutoff corrects neither
+  the archive-wide selection history nor other energy hypotheses.
+  This test cannot establish a causal renewable-energy or consumer-tariff
+  effect.
+steelman: hypotheses/steelman/smard_german_vre_share_day_ahead_price_2018_2026.md
+scope:
+  period: [2018, 2026]
+  countries: [DEU]
+  outcome_dim: [energy]
+  policy_family: [none]
+  treatment_tags: [wind_solar_generation_share, wholesale_electricity_price]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  Blind registration and source plan:
+  engine/audits/smard_german_vre_share_day_ahead_price_2018_2026_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_smard_german_vre_share_day_ahead_price_2018_2026.py.
