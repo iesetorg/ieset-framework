@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: us_state_minimum_wage_bite_teen_employment_non_alabama_2026_v2
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: "-"
+claim: >-
+  Across a fixed roster of 49 US states plus the District of Columbia (Alabama excluded) in
+  2014-2018, 2021, and 2023-2024, a higher effective state minimum wage
+  relative to the state median hourly wage is associated with a lower Census
+  ACS one-year employment-to-population ratio among people aged 16-19,
+  conditional on state and year fixed effects.
+methodology_note: >-
+  This is one age-specific descriptive follow-up to the earlier all-age state
+  employment-ratio screen and the separate national youth-unemployment test.
+  It cannot rescue the archived high-bite causal/DiD claims, whose declared
+  sources and outcomes differ. The 400 possible state-year keys, eight
+  nonconsecutive years, Census ACS field, model, and verdict gates were fixed
+  before opening selected Census outcomes or the treatment values in this
+  exercise. Alabama is excluded because its eight selected employment estimates
+  were viewed during official-source access probing before a source lock.
+  The remaining 50 jurisdictions were fixed before opening their outcome
+  values. The treatment source was already used in IESET, so this is not an
+  independent holdout. The ACS is a survey estimate, not an administrative
+  teen-employment count.
+evidence_type: associational
+sample:
+  countries: [USA]
+  period: [2014, 2024]
+  temporal_structure: panel
+  exclusion_rules:
+    - >-
+      Use only the 400 exact state FIPS and year keys in the committed roster,
+      excluding Alabama (whose selected estimates were seen during access
+      probing) and territories. The eligible years are 2014-2018, 2021,
+      2023-2024. Do not fill missing 2019/2022 wage years, 2020 ACS one-year
+      data, or any other year.
+    - >-
+      Pull only S2301_C03_002E and its margin of error
+      S2301_C03_002M from the official Census data.census.gov ACS one-year
+      Subject Table S2301 service, requesting each frozen state/year key.
+      Preserve exact response bodies and hashes; match each state FIPS
+      exactly and reject duplicate keys or publication/schema mismatches.
+    - >-
+      Keep complete pairs with finite bite ratio in [0,1] and teen
+      employment ratio in [0,100]. No imputation, clipping, extrapolation,
+      or analyst-chosen state exclusions. Require at least 300 pairs,
+      45 states, and five years per retained state. Require a treatment
+      p90-p10 gap of at least 0.10.
+variables:
+  outcome:
+    - name: teen_employment_population_ratio_pct
+      source: us_census:data_census_gov_acs1_subject_S2301_C03_002E
+      transformation: >-
+        Published ACS one-year state estimate, percentage points, age 16-19.
+        Margin of error is retained as source metadata, not used as a weight.
+  treatment:
+    - name: state_minimum_wage_median_bite_ratio
+      source: derived:minimum_wage_bite_ratio_state_panel
+      transformation: >-
+        Effective state minimum wage divided by the BLS OEWS state median
+        hourly wage in the pinned 2026-05-14 local vintage.
+intervention_channel: regulatory
+intervention_channel_justification: >-
+  State minimum-wage levels are regulatory, but this association does not
+  identify the effect of changing a policy.
+estimator:
+  template: panel_fe
+  fixed_effects: [state, year]
+  clustering: state
+  notes: >-
+    Fit OLS with state and year dummies, clustered by state with the usual
+    small-sample correction. Calculate two-sided Student t p using retained
+    state count minus one degrees of freedom. Reject nonfinite or rank-deficient
+    fits. Require residualized-treatment largest-state squared-share <=0.20.
+    Refit the identical formula in the prespecified 2014-2018 pre-pandemic
+    window; require at least 180 pairs and 40 states, and use its coefficient
+    sign only as a directional sensitivity. Do not replace the primary fit.
+falsification:
+  test: acs_teen_employment_state_bite_twoway_fe
+  rule: >-
+    INCONCLUSIVE if source custody, chronology, fixed-key coverage, material
+    treatment, full or pre-pandemic model, or concentration gates fail.
+    Otherwise SUPPORTED only if the primary coefficient is negative with
+    two-sided p<=0.005, its implied change for a +0.10 bite increase is
+    at most -0.5 employment-ratio points, and the pre-pandemic coefficient
+    is nonpositive. REFUTED only for the symmetric positive result and
+    nonnegative pre-pandemic coefficient. Every other estimable result is
+    PARTIAL. Non-significance is not refutation. This 0.005 cutoff is
+    deliberately stricter than a one-test 0.05 threshold because the source
+    family was screened previously; it does not correct all IESET selection.
+    No causal, policy, school-score, or featured credit follows.
+  threshold:
+    family_id: us_minwage_age_specific_followup_2026_10_10
+    family_size: 1
+    family_p_max: 0.005
+    min_observations: 300
+    min_states: 45
+    min_years_per_state: 5
+    min_contrast_gap: 0.10
+    max_state_residualized_treatment_share: 0.20
+    preperiod: [2014, 2018]
+    preperiod_min_observations: 180
+    preperiod_min_states: 40
+    practical_effect_per_0_10_bite_pp: 0.5
+    fixed_key_upper_bound: 400
+    source_manifest:
+      path: data/manifests/fetch_run_2026-05-14T111058Z.yaml
+      sha256: 1ecb15544dd1bfa84a478ef327d4966cfdda5011cb77150eaf533d0360c841e5
+    treatment_vintage:
+      path: data/vintages/derived/minimum_wage_bite_ratio_state_panel@2026-05-14T111058Z.parquet
+      sha256: e5da018ddcef55c1b4255e406cfb4e22d987599cce132ecee915648fcf051119
+    outcome_field: S2301_C03_002E
+    outcome_moe_field: S2301_C03_002M
+    school_score_eligible: false
+    school_score_credit: 0
+prior_confidence: 0.50
+disclosure: >-
+  Selected because IESET lacked a teen state employment panel while related
+  minimum-wage questions were already present. Previous all-age state and
+  international youth screens are correlated research context. State policy
+  choices and youth employment respond to local economic conditions; schooling,
+  demographic shifts, and post-pandemic recovery are unmeasured. OEWS wage
+  denominators and ACS youth ratios are surveys with different universes.
+  Alabama was removed from this separate roster because its selected
+  outcomes were inspected before source lock; this is a post-access exclusion,
+  fixed before examining any of the other 50 jurisdictions. The series has
+  two missing wage years and excludes the unavailable standard 2020 ACS
+  one-year estimate. Even a directional result is descriptive and
+  cannot establish teen disemployment caused by minimum-wage changes.
+steelman: hypotheses/steelman/us_state_minimum_wage_bite_teen_employment_non_alabama_2026_v2.md
+scope:
+  period: [2014, 2024]
+  countries: [USA]
+  outcome_dim: [employment_labour]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
