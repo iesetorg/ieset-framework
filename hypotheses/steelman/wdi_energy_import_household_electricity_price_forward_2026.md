@@ -1,0 +1,7 @@
+# Steelman: net energy-import change and later household electricity price
+
+A country becoming more dependent on imported primary energy may face greater exposure to international energy prices and pass-through into household electricity bills. The fixed test compares each country with its own other years while holding common anchor-year shocks and its earlier import-share level fixed. A directional association that clears the prespecified size and uncertainty cutoffs would be useful as a narrow descriptive calibration.
+
+The rival account is strong. Import dependence may rise or fall alongside domestic fuel production, hydro output, weather, economic demand, exchange rates, generation mix, tax policy, subsidies, retail contracts, and market regulation. Primary-energy import share includes fuels beyond electricity and is not a purchased-electricity or imported-gas price. The association could reverse if imports displace expensive domestic generation or if subsidy policy absorbs the price shock.
+
+Even a supported result would say only that the earlier measured import-share change predicts a later tax-inclusive household electricity-price change in the frozen panel. It cannot establish an energy-import policy effect, an industrial-price effect, or a general result outside these countries and years. An opposite precise estimate is refuting for the narrow sign claim; weak or imprecise evidence remains partial. Frozen sample or inference failure remains inconclusive.
