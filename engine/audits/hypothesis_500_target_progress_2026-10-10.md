@@ -382,7 +382,16 @@ position, and featured credit. Four additional Swiss policy records document
 AEOI/CRS, Bilaterals II, the 2023 Credit Suisse rescue package, and the 2014
 FATCA agreement with distinct official enactment and effective dates and no
 inferred effects. Together with the earlier three treaty records, the local
-policy database has 3,389 records; eight have curated public tests.
+policy database has 3,395 records; eight have curated public tests.
+Six further source-backed legal-event records cover Nicaragua's 2014
+constitutional eligibility amendment, 2025 co-presidency reform, and 2023
+OAS withdrawal, plus Taiwan's 2025 tax-credit and nuclear-licensing
+amendments and 2026 asymmetric-defence procurement authorization. The
+Taiwan entries separate promulgation from third-day legal effect under
+Central Regulation Standard Act Article 13; the defence act's programme
+period is separately stated as beginning on promulgation. These six records
+reduce permitted missing movement-to-policy references from 44 to 38. They
+assign no enacted-policy effect or hypothesis credit.
 
 Several frozen scouts did **not** graduate: two FAOSTAT food-security tests
 fell below their 80-country floors; the NZ Employment Contracts Act donor test
@@ -458,13 +467,13 @@ not ready conversions. See
 `engine/audits/legacy_archive_v2_readiness_2026-10-10.md`. In particular,
 the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
 candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
-multiplication is also unsupported: the current registry has **3,389**
+multiplication is also unsupported: the current registry has **3,395**
 policies, but only **8** are marked tested through curated public result
 links. Most still need treated/comparison units, exact event timing, and
 measured outcomes before a policy-effect test. None of the three newly
 added treaty-date records supplies a verified causal estimate. The second-order
-index now retains **3,373** policies,
-including all **23** explicit evaluation designs even when a policy has no
+index now retains **3,379** policies,
+including all **33** explicit evaluation designs even when a policy has no
 scored drift axis. A WHO particulate-matter/chronic-outcome lead was rejected
 before registration because its short modeled window and concentrated
 exposure leave a weak test. WHO/JMP annual urban-sanitation and UNDP annual
@@ -495,12 +504,12 @@ dependent-run review.
 
 Generated preregistration, evidence-tier, census, conversion-funnel, and
 policy browser/evidence/measurement indexes were refreshed through the
-564/2,125-record checkpoint. Current local checks passed: **6,274** specs and
+564/2,125-record checkpoint. Current local checks passed: **6,280** specs and
 cross-references; 805 strict and 1,320 legacy registration pairs; the
 564/2,125 evidence and census checks; 1789–2026 drift consistency; zero link-
 reciprocity errors or warnings; 15 focused Python tests; eight web tests;
 TypeScript checking; exact tourism and tariff replay; tariff raw-source
-re-extraction; and public-tree OPSEC scanning. The latest static site build passed across 8,593 routes; the built drift,
+re-extraction; and public-tree OPSEC scanning. The latest static site build passed across 8,599 routes; the built drift,
 new hypothesis, Swiss policy, and policy-browser pages are present. Publication remains on hold: an
 older reverted local-path manifest and the initial Korea source-plan example
 survive in this local branch history. The local derived OECD CbCR source also
