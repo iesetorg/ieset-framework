@@ -1,0 +1,9 @@
+# Steelman — modern top PIT rates and later GDP per-person growth
+
+The archived `top_marginal_rate_growth_tradeoff` claims that very high postwar top personal tax rates coexisted with growth. Its first same-commit fit covered 1945–1980, only five countries and 65 fitted rows, and reported PARTIAL. The 2000–2016 OECD panel below tests a narrower, temporally separate question: whether the modern top statutory rate has an economically large negative association with later real income growth. The old result supplies no prospective credit and remains archived.
+
+A high top rate could finance public goods without materially discouraging aggregate production, especially if few taxpayers face the marginal bracket. Equally, a high rate may deter taxable effort, investment, or high-skill location and may proxy for a broader tax burden. The top rate alone omits base breadth, credits, bracket thresholds, social contributions, and capital-income rules. An observed growth association can reflect automatic policy responses to prior growth, a reform bundle, or common shocks. The result therefore remains descriptive even if precise.
+
+The test freezes OECD top statutory personal income-tax rates for t=2000–2016 and World Bank constant-price GDP per person at t-3, t, and exact t+3. It asks whether a ten-point higher rate is associated with more than 0.3 percentage points lower annualized forward growth, after country/year effects, baseline income, prior growth and trade share. A two-sided 99.5-percent country-cluster interval must exclude the harm margin to support or refute the narrow claim. An imprecise null is PARTIAL, never a no-harm victory. All source-key pairs, sample and influence floors, and sources were frozen before outcome access.
+
+This study cannot identify the effect of a tax change, the revenue-maximizing top rate, or the old roughly 70-percent historical regime. The original hypothesis and its school links retain no credit from this follow-up.

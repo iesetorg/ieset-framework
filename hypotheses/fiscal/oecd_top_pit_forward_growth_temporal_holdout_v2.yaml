@@ -1,0 +1,136 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_top_pit_forward_growth_temporal_holdout_v2
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: "?"
+claim: >-
+  In the fixed OECD 2000–2016 treatment-year panel, a 10-percentage-point
+  higher top statutory personal income-tax rate is compatible with subsequent
+  real GDP per-person growth: the annualized exact t-to-t+3 growth penalty is
+  smaller than 0.3 percentage points, conditional on country and year effects,
+  starting income, trade share, and the preceding three-year growth rate.
+methodology_note: >-
+  New-ID temporal follow-up to the archived same-commit
+  top_marginal_rate_growth_tradeoff. Its May 2026 PARTIAL estimate (65 rows,
+  five countries, p=0.312) and post-result rule sharpening are known. The old
+  historical runner restricted that fit to 1945–1980; all years here are
+  2000–2019. This is a narrower modern OECD compatibility question. It cannot
+  test whether roughly 70-percent postwar rates caused growth, locate a
+  revenue-maximizing rate, or validate the old Laffer framing. The source
+  hashes, complete key roster, validity and influence gates, estimand, and
+  99.5-percent interval rule were frozen before opening selected GDP or tax
+  values in this branch. A prior OECD tax/Gini study exposed a France 2013
+  out-of-range tax value; this study excludes all rates outside [0,100].
+evidence_type: associational
+sample:
+  countries: &countries [AUS, AUT, BEL, CAN, CHE, CHL, COL, CRI, CZE, DEU, DNK, ESP, EST, FIN, FRA, GBR, GRC, HUN, IRL, ISL, ISR, ITA, JPN, KOR, LTU, LUX, LVA, MEX, NLD, NOR, NZL, POL, PRT, SVK, SVN, SWE, TUR, USA]
+  period: [2000, 2016]
+  temporal_structure: panel
+  exclusion_rules:
+    - Use only the committed 646-country-year source-key roster; join exact GDP years t-3, t, and t+3 and exact trade year t. Do not choose years or countries after seeing values.
+    - After the separate source-lock commit, require top PIT in [0,100] percent, trade share finite and nonnegative, and all three GDP levels finite and strictly positive. Exclude missing and invalid values without imputation, interpolation, nearest-year substitution, or winsorization.
+    - Retain a country only if it has at least ten complete treatment-year rows. All excluded keys and countries must be reported.
+variables:
+  treatment:
+    - name: top_statutory_pit_per_ten_pp
+      source: oecd:oecd_top_statutory_pit_rate
+      transformation: Recorded OECD top statutory personal income-tax rate at t divided by ten; one unit is a ten-percentage-point higher rate.
+      notes: This is a top wage-income schedule rate, not an effective rate paid or a capital-income rate.
+  outcome:
+    - name: annualized_three_year_real_gdp_per_person_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 100 times [log(real GDP per person at t+3) minus log(real GDP per person at t)] divided by 3.
+  controls:
+    - name: initial_log_real_gdp_per_person
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: log of real GDP per person at t.
+    - name: prior_three_year_growth
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 100 times [log(real GDP per person at t) minus log(real GDP per person at t-3)] divided by 3.
+    - name: trade_share
+      source: world_bank_wdi:NE.TRD.GNFS.ZS
+      transformation: Trade in goods and services as percent of GDP at t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    OLS with country and treatment-year fixed effects, initial log real GDP
+    per person, prior three-year growth, and contemporaneous trade share.
+    Country-cluster CR1 uncertainty and Student-t(G-1) interval. The GDP
+    endpoint windows overlap within country, so clustering is essential.
+    This is descriptive; reform selection, rate thresholds, base changes,
+    reverse causality, and omitted policy packages remain possible.
+falsification:
+  test: run_oecd_top_pit_forward_growth_temporal_holdout_v2
+  rule: >-
+    INCONCLUSIVE if custody, complete-case, tax-variation, full-rank,
+    residual-exposure concentration, or finite cluster-uncertainty gates
+    fail. Estimate the annualized-growth coefficient per ten-point top-PIT
+    increase and its 99.5-percent two-sided country-cluster t interval.
+    SUPPORTED if the lower interval bound exceeds -0.3 percentage points.
+    REFUTED if the upper bound is below -0.3. Otherwise PARTIAL. A simple
+    nonsignificant coefficient never establishes compatibility. A decisive
+    label also requires every leave-one-country-out coefficient to be on
+    the same side of -0.3 as the full estimate; otherwise PARTIAL.
+  threshold:
+    family_id: oecd_top_pit_forward_growth_temporal_holdout_v2_2026_10_10
+    family_size: 1
+    family_alpha: 0.005
+    confidence_level_two_sided: 0.995
+    meaningful_harm_pp_annual_per_ten_tax_pp: -0.3
+    min_complete_rows: 450
+    min_complete_countries: 30
+    min_rows_per_country: 10
+    min_countries_with_five_pp_rate_range: 15
+    max_top_one_percent_partialled_exposure_share: 0.20
+    max_top_country_partialled_exposure_share: 0.20
+    max_top_year_partialled_exposure_share: 0.25
+    expected_key_rows: 646
+    expected_key_countries: 38
+    key_roster_sha256: 48caf338dfbe15839a3bd185cb570823ef9253be45d122b4d97847e12c2c430e
+    source_files:
+      treatment:
+        path: data/vintages/oecd/oecd_top_statutory_pit_rate@2026-07-23T153857Z.parquet
+        sha256: b500bdc808385c17ace3eb6d78b5698a02dadd28943daf5e7d198d9093f19151
+        manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+        manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+      outcome:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      control_trade:
+        path: data/vintages/world_bank_wdi/NE.TRD.GNFS.ZS@2026-05-05T194657Z.parquet
+        sha256: 4ecf502c1695a316e0d31dda4a90cb95d69494cf34cec26cee6f96420e4c34b1
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    causal_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: >-
+  OECD headline tax rates can differ sharply from effective liabilities and
+  omit bracket thresholds, credits, social contributions, capital income,
+  and tax-base reforms. The modern rates do not reproduce the old 70-percent
+  treatment. GDP growth, tax schedules, and trade can respond to common
+  shocks; country/year effects and a pretrend do not identify a tax effect.
+  The old verdict and related top-PIT studies were visible before this new
+  registration, and the 0.005 cutoff does not correct the entire IESET
+  archive search. No causal, policy, school, position, or featured credit.
+steelman: hypotheses/steelman/oecd_top_pit_forward_growth_temporal_holdout_v2.md
+intervention_channel: fiscal
+intervention_channel_justification: The exposure is the OECD-recorded statutory personal income-tax schedule.
+scope:
+  period: [2000, 2019]
+  countries: *countries
+  outcome_dim: [taxation, gdp_growth]
+  policy_family: [tax_policy]
+  treatment_tags: [top_statutory_personal_income_tax_rate, growth_compatibility]
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
