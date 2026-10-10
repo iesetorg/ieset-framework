@@ -2,10 +2,11 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current local evidence
-gate reports **490 public of 2,036 hypotheses**: 51 featured and 439 calibration.
-This is **118 additional** and leaves **382** to target. The 226 verified
-archives remain archived. A public calibration is a completed, reviewable test,
-not a supported, causal, policy-effect, or school-score finding.
+gate reports **498 public of 2,046 hypotheses**: 51 featured and 447 calibration.
+This is **126 additional** and leaves **374** to target. Another 228 records
+have verified registration but remain archived. A public calibration is a
+completed, reviewable test, not a supported, causal, policy-effect, or
+school-score finding.
 
 ## New prospective families
 
@@ -114,6 +115,36 @@ the frozen sample, event, and concentration gates and independently replayed.
 They are descriptive calibrations, not tax-policy effects, with zero causal,
 policy, school, and featured credit.
 
+## Additional prospective tests and frozen failures
+
+Ten further tests were registered after the earlier wave, each with a separate
+source lock and measured result commit. Eight cleared their sample and method
+floors and entered the public **descriptive-calibration** tier as PARTIAL:
+remittance growth against secondary enrolment and formal business entry (two),
+public active-labour spending against low-education employment, real effective
+exchange-rate appreciation against tourism, top personal-income-tax hikes
+against disposable-income Gini, new CEPII free-trade partners against
+manufactures export share, sustained FDI inflows against resident patenting,
+and WGI government-effectiveness change against later exported-HS6 product
+breadth. These are distinct source-pinned estimates, but neither the local
+multiple-test cutoffs nor strict chronology corrects the wider archive-wide
+selection history. None earns causal, policy, school-score, or featured credit.
+The individual sample sizes, coefficients, and exact replay checks are in
+their dated result audits and immutable run packets.
+
+Two frozen tests stayed **INCONCLUSIVE**. The WGI-effectiveness to OECD
+treatable-mortality test encountered an entirely null selected raw
+`Observation value` column; a normalized `value` field exists, but substituting
+it after the outcome was opened would violate the preregistered rule. The
+wealth-tax-receipts to WID top-1 wealth-share test had 1,113 complete pairs
+across 38 countries, but two selected values failed its prespecified 0–100
+range gate; estimation therefore stopped before its influence or rank gates.
+Neither inconclusive test enters the public count. The two latest packages
+registered in `8df05e8174c62aa2450d1c051a16d3c364a893ee`, locked in `f349add954bbda5f84c0d6eeac5204e5289b5125`, and ran in `25872b98f9ecc9cacb58ede796c4b7a1befaf21b`;
+their exact artifact replays passed. The WGI export-breadth coefficient was
+−0.0414351 log1p point per WGI point (p=0.592705; 1,862 pairs/153 reporter
+economies), below its frozen directional rule.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -132,10 +163,14 @@ steps in Slovakia and Croatia; it put the retained Croatian border and labour
 steps in their operative 2023 year. Only those two countries' derived scores
 changed. Separate policy `32a11b8a48acba4ab87a02a814cfab4412be72f5` records the 1869 final cessation of UK
 corn import duties from 1 June under the Revenue Act, without inventing a
-movement or a drift step. The authored national drift map remains
-**1846–2026**, 145 countries, and 21 axes. No dated national movement or
-policy record before 1846 exists in the authored corpus. These coding repairs
-do not confer empirical support. See
+movement or a drift step. The scored national drift map remains
+**1846–2026**, 145 countries, and 21 axes. Two newly sourced, unlinked
+candidate UK policy records now document the operative 1802 Parish Apprentices
+Act and the 1815 Corn Importation Act. They carry no invented movement,
+numeric drift step, or empirical support; the first defensible scored national
+movement remains in 1846. The drift page now shows these cited policy-only
+years as linked cards and dashed chart markers, with no scored values before
+1846. These coding repairs do not confer empirical support. See
 `engine/audits/policy_axis_source_corrections_2026-10-10.md`,
 `engine/audits/euro_schengen_axis_timing_corrections_2026-10-10.md`, and
 `engine/audits/uk_revenue_act_1869_policy_gap_2026-10-10.md`.
@@ -158,19 +193,24 @@ pending a separate regime review. See
 ## Remaining work and source boundary
 
 A fresh archive review found **no same-ID conversion** that clears its current
-frozen specification with local data. Among 1,320 legacy same-commit pairs,
+frozen specification with local data. Of 228 verified archives, 155 fail the
+estimator floor; 131 of those repeat a claim-mismatched Fraser-index/GDP-per-
+capita placeholder. Eight plain missing-verdict records fail frozen coverage
+floors or lack a prespecified non-support label, and the sole replication-only
+case lacks the required measured outcome. These need new designs or genuine
+reruns, not metadata promotion. Among 1,320 legacy same-commit pairs,
 only 203 have complete old source pins, and just 22 have any confirmed added
 raw calendar year in a later preserved vintage; those counts are upper bounds,
 not ready conversions. See
 `engine/audits/legacy_archive_v2_readiness_2026-10-10.md`. In particular,
 the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
 candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
-multiplication is also unsupported: the current registry has **3,373**
-policies, but only **7** have an exact-date comparative structure declared, **3,350**
+multiplication is also unsupported: the current registry has **3,375**
+policies, but only **7** have a comparative structure declared, **3,352**
 need treated/comparison unit coding, and **1,308** need exact event dates.
 Six of those seven declare known measurement gaps; the seventh lacks an
 outcome measurement plan. None is a verified causal estimate. The second-order
-index now retains **3,359** policies,
+index now retains **3,361** policies,
 including all **23** explicit evaluation designs even when a policy has no
 scored drift axis. A WHO particulate-matter/chronic-outcome lead was rejected
 before registration because its short modeled window and concentrated
@@ -182,12 +222,12 @@ registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
 Generated preregistration, evidence, census, conversion-funnel, school,
-second-order, and policy indexes were refreshed after the eighteen new results
-and policy corrections. Final local checks passed: 6,166 specs and cross-
-references, 29 focused Python tests, eight web tests, TypeScript type checking,
-the static site build, generated drift and evidence checks, and public-tree
-OPSEC scanning. Link reciprocity had zero errors or warnings; scope alignment
-had zero errors and seven warnings. Publication remains on hold: this local
-branch history contains an older rejected, path-bearing source manifest
-followed by a revert. No push, merge, or deployment is authorized by these
-local audits.
+second-order, and policy indexes were refreshed after all current result and
+policy commits. Local checks passed: 6,178 specs and cross-references,
+69 focused Python tests, eight web tests, TypeScript type checking, the
+static site build, generated drift consistency, exact replay of the two latest
+run packets, and public-tree OPSEC scanning. The static drift page and both
+pre-1846 policy pages were present in the build. Link reciprocity had zero
+errors or warnings; scope alignment had zero errors and seven warnings. Publication remains on hold: this local branch history
+contains an older rejected, path-bearing source manifest followed by a
+revert. No push, merge, or deployment is authorized by these local audits.
