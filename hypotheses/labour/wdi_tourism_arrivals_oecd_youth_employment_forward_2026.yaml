@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_tourism_arrivals_oecd_youth_employment_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: +
+claim: Across the frozen 2007–2018 country-year panel, stronger growth in international inbound arrival trips
+  from t-1 to t predicts a larger increase in the OECD 15–24 employment-to-population rate from t to t+1.
+methodology_note: Prospective descriptive two-test family. Registration uses treatment values and exact OECD
+  outcome keys/dimensions/status A, but no outcome values, signs, null masks, or fits. Source lock and outcome
+  access require separate later commits. Both tests stay in the denominator even if one is inconclusive.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUS
+  - AUT
+  - BEL
+  - BGR
+  - BRA
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CRI
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HRV
+  - HUN
+  - IDN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JPN
+  - KOR
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - MKD
+  - MLT
+  - NLD
+  - NOR
+  - NZL
+  - PER
+  - POL
+  - PRT
+  - ROU
+  - RUS
+  - SVK
+  - SVN
+  - SWE
+  - THA
+  - TUR
+  - USA
+  - ZAF
+  period:
+  - 2007
+  - 2018
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the committed country-year roster. Require treatment values at t-1 and t and the exact OECD youth-employment
+    outcome selector at t and t+1; never interpolate, substitute a source, or use nearest-year joins.
+  - Country is a frozen valid ISO3 REF_AREA code. Exclude OECD, EU, G7 and historical DEU_F aggregates/subseries;
+    exclude blank WDI aggregate ISO3 keys.
+  - Require OECD MEASURE=EMP_RATIO, UNIT_MEASURE=PT_POP_SUB, SEX=_T, AGE=Y15T24, LABOUR_FORCE_STATUS=EMP, and
+    OBS_STATUS=A at both endpoints; exclude B breaks and unlabeled statuses.
+  - Require positive finite WDI treatment counts at t-1 and t, cap absolute annual log change at 0.3 before
+    outcome access, and retain countries with at least five eligible candidate years.
+  - After the separately committed source lock, require finite OECD rate values in [0,100] at t and t+1; retain
+    countries with at least five complete pairs and keep zero and small treatment changes in the regression.
+  - Do not select countries, years, covariates, lags, or endpoints using outcome values, missingness, signs,
+    or fitted results.
+variables:
+  treatment:
+  - name: annual_log_change_in_inbound_arrival_trips
+    source: world_bank_wdi:ST.INT.ARVL
+    transformation: log(positive annual count at t) minus log(positive annual count at t-1)
+    notes: Inbound arrival trips, not distinct persons or domestic tourism; WDI status is blank and does not
+      flag visitor-definition or collection-method changes.
+  outcome:
+  - name: youth_employment_rate_one_year_forward_change_pp
+    source: oecd:DSD_LFS_DF_LFS_INDIC
+    transformation: Selected 15–24 employment-to-population percentage at t+1 minus selected percentage at
+      t.
+    notes: Exact normal-status A OECD labour-force-survey employment ratio, both endpoints; no modeled WHO/JMP/UNDP
+      outcome.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS of the one-year forward youth-employment-rate change on one annual treatment log change, with
+    country and treatment-year fixed effects. Country-cluster CR1 covariance and two-sided Student t with G-1
+    degrees of freedom. No controls, alternate lags/windows, or automatic covariate dropping; full-rank and
+    finite-uncertainty gates apply. Residual treatment concentration is checked on the complete fitted sample.
+falsification:
+  test: wdi_entry_tourism_oecd_youth_employment_2026_10_10
+  rule: INCONCLUSIVE if source/roster chronology, complete-case floor (400/35), material-exposure floor (70/25),
+    five-year-country, residual-treatment concentration, full-rank, or country-cluster uncertainty gates fail.
+    SUPPORTED iff beta >= +1.0 youth-employment percentage point per one-unit treatment log change and two-sided
+    p <= 0.005. REFUTED iff beta <= -1.0 with the same p cutoff. Otherwise PARTIAL if estimable. Both tests
+    remain in the Bonferroni denominator even when the other is inconclusive.
+  threshold:
+    family_id: wdi_entry_tourism_oecd_youth_employment_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 1.0
+    min_valid_rows: 400
+    min_valid_countries: 35
+    min_material_change_rows: 70
+    min_material_change_countries: 25
+    material_log_change_min_abs: 0.1
+    max_abs_treatment_log_change: 0.3
+    min_years_per_country: 5
+    max_top_one_percent_residual_x_share: 0.3
+    max_top_country_residual_x_share: 0.2
+    expected_key_rows: 564
+    expected_key_countries: 50
+    roster_sha256: b571b45b3a94765bf1661b97908670dac88980d8598d92c43e3fdeb74449f556
+    source_files:
+      tourism:
+        path: data/vintages/world_bank_wdi/ST.INT.ARVL@2026-05-05T203952Z.parquet
+        sha256: 1336df1cce2b3a2e784f917caa9487753d4cf53ad4ec65e5ea2fb045b0d41da5
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      outcome:
+        path: data/vintages/oecd/DSD_LFS_DF_LFS_INDIC@2026-07-23T151216Z.parquet
+        sha256: ac58f9ea05eb07e0d4696a81334021120cd679f58847a2fb32dc70e06074e6ae
+        manifest: data/manifests/fetch_run_2026-07-23T151302Z.yaml
+        manifest_sha256: 4952688fa8fbf62df91c20409bf4180b75977bc638bb33e2a00a267b3053b601
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: Visible IESET Singapore, UAE, Dominican Republic and other country-specific tourism/development
+  hypotheses, plus youth-wage-gap-to-youth-employment, precede this new exact directed pair. Treatment values
+  and key/status fields only informed sample selection; no outcome values or null masks were opened. Official
+  WDI count definitions and unflagged method breaks limit interpretation. Survey employment can respond to
+  common demand and reverse timing. The local two-test correction is not an archive-wide correction. Zero causal,
+  policy, school, or featured credit.
+steelman: hypotheses/steelman/wdi_tourism_arrivals_oecd_youth_employment_forward_2026.md
+scope:
+  period:
+  - 2007
+  - 2018
+  countries: *id001
+  outcome_dim:
+  - employment_labour
+  policy_family: []
+  treatment_tags:
+  - tourism_arrivals
+  - services_demand
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
