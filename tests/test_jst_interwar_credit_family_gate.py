@@ -49,7 +49,10 @@ def test_original_invalid_spec_cannot_be_public() -> None:
         ["git", "show", f"{commit}:{spec_rel}"],
         cwd=ROOT, capture_output=True, check=True,
     ).stdout
-    schema = json.loads((ROOT / "schemas" / "hypothesis.schema.json").read_text())
+    schema = json.loads(subprocess.run(
+        ["git", "show", f"{commit}:schemas/hypothesis.schema.json"],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout)
     errors = list(Draft202012Validator(schema).iter_errors(yaml.safe_load(frozen)))
     assert len(errors) == 1
     assert list(errors[0].absolute_path) == ["sample", "temporal_structure"]
@@ -63,6 +66,57 @@ def test_original_invalid_spec_cannot_be_public() -> None:
         return original_read(path)
     with patch.object(Path, "read_bytes", original_spec_bytes):
         assert nested_verdict(hid, "growth") == ""
+
+
+def test_later_schema_relaxation_cannot_restore_public_credit() -> None:
+    hid = "jst_1929_credit_intensity_real_gdp_pc_loss_v2"
+    spec_rel = f"hypotheses/growth/{hid}.yaml"
+    commit = registration(hid, "growth")["spec_commit"]
+    frozen = subprocess.run(
+        ["git", "show", f"{commit}:{spec_rel}"],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout
+    current_schema_path = ROOT / "schemas/hypothesis.schema.json"
+    future_schema = json.loads(subprocess.run(
+        ["git", "show", f"{commit}:schemas/hypothesis.schema.json"],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout)
+    allowed = future_schema["properties"]["sample"]["properties"]["temporal_structure"]["enum"]
+    if "cross_section" not in allowed:
+        allowed.append("cross_section")
+    assert Draft202012Validator(future_schema).is_valid(yaml.safe_load(frozen))
+
+    original_read_bytes = Path.read_bytes
+    original_read_text = Path.read_text
+    def first_spec_bytes(path: Path) -> bytes:
+        if path == ROOT / spec_rel:
+            return frozen
+        if path == current_schema_path:
+            return json.dumps(future_schema).encode()
+        return original_read_bytes(path)
+    def relaxed_schema_text(path: Path, *args: object, **kwargs: object) -> str:
+        if path == current_schema_path:
+            return json.dumps(future_schema)
+        return original_read_text(path, *args, **kwargs)
+    with patch.object(Path, "read_bytes", first_spec_bytes), patch.object(
+        Path, "read_text", relaxed_schema_text,
+    ):
+        assert nested_verdict(hid, "growth") == ""
+
+
+def test_missing_historical_schema_fails_closed() -> None:
+    hid = "jst_1929_credit_intensity_real_gdp_pc_loss_v2"
+    frozen_registration = registration(hid, "growth")
+    missing = ["git", "show", f"{frozen_registration['spec_commit']}:schemas/hypothesis.schema.json"]
+    real_run = subprocess.run
+
+    def missing_schema(args: list[str], **kwargs: object) -> subprocess.CompletedProcess[bytes]:
+        if args == missing:
+            return subprocess.CompletedProcess(args, 128, stdout=b"", stderr=b"missing")
+        return real_run(args, **kwargs)
+
+    with patch.object(audit_evidence_tiers.subprocess, "run", missing_schema):
+        assert not audit_evidence_tiers.original_registration_schema_valid(frozen_registration)
 
 
 def test_valid_single_source_locked_result_remains_public() -> None:

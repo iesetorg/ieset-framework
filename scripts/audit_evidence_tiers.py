@@ -24,6 +24,7 @@ from typing import Any
 
 import yaml
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import SchemaError
 
 import audit_integrity_detectors
 
@@ -259,13 +260,18 @@ def original_registration_schema_valid(registration: dict[str, Any]) -> bool:
         ["git", "show", f"{spec_commit}:{spec_rel}"],
         cwd=ROOT, capture_output=True, check=False,
     )
-    if frozen.returncode:
+    frozen_schema = subprocess.run(
+        ["git", "show", f"{spec_commit}:schemas/hypothesis.schema.json"],
+        cwd=ROOT, capture_output=True, check=False,
+    )
+    if frozen.returncode or frozen_schema.returncode:
         return False
     try:
         doc = yaml.safe_load(frozen.stdout)
-        schema = json.loads((ROOT / "schemas/hypothesis.schema.json").read_text())
+        schema = json.loads(frozen_schema.stdout)
+        Draft202012Validator.check_schema(schema)
         return isinstance(doc, dict) and Draft202012Validator(schema).is_valid(doc)
-    except (TypeError, ValueError, OSError, yaml.YAMLError):
+    except (TypeError, ValueError, OSError, yaml.YAMLError, SchemaError):
         return False
 
 
