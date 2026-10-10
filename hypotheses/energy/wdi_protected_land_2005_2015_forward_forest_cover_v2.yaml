@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+version: 1
+status: pre_registered
+topic: energy
+evidence_type: descriptive
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 1995
+  - 2023
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One fixed 2005–2015 protected-area change per eligible economy followed by one
+    2015–2023 outcome interval; 1995–2005 cereal-yield growth defines a prior condition.
+  exclusion_rules:
+  - 'Candidate roster is the ISO 3166 alpha-3 or XKX intersection of required country/year source keys: protected-area
+    share in 2005 and 2015; forest share, food-production index, and population in 2005, 2015, and 2023; real
+    GDP per capita in 2015; and FAOSTAT Cereals; primary yield in 1995 and 2005. The key-only roster is committed
+    in the later source lock before values or null masks are opened.'
+  - The FAOSTAT yield selector is Item Code 1717, Element Code 5412, Unit kg/ha. Convert Area Code (M49) by
+    stripping the leading apostrophe, padding to three digits, and mapping the M49 numeric code to pycountry
+    ISO3. Drop aggregate and unmapped geography. Duplicate selected country/year keys fail the run.
+  - Use one shared complete-case sample for both endpoints. Require finite protected-area and forest percentages
+    in [0,100], strictly positive finite food-production index, population, 2015 real GDP per person, and cereal
+    yield at the exact required years. Include only economies with 1995–2005 annualized cereal-yield log growth
+    at least 0.5 percentage points. Missing/invalid values are excluded; no interpolation, imputation, alternate
+    endpoint, country substitution, winsorization, or outcome-based subgroup.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-economy OLS with intercept and fixed endpoint-specific baseline controls. HC3 standard errors
+    and Student-t reference with N minus parameter-count degrees of freedom. Both outcomes share one complete-case
+    sample and one family. Forest uses two-sided alpha 0.025; food uses one-sided noninferiority alpha 0.025.
+    No model or sample search.
+prior_confidence: 0.35
+disclosure: The archived proxy result is known but did not measure protected land, forest cover, or food output
+  per person. The new forward tests are descriptive, vulnerable to designation measurement changes, land-quality
+  selection, forest accounting, and concurrent development. The two endpoints are one family; no identified
+  policy, causal, school, position, or featured credit.
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+hypothesis_id: wdi_protected_land_2005_2015_forward_forest_cover_v2
+claim_direction: +
+methodology_note: New-ID prospective direct-measure replacement for archived protected_land_food_security_emissions_panel.
+  The old generic WGI government-effectiveness to OWID CO2-intensity screen was a proxy and does not test the
+  archived protected-area/forest/food claim. These two non-nested endpoints form one descriptive family.
+steelman: hypotheses/steelman/wdi_protected_land_2005_2015_forward_forest_cover_v2.md
+notes: 'Pre-registration plan: engine/audits/wdi_protected_land_forward_forest_food_2026_family_prereg_2026-10-10.md.
+  Exact runner: scripts/run_wdi_protected_land_forward_forest_food_2026_family.py. Forest outcome means net
+  cover change, not gross deforestation or land-use emissions.'
+scope:
+  period:
+  - 1995
+  - 2023
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - energy
+  policy_family:
+  - none
+  treatment_tags:
+  - protected_land_share_expansion
+variables:
+  treatment:
+  - name: protected_land_share_gain_per_5pp
+    source: world_bank_wdi:ER.LND.PTLD.ZS
+    transformation: (2015 percentage share minus 2005 percentage share) / 5
+  outcome:
+  - name: forward_annual_net_forest_cover_share_change_pp
+    source: world_bank_wdi:AG.LND.FRST.ZS
+    transformation: (2023 forest percentage share minus 2015 share) / 8; positive means net cover retention
+  controls:
+  - name: protected_share_2005
+    source: world_bank_wdi:ER.LND.PTLD.ZS
+    transformation: 2005 percentage share
+  - name: log_real_income_2015
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of 2015 level
+  - name: prior_cereal_yield_growth_condition
+    source: faostat:Production_Crops_Livestock
+    transformation: 1995–2005 annualized log growth in Cereals; primary yield, Item 1717, Element 5412, kg/ha;
+      >=0.5 log percentage points per year; eligibility only
+  - name: forest_share_2015
+    source: world_bank_wdi:AG.LND.FRST.ZS
+    transformation: 2015 percentage share
+  - name: prior_forest_share_trend
+    source: world_bank_wdi:AG.LND.FRST.ZS
+    transformation: (2015 share minus 2005 share) / 10
+claim: Among economies with at least 0.5% annualized cereal-yield growth in 1995–2005, larger 2005–2015 increases
+  in terrestrial protected-area share predict more positive 2015–2023 annual net forest-cover-share change,
+  conditional on initial protected share, baseline forest share, its 2005–2015 trend, and 2015 real income.
+  This is a descriptive net-cover association, not gross deforestation or an identified protection effect.
+falsification:
+  test: fixed_wdi_protected_land_forward_forest_food_2026_family
+  rule: INCONCLUSIVE if any shared sample, exposure-variation, rank, HC3, concentration, or leave-one-out gate
+    fails. Otherwise SUPPORTED requires forest coefficient >=+0.05 annual forest-share percentage point per
+    5-point protected-share gain, two-sided p<=0.025, and >=75% positive leave-one-out coefficients. REFUTED
+    requires coefficient <=-0.05, p<=0.025, and >=75% negative leave-one-out coefficients. Other estimable
+    results are PARTIAL. This measures net forest-cover change only; family credit is zero for causal, policy,
+    school, position, and featured claims.
+  threshold:
+    family_id: wdi_protected_land_forward_forest_food_2026_family
+    family_size: 2
+    outcome_role: forest
+    prior_yield_years:
+    - 1995
+    - 2005
+    treatment_years:
+    - 2005
+    - 2015
+    outcome_years:
+    - 2015
+    - 2023
+    min_prior_yield_growth_annual_log_pp: 0.5
+    min_shared_complete_economies: 50
+    min_protected_gain_2pp_economies: 15
+    min_protected_gain_iqr_pp: 1.0
+    max_single_economy_residualized_exposure_share: 0.2
+    max_loo_failures: 2
+    min_loo_direction_share: 0.75
+    min_abs_beta_annual_forest_share_pp_per_5pp: 0.05
+    two_sided_p_max: 0.025
+    source_files:
+      protected:
+        path: data/vintages/world_bank_wdi/ER.LND.PTLD.ZS@2026-04-30T114927Z.parquet
+        sha256: aa9245985434e69f144a55efceb08295879b003bdfff8126516867cd247622ff
+      forest:
+        path: data/vintages/world_bank_wdi/AG.LND.FRST.ZS@2026-04-30T114910Z.parquet
+        sha256: cbca72337cd47da6cb31f03eebda8f3140524ceb8473c7f8fa53b05729c50fc0
+      food:
+        path: data/vintages/world_bank_wdi/AG.PRD.FOOD.XD@2026-05-05T203847Z.parquet
+        sha256: 05863480f2da10e8d59cb591a008fb54ad23e7b35d1818d1682fd7a673536876
+      population:
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+      yield:
+        path: data/vintages/faostat/faostat_prod_All_Data_(Normalized)@2026-05-02T212007Z.parquet
+        sha256: 02d93061467ca6e9a6cc738ba72702271d26abbaa21480c51d04d29b1017734a
+    policy_score_credit: 0
+    school_score_credit: 0
+    legacy_hypothesis_id: protected_land_food_security_emissions_panel

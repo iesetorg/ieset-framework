@@ -1,0 +1,5 @@
+# Steelman — wdi_protected_land_2005_2015_forward_food_per_person_v2
+
+The strongest opposing interpretation is that protected-area designation follows prior forest retention or state capacity rather than causing later retention. Protected-area shares can jump when registries change, and forest-area share is a net stock measure that may miss gross clearing and compensating regrowth. The positive forest slope can also reflect geography, land quality, or background development.
+
+For food, a noninferiority result still permits a small penalty within the frozen 0.5 annual log-point margin per 5-point exposure gain. It tests national food production per person, not household food access, affordability, or land-use emissions. Cereal-yield growth is a pre-exposure eligibility condition, not a guarantee for all foods. Same-sample complete cases and fixed baseline controls do not identify a conservation-policy effect. A null or data-limited result remains visible as PARTIAL or INCONCLUSIVE under the frozen rule.
