@@ -1,0 +1,344 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: imf_inflation_real_consumption_pc_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: '-'
+claim: Across the fixed 187-economy structural panel, a larger three-year increase in bounded IMF annual
+  CPI inflation predicts lower subsequent three-year growth of real household consumption per person.
+methodology_note: Retrospective blind-outcome calibration from exact pinned IMF and WDI snapshots. Only
+  source schemas, selected WDI indicator/country/year keys, and IMF inflation plus WDI GDP-per-person
+  control values were read before registration. No selected outcome value, null mask, observation status,
+  coefficient, or exact directed-pair result card was opened. A related IMF-inflation to CEPAL poverty
+  design and wider archive labels were visible, so this is not an archive-wide independent holdout.
+evidence_type: associational
+sample:
+  countries:
+  - ABW
+  - AFG
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BDI
+  - BEL
+  - BEN
+  - BFA
+  - BGD
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLR
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - BWA
+  - CAF
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - COM
+  - CPV
+  - CRI
+  - CYP
+  - CZE
+  - DEU
+  - DMA
+  - DNK
+  - DOM
+  - DZA
+  - ECU
+  - EGY
+  - ERI
+  - ESP
+  - EST
+  - ETH
+  - FIN
+  - FJI
+  - FRA
+  - FSM
+  - GAB
+  - GBR
+  - GEO
+  - GHA
+  - GIN
+  - GMB
+  - GNB
+  - GNQ
+  - GRC
+  - GRD
+  - GTM
+  - GUY
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IND
+  - IRL
+  - IRN
+  - IRQ
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KGZ
+  - KHM
+  - KIR
+  - KNA
+  - KOR
+  - LAO
+  - LBN
+  - LBR
+  - LBY
+  - LCA
+  - LKA
+  - LSO
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAR
+  - MDA
+  - MDG
+  - MDV
+  - MEX
+  - MHL
+  - MKD
+  - MLI
+  - MLT
+  - MMR
+  - MNE
+  - MNG
+  - MOZ
+  - MRT
+  - MUS
+  - MWI
+  - MYS
+  - NAM
+  - NER
+  - NGA
+  - NIC
+  - NLD
+  - NOR
+  - NPL
+  - NRU
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PLW
+  - PNG
+  - POL
+  - PRI
+  - PRT
+  - PRY
+  - QAT
+  - ROU
+  - RUS
+  - RWA
+  - SAU
+  - SDN
+  - SEN
+  - SGP
+  - SLB
+  - SLE
+  - SLV
+  - SMR
+  - SRB
+  - STP
+  - SUR
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - SYR
+  - TCD
+  - TGO
+  - THA
+  - TJK
+  - TKM
+  - TLS
+  - TON
+  - TTO
+  - TUN
+  - TUR
+  - TUV
+  - TZA
+  - UGA
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - ZAF
+  - ZMB
+  period:
+  - 1992
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - Use the frozen key-only 3,919 economy-year roster and exact ISO3/year joins. Do not add, replace,
+    or remove economies after selected outcomes are opened.
+  - IMF WEO flow WEO inflation must have a finite annual value at t-3 and t. WDI real GDP per person must
+    be finite, positive, and have blank observation status at t-3 and t.
+  - Selected WDI outcome files must carry unique indicator_id/country_iso3/year keys at t-3, t, and t+3.
+    The prelock structural-key check does not inspect their values, nulls, or status.
+  - Use exposure years t=1995..2016 only, and selected outcome years t-3, t, t+3 ending no later than
+    2019 to avoid pandemic and IMF projection periods.
+  - Require positive finite selected values at t-3, t, and t+3. Require blank WDI observation status for
+    all three selected years. Drop an invalid or status-flagged triple only; report separate counts.
+  - After selected triple filtering, retain only economies with at least eight complete exposure years.
+    No interpolation, nearest-year substitution, winsorization, outcome-driven country removal, alternate
+    horizon, or alternate estimator.
+variables:
+  treatment:
+  - name: bounded_inflation_acceleration
+    source: imf_weo_sdmx:WEO__PCPIPCH
+    transformation: 2 * (tanh(CPI inflation percent at t / 20) - tanh(CPI inflation percent at t-3 / 20))
+    notes: One exposure unit is roughly a rise from zero to 11 percent annual CPI inflation. It is a bounded
+      macro signal, not policy treatment.
+  outcome:
+  - name: forward_three_year_log_real_private_consumption_pc_change
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: ln(positive real household consumption per person at t+3) minus ln(value at t)
+    notes: Three-year forward change; selected t-3/t/t+3 values remain sealed until a separately committed
+      source lock.
+  controls:
+  - name: baseline_outcome
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: selected outcome level at t, log level for consumption
+  - name: prior_outcome_change
+    source: world_bank_wdi:NE.CON.PRVT.PC.KD
+    transformation: selected outcome level at t minus level at t-3, log difference for consumption
+  - name: prior_bounded_inflation_level
+    source: imf_weo_sdmx:WEO__PCPIPCH
+    transformation: 2 * tanh(CPI inflation percent at t-3 / 20)
+  - name: log_real_gdp_pc_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive constant-price GDP per person at t
+  - name: prior_three_year_log_gdp_pc_change
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log GDP per person at t minus natural log at t-3
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: 'One OLS equation per selected outcome: t to t+3 change on bounded t-3 to t inflation acceleration,
+    prior bounded inflation level, baseline outcome, prior outcome change, log GDP per person at t, prior
+    three-year log GDP-per-person change, economy and treatment-year effects. Reporter-cluster CR1 covariance
+    with G/(G-1)*(N-1)/(N-K) small-sample correction, two-sided Student t(G-1) p-values, and simultaneous
+    99.6667 percent confidence intervals. Require full rank and residualized-treatment concentration gates.'
+falsification:
+  test: run_imf_inflation_macro_responses_2026
+  rule: INCONCLUSIVE if frozen registration/source-lock chronology, source custody, key roster, selected-outcome
+    validity/status, complete-case/time/material-exposure floors, full rank, residualized-treatment concentration,
+    or finite country-cluster uncertainty fail. SUPPORTED only if the coefficient has the registered sign,
+    absolute magnitude at least 0.015 log points, and two-sided p<=0.01/3. REFUTED only if the opposite
+    sign clears the same magnitude and p gate. All other method-valid estimates are PARTIAL. No fallback
+    endpoint or post-result specification change.
+  threshold:
+    family_id: imf_inflation_macro_responses_2026_10_10
+    family_size: 3
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0033333333333333335
+    expected_beta_sign: '-'
+    meaningful_abs_beta: 0.015
+    meaningful_beta_unit: log points
+    exposure_years:
+    - 1995
+    - 2016
+    prior_start_year: 1992
+    outcome_end_year: 2019
+    material_abs_exposure: 0.5
+    min_valid_rows: 1200
+    min_valid_economies: 90
+    min_valid_treatment_years: 15
+    min_complete_years_per_economy: 8
+    min_material_acceleration_rows: 75
+    min_material_acceleration_economies: 45
+    min_material_deceleration_rows: 75
+    min_material_deceleration_economies: 45
+    max_top_one_percent_residual_exposure_share: 0.25
+    max_top_economy_residual_exposure_share: 0.15
+    max_top_year_residual_exposure_share: 0.18
+    expected_key_rows: 3919
+    expected_key_economies: 187
+    expected_material_acceleration_rows: 281
+    expected_material_acceleration_economies: 121
+    expected_material_deceleration_rows: 547
+    expected_material_deceleration_economies: 150
+    roster_sha256: d09808f487e272d30ec847fca348bd9d0c1dc10b30f6a7fb71593363b311ca3d
+    source_files:
+      inflation:
+        path: data/vintages/imf_weo_sdmx/WEO__PCPIPCH@2026-10-09T121600Z.parquet
+        sha256: 89564e357988848ac8801d946f958c4dcef37881bf35ca77d4c03c225caa0568
+        provenance: data/source_locks/cepal_imf_inflation_next_year_national_poverty_panel.yaml
+        provenance_sha256: e93cb599cfc40c042a7b0cc7cac57642f0445318d97ef315bda9176d416fdc6e
+      gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        provenance: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        provenance_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      consumption:
+        path: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+        sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+        provenance: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        provenance_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: The three endpoints share countries and source vintages, so Bonferroni controls the fixed
+  within-family tests only. Inflation and later outcomes can share macro shocks or respond to policy;
+  forward timing and controls do not identify causal or policy effects. Selected source files are historical
+  and previously collected, not a truly new future-data holdout. All results carry zero causal, policy,
+  school-score, and featured credit.
+steelman: hypotheses/steelman/imf_inflation_real_consumption_pc_forward_2026.md
+scope:
+  period:
+  - 1992
+  - 2019
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - private_consumption
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
