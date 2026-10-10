@@ -1,0 +1,237 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: cckp_faostat_sugarcane_temperature_yield_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: '-'
+claim: For the fixed 1963–2024 country-year roster, larger absolute annual mean-temperature
+  departure from 1961–1990 country normal, degC is associated with lower same-year
+  sugar cane yield log growth after prior crop growth, the other climate-departure
+  measure, and country/year effects.
+methodology_note: 'Value-blind 56-cell climate/crop family: four FAO aggregate groups
+  and ten named crops, two crop margins, two distinct weather exposures. Only source
+  schema, hashes, item/country/year keys, units and flag codebook were inspected at
+  registration; measurements, null masks and flags remain unopened. All cells share
+  one family multiplicity denominator and are correlated, not independent replications.'
+evidence_type: associational
+sample:
+  countries: &id001
+  - AFG
+  - AGO
+  - ARG
+  - ATG
+  - AUS
+  - BDI
+  - BEN
+  - BFA
+  - BGD
+  - BHS
+  - BLZ
+  - BOL
+  - BRA
+  - BRB
+  - BRN
+  - BTN
+  - CAF
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - CPV
+  - CRI
+  - CUB
+  - DJI
+  - DMA
+  - DOM
+  - ECU
+  - EGY
+  - ESP
+  - ETH
+  - FJI
+  - GAB
+  - GHA
+  - GIN
+  - GLP
+  - GNB
+  - GRD
+  - GTM
+  - GUF
+  - GUY
+  - HND
+  - HTI
+  - IDN
+  - IND
+  - IRN
+  - IRQ
+  - JAM
+  - JPN
+  - KEN
+  - KHM
+  - KNA
+  - KWT
+  - LAO
+  - LBN
+  - LBR
+  - LCA
+  - LKA
+  - MAR
+  - MDG
+  - MEX
+  - MLI
+  - MMR
+  - MOZ
+  - MTQ
+  - MUS
+  - MWI
+  - MYS
+  - NER
+  - NGA
+  - NIC
+  - NPL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - PRI
+  - PRT
+  - PRY
+  - PYF
+  - REU
+  - RWA
+  - SDN
+  - SEN
+  - SGP
+  - SLE
+  - SLV
+  - SOM
+  - SUR
+  - SWZ
+  - SYR
+  - TCD
+  - THA
+  - TTO
+  - TWN
+  - TZA
+  - UGA
+  - URY
+  - USA
+  - VCT
+  - VEN
+  - VNM
+  - VUT
+  - WSM
+  - YEM
+  - ZAF
+  - ZMB
+  - ZWE
+  period:
+  - 1961
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only country-year keys in the committed roster; no interpolation, nearest-year
+    join, or substitutions.
+  - Map FAOSTAT M49 to current ISO3 with pycountry; exclude noncountries and the CCKP
+    KSV code.
+  - Require exact crop values at t, t-1 and t-2, finite and positive, exact unit;
+    admit only FAO A, E and X flags and report their counts. Exclude I, B, M, blank
+    or unknown flags.
+  - Require climate tas and pr at t and all 1961–1990 baseline years; finite values
+    and a positive precipitation baseline sample SD.
+  - Exclude absolute current or prior crop log growth above 1.0; keep countries with
+    at least five complete years.
+  - Do not change item, margin, climate exposure, years, transformation, gates, estimator
+    or family size after opening selected measurements.
+variables:
+  outcome:
+  - name: same_year_yield_log_growth
+    source: faostat:crop_and_livestock_products
+    transformation: log(yield at year t) minus log(yield at t-1), item 156, element
+      5412, unit kg/ha
+  treatment:
+  - name: absolute_temperature_departure
+    source: world_bank_cckp:cru_ts4_10_tas_pr_annual_global
+    transformation: absolute annual mean-temperature departure from 1961–1990 country
+      normal, degC
+    notes: Annual country-average gridded observation; does not isolate crop-zone
+      weather.
+  controls:
+  - name: prior_crop_log_growth
+    source: faostat:crop_and_livestock_products
+    transformation: log(yield at t-1) minus log(yield at t-2)
+  - name: other_pr_departure
+    source: world_bank_cckp:cru_ts4_10_tas_pr_annual_global
+    transformation: absolute annual precipitation departure from 1961–1990 country
+      normal, divided by that baseline's sample SD
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS with country and outcome-year fixed effects, prior crop log growth and
+    the other weather-departure control; country-cluster CR1 standard error and two-sided
+    Student t(G-1), full-rank and residualized-exposure concentration gates. No alternate
+    estimator is substituted on failure.
+falsification:
+  test: cckp_faostat_weather_crop_family_2026_10_10_sugarcane_yield_temperature
+  rule: INCONCLUSIVE if exact-source, complete-case (500/30), material exposure (100/20),
+    five-year-country, rank, positive finite country-cluster SE, or 20% top-country
+    residualized-exposure cap fails. SUPPORTED iff beta <= -0.02 and two-sided p <=
+    0.01/56. REFUTED iff beta >= +0.02 at the same p cutoff; otherwise PARTIAL when
+    estimable. All 56, including failures, remain in the denominator.
+  threshold:
+    family_id: cckp_faostat_weather_crop_family_2026_10_10
+    family_size: 56
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00017857142857142857
+    expected_beta_sign: '-'
+    meaningful_beta_min_abs: 0.02
+    min_complete_rows: 500
+    min_complete_countries: 30
+    min_material_rows: 100
+    min_material_countries: 20
+    material_abs_temperature_departure_deg_c: 1.0
+    material_abs_precipitation_departure_baseline_sd: 1.0
+    min_complete_years_per_country: 5
+    max_abs_outcome_log_growth: 1.0
+    max_top_country_residualized_exposure_share: 0.2
+    baseline_years:
+    - 1961
+    - 1990
+    outcome_years:
+    - 1963
+    - 2024
+    roster_sha256: 0df474914d96a59e7fe16d53c33210cc9a46be63b0f56c661efa864a5cbeb5dc
+    source_lock_path: data/pinned_evidence/cckp_faostat_weather_crop_2026.manifest.json
+    causal_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.25
+disclosure: Descriptive calibration only. Country-average climate misses crop growing
+  zones and seasonal timing; crop mixes, irrigation, technology, reporting and other
+  shocks can confound the association. FAO group outcomes overlap named crops. No
+  causal, policy, position, school or featured credit.
+steelman: hypotheses/steelman/cckp_faostat_sugarcane_temperature_yield_2026.md
+scope:
+  period:
+  - 1961
+  - 2024
+  countries: *id001
+  outcome_dim:
+  - productivity
+  policy_family: []
+  treatment_tags:
+  - sugarcane
+  - temperature
+  - climate_weather
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
