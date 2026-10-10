@@ -1,0 +1,53 @@
+hypothesis_id: oecd_epl_2023_eurostat_longterm_unemployment_2025_v2
+preregistration:
+  spec_commit: 5c3c2d88140797e893457e8edcccca0615842392
+  source_lock_commit: ad31e371915cb16c0e86802b5a547b4237f7cdc0
+  key_roster: data/pinned_evidence/epl_duration_2025_temporal_holdout_v2_key_roster.csv
+  family_size: 1
+source:
+  source_sha256: 8bf49da9d9bce102946fb246ac40ee33ac6ad453d3958d43d2f8d26347ba5605
+  source_lock_commit: ad31e371915cb16c0e86802b5a547b4237f7cdc0
+  source_lock_manifest: data/pinned_evidence/oecd_epl_2023_eurostat_longterm_unemployment_2025_v2.source.json
+  key_roster_sha256: e4b076ff78f74eb7fad80de1a58172d86370be6c9872f1fea9ba23de50dd5120
+  input_vintages:
+  - path: data/vintages/eurostat/une_ltu_a@2026-10-10T162323Z.parquet
+    sha256: 8bf49da9d9bce102946fb246ac40ee33ac6ad453d3958d43d2f8d26347ba5605
+    manifest: data/manifests/fetch_run_2026-10-10T162324Z.yaml
+    url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_ltu_a?format=JSON
+  - path: data/vintages/eurostat/une_rt_a@2026-04-30T115942Z.parquet
+    sha256: 251ceda552026f2f55b5f18365d705cbf0c447f695323c3b984a6893bbce782d
+    manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+    url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_a?format=JSON
+  - path: data/vintages/oecd/OECD.ELS.EMP_DSD_EPL_OV_DF_EPL_OV_1.0@2026-07-23T154113Z.parquet
+    sha256: 8a25f91e01153564e8db18723e69ed41298c339255a6ac41b67942dc86022fcd
+    manifest: data/manifests/fetch_run_2026-07-23T154936Z.yaml
+    url: https://webfs.oecd.org/Els-com/Employment%20Protection%20Legislation/OECDEmploymentProtectionLegislationDatabase.xlsx
+result:
+  verdict: PARTIAL
+  reason: method-valid holdout does not clear the frozen directional threshold
+  gate_failures: []
+  gate_checks:
+    roster_countries: 25
+    valid_countries: 25
+    excluded: []
+    selected_years:
+    - 2023
+    - 2025
+    selected_duration_indicator: une_ltu_a:LTU
+    epr_iqr: 0.682539701461792
+    max_country_centered_epr_share: 0.20622411157226067
+    max_ols_leverage: 0.33153586284908315
+    max_country_residual_variance_share: 0.2590817174781297
+  primary:
+    coefficient_pp_per_epr_point: -0.38908226427719084
+    std_error_hc3: 1.0603376527326067
+    p_two_sided_normal: 0.7136623906951748
+    ci_99_lower: -3.120331061842097
+    ci_99_upper: 2.342166533287715
+    n_countries: 25
+    method: 2025 long-term share on 2023 EPR and 2023 long-term share; OLS HC3
+reproduction:
+  command: python3 scripts/run_oecd_epl_duration_2025_v2.py --verify
+  result_sha256: b64c2c22af8987185d94270e20754af5764f859d787b0b7e0fbb9e21c8eeafc9
+limitations: Associational 25-country temporal holdout; no causal, policy, school,
+  position, or featured credit; Eurostat cell flags not preserved.
