@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_pdb_manufacturing_productivity_next_year_employment_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '-'
+claim: Across the frozen OECD core country-year roster in 1996–2023, higher real manufacturing value-added-per-hour
+  growth at year t predicts lower manufacturing persons-employed growth from t to t+1, conditional on employment
+  growth from t-1 to t and country and treatment-year effects.
+evidence_type: associational
+methodology_note: One source-locked prospective cell of a three-sector OECD Productivity Database family. Source
+  schema, manifest, SHA-256, categorical series identities, and country/sector/year keys were inspected before
+  registration; no selected values or value/status missingness masks were read. Registration, three separate
+  source locks, and measurement must be committed in that order.
+sample:
+  countries:
+  - OECD
+  period:
+  - 1995
+  - 2024
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the registered sector-specific country/treatment-year keys for t=1996..2023 with GVAHRS annual
+    growth at t and EMP persons levels at t-1, t and t+1. The key roster gives no guarantee of measured coverage.
+  - Require finite observations with blank or A OECD OBS_STATUS. GVAHRS GY uses zero unit multiplier and absolute
+    growth no greater than 50 percentage points; positive EMP levels use their recorded base-10 unit multiplier.
+  - Annual prior and forward EMP growth are 100 times natural log ratios, each bounded to +/-50 log percentage
+    points. Exclude countries with fewer than ten complete treatment years; no imputation, interpolation, winsorization,
+    source substitution or post-result window change.
+variables:
+  outcome:
+  - name: next_year_sector_employment_growth
+    source: oecd_pdb:DSD_PDB:EMP
+    transformation: 100 ln(EMP_{Manufacturing,t+1}/EMP_{Manufacturing,t}), persons-employed levels, same sector.
+    notes: Subsequent sector headcount change, not wages, hours, job quality or displaced workers.
+  treatment:
+  - name: same_year_real_sector_value_added_per_hour_growth
+    source: oecd_pdb:DSD_PDB:GVAHRS
+    transformation: Annual GY percentage growth in chain-linked real gross value added per hour, ACTIVITY=C,
+      XDC_H/LR.
+    notes: Observed sector productivity growth is not an exogenous technology or policy intervention.
+  controls:
+  - name: prior_sector_employment_growth
+    source: oecd_pdb:DSD_PDB:EMP
+    transformation: 100 ln(EMP_t/EMP_t-1), same sector.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - treatment_year
+  clustering: country
+  notes: Equal-country-year OLS of forward sector employment log growth on same-year sector productivity percentage
+    growth and prior employment log growth, country and treatment-year effects. CR1 country-cluster covariance;
+    two-sided Student t with G-1 degrees of freedom. Three-test Holm family adjustment; five country hash-fold
+    omissions are sensitivity gates.
+falsification:
+  rule: After all eligibility and design gates, SUPPORT requires a negative coefficient with absolute magnitude
+    at least 0.05 next-year employment log percentage points per one productivity percentage point, Holm-adjusted
+    p<=0.05 across all three cells, and the same sign in at least four of five frozen country hash-fold omissions.
+    A qualifying opposite coefficient is REFUTED. An estimable result missing these directional conditions
+    is PARTIAL; any failed coverage, variation, concentration or estimator gate is INCONCLUSIVE.
+  test: Frozen three-cell country/year fixed-effects predictive panel with country-cluster t inference, Holm
+    family adjustment and hash-fold sign gate.
+  threshold:
+    family_id: oecd_pdb_sector_productivity_employment_forward_2026_10_10
+    family_size: 3
+    source_key_roster_path: data/pinned_evidence/oecd_pdb_sector_productivity_employment_2026_key_roster.csv
+    source_key_roster_sha256: d3de10283b9e5f666aae16d407800afbd65d2a7c2f094ee825de0847bcbc3f9d
+    source_lock_path: data/pinned_evidence/oecd_pdb_manufacturing_productivity_next_year_employment_2026.source.json
+    source_sha256: 3546c5c773a15933c439a9975bb6436c13f2df1ae250c75419340c2c91032b5c
+    registered_direction: -1
+    holm_alpha: 0.05
+    meaningful_beta_abs_pp_per_productivity_pp: 0.05
+    minimum_rows: 450
+    minimum_countries: 22
+    minimum_years_with_twelve_countries: 20
+    minimum_complete_years_per_country: 10
+    minimum_residual_productivity_sd_pp: 1.0
+    minimum_residual_employment_sd_pp: 0.5
+    maximum_country_productivity_ss_share: 0.2
+    maximum_top_one_percent_productivity_ss_share: 0.3
+    minimum_same_sign_hash_folds: 4
+    minimum_fold_rows: 320
+    minimum_fold_countries: 17
+    maximum_abs_productivity_growth_pp: 50.0
+    maximum_abs_employment_growth_log_pp: 50.0
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: The three sectors and directional priors were chosen after historical IESET outputs were visible.
+  Three-test Holm correction does not cover the wider archive. Demand, trade, hours, capital, sector mix and
+  measurement can confound the panel; later employment and fixed effects do not establish a causal or policy
+  effect. No school, position, causal, policy or featured credit.
+steelman: hypotheses/steelman/oecd_pdb_manufacturing_productivity_next_year_employment_2026.md
+scope:
+  period:
+  - 1995
+  - 2024
+  countries:
+  - OECD
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - none
+  treatment_tags:
+  - manufacturing_productivity_growth
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
