@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_almp_migrant_unemployment_gap_forward_2026
+version: 1
+status: pre_registered
+topic: labour
+claim_direction: '-'
+claim: Across the frozen OECD country panel, a larger increase in public active labour market programme spending
+  as a percentage of GDP from t-1 to t predicts a smaller foreign-born minus native-born unemployment-rate
+  gap change from t to t+1.
+methodology_note: Prospective descriptive two-test family registered with key-only outcome access and exposure-only
+  variation checks. Existing strict and legacy ALMP, migration, and migrant-employment cases were reviewed;
+  neither directed pair is an old exact test. Both tests remain in the family denominator even if one is inconclusive.
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  - AUT
+  - BEL
+  - CAN
+  - CHE
+  - CHL
+  - COL
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - LTU
+  - LUX
+  - LVA
+  - MEX
+  - NLD
+  - NOR
+  - NZL
+  - POL
+  - PRT
+  - SVK
+  - SVN
+  - SWE
+  - TUR
+  - USA
+  period:
+  - 2001
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - Retain only the exact committed key-only country-year roster, treatment years 2001-2022, and countries
+    with at least five eligible candidate years.
+  - Require direct OECD foreign-born and native-born total-sex unemployment-rate keys at t and t+1; exclude
+    the EU aggregate and never infer missing birth-place cells.
+  - After registration and a separate source-lock commit, require finite selected unemployment rates in [0,100]
+    at both endpoints; drop no other rows based on outcome magnitude.
+  - After source lock, accept only blank or A OECD OBS_STATUS at both birth-place cells and both endpoints;
+    all other observation-status codes are excluded without inspecting their values for selection.
+  - Require finite, unique source selectors and no interpolation, substitute series, or geography imputation.
+  - Public SOCX TP60 exposure values must be within [0,10] percent GDP and have both t-1 and t observations.
+variables:
+  outcome:
+  - name: foreign_minus_native_unemployment_gap_change_pp
+    source: oecd:OECD.ELS.IMD,DSD_MIG@DF_MIG_NUP_SEX,1.0
+    transformation: (FB unemployment rate at t+1 minus NB rate at t+1) minus (FB rate at t minus NB rate at
+      t)
+    notes: OECD UNE_RATE, percentage of labour force in the same subgroup; annual total sex and education.
+      It is a birthplace gap, not an immigrant-arrival cohort outcome.
+  treatment:
+  - name: public_active_labour_market_spending_change
+    source: oecd:DSD_SOCX@DF_SOCX_AGG
+    transformation: public SOCX TP60 spending percent GDP at t minus the same at t-1
+    notes: Public active labour market programme expenditure as percent GDP; not programme participation or
+      immigrant-targeted support.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Primary OLS forward gap change on one treatment change with country and treatment-year
+    fixed effects, without baseline gap adjustment. CR1 country-cluster covariance and two-sided Student
+    t with G-1 degrees of freedom. A baseline-gap-adjusted model, 2022 exclusion, and t<=2019 window
+    are diagnostic-only sensitivities. The adjusted change model is algebraically an ANCOVA for the future
+    gap and can be sensitive to regression to the mean; it cannot change the primary verdict. No model
+    search or coefficient comparison across the two separate rosters.
+falsification:
+  test: run_labour_gap_family_2026
+  rule: INCONCLUSIVE if source/roster custody, complete-case, material-exposure, or rank/cluster gates fail.
+    SUPPORTED only when the coefficient is negative with two-sided p<=0.005 and at least -0.1 pp gap change
+    per +0.1 GDP percentage point of ALMP spending. REFUTED requires the symmetric positive sign, p, and magnitude
+    gates. Any other estimable result is PARTIAL. Both tests remain in the Bonferroni denominator; time sensitivities
+    cannot create a verdict.
+  threshold:
+    family_id: labour_gap_family_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided: 0.005
+    practical_effect_pp_min: 0.1
+    exposure_scale: 0.1
+    min_valid_rows: 300
+    min_valid_countries: 25
+    min_years_per_country: 5
+    min_material_rows: 80
+    min_material_countries: 20
+    material_exposure_change: 0.05
+    expected_key_rows: 641
+    expected_key_countries: 35
+    roster_sha256: 3e850df6b2cf9b90d566fb5acf271e9c7358024ea7f593dd7acce60441475e20
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    featured_eligible: false
+    accepted_outcome_statuses: ['', A]
+    source_files:
+      almp:
+        source: oecd:DSD_SOCX@DF_SOCX_AGG
+        path: data/vintages/oecd/DSD_SOCX_DF_SOCX_AGG@2026-05-05T210247Z.parquet
+        sha256: 93e7e29b24dc791baf22833ae5596b4a381a366ddd0d78499bf59f7b80786124
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+        series_id: DSD_SOCX@DF_SOCX_AGG
+      immigration:
+        source: eurostat:migr_imm1ctz
+        path: data/vintages/eurostat/migr_imm1ctz@2026-05-05T205902Z.parquet
+        sha256: b0b178278dd7d1ef68d4a03188e496b580d3e30b61f9fa21c7db13ed547bfeb1
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+        series_id: migr_imm1ctz
+      population:
+        source: eurostat:demo_pjan
+        path: data/vintages/eurostat/demo_pjan@2026-05-05T205848Z.parquet
+        sha256: c0910d085947e1c95da781ea3679f79909f41cab5c2cf5731db4e8fcf415f3e3
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+        series_id: demo_pjan
+      outcome:
+        source: oecd:OECD.ELS.IMD,DSD_MIG@DF_MIG_NUP_SEX,1.0
+        path: data/vintages/oecd/OECD.ELS.IMD_DSD_MIG_DF_MIG_NUP_SEX_1.0@2026-07-23T150503Z.parquet
+        sha256: ae1346956bb114faa54f84801d8c80153081069f1d3012ab8762d60f1c4c89a0
+        manifest: data/manifests/fetch_run_2026-07-23T150922Z.yaml
+        manifest_sha256: f8d2a682717c02832a2cf323fb5ea777139502e14987348859f3114042bece51
+        series_id: OECD.ELS.IMD,DSD_MIG@DF_MIG_NUP_SEX,1.0
+prior_confidence: 0.35
+disclosure: Country-level descriptive calibration only. ALMP expenditure may react to unemployment and recessions;
+  percent-GDP denominator changes mechanically with GDP. Programmes need not target foreign-born workers, and
+  gap changes can reflect changing cohort mix. No causal, programme-effect, school-score, position, or featured
+  credit.
+steelman: hypotheses/steelman/oecd_almp_migrant_unemployment_gap_forward_2026.md
+scope:
+  period:
+  - 2001
+  - 2022
+  countries:
+  - OECD
+  outcome_dim:
+  - employment_labour
+  - demographics_migration
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
