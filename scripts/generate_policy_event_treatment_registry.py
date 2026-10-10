@@ -130,6 +130,7 @@ def readiness_flags(
     axes: list[str],
     inherited: dict[str, Any],
     has_source_references: bool,
+    treatment_onset_unresolved: bool = False,
 ) -> list[str]:
     comparison_status = comparison_structure_status(design)
     features = set(design.get("design_features") or [])
@@ -143,19 +144,21 @@ def readiness_flags(
     flags: list[str] = []
     if axes:
         flags.append("axis_coded_treatment")
-    if has_full_timing and has_source_references:
+    if has_full_timing and has_source_references and not treatment_onset_unresolved:
         flags.append("ready_for_event_study_timing")
-    elif has_full_timing:
+    elif has_full_timing and not has_source_references:
         flags.append("needs_exact_date_source")
-    else:
+    elif not has_full_timing:
         flags.append("needs_exact_event_dates")
+    if treatment_onset_unresolved:
+        flags.append("needs_treatment_onset_definition")
     if has_units:
         flags.append("ready_for_controlled_comparison_structure")
     elif has_any_design:
         flags.append("needs_comparison_unit_detail")
     else:
         flags.append("needs_treated_and_comparison_unit_coding")
-    if "triple_difference" in features and has_full_timing and has_source_references and has_units:
+    if "triple_difference" in features and has_full_timing and has_source_references and has_units and not treatment_onset_unresolved:
         flags.append("triple_difference_structure_declared")
     elif "triple_difference" in (inherited.get("preferred_designs") or []):
         flags.append("candidate_for_triple_difference_after_unit_coding")
@@ -165,7 +168,7 @@ def readiness_flags(
         flags.append("known_microdata_gaps_declared")
     if has_units and not (design.get("second_order_outcomes") or inherited.get("canonical_outcomes")):
         flags.append("needs_outcome_measurement_plan")
-    if has_full_timing and has_source_references and has_units:
+    if has_full_timing and has_source_references and has_units and not treatment_onset_unresolved:
         flags.append("comparative_structure_declared")
     return flags
 
@@ -176,6 +179,8 @@ def measurement_blockers(flags: list[str]) -> list[str]:
         blockers.append("needs_exact_event_dates")
     if "needs_exact_date_source" in flags:
         blockers.append("needs_exact_date_source")
+    if "needs_treatment_onset_definition" in flags:
+        blockers.append("needs_treatment_onset_definition")
     if "needs_treated_and_comparison_unit_coding" in flags:
         blockers.append("needs_treated_and_comparison_unit_coding")
     if "needs_comparison_unit_detail" in flags:
@@ -224,6 +229,7 @@ def compact_policy_row(
     inherited = second_order.inherited_axis_requirements(axes, axis_index, families)
     timing = timing_status(timeframe, design)
     has_source_references = any(str(ref).strip() for ref in (doc.get("references") or []))
+    treatment_onset_unresolved = timeframe.get("treatment_onset_unresolved") is True
     has_full_timing = timing in {"event_dated", "effective_date_only", "enacted_date_only"}
     exact_date_reference_status = (
         "no_exact_date" if not has_full_timing else
@@ -236,6 +242,7 @@ def compact_policy_row(
         axes=axes,
         inherited=inherited,
         has_source_references=has_source_references,
+        treatment_onset_unresolved=treatment_onset_unresolved,
     )
     blockers = measurement_blockers(flags)
 
@@ -252,6 +259,7 @@ def compact_policy_row(
             "enacted_date": timeframe.get("enacted_date"),
             "signed_date": timeframe.get("signed_date"),
             "effective_date": timeframe.get("effective_date"),
+            "treatment_onset_unresolved": treatment_onset_unresolved,
         },
         "timeframe_date_tokens": timeframe_tokens(timeframe),
         "event_date_tokens": event_date_tokens(design),

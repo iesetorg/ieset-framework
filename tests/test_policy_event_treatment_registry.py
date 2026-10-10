@@ -3,6 +3,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import yaml
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
@@ -229,6 +231,55 @@ def test_uncited_exact_date_keeps_raw_timing_but_blocks_readiness():
     assert "triple_difference_structure_declared" not in row["readiness_flags"]
     assert row["measurement_blockers"] == ["needs_exact_date_source"]
     assert row["registry_readiness"] == "needs_coding_or_data"
+
+
+def test_phased_law_retains_enactment_date_without_treatment_timing_readiness():
+    doc = {
+        "policy_id": "phased_law_1996",
+        "status": "candidate",
+        "timeframe": {
+            "start": 1996,
+            "enacted_date": "1996-08-22",
+            "treatment_onset_unresolved": True,
+        },
+        "references": ["https://official.example/statute"],
+        "evaluation_design": {
+            "design_features": ["triple_difference"],
+            "regulated_units": ["state programmes"],
+            "exempt_or_uncontrolled_units": ["later-transition states"],
+            "second_order_outcomes": ["employment"],
+        },
+    }
+    path = REPO_ROOT / "policies" / "phased_law_1996.yaml"
+    row = registry.compact_policy_row(path, doc, {}, {})
+
+    assert row["timeframe"]["enacted_date"] == "1996-08-22"
+    assert row["timeframe"]["treatment_onset_unresolved"] is True
+    assert row["timing_status"] == "enacted_date_only"
+    assert row["exact_date_reference_status"] == "references_present_date_unverified"
+    assert row["measurement_blockers"] == ["needs_treatment_onset_definition"]
+    assert "ready_for_event_study_timing" not in row["readiness_flags"]
+    assert "comparative_structure_declared" not in row["readiness_flags"]
+    assert "triple_difference_structure_declared" not in row["readiness_flags"]
+    assert row["registry_readiness"] == "needs_coding_or_data"
+
+    # A cited enactment without this explicit caveat remains a possible legal-event study.
+    doc["timeframe"].pop("treatment_onset_unresolved")
+    legal_event_row = registry.compact_policy_row(path, doc, {}, {})
+    assert "ready_for_event_study_timing" in legal_event_row["readiness_flags"]
+    assert "comparative_structure_declared" in legal_event_row["readiness_flags"]
+    assert "triple_difference_structure_declared" in legal_event_row["readiness_flags"]
+    assert legal_event_row["measurement_blockers"] == []
+
+
+def test_clinton_welfare_policy_requires_treatment_onset_definition():
+    path = REPO_ROOT / "policies" / "us_clinton_welfare_reform_1996.yaml"
+    row = registry.compact_policy_row(path, yaml.safe_load(path.read_text()), {}, {})
+
+    assert row["timeframe"]["enacted_date"] == "1996-08-22"
+    assert row["timeframe"]["treatment_onset_unresolved"] is True
+    assert "needs_treatment_onset_definition" in row["measurement_blockers"]
+    assert "ready_for_event_study_timing" not in row["readiness_flags"]
 
 
 def test_partial_date_does_not_pass_as_full_event_timing():
