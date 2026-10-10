@@ -23,7 +23,7 @@ alignment, not historical observations or an absolute market/state baseline.
 
 ## Reconciled later source records
 
-An ID inventory against `<LOCAL_HOME>/IESET/movements` found two authored
+An ID inventory against the source checkout movement corpus found two authored
 national movements missing from the integration corpus. They were reviewed
 against the cited public authorities and imported with bounded policy repairs:
 
