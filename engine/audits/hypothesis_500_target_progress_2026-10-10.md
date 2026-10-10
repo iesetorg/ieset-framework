@@ -2,8 +2,8 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current local evidence
-gate reports **547 public of 2,108 hypotheses**: 50 featured and 497 calibration.
-This is **175 additional records** and leaves **325** to the record-level target. These
+gate reports **564 public of 2,125 hypotheses**: 50 featured and 514 calibration.
+This is **192 additional records** and leaves **308** to the record-level target. These
 records are not independent research questions: one age-by-sex employment family
 contributes 20 visible records. The family accounting below keeps that distinction
 explicit. Another 241 records
@@ -343,6 +343,55 @@ the case INCONCLUSIVE. Its source manifest also had an unrelated local
 path, so importing it would add a public OPSEC defect without a graduation.
 No threshold, state roster, or outcome was changed after that result.
 
+## New locked energy, education, tourism, and tariff calibrations
+
+A separately registered SMARD monthly Germany test found a **SUPPORTED**
+descriptive association between a higher wind-and-solar generation share and
+a lower Germany/Luxembourg wholesale day-ahead price over 96 complete months.
+The frozen fixed-effect estimate was −23.85 EUR/MWh per 10-point share rise
+(p=0.00203). The source geographies differ, and this is no causal power-policy
+claim. See `engine/audits/smard_german_vre_share_day_ahead_price_2018_2026_results_2026-10-10.md`.
+
+Six WDI government-education-spending follow-through tests passed their
+sample and source gates and returned **PARTIAL**. The outcomes were primary
+completion, secondary enrolment, tertiary enrolment, adult literacy, upper-
+secondary attainment, and bachelor attainment. Their six-test correction and
+separate source-lock chronology are recorded in
+`engine/audits/wdi_education_spending_milestones_results_2026-10-10.md`.
+
+Six WDI tourism-arrivals response margins (adult employment, investment,
+formal business entry, services share, inflation, and GDP growth) each passed
+the frozen completeness and exposure gates but returned **PARTIAL**. The
+registered six-test correction does not erase selection after an earlier
+visible positive tourism/youth-employment result. A technical parser erratum
+excluded blank-ISO aggregate rows outside the fixed country roster before
+any fit. All six packets exactly replayed; see
+`engine/audits/wdi_tourism_response_six_outcome_results_2026-10-10.md`.
+
+Four WITS tariff-decline follow-through questions (manufacturing value-added,
+industrial employment, manufactures-export share, and fixed investment)
+passed their exact source, sample, and variation gates and returned **PARTIAL**.
+Their 3,225-row selected source slice re-extracted byte for byte and all 36
+run artifacts exactly replayed; see
+`engine/audits/wits_tariff_decline_structure_results_2026-10-10.md`.
+
+These 17 new public records are **calibrations**, not 17 independent positive
+findings. The education, tourism, and tariff outcomes share treatments and
+country-years within each family. All 17 have zero causal, policy, school,
+position, and featured credit. Four additional Swiss policy records document
+AEOI/CRS, Bilaterals II, the 2023 Credit Suisse rescue package, and the 2014
+FATCA agreement with distinct official enactment and effective dates and no
+inferred effects. Together with the earlier three treaty records, the local
+policy database has 3,389 records; eight have curated public tests.
+
+Several frozen scouts did **not** graduate: two FAOSTAT food-security tests
+fell below their 80-country floors; the NZ Employment Contracts Act donor test
+failed its pretrend gate; four WHO water/sanitation tests failed variation or
+concentration gates. A new OECD PMR-to-2025-productivity calibration returned
+PARTIAL in an isolated checkout, but its immutable preregistration commit
+contains a machine-specific path, so it was not integrated or counted. None
+of these failures was relabeled to improve the target count.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -409,12 +458,12 @@ not ready conversions. See
 `engine/audits/legacy_archive_v2_readiness_2026-10-10.md`. In particular,
 the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
 candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
-multiplication is also unsupported: the current registry has **3,385**
+multiplication is also unsupported: the current registry has **3,389**
 policies, but only **8** are marked tested through curated public result
 links. Most still need treated/comparison units, exact event timing, and
 measured outcomes before a policy-effect test. None of the three newly
 added treaty-date records supplies a verified causal estimate. The second-order
-index now retains **3,369** policies,
+index now retains **3,373** policies,
 including all **23** explicit evaluation designs even when a policy has no
 scored drift axis. A WHO particulate-matter/chronic-outcome lead was rejected
 before registration because its short modeled window and concentrated
@@ -425,7 +474,7 @@ changes at the required country-years. The 1,320 legacy same-commit
 registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
-The requested +500 remains unmet: **325 more public records** would be
+The requested +500 remains unmet: **308 more public records** would be
 needed, and the record count itself overstates independent research questions.
 A separate feasibility audit found no defensible hundreds-sized family in the
 preserved corpus. Priorities for genuinely new source acquisition are matched
@@ -445,17 +494,16 @@ not silently overwritten; any refreshed vintage needs a new version and
 dependent-run review.
 
 Generated preregistration, evidence-tier, census, conversion-funnel, and
-policy browser/evidence/measurement indexes were refreshed after the latest
-frozen runs. Current local checks passed: **6,253** specs and cross-references,
-788 strict and 1,320 legacy registration pairs, the 547/2,108 evidence and
-census checks, 1789–2026 drift consistency, strict publisher coverage,
-33 focused Python tests, eight web tests, TypeScript checking, the
-**8,555-route** static site build, exact replay of the three new public
-calibrations and the inconclusive Korea packet (through its path-redaction
-adapter), CEPII source re-extraction, and public-tree OPSEC scanning. The
-static drift, new hypothesis, policy, and policy-browser pages were present
-in the build. Publication remains on hold: an older reverted local-path
-manifest and the initial Korea source-plan example survive in this local
-branch history. The local derived OECD CbCR source also lacks its raw HTTP
-response, and CEPII slice redistribution terms need review. No push, merge,
-or deployment follows from these local audits.
+policy browser/evidence/measurement indexes were refreshed through the
+564/2,125-record checkpoint. Current local checks passed: **6,274** specs and
+cross-references; 805 strict and 1,320 legacy registration pairs; the
+564/2,125 evidence and census checks; 1789–2026 drift consistency; zero link-
+reciprocity errors or warnings; 15 focused Python tests; eight web tests;
+TypeScript checking; exact tourism and tariff replay; tariff raw-source
+re-extraction; and public-tree OPSEC scanning. The latest static site build
+remains pending after these additions; an earlier 8,555-route build verified
+its then-current drift and policy pages. Publication remains on hold: an
+older reverted local-path manifest and the initial Korea source-plan example
+survive in this local branch history. The local derived OECD CbCR source also
+lacks its raw HTTP response, and CEPII slice redistribution terms need review.
+No push, merge, or deployment follows from these local audits.
