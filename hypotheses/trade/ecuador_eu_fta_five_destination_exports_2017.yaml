@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: ecuador_eu_fta_five_destination_exports_2017
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: >-
+  After the EU-Ecuador trade agreement began provisional application on 1 January 2017,
+  Ecuador-origin nominal merchandise exports to five fixed EU destinations grew at least
+  15 percent more in log terms between the fixed pre and post windows than exports from
+  five fixed South American origins without an EU agreement. The five destinations form
+  one omnibus descriptive claim, not five independent tests or a causal treaty effect.
+evidence_type: descriptive
+methodology_note: >-
+  The registration freezes the official legal date, source ZIP hash, 240 directed dyad-year
+  cells, five EU destinations, five comparator origins, windows, estimator, pretrend gate,
+  and disposition before reading any selected trade-flow value or null mask. Existing
+  country-level or broad trade-policy results were not used to select this contrast.
+  Earlier IESET tests used the same CEPII publisher and some BACI flows, so global
+  source blindness is not asserted. No direct Ecuador–EU five-destination result was
+  inspected. One incomplete or nonunique cell makes the entire test INCONCLUSIVE;
+  no substitution.
+sample:
+  countries:
+  - ECU
+  - ARG
+  - BOL
+  - BRA
+  - PRY
+  - URY
+  - DEU
+  - ESP
+  - FRA
+  - ITA
+  - NLD
+  period:
+  - 2012
+  - 2019
+  temporal_structure: panel
+  exclusion_rules:
+  - >-
+    Only directed ECU, ARG, BOL, BRA, PRY, and URY exports to DEU, ESP, FRA,
+    ITA, and NLD; no reverse trade, product split, extra EU market, or donor replacement.
+  - >-
+    Pre years 2012-2015 and post years 2017-2019. The 2016 signing year is omitted
+    from both averages but must remain an intact source cell; 2020 is excluded.
+  - >-
+    All 240 origin-destination-year cells must have exactly one existing-country row,
+    a finite nonnegative BACI tradeflow, and the registered CEPII agreement-status schedule.
+  - No interpolation, winsorisation, outcome-conditioned exclusions, or alternate threshold.
+variables:
+  outcome:
+  - name: ecuador_and_donor_exports_to_five_eu_destinations
+    source: cepii:Gravity_V202211.tradeflow_baci
+    transformation: natural log of 1 plus directed nominal merchandise flow in thousands of current US dollars
+    notes: One pooled five-destination calibration; price and quantity changes are not separated.
+  treatment:
+  - name: ecuador_eu_accession_agreement_status
+    source: cepii:Gravity_V202211.fta_wto
+    transformation: >-
+      ECU to each listed EU destination is 0 in 2012-2016 and 1 in 2017-2019;
+      each of the 25 donor dyads is 0 throughout 2012-2019
+    notes: Agreement status checks the official application date; it is not tariff intensity.
+intervention_channel: regulatory
+intervention_channel_justification: The treaty changes a trade-policy regime; measured endpoint is nominal exports.
+estimator:
+  template: descriptive
+  event_year: 2016
+  clustering: none
+  notes: >-
+    For each directed dyad, change is mean log1p(BACI) in 2017-2019 minus mean
+    in 2012-2015. For each EU destination, subtract the median change of the
+    five fixed donor origins from Ecuador's change. Primary contrast is the median
+    of the five destination-level differences. For each pre year, take the median
+    across destinations of ECU log flow less the median donor log flow to that
+    destination. The absolute OLS slope of this four-point pooled pre-gap series
+    must be at most 0.03 log units per year. No p-value or causal inference.
+falsification:
+  test: ecuador_eu_fta_five_destination_fixed_source_prepost
+  rule: >-
+    First require immutable preregistration and a later committed, byte-pinned
+    source slice. Any source-key, country-existence, agreement-status, numeric,
+    or pooled pretrend failure is INCONCLUSIVE. If gates pass, SUPPORTED means
+    primary contrast >= ln(1.15), REFUTED means <= -ln(1.15), and PARTIAL is
+    between. Exactly one descriptive public card is possible. School, policy,
+    causal, and featured credit are zero.
+  threshold: absolute pooled pre-gap slope <=0.03 log units/year; contrast thresholds +/-ln(1.15); one omnibus test
+prior_confidence: 0.5
+disclosure: >-
+  The EU maintained a temporary preference bridge for Ecuador in 2015-2016, so
+  2017 provisional application is not a clean tariff discontinuity. The 2016
+  Ecuador earthquake, commodity prices, exchange rates, destination mix, and
+  concurrent domestic changes can shift nominal exports. Same-destination
+  South American donors do not identify a causal treaty effect. The five EU
+  destinations are correlated measurements of one treaty, not replication.
+  This test is eligible only for descriptive calibration visibility if all
+  frozen gates pass, with no school or policy score credit.
+scope:
+  period:
+  - 2012
+  - 2019
+  countries:
+  - ECU
+  - DEU
+  - ESP
+  - FRA
+  - ITA
+  - NLD
+  outcome_dim:
+  - trade_liberalisation
+  policy_family:
+  - trade_policy
+  treatment_tags:
+  - ecuador_eu_fta_2017
+steelman: hypotheses/steelman/ecuador_eu_fta_five_destination_exports_2017.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  Policy record ec_eu_andean_fta_2016. Official Journal notice:
+  https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:22016X1229(02).
+  CEPII source and chronology: engine/audits/ecuador_eu_fta_source_plan_2026-10-10.md.
