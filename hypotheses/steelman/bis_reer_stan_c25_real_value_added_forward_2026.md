@@ -1,0 +1,5 @@
+# Steelman: Manufacture of fabricated metal products, except machinery and equipment real value added after REER appreciation
+
+A currency appreciation can reduce price competitiveness for exporters and import-competing firms, which could later slow Manufacture of fabricated metal products, except machinery and equipment real value added growth. The fixed 2015–2016 exposure and 2017–2018 outcome timing provides a narrow prospective measurement of that prediction.
+
+The strongest alternative is that appreciated currencies can lower imported input and capital-goods costs, while aggregate demand, commodity prices, industrial specialisation and anticipated growth jointly affect the REER and industry outcomes. Some sectors sell largely at home. The same countries and REER changes are reused across 34 correlated tests; OECD STAN includes estimated detail, and the partial local parquet lacks a fetch manifest. Negative, positive, null and inconclusive results must remain visible. No result identifies an exchange-rate policy effect.

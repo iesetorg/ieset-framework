@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: bis_reer_stan_c21_real_value_added_forward_2026
+version: 1
+status: pre_registered
+topic: growth
+claim_direction: '-'
+claim: Across the frozen country sample, larger 2015-to-2016 broad real effective
+  exchange-rate appreciations predict lower 2017-to-2018 Manufacture of basic pharmaceutical
+  products and pharmaceutical preparations real value added growth.
+methodology_note: One of 34 source-key-registered descriptive outcomes; exact contract
+  in engine/audits/bis_reer_stan_industry_family_prereg_2026-10-10.md. STAN outcome
+  values and statuses were unopened before registration and source lock.
+evidence_type: associational
+sample:
+  countries: &id001
+  - AUT
+  - BEL
+  - CAN
+  - CZE
+  - DEU
+  - DNK
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GRC
+  - HUN
+  - ISL
+  - ITA
+  - MEX
+  - NLD
+  - POL
+  - SVK
+  - SVN
+  - SWE
+  - USA
+  period:
+  - 2015
+  - 2018
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One predeclared REER episode and later industry growth
+    pair; this measures association across countries only.
+  exclusion_rules:
+  - Use only the exact committed country roster and 2017/2018 STAN industry rows.
+  - Require 12 monthly BIS broad-real REER values in each of 2015 and 2016.
+  - After source lock, retain only finite positive values at both outcome endpoints
+    and both BIS annual means; no imputation, status-based sign selection, winsorisation
+    or replacement.
+variables:
+  treatment:
+  - name: prior_broad_real_eer_appreciation_logpp
+    source: bis:WS_EER
+    transformation: 100*log(mean 2016 monthly broad-real REER / mean 2015 monthly
+      broad-real REER).
+  outcome:
+  - name: forward_c21_real_value_added_growth_logpp
+    source: oecd_stan:OECD.STI.PIE,DSD_STAN@DF_STAN,1.0
+    transformation: 100*log(2018/2017) for ACTIVITY=C21, MEASURE=B1G, PRICE_BASE=L,
+      UNIT_MEASURE=XDC.
+    notes: Manufacture of basic pharmaceutical products and pharmaceutical preparations;
+      real value added. OECD STAN may include Secretariat estimates.
+estimator:
+  template: descriptive
+  notes: Cross-country OLS with intercept, HC3 robust SE, two-sided t(n-2); no fitted
+    covariates or alternate periods.
+falsification:
+  test: bis_reer_oecd_stan_manufacturing_forward_2026_10_10
+  rule: INCONCLUSIVE if the frozen sample, exposure variation, leverage, rank, or
+    uncertainty gate fails. Otherwise SUPPORTED for beta <= -0.2 at two-sided Bonferroni
+    p <= 0.01/34, REFUTED for beta >= +0.2 at the same cutoff, and PARTIAL for any
+    other estimable result. All 34 cells stay in the family denominator.
+  threshold:
+    family_id: bis_reer_oecd_stan_manufacturing_forward_2026_10_10
+    family_size: 34
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.00029411764705882356
+    minimum_adverse_beta_logpp_per_reer_logpp: 0.2
+    min_valid_countries: 20
+    min_appreciation_countries: 4
+    min_depreciation_countries: 4
+    min_exposure_p90_p10_logpp: 3.0
+    max_top_country_exposure_share: 0.45
+    expected_key_countries: 22
+    roster_sha256: d1e429e38cd8ece7661b9ee0ee34203d2d9858b5b6b23bf54a61511329d07c76
+    bis_sha256: 57bbce3e22fc428c8cd8ddee8a998d273b5240a816af89e532b81d41ade35170
+    stan_sha256: aad25afe7f2ab27e00f6dc10cfc049affe40d679e08528503416bf1e9c19d0c7
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.2
+disclosure: Shared macro exposure, one episode, correlated sectors, estimated STAN
+  detail, partial unmanifested local source and visible related REER hypotheses limit
+  interpretation to descriptive calibration. No policy, causal, school or featured
+  credit.
+steelman: hypotheses/steelman/bis_reer_stan_c21_real_value_added_forward_2026.md
+scope:
+  period:
+  - 2015
+  - 2018
+  countries: *id001
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - none
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
