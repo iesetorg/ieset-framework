@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_wealth_tax_receipts_wid_top1_share_lag3_calibration
+version: 1
+status: pre_registered
+topic: distribution
+evidence_type: descriptive
+claim_direction: "-"
+claim: >
+  Across the fixed 38-country roster with pinned OECD revenue and WID wealth
+  data, higher recurrent net-wealth-tax receipts as a share of GDP in year t
+  are associated with a lower top-1-percent share of net personal wealth in
+  year t+3 after country and tax-year fixed effects. This is a descriptive
+  calibration of a fiscal-revenue proxy, not an estimate of tax-policy impact.
+methodology_note: >
+  Prospective v1 package prepared from source schemas and country/year keys
+  only. The exact pair and three-year offset were selected before reading
+  outcome values, outcome null flags, run status, or published coefficients.
+  Registration is verified only after the first, separate git
+  preregistration commit.
+sample:
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GRC, IDN, IRL, ISR, ITA, JPN, KOR, MEX, NLD, NOR, NZL, PER, POL, PRT, SGP, SWE, TUR, USA, ZAF]
+  period: [1990, 2020]
+  temporal_structure: panel
+  exclusion_rules:
+    - Retain every pinned country/year key with treatment at t and outcome at t+3 in 1990-2020; no value-dependent country selection.
+    - Drop only nonfinite or missing values after the prospective lock and report each exclusion count.
+    - Do not winsorize, impute, rescale, substitute vintages, or modify the 38-country roster.
+variables:
+  outcome:
+    - name: top1_net_personal_wealth_share_t_plus_3
+      source: wid_concentration:top1_net_personal_wealth_share
+      transformation: level
+      notes: Pinned WID p99p100 share in percentage points, three calendar years after the tax-receipt observation.
+  treatment:
+    - name: recurrent_net_wealth_tax_receipts_pct_gdp_t
+      source: oecd:oecd_tax_recurrent_net_wealth_pct_gdp
+      transformation: level
+      notes: OECD recurrent net-wealth-tax receipts as percent of GDP; revenue is not a statutory tax-rate or policy-intensity measure.
+  controls: []
+intervention_channel: fiscal
+intervention_channel_justification: >
+  The measured fiscal quantity is tax receipts, which may respond to the tax
+  base and enforcement. It is used only as a descriptive proxy and gives no
+  intervention or policy-effect credit.
+scope:
+  period: [1990, 2023]
+  countries: [ARG, AUS, AUT, BEL, BRA, CAN, CHE, CHL, CHN, COL, CZE, DEU, DNK, EGY, ESP, EST, FIN, FRA, GBR, GRC, IDN, IRL, ISR, ITA, JPN, KOR, MEX, NLD, NOR, NZL, PER, POL, PRT, SGP, SWE, TUR, USA, ZAF]
+  outcome_dim: [poverty_inequality, taxation]
+  policy_family: [none]
+  treatment_tags: [recurrent_wealth_tax_receipts, top1_wealth_share]
+estimator:
+  template: panel_fe
+  fixed_effects: [country, tax_year]
+  clustering: country
+  notes: >
+    OLS of top-1 share at t+3 on receipts at t, with country and tax-year
+    indicators. Country-cluster CR1 covariance uses G/(G-1) times
+    (N-1)/(N-K), with a two-sided Student t reference at G-1 degrees of
+    freedom. Require full model rank. No additional controls or sample
+    weights. Leave-one-country-out signs are a stability gate.
+falsification:
+  test: oecd_wealth_tax_receipts_wid_top1_share_lag3_calibration
+  rule: >
+    First require at least 400 complete country-year pairs, 25 countries,
+    20 tax years, 15 countries with within-country receipts variation, finite
+    in-range values (receipts 0-100 percent GDP; wealth share 0-100 percent),
+    and a full-rank model. Residualize receipts against the country and tax-year
+    effects on the complete-case sample; the top ceiling(1% of rows) must
+    account for no more than 20% of squared residualized receipts, the largest
+    country no more than 15%, and the largest tax year no more than 20%.
+    Require at least 25 successful leave-one-country-out estimates. Any gate
+    failure is INCONCLUSIVE, with no trimming. SUPPORTED if the main receipts
+    coefficient is <= -0.5 top-1-share percentage point per GDP-percentage
+    point of receipts at two-sided country-cluster CR1 Student t(G-1) p<=0.01,
+    and at least 80% of successful leave-one-country-out coefficients are
+    negative. REFUTED symmetrically if it is >= +0.5 at p<=0.01 and at least
+    80% of leave-one-country-out coefficients are positive. Otherwise PARTIAL.
+    All labels are descriptive.
+  threshold:
+    expected_sign: "-"
+    p_max: 0.01
+    absolute_coefficient_min: 0.5
+    min_observations: 400
+    min_countries: 25
+    min_tax_years: 20
+    min_varying_countries: 15
+    min_loo_successes: 25
+    loo_sign_share_min: 0.8
+    top_one_percent_residualized_treatment_share_max: 0.2
+    top_country_residualized_treatment_share_max: 0.15
+    top_tax_year_residualized_treatment_share_max: 0.2
+prior_confidence: 0.45
+disclosure: >
+  A negative association is plausible under a redistribution story, but
+  receipt ratios also respond to taxable wealth, tax-base definitions,
+  enforcement, GDP, and avoidance. The source pair is selected without
+  viewing values; null and contrary results count. No school, causal,
+  policy, or featured-publication credit follows from this calibration.
+steelman: hypotheses/steelman/oecd_wealth_tax_receipts_wid_top1_share_lag3_calibration.md
+covers_claims: []
+notes: >
+  Exact source hashes and key roster are frozen in
+  engine/audits/prospective_wealth_tax_top1_calibration/source_roster.json.
+  Run only after separate preregistration and lock commits. No run artifacts
+  are included in the preregistration package.
