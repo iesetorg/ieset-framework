@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_education_spending_upper_secondary_attainment_forward_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: +
+claim: Across complete WDI country-year pairs in 2000–2018, a one-percentage-point-higher government education-expenditure
+  share of GDP at anchor year predicts at least one percentage point more adults 25+ with upper-secondary
+  attainment gain over the next exact three years, conditional on baseline outcome, income, GDP growth,
+  and country/year fixed effects. This is a descriptive association, not an education-policy effect.
+evidence_type: descriptive
+methodology_note: One member of the closed six-test education-milestones family wdi_education_spending_milestones_2026_10_10.
+  The old education-spending candidate archive, including a generic tertiary-enrolment proxy, was visible
+  before this new design. This fixed forward-change design is not an independent validation of those old
+  results. Registration and runner precede selected value access.
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2021
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the frozen 216 ISO-3-plus-XKX source-key roster; source-key presence does not imply a non-null
+    reading.
+  - For each anchor t in 2000–2018, require finite exact t spending, baseline outcome, GDP per person,
+    GDP growth, and exact t+3 outcome. No interpolation or imputation.
+  - Government education expenditure/GDP must be in (0,30]; GDP per person >0; GDP growth in [-100,100];
+    both outcome readings must be in the registered outcome range.
+  - Retain only economies with at least three complete pairs; all other sample and concentration floors
+    are fixed in falsification.threshold.
+variables:
+  outcome:
+  - name: upper_secondary_attainment_three_year_change_pp
+    source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+    transformation: exact t+3 level minus t level, percentage points
+    notes: Sustained education capacity can raise the share of adults who completed upper secondary. The
+      population-25+ stock responds slowly and cohort replacement can dominate a three-year change.
+  treatment:
+  - name: government_education_spending_pct_gdp_t
+    source: world_bank_wdi:SE.XPD.TOTL.GD.ZS
+    transformation: unmodified percentage of GDP at anchor t
+  controls:
+  - name: baseline_upper_secondary_attainment_t
+    source: world_bank_wdi:SE.SEC.CUAT.UP.ZS
+    transformation: unmodified outcome percentage at t
+  - name: log_real_gdp_per_person_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive real GDP per person at t
+  - name: real_gdp_growth_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: annual GDP growth percent at t
+intervention_channel: fiscal
+intervention_channel_justification: The exposure is a public education-expenditure share, but no enacted
+  policy or exogenous change is identified.
+estimator:
+  template: descriptive
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: Equal country-year-pair OLS of exact three-year outcome change on education spending share, baseline
+    outcome, log real GDP per person, GDP growth, country effects and anchor-year effects. Country-cluster
+    standard error; two-sided Student t with G-1 degrees of freedom. The fixed six-test family uses Bonferroni
+    0.01/6.
+falsification:
+  test: fixed_wdi_education_spending_upper_secondary_attainment_forward_2026
+  rule: An outcome is INCONCLUSIVE if any frozen sample, variation, rank, concentration, or uncertainty
+    gate fails. Otherwise SUPPORTED requires beta >= +1.0 three-year outcome percentage points per +1
+    point GDP spending and two-sided p <= 0.01/6; REFUTED requires beta <= -1.0 and the same p cutoff;
+    otherwise PARTIAL. All six tests remain in the family denominator, including inconclusive cases. Zero
+    causal, policy, school, position, or featured credit.
+  threshold:
+    family_id: wdi_education_spending_milestones_2026_10_10
+    family_size: 6
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0016666666666666668
+    meaningful_beta_min_pp: 1.0
+    min_complete_pairs: 150
+    min_countries: 20
+    min_pairs_per_country: 3
+    min_material_countries: 12
+    material_within_country_spending_range_pp: 0.5
+    max_country_residualized_exposure_share: 0.25
+    max_year_residualized_exposure_share: 0.2
+    outcome_valid_max: 100.0
+    roster_sha256: a7b8e33e420cd1c0ce8160ad4e03e1102440d184842dd450027a446df26e8638
+    source_files:
+      spending:
+        path: data/vintages/world_bank_wdi/SE.XPD.TOTL.GD.ZS@2026-05-05T204028Z.parquet
+        sha256: 0f21a848f064c16fce431b5425f5fb51519044c3e88256f329821b00504cc501
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      growth:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      upper_secondary_attainment:
+        path: data/vintages/world_bank_wdi/SE.SEC.CUAT.UP.ZS@2026-04-30T115107Z.parquet
+        sha256: ab2ebef019f3a4e19b64c8730f337609e2d3990d2a727ad3cc92c17eeea31dbb
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.38
+disclosure: Education spending/GDP can rise when GDP falls and can respond to past achievement. A three-year
+  gap can miss long human-capital lags; reporting and overlapping milestones induce correlated errors.
+  This local family correction does not erase the prior archive-wide search. No public result here proves
+  a spending or policy effect.
+scope:
+  period:
+  - 2000
+  - 2021
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - education_access
+  policy_family:
+  - none
+  treatment_tags:
+  - government_education_spending_share
+steelman: hypotheses/steelman/wdi_education_spending_upper_secondary_attainment_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Source-key and chronology plan: engine/audits/wdi_education_spending_milestones_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_wdi_education_spending_milestones_2026.py.'
