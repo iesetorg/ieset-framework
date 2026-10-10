@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wits_tariff_decline_manufactures_export_share_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: +
+claim: Across the frozen ISO source-key roster, a five-percentage-point larger reported 2005–2010 decline
+  in weighted mean applied merchandise tariffs predicts at least 1 percentage point greater 2010–2019
+  gain in manufactures/merchandise exports, conditional on initial tariff, real income, outcome baseline
+  and pretrend. This is a descriptive association, not a trade-policy effect.
+evidence_type: descriptive
+methodology_note: One member of the four-test wits_tariff_decline_structure_2026_10_10 family. All four
+  outcomes are correlated and share an exposure. Registered before selected tariff or outcome values were
+  read. Earlier generic tariff/manufacturing and tariff-duration results were visible; this new exposure
+  and horizon do not independently replicate them.
+sample:
+  countries:
+  - GLOBAL
+  period:
+  - 2000
+  - 2019
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One 2005–2010 exposure and one 2010–2019 outcome change per eligible ISO
+    code.
+  exclusion_rules:
+  - Frozen 215-code ISO source-key roster only; row-key presence does not imply a non-null reading.
+  - Require finite 2005 and 2010 weighted tariffs in [0,100], positive finite 2010 real GDP per person,
+    and finite outcome levels in [0,100] in exact years 2000, 2010 and 2019.
+  - Exclude incomplete countries for this endpoint without replacement, interpolation, imputation or winsorisation.
+    Other sample and variation gates are fixed in falsification.threshold.
+variables:
+  outcome:
+  - name: manufactures_exports_2010_2019_change_pp
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: 2019 level minus 2010 level, percentage points
+    notes: Input access could change export composition; this denominator can also move with commodity
+      prices.
+  treatment:
+  - name: weighted_applied_tariff_decline_2005_2010_per_5pp
+    source: wits:TM.TAX.MRCH.WM.AR.ZS
+    transformation: (2005 weighted mean applied tariff minus 2010 tariff) / 5; a positive value is a decline
+    notes: Import-weighted average; changes can reflect import mix or partner mix, not enacted schedule
+      cuts.
+  controls:
+  - name: initial_tariff_2005
+    source: wits:TM.TAX.MRCH.WM.AR.ZS
+    transformation: 2005 level, percentage points
+  - name: log_real_gdp_per_person_2010
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: natural log of positive 2010 level
+  - name: outcome_baseline_2010
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: 2010 level, percentage points
+  - name: outcome_pretrend_2000_2010
+    source: world_bank_wdi:TX.VAL.MANF.ZS.UN
+    transformation: 2010 minus 2000 level, percentage points
+intervention_channel: regulatory
+intervention_channel_justification: The tariff measure describes a trade environment. No enacted policy,
+  timing shock, or identification strategy is established.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: Equal-country OLS with intercept, tariff-decline exposure per five tariff points, 2005 tariff,
+    log 2010 GDP per person, 2010 outcome baseline and 2000–2010 outcome pretrend. HC3 heteroskedasticity-robust
+    SE; two-sided Student t reference with N−6 df; leave-one-country-out sign stability. No model search.
+falsification:
+  test: wits_tariff_decline_manufactures_export_share_forward_2026
+  rule: INCONCLUSIVE if any frozen completeness, variation, rank, exposure-concentration, HC3 or leave-one-out
+    gate fails. SUPPORTED requires positive beta >= 1 later outcome points per five-point tariff decline,
+    two-sided p<=0.0025 and at least 75% positive leave-one-out betas. REFUTED requires the symmetric
+    negative result. Otherwise PARTIAL. All four tests remain in the Bonferroni denominator, including
+    inconclusive results. Zero causal, policy, school, position and featured credit.
+  threshold:
+    family_id: wits_tariff_decline_structure_2026_10_10
+    family_size: 4
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.0025
+    meaningful_beta_min_pp_per_5pp_tariff_decline: 1.0
+    min_complete_countries: 45
+    min_countries_decline_ge_2pp: 10
+    min_countries_decline_lt_2pp: 10
+    min_tariff_decline_iqr_pp: 1.0
+    max_country_residualized_exposure_share: 0.2
+    max_loo_failure_share: 0.1
+    min_loo_sign_share: 0.75
+    roster_sha256: e9e90739212dd649390f873f3785acbb7d83a28276cf0a861e8d0ac5bc58e37b
+    source_files:
+      tariff:
+        path: data/vintages/wits/weighted_mean_applied_tariff@2026-07-23T151540Z.parquet
+        sha256: 73520e0da6a44048e51a64671c97369aadf160130937f351f90375fb86b0e010
+        manifest: data/manifests/fetch_run_2026-07-23T151550Z.yaml
+        manifest_sha256: 96243db0b85df0b1d5ccd10631b356618a9372d62c4741b692129658a49e05a5
+      income:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      manufactures_exports:
+        path: data/vintages/world_bank_wdi/TX.VAL.MANF.ZS.UN@2026-04-30T115209Z.parquet
+        sha256: c5077c18a1ba1b953bc1cd66ac980f36b5cda7568fc3749126b91587cf17c98b
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: Input access could change export composition; this denominator can also move with commodity
+  prices. Applied import-weighted tariff changes are endogenous to import composition, development and
+  existing trade performance. This cross-country association cannot be read as a policy effect. The prior
+  IESET archive-wide search and correlated four-endpoint family limit independent evidential weight.
+scope:
+  period:
+  - 2000
+  - 2019
+  countries:
+  - GLOBAL
+  outcome_dim:
+  - trade_liberalisation
+  policy_family:
+  - none
+  treatment_tags:
+  - weighted_tariff_decline
+steelman: hypotheses/steelman/wits_tariff_decline_manufactures_export_share_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Source-key and chronology plan: engine/audits/wits_tariff_decline_structure_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_wits_tariff_decline_structure_2026.py.'
