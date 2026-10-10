@@ -1,0 +1,255 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: oecd_cit_private_investment_forward_calibration_2026
+version: 1
+status: pre_registered
+topic: fiscal
+claim_direction: +
+claim: Across the fixed 2001–2020 OECD-source tax-rate reporter roster, a statutory combined corporate-income-tax
+  cut of at least one percentage point from t−1 to t predicts a higher two-year change
+  in private gross fixed capital formation as a share of GDP from t to t+2 than tax-stable
+  years, conditional on rate-hike years, baseline private investment, country effects,
+  and year effects.
+methodology_note: New claim-specific descriptive calibration after the archived corporate_tax_rate_investment_elasticity
+  Fraser/GDP-per-capita placeholder failed its estimator floor. Treatment/shock values
+  and outcome keys only were inspected before registration; selected outcome values,
+  null masks, and status fields remain unopened. The two-test Bonferroni contract
+  is in engine/audits/placeholder_claim_specific_replacement_prereg_2026-10-10.md.
+  No old verdict, score, or causal credit is inherited.
+evidence_type: associational
+sample:
+  countries: &id002
+  - ABW
+  - AGO
+  - ALB
+  - AND
+  - ARE
+  - ARG
+  - ARM
+  - ATG
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BEN
+  - BFA
+  - BGR
+  - BHR
+  - BHS
+  - BIH
+  - BLZ
+  - BMU
+  - BRA
+  - BRB
+  - BRN
+  - BWA
+  - CAN
+  - CHE
+  - CHL
+  - CHN
+  - CIV
+  - CMR
+  - COD
+  - COG
+  - COL
+  - CPV
+  - CRI
+  - CUW
+  - CYM
+  - CZE
+  - DEU
+  - DJI
+  - DMA
+  - DNK
+  - DOM
+  - EGY
+  - ESP
+  - EST
+  - FIN
+  - FJI
+  - FRA
+  - FRO
+  - GAB
+  - GBR
+  - GEO
+  - GIB
+  - GRC
+  - GRD
+  - GRL
+  - GTM
+  - HKG
+  - HND
+  - HRV
+  - HTI
+  - HUN
+  - IDN
+  - IMN
+  - IND
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JAM
+  - JOR
+  - JPN
+  - KAZ
+  - KEN
+  - KNA
+  - KOR
+  - KWT
+  - LBR
+  - LCA
+  - LIE
+  - LKA
+  - LTU
+  - LUX
+  - LVA
+  - MAC
+  - MAR
+  - MCO
+  - MDA
+  - MDV
+  - MEX
+  - MKD
+  - MLT
+  - MNE
+  - MNG
+  - MRT
+  - MUS
+  - MYS
+  - NAM
+  - NGA
+  - NLD
+  - NOR
+  - NZL
+  - OMN
+  - PAK
+  - PAN
+  - PER
+  - PHL
+  - PNG
+  - POL
+  - PRT
+  - PRY
+  - QAT
+  - ROU
+  - SAU
+  - SEN
+  - SGP
+  - SLE
+  - SMR
+  - SRB
+  - SVK
+  - SVN
+  - SWE
+  - SWZ
+  - SYC
+  - TCA
+  - TGO
+  - THA
+  - TTO
+  - TUN
+  - TUR
+  - UKR
+  - URY
+  - USA
+  - UZB
+  - VCT
+  - VGB
+  - VNM
+  - WSM
+  - ZAF
+  - ZMB
+  period: &id001
+  - 2001
+  - 2022
+  temporal_structure: panel
+  exclusion_rules:
+  - Use only the frozen key-only roster with OECD statutory-rate keys at t−1,t and
+    WDI private-investment keys at t,t+2; no year substitution or imputation.
+  - Rates must be finite within 0–100%; a cut is Δrate≤−1 pp, hike Δrate≥+1 pp, stable
+    |Δrate|<1 pp; keep every otherwise valid reform.
+  - Both private-investment endpoints must be finite within 0–100% of GDP and have
+    blank WDI observation status; omit blank-code aggregate rows.
+  - After the lock, retain countries with at least five complete pairs and enforce
+    the registered sample, exposure, rank, and influence floors.
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - industrial_capability
+  policy_family:
+  - tax_policy
+  treatment_tags:
+  - corporate_income_tax
+variables:
+  treatment:
+  - name: cit_cut_at_least_one_pp
+    source: oecd_taxstruct:combined_corporate_income_tax_rate
+    transformation: 1 if rate(t)-rate(t−1)≤−1 percentage point; 0 otherwise.
+  - name: cit_hike_at_least_one_pp
+    source: oecd_taxstruct:combined_corporate_income_tax_rate
+    transformation: Nuisance indicator, 1 if rate(t)-rate(t−1)≥+1 percentage point.
+  outcome:
+  - name: two_year_private_investment_share_change
+    source: world_bank_wdi:NE.GDI.FPRV.ZS
+    transformation: Private gross fixed capital formation / GDP at t+2 minus its value
+      at t, in percentage points.
+  controls:
+  - name: baseline_private_investment_share
+    source: world_bank_wdi:NE.GDI.FPRV.ZS
+    transformation: Value at tax-change year t.
+estimator:
+  template: panel_fe
+  fixed_effects:
+  - country
+  - year
+  clustering: country
+  notes: OLS with cut and hike indicators and baseline private-investment share; country-cluster
+    CR1 standard errors and Student t(G−1).
+falsification:
+  rule: SUPPORTED if the cut coefficient is at least +0.5 percentage point with two-sided
+    country-cluster p≤0.005; REFUTED if at most −0.5 pp with p≤0.005; otherwise PARTIAL.
+    Any frozen sample, exposure, full-rank, uncertainty, or concentration gate failure
+    is INCONCLUSIVE.
+  test: oecd_cit_private_investment_forward_bonferroni_2026
+  threshold:
+    family_id: placeholder_claim_specific_replacement_2026_10_10
+    family_size: 2
+    family_alpha: 0.01
+    p_max_two_sided_bonferroni: 0.005
+    expected_beta_sign: +
+    meaningful_beta_min_abs: 0.5
+    min_valid_rows: 500
+    min_valid_countries: 30
+    min_cut_rows: 50
+    min_cut_countries: 20
+    min_stable_rows: 200
+    min_years_per_country: 5
+    max_top_one_percent_partialled_x_share: 0.2
+    max_top_country_partialled_x_share: 0.12
+    roster_sha256: 1b028afd632f1646503bcf5f0107a917eaddc5cba20e3d5b524bde5bfbe7f19f
+    source_files:
+      cit:
+        path: data/vintages/oecd/oecd_combined_corporate_income_tax_rate@2026-07-23T153857Z.parquet
+        sha256: 3e9c5987717087d04d5f82461fc1a3fb5e406ba646fb9f333f8c542e5f3f5ee1
+        manifest: data/manifests/fetch_run_2026-07-23T153857Z_oecd_tax_structure.yaml
+        manifest_sha256: 6a9172689c2f5561fddfd3b779431bca070d48f54b2f75814ff4e9295fa0ba18
+      private:
+        path: data/vintages/world_bank_wdi/NE.GDI.FPRV.ZS@2026-04-30T115003Z.parquet
+        sha256: 84294f869d513ae4c70154630b31388a53b41c42bf849a006740c9324ebeba14
+        manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+        manifest_sha256: e4eba4196e874aa69112f5e93420aa1daeffe64225e73ff536b336e33dec282e
+    school_score_eligible: false
+    school_score_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+prior_confidence: 0.5
+disclosure: The statutory rate is not the effective tax burden. Private investment
+  / GDP is not capital stock per worker. Economic conditions can jointly move tax
+  policy and investment; this design is descriptive and tests only one component of
+  the archived claim.
+steelman: hypotheses/steelman/oecd_cit_private_investment_forward_calibration_2026.md
+linked_hypotheses: []
+covers_claims: []
+notes: This is a new prospective descriptive ID. The original placeholder remains
+  archived.

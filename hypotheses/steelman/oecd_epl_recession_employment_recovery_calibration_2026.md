@@ -1,0 +1,7 @@
+# Employment protection and recession recovery: steelman
+
+Regular-worker dismissal protection can preserve existing jobs in a downturn but may slow new hiring in the recovery. The preregistered claim tests whether a higher prior-year OECD EPR_V1 index is associated with a **smaller** change in the ages-20–64 employment-to-population ratio over two years after a negative real-GDP-growth event.
+
+The strongest objection is that EPR_V1 captures only regular-worker dismissal rules. A higher index may protect employment during the recession, leaving less ground to recover, while active labour policy, wage bargaining, sector mix, fiscal support, and the 2020 pandemic can dominate the subsequent employment path. The event roster chooses the deepest year of each contiguous negative-growth spell and excludes overlapping country events; the model adjusts for baseline employment, the GDP shock, and event-year effects. It does not identify a causal effect or measure individual re-employment time. A null or contrary coefficient must be retained. The archived `labour_market_flexibility_employment_resilience` Fraser/GDP-per-capita placeholder is untouched.
+
+The familywise rule is two-sided p≤0.005 and a practical magnitude of at least 0.75 employment percentage point per EPL index point, after the frozen sample and influence floors. This is descriptive calibration only, with zero causal or scoring credit.
