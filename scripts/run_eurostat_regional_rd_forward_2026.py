@@ -213,7 +213,8 @@ def classify(frame:pd.DataFrame,diag:dict,t:dict)->tuple[dict,str]:
  except Exception as exc:diag['gate_failures']=['estimator:'+type(exc).__name__+':'+str(exc)];return {},'INCONCLUSIVE'
  if estimate['residual_exposure_sd_pp']<t['min_residual_exposure_sd_pp']:gates.append('residual_exposure_sd')
  for key in ['max_region_exposure_ss_share','max_country_exposure_ss_share','top_five_region_exposure_ss_share']:
-  if estimate[key]>t[key]:gates.append(key)
+  limit_key='max_top_five_region_exposure_ss_share' if key=='top_five_region_exposure_ss_share' else key
+  if estimate[key]>t[limit_key]:gates.append(key)
  holdouts=[]
  for country in estimate['top_three_exposure_countries']:
   sub=frame[frame.country_code!=country]
