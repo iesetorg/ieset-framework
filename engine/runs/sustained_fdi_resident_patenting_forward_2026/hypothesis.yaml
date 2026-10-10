@@ -1,0 +1,187 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: sustained_fdi_resident_patenting_forward_2026
+version: 1
+status: pre_registered
+topic: trade
+claim_direction: "+"
+claim: >-
+  Among the fixed 2004 population-at-least-five-million country/economy cohort,
+  a three-year mean of net FDI inflows at least 3% of GDP at treatment year t
+  predicts a larger change in log(1 + resident patent applications per million)
+  from t to t+3 than a mean below 3%, conditional on baseline patent intensity,
+  real GDP per person, GDP growth, country effects, and treatment-year effects.
+methodology_note: >-
+  One-test prospective descriptive calibration. The 3% event threshold was
+  selected from treatment/control values alone because a continuous FDI-share
+  exposure concentrated 44.8% of its residualized variance in the top 1% of
+  rows. The binary event's analogous pre-outcome share is 8.8%. No patent
+  value, null mask, or observation status was opened before registration.
+  Registration and a separate immutable source-lock commit must precede first
+  patent measurement access. Local alpha 0.01 does not adjust for earlier
+  corpus-wide hypothesis selection.
+evidence_type: associational
+sample:
+  countries: &countries [AFG, AGO, ARG, AUS, AUT, AZE, BDI, BEL, BEN, BFA, BGD, BGR,
+    BLR, BOL, BRA, CAN, CHE, CHL, CHN, CIV, CMR, COD, COL, CUB, CZE, DEU, DNK,
+    DOM, DZA, ECU, EGY, ESP, ETH, FIN, FRA, GBR, GHA, GIN, GRC, GTM, HKG, HND,
+    HTI, HUN, IDN, IND, IRN, IRQ, ISR, ITA, JOR, JPN, KAZ, KEN, KGZ, KHM, KOR,
+    LAO, LBY, LKA, MAR, MDG, MEX, MLI, MMR, MOZ, MWI, MYS, NER, NGA, NIC, NLD,
+    NPL, PAK, PER, PHL, PNG, POL, PRK, PRT, PRY, ROU, RUS, RWA, SAU, SDN, SEN,
+    SLE, SLV, SOM, SRB, SSD, SVK, SWE, SYR, TCD, TGO, THA, TJK, TUN, TUR, TZA,
+    UGA, UKR, USA, UZB, VEN, VNM, YEM, ZAF, ZMB, ZWE]
+  period: [2004, 2019]
+  temporal_structure: panel
+  exclusion_rules:
+  - >-
+    Use only the listed ISO-3 country/economy IDs with positive 2004 WDI
+    population of at least five million, exact treatment years 2004-2019 in
+    the frozen key roster, and exact patent endpoints t and t+3. The source
+    cohort has 112 IDs; 110 have pre-outcome usable treatment/control keys.
+  - >-
+    Require finite WDI FDI net-inflow/GDP percentages in all of t-2, t-1,
+    and t; retain negative net inflows. Require finite GDP growth and positive
+    finite real GDP per person at t, plus positive finite population at t and
+    t+3. Do not use WDI aggregate country codes.
+  - >-
+    After source lock, require nonnegative finite resident patent counts and
+    blank/null observation status at both exact patent endpoints. A missing
+    patent count is never zero. Retain only countries with at least five
+    complete treatment-year pairs; no other country or row deletion.
+  - >-
+    No outcome-based roster revision, imputation, zero-fill, winsorization,
+    alternate FDI threshold, alternative vintage, post-result covariate
+    dropping, or model search.
+variables:
+  outcome:
+  - name: three_year_change_log_one_plus_resident_patents_per_million
+    source: world_bank_wdi:IP.PAT.RESD
+    transformation: >-
+      log(1 + patent_count(t+3) / positive_population(t+3) * 1e6) minus
+      log(1 + patent_count(t) / positive_population(t) * 1e6).
+    notes: WIPO resident patent application filings are administrative counts;
+      they do not measure grants, patent quality, or all local invention.
+  treatment:
+  - name: sustained_fdi_inflow_event
+    source: world_bank_wdi:BX.KLT.DINV.WD.GD.ZS
+    transformation: >-
+      One if arithmetic mean of the exact annual net FDI inflow shares of GDP
+      at t-2, t-1, and t is at least 3.0 percentage points; zero otherwise.
+    notes: Net FDI inflows include financial and affiliate transactions, not
+      only greenfield productive investment.
+  controls:
+  - name: baseline_log_one_plus_resident_patents_per_million
+    source: world_bank_wdi:IP.PAT.RESD
+    transformation: log(1 + patent_count(t) / positive_population(t) * 1e6).
+  - name: population_denominator
+    source: world_bank_wdi:SP.POP.TOTL
+    transformation: Positive finite midyear population at both t and t+3.
+  - name: log_real_gdp_per_person_at_t
+    source: world_bank_wdi:NY.GDP.PCAP.KD
+    transformation: Natural log of positive finite constant-2015-dollar GDP per person at t.
+  - name: real_gdp_growth_at_t
+    source: world_bank_wdi:NY.GDP.MKTP.KD.ZG
+    transformation: Finite annual real GDP growth in percentage points at t.
+estimator:
+  template: panel_fe
+  fixed_effects: [country, year]
+  clustering: country
+  notes: >-
+    One prespecified OLS coefficient for the binary FDI event with baseline
+    log patent intensity, log real GDP per person at t, real GDP growth at t,
+    country fixed effects, and treatment-year fixed effects. Country-cluster
+    CR1 standard errors use two-sided Student t with G-1 degrees of freedom.
+    Complete-case restrictions and concentration gates are frozen.
+falsification:
+  test: sustained_fdi_resident_patenting_forward_2026_10_10
+  rule: >-
+    INCONCLUSIVE if fewer than 400 complete pairs, 35 countries, five complete
+    pairs per retained country, 100 exposed pairs, 25 exposed countries, or
+    25 countries switching between exposed and unexposed years survive. Also
+    INCONCLUSIVE if any country exceeds 15%, the top five countries exceed
+    35%, or the top 1% of rows exceed 20% of squared residualized FDI-event
+    variation after all controls; or if the model rank, coefficient, or
+    clustered uncertainty is not identified and finite. Otherwise a positive
+    coefficient of at least 0.05 log points with two-sided p<=0.01 SUPPORTS
+    the narrow association. An opposite-sign coefficient at most -0.05 log
+    points with two-sided p<=0.01 REFUTES it. Every other estimable result
+    is PARTIAL.
+  threshold:
+    family_id: sustained_fdi_resident_patenting_forward_2026_10_10
+    family_size: 1
+    family_alpha: 0.01
+    p_max_two_sided: 0.01
+    expected_beta_sign: "+"
+    meaningful_beta_min_abs: 0.05
+    min_complete_rows: 400
+    min_complete_countries: 35
+    min_years_per_country: 5
+    min_exposed_rows: 100
+    min_exposed_countries: 25
+    min_within_country_switchers: 25
+    max_top_country_residual_x_share: 0.15
+    max_top_five_country_residual_x_share: 0.35
+    max_top_one_percent_rows_residual_x_share: 0.20
+    event_mean_fdi_share_gdp_threshold_pp: 3.0
+    population_floor_2004: 5000000
+    expected_baseline_population_cohort: 112
+    expected_key_rows: 1723
+    expected_key_countries: 110
+    expected_treatment_event_rows: 702
+    expected_treatment_event_countries: 74
+    expected_treatment_switcher_countries: 66
+    roster_sha256: 70ceb9453eabd876e0fa173188675eaf819b919dc60a7990fc64320a955500a4
+    source_files:
+      fdi:
+        path: data/vintages/world_bank_wdi/BX.KLT.DINV.WD.GD.ZS@2026-05-05T195106Z.parquet
+        sha256: 626691877048dc78d5f7b4f6948dd680d3e111aedff252d1286ca2fd40b8abc5
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      patents:
+        path: data/vintages/world_bank_wdi/IP.PAT.RESD@2026-05-05T203341Z.parquet
+        sha256: 617c357fceaff7a4f21710f710426f9ad2c01e710e9c0432b9085a41e7b887fe
+        manifest: data/manifests/fetch_run_2026-05-05T210519Z.yaml
+        manifest_sha256: 5022cf82e5656d89c54d3c0df1cc3c12718b93896488eebfde3ffa197beef112
+      population:
+        path: data/vintages/world_bank_wdi/SP.POP.TOTL@2026-05-05T194826Z.parquet
+        sha256: 6e8ccda8b27d188d08e0fbf036828c975641453c12e6e68d5807657140cd9456
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      gdp_pc:
+        path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+        sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+      gdp_growth:
+        path: data/vintages/world_bank_wdi/NY.GDP.MKTP.KD.ZG@2026-05-05T194655Z.parquet
+        sha256: db76a52909929c6cd3ca1dd3d1fdc4b28d28cbaea92e16cb59e88ee53d3f2e58
+        manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+        manifest_sha256: a571d660fd359d245176b77e595b59923a90a1e40a799ea56c13f001a7b09945
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    position_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: >-
+  This selected descriptive association is not a policy experiment or causal
+  technology-transfer estimate. FDI/GDP includes acquisitions, intracompany
+  debt, reinvested earnings, disinvestment, and GDP-denominator effects;
+  resident patent filings miss inventions assigned or filed abroad and can
+  change with office reporting and IP law. Fixed effects and forward timing
+  do not remove reverse selection or time-varying confounding. Local p<=0.01
+  does not correct earlier IESET search. No causal, policy, position, school,
+  or featured credit.
+steelman: hypotheses/steelman/sustained_fdi_resident_patenting_forward_2026.md
+scope:
+  period: [2004, 2022]
+  countries: *countries
+  outcome_dim: [industrial_capability]
+  policy_family: [none]
+  treatment_tags: []
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: The industrial_capability tag only indexes an administrative filing count;
+  it confers no innovation quality, welfare, or policy score.
