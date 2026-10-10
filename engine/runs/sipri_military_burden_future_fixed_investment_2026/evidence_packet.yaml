@@ -1,0 +1,140 @@
+packet_version: 1
+hypothesis:
+  id: sipri_military_burden_future_fixed_investment_2026
+  path: hypotheses/fiscal/sipri_military_burden_future_fixed_investment_2026.yaml
+preregistration:
+  commit: f78454c126b2c49c89886d74803618ff566d5fc0
+  steelman: hypotheses/steelman/sipri_military_burden_future_fixed_investment_2026.md
+  source_plan: engine/audits/sipri_military_fixed_investment_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/sipri_military_fixed_investment_2026_key_roster.csv
+source:
+  publisher: SIPRI Military Expenditure Database plus World Bank WDI
+  source_sha256: 5ccce854cc3127eb0510b2f9f0e99741fb4a037a5950c745137970e7c618d3be
+  secondary_source_sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+  source_lock_commit: c7904b8d8f40d0925a20c08ada3ea2637be2023b
+  source_lock_manifest: data/pinned_evidence/sipri_military_burden_future_fixed_investment_2026.source.json
+  key_roster_sha256: 89007d1649c0c35620711b68ece70c20fed43c590ca0545f26e50596b4d7c1b4
+  input_vintages:
+  - path: data/vintages/sipri/milex_share_gdp@2026-04-30T114417Z.parquet
+    sha256: 5ccce854cc3127eb0510b2f9f0e99741fb4a037a5950c745137970e7c618d3be
+    manifest: data/manifests/fetch_run_bootstrap_2026-04-30T121833Z.yaml
+  - path: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+    manifest: data/manifests/fetch_run_2026-05-05T203305Z.yaml
+  - path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+    manifest: data/manifests/fetch_run_2026-05-05T200056Z.yaml
+  license: SIPRI academic/press attribution plus World Bank CC BY 4.0
+  contains_source_values: false
+family:
+  id: sipri_military_burden_fixed_investment_2026_10_10
+  size: 1
+  members:
+  - sipri_military_burden_future_fixed_investment_2026
+  interpretation: One descriptive test across four repeated anchor windows
+reproduction:
+  runner: scripts/run_sipri_military_fixed_investment_2026_unit_fix.py
+  command: python3 scripts/run_sipri_military_fixed_investment_2026_unit_fix.py verify --source-root /path/to/IESET
+  result_sha256: 78fc608f157bd4b4bc2afc784fdda9765019c35dcc2fdd436f30ca0bc9cc7253
+result:
+  sample:
+    key_roster_rows: 660
+    key_roster_countries: 165
+    complete_rows_before_country_floor: 491
+    valid_rows: 483
+    valid_countries: 133
+    rows_per_anchor:
+      '2000': 111
+      '2005': 118
+      '2010': 128
+      '2015': 126
+    material_change_rows: 140
+    material_change_countries: 79
+    dropped:
+      country_below_two_anchors: 8
+      military_range: 3
+      missing_or_nonfinite: 166
+    selected_values_read_after_committed_lock: true
+    residual_treatment_sd_pp: 0.46841511097648414
+    residual_outcome_sd_pp: 3.5498323063312633
+    top_one_percent_treatment_ss_share: 0.2933134869443443
+    top_country_treatment_ss_share: 0.15271594996023632
+  primary:
+    beta: -0.32454303070251694
+    country_cluster_se: 0.4622004644486398
+    p_two_sided: 0.48380983154142676
+    confidence_level: 0.99
+    confidence_interval:
+    - -1.5325447300140376
+    - 0.8834586686090036
+    n_rows: 483
+    n_countries: 133
+    df_inference: 132
+    model_rank: 141
+    model_columns: 141
+    residual_treatment_sd_pp: 0.46841511097648414
+    residual_outcome_sd_pp: 3.5498323063312633
+    top_one_percent_treatment_ss_share: 0.2933134869443443
+    top_country_treatment_ss_share: 0.15271594996023632
+    method: equal-row country/anchor FE OLS with four baseline controls; country CR1 cluster t(G-1)
+  hash_folds:
+  - omitted_hash_fold: 0
+    rows: 367
+    countries: 100
+    beta: -0.4046128455740639
+  - omitted_hash_fold: 1
+    rows: 356
+    countries: 99
+    beta: -0.6603043639250341
+  - omitted_hash_fold: 2
+    rows: 418
+    countries: 114
+    beta: -0.16666686087216553
+  - omitted_hash_fold: 3
+    rows: 416
+    countries: 115
+    beta: -0.18052597081399135
+  - omitted_hash_fold: 4
+    rows: 375
+    countries: 104
+    beta: -0.29810183688376224
+  negative_folds: 5
+  positive_folds: 0
+  gate_failures: []
+  verdict: PARTIAL
+limitations:
+- SIPRI military expenditure and WDI gross fixed capital formation are both GDP shares; denominator changes
+  can contribute to their movements.
+- Gross fixed capital formation includes public and private assets and may include defense assets; it
+  is not civilian public investment or a budget appropriation.
+- Observed military spending changes are not exogenous budget shocks. Security threats, growth, fiscal
+  capacity and accounting changes can confound the later association.
+- The frozen 0–20 percent military level and 5-point change bounds focus on moderate budget movements
+  and exclude some wars and crises.
+- Four five-year windows share countries and data sources. One country/anchor fixed-effect test is one
+  descriptive calibration, not four replications.
+- The SIPRI vintage records no cell-level observation-status field; WDI observation-status cells do not
+  establish within-country methodology continuity.
+- The claim and negative prior follow visible fiscal crowding-out debates; the local 0.01 rule does not
+  adjust for all IESET archive selection.
+- No causal, policy, school, position or featured credit is assigned.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
+unit_correction:
+  type: source_unit_conversion
+  source_role: military
+  source_stored_unit: fraction of GDP
+  registered_unit: percentage points of GDP
+  exact_multiplier: 100
+  scope: SIPRI military input values only; no change to cohort, endpoints, controls, estimator, significance
+    rule or any registered threshold
+  first_attempt: First locked execution stopped at the material-change coverage gate (0 material rows
+    among 485 complete rows); no coefficient or directional result was estimated.
+  first_attempt_diagnostics: engine/audits/sipri_military_fixed_investment_unscaled_diagnostic_2026-10-10.json
+  first_attempt_diagnostics_sha256: d159451b9610649ce9c1f3aecd64d56bbef9872519f027894ced6760513ba34a

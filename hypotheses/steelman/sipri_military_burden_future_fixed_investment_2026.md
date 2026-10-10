@@ -1,0 +1,7 @@
+# Steelman: military burden and later fixed investment
+
+**Registered ID:** `sipri_military_burden_future_fixed_investment_2026`. A prolonged rise in military expenditure relative to GDP may absorb fiscal capacity, foreign exchange, skilled labor and capital goods, leaving fewer resources for fixed investment over the next five years. The strongest version predicts a negative within-country association after baseline investment and development trends are accounted for. A positive association is also plausible: defense procurement can itself form capital, and stronger states may raise security spending and investment together.
+
+The outcome is total national gross fixed capital formation as a GDP share. This test cannot separate civilian public infrastructure, private construction or defense assets. Threats, wars, recession denominators, commodity cycles and accounting revisions may jointly move both shares. The predefined 0–20 percent military burden and <=5-point change bounds focus on moderate movements; excluded crisis observations remain outside the claim. Source statuses do not certify comparable national methods.
+
+One frozen four-window panel test uses a two-sided .01 cutoff, effect size 0.25 and four-of-five sign-fold gate. A negative passing coefficient supports only the descriptive prediction; a positive passing coefficient refutes that direction; weaker or design-limited results are partial or inconclusive. Neither outcome grants causal or policy credit.
