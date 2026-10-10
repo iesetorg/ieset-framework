@@ -1,0 +1,194 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: who_physician_density_maternal_mortality_forward_2026
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: +
+claim: Across the frozen country-key roster, larger gains in WHO physician density from 2000 to 2010 predict
+  at least +0.05 log point maternal-mortality reduction from 2011 to 2019 per ten additional physicians
+  per 10,000 people, conditional on initial physician density and 2011 maternal mortality. This is a descriptive
+  association.
+evidence_type: descriptive
+methodology_note: One of a closed two-test family with both questions and Bonferroni denominator fixed
+  before selected values. Direct WHO WASH-child-health retesting was excluded after inspecting the four
+  recent failed WASH screens. Source-key roster and exact source hashes precede selected-value access.
+sample:
+  countries: &id001
+  - ALB
+  - AND
+  - ARE
+  - ARM
+  - AUS
+  - AUT
+  - AZE
+  - BEL
+  - BGR
+  - BHR
+  - BIH
+  - BLR
+  - BLZ
+  - BRN
+  - BWA
+  - CHE
+  - CHN
+  - COL
+  - CRI
+  - CUB
+  - CYP
+  - CZE
+  - DEU
+  - DNK
+  - ECU
+  - ERI
+  - ESP
+  - EST
+  - FIN
+  - FRA
+  - GBR
+  - GEO
+  - GRC
+  - GRD
+  - GUY
+  - HND
+  - HRV
+  - HUN
+  - IND
+  - IRL
+  - ISL
+  - ISR
+  - ITA
+  - JOR
+  - JPN
+  - KAZ
+  - KGZ
+  - KHM
+  - KOR
+  - KWT
+  - LAO
+  - LKA
+  - LTU
+  - LUX
+  - LVA
+  - MAR
+  - MDA
+  - MEX
+  - MKD
+  - MLT
+  - MNE
+  - MNG
+  - MUS
+  - MYS
+  - NLD
+  - NOR
+  - NZL
+  - OMN
+  - PAK
+  - PHL
+  - PNG
+  - POL
+  - PRT
+  - ROU
+  - RUS
+  - SAU
+  - SGP
+  - SVK
+  - SVN
+  - SWE
+  - SYR
+  - TJK
+  - TKM
+  - TTO
+  - TUN
+  - TUR
+  - UKR
+  - USA
+  - UZB
+  - VCT
+  - ZWE
+  period:
+  - 2000
+  - 2019
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: One fixed 2000-to-2010 exposure change and later 2011-to-2019 outcome improvement
+    per country; the end year avoids the 2020 pandemic shock.
+  exclusion_rules:
+  - Only the frozen 91-country WHO/WDI source-key intersection; key presence does not prove a non-null
+    value.
+  - Exact WHO country-level HWF_0001 physician-density readings in 2000 and 2010, finite and [0,200] per
+    10,000.
+  - Exact WDI modelled maternal mortality ratios in 2011 and 2019, finite, status blank/A and in (0,5000].
+  - No interpolation, alternate years, imputation, aggregate rows or post-result country adjustment.
+variables:
+  outcome:
+  - name: maternal_mortality_2011_2019_log_reduction
+    source: world_bank_wdi:SH.STA.MMRT
+    transformation: natural log of 2011 modelled maternal mortality ratio minus natural log of 2019 ratio
+    notes: Modelled deaths per 100,000 live births; model inputs include fertility, birth attendance and
+      GDP.
+  treatment:
+  - name: physician_density_2000_2010_gain_per_10000
+    source: who_gho:HWF_0001
+    transformation: 2010 minus 2000 physician density per 10,000 people, divided by 10 for regression
+    notes: WHO counts may be active or registered physicians depending on reporting source.
+  controls:
+  - name: baseline_physician_density_2000
+    source: who_gho:HWF_0001
+    transformation: 2000 physicians per 10,000 people
+  - name: baseline_log_maternal_mortality_2011
+    source: world_bank_wdi:SH.STA.MMRT
+    transformation: natural log of 2011 ratio
+estimator:
+  template: descriptive
+  notes: Equal-country cross-sectional OLS of later outcome improvement on prior exposure gain, baseline
+    exposure and 2011 baseline outcome, with intercept; HC3 two-sided Student t, five deterministic ISO3
+    hash-fold holdouts. Shared two-test family alpha 0.01; Bonferroni p cutoff 0.005.
+falsification:
+  test: fixed_who_physician_density_maternal_mortality_forward_2026
+  rule: INCONCLUSIVE if any frozen complete-case, material-gain, exposure spread, rank, finite uncertainty,
+    residualized-exposure concentration, or holdout gate fails. Otherwise SUPPORTED requires positive
+    slope at least the frozen meaningful bound, two-sided p<=0.005 and at least four positive holdout
+    slopes; REFUTED requires negative slope at least the same absolute bound, p<=0.005 and at least four
+    negative holdout slopes; other estimable cases PARTIAL. Both tests remain in the multiplicity denominator
+    regardless of data gates. Zero causal, policy, school, position and featured credit.
+  threshold:
+    family_id: physician_education_followthrough_2026
+    family_size: 2
+    family_alpha: 0.01
+    bonferroni_p_max_two_sided: 0.005
+    meaningful_beta_min_abs: 0.05
+    min_complete_countries: 50
+    min_material_exposure_gain_countries: 15
+    material_exposure_gain: 2.0
+    min_exposure_p90_p10_spread: 5.0
+    max_top_country_residualized_exposure_share: 0.2
+    max_top_5_residualized_exposure_share: 0.65
+    min_leave_one_hash_fold_out_countries: 40
+    min_concordant_holdouts_for_directional_verdict: 4
+    roster_sha256: 8befd15bbffd25608f71ac534f5ccffcff876d1bc3aae0fc92ba2e2425756dc0
+    source_lock_path: data/pinned_evidence/physician_education_family_2026.manifest.json
+    causal_credit: 0
+    policy_score_eligible: false
+    policy_score_credit: 0
+    school_score_eligible: false
+    school_score_credit: 0
+    featured_eligible: false
+prior_confidence: 0.35
+disclosure: Physician supply could matter for obstetric care, but density does not measure obstetric staffing
+  or service quality. The maternal mortality outcome is modelled partly from fertility, birth attendance
+  and GDP; earlier physician-density/amenable-mortality archive work was visible before selection.
+scope:
+  period:
+  - 2000
+  - 2019
+  countries: *id001
+  outcome_dim:
+  - life_expectancy_health
+  policy_family:
+  - none
+  treatment_tags: []
+steelman: hypotheses/steelman/who_physician_density_maternal_mortality_forward_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'Frozen family preregistration: engine/audits/physician_education_family_prereg_2026-10-10.md.
+  Exact runner: scripts/run_physician_education_family_2026.py. Later source lock: data/pinned_evidence/physician_education_family_2026.manifest.json.'
