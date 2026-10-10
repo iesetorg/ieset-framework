@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: wdi_oop_change_under5_mortality_followthrough_v2
+version: 1
+status: pre_registered
+topic: healthcare
+claim_direction: +
+claim: >-
+  Across World Bank country and territory economies with complete frozen
+  observations, a 10-percentage-point increase in the out-of-pocket share of
+  current health spending from 2005 to 2015 predicts at least 0.5 percentage
+  point per year less improvement in under-five mortality during 2015–2023,
+  after the registered prior mortality and income trends and 2015 health
+  spending share are controlled. This is a descriptive forecast association,
+  not a financing-policy effect or an amenable-mortality test.
+evidence_type: descriptive
+methodology_note: >-
+  New-ID repair of a measurable piece of two old legacy health-financing
+  candidates. The old wdi_out_of_pocket_health_spending_mortality_panel used
+  total current health expenditure as its generic treatment, despite naming
+  out-of-pocket spending; decommodified_health_oop_spending_mortality_panel
+  also used the generic total-spending treatment and claimed additional
+  avoidable-mortality and medical-impoverishment outcomes. Their old results
+  are known and do not grade this question. The four exact WDI vintage paths,
+  all years, source-key eligibility, estimator, and verdict gates were frozen
+  before any selected values, null masks, coefficients, or fit were opened.
+sample:
+  countries: [GLOBAL]
+  period: [2005, 2023]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    One 2005–2015 financing change and one later 2015–2023 under-five
+    mortality change are constructed for each eligible economy.
+  exclusion_rules:
+    - >-
+      Candidate roster is every ISO 3166 alpha-3 country or territory in
+      pycountry, plus XKX, with all required country/year keys in the four
+      pinned local source files. The roster is frozen in the separately
+      committed metadata-only source lock before reading any selected value.
+    - >-
+      Require finite out-of-pocket shares in [0,100] in 2005 and 2015;
+      strictly positive finite under-five mortality in 2005, 2015, and
+      2023; strictly positive finite real GDP per person in 2005 and 2015;
+      and finite 2015 current health expenditure share in (0,100]. A missing
+      or invalid cell excludes that economy. No interpolation, imputation,
+      replacements, winsorisation, or outcome-based geography split.
+variables:
+  outcome:
+    - name: future_under5_mortality_log_change_annual_pp
+      source: world_bank_wdi:SH.DYN.MORT
+      transformation: 100 times log(2023 mortality / 2015 mortality) divided by 8
+      notes: Modelled under-five deaths per 1,000 live births; higher means slower improvement.
+  treatment:
+    - name: out_of_pocket_share_change_per_ten_pp
+      source: world_bank_wdi:SH.XPD.OOPC.CH.ZS
+      transformation: (2015 share minus 2005 share) divided by 10
+  controls:
+    - name: log_under5_mortality_2015
+      source: world_bank_wdi:SH.DYN.MORT
+      transformation: natural log of 2015 level
+    - name: prior_under5_mortality_log_change_annual_pp
+      source: world_bank_wdi:SH.DYN.MORT
+      transformation: 100 times log(2015 mortality / 2005 mortality) divided by 10
+    - name: log_real_gdp_per_person_2015
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: natural log of 2015 level
+    - name: prior_real_gdp_per_person_log_change_annual_pp
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 100 times log(2015 GDP per person / 2005 GDP per person) divided by 10
+    - name: current_health_expenditure_gdp_share_2015
+      source: world_bank_wdi:SH.XPD.CHEX.GD.ZS
+      transformation: unmodified 2015 percentage of GDP
+intervention_channel: fiscal
+intervention_channel_justification: >-
+  A financing mix is measured, but no policy intervention is identified.
+estimator:
+  template: descriptive
+  fixed_effects: []
+  clustering: none
+  notes: >-
+    Equal-economy cross-sectional OLS with intercept, exposure change, and
+    the five listed controls. HC3 heteroskedasticity-robust standard error;
+    two-sided Student t reference with N−7 degrees of freedom. Outcome and
+    coefficient units are annual log-change percentage points per ten
+    percentage points of financing-share change. No model search.
+falsification:
+  test: fixed_wdi_oop_change_under5_followthrough_2015_2023
+  rule: >-
+    First require at least 80 complete economies, at least 20 with an
+    absolute 2005–2015 out-of-pocket-share change of 5 points or more,
+    exposure interquartile range of at least 3 points, full-rank design,
+    finite positive HC3 uncertainty, no one economy contributing over 20
+    percent of squared exposure residual after partialling controls, and
+    successful leave-one-economy-out fits for all but at most two economies.
+    Any failure is INCONCLUSIVE. SUPPORTED when beta >= +0.5 annual log
+    percentage point per ten-point exposure rise, two-sided p <= 0.01,
+    and at least 75 percent of successful leave-one-out betas are positive.
+    REFUTED when beta <= -0.5, p <= 0.01, and at least 75 percent of
+    leave-one-out betas are negative. Otherwise an estimable result is
+    PARTIAL. One closed descriptive family; zero causal, policy, school,
+    position, or featured credit.
+  threshold:
+    family_size: 1
+    min_complete_economies: 80
+    min_abs_change_5pp_economies: 20
+    min_exposure_iqr_pp: 3
+    max_single_economy_residualized_exposure_share: 0.20
+    max_loo_failures: 2
+    min_loo_sign_share: 0.75
+    min_abs_beta_annual_pp_per_10pp: 0.5
+    two_sided_p_max: 0.01
+    policy_score_credit: 0
+    school_score_credit: 0
+prior_confidence: 0.45
+disclosure: >-
+  A health-financing share is not an enacted policy. Households' medical
+  payments, income, insurance availability, mortality, and public spending
+  may jointly change. Under-five mortality is modelled and is not amenable
+  mortality; this does not test medical impoverishment. The sample can include
+  dependent territories and excludes economies with missing cells. Window
+  dates, source vintages, and the directional rule are fixed despite known
+  broad legacy health-financing results. Descriptive calibration only.
+scope:
+  period: [2005, 2023]
+  countries: [GLOBAL]
+  outcome_dim: [life_expectancy_health]
+  policy_family: [none]
+  treatment_tags: [out_of_pocket_health_financing]
+steelman: hypotheses/steelman/wdi_oop_change_under5_mortality_followthrough_v2.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: >-
+  Source-key and chronology plan:
+  engine/audits/wdi_oop_change_under5_mortality_followthrough_v2_prereg_2026-10-10.md.
+  Frozen runner: scripts/run_wdi_oop_change_under5_mortality_followthrough_v2.py.
