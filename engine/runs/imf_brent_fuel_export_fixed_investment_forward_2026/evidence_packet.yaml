@@ -1,0 +1,116 @@
+packet_version: 1
+hypothesis:
+  id: imf_brent_fuel_export_fixed_investment_forward_2026
+  path: hypotheses/commodity_shocks/imf_brent_fuel_export_fixed_investment_forward_2026.yaml
+preregistration:
+  commit: 06e36886b1f5774fd46bc19d3b2dd1fac2f14c68
+  steelman: hypotheses/steelman/imf_brent_fuel_export_fixed_investment_forward_2026.md
+  source_plan: engine/audits/imf_brent_export_transmission_prereg_2026-10-10.md
+  key_roster: data/pinned_evidence/imf_brent_export_transmission_2026_key_roster.csv
+source:
+  publisher: IMF Primary Commodity Prices and World Bank World Development Indicators
+  source_sha256: b42b34f7f85025e8bf091cdb9faa8d508e5da08a1a88eb4680a83f55bc312095
+  source_lock_commit: 6f369b88408f31da2c8a6bcdc990f8916eaab43c
+  source_lock_manifest: data/pinned_evidence/imf_brent_fuel_export_fixed_investment_forward_2026.source.json
+  key_roster_sha256: 5652568f0a0a9cf0c2b919abeeb0916f4325b5579403fedae31c9cd15dcc38d1
+  input_vintages:
+  - path: data/vintages/imf_pcps/POILBRE@2026-05-05T195409Z.parquet
+    sha256: d1f0753d78837b6be853f43672c138981582b1d524fe47152a413ddefa6dbc4c
+  - path: data/vintages/world_bank_wdi/TX.VAL.FUEL.ZS.UN@2026-04-30T115204Z.parquet
+    sha256: a4c2d9e1aef424666d6becae2a4f913925e32b2223491d87b6f3943e546ec20e
+  - path: data/vintages/world_bank_wdi/BN.CAB.XOKA.GD.ZS@2026-05-05T195123Z.parquet
+    sha256: 977f10a40e15becc1f1f7abdee7e3f8a99ab7c39ffdc6e3994d5a993efa4f168
+  - path: data/vintages/world_bank_wdi/NE.GDI.FTOT.ZS@2026-05-05T203056Z.parquet
+    sha256: fee6f66739512936ab17e82c4b7b788dc3030620ba30a6e5671e972a3a341a21
+  - path: data/vintages/world_bank_wdi/NY.GDP.PCAP.KD@2026-05-05T194645Z.parquet
+    sha256: 0cf53ee3a334988ded027fbe160a8d8c70773656772daf1c82206eb3f7c02a9f
+  - path: data/vintages/world_bank_wdi/NE.CON.PRVT.PC.KD@2026-05-05T194704Z.parquet
+    sha256: e696dc3fd004c69efb8bc783896f3de21a11422757ac9f6a2a0f558788032cfe
+  license: IMF attributed data use; WDI CC BY 4.0; derived summaries only
+  contains_source_values: false
+family:
+  id: imf_brent_fuel_export_forward_macro_2026_10_10
+  size: 4
+  members:
+  - imf_brent_fuel_export_current_account_forward_2026
+  - imf_brent_fuel_export_fixed_investment_forward_2026
+  - imf_brent_fuel_export_real_income_pc_forward_2026
+  - imf_brent_fuel_export_real_consumption_pc_forward_2026
+  holm_alpha: 0.05
+  interpretation: One global Brent shock interacted with fixed baseline fuel-export orientation; four correlated
+    future macro endpoints
+reproduction:
+  runner: scripts/run_imf_brent_export_transmission_2026.py
+  command: python3 scripts/run_imf_brent_export_transmission_2026.py verify --source-root /path/to/IESET
+  result_sha256: 112938875807e02bc7b7c9086437965139bbaf274414413097f43fe4f1589347
+result:
+  sample:
+    key_roster_rows: 2795
+    key_roster_countries: 215
+    valid_rows_before_country_floor: 1716
+    valid_rows: 1704
+    valid_countries: 134
+    valid_years: 13
+    exporter_countries: 23
+    exporter_rows: 291
+    rows_per_year:
+      '2005': 127
+      '2006': 127
+      '2007': 128
+      '2008': 129
+      '2009': 130
+      '2010': 130
+      '2011': 131
+      '2012': 133
+      '2013': 134
+      '2014': 134
+      '2015': 134
+      '2016': 134
+      '2017': 133
+    oil_invalid_years: []
+    dropped:
+      baseline_fuel_share_missing_or_out_of_range: 793
+      country_below_five_complete_years: 12
+      outcome_or_income_missing_or_nonfinite: 286
+    selected_values_read_after_committed_locks: true
+    exposure_pooled_mean: 0.003846859410631476
+    exposure_pooled_sd: 0.09111143680373189
+    residual_exposure:
+      residual_sd: 0.8443406313359377
+      top_one_percent_ss_share: 0.325642839744384
+      top_country_ss_share: 0.06947925913476093
+      top_year_ss_share: 0.38868267732102313
+    residual_outcome:
+      residual_sd: 3.2718955285020215
+      top_one_percent_ss_share: 0.320880783338883
+      top_country_ss_share: 0.09989345297508377
+      top_year_ss_share: 0.11469190989582936
+  primary: null
+  hash_folds: []
+  gate_failures:
+  - top_one_percent_exposure_concentration
+  - top_year_exposure_concentration
+  - top_one_percent_outcome_concentration
+  holm_adjusted_p: 1.0
+  verdict: INCONCLUSIVE
+limitations:
+- IMF PCPS Brent is a common global price, not a country-specific export price or exogenous country treatment; timing
+  and fixed effects do not establish effects.
+- WDI fuel exports are a share of merchandise exports, not GDP or net fuel exports; countries may also import fuel,
+  and fixed 2000-2004 shares do not capture later trade changes.
+- The outcomes are national-accounts or balance-of-payments aggregates with revisions and potential country-method
+  breaks; real mean consumption has no distributional interpretation.
+- All four cells share one oil series, baseline exposure and many countries; Holm controls only this selected family,
+  not the broader IESET search.
+- Country/year effects and baseline outcome trends do not eliminate global demand, exchange-rate, domestic production,
+  financial, and fiscal confounding.
+- Only derived results are tracked; raw IMF/World Bank values are not redistributed. All causal, policy, school,
+  position and featured credit is zero.
+correction:
+  disposition: descriptive_calibration_only
+  causal_credit: 0
+  policy_score_eligible: false
+  policy_score_credit: 0
+  school_score_eligible: false
+  school_score_credit: 0
+  featured_eligible: false
