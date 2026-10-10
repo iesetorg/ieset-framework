@@ -4,9 +4,9 @@ Only curated links to current public-tier results contribute to verdicts, postur
 
 ## Summary
 
-- Policies indexed: 3375
+- Policies indexed: 3382
 - archive_only: 2945
-- no_hypothesis_link: 161
+- no_hypothesis_link: 168
 - related_public_only: 261
 - tested: 8
 

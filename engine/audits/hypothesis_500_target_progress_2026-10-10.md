@@ -2,8 +2,11 @@
 
 The requested increment is **500 additional public hypotheses** above the
 audited starting count of 372, so the target is 872. The current local evidence
-gate reports **498 public of 2,046 hypotheses**: 51 featured and 447 calibration.
-This is **126 additional** and leaves **374** to target. Another 228 records
+gate reports **545 public of 2,099 hypotheses**: 51 featured and 494 calibration.
+This is **173 additional records** and leaves **327** to the record-level target. These
+records are not independent research questions: one age-by-sex employment family
+contributes 20 visible records. The family accounting below keeps that distinction
+explicit. Another 234 records
 have verified registration but remain archived. A public calibration is a
 completed, reviewable test, not a supported, causal, policy-effect, or
 school-score finding.
@@ -145,6 +148,118 @@ their exact artifact replays passed. The WGI export-breadth coefficient was
 −0.0414351 log1p point per WGI point (p=0.592705; 1,862 pairs/153 reporter
 economies), below its frozen directional rule.
 
+## Latest locked family results
+
+The three-test IMF inflation calibration was registered in `4c17b8e44f0a6c884c5b666aef0dabacaba63a3a`,
+source-locked in `4a84a9e0eeacb0caca749b15f83f0f2804131bce`, and measured in `d0fbfd77f39004a56355e5a11b74841bc970bce6`. All three passed
+method floors and were exactly replayed as public **PARTIAL** descriptive
+calibrations: real household consumption/person β −0.00881024 (p=0.388457;
+2,762 pairs/140 economies), fixed investment share β −0.697125 (p=0.127753;
+3,105/153), and unemployment β +0.301462 (p=0.029461; 3,679/173).
+The unemployment nominal p is below 0.05 but does not pass the frozen
+three-test Bonferroni p≤0.003333 gate. None is an IMF-policy effect or earns
+causal, policy, school, or featured credit. See
+`engine/audits/imf_inflation_macro_responses_results_2026-10-10.md`.
+
+The separate claim-specific tax/labour family was registered in `550a49fe5c54f9570e5308b03f1488b407565baf`,
+source-locked in `c6970d0ea3bf98fcb12ca0c226b73f874330e9c2`, and measured in `8ddeeed681cc37512fe082029cfa28839a889fdf`. The tax measure
+returned a public **PARTIAL** association (β +0.622553, p=0.11678; 775
+pairs/50 economies). The labour-protection measure was **INCONCLUSIVE**:
+its largest country supplied 18.218% of residualized treatment variation,
+above the frozen 12% cap. The estimate is kept in diagnostics rather than
+promoted. Both old generic Fraser/GDP-per-person placeholders remain archived.
+Neither new case receives causal, policy, school, or featured credit. See
+`engine/audits/placeholder_claim_specific_replacement_results_2026-10-10.md`.
+
+Three observed Internet-uptake tests were registered in `115c5037d021716c00d7b0845fcca898f4e419c2`,
+source-locked in `c594bfc524d39e6355e32c005efb2a0ab6dda135`, and measured in `ebf5c8d0df226568fa57ad531c31f1bcea861412`. All three had
+ample complete rows and material uptake, but failed the same frozen
+residualized-treatment year-concentration cap of 20%: business registrations
+22.815%, services employment share 21.460%, and high-tech export share
+27.310%. They are **INCONCLUSIVE** with no publishable coefficient; exact
+replay passed. Internet uptake was an observed proxy, not a policy treatment.
+See `engine/audits/wdi_digital_diffusion_structure_results_2026-10-10.md`.
+
+The direct union-density/low-education-unemployment component was registered
+in `f869983bd50a8ce7260380b506f3cee2f2a00c46`, source-locked in `a010eac8f12dc3f53a2e17967f37a5fd62edda5c`, and measured in `0c740f0a46f35ba734dddffce9e6eebe657313a5`.
+Only 137 of 200 key-only windows had qualifying actual-status outcome pairs;
+the frozen minimum per anchor and within-country union-range gates failed, so
+no model was fit and the case is **INCONCLUSIVE**. Its eight artifacts replayed
+exactly. The original multi-part union-density placeholder, youth and wage
+compression components, and old verdict remain archived. These four
+inconclusive tests added **zero** public calibrations.
+
+
+The one-test gross-secondary-enrolment/fertility follow-through family was
+registered in `a480a7942af078eb03fa5cf8d94798363787ee23`, source-locked in `5273d592bd4cbb50346668b5ca632f301b5439ae`, and measured in
+`1b2b085a126b97e037f8383f8d1be23952e0ef9a`. All frozen complete-case, material-change, rank, and
+concentration floors passed: 168 decade pairs across 72 countries, with 85
+material schooling changes across 57 countries. Its association was public
+**PARTIAL** (beta −0.000391181 ten-year log-fertility point per +1 enrolment
+point; p=0.843036) and exactly replayed. The selected gross, both-sex
+schooling measure is neither female completion nor an education policy
+intervention. It receives zero causal, policy, school-score, position, and
+featured credit. See
+`engine/audits/wdi_secondary_enrolment_fertility_results_2026-10-10.md`.
+
+
+The ten-test BIS household debt-service-change family against additional
+OECD How's Life measures was registered in `7a92472731ebe9a00236495cdd37204cf99feccf`, source-locked in
+`7b99e00e4ea5ac480718ce4dcefe43e383fe805a`, and measured in `d023e9c4401dc9cc67826cc271b46c99cc3718fe`. Nine tests passed the frozen
+sample and method gates as public **PARTIAL** descriptive calibrations.
+The youth not-in-employment-or-education measure was **INCONCLUSIVE**:
+219 complete pairs fell short of its fixed 230-pair floor, so it received
+no coefficient. All ten verdicts replayed exactly. None cleared the
+family's p≤0.001 and practical-magnitude rule for a directional finding;
+all causal, policy, school, position, and featured credit is zero. See
+`engine/audits/bis_dsr_oecd_hsl_extended_results_2026-10-10.md`.
+
+The twelve-test WDI real-GDP-growth family against mutually non-nested
+Eurostat fuel-combustion CO2 source categories was registered in
+`842ea1491f505205b5144b614e73779cbcfcd154`, source-locked in `48730de3ad0436351ea8e77c83e1e045e3eb8da7`, and measured in `a95d1739721cb4e41507da39a767067f0cabcbe9`.
+All twelve passed frozen sample and concentration gates and replayed
+exactly. Ten are public **PARTIAL** descriptive calibrations. Two passed
+the fixed Bonferroni p≤0.0008333 and β≥0.005 thresholds as descriptive
+**SUPPORTED** associations: other manufacturing/construction fuel
+(β +0.0158829, p=0.0000716; 641 pairs/28 countries) and road transport
+fuel (β +0.00749382, p=0.000000846; 664/29). Same-year aggregate GDP growth
+is not a sector output or policy intervention, and the selected inventory
+has no retained cell flags. All causal, policy, school, position, and
+featured credit is zero. See
+`engine/audits/wdi_gdp_eurostat_sector_co2_results_2026-10-10.md`.
+
+The twenty-cell real-GDP-growth and OECD age-by-sex employment family was
+registered in `b6aa15c2f6b118eb9db8b6e98ad1d43f538d8a58`, source-locked in `270134c36cd95c17b8a348462e599098ced2e8aa`, and measured in
+`d39121ad74022bfcb58070d749f1322a65a5b427`. All 20 disjoint population cells passed the fixed sample and
+influence gates, with 1,092 country-year pairs across 50 economies per cell.
+Eleven cell estimates cleared the 20-test Bonferroni and effect-size rule as
+descriptive **SUPPORTED** associations; nine are **PARTIAL**. Exact replay
+passed. These are one correlated labour-market question, not 20 independent
+confirmations or policy effects. They have zero causal, policy, school,
+position, and featured credit. See
+`engine/audits/wdi_growth_oecd_lfs_age_sex_results_2026-10-10.md`.
+
+The BIS nominal effective-exchange-rate depreciation to Eurostat annual HICP
+consumer-group test was registered as **one omnibus hypothesis** in
+`682ad0d9b7a6d1ace1d1044643145c09badc0560`, source-locked in `62f821394631e384c3d025415f1eba9adcc4489e`, and measured in `60884324cffb20343eee88c87818166f56f6bac4`.
+All 20 non-nested groups were estimable; five met the frozen positive
+component rule (two-sided p≤0.0005, effect and country-deletion floors),
+none met its opposite rule, and 15 were partial. The fixed omnibus rule
+therefore returned descriptive **SUPPORTED**, with exact replay. The 20
+component estimates count as one public record and do not identify causal
+exchange-rate pass-through. Causal, policy, school, position, and featured
+credit is zero. See
+`engine/audits/bis_neer_eurostat_goods_hicp_results_2026-10-10.md`.
+
+Record and family counting differ. Through the 524-record checkpoint, 148
+identifiable gross additions mapped to 57 preregistered family/test labels;
+three older ILO records were withdrawn. The starting 372-record snapshot lacks
+an ID-level ledger, so a precise net count of new independent questions is
+not recoverable. Related multi-outcome batches and the 20 employment cells
+must not be represented as independent replications. See
+`engine/audits/public_record_family_accounting_2026-10-10.md` and
+`engine/audits/large_family_feasibility_and_acquisition_2026-10-10.md`.
+
 ## Corpus and drift corrections
 
 Source-backed policy correction `daad06ddec8283bf05cb213bf28f1f75d8587067` dated Bahrain's VAT law decision
@@ -163,17 +278,23 @@ steps in Slovakia and Croatia; it put the retained Croatian border and labour
 steps in their operative 2023 year. Only those two countries' derived scores
 changed. Separate policy `32a11b8a48acba4ab87a02a814cfab4412be72f5` records the 1869 final cessation of UK
 corn import duties from 1 June under the Revenue Act, without inventing a
-movement or a drift step. The scored national drift map remains
-**1846–2026**, 145 countries, and 21 axes. Two newly sourced, unlinked
-candidate UK policy records now document the operative 1802 Parish Apprentices
-Act and the 1815 Corn Importation Act. They carry no invented movement,
-numeric drift step, or empirical support; the first defensible scored national
-movement remains in 1846. The drift page now shows these cited policy-only
-years as linked cards and dashed chart markers, with no scored values before
-1846. These coding repairs do not confer empirical support. See
+movement or a drift step. The scored national movement grid now spans
+**1789–2026**, 145 countries, and 21 axes. Narrow French provincial-
+privilege abolition (legally operative 3 November 1789), Civil Code (1804),
+and Restoration Charter (1814) candidates each add a source-backed weak
+`institutional.rule_of_law` step. They do not change France's statist
+composite; the earliest composite step in any country remains 1846. Two newly sourced,
+unlinked candidate UK policy records document the operative 1802 Parish
+Apprentices Act and 1815 Corn Importation Act without inventing movement
+scores. The drift page keeps both U.S. 1789 policy-only markers and the cited
+1802, 1815, 1833, and 1844 policy-only markers visible and separately plots the early French rule-of-law
+axis. These coding repairs do not confer empirical hypothesis support. See
 `engine/audits/policy_axis_source_corrections_2026-10-10.md`,
-`engine/audits/euro_schengen_axis_timing_corrections_2026-10-10.md`, and
-`engine/audits/uk_revenue_act_1869_policy_gap_2026-10-10.md`.
+`engine/audits/euro_schengen_axis_timing_corrections_2026-10-10.md`,
+`engine/audits/uk_revenue_act_1869_policy_gap_2026-10-10.md`,
+`engine/audits/french_pre1846_signed_backfill_2026-10-10.md`, and
+`engine/audits/fr_1789_privilege_backfill_2026-10-10.md`, and
+`engine/audits/us_judiciary_act_1789_policy_only_2026-10-10.md`.
 
 Finland correction `0811718366e3d5227347072564e1c724aff3113f` put the principal compulsory-education
 extension in August 2021, the family-leave entitlement in August 2022, and
@@ -192,8 +313,8 @@ pending a separate regime review. See
 
 ## Remaining work and source boundary
 
-A fresh archive review found **no same-ID conversion** that clears its current
-frozen specification with local data. Of 228 verified archives, 155 fail the
+An earlier archive review found **no same-ID conversion** that cleared its
+frozen specification with local data. Of 233 verified archives then, 155 failed the
 estimator floor; 131 of those repeat a claim-mismatched Fraser-index/GDP-per-
 capita placeholder. Eight plain missing-verdict records fail frozen coverage
 floors or lack a prespecified non-support label, and the sole replication-only
@@ -205,12 +326,12 @@ not ready conversions. See
 `engine/audits/legacy_archive_v2_readiness_2026-10-10.md`. In particular,
 the pinned Canada 2025 GDP-per-person holdout has no 2025 values, and a
 candidate Anglo money series has no Canadian 2019–2024 values. Bulk event
-multiplication is also unsupported: the current registry has **3,375**
-policies, but only **7** have a comparative structure declared, **3,352**
-need treated/comparison unit coding, and **1,308** need exact event dates.
+multiplication is also unsupported: the current registry has **3,382**
+policies, but only **7** have a comparative structure declared, **3,359**
+need treated/comparison unit coding, and **1,309** need exact event dates.
 Six of those seven declare known measurement gaps; the seventh lacks an
 outcome measurement plan. None is a verified causal estimate. The second-order
-index now retains **3,361** policies,
+index now retains **3,366** policies,
 including all **23** explicit evaluation designs even when a policy has no
 scored drift axis. A WHO particulate-matter/chronic-outcome lead was rejected
 before registration because its short modeled window and concentrated
@@ -221,13 +342,24 @@ changes at the required country-years. The 1,320 legacy same-commit
 registrations cannot become strict by renaming old results; new source-pinned
 holdouts would need separate v2 registrations and measured runs.
 
+The requested +500 remains unmet: **327 more public records** would be
+needed, and the record count itself overstates independent research questions.
+A separate feasibility audit found no defensible hundreds-sized family in the
+preserved corpus. Priorities for genuinely new source acquisition are matched
+regional wage/outcome panels, electricity price and reliability histories,
+cohort mobility outcomes, wealth-tax behaviour, and technology-specific
+renewables costs. Existing failed gates cannot be repaired by relabeling
+old runs or multiplying outcome slices.
+
 Generated preregistration, evidence, census, conversion-funnel, school,
 second-order, and policy indexes were refreshed after all current result and
-policy commits. Local checks passed: 6,178 specs and cross-references,
-69 focused Python tests, eight web tests, TypeScript type checking, the
-static site build, generated drift consistency, exact replay of the two latest
-run packets, and public-tree OPSEC scanning. The static drift page and both
-pre-1846 policy pages were present in the build. Link reciprocity had zero
-errors or warnings; scope alignment had zero errors and seven warnings. Publication remains on hold: this local branch history
-contains an older rejected, path-bearing source manifest followed by a
-revert. No push, merge, or deployment is authorized by these local audits.
+policy commits. Local checks passed: **6,241** specs and cross-references,
+three current focused Python tests, eight web tests, TypeScript type checking
+and the **8,534-route** static site build, generated drift consistency, exact
+replay of the employment and HICP packets, and public-tree OPSEC scanning.
+The static drift page, French 1789, U.S. Judiciary Act, and HICP result pages
+were present in the build. Link reciprocity had zero errors or warnings;
+scope alignment had zero errors and seven warnings. Publication remains on
+hold: this local branch history contains an older rejected, path-bearing
+source manifest followed by a revert. No push, merge, or deployment is
+authorized by these local audits.
