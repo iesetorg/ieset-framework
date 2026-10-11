@@ -11,6 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 import yaml
+from publication_rights_holds import project_evidence_audit, project_public_census
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "engine" / "public_corpus_census.json"
@@ -232,14 +233,16 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     output = args.output if args.output.is_absolute() else ROOT / args.output
-    expected = encoded(build())
+    full_census = build()
+    targets = [(output, encoded(full_census))]
+    if output.resolve() == DEFAULT_OUTPUT.resolve():
+        full_audit = json.loads(EVIDENCE_AUDIT.read_text(encoding="utf-8"))
+        public_audit = project_evidence_audit(full_audit)
+        targets.append((PUBLIC_OUTPUT, encoded(project_public_census(full_census, public_audit, verdict_bucket))))
     if args.check:
-        targets = [output]
-        if output.resolve() == DEFAULT_OUTPUT.resolve():
-            targets.append(PUBLIC_OUTPUT)
         stale = [
             target
-            for target in targets
+            for target, expected in targets
             if not target.exists()
             or target.read_text(encoding="utf-8") != expected
         ]
@@ -252,15 +255,12 @@ def main() -> int:
                 )
             return 1
     else:
-        targets = [output]
-        if output.resolve() == DEFAULT_OUTPUT.resolve():
-            targets.append(PUBLIC_OUTPUT)
-        for target in targets:
+        for target, expected in targets:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(expected, encoding="utf-8")
     print(
         "OK ("
-        + ", ".join(str(target.relative_to(ROOT)) for target in targets)
+        + ", ".join(str(target.relative_to(ROOT)) for target, _ in targets)
         + ")"
     )
     return 0

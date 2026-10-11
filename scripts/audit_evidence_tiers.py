@@ -27,6 +27,7 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 import audit_integrity_detectors
+from publication_rights_holds import project_evidence_audit
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "engine" / "evidence_tier_audit.json"
@@ -915,13 +916,16 @@ def main() -> int:
         help="Fail when either committed public audit copy is stale.",
     )
     args = parser.parse_args()
-    expected = encoded(build())
-    targets = (OUTPUT, PUBLIC_OUTPUT)
+    full_audit = build()
+    targets = (
+        (OUTPUT, encoded(full_audit)),
+        (PUBLIC_OUTPUT, encoded(project_evidence_audit(full_audit))),
+    )
 
     if args.check:
         stale = [
             path
-            for path in targets
+            for path, expected in targets
             if not path.exists()
             or path.read_text(encoding="utf-8") != expected
         ]
@@ -934,11 +938,11 @@ def main() -> int:
                 )
             return 1
     else:
-        for path in targets:
+        for path, expected in targets:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(expected, encoding="utf-8")
 
-    summary = json.loads(expected)["summary"]
+    summary = full_audit["summary"]
     print(
         "OK "
         f"(featured={summary['tier_counts'].get('featured', 0)}, "

@@ -15,6 +15,7 @@ import type {
   SourceToken,
   Variable,
 } from "./types";
+import { isPublicationHeld, publicationHeldIds } from "./publication-holds";
 
 // Repo root is one level up from /web
 export const REPO_ROOT = resolve(process.cwd(), "..");
@@ -111,9 +112,33 @@ export function loadEvidenceTierAudit(): EvidenceTierAudit | null {
     return null;
   }
   try {
-    _evidenceTierAuditCache = JSON.parse(
-      readFileSync(auditPath, "utf8")
-    ) as EvidenceTierAudit;
+    const source = JSON.parse(readFileSync(auditPath, "utf8")) as EvidenceTierAudit;
+    const sourceIds = new Set(source.records.map((record) => record.hypothesis_id));
+    for (const id of publicationHeldIds()) {
+      if (!sourceIds.has(id)) throw new Error(`Publication hold ID missing from evidence audit: ${id}`);
+    }
+    const records = source.records.filter((record) => !isPublicationHeld(record.hypothesis_id));
+    const count = (keys: string[]): Record<string, number> => {
+      const totals: Record<string, number> = {};
+      for (const key of keys) totals[key] = (totals[key] ?? 0) + 1;
+      return totals;
+    };
+    _evidenceTierAuditCache = {
+      ...source,
+      records,
+      reference_set: source.reference_set.filter((row) => !isPublicationHeld(row.hypothesis_id)),
+      summary: {
+        ...source.summary,
+        hypotheses: records.length,
+        public_visible: records.filter((record) => record.public_visible).length,
+        reference_set: records.filter((record) => record.reference_set).length,
+        tier_counts: count(records.map((record) => record.tier)),
+        registration_counts: count(records.map((record) => record.registration_status)),
+        verdict_counts: count(records.map((record) => record.verdict_bucket)),
+        estimator_floor_failures: count(records.flatMap((record) => record.estimator_floor_failures)),
+        exclusion_counts: count(records.flatMap((record) => record.exclusion_reasons)),
+      },
+    };
   } catch {
     _evidenceTierAuditCache = null;
   }
@@ -157,6 +182,7 @@ async function listHypothesisFiles(): Promise<string[]> {
 }
 
 export async function loadHypothesis(id: string): Promise<Hypothesis | null> {
+  if (isPublicationHeld(id)) return null;
   const files = await listHypothesisFiles();
   for (const file of files) {
     if (basename(file, ".yaml") === id) {
@@ -199,6 +225,7 @@ export function isHypothesisPubliclyVisible(
     diagnostics?: Record<string, unknown>;
   }
 ): boolean {
+  if (isPublicationHeld(h.hypothesis_id)) return false;
   // The versioned public ledger is the authoritative gate. Keeping the UI,
   // APIs, census, and scoreboard on one record prevents silent definition
   // drift between TypeScript and Python audit implementations.
@@ -247,7 +274,9 @@ export async function loadAllHypotheses(): Promise<Hypothesis[]> {
   if (_allHypothesesCache) return _allHypothesesCache;
   _allHypothesesCache = (async () => {
     const files = await listHypothesisFiles();
-    const all = await Promise.all(files.map((f) => parseHypothesis(f)));
+    const all = await Promise.all(
+      files.filter((file) => !isPublicationHeld(basename(file, ".yaml"))).map((f) => parseHypothesis(f))
+    );
     // Skip files that failed to parse rather than 500ing the whole site —
     // a malformed hypothesis YAML should be a per-file warning, not a global crash.
     const ok = all.filter((h): h is Hypothesis => h !== null);

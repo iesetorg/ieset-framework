@@ -14,10 +14,16 @@ import { readdir, rename, stat, writeFile, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  loadPublicationHolds,
+  projectEvidenceAudit,
+  projectPublicCensus,
+} from "./publication_holds.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(__dirname, "..", "out");
 const API = join(OUT, "api");
+const REPO_ROOT = resolve(__dirname, "..", "..");
 
 if (!existsSync(API)) {
   console.error(`post_build_api: ${API} does not exist — skipping`);
@@ -86,13 +92,20 @@ if (existing.includes(marker)) {
 }
 await writeFile(headersPath, nextHeaders);
 
-// Publish the single-source corpus census as /stats.json for sites, LLMs, and
-// journalists that need one consistent counter surface.
-const censusSrc = resolve(__dirname, "..", "..", "engine", "public_corpus_census.json");
+// Publish rights-filtered projections. Engine audits and evidence grades remain
+// intact, while the static site counts only records that it actually serves.
+const holds = loadPublicationHolds(REPO_ROOT);
+const auditSrc = join(REPO_ROOT, "engine", "evidence_tier_audit.json");
+const evidenceDest = join(OUT, "evidence-tiers.json");
+const audit = projectEvidenceAudit(JSON.parse(await readFile(auditSrc, "utf8")), holds);
+await writeFile(evidenceDest, JSON.stringify(audit, null, 2) + "\n");
+console.log(`post_build_api: wrote ${evidenceDest} (${audit.summary.public_visible} published results)`);
+
+const censusSrc = join(REPO_ROOT, "engine", "public_corpus_census.json");
 const statsDest = join(OUT, "stats.json");
 if (existsSync(censusSrc)) {
-  const census = await readFile(censusSrc, "utf8");
-  await writeFile(statsDest, census);
+  const census = projectPublicCensus(JSON.parse(await readFile(censusSrc, "utf8")), audit, holds, REPO_ROOT);
+  await writeFile(statsDest, JSON.stringify(census, null, 2) + "\n");
   console.log(`post_build_api: wrote ${statsDest}`);
 } else {
   console.warn(`post_build_api: census missing at ${censusSrc} — stats.json not written`);

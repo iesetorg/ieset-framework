@@ -7,6 +7,7 @@ import {
   scoreAllPositions,
 } from "@/lib/content";
 import { loadPublicCensus } from "@/lib/stats";
+import { publicationHoldCounts } from "@/lib/publication-holds";
 import { PUBLIC_GITHUB_REPO, PUBLIC_SITE_ORIGIN } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -154,6 +155,11 @@ export default async function EvidencePage() {
         registration, a real replication, a sharpened falsification rule, and
         the estimator floor all have to pass before a result enters the public
         evidence set.
+      </p>
+
+      <p className="mt-3 max-w-[860px] text-[13px] leading-[1.6] text-muted">
+        {publicationHoldCounts.records} research records, including {publicationHoldCounts.evidenceQualified} evidence-qualified results,
+        are held from this published catalog while source rights are reviewed. Their research verdicts and evidence grades have not been changed.
       </p>
 
       <section className="mt-8 rounded border border-amber bg-[#fff8e8] p-5">
