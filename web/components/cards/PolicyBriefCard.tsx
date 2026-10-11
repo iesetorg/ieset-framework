@@ -237,7 +237,11 @@ export function PolicyBriefCard({
   run: RunArtifacts;
   variables: VariableWithRole[];
 }) {
-  const question = plainQuestion(hypothesis, variables);
+  // Before a first run, keep the public summary tied to the actual frozen
+  // prediction. Topic-level summaries can describe a different claim.
+  const question = run.exists
+    ? plainQuestion(hypothesis, variables)
+    : hypothesis.claim.replace(/\s+/g, " ").trim();
   const measured = measureGroups(variables);
   const confidence = confidenceLabel(run);
 
@@ -251,7 +255,7 @@ export function PolicyBriefCard({
           </span>
         </div>
         <h2 className="m-0 max-w-[900px] text-[22px] font-semibold leading-[1.25] text-ink">
-          In ordinary language
+          {run.exists ? "In ordinary language" : "Registered prediction"}
         </h2>
         <p className="mb-0 mt-2 max-w-[860px] text-[16px] leading-[1.55] text-ink">
           {question}
@@ -266,7 +270,11 @@ export function PolicyBriefCard({
           </div>
           <div className="mb-5">
             <div className="sc mb-1.5 text-[10px] font-semibold text-muted">why it matters</div>
-            <p className="m-0 text-[14px] leading-[1.6] text-muted">{whyItMatters(hypothesis)}</p>
+            <p className="m-0 text-[14px] leading-[1.6] text-muted">
+              {run.exists
+                ? whyItMatters(hypothesis)
+                : "The prespecified data and decision rule will test this prediction. Its outcome is unknown until the first run."}
+            </p>
           </div>
           <div>
             <div className="sc mb-1.5 text-[10px] font-semibold text-muted">how the test works</div>
