@@ -1,0 +1,161 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: eu27_material_accounting_decoupling_gap_2016_2026_forward
+version: 1
+status: pre_registered
+topic: growth
+evidence_type: descriptive
+claim_direction: '+'
+claim: >-
+  Among the fixed EU-27 member states with higher real GDP per person in 2026
+  than in 2016, the share with a fall in direct-mass domestic material
+  consumption per person will exceed the share with a fall in consumption-based
+  raw material consumption per person by more than ten percentage points.
+methodology_note: >-
+  New, single-family prospective comparison of apparent domestic material use
+  (DMC) and consumption-based material footprint (RMC). The 2026 endpoint has
+  not been released in the selected Eurostat RMC dataset at registration. The
+  2016 endpoint and past aggregate and country data are public; this is not a
+  blind historical-data study. A country bootstrap tests whether the claimed
+  gap is stable to country composition, not whether the fixed EU-27 census was
+  randomly sampled. This is a measurement comparison, not a causal test of
+  offshoring, a test of total global extraction, or a test of degrowth policy.
+sample:
+  countries: &eu27
+    [AUT, BEL, BGR, HRV, CYP, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN,
+     IRL, ITA, LVA, LTU, LUX, MLT, NLD, POL, PRT, ROU, SVK, SVN, ESP, SWE]
+  period: &window [2016, 2026]
+  temporal_structure: cross_section_with_justification
+  cross_section_justification: >-
+    The estimand is the paired within-country change over the same fixed
+    ten-year window, compared across all 27 EU countries; intermediate-year
+    variation is outside this one prespecified endpoint test.
+  exclusion_rules:
+    - >-
+      Use only the 27 listed EU member states, with Eurostat geo codes AT, BE,
+      BG, HR, CY, CZ, DK, EE, FI, FR, DE, EL, HU, IE, IT, LV, LT, LU, MT,
+      NL, PL, PT, RO, SK, SI, ES, SE respectively. Exclude EU and euro-area
+      aggregate rows; do not substitute a changed membership roster.
+    - >-
+      Require positive finite values for each country's 2016 and 2026 real
+      GDP per person, DMC per person, and RMC per person in one common
+      Eurostat fetch vintage. Require all 27 complete country pairs; otherwise
+      mark INCONCLUSIVE_DATA_PENDING without a sample substitution.
+    - >-
+      Use annual, total-material, tonnes-per-capita DMC and RMC, and annual
+      chain-linked-volume 2020-euro GDP per capita. Do not replace RMC with
+      territorial emissions, DMC, domestic extraction, or an OWID proxy.
+      Any discontinued selector or non-comparable definition is INCONCLUSIVE.
+    - >-
+      The first eligible common Eurostat retrieval on or after 2027-01-01
+      must contain all six selected 2016/2026 cells for each country. Archive
+      the three raw JSON-stat responses and dimension labels, exact request
+      URLs/parameters, response SHA-256, fetch UTC, publisher metadata,
+      license, observation flags, and manifest before reading selected cells.
+      If no complete eligible vintage exists by 2030-01-01, record
+      INCONCLUSIVE_DATA_PENDING. Do not choose a later vintage by outcome.
+    - >-
+      Estimated or provisional Eurostat flags are allowed but must be shown
+      on the result. Confidential, missing, or definition-break flags on a
+      selected endpoint make the case INCONCLUSIVE_DATA_PENDING; later
+      revisions are vintage alerts, not replacements for the first result.
+variables:
+  outcome:
+    - name: raw_material_consumption_per_capita_2016_2026
+      source: eurostat:env_ac_rme
+      transformation: >-
+        Select freq=A, indic_env=RMC, material=TOTAL, unit=T_HAB,
+        time=2016 and 2026, and the fixed geo roster. Define RMC decline
+        as RMC_2026 < RMC_2016, with equality counted as no decline.
+      notes: >-
+        Eurostat's consumption-based raw-material-equivalent footprint;
+        country estimates may be model-derived and are not additive to the
+        EU aggregate.
+    - name: domestic_material_consumption_per_capita_2016_2026
+      source: eurostat:env_ac_mfa
+      transformation: >-
+        Select freq=A, indic_env=DMC, material=TOTAL, unit=T_HAB,
+        time=2016 and 2026, and the fixed geo roster. Define DMC decline
+        as DMC_2026 < DMC_2016, with equality counted as no decline.
+      notes: >-
+        Direct-mass domestic material consumption is domestic extraction
+        plus direct physical imports less direct physical exports. It omits
+        the upstream embodied extraction added by RMC accounting.
+  treatment:
+    - name: real_gdp_per_capita_growth_2016_2026
+      source: eurostat:sdg_08_10
+      transformation: >-
+        Select freq=A, na_item=B1GQ, unit=CLV20_EUR_HAB,
+        time=2016 and 2026, and the fixed geo roster. GDP grower means
+        GDPpc_2026 > GDPpc_2016; equality is not growth.
+      notes: >-
+        Growth-condition comparator only. No intervention or causal treatment.
+estimator:
+  template: descriptive
+  random_seed: 20261011
+  notes: >-
+    For each GDP-growing country i define d_i =
+    1[DMC_2026 < DMC_2016] - 1[RMC_2026 < RMC_2016].
+    The only primary estimand is the mean of d_i over GDP growers,
+    expressed as a proportion (one unit = 100 percentage points). Require at
+    least 20 GDP-growing countries. Draw 10,000 paired bootstrap resamples
+    of exactly that many GDP-growing country rows with replacement, using
+    NumPy Generator(PCG64(20261011)); recompute mean(d_i) for each draw.
+    The two-sided 95% percentile interval uses the 2.5th and 97.5th
+    percentiles with NumPy's linear interpolation. No country weighting,
+    covariates, alternate endpoints, one-sided interval, or second scored
+    outcome. Report the counts in each decoupling category and all 27 rows.
+falsification:
+  test: eu27_material_accounting_decoupling_gap_2016_2026_forward
+  rule: >-
+    INCONCLUSIVE_DATA_PENDING if source, definition, completeness, or
+    minimum 20 GDP-grower gates fail. Otherwise SUPPORTED only if the
+    lower bound of the prespecified paired-bootstrap 95% interval for the
+    DMC-minus-RMC decoupling-share gap exceeds +0.10. REFUTED if the upper
+    bound is at or below +0.10. All other intervals are INCONCLUSIVE. The
+    confidence interval and ten-point threshold apply to one primary
+    comparison; a weak or opposite gap cannot be recoded as support.
+  threshold:
+    family_id: eu27_material_accounting_decoupling_gap_2016_2026_forward
+    family_size: 1
+    endpoints: [2016, 2026]
+    minimum_complete_countries: 27
+    minimum_gdp_growers: 20
+    minimum_gap_proportion: 0.10
+    bootstrap_draws: 10000
+    bootstrap_seed: 20261011
+    confidence_level: 0.95
+    first_eligible_fetch_not_before: 2027-01-01
+    incomplete_cutoff: 2030-01-01
+prior_confidence: 0.55
+disclosure: >-
+  The author knows the published degrowth/offshoring argument and Eurostat's
+  reported 2025 EU aggregate footprint. A July 2026 Eurostat article also
+  displays national 2010 and 2025 footprint bars; its country ordering has
+  been seen, though no selected 2016/2026 country endpoint cells or paired
+  DMC/RMC results have been inspected. The 2026 RMC endpoint is genuinely
+  future as of registration. This background may bias the theory and
+  threshold choice. Eurostat RMC is model-derived, provisional releases and
+  revisions are possible, and this single descriptive contrast does not
+  establish offshoring causally or environmental sufficiency. It earns no
+  school result until a post-registration first run and full evidence audit.
+steelman: hypotheses/steelman/eu27_material_accounting_decoupling_gap_2016_2026_forward.md
+scope:
+  period: *window
+  countries: *eu27
+  outcome_dim: [gdp_growth, energy]
+  policy_family: [none]
+  treatment_tags: [consumption_based_accounting, material_footprint]
+covers_claims:
+  - position_id: degrowth
+    claim_index: 289
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: >-
+      Narrow prospective measurement forecast: apparent domestic material
+      consumption will overstate absolute decoupling relative to
+      consumption-based material footprint by more than ten percentage
+      points among GDP-growing EU-27 countries during 2016-2026. It does
+      not assert a causal offshoring mechanism.
+linked_hypotheses: []
+linked_conditions: []
