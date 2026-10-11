@@ -13,7 +13,7 @@ The map uses present-day reference boundaries. An authored country code does not
 | Supplemental disputed units | 1 | 1 | 0 | 0 | 0 |
 | ISO units on the current map | 174 | 38 | 7 | 13 | 0 |
 
-Authored movement records: 917 (912 national, 1 subnational, 4 supranational). 908 records use the schema's implicit national scope; classification itself may still need historical-jurisdiction review.
+Authored movement records: 921 (914 national, 1 subnational, 6 supranational). 907 records use the schema's implicit national scope; classification itself may still need historical-jurisdiction review.
 
 A missing movement is a documented research gap. Empty ideological alignments remain unclassified. Neither a broad ongoing range nor an inherited country code supplies missing historical evidence.
 
@@ -38,14 +38,14 @@ First/last below refer to national movement start years; coverage end is shown s
 | ATF | French Southern Territories | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | ATG | Antigua and Barbuda | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | AUS | Australia | country_or_territory | yes | 10 | 1975 | 2022 | 2026 | 0 | 10 | 63 | 1975 |
-| AUT | Austria | country_or_territory | yes | 11 | 1970 | 2025 | 2026 | 0 | 11 | 44 | 1970 |
+| AUT | Austria | country_or_territory | yes | 11 | 1970 | 2025 | 2026 | 0 | 11 | 42 | 1970 |
 | AZE | Azerbaijan | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | BDI | Burundi | country_or_territory | yes | 1 | 2020 | 2020 | 2026 | 0 | 1 | 4 | 1964 |
-| BEL | Belgium | country_or_territory | yes | 10 | 1974 | 2014 | 2025 | 0 | 10 | 43 | 1974 |
+| BEL | Belgium | country_or_territory | yes | 8 | 1974 | 2014 | 2025 | 0 | 8 | 41 | 1974 |
 | BEN | Benin | country_or_territory | yes | 2 | 2016 | 2026 | 2026 | 0 | 1 | 3 | 2018 |
 | BES | Bonaire, Sint Eustatius and Saba | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | BFA | Burkina Faso | country_or_territory | yes | 1 | 2022 | 2022 | 2026 | 0 | 1 | 4 | 2023 |
-| BGD | Bangladesh | country_or_territory | yes | 6 | 1972 | 2026 | 2026 | 0 | 5 | 22 | 1972 |
+| BGD | Bangladesh | country_or_territory | yes | 6 | 1972 | 2026 | 2026 | 0 | 5 | 23 | 1972 |
 | BGR | Bulgaria | country_or_territory | yes | 6 | 1944 | 2026 | 2026 | 0 | 5 | 9 | 1946 |
 | BHR | Bahrain | country_or_territory | no | 1 | 2020 | 2020 | 2026 | 0 | 1 | 5 | 1973 |
 | BHS | Bahamas | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
@@ -54,7 +54,7 @@ First/last below refer to national movement start years; coverage end is shown s
 | BLR | Belarus | country_or_territory | yes | 1 | 1994 | 1994 | 2026 | 0 | 1 | 3 | 1994 |
 | BLZ | Belize | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | BMU | Bermuda | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| BOL | Bolivia, Plurinational State of | country_or_territory | yes | 11 | 1985 | 2025 | 2026 | 0 | 10 | 35 | 1985 |
+| BOL | Bolivia, Plurinational State of | country_or_territory | yes | 11 | 1985 | 2025 | 2026 | 0 | 10 | 37 | 1985 |
 | BRA | Brazil | country_or_territory | yes | 14 | 1974 | 2023 | 2026 | 0 | 14 | 80 | 1974 |
 | BRB | Barbados | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | BRN | Brunei Darussalam | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
@@ -64,9 +64,9 @@ First/last below refer to national movement start years; coverage end is shown s
 | CAF | Central African Republic | country_or_territory | yes | 1 | 2019 | 2019 | 2026 | 0 | 1 | 3 | 2019 |
 | CAN | Canada | country_or_territory | yes | 20 | 1867 | 2025 | 2026 | 0 | 20 | 65 | 1867 |
 | CCK | Cocos (Keeling) Islands | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| CHE | Switzerland | country_or_territory | yes | 3 | 1959 | 2011 | 2026 | 0 | 2 | 9 | 1959 |
+| CHE | Switzerland | country_or_territory | yes | 3 | 1959 | 2011 | 2026 | 0 | 3 | 19 | 1959 |
 | CHL | Chile | country_or_territory | yes | 10 | 1975 | 2026 | 2026 | 0 | 9 | 50 | 1975 |
-| CHN | China | country_or_territory | yes | 7 | 1976 | 2012 | 2026 | 0 | 7 | 41 | 1976 |
+| CHN | China | country_or_territory | yes | 7 | 1976 | 2012 | 2026 | 0 | 7 | 42 | 1976 |
 | CIV | Côte d'Ivoire | country_or_territory | yes | 4 | 1960 | 2011 | 2026 | 0 | 4 | 6 | 1960 |
 | CMR | Cameroon | country_or_territory | yes | 1 | 2018 | 2018 | 2026 | 0 | 1 | 3 | 2019 |
 | COD | Congo, The Democratic Republic of the | country_or_territory | yes | 6 | 1965 | 2024 | 2026 | 0 | 6 | 9 | 1967 |
@@ -82,28 +82,28 @@ First/last below refer to national movement start years; coverage end is shown s
 | CXR | Christmas Island | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | CYM | Cayman Islands | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | CYP | Cyprus | country_or_territory | yes | 2 | 2004 | 2022 | 2026 | 0 | 2 | 6 | 1963 |
-| CZE | Czechia | country_or_territory | yes | 10 | 1993 | 2025 | 2026 | 0 | 9 | 34 | 1993 |
-| DEU | Germany | country_or_territory | yes | 23 | 1871 | 2025 | 2026 | 0 | 23 | 81 | 1871 |
+| CZE | Czechia | country_or_territory | yes | 10 | 1993 | 2025 | 2026 | 0 | 10 | 38 | 1993 |
+| DEU | Germany | country_or_territory | yes | 21 | 1871 | 2025 | 2026 | 0 | 21 | 80 | 1871 |
 | DJI | Djibouti | country_or_territory | yes | 1 | 2014 | 2014 | 2026 | 0 | 1 | 3 | 2014 |
 | DMA | Dominica | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| DNK | Denmark | country_or_territory | yes | 9 | 1975 | 2019 | 2026 | 0 | 9 | 37 | 1975 |
+| DNK | Denmark | country_or_territory | yes | 8 | 1975 | 2019 | 2026 | 1 | 8 | 37 | 1975 |
 | DOM | Dominican Republic | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | DZA | Algeria | country_or_territory | yes | 5 | 1962 | 2019 | 2026 | 0 | 5 | 7 | 1963 |
 | ECU | Ecuador | country_or_territory | yes | 11 | 1988 | 2023 | 2026 | 0 | 11 | 48 | 1988 |
 | EGY | Egypt | country_or_territory | yes | 9 | 1976 | 2024 | 2026 | 0 | 9 | 40 | 1976 |
 | ERI | Eritrea | country_or_territory | yes | 1 | 1994 | 1994 | 2026 | 0 | 1 | 3 | 1995 |
 | ESH | Western Sahara | country_or_territory | yes | 1 | 1991 | 1991 | 2026 | 0 | 1 | 0 | — |
-| ESP | Spain | country_or_territory | yes | 11 | 1977 | 2018 | 2026 | 0 | 11 | 61 | 1977 |
-| EST | Estonia | country_or_territory | yes | 4 | 1994 | 2021 | 2026 | 0 | 4 | 8 | 1994 |
+| ESP | Spain | country_or_territory | yes | 9 | 1977 | 2018 | 2026 | 0 | 9 | 58 | 1977 |
+| EST | Estonia | country_or_territory | yes | 4 | 1994 | 2021 | 2026 | 0 | 4 | 8 | 1993 |
 | ETH | Ethiopia | country_or_territory | yes | 5 | 1974 | 2018 | 2026 | 0 | 5 | 26 | 1974 |
-| FIN | Finland | country_or_territory | yes | 14 | 1977 | 2023 | 2026 | 0 | 14 | 43 | 1977 |
+| FIN | Finland | country_or_territory | yes | 13 | 1977 | 2023 | 2026 | 0 | 13 | 41 | 1977 |
 | FJI | Fiji | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | FLK | Falkland Islands (Malvinas) | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
-| FRA | France | country_or_territory | yes | 23 | 1789 | 2017 | 2026 | 0 | 23 | 97 | 1789 |
+| FRA | France | country_or_territory | yes | 24 | 1789 | 2017 | 2026 | 0 | 24 | 97 | 1788 |
 | FRO | Faroe Islands | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | FSM | Micronesia, Federated States of | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | GAB | Gabon | country_or_territory | yes | 2 | 2009 | 2023 | 2026 | 0 | 2 | 4 | 2009 |
-| GBR | United Kingdom | country_or_territory | yes | 24 | 1846 | 2024 | 2026 | 0 | 24 | 119 | 1846 |
+| GBR | United Kingdom | country_or_territory | yes | 23 | 1846 | 2024 | 2026 | 0 | 23 | 134 | 1802 |
 | GEO | Georgia | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | GGY | Guernsey | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | GHA | Ghana | country_or_territory | yes | 6 | 1983 | 2025 | 2026 | 0 | 6 | 13 | 1983 |
@@ -113,7 +113,7 @@ First/last below refer to national movement start years; coverage end is shown s
 | GMB | Gambia | country_or_territory | yes | 2 | 1994 | 2017 | 2026 | 0 | 2 | 5 | 1994 |
 | GNB | Guinea-Bissau | country_or_territory | yes | 2 | 2020 | 2025 | 2026 | 0 | 2 | 5 | 2022 |
 | GNQ | Equatorial Guinea | country_or_territory | yes | 1 | 2019 | 2019 | 2026 | 0 | 1 | 3 | 2019 |
-| GRC | Greece | country_or_territory | yes | 14 | 1974 | 2019 | 2026 | 0 | 14 | 65 | 1974 |
+| GRC | Greece | country_or_territory | yes | 12 | 1974 | 2019 | 2026 | 0 | 12 | 62 | 1974 |
 | GRD | Grenada | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | GRL | Greenland | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | GTM | Guatemala | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
@@ -125,28 +125,28 @@ First/last below refer to national movement start years; coverage end is shown s
 | HND | Honduras | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | HRV | Croatia | country_or_territory | yes | 3 | 1991 | 2016 | 2026 | 0 | 3 | 5 | 1991 |
 | HTI | Haiti | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
-| HUN | Hungary | country_or_territory | yes | 11 | 1968 | 2026 | 2026 | 0 | 10 | 47 | 1968 |
+| HUN | Hungary | country_or_territory | yes | 11 | 1968 | 2026 | 2026 | 0 | 11 | 50 | 1968 |
 | IDN | Indonesia | country_or_territory | yes | 10 | 1966 | 2024 | 2026 | 0 | 10 | 57 | 1966 |
 | IMN | Isle of Man | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | IND | India | country_or_territory | yes | 16 | 1909 | 2024 | 2026 | 0 | 16 | 82 | 1909 |
 | IOT | British Indian Ocean Territory | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| IRL | Ireland | country_or_territory | yes | 14 | 1977 | 2024 | 2025 | 1 | 14 | 61 | 1977 |
+| IRL | Ireland | country_or_territory | yes | 12 | 1977 | 2024 | 2025 | 1 | 12 | 58 | 1977 |
 | IRN | Iran, Islamic Republic of | country_or_territory | yes | 10 | 1974 | 2024 | 2026 | 0 | 10 | 43 | 1974 |
 | IRQ | Iraq | country_or_territory | yes | 5 | 1968 | 2022 | 2026 | 0 | 5 | 7 | 1970 |
 | ISL | Iceland | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | ISR | Israel | country_or_territory | yes | 17 | 1977 | 2022 | 2026 | 0 | 17 | 72 | 1977 |
-| ITA | Italy | country_or_territory | yes | 27 | 1861 | 2022 | 2026 | 0 | 27 | 103 | 1861 |
+| ITA | Italy | country_or_territory | yes | 25 | 1861 | 2022 | 2026 | 0 | 25 | 100 | 1861 |
 | JAM | Jamaica | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | JEY | Jersey | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | JOR | Jordan | country_or_territory | yes | 1 | 2022 | 2022 | 2026 | 0 | 1 | 4 | 1959 |
-| JPN | Japan | country_or_territory | yes | 24 | 1868 | 2025 | 2026 | 0 | 24 | 105 | 1868 |
+| JPN | Japan | country_or_territory | yes | 24 | 1868 | 2025 | 2026 | 0 | 24 | 107 | 1868 |
 | KAZ | Kazakhstan | country_or_territory | yes | 2 | 1991 | 2019 | 2026 | 0 | 2 | 4 | 1993 |
 | KEN | Kenya | country_or_territory | yes | 6 | 1978 | 2022 | 2026 | 0 | 6 | 29 | 1980 |
 | KGZ | Kyrgyzstan | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | KHM | Cambodia | country_or_territory | yes | 4 | 1975 | 2023 | 2026 | 0 | 4 | 7 | 1975 |
 | KIR | Kiribati | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | KNA | Saint Kitts and Nevis | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| KOR | Korea, Republic of | country_or_territory | yes | 11 | 1961 | 2025 | 2026 | 0 | 11 | 62 | 1961 |
+| KOR | Korea, Republic of | country_or_territory | yes | 11 | 1961 | 2025 | 2026 | 0 | 11 | 63 | 1961 |
 | KWT | Kuwait | country_or_territory | yes | 1 | 1961 | 1961 | 2026 | 0 | 1 | 5 | 1961 |
 | LAO | Lao People's Democratic Republic | country_or_territory | yes | 5 | 1975 | 2021 | 2026 | 0 | 5 | 7 | 1975 |
 | LBN | Lebanon | country_or_territory | yes | 3 | 1992 | 2025 | 2026 | 0 | 3 | 13 | 1992 |
@@ -166,7 +166,7 @@ First/last below refer to national movement start years; coverage end is shown s
 | MDA | Moldova, Republic of | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | MDG | Madagascar | country_or_territory | yes | 1 | 2024 | 2024 | 2026 | 0 | 1 | 3 | 2024 |
 | MDV | Maldives | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| MEX | Mexico | country_or_territory | yes | 9 | 1976 | 2024 | 2026 | 0 | 9 | 57 | 1976 |
+| MEX | Mexico | country_or_territory | yes | 9 | 1976 | 2024 | 2026 | 0 | 9 | 55 | 1976 |
 | MHL | Marshall Islands | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | MKD | North Macedonia | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | MLI | Mali | country_or_territory | yes | 5 | 1960 | 2020 | 2026 | 0 | 5 | 8 | 1960 |
@@ -188,13 +188,13 @@ First/last below refer to national movement start years; coverage end is shown s
 | NER | Niger | country_or_territory | yes | 1 | 2023 | 2023 | 2026 | 0 | 1 | 4 | 2024 |
 | NFK | Norfolk Island | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | NGA | Nigeria | country_or_territory | yes | 11 | 1975 | 2023 | 2026 | 0 | 11 | 56 | 1975 |
-| NIC | Nicaragua | country_or_territory | yes | 3 | 1979 | 2007 | 2026 | 0 | 2 | 7 | 1979 |
+| NIC | Nicaragua | country_or_territory | yes | 3 | 1979 | 2007 | 2026 | 0 | 2 | 10 | 1979 |
 | NIU | Niue | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| NLD | Netherlands | country_or_territory | yes | 14 | 1977 | 2024 | 2026 | 0 | 14 | 64 | 1977 |
+| NLD | Netherlands | country_or_territory | yes | 12 | 1977 | 2024 | 2026 | 0 | 12 | 62 | 1977 |
 | NOR | Norway | country_or_territory | yes | 10 | 1973 | 2021 | 2026 | 0 | 10 | 36 | 1973 |
 | NPL | Nepal | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | NRU | Nauru | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| NZL | New Zealand | country_or_territory | yes | 10 | 1975 | 2023 | 2026 | 0 | 10 | 56 | 1977 |
+| NZL | New Zealand | country_or_territory | yes | 10 | 1975 | 2023 | 2026 | 0 | 10 | 57 | 1977 |
 | OMN | Oman | country_or_territory | yes | 2 | 1970 | 2020 | 2026 | 0 | 2 | 5 | 1970 |
 | PAK | Pakistan | country_or_territory | yes | 12 | 1972 | 2024 | 2026 | 0 | 12 | 59 | 1972 |
 | PAN | Panama | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
@@ -206,7 +206,7 @@ First/last below refer to national movement start years; coverage end is shown s
 | POL | Poland | country_or_territory | yes | 12 | 1970 | 2023 | 2026 | 0 | 12 | 51 | 1971 |
 | PRI | Puerto Rico | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | PRK | Korea, Democratic People's Republic of | country_or_territory | yes | 1 | 2021 | 2021 | 2026 | 0 | 1 | 1 | 2026 |
-| PRT | Portugal | country_or_territory | yes | 11 | 1974 | 2024 | 2026 | 0 | 11 | 50 | 1974 |
+| PRT | Portugal | country_or_territory | yes | 9 | 1974 | 2024 | 2026 | 0 | 9 | 47 | 1974 |
 | PRY | Paraguay | country_or_territory | yes | 3 | 1954 | 2023 | 2026 | 0 | 3 | 7 | 1954 |
 | PSE | Palestine, State of | country_or_territory | yes | 1 | 1994 | 1994 | 2026 | 0 | 1 | 3 | 1997 |
 | PYF | French Polynesia | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
@@ -224,7 +224,7 @@ First/last below refer to national movement start years; coverage end is shown s
 | SJM | Svalbard and Jan Mayen | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | SLB | Solomon Islands | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | SLE | Sierra Leone | country_or_territory | yes | 1 | 2018 | 2018 | 2026 | 0 | 1 | 4 | 2018 |
-| SLV | El Salvador | country_or_territory | yes | 3 | 2014 | 2024 | 2026 | 0 | 3 | 17 | 2014 |
+| SLV | El Salvador | country_or_territory | yes | 3 | 2014 | 2024 | 2026 | 0 | 3 | 18 | 2014 |
 | SMR | San Marino | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | SOM | Somalia | country_or_territory | yes | 1 | 2022 | 2022 | 2026 | 0 | 1 | 4 | 2023 |
 | SPM | Saint Pierre and Miquelon | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
@@ -253,20 +253,20 @@ First/last below refer to national movement start years; coverage end is shown s
 | TUN | Tunisia | country_or_territory | yes | 4 | 1956 | 2022 | 2026 | 0 | 4 | 6 | 1956 |
 | TUR | Türkiye | country_or_territory | yes | 10 | 1975 | 2023 | 2026 | 0 | 10 | 46 | 1977 |
 | TUV | Tuvalu | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| TWN | Taiwan, Province of China | country_or_territory | yes | 6 | 1973 | 2024 | 2026 | 0 | 5 | 5 | 1973 |
-| TZA | Tanzania, United Republic of | country_or_territory | yes | 5 | 1967 | 2021 | 2026 | 0 | 4 | 12 | 1967 |
+| TWN | Taiwan, Province of China | country_or_territory | yes | 6 | 1973 | 2024 | 2026 | 0 | 6 | 9 | 1973 |
+| TZA | Tanzania, United Republic of | country_or_territory | yes | 5 | 1967 | 2021 | 2026 | 0 | 5 | 13 | 1967 |
 | UGA | Uganda | country_or_territory | yes | 2 | 2021 | 2026 | 2026 | 0 | 1 | 5 | 1966 |
 | UKR | Ukraine | country_or_territory | yes | 7 | 1991 | 2022 | 2026 | 0 | 7 | 9 | 1991 |
 | UMI | United States Minor Outlying Islands | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | URY | Uruguay | country_or_territory | yes | 6 | 1915 | 2025 | 2026 | 1 | 6 | 28 | 1896 |
-| USA | United States | country_or_territory | yes | 38 | 1789 | 2025 | 2026 | 0 | 38 | 185 | 1789 |
+| USA | United States | country_or_territory | yes | 38 | 1789 | 2025 | 2026 | 0 | 38 | 188 | 1781 |
 | UZB | Uzbekistan | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | VAT | Holy See (Vatican City State) | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | VCT | Saint Vincent and the Grenadines | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | VEN | Venezuela, Bolivarian Republic of | country_or_territory | yes | 7 | 1974 | 2013 | 2026 | 0 | 7 | 35 | 1974 |
 | VGB | Virgin Islands, British | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | VIR | Virgin Islands, U.S. | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
-| VNM | Viet Nam | country_or_territory | yes | 9 | 1976 | 2024 | 2026 | 0 | 9 | 44 | 1976 |
+| VNM | Viet Nam | country_or_territory | yes | 9 | 1976 | 2024 | 2026 | 0 | 9 | 43 | 1976 |
 | VUT | Vanuatu | country_or_territory | yes | 0 | — | — | — | 0 | 0 | 0 | — |
 | WLF | Wallis and Futuna | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |
 | WSM | Samoa | country_or_territory | no | 0 | — | — | — | 0 | 0 | 0 | — |

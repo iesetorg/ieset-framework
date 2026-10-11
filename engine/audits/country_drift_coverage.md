@@ -6,17 +6,17 @@ As of **2026**. This report is a source-review queue. Every movement and policy 
 
 | Measure | Count |
 | --- | ---: |
-| Authored movement records | 917 |
-| Movement records included in drift | 911 |
+| Authored movement records | 921 |
+| Movement records included in drift | 915 |
 | Countries with a plotted movement | 147 |
-| Countries with one plotted movement | 37 |
+| Countries with one plotted movement | 36 |
 | Countries with at most 2 plotted movements | 49 |
-| Countries first coded after 2000 | 35 |
-| Countries with internal uncovered intervals | 3 |
+| Countries first coded after 2000 | 34 |
+| Countries with internal uncovered intervals | 4 |
 | Countries lacking 2026 coverage, including policy-only countries | 1 |
-| Existing policy records flagged for research | 66 |
-| Overlapping authored movement pairs sharing policy IDs | 67 |
-| EU supranational geographic scope records to review | 4 |
+| Existing policy records flagged for research | 77 |
+| Overlapping authored movement pairs sharing policy IDs | 72 |
+| EU supranational geographic scope records to review | 5 |
 
 ## Missing current coverage
 
@@ -61,9 +61,8 @@ These are coverage observations. No movement is inferred from a date gap.
 | BEN | 2016 | 2 | 2026 |
 | DJI | 2014 | 1 | 2014 |
 | MOZ | 2014 | 1 | 2014 |
-| SLV | 2014 | 3 | 2024 |
+| SLV | 2014 | 3 | 2025 |
 | GAB | 2009 | 2 | 2023 |
-| LUX | 2008 | 1 | 2008 |
 | CYP | 2004 | 2 | 2022 |
 | MLT | 2004 | 2 | 2020 |
 | TLS | 2002 | 1 | 2002 |
@@ -72,6 +71,7 @@ These are coverage observations. No movement is inferred from a date gap.
 | ERI | 1994 | 1 | 1994 |
 | PSE | 1994 | 1 | 1994 |
 | GMB | 1994 | 2 | 2017 |
+| LUX | 1992 | 2 | 2020 |
 | ESH | 1991 | 1 | 1991 |
 | KAZ | 1991 | 2 | 2019 |
 | NAM | 1990 | 2 | 2020 |
@@ -92,8 +92,9 @@ Intervals between authored movement timeframes, after excluding context-only and
 | URY | 1916 | 2004 | 89 |
 | SYC | 1979 | 2007 | 29 |
 | LSO | 2001 | 2021 | 21 |
+| LUX | 2000 | 2007 | 8 |
 
-The full list of 3 internal intervals is in the JSON report.
+The full list of 4 internal intervals is in the JSON report.
 
 ## Existing dated policy leads
 
@@ -101,14 +102,13 @@ These policy records may help locate missing movements or repair existing links.
 
 | Reason | Policy-country records |
 | --- | ---: |
-| `before_first_coded_year` | 19 |
+| `before_first_coded_year` | 31 |
 | `enactor_timeframe_mismatch` | 37 |
 | `internal_uncovered_year` | 1 |
-| `linked_only_to_nonplotted_movement` | 11 |
+| `linked_only_to_nonplotted_movement` | 10 |
 
 | ISO3 | Year | Date basis | Scope | Existing policy | Review reason |
 | --- | ---: | --- | --- | --- | --- |
-| AUS | 1983 | timeframe.start_proxy | national | [au_hawke_keating_reform_package_1983_1996](../../policies/au_hawke_keating_reform_package_1983_1996.yaml) | enactor_timeframe_mismatch |
 | AUS | 2011 | enacted_date | national | [au_carbon_tax_repeal_2014](../../policies/au_carbon_tax_repeal_2014.yaml) | enactor_timeframe_mismatch |
 | AUS | 2011 | timeframe.start_proxy | national | [australia_clean_energy_act_2011](../../policies/australia_clean_energy_act_2011.yaml) | enactor_timeframe_mismatch |
 | AUS | 2011 | timeframe.start_proxy | national | [australia_emissions_reduction_fund_2014](../../policies/australia_emissions_reduction_fund_2014.yaml) | enactor_timeframe_mismatch |
@@ -124,6 +124,17 @@ These policy records may help locate missing movements or repair existing links.
 | CYP | 1963 | timeframe.start_proxy | national | [cyp_central_bank_law_1963](../../policies/cyp_central_bank_law_1963.yaml) | before_first_coded_year |
 | DZA | 1986 | timeframe.start_proxy | national | [dz_market_transition_and_stabilization_1989](../../policies/dz_market_transition_and_stabilization_1989.yaml) | enactor_timeframe_mismatch |
 | EGY | 2015 | timeframe.start_proxy | national | [eg_new_administrative_capital_2015_ongoing](../../policies/eg_new_administrative_capital_2015_ongoing.yaml) | enactor_timeframe_mismatch |
+| EST | 1993 | enacted_date | national | [estonia_flat_tax_1994](../../policies/estonia_flat_tax_1994.yaml) | before_first_coded_year, enactor_timeframe_mismatch |
+| FRA | 1788 | timeframe.start_proxy | national | [fr_non_catholic_civil_status_edict_1787_1788](../../policies/fr_non_catholic_civil_status_edict_1787_1788.yaml) | before_first_coded_year |
+| GBR | 1802 | enacted_date | national | [uk_parish_apprentices_act_1802](../../policies/uk_parish_apprentices_act_1802.yaml) | before_first_coded_year |
+| GBR | 1815 | enacted_date | national | [uk_corn_importation_act_1815](../../policies/uk_corn_importation_act_1815.yaml) | before_first_coded_year |
+| GBR | 1824 | enacted_date | national | [uk_combination_of_workmen_act_1824](../../policies/uk_combination_of_workmen_act_1824.yaml) | before_first_coded_year |
+| GBR | 1825 | enacted_date | national | [uk_combination_of_workmen_act_1825](../../policies/uk_combination_of_workmen_act_1825.yaml) | before_first_coded_year |
+| GBR | 1829 | enacted_date | national | [uk_roman_catholic_relief_act_1829](../../policies/uk_roman_catholic_relief_act_1829.yaml) | before_first_coded_year |
+| GBR | 1833 | enacted_date | national | [uk_factory_act_1833_january_1834_rules](../../policies/uk_factory_act_1833_january_1834_rules.yaml) | before_first_coded_year |
+| GBR | 1842 | enacted_date | national | [uk_mines_collieries_act_1842_women_children](../../policies/uk_mines_collieries_act_1842_women_children.yaml) | before_first_coded_year |
+| GBR | 1844 | enacted_date | national | [uk_bank_charter_act_1844_note_issue](../../policies/uk_bank_charter_act_1844_note_issue.yaml) | before_first_coded_year |
+| GBR | 1844 | enacted_date | national | [uk_factory_act_1844_women_hours](../../policies/uk_factory_act_1844_women_hours.yaml) | before_first_coded_year |
 | GRC | 1992 | enacted_date | national | [greece_social_security_law_2084_implementation](../../policies/greece_social_security_law_2084_implementation.yaml) | enactor_timeframe_mismatch |
 | HUN | 1987 | enacted_date | national | [hu_two_tier_banking_1987_1989](../../policies/hu_two_tier_banking_1987_1989.yaml) | enactor_timeframe_mismatch |
 | HUN | 2021 | enacted_date | national | [hu_price_caps_fuel_food_2021_2023](../../policies/hu_price_caps_fuel_food_2021_2023.yaml) | enactor_timeframe_mismatch |
@@ -139,7 +150,7 @@ These policy records may help locate missing movements or repair existing links.
 | LAO | 1986 | enacted_date | national | [lao_new_economic_mechanism_1986](../../policies/lao_new_economic_mechanism_1986.yaml) | enactor_timeframe_mismatch |
 | LSO | 1978 | timeframe.start_proxy | national | [lso_monetary_authority_act_1978](../../policies/lso_monetary_authority_act_1978.yaml) | before_first_coded_year |
 | LUX | 1842 | timeframe.start_proxy | national | [lux_zollverein_accession_1842](../../policies/lux_zollverein_accession_1842.yaml) | before_first_coded_year |
-| LUX | 1983 | timeframe.start_proxy | national | [lux_monetary_institute_supervision_1983](../../policies/lux_monetary_institute_supervision_1983.yaml) | before_first_coded_year |
+| LUX | 1983 | enacted_date | national | [lux_monetary_institute_supervision_1983](../../policies/lux_monetary_institute_supervision_1983.yaml) | before_first_coded_year |
 | MLT | 1967 | enacted_date | national | [mlt_central_bank_act_1967](../../policies/mlt_central_bank_act_1967.yaml) | before_first_coded_year |
 | MMR | 1988 | enacted_date | national | [mmr_partial_market_opening_1988](../../policies/mmr_partial_market_opening_1988.yaml) | enactor_timeframe_mismatch |
 | PAK | 2023 | enacted_date | national | [pk_imf_sba_3bn_2023](../../policies/pk_imf_sba_3bn_2023.yaml) | enactor_timeframe_mismatch |
@@ -148,22 +159,12 @@ These policy records may help locate missing movements or repair existing links.
 | PHL | 1973 | enacted_date | national | [ph_coconut_levy_cojuangco_1973_1986](../../policies/ph_coconut_levy_cojuangco_1973_1986.yaml) | enactor_timeframe_mismatch |
 | POL | 1998 | enacted_date | national | [pl_pension_reform_1997_1999](../../policies/pl_pension_reform_1997_1999.yaml) | enactor_timeframe_mismatch |
 | QAT | 1973 | timeframe.start_proxy | national | [qat_monetary_agency_law_1973](../../policies/qat_monetary_agency_law_1973.yaml) | before_first_coded_year |
-| QAT | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | before_first_coded_year |
-| RWA | 2020 | timeframe.start_proxy | national | [rw_kigali_financial_centre_buildout](../../policies/rw_kigali_financial_centre_buildout.yaml) | enactor_timeframe_mismatch |
-| SAU | 1981 | enacted_date | national | [ae_gcc_founding_1981](../../policies/ae_gcc_founding_1981.yaml) | enactor_timeframe_mismatch |
-| SGP | 1955 | timeframe.start_proxy | national | [singapore_cpf_1955](../../policies/singapore_cpf_1955.yaml) | before_first_coded_year, linked_only_to_nonplotted_movement |
-| SGP | 1955 | enacted_date | national | [singapore_cpf_establishment_1955](../../policies/singapore_cpf_establishment_1955.yaml) | before_first_coded_year, linked_only_to_nonplotted_movement |
-| SWE | 1985 | enacted_date | national | [se_november_revolution_credit_dereg_1985](../../policies/se_november_revolution_credit_dereg_1985.yaml) | enactor_timeframe_mismatch |
-| SWE | 2022 | enacted_date | national | [se_las_employment_protection_reform_2019_2022](../../policies/se_las_employment_protection_reform_2019_2022.yaml) | enactor_timeframe_mismatch |
-| SWZ | 1974 | enacted_date | national | [swz_monetary_authority_order_1974](../../policies/swz_monetary_authority_order_1974.yaml) | before_first_coded_year |
-| THA | 1987 | timeframe.start_proxy | national | [th_sixth_5yr_plan_acceleration_1988](../../policies/th_sixth_5yr_plan_acceleration_1988.yaml) | enactor_timeframe_mismatch |
-| TLS | 1999 | enacted_date | national | [id_east_timor_referendum_1999](../../policies/id_east_timor_referendum_1999.yaml) | before_first_coded_year |
 
-Showing 50 of 66 policy-country leads; the JSON report contains all of them.
+Showing 50 of 77 policy-country leads; the JSON report contains all of them.
 
 ## Overlap and shared-policy review
 
-There are 964 overlapping same-country authored movement pairs; 947 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
+There are 972 overlapping same-country authored movement pairs; 955 have both records included in drift. Only pairs sharing a policy ID appear below. Sharing can be legitimate across successive or parallel movements.
 
 | ISO3 | Overlap | Both plotted? | Movement pair | Shared policy IDs |
 | --- | --- | --- | --- | --- |
@@ -176,6 +177,7 @@ There are 964 overlapping same-country authored movement pairs; 947 have both re
 | BRA | 1993–1995 | yes | brazil_itamar_pmdb_1992_1995 / brazil_real_plan_cardoso_1994_2002 | brazil_plano_real_1994 |
 | BRA | 1993–2002 | yes | brazil_real_plan_1994 / brazil_real_plan_cardoso_1994_2002 | brazil_fiscal_responsibility_law_2000 |
 | CAN | 1993–1993 | yes | canada_chretien_liberal_first_1993_1997 / canada_mulroney_pc_second_1988_1993 | ca_nafta_canada_1994 |
+| CAN | 2015–2015 | yes | canada_harper_conservative_2006_2015 / canada_trudeau_2015_present | ca_ceta_2014 |
 | CHN | 1989–2002 | yes | china_jiang_era_1989_2002 / deng_xiaoping_reforms_1978 | china_wto_accession_2001 |
 | COL | 2002–2010 | yes | colombia_uribe_santos_duque_market_continuity_2002_2022 / colombia_uribe_security_market_reforms_2002_2010 | colombia_democratic_security_2002, colombia_pension_reform_law_797_2003, colombia_us_fta_2006 |
 | CZE | 2009–2009 | yes | czech_republic_fischer_caretaker_2009_2010 / czech_republic_topolanek_ods_2006_2009 | cz_lisbon_treaty_ratification_2009 |
@@ -188,10 +190,14 @@ There are 964 overlapping same-country authored movement pairs; 947 have both re
 | DEU | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
 | DEU | 2021–2022 | yes | germany_merkel_nuclear_phaseout_2011 / germany_scholz_ampel_2021_2025 | germany_energiewende_2011 |
 | DNK | 2019–2019 | yes | denmark_frederiksen_sap_broad_2019_present / denmark_lokke_rasmussen_venstre_2015_2019 | dk_ghetto_parallelsamfund_2018_2021 |
+| ECU | 2023–2023 | yes | ecuador_lasso_creo_2021_2023 / ecuador_noboa_adn_2023_present | ec_china_ftfa_2023 |
 | ESP | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
 | FIN | 2010–2010 | yes | finland_kiviniemi_centre_2010_2011 / finland_vanhanen_ii_centre_2007_2010 | fi_vat_rise_2010 |
 | FIN | 2014–2014 | yes | finland_katainen_six_party_2011_2014 / finland_stubb_kok_2014_2015 | fi_cit_20_percent_2014 |
 | FIN | 2023–2023 | yes | finland_marin_rainbow_2019_2023 / finland_orpo_rightbloc_2023_present | fi_sote_wellbeing_services_2023 |
+| FRA | 1789–1789 | yes | fr_constituent_assembly_legal_reordering_1789_1791 / fr_constituent_provincial_privilege_abolition_1789 | fr_august_decrees_1789 |
+| FRA | 1804–1804 | yes | fr_consulate_civil_codification_1804 / fr_consulate_empire_legal_state_1799_1815 | fr_civil_code_1804 |
+| FRA | 1814–1814 | yes | fr_bourbon_restoration_charter_1814 / fr_restoration_july_monarchy_1814_1848 | fr_charter_1814 |
 | FRA | 1981–1983 | yes | france_mitterrand_first_term_1981_1988 / mitterrand_nationalisations_1981_1983 | france_39_hour_week_1982, france_nationalisations_1982 |
 | FRA | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
 | GBR | 1976–1979 | yes | uk_callaghan_imf_1976 / uk_callaghan_labour_1976_1979 | uk_public_expenditure_white_paper_1976 |
@@ -201,7 +207,7 @@ There are 964 overlapping same-country authored movement pairs; 947 have both re
 | IDN | 1998–1998 | yes | indonesia_reformasi_1998_present / indonesia_suharto_new_order_1965_1998 | indonesia_imf_programme_1997 |
 | IND | 2016–2017 | yes | india_modi_first_second_term_2014_2024 / modi_demonetisation_gst_2016_2017 | india_demonetisation_2016, india_gst_2017 |
 | IRL | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
-| IRL | 2024–2024 | yes | ireland_harris_fg_2024_present / ireland_varadkar_fg_2022_2024 | ie_housing_for_all_continuation_2024, ie_oecd_pillar2_corporate_tax_2024 |
+| IRL | 2024–2024 | yes | ireland_harris_fg_2024_present / ireland_varadkar_fg_2022_2024 | ie_housing_for_all_continuation_2024 |
 | ITA | 1950–1970 | yes | italian_economic_miracle_1950_1970 / italy_dc_patronage_state_1945_1992 | italy_cassa_mezzogiorno_1950, italy_eni_founding_1953 |
 | ITA | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
 | ITA | 2021–2021 | yes | italy_conte_m5s_governments_2018_2021 / italy_draghi_national_unity_2021_2022 | italy_superbonus_110_2020 |
@@ -213,15 +219,15 @@ There are 964 overlapping same-country authored movement pairs; 947 have both re
 | MEX | 2024–2024 | yes | mexico_amlo_morena_2018_2024 / mexico_sheinbaum_morena_2024_present | mx_universal_pension_2019_2024 |
 | MYS | 2022–2022 | yes | malaysia_anwar_unity_2022_present / malaysia_ismail_sabri_umno_2021_2022 | my_anti_hopping_law_2022 |
 | NLD | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
-| NZL | 1990–1993 | yes | newzealand_bolger_national_1990_1997 / nz_rogernomics_1984_1993 | nz_employment_contracts_act_1991, nz_fiscal_responsibility_act_1994 |
 | POL | 1991–1991 | yes | poland_mazowiecki_solidarity_shock_therapy_1989_1991 / poland_transition_governments_1991_1993 | pl_balcerowicz_plan_1990 |
 | POL | 2017–2017 | yes | poland_morawiecki_pis_2017_2023 / poland_szydlo_pis_2015_2017 | pl_500_plus_child_benefit_2016 |
 | POL | 2021–2026 | yes | eu_csrd_sustainability_reporting_2023 / eu_green_deal_2020 | eu_csrd_2023, eu_taxonomy_regulation_2020 |
 | SAU | 2015–2015 | yes | saudi_abdullah_late_era_2005_2015 / saudi_salman_transition_2015_2017 | sa_nitaqat_saudisation_2011 |
 | SAU | 2017–2017 | yes | saudi_mbs_cp_era_2017_present / saudi_salman_transition_2015_2017 | sa_nitaqat_saudisation_2011, sa_vision_2030_launch_2016 |
+| SGP | 1959–1990 | no | lky_singapore_founding_1955_1990 / singapore_cpf_forced_saving_architecture_1955 | singapore_medisave_1984 |
+| SGP | 1959–1989 | no | lky_singapore_founding_1955_1990 / singapore_pap_industrialisation_1959_1989 | singapore_medisave_1984 |
 | SGP | 1959–1989 | no | singapore_cpf_forced_saving_architecture_1955 / singapore_pap_industrialisation_1959_1989 | singapore_medisave_1984 |
 | SGP | 1990–2003 | no | singapore_cpf_forced_saving_architecture_1955 / singapore_knowledge_economy_restructuring_1990_2004 | singapore_medifund_1993, singapore_medishield_1990 |
-| SLV | 2024–2024 | yes | elsalvador_bukele_first_term_2019_2024 / elsalvador_bukele_second_term_2024_present | sv_bitcoin_legal_tender_2021, sv_bond_buyback_2023, sv_cecot_mega_prison_2023, sv_digital_asset_issuance_law_2023, sv_municipal_consolidation_262_to_44_2023, sv_state_of_exception_2022, sv_tax_reform_2023 |
 | SVK | 2018–2018 | yes | slovakia_fico_smer_ii_iii_2012_2018 / slovakia_pellegrini_smer_2018_2020 | sk_minimum_wage_ramp_2012_2018 |
 | SWE | 1991–1991 | yes | sweden_bildt_centre_right_1991_1994 / sweden_carlsson_sap_1986_1991 | se_tax_reform_of_the_century_1991 |
 | SWE | 1994–1994 | yes | sweden_bildt_centre_right_1991_1994 / sweden_carlsson_sap_return_1994_1996 | se_eu_membership_accession_1995 |
@@ -231,9 +237,9 @@ There are 964 overlapping same-country authored movement pairs; 947 have both re
 | TUR | 2018–2023 | yes | turkey_erdogan_akp_2002_present / turkey_erdogan_presidential_system_2018_2023 | turkey_erdogan_low_rate_heterodoxy_2021_2023 |
 | USA | 2009–2012 | no | us_obama_ara_2009_recovery / us_obama_first_term_2009_2013 | us_dodd_frank_2010 |
 | USA | 2018–2019 | no | us_trump_first_term_broad_2017_2021 / us_trump_tariffs_2018_2019 | us_usmca_2020 |
-| USA | 2021–2024 | yes | biden_ira_chips_2022 / us_biden_administration_broad_2021_2025 | us_chips_act_2022, us_infrastructure_act_2021 |
-| VNM | 2011–2016 | yes | vietnam_dung_pm_2006_2016 / vietnam_trong_era_2011_2024 | vn_state_economic_groups_soe_expansion_2006_2012 |
-| VNM | 2024–2024 | yes | vietnam_to_lam_2024_present / vietnam_trong_era_2011_2024 | vn_blazing_furnace_anti_corruption_2016_2024, vn_land_law_revision_2024, vn_resolution_68_private_sector_2025 |
+| USA | 2022–2024 | yes | biden_ira_chips_2022 / us_biden_administration_broad_2021_2025 | us_chips_act_2022, us_ira_2022 |
+| VNM | 2006–2016 | yes | vietnam_doi_moi_1986 / vietnam_dung_pm_2006_2016 | vn_wto_accession_2007 |
+| VNM | 2024–2024 | yes | vietnam_to_lam_2024_present / vietnam_trong_era_2011_2024 | vn_blazing_furnace_anti_corruption_2016_2024 |
 
 ## EU geographic scope review
 
@@ -245,6 +251,7 @@ These EU supranational movement records use authored country lists. An omitted c
 | [eu_gdpr_regulatory_stack_2018](../../movements/eu_gdpr_regulatory_stack_2018.yaml) | 10 | yes |
 | [eu_green_deal_2020](../../movements/eu_green_deal_2020.yaml) | 10 | yes |
 | [eu_reach_chemicals_2007](../../movements/eu_reach_chemicals_2007.yaml) | 10 | yes |
+| [eu_single_market_1993](../../movements/eu_single_market_1993.yaml) | 11 | yes |
 
 ## Reading limits
 
