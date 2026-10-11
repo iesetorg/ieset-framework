@@ -129,10 +129,19 @@ NON_AUTH_TRIGGER_IDS = {
 
 def has_auth_strong_term(text: str) -> bool:
     """Match whole terms, so `coup` does not match coupled or coupons."""
+    text = re.sub(r"\b(?:not|no|never)\s+(?:a\s+|an\s+)?(?:single-party|one-party)\b", "", text)
     return any(
         re.search(r"(?<![a-z])" + re.escape(term) + r"(?![a-z])", text)
         for term in AUTH_STRONG_KEYWORDS
     )
+
+
+def has_military_rule_doctrine(text: str) -> bool:
+    """Require a governing military actor, not a policy reference to the military."""
+    return bool(re.search(
+        r"\b(?:governed|ruled|administered)\s+(?:by|through)\s+(?:a|the)\s+military\s+(?:council|junta|government)\b",
+        text,
+    ))
 
 
 def classify_movement_tone(m: dict) -> str:
@@ -145,6 +154,7 @@ def classify_movement_tone(m: dict) -> str:
             m.get("movement_id") not in NON_AUTH_TRIGGER_IDS
             and (
                 any(marker in coalition for marker in MILITARY_RULE_COALITION_MARKERS)
+                or has_military_rule_doctrine(doctrine)
                 or has_auth_strong_term(coalition)
                 or has_auth_strong_term(doctrine)
             )

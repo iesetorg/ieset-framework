@@ -34,3 +34,16 @@ test("whole-word match and reviewed historical references avoid false regime tag
     doctrine: "Prosecuted the preceding junta",
   }), "auth");
 });
+
+test("military governing actor and negated party label are classified by their meaning", () => {
+  assert.equal(classifyMovementTone({
+    movement_id: "military_council_example",
+    doctrine: "A military transition governed through a military council.",
+  }), "auth");
+  assert.equal(classifyMovementTone({
+    movement_id: "bipartisan_example",
+    coalition: "Bipartisan congressional reform majorities",
+    doctrine: "This was not a single-party governing program.",
+    axes_summary: [{ axis: "regulatory.product_market_competition", direction: "+", magnitude: "weak" }],
+  }), "centrist");
+});

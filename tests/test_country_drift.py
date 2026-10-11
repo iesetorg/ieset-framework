@@ -248,7 +248,8 @@ def test_corpus_timing_exceptions_are_explicit_and_ambiguous_entries_stay_queued
     swiss_transfer = next(entry for entry in swiss["axes_summary"] if entry["axis"] == "fiscal.transfer_expansion")
     czech_spending = next(entry for entry in czech["axes_summary"] if entry["axis"] == "fiscal.spending_level")
 
-    assert DRIFT.axis_attribution_year(swiss, swiss_transfer) == 2026
+    assert DRIFT.axis_attribution_year(swiss, swiss_transfer) == 2024
+    assert "policy commitment" in swiss_transfer["drift_attribution_basis"]
     assert DRIFT.axis_attribution_year(czech, czech_spending) == 2024
     review = DRIFT.timing_review(list(movements.values()))
     assert any(
@@ -256,9 +257,9 @@ def test_corpus_timing_exceptions_are_explicit_and_ambiguous_entries_stay_queued
         and row["axis"] == "fiscal.spending_level"
         for row in review["review_queue"]
     )
-    assert any(
-        row["movement_id"] == czech["movement_id"]
-        and row["axis"] == "fiscal.tax_corporate"
-        and row["manual_review_note"]
+    czech_tax = [entry for entry in czech["axes_summary"] if entry["axis"] == "fiscal.tax_corporate"]
+    assert {DRIFT.axis_attribution_year(czech, entry) for entry in czech_tax} == {2023, 2024}
+    assert not any(
+        row["movement_id"] == czech["movement_id"] and row["axis"] == "fiscal.tax_corporate"
         for row in review["review_queue"]
     )

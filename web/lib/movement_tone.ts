@@ -141,9 +141,14 @@ const NON_AUTH_TRIGGER_IDS = new Set([
 ]);
 
 function hasAuthStrongTerm(text: string): boolean {
+  const unnegated = text.replace(/\b(?:not|no|never)\s+(?:a\s+|an\s+)?(?:single-party|one-party)\b/g, "");
   return AUTH_STRONG_KEYWORDS.some((term) =>
-    new RegExp(`(^|[^a-z])${term}(?=$|[^a-z])`).test(text)
+    new RegExp(`(^|[^a-z])${term}(?=$|[^a-z])`).test(unnegated)
   );
+}
+
+function hasMilitaryRuleDoctrine(text: string): boolean {
+  return /\b(?:governed|ruled|administered)\s+(?:by|through)\s+(?:a|the)\s+military\s+(?:council|junta|government)\b/.test(text);
 }
 
 export function classifyMovementTone(m: MovementShape): MovementTone {
@@ -152,6 +157,7 @@ export function classifyMovementTone(m: MovementShape): MovementTone {
   const isAuth = AUTH_MOVEMENT_IDS.has(m.movement_id) || AUTH_REVIEW_HOLD_IDS.has(m.movement_id) ||
     (!NON_AUTH_TRIGGER_IDS.has(m.movement_id) && (
       MILITARY_RULE_COALITION_MARKERS.some((marker) => lcCoalition.includes(marker)) ||
+      hasMilitaryRuleDoctrine(lcDoctrine) ||
       hasAuthStrongTerm(lcCoalition) || hasAuthStrongTerm(lcDoctrine)
     ));
   if (isAuth) return "auth";
