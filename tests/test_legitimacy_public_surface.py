@@ -14,13 +14,18 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_stats_json_is_authoritative_census_copy():
-    census = (ROOT / "engine" / "public_corpus_census.json").read_text(encoding="utf-8")
-    public = (ROOT / "web" / "public" / "stats.json").read_text(encoding="utf-8")
-    assert json.loads(census) == json.loads(public)
-    data = json.loads(public)
-    assert "counts" in data
-    assert data["counts"]["hypothesis_specs"] > 0
+def test_stats_json_is_publication_safe_census_projection():
+    source = json.loads((ROOT / "engine" / "public_corpus_census.json").read_text(encoding="utf-8"))
+    data = json.loads((ROOT / "web" / "public" / "stats.json").read_text(encoding="utf-8"))
+    holds = json.loads((ROOT / "engine" / "publication_rights_holds.json").read_text(encoding="utf-8"))
+    held_ids = {item for group in holds["groups"] for item in group["hypothesis_ids"]}
+    held_qualified = sum(group["currently_public"] for group in holds["groups"])
+    assert data["counts"]["hypothesis_specs"] == source["counts"]["hypothesis_specs"] - len(held_ids)
+    assert data["counts"]["public_visible_results"] == source["counts"]["public_visible_results"] - held_qualified
+    assert data["counts"]["publication_rights_held_records"] == len(held_ids)
+    assert data["counts"]["publication_rights_held_evidence_qualified"] == held_qualified
+    for key in ("policies", "movements", "positions", "ranked_schools", "benchmark_controls"):
+        assert data["counts"][key] == source["counts"][key]
     assert data["counts"]["review_submissions"] == 0
     assert data["schema_version"] == 2
     assert data["counts"]["positions"] == (
@@ -122,12 +127,18 @@ def test_evidence_tier_ledger_is_balanced_and_definition_bearing():
         (ROOT / "engine" / "evidence_tier_audit.json").read_text(encoding="utf-8")
     )
     public = json.loads(
-        (ROOT / "web" / "public" / "evidence-tiers.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "web" / "public" / "evidence-tiers.json").read_text(encoding="utf-8")
     )
-    assert engine == public
-    summary = engine["summary"]
+    holds = json.loads((ROOT / "engine" / "publication_rights_holds.json").read_text(encoding="utf-8"))
+    held_ids = {item for group in holds["groups"] for item in group["hypothesis_ids"]}
+    private_rows = {row["hypothesis_id"]: row for row in engine["records"]}
+    public_rows = {row["hypothesis_id"]: row for row in public["records"]}
+    assert set(public_rows) == set(private_rows) - held_ids
+    assert all(public_rows[item] == private_rows[item] for item in public_rows)
+    assert public["summary"]["public_visible"] == sum(bool(row["public_visible"]) for row in public_rows.values())
+    assert public["summary"]["hypotheses"] == len(public_rows)
+    assert public["summary"]["reference_set"] == len(public["reference_set"])
+    summary = public["summary"]
     tiers = summary["tier_counts"]
     assert sum(tiers.values()) == summary["hypotheses"]
     assert summary["public_visible"] == tiers["featured"] + tiers["calibration"]
@@ -136,8 +147,8 @@ def test_evidence_tier_ledger_is_balanced_and_definition_bearing():
     assert summary["reference_set"] == 6
     assert summary["registration_counts"]["legacy_same_commit"] > 0
     assert sum(summary["estimator_floor_failures"].values()) > 0
-    assert "estimator_floor" in engine["definitions"]
-    for record in engine["reference_set"]:
+    assert "estimator_floor" in public["definitions"]
+    for record in public["reference_set"]:
         assert record["tier"] == "featured"
 
 
