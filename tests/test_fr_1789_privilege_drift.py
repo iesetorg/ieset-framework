@@ -9,6 +9,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_ID = "fr_august_decrees_1789"
 MOVEMENT_ID = "fr_constituent_provincial_privilege_abolition_1789"
+CONTEXT_ID = "fr_constituent_assembly_legal_reordering_1789_1791"
 
 
 def test_privilege_step_has_legal_date_and_only_changes_french_rule_of_law() -> None:
@@ -22,8 +23,11 @@ def test_privilege_step_has_legal_date_and_only_changes_french_rule_of_law() -> 
     policy = yaml.safe_load((ROOT / "policies" / f"{POLICY_ID}.yaml").read_text())
     movement = yaml.safe_load((ROOT / "movements" / f"{MOVEMENT_ID}.yaml").read_text())
     assert policy["timeframe"]["effective_date"] == "1789-11-03"
-    assert policy["enacted_by"] == [MOVEMENT_ID]
+    assert set(policy["enacted_by"]) == {MOVEMENT_ID, CONTEXT_ID}
     assert movement["policies"] == [POLICY_ID]
+    context = yaml.safe_load((ROOT / "movements" / f"{CONTEXT_ID}.yaml").read_text())
+    assert context["country_drift_role"] == "context_only"
+    assert context["country_drift_primary_movement"] == MOVEMENT_ID
     assert [(a["axis"], a["direction"], a["magnitude"]) for a in movement["axes_summary"]] == [
         ("institutional.rule_of_law", "+", "weak")
     ]
@@ -31,7 +35,7 @@ def test_privilege_step_has_legal_date_and_only_changes_french_rule_of_law() -> 
     authored = drift.load_movements()
     with_step = drift.build_drift(authored)
     without_step = drift.build_drift(
-        [m for m in authored if m["movement_id"] != MOVEMENT_ID]
+        [m for m in authored if m["movement_id"] not in {MOVEMENT_ID, CONTEXT_ID}]
     )
     assert with_step["year_min"] == 1789
     assert with_step["countries"]["FRA"]["axis_first_year"]["institutional.rule_of_law"] == 1789
