@@ -1,0 +1,310 @@
+hypothesis_id: aus_2023_graduate_extension_skilled_retention
+version: 1
+status: candidate
+topic: labour
+claim: Among international bachelor and coursework-master graduates whose original Temporary Graduate visas expired
+  in 2023-2024, eligibility for the additional two-year post-study work right introduced on 1 July 2023 is associated
+  with at least a five-percentage-point greater increase in the probability of being resident in Australia and employed
+  in an eligible shortage occupation 24 months after original visa expiry, compared with the eligible-versus-ineligible
+  difference for otherwise comparable pre-policy expiry cohorts.
+claim_direction: +
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  period:
+  - 2015
+  - 2026
+  temporal_structure: panel
+  exclusion_rules:
+  - Primary population is international bachelor and coursework-master graduates with a qualifying first subclass-485
+    post-study visa and observed original expiry date; do not use revised expiry as baseline.
+  - Treated eligibility must be reconstructed from the final course/qualification rules and individual conditions
+    in force when applications were accepted; an indicative occupation list is insufficient.
+  - Separate research masters, doctorates, regional extensions, replacement visas and applicants subject to distinct
+    treaty or nationality-specific provisions from the primary sample; report their excluded counts and reasons.
+  - Pre-policy comparison uses original expiry cohorts 2015-2017; post-policy cohorts use 2023-2024 original expiries
+    with the legally verified extension-application eligibility window.
+  - Exclude original-expiry cohorts 2018-2022 from the primary comparison because their 24-month follow-up overlaps
+    pandemic border/labour shocks; retain them only for explicit pandemic sensitivity analysis.
+  - Include only cohorts with complete 24-month residence and occupation follow-up in an audited release; otherwise
+    defer the test rather than redefine the horizon.
+  - Verified emigration is zero for the joint residence/employment outcome; unknown linkage or missing occupation
+    data is missing, not zero.
+variables:
+  outcome:
+  - name: resident_and_shortage_employed_24m
+    source: manual:home_affairs_education_abs_linked_graduate_outcomes
+    transformation: Binary one if resident in Australia under a verified administrative residence rule and working
+      in a pre-specified eligible shortage occupation during months 22-24 after original visa expiry; zero for verified
+      departures or known non-qualifying employment. Report percentage-point differences.
+    notes: Occupation means actual job duties/classification, not degree title or employer industry. Freeze the
+      occupation mapping before estimation; reproduce separately with stable job-match definitions and hours thresholds.
+  treatment:
+  - name: extension_eligibility_by_cohort
+    source: manual:education_2023_extended_poststudy_work_rights_final_rules
+    transformation: Intention-to-treat eligibility indicator multiplied by a post-policy original-expiry-cohort
+      indicator, applying individual qualification, timing and visa rules. Eligibility, not realised take-up, is
+      primary.
+    notes: The programme began 1 July 2023. Official Education material says access ended in mid-2024. Exact cessation,
+      transitional rules and the final course list require legal/administrative verification before registration.
+  - name: actual_additional_resident_months
+    source: manual:home_affairs_linked_visa_grants_movements
+    transformation: Months resident after original expiry attributable descriptively to additional permission; show
+      all subsequent visa transitions.
+    notes: Mechanism/take-up measure only; do not substitute this selected post-treatment variable for assigned
+      eligibility.
+  controls:
+  - name: pre_expiry_graduate_covariates
+    source: manual:education_abs_linked_graduate_baseline
+    transformation: Degree level, narrow field, provider, graduation cohort, age, prior earnings/employment and
+      state of residence measured before announcement or otherwise verified unaffected by policy.
+  - name: baseline_occupation_demand
+    source: manual:jobs_and_skills_australia_occupation_shortages_pre2023
+    transformation: Pre-announcement vacancy, employment and wage trajectories for nominated occupations; avoid
+      conditioning on policy-induced post-treatment demand or supply.
+  decomposition_channels:
+  - name: earnings_hours_and_job_match
+    source: manual:abs_ato_linked_graduate_earnings_hours_occupation
+    transformation: Real hourly earnings, paid hours, job match and underemployment; payroll earnings alone cannot
+      identify hourly pay or occupation.
+  - name: incumbent_worker_and_vacancy_outcomes
+    source: manual:abs_jsa_incumbent_labour_market_outcomes
+    transformation: Occupation-region wages, employment, unemployment and vacancy duration for incumbent workers
+      and employers.
+  - name: local_housing_and_fiscal_outcomes
+    source: manual:abs_state_housing_fiscal_graduate_location
+    transformation: Housing costs, local crowding, taxes and service costs associated with retention; report distribution
+      and uncertainty.
+intervention_channel: regulatory
+intervention_channel_justification: The exposure changes the permitted duration of residence and work under graduate
+  visas; tax-and-transfer and other fiscal effects are separate outcomes.
+estimator:
+  template: event_study
+  event_year: 2023
+  clustering: Course/provider eligibility clusters with provider-level resampling sensitivity; assess effective
+    clusters and dependence before reporting nominal coverage.
+  fixed_effects:
+  - provider
+  - degree_level
+  - broad_field
+  - original_expiry_cohort
+  random_seed: 20261009
+  notes: 'Primary estimate is a cohort difference-in-differences risk difference for the binary joint outcome, comparing
+    eligible versus matched ineligible courses before and after introduction. Match/reweight on pre-announcement
+    graduate characteristics and employment/shortage trajectories, require common support, and freeze weights before
+    accessing post-policy outcomes. Report eligibility-by-expiry-cohort event coefficients and the pooled 2023-2024
+    contrast, with complete 24-month follow-up. Eligibility was chosen partly because occupations had shortages,
+    not randomly assigned; matching and fixed effects do not remove this fundamental selection risk. Thus the present
+    specification is an associational efficacy screen, not a verified natural experiment or causal effect. Primary
+    controls exclude post-treatment earnings, take-up, visa transitions and labour demand. Robustness: placebo implementation
+    in pre-policy cohorts; pre-trend confidence intervals; alternative matching calipers; leave-provider and leave-occupation-out;
+    alternate residence/job-match definitions; full pandemic cohort sensitivity; differential linkage/missingness
+    bounds; and separate follow-up by original expiry quarter. If controls cannot track pre-policy outcomes or support
+    is inadequate, do not run a causal interpretation. Any upgrade to causal status requires a separately registered
+    design satisfying the IESET causal rules. Primary pre-policy original-expiry cohorts are 2015-2017, whose 24-month
+    endpoints all precede 2020. The more recent 2018-2019 expiry cohorts cannot serve as clean baseline cohorts
+    because their endpoint windows enter the pandemic. The resulting longer baseline gap is an identification limitation
+    and requires cohort-trend sensitivity.'
+falsification:
+  rule: The specified material-benefit claim is supported only when the lower endpoint of the primary two-sided
+    95% confidence interval is at least +5 percentage points and overlap, follow-up, outcome validity and missingness
+    gates pass. It is falsified at that stated material size if the interval's upper endpoint is below +5 percentage
+    points and those gates pass. An interval spanning +5, an imprecise null, incomplete follow-up or failed design
+    diagnostics is inconclusive. An interval entirely at or below zero additionally contradicts the positive-direction
+    claim. Increased visa grants, resident stock or employment in any job do not satisfy the joint shortage-employment
+    outcome. Even a supported screen does not prove causal attribution, a net labour-supply increase after displacement,
+    or net welfare.
+  test: Pre-specified cohort-DiD risk difference and two-sided 95% interval for the joint 24-month outcome; no substitution
+    of statistically stronger secondary endpoints.
+  threshold:
+    minimum_meaningful_risk_difference_percentage_points: 5
+    confidence_level: 0.95
+    follow_up_months_after_original_expiry: 24
+    preregistration_required_before_estimation: true
+prior_confidence: 0.5
+disclosure: This deliberately tests a claimed benefit as a counterhypothesis within a research framing critical
+  of government immigration policy. Choosing a joint skilled retention endpoint may undercount other benefits and
+  may still overstate net additional labour supply. The five-point threshold is a proposed substantive decision
+  rule, not an observed result. Public policy descriptions and earlier migration research were inspected before
+  drafting; no individual outcome data or model estimates have been examined.
+conflict_disclosure: No financial conflict is asserted or inferred; human author declarations remain required before
+  registration.
+steelman: hypotheses/steelman/aus_2023_graduate_extension_skilled_retention.md
+scope:
+  period:
+  - 2015
+  - 2026
+  countries:
+  - AUS
+  outcome_dim:
+  - employment_labour
+  - demographics_migration
+  policy_family:
+  - regulation
+  - labour_market
+  treatment_tags:
+  - australia_2023_poststudy_work_extension
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+mechanism_measurement:
+  mechanism_type: migration_policy
+  design_features:
+  - eligible_vs_ineligible_groups
+  - implementation_capacity_check
+  - mechanism_channel_decomposition
+  - leakage_substitution
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - Individually eligible graduates in verified 2023-2024 original-expiry cohorts.
+    control_units:
+    - Matched ineligible international graduates and corresponding eligible/ineligible pre-policy cohorts with common
+      support.
+    time_frequency: mixed
+    notes: Individual monthly outcome trajectories with cohort comparisons; selected eligibility is not asserted
+      exogenous.
+  causal_layers:
+  - layer: first_order_policy_effect
+    mechanism: Additional legal residence/work duration can retain graduates who would otherwise leave or cease
+      working.
+    variable_names:
+    - extension_eligibility_by_cohort
+    - actual_additional_resident_months
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: second_order_supply_response
+    mechanism: Retained graduates can supply labour in genuine shortage roles and complement incumbent workers.
+    variable_names:
+    - resident_and_shortage_employed_24m
+    - incumbent_worker_and_vacancy_outcomes
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: allocation_distortion
+    mechanism: Qualification eligibility may not translate into occupation matching, adequate hours or productive
+      use of skills.
+    variable_names:
+    - earnings_hours_and_job_match
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: leakage_or_substitution
+    mechanism: Graduates may have stayed on another visa anyway; employers may substitute among migrants and incumbent
+      workers.
+    variable_names:
+    - actual_additional_resident_months
+    - incumbent_worker_and_vacancy_outcomes
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: implementation_capacity
+    mechanism: Processing times, employer recruitment, licensing and skills recognition affect take-up and actual
+      skilled employment.
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: distributional_incidence
+    mechanism: Benefits and costs differ for graduates, incumbent workers, employers, renters and future cohorts.
+    variable_names:
+    - earnings_hours_and_job_match
+    - incumbent_worker_and_vacancy_outcomes
+    - local_housing_and_fiscal_outcomes
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Extra income-tax revenue and employer production coexist with processing, infrastructure and public-service
+      costs.
+    variable_names:
+    - local_housing_and_fiscal_outcomes
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: The retained-worker outcome does not alone measure displacement, productivity, rent burdens or total
+      social surplus.
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - new_entrants
+  - suppliers
+  - low_income_uncovered_households
+  - taxpayers
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: 'DATA GAP: graduates gain an option to remain and work; quantify earnings and employer
+      surplus separately.'
+    deadweight_loss: 'DATA GAP: displacement, mismatch, compliance burdens and any foregone alternate recruitment.'
+    quality_loss: 'DATA GAP: exploitation, underemployment and occupation-match quality.'
+    search_or_queue_cost: 'DATA GAP: employer hiring, licence recognition and visa-processing delays.'
+    future_supply_loss: 'DATA GAP: effects on domestic training, skilled migration alternatives and future student
+      decisions; signs undetermined.'
+    fiscal_or_enforcement_cost: 'DATA GAP: additional tax receipts minus administration and service costs.'
+    net_welfare_formula: 'DATA GAP: additional productive surplus and migrant gains less displacement, housing/congestion
+      and fiscal resource costs; do not equate retained headcount with welfare.'
+  promotion_gate: screen_only_until_second_order_measured
+notes: 'Untested candidate package only. No pre-registration, run, verified estimate,
+
+  ingested data, mapped school claim or public promotion. The existing manual
+
+  publisher is a pending provenance marker; the identifiers above are proposed
+
+  dataset labels and are not implemented adapters or confirmed access grants.
+
+  Record source URL, fetch UTC, licensing, methodology and hashes upon ingestion.
+
+
+  Critical blockers: final archived course list; exact eligibility/cessation and
+
+  transitional rules; original versus extended visa expiry; individual visa and
+
+  movement history; education linkage; actual occupational employment and hours;
+
+  coverage/missingness audit; comparable pre-policy cohorts; common support; and
+
+  complete follow-up through the last 2024 expiry plus 24 months. As of the
+
+  2026-10-09 drafting date, late-2024 expiry cohorts may not yet have a full
+
+  follow-up period, and administrative release lags can delay earlier cohorts.
+
+  A smaller mature cohort is a separately registered alternative, not a silent
+
+  replacement for the pooled target. A generic national wage or NOM series does
+
+  not identify the endpoint.
+
+
+  Policy began on 1 July 2023: eligible bachelor rights extended two to four
+
+  years, selected masters three to five, doctorates four to six. The primary
+
+  sample deliberately separates doctorates and other distinct entitlements.
+
+  This is a duration/retention policy, not a permanent migration-place increase.
+
+  Authoritative policy announcement, 3 July 2023:
+
+  https://www.education.gov.au/newsroom/articles/extended-poststudy-work-rights-commences-international-graduates
+
+  Official notice saying access ends mid-2024:
+
+  https://www.education.gov.au/international-education/support-international-students/end-extended-poststudy-work-rights-international-graduates
+
+  Indicative list only; obtain the final historical list before coding:
+
+  https://www.education.gov.au/international-education/resources/list-occupations-and-qualifications-eligible-poststudy-work-rights-extension
+
+  Official factsheet and eligibility explanation:
+
+  https://www.education.gov.au/download/15016/post-study-work-rights-factsheet/31486/document/pdf
+
+  Productivity Commission migration benefits/costs and labour-market research:
+
+  https://www.pc.gov.au/inquiries-and-research/migrant-intake/report/
+
+  https://assets.pc.gov.au/inquiries/completed/productivity/interim6-labour/productivity-interim6-labour.pdf
+
+  PUBLICATION STATUS (2026-10-10): imported as an untested candidate. Any earlier no-registration/no-import statements
+  describe the initial 2026-10-09 draft. Git tracking alone does not establish a verified spec-before-run pair,
+  completed data ingestion, an empirical verdict or evidence-score eligibility. Missing data and protocol gates
+  remain binding.
+
+  '

@@ -1,0 +1,295 @@
+hypothesis_id: aus_post2022_migration_rent_pressure
+version: 1
+status: candidate
+topic: housing
+claim: In Australian SA3 rental markets with low pre-pandemic dwelling-supply growth, one percentage point higher
+  annual net overseas migration relative to the resident population in 2022-2024 is associated with at least 0.5
+  percentage points faster real new-lease rent growth in the following year, 2023-2025, conditional on the specified
+  regional and national covariates.
+claim_direction: +
+evidence_type: associational
+sample:
+  countries:
+  - AUS
+  period:
+  - 2016
+  - 2025
+  temporal_structure: panel
+  exclusion_rules:
+  - Use annual SA3 observations harmonised to ASGS 2021 boundaries; do not combine changing boundaries without a
+    documented concordance.
+  - Exclude markets with fewer than 100 eligible new residential lease lodgements in either endpoint year of a rent-growth
+    observation.
+  - Exclude non-residential and subsidised/social leases from the primary private-market rent measure; report excluded
+    coverage separately.
+  - Primary post-reopening exposures are financial years ending June 2022, 2023 and 2024, with outcomes ending June
+    2023, 2024 and 2025.
+  - Retain 2020-2021 in source archives but exclude those exposure/outcome pairs from primary estimation because
+    border closures break the comparison; report a full-period sensitivity.
+  - Missing migration, rent-quality, baseline population or baseline housing-stock observations are not zeros; list
+    exclusions and test observable selection.
+variables:
+  outcome:
+  - name: real_new_lease_rent_growth_pp
+    source: manual:aus_state_rental_bond_new_lease_panel
+    transformation: 100 times annual change in log of a quality-adjusted SA3 new-lease rent index, minus the corresponding
+      capital-city CPI all-groups log change, explicitly used as a proxy for the state.
+    notes: Required raw observations include dwelling type, bedrooms, location and lease commencement; advertised
+      rents are a separately reported sensitivity, not a silent replacement. Source access, coverage and quality
+      adjustments remain to be established. No data have been ingested. ABS capital-city CPI is not a statewide
+      or SA3 cost-of-living index. National-CPI and nominal-rent sensitivities are required. State-by-year fixed
+      effects absorb a state-common deflator, so this choice should not change the primary within-state NOM slope.
+  treatment:
+  - name: lagged_nom_share_pp
+    source: manual:abs_sa3_regional_net_overseas_migration
+    transformation: 100 times annual SA3 net overseas migration divided by resident population at the start of that
+      year; lag one year relative to rent-growth outcome.
+    notes: Observed population flow, not a government-policy treatment. Includes arrivals and departures meeting
+      the ABS residence rule. Regional estimates have a different production/revision process from visa grant counts.
+  - name: low_baseline_housing_supply
+    source: manual:abs_state_net_dwelling_additions_sa3_2016_2019
+    transformation: Indicator for bottom within-state third of annualised net dwelling-stock additions per 1,000
+      baseline residents over 2016-2019; cutpoints calculated before inspecting post-2022 rent outcomes and frozen
+      with the preregistration.
+    notes: Net stock additions must account for demolitions; approvals are not completed dwellings. This baseline
+      measure's availability is a data blocker.
+  controls:
+  - name: baseline_rental_market_structure
+    source: manual:abs_census_sa3_housing_demographics
+    transformation: Predetermined dwelling mix, household size, rental share, density and student share, each interacted
+      with year indicators.
+  - name: regional_demand_covariates
+    source: manual:abs_regional_population_labour_market
+    transformation: Lagged internal migration share, natural increase, employment mix and unemployment rate; separately
+      report specification omitting possibly endogenous covariates.
+  - name: baseline_finance_and_supply_exposure
+    source: manual:abs_rba_state_housing_finance_construction
+    transformation: Baseline mortgage exposure interacted with national interest-rate changes; pre-2022 housing
+      pipeline and documented local supply-rule changes.
+    notes: State-year fixed effects absorb common state inflation, energy-price and construction-cost movements;
+      national rate variation alone cannot identify a local coefficient.
+  decomposition_channels:
+  - name: dwelling_supply_and_vacancy_response
+    source: manual:aus_sa3_dwelling_completions_vacancies
+    transformation: Net new dwellings and private rental vacancies after exposure; treated as outcomes/mediators,
+      not automatically controlled away.
+  - name: renter_distribution_and_labour_supply
+    source: manual:abs_hilda_linked_housing_labour_outcomes
+    transformation: Rent-to-income changes, crowding, residential moves and migrant construction/service employment
+      by household and worker group.
+estimator:
+  template: panel_fe
+  clustering: SA3 clustered errors; spatially robust errors and state-level wild-cluster bootstrap as sensitivity
+    checks, acknowledging only eight state/territory clusters.
+  fixed_effects:
+  - SA3
+  - state_by_year
+  random_seed: 20261009
+  notes: 'Fit annual panel models with lagged NOM-share interactions for post-2022 exposures and baseline low-supply
+    status. The primary estimand is the sum of coefficients giving the post-2022 slope in the low-supply subgroup,
+    in percentage points of real rent growth per one percentage point NOM share. Baseline outcome years are 2017-2019
+    (using 2016-2018 exposures) and primary post-reopening outcome years are 2023-2025 (using 2022-2024 exposures).
+    Report all interaction coefficients and linear contrasts. Weight primary estimates by fixed 2019 private-rental
+    household counts, not contemporaneous migration or lease volumes. Robustness: unweighted estimates; nominal
+    rents; alternative quality controls; incumbent-rent index where accessible; leave-one-state-out; capital-city
+    versus other markets; full pandemic period; leads/placebos; geographically neighbouring markets; alternate population
+    vintage; outlier influence; and baseline supply as a continuous variable. A national before/after comparison
+    cannot substitute for this regional design. No causal identification or effect of a named federal policy is
+    claimed by this estimator.'
+falsification:
+  rule: The meaningful-magnitude claim is supported only if the lower endpoint of the primary two-sided 95% confidence
+    interval is at least +0.5 percentage points. It is falsified at the stated material size only if its upper endpoint
+    is below +0.5 percentage points and the design/coverage gates pass. An interval spanning +0.5, an imprecise
+    null, or missing/invalid data is inconclusive. An interval entirely at or below zero also contradicts the positive-direction
+    claim. Material sign reversals across required specification and vintage checks produce a mixed/inconclusive
+    assessment, not selective reporting of the preferred model. None of these outcomes establishes causation or
+    a verdict on the Albanese government.
+  test: Pre-specified linear contrast and 95% confidence interval from the regional panel; assess primary magnitude
+    before inspecting secondary contrasts.
+  threshold:
+    minimum_meaningful_effect_pp_per_one_pp_nom_share: 0.5
+    confidence_level: 0.95
+    preregistration_required_before_estimation: true
+prior_confidence: 0.6
+disclosure: This candidate was requested in a discussion critical of the Albanese government's economic management.
+  That framing can favour demand-pressure stories and neglect migration's labour-supply benefits and inherited housing
+  shortages. The stated prior and 0.5-point threshold are proposed analyst choices, not fitted results or evidence
+  of an established effect. Known headline data and published mechanism discussions were read before authoring.
+conflict_disclosure: No financial conflict is asserted or inferred; author conflict declarations require human review
+  before registration.
+steelman: hypotheses/steelman/aus_post2022_migration_rent_pressure.md
+scope:
+  period:
+  - 2016
+  - 2025
+  countries:
+  - AUS
+  outcome_dim:
+  - housing
+  - demographics_migration
+  policy_family:
+  - none
+  treatment_tags:
+  - australia_post2022_migration_housing
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+mechanism_measurement:
+  mechanism_type: migration_policy
+  design_features:
+  - panel_fe_screen
+  - mechanism_channel_decomposition
+  - spillover_tracking
+  - distributional_decomposition
+  comparison_structure:
+    treated_units:
+    - SA3 markets with higher observed lagged NOM shares, especially the fixed low-supply subgroup.
+    control_units:
+    - Lower-exposure SA3 markets with comparable predetermined characteristics; these are comparison markets, not
+      untreated experimental controls.
+    adjacent_or_border_markets:
+    - Neighbouring SA3 markets affected by rental search, commuting and internal migration.
+    time_frequency: annual
+    notes: No equivalence is assumed between observed NOM and an Albanese policy intervention; policy-specific attribution
+      requires a separate identified test.
+  causal_layers:
+  - layer: first_order_policy_effect
+    mechanism: Net resident arrivals add demand for dwelling services while population composition changes.
+    variable_names:
+    - lagged_nom_share_pp
+    - real_new_lease_rent_growth_pp
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Neither regional merged data nor a policy-induced migration component has been measured.
+  - layer: second_order_supply_response
+    mechanism: Arrivals can support construction labour and additional housing investment as well as increase housing
+      demand.
+    variable_names:
+    - dwelling_supply_and_vacancy_response
+    - renter_distribution_and_labour_supply
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: allocation_distortion
+    mechanism: Crowding, smaller living space, delayed household formation and relocation can absorb demand without
+      appearing fully in rents.
+    variable_names:
+    - renter_distribution_and_labour_supply
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: externality_or_spillover
+    mechanism: Internal migration, commuting and rental search transmit effects across SA3 boundaries.
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: distributional_incidence
+    mechanism: New and incumbent renters, landlords, new migrants and low-income households face different price
+      and income changes.
+    variable_names:
+    - renter_distribution_and_labour_supply
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Population changes alter infrastructure costs, service demand and tax receipts at different government
+      levels.
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Rental costs must be weighed against labour income, producer gains, new supply and public-service
+      congestion.
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  distributional_groups:
+  - incumbent_beneficiaries
+  - new_entrants
+  - low_income_uncovered_households
+  - suppliers
+  - taxpayers
+  - neighbouring_market_users
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: 'DATA GAP: higher rent transfers income from tenants to landlords and is not entirely
+      a national resource loss.'
+    quality_loss: 'DATA GAP: space, quality and crowding changes.'
+    search_or_queue_cost: 'DATA GAP: unsuccessful applications, relocation and search time.'
+    future_supply_loss: 'DATA GAP: investment and construction-labour responses may offset rather than deepen scarcity.'
+    fiscal_or_enforcement_cost: 'DATA GAP: infrastructure and public services net of additional tax revenue.'
+    net_welfare_formula: 'DATA GAP: household and producer surplus plus labour/output benefits minus resource, congestion,
+      search and fiscal costs; no sum is currently estimable.'
+  promotion_gate: screen_only_until_second_order_measured
+  notes: Layer names describe mechanisms to measure; they do not certify a causal estimate or a policy verdict.
+notes: 'Candidate import package only. No pre-registration commit, data ingestion,
+
+  model execution, result card, claim mapping or public promotion has occurred.
+
+  The registered manual publisher is a provenance marker with pending status,
+
+  not a working fetcher or proof of observation-level provenance. Every future
+
+  dataset needs publisher URL, fetch UTC, licence, methodology and content hash.
+
+
+  Data blockers: consistent regional migration and historical boundary series;
+
+  multi-state new-lease bond microdata; quality-adjusted rent index; net dwelling
+
+  additions rather than approvals; predetermined housing-stock and finance
+
+  exposures; adequate effective sample/precision; and coverage auditing.
+
+
+  Policy attribution boundary: Albanese took office after most international
+
+  borders reopened in February 2022. Reopening, delayed departures, visa rules,
+
+  local planning, construction costs and monetary conditions are distinct
+
+  channels. A NOM coefficient is not the effect of a permanent migration cap.
+
+  Home Affairs'' 185,000 permanent places for 2026-27 include onshore status
+
+  transitions and do not cap NOM. Date those facts as context, not sample data.
+
+
+  Verified official context as read on 2026-10-09:
+
+  ABS March 2026 release (17 September 2026) reports annual NOM of 292,100,
+
+  down 5.6% on the previous year; its revised series has 555,798 in the year to
+
+  September 2023 and 301,572 in the year to June 2025. Preserve release vintages.
+
+  https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/latest-release
+
+  Regional population source family:
+
+  https://www.abs.gov.au/statistics/people/population/regional-population/latest-release
+
+  ABS historical border-reopening context:
+
+  https://www.abs.gov.au/statistics/people/population/overseas-migration/2024-25
+
+  Official distinction between permanent places and NOM:
+
+  https://immi.homeaffairs.gov.au/what-we-do/migration-program-planning-levels
+
+  RBA housing demand/supply mechanism, 16 May 2024:
+
+  https://www.rba.gov.au/speeches/2024/sp-ag-2024-05-16.html
+
+  RBA July 2025 student study: pressure is possible with fixed short-run supply,
+
+  but the student increase likely explains only a small share of pandemic-era
+
+  rent growth; substantial advertised-rent growth preceded border reopening.
+
+  https://www.rba.gov.au/publications/bulletin/2025/jul/international-students-and-the-australian-economy.html
+
+  CPI geography: https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release
+  ; capital-city CPI is a declared state proxy, not a published statewide index.
+
+
+  PUBLICATION STATUS (2026-10-10): imported as an untested candidate. Any earlier no-registration/no-import statements
+  describe the initial 2026-10-09 draft. Git tracking alone does not establish a verified spec-before-run pair,
+  completed data ingestion, an empirical verdict or evidence-score eligibility. Missing data and protocol gates
+  remain binding.
+
+  '

@@ -1,0 +1,157 @@
+hypothesis_id: aus_albanese_discretionary_budget_costings_2022_2026
+version: 1
+status: candidate
+topic: fiscal
+claim: For Australian financial years 2022-23 through 2025-26, the published incremental costings of Commonwealth
+  discretionary policy decisions made after 23 May 2022 reduced the cumulative underlying cash balance, relative
+  to the 2022 PEFO policy baseline, by at least 0.5 percent of the sum of nominal GDP across those same four years.
+  This is a claim about budgeted policy contributions, separate from economic parameter revisions and realised policy
+  effects.
+evidence_type: descriptive
+sample:
+  countries:
+  - AUS
+  period: &id001
+  - 2022
+  - 2026
+  temporal_structure: time_series
+  exclusion_rules:
+  - Use only the fixed four financial years 2022-23, 2023-24, 2024-25 and 2025-26. Do not sum rolling forward-estimate
+    totals with overlapping years.
+  - Exclude decisions attributed to the pre-23 May 2022 government, automatic stabilisers and purely economic/technical
+    reclassifications from the policy component; retain them in reconciliation channels.
+  - Include both spending and revenue measures, savings, reversals and amendments. Track provisions and decisions
+    taken but not announced without counting a provision and its later announcement twice.
+  - Do not claim that an FBO forecast error reveals the realised causal effect of a specific policy.
+scope:
+  period: *id001
+  countries:
+  - AUS
+  outcome_dim:
+  - fiscal_policy
+  - taxation
+  policy_family:
+  - fiscal_policy
+  - tax_policy
+  treatment_tags:
+  - albanese_government_2022
+prior_confidence: 0.5
+disclosure: AI-assisted candidate drafted 9 October 2026 following a research framing critical of the Albanese government.
+  Public headline results and official commentary were inspected before drafting. The prior is a subjective design
+  aid, not evidence or the user's declared probability. Numerical materiality thresholds are proposed research choices,
+  not measured findings. No estimation or prospective preregistration has occurred; historical testing must disclose
+  this prior exposure.
+conflict_disclosure: No additional conflicts were assessed. Do not infer that conflicts are absent.
+steelman: hypotheses/steelman/aus_albanese_discretionary_budget_costings_2022_2026.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+intervention_channel: fiscal
+intervention_channel_justification: Commonwealth tax and spending decisions only; state budgets, RBA interest-rate
+  decisions and regulatory interventions are separate.
+notes: 'Candidate import specification only. Not run, not registered, not a scoreboard result. The registered manual
+  and derived prefixes are provenance markers: no downloaded panel, access permission, operational adapter, immutable
+  source manifest or executable estimator is supplied. Freeze source vintages and establish per-cell source URL,
+  table/cell, fetch UTC, license and payload hash before any run. Existing movement australia_albanese_alp_2022_present
+  is context only; no automatic policy, position or movement linkage is declared. DATA BLOCKERS: complete fiscal-update
+  ledger, provision/revision matching, actual/estimate labelling and independent reconciliation not yet built. Public
+  source route exists, but the hypothesis is not currently executable.
+
+  PUBLICATION STATUS (2026-10-10): imported as an untested candidate. Any earlier no-registration/no-import statements
+  describe the initial 2026-10-09 draft. Git tracking alone does not establish a verified spec-before-run pair,
+  completed data ingestion, an empirical verdict or evidence-score eligibility. Missing data and protocol gates
+  remain binding.
+
+  '
+claim_direction: '-'
+variables:
+  outcome:
+  - name: policy_balance_effect_pct_gdp
+    source: derived:aus_incremental_policy_costings_ratio
+    transformation: 100 * sum(new_policy_cash_receipts - new_policy_cash_payments, across decisions and fixed fiscal
+      years) / sum(nominal_GDP_fixed_years)
+    notes: Negative means the published costings weaken the balance. Include net interest only where officially
+      attributed to the policy; separately report a primary-balance version.
+  treatment:
+  - name: post_may_2022_discretionary_policy_ledger
+    source: manual:aus_budget_policy_reconciliation_2022_2026
+    transformation: Append only newly recorded policy variations and explicit later revisions, each with unique
+      decision/vintage/fiscal-year key.
+    notes: 'Primary sources: https://www.pbo.gov.au/publications-and-data/data-and-tools/data-portal/historical-budget-forecasts-measures;
+      every Budget, MYEFO, PEFO and FBO from the 2022 PEFO baseline through the September 2026 FBO. Publication
+      lookup: https://archive.budget.gov.au/. Do not treat each repeat forecast of a measure as a new decision.'
+  decomposition_channels:
+  - name: parameter_and_other_variations
+    source: manual:aus_budget_parameter_variations_2022_2026
+    transformation: Cumulative net economic, technical and other revisions for the same fixed fiscal years.
+    notes: Split commodity/wage/inflation changes where documented; an unallocated residual must remain unallocated.
+  - name: reconciliation_residual_pct_gdp
+    source: derived:aus_budget_reconciliation_residual
+    transformation: 100 * (actual_UCB_minus_baseline_UCB - policy_effect - parameter_effect) / sum(nominal_GDP_fixed_years)
+    notes: Reconcile fiscal-year and aggregate levels. Flag rounding and classification uncertainty separately.
+  - name: public_service_and_distributional_benefits
+    source: manual:aus_policy_benefit_ledger
+    transformation: Policy-specific output, distribution and service-quality evidence, not a fiscal balance number.
+    notes: Not yet collected. Needed for any claim of bad management or negative welfare; outside the narrow budget-costing
+      verdict.
+  controls:
+  - name: nominal_GDP_fixed_years
+    source: manual:aus_nominal_gdp_fbo_2025_26_vintage
+    transformation: Sum the four annual nominal GDP levels in one fixed published vintage.
+    notes: https://archive.budget.gov.au/2025-26/fbo/download/01_part_1.pdf; historical appendix/ABS national accounts
+      must be reconciled. Freeze the denominator for all components.
+estimator:
+  template: descriptive
+  notes: 'Accounting reconciliation, not a causal regression. Build a decision-level ledger and independently reconstruct
+    the policy total using aggregate official policy/parameter reconciliation tables. Use the 2022 PEFO as baseline
+    and fixed financial-year cells. Both routes must agree within 0.05 percentage points of summed GDP and reconcile
+    total UCB changes within that tolerance. All revisions must preserve a lineage to the original measure. Two
+    reviewers should resolve classifications without looking at the aggregate threshold result. If non-disclosed
+    provisions cannot be allocated, calculate lower/upper bounds; do not assign them opportunistically. Report actual
+    versus baseline UCB separately: a stronger actual balance can coexist with net costly new decisions. Costings
+    omit some behavioural feedback and are not a measure of inefficiency.'
+falsification:
+  rule: SUPPORTED for the narrow costing claim only when the entire documented classification/rounding interval
+    is at or below -0.5 percent of summed GDP and reconciliation gates pass. FALSIFIED at the specified material
+    magnitude when the interval is wholly above -0.5. A negative but smaller value is not evidence that policies
+    were costless. Overlap with the threshold, unresolved double counting, absent source cells, or reconciliation
+    errors larger than 0.05 percentage points mean INCONCLUSIVE. No p-value is appropriate for this accounting identity.
+  test: fixed_horizon_incremental_policy_costing_reconciliation
+  threshold:
+    material_balance_effect_percent_of_summed_gdp: -0.5
+    maximum_reconciliation_error_percentage_points: 0.05
+    uncertainty: Documented classification and rounding bounds; not a statistical confidence interval.
+mechanism_measurement:
+  mechanism_type: public_spending
+  design_features:
+  - mechanism_channel_decomposition
+  - welfare_accounting
+  comparison_structure:
+    treated_units:
+    - Commonwealth policy decisions after 23 May 2022
+    control_units:
+    - 2022 PEFO policy baseline with economic revisions accounted separately
+    time_frequency: annual
+  causal_layers:
+  - layer: first_order_policy_effect
+    mechanism: Published net policy costings affect the reported budget balance.
+    variable_names:
+    - policy_balance_effect_pct_gdp
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: macro_feedback
+    mechanism: Economic and technical revisions can dominate the actual balance movement.
+    variable_names:
+    - parameter_and_other_variations
+    - reconciliation_residual_pct_gdp
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+  - layer: net_welfare
+    mechanism: Services, insurance and distributional benefits can justify a fiscal cost.
+    variable_names:
+    - public_service_and_distributional_benefits
+    measurement_status: data_gap
+    required_for_dispositive_verdict: false
+  promotion_gate: descriptive_only
+  notes: Only a budget-costing verdict is eligible. No causal verdict about growth, debt sustainability, or management
+    quality follows from a negative balance contribution.

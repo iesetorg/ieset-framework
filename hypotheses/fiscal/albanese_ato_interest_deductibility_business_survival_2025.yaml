@@ -1,0 +1,393 @@
+hypothesis_id: albanese_ato_interest_deductibility_business_survival_2025
+version: 1
+topic: fiscal
+status: candidate
+evidence_type: associational
+claim_direction: +
+claim: Among Australian incorporated small employers active on 1 July 2025, high pre-announcement exposure to the
+  withdrawal of ATO-interest deductions is associated with at least 0.5 percentage points greater probability of
+  first external administration during 1 July 2025 to 30 June 2026 than low exposure, after the specified baseline-risk
+  adjustment. This compares high versus low exposure within implementation survivors; it is not the causal effect
+  of the reform versus retaining deductions.
+sample:
+  countries:
+  - AUS
+  period:
+  - 2017
+  - 2026
+  temporal_structure: panel
+  exclusion_rules:
+  - Unit is a linked incorporated employing business/group; consolidated tax groups are analysed consistently and
+    clustered together, without duplicating their subsidiary employment.
+  - 'Primary exposed cohort: incorporated employers active on 2025-07-01, with positive payroll and aggregated turnover
+    below AUD 10 million in 2022-23; freeze size classification before announcement.'
+  - Exclude sole traders and partnerships from the primary ASIC outcome; their personal insolvencies require a separately
+    registered design.
+  - Exclude firms already in external administration before 2025-07-01 from the at-risk cohort. This survivor-conditioned
+    association excludes anticipation exits and cannot estimate a total policy effect. All included firms have zero
+    pre-implementation first-administration outcomes by construction; do not test trends in that outcome within
+    this fixed cohort.
+  - Primary high exposure is simulated annually usable GIC tax shield divided by 2022-23 turnover >=0.001; low exposure
+    is <=0.0002. Do not revise these bands after seeing post-treatment outcomes. Intermediate exposure is retained
+    for secondary continuous-dose analysis.
+  - Use 2017-2019 and July 2022-November 2023 histories only for payroll, revenue, arrears and other baseline distress
+    covariates, not first-administration pretrends within implementation survivors. Flag 2020-2021 as pandemic-distorted
+    and report separately.
+  - Exclude substituted accounting periods from the primary cohort because tax-year applicability can differ; map
+    their legal effective dates for a separately labelled robustness analysis.
+  - Unmatched firms without common support and records lacking consistent identifiers are excluded under a documented
+    outcome-blind rule; report their counts and composition.
+variables:
+  outcome:
+  - name: first_external_administration_12m
+    source: manual:asic_series1_firm_linkage_not_acquired
+    transformation: Binary first external administration 2025-07-01 through 2026-06-30; report 100 times risk difference
+      in percentage points.
+    notes: Requires firm event dates and linked risk-set denominators. Series 1 counts first appointments; aggregate
+      annual releases cannot identify the policy effect. External administration need not mean permanent closure.
+  - name: payroll_employment_retention
+    source: manual:ato_stp_abs_employment_linkage_not_acquired
+    transformation: 'Secondary: payroll headcount and paid hours relative to June 2025, with exits recorded as zero
+      rather than dropped.'
+    notes: Payroll definitions, reporting lags and entity changes require a frozen harmonisation plan; no linked
+      data accessed.
+  treatment:
+  - name: preannouncement_lost_gic_tax_shield_share
+    source: manual:ato_2022_23_debt_gic_tax_returns_not_acquired
+    transformation: Freeze assessed 2022-23 GIC accrued and marginal deduction usability before 2023-12-13. Simulate
+      the immediately usable tax saving under retained deduction, divide by fixed 2022-23 turnover.
+    notes: This is a planned exposure computation from confidential inputs, not an observed series. Do not infer
+      usability from the average tax rate; carryforward-only losses have no immediate shield. Check sensitivity
+      to future tax-shield present value separately.
+  - name: deduction_withdrawal_event
+    source: manual:ato_gic_sic_legal_chronology
+    transformation: Main event 2025-07-01; announcement 2023-12-13; encode announcement-to-implementation as anticipation,
+      not clean pretreatment.
+    notes: Both GIC and SIC deductions were removed. Primary exposure uses GIC; SIC and amended assessments are
+      separately tracked. Normal 30 June year-end businesses only in primary analysis.
+  decomposition_channels:
+  - name: actual_interest_and_cash_tax
+    source: manual:ato_interest_tax_cash_not_acquired
+    transformation: Track gross GIC, remissions, cash taxes and cash payments by month; reconcile removed deduction
+      with actual timing of cash burden.
+    notes: Actual tax benefits can lag assessment and can be unusable in a loss year; mechanical legislation is
+      not a measured cash effect.
+  - name: repayment_refinancing_response
+    source: manual:ato_debt_and_business_credit_not_acquired
+    transformation: Measure tax-debt repayment, commercial refinancing, arrears and finance cost changes.
+    notes: Debt restructuring can absorb the tax shock; report this post-policy response separately rather than
+      controlling it away in the primary adjusted association.
+  - name: firm_capital_and_market_share
+    source: manual:abs_bla_de_business_accounts_not_acquired
+    transformation: Measure investment, successor activity, local employment and industry-market shares including
+      entrants.
+    notes: Requires business linkage and successor/phoenix checks; neither disappearance of an ABN nor one ASIC
+      appointment establishes destroyed productive capacity.
+  - name: fiscal_collection_and_enforcement_cost
+    source: manual:ato_collection_cost_and_revenue_not_acquired
+    transformation: Incremental tax collections net of collection, compliance and insolvency administration costs.
+    notes: Keep tax transfers distinct from resource costs; legal documentation does not measure this channel.
+  - name: workers_owners_creditors_incidence
+    source: manual:linked_payroll_owner_creditor_records_not_acquired
+    transformation: Allocate measured cash-flow and employment changes among workers, owners, suppliers, creditors
+      and taxpayers.
+    notes: No distributional microdata obtained.
+  - name: net_welfare_and_macro_feedback
+    source: manual:linked_firm_sector_welfare_inputs_not_acquired
+    transformation: Combine observed productive losses, reallocation gains and externalities without treating every
+      tax payment as deadweight loss.
+    notes: A causal survival effect alone is insufficient for a national welfare judgment.
+  controls:
+  - name: baseline_risk_and_balance_sheet
+    source: manual:ato_abs_baseline_firm_accounts_not_acquired
+    transformation: Freeze 2022-23 age, turnover, employment, industry, state, cash flow, profits, liquidity, tax
+      arrears, bank leverage and pre-event trends.
+    notes: Use only predetermined covariates in the primary adjusted association; document overlap and balance.
+  - name: enforcement_policy_exposure
+    source: manual:ato_notice_remission_and_collection_logs_not_acquired
+    transformation: Separate preassigned collection regime and notices, recovery pilots and remission-policy changes
+      from the deduction intervention.
+    notes: Use preassigned collection exposure for adjustment. Contemporaneous notices may be co-treatment or mediators
+      and cannot identify an enforcement-held-fixed causal counterfactual merely by including them in a regression.
+      Report them descriptively and in explicitly labelled sensitivity analyses.
+  - name: sector_state_macro_shocks
+    source: manual:rba_abs_state_tax_chronology_not_ingested
+    transformation: Fixed industry and state indicators plus predetermined floating-rate debt, sector energy/rent
+      and state-tax exposure interacted with predeclared annual financing/sector shock summaries over the same 12-month
+      outcome window.
+    notes: RBA rates, payroll/land taxes and energy rents are competing explanations. Source tables and legal dates
+      must be manifested before use.
+intervention_channel: fiscal
+intervention_channel_justification: Federal removal of an income-tax deduction increases the tax base for exposed
+  debtors. The ATO collection regime is a separate institutional/enforcement co-treatment; it is not recoded as
+  a statutory corporate-rate change.
+scope:
+  period:
+  - 2025
+  - 2026
+  countries:
+  - AUS
+  outcome_dim:
+  - financial_crisis
+  - employment_labour
+  - taxation
+  policy_family:
+  - tax_policy
+  treatment_tags:
+  - albanese_government
+  - ato_interest_deduction_removal_2025
+estimator:
+  template: descriptive
+  random_seed: 20261009
+  clustering: Consolidated business group; report effective independent groups and dependence sensitivity.
+  fixed_effects:
+  - industry
+  - state
+  notes: 'ASSOCIATIONAL SCREEN ONLY. Define a fixed at-risk cohort on 2025-07-01. Primary estimator A is a doubly
+    robust covariate-standardised 12-month risk difference comparing high with low predetermined GIC exposure, targeted
+    to the high-exposure cohort. Freeze matching, balance and common-support rules before outcome inspection. Use
+    firm-level cumulative-incidence outcomes, with statutory first-administration events counted once, and appropriate
+    censoring/missingness handling. Do not use hazard ratios as risk differences.
+
+    Companion estimator B matches high/low firms on the same pre-announcement distress covariates and computes paired/weighted
+    12-month risk differences, using the same target high-exposure firms and target weights. Both are associational
+    robustness checks; shared conditional comparability is not independently established causality. Treat differences
+    between estimators as sensitivity, not an opportunity to choose a preferred answer.
+
+    Weight each high-exposure business group equally in the primary target. Freeze sample and weighting before outcomes;
+    report baseline-turnover weights only as sensitivity. Required diagnostics: covariate balance, support, missingness/censoring
+    bounds, continuous exposure, leave-sector/state-out, and announcement-period payroll/arrears changes. First-administration
+    pretrends in the fixed 2025 survivor cohort are mechanically zero and must not be presented as identification
+    evidence. Low exposure is not no treatment, and remaining tax-debt selection or enforcement differences may
+    explain the entire contrast.
+
+    A future causal protocol must use distinct historical at-risk inception cohorts defined before each historical
+    outcome window, include subsequent failures, justify transport across cohorts, and bound anticipation-driven
+    selection into the implementation-survivor population. That is a new separately registered design, not a causal
+    upgrade earned by significance here.
+
+    Require outcome-blind power simulation for the associational contrast: at least 80% probability of clearing
+    the +0.5 pp materiality boundary under a true +1.0 pp difference, after clustering/missingness. Separately assess
+    equivalence power at a true zero contrast; exact-boundary support cannot have 80% power. Missing confidential
+    data, inadequate support, reporting immaturity or insufficient precision mean INCONCLUSIVE/UNTESTED. No generic
+    country-year runner implements this matched-risk procedure.'
+falsification:
+  rule: Support the specified adjusted high-minus-low exposure association only when both valid estimators have
+    lower 95% confidence bounds above +0.5 pp. Falsify it at that material magnitude only when both upper bounds
+    are below +0.5 pp. Otherwise, including conflicting estimators, threshold-overlapping intervals, failed overlap
+    or invalid missingness bounds, report INCONCLUSIVE. Both 90% intervals inside [-0.2,+0.2] pp establish practical
+    equivalence of the adjusted contrast, not no causal policy effect. No screen result identifies the reform effect
+    against retaining deductions.
+  test: Matched and covariate-standardised implementation-survivor risk contrasts; clustered uncertainty and TOST
+    equivalence with fixed exposure bands and outcome. No first-administration pretrend test on the fixed surviving
+    cohort.
+  threshold:
+    outcome_unit: percentage_points
+    material_harm_boundary: 0.5
+    equivalence_band:
+    - -0.2
+    - 0.2
+    effect_ci: 0.95
+    equivalence_ci: 0.9
+    minimum_power: 0.8
+    equivalence_rule: Both designs have 90% intervals wholly inside the equivalence band; ratio agreement is not
+      required near zero.
+    planning_note: Prospective substantive threshold for this draft, not estimated from the observed aggregate trend.
+      Human review and outcome-blind feasibility must be completed before preregistration.
+    power_planning_true_effect_pp: 1.0
+prior_confidence: 0.4
+disclosure: Prepared in response to an initial concern that Albanese-government tax policies harmed business. That
+  concern can bias selection toward adverse outcomes. The associational claim, opposing account and meaningful-effect
+  boundaries are specified before any estimation in this work, but public aggregate outcomes have already been inspected.
+  The subjective prior is an authoring aid, not evidence, and should be reviewed by the human curator. This candidate
+  is a research design, not a verified preregistration or an executed test.
+conflict_disclosure: No personal commercial or political conflict was supplied in this task; none is inferred. Automated
+  assistance researched official sources and authored this draft; no external opposing-prior review has occurred.
+steelman: hypotheses/steelman/albanese_ato_interest_deductibility_business_survival_2025.md
+covers_claims: []
+linked_hypotheses: []
+linked_conditions: []
+notes: 'STATUS: UNTESTED CANDIDATE; prepared 2026-10-09. No outcome microdata have been acquired, no estimator has
+  run, and no causal result, local dataset, fetch manifest, access permission or ingestion adapter is claimed.
+
+  PROVENANCE: manual is a registered pending provenance marker in data/fetchers/publishers.yaml. Each manual series
+  below is a planned extraction/linkage, not an existing IESET dataset. Before estimation, preserve publisher URL,
+  exact table/field, unit, coverage, extraction UTC, release vintage, license/access restrictions, SHA256 and linkage
+  recipe in an immutable manifest. The 2026-10-09 website consultation date is not a dataset fetch timestamp. No
+  derived/computed series is represented as materialized.
+
+  REGISTRATION: resolve access, legal coding, estimand and power review; independently review the steelman; obtain
+  a prospective preregistration commit that is a strict ancestor of the first run commit. Do not create run artifacts
+  from this draft. Changes after any first run require an explicitly versioned alternative; no retroactive preregistration
+  claim.
+
+  ATTRIBUTION: fiscal tax-base treatment only. State payroll and land taxes, RBA monetary policy, pandemic support
+  expiry, commodity prices and ATO enforcement must not be silently attributed to a federal tax-rate increase. Party
+  identity is not a treatment. Effects apply to the stated treated population and window, not to all Australian
+  business or net national welfare.
+
+  LEGAL PROVENANCE: ATO, Changes to deductibility of interest on ATO debts, published 2025-06-06, https://www.ato.gov.au/tax-and-super-professionals/for-tax-professionals/tax-professionals-newsroom/changes-to-deductibility-of-interest-on-ato-debts
+  ; effective 2025-07-01. The rate quoted in that old release is not a current GIC-rate input. ATO law explanation,
+  updated 2025-08-29, https://www.ato.gov.au/api/public/content/0-cd3490b1-151e-442d-9571-b0d481b340e0 records announcement
+  on 2023-12-13 and accounting-period qualification. Preserve the operative statutory text and effective-date coding
+  in the eventual manifest.
+
+  OUTCOME PROVENANCE: ASIC Series 1 and interpretation, https://www.asic.gov.au/about-asic/corporate-publications/statistics/insolvency-statistics
+  and https://asic.gov.au/regulatory-resources/find-a-document/statistics/insolvency-statistics/how-to-interpret-asic-s-corporate-insolvency-statistics/
+  . October 2026 context: https://www.asic.gov.au/about-asic/corporate-publications/newsletters/asic-corporate-insolvency-update/asic-corporate-insolvency-update-issue-41-october-2026
+  reports 14,153 first administrations in 2025-26, down 4% from 2024-25. These public aggregates are context, not
+  treated/control data.
+
+  BUSINESS POPULATION PROVENANCE: ABS, released 2026-08-18, https://www.abs.gov.au/statistics/economy/business-indicators/counts-australian-businesses-including-entries-and-exits/latest-release
+  ; business counts and ASIC registered companies have different denominators. No conversion between them is allowed
+  without a consistent scope.
+
+  ENFORCEMENT PROVENANCE: ANAO, published 2026-06-30, https://www.anao.gov.au/work/performance-audit/australian-taxation-office-management-of-small-business-taxpayer-debt
+  documents firmer actions resuming in 2023-24 and limitations in evaluating debt-management outcomes. The audit
+  supports the need for enforcement controls, not a causal estimate of tax-policy harm.
+
+  ACCESS BLOCKERS: confidential business tax, debt, remission, collection and payroll records; entity-to-group-to-ASIC
+  crosswalk; approval for secure linkage and disclosure control; policy-rate vintage; enforcement-confounding documentation;
+  reporting maturity and power. Public sources cited here do not confer access. Causal attribution is outside this
+  screen; data and adjusted-comparison validity remain unresolved. Numeric prior and effect thresholds are proposals,
+  not measured findings.
+
+
+  DESIGN REVIEW: narrowed to an associational implementation-survivor vulnerability screen. The initial causal framing
+  was rejected before any run because selection at implementation makes first-administration pretrends mechanically
+  zero and because low exposure is not untreated. Any causal design needs new historical inception cohorts, transport
+  assumptions and selection bounds.
+
+
+  PUBLICATION STATUS (2026-10-10): imported as an untested candidate. Any earlier no-registration/no-import statements
+  describe the initial 2026-10-09 draft. Git tracking alone does not establish a verified spec-before-run pair,
+  completed data ingestion, an empirical verdict or evidence-score eligibility. Missing data and protocol gates
+  remain binding.
+
+  '
+mechanism_measurement:
+  mechanism_type: tax_policy
+  design_features:
+  - treated_vs_untreated_units
+  - distributional_decomposition
+  - leakage_substitution
+  - welfare_accounting
+  - implementation_capacity_check
+  comparison_structure:
+    treated_units:
+    - High pre-announcement immediately usable GIC tax-shield exposure in incorporated small employers active at
+      implementation.
+    control_units:
+    - Low-exposure implementation survivors matched/standardised on overlapping pre-announcement distress and finance
+      covariates. This is a comparison group, not a demonstrably untreated control.
+    exempt_or_uncontrolled_units:
+    - Commercial loan interest retaining its usual deductibility is a financing substitution margin, not an automatically
+      exchangeable control group.
+    time_frequency: mixed
+    notes: Primary cumulative 12-month outcome with historical covariates and monthly mechanism data. All comparisons
+      are associational; causal policy effects cannot be recovered from first-administration pretrends in the fixed
+      survivor cohort.
+  causal_layers:
+  - layer: first_order_policy_effect
+    mechanism: Deduction withdrawal changes effective cash tax cost only to the extent the shield was usable.
+    variable_names:
+    - actual_interest_and_cash_tax
+    - preannouncement_lost_gic_tax_shield_share
+    candidate_sources:
+    - manual:ato_interest_tax_cash_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Required corporate-tax layer; legal enactment alone does not count as measured.
+  - layer: behavioral_response
+    mechanism: Firms repay, seek remissions, improve compliance or refinance rather than bear the full gross interest
+      cost.
+    variable_names:
+    - repayment_refinancing_response
+    candidate_sources:
+    - manual:ato_debt_and_business_credit_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Separate behavioural adaptation from baseline distress; do not adjust away mediators in total-effect
+      estimates.
+  - layer: dynamic_investment_response
+    mechanism: Reduced liquidity may defer productive capital and hiring, while discipline may improve allocation.
+    variable_names:
+    - firm_capital_and_market_share
+    - payroll_employment_retention
+    candidate_sources:
+    - manual:abs_bla_de_business_accounts_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Corporate-tax layer; no investment linkage measured.
+  - layer: market_structure_response
+    mechanism: Exit and restructuring can redistribute market share, enable entry or transfer viable assets.
+    variable_names:
+    - first_external_administration_12m
+    - firm_capital_and_market_share
+    candidate_sources:
+    - manual:asic_series1_firm_linkage_not_acquired
+    - manual:abs_bla_de_business_accounts_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Distinguish formal appointment, continuing operation, sale and permanent shutdown.
+  - layer: macro_feedback
+    mechanism: Credit and employment spillovers may amplify firm effects or be offset by resource reallocation and
+      public receipts.
+    variable_names:
+    - net_welfare_and_macro_feedback
+    candidate_sources:
+    - manual:linked_firm_sector_welfare_inputs_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Required corporate-tax layer; no aggregate extrapolation from partial-equilibrium coefficient.
+  - layer: distributional_incidence
+    mechanism: Workers, owners, creditors and compliant competitors may bear different costs and benefits.
+    variable_names:
+    - workers_owners_creditors_incidence
+    candidate_sources:
+    - manual:linked_payroll_owner_creditor_records_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Required corporate-tax layer; group composition and tax-payment incidence unresolved.
+  - layer: fiscal_or_enforcement_cost
+    mechanism: Extra receipts and compliance incentives must be netted against recovery and insolvency administration
+      costs.
+    variable_names:
+    - fiscal_collection_and_enforcement_cost
+    - enforcement_policy_exposure
+    candidate_sources:
+    - manual:ato_collection_cost_and_revenue_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: Concurrent enforcement is both a potential confound and a resource-cost channel.
+  - layer: net_welfare
+    mechanism: A transfer to taxpayers is not automatically a resource loss; evaluate productive losses against
+      compliance and reallocation gains.
+    variable_names:
+    - net_welfare_and_macro_feedback
+    candidate_sources:
+    - manual:linked_firm_sector_welfare_inputs_not_acquired
+    measurement_status: data_gap
+    required_for_dispositive_verdict: true
+    notes: National welfare claim remains unavailable even if the narrower survival effect is estimated.
+  distributional_groups:
+  - enforcement_targets
+  - taxpayers
+  - suppliers
+  - new_entrants
+  - future_cohorts
+  welfare_accounting:
+    first_order_transfer: 'data_gap: actual incremental cash taxes and interest receipts, with remissions and deduction
+      timing.'
+    deadweight_loss: 'data_gap: productive activity lost beyond transfers, net of reallocation gains.'
+    quality_loss: 'data_gap: supplier/customer service continuity after restructurings.'
+    future_supply_loss: 'data_gap: investment and employment scarring.'
+    fiscal_or_enforcement_cost: 'data_gap: collection, compliance and insolvency administration resources.'
+    net_welfare_formula: 'data_gap: compliance/fairness and reallocation benefits plus value of incremental public
+      resources minus non-transfer output, adjustment and administration costs; avoid double-counting tax receipts
+      as both benefit and loss.'
+  promotion_gate: screen_only_until_second_order_measured
+  notes: All six fiscal.tax_corporate layers are explicitly required and currently data_gap; enforcement and net
+    welfare are additional required checks. No axis/position mapping has been added. Mechanism layer names are schema
+    categories, not certification of causal inference. The adjusted high/low vulnerability contrast alone cannot
+    establish a policy effect.
