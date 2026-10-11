@@ -83,7 +83,8 @@ def test_french_1789_1804_1814_steps_extend_the_signed_axis_history() -> None:
         country["composite_first_year"]
         for country in result["countries"].values()
         if country["composite_first_year"] is not None
-    ) == 1846
+    ) == 1789
+    assert result["countries"]["USA"]["composite_first_year"] == 1789
     # These early institutional steps are outside the composite's axis set.
     assert france["composite_first_year"] > 1846
 
