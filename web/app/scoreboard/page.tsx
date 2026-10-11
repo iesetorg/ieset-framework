@@ -35,13 +35,16 @@ export default async function ScoreboardPage() {
       if (Math.abs(rawNetDiff) > 0.001) return rawNetDiff;
       return a.position_id.localeCompare(b.position_id);
     });
-  const untestedOnly = rankedSchools.filter((s) => s.tested === 0);
   const totalRun = rankedSchools.reduce((a, s) => a + s.tested, 0);
   const totalDirectional = rankedSchools.reduce(
     (a, s) => a + s.supports + s.partial_supports + s.partial_refutes + s.refutes,
     0
   );
   const totalClaims = rankedSchools.reduce((a, s) => a + s.total_claims, 0);
+  const totalPublicResultLinks = rankedSchools.reduce(
+    (a, s) => a + s.scored_claims.filter((c) => c.public_result_visible).length,
+    0
+  );
   const distinctLinkedHypotheses = new Set(
     rankedSchools.flatMap((s) =>
       s.scored_claims
@@ -66,23 +69,34 @@ export default async function ScoreboardPage() {
           )
           .map((c) => c.linked_hypothesis_id)
       );
+      const publicResultLinked = new Set(
+        s.scored_claims
+          .filter(
+            (c) =>
+              c.hypothesis_exists &&
+              c.linked_hypothesis_id &&
+              c.public_result_visible
+          )
+          .map((c) => c.linked_hypothesis_id)
+      );
       const linkedCount = linked.size;
       const testedCount = testedLinked.size;
       return {
         position_id: s.position_id,
         school: s.school,
+        score: s,
         linkedCount,
+        publicResultCount: publicResultLinked.size,
+        archiveOrPendingCount: Math.max(0, linkedCount - publicResultLinked.size),
         testedCount,
+        directionalCount:
+          s.supports + s.partial_supports + s.partial_refutes + s.refutes,
         pendingCount: Math.max(0, linkedCount - testedCount),
         linkedGap: Math.max(0, COVERAGE_LINKED_FLOOR - linkedCount),
         testedGap: Math.max(0, COVERAGE_TESTED_FLOOR - testedCount),
       };
     })
-    .sort((a, b) => {
-      const gapDiff = b.linkedGap + b.testedGap - (a.linkedGap + a.testedGap);
-      if (gapDiff !== 0) return gapDiff;
-      return a.testedCount - b.testedCount;
-    });
+    .sort((a, b) => a.school.localeCompare(b.school));
   const balancedCoverage = coverageRows.filter(
     (r) => r.linkedGap === 0 && r.testedGap === 0
   ).length;
@@ -112,6 +126,11 @@ export default async function ScoreboardPage() {
           <div className="text-[11px] text-muted">Across {distinctLinkedHypotheses} distinct linked hypotheses</div>
         </div>
         <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Links to public results</div>
+          <div className="text-[22px] font-semibold">{totalPublicResultLinks}</div>
+          <div className="text-[11px] text-muted">Historical and advance links</div>
+        </div>
+        <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Eligible advance results</div>
           <div className="text-[22px] font-semibold">{totalRun}</div>
         </div>
@@ -120,7 +139,7 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{totalDirectional}</div>
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">V1 coverage balanced</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Schools at coverage target</div>
           <div className="text-[22px] font-semibold">{balancedCoverage}/{rankedSchools.length}</div>
         </div>
         <div>
@@ -128,6 +147,60 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{benchmarkControls.length}</div>
         </div>
       </div>
+
+      <section aria-labelledby="school-coverage-heading" className="mb-8">
+        <h2 id="school-coverage-heading" className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+          All {rankedSchools.length} schools — hypothesis coverage
+        </h2>
+        <p className="mb-4 max-w-[860px] text-[13.5px] leading-relaxed text-muted">
+          Every row links to the school&apos;s authored hypotheses, including
+          archived and pending records. Public results show which linked studies
+          clear the evidence gate. Only eligible advance results affect the
+          forecast score. Counts of hypotheses are distinct within each school;
+          a study linked to several schools appears in each relevant row.
+        </p>
+        <div className="overflow-x-auto rounded border border-rule bg-white">
+          <table className="w-full min-w-[900px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-rule bg-panel">
+                <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">School and hypothesis list</th>
+                <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Distinct authored hypothesis IDs linked to this school">Linked hypotheses</th>
+                <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Distinct linked hypotheses that clear the public evidence gate, including historical links">Public results</th>
+                <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Linked hypotheses still archived or awaiting an eligible public result">Archive / pending</th>
+                <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Claim links with eligible results and a school prediction frozen before the study first ran">Advance results</th>
+                <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Advance results with a directional school outcome">Directional</th>
+                <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Forecast quality net; unavailable without an eligible advance result">Forecast Q-net</th>
+              </tr>
+            </thead>
+            <tbody>
+              {coverageRows.map((r) => (
+                <tr key={r.position_id} className="border-b border-rule last:border-0 hover:bg-panel">
+                  <td className="p-3 align-top">
+                    <Link href={`/pos/${r.position_id}/#linked-hypotheses`} className="font-medium text-ink hover:underline">
+                      {r.school}
+                    </Link>
+                    <div className="mt-1 text-[11px] text-accent">
+                      <Link href={`/pos/${r.position_id}/#linked-hypotheses`} className="hover:underline">
+                        Browse linked hypotheses →
+                      </Link>
+                    </div>
+                  </td>
+                  <td className="p-3 text-right align-top font-mono font-semibold">{r.linkedCount}</td>
+                  <td className="p-3 text-right align-top font-mono">{r.publicResultCount}</td>
+                  <td className="p-3 text-right align-top font-mono text-muted">{r.archiveOrPendingCount}</td>
+                  <td className="p-3 text-right align-top font-mono">{r.testedCount}</td>
+                  <td className="p-3 text-right align-top font-mono">{r.directionalCount}</td>
+                  <td className="p-3 text-right align-top font-mono" style={{ color: r.testedCount > 0 ? scoreTone(r.score.adjusted_score_signal) : undefined }}>
+                    {r.testedCount > 0
+                      ? `${r.score.adjusted_net_score > 0 ? "+" : ""}${r.score.adjusted_net_score.toFixed(1)}`
+                      : "No score"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <div className="mb-4">
         <VerdictLegend />
@@ -295,28 +368,6 @@ export default async function ScoreboardPage() {
           </tbody>
         </table>
       </div>
-
-      {untestedOnly.length > 0 && (
-        <>
-          <h2 className="mt-12 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-            Schools with no scored advance results yet
-          </h2>
-          <div className="rounded border border-rule bg-white">
-            <ul className="divide-y divide-rule">
-              {untestedOnly.map((s) => (
-                <li key={s.position_id} className="flex items-center justify-between p-3">
-                  <Link href={`/pos/${s.position_id}`} className="font-medium text-ink hover:underline">
-                    {s.school}
-                  </Link>
-                  <span className="text-[13px] text-muted">
-                    {s.total_claims} linked claim{s.total_claims === 1 ? "" : "s"} · no advance score
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
 
       {benchmarkControls.length > 0 && (
         <>

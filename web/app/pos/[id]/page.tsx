@@ -114,6 +114,34 @@ export default async function PositionPage({
     });
   }
 
+  const authoredClaims = myScore?.scored_claims ?? [];
+  const claimGroups = [
+    {
+      id: "advance-results",
+      title: "Eligible advance results",
+      explanation: "These predictions were recorded before the study first ran and cleared the public evidence gate. They enter the forecast score; an inconclusive result adds no directional points.",
+      claims: authoredClaims.filter((c) => c.outcome !== "untested"),
+    },
+    {
+      id: "public-results",
+      title: "Public results without forecast credit",
+      explanation: "The hypothesis has a public result, but this school link did not clear every forecast gate. Its evidence remains available for historical context without earning forecast points.",
+      claims: authoredClaims.filter((c) => c.outcome === "untested" && c.public_result_visible),
+    },
+    {
+      id: "archived-results",
+      title: "Archived results",
+      explanation: "A run result exists, but it does not clear the public evidence gate. No verdict or forecast points are attributed to this school here.",
+      claims: authoredClaims.filter((c) => c.outcome === "untested" && !c.public_result_visible && c.linked_result_available),
+    },
+    {
+      id: "pending-results",
+      title: "No verdict yet",
+      explanation: "These authored claims have no run verdict. Some may have diagnostics or a blocked run; none affects the school's score.",
+      claims: authoredClaims.filter((c) => c.outcome === "untested" && !c.public_result_visible && !c.linked_result_available),
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-content px-8 py-10">
       <div className="mb-3 flex items-center gap-3 text-[13px] text-muted">
@@ -200,8 +228,8 @@ export default async function PositionPage({
                 ) : (
                   <>
                     <strong>{myScore.total_claims}</strong> claims listed, none yet
-                    qualifies for an advance forecast score. Linked historical
-                    results remain available below.
+                    qualifies for an advance forecast score. All linked claims
+                    and their result status are available below.
                   </>
                 )}
               </div>
@@ -241,6 +269,91 @@ export default async function PositionPage({
           <div className="prose-body text-[15px] leading-[1.65]">
             <p>{p.steelman}</p>
           </div>
+        </section>
+      )}
+
+      {myScore && authoredClaims.length > 0 && (
+        <section id="linked-hypotheses" className="mb-10 scroll-mt-20">
+          <h2 className="mb-3 border-b border-rule pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+            School claims and linked hypotheses
+          </h2>
+          <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-muted">
+            All {authoredClaims.length} authored claim links are listed below. A
+            linked hypothesis can have a result without earning an advance
+            forecast score. Counts here are claim links, so one hypothesis may
+            appear more than once.
+          </p>
+          <nav aria-label="Claim result groups" className="mb-6 flex flex-wrap gap-2 text-[12px]">
+            {claimGroups.map((group) => (
+              <a key={group.id} href={`#${group.id}`} className="rounded border border-rule bg-panel px-3 py-2 text-ink hover:border-rule-strong hover:no-underline">
+                {group.title} <strong>{group.claims.length}</strong>
+              </a>
+            ))}
+          </nav>
+          {claimGroups.map((group) => (
+            <div key={group.id} id={group.id} className="mb-8 scroll-mt-20 last:mb-0">
+              <h3 className="mb-1 text-[15px] font-semibold text-ink">
+                {group.title} <span className="font-normal text-muted">({group.claims.length})</span>
+              </h3>
+              <p className="mt-0 mb-3 max-w-[800px] text-[12.5px] leading-relaxed text-muted">
+                {group.explanation}
+              </p>
+              {group.claims.length > 0 ? (
+                <div className="space-y-2">
+                  {group.claims.map((c, i) => {
+                    const tone = c.outcome !== "untested"
+                      ? outcomeTone(c.outcome)
+                      : group.id === "public-results"
+                        ? { bg: "#e7edf4", fg: "#355d80", label: "public · historical" }
+                        : group.id === "archived-results"
+                          ? { bg: "#f3f3f1", fg: "#636363", label: "archived" }
+                          : { bg: "#fdf1da", fg: "#8b641a", label: "no verdict" };
+                    return (
+                      <div key={`${c.linked_hypothesis_id}-${i}`} className="rounded border border-rule bg-white px-4 py-3">
+                        <div className="flex flex-wrap items-start gap-2">
+                          <span className="inline-flex flex-none rounded px-2 py-[3px] text-[11px] font-semibold" style={{ background: tone.bg, color: tone.fg }}>
+                            {tone.label}
+                          </span>
+                          <div className="min-w-[240px] flex-1">
+                            <p className="m-0 text-[14px] leading-[1.5] text-ink">{c.claim}</p>
+                            <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted">
+                              <span>School predicts: <code>{c.school_prediction}</code></span>
+                              <span>·</span>
+                              <span>Hypothesis:</span>
+                              {c.hypothesis_exists ? (
+                                <Link href={`/h/${c.linked_hypothesis_id}`} className="font-mono">
+                                  {c.linked_hypothesis_id}
+                                </Link>
+                              ) : (
+                                <span className="font-mono text-faint">{c.linked_hypothesis_id} (record not available)</span>
+                              )}
+                            </div>
+                            {c.public_result_visible && c.verdict && (
+                              <div className="mt-2 rounded bg-panel px-3 py-2 text-[12px] text-muted">
+                                <span className="text-ink">{c.verdict}</span>
+                              </div>
+                            )}
+                            {group.id === "public-results" && !c.school_prediction_pre_run && (
+                              <p className="mb-0 mt-2 text-[11.5px] text-muted">
+                                This school link was added or changed after the study first ran.
+                              </p>
+                            )}
+                            {group.id === "public-results" && !c.school_score_eligible && (
+                              <p className="mb-0 mt-2 text-[11.5px] text-muted">
+                                This public result is excluded from school forecast scoring.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="rounded border border-rule bg-panel px-4 py-3 text-[12.5px] text-muted">None in this group yet.</p>
+              )}
+            </div>
+          ))}
         </section>
       )}
 
@@ -317,73 +430,6 @@ export default async function PositionPage({
           })
         )}
       </section>
-
-      {myScore && myScore.scored_claims.some((c) => c.verdict) && (
-        <section className="mb-10">
-          <h2 className="mb-4 border-b border-rule pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-            School claims — linked empirical results
-          </h2>
-          <p className="mb-4 text-[13px] leading-relaxed text-muted">
-            Advance predictions contribute to the scoreboard. Links recorded
-            after a study first ran show relevant historical evidence but do not
-            earn forecast points.
-          </p>
-          <div className="space-y-3">
-            {myScore.scored_claims.filter((c) => c.verdict).map((c, i) => {
-              const tone = c.outcome === "untested"
-                ? { bg: "#f3f3f1", fg: "#636363", label: "historical link" }
-                : outcomeTone(c.outcome);
-              return (
-                <div
-                  key={i}
-                  className="overflow-hidden rounded border border-rule bg-white"
-                >
-                  <div className="flex flex-wrap items-start gap-3 p-4">
-                    <span
-                      className="inline-flex items-center rounded px-2 py-[3px] text-xs font-semibold"
-                      style={{ background: tone.bg, color: tone.fg }}
-                    >
-                      {tone.label}
-                    </span>
-                    <div className="min-w-[300px] flex-1">
-                      <p className="m-0 text-[15px] leading-[1.55] text-ink">{c.claim}</p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-muted">
-                        <span>School predicts:</span>
-                        <code className="text-[11px]">{c.school_prediction}</code>
-                        <span>·</span>
-                        <span>Hypothesis:</span>
-                        {c.hypothesis_exists ? (
-                          <Link
-                            href={`/h/${c.linked_hypothesis_id}`}
-                            className="font-mono text-[11px]"
-                          >
-                            {c.linked_hypothesis_id}
-                          </Link>
-                        ) : (
-                          <span className="font-mono text-[11px] text-faint">
-                            {c.linked_hypothesis_id} <em>(not yet written)</em>
-                          </span>
-                        )}
-                      </div>
-                      {c.verdict && (
-                        <div className="mt-2 rounded bg-panel px-3 py-2 text-[12.5px] text-muted">
-                          <span className="text-ink">{c.verdict}</span>
-                        </div>
-                      )}
-                      {!c.school_prediction_pre_run && (
-                        <p className="mb-0 mt-2 text-[12px] text-muted">
-                          This school link was added or changed after the study
-                          first ran, so it does not enter the forecast score.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* Axis fingerprint moved to the top of the page (above the empirical
           track record). Inferred-evidence section follows below. */}

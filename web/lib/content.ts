@@ -725,6 +725,10 @@ export interface ScoredClaim {
   evidence_weight: number;
   school_score_eligible: boolean;
   school_prediction_pre_run: boolean;
+  /** The linked result passes the public evidence gate, regardless of school score eligibility. */
+  public_result_visible: boolean;
+  /** A run verdict exists, including historical or archived results. */
+  linked_result_available: boolean;
   coverage_confidence?: string;
   coverage_confidence_weight: number;
   hypothesis_prior_confidence?: number;
@@ -1198,14 +1202,18 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       let verdict: string | undefined;
       const linkedHyp = hypById.get(c.linked_hypothesis_id);
       const schoolScoreEligible = linkedHyp?._school_score_eligible !== false;
+      let publicResultVisible = false;
+      let linkedResultAvailable = false;
       if (exists) {
         const run = await loadRunArtifacts(c.linked_hypothesis_id);
+        linkedResultAvailable = Boolean(run.verdict);
+        publicResultVisible = Boolean(linkedHyp && isHypothesisPubliclyVisible(linkedHyp, run));
         // Public-visibility gate: only count verdicts from hypotheses that
         // pass the integrity bar (sharpened rule + real replication + real
         // verdict). Verdicts auto-graded against the generic falsification
         // boilerplate are excluded from school net-scores — they're not
         // dispositive enough to update a position's standing.
-        if (linkedHyp && schoolScoreEligible && isHypothesisPubliclyVisible(linkedHyp, run)) {
+        if (linkedHyp && schoolScoreEligible && publicResultVisible) {
           verdict = run.verdict;
         }
       }
@@ -1280,6 +1288,8 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         evidence_weight,
         school_score_eligible: schoolScoreEligible,
         school_prediction_pre_run: schoolPredictionPreRun,
+        public_result_visible: publicResultVisible,
+        linked_result_available: linkedResultAvailable,
         coverage_confidence,
         coverage_confidence_weight,
         hypothesis_prior_confidence: linkedHyp?.prior_confidence,
