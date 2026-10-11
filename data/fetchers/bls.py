@@ -527,6 +527,25 @@ def _fetch_qcew_panel(series_id: str, *, fetch_ts: datetime) -> FetchResult:
     )
 
 
+def _normalise_footnotes(fn) -> list[dict]:
+    """Coerce BLS footnotes to a list of {code, text} dicts.
+
+    For older windows (e.g. start_year <= 2016) BLS returns ``[{}]``; pyarrow
+    cannot write a struct with no child fields, so every element gets the same
+    two keys (None when absent). Matches the shape of recent vintages.
+    """
+    if fn is None or (isinstance(fn, float) and pd.isna(fn)):
+        fn = []
+    if isinstance(fn, dict):
+        fn = [fn]
+    out = [
+        {"code": (f or {}).get("code"), "text": (f or {}).get("text")}
+        for f in list(fn)
+        if isinstance(f, dict) or f is None
+    ]
+    return out or [{"code": None, "text": None}]
+
+
 def fetch(
     series_id: str,
     *,
@@ -570,6 +589,8 @@ def fetch(
     df = pd.DataFrame(data)
     df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
     df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    if "footnotes" in df.columns:
+        df["footnotes"] = df["footnotes"].map(_normalise_footnotes)
 
     path_out, sha = write_vintage(
         publisher="bls",

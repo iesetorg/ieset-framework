@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../../IESET/schemas/hypothesis.schema.json
+hypothesis_id: california_fast_food_20_wage_restaurant_employment
+version: 1
+status: draft
+topic: labour
+claim: California's $20 fast-food minimum wage (Apr 2024) reduced restaurant employment relative to the rest of the US.
+claim_direction: '-'
+evidence_type: associational
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 2023
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: ca_food_services_emp
+    source: bls:SMU06000007072200001
+    transformation: index Mar-2024=100
+  - name: us_food_services_emp_nsa
+    source: bls:CEU7072200001
+    transformation: index Mar-2024=100
+estimator:
+  template: descriptive
+falsification:
+  rule: Compare index (Mar-2024=100, same calendar month to net seasonality) at latest common month. SUPPORTED if CA index <= US index - 1.5; REFUTED if CA index >= US index; PARTIAL otherwise. Food services
+    & drinking places (broader than fast food).
+  test: index_gap_vs_us
+  threshold: ca_idx - us_idx <= -1.5
+prior_confidence: 0.5
+disclosure: Drafted 2026-10-09 by agent from a high-engagement X claim. The headline value quoted in the tweet was seen before drafting; the falsification threshold was fixed before the analysis script
+  was run and is frozen in PREREG_LEDGER.json (SHA256 + UTC). Not git-pre-registered (needs user-approved commit).
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/california_fast_food_20_wage_restaurant_employment.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - employment_labour
+  policy_family:
+  - labour_market
+source_provenance:
+  archive_refs:
+  - https://x.com/LeadingReport/status/2106846970304192891
+  mined_at: '2026-10-09'
+  mined_by_model: Grok Bot (X search)
+notes: X-sourced draft; build dir ~/IESET-x-build; runner scripts/run_x_hypotheses.py

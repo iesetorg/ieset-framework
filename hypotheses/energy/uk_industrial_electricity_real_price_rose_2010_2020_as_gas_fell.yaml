@@ -1,0 +1,51 @@
+hypothesis_id: uk_industrial_electricity_real_price_rose_2010_2020_as_gas_fell
+version: 1
+status: pre_registered
+topic: energy
+claim: UK industrial electricity prices rose by about 30% in real terms between 2010 and 2020 while the wholesale price of gas fell, so the rise cannot be blamed on overseas conflicts or fuel costs.
+claim_direction: +
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - GBR
+  period: &id001
+  - 2010
+  - 2020
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: uk_industrial_electricity_price
+    source: eurostat:nrg_pc_205
+    transformation: GBP/kWh, band MWH2000-19999, excl. VAT and recoverable taxes, annual mean of semesters
+  - name: uk_hicp
+    source: eurostat:prc_hicp_aind
+    transformation: CP00 annual average index, deflator
+  - name: eu_gas_price
+    source: fred:PNGASEUUSDM
+    transformation: USD/MMBtu, converted to GBP with fred:DEXUSUK, annual mean
+estimator:
+  template: descriptive
+falsification:
+  rule: 'E = real (HICP-deflated) change in UK band-ID industrial price from 2010 to the last UK year available in 2019-2020 (use 2020 if present, else 2019; report which). G = change in GBP gas price 2010
+    to the same end year. SUPPORTED if E >= +20% AND G < 0. REFUTED if E <= +5%. PARTIAL otherwise. Robustness (reported): band IC (MWH500-1999).'
+  test: endpoint_change_checklist
+  threshold: E>=0.20 & G<0
+prior_confidence: 0.65
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/uk_industrial_electricity_real_price_rose_2010_2020_as_gas_fell.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - energy
+  policy_family:
+  - energy_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/s8mb/status/2106485478820028524
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'

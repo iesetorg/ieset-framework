@@ -1,0 +1,49 @@
+hypothesis_id: us_mortgage_rates_normal_but_real_home_prices_far_above_average
+version: 1
+status: pre_registered
+topic: housing
+claim: US mortgage rates near 7% are within the normal historical range, while real home prices are about 90% above their long-term average since 1890.
+claim_direction: '?'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 1890
+  - 2026
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: mortgage_rate_30y
+    source: fred:MORTGAGE30US
+    transformation: weekly, percent; monthly mean
+  - name: real_home_price_index
+    source: shiller:home_price_index
+    transformation: Shiller Fig3-1 real home price index, annual/monthly
+estimator:
+  template: descriptive
+falsification:
+  rule: 'A = latest-month mean MORTGAGE30US <= mean of all MORTGAGE30US since 1971-04. B = latest Shiller real home price index >= 1.70 x its mean over 1890..latest. SUPPORTED if A and B. PARTIAL if exactly
+    one. REFUTED if neither. Informative: share of months since 1971 with a rate above latest.'
+  test: historical_comparison_checklist
+  threshold: rate<=mean_since_1971 & real_hpi>=1.7*mean_since_1890
+prior_confidence: 0.7
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/us_mortgage_rates_normal_but_real_home_prices_far_above_average.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - housing
+  policy_family:
+  - monetary_policy
+  - housing_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/nickgerli1/status/2105323344748757372
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'

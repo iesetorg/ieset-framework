@@ -1,0 +1,48 @@
+hypothesis_id: us_median_household_income_record_and_poverty_record_low_2025
+version: 1
+status: pre_registered
+topic: distribution
+claim: US real median household income is at a record high and the official poverty rate (10.2%) is the lowest on record.
+claim_direction: '?'
+evidence_type: descriptive
+sample:
+  countries: &id002
+  - USA
+  period: &id001
+  - 1959
+  - 2025
+  temporal_structure: time_series
+variables:
+  outcome:
+  - name: real_median_household_income
+    source: fred:MEHOINUSA672N
+    transformation: 2025 CPI-U-RS dollars, annual
+  - name: official_poverty_rate
+    source: us_census:hstpov2
+    transformation: percent of all people, official measure, CPS ASEC Historical Table 2
+estimator:
+  template: descriptive
+falsification:
+  rule: 'A = latest-year MEHOINUSA672N is the maximum of the whole series. B = latest-year official poverty rate (all people) is strictly the lowest since 1959 (ties count as not strictly lowest; report).
+    SUPPORTED if A and B. PARTIAL if exactly one. REFUTED if neither. Informative: latest poverty rate vs claimed 10.2%. Census table-break years (2013, 2017 redesigns) use the post-redesign row.'
+  test: record_checklist
+  threshold: income_latest==max & poverty_latest==min
+prior_confidence: 0.55
+disclosure: Drafted 2026-10-09 from a high-engagement X post (source URL in source_provenance). The figures quoted in the post were seen before drafting. No IESET data for this test was fetched or inspected
+  before this spec was frozen in prereg/x_sourced_2026-10-09_batch2/PREREG_LEDGER.json and committed to git; the run directory is added in a later commit. Thresholds chosen by the drafting agent and not
+  reviewed by a second analyst.
+conflict_disclosure: Author holds no positions related to this claim. Engine house prior is market-liberal; disclosed.
+steelman: hypotheses/steelman/us_median_household_income_record_and_poverty_record_low_2025.md
+scope:
+  period: *id001
+  countries: *id002
+  outcome_dim:
+  - poverty_inequality
+  policy_family:
+  - fiscal_policy
+source_provenance:
+  archive_refs:
+  - https://x.com/KanekoaTheGreat/status/2106462742848967105
+  mined_at: '2026-10-09'
+  mined_by_model: IESET research agent (X search)
+notes: 'X-sourced batch 2 (2026-10-09). Runner: prereg/x_sourced_2026-10-09_batch2/scripts/run_batch2.py'
