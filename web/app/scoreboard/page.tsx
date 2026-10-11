@@ -37,7 +37,18 @@ export default async function ScoreboardPage() {
     });
   const untestedOnly = rankedSchools.filter((s) => s.tested === 0);
   const totalRun = rankedSchools.reduce((a, s) => a + s.tested, 0);
+  const totalDirectional = rankedSchools.reduce(
+    (a, s) => a + s.supports + s.partial_supports + s.partial_refutes + s.refutes,
+    0
+  );
   const totalClaims = rankedSchools.reduce((a, s) => a + s.total_claims, 0);
+  const distinctLinkedHypotheses = new Set(
+    rankedSchools.flatMap((s) =>
+      s.scored_claims
+        .filter((c) => c.hypothesis_exists && c.linked_hypothesis_id)
+        .map((c) => c.linked_hypothesis_id)
+    )
+  ).size;
   const coverageRows = rankedSchools
     .map((s) => {
       const linked = new Set(
@@ -82,13 +93,12 @@ export default async function ScoreboardPage() {
         Scoreboard — schools of thought vs the data
       </h1>
       <p className="mt-4 max-w-[780px] text-[17px] leading-[1.55] text-muted">
-        Every school of thought (position) lists specific predictions it makes,
-        each linked to a hypothesis in the library. When a hypothesis runs, its
-        verdict feeds back into schools whose matching prediction was recorded
-        before that study first ran,
-        while discounting broad failure calls that do not identify why a policy
-        failed. This page is a diagnostic of the current authored corpus, not an
-        independent ranking of economic truth.
+        Every school of thought (position) lists specific claims linked to
+        hypotheses in the library. A result enters a school&apos;s forecast score
+        only when its matching prediction was recorded before the study first
+        ran and the result clears the public evidence gates. Later or ineligible
+        links remain visible as historical evidence. This page is a diagnostic
+        of the current authored corpus, not an independent ranking of economic truth.
       </p>
 
       <div className="my-6 flex flex-wrap gap-6 text-[14px]">
@@ -97,12 +107,17 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{rankedSchools.length}</div>
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Total predictions</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">School claim links</div>
           <div className="text-[22px] font-semibold">{totalClaims}</div>
+          <div className="text-[11px] text-muted">Across {distinctLinkedHypotheses} distinct linked hypotheses</div>
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Advance predictions scored</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Eligible advance results</div>
           <div className="text-[22px] font-semibold">{totalRun}</div>
+        </div>
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Directional outcomes scored</div>
+          <div className="text-[22px] font-semibold">{totalDirectional}</div>
         </div>
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">V1 coverage balanced</div>
@@ -122,11 +137,11 @@ export default async function ScoreboardPage() {
           how to read this
         </div>
         <p className="m-0">
-          <strong>Support rate</strong> = of a school&apos;s advance predictions
-          with eligible results, the fraction where the data agreed with
-          the school. A school with 1-of-1 tested prediction supported is not
-          more vindicated than one with 3-of-5 — the <strong>Tested</strong>{" "}
-          column matters as much as <strong>Rate</strong>. This scoreboard{" "}
+          <strong>Support rate</strong> uses directionally resolved advance
+          results: the share where the data agreed with the school, with partial
+          support counted at half weight. Neutral results remain in the eligible
+          result count but add no directional score. Small samples matter as much
+          as the rate. This scoreboard{" "}
           <em>is</em> the framework updating on evidence in public.
         </p>
         <p className="mt-3 mb-0">
@@ -203,7 +218,7 @@ export default async function ScoreboardPage() {
       </div>
 
       <h2 className="mt-10 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-        Schools with tested predictions — Forecast Q-net view
+        Schools with eligible advance results — Forecast Q-net view
       </h2>
       <div className="overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full border-collapse text-sm">
@@ -218,7 +233,7 @@ export default async function ScoreboardPage() {
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Direction-wrong partial verdicts — weak evidence against school">Partial −</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Refutes</th>
               <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted" title="Test-quality failures (pre-trend issues, identification problems) — neither school wins nor loses">Neutral</th>
-              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Untested</th>
+              <th className="p-3 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">Unscored</th>
               <th className="p-3 text-left text-[10px] font-semibold uppercase tracking-wider text-muted">Progress</th>
             </tr>
           </thead>
@@ -284,7 +299,7 @@ export default async function ScoreboardPage() {
       {untestedOnly.length > 0 && (
         <>
           <h2 className="mt-12 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-            Schools with no eligible advance predictions yet
+            Schools with no scored advance results yet
           </h2>
           <div className="rounded border border-rule bg-white">
             <ul className="divide-y divide-rule">
@@ -322,7 +337,7 @@ export default async function ScoreboardPage() {
                   {s.adjusted_net_score.toFixed(1)}
                   {" · "}raw {s.net_score > 0 ? "+" : ""}
                   {s.net_score.toFixed(1)}
-                  {" · "}{s.tested} tested of {s.total_claims}
+                  {" · "}{s.tested} eligible results of {s.total_claims} claim links
                 </div>
               </div>
             ))}
@@ -352,9 +367,10 @@ export default async function ScoreboardPage() {
             verdict on the school.
           </li>
           <li>
-            Predictions marked &quot;untested&quot; are either hypotheses we haven&apos;t
-            run yet, or hypotheses we haven&apos;t written yet. Both are tracked
-            as open work.
+            Unscored claim links may point to studies that have not run,
+            archived or ineligible results, or school predictions attached
+            after a study first ran. A linked hypothesis can exist and have a
+            result without qualifying for an advance forecast score.
           </li>
           <li>
             Distributional wins are not treated as fake wins. They are treated
@@ -363,8 +379,8 @@ export default async function ScoreboardPage() {
             groups, or shrink the base it redistributed from?
           </li>
           <li>
-            The score updates automatically when hypothesis runs land. This page
-            is a live read of the git state.
+            Advance forecast scores update as eligible results enter the
+            published corpus. This page is a live read of the git state.
           </li>
           <li>
             House or calibration positions are benchmark controls. They remain
@@ -419,7 +435,7 @@ function StackedBar({
       <div className="h-full bg-amber" style={{ width: seg(s.partial) }} title={`neutral partial: ${s.partial}`} />
       <div className="h-full" style={{ width: seg(s.partial_refutes), background: "#e3b5b0" }} title={`partial−: ${s.partial_refutes}`} />
       <div className="h-full bg-red" style={{ width: seg(s.refutes) }} title={`refutes: ${s.refutes}`} />
-      <div className="h-full" style={{ width: seg(s.untested), background: "#e8e6e0" }} title={`untested: ${s.untested}`} />
+      <div className="h-full" style={{ width: seg(s.untested), background: "#e8e6e0" }} title={`unscored claim links: ${s.untested}`} />
     </div>
   );
 }
