@@ -66,7 +66,7 @@ Blocker counts overlap when an archived result fails more than one gate. The ful
 | `marxian` | 219 | 15 | 185 | 0 | 269 | registration_legacy_same_commit (196), estimator_floor_failed (25), non_result_verdict (11) |
 | `developmentalism` | 169 | 12 | 188 | 31 | 280 | registration_legacy_same_commit (149), estimator_floor_failed (14), external_integrity_quarantine (4) |
 | `institutionalism` | 159 | 14 | 186 | 41 | 260 | registration_legacy_same_commit (123), estimator_floor_failed (20), neutral_result (11) |
-| `chicago_monetarism` | 233 | 24 | 176 | 0 | 265 | registration_legacy_same_commit (192), estimator_floor_failed (26), non_result_verdict (8) |
+| `chicago_monetarism` | 233 | 24 | 176 | 0 | 265 | registration_legacy_same_commit (192), estimator_floor_failed (26), external_integrity_quarantine (7) |
 | `austrian` | 243 | 34 | 166 | 0 | 233 | registration_legacy_same_commit (175), neutral_result (25), estimator_floor_failed (23) |
 | `ordoliberal` | 258 | 36 | 164 | 0 | 243 | registration_legacy_same_commit (171), neutral_result (36), estimator_floor_failed (26) |
 | `classical_liberal` | 308 | 47 | 153 | 0 | 270 | registration_legacy_same_commit (211), neutral_result (36), estimator_floor_failed (30) |
