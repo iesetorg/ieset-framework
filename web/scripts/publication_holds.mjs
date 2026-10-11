@@ -1,5 +1,18 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const REPO_ROOT = resolve(fileURLToPath(new URL("../../", import.meta.url)));
+
+function hasEntry(path) {
+  try {
+    lstatSync(path);
+    return true;
+  } catch (error) {
+    if (error.code === "ENOENT") return false;
+    throw error;
+  }
+}
 
 export function loadPublicationHolds(repoRoot) {
   const path = join(repoRoot, "engine", "publication_rights_holds.json");
@@ -34,14 +47,19 @@ function counts(values) {
   return tally;
 }
 
-export function projectEvidenceAudit(source, holds) {
+export function projectEvidenceAudit(source, holds, repoRoot = REPO_ROOT) {
   const original = new Map(source.records.map((record) => [record.hypothesis_id, record]));
   for (const id of holds.ids) {
     if (!original.has(id)) throw new Error(`Publication hold ID missing from evidence audit: ${id}`);
   }
   const heldPublic = [...holds.ids].filter((id) => original.get(id).public_visible).length;
-  if (heldPublic !== holds.evidenceQualified) {
-    throw new Error(`Publication hold public count drift: registry ${holds.evidenceQualified}, audit ${heldPublic}`);
+  const publicProjection = heldPublic === 0 && [...holds.ids].every((id) => {
+    const runPath = join(repoRoot, "engine", "runs", id);
+    return original.get(id).registration_status === "registered_no_run" &&
+      !hasEntry(runPath) && !hasEntry(join(runPath, "result_card.md"));
+  });
+  if (heldPublic !== holds.evidenceQualified && !publicProjection) {
+    throw new Error(`Publication hold source is neither the private evidence audit nor a run-free public projection: registry ${holds.evidenceQualified}, audit ${heldPublic}`);
   }
   const records = source.records.filter((record) => !holds.ids.has(record.hypothesis_id));
   return {

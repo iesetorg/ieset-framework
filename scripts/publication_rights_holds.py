@@ -51,9 +51,18 @@ def project_evidence_audit(source: dict[str, Any]) -> dict[str, Any]:
     if missing:
         raise ValueError(f"Publication hold IDs missing from evidence audit: {sorted(missing)}")
     actual_qualified = sum(bool(by_id[item]["public_visible"]) for item in ids)
-    if actual_qualified != qualified:
+    public_projection = actual_qualified == 0 and all(
+        by_id[item]["registration_status"] == "registered_no_run"
+        and not (run := ROOT / "engine" / "runs" / item).exists()
+        and not run.is_symlink()
+        and not (card := run / "result_card.md").exists()
+        and not card.is_symlink()
+        for item in ids
+    )
+    if actual_qualified != qualified and not public_projection:
         raise ValueError(
-            f"Publication hold public count drift: registry {qualified}, audit {actual_qualified}"
+            "Publication hold source is neither the private evidence audit nor a "
+            f"run-free public projection: registry {qualified}, audit {actual_qualified}"
         )
 
     records = [record for record in source["records"] if record["hypothesis_id"] not in ids]

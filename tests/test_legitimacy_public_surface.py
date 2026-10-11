@@ -21,7 +21,17 @@ def test_stats_json_is_publication_safe_census_projection():
     held_ids = {item for group in holds["groups"] for item in group["hypothesis_ids"]}
     held_qualified = sum(group["currently_public"] for group in holds["groups"])
     assert data["counts"]["hypothesis_specs"] == source["counts"]["hypothesis_specs"] - len(held_ids)
-    assert data["counts"]["public_visible_results"] == source["counts"]["public_visible_results"] - held_qualified
+    held_visible_in_source = sum(
+        row["public_visible"]
+        for row in json.loads(
+            (ROOT / "engine" / "evidence_tier_audit.json").read_text(encoding="utf-8")
+        )["records"]
+        if row["hypothesis_id"] in held_ids
+    )
+    assert held_visible_in_source in (0, held_qualified)
+    assert data["counts"]["public_visible_results"] == (
+        source["counts"]["public_visible_results"] - held_visible_in_source
+    )
     assert data["counts"]["publication_rights_held_records"] == len(held_ids)
     assert data["counts"]["publication_rights_held_evidence_qualified"] == held_qualified
     for key in ("policies", "movements", "positions", "ranked_schools", "benchmark_controls"):
