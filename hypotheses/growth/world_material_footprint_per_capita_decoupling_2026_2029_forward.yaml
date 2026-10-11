@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: world_material_footprint_per_capita_decoupling_2026_2029_forward
+version: 1
+status: pre_registered
+topic: growth
+evidence_type: descriptive
+claim_direction: '-'
+claim: >-
+  If real world GDP per person rises at least 6% from 2026 to 2029, the
+  world consumption-based material footprint per person will fall by less
+  than 5% over those same endpoints. A decline of at least 5% in material
+  footprint per person alongside that income growth would refute this
+  narrow degrowth forecast of insufficient per-capita absolute decoupling.
+methodology_note: >-
+  New prospective world-level material-throughput forecast. The selected
+  material-footprint series currently ends in 2022, and the current WDI
+  source vintage ends in 2025; neither selected endpoint exists in the local
+  corpus at registration. No source or outcome values for 2026 or 2029 are
+  opened, and no run artifact exists. This does not test total world tonnes,
+  a planetary-boundary threshold or a causal policy mechanism.
+sample:
+  countries: [GLOBAL]
+  period: [2026, 2029]
+  temporal_structure: time_series
+  exclusion_rules:
+    - Use only the World entity with Code OWID_WRL in the OWID material-footprint-per-capita chart and the WLD aggregate in World Bank WDI real GDP per capita.
+    - Require exact 2026 and 2029 observations for both series in a single vintage per publisher; no neighboring-year substitution, interpolation, country sum or revised-series splice.
+    - Require finite positive endpoint values, the OWID chart column "Material footprint per capita, by type of raw material (tonnes) - Total or no breakdown", and World Bank WDI constant-price GDP-per-person series NY.GDP.PCAP.KD; a renamed or split chart is INCONCLUSIVE pending a new ID.
+    - Fetch the first OWID chart and WDI releases available on or after 2034-01-01, pin both raw responses, metadata, fetch UTC, publisher URLs, licenses, manifests and SHA-256 before opening selected values; if an endpoint is missing, record INCONCLUSIVE.
+variables:
+  outcome:
+    - name: world_material_footprint_per_capita_change_2026_2029
+      source: owid:material-footprint-per-capita
+      transformation: 100 * (World tonnes-per-person in 2029 / World tonnes-per-person in 2026 - 1)
+      notes: >-
+        OWID chart processes UNEP/UN SDG material-footprint-per-capita data,
+        a consumption-based raw-material-equivalent measure. Select the
+        World aggregate and total/no-breakdown material category only.
+  treatment:
+    - name: world_real_gdp_per_capita_change_2026_2029
+      source: world_bank_wdi:NY.GDP.PCAP.KD
+      transformation: 100 * (WLD constant-price GDP per person in 2029 / 2026 - 1)
+      notes: Growth-condition comparator, not a policy intervention or causal treatment.
+estimator:
+  template: descriptive
+  notes: >-
+    One preregistered two-endpoint world comparison. GDP per person first
+    determines whether the growth condition is met. If it is, compare the
+    material-footprint-per-person percentage change with the fixed -5%
+    decoupling threshold. No trend fitting, country weighting, sensitivity
+    window, significance test or alternative throughput proxy.
+falsification:
+  test: world_material_footprint_per_capita_decoupling_2026_2029_forward
+  rule: >-
+    INCONCLUSIVE if source custody, exact endpoints or the GDP-growth
+    condition fails. Given real GDP per person growth of at least 6%,
+    SUPPORTED if the world material footprint per person declines by less
+    than 5% (including a flat or rising footprint); REFUTED if it declines
+    by at least 5%. The boundary is inclusive for refutation.
+  threshold:
+    family_id: world_material_footprint_per_capita_decoupling_2026_2029_forward
+    family_size: 1
+    source_release_not_before: 2034-01-01
+    gdp_per_capita_growth_min_pct: 6.0
+    material_footprint_refute_decline_pct: 5.0
+prior_confidence: 0.63
+disclosure: >-
+  Past material-footprint and GDP series already inform this prior; the
+  selected 2026 and 2029 outcome values are genuinely future observations.
+  Material footprint is model-derived and sensitive to trade allocation and
+  revisions. Per-capita decoupling is weaker than reducing total extraction
+  or meeting ecological limits. This is a descriptive forecast, with zero
+  causal or policy-effect credit; public school-score eligibility must be
+  decided only after a full evidence audit.
+steelman: hypotheses/steelman/world_material_footprint_per_capita_decoupling_2026_2029_forward.md
+scope:
+  period: [2026, 2029]
+  countries: [GLOBAL]
+  outcome_dim: [gdp_growth, energy]
+  policy_family: [none]
+  treatment_tags: [consumption_based_accounting, material_footprint]
+covers_claims:
+  - position_id: degrowth
+    claim_index: 288
+    polarity: aligned
+    school_prediction: supported
+    confidence: medium
+    notes: >-
+      Degrowth predicts that rising global income will not be accompanied
+      by a material decline in consumption-based footprint per person; this
+      narrower per-capita forecast is not total material decoupling.
+linked_hypotheses: []
+linked_conditions: []

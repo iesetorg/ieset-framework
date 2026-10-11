@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/hypothesis.schema.json
+hypothesis_id: nordic_cash_redistribution_gini_2027_2029_forward
+version: 1
+status: pre_registered
+topic: distribution
+evidence_type: descriptive
+claim_direction: '+'
+claim: >-
+  In Denmark, Finland, Iceland, Norway, and Sweden during 2027-2029, the
+  all-age market-income Gini will exceed the disposable-income Gini by an
+  equal-country, equal-year mean of at least 0.10 on the OECD 0-to-1 scale.
+  This is a forecast of the measured tax-and-cash-transfer accounting gap,
+  not a claim that the observed difference identifies a behavioral causal effect.
+methodology_note: >-
+  New prospective school-specific forecast, registered before any 2027-2029
+  OECD IDD values are available. The exact five-country, three-year roster,
+  dataflow selectors, one primary mean, thresholds and missing-data rule are
+  fixed here. Earlier IDD redistribution studies and historical Nordic gaps
+  are visible, so this is not an independent test of a new mechanism. No
+  result or run artifact exists at registration.
+sample:
+  countries: [DNK, FIN, ISL, NOR, SWE]
+  period: [2027, 2029]
+  temporal_structure: panel
+  exclusion_rules:
+    - Require all 15 named country-year pairs in one OECD IDD snapshot; any missing market or disposable measure makes the test INCONCLUSIVE.
+    - Require annual frequency, all ages, METH2012, D_CUR, 0_TO_1, statistical operation _Z, poverty-line selector _Z and exact 2027-2029 years for both measures.
+    - Require OBS_STATUS A and finite market and disposable Ginis in [0,1]; no imputation, provisional observations, revised-definition splice, nearest-year substitution or country replacement.
+    - Use the first OECD IDD dataflow release available on or after 2032-01-01, pinned with raw response, fetch UTC, publisher URL, license, manifest and SHA-256 before any calculation; if its fixed roster is incomplete, record INCONCLUSIVE.
+variables:
+  outcome:
+    - name: market_minus_disposable_gini
+      source: oecd:OECD.WISE.INE,DSD_WISE_IDD@DF_IDD,1.0
+      transformation: >-
+        INC_MRKT_GINI minus INC_DISP_GINI for each exact country-year, both
+        FREQ A, AGE _T, UNIT_MEASURE 0_TO_1, METH2012, D_CUR,
+        STATISTICAL_OPERATION _Z and POVERTY_LINE _Z.
+      notes: >-
+        Same-source accounting comparison of household market income with
+        disposable income after direct taxes and cash transfers. No in-kind
+        services, indirect taxes or behavioral counterfactual is measured.
+intervention_channel: fiscal
+intervention_channel_justification: >-
+  The accounting contrast includes direct taxes and cash transfers, but it
+  does not isolate a policy change or identify the causal effect of a reform.
+estimator:
+  template: descriptive
+  notes: >-
+    One primary estimate: compute each of 15 market-minus-disposable Gini
+    differences, average the three years within each of five countries, then
+    average the five country means. No pooled-year weighting, regression,
+    alternative age group, interval search or significance test.
+falsification:
+  test: nordic_cash_redistribution_gini_2027_2029_forward
+  rule: >-
+    INCONCLUSIVE if source custody or any of the 15 exact paired country-years
+    fails. SUPPORTED if the primary equal-country mean is at least 0.10 Gini
+    units. REFUTED if it is below 0.07. Otherwise PARTIAL. No threshold,
+    source, country or year may change after this registration.
+  threshold:
+    family_id: nordic_cash_redistribution_gini_2027_2029_forward
+    family_size: 1
+    source_release_not_before: 2032-01-01
+    exact_country_year_pairs: 15
+    support_gap_min: 0.10
+    refute_gap_below: 0.07
+prior_confidence: 0.72
+disclosure: >-
+  Older OECD summaries show material before/after cash redistribution gaps,
+  so the prior is favorable and the threshold is not a blind discovery. The
+  future 2027-2029 country-year values are outside the current corpus; source
+  revisions, pension accounting, household surveys and unmeasured services
+  could change the forecast. The test is descriptive, with zero causal or
+  policy-effect credit; public school-score eligibility must be decided only
+  after a full evidence audit.
+steelman: hypotheses/steelman/nordic_cash_redistribution_gini_2027_2029_forward.md
+scope:
+  period: [2027, 2029]
+  countries: [DNK, FIN, ISL, NOR, SWE]
+  outcome_dim: [poverty_inequality, welfare_state]
+  policy_family: [welfare_architecture, tax_policy]
+  treatment_tags: [nordic_cash_redistribution]
+covers_claims:
+  - position_id: social_democratic
+    claim_index: 301
+    polarity: aligned
+    school_prediction: supported
+    confidence: high
+    notes: >-
+      The social-democratic account predicts a sizable observed cash
+      redistribution gap in Nordic household income; this forecast tests its
+      magnitude without claiming causal policy attribution.
+linked_hypotheses: []
+linked_conditions: []
