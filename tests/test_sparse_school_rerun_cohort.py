@@ -123,3 +123,25 @@ def test_status_is_read_from_git_tree_before_first_run(tmp_path):
             "run_first_commit": git("rev-parse", "HEAD"),
         })
         assert observed == status
+
+
+def test_duplicate_country_cleanup_does_not_count_as_frozen_sample_drift(tmp_path):
+    def git(*args):
+        return subprocess.check_output(["git", *args], cwd=tmp_path, text=True).strip()
+
+    git("init", "-q")
+    git("config", "user.name", "IESET Test")
+    git("config", "user.email", "ieset-test@example.invalid")
+    relative_path = "hypotheses/fiscal/example.yaml"
+    spec = tmp_path / relative_path
+    spec.parent.mkdir(parents=True)
+    spec.write_text("sample:\n  countries: [USA, GBR, USA]\n  period: [1990, 2020]\n")
+    git("add", relative_path)
+    git("commit", "-qm", "frozen sample")
+    registration = {"spec_commit": git("rev-parse", "HEAD"), "path": relative_path}
+
+    spec.write_text("sample:\n  countries: [GBR, USA]\n  period: [1990, 2020]\n")
+    assert reruns.frozen_spec_drift(tmp_path, registration) == []
+
+    spec.write_text("sample:\n  countries: [GBR, USA]\n  period: [1990, 2021]\n")
+    assert reruns.frozen_spec_drift(tmp_path, registration) == ["sample"]

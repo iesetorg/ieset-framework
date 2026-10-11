@@ -60,14 +60,27 @@ INTACT_CASE_NOTES = {
         "The design is unchanged, but the external integrity hold requires source and result custody review."
     ),
     "unemployment_benefit_generosity_employment_drag": (
-        "First committed as pre_registered, but the current sample changed after that commitment "
-        "and its saved run is externally quarantined. Recover v1 before judging feasibility."
+        "First committed as pre_registered. Later country-list deduplication did not change "
+        "the frozen sample; its saved run remains externally quarantined. Replay the full "
+        "original rule with claim-matched sources before judging feasibility."
     ),
     "workfare_conditionality_employment_effect": (
-        "First committed as pre_registered, but the current sample changed after that commitment "
-        "and its saved run is externally quarantined. Recover v1 before judging feasibility."
+        "First committed as pre_registered. Later country-list deduplication did not change "
+        "the frozen sample; its saved run remains externally quarantined. Replay the full "
+        "original rule with claim-matched sources before judging feasibility."
     ),
 }
+
+
+def comparable_sample(value: Any) -> Any:
+    """Country-list duplicates do not alter a panel's selected country set."""
+    if not isinstance(value, dict):
+        return value
+    sample = dict(value)
+    countries = sample.get("countries")
+    if isinstance(countries, list) and all(isinstance(code, str) for code in countries):
+        sample["countries"] = sorted(set(countries))
+    return sample
 
 
 def frozen_spec_drift(root: Path, registration: dict[str, Any]) -> list[str]:
@@ -82,7 +95,13 @@ def frozen_spec_drift(root: Path, registration: dict[str, Any]) -> list[str]:
         current = yaml.safe_load((root / path).read_text()) or {}
     except (OSError, subprocess.CalledProcessError, yaml.YAMLError) as exc:
         raise ValueError(f"cannot verify original specification {revision}:{path}") from exc
-    return [field for field in FROZEN_FIELDS if frozen.get(field) != current.get(field)]
+    return [
+        field for field in FROZEN_FIELDS
+        if (
+            comparable_sample(frozen.get(field)) != comparable_sample(current.get(field))
+            if field == "sample" else frozen.get(field) != current.get(field)
+        )
+    ]
 
 
 def timing_verified(registration: dict[str, Any]) -> bool:

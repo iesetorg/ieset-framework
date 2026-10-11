@@ -23,7 +23,7 @@ Generated: 2026-10-11
 - Unique score-eligible tested hypothesis range: 0-53
 - Unique directional scored hypothesis range: 0-18
 - Total gap to 200 directional scored links per school: 3136
-- Theoretical minimum new directional claims even if every existing directional link passes: 267
+- Theoretical minimum new directional claims even if every existing directional link passes: 266
 - V1 linked deficit remaining: 0
 - V1 tested deficit remaining: 786
 
@@ -35,7 +35,7 @@ Generated: 2026-10-11
 | `post_keynesian` | 285 | 17 | 16 | 0 | 0 | 0 | 285 | 0 | 60 | under_covered |
 | `new_keynesian` | 286 | 19 | 18 | 0 | 0 | 0 | 286 | 0 | 60 | under_covered |
 | `democratic_socialist` | 287 | 18 | 17 | 0 | 0 | 0 | 287 | 0 | 60 | under_covered |
-| `degrowth` | 289 | 20 | 19 | 0 | 0 | 0 | 289 | 0 | 60 | under_covered |
+| `degrowth` | 290 | 20 | 19 | 0 | 0 | 0 | 290 | 0 | 60 | under_covered |
 | `marxian` | 290 | 21 | 20 | 0 | 0 | 0 | 290 | 0 | 60 | under_covered |
 | `eco_socialist` | 292 | 16 | 15 | 0 | 0 | 0 | 292 | 0 | 60 | under_covered |
 | `developmentalism` | 301 | 21 | 20 | 0 | 0 | 0 | 301 | 0 | 60 | under_covered |
@@ -59,7 +59,7 @@ Blocker counts overlap when an archived result fails more than one gate. The ful
 | `post_keynesian` | 254 | 0 | 200 | 0 | 268 | registration_legacy_same_commit (227), estimator_floor_failed (31), school_prediction_not_pre_run (15) |
 | `new_keynesian` | 90 | 0 | 200 | 110 | 267 | registration_legacy_same_commit (83), estimator_floor_failed (6), non_result_verdict (5) |
 | `democratic_socialist` | 266 | 0 | 200 | 0 | 269 | registration_legacy_same_commit (242), estimator_floor_failed (31), school_prediction_not_pre_run (14) |
-| `degrowth` | 151 | 0 | 200 | 49 | 269 | registration_legacy_same_commit (149), estimator_floor_failed (20), non_result_verdict (8) |
+| `degrowth` | 152 | 0 | 200 | 48 | 270 | registration_legacy_same_commit (149), estimator_floor_failed (20), non_result_verdict (8) |
 | `marxian` | 219 | 0 | 200 | 0 | 269 | registration_legacy_same_commit (196), estimator_floor_failed (25), school_prediction_not_pre_run (19) |
 | `eco_socialist` | 230 | 0 | 200 | 0 | 276 | registration_legacy_same_commit (214), estimator_floor_failed (29), non_result_verdict (13) |
 | `developmentalism` | 169 | 0 | 200 | 31 | 280 | registration_legacy_same_commit (149), estimator_floor_failed (14), school_prediction_not_pre_run (12) |

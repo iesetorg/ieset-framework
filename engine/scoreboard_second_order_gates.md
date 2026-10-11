@@ -4,17 +4,17 @@ This generated artifact separates hypothesis verdicts, school forecast scoring, 
 
 ## Summary
 
-- Claim links: 5067
+- Claim links: 5068
 - Public claim links: 560
-- School-scored public links: 543
-- Public links retained without school score: 17
+- School-scored public links: 202
+- Public links retained without school score: 358
 - Declared-gate eligible public links: 202
 - Declared-gate held public links: 358
 - Strict-gate eligible public links: 0
 - Strict-gate held public links: 560
 - Declared gate statuses: `{"missing_contract_flag": 202, "school_prediction_timing_hold": 341, "school_score_hold": 17}`
 - Strict gate statuses: `{"missing_contract_hold": 202, "school_prediction_timing_hold": 341, "school_score_hold": 17}`
-- Failure-credit classes: `{"not_failure_prediction_win": 5067}`
+- Failure-credit classes: `{"not_failure_prediction_win": 5068}`
 
 ## Held Public Links
 

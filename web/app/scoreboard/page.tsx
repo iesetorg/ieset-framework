@@ -16,6 +16,7 @@ function formatPct(n: number): string {
 
 const COVERAGE_LINKED_FLOOR = 100;
 const COVERAGE_TESTED_FLOOR = 60;
+const DIRECTIONAL_TARGET_PER_SCHOOL = 200;
 
 export default async function ScoreboardPage() {
   const scores = await scoreAllPositions();
@@ -36,6 +37,11 @@ export default async function ScoreboardPage() {
       return a.position_id.localeCompare(b.position_id);
     });
   const totalRun = rankedSchools.reduce((a, s) => a + s.tested, 0);
+  const distinctAdvanceStudies = new Set(
+    rankedSchools.flatMap((s) => s.scored_claims
+      .filter((c) => c.outcome !== "untested" && c.linked_hypothesis_id)
+      .map((c) => c.linked_hypothesis_id))
+  ).size;
   const totalDirectional = rankedSchools.reduce(
     (a, s) => a + s.supports + s.partial_supports + s.partial_refutes + s.refutes,
     0
@@ -45,6 +51,13 @@ export default async function ScoreboardPage() {
     (a, s) => a + s.scored_claims.filter((c) => c.public_result_visible).length,
     0
   );
+  const publicSchoolScoreLinks = rankedSchools.reduce(
+    (a, s) => a + s.scored_claims.filter(
+      (c) => c.public_result_visible && c.school_score_eligible && c.verdict
+    ).length,
+    0
+  );
+  const historicalSchoolScoreLinks = publicSchoolScoreLinks - totalRun;
   const distinctLinkedHypotheses = new Set(
     rankedSchools.flatMap((s) =>
       s.scored_claims
@@ -100,6 +113,11 @@ export default async function ScoreboardPage() {
   const balancedCoverage = coverageRows.filter(
     (r) => r.linkedGap === 0 && r.testedGap === 0
   ).length;
+  const schoolsWithoutAdvanceResults = coverageRows.filter((r) => r.testedCount === 0).length;
+  const directionalGap = coverageRows.reduce(
+    (total, row) => total + Math.max(0, DIRECTIONAL_TARGET_PER_SCHOOL - row.directionalCount),
+    0
+  );
 
   return (
     <div className="mx-auto max-w-content px-8 py-10">
@@ -133,6 +151,7 @@ export default async function ScoreboardPage() {
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Eligible advance results</div>
           <div className="text-[22px] font-semibold">{totalRun}</div>
+          <div className="text-[11px] text-muted">Across {distinctAdvanceStudies} distinct studies</div>
         </div>
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Directional outcomes scored</div>
@@ -147,6 +166,27 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{benchmarkControls.length}</div>
         </div>
       </div>
+
+      <section aria-labelledby="advance-count-explainer" className="mb-8 rounded border border-rule bg-panel px-5 py-4 text-[13.5px] leading-relaxed">
+        <h2 id="advance-count-explainer" className="m-0 text-[15px] font-semibold">
+          Why the advance count is smaller
+        </h2>
+        <p className="mb-0 mt-2 text-muted">
+          Of {publicSchoolScoreLinks} public school claim results that otherwise
+          pass the score gate, {historicalSchoolScoreLinks} lack an exact reciprocal
+          school forecast frozen before the study first ran. They remain
+          browseable as historical evidence; {totalRun} qualify as advance
+          results. This timing rule applies to favourable and unfavourable
+          findings alike.
+        </p>
+        <p className="mb-0 mt-2 text-muted">
+          {schoolsWithoutAdvanceResults} schools currently have no advance
+          result. Reaching {DIRECTIONAL_TARGET_PER_SCHOOL} directional results
+          in each school requires {directionalGap} more scored school claim
+          results. A study linked to several schools can fill several claim
+          slots, so this is not a count of independent studies.
+        </p>
+      </section>
 
       <section aria-labelledby="school-coverage-heading" className="mb-8">
         <h2 id="school-coverage-heading" className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">

@@ -332,8 +332,14 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
         "summary": {
             "claim_links": len(claim_rows),
             "public_claim_links": len(public_rows),
-            "school_scored_public_links": sum(1 for row in public_rows if row.get("school_score_eligible", True)),
-            "unscored_public_links": sum(1 for row in public_rows if not row.get("school_score_eligible", True)),
+            "school_scored_public_links": sum(
+                1 for row in public_rows
+                if row.get("school_score_eligible", True) and row["school_prediction_pre_run"]
+            ),
+            "unscored_public_links": sum(
+                1 for row in public_rows
+                if not row.get("school_score_eligible", True) or not row["school_prediction_pre_run"]
+            ),
             "declared_scoreboard_eligible_public_links": sum(
                 1 for row in public_rows if row["declared_scoreboard_eligible"]
             ),
